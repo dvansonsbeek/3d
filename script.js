@@ -3822,11 +3822,11 @@ folderCam.add(o, 'Earth camera')
   }
   
   let folderO = gui.addFolder('Stars & helper objects')
-  folderO.add(zodiac, 'visible').name('Zodiac@Earth');
-  folderO.add(zodiac2, 'visible').name('Zodiac@HELION-POINT');
+  folderO.add(zodiac, 'visible').name('Zodiac');
+  //folderO.add(zodiac2, 'visible').name('Zodiac@HELION-POINT');
   //folderO.add(zodiac, 'scale.y', 0.1, 200).step(0.1).name('Zodiac size');
   //folderO.add(zodiac, 'renderOrder', 0, 200);
-  folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac@Earth size').onChange(()=>{changeZodiacScale()})
+  folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
   // folderO.add(zodiac.position, 'y', -10, 10).step(0.1).name('Zodiac position');
   
   folderO.add(o, 'Polar line').onFinishChange(()=>{
