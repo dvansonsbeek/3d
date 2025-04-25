@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair Display:wght@400;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open Sans:wght@400;800&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Raleway:200');
+
+main { position: absolute; top: 100px; left: 100px; }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+canvas {
+  display: block;
+}
+
+/*Make dat gui panel unselectable so it doesent get selected during mouse drag*/
+#gui {  
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+a {color: white;
+}
+a:link {
+  text-decoration: none;
+}
+
+#info {
+  font-family: "Playfair Display", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  position: absolute;
+  z-index: 10;
+  width: 98%;
+  bottom: 87%;
+  left: 0;
+  right: 0;
+  margin: auto;
+  text-align: left;
+  color: #f2f5f0;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+#bannerlogo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#img_logo {
+    max-width: 10%;
+    max-height: auto;
+}
+
+#banner {
+  font-family: "Noto Sans", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  position: absolute;
+  z-index: 10;
+  width: 98%;
+  bottom: 92%;
+  left: 0;
+  right: 0;
+  margin: auto;
+  text-align: left;
+  color: #cc8d54;
+  font-size: 1.2em;
+  opacity: 0.7;
+}
+
+#footerlinks {
+  font-family: "Open sans", sans-serif;
+  position: absolute;
+  display: block;
+  width: 100%;
+  font-size: 70%;
+  bottom: 3px;
+  right: 5px;
+  z-index: 1000;
+  color: #f2f5f0;
+  font-size: 0.6em;
+  opacity: 0.4;
+  text-align: right;
+  text-decoration: none;
+  position: fixed;
+} 
+
+#footerright {
+  font-family: "Open sans", sans-serif;
+  position: absolute;
+  display: block;
+  width: 100%;
+  font-size: 70%;
+  bottom: 3px;
+  left: 5px;
+  z-index: 1000;
+  color: #f2f5f0;
+  font-size: 0.6em;
+  opacity: 0.4;
+  text-align: left;
+  text-decoration: none;
+  position: fixed;
+} 
+
+#donationbar {
+  font-family: "Poppins", sans-serif;
+  font-style: bold;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  bottom: 13px;
+  left: 0;
+  right: 85%;
+  text-align: center;
+  color: #f2f5f0;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
