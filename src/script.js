@@ -3307,27 +3307,6 @@ earth.pivotObj.add(zodiac);
 zodiac.position.y = 0; 
 zodiac.visible = false;
 
-//Zodiac2
-const zodiac2 = new THREE.PolarGridHelper( radius = 250, radials = 24, circles = 1, divisions = 64, color1 = 0x000000, color2 = 0x555555 );
-const zCanvas2 = getCircularText("      GEMINI             TAURUS             ARIES             PISCES          AQUARIUS       CAPRICORN     SAGITTARIUS      SCORPIO             LIBRA              VIRGO                LEO               CANCER ", 800, 0, "right", false, true, "Arial", "18pt", 2);
-const zTexture2 = new THREE.CanvasTexture(zCanvas2);
-const zLabelGeometry2 = new THREE.RingGeometry( 235, 250, 32 );
-//const zLabelGeometry = new THREE.PlaneBufferGeometry(500, 500);
-const zLabelMaterial2 = new THREE.MeshBasicMaterial({
-    map: zTexture2,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 1,
-});
-const zLabel2 = new THREE.Mesh(zLabelGeometry2, zLabelMaterial2);
-zodiac2.add(zLabel2);
-zLabel2.rotation.x = -Math.PI/2
-// scene.add( zodiac );
-earthHelionPoint.pivotObj.add(zodiac2);
-zodiac2.position.y = 0; 
-zodiac2.visible = false;
-//Zodiac2
-
 const plane = new THREE.GridHelper(o.starDistance*2, 30, 0x008800, 0x000088);
 earth.pivotObj.add(plane);
 plane.visible = false
@@ -3823,7 +3802,6 @@ folderCam.add(o, 'Earth camera')
   
   let folderO = gui.addFolder('Stars & helper objects')
   folderO.add(zodiac, 'visible').name('Zodiac');
-  //folderO.add(zodiac2, 'visible').name('Zodiac@HELION-POINT');
   //folderO.add(zodiac, 'scale.y', 0.1, 200).step(0.1).name('Zodiac size');
   //folderO.add(zodiac, 'renderOrder', 0, 200);
   folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
@@ -4304,7 +4282,7 @@ function moveModel(pos){
     }
   })
  zodiac.rotation.y = -Math.PI/3 + zodiacRotationSpeed * pos
- zodiac2.rotation.y = -Math.PI/3 + zodiacRotationSpeed * pos
+
 }
 // Math.PI/6 + 
 function onWindowResize() {
