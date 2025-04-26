@@ -3376,7 +3376,7 @@ function createLabel(message) {
   return sprite;  
 }
 
-const bsc5url = 'bsc5-short.json'
+const bsc5url = 'input-stars.json'
 /*
 https://github.com/brettonw/YaleBrightStarCatalog
 Fields in the Short BSC5 file (empty fields are omitted):
@@ -3436,7 +3436,7 @@ constContainer.applyMatrix( earth.rotationAxis.matrixWorld )
 scene.add(constContainer)
 constContainer.visible = false;
 
-const constellationsUrl = 'constellations.json'
+const constellationsUrl = 'input-constellations.json'
 //create a blue LineBasicMaterial
 const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 fetch(constellationsUrl)
