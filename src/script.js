@@ -3022,9 +3022,9 @@ var o = {
   lookAtObj : {},
 }
 
-const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession, earthInclinationPrecession2, earthObliquityPrecession, earthInclinationPrecession1, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
 
-const tracePlanets = [earthWobbleCenter, earthHelionPoint, midEccentricityOrbit, sun, moon, mercurySunBarycenter0, mercury, venusSunBarycenter0, venus, marsSunBarycenter0, mars, jupiterSunBarycenter0, jupiter, saturnSunBarycenter0, saturn, uranusSunBarycenter0, uranus, neptuneSunBarycenter0, neptune]
+const tracePlanets = [earthHelionPoint, midEccentricityOrbit, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
 //*************************************************************
 // LOAD DEFAULT SETTINGS
@@ -3053,17 +3053,17 @@ initXRingGeometry();
 THREE.ImageUtils.crossOrigin = '';
 
 //*************************************************************
-// CREATE AND CONFIGURE PLANETS
+//CREATE AND CONFIGURE PLANETS
 //*************************************************************
 createPlanet(startEarth);
 createPlanet(earthWobbleCenter);
 createPlanet(midEccentricityOrbit);
 createPlanet(helionPointAlternative);
 createPlanet(earth);
-createPlanet(earthPerihelionPrecession1);
-createPlanet(earthPerihelionPrecession2);
+createPlanet(earthPerihelionPrecession);
+createPlanet(earthInclinationPrecession1);
 createPlanet(earthObliquityPrecession);
-createPlanet(earthInclinationPrecession);
+createPlanet(earthInclinationPrecession2);
 createPlanet(earthEclipticPrecession);
 createPlanet(barycenterSun);
 createPlanet(earthHelionPoint);
@@ -3130,13 +3130,13 @@ createPlanet(eros);
 
 startEarth.pivotObj.add(earth.containerObj);
 startEarth.pivotObj.add(helionPointAlternative);
-earth.pivotObj.add(earthInclinationPrecession.containerObj);
-earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
-earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
+earth.pivotObj.add(earthInclinationPrecession1.containerObj);
+earthInclinationPrecession1.pivotObj.add(midEccentricityOrbit.containerObj);
+earthInclinationPrecession1.pivotObj.add(earthEclipticPrecession.containerObj);
 earthEclipticPrecession.pivotObj.add(earthObliquityPrecession.containerObj);
-earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession1.containerObj);
-earthPerihelionPrecession1.pivotObj.add(earthPerihelionPrecession2.containerObj);
-earthPerihelionPrecession2.pivotObj.add(barycenterSun.containerObj);
+earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession.containerObj);
+earthPerihelionPrecession.pivotObj.add(earthInclinationPrecession2.containerObj);
+earthInclinationPrecession2.pivotObj.add(barycenterSun.containerObj);
 
 barycenterSun.pivotObj.add(earthHelionPoint.containerObj);
 barycenterSun.pivotObj.add(mercurySunBarycenter0.containerObj);
