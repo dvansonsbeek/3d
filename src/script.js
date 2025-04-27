@@ -52,6 +52,19 @@ c) 1246 Lenght of solar day was above 86,400 SI seconds because of historic Delt
 8. Orbital Inclination to ICRF correct both historic and current values
 9. Eccentricity correct both historic and current values
 
+Technical: 
+
+It's an interactive 3D visualization where the browser renders a miniature model of the solar system using three.js — a JavaScript library that simplifies working with WebGL. The project typically features:
+- A central sun: A bright, glowing sphere, possibly using a texture and some light emission effects.
+- Orbiting planets: Each planet is a textured sphere with individual rotation (spinning) and revolution (orbiting) animations.
+- Orbit paths: Visualized with faint circles or lines showing the paths of the planets.
+- Lighting: A combination of ambient and point lights to simulate how the sun lights up the planets.
+- Camera controls: Using something like OrbitControls to let the user zoom, pan, and rotate around the system.
+- Scaling: Distances and sizes are usually not to scale because realistic proportions would make some planets almost invisible or too far apart.
+- Extras: You might see moons orbiting planets, rings around Saturn, or even starfield backgrounds to make it more immersive.
+
+At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.
+
 Created with the help of TYCHOSIUM software <https://codepen.io/pholmq/pen/XGPrPd>. The Interactive 3D Solar System Simulation of the Holistic Universe Model is not affiliated with TYCHOSIUM or its authors in any way*/
 
 /*Copyright 2018 Simon Shack, Patrik Holmqvist
