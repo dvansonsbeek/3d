@@ -126,7 +126,7 @@ const defaultSettings =
   "rotationSpeed": 2301.16782401453,
   "tilt": -23.4243449577,
   "tiltb": 0,
-  "orbitRadius": -100.27304333159777,
+  "orbitRadius": -0.27304333159777,
   "orbitCentera": 0,
   "orbitCenterb": 0,
   "orbitCenterc": 0,
@@ -134,7 +134,7 @@ const defaultSettings =
   "orbitTiltb": 0
 },
 {
-  "name": "Earth Inclination Precession",
+  "name": "Earth Inclination Precession1",
   "startPos": 98.5866146146096,
   "speed": 0.0000616095201912024,
   "orbitRadius": 0,
@@ -167,7 +167,7 @@ const defaultSettings =
   "orbitTiltb": 0.58
 },
 {
-  "name": "Earth Perihelion Precession1",
+  "name": "Earth Perihelion Precession",
   "startPos": -194.204722055415,
   "speed": 0.000328584107686413,
   "orbitRadius": 0,
@@ -178,9 +178,9 @@ const defaultSettings =
   "orbitTiltb": 0
 },
 {
-  "name": "Earth Perihelion Precession2",
-  "startPos": 194.204722055415,
-  "speed": -0.000328584107686413,
+  "name": "Earth Inclination Precession2",
+  "startPos": -98.5866146146096,
+  "speed": -0.0000616095201912024,
   "orbitRadius": 0,
   "orbitCentera": -1.404974,
   "orbitCenterb": 0,
@@ -190,9 +190,9 @@ const defaultSettings =
 },
 {
   "name": "Barycenter Sun",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 100.27304333159777,
+  "startPos": -67.2086633299753,
+  "speed": -0.00026697458749521,
+  "orbitRadius": 0.27304333159777,
   "orbitCentera": 0,
   "orbitCenterb": 0,
   "orbitCenterc": 0,
@@ -1053,8 +1053,8 @@ var earth = {
   traceArrIndex : 0,
 };
 
-var earthInclinationPrecession = {
-  name: "Earth Inclination Precession",
+var earthInclinationPrecession1 = {
+  name: "Earth Inclination Precession1",
   size: 0.1,
   color: 0xFEAA0D,
   startPos: 0,
@@ -1122,8 +1122,8 @@ var earthObliquityPrecession = {
   isDeferent: true,
 };
 
-var earthPerihelionPrecession1 = {
-  name: "Earth Perihelion Precession1",
+var earthPerihelionPrecession = {
+  name: "Earth Perihelion Precession",
   size: 0.1,
   color: 0xFEAA0D,
   startPos: 0,
@@ -1145,8 +1145,8 @@ var earthPerihelionPrecession1 = {
   isDeferent: true,
 };
 
-var earthPerihelionPrecession2 = {
-  name: "Earth Perihelion Precession2",
+var earthInclinationPrecession2 = {
+  name: "Earth Inclination Precession2",
   size: 0.1,
   color: 0xFEAA0D,
   startPos: 0,
@@ -1407,7 +1407,7 @@ var moon = {
 
 var mercurySunBarycenter0 = {
    name: "BARYCENTER MERCURY",
-   size: 0.5,
+   size: 0.011,   
    color: 0x333333,
    planetColor: 0x868485,
    startPos: 0,    
@@ -1424,7 +1424,7 @@ var mercurySunBarycenter0 = {
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
-   visible: true,
+   visible: false,
    containerObj:"",
    orbitObj:"",
    planetObj:"",
@@ -1436,7 +1436,7 @@ var mercurySunBarycenter0 = {
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
-   //isDeferent: true,
+   isDeferent: true,
 };
 
 var mercurySunBarycenter = {
@@ -1571,7 +1571,7 @@ var venusSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -1583,7 +1583,7 @@ var venusSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var venusSunBarycenter = {
@@ -1701,7 +1701,7 @@ var venus = {
 
 var marsSunBarycenter0 = {
   name: "BARYCENTER MARS",
-  size: 0.5,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xFF0000,
   startPos: 0,    
@@ -1718,7 +1718,7 @@ var marsSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -1730,7 +1730,7 @@ var marsSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var marsSunBarycenter = {
@@ -1892,7 +1892,7 @@ var deimos = {
 
 var jupiterSunBarycenter0 = {
   name: "BARYCENTER JUPITER",
-  size: 0.5,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xCDC2B2,
   startPos: 0,    
@@ -1909,7 +1909,7 @@ var jupiterSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -1921,7 +1921,7 @@ var jupiterSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var jupiterSunBarycenter = {
@@ -2039,7 +2039,7 @@ var jupiter = {
 
 var saturnSunBarycenter0 = {
   name: "BARYCENTER SATURN",
-  size: 0.5,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xA79662,
   startPos: 0,    
@@ -2056,7 +2056,7 @@ var saturnSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -2068,7 +2068,7 @@ var saturnSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var saturnSunBarycenter = {
@@ -2188,7 +2188,7 @@ var saturn = {
 
 var uranusSunBarycenter0 = {
   name: "BARYCENTER URANUS",
-  size: 0.5,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xD2F9FA,
   startPos: 0,    
@@ -2205,7 +2205,7 @@ var uranusSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -2217,7 +2217,7 @@ var uranusSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var uranusSunBarycenter = {
@@ -2334,7 +2334,7 @@ var uranus = {
 
 var neptuneSunBarycenter0 = {
   name: "BARYCENTER NEPTUNE",
-  size: 0.5,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0x5E93F1,
   startPos: 0,    
@@ -2351,7 +2351,7 @@ var neptuneSunBarycenter0 = {
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
@@ -2363,7 +2363,7 @@ var neptuneSunBarycenter0 = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
 var neptuneSunBarycenter = {
@@ -2481,7 +2481,7 @@ var neptune = {
 
 var plutoSunBarycenter0 = {
   name: "BARYCENTER PLUTO",
-  size: 0.01,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xA79662,
   startPos: 0,    
@@ -2629,7 +2629,7 @@ var pluto = {
 
 var halleysSunBarycenter0 = {
   name: "BARYCENTER HALLEYS",
-  size: 0.01,   
+  size: 0.011,   
   color: 0x333333,
   planetColor: 0xA79662,
   startPos: 0,    
@@ -2777,7 +2777,7 @@ var halleys = {
 
 var erosSunBarycenter0 = {
    name: "BARYCENTER EROS",
-   size: 0.01,   
+   size: 0.011,   
    color: 0x333333,
    planetColor: 0xA79662,
    startPos: 0,    
@@ -3022,9 +3022,9 @@ var o = {
   lookAtObj : {},
 }
 
-const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession, earthInclinationPrecession2, earthObliquityPrecession, earthInclinationPrecession1, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
 
-const tracePlanets = [earthWobbleCenter, earthHelionPoint, midEccentricityOrbit, sun, moon, mercurySunBarycenter0, mercury, venusSunBarycenter0, venus, marsSunBarycenter0, mars, jupiterSunBarycenter0, jupiter, saturnSunBarycenter0, saturn, uranusSunBarycenter0, uranus, neptuneSunBarycenter0, neptune]
+const tracePlanets = [earthHelionPoint, midEccentricityOrbit, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
 //*************************************************************
 // LOAD DEFAULT SETTINGS
@@ -3053,17 +3053,17 @@ initXRingGeometry();
 THREE.ImageUtils.crossOrigin = '';
 
 //*************************************************************
-// CREATE AND CONFIGURE PLANETS
+//CREATE AND CONFIGURE PLANETS
 //*************************************************************
 createPlanet(startEarth);
 createPlanet(earthWobbleCenter);
 createPlanet(midEccentricityOrbit);
 createPlanet(helionPointAlternative);
 createPlanet(earth);
-createPlanet(earthPerihelionPrecession1);
-createPlanet(earthPerihelionPrecession2);
+createPlanet(earthPerihelionPrecession);
+createPlanet(earthInclinationPrecession1);
 createPlanet(earthObliquityPrecession);
-createPlanet(earthInclinationPrecession);
+createPlanet(earthInclinationPrecession2);
 createPlanet(earthEclipticPrecession);
 createPlanet(barycenterSun);
 createPlanet(earthHelionPoint);
@@ -3130,13 +3130,13 @@ createPlanet(eros);
 
 startEarth.pivotObj.add(earth.containerObj);
 startEarth.pivotObj.add(helionPointAlternative);
-earth.pivotObj.add(earthInclinationPrecession.containerObj);
-earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
-earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
+earth.pivotObj.add(earthInclinationPrecession1.containerObj);
+earthInclinationPrecession1.pivotObj.add(midEccentricityOrbit.containerObj);
+earthInclinationPrecession1.pivotObj.add(earthEclipticPrecession.containerObj);
 earthEclipticPrecession.pivotObj.add(earthObliquityPrecession.containerObj);
-earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession1.containerObj);
-earthPerihelionPrecession1.pivotObj.add(earthPerihelionPrecession2.containerObj);
-earthPerihelionPrecession2.pivotObj.add(barycenterSun.containerObj);
+earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession.containerObj);
+earthPerihelionPrecession.pivotObj.add(earthInclinationPrecession2.containerObj);
+earthInclinationPrecession2.pivotObj.add(barycenterSun.containerObj);
 
 barycenterSun.pivotObj.add(earthHelionPoint.containerObj);
 barycenterSun.pivotObj.add(mercurySunBarycenter0.containerObj);
@@ -3257,7 +3257,7 @@ plane.visible = false
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
 
-const skyTexture = new THREE.TextureLoader().load("milkyway.jpg");
+const skyTexture = new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
 
 const skyMaterial = new THREE.MeshBasicMaterial({ 
          map: skyTexture,
@@ -3300,7 +3300,7 @@ function createLabel(message) {
 //*************************************************************
 // ADD THE STARS
 //*************************************************************
-const bsc5url = 'input-stars.json'
+const bsc5url = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input-stars.json'
 /*
 https://github.com/brettonw/YaleBrightStarCatalog
 Fields in the Short BSC5 file (empty fields are omitted):
@@ -3360,7 +3360,7 @@ constContainer.visible = false;
 //*************************************************************
 // ADD THE CONSTELLATIONS
 //*************************************************************
-const constellationsUrl = 'input-constellations.json'
+const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input-constellations.json'
 //create a blue LineBasicMaterial
 const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 fetch(constellationsUrl)
@@ -3525,7 +3525,7 @@ light.shadow.radius = 2;
 //*************************************************************
 // ADD GLOW EFFECT TO SUN
 //*************************************************************
-const sunTexture = new THREE.TextureLoader().load('glow.png'); 
+const sunTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
 
 // Create the Sprite material
 const sunGlowMaterial = new THREE.SpriteMaterial({
@@ -3549,7 +3549,7 @@ sun.pivotObj.add(sunGlow);
 //*************************************************************
 // ADD LENS FLARE EFFECT TO SUN
 //*************************************************************
-const flareTexture = new THREE.TextureLoader().load('lensflare.png'); 
+const flareTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
 // You can use any small round bright texture or generate a quick radial white glow.
 
 function createFlare(color, scale) {
@@ -4075,7 +4075,7 @@ function setTraceMaterial(obj) {
       transparent: true,
       opacity: 0.7,
       alphaTest: 0.5,
-      map: new THREE.TextureLoader().load("disc.png"),
+      map: new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/disc.png"),
     });
   } else {
     scene.remove(obj.traceLine);
