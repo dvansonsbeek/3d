@@ -2908,7 +2908,7 @@ var eros = {
 };
 
 //*************************************************************
-//GLOBAL and GUI SETTINGS
+// GLOBAL and GUI SETTINGS
 //*************************************************************
 var o = {
   'ambientLight' : 2,
@@ -2951,58 +2951,8 @@ var o = {
   'Today' : function() {
               const newPos = sDay * dateToDays(new Intl.DateTimeFormat("sv-SE", {year: "numeric", month: "2-digit", day: "2-digit"}).format(Date.now()))
               o.pos = newPos; controls.reset()
-  },
-  'Save settings' : function() {
-    let subset, fText = "[";
-    planets.forEach(obj => {
-      subset = (({ name, size, startPos, speed, rotationSpeed, 
-                  tilt, tiltb, orbitRadius, orbitCentera, orbitCenterb,
-                  orbitCenterc, orbitTilta, orbitTiltb
-                 }) => ({ name, size, startPos, speed, rotationSpeed, 
-                         tilt, tiltb, orbitRadius, orbitCentera, orbitCenterb,
-                         orbitCenterc, orbitTilta, orbitTiltb
-                        }))(obj);
-      fText +=  "\n" + JSON.stringify(subset, null, 2) + ","
-      // obj.ra = "";
-      // obj.dec = "";
-      // obj.dist = "";      
-    });
-    fText = fText.substring(0, fText.length - 1);
-    fText +="]";
-    const blob = new Blob([fText], {type: "text/plain;charset=utf-8"});
-    const d = new Date().toUTCString(); 
-
-    const fileName = "TS Settings " + d + ".txt"
-    saveAs(blob, fileName);
-  },
-  'Load settings' : function() {
-    let input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = e => { 
-      let file = e.target.files[0]; 
-      var reader = new FileReader();
-      reader.readAsText(file,'UTF-8');
-
-      // here we tell the reader what to do when it's done reading...
-      reader.onload = readerEvent => {
-        let content = readerEvent.target.result; // this is the content!
-        console.log(content)
-        let jsonObj = JSON.parse(content);
-        planets.forEach(obj => {
-          let newVals = jsonObj.find(obj2 => {
-            return obj.name === obj2.name
-          });
-          Object.assign(obj, newVals);
-          updatePlanet(obj)
-          initTrace(obj)
-        });
-        gui.remove()
-        setupGUI()
-      }
-    }
-    input.click();
   }, 
-  pos : 0,
+//  pos : 0,
   'Position' : "", // Dat.GUI var for pos
   'Date' : "",
   'cSphereSize' : 1,
@@ -3039,7 +2989,6 @@ var o = {
   'camZ' : 0,
   'Size' : 1,
   'traceSize' : 1,
-//  traceStartPos : 0,
   traceLength : sYear * 18,
   traceStep : sDay,
   traceCurrPos : 0,
@@ -3060,11 +3009,12 @@ var o = {
   lookAtObj : {},
 }
 
-const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession, earthInclinationPrecession2, earthObliquityPrecession, earthInclinationPrecession1, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
 
-const tracePlanets = [earthHelionPoint, midEccentricityOrbit, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
+const tracePlanets = [earthWobbleCenter, earthHelionPoint, midEccentricityOrbit, sun, moon, mercurySunBarycenter0, mercury, venusSunBarycenter0, venus, marsSunBarycenter0, mars, jupiterSunBarycenter0, jupiter, saturnSunBarycenter0, saturn, uranusSunBarycenter0, uranus, neptuneSunBarycenter0, neptune]
+
 //*************************************************************
-//LOAD DEFAULT SETTINGS
+// LOAD DEFAULT SETTINGS
 //*************************************************************
 let jsonObj = defaultSettings;
 planets.forEach(obj => {
@@ -3077,10 +3027,7 @@ planets.forEach(obj => {
 });
 
 const scene = new THREE.Scene();
-
-//scene.background = new THREE.Color( 0xffffff );
 scene.background = new THREE.Color( o.background );
-
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.shadowMap.enabled = true;
@@ -3092,19 +3039,18 @@ document.body.appendChild(renderer.domElement);
 initXRingGeometry();
 THREE.ImageUtils.crossOrigin = '';
 
-
 //*************************************************************
-//CREATE AND CONFIGURE PLANETS
+// CREATE AND CONFIGURE PLANETS
 //*************************************************************
 createPlanet(startEarth);
 createPlanet(earthWobbleCenter);
 createPlanet(midEccentricityOrbit);
 createPlanet(helionPointAlternative);
 createPlanet(earth);
-createPlanet(earthPerihelionPrecession);
-createPlanet(earthInclinationPrecession1);
+createPlanet(earthPerihelionPrecession1);
+createPlanet(earthPerihelionPrecession2);
 createPlanet(earthObliquityPrecession);
-createPlanet(earthInclinationPrecession2);
+createPlanet(earthInclinationPrecession);
 createPlanet(earthEclipticPrecession);
 createPlanet(barycenterSun);
 createPlanet(earthHelionPoint);
@@ -3171,13 +3117,13 @@ createPlanet(eros);
 
 startEarth.pivotObj.add(earth.containerObj);
 startEarth.pivotObj.add(helionPointAlternative);
-earth.pivotObj.add(earthInclinationPrecession1.containerObj);
-earthInclinationPrecession1.pivotObj.add(midEccentricityOrbit.containerObj);
-earthInclinationPrecession1.pivotObj.add(earthEclipticPrecession.containerObj);
+earth.pivotObj.add(earthInclinationPrecession.containerObj);
+earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
+earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
 earthEclipticPrecession.pivotObj.add(earthObliquityPrecession.containerObj);
-earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession.containerObj);
-earthPerihelionPrecession.pivotObj.add(earthInclinationPrecession2.containerObj);
-earthInclinationPrecession2.pivotObj.add(barycenterSun.containerObj);
+earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession1.containerObj);
+earthPerihelionPrecession1.pivotObj.add(earthPerihelionPrecession2.containerObj);
+earthPerihelionPrecession2.pivotObj.add(barycenterSun.containerObj);
 
 barycenterSun.pivotObj.add(earthHelionPoint.containerObj);
 barycenterSun.pivotObj.add(mercurySunBarycenter0.containerObj);
@@ -3250,33 +3196,17 @@ earth.containerObj.rotation.y = Math.PI/2;
 //END CREATE AND CONFIGURE PLANETS
 
 //*************************************************************
-//CREATE VALUE HOLDERS FOR Right Ascension, Declination and Distance
+// CREATE VALUE HOLDERS FOR Right Ascension, Declination and Distance
 //*************************************************************
-  planets.forEach(obj => {
+planets.forEach(obj => {
     obj.ra = "";
     obj.dec = "";
     obj.dist = "";      
     obj.distKm = "";      
 })
 
-function createEarthPolarLine() {
-  const material = new THREE.LineBasicMaterial({
-    color: 0xffffff
-  });
-  const geometry = new THREE.Geometry();
-  geometry.vertices.push(
-    new THREE.Vector3(0,-100,0),
-    new THREE.Vector3(0,100,0)
-  );
-  const line = new THREE.Line( geometry, material );
-  line.visible = o['Polar line']
-  return line
-}
-const polarLine = createEarthPolarLine();
-//polarLine.rotation.y = -0.25;
-earth.rotationAxis.add(polarLine);
 //*************************************************************
-//CREATTE BARYCENTER, CELESTIAL SPHERE AND ECLIPTIC GRID
+// CREATTE BARYCENTER, CELESTIAL SPHERE AND ECLIPTIC GRID
 //*************************************************************
 const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
 const bMaterial = new THREE.MeshBasicMaterial( { color: 0x333333 } );
@@ -3292,7 +3222,6 @@ const zodiac = new THREE.PolarGridHelper( radius = 250, radials = 24, circles = 
 const zCanvas = getCircularText("      GEMINI             TAURUS             ARIES             PISCES          AQUARIUS       CAPRICORN     SAGITTARIUS      SCORPIO             LIBRA              VIRGO                LEO               CANCER ", 800, 0, "right", false, true, "Arial", "18pt", 2);
 const zTexture = new THREE.CanvasTexture(zCanvas);
 const zLabelGeometry = new THREE.RingGeometry( 235, 250, 32 );
-//const zLabelGeometry = new THREE.PlaneBufferGeometry(500, 500);
 const zLabelMaterial = new THREE.MeshBasicMaterial({
     map: zTexture,
     side: THREE.DoubleSide,
@@ -3302,7 +3231,6 @@ const zLabelMaterial = new THREE.MeshBasicMaterial({
 const zLabel = new THREE.Mesh(zLabelGeometry, zLabelMaterial);
 zodiac.add(zLabel);
 zLabel.rotation.x = -Math.PI/2
-// scene.add( zodiac );
 earth.pivotObj.add(zodiac);
 zodiac.position.y = 0; 
 zodiac.visible = false;
@@ -3312,29 +3240,30 @@ earth.pivotObj.add(plane);
 plane.visible = false
 
 //*************************************************************
-//CREATE MILKYWAY SKYDOME
+// CREATE MILKYWAY SKYDOME
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
 
-const skyTexture = new THREE.TextureLoader().load("milkyway.jpg");
-
+const skyTexture = new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
 
 const skyMaterial = new THREE.MeshBasicMaterial({ 
          map: skyTexture,
  });
- const sky = new THREE.Mesh(skyGeo, skyMaterial);
- sky.material.side = THREE.BackSide;
- scene.add(sky);
+
+const sky = new THREE.Mesh(skyGeo, skyMaterial);
+sky.material.side = THREE.BackSide;
+scene.add(sky);
+
 //*************************************************************
-//CREATE BACKGOUND STARFIELD AND PLOT NAKED EYE VISIBLE STARS
+// CREATE BACKGOUND STARFIELD AND PLOT NAKED EYE VISIBLE STARS
 //*************************************************************
-// createStarfield()
+
+createStarfield()
 scene.updateMatrixWorld() 
 const starsContainer = new THREE.Object3D();
 starsContainer.applyMatrix( earth.rotationAxis.matrixWorld )
 scene.add(starsContainer)
 starsContainer.visible = false
-// scene.updateMatrixWorld()
 
 function createLabel(message) {
   const fontSize = 30;
@@ -3355,7 +3284,10 @@ function createLabel(message) {
   return sprite;  
 }
 
-const bsc5url = 'input-stars.json'
+//*************************************************************
+// ADD THE STARS
+//*************************************************************
+const bsc5url = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input-stars.json'
 /*
 https://github.com/brettonw/YaleBrightStarCatalog
 Fields in the Short BSC5 file (empty fields are omitted):
@@ -3371,9 +3303,7 @@ K	An approximate color temperature of the star, computed from B-V or the Spectra
 V	Visual magnitude
 */
 fetch(bsc5url)
-  .then(response => {
-  return response.json();
-})
+  .then(response => response.json())
   .then(bscStars => {
 
   bscStars.forEach(obj => {
@@ -3408,14 +3338,16 @@ fetch(bsc5url)
   });
 });
 
-
 const constContainer = new THREE.Object3D();
 scene.updateMatrixWorld()
 constContainer.applyMatrix( earth.rotationAxis.matrixWorld )
 scene.add(constContainer)
 constContainer.visible = false;
 
-const constellationsUrl = 'input-constellations.json'
+//*************************************************************
+// ADD THE CONSTELLATIONS
+//*************************************************************
+const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input-constellations.json'
 //create a blue LineBasicMaterial
 const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 fetch(constellationsUrl)
@@ -3457,10 +3389,8 @@ fetch(constellationsUrl)
     }
   });
 
-
-
 //*************************************************************
-//SETUP CAMERAS and CONTROLS
+// SETUP CAMERAS and CONTROLS
 //*************************************************************
 const camera = new THREE.PerspectiveCamera(15, window.innerWidth/window.innerHeight, 0.1, 10000000);
 //earth.pivotObj.add(camera);
@@ -3469,7 +3399,9 @@ camera.position.set(0, 2500, 0);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableKeys = false
 
-//EARTH CAMERA
+//*************************************************************
+// SETUP EXPERIMENTAL EARTH CAMERAS and CONTROLS
+//*************************************************************
 const camPivotX = new THREE.Object3D();
 const camPivotY = new THREE.Object3D();
 
@@ -3479,70 +3411,46 @@ camPivotY.add(camPivotX);
 const cameraMount = new THREE.Object3D();
 camPivotX.add(cameraMount);
 
+const planetCamera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.001, 10000000);
 
-//const planetCamera = new THREE.PerspectiveCamera( 1000, 1600/800, 0.0001, 2000 );
-const planetCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.001, 10000000);
-
-// const left = -1;
-// const right = 1;
-// const top2 = 1;
-// const bottom = -1;
-// const near = 5;
-// const far = 50;
-//const planetCamera = new THREE.OrthographicCamera(-100, 100, 100, -100, 0.000001, 10000000);
-//planetCamera.zoom = 0.2;
+//const planetCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.001, 10000000);
 
 let SCREEN_WIDTH = window.innerWidth;
 let SCREEN_HEIGHT = window.innerHeight;
 let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 const frustumSize = 10;
-		// cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
-
-// const planetCamera = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 2000 );
-
 
 cameraMount.add(planetCamera)
 
-//Add the fake planet mansPath so we can trace "A mans yearly path"
-// cameraMount.add(mansPath.containerObj)
-
-
-cameraMount.position.z = -earth.size - 0.002
+cameraMount.position.z = -(earth.size + 0.02);
 
 const cameraHelper = new THREE.CameraHelper( planetCamera );
 scene.add( cameraHelper );
 const axisHelper = new THREE.AxesHelper(10)
 planetCamera.add(axisHelper)
-planetCamera.rotateX(-1)
+//planetCamera.rotateX(-1)
+planetCamera.rotation.set(Math.PI / 2, 0, 0); 
 
 function updatePlanetCamera() {
      planetCamera.updateProjectionMatrix()
      cameraHelper.update()
 }
 
-// o['Camera helper'] = true
-
-
 function trackSun() {
     camPivotX.rotation.x = o['Camera Lat'] + Math.PI/2
     camPivotY.rotation.y = o['Camera Long'] + Math.PI/2
-
 }
 
-
 window.addEventListener('keydown', function(event) {
-  //event.preventDefault();
   let rotSpeed = 0.1;
   switch (event.key) {
     case "ArrowLeft" :
     case "a" :
-      //planetCamera.rotateY( -rotSpeed );
       cameraMount.rotateZ( -rotSpeed );
       break;
     case "ArrowRight" :
     case "d" :
-      //planetCamera.rotateY( -rotSpeed );
       cameraMount.rotateZ( rotSpeed );
       break;
     case "ArrowUp" :
@@ -3553,27 +3461,17 @@ window.addEventListener('keydown', function(event) {
     case "s" :
       planetCamera.rotateX( -rotSpeed );
       break;
-    // case "q" :
-    //   planetCamera.rotateZ( rotSpeed );
-    //   break;
-    // case "e" :
-    //   planetCamera.rotateZ( -rotSpeed );
-    //  break;
   }
 });
-
-
 
 function showHideCameraHelper () {
   axisHelper.visible = o['Camera helper']
   cameraHelper.visible = o['Camera helper']
 }
 
-
 //*************************************************************
-//SETUP LIGHT
+// SETUP LIGHT
 //*************************************************************
-
 const ambientLight = new THREE.AmbientLight( 0x404040, o.ambientLight ); // soft white light
 // const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
 scene.add(ambientLight);
@@ -3586,49 +3484,23 @@ sun.pivotObj.add( light );
 const lightMount = new THREE.Object3D();
 sun.pivotObj.add( lightMount );
 
-const lightOnSun = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun );
-lightOnSun.position.y = 15
-lightOnSun.angle = 0.5
-lightOnSun.distance = 15
-lightOnSun.target = lightMount
-// const helper = new THREE.SpotLightHelper(lightOnSun);
-// scene.add(helper);
+const spotlightDirections = [
+  new THREE.Vector3( 1, 0, 0),
+  new THREE.Vector3(-1, 0, 0),
+  new THREE.Vector3(0,  1, 0),
+  new THREE.Vector3(0, -1, 0),
+  new THREE.Vector3(0, 0,  1),
+  new THREE.Vector3(0, 0, -1),
+];
 
-const lightOnSun2 = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun2 );
-lightOnSun2.position.y = -15
-lightOnSun2.angle = 0.5
-lightOnSun2.distance = 15
-lightOnSun2.target = lightMount
-
-const lightOnSun3 = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun3 );
-lightOnSun3.position.z = 15
-lightOnSun3.angle = 0.5
-lightOnSun3.distance = 15
-lightOnSun3.target = lightMount
-
-const lightOnSun4 = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun4 );
-lightOnSun4.position.z = -15
-lightOnSun4.angle = 0.5
-lightOnSun4.distance = 15
-lightOnSun4.target = lightMount
-
-const lightOnSun5 = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun5 );
-lightOnSun5.position.x = 16
-lightOnSun5.angle = 0.5
-lightOnSun5.distance = 15
-lightOnSun5.target = lightMount
-
-const lightOnSun6 = new THREE.SpotLight(0xffffff, 10);
-lightMount.add( lightOnSun6 );
-lightOnSun6.position.x = -15
-lightOnSun6.angle = 0.5
-lightOnSun6.distance = 15
-lightOnSun6.target = lightMount
+spotlightDirections.forEach(direction => {
+  const spotlight = new THREE.SpotLight(0xffffff, 10);
+  lightMount.add(spotlight);
+  spotlight.position.copy(direction.clone().multiplyScalar(15));
+  spotlight.angle = 0.5;
+  spotlight.distance = 15;
+  spotlight.target = lightMount; // Optional: maybe skip this
+});
 
 moon.planetObj.castShadow = true;
 earth.planetObj.receiveShadow = true;
@@ -3636,31 +3508,116 @@ light.shadow.camera.far = 50000
 light.shadow.mapSize.width = 2560;  // 2560 4096 512 default 
 light.shadow.mapSize.height = 2560; // 512 default
 light.shadow.radius = 2;
-// const axesHelper = new THREE.AxesHelper( 20 );
-// scene.add(axesHelper);
 
 //*************************************************************
-//CREATE SETTINGGS AND SETUP GUI
+// ADD GLOW EFFECT TO SUN
+//*************************************************************
+const sunTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
+
+// Create the Sprite material
+const sunGlowMaterial = new THREE.SpriteMaterial({
+  map: sunTexture || null, // if no texture, just use color
+  color: 0xffffaa, // soft yellowish white
+  blending: THREE.AdditiveBlending,
+  transparent: true,
+  opacity: 0.05, // soft glow
+  depthWrite: false, // important! otherwise sun glow could hide other objects
+});
+
+// Create the Sprite
+const sunGlow = new THREE.Sprite(sunGlowMaterial);
+
+// Set position and size
+sunGlow.scale.set(500, 500, 10); // Size of glow in world units, adjust as needed
+
+// Attach to Sun pivot
+sun.pivotObj.add(sunGlow);
+
+//*************************************************************
+// ADD LENS FLARE EFFECT TO SUN
+//*************************************************************
+const flareTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
+// You can use any small round bright texture or generate a quick radial white glow.
+
+function createFlare(color, scale) {
+  const material = new THREE.SpriteMaterial({
+    map: flareTexture || null,
+    color: color,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+    opacity: 0.5,
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(scale, scale, 1);
+  scene.add(sprite);
+  return sprite;
+}
+
+// Create multiple flare elements
+const flares = [
+  createFlare(0xffffff, 30),   // Bright center flare
+  createFlare(0xffcc88, 15),   // Warm flare
+  createFlare(0x88aaff, 20),   // Cool flare
+  createFlare(0xff8888, 8),    // Small red flare
+  createFlare(0x88ff88, 12),   // Small greenish flare
+];
+
+// The flares need to be added to the position of the Sun
+function updateFlares() {
+  const sunWorldPos = new THREE.Vector3();
+  sunGlow.getWorldPosition(sunWorldPos);
+
+  const cameraWorldPos = new THREE.Vector3();
+  camera.getWorldPosition(cameraWorldPos);
+
+  const cameraDir = new THREE.Vector3();
+  camera.getWorldDirection(cameraDir);
+
+  const toSun = new THREE.Vector3().subVectors(sunWorldPos, cameraWorldPos).normalize();
+
+  const dot = cameraDir.dot(toSun);
+
+  if (dot > 0.5) { // Sun is roughly in front
+    const sunScreenPosition = sunWorldPos.clone().project(camera);
+
+    const flareLineDir = new THREE.Vector3().subVectors(cameraWorldPos, sunWorldPos).normalize();
+
+    flares.forEach((flare, index) => {
+      const factor = (index - 0.5) * (index - 2) * 15;  // Spread out spacing (tweak this value)
+
+      // Position along the line starting from the Sun
+      const flarePos = new THREE.Vector3().copy(sunWorldPos)
+        .add(flareLineDir.clone().multiplyScalar(factor));
+
+      flare.position.copy(flarePos);
+      flare.visible = true;
+      flare.material.opacity = 1.0 - Math.abs(index - 1) * 0.3; // Center flare brightest
+    });
+
+  } else {
+    flares.forEach(flare => {
+      flare.visible = false;
+    });
+  }
+}
+
+//*************************************************************
+// CREATE SETTINGS AND SETUP GUI
 //*************************************************************
 setupGUI()
 function setupGUI() {
-  // console.log(gui)
-  // if (gui) {
-  //     gui.destroy(); 
-  // } else {
-  // }
-  //var gui = new dat.GUI( { autoPlace: false } );
-  var gui = new dat.GUI();
+  const gui = new dat.GUI();
   gui.domElement.id = 'gui';
   gui.add(o, 'Date').listen().onFinishChange(() => {
     if (isValidDate(o.Date)) {
-      o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
+      updatePosition();
     }
   });
   
   gui.add(o, 'Time').name('Time (UTC)').listen().onFinishChange(function() {
     if (isValidTime(o.Time)) {
-      o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
+      updatePosition();
     } 
   });
   
@@ -3670,7 +3627,7 @@ function setupGUI() {
       o.pos = sDay * o.Day + timeToPos(o.Time);
     }
   });
-
+  
   let ctrlFolder = gui.addFolder('Controls')
   ctrlFolder.add(o, 'Run').listen();
   ctrlFolder.add(o, 'traceBtn').name('Trace').onFinishChange(()=>{
@@ -3678,29 +3635,22 @@ function setupGUI() {
       initTrace(obj);
     });
   });
-  
-  //  tracePlanets.forEach(obj => {
-  //   folderT.add(obj, 'traceOn').name(obj.name).onFinishChange(()=>{initTrace(obj)})
-  // });
-  
+    
   ctrlFolder.add(o, '1 second equals', 
-                 { '1 second': sSecond, 
-                  '1 minute': sMinute, 
-                  '1 hour': sHour, 
-                  '1 day': sDay, 
-                  '1 week': sWeek, 
-                  '1 month': sMonth,  
-                  '1 year': sYear, 
-                  '10 years': sYear*10,
-                  '100 years': sYear*100,
-                  '1000 years': sYear*1000,
+                 {  '1 second': sSecond, 
+                    '1 minute': sMinute, 
+                    '1 hour': sHour, 
+                    '1 day': sDay, 
+                    '1 week': sWeek, 
+                    '1 month': sMonth,  
+                    '1 year': sYear, 
+                    '10 years': sYear*10,
+                    '100 years': sYear*100,
+                    '1000 years': sYear*1000,
                  }).onFinishChange(function() {
     o.speedFact = Number(o['1 second equals']);
   });
   ctrlFolder.add(o, 'speed', -5, 5).step(0.5).name('Speed multiplier');
-  // ctrlFolder.add(o, 'reverse').name('Reverse direction').onFinishChange(() => {
-  //   if (o.reverse) {o.speed = -1} else {o.speed = 1}
-  // });
   ctrlFolder.add(o, 'Step forward' );
   ctrlFolder.add(o, 'Step backward' );
   ctrlFolder.add(o, 'Reset' );
@@ -3713,46 +3663,15 @@ function setupGUI() {
   });
 
   ctrlFolder.add(o, 'Target', {'Please select': "", ...planList}).name('Look at').onFinishChange(()=>{
-    // console.log(o.Target)
     o.lookAtObj = planets.find(obj => {
       return obj.name === o.Target
     })
     if (o.Target === "") {o.lookAtObj = {}}    
   });
   
-  ctrlFolder.open()
-
-  let folderCamera = gui.addFolder('Camera')  
-  // folderCamera.add(o, 'worldCamX').name('X').listen().onFinishChange(function() {
-  //   if (isNumeric(o.worldCamX)) { camera.position.x = o.worldCamX }
-  // });
-  // folderCamera.add(o, 'worldCamY').name('Y').listen().onFinishChange(function() {
-  //   if (isNumeric(o.worldCamY)) { camera.position.y = o.worldCamY }
-  // });
-  // folderCamera.add(o, 'worldCamZ').name('Z').listen().onFinishChange(function() {
-  //   if (isNumeric(o.worldCamZ)) { camera.position.z = o.worldCamZ }
-  // });
-
-  folderCamera.add(o, 'worldCamRa').name('RA').listen()
-  folderCamera.add(o, 'worldCamDec').name('Dec').listen()
-  // folderCamera.add(o, 'worldCamDistKm').name('Kilometers').listen()
-  folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
-
+  ctrlFolder.open() 
   
-let folderCam = folderCamera.addFolder('Earth cam (experimental) Move w arrows')
-folderCam.add(o, 'Earth camera')
-  //folderCam.add(planetCamera, 'fov', 1, 180).onChange(updatePlanetCamera);
-  o['Camera Lat'] = 0.01
-  o['Camera Long'] = 0.01
-  folderCam.add(o, 'Camera Lat', 0.00, Math.PI).listen()
-  folderCam.add(o, 'Camera Long', 0.00, Math.PI*2).listen()
-  o['Camera Lat'] = 0.67
-  o['Camera Long'] = 0
-  folderCam.add(o, 'Camera helper').onFinishChange(() => {
-    showHideCameraHelper()
-  });  
-  
-  let folderT = gui.addFolder('Trace')
+  let folderT = gui.addFolder('Trace Settings')
   folderT.add(o, 'traceSize', 0.1, 2).name('Dot size').onChange(()=>{changeTraceScale()})
 
   folderT.add(o, 'Lines').onFinishChange(()=>{
@@ -3764,10 +3683,8 @@ folderCam.add(o, 'Earth camera')
   tracePlanets.forEach(obj => {
     folderT.add(obj, 'traceOn').name(obj.name).onFinishChange(()=>{initTrace(obj)})
   });
-  // folderT.open();
-
   
-  let posFolder = gui.addFolder('Positions')
+  let posFolder = gui.addFolder('Celestial Positions')
   let posPlFolder
   tracePlanets.forEach(obj => {
     posPlFolder = posFolder.addFolder(obj.name)
@@ -3777,60 +3694,26 @@ folderCam.add(o, 'Earth camera')
     posPlFolder.add(obj, 'dist').listen().name('AU Distance')
     posPlFolder.open()
   })
-
-  
-  
-
-  let folderElongations=gui.addFolder("Elongations");
-  folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
-  folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
-  folderElongations.add(o,"venusElongation").min(0.0).max(180.0).listen().name("Venus")
-  folderElongations.add(o,"marsElongation").min(0.0).max(180.0).listen().name("Mars")
-  folderElongations.add(o,"jupiterElongation").min(0.0).max(180.0).listen().name("Jupiter")
-  folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
-  folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
-  folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
-  
-  function changeSphereScale() {
-      celestialSphere.scale.set(o.cSphereSize, o.cSphereSize, o.cSphereSize);
-    
-  }
-  function changeZodiacScale() {
-      zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);
-    
-  }
   
   let folderO = gui.addFolder('Stars & helper objects')
   folderO.add(zodiac, 'visible').name('Zodiac');
-  //folderO.add(zodiac, 'scale.y', 0.1, 200).step(0.1).name('Zodiac size');
-  //folderO.add(zodiac, 'renderOrder', 0, 200);
   folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
-  // folderO.add(zodiac.position, 'y', -10, 10).step(0.1).name('Zodiac position');
-  
   folderO.add(o, 'Polar line').onFinishChange(()=>{
     polarLine.visible = o['Polar line']
   });
   folderO.add(o, 'polarLineLength', 0.1, 50).name('Line length').onChange(()=>{
-      // polarLine.scale.x = o.polarLineLength
       polarLine.scale.y = o.polarLineLength
   });
-
   
-  // folderO.add(o, 'Axis helpers' ).onFinishChange(()=>{
-  //     showHideAxisHelpers();
-  //   });
-  
-  folderO.add(starsContainer, 'visible' ).name('Stars');
+  folderO.add(starsContainer, 'visible' ).name('Stars visible');
   folderO.add(o, 'starNamesVisible').name('Star names').onChange(()=>{
     starsContainer.children.forEach(
       function(starPos) {
         const nameTag = starPos.children[1];
         nameTag.visible = o.starNamesVisible;
       });
-    
   });
-  folderO.add(constContainer, 'visible').name('Constellations')
-  
+  folderO.add(constContainer, 'visible').name('Constellations') 
   folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(()=>{
     starsContainer.children.forEach(
       function(starPos) {
@@ -3842,7 +3725,6 @@ folderCam.add(o, 'Earth camera')
     celestialSphere.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
     plane.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
     constContainer.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-
   });
   
   folderO.add(o, 'starSize', 0.1, 5).step(0.1).name('Star sizes').onChange(()=>{
@@ -3854,45 +3736,11 @@ folderCam.add(o, 'Earth camera')
         star.scale.z = o.starSize
       });
   });
- 
-
-        // const star = starPos.children[0];
-//     const nametag = star.children[0];
-//     const scale = scaleVec.subVectors(star.getWorldPosition(starPosVec), camera.position).length() / scaleFactor;
-//     nametag.scale.set(scale, scale, 1);
-//   });})
-  
-//   folderO.add(o, 'Stars' ).onFinishChange(()=>{
-//     showHideStars();
-//   });
-  
-//   folderO.add(o, 'Star distance', 0.1, 20).onChange(() => {
-//     setStarDistance();
-//   });
  folderO.add(celestialSphere, 'visible').name('Celestial sphere')
  folderO.add(plane, 'visible').name('Ecliptic grid')
-
-  // folderO.add(o, 'cSphereSize', 0.1, 50).step(0.1).name('Sphere size').onChange(()=>{changeSphereScale()})
-  // folderO.add(barycenter, 'visible').name('Barycenter')
   
-  // folderO.add(o, infotext ).onFinishChange(()=>{
-  //   showHideInfoText();
-  // });
-  // folderO.add(o, 'Performance').onFinishChange(() => {
-  //   if (o.Performance) {stats.dom.style.visibility = 'visible'} 
-  //   else {stats.dom.style.visibility = 'hidden'}
-  // });
-
-  function changePlanetScale(){
-    planets.forEach(obj => {
-      obj.planetObj.scale.x = o.Size
-      obj.planetObj.scale.y = o.Size
-      obj.planetObj.scale.z = o.Size
-    });  
-  }
-  
-  let folderPlanets = gui.addFolder('Planets');
-  // folderPlanets.open();
+  let sFolder = gui.addFolder('Settings')
+  let folderPlanets = sFolder.addFolder('Planets show/hide');
   folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
     showHideOrbits();
   });
@@ -3905,25 +3753,7 @@ folderCam.add(o, 'Earth camera')
       });
     }
   })
-  function changeTraceScale(){
-    tracePlanets.forEach(obj => {
-      if (obj.traceLine) {
-        obj.traceLine.material.size = obj.size*10 * o.traceSize
-      }
-    });  
-  }
-  
-  let sFolder = gui.addFolder('Settings')
-  const lightFolder = sFolder.addFolder("Light and color")
-  //lightFolder.open();
-  lightFolder.add(o, 'ambientLight', 0.1, 4).name('Amb. light').onChange(()=>{
-    ambientLight.intensity = o.ambientLight})
-  lightFolder.add(o, 'sunLight', 0.1, 4).name('Sunlight').onChange(()=>{
-    light.intensity = o.sunLight})
-  lightFolder.addColor(o, 'background').onChange(()=> {
-    scene.background = new THREE.Color(o.background)})
-
-  lightFolder.add(o, 'Shadows' )
+ 
   let folderDef = sFolder.addFolder('Objects show/hide');
   planets.forEach(obj => {
     if (obj.isDeferent) {
@@ -3933,67 +3763,60 @@ folderCam.add(o, 'Earth camera')
     }
   })
 
-  sFolder.add(o, 'Save settings' )
-  sFolder.add(o, 'Load settings' )
+  let folderElongations=sFolder.addFolder("Elongations show/hide");
+  folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
+  folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
+  folderElongations.add(o,"venusElongation").min(0.0).max(180.0).listen().name("Venus")
+  folderElongations.add(o,"marsElongation").min(0.0).max(180.0).listen().name("Mars")
+  folderElongations.add(o,"jupiterElongation").min(0.0).max(180.0).listen().name("Jupiter")
+  folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
+  folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
+  folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
 
+  // folderO.add(o, 'Axis helpers' ).onFinishChange(()=>{
+  //     showHideAxisHelpers();
+  // });
+  
+  let folderCamera = sFolder.addFolder('Camera show/hide')  
 
-
-  let oFolder 
-  planets.forEach(obj => {
-    oFolder = sFolder.addFolder(obj.name)
-    addSetting(obj, 'startPos', 'Start Position', oFolder)
-    addSetting(obj, 'speed', 'Speed', oFolder)
-    addSetting(obj, 'orbitCentera', 'Orbit center A', oFolder)
-    addSetting(obj, 'orbitCenterb', 'Orbit center B', oFolder)
-    addSetting(obj, 'orbitCenterc', 'Orbit center C', oFolder)
-    addSetting(obj, 'orbitTilta', 'Orbit tilt A', oFolder)
-    addSetting(obj, 'orbitTiltb', 'Orbit tilt B', oFolder)
-    if (obj.settingsVisible) {
-      oFolder.open()
-    }
-  })
-
-  function addSetting(obj, attrib, name, folder) {
-    obj[name] = obj[attrib].toString()
-    folder.add(obj, name).listen().onFinishChange(()=>{
-      if (isNumeric(obj[name])) {
-        obj[attrib] = Number(obj[name])
-        obj[name] = obj[attrib].toString()
-        updatePlanet(obj)
-        initTrace(obj)
-      } else {
-        obj[name] = obj[attrib].toString()
-      }
-    })
-  }
-
+  folderCamera.add(o, 'worldCamRa').name('RA').listen()
+  folderCamera.add(o, 'worldCamDec').name('Dec').listen()
+  folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
+  
+  let folderCam = sFolder.addFolder('Earth Camera show/hide')
+  folderCam.add(o, 'Earth camera')
+  o['Camera Lat'] = 0.67
+  o['Camera Long'] = 0.01
+  folderCam.add(o, 'Camera Lat', 0.00, Math.PI).listen()
+  folderCam.add(o, 'Camera Long', 0.00, Math.PI*2).listen()
+  folderCam.add(o, 'Camera helper').onFinishChange(() => {
+    showHideCameraHelper()
+  }); 
 }  
-
-
+//*************************************************************
+// STATISTICS (WHEN NEEDED)
+//*************************************************************
 const stats = new Stats()
 document.body.appendChild( stats.dom )
 if (!o.Perfomance) stats.dom.style.visibility = 'hidden';
 //if (!o.Perfomance) stats.dom.style.visibility = 'visible';
-
 // stats.dom.container.style.visibility = 'hidden';
+
+//*************************************************************
+// START SCENE
+//*************************************************************
 const clock = new THREE.Clock(); 
 
 window.addEventListener('resize', onWindowResize, false);
 onWindowResize();
 
-
-// window.addEventListener('resize', onWindowResize, false);
-// onWindowResize();
-
 // var orbit;
 var pause = true;
-
 
 planets.forEach(obj => {
   showHideObject(obj)
 });
 showHideAxisHelpers();
-// showHideStars();
 showHideCameraHelper();
 showHideInfoText();
 
@@ -4004,83 +3827,137 @@ renderer.render(scene, camera);//renderer needs to be called otherwise the posit
 const centerPosVec = new THREE.Vector3();
 const starPosVec  = new THREE.Vector3();
 const scaleVec = new THREE.Vector3();
+
 //*************************************************************
 //THE RENDER LOOP
 //*************************************************************
 function render() {
   requestAnimationFrame(render);
   stats.update();
-//   if (o.Target !== "") {
-  
-//   camera.copy(fakeCamera)
 
-  if (Object.keys(o.lookAtObj).length !== 0) {
-    //controls.target = earth.planetObj.getWorldPosition(new THREE.Vector3())
-    
-    controls.target = o.lookAtObj.pivotObj.getWorldPosition(centerPosVec)
-    // controls.target = o.lookAtObj.planetObj.getWorldPosition(new THREE.Vector3())
+  if (o.lookAtObj && o.lookAtObj.pivotObj) {
+    controls.target.copy(o.lookAtObj.pivotObj.getWorldPosition(centerPosVec));
     controls.update();
-  } 
+  }
+
   let delta = clock.getDelta();
-  tlapsed += delta
+  tlapsed += delta;
+
   if (tlapsed > 0.05) {
-    tlapsed = 0;
-    o['Position'] = o.pos
+    tlapsed -= 0.05;
+
+    o.Position = o.pos;
     o.Day = posToDays(o.pos);
     o.julianDay = o.Day + 2451717;
-    o.Date = daysToDate(o.Day)
-    o.Time = posToTime(o.pos)
-    o.worldCamX = Math.round(camera.position.x)
-    o.worldCamY = Math.round(camera.position.y)
-    o.worldCamZ = Math.round(camera.position.z)
-    renderer.shadowMap.enabled = o['Shadows'];
+    o.Date = daysToDate(o.Day);
+    o.Time = posToTime(o.pos);
 
+    o.worldCamX = Math.round(camera.position.x);
+    o.worldCamY = Math.round(camera.position.y);
+    o.worldCamZ = Math.round(camera.position.z);
 
+    if (renderer.shadowMap.enabled !== o.Shadows) {
+      renderer.shadowMap.enabled = o.Shadows;
+    }
   }
+
   if (o.Run) {
     o.pos += Number(o.speedFact) * o.speed * delta;
   }
-  //tracePlanet(mars, o.pos);  
-  // lineTrace(o.pos);
+
   trace(o.pos);
   moveModel(o.pos);
   updateElongations();
   updatePositions();
   trackSun();
-  if (o['Earth camera']) {
-    renderer.render(scene, planetCamera);
 
-  } else {
-    renderer.render(scene, camera);
+  const activeCamera = o['Earth camera'] ? planetCamera : camera;
+  renderer.render(scene, activeCamera);
+  updateFlares();
 
-  }
-  
+  const sunDistance = camera.position.distanceTo(sunGlow.getWorldPosition(new THREE.Vector3()));
+  const glowSize = sunDistance / 2; // tweak factor as needed
+  sunGlow.scale.set(glowSize, glowSize, 10);
   
   starsContainer.children.forEach(function(starPos) {
+  const scaleFactor = 25;
+  const fadeStart = 7500;  // Distance where fading starts
+  const fadeEnd = 30000;   // Distance where labels become fully transparent
 
-    const scaleFactor = 30;
-    const star = starPos.children[0];
-    const nametag = starPos.children[1];
-    // const scale = scaleVec.subVectors(nametag.getWorldPosition(starPosVec), camera.position).length() / scaleFactor;
-    const scale = scaleVec.subVectors(star.getWorldPosition(starPosVec), camera.position).length() / scaleFactor;
-    nametag.scale.set(scale, scale, 1);
-    // NO EFFECT
-    // nametag.position.copy(star.position) 
+  const star = starPos.children[0];
+  const nametag = starPos.children[1];
 
-  });
-  
-  
+  const distance = scaleVec.subVectors(star.getWorldPosition(starPosVec), camera.position).length();
 
-  
+  // Scale the nametag
+  const scale = distance / scaleFactor;
+  nametag.scale.set(scale, scale, 1);
+
+  // Fade out nametag based on distance
+  let opacity = 1.0;
+  if (distance > fadeStart) {
+    opacity = 1.0 - (distance - fadeStart) / (fadeEnd - fadeStart);
+    opacity = Math.max(0, Math.min(1, opacity)); // Clamp between 0 and 1
+  }
+
+  if (nametag.material) {
+    nametag.material.transparent = true;
+    nametag.material.opacity = opacity;
+  }
+});
 }
 render();
 //*************************************************************
-//END RENDER LOOP
+// END RENDER LOOP
 //*************************************************************
 
+function createEarthPolarLine() {
+  const material = new THREE.LineBasicMaterial({
+    color: 0xffffff
+  });
+  const geometry = new THREE.Geometry();
+  geometry.vertices.push(
+    new THREE.Vector3(0,-100,0),
+    new THREE.Vector3(0,100,0)
+  );
+  const line = new THREE.Line( geometry, material );
+  line.visible = o['Polar line']
+  return line
+}
+const polarLine = createEarthPolarLine();
+
+earth.rotationAxis.add(polarLine);
+
+function changeSphereScale() {
+      celestialSphere.scale.set(o.cSphereSize, o.cSphereSize, o.cSphereSize);    
+  }
+  
+function changeZodiacScale() {
+      zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);  
+  }
+
+function updatePosition() {
+  o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
+}
+
+function changeTraceScale(){
+    tracePlanets.forEach(obj => {
+      if (obj.traceLine) {
+        obj.traceLine.material.size = obj.size*10 * o.traceSize
+      }
+    });  
+  }
+
+function changePlanetScale(){
+    planets.forEach(obj => {
+      obj.planetObj.scale.x = o.Size
+      obj.planetObj.scale.y = o.Size
+      obj.planetObj.scale.z = o.Size
+    });  
+  }
+  
 function updatePositions() {
   scene.updateMatrixWorld() //No effect(?)
-
 
   const csPos = new THREE.Vector3();
   celestialSphere.getWorldPosition(csPos);
@@ -4097,16 +3974,10 @@ function updatePositions() {
     sphericalPos.setFromVector3(lookAtDir)
     obj.ra = radToRa(sphericalPos.theta)
     obj.dec = radToDec(sphericalPos.phi)
-    
-//      if (obj.name === "Moon") {
-//      obj.distKm = (sphericalPos.radius/100 * 149597870.698828/39.2078).toFixed(2)
-//      obj.dist = (sphericalPos.radius/100/39.2078).toFixed(8)
-//    } else 
-    {
-      obj.distKm = (sphericalPos.radius/100 * 149597870.698828).toFixed(2)
-      obj.dist = (sphericalPos.radius/100).toFixed(8)
-    }
+    obj.distKm = (sphericalPos.radius/100 * 149597870.698828).toFixed(2)
+    obj.dist = (sphericalPos.radius/100).toFixed(8)
   });
+  
   //Get camera pos
   const cameraPos = new THREE.Vector3();
   const lookAtDir = new THREE.Vector3(0,0,1);
@@ -4117,13 +3988,8 @@ function updatePositions() {
   sphericalPos.setFromVector3(lookAtDir);
   o.worldCamRa = radToRa(sphericalPos.theta);
   o.worldCamDec = radToDec(sphericalPos.phi);
-  //o.worldCamDistKm = (sphericalPos.radius/100 * 149597870.698828/39.2078).toFixed(2);
   o.worldCamDistKm = (sphericalPos.radius/100 * 149597870.698828).toFixed(2);
-  o.worldCamDist = (sphericalPos.radius/100).toFixed(8);
-  
-
-
-  
+  o.worldCamDist = (sphericalPos.radius/100).toFixed(8);  
 }
 
 function drawSunLine(){
@@ -4139,10 +4005,8 @@ function drawSunLine(){
   lookAtDir.applyQuaternion(csLookAtObj.quaternion);
   lookAtDir.setLength(csPos.distanceTo(planetPos))
   
-  
   sphericalPos.setFromVector3(lookAtDir)
 
-  
   var material = new THREE.LineBasicMaterial({
     color: 0x0000ff
   });
@@ -4161,7 +4025,6 @@ function drawSunLine(){
   sphericalPos.theta = sun.ra 
   sphericalPos.phi =  sun.dec
   sphericalPos.radius = sun.dist
-
   
   var material2 = new THREE.LineBasicMaterial({
     color: 0xff0000
@@ -4174,18 +4037,13 @@ function drawSunLine(){
   );
 
   var line2 = new THREE.Line( geometry2, material2 );
-  celestialSphere.add( line2 );
-  
-  
-  
+  celestialSphere.add( line2 );  
 }
-
 
 function trace(pos) {
     tracePlanets.forEach(obj => {
       tracePlanet(obj, pos)
     });        
-  // tracePlanet(mars, pos)
 }
 
   function initTrace(obj) {
@@ -4194,86 +4052,92 @@ function trace(pos) {
   }
 
 function setTraceMaterial(obj) {
-  let lineMaterial 
-  let lineGeometry
+  let lineMaterial;
+  const vertexCount = Math.round(obj.traceLength / obj.traceStep);
+
   if (!obj.traceLine) {
-    lineMaterial = new THREE.PointsMaterial( { 
-      color: obj.color,                                          
-      size: obj.size*10,
-      //sizeAttenuation: false,
+    lineMaterial = new THREE.PointsMaterial({
+      color: obj.color,
+      size: obj.size * 10,
       transparent: true,
       opacity: 0.7,
-      alphaTest : 0.5,
-      map: new THREE.TextureLoader().load( "disc.png" ),
-      
-    } )
-            
-    lineGeometry = new THREE.Geometry()
-    obj.traceLine = new THREE.Points( lineGeometry, lineMaterial )
-    obj.traceLine.sortParticles = true;
-    obj.traceLine.geometry.vertices.length = (obj.traceLength/obj.traceStep).toFixed()
+      alphaTest: 0.5,
+      map: new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/disc.png"),
+    });
   } else {
-    scene.remove(obj.traceLine)
-    lineMaterial = obj.traceLine.material 
-    lineGeometry = obj.traceLine.geometry
-
-  }  
-  if (o.Lines) {
-    obj.traceLine = new THREE.Line( lineGeometry, lineMaterial )    
-  } else {
-    obj.traceLine = new THREE.Points( lineGeometry, lineMaterial )    
-    
+    scene.remove(obj.traceLine);
+    lineMaterial = obj.traceLine.material; // Reuse material
   }
-  scene.add(obj.traceLine)
-}
 
+  const lineGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(vertexCount * 3); // 3 floats (x,y,z) per vertex
+  lineGeometry.addAttribute('position', new THREE.BufferAttribute(positions, 3)); // <-- use addAttribute!
+
+  if (o.Lines) {
+    obj.traceLine = new THREE.Line(lineGeometry, lineMaterial);
+  } else {
+    obj.traceLine = new THREE.Points(lineGeometry, lineMaterial);
+  }
+
+  scene.add(obj.traceLine);
+}
 
 function tracePlanet(obj, pos) {
   let update = false;
-  if (!obj.traceOn || !o.traceBtn) { obj.traceLine.visible = false; return;}
-  if (pos < obj.traceStartPos) {initTrace(obj); update = true}
-  if (pos < obj.traceCurrPos) {obj.traceCurrPos = obj.traceStartPos; obj.traceArrIndex = 0; update = true}
+  if (!obj.traceOn || !o.traceBtn) { 
+    obj.traceLine.visible = false; 
+    return;
+  }
+
+  if (pos < obj.traceStartPos) {
+    initTrace(obj);
+    update = true;
+  }
+  if (pos < obj.traceCurrPos) {
+    obj.traceCurrPos = obj.traceStartPos;
+    obj.traceArrIndex = 0;
+    update = true;
+  }
   if (obj.traceCurrPos + obj.traceStep > pos && !update) return;
 
-  let firstRun = false
+  let firstRun = false;
   if (obj.traceArrIndex === 0) firstRun = true;
-  
+
   if (!obj.traceLine) {
-    setTraceMaterial(obj)
-  }    
-  let nextPos = obj.traceCurrPos
-  let vertArray = obj.traceLine.geometry.vertices
-  while(nextPos < pos) {
+    setTraceMaterial(obj);
+  }
+
+  let nextPos = obj.traceCurrPos;
+  const positionAttr = obj.traceLine.geometry.attributes.position;
+  const vertArray = positionAttr.array;
+  const pointCount = vertArray.length / 3;
+
+  while (nextPos < pos) {
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
-    let epos = new THREE.Vector3(); 
-    obj.planetObj.getWorldPosition(epos); //NEEDS to be a new vector every time! (declared inside the loop)
-    if (obj.traceArrIndex < vertArray.length) {
-      vertArray[obj.traceArrIndex] = epos;    
-      obj.traceArrIndex ++
-    } else {
-      for(let i = 0; i < vertArray.length-1; i++) {
-        vertArray[i] = vertArray[i+1]
-      }
-      vertArray[vertArray.length-1] = epos;          
-    }
-    nextPos += obj.traceStep
+    let epos = new THREE.Vector3();
+    obj.planetObj.getWorldPosition(epos);
+
+    // Write position at current circular index
+    const writeIndex = (obj.traceArrIndex % pointCount) * 3;
+    vertArray[writeIndex + 0] = epos.x;
+    vertArray[writeIndex + 1] = epos.y;
+    vertArray[writeIndex + 2] = epos.z;
+
+    obj.traceArrIndex++;
+    nextPos += obj.traceStep;
   }
-  if (firstRun) {
-    //We need to pad the vertices array 
-    let index = obj.traceArrIndex;
-    while (index < obj.traceLine.geometry.vertices.length) {
-      obj.traceLine.geometry.vertices[index ++] = 0;    
-    }    
-  }  
-  obj.traceLine.geometry.verticesNeedUpdate = true;
+
+  positionAttr.needsUpdate = true; // Tell Three.js to update the buffer
   obj.traceCurrPos = nextPos - obj.traceStep;
   obj.traceLine.visible = true;
 }
 
-//To get the Zodiac ring to not rotate while following Earth,
-//set its rotation to the negative speed of Earths speed
-var zodiacRotationSpeed = 0.00026697458749521
+function getZodiacRotationSpeed() {
+  const earth = planets.find(obj => obj.name === "Earth");
+  return earth ? -earth.speed : 0;
+}
+
 function moveModel(pos){
   planets.forEach(obj => {
     obj.orbitObj.rotation.y = obj.speed * pos - obj.startPos * (Math.PI/180)
@@ -4281,8 +4145,7 @@ function moveModel(pos){
       obj.planetObj.rotation.y = obj.rotationSpeed * pos 
     }
   })
- zodiac.rotation.y = -Math.PI/3 + zodiacRotationSpeed * pos
-
+  zodiac.rotation.y = -Math.PI/3 - earth.orbitObj.rotation.y;
 }
 // Math.PI/6 + 
 function onWindowResize() {
@@ -4292,7 +4155,6 @@ function onWindowResize() {
   } else {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
@@ -4303,12 +4165,12 @@ function addPolarGridHelper(inplanet) {
 }
 
 function posToDays(pos) {
-  pos += sHour*12 //Set the clock to tweleve for pos 0
+  pos += sHour*12 //Set the clock to twelve for pos 0
 	return Math.floor(pos/sDay)
 }
 
 function posToTime(pos) {
-  pos += sHour*12 //Set the clock to tweleve for pos 0
+  pos += sHour*12 //Set the clock to twelve for pos 0
 	let days = pos/sDay - Math.floor(pos/sDay)
   let hours = Math.floor(days*24);
   let minutes = Math.floor((days*24 - hours) * 60);
@@ -4327,7 +4189,6 @@ function posToTime(pos) {
 	let hh = ("0" + hours).slice(-2);
   let mm = ("0" + minutes).slice(-2);
   let ss = ("0" + seconds).slice(-2);
-  
 
   return hh + ":" + mm +":" + ss
 }
@@ -4347,11 +4208,18 @@ function raToRadians(rightAscension) {
 }
 
 function radiansToRa(radians) {
-  const raDec = radians * 12/Math.PI
+  const raDec = radians * 12 / Math.PI;
   const hours = Math.floor(raDec);
-  const minutes = raDec % 1 
-}
+  const minutesFloat = (raDec - hours) * 60;
+  const minutes = Math.floor(minutesFloat);
+  const seconds = Math.round((minutesFloat - minutes) * 60);
 
+  const hh = ("0" + hours).slice(-2);
+  const mm = ("0" + minutes).slice(-2);
+  const ss = ("0" + seconds).slice(-2);
+
+  return hh + ":" + mm + ":" + ss;
+}
 
 //console.log(decToRadians("360:00:00"))
 function decToRadians(declination) {
@@ -4361,37 +4229,42 @@ function decToRadians(declination) {
   return deg * (Math.PI/180);
 }
 
-function raToRadOld(ra) {
-  const hours = ra.split('h')[0];
-  const minutes = ra.split('h')[1].split('m')[0]
-  const seconds = ra.split('h')[1].split('m')[1].split('s')[0]
-  return hours*Math.PI/12 + minutes*(Math.PI/(12*60)) + seconds*(Math.PI/(12*3600))
-}
-
-   // ra: "02h31m49.09s", //02h 31m 49.09s "02h 31m 48.7s"
-   //  dec: "89d15m50.8s", //89° 15′ 50.8 "+89° 15′ 51″"
-
 function raToRad(ra) {
-  ra.replace(/\s+/g, '');
+  ra = ra.replace(/\s+/g, '');
   const hours = ra.split('h')[0];
   const minutes = ra.split('h')[1].split('m')[0]
   const seconds = ra.split('h')[1].split('m')[1].split('s')[0]
   return hours*Math.PI/12 + minutes*(Math.PI/(12*60)) + seconds*(Math.PI/(12*3600))
 }
 
-function decToRadOld(dec) {
-  const degrees = dec.split('d')[0];
-  const minutes = dec.split('d')[1].split('m')[0]
-  const seconds = dec.split('d')[1].split('m')[1].split('s')[0]
-  return degrees*Math.PI/180 + minutes*(Math.PI/(180*60)) + seconds*(Math.PI/(180*3600))
-}
-
+//Thanks to AI correct version of decToRad (chaecked by viewing the orionbelt)
 function decToRad(dec) {
-  dec.replace(/\s+/g, '');
-  const degrees = dec.split('°')[0];
-  const minutes = dec.split('°')[1].split('′')[0]
-  const seconds = dec.split('°')[1].split('′')[1].split('″')[0]
-  return degrees*Math.PI/180 + minutes*(Math.PI/(180*60)) + seconds*(Math.PI/(180*3600))
+  if (typeof dec !== 'string') {
+    console.warn('decToRad expected a string but got', typeof dec);
+    return 0;
+  }
+
+  dec = dec.replace(/\s+/g, '');
+
+  const degreeParts = dec.split('°');
+  if (degreeParts.length < 2) {
+    console.warn('Invalid declination format (missing °):', dec);
+    return 0;
+  }
+
+  let degrees = parseFloat(degreeParts[0]) || 0;
+  const isNegative = degrees < 0;
+
+  const minuteSecondPart = degreeParts[1].split('′');
+  const minutes = parseFloat(minuteSecondPart[0]) || 0;
+  let seconds = 0;
+
+  if (minuteSecondPart.length > 1) {
+    seconds = parseFloat(minuteSecondPart[1].replace('″', '')) || 0;
+  }
+
+  const absDegrees = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
+  return (isNegative ? -absDegrees : absDegrees) * (Math.PI / 180);
 }
 
 function radToRa(rad){
@@ -4399,31 +4272,27 @@ function radToRa(rad){
   const raDec = rad * 12/Math.PI
   const hours = Math.floor(raDec);
   const minutesSeconds = (raDec - hours) * 60
-  const minutes = Math.floor((raDec - hours) * 60)
+  const minutes = Math.floor(minutesSeconds);
   const seconds = (minutesSeconds - minutes) * 60
   return leadZero(hours) + "h" + leadZero(minutes) + "m" + leadZero(seconds.toFixed(0)) + "s"
   }
 
-function radToDec(rad){
-  if (rad <= 0) {
-    rad = rad + Math.PI/2
-  } else {
-    rad = Math.PI/2 - rad
-  }
-  var degDec = rad * 180/Math.PI
-  var degreesSign=""
+function radToDec(rad) {
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  let degDec = rad * 180 / Math.PI;
+  let degreesSign = "";
 
-  if(degDec<0)
-  {
-    degDec*=-1.0
-    degreesSign="-"
+  if (degDec < 0) {
+    degDec *= -1.0;
+    degreesSign = "-";
   }
 
   const degrees = Math.floor(degDec);
-  const minutesSeconds = (degDec - degrees) * 60
-  const minutes = Math.floor((degDec - degrees) * 60)
-  const seconds = (minutesSeconds - minutes) * 60
-  return leadZero(degreesSign+degrees, true) + "\xB0" + leadZero(minutes) + "\'" + leadZero(seconds.toFixed(0)) + "\""
+  const minutesSeconds = (degDec - degrees) * 60;
+  const minutes = Math.floor(minutesSeconds);
+  const seconds = (minutesSeconds - minutes) * 60;
+
+  return leadZero(degreesSign + degrees, true) + "\xB0" + leadZero(minutes) + "'" + leadZero(seconds.toFixed(0)) + "\"";
 }
 
 function isNumeric(n) {
@@ -4440,109 +4309,131 @@ function leadZero(n, plus){
     return n > 9 ? sign + n: sign + "0" + n;
 }
 
-
 function isValidTime(value) {
-  //check input
   let aTime = value.split(":");
   if (aTime.length > 3) {
-    //Only hh:mm:ss
+    return false; // Only hh:mm:ss allowed
+  }
+
+  // Hours
+  if (!/^\d+$/.test(aTime[0]) || aTime[0].length != 2) return false;
+  const hours = Number(aTime[0]);
+  if (hours > 24) return false;
+
+  // Minutes
+  if (aTime.length > 1) {
+    if (!/^\d+$/.test(aTime[1]) || aTime[1].length != 2) return false;
+    const minutes = Number(aTime[1]);
+    if (minutes > 59) return false;
+  }
+
+  // Seconds
+  if (aTime.length > 2) {
+    if (!/^\d+$/.test(aTime[2]) || aTime[2].length != 2) return false;
+    const seconds = Number(aTime[2]);
+    if (seconds > 59) return false;
+  }
+
+  // Extra: if hour == 24, minutes and seconds must be 00
+  if (hours === 24 && (Number(aTime[1]) > 0 || Number(aTime[2]) > 0)) {
     return false;
   }
-  //Check with regex that we only have numbers and a valid time
-  if (!/^\d+$/.test(aTime[0]) || aTime[0].length != 2 ) return false;
-  if (aTime[0] > 24) return false;
-  if (!/^\d+$/.test(aTime[1]) || aTime[1].length != 2 ) return false;
-  if (aTime[1] > 59) return false;
-  if (!/^\d+$/.test(aTime[2]) || aTime[2].length != 2 ) return false;
-  if (aTime[2] > 59) return false;
 
   return true;
 }
 
 function isValidDate(value) {
-  //check input
   let aDate = value.split("-");
   if (aDate.length > 3) {
-    //Assume we have a minus sign first
-    aDate.shift();
+    aDate.shift(); // Assume minus sign first
   }
-  if (aDate.length > 3) {
-  	//Only year-month-day allowed
+  if (aDate.length !== 3) return false; // must be exactly 3 parts
+
+  const year = Number(aDate[0]);
+  const month = Number(aDate[1]);
+  const day = Number(aDate[2]);
+
+  if (!isNumeric(year) || !isNumeric(month) || !isNumeric(day)) return false;
+
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+
+  // Check valid days in months
+  const daysInMonth = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month - 1]) return false;
+
+  // Gregorian calendar transition
+  if (year === 1582 && month === 10 && day > 4 && day < 15) {
     return false;
   }
-  //Check with regex that we only have numbers and a (probably) valid date
-  if (!/^\d+$/.test(aDate[0]) || aDate[0].length > 20 ) {
-    return false;
-  }
-  if (!/^\d+$/.test(aDate[1]) || aDate[1].length != 2 ) {
-    return false;
-  }
-  if (aDate[1] > 12 || aDate[1] < 1) {
-    return false;  
-  }
-  if (!/^\d+$/.test(aDate[2]) || aDate[2].length != 2 ) {
-    return false;
-  }
-  if (aDate[2] > 31 || aDate[2] < 1) {
-    return false;  
-  }
-  // if (Number(aDate[0]) === 0) return false; //Year 0 is not allowed
-  if (Number(aDate[0]) === 1582 && Number(aDate[1]) === 10 ) {
-    if (aDate[2] > 4 && aDate[2] < 15) return false; //Day 5-14, oct 1582 are not dates
-  } 
-  
+
   return true;
 }
 
-//console.log(dateToDays("2000-06-20"))
-
 function dateToDays(sDate) {
-  //Calculates the number of days passed since 2000-06-21 for a date. Positive or negative
-  //Taken from https://alcor.concordia.ca/~gpkatch/gdate-algorithm.html
-  let aDate = sDate.split("-");
-  let y,m,d;
-  if (aDate.length > 3) {
-    //We had a minus sign first (a BC date)
-    y = -Number(aDate[1]); m = Number(aDate[2]); d = Number(aDate[3]);
+  // Calculates number of days since 2000-06-21
+  // Handles Julian and Gregorian calendar dates, including BC dates (astronomical numbering)
+  
+  const GREGORIAN_START = { year: 1582, month: 10, day: 15 };
+  const GREGORIAN_REFERENCE_DAY = 730597; // days since 0 AD to 2000-06-21 (Gregorian)
+  const JULIAN_REFERENCE_DAY = 2451717;   // Julian Day Number for 2000-06-21
 
-  } else {
-    y = Number(aDate[0]); m = Number(aDate[1]); d = Number(aDate[2]);
-  };
-  
-  if (y < 1582) return julianDateToDays(sDate);
-  if (y === 1582 && m < 10) return julianDateToDays(sDate);
-  if (y === 1582 && m === 10 && d < 15)  return julianDateToDays(sDate);
-  
-  m = (m + 9) % 12;
-  y = y - Math.floor(m/10);
-  return 365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) + Math.floor((m*306 + 5)/10) + ( d - 1 ) - 730597;
-};
-
-function julianDateToDays(sDate) {
-  //Calculates the number of days passed since 2000-06-21 for a date. Positive or negative
-  //Taken from https://alcor.concordia.ca/~gpkatch/gdate-algorithm.html
-  let aDate = sDate.split("-");
-  let y,m,d, jd;
-  if (aDate.length > 3) {
-    //We had a minus sign first (a BC date)
-    y = -Number(aDate[1]); m = Number(aDate[2]); d = Number(aDate[3]);
-
-  } else {
-    y = Number(aDate[0]); m = Number(aDate[1]); d = Number(aDate[2]);
-  };
-  
-  // if (y < 0 ) y += 1;
-  //if (y === -1) y -= 1;
-  
-  if (m < 3) {
-  	m += 12;
-    y -= 1;
+  if (typeof sDate !== 'string') {
+    console.error('safeDateToDays expected a string but got', typeof sDate);
+    return NaN;
   }
-  //Math.trunc(x) 
-  jd =  Math.trunc(365.25*(y + 4716)) + Math.trunc(30.6001*(m + 1)) + d - 1524
-  
-  return jd - 2451717;
-};
+
+  let aDate = sDate.split("-");
+  let y, m, d;
+
+  if (sDate.startsWith("-")) {
+    // BC date using astronomical numbering
+    y = -Number(aDate[1]);
+    m = Number(aDate[2]);
+    d = Number(aDate[3]);
+  } else {
+    y = Number(aDate[0]);
+    m = Number(aDate[1]);
+    d = Number(aDate[2]);
+  }
+
+  if (isNaN(y) || isNaN(m) || isNaN(d)) {
+    console.error('Invalid date format:', sDate);
+    return NaN;
+  }
+
+  // Decide calendar: Julian or Gregorian?
+  let useJulian = false;
+  if (y < GREGORIAN_START.year) useJulian = true;
+  if (y === GREGORIAN_START.year && m < GREGORIAN_START.month) useJulian = true;
+  if (y === GREGORIAN_START.year && m === GREGORIAN_START.month && d < GREGORIAN_START.day) useJulian = true;
+
+  if (useJulian) {
+    // Julian calendar calculation
+    if (m < 3) {
+      m += 12;
+      y -= 1;
+    }
+    let jd = Math.trunc(365.25 * (y + 4716)) +
+             Math.trunc(30.6001 * (m + 1)) +
+             d - 1524;
+    return jd - JULIAN_REFERENCE_DAY;
+  } else {
+    // Gregorian calendar calculation
+    m = (m + 9) % 12;
+    y = y - Math.floor(m / 10);
+
+    let days =
+      365 * y +
+      Math.floor(y / 4) -
+      Math.floor(y / 100) +
+      Math.floor(y / 400) +
+      Math.floor((m * 306 + 5) / 10) +
+      (d - 1);
+
+    return days - GREGORIAN_REFERENCE_DAY;
+  }
+}
 
 function addYears(sDate, year) {
   let aDate = sDate.split("-");
@@ -4557,8 +4448,6 @@ function addYears(sDate, year) {
   };
   return date
 }
-
-//console.log(daysToDate(0))
 
 function daysToDate(g) {
   if (g < -152556) return julianCalDayToDate(g); //Julian dates earlier than 1582-10-15
@@ -4629,7 +4518,6 @@ function updateElongations()
   o["uranusElongation"]=getElongationFromSun(uranus);
   o["neptuneElongation"]=getElongationFromSun(neptune);
 };
-
 
 //CREATE PLANETS
 
@@ -4703,8 +4591,6 @@ function createPlanet (pd) { //pd = Planet Data
   // nameTag.position.copy(rotationAxis.position)
   // nameTag.scale.set(10,10,10)
   // rotationAxis.add(nameTag);
-
-  
   
   orbit.add(rotationAxis);
   orbitContainer.add(orbit);
@@ -4733,7 +4619,6 @@ function updatePlanet (pd) {
   if (pd.hasOwnProperty('tiltb')) {
     pd.rotationAxis.rotation.x = pd.tiltb * (Math.PI/180)
   }
-
 }
 
 function createCelestialSphere(radius) {
@@ -4782,14 +4667,6 @@ function showHideOrbits() {
   });
 }
 
-
-
-// function showHideStars() {
-//   stars.forEach(obj => {
-//     obj.starObj.visible = o.Stars
-//   })
-// };
-
 function showHideInfoText() {
     var x = document.getElementById("info");
   if(o.infotext) {
@@ -4797,22 +4674,20 @@ function showHideInfoText() {
   } else {
     x.style.display = "none";    
   }
-  // if (x.style.display === "none") {
-  //   x.style.display = "block";
-  // } else {
-  //   x.style.display = "none";
-  // }
 };
 
-
-
-function randomPointInSphere( radius ) {
+function randomPointInSphere(radius) {
   const v = new THREE.Vector3();
+  let x, y, z, normalizationFactor;
 
-  const x = THREE.Math.randFloat( -1, 1 );
-  const y = THREE.Math.randFloat( -1, 1 );
-  const z = THREE.Math.randFloat( -1, 1 );
-  const normalizationFactor = 1 / Math.sqrt( x * x + y * y + z * z );
+  do {
+    x = THREE.Math.randFloat(-1, 1);
+    y = THREE.Math.randFloat(-1, 1);
+    z = THREE.Math.randFloat(-1, 1);
+    normalizationFactor = Math.sqrt(x * x + y * y + z * z);
+  } while (normalizationFactor === 0); // retry if all zero
+
+  normalizationFactor = 1 / normalizationFactor;
 
   v.x = x * normalizationFactor * radius;
   v.y = y * normalizationFactor * radius;
@@ -4823,31 +4698,42 @@ function randomPointInSphere( radius ) {
 
 function createStarfield() {  
   const geometry = new THREE.BufferGeometry();
-  var positions = [];
+  const positions = [];
+  const colors = [];
 
-  for (var i = 0; i < 100000; i ++ ) {
+  for (let i = 0; i < 100000; i++) {
+    const vertex = randomPointInSphere(1000000);
+    positions.push(vertex.x, vertex.y, vertex.z);
 
-    var vertex = randomPointInSphere( 1000000 );
-    positions.push( vertex.x, vertex.y, vertex.z );
+    // Generate random star temperature (Kelvin range for stars)
+    const tempK = THREE.Math.randFloat(2000, 10000);
 
+    // Convert temperature to RGB
+    const rgbString = colorTemperature2rgb(tempK);
+    const rgbValues = rgbString.match(/\d+/g); // extract numbers
+
+    // Normalize to 0..1 for Three.js colors
+    colors.push(parseInt(rgbValues[0]) / 255, parseInt(rgbValues[1]) / 255, parseInt(rgbValues[2]) / 255);
   }
 
-  geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+  geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-  material = new THREE.PointsMaterial( { color: 0x888888, size: 0.05, sizeAttenuation: false} );
-  //material = new THREE.PointsMaterial( { color: 0xffffff, size: 0.01 } );
-  particles = new THREE.Points(geometry, material);
-  scene.add( particles );
+  const material = new THREE.PointsMaterial({
+    size: 0.05,
+    vertexColors: THREE.VertexColors, // <--- use per-particle color
+    sizeAttenuation: false
+  });
+
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
 }
 
 function setStarDistance() {
   stars.forEach(obj => {
     obj.starObj.position.x = obj.dist * o['Star distance'];
   })
-
 }
-
-
 
 function createRings(radius, segments, texture) {
   return new THREE.Mesh(new THREE.XRingGeometry(1.2 * radius, 2 * radius, 2 * segments, 5, 0, Math.PI * 2), new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })); 
@@ -4861,7 +4747,6 @@ function initXRingGeometry() {
   
  //This allows textures to be added to a disc in a way that makes planetary ring look nice
   THREE.XRingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
     THREE.Geometry.call( this );
 
     this.type = 'XRingGeometry';
@@ -4933,43 +4818,13 @@ function initXRingGeometry() {
 
     this.computeFaceNormals();
 
-    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
-
+    this.boundingSphere = new THREE.Sphere(new THREE.Vector3(), outerRadius);
+//    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
   };
 
   THREE.XRingGeometry.prototype = Object.create( THREE.Geometry.prototype );
   THREE.XRingGeometry.prototype.constructor = THREE.XRingGeometry;
-
 }
-
-// function makeTextSprite( message, parameters )
-//     {
-//         if ( parameters === undefined ) parameters = {};
-//         var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Courier New";
-//         var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 18;
-//         var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
-//         var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
-//         var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:0, g:0, b:255, a:1.0 };
-//         var textColor = parameters.hasOwnProperty("textColor") ?parameters["textColor"] : { r:0, g:0, b:0, a:1.0 };
-
-//         var canvas = document.createElement('canvas');
-//         var context = canvas.getContext('2d');
-//         context.font = "Bold " + fontsize + "px " + fontface;
-//         var metrics = context.measureText( message );
-//         var textWidth = metrics.width;
-
-//         context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-//         context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
-//         context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
-//         context.fillText( message, borderThickness, fontsize + borderThickness);
-
-//         var texture = new THREE.Texture(canvas) 
-//         texture.needsUpdate = true;
-//         var spriteMaterial = new THREE.SpriteMaterial( { map: texture} );
-//         var sprite = new THREE.Sprite( spriteMaterial );
-//         sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
-//         return sprite;  
-//     }
 
 function getCircularText(text, diameter, startAngle, align, textInside, inwardFacing, fName, fSize, kerning) {
     // text:         The text to be displayed in circular fashion
