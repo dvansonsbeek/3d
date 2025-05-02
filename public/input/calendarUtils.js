@@ -1,5 +1,5 @@
 // === Constants ===
-export const GREGORIAN_START_JD = 2299161;         // 1582-10-15
+//export const GREGORIAN_START_JD = 2299161;        // will be taken from main script 1582-10-15
 //export const perihelionalignmentJD = 2176142;     // will be taken from main script 1245-12-14
 //export const startmodelJD = 2451717;              // will be taken from main script 2000-06-21
 
@@ -78,11 +78,17 @@ export function raToRadians(raStr) {
 
 export function radiansToRa(rad) {
   if (rad < 0) rad += 2 * Math.PI;
+
   const totalHours = rad * 12 / Math.PI;
   const hh = Math.floor(totalHours);
   const mm = Math.floor((totalHours - hh) * 60);
   const ss = Math.round(((totalHours - hh) * 60 - mm) * 60);
-  return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')}`;
+
+  return (
+    String(hh).padStart(2, '0') + 'h' +
+    String(mm).padStart(2, '0') + 'm' +
+    String(ss).padStart(2, '0') + 's'
+  );
 }
 
 export function decToRadians(decStr) {
@@ -92,13 +98,28 @@ export function decToRadians(decStr) {
 }
 
 export function radiansToDec(rad) {
-  const deg = rad * 180 / Math.PI;
-  const sign = deg < 0 ? '-' : '';
-  const absDeg = Math.abs(deg);
-  const d = Math.floor(absDeg);
-  const m = Math.floor((absDeg - d) * 60);
-  const s = Math.round(((absDeg - d) * 60 - m) * 60);
-  return `${sign}${String(d).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  // Convert spherical phi to standard declination (0 at equator, ±90 at poles)
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  let degDec = rad * 180 / Math.PI;
+
+  const sign = degDec < 0 ? '-' : '+';
+  degDec = Math.abs(degDec);
+
+  const degrees = Math.floor(degDec);
+  const minutes = Math.floor((degDec - degrees) * 60);
+  const seconds = Math.round(((degDec - degrees) * 60 - minutes) * 60);
+
+  return (
+    sign +
+    String(degrees).padStart(2, '0') + '°' +
+    String(minutes).padStart(2, '0') + "'" +
+    String(seconds).padStart(2, '0') + '"'
+  );
+}
+
+function radiansToDecDecimal(rad) {
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  return (rad * 180 / Math.PI).toFixed(4);
 }
 
 // === Utilities ===
