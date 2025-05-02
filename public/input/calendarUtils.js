@@ -1,7 +1,7 @@
 // === Constants ===
 export const GREGORIAN_START_JD = 2299161;         // 1582-10-15
-export const PERIHELION_EPOCH_JD = 2176142;        // 1245-12-14
-export const STARTMODEL_JD = 2451717;              // 2000-06-21
+//export const perihelionalignmentJD = 2176142;     // will be taken from main script 1245-12-14
+//export const startmodelJD = 2451717;              // will be taken from main script 2000-06-21
 
 // === Date → Julian Day ===
 export function dateToJulianDay(dateStr) {
@@ -62,12 +62,12 @@ export function daysSinceToDate(days, epochJD) {
 
 // === Perihelion Calendar Conversion ===
 export function dateToPerihelionCalendar(dateStr) {
-  return daysSinceToDate(dateToDaysSince(dateStr, PERIHELION_EPOCH_JD), 0);
+  return daysSinceToDate(dateToDaysSince(dateStr, perihelionalignmentJD), 0);
 }
 
 export function perihelionCalendarToDate(periDateStr) {
   const days = dateToDaysSince(periDateStr, 0);
-  return julianDayToDate(PERIHELION_EPOCH_JD + days);
+  return julianDayToDate(perihelionalignmentJD + days);
 }
 
 // === RA and Dec Conversions ===
