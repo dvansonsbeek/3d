@@ -80,8 +80,37 @@ export function calculatePerihelionDateFromJulian(jd) {
 
 // === RA and Dec Conversions ===
 export function raToRadians(raStr) {
-  const [hh, mm, ss] = raStr.split(":").map(Number);
-  return ((hh + mm / 60 + ss / 3600) * 15) * (Math.PI / 180);
+  if (typeof raStr !== 'string') {
+    console.warn('raToRadians expected a string but got', typeof raStr);
+    return 0;
+  }
+
+  raStr = raStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
+
+  // Match formats like: "23h20m38.2s"
+  let match1 = raStr.match(/^(\d+)h(\d+)m([\d.]+)s$/);
+  if (match1) {
+    let [ , hh, mm, ss ] = match1;
+    hh = parseFloat(hh);
+    mm = parseFloat(mm);
+    ss = parseFloat(ss);
+    const degrees = (hh + mm / 60 + ss / 3600) * 15;
+    return degrees * (Math.PI / 180);
+  }
+
+  // Match colon-separated format: "23:20:38.2"
+  let match2 = raStr.match(/^(\d+):(\d+):([\d.]+)$/);
+  if (match2) {
+    let [ , hh, mm, ss ] = match2;
+    hh = parseFloat(hh);
+    mm = parseFloat(mm);
+    ss = parseFloat(ss);
+    const degrees = (hh + mm / 60 + ss / 3600) * 15;
+    return degrees * (Math.PI / 180);
+  }
+
+  console.warn('Unrecognized RA format:', raStr);
+  return 0;
 }
 
 export function radiansToRa(rad) {
@@ -100,9 +129,39 @@ export function radiansToRa(rad) {
 }
 
 export function decToRadians(decStr) {
-  const [deg, min, sec] = decStr.split(':').map(Number);
-  const sign = Math.sign(deg);
-  return sign * Math.abs(deg + min / 60 + sec / 3600) * (Math.PI / 180);
+  if (typeof decStr !== 'string') {
+    console.warn('decToRadians expected a string but got', typeof decStr);
+    return 0;
+  }
+
+  decStr = decStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
+
+  // Match formats like: "+23°44′25″" or "-12°30′15.5″"
+  let match1 = decStr.match(/^(-?\+?\d+)°(\d+)′([\d.]+)″$/);
+  if (match1) {
+    let [ , deg, min, sec ] = match1;
+    deg = parseFloat(deg);
+    min = parseFloat(min);
+    sec = parseFloat(sec);
+    const sign = Math.sign(deg);
+    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
+    return sign * absDeg * (Math.PI / 180);
+  }
+
+  // Match colon-separated format: "+23:44:25.2"
+  let match2 = decStr.match(/^(-?\+?\d+):(\d+):([\d.]+)$/);
+  if (match2) {
+    let [ , deg, min, sec ] = match2;
+    deg = parseFloat(deg);
+    min = parseFloat(min);
+    sec = parseFloat(sec);
+    const sign = Math.sign(deg);
+    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
+    return sign * absDeg * (Math.PI / 180);
+  }
+
+  console.warn('Unrecognized declination format:', decStr);
+  return 0;
 }
 
 export function radiansToDec(rad) {
