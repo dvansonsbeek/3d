@@ -70,6 +70,14 @@ export function perihelionCalendarToDate(periDateStr) {
   return julianDayToDate(perihelionalignmentJD + days);
 }
 
+export function calculatePerihelionDate(dateStr) {
+  return dateToPerihelionCalendar(dateStr);
+}
+
+export function calculatePerihelionDateFromJulian(jd) {
+  return daysSinceToDate(jd - perihelionalignmentJD, 0);
+}
+
 // === RA and Dec Conversions ===
 export function raToRadians(raStr) {
   const [hh, mm, ss] = raStr.split(":").map(Number);
@@ -117,7 +125,7 @@ export function radiansToDec(rad) {
   );
 }
 
-function radiansToDecDecimal(rad) {
+export function radiansToDecDecimal(rad) {
   rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
   return (rad * 180 / Math.PI).toFixed(4);
 }
