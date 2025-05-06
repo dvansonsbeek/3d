@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair Display:wght@400;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open Sans:wght@400;800&display=swap");
 
 main { position: absolute; top: 100px; left: 100px; }
@@ -24,23 +23,6 @@ a {color: white;
 }
 a:link {
   text-decoration: none;
-}
-
-#info {
-  font-family: "Playfair Display", sans-serif;
-  font-style: normal;
-  font-weight: bold;
-  position: absolute;
-  z-index: 10;
-  width: 98%;
-  bottom: 87%;
-  left: 0;
-  right: 0;
-  margin: auto;
-  text-align: left;
-  color: #f2f5f0;
-  font-size: 0.8em;
-  opacity: 0.7;
 }
 
 #footerleft {
@@ -76,3 +58,112 @@ a:link {
   text-decoration: none;
   position: fixed;
 } 
+
+.highlight-perihelion input[type="text"] {
+  background: none !important;
+  border: none !important;
+  color: grey !important;
+  font-weight: bold !important;
+  text-align: right !important;
+  pointer-events: none !important;
+}
+
+/* 1) Hide the native checkbox visuals */
+.dg li .c input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 16px;
+  background: #ccc;
+  border-radius: 8px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* 2) The “knob” */
+.dg li .c input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  transition: left 0.2s ease;
+}
+
+/* 3) Checked state */
+.dg li .c input[type="checkbox"]:checked {
+  background: #4caf50;
+}
+
+.dg li .c input[type="checkbox"]:checked::after {
+  left: 18px;
+}
+
+/* first reset the default on everything */
+.dg li .c {
+  overflow: visible !important;
+}
+/* then only clamp the boolean rows */
+.dg li.cr.boolean .c {
+  overflow: hidden;
+}
+
+/* Make the GUI smaller and neater */
+/*#gui {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Style all folders (titles) */
+/*#gui .folder .title {
+  background-color: #444;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+/* Style the buttons (boolean or actions) */
+/*#gui .cr.boolean, 
+#gui .cr.function {
+  background-color: #555;
+  border-radius: 4px;
+  margin: 3px 0;
+  padding: 4px;
+  text-align: center;
+  color: #eee;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect for buttons */
+/*#gui .cr.boolean:hover, 
+#gui .cr.function:hover {
+  background-color: #777;
+  transform: scale(1.02);
+}
+
+/* Make sliders cleaner */
+/*#gui .cr.number {
+  background-color: #333;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin: 2px 0;
+}
+
+/* Labels */
+/*#gui .property-name {
+  color: #ccc;
+}

@@ -1,4 +1,4 @@
-/*The Interactive 3D Solar System Simulation of the Holistic Universe Model shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 305,952 years, an Axial precession cycle of ~23,535 years, an Inclination precession cycle of 101,984 years and a Perihelion precession cycle of 19,122 years. 
+/*The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 305,952 years, an Axial precession cycle of ~23,535 years, an Inclination precession cycle of 101,984 years and a Perihelion precession cycle of 19,122 years. 
 
 The way it is modelled:
 * The EARTH-WOBBLE-CENTER is the center of our solar system.
@@ -40,11 +40,11 @@ For more details see https://holisticuniverse.com.
 
 Why is the length of the Holistic-Year 305,952 years? This number fits all observations best:
 1. Historic value longitude of perihelion 90°: 1245-12-14
-2. Current value longitude of perihelion: 6h51m47s = ~102.945°
-3. Sheet Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
+2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.945°
+3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
 a) 1246 Length of solar day in days was ~365.242236 days (which is ~31,556,929.19 SI seconds in Ephemeris time).
 b) 1246 Length of sidereal year in SI seconds was ~31,558,149.6847
-c) 1246 Lenght of solar day was above 86,400 SI seconds because of historic Delta T predictions.
+c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.
 4. Climate graphs with ~100k cycles as a cycle of 305,952 years
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. The location of the EARTH-WOBBLE-CENTER is at a MEAN ratio of 1:366.2422341 compared to the location the Sun as seen from Earth
@@ -54,852 +54,89 @@ c) 1246 Lenght of solar day was above 86,400 SI seconds because of historic Delt
 
 Technical: 
 
+Build in Three js R175 including orbitcontrols.
+
 It's an interactive 3D visualization where the browser renders a miniature model of the solar system using three.js — a JavaScript library that simplifies working with WebGL. The project typically features:
 - A central sun: A bright, glowing sphere, possibly using a texture and some light emission effects.
 - Orbiting planets: Each planet is a textured sphere with individual rotation (spinning) and revolution (orbiting) animations.
 - Orbit paths: Visualized with faint circles or lines showing the paths of the planets.
 - Lighting: A combination of ambient and point lights to simulate how the sun lights up the planets.
 - Camera controls: Using something like OrbitControls to let the user zoom, pan, and rotate around the system.
-- Scaling: Distances and sizes are usually not to scale because realistic proportions would make some planets almost invisible or too far apart.
-- Extras: You might see moons orbiting planets, rings around Saturn, or even starfield backgrounds to make it more immersive.
+- Scaling: Distances are to scale but sizes of the planets are not to scale because realistic proportions would make some planets almost invisible or too far apart.
+- Extras: You might see moons orbiting planets, rings around Saturn, zodiac positions, polar axis line,constellation or even starfield backgrounds to make it more immersive.
 
-At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.
+At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.*/
 
-Created with the help of TYCHOSIUM software <https://codepen.io/pholmq/pen/XGPrPd>. The Interactive 3D Solar System Simulation of the Holistic Universe Model is not affiliated with TYCHOSIUM or its authors in any way*/
-
-/*Copyright 2018 Simon Shack, Patrik Holmqvist
-The TYCHOSIUM is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.*/
-
-const defaultSettings = 
-[
-{
-  "name": "EARTH-WOBBLE-CENTER",
-  "size": 0.011,
-  "startPos": -112.791336670025,
-  "speed": 0,
-  "rotationSpeed": -0.00026697458749521,
-  "tilt": 0,
-  "tiltb": 0,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "MID-ECCENTRICITY-ORBIT",
-  "size": 0.011,
-  "startPos": -112.791336670025,
-  "speed": 0.00026697458749521,
-  "rotationSpeed": 0,
-  "tilt": 0,
-  "tiltb": 0,
-  "orbitRadius": 1.404974,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Helion Point (Alternative)",
-  "size": 0.011,
-  "startPos": -104.204722055415,
-  "speed": 0.0000616095201912024,
-  "rotationSpeed": 0,
-  "tilt": 0,
-  "tiltb": 0,
-  "orbitRadius": 1.404974,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Earth",
-  "size": 0.0852703981708473,
-  "startPos": 0,
-  "speed": -0.00026697458749521,
-  "rotationSpeed": 2301.16782401453,
-  "tilt": -23.4243449577,
-  "tiltb": 0,
-  "orbitRadius": -0.27304333159777,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Earth Inclination Precession",
-  "startPos": 98.5866146146096,
-  "speed": 0.0000616095201912024,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Earth Ecliptic Precession",
-  "startPos": 164.311024357683,
-  "speed": 0.000102682533652004,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": -0.58
-},
-{
-  "name": "Earth Obliquity Precession",
-  "startPos": 97.1023610277075,
-  "speed": -0.000164292053843206,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0.58
-},
-{
-  "name": "Earth Perihelion Precession1",
-  "startPos": -194.204722055415,
-  "speed": 0.000328584107686413,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": -1.11,
-  "orbitTiltb": 0
-},
-{
-  "name": "Earth Perihelion Precession2",
-  "startPos": 194.204722055415,
-  "speed": -0.000328584107686413,
-  "orbitRadius": 0,
-  "orbitCentera": -1.404974,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Barycenter Sun",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0.27304333159777,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "HELION-POINT",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0
-},
-{
-  "name": "Sun",
-  "size": 7,
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "rotationSpeed": 83.9952982796623,
-  "tilt": -7.155,
-  "orbitRadius": 100,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Moon Apsidal Precession",
-  "startPos": 340,
-  "speed": 0.709885428149756,
-  "orbitRadius": -0.0141069500625657,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Moon Apsidal Nodal Precession1",
-  "startPos": -90,
-  "speed": -1.04769042735813,
-  "tilt": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Moon Apsidal Nodal Precession2",
-  "startPos": 90,
-  "speed": 1.04769042735813,
-  "tilt": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Moon Royer Cycle",
-  "startPos": -44.1,
-  "speed": -0.372080428941402,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Moon Nodal Precession",
-  "startPos": 64.1,
-  "speed": -0.337804999208372,
-  "tilt": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90+180)*Math.PI)/180)*-5.1453964,
-  "orbitTiltb": Math.sin(((-90+180)*Math.PI)/180)*-5.1453964
-},
-{
-  "name": "Moon",
-  "size": 0.0232276033326404,
-  "startPos": 126.22,
-  "speed": 83.9952982796623,
-  "rotationSpeed": 0,
-  "tilt": -6.687,
-  "orbitRadius": 0.25695490731541,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER MERCURY",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -11.2169591606661,
-  "orbitCenterb": 0,
-  "orbitCenterc": -0.6,
-},
-{
-  "name": "Barycenter Mercury-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Mercury Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -11.2169591606661,
-  "orbitCenterb": 0,
-  "orbitCenterc": -0.6,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Mercury Ellipse Factor",
-  "startPos": 0,
-  "speed": -Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Mercury",
-  "size": 1,
-  "startPos": 211.54,
-  "speed": 26.0875244996281,
-  "rotationSpeed": 39.1312867494422,
-  "tilt": -0.03,
-  "orbitRadius": 38.7107274186104,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-48.33167)*Math.PI)/180)*-7.00487,
-  "orbitTiltb": Math.sin(((-90-48.33167)*Math.PI)/180)*-7.00487
-},
-{
-  "name": "BARYCENTER VENUS",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -0.489934935944517,
-  "orbitCenterb": 0,
-  "orbitCenterc": -0.05
-},
-{
-  "name": "Barycenter Venus-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Venus Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -0.489934935944517,
-  "orbitCenterb": 0,
-  "orbitCenterc": -0.05,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Venus Ellipse Factor",
-  "startPos": 0,
-  "speed": -Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Venus",
-  "size": 1,
-  "startPos": 352.635,
-  "speed": 10.2132976731898,
-  "rotationSpeed": -9.4430965247729,
-  "tilt": -2.6392,
-  "orbitRadius": 72.3340172922693,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-76.68069)*Math.PI)/180)*-3.39471,
-  "orbitTiltb": Math.sin(((-90-76.68069)*Math.PI)/180)*-3.39471
-},
-{
-  "name": "BARYCENTER MARS",
-  "startPos": 0,
-  "speed": Math.PI*2, 
-  "orbitRadius": 7.78722181048582,
-  "orbitCentera": 8.83305630702754,
-  "orbitCenterb": -20.1708748079022,
-  "orbitCenterc": 0.7
-},
-{
-  "name": "Barycenter Mars-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Mars Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": 8.83305630702754,
-  "orbitCenterb": -20.1708748079022,
-  "orbitCenterc": 0.7,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Mars Ellipse Factor",
-  "startPos": 243.094,
-  "speed": 0.398326084542855,
-  "orbitRadius": 7.78722181048582,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-49.57854)*Math.PI)/180)*-1.85061,
-  "orbitTiltb": Math.sin(((-90-49.57854)*Math.PI)/180)*-1.85061
-},
-{
-  "name": "Mars",
-  "size": 1,
-  "startPos": 121.547,
-  "speed": -3.34075569586122,
-  "rotationSpeed": 2236.82429921882,
-  "tilt": -25.19,
-  "orbitRadius": 152.366713671252,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Phobos",
-  "size": 0.027272727,
-  "startPos": 122,
-  "speed": 6986.5,
-  "rotationSpeed": 0,
-  "tilt": 0,
-  "orbitRadius": 5,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Deimos",
-  "size": 0.027272727,
-  "startPos": 0,
-  "speed": 1802,
-  "rotationSpeed": 0,
-  "tilt": 0,
-  "orbitRadius": 10,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER JUPITER",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -14.8529260159503,
-  "orbitCenterb": -44.5901620064302,
-  "orbitCenterc": 0.7
-},
-{
-  "name": "Barycenter Jupiter-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Jupiter Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -14.8529260159503,
-  "orbitCenterb": -44.5901620064302,
-  "orbitCenterc": 0.7,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Jupiter Ellipse Factor",
-  "startPos": 41.205,
-  "speed": -5.75326128750832,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-100.55615)*Math.PI)/180)*-1.3053,
-  "orbitTiltb": Math.sin(((-90-100.55615)*Math.PI)/180)*-1.3053
-},
-{
-  "name": "Jupiter",
-  "size": 6,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": 5549.34320193203,
-  "tilt": -3.13,
-  "orbitRadius": 519.969067802053,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER SATURN",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -99.8674039040765,
-  "orbitCenterb": 3.4559296989952,
-  "orbitCenterc": 1.8
-},
-{
-  "name": "Barycenter Saturn-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Saturn Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -99.8674039040765,
-  "orbitCenterb": 3.4559296989952,
-  "orbitCenterc": 1.8,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Saturn Ellipse Factor",
-  "startPos": 34.355,
-  "speed": -6.06960563718342,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-113.71504)*Math.PI)/180)*-2.48446,
-  "orbitTiltb": Math.sin(((-90-113.71504)*Math.PI)/180)*-2.48446
-},
-{
-  "name": "Saturn",
-  "size": 5,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": 5215.37251228578,
-  "tilt": -26.73,
-  "orbitRadius": 952.971629139966,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER URANUS",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -27.8688886566711,
-  "orbitCenterb": 175.24925683614,
-  "orbitCenterc": -1.9
-},
-{
-  "name": "Barycenter Uranus-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Uranus Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -27.8688886566711,
-  "orbitCenterb": 175.24925683614,
-  "orbitCenterc": -1.9,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Uranus Ellipse Factor",
-  "startPos": 134.51,
-  "speed": -6.2081449115867,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-74.22988)*Math.PI)/180)*-0.76986,
-  "orbitTiltb": Math.sin(((-90-74.22988)*Math.PI)/180)*-0.76986
-},
-{
-  "name": "Uranus",
-  "size": 5,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": -3194.74981995042,
-  "tilt": -82.23,
-  "orbitRadius": 1913.91730411169,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER NEPTUNE",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": -34.3277111737215,
-  "orbitCenterb": -34.3620585913588,
-  "orbitCenterc": 1.7
-},
-{
-  "name": "Barycenter Neptune-Sun",
-  //"size": 2,
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Neptune Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -34.3277111737215,
-  "orbitCenterb": -34.3620585913588,
-  "orbitCenterc": 1.7,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Neptune Ellipse Factor",
-  "startPos": 144.16,
-  "speed": -6.2448231126072,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-131.72169)*Math.PI)/180)*-1.76917,
-  "orbitTiltb": Math.sin(((-90-131.72169)*Math.PI)/180)*-1.76917
-},
-{
-  "name": "Neptune",
-  "size": 5,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": 3418.56790376751,
-  "tilt": -28.32,
-  "orbitRadius": 2993.53460611855,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-//The accurate orbits of Pluto and Halleys will be added later
-{
-  "name": "BARYCENTER PLUTO",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCentera": 1355.8371267405,
-  "orbitCenterb": 1400.74054002809,
-  "orbitCenterc": 0
-},
-{
-  "name": "Barycenter Pluto-Sun",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Pluto Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": 1355.8371267405,
-  "orbitCenterb": 1400.74054002809,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Pluto Ellipse Factor",
-  "startPos": 215,
-  "speed": -6.25761735630024,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-110.30347)*Math.PI)/180)*-17.14175,
-  "orbitTiltb": Math.sin(((-90-110.30347)*Math.PI)/180)*-17.14175
-},
-{
-  "name": "Pluto",
-  "size": 5,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": 359.294297168521,
-  "tilt": -57.47,
-  "orbitRadius": 3923.3401562492,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER HALLEYS",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitRadius": 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  "orbitCenterb": 3425.26406009445,
-  "orbitCenterc": -479.375616078497,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Barycenter Halleys-Sun",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Halleys Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": 0,
-  "orbitCenterb": 3425.26406009445,
-  "orbitCenterc": -479.375616078497,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Halleys Ellipse Factor",
-  "startPos": 200,
-  "speed": -6.20009460094839,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
-  "orbitTiltb": Math.sin(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561)
-},
-{
-  "name": "Halleys",
-  "size": 6,
-  "startPos": 0,
-  "speed": 0,
-  "rotationSpeed": 1043.12937189584,
-  "tilt": 0,
-  "orbitRadius": 1788.20900979424,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "BARYCENTER EROS",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 17.0301972356361,
-  "orbitCentera": -41.5066637049184,
-  "orbitCenterb": 27.010766876461,
-  "orbitCenterc": 0
-},
-{
-  "name": "Barycenter Eros-Sun",
-  "startPos": 0,
-  "speed": 0,
-  "orbitRadius": 0,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-},
-{
-  "name": "Eros Barycenter Location",
-  "startPos": 0,
-  "speed": Math.PI*2,
-  "orbitRadius": 0,
-  "orbitCentera": -41.5066637049184,
-  "orbitCenterb": 27.010766876461,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-},
-{
-  "name": "Eros Ellipse Factor",
-  "startPos": 114.6,
-  "speed": 0.852798978486624,
-  "orbitRadius": 17.0301972356361,
-  "orbitCentera": 100,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": Math.cos(((-90-304.4115786)*Math.PI)/180)*-10.82903287,
-  "orbitTiltb": Math.sin(((-90-304.4115786)*Math.PI)/180)*-10.82903287
-},
-{
-  "name": "Eros",
-  "size": 1,
-  "startPos": 57.3,
-  "speed": -3.56799275538197,
-  "rotationSpeed": 10451.0875434594,
-  "tilt": 0,
-  "orbitRadius": 145.826791115055,
-  "orbitCentera": 0,
-  "orbitCenterb": 0,
-  "orbitCenterc": 0,
-  "orbitTilta": 0,
-  "orbitTiltb": 0
-}
-]
-
-//DEFINE TIME CONSTANTS
-const yearLength = 365.242234075933
-const earthRotations = 366.242234075933
-
-const sDay = 1/yearLength;
-const sYear = sDay*365
+//*************************************************************
+// ADD GLOBAL INPUT CONSTANTS
+//*************************************************************
+const holisticyearLength = 305952;
+// Input Length of Holistic-Year in Years
+const perihelionalignmentYear = 1246;
+// Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
+const perihelionalignmentJD = 2176142;
+// Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
+const lengthsolaryearindaysin1246 = 365.242236;
+// Reference length of solar year in days in 1246 AD according to EPOCH document = MEAN
+const meansiderealyearlengthinSeconds = 31558149.6846777;
+// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
+const startmodelJD = 2451717;
+// Start of the 3D model in Juliandate
+const startmodelYear = 2000.5;
+// Start of the 3D model in year
+const correctionDays = 2.7343897;
+// Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
+const earthtiltMean = 23.4243449577;
+const earthinclinationMean = 1.492075548;
+const earthandinclinationtiltAmplitude = 0.58;
+const eccentricityMean = 1.404974;
+const eccentricityAmplitude = 0.27304333159777;
+const eccentricitysinusCorrection = 0.6895;
+const mideccentricitypointAmplitude = 2.43229166666669;
+const helionpointAmplitude = 9.8471328125;
+const meansolardayAmplitudeinSeconds = 0.07875;
+const meansolaryearAmplitudeinDays = 0.00017926844;
+const meansiderealyearAmplitudeinSeconds = 0.3036366;
+//*************************************************************
+// ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
+//*************************************************************
+const meansolaryearlengthinDays = Math.round(lengthsolaryearindaysin1246 * (holisticyearLength / 16)) / (holisticyearLength / 16);
+const meanearthRotationsinDays = meansolaryearlengthinDays+1;
+const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
+const balancedYear = perihelionalignmentYear-(14.5*(holisticyearLength/16));
+const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
+const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
+const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
+//sDAY IS USED IN 3D MODEL CALCULATIONS 
+const sDay = 1/meansolaryearlengthinDays;
+//sDAY IS USED IN 3D MODEL CALCULATIONS
+const sYear = sDay*365;
 const sMonth = sDay*30;
 const sWeek = sDay*7;
 const sHour = sDay/24;
 const sMinute = sHour/60;
 const sSecond = sMinute/60;
 
-//*************************************************************
-//DEFINE PLANETS (Stars, Moons and deferents conunt as planets)
-//*************************************************************
+//alert(meansolaryearlengthinDays);
+//alert(meanearthRotationsinDays);
+//alert(startmodelyearwithCorrection);
+//alert(balancedYear);
+//alert(balancedJD);
+//alert(meansiderealyearlengthinDays);
+//alert(meanlengthofday);
+//alert(sDay);
+//alert(sYear);
+//alert(sMonth);
+//alert(sWeek);
+//alert(sHour);
+//alert(sMinute);
+//alert(sSecond);
 
-var startEarth = {
-  name: "Start Earth",
+//*************************************************************
+// ADD PLANETS (Stars, Moons and deferents conunt as planets)
+//*************************************************************
+const startingPoint = {
+  name: "Starting Point",
   size: 0.1,
   color: 0x578B7C,
   startPos: 0,
@@ -921,22 +158,22 @@ var startEarth = {
   isDeferent: true,
 };
 
-var earthWobbleCenter = {
+const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
   size: 0.011,
   color: 0x333333,
-  planetColor: 0xFFFFFF,
-  startPos: 0,
+  startPos: -112.791336670025,
   speed: 0,
   tilt: 0,
-  rotationSpeed: 0,
-  orbitRadius: 0,
+  rotationSpeed: -0.00026697458749521,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'deathstar.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/deathstar.png',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -945,29 +182,28 @@ var earthWobbleCenter = {
   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    //isDeferent: true,
 };
 
-var midEccentricityOrbit = {
-  name: "MID-ECCENTRICITY-ORBIT",
+const midEccentricityOrbit = {
+  name: "EARTH-MID-ECCENTRICITY-ORBIT",
    size: 0.011,   
    color: 0x0096FF,
-   planetColor: 0xFFFF00,
-   startPos: 0,
-   speed: 0,
+   startPos: -112.791336670025,
+   speed: 0.00026697458749521,
    rotationSpeed: 0,
    tilt: 0,
-   orbitRadius: 0,
+   orbitRadius: 1.404974,
    orbitCentera: 0,
    orbitCenterb: 0,
    orbitCenterc: 0,
    orbitTilta: 0,
    orbitTiltb: 0,
-   textureUrl: 'earth_mean_eccentricity.png',
+   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earth_mean_eccentricity.png',
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
@@ -976,32 +212,31 @@ var midEccentricityOrbit = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: true,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    isDeferent: true,
 };
 
-var helionPointAlternative = {
+const helionPointAlternative = {
   name: "Helion Point (Alternative)",
    size: 0.011,   
    color: 0x333333,
-   planetColor: 0xFFFF00,
-   startPos: 0,
-   speed: 0,
+   startPos: -104.204722055415,
+   speed: 0.0000616095201912024,
    rotationSpeed: 0,
    tilt: 0,
-   orbitRadius: 0,
+   orbitRadius: 1.404974,
    orbitCentera: 0,
    orbitCenterb: 0,
    orbitCenterc: 0,
    orbitTilta: 0,
    orbitTiltb: 0,
-   textureUrl: 'lightstar.png',
+   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
@@ -1010,55 +245,55 @@ var helionPointAlternative = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    isDeferent: true,
 };
 
-var earth = {
+const earth = {
   name: "Earth",
-  size: 0.00852703981708473,   
+  size: 0.0852703981708473,
+  // 10 times bigger than real 
   color: 0x333333,
   sphereSegments: 320,
   startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
+  speed: -0.00026697458749521,
+  rotationSpeed: 2301.16782401453,
+  tilt: -23.4243449577,
   tiltb: 0,
-  orbitRadius: 0,
+  orbitRadius: -0.27304333159777,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,  
-  textureUrl: 'Earth.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var earthInclinationPrecession = {
+const earthInclinationPrecession = {
   name: "Earth Inclination Precession",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: 98.5866146146096,
+  speed: 0.0000616095201912024,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1076,19 +311,19 @@ var earthInclinationPrecession = {
   isDeferent: true,
 };
 
-var earthEclipticPrecession = {
+const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: 164.311024357683,
+  speed: 0.000102682533652004,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTiltb: -0.58,
 
   visible: false,
   containerObj:"",
@@ -1099,19 +334,19 @@ var earthEclipticPrecession = {
   isDeferent: true,
 };
 
-var earthObliquityPrecession = {
+const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: 97.1023610277075,
+  speed: -0.000164292053843206,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTiltb: 0.58,
 
   visible: false,
   containerObj:"",
@@ -1122,18 +357,18 @@ var earthObliquityPrecession = {
   isDeferent: true,
 };
 
-var earthPerihelionPrecession1 = {
+const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: -194.204722055415,
+  speed: 0.000328584107686413,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
+  orbitTilta: -1.11,
   orbitTiltb: 0,
 
   visible: false,
@@ -1145,15 +380,15 @@ var earthPerihelionPrecession1 = {
   isDeferent: true,
 };
 
-var earthPerihelionPrecession2 = {
+const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: 194.204722055415,
+  speed: -0.000328584107686413,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: -1.404974,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1168,14 +403,14 @@ var earthPerihelionPrecession2 = {
   isDeferent: true,
 };
 
-var barycenterSun = {
+const barycenterSun = {
   name: "Barycenter Sun",
   size: 0.01,
   color: 0xFFFF00,
   startPos: 0,
   speed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 0.27304333159777,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1191,22 +426,22 @@ var barycenterSun = {
   isDeferent: true,
 };
 
-var earthHelionPoint = {
-   name: "HELION-POINT",
+const earthHelionPoint = {
+   name: "HELION-POINT = LONGITUDE PERIHELION",
    size: 0.011,   
    color: 0xBF40BF,
-   planetColor: 0xFFFF00,
    startPos: 0,    
    speed: 0,
    rotationSpeed: 0,
    tilt: 0,
-   orbitRadius: 0,
+   orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
    orbitCentera: 0,
    orbitCenterb: 0,
    orbitCenterc: 0,
    orbitTilta: 0,
    orbitTiltb: 0,
-   textureUrl: 'lightstar.png',
+   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
@@ -1215,31 +450,31 @@ var earthHelionPoint = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: true,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    //isDeferent: true,
 };
 
-var sun = {
+const sun = {
   name: "Sun",
   size: 0.930951753186224,    
   color: 0x333333,
   startPos: 0,
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  speed: Math.PI*2,
+  rotationSpeed: 83.9952982796623,
+  tilt: -7.155,
+  orbitRadius: 100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'Sun.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg',
   textureTransparency: 9,
   visible: true,
   emissive: true,
@@ -1247,25 +482,24 @@ var sun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceLength : sYear * 1000000,
   traceStep : sYear*10,
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var moonApsidalPrecession = {
+const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
   size: 0.001,
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: 340,
+  speed: 0.709885428149756,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: -0.0141069500625657,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1281,12 +515,12 @@ var moonApsidalPrecession = {
   isDeferent: true,
 }; 
 
-var moonApsidalNodalPrecession1 = {
+const moonApsidalNodalPrecession1 = {
   name: "Moon Apsidal Nodal Precession1",
   size: 0.001,
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: -90,
+  speed: -1.04769042735813,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1304,12 +538,12 @@ var moonApsidalNodalPrecession1 = {
   isDeferent: true,
 }; 
 
-var moonApsidalNodalPrecession2 = {
+const moonApsidalNodalPrecession2 = {
   name: "Moon Apsidal Nodal Precession2",
   size: 0.001,
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: 90,
+  speed: 1.04769042735813,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1327,12 +561,12 @@ var moonApsidalNodalPrecession2 = {
   isDeferent: true,
 }; 
 
-var moonRoyerCycle = {
+const moonRoyerCycle = {
   name: "Moon Royer Cycle",
   size: 0.001,
   color: 0xFFFF00,
-  startPos: 0,
-  speed: 0,
+  startPos: -44.1,
+  speed: -0.372080428941402,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1350,19 +584,19 @@ var moonRoyerCycle = {
   isDeferent: true,
 };
 
-var moonNodalPrecession = {
+const moonNodalPrecession = {
   name: "Moon Nodal Precession",
   size: 0.001,
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: 64.1,
+  speed: -0.337804999208372,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-5.1453964,
+  orbitTiltb: Math.sin(((-90+180)*Math.PI)/180)*-5.1453964,
 
   visible: false,
   containerObj:"",
@@ -1373,83 +607,82 @@ var moonNodalPrecession = {
   isDeferent: true,
 }; 
 
-var moon = {
+const moon = {
   name: "Moon",
-  size: 0.00232276033326404,
+  size: 0.0232276033326404,
+  //10 times bigger than real
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: 126.22,
+  speed: 83.9952982796623,
   rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  tilt: -6.687,
+  orbitRadius: 0.25695490731541,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
 
-  textureUrl: 'Moon.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   
   traceLength : sYear * 18,
   traceStep : sDay,
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var mercurySunBarycenter0 = {
+const mercurySunBarycenter0 = {
    name: "BARYCENTER MERCURY",
    size: 0.5,
    color: 0x333333,
-   planetColor: 0x868485,
    startPos: 0,    
-   speed: 0,
+   speed: Math.PI*2,
    rotationSpeed: 0,
    tilt: 0,
-   orbitRadius: 0,
-   orbitCentera: 0,
+   orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+   orbitCentera: -11.2169591606661,
    orbitCenterb: 0,
-   orbitCenterc: 0,
+   orbitCenterc: -0.6,
    orbitTilta: 0,
    orbitTiltb: 0,
-   textureUrl: 'mercury_barycenter.png',
+   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_barycenter.png',
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
-   visible: true,
+   visible: false,
    containerObj:"",
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
-   //isDeferent: true,
+   isDeferent: true,
 };
 
-var mercurySunBarycenter = {
+const mercurySunBarycenter = {
    name: "Barycenter Mercury-Sun",
    size: 0.01,   
    color: 0x333333,
-   planetColor: 0x868485,
    startPos: 0,    
    speed: 0,
    rotationSpeed: 0,
    tilt: 0,
    orbitRadius: 0,
-   orbitCentera: 0,
+   orbitCentera: 100,
    orbitCenterb: 0,
    orbitCenterc: 0,
    orbitTilta: 0,
@@ -1462,28 +695,28 @@ var mercurySunBarycenter = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    isDeferent: true,
 };
 
-var mercuryBarycenter = {
+const mercuryBarycenter = {
   name: "Mercury Barycenter Location",
   size: 0.1,
   color: 0x868485,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: -11.2169591606661,
   orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCenterc: -0.6,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -1496,16 +729,16 @@ var mercuryBarycenter = {
   isDeferent: true,
 };
 
-var mercuryEllipse = {
+const mercuryEllipse = {
   name: "Mercury Ellipse Factor",
   size: 0.1,
   color: 0x868485,
   startPos: 0,
-  speed: 0,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1520,83 +753,81 @@ var mercuryEllipse = {
   isDeferent: true,
 };
 
-var mercury = {
+const mercury = {
   name: "Mercury",
-  size: 0.00326167744046522,
+  //size: 0.00326167744046522,
+  size: 1,
   color: 0x868485,
-  startPos: 0,
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  startPos: 211.54,
+  speed: 26.0875244996281,
+  rotationSpeed: 39.1312867494422,
+  tilt: -0.03,
+  orbitRadius: 38.7107274186104,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-48.33167)*Math.PI)/180)*-7.00487,
+  orbitTiltb: Math.sin(((-90-48.33167)*Math.PI)/180)*-7.00487,
 
-  textureUrl: 'Mercury.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceLength : sYear * 14,
   traceStep : sDay,
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var venusSunBarycenter0 = {
+const venusSunBarycenter0 = {
   name: "BARYCENTER VENUS",
   size: 0.011,   
   color: 0x333333,
-  planetColor: 0xA57C1B,
   startPos: 0, 
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: -0.489934935944517,
   orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCenterc: -0.05,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'venus_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var venusSunBarycenter = {
+const venusSunBarycenter = {
   name: "Barycenter Venus-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA57C1B,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1609,28 +840,27 @@ var venusSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var venusBarycenter = {
+const venusBarycenter = {
   name: "Venus Barycenter Location",
   size: 0.1,
   color: 0xA57C1B,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: -0.489934935944517,
   orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCenterc: -0.05,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -1639,20 +869,20 @@ var venusBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var venusEllipse = {
+const venusEllipse = {
   name: "Venus Ellipse Factor",
   size: 0.1,
   color: 0xA57C1B,
   startPos: 0,
-  speed: 0,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1663,87 +893,84 @@ var venusEllipse = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var venus = {
+const venus = {
   name: "Venus",
-  size: 0.00809075686937222,
+  //size: 0.00809075686937222,
+  size: 1,
   color: 0xA57C1B,
-  startPos: 0,
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  startPos: 352.635,
+  speed: 10.2132976731898,
+  rotationSpeed: -9.4430965247729,
+  tilt: -2.6392,
+  orbitRadius: 72.3340172922693,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-76.68069)*Math.PI)/180)*-3.39471,
+  orbitTiltb: Math.sin(((-90-76.68069)*Math.PI)/180)*-3.39471,
   traceLength : sYear *16,
   traceStep : sWeek,
 
-  textureUrl: 'VenusAtmosphere.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var marsSunBarycenter0 = {
+const marsSunBarycenter0 = {
   name: "BARYCENTER MARS",
   size: 0.5,   
   color: 0x333333,
-  planetColor: 0xFF0000,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitRadius: 7.78722181048582,
+  orbitCentera: 8.83305630702754,
+  orbitCenterb: -20.1708748079022,
+  orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'mars_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var marsSunBarycenter = {
+const marsSunBarycenter = {
   name: "Barycenter Mars-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xFF0000,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1756,28 +983,27 @@ var marsSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var marsBarycenter = {
+const marsBarycenter = {
   name: "Mars Barycenter Location",
   size: 0.1,
   color: 0x008000,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCentera: 8.83305630702754,
+  orbitCenterb: -20.1708748079022,
+  orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -1789,20 +1015,20 @@ var marsBarycenter = {
   isDeferent: true,
 };  
 
-var marsEllipse = {
+const marsEllipse = {
   name: "Mars Ellipse Factor",
   size: 0.1,
   color: 0xFEAA0D,
-  startPos: 0,
-  speed: 0,
+  startPos: 243.094,
+  speed: 0.398326084542855,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
+  orbitRadius: 7.78722181048582,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-49.57854)*Math.PI)/180)*-1.85061,
+  orbitTiltb: Math.sin(((-90-49.57854)*Math.PI)/180)*-1.85061,
 
   visible: false,
   containerObj:"",
@@ -1812,15 +1038,16 @@ var marsEllipse = {
   isDeferent: true,
 }; 
 
-var mars = {
+const mars = {
   name: "Mars",
-  size: 0.00453148161022128,
+  //size: 0.00453148161022128,
+  size: 1,
   color: 0xFF0000,
-  startPos: 0,
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  startPos: 121.547,
+  speed: -3.34075569586122,
+  rotationSpeed: 2236.82429921882,
+  tilt: -25.19,
+  orbitRadius: 152.366713671252,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1829,30 +1056,30 @@ var mars = {
   traceLength : sYear * 44,
   traceStep : sWeek, 
 
-  textureUrl: 'Mars.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var phobos = {
+const phobos = {
   name: "Phobos",
-  size: 0.0000148397834115522,
+  //size: 0.0000148397834115522,
+  size: 0.027272727,
   color: 0x8b8b8b,
-  startPos: 0,
-  speed: 0,
+  startPos: 122,
+  speed: 6986.5,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 5,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1867,15 +1094,16 @@ var phobos = {
   isDeferent: true,
 };
 
-var deimos = {
+const deimos = {
   name: "Deimos",
-  size: 0.00000842257977412423,
+  //size: 0.00000842257977412423,
+  size: 0.027272727,
   color: 0x8b8b8b,
   startPos: 0,    
-  speed: 0,
+  speed: 1802,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 10,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1890,51 +1118,49 @@ var deimos = {
   isDeferent: true,
 };
 
-var jupiterSunBarycenter0 = {
+const jupiterSunBarycenter0 = {
   name: "BARYCENTER JUPITER",
   size: 0.5,   
   color: 0x333333,
-  planetColor: 0xCDC2B2,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: -14.8529260159503,
+  orbitCenterb: -44.5901620064302,
+  orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'jupiter_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var jupiterSunBarycenter = {
+const jupiterSunBarycenter = {
   name: "Barycenter Jupiter-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xCDC2B2,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -1947,28 +1173,27 @@ var jupiterSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var jupiterBarycenter = {
+const jupiterBarycenter = {
   name: "Jupiter Barycenter Location",
   size: 0.1,
   color: 0xCDC2B2,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCentera: -14.8529260159503,
+  orbitCenterb: -44.5901620064302,
+  orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -1977,43 +1202,44 @@ var jupiterBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var jupiterEllipse = {
+const jupiterEllipse = {
   name: "Jupiter Ellipse Factor",
   size: 0.1,
   color: 0xCDC2B2,
-  startPos: 0,    
-  speed: 0,
+  startPos: 41.205,    
+  speed: -5.75326128750832,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-100.55615)*Math.PI)/180)*-1.3053,
+  orbitTiltb: Math.sin(((-90-100.55615)*Math.PI)/180)*-1.3053,
   
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var jupiter = {
+const jupiter = {
   name: "Jupiter",
-  size: 0.0934652340617141,   
+  //size: 0.0934652340617141,   
+  size: 6,
   color: 0xCDC2B2,
   startPos: 0,    
   speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  rotationSpeed: 5549.34320193203,
+  tilt: -3.13,
+  orbitRadius: 519.969067802053,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2022,66 +1248,63 @@ var jupiter = {
   traceLength : sYear * 24,
   traceStep : sWeek,
   
-  textureUrl: 'Jupiter.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var saturnSunBarycenter0 = {
+const saturnSunBarycenter0 = {
   name: "BARYCENTER SATURN",
   size: 0.5,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: -99.8674039040765,
+  orbitCenterb: 3.4559296989952,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'saturn_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var saturnSunBarycenter = {
+const saturnSunBarycenter = {
   name: "Barycenter Saturn-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -2094,28 +1317,27 @@ var saturnSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var saturnBarycenter = {
+const saturnBarycenter = {
   name: "Saturn Barycenter Location",
   size: 0.1,
   color: 0xA79662,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCentera: -99.8674039040765,
+  orbitCenterb: 3.4559296989952,
+  orbitCenterc: 1.8,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -2124,43 +1346,44 @@ var saturnBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var saturnEllipse = {
+const saturnEllipse = {
   name: "Saturn Ellipse Factor",
   size: 0.1,   
   color: 0xA79662,
-  startPos: 0,    
-  speed: 0,
+  startPos: 34.355,    
+  speed: -6.06960563718342,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-113.71504)*Math.PI)/180)*-2.48446,
+  orbitTiltb: Math.sin(((-90-113.71504)*Math.PI)/180)*-2.48446,
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var saturn = {
+const saturn = {
   name: "Saturn",
-  size: 0.0778513754613971,   
+  //size: 0.0778513754613971,   
+  size: 5,
   color: 0xA79662,
   startPos: 0,    
   speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  rotationSpeed: 5215.37251228578,
+  tilt: -26.73,
+  orbitRadius: 952.971629139966,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2169,68 +1392,65 @@ var saturn = {
   traceLength : sYear * 60,
   traceStep : sWeek,
 
-  textureUrl: 'Saturn.jpg',
-  ringUrl: 'saturn-rings.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
+  ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-rings.png',
   ringSize: 10,
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var uranusSunBarycenter0 = {
+const uranusSunBarycenter0 = {
   name: "BARYCENTER URANUS",
   size: 0.5,   
   color: 0x333333,
-  planetColor: 0xD2F9FA,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: -27.8688886566711,
+  orbitCenterb: 175.24925683614,
+  orbitCenterc: -1.9,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'uranus_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var uranusSunBarycenter = {
+const uranusSunBarycenter = {
   name: "Barycenter Uranus-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xD2F9FA,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -2243,28 +1463,27 @@ var uranusSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var uranusBarycenter = {
+const uranusBarycenter = {
   name: "Uranus Barycenter Location",
   size: 0.1,
   color: 0xD2F9FA,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCentera: -27.8688886566711,
+  orbitCenterb: 175.24925683614,
+  orbitCenterc: -1.9,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -2273,43 +1492,44 @@ var uranusBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var uranusEllipse = {
+const uranusEllipse = {
   name: "Uranus Ellipse Factor",
   size: 0.1,   
   color: 0xD2F9FA,
-  startPos: 0,    
-  speed: 0,
+  startPos: 134.51,    
+  speed: -6.2081449115867,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-74.22988)*Math.PI)/180)*-0.76986,
+  orbitTiltb: Math.sin(((-90-74.22988)*Math.PI)/180)*-0.76986,
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var uranus = {
+const uranus = {
   name: "Uranus",
-  size: 0.0339068997192601, 
+  //size: 0.0339068997192601, 
+  size: 5,
   color: 0xD2F9FA,
   startPos: 0,    
   speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  rotationSpeed: -3194.74981995042,
+  tilt: -82.23,
+  orbitRadius: 1913.91730411169,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2318,65 +1538,62 @@ var uranus = {
   traceLength : sYear * 18,
   traceStep : sWeek,
   
-  textureUrl: 'Uranus.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var neptuneSunBarycenter0 = {
+const neptuneSunBarycenter0 = {
   name: "BARYCENTER NEPTUNE",
   size: 0.5,   
   color: 0x333333,
-  planetColor: 0x5E93F1,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: -34.3277111737215,
+  orbitCenterb: -34.3620585913588,
+  orbitCenterc: 1.7,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'neptune_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
-  visible: true,
+  visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isDeferent: true,
+  isDeferent: true,
 };
 
-var neptuneSunBarycenter = {
+const neptuneSunBarycenter = {
   name: "Barycenter Neptune-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0x5E93F1,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -2389,28 +1606,27 @@ var neptuneSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var neptuneBarycenter = {
+const neptuneBarycenter = {
   name: "Neptune Barycenter Location",
   size: 0.1,
   color: 0x5E93F1,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCentera: -34.3277111737215,
+  orbitCenterb: -34.3620585913588,
+  orbitCenterc: 1.7,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -2419,43 +1635,44 @@ var neptuneBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var neptuneEllipse = {
+const neptuneEllipse = {
   name: "Neptune Ellipse Factor",
   size: 0.1,   
   color: 0x5E93F1,
-  startPos: 0,    
-  speed: 0,
+  startPos: 144.16,    
+  speed: -6.2448231126072,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-131.72169)*Math.PI)/180)*-1.76917,
+  orbitTiltb: Math.sin(((-90-131.72169)*Math.PI)/180)*-1.76917,
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var neptune = {
+const neptune = {
   name: "Neptune",
-  size: 0.0329175808251566,   
+  //size: 0.0329175808251566,
+  size: 5,
   color: 0x5E93F1,
   startPos: 0,    
   speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  rotationSpeed: 3418.56790376751,
+  tilt: -28.32,
+  orbitRadius: 2993.53460611855,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2464,37 +1681,41 @@ var neptune = {
   traceLength : sYear * 18,
   traceStep : sWeek,
   
-  textureUrl: 'Neptune.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-var plutoSunBarycenter0 = {
+//The accurate orbits of Pluto and Halleys and Eros will be added later
+// You can now make eccentric orbits with these settings (especially helpfull for hallays)
+//  orbitSemiMajor: 100,
+//  orbitSemiMinor: 30,
+
+const plutoSunBarycenter0 = {
   name: "BARYCENTER PLUTO",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
+  orbitCentera: 1355.8371267405,
+  orbitCenterb: 1400.74054002809,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'pluto_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
@@ -2503,27 +1724,25 @@ var plutoSunBarycenter0 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var plutoSunBarycenter = {
+const plutoSunBarycenter = {
   name: "Barycenter Pluto-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -2536,27 +1755,26 @@ var plutoSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var plutoBarycenter = {
+const plutoBarycenter = {
   name: "Pluto Barycenter Location",
   size: 5,
   color: 0x5E93F1,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
+  orbitCentera: 1355.8371267405,
+  orbitCenterb: 1400.74054002809,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -2566,43 +1784,44 @@ var plutoBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var plutoEllipse = {
+const plutoEllipse = {
   name: "Pluto Ellipse Factor",
   size: 0.1,   
   color: 0x5E93F1,
-  startPos: 0,    
-  speed: 0,
+  startPos: 215,    
+  speed: -6.25761735630024,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-110.30347)*Math.PI)/180)*-17.14175,
+  orbitTiltb: Math.sin(((-90-110.30347)*Math.PI)/180)*-17.14175,
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var pluto = {
+const pluto = {
   name: "Pluto",
-  size: 0.00158865897549076,   
+  //size: 0.00158865897549076,   
+  size: 5,
   color: 0x5E93F1,
   startPos: 0,    
   speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
+  rotationSpeed: 359.294297168521,
+  tilt: -57.47,
+  orbitRadius: 3923.3401562492,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2611,38 +1830,37 @@ var pluto = {
   traceLength : sYear * 18,
   traceStep : sWeek,
   
-  textureUrl: 'FictionalMakemake.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var halleysSunBarycenter0 = {
+const halleysSunBarycenter0 = {
   name: "BARYCENTER HALLEYS",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
-  speed: 0,
+  speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 0.0000000000000000000000000001,
+  // Only to prevent the default orbit ring is shown if 0
   orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCenterb: 3425.26406009445,
+  orbitCenterc: -479.375616078497,
   orbitTilta: 0,
   orbitTiltb: 0,
-  textureUrl: 'halleys_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   
@@ -2651,27 +1869,25 @@ var halleysSunBarycenter0 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var halleysSunBarycenter = {
+const halleysSunBarycenter = {
   name: "Barycenter Halleys-Sun",
   size: 0.01,   
   color: 0x333333,
-  planetColor: 0xA79662,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -2684,27 +1900,26 @@ var halleysSunBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var halleysBarycenter = {
+const halleysBarycenter = {
   name: "Halleys Barycenter Location",
   size: 0.1,
   color: 0xA57C1B,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
+  orbitCenterb: 3425.26406009445,
+  orbitCenterc: -479.375616078497,
   orbitTilta: 0,
   orbitTiltb: 0,
 
@@ -2713,44 +1928,44 @@ var halleysBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var halleysEllipse = {
+const halleysEllipse = {
   name: "Halleys Ellipse Factor",
   size: 0.1,
   color: 0xA57C1B,
-  startPos: 0,
-  speed: 0,
+  startPos: 200,
+  speed: -6.20009460094839,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
+  orbitTiltb: Math.sin(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var halleys = {
+const halleys = {
   name: "Halleys",
-  size: 0.0000073530458345529,
+  //size: 0.0000073530458345529,
+  size: 6,
   color: 0x00FF00,
-  planetColor: 0xFFFFFF,
   startPos: 0,
   speed: 0,
-  rotationSpeed: 0,
+  rotationSpeed: 1043.12937189584,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 1788.20900979424,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2759,38 +1974,36 @@ var halleys = {
   traceLength : sYear * 90,
   traceStep : sWeek,
 
-  textureUrl: 'FictionalCeres.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
   isDeferent: true,
 };
 
-var erosSunBarycenter0 = {
+const erosSunBarycenter0 = {
    name: "BARYCENTER EROS",
    size: 0.01,   
    color: 0x333333,
-   planetColor: 0xA79662,
    startPos: 0,    
-   speed: 0,
+   speed: Math.PI*2,
    rotationSpeed: 0,
    tilt: 0,
-   orbitRadius: 0,
-   orbitCentera: 0,
-   orbitCenterb: 0,
+   orbitRadius: 17.0301972356361,
+   orbitCentera: -41.5066637049184,
+   orbitCenterb: 27.010766876461,
    orbitCenterc: 0,
    orbitTilta: 0,
    orbitTiltb: 0,
-   textureUrl: 'eros_barycenter.png',
+   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_barycenter.png',
    traceLength : sYear * 1000000,
    traceStep : sYear,
   
@@ -2799,27 +2012,26 @@ var erosSunBarycenter0 = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    isDeferent: true,
 };
 
-var erosSunBarycenter = {
+const erosSunBarycenter = {
    name: "Barycenter Eros-Sun",
    size: 0.01,   
    color: 0x333333,
-   planetColor: 0xA79662,
    startPos: 0,    
    speed: 0,
    rotationSpeed: 0,
    tilt: 0,
    orbitRadius: 0,
-   orbitCentera: 0,
+   orbitCentera: 100,
    orbitCenterb: 0,
    orbitCenterc: 0,
    orbitTilta: 0,
@@ -2832,26 +2044,26 @@ var erosSunBarycenter = {
    orbitObj:"",
    planetObj:"",
    pivotObj:"",
-   axisHelper: true,
+   axisHelper: false,
 
    traceOn: false,
-   traceLine: false,
+
    traceStartPos : 0,
    traceCurrPos : 0,
    traceArrIndex : 0,
    isDeferent: true,
 };
 
-var erosBarycenter = {
+const erosBarycenter = {
   name: "Eros Barycenter Location",
   size: 0.1,
   color: 0xA57C1B,
   startPos: 0,
-  speed: 0,
+  speed: Math.PI*2,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
+  orbitCentera: -41.5066637049184,
+  orbitCenterb: 27.010766876461,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -2861,41 +2073,43 @@ var erosBarycenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var erosEllipse = {
+const erosEllipse = {
   name: "Eros Ellipse Factor",
   size: 0.1,
   color: 0xA57C1B,
-  startPos: 0,
-  speed: 0,
+  startPos: 114.6,
+  speed: 0.852798978486624,
   tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
+  orbitRadius: 17.0301972356361,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-304.4115786)*Math.PI)/180)*-10.82903287,
+  orbitTiltb: Math.sin(((-90-304.4115786)*Math.PI)/180)*-10.82903287,
 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
   isDeferent: true,
 };
 
-var eros = {
+const eros = {
   name: "Eros",
-  size: 0.0000112568447139883,
+  //size: 0.0000112568447139883,
+  size: 1,
   color: 0xA57C1B,
-  startPos: 0,
-  speed: 0,
+  startPos: 57.3,
+  speed: -3.56799275538197,
+  rotationSpeed: 10451.0875434594,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 145.826791115055,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2904,16 +2118,15 @@ var eros = {
   traceLength : sYear *16,
   traceStep : sWeek,
 
-  textureUrl: 'FictionalEris.jpg',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: true,
+  axisHelper: false,
 
   traceOn: false,
-  traceLine: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
@@ -2921,124 +2134,153 @@ var eros = {
 };
 
 //*************************************************************
-// GLOBAL and GUI SETTINGS
+// ADD CONSTANTS
 //*************************************************************
-var o = {
-  'ambientLight' : 2,
-  'sunLight' : 2,
-  'background' : 0x000000,
-  'Run' : false,
-  'traceBtn' : false,
-  '1 second equals' : sWeek,
-  'speedFact' : sWeek,
-  'speed' : 1,
-  'reverse' : false,
-  'Step forward' : function() {
-    if (o.speedFact === sYear) {
-      o.pos = dateToDays(addYears(o.Date, 1))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*10 ) {
-      o.pos = dateToDays(addYears(o.Date, 10))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*100 ) {
-      o.pos = dateToDays(addYears(o.Date, 100))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*1000 ) {
-      o.pos = dateToDays(addYears(o.Date, 1000))*sDay + timeToPos(o.Time)
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+
+const tracePlanets = [earthHelionPoint, midEccentricityOrbit, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
+
+//*************************************************************
+// ADD ALL CALENDAR CONSTANTS
+//*************************************************************
+const GREGORIAN_START = { year: 1582, month: 10, day: 15};
+// Start of the Gregorian Calendar
+const GREGORIAN_START_JD = 2299160.5;
+// Start of the Gregorian Calendar in Juliandate
+const REVISION_START_JD = perihelionalignmentJD;
+// Start of the Revised Julian Calendar in Juliandate
+
+//*************************************************************
+// ADD ALL SETTINGS NEEDED FOR GUI
+//*************************************************************
+let o = {
+  background: 0x000000,
+  Run: false,
+  traceBtn: false,
+  '1 second equals': sWeek,
+  speedFact: sWeek,
+  speed: 1,
+  reverse: false,
+
+  'Step forward': function () {
+    if (this.speedFact === sYear) {
+      this.pos = dateToDays(addYears(this.Date, 1)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 10) {
+      this.pos = dateToDays(addYears(this.Date, 10)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 100) {
+      this.pos = dateToDays(addYears(this.Date, 100)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 1000) {
+      this.pos = dateToDays(addYears(this.Date, 1000)) * sDay + timeToPos(this.Time);
     } else {
-      o.pos += o.speedFact
+      this.pos += this.speedFact;
     }
   },
 
-  'Step backward' : function() {
-    if (o.speedFact === sYear) {
-      o.pos = dateToDays(addYears(o.Date, -1))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*10 ) {
-      o.pos = dateToDays(addYears(o.Date, -10))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*100 ) {
-      o.pos = dateToDays(addYears(o.Date, -100))*sDay + timeToPos(o.Time)
-    } else if (o.speedFact === sYear*1000 ) {
-      o.pos = dateToDays(addYears(o.Date, -1000))*sDay + timeToPos(o.Time)
+  'Step backward': function () {
+    if (this.speedFact === sYear) {
+      this.pos = dateToDays(addYears(this.Date, -1)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 10) {
+      this.pos = dateToDays(addYears(this.Date, -10)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 100) {
+      this.pos = dateToDays(addYears(this.Date, -100)) * sDay + timeToPos(this.Time);
+    } else if (this.speedFact === sYear * 1000) {
+      this.pos = dateToDays(addYears(this.Date, -1000)) * sDay + timeToPos(this.Time);
     } else {
-      o.pos -= o.speedFact
+      this.pos -= this.speedFact;
     }
   },
-  'Reset' : function() {o.pos = 0; controls.reset()},
-  'Today' : function() {
-              const newPos = sDay * dateToDays(new Intl.DateTimeFormat("sv-SE", {year: "numeric", month: "2-digit", day: "2-digit"}).format(Date.now()))
-              o.pos = newPos; controls.reset()
-  }, 
-//  pos : 0,
-  'Position' : "", // Dat.GUI var for pos
-  'Date' : "",
-  'cSphereSize' : 1,
-  'zodiacSize'  : 1,
-  'starDistanceScaleFact' : 1.5,
-  'starDistance' : 5000,
-  'starSize' : 1,
-  'starNamesVisible' : false,
-  'Axis helpers' : false,
-  'Shadows' : false,
-  'Orbits' : true,
-  'Time' : "00:00:00",
-  'Zoom' : 0,
-  'worldCamX' : '0',
-  'worldCamY' : '0',
-  'worldCamZ' : '0',
-  'worldCamDist' : '0',
-  'worldCamDistKm' : '0',
-  'worldCamRa' : '0',
-  'worldCamDec' : '0',
-  
-  'Day' : "",
-  'julianDay' : "",  
-  'Line trace' : true,
-  'Earth camera' : false,
+
+  'Reset': function () {
+    this.pos = 0;
+    controls.reset();
+  },
+
+  'Today': function () {
+    const newPos = sDay * dateToDays(
+      new Intl.DateTimeFormat("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit" }).format(Date.now())
+    );
+    this.pos = newPos;
+    controls.reset();
+  },
+
+  Position: "", 
+  Date: "",
+  periheliondate: "",
+  cSphereSize: 1,
+  zodiacSize: 1,
+  starDistanceScaleFact: 1.5,
+  starDistance: 5000,
+  starSize: 1,
+  starsizeBase: 50,
+  starNamesVisible: false,
+  'Axis helpers': false,
+  Orbits: true,
+  Time: "00:00:00",
+  Zoom: 0,
+  worldCamX: '0',
+  worldCamY: '0',
+  worldCamZ: '0',
+  worldCamDist: '0',
+  worldCamDistKm: '0',
+  worldCamRa: '0',
+  worldCamDec: '0',
+
+  Day: "",
+  julianDay: "",
+  juliandaysbalancedJD: 0,
+  'Line trace': true,
   'Camera Lat': 0,
   'Camera Long': 0,
   'Polar line': false,
-  'polarLineLength': 1,
-  'Camera helper' : false,
-  'Performance' : false,
-  'camX' : 0,
-  'camY' : 0,
-  'camZ' : 0,
-  'Size' : 1,
-  'traceSize' : 1,
-  traceLength : sYear * 18,
-  traceStep : sDay,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  Lines : true,
+  polarLineLength: 1,
+  Performance: false,
+  camX: 0,
+  camY: 0,
+  camZ: 0,
+  Size: 1,
+  traceSize: 1,
+  traceLength: sYear * 18,
+  traceStep: sDay,
+  tracePlanet: earth,
+  traceArrIndex: 0,
+  Lines: true,
 
-  "moonElongation":0.01,
-  "mercuryElongation":0.01,
-  "venusElongation":0.01,
-  "marsElongation":0.01,
-  "jupiterElongation":0.01,
-  "saturnElongation":0.01,
-  "uranusElongation":0.01,
-  "neptuneElongation":0.01,
-  
-  infotext: true,
-  "Target" : "",
-  lookAtObj : {},
-}
+  moonElongation: 0.01,
+  mercuryElongation: 0.01,
+  venusElongation: 0.01,
+  marsElongation: 0.01,
+  jupiterElongation: 0.01,
+  saturnElongation: 0.01,
+  uranusElongation: 0.01,
+  neptuneElongation: 0.01,
 
-const planets = [startEarth, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+  Target: "",
+  lookAtObj: {}
+};
 
-const tracePlanets = [earthWobbleCenter, earthHelionPoint, midEccentricityOrbit, sun, moon, mercurySunBarycenter0, mercury, venusSunBarycenter0, venus, marsSunBarycenter0, mars, jupiterSunBarycenter0, jupiter, saturnSunBarycenter0, saturn, uranusSunBarycenter0, uranus, neptuneSunBarycenter0, neptune]
+let predictions = {
+  juliandaysbalancedJD: 0,
+  lengthofDay: 0,
+  lengthofsiderealDay: 0,
+  predictedDeltat: 0,
+  lengthofsolarYear: 0,
+  lengthofsiderealYear: 0,
+  lengthofanomalisticYear: 0,
+  perihelionPrecession: 0,
+  axialPrecession: 0,
+  inclinationPrecession: 0,
+  obliquityPrecession: 0,
+  eccentricityEarth: 0,
+  obliquityEarth: 0,
+  inclinationEarth: 0,
+  longitudePerihelion: 0,
+  lengthofAU: 0,
+  anomalisticMercury: 0,
+};
 
 //*************************************************************
-// LOAD DEFAULT SETTINGS
+// LOAD DEFAULT SETTINGS (Three.js core setup (scene, camera, renderer))
 //*************************************************************
-let jsonObj = defaultSettings;
-planets.forEach(obj => {
-  let newVals = jsonObj.find(obj2 => {
-    return obj.name === obj2.name
-  });
-  Object.assign(obj, newVals);  
-  // updatePlanet(obj)
-  // initTrace(obj)
-});
-
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( o.background );
 
@@ -3046,90 +2288,27 @@ const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.5; // Try adjusting this
+renderer.useLegacyLights = false
+
 document.body.appendChild(renderer.domElement);
 
-// INIT XRING GEOMETRY AND CROSS ORIGIN TEXTURE LOADING
-initXRingGeometry();
-THREE.ImageUtils.crossOrigin = '';
+const textureLoader = new THREE.TextureLoader();
+textureLoader.setCrossOrigin('');
+textureLoader.load('url', texture => {});
 
 //*************************************************************
 // CREATE AND CONFIGURE PLANETS
 //*************************************************************
-createPlanet(startEarth);
-createPlanet(earthWobbleCenter);
-createPlanet(midEccentricityOrbit);
-createPlanet(helionPointAlternative);
-createPlanet(earth);
-createPlanet(earthPerihelionPrecession1);
-createPlanet(earthPerihelionPrecession2);
-createPlanet(earthObliquityPrecession);
-createPlanet(earthInclinationPrecession);
-createPlanet(earthEclipticPrecession);
-createPlanet(barycenterSun);
-createPlanet(earthHelionPoint);
-createPlanet(mercurySunBarycenter0);
-createPlanet(mercurySunBarycenter);
-createPlanet(venusSunBarycenter0);
-createPlanet(venusSunBarycenter);
-createPlanet(marsSunBarycenter0);
-createPlanet(marsSunBarycenter);
-createPlanet(jupiterSunBarycenter0);
-createPlanet(jupiterSunBarycenter);
-createPlanet(saturnSunBarycenter0);
-createPlanet(saturnSunBarycenter);
-createPlanet(uranusSunBarycenter0);
-createPlanet(uranusSunBarycenter);
-createPlanet(neptuneSunBarycenter0);
-createPlanet(neptuneSunBarycenter);
-createPlanet(plutoSunBarycenter0);
-createPlanet(plutoSunBarycenter);
-createPlanet(halleysSunBarycenter0);
-createPlanet(halleysSunBarycenter);
-createPlanet(erosSunBarycenter0);
-createPlanet(erosSunBarycenter);
-createPlanet(sun);
-createPlanet(moonApsidalPrecession);
-createPlanet(moonApsidalNodalPrecession1);
-createPlanet(moonApsidalNodalPrecession2);
-createPlanet(moonRoyerCycle);
-createPlanet(moonNodalPrecession);
-createPlanet(moon);
-moon.planetObj.rotation.y = Math.PI //quick fix so that the Moon texture is turned towards Earth
-createPlanet(mercuryBarycenter);
-createPlanet(mercuryEllipse);
-createPlanet(mercury);
-createPlanet(venusBarycenter);
-createPlanet(venusEllipse);
-createPlanet(venus);
-createPlanet(marsBarycenter);
-createPlanet(marsEllipse);
-createPlanet(mars);
-createPlanet(phobos);
-createPlanet(deimos);
-createPlanet(jupiterBarycenter);
-createPlanet(jupiterEllipse);
-createPlanet(jupiter);
-createPlanet(saturnBarycenter);
-createPlanet(saturnEllipse);
-createPlanet(saturn);
-createPlanet(uranusBarycenter);
-createPlanet(uranusEllipse);
-createPlanet(uranus);
-createPlanet(neptuneBarycenter);
-createPlanet(neptuneEllipse);
-createPlanet(neptune);
-createPlanet(plutoBarycenter);
-createPlanet(plutoEllipse);
-createPlanet(pluto);
-createPlanet(halleysBarycenter);
-createPlanet(halleysEllipse);
-createPlanet(halleys);
-createPlanet(erosBarycenter);
-createPlanet(erosEllipse);
-createPlanet(eros);
+//First add the default settings of the planets
+planetObjects.forEach(obj => createPlanet(obj));
 
-startEarth.pivotObj.add(earth.containerObj);
-startEarth.pivotObj.add(helionPointAlternative);
+//Now adding the order of all objects 
+startingPoint.pivotObj.add(earth.containerObj);
+startingPoint.pivotObj.add(helionPointAlternative.containerObj);
+
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
 earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
 earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
@@ -3211,193 +2390,240 @@ earth.containerObj.rotation.y = Math.PI/2;
 //*************************************************************
 // CREATE VALUE HOLDERS FOR Right Ascension, Declination and Distance
 //*************************************************************
-planets.forEach(obj => {
+planetObjects.forEach(obj => {
     obj.ra = "";
     obj.dec = "";
+    obj.raDisplay = '';
+    obj.decDisplay = '';
     obj.dist = "";      
     obj.distKm = "";      
 })
 
 //*************************************************************
-// CREATTE BARYCENTER, CELESTIAL SPHERE AND ECLIPTIC GRID
+// ADD CELESTIAL SPHERE, ECLIPTIC GRID & ZODIAC TO Earth
 //*************************************************************
-const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
-const bMaterial = new THREE.MeshBasicMaterial( { color: 0x333333 } );
-const barycenter = new THREE.Mesh( new THREE.SphereGeometry( 0.01, 32, 16 ), new THREE.MeshBasicMaterial( { color: 0x578B7C } ) );
-scene.add(barycenter);
-const celestialSphere = createCelestialSphere(o.starDistance)
+// Celestial sphere setup
+const celestialSphere = createCelestialSphere(o.starDistance);
 earth.rotationAxis.add(celestialSphere);
 celestialSphere.visible = false;
-const csLookAtObj = new THREE.Object3D();
-celestialSphere.add(csLookAtObj)
 
-const zodiac = new THREE.PolarGridHelper( radius = 250, radials = 24, circles = 1, divisions = 64, color1 = 0x000000, color2 = 0x555555 );
-const zCanvas = getCircularText("      GEMINI             TAURUS             ARIES             PISCES          AQUARIUS       CAPRICORN     SAGITTARIUS      SCORPIO             LIBRA              VIRGO                LEO               CANCER ", 800, 0, "right", false, true, "Arial", "18pt", 2);
+// Object to help align the celestial sphere
+const csLookAtObj = new THREE.Object3D();
+celestialSphere.add(csLookAtObj);
+
+// Ground plane grid helper
+const plane = new THREE.GridHelper(o.starDistance * 2, 30, 0x008800, 0x000088);
+earth.pivotObj.add(plane);
+plane.visible = false;
+
+// Zodiac
+const zodiac = new THREE.PolarGridHelper(250, 24, 1, 64, 0x000000, 0x555555);
+
+// Generate zodiac circular text texture
+const zodiacText = "      GEMINI             TAURUS             ARIES             PISCES          AQUARIUS       CAPRICORN     SAGITTARIUS      SCORPIO             LIBRA              VIRGO                LEO               CANCER ";
+const zCanvas = getCircularText(
+    zodiacText,
+    800,
+    0,
+    "right",
+    false,
+    true,
+    "Arial",
+    "18pt",
+    2
+);
+
+// Create texture and mesh for circular label
 const zTexture = new THREE.CanvasTexture(zCanvas);
-const zLabelGeometry = new THREE.RingGeometry( 235, 250, 32 );
+zTexture.anisotropy = 8;
+zTexture.minFilter = THREE.LinearMipMapLinearFilter;
+zTexture.magFilter = THREE.LinearFilter;
+zTexture.needsUpdate = true;
+
+const zLabelGeometry = new THREE.RingGeometry(235, 250, 128);
 const zLabelMaterial = new THREE.MeshBasicMaterial({
     map: zTexture,
     side: THREE.DoubleSide,
     transparent: true,
     opacity: 1,
+    depthWrite: false
 });
+
 const zLabel = new THREE.Mesh(zLabelGeometry, zLabelMaterial);
+zLabel.rotation.x = -Math.PI / 2;
 zodiac.add(zLabel);
-zLabel.rotation.x = -Math.PI/2
+
+// Add to scene
 earth.pivotObj.add(zodiac);
-zodiac.position.y = 0; 
+zodiac.position.y = 0;
 zodiac.visible = false;
 
-const plane = new THREE.GridHelper(o.starDistance*2, 30, 0x008800, 0x000088);
-earth.pivotObj.add(plane);
-plane.visible = false
+// Add Glow effect of zodiac
+const glowGeometry = new THREE.RingGeometry(255, 265, 128);
+const glowMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffaa,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.2,
+    depthWrite: false
+});
+
+// Add Glow ring (can be used in render loop)
+const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
+glowRing.rotation.x = -Math.PI / 2;
+zodiac.add(glowRing);
+
+// Add polar line
+const polarLine = createEarthPolarLine();
+earth.rotationAxis.add(polarLine);
 
 //*************************************************************
 // CREATE MILKYWAY SKYDOME
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
+const loader = new THREE.TextureLoader();
+const skyTexture = loader.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
 
-const skyTexture = new THREE.TextureLoader().load("milkyway.jpg");
-
-const skyMaterial = new THREE.MeshBasicMaterial({ 
-         map: skyTexture,
- });
-
+// ✅ Set correct color space for color image textures
+skyTexture.colorSpace = THREE.SRGBColorSpace; // This is the correct setting for normal color images
+const skyMaterial = new THREE.MeshBasicMaterial({
+  map: skyTexture,
+  side: THREE.BackSide
+});
 const sky = new THREE.Mesh(skyGeo, skyMaterial);
-sky.material.side = THREE.BackSide;
 scene.add(sky);
 
 //*************************************************************
-// CREATE BACKGOUND STARFIELD AND PLOT NAKED EYE VISIBLE STARS
+// ADD STARS, CONSTELLATIONS
 //*************************************************************
+const sceneObjects = {
+  stars: new THREE.Object3D(),
+  constellations: new THREE.Object3D(),
+  // we can add other fixed obects over here later on. e.g.
+  //blackholes: new THREE.Object3D(), 
+};
 
-createStarfield()
-scene.updateMatrixWorld() 
-const starsContainer = new THREE.Object3D();
-starsContainer.applyMatrix( earth.rotationAxis.matrixWorld )
-scene.add(starsContainer)
-starsContainer.visible = false
+// Add containers to the scene
+scene.add(sceneObjects.stars);
+scene.add(sceneObjects.constellations);
+// we can add other fixed objects over here later on. e.g.
+//scene.add(sceneObjects.blackholes);
 
-function createLabel(message) {
-  const fontSize = 30;
-  let canvas = document.createElement('canvas');
-  let context = canvas.getContext('2d');
-  canvas.width = 256;
-  canvas.height = 128;
-  context.font = fontSize + "px Arial";
-  context.strokeStyle = 'black';
-  context.lineWidth = 8;
-  context.strokeText(message, 0, fontSize);
-  context.fillStyle = 'LightGrey';
-  context.fillText( message, 0, fontSize);
-  let texture = new THREE.Texture(canvas) 
-  texture.needsUpdate = true;
-  let spriteMaterial = new THREE.SpriteMaterial( { map: texture, depthTest: false} );
-  let sprite = new THREE.Sprite( spriteMaterial );
-  return sprite;  
-}
+// --- Create Starfield ---
+createStarfield();
+scene.updateMatrixWorld();
+sceneObjects.stars.applyMatrix4(earth.rotationAxis.matrixWorld);
+sceneObjects.stars.visible = true;
 
-//*************************************************************
-// ADD THE STARS
-//*************************************************************
-const bsc5url = 'input-stars.json'
-/*
-https://github.com/brettonw/YaleBrightStarCatalog
-Fields in the Short BSC5 file (empty fields are omitted):
-Field	Description
-HR	Harvard Revised Number = Bright Star Number
-F	Flamsteed number, to be taken with the constellation name
-B	Bayer designation as greek letter with superscript sequence (if multi), to be taken with the constellation name
-N	The common name of the star (drawn from IAU designations and notes)
-C	The traditional 3-letter abbreviation for the constellation name
-RA	Right Ascension (00h 00m 00.0s), equinox J2000, epoch 2000.0
-Dec	Declination (+/-00° 00′ 00″), equinox J2000, epoch 2000.0
-K	An approximate color temperature of the star, computed from B-V or the SpectralCls
-V	Visual magnitude
-*/
+// --- Create Constellations ---
+scene.updateMatrixWorld();
+sceneObjects.constellations.applyMatrix4(earth.rotationAxis.matrixWorld);
+sceneObjects.constellations.visible = false;
+
+// --- Create Blackholes ---
+//scene.updateMatrixWorld();
+//sceneObjects.blackholes.applyMatrix4(earth.rotationAxis.matrixWorld);
+//sceneObjects.blackholes.visible = false;
+
+// --- Add star texture for nice glow effect ---
+const starTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'); // <-- small transparent glow
+
+// ✅ Set correct color space for color image textures
+starTexture.colorSpace = THREE.SRGBColorSpace;
+
+// --- Add the Stars RA coordinates ---
+const bsc5url = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/stars.json';
+
 fetch(bsc5url)
   .then(response => response.json())
   .then(bscStars => {
+    const starsizeBase = 50; // <-- Increase base size
 
-  bscStars.forEach(obj => {
-    if (obj.N !== undefined) {    
+    bscStars.forEach(obj => {
+      if (obj.N !== undefined) {
+        const starPos = new THREE.Object3D();
+        starPos.rotation.z = decToRadians(obj.Dec);
+        starPos.rotation.y = raToRadians(obj.RA) - Math.PI / 2;
 
-      const starPos = new THREE.Object3D();
-      starPos.rotation.z = decToRad(obj.Dec)
-      starPos.rotation.y = raToRad(obj.RA) - Math.PI/2
-      let starsize;
-      if (obj.V < 1) {
-        starsize = 12;
-      } else if(obj.V > 1 && obj.V < 3) {
-        starsize = 6;
-      } else if(obj.V > 3 && obj.V < 5) {
-        starsize = 3;
-      } else {
-        starsize = 1;
+        let starsize;
+        if (obj.V < 1) {
+          starsize = starsizeBase * 1.5;
+        } else if (obj.V > 1 && obj.V < 3) {
+          starsize = starsizeBase * 1.0;
+        } else if (obj.V > 3 && obj.V < 5) {
+          starsize = starsizeBase * 0.6;
+        } else {
+          starsize = starsizeBase * 0.3;
+        }
+
+        const starMaterial = new THREE.SpriteMaterial({
+          map: starTexture,
+          //color: 0xffffff,
+          color: colorTemperature2rgb(obj.K),
+          transparent: true,
+          depthWrite: false,
+        });
+
+        const star = new THREE.Sprite(starMaterial);
+        star.scale.set(starsize, starsize, 1);
+        star.userData.magnitude = obj.V; // <--- SAVE magnitude for later
+        star.position.x = o.starDistance;
+
+        // Tiny random jitter for realism
+        star.position.x += (Math.random() - 0.5) * 0.001;
+        star.position.y += (Math.random() - 0.5) * 0.001;
+        star.position.z += (Math.random() - 0.5) * 0.001;
+
+        const nameTag = createLabel(obj.N);
+        nameTag.visible = o.starNamesVisible;
+        nameTag.position.copy(star.position);
+
+        starPos.add(star);
+        starPos.add(nameTag);
+        sceneObjects.stars.add(starPos);
       }
-      const star = new THREE.Mesh(
-        new THREE.SphereBufferGeometry(starsize, 20, 20),
-
-        new THREE.MeshBasicMaterial({color: colorTemperature2rgb(obj.K)})
-      );
-      star.position.x = o.starDistance;
-      const nameTag = createLabel(obj.N);
-      nameTag.visible = o.starNamesVisible;
-      nameTag.position.copy(star.position)
-      starPos.add(star)
-      starPos.add(nameTag)
-      starsContainer.add(starPos);
-    }
+    });
   });
+
+// --- Add the Constellations Texture ---
+const constellationMaterial = new THREE.LineDashedMaterial({
+  color: 0x00aaff,
+  linewidth: 1,
+  scale: 1,
+  dashSize: 2,
+  gapSize: 1,
+  opacity: 0.5,
+  transparent: true,
 });
 
-const constContainer = new THREE.Object3D();
-scene.updateMatrixWorld()
-constContainer.applyMatrix( earth.rotationAxis.matrixWorld )
-scene.add(constContainer)
-constContainer.visible = false;
+// --- Add the Constellations RA coordinates ---
+const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
 
-//*************************************************************
-// ADD THE CONSTELLATIONS
-//*************************************************************
-const constellationsUrl = 'input-constellations.json'
-//create a blue LineBasicMaterial
-const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 fetch(constellationsUrl)
-  .then(response => {
-  return response.json();
-})
+  .then(response => response.json())
   .then(constData => {
-    const cRA = constData.rightAscension
-    const cDec = constData.declination
-    const cAst = constData.asterismIndices
-    
     let points = [];
-    
+
     for (let i = 0; i < constData.asterismIndices.length; i++) {
-
       let starIndex = constData.asterismIndices[i];
-      if (starIndex != -1) {
 
-        // Compute star position.
-        let ra = constData.rightAscension[starIndex];
-        let dec = constData.declination[starIndex];
+      if (starIndex !== -1) {
+        const ra = constData.rightAscension[starIndex];
+        const dec = constData.declination[starIndex];
 
-        let x = o.starDistance * Math.cos(dec) * Math.sin(ra);
-        let y = o.starDistance * Math.sin(dec);
-        let z = o.starDistance * Math.cos(dec) * Math.cos(ra);
+        const x = o.starDistance * Math.cos(dec) * Math.sin(ra);
+        const y = o.starDistance * Math.sin(dec);
+        const z = o.starDistance * Math.cos(dec) * Math.cos(ra);
 
-        // points.push(new THREE.Vector3(-x, y, z));
         points.push(new THREE.Vector3(x, y, z));
-      }
-      else {
-
-        // Create lines.
-        const geometry = new THREE.BufferGeometry().setFromPoints( points );
-        const line = new THREE.Line( geometry, material );
-        constContainer.add(line);
-        // Clear points array.
-        points = [];
+      } else {
+        if (points.length > 1) {
+          const geometry = new THREE.BufferGeometry().setFromPoints(points);
+          const line = new THREE.Line(geometry, constellationMaterial);
+          line.computeLineDistances(); // Needed for dashed lines
+          sceneObjects.constellations.add(line);
+        }
+        points.length = 0; // Clear for next line
       }
     }
   });
@@ -3405,127 +2631,79 @@ fetch(constellationsUrl)
 //*************************************************************
 // SETUP CAMERAS and CONTROLS
 //*************************************************************
-const camera = new THREE.PerspectiveCamera(15, window.innerWidth/window.innerHeight, 0.1, 10000000);
-//earth.pivotObj.add(camera);
+const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
 camera.position.set(0, 2500, 0);
+//camera.position.set(0, 0.5, 4);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableKeys = false
-
-//*************************************************************
-// SETUP EXPERIMENTAL EARTH CAMERAS and CONTROLS
-//*************************************************************
-const camPivotX = new THREE.Object3D();
-const camPivotY = new THREE.Object3D();
-
-earth.planetObj.add(camPivotY);
-camPivotY.add(camPivotX);
-
-const cameraMount = new THREE.Object3D();
-camPivotX.add(cameraMount);
-
-const planetCamera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.001, 10000000);
-
-//const planetCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.001, 10000000);
-
-let SCREEN_WIDTH = window.innerWidth;
-let SCREEN_HEIGHT = window.innerHeight;
-let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-const frustumSize = 10;
-
-cameraMount.add(planetCamera)
-
-cameraMount.position.z = -(earth.size + 0.02);
-
-const cameraHelper = new THREE.CameraHelper( planetCamera );
-scene.add( cameraHelper );
-const axisHelper = new THREE.AxesHelper(10)
-planetCamera.add(axisHelper)
-//planetCamera.rotateX(-1)
-planetCamera.rotation.set(Math.PI / 2, 0, 0); 
-
-function updatePlanetCamera() {
-     planetCamera.updateProjectionMatrix()
-     cameraHelper.update()
-}
-
-function trackSun() {
-    camPivotX.rotation.x = o['Camera Lat'] + Math.PI/2
-    camPivotY.rotation.y = o['Camera Long'] + Math.PI/2
-}
-
-window.addEventListener('keydown', function(event) {
-  let rotSpeed = 0.1;
-  switch (event.key) {
-    case "ArrowLeft" :
-    case "a" :
-      cameraMount.rotateZ( -rotSpeed );
-      break;
-    case "ArrowRight" :
-    case "d" :
-      cameraMount.rotateZ( rotSpeed );
-      break;
-    case "ArrowUp" :
-    case "w" :
-      planetCamera.rotateX( rotSpeed );
-      break;
-    case "ArrowDown":
-    case "s" :
-      planetCamera.rotateX( -rotSpeed );
-      break;
-  }
-});
-
-function showHideCameraHelper () {
-  axisHelper.visible = o['Camera helper']
-  cameraHelper.visible = o['Camera helper']
-}
+controls.enableKeys = false;
+controls.zoomSpeed = 8.0;
+controls.dollySpeed = 8.0;
 
 //*************************************************************
 // SETUP LIGHT
 //*************************************************************
-const ambientLight = new THREE.AmbientLight( 0x404040, o.ambientLight ); // soft white light
-// const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+// AMBIENT LIGHT — soft fill light for subtle illumination
+const ambientLight = new THREE.AmbientLight(0x404040, o.ambientLight || 1.2);
 scene.add(ambientLight);
 
-const light = new THREE.PointLight( 0xffffff, o.sunLight, 0 );
-light.castShadow = true;
-// light.position.set( 50, 50, 50 );
-sun.pivotObj.add( light );
+const fallbackLight = new THREE.PointLight(0xffffff, 10000); // distance = 0 = infinite
+fallbackLight.visible = false;
+scene.add(fallbackLight);
 
-const lightMount = new THREE.Object3D();
-sun.pivotObj.add( lightMount );
+// POINTLIGHT SUNLIGHT — Obsolete. Was initial light for planets in space
+//const sun2Light = new THREE.PointLight(0xffffff, 0.1);
+//scene.add(sun2Light);
 
-const spotlightDirections = [
-  new THREE.Vector3( 1, 0, 0),
-  new THREE.Vector3(-1, 0, 0),
-  new THREE.Vector3(0,  1, 0),
-  new THREE.Vector3(0, -1, 0),
-  new THREE.Vector3(0, 0,  1),
-  new THREE.Vector3(0, 0, -1),
-];
+// DIRECTIONAL SUNLIGHT — better choice for Earth in space
+const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+sunLight.castShadow = true;
 
-spotlightDirections.forEach(direction => {
-  const spotlight = new THREE.SpotLight(0xffffff, 10);
-  lightMount.add(spotlight);
-  spotlight.position.copy(direction.clone().multiplyScalar(15));
-  spotlight.angle = 0.5;
-  spotlight.distance = 15;
-  spotlight.target = lightMount; // Optional: maybe skip this
-});
+// Optional: adjust shadow quality
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.bias = -0.0001;
+sunLight.shadow.radius = 1;
+sunLight.shadow.camera.far = 1000; // Increase only if necessary
 
-moon.planetObj.castShadow = true;
-earth.planetObj.receiveShadow = true;
-light.shadow.camera.far = 50000
-light.shadow.mapSize.width = 2560;  // 2560 4096 512 default 
-light.shadow.mapSize.height = 2560; // 512 default
-light.shadow.radius = 2;
+// Add light and its target
+scene.add(sunLight);
+scene.add(sunLight.target); // Required for .target to work
+
+// Optional: helper for debugging shadow frustum
+// const helper = new THREE.CameraHelper(sunLight.shadow.camera);
+// scene.add(helper);
+
+//const shadowCameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
+//scene.add(shadowCameraHelper);
+
+// Add light to the Sun pivot, so it follows the Sun’s position
+sun.pivotObj.add(sunLight);
+
+// Add target for the light to follow Earth
+const lightTarget = new THREE.Object3D();
+scene.add(lightTarget);
+sunLight.target = lightTarget;
+
+// Add the light to the scene
+scene.add(sunLight);
+
+//*************************************************************
+// Add a Visual Ring or Glow Around the Focused Planet
+//*************************************************************
+const focusRing = new THREE.Mesh(
+  new THREE.RingGeometry(1.1, 1.2, 64),
+  new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide })
+);
+focusRing.rotation.x = Math.PI / 2;
+scene.add(focusRing);
 
 //*************************************************************
 // ADD GLOW EFFECT TO SUN
 //*************************************************************
-const sunTexture = new THREE.TextureLoader().load('glow.png'); 
+const sunTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
+
+// ✅ Set correct color space for color image textures
+sunTexture.colorSpace = THREE.SRGBColorSpace;
 
 // Create the Sprite material
 const sunGlowMaterial = new THREE.SpriteMaterial({
@@ -3547,10 +2725,556 @@ sunGlow.scale.set(500, 500, 10); // Size of glow in world units, adjust as neede
 sun.pivotObj.add(sunGlow);
 
 //*************************************************************
-// ADD LENS FLARE EFFECT TO SUN
+// ADD LENS FLARE EFFECT WHEN LOOKING AT TO SUN
 //*************************************************************
-const flareTexture = new THREE.TextureLoader().load('lensflare.png'); 
+const flareTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
 // You can use any small round bright texture or generate a quick radial white glow.
+
+// ✅ Set correct color space for color image textures
+flareTexture.colorSpace = THREE.SRGBColorSpace;
+
+// Create multiple flare elements
+const flares = [
+  createFlare(0xffffff, 30),   // Bright center flare
+  createFlare(0xffcc88, 15),   // Warm flare
+  createFlare(0x88aaff, 20),   // Cool flare
+  createFlare(0xff8888, 8),    // Small red flare
+  createFlare(0x88ff88, 12),   // Small greenish flare
+];
+
+//*************************************************************
+// USE STATISTICS (WHEN NEEDED)
+//*************************************************************
+const stats = new Stats()
+document.body.appendChild( stats.dom )
+if (!o.Performance) stats.dom.style.display = 'none';
+//if (!o.Performance) stats.dom.style.display = 'visible';
+//stats.dom.style.display = 'none';    // completely removes it from layout
+// OR
+//stats.dom.style.visibility = 'hidden'; // hides but still takes up space
+//stats.dom.style.display = 'block';   // or '' if you want default style
+// OR
+//stats.dom.style.visibility = 'visible';
+
+//*************************************************************
+// START SCENE
+//*************************************************************
+const clock = new THREE.Clock(); 
+
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    onWindowResize();
+  }, 100);
+});
+onWindowResize();
+
+let pause = true;
+
+planetObjects.forEach(obj => {
+  showHideObject(obj)
+});
+showHideAxisHelpers();
+
+// Create reusable geometries and materials
+const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
+const unlitMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
+
+o.pos = 0;
+o.sun = {pivotObj: new THREE.Object3D()};
+o.earth = {pivotObj: new THREE.Object3D()};
+o.lookAtObj = o.earth;
+o.displayFormat = 'sexagesimal'; // or 'decimal'
+o.RA_Display = '';
+o.Dec_Display = '';
+//o.julianDay = startmodelJD; BE CAREFUL: IF YOU SET THIS THE JULIAN DAY IS NOT SELECTABLE
+o.perihelionDate = "";
+let currPos; 
+let lastPlanetFocus = earth; // Default fallback
+
+let lastFrameTime = 0;
+let smoothedFps   = 60;
+let lastCameraX   = 0, lastCameraY = 0, lastCameraZ = 0;
+let lowPerformanceMode = false;
+
+// At the top of your file, create a reusable vectors
+const centerPosVec = new THREE.Vector3();
+const starPosVec  = new THREE.Vector3();
+const scaleVec = new THREE.Vector3();
+const _tempVec = new THREE.Vector3();
+
+let cameraWorldPos = new THREE.Vector3();
+
+const CS_POS       = new THREE.Vector3();
+const CAMERA_POS   = new THREE.Vector3();
+const PLANET_POS   = new THREE.Vector3();
+const LOOK_DIR     = new THREE.Vector3();
+const SPHERICAL    = new THREE.Spherical();
+const AU_IN_KM     = 149597870.698828;
+
+const _pos        = new THREE.Vector3();
+const _camPos     = new THREE.Vector3();
+const _starPos    = new THREE.Vector3();
+const _linePos    = new THREE.Vector3();
+
+const starsArr = sceneObjects.stars.children;
+const constArr = sceneObjects.constellations.children;
+
+let tlapsed = 0;
+let posElapsed =0;
+let uiElapsed =0;
+let lightElapsed =0;
+let updatePredictionElapsed = 0;
+
+let cameraMoved = true; // Force first update
+let eggTriggered = false;
+
+//*************************************************************
+// CREATE SETTINGS AND SETUP GUI
+//*************************************************************
+setupGUI()
+function setupGUI() {
+  const gui = new dat.GUI({ width: 300 });
+  gui.domElement.id = 'gui';
+  gui.add(o, 'Date').name('Date (Y-M-D)').listen().onFinishChange(() => {
+    if (isValidDate(o.Date)) {
+      updatePosition();
+    }
+  });
+  
+  gui.add(o, 'Time').name('Time (UTC)').listen().onFinishChange(function() {
+    if (isValidTime(o.Time)) {
+      updatePosition();
+    } 
+  });
+
+  gui.add(o, 'julianDay').name('Julian day').listen().onFinishChange(() => {
+    if (isNumeric(o.julianDay)) {
+      o.Day = o.julianDay - startmodelJD;
+      o.pos = sDay * o.Day + timeToPos(o.Time);
+      const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
+      o.perihelionDate = `${p.date}`;
+    }
+  });
+  
+  const perihelionController = gui.add(o, 'perihelionDate')
+  .name('Perihelion Date')
+  .listen(); // display-only
+
+  if (perihelionController.__li) {
+  perihelionController.__li.classList.add('highlight-perihelion');
+  }
+  
+  let ctrlFolder = gui.addFolder('Simulation Controls')
+  ctrlFolder.add(o, 'Run').listen();
+  ctrlFolder.add(o, '1 second equals', 
+                 {  '1 second': sSecond, 
+                    '1 minute': sMinute, 
+                    '1 hour': sHour, 
+                    '1 day': sDay, 
+                    '1 week': sWeek, 
+                    '1 month': sMonth,  
+                    '1 year': sYear, 
+                    '10 years': sYear*10,
+                    '100 years': sYear*100,
+                    '1000 years': sYear*1000,
+                 }).onFinishChange(function() {
+    o.speedFact = Number(o['1 second equals']);});
+  ctrlFolder.add(o, 'speed', -5, 5).step(0.5).name('Speed multiplier');
+  ctrlFolder.add(o, 'traceBtn').name('Enable Tracing').onFinishChange(() => {
+  if (o.traceBtn) {
+    // Tracing turned ON → reset and re-init
+    resetAllTraces();
+  } else {
+    // Tracing turned OFF → remove all traces and stop drawing
+    tracePlanets.forEach(obj => {
+      if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+        scene.remove(obj.traceLine);
+      }
+      obj.traceLine = undefined;
+      obj.traceArrIndex = 0;
+      obj.traceStartPos = o.pos;
+      obj.traceCurrPos = o.pos;
+    });
+  }
+  });
+
+  let folderT = ctrlFolder.addFolder('Select objects to Trace')  
+  
+  tracePlanets.forEach(obj => {
+    folderT.add(obj, 'traceOn').name(obj.name).onFinishChange(()=>{resetAllTraces(obj)})
+  });
+
+  ctrlFolder.add(o, 'Step forward' );
+  ctrlFolder.add(o, 'Step backward' );
+  ctrlFolder.add(o, 'Reset' );
+  ctrlFolder.add(o, 'Today' );
+  
+  let planetList = {}
+  let isHelper = {}
+  const helperRegex = /Barycenter|Phobos|Deimos|Precession|WOBBLE|HELION|Eros|Pluto|Halleys|Eccentricity|Helion|Starting|Cycle|Ellipse/i;
+
+  planetObjects.forEach(obj => {
+  if (!helperRegex.test(obj.name)) {
+    // not a “helper” → go in the planet list
+    planetList[obj.name] = obj.name;
+  } else {
+    // otherwise → it’s a helper object
+    isHelper[obj.name] = obj.name;
+    }
+  });
+
+  ctrlFolder.add(o, 'Target', {'Please select': "", ...planetList}).name('Look at').onFinishChange(()=>{
+    o.lookAtObj = planetObjects.find(obj => {
+      return obj.name === o.Target
+    })
+    if (o.Target === "") {o.lookAtObj = {}}    
+  });
+  
+  ctrlFolder.open() 
+  
+  let astroFolder = gui.addFolder('Predictions Holistic Universe Model');
+
+    let daysFolder = astroFolder.addFolder('Length of Days Predictions');
+ //     daysFolder.add(predictions, 'juliandaysbalancedJD').name('Juliandays since balanced year').listen();
+      daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').listen();
+      daysFolder.add(predictions, 'lengthofsiderealDay').name('Length of Sidereal Day (sec)').listen();
+      daysFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+    daysFolder.open();
+    let yearsFolder = astroFolder.addFolder('Length of Years Predictions');
+      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').listen();
+      yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').listen();
+      yearsFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').listen();
+    yearsFolder.open();
+    let precessionFolder = astroFolder.addFolder('Experienced Precession Predictions');
+      precessionFolder.add(predictions, 'perihelionPrecession').name('Perihelion Precession (yrs)').listen();
+      precessionFolder.add(predictions, 'axialPrecession').name('Axial Precession (yrs)').listen();
+      precessionFolder.add(predictions, 'inclinationPrecession').name('Inclination Precession (yrs)').listen();
+      precessionFolder.add(predictions, 'obliquityPrecession').name('Length Obliquity Cycle (yrs)').listen();
+    precessionFolder.open();
+    let orbitalFolder = astroFolder.addFolder('Orbital Elements Predictions');
+      orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').listen();
+      orbitalFolder.add(predictions, 'obliquityEarth').name('Earth Obliquity (°)').listen();
+      orbitalFolder.add(predictions, 'inclinationEarth').name('Earth Inclination to invariable plane (°)').listen();
+      orbitalFolder.add(predictions, 'longitudePerihelion').name('Earth Longitude of Perihelion (°)').listen();
+      orbitalFolder.add(predictions, 'lengthofAU').name('Length of AU (km)').listen();
+      orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').listen();
+    orbitalFolder.open();
+  astroFolder.close();
+  
+  let posFolder = gui.addFolder('Celestial Positions')
+  posFolder
+  .add(o, 'displayFormat', ['sexagesimal', 'decimal'])
+  .name('RA/Dec Format')
+  .onChange(updatePositions); // Recompute output when format changes
+
+  const helperFolder = posFolder.addFolder('Show Helper Objects');
+  
+  tracePlanets.forEach(obj => {
+  const isHelperObj  = Boolean(isHelper[obj.name]);
+  // helpers → helperFolder, planets → posFolder directly
+  const targetFolder = isHelperObj ? helperFolder : posFolder;
+
+  const sub = targetFolder.addFolder(obj.name);
+  sub.add(obj, 'raDisplay').name('RA').listen();
+  sub.add(obj, 'decDisplay').name('Dec').listen();
+  sub.add(obj, 'distKm').name('Kilometers').listen();
+  sub.add(obj, 'dist').name('AU Distance').listen();
+  sub.open();
+  });
+
+  //tracePlanets.forEach(obj => {
+  //let posPlFolder = posFolder.addFolder(obj.name);
+  //posPlFolder.add(obj, 'raDisplay').name('RA').listen();
+  //posPlFolder.add(obj, 'decDisplay').name('Dec').listen();
+  //posPlFolder.add(obj, 'distKm').listen().name('Kilometers');
+  //posPlFolder.add(obj, 'dist').listen().name('AU Distance');
+  //posPlFolder.open();
+  //});
+  
+  let folderO = gui.addFolder('Celestial Tools')
+  folderO.add(zodiac, 'visible').name('Zodiac');
+  folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
+  folderO.add(o, 'Polar line').onFinishChange(()=>{
+    polarLine.visible = o['Polar line']
+  });
+  folderO.add(o, 'polarLineLength', 0.1, 50).name('Line length').onChange(()=>{
+      polarLine.scale.y = o.polarLineLength
+  });
+  
+  folderO.add(sceneObjects.stars, 'visible').name('Stars visible');
+  folderO.add(o, 'starNamesVisible').name('Star names').onChange(() => {
+  sceneObjects.stars.children.forEach(function(starPos) {
+    if (starPos.children.length > 1) {
+      const nameTag = starPos.children[1];
+      if (nameTag && nameTag instanceof THREE.Sprite) {
+        nameTag.visible = o.starNamesVisible;
+      }
+    }
+  });
+});
+  folderO.add(sceneObjects.constellations, 'visible').name('Constellations visible');
+  //folderO.add(constContainer, 'visible').name('Constellations') 
+  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(() => {
+  sceneObjects.stars.children.forEach(function(starPos) {
+    const star = starPos.children[0];
+    const nameTag = starPos.children[1];
+    if (star && star instanceof THREE.Sprite) {
+      star.position.x = o.starDistance * o.starDistanceScaleFact;
+    }
+    if (nameTag && nameTag instanceof THREE.Sprite) {
+      nameTag.position.x = o.starDistance * o.starDistanceScaleFact;
+    }
+  });
+  celestialSphere.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
+  plane.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
+  sceneObjects.constellations.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
+});
+  
+  folderO.add(o, 'starsizeBase', 10, 200).step(5).name('Star size base').onChange(() => {
+  updateStarSizes();
+});
+  
+ folderO.add(celestialSphere, 'visible').name('Celestial sphere')
+ folderO.add(plane, 'visible').name('Ecliptic grid')
+  
+  let sFolder = gui.addFolder('Settings')
+  let folderPlanets = sFolder.addFolder('Planets show/hide');
+  folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
+    showHideOrbits();
+  });
+
+  folderPlanets.add(o, 'Size', 0.4, 1.4).onChange(()=>{changePlanetScale()})
+  planetObjects.forEach(obj => {
+    if (!obj.isDeferent) {
+      folderPlanets.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
+        showHideObject(obj);
+      });
+    }
+  })
+ 
+  let folderDef = sFolder.addFolder('Objects show/hide');
+  planetObjects.forEach(obj => {
+    if (obj.isDeferent) {
+      folderDef.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
+        showHideObject(obj);
+      });
+    }
+  })
+
+  let folderElongations=sFolder.addFolder("Elongations show/hide");
+  folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
+  folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
+  folderElongations.add(o,"venusElongation").min(0.0).max(180.0).listen().name("Venus")
+  folderElongations.add(o,"marsElongation").min(0.0).max(180.0).listen().name("Mars")
+  folderElongations.add(o,"jupiterElongation").min(0.0).max(180.0).listen().name("Jupiter")
+  folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
+  folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
+  folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
+  
+  let folderCamera = sFolder.addFolder('Camera show/hide')  
+
+  folderCamera.add(o, 'worldCamRa').name('RA').listen()
+  folderCamera.add(o, 'worldCamDec').name('Dec').listen()
+  folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
+ 
+}  
+
+//*************************************************************
+// THE ANIMATE/RENDER LOOP (BE CAREFUL WITH ADDING/ CHANGING)
+//*************************************************************
+function render(now) {
+  requestAnimationFrame(render);
+  stats.update();
+
+  // 1) Delta and FPS throttle
+  const deltaMs = now - lastFrameTime;
+  lastFrameTime = now;
+  const delta   = deltaMs * 0.001;    // seconds/frame
+  const fps     = 1000 / deltaMs;
+  smoothedFps   = smoothedFps * 0.9 + fps * 0.1;
+
+  if (smoothedFps < 30 && !lowPerformanceMode) {
+    renderer.setPixelRatio(1);
+    lowPerformanceMode = true;
+  } else if (smoothedFps > 40 && lowPerformanceMode) {
+    renderer.setPixelRatio(window.devicePixelRatio);
+    lowPerformanceMode = false;
+  }
+
+  // 2) Did the camera move?
+  const { x, y, z } = camera.position;
+  cameraMoved = (x !== lastCameraX || y !== lastCameraY || z !== lastCameraZ);
+  lastCameraX = x; lastCameraY = y; lastCameraZ = z;
+
+  // 3) OrbitControls: point at your selected pivot
+  if (o.lookAtObj?.pivotObj) {
+    controls.target.copy(
+      o.lookAtObj.pivotObj.getWorldPosition(new THREE.Vector3())
+    );
+  }
+  controls.update();
+
+  // 4) Throttle the human-readable GUI (20 Hz)
+  uiElapsed += delta;
+  if (uiElapsed >= 0.05) {
+    uiElapsed -= 0.05;
+    o.Position      = o.pos;
+    o.Day           = posToDays(o.pos);
+    o.Date          = daysToDate(o.Day);
+    o.Time          = posToTime(o.pos);
+    o.julianDay     = dateTimeToJulianDay(o.Date, o.Time);
+    const p         = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
+    o.perihelionDate = `${p.date} ${p.time}`;
+    // Easter egg/ Can be added later
+    //     if (isPerihelionCycle(o.periheliondate, 'perihelionday', ) && !eggTriggered) {
+    //       eggTriggered = true;
+    //       triggerPerihelionEasterEgg();
+    //     }
+    o.juliandaysbalancedJD = o.julianDay - balancedJD;
+    o.worldCamX = Math.round(x);
+    o.worldCamY = Math.round(y);
+    o.worldCamZ = Math.round(z);
+  }
+
+  // 5) Advance the simulation time (once per frame)
+  if (o.Run) {
+    o.pos += Number(o.speedFact) * o.speed * delta;
+  }
+
+  // 6) Must-run-every-frame: updates your models
+  trace(o.pos);
+  moveModel(o.pos);
+  updatePositions();
+  updateLightingForFocus();
+  updateFlares();
+  updateSunGlow();
+  
+  // 7) Throttle astro-heavy updates (10 Hz)
+  posElapsed += delta;
+  if (posElapsed >= 0.1) {
+    posElapsed -= 0.1;
+    updateElongations();
+    updatePredictions();
+    //updateDomLabel(); Can be added later
+  }
+
+  // 8) Throttle lighting/glow (10 Hz)
+  lightElapsed += delta;
+  if (lightElapsed >= 0.1) {
+    lightElapsed -= 0.1;
+    updateFocusRing();
+    animateGlow(); // zodiac animation
+  }
+
+  // 9) Camera-move-dependent fades & flares
+  if (cameraMoved) {
+    // star‐tag fades
+    for (let i = 0, L = starsArr.length; i < L; i++) {
+      const starPos = starsArr[i];
+      starPos.children[0].getWorldPosition(_starPos);
+      const d = _starPos.distanceTo(camera.position);
+      starPos.children[1].scale.set(d/25, d/25, 1);
+      const op = d > 7500
+               ? 1 - (d - 7500) / (30000 - 7500)
+               : 1;
+      starPos.children[1].material.opacity     = op;
+      starPos.children[1].material.transparent = true;
+    }
+    // constellation fades
+    for (let i = 0, M = constArr.length; i < M; i++) {
+      const line = constArr[i];
+      line.getWorldPosition(_linePos);
+      const dLine = _linePos.distanceTo(camera.position);
+      const fadeStart = 7500 + line.position.length()*0.06;
+      const fadeEnd   = 30000 + line.position.length()*0.06;
+      const op = dLine > fadeStart
+               ? 1 - (dLine - fadeStart)/(fadeEnd - fadeStart)
+               : 1;
+      if (line.material) {
+        line.material.opacity     = op;
+        line.material.transparent = true;
+      }
+    }
+  }
+
+  // 10) Last thing: draw
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(render);
+//} 
+//render();
+//*************************************************************
+// FUNCTIONS
+//*************************************************************
+function updateDomLabel() {
+  const label = document.getElementById('planetLabel');
+
+  if (o.lookAtObj?.pivotObj) {
+    o.lookAtObj.pivotObj.updateMatrixWorld();
+    const worldPos = o.lookAtObj.pivotObj.getWorldPosition(new THREE.Vector3());
+    const screenPos = worldPos.clone().project(camera);
+
+    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+
+    label.style.left = `${x}px`;
+    label.style.top = `${y}px`;
+    label.style.display = 'block';
+    label.textContent = o.lookAtObj.name || 'Unnamed';
+  } else {
+    label.style.display = 'none';
+  }
+}
+
+function updateSunGlow() {
+  // 1a) Get the world position of the glow’s pivot into _tempVec
+  sunGlow.getWorldPosition(_tempVec);
+
+  // 1b) Compute distance camera→sunGlow
+  const sunDistance = camera.position.distanceTo(_tempVec);
+
+  // 1c) Scale the glow based on that distance
+  const glowSize = sunDistance / 2;
+  sunGlow.scale.set(glowSize, glowSize, 10);
+}
+
+function updateStarSizes() {
+  sceneObjects.stars.children.forEach(function(starPos) {
+    const star = starPos.children[0]; // First child = star Sprite
+
+    if (star && star instanceof THREE.Sprite) {
+      const magnitude = star.userData.magnitude; // Saved during creation
+      let starsize;
+
+      if (magnitude < 1) {
+        starsize = o.starsizeBase * 1.5;
+      } else if (magnitude >= 1 && magnitude < 3) {
+        starsize = o.starsizeBase * 1.0;
+      } else if (magnitude >= 3 && magnitude < 5) {
+        starsize = o.starsizeBase * 0.6;
+      } else {
+        starsize = o.starsizeBase * 0.3;
+      }
+
+      star.scale.set(starsize, starsize, 1);
+    }
+  });
+}
+
+function updateFocusRing() {
+  if (o.lookAtObj?.name === 'Sun' && o.sun?.pivotObj) {
+    o.sun.pivotObj.updateMatrixWorld();
+    focusRing.position.copy(
+      o.sun.pivotObj.getWorldPosition(new THREE.Vector3())
+    );
+    focusRing.visible = true;
+    focusRing.scale.set(5, 5, 0);
+  } else {
+    focusRing.visible = false;
+  }
+}
 
 function createFlare(color, scale) {
   const material = new THREE.SpriteMaterial({
@@ -3566,15 +3290,6 @@ function createFlare(color, scale) {
   scene.add(sprite);
   return sprite;
 }
-
-// Create multiple flare elements
-const flares = [
-  createFlare(0xffffff, 30),   // Bright center flare
-  createFlare(0xffcc88, 15),   // Warm flare
-  createFlare(0x88aaff, 20),   // Cool flare
-  createFlare(0xff8888, 8),    // Small red flare
-  createFlare(0x88ff88, 12),   // Small greenish flare
-];
 
 // The flares need to be added to the position of the Sun
 function updateFlares() {
@@ -3615,331 +3330,127 @@ function updateFlares() {
   }
 }
 
-//*************************************************************
-// CREATE SETTINGS AND SETUP GUI
-//*************************************************************
-setupGUI()
-function setupGUI() {
-  const gui = new dat.GUI();
-  gui.domElement.id = 'gui';
-  gui.add(o, 'Date').listen().onFinishChange(() => {
-    if (isValidDate(o.Date)) {
-      updatePosition();
-    }
-  });
-  
-  gui.add(o, 'Time').name('Time (UTC)').listen().onFinishChange(function() {
-    if (isValidTime(o.Time)) {
-      updatePosition();
-    } 
-  });
-  
-  gui.add(o, 'julianDay').name('Julian day').listen().onFinishChange(() => {
-    if (isNumeric(o.julianDay)) {
-      o.Day = o.julianDay - 2451717;
-      o.pos = sDay * o.Day + timeToPos(o.Time);
-    }
-  });
-  
-  let ctrlFolder = gui.addFolder('Controls')
-  ctrlFolder.add(o, 'Run').listen();
-  ctrlFolder.add(o, 'traceBtn').name('Trace').onFinishChange(()=>{
-    tracePlanets.forEach(obj => {
-      initTrace(obj);
-    });
-  });
-    
-  ctrlFolder.add(o, '1 second equals', 
-                 {  '1 second': sSecond, 
-                    '1 minute': sMinute, 
-                    '1 hour': sHour, 
-                    '1 day': sDay, 
-                    '1 week': sWeek, 
-                    '1 month': sMonth,  
-                    '1 year': sYear, 
-                    '10 years': sYear*10,
-                    '100 years': sYear*100,
-                    '1000 years': sYear*1000,
-                 }).onFinishChange(function() {
-    o.speedFact = Number(o['1 second equals']);
-  });
-  ctrlFolder.add(o, 'speed', -5, 5).step(0.5).name('Speed multiplier');
-  ctrlFolder.add(o, 'Step forward' );
-  ctrlFolder.add(o, 'Step backward' );
-  ctrlFolder.add(o, 'Reset' );
-  ctrlFolder.add(o, 'Today' );
-  let planList = {}
-  planets.forEach(obj => {
-    if (!obj.isDeferent) {
-      planList[obj.name] = obj.name
-    }
-  });
+function updateSunlightForPlanet(lightTargetObj, shadowReceiverObj = lightTargetObj) {
+  if (!lightTargetObj || !shadowReceiverObj) return;
 
-  ctrlFolder.add(o, 'Target', {'Please select': "", ...planList}).name('Look at').onFinishChange(()=>{
-    o.lookAtObj = planets.find(obj => {
-      return obj.name === o.Target
-    })
-    if (o.Target === "") {o.lookAtObj = {}}    
-  });
-  
-  ctrlFolder.open() 
-  
-  let folderT = gui.addFolder('Trace Settings')
-  folderT.add(o, 'traceSize', 0.1, 2).name('Dot size').onChange(()=>{changeTraceScale()})
+  // Update world matrices
+  sun.planetObj.updateMatrixWorld();
+  lightTargetObj.updateMatrixWorld();
+  shadowReceiverObj.updateMatrixWorld();
 
-  folderT.add(o, 'Lines').onFinishChange(()=>{
-    tracePlanets.forEach(obj => {
-      setTraceMaterial(obj)
-    });
-  });
+  // Get positions
+  const sunPos = new THREE.Vector3();
+  const targetPos = new THREE.Vector3();
+  sun.planetObj.getWorldPosition(sunPos);
+  lightTargetObj.getWorldPosition(targetPos);
 
-  tracePlanets.forEach(obj => {
-    folderT.add(obj, 'traceOn').name(obj.name).onFinishChange(()=>{initTrace(obj)})
-  });
-  
-  let posFolder = gui.addFolder('Celestial Positions')
-  let posPlFolder
-  tracePlanets.forEach(obj => {
-    posPlFolder = posFolder.addFolder(obj.name)
-    posPlFolder.add(obj, 'ra').listen().name('RA')
-    posPlFolder.add(obj, 'dec').listen().name('Dec')
-    posPlFolder.add(obj, 'distKm').listen().name('Kilometers')
-    posPlFolder.add(obj, 'dist').listen().name('AU Distance')
-    posPlFolder.open()
-  })
-  
-  let folderO = gui.addFolder('Stars & helper objects')
-  folderO.add(zodiac, 'visible').name('Zodiac');
-  folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
-  folderO.add(o, 'Polar line').onFinishChange(()=>{
-    polarLine.visible = o['Polar line']
-  });
-  folderO.add(o, 'polarLineLength', 0.1, 50).name('Line length').onChange(()=>{
-      polarLine.scale.y = o.polarLineLength
-  });
-  
-  folderO.add(starsContainer, 'visible' ).name('Stars visible');
-  folderO.add(o, 'starNamesVisible').name('Star names').onChange(()=>{
-    starsContainer.children.forEach(
-      function(starPos) {
-        const nameTag = starPos.children[1];
-        nameTag.visible = o.starNamesVisible;
-      });
-  });
-  folderO.add(constContainer, 'visible').name('Constellations') 
-  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(()=>{
-    starsContainer.children.forEach(
-      function(starPos) {
-        const star = starPos.children[0];
-        star.position.x = o.starDistance * o.starDistanceScaleFact;
-        const nameTag = starPos.children[1];
-        nameTag.position.x = o.starDistance * o.starDistanceScaleFact;
-      });
-    celestialSphere.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-    plane.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-    constContainer.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-  });
-  
-  folderO.add(o, 'starSize', 0.1, 5).step(0.1).name('Star sizes').onChange(()=>{
-    starsContainer.children.forEach(
-      function(starPos) {
-        const star = starPos.children[0];
-        star.scale.x = o.starSize
-        star.scale.y = o.starSize
-        star.scale.z = o.starSize
-      });
-  });
- folderO.add(celestialSphere, 'visible').name('Celestial sphere')
- folderO.add(plane, 'visible').name('Ecliptic grid')
-  
-  let sFolder = gui.addFolder('Settings')
-  let folderPlanets = sFolder.addFolder('Planets show/hide');
-  folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
-    showHideOrbits();
-  });
+  // Light direction: from Sun ➡ target
+  const direction = new THREE.Vector3().subVectors(targetPos, sunPos).normalize();
+  const distance = sunPos.distanceTo(targetPos);
+  const lightDistance = distance + 10;
 
-  folderPlanets.add(o, 'Size', 0.4, 1.4).onChange(()=>{changePlanetScale()})
-  planets.forEach(obj => {
-    if (!obj.isDeferent) {
-      folderPlanets.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
-        showHideObject(obj);
-      });
-    }
-  })
- 
-  let folderDef = sFolder.addFolder('Objects show/hide');
-  planets.forEach(obj => {
-    if (obj.isDeferent) {
-      folderDef.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
-        showHideObject(obj);
-      });
-    }
-  })
+  // Position light "behind" target along direction
+  const lightPos = targetPos.clone().add(direction.clone().multiplyScalar(-lightDistance));
+  sunLight.position.copy(lightPos);
 
-  let folderElongations=sFolder.addFolder("Elongations show/hide");
-  folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
-  folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
-  folderElongations.add(o,"venusElongation").min(0.0).max(180.0).listen().name("Venus")
-  folderElongations.add(o,"marsElongation").min(0.0).max(180.0).listen().name("Mars")
-  folderElongations.add(o,"jupiterElongation").min(0.0).max(180.0).listen().name("Jupiter")
-  folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
-  folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
-  folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
+  // Always aim the light at the lighting target
+  sunLight.target.position.copy(targetPos);
+  sunLight.target.updateMatrixWorld();
 
-  // folderO.add(o, 'Axis helpers' ).onFinishChange(()=>{
-  //     showHideAxisHelpers();
-  // });
-  
-  let folderCamera = sFolder.addFolder('Camera show/hide')  
+  // === Shadow Frustum ONLY for the shadow-receiving planet ===
+  const box = new THREE.Box3().setFromObject(shadowReceiverObj);
+  const size = new THREE.Vector3();
+  box.getSize(size);
 
-  folderCamera.add(o, 'worldCamRa').name('RA').listen()
-  folderCamera.add(o, 'worldCamDec').name('Dec').listen()
-  folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
-  
-  let folderCam = sFolder.addFolder('Earth Camera show/hide')
-  folderCam.add(o, 'Earth camera')
-  o['Camera Lat'] = 0.67
-  o['Camera Long'] = 0.01
-  folderCam.add(o, 'Camera Lat', 0.00, Math.PI).listen()
-  folderCam.add(o, 'Camera Long', 0.00, Math.PI*2).listen()
-  folderCam.add(o, 'Camera helper').onFinishChange(() => {
-    showHideCameraHelper()
-  }); 
-}  
-//*************************************************************
-// STATISTICS (WHEN NEEDED)
-//*************************************************************
-const stats = new Stats()
-document.body.appendChild( stats.dom )
-if (!o.Perfomance) stats.dom.style.visibility = 'hidden';
-//if (!o.Perfomance) stats.dom.style.visibility = 'visible';
-// stats.dom.container.style.visibility = 'hidden';
+  const padding = 1.2;
+  const halfW = (size.x / 2) * padding;
+  const halfH = (size.y / 2) * padding;
+  const depth = size.z * padding;
 
-//*************************************************************
-// START SCENE
-//*************************************************************
-const clock = new THREE.Clock(); 
+  sunLight.shadow.camera.left = -halfW;
+  sunLight.shadow.camera.right = halfW;
+  sunLight.shadow.camera.top = halfH;
+  sunLight.shadow.camera.bottom = -halfH;
+  sunLight.shadow.camera.near = 2;
+  sunLight.shadow.camera.far = depth * 4;
 
-window.addEventListener('resize', onWindowResize, false);
-onWindowResize();
+  sunLight.shadow.camera.updateProjectionMatrix();
 
-// var orbit;
-var pause = true;
-
-planets.forEach(obj => {
-  showHideObject(obj)
-});
-showHideAxisHelpers();
-showHideCameraHelper();
-showHideInfoText();
-
-o.pos = 0
-let currPos 
-let tlapsed = 0;
-renderer.render(scene, camera);//renderer needs to be called otherwise the position are wrong
-const centerPosVec = new THREE.Vector3();
-const starPosVec  = new THREE.Vector3();
-const scaleVec = new THREE.Vector3();
-
-//*************************************************************
-//THE RENDER LOOP
-//*************************************************************
-function render() {
-  requestAnimationFrame(render);
-  stats.update();
-
-  if (o.lookAtObj && o.lookAtObj.pivotObj) {
-    controls.target.copy(o.lookAtObj.pivotObj.getWorldPosition(centerPosVec));
-    controls.update();
+  if (typeof shadowCameraHelper !== 'undefined') {
+    shadowCameraHelper.update();
   }
-
-  let delta = clock.getDelta();
-  tlapsed += delta;
-
-  if (tlapsed > 0.05) {
-    tlapsed -= 0.05;
-
-    o.Position = o.pos;
-    o.Day = posToDays(o.pos);
-    o.julianDay = o.Day + 2451717;
-    o.Date = daysToDate(o.Day);
-    o.Time = posToTime(o.pos);
-
-    o.worldCamX = Math.round(camera.position.x);
-    o.worldCamY = Math.round(camera.position.y);
-    o.worldCamZ = Math.round(camera.position.z);
-
-    if (renderer.shadowMap.enabled !== o.Shadows) {
-      renderer.shadowMap.enabled = o.Shadows;
-    }
-  }
-
-  if (o.Run) {
-    o.pos += Number(o.speedFact) * o.speed * delta;
-  }
-
-  trace(o.pos);
-  moveModel(o.pos);
-  updateElongations();
-  updatePositions();
-  trackSun();
-
-  const activeCamera = o['Earth camera'] ? planetCamera : camera;
-  renderer.render(scene, activeCamera);
-  updateFlares();
-
-  const sunDistance = camera.position.distanceTo(sunGlow.getWorldPosition(new THREE.Vector3()));
-  const glowSize = sunDistance / 2; // tweak factor as needed
-  sunGlow.scale.set(glowSize, glowSize, 10);
-  
-  starsContainer.children.forEach(function(starPos) {
-  const scaleFactor = 25;
-  const fadeStart = 7500;  // Distance where fading starts
-  const fadeEnd = 30000;   // Distance where labels become fully transparent
-
-  const star = starPos.children[0];
-  const nametag = starPos.children[1];
-
-  const distance = scaleVec.subVectors(star.getWorldPosition(starPosVec), camera.position).length();
-
-  // Scale the nametag
-  const scale = distance / scaleFactor;
-  nametag.scale.set(scale, scale, 1);
-
-  // Fade out nametag based on distance
-  let opacity = 1.0;
-  if (distance > fadeStart) {
-    opacity = 1.0 - (distance - fadeStart) / (fadeEnd - fadeStart);
-    opacity = Math.max(0, Math.min(1, opacity)); // Clamp between 0 and 1
-  }
-
-  if (nametag.material) {
-    nametag.material.transparent = true;
-    nametag.material.opacity = opacity;
-  }
-});
 }
-render();
-//*************************************************************
-// END RENDER LOOP
-//*************************************************************
+
+function updateLightingForFocus() {
+  const isSun = o.lookAtObj?.name === 'Sun';
+
+  if (isSun) {
+    // Disable directional light
+    sunLight.visible = false;
+
+    // Enable fallback point light and follow camera
+    fallbackLight.visible = true;
+    fallbackLight.position.copy(camera.position);
+  } else if (o.lookAtObj?.pivotObj) {
+    // Enable directional sunlight toward selected planet
+    sunLight.visible = true;
+    fallbackLight.visible = false;
+
+    updateSunlightForPlanet(o.lookAtObj.pivotObj, o.lookAtObj.pivotObj);
+  }
+}
+
+// --- Helper to create name labels ---
+function createLabel(message) {
+  const fontSize = 30;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  canvas.width = 256;
+  canvas.height = 128;
+  context.font = `${fontSize}px Arial`;
+  context.strokeStyle = 'black';
+  context.lineWidth = 8;
+  context.strokeText(message, 0, fontSize);
+  context.fillStyle = 'LightGrey';
+  context.fillText(message, 0, fontSize);
+
+  const texture = new THREE.Texture(canvas);
+  texture.needsUpdate = true;
+
+  const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+  const sprite = new THREE.Sprite(spriteMaterial);
+  return sprite;
+}
+
+// Optional animation (pulsing)
+function animateGlow() {
+    glowMaterial.opacity = 0.2 + 0.1 * Math.sin(Date.now() * 0.002);
+    requestAnimationFrame(animateGlow);
+}
 
 function createEarthPolarLine() {
-  const material = new THREE.LineBasicMaterial({
-    color: 0xffffff
-  });
-  const geometry = new THREE.Geometry();
-  geometry.vertices.push(
-    new THREE.Vector3(0,-100,0),
-    new THREE.Vector3(0,100,0)
-  );
-  const line = new THREE.Line( geometry, material );
-  line.visible = o['Polar line']
-  return line
-}
-const polarLine = createEarthPolarLine();
+  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
-earth.rotationAxis.add(polarLine);
+  let geometry;
+
+  // Use BufferGeometry if available (modern Three.js), fallback to Geometry for R97
+  if (typeof THREE.BufferGeometry !== 'undefined') {
+    geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -100, 0),
+      new THREE.Vector3(0, 100, 0)
+    ]);
+  } else {
+    geometry = new THREE.Geometry();
+    geometry.vertices.push(
+      new THREE.Vector3(0, -100, 0),
+      new THREE.Vector3(0, 100, 0)
+    );
+  }
+
+  const line = new THREE.Line(geometry, material);
+  line.visible = o['Polar line'];
+  return line;
+}
 
 function changeSphereScale() {
       celestialSphere.scale.set(o.cSphereSize, o.cSphereSize, o.cSphereSize);    
@@ -3951,6 +3462,8 @@ function changeZodiacScale() {
 
 function updatePosition() {
   o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
+  const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
+  o.perihelionDate = `${p.date}`;
 }
 
 function changeTraceScale(){
@@ -3962,7 +3475,7 @@ function changeTraceScale(){
   }
 
 function changePlanetScale(){
-    planets.forEach(obj => {
+    planetObjects.forEach(obj => {
       obj.planetObj.scale.x = o.Size
       obj.planetObj.scale.y = o.Size
       obj.planetObj.scale.z = o.Size
@@ -3970,87 +3483,61 @@ function changePlanetScale(){
   }
   
 function updatePositions() {
-  scene.updateMatrixWorld() //No effect(?)
+  // 1) refresh world matrices
+  scene.updateMatrixWorld(true);
 
-  const csPos = new THREE.Vector3();
-  celestialSphere.getWorldPosition(csPos);
+  // 2) get the sky‐center origin
+  celestialSphere.getWorldPosition(CS_POS);
 
-  const sphericalPos = new THREE.Spherical();
+  // 3) each planet…
+  for (let i = 0, L = tracePlanets.length; i < L; i++) {
+    const obj = tracePlanets[i];
 
-  tracePlanets.forEach(obj => {    
-    const planetPos = new THREE.Vector3();
-    const lookAtDir = new THREE.Vector3(0,0,1);
-    obj.planetObj.getWorldPosition(planetPos)
-    csLookAtObj.lookAt(planetPos)
-    lookAtDir.applyQuaternion(csLookAtObj.quaternion);
-    lookAtDir.setLength(csPos.distanceTo(planetPos))
-    sphericalPos.setFromVector3(lookAtDir)
-    obj.ra = radToRa(sphericalPos.theta)
-    obj.dec = radToDec(sphericalPos.phi)
-    obj.distKm = (sphericalPos.radius/100 * 149597870.698828).toFixed(2)
-    obj.dist = (sphericalPos.radius/100).toFixed(8)
-  });
-  
-  //Get camera pos
-  const cameraPos = new THREE.Vector3();
-  const lookAtDir = new THREE.Vector3(0,0,1);
-  camera.getWorldPosition(cameraPos)
-  csLookAtObj.lookAt(cameraPos)
-  lookAtDir.applyQuaternion(csLookAtObj.quaternion);
-  lookAtDir.setLength(csPos.distanceTo(cameraPos));
-  sphericalPos.setFromVector3(lookAtDir);
-  o.worldCamRa = radToRa(sphericalPos.theta);
-  o.worldCamDec = radToDec(sphericalPos.phi);
-  o.worldCamDistKm = (sphericalPos.radius/100 * 149597870.698828).toFixed(2);
-  o.worldCamDist = (sphericalPos.radius/100).toFixed(8);  
-}
+    // a) world-pos of planet
+    obj.planetObj.getWorldPosition(PLANET_POS);
 
-function drawSunLine(){
-  const csPos = new THREE.Vector3();
-  celestialSphere.getWorldPosition(csPos);
-  const lookAtDir = new THREE.Vector3(0,0,1);
-  const planetPos = new THREE.Vector3();
+    // b) point your temp look-at helper at that pos
+    csLookAtObj.lookAt(PLANET_POS);
 
-  const sphericalPos = new THREE.Spherical();
-  
-  sun.planetObj.getWorldPosition(planetPos)
-  csLookAtObj.lookAt(planetPos)
-  lookAtDir.applyQuaternion(csLookAtObj.quaternion);
-  lookAtDir.setLength(csPos.distanceTo(planetPos))
-  
-  sphericalPos.setFromVector3(lookAtDir)
+    // c) start from (0,0,1), rotate into obj direction
+    LOOK_DIR.set(0, 0, 1)
+            .applyQuaternion(csLookAtObj.quaternion)
+            .setLength(CS_POS.distanceTo(PLANET_POS));
 
-  var material = new THREE.LineBasicMaterial({
-    color: 0x0000ff
-  });
+    // d) spherical coords of that vector
+    SPHERICAL.setFromVector3(LOOK_DIR);
 
-  var geometry = new THREE.Geometry();
-  geometry.vertices.push(
-    new THREE.Vector3(0,0,0),
-    new THREE.Vector3().setFromSpherical(sphericalPos)
-  );
+    // e) raw numeric results
+    obj.ra     = SPHERICAL.theta;
+    obj.dec    = SPHERICAL.phi;
+    const au   = SPHERICAL.radius / 100;     // your units → AU
+    obj.dist   = au;
+    obj.distKm = (au * AU_IN_KM).toFixed(2);
 
-  var line = new THREE.Line( geometry, material );
-  celestialSphere.add( line );
-  
-  console.log(sphericalPos.theta)
-  
-  sphericalPos.theta = sun.ra 
-  sphericalPos.phi =  sun.dec
-  sphericalPos.radius = sun.dist
-  
-  var material2 = new THREE.LineBasicMaterial({
-    color: 0xff0000
-  });
+    // f) formatted for your GUI
+    if (o.displayFormat === 'decimal') {
+      obj.raDisplay  = ((obj.ra * 180/Math.PI + 360) % 360)
+                         .toFixed(4) + '°';
+      obj.decDisplay = radiansToDecDecimal(obj.dec) + '°';
+    } else {
+      obj.raDisplay  = radiansToRa(obj.ra);
+      obj.decDisplay = radiansToDec(obj.dec);
+    }
+  }
 
-  var geometry2 = new THREE.Geometry();
-  geometry2.vertices.push(
-    new THREE.Vector3(0,0,0),
-    new THREE.Vector3().setFromSpherical(sphericalPos)
-  );
+  // 4) now the same dance for the camera itself
+  camera.getWorldPosition(CAMERA_POS);
+  csLookAtObj.lookAt(CAMERA_POS);
+  LOOK_DIR.set(0, 0, 1)
+          .applyQuaternion(csLookAtObj.quaternion)
+          .setLength(CS_POS.distanceTo(CAMERA_POS));
+  SPHERICAL.setFromVector3(LOOK_DIR);
 
-  var line2 = new THREE.Line( geometry2, material2 );
-  celestialSphere.add( line2 );  
+  const camAu = SPHERICAL.radius / 100;
+  o.worldCamDistKm = (camAu * AU_IN_KM).toFixed(2);
+  o.worldCamDist   = camAu.toFixed(8);
+  o.worldCamRa     = SPHERICAL.theta;
+  o.worldCamDec    = SPHERICAL.phi;
 }
 
 function trace(pos) {
@@ -4059,64 +3546,81 @@ function trace(pos) {
     });        
 }
 
-  function initTrace(obj) {
-    obj.traceStartPos = obj.traceCurrPos = o.pos; 
+function resetAllTraces() {
+  tracePlanets.forEach(obj => {
+    // Remove existing trace line from scene
+    if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+      scene.remove(obj.traceLine);
+    }
+
+    // Clear all trace-related state
+    obj.traceLine = undefined;
     obj.traceArrIndex = 0;
-  }
+    obj.traceStartPos = o.pos;
+    obj.traceCurrPos = o.pos;
+
+    // Optionally reinitialize if enabled
+    if (obj.traceOn && o.traceBtn) {
+      setTraceMaterial(obj);
+    }
+  });
+}
 
 function setTraceMaterial(obj) {
-  let lineMaterial;
   const vertexCount = Math.round(obj.traceLength / obj.traceStep);
+  let lineMaterial;
 
-  if (!obj.traceLine) {
+  // If an existing traceLine exists, remove it from the scene
+  if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+    scene.remove(obj.traceLine);
+    lineMaterial = obj.traceLine.material; // Reuse existing material
+  } else {
     lineMaterial = new THREE.PointsMaterial({
       color: obj.color,
       size: obj.size * 10,
       transparent: true,
       opacity: 0.7,
       alphaTest: 0.5,
-      map: new THREE.TextureLoader().load("disc.png"),
+      map: new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/disc.png"),
     });
-  } else {
-    scene.remove(obj.traceLine);
-    lineMaterial = obj.traceLine.material; // Reuse material
   }
 
   const lineGeometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(vertexCount * 3); // 3 floats (x,y,z) per vertex
-  lineGeometry.addAttribute('position', new THREE.BufferAttribute(positions, 3)); // <-- use addAttribute!
+  const positions = new Float32Array(vertexCount * 3);
+  lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-  if (o.Lines) {
-    obj.traceLine = new THREE.Line(lineGeometry, lineMaterial);
-  } else {
-    obj.traceLine = new THREE.Points(lineGeometry, lineMaterial);
-  }
+  obj.traceLine = o.Lines
+    ? new THREE.Line(lineGeometry, lineMaterial)
+    : new THREE.Points(lineGeometry, lineMaterial);
 
+  obj.traceLine.visible = false; // start hidden
   scene.add(obj.traceLine);
 }
 
 function tracePlanet(obj, pos) {
   let update = false;
-  if (!obj.traceOn || !o.traceBtn) { 
-    obj.traceLine.visible = false; 
+
+  if (!obj.traceOn || !o.traceBtn) {
+    if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+      obj.traceLine.visible = false;
+    }
     return;
   }
 
   if (pos < obj.traceStartPos) {
-    initTrace(obj);
+    resetAllTraces(obj);
     update = true;
   }
+
   if (pos < obj.traceCurrPos) {
     obj.traceCurrPos = obj.traceStartPos;
     obj.traceArrIndex = 0;
     update = true;
   }
+
   if (obj.traceCurrPos + obj.traceStep > pos && !update) return;
 
-  let firstRun = false;
-  if (obj.traceArrIndex === 0) firstRun = true;
-
-  if (!obj.traceLine) {
+  if (!obj.traceLine || !(obj.traceLine instanceof THREE.Object3D)) {
     setTraceMaterial(obj);
   }
 
@@ -4128,10 +3632,9 @@ function tracePlanet(obj, pos) {
   while (nextPos < pos) {
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
-    let epos = new THREE.Vector3();
+    const epos = new THREE.Vector3();
     obj.planetObj.getWorldPosition(epos);
 
-    // Write position at current circular index
     const writeIndex = (obj.traceArrIndex % pointCount) * 3;
     vertArray[writeIndex + 0] = epos.x;
     vertArray[writeIndex + 1] = epos.y;
@@ -4141,18 +3644,18 @@ function tracePlanet(obj, pos) {
     nextPos += obj.traceStep;
   }
 
-  positionAttr.needsUpdate = true; // Tell Three.js to update the buffer
+  positionAttr.needsUpdate = true;
   obj.traceCurrPos = nextPos - obj.traceStep;
   obj.traceLine.visible = true;
 }
 
 function getZodiacRotationSpeed() {
-  const earth = planets.find(obj => obj.name === "Earth");
+  const earth = planetObjects.find(obj => obj.name === "Earth");
   return earth ? -earth.speed : 0;
 }
 
 function moveModel(pos){
-  planets.forEach(obj => {
+  planetObjects.forEach(obj => {
     obj.orbitObj.rotation.y = obj.speed * pos - obj.startPos * (Math.PI/180)
     if (obj.rotationSpeed) {
       obj.planetObj.rotation.y = obj.rotationSpeed * pos 
@@ -4160,20 +3663,43 @@ function moveModel(pos){
   })
   zodiac.rotation.y = -Math.PI/3 - earth.orbitObj.rotation.y;
 }
-// Math.PI/6 + 
-function onWindowResize() {
-  if (o['Earth camera']) {
-    planetCamera.aspect = window.innerWidth / window.innerHeight;
-    planetCamera.updateProjectionMatrix();
+
+//
+function getOptimizedPixelRatio() {
+  const dpr = window.devicePixelRatio || 1;
+  const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
+
+  if (smallScreen && dpr > 1.5) {
+    return 1.2; // Lower pixel ratio for small mobile devices
   } else {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    return Math.min(dpr, 2); // Keep max 2 for normal desktop/tablet
   }
-  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function addPolarGridHelper(inplanet) {
-  var polarGridHelper = new THREE.PolarGridHelper( 10, 16, 8, 64, 0x0000ff, 0x808080 );
+// And your normal resize function:
+function onWindowResize() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(getOptimizedPixelRatio());
+}
+
+function addPolarGridHelper(inplanet, planetSize = 10) {
+  const polarGridHelper = new THREE.PolarGridHelper(
+    planetSize * 1.1,  // slightly bigger than the planet
+    12,                // 12 radial lines (for zodiac / months / seasons)
+    6,                 // 6 circles
+    32,                // fewer segments per circle (performance)
+    0x0000ff,          // radial line color (blue)
+    0x808080           // circle line color (gray)
+  );
+  polarGridHelper.material.opacity = 0.5;
+  polarGridHelper.material.transparent = true;
+  polarGridHelper.rotation.x = Math.PI / 2; // flat
   inplanet.add(polarGridHelper);
 }
 
@@ -4212,102 +3738,701 @@ function timeToPos(value) {
   return pos-= sHour*12 //Set the clock to tweleve for pos 0
 }
 
-//console.log(raToRadians("00:00:60"))
-function raToRadians(rightAscension) {
-  const time = rightAscension.split(":");
-  const deg = (Number(time[0]) + time[1]/60 + time[2]/3600)*15;
-  //console.log(deg)
-  return deg * (Math.PI/180);
+//Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
+function getElongationFromSun(targetPlanet) {
+  let sunPosition = new THREE.Vector3();
+  let earthPosition = new THREE.Vector3();
+  let targetPlanetPosition = new THREE.Vector3();
+
+  sun.planetObj.getWorldPosition(sunPosition);
+  earth.planetObj.getWorldPosition(earthPosition);
+  targetPlanet.planetObj.getWorldPosition(targetPlanetPosition);
+
+  let earthSunDistance = earthPosition.distanceTo(sunPosition);
+  let earthTargetPlanetDistance = earthPosition.distanceTo(targetPlanetPosition);
+  let sunTargetPlanetDistance = sunPosition.distanceTo(targetPlanetPosition);
+
+  let numerator =
+    Math.pow(earthSunDistance, 2) +
+    Math.pow(earthTargetPlanetDistance, 2) -
+    Math.pow(sunTargetPlanetDistance, 2);
+
+  let denominator = 2.0 * earthSunDistance * earthTargetPlanetDistance;
+
+  let elongationRadians = Math.acos(numerator / denominator);
+  return (180.0 * elongationRadians) / Math.PI;
 }
 
-function radiansToRa(radians) {
-  const raDec = radians * 12 / Math.PI;
-  const hours = Math.floor(raDec);
-  const minutesFloat = (raDec - hours) * 60;
-  const minutes = Math.floor(minutesFloat);
-  const seconds = Math.round((minutesFloat - minutes) * 60);
+function updateElongations() {
+  o["moonElongation"]=getElongationFromSun(moon);
+  o["mercuryElongation"]=getElongationFromSun(mercury);
+  o["venusElongation"]=getElongationFromSun(venus);
+  o["marsElongation"]=getElongationFromSun(mars);
+  o["jupiterElongation"]=getElongationFromSun(jupiter);
+  o["saturnElongation"]=getElongationFromSun(saturn);
+  o["uranusElongation"]=getElongationFromSun(uranus);
+  o["neptuneElongation"]=getElongationFromSun(neptune);
+};
 
-  const hh = ("0" + hours).slice(-2);
-  const mm = ("0" + minutes).slice(-2);
-  const ss = ("0" + seconds).slice(-2);
-
-  return hh + ":" + mm + ":" + ss;
+function updatePredictions() {
+  // 1. Auto-copy fields with same names
+  for (let key in predictions) {
+    if (o.hasOwnProperty(key)) {
+      predictions[key] = o[key];
+    }
+  }
+  
+  // 2. Do calculations based on juliandaysbalancedJD
+//  predictions.lengthofDay = parseFloat(predictions.lengthofDay.toFixed(2));
+  predictions.lengthofDay = calculatelengthofDay(o.juliandaysbalancedJD);
+  predictions.lengthofsiderealDay = calculatelengthofsiderealDay(o.juliandaysbalancedJD);
+  predictions.predictedDeltat = parseFloat(meanlengthofday);
 }
 
-//console.log(decToRadians("360:00:00"))
-function decToRadians(declination) {
-  const time = declination.split(":");
-  const deg = Number(time[0]) + time[1]/60 + time[2]/3600;
-  //console.log(deg)
-  return deg * (Math.PI/180);
+function calculatelengthofDay(juliandaysbalancedJD) {
+  const secondsInDay = 86400; // Normal seconds in a day
+  const changeRatePerYear = 0.001 / (100 * 365.25); // millisecond drift per day per year
+
+  const yearsSinceBalance = juliandaysbalancedJD / 365.25;
+  const changeInSeconds = yearsSinceBalance * changeRatePerYear;
+
+  return secondsInDay + changeInSeconds; // New length of day
 }
 
-function raToRad(ra) {
-  ra = ra.replace(/\s+/g, '');
-  const hours = ra.split('h')[0];
-  const minutes = ra.split('h')[1].split('m')[0]
-  const seconds = ra.split('h')[1].split('m')[1].split('s')[0]
-  return hours*Math.PI/12 + minutes*(Math.PI/(12*60)) + seconds*(Math.PI/(12*3600))
+function calculatelengthofsiderealDay(juliandaysbalancedJD) {
+
+  return juliandaysbalancedJD
 }
 
-//Thanks to AI correct version of decToRad (chaecked by viewing the orionbelt)
-function decToRad(dec) {
-  if (typeof dec !== 'string') {
-    console.warn('decToRad expected a string but got', typeof dec);
+//*************************************************************
+// F:CREATE PLANETS
+//*************************************************************
+function createPlanet(pd) { // pd = Planet Data
+
+  // Orbit container
+  const orbitContainer = new THREE.Object3D();
+  orbitContainer.rotation.x = pd.orbitTilta * (Math.PI / 180);
+  orbitContainer.rotation.z = pd.orbitTiltb * (Math.PI / 180);
+  orbitContainer.position.set(pd.orbitCentera, pd.orbitCenterc, pd.orbitCenterb);
+
+  // Orbit object
+  const orbit = new THREE.Object3D();
+
+  // Correct orbit: support for eccentricity (ellipse)
+  const points = [];
+  const segments = 100;
+  const semiMajor = pd.orbitSemiMajor !== undefined ? pd.orbitSemiMajor : pd.orbitRadius;
+  const semiMinor = pd.orbitSemiMinor !== undefined ? pd.orbitSemiMinor : pd.orbitRadius;
+
+  for (let i = 0; i <= segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    points.push(new THREE.Vector3(
+      Math.cos(angle) * semiMajor,
+      Math.sin(angle) * semiMinor,
+      0
+    ));
+  }
+
+  const orbitGeometry = new THREE.BufferGeometry().setFromPoints(points);
+  const orbitMaterial = new THREE.LineBasicMaterial({ color: pd.color, transparent: true, opacity: 0.4 });
+  const orbitLine = new THREE.LineLoop(orbitGeometry, orbitMaterial);
+
+  orbitLine.rotation.x = Math.PI / 2; // Rotate into XZ plane
+  orbit.add(orbitLine);
+
+  // Material setup (choose texture first if available)
+  let materialOptions = {};
+
+  if (pd.textureUrl) {
+    const texture = new THREE.TextureLoader().load(pd.textureUrl);
+    materialOptions.map = texture;
+    materialOptions.bumpScale = 0.05;
+    materialOptions.specular = new THREE.Color('#190909'); // Dark specular for older phong look
+
+    if (pd.textureTransparency) {
+      materialOptions.transparent = true;
+      materialOptions.opacity = pd.textureTransparency;
+    }
+  } else {
+    // If no texture, fallback to basic color
+    materialOptions.color = pd.color;
+  }
+
+  // Then optionally add emissive settings
+  if (pd.emissive || pd.planetColor) {
+    materialOptions.emissive = pd.planetColor || pd.color;
+    materialOptions.emissiveIntensity = 2; // <- back to your original intensity
+  }
+
+  const planetMaterial = new THREE.MeshPhongMaterial(materialOptions);
+
+  // Planet sphere
+  const segmentsSphere = pd.sphereSegments || 32;
+  const sphereGeometry = new THREE.SphereGeometry(pd.size, segmentsSphere, segmentsSphere);
+  const planetMesh = new THREE.Mesh(sphereGeometry, planetMaterial);
+  
+  // 🌑 Apply shadow flags only to real planets
+  if (/Barycenter|Precession|WOBBLE|HELION|Eccentricity|Helion|Starting|Cycle|Ellipse/i.test(pd.name)) {
+    if (pd.textureUrl) {
+    const texture = new THREE.TextureLoader().load(pd.textureUrl);
+    planetMesh.material = new THREE.MeshBasicMaterial({
+      map: texture,
+      color: 0x777777, // ← dims the texture
+      transparent: !!pd.textureTransparency,
+      opacity: pd.textureTransparency || 1.0,
+      });
+    }
+  } else {
+  planetMesh.material = planetMaterial; 
+  planetMesh.castShadow = true;
+  planetMesh.receiveShadow = true;
+  }
+
+  // Pivot (center of orbit)
+  const pivot = new THREE.Object3D();
+  pivot.position.set(semiMajor, 0, 0); // Adjust pivot to semiMajor if eccentric
+  orbit.add(pivot);
+
+  // Rotation axis
+  const rotationAxis = new THREE.Object3D();
+  rotationAxis.position.copy(pivot.position);
+  rotationAxis.rotation.z = pd.tilt * (Math.PI / 180);
+
+  if (pd.tiltb) {
+    rotationAxis.rotation.x = pd.tiltb * (Math.PI / 180);
+  }
+
+  // Ring system (optional)
+  if (pd.ringUrl) {
+    const texLoader = new THREE.TextureLoader();
+    texLoader.load(pd.ringUrl, texture => {
+    if (!(isPowerOfTwo(texture.image.width) &&
+          isPowerOfTwo(texture.image.height))) {
+      console.warn('Ring texture is not POT—will be clamped.');
+    }
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set( segments, 1 );
+
+    // disable mipmaps so nothing ever clamps to the border
+    texture.generateMipmaps = false;
+    texture.minFilter     = THREE.LinearFilter;
+    texture.needsUpdate   = true;
+    texture.center.set(0.5, 0.5);
+    texture.rotation = 0;              // rotate if you need to flip inward
+
+    const ring = createRings(pd.ringSize, segments, texture);
+    rotationAxis.add(ring);
+    pd.ringObj = ring;
+    });
+  }
+
+  rotationAxis.add(planetMesh);
+
+  // Optional: name tag (commented, activate if needed)
+  // const nameTag = createLabel(pd.name);
+  // nameTag.position.copy(rotationAxis.position);
+  // nameTag.scale.set(10, 10, 10);
+  // rotationAxis.add(nameTag);
+
+  orbit.add(rotationAxis);
+  orbitContainer.add(orbit);
+
+  // Axis helper (only if explicitly set)
+  if (pd.axisHelper === true) {
+    const axisHelper = new THREE.AxesHelper(pd.size * 3);
+    planetMesh.add(axisHelper);
+    pd.axisHelperObj = axisHelper;
+  }
+
+  // Save references
+  pd.containerObj = orbitContainer;
+  pd.orbitObj = orbit;
+  pd.orbitLineObj = orbitLine;
+  pd.planetObj = planetMesh;
+  pd.planetMaterial = planetMaterial;
+  pd.pivotObj = pivot;
+  pd.rotationAxis = rotationAxis;
+
+  // ✅ Log the material type and settings
+  if (!/Barycenter|Precession|Cycle|Ellipse/i.test(pd.name)) {
+  console.log(`Created planet: ${pd.name}`);
+  console.log('Material type:', planetMaterial.type);
+  console.log('Material options:', {
+    map: planetMaterial.map ? '✔ texture' : '✖ no texture',
+    color: planetMaterial.color.getHexString(),
+    emissive: planetMaterial.emissive.getHexString(),
+    transparent: planetMaterial.transparent,
+    opacity: planetMaterial.opacity,
+  });
+  console.log('Shadow flags:', {
+    castShadow: planetMesh.castShadow,
+    receiveShadow: planetMesh.receiveShadow
+  });
+}
+
+  // Add to scene
+  scene.add(orbitContainer);
+}
+
+function createRings(radius, segments, texture) {
+  const geometry = new THREE.RingGeometry(1.2 * radius, 2 * radius, 2 * segments, 5, 0, Math.PI * 2);
+
+  // Fix UV mapping to wrap around
+  const uvs = geometry.attributes.uv;
+  const pos = geometry.attributes.position;
+  const innerR = 1.2 * radius;
+  const outerR = 2   * radius;
+  for (let i = 0; i < uvs.count; i++) {
+  const x = pos.getX(i), y = pos.getY(i);
+  // U: full 0→1 sweep around the circle
+  const u = ( Math.atan2(y, x) + Math.PI ) / (2 * Math.PI);
+  // V: map the ring-width to 0→1
+  const dist = Math.sqrt(x*x + y*y);
+  const v = (dist - innerR) / (outerR - innerR);
+  uvs.setXY(i, u, v);
+  }
+  geometry.attributes.uv.needsUpdate = true;
+  const material = new THREE.MeshBasicMaterial({
+  //const material = new THREE.MeshPhongMaterial({
+    map:         texture,
+    side:        THREE.DoubleSide,
+    transparent: true,
+    opacity:     0.6
+  });
+  const ring = new THREE.Mesh(geometry, material);
+  ring.rotation.x = -Math.PI / 2;   // lie flat
+  return ring;
+}
+
+function createCelestialSphere(radius) {
+  const geometry1 = new THREE.SphereGeometry( radius, 40, 40 );
+  const material1 = new THREE.MeshNormalMaterial( { transparent: true, wireframe: false, opacity: 0 , depthWrite: false} );
+  const mesh1 = new THREE.Mesh( geometry1, material1 );
+  const edgesGeometry = new THREE.EdgesGeometry( geometry1 );
+  const wireframe = new THREE.LineSegments( edgesGeometry, new THREE.LineBasicMaterial( { color: 0x666666, transparent: true, opacity: 0.3 } ) );
+  wireframe.add(new THREE.PolarGridHelper( radius, 4, 1, 60, 0x0000ff, 0x0000ff ));
+
+  mesh1.add( wireframe );
+  mesh1.wireFrameObj = wireframe;
+  return mesh1;
+}
+
+function showHideObject(obj) {
+    obj.orbitLineObj.visible = obj.visible;
+    if (obj.planetObj) {
+       obj.planetObj.visible = obj.visible;
+       }
+    if (obj.axisHelper) {
+      if (obj.visible) {
+        obj.axisHelper.visible = o['Axis helpers']
+      } else {
+        obj.axisHelper.visible = obj.visible;                       
+      }
+    }  
+    if (obj.ringObj) {
+    obj.ringObj.visible = obj.visible;
+  }
+}
+
+function showHideAxisHelpers() {
+  planetObjects.forEach(obj => {
+    if (obj.axisHelper) {
+      obj.axisHelper.visible = o['Axis helpers'];
+    }  
+  });
+}
+
+function showHideOrbits() {
+  planetObjects.forEach(obj => {
+    if (obj.orbitLineObj && !obj.isDeferent) {
+       if (obj.visible) {
+        obj.orbitLineObj.visible = o['Orbits'];
+       }
+    }  
+  });
+}
+
+function randomPointInSphere(radius) {
+  const v = new THREE.Vector3();
+  let x, y, z, normalizationFactor;
+
+  do {
+    x = THREE.MathUtils.randFloat(-1, 1);
+    y = THREE.MathUtils.randFloat(-1, 1);
+    z = THREE.MathUtils.randFloat(-1, 1);
+    normalizationFactor = Math.sqrt(x * x + y * y + z * z);
+  } while (normalizationFactor === 0); // retry if all zero
+
+  normalizationFactor = 1 / normalizationFactor;
+
+  v.x = x * normalizationFactor * radius;
+  v.y = y * normalizationFactor * radius;
+  v.z = z * normalizationFactor * radius;
+
+  return v;
+}
+
+function createStarfield() {  
+  const geometry = new THREE.BufferGeometry();
+  const positions = [];
+  const colors = [];
+
+  for (let i = 0; i < 100000; i++) {
+    const vertex = randomPointInSphere(1000000);
+    positions.push(vertex.x, vertex.y, vertex.z);
+
+    // Generate random star temperature (Kelvin range for stars)
+    const tempK = THREE.MathUtils.randFloat(2000, 10000);
+    const color = colorTemperature2rgb(tempK);
+
+    // Convert to 0–255 RGB integers
+    const r = Math.round(color.r * 255);
+    const g = Math.round(color.g * 255);
+    const b = Math.round(color.b * 255);
+
+    const rgbValues = [r, g, b]; // Same as what match() would have given
+
+    // Normalize to 0..1 for Three.js colors
+    colors.push(parseInt(rgbValues[0]) / 255, parseInt(rgbValues[1]) / 255, parseInt(rgbValues[2]) / 255);
+  }
+
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+  const material = new THREE.PointsMaterial({
+    size: 0.05,
+    vertexColors: true // or THREE.VertexColors (deprecated in newer versions)
+  });
+
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+}
+
+function setStarDistance() {
+  stars.forEach(obj => {
+    obj.starObj.position.x = obj.dist * o['Star distance'];
+  })
+}
+
+function getCircularText(
+  text, diameter, startAngle, align, textInside, inwardFacing, 
+  fName, fSize, kerning
+) {
+    align = align.toLowerCase();
+    const mainCanvas = document.createElement('canvas');
+    const resolutionFactor = 3;
+    const ctxRef = mainCanvas.getContext('2d');
+    const clockwise = align === "right" ? 1 : -1;
+    startAngle = startAngle * (Math.PI / 180);
+    
+    // Font height measurement
+    const div = document.createElement("div");
+    div.innerHTML = text;
+    div.style.position = 'absolute';
+    div.style.top = '-10000px';
+    div.style.left = '-10000px';
+    div.style.fontFamily = fName;
+    div.style.fontSize = fSize;
+    div.style.fontWeight = 'bold';
+    document.body.appendChild(div);
+    const textHeight = div.offsetHeight;
+    document.body.removeChild(div);
+
+    if (!textInside) diameter += textHeight * 2;
+
+    const canvasSize = diameter * resolutionFactor;
+    mainCanvas.width = canvasSize;
+    mainCanvas.height = canvasSize;
+
+    ctxRef.scale(resolutionFactor, resolutionFactor);
+    ctxRef.translate(diameter / 2, diameter / 2);
+    ctxRef.font = `bold ${fSize} ${fName}`;
+    ctxRef.fillStyle = '#ffffff';
+    ctxRef.textBaseline = 'middle';
+    ctxRef.textAlign = 'center';
+    ctxRef.shadowColor = 'black';
+    ctxRef.shadowBlur = 4;
+
+    if (((["left", "center"].includes(align)) && inwardFacing) || (align == "right" && !inwardFacing)) {
+        text = text.split("").reverse().join("");
+    }
+
+    startAngle += (Math.PI * !inwardFacing);
+
+    if (align == "center") {
+        for (let j = 0; j < text.length; j++) {
+            const charWid = ctxRef.measureText(text[j]).width;
+            startAngle += ((charWid + (j === text.length - 1 ? 0 : kerning)) / (diameter / 2 - textHeight)) / 2 * -clockwise;
+        }
+    }
+
+    ctxRef.rotate(startAngle);
+
+    for (let j = 0; j < text.length; j++) {
+        const charWid = ctxRef.measureText(text[j]).width;
+        ctxRef.rotate((charWid / 2) / (diameter / 2 - textHeight) * clockwise);
+        ctxRef.fillText(text[j], 0, (inwardFacing ? 1 : -1) * (0 - diameter / 2 + textHeight / 2));
+        ctxRef.rotate((charWid / 2 + kerning) / (diameter / 2 - textHeight) * clockwise);
+    }
+  
+  return mainCanvas;
+}
+
+function colorTemperature2rgb(kelvin) {
+  let temperature = kelvin / 100.0;
+  let red, green, blue;
+
+  // Calculate red
+  if (temperature < 66.0) {
+    red = 255;
+  } else {
+    let t = temperature - 55.0;
+    red = 351.97690566805693 + 0.114206453784165 * t - 40.25366309332127 * Math.log(t);
+    red = Math.min(Math.max(red, 0), 255);
+  }
+
+  // Calculate green
+  if (temperature < 66.0) {
+    let t = temperature - 2;
+    green = -155.25485562709179 - 0.44596950469579133 * t + 104.49216199393888 * Math.log(t);
+  } else {
+    let t = temperature - 50.0;
+    green = 325.4494125711974 + 0.07943456536662342 * t - 28.0852963507957 * Math.log(t);
+  }
+  green = Math.min(Math.max(green, 0), 255);
+
+  // Calculate blue
+  if (temperature >= 66.0) {
+    blue = 255;
+  } else if (temperature <= 20.0) {
+    blue = 0;
+  } else {
+    let t = temperature - 10;
+    blue = -254.76935184120902 + 0.8274096064007395 * t + 115.67994401066147 * Math.log(t);
+    blue = Math.min(Math.max(blue, 0), 255);
+  }
+
+  // Return as THREE.Color (normalized to [0, 1] range)
+  return new THREE.Color(red / 255, green / 255, blue / 255);
+}
+
+/**
+ * Check whether a given day (JD or Perihelion-day) falls on a
+ * Perihelion-calendar “cycle” date: Year % cycleYears === 0, Month=1, Day=1.
+ *
+ * @param {number} day           — input day count (JD if julianday, or perihelion-day)
+ * @param {'julianday'|'perihelionday'} inputKind
+ * @param {number} cycleYears    — length of one cycle in Perihelion years (default 19122)
+ * @returns {boolean}
+ */
+function isPerihelionCycle(day, inputKind, cycleYears = (holisticyearLength/16)) {
+  // 1) get the Perihelion‐calendar date
+  const p = dayToDateNew(day, inputKind, 'perihelion-calendar');
+  // p.date is "YYYY-MM-DD" or "-YYYY-MM-DD"
+  
+  // 2) extract Y/M/D via regex
+  const m = /^(-?\d+)-(\d{2})-(\d{2})$/.exec(p.date);
+  if (!m) {
+    console.warn('Unexpected perihelion date format:', p.date);
+    return false;
+  }
+  const year  = parseInt(m[1], 10);
+  const month = parseInt(m[2], 10);
+  const dayOfM= parseInt(m[3], 10);
+
+  // 3) check for Jan 1 of a positive multiple of cycleYears
+  return (
+    month === 1 &&
+    dayOfM === 1 &&
+    year > 0 &&
+    year % cycleYears === 0
+  );
+}
+
+function triggerPerihelionEasterEgg() {
+  // a) Play your chime
+  //const audio = new Audio('sounds/celestial-chime.mp3');
+  //audio.play();
+
+  // b) Golden glow: animate a bloom post-process or add a sprite/ Needs Bloompass addpass
+  //addGoldenGlow(); 
+
+  // c) Cosmic confetti: particle system of little star/comet sprites
+  addConfettiParticles( camera.position.distanceTo(scene.position) );
+}
+
+function addConfettiParticles(spawnRadius = 5) {
+  const geom = new THREE.BufferGeometry();
+  const count = 200;
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    // random direction in a sphere
+    const v = new THREE.Vector3(
+      (Math.random()*2-1),
+      (Math.random()*2-1),
+      (Math.random()*2-1)
+    ).normalize().multiplyScalar(spawnRadius);
+    pos.set([v.x, v.y, v.z], i*3);
+  }
+  geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.1,
+    map: new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const pts = new THREE.Points(geom, mat);
+  scene.add(pts);
+
+  // animate them shooting outward and fading
+  new TWEEN.Tween({ t: 0 })
+    .to({ t: 1 }, 3000)
+    .onUpdate(({ t }) => {
+      geom.attributes.position.array.forEach((_, idx, arr) => {
+        arr[idx] *= 1 + 2 * (t);  // move outward
+      });
+      geom.attributes.position.needsUpdate = true;
+      mat.opacity = 1 - t;
+    })
+    .onComplete(() => {
+      scene.remove(pts);
+      geom.dispose(); mat.dispose();
+    })
+    .start();
+}
+
+function addGoldenGlow() {
+  const initial = bloomPass.strength;
+  new TWEEN.Tween({ str: initial })
+    .to({ str: initial * 2 }, 1000)
+    .yoyo(true)
+    .repeat(1)
+    .onUpdate(({ str }) => bloomPass.strength = str)
+    .start();
+}
+
+// helper
+function isPowerOfTwo(v) {
+  return (v & (v - 1)) === 0;
+}
+//*************************************************************
+// EXTERNAL FUNCTIONS
+//*************************************************************
+  
+// === RA and Dec Conversions ===
+function raToRadians(raStr) {
+  if (typeof raStr !== 'string') {
+    console.warn('raToRadians expected a string but got', typeof raStr);
     return 0;
   }
 
-  dec = dec.replace(/\s+/g, '');
+  raStr = raStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
 
-  const degreeParts = dec.split('°');
-  if (degreeParts.length < 2) {
-    console.warn('Invalid declination format (missing °):', dec);
+  // Match formats like: "23h20m38.2s"
+  let match1 = raStr.match(/^(\d+)h(\d+)m([\d.]+)s$/);
+  if (match1) {
+    let [ , hh, mm, ss ] = match1;
+    hh = parseFloat(hh);
+    mm = parseFloat(mm);
+    ss = parseFloat(ss);
+    const degrees = (hh + mm / 60 + ss / 3600) * 15;
+    return degrees * (Math.PI / 180);
+  }
+
+  // Match colon-separated format: "23:20:38.2"
+  let match2 = raStr.match(/^(\d+):(\d+):([\d.]+)$/);
+  if (match2) {
+    let [ , hh, mm, ss ] = match2;
+    hh = parseFloat(hh);
+    mm = parseFloat(mm);
+    ss = parseFloat(ss);
+    const degrees = (hh + mm / 60 + ss / 3600) * 15;
+    return degrees * (Math.PI / 180);
+  }
+
+  console.warn('Unrecognized RA format:', raStr);
+  return 0;
+}
+
+function radiansToRa(rad) {
+  if (rad < 0) rad += 2 * Math.PI;
+
+  const totalHours = rad * 12 / Math.PI;
+  const hh = Math.floor(totalHours);
+  const mm = Math.floor((totalHours - hh) * 60);
+  const ss = Math.round(((totalHours - hh) * 60 - mm) * 60);
+
+  return (
+    String(hh).padStart(2, '0') + 'h' +
+    String(mm).padStart(2, '0') + 'm' +
+    String(ss).padStart(2, '0') + 's'
+  );
+}
+
+function decToRadians(decStr) {
+  if (typeof decStr !== 'string') {
+    console.warn('decToRadians expected a string but got', typeof decStr);
     return 0;
   }
 
-  let degrees = parseFloat(degreeParts[0]) || 0;
-  const isNegative = degrees < 0;
+  decStr = decStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
 
-  const minuteSecondPart = degreeParts[1].split('′');
-  const minutes = parseFloat(minuteSecondPart[0]) || 0;
-  let seconds = 0;
-
-  if (minuteSecondPart.length > 1) {
-    seconds = parseFloat(minuteSecondPart[1].replace('″', '')) || 0;
+  // Match formats like: "+23°44′25″" or "-12°30′15.5″"
+  let match1 = decStr.match(/^(-?\+?\d+)°(\d+)′([\d.]+)″$/);
+  if (match1) {
+    let [ , deg, min, sec ] = match1;
+    deg = parseFloat(deg);
+    min = parseFloat(min);
+    sec = parseFloat(sec);
+    const sign = Math.sign(deg);
+    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
+    return sign * absDeg * (Math.PI / 180);
   }
 
-  const absDegrees = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
-  return (isNegative ? -absDegrees : absDegrees) * (Math.PI / 180);
+  // Match colon-separated format: "+23:44:25.2"
+  let match2 = decStr.match(/^(-?\+?\d+):(\d+):([\d.]+)$/);
+  if (match2) {
+    let [ , deg, min, sec ] = match2;
+    deg = parseFloat(deg);
+    min = parseFloat(min);
+    sec = parseFloat(sec);
+    const sign = Math.sign(deg);
+    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
+    return sign * absDeg * (Math.PI / 180);
+  }
+
+  console.warn('Unrecognized declination format:', decStr);
+  return 0;
 }
 
-function radToRa(rad){
-  if ( rad < 0 ) {rad = rad + Math.PI*2}
-  const raDec = rad * 12/Math.PI
-  const hours = Math.floor(raDec);
-  const minutesSeconds = (raDec - hours) * 60
-  const minutes = Math.floor(minutesSeconds);
-  const seconds = (minutesSeconds - minutes) * 60
-  return leadZero(hours) + "h" + leadZero(minutes) + "m" + leadZero(seconds.toFixed(0)) + "s"
-  }
-
-function radToDec(rad) {
+function radiansToDec(rad) {
+  // Convert spherical phi to standard declination (0 at equator, ±90 at poles)
   rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
   let degDec = rad * 180 / Math.PI;
-  let degreesSign = "";
 
-  if (degDec < 0) {
-    degDec *= -1.0;
-    degreesSign = "-";
-  }
+  const sign = degDec < 0 ? '-' : '+';
+  degDec = Math.abs(degDec);
 
   const degrees = Math.floor(degDec);
-  const minutesSeconds = (degDec - degrees) * 60;
-  const minutes = Math.floor(minutesSeconds);
-  const seconds = (minutesSeconds - minutes) * 60;
+  const minutes = Math.floor((degDec - degrees) * 60);
+  const seconds = Math.round(((degDec - degrees) * 60 - minutes) * 60);
 
-  return leadZero(degreesSign + degrees, true) + "\xB0" + leadZero(minutes) + "'" + leadZero(seconds.toFixed(0)) + "\"";
+  return (
+    sign +
+    String(degrees).padStart(2, '0') + '°' +
+    String(minutes).padStart(2, '0') + "'" +
+    String(seconds).padStart(2, '0') + '"'
+  );
 }
 
+function radiansToDecDecimal(rad) {
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  return (rad * 180 / Math.PI).toFixed(4);
+}
+
+// === Utilities ===
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
@@ -4323,65 +4448,611 @@ function leadZero(n, plus){
 }
 
 function isValidTime(value) {
-  let aTime = value.split(":");
-  if (aTime.length > 3) {
-    return false; // Only hh:mm:ss allowed
-  }
+  const parts = value.split(':');
+  // 1) must be exactly hh:mm:ss
+  if (parts.length !== 3) return false;
 
-  // Hours
-  if (!/^\d+$/.test(aTime[0]) || aTime[0].length != 2) return false;
-  const hours = Number(aTime[0]);
-  if (hours > 24) return false;
+  const [hStr, mStr, sStr] = parts;
+  // 2) each piece must be two digits
+  if (!/^\d{2}$/.test(hStr)) return false;
+  if (!/^\d{2}$/.test(mStr)) return false;
+  if (!/^\d{2}$/.test(sStr)) return false;
 
-  // Minutes
-  if (aTime.length > 1) {
-    if (!/^\d+$/.test(aTime[1]) || aTime[1].length != 2) return false;
-    const minutes = Number(aTime[1]);
-    if (minutes > 59) return false;
-  }
+  const h = Number(hStr);
+  const m = Number(mStr);
+  const s = Number(sStr);
 
-  // Seconds
-  if (aTime.length > 2) {
-    if (!/^\d+$/.test(aTime[2]) || aTime[2].length != 2) return false;
-    const seconds = Number(aTime[2]);
-    if (seconds > 59) return false;
-  }
-
-  // Extra: if hour == 24, minutes and seconds must be 00
-  if (hours === 24 && (Number(aTime[1]) > 0 || Number(aTime[2]) > 0)) {
-    return false;
-  }
+  // 3) valid ranges
+  if (h < 0 || h > 24)      return false;
+  if (m < 0 || m > 59)      return false;
+  if (s < 0 || s > 59)      return false;
+  // extra: only allow 24:00:00 as a special case
+  if (h === 24 && (m !== 0 || s !== 0)) return false;
 
   return true;
 }
 
+/**
+ * Validate a calendar date string in your Julian⇄Gregorian system.
+ *
+ * – Accepts astronomical years (“-4712-01-01” → 4713 BC)
+ * – Uses Julian leap-rule for dates < 1582-10-15, Gregorian thereafter
+ * – Rejects the 10 “skipped” days in Oct 1582
+ *
+ * @param {string} value  “YYYY-MM-DD” or “-YYYY-MM-DD”
+ * @returns {boolean}
+ */
 function isValidDate(value) {
-  let aDate = value.split("-");
-  if (aDate.length > 3) {
-    aDate.shift(); // Assume minus sign first
+  // 1) Parse with a single regex; preserve leading “-” on year
+  const m = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(value);
+  if (!m) return false;
+
+  const Y = parseInt(m[1], 10);
+  const M = parseInt(m[2], 10);
+  const D = parseInt(m[3], 10);
+
+  // 2) Basic range checks
+  if (M < 1 || M > 12 || D < 1 || D > 31) {
+    return false;
   }
-  if (aDate.length !== 3) return false; // must be exactly 3 parts
 
-  const year = Number(aDate[0]);
-  const month = Number(aDate[1]);
-  const day = Number(aDate[2]);
+  // 3) Reject the “skipped” days of Oct 5–14, 1582
+  if (
+    Y === GREGORIAN_START.year &&
+    M === GREGORIAN_START.month &&
+    D > 4 &&
+    D < GREGORIAN_START.day
+  ) {
+    return false;
+  }
 
-  if (!isNumeric(year) || !isNumeric(month) || !isNumeric(day)) return false;
+  // 4) Decide which leap-rule applies
+  const beforeGregorian =
+    Y < GREGORIAN_START.year ||
+    (Y === GREGORIAN_START.year && (
+      M < GREGORIAN_START.month ||
+      (M === GREGORIAN_START.month && D < GREGORIAN_START.day)
+    ));
+  const isLeap = beforeGregorian
+               ? (Y % 4 === 0)  // Julian rule
+               : (Y % 4 === 0 && (Y % 100 !== 0 || Y % 400 === 0));  // Gregorian
 
-  if (month < 1 || month > 12) return false;
-  if (day < 1 || day > 31) return false;
-
-  // Check valid days in months
-  const daysInMonth = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (day > daysInMonth[month - 1]) return false;
-
-  // Gregorian calendar transition
-  if (year === 1582 && month === 10 && day > 4 && day < 15) {
+  // 5) Month lengths
+  const monthLengths = [
+    31,
+    isLeap ? 29 : 28,
+    31, 30, 31, 30,
+    31, 31, 30, 31,
+    30, 31
+  ];
+  if (D > monthLengths[M - 1]) {
     return false;
   }
 
   return true;
 }
+
+function addYears(sDate, year) {
+  let aDate = sDate.split("-");
+  let y, date;
+  if (aDate.length > 3) {
+    //We had a minus sign first = a BC date
+    y = -Number(aDate[1])
+    date = (y + year) + "-" + aDate[2] + "-" + aDate[3];
+  } else {
+    y = Number(aDate[0])
+    date = (y + year) + "-" + aDate[1] + "-" + aDate[2];
+  };
+  return date
+}
+
+// === Perihelion Calendar Conversions ===
+
+// Epoch constant: perihelion-day 0 corresponds to Julian Day 2176142
+//const PERIHELION_EPOCH_JD = 2176142 = (startmodelJD-perihelionalignmentJD);
+
+function perihelionDayToJulianDay(pd) {
+  if (typeof pd !== 'number' || !Number.isFinite(pd)) {
+    throw new Error(`Invalid perihelion day: ${pd}`);
+  }
+  // Simple offset
+  return pd + (startmodelJD-perihelionalignmentJD);
+}
+
+function julianDayToPerihelionDay(jd) {
+  if (typeof jd !== 'number' || !Number.isFinite(jd)) {
+    throw new Error(`Invalid Julian Day: ${jd}`);
+  }
+  return jd - (startmodelJD-perihelionalignmentJD);
+}
+
+/**
+ * Convert a Julian Day Number to a UTC calendar date + time.
+ *
+ * @param {number} jd  The Julian Day Number (can be fractional).
+ * @returns {{ date: string, time: string, calendar: 'Julian'|'Gregorian' }}
+ * @throws {TypeError} If jd is not a finite number.
+ */
+function dayToDate(jd) {
+  if (typeof jd !== 'number' || !isFinite(jd)) {
+    throw new TypeError('dayToDate: julian day must be a finite number');
+  }
+
+  // shift origin to midnight
+  const J = jd + 0.5;
+  const Z = Math.floor(J);
+  const F = J - Z;
+
+  // determine whether to use Julian or Gregorian calendar rules
+  const isGregorian = jd >= GREGORIAN_START_JD;
+  let A;
+  if (!isGregorian) {
+    // Julian calendar
+    A = Z;
+  } else {
+    // Gregorian calendar correction
+    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+    A = Z + 1 + alpha - Math.floor(alpha / 4);
+  }
+
+  // common steps
+  const B = A + 1524;
+  const C = Math.floor((B - 122.1) / 365.25);
+  const D = Math.floor(365.25 * C);
+  const E = Math.floor((B - D) / 30.6001);
+
+  // day with fractional part
+  const dayWithFrac = B - D - Math.floor(30.6001 * E) + F;
+  let day = Math.floor(dayWithFrac);
+  let fracDay = dayWithFrac - day;
+
+  // month / year
+  const month = (E < 14) ? E - 1 : E - 13;
+  const year = (month > 2) ? C - 4716 : C - 4715;
+
+  if (year <= 0) {
+    console.warn(
+      `dayToDate: resulting year is ${year} (astronomical numbering; year 0 = 1 BC).`
+    );
+  }
+
+  // convert fractional day to H:M:S
+  let hours   = Math.floor(fracDay * 24);
+  let minutes = Math.floor((fracDay * 24 - hours) * 60);
+  let seconds = Math.floor((((fracDay * 24 - hours) * 60) - minutes) * 60 + 0.5);
+
+  // handle rounding spill-over
+  if (seconds >= 60) { seconds -= 60; minutes += 1; }
+  if (minutes >= 60) { minutes -= 60; hours   += 1; }
+  if (hours   >= 24) { hours   -= 24; day      += 1; 
+    // note: on an extremely rare rounding boundary this could push you into the next day —
+    // if that matters you could re-run the algorithm on jd + tiny epsilon.
+  }
+
+  // zero-pad helpers
+  const pad2 = n => n.toString().padStart(2, '0');
+  const pad4 = n => n.toString().padStart(4, '0');
+
+  return {
+    calendar: isGregorian ? 'Gregorian' : 'Julian',
+    date: `${pad4(year)}-${pad2(month)}-${pad2(day)}`,
+    time: `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`
+  };
+}
+
+/*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  Helpers below: you can tuck these in the same module/file.
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
+
+/**
+ * Convert either a Julian or Perihelion day count into a calendar date/time
+ * in either the standard Julian→Gregorian switch or a Perihelion calendar.
+ *
+ * @param {number} day      — the input day count (may be fractional)
+ * @param {'julianday'|'perihelionday'} inputKind
+ * @param {'julian-gregorian-calendar'|'perihelion-calendar'} outputKind
+ * @returns {{ calendar: string, date: string, time: string }}
+ * @throws {TypeError|Error} on bad input
+ */
+function dayToDateNew(day, inputKind, outputKind) {
+  // 1) Validate
+  // 1) Normalize & validate `day`
+  const d = Number(day);
+  if (!Number.isFinite(d)) {
+    throw new TypeError(
+      `dayToDateNew: first argument must be a finite number, got ${day}`
+    );
+  }
+  day = d;
+
+  // 2) Validate your flags
+  if (inputKind !== 'julianday' && inputKind !== 'perihelionday') {
+    throw new TypeError(
+      `dayToDateNew: inputKind must be 'julianday' or 'perihelionday'`
+    );
+  }
+  if (
+    outputKind !== 'julian-gregorian-calendar' &&
+    outputKind !== 'perihelion-calendar'
+  ) {
+    throw new TypeError(
+      `dayToDateNew: outputKind must be 'julian-gregorian-calendar' or 'perihelion-calendar'`
+    );
+  }
+
+  // 3) Turn everything into a single JD
+  let jd;
+  if (inputKind === 'julianday') {
+    jd = day;
+  } else {
+    // PERIHELION → JD
+    jd = day + perihelionalignmentJD;  // perihelion-day 0 was exactly JD = perihelionalignmentJD
+  }
+
+  // 4) Dispatch to the right formatter
+  if (outputKind === 'julian-gregorian-calendar') {
+    return dayToDate(jd);
+  } else {
+    return dayToPerihelionCalendarDate(jd);
+  }
+}
+
+/**
+ * Convert a calendar date at UTC 00:00 into Julian Day Number.
+ *
+ * – Accepts astronomical years (year 0 = 1 BC, –1 = 2 BC, etc.)
+ * – Uses pure Julian rules before 1582-10-15, Gregorian thereafter.
+ *
+ * @param {number} Y   full year (may be negative or zero)
+ * @param {number} M   month 1–12
+ * @param {number} D   day   1–31
+ * @returns {number}   Julian Day Number at 00:00 UTC
+ * @throws {TypeError} on invalid inputs
+ */
+function dateToJulianDay(Y, M, D) {
+  // 1) Validate types & ranges
+  if (!Number.isInteger(Y) || !Number.isInteger(M) || !Number.isInteger(D)) {
+    throw new TypeError(
+      `dateToJulianDay: expected integers, got Y=${Y}, M=${M}, D=${D}`
+    );
+  }
+  if (M < 1 || M > 12) {
+    throw new TypeError(`dateToJulianDay: month out of range: ${M}`);
+  }
+  if (D < 1 || D > 31) {
+    throw new TypeError(`dateToJulianDay: day out of range: ${D}`);
+  }
+
+  // 2) Shift Jan/Feb to months 13/14 of previous year
+  let y = Y, m = M;
+  if (m <= 2) {
+    y -= 1;
+    m += 12;
+  }
+
+  // 3) Julian vs. Gregorian correction
+  let B;
+  const beforeGregorian =
+    Y <  GREGORIAN_START.year ||
+    (Y === GREGORIAN_START.year && (
+      M  < GREGORIAN_START.month ||
+      (M  === GREGORIAN_START.month && D < GREGORIAN_START.day)
+    ));
+  if (beforeGregorian) {
+    B = 0;  // Julian calendar
+  } else {
+    const A = Math.floor(y / 100);
+    B = 2 - A + Math.floor(A / 4);
+  }
+
+  // 4) Compute JD at midnight
+  const jd = Math.floor(365.25 * (y + 4716))
+           + Math.floor(30.6001 * (m + 1))
+           + D + B - 1524.5;
+
+  return jd;
+}
+
+/**
+ * Convert a calendar date+time (UTC) into a (possibly fractional) Julian Day Number.
+ *
+ * – Years may be negative or zero (astronomical numbering: 0 = 1 BC, –1 = 2 BC, …)
+ * – Dates < 1582-10-15 use the Julian calendar (no century correction)
+ * – Dates ≥ 1582-10-15 use the Gregorian calendar correction
+ * – Time “24:00:00” is allowed and becomes the next day at 00:00
+ *
+ * @param {string} dateStr  “YYYY-MM-DD” or “-YYYY-MM-DD”
+ * @param {string} timeStr  “hh:mm:ss” or “24:00:00”
+ * @returns {number}        fractional Julian Day Number
+ * @throws {TypeError}      on malformed date or time
+ */
+function dateTimeToJulianDay(dateStr, timeStr) {
+  // — 1) parse the date, allowing a leading “-” for BC years —
+  const dateRe = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/;
+  const dm     = dateRe.exec(dateStr);
+  if (!dm) {
+    throw new TypeError(
+      `Invalid date "${dateStr}". Expected "YYYY-MM-DD" or "-YYYY-MM-DD".`
+    );
+  }
+  const Y = parseInt(dm[1], 10),
+        M = parseInt(dm[2], 10),
+        D = parseInt(dm[3], 10);
+  if (M < 1 || M > 12) {
+    throw new TypeError(`Invalid month ${M} in date "${dateStr}".`);
+  }
+  if (D < 1 || D > 31) {
+    throw new TypeError(`Invalid day ${D} in date "${dateStr}".`);
+  }
+
+  // — 2) parse the time —
+  const timeRe = /^(\d{1,2}):(\d{1,2}):(\d{1,2})$/;
+  const tm     = timeRe.exec(timeStr);
+  if (!tm) {
+    throw new TypeError(
+      `Invalid time "${timeStr}". Expected "hh:mm:ss".`
+    );
+  }
+  const hh = parseInt(tm[1], 10),
+        mm = parseInt(tm[2], 10),
+        ss = parseInt(tm[3], 10);
+
+  // — 3) special‐case 24:00:00 as "next day at midnight" —
+  if (hh === 24 && mm === 0 && ss === 0) {
+    // compute JD at 00:00 of this date, plus one full day
+    const jdMidnight = dateToJulianDay(Y, M, D);
+    return jdMidnight + 1;
+  }
+
+  // — 4) otherwise validate “normal” time ranges —
+  if (hh < 0 || hh > 23 || mm < 0 || mm > 59 || ss < 0 || ss > 59) {
+    throw new TypeError(`Invalid time components in "${timeStr}".`);
+  }
+
+  // — 5) compute the JD at 00:00 UTC for (Y,M,D) —
+  const jd0 = dateToJulianDay(Y, M, D);
+
+  // — 6) add fractional day from time —
+  const dayFraction = hh / 24 + mm / 1440 + ss / 86400;
+  return jd0 + dayFraction;
+}
+
+/** Is a year leap under the old Julian rule? */
+function isJulianLeapYear(y) {
+  return (y % 4) === 0;
+}
+
+/** Is a year leap under the Revised-Julian rule? */
+function isRevisedJulianLeapYear(y) {
+  if (y % 4 !== 0) return false;
+  if (y % 100 !== 0) return true;
+  const r = y % 900;
+  return (r === 200 || r === 600);
+}
+
+/**
+ * JD → Perihelion calendar date/time (astronomical years, fractional days).
+ */
+function dayToPerihelionCalendarDate(jd) {
+  // 1) offset so that P=0 at perihelion epoch, integer days at midnight
+  const P = jd - perihelionalignmentJD + 0.5;
+  let   Z = Math.floor(P);
+  const F = P - Z;
+
+  // 2) peel off whole years forward or backward
+  let year       = 0;
+  let daysPassed = 0;    // days from epoch to start of 'year'
+  let daysInYear;
+
+  if (Z >= 0) {
+    // move forward from year=0
+    while (true) {
+      const yearStartJD = perihelionalignmentJD + daysPassed;
+      const useRevised  = yearStartJD >= REVISION_START_JD;
+      const isLeap      = useRevised
+                         ? isRevisedJulianLeapYear(year)
+                         : isJulianLeapYear(year);
+      daysInYear = isLeap ? 366 : 365;
+
+      if (Z >= daysInYear) {
+        Z         -= daysInYear;
+        daysPassed+= daysInYear;
+        year++;
+      } else break;
+    }
+  } else {
+    // move backward from year=0
+    while (Z < 0) {
+      const prevYear = year - 1;
+      // start JD of that previous year:
+      //   = epoch JD + (daysPassed minus daysInPrevYear)
+      const useRevised = (perihelionalignmentJD + daysPassed) >= REVISION_START_JD;
+      const isLeapPrev = useRevised 
+                        ? isRevisedJulianLeapYear(prevYear)
+                        : isJulianLeapYear(prevYear);
+      daysInYear = isLeapPrev ? 366 : 365;
+
+      Z         += daysInYear;
+      daysPassed-= daysInYear;
+      year--;
+    }
+  }
+
+  // 3) now Z is day-of-year in [0 .. daysInYear-1]; F is time-fraction
+  //    determine leap-flag for THIS year:
+  const thisYearStartJD = perihelionalignmentJD + daysPassed;
+  const thisUseRevised  = thisYearStartJD >= REVISION_START_JD;
+  const thisIsLeap      = thisUseRevised
+                         ? isRevisedJulianLeapYear(year)
+                         : isJulianLeapYear(year);
+
+  // month/day extraction
+  const monthLengths = [31, thisIsLeap?29:28,31,30,31,30,31,31,30,31,30,31];
+  let  month = 1;
+  let  dayOfYear = Z;
+  for (const ml of monthLengths) {
+    if (dayOfYear >= ml) {
+      dayOfYear -= ml;
+      month++;
+    } else break;
+  }
+  const dayOfMonth = dayOfYear + 1;
+
+  // 4) time from F
+  let hh = Math.floor(F * 24);
+  let mm = Math.floor((F*24 - hh)*60);
+  let ss = Math.floor(((F*24 - hh)*60 - mm)*60 + 0.5);
+  if (ss >= 60) { ss -= 60; mm++; }
+  if (mm >= 60) { mm -= 60; hh++; }
+
+  // zero-pad
+  const p2 = n => n.toString().padStart(2,'0');
+  const p4 = n => {
+    const s = Math.abs(n).toString().padStart(4,'0');
+    return n<0 ? `-${s}` : s;
+  };
+
+  // warn if astronomical year ≤ 0
+  // if (year <= 0) {
+  //   console.warn(
+  //     `dayToPerihelionCalendarDate: year ${year} ≤ 0 (astronomical numbering).`
+  //   );
+  // }
+
+  return {
+    calendar: 'Perihelion',
+    date:     `${p4(year)}-${p2(month)}-${p2(dayOfMonth)}`,
+    time:     `${p2(hh)}:${p2(mm)}:${p2(ss)}`
+  };
+}
+
+/**
+ * Convert a calendar date/time → either Julian Day or Perihelion Day.
+ *
+ * @param {string} dateStr
+ *   – in "YYYY-MM-DD" or "-YYYY-MM-DD" (astronomical year 0 = 1 BC)
+ * @param {string} timeStr
+ *   – in "hh:mm:ss" or "24:00:00"
+ * @param {'julian-gregorian-date'|'perihelion-date'} inputKind
+ * @param {'julianday'|'perihelionday'} outputKind
+ * @returns {number}  the desired day (may be fractional)
+ * @throws {TypeError} on bad args
+ */
+function dateToDayNew(dateStr, timeStr, inputKind, outputKind) {
+  // 1) validate flags
+  if (inputKind !== 'julian-gregorian-date'
+   && inputKind !== 'perihelion-date') {
+    throw new TypeError(
+      `dateToDayNew: inputKind must be `
+      +`'julian-gregorian-date' or 'perihelion-date'`
+    );
+  }
+  if (outputKind !== 'julianday'
+   && outputKind !== 'perihelionday') {
+    throw new TypeError(
+      `dateToDayNew: outputKind must be 'julianday' or 'perihelionday'`
+    );
+  }
+
+  // 2) get a single Julian Day Number (JD) from the input calendar
+  let jd;
+  if (inputKind === 'julian-gregorian-date') {
+    // uses the dateTimeToJulianDay we built earlier
+    jd = dateTimeToJulianDay(dateStr, timeStr);
+  } else {
+    // perihelion-date → JD via our reverse‐perihelion helper
+    jd = dateToPerihelionJulianDay(dateStr, timeStr);
+  }
+
+  // 3) dispatch to the desired output
+  if (outputKind === 'julianday') {
+    return jd;
+  } else {
+    // perihelionday = JD – perihelionAlignmentJD
+    return julianDayToPerihelionDay(jd);
+  }
+}
+
+
+
+/*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  Helper: calendar‐date (perihelion) → Julian Day Number
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
+
+function dateToPerihelionJulianDay(dateStr, timeStr) {
+  // parse date (allows "-YYYY")
+  const dm = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(dateStr);
+  if (!dm) throw new TypeError(
+    `Invalid date "${dateStr}". Expected "YYYY-MM-DD" or "-YYYY-MM-DD".`
+  );
+  const Y = parseInt(dm[1], 10),
+        M = parseInt(dm[2], 10),
+        D = parseInt(dm[3], 10);
+  if (M < 1 || M > 12) throw new TypeError(`Invalid month ${M}`);
+  if (D < 1 || D > 31) throw new TypeError(`Invalid day ${D}`);
+
+  // parse time, special‐case "24:00:00"
+  const tm = /^(\d{1,2}):(\d{1,2}):(\d{1,2})$/.exec(timeStr);
+  if (!tm) throw new TypeError(
+    `Invalid time "${timeStr}". Expected "hh:mm:ss".`
+  );
+  let [ hh, mm, ss ] = tm.slice(1).map(x=>parseInt(x,10));
+  if (hh === 24 && mm === 0 && ss === 0) {
+    // midnight rollover → JD @ next midnight
+    return dateToPerihelionJulianDay(dateStr, '00:00:00') + 1;
+  }
+  if (hh<0||hh>23||mm<0||mm>59||ss<0||ss>59) {
+    throw new TypeError(`Invalid time components in "${timeStr}".`);
+  }
+
+  // 1) days since perihelion‐epoch to the START of year Y
+  let daysAcc = 0, year = 0;
+  if (Y >= 0) {
+    for (; year < Y; year++) {
+      const startJD    = perihelionalignmentJD + daysAcc;
+      const useRevised = startJD >= REVISION_START_JD;
+      const isLeap     = useRevised
+                        ? isRevisedJulianLeapYear(year)
+                        : isJulianLeapYear(year);
+      daysAcc += (isLeap ? 366 : 365);
+    }
+  } else {
+    for (year = 0; year > Y; year--) {
+      const startJD    = perihelionalignmentJD + daysAcc;
+      const useRevised = startJD >= REVISION_START_JD;
+      const isLeap     = useRevised
+                        ? isRevisedJulianLeapYear(year-1)
+                        : isJulianLeapYear(year-1);
+      daysAcc -= (isLeap ? 366 : 365);
+    }
+  }
+
+  // 2) add days for the months BEFORE M in year Y
+  //    figure out if year Y is leap
+  const yearStartJD  = perihelionalignmentJD + daysAcc;
+  const useRevisedY  = yearStartJD >= REVISION_START_JD;
+  const isLeapY      = useRevisedY
+                      ? isRevisedJulianLeapYear(year)
+                      : isJulianLeapYear(year);
+  const monthLens    = [31, isLeapY?29:28,31,30,31,30,31,31,30,31,30,31];
+  let dayOfYear      = D - 1;
+  for (let m = 1; m < M; m++) {
+    dayOfYear += monthLens[m-1];
+  }
+
+  // 3) fold into a Julian Day Number
+  //    JD = periAlignJD + daysAcc + dayOfYear + timeFrac - 0.5
+  const timeFrac = hh/24 + mm/1440 + ss/86400;
+  return perihelionalignmentJD
+       + daysAcc
+       + dayOfYear
+       + timeFrac
+       - 0.5;
+}
+
+//*************************************************************
+// TO BE DELETED, MIGRATED
+//*************************************************************
 
 function dateToDays(sDate) {
   // Calculates number of days since 2000-06-21
@@ -4389,7 +5060,6 @@ function dateToDays(sDate) {
   
   const GREGORIAN_START = { year: 1582, month: 10, day: 15 };
   const GREGORIAN_REFERENCE_DAY = 730597; // days since 0 AD to 2000-06-21 (Gregorian)
-  const JULIAN_REFERENCE_DAY = 2451717;   // Julian Day Number for 2000-06-21
 
   if (typeof sDate !== 'string') {
     console.error('safeDateToDays expected a string but got', typeof sDate);
@@ -4430,7 +5100,7 @@ function dateToDays(sDate) {
     let jd = Math.trunc(365.25 * (y + 4716)) +
              Math.trunc(30.6001 * (m + 1)) +
              d - 1524;
-    return jd - JULIAN_REFERENCE_DAY;
+    return jd - startmodelJD;
   } else {
     // Gregorian calendar calculation
     m = (m + 9) % 12;
@@ -4446,20 +5116,6 @@ function dateToDays(sDate) {
 
     return days - GREGORIAN_REFERENCE_DAY;
   }
-}
-
-function addYears(sDate, year) {
-  let aDate = sDate.split("-");
-  let y, date;
-  if (aDate.length > 3) {
-    //We had a minus sign first = a BC date
-    y = -Number(aDate[1])
-    date = (y + year) + "-" + aDate[2] + "-" + aDate[3];
-  } else {
-    y = Number(aDate[0])
-    date = (y + year) + "-" + aDate[1] + "-" + aDate[2];
-  };
-  return date
 }
 
 function daysToDate(g) {
@@ -4499,499 +5155,3 @@ function julianCalDayToDate(g) {
   // if (year <= 0) year -= 1;
   return year + "-" + month + "-" + day
 };
-
-//Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
-function getElongationFromSun(targetPlanet)
-{
-  var sunPosition=new THREE.Vector3();
-  var earthPosition=new THREE.Vector3();
-  var targetPlanetPosition=new THREE.Vector3();
-  sun.planetObj.getWorldPosition(sunPosition);
-  earth.planetObj.getWorldPosition(earthPosition);
-  targetPlanet.planetObj.getWorldPosition(targetPlanetPosition);
-
-  var earthSunDistance=earthPosition.distanceTo(sunPosition);
-  var earthTargetPlanetDistance=earthPosition.distanceTo(targetPlanetPosition);
-  var sunTargetPlanetDistance=sunPosition.distanceTo(targetPlanetPosition);
-	
-  var numerator=(Math.pow(earthSunDistance,2)+Math.pow(earthTargetPlanetDistance,2))-Math.pow(sunTargetPlanetDistance,2);
-  var denominator=2.0*earthSunDistance*earthTargetPlanetDistance;
-  elongationRadians=Math.acos(numerator/denominator);
-  return (180.0*elongationRadians)/Math.PI;
-};
-
-function updateElongations()
-{
-  o["moonElongation"]=getElongationFromSun(moon);
-  o["mercuryElongation"]=getElongationFromSun(mercury);
-  o["venusElongation"]=getElongationFromSun(venus);
-  o["marsElongation"]=getElongationFromSun(mars);
-  o["jupiterElongation"]=getElongationFromSun(jupiter);
-  o["saturnElongation"]=getElongationFromSun(saturn);
-  o["uranusElongation"]=getElongationFromSun(uranus);
-  o["neptuneElongation"]=getElongationFromSun(neptune);
-};
-
-//CREATE PLANETS
-
-function createPlanet (pd) { //pd = Planet Data
-  var orbitContainer = new THREE.Object3D();
-  orbitContainer.rotation.x = pd.orbitTilta * (Math.PI/180);
-  orbitContainer.rotation.z = pd.orbitTiltb * (Math.PI/180);
-  orbitContainer.position.x = pd.orbitCentera;
-  orbitContainer.position.z = pd.orbitCenterb;
-  orbitContainer.position.y = pd.orbitCenterc;
-  
-  var orbit = new THREE.Object3D();
-  var geometry = new THREE.CircleGeometry(pd.orbitRadius, 100);
-  geometry.vertices.shift();
-  
-  var line = new THREE.LineLoop( geometry, new THREE.LineBasicMaterial({color: pd.color, transparent: true, opacity : 0.4} ));
-  line.rotation.x = Math.PI/2;
-  orbit.add(line);
-
-  var planetMesh
-  if (pd.emissive) {
-    planetMesh = new THREE.MeshPhongMaterial({color: pd.color, emissive: pd.color, emissiveIntensity: 2});
-  } else {
-    if (pd.planetColor) { //Halleys
-      planetMesh = new THREE.MeshPhongMaterial({color: pd.planetColor, emissive: pd.planetColor, emissiveIntensity: 2});
-    } else {
-      planetMesh = new THREE.MeshPhongMaterial({color: pd.color});
-    }
-  }
-  
-  if (pd.textureUrl) {
-    const texture = new THREE.TextureLoader().load(pd.textureUrl)
-    if (pd.textureTransparency) {
-      planetMesh = new THREE.MeshPhongMaterial({ map: texture, bumpScale: 0.05, specular: new THREE.Color('#190909'), transparent: true, opacity: pd.textureTransparency, });
-
-    } else {
-      planetMesh = new THREE.MeshPhongMaterial({ map: texture, bumpScale: 0.05, specular: new THREE.Color('#190909') });
-    }
-
-  }
-  if (pd.sphereSegments) {
-    var planet = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(pd.size, pd.sphereSegments, pd.sphereSegments), planetMesh);  
-  } else {
-    var planet = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(pd.size, 32, 32), planetMesh);
-  }
-
-  var pivot = new THREE.Object3D();
-  pivot.position.set(pd.orbitRadius, 0.0, 0.0);
-  orbit.add(pivot);
-
-  var rotationAxis = new THREE.Object3D();
-  rotationAxis.position.set(pd.orbitRadius, 0.0, 0.0);
-  rotationAxis.rotation.z = pd.tilt * (Math.PI/180)
-  if (pd.tiltb) {
-    rotationAxis.rotation.x = pd.tiltb * (Math.PI/180)
-  }
-
-  if (pd.ringUrl) {
-    var texloader = new THREE.TextureLoader();
-    texloader.load(pd.ringUrl, function(tex) {
-      const ring = createRings(pd.ringSize, 32, tex)
-      rotationAxis.add(ring);
-      pd.ringObj = ring;
-    });
-  };
-  rotationAxis.add(planet);
-
-  // const nameTag = createLabel(pd.name);
-  // nameTag.position.copy(rotationAxis.position)
-  // nameTag.scale.set(10,10,10)
-  // rotationAxis.add(nameTag);
-  
-  orbit.add(rotationAxis);
-  orbitContainer.add(orbit);
-
-  if (pd.axisHelper) {
-    pd.axisHelper = new THREE.AxesHelper(pd.size*3)
-    planet.add(pd.axisHelper);
-  }  
-  pd.containerObj = orbitContainer;
-  pd.orbitObj = orbit;
-  pd.orbitLineObj = line;
-  pd.planetObj = planet;
-  pd.planetMesh = planetMesh;
-  pd.pivotObj = pivot;
-  pd.rotationAxis = rotationAxis;
-  scene.add(orbitContainer);
-}
-
-function updatePlanet (pd) { 
-  pd.containerObj.rotation.x = pd.orbitTilta * (Math.PI/180);
-  pd.containerObj.rotation.z = pd.orbitTiltb * (Math.PI/180);
-  pd.containerObj.position.x = pd.orbitCentera;
-  pd.containerObj.position.z = pd.orbitCenterb;
-  pd.containerObj.position.y = pd.orbitCenterc;
-  pd.rotationAxis.rotation.z = pd.tilt * (Math.PI/180)
-  if (pd.hasOwnProperty('tiltb')) {
-    pd.rotationAxis.rotation.x = pd.tiltb * (Math.PI/180)
-  }
-}
-
-function createCelestialSphere(radius) {
-  const geometry1 = new THREE.SphereBufferGeometry( radius, 40, 40 );
-  const material1 = new THREE.MeshNormalMaterial( { transparent: true, wireframe: false, opacity: 0 , depthWrite: false} );
-  const mesh1 = new THREE.Mesh( geometry1, material1 );
-  const edgesGeometry = new THREE.EdgesGeometry( geometry1 );
-  const wireframe = new THREE.LineSegments( edgesGeometry, new THREE.LineBasicMaterial( { color: 0x666666, transparent: true, opacity: 0.3 } ) );
-  wireframe.add(new THREE.PolarGridHelper( radius, 4, 1, 60, 0x0000ff, 0x0000ff ));
-
-  mesh1.add( wireframe );
-  mesh1.wireFrameObj = wireframe;
-  return mesh1;
-}
-
-  function showHideObject(obj) {
-    obj.orbitLineObj.visible = obj.visible;
-    obj.planetMesh.visible = obj.visible;
-    if (obj.axisHelper) {
-      if (obj.visible) {
-        obj.axisHelper.visible = o['Axis helpers']
-      } else {
-        obj.axisHelper.visible = obj.visible;                       
-      }
-    }  
-    if (obj.ringObj) {
-    obj.ringObj.visible = obj.visible;
-  }
-}
-
-function showHideAxisHelpers() {
-  planets.forEach(obj => {
-    if (obj.axisHelper) {
-      obj.axisHelper.visible = o['Axis helpers'];
-    }  
-  });
-}
-
-function showHideOrbits() {
-  planets.forEach(obj => {
-    if (obj.orbitLineObj && !obj.isDeferent) {
-       if (obj.visible) {
-        obj.orbitLineObj.visible = o['Orbits'];
-       }
-    }  
-  });
-}
-
-function showHideInfoText() {
-    var x = document.getElementById("info");
-  if(o.infotext) {
-    x.style.display = "block";    
-  } else {
-    x.style.display = "none";    
-  }
-};
-
-function randomPointInSphere(radius) {
-  const v = new THREE.Vector3();
-  let x, y, z, normalizationFactor;
-
-  do {
-    x = THREE.Math.randFloat(-1, 1);
-    y = THREE.Math.randFloat(-1, 1);
-    z = THREE.Math.randFloat(-1, 1);
-    normalizationFactor = Math.sqrt(x * x + y * y + z * z);
-  } while (normalizationFactor === 0); // retry if all zero
-
-  normalizationFactor = 1 / normalizationFactor;
-
-  v.x = x * normalizationFactor * radius;
-  v.y = y * normalizationFactor * radius;
-  v.z = z * normalizationFactor * radius;
-
-  return v;
-}
-
-function createStarfield() {  
-  const geometry = new THREE.BufferGeometry();
-  const positions = [];
-  const colors = [];
-
-  for (let i = 0; i < 100000; i++) {
-    const vertex = randomPointInSphere(1000000);
-    positions.push(vertex.x, vertex.y, vertex.z);
-
-    // Generate random star temperature (Kelvin range for stars)
-    const tempK = THREE.Math.randFloat(2000, 10000);
-
-    // Convert temperature to RGB
-    const rgbString = colorTemperature2rgb(tempK);
-    const rgbValues = rgbString.match(/\d+/g); // extract numbers
-
-    // Normalize to 0..1 for Three.js colors
-    colors.push(parseInt(rgbValues[0]) / 255, parseInt(rgbValues[1]) / 255, parseInt(rgbValues[2]) / 255);
-  }
-
-  geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-  const material = new THREE.PointsMaterial({
-    size: 0.05,
-    vertexColors: THREE.VertexColors, // <--- use per-particle color
-    sizeAttenuation: false
-  });
-
-  const particles = new THREE.Points(geometry, material);
-  scene.add(particles);
-}
-
-function setStarDistance() {
-  stars.forEach(obj => {
-    obj.starObj.position.x = obj.dist * o['Star distance'];
-  })
-}
-
-function createRings(radius, segments, texture) {
-  return new THREE.Mesh(new THREE.XRingGeometry(1.2 * radius, 2 * radius, 2 * segments, 5, 0, Math.PI * 2), new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, opacity: 0.6 })); 
-}
-
-function initXRingGeometry() {
-  /**
- * @author Kaleb Murphy
- * Modified uvs.push on line no. 42.
- */
-  
- //This allows textures to be added to a disc in a way that makes planetary ring look nice
-  THREE.XRingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-    THREE.Geometry.call( this );
-
-    this.type = 'XRingGeometry';
-
-    this.parameters = {
-      innerRadius: innerRadius,
-      outerRadius: outerRadius,
-      thetaSegments: thetaSegments,
-      phiSegments: phiSegments,
-      thetaStart: thetaStart,
-      thetaLength: thetaLength
-    };
-
-    innerRadius = innerRadius || 0;
-    outerRadius = outerRadius || 50;
-
-    thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-    thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-    phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 8;
-
-    var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-
-    for ( i = 0; i < phiSegments + 1; i ++ ) { // concentric circles inside ring
-
-      for ( o = 0; o < thetaSegments + 1; o ++ ) { // number of segments per circle
-
-        var vertex = new THREE.Vector3();
-        var segment = thetaStart + o / thetaSegments * thetaLength;
-        vertex.x = radius * Math.cos( segment );
-        vertex.z = radius * Math.sin( segment );
-
-        this.vertices.push( vertex );
-        // uvs.push( new THREE.Vector2( ( vertex.x / outerRadius + 1 ) / 2, ( vertex.y / outerRadius + 1 ) / 2 ) );
-        uvs.push( new THREE.Vector2( o / thetaSegments, i / phiSegments ) );
-      }
-
-      radius += radiusStep;
-
-    }
-
-    var n = new THREE.Vector3( 1, 0, 0 );
-
-    for ( i = 0; i < phiSegments; i ++ ) { // concentric circles inside ring
-
-      var thetaSegment = i * (thetaSegments + 1);
-
-      for ( o = 0; o < thetaSegments ; o ++ ) { // number of segments per circle
-
-        var segment = o + thetaSegment;
-
-        var v1 = segment;
-        var v2 = segment + thetaSegments + 1;
-        var v3 = segment + thetaSegments + 2;
-
-        this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-        this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
-
-        v1 = segment;
-        v2 = segment + thetaSegments + 2;
-        v3 = segment + 1;
-
-        this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-        this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
-
-      }
-    }
-
-    this.computeFaceNormals();
-
-    this.boundingSphere = new THREE.Sphere(new THREE.Vector3(), outerRadius);
-//    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
-  };
-
-  THREE.XRingGeometry.prototype = Object.create( THREE.Geometry.prototype );
-  THREE.XRingGeometry.prototype.constructor = THREE.XRingGeometry;
-}
-
-function getCircularText(text, diameter, startAngle, align, textInside, inwardFacing, fName, fSize, kerning) {
-    // text:         The text to be displayed in circular fashion
-    // diameter:     The diameter of the circle around which the text will
-    //               be displayed (inside or outside)
-    // startAngle:   In degrees, Where the text will be shown. 0 degrees
-    //               if the top of the circle
-    // align:        Positions text to left right or center of startAngle
-    // textInside:   true to show inside the diameter. False to show outside
-    // inwardFacing: true for base of text facing inward. false for outward
-    // fName:        name of font family. Make sure it is loaded
-    // fSize:        size of font family. Don't forget to include units
-    // kearning:     0 for normal gap between letters. positive or
-    //               negative number to expand/compact gap in pixels
- //------------------------------------------------------------------------
-
-    // declare and intialize canvas, reference, and useful variables
-    align = align.toLowerCase();
-    var mainCanvas = document.createElement('canvas');
-    var ctxRef = mainCanvas.getContext('2d');
-    var clockwise = align == "right" ? 1 : -1; // draw clockwise for aligned right. Else Anticlockwise
-    startAngle = startAngle * (Math.PI / 180); // convert to radians
-
-    // calculate height of the font. Many ways to do this
-    // you can replace with your own!
-    var div = document.createElement("div");
-    div.innerHTML = text;
-    div.style.position = 'absolute';
-    div.style.top = '-10000px';
-    div.style.left = '-10000px';
-    div.style.fontFamily = fName;
-    div.style.fontSize = fSize;
-    document.body.appendChild(div);
-    var textHeight = div.offsetHeight;
-    document.body.removeChild(div);
-    
-    // in cases where we are drawing outside diameter,
-    // expand diameter to handle it
-    if (!textInside) diameter += textHeight * 2;
-
-    mainCanvas.width = diameter;
-    mainCanvas.height = diameter;
-    // omit next line for transparent background
-    //mainCanvas.style.backgroundColor = 'lightgray'; 
-    ctxRef.fillStyle = 'grey';
-    ctxRef.font = fSize + ' ' + fName;
-    
-    // Reverse letters for align Left inward, align right outward 
-    // and align center inward.
-    if (((["left", "center"].indexOf(align) > -1) && inwardFacing) || (align == "right" && !inwardFacing)) text = text.split("").reverse().join(""); 
-    
-    // Setup letters and positioning
-    ctxRef.translate(diameter / 2, diameter / 2); // Move to center
-    startAngle += (Math.PI * !inwardFacing); // Rotate 180 if outward
-    ctxRef.textBaseline = 'middle'; // Ensure we draw in exact center
-    ctxRef.textAlign = 'center'; // Ensure we draw in exact center
-
-    // rotate 50% of total angle for center alignment
-    if (align == "center") {
-        for (var j = 0; j < text.length; j++) {
-            var charWid = ctxRef.measureText(text[j]).width;
-            startAngle += ((charWid + (j == text.length-1 ? 0 : kerning)) / (diameter / 2 - textHeight)) / 2 * -clockwise;
-        }
-    }
-
-    // Phew... now rotate into final start position
-    ctxRef.rotate(startAngle);
-
-    // Now for the fun bit: draw, rotate, and repeat
-    for (var j = 0; j < text.length; j++) {
-        var charWid = ctxRef.measureText(text[j]).width; // half letter
-        // rotate half letter
-        ctxRef.rotate((charWid/2) / (diameter / 2 - textHeight) * clockwise); 
-        // draw the character at "top" or "bottom" 
-        // depending on inward or outward facing
-        ctxRef.fillText(text[j], 0, (inwardFacing ? 1 : -1) * (0 - diameter / 2 + textHeight / 2));
-
-        ctxRef.rotate((charWid/2 + kerning) / (diameter / 2 - textHeight) * clockwise); // rotate half letter
-    }
-
-    // Return it
-    return (mainCanvas);
-}
-
- function colorTemperature2rgb(kelvin) {
-
-  var temperature = kelvin / 100.0;
-  var red, green, blue;
-
-  if (temperature < 66.0) {
-    red = 255;
-  } else {
-    // a + b x + c Log[x] /.
-    // {a -> 351.97690566805693`,
-    // b -> 0.114206453784165`,
-    // c -> -40.25366309332127
-    //x -> (kelvin/100) - 55}
-    red = temperature - 55.0;
-    red = 351.97690566805693+ 0.114206453784165 * red - 40.25366309332127 * Math.log(red);
-    if (red < 0) red = 0;
-    if (red > 255) red = 255;
-  }
-
-  /* Calculate green */
-
-  if (temperature < 66.0) {
-
-    // a + b x + c Log[x] /.
-    // {a -> -155.25485562709179`,
-    // b -> -0.44596950469579133`,
-    // c -> 104.49216199393888`,
-    // x -> (kelvin/100) - 2}
-    green = temperature - 2;
-    green = -155.25485562709179 - 0.44596950469579133 * green + 104.49216199393888 * Math.log(green);
-    if (green < 0) green = 0;
-    if (green > 255) green = 255;
-
-  } else {
-
-    // a + b x + c Log[x] /.
-    // {a -> 325.4494125711974`,
-    // b -> 0.07943456536662342`,
-    // c -> -28.0852963507957`,
-    // x -> (kelvin/100) - 50}
-    green = temperature - 50.0;
-    green = 325.4494125711974 + 0.07943456536662342 * green - 28.0852963507957 * Math.log(green);
-    if (green < 0) green = 0;
-    if (green > 255) green = 255;
-
-  }
-
-  /* Calculate blue */
-
-  if (temperature >= 66.0) {
-    blue = 255;
-  } else {
-
-    if (temperature <= 20.0) {
-      blue = 0;
-    } else {
-
-      // a + b x + c Log[x] /.
-      // {a -> -254.76935184120902`,
-      // b -> 0.8274096064007395`,
-      // c -> 115.67994401066147`,
-      // x -> kelvin/100 - 10}
-      blue = temperature - 10;
-      blue = -254.76935184120902 + 0.8274096064007395 * blue + 115.67994401066147 * Math.log(blue);
-      if (blue < 0) blue = 0;
-      if (blue > 255) blue = 255;
-    }
-  }
-  //  return {red: Math.round(red), blue: Math.round(blue), green: Math.round(green)};
-
-   //const white = new THREE.Color('rgb(255,255,255)');
-  return 'rgb(' + Math.round(red) + ',' + Math.round(green) + ',' + Math.round(blue) + ')'; 
-}
