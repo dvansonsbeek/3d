@@ -2285,17 +2285,23 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color( o.background );
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
-renderer.setPixelRatio( getOptimizedPixelRatio() );
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+// —– setup once —–
+const labelRenderer = new THREE.CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.body.appendChild(labelRenderer.domElement);
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.5; // Try adjusting this
 renderer.useLegacyLights = false
+
+document.body.appendChild(renderer.domElement);
 
 // Memory improvement: create one loader, one cache
 const textureLoader = new THREE.TextureLoader();
@@ -2402,8 +2408,71 @@ planetObjects.forEach(obj => {
 })
 
 //*************************************************************
+// SETUP CAMERAS and CONTROLS
+//*************************************************************
+const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
+camera.position.set(0, 2500, 0);
+//camera.position.set(0, 0.5, 4);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableKeys = false;
+controls.zoomSpeed = 8.0;
+controls.dollySpeed = 8.0;
+
+//*************************************************************
+// SETUP LIGHT
+//*************************************************************
+// AMBIENT LIGHT — soft fill light for subtle illumination
+const ambientLight = new THREE.AmbientLight(0x404040, o.ambientLight || 1.2);
+scene.add(ambientLight);
+
+const fallbackLight = new THREE.PointLight(0xffffff, 10000); // distance = 0 = infinite
+fallbackLight.visible = false;
+scene.add(fallbackLight);
+
+// POINTLIGHT SUNLIGHT — Obsolete. Was initial light for planets in space
+//const sun2Light = new THREE.PointLight(0xffffff, 0.1);
+//scene.add(sun2Light);
+
+// DIRECTIONAL SUNLIGHT — better choice for Earth in space
+const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+sunLight.castShadow = true;
+
+// Optional: adjust shadow quality
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.bias = -0.0001;
+sunLight.shadow.radius = 1;
+sunLight.shadow.camera.far = 1000; // Increase only if necessary
+
+// Add light and its target
+scene.add(sunLight);
+scene.add(sunLight.target); // Required for .target to work
+
+// Optional: helper for debugging shadow frustum
+// const helper = new THREE.CameraHelper(sunLight.shadow.camera);
+// scene.add(helper);
+
+//const shadowCameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
+//scene.add(shadowCameraHelper);
+
+// Add light to the Sun pivot, so it follows the Sun’s position
+sun.pivotObj.add(sunLight);
+
+// Add target for the light to follow Earth
+const lightTarget = new THREE.Object3D();
+scene.add(lightTarget);
+sunLight.target = lightTarget;
+
+// Add the light to the scene
+scene.add(sunLight);
+
+//*************************************************************
 // ADD CELESTIAL SPHERE, ECLIPTIC GRID & ZODIAC TO Earth
 //*************************************************************
+// Add polar line
+const polarLine = createEarthPolarLine();
+earth.rotationAxis.add(polarLine);
+
 // Celestial sphere setup
 const celestialSphere = createCelestialSphere(o.starDistance);
 earth.rotationAxis.add(celestialSphere);
@@ -2475,16 +2544,12 @@ const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
 glowRing.rotation.x = -Math.PI / 2;
 zodiac.add(glowRing);
 
-// Add polar line
-const polarLine = createEarthPolarLine();
-earth.rotationAxis.add(polarLine);
-
 //*************************************************************
 // CREATE MILKYWAY SKYDOME
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
 const loader = new THREE.TextureLoader();
-const skyTexture = loader.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
+const skyTexture = loadTexture("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
 
 // ✅ Set correct color space for color image textures
 skyTexture.colorSpace = THREE.SRGBColorSpace; // This is the correct setting for normal color images
@@ -2527,14 +2592,41 @@ sceneObjects.constellations.visible = false;
 //sceneObjects.blackholes.applyMatrix4(earth.rotationAxis.matrixWorld);
 //sceneObjects.blackholes.visible = false;
 
-// --- Add star texture for nice glow effect ---
-const starTexture = new loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'); // <-- small transparent glow
+//*************************************************************
+// Add the stars, star-lables and constellations
+//*************************************************************
+// 1) Asset URLs
+const bsc5url           = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/stars.json';
+const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
+const starGlowURL       = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png';
+
+let starTexture;
+let starSizeMaterial = null;
+let starsMesh;
+
+// 2) One dashed‐line material for all constellations
+const constellationMaterial = new THREE.LineDashedMaterial({
+  color:       0x00aaff,
+  linewidth:   1,
+  scale:       1,
+  dashSize:    2,
+  gapSize:     1,
+  transparent: true,
+  opacity:     0.5,
+});
+
+// 3) Kick off constellation setup immediately
+initConstellations();
+
+// 4) Load star‐glow texture, then build stars
+loadTexture(starGlowURL, tex => {
+  starTexture = tex;
+  starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
+//  initStars();  // now that we have the texture, build the Points cloud
+});
 
 // ✅ Set correct color space for color image textures
-starTexture.colorSpace = THREE.SRGBColorSpace;
-
-// --- Add the Stars RA coordinates ---
-const bsc5url = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/stars.json';
+//starTexture.colorSpace = THREE.SRGBColorSpace;
 
 fetch(bsc5url)
   .then(response => response.json())
@@ -2586,108 +2678,6 @@ fetch(bsc5url)
       }
     });
   });
-
-// --- Add the Constellations Texture ---
-const constellationMaterial = new THREE.LineDashedMaterial({
-  color: 0x00aaff,
-  linewidth: 1,
-  scale: 1,
-  dashSize: 2,
-  gapSize: 1,
-  opacity: 0.5,
-  transparent: true,
-});
-
-// --- Add the Constellations RA coordinates ---
-const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
-
-fetch(constellationsUrl)
-  .then(response => response.json())
-  .then(constData => {
-    let points = [];
-
-    for (let i = 0; i < constData.asterismIndices.length; i++) {
-      let starIndex = constData.asterismIndices[i];
-
-      if (starIndex !== -1) {
-        const ra = constData.rightAscension[starIndex];
-        const dec = constData.declination[starIndex];
-
-        const x = o.starDistance * Math.cos(dec) * Math.sin(ra);
-        const y = o.starDistance * Math.sin(dec);
-        const z = o.starDistance * Math.cos(dec) * Math.cos(ra);
-
-        points.push(new THREE.Vector3(x, y, z));
-      } else {
-        if (points.length > 1) {
-          const geometry = new THREE.BufferGeometry().setFromPoints(points);
-          const line = new THREE.Line(geometry, constellationMaterial);
-          line.computeLineDistances(); // Needed for dashed lines
-          sceneObjects.constellations.add(line);
-        }
-        points.length = 0; // Clear for next line
-      }
-    }
-  });
-
-//*************************************************************
-// SETUP CAMERAS and CONTROLS
-//*************************************************************
-const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
-camera.position.set(0, 2500, 0);
-//camera.position.set(0, 0.5, 4);
-
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableKeys = false;
-controls.zoomSpeed = 8.0;
-controls.dollySpeed = 8.0;
-
-//*************************************************************
-// SETUP LIGHT
-//*************************************************************
-// AMBIENT LIGHT — soft fill light for subtle illumination
-const ambientLight = new THREE.AmbientLight(0x404040, o.ambientLight || 1.2);
-scene.add(ambientLight);
-
-const fallbackLight = new THREE.PointLight(0xffffff, 10000); // distance = 0 = infinite
-fallbackLight.visible = false;
-scene.add(fallbackLight);
-
-// POINTLIGHT SUNLIGHT — Obsolete. Was initial light for planets in space
-//const sun2Light = new THREE.PointLight(0xffffff, 0.1);
-//scene.add(sun2Light);
-
-// DIRECTIONAL SUNLIGHT — better choice for Earth in space
-const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-sunLight.castShadow = true;
-
-// Optional: adjust shadow quality
-sunLight.shadow.mapSize.set(2048, 2048);
-sunLight.shadow.bias = -0.0001;
-sunLight.shadow.radius = 1;
-sunLight.shadow.camera.far = 1000; // Increase only if necessary
-
-// Add light and its target
-scene.add(sunLight);
-scene.add(sunLight.target); // Required for .target to work
-
-// Optional: helper for debugging shadow frustum
-// const helper = new THREE.CameraHelper(sunLight.shadow.camera);
-// scene.add(helper);
-
-//const shadowCameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
-//scene.add(shadowCameraHelper);
-
-// Add light to the Sun pivot, so it follows the Sun’s position
-sun.pivotObj.add(sunLight);
-
-// Add target for the light to follow Earth
-const lightTarget = new THREE.Object3D();
-scene.add(lightTarget);
-sunLight.target = lightTarget;
-
-// Add the light to the scene
-scene.add(sunLight);
 
 //*************************************************************
 // Add a Visual Ring or Glow Around the Focused Planet
@@ -3210,6 +3200,95 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+function initConstellations() {
+  console.log('⏳ initConstellations(): fetching', constellationsUrl);
+  fetch(constellationsUrl)
+    .then(r => {
+      console.log('  → fetch status', r.status, r.ok);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      console.log('  → JSON keys:', Object.keys(data));
+      console.log('  → First 10 asterismIndices:', data.asterismIndices.slice(0,10));
+
+      // 1) Build strokes
+      const strokes = [];
+      let stroke = [];
+      data.asterismIndices.forEach(idx => {
+        if (idx !== -1) {
+          // original code treated RA/Dec as radians already:
+          const ra  = data.rightAscension   [idx];
+          const dec = data.declination      [idx];
+          // guard
+          if (!Number.isFinite(ra) || !Number.isFinite(dec)) return;
+          const R = o.starDistance;
+          const x = R * Math.cos(dec) * Math.sin(ra);
+          const y = R * Math.sin(dec);
+          const z = R * Math.cos(dec) * Math.cos(ra);
+          stroke.push(new THREE.Vector3(x, y, z));
+        } else {
+          if (stroke.length > 1) strokes.push(stroke);
+          stroke = [];
+        }
+      });
+      if (stroke.length > 1) strokes.push(stroke);
+      console.log('  → built strokes:', strokes.length);
+
+      // 2) Flatten into point pairs
+      const linePoints = [];
+      strokes.forEach(s => {
+        for (let i = 0; i < s.length - 1; i++) {
+          linePoints.push(s[i], s[i+1]);
+        }
+      });
+      console.log('  → total segments =', linePoints.length/2);
+      if (linePoints.length === 0) {
+        console.warn('  → no segments to draw, aborting');
+        return;
+      }
+
+      // 3) Build geometry and position attrib
+      const geo = new THREE.BufferGeometry().setFromPoints(linePoints);
+      console.log('  → geometry vertices =', geo.attributes.position.count);
+
+      // 4) **Manually compute** lineDistance so dashes work
+      const count = linePoints.length;
+      const lineDistances = new Float32Array(count);
+      let dist = 0;
+      for (let i = 0; i < count; i += 2) {
+        lineDistances[i] = dist;
+        const a = linePoints[i];
+        const b = linePoints[i+1];
+        dist += a.distanceTo(b);
+        lineDistances[i+1] = dist;
+      }
+      geo.setAttribute('lineDistance', new THREE.BufferAttribute(lineDistances, 1));
+      console.log('  → set lineDistance attribute');
+
+      // 5) Bounding sphere so culling works
+      geo.computeBoundingSphere();
+      console.log('  → boundingSphere radius =', geo.boundingSphere.radius);
+
+      // 6) Create LineSegments
+      const linesMesh = new THREE.LineSegments(geo, constellationMaterial);
+      linesMesh.computeLineDistances = undefined; // clear broken method
+      linesMesh.frustumCulled = false;
+      console.log('  → created LineSegments');
+
+      // 7) Clear old children (no .clear() on Object3D)
+      while (sceneObjects.constellations.children.length) {
+        sceneObjects.constellations.remove(sceneObjects.constellations.children[0]);
+      }
+      console.log('  → old children removed');
+
+      // 8) Add new mesh
+      sceneObjects.constellations.add(linesMesh);
+      console.log('  → added new mesh, count =', sceneObjects.constellations.children.length);
+    })
+    .catch(err => console.error('❌ initConstellations error:', err));
+}
+
 function loadTexture( url, onLoad ) {
   if ( textureCache.has( url ) ) {
     // reuse
@@ -3223,6 +3302,18 @@ function loadTexture( url, onLoad ) {
   });
   textureCache.set( url, tex );
   return tex;
+}
+
+// —– when creating stars —–
+function addLabel(obj3D, message) {
+  const div = document.createElement('div');
+  div.className = 'star-label';
+  div.textContent = message;
+  div.style.padding = '2px 4px';
+  div.style.background = 'rgba(0,0,0,0.5)';
+  div.style.color = '#fff';
+  const label = new CSS2DObject(div);
+  obj3D.add(label);
 }
 
 function updateDomLabel() {
@@ -3687,21 +3778,16 @@ function moveModel(pos){
   zodiac.rotation.y = -Math.PI/3 - earth.orbitObj.rotation.y;
 }
 
-// Returns a DPR clamped to max 2, with an extra reduction on small high-DPR screens.
+//
 function getOptimizedPixelRatio() {
-  // 1. Grab the real DPR (fallback to 1).
-  const rawDPR = window.devicePixelRatio || 1;
-  // 2. Clamp to a max of 2 immediately.
-  const dpr = Math.min(rawDPR, 2);
+  const dpr = window.devicePixelRatio || 1;
+  const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
 
-  // 3. If it’s a “small” viewport (e.g. mobile) AND still >1.5, force a lower DPR.
-  const isSmall = Math.min(window.innerWidth, window.innerHeight) < 768;
-  if (isSmall && dpr > 1.5) {
-    return 1.2;    // mobile-friendly
+  if (smallScreen && dpr > 1.5) {
+    return 1.2; // Lower pixel ratio for small mobile devices
+  } else {
+    return Math.min(dpr, 2); // Keep max 2 for normal desktop/tablet
   }
-
-  // 4. Otherwise use the clamped value.
-  return dpr;
 }
 
 // And your normal resize function:
@@ -4306,7 +4392,7 @@ function addConfettiParticles(spawnRadius = 5) {
 
   const mat = new THREE.PointsMaterial({
     size: 0.1,
-    map: new loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
+    map: loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
