@@ -2285,6 +2285,10 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color( o.background );
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setPixelRatio( getOptimizedPixelRatio() );
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
@@ -2293,11 +2297,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.5; // Try adjusting this
 renderer.useLegacyLights = false
 
-document.body.appendChild(renderer.domElement);
-
+// Memory improvement: create one loader, one cache
 const textureLoader = new THREE.TextureLoader();
-textureLoader.setCrossOrigin('');
-textureLoader.load('url', texture => {});
+const textureCache = new Map();
 
 //*************************************************************
 // CREATE AND CONFIGURE PLANETS
@@ -2526,7 +2528,7 @@ sceneObjects.constellations.visible = false;
 //sceneObjects.blackholes.visible = false;
 
 // --- Add star texture for nice glow effect ---
-const starTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'); // <-- small transparent glow
+const starTexture = new loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'); // <-- small transparent glow
 
 // ✅ Set correct color space for color image textures
 starTexture.colorSpace = THREE.SRGBColorSpace;
@@ -2700,7 +2702,7 @@ scene.add(focusRing);
 //*************************************************************
 // ADD GLOW EFFECT TO SUN
 //*************************************************************
-const sunTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
+const sunTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
 
 // ✅ Set correct color space for color image textures
 sunTexture.colorSpace = THREE.SRGBColorSpace;
@@ -2727,7 +2729,7 @@ sun.pivotObj.add(sunGlow);
 //*************************************************************
 // ADD LENS FLARE EFFECT WHEN LOOKING AT TO SUN
 //*************************************************************
-const flareTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
+const flareTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
 // You can use any small round bright texture or generate a quick radial white glow.
 
 // ✅ Set correct color space for color image textures
@@ -3208,6 +3210,21 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+function loadTexture( url, onLoad ) {
+  if ( textureCache.has( url ) ) {
+    // reuse
+    const tex = textureCache.get( url );
+    onLoad && onLoad( tex );
+    return tex;
+  }
+  // first time: load + store
+  const tex = textureLoader.load( url, t => {
+    onLoad && onLoad( t );
+  });
+  textureCache.set( url, tex );
+  return tex;
+}
+
 function updateDomLabel() {
   const label = document.getElementById('planetLabel');
 
@@ -3567,33 +3584,39 @@ function resetAllTraces() {
 }
 
 function setTraceMaterial(obj) {
+  // 1) Compute how many segments we need
   const vertexCount = Math.round(obj.traceLength / obj.traceStep);
-  let lineMaterial;
 
-  // If an existing traceLine exists, remove it from the scene
-  if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+  // 2) If there’s an existing traceLine, remove & dispose it
+  if (obj.traceLine && obj.traceLine instanceof THREE.Line) {
     scene.remove(obj.traceLine);
-    lineMaterial = obj.traceLine.material; // Reuse existing material
-  } else {
-    lineMaterial = new THREE.PointsMaterial({
-      color: obj.color,
-      size: obj.size * 10,
-      transparent: true,
-      opacity: 0.7,
-      alphaTest: 0.5,
-      map: new THREE.TextureLoader().load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/disc.png"),
-    });
+
+    // dispose old geometry & material to free GPU/JS memory
+    obj.traceLine.geometry.dispose();
+    obj.traceLine.material.dispose();
+
+    obj.traceLine = null;
   }
 
-  const lineGeometry = new THREE.BufferGeometry();
+  // 3) Build the new geometry and fill its position attribute
   const positions = new Float32Array(vertexCount * 3);
-  lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const lineGeometry = new THREE.BufferGeometry();
+  lineGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(positions, 3)
+  );
 
-  obj.traceLine = o.Lines
-    ? new THREE.Line(lineGeometry, lineMaterial)
-    : new THREE.Points(lineGeometry, lineMaterial);
+  // 4) Create a simple line material (no texture)
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color:       obj.color,
+    linewidth:   obj.size,    // note: many platforms ignore linewidth > 1
+    transparent: true,
+    opacity:     0.7
+  });
 
-  obj.traceLine.visible = false; // start hidden
+  // 5) Create the Line mesh, hide it, and add to scene
+  obj.traceLine = new THREE.Line(lineGeometry, lineMaterial);
+  obj.traceLine.visible = false;
   scene.add(obj.traceLine);
 }
 
@@ -3664,16 +3687,21 @@ function moveModel(pos){
   zodiac.rotation.y = -Math.PI/3 - earth.orbitObj.rotation.y;
 }
 
-//
+// Returns a DPR clamped to max 2, with an extra reduction on small high-DPR screens.
 function getOptimizedPixelRatio() {
-  const dpr = window.devicePixelRatio || 1;
-  const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
+  // 1. Grab the real DPR (fallback to 1).
+  const rawDPR = window.devicePixelRatio || 1;
+  // 2. Clamp to a max of 2 immediately.
+  const dpr = Math.min(rawDPR, 2);
 
-  if (smallScreen && dpr > 1.5) {
-    return 1.2; // Lower pixel ratio for small mobile devices
-  } else {
-    return Math.min(dpr, 2); // Keep max 2 for normal desktop/tablet
+  // 3. If it’s a “small” viewport (e.g. mobile) AND still >1.5, force a lower DPR.
+  const isSmall = Math.min(window.innerWidth, window.innerHeight) < 768;
+  if (isSmall && dpr > 1.5) {
+    return 1.2;    // mobile-friendly
   }
+
+  // 4. Otherwise use the clamped value.
+  return dpr;
 }
 
 // And your normal resize function:
@@ -3844,7 +3872,7 @@ function createPlanet(pd) { // pd = Planet Data
   let materialOptions = {};
 
   if (pd.textureUrl) {
-    const texture = new THREE.TextureLoader().load(pd.textureUrl);
+    const texture = loadTexture(pd.textureUrl);
     materialOptions.map = texture;
     materialOptions.bumpScale = 0.05;
     materialOptions.specular = new THREE.Color('#190909'); // Dark specular for older phong look
@@ -3874,7 +3902,7 @@ function createPlanet(pd) { // pd = Planet Data
   // 🌑 Apply shadow flags only to real planets
   if (/Barycenter|Precession|WOBBLE|HELION|Eccentricity|Helion|Starting|Cycle|Ellipse/i.test(pd.name)) {
     if (pd.textureUrl) {
-    const texture = new THREE.TextureLoader().load(pd.textureUrl);
+    const texture = loadTexture(pd.textureUrl);
     planetMesh.material = new THREE.MeshBasicMaterial({
       map: texture,
       color: 0x777777, // ← dims the texture
@@ -4278,7 +4306,7 @@ function addConfettiParticles(spawnRadius = 5) {
 
   const mat = new THREE.PointsMaterial({
     size: 0.1,
-    map: new THREE.TextureLoader().load('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
+    map: new loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
