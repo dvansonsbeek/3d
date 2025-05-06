@@ -2600,7 +2600,7 @@ const bsc5url           = 'https://raw.githubusercontent.com/dvansonsbeek/3d/mas
 const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
 const starGlowURL       = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png';
 
-let starTexture;
+//let starTexture;
 let starSizeMaterial = null;
 let starsMesh;
 
@@ -2619,14 +2619,15 @@ const constellationMaterial = new THREE.LineDashedMaterial({
 initConstellations();
 
 // 4) Load star‐glow texture, then build stars
-loadTexture(starGlowURL, tex => {
-  starTexture = tex;
-  starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
+//loadTexture(starGlowURL, tex => {
+//  starTexture = tex;
+//  starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
 //  initStars();  // now that we have the texture, build the Points cloud
-});
+//});
 
+const starTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png');
 // ✅ Set correct color space for color image textures
-//starTexture.colorSpace = THREE.SRGBColorSpace;
+starTexture.colorSpace = THREE.SRGBColorSpace;
 
 fetch(bsc5url)
   .then(response => response.json())
@@ -3173,21 +3174,6 @@ function render(now) {
                : 1;
       starPos.children[1].material.opacity     = op;
       starPos.children[1].material.transparent = true;
-    }
-    // constellation fades
-    for (let i = 0, M = constArr.length; i < M; i++) {
-      const line = constArr[i];
-      line.getWorldPosition(_linePos);
-      const dLine = _linePos.distanceTo(camera.position);
-      const fadeStart = 7500 + line.position.length()*0.06;
-      const fadeEnd   = 30000 + line.position.length()*0.06;
-      const op = dLine > fadeStart
-               ? 1 - (dLine - fadeStart)/(fadeEnd - fadeStart)
-               : 1;
-      if (line.material) {
-        line.material.opacity     = op;
-        line.material.transparent = true;
-      }
     }
   }
 
