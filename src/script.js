@@ -2208,6 +2208,7 @@ let o = {
   periheliondate: "",
   cSphereSize: 1,
   zodiacSize: 1,
+  constellationLayout: 'asterism', // or 'stellarium'
   starDistanceScaleFact: 1.5,
   starDistance: 5000,
   starSize: 1,
@@ -2279,6 +2280,14 @@ let predictions = {
 };
 
 //*************************************************************
+// SETUP CAMERAS and CONTROLS
+//*************************************************************
+const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
+camera.position.set(0, 1000, 0);
+//camera.position.set(0, 0.5, 4);
+const baseCamDistance = camera.position.length();
+
+//*************************************************************
 // LOAD DEFAULT SETTINGS (Three.js core setup (scene, camera, renderer))
 //*************************************************************
 const scene = new THREE.Scene();
@@ -2291,12 +2300,100 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 // —– setup once —–
 const labelRenderer = new THREE.CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);
-labelRenderer.domElement.style.position = 'absolute';
-labelRenderer.domElement.style.top = '0';
+// ────────────────────────────────────────────────────
+// 1) Style & add your CSS2DRenderer DOM element
+// ────────────────────────────────────────────────────
+labelRenderer.domElement.style.position      = 'absolute';
+labelRenderer.domElement.style.top           = '0';
+labelRenderer.domElement.style.left          = '0';
+labelRenderer.domElement.style.right         = '0';
+labelRenderer.domElement.style.bottom        = '0';
 labelRenderer.domElement.style.pointerEvents = 'none';
+labelRenderer.domElement.style.zIndex        = '0';
 document.body.appendChild(labelRenderer.domElement);
 
+// ----------------------------------------------------------
+//  Patch CSS2DRenderer so labels never disappear and
+//  use proper .project() for on-screen placement
+// ----------------------------------------------------------
+;(function(labelRenderer, baseCamDistance) {
+  const projV    = new THREE.Vector3();
+  const dom      = labelRenderer.domElement;
+  const zoomFactor = 0.5, minScale = 0.2, maxScale = 1.5;
+
+  // Ensure the CSS2D layer really covers the viewport
+  Object.assign(dom.style, {
+    position:      'absolute',
+    top:           '0',
+    left:          '0',
+    right:         '0',
+    bottom:        '0',
+    pointerEvents: 'none',
+    zIndex:        '0'
+  });
+
+  labelRenderer.render = (scene, camera) => {
+    if (!needsLabelUpdate) return;
+    needsLabelUpdate = false;
+
+    console.groupCollapsed('[Label Debug] render start');
+    console.log('starNamesVisible =', o.starNamesVisible);
+
+    // 1) Sync size
+    const w = window.innerWidth, h = window.innerHeight;
+    labelRenderer.setSize(w, h);
+
+    // 2) Clear out any old labels
+    while (dom.firstChild) dom.removeChild(dom.firstChild);
+
+    // 3) Update matrices
+    scene.updateMatrixWorld();
+    camera.updateMatrixWorld();
+    camera.updateProjectionMatrix();
+
+    // 4) Compute scale
+    const rawScale   = baseCamDistance / camera.position.length();
+    const scaled     = Math.pow(rawScale, zoomFactor);
+    const finalScale = Math.min(maxScale, Math.max(minScale, scaled));
+    console.log('Computed label scale:', finalScale.toFixed(3));
+
+    // 5) Traverse and append *only* visible labels
+    let total = 0, flaggedVisible = 0, appended = 0;
+    scene.traverse(obj => {
+      if (!(obj instanceof THREE.CSS2DObject)) return;
+      total++;
+      if (!obj.visible) return;    // skip invisible ones
+
+      flaggedVisible++;
+
+      // project to screen
+      projV.setFromMatrixPosition(obj.matrixWorld).project(camera);
+      const x = (projV.x * 0.5 + 0.5) * w;
+      const y = (-projV.y * 0.5 + 0.5) * h;
+      const el = obj.element;
+
+      // position & show
+      el.style.transform = 
+        `translate(-50%,-50%) translate(${x}px,${y}px) scale(${finalScale})`;
+      el.style.display   = '';    // guarantee it’s not hidden via CSS
+
+      dom.appendChild(el);
+      appended++;
+    });
+
+    // 6) Summary
+    console.log(`Totals → all:${total}, visible:${flaggedVisible}, appended:${appended}, domChildren:${dom.childElementCount}`);
+    if (flaggedVisible !== appended) {
+      console.error('⚠️ Mismatch: flaggedVisible(' + flaggedVisible + ') ≠ appended(' + appended + ')');
+    }
+    console.groupEnd();
+  };
+})(labelRenderer, baseCamDistance);
+
+//})(labelRenderer, camera, baseCamDistance);
+
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.5; // Try adjusting this
 renderer.useLegacyLights = false
@@ -2306,6 +2403,11 @@ document.body.appendChild(renderer.domElement);
 // Memory improvement: create one loader, one cache
 const textureLoader = new THREE.TextureLoader();
 const textureCache = new Map();
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableKeys = false;
+controls.zoomSpeed = 8.0;
+controls.dollySpeed = 8.0;
 
 //*************************************************************
 // CREATE AND CONFIGURE PLANETS
@@ -2406,18 +2508,6 @@ planetObjects.forEach(obj => {
     obj.dist = "";      
     obj.distKm = "";      
 })
-
-//*************************************************************
-// SETUP CAMERAS and CONTROLS
-//*************************************************************
-const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
-camera.position.set(0, 2500, 0);
-//camera.position.set(0, 0.5, 4);
-
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableKeys = false;
-controls.zoomSpeed = 8.0;
-controls.dollySpeed = 8.0;
 
 //*************************************************************
 // SETUP LIGHT
@@ -2600,9 +2690,16 @@ const bsc5url           = 'https://raw.githubusercontent.com/dvansonsbeek/3d/mas
 const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
 const starGlowURL       = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png';
 
-//let starTexture;
+let starTexture;
 let starSizeMaterial = null;
 let starsMesh;
+
+let needsLabelUpdate = true;
+// 2) Whenever you know the labels need repositioning:
+//    • On camera move:
+controls.addEventListener('change', () => { needsLabelUpdate = true; });
+//    • On zoom (if separate):
+camera.addEventListener('zoom',   () => { needsLabelUpdate = true; });
 
 // 2) One dashed‐line material for all constellations
 const constellationMaterial = new THREE.LineDashedMaterial({
@@ -2615,70 +2712,51 @@ const constellationMaterial = new THREE.LineDashedMaterial({
   opacity:     0.5,
 });
 
+// ——————————————————————————————————————————
+// 1) Create a “draw-on” shader material prototype
+// ——————————————————————————————————————————
+const drawOnShaderProto = new THREE.ShaderMaterial({
+  uniforms: {
+    uDrawProgress: { value: 0.0 },
+    uTotalLength:   { value: 1.0 },                          // ← declared here
+    uColor:         { value: constellationMaterial.color.clone() }
+  },
+  vertexShader: `
+    attribute float lineDistance;
+    varying   float vLineDistance;
+    void main() {
+      vLineDistance = lineDistance;
+      gl_Position   = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uDrawProgress;
+    uniform float uTotalLength;                                // ← and here
+    uniform vec3  uColor;
+    varying float vLineDistance;
+    void main() {
+      // now we can safely compare against uTotalLength
+      if ((vLineDistance / uTotalLength) > uDrawProgress) discard;
+      gl_FragColor = vec4(uColor, 1.0);
+    }
+  `,
+  transparent: true,
+  depthWrite:  false
+});
+
+// Array to keep track of every material instance we create,
+// so we can update their `uDrawProgress` in a single loop.
+const drawMaterials = [];
+
 // 3) Kick off constellation setup immediately
 initConstellations();
 
 // 4) Load star‐glow texture, then build stars
-//loadTexture(starGlowURL, tex => {
-//  starTexture = tex;
-//  starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
-//  initStars();  // now that we have the texture, build the Points cloud
-//});
-
-const starTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png');
-// ✅ Set correct color space for color image textures
-starTexture.colorSpace = THREE.SRGBColorSpace;
-
-fetch(bsc5url)
-  .then(response => response.json())
-  .then(bscStars => {
-    const starsizeBase = 50; // <-- Increase base size
-
-    bscStars.forEach(obj => {
-      if (obj.N !== undefined) {
-        const starPos = new THREE.Object3D();
-        starPos.rotation.z = decToRadians(obj.Dec);
-        starPos.rotation.y = raToRadians(obj.RA) - Math.PI / 2;
-
-        let starsize;
-        if (obj.V < 1) {
-          starsize = starsizeBase * 1.5;
-        } else if (obj.V > 1 && obj.V < 3) {
-          starsize = starsizeBase * 1.0;
-        } else if (obj.V > 3 && obj.V < 5) {
-          starsize = starsizeBase * 0.6;
-        } else {
-          starsize = starsizeBase * 0.3;
-        }
-
-        const starMaterial = new THREE.SpriteMaterial({
-          map: starTexture,
-          //color: 0xffffff,
-          color: colorTemperature2rgb(obj.K),
-          transparent: true,
-          depthWrite: false,
-        });
-
-        const star = new THREE.Sprite(starMaterial);
-        star.scale.set(starsize, starsize, 1);
-        star.userData.magnitude = obj.V; // <--- SAVE magnitude for later
-        star.position.x = o.starDistance;
-
-        // Tiny random jitter for realism
-        star.position.x += (Math.random() - 0.5) * 0.001;
-        star.position.y += (Math.random() - 0.5) * 0.001;
-        star.position.z += (Math.random() - 0.5) * 0.001;
-
-        const nameTag = createLabel(obj.N);
-        nameTag.visible = o.starNamesVisible;
-        nameTag.position.copy(star.position);
-
-        starPos.add(star);
-        starPos.add(nameTag);
-        sceneObjects.stars.add(starPos);
-      }
-    });
-  });
+loadTexture(starGlowURL, tex => {
+  starTexture = tex;
+  starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
+  initStars();  // now that we have the texture, build the Points cloud
+});
 
 //*************************************************************
 // Add a Visual Ring or Glow Around the Focused Planet
@@ -2734,20 +2812,6 @@ const flares = [
   createFlare(0xff8888, 8),    // Small red flare
   createFlare(0x88ff88, 12),   // Small greenish flare
 ];
-
-//*************************************************************
-// USE STATISTICS (WHEN NEEDED)
-//*************************************************************
-const stats = new Stats()
-document.body.appendChild( stats.dom )
-if (!o.Performance) stats.dom.style.display = 'none';
-//if (!o.Performance) stats.dom.style.display = 'visible';
-//stats.dom.style.display = 'none';    // completely removes it from layout
-// OR
-//stats.dom.style.visibility = 'hidden'; // hides but still takes up space
-//stats.dom.style.display = 'block';   // or '' if you want default style
-// OR
-//stats.dom.style.visibility = 'visible';
 
 //*************************************************************
 // START SCENE
@@ -2997,40 +3061,42 @@ function setupGUI() {
   });
   
   folderO.add(sceneObjects.stars, 'visible').name('Stars visible');
-  folderO.add(o, 'starNamesVisible').name('Star names').onChange(() => {
-  sceneObjects.stars.children.forEach(function(starPos) {
-    if (starPos.children.length > 1) {
-      const nameTag = starPos.children[1];
-      if (nameTag && nameTag instanceof THREE.Sprite) {
-        nameTag.visible = o.starNamesVisible;
+
+  folderO.add(o, 'starNamesVisible').name('Star names')
+  .onChange(visible => {
+    sceneObjects.stars.children.forEach(child => {
+      if (child instanceof THREE.CSS2DObject) {
+        child.visible = visible;
       }
-    }
+    });
+    needsLabelUpdate = true;  // ensure your next frame re‐draws all labels
   });
-});
+
   folderO.add(sceneObjects.constellations, 'visible').name('Constellations visible');
-  //folderO.add(constContainer, 'visible').name('Constellations') 
-  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(() => {
-  sceneObjects.stars.children.forEach(function(starPos) {
-    const star = starPos.children[0];
-    const nameTag = starPos.children[1];
-    if (star && star instanceof THREE.Sprite) {
-      star.position.x = o.starDistance * o.starDistanceScaleFact;
-    }
-    if (nameTag && nameTag instanceof THREE.Sprite) {
-      nameTag.position.x = o.starDistance * o.starDistanceScaleFact;
-    }
+  folderO.add(o, 'constellationLayout', {
+  'Traditional (Asterism)': 'asterism',
+  'Artistic (Curved)':  'stellarium'
+})
+  .name('Constellation Style')
+  .onChange(() => {
+    initConstellations();   // re–draw with the new style
   });
-  celestialSphere.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-  plane.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-  sceneObjects.constellations.scale.set(o.starDistanceScaleFact, o.starDistanceScaleFact, o.starDistanceScaleFact);
-});
   
-  folderO.add(o, 'starsizeBase', 10, 200).step(5).name('Star size base').onChange(() => {
-  updateStarSizes();
-});
-  
- folderO.add(celestialSphere, 'visible').name('Celestial sphere')
- folderO.add(plane, 'visible').name('Ecliptic grid')
+  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance')
+  .onChange(factor => {
+    sceneObjects.stars.scale.setScalar(factor);
+    sceneObjects.constellations.scale.setScalar(factor);
+    sceneObjects.stars.children.forEach(child => {
+      if (child instanceof THREE.CSS2DObject) {
+        child.scale.setScalar(factor);
+      }
+    });
+  });
+
+// ← no star-size here; that slider lives inside initStars()
+
+  folderO.add(celestialSphere, 'visible').name('Celestial sphere')
+  folderO.add(plane, 'visible').name('Ecliptic grid')
   
   let sFolder = gui.addFolder('Settings')
   let folderPlanets = sFolder.addFolder('Planets show/hide');
@@ -3075,10 +3141,26 @@ function setupGUI() {
 }  
 
 //*************************************************************
+// USE STATISTICS (WHEN NEEDED)
+//*************************************************************
+const stats = new Stats()
+//stats.showPanel(2); // 0: fps, 1: ms, 2: MB
+document.body.appendChild( stats.dom )
+if (!o.Performance) stats.dom.style.display = 'none';
+//if (!o.Performance) stats.dom.style.display = 'visible';
+//stats.dom.style.display = 'none';    // completely removes it from layout
+// OR
+//stats.dom.style.visibility = 'hidden'; // hides but still takes up space
+//stats.dom.style.display = 'block';   // or '' if you want default style
+// OR
+//stats.dom.style.visibility = 'visible';
+
+//*************************************************************
 // THE ANIMATE/RENDER LOOP (BE CAREFUL WITH ADDING/ CHANGING)
 //*************************************************************
 function render(now) {
   requestAnimationFrame(render);
+  //stats.begin();
   stats.update();
 
   // 1) Delta and FPS throttle
@@ -3164,21 +3246,20 @@ function render(now) {
   // 9) Camera-move-dependent fades & flares
   if (cameraMoved) {
     // star‐tag fades
-    for (let i = 0, L = starsArr.length; i < L; i++) {
-      const starPos = starsArr[i];
-      starPos.children[0].getWorldPosition(_starPos);
-      const d = _starPos.distanceTo(camera.position);
-      starPos.children[1].scale.set(d/25, d/25, 1);
-      const op = d > 7500
-               ? 1 - (d - 7500) / (30000 - 7500)
-               : 1;
-      starPos.children[1].material.opacity     = op;
-      starPos.children[1].material.transparent = true;
-    }
   }
 
   // 10) Last thing: draw
   renderer.render(scene, camera);
+  if (needsLabelUpdate) {
+    // 3a) sync the CSS2D internal size
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+
+    // 3b) call your patched render (it will clear & re-append all labels)
+    labelRenderer.render(scene, camera);
+
+    needsLabelUpdate = false;
+  }
+  //stats.end();
 }
 requestAnimationFrame(render);
 //} 
@@ -3187,92 +3268,254 @@ requestAnimationFrame(render);
 // FUNCTIONS
 //*************************************************************
 function initConstellations() {
-  console.log('⏳ initConstellations(): fetching', constellationsUrl);
+  console.log(`⏳ initConstellations() [${o.constellationLayout}] fetching…`);
+
   fetch(constellationsUrl)
     .then(r => {
-      console.log('  → fetch status', r.status, r.ok);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();
     })
     .then(data => {
-      console.log('  → JSON keys:', Object.keys(data));
-      console.log('  → First 10 asterismIndices:', data.asterismIndices.slice(0,10));
-
-      // 1) Build strokes
+      // build raw strokes
       const strokes = [];
       let stroke = [];
       data.asterismIndices.forEach(idx => {
         if (idx !== -1) {
-          // original code treated RA/Dec as radians already:
-          const ra  = data.rightAscension   [idx];
-          const dec = data.declination      [idx];
-          // guard
+          const ra  = data.rightAscension[idx];
+          const dec = data.declination   [idx];
           if (!Number.isFinite(ra) || !Number.isFinite(dec)) return;
           const R = o.starDistance;
-          const x = R * Math.cos(dec) * Math.sin(ra);
-          const y = R * Math.sin(dec);
-          const z = R * Math.cos(dec) * Math.cos(ra);
-          stroke.push(new THREE.Vector3(x, y, z));
+          stroke.push(new THREE.Vector3(
+            R * Math.cos(dec) * Math.sin(ra),
+            R * Math.sin(dec),
+            R * Math.cos(dec) * Math.cos(ra)
+          ));
         } else {
           if (stroke.length > 1) strokes.push(stroke);
           stroke = [];
         }
       });
       if (stroke.length > 1) strokes.push(stroke);
-      console.log('  → built strokes:', strokes.length);
+      console.log(`  → parsed ${strokes.length} strokes`);
 
-      // 2) Flatten into point pairs
-      const linePoints = [];
-      strokes.forEach(s => {
-        for (let i = 0; i < s.length - 1; i++) {
-          linePoints.push(s[i], s[i+1]);
+      // clear old
+      sceneObjects.constellations.clear();
+      drawMaterials.length = 0;
+
+      if (o.constellationLayout === 'asterism') {
+        console.log('  → drawing ASTERISM segments');
+        const pts = [];
+        strokes.forEach(s => {
+          for (let i = 0; i < s.length - 1; i++) pts.push(s[i], s[i+1]);
+        });
+        if (pts.length === 0) return;
+
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const distArr = new Float32Array(pts.length);
+        let acc = 0;
+        distArr[0] = 0;
+        for (let i = 1; i < pts.length; i++) {
+          acc += pts[i].distanceTo(pts[i - 1]);
+          distArr[i] = acc;
         }
+        geo.setAttribute('lineDistance', new THREE.BufferAttribute(distArr, 1));
+        geo.computeBoundingSphere();
+
+        const mesh = new THREE.LineSegments(geo, constellationMaterial);
+        mesh.frustumCulled = false;
+        sceneObjects.constellations.add(mesh);
+
+        // single render if you’re not in a loop
+        renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
+        console.log('  → ASTERISM render complete');
+
+      } else {
+        console.log('  → drawing STELLARIUM curves');
+
+        // build curves & collect materials
+        strokes.forEach(pts => {
+          if (pts.length < 2) return;
+          const curve     = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
+          const divisions = pts.length * 5;
+          const splinePts = curve.getPoints(divisions);
+
+          const geo = new THREE.BufferGeometry().setFromPoints(splinePts);
+          const count = splinePts.length;
+          const dArr  = new Float32Array(count);
+          dArr[0] = 0;
+          let totalLen = 0;
+          for (let i = 1; i < count; i++) {
+            totalLen += splinePts[i].distanceTo(splinePts[i - 1]);
+            dArr[i] = totalLen;
+          }
+          geo.setAttribute('lineDistance', new THREE.BufferAttribute(dArr, 1));
+          geo.computeBoundingSphere();
+
+          const mat = drawOnShaderProto.clone();
+          mat.uniforms.uTotalLength.value = totalLen;
+          mat.uniforms.uColor.value       = constellationMaterial.color.clone();
+          drawMaterials.push(mat);
+
+          const line = new THREE.Line(geo, mat);
+          line.frustumCulled = false;
+          sceneObjects.constellations.add(line);
+        });
+
+        console.log(`  → created ${drawMaterials.length} curved lines`);
+
+        if (drawMaterials.length) {
+          console.log('  → starting draw-on animation');
+          const start    = performance.now();
+          const duration = 2000;
+          (function animateDraw() {
+            const t = Math.min((performance.now() - start) / duration, 1);
+            drawMaterials.forEach(m => m.uniforms.uDrawProgress.value = t);
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+            if (t < 1) requestAnimationFrame(animateDraw);
+            else console.log('  → draw-on animation complete');
+          })();
+        }
+      }
+    })
+    .catch(err => console.error('❌ initConstellations error:', err));
+}
+
+// — Make sure you have these at the top of your script —
+// const bsc5url = 'https://raw.githubusercontent.com/dvansonsbeek/3d/main/public/input/stars.json';
+// let starSizeMaterial = null;
+// sceneObjects.stars = new THREE.Object3D();  scene.add(sceneObjects.stars);
+
+function initStars() {
+  console.log('⏳ initStars(): fetching', bsc5url);
+  fetch(bsc5url)
+    .then(r => {
+      if (!r.ok) throw new Error(`Stars load failed: ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error('Stars JSON is not an array or is empty');
+      }
+
+      // 1) Prepare flat arrays and label holders
+      const positions    = [];
+      const colors       = [];
+      const sizes        = [];
+      const labelObjects = [];
+      const tmpColor     = new THREE.Color();
+      const R            = o.starDistance    || 10000;
+      const baseSize     = o.starsizeBase    ||   50;
+
+      data.forEach((star, i) => {
+        // 2) Parse & validate fields
+        const ra   = raToRadians(star.RA);
+        const dec  = decToRadians(star.Dec);
+        const mag  = parseFloat(star.V);
+        const kel  = parseFloat(star.K);
+        const name = star.N;
+        if (![ra, dec, mag, kel].every(Number.isFinite) || !name) return;
+
+        // 3) Spherical → Cartesian via THREE.Spherical
+        const sph = new THREE.Spherical(
+          R,
+          Math.PI/2 - dec,  // polar angle
+          ra                 // azimuthal angle
+        );
+        const pos = new THREE.Vector3().setFromSpherical(sph);
+        // tiny jitter to avoid z-fighting
+        pos.x += (Math.random() - 0.5) * 0.001;
+        pos.y += (Math.random() - 0.5) * 0.001;
+        pos.z += (Math.random() - 0.5) * 0.001;
+
+        // 4) Collect for BufferGeometry
+        positions.push(pos.x, pos.y, pos.z);
+        tmpColor.set(colorTemperature2rgb(kel));
+        colors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+        const s = mag < 1 ? 1.5 : mag < 3 ? 1.0 : mag < 5 ? 0.6 : 0.3;
+        sizes.push(s * baseSize);
+
+        // 5) Create CSS2D label inline
+        const labelDiv = document.createElement('div');
+        labelDiv.className   = 'star-label';
+        labelDiv.textContent = name;
+        // (All styling comes from your CSS .star-label rules)
+        labelDiv.style.pointerEvents = 'none';
+
+        const labelObj = new THREE.CSS2DObject(labelDiv);
+        labelObj.position.copy(pos);
+        labelObj.visible = o.starNamesVisible;
+        labelObjects.push(labelObj);
       });
-      console.log('  → total segments =', linePoints.length/2);
-      if (linePoints.length === 0) {
-        console.warn('  → no segments to draw, aborting');
-        return;
-      }
 
-      // 3) Build geometry and position attrib
-      const geo = new THREE.BufferGeometry().setFromPoints(linePoints);
-      console.log('  → geometry vertices =', geo.attributes.position.count);
+      console.log(`  → kept ${positions.length/3} stars`);
 
-      // 4) **Manually compute** lineDistance so dashes work
-      const count = linePoints.length;
-      const lineDistances = new Float32Array(count);
-      let dist = 0;
-      for (let i = 0; i < count; i += 2) {
-        lineDistances[i] = dist;
-        const a = linePoints[i];
-        const b = linePoints[i+1];
-        dist += a.distanceTo(b);
-        lineDistances[i+1] = dist;
-      }
-      geo.setAttribute('lineDistance', new THREE.BufferAttribute(lineDistances, 1));
-      console.log('  → set lineDistance attribute');
-
-      // 5) Bounding sphere so culling works
+      // 6) Build one BufferGeometry
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position',  new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('starColor', new THREE.Float32BufferAttribute(colors,    3));
+      geo.setAttribute('starSize',  new THREE.Float32BufferAttribute(sizes,     1));
       geo.computeBoundingSphere();
       console.log('  → boundingSphere radius =', geo.boundingSphere.radius);
 
-      // 6) Create LineSegments
-      const linesMesh = new THREE.LineSegments(geo, constellationMaterial);
-      linesMesh.computeLineDistances = undefined; // clear broken method
-      linesMesh.frustumCulled = false;
-      console.log('  → created LineSegments');
+      // 7) Create ShaderMaterial with additive blending & alpha‐only sprite
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          pointTexture: { value: starTexture },
+          uScaleFactor: { value: 2500.0 },
+          fadeStart:    { value: 7500.0 },
+          fadeEnd:      { value: 30000.0 }
+        },
+        vertexShader: `
+          uniform float uScaleFactor;
+          attribute float starSize;
+          attribute vec3 starColor;
+          varying vec3 vColor;
+          varying float vDist;
+          void main() {
+            vColor = starColor;
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            vDist = -mv.z;
+            gl_PointSize = starSize * (uScaleFactor / max(vDist, 0.0001));
+            gl_Position  = projectionMatrix * mv;
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D pointTexture;
+          uniform float fadeStart, fadeEnd;
+          varying vec3 vColor;
+          varying float vDist;
+          void main() {
+            float a = texture2D(pointTexture, gl_PointCoord).a;
+            float f = 1.0 - smoothstep(fadeStart, fadeEnd, vDist);
+            gl_FragColor = vec4(vColor * f, a * f);
+          }
+        `,
+        blending:     THREE.AdditiveBlending,
+        depthWrite:   false,
+        transparent:  true,
+        vertexColors: true
+      });
+      // optional: expose for GUI tweaks
+      starSizeMaterial = mat;
 
-      // 7) Clear old children (no .clear() on Object3D)
-      while (sceneObjects.constellations.children.length) {
-        sceneObjects.constellations.remove(sceneObjects.constellations.children[0]);
+      // 8) Create & insert the Points mesh
+      const points = new THREE.Points(geo, mat);
+      points.frustumCulled = false;
+
+      // clear any old stars & labels
+      while (sceneObjects.stars.children.length) {
+        sceneObjects.stars.remove(sceneObjects.stars.children[0]);
       }
-      console.log('  → old children removed');
+      sceneObjects.stars.add(points);
 
-      // 8) Add new mesh
-      sceneObjects.constellations.add(linesMesh);
-      console.log('  → added new mesh, count =', sceneObjects.constellations.children.length);
+      // 9) Add all CSS2D labels into the same group
+      labelObjects.forEach(lo => sceneObjects.stars.add(lo));
+
+      console.log('✅ initStars: complete');
     })
-    .catch(err => console.error('❌ initConstellations error:', err));
+    .catch(err => console.error('❌ initStars error:', err));
 }
 
 function loadTexture( url, onLoad ) {
@@ -3288,18 +3531,6 @@ function loadTexture( url, onLoad ) {
   });
   textureCache.set( url, tex );
   return tex;
-}
-
-// —– when creating stars —–
-function addLabel(obj3D, message) {
-  const div = document.createElement('div');
-  div.className = 'star-label';
-  div.textContent = message;
-  div.style.padding = '2px 4px';
-  div.style.background = 'rgba(0,0,0,0.5)';
-  div.style.color = '#fff';
-  const label = new CSS2DObject(div);
-  obj3D.add(label);
 }
 
 function updateDomLabel() {
@@ -3492,28 +3723,6 @@ function updateLightingForFocus() {
 
     updateSunlightForPlanet(o.lookAtObj.pivotObj, o.lookAtObj.pivotObj);
   }
-}
-
-// --- Helper to create name labels ---
-function createLabel(message) {
-  const fontSize = 30;
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  canvas.width = 256;
-  canvas.height = 128;
-  context.font = `${fontSize}px Arial`;
-  context.strokeStyle = 'black';
-  context.lineWidth = 8;
-  context.strokeText(message, 0, fontSize);
-  context.fillStyle = 'LightGrey';
-  context.fillText(message, 0, fontSize);
-
-  const texture = new THREE.Texture(canvas);
-  texture.needsUpdate = true;
-
-  const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
-  const sprite = new THREE.Sprite(spriteMaterial);
-  return sprite;
 }
 
 // Optional animation (pulsing)
@@ -3778,14 +3987,19 @@ function getOptimizedPixelRatio() {
 
 // And your normal resize function:
 function onWindowResize() {
-  const width = window.innerWidth;
+  const width  = window.innerWidth;
   const height = window.innerHeight;
 
+  // 1) update camera
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
+  // 2) resize WebGL
   renderer.setSize(width, height);
   renderer.setPixelRatio(getOptimizedPixelRatio());
+
+  // 3) resize CSS2DRenderer
+  labelRenderer.setSize(width, height);
 }
 
 function addPolarGridHelper(inplanet, planetSize = 10) {
