@@ -97,6 +97,8 @@ const helionpointAmplitude = 9.8471328125;
 const meansolardayAmplitudeinSeconds = 0.07875;
 const meansolaryearAmplitudeinDays = 0.00017926844;
 const meansiderealyearAmplitudeinSeconds = 0.3036366;
+const currentAUDistance = 149597870.698828;
+const speedofSuninKM = 107225.047767317;
 //*************************************************************
 // ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
 //*************************************************************
@@ -2264,15 +2266,26 @@ let predictions = {
   juliandaysbalancedJD: 0,
   lengthofDay: 0,
   lengthofsiderealDay: 0,
+  lengthofsiderealDayRealLOD: 0,
   predictedDeltat: 0,
   lengthofsolarYear: 0,
+  lengthofsolarYearSec: 0,
   lengthofsiderealYear: 0,
+  lengthofsiderealYearDays: 0,
   lengthofanomalisticYear: 0,
+  lengthofsolarYearSecRealLOD: 0,
+  lengthofsiderealYearDaysRealLOD: 0,
+  lengthofanomalisticYearRealLOD: 0,
   perihelionPrecession: 0,
   axialPrecession: 0,
   inclinationPrecession: 0,
   obliquityPrecession: 0,
   eclipticPrecession: 0,
+  perihelionPrecessionRealLOD: 0,
+  axialPrecessionRealLOD: 0,
+  inclinationPrecessionRealLOD: 0,
+  obliquityPrecessionRealLOD: 0,
+  eclipticPrecessionRealLOD: 0,
   eccentricityEarth: 0,
   obliquityEarth: 0,
   inclinationEarth: 0,
@@ -2870,7 +2883,6 @@ const CAMERA_POS   = new THREE.Vector3();
 const PLANET_POS   = new THREE.Vector3();
 const LOOK_DIR     = new THREE.Vector3();
 const SPHERICAL    = new THREE.Spherical();
-const AU_IN_KM     = 149597870.698828;
 
 const _pos        = new THREE.Vector3();
 const _camPos     = new THREE.Vector3();
@@ -2996,31 +3008,52 @@ function setupGUI() {
   let astroFolder = gui.addFolder('Predictions Holistic Universe Model');
 
     let daysFolder = astroFolder.addFolder('Length of Days Predictions');
- //     daysFolder.add(predictions, 'juliandaysbalancedJD').name('Juliandays since balanced year').listen();
       daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').step(0.000001).listen();
-      daysFolder.add(predictions, 'lengthofsiderealDay').name('Length of Sidereal Day (sec)').step(0.000001).listen();
-      daysFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
     daysFolder.open();
+  
     let yearsFolder = astroFolder.addFolder('Length of Years Predictions');
       yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
       yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').step(0.000001).listen();
-      yearsFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
-    yearsFolder.open();
-    let precessionFolder = astroFolder.addFolder('Experienced Precession Predictions');
+    yearsFolder.open();  
+
+    let precessionFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
+      precessionFolder.add(predictions, 'lengthofsiderealDay').name('Length of Sidereal Day (sec)').step(0.000001).listen();
+      //precessionFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+  
+      precessionFolder.add(predictions, 'lengthofsolarYearSec').name('Length of Solar Year (sec)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'lengthofsiderealYearDays').name('Length of Sidereal Year (days)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
+  
       precessionFolder.add(predictions, 'perihelionPrecession').name('Perihelion Precession (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'axialPrecession').name('Axial Precession (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'inclinationPrecession').name('Inclination Precession (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'eclipticPrecession').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'obliquityPrecession').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
     precessionFolder.open();
+  
     let orbitalFolder = astroFolder.addFolder('Orbital Elements Predictions');
       orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').step(0.000001).listen();
       orbitalFolder.add(predictions, 'obliquityEarth').name('Earth Obliquity (°)').step(0.000001).listen();
       orbitalFolder.add(predictions, 'inclinationEarth').name('Earth Inclination to invariable plane (°)').step(0.000001).listen();
       orbitalFolder.add(predictions, 'longitudePerihelion').name('Earth Longitude of Perihelion (°)').step(0.000001).listen();
       orbitalFolder.add(predictions, 'lengthofAU').name('Length of AU (km)').step(0.000001).listen();
-      orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
+      //orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
     orbitalFolder.open();
+  
+    let precessionRealLODFolder = astroFolder.addFolder('Real Length of Day - Predictions');
+      precessionRealLODFolder.add(predictions, 'lengthofsiderealDayRealLOD').name('Real LOD - Length of Sidereal Day (sec)').step(0.000001).listen();
+      //precessionRealLODFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+  
+      precessionRealLODFolder.add(predictions, 'lengthofsolarYearSecRealLOD').name('Real LOD - Length of Solar Year (sec)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'lengthofsiderealYearDaysRealLOD').name('Real LOD - Length of Sidereal Year (days)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'lengthofanomalisticYearRealLOD').name('Real LOD - Length of Anomalistic Year (sec)').step(0.000001).listen();
+  
+      precessionRealLODFolder.add(predictions, 'perihelionPrecessionRealLOD').name('Real LOD - Perihelion Precession (yrs)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'axialPrecessionRealLOD').name('Real LOD - Axial Precession (yrs)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'inclinationPrecessionRealLOD').name('Real LOD - Inclination Precession (yrs)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'eclipticPrecessionRealLOD').name('Real LOD - Length Ecliptic Cycle (yrs)').step(0.000001).listen();
+      precessionRealLODFolder.add(predictions, 'obliquityPrecessionRealLOD').name('Real LOD - Length Obliquity Cycle (yrs)').step(0.000001).listen();
+    precessionRealLODFolder.close();  
   astroFolder.close();
   
   let posFolder = gui.addFolder('Celestial Positions')
@@ -3823,7 +3856,7 @@ function updatePositions() {
     obj.dec    = SPHERICAL.phi;
     const au   = SPHERICAL.radius / 100;     // your units → AU
     obj.dist   = au;
-    obj.distKm = (au * AU_IN_KM).toFixed(2);
+    obj.distKm = (au * currentAUDistance).toFixed(2);
 
     // f) formatted for your GUI
     if (o.displayFormat === 'decimal') {
@@ -3845,7 +3878,7 @@ function updatePositions() {
   SPHERICAL.setFromVector3(LOOK_DIR);
 
   const camAu = SPHERICAL.radius / 100;
-  o.worldCamDistKm = (camAu * AU_IN_KM).toFixed(2);
+  o.worldCamDistKm = (camAu * currentAUDistance).toFixed(2);
   o.worldCamDist   = camAu.toFixed(8);
   o.worldCamRa     = SPHERICAL.theta;
   o.worldCamDec    = SPHERICAL.phi;
@@ -4104,49 +4137,48 @@ function updatePredictions() {
     }
   }
   
-    //  predictions.lengthofDay = parseFloat(predictions.lengthofDay.toFixed(2));
-  //predictions.lengthofDay = computeLengthofDay(o.juliandaysbalancedJD);
-  //predictions.lengthofsiderealDay = computeLengthofsiderealDay(o.juliandaysbalancedJD);
-  //predictions.predictedDeltat = parseFloat(meanlengthofday);
-  
   predictions.lengthofDay = o.lengthofDay = computeLengthofDay(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, meansolardayAmplitudeinSeconds, meanlengthofday);
-  //predictions.lengthofsiderealDay = o.lengthofsiderealDay = computeLengthofsiderealDay(o.currentYear);
-  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
+  
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolaryearAmplitudeinDays, meansolaryearlengthinDays);
   predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
-  predictions.lengthofanomalisticYear = computeLengthofanomalisticYear(o.perihelionPrecession, o.lengthofsolarYear);
-  predictions.perihelionPrecession = o.perihelionPrecession = computePerihelionPrecession(o.axialPrecession);
+  
+  predictions.lengthofsiderealDay = o.lengthofsolarYearSec/(o.lengthofsolarYear+1);
+  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
+  
+  predictions.lengthofsolarYearSec = o.lengthofsolarYearSec = o.lengthofsolarYear*86400;
+  predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/86400;
+  predictions.lengthofanomalisticYear = computeLengthofanomalisticYear(o.perihelionPrecession, o.lengthofsolarYear); 
+  
+  predictions.perihelionPrecession = o.perihelionPrecession = o.axialPrecession*13/16;
   predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYear, o.lengthofsolarYear);
-  predictions.inclinationPrecession = computeInclinationPrecession(o.axialPrecession);
-  predictions.obliquityPrecession = computeObliquityPrecession(o.axialPrecession);
-  predictions.eclipticPrecession = computeEclipticPrecession(o.axialPrecession);
+  predictions.inclinationPrecession = o.axialPrecession*13/3;
+  predictions.obliquityPrecession = o.axialPrecession*13/8;
+  predictions.eclipticPrecession = o.axialPrecession*13/5;
+  
+  predictions.lengthofsiderealDayRealLOD = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYear+1);
+  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
+  
+  predictions.lengthofsolarYearSecRealLOD = o.lengthofsolarYearSecRealLOD = o.lengthofsolarYear*o.lengthofDay;
+  predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear/o.lengthofDay;
+  predictions.lengthofanomalisticYearRealLOD = computeLengthofanomalisticYearRealLOD(o.perihelionPrecessionRealLOD, o.lengthofsolarYear, o.lengthofDay);
+  
+  predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.axialPrecessionRealLOD*13/16;
+  predictions.computeAxialPrecessionRealLOD = o.axialPrecessionRealLOD = computeAxialPrecessionRealLOD(o.lengthofsiderealYear, o.lengthofsolarYear, o.lengthofDay);
+  predictions.inclinationPrecessionRealLOD = o.axialPrecessionRealLOD*13/3;
+  predictions.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
+  predictions.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
+  
   predictions.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
   predictions.obliquityEarth = computeObliquityEarth(o.currentYear);
   predictions.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
   predictions.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
-  //predictions.lengthofAU = o.lengthofAU = computeLengthofAU(o.currentYear);
+  predictions.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
   //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
 
 }
 
 // 2000.57860 o.currentYear
 // 10315.566 o.perihelionprecessioncycleYear
-
-//function computeLengthofDay(currentYear) {
-// const secondsInDay = 86400; // Normal seconds in a day
-//  const changeRatePerYear = 0.001 / (100 * 365.25); // millisecond drift per day per year
-
-//  const yearsSinceBalance = juliandaysbalancedJD / 365.25;
-//  const changeInSeconds = yearsSinceBalance * changeRatePerYear;
-
-//  return secondsInDay + changeInSeconds; // New length of day
-//}
-
-//function computeLengthofsiderealDay(currentYear) {
-
-//  return juliandaysbalancedJD
-//}
-
 
 /**
  * Compute the length of day (in seconds) for a given year.
@@ -4280,13 +4312,19 @@ function computeLengthofanomalisticYear(
 }
 
 /**
- * Compute the perihelion precession.
+ * Compute the length of the anomalistic year (in seconds) with Real LOD.
  *
- * @param {number} axialPrecession – the axial precession value
- * @returns {number} perihelionPrecession
+ * @param {number} perihelionPrecession – the perihelion precession value
+ * @param {number} lengthofsolarYear    – the length of the solar year (in days)
+ * @returns {number} lengthofanomalisticYearRealLOD (in seconds)
  */
-function computePerihelionPrecession(axialPrecession) {
-  return axialPrecession * 13 / 16;
+function computeLengthofanomalisticYearRealLOD(
+  perihelionPrecession,
+  lengthofsolarYear,
+  lengthofDay
+) {
+  return ((perihelionPrecession * lengthofsolarYear) /
+          (perihelionPrecession - 1)) * lengthofDay;
 }
 
 /**
@@ -4305,33 +4343,20 @@ function computeAxialPrecession(
 }
 
 /**
- * Compute the inclination precession.
+ * Compute the axial precession with Real LOD.
  *
- * @param {number} axialPrecession – the axial precession value
- * @returns {number} inclinationPrecession
+ * @param {number} lengthofsiderealYear – the length of the sidereal year (in seconds)
+ * @param {number} lengthofsolarYear    – the length of the solar year (in days)
+ * @param {number} lengthofDay          – number of seconds in one solar day (e.g. 86400)
+ * @returns {number} axialPrecession
  */
-function computeInclinationPrecession(axialPrecession) {
-  return axialPrecession * 13 / 3;
-}
-
-/**
- * Compute the obliquity precession.
- *
- * @param {number} axialPrecession – the axial precession value
- * @returns {number} obliquityPrecession
- */
-function computeObliquityPrecession(axialPrecession) {
-  return axialPrecession * 13 / 8;
-}
-
-/**
- * Compute the ecliptic precession.
- *
- * @param {number} axialPrecession – the axial precession value
- * @returns {number} eclipticPrecession
- */
-function computeEclipticPrecession(axialPrecession) {
-  return axialPrecession * 13 / 5;
+function computeAxialPrecessionRealLOD(
+  lengthofsiderealYear,
+  lengthofsolarYear,
+  lengthofDay
+) {
+  return lengthofsiderealYear /
+         (lengthofsiderealYear - (lengthofsolarYear * lengthofDay));
 }
 
 /**
