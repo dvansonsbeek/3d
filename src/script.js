@@ -88,10 +88,10 @@ const correctionDays = 2.7343897;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
 const earthtiltMean = 23.4243449577;
 const earthinclinationMean = 1.492075548;
-const earthandinclinationtiltAmplitude = 0.58;
-const eccentricityMean = 1.404974;
-const eccentricityAmplitude = 0.27304333159777;
-const eccentricitysinusCorrection = 0.6895;
+const tiltandinclinationAmplitude = 0.58;
+const eccentricityMean = 0.01404974;
+const eccentricityAmplitude = 0.0027304333159777;
+const eccentricitySinusCorrection = 0.6895;
 const mideccentricitypointAmplitude = 2.43229166666669;
 const helionpointAmplitude = 9.8471328125;
 const meansolardayAmplitudeinSeconds = 0.07875;
@@ -100,6 +100,7 @@ const meansiderealyearAmplitudeinSeconds = 0.3036366;
 //*************************************************************
 // ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
 //*************************************************************
+const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(lengthsolaryearindaysin1246 * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
@@ -2271,6 +2272,7 @@ let predictions = {
   axialPrecession: 0,
   inclinationPrecession: 0,
   obliquityPrecession: 0,
+  eclipticPrecession: 0,
   eccentricityEarth: 0,
   obliquityEarth: 0,
   inclinationEarth: 0,
@@ -2995,28 +2997,29 @@ function setupGUI() {
 
     let daysFolder = astroFolder.addFolder('Length of Days Predictions');
  //     daysFolder.add(predictions, 'juliandaysbalancedJD').name('Juliandays since balanced year').listen();
-      daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').listen();
-      daysFolder.add(predictions, 'lengthofsiderealDay').name('Length of Sidereal Day (sec)').listen();
+      daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').step(0.000001).listen();
+      daysFolder.add(predictions, 'lengthofsiderealDay').name('Length of Sidereal Day (sec)').step(0.000001).listen();
       daysFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
     daysFolder.open();
     let yearsFolder = astroFolder.addFolder('Length of Years Predictions');
-      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').listen();
-      yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').listen();
-      yearsFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').listen();
+      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
+      yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').step(0.000001).listen();
+      yearsFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
     yearsFolder.open();
     let precessionFolder = astroFolder.addFolder('Experienced Precession Predictions');
-      precessionFolder.add(predictions, 'perihelionPrecession').name('Perihelion Precession (yrs)').listen();
-      precessionFolder.add(predictions, 'axialPrecession').name('Axial Precession (yrs)').listen();
-      precessionFolder.add(predictions, 'inclinationPrecession').name('Inclination Precession (yrs)').listen();
-      precessionFolder.add(predictions, 'obliquityPrecession').name('Length Obliquity Cycle (yrs)').listen();
+      precessionFolder.add(predictions, 'perihelionPrecession').name('Perihelion Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'axialPrecession').name('Axial Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'inclinationPrecession').name('Inclination Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'eclipticPrecession').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'obliquityPrecession').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
     precessionFolder.open();
     let orbitalFolder = astroFolder.addFolder('Orbital Elements Predictions');
-      orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').listen();
-      orbitalFolder.add(predictions, 'obliquityEarth').name('Earth Obliquity (°)').listen();
-      orbitalFolder.add(predictions, 'inclinationEarth').name('Earth Inclination to invariable plane (°)').listen();
-      orbitalFolder.add(predictions, 'longitudePerihelion').name('Earth Longitude of Perihelion (°)').listen();
-      orbitalFolder.add(predictions, 'lengthofAU').name('Length of AU (km)').listen();
-      orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').listen();
+      orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').step(0.000001).listen();
+      orbitalFolder.add(predictions, 'obliquityEarth').name('Earth Obliquity (°)').step(0.000001).listen();
+      orbitalFolder.add(predictions, 'inclinationEarth').name('Earth Inclination to invariable plane (°)').step(0.000001).listen();
+      orbitalFolder.add(predictions, 'longitudePerihelion').name('Earth Longitude of Perihelion (°)').step(0.000001).listen();
+      orbitalFolder.add(predictions, 'lengthofAU').name('Length of AU (km)').step(0.000001).listen();
+      orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
     orbitalFolder.open();
   astroFolder.close();
   
@@ -3202,12 +3205,17 @@ function render(now) {
     o.julianDay     = dateTimeToJulianDay(o.Date, o.Time);
     const p         = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
     o.perihelionDate = `${p.date} ${p.time}`;
+    o.currentYear = julianDateToDecimalYear(o.julianDay)
+    o.perihelionprecessioncycleYear = yearInCycle(o.currentYear, balancedYear, holisticyearLength);
+
+    o.juliandaysbalancedJD = o.julianDay - balancedJD;
+    //console.log(o.perihelionprecessioncycleYear)
     // Easter egg/ Can be added later
     //     if (isPerihelionCycle(o.periheliondate, 'perihelionday', ) && !eggTriggered) {
     //       eggTriggered = true;
     //       triggerPerihelionEasterEgg();
     //     }
-    o.juliandaysbalancedJD = o.julianDay - balancedJD;
+
     o.worldCamX = Math.round(x);
     o.worldCamY = Math.round(y);
     o.worldCamZ = Math.round(z);
@@ -4096,26 +4104,463 @@ function updatePredictions() {
     }
   }
   
-  // 2. Do calculations based on juliandaysbalancedJD
-//  predictions.lengthofDay = parseFloat(predictions.lengthofDay.toFixed(2));
-  predictions.lengthofDay = calculatelengthofDay(o.juliandaysbalancedJD);
-  predictions.lengthofsiderealDay = calculatelengthofsiderealDay(o.juliandaysbalancedJD);
-  predictions.predictedDeltat = parseFloat(meanlengthofday);
+    //  predictions.lengthofDay = parseFloat(predictions.lengthofDay.toFixed(2));
+  //predictions.lengthofDay = computeLengthofDay(o.juliandaysbalancedJD);
+  //predictions.lengthofsiderealDay = computeLengthofsiderealDay(o.juliandaysbalancedJD);
+  //predictions.predictedDeltat = parseFloat(meanlengthofday);
+  
+  predictions.lengthofDay = o.lengthofDay = computeLengthofDay(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, meansolardayAmplitudeinSeconds, meanlengthofday);
+  //predictions.lengthofsiderealDay = o.lengthofsiderealDay = computeLengthofsiderealDay(o.currentYear);
+  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
+  predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolaryearAmplitudeinDays, meansolaryearlengthinDays);
+  predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
+  predictions.lengthofanomalisticYear = computeLengthofanomalisticYear(o.perihelionPrecession, o.lengthofsolarYear);
+  predictions.perihelionPrecession = o.perihelionPrecession = computePerihelionPrecession(o.axialPrecession);
+  predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYear, o.lengthofsolarYear);
+  predictions.inclinationPrecession = computeInclinationPrecession(o.axialPrecession);
+  predictions.obliquityPrecession = computeObliquityPrecession(o.axialPrecession);
+  predictions.eclipticPrecession = computeEclipticPrecession(o.axialPrecession);
+  predictions.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
+  predictions.obliquityEarth = computeObliquityEarth(o.currentYear);
+  predictions.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
+  predictions.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
+  //predictions.lengthofAU = o.lengthofAU = computeLengthofAU(o.currentYear);
+  //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
+
 }
 
-function calculatelengthofDay(juliandaysbalancedJD) {
-  const secondsInDay = 86400; // Normal seconds in a day
-  const changeRatePerYear = 0.001 / (100 * 365.25); // millisecond drift per day per year
+// 2000.57860 o.currentYear
+// 10315.566 o.perihelionprecessioncycleYear
 
-  const yearsSinceBalance = juliandaysbalancedJD / 365.25;
-  const changeInSeconds = yearsSinceBalance * changeRatePerYear;
+//function computeLengthofDay(currentYear) {
+// const secondsInDay = 86400; // Normal seconds in a day
+//  const changeRatePerYear = 0.001 / (100 * 365.25); // millisecond drift per day per year
 
-  return secondsInDay + changeInSeconds; // New length of day
+//  const yearsSinceBalance = juliandaysbalancedJD / 365.25;
+//  const changeInSeconds = yearsSinceBalance * changeRatePerYear;
+
+//  return secondsInDay + changeInSeconds; // New length of day
+//}
+
+//function computeLengthofsiderealDay(currentYear) {
+
+//  return juliandaysbalancedJD
+//}
+
+
+/**
+ * Compute the length of day (in seconds) for a given year.
+ *
+ * @param {number} currentYear                      – the year you want to compute for
+ * @param {number} balancedYear                     – the reference (“balanced”) year
+ * @param {number} perihelionCycleLength            – length of the perihelion cycle (in years)
+ * @param {number} perihelionprecessioncycleYear    – the precession cycle year threshold
+ * @param {number} helionpointAmplitude             – amplitude of the perihelion‐point variation (in degrees)
+ * @param {number} meansolardayAmplitudeinSeconds   – amplitude of the mean solar‐day variation (in seconds)
+ * @param {number} meanlengthofday                  – the base mean length of day (in seconds)
+ * @returns {number} lengthofDay (in seconds)
+ */
+function computeLengthofDay(
+  currentYear,
+  balancedYear,
+  perihelionCycleLength,
+  perihelionprecessioncycleYear,
+  helionpointAmplitude,
+  meansolardayAmplitudeinSeconds,
+  meanlengthofday
+) {
+  // Δ‐year
+  const delta = currentYear - balancedYear;
+
+  // Excel’s IF: if (Δ/length < 1) then Δ else perihelionprecessioncycleYear
+  const cycleValue = (delta / perihelionCycleLength) < 1
+    ? delta
+    : perihelionprecessioncycleYear;
+
+  // factor: helionpointAmplitude / ((360/perihelionCycleLength) * 100)
+  const firstFactor = helionpointAmplitude / ((360 / perihelionCycleLength) * 100);
+
+  // angle for the first COS term (in radians):
+  // (cycleValue / perihelionCycleLength) * 360°
+  const angle1 = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
+  const term1 = -meansolardayAmplitudeinSeconds * firstFactor * Math.cos(angle1);
+
+  // angle for the second COS term (in radians):
+  // (cycleValue / (perihelionCycleLength/2)) * 360°
+  const angle2 = (cycleValue / (perihelionCycleLength / 2)) * 360 * Math.PI / 180;
+  const term2 = -meansolardayAmplitudeinSeconds * Math.cos(angle2);
+
+  // sum both terms + base mean length of day
+  return term1 + term2 + meanlengthofday;
 }
 
-function calculatelengthofsiderealDay(juliandaysbalancedJD) {
+/**
+ * Compute the length of the solar year (in days) for a given year.
+ *
+ * @param {number} currentYear                      – the year you want to compute for
+ * @param {number} balancedYear                     – the reference (“balanced”) year
+ * @param {number} perihelionCycleLength            – length of the perihelion cycle (in years)
+ * @param {number} perihelionprecessioncycleYear    – the precession cycle year threshold
+ * @param {number} meansolaryearAmplitudeinDays     – amplitude of the solar‐year variation (in days)
+ * @param {number} meansolaryearlengthinDays        – the base mean length of solar year (in days)
+ * @returns {number} lengthofsolarYear (in days)
+ */
+function computeLengthofsolarYear(
+  currentYear,
+  balancedYear,
+  perihelionCycleLength,
+  perihelionprecessioncycleYear,
+  meansolaryearAmplitudeinDays,
+  meansolaryearlengthinDays
+) {
+  // Δ‐year
+  const delta = currentYear - balancedYear;
 
-  return juliandaysbalancedJD
+  // Excel’s IF: if (Δ/length < 1) then Δ else perihelionprecessioncycleYear
+  const cycleValue = (delta / perihelionCycleLength) < 1
+    ? delta
+    : perihelionprecessioncycleYear;
+
+  // angle in radians: (cycleValue/perihelionCycleLength) * 360°
+  const angle = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
+
+  // formula: amplitude × sin(angle) + base length
+  return meansolaryearAmplitudeinDays * Math.sin(angle)
+       + meansolaryearlengthinDays;
+}
+
+/**
+ * Compute the length of the sidereal year (in seconds) for a given year.
+ *
+ * @param {number} currentYear                          – the year you want to compute for
+ * @param {number} balancedYear                         – the reference (“balanced”) year
+ * @param {number} perihelionCycleLength                – length of the perihelion cycle (in years)
+ * @param {number} perihelionprecessioncycleYear        – the precession cycle year threshold
+ * @param {number} meansiderealyearAmplitudeinSeconds   – amplitude of the sidereal‐year variation (in seconds)
+ * @param {number} meansiderealyearlengthinSeconds      – the base mean length of sidereal year (in seconds)
+ * @returns {number} lengthofsiderealYear (in seconds)
+ */
+function computeLengthofsiderealYear(
+  currentYear,
+  balancedYear,
+  perihelionCycleLength,
+  perihelionprecessioncycleYear,
+  meansiderealyearAmplitudeinSeconds,
+  meansiderealyearlengthinSeconds
+) {
+  // Δ‐year
+  const delta = currentYear - balancedYear;
+
+  // Excel’s IF: if (Δ/length < 1) then Δ else perihelionprecessioncycleYear
+  const cycleValue = (delta / perihelionCycleLength) < 1
+    ? delta
+    : perihelionprecessioncycleYear;
+
+  // angle in radians: (cycleValue / perihelionCycleLength) * 360°
+  const angle = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
+
+  // formula: − amplitude × sin(angle) + base length
+  return -meansiderealyearAmplitudeinSeconds * Math.sin(angle)
+         + meansiderealyearlengthinSeconds;
+}
+
+/**
+ * Compute the length of the anomalistic year (in seconds).
+ *
+ * @param {number} perihelionPrecession – the perihelion precession value
+ * @param {number} lengthofsolarYear    – the length of the solar year (in days)
+ * @returns {number} lengthofanomalisticYear (in seconds)
+ */
+function computeLengthofanomalisticYear(
+  perihelionPrecession,
+  lengthofsolarYear
+) {
+  return ((perihelionPrecession * lengthofsolarYear) /
+          (perihelionPrecession - 1)) * 86400;
+}
+
+/**
+ * Compute the perihelion precession.
+ *
+ * @param {number} axialPrecession – the axial precession value
+ * @returns {number} perihelionPrecession
+ */
+function computePerihelionPrecession(axialPrecession) {
+  return axialPrecession * 13 / 16;
+}
+
+/**
+ * Compute the axial precession.
+ *
+ * @param {number} lengthofsiderealYear – the length of the sidereal year (in seconds)
+ * @param {number} lengthofsolarYear    – the length of the solar year (in days)
+ * @returns {number} axialPrecession
+ */
+function computeAxialPrecession(
+  lengthofsiderealYear,
+  lengthofsolarYear
+) {
+  return lengthofsiderealYear /
+         (lengthofsiderealYear - (lengthofsolarYear * 86400));
+}
+
+/**
+ * Compute the inclination precession.
+ *
+ * @param {number} axialPrecession – the axial precession value
+ * @returns {number} inclinationPrecession
+ */
+function computeInclinationPrecession(axialPrecession) {
+  return axialPrecession * 13 / 3;
+}
+
+/**
+ * Compute the obliquity precession.
+ *
+ * @param {number} axialPrecession – the axial precession value
+ * @returns {number} obliquityPrecession
+ */
+function computeObliquityPrecession(axialPrecession) {
+  return axialPrecession * 13 / 8;
+}
+
+/**
+ * Compute the ecliptic precession.
+ *
+ * @param {number} axialPrecession – the axial precession value
+ * @returns {number} eclipticPrecession
+ */
+function computeEclipticPrecession(axialPrecession) {
+  return axialPrecession * 13 / 5;
+}
+
+/**
+ * Compute Earth's orbital eccentricity for a given year.
+ *
+ * @param {number} currentYear
+ * @param {number} balancedYear
+ * @param {number} perihelionCycleLength
+ * @param {number} eccentricityMean
+ * @param {number} eccentricityAmplitude
+ * @param {number} eccentricitySinusCorrection
+ * @returns {number}
+ */
+function computeEccentricityEarth(
+  currentYear,
+  balancedYear,
+  perihelionCycleLength,
+  eccentricityMean,
+  eccentricityAmplitude,
+  eccentricitySinusCorrection
+) {
+  // 1. root = √(eₘ² + a²)
+  const root = Math.sqrt(
+    eccentricityMean * eccentricityMean +
+    eccentricityAmplitude * eccentricityAmplitude
+  );
+
+  // 2. θ in radians
+  const degrees = ((currentYear - balancedYear) / perihelionCycleLength) * 360;
+  const θ = degrees * Math.PI / 180;
+
+  const cosθ = Math.cos(θ);
+  const absCosθ = Math.abs(cosθ);
+  const signCosθ = Math.sign(cosθ);
+
+  // 3. pull the sign out of the exponentiation
+  const term1 = signCosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
+  const term2 =      cosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
+
+  // 4. two candidate eccentricities
+  const e1 = root +
+    (
+      -eccentricityAmplitude +
+      (eccentricityMean - root) * term1
+    ) * cosθ;
+
+  const e2 = root +
+    (
+      -eccentricityAmplitude +
+      (eccentricityMean - root) * term2
+    ) * cosθ;
+
+  // 5. pick the branch
+  return e1 > root ? e1 : e2;
+}
+
+/**
+ * Compute Earth's obliquity (tilt) for a given decimal year.
+ *
+ * Relies on these values being in scope:
+ *   - earthtiltMean                  (mean obliquity, in degrees)
+ *   - tilandinclinationAmplitude  (amplitude, in degrees)
+ *   - balancedYear                   (reference year for phase = 0)
+ *   - holisticyearLength             (full cycle length, in years)
+ *
+ * @param {number} currentYear  – e.g. the decimal year from your JD→year fn
+ * @returns {number}            Earth's tilt (in degrees) at that year
+ */
+function computeObliquityEarth(currentYear) {
+  const t = currentYear - balancedYear;
+
+  // two cycle lengths (years) for the cosine terms:
+  const cycle3 = holisticyearLength / 3;
+  const cycle8 = holisticyearLength / 8;
+
+  // Convert each fractional cycle into radians:
+  //    (t / cycle) * 360°  →  in radians = (t / cycle) * 2π
+  const phase3 = (t / cycle3) * 2 * Math.PI;
+  const phase8 = (t / cycle8) * 2 * Math.PI;
+
+  // obliquityEarth
+  //   + [–A * cos(phase3)] 
+  //   + [+A * cos(phase8)]
+  return earthtiltMean
+       - tiltandinclinationAmplitude * Math.cos(phase3)
+       + tiltandinclinationAmplitude * Math.cos(phase8);
+}
+
+/**
+ * Compute Earth’s orbital inclination for a given year.
+ *
+ * @param {number} currentYear                   – the year you want to compute for
+ * @param {number} balancedYear                  – the reference (“balanced”) year
+ * @param {number} holisticyearLength            – length of the holistic cycle (in years)
+ * @param {number} earthinclinationMean          – the mean inclination (in degrees)
+ * @param {number} tiltandinclinationAmplitude   – amplitude of the tilt & inclination variation (in degrees)
+ * @returns {number} the computed inclination (in degrees)
+ */
+function computeInclinationEarth(
+  currentYear,
+  balancedYear,
+  holisticyearLength,
+  earthinclinationMean,
+  tiltandinclinationAmplitude
+) {
+  // 1. Compute cycle position in degrees
+  const degrees = (
+    (currentYear - balancedYear) /
+    (holisticyearLength / 3)
+  ) * 360;
+
+  // 2. Convert to radians
+  const radians = degrees * Math.PI / 180;
+
+  // 3. Apply the formula
+  return earthinclinationMean +
+         (-tiltandinclinationAmplitude * Math.cos(radians));
+}
+
+/**
+ * Compute the longitude of perihelion for a given year.
+ *
+ * @param {number} currentYear                        – the year you want to compute for
+ * @param {number} balancedYear                       – the reference (“balanced”) year
+ * @param {number} perihelionCycleLength              – length of the perihelion cycle (in years)
+ * @param {number} perihelionprecessioncycleYear      – the precession cycle year threshold
+ * @param {number} helionpointAmplitude               – amplitude of the perihelion-point variation (in degrees)
+ * @param {number} mideccentricitypointAmplitude      – amplitude of the mid-eccentricity-point variation (in degrees)
+ * @returns {number} longitudePerihelion (in degrees)
+ */
+function computeLongitudePerihelion(
+  currentYear,
+  balancedYear,
+  perihelionCycleLength,
+  perihelionprecessioncycleYear,
+  helionpointAmplitude,
+  mideccentricitypointAmplitude
+) {
+  // 1. Determine which cycle value to use
+  const delta = currentYear - balancedYear;
+  const cycleValue = (delta / perihelionCycleLength) > 1
+    ? delta
+    : perihelionprecessioncycleYear;
+
+  // 2. First sinusoidal term:
+  //    helionpointAmplitude * sin( (cycleValue / perihelionCycleLength) * 360° )
+  const angle1 = (cycleValue / perihelionCycleLength) * 360;
+  const term1 = helionpointAmplitude * Math.sin(angle1 * Math.PI / 180);
+
+  // 3. Linear drift term normalized into [0, 360):
+  //    270 + delta * (360 / perihelionCycleLength)
+  //    then subtract floor(.../360)*360
+  const raw = 270 + delta * (360 / perihelionCycleLength);
+  const term2 = raw - Math.floor(raw / 360) * 360;
+
+  // 4. Second sinusoidal term:
+  //    mideccentricitypointAmplitude * sin( (cycleValue / (perihelionCycleLength/2)) * 360° )
+  const angle3 = (cycleValue / (perihelionCycleLength / 2)) * 360;
+  const term3 = mideccentricitypointAmplitude * Math.sin(angle3 * Math.PI / 180);
+
+  // 5. Sum all contributions
+  return term1 + term2 + term3;
+}
+
+/**
+ * Calculate the offset into the current 1/16-cycle.
+ *
+ * @param {number} currentYear               – e.g. your decimal year from JD
+ * @param {number} balancedYear              – reference “start” of the cycle
+ * @param {number} holisticyearLength        – full cycle length in years
+ * @returns {number}  A value in [0, holisticyearLength/16)
+ */
+function yearInCycle(currentYear, balancedYear, holisticyearLength) {
+  const delta       = currentYear - balancedYear;
+  // Excel’s ROUNDDOWN(...,0) is truncation toward zero
+  const wholeCycles = Math.trunc(delta / perihelionCycleLength);
+  return delta - wholeCycles * perihelionCycleLength;
+}
+
+/**
+ * Convert an astronomical Julian Date to a decimal year, using
+ * the Julian calendar before 1582‐10‐15 and the Gregorian calendar thereafter.
+ *
+ * @param {number} jd  Astronomical Julian Date (can include fractional days).
+ * @returns {number}   Decimal year (e.g. 1999.1234).
+ */
+function julianDateToDecimalYear(jd) {
+  // 1) Compute intermediate values
+  const J = jd + 0.5;
+  const Z = Math.floor(J);
+  const F = J - Z;
+
+  // 2) Decide which calendar to use
+  //    The switch happens at JD = 2299160.5 (1582-10-15 00:00 UTC)
+  let A = Z;
+  if (Z >= 2299161) {
+    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+    A = Z + 1 + alpha - Math.floor(alpha / 4);
+  }
+
+  // 3) Convert to calendar date (year, month, day.fraction)
+  const B = A + 1524;
+  const C = Math.floor((B - 122.1) / 365.25);
+  const D = Math.floor(365.25 * C);
+  const E = Math.floor((B - D) / 30.6001);
+
+  const day = B - D - Math.floor(30.6001 * E) + F;
+  const month = (E < 14) ? E - 1 : E - 13;
+  const year  = (month > 2) ? C - 4716 : C - 4715;
+
+  // 4) Figure out day‐of‐year, including the fractional part
+  //    Build month lengths array according to the calendar in use
+  const isGregorian = (Z >= 2299161);
+  const isLeap = isGregorian
+    ? (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0))
+    : (year % 4 === 0);
+
+  const monthLengths = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  let dayOfYear = day;
+  for (let m = 0; m < month - 1; m++) {
+    dayOfYear += monthLengths[m];
+  }
+
+  // 5) Compute decimal year
+  const daysInYear = isLeap ? 366 : 365;
+  // At Jan 1 00:00 → dayOfYear = 1 → fraction = 0 → decimalYear = year
+  const decimalYear = year + (dayOfYear - 1) / daysInYear;
+
+  return decimalYear;
 }
 
 //*************************************************************
@@ -5282,7 +5727,7 @@ function dateToDayNew(dateStr, timeStr, inputKind, outputKind) {
   if (outputKind === 'julianday') {
     return jd;
   } else {
-    // perihelionday = JD – perihelionAlignmentJD
+    // perihelionday = JD – perihelionalignmentJD
     return julianDayToPerihelionDay(jd);
   }
 }
