@@ -72,7 +72,6 @@ Each planet is structured like this:
 ## ✅ Suggestions for Next Steps
 
 - 🌑 Technical improvements (can we prevent the camera swings when looking at the sun?)
-- 🌟 Add prediction calculations LOD, precession, etc (placeholders present)
-- 📈 Visual improvements
+- 🌟 Visual improvements
 - 🖼 Export frames for video or screenshots
 - 🕶 Integrate with `WebXR` for VR solar system flythrough
