@@ -3220,7 +3220,7 @@ function render(now) {
   lastCameraX = x; lastCameraY = y; lastCameraZ = z;
 
   // 3) OrbitControls: point at your selected pivot
-  if (o.lookAtObj?.pivotObj) {
+  if (o.lookAtObj.pivotObj) {
     controls.target.copy(
       o.lookAtObj.pivotObj.getWorldPosition(new THREE.Vector3())
     );
@@ -3577,7 +3577,7 @@ function loadTexture( url, onLoad ) {
 function updateDomLabel() {
   const label = document.getElementById('planetLabel');
 
-  if (o.lookAtObj?.pivotObj) {
+  if (o.lookAtObj.pivotObj) {
     o.lookAtObj.pivotObj.updateMatrixWorld();
     const worldPos = o.lookAtObj.pivotObj.getWorldPosition(new THREE.Vector3());
     const screenPos = worldPos.clone().project(camera);
@@ -3630,7 +3630,7 @@ function updateStarSizes() {
 }
 
 function updateFocusRing() {
-  if (o.lookAtObj?.name === 'Sun' && o.sun?.pivotObj) {
+  if (o.lookAtObj.name === 'Sun' && o.sun?.pivotObj) {
     o.sun.pivotObj.updateMatrixWorld();
     focusRing.position.copy(
       o.sun.pivotObj.getWorldPosition(new THREE.Vector3())
@@ -3748,7 +3748,7 @@ function updateSunlightForPlanet(lightTargetObj, shadowReceiverObj = lightTarget
 }
 
 function updateLightingForFocus() {
-  const isSun = o.lookAtObj?.name === 'Sun';
+  const isSun = o.lookAtObj.name === 'Sun';
 
   if (isSun) {
     // Disable directional light
@@ -3757,7 +3757,7 @@ function updateLightingForFocus() {
     // Enable fallback point light and follow camera
     fallbackLight.visible = true;
     fallbackLight.position.copy(camera.position);
-  } else if (o.lookAtObj?.pivotObj) {
+  } else if (o.lookAtObj.pivotObj) {
     // Enable directional sunlight toward selected planet
     sunLight.visible = true;
     fallbackLight.visible = false;
