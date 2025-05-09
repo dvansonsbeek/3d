@@ -2425,7 +2425,8 @@ document.body.appendChild(renderer.domElement);
 const textureLoader = new THREE.TextureLoader();
 const textureCache = new Map();
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // for smoother motion, optional
 controls.enableKeys = false;
 controls.zoomSpeed = 8.0;
 controls.dollySpeed = 8.0;
