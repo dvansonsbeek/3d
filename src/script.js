@@ -3108,7 +3108,7 @@ function setupGUI() {
   folderO.add(o, 'starNamesVisible').name('Star names')
   .onChange(visible => {
     sceneObjects.stars.children.forEach(child => {
-      if (child instanceof THREE.CSS2DObject) {
+      if (child instanceof CSS2DObject) {
         child.visible = visible;
       }
     });
@@ -3130,7 +3130,7 @@ function setupGUI() {
     sceneObjects.stars.scale.setScalar(factor);
     sceneObjects.constellations.scale.setScalar(factor);
     sceneObjects.stars.children.forEach(child => {
-      if (child instanceof THREE.CSS2DObject) {
+      if (child instanceof CSS2DObject) {
         child.scale.setScalar(factor);
       }
     });
@@ -3491,7 +3491,7 @@ function initStars() {
         // (All styling comes from your CSS .star-label rules)
         labelDiv.style.pointerEvents = 'none';
 
-        const labelObj = new THREE.CSS2DObject(labelDiv);
+        const labelObj = new CSS2DObject(labelDiv);
         labelObj.position.copy(pos);
         labelObj.visible = o.starNamesVisible;
         labelObjects.push(labelObj);
