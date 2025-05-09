@@ -3630,7 +3630,7 @@ function updateStarSizes() {
 }
 
 function updateFocusRing() {
-  if (o.lookAtObj.name === 'Sun' && o.sun?.pivotObj) {
+  if (o.lookAtObj.name === 'Sun' && o.sun.pivotObj) {
     o.sun.pivotObj.updateMatrixWorld();
     focusRing.position.copy(
       o.sun.pivotObj.getWorldPosition(new THREE.Vector3())
