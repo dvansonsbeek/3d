@@ -1,9 +1,7 @@
-
 # 🌌 Solar System build in three js R175 - Summary
 
 ## ✅ Core Architecture
 
-- **Planet creation 
 - **Supports:**  
   - Planet tilts and custom orbit inclinations  
   - Optional ring textures  
