@@ -2319,7 +2319,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 // —– setup once —–
-const labelRenderer = new THREE.CSS2DRenderer();
+const labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);
 // ────────────────────────────────────────────────────
 // 1) Style & add your CSS2DRenderer DOM element
