@@ -1,13 +1,15 @@
 {
   "name": "threejs-r175-app",
   "version": "1.0.0",
-  "description": "A minimal Three.js r175 example",
+  "description": "A minimal Three.js r175 example with stats.js, dat.gui & OrbitControls",
   "scripts": {
     "start": "parcel index.html --open",
     "build": "parcel build index.html --dist-dir dist"
   },
   "dependencies": {
-    "three": "^0.175.0"
+    "three": "^0.175.0",
+    "stats.js": "^0.17.0",
+    "dat.gui": "^0.7.9"
   },
   "devDependencies": {
     "parcel": "^2.9.0"
