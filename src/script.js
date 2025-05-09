@@ -61,21 +61,6 @@ const sHour = sDay/24;
 const sMinute = sHour/60;
 const sSecond = sMinute/60;
 
-//alert(meansolaryearlengthinDays);
-//alert(meanearthRotationsinDays);
-//alert(startmodelyearwithCorrection);
-//alert(balancedYear);
-//alert(balancedJD);
-//alert(meansiderealyearlengthinDays);
-//alert(meanlengthofday);
-//alert(sDay);
-//alert(sYear);
-//alert(sMonth);
-//alert(sWeek);
-//alert(sHour);
-//alert(sMinute);
-//alert(sSecond);
-
 //*************************************************************
 // ADD PLANETS (Stars, Moons and deferents conunt as planets)
 //*************************************************************
