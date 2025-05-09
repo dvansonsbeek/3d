@@ -2,7 +2,7 @@
   "name": "threejs-app",
   "version": "1.0.0",
   "description": "My Three.js sandbox",
-  "main": "src/index.js",
+  "main": "src/index.html",
   "scripts": {
     // start the dev server
     "dev": "webpack serve --config webpack.config.js --mode development",
