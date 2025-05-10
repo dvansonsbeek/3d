@@ -2948,7 +2948,15 @@ function setupGUI() {
     daysFolder.open();
   
     let yearsFolder = astroFolder.addFolder('Length of Years Predictions');
-      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
+ //     yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
+  
+  // 1⃣  create the controller and keep the reference
+  const yearCtrl = yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.00000001).listen();
+
+  // 2⃣  tell dat.gui to render 8 digits after the decimal point
+  yearCtrl.__precision = 8;    // undocumented but fully supported
+  yearCtrl.updateDisplay();    // redraw once right away
+  
       yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').step(0.000001).listen();
     yearsFolder.open();  
 
@@ -3113,22 +3121,7 @@ function setupGUI() {
    /* ---------------------------------------------------------
    * width-toggle badge (does NOT consume a controller slot)
    * --------------------------------------------------------- */
-  const sizes = [300, 440];   // narrow, wide
-  let idx = 0;
-
-  const badge = document.createElement('div');
-  badge.className  = 'gui-width-toggle';
-  badge.textContent = '⇆';     // anything you like: ↔, ⇆, ‹› …
-
-  badge.onclick = () => {
-    idx = 1 - idx;                           // 0 → 1 → 0 …
-    gui.domElement.style.width = sizes[idx] + 'px';
-    /* dat.gui re-flows automatically on the next frame */
-  };
-
-  /*  position badge *after* the panel is in the DOM  */
-  gui.domElement.style.position = 'relative';  // ensure the badge is anchored
-  gui.domElement.appendChild(badge);
+   addWidthToggle(gui);
 }  
 
 //*************************************************************
@@ -3263,6 +3256,36 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+function addWidthToggle(gui, sizes = [300, 440]) {
+  let idx = 0;
+
+  /* badge creation is the same … */
+  const badge = document.createElement('div');
+  badge.id = 'guiWidthToggle';
+  badge.textContent = '⇆';
+  document.body.appendChild(badge);
+
+  /* ---------- centred positioning ---------- */
+  function align() {
+    const r = gui.domElement.getBoundingClientRect();
+    const bH = badge.getBoundingClientRect().height;        // badge height
+    badge.style.left = `${r.left - badge.offsetWidth}px`;   // same as before
+    badge.style.top  = `${r.top + (r.height - bH) / 2}px`;  // ← centred!
+  }
+  align();                                   // first positioning
+
+  /* follow window resizes & panel height changes */
+  window.addEventListener('resize', align);
+  new ResizeObserver(align).observe(gui.domElement);
+
+  /* width toggle */
+  badge.onclick = () => {
+    idx = 1 - idx;
+    gui.domElement.style.width = `${sizes[idx]}px`;
+    align();                                 // badge tracks new width
+  };
+}
+
 function initConstellations() {
   console.log(`⏳ initConstellations() [${o.constellationLayout}] fetching…`);
 
