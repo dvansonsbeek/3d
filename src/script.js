@@ -40,6 +40,7 @@ const meansolaryearAmplitudeinDays = 0.00017926844;
 const meansiderealyearAmplitudeinSeconds = 0.3036366;
 const currentAUDistance = 149597870.698828;
 const speedofSuninKM = 107225.047767317;
+
 //*************************************************************
 // ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
 //*************************************************************
@@ -1895,6 +1896,8 @@ const halleys = {
   rotationSpeed: 1043.12937189584,
   tilt: 0,
   orbitRadius: 1788.20900979424,
+  orbitSemiMajor: 0,
+  orbitSemiMinor: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2224,7 +2227,7 @@ let predictions = {
 // SETUP CAMERAS and CONTROLS
 //*************************************************************
 const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
-camera.position.set(0, 1000, 0);
+camera.position.set(0, 500, 0);
 //camera.position.set(0, 0.5, 4);
 const baseCamDistance = camera.position.length();
 
@@ -2760,14 +2763,20 @@ const flares = [
 //*************************************************************
 const clock = new THREE.Clock(); 
 
+// --------------------------------------------------------
+// initial setup — run ONCE, right after you create renderer,
+// camera, starMaterial, labelRenderer, etc.
+// --------------------------------------------------------
+const DESIRED_HFOV   = 60;        // horizontal slice you like
+const MIN_SIZE       = 2;         // protect against 0-px viewports
+const starMaterial   = new THREE.PointsMaterial({ size: 2, sizeAttenuation: false });
+
 let resizeTimeout;
 window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    onWindowResize();
-  }, 100);
+  clearTimeout(resizeTimeout);               // debounce
+  resizeTimeout = setTimeout(onWindowResize, 100);
 });
-onWindowResize();
+onWindowResize();                            // initial call
 
 let pause = true;
 
@@ -3101,6 +3110,25 @@ function setupGUI() {
   folderCamera.add(o, 'worldCamDec').name('Dec').listen()
   folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
  
+   /* ---------------------------------------------------------
+   * width-toggle badge (does NOT consume a controller slot)
+   * --------------------------------------------------------- */
+  const sizes = [300, 440];   // narrow, wide
+  let idx = 0;
+
+  const badge = document.createElement('div');
+  badge.className  = 'gui-width-toggle';
+  badge.textContent = '⇆';     // anything you like: ↔, ⇆, ‹› …
+
+  badge.onclick = () => {
+    idx = 1 - idx;                           // 0 → 1 → 0 …
+    gui.domElement.style.width = sizes[idx] + 'px';
+    /* dat.gui re-flows automatically on the next frame */
+  };
+
+  /*  position badge *after* the panel is in the DOM  */
+  gui.domElement.style.position = 'relative';  // ensure the badge is anchored
+  gui.domElement.appendChild(badge);
 }  
 
 //*************************************************************
@@ -3955,19 +3983,26 @@ function getOptimizedPixelRatio() {
 
 // And your normal resize function:
 function onWindowResize() {
-  const width  = window.innerWidth;
-  const height = window.innerHeight;
+  /* ---------- safe viewport ---------- */
+  const width  = Math.max(MIN_SIZE, window.innerWidth);
+  const height = Math.max(MIN_SIZE, window.innerHeight);
+  const aspect = width / height;
 
-  // 1) update camera
-  camera.aspect = width / height;
+  /* ---------- camera (fixed hFOV) ---- */
+  const hFovRad = THREE.MathUtils.degToRad(DESIRED_HFOV);
+  const vFovRad = 2 * Math.atan( Math.tan(hFovRad / 2) / aspect );
+  camera.fov    = THREE.MathUtils.radToDeg(vFovRad);
+  camera.aspect = aspect;
   camera.updateProjectionMatrix();
 
-  // 2) resize WebGL
+  /* ---------- renderer sizes --------- */
   renderer.setSize(width, height);
   renderer.setPixelRatio(getOptimizedPixelRatio());
-
-  // 3) resize CSS2DRenderer
   labelRenderer.setSize(width, height);
+
+  /* ---------- star sprite size ------- */
+  const dpr = renderer.getPixelRatio();      // 1, 2, 3, …
+  starMaterial.size = 2 / dpr;               // stays ~2 CSS-px on any screen
 }
 
 function addPolarGridHelper(inplanet, planetSize = 10) {

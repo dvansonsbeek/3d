@@ -136,3 +136,28 @@ a:link {
   pointer-events: none;
   user-select: none;
 }
+
+.gui-width-toggle {
+  position: absolute;
+  /* stick it 22 px to the left, so it never hides any GUI text */
+  left: -22px;
+  top: 0;
+  width: 22px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 13px/1 sans-serif;
+  color: #fff;
+  background: rgba(0,0,0,0.35);
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;     /* smooth on iPad */
+  writing-mode: vertical-rl;      /* upright letters */
+  text-orientation: mixed;        /* keeps “⇆” readable */
+  z-index: 999;              /* keep the badge on top after each re-flow */
+}
+
+.dg {                         /* <— dat.gui’s root selector */
+  overflow: visible !important;   /* never clip children */
+}
