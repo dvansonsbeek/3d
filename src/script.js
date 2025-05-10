@@ -3259,30 +3259,37 @@ requestAnimationFrame(render);
 function addWidthToggle(gui, sizes = [300, 440]) {
   let idx = 0;
 
-  /* badge creation is the same … */
+  /* create the floating badge */
   const badge = document.createElement('div');
   badge.id = 'guiWidthToggle';
   badge.textContent = '⇆';
   document.body.appendChild(badge);
 
-  /* ---------- centred positioning ---------- */
+  /* positioning — centred beside the panel */
   function align() {
-    const r = gui.domElement.getBoundingClientRect();
-    const bH = badge.getBoundingClientRect().height;        // badge height
-    badge.style.left = `${r.left - badge.offsetWidth}px`;   // same as before
-    badge.style.top  = `${r.top + (r.height - bH) / 2}px`;  // ← centred!
+    const r  = gui.domElement.getBoundingClientRect();
+    const bh = badge.getBoundingClientRect().height;
+    badge.style.left = `${r.left - badge.offsetWidth}px`;
+    badge.style.top  = `${r.top + (r.height - bh) / 2}px`;
   }
-  align();                                   // first positioning
+  align();                               // first run
 
-  /* follow window resizes & panel height changes */
+  /* keep badge in place on window resizes */
   window.addEventListener('resize', align);
-  new ResizeObserver(align).observe(gui.domElement);
 
-  /* width toggle */
+  /*—--- feature-detect ResizeObserver ----*/
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(align).observe(gui.domElement);
+  } else {
+    /* fallback: re-align every 1 s on browsers without the API */
+    setInterval(align, 1000);
+  }
+
+  /* click / tap toggles the panel width */
   badge.onclick = () => {
     idx = 1 - idx;
     gui.domElement.style.width = `${sizes[idx]}px`;
-    align();                                 // badge tracks new width
+    align();                             // badge tracks the new width
   };
 }
 
