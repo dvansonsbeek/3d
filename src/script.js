@@ -2837,6 +2837,31 @@ let updatePredictionElapsed = 0;
 let cameraMoved = true; // Force first update
 let eggTriggered = false;
 
+let earthLabelDismissed = false;
+let earthLabelPrevHTML = '';
+
+// 1️⃣  put every “big-radius” object that must expand / shrink together in one array
+const scalableObjects = [
+  sceneObjects.stars,
+  sceneObjects.constellations,
+  celestialSphere,
+  plane                     //  ← NEW
+];
+
+//const baseCamDistance = camera.position.length(); // distance that feels “100 %” size
+const zoomFactor = 1.0;   // identical to your star-label code
+const minScale   = 0.01;   // clamp values to taste
+const maxScale   = 0.9;
+
+const label        = document.getElementById('planetLabel');
+const labelContent = label.querySelector('.labelContent');
+const closeBtn     = label.querySelector('.closeBtn');
+
+closeBtn.addEventListener('click', e => {
+  e.stopPropagation();         // keeps the click from bubbling to scene
+  label.style.display = 'none';
+});
+
 //*************************************************************
 // CREATE SETTINGS AND SETUP GUI
 //*************************************************************
@@ -3020,15 +3045,6 @@ function setupGUI() {
   sub.add(obj, 'dist').name('AU Distance').listen();
   sub.open();
   });
-
-  //tracePlanets.forEach(obj => {
-  //let posPlFolder = posFolder.addFolder(obj.name);
-  //posPlFolder.add(obj, 'raDisplay').name('RA').listen();
-  //posPlFolder.add(obj, 'decDisplay').name('Dec').listen();
-  //posPlFolder.add(obj, 'distKm').listen().name('Kilometers');
-  //posPlFolder.add(obj, 'dist').listen().name('AU Distance');
-  //posPlFolder.open();
-  //});
   
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
@@ -3062,18 +3078,18 @@ function setupGUI() {
     initConstellations();   // re–draw with the new style
   });
   
-  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance')
-  .onChange(factor => {
-    sceneObjects.stars.scale.setScalar(factor);
-    sceneObjects.constellations.scale.setScalar(factor);
+  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(factor => {
+
+    // scale all Three.js objects (Mesh, Group, etc.)
+    scalableObjects.forEach(obj => obj.scale.setScalar(factor));
+
+    // keep the CSS2D name labels in sync too
     sceneObjects.stars.children.forEach(child => {
-      if (child instanceof CSS2DObject) {
-        child.scale.setScalar(factor);
-      }
+      if (child instanceof CSS2DObject) child.scale.setScalar(factor);
     });
   });
 
-// ← no star-size here; that slider lives inside initStars()
+  // ← no star-size here; that slider lives inside initStars()
 
   folderO.add(celestialSphere, 'visible').name('Celestial sphere')
   folderO.add(plane, 'visible').name('Ecliptic grid')
@@ -3145,7 +3161,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 function render(now) {
   requestAnimationFrame(render);
   //stats.begin();
-  stats.update();
+  //stats.update();
 
   // 1) Delta and FPS throttle
   const deltaMs = now - lastFrameTime;
@@ -3221,7 +3237,7 @@ function render(now) {
     posElapsed -= 0.1;
     updateElongations();
     updatePredictions();
-    //updateDomLabel(); Can be added later
+    updateDomLabel(); //Can be added later
   }
 
   // 8) Throttle lighting/glow (10 Hz)
@@ -3256,7 +3272,7 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
-function addWidthToggle(gui, sizes = [300, 440]) {
+function addWidthToggle(gui, sizes = [300, 550]) {
   let idx = 0;
 
   /* create the floating badge */
@@ -3560,23 +3576,92 @@ function loadTexture( url, onLoad ) {
 }
 
 function updateDomLabel() {
-  const label = document.getElementById('planetLabel');
+  /* 1 ── get / build the card (runs only once) ─────────────────────── */
+  let label = document.getElementById('planetLabel');
+  if (!label) { console.error('#planetLabel element missing'); return; }
 
-  if (o.lookAtObj.pivotObj) {
-    o.lookAtObj.pivotObj.updateMatrixWorld();
-    const worldPos = o.lookAtObj.pivotObj.getWorldPosition(new THREE.Vector3());
-    const screenPos = worldPos.clone().project(camera);
+  if (!label.dataset.init) {               // first time only
+    label.innerHTML = '';
 
-    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
-    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+    const closeBtn = document.createElement('span');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText =
+      'position:absolute;top:4px;right:6px;font-weight:bold;cursor:pointer;' +
+      'opacity:.65;user-select:none;pointer-events:auto;';
+    ['pointerdown','click'].forEach(evt =>
+      closeBtn.addEventListener(evt, e => {
+        e.stopPropagation();
+        earthLabelDismissed = true;        // remember until Earth is re-selected
+        label.style.display = 'none';
+      })
+    );
 
-    label.style.left = `${x}px`;
-    label.style.top = `${y}px`;
-    label.style.display = 'block';
-    label.textContent = o.lookAtObj.name || 'Unnamed';
-  } else {
-    label.style.display = 'none';
+    const content = document.createElement('div');
+    content.className = 'labelContent';
+
+    label.appendChild(closeBtn);
+    label.appendChild(content);
+    label.style.pointerEvents = 'auto';
+    label.dataset.init = '1';
   }
+
+  const content = label.querySelector('.labelContent');
+
+  /* 2 ── show card only for Earth & not dismissed ──────────────────── */
+  const isEarthSelected = !!(
+    o.lookAtObj?.name?.toLowerCase() === 'earth' &&
+    o.lookAtObj.pivotObj
+  );
+
+  if (!isEarthSelected) {
+    label.style.display = 'none';
+    earthLabelDismissed = false;           // reset when leaving Earth
+    return;
+  }
+  if (earthLabelDismissed) {               // user clicked ×
+    label.style.display = 'none';
+    return;
+  }
+
+  /* 3 ── build nextHTML (numbers formatted to 2 decimals) ──────────── */
+  const f = n => Number(n).toFixed(2);
+
+  const nextHTML = `
+    <strong>Earth</strong><br>
+    <span style="font-size:.8em;opacity:.8">
+      Day length (sec)&nbsp;•&nbsp;${o.lengthofDay}<br>
+      Solar year (days)&nbsp;•&nbsp;${o.lengthofsolarYear}<br>
+      Sidereal year (sec)&nbsp;•&nbsp;${o.lengthofsiderealYear}<br>
+      Axial precession (yrs)&nbsp;•&nbsp;${o.axialPrecession}<br>
+      Longitude perihelion (°)&nbsp;•&nbsp;${o.longitudePerihelion}<br>
+      Eccentricity (AU)&nbsp;•&nbsp;${o.eccentricityEarth}<br>
+      Obliquity (°)&nbsp;•&nbsp;${o.obliquityEarth}<br>
+      Inclination (°)&nbsp;•&nbsp;${o.inclinationEarth}
+    </span>
+  `;
+
+  /* 4 ── rewrite only when data changed ────────────────────────────── */
+  if (nextHTML !== earthLabelPrevHTML) {
+    content.innerHTML   = nextHTML;
+    earthLabelPrevHTML  = nextHTML;
+  }
+
+  /* 5 ── position & scale every frame (no DOM churn) ───────────────── */
+  const pivot = o.lookAtObj.pivotObj;
+  pivot.updateMatrixWorld();
+  const pos = pivot.getWorldPosition(new THREE.Vector3()).project(camera);
+
+  const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (-pos.y * 0.5 + 0.5) * window.innerHeight;
+
+  const raw   = baseCamDistance / camera.position.length();
+  const scale = Math.max(minScale,
+                 Math.min(maxScale, Math.pow(raw, zoomFactor)));
+
+  label.style.transform =
+    `translate(-50%,-50%) translate(${x}px,${y}px) scale(${scale})`;
+  label.style.transformOrigin = 'center';
+  label.style.display = 'block';
 }
 
 function updateSunGlow() {
@@ -4160,10 +4245,10 @@ function updatePredictions() {
   predictions.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
   predictions.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
   
-  predictions.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
-  predictions.obliquityEarth = computeObliquityEarth(o.currentYear);
-  predictions.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
-  predictions.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
+  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
+  predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
+  predictions.inclinationEarth = o.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
+  predictions.longitudePerihelion = o.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
   predictions.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
   //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
 

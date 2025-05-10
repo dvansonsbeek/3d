@@ -14,19 +14,16 @@
 <div id="footerleft" style="line-height:10px;"><a href="https://holisticuniverse.com" target="_blank">Interactive 3D Solar System Simulation of the Holistic Universe Model</a>
 </div>
 <div id="planetLabel" style="
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 4px 8px;
-  background: rgba(0,0,0,0.6);
-  color: white;
-  border-radius: 4px;
-  font-size: 13px;
-  pointer-events: none;
-  font-family: sans-serif;
-  display: none;
-  z-index: 1000;
-"></div>
-  <script type="module" src="./script.js"></script>
+  position:absolute; top:0; left:0;
+  padding:4px 8px 6px;
+  background:rgba(0,0,0,0.6);
+  color:#fff; border-radius:4px;
+  font:13px/1.25 sans-serif;
+  pointer-events:auto;          <!-- change was here -->
+  display:none; z-index:1000;">
+  <span class="closeBtn" style="pointer-events:auto;">×</span>
+  <div class="labelContent"></div>
+</div>
+<script type="module" src="./script.js"></script>
 </body>
 </html>

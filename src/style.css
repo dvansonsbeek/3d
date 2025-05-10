@@ -150,3 +150,31 @@ a:link {
   touch-action:manipulation;
   z-index:1000;                    /* above the canvas & GUI */
 }
+
+/* small, hover-aware × button */
+#planetLabel .closeBtn {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity .15s;
+  user-select: none;       /* stops accidental text selection */
+}
+
+#planetLabel{
+  position:absolute;           /* already there */
+  /* … all your other inline/stylesheet props … */
+  pointer-events:auto !important;   /* ← ensure clicks reach the label */
+}
+
+#planetLabel .closeBtn{
+  pointer-events:auto;         /* button itself is also clickable */
+  /* rest of the close-button CSS stays the same */
+}
+
+#planetLabel .closeBtn:hover { opacity: 1; }
+
+/* optional: subtle border around the card when hovered */
+#planetLabel:hover { box-shadow: 0 0 4px rgba(255,255,255,.25); }
