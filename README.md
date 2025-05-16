@@ -5,25 +5,25 @@ The Interactive 3D Solar System Simulation shows the precession / eccentricity /
 The way it is modelled:
 * The EARTH-WOBBLE-CENTER is the center of our solar system.
 * Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~23,535 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The HELION-POINT is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* The PERIHELION OF EARTH is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
 * Axial precession meets Inclination precession every 19,122 years.
-* Our Sun is orbiting the HELION-POINT in a period of 1 solar year.
+* Our Sun is orbiting the PERIHELION OF EARTH in a period of 1 solar year.
 * Therefore it shows as if the Sun is orbiting Earth.
 
 How you could also see it:
-* The HELION-POINT is the center of our solar system.
+* The PERIHELION OF EARTH is the center of our solar system.
 * Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~23,535 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The EARTH-WOBBLE-CENTER - and therefore Earth - is orbiting the HELION-POINT counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* The EARTH-WOBBLE-CENTER - and therefore Earth - is orbiting the PERIHELION OF EARTH counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
 * Axial precession meets Inclination precession every 19,122 years.
-* Our Sun is orbiting the HELION-POINT in a period of 1 solar year.
+* Our Sun is orbiting the PERIHELION OF EARTH in a period of 1 solar year.
 * Therefore it shows as if the Sun is orbiting Earth.
 
 What is actually happening:
 * The Sun is (still) the center of our solar system.
 * Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~23,535 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The HELION-POINT of Earth is orbiting the Sun counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* The PERIHELION OF EARTH of Earth is orbiting the Sun counter-clockwise in a period of 101,984 solar years, also known as Inclination precession and therefore the inclination tilt changes.
 * Axial precession meets Inclination precession every 19,122 years.
-* Earth is orbiting the HELION-POINT of Earth - close to the Sun - in a period of 1 solar year.
+* Earth is orbiting the PERIHELION OF EARTH of Earth - close to the Sun - in a period of 1 solar year.
 * Therefore it shows Earth is actually orbiting the Sun.
 * So we still live in a Heliocentric solar system
 
@@ -35,7 +35,7 @@ Additional explanation to understand the model:
 * There are only two counter movements around Earth working against each other in a ratio of 3:13 ; Inclination:Axial which explains all movements around Earth (precession, eccentricity, obliquity, inclination, etc)
 * The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is 13/16th of Axial precession: ~25,771*13/16 = ~20,939 years)
 * The Perihelion precession cycle of 19,122 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
-* The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the HELION-POINT and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
+* The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION OF EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
 * The difference between the sidereal day - stellar day leads to the difference solar year – sidereal year because the location of the EARTH-WOBBLE-CENTER is at a MEAN ratio of 1:366.2422341 compared to the Sun: 1 second movement is (mean) amplified ~366.2422341 times.
 
 For more details see https://holisticuniverse.com.
