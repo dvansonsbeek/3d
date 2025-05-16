@@ -67,8 +67,6 @@ const sSecond = sMinute/60;
 //*************************************************************
 const startingPoint = {
   name: "Starting Point",
-  size: 0.1,
-  color: 0x578B7C,
   startPos: 0,
   speed: 0,
   tilt: 0,
@@ -79,6 +77,8 @@ const startingPoint = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0x578B7C,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -90,19 +90,19 @@ const startingPoint = {
 
 const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
-  size: 0.011,
-  color: 0x333333,
   startPos: -112.791336670025,
   speed: 0,
   tilt: 0,
   rotationSpeed: -0.00026697458749521,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.011,
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/deathstar.png',
   visible: true,
   containerObj:"",
@@ -110,98 +110,93 @@ const earthWobbleCenter = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   //isDeferent: true,
+  traceOn: false,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
+  //isDeferent: true,
 };
 
 const midEccentricityOrbit = {
   name: "EARTH-MID-ECCENTRICITY-ORBIT",
-   size: 0.011,   
-   color: 0x0096FF,
-   startPos: -112.791336670025,
-   speed: 0.00026697458749521,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 1.404974,
-   orbitCentera: 0,
-   orbitCenterb: 0,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earth_mean_eccentricity.png',
-   traceLength : sYear * 1000000,
-   traceStep : sYear,
+  startPos: -112.791336670025,
+  speed: 0.00026697458749521,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 1.404974,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
   
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: true,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
+  size: 0.011,   
+  color: 0x0096FF,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earth_mean_eccentricity.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  traceOn: true,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
+  isDeferent: true,
 };
 
-const helionPointAlternative = {
-  name: "Helion Point (Alternative)",
-   size: 0.011,   
-   color: 0x333333,
-   startPos: -104.204722055415,
-   speed: 0.0000616095201912024,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 1.404974,
-   orbitCentera: 0,
-   orbitCenterb: 0,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
-   traceLength : sYear * 1000000,
-   traceStep : sYear,
+const perihelionPointAlternative = {
+  name: "Perihelion Earth (Alternative)",
+  startPos: -104.204722055415,
+  speed: 0.0000616095201912024,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 1.404974,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
   
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
+  size: 0.011,   
+  color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  traceOn: false,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
+  isDeferent: true,
 };
 
 const earth = {
   name: "Earth",
-  size: 0.0852703981708473,
-  // 10 times bigger than real 
-  color: 0x333333,
-  sphereSegments: 320,
   startPos: 0,    
   speed: -0.00026697458749521,
   rotationSpeed: 2301.16782401453,
   tilt: -23.4243449577,
-  tiltb: 0,
   orbitRadius: -0.27304333159777,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: 0,  
+  orbitTiltb: 0,
+  
+  size: 0.0852703981708473,
+  // 10 times bigger than real 
+  color: 0x333333,
+  sphereSegments: 320,
+  tiltb: 0,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
   visible: true,
   containerObj:"",
@@ -209,7 +204,6 @@ const earth = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-  
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
@@ -220,8 +214,6 @@ const earth = {
 
 const earthInclinationPrecession = {
   name: "Earth Inclination Precession",
-  size: 0.1,
-  color: 0xFEAA0D,
   startPos: 98.5866146146096,
   speed: 0.0000616095201912024,
   tilt: 0,
@@ -232,6 +224,8 @@ const earthInclinationPrecession = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -243,8 +237,6 @@ const earthInclinationPrecession = {
 
 const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
-  size: 0.1,
-  color: 0xFEAA0D,
   startPos: 164.311024357683,
   speed: 0.000102682533652004,
   tilt: 0,
@@ -255,6 +247,8 @@ const earthEclipticPrecession = {
   orbitTilta: 0,
   orbitTiltb: -0.58,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -266,8 +260,6 @@ const earthEclipticPrecession = {
 
 const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
-  size: 0.1,
-  color: 0xFEAA0D,
   startPos: 97.1023610277075,
   speed: -0.000164292053843206,
   tilt: 0,
@@ -278,6 +270,8 @@ const earthObliquityPrecession = {
   orbitTilta: 0,
   orbitTiltb: 0.58,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -289,8 +283,6 @@ const earthObliquityPrecession = {
 
 const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
-  size: 0.1,
-  color: 0xFEAA0D,
   startPos: -194.204722055415,
   speed: 0.000328584107686413,
   tilt: 0,
@@ -301,6 +293,8 @@ const earthPerihelionPrecession1 = {
   orbitTilta: -1.11,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -312,8 +306,6 @@ const earthPerihelionPrecession1 = {
 
 const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
-  size: 0.1,
-  color: 0xFEAA0D,
   startPos: 194.204722055415,
   speed: -0.000328584107686413,
   tilt: 0,
@@ -324,6 +316,8 @@ const earthPerihelionPrecession2 = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -333,10 +327,8 @@ const earthPerihelionPrecession2 = {
   isDeferent: true,
 };
 
-const barycenterSun = {
-  name: "Barycenter Sun",
-  size: 0.01,
-  color: 0xFFFF00,
+const barycenterEarthAndSun = {
+  name: "Barycenter Earth and Sun",
   startPos: 0,
   speed: 0,
   tilt: 0,
@@ -347,6 +339,8 @@ const barycenterSun = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.01,
+  color: 0xFFFF00,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -356,44 +350,39 @@ const barycenterSun = {
   isDeferent: true,
 };
 
-const earthHelionPoint = {
-   name: "HELION-POINT = LONGITUDE PERIHELION",
-   size: 0.011,   
-   color: 0xBF40BF,
-   startPos: 0,    
-   speed: 0,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-   orbitCentera: 0,
-   orbitCenterb: 0,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
-   traceLength : sYear * 1000000,
-   traceStep : sYear,
+const earthPerihelionFromEarth = {
+  name: "PERIHELION EARTH",
+  startPos: 0,    
+  speed: 0,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
   
-   visible: true,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: true,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   //isDeferent: true,
+  size: 0.011,   
+  color: 0xBF40BF,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
+  visible: true,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  traceOn: true,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
+  //isDeferent: true,
 };
 
 const sun = {
   name: "Sun",
-  size: 0.930951753186224,    
-  color: 0x333333,
   startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 83.9952982796623,
@@ -404,6 +393,9 @@ const sun = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.930951753186224,    
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg',
   textureTransparency: 9,
   visible: true,
@@ -413,7 +405,6 @@ const sun = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceLength : sYear * 1000000,
   traceStep : sYear*10,
   traceOn: false,
@@ -424,8 +415,6 @@ const sun = {
 
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
-  size: 0.001,
-  color: 0x8b8b8b,
   startPos: 340,
   speed: 0.709885428149756,
   tilt: 0,
@@ -436,6 +425,8 @@ const moonApsidalPrecession = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.001,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -447,8 +438,6 @@ const moonApsidalPrecession = {
 
 const moonApsidalNodalPrecession1 = {
   name: "Moon Apsidal Nodal Precession1",
-  size: 0.001,
-  color: 0x8b8b8b,
   startPos: -90,
   speed: -1.04769042735813,
   tilt: 0,
@@ -459,6 +448,8 @@ const moonApsidalNodalPrecession1 = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.001,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -470,8 +461,6 @@ const moonApsidalNodalPrecession1 = {
 
 const moonApsidalNodalPrecession2 = {
   name: "Moon Apsidal Nodal Precession2",
-  size: 0.001,
-  color: 0x8b8b8b,
   startPos: 90,
   speed: 1.04769042735813,
   tilt: 0,
@@ -482,6 +471,8 @@ const moonApsidalNodalPrecession2 = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.001,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -493,8 +484,6 @@ const moonApsidalNodalPrecession2 = {
 
 const moonRoyerCycle = {
   name: "Moon Royer Cycle",
-  size: 0.001,
-  color: 0xFFFF00,
   startPos: -44.1,
   speed: -0.372080428941402,
   tilt: 0,
@@ -505,6 +494,8 @@ const moonRoyerCycle = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.001,
+  color: 0xFFFF00,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -516,8 +507,6 @@ const moonRoyerCycle = {
 
 const moonNodalPrecession = {
   name: "Moon Nodal Precession",
-  size: 0.001,
-  color: 0x8b8b8b,
   startPos: 64.1,
   speed: -0.337804999208372,
   tilt: 0,
@@ -528,6 +517,8 @@ const moonNodalPrecession = {
   orbitTilta: Math.cos(((-90+180)*Math.PI)/180)*-5.1453964,
   orbitTiltb: Math.sin(((-90+180)*Math.PI)/180)*-5.1453964,
 
+  size: 0.001,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -539,9 +530,6 @@ const moonNodalPrecession = {
 
 const moon = {
   name: "Moon",
-  size: 0.0232276033326404,
-  //10 times bigger than real
-  color: 0x8b8b8b,
   startPos: 126.22,
   speed: 83.9952982796623,
   rotationSpeed: 0,
@@ -553,14 +541,16 @@ const moon = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.0232276033326404,
+  //10 times bigger than real
+  color: 0x8b8b8b,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
-  
+  axisHelper: false, 
   traceLength : sYear * 18,
   traceStep : sDay,
   traceOn: false,
@@ -569,77 +559,9 @@ const moon = {
   traceArrIndex : 0,
 };
 
-const mercurySunBarycenter0 = {
-   name: "BARYCENTER MERCURY",
-   size: 0.5,
-   color: 0x333333,
-   startPos: 0,    
-   speed: Math.PI*2,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-   orbitCentera: -11.2169591606661,
-   orbitCenterb: 0,
-   orbitCenterc: -0.6,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_barycenter.png',
-   traceLength : sYear * 1000000,
-   traceStep : sYear,
-  
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
-};
-
-const mercurySunBarycenter = {
-   name: "Barycenter Mercury-Sun",
-   size: 0.01,   
-   color: 0x333333,
-   startPos: 0,    
-   speed: 0,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 0,
-   orbitCentera: 100,
-   orbitCenterb: 0,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   traceLength : sYear * 90,
-   traceStep : sMonth,
-  
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
-};
-
-const mercuryBarycenter = {
-  name: "Mercury Barycenter Location",
-  size: 0.1,
-  color: 0x868485,
-  startPos: 0,
+const mercuryPerihelionFromEarth = {
+  name: "PERIHELION MERCURY AS SEEN FROM EARTH",
+  startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -649,20 +571,27 @@ const mercuryBarycenter = {
   orbitCenterc: -0.6,
   orbitTilta: 0,
   orbitTiltb: 0,
-
+  
+  size: 0.5,
+  color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_barycenter.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
+  traceOn: false,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
   isDeferent: true,
 };
 
-const mercuryEllipse = {
-  name: "Mercury Ellipse Factor",
-  size: 0.1,
-  color: 0x868485,
+const mercuryPerihelionFromSun = {
+  name: "Mercury Perihelion From Sun",
   startPos: 0,
   speed: -Math.PI*2,
   rotationSpeed: 0,
@@ -674,6 +603,8 @@ const mercuryEllipse = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0x868485,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -685,9 +616,6 @@ const mercuryEllipse = {
 
 const mercury = {
   name: "Mercury",
-  //size: 0.00326167744046522,
-  size: 1,
-  color: 0x868485,
   startPos: 211.54,
   speed: 26.0875244996281,
   rotationSpeed: 39.1312867494422,
@@ -699,6 +627,9 @@ const mercury = {
   orbitTilta: Math.cos(((-90-48.33167)*Math.PI)/180)*-7.00487,
   orbitTiltb: Math.sin(((-90-48.33167)*Math.PI)/180)*-7.00487,
 
+  //size: 0.00326167744046522,
+  size: 1,
+  color: 0x868485,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
   visible: true,
   containerObj:"",
@@ -706,7 +637,6 @@ const mercury = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceLength : sYear * 14,
   traceStep : sDay,
   traceOn: false,
@@ -715,32 +645,30 @@ const mercury = {
   traceArrIndex : 0,
 };
 
-const venusSunBarycenter0 = {
-  name: "BARYCENTER VENUS",
-  size: 0.011,   
-  color: 0x333333,
+const venusPerihelionFromEarth = {
+  name: "PERIHELION VENUS AS SEEN FROM EARTH",
   startPos: 0, 
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: -0.489934935944517,
   orbitCenterb: 0,
   orbitCenterc: -0.05,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.5,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_barycenter.png',
   traceLength : sYear * 1000000,
-  traceStep : sYear,
-  
+  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -748,65 +676,8 @@ const venusSunBarycenter0 = {
   isDeferent: true,
 };
 
-const venusSunBarycenter = {
-  name: "Barycenter Venus-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const venusBarycenter = {
-  name: "Venus Barycenter Location",
-  size: 0.1,
-  color: 0xA57C1B,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: -0.489934935944517,
-  orbitCenterb: 0,
-  orbitCenterc: -0.05,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const venusEllipse = {
-  name: "Venus Ellipse Factor",
-  size: 0.1,
-  color: 0xA57C1B,
+const venusPerihelionFromSun = {
+  name: "Venus Perihelion From Sun",
   startPos: 0,
   speed: -Math.PI*2,
   rotationSpeed: 0,
@@ -818,6 +689,8 @@ const venusEllipse = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  size: 0.1,
+  color: 0xA57C1B,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -829,9 +702,6 @@ const venusEllipse = {
 
 const venus = {
   name: "Venus",
-  //size: 0.00809075686937222,
-  size: 1,
-  color: 0xA57C1B,
   startPos: 352.635,
   speed: 10.2132976731898,
   rotationSpeed: -9.4430965247729,
@@ -842,9 +712,12 @@ const venus = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-76.68069)*Math.PI)/180)*-3.39471,
   orbitTiltb: Math.sin(((-90-76.68069)*Math.PI)/180)*-3.39471,
+  
+  //size: 0.00809075686937222,
+  size: 1,
+  color: 0xA57C1B,
   traceLength : sYear *16,
   traceStep : sWeek,
-
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
   visible: true,
   containerObj:"",
@@ -852,38 +725,36 @@ const venus = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-const marsSunBarycenter0 = {
-  name: "BARYCENTER MARS",
-  size: 0.5,   
-  color: 0x333333,
+const marsPerihelionFromEarth = {
+  name: "PERIHELION MARS AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 7.78722181048582,
+  orbitRadius: 0,
   orbitCentera: 8.83305630702754,
   orbitCenterb: -20.1708748079022,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.5,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
-  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -891,64 +762,8 @@ const marsSunBarycenter0 = {
   isDeferent: true,
 };
 
-const marsSunBarycenter = {
-  name: "Barycenter Mars-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const marsBarycenter = {
-  name: "Mars Barycenter Location",
-  size: 0.1,
-  color: 0x008000,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 8.83305630702754,
-  orbitCenterb: -20.1708748079022,
-  orbitCenterc: 0.7,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isDeferent: true,
-};  
-
-const marsEllipse = {
-  name: "Mars Ellipse Factor",
-  size: 0.1,
-  color: 0xFEAA0D,
+const marsPerihelionFromSun = {
+  name: "Mars Perihelion From Sun",
   startPos: 243.094,
   speed: 0.398326084542855,
   rotationSpeed: 0,
@@ -960,6 +775,8 @@ const marsEllipse = {
   orbitTilta: Math.cos(((-90-49.57854)*Math.PI)/180)*-1.85061,
   orbitTiltb: Math.sin(((-90-49.57854)*Math.PI)/180)*-1.85061,
 
+  size: 0.1,
+  color: 0xFEAA0D,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -970,9 +787,6 @@ const marsEllipse = {
 
 const mars = {
   name: "Mars",
-  //size: 0.00453148161022128,
-  size: 1,
-  color: 0xFF0000,
   startPos: 121.547,
   speed: -3.34075569586122,
   rotationSpeed: 2236.82429921882,
@@ -983,9 +797,12 @@ const mars = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  //size: 0.00453148161022128,
+  size: 1,
+  color: 0xFF0000,
   traceLength : sYear * 44,
   traceStep : sWeek, 
-
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
   visible: true,
   containerObj:"",
@@ -993,7 +810,6 @@ const mars = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1002,9 +818,6 @@ const mars = {
 
 const phobos = {
   name: "Phobos",
-  //size: 0.0000148397834115522,
-  size: 0.027272727,
-  color: 0x8b8b8b,
   startPos: 122,
   speed: 6986.5,
   rotationSpeed: 0,
@@ -1016,6 +829,9 @@ const phobos = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  //size: 0.0000148397834115522,
+  size: 0.027272727,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1026,9 +842,6 @@ const phobos = {
 
 const deimos = {
   name: "Deimos",
-  //size: 0.00000842257977412423,
-  size: 0.027272727,
-  color: 0x8b8b8b,
   startPos: 0,    
   speed: 1802,
   rotationSpeed: 0,
@@ -1040,6 +853,9 @@ const deimos = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
+  //size: 0.00000842257977412423,
+  size: 0.027272727,
+  color: 0x8b8b8b,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1048,32 +864,30 @@ const deimos = {
   isDeferent: true,
 };
 
-const jupiterSunBarycenter0 = {
-  name: "BARYCENTER JUPITER",
-  size: 0.5,   
-  color: 0x333333,
+const jupiterPerihelionFromEarth = {
+  name: "PERIHELION JUPITER AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: -14.8529260159503,
   orbitCenterb: -44.5901620064302,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.5,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
-  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1081,65 +895,8 @@ const jupiterSunBarycenter0 = {
   isDeferent: true,
 };
 
-const jupiterSunBarycenter = {
-  name: "Barycenter Jupiter-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const jupiterBarycenter = {
-  name: "Jupiter Barycenter Location",
-  size: 0.1,
-  color: 0xCDC2B2,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: -14.8529260159503,
-  orbitCenterb: -44.5901620064302,
-  orbitCenterc: 0.7,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const jupiterEllipse = {
-  name: "Jupiter Ellipse Factor",
-  size: 0.1,
-  color: 0xCDC2B2,
+const jupiterPerihelionFromSun = {
+  name: "Jupiter Perihelion From Sun",
   startPos: 41.205,    
   speed: -5.75326128750832,
   rotationSpeed: 0,
@@ -1151,6 +908,8 @@ const jupiterEllipse = {
   orbitTilta: Math.cos(((-90-100.55615)*Math.PI)/180)*-1.3053,
   orbitTiltb: Math.sin(((-90-100.55615)*Math.PI)/180)*-1.3053,
   
+  size: 0.1,
+  color: 0xCDC2B2,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1162,9 +921,6 @@ const jupiterEllipse = {
 
 const jupiter = {
   name: "Jupiter",
-  //size: 0.0934652340617141,   
-  size: 6,
-  color: 0xCDC2B2,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 5549.34320193203,
@@ -1175,9 +931,12 @@ const jupiter = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  traceLength : sYear * 24,
-  traceStep : sWeek,
   
+  //size: 0.0934652340617141,   
+  size: 6,
+  color: 0xCDC2B2,
+  traceLength : sYear * 24,
+  traceStep : sWeek,  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
   visible: true,
   containerObj:"",
@@ -1185,82 +944,15 @@ const jupiter = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-const saturnSunBarycenter0 = {
-  name: "BARYCENTER SATURN",
-  size: 0.5,   
-  color: 0x333333,
+const saturnPerihelionFromEarth = {
+  name: "PERIHELION SATURN AS SEEN FROM EARTH",
   startPos: 0,    
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
-  orbitCentera: -99.8674039040765,
-  orbitCenterb: 3.4559296989952,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_barycenter.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const saturnSunBarycenter = {
-  name: "Barycenter Saturn-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const saturnBarycenter = {
-  name: "Saturn Barycenter Location",
-  size: 0.1,
-  color: 0xA79662,
-  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1270,20 +962,27 @@ const saturnBarycenter = {
   orbitCenterc: 1.8,
   orbitTilta: 0,
   orbitTiltb: 0,
-
+  
+  size: 0.5,   
+  color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_barycenter.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear,  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
+  traceOn: false,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
   isDeferent: true,
 };
 
-const saturnEllipse = {
-  name: "Saturn Ellipse Factor",
-  size: 0.1,   
-  color: 0xA79662,
+const saturnPerihelionFromSun = {
+  name: "Saturn Perihelion From Sun",
   startPos: 34.355,    
   speed: -6.06960563718342,
   rotationSpeed: 0,
@@ -1295,6 +994,8 @@ const saturnEllipse = {
   orbitTilta: Math.cos(((-90-113.71504)*Math.PI)/180)*-2.48446,
   orbitTiltb: Math.sin(((-90-113.71504)*Math.PI)/180)*-2.48446,
 
+  size: 0.1,   
+  color: 0xA79662,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1306,9 +1007,6 @@ const saturnEllipse = {
 
 const saturn = {
   name: "Saturn",
-  //size: 0.0778513754613971,   
-  size: 5,
-  color: 0xA79662,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 5215.37251228578,
@@ -1319,9 +1017,12 @@ const saturn = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  //size: 0.0778513754613971,   
+  size: 5,
+  color: 0xA79662,
   traceLength : sYear * 60,
   traceStep : sWeek,
-
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
   ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-rings.png',
   ringSize: 10,
@@ -1331,39 +1032,36 @@ const saturn = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
 };
 
-const uranusSunBarycenter0 = {
-  name: "BARYCENTER URANUS",
-  size: 0.5,   
-  color: 0x333333,
+const uranusPerihelionFromEarth = {
+  name: "PERIHELION URANUS AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: -27.8688886566711,
   orbitCenterb: 175.24925683614,
   orbitCenterc: -1.9,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.5,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
-  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1371,65 +1069,8 @@ const uranusSunBarycenter0 = {
   isDeferent: true,
 };
 
-const uranusSunBarycenter = {
-  name: "Barycenter Uranus-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const uranusBarycenter = {
-  name: "Uranus Barycenter Location",
-  size: 0.1,
-  color: 0xD2F9FA,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: -27.8688886566711,
-  orbitCenterb: 175.24925683614,
-  orbitCenterc: -1.9,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const uranusEllipse = {
-  name: "Uranus Ellipse Factor",
-  size: 0.1,   
-  color: 0xD2F9FA,
+const uranusPerihelionFromSun = {
+  name: "Uranus Perihelion From Sun",
   startPos: 134.51,    
   speed: -6.2081449115867,
   rotationSpeed: 0,
@@ -1441,6 +1082,8 @@ const uranusEllipse = {
   orbitTilta: Math.cos(((-90-74.22988)*Math.PI)/180)*-0.76986,
   orbitTiltb: Math.sin(((-90-74.22988)*Math.PI)/180)*-0.76986,
 
+  size: 0.1,   
+  color: 0xD2F9FA,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1452,9 +1095,6 @@ const uranusEllipse = {
 
 const uranus = {
   name: "Uranus",
-  //size: 0.0339068997192601, 
-  size: 5,
-  color: 0xD2F9FA,
   startPos: 0,    
   speed: 0,
   rotationSpeed: -3194.74981995042,
@@ -1465,9 +1105,12 @@ const uranus = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  traceLength : sYear * 18,
-  traceStep : sWeek,
   
+  //size: 0.0339068997192601, 
+  size: 5,
+  color: 0xD2F9FA,
+  traceLength : sYear * 18,
+  traceStep : sWeek,  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
   visible: true,
   containerObj:"",
@@ -1481,32 +1124,30 @@ const uranus = {
   traceArrIndex : 0,
 };
 
-const neptuneSunBarycenter0 = {
-  name: "BARYCENTER NEPTUNE",
-  size: 0.5,   
-  color: 0x333333,
+const neptunePerihelionFromEarth = {
+  name: "PERIHELION NEPTUNE AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: -34.3277111737215,
   orbitCenterb: -34.3620585913588,
   orbitCenterc: 1.7,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.5,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
-  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1514,65 +1155,8 @@ const neptuneSunBarycenter0 = {
   isDeferent: true,
 };
 
-const neptuneSunBarycenter = {
-  name: "Barycenter Neptune-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const neptuneBarycenter = {
-  name: "Neptune Barycenter Location",
-  size: 0.1,
-  color: 0x5E93F1,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: -34.3277111737215,
-  orbitCenterb: -34.3620585913588,
-  orbitCenterc: 1.7,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const neptuneEllipse = {
-  name: "Neptune Ellipse Factor",
-  size: 0.1,   
-  color: 0x5E93F1,
+const neptunePerihelionFromSun = {
+  name: "Neptune Perihelion From Sun",
   startPos: 144.16,    
   speed: -6.2448231126072,
   rotationSpeed: 0,
@@ -1584,6 +1168,8 @@ const neptuneEllipse = {
   orbitTilta: Math.cos(((-90-131.72169)*Math.PI)/180)*-1.76917,
   orbitTiltb: Math.sin(((-90-131.72169)*Math.PI)/180)*-1.76917,
 
+  size: 0.1,   
+  color: 0x5E93F1,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1595,9 +1181,6 @@ const neptuneEllipse = {
 
 const neptune = {
   name: "Neptune",
-  //size: 0.0329175808251566,
-  size: 5,
-  color: 0x5E93F1,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 3418.56790376751,
@@ -1608,9 +1191,12 @@ const neptune = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  //size: 0.0329175808251566,
+  size: 5,
+  color: 0x5E93F1,
   traceLength : sYear * 18,
   traceStep : sWeek,
-  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
   visible: true,
   containerObj:"",
@@ -1618,7 +1204,6 @@ const neptune = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1630,32 +1215,30 @@ const neptune = {
 //  orbitSemiMajor: 100,
 //  orbitSemiMinor: 30,
 
-const plutoSunBarycenter0 = {
-  name: "BARYCENTER PLUTO",
-  size: 0.01,   
-  color: 0x333333,
+const plutoPerihelionFromEarth = {
+  name: "PERIHELION PLUTO AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: 1355.8371267405,
   orbitCenterb: 1400.74054002809,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.01,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_barycenter.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
-  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1663,65 +1246,8 @@ const plutoSunBarycenter0 = {
   isDeferent: true,
 };
 
-const plutoSunBarycenter = {
-  name: "Barycenter Pluto-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const plutoBarycenter = {
-  name: "Pluto Barycenter Location",
-  size: 5,
-  color: 0x5E93F1,
-  startPos: 0,
-  speed: Math.PI*2,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 1355.8371267405,
-  orbitCenterb: 1400.74054002809,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const plutoEllipse = {
-  name: "Pluto Ellipse Factor",
-  size: 0.1,   
-  color: 0x5E93F1,
+const plutoPerihelionFromSun = {
+  name: "Pluto Perihelion From Sun",
   startPos: 215,    
   speed: -6.25761735630024,
   rotationSpeed: 0,
@@ -1733,6 +1259,8 @@ const plutoEllipse = {
   orbitTilta: Math.cos(((-90-110.30347)*Math.PI)/180)*-17.14175,
   orbitTiltb: Math.sin(((-90-110.30347)*Math.PI)/180)*-17.14175,
 
+  size: 0.1,   
+  color: 0x5E93F1,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1744,9 +1272,6 @@ const plutoEllipse = {
 
 const pluto = {
   name: "Pluto",
-  //size: 0.00158865897549076,   
-  size: 5,
-  color: 0x5E93F1,
   startPos: 0,    
   speed: 0,
   rotationSpeed: 359.294297168521,
@@ -1757,9 +1282,12 @@ const pluto = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  traceLength : sYear * 18,
-  traceStep : sWeek,
   
+  //size: 0.00158865897549076,   
+  size: 5,
+  color: 0x5E93F1,
+  traceLength : sYear * 18,
+  traceStep : sWeek,  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
   visible: false,
   containerObj:"",
@@ -1767,7 +1295,6 @@ const pluto = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1775,32 +1302,30 @@ const pluto = {
   isDeferent: true,
 };
 
-const halleysSunBarycenter0 = {
-  name: "BARYCENTER HALLEYS",
-  size: 0.01,   
-  color: 0x333333,
+const halleysPerihelionFromEarth = {
+  name: "PERIHELION HALLEYS AS SEEN FROM EARTH",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.0000000000000000000000000001,
-  // Only to prevent the default orbit ring is shown if 0
+  orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 3425.26406009445,
   orbitCenterc: -479.375616078497,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  size: 0.01,   
+  color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_barycenter.png',
   traceLength : sYear * 1000000,
-  traceStep : sYear,
-  
+  traceStep : sYear,  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1808,64 +1333,8 @@ const halleysSunBarycenter0 = {
   isDeferent: true,
 };
 
-const halleysSunBarycenter = {
-  name: "Barycenter Halleys-Sun",
-  size: 0.01,   
-  color: 0x333333,
-  startPos: 0,    
-  speed: 0,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 100,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  traceLength : sYear * 90,
-  traceStep : sMonth,
-  
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
-const halleysBarycenter = {
-  name: "Halleys Barycenter Location",
-  size: 0.1,
-  color: 0xA57C1B,
-  startPos: 0,
-  speed: Math.PI*2,
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 3425.26406009445,
-  orbitCenterc: -479.375616078497,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  isDeferent: true,
-};
-
-const halleysEllipse = {
-  name: "Halleys Ellipse Factor",
-  size: 0.1,
-  color: 0xA57C1B,
+const halleysPerihelionFromSun = {
+  name: "Halleys Perihelion From Sun",
   startPos: 200,
   speed: -6.20009460094839,
   rotationSpeed: 0,
@@ -1877,6 +1346,8 @@ const halleysEllipse = {
   orbitTilta: Math.cos(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
   orbitTiltb: Math.sin(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
 
+  size: 0.1,
+  color: 0xA57C1B,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -1888,9 +1359,6 @@ const halleysEllipse = {
 
 const halleys = {
   name: "Halleys",
-  //size: 0.0000073530458345529,
-  size: 6,
-  color: 0x00FF00,
   startPos: 0,
   speed: 0,
   rotationSpeed: 1043.12937189584,
@@ -1903,9 +1371,12 @@ const halleys = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  //size: 0.0000073530458345529,
+  size: 6,
+  color: 0x00FF00,
   traceLength : sYear * 90,
   traceStep : sWeek,
-
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
   visible: false,
   containerObj:"",
@@ -1913,7 +1384,6 @@ const halleys = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -1921,77 +1391,11 @@ const halleys = {
   isDeferent: true,
 };
 
-const erosSunBarycenter0 = {
-   name: "BARYCENTER EROS",
-   size: 0.01,   
-   color: 0x333333,
-   startPos: 0,    
-   speed: Math.PI*2,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 17.0301972356361,
-   orbitCentera: -41.5066637049184,
-   orbitCenterb: 27.010766876461,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_barycenter.png',
-   traceLength : sYear * 1000000,
-   traceStep : sYear,
-  
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
-};
-
-const erosSunBarycenter = {
-   name: "Barycenter Eros-Sun",
-   size: 0.01,   
-   color: 0x333333,
-   startPos: 0,    
-   speed: 0,
-   rotationSpeed: 0,
-   tilt: 0,
-   orbitRadius: 0,
-   orbitCentera: 100,
-   orbitCenterb: 0,
-   orbitCenterc: 0,
-   orbitTilta: 0,
-   orbitTiltb: 0,
-   traceLength : sYear * 90,
-   traceStep : sMonth,
-  
-   visible: false,
-   containerObj:"",
-   orbitObj:"",
-   planetObj:"",
-   pivotObj:"",
-   axisHelper: false,
-
-   traceOn: false,
-
-   traceStartPos : 0,
-   traceCurrPos : 0,
-   traceArrIndex : 0,
-   isDeferent: true,
-};
-
-const erosBarycenter = {
-  name: "Eros Barycenter Location",
-  size: 0.1,
-  color: 0xA57C1B,
-  startPos: 0,
+const erosPerihelionFromEarth = {
+  name: "PERIHELION EROS AS SEEN FROM EARTH",
+  startPos: 0,    
   speed: Math.PI*2,
+  rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: -41.5066637049184,
@@ -1999,20 +1403,27 @@ const erosBarycenter = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-
+  
+  size: 0.01,   
+  color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_barycenter.png',
+  traceLength : sYear * 1000000,
+  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
+  traceOn: false,
+  traceStartPos : 0,
+  traceCurrPos : 0,
+  traceArrIndex : 0,
   isDeferent: true,
 };
 
-const erosEllipse = {
-  name: "Eros Ellipse Factor",
-  size: 0.1,
-  color: 0xA57C1B,
+const erosPerihelionFromSun = {
+  name: "Eros Perihelion From Sun",
   startPos: 114.6,
   speed: 0.852798978486624,
   tilt: 0,
@@ -2023,6 +1434,8 @@ const erosEllipse = {
   orbitTilta: Math.cos(((-90-304.4115786)*Math.PI)/180)*-10.82903287,
   orbitTiltb: Math.sin(((-90-304.4115786)*Math.PI)/180)*-10.82903287,
 
+  size: 0.1,
+  color: 0xA57C1B,
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -2034,9 +1447,6 @@ const erosEllipse = {
 
 const eros = {
   name: "Eros",
-  //size: 0.0000112568447139883,
-  size: 1,
-  color: 0xA57C1B,
   startPos: 57.3,
   speed: -3.56799275538197,
   rotationSpeed: 10451.0875434594,
@@ -2047,9 +1457,12 @@ const eros = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  
+  //size: 0.0000112568447139883,
+  size: 1,
+  color: 0xA57C1B,
   traceLength : sYear *16,
   traceStep : sWeek,
-
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
   visible: false,
   containerObj:"",
@@ -2057,7 +1470,6 @@ const eros = {
   planetObj:"",
   pivotObj:"",
   axisHelper: false,
-
   traceOn: false,
   traceStartPos : 0,
   traceCurrPos : 0,
@@ -2068,9 +1480,9 @@ const eros = {
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, helionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterSun, earthHelionPoint, mercurySunBarycenter0, mercurySunBarycenter, venusSunBarycenter0, venusSunBarycenter, marsSunBarycenter0, marsSunBarycenter, jupiterSunBarycenter0, jupiterSunBarycenter, saturnSunBarycenter0, saturnSunBarycenter, uranusSunBarycenter0, uranusSunBarycenter, neptuneSunBarycenter0, neptuneSunBarycenter, plutoSunBarycenter0, plutoSunBarycenter, halleysSunBarycenter0, halleysSunBarycenter, erosSunBarycenter0, erosSunBarycenter, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryBarycenter, mercuryEllipse, mercury, venusBarycenter, venusEllipse, venus, marsBarycenter, marsEllipse, mars, phobos, deimos, jupiterBarycenter, jupiterEllipse, jupiter, saturnBarycenter, saturnEllipse, saturn, uranusBarycenter, uranusEllipse, uranus, neptuneBarycenter, neptuneEllipse, neptune, plutoBarycenter, plutoEllipse, pluto, halleysBarycenter, halleysEllipse, halleys, erosBarycenter, erosEllipse, eros]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, perihelionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryPerihelionFromSun, mercury, venusPerihelionFromSun, venus, marsPerihelionFromSun, mars, phobos, deimos, jupiterPerihelionFromSun, jupiter, saturnPerihelionFromSun, saturn, uranusPerihelionFromSun, uranus, neptunePerihelionFromSun, neptune, plutoPerihelionFromSun, pluto, halleysPerihelionFromSun, halleys, erosPerihelionFromSun, eros]
 
-const tracePlanets = [earthHelionPoint, midEccentricityOrbit, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
+const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
 //*************************************************************
 // ADD ALL CALENDAR CONSTANTS
@@ -2187,6 +1599,15 @@ let o = {
   uranusElongation: 0.01,
   neptuneElongation: 0.01,
 
+  mercuryPerihelion: 0,
+  venusPerihelion: 0,
+  earthPerihelion: 0,
+  marsPerihelion: 0,
+  jupiterPerihelion: 0,
+  saturnPerihelion: 0,
+  uranusPerihelion: 0,
+  neptunePerihelion: 0,
+  
   Target: "",
   lookAtObj: {}
 };
@@ -2219,6 +1640,8 @@ let predictions = {
   obliquityEarth: 0,
   inclinationEarth: 0,
   longitudePerihelion: 0,
+  longitudePerihelionDatePer: 0,
+  longitudePerihelionDateAp: 0,
   lengthofAU: 0,
   anomalisticMercury: 0,
 };
@@ -2262,6 +1685,8 @@ document.body.appendChild(labelRenderer.domElement);
 // ----------------------------------------------------------
 ;(function(labelRenderer, baseCamDistance) {
   const projV    = new THREE.Vector3();
+  const worldV   = new THREE.Vector3();   // scratch for world pos
+  const camV     = new THREE.Vector3();   // scratch for camera‐space pos
   const dom      = labelRenderer.domElement;
   const zoomFactor = 0.5, minScale = 0.2, maxScale = 1.5;
 
@@ -2301,36 +1726,43 @@ document.body.appendChild(labelRenderer.domElement);
     const finalScale = Math.min(maxScale, Math.max(minScale, scaled));
     console.log('Computed label scale:', finalScale.toFixed(3));
 
-    // 5) Traverse and append *only* visible labels
-    let total = 0, flaggedVisible = 0, appended = 0;
+    // 5) Traverse and append only those labels that are both visible
+    //    and in front of the camera
+    let totalLabels   = 0;
+    let wantVisible   = 0;
+    let actuallyShown = 0;
+
     scene.traverse(obj => {
-      if (!(obj instanceof CSS2DObject)) return;
-      total++;
-      if (!obj.visible) return;    // skip invisible ones
+    if (!(obj instanceof CSS2DObject)) return;
+    totalLabels++;
 
-      flaggedVisible++;
+    // skip labels you’ve explicitly hidden
+    if (!obj.visible) return;
+    wantVisible++;
 
-      // project to screen
-      projV.setFromMatrixPosition(obj.matrixWorld).project(camera);
-      const x = (projV.x * 0.5 + 0.5) * w;
-      const y = (-projV.y * 0.5 + 0.5) * h;
-      const el = obj.element;
+    //  a) get its world‐position
+    worldV.setFromMatrixPosition(obj.matrixWorld);
+    //  b) transform into camera‐space
+    camV.copy(worldV).applyMatrix4(camera.matrixWorldInverse);
+    //  c) cull if it’s behind (camera looks down –Z in three.js)
+    if (camV.z > 0) return;
 
-      // position & show
-      el.style.transform = 
-        `translate(-50%,-50%) translate(${x}px,${y}px) scale(${finalScale})`;
-      el.style.display   = '';    // guarantee it’s not hidden via CSS
+    // project to NDC then to screen
+    projV.copy(worldV).project(camera);
+    const x = (projV.x * 0.5 + 0.5) * w;
+    const y = (-projV.y * 0.5 + 0.5) * h;
 
-      dom.appendChild(el);
-      appended++;
+    // position & show
+    const el = obj.element;
+    el.style.transform = 
+    `translate(-50%,-50%) translate(${x}px,${y}px) scale(${finalScale})`;
+    el.style.display   = '';
+
+    dom.appendChild(el);
+    actuallyShown++;
     });
 
-    // 6) Summary
-    console.log(`Totals → all:${total}, visible:${flaggedVisible}, appended:${appended}, domChildren:${dom.childElementCount}`);
-    if (flaggedVisible !== appended) {
-      console.error('⚠️ Mismatch: flaggedVisible(' + flaggedVisible + ') ≠ appended(' + appended + ')');
-    }
-    console.groupEnd();
+    console.log(`Labels — total: ${totalLabels}, wanted: ${wantVisible}, shown: ${actuallyShown}`);
   };
 })(labelRenderer, baseCamDistance);
 
@@ -2362,7 +1794,7 @@ planetObjects.forEach(obj => createPlanet(obj));
 
 //Now adding the order of all objects 
 startingPoint.pivotObj.add(earth.containerObj);
-startingPoint.pivotObj.add(helionPointAlternative.containerObj);
+startingPoint.pivotObj.add(perihelionPointAlternative.containerObj);
 
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
 earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
@@ -2370,24 +1802,18 @@ earthInclinationPrecession.pivotObj.add(earthEclipticPrecession.containerObj);
 earthEclipticPrecession.pivotObj.add(earthObliquityPrecession.containerObj);
 earthObliquityPrecession.pivotObj.add(earthPerihelionPrecession1.containerObj);
 earthPerihelionPrecession1.pivotObj.add(earthPerihelionPrecession2.containerObj);
-earthPerihelionPrecession2.pivotObj.add(barycenterSun.containerObj);
+earthPerihelionPrecession2.pivotObj.add(barycenterEarthAndSun.containerObj);
 
-barycenterSun.pivotObj.add(earthHelionPoint.containerObj);
-barycenterSun.pivotObj.add(mercurySunBarycenter0.containerObj);
-mercurySunBarycenter0.pivotObj.add(mercurySunBarycenter.containerObj);
-barycenterSun.pivotObj.add(venusSunBarycenter0.containerObj);
-venusSunBarycenter0.pivotObj.add(venusSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(marsSunBarycenter0.containerObj);
-marsSunBarycenter0.pivotObj.add(marsSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(jupiterSunBarycenter0.containerObj);
-jupiterSunBarycenter0.pivotObj.add(jupiterSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(saturnSunBarycenter0.containerObj);
-saturnSunBarycenter0.pivotObj.add(saturnSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(uranusSunBarycenter0.containerObj);
-uranusSunBarycenter0.pivotObj.add(uranusSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(neptuneSunBarycenter0.containerObj);
-neptuneSunBarycenter0.pivotObj.add(neptuneSunBarycenter.containerObj);
-barycenterSun.pivotObj.add(sun.containerObj);
+barycenterEarthAndSun.pivotObj.add(sun.containerObj);
+barycenterEarthAndSun.pivotObj.add(earthPerihelionFromEarth.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(venusPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(marsPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(saturnPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(uranusPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(neptunePerihelionFromEarth.containerObj);
 
 earth.pivotObj.add(moonApsidalPrecession.containerObj);
 moonApsidalPrecession.pivotObj.add(moonApsidalNodalPrecession1.containerObj);
@@ -2396,48 +1822,38 @@ moonApsidalNodalPrecession2.pivotObj.add(moonRoyerCycle.containerObj);
 moonRoyerCycle.pivotObj.add(moonNodalPrecession.containerObj);
 moonNodalPrecession.pivotObj.add(moon.containerObj);
 
-barycenterSun.pivotObj.add(mercuryBarycenter.containerObj);
-mercuryBarycenter.pivotObj.add(mercuryEllipse.containerObj);
-mercuryEllipse.pivotObj.add(mercury.containerObj);
+mercuryPerihelionFromEarth.pivotObj.add(mercuryPerihelionFromSun.containerObj);
+mercuryPerihelionFromSun.pivotObj.add(mercury.containerObj);
 
-barycenterSun.pivotObj.add(venusBarycenter.containerObj);
-venusBarycenter.pivotObj.add(venusEllipse.containerObj);
-venusEllipse.pivotObj.add(venus.containerObj);
+venusPerihelionFromEarth.pivotObj.add(venusPerihelionFromSun.containerObj);
+venusPerihelionFromSun.pivotObj.add(venus.containerObj);
 
-barycenterSun.pivotObj.add(marsBarycenter.containerObj);
-marsBarycenter.pivotObj.add(marsEllipse.containerObj);
-marsEllipse.pivotObj.add(mars.containerObj);
+marsPerihelionFromEarth.pivotObj.add(marsPerihelionFromSun.containerObj);
+marsPerihelionFromSun.pivotObj.add(mars.containerObj);
 
 mars.pivotObj.add(phobos.containerObj);
 mars.pivotObj.add(deimos.containerObj);
 
-barycenterSun.pivotObj.add(jupiterBarycenter.containerObj);
-jupiterBarycenter.pivotObj.add(jupiterEllipse.containerObj);
-jupiterEllipse.pivotObj.add(jupiter.containerObj);
+jupiterPerihelionFromEarth.pivotObj.add(jupiterPerihelionFromSun.containerObj);
+jupiterPerihelionFromSun.pivotObj.add(jupiter.containerObj);
 
-barycenterSun.pivotObj.add(saturnBarycenter.containerObj);
-saturnBarycenter.pivotObj.add(saturnEllipse.containerObj);
-saturnEllipse.pivotObj.add(saturn.containerObj);
+saturnPerihelionFromEarth.pivotObj.add(saturnPerihelionFromSun.containerObj);
+saturnPerihelionFromSun.pivotObj.add(saturn.containerObj);
 
-barycenterSun.pivotObj.add(uranusBarycenter.containerObj);
-uranusBarycenter.pivotObj.add(uranusEllipse.containerObj);
-uranusEllipse.pivotObj.add(uranus.containerObj);
+uranusPerihelionFromEarth.pivotObj.add(uranusPerihelionFromSun.containerObj);
+uranusPerihelionFromSun.pivotObj.add(uranus.containerObj);
 
-barycenterSun.pivotObj.add(neptuneBarycenter.containerObj);
-neptuneBarycenter.pivotObj.add(neptuneEllipse.containerObj);
-neptuneEllipse.pivotObj.add(neptune.containerObj);
+neptunePerihelionFromEarth.pivotObj.add(neptunePerihelionFromSun.containerObj);
+neptunePerihelionFromSun.pivotObj.add(neptune.containerObj);
 
-barycenterSun.pivotObj.add(plutoBarycenter.containerObj);
-plutoBarycenter.pivotObj.add(plutoEllipse.containerObj);
-plutoEllipse.pivotObj.add(pluto.containerObj);
+plutoPerihelionFromEarth.pivotObj.add(plutoPerihelionFromSun.containerObj);
+plutoPerihelionFromSun.pivotObj.add(pluto.containerObj);
 
-barycenterSun.pivotObj.add(halleysBarycenter.containerObj);
-halleysBarycenter.pivotObj.add(halleysEllipse.containerObj);
-halleysEllipse.pivotObj.add(halleys.containerObj);
+halleysPerihelionFromEarth.pivotObj.add(halleysPerihelionFromSun.containerObj);
+halleysPerihelionFromSun.pivotObj.add(halleys.containerObj);
 
-barycenterSun.pivotObj.add(erosBarycenter.containerObj);
-erosBarycenter.pivotObj.add(erosEllipse.containerObj);
-erosEllipse.pivotObj.add(eros.containerObj);
+erosPerihelionFromEarth.pivotObj.add(erosPerihelionFromSun.containerObj);
+erosPerihelionFromSun.pivotObj.add(eros.containerObj);
 
 earth.containerObj.rotation.y = Math.PI/2;
 //END CREATE AND CONFIGURE PLANETS
@@ -2837,8 +2253,15 @@ let updatePredictionElapsed = 0;
 let cameraMoved = true; // Force first update
 let eggTriggered = false;
 
-let earthLabelDismissed = false;
-let earthLabelPrevHTML = '';
+const DEG = Math.PI / 180;
+
+/* ------------------------------------------------------------------ */
+/*  Globals used by updateDomLabel()                                  */
+/* ------------------------------------------------------------------ */
+let labelDismissed = false;
+let prevPlanetName = '';
+let labelPrevHTML  = '';
+const niceName = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 // 1️⃣  put every “big-radius” object that must expand / shrink together in one array
 const scalableObjects = [
@@ -3046,6 +2469,16 @@ function setupGUI() {
   sub.open();
   });
   
+  let folderPerihelion = gui.addFolder('Perihelion Planets')
+  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mercury Perihelion")
+  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Venus Perihelion")
+  folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Earth Perihelion")
+  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mars Perihelion")
+  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Jupiter Perihelion")
+  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Saturn Perihelion")  
+  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Uranus Perihelion") 
+  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.001).listen().name("Neptune Perihelion")   
+  
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
   folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
@@ -3117,7 +2550,7 @@ function setupGUI() {
       });
     }
   })
-
+  
   let folderElongations=sFolder.addFolder("Elongations show/hide");
   folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
   folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
@@ -3236,6 +2669,7 @@ function render(now) {
   if (posElapsed >= 0.1) {
     posElapsed -= 0.1;
     updateElongations();
+    updatePerihelion();
     updatePredictions();
     updateDomLabel(); //Can be added later
   }
@@ -3576,25 +3010,213 @@ function loadTexture( url, onLoad ) {
 }
 
 function updateDomLabel() {
-  /* 1 ── get / build the card (runs only once) ─────────────────────── */
-  let label = document.getElementById('planetLabel');
+
+  /* 0 — per-frame stats, NOW they see the current o.* values  */
+  const planetStats = {
+    earth: {
+      'Size diameter (km)'                                : 12756.27,
+      'Day length (sec)'                                  : o.lengthofDay,
+      'Orbit Period Solar = Solar year (days)'            : o.lengthofsolarYear,
+      'Orbit Period Sidereal = Sidereal year (sec)'       : o.lengthofsiderealYear,
+      'Orbit distance = AU length (km)'                   : o.lengthofAU,
+      'Orbital speed around Sun (km/h)'                   : 107225.047767,
+      'Longitude of perihelion (°)'                       : o.longitudePerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : o.longitudePerihelionDatePer,
+      'Date of Aphelion (Y-M-D h:m:s)'                    : o.longitudePerihelionDateAp,
+      'Longitude of Ascending node (°)'                   : 0,
+      'Orbital Eccentricity (AU)'                         : o.eccentricityEarth,
+      'Obliquity (°)'                                     : o.obliquityEarth,
+      'Orbital Inclination (°)'                           : 0,
+      'Invariable plane inclination (°)'                  : o.inclinationEarth,
+      'Axial precession (with fixed 86400 sec/day) (yrs)' : o.axialPrecession,
+      'Inclination precession (with fixed 86400 sec/day) (yrs)' : o.inclinationPrecession,
+      'Perihelion precession (with fixed 86400 sec/day) (yrs)' : o.perihelionPrecession,
+      'Obliquity precession (with fixed 86400 sec/day) (yrs)' : o.obliquityPrecession,
+      'Ecliptic precession (with fixed 86400 sec/day) (yrs)' : o.eclipticPrecession,
+      'Axial precession (with Real LOD) (yrs)'            : o.axialPrecessionRealLOD,
+      'Inclination precession (with Real LOD) (yrs)'      : o.inclinationPrecessionRealLOD,
+      'Perihelion precession (with Real LOD) (yrs)'       : o.perihelionPrecessionRealLOD,
+      'Obliquity precession (with Real LOD) (yrs)'        : o.obliquityPrecessionRealLOD,
+      'Ecliptic precession (with Real LOD) (yrs)'        : o.eclipticPrecessionRealLOD,
+    },
+
+    moon: {
+      'Size diameter (km)'                          : 3474.8,
+      'Mean Sidereal month = rotation period (days)' : 27.3216713304409,
+      'Mean Synodic month (days)' : 29.5305911900755,
+      'Mean Anomalistic month (days)' : 27.554549068073,
+      'Mean Draconic month or nodal period (days)' : 27.2122311934005,
+      'Mean Tropical month (days)' : 27.321584489962,
+      'Mean Full Moon cycle ICRF (days)' : 411.7640695,
+      'Mean Full Moon cycle Ecliptic (days)' : 411.7837949,
+      'Mean Draconic year ICRF (days)' : 346.6074609,
+      'Mean Draconic year Ecliptic (days)' : 346.6214375,
+      'Mean Apsidal precession Ecliptic (days)' : 3231.53823,
+      'Mean Apsidal precession ICRF (days)' : 3232.753551, 
+      'Mean Nodal precession ICRF (days)' : 6793.518877,
+      'Mean Nodal precession Ecliptic (days)' : 6798.892188,
+      'Mean Nodal meets Apsidal precession every (days)' : 2190.422456,
+      'Mean Royer Cycle (days)' : 6167.711226,
+      'Mean Orbital Eccentricity (AU)'              : 0.054900489,
+      'Mean Orbital Inclination (°)'                : -5.1453964,
+    },
+    sun: {
+      'Size diameter (km)'                          : 1392684.00,
+      'Mean Synodic period with Earth (sec)'        : o.lengthofsiderealYear,
+      'Mean Axial tilt (°)'                         : 7.155,
+    },
+    mercury: {
+      'Size diameter (km)'                          : 4879.40,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.mercuryPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.mercuryPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.mercuryPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 48.33167,
+      'Mean Orbital Eccentricity (AU)'              : 0.20563069,
+      'Mean Orbital Inclination (°)'                : 7.00487,
+      'Mean Invariable plane inclination (°)'       : 6.3472858,
+      'Mean Axial tilt (°)'                         : 0.03,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    venus  : {
+      'Size diameter (km)'                          : 12103.60,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.venusPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.venusPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.venusPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 76.68069,
+      'Mean Orbital Eccentricity (AU)'              : 0.00677323,
+      'Mean Orbital Inclination (°)'                : 3.39471,
+      'Mean Invariable plane inclination (°)'       : 2.1545441,
+      'Mean Axial tilt (°)'                         : 2.6392,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    mars   : {
+      'Size diameter (km)'                          : 6779.00,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.marsPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.marsPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.marsPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 49.57854,
+      'Mean Orbital Eccentricity (AU)'              : 0.09341233,
+      'Mean Orbital Inclination (°)'                : 1.85061,
+      'Mean Invariable plane inclination (°)'       : 1.6311858,
+      'Mean Axial tilt (°)'                         : 25.19,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    jupiter: {
+      'Size diameter (km)'                          : 139822.00,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.jupiterPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.jupiterPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.jupiterPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 100.55615,
+      'Mean Orbital Eccentricity (AU)'              : 0.04839266,
+      'Mean Orbital Inclination (°)'                : 1.3053,
+      'Mean Invariable plane inclination (°)'       : 0.3219652,
+      'Mean Axial tilt (°)'                         : 3.13,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    saturn : {
+      'Size diameter (km)'                          : 116464.00,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.saturnPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.saturnPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.saturnPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 113.71504,
+      'Mean Orbital Eccentricity (AU)'              : 0.0541506,
+      'Mean Orbital Inclination (°)'                : 2.48446,
+      'Mean Invariable plane inclination (°)'       : 0.9254704,
+      'Mean Axial tilt (°)'                         : 26.73,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    uranus : {
+      'Size diameter (km)'                          : 50724.00,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.uranusPerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.uranusPerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.uranusPerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 74.22988,
+      'Mean Orbital Eccentricity (AU)'              : 0.04716771,
+      'Mean Orbital Inclination (°)'                : 0.76986,
+      'Mean Invariable plane inclination (°)'       : 0.9946692,
+      'Mean Axial tilt (°)'                         : 82.23,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+    neptune: {
+      'Size diameter (km)'                          : 49244.00,
+      'Mean Day length (hours) = rotation'          : o.meanDistanceMoon,
+      'Mean Orbit Period Solar (days)'              : o.orbitalPeriodMoon,
+      'Mean Orbit Period Solar (yrs)'               : o.orbitalPeriodMoon,
+      'Mean Orbit Period Sidereal (days)'           : o.meanDistanceMoon,
+      'Mean Orbit distance (km)'                    : o.orbitalPeriodMoon,
+      'Mean Orbital speed around Sun (km/h)'        : o.orbitalPeriodMoon,
+      'Mean Synodic period with Earth (days)'       : o.meanDistanceMoon,
+      'Mean Longitude of Perihelion (°)'            : o.neptunePerihelion,
+      'Date of Perihelion (Y-M-D h:m:s)'                  : longitudeToDateTime((o.neptunePerihelion-180), o.currentYear),
+      'Date of Aphelion (Y-M-D h:m:s)'                    : longitudeToDateTime(o.neptunePerihelion, o.currentYear),
+      'Mean Longitude of Ascending node (°)'        : 131.72169,
+      'Mean Orbital Eccentricity (AU)'              : 0.00858587,
+      'Mean Orbital Inclination (°)'                : 1.76917,
+      'Mean Invariable plane inclination (°)'       : 0.7354155,
+      'Mean Axial tilt (°)'                         : 28.32,
+      'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon,
+    },
+  };
+
+  /* 1 — build / fetch the DOM elements … (unchanged)  */
+  const label = document.getElementById('planetLabel');
   if (!label) { console.error('#planetLabel element missing'); return; }
 
-  if (!label.dataset.init) {               // first time only
+  if (!label.dataset.init) {
     label.innerHTML = '';
-
     const closeBtn = document.createElement('span');
     closeBtn.textContent = '×';
     closeBtn.style.cssText =
       'position:absolute;top:4px;right:6px;font-weight:bold;cursor:pointer;' +
       'opacity:.65;user-select:none;pointer-events:auto;';
-    ['pointerdown','click'].forEach(evt =>
-      closeBtn.addEventListener(evt, e => {
-        e.stopPropagation();
-        earthLabelDismissed = true;        // remember until Earth is re-selected
-        label.style.display = 'none';
-      })
-    );
+    closeBtn.addEventListener('pointerdown', e => e.stopPropagation());
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      labelDismissed = true;
+      label.style.display = 'none';
+    });
 
     const content = document.createElement('div');
     content.className = 'labelContent';
@@ -3604,50 +3226,59 @@ function updateDomLabel() {
     label.style.pointerEvents = 'auto';
     label.dataset.init = '1';
   }
-
   const content = label.querySelector('.labelContent');
 
-  /* 2 ── show card only for Earth & not dismissed ──────────────────── */
-  const isEarthSelected = !!(
-    o.lookAtObj?.name?.toLowerCase() === 'earth' &&
-    o.lookAtObj.pivotObj
-  );
+  /* 2 — should we show anything? … (unchanged)  */
+  const selObj   = o.lookAtObj;
+  const selName  = selObj?.name?.toLowerCase() || '';
+  const pivot    = selObj?.pivotObj;
 
-  if (!isEarthSelected) {
+  const showCard =
+    pivot &&
+    selName &&
+    selName !== 'unnamed' &&
+    planetStats[selName];
+
+  if (!showCard) {
     label.style.display = 'none';
-    earthLabelDismissed = false;           // reset when leaving Earth
+    labelDismissed   = false;
+    prevPlanetName   = '';
     return;
   }
-  if (earthLabelDismissed) {               // user clicked ×
+
+  if (selName !== prevPlanetName) {
+    labelDismissed = false;
+    prevPlanetName = selName;
+  }
+  if (labelDismissed) {
     label.style.display = 'none';
     return;
   }
 
-  /* 3 ── build nextHTML (numbers formatted to 2 decimals) ──────────── */
-  const f = n => Number(n).toFixed(2);
+  /* 3 — build the HTML with the *fresh* numbers  */
+  // NEW  (shows the full value, up to 8 decimals, no trailing zeroes)
+  const fmt = v => {
+  if (!isFinite(v)) return v;            // strings like 'N/A' pass through
+  return parseFloat(v.toFixed(8));       // 23.93447012 -> "23.93447012"
+  };
+  let nextHTML = `<strong>${niceName(selName)}</strong>`;
 
-  const nextHTML = `
-    <strong>Earth</strong><br>
-    <span style="font-size:.8em;opacity:.8">
-      Day length (sec)&nbsp;•&nbsp;${o.lengthofDay}<br>
-      Solar year (days)&nbsp;•&nbsp;${o.lengthofsolarYear}<br>
-      Sidereal year (sec)&nbsp;•&nbsp;${o.lengthofsiderealYear}<br>
-      Axial precession (yrs)&nbsp;•&nbsp;${o.axialPrecession}<br>
-      Longitude perihelion (°)&nbsp;•&nbsp;${o.longitudePerihelion}<br>
-      Eccentricity (AU)&nbsp;•&nbsp;${o.eccentricityEarth}<br>
-      Obliquity (°)&nbsp;•&nbsp;${o.obliquityEarth}<br>
-      Inclination (°)&nbsp;•&nbsp;${o.inclinationEarth}
-    </span>
-  `;
+  for (const [labelTxt, val] of Object.entries(planetStats[selName])) {
+  nextHTML += `
+    <div class="pl-row">
+      <span class="pl-key">${labelTxt}</span>
+      <span class="pl-val">${fmt(val)}</span>
+    </div>`;
+  } 
+  
+  nextHTML += '</span>';
 
-  /* 4 ── rewrite only when data changed ────────────────────────────── */
-  if (nextHTML !== earthLabelPrevHTML) {
-    content.innerHTML   = nextHTML;
-    earthLabelPrevHTML  = nextHTML;
+  if (nextHTML !== labelPrevHTML) {
+    content.innerHTML = nextHTML;
+    labelPrevHTML     = nextHTML;
   }
 
-  /* 5 ── position & scale every frame (no DOM churn) ───────────────── */
-  const pivot = o.lookAtObj.pivotObj;
+  /* 4 — position & scale … (unchanged)  */
   pivot.updateMatrixWorld();
   const pos = pivot.getWorldPosition(new THREE.Vector3()).project(camera);
 
@@ -4170,6 +3801,60 @@ function timeToPos(value) {
   return pos-= sHour*12 //Set the clock to tweleve for pos 0
 }
 
+/**
+ * Computes the apparent RA of pdB as seen from pdA (in the ecliptic plane),
+ * then returns the 180°–opposite of that angle.
+ *
+ * @param {object} pdA  – planet‐data with .name, .raDisplay (HHhMMmSSs) & .distKm
+ * @param {object} pdB  – another planet‐data object
+ * @returns {number} opposite apparent RA in [0,360)
+ */
+function apparentRaFromPdA(pdA, pdB) {
+  // 1) RA strings → degrees
+  const RA1 = raToDeg(pdA.raDisplay);
+  const RA2 = raToDeg(pdB.raDisplay);
+
+  // 2) distances
+  const r1 = parseFloat(pdA.distKm);
+  const r2 = parseFloat(pdB.distKm);
+
+  // 3) positions in XZ plane
+  const x1 = r1 * Math.cos(RA1 * Math.PI/180);
+  const z1 = r1 * Math.sin(RA1 * Math.PI/180);
+  const x2 = r2 * Math.cos(RA2 * Math.PI/180);
+  const z2 = r2 * Math.sin(RA2 * Math.PI/180);
+
+  // 4) vector from pdA → pdB
+  const dx = x2 - x1;
+  const dz = z2 - z1;
+
+  // 5) apparent RA (0° = +X, CCW)
+  let apar = Math.atan2(dz, dx) * 180/Math.PI;
+  apar = (apar + 360) % 360;
+
+  // 6) opposite angle
+  const opposite = (apar + 180) % 360;
+
+  // 7) final log
+  //console.log(
+  //  `${pdB.name} from ${pdA.name} → apparent RA: ${apar.toFixed(4)}°, `,
+  //  ` opposite RA: ${opposite.toFixed(4)}°`
+  //);
+
+  return opposite;
+}
+
+function updatePerihelion() {
+  o["mercuryPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth);
+  o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth);
+  o["earthPerihelion"] = o.longitudePerihelion;
+  o["marsPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, marsPerihelionFromEarth);
+  o["jupiterPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, jupiterPerihelionFromEarth);
+  o["saturnPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, saturnPerihelionFromEarth);
+  o["uranusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, uranusPerihelionFromEarth);
+  o["neptunePerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, neptunePerihelionFromEarth);
+};
+
 //Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
 function getElongationFromSun(targetPlanet) {
   let sunPosition = new THREE.Vector3();
@@ -4228,9 +3913,9 @@ function updatePredictions() {
   
   predictions.perihelionPrecession = o.perihelionPrecession = o.axialPrecession*13/16;
   predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYear, o.lengthofsolarYear);
-  predictions.inclinationPrecession = o.axialPrecession*13/3;
-  predictions.obliquityPrecession = o.axialPrecession*13/8;
-  predictions.eclipticPrecession = o.axialPrecession*13/5;
+  predictions.inclinationPrecession = o.inclinationPrecession = o.axialPrecession*13/3;
+  predictions.obliquityPrecession = o.obliquityPrecession = o.axialPrecession*13/8;
+  predictions.eclipticPrecession = o.eclipticPrecession = o.axialPrecession*13/5;
   
   predictions.lengthofsiderealDayRealLOD = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYear+1);
   //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
@@ -4241,15 +3926,19 @@ function updatePredictions() {
   
   predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.axialPrecessionRealLOD*13/16;
   predictions.computeAxialPrecessionRealLOD = o.axialPrecessionRealLOD = computeAxialPrecessionRealLOD(o.lengthofsiderealYear, o.lengthofsolarYear, o.lengthofDay);
-  predictions.inclinationPrecessionRealLOD = o.axialPrecessionRealLOD*13/3;
-  predictions.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
-  predictions.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
+  predictions.inclinationPrecessionRealLOD = o.inclinationPrecessionRealLOD = o.axialPrecessionRealLOD*13/3;
+  predictions.obliquityPrecessionRealLOD = o.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
+  predictions.eclipticPrecessionRealLOD =o.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
   
   predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
   predictions.inclinationEarth = o.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
   predictions.longitudePerihelion = o.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
-  predictions.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
+  
+  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((o.longitudePerihelion-180), o.currentYear)
+  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(o.longitudePerihelion, o.currentYear)
+  
+  predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
   //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
 
 }
@@ -5077,6 +4766,81 @@ function colorTemperature2rgb(kelvin) {
   return new THREE.Color(red / 255, green / 255, blue / 255);
 }
 
+/* -----------------------------------------------------------------
+   Ecliptic longitude ➜ calendar date *with time*  (±1 s accuracy)
+   – uses your own dateTimeToJulianDay() + dayToDateNew()
+   – valid for roughly 4000 BC … 4000 AD
+------------------------------------------------------------------ */
+
+/* Meeus – Sun’s true longitude  ---------------------------------- */
+function solarLongitudeDeg(JD){
+  const T  = (JD - 2451545.0) / 36525;
+  const L0 = 280.46646 + 36000.76983*T + 0.0003032*T*T;
+  const M  = 357.52911 + 35999.05029*T - 0.0001537*T*T;
+  const C  = (1.914602 - 0.004817*T - 0.000014*T*T)*Math.sin(M*DEG) +
+             (0.019993 - 0.000101*T)*Math.sin(2*M*DEG) +
+              0.000289*Math.sin(3*M*DEG);
+  return (L0 + C) % 360;
+}
+
+/**
+ * Convert an ecliptic longitude to an exact civil date-time.
+ *
+ * @param {number} lonDeg        – true solar longitude (deg, any real number)
+ * @param {number} [currentYear] – civil year; may be fractional (e.g. 2025.37)
+ *                                 If omitted or non-finite, the function
+ *                                 uses Math.floor(o.currentYear) when that
+ *                                 is finite, otherwise the computer’s UTC year.
+ * @returns {string}  "YYYY-MM-DD hh:mm:ss"
+ */
+function longitudeToDateTime(lonDeg, currentYear) {
+
+  /* 1 — validate & normalise longitude --------------------------------- */
+  lonDeg = Number(lonDeg);
+  if (!Number.isFinite(lonDeg)) {
+    throw new TypeError(
+      `longitudeToDateTime: first argument must be a finite number, got ${lonDeg}`
+    );
+  }
+  lonDeg = ((lonDeg % 360) + 360) % 360;      // wrap −∞…∞ → 0–360
+
+  /* 2 — decide which civil year to use --------------------------------- */
+  let yr = Number.isFinite(currentYear)
+           ? Math.floor(currentYear)
+           : (Number.isFinite(o.currentYear)
+                ? Math.floor(o.currentYear)
+                : new Date().getUTCFullYear());
+
+  /* 3 — crude day-of-year guess (linear anchors) ----------------------- */
+  const anchorLon = [  0,  90, 180, 270, 360];
+  const anchorDOY = [ 79, 172, 266, 355, 444];   // mean dates in non-leap year
+  let i = 0;
+  while (lonDeg >= anchorLon[i + 1]) i++;
+  const f   = (lonDeg - anchorLon[i]) / 90;
+  const doy = anchorDOY[i] + f * (anchorDOY[i + 1] - anchorDOY[i]);
+
+  /* 4 — JD at 00:00 UTC, 1 Jan of chosen year -------------------------- */
+  let JD = dateTimeToJulianDay(`${yr}-01-01`, '00:00:00') + doy;
+
+  /* 5 — Newton iterations to refine JD to the exact longitude ---------- */
+  const dλdT = 0.98564736;                     // mean solar motion °/day
+  for (let k = 0; k < 8; k++) {
+    const λ    = solarLongitudeDeg(JD);
+    const diff = ((λ - lonDeg + 540) % 360) - 180;   // signed −180…+180
+    if (Math.abs(diff) < 1e-8) break;                // ~0.00001 °
+    JD -= diff / dλdT;
+  }
+
+  /* 6 — JD → calendar date-time via your helper ------------------------ */
+  const { date, time } = dayToDateNew(
+    JD,
+    'julianday',
+    'julian-gregorian-calendar'
+  );
+
+  return `${date} ${time}`;
+}
+
 /**
  * Check whether a given day (JD or Perihelion-day) falls on a
  * Perihelion-calendar “cycle” date: Year % cycleYears === 0, Month=1, Day=1.
@@ -5291,6 +5055,19 @@ function radiansToDec(rad) {
 function radiansToDecDecimal(rad) {
   rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
   return (rad * 180 / Math.PI).toFixed(4);
+}
+
+/**
+ * Convert an RA string "HHhMMmSSs" → degrees.
+ */
+function raToDeg(raStr) {
+  const m = raStr.match(/(\d+)h(\d+)m([\d.]+)s/);
+  if (!m) {
+    console.warn('raToDeg: couldn’t parse RA string:', raStr);
+    return NaN;
+  }
+  const [ , h, min, sec ] = m.map(Number);
+  return (h + min/60 + sec/3600) * 15;
 }
 
 // === Utilities ===

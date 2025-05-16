@@ -178,3 +178,20 @@ a:link {
 
 /* optional: subtle border around the card when hovered */
 #planetLabel:hover { box-shadow: 0 0 4px rgba(255,255,255,.25); }
+
+#planetLabel .pl-row{
+  display:flex;              /* 1 row, 2 columns                  */
+  justify-content:space-between;
+  gap:8px;                   /* little breathing room             */
+  font-size:.8em;
+  opacity:.8;
+  white-space:nowrap;        /* keep each row on a single line    */
+}
+
+#planetLabel .pl-key{        /* left column (label)               */
+  flex:1 1 auto;             /* takes remaining width, left-aligned*/
+}
+
+#planetLabel .pl-val{        /* right column (value)              */
+  text-align:right;          /* ← HERE is the right-alignment     */
+}
