@@ -1733,7 +1733,7 @@ const eros = {
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, perihelionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterEarthAndSun, barycenterPLANETS, mercurybarycenterPLANETS, venusbarycenterPLANETS, marsbarycenterPLANETS, jupiterbarycenterPLANETS, saturnbarycenterPLANETS, uranusbarycenterPLANETS, neptunebarycenterPLANETS, plutobarycenterPLANETS, halleysbarycenterPLANETS, erosbarycenterPLANETS, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryPerihelionFromSun, mercury, venusPerihelionFromSun, venus, marsPerihelionFromSun, mars, phobos, deimos, jupiterPerihelionFromSun, jupiter, saturnPerihelionFromSun, saturn, uranusPerihelionFromSun, uranus, neptunePerihelionFromSun, neptune, plutoPerihelionFromSun, pluto, halleysPerihelionFromSun, halleys, erosPerihelionFromSun, eros]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, barycenterPLANETS, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, phobos, deimos, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros, perihelionPointAlternative]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
@@ -4072,34 +4072,52 @@ function timeToPos(value) {
  * Computes the apparent RA of pdB as seen from pdA (in the ecliptic plane),
  * then returns the 180°–opposite of that angle.
  *
- * @param {object} pdA  – planet‐data with .name, .raDisplay (HHhMMmSSs) & .distKm
- * @param {object} pdB  – another planet‐data object
+ * @param {object} pdA – planet‐data with .name, .raDisplay (HHhMMmSSs) & .distKm
+ * @param {object} pdB – another planet‐data object
  * @returns {number} opposite apparent RA in [0,360)
+ * @throws  TypeError / RangeError on invalid input
  */
 function apparentRaFromPdA(pdA, pdB) {
-  // 1) RA strings → degrees
+  /* ---- 1  RA strings → degrees -------------------------------------- */
   const RA1 = raToDeg(pdA.raDisplay);
   const RA2 = raToDeg(pdB.raDisplay);
 
-  // 2) distances
-  const r1 = parseFloat(pdA.distKm);
-  const r2 = parseFloat(pdB.distKm);
+  /* ---- 2  distances -------------------------------------------------- */
+  const r1 = Number(pdA.distKm);
+  const r2 = Number(pdB.distKm);
 
-  // 3) positions in XZ plane
-  const x1 = r1 * Math.cos(RA1 * Math.PI/180);
-  const z1 = r1 * Math.sin(RA1 * Math.PI/180);
-  const x2 = r2 * Math.cos(RA2 * Math.PI/180);
-  const z2 = r2 * Math.sin(RA2 * Math.PI/180);
+  if (!Number.isFinite(r1) || r1 < 0) {
+    throw new TypeError(`distKm for ${pdA.name} is invalid: ${pdA.distKm}`);
+  }
+  if (!Number.isFinite(r2) || r2 < 0) {
+    throw new TypeError(`distKm for ${pdB.name} is invalid: ${pdB.distKm}`);
+  }
 
-  // 4) vector from pdA → pdB
+  /* ---- 3  positions in XZ plane ------------------------------------- */
+  const DEG2RAD = Math.PI / 180;
+
+  const x1 = r1 * Math.cos(RA1 * DEG2RAD);
+  const z1 = r1 * Math.sin(RA1 * DEG2RAD);
+  const x2 = r2 * Math.cos(RA2 * DEG2RAD);
+  const z2 = r2 * Math.sin(RA2 * DEG2RAD);
+
+  /* ---- 4  vector from pdA → pdB ------------------------------------- */
   const dx = x2 - x1;
   const dz = z2 - z1;
 
-  // 5) apparent RA (0° = +X, CCW)
-  let apar = Math.atan2(dz, dx) * 180/Math.PI;
+  // If the two bodies project to the same ecliptic coordinates,
+  // the apparent direction is undefined.
+  if (dx === 0 && dz === 0) {
+    throw new RangeError(
+      `${pdA.name} and ${pdB.name} share identical ecliptic coords`
+    );
+  }
+
+  /* ---- 5  apparent RA (0° = +X, CCW) -------------------------------- */
+  let apar = Math.atan2(dz, dx) / DEG2RAD; // convert rad→deg
   apar = (apar + 360) % 360;
 
-  // 6) opposite angle
+  /* ---- 6  opposite angle -------------------------------------------- */
   const opposite = (apar + 180) % 360;
 
   // 7) final log
@@ -4107,7 +4125,8 @@ function apparentRaFromPdA(pdA, pdB) {
   //  `${pdB.name} from ${pdA.name} → apparent RA: ${apar.toFixed(4)}°, `,
   //  ` opposite RA: ${opposite.toFixed(4)}°`
   //);
-
+  
+  /* ---- 7  final return ---------------------------------------------- */
   return opposite;
 }
 
@@ -5325,16 +5344,74 @@ function radiansToDecDecimal(rad) {
 }
 
 /**
- * Convert an RA string "HHhMMmSSs" → degrees.
+ * raToDeg                                           v2 · MIT
+ * ---------------------------------------------------------
+ * Convert Right Ascension → ecliptic longitude (degrees)
+ *
+ * Accepts …
+ *   •  "12h34m56.7s"
+ *   •  "12:34:56.7"
+ *   •  "12 34 56.7"
+ *   •  "12.5824h"           (decimal hours)
+ *   •  12.5824             ← number ⇒ decimal hours
+ *   •  "189.785°" / "189.785 deg"
+ *   •  189.785              ← number ≥ 24 ⇒ degrees
+ *
+ * Throws TypeError on anything it can’t parse.
+ * Always returns a finite number 0 ≤ λ < 360
  */
-function raToDeg(raStr) {
-  const m = raStr.match(/(\d+)h(\d+)m([\d.]+)s/);
-  if (!m) {
-    console.warn('raToDeg: couldn’t parse RA string:', raStr);
-    return NaN;
+function raToDeg(ra) {
+  /* 0 — blank & NaN guards -------------------------------------------- */
+  if (ra == null || (typeof ra === 'string' && !ra.trim())) {
+    throw new TypeError('raToDeg: value is blank or nullish');
   }
-  const [ , h, min, sec ] = m.map(Number);
-  return (h + min/60 + sec/3600) * 15;
+
+  /* 1 — purely numeric input ------------------------------------------ */
+  if (typeof ra === 'number') {
+    if (!Number.isFinite(ra)) {
+      throw new TypeError(`raToDeg: number is not finite: ${ra}`);
+    }
+    return ((ra < 24 ? ra * 15 : ra) % 360 + 360) % 360;
+  }
+
+  /* 2 — normalise string ---------------------------------------------- */
+  const s = ra.trim().toLowerCase();
+
+  /* 2a — explicit degree string (“deg” or “°”) ------------------------ */
+  if (/[°d]/.test(s)) {
+    const deg = parseFloat(s.replace(/[^\d.+-eE]/g, ''));
+    if (!Number.isFinite(deg)) {
+      throw new TypeError(`raToDeg: cannot parse degree string: "${ra}"`);
+    }
+    return ((deg % 360) + 360) % 360;
+  }
+
+  /* 2b — split into [h, m, s] ----------------------------------------- */
+  // replace h / m / s / : by spaces, collapse 2+ spaces, split
+  const parts = s
+    .replace(/[hms]/g, ' ')
+    .replace(/:/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(Number);
+
+  if (parts.some(n => !Number.isFinite(n))) {
+    throw new TypeError(`raToDeg: cannot parse RA string: "${ra}"`);
+  }
+
+  const [h, m = 0, sec = 0] = parts;
+
+  /* Accept decimal-hour forms like "12.345" or "12.345h" -------------- */
+  if (parts.length === 1) {
+    return ((h * 15) % 360 + 360) % 360;
+  }
+
+  /* Standard HH MM SS[.sss] form -------------------------------------- */
+  if (h < 0 || h >= 24 || m < 0 || m >= 60 || sec < 0 || sec >= 60) {
+    throw new RangeError(`raToDeg: out-of-range H M S values: "${ra}"`);
+  }
+
+  return (((h + m / 60 + sec / 3600) * 15) % 360 + 360) % 360;
 }
 
 // === Utilities ===
