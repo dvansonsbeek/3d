@@ -381,6 +381,29 @@ const earthPerihelionFromEarth = {
   //isDeferent: true,
 };
 
+const barycenterPLANETS = {
+  name: "Barycenter Planets",
+  startPos: 0,
+  speed: 0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const sun = {
   name: "Sun",
   startPos: 0,
@@ -566,8 +589,8 @@ const mercuryPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -11.2169591606661,
-  orbitCenterb: 0,
+  orbitCentera: -10.8014576143799,
+  orbitCenterb: -2.1341527671719,
   orbitCenterc: -0.6,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -587,6 +610,29 @@ const mercuryPerihelionFromEarth = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
+  isDeferent: true,
+};
+
+const mercurybarycenterPLANETS = {
+  name: "Barycenter Mercury Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
   isDeferent: true,
 };
 
@@ -616,16 +662,16 @@ const mercuryPerihelionFromSun = {
 
 const mercury = {
   name: "Mercury",
-  startPos: 211.54,
-  speed: 26.0875244996281,
-  rotationSpeed: 39.1312867494422,
+  startPos: 207.38,
+  speed: 26.0879352297627,
+  rotationSpeed: 39.1319028446441,
   tilt: -0.03,
-  orbitRadius: 38.7107274186104,
+  orbitRadius: 38.710321108085,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-48.33167)*Math.PI)/180)*-7.00487,
-  orbitTiltb: Math.sin(((-90-48.33167)*Math.PI)/180)*-7.00487,
+  orbitTilta: Math.cos(((-90-48.336479)*Math.PI)/180)*-7.004995,
+  orbitTiltb: Math.sin(((-90-48.336479)*Math.PI)/180)*-7.004995,
 
   //size: 0.00326167744046522,
   size: 1,
@@ -652,8 +698,8 @@ const venusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -0.489934935944517,
-  orbitCenterb: 0,
+  orbitCentera: -0.382449363636126,
+  orbitCenterb: 0.306074425233886,
   orbitCenterc: -0.05,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -673,6 +719,29 @@ const venusPerihelionFromEarth = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
+  isDeferent: true,
+};
+
+const venusbarycenterPLANETS = {
+  name: "Barycenter Venus Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
   isDeferent: true,
 };
 
@@ -702,7 +771,7 @@ const venusPerihelionFromSun = {
 
 const venus = {
   name: "Venus",
-  startPos: 352.635,
+  startPos: 352.39,
   speed: 10.2132976731898,
   rotationSpeed: -9.4430965247729,
   tilt: -2.6392,
@@ -710,8 +779,8 @@ const venus = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-76.68069)*Math.PI)/180)*-3.39471,
-  orbitTiltb: Math.sin(((-90-76.68069)*Math.PI)/180)*-3.39471,
+  orbitTilta: Math.cos(((-90-75.684163)*Math.PI)/180)*-3.394667,
+  orbitTiltb: Math.sin(((-90-75.684163)*Math.PI)/180)*-3.394667,
   
   //size: 0.00809075686937222,
   size: 1,
@@ -738,8 +807,8 @@ const marsPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 8.83305630702754,
-  orbitCenterb: -20.1708748079022,
+  orbitCentera: 9.89120219232138,
+  orbitCenterb: -19.6399043407965,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -762,18 +831,41 @@ const marsPerihelionFromEarth = {
   isDeferent: true,
 };
 
+const marsbarycenterPLANETS = {
+  name: "Barycenter Mars Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const marsPerihelionFromSun = {
   name: "Mars Perihelion From Sun",
-  startPos: 243.094,
-  speed: 0.398326084542855,
+  startPos: 242.93,
+  speed: 0.398243938515933,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 7.78722181048582,
+  orbitRadius: 7.75871684174344,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-49.57854)*Math.PI)/180)*-1.85061,
-  orbitTiltb: Math.sin(((-90-49.57854)*Math.PI)/180)*-1.85061,
+  orbitTilta: Math.cos(((-90-49.561729)*Math.PI)/180)*-1.849723,
+  orbitTiltb: Math.sin(((-90-49.561729)*Math.PI)/180)*-1.849723,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -787,11 +879,11 @@ const marsPerihelionFromSun = {
 
 const mars = {
   name: "Mars",
-  startPos: 121.547,
-  speed: -3.34075569586122,
+  startPos: 121.465,
+  speed: -3.34071462284776,
   rotationSpeed: 2236.82429921882,
   tilt: -25.19,
-  orbitRadius: 152.366713671252,
+  orbitRadius: 152.367962535236,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -871,8 +963,8 @@ const jupiterPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -14.8529260159503,
-  orbitCenterb: -44.5901620064302,
+  orbitCentera: -12.2201883591213,
+  orbitCenterb: -45.4831359863113,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -895,9 +987,32 @@ const jupiterPerihelionFromEarth = {
   isDeferent: true,
 };
 
+const jupiterbarycenterPLANETS = {
+  name: "Barycenter Jupiter Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const jupiterPerihelionFromSun = {
   name: "Jupiter Perihelion From Sun",
-  startPos: 41.205,    
+  startPos: 41.445,    
   speed: -5.75326128750832,
   rotationSpeed: 0,
   tilt: 0,
@@ -905,8 +1020,8 @@ const jupiterPerihelionFromSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-100.55615)*Math.PI)/180)*-1.3053,
-  orbitTiltb: Math.sin(((-90-100.55615)*Math.PI)/180)*-1.3053,
+  orbitTilta: Math.cos(((-90-100.469215)*Math.PI)/180)*-1.303241,
+  orbitTiltb: Math.sin(((-90-100.469215)*Math.PI)/180)*-1.303241,
   
   size: 0.1,
   color: 0xCDC2B2,
@@ -957,8 +1072,8 @@ const saturnPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -99.8674039040765,
-  orbitCenterb: 3.4559296989952,
+  orbitCentera: -102.455579752029,
+  orbitCenterb: 5.04046308853685,
   orbitCenterc: 1.8,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -981,9 +1096,32 @@ const saturnPerihelionFromEarth = {
   isDeferent: true,
 };
 
+const saturnbarycenterPLANETS = {
+  name: "Barycenter Saturn Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const saturnPerihelionFromSun = {
   name: "Saturn Perihelion From Sun",
-  startPos: 34.355,    
+  startPos: 34.19,    
   speed: -6.06960563718342,
   rotationSpeed: 0,
   tilt: 0,
@@ -991,8 +1129,8 @@ const saturnPerihelionFromSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-113.71504)*Math.PI)/180)*-2.48446,
-  orbitTiltb: Math.sin(((-90-113.71504)*Math.PI)/180)*-2.48446,
+  orbitTilta: Math.cos(((-90-113.669633)*Math.PI)/180)*-2.488861,
+  orbitTiltb: Math.sin(((-90-113.669633)*Math.PI)/180)*-2.488861,
 
   size: 0.1,   
   color: 0xA79662,
@@ -1045,8 +1183,8 @@ const uranusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -27.8688886566711,
-  orbitCenterb: 175.24925683614,
+  orbitCentera: -23.7844521015418,
+  orbitCenterb: 172.784911663013,
   orbitCenterc: -1.9,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1069,9 +1207,32 @@ const uranusPerihelionFromEarth = {
   isDeferent: true,
 };
 
+const uranusbarycenterPLANETS = {
+  name: "Barycenter Uranus Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const uranusPerihelionFromSun = {
   name: "Uranus Perihelion From Sun",
-  startPos: 134.51,    
+  startPos: 134.56,    
   speed: -6.2081449115867,
   rotationSpeed: 0,
   tilt: 0,
@@ -1079,8 +1240,8 @@ const uranusPerihelionFromSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-74.22988)*Math.PI)/180)*-0.76986,
-  orbitTiltb: Math.sin(((-90-74.22988)*Math.PI)/180)*-0.76986,
+  orbitTilta: Math.cos(((-90-74.008411)*Math.PI)/180)*-0.773201,
+  orbitTiltb: Math.sin(((-90-74.008411)*Math.PI)/180)*-0.773201,
 
   size: 0.1,   
   color: 0xD2F9FA,
@@ -1131,8 +1292,8 @@ const neptunePerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -34.3277111737215,
-  orbitCenterb: -34.3620585913588,
+  orbitCentera: -41.260305000826,
+  orbitCenterb: -34.7481051802395,
   orbitCenterc: 1.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1155,9 +1316,32 @@ const neptunePerihelionFromEarth = {
   isDeferent: true,
 };
 
+const neptunebarycenterPLANETS = {
+  name: "Barycenter Neptune Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const neptunePerihelionFromSun = {
   name: "Neptune Perihelion From Sun",
-  startPos: 144.16,    
+  startPos: 144.075,    
   speed: -6.2448231126072,
   rotationSpeed: 0,
   tilt: 0,
@@ -1165,8 +1349,8 @@ const neptunePerihelionFromSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-131.72169)*Math.PI)/180)*-1.76917,
-  orbitTiltb: Math.sin(((-90-131.72169)*Math.PI)/180)*-1.76917,
+  orbitTilta: Math.cos(((-90-131.789247)*Math.PI)/180)*-1.769909,
+  orbitTiltb: Math.sin(((-90-131.789247)*Math.PI)/180)*-1.769909,
 
   size: 0.1,   
   color: 0x5E93F1,
@@ -1243,6 +1427,29 @@ const plutoPerihelionFromEarth = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
+  isDeferent: true,
+};
+
+const plutobarycenterPLANETS = {
+  name: "Barycenter Pluto Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
   isDeferent: true,
 };
 
@@ -1330,6 +1537,29 @@ const halleysPerihelionFromEarth = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
+  isDeferent: true,
+};
+
+const halleysbarycenterPLANETS = {
+  name: "Barycenter Halleys Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
   isDeferent: true,
 };
 
@@ -1422,6 +1652,29 @@ const erosPerihelionFromEarth = {
   isDeferent: true,
 };
 
+const erosbarycenterPLANETS = {
+  name: "Barycenter Eros Counter movement",
+  startPos: 0,
+  speed: -0.0002669745874952100,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.01,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
 const erosPerihelionFromSun = {
   name: "Eros Perihelion From Sun",
   startPos: 114.6,
@@ -1480,7 +1733,7 @@ const eros = {
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, perihelionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryPerihelionFromSun, mercury, venusPerihelionFromSun, venus, marsPerihelionFromSun, mars, phobos, deimos, jupiterPerihelionFromSun, jupiter, saturnPerihelionFromSun, saturn, uranusPerihelionFromSun, uranus, neptunePerihelionFromSun, neptune, plutoPerihelionFromSun, pluto, halleysPerihelionFromSun, halleys, erosPerihelionFromSun, eros]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, perihelionPointAlternative, earth, earthPerihelionPrecession1, earthPerihelionPrecession2, earthObliquityPrecession, earthInclinationPrecession, earthEclipticPrecession, barycenterEarthAndSun, barycenterPLANETS, mercurybarycenterPLANETS, venusbarycenterPLANETS, marsbarycenterPLANETS, jupiterbarycenterPLANETS, saturnbarycenterPLANETS, uranusbarycenterPLANETS, neptunebarycenterPLANETS, plutobarycenterPLANETS, halleysbarycenterPLANETS, erosbarycenterPLANETS, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, mercuryPerihelionFromSun, mercury, venusPerihelionFromSun, venus, marsPerihelionFromSun, mars, phobos, deimos, jupiterPerihelionFromSun, jupiter, saturnPerihelionFromSun, saturn, uranusPerihelionFromSun, uranus, neptunePerihelionFromSun, neptune, plutoPerihelionFromSun, pluto, halleysPerihelionFromSun, halleys, erosPerihelionFromSun, eros]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
@@ -1806,14 +2059,18 @@ earthPerihelionPrecession2.pivotObj.add(barycenterEarthAndSun.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(sun.containerObj);
 barycenterEarthAndSun.pivotObj.add(earthPerihelionFromEarth.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS.containerObj);
 
-barycenterEarthAndSun.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(venusPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(marsPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(saturnPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(uranusPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(neptunePerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(venusPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(marsPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(saturnPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(uranusPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(neptunePerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(plutoPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(halleysPerihelionFromEarth.containerObj);
+barycenterPLANETS.pivotObj.add(erosPerihelionFromEarth.containerObj);
 
 earth.pivotObj.add(moonApsidalPrecession.containerObj);
 moonApsidalPrecession.pivotObj.add(moonApsidalNodalPrecession1.containerObj);
@@ -1822,37 +2079,47 @@ moonApsidalNodalPrecession2.pivotObj.add(moonRoyerCycle.containerObj);
 moonRoyerCycle.pivotObj.add(moonNodalPrecession.containerObj);
 moonNodalPrecession.pivotObj.add(moon.containerObj);
 
-mercuryPerihelionFromEarth.pivotObj.add(mercuryPerihelionFromSun.containerObj);
+mercuryPerihelionFromEarth.pivotObj.add(mercurybarycenterPLANETS.containerObj);
+mercurybarycenterPLANETS.pivotObj.add(mercuryPerihelionFromSun.containerObj);
 mercuryPerihelionFromSun.pivotObj.add(mercury.containerObj);
 
-venusPerihelionFromEarth.pivotObj.add(venusPerihelionFromSun.containerObj);
+venusPerihelionFromEarth.pivotObj.add(venusbarycenterPLANETS.containerObj);
+venusbarycenterPLANETS.pivotObj.add(venusPerihelionFromSun.containerObj);
 venusPerihelionFromSun.pivotObj.add(venus.containerObj);
 
-marsPerihelionFromEarth.pivotObj.add(marsPerihelionFromSun.containerObj);
+marsPerihelionFromEarth.pivotObj.add(marsbarycenterPLANETS.containerObj);
+marsbarycenterPLANETS.pivotObj.add(marsPerihelionFromSun.containerObj);
 marsPerihelionFromSun.pivotObj.add(mars.containerObj);
 
 mars.pivotObj.add(phobos.containerObj);
 mars.pivotObj.add(deimos.containerObj);
 
-jupiterPerihelionFromEarth.pivotObj.add(jupiterPerihelionFromSun.containerObj);
+jupiterPerihelionFromEarth.pivotObj.add(jupiterbarycenterPLANETS.containerObj);
+jupiterbarycenterPLANETS.pivotObj.add(jupiterPerihelionFromSun.containerObj);
 jupiterPerihelionFromSun.pivotObj.add(jupiter.containerObj);
 
-saturnPerihelionFromEarth.pivotObj.add(saturnPerihelionFromSun.containerObj);
+saturnPerihelionFromEarth.pivotObj.add(saturnbarycenterPLANETS.containerObj);
+saturnbarycenterPLANETS.pivotObj.add(saturnPerihelionFromSun.containerObj);
 saturnPerihelionFromSun.pivotObj.add(saturn.containerObj);
 
-uranusPerihelionFromEarth.pivotObj.add(uranusPerihelionFromSun.containerObj);
+uranusPerihelionFromEarth.pivotObj.add(uranusbarycenterPLANETS.containerObj);
+uranusbarycenterPLANETS.pivotObj.add(uranusPerihelionFromSun.containerObj);
 uranusPerihelionFromSun.pivotObj.add(uranus.containerObj);
 
-neptunePerihelionFromEarth.pivotObj.add(neptunePerihelionFromSun.containerObj);
+neptunePerihelionFromEarth.pivotObj.add(neptunebarycenterPLANETS.containerObj);
+neptunebarycenterPLANETS.pivotObj.add(neptunePerihelionFromSun.containerObj);
 neptunePerihelionFromSun.pivotObj.add(neptune.containerObj);
 
-plutoPerihelionFromEarth.pivotObj.add(plutoPerihelionFromSun.containerObj);
+plutoPerihelionFromEarth.pivotObj.add(plutobarycenterPLANETS.containerObj);
+plutobarycenterPLANETS.pivotObj.add(plutoPerihelionFromSun.containerObj);
 plutoPerihelionFromSun.pivotObj.add(pluto.containerObj);
 
-halleysPerihelionFromEarth.pivotObj.add(halleysPerihelionFromSun.containerObj);
+halleysPerihelionFromEarth.pivotObj.add(halleysbarycenterPLANETS.containerObj);
+halleysbarycenterPLANETS.pivotObj.add(halleysPerihelionFromSun.containerObj);
 halleysPerihelionFromSun.pivotObj.add(halleys.containerObj);
 
-erosPerihelionFromEarth.pivotObj.add(erosPerihelionFromSun.containerObj);
+erosPerihelionFromEarth.pivotObj.add(erosbarycenterPLANETS.containerObj);
+erosbarycenterPLANETS.pivotObj.add(erosPerihelionFromSun.containerObj);
 erosPerihelionFromSun.pivotObj.add(eros.containerObj);
 
 earth.containerObj.rotation.y = Math.PI/2;
