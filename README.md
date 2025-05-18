@@ -43,11 +43,11 @@ For more details see https://holisticuniverse.com.
 Why is the length of the Holistic-Year 305,952 years? This number fits all observations best:
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.945°
-3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
-a) 1246 Length of solar day in days was ~365.242236 days (which is ~31,556,929.19 SI seconds in Ephemeris time).
-b) 1246 Length of sidereal year in SI seconds was ~31,558,149.6847
-c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.
-4. Climate graphs with ~100k cycles as a cycle of 305,952 years
+3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
+a) 1246 Length of solar day in days was - according to the current theory - ~365.242236 days (which is ~31,556,929.19 SI seconds in Ephemeris time).  
+b) 1246 Length of sidereal year in SI seconds was - according to the current theory - ~31,558,149.6847  
+c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.  
+4. Climate graphs with ~100k cycles as a cycle of 101,984 years (three times 101,984 years = 305,952 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. The location of the EARTH-WOBBLE-CENTER is at a MEAN ratio of 1:366.2422341 compared to the location the Sun as seen from Earth
 7. Obliquity correct both historic and current values
