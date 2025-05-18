@@ -2783,10 +2783,9 @@ function setupGUI() {
     // scale all Three.js objects (Mesh, Group, etc.)
     scalableObjects.forEach(obj => obj.scale.setScalar(factor));
 
-    // keep the CSS2D name labels in sync too
-    sceneObjects.stars.children.forEach(child => {
-      if (child instanceof CSS2DObject) child.scale.setScalar(factor);
-    });
+    // 2 – tell the label renderer that it has to recompute the screen-space position of every CSS2DObject next frame
+    needsLabelUpdate = true;
+
   });
 
   // ← no star-size here; that slider lives inside initStars()
