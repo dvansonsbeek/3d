@@ -384,7 +384,7 @@ const earthPerihelionFromEarth = {
 const barycenterPLANETS = {
   name: "Barycenter Planets",
   startPos: 0,
-  speed: 0.0002669745874952100,
+  speed: 0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -616,7 +616,7 @@ const mercuryPerihelionFromEarth = {
 const mercurybarycenterPLANETS = {
   name: "Barycenter Mercury Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -725,7 +725,7 @@ const venusPerihelionFromEarth = {
 const venusbarycenterPLANETS = {
   name: "Barycenter Venus Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -834,7 +834,7 @@ const marsPerihelionFromEarth = {
 const marsbarycenterPLANETS = {
   name: "Barycenter Mars Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -990,7 +990,7 @@ const jupiterPerihelionFromEarth = {
 const jupiterbarycenterPLANETS = {
   name: "Barycenter Jupiter Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1099,7 +1099,7 @@ const saturnPerihelionFromEarth = {
 const saturnbarycenterPLANETS = {
   name: "Barycenter Saturn Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1210,7 +1210,7 @@ const uranusPerihelionFromEarth = {
 const uranusbarycenterPLANETS = {
   name: "Barycenter Uranus Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1319,7 +1319,7 @@ const neptunePerihelionFromEarth = {
 const neptunebarycenterPLANETS = {
   name: "Barycenter Neptune Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1396,8 +1396,8 @@ const neptune = {
 
 //The accurate orbits of Pluto and Halleys and Eros will be added later
 // You can now make eccentric orbits with these settings (especially helpfull for hallays)
-//  orbitSemiMajor: 100,
-//  orbitSemiMinor: 30,
+// orbitSemiMajor: 519.969067802053,
+// orbitSemiMinor: 519.969067802053*Math.sqrt(1-0.048499*0.048499),
 
 const plutoPerihelionFromEarth = {
   name: "PERIHELION PLUTO AS SEEN FROM EARTH",
@@ -1433,7 +1433,7 @@ const plutoPerihelionFromEarth = {
 const plutobarycenterPLANETS = {
   name: "Barycenter Pluto Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1543,7 +1543,7 @@ const halleysPerihelionFromEarth = {
 const halleysbarycenterPLANETS = {
   name: "Barycenter Halleys Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1655,7 +1655,7 @@ const erosPerihelionFromEarth = {
 const erosbarycenterPLANETS = {
   name: "Barycenter Eros Counter movement",
   startPos: 0,
-  speed: -0.0002669745874952100,
+  speed: -0.00024643808076481,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -5371,6 +5371,7 @@ function raToDeg(ra) {
     if (!Number.isFinite(ra)) {
       throw new TypeError(`raToDeg: number is not finite: ${ra}`);
     }
+    // 0–24  ⇒ hours,  others ⇒ degrees
     return ((ra < 24 ? ra * 15 : ra) % 360 + 360) % 360;
   }
 
@@ -5387,7 +5388,6 @@ function raToDeg(ra) {
   }
 
   /* 2b — split into [h, m, s] ----------------------------------------- */
-  // replace h / m / s / : by spaces, collapse 2+ spaces, split
   const parts = s
     .replace(/[hms]/g, ' ')
     .replace(/:/g, ' ')
@@ -5403,15 +5403,18 @@ function raToDeg(ra) {
 
   /* Accept decimal-hour forms like "12.345" or "12.345h" -------------- */
   if (parts.length === 1) {
+    if (h < 0) throw new RangeError(`raToDeg: negative hour value: "${ra}"`);
     return ((h * 15) % 360 + 360) % 360;
   }
 
-  /* Standard HH MM SS[.sss] form -------------------------------------- */
-  if (h < 0 || h >= 24 || m < 0 || m >= 60 || sec < 0 || sec >= 60) {
-    throw new RangeError(`raToDeg: out-of-range H M S values: "${ra}"`);
+  /* ---- validation (only negatives are forbidden) -------------------- */
+  if (h < 0 || m < 0 || sec < 0) {
+    throw new RangeError(`raToDeg: negative H M S value: "${ra}"`);
   }
 
-  return (((h + m / 60 + sec / 3600) * 15) % 360 + 360) % 360;
+  /* ---- convert, allowing overflow ----------------------------------- */
+  const totalHours = h + m / 60 + sec / 3600;   // 60 s ⇒ +1 min, 60 min ⇒ +1 h
+  return ((totalHours * 15) % 360 + 360) % 360; // wrap to 0–360°
 }
 
 // === Utilities ===
