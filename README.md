@@ -56,7 +56,7 @@ c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delt
 
 Technical: 
 
-Build in Three js R175 including orbitcontrols.
+Build in Three js R175.
 
 It's an interactive 3D visualization where the browser renders a miniature model of the solar system using three.js — a JavaScript library that simplifies working with WebGL. The project typically features:
 - A central sun: A bright, glowing sphere, possibly using a texture and some light emission effects.
