@@ -583,14 +583,14 @@ const moon = {
 };
 
 const mercuryPerihelionFromEarth = {
-  name: "PERIHELION MERCURY AS SEEN FROM EARTH",
+  name: "PERIHELION MERCURY",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -10.8014576143799,
-  orbitCenterb: -2.1341527671719,
+  orbitCentera: -7.98081688741331,
+  orbitCenterb: -1.54936973150432,
   orbitCenterc: -0.6,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -638,11 +638,11 @@ const mercurybarycenterPLANETS = {
 
 const mercuryPerihelionFromSun = {
   name: "Mercury Perihelion From Sun",
-  startPos: 0,
+  startPos: 141.88,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 1.671013,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -662,11 +662,11 @@ const mercuryPerihelionFromSun = {
 
 const mercury = {
   name: "Mercury",
-  startPos: 207.38,
-  speed: 26.0879352297627,
-  rotationSpeed: 39.1319028446441,
+  startPos: 70.94,
+  speed: 26.0876066456551,
+  rotationSpeed: 39.1314099684826,
   tilt: -0.03,
-  orbitRadius: 38.710321108085,
+  orbitRadius: 38.7106461556524,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -692,14 +692,14 @@ const mercury = {
 };
 
 const venusPerihelionFromEarth = {
-  name: "PERIHELION VENUS AS SEEN FROM EARTH",
+  name: "PERIHELION VENUS",
   startPos: 0, 
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -0.382449363636126,
-  orbitCenterb: 0.306074425233886,
+  orbitCentera: -0.379982936020606,
+  orbitCenterb: 0.303883010827798,
   orbitCenterc: -0.05,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -801,14 +801,14 @@ const venus = {
 };
 
 const marsPerihelionFromEarth = {
-  name: "PERIHELION MARS AS SEEN FROM EARTH",
+  name: "PERIHELION MARS",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 9.89120219232138,
-  orbitCenterb: -19.6399043407965,
+  orbitCentera: 10.0131653554581,
+  orbitCenterb: -19.8820735746806,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -856,11 +856,11 @@ const marsbarycenterPLANETS = {
 
 const marsPerihelionFromSun = {
   name: "Mars Perihelion From Sun",
-  startPos: 242.93,
-  speed: 0.398243938515933,
+  startPos: 243.09,
+  speed: 0.398326084542855,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 7.75871684174344,
+  orbitRadius: 8.17878252993853,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -879,11 +879,11 @@ const marsPerihelionFromSun = {
 
 const mars = {
   name: "Mars",
-  startPos: 121.465,
-  speed: -3.34071462284776,
+  startPos: 121.545,
+  speed: -3.34075569586122,
   rotationSpeed: 2236.82429921882,
   tilt: -25.19,
-  orbitRadius: 152.367962535236,
+  orbitRadius: 152.366713671252,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -957,14 +957,14 @@ const deimos = {
 };
 
 const jupiterPerihelionFromEarth = {
-  name: "PERIHELION JUPITER AS SEEN FROM EARTH",
-  startPos: 0,    
+  name: "PERIHELION JUPITER",
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -12.2201883591213,
-  orbitCenterb: -45.4831359863113,
+  orbitCentera: -12.0322018698551,
+  orbitCenterb: -44.8459208753374,
   orbitCenterc: 0.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1012,8 +1012,8 @@ const jupiterbarycenterPLANETS = {
 
 const jupiterPerihelionFromSun = {
   name: "Jupiter Perihelion From Sun",
-  startPos: 41.445,    
-  speed: -5.75326128750832,
+  startPos: 27.6,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1036,8 +1036,8 @@ const jupiterPerihelionFromSun = {
 
 const jupiter = {
   name: "Jupiter",
-  startPos: 0,    
-  speed: 0,
+  startPos: 13.8,
+  speed: 0.529924019671262,
   rotationSpeed: 5549.34320193203,
   tilt: -3.13,
   orbitRadius: 519.969067802053,
@@ -1051,7 +1051,7 @@ const jupiter = {
   size: 6,
   color: 0xCDC2B2,
   traceLength : sYear * 24,
-  traceStep : sWeek,  
+  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
   visible: true,
   containerObj:"",
@@ -1066,19 +1066,19 @@ const jupiter = {
 };
 
 const saturnPerihelionFromEarth = {
-  name: "PERIHELION SATURN AS SEEN FROM EARTH",
-  startPos: 0,    
+  name: "PERIHELION SATURN",
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -102.455579752029,
-  orbitCenterb: 5.04046308853685,
+  orbitCentera: -103.526061827915,
+  orbitCenterb: 5.12935263463164,
   orbitCenterc: 1.8,
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.5,   
+  size: 0.5,
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_barycenter.png',
   traceLength : sYear * 1000000,
@@ -1121,8 +1121,8 @@ const saturnbarycenterPLANETS = {
 
 const saturnPerihelionFromSun = {
   name: "Saturn Perihelion From Sun",
-  startPos: 34.19,    
-  speed: -6.06960563718342,
+  startPos: 22.77,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1145,11 +1145,11 @@ const saturnPerihelionFromSun = {
 
 const saturn = {
   name: "Saturn",
-  startPos: 0,    
-  speed: 0,
+  startPos: 11.385,    
+  speed: 0.213538596982708,
   rotationSpeed: 5215.37251228578,
   tilt: -26.73,
-  orbitRadius: 952.971629139966,
+  orbitRadius: 953.093824572666,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1177,14 +1177,14 @@ const saturn = {
 };
 
 const uranusPerihelionFromEarth = {
-  name: "PERIHELION URANUS AS SEEN FROM EARTH",
+  name: "PERIHELION URANUS",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -23.7844521015418,
-  orbitCenterb: 172.784911663013,
+  orbitCentera: -22.967626194115,
+  orbitCenterb: 166.420952723134,
   orbitCenterc: -1.9,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1232,8 +1232,8 @@ const uranusbarycenterPLANETS = {
 
 const uranusPerihelionFromSun = {
   name: "Uranus Perihelion From Sun",
-  startPos: 134.56,    
-  speed: -6.2081449115867,
+  startPos: 89.64,    
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1256,8 +1256,8 @@ const uranusPerihelionFromSun = {
 
 const uranus = {
   name: "Uranus",
-  startPos: 0,    
-  speed: 0,
+  startPos: 44.82,    
+  speed: 0.0750403955928845,
   rotationSpeed: -3194.74981995042,
   tilt: -82.23,
   orbitRadius: 1913.91730411169,
@@ -1286,14 +1286,14 @@ const uranus = {
 };
 
 const neptunePerihelionFromEarth = {
-  name: "PERIHELION NEPTUNE AS SEEN FROM EARTH",
+  name: "PERIHELION NEPTUNE",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -41.260305000826,
-  orbitCenterb: -34.7481051802395,
+  orbitCentera: -41.6132425813307,
+  orbitCenterb: -35.0577537689219,
   orbitCenterc: 1.7,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1341,8 +1341,8 @@ const neptunebarycenterPLANETS = {
 
 const neptunePerihelionFromSun = {
   name: "Neptune Perihelion From Sun",
-  startPos: 144.075,    
-  speed: -6.2448231126072,
+  startPos: 96.046,    
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1365,8 +1365,8 @@ const neptunePerihelionFromSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: 0,    
-  speed: 0,
+  startPos: 48.023,
+  speed: 0.0383621945723887,
   rotationSpeed: 3418.56790376751,
   tilt: -28.32,
   orbitRadius: 2993.53460611855,
@@ -1400,14 +1400,14 @@ const neptune = {
 // orbitSemiMinor: 519.969067802053*Math.sqrt(1-0.048499*0.048499),
 
 const plutoPerihelionFromEarth = {
-  name: "PERIHELION PLUTO AS SEEN FROM EARTH",
+  name: "PERIHELION PLUTO",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 1355.8371267405,
-  orbitCenterb: 1400.74054002809,
+  orbitCentera: 1087.29859326151,
+  orbitCenterb: 1123.30838908234,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1455,8 +1455,8 @@ const plutobarycenterPLANETS = {
 
 const plutoPerihelionFromSun = {
   name: "Pluto Perihelion From Sun",
-  startPos: 215,    
-  speed: -6.25761735630024,
+  startPos: 143.4,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1479,8 +1479,8 @@ const plutoPerihelionFromSun = {
 
 const pluto = {
   name: "Pluto",
-  startPos: 0,    
-  speed: 0,
+  startPos: 71.7,
+  speed: 0.025567950879349,
   rotationSpeed: 359.294297168521,
   tilt: -57.47,
   orbitRadius: 3923.3401562492,
@@ -1510,15 +1510,15 @@ const pluto = {
 };
 
 const halleysPerihelionFromEarth = {
-  name: "PERIHELION HALLEYS AS SEEN FROM EARTH",
+  name: "PERIHELION HALLEYS",
   startPos: 0,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
-  orbitCenterb: 3425.26406009445,
-  orbitCenterc: -479.375616078497,
+  orbitCenterb: 1742.10124111005,
+  orbitCenterc: -243.812109395506,
   orbitTilta: 0,
   orbitTiltb: 0,
   
@@ -1565,8 +1565,8 @@ const halleysbarycenterPLANETS = {
 
 const halleysPerihelionFromSun = {
   name: "Halleys Perihelion From Sun",
-  startPos: 200,
-  speed: -6.20009460094839,
+  startPos: 108,
+  speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
@@ -1589,8 +1589,8 @@ const halleysPerihelionFromSun = {
 
 const halleys = {
   name: "Halleys",
-  startPos: 0,
-  speed: 0,
+  startPos: 54,
+  speed: 0.0830907062312016,
   rotationSpeed: 1043.12937189584,
   tilt: 0,
   orbitRadius: 1788.20900979424,
@@ -1622,14 +1622,14 @@ const halleys = {
 };
 
 const erosPerihelionFromEarth = {
-  name: "PERIHELION EROS AS SEEN FROM EARTH",
-  startPos: 0,    
+  name: "PERIHELION EROS",
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -41.5066637049184,
-  orbitCenterb: 27.010766876461,
+  orbitCentera: -36.1217511010512,
+  orbitCenterb: 23.5064953689454,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1680,7 +1680,7 @@ const erosPerihelionFromSun = {
   startPos: 114.6,
   speed: 0.852798978486624,
   tilt: 0,
-  orbitRadius: 17.0301972356361,
+  orbitRadius: 14.9565668597751,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1701,7 +1701,7 @@ const erosPerihelionFromSun = {
 const eros = {
   name: "Eros",
   startPos: 57.3,
-  speed: -3.56799275538197,
+  speed: -3.56799214283311,
   rotationSpeed: 10451.0875434594,
   tilt: 0,
   orbitRadius: 145.826791115055,
@@ -2785,7 +2785,7 @@ function setupGUI() {
 
     // 2 – tell the label renderer that it has to recompute the screen-space position of every CSS2DObject next frame
     needsLabelUpdate = true;
-
+    
   });
 
   // ← no star-size here; that slider lives inside initStars()
