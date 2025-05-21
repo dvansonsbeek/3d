@@ -597,7 +597,7 @@ const mercuryPerihelionFromEarth = {
   
   size: 0.5,
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear, 
   visible: false,
@@ -706,7 +706,7 @@ const venusPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear, 
   visible: false,
@@ -815,7 +815,7 @@ const marsPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   visible: false,
@@ -971,7 +971,7 @@ const jupiterPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   visible: false,
@@ -1080,7 +1080,7 @@ const saturnPerihelionFromEarth = {
   
   size: 0.5,
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,  
   visible: false,
@@ -1191,7 +1191,7 @@ const uranusPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   visible: false,
@@ -1300,7 +1300,7 @@ const neptunePerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   visible: false,
@@ -1414,7 +1414,7 @@ const plutoPerihelionFromEarth = {
   
   size: 0.01,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,
   visible: false,
@@ -1524,7 +1524,7 @@ const halleysPerihelionFromEarth = {
   
   size: 0.01,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear,  
   visible: false,
@@ -1636,7 +1636,7 @@ const erosPerihelionFromEarth = {
   
   size: 0.01,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_barycenter.png',
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_perihelion.png',
   traceLength : sYear * 1000000,
   traceStep : sYear, 
   visible: false,
@@ -2522,6 +2522,19 @@ let eggTriggered = false;
 
 const DEG = Math.PI / 180;
 
+// create the golden-spiral line (returns { line, update })
+const golden = goldenspiralPerihelionObjects(
+  mercuryPerihelionFromEarth,
+  venusPerihelionFromEarth,
+  marsPerihelionFromEarth,
+  jupiterPerihelionFromEarth,
+  neptunePerihelionFromEarth,
+  saturnPerihelionFromEarth,
+  uranusPerihelionFromEarth,
+  camera,
+  scene
+);
+
 /* ------------------------------------------------------------------ */
 /*  Globals used by updateDomLabel()                                  */
 /* ------------------------------------------------------------------ */
@@ -2737,6 +2750,7 @@ function setupGUI() {
   });
   
   let folderPerihelion = gui.addFolder('Perihelion Planets')
+  folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
   folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mercury Perihelion")
   folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Venus Perihelion")
   folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Earth Perihelion")
@@ -2937,7 +2951,8 @@ function render(now) {
     updateElongations();
     updatePerihelion();
     updatePredictions();
-    updateDomLabel(); //Can be added later
+    updateDomLabel();
+    golden.update();
   }
 
   // 8) Throttle lighting/glow (10 Hz)
@@ -4139,6 +4154,117 @@ function updatePerihelion() {
   o["uranusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, uranusPerihelionFromEarth);
   o["neptunePerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, neptunePerihelionFromEarth);
 };
+
+/**
+ * goldenspiralPerihelionObjects
+ * -----------------------------
+ * Creates a golden-coloured THREE.Line that dynamically links every perihelion
+ * helper that is visible in the camera frustum.
+ *
+ * @param {...THREE.Object3D} perihelionObjs  The perihelion helpers (must expose pivotObj).
+ *        Pass them in the order you want them connected.
+ *        👉  The last two arguments **must** be the camera and the scene.
+ *
+ * @returns {Function} update() – call this once per frame inside your render loop.
+ *
+ * Usage:
+ * const updateLine = goldenspiralPerihelionObjects(
+ *     earthPerihelionFromEarth,
+ *     venusPerihelionFromEarth,
+ *     marsPerihelionFromEarth,
+ *     jupiterPerihelionFromEarth,
+ *     saturnPerihelionFromEarth,
+ *     uranusPerihelionFromEarth,
+ *     neptunePerihelionFromEarth,   // 7th object? No problem – pass as many as you like.
+ *     camera,
+ *     scene
+ * );
+ *
+ * function animate() {
+ *   requestAnimationFrame( animate );
+ *   updateLine();                   // refresh positions & visibility
+ *   renderer.render( scene, camera );
+ * }
+ */
+function goldenspiralPerihelionObjects(...args) {
+
+  /* ---------- 0. unpack parameters ---------------------------------- */
+  const camera = args[args.length - 2];
+  const scene  = args[args.length - 1];
+  const pds    = args.slice(0, -2);
+
+  for (const pd of pds) (pd.planetObj ?? pd).visible = false;
+  
+  /* ---------- 1. constants ------------------------------------------ */
+  const SMOOTH_SEGMENTS   = 32;   // Catmull-Rom samples / segment
+  const TUBE_RADIUS       = 0.08; // 0.02-0.06 looks nice
+  const TUBE_RADIAL_SEGS  = 24;
+
+  /* ---------- 2. dummy geometry / material -------------------------- */
+  const goldenTube = new THREE.Mesh(
+    new THREE.BufferGeometry(),                       // placeholder
+    new THREE.MeshBasicMaterial({
+      color: 0xfff7b3,              // pale–gold – the brighter, the better
+      transparent: true,
+      opacity: 0.95,                // tiny transparency helps bloom later
+      toneMapped: false,            // <-- crucial: bypass tone-mapping curve
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,             // keeps the glow from killing depth buffer
+    })
+  );
+  goldenTube.visible       = false;   // off by default
+  goldenTube.frustumCulled = false;   // never culled
+  scene.add(goldenTube);
+
+  /* ---------- 3. updater -------------------------------------------- */
+  const world = new THREE.Vector3();
+  const ndc   = new THREE.Vector3();
+  const visiblePts = [];                    // reused every frame
+
+  function updateGoldenSpiralLine() {
+
+    /* 3-a. gather **all** perihelion helpers ----------------------- */
+     visiblePts.length = 0;
+     for (const pd of pds) {
+       pd.pivotObj.getWorldPosition(world);
+       visiblePts.push(world.clone());
+     }
+
+    /* 3-b. build Catmull-Rom curve & sample points ------------------ */
+    const curve = new THREE.CatmullRomCurve3(visiblePts);
+    const curvePts = curve.getPoints(
+      (visiblePts.length - 1) * SMOOTH_SEGMENTS
+    );
+
+    /* 3-c. ---------- rebuild tube RIGHT HERE ----------------------- */
+    if (goldenTube.visible) {                 // skip if user has it hidden
+      const oldGeom = goldenTube.geometry;    // dispose afterwards
+
+      const tubeGeom = new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(curvePts),
+        curvePts.length * 2,                  // tubularSegments
+        TUBE_RADIUS,
+        TUBE_RADIAL_SEGS,
+        false
+      );
+
+      goldenTube.geometry = tubeGeom;
+      oldGeom.dispose();
+    }
+  }
+ 
+  /* ---------- NEW utility: flip markers on/off ------------------- */
+  function setHelpersVisible(v) {
+    for (const pd of pds) (pd.planetObj ?? pd).visible = v;
+  }
+  
+  /* ---------- 4. export -------------------------------------------- */
+  return {
+    goldenLine: goldenTube,         // public name stays goldenLine for GUI
+    update: updateGoldenSpiralLine,
+    setHelpersVisible                 // expose the helper toggler
+  };
+}
 
 //Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
 function getElongationFromSun(targetPlanet) {
