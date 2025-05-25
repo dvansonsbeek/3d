@@ -151,47 +151,236 @@ a:link {
   z-index:1000;                    /* above the canvas & GUI */
 }
 
-/* small, hover-aware × button */
-#planetLabel .closeBtn {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  opacity: 0.65;
-  transition: opacity .15s;
-  user-select: none;       /* stops accidental text selection */
-}
+/* ==========================================================
+   TOP-LEFT “PLANET INFO” PANEL
+   ========================================================== */
 
+/* root wrapper injected by updateDomLabel()  */
 #planetLabel{
-  position:absolute;           /* already there */
-  /* … all your other inline/stylesheet props … */
-  pointer-events:auto !important;   /* ← ensure clicks reach the label */
+  position:fixed; top:16px; left:16px;
+  transform:none !important;          /* never move again */
+  pointer-events:auto; 
+  z-index:9999;
+    /* ⭐ NEW: make the wrapper as wide as its children  */
+  width:max-content;              /* Chrome / Edge / Safari */
+  width:-moz-max-content;         /* Firefox                */
+  box-sizing:border-box;          /* include border in that width */
 }
 
+/* ---- card body ---- */
+#planetLabel .labelContent{
+  position:relative;
+  background:rgba(20,24,30,.80);
+  backdrop-filter:blur(6px);
+  color:#eee;
+  padding:14px 18px 16px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  font:14px/1.4 "Inter","Helvetica",sans-serif;
+}
+
+#planetLabel .labelContent{
+  /* let the browser size the box to the widest line it contains */
+  width:max-content;              /* Chrome / Safari / Edge */
+  width:-moz-max-content;         /* Firefox                 */
+
+  /* make sure padding + border are inside that intrinsic width   */
+  box-sizing:border-box;
+
+  /* kill any earlier size limits that might still be in another
+     stylesheet, just in case                                       */
+  max-width:none !important;
+  overflow:visible;
+}
+
+/* title */
+#planetLabel strong{
+  display:block;
+  margin:0 0 .7em;
+  font-size:1.05em;
+  font-weight:600;
+  letter-spacing:.02em;
+}
+
+/* ───────── close (×) button ───────── */
 #planetLabel .closeBtn{
-  pointer-events:auto;         /* button itself is also clickable */
-  /* rest of the close-button CSS stays the same */
+  position:absolute; top:4px; right:12px;
+  font-size:20px;                /* bigger glyph */
+  line-height:20px;
+  font-weight:bold;
+  color:#fff;                    /* bright white */
+  opacity:.90;                   /* almost fully opaque */
+  cursor:pointer; user-select:none;
+  transition:opacity .15s, transform .15s;
+  z-index:3;                     /* sits above the glass panel */
+}
+#planetLabel .closeBtn:hover{
+  opacity:1;
+  transform:scale(1.15);         /* subtle hover feedback */
 }
 
-#planetLabel .closeBtn:hover { opacity: 1; }
+/* ---- single 3-column grid ---- */
+.pl-grid{
+  display:grid;
+  /* widths will be FROZEN by JS with grid-template-columns */
+  column-gap:.75em; row-gap:.3em;
+  align-items:center;
+}
 
-/* optional: subtle border around the card when hovered */
-#planetLabel:hover { box-shadow: 0 0 4px rgba(255,255,255,.25); }
+/* zebra stripes (all 3 columns) */
+.pl-grid span:nth-child(6n+1),
+.pl-grid span:nth-child(6n+2),
+.pl-grid span:nth-child(6n+3){ background:rgba(255,255,255,.03); }
 
-#planetLabel .pl-row{
-  display:flex;              /* 1 row, 2 columns                  */
-  justify-content:space-between;
-  gap:8px;                   /* little breathing room             */
-  font-size:.8em;
+/* alignment + fonts */
+.pl-key  { 
+  white-space:nowrap;         /* <— NEW: keep every label on one line  */
+  text-align:left;
+}
+.pl-val  { text-align:right; font-family:Menlo,Consolas,monospace; }
+/*.pl-unit { text-align:left; font-size:.85em; opacity:.8;*/
+.pl-alt{
+  font:inherit;                      /* <- same family & size as .pl-key */
+  font-variant-numeric:tabular-nums; /* lined-up digits, no monospace needed */
+  text-align:left;                  /* keep numbers and units right-aligned */
+  opacity:.9;                        /* tweak if you still want it lighter */
+}
+
+* ----------  global look for the card  ---------- */
+#planetLabel{
+  --planet-info-font-size: 8px;   /* ← CHANGE THIS ONE VALUE to resize all text */
+}
+
+/* the glass card body */
+#planetLabel .labelContent{
+  font-size:var(--planet-info-font-size);
+  font-family:"Inter","Helvetica",sans-serif;
+  line-height:1.1;
+}
+
+/* use the SAME font everywhere */
+.pl-key,
+.pl-val,
+.pl-unit{
+  font:inherit;
+  font-variant-numeric:tabular-nums;   /* digits line up even without monospace */
+}
+
+/* the scrollable area inside the card */
+.scrollBox{
+  max-height:calc(100vh - 72px);   /* glass frame (top+bottom) plus 20-ish px headroom */
+  overflow-y:auto;
+  overscroll-behavior:contain;     /* avoid scrolling the page when you reach top/bottom */
+  padding-right:4px;               /* room for the native scrollbar so text doesn’t hide */
+}
+
+/* make the native scrollbar match the frosted-glass look (WebKit only) */
+.scrollBox::-webkit-scrollbar{ width:6px; }
+.scrollBox::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.25);
+  border-radius:3px;
+}
+
+/* header row */
+.pl-head{
+  grid-column:1 / -1;          /* span all columns */
+  text-align:center;
+  font-weight:600;
+  padding:.2em 0;
+}
+
+/* blank row: keep height without text */
+.pl-blank{ height:.6em; }
+
+/* info-tip icon */
+.pl-info{
+  margin-right:.25em;
+  text-decoration:none;
   opacity:.8;
-  white-space:nowrap;        /* keep each row on a single line    */
+  cursor:help;
+}
+.pl-info:hover{ opacity:1; }
+
+/* ============================================================== */
+/*  VALUE-CELL EMPHASIS                                           */
+/* ============================================================== */
+
+/* ------------ bold ------------------------------------------- */
+.pl-val strong,
+.pl-alt strong{
+  font-weight:600;             /* Inter SemiBold look */
+  color:#fff;                  /* keep full brightness */
 }
 
-#planetLabel .pl-key{        /* left column (label)               */
-  flex:1 1 auto;             /* takes remaining width, left-aligned*/
+/* ------------ italic ----------------------------------------- */
+.pl-val em,
+.pl-alt em{
+  font-style:italic;
+  opacity:.9;                  /* subtle, not ghostly */
 }
 
-#planetLabel .pl-val{        /* right column (value)              */
-  text-align:right;          /* ← HERE is the right-alignment     */
+/* ------------ small text ------------------------------------- */
+.pl-val small,
+.pl-alt small{
+  font-size:0.85em;            /* 85 % of the base size you set with --planet-info-font-size */
+  line-height:inherit;
+  opacity:.85;
+}
+
+/* optional: “small-caps” helper if you ever need it */
+.smallcaps{
+  font-variant:small-caps;
+}
+
+/* ==========================================================
+   COLOUR THEMES — each planet sets two CSS variables
+   ========================================================== */
+#planetLabel{
+  /* default fallback — the dark glass you already have */
+  --panel-bg     : rgba(20,24,30,.80);
+  --panel-border : rgba(255,255,255,.15);
+}
+
+#planetLabel .labelContent{
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+}
+
+/* ---- per-planet tints (place AFTER the default rule) --------------- */
+#planetLabel.theme-earth   { --panel-bg:rgba( 46,100,190,.58); --panel-border:rgba( 46,100,190,.28); }
+#planetLabel.theme-moon    { --panel-bg:rgba(120,120,120,.58); --panel-border:rgba(255,255,255,.28); }
+#planetLabel.theme-mercury { --panel-bg:rgba(110,110,110,.58); --panel-border:rgba(255,255,255,.28); }
+#planetLabel.theme-venus   { --panel-bg:rgba(213,171, 55,.58); --panel-border:rgba(213,171, 55,.28); }
+#planetLabel.theme-mars    { --panel-bg:rgba(176, 58, 46,.58); --panel-border:rgba(176, 58, 46,.28); }
+#planetLabel.theme-jupiter { --panel-bg:rgba(201,126, 79,.58); --panel-border:rgba(201,126, 79,.28); }
+#planetLabel.theme-saturn  { --panel-bg:rgba(217,182, 92,.58); --panel-border:rgba(217,182, 92,.28); }
+#planetLabel.theme-uranus  { --panel-bg:rgba( 55,198,208,.58); --panel-border:rgba( 55,198,208,.28); }
+#planetLabel.theme-neptune { --panel-bg:rgba( 44, 83,158,.58); --panel-border:rgba( 44, 83,158,.28); }
+#planetLabel.theme-sun     { --panel-bg:rgba(255,174,  0,.60); --panel-border:rgba(255,174,  0,.30); }
+
+/* ==========================================================
+   TITLE BAR  (planet name + symbol)
+   ========================================================== */
+.pl-title{
+  display:flex;
+  align-items:center;
+  gap:.35em;
+  margin:0 0 .65em 0;
+  line-height:1.1;
+  font-weight:600;
+  font-size:1.15em;               /* tweak size here */
+  letter-spacing:.02em;
+  text-shadow:0 0 3px rgba(0,0,0,.35);
+  color:#fff;                     /* bright against any tint */
+}
+
+.pl-symbol{
+  font-size:1.35em;               /* symbol slightly larger */
+  line-height:1;
+  opacity:.9;
+}
+
+.pl-name{
+  font-variant:small-caps;        /* classy look */
 }
