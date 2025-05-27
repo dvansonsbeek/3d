@@ -594,8 +594,8 @@ const mercuryPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -7.79875323666705,
-  orbitCenterb: -1.59455018169281,
+  orbitCentera: -7.79880291975054,
+  orbitCenterb: -1.59456034000496,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -647,7 +647,7 @@ const mercuryPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 3.30121692544698,
+  orbitRadius: 3.30123436930967,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -703,8 +703,8 @@ const venusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -0.381804650233582,
-  orbitCenterb: 0.306762805384116,
+  orbitCentera: -0.381861038455445,
+  orbitCenterb: 0.306808110775548,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -756,7 +756,7 @@ const venusPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.243239838595844,
+  orbitRadius: 0.243275520725271,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -812,8 +812,8 @@ const marsPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 9.76460175702406,
-  orbitCenterb: -19.9928531396544,
+  orbitCentera: 9.84185006300923,
+  orbitCenterb: -20.1331929354344,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -861,7 +861,7 @@ const marsbarycenterPLANETS = {
 
 const marsPerihelionFromSun = {
   name: "Mars Perihelion From Sun",
-  startPos: 243.09,
+  startPos: 243.156,
   speed: 0.398326084542855,
   rotationSpeed: 0,
   tilt: 0,
@@ -884,7 +884,7 @@ const marsPerihelionFromSun = {
 
 const mars = {
   name: "Mars",
-  startPos: 121.545,
+  startPos: 121.578,
   speed: -3.34075569586122,
   rotationSpeed: 2236.82429921882,
   tilt: -25.19,
@@ -968,8 +968,8 @@ const jupiterPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -12.0322018698551,
-  orbitCenterb: -44.8459208753374,
+  orbitCentera: -12.7649841206703,
+  orbitCenterb: -46.3783884222424,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1017,11 +1017,11 @@ const jupiterbarycenterPLANETS = {
 
 const jupiterPerihelionFromSun = {
   name: "Jupiter Perihelion From Sun",
-  startPos: 27.6,
+  startPos: 27.684,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 1.16647398162302,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1041,7 +1041,7 @@ const jupiterPerihelionFromSun = {
 
 const jupiter = {
   name: "Jupiter",
-  startPos: 13.8,
+  startPos: 13.842,
   speed: 0.529924019671262,
   rotationSpeed: 5549.34320193203,
   tilt: -3.13,
@@ -1077,8 +1077,8 @@ const saturnPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -103.526061827915,
-  orbitCenterb: 5.12935263463164,
+  orbitCentera: -100.18985703282,
+  orbitCenterb: 4.92899730245992,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1126,11 +1126,11 @@ const saturnbarycenterPLANETS = {
 
 const saturnPerihelionFromSun = {
   name: "Saturn Perihelion From Sun",
-  startPos: 22.77,
+  startPos: 22.888,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 2.57197670782462,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1150,7 +1150,7 @@ const saturnPerihelionFromSun = {
 
 const saturn = {
   name: "Saturn",
-  startPos: 11.385,    
+  startPos: 11.444,    
   speed: 0.213538596982708,
   rotationSpeed: 5215.37251228578,
   tilt: -26.73,
@@ -1188,8 +1188,8 @@ const uranusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -22.967626194115,
-  orbitCenterb: 166.420952723134,
+  orbitCentera: -22.3744267200277,
+  orbitCenterb: 168.187625950574,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1237,11 +1237,11 @@ const uranusbarycenterPLANETS = {
 
 const uranusPerihelionFromSun = {
   name: "Uranus Perihelion From Sun",
-  startPos: 89.64,    
+  startPos: 89.708,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 3.93471734577913,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1261,7 +1261,7 @@ const uranusPerihelionFromSun = {
 
 const uranus = {
   name: "Uranus",
-  startPos: 44.82,    
+  startPos: 44.854,    
   speed: 0.0750403955928845,
   rotationSpeed: -3194.74981995042,
   tilt: -82.23,
@@ -1297,8 +1297,8 @@ const neptunePerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -52.315024776711,
-  orbitCenterb: -42.7325230502452,
+  orbitCentera: -53.4252786423449,
+  orbitCenterb: -44.0137967163906,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1346,11 +1346,11 @@ const neptunebarycenterPLANETS = {
 
 const neptunePerihelionFromSun = {
   name: "Neptune Perihelion From Sun",
-  startPos: 95.896,    
+  startPos: 95.874,    
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 0.404247596786746,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1370,7 +1370,7 @@ const neptunePerihelionFromSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: 47.948,
+  startPos: 47.937,
   speed: 0.0382800485454671,
   rotationSpeed: 3418.56790376751,
   tilt: -28.32,
@@ -1417,7 +1417,7 @@ const plutoPerihelionFromEarth = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.01,   
+  size: 5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_perihelion.png',
   traceLength : sYear * 1000000,
@@ -1460,11 +1460,11 @@ const plutobarycenterPLANETS = {
 
 const plutoPerihelionFromSun = {
   name: "Pluto Perihelion From Sun",
-  startPos: 143.4,
+  startPos: 143.12,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 194.485802383665,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1484,7 +1484,7 @@ const plutoPerihelionFromSun = {
 
 const pluto = {
   name: "Pluto",
-  startPos: 71.7,
+  startPos: 71.56,
   speed: 0.025567950879349,
   rotationSpeed: 359.294297168521,
   tilt: -57.47,
@@ -1511,7 +1511,6 @@ const pluto = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  isDeferent: true,
 };
 
 const halleysPerihelionFromEarth = {
@@ -1521,13 +1520,13 @@ const halleysPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 0,
+  orbitCentera: -243.812109395506,
   orbitCenterb: 1742.10124111005,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.01,   
+  size: 5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_perihelion.png',
   traceLength : sYear * 1000000,
@@ -1570,16 +1569,16 @@ const halleysbarycenterPLANETS = {
 
 const halleysPerihelionFromSun = {
   name: "Halleys Perihelion From Sun",
-  startPos: 108,
+  startPos: 80,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0,
+  orbitRadius: 851.344214398387,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
-  orbitTiltb: Math.sin(((-90-59.56078348)*Math.PI)/180)*(180-162.192203847561),
+  orbitTilta: Math.cos(((-90-59.56078348)*Math.PI)/180)*(-162.192203847561),
+  orbitTiltb: Math.sin(((-90-59.56078348)*Math.PI)/180)*(-162.192203847561),
 
   size: 0.1,
   color: 0xA57C1B,
@@ -1594,7 +1593,7 @@ const halleysPerihelionFromSun = {
 
 const halleys = {
   name: "Halleys",
-  startPos: 54,
+  startPos: 40,
   speed: 0.0830907062312016,
   rotationSpeed: 1043.12937189584,
   tilt: 0,
@@ -1623,7 +1622,6 @@ const halleys = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  isDeferent: true,
 };
 
 const erosPerihelionFromEarth = {
@@ -1633,13 +1631,13 @@ const erosPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -36.1217511010512,
-  orbitCenterb: 23.5064953689454,
+  orbitCentera: -39.770115595928,
+  orbitCenterb: 25.8806954143179,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.01,   
+  size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_perihelion.png',
   traceLength : sYear * 1000000,
@@ -1682,10 +1680,10 @@ const erosbarycenterPLANETS = {
 
 const erosPerihelionFromSun = {
   name: "Eros Perihelion From Sun",
-  startPos: 114.6,
-  speed: 0.852798978486624,
+  startPos: 114.33,
+  speed: 0.852388248352015,
   tilt: 0,
-  orbitRadius: 14.9565668597751,
+  orbitRadius: 14.957076673965,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1705,11 +1703,11 @@ const erosPerihelionFromSun = {
 
 const eros = {
   name: "Eros",
-  startPos: 57.3,
-  speed: -3.56799214283311,
+  startPos: 57.165,
+  speed: -3.5677867777658,
   rotationSpeed: 10451.0875434594,
   tilt: 0,
-  orbitRadius: 145.826791115055,
+  orbitRadius: 145.832387010277,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1732,7 +1730,6 @@ const eros = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  isDeferent: true,
 };
 
 //*************************************************************
@@ -1740,7 +1737,7 @@ const eros = {
 //*************************************************************
 const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, barycenterPLANETS, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, phobos, deimos, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros, perihelionPointAlternative]
 
-const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
+const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
 //*************************************************************
 // ADD ALL CALENDAR CONSTANTS
@@ -2678,7 +2675,7 @@ function setupGUI() {
   
   let planetList = {}
   let isHelper = {}
-  const helperRegex = /Barycenter|Phobos|Deimos|Precession|WOBBLE|HELION|Eros|Pluto|Halleys|Eccentricity|Helion|Starting|Cycle|Ellipse/i;
+  const helperRegex = /Barycenter|Precession|WOBBLE|HELION|Eccentricity|Pluto|Eros|Halleys|Helion|Starting|Cycle|Ellipse/i;
 
   planetObjects.forEach(obj => {
   if (!helperRegex.test(obj.name)) {
@@ -2727,7 +2724,9 @@ function setupGUI() {
       precessionFolder.add(predictions, 'lengthofanomalisticYear').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
   
       precessionFolder.add(predictions, 'perihelionPrecession').name('Perihelion Precession (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'axialPrecession').name('Axial Precession (yrs)').step(0.000001).listen();
+      const axialCtrl = precessionFolder.add( predictions, 'axialPrecession' ).name( 'Axial Precession (yrs)' ).step( 0.000001 ).listen();
+      addInfoButton(axialCtrl, 'https://en.wikipedia.org/wiki/Axial_precession');
+ 
       precessionFolder.add(predictions, 'inclinationPrecession').name('Inclination Precession (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'eclipticPrecession').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
       precessionFolder.add(predictions, 'obliquityPrecession').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
@@ -2788,6 +2787,7 @@ function setupGUI() {
   
   let folderPerihelion = gui.addFolder('Perihelion Planets')
   folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
+  addInfoButton( folderPerihelion, 'https://britastro.org/computing/applets_orbel.html' );
   folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mercury Perihelion")
   folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Venus Perihelion")
   folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Earth Perihelion")
@@ -4267,17 +4267,46 @@ function getZodiacRotationSpeed() {
   return earth ? -earth.speed : 0;
 }
 
-function moveModel(pos){
+function moveModel(pos) {
+
+  let earthTheta = 0;                     // we need this afterwards
+
   planetObjects.forEach(obj => {
-    obj.orbitObj.rotation.y = obj.speed * pos - obj.startPos * (Math.PI/180)
-    if (obj.rotationSpeed) {
-      obj.planetObj.rotation.y = obj.rotationSpeed * pos 
+
+    // current mean (or true) anomaly, same formula you already used
+    const θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
+
+    const a = obj.a ?? obj.orbitRadius;   // semi-major (or radius)
+    const b = obj.b ?? obj.orbitRadius;   // semi-minor (or radius)
+    const isEllipse = a !== b;            // true only when the axes differ
+
+    if (isEllipse) {
+      // -------- analytic curve --------
+      const x = Math.cos(θ) * a;
+      const z = Math.sin(θ) * b;
+
+      obj.pivotObj.position.set(x, 0, z);
+      obj.rotationAxis.position.set(x, 0, z);   // planet + rings
+
+      obj.orbitObj.rotation.y = 0;              // keep the path still
+    } else {
+      // -------- orbitradius circular logic ----
+      obj.orbitObj.rotation.y = θ; 
     }
-  })
-  zodiac.rotation.y = -Math.PI/3 - earth.orbitObj.rotation.y;
+
+    // planet’s own day-night spin
+    if (obj.rotationSpeed) {
+      obj.planetObj.rotation.y = obj.rotationSpeed * pos;
+    }
+
+    // remember Earth’s anomaly for the zodiac strip
+    if (obj.name === 'Earth') earthTheta = θ;
+  });
+
+  // zodiac band keeps its old behaviour
+  zodiac.rotation.y = -Math.PI / 3 - earthTheta;
 }
 
-//
 function getOptimizedPixelRatio() {
   const dpr = window.devicePixelRatio || 1;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
@@ -5066,6 +5095,9 @@ function createPlanet(pd) { // pd = Planet Data
   const semiMajor = pd.orbitSemiMajor !== undefined ? pd.orbitSemiMajor : pd.orbitRadius;
   const semiMinor = pd.orbitSemiMinor !== undefined ? pd.orbitSemiMinor : pd.orbitRadius;
 
+  pd.a = semiMajor;      // store semi-major axis
+  pd.b = semiMinor;      // store semi-minor axis
+  
   for (let i = 0; i <= segments; i++) {
     const angle = (i / segments) * Math.PI * 2;
     points.push(new THREE.Vector3(
@@ -5824,6 +5856,29 @@ function raToDeg(ra) {
 }
 
 // === Utilities ===
+function addInfoButton ( ctrl, url ) {
+  const labelEl =
+        ctrl.$name ||                                        // lil-gui
+        ( ctrl.domElement &&                                 // dat.gui ≥0.7
+          ctrl.domElement.querySelector('.property-name') ) ||
+        ( ctrl.__li &&
+          ctrl.__li.querySelector('.property-name') );
+
+  if ( !labelEl || labelEl.querySelector('.gui-info') ) return;
+
+  const a = document.createElement('a');
+  a.className     = 'gui-info';
+  a.href          = url;
+  a.target        = '_blank';
+  a.rel           = 'noopener';
+  a.title         = 'Background information';
+  a.textContent   = ' ⓘ';                  // NBSP + circled-I
+  a.style.cssText = 'margin-left:4px; text-decoration:none; ' +
+                    'cursor:pointer; user-select:none; font-weight:600;';
+
+  labelEl.appendChild( a );
+}
+
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }

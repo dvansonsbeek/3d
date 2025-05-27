@@ -165,6 +165,7 @@ a:link {
   width:max-content;              /* Chrome / Edge / Safari */
   width:-moz-max-content;         /* Firefox                */
   box-sizing:border-box;          /* include border in that width */
+  display: none;
 }
 
 /* ---- card body ---- */
