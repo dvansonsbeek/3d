@@ -9,9 +9,9 @@ import * as dat from 'dat.gui';
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
 The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.*/
 
-/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 305,952 years, an Axial precession cycle of ~23,535 years, an Inclination precession cycle of 101,984 years and a Perihelion precession cycle of 19,122 years. 
+/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 305,952 years, an Axial precession cycle of ~23,535 years, an Inclination precession cycle of 101,984 years and a Perihelion precession cycle of 19,122 years.*/
 
-See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d*/
+//See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d
 
 //*************************************************************
 // ADD GLOBAL INPUT CONSTANTS
@@ -23,14 +23,14 @@ const perihelionalignmentYear = 1246;
 const perihelionalignmentJD = 2176142;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const lengthsolaryearindaysin1246 = 365.242236;
-// Reference length of solar year in days in 1246 AD according to EPOCH document = MEAN
+// Reference length of solar year in days in 1246 AD according to EPOCH document = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
-// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
+// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = ~MEAN
 const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = -0.2656103;
+const correctionDays = 2.7343897;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
 const earthtiltMean = 23.4243449577;
 const earthinclinationMean = 1.492075548;
@@ -154,7 +154,7 @@ const midEccentricityOrbit = {
 };
 
 const perihelionPointAlternative = {
-  name: "Perihelion Earth (Alternative)",
+  name: "Perihelion-of-Earth (Alternative)",
   startPos: -104.204722055415,
   speed: 0.0000616095201912024,
   rotationSpeed: 0,
@@ -356,7 +356,7 @@ const barycenterEarthAndSun = {
 };
 
 const earthPerihelionFromEarth = {
-  name: "PERIHELION EARTH",
+  name: "PERIHELION-OF-EARTH",
   startPos: 0,    
   speed: 0,
   rotationSpeed: 0,
@@ -3399,8 +3399,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.mercuryPerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.mercuryPerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.mercuryPerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.mercuryPerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.mercuryPerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'        : 48.33167 },
     { 'Mean Orbital Eccentricity (AU)'              : 0.20563069 },
@@ -3420,8 +3420,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.venusPerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.venusPerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.venusPerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.venusPerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.venusPerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'  : 76.68069 },
     { 'Mean Orbital Eccentricity (AU)'        : 0.00677323 },
@@ -3464,8 +3464,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.jupiterPerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.jupiterPerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.jupiterPerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.jupiterPerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.jupiterPerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'  : 100.55615 },
     { 'Mean Orbital Eccentricity (AU)'        : 0.04839266 },
@@ -3486,8 +3486,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.saturnPerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.saturnPerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.saturnPerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.saturnPerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.saturnPerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'        : 113.71504},
     { 'Mean Orbital Eccentricity (AU)'              : 0.0541506},
@@ -3508,8 +3508,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.uranusPerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.uranusPerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.uranusPerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.uranusPerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.uranusPerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'        : 74.22988 },
     { 'Mean Orbital Eccentricity (AU)'              : 0.04716771 },
@@ -3530,8 +3530,8 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth (days)' : o.meanDistanceMoon },
     { 'Mean Longitude of Perihelion (°)'      : o.neptunePerihelion },
 
-    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.neptunePerihelion - 180, o.currentYear) },
-    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.neptunePerihelion,        o.currentYear) },
+    { 'Date of Perihelion (Y-M-D h:m:s)' : longitudeToDateTime(o.neptunePerihelion, o.currentYear) },
+    { 'Date of Aphelion  (Y-M-D h:m:s)'  : longitudeToDateTime(o.neptunePerihelion - 180,        o.currentYear) },
 
     { 'Mean Longitude of Ascending node (°)'        : 131.72169 },
     { 'Mean Orbital Eccentricity (AU)'              : 0.00858587 },
