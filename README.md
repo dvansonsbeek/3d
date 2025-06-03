@@ -1,5 +1,7 @@
 # 🌌 Solar System Simuation build in three js
 
+![ss](https://www.holisticuniverse.com/img/14_predicted_Year2058AD.png)
+
 NO AI TRAINING on this Interactive 3D Solar System Simulation of the Holistic Universe Model unless explicitly authorized by D. van Sonsbeek.
 
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
@@ -149,3 +151,9 @@ Each planet is structured like this:
 - 🌟 Visual improvements
 - 🖼 Export frames for video or screenshots
 - 🕶 Integrate with `WebXR` for VR solar system flythrough
+
+## Contact
+
+For questions or support, please contact [info@holisticuniverse.com].
+
+**Repository Views** ![Views](https://profile-counter.glitch.me/planet3D/count.svg)
