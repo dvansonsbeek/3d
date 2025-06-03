@@ -2061,8 +2061,6 @@ document.body.appendChild(labelRenderer.domElement);
   };
 })(labelRenderer, baseCamDistance);
 
-//})(labelRenderer, camera, baseCamDistance);
-
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2164,6 +2162,7 @@ erosPerihelionFromEarth.pivotObj.add(erosbarycenterPLANETS.containerObj);
 erosbarycenterPLANETS.pivotObj.add(erosPerihelionFromSun.containerObj);
 erosPerihelionFromSun.pivotObj.add(eros.containerObj);
 
+// The model starts on 21 june and not at 0 degrees (equinox) so we need to turn it 90 degrees
 earth.containerObj.rotation.y = Math.PI/2;
 //END CREATE AND CONFIGURE PLANETS
 
@@ -2317,7 +2316,7 @@ const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
 const loader = new THREE.TextureLoader();
 const skyTexture = loadTexture("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
 
-// ✅ Set correct color space for color image textures
+// Set correct color space for color image textures
 skyTexture.colorSpace = THREE.SRGBColorSpace; // This is the correct setting for normal color images
 const skyMaterial = new THREE.MeshBasicMaterial({
   map: skyTexture,
@@ -2377,7 +2376,7 @@ controls.addEventListener('change', () => { needsLabelUpdate = true; });
 //    • On zoom (if separate):
 camera.addEventListener('zoom',   () => { needsLabelUpdate = true; });
 
-// 2) One dashed‐line material for all constellations
+// 3) One dashed‐line material for all constellations
 const constellationMaterial = new THREE.LineDashedMaterial({
   color:       0x00aaff,
   linewidth:   1,
@@ -2394,7 +2393,7 @@ const constellationMaterial = new THREE.LineDashedMaterial({
 const drawOnShaderProto = new THREE.ShaderMaterial({
   uniforms: {
     uDrawProgress: { value: 0.0 },
-    uTotalLength:   { value: 1.0 },                          // ← declared here
+    uTotalLength:   { value: 1.0 },
     uColor:         { value: constellationMaterial.color.clone() }
   },
   vertexShader: `
@@ -2424,10 +2423,10 @@ const drawOnShaderProto = new THREE.ShaderMaterial({
 // so we can update their `uDrawProgress` in a single loop.
 const drawMaterials = [];
 
-// 3) Kick off constellation setup immediately
+// 4) Kick off constellation setup immediately
 initConstellations();
 
-// 4) Load star‐glow texture, then build stars
+// 5) Load star‐glow texture, then build stars
 loadTexture(starGlowURL, tex => {
   starTexture = tex;
   starTexture.colorSpace = THREE.SRGBColorSpace;  // correct color space
@@ -2449,7 +2448,7 @@ scene.add(focusRing);
 //*************************************************************
 const sunTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
 
-// ✅ Set correct color space for color image textures
+// Set correct color space for color image textures
 sunTexture.colorSpace = THREE.SRGBColorSpace;
 
 // Create the Sprite material
@@ -2477,7 +2476,7 @@ sun.pivotObj.add(sunGlow);
 const flareTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
 // You can use any small round bright texture or generate a quick radial white glow.
 
-// ✅ Set correct color space for color image textures
+// Set correct color space for color image textures
 flareTexture.colorSpace = THREE.SRGBColorSpace;
 
 // Create multiple flare elements
@@ -2529,7 +2528,6 @@ o.distanceUnit = 'AU';
 o.RA_Display = '';
 o.Dec_Display = '';
 o.lengthofAU = '149597870.698828';
-//o.julianDay = startmodelJD; BE CAREFUL: IF YOU SET THIS THE JULIAN DAY IS NOT SELECTABLE
 o.perihelionDate = "";
 let currPos; 
 let lastPlanetFocus = earth; // Default fallback
@@ -2539,7 +2537,7 @@ let smoothedFps   = 60;
 let lastCameraX   = 0, lastCameraY = 0, lastCameraZ = 0;
 let lowPerformanceMode = false;
 
-// At the top of your file, create a reusable vectors
+// At the top of your file, create reusable vectors
 const centerPosVec = new THREE.Vector3();
 const starPosVec  = new THREE.Vector3();
 const scaleVec = new THREE.Vector3();
@@ -2603,7 +2601,6 @@ const PERI_ALIGN_JD = 2_176_142;
 /* wrap any real angle to 0 … 360° ---------------------------------- */
 const wrap360 = x => ((x % 360) + 360) % 360;
 
-
 // --------------------------------------------------------------
 //  GLOBAL helper: store frozen widths per planet name
 // --------------------------------------------------------------
@@ -2624,12 +2621,12 @@ const PLANET_SYMBOL = {
   uranus  : '♅',   neptune : '♆',  pluto  : '♇'
 };
 
-// 1️⃣  put every “big-radius” object that must expand / shrink together in one array
+// put every “big-radius” object that must expand / shrink together in one array
 const scalableObjects = [
   sceneObjects.stars,
   sceneObjects.constellations,
   celestialSphere,
-  plane                     //  ← NEW
+  plane
 ];
 
 //const baseCamDistance = camera.position.length(); // distance that feels “100 %” size
@@ -2844,8 +2841,6 @@ function setupGUI() {
   sub.add(obj, 'decDisplay').name('Dec').listen();
   sub.add(obj, 'distDisplay').name('Distance to Earth').listen();
   sub.add(obj, 'sunDistDisplay').name('Distance to Sun').listen();
-//  sub.add(obj, 'distKm').name('Kilometers').listen();
-//  sub.add(obj, 'dist').name('AU Distance').listen();
   sub.open();
   });
   
@@ -2887,7 +2882,7 @@ function setupGUI() {
   folderO.add(o, 'constellationLayout', {
   'Traditional (Asterism)': 'asterism',
   'Artistic (Curved)':  'stellarium'
-})
+  })
   .name('Constellation Style')
   .onChange(() => {
     initConstellations();   // re–draw with the new style
@@ -2948,10 +2943,10 @@ function setupGUI() {
   folderCamera.add(o, 'worldCamDec').name('Dec').listen()
   folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
  
-   /* ---------------------------------------------------------
-   * width-toggle badge (does NOT consume a controller slot)
-   * --------------------------------------------------------- */
-   addWidthToggle(gui);
+  /* ---------------------------------------------------------
+  * width-toggle badge (does NOT consume a controller slot)
+  * --------------------------------------------------------- */
+  addWidthToggle(gui);
 }  
 
 //*************************************************************
@@ -3084,8 +3079,7 @@ function render(now) {
   //stats.end();
 }
 requestAnimationFrame(render);
-//} 
-//render();
+
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
@@ -3394,7 +3388,7 @@ function loadTexture( url, onLoad ) {
 
 function updateDomLabel() {
 
-  /* 0 — per-frame stats, NOW they see the current o.* values  */
+  // 0 — per-frame stats
   const planetStats = {
     earth: [
       { header : '—  General characteristics —' },
@@ -3403,9 +3397,9 @@ function updateDomLabel() {
       null,
       { header : 'Date specific characteristics for ',  date   : () => o.Date } ,
       {''                                           : [ { small : 'mean' },'on date']},
-      {'Day length in SI seconds'                   : [{ small : meanlengthofday},o.lengthofDay]},
-      {'Sidereal day length in SI seconds = Earth rotation period' : [{ small: meanSiderealday}, o.lengthofsiderealDayRealLOD ]},
-      {'True Sidereal day length in SI seconds'                   : [{ small: meanTrueSiderealday}, o.lengthofsiderealYear/((o.lengthofsiderealYear/o.lengthofDay)+1) ]},
+      {'Solar Day in SI seconds'                    : [{ small : meanlengthofday},o.lengthofDay]},
+      {'Sidereal day in SI seconds = Earth rotation period' : [{ small: meanSiderealday}, o.lengthofsiderealDayRealLOD ]},
+      {'True Sidereal day in SI seconds'                   : [{ small: meanTrueSiderealday}, o.lengthofsiderealYear/((o.lengthofsiderealYear/o.lengthofDay)+1) ]},
       {'Orbit Period Solar = Solar year in REAL days' : [{ small : meansolaryearlengthinDays},o.lengthofsolarYear]},
       {'Solar year in SI seconds'                   : [{ small: meanlengthofday*meansolaryearlengthinDays}, o.lengthofsolarYearSecRealLOD ]},
       {'Orbit Period Sidereal = Sidereal year in SI seconds' : [{ small : meansiderealyearlengthinSeconds},o.lengthofsiderealYear]},
@@ -3494,7 +3488,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.mercuryAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.mercuryDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.mercuryArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'  : [1296000/(((((57910302.3826137-(57910302.3826137/100*20.5632))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     venus: [
     { header : '—  General characteristics —' },
@@ -3520,7 +3514,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.venusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.venusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.venusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((108210149.66-(108210149.66/100*0.6772))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     mars: [
@@ -3547,7 +3541,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.marsAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.marsDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.marsArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((227937359.31-(227937359.31/100*9.3401))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
    
     jupiter: [
@@ -3574,7 +3568,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.jupiterAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.jupiterDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.jupiterArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((777862653.72-(777862653.72/100*4.8499))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     saturn: [
@@ -3601,7 +3595,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.saturnAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.saturnDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.saturnArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((1425808067.32-(1425808067.32/100*5.5547))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     uranus: [
@@ -3628,7 +3622,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.uranusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.uranusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.uranusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((2863179533.89-(2863179533.89/100*4.6381))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     neptune: [
@@ -3655,11 +3649,11 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.neptuneAscendingNode]},
     { 'Longitude of Descending'                     : [{ small : 'N/A' },o.neptuneDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.neptuneArgumentOfPeriapsis]},
-    { 'Missing perihelion precession (arcsec/100 yrs)' : o.meanDistanceMoon },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((4484668412.63-(4484668412.63/100*1.168))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
   };
 
-  /* 1 — build / fetch the DOM elements … (unchanged)  */
+  // 1 — build / fetch the DOM elements
   const label = document.getElementById('planetLabel');
   if (!label) { console.error('#planetLabel element missing'); return; }
 
@@ -3694,7 +3688,7 @@ function updateDomLabel() {
   }
   const content = label.querySelector('.labelContent');
 
-  /* 2 — should we show anything? … (unchanged)  */
+  // 2 — should we show anything?
   const selObj   = o.lookAtObj;
   const selName  = selObj?.name?.toLowerCase() || '';
   const pivot    = selObj?.pivotObj;
@@ -3705,20 +3699,18 @@ function updateDomLabel() {
     selName !== 'unnamed' &&
     planetStats[selName];
 
-  /* ------------------------------------------------------------------
-   Apply per-planet colour theme to the panel
-   ------------------------------------------------------------------ */
+  
+  // 3 - Apply per-planet colour theme to the panel
   if (showCard) {                         // only bother when the card is visible
   const labelEl  = document.getElementById('planetLabel');
   const themeCls = `theme-${selName}`;  // e.g. "theme-mars"
 
-  // remove any earlier theme-* class
   for (const c of [...labelEl.classList]) {
     if (c.startsWith('theme-') && c !== themeCls) {
       labelEl.classList.remove(c);
     }
   }
-  // add the new theme if it’s not there yet
+  // 4 - add the new theme if it’s not there yet
   if (!labelEl.classList.contains(themeCls)) {
     labelEl.classList.add(themeCls);
   }
@@ -3740,15 +3732,13 @@ function updateDomLabel() {
     return;
   }
 
-  /* 3 — build the HTML with the *fresh* numbers  */
+  // 5 — build the HTML with the *fresh* numbers
   const fmt = v =>
   (typeof v === 'number' && Number.isFinite(v)) ? +v.toFixed(8) : (v ?? '');
 
   const mkCell = (cls, content) =>
   `<span class="${cls}">${content ?? ''}</span>`;
 
- // let nextHTML =
- // `<strong>${niceName(selName)}</strong>
   const symbol = PLANET_SYMBOL[selName] || '';
   let nextHTML = `
   <div class="pl-title">
@@ -3760,16 +3750,15 @@ function updateDomLabel() {
 
   for (const row of planetStats[selName]) {
 
-  /* —— 1. header row ——————————————————————————————— */
-  /***** header row ***********************************************************/
-if (row && row.header) {
+  // 6 Header row logic
+  if (row && row.header) {
 
-  /* 1 — fetch the current date value (string | number | Date | undefined) */
+  // 7 Date row logic (string | number | Date | undefined)
   const raw = (typeof row.date === 'function')
                 ? row.date()           // call the getter every rebuild
                 : row.date;
 
-  /* 2 — convert to "dd/mm/yyyy" when possible, otherwise show raw string   */
+  // 7b) convert to "dd/mm/yyyy" when possible, otherwise show raw string
   let dateStr = '';
   if (raw !== undefined && raw !== null) {
     let d;
@@ -3792,7 +3781,7 @@ if (row && row.header) {
                 : String(raw);
   }
 
-  /* 3 — compose the header HTML and insert it */
+  // 7c) — compose the header HTML and insert it
   const headHTML =
         row.header +
         (dateStr ? ` <span class="date">${dateStr}</span>` : '');
@@ -3801,16 +3790,14 @@ if (row && row.header) {
   continue;
   }
 
-
-  /* —— 2. blank row ——————————————————————————————— */
+  // 8 - blank row
   if (row === null) {
     nextHTML += mkCell('pl-blank','') + mkCell('pl-blank','') + mkCell('pl-blank','');
     continue;
   }
 
-  /* —— 3. normal data rows ———————————————————————— */
-  //const [ labelTxt, rawVal ] = Object.entries(row)[0];
-    // find the first entry that is NOT a meta-key
+  // 9 - normal data rows
+  // find the first entry that is NOT a meta-key
   const [ labelTxt, rawVal ] = Object.entries(row)
      .find(([k]) => k !== 'info' && k !== 'header');
   const unit = (labelTxt.match(/\(([^)]+)\)/) || [,''])[1];
@@ -3855,7 +3842,7 @@ if (row && row.header) {
       mkCell('pl-key', labelHTML) +
       mkCell('pl-val', render(v1)) +
       mkCell('pl-alt', render(v2));
-}
+  }
 
   nextHTML += '</div></div>';
 
@@ -3863,7 +3850,7 @@ if (row && row.header) {
   content.innerHTML = nextHTML;
   labelPrevHTML     = nextHTML;
 
-  /* ------------ freeze / reuse column widths ------------- */
+  // freeze / reuse column widths
   let templateCols = columnCache[selName];
   if (!templateCols) {                          // first build for this planet
     const grid  = content.querySelector('.pl-grid');
@@ -3879,18 +3866,16 @@ if (row && row.header) {
   content.querySelector('.pl-grid').style.gridTemplateColumns = templateCols;
   }
   
-  /* 4 — position & scale  (now fixed to top-left) */
-  /* ───────────────────────────────────────────── */
-
+  // 10 — position & scale  (fixed to top-left)
   label.style.position  = 'fixed';   // stay in viewport space
   label.style.top       = '16px';
   label.style.left      = '16px';
 
-  /* keep it the same size, no zoom-scaling */
+  // keep it the same size, no zoom-scaling
   label.style.transform = 'none';
   label.style.display   = 'block';
   
-  /* 4 — position & scale … (unchanged)  */
+  // position & scale
   pivot.updateMatrixWorld();
   const pos = pivot.getWorldPosition(new THREE.Vector3()).project(camera);
 
@@ -3903,7 +3888,6 @@ if (row && row.header) {
 
   label.style.transform =
     `translate(-50%,-50%) translate(${x}px,${y}px) scale(1)`;
-//     `translate(-50%,-50%) translate(${x}px,${y}px) scale(${scale})`;  // Zoom was used here
   label.style.transformOrigin = 'center';
   label.style.display = 'block';
 }
@@ -3962,11 +3946,10 @@ function updateFocusRing() {
     );
     focusRing.scale.set(5, 5, 0);   // whatever size you need
     focusRing.visible = true;
-  } else {
+    } else {
     focusRing.visible = false;
   }
 }
-
 
 function createFlare(color, scale) {
   const material = new THREE.SpriteMaterial({
@@ -4015,7 +3998,7 @@ function updateFlares() {
       flare.material.opacity = 1.0 - Math.abs(index - 1) * 0.3; // Center flare brightest
     });
 
-  } else {
+    } else {
     flares.forEach(flare => {
       flare.visible = false;
     });
@@ -4107,7 +4090,7 @@ function updateLightingForFocus() {
   }
 }
 
-// Optional animation (pulsing)
+// Animation (pulsing)
 function animateGlow() {
     glowMaterial.opacity = 0.2 + 0.1 * Math.sin(Date.now() * 0.002);
     requestAnimationFrame(animateGlow);
@@ -4139,11 +4122,11 @@ function createEarthPolarLine() {
 
 function changeSphereScale() {
       celestialSphere.scale.set(o.cSphereSize, o.cSphereSize, o.cSphereSize);    
-  }
+}
   
 function changeZodiacScale() {
       zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);  
-  }
+}
 
 function updatePosition() {
   o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
@@ -4153,18 +4136,18 @@ function updatePosition() {
 
 function changeTraceScale(){
     tracePlanets.forEach(obj => {
-      if (obj.traceLine) {
+    if (obj.traceLine) {
         obj.traceLine.material.size = obj.size*10 * o.traceSize
-      }
-    });  
-  }
+    }
+  });  
+}
 
 function changePlanetScale(){
     planetObjects.forEach(obj => {
       obj.planetObj.scale.x = o.Size
       obj.planetObj.scale.y = o.Size
       obj.planetObj.scale.z = o.Size
-    });  
+  });  
 }
 
 function auToKm(au) { return au * o.lengthofAU; }  // live conversion
@@ -4468,7 +4451,7 @@ function getOptimizedPixelRatio() {
   }
 }
 
-// And your normal resize function:
+// resize function:
 function onWindowResize() {
   /* ---------- safe viewport ---------- */
   const width  = Math.max(MIN_SIZE, window.innerWidth);
@@ -5003,9 +4986,6 @@ function updatePredictions() {
 
 }
 
-// 2000.57860 o.currentYear
-// 10315.566 o.perihelionprecessioncycleYear
-
 /**
  * Compute the length of day (in seconds) for a given year.
  *
@@ -5026,7 +5006,7 @@ function computeLengthofDay(
   helionpointAmplitude,
   meansolardayAmplitudeinSeconds,
   meanlengthofday
-) {
+  ) {
   // Δ‐year
   const delta = currentYear - balancedYear;
 
@@ -5070,7 +5050,7 @@ function computeLengthofsolarYear(
   perihelionprecessioncycleYear,
   meansolaryearAmplitudeinDays,
   meansolaryearlengthinDays
-) {
+  ) {
   // Δ‐year
   const delta = currentYear - balancedYear;
 
@@ -5105,7 +5085,7 @@ function computeLengthofsiderealYear(
   perihelionprecessioncycleYear,
   meansiderealyearAmplitudeinSeconds,
   meansiderealyearlengthinSeconds
-) {
+  ) {
   // Δ‐year
   const delta = currentYear - balancedYear;
 
@@ -5132,7 +5112,7 @@ function computeLengthofsiderealYear(
 function computeLengthofanomalisticYear(
   perihelionPrecession,
   lengthofsolarYear
-) {
+  ) {
   return ((perihelionPrecession * lengthofsolarYear) /
           (perihelionPrecession - 1)) * 86400;
 }
@@ -5148,7 +5128,7 @@ function computeLengthofanomalisticYearRealLOD(
   perihelionPrecession,
   lengthofsolarYear,
   lengthofDay
-) {
+  ) {
   return ((perihelionPrecession * lengthofsolarYear) /
           (perihelionPrecession - 1)) * lengthofDay;
 }
@@ -5163,7 +5143,7 @@ function computeLengthofanomalisticYearRealLOD(
 function computeAxialPrecession(
   lengthofsiderealYear,
   lengthofsolarYear
-) {
+  ) {
   return lengthofsiderealYear /
          (lengthofsiderealYear - (lengthofsolarYear * 86400));
 }
@@ -5180,7 +5160,7 @@ function computeAxialPrecessionRealLOD(
   lengthofsiderealYear,
   lengthofsolarYear,
   lengthofDay
-) {
+  ) {
   return lengthofsiderealYear /
          (lengthofsiderealYear - (lengthofsolarYear * lengthofDay));
 }
@@ -5203,7 +5183,7 @@ function computeEccentricityEarth(
   eccentricityMean,
   eccentricityAmplitude,
   eccentricitySinusCorrection
-) {
+  ) {
   // 1. root = √(eₘ² + a²)
   const root = Math.sqrt(
     eccentricityMean * eccentricityMean +
@@ -5287,7 +5267,7 @@ function computeInclinationEarth(
   holisticyearLength,
   earthinclinationMean,
   tiltandinclinationAmplitude
-) {
+  ) {
   // 1. Compute cycle position in degrees
   const degrees = (
     (currentYear - balancedYear) /
@@ -5320,7 +5300,7 @@ function computeLongitudePerihelion(
   perihelionprecessioncycleYear,
   helionpointAmplitude,
   mideccentricitypointAmplitude
-) {
+  ) {
   // 1. Determine which cycle value to use
   const delta = currentYear - balancedYear;
   const cycleValue = (delta / perihelionCycleLength) > 1
@@ -5414,9 +5394,6 @@ function julianDateToDecimalYear(jd) {
   return decimalYear;
 }
 
-//*************************************************************
-// F:CREATE PLANETS
-//*************************************************************
 function createPlanet(pd) { // pd = Planet Data
 
   // Orbit container
@@ -5580,11 +5557,11 @@ function createPlanet(pd) { // pd = Planet Data
     transparent: planetMaterial.transparent,
     opacity: planetMaterial.opacity,
   });
-  console.log('Shadow flags:', {
+    console.log('Shadow flags:', {
     castShadow: planetMesh.castShadow,
     receiveShadow: planetMesh.receiveShadow
-  });
-}
+    });
+  }
 
   // Add to scene
   scene.add(orbitContainer);
@@ -5733,7 +5710,7 @@ function setStarDistance() {
 function getCircularText(
   text, diameter, startAngle, align, textInside, inwardFacing, 
   fName, fSize, kerning
-) {
+  ) {
     align = align.toLowerCase();
     const mainCanvas = document.createElement('canvas');
     const resolutionFactor = 3;
@@ -6017,6 +5994,7 @@ function addGoldenGlow() {
 function isPowerOfTwo(v) {
   return (v & (v - 1)) === 0;
 }
+
 //*************************************************************
 // EXTERNAL FUNCTIONS
 //*************************************************************
@@ -6778,8 +6756,6 @@ function dateToDayNew(dateStr, timeStr, inputKind, outputKind) {
   }
 }
 
-
-
 /*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   Helper: calendar‐date (perihelion) → Julian Day Number
 ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
@@ -6856,7 +6832,7 @@ function dateToPerihelionJulianDay(dateStr, timeStr) {
 }
 
 //*************************************************************
-// TO BE DELETED, MIGRATED
+// TO BE MIGRATED?
 //*************************************************************
 
 function dateToDays(sDate) {
