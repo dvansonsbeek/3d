@@ -154,6 +154,4 @@ Each planet is structured like this:
 
 ## Contact
 
-For questions or support, please contact [info@holisticuniverse.com].
-
-**Repository Views** ![Views](https://profile-counter.glitch.me/planet3D/count.svg)
+For questions or support, please contact me at [info@holisticuniverse.com].
