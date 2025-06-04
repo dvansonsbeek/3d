@@ -1,4 +1,4 @@
-# 🌌 Solar System Simluation build in three js
+# 🌌 Solar System Simulation build in three js
 
 ![ss](https://www.holisticuniverse.com/img/14_predicted_Year2058AD.png)
 
