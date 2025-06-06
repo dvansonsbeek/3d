@@ -9,14 +9,14 @@ import * as dat from 'dat.gui';
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
 The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.*/
 
-/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 305,952 years, an Axial precession cycle of ~23,535 years, an Inclination precession cycle of 101,984 years and a Perihelion precession cycle of 19,122 years.*/
+/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 297,824 years, an Axial precession cycle of ~22,910 years, an Inclination precession cycle of ~99,275 years and a Perihelion precession cycle of 18,614 years.*/
 
 //See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d
 
 //*************************************************************
 // ADD GLOBAL INPUT CONSTANTS
 //*************************************************************
-const holisticyearLength = 305952;
+const holisticyearLength = 297824;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
@@ -30,19 +30,19 @@ const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = 2.7343897;
+const correctionDays = 2.73216398060321;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.4243449577;
-const earthinclinationMean = 1.492075548;
-const tiltandinclinationAmplitude = 0.58;
-const eccentricityMean = 0.01404974;
-const eccentricityAmplitude = 0.0027304333159777;
-const eccentricitySinusCorrection = 0.6895;
-const mideccentricitypointAmplitude = 2.43229166666669;
-const helionpointAmplitude = 9.8471328125;
-const meansolardayAmplitudeinSeconds = 0.07875;
-const meansolaryearAmplitudeinDays = 0.00017926844;
-const meansiderealyearAmplitudeinSeconds = 0.3036366;
+const earthtiltMean = 23.42722977;
+const earthinclinationMean = 1.49428367;
+const tiltandinclinationAmplitude = 0.57;
+const eccentricityMean = 0.01368696;
+const eccentricityAmplitude = 0.003105;
+const eccentricitySinusCorrection = 0.65;
+const mideccentricitypointAmplitude = 2.46125;
+const helionpointAmplitude = 11.28483125;
+const meansiderealyearAmplitudeinSeconds = 0.2957384;
+const meansolardayAmplitudeinSeconds = 0.08998;
+const meansolaryearAmplitudeinDays = 0.00018631435;
 const currentAUDistance = 149597870.698828;
 const speedofSuninKM = 107225.047767317;
 
@@ -98,10 +98,10 @@ const startingPoint = {
 
 const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
-  startPos: -112.791336670025,
+  startPos: -113.106314495636,
   speed: 0,
   tilt: 0,
-  rotationSpeed: -0.00026697458749521,
+  rotationSpeed: -0.000274260667351639,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
@@ -127,11 +127,11 @@ const earthWobbleCenter = {
 
 const midEccentricityOrbit = {
   name: "EARTH-MID-ECCENTRICITY-ORBIT",
-  startPos: -112.791336670025,
-  speed: 0.00026697458749521,
+  startPos: -113.106314495636,
+  speed: 0.000274260667351639,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 1.404974,
+  orbitRadius: 1.368696,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -158,11 +158,11 @@ const midEccentricityOrbit = {
 
 const perihelionPointAlternative = {
   name: "Perihelion-of-Earth (Alternative)",
-  startPos: -104.204722055415,
-  speed: 0.0000616095201912024,
+  startPos: -104.592387071551,
+  speed: 0.0000632909232349937,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 1.404974,
+  orbitRadius: 1.368696,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -190,10 +190,10 @@ const perihelionPointAlternative = {
 const earth = {
   name: "Earth",
   startPos: 0,    
-  speed: -0.00026697458749521,
-  rotationSpeed: 2301.16782401453,
-  tilt: -23.4243449577,
-  orbitRadius: -0.27304333159777,
+  speed: -0.000274260667351639,
+  rotationSpeed: 2301.16784254968,
+  tilt: -23.42722977,
+  orbitRadius: -0.3105,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -222,8 +222,8 @@ const earth = {
 
 const earthInclinationPrecession = {
   name: "Earth Inclination Precession",
-  startPos: 98.5866146146096,
-  speed: 0.0000616095201912024,
+  startPos: 98.5139274240842,
+  speed: 0.0000632909232349937,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -245,15 +245,15 @@ const earthInclinationPrecession = {
 
 const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
-  startPos: 164.311024357683,
-  speed: 0.000102682533652004,
+  startPos: 164.18987904014,
+  speed: 0.000105484872058323,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: -0.58,
+  orbitTiltb: -0.57,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -268,15 +268,15 @@ const earthEclipticPrecession = {
 
 const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
-  startPos: 97.1023610277075,
-  speed: -0.000164292053843206,
+  startPos: 97.2961935357757,
+  speed: -0.000168775795293316,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: 0.58,
+  orbitTiltb: 0.57,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -291,14 +291,14 @@ const earthObliquityPrecession = {
 
 const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
-  startPos: -194.204722055415,
-  speed: 0.000328584107686413,
+  startPos: -194.592387071551,
+  speed: 0.000337551590586633,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: -1.11,
+  orbitTilta: -1.09,
   orbitTiltb: 0,
 
   size: 0.1,
@@ -314,11 +314,11 @@ const earthPerihelionPrecession1 = {
 
 const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
-  startPos: 194.204722055415,
-  speed: -0.000328584107686413,
+  startPos: 194.592387071551,
+  speed: -0.000337551590586633,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -1.404974,
+  orbitCentera: -1.368696,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -340,7 +340,7 @@ const barycenterEarthAndSun = {
   startPos: 0,
   speed: 0,
   tilt: 0,
-  orbitRadius: 0.27304333159777,
+  orbitRadius: 0.3105,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -392,7 +392,7 @@ const earthPerihelionFromEarth = {
 const barycenterPLANETS = {
   name: "Barycenter Planets",
   startPos: 0,
-  speed: 0.00024643808076481,
+  speed: 0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -416,7 +416,7 @@ const sun = {
   name: "Sun",
   startPos: 0,
   speed: Math.PI*2,
-  rotationSpeed: 83.9952982796623,
+  rotationSpeed: 83.995325146806,
   tilt: -7.155,
   orbitRadius: 100,
   orbitCentera: 0,
@@ -447,7 +447,7 @@ const sun = {
 const moonApsidalPrecession = {
   name: "Moon Apsidal Precession",
   startPos: 340,
-  speed: 0.709905964656497,
+  speed: 0.709934285926918,
   tilt: 0,
   orbitRadius: -0.0141069500625657,
   orbitCentera: 0,
@@ -470,7 +470,7 @@ const moonApsidalPrecession = {
 const moonApsidalNodalPrecession1 = {
   name: "Moon Apsidal Nodal Precession1",
   startPos: -90,
-  speed: -1.04771096386486,
+  speed: -1.04776013718091,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -493,7 +493,7 @@ const moonApsidalNodalPrecession1 = {
 const moonApsidalNodalPrecession2 = {
   name: "Moon Apsidal Nodal Precession2",
   startPos: 90,
-  speed: 1.04771096386486,
+  speed: 1.04776013718091,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -516,7 +516,7 @@ const moonApsidalNodalPrecession2 = {
 const moonRoyerCycle = {
   name: "Moon Royer Cycle",
   startPos: -44.1,
-  speed: -0.372100965448132,
+  speed: -0.37210843467294,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -539,7 +539,7 @@ const moonRoyerCycle = {
 const moonNodalPrecession = {
   name: "Moon Nodal Precession",
   startPos: 64.1,
-  speed: -0.337804999208365,
+  speed: -0.337825851253986,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -562,7 +562,7 @@ const moonNodalPrecession = {
 const moon = {
   name: "Moon",
   startPos: 126.22,
-  speed: 83.9953393526758,
+  speed: 83.995325146806,
   rotationSpeed: 0,
   tilt: -6.687,
   orbitRadius: 0.25695490731541,
@@ -597,8 +597,8 @@ const mercuryPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -7.79880291975054,
-  orbitCenterb: -1.59456034000496,
+  orbitCentera: -7.7988298038355,
+  orbitCenterb: -1.59442403176256,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -624,7 +624,7 @@ const mercuryPerihelionFromEarth = {
 const mercurybarycenterPLANETS = {
   name: "Barycenter Mercury Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -650,7 +650,7 @@ const mercuryPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 3.30123436930967,
+  orbitRadius: 3.30123396926907,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -671,10 +671,10 @@ const mercuryPerihelionFromSun = {
 const mercury = {
   name: "Mercury",
   startPos: 70.84,
-  speed: 26.0876066456551,
-  rotationSpeed: 39.1314099684826,
+  speed: 26.0876113875647,
+  rotationSpeed: 39.131417081347,
   tilt: -0.03,
-  orbitRadius: 38.7106461556524,
+  orbitRadius: 38.7106414647312,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -706,8 +706,8 @@ const venusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -0.381861038455445,
-  orbitCenterb: 0.306808110775548,
+  orbitCentera: -0.381861018435342,
+  orbitCenterb: 0.306808094690298,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -733,7 +733,7 @@ const venusPerihelionFromEarth = {
 const venusbarycenterPLANETS = {
   name: "Barycenter Venus Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -759,7 +759,7 @@ const venusPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.243275520725271,
+  orbitRadius: 0.243275507970893,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -780,10 +780,10 @@ const venusPerihelionFromSun = {
 const venus = {
   name: "Venus",
   startPos: 117.527,
-  speed: 10.2132976731898,
-  rotationSpeed: -9.4430965247729,
+  speed: 10.2132984763798,
+  rotationSpeed: -9.4430901345587,
   tilt: -2.6392,
-  orbitRadius: 72.3340172922693,
+  orbitRadius: 72.3340134999617,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -815,8 +815,8 @@ const marsPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 9.84185006300923,
-  orbitCenterb: -20.1331929354344,
+  orbitCentera: 9.84186300502507,
+  orbitCenterb: -20.1332194105483,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -842,7 +842,7 @@ const marsPerihelionFromEarth = {
 const marsbarycenterPLANETS = {
   name: "Barycenter Mars Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -865,10 +865,10 @@ const marsbarycenterPLANETS = {
 const marsPerihelionFromSun = {
   name: "Mars Perihelion From Sun",
   startPos: 243.156,
-  speed: 0.398326084542855,
+  speed: 0.398310876892226,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 8.17878252993853,
+  orbitRadius: 8.17879040475749,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -888,10 +888,10 @@ const marsPerihelionFromSun = {
 const mars = {
   name: "Mars",
   startPos: 121.578,
-  speed: -3.34075569586122,
-  rotationSpeed: 2236.82429921882,
+  speed: -3.34074809203591,
+  rotationSpeed: 2236.82430687339,
   tilt: -25.19,
-  orbitRadius: 152.366713671252,
+  orbitRadius: 152.366944870852,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -971,8 +971,8 @@ const jupiterPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -12.7649841206703,
-  orbitCenterb: -46.3783884222424,
+  orbitCentera: -12.7644706226665,
+  orbitCenterb: -46.3765227552234,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -998,7 +998,7 @@ const jupiterPerihelionFromEarth = {
 const jupiterbarycenterPLANETS = {
   name: "Barycenter Jupiter Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1020,11 +1020,11 @@ const jupiterbarycenterPLANETS = {
 
 const jupiterPerihelionFromSun = {
   name: "Jupiter Perihelion From Sun",
-  startPos: 27.684,
+  startPos: 27.683,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 1.16647398162302,
+  orbitRadius: 1.16642705778395,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1044,11 +1044,11 @@ const jupiterPerihelionFromSun = {
 
 const jupiter = {
   name: "Jupiter",
-  startPos: 13.842,
-  speed: 0.529924019671262,
-  rotationSpeed: 5549.34320193203,
+  startPos: 13.8415,
+  speed: 0.529955997221014,
+  rotationSpeed: 5549.34325474618,
   tilt: -3.13,
-  orbitRadius: 519.969067802053,
+  orbitRadius: 519.948150966137,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1080,8 +1080,8 @@ const saturnPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -100.18985703282,
-  orbitCenterb: 4.92899730245992,
+  orbitCentera: -100.188299978983,
+  orbitCenterb: 4.92892070075199,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1107,7 +1107,7 @@ const saturnPerihelionFromEarth = {
 const saturnbarycenterPLANETS = {
   name: "Barycenter Saturn Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1133,7 +1133,7 @@ const saturnPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 2.57197670782462,
+  orbitRadius: 2.78594505677631,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1154,10 +1154,10 @@ const saturnPerihelionFromSun = {
 const saturn = {
   name: "Saturn",
   startPos: 11.444,    
-  speed: 0.213538596982708,
-  rotationSpeed: 5215.37251228578,
+  speed: 0.213543574994869,
+  rotationSpeed: 5215.37255911131,
   tilt: -26.73,
-  orbitRadius: 953.093824572666,
+  orbitRadius: 953.079012510434,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1191,8 +1191,8 @@ const uranusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -22.3744267200277,
-  orbitCenterb: 168.187625950574,
+  orbitCentera: -22.3741201341558,
+  orbitCenterb: 168.185321357452,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1218,7 +1218,7 @@ const uranusPerihelionFromEarth = {
 const uranusbarycenterPLANETS = {
   name: "Barycenter Uranus Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1244,7 +1244,7 @@ const uranusPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 3.93471734577913,
+  orbitRadius: 3.934663430264,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1265,10 +1265,10 @@ const uranusPerihelionFromSun = {
 const uranus = {
   name: "Uranus",
   startPos: 44.854,    
-  speed: 0.0750403955928845,
-  rotationSpeed: -3194.74981995042,
+  speed: 0.0750419379822908,
+  rotationSpeed: -3194.74985613589,
   tilt: -82.23,
-  orbitRadius: 1913.91730411169,
+  orbitRadius: 1913.89107863506,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1300,8 +1300,8 @@ const neptunePerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -53.4252786423449,
-  orbitCenterb: -44.0137967163906,
+  orbitCentera: -53.3954727046902,
+  orbitCenterb: -43.9892414400455,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1327,7 +1327,7 @@ const neptunePerihelionFromEarth = {
 const neptunebarycenterPLANETS = {
   name: "Barycenter Neptune Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1349,11 +1349,11 @@ const neptunebarycenterPLANETS = {
 
 const neptunePerihelionFromSun = {
   name: "Neptune Perihelion From Sun",
-  startPos: 95.874,    
+  startPos: 95.876,    
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.404247596786746,
+  orbitRadius: 0.404022067243908,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1373,11 +1373,11 @@ const neptunePerihelionFromSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: 47.937,
-  speed: 0.0382800485454671,
-  rotationSpeed: 3418.56790376751,
+  startPos: 47.938,
+  speed: 0.0383121055315828,
+  rotationSpeed: 3418.56793192991,
   tilt: -28.32,
-  orbitRadius: 2997.8156718939,
+  orbitRadius: 2996.14319195018,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1414,8 +1414,8 @@ const plutoPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: 1087.29859326151,
-  orbitCenterb: 1123.30838908234,
+  orbitCentera: 1087.25374193796,
+  orbitCenterb: 1123.26205234622,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1441,7 +1441,7 @@ const plutoPerihelionFromEarth = {
 const plutobarycenterPLANETS = {
   name: "Barycenter Pluto Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1467,7 +1467,7 @@ const plutoPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 194.485802383665,
+  orbitRadius: 194.477779798423,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1488,10 +1488,10 @@ const plutoPerihelionFromSun = {
 const pluto = {
   name: "Pluto",
   startPos: 71.56,
-  speed: 0.025567950879349,
-  rotationSpeed: 359.294297168521,
+  speed: 0.0255695329869374,
+  rotationSpeed: 359.29430119109,
   tilt: -57.47,
-  orbitRadius: 3923.3401562492,
+  orbitRadius: 3923.17831754193,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1523,8 +1523,8 @@ const halleysPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -243.812109395506,
-  orbitCenterb: 1742.10124111005,
+  orbitCentera: -243.792009680356,
+  orbitCenterb: 1741.95762339231,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1550,7 +1550,7 @@ const halleysPerihelionFromEarth = {
 const halleysbarycenterPLANETS = {
   name: "Barycenter Halleys Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1576,7 +1576,7 @@ const halleysPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 851.344214398387,
+  orbitRadius: 851.2740301231,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1597,10 +1597,10 @@ const halleysPerihelionFromSun = {
 const halleys = {
   name: "Halleys",
   startPos: 40,
-  speed: 0.0830907062312016,
-  rotationSpeed: 1043.12937189584,
+  speed: 0.0831009822075467,
+  rotationSpeed: 1043.1293934915,
   tilt: 0,
-  orbitRadius: 1788.20900979424,
+  orbitRadius: 1788.06159098139,
   orbitSemiMajor: 0,
   orbitSemiMinor: 0,
   orbitCentera: 0,
@@ -1634,8 +1634,8 @@ const erosPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -39.770115595928,
-  orbitCenterb: 25.8806954143179,
+  orbitCentera: -39.770215327776,
+  orbitCenterb: 25.880760315552,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1661,7 +1661,7 @@ const erosPerihelionFromEarth = {
 const erosbarycenterPLANETS = {
   name: "Barycenter Eros Counter movement",
   startPos: 0,
-  speed: -0.00024643808076481,
+  speed: -0.000253163692939975,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1684,9 +1684,9 @@ const erosbarycenterPLANETS = {
 const erosPerihelionFromSun = {
   name: "Eros Perihelion From Sun",
   startPos: 114.33,
-  speed: 0.852388248352015,
+  speed: 0.852359960180072,
   tilt: 0,
-  orbitRadius: 14.957076673965,
+  orbitRadius: 14.9571097881425,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1707,10 +1707,10 @@ const erosPerihelionFromSun = {
 const eros = {
   name: "Eros",
   startPos: 57.165,
-  speed: -3.5677867777658,
-  rotationSpeed: 10451.0875434594,
+  speed: -3.56777263367983,
+  rotationSpeed: 10451.0876226354,
   tilt: 0,
-  orbitRadius: 145.832387010277,
+  orbitRadius: 145.832772435521,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2847,14 +2847,14 @@ function setupGUI() {
   let folderPerihelion = gui.addFolder('Perihelion Planets')
   folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
   addInfoButton( folderPerihelion, 'https://britastro.org/computing/applets_orbel.html' );
-  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mercury Perihelion")
-  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Venus Perihelion")
-  folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Earth Perihelion")
-  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Mars Perihelion")
-  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Jupiter Perihelion")
-  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Saturn Perihelion")  
-  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.001).listen().name("Uranus Perihelion") 
-  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.001).listen().name("Neptune Perihelion")   
+  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury Perihelion")
+  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus Perihelion")
+  folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Earth Perihelion")
+  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars Perihelion")
+  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter Perihelion")
+  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn Perihelion")  
+  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus Perihelion") 
+  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune Perihelion")   
   
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
@@ -3416,15 +3416,15 @@ function updateDomLabel() {
       null,
       { header : 'Precession calculations for ',  date   : () => o.Date } ,
       {''                                                  : [ { small : 'with fixed 86400 LOD sec/day' },{ small : 'with REAL LOD sec/day'}]},
-      {info : 'https://en.wikipedia.org/wiki/Axial_precession','Axial precession _____ - Mean 23,534.76923 years'                            : [ o.axialPrecession,
+      {info : 'https://en.wikipedia.org/wiki/Axial_precession','Axial precession _____ - Mean 22,909.53846 years'                            : [ o.axialPrecession,
                                                               o.axialPrecessionRealLOD ]},
-      {info : 'https://en.wikipedia.org/wiki/Apsidal_precession','Inclination precession - Mean 101,984 years'                    : [ o.inclinationPrecession,
+      {info : 'https://en.wikipedia.org/wiki/Apsidal_precession','Inclination precession - Mean 99,274.66667 years'                    : [ o.inclinationPrecession,
                                                               o.inclinationPrecessionRealLOD ]},
-      {info : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Apsidal_precession','Perihelion precession - Mean 19,122 years' : [ o.perihelionPrecession,
+      {info : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Apsidal_precession','Perihelion precession - Mean 18,614 years' : [ o.perihelionPrecession,
                                                               o.perihelionPrecessionRealLOD ]},
-      {info : 'https://en.wikipedia.org/wiki/Axial_tilt#Long_term','Obliquity precession_ - Mean 38,244 years'                    : [ o.obliquityPrecession,
+      {info : 'https://en.wikipedia.org/wiki/Axial_tilt#Long_term','Obliquity precession_ - Mean 37,228 years'                    : [ o.obliquityPrecession,
                                                               o.obliquityPrecessionRealLOD ]},
-      {info : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Orbital_inclination','Ecliptic precession___ - Mean 61,190.4 years'  : [ o.eclipticPrecession,
+      {info : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Orbital_inclination','Ecliptic precession___ - Mean 59,564.8 years'  : [ o.eclipticPrecession,
                                                               o.eclipticPrecessionRealLOD ]},
     ],
 
@@ -3437,27 +3437,27 @@ function updateDomLabel() {
     null,
     { header : 'Date specific characteristics for ',  date   : () => o.Date } ,
     {''                                             : [ { small : 'mean' },'on date']},
-    { info : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon','Sidereal month = rotation period (days)' : [{small : 27.3216579703313}, 27.3216579703313*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Synodic month in days'                       : [ {small : 29.5305755823449}, 29.5305755823449*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Anomalistic month in days'                   : [{small : 27.5545422736556}, 27.5545422736556*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Draconic month or nodal period in days'      : [{small : 27.2122179401074}, 27.2122179401074*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { info : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html','Tropical month (days)'                   : [{small : 27.3215711299373}, 27.3215711299373*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Full Moon cycle ICRF in days'                : [{small : 411.7655868}, 411.7655868*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Full Moon cycle Ecliptic in days'            : [{small : 411.7853124}, 411.7853124*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Draconic year ICRF in days'                  : [{small : 346.6074609}, 346.6074609*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Draconic year Ecliptic in days'              : [{small : 346.6214375}, 346.6214375*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Apsidal precession Ecliptic in days'         : [{small : 3231.444782}, 3231.444782*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Apsidal precession Ecliptic in years'        : [{small : 3231.444782/meansolaryearlengthinDays}, 3231.444782/o.lengthofsolarYear]},
-    { 'Apsidal precession ICRF in days'             : [{small : 3232.660032}, 3232.660032*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Apsidal precession ICRF in years'            : [{small : 3232.660032/meansolaryearlengthinDays}, 3232.660032/o.lengthofsolarYear]},
-    { 'Nodal precession ICRF in days'               : [{small : 6793.518877}, 6793.518877*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Nodal precession ICRF in years'              : [{small : 6793.518877/meansolaryearlengthinDays}, 6793.518877/o.lengthofsolarYear]},
+    { info : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon','Sidereal month = rotation period (days)' : [{small : 27.3216651818378}, 27.3216651818378*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Synodic month in days'                       : [ {small : 29.5305812190789}, 29.5305812190789*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Anomalistic month in days'                   : [{small : 27.5545589767076}, 27.5545589767076*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Draconic month or nodal period in days'      : [{small : 27.2122183663749}, 27.2122183663749*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { info : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html','Tropical month (days)'                   : [{small : 27.3215759714190}, 27.3215759714190*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Full Moon cycle ICRF in days'                : [{small : 411.7676825}, 411.7676825*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Full Moon cycle Ecliptic in days'            : [{small : 411.7879467}, 411.7879467*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Draconic year ICRF in days'                  : [{small : 346.6063721}, 346.6063721*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Draconic year Ecliptic in days'              : [{small : 346.6207301}, 346.6207301*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Apsidal precession Ecliptic in days'         : [{small : 3231.282795}, 3231.282795*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Apsidal precession Ecliptic in years'        : [{small : 3231.282795/meansolaryearlengthinDays}, 3231.282795/o.lengthofsolarYear]},
+    { 'Apsidal precession ICRF in days'             : [{small : 3232.531099}, 3232.531099*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Apsidal precession ICRF in years'            : [{small : 3232.531099/meansolaryearlengthinDays}, 3232.531099/o.lengthofsolarYear]},
+    { 'Nodal precession ICRF in days'               : [{small : 6793.099607}, 6793.099607*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Nodal precession ICRF in years'              : [{small : 6793.099607/meansolaryearlengthinDays}, 6793.099607/o.lengthofsolarYear]},
     { 'Nodal precession Ecliptic in days'           : [{small : 6798.892188}, 6798.892188*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Nodal precession Ecliptic in years'          : [{small : 6798.892188/meansolaryearlengthinDays}, 6798.892188/o.lengthofsolarYear]},
-    { 'Nodal meets Apsidal precession in days'      : [{small : 2190.379521}, 2190.379521*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Nodal meets Apsidal precession in years'     : [{small : 2190.379521/meansolaryearlengthinDays}, 2190.379521/o.lengthofsolarYear]},
-    { info : 'https://geoenergymath.com/2014/04/05/the-chandler-wobble-and-the-soim/','Royer Cycle in days'                      : [{small : 6167.370826}, 6167.370826*meansolaryearlengthinDays/o.lengthofsolarYear]},
-    { 'Royer Cycle in years'                        : [{small : 6167.370826/meansolaryearlengthinDays}, 6167.370826/o.lengthofsolarYear]},
+    { 'Nodal precession Ecliptic in years'          : [{small : 6798.619/meansolaryearlengthinDays}, 6798.619/o.lengthofsolarYear]},
+    { 'Nodal meets Apsidal precession in days'      : [{small : 2190.27674}, 2190.27674*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Nodal meets Apsidal precession in years'     : [{small : 2190.27674/meansolaryearlengthinDays}, 2190.27674/o.lengthofsolarYear]},
+    { info : 'https://geoenergymath.com/2014/04/05/the-chandler-wobble-and-the-soim/','Royer Cycle in days'                      : [{small : 6167.24708}, 6167.24708*meansolaryearlengthinDays/o.lengthofsolarYear]},
+    { 'Royer Cycle in years'                        : [{small : 6167.24708/meansolaryearlengthinDays}, 6167.24708/o.lengthofsolarYear]},
     ],
     sun: [
     { header : '—  General characteristics —' },
@@ -3467,14 +3467,14 @@ function updateDomLabel() {
     mercury: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/Mercury_(planet)','Size diameter'   : [4879.40,{small :'km'}]},
-    { 'Orbital speed around the Sun'                : [172344.662476, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [1407.494168, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [0.240849434, {small : '305,952/1270304'} ]},
-    { 'Mean Orbit Period Solar - days'              : [87.96838552, {small : '305,952/1270304*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [87.96928578, {small : '305,952/(1270304-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [115.8773892, {small : '305,952/(1270304-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [0.387106462, {small : '((305,952/1270304)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [57910302.38, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [172344.671526, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [1407.493924, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [0.240849391, {small : '297,824/1236557'} ]},
+    { 'Mean Orbit Period Solar - days'              : [87.96837024, {small : '297,824/1236557*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [87.96929507, {small : '297,824/(1236557-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [115.8773624, {small : '297,824/(1236557-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [0.387106415, {small : '((297,824/1236557)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [57910295.37, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.205632,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.mercuryInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [6.3472858,{ small : 'degrees (°)' } ]},
@@ -3488,19 +3488,19 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.mercuryAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.mercuryDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.mercuryArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'  : [1296000/(((((57910302.3826137-(57910302.3826137/100*20.5632))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'  : [1296000/((((57910295.37-(57910295.37/100*20.5632)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     venus: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/venus','Size diameter (km)'                    : 12103.60 },
-    { 'Orbital speed around the Sun'                : [126078.709624, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [5832.539272, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [0.615196532, {small : '305,952/497324'} ]},
-    { 'Mean Orbit Period Solar - days'              : [224.6957557, {small : '305,952/497324*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [224.7016294, {small : '305,952/(497324-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [583.9234162, {small : '305,952/(497324-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [0.723340173, {small : '((305,952/497324)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [108210149.66, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [126078.711911, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [5832.543266, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [0.615196483, {small : '297,824/484112'} ]},
+    { 'Mean Orbit Period Solar - days'              : [224.6957398, {small : '297,824/484112*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [224.7017738, {small : '297,824/(484112-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [583.9233016, {small : '297,824/(484112-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [0.723340135, {small : '((297,824/484112)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [108210143.99, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.006772,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.venusInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [2.1545441,{ small : 'degrees (°)' } ]},
@@ -3514,20 +3514,20 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.venusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.venusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.venusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((108210149.66-(108210149.66/100*0.6772))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((108210143.99-(108210143.99/100*0.6772)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     mars: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/mars','Size diameter (km)'                    : 6779.00 },
-    { 'Orbital speed around the Sun'                : [86869.635222, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [24.62295825, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [1.88076767, {small : '305,952/162674'} ]},
-    { 'Mean Orbit Period Solar - days'              : [686.9357857, {small : '305,952/162674*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [686.9906862, {small : '305,952/(162674-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [779.9284747, {small : '305,952/(162674-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [1.523667137, {small : '((305,952/162674)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [227937359.31, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [86869.568613, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [24.62295836, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [1.880771951, {small : '297,824/158352'} ]},
+    { 'Mean Orbit Period Solar - days'              : [686.9373548, {small : '297,824/158352*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [686.9937539, {small : '297,824/(158352-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [779.9264655, {small : '297,824/(158352-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [1.523669449, {small : '((297,824/158352)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [227937705.18, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.093401,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.marsInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [1.6311858,{ small : 'degrees (°)' } ]},
@@ -3541,20 +3541,20 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.marsAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.marsDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.marsArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((227937359.31-(227937359.31/100*9.3401))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((227937705.18-(227937705.18/100*9.3401)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
    
     jupiter: [
     { header : '—  General characteristics —' }, 
     { info : 'https://en.wikipedia.org/wiki/jupiter','Size diameter (km)'                    : 139822.00 },
-    { 'Orbital speed around the Sun'                : [47024.511607, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [9.925000009, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [11.85676639, {small : '305,952/25804'} ]},
-    { 'Mean Orbit Period Solar - days'              : [4330.591846, {small : '305,952/25804*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [4332.774689, {small : '305,952/(25804-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [398.8841327, {small : '305,952/(25804-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [5.199690678, {small : '((305,952/25804)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [777862653.72, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [47025.457085, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [9.924999995, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [11.85605096, {small : '297,824/25120'} ]},
+    { 'Mean Orbit Period Solar - days'              : [4330.330573, {small : '297,824/25120*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [4332.572749, {small : '297,824/(25120-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [398.886353, {small : '297,824/(25120-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [5.19948151, {small : '((297,824/25120)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [777831362.58, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.048499,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.jupiterInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [0.3219652,{ small : 'degrees (°)' } ]},
@@ -3568,20 +3568,20 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.jupiterAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.jupiterDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.jupiterArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((777862653.72-(777862653.72/100*4.8499))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((777831362.58-(777831362.58/100*4.8499)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     saturn: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/saturn','Size diameter (km)'                    : 116464.00 },
-    { 'Orbital speed around the Sun'                : [34733.233849, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [10.56055559, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [29.42412002, {small : '305,952/10398'} ]},
-    { 'Mean Orbit Period Solar - days'              : [10746.93133, {small : '305,952/10398*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [10760.3844, {small : '305,952/(10398-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [378.0919629, {small : '305,952/(10398-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [9.530938246, {small : '((305,952/10398)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [1425808067.32, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [34733.503467, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [10.56055558, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [29.4234341, {small : '297,824/10122'} ]},
+    { 'Mean Orbit Period Solar - days'              : [10746.68089, {small : '297,824/10122*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [10760.50094, {small : '297,824/(10122-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [378.092276, {small : '297,824/(10122-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [9.530790125, {small : '((297,824/10122)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [1425785908.79, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.055547,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.saturnInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [0.9254704,{ small : 'degrees (°)' } ]},
@@ -3595,20 +3595,20 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.saturnAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.saturnDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.saturnArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((1425808067.32-(1425808067.32/100*5.5547))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((1425785908.79-(1425785908.79/100*5.5547)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     uranus: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/uranus','Size diameter (km)'                    : 50724.00 },
-    { 'Orbital speed around the Sun'                : [24510.460095, {small :'km/h'}]},
-    { 'Mean Day length = rotation'                  : [17.23992, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [83.73070608, {small : '305,952/3654'} ]},
-    { 'Mean Orbit Period Solar - days'              : [30581.99015, {small : '305,952/3654*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [30691.18154, {small : '305,952/(3654-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [369.6570669, {small : '305,952/(3654-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [19.13917304, {small : '((305,952/3654)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [2863179533.89, {small :'km'}]},
+    { 'Orbital speed around the Sun'                : [24510.627826, {small :'km/h'}]},
+    { 'Mean Day length = rotation'                  : [17.23991995, {small :'hours'}]},
+    { 'Mean Orbit Period Solar - years'             : [83.7289851, {small : '297,824/3557'} ]},
+    { 'Mean Orbit Period Solar - days'              : [30581.36182, {small : '297,824/3557*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [30693.5395, {small : '297,824/(3557-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [369.6571617, {small : '297,824/(3557-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [19.13891079, {small : '((297,824/3557)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [2863140301.13, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.046381,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.uranusInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [0.9946692,{ small : 'degrees (°)' } ]},
@@ -3622,20 +3622,20 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.uranusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.uranusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.uranusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((2863179533.89-(2863179533.89/100*4.6381))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((2863140301.13-(2863140301.13/100*4.6381)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     neptune: [
     { header : '—  General characteristics —' },
     { info : 'https://en.wikipedia.org/wiki/neptune','Size diameter (km)'                    : 49244.00 },
-    { 'Orbital speed around the Sun'                : [19584.414183, {small :'km/h'}]},
+    { 'Orbital speed around the Sun'                : [19589.879380, {small :'km/h'}]},
     { 'Mean Day length = rotation'                  : [16.11120003, {small :'hours'}]},
-    { 'Mean Orbit Period Solar - years'             : [164.1373391, {small : '305,952/1864'} ]},
-    { 'Mean Orbit Period Solar - days'              : [59949.88841, {small : '305,952/1864*365.2422341'} ]},
-    { 'Mean Orbit Period Sidereal - days'           : [60370.93031, {small : '305,952/(1864-13)*365.2422341'} ]},
-    { 'Mean Synodic period with Earth - days'       : [367.4810976, {small : '305,952/(1864-305,952)*365.2422341'} ]},
-    { 'Orbit distance around Sun - AU'              : [29.97815672, {small : '((305,952/1864)^2)^(1/3)'} ]},
-    { 'Orbit distance around Sun - km'              : [4484668412.63, {small :'km'}]},
+    { 'Mean Orbit Period Solar - years'             : [164.0000000, {small : '297,824/1816'} ]},
+    { 'Mean Orbit Period Solar - days'              : [59899.72687, {small : '297,824/1816*365.242237'} ]},
+    { 'Mean Orbit Period Sidereal - days'           : [60331.6162, {small : '297,824/(1816-13)*365.242237'} ]},
+    { 'Mean Synodic period with Earth - days'       : [367.4829869, {small : '297,824/(1816-297,824)*365.242237'} ]},
+    { 'Orbit distance around Sun - AU'              : [29.96143192, {small : '((297,824/1816)^2)^(1/3)'} ]},
+    { 'Orbit distance around Sun - km'              : [4482166418.25, {small :'km'}]},
     { 'Mean Orbital Eccentricity (AU)'              : [0.01168,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.neptuneInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [0.7354155,{ small : 'degrees (°)' } ]},
@@ -3649,7 +3649,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.neptuneAscendingNode]},
     { 'Longitude of Descending'                     : [{ small : 'N/A' },o.neptuneDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.neptuneArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/(((((4484668412.63-(4484668412.63/100*1.168))))*2*Math.PI)/((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI))/(meansolaryearlengthinDays+1)*2*Math.PI)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((4482166418.25-(4482166418.25/100*1.168)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
   };
 
@@ -4535,11 +4535,28 @@ function timeToPos(value) {
  * @throws  TypeError / RangeError on invalid input
  */
 function apparentRaFromPdA(pdA, pdB) {
-  /* ---- 1  RA strings → degrees -------------------------------------- */
-  const RA1 = raToDeg(pdA.raDisplay);
-  const RA2 = raToDeg(pdB.raDisplay);
+  const RAD2DEG = 180 / Math.PI;
+  const TWO_PI  = 2 * Math.PI;
 
-  /* ---- 2  distances -------------------------------------------------- */
+  // 1) Pull raw ra‐in‐radians from each object
+  const ra1 = Number(pdA.ra);
+  const ra2 = Number(pdB.ra);
+
+  if (!Number.isFinite(ra1)) {
+    throw new TypeError(`ra for ${pdA.name} is invalid: ${pdA.ra}`);
+  }
+  if (!Number.isFinite(ra2)) {
+    throw new TypeError(`ra for ${pdB.name} is invalid: ${pdB.ra}`);
+  }
+
+  // 2) Normalize each input RA into [0, 2π)
+  let θ1 = ra1 % TWO_PI;
+  if (θ1 < 0) θ1 += TWO_PI;
+
+  let θ2 = ra2 % TWO_PI;
+  if (θ2 < 0) θ2 += TWO_PI;
+
+  // 3) Pull & validate distances (km)
   const r1 = Number(pdA.distKm);
   const r2 = Number(pdB.distKm);
 
@@ -4550,41 +4567,44 @@ function apparentRaFromPdA(pdA, pdB) {
     throw new TypeError(`distKm for ${pdB.name} is invalid: ${pdB.distKm}`);
   }
 
-  /* ---- 3  positions in XZ plane ------------------------------------- */
-  const DEG2RAD = Math.PI / 180;
+  // 4) Compute each body’s (x, z) in the ecliptic plane:
+  //    x = r * cos(θ),  z = r * sin(θ)
+  const x1 = r1 * Math.cos(θ1);
+  const z1 = r1 * Math.sin(θ1);
+  const x2 = r2 * Math.cos(θ2);
+  const z2 = r2 * Math.sin(θ2);
 
-  const x1 = r1 * Math.cos(RA1 * DEG2RAD);
-  const z1 = r1 * Math.sin(RA1 * DEG2RAD);
-  const x2 = r2 * Math.cos(RA2 * DEG2RAD);
-  const z2 = r2 * Math.sin(RA2 * DEG2RAD);
-
-  /* ---- 4  vector from pdA → pdB ------------------------------------- */
+  // 5) Vector from A → B in that same plane
   const dx = x2 - x1;
   const dz = z2 - z1;
 
-  // If the two bodies project to the same ecliptic coordinates,
-  // the apparent direction is undefined.
+  // If they coincide exactly, the apparent RA is undefined.
   if (dx === 0 && dz === 0) {
     throw new RangeError(
       `${pdA.name} and ${pdB.name} share identical ecliptic coords`
     );
   }
 
-  /* ---- 5  apparent RA (0° = +X, CCW) -------------------------------- */
-  let apar = Math.atan2(dz, dx) / DEG2RAD; // convert rad→deg
-  apar = (apar + 360) % 360;
+  // 6) Apparent RA = atan2(dz, dx), then normalized into [0, 2π)
+  let aparRad = Math.atan2(dz, dx); // yields (−π, +π]
+  if (aparRad < 0) {
+    aparRad += TWO_PI;             // now in [0, 2π)
+  }
 
-  /* ---- 6  opposite angle -------------------------------------------- */
-  const opposite = (apar + 180) % 360;
+  // 7) Compute the “opposite” direction by adding π and re‐wrapping
+  let oppRad = aparRad + Math.PI;  // in [π, 3π)
+  if (oppRad >= TWO_PI) {
+    oppRad -= TWO_PI;              // wrap into [0, 2π)
+  }
 
-  // 7) final log
-  //console.log(
+  // final log
+  // console.log(
   //  `${pdB.name} from ${pdA.name} → apparent RA: ${apar.toFixed(4)}°, `,
   //  ` opposite RA: ${opposite.toFixed(4)}°`
   //);
-  
-  /* ---- 7  final return ---------------------------------------------- */
-  return opposite;
+
+  // 8) Convert back to degrees, in [0,360), and return
+  return oppRad * RAD2DEG;
 }
 
 function updatePerihelion() {
