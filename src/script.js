@@ -3488,7 +3488,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.mercuryAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.mercuryDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.mercuryArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'  : [1296000/((((57910295.37-(57910295.37/100*20.5632)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'  : [1296000/((57910326.59*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     venus: [
     { header : '—  General characteristics —' },
@@ -3514,7 +3514,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.venusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.venusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.venusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((108210143.99-(108210143.99/100*0.6772)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((108210143.99*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     mars: [
@@ -3541,7 +3541,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.marsAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.marsDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.marsArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((227937705.18-(227937705.18/100*9.3401)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((227937705.18*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
    
     jupiter: [
@@ -3568,7 +3568,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.jupiterAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.jupiterDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.jupiterArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((777831362.58-(777831362.58/100*4.8499)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((777831362.58*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     saturn: [
@@ -3595,7 +3595,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.saturnAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.saturnDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.saturnArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((1425785908.79-(1425785908.79/100*5.5547)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((1425785908.79*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
     
     uranus: [
@@ -3622,7 +3622,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.uranusAscendingNode]},
     { 'Longitude of Descending node'                : [{ small : 'N/A' },o.uranusDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.uranusArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((2863140301.13-(2863140301.13/100*4.6381)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((2863677047.69*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
 
     neptune: [
@@ -3649,7 +3649,7 @@ function updateDomLabel() {
     { 'Longitude of Ascending node'                 : [{ small : 'N/A' },o.neptuneAscendingNode]},
     { 'Longitude of Descending'                     : [{ small : 'N/A' },o.neptuneDescendingNode]},
     { 'Argument of Periapsis'                       : [{ small : 'N/A' },o.neptuneArgumentOfPeriapsis]},
-    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((((4482166418.25-(4482166418.25/100*1.168)))*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
+    { 'Missing perihelion precession due to Earth Axial precession'               : [1296000/((4482166418.25*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100 , { small : 'arcsec/100 yrs'}] },
     ],
   };
 
