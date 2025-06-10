@@ -45,7 +45,7 @@ Additional explanation to understand the model:
 * The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is 13/16th of Axial precession: ~25,771*13/16 = ~20,939 years)
 * The Perihelion precession cycle of 18,614 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
 * The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION-OF-EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
-* The difference between the sidereal day - Stellar day leads to the difference solar year – sidereal year.
+* The difference between the sidereal day - stellar day leads to the difference solar year – sidereal year.
 
 For more details see https://holisticuniverse.com.
 
