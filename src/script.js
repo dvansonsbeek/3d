@@ -32,19 +32,19 @@ const startmodelYear = 2000.5;
 // Start of the 3D model in year
 const correctionDays = 2.73216398060321;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.42722977;
-const earthinclinationMean = 1.49428367;
-const tiltandinclinationAmplitude = 0.57;
-const eccentricityMean = 0.01368696;
-const eccentricityAmplitude = 0.003105;
-const eccentricitySinusCorrection = 0.65;
-const mideccentricitypointAmplitude = 2.46125;
-const helionpointAmplitude = 11.29467625;
-const meansiderealyearAmplitudeinSeconds = 0.2957384;
-const meansolardayAmplitudeinSeconds = 0.09;
-const meansolaryearAmplitudeinDays = 0.00018631435;
-const currentAUDistance = 149597870.698828;
-const speedofSuninKM = 107225.047767317;
+const earthtiltMean = 23.42722977;                        // 3D model + formula
+const earthinclinationMean = 1.49428367;                  // Formula only
+const tiltandinclinationAmplitude = 0.57;                 // 3D model + formula
+const eccentricityMean = 0.01368696;                      // 3D model + formula
+const eccentricityAmplitude = 0.003105;                   // 3D model + formula
+const eccentricitySinusCorrection = 0.65;                 // Formula only
+const mideccentricitypointAmplitude = 2.46125;            // Formula only
+const helionpointAmplitude = 11.29467625;                 // Formula only
+const meansiderealyearAmplitudeinSeconds = 0.2957384;     // Formula only
+const meansolardayAmplitudeinSeconds = 0.09;              // Formula only
+const meansolaryearAmplitudeinDays = 0.00018631435;       // Formula only
+const currentAUDistance = 149597870.698828;               // 3D model + formula
+const speedofSuninKM = 107225.047767317;                  // Formula only
 
 //*************************************************************
 // ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
@@ -98,10 +98,10 @@ const startingPoint = {
 
 const earthWobbleCenter = {
   name: "EARTH-WOBBLE-CENTER",
-  startPos: -113.106314495636,
+  startPos: -(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/3)*360)-(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360)-180)),
   speed: 0,
   tilt: 0,
-  rotationSpeed: -0.000274260667351639,
+  rotationSpeed: -Math.PI*2/(holisticyearLength/13),
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
@@ -127,11 +127,11 @@ const earthWobbleCenter = {
 
 const midEccentricityOrbit = {
   name: "EARTH-MID-ECCENTRICITY-ORBIT",
-  startPos: -113.106314495636,
-  speed: 0.000274260667351639,
+  startPos: -(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/3)*360)-(((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360)-180)),
+  speed: Math.PI*2/(holisticyearLength/13),
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 1.368696,
+  orbitRadius: eccentricityMean*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -156,44 +156,13 @@ const midEccentricityOrbit = {
   isDeferent: true,
 };
 
-const perihelionPointAlternative = {
-  name: "Perihelion-of-Earth (Alternative)",
-  startPos: -104.592387071551,
-  speed: 0.0000632909232349937,
-  rotationSpeed: 0,
-  tilt: 0,
-  orbitRadius: 1.368696,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-  
-  size: 0.011,   
-  color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  axisHelper: false,
-  traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
-  isDeferent: true,
-};
-
 const earth = {
   name: "Earth",
   startPos: 0,    
-  speed: -0.000274260667351639,
-  rotationSpeed: 2301.16784254968,
-  tilt: -23.42722977,
-  orbitRadius: -0.3105,
+  speed: -Math.PI*2/(holisticyearLength/13),
+  rotationSpeed: Math.PI*2*(meansolaryearlengthinDays+1),
+  tilt: -earthtiltMean,
+  orbitRadius: -eccentricityAmplitude*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -222,8 +191,8 @@ const earth = {
 
 const earthInclinationPrecession = {
   name: "Earth Inclination Precession",
-  startPos: 98.5139274240842,
-  speed: 0.0000632909232349937,
+  startPos: ((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/3)*360),
+  speed: Math.PI*2/(holisticyearLength/3),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -245,15 +214,15 @@ const earthInclinationPrecession = {
 
 const earthEclipticPrecession = {
   name: "Earth Ecliptic Precession",
-  startPos: 164.18987904014,
-  speed: 0.000105484872058323,
+  startPos: ((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/5)*360),
+  speed: Math.PI*2/(holisticyearLength/5),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: -0.57,
+  orbitTiltb: -tiltandinclinationAmplitude,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -268,15 +237,15 @@ const earthEclipticPrecession = {
 
 const earthObliquityPrecession = {
   name: "Earth Obliquity Precession",
-  startPos: 97.2961935357757,
-  speed: -0.000168775795293316,
+  startPos: -((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/8)*360),
+  speed: -Math.PI*2/(holisticyearLength/8),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
-  orbitTiltb: 0.57,
+  orbitTiltb: tiltandinclinationAmplitude,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -291,8 +260,8 @@ const earthObliquityPrecession = {
 
 const earthPerihelionPrecession1 = {
   name: "Earth Perihelion Precession1",
-  startPos: -194.592387071551,
-  speed: 0.000337551590586633,
+  startPos: ((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360),
+  speed: Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -314,11 +283,11 @@ const earthPerihelionPrecession1 = {
 
 const earthPerihelionPrecession2 = {
   name: "Earth Perihelion Precession2",
-  startPos: 194.592387071551,
-  speed: -0.000337551590586633,
+  startPos: -((balancedYear-startmodelyearwithCorrection)/(holisticyearLength/16)*360),
+  speed: -Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -1.368696,
+  orbitCentera: -eccentricityMean*100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -340,7 +309,7 @@ const barycenterEarthAndSun = {
   startPos: 0,
   speed: 0,
   tilt: 0,
-  orbitRadius: 0.3105,
+  orbitRadius: eccentricityAmplitude*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -389,10 +358,102 @@ const earthPerihelionFromEarth = {
   //isDeferent: true,
 };
 
-const barycenterPLANETS = {
-  name: "Barycenter Planets",
+const barycenterPLANETS12 = {
+  name: "Barycenter Planets12",
   startPos: 0,
-  speed: 0.000253163692939975,
+  speed: Math.PI*2/(holisticyearLength/12),
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
+const barycenterPLANETS13 = {
+  name: "Barycenter Planets13",
+  startPos: 0,
+  speed: Math.PI*2/(holisticyearLength/13),
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
+const barycenterPLANETS14 = {
+  name: "Barycenter Planets14",
+  startPos: 0,
+  speed: Math.PI*2/(holisticyearLength/14),
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
+const barycenterPLANETS15 = {
+  name: "Barycenter Planets15",
+  startPos: 0,
+  speed: Math.PI*2/(holisticyearLength/15),
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  axisHelper: false,
+  isDeferent: true,
+};
+
+const barycenterPLANETS16 = {
+  name: "Barycenter Planets16",
+  startPos: 0,
+  speed: Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -624,7 +685,7 @@ const mercuryPerihelionFromEarth = {
 const mercurybarycenterPLANETS = {
   name: "Barycenter Mercury Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -733,7 +794,7 @@ const venusPerihelionFromEarth = {
 const venusbarycenterPLANETS = {
   name: "Barycenter Venus Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -842,7 +903,7 @@ const marsPerihelionFromEarth = {
 const marsbarycenterPLANETS = {
   name: "Barycenter Mars Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -998,7 +1059,7 @@ const jupiterPerihelionFromEarth = {
 const jupiterbarycenterPLANETS = {
   name: "Barycenter Jupiter Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/14),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1107,7 +1168,7 @@ const saturnPerihelionFromEarth = {
 const saturnbarycenterPLANETS = {
   name: "Barycenter Saturn Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/15),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1218,7 +1279,7 @@ const uranusPerihelionFromEarth = {
 const uranusbarycenterPLANETS = {
   name: "Barycenter Uranus Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/14),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1300,8 +1361,8 @@ const neptunePerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -53.3954727046902,
-  orbitCenterb: -43.9892414400455,
+  orbitCentera: -43.3281675806076,
+  orbitCenterb: -35.6954087736858,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -1327,7 +1388,7 @@ const neptunePerihelionFromEarth = {
 const neptunebarycenterPLANETS = {
   name: "Barycenter Neptune Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1349,11 +1410,11 @@ const neptunebarycenterPLANETS = {
 
 const neptunePerihelionFromSun = {
   name: "Neptune Perihelion From Sun",
-  startPos: 95.876,    
+  startPos: 96.034,    
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: 0.404022067243908,
+  orbitRadius: 0.265449260299722,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1373,7 +1434,7 @@ const neptunePerihelionFromSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: 47.938,
+  startPos: 48.017,
   speed: 0.0383121055315828,
   rotationSpeed: 3418.56793192991,
   tilt: -28.32,
@@ -1441,7 +1502,7 @@ const plutoPerihelionFromEarth = {
 const plutobarycenterPLANETS = {
   name: "Barycenter Pluto Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1550,7 +1611,7 @@ const halleysPerihelionFromEarth = {
 const halleysbarycenterPLANETS = {
   name: "Barycenter Halleys Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1661,7 +1722,7 @@ const erosPerihelionFromEarth = {
 const erosbarycenterPLANETS = {
   name: "Barycenter Eros Counter movement",
   startPos: 0,
-  speed: -0.000253163692939975,
+  speed: -Math.PI*2/(holisticyearLength/12),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1738,7 +1799,7 @@ const eros = {
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, barycenterPLANETS, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, phobos, deimos, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros, perihelionPointAlternative]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCycle, moonNodalPrecession, moon, barycenterPLANETS12, barycenterPLANETS13, barycenterPLANETS14, barycenterPLANETS15, barycenterPLANETS16, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, phobos, deimos, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
@@ -1924,7 +1985,7 @@ let predictions = {
   longitudePerihelion: 0,
   longitudePerihelionDatePer: 0,
   longitudePerihelionDateAp: 0,
-  lengthofAU: 149597870.698828,
+  lengthofAU: currentAUDistance,
   anomalisticMercury: 0,
 };
 
@@ -2087,7 +2148,6 @@ planetObjects.forEach(obj => createPlanet(obj));
 
 //Now adding the order of all objects 
 startingPoint.pivotObj.add(earth.containerObj);
-startingPoint.pivotObj.add(perihelionPointAlternative.containerObj);
 
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
 earthInclinationPrecession.pivotObj.add(midEccentricityOrbit.containerObj);
@@ -2099,18 +2159,22 @@ earthPerihelionPrecession2.pivotObj.add(barycenterEarthAndSun.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(sun.containerObj);
 barycenterEarthAndSun.pivotObj.add(earthPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS12.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS13.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS14.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS15.containerObj);
+barycenterEarthAndSun.pivotObj.add(barycenterPLANETS16.containerObj);
 
-barycenterPLANETS.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(venusPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(marsPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(saturnPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(uranusPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(neptunePerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(plutoPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(halleysPerihelionFromEarth.containerObj);
-barycenterPLANETS.pivotObj.add(erosPerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(venusPerihelionFromEarth.containerObj);
+barycenterPLANETS16.pivotObj.add(marsPerihelionFromEarth.containerObj);
+barycenterPLANETS14.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
+barycenterPLANETS15.pivotObj.add(saturnPerihelionFromEarth.containerObj);
+barycenterPLANETS14.pivotObj.add(uranusPerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(neptunePerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(plutoPerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(halleysPerihelionFromEarth.containerObj);
+barycenterPLANETS12.pivotObj.add(erosPerihelionFromEarth.containerObj);
 
 earth.pivotObj.add(moonApsidalPrecession.containerObj);
 moonApsidalPrecession.pivotObj.add(moonApsidalNodalPrecession1.containerObj);
@@ -3636,7 +3700,7 @@ function updateDomLabel() {
     { 'Mean Synodic period with Earth - days'       : [367.4829869, {small : '297,824/(1816-297,824)*365.242237'} ]},
     { 'Orbit distance around Sun - AU'              : [29.96143192, {small : '((297,824/1816)^2)^(1/3)'} ]},
     { 'Orbit distance around Sun - km'              : [4482166418.25, {small :'km'}]},
-    { 'Mean Orbital Eccentricity (AU)'              : [0.01168,{ small : 'AU' } ]},
+    { 'Mean Orbital Eccentricity (AU)'              : [0.009457,{ small : 'AU' } ]},
     { 'Orbital Inclination'                         : [o.neptuneInclination,{ small : 'degrees (°)' } ]},
     { 'Mean Invariable plane inclination (°)'       : [0.7354155,{ small : 'degrees (°)' } ]},
     { 'Mean Axial tilt (°)'                         : [28.32,{ small : 'degrees (°)' }] },
