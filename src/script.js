@@ -32,9 +32,9 @@ const startmodelYear = 2000.5;
 // Start of the 3D model in year
 const correctionDays = 2.73216398060321;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.42722977;                        // 3D model + formula
-const earthinclinationMean = 1.49428367;                  // Formula only
-const tiltandinclinationAmplitude = 0.57;                 // 3D model + formula
+const earthtiltMean = 23.4273771372;                      // 3D model + formula
+const earthinclinationMean = 1.4953200237;                // Formula only
+const tiltandinclinationAmplitude = 0.563;                // 3D model + formula
 const eccentricityMean = 0.01368696;                      // 3D model + formula
 const eccentricityAmplitude = 0.003105;                   // 3D model + formula
 const eccentricitySinusCorrection = 0.65;                 // Formula only
