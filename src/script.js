@@ -58,7 +58,7 @@ const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCo
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday
-const meanTrueSiderealday = (meansiderealyearlengthinDays/(meansiderealyearlengthinDays+1))*meanlengthofday
+const meanStellarday = (meansiderealyearlengthinDays/(meansiderealyearlengthinDays+1))*meanlengthofday
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays
 //sDAY IS USED IN 3D MODEL CALCULATIONS 
 const sDay = 1/meansolaryearlengthinDays;
@@ -3462,8 +3462,9 @@ function updateDomLabel() {
       { header : 'Date specific characteristics for ',  date   : () => o.Date } ,
       {''                                           : [ { small : 'mean' },'on date']},
       {'Solar Day in SI seconds'                    : [{ small : meanlengthofday},o.lengthofDay]},
-      {'Sidereal day in SI seconds = Earth rotation period' : [{ small: meanSiderealday}, o.lengthofsiderealDayRealLOD ]},
-      {'True Sidereal day in SI seconds'                   : [{ small: meanTrueSiderealday}, o.lengthofsiderealYear/((o.lengthofsiderealYear/o.lengthofDay)+1) ]},
+      {'Sidereal day in SI seconds = Earth rotation period in 86400 sec/day' : ['', o.lengthofsiderealDay ]},
+      {'Sidereal day in SI seconds = Earth rotation period in REAL LOD' : [{ small: meanSiderealday}, o.lengthofsiderealDayRealLOD ]},
+      {'Stellar day in SI seconds'                   : [{ small: meanStellarday}, (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDayRealLOD ]},
       {'Orbit Period Solar = Solar year in REAL days' : [{ small : meansolaryearlengthinDays},o.lengthofsolarYear]},
       {'Solar year in SI seconds'                   : [{ small: meanlengthofday*meansolaryearlengthinDays}, o.lengthofsolarYearSecRealLOD ]},
       {'Orbit Period Sidereal = Sidereal year in SI seconds' : [{ small : meansiderealyearlengthinSeconds},o.lengthofsiderealYear]},
@@ -5031,7 +5032,7 @@ function updatePredictions() {
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolaryearAmplitudeinDays, meansolaryearlengthinDays);
   predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
   
-  predictions.lengthofsiderealDay = o.lengthofsolarYearSec/(o.lengthofsolarYear+1);
+  predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSec/(o.lengthofsolarYear+1);
   //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
   
   predictions.lengthofsolarYearSec = o.lengthofsolarYearSec = o.lengthofsolarYear*86400;
