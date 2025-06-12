@@ -2356,6 +2356,7 @@ zodiac.add(zLabel);
 // Add to scene
 earth.pivotObj.add(zodiac);
 zodiac.position.y = 0;
+zodiac.position.z = -(eccentricityAmplitude*Math.PI*2)/(holisticyearLength/13)*(startmodelyearwithCorrection-(perihelionalignmentYear-(1.5*(holisticyearLength/16))+(Math.round((startmodelyearwithCorrection-perihelionalignmentYear+((1.5*(holisticyearLength/16))))/(holisticyearLength/156)))*(holisticyearLength/156)))*100; //To align to start Aquarius
 zodiac.visible = false;
 
 // Add Glow effect of zodiac
