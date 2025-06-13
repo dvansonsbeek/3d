@@ -9,29 +9,21 @@ The author reserves all rights to license usage of this work for generative AI t
 
 ============
 
-The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 297,824 years, an Axial precession cycle of ~22,910 years, an Inclination precession cycle of ~99,275 years and a Perihelion precession cycle of 18,614 years. 
+The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 297,856 years, an Axial precession cycle of 22,912 years, an Inclination precession cycle of ~99,285 years and a Perihelion precession cycle of 18,616 years. 
 
 The way it is modelled:
 * The EARTH-WOBBLE-CENTER is the center of our solar system.
-* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,910 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The PERIHELION-OF-EARTH is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of ~99,275 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-* Axial precession meets Inclination precession every 18,614 years.
-* Our Sun is orbiting the PERIHELION-OF-EARTH in a period of 1 solar year.
-* Therefore it shows as if the Sun is orbiting Earth.
-
-How you could also see it:
-* The PERIHELION-OF-EARTH is the center of our solar system.
-* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,910 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The EARTH-WOBBLE-CENTER - and therefore Earth - is orbiting the PERIHELION-OF-EARTH counter-clockwise in a period of ~99,275 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-* Axial precession meets Inclination precession every 18,614 years.
+* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of 22,912 solar years, also known as Axial precession and therefore the Axial tilt changes.
+* The PERIHELION-OF-EARTH is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of ~99,285 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* Axial precession meets Inclination precession every 18,616 years.
 * Our Sun is orbiting the PERIHELION-OF-EARTH in a period of 1 solar year.
 * Therefore it shows as if the Sun is orbiting Earth.
 
 What is actually happening:
 * The Sun is (still) the center of our solar system.
-* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,910 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The PERIHELION-OF-EARTH is orbiting the Sun counter-clockwise in a period of ~99,275 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-* Axial precession meets Inclination precession every 18,614 years.
+* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of 22,912 solar years, also known as Axial precession and therefore the Axial tilt changes.
+* The PERIHELION-OF-EARTH is orbiting the Sun counter-clockwise in a period of ~99,285 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* Axial precession meets Inclination precession every 18,616 years.
 * Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
 * Therefore it shows Earth is actually orbiting the Sun.
 * So we still live in a Heliocentric solar system
@@ -43,20 +35,20 @@ Additional explanation to understand the model:
 * The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth’s axis (J2000 value +23°26'21").
 * There are only two counter movements around Earth working against each other in a ratio of 3:13 ; Inclination:Axial which explains all movements around Earth (precession, eccentricity, obliquity, inclination, etc)
 * The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is 13/16th of Axial precession: ~25,771*13/16 = ~20,939 years)
-* The Perihelion precession cycle of 18,614 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
+* The Perihelion precession cycle of 18,616 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
 * The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION-OF-EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
 * The difference between the sidereal day - stellar day leads to the difference solar year – sidereal year.
 
 For more details see https://holisticuniverse.com.
 
-Why is the length of the Holistic-Year 297,824 years? This number fits all observations best:
+Why is the length of the Holistic-Year 297,856 years? This number fits all observations best:
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.945°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
-a) 1246 Length of solar day in days was - according to the current theory - ~365.242236 days (which is ~31,556,929.19 SI seconds in Ephemeris time).  
+a) 1246 Length of solar day in days was - according to the current theory - ~365.242211 days (which is ~31,556,929.19 SI seconds in Ephemeris time).  
 b) 1246 Length of sidereal year in SI seconds was - according to the current theory - ~31,558,149.6847  
 c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.  
-4. Climate graphs with ~100k cycles as a cycle of ~99,275 years (three times ~99,275 years = 297,824 years)
+4. Climate graphs with ~100k cycles as a cycle of ~99,285 years (three times ~99,285 years = 297,856 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. Mercury perihelion precession aligned to ~5600 arc seconds per century - THE KEY EVIDENCE OF THE MODEL
 7. Obliquity correct both historic and current values
