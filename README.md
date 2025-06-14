@@ -27,9 +27,7 @@ What is actually happening:
 * Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
 * Therefore it shows Earth is actually orbiting the Sun.
 * So we still live in a Heliocentric solar system
-
-* All planets in our solar system are orbiting the Sun but have a barycenter just outside of the Sun.
-* The location of the barycenters of the planets are structured according to the Golden Spiral pattern around the Sun and the planets are orbiting these barycenters according to Kepler’s 3rd law.
+* All planets in our solar system are orbiting the Sun according to Kepler’s 3rd law, and have a barycenter just outside of the Sun.
 
 Additional explanation to understand the model:
 * The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth’s axis (J2000 value +23°26'21").
@@ -45,8 +43,8 @@ Why is the length of the Holistic-Year 297,856 years? This number fits all obser
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.945°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
-a) 1246 Length of solar day in days was - according to the current theory - ~365.242211 days (which is ~31,556,929.19 SI seconds in Ephemeris time).  
-b) 1246 Length of sidereal year in SI seconds was - according to the current theory - ~31,558,149.6847  
+a) 1246 Length of solar day in SI seconds was - according to the current theory - ~31,556,929.19 SI seconds.  
+b) 1246 Length of sidereal year in SI seconds was - according to the current theory - ~31,558,149.6847 SI seconds.
 c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.  
 4. Climate graphs with ~100k cycles as a cycle of ~99,285 years (three times ~99,285 years = 297,856 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
@@ -54,10 +52,6 @@ c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delt
 7. Obliquity correct both historic and current values
 8. Orbital Inclination to ICRF correct both historic and current values
 9. Eccentricity correct both historic and current values
-
-Technical: 
-
-Built in Three js R175.
 
 It's an interactive 3D visualization where the browser renders a miniature model of the solar system using three.js — a JavaScript library that simplifies working with WebGL. The project typically features:
 - A central sun: A bright, glowing sphere, possibly using a texture and some light emission effects.
