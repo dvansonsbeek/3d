@@ -381,43 +381,53 @@ const renderVal = val => {
 const planetMeta = {
   earth : {
     intro : 'Earth is the third planet from the Sun and is the largest of the terrestrial planets. The Earth is the only planet in our solar system not to be named after a Greek or Roman deity. The Earth was formed approximately 4.54 billion years ago and is the only known planet to support life.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
+    imgRatio : 35 / 9
   },
   sun  : {
     intro : 'The Sun (or Sol), is the star at the centre of our solar system and is responsible for the Earth’s climate and weather. The Sun is an almost perfect sphere with a difference of just 10km in diameter between the poles and the equator. The average radius of the Sun is 695,508 km (109.2 x that of the Earth) of which 20–25% is the core.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg',
+    imgRatio : 35 / 9
   },
   moon  : {
     intro : 'The Moon is Earths only natural satellite. It orbits around Earth at an average distance of 384,399 km. The Moon is just less than a third of the width of Earth which is really large compared to other Moon-Planet sizes in our solar system. The Moon rotates, but keeps facing Earth with the same near side. The origin of the Moon is usually explained by a Mars-sized body, known as Theia, striking the Earth, creating a debris ring that eventually collected into a single natural satellite, the Moon, but there are a number of variations on this giant-impact hypothesis, as well as alternative explanations, and research continues into how the Moon came to be formed.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
+    imgRatio : 35 / 9
   },
   mercury  : {
     intro : 'Mercury is the closest planet to the Sun and due to its proximity it is not easily seen except during twilight. For every two orbits of the Sun, Mercury completes three rotations about its axis and up until 1965 it was thought that the same side of Mercury constantly faced the Sun. Thirteen times a century Mercury can be observed from the Earth passing across the face of the Sun in an event called a transit, the next will occur on the 13th November 2032.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
+    imgRatio : 35 / 9
   },
   venus  : {
     intro : 'Venus is the second planet from the Sun and is the second brightest object in the night sky after the Moon. Named after the Roman goddess of love and beauty, Venus is the second largest terrestrial planet and is sometimes referred to as the Earth’s sister planet due the their similar size and mass. The surface of the planet is obscured by an opaque layer of clouds made up of sulphuric acid',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
+    imgRatio : 35 / 9
   },
   mars  : {
     intro : 'Mars is the fourth planet from the Sun and is the second smallest planet in the solar system. Named after the Roman god of war, Mars is also often described as the “Red Planet” due to its reddish appearance. Mars is a terrestrial planet with a thin atmosphere composed primarily of carbon dioxide.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
+    imgRatio : 35 / 9
   },
   jupiter  : {
     intro : 'The planet Jupiter is the fifth planet out from the Sun, and is two and a half times more massive than all the other planets in the solar system combined. It is made primarily of gases and is therefore known as a “gas giant”.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
+    imgRatio : 35 / 9
   },
   saturn  : {
     intro : 'Saturn is the sixth planet from the Sun and the most distant that can be seen with the naked eye. Saturn is the second largest planet and is best known for its fabulous ring system that was first observed in 1610 by the astronomer Galileo Galilei. Like Jupiter, Saturn is a gas giant and is composed of similar gasses including hydrogen, helium and methane.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
+    imgRatio : 35 / 9
   },
   uranus  : {
     intro : 'Uranus is the seventh planet from the Sun. While being visible to the naked eye, it was not recognised as a planet due to its dimness and slow orbit. Uranus became the first planet discovered with the use of a telescope. Uranus is tipped over on its side with an axial tilt of 98 degrees. It is often described as “rolling around the Sun on its side.”',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
+    imgRatio : 35 / 9
   },
   neptune  : {
     intro : 'Neptune is the eighth planet from the Sun making it the most distant in the solar system. This gas giant planet may have formed much closer to the Sun in early solar system history before migrating to its present position.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg'
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
+    imgRatio : 35 / 9
   },
   // …
 };
@@ -4517,7 +4527,7 @@ const planetStats = {
 function updateDomLabel () {
 
   /* ———————————————————————————————————————————————
-     helper: escape &, ", <, > for use inside title=""
+     escape &, ", <, > for safe use in title=""
      ——————————————————————————————————————————————— */
   const escapeAttr = str =>
     String(str)
@@ -4525,6 +4535,12 @@ function updateDomLabel () {
       .replace(/"/g,  '&quot;')
       .replace(/</g,  '&lt;')
       .replace(/>/g,  '&gt;');
+
+  /* ———————————————————————————————————————————————
+     helper: compute max-height for <img> given drawer width
+     ——————————————————————————————————————————————— */
+  const maxImgHeight = (drawerWidth, ratio) =>
+    Math.round(drawerWidth / ratio);          // px
 
   /* 0 — gather the DOM wrapper ------------------------------------------------ */
   const label = document.getElementById('planetLabel');
@@ -4547,6 +4563,17 @@ function updateDomLabel () {
     content.appendChild(closeBtn);
     label.appendChild(content);
     label.dataset.init = '1';
+
+    /* — NEW — keep image heights in sync on resize — */
+    window.addEventListener('resize', () => {
+      const w = label.clientWidth || (innerWidth / 3);
+      content.querySelectorAll('.pl-img[data-ar]')
+        .forEach(img => {
+          const ar = +img.dataset.ar || (16 / 9);
+          img.style.maxHeight = maxImgHeight(w, ar) + 'px';
+        });
+    });
+    /* —————————————————————————————————————————— */
   }
   const content = label.querySelector('.labelContent');
 
@@ -4581,14 +4608,21 @@ function updateDomLabel () {
   if (labelDismissed) { label.style.display = 'none'; return; }
 
   /* 4 — HEADER block (title • intro • image) --------------------------------- */
-  const { intro = '', img = '' } = meta ?? {};
+  const { intro = '', img = '', imgRatio = 16 / 9 } = meta ?? {};
+  const drawerW  = label.clientWidth || (innerWidth / 3);
+  const imgMaxH  = maxImgHeight(drawerW, imgRatio);
+
   let nextHTML = /* html */`
     <div class="pl-title">
       ${PLANET_SYMBOL[selName] ? `<span class="pl-symbol">${PLANET_SYMBOL[selName]}</span>` : ''}
       <span class="pl-name">${niceName(selName)}</span>
     </div>
     ${intro ? `<p class="pl-intro">${intro}</p>` : ''}
-    ${img   ? `<img class="pl-img" src="${img}" alt="${selName}">` : ''}
+    ${img   ? `<img class="pl-img"
+                   src="${img}"
+                   alt="${selName}"
+                   data-ar="${imgRatio}"
+                   style="width:100%;height:auto;max-height:${imgMaxH}px">` : ''}
     <div class="scrollBox"><div class="pl-grid">
   `;
 
@@ -4636,7 +4670,7 @@ function updateDomLabel () {
       if (Array.isArray(hv)) [h1, h2] = hv;
       else                    h1 = h2 = hv;
     }
-    const keyTitle  = h1 || h2;                    // show *something* on label
+    const keyTitle  = h1 || h2;
     const keyAttr   = keyTitle ? ` title="${escapeAttr(keyTitle)}"` : '';
     const valAttr   = h1       ? ` title="${escapeAttr(h1)}"`       : '';
     const altAttr   = h2       ? ` title="${escapeAttr(h2)}"`       : '';
@@ -4673,15 +4707,13 @@ function updateDomLabel () {
 
       columnCache[selName] = `max-content ${maxValCh}ch ${maxAltCh}ch`;
     }
-    content
-      .querySelector('.pl-grid')
-      .style.gridTemplateColumns = columnCache[selName];
+    content.querySelector('.pl-grid').style.gridTemplateColumns =
+      columnCache[selName];
   }
 
   /* 7 — show the drawer ------------------------------------------------------ */
   label.style.display = 'block';
 }
-
 
 function updateSunGlow() {
   // 1a) Get the world position of the glow’s pivot into _tempVec

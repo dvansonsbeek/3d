@@ -155,200 +155,27 @@ a:link {
    TOP-LEFT “PLANET INFO” PANEL
    ========================================================== */
 
-/* root wrapper injected by updateDomLabel()  */
+/* ───────────────────────────────────────────────
+   1.  ROOT WRAPPER   (#planetLabel)
+   ─────────────────────────────────────────────── */
 #planetLabel{
-  position:fixed; top:16px; left:16px;
-  transform:none !important;          /* never move again */
-  pointer-events:auto; 
+  /* geometry / layout */
+  position:fixed;
+  inset:0 auto 0 0;           /* top:0; right:auto; bottom:0; left:0 */
+  width:33.333vw;             /* one-third of the viewport           */
+  height:100vh;
+  transform:none !important;
+  overflow:hidden;            /* clip anything outside the drawer    */
+  display:none;
   z-index:9999;
-    /* ⭐ NEW: make the wrapper as wide as its children  */
-  width:max-content;              /* Chrome / Edge / Safari */
-  width:-moz-max-content;         /* Firefox                */
-  box-sizing:border-box;          /* include border in that width */
-  display: none;
-}
 
-/* ---- card body ---- */
-#planetLabel .labelContent{
-  position:relative;
-  background:rgba(20,24,30,.80);
-  backdrop-filter:blur(6px);
-  color:#eee;
-  padding:14px 18px 16px;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:8px;
-  box-shadow:0 6px 18px rgba(0,0,0,.35);
-  font:14px/1.4 "Inter","Helvetica",sans-serif;
-}
-
-#planetLabel .labelContent{
-  /* let the browser size the box to the widest line it contains */
-  width:max-content;              /* Chrome / Safari / Edge */
-  width:-moz-max-content;         /* Firefox                 */
-
-  /* make sure padding + border are inside that intrinsic width   */
-  box-sizing:border-box;
-
-  /* kill any earlier size limits that might still be in another
-     stylesheet, just in case                                       */
-  max-width:none !important;
-  overflow:visible;
-}
-
-/* title */
-#planetLabel strong{
-  display:block;
-  margin:0 0 .7em;
-  font-size:1.05em;
-  font-weight:600;
-  letter-spacing:.02em;
-}
-
-/* ───────── close (×) button ───────── */
-#planetLabel .closeBtn{
-  position:absolute; top:4px; right:12px;
-  font-size:20px;                /* bigger glyph */
-  line-height:20px;
-  font-weight:bold;
-  color:#fff;                    /* bright white */
-  opacity:.90;                   /* almost fully opaque */
-  cursor:pointer; user-select:none;
-  transition:opacity .15s, transform .15s;
-  z-index:3;                     /* sits above the glass panel */
-}
-#planetLabel .closeBtn:hover{
-  opacity:1;
-  transform:scale(1.15);         /* subtle hover feedback */
-}
-
-/* ---- single 3-column grid ---- */
-.pl-grid{
-  display:grid;
-  /* widths will be FROZEN by JS with grid-template-columns */
-  column-gap:.75em; row-gap:.3em;
-  align-items:center;
-}
-
-/* zebra stripes (all 3 columns) */
-.pl-grid span:nth-child(6n+1),
-.pl-grid span:nth-child(6n+2),
-.pl-grid span:nth-child(6n+3){ background:rgba(255,255,255,.03); }
-
-/* alignment + fonts */
-.pl-key  { 
-  white-space:nowrap;         /* <— NEW: keep every label on one line  */
-  text-align:left;
-}
-.pl-val  { text-align:right; font-family:Menlo,Consolas,monospace; }
-/*.pl-unit { text-align:left; font-size:.85em; opacity:.8;*/
-.pl-alt{
-  font:inherit;                      /* <- same family & size as .pl-key */
-  font-variant-numeric:tabular-nums; /* lined-up digits, no monospace needed */
-  text-align:left;                  /* keep numbers and units right-aligned */
-  opacity:.9;                        /* tweak if you still want it lighter */
-}
-
-* ----------  global look for the card  ---------- */
-#planetLabel{
-  --planet-info-font-size: 8px;   /* ← CHANGE THIS ONE VALUE to resize all text */
-}
-
-/* the glass card body */
-#planetLabel .labelContent{
-  font-size:var(--planet-info-font-size);
-  font-family:"Inter","Helvetica",sans-serif;
-  line-height:1.1;
-}
-
-/* use the SAME font everywhere */
-.pl-key,
-.pl-val,
-.pl-unit{
-  font:inherit;
-  font-variant-numeric:tabular-nums;   /* digits line up even without monospace */
-}
-
-/* the scrollable area inside the card */
-.scrollBox{
-  max-height:calc(100vh - 72px);   /* glass frame (top+bottom) plus 20-ish px headroom */
-  overflow-y:auto;
-  overscroll-behavior:contain;     /* avoid scrolling the page when you reach top/bottom */
-  padding-right:4px;               /* room for the native scrollbar so text doesn’t hide */
-}
-
-/* make the native scrollbar match the frosted-glass look (WebKit only) */
-.scrollBox::-webkit-scrollbar{ width:6px; }
-.scrollBox::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.25);
-  border-radius:3px;
-}
-
-/* header row */
-.pl-head{
-  grid-column:1 / -1;          /* span all columns */
-  text-align:center;
-  font-weight:600;
-  padding:.2em 0;
-}
-
-/* blank row: keep height without text */
-.pl-blank{ height:.6em; }
-
-/* info-tip icon */
-.pl-info{
-  margin-right:.25em;
-  text-decoration:none;
-  opacity:.8;
-  cursor:help;
-}
-.pl-info:hover{ opacity:1; }
-
-/* ============================================================== */
-/*  VALUE-CELL EMPHASIS                                           */
-/* ============================================================== */
-
-/* ------------ bold ------------------------------------------- */
-.pl-val strong,
-.pl-alt strong{
-  font-weight:600;             /* Inter SemiBold look */
-  color:#fff;                  /* keep full brightness */
-}
-
-/* ------------ italic ----------------------------------------- */
-.pl-val em,
-.pl-alt em{
-  font-style:italic;
-  opacity:.9;                  /* subtle, not ghostly */
-}
-
-/* ------------ small text ------------------------------------- */
-.pl-val small,
-.pl-alt small{
-  font-size:0.85em;            /* 85 % of the base size you set with --planet-info-font-size */
-  line-height:inherit;
-  opacity:.85;
-}
-
-/* optional: “small-caps” helper if you ever need it */
-.smallcaps{
-  font-variant:small-caps;
-}
-
-/* ==========================================================
-   COLOUR THEMES — each planet sets two CSS variables
-   ========================================================== */
-#planetLabel{
-  /* default fallback — the dark glass you already have */
+  /* design-tokens (can be overridden by themes) */
+  --planet-info-font-size:13px;
   --panel-bg     : rgba(20,24,30,.80);
   --panel-border : rgba(255,255,255,.15);
 }
 
-#planetLabel .labelContent{
-  background:var(--panel-bg);
-  border:1px solid var(--panel-border);
-}
-
-/* ---- per-planet tints (place AFTER the default rule) --------------- */
+/* per-planet colour themes (override 2 CSS variables) */
 #planetLabel.theme-earth   { --panel-bg:rgba( 46,100,190,.58); --panel-border:rgba( 46,100,190,.28); }
 #planetLabel.theme-moon    { --panel-bg:rgba(120,120,120,.58); --panel-border:rgba(255,255,255,.28); }
 #planetLabel.theme-mercury { --panel-bg:rgba(110,110,110,.58); --panel-border:rgba(255,255,255,.28); }
@@ -360,28 +187,129 @@ a:link {
 #planetLabel.theme-neptune { --panel-bg:rgba( 44, 83,158,.58); --panel-border:rgba( 44, 83,158,.28); }
 #planetLabel.theme-sun     { --panel-bg:rgba(255,174,  0,.60); --panel-border:rgba(255,174,  0,.30); }
 
-/* ==========================================================
-   TITLE BAR  (planet name + symbol)
-   ========================================================== */
-.pl-title{
+/* drawer slide-in effect (optional) */
+#planetLabel[style*="display: block"]{
+  animation:pl-slide 320ms cubic-bezier(.25,.8,.25,1);
+}
+@keyframes pl-slide{
+  from{ transform:translateX(-100%); opacity:0; }
+  to  { transform:none;            opacity:1; }
+}
+
+/* ───────────────────────────────────────────────
+   2.  GLASS PANEL BODY   (.labelContent)
+   ─────────────────────────────────────────────── */
+#planetLabel .labelContent{
+  /* full-size glass card */
+  position:relative;
+  width:100%;
+  height:100%;
   display:flex;
-  align-items:center;
-  gap:.35em;
-  margin:0 0 .65em 0;
-  line-height:1.1;
-  font-weight:600;
-  font-size:1.15em;               /* tweak size here */
+  flex-direction:column;
+  padding:14px 18px 16px;
+  box-sizing:border-box;
+
+  /* frosted look */
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  backdrop-filter:blur(6px);
+  border-radius:0;            /* flush with drawer edges */
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+
+  /* Typography tokens */
+  color:#eee;
+  font:var(--planet-info-font-size)/1.1 "Inter","Helvetica",sans-serif;
+}
+
+/* ───── close (×) button ───── */
+#planetLabel .closeBtn{
+  position:absolute; top:6px; right:10px;
+  font-size:26px; line-height:26px; font-weight:bold;
+  color:#fff; cursor:pointer; user-select:none;
+  opacity:.85; transition:opacity .15s, transform .15s;
+}
+#planetLabel .closeBtn:hover{ opacity:1; transform:scale(1.15); }
+
+/* ───────────────────────────────────────────────
+   3.  HEADER ZONE (title + intro + image)
+   ─────────────────────────────────────────────── */
+.pl-title{
+  display:flex; align-items:center; gap:.35em;
+  margin:0 0 .65em;
+  font:600 1.15em/1.1 inherit;
   letter-spacing:.02em;
   text-shadow:0 0 3px rgba(0,0,0,.35);
-  color:#fff;                     /* bright against any tint */
+  color:#fff;
+}
+.pl-symbol{ font-size:1.35em; line-height:1; opacity:.9; }
+.pl-name  { font-variant:small-caps; }
+
+.pl-intro{ margin:.5em 0 1em; line-height:1.3; }
+.pl-img{
+  width:100%; max-height:28vh; object-fit:cover;
+  border-radius:8px; margin:0 0 1em;
 }
 
-.pl-symbol{
-  font-size:1.35em;               /* symbol slightly larger */
-  line-height:1;
-  opacity:.9;
+/* ───────────────────────────────────────────────
+   4.  SCROLLABLE DATA ZONE
+   ─────────────────────────────────────────────── */
+.scrollBox{
+  flex:1 1 auto; min-height:0;          /* allows vertical scroll */
+  overflow:auto;                        /* both axes              */
+  overscroll-behavior:contain;
+  padding-right:6px;                    /* space for scrollbar    */
+  max-width:100%;
 }
 
-.pl-name{
-  font-variant:small-caps;        /* classy look */
+/* WebKit scrollbar tint */
+.scrollBox::-webkit-scrollbar{ width:6px; }
+.scrollBox::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.25);
+  border-radius:3px;
 }
+/* example planet-specific thumb */
+#planetLabel.theme-mars .scrollBox::-webkit-scrollbar-thumb{
+  background:rgba(176,58,46,.4);
+}
+
+/* ───────────────────────────────────────────────
+   5.  3-COLUMN GRID
+   ─────────────────────────────────────────────── */
+.pl-grid{
+  display:grid;
+  column-gap:.75em; row-gap:.3em;
+  align-items:center;
+  min-width:100%;                      /* prevents width jump */
+}
+
+/* zebra stripes (apply to each row’s 3 spans) */
+.pl-grid span:nth-child(6n+1),
+.pl-grid span:nth-child(6n+2),
+.pl-grid span:nth-child(6n+3){
+  background:rgba(255,255,255,.03);
+}
+
+/* cell roles */
+.pl-key, .pl-val, .pl-alt{
+  font:inherit;
+  font-variant-numeric:tabular-nums;
+}
+.pl-key{  white-space:nowrap; text-align:left; }
+.pl-val{  text-align:right; font-family:Menlo,Consolas,monospace; }
+.pl-alt{  text-align:left;  opacity:.9; }
+
+/* header row + blank row helpers */
+.pl-head{ grid-column:1/-1; text-align:center; font-weight:600; padding:.2em 0; }
+.pl-blank{ height:.6em; }
+
+/* info-tip icon */
+.pl-info{ margin-right:.25em; text-decoration:none; opacity:.8; cursor:help; }
+.pl-info:hover{ opacity:1; }
+
+/* ─── emphasis helpers inside value cells ─── */
+.pl-val strong, .pl-alt strong{ font-weight:600; color:#fff; }
+.pl-val em,     .pl-alt em    { font-style:italic; opacity:.9; }
+.pl-val small,  .pl-alt small { font-size:.85em;   opacity:.85; }
+
+/* rare utility if you need it */
+.smallcaps{ font-variant:small-caps; }
