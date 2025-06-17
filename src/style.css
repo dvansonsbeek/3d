@@ -1,5 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Open Sans:wght@400;800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2\
+?family=Inter:wght@400;500;600\
+&family=IBM+Plex+Sans:wght@300;400;500;600;700\
+&family=IBM+Plex+Mono:wght@300;400;500;600;700\
+&display=swap");
+
+/* ───────────────────────────────────────────────
+   0.  GLOBAL FONT TOKENS
+   ─────────────────────────────────────────────── */
+:root{
+  /* swap families here and every panel updates */
+  --pl-body-font: "Inter", "IBM Plex Sans", system-ui, -apple-system,
+                  "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* mono family for your numeric column */
+  --pl-mono-font: "IBM Plex Mono", Menlo, Consolas, monospace;
+}
 
 main { position: absolute; top: 100px; left: 100px; }
 body {
@@ -27,7 +42,7 @@ a:link {
 }
 
 #footerleft {
-  font-family: "Open sans", sans-serif;
+  font-family: "Inter", sans-serif;
   position: absolute;
   display: block;
   width: 100%;
@@ -44,7 +59,7 @@ a:link {
 } 
 
 #footerright {
-  font-family: "Open sans", sans-serif;
+  font-family: "Inter", sans-serif;
   position: absolute;
   display: block;
   width: 100%;
@@ -218,7 +233,7 @@ a:link {
 
   /* Typography tokens */
   color:#eee;
-  font:var(--planet-info-font-size)/1.1 "Inter","Helvetica",sans-serif;
+  font:var(--planet-info-font-size)/1.1 var(--pl-body-font);
 }
 
 /* ───── close (×) button ───── */
@@ -294,9 +309,14 @@ a:link {
   font:inherit;
   font-variant-numeric:tabular-nums;
 }
-.pl-key{  white-space:nowrap; text-align:left; }
-.pl-val{  text-align:right; font-family:Menlo,Consolas,monospace; }
-.pl-alt{  text-align:left;  opacity:.9; }
+.pl-key{ white-space:nowrap; text-align:left; }
+
+/* NEW → mono family for aligned numbers */
+.pl-val{
+  text-align:right;
+  font-family:var(--pl-mono-font);
+}
+.pl-alt{ text-align:left;  opacity:.9; }
 
 /* header row + blank row helpers */
 .pl-head{ grid-column:1/-1; text-align:center; font-weight:600; padding:.2em 0; }
