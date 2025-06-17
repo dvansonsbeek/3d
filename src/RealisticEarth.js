@@ -6,8 +6,8 @@
      three/examples/jsm/utils/BufferGeometryUtils.js
    ------------------------------------------------------------------------- */
 import * as THREE from "https://esm.sh/three";
-import { BufferGeometryUtils }
-       from "https://esm.sh/three/examples/jsm/utils/BufferGeometryUtils.js";
+import { computeTangents } from
+  "https://esm.sh/three/examples/jsm/utils/BufferGeometryUtils.js";
 
 /* ╭──────────────────────────── helper scratch vectors ───────────────────╮ */
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3();
