@@ -4,12 +4,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import * as dat from 'dat.gui';
 
-import * as THREE        from "https://esm.sh/three";
-import Stats             from "https://esm.sh/three/examples/jsm/libs/stats.module.js";
-import { OrbitControls } from "https://esm.sh/three/examples/jsm/controls/OrbitControls.js";
-import { CSS2DRenderer, CSS2DObject } from "https://esm.sh/three/examples/jsm/renderers/CSS2DRenderer.js";
-import * as dat from "https://esm.sh/dat.gui";
-
 /*NO AI TRAINING on this Interactive 3D Solar System Simulation of the Holistic Universe Model unless explicitly authorized by D. van Sonsbeek.
 
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
@@ -3969,18 +3963,16 @@ const planetStats = {
        value : [ { v: () => moonRoyerCycleindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: 'years' }]},
       {label : () => `Number of Royer cycles per perihelion precession cycle`,
        value : [ { v: () => (meansolaryearlengthinDays*(holisticyearLength/16))/moonRoyerCycleindays, dec:10, sep:',' },{ small: 'times' }]},
-    null,
+         null,
       { header : 'Solar eclipse cycles - Metonic' },
-    null,
       {label : () => `235 Synodic Months`,
        value : [ { v: () => 235*moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `255 Draconic months`,
        value : [ { v: () => 255*moonNodalMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `19 Solar years`,
        value : [ { v: () => 19*o.lengthofsolarYear, dec:10, sep:',' },{ small: 'days' }]},
-    null,
+         null,
       { header : 'Solar eclipse cycles - Saros' },
-    null,
       {label : () => `223 Synodic Months`,
        value : [ { v: () => 223*moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `239 Anomalistic Months`,
@@ -3989,9 +3981,8 @@ const planetStats = {
        value : [ { v: () => 242*moonNodalMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `19 Draconic year cycles`,
        value : [ { v: () => 19*moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }]},
-    null,
+         null,
       { header : 'Solar eclipse cycles - Exeligmos = 3 Saros cycles' },
-    null,
       {label : () => `3 * 223 Synodic Months`,
        value : [ { v: () => 3*223*moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `3 * 239 Anomalistic Months`,
@@ -4000,9 +3991,8 @@ const planetStats = {
        value : [ { v: () => 3*242*moonNodalMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `3 * 19 Draconic year cycles`,
        value : [ { v: () => 3*19*moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }]},
-    null,
+         null,
       { header : 'Solar eclipse cycles - Callippic' },
-    null,
       {label : () => `940 Synodic Months`,
        value : [ { v: () => 940*moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }]},
       {label : () => `1020 Draconic months`,
@@ -4024,9 +4014,8 @@ const planetStats = {
        value : [ { v: () => sunTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Number of Moons`,
        value : [ '',{ small: '0' }]},
-    null, 
-      { header : 'New Constants which can be used for long term calculations' },
     null,
+      { header : 'New Constants which can be used for long term calculations' },
       {label : () => `NEW-AU`,
        value : [ { small:{ v: () => (meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI), dec:6, sep:',' }},{ small: 'km' }]}, 
       {label : () => `NEW-Light-year`,
@@ -4039,7 +4028,6 @@ const planetStats = {
        hover : [`A NEW-SI second is 86400/${fmtNum(meanlengthofday,8,',')} times the current SI second to make sure we can keep using 86,400 seconds a day`]},
      null,
       { header : 'Our Sun is orbiting the Milky Way' },
-     null,
       {label : () => `Orbit period of our Sun`,
        value : [ { v: () => sunOrbitPeriod, dec:0, sep:',' },{ small: 'years' }]},
       {label : () => `Orbit distance of our Sun to the Milky Way center`,
@@ -4049,7 +4037,6 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Galactic_year'},
     null,
       { header : 'Our Milky Way is orbiting the Great Attractor' },
-    null,
       {label : () => `Orbit period of our Milky Way galaxy`,
        value : [ { v: () => milkywayOrbitPeriod, dec:0, sep:',' },{ small: 'years' }],
        hover : [`Calculated based upon 2 mln light-years to the great attractor center, so (${fmtNum(greatattractorDistance,0,',')}*${fmtNum(lightYear,0,',')}*2*PI)/${fmtNum(milkywaySpeed,0,',')}/60/60*${fmtNum(meanlengthofday,6,',')}*${fmtNum(meansolaryearlengthinDays,6,',')}`]},
@@ -4058,13 +4045,9 @@ const planetStats = {
       {label : () => `Orbital speed of our Milky Way to the Great Attractor`,
        value : [ { v: () => milkywaySpeed, dec:0, sep:',' },{ small: 'km/h' }],
        info  : 'https://en.wikipedia.org/wiki/Great_Attractor'},
-    null,
-      { header : 'The age of the universe' },
-    null,
+        null,
       {label : () => `Visible age of the universe`,
-       value : [ { v: () => ((((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI)*Math.PI*2)/1296000)*(648000/(Math.PI))**2)/299792.458)/meanlengthofday/meansolaryearlengthinDays)*4.22*1000000000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Calculated based upon 4.220 billion parsecs visible`],
-       info  : 'https://en.wikipedia.org/wiki/Observable_universe'},
+       value : [ { v: () => ((((((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI)*Math.PI*2)/1296000)*(648000/(Math.PI))**2)/299792.458)/meanlengthofday/meansolaryearlengthinDays)*4.22*1000000000, dec:0, sep:',' },{ small: 'years' }]},    
     ],
     
     mercury: [
