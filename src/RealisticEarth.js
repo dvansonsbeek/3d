@@ -28,7 +28,7 @@ export class RealisticEarth {
 
     /* ── 1. geometry (with tangents for the normal-map) ───────────────── */
     const geom = new THREE.SphereGeometry(radius, segments, segments);
-    BufferGeometryUtils.computeTangents(geom);
+    computeTangents(geom);
 
     /* ── 2. textures ──────────────────────────────────────────────────── */
     const TL = new THREE.TextureLoader();
