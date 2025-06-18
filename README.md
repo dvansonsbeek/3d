@@ -22,12 +22,12 @@ The way it is modelled:
 What is actually happening:
 * The Sun is (still) the center of our solar system.
 * Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of 22,912 solar years, also known as Axial precession and therefore the Axial tilt changes.
-* The PERIHELION-OF-EARTH is orbiting the Sun counter-clockwise in a period of ~99,285 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+* The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of ~99,285 solar years, also known as Inclination precession and therefore the inclination tilt changes.
 * Axial precession meets Inclination precession every 18,616 years.
 * Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
 * Therefore it shows Earth is actually orbiting the Sun.
 * So we still live in a Heliocentric solar system
-* All planets in our solar system are orbiting the Sun according to Kepler’s 3rd law, and have a barycenter just outside of the Sun.
+* All planets in our solar system are orbiting their perihelion-point according to Kepler’s 3rd law.
 
 Additional explanation to understand the model:
 * The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth’s axis (J2000 value +23°26'21").
@@ -43,9 +43,9 @@ Why is the length of the Holistic-Year 297,856 years? This number fits all obser
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.945°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
-a) 1246 Length of solar day in SI seconds was - according to the current theory - ~31,556,929.19 SI seconds.  
-b) 1246 Length of sidereal year in SI seconds was - according to the current theory - ~31,558,149.6847 SI seconds.
-c) 1246 Length of solar day was above 86,400 SI seconds because of historic Delta T predictions.  
+a) 1246 Length of solar day in SI seconds was - fully aligned with the current theory - ~31,556,929.19 SI seconds.  
+b) 1246 Length of sidereal year in SI seconds was - fully aligned with the current theory - ~31,558,149.6847 SI seconds.
+c) 1246 Length of solar day was ~86,400.006 SI seconds because of historic Delta T predictions.  
 4. Climate graphs with ~100k cycles as a cycle of ~99,285 years (three times ~99,285 years = 297,856 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. Mercury perihelion precession aligned to ~5600 arc seconds per century - THE KEY EVIDENCE OF THE MODEL
@@ -70,7 +70,7 @@ At a basic level, it's like building a tiny universe in the browser, where JavaS
   - Planet tilts and custom orbit inclinations  
   - Optional ring textures  
   - Emissive + textured planets  
-  - Non-planet objects (barycenters, cycles) using `MeshBasicMaterial`
+  - Non-planet objects (perihelion, cycles) using `MeshBasicMaterial`
   - Starfield background and constellations
 
 ---
@@ -87,7 +87,7 @@ At a basic level, it's like building a tiny universe in the browser, where JavaS
 ## 🌈 Materials
 
 - **Planets:** `MeshPhongMaterial` with bump, specular, and emissive options
-- **Trace objects (e.g., Barycenter):**  
+- **Trace objects**  
   `MeshBasicMaterial`  
   with optional dimmed texture (`color: 0x888888`) or fallback color
 
@@ -117,7 +117,7 @@ Each planet is structured like this:
 
 ## ✨ Visual Effects
 
-- **Focus ring:** Shown around Sun’s barycenter when Sun is selected
+- **Focus ring:** Shown around Earth when Sun is selected
 - **Sun glow:** Dynamically scaled by camera distance
 - **Name tags and constellations:** Fading and scaling based on camera distance
 - **DOM overlay label:** Follows selected planet on screen
