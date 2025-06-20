@@ -283,21 +283,36 @@ a:link {
 /* ───────────────────────────────────────────────
    4.  SCROLLABLE DATA ZONE
    ─────────────────────────────────────────────── */
+#planetLabel .labelBody{
+  /* let it grow or shrink vertically so the data zone can scroll */
+  flex:1 1 auto;
+  min-height:0;
+
+  /* column layout so header / intro / image / scrollBox stack vertically */
+  display:flex;
+  flex-direction:column;
+
+  /* NO overflow here – only the .scrollBox scrolls */
+}
+
+/* 1.  THE *ONLY* SCROLLABLE AREA
+      ------------------------------------------------------- */
 .scrollBox{
-  flex:1 1 auto; min-height:0;          /* allows vertical scroll */
-  overflow:auto;                        /* both axes              */
+  flex:1 1 auto;      /* fill remaining height                     */
+  min-height:0;       /* let it shrink when the grid is taller     */
+  min-width:0;        /* ← KEY: allows grid to shrink horizontally */
+  overflow:auto;      /* vertical + horizontal scrollbars          */
   overscroll-behavior:contain;
-  padding-right:6px;                    /* space for scrollbar    */
+  padding-right:6px;  /* leave room for the vertical scrollbar     */
   max-width:100%;
 }
 
-/* WebKit scrollbar tint */
+/* keep your existing thumb colours … */
 .scrollBox::-webkit-scrollbar{ width:6px; }
 .scrollBox::-webkit-scrollbar-thumb{
   background:rgba(255,255,255,.25);
   border-radius:3px;
 }
-/* example planet-specific thumb */
 #planetLabel.theme-mars .scrollBox::-webkit-scrollbar-thumb{
   background:rgba(176,58,46,.4);
 }
