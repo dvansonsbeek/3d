@@ -2174,8 +2174,12 @@ void main(){
 const EARTH_FRAG = `
 precision mediump float;
 
-uniform sampler2D u_dayTexture;
-uniform sampler2D u_nightTexture;
+uniform sampler2D u_dayTexA;
+uniform sampler2D u_dayTexB;
+uniform sampler2D u_niteTexA;
+uniform sampler2D u_niteTexB;
+uniform float     u_dayMix;
+uniform float     u_niteMix;
 uniform sampler2D u_normalTexture;
 uniform sampler2D u_specTexture;
 
@@ -2215,8 +2219,15 @@ void main(){
     float edge1 = 0.5 + 0.5 * u_termWidth;
     hemi = smoothstep(edge0, edge1, clamp(hemi, 0.07, 1.0));
 
-    vec3 day   = texture2D(u_dayTexture,   vUv).rgb * u_dayGain;
-    vec3 night = texture2D(u_nightTexture, vUv).rgb;
+    /* day map ------------------------------------------------------------- */
+    vec3 dayA = texture2D(u_dayTexA, vUv).rgb;
+    vec3 dayB = texture2D(u_dayTexB, vUv).rgb;
+    vec3 day  = mix(dayA, dayB, u_dayMix) * u_dayGain;
+
+    /* night map ----------------------------------------------------------- */
+    vec3 niteA = texture2D(u_niteTexA, vUv).rgb;
+    vec3 niteB = texture2D(u_niteTexB, vUv).rgb;
+    vec3 night = mix(niteA, niteB, u_niteMix);
     vec3 color = mix(night, day, hemi);
 
     /* --- polar ice glow ----------------------------------------------- */
@@ -4917,35 +4928,53 @@ function updateDomLabel () {
   const label = document.getElementById('planetLabel');
   if (!label) { console.error('#planetLabel element missing'); return; }
 
-  /* build the wrapper once (close button, inner div) -------------------------- */
+  /* 0a — build the static DOM only once --------------------------------------- */
   if (!label.dataset.init) {
-    const content = document.createElement('div');
+    /* outer container that never changes */
+    const content   = document.createElement('div');
     content.className = 'labelContent';
 
-    const closeBtn = document.createElement('span');
+    /* **dynamic** part we will overwrite each frame */
+    const body      = document.createElement('div');
+    body.className  = 'labelBody';
+
+    /* close button (static) */
+    const closeBtn  = document.createElement('span');
     closeBtn.className  = 'closeBtn';
     closeBtn.textContent = '×';
     closeBtn.addEventListener('click', e => {
       e.stopPropagation();
       label.style.display = 'none';
       labelDismissed = true;
+      
+      /* -- turn off the helper of the planet that was being looked at */
+      if (o.lookAtObj && o.lookAtObj.orbitPlaneHelper) {
+      o.lookAtObj.orbitPlaneHelper.visible = false;
+      }
     });
 
-    content.appendChild(closeBtn);
+    /* assemble */
+    content.appendChild(closeBtn);  // static
+    content.appendChild(body);      // dynamic
     label.appendChild(content);
-    label.dataset.init = '1';
 
-    /* — NEW — keep image heights in sync on resize — */
+    /* keep a reference so we can reach it later */
+    label._body = body;
+
+    /* — keep image heights in sync on resize — */
     window.addEventListener('resize', () => {
       const w = label.clientWidth || (innerWidth / 3);
       content.querySelectorAll('.pl-img[data-ar]')
         .forEach(img => {
           const ar = +img.dataset.ar || (16 / 9);
-          img.style.maxHeight = maxImgHeight(w, ar) + 'px';
+          img.style.maxHeight = Math.round(w / ar) + 'px';
         });
     });
-    /* —————————————————————————————————————————— */
+
+    label.dataset.init = '1';
   }
+  
+  const body    = label._body;          // <div class="labelBody">
   const content = label.querySelector('.labelContent');
 
   /* 1 — what planet are we looking at?  -------------------------------------- */
@@ -5064,7 +5093,7 @@ function updateDomLabel () {
 
   /* 6 — inject only if changed ---------------------------------------------- */
   if (nextHTML !== labelPrevHTML) {
-    content.innerHTML = nextHTML;
+    body.innerHTML = nextHTML;
     labelPrevHTML     = nextHTML;
 
     /* freeze column widths the first time we show this planet ---------------- */
@@ -6618,28 +6647,36 @@ function makeRealisticEarth(pd){
     /* ------------------------------------------------ textures -------- */
     const TL = new THREE.TextureLoader().setCrossOrigin('anonymous');
     const tex = {
-        day   : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg"),
+        dayPostLGM  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg"),
+        dayLGM      : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthLGM.png"),
         niteModern  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNight.png"),
         niteClassic : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNightClassic.png"),
-        norm  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNormal.png"),
-        spec  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthSpecular.png"),
-        cloud : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earthcloudmap.png"),
+        norm        : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNormal.png"),
+        spec        : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthSpecular.png"),
+        cloud       : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earthcloudmap.png"),
     };
   
     // ----- colour-space assignment  ----------------------------------
-    tex.day.colorSpace   = THREE.NoColorSpace;
+    tex.dayPostLGM.colorSpace  = THREE.NoColorSpace;
+    tex.dayLGM.colorSpace      = THREE.NoColorSpace;
     tex.niteModern.colorSpace  = THREE.SRGBColorSpace;
-    tex.cloud.colorSpace = THREE.SRGBColorSpace;
+    tex.cloud.colorSpace       = THREE.SRGBColorSpace;
     tex.niteClassic.colorSpace = THREE.SRGBColorSpace;
-    tex.norm.colorSpace  = THREE.NoColorSpace;
-    tex.spec.colorSpace  = THREE.NoColorSpace;
+    tex.norm.colorSpace        = THREE.NoColorSpace;
+    tex.spec.colorSpace        = THREE.NoColorSpace;
 
     /* ------------------------------------------------ shared uniforms - */
-    const STARTS_MODERN = o.julianDay >= 2414827;   // when cities became lighted.
     const U = {
-        u_dayTexture     : { value: tex.day  },
-        u_nightTexture   : { value: STARTS_MODERN ? tex.nightModern : tex.niteClassic },
-        u_nightTexture   : { value: tex.nite },
+        /* DAY -------- */
+        u_dayTexA : { value: tex.dayLGM      },   // before the change-over
+        u_dayTexB : { value: tex.dayPostLGM  },   // after   the change-over
+        u_dayMix  : { value: 0.0 },               // 0 → A, 1 → B
+
+        /* NIGHT ------ */
+        u_niteTexA : { value: tex.niteClassic },
+        u_niteTexB : { value: tex.niteModern  },
+        u_niteMix  : { value: 0.0 },
+   
         u_normalTexture  : { value: tex.norm },
         u_specTexture    : { value: tex.spec },
         u_cloudTexture   : { value: tex.cloud },     // <-- NEW
@@ -6712,19 +6749,20 @@ function makeRealisticEarth(pd){
     }
   
     // ------------------------------------------------ era / map switcher -- 
-    let usingModernMap = STARTS_MODERN;
+    const JD_NIGHT_BOUNDARY = 2305620;   // first lit cities
+    const JD_DAY_BOUNDARY   = -5756193;  // End of LGM with max inclination of 2.05831717
+    const TRANSITION_DAYS   = 109572;       // length of the fade
 
-    function updateEra(julianDay = o.julianDay){
-      const shouldBeModern = julianDay >= 2414827;
+    function updateEra(julianDay = o.julianDay) {
 
-      // swap only when we actually cross the boundary
-      if (shouldBeModern !== usingModernMap){
-        usingModernMap           = shouldBeModern;
-        U.u_nightTexture.value   = shouldBeModern ? tex.niteModern : tex.niteClassic;
+    // night side (Classic ➜ Modern)
+      let t = (julianDay - JD_NIGHT_BOUNDARY) / TRANSITION_DAYS;
+      U.u_niteMix.value = THREE.MathUtils.clamp(t, 0, 1);
+      // or:  U.u_niteMix.value = THREE.MathUtils.smoothstep(0, 1, t);
 
-        // tell WebGL the sampler bindings changed
-        U.u_nightTexture.value.needsUpdate = true;
-      }
+      // day side (LGM ➜ Post-LGM)
+      t = (julianDay - JD_DAY_BOUNDARY) / TRANSITION_DAYS;
+      U.u_dayMix.value = THREE.MathUtils.clamp(t, 0, 1);
     }
 
     U.u_position.value.copy(core.position);
