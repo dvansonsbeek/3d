@@ -1,6 +1,6 @@
 # 🌌 Solar System Simulation built in three js
 
-![ss](https://www.holisticuniverse.com/img/14_predicted_Year2058AD.png)
+![ss](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
 NO AI TRAINING on this Interactive 3D Solar System Simulation of the Holistic Universe Model unless explicitly authorized by D. van Sonsbeek.
 
