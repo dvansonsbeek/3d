@@ -200,6 +200,9 @@ a:link {
 #planetLabel.theme-saturn  { --panel-bg:rgba(217,182, 92,.58); --panel-border:rgba(217,182, 92,.28); }
 #planetLabel.theme-uranus  { --panel-bg:rgba( 55,198,208,.58); --panel-border:rgba( 55,198,208,.28); }
 #planetLabel.theme-neptune { --panel-bg:rgba( 44, 83,158,.58); --panel-border:rgba( 44, 83,158,.28); }
+#planetLabel.theme-pluto   { --panel-bg:rgba(201,178,154,.58); --panel-border:rgba(201,178,154,.28); } 
+#planetLabel.theme-halleys { --panel-bg:rgba(158,203,255,.58); --panel-border:rgba(158,203,255,.28); } 
+#planetLabel.theme-eros    { --panel-bg:rgba(142,128,116,.58); --panel-border:rgba(142,128,116,.28); } 
 #planetLabel.theme-sun     { --panel-bg:rgba(255,174,  0,.60); --panel-border:rgba(255,174,  0,.30); }
 
 /* drawer slide-in effect (optional) */

@@ -63,8 +63,23 @@ const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
 
+const diameters = {
+  sunDiameter      : 1392684.00,
+  moonDiameter     : 3474.8,
+  earthDiameter    : 12756.27,
+  mercuryDiameter  : 4879.40,
+  venusDiameter    : 12103.60,
+  marsDiameter     : 6779,
+  jupiterDiameter  : 139822,
+  saturnDiameter   : 116464,
+  uranusDiameter   : 50724,
+  neptuneDiameter  : 49244,
+  plutoDiameter    : 2376.6,
+  halleysDiameter  : 11,
+  erosDiameter     : 16.84,
+};
+
 // Sun, Moon, Earth and Planet fixed settings
-const sunDiameter = 1392684.00;
 const sunTilt = 7.155;
 
 const milkywayDistance = 27500;
@@ -73,7 +88,6 @@ const greatattractorDistance = 200000000;
 const milkywaySpeed = 2160000;
 
 const moonDistance = 384399.07;
-const moonDiameter = 3474.8;
 const moonOrbitalInclination = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
@@ -82,9 +96,6 @@ const moonStartposApsidalMeetsNodal = -90;   // Set as random number
 const moonStartposNodal = 64.1;              // 
 const moonStartposMoon = 126.22;             // Needs to be at 21h31m22s at start model 
 
-const earthDiameter = 12756.27;
-
-const mercuryDiameter = 4879.40;
 const mercuryOrbitalInclination =  7.004995;
 const mercuryOrbitalEccentricity = 0.205632;
 const mercuryInclination = 6.3472858;
@@ -94,7 +105,6 @@ const mercuryAscendingNode = 48.336479;
 const mercuryStartpos = 70.84;         // Needs to be at 7h25m01.97 at start model
 const mercuryAngleCorrection = 0.982;  // To align the perihelion exactly
 
-const venusDiameter = 12103.60;
 const venusOrbitalInclination = 3.394667;
 const venusOrbitalEccentricity = 0.006772;
 const venusInclination = 2.1545441;
@@ -104,7 +114,6 @@ const venusAscendingNode = 75.684163;
 const venusStartpos = 117.526;         // Needs to be at 6h13m49.46 at start model
 const venusAngleCorrection = -2.79;    // To align the perihelion exactly
 
-const marsDiameter = 6779;
 const marsOrbitalInclination = 1.849723;
 const marsOrbitalEccentricity = 0.093401;
 const marsInclination = 1.6311858;
@@ -114,7 +123,6 @@ const marsAscendingNode = 49.561729;
 const marsStartpos = 121.578;          // Needs to be at 6h14m37.15 at start model
 const marsAngleCorrection = -2.12;     // To align the perihelion exactly
 
-const jupiterDiameter = 139822;
 const jupiterOrbitalInclination = 1.303241;
 const jupiterOrbitalEccentricity = 0.048499;
 const jupiterInclination = 0.3219652;
@@ -124,7 +132,6 @@ const jupiterAscendingNode = 100.469215;
 const jupiterStartpos = 13.8415;       // Needs to be at 3h44m14.54 at start model
 const jupiterAngleCorrection = 1.05;   // To align the perihelion exactly
 
-const saturnDiameter = 116464;
 const saturnOrbitalInclination = 2.488861;
 const saturnOrbitalEccentricity = 0.055547;
 const saturnInclination = 0.9254704;
@@ -134,7 +141,6 @@ const saturnAscendingNode = 113.669633;
 const saturnStartpos = 11.444;         // Needs to be at 3h35m02.7 at start model
 const saturnAngleCorrection = -0.25;   // To align the perihelion exactly
 
-const uranusDiameter = 50724;
 const uranusOrbitalInclination = 0.773201;
 const uranusOrbitalEccentricity = 0.046381;
 const uranusInclination = 0.9946692;
@@ -144,7 +150,6 @@ const uranusAscendingNode = 74.008411;
 const uranusStartpos = 44.853;         // Needs to be at 21h32m40.12 at start model
 const uranusAngleCorrection = -0.59;   // To align the perihelion exactly
 
-const neptuneDiameter = 49244;
 const neptuneOrbitalInclination = 1.769909;
 const neptuneOrbitalEccentricity = 0.009457;
 const neptuneInclination = 0.7354155;
@@ -154,34 +159,31 @@ const neptuneAscendingNode = 131.789247;
 const neptuneStartpos = 48.016;        // Needs to be at 20h33m37.31 at start model
 const neptuneAngleCorrection = 2.39;   // To align the perihelion exactly
 
-const plutoDiameter = 2376.6;
 const plutoOrbitalInclination = 17.14175;
 const plutoOrbitalEccentricity = 0.24880766;
 const plutoInclination = 15.5541473;
 const plutoTilt = 57.47;
 const plutoLongitudePerihelion = 224.06676;
 const plutoAscendingNode = 110.30347;
-const plutoStartpos = 0;               // Needs to be at 16h44m09.67 at start model
+const plutoStartpos = 71.555;          // Needs to be at 16h44m09.67 at start model
 const plutoAngleCorrection = 0;        // To align the perihelion exactly
 
-const halleysDiameter = 11;
 const halleysOrbitalInclination = 162.192203847561;
 const halleysOrbitalEccentricity = 0.9679427911271;
 const halleysInclination = 0.7354155;
 const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 0;             // Needs to be at 08h43m15.95 at start model
+const halleysStartpos = 250;           // Needs to be at 08h43m15.95 at start model
 const halleysAngleCorrection = 0;      // To align the perihelion exactly
 
-const erosDiameter = 16.84;
 const erosOrbitalInclination = 10.8290328658513;
 const erosOrbitalEccentricity = 0.222807894458402;
 const erosInclination = 10.8290328658513;
 const erosTilt = 0;
 const erosLongitudePerihelion = 123.054362100533;
 const erosAscendingNode = 304.411578580454;
-const erosStartpos = 57.165;           // Needs to be at 20h37m49.52 at start model
+const erosStartpos = 57.402;           // Needs to be at 20h37m49.52 at start model
 const erosAngleCorrection = 0;         // To align the perihelion exactly
 
 //*************************************************************
@@ -442,6 +444,21 @@ const planetMeta = {
     img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
     imgRatio : 35 / 9
   },
+  pluto  : {
+    intro : 'Pluto text',
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
+    imgRatio : 35 / 9
+  },
+  halleys  : {
+    intro : 'Halleys text',
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
+    imgRatio : 35 / 9
+  },
+  eros  : {
+    intro : 'Eros text.',
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
+    imgRatio : 35 / 9
+  },
   // …
 };
 
@@ -497,6 +514,7 @@ const earthWobbleCenter = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
+  isNotPhysicalObject: true,
 };
 
 const midEccentricityOrbit = {
@@ -729,7 +747,7 @@ const earthPerihelionFromEarth = {
   traceStartPos : 0,
   traceCurrPos : 0,
   traceArrIndex : 0,
-  //isNotPhysicalObject: true,
+  isNotPhysicalObject: true,
 };
 
 const barycenterPLANETS12 = {
@@ -2145,7 +2163,7 @@ const eros = {
 //*************************************************************
 const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCyclePrecession, moonNodalPrecession, moon, barycenterPLANETS12, barycenterPLANETS13, barycenterPLANETS14, barycenterPLANETS15, barycenterPLANETS16, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros]
 
-const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
+const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
 //*************************************************************
 // ADD ALL CALENDAR CONSTANTS
@@ -2406,6 +2424,16 @@ let o = {
   Day: "",
   julianDay: "",
   juliandaysbalancedJD: 0,
+  lengthofAU : 149597870.698828,
+  pos : 0,
+  sun : {pivotObj: new THREE.Object3D()},
+  earth : {pivotObj: new THREE.Object3D()},
+  displayFormat : 'sexagesimal',
+  distanceUnit : 'AU',
+  RA_Display : '',
+  Dec_Display : '',
+  perihelionDate : "",
+
   'Line trace': true,
   'Camera Lat': 0,
   'Camera Long': 0,
@@ -2431,6 +2459,9 @@ let o = {
   saturnElongation: 0.01,
   uranusElongation: 0.01,
   neptuneElongation: 0.01,
+  plutoElongation: 0.01,
+  halleysElongation: 0.01,
+  erosElongation: 0.01,
 
   mercuryPerihelion: 0,
   venusPerihelion: 0,
@@ -2440,6 +2471,9 @@ let o = {
   saturnPerihelion: 0,
   uranusPerihelion: 0,
   neptunePerihelion: 0,
+  plutoPerihelion: 0,
+  halleysPerihelion: 0,
+  erosPerihelion: 0,
   
   mercuryArgumentOfPeriapsis: 0,
   venusArgumentOfPeriapsis: 0,
@@ -2448,6 +2482,9 @@ let o = {
   saturnArgumentOfPeriapsis: 0,
   uranusArgumentOfPeriapsis: 0,
   neptuneArgumentOfPeriapsis: 0,
+  plutoArgumentOfPeriapsis: 0,
+  halleysArgumentOfPeriapsis: 0,
+  erosArgumentOfPeriapsis: 0,
   
   mercuryAscendingNode: 0,
   venusAscendingNode: 0,
@@ -2456,6 +2493,9 @@ let o = {
   saturnAscendingNode: 0,
   uranusAscendingNode: 0,
   neptuneAscendingNode: 0,
+  plutoAscendingNode: 0,
+  halleysAscendingNode: 0,
+  erosAscendingNode: 0,
 
   mercuryDescendingNode: 0,
   venusDescendingNode: 0,
@@ -2464,10 +2504,15 @@ let o = {
   saturnDescendingNode: 0,
   uranusDescendingNode: 0,
   neptuneDescendingNode: 0,
+  plutoDescendingNode: 0,
+  halleysDescendingNode: 0,
+  erosDescendingNode: 0,
   
   Target: "",
   lookAtObj: {}
 };
+
+const settingsObj = { sizeBlend : 0.5 };
 
 let predictions = {
   juliandaysbalancedJD: 0,
@@ -2513,7 +2558,10 @@ const planetColorHex = {
   saturn:  0xd9b65c,
   uranus:  0x37c6d0,
   neptune: 0x2c539e,
-  sun:     0xffae00
+  sun:     0xffae00,
+  pluto:   0xc9b29a,
+  halleys: 0x9ecbff,
+  eros:    0x8e8074,
 };
 
 //*************************************************************
@@ -2658,6 +2706,7 @@ controls.dollySpeed = 8.0;
 //*************************************************************
 //First add the default settings of the planets
 planetObjects.forEach(obj => createPlanet(obj));
+bakeRealisticScaleFactors();
 
 //Now adding the order of all objects 
 startingPoint.pivotObj.add(earth.containerObj);
@@ -3094,16 +3143,7 @@ showHideAxisHelpers();
 const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
 const unlitMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
 
-o.pos = 0;
-o.sun = {pivotObj: new THREE.Object3D()};
-o.earth = {pivotObj: new THREE.Object3D()};
 o.lookAtObj = o.earth;
-o.displayFormat = 'sexagesimal'; // or 'decimal'
-o.distanceUnit = 'AU';
-o.RA_Display = '';
-o.Dec_Display = '';
-o.lengthofAU = '149597870.698828';
-o.perihelionDate = "";
 let currPos; 
 let lastPlanetFocus = earth; // Default fallback
 
@@ -3300,15 +3340,14 @@ function setupGUI() {
   
   let planetList = {}
   let isHelper = {}
-  const helperRegex = /Barycenter|Phobos|Deimos|Precession|WOBBLE|HELION|Eccentricity|Pluto|Eros|Halleys|Helion|Starting|Cycle|Ellipse/i;
-
+  
   planetObjects.forEach(obj => {
-  if (!helperRegex.test(obj.name)) {
-    // not a “helper” → go in the planet list
-    planetList[obj.name] = obj.name;
-  } else {
-    // otherwise → it’s a helper object
-    isHelper[obj.name] = obj.name;
+    const isHelperObj =
+        (obj.isNotPhysicalObject === true) || (obj.visible === false);
+    if (isHelperObj) {
+      isHelper[obj.name]  = obj.name;   // put in helper list
+    } else {
+      planetList[obj.name] = obj.name;  // put in normal-planet list
     }
   });
 
@@ -3428,7 +3467,10 @@ function setupGUI() {
   folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter Perihelion")
   folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn Perihelion")  
   folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus Perihelion") 
-  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune Perihelion")   
+  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune Perihelion")
+  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto Perihelion")
+  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys Perihelion")
+  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros Perihelion")   
   
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
@@ -3478,6 +3520,7 @@ function setupGUI() {
   folderO.add(plane, 'visible').name('Ecliptic grid')
   
   let sFolder = gui.addFolder('Settings')
+  sFolder.add(settingsObj, 'sizeBlend', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
   let folderPlanets = sFolder.addFolder('Planets show/hide');
   folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
     showHideOrbits();
@@ -3510,6 +3553,9 @@ function setupGUI() {
   folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
   folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
   folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
+  folderElongations.add(o,"plutoElongation").min(0.0).max(180.0).listen().name("Pluto") 
+  folderElongations.add(o,"halleysElongation").min(0.0).max(180.0).listen().name("Halleys") 
+  folderElongations.add(o,"erosElongation").min(0.0).max(180.0).listen().name("Eros") 
   
   let folderCamera = sFolder.addFolder('Camera show/hide')  
 
@@ -3660,6 +3706,64 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+
+function bakeRealisticScaleFactors () {
+
+  planetObjects.forEach(pd => {     //  ← pd is in-scope only here
+
+    const key = pd.name.replace(/\s+/g,'').toLowerCase() + 'Diameter';
+
+    /* look up the constant (change this line if you use an object) */
+    const dk = diameters[key];
+
+    if (!dk) {
+    //  console.warn(`No diameter constant found for ${pd.name} (${key})`);
+      return;                       // skip and keep pretty size
+    }
+
+    const realSceneUnits  = (dk / o.lengthofAU)*100;
+    pd._sizeScaleFactor   = realSceneUnits / pd.size;
+
+    /* -------------- diagnostic stays INSIDE the forEach ------------- */
+    //console.log(
+    //  pd.name.padEnd(8),
+    //  'km =', dk.toString().padStart(6),
+    //  'scaleFactor =', pd._sizeScaleFactor.toFixed(4)
+    //);
+  });
+}
+
+function updatePlanetSizes (t) {
+
+  const BOOST = 4.0;               // <— tune this to taste
+                                   //     2.0 = double the “pretty” size
+
+  planetObjects.forEach(pd => {
+
+    /* skip objects with no mesh to scale */
+    if (!pd.rotationAxis) return;
+
+    /* we pre-computed this earlier; default to 1 if missing */
+    const fReal  = pd._sizeScaleFactor || 1;   // realistic / pretty
+    const fPretty= 1;                          // pretty  / pretty
+    const fBoost = BOOST;                      // boosted / pretty
+
+    /* piecewise-linear blend:
+       0→0.5 : lerp(realistic, pretty)
+       0.5→1 : lerp(pretty,     boost)         */
+    let scale;
+    if (t <= 0.5){
+      const α = t / 0.5;                       // 0 → 1
+      scale = THREE.MathUtils.lerp(fReal, fPretty, α);
+    } else {
+      const α = (t - 0.5) / 0.5;               // 0 → 1
+      scale = THREE.MathUtils.lerp(fPretty, fBoost, α);
+    }
+
+    pd.rotationAxis.scale.setScalar(scale);
+  });
+}
+
 function addWidthToggle(gui, sizes = [300, 550]) {
   let idx = 0;
 
@@ -3968,7 +4072,7 @@ const planetStats = {
     earth: [
       {header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => earthDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.earthDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/Earth'},   
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -4070,7 +4174,7 @@ const planetStats = {
     moon: [
     {header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => moonDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.moonDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/Moon'},
       {label : () => `Axial tilt`,
        value : [ { v: () => moonTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
@@ -4189,7 +4293,7 @@ const planetStats = {
     sun: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => sunDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.sunDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/Sun'},    
       {label : () => `Axial tilt`,
        value : [ { v: () => sunTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
@@ -4244,7 +4348,7 @@ const planetStats = {
     mercury: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => mercuryDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.mercuryDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/Mercury_(planet)'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => mercuryTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
@@ -4307,7 +4411,7 @@ const planetStats = {
     venus: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => venusDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.venusDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/venus'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => venusTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},  
@@ -4371,7 +4475,7 @@ const planetStats = {
     mars: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => marsDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.marsDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/mars'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => marsTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]}, 
@@ -4435,7 +4539,7 @@ const planetStats = {
     jupiter: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => jupiterDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.jupiterDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/jupiter'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => jupiterTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
@@ -4499,7 +4603,7 @@ const planetStats = {
     saturn: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => saturnDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.saturnDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/saturn'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => saturnTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},   
@@ -4563,7 +4667,7 @@ const planetStats = {
     uranus: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => uranusDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.uranusDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/uranus'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => uranusTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},  
@@ -4627,7 +4731,7 @@ const planetStats = {
     neptune: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => neptuneDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.neptuneDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/neptune'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => neptuneTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},   
@@ -4690,7 +4794,7 @@ const planetStats = {
     pluto: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => plutoDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.plutoDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/pluto'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => plutoTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},   
@@ -4753,7 +4857,7 @@ const planetStats = {
       halleys: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => halleysDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.halleysDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/halleys'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => halleysTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},   
@@ -4816,7 +4920,7 @@ const planetStats = {
       eros: [
     { header : '—  General characteristics —' },
       {label : () => `Size diameter`,
-       value : [ { v: () => erosDiameter, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => diameters.erosDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/eros'}, 
       {label : () => `Axial tilt`,
        value : [ { v: () => erosTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]}, 
@@ -5839,6 +5943,9 @@ function updatePerihelion() {
   o["saturnPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, saturnPerihelionFromEarth);
   o["uranusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, uranusPerihelionFromEarth);
   o["neptunePerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, neptunePerihelionFromEarth);
+  o["plutoPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, plutoPerihelionFromEarth);
+  o["halleysPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, halleysPerihelionFromEarth);
+  o["erosPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, erosPerihelionFromEarth);
 };
 
 /**
@@ -5884,7 +5991,10 @@ function updateOrbitOrientations() {
     ["jupiter",  jupiterPerihelionFromSun,  o.jupiterPerihelion],
     ["saturn",   saturnPerihelionFromSun,   o.saturnPerihelion],
     ["uranus",   uranusPerihelionFromSun,   o.uranusPerihelion],
-    ["neptune",  neptunePerihelionFromSun,  o.neptunePerihelion]
+    ["neptune",  neptunePerihelionFromSun,  o.neptunePerihelion],
+    ["pluto",    plutoPerihelionFromSun,    o.plutoPerihelion],
+    ["halleys",  halleysPerihelionFromSun,  o.halleysPerihelion],
+    ["eros",     erosPerihelionFromSun,     o.erosPerihelion]
   ];
 
   for (const [name, pd, peri] of planets) {
@@ -6175,6 +6285,9 @@ function updateElongations() {
   o["saturnElongation"]=getElongationFromSun(saturn);
   o["uranusElongation"]=getElongationFromSun(uranus);
   o["neptuneElongation"]=getElongationFromSun(neptune);
+  o["plutoElongation"]=getElongationFromSun(pluto);
+  o["halleysElongation"]=getElongationFromSun(halleys);
+  o["erosElongation"]=getElongationFromSun(eros);
 };
 
 function updatePredictions() {
@@ -6776,7 +6889,7 @@ function makeRealisticEarth(pd){
     };
 }
 
-function createPlanet(pd) {           // pd = Planet Data  (unchanged)
+function createPlanet(pd) {           // pd = Planet Data
 
   /*  ───────────────────────── orbit container (unchanged) ─────────── */
   const orbitContainer = new THREE.Object3D();
@@ -6823,13 +6936,11 @@ function createPlanet(pd) {           // pd = Planet Data  (unchanged)
   pd.planetMaterial    = earthPack.coreMesh.material;
   pd._updateSunDirFunc = earthPack.updateSunDir;
   pd._updateCloudsFunc = earthPack.updateClouds;
-  pd._updateEraFunc = earthPack.updateEra;
+  pd._updateEraFunc    = earthPack.updateEra;
     
-      /* ————————————————————————————————
-      Hide the legacy Phong sphere so only
-      the shader-driven Earth is rendered.
-      (planetMesh is the old sphere you built
-       earlier in this function.)            */
+  /* ————————————————————————————————
+  Hide the legacy Phong sphere so only the shader-driven Earth is rendered.
+  (planetMesh is the old sphere you built earlier in this function.)            */
    if (typeof planetMesh !== "undefined") {
        planetMesh.visible = false;
    }
@@ -6862,8 +6973,8 @@ function createPlanet(pd) {           // pd = Planet Data  (unchanged)
     const sphereGeom    = new THREE.SphereGeometry(pd.size, segsSphere, segsSphere);
     planetMesh          = new THREE.Mesh(sphereGeom, planetMat);
 
-    /*  Legacy “wobble” exclusions (unchanged)  */
-    if (/Barycenter|Precession|WOBBLE|HELION|Eccentricity|Helion|Starting|Cycle|Ellipse/i.test(pd.name)){
+    /*  Exclusions for shadows  */
+    if (pd.isNotPhysicalObject === true){
       if (pd.textureUrl){
         const tex = loadTexture(pd.textureUrl);
         planetMesh.material = new THREE.MeshBasicMaterial({
@@ -6872,9 +6983,9 @@ function createPlanet(pd) {           // pd = Planet Data  (unchanged)
           opacity: pd.textureTransparency || 1.0
         });
       }
-    } else {
-      planetMesh.castShadow    = true;
-      planetMesh.receiveShadow = true;
+     /* ghost helpers should never touch the shadow pipeline */
+    planetMesh.castShadow    = false;
+    planetMesh.receiveShadow = false;
     }
 
     pd.planetMaterial = planetMat;             // keep reference for GUI
@@ -6882,7 +6993,9 @@ function createPlanet(pd) {           // pd = Planet Data  (unchanged)
   }
 
   /*  ---------- rest of your original helper (rings, helpers, etc.) --- */
+  if (planetMesh) {
   rotationAxis.add(planetMesh);
+  }
 
   /* optional ring system (unchanged) */
   if (pd.ringUrl){
@@ -6926,10 +7039,10 @@ function createPlanet(pd) {           // pd = Planet Data  (unchanged)
   pd.pivotObj      = pivot;
   pd.rotationAxis  = rotationAxis;
 
-  /* console log (kept) */
-  if (!/Barycenter|Precession|Cycle|Ellipse/i.test(pd.name)) {
-    console.log(`Created planet: ${pd.name}`);
-  }
+  /* console log (when needed) */
+  //if (!/Barycenter|Precession|Cycle|Ellipse/i.test(pd.name)) {
+  //  console.log(`Created planet: ${pd.name}`);
+  //}
 
   scene.add(orbitContainer);
 }
