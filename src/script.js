@@ -174,7 +174,7 @@ const halleysInclination = 0.7354155;
 const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 250;           // Needs to be at 08h43m15.95 at start model
+const halleysStartpos = 80;            // Needs to be at 08h43m15.95 at start model
 const halleysAngleCorrection = 0;      // To align the perihelion exactly
 
 const erosOrbitalInclination = 10.8290328658513;
@@ -395,7 +395,7 @@ const renderVal = val => {
 
 const planetMeta = {
   earth : {
-    intro : 'Earth is the third planet from the Sun and is the largest of the terrestrial planets. The Earth is the only planet in our solar system not to be named after a Greek or Roman deity. The Earth was formed approximately ~4.5 billion years ago and is the only known planet to support life. It has a significant atmosphere, active geology, and a large moon, distinguished by its vast oceans of liquid water and diverse ecosystems that make it unique in the Solar System.',
+    intro : 'Earth is the third planet from the Sun and is the largest of the terrestrial planets. It is the only planet in our solar system not to be named after a Greek or Roman deity. The Earth was formed approximately ~4.5 billion years ago and is the only known planet to support life. It has a significant atmosphere, active geology, and a large moon, distinguished by its vast oceans of liquid water and diverse ecosystems that make it unique in the Solar System.',
     img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
     imgRatio : 35 / 9
   },
@@ -445,17 +445,17 @@ const planetMeta = {
     imgRatio : 35 / 9
   },
   pluto  : {
-    intro : 'Pluto text',
+    intro : 'Pluto is a dwarf planet located in a distant region of our solar system beyond Neptune known as the Kuiper Belt. Pluto was long considered our ninth planet, but the International Astronomical Union reclassified Pluto as a dwarf planet in 2006. It is the largest known trans-Neptunian object by volume by a small margin, but is less massive than Eris. Like other Kuiper belt objects, Pluto is made primarily of ice and rock and is much smaller than the inner planets. Pluto has roughly one-sixth the mass of the Moon and one-third its volume.',
     img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
     imgRatio : 35 / 9
   },
   halleys  : {
-    intro : 'Halleys text',
+    intro : 'Halleys Comet is the only known short-period comet that is consistently visible to the naked eye from Earth, appearing every 72–80 years. Halleys periodic returns to the inner Solar System have been observed and recorded by astronomers around the world since at least 240 BC, but it was not until 1705 that the English astronomer Edmond Halley understood that these appearances were re-appearances of the same comet. As a result of this discovery, the comet is named after Halley.',
     img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
     imgRatio : 35 / 9
   },
   eros  : {
-    intro : 'Eros text.',
+    intro : '433 Eros is a stony asteroid of the Amor group, and the first discovered, and second-largest near-Earth object. It has an elongated shape and a volume-equivalent diameter of approximately 16.8 kilometers (10.4 miles). Visited by the NEAR Shoemaker space probe in 1998, it became the first asteroid ever studied from its own orbit. The asteroid was discovered by German astronomer C. G. Witt at the Berlin Observatory on 13 August 1898 in an eccentric orbit between Mars and Earth. It was later named after Eros, a god from Greek mythology, the son of Aphrodite.',
     img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
     imgRatio : 35 / 9
   },
@@ -484,7 +484,6 @@ const startingPoint = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -509,11 +508,7 @@ const earthWobbleCenter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -533,18 +528,14 @@ const midEccentricityOrbit = {
   size: 0.011,   
   color: 0x0096FF,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earth_mean_eccentricity.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: true,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -561,24 +552,17 @@ const earth = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.0852703981708473,
-  // 10 times bigger than real 
+  size: (diameters.earthDiameter/ currentAUDistance)*100,
   color: 0x333333,
-  sphereSegments: 320,
-  tiltb: 0,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   traceLength : sYear * 1000000,
   traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const earthInclinationPrecession = {
@@ -600,7 +584,6 @@ const earthInclinationPrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -623,7 +606,6 @@ const earthEclipticPrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -646,7 +628,6 @@ const earthObliquityPrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -669,7 +650,6 @@ const earthPerihelionPrecession1 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -692,7 +672,6 @@ const earthPerihelionPrecession2 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -715,7 +694,6 @@ const barycenterEarthAndSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -735,18 +713,14 @@ const earthPerihelionFromEarth = {
   size: 0.011,   
   color: 0xBF40BF,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   traceOn: true,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   isNotPhysicalObject: true,
 };
 
@@ -769,7 +743,6 @@ const barycenterPLANETS12 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -792,7 +765,6 @@ const barycenterPLANETS13 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -815,7 +787,6 @@ const barycenterPLANETS14 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -838,7 +809,6 @@ const barycenterPLANETS15 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -861,7 +831,6 @@ const barycenterPLANETS16 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -878,23 +847,17 @@ const sun = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.930951753186224,    
+  size: (diameters.sunDiameter/ currentAUDistance)*100,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg',
-  textureTransparency: 9,
   visible: true,
   emissive: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   traceLength : sYear * 1000000,
-  traceStep : sYear*10,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const moonApsidalPrecession = {
@@ -916,7 +879,6 @@ const moonApsidalPrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 }; 
 
@@ -939,7 +901,6 @@ const moonApsidalNodalPrecession1 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 }; 
 
@@ -962,7 +923,6 @@ const moonApsidalNodalPrecession2 = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 }; 
 
@@ -985,7 +945,6 @@ const moonRoyerCyclePrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1008,7 +967,6 @@ const moonNodalPrecession = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 }; 
 
@@ -1025,8 +983,7 @@ const moon = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
-  size: 0.0232276033326404,
-  //10 times bigger than real
+  size: (diameters.moonDiameter/ currentAUDistance)*100,
   color: 0x8b8b8b,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
   visible: true,
@@ -1034,13 +991,9 @@ const moon = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false, 
-  traceLength : sYear * 18,
+  traceLength : sYear * 19,
   traceStep : sDay,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const mercuryPerihelionFromEarth = {
@@ -1059,18 +1012,14 @@ const mercuryPerihelionFromEarth = {
   size: 0.5,
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear, 
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1093,7 +1042,6 @@ const mercurybarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1117,7 +1065,6 @@ const mercuryPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1134,8 +1081,7 @@ const mercury = {
   orbitTilta: 0,
   orbitTiltb: 0,
 
-  //size: 0.00326167744046522,
-  size: 1,
+  size: (diameters.mercuryDiameter/ currentAUDistance)*100,
   color: 0x868485,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
   visible: true,
@@ -1143,13 +1089,9 @@ const mercury = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
-  traceLength : sYear * 14,
-  traceStep : sDay,
+  traceLength : sYear * 16,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const venusPerihelionFromEarth = {
@@ -1168,18 +1110,14 @@ const venusPerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear, 
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1202,7 +1140,6 @@ const venusbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1226,7 +1163,6 @@ const venusPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1243,22 +1179,17 @@ const venus = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.00809075686937222,
-  size: 1,
+  size: (diameters.venusDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
-  traceLength : sYear *16,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 16,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const marsPerihelionFromEarth = {
@@ -1277,18 +1208,14 @@ const marsPerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1311,7 +1238,6 @@ const marsbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1351,22 +1277,17 @@ const mars = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.00453148161022128,
-  size: 1,
+  size: (diameters.marsDiameter/ currentAUDistance)*100,
   color: 0xFF0000,
-  traceLength : sYear * 44,
-  traceStep : sWeek, 
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 16,
+  traceStep : sWeek, 
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const jupiterPerihelionFromEarth = {
@@ -1385,18 +1306,14 @@ const jupiterPerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1419,7 +1336,6 @@ const jupiterbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1443,7 +1359,6 @@ const jupiterPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1460,14 +1375,11 @@ const jupiter = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0934652340617141,   
-  size: 6,
+  size: (diameters.jupiterDiameter/ currentAUDistance)*100,
   color: 0xCDC2B2,
-  traceLength : sYear * 24,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
   ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
-  ringSize   : 11,
+  ringSize   : 11/6*(diameters.jupiterDiameter/ currentAUDistance)*100,
   ringInnerMult : 1.70,
   ringOuterMult : 1.90,
   ringOpacity   : 0.03,
@@ -1476,11 +1388,9 @@ const jupiter = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 16,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const saturnPerihelionFromEarth = {
@@ -1499,18 +1409,14 @@ const saturnPerihelionFromEarth = {
   size: 0.5,
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,  
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1533,7 +1439,6 @@ const saturnbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1557,7 +1462,6 @@ const saturnPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1574,14 +1478,11 @@ const saturn = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0778513754613971,   
-  size: 5,
+  size: (diameters.saturnDiameter/ currentAUDistance)*100,
   color: 0xA79662,
-  traceLength : sYear * 60,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
   ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-rings.png',
-  ringSize   : 10,
+  ringSize   : 2*(diameters.saturnDiameter/ currentAUDistance)*100,
   ringInnerMult: 1.23,
   ringOuterMult: 2.27,
   ringOpacity : 0.4,
@@ -1590,11 +1491,9 @@ const saturn = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 250,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const uranusPerihelionFromEarth = {
@@ -1613,18 +1512,14 @@ const uranusPerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1647,7 +1542,6 @@ const uranusbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1671,7 +1565,6 @@ const uranusPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1688,14 +1581,11 @@ const uranus = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0339068997192601, 
-  size: 5,
+  size: (diameters.uranusDiameter/ currentAUDistance)*100,
   color: 0xD2F9FA,
-  traceLength : sYear * 18,
-  traceStep : sWeek,  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
   ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
-  ringSize   : 6,
+  ringSize   : 6/5*(diameters.uranusDiameter/ currentAUDistance)*100,
   ringInnerMult : 1.50,
   ringOuterMult : 2.00,
   ringOpacity   : 0.05,
@@ -1704,11 +1594,9 @@ const uranus = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 250,
+  traceStep : sWeek,  
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const neptunePerihelionFromEarth = {
@@ -1727,18 +1615,14 @@ const neptunePerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1761,7 +1645,6 @@ const neptunebarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1785,7 +1668,6 @@ const neptunePerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1802,14 +1684,11 @@ const neptune = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0329175808251566,
-  size: 5,
+  size: (diameters.neptuneDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
-  traceLength : sYear * 18,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
   ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
-  ringSize   : 4,
+  ringSize   : 4/5*(diameters.neptuneDiameter/ currentAUDistance)*100,
   ringInnerMult : 1.80,
   ringOuterMult : 2.05,
   ringOpacity   : 0.03,
@@ -1818,11 +1697,9 @@ const neptune = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 250,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 //The accurate orbits of Pluto and Halleys and Eros will be added later
@@ -1846,18 +1723,14 @@ const plutoPerihelionFromEarth = {
   size: 5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/pluto_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1880,7 +1753,6 @@ const plutobarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1904,7 +1776,6 @@ const plutoPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -1921,22 +1792,17 @@ const pluto = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.00158865897549076,   
-  size: 5,
+  size: (diameters.plutoDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
-  traceLength : sYear * 18,
-  traceStep : sWeek,  
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 250,
+  traceStep : sWeek,  
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const halleysPerihelionFromEarth = {
@@ -1955,18 +1821,14 @@ const halleysPerihelionFromEarth = {
   size: 5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/halleys_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear,  
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear,  
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -1989,7 +1851,6 @@ const halleysbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -2013,7 +1874,6 @@ const halleysPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -2032,22 +1892,17 @@ const halleys = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0000073530458345529,
-  size: 6,
+  size: (diameters.halleysDiameter/ currentAUDistance)*100,
   color: 0x00FF00,
-  traceLength : sYear * 90,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 250,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 const erosPerihelionFromEarth = {
@@ -2066,18 +1921,14 @@ const erosPerihelionFromEarth = {
   size: 0.5,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/eros_perihelion.png',
-  traceLength : sYear * 1000000,
-  traceStep : sYear, 
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 1000000,
+  traceStep : sYear, 
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
   isNotPhysicalObject: true,
 };
 
@@ -2100,7 +1951,6 @@ const erosbarycenterPLANETS = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -2123,7 +1973,6 @@ const erosPerihelionFromSun = {
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
   isNotPhysicalObject: true,
 };
 
@@ -2140,22 +1989,17 @@ const eros = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  //size: 0.0000112568447139883,
-  size: 1,
+  size: (diameters.erosDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
-  traceLength : sYear *16,
-  traceStep : sWeek,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
   visible: false,
   containerObj:"",
   orbitObj:"",
   planetObj:"",
   pivotObj:"",
-  axisHelper: false,
+  traceLength : sYear * 16,
+  traceStep : sWeek,
   traceOn: false,
-  traceStartPos : 0,
-  traceCurrPos : 0,
-  traceArrIndex : 0,
 };
 
 //*************************************************************
@@ -2512,7 +2356,7 @@ let o = {
   lookAtObj: {}
 };
 
-const settingsObj = { sizeBlend : 0.5 };
+const params = { sizeBoost: 0 }; 
 
 let predictions = {
   juliandaysbalancedJD: 0,
@@ -2706,7 +2550,7 @@ controls.dollySpeed = 8.0;
 //*************************************************************
 //First add the default settings of the planets
 planetObjects.forEach(obj => createPlanet(obj));
-bakeRealisticScaleFactors();
+updatePlanetSizes(0);
 
 //Now adding the order of all objects 
 startingPoint.pivotObj.add(earth.containerObj);
@@ -2818,11 +2662,6 @@ const fallbackLight = new THREE.PointLight(0xffffff, 10000); // distance = 0 = i
 fallbackLight.visible = false;
 scene.add(fallbackLight);
 
-// POINTLIGHT SUNLIGHT — Obsolete. Was initial light for planets in space
-//const sun2Light = new THREE.PointLight(0xffffff, 0.1);
-//scene.add(sun2Light);
-
-// DIRECTIONAL SUNLIGHT — better choice for Earth in space
 const sunLight = new THREE.DirectionalLight(0xffffff, 1);
 sunLight.castShadow = true;
 
@@ -2832,27 +2671,13 @@ sunLight.shadow.bias = -0.0001;
 sunLight.shadow.radius = 1;
 sunLight.shadow.camera.far = 1000; // Increase only if necessary
 
-// Add light and its target
-scene.add(sunLight);
-scene.add(sunLight.target); // Required for .target to work
-
 // Optional: helper for debugging shadow frustum
-// const helper = new THREE.CameraHelper(sunLight.shadow.camera);
-// scene.add(helper);
-
 //const shadowCameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
 //scene.add(shadowCameraHelper);
 
-// Add light to the Sun pivot, so it follows the Sun’s position
-sun.pivotObj.add(sunLight);
-
-// Add target for the light to follow Earth
-const lightTarget = new THREE.Object3D();
-scene.add(lightTarget);
-sunLight.target = lightTarget;
-
 // Add the light to the scene
 scene.add(sunLight);
+scene.add(sunLight.target);
 
 //*************************************************************
 // ADD CELESTIAL SPHERE, ECLIPTIC GRID & ZODIAC TO Earth
@@ -3143,9 +2968,8 @@ showHideAxisHelpers();
 const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
 const unlitMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
 
-o.lookAtObj = o.earth;
+o.lookAtObj = earth;
 let currPos; 
-let lastPlanetFocus = earth; // Default fallback
 
 let lastFrameTime = 0;
 let smoothedFps   = 60;
@@ -3166,6 +2990,16 @@ const tmp3 = new THREE.Vector3();
 let cameraWorldPos = new THREE.Vector3();
 
 const tmpVec = new THREE.Vector3();
+
+const _ctrWS  = new THREE.Vector3();
+const _offset = new THREE.Vector3();
+const _scale  = new THREE.Vector3();
+
+const _sunWS      = new THREE.Vector3();          // Sun (world space)
+const _planetWS   = new THREE.Vector3();          // Planet (world space)
+const _cornersLS  = [...Array(8)].map(() => new THREE.Vector3());
+const _wsBox      = new THREE.Box3();
+const _invMat     = new THREE.Matrix4();
 
 const EARTH_POS    = new THREE.Vector3();   // Earth centre (world)
 const SUN_POS      = new THREE.Vector3();   // Sun   centre (world)
@@ -3367,7 +3201,7 @@ function setupGUI() {
       o.lookAtObj.orbitPlaneHelper.visible = true;
     }
   });
-  
+  focusPlanet(o.lookAtObj);
   ctrlFolder.open() 
   
   let astroFolder = gui.addFolder('Predictions Holistic Universe Model');
@@ -3520,7 +3354,7 @@ function setupGUI() {
   folderO.add(plane, 'visible').name('Ecliptic grid')
   
   let sFolder = gui.addFolder('Settings')
-  sFolder.add(settingsObj, 'sizeBlend', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
+  sFolder.add(params, 'sizeBoost', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
   let folderPlanets = sFolder.addFolder('Planets show/hide');
   folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
     showHideOrbits();
@@ -3707,59 +3541,56 @@ requestAnimationFrame(render);
 // FUNCTIONS
 //*************************************************************
 
-function bakeRealisticScaleFactors () {
+function focusPlanet(pd, pad = 1.01) {
+  if (!pd?.planetObj) {
+    // user picked "Please select" → remove limits
+    controls.minDistance = 0;
+    controls.maxDistance = Infinity;
+    return;
+  }
 
-  planetObjects.forEach(pd => {     //  ← pd is in-scope only here
+  /* — planet world-space centre — */
+  pd.planetObj.updateMatrixWorld(true);
+  pd.planetObj.getWorldPosition(_ctrWS);
 
-    const key = pd.name.replace(/\s+/g,'').toLowerCase() + 'Diameter';
+  /* — scaled radius (uniform scaling assumed) — */
+  pd.planetObj.getWorldScale(_scale);
+  const R = pd.size * _scale.x;          // pd.size = "pretty" radius
+  const minD = R * pad;
 
-    /* look up the constant (change this line if you use an object) */
-    const dk = diameters[key];
+  controls.target.copy(_ctrWS);
+  controls.minDistance = minD;
+  controls.maxDistance = Infinity;        // generous zoom-out
 
-    if (!dk) {
-    //  console.warn(`No diameter constant found for ${pd.name} (${key})`);
-      return;                       // skip and keep pretty size
-    }
+  /* — if camera is *inside* new shell → pop it to the skin — */
+  _offset.subVectors(camera.position, _ctrWS);
+  if (_offset.length() < minD) {
+    camera.position.copy(_ctrWS).add(_offset.setLength(minD));
+    controls.update();                   // rebuild spherical coords
+  }
 
-    const realSceneUnits  = (dk / o.lengthofAU)*100;
-    pd._sizeScaleFactor   = realSceneUnits / pd.size;
-
-    /* -------------- diagnostic stays INSIDE the forEach ------------- */
-    //console.log(
-    //  pd.name.padEnd(8),
-    //  'km =', dk.toString().padStart(6),
-    //  'scaleFactor =', pd._sizeScaleFactor.toFixed(4)
-    //);
-  });
+  /* — near plane: 20 % of min distance for good z-precision — */
+  camera.near = Math.max(0.01, minD * 0.2);
+  camera.updateProjectionMatrix();
 }
 
-function updatePlanetSizes (t) {
+/**
+ * Blow-up slider for the physical planets only.
+ * Pass a slider value `t` ∈ [0, 1].
+ */
+function updatePlanetSizes(t) {
 
-  const BOOST = 4.0;               // <— tune this to taste
-                                   //     2.0 = double the “pretty” size
+  t = THREE.MathUtils.clamp(t, 0, 1);   // safety against out-of-range
+  const BOOST = 250.0;                    // max multiple at t = 1
 
   planetObjects.forEach(pd => {
 
-    /* skip objects with no mesh to scale */
+    /* ignore helpers / ghost objects */
+    if (pd.isNotPhysicalObject === true || pd.visible === false) return;
     if (!pd.rotationAxis) return;
 
-    /* we pre-computed this earlier; default to 1 if missing */
-    const fReal  = pd._sizeScaleFactor || 1;   // realistic / pretty
-    const fPretty= 1;                          // pretty  / pretty
-    const fBoost = BOOST;                      // boosted / pretty
-
-    /* piecewise-linear blend:
-       0→0.5 : lerp(realistic, pretty)
-       0.5→1 : lerp(pretty,     boost)         */
-    let scale;
-    if (t <= 0.5){
-      const α = t / 0.5;                       // 0 → 1
-      scale = THREE.MathUtils.lerp(fReal, fPretty, α);
-    } else {
-      const α = (t - 0.5) / 0.5;               // 0 → 1
-      scale = THREE.MathUtils.lerp(fPretty, fBoost, α);
-    }
-
+    /* linear scale from 1 → BOOST */
+    const scale = 1 + t * (BOOST - 1);  // 0 ↦ 1, 1 ↦ BOOST
     pd.rotationAxis.scale.setScalar(scale);
   });
 }
@@ -5332,52 +5163,62 @@ function updateFlares() {
   }
 }
 
-function updateSunlightForPlanet(lightTargetObj, shadowReceiverObj = lightTargetObj) {
-  if (!lightTargetObj || !shadowReceiverObj) return;
+/**
+ * Call once per frame *after* you have moved the Sun & planets,
+ * but *before* renderer.render().
+ *
+ * @param {THREE.Mesh} planetMesh  – the mesh that receives the shadow
+ * @param {number}      pad        – padding multiplier (> 1) for safety
+ */
+function updateSunlightForPlanet(planetMesh, pad = 1.1) {
 
-  // Update world matrices
-  sun.planetObj.updateMatrixWorld();
-  lightTargetObj.updateMatrixWorld();
-  shadowReceiverObj.updateMatrixWorld();
+  if (!planetMesh) return;
 
-  // Get positions
-  const sunPos = new THREE.Vector3();
-  const targetPos = new THREE.Vector3();
-  sun.planetObj.getWorldPosition(sunPos);
-  lightTargetObj.getWorldPosition(targetPos);
+  /* 1. Sun & planet world positions ------------------------------ */
+  sun.planetObj.getWorldPosition(_sunWS);
+  planetMesh   .getWorldPosition(_planetWS);
 
-  // Light direction: from Sun ➡ target
-  const direction = new THREE.Vector3().subVectors(targetPos, sunPos).normalize();
-  const distance = sunPos.distanceTo(targetPos);
-  const lightDistance = distance + 10;
+  /* 2. move the light to the Sun & aim at planet ----------------- */
+  sunLight.position.copy(_sunWS);
+  sunLight.target.position.copy(_planetWS);
+  sunLight.target.updateMatrixWorld(true);
 
-  // Position light "behind" target along direction
-  const lightPos = targetPos.clone().add(direction.clone().multiplyScalar(-lightDistance));
-  sunLight.position.copy(lightPos);
+  /* 3. force Three to rebuild the shadow camera                    *
+   *    (this fixes the “camera pointing down” problem)            */
+  sunLight.shadow.updateMatrices(sunLight);        // <- KEY LINE
+  sunLight.updateMatrixWorld(true);                // also refresh self
 
-  // Always aim the light at the lighting target
-  sunLight.target.position.copy(targetPos);
-  sunLight.target.updateMatrixWorld();
+  /* 4. world-space AABB of the planet mesh ----------------------- */
+  _wsBox.setFromObject(planetMesh);
 
-  // === Shadow Frustum ONLY for the shadow-receiving planet ===
-  const box = new THREE.Box3().setFromObject(shadowReceiverObj);
-  const size = new THREE.Vector3();
-  box.getSize(size);
+  /* 5. bring the 8 corners into *light* space -------------------- */
+  _invMat.copy(sunLight.shadow.camera.matrixWorldInverse);
 
-  const padding = 1.2;
-  const halfW = (size.x / 2) * padding;
-  const halfH = (size.y / 2) * padding;
-  const depth = size.z * padding;
+  let i = 0;
+  for (const x of [_wsBox.min.x, _wsBox.max.x])
+  for (const y of [_wsBox.min.y, _wsBox.max.y])
+  for (const z of [_wsBox.min.z, _wsBox.max.z]) {
+    _cornersLS[i++].set(x, y, z).applyMatrix4(_invMat);
+  }
 
-  sunLight.shadow.camera.left = -halfW;
-  sunLight.shadow.camera.right = halfW;
-  sunLight.shadow.camera.top = halfH;
-  sunLight.shadow.camera.bottom = -halfH;
-  sunLight.shadow.camera.near = 2;
-  sunLight.shadow.camera.far = depth * 4;
+  /* 6. light-space AABB + padding -------------------------------- */
+  const lsBox = new THREE.Box3().setFromPoints(_cornersLS);
+  lsBox.min.multiplyScalar(pad);
+  lsBox.max.multiplyScalar(pad);
 
-  sunLight.shadow.camera.updateProjectionMatrix();
+  /* 7. write extents to the orthographic camera ------------------ */
+  const cam = sunLight.shadow.camera;
+  cam.left   = lsBox.min.x;
+  cam.right  = lsBox.max.x;
+  cam.bottom = lsBox.min.y;
+  cam.top    = lsBox.max.y;
 
+  /* --- key change: keep near tiny, far big ---------------------- */
+  cam.near = 0.1;                 // a fixed, small value near the Sun
+  cam.far  = -lsBox.min.z;        // always positive and > near
+  cam.updateProjectionMatrix();
+
+  /* 8. helper (for debugging) ------------------------------------ */
   if (typeof shadowCameraHelper !== 'undefined') {
     shadowCameraHelper.update();
   }
@@ -5410,10 +5251,7 @@ function updateLightingForFocus() {
     sunLight.visible      = true;
     fallbackLight.visible = false;
 
-    updateSunlightForPlanet(
-      o.lookAtObj.pivotObj,   // the planet
-      o.lookAtObj.pivotObj    // (same object here if your helper expects both)
-    );
+    updateSunlightForPlanet(o.lookAtObj.planetObj);
   }
 }
 
@@ -6813,7 +6651,20 @@ function makeRealisticEarth(pd){
 
     const core = new THREE.Mesh(geom, coreMat);
     core.material.depthWrite = true;
+  
+    core.castShadow    = true;        // (you probably set this elsewhere)
+    core.receiveShadow = false;       // <— let the shell handle darkening
 
+    /* ───────────────── Shadow-receiver shell ────────────────── */
+    const shellGeom = new THREE.SphereGeometry(radius * 1.01, 64, 64);
+    const shellMat  = new THREE.ShadowMaterial({
+      opacity: 1.0          // 0 = invisible, 1 = pitch-black; tweak to taste
+    });
+    const shadowShell = new THREE.Mesh(shellGeom, shellMat);
+
+    shadowShell.receiveShadow = true; // darken where the shadow map says so
+    shadowShell.castShadow    = false;/* planet already casts its own shadow */
+  
     /* ------------------------------------------------ clouds ---------- */
     const cloudMat = new THREE.ShaderMaterial({
         uniforms      : U,    // reuse; contains all needed uniforms now
@@ -6844,8 +6695,8 @@ function makeRealisticEarth(pd){
 
     /* ------------------------------------------------ container ------- */
     const container = new THREE.Object3D();
-    core.add(clouds);                   // clouds follow core spin 1-to-1
-    container.add(core, atm);           // atmosphere can stay a sibling
+    core.add(clouds);                        // clouds follow core spin 1-to-1
+    container.add(core, atm, shadowShell);   // atmosphere can stay a sibling
 
     /* ------------------------------------------------ helpers --------- */
     function updateSunDir(sunObj){
@@ -6930,7 +6781,16 @@ function createPlanet(pd) {           // pd = Planet Data
   if (pd.name === "Earth") {
   const earthPack = makeRealisticEarth(pd);
   rotationAxis.add(earthPack.container);
-
+  
+  earthPack.coreMesh.castShadow    = true;
+  earthPack.coreMesh.receiveShadow = true;
+    
+  /* optional – you probably *don’t* want the translucent layers to cast, but they can safely *receive* */
+  // earthPack.clouds.castShadow    = false;
+  // earthPack.clouds.receiveShadow = true;
+  // earthPack.atm.castShadow       = false;
+  // earthPack.atm.receiveShadow    = true;  
+    
   /* preserve your world-access references so nothing else breaks */
   pd.planetObj         = earthPack.coreMesh;
   pd.planetMaterial    = earthPack.coreMesh.material;
@@ -6938,14 +6798,6 @@ function createPlanet(pd) {           // pd = Planet Data
   pd._updateCloudsFunc = earthPack.updateClouds;
   pd._updateEraFunc    = earthPack.updateEra;
     
-  /* ————————————————————————————————
-  Hide the legacy Phong sphere so only the shader-driven Earth is rendered.
-  (planetMesh is the old sphere you built earlier in this function.)            */
-   if (typeof planetMesh !== "undefined") {
-       planetMesh.visible = false;
-   }
-   /* ————————————————————————————————*/
-
   } else {
     /*  ---------- all other planets keep your original logic ---------- */
     let materialOpts = {};
@@ -6974,6 +6826,24 @@ function createPlanet(pd) {           // pd = Planet Data
     planetMesh          = new THREE.Mesh(sphereGeom, planetMat);
 
     /*  Exclusions for shadows  */
+    if (pd.isNotPhysicalObject === true) {
+      /* … your ghost-helper code … */
+      planetMesh.castShadow    = false;
+      planetMesh.receiveShadow = false;
+
+    /* +++++ Sun exception +++++++++++++++++++++++++++++++++++ */
+    } else if (pd.name === 'Sun') {
+      planetMesh.castShadow    = false; 
+      planetMesh.receiveShadow = false;
+      planetMesh.material.depthWrite = false;/* optional – lets bloom/glow overlap */
+    /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+    } else {
+      /* normal physical bodies */
+      planetMesh.castShadow    = true;
+      planetMesh.receiveShadow = true;
+    }
+    
     if (pd.isNotPhysicalObject === true){
       if (pd.textureUrl){
         const tex = loadTexture(pd.textureUrl);
@@ -6983,9 +6853,6 @@ function createPlanet(pd) {           // pd = Planet Data
           opacity: pd.textureTransparency || 1.0
         });
       }
-     /* ghost helpers should never touch the shadow pipeline */
-    planetMesh.castShadow    = false;
-    planetMesh.receiveShadow = false;
     }
 
     pd.planetMaterial = planetMat;             // keep reference for GUI
