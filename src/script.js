@@ -45,6 +45,7 @@ const meansolardayAmplitudeinSeconds = 0.0887446;         // Formula only
 const meansolaryearAmplitudeinDays = 0.00009217419;       // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
+const earthRAAngle = 1.09;                                // 3D model
 
 // Reference lenghts of Solar Year used as INPUT for the Planets 
 const mercurySolarYearInput = 87.9684444563;
@@ -91,9 +92,9 @@ const moonDistance = 384399.07;
 const moonOrbitalInclination = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 340;             // 
+const moonStartposApsidal = 389;             // 
 const moonStartposApsidalMeetsNodal = -90;   // Set as random number
-const moonStartposNodal = 64.1;              // 
+const moonStartposNodal = 86;                // 
 const moonStartposMoon = 126.22;             // Needs to be at 21h31m22s at start model 
 
 const mercuryOrbitalInclination =  7.004995;
@@ -129,7 +130,7 @@ const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.8415;       // Needs to be at 3h44m14.54 at start model
+const jupiterStartpos = 13.868;        // Needs to be at 3h44m14.54 at start model
 const jupiterAngleCorrection = 1.05;   // To align the perihelion exactly
 
 const saturnOrbitalInclination = 2.488861;
@@ -640,7 +641,7 @@ const earthPerihelionPrecession1 = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: -1.09,
+  orbitTilta: -earthRAAngle,
   orbitTiltb: 0,
 
   size: 0.1,
@@ -980,8 +981,8 @@ const moon = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: moonOrbitalInclination,
+  orbitTiltb: -1.09,
 
   size: (diameters.moonDiameter/ currentAUDistance)*100,
   color: 0x8b8b8b,
@@ -1372,7 +1373,7 @@ const jupiter = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
+  orbitTilta: jupiterOrbitalInclination,
   orbitTiltb: 0,
   
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
