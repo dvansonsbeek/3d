@@ -92,10 +92,9 @@ const moonDistance = 384399.07;
 const moonOrbitalInclination = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 340;             // Aligned with stellarium data.
-const moonStartposApsidalMeetsNodal = -90;   // Set as random number
-const moonStartposNodal = 64.1;              // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 126.22;             // Needs to be at 21h31m22s at start model according to stellarium
+const moonStartposApsidal = 330;             // Aligned with stellarium data.
+const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
+const moonStartposMoon = 126.19;             // Needs to be at 21h31m22s at start model according to stellarium
 
 const mercuryOrbitalInclination =  7.004995;
 const mercuryOrbitalEccentricity = 0.205632;
@@ -870,10 +869,10 @@ const moonApsidalPrecession = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
+  orbitTilta: moonOrbitalInclination-moonTilt,
   orbitTiltb: 0,
 
-  size: 0.001,
+  size: 0.01,
   color: 0x8b8b8b,
   visible: false,
   containerObj:"",
@@ -885,7 +884,7 @@ const moonApsidalPrecession = {
 
 const moonApsidalNodalPrecession1 = {
   name: "Moon Apsidal Nodal Precession1",
-  startPos: moonStartposApsidalMeetsNodal,
+  startPos: moonStartposApsidal-moonStartposNodal,
   speed: -(Math.PI*2)/(moonApsidalMeetsNodalindays/meansolaryearlengthinDays),
   tilt: 0,
   orbitRadius: 0,
@@ -907,7 +906,7 @@ const moonApsidalNodalPrecession1 = {
 
 const moonApsidalNodalPrecession2 = {
   name: "Moon Apsidal Nodal Precession2",
-  startPos: -moonStartposApsidalMeetsNodal,
+  startPos: -(moonStartposApsidal-moonStartposNodal),
   speed: (Math.PI*2)/(moonApsidalMeetsNodalindays/meansolaryearlengthinDays),
   tilt: 0,
   orbitRadius: 0,
