@@ -92,10 +92,10 @@ const moonDistance = 384399.07;
 const moonOrbitalInclination = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 389;             // 
+const moonStartposApsidal = 340;             // Aligned with stellarium data.
 const moonStartposApsidalMeetsNodal = -90;   // Set as random number
-const moonStartposNodal = 86;                // 
-const moonStartposMoon = 126.22;             // Needs to be at 21h31m22s at start model 
+const moonStartposNodal = 64.1;              // Aligned to major lunar standstill and minor lunar standstill
+const moonStartposMoon = 126.22;             // Needs to be at 21h31m22s at start model according to stellarium
 
 const mercuryOrbitalInclination =  7.004995;
 const mercuryOrbitalEccentricity = 0.205632;
@@ -981,8 +981,8 @@ const moon = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: moonOrbitalInclination,
-  orbitTiltb: -earthRAAngle,
+  orbitTilta: 0,
+  orbitTiltb: 0,
 
   size: (diameters.moonDiameter/ currentAUDistance)*100,
   color: 0x8b8b8b,
