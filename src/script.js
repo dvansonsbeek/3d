@@ -138,7 +138,7 @@ const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.444;         // Needs to be at 3h35m02.7 at start model
+const saturnStartpos = 11.421;         // Needs to be at 3h35m02.7 at start model
 const saturnAngleCorrection = -0.25;   // To align the perihelion exactly
 
 const uranusOrbitalInclination = 0.773201;
@@ -1448,7 +1448,7 @@ const saturnPerihelionFromSun = {
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: saturnElipticOrbit,
+  orbitRadius: -saturnElipticOrbit,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
