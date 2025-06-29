@@ -9,20 +9,20 @@ import * as dat from 'dat.gui';
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
 The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.*/
 
-/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 297,856 years, an Axial precession cycle of 22,912 years, an Inclination precession cycle of ~99,285 years and a Perihelion precession cycle of 18,616 years.*/
+/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,080 years, an Axial precession cycle of ~22,929 years, an Inclination precession cycle of 99,360 years and a Perihelion precession cycle of 18,630 years.*/
 
 //See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d
 
 //*************************************************************
 // ADD GLOBAL INPUT CONSTANTS
 //*************************************************************
-const holisticyearLength = 297856;
+const holisticyearLength = 298080;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
 const perihelionalignmentJD = 2176142;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
-const lengthsolaryearindaysin1246 = 31556929.19/86400.0055;
+const lengthsolaryearindaysin1246 = 31556929.19/86399.986;
 // Reference length of solar year in days in 1246 AD according to formula  J. Laskar + predicted LOD due to historic Delta-T values = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
 // Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = ~MEAN
@@ -30,22 +30,23 @@ const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = 2.75179952383041;
+const correctionDays = 2.68663449585437;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + RA correction + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.4273666407;                      // 3D model + formula
-const earthinclinationMean = 1.4953171672;                // Formula only
+const earthtiltMean = 23.427293228;                      // 3D model + formula
+const earthinclinationMean = 1.4952971886;                // Formula only
 const tiltandinclinationAmplitude = 0.563;                // 3D model + formula
-const eccentricityMean = 0.01368694;                      // 3D model + formula
-const eccentricityAmplitude = 0.003105;                   // 3D model + formula
-const eccentricitySinusCorrection = 0.65;                 // Formula only
+const eccentricityMean = 0.01369955;                      // 3D model + formula
+const eccentricityAmplitude = 0.003092;                   // 3D model + formula
+const eccentricitySinusCorrection = 0.652;                // Formula only
 const mideccentricitypointAmplitude = 2.46125;            // Formula only
-const helionpointAmplitude = 11.29467625;                 // Formula only
-const meansiderealyearAmplitudeinSeconds = 0.2957694;     // Formula only
-const meansolardayAmplitudeinSeconds = 0.0887446;         // Formula only 
-const meansolaryearAmplitudeinDays = 0.00009217419;       // Formula only
+const helionpointAmplitude = 11.2479124999959;            // Formula only
+const meansiderealyearAmplitudeinSeconds = 0.295987;      // Formula only
+const meansolardayAmplitudeinSeconds = 0.127024;          // Formula only 
+const meansolaryearAmplitudeinDays = 0.00044922;          // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
 const earthRAAngle = 1.09;                                // 3D model
+const DELTA_T_START = 63.63;                              // Formula only ; commented out by default
 
 // Reference lenghts of Solar Year used as INPUT for the Planets 
 const mercurySolarYearInput = 87.9684444563;
@@ -103,7 +104,7 @@ const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4634482921134;
 const mercuryAscendingNode = 48.336479;
 const mercuryStartpos = 70.84;         // Needs to be at 7h25m01.97 at start model
-const mercuryAngleCorrection = 0.982;  // To align the perihelion exactly
+const mercuryAngleCorrection = 0.983;  // To align the perihelion exactly
 
 const venusOrbitalInclination = 3.394667;
 const venusOrbitalEccentricity = 0.006772;
@@ -112,7 +113,7 @@ const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.570305875962;
 const venusAscendingNode = 75.684163;
 const venusStartpos = 117.526;         // Needs to be at 6h13m49.46 at start model
-const venusAngleCorrection = -2.79;    // To align the perihelion exactly
+const venusAngleCorrection = -2.784;    // To align the perihelion exactly
 
 const marsOrbitalInclination = 1.849723;
 const marsOrbitalEccentricity = 0.093401;
@@ -120,8 +121,8 @@ const marsInclination = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.068903258872;
 const marsAscendingNode = 49.561729;
-const marsStartpos = 121.578;          // Needs to be at 6h14m37.15 at start model
-const marsAngleCorrection = -2.12;     // To align the perihelion exactly
+const marsStartpos = 121.472;          // Needs to be at 6h14m37.15 at start model
+const marsAngleCorrection = -2.115;     // To align the perihelion exactly
 
 const jupiterOrbitalInclination = 1.303241;
 const jupiterOrbitalEccentricity = 0.048499;
@@ -130,7 +131,7 @@ const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
 const jupiterStartpos = 13.868;        // Needs to be at 3h44m14.54 at start model
-const jupiterAngleCorrection = 1.05;   // To align the perihelion exactly
+const jupiterAngleCorrection = 1.057;   // To align the perihelion exactly
 
 const saturnOrbitalInclination = 2.488861;
 const saturnOrbitalEccentricity = 0.055547;
@@ -139,7 +140,7 @@ const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
 const saturnStartpos = 11.421;         // Needs to be at 3h35m02.7 at start model
-const saturnAngleCorrection = -0.25;   // To align the perihelion exactly
+const saturnAngleCorrection = -0.253;   // To align the perihelion exactly
 
 const uranusOrbitalInclination = 0.773201;
 const uranusOrbitalEccentricity = 0.046381;
@@ -148,7 +149,7 @@ const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 173.01229057226;
 const uranusAscendingNode = 74.008411;
 const uranusStartpos = 44.853;         // Needs to be at 21h32m40.12 at start model
-const uranusAngleCorrection = -0.59;   // To align the perihelion exactly
+const uranusAngleCorrection = -0.588;   // To align the perihelion exactly
 
 const neptuneOrbitalInclination = 1.769909;
 const neptuneOrbitalEccentricity = 0.009457;
@@ -157,7 +158,7 @@ const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 48.1269921140939;
 const neptuneAscendingNode = 131.789247;
 const neptuneStartpos = 48.016;        // Needs to be at 20h33m37.31 at start model
-const neptuneAngleCorrection = 2.39;   // To align the perihelion exactly
+const neptuneAngleCorrection = 2.386;   // To align the perihelion exactly
 
 const plutoOrbitalInclination = 17.14175;
 const plutoOrbitalEccentricity = 0.24880766;
@@ -214,12 +215,12 @@ const sunOrbitPeriod = (lightYear*milkywayDistance*Math.PI*2)/(sunSpeed/60/60*me
 const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkywaySpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
 
 // Moon calculations
-const moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-1);
-// You can tweak the last number +/-1 but as long as the 'Number of Royer cycles per perihelion precession cycle' is a rounded number as well (See Moon characteristics)
+const moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-0);
+// You can tweak the last number +/-1 (See Moon characteristics)
 const moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonAnomalisticMonthInput)-1);
-// You can tweak the last number +/-1 but as long as the 'Number of Royer cycles per perihelion precession cycle' is a rounded number as well (See Moon characteristics)
+// You can tweak the last number +/-1 (See Moon characteristics)
 const moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonNodalMonthInput)-0);
-// You can tweak the last number +/-1 but as long as the 'Number of Royer cycles per perihelion precession cycle' is a rounded number as well (See Moon characteristics)
+// You can tweak the last number +/-1 (See Moon characteristics)
 
 const moonSynodicMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-1)+13-holisticyearLength);
 const moonTropicalMonth = (holisticyearLength*meansolaryearlengthinDays)/(Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-1)+13);
@@ -1702,8 +1703,8 @@ const neptune = {
   traceOn: false,
 };
 
-//The accurate orbits of Pluto and Halleys and Eros will be added later
-// You can now make eccentric orbits with these settings (especially helpfull for hallays)
+// The accurate orbits of Pluto and Halleys and Eros can be added later
+// You might be able to make eccentric orbits with these settings but not sure if it works (helpfull for hallays?)
 // orbitSemiMajor: 519.969067802053,
 // orbitSemiMinor: 519.969067802053*Math.sqrt(1-0.048499*0.048499),
 
@@ -2123,7 +2124,7 @@ void main(){
     gl_FragColor = vec4(color, 1.0);
 }`;
 
-/* atmosphere shell shaders (unchanged) */
+/* atmosphere shell shaders */
 const ATM_VERT = `
 varying vec3 vN;
 varying vec3 vPos;
@@ -2364,6 +2365,7 @@ let predictions = {
   lengthofsiderealDay: 0,
   lengthofsiderealDayRealLOD: 0,
   predictedDeltat: 0,
+  predictedDeltatPerYear: 0,
   lengthofsolarYear: 0,
   lengthofsolarYearSec: 0,
   lengthofsiderealYear: 0,
@@ -2630,6 +2632,9 @@ erosbarycenterPLANETS.pivotObj.add(erosPerihelionFromSun.containerObj);
 erosPerihelionFromSun.pivotObj.add(eros.containerObj);
 
 // The model starts on 21 june and not at 0 degrees (equinox) so we need to turn it 90 degrees
+// Why 21 june 2000?
+// a) We need a solstice date
+// b) We need to be able to point to polaris + pointing to the EARTH-WOBBLE-CENTER at RA 6h
 earth.containerObj.rotation.y = Math.PI/2;
 //END CREATE AND CONFIGURE PLANETS
 
@@ -3031,6 +3036,11 @@ let eggTriggered = false;
 const DEG = Math.PI / 180;
 const KM_TO_MI = 0.62137119;   // 1 kilometre  → 0.621 371 miles
 
+const state = {
+  prevJD  : startmodelJD,     // JD at previous animation tick
+  deltaT  : DELTA_T_START     // accumulated ΔT (seconds)
+};
+
 // create the golden-spiral line (returns { line, update })
 const golden = goldenspiralPerihelionObjects(
   mercuryPerihelionFromEarth,
@@ -3225,7 +3235,8 @@ function setupGUI() {
   
       let precessionRealLODFolder = astroFolder.addFolder('Length of Day - Predictions');
       precessionRealLODFolder.add(predictions, 'lengthofsiderealDayRealLOD').name('Length of Sidereal Day (sec)').step(0.000001).listen();
-      //precessionRealLODFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+//      precessionRealLODFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+//      precessionRealLODFolder.add(predictions, 'predictedDeltatPerYear').name('ΔT change (sec/year)').step(0.000001).listen();
   
       precessionRealLODFolder.add(predictions, 'lengthofsolarYearSecRealLOD').name('Length of Solar Year (sec)').step(0.000001).listen();
       precessionRealLODFolder.add(predictions, 'lengthofsiderealYearDaysRealLOD').name('Length of Sidereal Year (days)').step(0.000001).listen();
@@ -3249,8 +3260,6 @@ function setupGUI() {
   
       let precessionFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
       precessionFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
-      //precessionFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
-  
       precessionFolder.add(predictions, 'lengthofsolarYearSec').name('86400 sec/day - Length of Solar Year (sec)').step(0.000001).listen();
       precessionFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
       precessionFolder.add(predictions, 'lengthofanomalisticYear').name('86400 sec/day - Length of Anomalistic Year (sec)').step(0.000001).listen();
@@ -3489,6 +3498,8 @@ function render(now) {
   // 6) Must-run-every-frame: updates your models
   trace(o.pos);
   moveModel(o.pos);
+  updatePredictions();
+  //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy
   updatePositions();
   updateLightingForFocus();
   if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
@@ -3504,7 +3515,6 @@ function render(now) {
     updateElongations();
     updatePerihelion();
     updateOrbitOrientations();
-    updatePredictions();
     updateDomLabel();
     golden.update();
   }
@@ -3540,6 +3550,147 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+
+// ---------------------------------------------------------------------------
+//  HELPER — “excess seconds per (mean) day” at the *current* JD
+//  Positive  => Earth day is longer than 86 400 s  ➜ ΔT increases
+//  Negative  => Earth day is shorter            ➜ ΔT decreases
+// ---------------------------------------------------------------------------
+function secondsExcessPerDay () {
+  // `o.lengthofDay` must already hold the length of *this* day in seconds.
+  // (If you compute that elsewhere each tick, just reference the same value.)
+  return o.lengthofDay - 86400;
+}
+
+// ---------------------------------------------------------------------------
+//  CALL THIS ONCE *EACH* SIMULATION STEP *AFTER* YOU ADVANCE YOUR CLOCK
+//  (`currentJD` must be the new Julian Day number for the model)
+// ---------------------------------------------------------------------------
+function updateDeltaT() {
+  const currentJD = o.julianDay;                       // use your existing value
+  const daysElapsed = currentJD - state.prevJD;
+  const excess = o.lengthofDay - 86400;
+
+  if (isNaN(excess) || isNaN(daysElapsed)) {
+    console.warn("Bad input to updateDeltaT", { excess, daysElapsed });
+    return;
+  }
+
+  state.deltaT += excess * daysElapsed;
+  state.prevJD = currentJD;
+}
+
+function resetDeltaTForJump() {
+  /* ------------------------------------------------------------------ */
+  const BASE_YEAR          = startmodelYear;
+  const SUBSTEPS_PER_YEAR  = 10; 
+  /* ------------------------------------------------------------------ */
+
+  const targetYear = o.currentYear;
+  const startYear  = Math.min(BASE_YEAR, targetYear);
+  const endYear    = Math.max(BASE_YEAR, targetYear);
+
+  let deltaTsum = 0;           // total change to apply to DELTA_T_START
+
+  /* ── integrate whole years, sampling “one-year-before” each slice ── */
+  for (let y = startYear; y < endYear; y++) {
+    for (let i = 0; i < SUBSTEPS_PER_YEAR; i++) {
+
+      /* sample ***one year earlier*** than the slice we are adding   */
+      const subYear    = y + i / SUBSTEPS_PER_YEAR;
+      const sourceYear = subYear - 1;
+
+      const lod = computeLengthofDay(
+        sourceYear,
+        balancedYear,
+        perihelionCycleLength,
+        o.perihelionprecessioncycleYear,
+        helionpointAmplitude,
+        meansolardayAmplitudeinSeconds,
+        meanlengthofday
+      );
+
+      const solarYear = computeLengthofsolarYear(
+        sourceYear,
+        balancedYear,
+        perihelionCycleLength,
+        o.perihelionprecessioncycleYear,
+        meansolaryearAmplitudeinDays,
+        meansolaryearlengthinDays
+      );
+
+      const dTchangePerYr = (lod - 86_400) * solarYear;       // seconds/yr
+      deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;         // fraction
+    }
+  }
+
+  /* ── fractional part of the final calendar year (if any) ─────────── */
+  const frac = targetYear - Math.floor(targetYear);           // 0 … <1
+  if (frac !== 0) {
+    const y = Math.floor(targetYear);
+    const slices = Math.round(SUBSTEPS_PER_YEAR * frac);
+
+    for (let i = 0; i < slices; i++) {
+      const subYear    = y + i / SUBSTEPS_PER_YEAR;
+      const sourceYear = subYear - 1;
+
+      const lod = computeLengthofDay(
+        sourceYear,
+        balancedYear,
+        perihelionCycleLength,
+        o.perihelionprecessioncycleYear,
+        helionpointAmplitude,
+        meansolardayAmplitudeinSeconds,
+        meanlengthofday
+      );
+
+      const solarYear = computeLengthofsolarYear(
+        sourceYear,
+        balancedYear,
+        perihelionCycleLength,
+        o.perihelionprecessioncycleYear,
+        meansolaryearAmplitudeinDays,
+        meansolaryearlengthinDays
+      );
+
+      const dTchangePerYr = (lod - 86_400) * solarYear;
+      deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;
+    }
+  }
+
+  /* ── final ΔT: add for future, subtract for past ─────────────────── */
+  const deltaT = (targetYear >= BASE_YEAR)
+    ? DELTA_T_START + deltaTsum   // stepping FORWARD  → grows
+    : DELTA_T_START - deltaTsum;  // stepping BACKWARD → shrinks
+
+  state.deltaT = deltaT;
+  state.prevJD = o.julianDay;     // avoid monster step on next frame
+}
+
+// ---------------------------------------------------------------------------
+//  CONVENIENCE GETTERS — call whenever you need to *display* the values
+// ---------------------------------------------------------------------------
+
+// predicted change *per* tropical year at "right now"
+function getDeltaTChangePerYear () {
+  return secondsExcessPerDay() * o.lengthofsolarYear;  // seconds / yr
+}
+
+// total accumulated ΔT (seconds) since 2000-06-21
+function getDeltaT () {
+  return state.deltaT;
+}
+
+function detectAndUpdateDeltaT() {
+  const currentJD = o.julianDay;
+  const jumpThreshold = 5; // days – tune this as needed
+
+  if (Math.abs(currentJD - state.prevJD) > jumpThreshold) {
+    resetDeltaTForJump();
+  } else {
+    updateDeltaT();
+  }
+}
 
 function focusPlanet(pd, pad = 1.01) {
   if (!pd?.planetObj) {
@@ -3935,6 +4086,8 @@ const planetStats = {
        value : [ { v: () => o.lengthofDay/86400*24, dec:6, sep:',' }, { small : 'hours' }]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => o.lengthofsiderealDayRealLOD/86400*24, dec:6, sep:',' },{ small: 'hours' }]},
+   //   {label : () => `Predicted ΔT change`,
+   //    value : [ { v: () => o.predictedDeltatPerYear , dec:6, sep:',' },{ small: 'sec/ year' }]},
     null,
       {label : () => `Orbit distance to Sun`,
        value : [ { v: () => o.lengthofAU/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI)), dec:6, sep:',' },{ small : 'AU' }]},   
@@ -3943,8 +4096,7 @@ const planetStats = {
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => speedofSuninKM, dec:2, sep:',' },{ small: 'km/h' }]},
     null,  
-//      {label : () => `Longitude of perihelion`,
-//       value : [ { v: () => o.longitudePerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }]},
          
@@ -6233,7 +6385,6 @@ function updatePredictions() {
   predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
   
   predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSec/(o.lengthofsolarYear+1);
-  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
   
   predictions.lengthofsolarYearSec = o.lengthofsolarYearSec = o.lengthofsolarYear*86400;
   predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/86400;
@@ -6246,7 +6397,9 @@ function updatePredictions() {
   predictions.eclipticPrecession = o.eclipticPrecession = o.axialPrecession*13/5;
   
   predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYear+1);
-  //predictions.predictedDeltat = o.predictedDeltat = computePredictedDeltat(o.currentYear);
+  
+  //predictions.predictedDeltat = getDeltaT();
+  predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
   
   predictions.lengthofsolarYearSecRealLOD = o.lengthofsolarYearSecRealLOD = o.lengthofsolarYear*o.lengthofDay;
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear/o.lengthofDay;
@@ -6311,7 +6464,7 @@ function computeLengthofDay(
   // angle for the second COS term (in radians):
   // (cycleValue / (perihelionCycleLength/2)) * 360°
   const angle2 = (cycleValue / (perihelionCycleLength / 2)) * 360 * Math.PI / 180;
-  const term2 = -meansolardayAmplitudeinSeconds * Math.cos(angle2);
+  const term2 = -meansolardayAmplitudeinSeconds * mideccentricitypointAmplitude * Math.cos(angle2);
 
   // sum both terms + base mean length of day
   return term1 + term2 + meanlengthofday;
@@ -6806,7 +6959,7 @@ function makeRealisticEarth(pd){
     // ------------------------------------------------ era / map switcher -- 
     const JD_NIGHT_BOUNDARY = 2305620;   // first lit cities
     const JD_DAY_BOUNDARY   = -5756193;  // End of LGM with max inclination of 2.05831717
-    const TRANSITION_DAYS   = 109572;       // length of the fade
+    const TRANSITION_DAYS   = 109572;    // length of the fade
 
     function updateEra(julianDay = o.julianDay) {
 
@@ -6833,7 +6986,7 @@ function makeRealisticEarth(pd){
 
 function createPlanet(pd) {           // pd = Planet Data
 
-  /*  ───────────────────────── orbit container (unchanged) ─────────── */
+  /*  ───────────────────────── orbit container  ─────────── */
   const orbitContainer = new THREE.Object3D();
   orbitContainer.rotation.x = pd.orbitTilta * Math.PI/180;
   orbitContainer.rotation.z = pd.orbitTiltb * Math.PI/180;
@@ -6845,7 +6998,7 @@ function createPlanet(pd) {           // pd = Planet Data
   const segs       = 100;
   const a          = pd.orbitSemiMajor ?? pd.orbitRadius;
   const b          = pd.orbitSemiMinor ?? pd.orbitRadius;
-  pd.a = a; pd.b = b;                             // keep your metadata
+  pd.a = a; pd.b = b; 
 
   for (let i=0;i<=segs;i++){
     const t = i/segs * Math.PI*2;
@@ -6876,12 +7029,6 @@ function createPlanet(pd) {           // pd = Planet Data
   earthPack.coreMesh.castShadow    = true;
   earthPack.coreMesh.receiveShadow = true;
     
-  /* optional – you probably *don’t* want the translucent layers to cast, but they can safely *receive* */
-  // earthPack.clouds.castShadow    = false;
-  // earthPack.clouds.receiveShadow = true;
-  // earthPack.atm.castShadow       = false;
-  // earthPack.atm.receiveShadow    = true;  
-    
   /* preserve your world-access references so nothing else breaks */
   pd.planetObj         = earthPack.coreMesh;
   pd.planetMaterial    = earthPack.coreMesh.material;
@@ -6890,7 +7037,7 @@ function createPlanet(pd) {           // pd = Planet Data
   pd._updateEraFunc    = earthPack.updateEra;
     
   } else {
-    /*  ---------- all other planets keep your original logic ---------- */
+    /*  ---------- all other planets  ---------- */
     let materialOpts = {};
 
     if (pd.textureUrl){
@@ -6926,7 +7073,7 @@ function createPlanet(pd) {           // pd = Planet Data
     } else if (pd.name === 'Sun') {
       planetMesh.castShadow    = false; 
       planetMesh.receiveShadow = false;
-      planetMesh.material.depthWrite = false;/* optional – lets bloom/glow overlap */
+      planetMesh.material.depthWrite = false;
     /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
     } else {
@@ -6950,12 +7097,12 @@ function createPlanet(pd) {           // pd = Planet Data
     pd.planetObj      = planetMesh;
   }
 
-  /*  ---------- rest of your original helper (rings, helpers, etc.) --- */
+  /*  ---------- rest of helpers (rings, helpers, etc.) --- */
   if (planetMesh) {
   rotationAxis.add(planetMesh);
   }
 
-  /* optional ring system (unchanged) */
+  /* optional ring system */
   if (pd.ringUrl){
     new THREE.TextureLoader().load(pd.ringUrl, tex=>{
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -6980,7 +7127,7 @@ function createPlanet(pd) {           // pd = Planet Data
   orbit.add(rotationAxis);
   orbitContainer.add(orbit);
 
-  /* helpers, axis, traces (all your original code) -------------------- */
+  /* helpers, axis, traces -------------------- */
   pd.orbitPlaneHelper = addOrbitPlaneHelper(pd, orbitContainer, o.starDistance*2);
   pd.orbitPlaneHelper.visible = false;
 
@@ -7450,7 +7597,7 @@ function isPowerOfTwo(v) {
 }
 
 //*************************************************************
-// EXTERNAL FUNCTIONS
+// RA and Degree Functions
 //*************************************************************
   
 // === RA and Dec Conversions ===
@@ -7785,9 +7932,6 @@ function addYears(sDate, year) {
 
 // === Perihelion Calendar Conversions ===
 
-// Epoch constant: perihelion-day 0 corresponds to Julian Day 2176142
-//const PERIHELION_EPOCH_JD = 2176142 = (startmodelJD-perihelionalignmentJD);
-
 function perihelionDayToJulianDay(pd) {
   if (typeof pd !== 'number' || !Number.isFinite(pd)) {
     throw new Error(`Invalid perihelion day: ${pd}`);
@@ -7876,10 +8020,6 @@ function dayToDate(jd) {
     time: `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`
   };
 }
-
-/*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  Helpers below: you can tuck these in the same module/file.
-––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
 
 /**
  * Convert either a Julian or Perihelion day count into a calendar date/time
@@ -8149,13 +8289,6 @@ function dayToPerihelionCalendarDate(jd) {
     return n<0 ? `-${s}` : s;
   };
 
-  // warn if astronomical year ≤ 0
-  // if (year <= 0) {
-  //   console.warn(
-  //     `dayToPerihelionCalendarDate: year ${year} ≤ 0 (astronomical numbering).`
-  //   );
-  // }
-
   return {
     calendar: 'Perihelion',
     date:     `${p4(year)}-${p2(month)}-${p2(dayOfMonth)}`,
@@ -8286,7 +8419,7 @@ function dateToPerihelionJulianDay(dateStr, timeStr) {
 }
 
 //*************************************************************
-// TO BE MIGRATED?
+// Date functions
 //*************************************************************
 
 function dateToDays(sDate) {
