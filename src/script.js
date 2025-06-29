@@ -11,10 +11,12 @@ The author reserves all rights to license usage of this work for generative AI t
 
 /* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,080 years, an Axial precession cycle of ~22,929 years, an Inclination precession cycle of 99,360 years and a Perihelion precession cycle of 18,630 years.*/
 
+//Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with 10 parameters per planet/moon our complete solar system appears.
+
 //See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d
 
 //*************************************************************
-// ADD GLOBAL INPUT CONSTANTS
+// ALL INPUT CONSTANTS
 //*************************************************************
 const holisticyearLength = 298080;
 // Input Length of Holistic-Year in Years
@@ -32,7 +34,7 @@ const startmodelYear = 2000.5;
 // Start of the 3D model in year
 const correctionDays = 2.68663449585437;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + RA correction + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.427293228;                      // 3D model + formula
+const earthtiltMean = 23.427293228;                       // 3D model + formula
 const earthinclinationMean = 1.4952971886;                // Formula only
 const tiltandinclinationAmplitude = 0.563;                // 3D model + formula
 const eccentricityMean = 0.01369955;                      // 3D model + formula
@@ -45,26 +47,144 @@ const meansolardayAmplitudeinSeconds = 0.127024;          // Formula only
 const meansolaryearAmplitudeinDays = 0.00044922;          // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
-const earthRAAngle = 1.09;                                // 3D model
-const DELTA_T_START = 63.63;                              // Formula only ; commented out by default
+const earthRAAngle = 1.09;                                // 3D model = the only value which is very hard to derive
+const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
+const temperatureGraphMostLikely = 14.5;                  // 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude nagative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 
-// Reference lenghts of Solar Year used as INPUT for the Planets 
-const mercurySolarYearInput = 87.9684444563;
-const venusSolarYearInput = 224.695715407181;
-const marsSolarYearInput = 686.937;
-const jupiterSolarYearInput = 4330.595;
-const saturnSolarYearInput = 10746.6;
-const uranusSolarYearInput = 30589;
-const neptuneSolarYearInput = 59926;
-const plutoSolarYearInput = 89760;
-const halleysSolarYearInput = 27618;
-const erosSolarYearInput = 643.22295;
+// Reference lenghts used as INPUT for the Sun
+const sunTilt = 7.155;
+const milkywayDistance = 27500;
+const sunSpeed = 828000;
+const greatattractorDistance = 200000000;
+const milkywaySpeed = 2160000;
 
 // Reference lenghts used as INPUT for the Moon 
 const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
+const moonDistance = 384399.07;
+const moonOrbitalInclination = 5.1453964;
+const moonOrbitalEccentricity = 0.054900489;
+const moonTilt = 6.687;
+const moonStartposApsidal = 330;             // Aligned with stellarium data.
+const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
+const moonStartposMoon = 126.19;             // Needs to be at 21h31m22s at start model according to stellarium
 
+// Reference lenghts used as INPUT for Mercury
+const mercurySolarYearInput = 87.96845;
+const mercuryOrbitalInclination =  7.004995;
+const mercuryOrbitalEccentricity = 0.205632;
+const mercuryInclination = 6.3472858;
+const mercuryTilt = 0.03;
+const mercuryLongitudePerihelion = 77.4634482921134;
+const mercuryAscendingNode = 48.336479;
+const mercuryStartpos = 70.84;               // Needs to be at 7h25m01.97 at start model
+const mercuryAngleCorrection = 0.983;        // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Venus
+const venusSolarYearInput = 224.6957;
+const venusOrbitalInclination = 3.394667;
+const venusOrbitalEccentricity = 0.006772;
+const venusInclination = 2.1545441;
+const venusTilt = 2.6392;
+const venusLongitudePerihelion = 131.570305875962;
+const venusAscendingNode = 75.684163;
+const venusStartpos = 117.526;               // Needs to be at 6h13m49.46 at start model
+const venusAngleCorrection = -2.784;         // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Mars
+const marsSolarYearInput = 686.937;
+const marsOrbitalInclination = 1.849723;
+const marsOrbitalEccentricity = 0.093401;
+const marsInclination = 1.6311858;
+const marsTilt = 25.19;
+const marsLongitudePerihelion = 336.068903258872;
+const marsAscendingNode = 49.561729;
+const marsStartpos = 121.472;                // Needs to be at 6h14m37.15 at start model
+const marsAngleCorrection = -2.115;          // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Jupiter
+const jupiterSolarYearInput = 4330.595;
+const jupiterOrbitalInclination = 1.303241;
+const jupiterOrbitalEccentricity = 0.048499;
+const jupiterInclination = 0.3219652;
+const jupiterTilt = 3.13;
+const jupiterLongitudePerihelion = 14.3388009380591;
+const jupiterAscendingNode = 100.469215;
+const jupiterStartpos = 13.868;              // Needs to be at 3h44m14.54 at start model
+const jupiterAngleCorrection = 1.057;        // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Saturn
+const saturnSolarYearInput = 10746.6;
+const saturnOrbitalInclination = 2.488861;
+const saturnOrbitalEccentricity = 0.055547;
+const saturnInclination = 0.9254704;
+const saturnTilt = 26.73;
+const saturnLongitudePerihelion = 93.0664850365646;
+const saturnAscendingNode = 113.669633;
+const saturnStartpos = 11.421;               // Needs to be at 3h35m02.7 at start model
+const saturnAngleCorrection = -0.253;        // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Uranus
+const uranusSolarYearInput = 30589;
+const uranusOrbitalInclination = 0.773201;
+const uranusOrbitalEccentricity = 0.046381;
+const uranusInclination = 0.9946692;
+const uranusTilt = 82.23;
+const uranusLongitudePerihelion = 173.01229057226;
+const uranusAscendingNode = 74.008411;
+const uranusStartpos = 44.853;               // Needs to be at 21h32m40.12 at start model
+const uranusAngleCorrection = -0.588;        // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Neptune
+const neptuneSolarYearInput = 59926;
+const neptuneOrbitalInclination = 1.769909;
+const neptuneOrbitalEccentricity = 0.009457;
+const neptuneInclination = 0.7354155;
+const neptuneTilt = 28.32;
+const neptuneLongitudePerihelion = 48.1269921140939;
+const neptuneAscendingNode = 131.789247;
+const neptuneStartpos = 48.016;              // Needs to be at 20h33m37.31 at start model
+const neptuneAngleCorrection = 2.386;        // To align the perihelion exactly
+
+//*************************************************************
+// The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
+//*************************************************************
+
+// Reference lenghts used as INPUT for Pluto
+const plutoSolarYearInput = 89760;
+const plutoOrbitalInclination = 17.14175;
+const plutoOrbitalEccentricity = 0.24880766;
+const plutoInclination = 15.5541473;
+const plutoTilt = 57.47;
+const plutoLongitudePerihelion = 224.06676;
+const plutoAscendingNode = 110.30347;
+const plutoStartpos = 71.555;               // Needs to be at 16h44m09.67 at start model
+const plutoAngleCorrection = 0;             // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Halleys
+const halleysSolarYearInput = 27618;
+const halleysOrbitalInclination = 162.192203847561;
+const halleysOrbitalEccentricity = 0.9679427911271;
+const halleysInclination = 0.7354155;
+const halleysTilt = 0;
+const halleysLongitudePerihelion = 172.033036745069;
+const halleysAscendingNode = 59.5607834844014;
+const halleysStartpos = 80;                 // Needs to be at 08h43m15.95 at start model
+const halleysAngleCorrection = 0;           // To align the perihelion exactly
+
+// Reference lenghts used as INPUT for Eros
+const erosSolarYearInput = 643.22295;
+const erosOrbitalInclination = 10.8290328658513;
+const erosOrbitalEccentricity = 0.222807894458402;
+const erosInclination = 10.8290328658513;
+const erosTilt = 0;
+const erosLongitudePerihelion = 123.054362100533;
+const erosAscendingNode = 304.411578580454;
+const erosStartpos = 57.402;                // Needs to be at 20h37m49.52 at start model
+const erosAngleCorrection = 0;              // To align the perihelion exactly
+
+// Really fixed values
 const diameters = {
   sunDiameter      : 1392684.00,
   moonDiameter     : 3474.8,
@@ -81,126 +201,21 @@ const diameters = {
   erosDiameter     : 16.84,
 };
 
-// Sun, Moon, Earth and Planet fixed settings
-const sunTilt = 7.155;
-
-const milkywayDistance = 27500;
-const sunSpeed = 828000;
-const greatattractorDistance = 200000000;
-const milkywaySpeed = 2160000;
-
-const moonDistance = 384399.07;
-const moonOrbitalInclination = 5.1453964;
-const moonOrbitalEccentricity = 0.054900489;
-const moonTilt = 6.687;
-const moonStartposApsidal = 330;             // Aligned with stellarium data.
-const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 126.19;             // Needs to be at 21h31m22s at start model according to stellarium
-
-const mercuryOrbitalInclination =  7.004995;
-const mercuryOrbitalEccentricity = 0.205632;
-const mercuryInclination = 6.3472858;
-const mercuryTilt = 0.03;
-const mercuryLongitudePerihelion = 77.4634482921134;
-const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 70.84;         // Needs to be at 7h25m01.97 at start model
-const mercuryAngleCorrection = 0.983;  // To align the perihelion exactly
-
-const venusOrbitalInclination = 3.394667;
-const venusOrbitalEccentricity = 0.006772;
-const venusInclination = 2.1545441;
-const venusTilt = 2.6392;
-const venusLongitudePerihelion = 131.570305875962;
-const venusAscendingNode = 75.684163;
-const venusStartpos = 117.526;         // Needs to be at 6h13m49.46 at start model
-const venusAngleCorrection = -2.784;    // To align the perihelion exactly
-
-const marsOrbitalInclination = 1.849723;
-const marsOrbitalEccentricity = 0.093401;
-const marsInclination = 1.6311858;
-const marsTilt = 25.19;
-const marsLongitudePerihelion = 336.068903258872;
-const marsAscendingNode = 49.561729;
-const marsStartpos = 121.472;          // Needs to be at 6h14m37.15 at start model
-const marsAngleCorrection = -2.115;     // To align the perihelion exactly
-
-const jupiterOrbitalInclination = 1.303241;
-const jupiterOrbitalEccentricity = 0.048499;
-const jupiterInclination = 0.3219652;
-const jupiterTilt = 3.13;
-const jupiterLongitudePerihelion = 14.3388009380591;
-const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.868;        // Needs to be at 3h44m14.54 at start model
-const jupiterAngleCorrection = 1.057;   // To align the perihelion exactly
-
-const saturnOrbitalInclination = 2.488861;
-const saturnOrbitalEccentricity = 0.055547;
-const saturnInclination = 0.9254704;
-const saturnTilt = 26.73;
-const saturnLongitudePerihelion = 93.0664850365646;
-const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.421;         // Needs to be at 3h35m02.7 at start model
-const saturnAngleCorrection = -0.253;   // To align the perihelion exactly
-
-const uranusOrbitalInclination = 0.773201;
-const uranusOrbitalEccentricity = 0.046381;
-const uranusInclination = 0.9946692;
-const uranusTilt = 82.23;
-const uranusLongitudePerihelion = 173.01229057226;
-const uranusAscendingNode = 74.008411;
-const uranusStartpos = 44.853;         // Needs to be at 21h32m40.12 at start model
-const uranusAngleCorrection = -0.588;   // To align the perihelion exactly
-
-const neptuneOrbitalInclination = 1.769909;
-const neptuneOrbitalEccentricity = 0.009457;
-const neptuneInclination = 0.7354155;
-const neptuneTilt = 28.32;
-const neptuneLongitudePerihelion = 48.1269921140939;
-const neptuneAscendingNode = 131.789247;
-const neptuneStartpos = 48.016;        // Needs to be at 20h33m37.31 at start model
-const neptuneAngleCorrection = 2.386;   // To align the perihelion exactly
-
-const plutoOrbitalInclination = 17.14175;
-const plutoOrbitalEccentricity = 0.24880766;
-const plutoInclination = 15.5541473;
-const plutoTilt = 57.47;
-const plutoLongitudePerihelion = 224.06676;
-const plutoAscendingNode = 110.30347;
-const plutoStartpos = 71.555;          // Needs to be at 16h44m09.67 at start model
-const plutoAngleCorrection = 0;        // To align the perihelion exactly
-
-const halleysOrbitalInclination = 162.192203847561;
-const halleysOrbitalEccentricity = 0.9679427911271;
-const halleysInclination = 0.7354155;
-const halleysTilt = 0;
-const halleysLongitudePerihelion = 172.033036745069;
-const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 80;            // Needs to be at 08h43m15.95 at start model
-const halleysAngleCorrection = 0;      // To align the perihelion exactly
-
-const erosOrbitalInclination = 10.8290328658513;
-const erosOrbitalEccentricity = 0.222807894458402;
-const erosInclination = 10.8290328658513;
-const erosTilt = 0;
-const erosLongitudePerihelion = 123.054362100533;
-const erosAscendingNode = 304.411578580454;
-const erosStartpos = 57.402;           // Needs to be at 20h37m49.52 at start model
-const erosAngleCorrection = 0;         // To align the perihelion exactly
-
 //*************************************************************
-// ADD OTHER GLOBAL CONSTANTS VIA CALCULATIONS
+// ALL CONSTANTS ARE CALCULATED FROM HERE ONWARDS
 //*************************************************************
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(lengthsolaryearindaysin1246 * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
-const balancedYear = perihelionalignmentYear-(14.5*(holisticyearLength/16));
+const balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday
 const meanStellarday = (meansiderealyearlengthinDays/(meansiderealyearlengthinDays+1))*meanlengthofday
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays
+
 //sDAY IS USED IN 3D MODEL CALCULATIONS 
 const sDay = 1/meansolaryearlengthinDays;
 const sYear = sDay*365;
@@ -3038,7 +3053,7 @@ const KM_TO_MI = 0.62137119;   // 1 kilometre  → 0.621 371 miles
 
 const state = {
   prevJD  : startmodelJD,     // JD at previous animation tick
-  deltaT  : DELTA_T_START     // accumulated ΔT (seconds)
+  deltaT  : deltaTStart    // accumulated ΔT (seconds)
 };
 
 // create the golden-spiral line (returns { line, update })
@@ -3499,7 +3514,7 @@ function render(now) {
   trace(o.pos);
   moveModel(o.pos);
   updatePredictions();
-  //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy
+  //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy. If you switch it on, also switch on the menu-items/ info-box-itms.
   updatePositions();
   updateLightingForFocus();
   if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
@@ -3590,7 +3605,7 @@ function resetDeltaTForJump() {
   const startYear  = Math.min(BASE_YEAR, targetYear);
   const endYear    = Math.max(BASE_YEAR, targetYear);
 
-  let deltaTsum = 0;           // total change to apply to DELTA_T_START
+  let deltaTsum = 0;           // total change to apply to deltaTStart
 
   /* ── integrate whole years, sampling “one-year-before” each slice ── */
   for (let y = startYear; y < endYear; y++) {
@@ -3660,8 +3675,8 @@ function resetDeltaTForJump() {
 
   /* ── final ΔT: add for future, subtract for past ─────────────────── */
   const deltaT = (targetYear >= BASE_YEAR)
-    ? DELTA_T_START + deltaTsum   // stepping FORWARD  → grows
-    : DELTA_T_START - deltaTsum;  // stepping BACKWARD → shrinks
+    ? deltaTStart + deltaTsum   // stepping FORWARD  → grows
+    : deltaTStart - deltaTsum;  // stepping BACKWARD → shrinks
 
   state.deltaT = deltaT;
   state.prevJD = o.julianDay;     // avoid monster step on next frame
