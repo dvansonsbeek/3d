@@ -21,7 +21,7 @@ The way it is modelled:
 
 What is actually happening:
 * The Sun is (still) the center of our solar system.
-* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of 22,912 solar years, also known as Axial precession and therefore the Axial tilt changes.
+* Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,929 solar years, also known as Axial precession and therefore the Axial tilt changes.
 * The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of 99,360 solar years, also known as Inclination precession and therefore the inclination tilt changes.
 * Axial precession meets Inclination precession every 18,630 years.
 * Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
@@ -44,14 +44,15 @@ Why is the length of the Holistic-Year 298,080 years? This number fits all obser
 2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.947°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
 a) 1246 Length of solar day in SI seconds was - fully aligned with the current theory - ~31,556,929.19 SI seconds.  
-b) 1246 Length of sidereal year in SI seconds was - fully aligned with the current theory - ~31,558,149.6847 SI seconds.
+b) 1246 Length of sidereal year in SI seconds was - fully aligned with the current theory - ~31,558,149.6847 SI seconds.  
 c) 1246 Length of solar day was ~86,399.986 SI seconds because of historic Delta T predictions (Delta-T was greater in the past).  
 4. Climate graphs with ~100k cycles as a cycle of 99,360 years (three times 99,360 years = 298,080 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. Mercury perihelion precession aligned to ~5600 arc seconds per century - THE KEY EVIDENCE OF THE MODEL
-7. Obliquity correct both historic and current values
-8. Orbital Inclination to ICRF correct both historic and current values
-9. Eccentricity correct both historic and current values
+7. Ratio Earth to EARTH-WOBBLE-CENTER compared to Earth to the Sun (~323) explains the difference sidereal day - stellar day leads to the difference solar year - sidereal year (~323/13*16 = ~398). 
+8. Obliquity correct both historic and current values
+9. Orbital Inclination to ICRF correct both historic and current values
+10. Eccentricity correct both historic and current values
 
 It's an interactive 3D visualization where the browser renders a miniature model of the solar system using three.js — a JavaScript library that simplifies working with WebGL. The project typically features:
 - A central sun: A bright, glowing sphere, possibly using a texture and some light emission effects.
