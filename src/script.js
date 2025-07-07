@@ -9,7 +9,7 @@ import * as dat from 'dat.gui';
 Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
 The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.*/
 
-/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,080 years, an Axial precession cycle of ~22,929 years, an Inclination precession cycle of 99,360 years and a Perihelion precession cycle of 18,630 years.*/
+/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years.*/
 
 //Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with 10 parameters per planet/moon our complete solar system appears.
 
@@ -18,13 +18,13 @@ The author reserves all rights to license usage of this work for generative AI t
 //*************************************************************
 // ALL INPUT CONSTANTS
 //*************************************************************
-const holisticyearLength = 298080;
+const holisticyearLength = 298176;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
 const perihelionalignmentJD = 2176142;
 // Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
-const lengthsolaryearindaysin1246 = 31556929.19/86399.986;
+const lengthsolaryearindaysin1246 = 31556929.19/86399.9913;
 // Reference length of solar year in days in 1246 AD according to formula  J. Laskar + predicted LOD due to historic Delta-T values = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
 // Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = ~MEAN
@@ -32,19 +32,20 @@ const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = 2.68663449585437;
+const correctionDays = 2.70500643551349;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + RA correction + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.427293228;                       // 3D model + formula
-const earthinclinationMean = 1.4952971886;                // Formula only
+const earthtiltMean = 23.427261799;                       // 3D model + formula
+const earthinclinationMean = 1.4952886356;                // Formula only
 const tiltandinclinationAmplitude = 0.563;                // 3D model + formula
-const eccentricityMean = 0.01369955;                      // 3D model + formula
-const eccentricityAmplitude = 0.003092;                   // 3D model + formula
+const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned to 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
+const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned to 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
 const eccentricitySinusCorrection = 0.652;                // Formula only
-const mideccentricitypointAmplitude = 2.46125;            // Formula only
-const helionpointAmplitude = 11.2479124999959;            // Formula only
-const meansiderealyearAmplitudeinSeconds = 0.295987;      // Formula only
-const meansolardayAmplitudeinSeconds = 0.127024;          // Formula only 
-const meansolaryearAmplitudeinDays = 0.00044922;          // Formula only
+const mideccentricitypointAmplitude = 2.4625;             // Formula only
+const helionpointAmplitude = 11.2195469631;               // Formula only
+const meansiderealyearAmplitudeinSeconds = 0.2960802;     // Formula only
+const meansolardayAmplitudeinSeconds = 0.270111704;       // Formula only 
+const meansolaryearAmplitudeinDays = 0.0003806795;        // Formula only
+const meansolaryearAmplitude = 2.575;                     // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
 const earthRAAngle = 1.09;                                // 3D model = the only value which is very hard to derive
@@ -213,7 +214,7 @@ const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCo
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday
-const meanStellarday = (meansiderealyearlengthinDays/(meansiderealyearlengthinDays+1))*meanlengthofday
+const meanStellarday = ((meansiderealyearlengthinSeconds-(meansolaryearlengthinDays*meanlengthofday))/(1/eccentricityAmplitude/13*16))/(meansolaryearlengthinDays+1)+meanSiderealday
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays
 
 //sDAY IS USED IN 3D MODEL CALCULATIONS 
@@ -2377,17 +2378,21 @@ const params = { sizeBoost: 0 };
 let predictions = {
   juliandaysbalancedJD: 0,
   lengthofDay: 0,
+  lengthofsolarDay: 86400,
   lengthofsiderealDay: 0,
+  lengthofstellarDay : 0,
   lengthofsiderealDayRealLOD: 0,
+  lengthofstellarDayRealLOD: 0,
   predictedDeltat: 0,
   predictedDeltatPerYear: 0,
   lengthofsolarYear: 0,
-  lengthofsolarYearSec: 0,
+  lengthofsolarYearinDays: 0,
   lengthofsiderealYear: 0,
   lengthofsiderealYearDays: 0,
-  lengthofanomalisticYear: 0,
+  lengthofanomalisticYearinDays: 0,
   lengthofsolarYearSecRealLOD: 0,
   lengthofsiderealYearDaysRealLOD: 0,
+  lengthofanomalisticDaysRealLOD: 0,
   lengthofanomalisticYearRealLOD: 0,
   perihelionPrecession: 0,
   axialPrecession: 0,
@@ -3233,36 +3238,32 @@ function setupGUI() {
 
     let daysFolder = astroFolder.addFolder('Length of Days Predictions');
       daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').step(0.000001).listen();
+      daysFolder.add(predictions, 'lengthofsiderealDayRealLOD').name('Length of Sidereal Day (sec)').step(0.000001).listen();
+      daysFolder.add(predictions, 'lengthofstellarDayRealLOD').name('Length of Stellar Day (sec)').step(0.000001).listen();  
     daysFolder.open();
   
-    let yearsFolder = astroFolder.addFolder('Length of Years Predictions');
- //     yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
+    let yearsFolder = astroFolder.addFolder('Length of Solar Year Predictions'); 
+      yearsFolder.add(predictions, 'lengthofsolarYearSecRealLOD').name('Length of Solar Year (sec)').step(0.000001).listen();
+      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
+    yearsFolder.open(); 
   
-  // 1⃣  create the controller and keep the reference
-  const yearCtrl = yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.00000001).listen();
-
-  // 2⃣  tell dat.gui to render 8 digits after the decimal point
-  yearCtrl.__precision = 8;    // undocumented but fully supported
-  yearCtrl.updateDisplay();    // redraw once right away
+    let siderealFolder = astroFolder.addFolder('Length of Sidreal Year Predictions'); 
+      siderealFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').step(0.000001).listen(); 
+      siderealFolder.add(predictions, 'lengthofsiderealYearDaysRealLOD').name('Length of Sidereal Year (days)').step(0.000001).listen();
+    siderealFolder.open(); 
   
-      yearsFolder.add(predictions, 'lengthofsiderealYear').name('Length of Sidereal Year (sec)').step(0.000001).listen();
-    yearsFolder.open();  
+    let anomalisticFolder = astroFolder.addFolder('Length of Anomalistic Year - Predictions');
+      anomalisticFolder.add(predictions, 'lengthofanomalisticYearRealLOD').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
+      anomalisticFolder.add(predictions, 'lengthofanomalisticDaysRealLOD').name('Length of Anomalistic Year (days)').step(0.000001).listen();
+    anomalisticFolder.open(); 
   
-      let precessionRealLODFolder = astroFolder.addFolder('Length of Day - Predictions');
-      precessionRealLODFolder.add(predictions, 'lengthofsiderealDayRealLOD').name('Length of Sidereal Day (sec)').step(0.000001).listen();
-//      precessionRealLODFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
-//      precessionRealLODFolder.add(predictions, 'predictedDeltatPerYear').name('ΔT change (sec/year)').step(0.000001).listen();
-  
-      precessionRealLODFolder.add(predictions, 'lengthofsolarYearSecRealLOD').name('Length of Solar Year (sec)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'lengthofsiderealYearDaysRealLOD').name('Length of Sidereal Year (days)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'lengthofanomalisticYearRealLOD').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
-  
-      precessionRealLODFolder.add(predictions, 'perihelionPrecessionRealLOD').name('Perihelion Precession (yrs)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'axialPrecessionRealLOD').name('Axial Precession (yrs)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'inclinationPrecessionRealLOD').name('Inclination Precession (yrs)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'eclipticPrecessionRealLOD').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
-      precessionRealLODFolder.add(predictions, 'obliquityPrecessionRealLOD').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
-    precessionRealLODFolder.open(); 
+    let precessionFolder = astroFolder.addFolder('Length of Precession - Predictions');
+      precessionFolder.add(predictions, 'perihelionPrecessionRealLOD').name('Perihelion Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'axialPrecessionRealLOD').name('Axial Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'inclinationPrecessionRealLOD').name('Inclination Precession (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'eclipticPrecessionRealLOD').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
+      precessionFolder.add(predictions, 'obliquityPrecessionRealLOD').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
+    precessionFolder.open(); 
   
     let orbitalFolder = astroFolder.addFolder('Orbital Elements Predictions');
       orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').step(0.000001).listen();
@@ -3273,20 +3274,17 @@ function setupGUI() {
       //orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
     orbitalFolder.open(); 
   
-      let precessionFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
-      precessionFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'lengthofsolarYearSec').name('86400 sec/day - Length of Solar Year (sec)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'lengthofanomalisticYear').name('86400 sec/day - Length of Anomalistic Year (sec)').step(0.000001).listen();
+      let ephemerisFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
+  //      ephemerisFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
+  //      ephemerisFolder.add(predictions, 'predictedDeltatPerYear').name('ΔT change (sec/year)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofsolarDay').name('86400 sec/day - Length of Solar Day (sec)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofstellarDay').name('86400 sec/day - Length of Stellar Day (sec)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofsolarYearinDays').name('86400 sec/day - Length of Solar Year (days)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
+      ephemerisFolder.add(predictions, 'lengthofanomalisticYearinDays').name('86400 sec/day - Length of Anomalistic Year (days)').step(0.000001).listen();
+    ephemerisFolder.open();
   
-       precessionFolder.add(predictions, 'perihelionPrecession').name('86400 sec/day - Perihelion Precession (yrs)').step(0.000001).listen();
-      const axialCtrl = precessionFolder.add( predictions, 'axialPrecession' ).name( '86400 sec/day - Axial Precession (yrs)' ).step( 0.000001 ).listen();
-      addInfoButton(axialCtrl, 'https://en.wikipedia.org/wiki/Axial_precession');
- 
-      precessionFolder.add(predictions, 'inclinationPrecession').name('86400 sec/day - Inclination Precession (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'eclipticPrecession').name('86400 sec/day - Length Ecliptic Cycle (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'obliquityPrecession').name('86400 sec/day - Length Obliquity Cycle (yrs)').step(0.000001).listen();
-    precessionFolder.close();
   astroFolder.close();
   
   let posFolder = gui.addFolder('Celestial Positions')
@@ -4127,7 +4125,7 @@ const planetStats = {
       {label : () => `Sidereal day (SI seconds)`,
        value : [ { small: meanSiderealday },{ v: () => o.lengthofsiderealDayRealLOD, dec:10, sep:',' }]},
       {label : () => `Stellar day (SI seconds)`,
-       value : [ { small: meanStellarday },{ v: () => (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDayRealLOD, dec:10, sep:',' }]},
+       value : [ { small: meanStellarday },{ v: () => o.lengthofstellarDayRealLOD, dec:10, sep:',' }]},
      null,
       {label : () => `Solar year (SI seconds)`,
        value : [ { small: meanlengthofday*meansolaryearlengthinDays },{ v: () => o.lengthofsolarYearSecRealLOD, dec:6, sep:',' }]},
@@ -6033,7 +6031,7 @@ function apparentRaFromPdA(pdA, pdB) {
 function updatePerihelion() {
   o["mercuryPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth);
   o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth);
-  o["earthPerihelion"] = o.longitudePerihelion;
+  o["earthPerihelion"] = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
   o["marsPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, marsPerihelionFromEarth);
   o["jupiterPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, jupiterPerihelionFromEarth);
   o["saturnPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, saturnPerihelionFromEarth);
@@ -6399,11 +6397,11 @@ function updatePredictions() {
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolaryearAmplitudeinDays, meansolaryearlengthinDays);
   predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
   
-  predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSec/(o.lengthofsolarYear+1);
+  predictions.lengthofsolarYearinDays = o.lengthofsolarYearinDays = o.lengthofsolarYearSecRealLOD/86400;
+  predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYearinDays+1);
+  predictions.lengthofstellarDay = o.lengthofstellarDay = (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDay;
   
-  predictions.lengthofsolarYearSec = o.lengthofsolarYearSec = o.lengthofsolarYear*86400;
-  predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/86400;
-  predictions.lengthofanomalisticYear = computeLengthofanomalisticYear(o.perihelionPrecession, o.lengthofsolarYear); 
+  predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/86400; 
   
   predictions.perihelionPrecession = o.perihelionPrecession = o.axialPrecession*13/16;
   predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYear, o.lengthofsolarYear);
@@ -6412,6 +6410,7 @@ function updatePredictions() {
   predictions.eclipticPrecession = o.eclipticPrecession = o.axialPrecession*13/5;
   
   predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYear+1);
+  predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDayRealLOD;
   
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -6419,6 +6418,9 @@ function updatePredictions() {
   predictions.lengthofsolarYearSecRealLOD = o.lengthofsolarYearSecRealLOD = o.lengthofsolarYear*o.lengthofDay;
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear/o.lengthofDay;
   predictions.lengthofanomalisticYearRealLOD = o.lengthofanomalisticYearRealLOD = computeLengthofanomalisticYearRealLOD(o.perihelionPrecessionRealLOD, o.lengthofsolarYear, o.lengthofDay);
+  
+  predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearRealLOD/86400;
+  predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearRealLOD/o.lengthofDay;
   
   predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.axialPrecessionRealLOD*13/16;
   predictions.computeAxialPrecessionRealLOD = o.axialPrecessionRealLOD = computeAxialPrecessionRealLOD(o.lengthofsiderealYear, o.lengthofsolarYear, o.lengthofDay);
@@ -6429,10 +6431,10 @@ function updatePredictions() {
   predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
   predictions.inclinationEarth = o.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
-  predictions.longitudePerihelion = o.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude);
+  predictions.longitudePerihelion = o.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude); // better to use ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360) because this is just a rough estimate formula
   
-  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((o.longitudePerihelion-180), o.currentYear)
-  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(o.longitudePerihelion, o.currentYear)
+  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-180), o.currentYear)
+  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360), o.currentYear)
   
   predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
   //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
@@ -6469,17 +6471,17 @@ function computeLengthofDay(
     : perihelionprecessioncycleYear;
 
   // factor: helionpointAmplitude / ((360/perihelionCycleLength) * 100)
-  const firstFactor = helionpointAmplitude / ((360 / perihelionCycleLength) * 100);
+  //const firstFactor = helionpointAmplitude / ((360 / perihelionCycleLength) * 100);
 
   // angle for the first COS term (in radians):
   // (cycleValue / perihelionCycleLength) * 360°
   const angle1 = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
-  const term1 = -meansolardayAmplitudeinSeconds * firstFactor * Math.cos(angle1);
+  const term1 = -meansolardayAmplitudeinSeconds * meansolaryearAmplitude * Math.cos(angle1);
 
   // angle for the second COS term (in radians):
   // (cycleValue / (perihelionCycleLength/2)) * 360°
   const angle2 = (cycleValue / (perihelionCycleLength / 2)) * 360 * Math.PI / 180;
-  const term2 = -meansolardayAmplitudeinSeconds * mideccentricitypointAmplitude * Math.cos(angle2);
+  const term2 = -meansolardayAmplitudeinSeconds * Math.cos(angle2);
 
   // sum both terms + base mean length of day
   return term1 + term2 + meanlengthofday;
@@ -6553,21 +6555,6 @@ function computeLengthofsiderealYear(
   // formula: − amplitude × sin(angle) + base length
   return -meansiderealyearAmplitudeinSeconds * Math.sin(angle)
          + meansiderealyearlengthinSeconds;
-}
-
-/**
- * Compute the length of the anomalistic year (in seconds).
- *
- * @param {number} perihelionPrecession – the perihelion precession value
- * @param {number} lengthofsolarYear    – the length of the solar year (in days)
- * @returns {number} lengthofanomalisticYear (in seconds)
- */
-function computeLengthofanomalisticYear(
-  perihelionPrecession,
-  lengthofsolarYear
-  ) {
-  return ((perihelionPrecession * lengthofsolarYear) /
-          (perihelionPrecession - 1)) * 86400;
 }
 
 /**
