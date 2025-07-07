@@ -45,12 +45,12 @@ Why is the length of the Holistic-Year 298,176 years? This number fits all obser
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
 a) 1246 Length of solar day in SI seconds was - fully aligned with the current theory - ~31,556,929.19 SI seconds.  
 b) 1246 Length of sidereal year in SI seconds was - fully aligned with the current theory - ~31,558,149.6847 SI seconds.  
-c) 1246 Length of solar day was ~86,399.986 SI seconds because of historic Delta T predictions (Delta-T was greater in the past).  
+c) 1246 Length of solar day was ~86,399.9913 SI seconds because of historic Delta T predictions (Delta-T was greater in the past).  
 4. Climate graphs with ~100k cycles as a cycle of 99,392 years (three times 99,392 years = 298,176 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger dryes around 9800 BC. 
 6. Mercury perihelion precession aligned to ~5600 arc seconds per century - THE KEY EVIDENCE OF THE MODEL
-7. Ratio Earth to EARTH-WOBBLE-CENTER compared to Earth to the Sun (~324.5) explains the difference sidereal day - stellar day leads to the difference solar year - sidereal year (~324.5/13*16 = ~399.3).
-8. Difference stellar day and sidereal day exactly according to theory (86164.0989036905-86164.0905308328)*1000
+7. Ratio Earth to EARTH-WOBBLE-CENTER compared to Earth to the Sun (~324.5) explains the difference sidereal day - stellar day leads to the difference solar year - sidereal year (~324.5/13*16 = ~399.3) - THE KEY EVIDENCE OF THE MODEL
+8. Difference stellar day and sidereal day exactly according to theory (86164.0989036905-86164.0905308328)*1000 = 8.37286 ms - THE KEY EVIDENCE OF THE MODEL
 9. Obliquity correct both historic and current values
 10. Orbital Inclination to ICRF correct both historic and current values
 11. Eccentricity correct both historic and current values
