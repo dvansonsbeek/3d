@@ -3673,7 +3673,7 @@ function solsticeForYear(year) {
   let bestJD    = NaN;
   let bestObliq = -Infinity;
 
-  for (let k = -144; k <= 144; ++k) {             // 289 samples
+  for (let k = -288; k <= 288; ++k) {             // 288*2+1 samples of 30 minutes interval around the approxJD.
     const jd   = approxJD + k * step;
     const frac = jd - Math.floor(jd);
 
