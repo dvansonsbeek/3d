@@ -27,30 +27,30 @@ const perihelionalignmentJD = 2176142;
 const lengthsolaryearindaysin1246 = 31556929.19/86399.9913;
 // Reference length of solar year in days in 1246 AD according to formula  J. Laskar + predicted LOD due to historic Delta-T values = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
-// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = ~MEAN
+// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
 const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
 const correctionDays = 2.70500643551349;
 // Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + RA correction + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.427261799;                       // 3D model + formula
-const earthinclinationMean = 1.4952886356;                // Formula only
-const tiltandinclinationAmplitude = 0.563;                // 3D model + formula
-const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned to 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
-const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned to 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
+const earthtiltMean = 23.42707;                           // 3D model + formula BUT NEEDS TO BE FURTHER REFINED FOR CORRECT OBLIQUITY FORMULA VALUE. ALSO IMPACTS THE ORBITAL INCLINATION VALUE
+const earthinclinationMean = 1.49514052955444;            // Formula only
+const tiltandinclinationAmplitude = 0.564;                // 3D model + formula
+const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
+const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
 const eccentricitySinusCorrection = 0.652;                // Formula only
-const mideccentricitypointAmplitude = 2.4625;             // Formula only
-const helionpointAmplitude = 11.2195469631;               // Formula only
+const mideccentricitypointAmplitude = 2.461586;           // Formula only
+const helionpointAmplitude = 11.2153826318;               // Formula only
 const meansiderealyearAmplitudeinSeconds = 0.2960802;     // Formula only
 const meansolardayAmplitudeinSeconds = 0.270111704;       // Formula only 
 const meansolaryearAmplitudeinDays = 0.0003806795;        // Formula only
 const meansolaryearAmplitude = 2.575;                     // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
-const earthRAAngle = 1.09;                                // 3D model = the only value which is very hard to derive
+const earthRAAngle = 1.21;                                // 3D model = the only value which is very hard to derive
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
-const temperatureGraphMostLikely = 14.5;                  // 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude nagative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
+const temperatureGraphMostLikely = 14.5;                  // 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 
 // Reference lenghts used as INPUT for the Sun
 const sunTilt = 7.155;
@@ -79,8 +79,8 @@ const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4634482921134;
 const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 70.84;               // Needs to be at 7h25m01.97 at start model
-const mercuryAngleCorrection = 0.983;        // To align the perihelion exactly
+const mercuryStartpos = 70.842;               // Needs to be at 7h25m01.97 at start model
+const mercuryAngleCorrection = 0.987;        // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Venus
 const venusSolarYearInput = 224.6957;
@@ -90,8 +90,8 @@ const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.570305875962;
 const venusAscendingNode = 75.684163;
-const venusStartpos = 117.526;               // Needs to be at 6h13m49.46 at start model
-const venusAngleCorrection = -2.784;         // To align the perihelion exactly
+const venusStartpos = 117.528;               // Needs to be at 6h13m49.46 at start model
+const venusAngleCorrection = -2.777;         // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Mars
 const marsSolarYearInput = 686.937;
@@ -101,8 +101,8 @@ const marsInclination = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.068903258872;
 const marsAscendingNode = 49.561729;
-const marsStartpos = 121.472;                // Needs to be at 6h14m37.15 at start model
-const marsAngleCorrection = -2.115;          // To align the perihelion exactly
+const marsStartpos = 121.474;                // Needs to be at 6h14m37.15 at start model
+const marsAngleCorrection = -2.074;          // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
@@ -112,8 +112,8 @@ const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.868;              // Needs to be at 3h44m14.54 at start model
-const jupiterAngleCorrection = 1.057;        // To align the perihelion exactly
+const jupiterStartpos = 13.862;              // Needs to be at 3h44m14.54 at start model
+const jupiterAngleCorrection = 1.106;        // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Saturn
 const saturnSolarYearInput = 10746.6;
@@ -123,7 +123,7 @@ const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.421;               // Needs to be at 3h35m02.7 at start model
+const saturnStartpos = 11.415;               // Needs to be at 3h35m02.7 at start model
 const saturnAngleCorrection = -0.253;        // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Uranus
@@ -134,8 +134,8 @@ const uranusInclination = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 173.01229057226;
 const uranusAscendingNode = 74.008411;
-const uranusStartpos = 44.853;               // Needs to be at 21h32m40.12 at start model
-const uranusAngleCorrection = -0.588;        // To align the perihelion exactly
+const uranusStartpos = 44.842;               // Needs to be at 21h32m40.12 at start model
+const uranusAngleCorrection = -0.539;        // To align the perihelion exactly
 
 // Reference lenghts used as INPUT for Neptune
 const neptuneSolarYearInput = 59926;
@@ -145,8 +145,8 @@ const neptuneInclination = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 48.1269921140939;
 const neptuneAscendingNode = 131.789247;
-const neptuneStartpos = 48.016;              // Needs to be at 20h33m37.31 at start model
-const neptuneAngleCorrection = 2.386;        // To align the perihelion exactly
+const neptuneStartpos = 48.01;              // Needs to be at 20h33m37.31 at start model
+const neptuneAngleCorrection = 2.407;        // To align the perihelion exactly
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
