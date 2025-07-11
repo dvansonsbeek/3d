@@ -2370,7 +2370,22 @@ let o = {
   erosDescendingNode: 0,
   
   Target: "",
-  lookAtObj: {}
+  lookAtObj: {},
+  
+  testMode        : 'Range',         // 'Range' | 'List'
+  testJDsText     : "2451717, 2627033, etc.",    // list of Julian Days you want to probe
+  rangeStart      : startmodelJD-(meansolaryearlengthinDays*25200), 
+  rangeEnd        : startmodelJD+(meansolaryearlengthinDays*23800),
+  rangePieces     : ((25200+23800)/100)+1,
+  runRATestToggle : false,
+  _raTestBusy     : false,
+  
+  solMode        : 'Range',          // 'Range' | 'List'
+  solYearsText   : '2000, 2005, etc.',
+  solRangeStart  : 2000,
+  solRangeEnd    : 2025,
+  runSolToggle   : false,
+  _solBusy       : false 
 };
 
 const params = { sizeBoost: 0 }; 
@@ -3173,6 +3188,11 @@ function setupGUI() {
                  }).onFinishChange(function() {
     o.speedFact = Number(o['1 second equals']);});
   ctrlFolder.add(o, 'speed', -5, 5).step(0.5).name('Speed multiplier');
+  
+  function toggleCtrl (ctrl, show) {
+  if (ctrl && ctrl.__li) ctrl.__li.style.display = show ? '' : 'none';
+  }
+  
   ctrlFolder.add(o, 'traceBtn').name('Enable Tracing').onFinishChange(() => {
   if (o.traceBtn) {
     // Tracing turned ON → reset and re-init
@@ -3377,6 +3397,87 @@ function setupGUI() {
   
   let sFolder = gui.addFolder('Settings')
   sFolder.add(params, 'sizeBoost', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
+  
+  /* --- Output file  -------------------------------------------- */
+  const testSettings = sFolder.addFolder('Create Object File');
+
+  const modeCtrl   = testSettings.add(o, 'testMode', ['List', 'Range']).name('Mode');
+  const listCtrl   = testSettings.add(o, 'testJDsText').name('JD list (CSV)');
+  const startCtrl  = testSettings.add(o, 'rangeStart').name('Start JD');
+  const endCtrl    = testSettings.add(o, 'rangeEnd').name('End JD');
+  const pieceCtrl  = testSettings.add(o, 'rangePieces').name('# points').min(2).step(1);
+
+  //testSettings.add(o, 'runRATestButton').name('Create file (be patient)');
+  const runCtrl = testSettings
+  .add(o, 'runRATestToggle')
+  .name('Create file (be patient)')
+  .listen();
+  
+  runCtrl.onChange(async val => {
+  if (!val || o._raTestBusy) return;   // only react on first tick
+
+  o._raTestBusy = true;
+  try {
+    await runRATest();                // heavy work runs **after** the UI paints
+  } finally {
+    o.runRATestToggle = false;        // untick when finished
+    runCtrl.updateDisplay();
+    o._raTestBusy = false;
+  }
+  });
+  
+  /* --- show only the relevant rows ------------------------------- */
+  function syncVis () {
+  const list = o.testMode === 'List';
+  toggleCtrl(listCtrl,  list);
+  toggleCtrl(startCtrl, !list);
+  toggleCtrl(endCtrl,   !list);
+  toggleCtrl(pieceCtrl, !list);
+  }
+  syncVis();
+  modeCtrl.onChange(syncVis);
+  
+  /* --- Solstice file --------------------------------------------------- */
+  const solFolder = sFolder.addFolder('Create Solstice File');
+
+  const modeCtrl2  = solFolder.add(o, 'solMode', ['Range', 'List']).name('Mode');
+  const yearList   = solFolder.add(o, 'solYearsText').name('Year list (CSV)');
+  const startCtrl2 = solFolder.add(o, 'solRangeStart').name('Start year').step(1);
+  const endCtrl2   = solFolder.add(o, 'solRangeEnd').name('End year').step(1);
+
+  const runCtrl2 = solFolder
+  .add(o, 'runSolToggle')
+  .name('Create file (be patient)')
+  .listen();
+
+  /* --- show only the relevant rows ------------------------------------ */
+  function syncSolVis() {
+  const list = o.solMode === 'List';
+  toggleCtrl(yearList,  list);      // show list box only in List mode
+  toggleCtrl(startCtrl2, !list);    // show range fields only in Range mode
+  toggleCtrl(endCtrl2,   !list);
+  }
+  syncSolVis();
+  modeCtrl2.onChange(syncSolVis);
+
+  /* --- run button ------------------------------------------------------ */
+  runCtrl2.onChange(async ticked => {
+  if (!ticked || o._solBusy) return;   // ignore untick or double-click
+  o._solBusy = true;
+  try {
+    const yrs = buildYearArray();      // builds array from List or Range
+    if (!yrs.length) {
+      alert('No valid years — check your input.');
+      return;
+    }
+    await runSolsticeExport(yrs);      // heavy work
+  } finally {
+    o.runSolToggle = false;            // untick when finished
+    runCtrl2.updateDisplay();
+    o._solBusy = false;
+  }
+  });
+  
   let folderPlanets = sFolder.addFolder('Planets show/hide');
   folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
     showHideOrbits();
@@ -3563,6 +3664,347 @@ requestAnimationFrame(render);
 //*************************************************************
 // FUNCTIONS
 //*************************************************************
+function solsticeForYear(year) {
+
+  const approxJD = startmodelJD +
+        ((year + 0.5) - startmodelYear) * meansolaryearlengthinDays;
+
+  const step    = 0.5 / 24;         // 0.5 h in days
+  let bestJD    = NaN;
+  let bestObliq = -Infinity;
+
+  for (let k = -144; k <= 144; ++k) {             // 289 samples
+    const jd   = approxJD + k * step;
+    const frac = jd - Math.floor(jd);
+
+    o.Time = fracDayToTimeStr(frac);              // sync viewer clock
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    if (!Number.isFinite(sun?.dec)) continue;
+
+    const obDeg = 90 - sun.dec * 180 / Math.PI;
+    if (obDeg > bestObliq) { bestObliq = obDeg; bestJD = jd; }
+  }
+
+  if (!Number.isFinite(bestJD)) return null;
+
+  /* final, unrounded values */
+  const bestFrac = bestJD - Math.floor(bestJD);
+  o.Time = fracDayToTimeStr(bestFrac);
+  jumpToJulianDay(bestJD);
+  forceSceneUpdate();
+
+  return {
+    jd      : bestJD,
+    raDeg   : (sun.ra * 180 / Math.PI + 360) % 360,
+    obliqDeg: bestObliq
+  };
+}
+
+async function runSolsticeExport(years) {
+
+  console.log('Solstice export for years:', years);
+
+  /* A · freeze viewer */
+  const oldRun  = o.Run;
+  const oldJD   = o.julianDay;
+  const oldTime = o.Time;
+  o.Run = false;
+
+  /* B · rows */
+  const rows = [['Date', 'Time', 'JD', 'RA (°)', 'Obliquity (°)']];
+  const YIELD_EVERY = 25;
+  let done = 0;
+
+  for (const y of years) {
+    const r = solsticeForYear(y);
+    if (!r) continue;
+
+    rows.push([
+      o.Date,
+      o.Time,
+      r.jd.toFixed(6),
+      r.raDeg.toFixed(6),
+      r.obliqDeg.toFixed(6)
+    ]);
+    if (++done % YIELD_EVERY === 0) {
+      await new Promise(requestAnimationFrame);
+    }
+  }
+
+  /* C · restore viewer */
+  o.Time = oldTime;
+  jumpToJulianDay(oldJD);
+  o.Run  = oldRun;
+
+  /* D · write file */
+  if (done) {
+    await ensureSheetJs();
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,
+        XLSX.utils.aoa_to_sheet(rows), 'Solstice Dates');
+    const url = URL.createObjectURL(workbookToBlob(wb));
+    Object.assign(document.createElement('a'), {
+      href: url,
+      download: 'Holistic_solstice_results.xlsx'
+    }).click();
+    URL.revokeObjectURL(url);
+    console.log(`Export finished – ${done} rows`);
+  } else {
+    console.error('No valid years – nothing written');
+  }
+}
+
+/* ----------------------------------------------------------------------
+   fracDayToTimeStr() helper  (unchanged)
+---------------------------------------------------------------------- */
+function fracDayToTimeStr(frac) {
+  const totalSec = Math.round(frac * 86400);
+  const hh = Math.floor(totalSec / 3600);
+  const mm = Math.floor((totalSec % 3600) / 60);
+  const ss = totalSec % 60;
+  return `${String(hh).padStart(2,'0')}:` +
+         `${String(mm).padStart(2,'0')}:` +
+         `${String(ss).padStart(2,'0')}`;
+}
+
+/* ----------------------------------------------------------------------
+   Build array of integer years according to the current GUI mode.
+---------------------------------------------------------------------- */
+function buildYearArray() {
+
+  if (o.solMode === 'List') {
+    const raw = document.querySelector('input[data-property="solYearsText"]')
+               ?.value || o.solYearsText;
+    return (raw.match(/-?\d+/g) || [])          // ['1999','2000', …]
+           .map(Number)
+           .filter(Number.isFinite);
+  }
+
+  /* --- Range mode ---------------------------------------------------- */
+  const s = Number(o.solRangeStart);
+  const e = Number(o.solRangeEnd);
+
+  if (!Number.isFinite(s) || !Number.isFinite(e)) {
+    console.error('Solstice “Range” values must be numbers:', s, e);
+    return [];
+  }
+  const step = s <= e ? 1 : -1;
+  const yrs  = [];
+  for (let y = s; step > 0 ? y <= e : y >= e; y += step) yrs.push(y);
+  return yrs;
+}
+
+function buildJdArray () {
+
+  if (o.testMode === 'List') {
+    const field = document.querySelector('input[data-property="testJDsText"]');
+    const raw   = field ? field.value : o.testJDsText;
+
+    //    ┌─ optional sign ─┐┌──── digits ───┐┌─ optional .fraction ──┐┌ optional exponent ┐
+    const numRE = /[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/g;
+
+    return (raw.match(numRE) || [])
+           .map(Number)             // Number/parseFloat both keep decimals
+           .filter(Number.isFinite);
+  }
+
+  /* ── Range mode ────────────────────────────────────────── */
+  const s = Number(o.rangeStart);
+  const e = Number(o.rangeEnd);
+  const n = Math.max(2, Number(o.rangePieces) | 0);   // force integer ≥ 2
+
+  if (!Number.isFinite(s) || !Number.isFinite(e) || !Number.isFinite(n)) {
+    console.error('RA-test “Range” values must be numbers:', s, e, n);
+    return [];
+  }
+  const step = (e - s) / (n - 1);
+  return Array.from({ length: n }, (_, i) => Math.round(s + i * step));
+}
+
+/* ────────────────────────────────────────────────────────── */
+/*  Helper – do exactly what the “Julian day” GUI field does */
+/* ────────────────────────────────────────────────────────── */
+function jumpToJulianDay (jd) {
+  o.julianDay = jd;
+
+  // replicate the onFinishChange() logic you already have
+  o.Day = o.julianDay - startmodelJD;
+  o.pos = sDay * o.Day + timeToPos(o.Time);
+
+  const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
+  o.perihelionDate = `${p.date}`;
+
+  updatePositions();        // whatever routine you already call in the GUI
+}
+
+/* Force all the astro calculations that the render loop usually so RA & DEC are up-to-date. */
+function forceSceneUpdate () {
+  o.Position      = o.pos;
+  o.Day           = posToDays(o.pos);
+  o.Date          = daysToDate(o.Day);
+  o.Time          = posToTime(o.pos);
+  trace(o.pos);
+  moveModel(o.pos);
+  updatePredictions();
+  updatePositions();
+  updatePerihelion();
+  updateOrbitOrientations();
+  // -- anything else your render loop does that affects .ra/.dec
+}
+
+/*  Load SheetJS the first time we need it  */
+function ensureSheetJs () {
+  return new Promise(res => {
+    if (window.XLSX) return res();
+    const s = document.createElement('script');
+    s.src   = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = res;
+    document.head.appendChild(s);
+  });
+}
+
+/*  Convert workbook → Blob  */
+function workbookToBlob (wb) {
+  const wbout = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+  return new Blob([wbout], { type:
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+async function runRATest() {
+
+  const jds = buildJdArray();
+  if (!jds.length) {
+    alert('No valid Julian dates — please check your input.');
+    return;
+  }
+
+  /* headers */
+  const earthRows  = [['JD', 'Date', 'Time', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
+  const periRows   = [['JD', 'Date', 'Time','Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion']]; 
+  //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
+  const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
+  //const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun','Pluto RA', 'Pluto Dec', 'Pluto Dist Earth', 'Pluto Dist Sun','Halleys RA', 'Halleys Dec', 'Halleys Dist Earth', 'Halleys Dist Sun', 'Eros RA', 'Eros Dec', 'Eros Dist Earth', 'Eros Dist Sun']]; 
+
+  /* freeze viewer */
+  const oldRun = o.Run;
+  const oldJD  = o.julianDay;
+  const oldTime = o.Time; 
+  
+  o.Run = false;
+  o.Time = '12:00:00';
+
+  for (const jd of jds) {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    
+    const date = o.Date
+    const time = o.Time
+
+    const earthWobbRA    = (earthWobbleCenter.ra * 180 / Math.PI + 360) % 360;
+    const earthWobbDec   = 90-(earthWobbleCenter.dec * 180 / Math.PI);
+    const earthWobbDistE = earthWobbleCenter.distAU;
+    const earthWobbDistS = earthWobbleCenter.sunDistAU;
+    const earthPerRA     = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
+    const earthPerDec    = 90-(earthPerihelionFromEarth.dec * 180 / Math.PI);
+    const earthPerDistE  = earthPerihelionFromEarth.distAU;
+    const earthPerDistS  = earthPerihelionFromEarth.sunDistAU;
+    const earthMidRA     = (midEccentricityOrbit.ra   * 180 / Math.PI + 360) % 360;
+    const earthMidDec    = 90-(midEccentricityOrbit.dec * 180 / Math.PI);
+    const earthMidDistE  = midEccentricityOrbit.distAU;
+    const earthMidDistS  = midEccentricityOrbit.sunDistAU;
+                            
+    const mercuryPer   = o.mercuryPerihelion;
+    const venusPer     = o.venusPerihelion;
+    const marsPer      = o.marsPerihelion;
+    const jupiterPer   = o.jupiterPerihelion;
+    const saturnPer    = o.saturnPerihelion;
+    const uranusPer    = o.uranusPerihelion;
+    const neptunePer   = o.neptunePerihelion;
+    const plutoPer     = o.plutoPerihelion;
+    const halleysPer   = o.halleysPerihelion;
+    const erosPer      = o.erosPerihelion;
+    
+    const sunRA         = (sun.ra   * 180 / Math.PI + 360) % 360;
+    const sunDec        = 90-(sun.dec * 180 / Math.PI);
+    const sunDistE      = sun.distAU;
+    
+    const mercuryRA     = (mercury.ra   * 180 / Math.PI + 360) % 360;
+    const mercuryDec    = 90-(mercury.dec * 180 / Math.PI);
+    const mercuryDistE  = mercury.distAU;
+    const mercuryDistS  = mercury.sunDistAU;
+    const venusRA       = (venus.ra   * 180 / Math.PI + 360) % 360;
+    const venusDec      = 90-(venus.dec * 180 / Math.PI);
+    const venusDistE    = venus.distAU;
+    const venusDistS    = venus.sunDistAU;
+    const marsRA        = (mars.ra   * 180 / Math.PI + 360) % 360;
+    const marsDec       = 90-(mars.dec * 180 / Math.PI);
+    const marsDistE     = mars.distAU;
+    const marsDistS     = mars.sunDistAU;
+    const jupiterRA     = (jupiter.ra   * 180 / Math.PI + 360) % 360;
+    const jupiterDec    = 90-(jupiter.dec * 180 / Math.PI);
+    const jupiterDistE  = jupiter.distAU;
+    const jupiterDistS  = jupiter.sunDistAU;
+    const saturnRA      = (saturn.ra   * 180 / Math.PI + 360) % 360;
+    const saturnDec     = 90-(saturn.dec * 180 / Math.PI);
+    const saturnDistE   = saturn.distAU;
+    const saturnDistS   = saturn.sunDistAU;
+    const uranusRA      = (uranus.ra   * 180 / Math.PI + 360) % 360;
+    const uranusDec     = 90-(uranus.dec * 180 / Math.PI);
+    const uranusDistE   = uranus.distAU;
+    const uranusDistS   = uranus.sunDistAU;
+    const neptuneRA     = (neptune.ra   * 180 / Math.PI + 360) % 360;
+    const neptuneDec    = 90-(neptune.dec * 180 / Math.PI);
+    const neptuneDistE  = neptune.distAU;
+    const neptuneDistS  = neptune.sunDistAU;
+    const plutoRA       = (pluto.ra   * 180 / Math.PI + 360) % 360;
+    const plutoDec      = 90-(pluto.dec * 180 / Math.PI);
+    const plutoDistE    = pluto.distAU;
+    const plutoDistS    = pluto.sunDistAU;
+    const halleysRA     = (halleys.ra   * 180 / Math.PI + 360) % 360;
+    const halleysDec    = 90-(halleys.dec * 180 / Math.PI);
+    const halleysDistE  = halleys.distAU;
+    const halleysDistS  = halleys.sunDistAU;
+    const erosRA        = (eros.ra   * 180 / Math.PI + 360) % 360;
+    const erosDec       = 90-(eros.dec * 180 / Math.PI);
+    const erosDistE     = eros.distAU;
+    const erosDistS     = eros.sunDistAU;
+        
+        earthRows.push([jd, date, time, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
+    
+//    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
+    
+        periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6)]);
+    
+//    planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6), plutoRA.toFixed(6), plutoDec.toFixed(6), plutoDistE.toFixed(6), plutoDistS.toFixed(6), halleysRA.toFixed(6), halleysDec.toFixed(6), halleysDistE.toFixed(6), halleysDistS.toFixed(6), erosRA.toFixed(6), erosDec.toFixed(6), erosDistE.toFixed(6), erosDistS.toFixed(6)]);
+    
+        planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6)]);
+    
+  }
+
+  /* restore viewer */
+  o.Time = oldTime; 
+  jumpToJulianDay(oldJD);
+  o.Run = oldRun;
+  
+
+  /* build & download XLSX */
+  await ensureSheetJs();                   // load SheetJS if needed
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet(earthRows),  'Earth Longitude');
+  XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet(periRows),   'Perihelion Planets');
+  XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet(planetRows), 'Sun & Planets');
+
+  const wbBlob = workbookToBlob(wb);
+  const url    = URL.createObjectURL(wbBlob);
+  Object.assign(document.createElement('a'),
+    { href: url, download: 'Holistic_objects_results.xlsx' }).click();
+  URL.revokeObjectURL(url);
+}
 
 // ---------------------------------------------------------------------------
 //  HELPER — “excess seconds per (mean) day” at the *current* JD
