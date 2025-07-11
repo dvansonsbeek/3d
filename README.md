@@ -41,7 +41,7 @@ For more details see https://holisticuniverse.com.
 
 Why is the length of the Holistic-Year 298,176 years? This number fits all observations best:
 1. Historic value longitude of perihelion 90°: 1245-12-14
-2. Current (J2000) value longitude of perihelion: 6h51m47s = ~102.947°
+2. J2000 value longitude of perihelion: 6h51m47s = ~102.947°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values  
 a) 1246 Length of solar day in SI seconds was - fully aligned with the current theory - ~31,556,929.19 SI seconds.  
 b) 1246 Length of sidereal year in SI seconds was - fully aligned with the current theory - ~31,558,149.6847 SI seconds.  
