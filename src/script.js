@@ -73,7 +73,7 @@ const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
 const moonStartposApsidal = 330;             // Aligned with stellarium data.
 const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 126.19;             // Needs to be at 21h31m22s at start model according to stellarium
+const moonStartposMoon = 126.19;             // Needs to be at ~21h31m22s at start model according to stellarium
 
 // Reference lenghts used as INPUT for Mercury
 const mercurySolarYearInput = 87.96845;
@@ -83,8 +83,8 @@ const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4634482921134;
 const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 70.842;               // Needs to be at 7h25m01.97 at start model
-const mercuryAngleCorrection = 0.987;        // To align the perihelion exactly
+const mercuryStartpos = 70.842;              // Needs to be at ~7h25m01.97 at start model
+const mercuryAngleCorrection = 0.984;        // To align the perihelion exactly. According to formula ~77.46345
 
 // Reference lenghts used as INPUT for Venus
 const venusSolarYearInput = 224.6957;
@@ -94,8 +94,8 @@ const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.570305875962;
 const venusAscendingNode = 75.684163;
-const venusStartpos = 117.528;               // Needs to be at 6h13m49.46 at start model
-const venusAngleCorrection = -2.777;         // To align the perihelion exactly
+const venusStartpos = 117.528;               // Needs to be at ~6h13m49.46 at start model
+const venusAngleCorrection = -2.783;         // To align the perihelion exactly. According to formula ~131.570306
 
 // Reference lenghts used as INPUT for Mars
 const marsSolarYearInput = 686.937;
@@ -105,8 +105,8 @@ const marsInclination = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.068903258872;
 const marsAscendingNode = 49.561729;
-const marsStartpos = 121.474;                // Needs to be at 6h14m37.15 at start model
-const marsAngleCorrection = -2.074;          // To align the perihelion exactly
+const marsStartpos = 121.474;                // Needs to be at ~6h14m37.15 at start model
+const marsAngleCorrection = -2.106;          // To align the perihelion exactly. According to formula ~336.06890
 
 // Reference lenghts used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
@@ -116,8 +116,8 @@ const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.862;              // Needs to be at 3h44m14.54 at start model
-const jupiterAngleCorrection = 1.106;        // To align the perihelion exactly
+const jupiterStartpos = 13.867;              // Needs to be at ~3h44m14.54 at start model
+const jupiterAngleCorrection = 1.069;        // To align the perihelion exactly. According to formula ~14.33880
 
 // Reference lenghts used as INPUT for Saturn
 const saturnSolarYearInput = 10746.6;
@@ -127,8 +127,8 @@ const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.415;               // Needs to be at 3h35m02.7 at start model
-const saturnAngleCorrection = -0.253;        // To align the perihelion exactly
+const saturnStartpos = 11.42;                // Needs to be at ~3h35m02.7 at start model
+const saturnAngleCorrection = -0.253;        // To align the perihelion exactly. According to formula ~93.06649
 
 // Reference lenghts used as INPUT for Uranus
 const uranusSolarYearInput = 30589;
@@ -138,8 +138,8 @@ const uranusInclination = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 173.01229057226;
 const uranusAscendingNode = 74.008411;
-const uranusStartpos = 44.842;               // Needs to be at 21h32m40.12 at start model
-const uranusAngleCorrection = -0.539;        // To align the perihelion exactly
+const uranusStartpos = 44.85;                // Needs to be at ~21h32m40.12 at start model
+const uranusAngleCorrection = -0.576;        // To align the perihelion exactly. According to formula ~173.01229 
 
 // Reference lenghts used as INPUT for Neptune
 const neptuneSolarYearInput = 59926;
@@ -149,8 +149,8 @@ const neptuneInclination = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 48.1269921140939;
 const neptuneAscendingNode = 131.789247;
-const neptuneStartpos = 48.01;              // Needs to be at 20h33m37.31 at start model
-const neptuneAngleCorrection = 2.407;        // To align the perihelion exactly
+const neptuneStartpos = 48.015;              // Needs to be at ~20h33m37.31 at start model
+const neptuneAngleCorrection = 2.391;        // To align the perihelion exactly. According to formula ~48.12699
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
@@ -164,8 +164,8 @@ const plutoInclination = 15.5541473;
 const plutoTilt = 57.47;
 const plutoLongitudePerihelion = 224.06676;
 const plutoAscendingNode = 110.30347;
-const plutoStartpos = 71.555;               // Needs to be at 16h44m09.67 at start model
-const plutoAngleCorrection = 0;             // To align the perihelion exactly
+const plutoStartpos = 71.555;                // Needs to be at ~16h44m09.67 at start model
+const plutoAngleCorrection = 2.468;          // To align the perihelion exactly. According to formula ~224.06676
 
 // Reference lenghts used as INPUT for Halleys
 const halleysSolarYearInput = 27618;
@@ -175,8 +175,8 @@ const halleysInclination = 0.7354155;
 const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 80;                 // Needs to be at 08h43m15.95 at start model
-const halleysAngleCorrection = 0;           // To align the perihelion exactly
+const halleysStartpos = 80;                  // Needs to be at ~08h43m15.95 at start model
+const halleysAngleCorrection = -0.701;       // To align the perihelion exactly. According to formula ~172.03304
 
 // Reference lenghts used as INPUT for Eros
 const erosSolarYearInput = 643.22295;
@@ -186,8 +186,8 @@ const erosInclination = 10.8290328658513;
 const erosTilt = 0;
 const erosLongitudePerihelion = 123.054362100533;
 const erosAscendingNode = 304.411578580454;
-const erosStartpos = 57.402;                // Needs to be at 20h37m49.52 at start model
-const erosAngleCorrection = 0;              // To align the perihelion exactly
+const erosStartpos = 57.402;                 // Needs to be at ~20h37m49.52 at start model
+const erosAngleCorrection = -2.202;          // To align the perihelion exactly. According to formula ~123.05436
 
 // Really fixed values
 const diameters = {
