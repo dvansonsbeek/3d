@@ -32,13 +32,19 @@ const startmodelJD = 2451717;
 // Start of the 3D model in Juliandate
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = 2.70500643551349;
-// Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + RA correction + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const earthtiltMean = 23.42707;                           // 3D model + formula BUT NEEDS TO BE FURTHER REFINED FOR CORRECT OBLIQUITY FORMULA VALUE. ALSO IMPACTS THE ORBITAL INCLINATION VALUE
-const earthinclinationMean = 1.49514052955444;            // Formula only
+const correctionDays = 0.20500643551349;
+// Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
+const correctionSun = -0.22;
+// Small correction in degrees because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
+const temperatureGraphMostLikely = 14.5;                  
+// 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
+const earthRAAngle = 1.12;                                
+// 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & tiltandinclinationAmplitude values.
+const earthtiltMean = 23.42723;                           // 3D model + formula BUT NEEDS TO BE FURTHER REFINED FOR 100% CORRECT OBLIQUITY FORMULA VALUE. ALSO IMPACTS THE ORBITAL INCLINATION VALUE
 const tiltandinclinationAmplitude = 0.564;                // 3D model + formula
-const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
-const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was 102.947
+const earthinclinationMean = 1.49514053;                  // Formula only
+const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricitySinusCorrection = 0.652;                // Formula only
 const mideccentricitypointAmplitude = 2.461586;           // Formula only
 const helionpointAmplitude = 11.2153826318;               // Formula only
@@ -48,9 +54,7 @@ const meansolaryearAmplitudeinDays = 0.0003806795;        // Formula only
 const meansolaryearAmplitude = 2.575;                     // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
-const earthRAAngle = 1.21;                                // 3D model = the only value which is very hard to derive
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
-const temperatureGraphMostLikely = 14.5;                  // 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 
 // Reference lenghts used as INPUT for the Sun
 const sunTilt = 7.155;
@@ -853,7 +857,7 @@ const barycenterPLANETS16 = {
 
 const sun = {
   name: "Sun",
-  startPos: 0,
+  startPos: correctionSun,
   speed: Math.PI*2,
   rotationSpeed: (Math.PI*2)/(1/(meansolaryearlengthinDays/moonTropicalMonth)),
   tilt: -7.155,
