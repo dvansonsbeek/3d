@@ -157,7 +157,15 @@ Each planet is structured like this:
   - Obliquity
   - Mid-eccentricity
   - Longitude of perihelion
-  - Solstice date (now J. Meeus formula)
+  - Solstice date (now J. Meeus formula which is only valid for dates close to current ~1000 years)
+    - Update:
+      - function solarLongitudeDeg(JD){
+      - function longitudeToDateTime(lonDeg, currentYear) {
+    - Remove:
+      - constant that are used in below functions:
+      - function lastPerihelionJD(JD) {
+      - function equationOfCentre(e, M) {
+      - function solarLongitudeDegLong(JD) {
 - Add an easter egg when reaching an perihelion 0 date (eg 14-12-1245)
 - Integrate with `WebXR` for VR solar system flythrough
 
@@ -171,6 +179,7 @@ Each planet is structured like this:
 - Add the correct orbits for all planets
   - Why Mercury and Venus can be added at 90 degrees ascending node?
   - Planet movements can be added more accurately
+  - Add more planets and objects (pluto, halleys, etc.)
 
 ---
 

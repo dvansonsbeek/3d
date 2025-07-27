@@ -7858,14 +7858,6 @@ function colorTemperature2rgb(kelvin) {
   return new THREE.Color(red / 255, green / 255, blue / 255);
 }
 
-function solarLongitudeDegMeeusLimited(JD) {
-  const Y = 2000 + (JD - 2451545.0) / 365.2422;   // civil year estimate
-  if (Y < -4000 || Y > 4000) {
-    return null;                                  // ← outside validity
-  }
-  return solarLongitudeDeg(JD);                   // ← your old routine
-}
-
 /* -----------------------------------------------------------------
    Ecliptic longitude ➜ calendar date *with time*  (±1 s accuracy)
    – uses the dateTimeToJulianDay() + dayToDateNew()
