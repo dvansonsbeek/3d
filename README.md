@@ -66,6 +66,15 @@ It's an interactive 3D visualization where the browser renders a miniature model
 
 At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.
 
+## 🕶 Startdate model
+
+- The startdate is set to 21-06-2000 12:00 UTC because:
+  - Close to actual June solstice (01:47 AM in the morning of 21 June)
+  - Earth axis is Pointing (close) to Polaris
+  - Close to J2000 values so we can check and compare all values
+
+---
+
 ## ✅ Core Architecture
 
 - **Supports:**  
@@ -133,13 +142,38 @@ Each planet is structured like this:
 
 ---
 
-## ✅ Suggestions for Next Steps
+## 🌟 Export function
 
-- 🌑 Technical improvements (can we prevent the camera swings when looking at the sun?)
-- 🌟 Visual improvements
-- 🖼 Export frames for video or screenshots
-- 🕶 Integrate with `WebXR` for VR solar system flythrough
+- Solstice dates and objects positions can be exported
 
-## Contact
+---
 
-For questions or support, please contact me at [info@holisticuniverse.com].
+## 🖼 Suggestions for additional features
+
+- When selecting another planet/ Sun, the stars & constellations also need to move to the "look at" point to prevent the camera is swinging around.
+- Show visible orbit of Earth around the Sun when Sun is selected as "look at".
+- Show the constellation the planet is in (based upon the RA values).
+- Create 100% correct formulas for:
+  - Obliquity
+  - Mid-eccentricity
+  - Longitude of perihelion
+  - Solstice date (now J. Meeus formula)
+- Add an easter egg when reaching an perihelion 0 date (eg 14-12-1245)
+- Integrate with `WebXR` for VR solar system flythrough
+
+---
+
+## 🌑 Order to get to the 100% correct 3D-model
+
+- Do we need to add eccentric orbit for the Sun to also the September/ March equinox and December solstice times are 100% correct (now only June solstice is 100% correct)
+- Agree the Sun's orbit seems correct (e.g. does the movement of earth around the EARTH-WOBBLE-CENTER also need an eliptic orbit?)
+- Add the correct orbits for the Moon
+- Add the correct orbits for all planets
+  - Why Mercury and Venus can be added at 90 degrees ascending node?
+  - Planet movements can be added more accurately
+
+---
+
+## ✅ Contact
+
+For questions about the model / you want to help developing this model further, please contact me at [info@holisticuniverse.com].
