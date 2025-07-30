@@ -1,4 +1,3 @@
-// time.ts
 const MS_PER_DAY = 86_400_000;
 const JD_UNIX_EPOCH = 2440587.5; // JD at 1970-01-01T00:00:00Z
 
