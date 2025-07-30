@@ -1,5 +1,5 @@
 // simTime.ts
-import { dateToJD, jdToDate } from './time';
+import { dateToJD, jdToDate } from 'https://github.com/dvansonsbeek/3d/tree/main/src/time';
 
 export interface StartOptions {
   iso?: string;      // e.g., "2000-06-21T02:00:00Z"
