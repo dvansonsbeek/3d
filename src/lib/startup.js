@@ -1,4 +1,3 @@
-// startup.ts
 import { SimTime } from './simTime.js';
 
 export function initSimTimeFromQuery(url: URL): SimTime {
