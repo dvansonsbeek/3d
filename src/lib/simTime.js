@@ -1,5 +1,5 @@
 // simTime.ts
-import { dateToJD, jdToDate } from './lib/time';
+import { dateToJD, jdToDate } from './lib/time.js';
 
 export interface StartOptions {
   iso?: string;      // e.g., "2000-06-21T02:00:00Z"
