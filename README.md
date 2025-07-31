@@ -68,7 +68,7 @@ At a basic level, it's like building a tiny universe in the browser, where JavaS
 
 ## 🕶 Startdate model
 
-- The startdate is set to 21-06-2000 12:00 UTC because:
+- The startdate is set to 21-06-2000 00:00 UTC because:
   - Close to actual June solstice (01:47 AM in the morning of 21 June)
   - Earth axis is Pointing (close) to Polaris
   - Close to J2000 values so we can check and compare all values
