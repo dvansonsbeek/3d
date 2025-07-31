@@ -28,19 +28,19 @@ const lengthsolaryearindaysin1246 = 31556929.19/86399.9913;
 // Reference length of solar year in days in 1246 AD according to formula  J. Laskar + predicted LOD due to historic Delta-T values = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
 // Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
-const startmodelJD = 2451717;
-// Start of the 3D model in Juliandate
+const startmodelJD = 2451716.5;
+// Start of the 3D model in Juliandate and dates start at 00:00 (so julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const startmodelYear = 2000.5;
 // Start of the 3D model in year
-const correctionDays = 0.20500643551349;
-// Small correction in days because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = -0.22;
-// Small correction in degrees because the startmodel on 21 june 12:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
+const correctionDays = -0.294993564486504;
+// Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
+const correctionSun = 0.28;
+// Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
 const temperatureGraphMostLikely = 14.5;                  
 // 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 const earthRAAngle = 1.12;                                
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & tiltandinclinationAmplitude values.
-const earthtiltMean = 23.42723;                           // 3D model + formula BUT NEEDS TO BE FURTHER REFINED FOR 100% CORRECT OBLIQUITY FORMULA VALUE. ALSO IMPACTS THE ORBITAL INCLINATION VALUE
+const earthtiltMean = 23.42723;                           // 3D model + formula
 const tiltandinclinationAmplitude = 0.564;                // 3D model + formula
 const earthinclinationMean = 1.49514053;                  // Formula only
 const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
@@ -73,7 +73,7 @@ const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
 const moonStartposApsidal = 330;             // Aligned with stellarium data.
 const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 126.19;             // Needs to be at ~21h31m22s at start model according to stellarium
+const moonStartposMoon = 132.105;             // Needs to be at ~21h09m57s if start model is 2451716.5
 
 // Reference lenghts used as INPUT for Mercury
 const mercurySolarYearInput = 87.96845;
@@ -83,7 +83,7 @@ const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4634482921134;
 const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 70.842;              // Needs to be at ~7h25m01.97 at start model
+const mercuryStartpos = 70.793;              // Needs to be at ~7h24m46.43 if start model is 2451716.5
 const mercuryAngleCorrection = 0.984;        // To align the perihelion exactly. According to formula ~77.46345
 
 // Reference lenghts used as INPUT for Venus
@@ -94,7 +94,7 @@ const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.570305875962;
 const venusAscendingNode = 75.684163;
-const venusStartpos = 117.528;               // Needs to be at ~6h13m49.46 at start model
+const venusStartpos = 118.017;               // Needs to be at ~6h11m08.61 if start model is 2451716.5
 const venusAngleCorrection = -2.783;         // To align the perihelion exactly. According to formula ~131.570306
 
 // Reference lenghts used as INPUT for Mars
@@ -105,7 +105,7 @@ const marsInclination = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.068903258872;
 const marsAscendingNode = 49.561729;
-const marsStartpos = 121.474;                // Needs to be at ~6h14m37.15 at start model
+const marsStartpos = 121.665;                // Needs to be at ~6h13m09.72 if start model is 2451716.5
 const marsAngleCorrection = -2.106;          // To align the perihelion exactly. According to formula ~336.06890
 
 // Reference lenghts used as INPUT for Jupiter
@@ -116,7 +116,7 @@ const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.867;              // Needs to be at ~3h44m14.54 at start model
+const jupiterStartpos = 13.906;              // Needs to be at ~3h43m48.25 if start model is 2451716.5
 const jupiterAngleCorrection = 1.069;        // To align the perihelion exactly. According to formula ~14.33880
 
 // Reference lenghts used as INPUT for Saturn
@@ -127,7 +127,7 @@ const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.42;                // Needs to be at ~3h35m02.7 at start model
+const saturnStartpos = 11.439;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
 const saturnAngleCorrection = -0.253;        // To align the perihelion exactly. According to formula ~93.06649
 
 // Reference lenghts used as INPUT for Uranus
@@ -138,7 +138,7 @@ const uranusInclination = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 173.01229057226;
 const uranusAscendingNode = 74.008411;
-const uranusStartpos = 44.85;                // Needs to be at ~21h32m40.12 at start model
+const uranusStartpos = 44.846;               // Needs to be at ~21h32m43.04 if start model is 2451716.5
 const uranusAngleCorrection = -0.576;        // To align the perihelion exactly. According to formula ~173.01229 
 
 // Reference lenghts used as INPUT for Neptune
@@ -149,7 +149,7 @@ const neptuneInclination = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 48.1269921140939;
 const neptuneAscendingNode = 131.789247;
-const neptuneStartpos = 48.015;              // Needs to be at ~20h33m37.31 at start model
+const neptuneStartpos = 48.011;              // Needs to be at ~20h33m40.34 if start model is 2451716.5
 const neptuneAngleCorrection = 2.391;        // To align the perihelion exactly. According to formula ~48.12699
 
 //*************************************************************
@@ -164,7 +164,7 @@ const plutoInclination = 15.5541473;
 const plutoTilt = 57.47;
 const plutoLongitudePerihelion = 224.06676;
 const plutoAscendingNode = 110.30347;
-const plutoStartpos = 71.555;                // Needs to be at ~16h44m09.67 at start model
+const plutoStartpos = 71.555;                // Needs to be at ~16h44m12.72 if start model is 2451716.5
 const plutoAngleCorrection = 2.468;          // To align the perihelion exactly. According to formula ~224.06676
 
 // Reference lenghts used as INPUT for Halleys
@@ -175,7 +175,7 @@ const halleysInclination = 0.7354155;
 const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 80;                  // Needs to be at ~08h43m15.95 at start model
+const halleysStartpos = 80;                  // Needs to be at ~08h43m12.79 if start model is 2451716.5
 const halleysAngleCorrection = -0.701;       // To align the perihelion exactly. According to formula ~172.03304
 
 // Reference lenghts used as INPUT for Eros
@@ -186,7 +186,7 @@ const erosInclination = 10.8290328658513;
 const erosTilt = 0;
 const erosLongitudePerihelion = 123.054362100533;
 const erosAscendingNode = 304.411578580454;
-const erosStartpos = 57.402;                 // Needs to be at ~20h37m49.52 at start model
+const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
 const erosAngleCorrection = -2.202;          // To align the perihelion exactly. According to formula ~123.05436
 
 // Really fixed values
@@ -2263,7 +2263,6 @@ let o = {
     controls.reset();
   },
 
-  Position: "", 
   Date: "",
   periheliondate: "",
   cSphereSize: 1,
@@ -3097,10 +3096,6 @@ const golden = goldenspiralPerihelionObjects(
 /*  CONSTANTS & UTILITIES                                             */
 /* ------------------------------------------------------------------ */
 
-/* anchor: 14 Dec 1245 (JD 2176142) when perihelion and December solstice
-   were aligned — here taken as M = 0° and ν = 0°                    */
-const PERI_ALIGN_JD = 2_176_142;
-
 /* wrap any real angle to 0 … 360° ---------------------------------- */
 const wrap360 = x => ((x % 360) + 360) % 360;
 
@@ -3585,7 +3580,6 @@ function render(now) {
   uiElapsed += delta;
   if (uiElapsed >= 0.05) {
     uiElapsed -= 0.05;
-    o.Position      = o.pos;
     o.Day           = posToDays(o.pos);
     o.Date          = daysToDate(o.Day);
     o.Time          = posToTime(o.pos);
@@ -3845,7 +3839,6 @@ function jumpToJulianDay (jd) {
 
 /* Force all the astro calculations that the render loop usually so RA & DEC are up-to-date. */
 function forceSceneUpdate () {
-  o.Position      = o.pos;
   o.Day           = posToDays(o.pos);
   o.Date          = daysToDate(o.Day);
   o.Time          = posToTime(o.pos);
@@ -4559,9 +4552,9 @@ const planetStats = {
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }]},
          
-      {label : () => `Date of Perihelion`,
+      {label : () => `Approximate Date of Perihelion`,
        value : [ { v: () => o.longitudePerihelionDatePer },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of Aphelion`,
+      {label : () => `Approximate Date of Aphelion`,
        value : [ { v: () => o.longitudePerihelionDateAp },{ small: 'D/M/Y, h:m:s' }]},
     null,
       { header : 'All date specific characteristics for ',  date   : () => o.Date } ,
@@ -4862,10 +4855,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.mercuryPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion+mercuryAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion+mercuryAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => mercuryAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -4932,10 +4925,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.venusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.venusPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.venusPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.venusPerihelion+venusAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.venusPerihelion+venusAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => venusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5003,10 +4996,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.marsPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.marsPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.marsPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.marsPerihelion+marsAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.marsPerihelion+marsAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.marsAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5074,10 +5067,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.jupiterPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion+jupiterAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion+jupiterAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.jupiterAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5145,10 +5138,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.saturnPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion+saturnAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion+saturnAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.saturnAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5216,10 +5209,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.uranusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion+uranusAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion+uranusAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.uranusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5287,10 +5280,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.neptunePerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion+neptuneAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion+neptuneAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.neptuneAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5357,10 +5350,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.plutoPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion+plutoAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion+plutoAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.plutoAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5427,10 +5420,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.halleysPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion+halleysAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion+halleysAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.halleysAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5497,10 +5490,10 @@ const planetStats = {
     null,
       {label : () => `Longitude of perihelion`,
        value : [ { v: () => o.erosPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Date of perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.erosPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
-      {label : () => `Date of aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.erosPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Perihelion`,
+       value : [ { v: () => longitudeToDateTime(o.erosPerihelion+erosAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+      {label : () => `Approximate Date of Aphelion`,
+       value : [ { v: () => longitudeToDateTime(o.erosPerihelion+erosAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
       {label : () => `Longitude of ascending node`,
        value : [ { v: () => o.erosAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
@@ -5674,7 +5667,7 @@ function updateDomLabel () {
         const d = (rawDate instanceof Date)      ? rawDate :
                   (typeof rawDate === 'number')  ? new Date(rawDate) :
                   (typeof rawDate === 'string' && /[/-]/.test(rawDate))
-                                                  ? new Date(...rawDate.split(/[/-]/).map((p,i)=> i? p-1:p))
+                                                  ? new Date(...rawDate.split(/[/-]/).map((p,i)=> i === 1 ? p-1 : p))
                                                   : new Date(rawDate);
         dateStr = (!isNaN(d)) ? d.toLocaleDateString('en-GB') : String(rawDate);
       }
@@ -6358,16 +6351,14 @@ function addPolarGridHelper(inplanet, planetSize = 10) {
 }
 
 function posToDays(pos) {
-  pos += sHour*12 //Set the clock to twelve for pos 0
-	return Math.floor(pos/sDay)
+  return Math.floor(pos / sDay);  // REMOVE +12h shift
 }
 
 function posToTime(pos) {
-  pos += sHour*12 //Set the clock to twelve for pos 0
-	let days = pos/sDay - Math.floor(pos/sDay)
-  let hours = Math.floor(days*24);
-  let minutes = Math.floor((days*24 - hours) * 60);
-  let seconds = Math.round(((days*24 - hours) * 60 - minutes) * 60);
+  let days = pos / sDay - Math.floor(pos / sDay);
+  let hours = Math.floor(days * 24);
+  let minutes = Math.floor((days * 24 - hours) * 60);
+  let seconds = Math.round(((days * 24 - hours) * 60 - minutes) * 60);
 
   if (seconds === 60) {
     seconds = 0;
@@ -6388,8 +6379,8 @@ function posToTime(pos) {
 
 function timeToPos(value) {
   let aTime = value.split(":");
-  let pos = aTime[0] * sHour + aTime[1] * sMinute + aTime[2] * sSecond
-  return pos-= sHour*12 //Set the clock to tweleve for pos 0
+  let pos = aTime[0] * sHour + aTime[1] * sMinute + aTime[2] * sSecond;
+  return pos;
 }
 
 /**
@@ -6708,8 +6699,8 @@ function goldenspiralPerihelionObjects(...args) {
  */
 function lastPerihelionJD(JD) {
   const siderealDays = o.lengthofsiderealYear / o.lengthofDay;   // days
-  const cycles       = Math.floor((JD - PERI_ALIGN_JD) / siderealDays);
-  return PERI_ALIGN_JD + cycles * siderealDays;
+  const cycles       = Math.floor((JD - perihelionalignmentJD) / siderealDays);
+  return perihelionalignmentJD + cycles * siderealDays;
 }
 
 /* ------------------------------------------------------------------ */
@@ -6879,8 +6870,8 @@ function updatePredictions() {
   predictions.inclinationEarth = o.inclinationEarth = computeInclinationEarth(o.currentYear, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
   predictions.longitudePerihelion = o.longitudePerihelion = computeLongitudePerihelion(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, mideccentricitypointAmplitude); // better to use ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360) because this is just a rough estimate formula
   
-  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-180), o.currentYear)
-  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360), o.currentYear)
+  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)-earthRAAngle-180), o.currentYear)
+  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
   
   predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
   //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
@@ -7915,7 +7906,7 @@ function longitudeToDateTime(lonDeg, currentYear) {
   let JD = dateTimeToJulianDay(`${yr}-01-01`, '00:00:00') + doy;
 
   /* 5 — Newton iterations to refine JD to the exact longitude ---------- */
-  const dλdT = 0.98564736;                     // mean solar motion °/day
+  const dλdT = 360/meansolaryearlengthinDays;                     // mean solar motion °/day
   for (let k = 0; k < 8; k++) {
     const λ = solarLongitudeDeg(JD);
     if (λ === null) return "no formula";
@@ -8431,11 +8422,11 @@ function dayToDate(jd) {
   const month = (E < 14) ? E - 1 : E - 13;
   const year = (month > 2) ? C - 4716 : C - 4715;
 
-  if (year <= 0) {
-    console.warn(
-      `dayToDate: resulting year is ${year} (astronomical numbering; year 0 = 1 BC).`
-    );
-  }
+  //if (year <= 0) {
+  //  console.warn(
+  //    `dayToDate: resulting year is ${year} (astronomical numbering; year 0 = 1 BC).`
+  //  );
+  // }
 
   // convert fractional day to H:M:S
   let hours   = Math.floor(fracDay * 24);
@@ -8862,104 +8853,165 @@ function dateToPerihelionJulianDay(dateStr, timeStr) {
 // Date functions
 //*************************************************************
 
-function dateToDays(sDate) {
-  // Calculates number of days since 2000-06-21
-  // Handles Julian and Gregorian calendar dates, including BC dates (astronomical numbering)
-  
-  const GREGORIAN_START = { year: 1582, month: 10, day: 15 };
-  const GREGORIAN_REFERENCE_DAY = 730597; // days since 0 AD to 2000-06-21 (Gregorian)
-
-  if (typeof sDate !== 'string') {
-    console.error('safeDateToDays expected a string but got', typeof sDate);
-    return NaN;
-  }
-
-  let aDate = sDate.split("-");
-  let y, m, d;
-
-  if (sDate.startsWith("-")) {
-    // BC date using astronomical numbering
-    y = -Number(aDate[1]);
-    m = Number(aDate[2]);
-    d = Number(aDate[3]);
-  } else {
-    y = Number(aDate[0]);
-    m = Number(aDate[1]);
-    d = Number(aDate[2]);
-  }
-
-  if (isNaN(y) || isNaN(m) || isNaN(d)) {
-    console.error('Invalid date format:', sDate);
-    return NaN;
-  }
-
-  // Decide calendar: Julian or Gregorian?
-  let useJulian = false;
-  if (y < GREGORIAN_START.year) useJulian = true;
-  if (y === GREGORIAN_START.year && m < GREGORIAN_START.month) useJulian = true;
-  if (y === GREGORIAN_START.year && m === GREGORIAN_START.month && d < GREGORIAN_START.day) useJulian = true;
-
-  if (useJulian) {
-    // Julian calendar calculation
-    if (m < 3) {
-      m += 12;
-      y -= 1;
-    }
-    let jd = Math.trunc(365.25 * (y + 4716)) +
-             Math.trunc(30.6001 * (m + 1)) +
-             d - 1524;
-    return jd - startmodelJD;
-  } else {
-    // Gregorian calendar calculation
-    m = (m + 9) % 12;
-    y = y - Math.floor(m / 10);
-
-    let days =
-      365 * y +
-      Math.floor(y / 4) -
-      Math.floor(y / 100) +
-      Math.floor(y / 400) +
-      Math.floor((m * 306 + 5) / 10) +
-      (d - 1);
-
-    return days - GREGORIAN_REFERENCE_DAY;
-  }
+// --- REQUIREMENT: a global startmodelJD must already exist and be finite (may be fractional)
+if (!(typeof startmodelJD === 'number' && isFinite(startmodelJD))) {
+  throw new TypeError(`Expected global startmodelJD as a finite number, got ${startmodelJD}`);
 }
 
-function daysToDate(g) {
-  if (g < -152556) return julianCalDayToDate(g); //Julian dates earlier than 1582-10-15
-  g += 730597;
-  let y = Math.floor((10000*g + 14780)/3652425);
-  let ddd = g - (365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400));
-  if (ddd < 0) {
-    y = y - 1
-    ddd = g - (365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400));
-  };
-  let mi = Math.floor((100*ddd + 52)/3060);
-  let mm = (mi + 2)%12 + 1
-  y = y + Math.floor((mi + 2)/12);
-  let dd = ddd - Math.floor((mi*306 + 5)/10) + 1
-  
-  mm = ("0" + mm).slice(-2);
-  dd = ("0" + dd).slice(-2);
-  
-  return y + "-" + mm + "-" + dd;
-};
+// -------------------------
+// JDN <-> calendar helpers
+// -------------------------
 
-function julianCalDayToDate(g) {
-  var jDay = g + 2451717 //+ 10;
-  var z = Math.floor(jDay - 1721116.5);
-  var r = jDay - 1721116.5 - z;
-  var year = Math.floor((z - 0.25) / 365.25);
-  var c = z - Math.floor(365.25 * year);
-  var month = Math.trunc((5 * c + 456) / 153);
-  var day = c - Math.trunc((153 * month - 457) / 5) + r - 0.5;
-  if (month > 12) {
-  	year = year + 1;
-    month = month -12;
+// JDN from a Gregorian date (astronomical year numbering: year 0 allowed)
+function jdnFromGregorian(y, m, d) {
+  const a  = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12*a - 3;
+  return d + Math.floor((153*m2 + 2)/5) + 365*y2 + Math.floor(y2/4)
+       - Math.floor(y2/100) + Math.floor(y2/400) - 32045;
+}
+
+// JDN from a Julian date
+function jdnFromJulian(y, m, d) {
+  const a  = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12*a - 3;
+  return d + Math.floor((153*m2 + 2)/5) + 365*y2 + Math.floor(y2/4) - 32083;
+}
+
+// Gregorian date from integer JDN
+function gregorianFromJdn(J) {
+  const a = J + 32044;
+  const b = Math.floor((4*a + 3) / 146097);
+  const c = a - Math.floor(146097*b / 4);
+  const d = Math.floor((4*c + 3) / 1461);
+  const e = c - Math.floor(1461*d / 4);
+  const m = Math.floor((5*e + 2) / 153);
+  const day = e - Math.floor((153*m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = b*100 + d - 4800 + Math.floor(m / 10);
+  return { y: year, m: month, d: day };
+}
+
+// Julian date from integer JDN
+function julianFromJdn(J) {
+  const c = J + 32082;
+  const d = Math.floor((4*c + 3) / 1461);
+  const e = c - Math.floor(1461*d / 4);
+  const m = Math.floor((5*e + 2) / 153);
+  const day = e - Math.floor((153*m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = d - 4800 + Math.floor(m / 10);
+  return { y: year, m: month, d: day };
+}
+
+// Gregorian reform switch (first Gregorian civil date = 1582-10-15)
+const GREG_START_JDN = jdnFromGregorian(1582, 10, 15);
+
+// --------------------
+// Parsing & utilities
+// --------------------
+function pad2(n) { return String(n).padStart(2, "0"); }
+
+// Civil-date check (ignores any fractional day)
+function isJulianDate(y, m, d) {
+  return (y < 1582) || (y === 1582 && (m < 10 || (m === 10 && d < 15)));
+}
+
+// Accepts "YYYY-MM-DD" or "YYYY-MM-DD.f" (and "-YYYY-...").
+// Returns { y, m, dInt, frac } with 0 ≤ frac < 1 (fraction of day since MIDNIGHT).
+function parseYMDAllowingFraction(sDate) {
+  if (typeof sDate !== 'string') {
+    throw new TypeError(`Invalid date "${sDate}". Expected "YYYY-MM-DD" or "-YYYY-MM-DD".`);
   }
-  month = ("0" + month).slice(-2);
-  day = ("0" + day).slice(-2);
-  // if (year <= 0) year -= 1;
-  return year + "-" + month + "-" + day
-};
+
+  const parts = sDate.split("-");
+  let y, m, dStr;
+
+  if (sDate.startsWith("-")) {
+    if (parts.length !== 4) {
+      throw new TypeError(`Invalid date "${sDate}". Expected "-YYYY-MM-DD" or "-YYYY-MM-DD.f".`);
+    }
+    y = -Number(parts[1]);
+    m = Number(parts[2]);
+    dStr = parts[3];
+  } else {
+    if (parts.length !== 3) {
+      throw new TypeError(`Invalid date "${sDate}". Expected "YYYY-MM-DD" or "YYYY-MM-DD.f".`);
+    }
+    y = Number(parts[0]);
+    m = Number(parts[1]);
+    dStr = parts[2];
+  }
+
+  const dFloat = Number(dStr);
+  if (![y, m, dFloat].every(Number.isFinite)) {
+    throw new TypeError(`Invalid date "${sDate}". Expected "YYYY-MM-DD" or "-YYYY-MM-DD".`);
+  }
+  if (m < 1 || m > 12) {
+    throw new TypeError(`Invalid date "${sDate}". Month must be 1–12.`);
+  }
+
+  const dInt = Math.floor(dFloat);
+  const frac = dFloat - dInt;
+  if (dInt < 1 || dInt > 31 || frac < 0 || frac >= 1) {
+    throw new TypeError(`Invalid date "${sDate}". Day must be 1–31 (fractional part 0 ≤ f < 1).`);
+  }
+
+  return { y, m, dInt, frac };
+}
+
+// ------------------------------------------------------
+// Public helpers (drop-in): handle fractional days too
+// ------------------------------------------------------
+
+// Convert "YYYY-MM-DD" or "...-DD.f" to (possibly fractional) days since startmodelJD
+function dateToDays(sDate) {
+  const { y, m, dInt, frac } = parseYMDAllowingFraction(sDate);
+
+  // Calendar selection based on civil date (ignore time-of-day)
+  const useJulian = isJulianDate(y, m, dInt);
+  const baseJDN = useJulian ? jdnFromJulian(y, m, dInt) : jdnFromGregorian(y, m, dInt);
+
+  // JD convention: integer boundary at NOON; fraction is measured from MIDNIGHT.
+  // So JD = baseJDN + (frac - 0.5).
+  const JD = baseJDN + (frac - 0.5);
+
+  return JD - startmodelJD;  // startmodelJD may be fractional
+}
+
+// Convert (possibly fractional) days since startmodelJD to a civil date (no fraction)
+function daysToDate(g) {
+  if (!Number.isFinite(g)) {
+    throw new TypeError(`daysToDate expected a finite number but got ${g}`);
+  }
+
+  const JD = startmodelJD + g;
+  const JDNint = Math.floor(JD + 0.5);   // map JD (noon-based) to civil day
+
+  const useJulian = JDNint < GREG_START_JDN;
+  const { y, m, d } = useJulian ? julianFromJdn(JDNint) : gregorianFromJdn(JDNint);
+  return `${y}-${pad2(m)}-${pad2(d)}`;
+}
+
+// Same as above, but include the fractional day in the last field for display
+function daysToDateWithFraction(g, precision = 9) {
+  const JD = startmodelJD + g;
+  const JDNint = Math.floor(JD + 0.5);
+  const fracFromMidnight = JD - (JDNint - 0.5);  // ∈ [0,1)
+
+  const useJulian = JDNint < GREG_START_JDN;
+  const { y, m, d } = useJulian ? julianFromJdn(JDNint) : gregorianFromJdn(JDNint);
+
+  const dayWithFrac = (d + fracFromMidnight).toFixed(precision)
+    .replace(/0+$/,'').replace(/\.$/,'');
+  return `${y}-${pad2(m)}-${dayWithFrac}`;
+}
+
+// Keep this name if other code calls it; returns a Julian-calendar date (no fraction)
+function julianCalDayToDate(g) {
+  const JD = startmodelJD + g;
+  const JDNint = Math.floor(JD + 0.5);
+  const { y, m, d } = julianFromJdn(JDNint);
+  return `${y}-${pad2(m)}-${pad2(d)}`;
+} 
