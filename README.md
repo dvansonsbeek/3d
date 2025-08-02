@@ -2,11 +2,6 @@
 
 ![ss](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
-NO AI TRAINING on this Interactive 3D Solar System Simulation of the Holistic Universe Model unless explicitly authorized by D. van Sonsbeek.
-
-Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
-The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.
-
 ============
 
 The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years. 
@@ -66,7 +61,7 @@ It's an interactive 3D visualization where the browser renders a miniature model
 
 At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.
 
-## 🕶 Startdate model
+## 🚀 Startdate model
 
 - The startdate is set to 21-06-2000 00:00 UTC because:
   - Close to actual June solstice (01:47 AM in the morning of 21 June)
@@ -75,7 +70,7 @@ At a basic level, it's like building a tiny universe in the browser, where JavaS
 
 ---
 
-## ✅ Core Architecture
+## 🏛️ Core Architecture
 
 - **Supports:**  
   - Planet tilts and custom orbit inclinations  
@@ -142,13 +137,13 @@ Each planet is structured like this:
 
 ---
 
-## 🌟 Export function
+## 💾 Export function
 
 - Solstice dates and objects positions can be exported
 
 ---
 
-## 🖼 Suggestions for additional features
+## 🔜 Suggestions for additional features
 
 - When selecting another planet/ Sun, the stars & constellations also need to move to the "look at" point to prevent the camera is swinging around.
 - Show visible orbit of Earth around the Sun when Sun is selected as "look at".
@@ -171,7 +166,7 @@ Each planet is structured like this:
 
 ---
 
-## 🌑 Order to get to the 100% correct 3D-model
+## ➡️ Next steps
 
 - Do we need to add eccentric orbit for the Sun to also the September/ March equinox and December solstice times are 100% correct (now only June solstice is 100% correct)
 - Agree the Sun's orbit seems correct (e.g. does the movement of earth around the EARTH-WOBBLE-CENTER also need an eliptic orbit?)
@@ -183,6 +178,21 @@ Each planet is structured like this:
 
 ---
 
-## ✅ Contact
+## ⭐ Credits
+
+- Three.js: https://github.com/paulmasson/threejs-with-controls
+- Tychosium: https://codepen.io/pholmq/pen/XGPrPd
+- Textures: https://www.solarsystemscope.com/textures/
+- Stars: https://github.com/brettonw/YaleBrightStarCatalog
+
+---
+
+## 🧾 Licence
+
+This software is licensed under the GNU General Public License (GPL-3.0). For more information, visit <https://www.gnu.org/licenses/>.
+
+---
+
+## 📩 Contact
 
 For questions about the model / you want to help developing this model further, please contact me at [info@holisticuniverse.com].

@@ -4,16 +4,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import * as dat from 'dat.gui';
 
-/*NO AI TRAINING on this Interactive 3D Solar System Simulation of the Holistic Universe Model unless explicitly authorized by D. van Sonsbeek.
+/*This software is licensed under the GNU General Public License (GPL-3.0). For more information, visit <https://www.gnu.org/licenses/>.
 
-Without in any way limiting the author’s [and publisher’s] exclusive rights under copyright, any use of this publication to “train” generative artificial intelligence (AI) technologies to generate text is expressly prohibited.
-The author reserves all rights to license usage of this work for generative AI training and development of machine learning language models.*/
+The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years.
 
-/* The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years.*/
+Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with ~10 parameters per planet/moon our complete solar system appears.
 
-//Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with 10 parameters per planet/moon our complete solar system appears.
-
-//See https://www.holisticuniverse.com/en & https://github.com/dvansonsbeek/3d
+For more information, see https://www.holisticuniverse.com */
 
 //*************************************************************
 // ALL INPUT CONSTANTS
@@ -21,23 +18,25 @@ The author reserves all rights to license usage of this work for generative AI t
 const holisticyearLength = 298176;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
-// Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
+// Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
 const perihelionalignmentJD = 2176142;
-// Last AD YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
+// Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const lengthsolaryearindaysin1246 = 31556929.19/86399.9913;
 // Reference length of solar year in days in 1246 AD according to formula  J. Laskar + predicted LOD due to historic Delta-T values = ~MEAN
 const meansiderealyearlengthinSeconds = 31558149.6846777;
 // Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
 const startmodelJD = 2451716.5;
-// Start of the 3D model in Juliandate and dates start at 00:00 (so julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
+// By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const startmodelYear = 2000.5;
-// Start of the 3D model in year
+// By default the model is pointing to the June Solstice in year 2000. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
+const whichSolsticeOrEquinox = 1;
+// By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.294993564486504;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
 const correctionSun = 0.28;
 // Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
 const temperatureGraphMostLikely = 14.5;                  
-// 3D model. Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
+// 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make tiltandinclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 const earthRAAngle = 1.12;                                
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & tiltandinclinationAmplitude values.
 const earthtiltMean = 23.42723;                           // 3D model + formula
@@ -2669,11 +2668,12 @@ erosPerihelionFromEarth.pivotObj.add(erosbarycenterPLANETS.containerObj);
 erosbarycenterPLANETS.pivotObj.add(erosPerihelionFromSun.containerObj);
 erosPerihelionFromSun.pivotObj.add(eros.containerObj);
 
-// The model starts on 21 june and not at 0 degrees (equinox) so we need to turn it 90 degrees
+// The model starts on 21 june and not at 0 degrees (March equinox) so we need to turn it 90 degrees
 // Why 21 june 2000?
 // a) We need a solstice date
 // b) We need to be able to point to polaris + pointing to the EARTH-WOBBLE-CENTER at RA 6h
-earth.containerObj.rotation.y = Math.PI/2;
+// c) Close to J2000 values so we can check and compare all values
+earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
 //END CREATE AND CONFIGURE PLANETS
 
 //*************************************************************
