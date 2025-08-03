@@ -2,8 +2,6 @@
 
 ![ss](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
-============
-
 The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years. 
 
 The way it is modelled:
@@ -61,8 +59,11 @@ It's an interactive 3D visualization where the browser renders a miniature model
 
 At a basic level, it's like building a tiny universe in the browser, where JavaScript, math (especially trigonometry), and 3D graphics all work together.
 
-## 🚀 Startdate model
+---
 
+## 🚀 Basics
+
+- Uses a teaching/visualization scale: 1 AU = 100 units; 1 solar year = 2π (the fundamental time angle). All other motions are expressed relative to these bases.
 - The startdate is set to 21-06-2000 00:00 UTC because:
   - Close to actual June solstice (01:47 AM in the morning of 21 June)
   - Earth axis is Pointing (close) to Polaris
