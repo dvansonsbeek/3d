@@ -82,7 +82,8 @@ const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4634482921134;
 const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 70.793;              // Needs to be at ~7h24m46.43 if start model is 2451716.5
+const mercuryStartpos = 71.876;              // Needs to be at ~7h24m46.43 if start model is 2451716.5
+const mercuryPerihelionStartPos = 1.2;       // Can be used to align the transits/ occultations more exactly
 const mercuryAngleCorrection = 0.984;        // To align the perihelion exactly. According to formula ~77.46345
 
 // Reference lenghts used as INPUT for Venus
@@ -93,7 +94,8 @@ const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.570305875962;
 const venusAscendingNode = 75.684163;
-const venusStartpos = 118.017;               // Needs to be at ~6h11m08.61 if start model is 2451716.5
+const venusStartpos = 117.62;               // Needs to be at ~6h11m08.61 if start model is 2451716.5
+const venusPerihelionStartPos = 0.5;         // Can be used to align the transits/ occultations more exactly
 const venusAngleCorrection = -2.783;         // To align the perihelion exactly. According to formula ~131.570306
 
 // Reference lenghts used as INPUT for Mars
@@ -105,6 +107,7 @@ const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.068903258872;
 const marsAscendingNode = 49.561729;
 const marsStartpos = 121.665;                // Needs to be at ~6h13m09.72 if start model is 2451716.5
+const marsPerihelionStartPos = 0;            // Can be used to align the transits/ occultations more exactly
 const marsAngleCorrection = -2.106;          // To align the perihelion exactly. According to formula ~336.06890
 
 // Reference lenghts used as INPUT for Jupiter
@@ -116,6 +119,7 @@ const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.3388009380591;
 const jupiterAscendingNode = 100.469215;
 const jupiterStartpos = 13.906;              // Needs to be at ~3h43m48.25 if start model is 2451716.5
+const jupiterPerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
 const jupiterAngleCorrection = 1.069;        // To align the perihelion exactly. According to formula ~14.33880
 
 // Reference lenghts used as INPUT for Saturn
@@ -127,6 +131,7 @@ const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 93.0664850365646;
 const saturnAscendingNode = 113.669633;
 const saturnStartpos = 11.439;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
+const saturnPerihelionStartPos = 0;          // Can be used to align the transits/ occultations more exactly
 const saturnAngleCorrection = -0.253;        // To align the perihelion exactly. According to formula ~93.06649
 
 // Reference lenghts used as INPUT for Uranus
@@ -138,6 +143,7 @@ const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 173.01229057226;
 const uranusAscendingNode = 74.008411;
 const uranusStartpos = 44.846;               // Needs to be at ~21h32m43.04 if start model is 2451716.5
+const uranusPerihelionStartPos = 0;          // Can be used to align the transits/ occultations more exactly
 const uranusAngleCorrection = -0.576;        // To align the perihelion exactly. According to formula ~173.01229 
 
 // Reference lenghts used as INPUT for Neptune
@@ -149,6 +155,7 @@ const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 48.1269921140939;
 const neptuneAscendingNode = 131.789247;
 const neptuneStartpos = 48.011;              // Needs to be at ~20h33m40.34 if start model is 2451716.5
+const neptunePerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
 const neptuneAngleCorrection = 2.391;        // To align the perihelion exactly. According to formula ~48.12699
 
 //*************************************************************
@@ -164,6 +171,7 @@ const plutoTilt = 57.47;
 const plutoLongitudePerihelion = 224.06676;
 const plutoAscendingNode = 110.30347;
 const plutoStartpos = 71.555;                // Needs to be at ~16h44m12.72 if start model is 2451716.5
+const plutoPerihelionStartPos = 0;           // Can be used to align the transits/ occultations more exactly
 const plutoAngleCorrection = 2.468;          // To align the perihelion exactly. According to formula ~224.06676
 
 // Reference lenghts used as INPUT for Halleys
@@ -175,6 +183,7 @@ const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
 const halleysStartpos = 80;                  // Needs to be at ~08h43m12.79 if start model is 2451716.5
+const halleysPerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
 const halleysAngleCorrection = -0.701;       // To align the perihelion exactly. According to formula ~172.03304
 
 // Reference lenghts used as INPUT for Eros
@@ -186,6 +195,7 @@ const erosTilt = 0;
 const erosLongitudePerihelion = 123.054362100533;
 const erosAscendingNode = 304.411578580454;
 const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
+const erosPerihelionStartPos = 0;            // Can be used to align the transits/ occultations more exactly
 const erosAngleCorrection = -2.202;          // To align the perihelion exactly. According to formula ~123.05436
 
 // Really fixed values
@@ -1018,7 +1028,7 @@ const moon = {
 
 const mercuryPerihelionFromEarth = {
   name: "PERIHELION MERCURY",
-  startPos: 0,    
+  startPos: mercuryPerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1116,7 +1126,7 @@ const mercury = {
 
 const venusPerihelionFromEarth = {
   name: "PERIHELION VENUS",
-  startPos: 0, 
+  startPos: venusPerihelionStartPos, 
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1214,7 +1224,7 @@ const venus = {
 
 const marsPerihelionFromEarth = {
   name: "PERIHELION MARS",
-  startPos: 0,    
+  startPos: marsPerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1312,7 +1322,7 @@ const mars = {
 
 const jupiterPerihelionFromEarth = {
   name: "PERIHELION JUPITER",
-  startPos: 0,
+  startPos: jupiterPerihelionStartPos,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1415,7 +1425,7 @@ const jupiter = {
 
 const saturnPerihelionFromEarth = {
   name: "PERIHELION SATURN",
-  startPos: 0,
+  startPos: saturnPerihelionStartPos,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1518,7 +1528,7 @@ const saturn = {
 
 const uranusPerihelionFromEarth = {
   name: "PERIHELION URANUS",
-  startPos: 0,    
+  startPos: uranusPerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1621,7 +1631,7 @@ const uranus = {
 
 const neptunePerihelionFromEarth = {
   name: "PERIHELION NEPTUNE",
-  startPos: 0,    
+  startPos: neptunePerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1729,7 +1739,7 @@ const neptune = {
 
 const plutoPerihelionFromEarth = {
   name: "PERIHELION PLUTO",
-  startPos: 0,    
+  startPos: plutoPerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1827,7 +1837,7 @@ const pluto = {
 
 const halleysPerihelionFromEarth = {
   name: "PERIHELION HALLEYS",
-  startPos: 0,    
+  startPos: halleysPerihelionStartPos,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1927,7 +1937,7 @@ const halleys = {
 
 const erosPerihelionFromEarth = {
   name: "PERIHELION EROS",
-  startPos: 0,
+  startPos: erosPerihelionStartPos,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
