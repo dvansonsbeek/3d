@@ -426,7 +426,7 @@ const renderVal = val => {
 const planetMeta = {
   earth : {
     intro : 'Earth is the third planet from the Sun and is the largest of the terrestrial planets. It is the only planet in our solar system not to be named after a Greek or Roman deity. The Earth was formed approximately ~4.5 billion years ago and is the only known planet to support life. It has a significant atmosphere, active geology, and a large moon, distinguished by its vast oceans of liquid water and diverse ecosystems that make it unique in the Solar System.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
+    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth_OLD.jpg',
     imgRatio : 35 / 9
   },
   sun  : {
