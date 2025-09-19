@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Three.js r175 app with stats, dat.gui & OrbitControls",
   "scripts": {
-    "start": "parcel index.html --open",
-    "build": "parcel build index.html --dist-dir dist"
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html --dist-dir dist"
   },
   "dependencies": {
     "three": "^0.175.0",
@@ -14,8 +14,7 @@
     "parcel": "^2.9.0",
 
     "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.24.0",
-    "@babel/plugin-proposal-optional-chaining": "^7.24.0"
+    "@babel/preset-env": "^7.24.0"
   },
 
   "browserslist": [
