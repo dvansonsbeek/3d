@@ -1,25 +1,19 @@
 {
   "name": "threejs-r175-app",
   "version": "1.0.0",
-  "description": "Three.js r175 app with stats, dat.gui & OrbitControls",
   "scripts": {
-    "start": "parcel src/index.html --open",
+    "start": "parcel src/index.html",
+    "dev": "parcel src/index.html",
     "build": "parcel build src/index.html --dist-dir dist"
   },
   "dependencies": {
-    "three": "^0.175.0",
-    "dat.gui": "^0.7.9"
+    "dat.gui": "^0.7.9",
+    "three": "^0.175.0"
   },
   "devDependencies": {
-    "parcel": "^2.9.0",
-
     "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.24.0"
-  },
-
-  "browserslist": [
-    ">0.25%",
-    "not dead"
-  ]
+    "@babel/preset-env": "^7.24.0",
+    "baseline-browser-mapping": "^2.9.7",
+    "parcel": "^2.16.3"
+  }
 }
-

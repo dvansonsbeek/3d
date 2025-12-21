@@ -6,3 +6,9 @@ dist/
 
 # parcel cache
 .parcel-cache/
+
+# excluded folders
+.bmad-core/
+.claude/
+docs/hidden/
+web-bundles/

@@ -10,7 +10,7 @@ The Interactive 3D Solar System Simulation shows the precession / eccentricity /
 
 Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with ~10 parameters per planet/moon our complete solar system appears.
 
-For more information, see https://www.holisticuniverse.com */
+For more information, see https://holisticuniverse.com */
 
 //*************************************************************
 // ALL INPUT CONSTANTS
@@ -54,15 +54,18 @@ const meansolaryearAmplitude = 2.575;                     // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedofSuninKM = 107225.047767317;                  // Formula only
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
+const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
+const earthPerihelionEclipticYears = holisticyearLength/3;// Duration of Earth's orbital plane precession ~99,392 years against ICRF
+const inclinationPathZodiacOffsetDeg = 7;                 // Visual calibration offset for inclination path alignment with zodiac. Shifts the path 7° counterclockwise so lowest inclination appears in early Libra
 
-// Reference lenghts used as INPUT for the Sun
+// Reference lengths used as INPUT for the Sun
 const sunTilt = 7.155;
 const milkywayDistance = 27500;
 const sunSpeed = 828000;
 const greatattractorDistance = 200000000;
 const milkywaySpeed = 2160000;
 
-// Reference lenghts used as INPUT for the Moon 
+// Reference lengths used as INPUT for the Moon 
 const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
@@ -72,109 +75,125 @@ const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
 const moonStartposApsidal = 330;             // Aligned with stellarium data.
 const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 132.105;             // Needs to be at ~21h09m57s if start model is 2451716.5
+const moonStartposMoon = 132.105;            // Needs to be at ~21h09m57s if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Mercury
+// Reference lengths used as INPUT for Mercury
 const mercurySolarYearInput = 87.96845;
-const mercuryOrbitalInclination =  7.004995;
-const mercuryOrbitalEccentricity = 0.205632;
+const mercuryOrbitalInclination =  7.00501638;
+const mercuryOrbitalEccentricity = 0.20562928;
 const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
-const mercuryLongitudePerihelion = 77.4634482921134;
-const mercuryAscendingNode = 48.336479;
-const mercuryStartpos = 71.876;              // Needs to be at ~7h24m46.43 if start model is 2451716.5
-const mercuryPerihelionStartPos = 1.2;       // Can be used to align the transits/ occultations more exactly
-const mercuryAngleCorrection = 0.984;        // To align the perihelion exactly. According to formula ~77.46345
+const mercuryLongitudePerihelion = 77.4569131;
+const mercuryAscendingNode = 48.33033155;
+const mercuryMeanAnomaly = 156.6364301;
+const mercuryTrueAnomaly = 164.1669319;
+const mercuryAngleCorrection = 0.984431;     // To align the perihelion exactly. According to formula ~77.4569131
+const mercuryPerihelionEclipticYears = 243460; // Duration of perihelion precession to explain ~570 arcseconds per century
+const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Venus
+// Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.6957;
-const venusOrbitalInclination = 3.394667;
-const venusOrbitalEccentricity = 0.006772;
+const venusOrbitalInclination = 3.3946018;
+const venusOrbitalEccentricity = 0.00674819;
 const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
-const venusLongitudePerihelion = 131.570305875962;
-const venusAscendingNode = 75.684163;
-const venusStartpos = 117.62;               // Needs to be at ~6h11m08.61 if start model is 2451716.5
-const venusPerihelionStartPos = 0.5;         // Can be used to align the transits/ occultations more exactly
-const venusAngleCorrection = -2.783;         // To align the perihelion exactly. According to formula ~131.570306
+const venusLongitudePerihelion = 131.5765919;
+const venusAscendingNode = 76.67877109;
+const venusMeanAnomaly = 324.9668371;
+const venusTrueAnomaly = 324.5198504;
+const venusAngleCorrection = -2.78364;       // To align the perihelion exactly. According to formula ~131.5765919
+const venusPerihelionEclipticYears = holisticyearLength*20000000; // Duration of perihelion precession to explain ~200 arcseconds per century
+const venusStartpos = 249.68;                // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
-// Reference lenghts used as INPUT for Mars
+// Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.937;
-const marsOrbitalInclination = 1.849723;
-const marsOrbitalEccentricity = 0.093401;
+const marsOrbitalInclination = 1.84971028;
+const marsOrbitalEccentricity = 0.09344726;
 const marsInclination = 1.6311858;
 const marsTilt = 25.19;
-const marsLongitudePerihelion = 336.068903258872;
-const marsAscendingNode = 49.561729;
-const marsStartpos = 121.665;                // Needs to be at ~6h13m09.72 if start model is 2451716.5
-const marsPerihelionStartPos = 0;            // Can be used to align the transits/ occultations more exactly
-const marsAngleCorrection = -2.106;          // To align the perihelion exactly. According to formula ~336.06890
+const marsLongitudePerihelion = 336.0650681;
+const marsAscendingNode = 49.55737662;
+const marsMeanAnomaly = 109.2630844;
+const marsTrueAnomaly = 118.9501056;
+const marsAngleCorrection = -2.10526;        // To align the perihelion exactly. According to formula ~336.0650681
+const marsPerihelionEclipticYears = holisticyearLength/4; // Duration of perihelion precession to explain ~1700 arcseconds per century
+const marsStartpos = 121.514;                // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Jupiter
+// Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
-const jupiterOrbitalInclination = 1.303241;
-const jupiterOrbitalEccentricity = 0.048499;
+const jupiterOrbitalInclination = 1.30450732;
+const jupiterOrbitalEccentricity = 0.04966799;
 const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
-const jupiterLongitudePerihelion = 14.3388009380591;
-const jupiterAscendingNode = 100.469215;
-const jupiterStartpos = 13.906;              // Needs to be at ~3h43m48.25 if start model is 2451716.5
-const jupiterPerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
-const jupiterAngleCorrection = 1.069;        // To align the perihelion exactly. According to formula ~14.33880
+const jupiterLongitudePerihelion = 14.70659401;
+const jupiterAscendingNode = 100.4877868;
+const jupiterMeanAnomaly = 32.47179744;
+const jupiterTrueAnomaly = 35.69428061;
+const jupiterAngleCorrection = 1.1019;       // To align the perihelion exactly. According to formula ~14.70659401
+const jupiterPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain ~400 arcseconds per century
+const jupiterStartpos = 13.79;               // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Saturn
-const saturnSolarYearInput = 10746.6;
-const saturnOrbitalInclination = 2.488861;
-const saturnOrbitalEccentricity = 0.055547;
+// Reference lengths used as INPUT for Saturn
+const saturnSolarYearInput = 10745.6;
+const saturnOrbitalInclination = 2.4853834;
+const saturnOrbitalEccentricity = 0.0564781;
 const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
-const saturnLongitudePerihelion = 93.0664850365646;
-const saturnAscendingNode = 113.669633;
-const saturnStartpos = 11.439;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
-const saturnPerihelionStartPos = 0;          // Can be used to align the transits/ occultations more exactly
-const saturnAngleCorrection = -0.253;        // To align the perihelion exactly. According to formula ~93.06649
+const saturnLongitudePerihelion = 92.12794343;
+const saturnAscendingNode = 113.6452856;
+const saturnMeanAnomaly = 325.663876;
+const saturnTrueAnomaly = 321.7910116;
+const saturnAngleCorrection = -0.175456;     // To align the perihelion exactly. According to formula ~92.12794343
+const saturnPerihelionEclipticYears = -holisticyearLength; // Duration of perihelion precession to explain ~-400 arcseconds per century
+const saturnStartpos = 11.344;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Uranus
+// Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30589;
-const uranusOrbitalInclination = 0.773201;
-const uranusOrbitalEccentricity = 0.046381;
+const uranusOrbitalInclination = 0.77234317;
+const uranusOrbitalEccentricity = 0.04519611;
 const uranusInclination = 0.9946692;
 const uranusTilt = 82.23;
-const uranusLongitudePerihelion = 173.01229057226;
-const uranusAscendingNode = 74.008411;
-const uranusStartpos = 44.846;               // Needs to be at ~21h32m43.04 if start model is 2451716.5
-const uranusPerihelionStartPos = 0;          // Can be used to align the transits/ occultations more exactly
-const uranusAngleCorrection = -0.576;        // To align the perihelion exactly. According to formula ~173.01229 
+const uranusLongitudePerihelion = 170.7308251;
+const uranusAscendingNode = 73.98118815;
+const uranusMeanAnomaly = 145.7292678;
+const uranusTrueAnomaly = 148.5142459;
+const uranusAngleCorrection = -0.77209;      // To align the perihelion exactly. According to formula ~170.7308251
+const uranusPerihelionEclipticYears = holisticyearLength/3; // Duration of perihelion precession to explain ~1200 arcseconds per century
+const uranusStartpos = 44.676;               // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Neptune
+// Reference lengths used as INPUT for Neptune
 const neptuneSolarYearInput = 59926;
-const neptuneOrbitalInclination = 1.769909;
+const neptuneOrbitalInclination = 1.768273;
 const neptuneOrbitalEccentricity = 0.009457;
 const neptuneInclination = 0.7354155;
 const neptuneTilt = 28.32;
-const neptuneLongitudePerihelion = 48.1269921140939;
-const neptuneAscendingNode = 131.789247;
-const neptuneStartpos = 48.011;              // Needs to be at ~20h33m40.34 if start model is 2451716.5
-const neptunePerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
-const neptuneAngleCorrection = 2.391;        // To align the perihelion exactly. According to formula ~48.12699
+const neptuneLongitudePerihelion = 45.80124471;
+const neptuneAscendingNode = 131.7853754;
+const neptuneMeanAnomaly = 262.5003424;
+const neptuneTrueAnomaly = 261.2242728;
+const neptuneAngleCorrection = 2.406717;     // To align the perihelion exactly. According to formula ~45.80124471
+const neptunePerihelionEclipticYears = -holisticyearLength; // Duration of perihelion precession to explain ~-400 arcseconds per century
+const neptuneStartpos = 47.917;              // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
 //*************************************************************
 
-// Reference lenghts used as INPUT for Pluto
+// Reference lengths used as INPUT for Pluto
 const plutoSolarYearInput = 89760;
 const plutoOrbitalInclination = 17.14175;
 const plutoOrbitalEccentricity = 0.24880766;
-const plutoInclination = 15.5541473;
+const plutoInclination = 15.5639473;  // Adjusted from 15.5541473 for J2000 apparent inclination match
 const plutoTilt = 57.47;
 const plutoLongitudePerihelion = 224.06676;
 const plutoAscendingNode = 110.30347;
-const plutoStartpos = 71.555;                // Needs to be at ~16h44m12.72 if start model is 2451716.5
-const plutoPerihelionStartPos = 0;           // Can be used to align the transits/ occultations more exactly
+const plutoMeanAnomaly = 15.83341625;
+const plutoTrueAnomaly = 26.51719941;
 const plutoAngleCorrection = 2.468;          // To align the perihelion exactly. According to formula ~224.06676
+const plutoPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const plutoStartpos = 71.555;                // Needs to be at ~16h44m12.72 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Halleys
+// Reference lengths used as INPUT for Halleys
 const halleysSolarYearInput = 27618;
 const halleysOrbitalInclination = 162.192203847561;
 const halleysOrbitalEccentricity = 0.9679427911271;
@@ -182,11 +201,13 @@ const halleysInclination = 0.7354155;
 const halleysTilt = 0;
 const halleysLongitudePerihelion = 172.033036745069;
 const halleysAscendingNode = 59.5607834844014;
-const halleysStartpos = 80;                  // Needs to be at ~08h43m12.79 if start model is 2451716.5
-const halleysPerihelionStartPos = 0;         // Can be used to align the transits/ occultations more exactly
+const halleysMeanAnomaly = 13;               // TODO
+const halleysTrueAnomaly = 13;               // TODO
 const halleysAngleCorrection = -0.701;       // To align the perihelion exactly. According to formula ~172.03304
+const halleysPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const halleysStartpos = 80;                  // Needs to be at ~08h43m12.79 if start model is 2451716.5
 
-// Reference lenghts used as INPUT for Eros
+// Reference lengths used as INPUT for Eros
 const erosSolarYearInput = 643.22295;
 const erosOrbitalInclination = 10.8290328658513;
 const erosOrbitalEccentricity = 0.222807894458402;
@@ -194,9 +215,44 @@ const erosInclination = 10.8290328658513;
 const erosTilt = 0;
 const erosLongitudePerihelion = 123.054362100533;
 const erosAscendingNode = 304.411578580454;
-const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
-const erosPerihelionStartPos = 0;            // Can be used to align the transits/ occultations more exactly
+const erosMeanAnomaly = 153.67797646;
+const erosTrueAnomaly = 162.69081884;
 const erosAngleCorrection = -2.202;          // To align the perihelion exactly. According to formula ~123.05436
+const erosPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
+
+// Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
+// These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
+// Units: degrees at J2000.0 epoch
+const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;   // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
+const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
+const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
+const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
+const jupiterAscendingNodeInvPlaneSouamiSouchay = 306.92;
+const saturnAscendingNodeInvPlaneSouamiSouchay = 122.27;
+const uranusAscendingNodeInvPlaneSouamiSouchay = 308.44;
+const neptuneAscendingNodeInvPlaneSouamiSouchay = 189.28;
+const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
+// TODO: Halley's and Eros invariable plane data are approximations (not from Souami & Souchay 2012)
+// Using ecliptic ascending node as placeholder - should be calculated from orbital elements
+const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56;  // Approximation from ecliptic value
+const erosAscendingNodeInvPlaneSouamiSouchay = 304.41;    // Approximation from ecliptic value
+
+// J2000-verified ascending nodes - optimized to reproduce exact J2000 apparent inclinations
+// These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
+// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.inclinationEarth = 1.578° at J2000
+// Result: All planets match J2000 OrbitalInclination values with error < 0.0001°
+const earthAscendingNodeInvPlaneVerified = 284.492;   // Adjusted from S&S 284.51°
+const mercuryAscendingNodeInvPlaneVerified = 32.8118;   // was 32.22, Δ = +0.61° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.68;     // was 52.31, Δ = +2.41° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.853;     // was 352.95, Δ = +1.92° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.9;  // was 306.92, Δ = +6.19° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 119.04;   // was 122.27, Δ = -3.50° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.76;   // was 308.44, Δ = -0.64° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192.175;  // was 189.28, Δ = +2.84° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 105.44;    // was 107.06, Δ = -1.62° (from S&S)
+const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
+const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (from S&S)
 
 // Really fixed values
 const diameters = {
@@ -218,6 +274,7 @@ const diameters = {
 //*************************************************************
 // ALL CONSTANTS ARE CALCULATED FROM HERE ONWARDS
 //*************************************************************
+
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(lengthsolaryearindaysin1246 * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
@@ -226,9 +283,9 @@ const balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holist
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
-const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday
-const meanStellarday = ((meansiderealyearlengthinSeconds-(meansolaryearlengthinDays*meanlengthofday))/(1/eccentricityAmplitude/13*16))/(meansolaryearlengthinDays+1)+meanSiderealday
-const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays
+const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
+const meanStellarday = ((meansiderealyearlengthinSeconds-(meansolaryearlengthinDays*meanlengthofday))/(1/eccentricityAmplitude/13*16))/(meansolaryearlengthinDays+1)+meanSiderealday;
+const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 
 //sDAY IS USED IN 3D MODEL CALCULATIONS 
 const sDay = 1/meansolaryearlengthinDays;
@@ -268,19 +325,21 @@ const moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // Planet calculations TYPE I
 const mercurySolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/mercurySolarYearInput));
 const mercuryOrbitDistance = (((holisticyearLength/mercurySolarYearCount)**2)**(1/3));
-const mercuryRealOrbitalEccentricity = mercuryOrbitalEccentricity/(1+mercuryOrbitalEccentricity);
-const mercuryElipticOrbit = ((mercuryRealOrbitalEccentricity*mercuryOrbitDistance)/2)*100; 
 const mercuryPerihelionDistance = mercuryOrbitDistance*mercuryOrbitalEccentricity*100;
+const mercuryElipticOrbit = mercuryPerihelionDistance/2;
 const mercurySpeed = (mercuryOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/mercurySolarYearCount))/24;
 const mercuryRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(mercurySolarYearCount*3/2);
-      
+const mercuryEccentricityPerihelion = (mercuryPerihelionDistance/2)*mercuryOrbitalEccentricity;
+const mercuryLowestPoint = 180-mercuryAscendingNode;
+
 const venusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/venusSolarYearInput));
 const venusOrbitDistance = (((holisticyearLength/venusSolarYearCount)**2)**(1/3));
-const venusRealOrbitalEccentricity = venusOrbitalEccentricity/(1+venusOrbitalEccentricity);
-const venusElipticOrbit = ((venusRealOrbitalEccentricity*venusOrbitDistance)/2)*100; 
-const venusPerihelionDistance = venusOrbitDistance*venusOrbitalEccentricity*100;
+const venusPerihelionDistance = (venusOrbitDistance*venusOrbitalEccentricity*100);
+const venusElipticOrbit = venusPerihelionDistance/2;
 const venusSpeed = (venusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/venusSolarYearCount))/24;
 const venusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/243.022699230302));
+const venusEccentricityPerihelion = (venusPerihelionDistance/2)*venusOrbitalEccentricity;
+const venusLowestPoint = 180-venusAscendingNode;
 
 // Planet calculations TYPE II
 const marsSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/marsSolarYearInput));
@@ -334,9 +393,8 @@ const neptuneRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/
 
 const plutoSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/plutoSolarYearInput));
 const plutoOrbitDistance = (((holisticyearLength/plutoSolarYearCount)**2)**(1/3));
-const plutoRealOrbitalEccentricity = plutoOrbitalEccentricity/(1+plutoOrbitalEccentricity);
-const plutoElipticOrbit = ((plutoOrbitalEccentricity*plutoOrbitDistance)-(plutoRealOrbitalEccentricity*plutoOrbitDistance))*100; 
-const plutoPerihelionDistance = plutoRealOrbitalEccentricity*plutoOrbitDistance*2*100;
+const plutoPerihelionDistance = plutoOrbitalEccentricity*plutoOrbitDistance*100;
+const plutoElipticOrbit = plutoPerihelionDistance/2;
 const plutoSpeed = (plutoOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/plutoSolarYearCount))/24;
 const plutoRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/6.38720012152536));
 
@@ -396,7 +454,10 @@ const renderVal = val => {
       if (!isNaN(d)) return d.toLocaleString('en-GB', { hour12:false });
     }
 
-    /* 3. fall back to numeric formatting */
+    /* 3. if it's already a string (non-date), return it directly */
+    if (typeof raw === 'string') return raw;
+
+    /* 4. fall back to numeric formatting */
     const num = Number(raw);
     if (!Number.isFinite(num)) return '';          // guard NaN or ±∞
 
@@ -754,116 +815,6 @@ const earthPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const barycenterPLANETS12 = {
-  name: "Barycenter Planets12",
-  startPos: 0,
-  speed: Math.PI*2/(holisticyearLength/12),
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const barycenterPLANETS13 = {
-  name: "Barycenter Planets13",
-  startPos: 0,
-  speed: Math.PI*2/(holisticyearLength/13),
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const barycenterPLANETS14 = {
-  name: "Barycenter Planets14",
-  startPos: 0,
-  speed: Math.PI*2/(holisticyearLength/14),
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const barycenterPLANETS15 = {
-  name: "Barycenter Planets15",
-  startPos: 0,
-  speed: Math.PI*2/(holisticyearLength/15),
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
-const barycenterPLANETS16 = {
-  name: "Barycenter Planets16",
-  startPos: 0,
-  speed: Math.PI*2/(holisticyearLength/16),
-  tilt: 0,
-  orbitRadius: 0,
-  orbitCentera: 0,
-  orbitCenterb: 0,
-  orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
-
-  size: 0.5,
-  color: 0xFFFF00,
-  visible: false,
-  containerObj:"",
-  orbitObj:"",
-  planetObj:"",
-  pivotObj:"",
-  isNotPhysicalObject: true,
-};
-
 const sun = {
   name: "Sun",
   startPos: correctionSun,
@@ -1026,9 +977,31 @@ const moon = {
   traceOn: false,
 };
 
+const mercuryPerihelionDurationEcliptic1 = {
+  name: "Mercury Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/mercuryPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const mercuryPerihelionFromEarth = {
   name: "PERIHELION MERCURY",
-  startPos: mercuryPerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1053,10 +1026,10 @@ const mercuryPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const mercurybarycenterPLANETS = {
-  name: "Barycenter Mercury Counter movement",
+const mercuryPerihelionDurationEcliptic2 = {
+  name: "Mercury Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/mercuryPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1075,18 +1048,41 @@ const mercurybarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const mercuryPerihelionFromSun = {
-  name: "Mercury Perihelion From Sun",
-  startPos: mercuryStartpos*2,
+const mercuryRealPerihelionAtSun = {
+  name: "Mercury Real Perihelion At Sun",
+  startPos: mercuryLowestPoint,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: mercuryElipticOrbit,
   orbitCentera: 100,
+  orbitCenterb: mercuryEccentricityPerihelion,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryOrbitalInclination,
+
+  size: 1.0,
+  color: 0x868485,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const mercuryFixedPerihelionAtSun = {
+  name: "Mercury Fixed Perihelion At Sun",
+  startPos: mercuryLowestPoint,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: mercuryOrbitalInclination,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryOrbitalInclination,
 
   size: 1.0,
   color: 0x868485,
@@ -1124,9 +1120,31 @@ const mercury = {
   traceOn: false,
 };
 
+const venusPerihelionDurationEcliptic1 = {
+  name: "Venus Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/venusPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const venusPerihelionFromEarth = {
   name: "PERIHELION VENUS",
-  startPos: venusPerihelionStartPos, 
+  startPos: correctionSun, 
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1137,7 +1155,7 @@ const venusPerihelionFromEarth = {
   orbitTilta: 0,
   orbitTiltb: 0,
   
-  size: 0.5,   
+  size: 0.1,   
   color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_perihelion.png',
   visible: false,
@@ -1151,10 +1169,10 @@ const venusPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const venusbarycenterPLANETS = {
-  name: "Barycenter Venus Counter movement",
+const venusPerihelionDurationEcliptic2 = {
+  name: "Venus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/venusPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1173,18 +1191,41 @@ const venusbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const venusPerihelionFromSun = {
-  name: "Venus Perihelion From Sun",
-  startPos: venusStartpos*2,
+const venusRealPerihelionAtSun = {
+  name: "Venus Real Perihelion At Sun",
+  startPos: venusLowestPoint,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: venusElipticOrbit,
   orbitCentera: 100,
+  orbitCenterb: venusEccentricityPerihelion,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-venusAscendingNode)*Math.PI)/180)*-venusOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-venusAscendingNode)*Math.PI)/180)*-venusOrbitalInclination,
+
+  size: 0.1,
+  color: 0xA57C1B,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const venusFixedPerihelionAtSun = {
+  name: "Venus Fixed Perihelion At Sun",
+  startPos: venusLowestPoint,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: venusOrbitalInclination,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-venusAscendingNode)*Math.PI)/180)*-venusOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-venusAscendingNode)*Math.PI)/180)*-venusOrbitalInclination,
 
   size: 0.1,
   color: 0xA57C1B,
@@ -1222,9 +1263,31 @@ const venus = {
   traceOn: false,
 };
 
+const marsPerihelionDurationEcliptic1 = {
+  name: "Mars Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/marsPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const marsPerihelionFromEarth = {
   name: "PERIHELION MARS",
-  startPos: marsPerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1249,10 +1312,10 @@ const marsPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const marsbarycenterPLANETS = {
-  name: "Barycenter Mars Counter movement",
+const marsPerihelionDurationEcliptic2 = {
+  name: "Mars Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/16),
+  speed: -Math.PI*2/marsPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1271,13 +1334,36 @@ const marsbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const marsPerihelionFromSun = {
-  name: "Mars Perihelion From Sun",
+const marsRealPerihelionAtSun = {
+  name: "Mars Real Perihelion At Sun",
   startPos: marsStartpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: marsElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-marsAscendingNode)*Math.PI)/180)*-marsOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-marsAscendingNode)*Math.PI)/180)*-marsOrbitalInclination,
+
+  size: 0.1,
+  color: 0xFEAA0D,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+}; 
+
+const marsFixedPerihelionAtSun = {
+  name: "Mars Fixed Perihelion At Sun",
+  startPos: marsStartpos*2,
+  speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1320,9 +1406,31 @@ const mars = {
   traceOn: false,
 };
 
+const jupiterPerihelionDurationEcliptic1 = {
+  name: "Jupiter Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/jupiterPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const jupiterPerihelionFromEarth = {
   name: "PERIHELION JUPITER",
-  startPos: jupiterPerihelionStartPos,
+  startPos: correctionSun,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1347,10 +1455,10 @@ const jupiterPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const jupiterbarycenterPLANETS = {
-  name: "Barycenter Jupiter Counter movement",
+const jupiterPerihelionDurationEcliptic2 = {
+  name: "Jupiter Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/14),
+  speed: -Math.PI*2/jupiterPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1369,8 +1477,8 @@ const jupiterbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const jupiterPerihelionFromSun = {
-  name: "Jupiter Perihelion From Sun",
+const jupiterRealPerihelionAtSun = {
+  name: "Jupiter Real Perihelion At Sun",
   startPos: jupiterStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
@@ -1382,7 +1490,30 @@ const jupiterPerihelionFromSun = {
   orbitTilta: Math.cos(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterOrbitalInclination,
   orbitTiltb: Math.sin(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterOrbitalInclination,
   
-  size: 0.1,
+  size: 1.0,
+  color: 0xCDC2B2,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const jupiterFixedPerihelionAtSun = {
+  name: "Jupiter Fixed Perihelion At Sun",
+  startPos: jupiterStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterOrbitalInclination,
+  
+  size: 1.0,
   color: 0xCDC2B2,
   visible: false,
   containerObj:"",
@@ -1402,7 +1533,7 @@ const jupiter = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: jupiterOrbitalInclination,
+  orbitTilta: 0,
   orbitTiltb: 0,
   
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
@@ -1423,9 +1554,31 @@ const jupiter = {
   traceOn: false,
 };
 
+const saturnPerihelionDurationEcliptic1 = {
+  name: "Saturn Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/saturnPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const saturnPerihelionFromEarth = {
   name: "PERIHELION SATURN",
-  startPos: saturnPerihelionStartPos,
+  startPos: correctionSun,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1450,10 +1603,10 @@ const saturnPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const saturnbarycenterPLANETS = {
-  name: "Barycenter Saturn Counter movement",
+const saturnPerihelionDurationEcliptic2 = {
+  name: "Saturn Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/15),
+  speed: -Math.PI*2/saturnPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1472,13 +1625,36 @@ const saturnbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const saturnPerihelionFromSun = {
-  name: "Saturn Perihelion From Sun",
+const saturnRealPerihelionAtSun = {
+  name: "Saturn Real Perihelion At Sun",
   startPos: saturnStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: -saturnElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnOrbitalInclination,
+
+  size: 0.1,   
+  color: 0xA79662,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const saturnFixedPerihelionAtSun = {
+  name: "Saturn Fixed Perihelion At Sun",
+  startPos: saturnStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1526,9 +1702,31 @@ const saturn = {
   traceOn: false,
 };
 
+const uranusPerihelionDurationEcliptic1 = {
+  name: "Uranus Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/uranusPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const uranusPerihelionFromEarth = {
   name: "PERIHELION URANUS",
-  startPos: uranusPerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1553,10 +1751,10 @@ const uranusPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const uranusbarycenterPLANETS = {
-  name: "Barycenter Uranus Counter movement",
+const uranusPerihelionDurationEcliptic2 = {
+  name: "Uranus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/14),
+  speed: -Math.PI*2/uranusPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1575,13 +1773,36 @@ const uranusbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const uranusPerihelionFromSun = {
-  name: "Uranus Perihelion From Sun",
+const uranusRealPerihelionAtSun = {
+  name: "Uranus Real Perihelion At Sun",
   startPos: uranusStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: uranusElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusOrbitalInclination,
+
+  size: 0.1,   
+  color: 0xD2F9FA,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const uranusFixedPerihelionAtSun = {
+  name: "Uranus Fixed Perihelion At Sun",
+  startPos: uranusStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1629,9 +1850,31 @@ const uranus = {
   traceOn: false,
 };
 
+const neptunePerihelionDurationEcliptic1 = {
+  name: "Neptune Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/neptunePerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const neptunePerihelionFromEarth = {
   name: "PERIHELION NEPTUNE",
-  startPos: neptunePerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1656,10 +1899,10 @@ const neptunePerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const neptunebarycenterPLANETS = {
-  name: "Barycenter Neptune Counter movement",
+const neptunePerihelionDurationEcliptic2 = {
+  name: "Neptune Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/neptunePerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1678,13 +1921,36 @@ const neptunebarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const neptunePerihelionFromSun = {
-  name: "Neptune Perihelion From Sun",
-  startPos: neptuneStartpos*2,    
+const neptuneRealPerihelionAtSun = {
+  name: "Neptune Real Perihelion At Sun",
+  startPos: neptuneStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: neptuneElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneOrbitalInclination,
+
+  size: 0.1,   
+  color: 0x5E93F1,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const neptuneFixedPerihelionAtSun = {
+  name: "Neptune Fixed Perihelion At Sun",
+  startPos: neptuneStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1737,9 +2003,31 @@ const neptune = {
 // orbitSemiMajor: 519.969067802053,
 // orbitSemiMinor: 519.969067802053*Math.sqrt(1-0.048499*0.048499),
 
+const plutoPerihelionDurationEcliptic1 = {
+  name: "Pluto Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/plutoPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const plutoPerihelionFromEarth = {
   name: "PERIHELION PLUTO",
-  startPos: plutoPerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1764,10 +2052,10 @@ const plutoPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const plutobarycenterPLANETS = {
-  name: "Barycenter Pluto Counter movement",
+const plutoPerihelionDurationEcliptic2 = {
+  name: "Pluto Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/plutoPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1786,13 +2074,36 @@ const plutobarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const plutoPerihelionFromSun = {
-  name: "Pluto Perihelion From Sun",
+const plutoRealPerihelionAtSun = {
+  name: "Pluto Real Perihelion At Sun",
   startPos: plutoStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: plutoElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoOrbitalInclination,
+
+  size: 0.1,   
+  color: 0x5E93F1,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const plutoFixedPerihelionAtSun = {
+  name: "Pluto Fixed Perihelion At Sun",
+  startPos: plutoStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1835,9 +2146,31 @@ const pluto = {
   traceOn: false,
 };
 
+const halleysPerihelionDurationEcliptic1 = {
+  name: "Halleys Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/halleysPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const halleysPerihelionFromEarth = {
   name: "PERIHELION HALLEYS",
-  startPos: halleysPerihelionStartPos,    
+  startPos: correctionSun,    
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1862,10 +2195,10 @@ const halleysPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const halleysbarycenterPLANETS = {
-  name: "Barycenter Halleys Counter movement",
+const halleysPerihelionDurationEcliptic2 = {
+  name: "Halleys Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/halleysPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1884,13 +2217,36 @@ const halleysbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const halleysPerihelionFromSun = {
-  name: "Halleys Perihelion From Sun",
+const halleysRealPerihelionAtSun = {
+  name: "Halleys Real Perihelion At Sun",
   startPos: halleysStartpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: halleysElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysOrbitalInclination),
+  orbitTiltb: Math.sin(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysOrbitalInclination),
+
+  size: 0.1,
+  color: 0xA57C1B,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const halleysFixedPerihelionAtSun = {
+  name: "Halleys Fixed Perihelion At Sun",
+  startPos: halleysStartpos*2,
+  speed: -Math.PI*2,
+  rotationSpeed: 0,
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1935,9 +2291,31 @@ const halleys = {
   traceOn: false,
 };
 
+const erosPerihelionDurationEcliptic1 = {
+  name: "Eros Perihelion Duration Ecliptic1",
+  startPos: 0,
+  speed: Math.PI*2/erosPerihelionEclipticYears,
+  tilt: 0,
+  orbitRadius: 0,
+  orbitCentera: 0,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: 0,
+  orbitTiltb: 0,
+
+  size: 0.5,
+  color: 0xFFFF00,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
 const erosPerihelionFromEarth = {
   name: "PERIHELION EROS",
-  startPos: erosPerihelionStartPos,
+  startPos: correctionSun,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -1962,10 +2340,10 @@ const erosPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-const erosbarycenterPLANETS = {
-  name: "Barycenter Eros Counter movement",
+const erosPerihelionDurationEcliptic2 = {
+  name: "Eros Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/(holisticyearLength/12),
+  speed: -Math.PI*2/erosPerihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -1984,12 +2362,34 @@ const erosbarycenterPLANETS = {
   isNotPhysicalObject: true,
 };
 
-const erosPerihelionFromSun = {
-  name: "Eros Perihelion From Sun",
+const erosRealPerihelionAtSun = {
+  name: "Eros Real Perihelion At Sun",
   startPos: erosStartpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/erosSolarYearCount)),
   tilt: 0,
   orbitRadius: erosElipticOrbit,
+  orbitCentera: 100,
+  orbitCenterb: 0,
+  orbitCenterc: 0,
+  orbitTilta: Math.cos(((-90-erosAscendingNode)*Math.PI)/180)*-erosOrbitalInclination,
+  orbitTiltb: Math.sin(((-90-erosAscendingNode)*Math.PI)/180)*-erosOrbitalInclination,
+
+  size: 0.1,
+  color: 0xA57C1B,
+  visible: false,
+  containerObj:"",
+  orbitObj:"",
+  planetObj:"",
+  pivotObj:"",
+  isNotPhysicalObject: true,
+};
+
+const erosFixedPerihelionAtSun = {
+  name: "Eros Fixed Perihelion At Sun",
+  startPos: erosStartpos*2,
+  speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/erosSolarYearCount)),
+  tilt: 0,
+  orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -2035,7 +2435,7 @@ const eros = {
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCyclePrecession, moonNodalPrecession, moon, barycenterPLANETS12, barycenterPLANETS13, barycenterPLANETS14, barycenterPLANETS15, barycenterPLANETS16, mercurybarycenterPLANETS, mercuryPerihelionFromSun, mercury, venusbarycenterPLANETS, venusPerihelionFromSun, venus, marsbarycenterPLANETS, marsPerihelionFromSun, mars, jupiterbarycenterPLANETS, jupiterPerihelionFromSun, jupiter, saturnbarycenterPLANETS, saturnPerihelionFromSun, saturn, uranusbarycenterPLANETS, uranusPerihelionFromSun, uranus, neptunebarycenterPLANETS, neptunePerihelionFromSun, neptune, plutobarycenterPLANETS, plutoPerihelionFromSun, pluto, halleysbarycenterPLANETS, halleysPerihelionFromSun, halleys, erosbarycenterPLANETS, erosPerihelionFromSun, eros]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonRoyerCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
@@ -2313,6 +2713,7 @@ let o = {
   'Polar line': false,
   polarLineLength: 1,
   Performance: false,
+  debugAscendingNode: false,
   camX: 0,
   camY: 0,
   camZ: 0,
@@ -2338,6 +2739,7 @@ let o = {
 
   mercuryPerihelion: 0,
   venusPerihelion: 0,
+//  mercuryPerihelion2: 0,
   earthPerihelion: 0,
   marsPerihelion: 0,
   jupiterPerihelion: 0,
@@ -2380,7 +2782,105 @@ let o = {
   plutoDescendingNode: 0,
   halleysDescendingNode: 0,
   erosDescendingNode: 0,
-  
+
+  mercuryMeanAnomaly: 0,
+  mercuryTrueAnomaly: 0,
+  venusMeanAnomaly: 0,
+  venusTrueAnomaly: 0,
+  marsMeanAnomaly: 0,
+  marsTrueAnomaly: 0,
+  jupiterMeanAnomaly: 0,
+  jupiterTrueAnomaly: 0,
+  saturnMeanAnomaly: 0,
+  saturnTrueAnomaly: 0,
+  uranusMeanAnomaly: 0,
+  uranusTrueAnomaly: 0,
+  neptuneMeanAnomaly: 0,
+  neptuneTrueAnomaly: 0,
+  plutoMeanAnomaly: 0,
+  plutoTrueAnomaly: 0,
+  halleysMeanAnomaly: 0,
+  halleysTrueAnomaly: 0,
+  erosMeanAnomaly: 0,
+  erosTrueAnomaly: 0,
+
+  // Height above invariable plane for each planet (in AU, positive = above)
+  mercuryHeightAboveInvPlane: 0,
+  venusHeightAboveInvPlane: 0,
+  earthHeightAboveInvPlane: 0,
+  marsHeightAboveInvPlane: 0,
+  jupiterHeightAboveInvPlane: 0,
+  saturnHeightAboveInvPlane: 0,
+  uranusHeightAboveInvPlane: 0,
+  neptuneHeightAboveInvPlane: 0,
+  plutoHeightAboveInvPlane: 0,
+
+  // Boolean flags for above/below invariable plane
+  mercuryAboveInvPlane: true,
+  venusAboveInvPlane: true,
+  earthAboveInvPlane: true,
+  marsAboveInvPlane: true,
+  jupiterAboveInvPlane: true,
+  saturnAboveInvPlane: true,
+  uranusAboveInvPlane: true,
+  neptuneAboveInvPlane: true,
+  plutoAboveInvPlane: true,
+  halleysHeightAboveInvPlane: 0,
+  halleysAboveInvPlane: true,
+  erosHeightAboveInvPlane: 0,
+  erosAboveInvPlane: true,
+
+  // Dynamic ascending nodes on invariable plane - J2000-verified values (primary, precess over time)
+  mercuryAscendingNodeInvPlane: 0,
+  venusAscendingNodeInvPlane: 0,
+  earthAscendingNodeInvPlane: 0,
+  marsAscendingNodeInvPlane: 0,
+  jupiterAscendingNodeInvPlane: 0,
+  saturnAscendingNodeInvPlane: 0,
+  uranusAscendingNodeInvPlane: 0,
+  neptuneAscendingNodeInvPlane: 0,
+  plutoAscendingNodeInvPlane: 0,
+  halleysAscendingNodeInvPlane: 0,
+  erosAscendingNodeInvPlane: 0,
+
+  // Dynamic ascending nodes on invariable plane - Souami & Souchay (2012) values (for comparison, precess over time)
+  mercuryAscendingNodeInvPlaneSouamiSouchay: 0,
+  venusAscendingNodeInvPlaneSouamiSouchay: 0,
+  marsAscendingNodeInvPlaneSouamiSouchay: 0,
+  jupiterAscendingNodeInvPlaneSouamiSouchay: 0,
+  saturnAscendingNodeInvPlaneSouamiSouchay: 0,
+  uranusAscendingNodeInvPlaneSouamiSouchay: 0,
+  neptuneAscendingNodeInvPlaneSouamiSouchay: 0,
+  plutoAscendingNodeInvPlaneSouamiSouchay: 0,
+  halleysAscendingNodeInvPlaneSouamiSouchay: 0,
+  erosAscendingNodeInvPlaneSouamiSouchay: 0,
+
+  // Dynamic apparent inclination using J2000-verified ascending nodes
+  // These match J2000 reference values exactly at year 2000
+  mercuryApparentInclination: 0,
+  venusApparentInclination: 0,
+  marsApparentInclination: 0,
+  jupiterApparentInclination: 0,
+  saturnApparentInclination: 0,
+  uranusApparentInclination: 0,
+  neptuneApparentInclination: 0,
+  plutoApparentInclination: 0,
+  halleysApparentInclination: 0,
+  erosApparentInclination: 0,
+
+  // Dynamic apparent inclination using Souami & Souchay (2012) ascending nodes
+  // For comparison with original published data
+  mercuryApparentInclinationSouamiSouchay: 0,
+  venusApparentInclinationSouamiSouchay: 0,
+  marsApparentInclinationSouamiSouchay: 0,
+  jupiterApparentInclinationSouamiSouchay: 0,
+  saturnApparentInclinationSouamiSouchay: 0,
+  uranusApparentInclinationSouamiSouchay: 0,
+  neptuneApparentInclinationSouamiSouchay: 0,
+  plutoApparentInclinationSouamiSouchay: 0,
+  halleysApparentInclinationSouamiSouchay: 0,
+  erosApparentInclinationSouamiSouchay: 0,
+
   Target: "",
   lookAtObj: {},
   
@@ -2516,8 +3016,8 @@ document.body.appendChild(labelRenderer.domElement);
     if (!needsLabelUpdate) return;
     needsLabelUpdate = false;
 
-    console.groupCollapsed('[Label Debug] render start');
-    console.log('starNamesVisible =', o.starNamesVisible);
+    // console.groupCollapsed('[Label Debug] render start');
+    // console.log('starNamesVisible =', o.starNamesVisible);
 
     // 1) Sync size
     const w = window.innerWidth, h = window.innerHeight;
@@ -2535,7 +3035,7 @@ document.body.appendChild(labelRenderer.domElement);
     const rawScale   = baseCamDistance / camera.position.length();
     const scaled     = Math.pow(rawScale, zoomFactor);
     const finalScale = Math.min(maxScale, Math.max(minScale, scaled));
-    console.log('Computed label scale:', finalScale.toFixed(3));
+    // console.log('Computed label scale:', finalScale.toFixed(3));
 
     // 5) Traverse and append only those labels that are both visible
     //    and in front of the camera
@@ -2573,7 +3073,7 @@ document.body.appendChild(labelRenderer.domElement);
     actuallyShown++;
     });
 
-    console.log(`Labels — total: ${totalLabels}, wanted: ${wantVisible}, shown: ${actuallyShown}`);
+    // console.log(`Labels — total: ${totalLabels}, wanted: ${wantVisible}, shown: ${actuallyShown}`);
   };
 })(labelRenderer, baseCamDistance);
 
@@ -2589,10 +3089,57 @@ const textureLoader = new THREE.TextureLoader();
 const textureCache = new Map();
 
 const controls = new OrbitControls(camera, renderer.domElement);
-//controls.enableDamping = true; // for smoother motion, optional
+controls.enableDamping = true; // for smoother motion, optional
+controls.dampingFactor = 0.5;  // Lower = smoother, higher = snappier
 controls.enableKeys = false;
 controls.zoomSpeed = 8.0;
 controls.dollySpeed = 8.0;
+
+// Per-planet minimum distance multipliers (distance = radius * multiplier)
+const cameraMinDistMultiplier = {
+  'Sun': 5.0,
+  'Earth': 2.5,
+  'Moon': 6.0,
+  'Mercury': 5.0,
+  'Venus': 5.0,
+  'Mars': 5.0,
+  'Jupiter': 5.0,
+  'Saturn': 5.0,
+  'Uranus': 5.0,
+  'Neptune': 5.0,
+  'Pluto': 5.0,
+  'default': 5.0
+};
+
+function getCameraMinDistMultiplier(name) {
+  return cameraMinDistMultiplier[name] ?? cameraMinDistMultiplier['default'];
+}
+
+// Prevent zooming inside planets by intercepting wheel events
+renderer.domElement.addEventListener('wheel', (event) => {
+  // Skip zoom prevention when hierarchy inspector is controlling camera
+  if (hierarchyInspector._cameraControlActive) return;
+
+  if (!o.lookAtObj?.planetObj || !o.lookAtObj.size) return;
+
+  // Get current distance from camera to target
+  const currentDistance = camera.position.distanceTo(controls.target);
+
+  // Calculate minimum distance based on planet's visual size
+  // Use rotationAxis scale (where blow-up slider applies) not planetObj scale
+  const scale = o.lookAtObj.rotationAxis?.scale?.x ?? 1;
+  const visualRadius = o.lookAtObj.size * scale;
+  const multiplier = getCameraMinDistMultiplier(o.lookAtObj.name);
+  const minDistance = visualRadius * multiplier;
+
+  // If zooming in and already at or below minimum, block it
+  // deltaY < 0 = scroll up = zoom in (on most systems)
+  const zoomingIn = event.deltaY < 0;
+  if (zoomingIn && currentDistance <= minDistance * 1.1) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}, { passive: false, capture: true });
 
 //*************************************************************
 // CREATE AND CONFIGURE PLANETS
@@ -2614,22 +3161,6 @@ earthPerihelionPrecession2.pivotObj.add(barycenterEarthAndSun.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(sun.containerObj);
 barycenterEarthAndSun.pivotObj.add(earthPerihelionFromEarth.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS12.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS13.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS14.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS15.containerObj);
-barycenterEarthAndSun.pivotObj.add(barycenterPLANETS16.containerObj);
-
-barycenterPLANETS12.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
-barycenterPLANETS12.pivotObj.add(venusPerihelionFromEarth.containerObj);
-barycenterPLANETS16.pivotObj.add(marsPerihelionFromEarth.containerObj);
-barycenterPLANETS14.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
-barycenterPLANETS15.pivotObj.add(saturnPerihelionFromEarth.containerObj);
-barycenterPLANETS14.pivotObj.add(uranusPerihelionFromEarth.containerObj);
-barycenterPLANETS12.pivotObj.add(neptunePerihelionFromEarth.containerObj);
-barycenterPLANETS12.pivotObj.add(plutoPerihelionFromEarth.containerObj);
-barycenterPLANETS12.pivotObj.add(halleysPerihelionFromEarth.containerObj);
-barycenterPLANETS12.pivotObj.add(erosPerihelionFromEarth.containerObj);
 
 earth.pivotObj.add(moonApsidalPrecession.containerObj);
 moonApsidalPrecession.pivotObj.add(moonApsidalNodalPrecession1.containerObj);
@@ -2638,45 +3169,85 @@ moonApsidalNodalPrecession2.pivotObj.add(moonRoyerCyclePrecession.containerObj);
 moonRoyerCyclePrecession.pivotObj.add(moonNodalPrecession.containerObj);
 moonNodalPrecession.pivotObj.add(moon.containerObj);
 
-mercuryPerihelionFromEarth.pivotObj.add(mercurybarycenterPLANETS.containerObj);
-mercurybarycenterPLANETS.pivotObj.add(mercuryPerihelionFromSun.containerObj);
-mercuryPerihelionFromSun.pivotObj.add(mercury.containerObj);
+barycenterEarthAndSun.pivotObj.add(mercuryPerihelionDurationEcliptic1.containerObj);
+mercuryPerihelionDurationEcliptic1.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
+mercuryPerihelionFromEarth.pivotObj.add(mercuryPerihelionDurationEcliptic2.containerObj);
+mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryRealPerihelionAtSun.containerObj);
+mercuryRealPerihelionAtSun.pivotObj.add(mercury.containerObj);
 
-venusPerihelionFromEarth.pivotObj.add(venusbarycenterPLANETS.containerObj);
-venusbarycenterPLANETS.pivotObj.add(venusPerihelionFromSun.containerObj);
-venusPerihelionFromSun.pivotObj.add(venus.containerObj);
+mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryFixedPerihelionAtSun.containerObj);
 
-marsPerihelionFromEarth.pivotObj.add(marsbarycenterPLANETS.containerObj);
-marsbarycenterPLANETS.pivotObj.add(marsPerihelionFromSun.containerObj);
-marsPerihelionFromSun.pivotObj.add(mars.containerObj);
+barycenterEarthAndSun.pivotObj.add(venusPerihelionDurationEcliptic1.containerObj);
+venusPerihelionDurationEcliptic1.pivotObj.add(venusPerihelionFromEarth.containerObj);
+venusPerihelionFromEarth.pivotObj.add(venusPerihelionDurationEcliptic2.containerObj);
+venusPerihelionDurationEcliptic2.pivotObj.add(venusRealPerihelionAtSun.containerObj);
+venusRealPerihelionAtSun.pivotObj.add(venus.containerObj);
 
-jupiterPerihelionFromEarth.pivotObj.add(jupiterbarycenterPLANETS.containerObj);
-jupiterbarycenterPLANETS.pivotObj.add(jupiterPerihelionFromSun.containerObj);
-jupiterPerihelionFromSun.pivotObj.add(jupiter.containerObj);
+venusPerihelionDurationEcliptic2.pivotObj.add(venusFixedPerihelionAtSun.containerObj);
 
-saturnPerihelionFromEarth.pivotObj.add(saturnbarycenterPLANETS.containerObj);
-saturnbarycenterPLANETS.pivotObj.add(saturnPerihelionFromSun.containerObj);
-saturnPerihelionFromSun.pivotObj.add(saturn.containerObj);
+barycenterEarthAndSun.pivotObj.add(marsPerihelionDurationEcliptic1.containerObj);
+marsPerihelionDurationEcliptic1.pivotObj.add(marsPerihelionFromEarth.containerObj);
+marsPerihelionFromEarth.pivotObj.add(marsPerihelionDurationEcliptic2.containerObj);
+marsPerihelionDurationEcliptic2.pivotObj.add(marsRealPerihelionAtSun.containerObj);
+marsRealPerihelionAtSun.pivotObj.add(mars.containerObj);
 
-uranusPerihelionFromEarth.pivotObj.add(uranusbarycenterPLANETS.containerObj);
-uranusbarycenterPLANETS.pivotObj.add(uranusPerihelionFromSun.containerObj);
-uranusPerihelionFromSun.pivotObj.add(uranus.containerObj);
+marsPerihelionDurationEcliptic2.pivotObj.add(marsFixedPerihelionAtSun.containerObj);
 
-neptunePerihelionFromEarth.pivotObj.add(neptunebarycenterPLANETS.containerObj);
-neptunebarycenterPLANETS.pivotObj.add(neptunePerihelionFromSun.containerObj);
-neptunePerihelionFromSun.pivotObj.add(neptune.containerObj);
+barycenterEarthAndSun.pivotObj.add(jupiterPerihelionDurationEcliptic1.containerObj);
+jupiterPerihelionDurationEcliptic1.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
+jupiterPerihelionFromEarth.pivotObj.add(jupiterPerihelionDurationEcliptic2.containerObj);
+jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterRealPerihelionAtSun.containerObj);
+jupiterRealPerihelionAtSun.pivotObj.add(jupiter.containerObj);
 
-plutoPerihelionFromEarth.pivotObj.add(plutobarycenterPLANETS.containerObj);
-plutobarycenterPLANETS.pivotObj.add(plutoPerihelionFromSun.containerObj);
-plutoPerihelionFromSun.pivotObj.add(pluto.containerObj);
+jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterFixedPerihelionAtSun.containerObj);
 
-halleysPerihelionFromEarth.pivotObj.add(halleysbarycenterPLANETS.containerObj);
-halleysbarycenterPLANETS.pivotObj.add(halleysPerihelionFromSun.containerObj);
-halleysPerihelionFromSun.pivotObj.add(halleys.containerObj);
+barycenterEarthAndSun.pivotObj.add(saturnPerihelionDurationEcliptic1.containerObj);
+saturnPerihelionDurationEcliptic1.pivotObj.add(saturnPerihelionFromEarth.containerObj);
+saturnPerihelionFromEarth.pivotObj.add(saturnPerihelionDurationEcliptic2.containerObj);
+saturnPerihelionDurationEcliptic2.pivotObj.add(saturnRealPerihelionAtSun.containerObj);
+saturnRealPerihelionAtSun.pivotObj.add(saturn.containerObj);
 
-erosPerihelionFromEarth.pivotObj.add(erosbarycenterPLANETS.containerObj);
-erosbarycenterPLANETS.pivotObj.add(erosPerihelionFromSun.containerObj);
-erosPerihelionFromSun.pivotObj.add(eros.containerObj);
+saturnPerihelionDurationEcliptic2.pivotObj.add(saturnFixedPerihelionAtSun.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(uranusPerihelionDurationEcliptic1.containerObj);
+uranusPerihelionDurationEcliptic1.pivotObj.add(uranusPerihelionFromEarth.containerObj);
+uranusPerihelionFromEarth.pivotObj.add(uranusPerihelionDurationEcliptic2.containerObj);
+uranusPerihelionDurationEcliptic2.pivotObj.add(uranusRealPerihelionAtSun.containerObj);
+uranusRealPerihelionAtSun.pivotObj.add(uranus.containerObj);
+
+uranusPerihelionDurationEcliptic2.pivotObj.add(uranusFixedPerihelionAtSun.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(neptunePerihelionDurationEcliptic1.containerObj);
+neptunePerihelionDurationEcliptic1.pivotObj.add(neptunePerihelionFromEarth.containerObj);
+neptunePerihelionFromEarth.pivotObj.add(neptunePerihelionDurationEcliptic2.containerObj);
+neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneRealPerihelionAtSun.containerObj);
+neptuneRealPerihelionAtSun.pivotObj.add(neptune.containerObj);
+
+neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneFixedPerihelionAtSun.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(plutoPerihelionDurationEcliptic1.containerObj);
+plutoPerihelionDurationEcliptic1.pivotObj.add(plutoPerihelionFromEarth.containerObj);
+plutoPerihelionFromEarth.pivotObj.add(plutoPerihelionDurationEcliptic2.containerObj);
+plutoPerihelionDurationEcliptic2.pivotObj.add(plutoRealPerihelionAtSun.containerObj);
+plutoRealPerihelionAtSun.pivotObj.add(pluto.containerObj);
+
+plutoPerihelionDurationEcliptic2.pivotObj.add(plutoFixedPerihelionAtSun.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(halleysPerihelionDurationEcliptic1.containerObj);
+halleysPerihelionDurationEcliptic1.pivotObj.add(halleysPerihelionFromEarth.containerObj);
+halleysPerihelionFromEarth.pivotObj.add(halleysPerihelionDurationEcliptic2.containerObj);
+halleysPerihelionDurationEcliptic2.pivotObj.add(halleysRealPerihelionAtSun.containerObj);
+halleysRealPerihelionAtSun.pivotObj.add(halleys.containerObj);
+
+halleysPerihelionDurationEcliptic2.pivotObj.add(halleysFixedPerihelionAtSun.containerObj);
+
+barycenterEarthAndSun.pivotObj.add(erosPerihelionDurationEcliptic1.containerObj);
+erosPerihelionDurationEcliptic1.pivotObj.add(erosPerihelionFromEarth.containerObj);
+erosPerihelionFromEarth.pivotObj.add(erosPerihelionDurationEcliptic2.containerObj);
+erosPerihelionDurationEcliptic2.pivotObj.add(erosRealPerihelionAtSun.containerObj);
+erosRealPerihelionAtSun.pivotObj.add(eros.containerObj);
+
+erosPerihelionDurationEcliptic2.pivotObj.add(erosFixedPerihelionAtSun.containerObj);
 
 // The model starts on 21 june and not at 0 degrees (March equinox) so we need to turn it 90 degrees
 // Why 21 june 2000?
@@ -2699,7 +3270,8 @@ planetObjects.forEach(obj => {
     obj.dist = "";      
     obj.distKm = ""; 
     obj.distMi = ""; 
-    obj.sunDistAU = "";      
+    obj.sunDistAU = "";
+    obj.perihelionDistAU = "";
     obj.sunDistKm = "";  
     obj.sunDistMi = "";
 })
@@ -2810,6 +3382,435 @@ const glowMaterial = new THREE.MeshBasicMaterial({
 const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
 glowRing.rotation.x = -Math.PI / 2;
 zodiac.add(glowRing);
+
+//*************************************************************
+// INVARIABLE PLANE VISUALIZATION
+//*************************************************************
+
+// Helper function to create the invariable plane (tilted grid/disc)
+function createInvariablePlaneVisualization(size = 500, divisions = 20) {
+  const group = new THREE.Group();
+  group.name = 'InvariablePlaneVisualization';
+
+  const MEAN_INCLINATION_RAD = earthinclinationMean * Math.PI / 180;
+
+  // Phase offset to align HIGH/LOW/MEAN markers with zodiac signs
+  // Uses global inclinationPathZodiacOffsetDeg constant
+  const MARKER_PHASE_OFFSET = inclinationPathZodiacOffsetDeg * Math.PI / 180;
+
+  // Grid helper (tilted to represent invariable plane) - fewer divisions for performance
+  // Use a more visible purple/magenta color to distinguish from ecliptic
+  const gridHelper = new THREE.GridHelper(size, divisions, 0xaa44aa, 0x663366);
+  gridHelper.material.opacity = 0.4;
+  gridHelper.material.transparent = true;
+  gridHelper.rotation.x = -MEAN_INCLINATION_RAD; // Tilt DOWN from ecliptic
+  group.add(gridHelper);
+
+  // Solid disc for better visibility (fewer segments) - purple tint
+  const discGeometry = new THREE.CircleGeometry(size / 2, 32);
+  const discMaterial = new THREE.MeshBasicMaterial({
+    color: 0x8844aa,
+    transparent: true,
+    opacity: 0.15,
+    side: THREE.DoubleSide
+  });
+  const disc = new THREE.Mesh(discGeometry, discMaterial);
+  disc.rotation.x = -Math.PI / 2 - MEAN_INCLINATION_RAD;
+  group.add(disc);
+
+  // Edge ring - thicker and more visible (magenta)
+  const ringGeometry = new THREE.RingGeometry(size/2 - 4, size/2, 64);
+  const ringMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff44ff,
+    transparent: true,
+    opacity: 0.7,
+    side: THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+  ring.rotation.x = -Math.PI / 2 - MEAN_INCLINATION_RAD;
+  group.add(ring);
+
+  // Add a "tilt indicator" using a cylinder (tube) for better visibility
+  // This shows the tilt axis - from lowest point to highest point
+  const halfSize = size / 2;
+  const tubeRadius = 3;
+  const tubeLength = size * 0.9;
+  const indicatorGeometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, tubeLength, 8);
+  const indicatorMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.8
+  });
+  const indicatorTube = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
+  // Cylinder is vertical by default, rotate to horizontal along X axis
+  indicatorTube.rotation.z = Math.PI / 2;
+  // Then apply the tilt
+  indicatorTube.rotation.x = -MEAN_INCLINATION_RAD;
+  // Apply the same phase offset as the markers (rotate around Y axis, negated)
+  indicatorTube.rotation.y = -MARKER_PHASE_OFFSET;
+  group.add(indicatorTube);
+
+  // Add a second tube at 90° for the MEAN axis (magenta color to match mean markers)
+  // This creates a cross showing both HIGH-LOW axis and MEAN-MEAN axis
+  const meanIndicatorGeometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, tubeLength, 8);
+  const meanIndicatorMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff88ff, // Magenta to match mean markers
+    transparent: true,
+    opacity: 0.8
+  });
+  const meanIndicatorTube = new THREE.Mesh(meanIndicatorGeometry, meanIndicatorMaterial);
+  // Cylinder is vertical by default, rotate to horizontal along X axis
+  meanIndicatorTube.rotation.z = Math.PI / 2;
+  // Apply phase offset + 90° to be perpendicular to the HIGH-LOW axis
+  meanIndicatorTube.rotation.y = -MARKER_PHASE_OFFSET - Math.PI / 2;
+  group.add(meanIndicatorTube);
+
+  // Add larger spheres at the high and low points of the tilt
+  const markerGeom = new THREE.SphereGeometry(12, 12, 12); // Larger spheres
+
+  // Calculate inclination range values
+  const maxInclination = earthinclinationMean + tiltandinclinationAmplitude; // 2.059°
+  const minInclination = earthinclinationMean - tiltandinclinationAmplitude; // 0.931°
+
+  // High point marker (yellow) - where Earth reaches MAXIMUM inclination (2.059°)
+  const highMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const highMarker = new THREE.Mesh(markerGeom, highMarkerMat);
+  // Position at edge of disc, rotated by MARKER_PHASE_OFFSET for zodiac alignment
+  const markerDist = halfSize * 0.95;
+  // HIGH is at angle 0 + offset, LOW is at angle π + offset
+  const highAngle = MARKER_PHASE_OFFSET;
+  const highXpos = Math.cos(highAngle) * markerDist;
+  const highZpos = Math.sin(highAngle) * markerDist;
+  const highYpos = Math.sin(MEAN_INCLINATION_RAD) * Math.cos(highAngle) * markerDist; // Y from tilt
+  highMarker.position.set(Math.cos(MEAN_INCLINATION_RAD) * highXpos, highYpos, highZpos);
+  group.add(highMarker);
+
+  // Low point marker (cyan) - where Earth reaches MINIMUM inclination (0.931°)
+  const lowMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+  const lowMarker = new THREE.Mesh(markerGeom, lowMarkerMat);
+  const lowAngle = Math.PI + MARKER_PHASE_OFFSET;
+  const lowXpos = Math.cos(lowAngle) * markerDist;
+  const lowZpos = Math.sin(lowAngle) * markerDist;
+  const lowYpos = Math.sin(MEAN_INCLINATION_RAD) * Math.cos(lowAngle) * markerDist;
+  lowMarker.position.set(Math.cos(MEAN_INCLINATION_RAD) * lowXpos, lowYpos, lowZpos);
+  group.add(lowMarker);
+
+  // Add labels for high/low points with inclination values
+  const highLabelDiv = document.createElement('div');
+  highLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">HIGH</span><br>' + maxInclination.toFixed(4) + '°';
+  highLabelDiv.style.color = '#ffff00';
+  highLabelDiv.style.fontSize = '14px';
+  highLabelDiv.style.fontFamily = 'Arial, sans-serif';
+  highLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  highLabelDiv.style.pointerEvents = 'none';
+  highLabelDiv.style.textAlign = 'center';
+  highLabelDiv.style.lineHeight = '1.3';
+  highLabelDiv.style.display = 'none'; // Hidden by default
+  const highLabelObj = new CSS2DObject(highLabelDiv);
+  highLabelObj.position.set(Math.cos(MEAN_INCLINATION_RAD) * highXpos, highYpos + 20, highZpos);
+  group.add(highLabelObj);
+
+  const lowLabelDiv = document.createElement('div');
+  lowLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">LOW</span><br>' + minInclination.toFixed(4) + '°';
+  lowLabelDiv.style.color = '#00ffff';
+  lowLabelDiv.style.fontSize = '14px';
+  lowLabelDiv.style.fontFamily = 'Arial, sans-serif';
+  lowLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  lowLabelDiv.style.pointerEvents = 'none';
+  lowLabelDiv.style.textAlign = 'center';
+  lowLabelDiv.style.lineHeight = '1.3';
+  lowLabelDiv.style.display = 'none'; // Hidden by default
+  const lowLabelObj = new CSS2DObject(lowLabelDiv);
+  lowLabelObj.position.set(Math.cos(MEAN_INCLINATION_RAD) * lowXpos, lowYpos - 20, lowZpos);
+  group.add(lowLabelObj);
+
+  // Add mean labels perpendicular to tilt axis (rotated by MARKER_PHASE_OFFSET)
+  // These show where Earth crosses the mean inclination
+  const meanMarkerGeom = new THREE.SphereGeometry(10, 12, 12);
+  const meanMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff88ff }); // Magenta
+
+  // Mean markers at 90° and 270° from HIGH, plus the offset
+  const mean1Angle = Math.PI / 2 + MARKER_PHASE_OFFSET;
+  const mean2Angle = 3 * Math.PI / 2 + MARKER_PHASE_OFFSET;
+  const mean1X = Math.cos(mean1Angle) * markerDist;
+  const mean1Z = Math.sin(mean1Angle) * markerDist;
+  const mean2X = Math.cos(mean2Angle) * markerDist;
+  const mean2Z = Math.sin(mean2Angle) * markerDist;
+
+  // Mean marker 1
+  const meanMarker1 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
+  meanMarker1.position.set(mean1X, 0, mean1Z);
+  group.add(meanMarker1);
+
+  // Mean marker 2
+  const meanMarker2 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
+  meanMarker2.position.set(mean2X, 0, mean2Z);
+  group.add(meanMarker2);
+
+  // Mean labels
+  const meanLabel1Div = document.createElement('div');
+  meanLabel1Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthinclinationMean.toFixed(4) + '°';
+  meanLabel1Div.style.color = '#ff88ff';
+  meanLabel1Div.style.fontSize = '12px';
+  meanLabel1Div.style.fontFamily = 'Arial, sans-serif';
+  meanLabel1Div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  meanLabel1Div.style.pointerEvents = 'none';
+  meanLabel1Div.style.textAlign = 'center';
+  meanLabel1Div.style.lineHeight = '1.3';
+  meanLabel1Div.style.display = 'none'; // Hidden by default
+  const meanLabel1Obj = new CSS2DObject(meanLabel1Div);
+  meanLabel1Obj.position.set(mean1X, 15, mean1Z);
+  group.add(meanLabel1Obj);
+
+  const meanLabel2Div = document.createElement('div');
+  meanLabel2Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthinclinationMean.toFixed(4) + '°';
+  meanLabel2Div.style.color = '#ff88ff';
+  meanLabel2Div.style.fontSize = '12px';
+  meanLabel2Div.style.fontFamily = 'Arial, sans-serif';
+  meanLabel2Div.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  meanLabel2Div.style.pointerEvents = 'none';
+  meanLabel2Div.style.textAlign = 'center';
+  meanLabel2Div.style.lineHeight = '1.3';
+  meanLabel2Div.style.display = 'none'; // Hidden by default
+  const meanLabel2Obj = new CSS2DObject(meanLabel2Div);
+  meanLabel2Obj.position.set(mean2X, 15, mean2Z);
+  group.add(meanLabel2Obj);
+
+  // Store references to all labels for visibility control
+  // Store both the div elements and CSS2DObject instances
+  group.userData.highLabelDiv = highLabelDiv;
+  group.userData.lowLabelDiv = lowLabelDiv;
+  group.userData.meanLabel1Div = meanLabel1Div;
+  group.userData.meanLabel2Div = meanLabel2Div;
+  group.userData.highLabelObj = highLabelObj;
+  group.userData.lowLabelObj = lowLabelObj;
+  group.userData.meanLabel1Obj = meanLabel1Obj;
+  group.userData.meanLabel2Obj = meanLabel2Obj;
+
+  // Set all CSS2DObjects to not visible initially (this is what the patched renderer checks)
+  highLabelObj.visible = false;
+  lowLabelObj.visible = false;
+  meanLabel1Obj.visible = false;
+  meanLabel2Obj.visible = false;
+
+  return group;
+}
+
+// Helper function to create the inclination path (wobble curve)
+// The path should align with zodiac so mean crossings are at Cancer/Capricorn (solstice axis)
+function createInclinationPath(radius = 250, numPoints = 120, yScale = 50) {
+  const group = new THREE.Group();
+  group.name = 'InclinationPath';
+
+  const points = [];
+  const colors = [];
+  const CYCLE_LENGTH = holisticyearLength / 3; // 99,392 years
+
+  // Phase offset to align the path with the zodiac
+  // The path is now a child of zodiac, so it's in zodiac's local coordinate system.
+  // Uses global inclinationPathZodiacOffsetDeg constant
+  const PHASE_OFFSET = Math.PI + inclinationPathZodiacOffsetDeg * Math.PI / 180;
+
+  for (let i = 0; i <= numPoints; i++) {
+    const t = i / numPoints;
+    const year = balancedYear + t * CYCLE_LENGTH;
+
+    const incl = computeInclinationEarth(
+      year, balancedYear, holisticyearLength,
+      earthinclinationMean, tiltandinclinationAmplitude
+    );
+
+    // Calculate angle with phase offset
+    // Negate to make marker move counterclockwise (same direction as Earth's orbit)
+    const angle = -(t * Math.PI * 2) + PHASE_OFFSET;
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius;
+    const deviationFromMean = incl - earthinclinationMean;
+    // Higher inclination (further from invariable plane) = HIGHER in visualization (positive Y)
+    const y = deviationFromMean * yScale;
+
+    points.push(new THREE.Vector3(x, y, z));
+
+    // Color: yellow at max incl, blue at min incl
+    const minIncl = earthinclinationMean - tiltandinclinationAmplitude;
+    const maxIncl = earthinclinationMean + tiltandinclinationAmplitude;
+    const norm = (incl - minIncl) / (maxIncl - minIncl);
+    colors.push(norm, norm * 0.8, 1 - norm * 0.5);
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+  const material = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
+  const pathLine = new THREE.Line(geometry, material);
+  group.add(pathLine);
+
+  // Current position marker group (contains sphere, arrow, and label)
+  const markerGroup = new THREE.Group();
+  markerGroup.name = 'CurrentInclinationMarker';
+
+  // Yellow sphere
+  const markerGeom = new THREE.SphereGeometry(3, 8, 8);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const markerSphere = new THREE.Mesh(markerGeom, markerMat);
+  markerGroup.add(markerSphere);
+
+  // Direction arrow (points in direction of motion along the path)
+  const arrowLength = 25;
+  const arrowHeadLength = 8;
+  const arrowHeadWidth = 5;
+  const arrowDir = new THREE.Vector3(1, 0, 0); // Will be updated dynamically
+  const arrowOrigin = new THREE.Vector3(0, 0, 0);
+  const arrowHelper = new THREE.ArrowHelper(arrowDir, arrowOrigin, arrowLength, 0xff8800, arrowHeadLength, arrowHeadWidth);
+  arrowHelper.name = 'DirectionArrow';
+  markerGroup.add(arrowHelper);
+
+  // Inclination value label (using CSS2DObject for crisp text)
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'inclination-label';
+  labelDiv.style.color = '#ffff00';
+  labelDiv.style.fontSize = '14px';
+  labelDiv.style.fontFamily = 'Arial, sans-serif';
+  labelDiv.style.fontWeight = 'bold';
+  labelDiv.style.textShadow = '1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black';
+  labelDiv.style.pointerEvents = 'none';
+  labelDiv.style.whiteSpace = 'nowrap';
+  labelDiv.textContent = '';
+  const labelObject = new CSS2DObject(labelDiv);
+  labelObject.position.set(0, 12, 0); // Position above the marker
+  labelObject.name = 'InclinationLabel';
+  labelObject.visible = false; // Hidden initially (patched renderer checks this)
+  markerGroup.add(labelObject);
+
+  // Hide marker group initially (will be shown when path becomes visible)
+  markerGroup.visible = false;
+
+  group.add(markerGroup);
+
+  // Store references for update function
+  group.userData.marker = markerGroup;
+  group.userData.markerSphere = markerSphere;
+  group.userData.arrowHelper = arrowHelper;
+  group.userData.labelObject = labelObject;
+  group.userData.labelDiv = labelDiv;
+  group.userData.radius = radius;
+  group.userData.yScale = yScale;
+  group.userData.phaseOffset = PHASE_OFFSET;
+
+  return group;
+}
+
+// Update function for inclination path marker (called in render loop, throttled)
+let _lastInclinationUpdateYear = null;
+const _inclinationArrowDir = new THREE.Vector3(); // Reusable vector for arrow direction
+function updateInclinationPathMarker() {
+  const marker = inclinationPathGroup.userData.marker;
+  const labelDiv = inclinationPathGroup.userData.labelDiv;
+  const labelObject = inclinationPathGroup.userData.labelObject;
+
+  // Hide marker and label when path is not visible
+  if (!inclinationPathGroup.visible) {
+    if (marker.visible) {
+      marker.visible = false;
+      labelObject.visible = false; // Use CSS2DObject.visible (patched renderer checks this)
+    }
+    return;
+  }
+
+  // Check if this is a fresh show (marker was hidden, now path is visible)
+  const needsImmediateUpdate = !marker.visible;
+
+  // Throttle: only update if year changed significantly (0.1 year = ~36 days)
+  // But always update on fresh show
+  if (!needsImmediateUpdate && _lastInclinationUpdateYear !== null &&
+      Math.abs(o.currentYear - _lastInclinationUpdateYear) < 0.1) {
+    return;
+  }
+  _lastInclinationUpdateYear = o.currentYear;
+
+  const arrowHelper = inclinationPathGroup.userData.arrowHelper;
+  const radius = inclinationPathGroup.userData.radius;
+  const yScale = inclinationPathGroup.userData.yScale;
+  const phaseOffset = inclinationPathGroup.userData.phaseOffset || 0;
+
+  const CYCLE_LENGTH = holisticyearLength / 3;
+  let progress = ((o.currentYear - balancedYear) % CYCLE_LENGTH) / CYCLE_LENGTH;
+  if (progress < 0) progress += 1;
+
+  // Apply same angle calculation as the path (negated for counterclockwise motion)
+  const angle = -(progress * Math.PI * 2) + phaseOffset;
+  const deviation = o.inclinationEarth - earthinclinationMean;
+
+  // Higher inclination = higher Y (positive deviation = above mean line)
+  const x = Math.cos(angle) * radius;
+  const y = deviation * yScale;
+  const z = Math.sin(angle) * radius;
+
+  // Set position BEFORE showing marker (prevents flash at wrong position)
+  marker.position.set(x, y, z);
+
+  // Now show marker if it was hidden (label will be shown after text is set)
+  if (needsImmediateUpdate) {
+    marker.visible = true;
+  }
+
+  // Calculate direction of motion (tangent to path, pointing counterclockwise)
+  // Derivative of position with respect to angle (negated because angle decreases with time)
+  // dx/dangle = -sin(angle) * radius, dz/dangle = cos(angle) * radius
+  // But since angle = -progress*2π, motion is in direction of increasing angle visually
+  // The tangent pointing in direction of motion (counterclockwise):
+  const tangentX = Math.sin(angle) * radius;  // -d(cos)/dangle = sin
+  const tangentZ = -Math.cos(angle) * radius; // d(sin)/dangle = cos, negated for CCW
+
+  // Also include Y component based on rate of change of inclination
+  // At progress p, inclination uses cos, so derivative is sin (positive when rising)
+  const progressNext = progress + 0.001;
+  const angleNext = -(progressNext * Math.PI * 2) + phaseOffset;
+  const yearNext = balancedYear + progressNext * CYCLE_LENGTH;
+  const inclNext = computeInclinationEarth(yearNext, balancedYear, holisticyearLength, earthinclinationMean, tiltandinclinationAmplitude);
+  const deviationNext = inclNext - earthinclinationMean;
+  const tangentY = (deviationNext - deviation) * yScale * 1000; // Scale for visibility
+
+  _inclinationArrowDir.set(tangentX, tangentY, tangentZ).normalize();
+  arrowHelper.setDirection(_inclinationArrowDir);
+
+  // Update inclination label with current value
+  labelDiv.textContent = o.inclinationEarth.toFixed(3) + '°';
+
+  // Show label after all updates are complete (if this was a fresh show)
+  // This happens after position, arrow direction, and text are all set
+  if (needsImmediateUpdate) {
+    labelObject.visible = true; // Use CSS2DObject.visible (patched renderer checks this)
+  }
+}
+
+// Update invariable plane Y position based on current inclination
+// The invariable plane should appear BELOW Earth when inclination > mean
+// and ABOVE Earth when inclination < mean
+// This makes Earth visually "above" or "below" the invariable plane correctly
+function updateInvariablePlanePosition() {
+  if (!invariablePlaneGroup || !invariablePlaneGroup.visible) return;
+
+  // Use same yScale as inclination path (50)
+  const yScale = 50;
+  const deviation = o.inclinationEarth - earthinclinationMean;
+
+  // Offset the invariable plane DOWN when Earth is above mean (positive deviation)
+  // So Earth appears ABOVE the plane
+  invariablePlaneGroup.position.y = -deviation * yScale;
+}
+
+// Create invariable plane (tilted grid/disc)
+const invariablePlaneGroup = createInvariablePlaneVisualization(o.starDistance * 2, 30);
+earth.pivotObj.add(invariablePlaneGroup);
+invariablePlaneGroup.visible = false; // Off by default (labels also hidden by default)
+
+// Create inclination path (wobble curve showing 99,392-year cycle)
+// Add to earth.pivotObj (same as zodiac) so it can be toggled independently
+// The rotation is applied in moveModel() to match zodiac alignment
+const inclinationPathGroup = createInclinationPath(250, 360, 50);
+earth.pivotObj.add(inclinationPathGroup);
+inclinationPathGroup.visible = false; // Off by default
 
 //*************************************************************
 // CREATE MILKYWAY SKYDOME
@@ -3056,6 +4057,8 @@ const _invMat     = new THREE.Matrix4();
 
 const EARTH_POS    = new THREE.Vector3();   // Earth centre (world)
 const SUN_POS      = new THREE.Vector3();   // Sun   centre (world)
+const WOBBLE_POS  = new THREE.Vector3();   // WOBBLE   centre (world)
+const PERIHELION_OF_EARTH_POS  = new THREE.Vector3();   // PERIHELION-OF-EARTH   centre (world)
 const DELTA        = new THREE.Vector3();   // reusable difference-vector
 const LOCAL        = new THREE.Vector3();   // world-to-Earth local
 const CAM_LOCAL    = new THREE.Vector3();   // camera in Earth local
@@ -3063,6 +4066,29 @@ const CAMERA_POS   = new THREE.Vector3();
 const PLANET_POS   = new THREE.Vector3();
 const LOOK_DIR     = new THREE.Vector3();
 const SPHERICAL    = new THREE.Spherical();
+
+// Reusable vectors for updateFlares()
+const _flareSunPos   = new THREE.Vector3();
+const _flareCamPos   = new THREE.Vector3();
+const _flareCamDir   = new THREE.Vector3();
+const _flareToSun    = new THREE.Vector3();
+const _flareLineDir  = new THREE.Vector3();
+const _flarePos      = new THREE.Vector3();
+
+// Reusable vector for tracePlanet()
+const _tracePos = new THREE.Vector3();
+
+const _elSunPos = new THREE.Vector3();
+const _elEarthPos = new THREE.Vector3();
+const _elTargetPos = new THREE.Vector3();
+
+// Pooled vectors for dynamic inclination calculations
+const _eclipticNormalVerified = new THREE.Vector3();
+const _eclipticNormalSS = new THREE.Vector3();
+const _planetNormal = new THREE.Vector3();
+
+const world = new THREE.Vector3();
+const ndc   = new THREE.Vector3();
 
 const _pos        = new THREE.Vector3();
 const _camPos     = new THREE.Vector3();
@@ -3129,12 +4155,14 @@ const PLANET_SYMBOL = {
   uranus  : '♅',   neptune : '♆',  pluto  : '♇'
 };
 
-// put every “big-radius” object that must expand / shrink together in one array
+// put every "big-radius" object that must expand / shrink together in one array
 const scalableObjects = [
   sceneObjects.stars,
   sceneObjects.constellations,
   celestialSphere,
-  plane
+  plane,
+  invariablePlaneGroup,
+  inclinationPathGroup
 ];
 
 //const baseCamDistance = camera.position.length(); // distance that feels “100 %” size
@@ -3144,6 +4172,4072 @@ const maxScale   = 0.9;
 
 const label        = document.getElementById('planetLabel');
 const labelContent = label.querySelector('.labelContent');
+
+//*************************************************************
+// PLANET HIERARCHY INSPECTOR
+//*************************************************************
+
+// Planet registry - maps planet names to their hierarchy chain
+const PLANET_HIERARCHIES = {
+  mercury: {
+    label: 'Mercury',
+    fixedPerihelion: () => mercuryFixedPerihelionAtSun,
+    perihelionOf: () => mercuryPerihelionFromEarth,
+    steps: () => [
+      { obj: mercuryPerihelionDurationEcliptic1, name: 'mercuryPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: mercuryPerihelionFromEarth, name: 'mercuryPerihelionFromEarth', parentName: 'mercuryPerihelionDurationEcliptic1' },
+      { obj: mercuryPerihelionDurationEcliptic2, name: 'mercuryPerihelionDurationEcliptic2', parentName: 'mercuryPerihelionFromEarth' },
+      { obj: mercuryRealPerihelionAtSun, name: 'mercuryRealPerihelionAtSun', parentName: 'mercuryPerihelionDurationEcliptic2' },
+      { obj: mercury, name: 'mercury', parentName: 'mercuryRealPerihelionAtSun' }
+    ]
+  },
+  venus: {
+    label: 'Venus',
+    fixedPerihelion: () => venusFixedPerihelionAtSun,
+    perihelionOf: () => venusPerihelionFromEarth,
+    steps: () => [
+      { obj: venusPerihelionDurationEcliptic1, name: 'venusPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: venusPerihelionFromEarth, name: 'venusPerihelionFromEarth', parentName: 'venusPerihelionDurationEcliptic1' },
+      { obj: venusPerihelionDurationEcliptic2, name: 'venusPerihelionDurationEcliptic2', parentName: 'venusPerihelionFromEarth' },
+      { obj: venusRealPerihelionAtSun, name: 'venusRealPerihelionAtSun', parentName: 'venusPerihelionDurationEcliptic2' },
+      { obj: venus, name: 'venus', parentName: 'venusRealPerihelionAtSun' }
+    ]
+  },
+  mars: {
+    label: 'Mars',
+    fixedPerihelion: () => marsFixedPerihelionAtSun,
+    perihelionOf: () => marsPerihelionFromEarth,
+    steps: () => [
+      { obj: marsPerihelionDurationEcliptic1, name: 'marsPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: marsPerihelionFromEarth, name: 'marsPerihelionFromEarth', parentName: 'marsPerihelionDurationEcliptic1' },
+      { obj: marsPerihelionDurationEcliptic2, name: 'marsPerihelionDurationEcliptic2', parentName: 'marsPerihelionFromEarth' },
+      { obj: marsRealPerihelionAtSun, name: 'marsRealPerihelionAtSun', parentName: 'marsPerihelionDurationEcliptic2' },
+      { obj: mars, name: 'mars', parentName: 'marsRealPerihelionAtSun' }
+    ]
+  },
+  jupiter: {
+    label: 'Jupiter',
+    fixedPerihelion: () => jupiterFixedPerihelionAtSun,
+    perihelionOf: () => jupiterPerihelionFromEarth,
+    steps: () => [
+      { obj: jupiterPerihelionDurationEcliptic1, name: 'jupiterPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: jupiterPerihelionFromEarth, name: 'jupiterPerihelionFromEarth', parentName: 'jupiterPerihelionDurationEcliptic1' },
+      { obj: jupiterPerihelionDurationEcliptic2, name: 'jupiterPerihelionDurationEcliptic2', parentName: 'jupiterPerihelionFromEarth' },
+      { obj: jupiterRealPerihelionAtSun, name: 'jupiterRealPerihelionAtSun', parentName: 'jupiterPerihelionDurationEcliptic2' },
+      { obj: jupiter, name: 'jupiter', parentName: 'jupiterRealPerihelionAtSun' }
+    ]
+  },
+  saturn: {
+    label: 'Saturn',
+    fixedPerihelion: () => saturnFixedPerihelionAtSun,
+    perihelionOf: () => saturnPerihelionFromEarth,
+    steps: () => [
+      { obj: saturnPerihelionDurationEcliptic1, name: 'saturnPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: saturnPerihelionFromEarth, name: 'saturnPerihelionFromEarth', parentName: 'saturnPerihelionDurationEcliptic1' },
+      { obj: saturnPerihelionDurationEcliptic2, name: 'saturnPerihelionDurationEcliptic2', parentName: 'saturnPerihelionFromEarth' },
+      { obj: saturnRealPerihelionAtSun, name: 'saturnRealPerihelionAtSun', parentName: 'saturnPerihelionDurationEcliptic2' },
+      { obj: saturn, name: 'saturn', parentName: 'saturnRealPerihelionAtSun' }
+    ]
+  },
+  uranus: {
+    label: 'Uranus',
+    fixedPerihelion: () => uranusFixedPerihelionAtSun,
+    perihelionOf: () => uranusPerihelionFromEarth,
+    steps: () => [
+      { obj: uranusPerihelionDurationEcliptic1, name: 'uranusPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: uranusPerihelionFromEarth, name: 'uranusPerihelionFromEarth', parentName: 'uranusPerihelionDurationEcliptic1' },
+      { obj: uranusPerihelionDurationEcliptic2, name: 'uranusPerihelionDurationEcliptic2', parentName: 'uranusPerihelionFromEarth' },
+      { obj: uranusRealPerihelionAtSun, name: 'uranusRealPerihelionAtSun', parentName: 'uranusPerihelionDurationEcliptic2' },
+      { obj: uranus, name: 'uranus', parentName: 'uranusRealPerihelionAtSun' }
+    ]
+  },
+  neptune: {
+    label: 'Neptune',
+    fixedPerihelion: () => neptuneFixedPerihelionAtSun,
+    perihelionOf: () => neptunePerihelionFromEarth,
+    steps: () => [
+      { obj: neptunePerihelionDurationEcliptic1, name: 'neptunePerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: neptunePerihelionFromEarth, name: 'neptunePerihelionFromEarth', parentName: 'neptunePerihelionDurationEcliptic1' },
+      { obj: neptunePerihelionDurationEcliptic2, name: 'neptunePerihelionDurationEcliptic2', parentName: 'neptunePerihelionFromEarth' },
+      { obj: neptuneRealPerihelionAtSun, name: 'neptuneRealPerihelionAtSun', parentName: 'neptunePerihelionDurationEcliptic2' },
+      { obj: neptune, name: 'neptune', parentName: 'neptuneRealPerihelionAtSun' }
+    ]
+  },
+  pluto: {
+    label: 'Pluto',
+    fixedPerihelion: () => plutoFixedPerihelionAtSun,
+    perihelionOf: () => plutoPerihelionFromEarth,
+    steps: () => [
+      { obj: plutoPerihelionDurationEcliptic1, name: 'plutoPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: plutoPerihelionFromEarth, name: 'plutoPerihelionFromEarth', parentName: 'plutoPerihelionDurationEcliptic1' },
+      { obj: plutoPerihelionDurationEcliptic2, name: 'plutoPerihelionDurationEcliptic2', parentName: 'plutoPerihelionFromEarth' },
+      { obj: plutoRealPerihelionAtSun, name: 'plutoRealPerihelionAtSun', parentName: 'plutoPerihelionDurationEcliptic2' },
+      { obj: pluto, name: 'pluto', parentName: 'plutoRealPerihelionAtSun' }
+    ]
+  },
+  halleys: {
+    label: "Halley's Comet",
+    fixedPerihelion: () => halleysFixedPerihelionAtSun,
+    perihelionOf: () => halleysPerihelionFromEarth,
+    steps: () => [
+      { obj: halleysPerihelionDurationEcliptic1, name: 'halleysPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: halleysPerihelionFromEarth, name: 'halleysPerihelionFromEarth', parentName: 'halleysPerihelionDurationEcliptic1' },
+      { obj: halleysPerihelionDurationEcliptic2, name: 'halleysPerihelionDurationEcliptic2', parentName: 'halleysPerihelionFromEarth' },
+      { obj: halleysRealPerihelionAtSun, name: 'halleysRealPerihelionAtSun', parentName: 'halleysPerihelionDurationEcliptic2' },
+      { obj: halleys, name: 'halleys', parentName: 'halleysRealPerihelionAtSun' }
+    ]
+  },
+  eros: {
+    label: 'Eros',
+    fixedPerihelion: () => erosFixedPerihelionAtSun,
+    perihelionOf: () => erosPerihelionFromEarth,
+    steps: () => [
+      { obj: erosPerihelionDurationEcliptic1, name: 'erosPerihelionDurationEcliptic1', parentName: 'startingPoint' },
+      { obj: erosPerihelionFromEarth, name: 'erosPerihelionFromEarth', parentName: 'erosPerihelionDurationEcliptic1' },
+      { obj: erosPerihelionDurationEcliptic2, name: 'erosPerihelionDurationEcliptic2', parentName: 'erosPerihelionFromEarth' },
+      { obj: erosRealPerihelionAtSun, name: 'erosRealPerihelionAtSun', parentName: 'erosPerihelionDurationEcliptic2' },
+      { obj: eros, name: 'eros', parentName: 'erosRealPerihelionAtSun' }
+    ]
+  }
+};
+
+// ================================================================
+// PLANET TEST DATES CONFIGURATION
+// ================================================================
+// Each planet has its own list of Julian Day dates to test.
+// - jd: Julian Day number
+// - type: 'position', 'longitude', or 'both'
+// - label: Human-readable description
+// - showOnScreen: true = show in inspector panel, false = Excel only
+//
+// DATA SOURCES:
+// - Mercury transits: https://eclipse.gsfc.nasa.gov/transit/catalog/MercuryCatalog.html (NASA GSFC)
+// - Venus transits: https://eclipse.gsfc.nasa.gov/transit/catalog/VenusCatalog.html (NASA GSFC)
+// - Mars oppositions: https://stjerneskinn.com/mars-at-opposition.htm (Jean Meeus tables)
+//                     https://www.nakedeyeplanets.com/mars-oppositions.htm
+// - Jupiter/Saturn conjunctions: https://astropixels.com/ephemeris/planets/jupiter2020.html (JPL DE405)
+//                                https://www.astropro.com/features/tables/geo/ju-sa/ju000sa.html
+// - Mutual planetary occultations: https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses
+//                                  https://www.projectpluto.com/mut_pln.htm
+//                                  https://www.bogan.ca/astro/occultations/occltlst.htm
+// ================================================================
+const PLANET_TEST_DATES = {
+  mercury: [
+    // Model start date: ra is in decimal hours (e.g., 7.682 = 7h 40m 55s)
+    { jd: 2451716.5, ra: '7.412897222', dec: '20.8486', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    // NASA Mercury Transit Catalog: https://eclipse.gsfc.nasa.gov/transit/catalog/MercuryCatalog.html
+    { jd: 2307579.3, dec: '-14.68', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2311048.9, dec: '15.61', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2312330.1, dec: '-15.49', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2315800.2, dec: '16.52', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2317080.8, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2321831.5, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2324381.5, dec: '-15.01', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2327851.2, dec: '15.94', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2329132.3, dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2332602.5, dec: '16.84', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2333883.0, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2338633.7, dec: '-17.32', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2341183.7, dec: '-15.33', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2344653.5, dec: '16.27', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2345934.5, dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2350685.2, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2355435.9, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2356704.5, dec: '15.68', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2357985.9, dec: '-15.65', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2361455.8, dec: '16.59', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2362736.7, dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2367487.4, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2370037.4, dec: '-14.91', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2372238.1, dec: '-17.88', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2373506.7, dec: '16.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2374788.1, dec: '-15.96', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2378258.0, dec: '16.90', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2379538.9, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2384289.6, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2386839.6, dec: '-15.50', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2390309.0, dec: '16.34', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2391590.3, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2395060.3, dec: '17.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2396341.1, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2401091.8, dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2403641.8, dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2407111.3, dec: '16.66', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2408392.5, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2411862.6, dec: '17.52', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2413143.3, dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2417894.0, dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2420444.0, dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2423913.6, dec: '16.97', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2425194.7, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2428664.9, dec: '17.81', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2429945.5, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2434696.2, dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2435964.6, dec: '16.41', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2437246.2, dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2440715.8, dec: '17.28', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2441996.9, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2446747.7, dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2449297.7, dec: '-15.97', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2451498.4, dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2452766.8, dec: '16.73', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2454048.4, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2457518.1, dec: '17.58', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2458799.1, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2463549.9, dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2466099.9, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2469569.1, dec: '17.04', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2470850.6, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2474320.4, dec: '17.88', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2475601.3, dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2480352.1, dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2482902.1, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2486371.4, dec: '17.35', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2487652.8, dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2491122.7, dec: '18.16', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2492403.5, dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2497154.3, dec: '-18.67', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2499704.3, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2503173.7, dec: '17.65', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2504455.0, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2507925.0, dec: '18.45', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2509205.7, dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2513956.5, dec: '-18.92', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2515224.6, dec: '17.12', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2516506.5, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2519975.9, dec: '17.94', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2521257.2, dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2526007.9, dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2528557.9, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2532026.9, dec: '17.41', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2533308.7, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2536778.2, dec: '18.23', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2538059.4, dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2542810.1, dec: '-18.80', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2545360.1, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2548829.2, dec: '17.71', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2550110.9, dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2553580.5, dec: '18.50', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2554861.6, dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2559612.3, dec: '-19.04', type: 'position', label: 'NASA date', showOnScreen: false },
+  ],
+  // VENUS TRANSIT DATA
+  // NASA Venus Transit Catalog: https://eclipse.gsfc.nasa.gov/transit/catalog/VenusCatalog.html
+  venus: [
+    { jd: 2451716.5, ra: '6.185725', dec: '23.8844', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 991610.0, dec: '-15.31', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1030146.3, dec: '16.16', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1033066.0, dec: '15.50', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1077446.5, dec: '-16.65', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1080366.0, dec: '-15.91', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1118902.5, dec: '16.83', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1121822.3, dec: '16.20', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1166202.5, dec: '-17.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1169122.0, dec: '-16.48', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1207658.7, dec: '17.47', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1210578.5, dec: '16.86', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1254958.5, dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1257878.1, dec: '-17.04', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1296415.0, dec: '18.08', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1299334.7, dec: '17.50', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1343714.5, dec: '-18.25', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1346634.1, dec: '-17.58', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1385171.2, dec: '18.67', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1388090.9, dec: '18.11', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1432470.5, dec: '-18.74', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1435390.1, dec: '-18.10', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1476847.1, dec: '18.69', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1521226.5, dec: '-19.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1524146.1, dec: '-18.59', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1565603.3, dec: '19.25', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1609982.5, dec: '-19.66', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1654359.5, dec: '19.76', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1698738.5, dec: '-20.08', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1743115.6, dec: '20.25', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1787494.5, dec: '-20.48', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1831871.8, dec: '20.71', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1876250.5, dec: '-20.86', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1920628.0, dec: '21.13', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1923547.7, dec: '20.72', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 1965006.4, dec: '-21.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2009384.1, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2012303.9, dec: '21.14', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2053762.4, dec: '-21.53', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2098140.3, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2101060.0, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2142518.4, dec: '-21.83', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2186896.4, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2189816.2, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2231274.3, dec: '-22.10', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2275652.6, dec: '22.45', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2278572.3, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2317110.7, dec: '-22.64', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2320030.3, dec: '-22.34', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2364408.7, dec: '22.69', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2367328.4, dec: '22.44', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2405866.7, dec: '-22.82', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2408786.2, dec: '-22.56', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2453164.8, dec: '22.89', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2456084.6, dec: '22.68', type: 'position', label: 'NASA date', showOnScreen: true },
+    { jd: 2494622.6, dec: '-22.97', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2497542.2, dec: '-22.74', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2541921.0, dec: '23.05', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2544840.7, dec: '22.87', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2583378.6, dec: '-23.09', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2586298.1, dec: '-22.90', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2630677.1, dec: '23.17', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2633596.8, dec: '23.02', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2672134.5, dec: '-23.18', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2675054.1, dec: '-23.03', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2719433.2, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2722352.9, dec: '23.14', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2760890.5, dec: '-23.24', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2763810.0, dec: '-23.12', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2808189.3, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2811109.0, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2849646.4, dec: '-23.27', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2896945.4, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2899865.1, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2938402.3, dec: '-23.26', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2985701.5, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2988621.2, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 3027158.3, dec: '-23.23', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 3074457.6, dec: '23.16', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 3077377.3, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 3115914.2, dec: '-23.16', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 3166133.4, dec: '23.13', type: 'position', label: 'NASA date', showOnScreen: false },
+// VENUS OCCULTATIONS (9 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1388944.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1601453.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1618742.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1864578.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1997689.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2012028.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2222501.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2355634.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2500459.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+  ],
+  // MARS OPPOSITION DATA
+  // Sources: https://stjerneskinn.com/mars-at-opposition.htm (Jean Meeus tables)
+  //          https://www.nakedeyeplanets.com/mars-oppositions.htm
+  mars: [
+    { jd: 2451716.5, ra: '6.219366667', dec: '24.2058', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    // Mars Opposition dates - declination values from astronomical tables
+    { jd: 2414673.5, dec: '24.70', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2415437.8, dec: '14.53', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2416202.8, dec: '-0.08', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2416974.3, dec: '-16.95', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2417763.1, dec: '-27.98', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2418573.9, dec: '-4.22', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2419365.7, dec: '21.72', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2420138.3, dec: '26.57', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2420903.6, dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2421667.8, dec: '5.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2422435.9, dec: '-10.35', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2423216.1, dec: '-25.93', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2424021.2, dec: '-17.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2424823.9, dec: '14.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2425602.1, dec: '26.65', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2426369.3, dec: '22.90', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2427133.3, dec: '11.43', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2427899.2, dec: '-3.87', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2428673.3, dec: '-20.67', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2429467.8, dec: '-26.40', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2430278.0, dec: '3.50', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2431064.3, dec: '24.40', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2431834.5, dec: '25.60', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2432599.2, dec: '16.42', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2433363.7, dec: '2.33', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2434133.6, dec: '-14.28', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2434918.2, dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2435727.4, dec: '-10.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2436524.1, dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2437298.9, dec: '26.82', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2438065.0, dec: '20.70', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2438829.0, dec: '8.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2439596.0, dec: '-7.72', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2440373.2, dec: '-23.95', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2441173.8, dec: '-22.25', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2441980.6, dec: '10.30', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2442762.1, dec: '26.05', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2443530.5, dec: '24.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2444294.7, dec: '13.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2445059.9, dec: '-1.35', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2445831.9, dec: '-18.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2446621.7, dec: '-27.73', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2447432.6, dec: '-2.12', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2448223.4, dec: '22.63', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2448995.4, dec: '26.27', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2449760.6, dec: '18.17', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2450524.8, dec: '4.67', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2451293.2, dec: '-11.62', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2452074.2, dec: '-26.50', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2452880.2, dec: '-15.82', type: 'position', label: 'Opposition', showOnScreen: true},
+    { jd: 2453681.8, dec: '15.90', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2454459.3, dec: '26.77', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2455226.3, dec: '22.15', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2455990.3, dec: '10.28', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2456756.4, dec: '-5.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2457531.0, dec: '-21.65', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2458326.7, dec: '-25.50', type: 'position', label: 'Opposition', showOnScreen: true },
+    { jd: 2459136.5, dec: '5.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2459921.7, dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: true },
+    { jd: 2460691.6, dec: '25.12', type: 'position', label: 'Opposition', showOnScreen: true },
+    { jd: 2461456.2, dec: '15.37', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2462220.8, dec: '1.07', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2462991.0, dec: '-15.48', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2463776.6, dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2464586.3, dec: '-8.03', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2465381.9, dec: '20.27', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2466156.1, dec: '26.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2466922.0, dec: '19.83', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2467686.0, dec: '6.93', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2468453.2, dec: '-9.00', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2469231.1, dec: '-24.75', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2470032.8, dec: '-20.73', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2470838.8, dec: '11.97', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2471619.4, dec: '26.33', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2472387.6, dec: '23.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2473151.7, dec: '12.33', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2473917.0, dec: '-2.63', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2474689.4, dec: '-19.18', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2475480.4, dec: '-27.32', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2476291.3, dec: '-0.02', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2477080.9, dec: '23.43', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2477852.5, dec: '25.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2478617.6, dec: '17.20', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2479381.9, dec: '3.43', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2480150.6, dec: '-12.85', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2480932.3, dec: '-26.97', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2481739.2, dec: '-13.88', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2482539.8, dec: '17.27', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2483316.6, dec: '26.80', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2484083.3, dec: '21.35', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2484847.3, dec: '9.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2485613.6, dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2486388.8, dec: '-22.60', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2487185.6, dec: '-24.43', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2487994.8, dec: '7.33', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2488779.2, dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2489548.7, dec: '24.57', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2490313.1, dec: '14.30', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2491077.9, dec: '-0.18', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2491848.4, dec: '-16.62', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2492635.0, dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2493445.2, dec: '-5.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2494239.6, dec: '21.32', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2495013.3, dec: '26.47', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2495779.0, dec: '18.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2496543.1, dec: '5.70', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2497310.5, dec: '-10.25', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2498089.0, dec: '-25.43', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2498891.8, dec: '-19.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2499696.9, dec: '13.57', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2500476.8, dec: '26.55', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2501244.6, dec: '22.73', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2502008.7, dec: '11.20', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2502774.2, dec: '-3.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2503547.1, dec: '-20.25', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2504339.1, dec: '-26.72', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2505149.9, dec: '2.02', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2505938.4, dec: '24.15', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2506709.7, dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2507474.6, dec: '16.18', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2508238.9, dec: '2.18', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2509007.9, dec: '-14.05', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2509790.5, dec: '-27.30', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2510598.3, dec: '-11.85', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2511397.6, dec: '18.55', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2512173.8, dec: '26.73', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2512940.3, dec: '20.52', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2513704.3, dec: '7.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2514470.8, dec: '-7.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2515246.5, dec: '-23.47', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2516044.5, dec: '-23.23', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2516853.1, dec: '9.15', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2517636.6, dec: '25.90', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2518405.8, dec: '23.95', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2519170.1, dec: '13.20', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2519935.0, dec: '-1.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2520706.0, dec: '-17.77', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2521493.5, dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2522304.0, dec: '-3.78', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2523097.3, dec: '22.27', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2523870.4, dec: '26.18', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2524636.0, dec: '17.95', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2525400.1, dec: '4.48', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2526167.8, dec: '-11.47', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2526947.0, dec: '-26.02', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2527750.9, dec: '-17.33', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2528554.9, dec: '15.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2529334.0, dec: '26.67', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2530101.6, dec: '21.98', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2530865.7, dec: '10.03', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2531631.3, dec: '-5.17', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2532404.7, dec: '-21.23', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2533197.8, dec: '-25.98', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2534008.4, dec: '4.02', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2534796.0, dec: '24.78', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2535566.8, dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2536331.5, dec: '15.13', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2537096.0, dec: '0.93', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2537865.3, dec: '-15.23', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2538648.8, dec: '-27.52', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2539457.3, dec: '-9.77', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2540255.5, dec: '19.73', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2541031.0, dec: '26.60', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2541797.3, dec: '19.63', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2542561.3, dec: '6.72', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2543328.0, dec: '-8.92', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2544104.3, dec: '-24.25', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2544903.5, dec: '-21.87', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2545711.4, dec: '10.90', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2546494.0, dec: '26.22', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2547262.8, dec: '23.30', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2548027.1, dec: '12.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2548792.1, dec: '-2.72', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2549563.5, dec: '-18.83', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2550352.0, dec: '-27.38', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2551162.7, dec: '-1.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2551954.9, dec: '23.10', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2552727.6, dec: '25.82', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2553493.0, dec: '16.97', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2554257.1, dec: '3.25', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2555025.1, dec: '-12.68', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2555805.1, dec: '-26.53', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2556610.0, dec: '-15.47', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2557413.0, dec: '16.53', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2558191.3, dec: '26.70', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2558958.6, dec: '21.17', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2559722.7, dec: '8.87', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2560488.5, dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2561262.3, dec: '-22.15', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2562056.6, dec: '-25.08', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2562866.9, dec: '5.97', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2563653.5, dec: '25.30', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2564423.8, dec: '24.45', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2565188.5, dec: '14.07', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2565953.0, dec: '-0.32', type: 'position', label: 'Opposition', showOnScreen: false },
+    { jd: 2566722.7, dec: '-16.37', type: 'position', label: 'Opposition', showOnScreen: false },
+// MARS OCCULTATIONS (12 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1382451.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1541461.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1561025.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1623446.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1705389.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1837063.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1932304.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2083530.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2302080.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2480621.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2497775.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2571132.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+  ],
+  // JUPITER-SATURN GREAT CONJUNCTIONS (Occultations)
+  // Sources: https://astropixels.com/ephemeris/planets/jupiter2020.html (JPL DE405 ephemeris)
+  //          https://www.astropro.com/features/tables/geo/ju-sa/ju000sa.html (3000-year table)
+  //          https://en.wikipedia.org/wiki/Great_conjunction
+  // Longitude values in ecliptic coordinates (tropical zodiac)
+  jupiter: [
+    { jd: 2451716.5, ra: '3.730069444', dec: '18.8969', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    // Jupiter-Saturn conjunctions with ecliptic longitude reference
+    { jd: 2161655.0, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2168918.0, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
+    { jd: 2176423.0, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2183305.0, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2190769.0, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2198068.0, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2198184.0, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2198274.0, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2205166.0, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2212402.0, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2219922.0, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2227028.0, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2234250.0, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2241584.0, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2241616.0, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2241777.0, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2248674.0, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2255882.0, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2263411.0, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2270539.0, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2277729.0, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2285265.0, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2292180.0, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2299361.0, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2306895.0, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2314045.0, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
+    { jd: 2321208.0, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2328747.0, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2335695.0, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2335803.0, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2335901.0, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2342843.0, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2350377.0, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2357554.0, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2364694.0, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2372231.0, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2379424.0, longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2386336.0, longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2393862.0, longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2401070.0, longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2408189.0, longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2415717.0, longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2422943.0, longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2429850.0, longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2429923.0, longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2430041.0, longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2437350.0, longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2444605.0, longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2444668.0, longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2444810.0, longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2451693.0, longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2459205.0, longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
+    { jd: 2466459.0, longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2473557.0, longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2480839.0, longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
+    { jd: 2488330.0, longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2495204.0, longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2502692.0, longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2509973.0, longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2517071.0, longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2524325.0, longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2531836.0, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2538722.0, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2538850.0, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2538918.0, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2546176.0, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2553484.0, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2553574.0, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2553690.0, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2560580.0, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2567808.0, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2575332.0, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2582444.0, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2589655.0, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+    { jd: 2597186.0, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
+// JUPITER OCCULTATIONS (42 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1363901.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1367887.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1395865.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1423361.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1439704.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1458892.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1479205.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1494378.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1508687.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1519101.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1534273.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1552248.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1624407.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1653936.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1667476.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1720860.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1820586.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1853752.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1877682.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1901285.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1907175.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1970158.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1976993.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1988594.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2024120.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2102311.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2148655.4, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2156435.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2160931.3, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2163270.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2227923.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2294535.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2343999.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2345171.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2385073.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2475612.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2483987.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2485975.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2496726.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2533329.0, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2574181.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2626372.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+  ],
+  // SATURN-JUPITER GREAT CONJUNCTIONS (Occultations)
+  // Sources: https://astropixels.com/ephemeris/planets/saturn2020.html (JPL DE405 ephemeris)
+  //          https://www.astropro.com/features/tables/geo/ju-sa/ju000sa.html (3000-year table)
+  //          https://en.wikipedia.org/wiki/Great_conjunction
+  // Longitude values in ecliptic coordinates (tropical zodiac)
+  saturn: [
+    { jd: 2451716.5, ra: '3.580388889', dec: '17.1936', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    // Saturn-Jupiter conjunctions with ecliptic longitude reference
+    { jd: 2161655.0, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2168918.0, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2176423.0, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2183305.0, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2190769.0, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2198068.0, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2198184.0, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2198274.0, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2205166.0, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2212402.0, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2219922.0, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2227028.0, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2234250.0, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2241584.0, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2241616.0, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2241777.0, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2248674.0, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2255882.0, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2263411.0, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2270539.0, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2277729.0, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2285265.0, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2292180.0, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2299361.0, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2306895.0, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2314045.0, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2321208.0, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2328747.0, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2335695.0, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2335803.0, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2335901.0, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2342843.0, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2350377.0, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2357554.0, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2364694.0, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2372231.0, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2379424.0, longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2386336.0, longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2393862.0, longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2401070.0, longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2408189.0, longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2415717.0, longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2422943.0, longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2429850.0, longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2429923.0, longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2430041.0, longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2437350.0, longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2444605.0, longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2444668.0, longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2444810.0, longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2451693.0, longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2459205.0, longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2466459.0, longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2473557.0, longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2480839.0, longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2488330.0, longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2495204.0, longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2502692.0, longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2509973.0, longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2517071.0, longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2524325.0, longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2531836.0, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2538722.0, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2538850.0, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2538918.0, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2546176.0, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2553484.0, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2553574.0, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2553690.0, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2560580.0, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2567808.0, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2575332.0, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2582444.0, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2589655.0, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2597186.0, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+// SATURN OCCULTATIONS (19 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1359023.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1661510.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1717800.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1750343.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1797617.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1809331.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1933280.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2055100.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2056972.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2095910.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2179057.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2238472.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2260754.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2260814.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2276995.8, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2368145.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2381761.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2540521.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2640765.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+  ],
+  uranus: [
+    { jd: 2451716.5, ra: '21.54528889', dec: '-15.3240', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2314075.2, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2345089.0, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+    { jd: 2376141.7, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+// URANUS OCCULTATIONS (14 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1466919.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 1517868.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1707826.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1842746.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2073791.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2218697.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2226429.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2314075.2, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+     { jd: 2345089.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2376141.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2543283.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2563927.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2579841.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2604944.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+  ],
+  neptune: [
+    { jd: 2451716.5, ra: '20.56120556', dec: '-18.5374', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2361567.0, longitude: '125.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2366314.0, longitude: '152.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2371065.0, longitude: '180.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2375586.0, longitude: '233.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2375660.0, longitude: '239.07', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2375811.0, longitude: '237.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2380321.0, longitude: '267.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2385064.0, longitude: '294.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2389802.0, longitude: '321.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2394300.0, longitude: '320.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2394455.0, longitude: '319.33', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2394488.0, longitude: '318.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2399010.0, longitude: '344.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2403755.0, longitude: '15.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2408250.0, longitude: '45.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2412981.0, longitude: '73.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2417718.0, longitude: '100.83', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2422226.0, longitude: '130.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2422392.0, longitude: '129.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2422439.0, longitude: '128.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2426970.0, longitude: '155.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2431721.0, longitude: '185.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2436471.0, longitude: '213.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2440984.0, longitude: '242.78', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2441094.0, longitude: '241.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2441211.0, longitude: '240.62', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2445719.0, longitude: '270.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2450458.0, longitude: '297.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2454979.0, longitude: '326.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
+    { jd: 2455023.0, longitude: '326.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2455187.0, longitude: '324.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+    { jd: 2459682.0, longitude: '353.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false }, 
+// NEPTUNE OCCULTATIONS (16 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm     , https://www.bogan.ca/astro/occultations/occltlst.htm
+// ============================================================
+     { jd: 1405723.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 1439150.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1442495.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1528047.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 1918050.3, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+     { jd: 1981572.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2157251.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2188084.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+     { jd: 2191071.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2242510.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2249744.9, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+     { jd: 2310199.4, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+     { jd: 2342964.1, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
+     { jd: 2476212.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+     { jd: 2489762.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+     { jd: 2639740.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+  ],
+  pluto: [
+    { jd: 2451716.5, ra: '16.73686667', dec: '-10.9377', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+  ],
+  halleys: [
+    { jd: 2451716.5, ra: '8.720219444', dec: '0.5128', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+  ],
+  eros: [
+    { jd: 2451716.5, ra: '20.64013056', dec: '-26.1392', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+  ]
+};
+
+// Reference constants for longitude validation
+const LONGITUDE_PERIHELION_REFS = {
+  mercury: mercuryLongitudePerihelion,
+  venus: venusLongitudePerihelion,
+  mars: marsLongitudePerihelion,
+  jupiter: jupiterLongitudePerihelion,
+  saturn: saturnLongitudePerihelion,
+  uranus: uranusLongitudePerihelion,
+  neptune: neptuneLongitudePerihelion,
+  pluto: plutoLongitudePerihelion,
+  halleys: halleysLongitudePerihelion,
+  eros: erosLongitudePerihelion
+};
+
+const ASCENDING_NODE_REFS = {
+  mercury: mercuryAscendingNode,
+  venus: venusAscendingNode,
+  mars: marsAscendingNode,
+  jupiter: jupiterAscendingNode,
+  saturn: saturnAscendingNode,
+  uranus: uranusAscendingNode,
+  neptune: neptuneAscendingNode,
+  pluto: plutoAscendingNode,
+  halleys: halleysAscendingNode,
+  eros: erosAscendingNode
+};
+
+// Planet object references for report generation
+const PLANET_OBJECTS = {
+  mercury: () => mercury,
+  venus: () => venus,
+  mars: () => mars,
+  jupiter: () => jupiter,
+  saturn: () => saturn,
+  uranus: () => uranus,
+  neptune: () => neptune,
+  pluto: () => pluto,
+  halleys: () => halleys,
+  eros: () => eros
+};
+
+// Hierarchy inspector state
+const hierarchyInspector = {
+  panel: null,
+  currentPlanet: 'mercury',
+  currentStep: 0,
+  highlightActive: false,
+  axesHelper: null,
+  startPosArrow: null,
+  currentPosArrow: null,
+  orbitCenterArrow: null,
+  rotationArrow: null,
+  inclinationPlane: null,
+  ascendingNode: null,
+  descendingNode: null,
+  aboveHalfPlane: null,  // GREEN half-plane (above ecliptic)
+  belowHalfPlane: null,  // RED half-plane (below ecliptic)
+  highestPointMarker: null,  // GREEN sphere at highest point (90° after ascending node)
+  lowestPointMarker: null,   // RED sphere at lowest point (90° after descending node)
+  perihelionDot: null,
+  perihelionArrow: null,
+  earthPerihelionArrow: null,  // Green arrow from planet perihelion to Earth perihelion (Step 2)
+  // Anomaly visualization elements (updated live)
+  anomalyGroup: null,
+  perihelionLine: null,
+  trueAnomalyLine: null,
+  meanAnomalyLine: null,
+  trueAnomalyArc: null,
+  meanAnomalyArc: null,
+  // New anomaly visualization elements (P→Planet, Sun→Planet lines and arcs)
+  pToPlanetLine: null,
+  sunToPlanetLine: null,
+  meanAnomalyArcAtP: null,
+  trueAnomalyArcAtSun: null,
+  _meanArcAtPRadius: null,
+  _trueArcAtSunRadius: null,
+  // Temporary perihelion visibility state (for step-based camera focus)
+  _tempPerihelionVisible: null,
+  _tempPerihelionOriginalVisible: null,
+  _tempPerihelionOrbitOriginalVisible: null,
+  // Camera control flag - when true, hierarchy inspector controls camera target
+  _cameraControlActive: false,
+  _cameraTarget: null,  // The object to focus on (for animation loop)
+  helpers: {
+    showAxes: true,
+    showStartPos: true,
+    showOrbitCenter: false,  // Solar period reference - off by default
+    showRotationDir: true,
+    showInclinationPlane: true,
+    showPerihelionPoint: true,
+    showAnomalies: true
+  }
+};
+
+// Get parent object by name
+function getParentObject(parentName) {
+  if (parentName === 'startingPoint') return startingPoint;
+  // Search through all hierarchies for the object
+  for (const planetKey of Object.keys(PLANET_HIERARCHIES)) {
+    const steps = PLANET_HIERARCHIES[planetKey].steps();
+    for (const step of steps) {
+      if (step.name === parentName) return step.obj;
+    }
+  }
+  return null;
+}
+
+// Calculate period from speed (preserves sign to indicate direction)
+function speedToPeriod(speed) {
+  if (!speed || speed === 0) return Infinity;
+  // Preserve sign: negative speed = negative period (opposite direction)
+  return (2 * Math.PI) / speed;
+}
+
+// Calculate arcseconds per century from period (preserves sign)
+function periodToArcsecPerCentury(periodYears) {
+  if (!isFinite(periodYears) || periodYears === 0) return 0;
+  // Preserve sign: negative period = negative arcsec/century (retrograde precession)
+  return 129600000 / periodYears; // 360° * 3600 arcsec/degree * 100 years = 129,600,000 arcsec/century
+}
+
+// Format number with precision
+function formatNum(val, precision = 4) {
+  if (val === undefined || val === null) return 'undefined';
+  if (typeof val !== 'number') return String(val);
+  if (isNaN(val)) return 'NaN';
+  if (!isFinite(val)) return val > 0 ? 'Infinity' : '-Infinity';
+  return val.toFixed(precision);
+}
+
+// Validate a step and return issues
+function validateStep(stepData, stepIndex, steps) {
+  const issues = [];
+  const obj = stepData.obj;
+
+  // Check for NaN values
+  if (isNaN(obj.speed)) issues.push({ type: 'error', msg: 'Speed is NaN' });
+  if (isNaN(obj.startPos)) issues.push({ type: 'error', msg: 'StartPos is NaN' });
+  if (isNaN(obj.orbitRadius)) issues.push({ type: 'error', msg: 'OrbitRadius is NaN' });
+  if (isNaN(obj.orbitCentera) || isNaN(obj.orbitCenterb) || isNaN(obj.orbitCenterc)) {
+    issues.push({ type: 'error', msg: 'OrbitCenter has NaN values' });
+  }
+
+  // Check for zero speed on precession steps (steps 0, 2)
+  if ((stepIndex === 0 || stepIndex === 2) && obj.speed === 0) {
+    issues.push({ type: 'warning', msg: 'Speed is 0 - no precession will occur' });
+  }
+
+  // Check runtime objects exist
+  if (!obj.containerObj) issues.push({ type: 'error', msg: 'containerObj not created' });
+  if (!obj.pivotObj) issues.push({ type: 'error', msg: 'pivotObj not created' });
+  if (!obj.orbitObj) issues.push({ type: 'warning', msg: 'orbitObj not created' });
+
+  // Check parent-child connection
+  if (stepIndex > 0) {
+    const parentObj = getParentObject(stepData.parentName);
+    if (parentObj && parentObj.pivotObj && obj.containerObj) {
+      if (obj.containerObj.parent !== parentObj.pivotObj) {
+        issues.push({ type: 'error', msg: `Not attached to parent's pivot (${stepData.parentName})` });
+      }
+    }
+  }
+
+  // Check if orbitRadius and orbitCenter both have non-zero values
+  if (obj.orbitRadius > 0 && (obj.orbitCentera !== 0 || obj.orbitCenterb !== 0 || obj.orbitCenterc !== 0)) {
+    issues.push({ type: 'warning', msg: 'Both orbitRadius and orbitCenter are set' });
+  }
+
+  // Step 2 (PerihelionFromEarth) should point at the Sun - calculate angle to Sun
+  if (stepIndex === 1 && obj.pivotObj && sun.pivotObj) {
+    // Get world positions (using reusable temp vectors)
+    obj.pivotObj.getWorldPosition(_hiObjWorldPos);
+    sun.pivotObj.getWorldPosition(_hiSunWorldPos);
+
+    // Calculate angle from object to Sun in XZ plane
+    const dx = _hiSunWorldPos.x - _hiObjWorldPos.x;
+    const dz = _hiSunWorldPos.z - _hiObjWorldPos.z;
+    const angleToSunRad = Math.atan2(-dz, dx); // Note: -dz because of coordinate system
+    const angleToSunDeg = angleToSunRad * 180 / Math.PI;
+
+    // Get current rotation (startPos + accumulated rotation)
+    const startPosRad = (obj.startPos || 0) * Math.PI / 180;
+    const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
+    const currentAngleRad = startPosRad + currentRotation;
+    const currentAngleDeg = currentAngleRad * 180 / Math.PI;
+
+    // Normalize angles to -180 to 180
+    const normalizeAngle = (a) => ((a + 180) % 360 + 360) % 360 - 180;
+    const normalizedCurrent = normalizeAngle(currentAngleDeg);
+    const normalizedToSun = normalizeAngle(angleToSunDeg);
+    const angleDiff = Math.abs(normalizeAngle(normalizedCurrent - normalizedToSun));
+
+    issues.push({
+      type: 'info',
+      msg: `Angle between Perihelion and Sun: ${(normalizedToSun - 90).toFixed(2)}°`
+    });
+
+    // Calculate distance between earthPerihelionFromEarth and the planet's perihelion
+    if (earthPerihelionFromEarth?.pivotObj && obj.pivotObj) {
+      earthPerihelionFromEarth.pivotObj.getWorldPosition(_hiEarthPeriPos);
+
+      const distanceSceneUnits = Math.sqrt(
+        Math.pow(_hiObjWorldPos.x - _hiEarthPeriPos.x, 2) +
+        Math.pow(_hiObjWorldPos.y - _hiEarthPeriPos.y, 2) +
+        Math.pow(_hiObjWorldPos.z - _hiEarthPeriPos.z, 2)
+      );
+      const distanceAU = distanceSceneUnits / 100; // scene units to AU
+
+      issues.push({
+        type: 'info',
+        msg: `Calculated distance perihelion Sun barycenter: ${distanceAU.toFixed(6)} AU`
+      });
+    }
+
+    // Calculate angle from earthPerihelionFromEarth to planet perihelion using apparentRaFromPdA
+    // This uses the astronomical Right Ascension calculation for accuracy
+    if (earthPerihelionFromEarth && obj) {
+      // Reference longitude of perihelion values (expected on model start date)
+      const referenceLongitudes = {
+        mercury: mercuryLongitudePerihelion,
+        venus: venusLongitudePerihelion,
+        mars: marsLongitudePerihelion,
+        jupiter: jupiterLongitudePerihelion,
+        saturn: saturnLongitudePerihelion,
+        uranus: uranusLongitudePerihelion,
+        neptune: neptuneLongitudePerihelion,
+        pluto: plutoLongitudePerihelion,
+        halleys: halleysLongitudePerihelion,
+        eros: erosLongitudePerihelion
+      };
+
+      const currentPlanet = hierarchyInspector.currentPlanet;
+      const referenceLong = referenceLongitudes[currentPlanet];
+
+      try {
+        const angleDeg = apparentRaFromPdA(earthPerihelionFromEarth, obj);
+        issues.push({
+          type: 'info',
+          msg: `Calculated longitude of perihelion: ${angleDeg.toFixed(6)}°`
+        });
+      } catch (e) {
+        // If calculation fails (e.g., missing ra/distKm), skip silently
+      }
+
+      if (referenceLong !== undefined) {
+        issues.push({
+          type: 'reference',
+          msg: `Reference longitude of perihelion: ${referenceLong.toFixed(6)}°`
+        });
+      }
+    }
+  }
+
+  // Step 4 (RealPerihelionAtSun) - comprehensive orbital diagnostics
+  if (stepIndex === 3) {
+    const tiltaDeg = obj.orbitTilta || 0;
+    const tiltbDeg = obj.orbitTiltb || 0;
+    const startPosDeg = obj.startPos || 0;
+
+    // Calculate the total inclination magnitude
+    const totalInclinationDeg = Math.sqrt(tiltaDeg * tiltaDeg + tiltbDeg * tiltbDeg);
+
+    // Calculate the longitude of ascending node from tilt components
+    // The encoding formula used in RealPerihelionAtSun objects is:
+    //   orbitTilta = cos((-90-Ω) * π/180) * -inclination
+    //   orbitTiltb = sin((-90-Ω) * π/180) * -inclination
+    // The negative inclination flips signs, equivalent to adding 180°:
+    //   orbitTilta = cos((90-Ω) * π/180) * inclination
+    //   orbitTiltb = sin((90-Ω) * π/180) * inclination
+    // To reverse: θ = atan2(tiltb, tilta) = (90 - Ω), so Ω = 90 - θ
+    const theta = Math.atan2(tiltbDeg, tiltaDeg) * 180 / Math.PI;
+    let ascNodeAngleDeg = 90 - theta;
+    // Normalize to 0-360 range
+    ascNodeAngleDeg = ((ascNodeAngleDeg % 360) + 360) % 360;
+
+    issues.push({
+      type: 'valid',
+      msg: `orbitTilta: ${tiltaDeg.toFixed(4)}° (rotation around X)`
+    });
+    issues.push({
+      type: 'valid',
+      msg: `orbitTiltb: ${tiltbDeg.toFixed(4)}° (rotation around Z)`
+    });
+    issues.push({
+      type: 'valid',
+      msg: `Total inclination: ${totalInclinationDeg.toFixed(4)}°`
+    });
+
+  }
+
+  // Step 5 (actual planet) - RA validation now shown in Position Report section
+
+  if (issues.length === 0) {
+    issues.push({ type: 'valid', msg: 'All checks passed' });
+  }
+
+  return issues;
+}
+
+// Create visual helpers for current step
+// Options:
+//   skipClear: if true, don't call clearVisualHelpers (caller has already done it)
+function createVisualHelpers(stepData, options = {}) {
+  const { skipClear = false } = options;
+  if (!skipClear) {
+    // Force clean all anomaly elements since we're recreating for potentially a new step
+    clearVisualHelpers({ forceCleanAnomalies: true });
+  }
+
+  const obj = stepData.obj;
+  if (!obj.pivotObj) return;
+
+  const scale = Math.max(50, obj.orbitRadius || 50);
+
+  // Axes helper (XYZ)
+  if (hierarchyInspector.helpers.showAxes) {
+    hierarchyInspector.axesHelper = new THREE.AxesHelper(scale * 0.5);
+    obj.pivotObj.add(hierarchyInspector.axesHelper);
+  }
+
+  // StartPos direction arrow (WHITE - initial/to-be position)
+  if (hierarchyInspector.helpers.showStartPos && obj.startPos !== undefined) {
+    const startPosRad = (obj.startPos || 0) * Math.PI / 180;
+    const arrowDir = new THREE.Vector3(Math.cos(startPosRad), 0, -Math.sin(startPosRad));
+    const arrowLength = scale * 0.4;
+    hierarchyInspector.startPosArrow = new THREE.ArrowHelper(
+      arrowDir, new THREE.Vector3(0, 0, 0), arrowLength, 0xffd700, arrowLength * 0.15, arrowLength * 0.08
+    );
+    obj.pivotObj.add(hierarchyInspector.startPosArrow);
+
+    // Current position arrow (WHITE - where object currently is)
+    // The current rotation is stored in orbitObj.rotation.y
+    const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
+    const currentPosRad = startPosRad + currentRotation;
+    const currentDir = new THREE.Vector3(Math.cos(currentPosRad), 0, -Math.sin(currentPosRad));
+    hierarchyInspector.currentPosArrow = new THREE.ArrowHelper(
+      currentDir, new THREE.Vector3(0, 0, 0), arrowLength * 1.1, 0xffffff, arrowLength * 0.15, arrowLength * 0.08
+    );
+    obj.pivotObj.add(hierarchyInspector.currentPosArrow);
+  }
+
+  // Orbit center offset arrow
+  if (hierarchyInspector.helpers.showOrbitCenter) {
+    const offsetX = obj.orbitCentera || 0;
+    const offsetY = obj.orbitCenterc || 0;
+    const offsetZ = obj.orbitCenterb || 0;
+    if (offsetX !== 0 || offsetY !== 0 || offsetZ !== 0) {
+      const offsetVec = new THREE.Vector3(offsetX, offsetY, offsetZ);
+      const offsetLength = offsetVec.length();
+      hierarchyInspector.orbitCenterArrow = new THREE.ArrowHelper(
+        offsetVec.clone().normalize(), new THREE.Vector3(0, 0, 0), offsetLength, 0x00ffff, offsetLength * 0.15, offsetLength * 0.08
+      );
+      obj.pivotObj.add(hierarchyInspector.orbitCenterArrow);
+    }
+  }
+
+  // Rotation direction indicator
+  if (hierarchyInspector.helpers.showRotationDir && obj.speed !== 0) {
+    const isCounterClockwise = obj.speed > 0;
+    const color = isCounterClockwise ? 0x00ff00 : 0xff0000;
+    const curve = new THREE.EllipseCurve(0, 0, scale * 0.3, scale * 0.3, 0, Math.PI * 1.5, !isCounterClockwise);
+    const points = curve.getPoints(32);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
+    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 });
+    hierarchyInspector.rotationArrow = new THREE.Line(geometry, material);
+    obj.pivotObj.add(hierarchyInspector.rotationArrow);
+  }
+
+  // Green arrow from planet perihelion to Earth perihelion (Step 2 only)
+  if (hierarchyInspector.currentStep === 1 && earthPerihelionFromEarth?.pivotObj && obj.pivotObj) {
+    obj.pivotObj.getWorldPosition(_hiPlanetPeriPos);
+    earthPerihelionFromEarth.pivotObj.getWorldPosition(_hiEarthPeriPos);
+
+    // Calculate direction and distance (reusing temp vector)
+    _hiDirection.subVectors(_hiEarthPeriPos, _hiPlanetPeriPos);
+    const distance = _hiDirection.length();
+
+    if (distance > 0.001) {
+      _hiDirection.normalize();
+      // Create green arrow from planet perihelion pointing to Earth perihelion
+      hierarchyInspector.earthPerihelionArrow = new THREE.ArrowHelper(
+        _hiDirection,
+        _hiPlanetPeriPos,
+        distance,
+        0x00ff00,  // Green color
+        distance * 0.1,  // Head length
+        distance * 0.05  // Head width
+      );
+      scene.add(hierarchyInspector.earthPerihelionArrow);
+    }
+  }
+
+  // Inclination plane with ascending/descending nodes (Step 4 only - RealPerihelionAtSun)
+  // Step 4 is index 3 (0-based), and it has orbitTilta for orbital inclination
+  if (hierarchyInspector.helpers.showInclinationPlane &&
+      hierarchyInspector.currentStep === 3 &&
+      (obj.orbitTilta !== undefined || obj.orbitTiltb !== undefined)) {
+
+    // Get the actual tilt values in degrees (as stored in the object)
+    const tiltaDeg = obj.orbitTilta || 0;
+    const tiltbDeg = obj.orbitTiltb || 0;
+    const tiltaRad = tiltaDeg * Math.PI / 180;
+    const tiltbRad = tiltbDeg * Math.PI / 180;
+
+    const planeRadius = scale * 0.5;
+
+    // Create a group to hold the inclined plane and nodes
+    hierarchyInspector.inclinationPlane = new THREE.Group();
+
+    // Create ecliptic plane reference (flat ring at y=0) - BLUE DASHED
+    const eclipticCurve = new THREE.EllipseCurve(0, 0, planeRadius * 1.05, planeRadius * 1.05, 0, Math.PI * 2, false);
+    const eclipticPoints = eclipticCurve.getPoints(64);
+    const eclipticGeometry = new THREE.BufferGeometry().setFromPoints(
+      eclipticPoints.map(p => new THREE.Vector3(p.x, 0, p.y))
+    );
+    const eclipticMaterial = new THREE.LineDashedMaterial({
+      color: 0x4488ff,
+      linewidth: 1,
+      dashSize: 5,
+      gapSize: 3
+    });
+    const eclipticLine = new THREE.Line(eclipticGeometry, eclipticMaterial);
+    eclipticLine.computeLineDistances();
+    hierarchyInspector.inclinationPlane.add(eclipticLine);
+
+    // COORDINATE SYSTEM EXPLANATION:
+    // The inclinationPlane is added to obj.pivotObj, which is INSIDE orbitContainer.
+    // orbitContainer already has the tilt applied (rotation.x and rotation.z).
+    // Therefore, our LOCAL y=0 plane IS the tilted orbital plane in world space.
+    // The WORLD ecliptic (world y=0) appears tilted relative to our local frame.
+    //
+    // To find nodes and color the half-planes correctly, we need to transform
+    // LOCAL points to WORLD space to check which side of the ecliptic they're on.
+    //
+    // The parent (orbitContainer) applies rotation via Euler angles:
+    //   rotation.x = tiltaRad, rotation.z = tiltbRad (default 'XYZ' order)
+    // We must match this EXACTLY by using the same Euler approach
+    const localToWorld = new THREE.Matrix4();
+    localToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
+
+    // Get the ACTUAL ascending node angle from the o.xxxAscendingNode property
+    // This is the authoritative value that's dynamically calculated for the current date
+    const ascNodePropertyMap = {
+      mercury: 'mercuryAscendingNode',
+      venus: 'venusAscendingNode',
+      mars: 'marsAscendingNode',
+      jupiter: 'jupiterAscendingNode',
+      saturn: 'saturnAscendingNode',
+      uranus: 'uranusAscendingNode',
+      neptune: 'neptuneAscendingNode',
+      pluto: 'plutoAscendingNode',
+      halleys: 'halleysAscendingNode',
+      eros: 'erosAscendingNode'
+    };
+    const ascNodeProp = ascNodePropertyMap[hierarchyInspector.currentPlanet];
+    const ascNodeAngleDeg = ascNodeProp ? (o[ascNodeProp] || 0) : 0;
+    const ascNodeAngleRad = ascNodeAngleDeg * Math.PI / 180;
+
+    // Calculate ascending node position in LOCAL coordinates
+    // The ascending node angle is in ecliptic longitude (measured from vernal equinox)
+    // Our model is 90° rotated (from March 21 to June 21), so we add 90° counterclockwise
+    // Original: X = cos(angle), Z = -sin(angle)
+    // After 90° CCW rotation: X = -sin(angle), Z = -cos(angle)
+    let ascendingNodePos = new THREE.Vector3(
+      planeRadius * -Math.sin(ascNodeAngleRad),
+      0,
+      planeRadius * -Math.cos(ascNodeAngleRad)
+    );
+
+    // Descending node is 180° opposite the ascending node
+    let descendingNodePos = new THREE.Vector3(
+      -ascendingNodePos.x,
+      0,
+      -ascendingNodePos.z
+    );
+
+    // Find highest and lowest points by sampling the orbit
+    // These are 90° after the ascending/descending nodes
+    const numSamples = 360;
+    let highestLocalPos = new THREE.Vector3();
+    let lowestLocalPos = new THREE.Vector3();
+    let maxWorldY = -Infinity;
+    let minWorldY = Infinity;
+
+    for (let i = 0; i < numSamples; i++) {
+      const angle = (i / numSamples) * Math.PI * 2;
+
+      // Point on LOCAL orbital plane (flat circle at local y=0)
+      const pLocal = new THREE.Vector3(planeRadius * Math.cos(angle), 0, planeRadius * Math.sin(angle));
+
+      // Transform to WORLD space to check ecliptic position
+      const pWorld = pLocal.clone().applyMatrix4(localToWorld);
+
+      // Track highest and lowest points (in WORLD y), but store LOCAL positions for markers
+      if (pWorld.y > maxWorldY) {
+        maxWorldY = pWorld.y;
+        highestLocalPos.copy(pLocal);
+      }
+      if (pWorld.y < minWorldY) {
+        minWorldY = pWorld.y;
+        lowestLocalPos.copy(pLocal);
+      }
+    }
+
+    // ===== BUILD THE ORBITAL PLANE WITH TWO COLORED HALVES =====
+    // Geometry is FLAT in LOCAL space (y=0). The parent transform tilts it in world.
+    // We color segments based on their WORLD y position (above/below ecliptic).
+
+    // Generate points for the orbit outline (LOCAL y=0 plane)
+    const numPoints = 64;
+    const orbitPoints = [];        // LOCAL positions for geometry
+    const orbitPointsWorld = [];   // WORLD positions for coloring logic
+    for (let i = 0; i <= numPoints; i++) {
+      const angle = (i / numPoints) * Math.PI * 2;
+      const localPoint = new THREE.Vector3(
+        planeRadius * Math.cos(angle),
+        0,
+        planeRadius * Math.sin(angle)
+      );
+      orbitPoints.push(localPoint);
+      orbitPointsWorld.push(localPoint.clone().applyMatrix4(localToWorld));
+    }
+
+    // Create the tilted orbit outline - WHITE LINE
+    const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+    const orbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+    const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+    hierarchyInspector.inclinationPlane.add(orbitLine);
+
+    // Create two half-disc meshes for ABOVE and BELOW ecliptic portions
+    // Geometry uses LOCAL positions, but we check WORLD y to determine coloring
+
+    // Helper function to create a half-disc mesh
+    // localPoints: positions for geometry (in local space)
+    // worldPoints: positions for above/below check (in world space)
+    const createHalfDisc = (localPoints, worldPoints, color, isAbove) => {
+      const vertices = [];
+      const indices = [];
+      const center = new THREE.Vector3(0, 0, 0);
+
+      // Add center point (local origin)
+      vertices.push(center.x, center.y, center.z);
+
+      // Add edge points from LOCAL positions (for geometry)
+      for (let i = 0; i < localPoints.length; i++) {
+        const p = localPoints[i];
+        vertices.push(p.x, p.y, p.z);
+      }
+
+      // Create triangles from center to each pair of adjacent points
+      // Use WORLD y to determine if segment is above/below ecliptic
+      for (let i = 1; i < localPoints.length; i++) {
+        const p1World = worldPoints[i - 1];
+        const p2World = worldPoints[i];
+
+        // Check if midpoint of this segment is above or below WORLD ecliptic (y=0)
+        const midWorldY = (p1World.y + p2World.y) / 2;
+        const segmentIsAbove = midWorldY > 0;
+
+        if (segmentIsAbove === isAbove) {
+          indices.push(0, i, i + 1);
+        }
+      }
+
+      if (indices.length === 0) return null;
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+
+      const material = new THREE.MeshBasicMaterial({
+        color: color,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.3
+      });
+
+      return new THREE.Mesh(geometry, material);
+    };
+
+    // Create GREEN half for segments ABOVE world ecliptic (world y > 0)
+    const aboveHalf = createHalfDisc(orbitPoints, orbitPointsWorld, 0x00ff00, true);
+    if (aboveHalf) {
+      hierarchyInspector.inclinationPlane.add(aboveHalf);
+      hierarchyInspector.aboveHalfPlane = aboveHalf;
+    }
+
+    // Create RED half for segments BELOW world ecliptic (world y < 0)
+    const belowHalf = createHalfDisc(orbitPoints, orbitPointsWorld, 0xff0000, false);
+    if (belowHalf) {
+      hierarchyInspector.inclinationPlane.add(belowHalf);
+      hierarchyInspector.belowHalfPlane = belowHalf;
+    }
+
+    // ===== NODE MARKERS =====
+
+    // Ascending node marker - MAGENTA sphere with UP arrow (planet rises above ecliptic here)
+    const ascNodeGeometry = new THREE.SphereGeometry(planeRadius * 0.08, 16, 16);
+    const ascNodeMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff }); // Magenta
+    hierarchyInspector.ascendingNode = new THREE.Mesh(ascNodeGeometry, ascNodeMaterial);
+    hierarchyInspector.ascendingNode.position.copy(ascendingNodePos);
+    hierarchyInspector.inclinationPlane.add(hierarchyInspector.ascendingNode);
+
+    // Ascending node arrow pointing up
+    const ascArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 1, 0),
+      ascendingNodePos,
+      planeRadius * 0.3,
+      0xff00ff, // Magenta
+      planeRadius * 0.1,
+      planeRadius * 0.05
+    );
+    hierarchyInspector.inclinationPlane.add(ascArrow);
+    hierarchyInspector._ascNodeArrow = ascArrow; // Cache for performance
+
+    // Descending node marker - CYAN sphere with DOWN arrow (planet drops below ecliptic here)
+    const descNodeGeometry = new THREE.SphereGeometry(planeRadius * 0.08, 16, 16);
+    const descNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff }); // Cyan
+    hierarchyInspector.descendingNode = new THREE.Mesh(descNodeGeometry, descNodeMaterial);
+    hierarchyInspector.descendingNode.position.copy(descendingNodePos);
+    hierarchyInspector.inclinationPlane.add(hierarchyInspector.descendingNode);
+
+    // Descending node arrow pointing down
+    const descArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0),
+      descendingNodePos,
+      planeRadius * 0.3,
+      0x00ffff, // Cyan
+      planeRadius * 0.1,
+      planeRadius * 0.05
+    );
+    hierarchyInspector.inclinationPlane.add(descArrow);
+    hierarchyInspector._descNodeArrow = descArrow; // Cache for performance
+
+    // Line of nodes (yellow dashed) - connects ascending and descending nodes
+    const nodesLineGeometry = new THREE.BufferGeometry().setFromPoints([
+      ascendingNodePos, descendingNodePos
+    ]);
+    const nodesLineMaterial = new THREE.LineDashedMaterial({
+      color: 0xffff00,
+      linewidth: 2,
+      dashSize: 3,
+      gapSize: 2
+    });
+    const nodesLine = new THREE.Line(nodesLineGeometry, nodesLineMaterial);
+    nodesLine.computeLineDistances();
+    hierarchyInspector.inclinationPlane.add(nodesLine);
+    hierarchyInspector._nodesLine = nodesLine; // Cache for performance
+
+    // ===== HIGHEST/LOWEST POINT MARKERS =====
+    // Use LOCAL positions (the parent transform will place them correctly in world)
+
+    // Highest point marker - GREEN small sphere (maximum altitude above ecliptic)
+    const highGeometry = new THREE.SphereGeometry(planeRadius * 0.05, 12, 12);
+    const highMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Green
+    const highMarker = new THREE.Mesh(highGeometry, highMaterial);
+    highMarker.position.copy(highestLocalPos);
+    hierarchyInspector.inclinationPlane.add(highMarker);
+    hierarchyInspector.highestPointMarker = highMarker;
+
+    const highArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 1, 0),  // UP arrow - highest point above ecliptic
+      highestLocalPos,
+      planeRadius * 0.15,
+      0x00ff00, // Green
+      planeRadius * 0.05,
+      planeRadius * 0.03
+    );
+    hierarchyInspector.inclinationPlane.add(highArrow);
+    hierarchyInspector._highArrow = highArrow;
+
+    // Lowest point marker - RED small sphere (maximum depth below ecliptic)
+    const lowGeometry = new THREE.SphereGeometry(planeRadius * 0.05, 12, 12);
+    const lowMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red
+    const lowMarker = new THREE.Mesh(lowGeometry, lowMaterial);
+    lowMarker.position.copy(lowestLocalPos);
+    hierarchyInspector.inclinationPlane.add(lowMarker);
+    hierarchyInspector.lowestPointMarker = lowMarker;
+
+    const lowArrow = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0),  // DOWN arrow - lowest point below ecliptic
+      lowestLocalPos,
+      planeRadius * 0.15,
+      0xff0000, // Red
+      planeRadius * 0.05,
+      planeRadius * 0.03
+    );
+    hierarchyInspector.inclinationPlane.add(lowArrow);
+    hierarchyInspector._lowArrow = lowArrow;
+
+    // Add to containerObj (orbitContainer) NOT pivotObj!
+    // The inclinationPlane should only inherit the orbital tilt (rotation.x, rotation.z)
+    // but NOT the orbit.rotation.y which changes with startPos and animation.
+    // The ascending/descending nodes are fixed points in space relative to the ecliptic.
+    obj.containerObj.add(hierarchyInspector.inclinationPlane);
+  }
+
+  // Arrow from P (FixedPerihelionAtSun) to Sun (Step 4 only)
+  // This arrow will be updated dynamically in updateHierarchyLiveData()
+  if (hierarchyInspector.helpers.showPerihelionPoint && hierarchyInspector.currentStep === 3) {
+    // Get the FixedPerihelionAtSun object for the current planet
+    const planetKey = hierarchyInspector.currentPlanet;
+    const fixedPerihelionObjects = {
+      mercury: mercuryFixedPerihelionAtSun,
+      venus: venusFixedPerihelionAtSun,
+      mars: marsFixedPerihelionAtSun,
+      jupiter: jupiterFixedPerihelionAtSun,
+      saturn: saturnFixedPerihelionAtSun,
+      uranus: uranusFixedPerihelionAtSun,
+      neptune: neptuneFixedPerihelionAtSun,
+      pluto: plutoFixedPerihelionAtSun,
+      halleys: halleysFixedPerihelionAtSun,
+      eros: erosFixedPerihelionAtSun
+    };
+    const fixedPerihelion = fixedPerihelionObjects[planetKey];
+
+    // Store reference for dynamic updates
+    hierarchyInspector._fixedPerihelionObj = fixedPerihelion;
+    hierarchyInspector._perihelionArrowScale = scale;
+
+    // Create arrow group that will be updated dynamically
+    hierarchyInspector.perihelionArrow = new THREE.Group();
+
+    // Create initial line geometry (will be updated each frame)
+    const lineLength = scale * 1.5;
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -lineLength, 0, 0, lineLength], 3));
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 2 });
+    hierarchyInspector._perihelionLine = new THREE.Line(lineGeometry, lineMaterial);
+    hierarchyInspector.perihelionArrow.add(hierarchyInspector._perihelionLine);
+
+    // Create arrowhead (will be updated each frame)
+    hierarchyInspector._perihelionArrowHead = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 0, 1),
+      new THREE.Vector3(0, 0, lineLength * 0.85),
+      lineLength * 0.15,
+      0x00ff00,
+      lineLength * 0.1,
+      lineLength * 0.05
+    );
+    hierarchyInspector.perihelionArrow.add(hierarchyInspector._perihelionArrowHead);
+
+    // Add to scene (will be positioned in updateHierarchyLiveData)
+    scene.add(hierarchyInspector.perihelionArrow);
+
+    // Initialize arrow position immediately to avoid misplacement on first frame
+    if (fixedPerihelion) {
+      const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
+      if (sourceObj) {
+        // Initialize cached vectors
+        hierarchyInspector._sunPosVec3 = new THREE.Vector3();
+        hierarchyInspector._dirVec3 = new THREE.Vector3();
+        hierarchyInspector._defaultDir = new THREE.Vector3(0, 0, 1);
+        hierarchyInspector._arrowQuat = new THREE.Quaternion();
+
+        // Get initial positions
+        const initialPos = new THREE.Vector3();
+        sourceObj.getWorldPosition(initialPos);
+        hierarchyInspector.perihelionArrow.position.copy(initialPos);
+
+        // Get Sun's position and calculate direction
+        if (sun && sun.pivotObj) {
+          sun.pivotObj.getWorldPosition(hierarchyInspector._sunPosVec3);
+          hierarchyInspector._dirVec3.subVectors(hierarchyInspector._sunPosVec3, initialPos).normalize();
+
+          // Set initial rotation
+          if (hierarchyInspector._dirVec3.lengthSq() > 0.0001) {
+            hierarchyInspector._arrowQuat.setFromUnitVectors(hierarchyInspector._defaultDir, hierarchyInspector._dirVec3);
+            hierarchyInspector.perihelionArrow.setRotationFromQuaternion(hierarchyInspector._arrowQuat);
+          }
+        }
+      }
+    }
+  }
+
+  // Anomaly visualization (Step 4 only - RealPerihelionAtSun)
+  // Shows True Anomaly and Mean Anomaly as lines/arcs from Sun through orbit
+  // Note: currentStep is 0-indexed, so step 4 = index 3
+  if (hierarchyInspector.helpers.showAnomalies && hierarchyInspector.currentStep === 3) {
+    const anomalyRadius = scale * 0.5; // Match inclination plane radius
+
+    // Arc radii based on the planet's elliptic orbit size (distance between P and orbit center)
+    // This makes the visualization proportional to the actual orbit eccentricity
+    const ellipticOrbitRadius = obj.orbitRadius || anomalyRadius * 0.5;
+
+    // Only create the anomalyGroup and its contents if it doesn't exist
+    // This allows the visualization to persist when toggling OTHER helper checkboxes
+    if (!hierarchyInspector.anomalyGroup) {
+      // Create a group for anomaly visuals - will be added to scene at Sun's position
+      hierarchyInspector.anomalyGroup = new THREE.Group();
+
+      const arcSegments = 32;
+      const trueArcRadius = ellipticOrbitRadius * 1.2;   // True anomaly arc (outer)
+      const meanArcRadius = ellipticOrbitRadius * 1.0;   // Mean anomaly arc (inner)
+      hierarchyInspector._trueArcRadius = trueArcRadius;
+      hierarchyInspector._meanArcRadius = meanArcRadius;
+
+      const trueArcGeo = new THREE.BufferGeometry();
+      const trueArcPositions = new Float32Array((arcSegments + 1) * 3);
+      trueArcGeo.setAttribute('position', new THREE.BufferAttribute(trueArcPositions, 3));
+      const trueArcMat = new THREE.LineBasicMaterial({ color: 0xff9800, linewidth: 2 });
+      hierarchyInspector.trueAnomalyArc = new THREE.Line(trueArcGeo, trueArcMat);
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyArc);
+
+      // Mean Anomaly arc (yellow dashed) - shows the uniform angle
+      const meanArcGeo = new THREE.BufferGeometry();
+      const meanArcPositions = new Float32Array((arcSegments + 1) * 3);
+      meanArcGeo.setAttribute('position', new THREE.BufferAttribute(meanArcPositions, 3));
+      const meanArcMat = new THREE.LineDashedMaterial({
+        color: 0xffeb3b,
+        dashSize: 1,
+        gapSize: 1,
+        linewidth: 2
+      });
+      hierarchyInspector.meanAnomalyArc = new THREE.Line(meanArcGeo, meanArcMat);
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyArc);
+
+      // Start marker for True Anomaly arc (small sphere at 0°)
+      const trueStartMarkerGeo = new THREE.SphereGeometry(ellipticOrbitRadius * 0.04, 8, 8);
+      const trueStartMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff9800 });
+      hierarchyInspector.trueAnomalyStartMarker = new THREE.Mesh(trueStartMarkerGeo, trueStartMarkerMat);
+      hierarchyInspector.trueAnomalyStartMarker.position.set(trueArcRadius, 0, 0); // At arc start (0°)
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyStartMarker);
+
+      // Start marker for Mean Anomaly arc (small sphere at 0°)
+      const meanStartMarkerGeo = new THREE.SphereGeometry(ellipticOrbitRadius * 0.035, 8, 8);
+      const meanStartMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
+      hierarchyInspector.meanAnomalyStartMarker = new THREE.Mesh(meanStartMarkerGeo, meanStartMarkerMat);
+      hierarchyInspector.meanAnomalyStartMarker.position.set(meanArcRadius, 0, 0); // At arc start (0°)
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyStartMarker);
+
+      // Direction arrow for True Anomaly (shows counter-clockwise direction)
+      // Arrow points in the direction of increasing anomaly (counter-clockwise = -Z in Three.js when starting from +X)
+      const trueArrowDir = new THREE.Vector3(0, 0, -1); // Counter-clockwise direction
+      hierarchyInspector.trueAnomalyArrow = new THREE.ArrowHelper(
+        trueArrowDir,
+        new THREE.Vector3(trueArcRadius, 0, 0), // Start at 0° position
+        ellipticOrbitRadius * 0.1, // Length
+        0xff9800, // Orange
+        ellipticOrbitRadius * 0.05, // Head length
+        ellipticOrbitRadius * 0.03 // Head width
+      );
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.trueAnomalyArrow);
+
+      // Direction arrow for Mean Anomaly (shows counter-clockwise direction)
+      const meanArrowDir = new THREE.Vector3(0, 0, -1); // Counter-clockwise direction
+      hierarchyInspector.meanAnomalyArrow = new THREE.ArrowHelper(
+        meanArrowDir,
+        new THREE.Vector3(meanArcRadius, 0, 0), // Start at 0° position
+        ellipticOrbitRadius * 0.08, // Length
+        0xffeb3b, // Yellow
+        ellipticOrbitRadius * 0.04, // Head length
+        ellipticOrbitRadius * 0.025 // Head width
+      );
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.meanAnomalyArrow);
+
+      // Earth-Sun reference line
+      // This shows the direction from Earth through Sun to the opposite side
+      // - From Earth to Sun: subtle/transparent
+      // - From Sun to beyond mean anomaly circle: same color as mean anomaly
+      const earthSunLineLength = meanArcRadius * 1.15; // Extends just past the mean anomaly arc
+
+      // Create a group for the Earth-Sun line (will be rotated to point away from Earth)
+      hierarchyInspector.earthSunLine = new THREE.Group();
+
+      // Part 1: Sun to beyond mean anomaly circle (yellow, same as mean anomaly)
+      const sunToArcGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(earthSunLineLength, 0, 0)
+      ]);
+      const sunToArcMat = new THREE.LineBasicMaterial({
+        color: 0xffeb3b,
+        linewidth: 2
+      });
+      const sunToArcLine = new THREE.Line(sunToArcGeo, sunToArcMat);
+      hierarchyInspector.earthSunLine.add(sunToArcLine);
+
+      // Part 2: Earth to Sun (subtle/transparent) - this will be in negative X direction
+      // We'll get the actual Earth distance dynamically, but use a reasonable estimate for now
+      const earthToSunGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(-meanArcRadius * 3, 0, 0) // Extends toward Earth (will be clipped by scene)
+      ]);
+      const earthToSunMat = new THREE.LineBasicMaterial({
+        color: 0xffeb3b,
+        transparent: true,
+        opacity: 0.2
+      });
+      const earthToSunLine = new THREE.Line(earthToSunGeo, earthToSunMat);
+      hierarchyInspector.earthSunLine.add(earthToSunLine);
+
+      hierarchyInspector.anomalyGroup.add(hierarchyInspector.earthSunLine);
+
+      // Add to scene (will be positioned at Sun in updateHierarchyLiveData)
+      scene.add(hierarchyInspector.anomalyGroup);
+    }
+
+    // P → Planet line (Red) - for Mean Anomaly visualization
+    // Shows direction from orbit center (P) to planet position
+    // Only create if doesn't already exist (these persist across helper checkbox toggles)
+    if (!hierarchyInspector.pToPlanetLine) {
+      const pToPlanetGeo = new THREE.BufferGeometry();
+      pToPlanetGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+      const pToPlanetMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2 });
+      hierarchyInspector.pToPlanetLine = new THREE.Line(pToPlanetGeo, pToPlanetMat);
+      scene.add(hierarchyInspector.pToPlanetLine); // Add to scene, not group (world coords)
+    }
+
+    // Sun → Planet line (Amber) - for True Anomaly visualization
+    // Shows direction from Sun (focus) to planet position
+    if (!hierarchyInspector.sunToPlanetLine) {
+      const sunToPlanetGeo = new THREE.BufferGeometry();
+      sunToPlanetGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+      const sunToPlanetMat = new THREE.LineBasicMaterial({ color: 0xffbf00, linewidth: 2 });
+      hierarchyInspector.sunToPlanetLine = new THREE.Line(sunToPlanetGeo, sunToPlanetMat);
+      scene.add(hierarchyInspector.sunToPlanetLine); // Add to scene, not group (world coords)
+    }
+
+    // Mean Anomaly Arc (Cyan, dashed) - centered at P (orbit center)
+    if (!hierarchyInspector.meanAnomalyArcAtP) {
+      const newArcSegments = 64;
+      const meanArcAtPGeo = new THREE.BufferGeometry();
+      const meanArcAtPPositions = new Float32Array((newArcSegments + 1) * 3);
+      meanArcAtPGeo.setAttribute('position', new THREE.BufferAttribute(meanArcAtPPositions, 3));
+      const meanArcAtPMat = new THREE.LineDashedMaterial({
+        color: 0x00ffff,
+        linewidth: 2,
+        dashSize: 3,
+        gapSize: 2
+      });
+      hierarchyInspector.meanAnomalyArcAtP = new THREE.Line(meanArcAtPGeo, meanArcAtPMat);
+      scene.add(hierarchyInspector.meanAnomalyArcAtP); // Add to scene (world coords)
+    }
+
+    // True Anomaly Arc (Amber, solid) - centered at Sun (focus)
+    if (!hierarchyInspector.trueAnomalyArcAtSun) {
+      const trueArcSegments = 64;
+      const trueArcAtSunGeo = new THREE.BufferGeometry();
+      const trueArcAtSunPositions = new Float32Array((trueArcSegments + 1) * 3);
+      trueArcAtSunGeo.setAttribute('position', new THREE.BufferAttribute(trueArcAtSunPositions, 3));
+      const trueArcAtSunMat = new THREE.LineBasicMaterial({ color: 0xffbf00, linewidth: 2 });
+      hierarchyInspector.trueAnomalyArcAtSun = new THREE.Line(trueArcAtSunGeo, trueArcAtSunMat);
+      scene.add(hierarchyInspector.trueAnomalyArcAtSun); // Add to scene (world coords)
+    }
+
+    // Store arc radii for dynamic updates
+    if (!hierarchyInspector._meanArcAtPRadius) {
+      hierarchyInspector._meanArcAtPRadius = ellipticOrbitRadius * 0.3;
+    }
+    if (!hierarchyInspector._trueArcAtSunRadius) {
+      hierarchyInspector._trueArcAtSunRadius = ellipticOrbitRadius * 0.4;
+    }
+
+    // Initialize anomaly group position and arc geometry immediately to avoid misplacement on first frame
+    // Position at the SUN (center of solar system), not at the orbital container
+    if (sun && sun.pivotObj) {
+      sun.pivotObj.getWorldPosition(_hiSunPos);
+      hierarchyInspector.anomalyGroup.position.copy(_hiSunPos);
+
+      // Calculate initial rotation to align with perihelion direction
+      const planetKey = hierarchyInspector.currentPlanet;
+      const initFixedPerihelionObjects = {
+        mercury: mercuryFixedPerihelionAtSun,
+        venus: venusFixedPerihelionAtSun,
+        mars: marsFixedPerihelionAtSun,
+        jupiter: jupiterFixedPerihelionAtSun,
+        saturn: saturnFixedPerihelionAtSun,
+        uranus: uranusFixedPerihelionAtSun,
+        neptune: neptuneFixedPerihelionAtSun,
+        pluto: plutoFixedPerihelionAtSun,
+        halleys: halleysFixedPerihelionAtSun,
+        eros: erosFixedPerihelionAtSun
+      };
+      const initFixedPerihelion = initFixedPerihelionObjects[planetKey];
+
+      if (initFixedPerihelion) {
+        const sourceObj = initFixedPerihelion.planetObj || initFixedPerihelion.pivotObj;
+        if (sourceObj) {
+          sourceObj.getWorldPosition(_hiPerihelionPos);
+
+          // Calculate direction from Sun to Perihelion (P point)
+          const dx = _hiPerihelionPos.x - _hiSunPos.x;
+          const dz = _hiPerihelionPos.z - _hiSunPos.z;
+          // atan2(dz, dx) gives angle from +X to Sun→P direction
+          // Add PI to flip 180° so markers are on P side, not Sun side
+          const perihelionAngle = Math.atan2(dz, dx);
+
+          // Rotate so local +X points toward P (away from Sun center)
+          hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
+
+          // Apply orbital plane tilt
+          if (obj && obj.containerObj) {
+            hierarchyInspector.anomalyGroup.rotation.x = obj.containerObj.rotation.x;
+            hierarchyInspector.anomalyGroup.rotation.z = obj.containerObj.rotation.z;
+          }
+
+          // Initialize Earth-Sun line rotation
+          if (hierarchyInspector.earthSunLine && earth && earth.pivotObj) {
+            earth.pivotObj.getWorldPosition(_hiEarthPos);
+
+            // Direction from Earth to Sun
+            const dxE = _hiSunPos.x - _hiEarthPos.x;
+            const dzE = _hiSunPos.z - _hiEarthPos.z;
+            const earthToSunAngle = Math.atan2(dzE, dxE);
+
+            // Convert to local space
+            const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
+            const localAngle = earthToSunAngle + groupRotY;
+
+            hierarchyInspector.earthSunLine.rotation.y = -localAngle;
+          }
+        }
+      }
+
+      // Calculate the Earth-Sun angle in local space for arc initialization
+      // This should match what updateHierarchyLiveData does
+      let initEarthSunLocalAngle = 0;
+      if (earth && earth.pivotObj) {
+        earth.pivotObj.getWorldPosition(_hiEarthPos);
+
+        // Direction from Earth to Sun
+        const dxE = _hiSunPos.x - _hiEarthPos.x;
+        const dzE = _hiSunPos.z - _hiEarthPos.z;
+        const earthToSunAngle = Math.atan2(dzE, dxE);
+
+        // Convert to local space
+        const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
+        initEarthSunLocalAngle = earthToSunAngle + groupRotY;
+      }
+
+      // Use the same angle for both arcs (true anomaly will be adjusted for eccentricity later)
+      const trueAnomalyRad = initEarthSunLocalAngle;
+      const meanAnomalyRad = initEarthSunLocalAngle;
+
+      // Initialize true anomaly arc geometry
+      if (hierarchyInspector.trueAnomalyArc) {
+        const arcSegments = 32;
+        const arcRadius = hierarchyInspector._trueArcRadius || 50;
+        const positions = hierarchyInspector.trueAnomalyArc.geometry.attributes.position.array;
+        for (let i = 0; i <= arcSegments; i++) {
+          const t = i / arcSegments;
+          const angle = t * trueAnomalyRad;
+          positions[i * 3] = arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = 0;
+          positions[i * 3 + 2] = -arcRadius * Math.sin(angle);
+        }
+        hierarchyInspector.trueAnomalyArc.geometry.attributes.position.needsUpdate = true;
+      }
+
+      // Initialize mean anomaly arc geometry
+      if (hierarchyInspector.meanAnomalyArc) {
+        const arcSegments = 32;
+        const arcRadius = hierarchyInspector._meanArcRadius || 40;
+        const positions = hierarchyInspector.meanAnomalyArc.geometry.attributes.position.array;
+        for (let i = 0; i <= arcSegments; i++) {
+          const t = i / arcSegments;
+          const angle = t * meanAnomalyRad;
+          positions[i * 3] = arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = 0;
+          positions[i * 3 + 2] = -arcRadius * Math.sin(angle);
+        }
+        hierarchyInspector.meanAnomalyArc.geometry.attributes.position.needsUpdate = true;
+        hierarchyInspector.meanAnomalyArc.computeLineDistances();
+      }
+    }
+  }
+
+  // Make RealPerihelionAtSun and FixedPerihelionAtSun visible at Step 4
+  // This helps visualize the perihelion movement around the real perihelion point
+  if (hierarchyInspector.currentStep === 3) {
+    const planetKey = hierarchyInspector.currentPlanet;
+
+    // Mapping of planet keys to their RealPerihelionAtSun and FixedPerihelionAtSun objects
+    const perihelionObjects = {
+      mercury: { fromSun: mercuryRealPerihelionAtSun, atSun: mercuryFixedPerihelionAtSun },
+      venus: { fromSun: venusRealPerihelionAtSun, atSun: venusFixedPerihelionAtSun },
+      mars: { fromSun: marsRealPerihelionAtSun, atSun: marsFixedPerihelionAtSun },
+      jupiter: { fromSun: jupiterRealPerihelionAtSun, atSun: jupiterFixedPerihelionAtSun },
+      saturn: { fromSun: saturnRealPerihelionAtSun, atSun: saturnFixedPerihelionAtSun },
+      uranus: { fromSun: uranusRealPerihelionAtSun, atSun: uranusFixedPerihelionAtSun },
+      neptune: { fromSun: neptuneRealPerihelionAtSun, atSun: neptuneFixedPerihelionAtSun },
+      pluto: { fromSun: plutoRealPerihelionAtSun, atSun: plutoFixedPerihelionAtSun },
+      halleys: { fromSun: halleysRealPerihelionAtSun, atSun: halleysFixedPerihelionAtSun },
+      eros: { fromSun: erosRealPerihelionAtSun, atSun: erosFixedPerihelionAtSun }
+    };
+
+    const objects = perihelionObjects[planetKey];
+    if (objects) {
+      // Store original state to restore later
+      hierarchyInspector._perihelionFromSunOriginalVisible = objects.fromSun.planetObj?.visible;
+      hierarchyInspector._perihelionAtSunOriginalVisible = objects.atSun.planetObj?.visible;
+      hierarchyInspector._perihelionFromSunOrbitOriginalVisible = objects.fromSun.orbitLineObj?.visible;
+
+      // Make RealPerihelionAtSun visible (purple sphere and orbit line)
+      if (objects.fromSun.planetObj) {
+        objects.fromSun.planetObj.visible = true;
+        // Store original scale and set consistent size (base size varies between objects)
+        hierarchyInspector._perihelionFromSunOriginalScale = objects.fromSun.planetObj.scale.clone();
+        // Calculate scale to achieve size 1.5: scale = 1.5 / baseSize
+        const fromSunScale = 1.5 / (objects.fromSun.size || 1);
+        objects.fromSun.planetObj.scale.setScalar(fromSunScale);
+        // Change color to purple to distinguish it
+        if (objects.fromSun.planetObj.material) {
+          hierarchyInspector._perihelionFromSunOriginalColor = objects.fromSun.planetObj.material.color.clone();
+          objects.fromSun.planetObj.material.color.setHex(0x9932cc); // Purple
+          objects.fromSun.planetObj.material.emissive = new THREE.Color(0x9932cc);
+          objects.fromSun.planetObj.material.emissiveIntensity = 0.5;
+          // Render on top of scene objects, but below green dot (which has renderOrder 999)
+          objects.fromSun.planetObj.material.depthTest = false;
+          objects.fromSun.planetObj.renderOrder = 997;
+        }
+
+        // Create "P2" label sprite and attach to the planetObj
+        // Only show P2 label if purple dot is far enough from green dot
+        let showP2Label = true;
+        if (objects.atSun.planetObj && objects.fromSun.planetObj) {
+          objects.fromSun.planetObj.getWorldPosition(_hiPurpleWorldPos);
+          objects.atSun.planetObj.getWorldPosition(_hiGreenWorldPos);
+          const distance = _hiPurpleWorldPos.distanceTo(_hiGreenWorldPos);
+          // If dots are closer than 3 units, don't show P2 label (green dot would overlap it)
+          if (distance < 3) {
+            showP2Label = false;
+          }
+        }
+
+        if (showP2Label) {
+          const canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#000000';
+          ctx.font = 'bold 36px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('P2', 32, 32);
+
+          const texture = new THREE.CanvasTexture(canvas);
+          const spriteMaterial = new THREE.SpriteMaterial({
+            map: texture,
+            depthTest: false,
+            transparent: true
+          });
+          const sprite = new THREE.Sprite(spriteMaterial);
+          // Counter-scale to achieve consistent size regardless of parent's scale
+          const labelSize = 1.5 / fromSunScale;
+          sprite.scale.set(labelSize, labelSize, 1);
+          sprite.renderOrder = 998; // Above purple dot (997), below green dot (999)
+          objects.fromSun.planetObj.add(sprite);
+          hierarchyInspector._perihelionFromSunLabel = sprite;
+        }
+      }
+      // Also make the orbit line visible (this is the elliptical path)
+      if (objects.fromSun.orbitLineObj) {
+        objects.fromSun.orbitLineObj.visible = true;
+        // Store original color and change to purple
+        hierarchyInspector._perihelionFromSunOrbitOriginalColor = objects.fromSun.orbitLineObj.material?.color?.clone();
+        if (objects.fromSun.orbitLineObj.material) {
+          objects.fromSun.orbitLineObj.material.color.setHex(0x9932cc); // Purple
+          objects.fromSun.orbitLineObj.material.opacity = 0.8;
+        }
+      }
+
+      // Make FixedPerihelionAtSun visible (green sphere - the "real" perihelion)
+      if (objects.atSun.planetObj) {
+        objects.atSun.planetObj.visible = true;
+        // Store original scale and set consistent size (base size varies between objects)
+        hierarchyInspector._perihelionAtSunOriginalScale = objects.atSun.planetObj.scale.clone();
+        // Calculate scale to achieve size 1.5 (slightly bigger): scale = 1.5 / baseSize
+        const atSunScale = 1.5 / (objects.atSun.size || 1);
+        objects.atSun.planetObj.scale.setScalar(atSunScale);
+        // Change color to bright green to distinguish it as the "real" perihelion point
+        if (objects.atSun.planetObj.material) {
+          hierarchyInspector._perihelionAtSunOriginalColor = objects.atSun.planetObj.material.color.clone();
+          objects.atSun.planetObj.material.color.setHex(0x00ff00); // Bright green
+          objects.atSun.planetObj.material.emissive = new THREE.Color(0x00ff00);
+          objects.atSun.planetObj.material.emissiveIntensity = 0.5;
+          // Render on top of other objects, and write to depth buffer so it can occlude P2
+          objects.atSun.planetObj.material.depthTest = false;
+          objects.atSun.planetObj.material.depthWrite = true;
+          objects.atSun.planetObj.renderOrder = 999;
+        }
+
+        // Create "P" label sprite and attach to the planetObj
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('P', 32, 32);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMaterial = new THREE.SpriteMaterial({
+          map: texture,
+          depthTest: false,
+          transparent: true
+        });
+        const sprite = new THREE.Sprite(spriteMaterial);
+        // Counter-scale to achieve consistent size regardless of parent's scale
+        // Parent is scaled by atSunScale, so we divide by it to get consistent world size
+        const labelSize = 2.5 / atSunScale;
+        sprite.scale.set(labelSize, labelSize, 1);
+        sprite.renderOrder = 1001; // Highest - always on top
+        objects.atSun.planetObj.add(sprite);
+        hierarchyInspector._perihelionLabel = sprite;
+      }
+
+      // Store references for cleanup
+      hierarchyInspector._perihelionFromSunObj = objects.fromSun;
+      hierarchyInspector._perihelionAtSunObj = objects.atSun;
+    }
+  }
+
+  // Planet locator circle (Step 4 and Step 5 only)
+  // Creates a bright circle around the planet to make it easier to find
+  if (hierarchyInspector.currentStep === 3 || hierarchyInspector.currentStep === 4) {
+    const planetKey = hierarchyInspector.currentPlanet;
+    const hierarchy = PLANET_HIERARCHIES[planetKey];
+    if (hierarchy) {
+      const steps = hierarchy.steps();
+      // Get the actual planet (Step 5, index 4)
+      const planetStepObj = steps[4]?.obj;
+      if (planetStepObj && planetStepObj.planetObj) {
+        // Create a circle that will surround the planet
+        // Size based on planet's actual size or a minimum visible size
+        const planetSize = planetStepObj.size || 1;
+        const circleRadius = Math.max(planetSize * 3, 2); // At least 3x planet size, minimum 2 units
+
+        // Create ring geometry (torus for 3D visibility from any angle)
+        const ringGeometry = new THREE.TorusGeometry(circleRadius, circleRadius * 0.1, 8, 32);
+        const ringMaterial = new THREE.MeshBasicMaterial({
+          color: 0x00ffff, // Cyan color
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+          depthTest: false // Always visible
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.renderOrder = 998; // Render on top
+
+        // Add to scene (will be positioned in updateHierarchyLiveData)
+        scene.add(ring);
+        hierarchyInspector._planetLocatorCircle = ring;
+        hierarchyInspector._planetLocatorTarget = planetStepObj;
+
+        // Initialize position immediately
+        if (planetStepObj.planetObj) {
+          planetStepObj.planetObj.getWorldPosition(_hiTempPos);
+          ring.position.copy(_hiTempPos);
+        }
+      }
+    }
+  }
+}
+
+// Clear visual helpers
+// Options:
+//   forceCleanAnomalies: if true, always clean anomaly elements; if false, only clean if showAnomalies is off or not step 3
+function clearVisualHelpers(options = {}) {
+  const { forceCleanAnomalies = false } = options;
+
+  // Determine if we should clean anomaly elements
+  // Clean them if: forced OR showAnomalies is off OR not on step 3
+  const shouldCleanAnomalies = forceCleanAnomalies ||
+                               !hierarchyInspector.helpers.showAnomalies ||
+                               hierarchyInspector.currentStep !== 3;
+
+  // Restore temporary perihelion visibility (used by step-based camera focus)
+  if (hierarchyInspector._tempPerihelionVisible) {
+    const prevObj = hierarchyInspector._tempPerihelionVisible;
+    if (prevObj.planetObj) {
+      prevObj.planetObj.visible = hierarchyInspector._tempPerihelionOriginalVisible ?? false;
+    }
+    if (prevObj.orbitLineObj) {
+      prevObj.orbitLineObj.visible = hierarchyInspector._tempPerihelionOrbitOriginalVisible ?? false;
+    }
+    hierarchyInspector._tempPerihelionVisible = null;
+    hierarchyInspector._tempPerihelionOriginalVisible = null;
+    hierarchyInspector._tempPerihelionOrbitOriginalVisible = null;
+  }
+
+  if (hierarchyInspector.axesHelper) {
+    hierarchyInspector.axesHelper.parent?.remove(hierarchyInspector.axesHelper);
+    hierarchyInspector.axesHelper.dispose?.();
+    hierarchyInspector.axesHelper = null;
+  }
+  if (hierarchyInspector.startPosArrow) {
+    hierarchyInspector.startPosArrow.parent?.remove(hierarchyInspector.startPosArrow);
+    hierarchyInspector.startPosArrow = null;
+  }
+  if (hierarchyInspector.currentPosArrow) {
+    hierarchyInspector.currentPosArrow.parent?.remove(hierarchyInspector.currentPosArrow);
+    hierarchyInspector.currentPosArrow = null;
+  }
+  if (hierarchyInspector.orbitCenterArrow) {
+    hierarchyInspector.orbitCenterArrow.parent?.remove(hierarchyInspector.orbitCenterArrow);
+    hierarchyInspector.orbitCenterArrow = null;
+  }
+  if (hierarchyInspector.earthPerihelionArrow) {
+    hierarchyInspector.earthPerihelionArrow.parent?.remove(hierarchyInspector.earthPerihelionArrow);
+    hierarchyInspector.earthPerihelionArrow.dispose?.();
+    hierarchyInspector.earthPerihelionArrow = null;
+  }
+  if (hierarchyInspector.rotationArrow) {
+    hierarchyInspector.rotationArrow.parent?.remove(hierarchyInspector.rotationArrow);
+    hierarchyInspector.rotationArrow.geometry?.dispose();
+    hierarchyInspector.rotationArrow.material?.dispose();
+    hierarchyInspector.rotationArrow = null;
+  }
+  if (hierarchyInspector.inclinationPlane) {
+    hierarchyInspector.inclinationPlane.parent?.remove(hierarchyInspector.inclinationPlane);
+    // Dispose all children geometries and materials
+    hierarchyInspector.inclinationPlane.traverse((child) => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
+    hierarchyInspector.inclinationPlane = null;
+    hierarchyInspector.ascendingNode = null;
+    hierarchyInspector.descendingNode = null;
+    hierarchyInspector.aboveHalfPlane = null;
+    hierarchyInspector.belowHalfPlane = null;
+    hierarchyInspector.highestPointMarker = null;
+    hierarchyInspector.lowestPointMarker = null;
+    hierarchyInspector._highArrow = null;
+    hierarchyInspector._lowArrow = null;
+    hierarchyInspector._ascNodeArrow = null;
+    hierarchyInspector._descNodeArrow = null;
+    hierarchyInspector._nodesLine = null;
+    // Reset tilt cache to force recalculation on next creation
+    _lastAscNodeTiltA = null;
+    _lastAscNodeTiltB = null;
+  }
+  if (hierarchyInspector.perihelionDot) {
+    hierarchyInspector.perihelionDot.parent?.remove(hierarchyInspector.perihelionDot);
+    hierarchyInspector.perihelionDot.geometry?.dispose();
+    hierarchyInspector.perihelionDot.material?.dispose();
+    hierarchyInspector.perihelionDot = null;
+  }
+  if (hierarchyInspector.perihelionArrow) {
+    hierarchyInspector.perihelionArrow.parent?.remove(hierarchyInspector.perihelionArrow);
+    hierarchyInspector.perihelionArrow = null;
+    hierarchyInspector._perihelionLine = null;
+    hierarchyInspector._perihelionArrowHead = null;
+    hierarchyInspector._fixedPerihelionObj = null;
+    hierarchyInspector._perihelionArrowScale = null;
+    // Clear cached vectors (they'll be recreated if needed)
+    hierarchyInspector._sunPosVec3 = null;
+    hierarchyInspector._dirVec3 = null;
+    hierarchyInspector._defaultDir = null;
+    hierarchyInspector._arrowQuat = null;
+  }
+  // Clean up anomaly visualization elements only when appropriate
+  // (when showAnomalies is off, not on step 3, or forced)
+  if (shouldCleanAnomalies && hierarchyInspector.anomalyGroup) {
+    hierarchyInspector.anomalyGroup.parent?.remove(hierarchyInspector.anomalyGroup);
+    hierarchyInspector.anomalyGroup.traverse((child) => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
+    hierarchyInspector.anomalyGroup = null;
+    hierarchyInspector.trueAnomalyArc = null;
+    hierarchyInspector.meanAnomalyArc = null;
+    hierarchyInspector.trueAnomalyStartMarker = null;
+    hierarchyInspector.meanAnomalyStartMarker = null;
+    hierarchyInspector.trueAnomalyArrow = null;
+    hierarchyInspector.meanAnomalyArrow = null;
+    hierarchyInspector.earthSunLine = null;
+    hierarchyInspector._trueArcRadius = null;
+    hierarchyInspector._meanArcRadius = null;
+  }
+  // Clean up new anomaly visualization elements (added to scene directly)
+  // Only clean when shouldCleanAnomalies is true
+  if (shouldCleanAnomalies) {
+    if (hierarchyInspector.pToPlanetLine) {
+      hierarchyInspector.pToPlanetLine.parent?.remove(hierarchyInspector.pToPlanetLine);
+      hierarchyInspector.pToPlanetLine.geometry?.dispose();
+      hierarchyInspector.pToPlanetLine.material?.dispose();
+      hierarchyInspector.pToPlanetLine = null;
+    }
+    if (hierarchyInspector.sunToPlanetLine) {
+      hierarchyInspector.sunToPlanetLine.parent?.remove(hierarchyInspector.sunToPlanetLine);
+      hierarchyInspector.sunToPlanetLine.geometry?.dispose();
+      hierarchyInspector.sunToPlanetLine.material?.dispose();
+      hierarchyInspector.sunToPlanetLine = null;
+    }
+    if (hierarchyInspector.meanAnomalyArcAtP) {
+      hierarchyInspector.meanAnomalyArcAtP.parent?.remove(hierarchyInspector.meanAnomalyArcAtP);
+      hierarchyInspector.meanAnomalyArcAtP.geometry?.dispose();
+      hierarchyInspector.meanAnomalyArcAtP.material?.dispose();
+      hierarchyInspector.meanAnomalyArcAtP = null;
+    }
+    if (hierarchyInspector.trueAnomalyArcAtSun) {
+      hierarchyInspector.trueAnomalyArcAtSun.parent?.remove(hierarchyInspector.trueAnomalyArcAtSun);
+      hierarchyInspector.trueAnomalyArcAtSun.geometry?.dispose();
+      hierarchyInspector.trueAnomalyArcAtSun.material?.dispose();
+      hierarchyInspector.trueAnomalyArcAtSun = null;
+    }
+    hierarchyInspector._meanArcAtPRadius = null;
+    hierarchyInspector._trueArcAtSunRadius = null;
+  }
+
+  // Restore original state of RealPerihelionAtSun and FixedPerihelionAtSun objects
+  if (hierarchyInspector._perihelionFromSunObj) {
+    const obj = hierarchyInspector._perihelionFromSunObj;
+    if (obj.planetObj) {
+      obj.planetObj.visible = hierarchyInspector._perihelionFromSunOriginalVisible ?? false;
+      // Restore original scale
+      if (hierarchyInspector._perihelionFromSunOriginalScale) {
+        obj.planetObj.scale.copy(hierarchyInspector._perihelionFromSunOriginalScale);
+      }
+      // Restore original color and depth settings
+      if (hierarchyInspector._perihelionFromSunOriginalColor && obj.planetObj.material) {
+        obj.planetObj.material.color.copy(hierarchyInspector._perihelionFromSunOriginalColor);
+        obj.planetObj.material.emissive = new THREE.Color(0x000000);
+        obj.planetObj.material.emissiveIntensity = 0;
+        obj.planetObj.material.depthTest = true;
+        obj.planetObj.renderOrder = 0;
+      }
+    }
+    // Restore orbit line visibility and color
+    if (obj.orbitLineObj) {
+      obj.orbitLineObj.visible = hierarchyInspector._perihelionFromSunOrbitOriginalVisible ?? false;
+      if (hierarchyInspector._perihelionFromSunOrbitOriginalColor && obj.orbitLineObj.material) {
+        obj.orbitLineObj.material.color.copy(hierarchyInspector._perihelionFromSunOrbitOriginalColor);
+        obj.orbitLineObj.material.opacity = 0.4;
+      }
+    }
+    hierarchyInspector._perihelionFromSunObj = null;
+    hierarchyInspector._perihelionFromSunOriginalVisible = null;
+    hierarchyInspector._perihelionFromSunOriginalScale = null;
+    hierarchyInspector._perihelionFromSunOriginalColor = null;
+    hierarchyInspector._perihelionFromSunOrbitOriginalVisible = null;
+    hierarchyInspector._perihelionFromSunOrbitOriginalColor = null;
+  }
+  // Remove RealPerihelionAtSun label sprite (P2)
+  if (hierarchyInspector._perihelionFromSunLabel) {
+    hierarchyInspector._perihelionFromSunLabel.parent?.remove(hierarchyInspector._perihelionFromSunLabel);
+    hierarchyInspector._perihelionFromSunLabel.material?.map?.dispose();
+    hierarchyInspector._perihelionFromSunLabel.material?.dispose();
+    hierarchyInspector._perihelionFromSunLabel = null;
+  }
+  if (hierarchyInspector._perihelionAtSunObj) {
+    const obj = hierarchyInspector._perihelionAtSunObj;
+    if (obj.planetObj) {
+      obj.planetObj.visible = hierarchyInspector._perihelionAtSunOriginalVisible ?? false;
+      // Restore original scale
+      if (hierarchyInspector._perihelionAtSunOriginalScale) {
+        obj.planetObj.scale.copy(hierarchyInspector._perihelionAtSunOriginalScale);
+      }
+      // Restore original color and depth settings
+      if (hierarchyInspector._perihelionAtSunOriginalColor && obj.planetObj.material) {
+        obj.planetObj.material.color.copy(hierarchyInspector._perihelionAtSunOriginalColor);
+        obj.planetObj.material.emissive = new THREE.Color(0x000000);
+        obj.planetObj.material.emissiveIntensity = 0;
+        obj.planetObj.material.depthTest = true;
+        obj.planetObj.renderOrder = 0;
+      }
+    }
+    hierarchyInspector._perihelionAtSunObj = null;
+    hierarchyInspector._perihelionAtSunOriginalVisible = null;
+    hierarchyInspector._perihelionAtSunOriginalScale = null;
+    hierarchyInspector._perihelionAtSunOriginalColor = null;
+  }
+  // Remove perihelion label sprite
+  if (hierarchyInspector._perihelionLabel) {
+    hierarchyInspector._perihelionLabel.parent?.remove(hierarchyInspector._perihelionLabel);
+    hierarchyInspector._perihelionLabel.material?.map?.dispose();
+    hierarchyInspector._perihelionLabel.material?.dispose();
+    hierarchyInspector._perihelionLabel = null;
+  }
+  // Remove planet locator circle
+  if (hierarchyInspector._planetLocatorCircle) {
+    hierarchyInspector._planetLocatorCircle.parent?.remove(hierarchyInspector._planetLocatorCircle);
+    hierarchyInspector._planetLocatorCircle.geometry?.dispose();
+    hierarchyInspector._planetLocatorCircle.material?.dispose();
+    hierarchyInspector._planetLocatorCircle = null;
+    hierarchyInspector._planetLocatorTarget = null;
+  }
+}
+
+// Focus camera on the current step's pivot object with step-aware positioning
+function focusOnStepObject(stepData) {
+  const obj = stepData.obj;
+  if (!obj.pivotObj) return;
+
+  const step = hierarchyInspector.currentStep;
+  const planetKey = hierarchyInspector.currentPlanet;
+  const planetData = PLANET_HIERARCHIES[planetKey];
+
+  // Get perihelion object for this planet
+  const perihelionObj = planetData.perihelionOf?.();
+
+  // Clean up any previously temporarily shown perihelion
+  if (hierarchyInspector._tempPerihelionVisible) {
+    const prevObj = hierarchyInspector._tempPerihelionVisible;
+    if (prevObj.planetObj) {
+      prevObj.planetObj.visible = hierarchyInspector._tempPerihelionOriginalVisible ?? false;
+    }
+    if (prevObj.orbitLineObj) {
+      prevObj.orbitLineObj.visible = hierarchyInspector._tempPerihelionOrbitOriginalVisible ?? false;
+    }
+    hierarchyInspector._tempPerihelionVisible = null;
+    hierarchyInspector._tempPerihelionOriginalVisible = null;
+    hierarchyInspector._tempPerihelionOrbitOriginalVisible = null;
+  }
+
+  let targetPos = new THREE.Vector3();
+  let viewDistance;
+  let focusObj = null;  // The object to track in animation loop
+
+  if (step === 0) {
+    // Step 1 (index 0): Focus on earthPerihelionFromEarth
+    if (earthPerihelionFromEarth?.pivotObj) {
+      // Store original visibility and make visible temporarily
+      hierarchyInspector._tempPerihelionOriginalVisible = earthPerihelionFromEarth.planetObj?.visible;
+      hierarchyInspector._tempPerihelionOrbitOriginalVisible = earthPerihelionFromEarth.orbitLineObj?.visible;
+      hierarchyInspector._tempPerihelionVisible = earthPerihelionFromEarth;
+
+      if (earthPerihelionFromEarth.planetObj) earthPerihelionFromEarth.planetObj.visible = true;
+      if (earthPerihelionFromEarth.orbitLineObj) earthPerihelionFromEarth.orbitLineObj.visible = true;
+
+      focusObj = earthPerihelionFromEarth;
+      earthPerihelionFromEarth.pivotObj.updateMatrixWorld(true);
+      earthPerihelionFromEarth.pivotObj.getWorldPosition(targetPos);
+      viewDistance = Math.max(100, (earthPerihelionFromEarth.orbitRadius || 50) * 2);
+    } else {
+      // Fallback to step object
+      focusObj = obj;
+      obj.pivotObj.updateMatrixWorld(true);
+      obj.pivotObj.getWorldPosition(targetPos);
+      viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
+    }
+  } else if (step <= 2) {
+    // Steps 2, 3 (indices 1, 2): Focus on PERIHELION object
+    if (perihelionObj?.pivotObj) {
+      // Store original visibility and make visible temporarily
+      hierarchyInspector._tempPerihelionOriginalVisible = perihelionObj.planetObj?.visible;
+      hierarchyInspector._tempPerihelionOrbitOriginalVisible = perihelionObj.orbitLineObj?.visible;
+      hierarchyInspector._tempPerihelionVisible = perihelionObj;
+
+      if (perihelionObj.planetObj) perihelionObj.planetObj.visible = true;
+      if (perihelionObj.orbitLineObj) perihelionObj.orbitLineObj.visible = true;
+
+      focusObj = perihelionObj;
+      perihelionObj.pivotObj.updateMatrixWorld(true);
+      perihelionObj.pivotObj.getWorldPosition(targetPos);
+      viewDistance = Math.max(100, (perihelionObj.orbitRadius || 50) * 2);
+    } else {
+      // Fallback to step object if no perihelion
+      focusObj = obj;
+      obj.pivotObj.updateMatrixWorld(true);
+      obj.pivotObj.getWorldPosition(targetPos);
+      viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
+    }
+  } else if (step === 3) {
+    // Step 4 (index 3): Focus on Sun
+    focusObj = sun;
+    sun.pivotObj.updateMatrixWorld(true);
+    sun.pivotObj.getWorldPosition(targetPos);
+    viewDistance = Math.max(200, (obj.orbitRadius || 100) * 2);
+  } else {
+    // Step 5 (index 4): Focus on planet
+    focusObj = obj;
+    obj.pivotObj.updateMatrixWorld(true);
+    obj.pivotObj.getWorldPosition(targetPos);
+    viewDistance = Math.max(100, (obj.orbitRadius || 50) * 2);
+  }
+
+  // Enable hierarchy inspector camera control
+  hierarchyInspector._cameraControlActive = true;
+  hierarchyInspector._cameraTarget = focusObj;
+
+  // Set camera target
+  controls.target.copy(targetPos);
+
+  // Position camera based on step
+  if (step <= 3) {
+    // Steps 1-4: Looking down on celestial plane (Y+ is up, Earth below, Sun on top)
+    camera.position.set(targetPos.x, targetPos.y + viewDistance, targetPos.z);
+  } else {
+    // Step 5: Looking from Sun towards planet (camera behind planet, looking towards Sun)
+    const sunPos = new THREE.Vector3();
+    sun.pivotObj.updateMatrixWorld(true);
+    sun.pivotObj.getWorldPosition(sunPos);
+
+    const direction = new THREE.Vector3().subVectors(targetPos, sunPos).normalize();
+    camera.position.copy(targetPos).add(direction.multiplyScalar(viewDistance));
+  }
+
+  // Update controls
+  controls.minDistance = 0;
+  controls.maxDistance = Infinity;
+  controls.update();
+
+  // Reset near plane to default for unrestricted zooming
+  camera.near = 0.1;
+  camera.updateProjectionMatrix();
+}
+
+// Build hierarchy tree HTML
+function buildHierarchyTree(steps, currentIdx) {
+  let html = '<span style="color:rgba(255,255,255,0.4)">startingPoint</span>\n';
+  const indent = '    ';
+  steps.forEach((step, idx) => {
+    const prefix = indent.repeat(idx + 1) + '\u2514\u2500\u2500 ';
+    if (idx === currentIdx) {
+      html += `${prefix}<span class="hi-current">\u2605 ${step.name}</span>  \u2190 CURRENT\n`;
+    } else {
+      html += `${prefix}${step.name}\n`;
+    }
+  });
+  return html;
+}
+
+// Update inspector display
+function updateInspectorDisplay() {
+  const panel = hierarchyInspector.panel;
+  if (!panel) return;
+
+  const planetData = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet];
+  if (!planetData) return;
+
+  const steps = planetData.steps();
+  const stepData = steps[hierarchyInspector.currentStep];
+  const obj = stepData.obj;
+
+  // Update step indicator
+  panel.querySelector('.hi-step-indicator').textContent =
+    `STEP ${hierarchyInspector.currentStep + 1} of ${steps.length}: ${obj.name || stepData.name}`;
+
+  // Step 4 (index 3): Turn off some helpers by default for cleaner anomaly visualization
+  const isStep4 = hierarchyInspector.currentStep === 3;
+  const step4OffHelpers = ['showAxes', 'showStartPos', 'showRotationDir'];
+  step4OffHelpers.forEach(helper => {
+    const checkbox = panel.querySelector(`input[data-helper="${helper}"]`);
+    if (checkbox) {
+      if (isStep4) {
+        checkbox.checked = false;
+        hierarchyInspector.helpers[helper] = false;
+      } else {
+        checkbox.checked = true;
+        hierarchyInspector.helpers[helper] = true;
+      }
+    }
+  });
+
+  // Show/hide Visual Legend section (only visible on Step 4)
+  const legendSection = panel.querySelector('.hi-legend-section');
+  if (legendSection) {
+    legendSection.style.display = isStep4 ? 'block' : 'none';
+  }
+
+  // Show/hide Live Data section (only visible on Step 4)
+  const liveSection = panel.querySelector('.hi-live-section');
+  if (liveSection) {
+    liveSection.style.display = isStep4 ? 'block' : 'none';
+  }
+
+  // Show/hide Report section (only visible on Step 5 - index 4)
+  const isStep5 = hierarchyInspector.currentStep === 4;
+  const reportSection = panel.querySelector('.hi-report-section');
+  if (reportSection) {
+    reportSection.style.display = isStep5 ? 'block' : 'none';
+    if (isStep5) {
+      // Generate and display report for Step 5
+      generateAndDisplayReport(hierarchyInspector.currentPlanet);
+    }
+  }
+
+  // Show/hide Step 4 specific helper checkboxes
+  const step4Helpers = ['showOrbitCenter', 'showInclinationPlane', 'showPerihelionPoint', 'showAnomalies'];
+  step4Helpers.forEach(helper => {
+    const label = panel.querySelector(`input[data-helper="${helper}"]`)?.parentElement;
+    if (label) {
+      label.style.display = isStep4 ? '' : 'none';
+    }
+  });
+  // Also hide the solar period section when not on Step 4
+  const solarPeriodSection = panel.querySelector('.hi-solar-period-section');
+  if (solarPeriodSection && !isStep4) {
+    solarPeriodSection.style.display = 'none';
+  }
+
+  // Calculate derived values
+  const periodYears = speedToPeriod(obj.speed);
+  const arcsecPerCentury = periodToArcsecPerCentury(periodYears);
+  const currentRotation = obj.orbitObj?.rotation?.y ?? 0;
+  if (obj.pivotObj) obj.pivotObj.getWorldPosition(_hiWorldPos);
+
+  // Build settings section
+  const settingsHtml = `
+    <div class="hi-props">
+      <span class="hi-key">name</span><span class="hi-val">"${obj.name || 'unnamed'}"</span>
+      <span class="hi-key">startPos</span><span class="hi-val">${formatNum(obj.startPos, 2)}\u00b0</span>
+      <span class="hi-key">speed (raw)</span><span class="hi-val">${formatNum(obj.speed, 8)} rad/yr</span>
+      <span class="hi-key">speed (period)</span><span class="hi-val">${formatNum(periodYears, 2)} years</span>
+      <span class="hi-key">speed (arcsec)</span><span class="hi-val">${formatNum(arcsecPerCentury, 2)} "/century</span>
+      <span class="hi-key">tilt</span><span class="hi-val">${formatNum(obj.tilt, 2)}\u00b0</span>
+      <span class="hi-key">orbitRadius</span><span class="hi-val">${formatNum(obj.orbitRadius, 4)}</span>
+      <span class="hi-key">orbitCenter</span><span class="hi-val">(${formatNum(obj.orbitCentera, 4)}, ${formatNum(obj.orbitCenterb, 4)}, ${formatNum(obj.orbitCenterc, 4)})</span>
+      <span class="hi-key">orbitTilt</span><span class="hi-val">(${formatNum(obj.orbitTilta, 2)}\u00b0, ${formatNum(obj.orbitTiltb, 2)}\u00b0)</span>
+      <span class="hi-key">visible</span><span class="hi-val">${obj.visible}</span>
+      <span class="hi-key">isNotPhysical</span><span class="hi-val">${obj.isNotPhysicalObject ?? false}</span>
+    </div>
+  `;
+  panel.querySelector('.hi-settings-content').innerHTML = settingsHtml;
+
+  // Build runtime section
+  const runtimeHtml = `
+    <div class="hi-props">
+      <span class="hi-key">Current rotation</span><span class="hi-val">${formatNum(currentRotation, 4)} rad (${formatNum(currentRotation * 180 / Math.PI, 2)}\u00b0)</span>
+      <span class="hi-key">World position</span><span class="hi-val">(${formatNum(_hiWorldPos.x, 2)}, ${formatNum(_hiWorldPos.y, 2)}, ${formatNum(_hiWorldPos.z, 2)})</span>
+      <span class="hi-key">containerObj</span><span class="hi-val">${obj.containerObj ? '\u2713 exists' : '\u2717 missing'}</span>
+      <span class="hi-key">orbitObj</span><span class="hi-val">${obj.orbitObj ? '\u2713 exists' : '\u2717 missing'}</span>
+      <span class="hi-key">pivotObj</span><span class="hi-val">${obj.pivotObj ? '\u2713 exists' : '\u2717 missing'}</span>
+      <span class="hi-key">planetObj</span><span class="hi-val">${obj.planetObj ? '\u2713 exists' : '\u2717 missing'}</span>
+    </div>
+  `;
+  panel.querySelector('.hi-runtime-content').innerHTML = runtimeHtml;
+
+  // Build validation section
+  const issues = validateStep(stepData, hierarchyInspector.currentStep, steps);
+  let validationHtml = '';
+  issues.forEach(issue => {
+    const icon = issue.type === 'valid' ? '\u2713' : issue.type === 'warning' ? '\u26a0' : issue.type === 'info' ? '\u2139' : issue.type === 'reference' ? '\u2192' : '\u2717';
+    validationHtml += `<div class="hi-validation-item ${issue.type}"><span class="hi-validation-icon">${icon}</span>${issue.msg}</div>`;
+  });
+  panel.querySelector('.hi-validation-content').innerHTML = validationHtml;
+
+  // Build hierarchy tree
+  panel.querySelector('.hi-tree').innerHTML = buildHierarchyTree(steps, hierarchyInspector.currentStep);
+
+  // Clear Live Data section when not on Step 4 (the section is hidden, but reset cached elements)
+  if (hierarchyInspector.currentStep !== 3) {
+    _liveDataElements = null;
+  }
+  // If on Step 4, updateHierarchyLiveData() will populate it
+
+  // Update nav buttons
+  panel.querySelector('.hi-prev-btn').disabled = hierarchyInspector.currentStep === 0;
+  panel.querySelector('.hi-next-btn').disabled = hierarchyInspector.currentStep === steps.length - 1;
+
+  // Always show visual helpers and focus on the object when panel is open
+  createVisualHelpers(stepData);
+  focusOnStepObject(stepData);
+
+  // Update highlight button state
+  const highlightBtn = panel.querySelector('.hi-highlight-btn');
+  highlightBtn.classList.add('active');
+  highlightBtn.textContent = 'Hide Helpers';
+  hierarchyInspector.highlightActive = true;
+}
+
+// Create inspector panel HTML
+function createInspectorPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'hierarchyInspector';
+  panel.innerHTML = `
+    <div class="hi-header">
+      <h2>Planet Hierarchy Inspector</h2>
+      <div class="hi-close" title="Close"></div>
+    </div>
+    <div class="hi-selector">
+      <label>Planet:</label>
+      <select class="hi-planet-select">
+        ${Object.entries(PLANET_HIERARCHIES).map(([key, val]) =>
+          `<option value="${key}">${val.label}</option>`
+        ).join('')}
+      </select>
+    </div>
+    <div class="hi-step-indicator">STEP 1 of 5</div>
+    <div class="hi-body">
+      <div class="hi-section">
+        <div class="hi-section-title">Settings</div>
+        <div class="hi-settings-content"></div>
+      </div>
+      <div class="hi-section">
+        <div class="hi-section-title">Runtime State</div>
+        <div class="hi-runtime-content"></div>
+      </div>
+      <div class="hi-section">
+        <div class="hi-section-title">Validation</div>
+        <div class="hi-validation-content"></div>
+      </div>
+      <div class="hi-section hi-live-section" style="display: none;">
+        <div class="hi-section-title">Live Data <span style="color:#4caf50; font-size:10px;">(updates in real-time)</span></div>
+        <div class="hi-live-content" style="font-family: var(--pl-mono-font); color: #4caf50;"></div>
+      </div>
+      <div class="hi-section hi-report-section" style="display: none;">
+        <div class="hi-section-title">Position Report <span style="color:#64b5f6; font-size:10px;">(Step 5)</span></div>
+        <div class="hi-report-content">
+          <div class="hi-report-loading">Generating report...</div>
+          <pre class="hi-report"></pre>
+          <div class="hi-report-buttons">
+            <button class="hi-report-btn download">Download Excel</button>
+            <button class="hi-report-btn copy">Copy Report</button>
+          </div>
+        </div>
+      </div>
+      <div class="hi-section hi-legend-section" style="display: none;">
+        <div class="hi-section-title">Visual Legend</div>
+        <div class="hi-legend-content" style="font-size: 11px; line-height: 1.6;">
+          <div><span style="color:#00ff00">GREEN</span> half-plane: Above ecliptic</div>
+          <div><span style="color:#ff0000">RED</span> half-plane: Below ecliptic</div>
+          <div><span style="color:#ff00ff">Magenta</span> sphere ↑: Ascending node</div>
+          <div><span style="color:#00ffff">Cyan</span> sphere ↓: Descending node</div>
+          <div><span style="color:#00ff00">Green</span> sphere ↑: Highest point (max north)</div>
+          <div><span style="color:#ff0000">Red</span> sphere ↓: Lowest point (max south)</div>
+          <div><span style="color:#800080">Purple</span> line →: Current angle perihelion to Sun</div>
+          <div><span style="color:#00ffff">Cyan</span> arrow →: Mean Anomaly angle to perihelion</div>
+          <div><span style="color:#ffbf00">Amber</span> arrow →: True Anomaly angle to perihelion</div>
+          <div>P point →: Fixed perihelion point</div>
+          <div>P2 point →: Real perihelion point (ellipse)</div>
+        </div>
+      </div>
+      <div class="hi-section">
+        <div class="hi-section-title">Hierarchy Path</div>
+        <div class="hi-tree"></div>
+      </div>
+      <div class="hi-helpers">
+        <div class="hi-helpers-title">Visual Helpers</div>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showAxes" checked> Show Axes (XYZ)</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showStartPos" checked> Show StartPos Direction</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showRotationDir" checked> Show Rotation Direction</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showOrbitCenter"> Show Startpos Reference Information (Step 4)</label>
+        <div class="hi-solar-period-section" style="display: none; margin-left: 20px; margin-bottom: 8px; padding: 8px; background: rgba(0,255,255,0.05); border-left: 2px solid #00ffff; font-size: 11px;">
+          <div style="color: rgba(255,255,255,0.5); font-size: 10px; margin-bottom: 4px;">SOLAR PERIOD REFERENCE</div>
+          <div style="color: rgba(255,255,255,0.4); font-size: 9px; margin-bottom: 6px;">(Planet's position on its orbit around the Sun)</div>
+          <div style="display: grid; grid-template-columns: 1fr auto; gap: 2px 8px;">
+            <span style="color: #00ffff;">Reference angle on Solar period</span>
+            <span data-id="refAngleHelper" style="color: #00ffff;"></span>
+            <span style="color: rgba(255,255,255,0.6);">Orbit Period Solar</span>
+            <span data-id="orbitPeriodSolarHelper" style="color: rgba(255,255,255,0.6);"></span>
+            <span style="color: #00ffff;">Days before next alignment</span>
+            <span data-id="daysUntilAlignmentHelper" style="color: #00ffff;"></span>
+          </div>
+          <div style="color: rgba(255,255,255,0.4); font-size: 9px; margin-top: 4px;">(planet alignment with the cyan arrow = start of planet orbit)</div>
+        </div>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showInclinationPlane" checked> Show Inclination Plane (Step 4)</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showPerihelionPoint" checked> Show Perihelion Point & Arrow (Step 4)</label>
+        <label class="hi-helper-row"><input type="checkbox" data-helper="showAnomalies" checked> Show Anomalies Visualization (Step 4)</label>
+      </div>
+    </div>
+    <div class="hi-footer">
+      <button class="hi-nav-btn hi-prev-btn">\u25c0 Prev</button>
+      <button class="hi-nav-btn hi-highlight-btn">Highlight in Scene</button>
+      <button class="hi-nav-btn hi-next-btn">Next \u25b6</button>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  // Event listeners
+  panel.querySelector('.hi-close').addEventListener('click', closeHierarchyInspector);
+
+  panel.querySelector('.hi-planet-select').addEventListener('change', (e) => {
+    hierarchyInspector.currentPlanet = e.target.value;
+    hierarchyInspector.currentStep = 0;
+    updateInspectorDisplay();
+  });
+
+  panel.querySelector('.hi-prev-btn').addEventListener('click', () => {
+    if (hierarchyInspector.currentStep > 0) {
+      hierarchyInspector.currentStep--;
+      updateInspectorDisplay();
+    }
+  });
+
+  panel.querySelector('.hi-next-btn').addEventListener('click', () => {
+    const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
+    if (hierarchyInspector.currentStep < steps.length - 1) {
+      hierarchyInspector.currentStep++;
+      updateInspectorDisplay();
+    }
+  });
+
+  panel.querySelector('.hi-highlight-btn').addEventListener('click', (e) => {
+    hierarchyInspector.highlightActive = !hierarchyInspector.highlightActive;
+    e.target.classList.toggle('active', hierarchyInspector.highlightActive);
+    e.target.textContent = hierarchyInspector.highlightActive ? 'Hide Helpers' : 'Highlight in Scene';
+    if (hierarchyInspector.highlightActive) {
+      const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
+      createVisualHelpers(steps[hierarchyInspector.currentStep]);
+    } else {
+      // Highlight turned off - force clean everything
+      clearVisualHelpers({ forceCleanAnomalies: true });
+    }
+  });
+
+  // Helper checkboxes
+  panel.querySelectorAll('.hi-helper-row input').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const helperName = e.target.dataset.helper;
+      hierarchyInspector.helpers[helperName] = e.target.checked;
+
+      // Toggle solar period section visibility when showOrbitCenter is toggled
+      if (helperName === 'showOrbitCenter') {
+        const solarPeriodSection = panel.querySelector('.hi-solar-period-section');
+        if (solarPeriodSection) {
+          solarPeriodSection.style.display = e.target.checked ? 'block' : 'none';
+        }
+      }
+
+      if (hierarchyInspector.highlightActive) {
+        // Only force clean anomaly elements if the showAnomalies checkbox was toggled
+        const forceCleanAnomalies = (helperName === 'showAnomalies');
+        clearVisualHelpers({ forceCleanAnomalies });
+        const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
+        // Skip clear since we just did it with the right forceCleanAnomalies setting
+        createVisualHelpers(steps[hierarchyInspector.currentStep], { skipClear: true });
+      }
+    });
+  });
+
+  // Report buttons (Step 5)
+  panel.querySelector('.hi-report-btn.download').addEventListener('click', async () => {
+    if (_currentReportData && _currentReportData.excelData) {
+      await exportPlanetReportToExcel(_currentReportData.planetKey, _currentReportData.excelData);
+    }
+  });
+
+  panel.querySelector('.hi-report-btn.copy').addEventListener('click', () => {
+    if (_currentReportData && _currentReportData.screenReport) {
+      copyReportToClipboard(_currentReportData.screenReport);
+    }
+  });
+
+  // Keyboard navigation
+  const keyHandler = (e) => {
+    if (!panel.classList.contains('visible')) return;
+
+    // Don't intercept keyboard events when user is typing in an input field
+    // (e.g., editing date/time in dat.GUI)
+    const activeEl = document.activeElement;
+    const isTyping = activeEl && (
+      activeEl.tagName === 'INPUT' ||
+      activeEl.tagName === 'TEXTAREA' ||
+      activeEl.isContentEditable
+    );
+    if (isTyping) return;
+
+    if (e.key === 'ArrowLeft' || e.key === 'p') {
+      panel.querySelector('.hi-prev-btn').click();
+    } else if (e.key === 'ArrowRight' || e.key === 'n') {
+      panel.querySelector('.hi-next-btn').click();
+    } else if (e.key === 'Escape' || e.key === 'q') {
+      closeHierarchyInspector();
+    }
+  };
+  document.addEventListener('keydown', keyHandler);
+
+  return panel;
+}
+
+// Open the hierarchy inspector
+function openHierarchyInspector() {
+  if (!hierarchyInspector.panel) {
+    hierarchyInspector.panel = createInspectorPanel();
+  }
+  hierarchyInspector.panel.classList.add('visible');
+  hierarchyInspector.panel.querySelector('.hi-planet-select').value = hierarchyInspector.currentPlanet;
+  updateInspectorDisplay();
+  // Hide the planet data panel while hierarchy inspector is open
+  labelDismissed = true;
+  const planetLabel = document.getElementById('planetLabel');
+  if (planetLabel) {
+    planetLabel.style.display = 'none';
+  }
+  // Hide orbit plane helper of current lookAtObj
+  if (o.lookAtObj?.orbitPlaneHelper) {
+    o.lookAtObj.orbitPlaneHelper.visible = false;
+  }
+  // Hide focus ring (shown when looking at Sun)
+  if (focusRing) {
+    focusRing.visible = false;
+  }
+}
+
+// Close the hierarchy inspector
+function closeHierarchyInspector() {
+  if (hierarchyInspector.panel) {
+    hierarchyInspector.panel.classList.remove('visible');
+    // Set highlightActive to false BEFORE clearVisualHelpers so anomaly elements are cleaned up
+    hierarchyInspector.highlightActive = false;
+    // Disable hierarchy inspector camera control
+    hierarchyInspector._cameraControlActive = false;
+    hierarchyInspector._cameraTarget = null;
+    // Force clean everything when closing inspector
+    clearVisualHelpers({ forceCleanAnomalies: true });
+    const highlightBtn = hierarchyInspector.panel.querySelector('.hi-highlight-btn');
+    highlightBtn.classList.remove('active');
+    highlightBtn.textContent = 'Highlight in Scene';
+    // Reset view to Earth with default bird's eye view (same as initial load)
+    o.lookAtObj = earth;
+    camera.position.set(0, 500, 0);
+    controls.target.set(0, 0, 0);
+    focusPlanet(earth);
+    // Show the planet data panel with Earth data
+    labelDismissed = false;
+    const planetLabel = document.getElementById('planetLabel');
+    if (planetLabel) {
+      planetLabel.style.display = 'block';
+    }
+    // Update the "Look at" dropdown to show Earth
+    o.Target = 'Earth';
+    // Hide all orbit plane helpers
+    planetObjects.forEach(p => {
+      if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false;
+    });
+    // Update the GUI dropdown by finding the select element
+    const guiContainer = document.getElementById('gui');
+    if (guiContainer) {
+      const selectElements = guiContainer.querySelectorAll('select');
+      selectElements.forEach(select => {
+        // Find the "Look at" dropdown by checking its options
+        const hasEarthOption = Array.from(select.options).some(opt => opt.value === 'Earth');
+        if (hasEarthOption) {
+          select.value = 'Earth';
+        }
+      });
+    }
+  }
+}
+
+// Update live data in hierarchy inspector (called from render loop)
+let _lastLiveDataJD = null;
+let _lastLiveDataPlanet = null; // Track planet changes to force refresh
+let _lastLiveDataStep = null; // Track step changes to force refresh when returning to Step 4
+const _liveDataVec3 = new THREE.Vector3(); // Reusable vector for performance
+const _liveDataVec3b = new THREE.Vector3(); // Second reusable vector for sun position
+const _liveDataInvTiltMatrix = new THREE.Matrix4(); // Reusable inverse tilt matrix
+const _liveDataTiltMatrix = new THREE.Matrix4(); // Reusable tilt matrix
+const _liveDataFlatPos = new THREE.Vector3(); // Reusable vector for flat orbital position
+const _liveDataP1 = new THREE.Vector3(); // Reusable vectors for node sampling
+const _liveDataP2 = new THREE.Vector3();
+const _liveDataP1World = new THREE.Vector3(); // Reusable vectors for world positions
+const _liveDataP2World = new THREE.Vector3();
+const _liveDataLocalPt = new THREE.Vector3(); // Reusable for orbit point sampling
+const _liveDataWorldPt = new THREE.Vector3();
+const _liveDataLocalToWorld = new THREE.Matrix4(); // Reusable transform matrix for node updates
+const _liveDataNewAscPos = new THREE.Vector3(); // Reusable for ascending node position
+const _liveDataNewDescPos = new THREE.Vector3(); // Reusable for descending node position
+const _liveDataNewHighPos = new THREE.Vector3(); // Reusable for highest point position
+const _liveDataNewLowPos = new THREE.Vector3(); // Reusable for lowest point position
+// Reusable vectors for hierarchy inspector validation and display
+const _hiObjWorldPos = new THREE.Vector3();
+const _hiSunWorldPos = new THREE.Vector3();
+const _hiEarthPeriPos = new THREE.Vector3();
+const _hiPlanetPeriPos = new THREE.Vector3();
+const _hiDirection = new THREE.Vector3();
+const _hiWorldPos = new THREE.Vector3();
+// Reusable vectors for Step 3 visual helpers
+const _hiSunPos = new THREE.Vector3();
+const _hiPerihelionPos = new THREE.Vector3();
+const _hiEarthPos = new THREE.Vector3();
+const _hiPurpleWorldPos = new THREE.Vector3();
+const _hiGreenWorldPos = new THREE.Vector3();
+const _hiTempPos = new THREE.Vector3();
+// Reusable vectors for camera positioning
+const _hiTargetPos = new THREE.Vector3();
+const _hiCamSunPos = new THREE.Vector3();
+const _hiCamDirection = new THREE.Vector3();
+let _cachedAscNodeOrbitalAngle = null; // Cached ascending node orbital angle
+let _cachedTiltA = null, _cachedTiltB = null; // Cached tilt values to detect changes
+let _liveDataElements = null; // Cached DOM element references for live data updates
+let _lastAscNodeTiltA = null, _lastAscNodeTiltB = null; // Cache to skip unchanged ascending node updates
+let _lastArcTrueAnomaly = null, _lastArcMeanAnomaly = null; // Cache for arc update throttling
+function updateHierarchyLiveData() {
+  try {
+    if (!hierarchyInspector.panel || !hierarchyInspector.panel.classList.contains('visible')) return;
+
+    // If not on Step 4, reset tracking so we refresh when returning to Step 4
+    if (hierarchyInspector.currentStep !== 3) {
+      _lastLiveDataStep = null;
+      return;
+    }
+
+  // Only update when simulation is running OR Julian Day has changed OR planet/step changed
+  // This allows copy/paste when paused
+  const currentJD = o.julianDay;
+  const currentPlanet = hierarchyInspector.currentPlanet;
+  const currentStep = hierarchyInspector.currentStep;
+  const planetChanged = _lastLiveDataPlanet !== currentPlanet;
+  const stepChanged = _lastLiveDataStep !== currentStep;
+
+  if (!o.Run && _lastLiveDataJD !== null && Math.abs(currentJD - _lastLiveDataJD) < 0.0001 && !planetChanged && !stepChanged) {
+    return; // Simulation paused, no JD change, same planet, and same step - skip update
+  }
+  _lastLiveDataJD = currentJD;
+  _lastLiveDataPlanet = currentPlanet;
+  _lastLiveDataStep = currentStep;
+
+  const liveContent = hierarchyInspector.panel.querySelector('.hi-live-content');
+  if (!liveContent) return;
+
+  const steps = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet].steps();
+  const stepData = steps[hierarchyInspector.currentStep];
+  const obj = stepData.obj;
+
+  if (!obj) return;
+
+  // Get the actual planet object (Step 5) to check its real world position
+  const planetStep = steps[4]; // Step 5 is the actual planet
+  const planetObj = planetStep?.obj;
+
+  // Get tilt values for ascending node calculation
+  const tiltaDeg = obj.orbitTilta || 0;
+  const tiltbDeg = obj.orbitTiltb || 0;
+
+  // The tilt encoding is:
+  //   orbitTilta = cos((-90 - Ω) * π/180) * (-inclination)
+  //   orbitTiltb = sin((-90 - Ω) * π/180) * (-inclination)
+  // The negative inclination flips signs, equivalent to:
+  //   atan2(tiltb, tilta) = 90 - Ω
+  // Therefore: Ω = 90 - atan2(tiltb, tilta)
+  // But we now use the DYNAMIC ascending node from o.<planet>AscendingNode
+  // which accounts for changes in Earth's obliquity over time
+  // Map planet keys to their o.xxxAscendingNode property names
+  const ascendingNodePropertyMap = {
+    mercury: 'mercuryAscendingNode',
+    venus: 'venusAscendingNode',
+    mars: 'marsAscendingNode',
+    jupiter: 'jupiterAscendingNode',
+    saturn: 'saturnAscendingNode',
+    uranus: 'uranusAscendingNode',
+    neptune: 'neptuneAscendingNode',
+    pluto: 'plutoAscendingNode',
+    halleys: 'halleysAscendingNode',
+    eros: 'erosAscendingNode'
+  };
+
+  // Use dynamic value if available, otherwise fall back to static calculation
+  let ascNodeAngleDeg;
+  const ascNodeProperty = ascendingNodePropertyMap[hierarchyInspector.currentPlanet];
+  if (ascNodeProperty && o[ascNodeProperty] !== undefined && o[ascNodeProperty] !== 0) {
+    ascNodeAngleDeg = o[ascNodeProperty];
+  } else {
+    // Fallback to static calculation
+    const theta = Math.atan2(tiltbDeg, tiltaDeg) * 180 / Math.PI;
+    ascNodeAngleDeg = 90 - theta;
+    ascNodeAngleDeg = ((ascNodeAngleDeg % 360) + 360) % 360;
+  }
+
+  // Get world positions (reuse vector for performance)
+  let planetWorldY = 0;
+  let planetWorldX = 0, planetWorldZ = 0;
+
+  if (planetObj?.pivotObj) {
+    planetObj.pivotObj.getWorldPosition(_liveDataVec3);
+    planetWorldX = _liveDataVec3.x;
+    planetWorldY = _liveDataVec3.y;
+    planetWorldZ = _liveDataVec3.z;
+  }
+
+  // Calculate orbital plane height metrics
+  const inclinationRad = Math.sqrt(tiltaDeg*tiltaDeg + tiltbDeg*tiltbDeg) * Math.PI / 180;
+  const orbitRadius = Math.sqrt(planetWorldX*planetWorldX + planetWorldZ*planetWorldZ);
+  const maxY = orbitRadius * Math.sin(inclinationRad);
+
+  // Calculate angle from planet to ascending node
+  // The planet's ecliptic longitude from its world position:
+  let planetEclipticLong = Math.atan2(-planetWorldZ, planetWorldX) * 180 / Math.PI;
+  planetEclipticLong = ((planetEclipticLong % 360) + 360) % 360;
+
+  // Angular distance from the ascending node (measured along the ecliptic)
+  let eclipticAngleFromAscNode = planetEclipticLong - ascNodeAngleDeg;
+  eclipticAngleFromAscNode = ((eclipticAngleFromAscNode + 180) % 360 + 360) % 360 - 180;
+
+  // The "angle from ascending node" in orbital terms is the argument of latitude (u)
+  // u = 0° at ascending node, 90° at highest point, 180° at descending node, 270° at lowest
+  //
+  // We can calculate this from the planet's Y height relative to maxY:
+  // Y/maxY = sin(u) for the ascending half (0° to 180°)
+  //
+  // To determine which half of the orbit we're in (ascending vs descending),
+  // we check if the ecliptic angle is in [0°, 180°] or [-180°, 0°]
+  let anglePlanetFromAscNode = 0;
+  if (maxY > 0.001) {
+    const yRatio = Math.max(-1, Math.min(1, planetWorldY / maxY));
+    const yAngle = Math.asin(yRatio) * 180 / Math.PI; // -90 to +90
+
+    // Determine which half of orbit based on ecliptic position
+    if (eclipticAngleFromAscNode >= 0 && eclipticAngleFromAscNode <= 180) {
+      // Ascending half: angle is directly the yAngle (0 to 90 to 0)
+      // But we need to distinguish 0-90 from 90-180
+      if (eclipticAngleFromAscNode <= 90) {
+        anglePlanetFromAscNode = yAngle; // 0 to 90
+      } else {
+        anglePlanetFromAscNode = 180 - yAngle; // 90 to 180 (but yAngle goes 90 to 0)
+      }
+    } else {
+      // Descending half: angle is -yAngle (0 to -90 to 0)
+      if (eclipticAngleFromAscNode >= -90) {
+        anglePlanetFromAscNode = yAngle; // 0 to -90 (yAngle is already negative here)
+      } else {
+        anglePlanetFromAscNode = -180 - yAngle; // -90 to -180
+      }
+    }
+  }
+
+  // Calculate angle from ascending node (ecliptic longitude based)
+  // sun.ra gives the Sun's ecliptic longitude directly (in radians)
+  // At June 21 (model start), sun.ra ≈ 90° (summer solstice)
+  const sunEclipticLongitude = (sun.ra * 180 / Math.PI + 360) % 360;
+  // Angle from ascending node = current ecliptic longitude - ascending node longitude
+  let angleFromAscNode = sunEclipticLongitude - ascNodeAngleDeg;
+  // Normalize to 0-360 first, then convert to ±180 range
+  angleFromAscNode = ((angleFromAscNode % 360) + 360) % 360;
+  if (angleFromAscNode > 180) {
+    angleFromAscNode = angleFromAscNode - 360; // Convert 181-359 to -179 to -1
+  }
+
+  // Calculate angle from longitude of perihelion
+  // Get the longitude of perihelion for this planet
+  const perihelionLongValues = {
+    mercury: o.mercuryPerihelion,
+    venus: o.venusPerihelion,
+    mars: o.marsPerihelion,
+    jupiter: o.jupiterPerihelion,
+    saturn: o.saturnPerihelion,
+    uranus: o.uranusPerihelion,
+    neptune: o.neptunePerihelion,
+    pluto: o.plutoPerihelion,
+    halleys: o.halleysPerihelion,
+    eros: o.erosPerihelion
+  };
+  const perihelionLong = perihelionLongValues[hierarchyInspector.currentPlanet] ?? 0;
+  // Angle from perihelion = current ecliptic longitude - longitude of perihelion
+  let angleFromPerihelion = sunEclipticLongitude - perihelionLong;
+  // Normalize to 0-360 first, then convert to ±180 range
+  angleFromPerihelion = ((angleFromPerihelion % 360) + 360) % 360;
+  if (angleFromPerihelion > 180) {
+    angleFromPerihelion = angleFromPerihelion - 360; // Convert 181-359 to -179 to -1
+  }
+
+  // Get planet label for display
+  const planetLabel = PLANET_HIERARCHIES[hierarchyInspector.currentPlanet]?.label || 'Planet';
+
+  // Get celestial coordinates directly from planet/sun objects
+  // These are the same values used in info panels
+  const planetRA = planetObj?.raDisplay || 'N/A';
+  const planetDec = planetObj?.decDisplay || 'N/A';
+  const sunDecDisplay = sun.decDisplay || 'N/A';
+
+  // Get raw Dec values in degrees for comparison
+  const planetDecValue = planetObj?.dec ? 90 - (planetObj.dec * 180 / Math.PI) : 0;
+  const sunDecValue = 90 - (sun.dec * 180 / Math.PI);
+
+  // Determine ecliptic position based on World Y (model's ecliptic plane)
+  let orbitalPlanePos, orbitalPlanePosColor;
+  const actuallyAbove = planetWorldY > 0.001;
+  const actuallyBelow = planetWorldY < -0.001;
+
+  if (!actuallyAbove && !actuallyBelow) {
+    orbitalPlanePos = 'ON ecliptic plane';
+    orbitalPlanePosColor = '#64b5f6';
+  } else if (actuallyAbove) {
+    orbitalPlanePos = 'NORTH of ecliptic';
+    orbitalPlanePosColor = '#4caf50';
+  } else {
+    orbitalPlanePos = 'SOUTH of ecliptic';
+    orbitalPlanePosColor = '#ffc107';
+  }
+
+  // Calculate Dec difference (planet relative to Sun)
+  const decDiff = planetDecValue - sunDecValue;
+  let decComparison, decComparisonColor;
+  if (Math.abs(decDiff) < 0.01) {
+    decComparison = 'SAME as Sun';
+    decComparisonColor = '#64b5f6';
+  } else if (decDiff > 0) {
+    decComparison = `${decDiff.toFixed(2)}° NORTH of Sun`;
+    decComparisonColor = '#4caf50';
+  } else {
+    decComparison = `${Math.abs(decDiff).toFixed(2)}° SOUTH of Sun`;
+    decComparisonColor = '#ffc107';
+  }
+
+  // Calculate reference angle on Solar period (live update)
+  // Option A: Starts at startPos value (e.g., 115.71° for Venus at model start)
+  // Increases as planet moves, wraps at 360° → 0°
+  // Shows 0° when planet aligns with the cyan arrow
+  let refAngleDeg = 0;
+  if (obj.speed !== undefined && obj.startPos !== undefined) {
+    // Get the child planet's speed (actual orbital speed) for the Solar period
+    const planetKey = hierarchyInspector.currentPlanet;
+    const hierarchy = PLANET_HIERARCHIES[planetKey];
+    let childPlanetSpeed = obj.speed;
+    let childStartPos = 0;
+    if (hierarchy) {
+      const steps = hierarchy.steps();
+      if (steps.length > 4 && steps[4].obj) {
+        if (steps[4].obj.speed !== undefined) childPlanetSpeed = steps[4].obj.speed;
+        if (steps[4].obj.startPos !== undefined) childStartPos = steps[4].obj.startPos;
+      }
+    }
+
+    // Calculate initial angle based on child planet's startPos
+    // The RealPerihelionAtSun.startPos = 2 * childStartPos (e.g., mercuryStartpos * 2 = 588)
+    //
+    // Rules for initial angle (counting DOWN from this value to 0):
+    // - If 2 * childStartPos >= 360: initialAngle = childStartPos (e.g., Mercury: 294°)
+    // - If 2 * childStartPos < 360: initialAngle = 2 * childStartPos (e.g., Mars: 243.31°)
+    //
+    // This represents "degrees remaining until alignment with cyan arrow"
+    const doubleStartPos = childStartPos * 2;
+    let initialAngle;
+    if (doubleStartPos >= 360) {
+      initialAngle = childStartPos; // Mercury: 294°
+    } else {
+      initialAngle = doubleStartPos; // Mars: 243.31°
+    }
+
+    // Calculate how many degrees the planet has traveled in its Solar period
+    // childPlanetSpeed is in rad/year, o.pos is in years (where 1 = meansolaryearlengthinDays)
+    // Note: outer planets (Mars, Jupiter, etc.) have NEGATIVE speed, so use absolute value
+    const traveledDeg = Math.abs(childPlanetSpeed) * o.pos * 180 / Math.PI;
+
+    // Reference angle COUNTS DOWN: starts at initialAngle, decreases to 0
+    // refAngleDeg = initialAngle - traveledDeg (mod 360)
+    refAngleDeg = (initialAngle - traveledDeg) % 360;
+    if (refAngleDeg < 0) refAngleDeg += 360;
+
+    // Calculate days until next alignment (when refAngleDeg reaches 0)
+    // Solar orbit length in days = (holisticyearLength / planetSolarYearCount) * meansolaryearlengthinDays
+    const solarYearCounts = {
+      mercury: mercurySolarYearCount,
+      venus: venusSolarYearCount,
+      mars: marsSolarYearCount,
+      jupiter: jupiterSolarYearCount,
+      saturn: saturnSolarYearCount,
+      uranus: uranusSolarYearCount,
+      neptune: neptuneSolarYearCount,
+      pluto: plutoSolarYearCount,
+      halleys: halleysSolarYearCount,
+      eros: erosSolarYearCount
+    };
+    const planetSolarYearCount = solarYearCounts[planetKey];
+    const planetSolarOrbitDays = planetSolarYearCount ? (holisticyearLength / planetSolarYearCount) * meansolaryearlengthinDays : 0;
+    window._orbitPeriodSolar = planetSolarOrbitDays;
+    window._daysUntilAlignment = planetSolarOrbitDays > 0 ? (refAngleDeg / 360) * planetSolarOrbitDays : 0;
+
+  }
+
+  // Calculate True Anomaly and Mean Anomaly dynamically from the model
+  // The child planet orbits inside RealPerihelionAtSun container.
+  // Its orbital angle θ = speed * pos - startPos * (π/180) [from moveModel]
+  // This θ represents the True Anomaly (angle from perihelion direction)
+
+  // Get the child planet object (Step 5 in hierarchy)
+  const anomalyPlanetKey = hierarchyInspector.currentPlanet;
+  const anomalyHierarchy = PLANET_HIERARCHIES[anomalyPlanetKey];
+  let childPlanet = null;
+  if (anomalyHierarchy) {
+    const steps = anomalyHierarchy.steps();
+    if (steps.length > 4 && steps[4].obj) {
+      childPlanet = steps[4].obj;
+    }
+  }
+
+  // Note: The Mean/True Anomaly values are now calculated dynamically
+  // in the anomaly visualization update section below, based on the
+  // actual Earth-Sun line angle. This ensures the arc always ends
+  // exactly at the Earth-Sun line.
+
+  // Check if we need to rebuild DOM structure (planet changed or first time)
+  const needsRebuild = !_liveDataElements || _liveDataElements.planet !== hierarchyInspector.currentPlanet;
+
+  if (needsRebuild) {
+    // Build the DOM structure once with data-id attributes for efficient updates
+    liveContent.innerHTML = `
+      <div style="display: grid; grid-template-columns: 200px 1fr; gap: 6px 12px; font-size: 12px;">
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 4px;">CELESTIAL COORDINATES</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Position relative to Earth's equator)</span>
+        <span style="color: rgba(255,255,255,0.6);">${planetLabel} RA</span>
+        <span data-id="planetRA" style="color: #4caf50;"></span>
+        <span style="color: rgba(255,255,255,0.6);">${planetLabel} Dec</span>
+        <span data-id="planetDec" style="color: #4caf50;"></span>
+        <span style="color: rgba(255,255,255,0.6);">Sun Dec</span>
+        <span data-id="sunDec" style="color: #4caf50;"></span>
+        <span style="color: rgba(255,255,255,0.6);">${planetLabel} vs Sun Dec</span>
+        <span data-id="decComparison"></span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(At transit: ${planetLabel} Dec ≈ Sun Dec)</span>
+
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ECLIPTIC POSITION OF PLANET</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Height above/below ecliptic plane in 3D model)</span>
+        <span style="color: rgba(255,255,255,0.6);">Ecliptic position</span>
+        <span data-id="eclipticPos"></span>
+        <span style="color: rgba(255,255,255,0.6);">Height above ecliptic</span>
+        <span data-id="heightEcliptic"></span>
+        <span style="color: rgba(255,255,255,0.6);">Height ratio (% of max)</span>
+        <span data-id="heightRatio" style="color: #4caf50;"></span>
+        <span style="color: rgba(255,255,255,0.6);">Angle planet from asc. node</span>
+        <span data-id="anglePlanetAsc" style="color: #4caf50;"></span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±90° based on Y height)</span>
+
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">CONTROL PERIHELION PLACEMENT IN 3D MODEL</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Verify P position matches Long.Peri - startAngle)</span>
+        <span style="color: rgba(255,255,255,0.6);">Start Angle of Model</span>
+        <span data-id="startAngleModel" style="color: rgba(255,255,255,0.6);"></span>
+        <span style="color: rgba(255,255,255,0.6);">Expected P angle (Long.Peri - ${startAngleModel.toFixed(1)}°)</span>
+        <span data-id="perihelionExpected" style="color: rgba(255,255,255,0.6);"></span>
+        <span style="color: rgba(255,255,255,0.6);">Expected P distance (Sun → P)</span>
+        <span data-id="perihelionDistanceExpected" style="color: rgba(255,255,255,0.6);"></span>
+        <span style="color: #00ff00;">Actual P angle (Sun → P)</span>
+        <span data-id="perihelionAngle3D" style="color: #00ff00;"></span>
+        <span style="color: #00ff00;">Actual P distance (Sun → P)</span>
+        <span data-id="perihelionDistance3D" style="color: #00ff00;"></span>
+
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">CURRENT ASCENDING NODE DISTANCE</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Current angle of Earth-Sun view to ascending node & longitude of perihelion)</span>
+        <span style="color: #ffff00;">Current Angle from asc. node</span>
+        <span data-id="angleFromAsc" style="color: #ffff00;"></span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±180° Sun ecliptic longitude - ascending node)</span>
+        <span style="color: #ffff00;">Current Angle from long. perihelion</span>
+        <span data-id="angleFromPeri" style="color: #ffff00;"></span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(±180° Sun ecliptic longitude - longitude of perihelion)</span>
+
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ORBITAL ELEMENTS</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(The orientation of the plane of the orbit)</span>
+        <span style="color: #ff00ff;">Longitude of Ascending Node (Ω)</span>
+        <span data-id="ascendingNodeLong" style="color: #ff00ff;"></span>
+        <span style="color: #ffffff;">Argument of Periapsis (ω)</span>
+        <span data-id="argumentOfPeriapsis" style="color: #ffffff;"></span>
+        <span style="color: #00ff00;">Longitude of Perihelion (ϖ)</span>
+        <span data-id="longitudeOfPerihelion" style="color: #00ff00;"></span>
+
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">ORBITAL ANOMALIES</span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(Angle from perihelion in planet's orbit)</span>
+        <span style="color: #00ffff;">Mean Anomaly (M)</span>
+        <span data-id="meanAnomaly" style="color: #00ffff;"></span>
+        <span style="color: #ffbf00;">True Anomaly (ν)</span>
+        <span data-id="trueAnomaly" style="color: #ffbf00;"></span>
+        <span style="color: #ff69b4;">Equation of Center (ν − M)</span>
+        <span data-id="equationOfCenter" style="color: #ff69b4;"></span>
+        <span style="color: rgba(255,255,255,0.4); font-size: 9px; grid-column: 1 / -1;">(M = uniform motion, ν = actual position from perihelion)</span>
+        <span style="color: rgba(255,255,255,0.5); font-size: 10px; grid-column: 1 / -1; margin-top: 8px;">REFERENCE ANOMALIES (21 Jun 2000)</span>
+        <span style="color: rgba(255,255,255,0.6);">Mean Anomaly (ref)</span>
+        <span data-id="refMeanAnomaly" style="color: rgba(255,255,255,0.6);"></span>
+        <span style="color: rgba(255,255,255,0.6);">True Anomaly (ref)</span>
+        <span data-id="refTrueAnomaly" style="color: rgba(255,255,255,0.6);"></span>
+        <span style="color: rgba(255,255,255,0.6);">Equation of Center (ref)</span>
+        <span data-id="refEquationOfCenter" style="color: rgba(255,255,255,0.6);"></span>
+      </div>
+    `;
+
+    // Cache element references for fast updates
+    _liveDataElements = {
+      planet: hierarchyInspector.currentPlanet,
+      planetRA: liveContent.querySelector('[data-id="planetRA"]'),
+      planetDec: liveContent.querySelector('[data-id="planetDec"]'),
+      sunDec: liveContent.querySelector('[data-id="sunDec"]'),
+      decComparison: liveContent.querySelector('[data-id="decComparison"]'),
+      eclipticPos: liveContent.querySelector('[data-id="eclipticPos"]'),
+      heightEcliptic: liveContent.querySelector('[data-id="heightEcliptic"]'),
+      heightRatio: liveContent.querySelector('[data-id="heightRatio"]'),
+      anglePlanetAsc: liveContent.querySelector('[data-id="anglePlanetAsc"]'),
+      angleFromAsc: liveContent.querySelector('[data-id="angleFromAsc"]'),
+      angleFromPeri: liveContent.querySelector('[data-id="angleFromPeri"]'),
+      ascendingNodeLong: liveContent.querySelector('[data-id="ascendingNodeLong"]'),
+      argumentOfPeriapsis: liveContent.querySelector('[data-id="argumentOfPeriapsis"]'),
+      // Solar period reference elements are now in the helper section, not live content
+      refAngle: hierarchyInspector.panel.querySelector('[data-id="refAngleHelper"]'),
+      orbitPeriodSolar: hierarchyInspector.panel.querySelector('[data-id="orbitPeriodSolarHelper"]'),
+      daysUntilAlignment: hierarchyInspector.panel.querySelector('[data-id="daysUntilAlignmentHelper"]'),
+      meanAnomaly: liveContent.querySelector('[data-id="meanAnomaly"]'),
+      trueAnomaly: liveContent.querySelector('[data-id="trueAnomaly"]'),
+      equationOfCenter: liveContent.querySelector('[data-id="equationOfCenter"]'),
+      refMeanAnomaly: liveContent.querySelector('[data-id="refMeanAnomaly"]'),
+      refTrueAnomaly: liveContent.querySelector('[data-id="refTrueAnomaly"]'),
+      refEquationOfCenter: liveContent.querySelector('[data-id="refEquationOfCenter"]'),
+      longitudeOfPerihelion: liveContent.querySelector('[data-id="longitudeOfPerihelion"]'),
+      startAngleModel: liveContent.querySelector('[data-id="startAngleModel"]'),
+      perihelionExpected: liveContent.querySelector('[data-id="perihelionExpected"]'),
+      perihelionDistanceExpected: liveContent.querySelector('[data-id="perihelionDistanceExpected"]'),
+      perihelionAngle3D: liveContent.querySelector('[data-id="perihelionAngle3D"]'),
+      perihelionDistance3D: liveContent.querySelector('[data-id="perihelionDistance3D"]')
+    };
+
+    // Get reference anomaly values for current planet (21 Jun 2000 00:00 UTC)
+    const refAnomalies = {
+      mercury: { mean: mercuryMeanAnomaly, true: mercuryTrueAnomaly },
+      venus: { mean: venusMeanAnomaly, true: venusTrueAnomaly },
+      mars: { mean: marsMeanAnomaly, true: marsTrueAnomaly },
+      jupiter: { mean: jupiterMeanAnomaly, true: jupiterTrueAnomaly },
+      saturn: { mean: saturnMeanAnomaly, true: saturnTrueAnomaly },
+      uranus: { mean: uranusMeanAnomaly, true: uranusTrueAnomaly },
+      neptune: { mean: neptuneMeanAnomaly, true: neptuneTrueAnomaly },
+      pluto: { mean: plutoMeanAnomaly, true: plutoTrueAnomaly },
+      halleys: { mean: halleysMeanAnomaly, true: halleysTrueAnomaly },
+      eros: { mean: erosMeanAnomaly, true: erosTrueAnomaly }
+    };
+    const refAnomaly = refAnomalies[hierarchyInspector.currentPlanet];
+    if (refAnomaly) {
+      _liveDataElements.refMeanAnomaly.textContent = refAnomaly.mean.toFixed(2) + '°';
+      _liveDataElements.refTrueAnomaly.textContent = refAnomaly.true.toFixed(2) + '°';
+      const refEoc = refAnomaly.true - refAnomaly.mean;
+      _liveDataElements.refEquationOfCenter.textContent = (refEoc >= 0 ? '+' : '') + refEoc.toFixed(2) + '°';
+    }
+
+    // Set expected perihelion distance (one-time, static value)
+    // These values are in scene units (AU * 100), so divide by 100 to get AU
+    const perihelionDistances = {
+      mercury: mercuryPerihelionDistance,
+      venus: venusPerihelionDistance,
+      mars: marsPerihelionDistance,
+      jupiter: jupiterPerihelionDistance,
+      saturn: saturnPerihelionDistance,
+      uranus: uranusPerihelionDistance,
+      neptune: neptunePerihelionDistance,
+      pluto: plutoPerihelionDistance,
+      halleys: halleysPerihelionDistance,
+      eros: erosPerihelionDistance
+    };
+    const expectedPeriDist = perihelionDistances[hierarchyInspector.currentPlanet];
+    if (expectedPeriDist !== undefined) {
+      _liveDataElements.perihelionDistanceExpected.textContent = (expectedPeriDist / 100).toFixed(6) + ' AU';
+    }
+  }
+
+  // Update only the text content (much faster than innerHTML)
+  const el = _liveDataElements;
+  el.planetRA.textContent = planetRA;
+  el.planetDec.textContent = planetDec;
+  el.sunDec.textContent = sunDecDisplay;
+  el.decComparison.textContent = decComparison;
+  el.decComparison.style.color = decComparisonColor;
+  el.eclipticPos.textContent = orbitalPlanePos;
+  el.eclipticPos.style.color = orbitalPlanePosColor;
+  el.heightEcliptic.textContent = planetWorldY.toFixed(4);
+  el.heightEcliptic.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
+  el.heightRatio.textContent = maxY > 0.001 ? (planetWorldY / maxY * 100).toFixed(1) + '%' : 'N/A';
+  el.heightRatio.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
+  el.anglePlanetAsc.textContent = anglePlanetFromAscNode.toFixed(2) + '°';
+  el.anglePlanetAsc.style.color = planetWorldY > 0 ? '#4caf50' : '#ffc107';
+  el.angleFromAsc.textContent = angleFromAscNode.toFixed(2) + '°';
+  el.angleFromPeri.textContent = angleFromPerihelion.toFixed(2) + '°';
+  el.ascendingNodeLong.textContent = ascNodeAngleDeg.toFixed(4) + '°';
+
+  // Get argument of periapsis for current planet
+  const argumentOfPeriapsisValues = {
+    mercury: o.mercuryArgumentOfPeriapsis,
+    venus: o.venusArgumentOfPeriapsis,
+    mars: o.marsArgumentOfPeriapsis,
+    jupiter: o.jupiterArgumentOfPeriapsis,
+    saturn: o.saturnArgumentOfPeriapsis,
+    uranus: o.uranusArgumentOfPeriapsis,
+    neptune: o.neptuneArgumentOfPeriapsis,
+    pluto: o.plutoArgumentOfPeriapsis,
+    halleys: o.halleysArgumentOfPeriapsis,
+    eros: o.erosArgumentOfPeriapsis
+  };
+  const argPeri = argumentOfPeriapsisValues[hierarchyInspector.currentPlanet] ?? 0;
+  el.argumentOfPeriapsis.textContent = argPeri.toFixed(4) + '°';
+
+  // Get longitude of perihelion for current planet
+  const longitudeOfPerihelionValues = {
+    mercury: o.mercuryPerihelion,
+    venus: o.venusPerihelion,
+    mars: o.marsPerihelion,
+    jupiter: o.jupiterPerihelion,
+    saturn: o.saturnPerihelion,
+    uranus: o.uranusPerihelion,
+    neptune: o.neptunePerihelion,
+    pluto: o.plutoPerihelion,
+    halleys: o.halleysPerihelion,
+    eros: o.erosPerihelion
+  };
+  const longPeri = longitudeOfPerihelionValues[hierarchyInspector.currentPlanet] ?? 0;
+  el.longitudeOfPerihelion.textContent = longPeri.toFixed(4) + '°';
+
+  // Show the fixed start angle of the model (Earth→Sun at June 21, 2000 00:00 UTC)
+  el.startAngleModel.textContent = startAngleModel.toFixed(8) + '°';
+
+  // Calculate expected perihelion angle: longitude of perihelion - start angle
+  let periExpected = ((longPeri - startAngleModel) % 360 + 360) % 360;
+  el.perihelionExpected.textContent = periExpected.toFixed(4) + '°';
+
+  // Calculate the actual Sun → P angle from the 3D model
+  // Define fixedPerihelionObjects once for reuse below
+  const fixedPerihelionObjects = {
+    mercury: mercuryFixedPerihelionAtSun,
+    venus: venusFixedPerihelionAtSun,
+    mars: marsFixedPerihelionAtSun,
+    jupiter: jupiterFixedPerihelionAtSun,
+    saturn: saturnFixedPerihelionAtSun,
+    uranus: uranusFixedPerihelionAtSun,
+    neptune: neptuneFixedPerihelionAtSun,
+    pluto: plutoFixedPerihelionAtSun,
+    halleys: halleysFixedPerihelionAtSun,
+    eros: erosFixedPerihelionAtSun
+  };
+  const fixedPerihelion = fixedPerihelionObjects[hierarchyInspector.currentPlanet];
+
+  // Get sun and perihelion world positions once for reuse throughout this function
+  let sunWorldPosX = 0, sunWorldPosZ = 0;
+  let periWorldPosX = 0, periWorldPosZ = 0;
+  let hasSunPos = false, hasPeriPos = false;
+
+  if (sun && sun.pivotObj) {
+    sun.pivotObj.getWorldPosition(_liveDataVec3);
+    sunWorldPosX = _liveDataVec3.x;
+    sunWorldPosZ = _liveDataVec3.z;
+    hasSunPos = true;
+  }
+
+  if (fixedPerihelion) {
+    const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
+    if (sourceObj) {
+      sourceObj.getWorldPosition(_liveDataVec3b);
+      periWorldPosX = _liveDataVec3b.x;
+      periWorldPosZ = _liveDataVec3b.z;
+      hasPeriPos = true;
+    }
+  }
+
+  if (hasSunPos && hasPeriPos) {
+    // Calculate Sun → P angle
+    const dxSP = periWorldPosX - sunWorldPosX;
+    const dzSP = periWorldPosZ - sunWorldPosZ;
+    const sunPAngleRad = Math.atan2(-dzSP, dxSP);
+    const sunPAngleDeg = ((sunPAngleRad * 180 / Math.PI) % 360 + 360) % 360;
+
+    // Combined angle = fixed startAngleModel + Sun→P
+    const combinedAngle = ((startAngleModel + sunPAngleDeg) % 360 + 360) % 360;
+
+    el.perihelionAngle3D.textContent = combinedAngle.toFixed(4) + '°';
+
+    // Calculate Sun → P distance in AU (scene units / 100 = AU)
+    const distanceSceneUnits = Math.sqrt(dxSP * dxSP + dzSP * dzSP);
+    const distanceAU = distanceSceneUnits / 100;
+    el.perihelionDistance3D.textContent = distanceAU.toFixed(6) + ' AU';
+  } else {
+    el.perihelionAngle3D.textContent = 'N/A';
+    el.perihelionDistance3D.textContent = 'N/A';
+  }
+
+  el.refAngle.textContent = refAngleDeg.toFixed(2) + '°';
+  el.orbitPeriodSolar.textContent = (window._orbitPeriodSolar?.toFixed(2) ?? '0.00') + ' days';
+  el.daysUntilAlignment.textContent = (window._daysUntilAlignment?.toFixed(2) ?? '0.00') + ' days';
+  el.meanAnomaly.textContent = (window._meanAnomaly?.toFixed(2) ?? '0.00') + '°';
+  el.trueAnomaly.textContent = (window._trueAnomaly?.toFixed(2) ?? '0.00') + '°';
+  const eocValue = (window._trueAnomaly ?? 0) - (window._meanAnomaly ?? 0);
+  el.equationOfCenter.textContent = (eocValue >= 0 ? '+' : '') + eocValue.toFixed(2) + '°';
+
+  // Update anomaly visualization if it exists
+  // The anomaly visualization shows True Anomaly and Mean Anomaly as angles from perihelion
+  // It should be centered at the SUN (the focus of the ellipse)
+  // Reuse sun and perihelion positions fetched above
+  if (hierarchyInspector.anomalyGroup && hasSunPos) {
+    // Position the anomaly group at the SUN (center of the solar system)
+    // Use _liveDataVec3 which still contains sun position from above
+    hierarchyInspector.anomalyGroup.position.set(sunWorldPosX, _liveDataVec3.y, sunWorldPosZ);
+
+    // Calculate the rotation to align the anomaly 0° direction with the perihelion direction
+    // The anomaly arcs should start (0°) pointing toward the fixed perihelion point
+    // Reuse fixedPerihelionObjects and perihelion position defined above
+
+    if (hasPeriPos) {
+      // Calculate direction from Sun to Perihelion (P) in the XZ plane (ecliptic)
+      // Using already-fetched positions
+      const dx = periWorldPosX - sunWorldPosX;
+      const dz = periWorldPosZ - sunWorldPosZ;
+
+      // Calculate the angle to align the anomaly visualization with the perihelion direction
+      //
+      // Goal: Start markers (at local +X) should be on the P side (far from Sun),
+      //       and arcs should sweep counter-clockwise from there toward Earth
+      //
+      // In Three.js (looking down from +Y / north pole view):
+      // - +X is right, +Z is toward viewer (Earth is at -Z roughly)
+      // - atan2(dz, dx) gives angle from +X axis to Sun→P direction
+      // - Add PI to flip 180° so markers are on the P side, not the Sun side
+      const perihelionAngle = Math.atan2(dz, dx);
+
+      // Rotate so local +X points toward P (away from Sun center, toward perihelion)
+      hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
+
+      // Apply orbital plane tilt (if any) - this tilts the entire anomaly visualization
+      if (obj && obj.containerObj) {
+        hierarchyInspector.anomalyGroup.rotation.x = obj.containerObj.rotation.x;
+        hierarchyInspector.anomalyGroup.rotation.z = obj.containerObj.rotation.z;
+      }
+    }
+
+    // Calculate the Earth-Sun line angle in local space of the anomalyGroup
+    // This angle is used for both the Earth-Sun line AND the mean anomaly arc
+    // so they always align perfectly
+    let earthSunLocalAngle = 0;
+
+    if (earth && earth.pivotObj) {
+      // Get Earth's world position (Sun position already stored above)
+      earth.pivotObj.getWorldPosition(_liveDataVec3b);
+
+      // Calculate direction from Earth to Sun in world space (using stored sun position)
+      const dxWorld = sunWorldPosX - _liveDataVec3b.x;
+      const dzWorld = sunWorldPosZ - _liveDataVec3b.z;
+      const earthToSunAngleWorld = Math.atan2(dzWorld, dxWorld);
+
+      // Convert to local space of anomalyGroup
+      // The anomalyGroup is rotated so +X points toward perihelion
+      const groupRotY = hierarchyInspector.anomalyGroup.rotation.y;
+      earthSunLocalAngle = earthToSunAngleWorld + groupRotY;
+
+      // Update the Earth-Sun reference line to point in this direction
+      if (hierarchyInspector.earthSunLine) {
+        hierarchyInspector.earthSunLine.rotation.y = -earthSunLocalAngle;
+      }
+    }
+
+    // =====================================================================
+    // PROPER TRUE ANOMALY AND MEAN ANOMALY CALCULATION
+    // Based on actual 3D positions, not Earth-Sun line angle
+    // - True Anomaly (ν): Angle at SUN from perihelion to planet
+    // - Mean Anomaly (M): Angle at P (orbit center) from perihelion to planet
+    // =====================================================================
+
+    // Get the fixedPerihelion object for this planet (P = orbit center)
+    const fixedPerihelionObj = anomalyHierarchy.fixedPerihelion ? anomalyHierarchy.fixedPerihelion() : null;
+
+    let trueAnomalyRad = 0;
+    let meanAnomalyRad = 0;
+    let periAngleSun = 0;  // Perihelion direction angle from Sun (for arc drawing)
+    let periAngleP = 0;    // Perihelion direction angle from P (for arc drawing)
+
+    // We need: Sun position, P position (orbit center), Planet position, Perihelion position
+    if (fixedPerihelionObj && childPlanet && sun && sun.pivotObj) {
+      // Reuse _liveDataVec3a-e for these calculations
+      const sunPos = new THREE.Vector3();
+      const pPos = new THREE.Vector3();
+      const planetPos = new THREE.Vector3();
+      const perihelionPos = new THREE.Vector3();
+
+      // Get world positions
+      sun.pivotObj.getWorldPosition(sunPos);
+      fixedPerihelionObj.pivotObj.getWorldPosition(pPos);  // P = orbit center
+      if (childPlanet.planetObj) {
+        childPlanet.planetObj.getWorldPosition(planetPos);
+      } else if (childPlanet.pivotObj) {
+        childPlanet.pivotObj.getWorldPosition(planetPos);
+      }
+      // Perihelion point (the marker on the orbit)
+      if (fixedPerihelionObj.planetObj) {
+        fixedPerihelionObj.planetObj.getWorldPosition(perihelionPos);
+      }
+
+      // Calculate direction vectors (in XZ plane - ecliptic)
+      // In an elliptical orbit:
+      // - P (center) is at the geometric center of the ellipse
+      // - Sun (focus) is between P and perihelion, at distance a*e from P
+      // - Perihelion is in the direction from P toward Sun, beyond the Sun
+      //
+      // Layout: P -------- Sun ------- Perihelion
+      //
+      // So perihelion direction from both P and Sun is: P → Sun direction
+
+      // Perihelion direction (from P toward Sun and perihelion)
+      const periDirX = sunPos.x - pPos.x;
+      const periDirZ = sunPos.z - pPos.z;
+
+      // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
+      const periDirFromSunX = periDirX;
+      const periDirFromSunZ = periDirZ;
+      const periDirFromPX = periDirX;
+      const periDirFromPZ = periDirZ;
+
+      // Planet direction from Sun (for True Anomaly)
+      const planetDirFromSunX = planetPos.x - sunPos.x;
+      const planetDirFromSunZ = planetPos.z - sunPos.z;
+
+      // Planet direction from P (for Mean Anomaly)
+      const planetDirFromPX = planetPos.x - pPos.x;
+      const planetDirFromPZ = planetPos.z - pPos.z;
+
+      // Calculate angles using atan2 (counter-clockwise from +X axis)
+      // Note: Three.js uses right-handed coords, +Z toward viewer
+      // Negate Z for standard counter-clockwise angle measurement
+      periAngleSun = Math.atan2(-periDirFromSunZ, periDirFromSunX);
+      const planetAngleSun = Math.atan2(-planetDirFromSunZ, planetDirFromSunX);
+
+      periAngleP = Math.atan2(-periDirFromPZ, periDirFromPX);
+      const planetAngleP = Math.atan2(-planetDirFromPZ, planetDirFromPX);
+
+      // True Anomaly: angle at Sun from perihelion to planet
+      trueAnomalyRad = planetAngleSun - periAngleSun;
+
+      // Mean Anomaly: angle at P from perihelion to planet
+      meanAnomalyRad = planetAngleP - periAngleP;
+
+      // Normalize to 0 to 2*PI range
+      trueAnomalyRad = ((trueAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+      meanAnomalyRad = ((meanAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+
+      // Update the new visualization lines (P→Planet and Sun→Planet)
+      if (hierarchyInspector.pToPlanetLine) {
+        const positions = hierarchyInspector.pToPlanetLine.geometry.attributes.position.array;
+        positions[0] = pPos.x; positions[1] = pPos.y; positions[2] = pPos.z;
+        positions[3] = planetPos.x; positions[4] = planetPos.y; positions[5] = planetPos.z;
+        hierarchyInspector.pToPlanetLine.geometry.attributes.position.needsUpdate = true;
+      }
+
+      if (hierarchyInspector.sunToPlanetLine) {
+        const positions = hierarchyInspector.sunToPlanetLine.geometry.attributes.position.array;
+        positions[0] = sunPos.x; positions[1] = sunPos.y; positions[2] = sunPos.z;
+        positions[3] = planetPos.x; positions[4] = planetPos.y; positions[5] = planetPos.z;
+        hierarchyInspector.sunToPlanetLine.geometry.attributes.position.needsUpdate = true;
+      }
+
+      // Update Mean Anomaly Arc (centered at P, sweeps from perihelion to planet)
+      if (hierarchyInspector.meanAnomalyArcAtP) {
+        const arcRadius = hierarchyInspector._meanArcAtPRadius || 20;
+        const positions = hierarchyInspector.meanAnomalyArcAtP.geometry.attributes.position.array;
+        const arcSegments = 64;
+
+        for (let i = 0; i <= arcSegments; i++) {
+          const t = i / arcSegments;
+          const angle = periAngleP + t * meanAnomalyRad;
+          positions[i * 3] = pPos.x + arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = pPos.y;
+          positions[i * 3 + 2] = pPos.z - arcRadius * Math.sin(angle);
+        }
+        hierarchyInspector.meanAnomalyArcAtP.geometry.attributes.position.needsUpdate = true;
+        hierarchyInspector.meanAnomalyArcAtP.computeLineDistances();
+      }
+
+      // Update True Anomaly Arc (centered at Sun, sweeps from perihelion to planet)
+      if (hierarchyInspector.trueAnomalyArcAtSun) {
+        const arcRadius = hierarchyInspector._trueArcAtSunRadius || 25;
+        const positions = hierarchyInspector.trueAnomalyArcAtSun.geometry.attributes.position.array;
+        const arcSegments = 64;
+
+        for (let i = 0; i <= arcSegments; i++) {
+          const t = i / arcSegments;
+          const angle = periAngleSun + t * trueAnomalyRad;
+          positions[i * 3] = sunPos.x + arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = sunPos.y;
+          positions[i * 3 + 2] = sunPos.z - arcRadius * Math.sin(angle);
+        }
+        hierarchyInspector.trueAnomalyArcAtSun.geometry.attributes.position.needsUpdate = true;
+      }
+    }
+
+    // Update display values (convert to degrees)
+    const meanAnomalyDeg = meanAnomalyRad * 180 / Math.PI;
+    const trueAnomalyDeg = trueAnomalyRad * 180 / Math.PI;
+    window._meanAnomaly = meanAnomalyDeg;
+    window._trueAnomaly = trueAnomalyDeg;
+
+    // Update the UI display immediately after calculation
+    // (The earlier display update in the function runs before these values are calculated)
+    if (_liveDataElements && _liveDataElements.meanAnomaly) {
+      _liveDataElements.meanAnomaly.textContent = meanAnomalyDeg.toFixed(2) + '°';
+    }
+    if (_liveDataElements && _liveDataElements.trueAnomaly) {
+      _liveDataElements.trueAnomaly.textContent = trueAnomalyDeg.toFixed(2) + '°';
+    }
+    if (_liveDataElements && _liveDataElements.equationOfCenter) {
+      const equationOfCenter = trueAnomalyDeg - meanAnomalyDeg;
+      _liveDataElements.equationOfCenter.textContent = (equationOfCenter >= 0 ? '+' : '') + equationOfCenter.toFixed(2) + '°';
+    }
+
+    // Keep existing arc visualization for Earth-Sun line (legacy, still useful)
+    // The arc should sweep counter-clockwise from perihelion (0°) to the Earth-Sun line
+    let arcAngle = -earthSunLocalAngle;
+    arcAngle = ((arcAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+
+    // Update true anomaly arc (from perihelion 0° to Earth-Sun line)
+    // NOTE: This OLD arc uses arcAngle (Earth-Sun angle), not the new trueAnomalyRad
+    if (hierarchyInspector.trueAnomalyArc) {
+      const arcSegments = 32;
+      const arcRadius = hierarchyInspector._trueArcRadius || 50;
+      const positions = hierarchyInspector.trueAnomalyArc.geometry.attributes.position.array;
+
+      for (let i = 0; i <= arcSegments; i++) {
+        const t = i / arcSegments;
+        const angle = t * arcAngle; // From 0 to Earth-Sun line (NOT trueAnomalyRad!)
+        positions[i * 3] = arcRadius * Math.cos(angle);     // X
+        positions[i * 3 + 1] = 0;                            // Y
+        positions[i * 3 + 2] = -arcRadius * Math.sin(angle); // Z (negative for counter-clockwise)
+      }
+      hierarchyInspector.trueAnomalyArc.geometry.attributes.position.needsUpdate = true;
+    }
+
+    // Update mean anomaly arc (from perihelion 0° to Earth-Sun line)
+    // NOTE: This OLD arc uses arcAngle (Earth-Sun angle), not the new meanAnomalyRad
+    if (hierarchyInspector.meanAnomalyArc) {
+      const arcSegments = 32;
+      const arcRadius = hierarchyInspector._meanArcRadius || 40;
+      const positions = hierarchyInspector.meanAnomalyArc.geometry.attributes.position.array;
+
+      for (let i = 0; i <= arcSegments; i++) {
+        const t = i / arcSegments;
+        const angle = t * arcAngle; // From 0 to Earth-Sun line (NOT meanAnomalyRad!)
+        positions[i * 3] = arcRadius * Math.cos(angle);     // X
+        positions[i * 3 + 1] = 0;                            // Y
+        positions[i * 3 + 2] = -arcRadius * Math.sin(angle); // Z (negative for clockwise in Three.js)
+      }
+      hierarchyInspector.meanAnomalyArc.geometry.attributes.position.needsUpdate = true;
+      hierarchyInspector.meanAnomalyArc.computeLineDistances();
+    }
+  }
+
+  // Update ascending/descending node marker positions based on dynamic ascending node
+  // The inclinationPlane is attached to containerObj, which rotates based on dynamic ascending node.
+  // We need to recalculate the LOCAL positions where the orbital plane intersects the ecliptic.
+
+  // DEBUG: Check if hierarchy inspector visuals exist
+  if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
+    const now = Date.now();
+    if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 150) {
+      const hasPlane = !!hierarchyInspector.inclinationPlane;
+      const hasAsc = !!hierarchyInspector.ascendingNode;
+      const hasDesc = !!hierarchyInspector.descendingNode;
+      console.log(`📐 Hierarchy inspector: plane=${hasPlane}, ascNode=${hasAsc}, descNode=${hasDesc}`);
+    }
+  }
+
+  if (hierarchyInspector.inclinationPlane && hierarchyInspector.ascendingNode && hierarchyInspector.descendingNode) {
+    const planetKey = hierarchyInspector.currentPlanet;
+    const realPerihelionObjects = {
+      mercury: mercuryRealPerihelionAtSun,
+      venus: venusRealPerihelionAtSun,
+      mars: marsRealPerihelionAtSun,
+      jupiter: jupiterRealPerihelionAtSun,
+      saturn: saturnRealPerihelionAtSun,
+      uranus: uranusRealPerihelionAtSun,
+      neptune: neptuneRealPerihelionAtSun,
+      pluto: plutoRealPerihelionAtSun,
+      halleys: halleysRealPerihelionAtSun,
+      eros: erosRealPerihelionAtSun
+    };
+    const obj = realPerihelionObjects[planetKey];
+
+    if (obj && obj.containerObj) {
+      // Get the current container rotation (which reflects the dynamic ascending node)
+      const tiltaRad = obj.containerObj.rotation.x;
+      const tiltbRad = obj.containerObj.rotation.z;
+
+      // PERFORMANCE: Skip expensive recalculation if tilt hasn't changed significantly (>0.0001 rad ≈ 0.006°)
+      const tiltChanged = _lastAscNodeTiltA === null ||
+        Math.abs(tiltaRad - _lastAscNodeTiltA) > 0.0001 ||
+        Math.abs(tiltbRad - _lastAscNodeTiltB) > 0.0001;
+
+      // DEBUG: Check if tiltChanged is blocking the update
+      if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
+        const now = Date.now();
+        if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 200) {
+          console.log(`🔄 tiltChanged=${tiltChanged}, tiltaRad=${tiltaRad.toFixed(6)}, lastA=${_lastAscNodeTiltA?.toFixed(6) || 'null'}`);
+        }
+      }
+
+      if (tiltChanged) {
+        _lastAscNodeTiltA = tiltaRad;
+        _lastAscNodeTiltB = tiltbRad;
+
+        // Build the local-to-world transformation matrix (reuse pooled matrix)
+        _liveDataLocalToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
+
+        // Get the scale used for the inclination plane
+        const scale = hierarchyInspector._perihelionArrowScale || 100;
+        const planeRadius = scale * 0.5;
+
+        // Get the ACTUAL ascending node angle from the o.xxxAscendingNode property
+        // This is the authoritative value that's dynamically calculated for the current date
+        const ascNodePropertyMap = {
+          mercury: 'mercuryAscendingNode',
+          venus: 'venusAscendingNode',
+          mars: 'marsAscendingNode',
+          jupiter: 'jupiterAscendingNode',
+          saturn: 'saturnAscendingNode',
+          uranus: 'uranusAscendingNode',
+          neptune: 'neptuneAscendingNode',
+          pluto: 'plutoAscendingNode',
+          halleys: 'halleysAscendingNode',
+          eros: 'erosAscendingNode'
+        };
+        const ascNodeProp = ascNodePropertyMap[hierarchyInspector.currentPlanet];
+        const ascNodeAngleDeg = ascNodeProp ? (o[ascNodeProp] || 0) : 0;
+        const ascNodeAngleRad = ascNodeAngleDeg * Math.PI / 180;
+
+        // Calculate ascending node position in LOCAL coordinates
+        // Our model is 90° rotated (from March 21 to June 21), so we add 90° counterclockwise
+        // After 90° CCW rotation: X = -sin(angle), Z = -cos(angle)
+        _liveDataNewAscPos.set(
+          planeRadius * -Math.sin(ascNodeAngleRad),
+          0,
+          planeRadius * -Math.cos(ascNodeAngleRad)
+        );
+
+        // Descending node is 180° opposite
+        _liveDataNewDescPos.set(
+          -_liveDataNewAscPos.x,
+          0,
+          -_liveDataNewAscPos.z
+        );
+
+        // Update marker positions
+        hierarchyInspector.ascendingNode.position.copy(_liveDataNewAscPos);
+        hierarchyInspector.descendingNode.position.copy(_liveDataNewDescPos);
+
+        // Update the arrows attached to the nodes using cached references if available
+        // PERFORMANCE: Use cached references instead of searching children
+        if (hierarchyInspector._ascNodeArrow) {
+          hierarchyInspector._ascNodeArrow.position.copy(_liveDataNewAscPos);
+        }
+        if (hierarchyInspector._descNodeArrow) {
+          hierarchyInspector._descNodeArrow.position.copy(_liveDataNewDescPos);
+        }
+
+        // Update the line of nodes using cached reference
+        if (hierarchyInspector._nodesLine) {
+          const positions = hierarchyInspector._nodesLine.geometry.attributes.position.array;
+          positions[0] = _liveDataNewAscPos.x;
+          positions[1] = _liveDataNewAscPos.y;
+          positions[2] = _liveDataNewAscPos.z;
+          positions[3] = _liveDataNewDescPos.x;
+          positions[4] = _liveDataNewDescPos.y;
+          positions[5] = _liveDataNewDescPos.z;
+          hierarchyInspector._nodesLine.geometry.attributes.position.needsUpdate = true;
+          hierarchyInspector._nodesLine.computeLineDistances();
+        }
+
+        // Update the half-plane geometries (green above / red below ecliptic)
+        // PERFORMANCE: Reuse orbit point arrays instead of recreating
+        if (hierarchyInspector.aboveHalfPlane && hierarchyInspector.belowHalfPlane) {
+          const numPoints = 64;
+
+          // DEBUG: Test if ascending node world Y is ~0 (it should be, since that's where orbit crosses ecliptic)
+          if (_debugAscendingNodeLogEnabled && hierarchyInspector.currentPlanet === 'mercury') {
+            const now = Date.now();
+            if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 500) {
+              const testX = planeRadius * -Math.sin(ascNodeAngleRad);
+              const testZ = planeRadius * -Math.cos(ascNodeAngleRad);
+              const testLocal = new THREE.Vector3(testX, 0, testZ);
+              const testWorld = testLocal.clone().applyMatrix4(_liveDataLocalToWorld);
+              // Also get actual marker world position
+              const markerWorld = new THREE.Vector3();
+              if (hierarchyInspector.ascendingNode) {
+                hierarchyInspector.ascendingNode.getWorldPosition(markerWorld);
+              }
+              console.log(`🟢🔴 Asc node: local(${testX.toFixed(1)}, 0, ${testZ.toFixed(1)}) → matrixY: ${testWorld.y.toFixed(4)}, actualWorldPos: (${markerWorld.x.toFixed(1)}, ${markerWorld.y.toFixed(4)}, ${markerWorld.z.toFixed(1)})`);
+            }
+          }
+
+          // Helper to rebuild half-disc geometry
+          const rebuildHalfDiscGeometry = (mesh, isAbove) => {
+            const vertices = [0, 0, 0]; // Center point
+            const indices = [];
+
+            // Generate points and check world positions
+            for (let i = 0; i <= numPoints; i++) {
+              const angle = (i / numPoints) * Math.PI * 2;
+              const x = planeRadius * Math.cos(angle);
+              const z = planeRadius * Math.sin(angle);
+              vertices.push(x, 0, z);
+            }
+
+            // Create triangles based on world Y position
+            for (let i = 1; i <= numPoints; i++) {
+              const angle1 = ((i - 1) / numPoints) * Math.PI * 2;
+              const angle2 = (i / numPoints) * Math.PI * 2;
+
+              // Calculate world Y for midpoint (reuse pooled vectors)
+              _liveDataLocalPt.set(planeRadius * Math.cos(angle1), 0, planeRadius * Math.sin(angle1));
+              _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
+              const y1 = _liveDataWorldPt.y;
+
+              _liveDataLocalPt.set(planeRadius * Math.cos(angle2), 0, planeRadius * Math.sin(angle2));
+              _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
+              const y2 = _liveDataWorldPt.y;
+
+              const midWorldY = (y1 + y2) / 2;
+              const segmentIsAbove = midWorldY > 0;
+
+              if (segmentIsAbove === isAbove) {
+                indices.push(0, i, i + 1);
+              }
+            }
+
+            // Update geometry
+            mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            mesh.geometry.setIndex(indices);
+            mesh.geometry.computeVertexNormals();
+            mesh.geometry.attributes.position.needsUpdate = true;
+            if (mesh.geometry.index) mesh.geometry.index.needsUpdate = true;
+          };
+
+          rebuildHalfDiscGeometry(hierarchyInspector.aboveHalfPlane, true);
+          rebuildHalfDiscGeometry(hierarchyInspector.belowHalfPlane, false);
+        }
+
+        // Update highest/lowest point markers (90° after ascending/descending nodes)
+        // PERFORMANCE: Use pooled vectors
+        if (hierarchyInspector.highestPointMarker && hierarchyInspector.lowestPointMarker) {
+          let maxWorldY = -Infinity;
+          let minWorldY = Infinity;
+          _liveDataNewHighPos.set(0, 0, 0);
+          _liveDataNewLowPos.set(0, 0, 0);
+
+          const numSamples = 360;
+          for (let i = 0; i < numSamples; i++) {
+            const angle = (i / numSamples) * Math.PI * 2;
+            _liveDataLocalPt.set(planeRadius * Math.cos(angle), 0, planeRadius * Math.sin(angle));
+            _liveDataWorldPt.copy(_liveDataLocalPt).applyMatrix4(_liveDataLocalToWorld);
+
+            if (_liveDataWorldPt.y > maxWorldY) {
+              maxWorldY = _liveDataWorldPt.y;
+              _liveDataNewHighPos.copy(_liveDataLocalPt);
+            }
+            if (_liveDataWorldPt.y < minWorldY) {
+              minWorldY = _liveDataWorldPt.y;
+              _liveDataNewLowPos.copy(_liveDataLocalPt);
+            }
+          }
+
+          // Update marker positions
+          hierarchyInspector.highestPointMarker.position.copy(_liveDataNewHighPos);
+          hierarchyInspector.lowestPointMarker.position.copy(_liveDataNewLowPos);
+
+          // Update arrows
+          if (hierarchyInspector._highArrow) {
+            hierarchyInspector._highArrow.position.copy(_liveDataNewHighPos);
+          }
+          if (hierarchyInspector._lowArrow) {
+            hierarchyInspector._lowArrow.position.copy(_liveDataNewLowPos);
+          }
+        }
+      } // End of tiltChanged block
+    }
+  }
+
+  // Update perihelion arrow (green line from P to Sun)
+  if (hierarchyInspector.perihelionArrow && hierarchyInspector._fixedPerihelionObj) {
+    const fixedPerihelion = hierarchyInspector._fixedPerihelionObj;
+
+    // Use planetObj if available, otherwise fall back to pivotObj
+    const sourceObj = fixedPerihelion.planetObj || fixedPerihelion.pivotObj;
+    if (sourceObj) {
+      // Reuse vectors for performance (using existing _liveDataVec3 pattern)
+      sourceObj.getWorldPosition(_liveDataVec3);
+
+      // Get Sun's world position using a second reusable vector
+      if (!hierarchyInspector._sunPosVec3) {
+        hierarchyInspector._sunPosVec3 = new THREE.Vector3();
+      }
+      if (sun && sun.pivotObj) {
+        sun.pivotObj.getWorldPosition(hierarchyInspector._sunPosVec3);
+      }
+
+      // Position the arrow group at the P point
+      hierarchyInspector.perihelionArrow.position.copy(_liveDataVec3);
+
+      // Calculate direction to Sun and make the arrow look at it
+      if (!hierarchyInspector._dirVec3) {
+        hierarchyInspector._dirVec3 = new THREE.Vector3();
+        hierarchyInspector._defaultDir = new THREE.Vector3(0, 0, 1);
+        hierarchyInspector._arrowQuat = new THREE.Quaternion();
+      }
+      hierarchyInspector._dirVec3.subVectors(hierarchyInspector._sunPosVec3, _liveDataVec3).normalize();
+
+      // Only update rotation if direction is valid (not zero length)
+      if (hierarchyInspector._dirVec3.lengthSq() > 0.0001) {
+        hierarchyInspector._arrowQuat.setFromUnitVectors(hierarchyInspector._defaultDir, hierarchyInspector._dirVec3);
+        hierarchyInspector.perihelionArrow.setRotationFromQuaternion(hierarchyInspector._arrowQuat);
+      }
+    }
+  }
+
+  // Update planet locator circle position (follows the planet)
+  if (hierarchyInspector._planetLocatorCircle && hierarchyInspector._planetLocatorTarget) {
+    const target = hierarchyInspector._planetLocatorTarget;
+    if (target.planetObj) {
+      target.planetObj.getWorldPosition(_liveDataVec3);
+      hierarchyInspector._planetLocatorCircle.position.copy(_liveDataVec3);
+      // Make the circle face the camera for better visibility
+      hierarchyInspector._planetLocatorCircle.lookAt(camera.position);
+    }
+  }
+  } catch (err) {
+    console.error('[HierarchyLiveData] Error:', err);
+  }
+}
 
 //*************************************************************
 // CREATE SETTINGS AND SETUP GUI
@@ -3164,13 +8258,39 @@ function setupGUI() {
     } 
   });
 
-  gui.add(o, 'julianDay').name('Julian day').listen().onFinishChange(() => {
-    if (isNumeric(o.julianDay)) {
-      o.Day = o.julianDay - startmodelJD;
-      o.pos = sDay * o.Day + timeToPos(o.Time);
-      const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-      o.perihelionDate = `${p.date}`;
+//  gui.add(o, 'julianDay').name('Julian day').listen().onFinishChange(() => {
+//    if (isNumeric(o.julianDay)) {
+//      o.Day = o.julianDay - startmodelJD;
+//      o.pos = sDay * o.Day + timeToPos(o.Time);
+//      const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
+//      o.perihelionDate = `${p.date}`;
+//    }
+//  });
+  
+  gui.add(o, 'julianDay').name('Julian day').listen()
+  .onFinishChange(() => {
+    if (!isNumeric(o.julianDay)) return;
+    
+    const newJD = Number(o.julianDay);
+    const currentJD = dateTimeToJulianDay(o.Date, o.Time);
+    
+    // Skip if value hasn't meaningfully changed
+    if (Math.abs(newJD - currentJD) < 0.0000001) {
+      return;
     }
+
+    // Convert Julian Day to date and time  <-- THIS IS THE MISSING PART
+    const converted = dayToDate(newJD);
+    o.Date = converted.date;
+    o.Time = converted.time;
+
+    // Update internal state (now using the NEW o.Time)
+    o.Day = newJD - startmodelJD;
+    o.pos = sDay * o.Day;  // Day already includes the time fraction
+
+    // Update perihelion calendar display
+    const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
+    o.perihelionDate = `${p.date}`;
   });
   
   const perihelionController = gui.add(o, 'perihelionDate')
@@ -3249,6 +8369,13 @@ function setupGUI() {
 
     /* value === ''  →  no planet selected */
     o.lookAtObj = planetObjects.find(p => p.name === value) || undefined;
+
+    /* Disable hierarchy inspector camera control when user manually changes target */
+    hierarchyInspector._cameraControlActive = false;
+    hierarchyInspector._cameraTarget = null;
+
+    /* Reset camera parameters for the new target */
+    focusPlanet(o.lookAtObj);
 
     /* hide every orbit-plane helper … */
     planetObjects.forEach(p => {
@@ -3344,8 +8471,9 @@ function setupGUI() {
   
   let folderPerihelion = gui.addFolder('Perihelion Planets')
   folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
-  addInfoButton( folderPerihelion, 'https://britastro.org/computing/applets_orbel.html' );
+  addInfoButton( folderPerihelion, 'https://wgc.jpl.nasa.gov:8443/webgeocalc/#OrbitalElements' );
   folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury Perihelion")
+//  folderPerihelion.add(o,"mercuryPerihelion2").min(0.0).max(360.0).step(0.000001).listen().name("Mercury Perihelion2")
   folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus Perihelion")
   folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Earth Perihelion")
   folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars Perihelion")
@@ -3403,8 +8531,42 @@ function setupGUI() {
 
   folderO.add(celestialSphere, 'visible').name('Celestial sphere')
   folderO.add(plane, 'visible').name('Ecliptic grid')
-  
+  folderO.add(invariablePlaneGroup, 'visible').name('Invariable plane').onChange(function(value) {
+    // Show/hide all labels when toggling the plane
+    // Must set CSS2DObject.visible property (not just div.style.display)
+    // because the patched labelRenderer checks obj.visible and overrides display style
+    if (invariablePlaneGroup.userData.highLabelObj) {
+      invariablePlaneGroup.userData.highLabelObj.visible = value;
+    }
+    if (invariablePlaneGroup.userData.lowLabelObj) {
+      invariablePlaneGroup.userData.lowLabelObj.visible = value;
+    }
+    if (invariablePlaneGroup.userData.meanLabel1Obj) {
+      invariablePlaneGroup.userData.meanLabel1Obj.visible = value;
+    }
+    if (invariablePlaneGroup.userData.meanLabel2Obj) {
+      invariablePlaneGroup.userData.meanLabel2Obj.visible = value;
+    }
+    needsLabelUpdate = true; // Force label renderer to redraw immediately
+  });
+  folderO.add(inclinationPathGroup, 'visible').name('Inclination path').onChange(function(value) {
+    if (value) {
+      // Force immediate position update when becoming visible
+      _lastInclinationUpdateYear = null; // Reset throttle
+      updateInclinationPathMarker();
+    } else {
+      // Hide label immediately when toggling off
+      const labelObject = inclinationPathGroup.userData.labelObject;
+      if (labelObject) labelObject.visible = false;
+    }
+    needsLabelUpdate = true; // Force label renderer to redraw immediately
+  })
+
   let sFolder = gui.addFolder('Settings')
+
+  // Hierarchy Inspector - first item in Settings
+  sFolder.add({ inspect: openHierarchyInspector }, 'inspect').name('Planet checks');
+
   sFolder.add(params, 'sizeBoost', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
   
   /* --- Output file  -------------------------------------------- */
@@ -3523,12 +8685,24 @@ function setupGUI() {
   folderElongations.add(o,"halleysElongation").min(0.0).max(180.0).listen().name("Halleys") 
   folderElongations.add(o,"erosElongation").min(0.0).max(180.0).listen().name("Eros") 
   
-  let folderCamera = sFolder.addFolder('Camera show/hide')  
+  let folderCamera = sFolder.addFolder('Camera show/hide')
 
   folderCamera.add(o, 'worldCamRa').name('RA').listen()
   folderCamera.add(o, 'worldCamDec').name('Dec').listen()
   folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
- 
+
+  // Debug folder for ascending node debugging
+  let debugFolder = sFolder.addFolder('Debug');
+  debugFolder.add(o, 'debugAscendingNode').name('Log Ascending Nodes').onChange((val) => {
+    _debugAscendingNodeLogEnabled = val;
+    if (val) {
+      console.log('🔍 Ascending Node debugging ENABLED - check console for logs every second');
+      console.log('   Go to a date like 12000-07-16 to see drift behavior');
+    } else {
+      console.log('🔍 Ascending Node debugging DISABLED');
+    }
+  });
+
   /* ---------------------------------------------------------
   * width-toggle badge (does NOT consume a controller slot)
   * --------------------------------------------------------- */
@@ -3579,12 +8753,33 @@ function render(now) {
   lastCameraX = x; lastCameraY = y; lastCameraZ = z;
 
   // 3) OrbitControls: point at your selected pivot
-  if (o.lookAtObj && o.lookAtObj.pivotObj) {
+  // If hierarchy inspector is controlling camera, use its target instead
+  if (hierarchyInspector._cameraControlActive && hierarchyInspector._cameraTarget?.pivotObj) {
+    controls.target.copy(
+      hierarchyInspector._cameraTarget.pivotObj.getWorldPosition(tmpVec)
+    );
+  } else if (o.lookAtObj && o.lookAtObj.pivotObj) {
     controls.target.copy(
       o.lookAtObj.pivotObj.getWorldPosition(tmpVec)
     );
   }
   controls.update();
+
+  // Enforce minimum distance after damping (prevents drifting into planet)
+  // Skip when hierarchy inspector is controlling camera (it has its own targets)
+  if (!hierarchyInspector._cameraControlActive && o.lookAtObj?.planetObj && o.lookAtObj.size) {
+    // Use rotationAxis scale (where blow-up slider applies) not planetObj scale
+    const scale = o.lookAtObj.rotationAxis?.scale?.x ?? 1;
+    const visualRadius = o.lookAtObj.size * scale;
+    const multiplier = getCameraMinDistMultiplier(o.lookAtObj.name);
+    const minDist = visualRadius * multiplier;
+    const dist = camera.position.distanceTo(controls.target);
+    if (dist < minDist) {
+      // Push camera back to minimum distance
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      camera.position.copy(controls.target).add(dir.multiplyScalar(minDist));
+    }
+  }
 
   // 4) Throttle the human-readable GUI (20 Hz)
   uiElapsed += delta;
@@ -3623,19 +8818,27 @@ function render(now) {
   updatePredictions();
   //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy. If you switch it on, also switch on the menu-items/ info-box-itms.
   updatePositions();
+  updateAscendingNodes(); // Must be before updateHierarchyLiveData() so dynamic values are current
+  updatePlanetAnomalies(); // Must be after updateAscendingNodes(), calculates Mean/True Anomaly for all planets
+  updatePlanetInvariablePlaneHeights(); // Must be after updatePlanetAnomalies(), calculates height above invariable plane
+  updateDynamicInclinations(); // Must be after updatePlanetInvariablePlaneHeights(), calculates apparent inclination to ecliptic
+  updateHierarchyLiveData(); // Must be after updatePositions() which sets raDisplay/decDisplay
   updateLightingForFocus();
   if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
   if (earth._updateCloudsFunc) earth._updateCloudsFunc(delta);   // delta in seconds
   if (earth._updateEraFunc)    earth._updateEraFunc(o.julianDay);
   updateFlares();
   updateSunGlow();
-  
+  updateInclinationPathMarker();
+  updateInvariablePlanePosition();
+
   // 7) Throttle astro-heavy updates (10 Hz)
   posElapsed += delta;
   if (posElapsed >= 0.1) {
     posElapsed -= 0.1;
     updateElongations();
     updatePerihelion();
+    // updateAscendingNodes() is now called every frame before updateHierarchyLiveData()
     updateOrbitOrientations();
     updateDomLabel();
     golden.update();
@@ -3852,11 +9055,16 @@ function forceSceneUpdate () {
   o.Day           = posToDays(o.pos);
   o.Date          = daysToDate(o.Day);
   o.Time          = posToTime(o.pos);
+  o.currentYear   = julianDateToDecimalYear(o.julianDay); // Required for updatePredictions & updateAscendingNodes
   trace(o.pos);
   moveModel(o.pos);
   updatePredictions();
   updatePositions();
   updatePerihelion();
+  updateAscendingNodes();
+  updatePlanetAnomalies();
+  updatePlanetInvariablePlaneHeights();
+  updateDynamicInclinations();
   updateOrbitOrientations();
   // -- anything else your render loop does that affects .ra/.dec
 }
@@ -3889,7 +9097,16 @@ async function runRATest() {
 
   /* headers */
   const earthRows  = [['JD', 'Date', 'Time', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
-  const periRows   = [['JD', 'Date', 'Time','Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion']]; 
+  const periRows   = [['JD', 'Date', 'Time',
+    'Mercury Perihelion', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Asc Node InvPlane', 'Mercury Apparent Incl',
+    'Venus Perihelion', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Asc Node InvPlane', 'Venus Apparent Incl',
+    'Earth Perihelion', 'Earth Asc Node InvPlane', 'Earth Incl to InvPlane',
+    'Mars Perihelion', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Asc Node InvPlane', 'Mars Apparent Incl',
+    'Jupiter Perihelion', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Asc Node InvPlane', 'Jupiter Apparent Incl',
+    'Saturn Perihelion', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Asc Node InvPlane', 'Saturn Apparent Incl',
+    'Uranus Perihelion', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Asc Node InvPlane', 'Uranus Apparent Incl',
+    'Neptune Perihelion', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Asc Node InvPlane', 'Neptune Apparent Incl'
+  ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
   const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
   //const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun','Pluto RA', 'Pluto Dec', 'Pluto Dist Earth', 'Pluto Dist Sun','Halleys RA', 'Halleys Dec', 'Halleys Dist Earth', 'Halleys Dist Sun', 'Eros RA', 'Eros Dec', 'Eros Dist Earth', 'Eros Dist Sun']]; 
@@ -3923,12 +9140,42 @@ async function runRATest() {
     const earthMidDistS  = midEccentricityOrbit.sunDistAU;
                             
     const mercuryPer   = o.mercuryPerihelion;
+    const mercuryAsc   = o.mercuryAscendingNode;
+    const mercuryArg   = o.mercuryArgumentOfPeriapsis;
+    const mercuryAscInv = o.mercuryAscendingNodeInvPlane;
+    const mercuryAppIncl = o.mercuryApparentInclination;
     const venusPer     = o.venusPerihelion;
+    const venusAsc     = o.venusAscendingNode;
+    const venusArg     = o.venusArgumentOfPeriapsis;
+    const venusAscInv  = o.venusAscendingNodeInvPlane;
+    const venusAppIncl = o.venusApparentInclination;
+    const earthAscInv  = o.earthAscendingNodeInvPlane;
+    const earthIncl    = o.inclinationEarth;
     const marsPer      = o.marsPerihelion;
+    const marsAsc      = o.marsAscendingNode;
+    const marsArg      = o.marsArgumentOfPeriapsis;
+    const marsAscInv   = o.marsAscendingNodeInvPlane;
+    const marsAppIncl  = o.marsApparentInclination;
     const jupiterPer   = o.jupiterPerihelion;
+    const jupiterAsc   = o.jupiterAscendingNode;
+    const jupiterArg   = o.jupiterArgumentOfPeriapsis;
+    const jupiterAscInv = o.jupiterAscendingNodeInvPlane;
+    const jupiterAppIncl = o.jupiterApparentInclination;
     const saturnPer    = o.saturnPerihelion;
+    const saturnAsc    = o.saturnAscendingNode;
+    const saturnArg    = o.saturnArgumentOfPeriapsis;
+    const saturnAscInv = o.saturnAscendingNodeInvPlane;
+    const saturnAppIncl = o.saturnApparentInclination;
     const uranusPer    = o.uranusPerihelion;
+    const uranusAsc    = o.uranusAscendingNode;
+    const uranusArg    = o.uranusArgumentOfPeriapsis;
+    const uranusAscInv = o.uranusAscendingNodeInvPlane;
+    const uranusAppIncl = o.uranusApparentInclination;
     const neptunePer   = o.neptunePerihelion;
+    const neptuneAsc   = o.neptuneAscendingNode;
+    const neptuneArg   = o.neptuneArgumentOfPeriapsis;
+    const neptuneAscInv = o.neptuneAscendingNodeInvPlane;
+    const neptuneAppIncl = o.neptuneApparentInclination;
     const plutoPer     = o.plutoPerihelion;
     const halleysPer   = o.halleysPerihelion;
     const erosPer      = o.erosPerihelion;
@@ -3981,8 +9228,17 @@ async function runRATest() {
         earthRows.push([jd, date, time, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
     
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
-    
-        periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6)]);
+
+        periRows.push([jd, date, time,
+          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAscInv.toFixed(6), mercuryAppIncl.toFixed(6),
+          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAscInv.toFixed(6), venusAppIncl.toFixed(6),
+          earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthIncl.toFixed(6),
+          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAscInv.toFixed(6), marsAppIncl.toFixed(6),
+          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAscInv.toFixed(6), jupiterAppIncl.toFixed(6),
+          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAscInv.toFixed(6), saturnAppIncl.toFixed(6),
+          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAscInv.toFixed(6), uranusAppIncl.toFixed(6),
+          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAscInv.toFixed(6), neptuneAppIncl.toFixed(6)
+        ]);
     
 //    planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6), plutoRA.toFixed(6), plutoDec.toFixed(6), plutoDistE.toFixed(6), plutoDistS.toFixed(6), halleysRA.toFixed(6), halleysDec.toFixed(6), halleysDistE.toFixed(6), halleysDistS.toFixed(6), erosRA.toFixed(6), erosDec.toFixed(6), erosDistE.toFixed(6), erosDistS.toFixed(6)]);
     
@@ -4013,8 +9269,791 @@ async function runRATest() {
   URL.revokeObjectURL(url);
 }
 
+// ================================================================
+// PLANET POSITION REPORT - Step 5 of Planet Hierarchy Inspector
+// ================================================================
+
+/**
+ * Convert RA in radians to HMS format string (matches radiansToRa but with more precision)
+ */
+function raToHMSFromRadians(rad) {
+  if (rad < 0) rad += 2 * Math.PI;
+  const totalHours = rad * 12 / Math.PI;
+  const h = Math.floor(totalHours);
+  const mFloat = (totalHours - h) * 60;
+  const m = Math.floor(mFloat);
+  const s = (mFloat - m) * 60;
+  return `${h}h ${m.toString().padStart(2, '0')}m ${s.toFixed(2).padStart(5, '0')}s`;
+}
+
+/**
+ * Convert RA in decimal hours (e.g., 7.682) to HMS format string
+ */
+function raDecimalHoursToHMS(decimalHours) {
+  const totalHours = parseFloat(decimalHours);
+  if (isNaN(totalHours)) return decimalHours;
+  const h = Math.floor(totalHours);
+  const mFloat = (totalHours - h) * 60;
+  const m = Math.floor(mFloat);
+  const s = (mFloat - m) * 60;
+  return `${h}h ${m.toString().padStart(2, '0')}m ${s.toFixed(2).padStart(5, '0')}s`;
+}
+
+/**
+ * Convert Dec from decimal degrees (e.g., 18.8969 or -23.5) to DMS format string
+ */
+function decDecimalDegreesToDMS(decimalDegrees) {
+  const deg = parseFloat(decimalDegrees);
+  if (isNaN(deg)) return decimalDegrees;
+
+  const sign = deg < 0 ? '-' : '+';
+  const absDeg = Math.abs(deg);
+
+  const d = Math.floor(absDeg);
+  const mFloat = (absDeg - d) * 60;
+  const m = Math.floor(mFloat);
+  const s = (mFloat - m) * 60;
+  return `${sign}${d}° ${m.toString().padStart(2, '0')}' ${s.toFixed(1).padStart(4, '0')}"`;
+}
+
+/**
+ * Convert Dec in radians (spherical phi) to DMS format string (matches radiansToDec but with more precision)
+ */
+function decToDMSFromRadians(rad) {
+  // Convert spherical phi to standard declination (0 at equator, ±90 at poles)
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  let degDec = rad * 180 / Math.PI;
+
+  const sign = degDec < 0 ? '-' : '+';
+  degDec = Math.abs(degDec);
+
+  const d = Math.floor(degDec);
+  const mFloat = (degDec - d) * 60;
+  const m = Math.floor(mFloat);
+  const s = (mFloat - m) * 60;
+  return `${sign}${d}° ${m.toString().padStart(2, '0')}' ${s.toFixed(1).padStart(4, '0')}"`;
+}
+
+/**
+ * Convert Julian Day to calendar date string
+ */
+function jdToDateString(jd) {
+  // Julian Day to calendar date conversion
+  const z = Math.floor(jd + 0.5);
+  const f = jd + 0.5 - z;
+  let a = z;
+  if (z >= 2299161) {
+    const alpha = Math.floor((z - 1867216.25) / 36524.25);
+    a = z + 1 + alpha - Math.floor(alpha / 4);
+  }
+  const b = a + 1524;
+  const c = Math.floor((b - 122.1) / 365.25);
+  const d = Math.floor(365.25 * c);
+  const e = Math.floor((b - d) / 30.6001);
+
+  const day = b - d - Math.floor(30.6001 * e);
+  const month = e < 14 ? e - 1 : e - 13;
+  const year = month > 2 ? c - 4716 : c - 4715;
+
+  // Time from fractional day
+  const totalHours = f * 24;
+  const hours = Math.floor(totalHours);
+  const mins = Math.floor((totalHours - hours) * 60);
+  const secs = Math.floor(((totalHours - hours) * 60 - mins) * 60);
+
+  return {
+    date: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+    time: `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  };
+}
+
+/**
+ * Collect position and longitude data for a specific planet at current simulation state
+ */
+function collectPlanetDataForDate(planetKey, testDate) {
+  const planet = PLANET_OBJECTS[planetKey]();
+  const dateInfo = jdToDateString(testDate.jd);
+
+  // Position data - store raw radians for proper conversion
+  const planetRARad = planet.ra;
+  const planetDecRad = planet.dec;
+  const planetDistE = planet.distAU;
+  const planetDistS = planet.sunDistAU;
+  const sunRARad = sun.ra;
+  const sunDecRad = sun.dec;
+  const sunDistE = sun.distAU;
+
+  // Reference values from test date (if provided, for position types)
+  const refDec = testDate.dec || '';
+  const refRA = testDate.ra;  // Reference RA in decimal hours (e.g., 7.682)
+  const refLongitude = testDate.longitude;  // Reference longitude in degrees (for Occultation)
+  const comparePlanet = testDate.comparePlanet;  // Companion planet key (for Occultation)
+
+  // Longitude data from o object
+  const longPeriCalc = o[`${planetKey}Perihelion`];
+  const longPeriRef = LONGITUDE_PERIHELION_REFS[planetKey];
+  const ascNodeCalc = o[`${planetKey}AscendingNode`];
+  const ascNodeRef = ASCENDING_NODE_REFS[planetKey];
+  const argPeriCalc = o[`${planetKey}ArgumentOfPeriapsis`];
+
+  return {
+    dateInfo,
+    position: {
+      planetRARad,
+      planetDecRad,
+      planetDistE,
+      planetDistS,
+      sunRARad,
+      sunDecRad,
+      sunDistE,
+      refDec,
+      refRA,
+      refLongitude,
+      comparePlanet
+    },
+    longitude: {
+      longPeriCalc,
+      longPeriRef,
+      longPeriDiff: longPeriCalc - longPeriRef,
+      ascNodeCalc,
+      ascNodeRef,
+      ascNodeDiff: ascNodeCalc - ascNodeRef,
+      argPeriCalc,
+      argPeriDerived: ((longPeriCalc - ascNodeCalc) % 360 + 360) % 360
+    },
+    positionRow: (() => {
+      // Get companion planet data if comparePlanet is specified
+      let companionRA = '';
+      let companionDec = '';
+      if (comparePlanet && PLANET_OBJECTS[comparePlanet]) {
+        const companion = PLANET_OBJECTS[comparePlanet]();
+        companionRA = raToHMSFromRadians(companion.ra);
+        companionDec = decToDMSFromRadians(companion.dec);
+      }
+
+      // Format reference RA (from decimal hours if provided)
+      const refRAFormatted = refRA ? raDecimalHoursToHMS(refRA) : '';
+
+      // Format reference longitude-derived RA (if longitude provided)
+      const refLongitudeRA = refLongitude ? longitudeToRAHMS(refLongitude) : '';
+
+      return [
+        String(testDate.jd),  // Force as string to avoid comma/dot issues
+        dateInfo.date,
+        dateInfo.time,
+        testDate.label,
+        raToHMSFromRadians(planetRARad),
+        decToDMSFromRadians(planetDecRad),
+        refRAFormatted || refLongitudeRA,  // Reference RA (from ra field or longitude)
+        refDec,  // Reference Dec (empty if not provided)
+        refLongitude || '',  // Reference Longitude
+        comparePlanet || '',  // Compare Planet
+        companionRA,  // Companion RA
+        companionDec,  // Companion Dec
+        planetDistE.toFixed(8),
+        planetDistS.toFixed(8),
+        raToHMSFromRadians(sunRARad),
+        decToDMSFromRadians(sunDecRad),
+        sunDistE.toFixed(8)
+      ];
+    })(),
+    longitudeRow: [
+      String(testDate.jd),  // Force as string to avoid comma/dot issues
+      dateInfo.date,
+      dateInfo.time,
+      testDate.label,
+      longPeriCalc.toFixed(6),
+      longPeriRef.toFixed(6),
+      (longPeriCalc - longPeriRef).toFixed(6),
+      ascNodeCalc.toFixed(6),
+      ascNodeRef.toFixed(6),
+      (ascNodeCalc - ascNodeRef).toFixed(6),
+      argPeriCalc.toFixed(6)
+    ]
+  };
+}
+
+/**
+ * Build the report header for screen display
+ */
+function buildReportHeader(planetKey) {
+  const planetLabel = PLANET_HIERARCHIES[planetKey]?.label || planetKey;
+  return `POSITION REPORT: ${planetLabel}\n${'='.repeat(50)}\n\n`;
+}
+
+/**
+ * Compare calculated Dec with reference Dec and determine match status
+ * Returns: 'match' if within 1 degree, 'mismatch' otherwise, or 'none' if no reference
+ */
+function compareDecValues(calculatedDecRad, refDecStr) {
+  if (!refDecStr) return 'none';
+
+  // Convert calculated Dec from radians to degrees (same as decToDMSFromRadians)
+  let rad = calculatedDecRad;
+  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
+  const calculatedDeg = rad * 180 / Math.PI;
+
+  // Parse reference Dec (it's in decimal degrees as a string like "-14.68" or "15.61")
+  const refDeg = parseFloat(refDecStr);
+
+  if (isNaN(refDeg)) return 'none';
+
+  // Compare - within 1 degree is a match
+  const diff = Math.abs(calculatedDeg - refDeg);
+  return diff <= 1.0 ? 'match' : 'mismatch';
+}
+
+/**
+ * Compare Planet RA vs Sun RA (for NASA transit dates)
+ * Returns: 'green' if within 5 minutes, 'amber' if 5-15 minutes, 'red' if > 15 minutes
+ */
+function compareRAToSun(planetRARad, sunRARad) {
+  // Convert both to total minutes (0-1440 for 24 hours)
+  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
+  let sunMinutes = (sunRARad * 12 / Math.PI) * 60;
+
+  // Normalize to 0-1440 range
+  if (planetMinutes < 0) planetMinutes += 1440;
+  if (sunMinutes < 0) sunMinutes += 1440;
+
+  // Calculate difference in minutes, accounting for wrap-around at 24h
+  let diffMinutes = Math.abs(planetMinutes - sunMinutes);
+  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
+
+  // Return status based on thresholds
+  if (diffMinutes <= 5) return 'green';
+  if (diffMinutes <= 15) return 'amber';
+  return 'red';
+}
+
+/**
+ * Compare Planet RA vs Sun RA for Opposition (should be 12 hours / 720 minutes apart)
+ * Returns: 'green' if within 5 minutes of 12h, 'amber' if 5-15 minutes, 'red' if > 15 minutes
+ */
+function compareRAOpposition(planetRARad, sunRARad) {
+  // Convert both to total minutes (0-1440 for 24 hours)
+  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
+  let sunMinutes = (sunRARad * 12 / Math.PI) * 60;
+
+  // Normalize to 0-1440 range
+  if (planetMinutes < 0) planetMinutes += 1440;
+  if (sunMinutes < 0) sunMinutes += 1440;
+
+  // Calculate difference in minutes, accounting for wrap-around at 24h
+  let diffMinutes = Math.abs(planetMinutes - sunMinutes);
+  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
+
+  // For opposition, we expect 720 minutes (12 hours) difference
+  // Calculate how far from 720 minutes we are
+  const deviationFromOpposition = Math.abs(diffMinutes - 720);
+
+  // Return status based on thresholds (deviation from perfect 12h opposition)
+  if (deviationFromOpposition <= 5) return 'green';
+  if (deviationFromOpposition <= 15) return 'amber';
+  return 'red';
+}
+
+/**
+ * Compare Planet RA vs Reference RA (for model validation dates)
+ * refRA is in decimal hours (e.g., 7.682 for ~7h 40m)
+ * Returns: 'green' if within 5 minutes, 'amber' if 5-15 minutes, 'red' if > 15 minutes, 'none' if no reference
+ */
+function compareRAToReference(planetRARad, refRA) {
+  if (refRA === undefined || refRA === null) return 'none';
+
+  // Convert planet RA from radians to minutes
+  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
+  if (planetMinutes < 0) planetMinutes += 1440;
+
+  // Convert reference RA from decimal hours to minutes
+  let refMinutes = parseFloat(refRA) * 60;
+  if (isNaN(refMinutes)) return 'none';
+  if (refMinutes < 0) refMinutes += 1440;
+
+  // Calculate difference in minutes, accounting for wrap-around at 24h
+  let diffMinutes = Math.abs(planetMinutes - refMinutes);
+  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
+
+  // Return status based on thresholds
+  if (diffMinutes <= 5) return 'green';
+  if (diffMinutes <= 15) return 'amber';
+  return 'red';
+}
+
+/**
+ * Convert ecliptic longitude (degrees) to RA (radians)
+ * Uses proper ecliptic-to-equatorial coordinate transformation
+ * Assumes ecliptic latitude ≈ 0 (appropriate for Jupiter-Saturn conjunctions near the ecliptic)
+ * @param {number|string} longitudeDeg - Ecliptic longitude in degrees
+ * @param {number} obliquityDeg - Obliquity of the ecliptic in degrees (defaults to o.obliquityEarth)
+ */
+function longitudeToRARad(longitudeDeg, obliquityDeg) {
+  const lon = parseFloat(longitudeDeg);
+  if (isNaN(lon)) return null;
+
+  // Use provided obliquity or get from global o object
+  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || 23.4393);
+  const obliquityRad = obliquity * Math.PI / 180;
+  const lonRad = lon * Math.PI / 180;
+
+  // For a point on the ecliptic (ecliptic latitude = 0):
+  // tan(RA) = sin(λ) * cos(ε) / cos(λ)
+  // RA = atan2(sin(λ) * cos(ε), cos(λ))
+  let raRad = Math.atan2(Math.sin(lonRad) * Math.cos(obliquityRad), Math.cos(lonRad));
+
+  // Normalize to [0, 2π)
+  if (raRad < 0) raRad += 2 * Math.PI;
+  return raRad;
+}
+
+/**
+ * Convert ecliptic longitude (degrees) to RA in HMS format string
+ * Uses proper ecliptic-to-equatorial coordinate transformation
+ * @param {number|string} longitudeDeg - Ecliptic longitude in degrees
+ * @param {number} obliquityDeg - Obliquity of the ecliptic in degrees (defaults to o.obliquityEarth)
+ */
+function longitudeToRAHMS(longitudeDeg, obliquityDeg) {
+  const lon = parseFloat(longitudeDeg);
+  if (isNaN(lon)) return longitudeDeg;
+
+  // Use provided obliquity or get from global o object
+  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || 23.4393);
+  const obliquityRad = obliquity * Math.PI / 180;
+  const lonRad = lon * Math.PI / 180;
+
+  // For a point on the ecliptic (ecliptic latitude = 0):
+  // RA = atan2(sin(λ) * cos(ε), cos(λ))
+  let raRad = Math.atan2(Math.sin(lonRad) * Math.cos(obliquityRad), Math.cos(lonRad));
+  if (raRad < 0) raRad += 2 * Math.PI;
+
+  // Convert radians to decimal hours (RA in hours = radians * 12 / π)
+  const decimalHours = raRad * 12 / Math.PI;
+  const h = Math.floor(decimalHours);
+  const mFloat = (decimalHours - h) * 60;
+  const m = Math.floor(mFloat);
+  const s = (mFloat - m) * 60;
+  return `${h}h ${m.toString().padStart(2, '0')}m ${s.toFixed(2).padStart(5, '0')}s`;
+}
+
+/**
+ * Compare Planet RA vs Longitude-derived RA (for Occultation dates)
+ * Uses proper ecliptic-to-equatorial coordinate transformation
+ * @param {number} planetRARad - Planet RA in radians
+ * @param {number|string} longitudeDeg - Ecliptic longitude in degrees (e.g., 55.77)
+ * @param {number} obliquityDeg - Obliquity of the ecliptic in degrees (defaults to o.obliquityEarth)
+ * @returns {'green'|'amber'|'red'|'none'} - Status based on difference thresholds
+ */
+function compareRAToLongitude(planetRARad, longitudeDeg, obliquityDeg) {
+  if (longitudeDeg === undefined || longitudeDeg === null) return 'none';
+
+  // Convert planet RA from radians to minutes
+  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
+  if (planetMinutes < 0) planetMinutes += 1440;
+
+  // Convert ecliptic longitude to RA using proper transformation
+  const refRARad = longitudeToRARad(longitudeDeg, obliquityDeg);
+  if (refRARad === null) return 'none';
+
+  // Convert reference RA to minutes
+  let refMinutes = (refRARad * 12 / Math.PI) * 60;
+  if (refMinutes < 0) refMinutes += 1440;
+
+  // Calculate difference in minutes, accounting for wrap-around at 24h
+  let diffMinutes = Math.abs(planetMinutes - refMinutes);
+  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
+
+  // Return status based on thresholds
+  if (diffMinutes <= 5) return 'green';
+  if (diffMinutes <= 15) return 'amber';
+  return 'red';
+}
+
+/**
+ * Get companion planet RA for Occultation comparison
+ * Returns the RA in radians of the specified planet at current simulation state
+ */
+function getCompanionPlanetRA(companionKey) {
+  const planetGetter = PLANET_OBJECTS[companionKey];
+  if (!planetGetter) return null;
+  const planet = planetGetter();
+  return planet.ra;
+}
+
+/**
+ * Build a date section for screen display (HTML format with color coding)
+ */
+function buildDateSection(planetKey, testDate, data) {
+  const planetLabel = PLANET_HIERARCHIES[planetKey]?.label || planetKey;
+  let section = '';
+
+  // Use ASCII box drawing for consistent width across all fonts
+  const W = 48; // content width
+  const HR = '-'.repeat(W); // horizontal rule
+
+  section += `+${HR}+\n`;
+  section += `|  ${testDate.label.padEnd(W - 2)}|\n`;
+  section += `|  JD: ${testDate.jd}  |  ${data.dateInfo.date} ${data.dateInfo.time}`.padEnd(W + 1) + `|\n`;
+  section += `+${HR}+\n`;
+
+  // Position data
+  if (testDate.type === 'position' || testDate.type === 'both') {
+    // Determine comparison mode based on label and comparePlanet field
+    const isNasaDate = testDate.label.toLowerCase().includes('nasa');
+    const isOpposition = testDate.label.toLowerCase().includes('opposition');
+    const isOccultation = !!data.position.comparePlanet;  // Has companion planet to compare
+
+    // Helper to get color from status
+    const getColorFromStatus = (status) => {
+      if (status === 'green') return '#4caf50';
+      if (status === 'amber') return '#ffb300';
+      if (status === 'red') return '#ff5252';
+      return '#e8e8e8'; // 'none' - no reference, use default white
+    };
+
+    section += `|  POSITION DATA`.padEnd(W + 1) + `|\n`;
+    section += `|  ${'-'.repeat(W - 4)}  |\n`;
+
+    if (isOccultation) {
+      // Occultation: Compare both planets against reference longitude-derived RA
+      const refLongitude = data.position.refLongitude;
+      const companionKey = data.position.comparePlanet;
+      const companionLabel = PLANET_HIERARCHIES[companionKey]?.label || companionKey;
+      const companionRARad = getCompanionPlanetRA(companionKey);
+
+      // Compare current planet RA to longitude reference
+      const planetRAStatus = compareRAToLongitude(data.position.planetRARad, refLongitude);
+      const planetRAColor = getColorFromStatus(planetRAStatus);
+
+      // Compare companion planet RA to longitude reference
+      const companionRAStatus = compareRAToLongitude(companionRARad, refLongitude);
+      const companionRAColor = getColorFromStatus(companionRAStatus);
+
+      // Reference RA from longitude (no color - it's the reference)
+      const refRAValue = longitudeToRAHMS(refLongitude);
+      const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
+      section += `|  ${refRAContent}|\n`;
+
+      // Show longitude value
+      const longContent = `(from longitude ${refLongitude}°)`.padEnd(46);
+      section += `|  ${longContent}|\n`;
+
+      section += `|  ${'-'.repeat(W - 4)}  |\n`;
+
+      // Current planet RA (color-coded)
+      const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
+      const planetRAContentLine = `${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22);
+      section += `|  <span style="color:${planetRAColor}">${planetRAContentLine}</span>|\n`;
+
+      // Current planet Dec
+      const decValue = decToDMSFromRadians(data.position.planetDecRad);
+      section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
+
+      section += `|  ${'-'.repeat(W - 4)}  |\n`;
+
+      // Companion planet RA (color-coded independently)
+      const companionRAValue = raToHMSFromRadians(companionRARad);
+      const companionRAContentLine = `${companionLabel} RA:`.padEnd(24) + companionRAValue.padStart(22);
+      section += `|  <span style="color:${companionRAColor}">${companionRAContentLine}</span>|\n`;
+
+      // Companion planet Dec
+      const companionPlanet = PLANET_OBJECTS[companionKey]();
+      const companionDecValue = decToDMSFromRadians(companionPlanet.dec);
+      section += `|  ${(`${companionLabel} Dec:`.padEnd(24) + companionDecValue.padStart(22))}|\n`;
+
+    } else {
+      // Standard comparison (NASA, Opposition, Model start date, etc.)
+      let raStatus;
+      if (isOpposition) {
+        // Opposition dates: Planet RA should be ~12h away from Sun RA
+        raStatus = compareRAOpposition(data.position.planetRARad, data.position.sunRARad);
+      } else if (isNasaDate) {
+        // NASA dates: compare Planet RA vs Sun RA (transit check)
+        raStatus = compareRAToSun(data.position.planetRARad, data.position.sunRARad);
+      } else {
+        // Other dates (e.g., Model start date): compare Planet RA vs Reference RA
+        raStatus = compareRAToReference(data.position.planetRARad, data.position.refRA);
+      }
+
+      const raColor = getColorFromStatus(raStatus);
+
+      // Color-coded Planet RA
+      const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
+      const planetRAContent = `${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22);
+      section += `|  <span style="color:${raColor}">${planetRAContent}</span>|\n`;
+
+      // Show reference RA if provided (for non-NASA dates) - same color as Planet RA
+      if (!isNasaDate && !isOpposition && data.position.refRA) {
+        const refRAValue = raDecimalHoursToHMS(data.position.refRA);
+        const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
+        section += `|  <span style="color:${raColor}">${refRAContent}</span>|\n`;
+      }
+
+      // Dec line (no color coding)
+      const decValue = decToDMSFromRadians(data.position.planetDecRad);
+      section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
+
+      // Show reference Dec if provided (no color coding)
+      if (data.position.refDec) {
+        const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
+        section += `|  ${('Reference Dec:'.padEnd(24) + refDecValue.padStart(22))}|\n`;
+      }
+      section += `|  ${(`${planetLabel} Dist Earth:`.padEnd(24) + (data.position.planetDistE.toFixed(6) + ' AU').padStart(22))}|\n`;
+      section += `|  ${(`${planetLabel} Dist Sun:`.padEnd(24) + (data.position.planetDistS.toFixed(6) + ' AU').padStart(22))}|\n`;
+
+      // Show Sun data for NASA dates (transit) and Opposition dates
+      if (isNasaDate || isOpposition) {
+        section += `|  ${'-'.repeat(W - 4)}  |\n`;
+
+        // Color-coded Sun RA (same color as Planet RA since they're being compared)
+        const sunRAValue = raToHMSFromRadians(data.position.sunRARad);
+        const sunRAContent = 'Sun RA:'.padEnd(24) + sunRAValue.padStart(22);
+        section += `|  <span style="color:${raColor}">${sunRAContent}</span>|\n`;
+
+        section += `|  ${('Sun Dec:'.padEnd(24) + decToDMSFromRadians(data.position.sunDecRad).padStart(22))}|\n`;
+        section += `|  ${('Sun Dist Earth:'.padEnd(24) + (data.position.sunDistE.toFixed(6) + ' AU').padStart(22))}|\n`;
+      }
+    }
+  }
+
+  // Longitude data
+  if (testDate.type === 'longitude' || testDate.type === 'both') {
+    if (testDate.type === 'both') {
+      section += `+${HR}+\n`;
+    }
+    section += `|  LONGITUDE DATA`.padEnd(W + 1) + `|\n`;
+    section += `|  ${'-'.repeat(W - 4)}  |\n`;
+    section += `|  Longitude of Perihelion (ϖ)`.padEnd(W + 1) + `|\n`;
+    section += `|  ${('  Calculated:'.padEnd(24) + (data.longitude.longPeriCalc.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${('  Reference:'.padEnd(24) + (data.longitude.longPeriRef.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${('  Difference:'.padEnd(24) + (data.longitude.longPeriDiff.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${'-'.repeat(W - 4)}  |\n`;
+    section += `|  Longitude of Ascending Node (Ω)`.padEnd(W + 1) + `|\n`;
+    section += `|  ${('  Calculated:'.padEnd(24) + (data.longitude.ascNodeCalc.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${('  Reference:'.padEnd(24) + (data.longitude.ascNodeRef.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${('  Difference:'.padEnd(24) + (data.longitude.ascNodeDiff.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${'-'.repeat(W - 4)}  |\n`;
+    section += `|  Argument of Periapsis (ω)`.padEnd(W + 1) + `|\n`;
+    section += `|  ${('  Calculated:'.padEnd(24) + (data.longitude.argPeriCalc.toFixed(6) + '°').padStart(22))}|\n`;
+    section += `|  ${('  (ϖ - Ω):'.padEnd(24) + (data.longitude.argPeriDerived.toFixed(6) + '°').padStart(22))}|\n`;
+  }
+
+  section += `+${HR}+\n\n`;
+  return section;
+}
+
+/**
+ * Generate the planet position report for Step 5
+ */
+async function generatePlanetReport(planetKey) {
+  const testDates = PLANET_TEST_DATES[planetKey];
+  if (!testDates || testDates.length === 0) {
+    return { screenReport: 'No test dates configured for this planet.', excelData: null };
+  }
+
+  // Save current state
+  const savedState = {
+    run: o.Run,
+    julianDay: o.julianDay,
+    time: o.Time,
+    pos: o.pos
+  };
+
+  o.Run = false;
+
+  let screenReport = buildReportHeader(planetKey);
+  const positionRows = [[
+    'JD', 'Date', 'Time', 'Label',
+    'Planet RA', 'Planet Dec',
+    'Reference RA', 'Reference Dec', 'Reference Longitude',
+    'Compare Planet', 'Companion RA', 'Companion Dec',
+    'Planet Dist Earth (AU)', 'Planet Dist Sun (AU)',
+    'Sun RA', 'Sun Dec', 'Sun Dist Earth (AU)'
+  ]];
+  const longitudeRows = [['JD', 'Date', 'Time', 'Label', 'Long Perihelion Calc (°)', 'Long Perihelion Ref (°)', 'Long Perihelion Diff (°)', 'Asc Node Calc (°)', 'Asc Node Ref (°)', 'Asc Node Diff (°)', 'Arg Periapsis Calc (°)']];
+
+  // Process each test date
+  for (const testDate of testDates) {
+    jumpToJulianDay(testDate.jd);
+    forceSceneUpdate();
+
+    const data = collectPlanetDataForDate(planetKey, testDate);
+
+    // Always add to Excel data
+    if (testDate.type === 'position' || testDate.type === 'both') {
+      positionRows.push(data.positionRow);
+    }
+    if (testDate.type === 'longitude' || testDate.type === 'both') {
+      longitudeRows.push(data.longitudeRow);
+    }
+
+    // Only add to screen report if showOnScreen is true
+    if (testDate.showOnScreen) {
+      screenReport += buildDateSection(planetKey, testDate, data);
+    }
+  }
+
+  // Restore state
+  o.Run = savedState.run;
+  jumpToJulianDay(savedState.julianDay);
+  o.Time = savedState.time;
+  o.pos = savedState.pos;
+  forceSceneUpdate();
+
+  return {
+    screenReport,
+    excelData: { positionRows, longitudeRows }
+  };
+}
+
+/**
+ * Export planet report to Excel file
+ */
+async function exportPlanetReportToExcel(planetKey, excelData) {
+  await ensureSheetJs();
+
+  const planetLabel = PLANET_HIERARCHIES[planetKey]?.label || planetKey;
+  const wb = XLSX.utils.book_new();
+
+  // Create Documentation front sheet
+  const docRows = [
+    ['PLANET POSITION REPORT - DOCUMENTATION'],
+    [''],
+    ['Planet:', planetLabel],
+    ['Generated:', new Date().toISOString()],
+    ['Model Start Date:', 'JD 2451716.5 (June 21, 2000 00:00 UTC)'],
+    [''],
+    ['DATA SOURCES'],
+    ['─'.repeat(60)],
+    ['Mercury transits:', 'https://eclipse.gsfc.nasa.gov/transit/catalog/MercuryCatalog.html (NASA GSFC)'],
+    ['Venus transits:', 'https://eclipse.gsfc.nasa.gov/transit/catalog/VenusCatalog.html (NASA GSFC)'],
+    ['Mars oppositions:', 'https://stjerneskinn.com/mars-at-opposition.htm (Jean Meeus tables)'],
+    ['', 'https://www.nakedeyeplanets.com/mars-oppositions.htm'],
+    ['Jupiter/Saturn conjunctions:', 'https://astropixels.com/ephemeris/planets/jupiter2020.html (JPL DE405)'],
+    ['', 'https://www.astropro.com/features/tables/geo/ju-sa/ju000sa.html'],
+    ['Mutual planetary occultations:', 'https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses'],
+    ['', 'https://www.projectpluto.com/mut_pln.htm'],
+    ['', 'https://www.bogan.ca/astro/occultations/occltlst.htm'],
+    [''],
+    ['COLUMN DESCRIPTIONS'],
+    ['─'.repeat(60)],
+    ['JD:', 'Julian Day number'],
+    ['Date/Time:', 'Calendar date and time (UTC)'],
+    ['Label:', 'Event type (NASA date, Opposition, Occultation, etc.)'],
+    ['Planet RA:', 'Calculated Right Ascension of the planet'],
+    ['Planet Dec:', 'Calculated Declination of the planet'],
+    ['Reference RA:', 'Reference Right Ascension from source data (if provided)'],
+    ['Reference Dec:', 'Reference Declination from source data (if provided)'],
+    ['Reference Longitude:', 'Ecliptic longitude from source data (for conjunctions)'],
+    ['Compare Planet:', 'Companion planet for occultation comparisons'],
+    ['Companion RA/Dec:', 'Position of companion planet at same date'],
+    ['Planet Dist Earth/Sun:', 'Distance in AU from Earth/Sun'],
+    [''],
+    ['CALCULATIONS'],
+    ['─'.repeat(60)],
+    ['Longitude to RA conversion:', 'Uses proper ecliptic-to-equatorial transformation'],
+    ['Formula:', 'RA = atan2(sin(λ) × cos(ε), cos(λ))'],
+    ['', 'where λ = ecliptic longitude, ε = obliquity (~23.44°)'],
+    ['Obliquity source:', 'Dynamic value from o.obliquityEarth at simulation date'],
+    [''],
+    ['COLOR CODING (in screen report)'],
+    ['─'.repeat(60)],
+    ['Green:', 'Difference ≤ 5 minutes of RA'],
+    ['Amber:', 'Difference 5-15 minutes of RA'],
+    ['Red:', 'Difference > 15 minutes of RA'],
+  ];
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.aoa_to_sheet(docRows),
+    'Documentation');
+
+  if (excelData.positionRows.length > 1) {
+    XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet(excelData.positionRows),
+      `${planetLabel} Position`);
+  }
+
+  if (excelData.longitudeRows.length > 1) {
+    XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet(excelData.longitudeRows),
+      `${planetLabel} Longitude`);
+  }
+
+  const wbBlob = workbookToBlob(wb);
+  const url = URL.createObjectURL(wbBlob);
+  Object.assign(document.createElement('a'),
+    { href: url, download: `${planetKey}_position_report.xlsx` }).click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Copy report text to clipboard
+ * Strips HTML tags (like color spans) from the text before copying
+ */
+function copyReportToClipboard(reportText) {
+  // Remove HTML tags (e.g., <span style="color:...">...</span>) for plain text copy
+  const plainText = reportText.replace(/<[^>]*>/g, '');
+  navigator.clipboard.writeText(plainText)
+    .then(() => {
+      // Show brief feedback
+      const copyBtn = document.querySelector('.hi-report-btn.copy');
+      if (copyBtn) {
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+      }
+    })
+    .catch(err => {
+      console.error('Failed to copy report:', err);
+    });
+}
+
+// Store current report data for button handlers
+let _currentReportData = null;
+
+/**
+ * Generate and display the planet position report in the inspector panel
+ */
+async function generateAndDisplayReport(planetKey) {
+  const panel = hierarchyInspector.panel;
+  if (!panel) return;
+
+  const reportElement = panel.querySelector('.hi-report');
+  const loadingElement = panel.querySelector('.hi-report-loading');
+  const buttonsElement = panel.querySelector('.hi-report-buttons');
+
+  if (!reportElement || !loadingElement) return;
+
+  // Show loading state
+  loadingElement.style.display = 'block';
+  reportElement.style.display = 'none';
+  buttonsElement.style.display = 'none';
+
+  try {
+    // Generate the report
+    const result = await generatePlanetReport(planetKey);
+
+    // Store for button handlers
+    _currentReportData = {
+      planetKey,
+      screenReport: result.screenReport,
+      excelData: result.excelData
+    };
+
+    // Display the report (use innerHTML to render color-coded spans)
+    reportElement.innerHTML = result.screenReport;
+    loadingElement.style.display = 'none';
+    reportElement.style.display = 'block';
+    buttonsElement.style.display = 'flex';
+  } catch (err) {
+    console.error('Error generating report:', err);
+    reportElement.textContent = `Error generating report: ${err.message}`;
+    loadingElement.style.display = 'none';
+    reportElement.style.display = 'block';
+    buttonsElement.style.display = 'none';
+  }
+}
+
 // ---------------------------------------------------------------------------
-//  HELPER — “excess seconds per (mean) day” at the *current* JD
+//  HELPER — "excess seconds per (mean) day" at the *current* JD
 //  Positive  => Earth day is longer than 86 400 s  ➜ ΔT increases
 //  Negative  => Earth day is shorter            ➜ ΔT decreases
 // ---------------------------------------------------------------------------
@@ -4517,7 +10556,7 @@ const planetStats = {
       {header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => holisticyearLength-13, dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Earth orbits the Sun ${fmtNum((holisticyearLength-13),0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -4530,14 +10569,16 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '1' }]},
       null,    
-      {label : () => `Orbital Eccentricity`,
+      {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityEarth, dec:8, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
+      {label : () => `PERIHELION-OF-EARTH Distance from Sun`,
+       value : [ { v: () => eccentricityMean, dec:8, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:8, sep:',' },{ small: 'degrees (°)' }]},      
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => o.inclinationEarth, dec:8, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => o.lengthofsolarYear/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }]},
       {label : () => `Orbit Period Solar`,
        value : [ { v: () => o.lengthofsolarYear, dec:8, sep:',' },{ small : 'days' }]},
@@ -4551,21 +10592,34 @@ const planetStats = {
    //   {label : () => `Predicted ΔT change`,
    //    value : [ { v: () => o.predictedDeltatPerYear , dec:6, sep:',' },{ small: 'sec/ year' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => o.lengthofAU/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI)), dec:6, sep:',' },{ small : 'AU' }]},   
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => o.lengthofAU, dec:6, sep:',' },{ small : 'km' }]},  
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => speedofSuninKM, dec:2, sep:',' },{ small: 'km/h' }]},
     null,  
 
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }]},
          
       {label : () => `Approximate Date of Perihelion`,
        value : [ { v: () => o.longitudePerihelionDatePer },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
        value : [ { v: () => o.longitudePerihelionDateAp },{ small: 'D/M/Y, h:m:s' }]},
+    null,
+      {label : () => `Longitude of ascending node (Ω)`,
+       value : [ { v: () => 0, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Longitude of descending node`,
+       value : [ { v: () => 180, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Argument of periapsis (ω)`,
+       value : [ { v: () => ((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360).toFixed(8), dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.earthHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.earthAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.earthAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
     null,
       { header : 'All date specific characteristics for ',  date   : () => o.Date } ,
       {''                                           : [ { small : 'mean' },'on date']},
@@ -4598,7 +10652,7 @@ const planetStats = {
       {label : () => `Inclination to the Invariable plane (degrees)`,
        value : [ { small: earthinclinationMean },{ v: () => o.inclinationEarth, dec:13, sep:',' }]},
      null,     
-      {label : () => `Lenght of AU (km)`,
+      {label : () => `Length of AU (km)`,
        value : [ { small:{ v: () => (meansiderealyearlengthinSeconds/60/60 * speedofSuninKM) / (2 * Math.PI), dec:6, sep:',' }},{ v: () => o.lengthofAU, dec:5, sep:',' }]},    
      null,
       {label : () => `Axial precession (years)`,
@@ -4627,7 +10681,7 @@ const planetStats = {
     {header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
     {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth, dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`The Moon orbits Earth ${fmtNum((meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -4638,9 +10692,9 @@ const planetStats = {
       {label : () => `Axial tilt`,
        value : [ { v: () => moonTilt, dec:6, sep:',' },{ small: 'degrees (°)' }]},
      null, 
-      {label : () => `Orbital Eccentricity`,
+      {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
+      {label : () => `Orbital Inclination (i)`,
        value : [ { v: () => moonOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
      null, 
       {label : () => `Sidereal month`,
@@ -4753,10 +10807,10 @@ const planetStats = {
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => 0, dec:0, sep:',' },{ small: 'orbits' }],
-       hover : [`The Sun is responsible for the lenght of the Holistic-Year of ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The Sun is responsible for the length of the Holistic-Year of ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       null,
       {label : () => `Size diameter`,
        value : [ { v: () => diameters.sunDiameter, dec:2, sep:',' },{ small: 'km' }],
@@ -4815,11 +10869,11 @@ const planetStats = {
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (mercurySolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Mercury orbits the Sun ${fmtNum(mercurySolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
-      null,
+    null,
       {label : () => `Size diameter`,
        value : [ { v: () => diameters.mercuryDiameter, dec:2, sep:',' },{ small: 'km' }],
        info  : 'https://en.wikipedia.org/wiki/Mercury_(planet)'}, 
@@ -4828,14 +10882,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '0' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => mercuryOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.mercuryInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => mercuryPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((mercuryPerihelionEclipticYears)-(holisticyearLength/13)))*(mercuryPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/mercuryPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Mercury's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((mercuryOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Mercury's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => mercuryOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-MERCURY Distance from Sun`,
+       value : [ { v: () => mercuryPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => mercuryOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.mercuryApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.mercuryApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => mercuryInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Orbit Period Solar`,
+      null,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/mercurySolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Mercury's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -4853,39 +10923,47 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => mercuryRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => mercuryOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mercury distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => mercuryOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Mercury distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => mercurySpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Mercury speed around the sun is calculated as (${fmtNum(mercuryOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/mercurySolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.mercuryPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion+mercuryAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion+mercuryAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.mercuryPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
-       value : [ { v: () => mercuryAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Longitude of ascending node (Ω)`,
+       value : [ { v: () => o.mercuryAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
-       value : [ { v: () => mercuryAscendingNode+180, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of Periapsis`,
-       value : [ { v: () => o.mercuryPerihelion-mercuryAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Mercury's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((mercuryOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Mercury's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+       value : [ { v: () => o.mercuryDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Argument of periapsis (ω)`,
+       value : [ { v: () => o.mercuryArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.mercuryHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.mercuryAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.mercuryAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.mercuryMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.mercuryTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.mercuryTrueAnomaly-o.mercuryMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
     venus: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (venusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Venus orbits the Sun ${fmtNum(venusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -4898,14 +10976,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '0' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => venusOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.venusInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => venusPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((venusPerihelionEclipticYears)-(holisticyearLength/13)))*(venusPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/venusPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Venus's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((venusOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Venus's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => venusOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-VENUS Distance from Sun`,
+       value : [ { v: () => venusPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => venusOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.venusApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.venusApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => venusInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/venusSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Venus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -4923,40 +11017,48 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => venusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => venusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Venus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => venusOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Venus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => venusSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Venus speed around the sun is calculated as (${fmtNum(venusOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/venusSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.venusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.venusPerihelion+venusAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.venusPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.venusPerihelion+venusAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.venusPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
-       value : [ { v: () => venusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Longitude of ascending node (Ω)`,
+       value : [ { v: () => o.venusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
-       value : [ { v: () => venusAscendingNode+180, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of Periapsis`,
-       value : [ { v: () => o.venusPerihelion-venusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Venus's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((venusOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Venus's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+       value : [ { v: () => o.venusDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Argument of periapsis (ω)`,
+       value : [ { v: () => o.venusArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.venusHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.venusAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.venusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.venusMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.venusTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.venusTrueAnomaly-o.venusMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
 
     mars: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (marsSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Mars orbits the Sun ${fmtNum(marsSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -4969,14 +11071,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '2' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => marsOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.marsInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => marsPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((marsPerihelionEclipticYears)-(holisticyearLength/13)))*(marsPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/marsPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Mars's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((marsOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Mars's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => marsOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-MARS Distance from Sun`,
+       value : [ { v: () => marsPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => marsOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.marsApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.marsApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => marsInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Orbit Period Solar`,
+      null,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/marsSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Mars's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -4994,40 +11112,48 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => marsRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => marsOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mars distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => marsOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Mars distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => marsSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Mars speed around the sun is calculated as (${fmtNum(marsOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/marsSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.marsPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.marsPerihelion+marsAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.marsPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.marsPerihelion+marsAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.marsPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.marsAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.marsDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.marsArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Mars's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((marsOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Mars's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.marsHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.marsAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.marsAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.marsMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.marsTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.marsTrueAnomaly-o.marsMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
    
     jupiter: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (jupiterSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Jupiter orbits the Sun ${fmtNum(jupiterSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5040,14 +11166,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '95' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => jupiterOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.jupiterInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => jupiterPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((jupiterPerihelionEclipticYears)-(holisticyearLength/13)))*(jupiterPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/jupiterPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Jupiter's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((jupiterOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Jupiter's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => jupiterOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-JUPITER Distance from Sun`,
+       value : [ { v: () => jupiterPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => jupiterOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.jupiterApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.jupiterApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => jupiterInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/jupiterSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Jupiter's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5065,40 +11207,48 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => jupiterRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => jupiterOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Jupiter distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => jupiterOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Jupiter distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => jupiterSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Jupiter speed around the sun is calculated as (${fmtNum(jupiterOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/jupiterSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.jupiterPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion+jupiterAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion+jupiterAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.jupiterPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.jupiterAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.jupiterDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.jupiterArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Jupiter's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((jupiterOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Jupiter's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.jupiterHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.jupiterAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.jupiterAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.jupiterMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.jupiterTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.jupiterTrueAnomaly-o.jupiterMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
-    
+
     saturn: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (saturnSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Saturn orbits the Sun ${fmtNum(saturnSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5111,14 +11261,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '274' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => saturnOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.saturnInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => saturnPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((saturnPerihelionEclipticYears)-(holisticyearLength/13)))*(saturnPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/saturnPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Saturn's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((saturnOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Saturn's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => saturnOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-SATURN Distance from Sun`,
+       value : [ { v: () => saturnPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => saturnOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.saturnApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.saturnApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => saturnInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/saturnSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Saturn's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5136,40 +11302,48 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => saturnRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => saturnOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Saturn distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => saturnOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Saturn distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => saturnSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Saturn speed around the sun is calculated as (${fmtNum(saturnOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/saturnSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.saturnPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion+saturnAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion+saturnAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.saturnPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.saturnAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.saturnDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.saturnArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Saturn's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((saturnOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Saturn's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.saturnHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.saturnAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.saturnAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.saturnMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.saturnTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.saturnTrueAnomaly-o.saturnMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
-    
+
     uranus: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (uranusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Uranus orbits the Sun ${fmtNum(uranusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5182,14 +11356,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '28' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => uranusOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.uranusInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => uranusPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((uranusPerihelionEclipticYears)-(holisticyearLength/13)))*(uranusPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/uranusPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Uranus's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((uranusOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Uranus's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => uranusOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-URANUS Distance from Sun`,
+       value : [ { v: () => uranusPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => uranusOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.uranusApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.uranusApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => uranusInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/uranusSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Uranus's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5207,40 +11397,48 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => uranusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => uranusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Uranus distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => uranusOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Uranus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => uranusSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Uranus speed around the sun is calculated as (${fmtNum(uranusOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/uranusSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.uranusPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion+uranusAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion+uranusAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.uranusPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.uranusAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.uranusDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.uranusArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Uranus's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((uranusOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Uranus's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.uranusHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.uranusAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.uranusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.uranusMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.uranusTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.uranusTrueAnomaly-o.uranusMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
 
     neptune: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (neptuneSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Neptune orbits the Sun ${fmtNum(neptuneSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5253,14 +11451,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '16' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => neptuneOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.neptuneInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => neptunePerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((neptunePerihelionEclipticYears)-(holisticyearLength/13)))*(neptunePerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/neptunePerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Neptune's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((neptuneOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Neptune's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => neptuneOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-NEPTUNE Distance from Sun`,
+       value : [ { v: () => neptunePerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => neptuneOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.neptuneApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.neptuneApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => neptuneInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/neptuneSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Neptune's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5278,39 +11492,47 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => neptuneRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => neptuneOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Neptune distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => neptuneOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Neptune distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => neptuneSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Neptune speed around the sun is calculated as (${fmtNum(neptuneOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/neptuneSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.neptunePerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion+neptuneAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion+neptuneAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.neptunePerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.neptuneAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.neptuneDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.neptuneArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Neptune's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((neptuneOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Neptune's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.neptuneHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.neptuneAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.neptuneAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.neptuneMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.neptuneTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.neptuneTrueAnomaly-o.neptuneMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
     pluto: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (plutoSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Pluto orbits the Sun ${fmtNum(plutoSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5323,14 +11545,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '5' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => plutoOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.plutoInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => plutoPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((plutoPerihelionEclipticYears)-(holisticyearLength/13)))*(plutoPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/plutoPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Pluto's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((plutoOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Pluto's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => plutoOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-PLUTO Distance from Sun`,
+       value : [ { v: () => plutoPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => plutoOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.plutoApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.plutoApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => plutoInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/plutoSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Pluto's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5348,39 +11586,47 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => plutoRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => plutoOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Pluto distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => plutoOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Pluto distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => plutoSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Pluto speed around the sun is calculated as (${fmtNum(plutoOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/plutoSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.plutoPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion+plutoAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion+plutoAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.plutoPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.plutoAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.plutoDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.plutoArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Pluto's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((plutoOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Pluto's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.plutoHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.plutoAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.plutoAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.plutoMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.plutoTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.plutoTrueAnomaly-o.plutoMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
       halleys: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (halleysSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Halleys orbits the Sun ${fmtNum(halleysSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5393,14 +11639,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '0' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => halleysOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.halleysInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => halleysPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((halleysPerihelionEclipticYears)-(holisticyearLength/13)))*(halleysPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/halleysPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Halleys's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((halleysOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Halleys's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => halleysOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-HALLEYS Distance from Sun`,
+       value : [ { v: () => halleysPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => halleysOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.halleysApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.halleysApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => halleysInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/halleysSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Halleys's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5418,39 +11680,47 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => halleysRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => halleysOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Halleys distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => halleysOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Halleys distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => halleysSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Halleys speed around the sun is calculated as (${fmtNum(halleysOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/halleysSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.halleysPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion+halleysAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion+halleysAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.halleysPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.halleysAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.halleysDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.halleysArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Halleys's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((halleysOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Halleys's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.halleysHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.halleysAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.halleysAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.halleysMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.halleysTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.halleysTrueAnomaly-o.halleysMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
       eros: [
     { header : '—  General characteristics —' },
       {label : () => `Length of Holistic-Year`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The lenght of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
+       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
       {label : () => `Number of orbits in a Holistic-Year`,
        value : [ { v: () => (erosSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Eros orbits the Sun ${fmtNum(erosSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`]},
@@ -5463,14 +11733,30 @@ const planetStats = {
       {label : () => `Number of Moons`,
        value : [ '',{ small: '0' }]},
     null,
-      {label : () => `Orbital Eccentricity`,
-       value : [ { v: () => erosOrbitalEccentricity, dec:6, sep:',' },{ small: 'AU' }]},
-      {label : () => `Orbital Inclination`,
-       value : [ { v: () => o.erosInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => erosPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion Precession Duration against ICRF`,
+       value : [ { v: () => (((holisticyearLength/13)/((erosPerihelionEclipticYears)-(holisticyearLength/13)))*(erosPerihelionEclipticYears)), dec:2, sep:',' },{ small: 'years' }]},
+      {label : () => `Perihelion precession per century`,
+       value : [ { v: () => 1296000/erosPerihelionEclipticYears*100, dec:2, sep:',' },{ small: 'arcsec/100 yrs' }]},
+      {label : () => `Missing Eros's advance due to Earth's wobble`,
+       value : [ { v: () => 1296000/((erosOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Eros's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+    null,
+      {label : () => `Orbital Eccentricity (e)`,
+       value : [ { v: () => erosOrbitalEccentricity, dec:6, sep:',' },{ small: '' }]},
+      {label : () => `PERIHELION-OF-EROS Distance from Sun`,
+       value : [ { v: () => erosPerihelionDistance/100, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Orbital Inclination J2000 (i)`,
+       value : [ { v: () => erosOrbitalInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Inclination (i)`,
+       value : [ { v: () => o.erosApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Apparent Incl. (Souami&Souchay)`,
+       value : [ { v: () => o.erosApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to the Invariable plane`,
        value : [ { v: () => erosInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Orbit Period Solar`,
+      {label : () => `Orbital period (P)`,
        value : [ { v: () => (holisticyearLength/erosSolarYearCount), dec:6, sep:',' },{ small: 'years' }],
        hover : [`Eros's Solar orbit period in years is calculated as ${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')}`]},
       {label : () => `Orbit Period Solar`,
@@ -5488,33 +11774,41 @@ const planetStats = {
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => erosRotationPeriod, dec:6, sep:',' },{ small: 'hours' }]},
     null,
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis (a)`,
        value : [ { v: () => erosOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Eros distance to Sun in AU is calculated as ((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3)`]},
-      {label : () => `Orbit distance to Sun`,
+      {label : () => `Semi-major axis`,
        value : [ { v: () => erosOrbitDistance*o.lengthofAU, dec:2, sep:',' },{ small: 'km' }],
        hover : [`Eros distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`]},
       {label : () => `Orbital speed around the Sun`,
        value : [ { v: () => erosSpeed, dec:6, sep:',' },{ small: 'km/h' }],
        hover : [`Eros speed around the sun is calculated as (${fmtNum(erosOrbitDistance*o.lengthofAU,0,',')}*2*PI)/(${fmtNum(meansolaryearlengthinDays,6,',')}*${fmtNum((holisticyearLength/erosSolarYearCount),6,',')})/24`]},
     null,
-      {label : () => `Longitude of perihelion`,
+      {label : () => `Longitude of perihelion (ϖ)`,
        value : [ { v: () => o.erosPerihelion, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Approximate Date of Perihelion`,
-       value : [ { v: () => longitudeToDateTime(o.erosPerihelion+erosAngleCorrection, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.erosPerihelion, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
       {label : () => `Approximate Date of Aphelion`,
-       value : [ { v: () => longitudeToDateTime(o.erosPerihelion+erosAngleCorrection - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
+       value : [ { v: () => longitudeToDateTime(o.erosPerihelion - 180, o.currentYear) },{ small: 'D/M/Y, h:m:s' }]},
     null,
-      {label : () => `Longitude of ascending node`,
+      {label : () => `Longitude of ascending node (Ω)`,
        value : [ { v: () => o.erosAscendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Longitude of descending node`,
        value : [ { v: () => o.erosDescendingNode, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Argument of periapsis`,
+      {label : () => `Argument of periapsis (ω)`,
        value : [ { v: () => o.erosArgumentOfPeriapsis, dec:8, sep:',' },{ small: 'degrees (°)' }]},
-    null,
-      {label : () => `Missing Eros's advance due to Earth's wobble`,
-       value : [ { v: () => 1296000/((erosOrbitDistance*o.lengthofAU*2*Math.PI)/((meansiderealyearlengthinSeconds/60/60 * speedofSuninKM*eccentricityAmplitude)/(o.axialPrecessionRealLOD)))*100, dec:6, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Eros's missing perihelion precession is not due to the general relativity but due to Earth's wobble movement`]},
+      {label : () => `Height above Invariable Plane`,
+       value : [ { v: () => o.erosHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }]},
+      {label : () => `Position relative to Inv. Plane`,
+       value : [ { v: () => o.erosAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
+      {label : () => `Ascending Node on Inv. Plane (Ω)`,
+       value : [ { v: () => o.erosAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Mean Anomaly (M)`,
+       value : [ { v: () => o.erosMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `True Anomaly (ν)`,
+       value : [ { v: () => o.erosTrueAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `Equation of the Center`,
+       value : [ { v: () => o.erosTrueAnomaly-o.erosMeanAnomaly, dec:2, sep:',' },{ small: 'degrees (°)' }]},
     ],
 };
 
@@ -5733,6 +12027,10 @@ function updateDomLabel () {
 
   /* 6 — inject only if changed ---------------------------------------------- */
   if (nextHTML !== labelPrevHTML) {
+    // Preserve scroll position before updating innerHTML
+    const scrollBox = body.querySelector('.scrollBox');
+    const savedScrollTop = scrollBox ? scrollBox.scrollTop : 0;
+
     body.innerHTML = nextHTML;
     labelPrevHTML     = nextHTML;
 
@@ -5749,6 +12047,12 @@ function updateDomLabel () {
     }
     content.querySelector('.pl-grid').style.gridTemplateColumns =
       columnCache[selName];
+
+    // Restore scroll position after updating innerHTML
+    const newScrollBox = body.querySelector('.scrollBox');
+    if (newScrollBox && savedScrollTop > 0) {
+      newScrollBox.scrollTop = savedScrollTop;
+    }
   }
 
   /* 7 — show the drawer ------------------------------------------------------ */
@@ -5792,8 +12096,8 @@ function updateStarSizes() {
 
 function updateFocusRing() {
 
-  /* ── 1  Nothing is selected → ring off and exit early ─────────── */
-  if (!o.lookAtObj) {
+  /* ── 1  Nothing is selected or hierarchy inspector is active → ring off and exit early ─────────── */
+  if (!o.lookAtObj || hierarchyInspector._cameraControlActive) {
     focusRing.visible = false;
     return;
   }
@@ -5831,37 +12135,28 @@ function createFlare(color, scale) {
 
 // The flares need to be added to the position of the Sun
 function updateFlares() {
-  const sunWorldPos = new THREE.Vector3();
-  sunGlow.getWorldPosition(sunWorldPos);
+  sunGlow.getWorldPosition(_flareSunPos);
+  camera.getWorldPosition(_flareCamPos);
+  camera.getWorldDirection(_flareCamDir);
 
-  const cameraWorldPos = new THREE.Vector3();
-  camera.getWorldPosition(cameraWorldPos);
+  _flareToSun.subVectors(_flareSunPos, _flareCamPos).normalize();
 
-  const cameraDir = new THREE.Vector3();
-  camera.getWorldDirection(cameraDir);
+  const dot = _flareCamDir.dot(_flareToSun);
 
-  const toSun = new THREE.Vector3().subVectors(sunWorldPos, cameraWorldPos).normalize();
-
-  const dot = cameraDir.dot(toSun);
-
-  if (dot > 0.5) { // Sun is roughly in front
-    const sunScreenPosition = sunWorldPos.clone().project(camera);
-
-    const flareLineDir = new THREE.Vector3().subVectors(cameraWorldPos, sunWorldPos).normalize();
+  if (dot > 0.5) {
+    _flareLineDir.subVectors(_flareCamPos, _flareSunPos).normalize();
 
     flares.forEach((flare, index) => {
-      const factor = (index - 0.5) * (index - 2) * 15;  // Spread out spacing (tweak this value)
+      const factor = (index - 0.5) * (index - 2) * 15;
 
-      // Position along the line starting from the Sun
-      const flarePos = new THREE.Vector3().copy(sunWorldPos)
-        .add(flareLineDir.clone().multiplyScalar(factor));
+      _flarePos.copy(_flareSunPos);
+      _flarePos.addScaledVector(_flareLineDir, factor);
 
-      flare.position.copy(flarePos);
+      flare.position.copy(_flarePos);
       flare.visible = true;
-      flare.material.opacity = 1.0 - Math.abs(index - 1) * 0.3; // Center flare brightest
+      flare.material.opacity = 1.0 - Math.abs(index - 1) * 0.3;
     });
-
-    } else {
+  } else {
     flares.forEach(flare => {
       flare.visible = false;
     });
@@ -5963,7 +12258,7 @@ function updateLightingForFocus() {
 // Animation (pulsing)
 function animateGlow() {
     glowMaterial.opacity = 0.2 + 0.1 * Math.sin(Date.now() * 0.002);
-    requestAnimationFrame(animateGlow);
+    //requestAnimationFrame(animateGlow);
 }
 
 function createEarthPolarLine() {
@@ -5971,19 +12266,11 @@ function createEarthPolarLine() {
 
   let geometry;
 
-  // Use BufferGeometry if available (modern Three.js), fallback to Geometry for R97
-  if (typeof THREE.BufferGeometry !== 'undefined') {
-    geometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, -100, 0),
-      new THREE.Vector3(0, 100, 0)
-    ]);
-  } else {
-    geometry = new THREE.Geometry();
-    geometry.vertices.push(
-      new THREE.Vector3(0, -100, 0),
-      new THREE.Vector3(0, 100, 0)
-    );
-  }
+  // Use BufferGeometry (THREE.Geometry was removed in Three.js r125+)
+  geometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, -100, 0),
+    new THREE.Vector3(0, 100, 0)
+  ]);
 
   const line = new THREE.Line(geometry, material);
   line.visible = o['Polar line'];
@@ -6079,6 +12366,8 @@ function updatePositions() {
   // 1.  anchor points in world space
   earth.rotationAxis.getWorldPosition(EARTH_POS);  // Earth centre
   sun.planetObj.getWorldPosition(SUN_POS);         // Sun   centre
+  earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);         // Sun   centre
+  barycenterEarthAndSun.planetObj.getWorldPosition(PERIHELION_OF_EARTH_POS);         // PERIHELION-OF-EARTH   centre
 
   // ───────────────────────── each planet ───────────────────────────
   for (let i = 0, L = tracePlanets.length; i < L; i++) {
@@ -6127,6 +12416,12 @@ function updatePositions() {
       (o.distanceUnit === 'AU') ? obj.sunDistAU.toFixed(8) + ' AU' :
       (o.distanceUnit === 'km') ? obj.sunDistKm.toFixed(2) + ' km'  :
                                   obj.sunDistMi.toFixed(2) + ' mi';
+  
+  
+      /*  PERIHELION-OF-EARTH → PERIHELION of planet (distance)  */
+    DELTA.subVectors(PLANET_POS, WOBBLE_POS);           // reuse DELTA
+    const perihelionRadius   = DELTA.length();
+    obj.perihelionDistAU     = perihelionRadius / 100;
   }
 
   // ─────────────────────── camera read-out ─────────────────────────
@@ -6213,6 +12508,7 @@ function setTraceMaterial(obj) {
   scene.add(obj.traceLine);
 }
 
+// Modified function
 function tracePlanet(obj, pos) {
   let update = false;
 
@@ -6248,13 +12544,12 @@ function tracePlanet(obj, pos) {
   while (nextPos < pos) {
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
-    const epos = new THREE.Vector3();
-    obj.planetObj.getWorldPosition(epos);
+    obj.planetObj.getWorldPosition(_tracePos);     // <-- CHANGED: reuse vector
 
     const writeIndex = (obj.traceArrIndex % pointCount) * 3;
-    vertArray[writeIndex + 0] = epos.x;
-    vertArray[writeIndex + 1] = epos.y;
-    vertArray[writeIndex + 2] = epos.z;
+    vertArray[writeIndex + 0] = _tracePos.x;       // <-- CHANGED: use _tracePos
+    vertArray[writeIndex + 1] = _tracePos.y;
+    vertArray[writeIndex + 2] = _tracePos.z;
 
     obj.traceArrIndex++;
     nextPos += obj.traceStep;
@@ -6308,6 +12603,15 @@ function moveModel(pos) {
 
   // zodiac band keeps its old behaviour
   zodiac.rotation.y = -Math.PI / 3 - earthTheta;
+
+  // Inclination path rotates with zodiac to stay aligned (but is independent object)
+  if (typeof inclinationPathGroup !== 'undefined') {
+    inclinationPathGroup.rotation.y = -Math.PI / 3 - earthTheta;
+  }
+  // Invariable plane also rotates with zodiac
+  if (typeof invariablePlaneGroup !== 'undefined') {
+    invariablePlaneGroup.rotation.y = -Math.PI / 3 - earthTheta;
+  }
 }
 
 function getOptimizedPixelRatio() {
@@ -6477,7 +12781,8 @@ function apparentRaFromPdA(pdA, pdB) {
 
 function updatePerihelion() {
   o["mercuryPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth);
-  o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth);
+  o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth) % 360;
+//  o["mercuryPerihelion2"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth) % 360; 
   o["earthPerihelion"] = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
   o["marsPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, marsPerihelionFromEarth);
   o["jupiterPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, jupiterPerihelionFromEarth);
@@ -6488,6 +12793,846 @@ function updatePerihelion() {
   o["halleysPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, halleysPerihelionFromEarth);
   o["erosPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, erosPerihelionFromEarth);
 };
+
+// ================================================================
+// DYNAMIC ASCENDING NODE CALCULATION
+// ================================================================
+//
+// The ascending node longitude shifts when Earth's obliquity changes.
+// This is a RATE-BASED calculation that integrates the effect over time,
+// properly handling:
+//   1. Obliquity direction changes (when obliquity starts increasing/decreasing)
+//   2. Inclination crossovers (when Earth's inclination crosses a planet's)
+//
+// The effect depends on:
+//   - The RATE of obliquity change (dε/dt), not total deviation from mean
+//   - The relative inclination between Earth and the planet at each moment
+//
+// Earth inclination range: ~0.93° to ~2.06° (mean 1.495°, amplitude 0.564°)
+// Planets affected by inclination crossover: Jupiter (1.30°), Mars (1.85°)
+// ================================================================
+
+/**
+ * Compute the integrated obliquity change from the mean obliquity point,
+ * accounting for direction changes in the obliquity cycle.
+ *
+ * Obliquity formula: ε = mean - A*cos(phase3) + A*cos(phase8)
+ * where phase3 = 2π*t/cycle3, phase8 = 2π*t/cycle8
+ *
+ * The integral of the RATE of change gives us the accumulated effect,
+ * but we need to account for sign changes based on inclination relationship.
+ *
+ * @param {number} currentYear - Current year
+ * @returns {object} { obliquityIntegral3, obliquityIntegral8 } - Integrated components
+ */
+function computeObliquityIntegrals(currentYear) {
+  const t = currentYear - balancedYear;
+  const cycle3 = holisticyearLength / 3;
+  const cycle8 = holisticyearLength / 8;
+
+  const phase3 = (t / cycle3) * 2 * Math.PI;
+  const phase8 = (t / cycle8) * 2 * Math.PI;
+
+  // The obliquity is: mean - A*cos(phase3) + A*cos(phase8)
+  // The integral of cos from 0 to phase is sin(phase)
+  // So the "accumulated obliquity change" from balanced year is:
+  //   -A*sin(phase3) + A*sin(phase8)  (but we need the actual deviation)
+  //
+  // Actually, for the ascending node effect, what matters is the
+  // obliquity VALUE relative to the mean, not the integral of rate.
+  // The formula dΩ = (dΩ/dε) * dε integrates to Ω = (dΩ/dε) * (ε - ε_mean)
+  //
+  // So we return the obliquity deviation from mean, split by component
+  // for potential future use in handling direction changes per component.
+
+  return {
+    component3: -tiltandinclinationAmplitude * Math.cos(phase3),  // Deviation from mean due to cycle3
+    component8: tiltandinclinationAmplitude * Math.cos(phase8),   // Deviation from mean due to cycle8
+    sin3: Math.sin(phase3),  // For determining direction of cycle3 contribution
+    sin8: Math.sin(phase8)   // For determining direction of cycle8 contribution
+  };
+}
+
+/**
+ * Compute Earth's inclination at a specific year.
+ * Inclination formula: i = mean - A*cos(phase3)
+ *
+ * @param {number} year - Year to compute for
+ * @returns {number} Earth inclination in degrees
+ */
+function getEarthInclinationAtYear(year) {
+  const t = year - balancedYear;
+  const cycle3 = holisticyearLength / 3;
+  const phase3 = (t / cycle3) * 2 * Math.PI;
+  return earthinclinationMean - tiltandinclinationAmplitude * Math.cos(phase3);
+}
+
+/**
+ * Compute Earth's obliquity at a specific year.
+ *
+ * @param {number} year - Year to compute for
+ * @returns {number} Earth obliquity in degrees
+ */
+function getObliquityAtYear(year) {
+  const t = year - balancedYear;
+  const cycle3 = holisticyearLength / 3;
+  const cycle8 = holisticyearLength / 8;
+  const phase3 = (t / cycle3) * 2 * Math.PI;
+  const phase8 = (t / cycle8) * 2 * Math.PI;
+  return earthtiltMean - tiltandinclinationAmplitude * Math.cos(phase3) + tiltandinclinationAmplitude * Math.cos(phase8);
+}
+
+/**
+ * Find the year when Earth's inclination equals a target value.
+ * Solves: earthinclinationMean - A*cos(phase3) = targetInclination
+ *
+ * @param {number} targetInclination - Target inclination in degrees
+ * @param {number} startYear - Start of search range
+ * @param {number} endYear - End of search range
+ * @param {boolean} findFirst - If true, find first crossing; if false, find last
+ * @returns {number|null} Year of crossing, or null if not found
+ */
+function findInclinationCrossingYear(targetInclination, startYear, endYear, findFirst = true) {
+  // Check if target is within Earth's inclination range
+  const minIncl = earthinclinationMean - tiltandinclinationAmplitude;
+  const maxIncl = earthinclinationMean + tiltandinclinationAmplitude;
+
+  if (targetInclination < minIncl || targetInclination > maxIncl) {
+    return null; // Target outside Earth's range
+  }
+
+  // Binary search for crossing
+  const steps = 1000;
+  const stepSize = (endYear - startYear) / steps;
+
+  let prevIncl = getEarthInclinationAtYear(startYear);
+  let crossings = [];
+
+  for (let i = 1; i <= steps; i++) {
+    const year = startYear + i * stepSize;
+    const incl = getEarthInclinationAtYear(year);
+
+    // Check if we crossed the target
+    if ((prevIncl < targetInclination && incl >= targetInclination) ||
+        (prevIncl > targetInclination && incl <= targetInclination)) {
+      // Refine with interpolation
+      const fraction = (targetInclination - prevIncl) / (incl - prevIncl);
+      crossings.push(year - stepSize + fraction * stepSize);
+    }
+    prevIncl = incl;
+  }
+
+  if (crossings.length === 0) return null;
+  return findFirst ? crossings[0] : crossings[crossings.length - 1];
+}
+
+/**
+ * Find ALL years when Earth's inclination equals a target value within a range.
+ * Used for proper segment handling in ascending node calculation.
+ *
+ * @param {number} targetInclination - Target inclination in degrees
+ * @param {number} startYear - Start of search range
+ * @param {number} endYear - End of search range
+ * @returns {number[]} Array of years where crossings occur
+ */
+function findAllInclinationCrossings(targetInclination, startYear, endYear) {
+  // Check if target is within Earth's inclination range
+  const minIncl = earthinclinationMean - tiltandinclinationAmplitude;
+  const maxIncl = earthinclinationMean + tiltandinclinationAmplitude;
+
+  if (targetInclination < minIncl || targetInclination > maxIncl) {
+    return []; // Target outside Earth's range
+  }
+
+  // Use enough steps to catch all crossings
+  // There are 2 crossings per ~99,392 year cycle, so ensure we have enough resolution
+  const yearSpan = Math.abs(endYear - startYear);
+  const cycleLength = holisticyearLength / 3;  // ~99,392 years
+  const expectedCrossings = Math.ceil(yearSpan / cycleLength) * 2 + 4;
+  const steps = Math.max(1000, expectedCrossings * 50);  // At least 50 samples per expected crossing
+  const stepSize = (endYear - startYear) / steps;
+
+  let prevIncl = getEarthInclinationAtYear(startYear);
+  let crossings = [];
+
+  for (let i = 1; i <= steps; i++) {
+    const year = startYear + i * stepSize;
+    const incl = getEarthInclinationAtYear(year);
+
+    // Check if we crossed the target
+    if ((prevIncl < targetInclination && incl >= targetInclination) ||
+        (prevIncl > targetInclination && incl <= targetInclination)) {
+      // Refine with interpolation
+      const fraction = (targetInclination - prevIncl) / (incl - prevIncl);
+      crossings.push(year - stepSize + fraction * stepSize);
+    }
+    prevIncl = incl;
+  }
+
+  return crossings;
+}
+
+/**
+ * Calculate the dynamic ascending node longitude using a RATE-BASED approach.
+ *
+ * This properly handles:
+ *   1. Obliquity direction changes (effect reverses when obliquity changes direction)
+ *   2. Inclination crossovers (effect reverses when Earth incl crosses planet incl)
+ *
+ * The effect on ascending node depends on:
+ *   - dΩ/dε = -sin(Ω) / tan(i)  (base perturbation rate)
+ *   - Sign depends on whether Earth incl > or < planet incl
+ *   - Effect accumulates based on obliquity CHANGE, respecting direction reversals
+ *
+ * @param {number} orbitTilta - Encodes sin(Ω)*i in degrees
+ * @param {number} orbitTiltb - Encodes cos(Ω)*i in degrees
+ * @param {number} currentObliquity - Current Earth obliquity (degrees)
+ * @param {number} earthInclination - Current Earth orbital inclination (degrees)
+ * @param {number} currentYear - Current year (needed for rate-based calculation)
+ * @returns {number} Dynamic ascending node longitude (degrees, 0-360)
+ */
+function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear) {
+  const DEG2RAD = Math.PI / 180;
+  const RAD2DEG = 180 / Math.PI;
+
+  // Extract the static ascending node and inclination from tilts
+  const staticOmegaDeg = Math.atan2(orbitTilta, orbitTiltb) * RAD2DEG;
+  const staticOmega = ((staticOmegaDeg % 360) + 360) % 360;
+  const planetInclination = Math.sqrt(orbitTilta * orbitTilta + orbitTiltb * orbitTiltb);
+
+  // If inclination is essentially zero, ascending node is undefined
+  if (planetInclination < 1e-6) {
+    return staticOmega;
+  }
+
+  const i = planetInclination * DEG2RAD;
+  const OmegaRad = staticOmega * DEG2RAD;
+
+  const tanI = Math.tan(i);
+  if (Math.abs(tanI) < 1e-10) {
+    return staticOmega;
+  }
+
+  // Base perturbation rate: dΩ/dε = -sin(Ω) / tan(i)
+  const sinOmega = Math.sin(OmegaRad);
+  const baseDOmegaDeps = -sinOmega / tanI;
+
+  // ================================================================
+  // RATE-BASED INTEGRATION WITH SEGMENT HANDLING
+  // ================================================================
+  //
+  // We integrate the ascending node change from the "balanced year" (where
+  // obliquity and inclination are at their mean values) to the current year.
+  //
+  // IMPORTANT: The staticOmega values are calibrated for EPOCH year 2000.
+  // To use balanced year as the reference, we need to:
+  //   1. Calculate the effect from balanced year to epoch (2000)
+  //   2. Subtract that from staticOmega to get the "balanced year baseline"
+  //   3. Then add the effect from balanced year to current year
+  //
+  // This simplifies to: just calculate the effect from EPOCH to currentYear,
+  // since the balanced year portions cancel out:
+  //   result = staticOmega - effect(balanced→epoch) + effect(balanced→current)
+  //          = staticOmega + effect(epoch→current)
+  //
+  // But we WANT to use balanced year as reference for proper cycle handling.
+  // So we compute effect(balanced→current) - effect(balanced→epoch).
+  //
+  // The integration must account for:
+  // 1. Obliquity direction changes (extrema in the obliquity cycle)
+  // 2. Inclination crossovers (when Earth incl = planet incl)
+  //
+  // At each segment boundary, the direction of the effect may reverse.
+  // ================================================================
+
+  const EPOCH_YEAR = 2000; // Year when staticOmega values are calibrated
+
+  // Helper function to integrate effect between two years
+  const integrateEffect = (fromYear, toYear) => {
+    if (Math.abs(toYear - fromYear) < 0.1) return 0;
+
+    const yearMin = Math.min(fromYear, toYear);
+    const yearMax = Math.max(fromYear, toYear);
+    const dir = toYear >= fromYear ? 1 : -1;
+
+    // Collect critical points: obliquity extrema and inclination crossings
+    let criticalYears = [yearMin, yearMax];
+
+    // Sample to find obliquity direction changes
+    const sampleStep = Math.min(1000, (yearMax - yearMin) / 100);
+    if (sampleStep > 0) {
+      let prevObl = getObliquityAtYear(yearMin);
+      let prevDir = 0;
+
+      for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
+        const obl = getObliquityAtYear(y);
+        const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
+
+        if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
+          // Direction changed - refine to find extremum
+          let lo = y - sampleStep;
+          let hi = y;
+          for (let iter = 0; iter < 20; iter++) {
+            const mid = (lo + hi) / 2;
+            const oblLo = getObliquityAtYear(lo);
+            const oblMid = getObliquityAtYear(mid);
+            const oblHi = getObliquityAtYear(hi);
+
+            if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
+              criticalYears.push(mid);
+              break;
+            } else if ((oblMid - oblLo) * prevDir > 0) {
+              lo = mid;
+            } else {
+              hi = mid;
+            }
+          }
+        }
+
+        if (curDir !== 0) prevDir = curDir;
+        prevObl = obl;
+      }
+    }
+
+    // Find ALL inclination crossings (only if planet is within Earth's inclination range)
+    // This is critical for long time spans where there may be many crossings
+    const minEarthIncl = earthinclinationMean - tiltandinclinationAmplitude;
+    const maxEarthIncl = earthinclinationMean + tiltandinclinationAmplitude;
+
+    if (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl) {
+      const allCrossings = findAllInclinationCrossings(planetInclination, yearMin, yearMax);
+      criticalYears.push(...allCrossings);
+    }
+
+    // Sort critical years and remove duplicates
+    criticalYears = [...new Set(criticalYears)].sort((a, b) => a - b);
+
+    // Integrate over segments
+    let effect = 0;
+    for (let idx = 0; idx < criticalYears.length - 1; idx++) {
+      const segStart = criticalYears[idx];
+      const segEnd = criticalYears[idx + 1];
+
+      const oblStart = getObliquityAtYear(segStart);
+      const oblEnd = getObliquityAtYear(segEnd);
+      const deltaObl = (oblEnd - oblStart) * DEG2RAD;
+
+      const midYear = (segStart + segEnd) / 2;
+      const earthInclAtMid = getEarthInclinationAtYear(midYear);
+      const inclDirection = earthInclAtMid > planetInclination ? 1 : -1;
+
+      effect += baseDOmegaDeps * inclDirection * deltaObl * RAD2DEG;
+    }
+
+    return effect * dir;
+  };
+
+  // Calculate the net effect: from epoch (2000) to current year
+  // This properly handles all obliquity direction changes and inclination crossovers
+  const effectFromEpoch = integrateEffect(EPOCH_YEAR, currentYear);
+
+  // Apply accumulated effect to the static (epoch) value
+  let newOmega = staticOmega + effectFromEpoch;
+
+  // Normalize to 0-360
+  newOmega = ((newOmega % 360) + 360) % 360;
+
+  return newOmega;
+}
+
+/**
+ * Legacy function - kept for reference but no longer used.
+ * Use calculateDynamicAscendingNodeFromTilts instead.
+ */
+function calculateDynamicAscendingNode(staticOmega, staticInclination, currentObliquity, referenceObliquity = earthtiltMean) {
+  // Convert static values to tilt format
+  const DEG2RAD = Math.PI / 180;
+  const OmegaRad = staticOmega * DEG2RAD;
+  // orbitTilta = sin(Ω) * i, orbitTiltb = cos(Ω) * i
+  const orbitTilta = Math.sin(OmegaRad) * staticInclination;
+  const orbitTiltb = Math.cos(OmegaRad) * staticInclination;
+
+  return calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, referenceObliquity);
+}
+
+
+/**
+ * Update all planet ascending nodes based on current obliquity.
+ * Uses the ACTUAL orbitTilta and orbitTiltb values from the planet data objects,
+ * which encode both inclination AND the direction of tilt.
+ * Also calculates the Argument of Periapsis for each planet.
+ * This function should be called each frame before updateHierarchyLiveData().
+ *
+ * The calculation uses a RATE-BASED approach that properly handles:
+ *   1. Obliquity direction changes (effect reverses when obliquity changes direction)
+ *   2. Inclination crossovers (effect reverses when Earth incl crosses planet incl)
+ */
+// Debug flag for ascending node logging - set to true to enable console output
+let _debugAscendingNodeLogEnabled = false;
+let _debugAscendingNodeLastLog = 0;
+const _debugAscendingNodeInterval = 1000; // Log at most every 1 second
+
+// Expose debug toggle globally for console access
+// Usage in browser console: window.enableAscNodeDebug(true) or window.enableAscNodeDebug(false)
+window.enableAscNodeDebug = (enabled) => {
+  _debugAscendingNodeLogEnabled = enabled;
+  o.debugAscendingNode = enabled;
+  console.log(`🔍 Ascending Node debugging ${enabled ? 'ENABLED' : 'DISABLED'}`);
+  if (enabled) {
+    console.log('   Logs will appear every second showing:');
+    console.log('   - Current year and obliquity');
+    console.log('   - Static orbitTilt values');
+    console.log('   - Calculated dynamic ascending node');
+    console.log('   - Visual rotation values applied');
+  }
+};
+
+function updateAscendingNodes() {
+  const currentObliquity = o.obliquityEarth;
+  const earthInclination = o.inclinationEarth;
+  const currentYear = o.currentYear;
+
+  // Mercury - use actual tilt values from planet data
+  o.mercuryAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    mercuryRealPerihelionAtSun.orbitTilta, mercuryRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.mercuryArgumentOfPeriapsis = ((o.mercuryPerihelion - o.mercuryAscendingNode) % 360 + 360) % 360;
+
+  // DEBUG: Log ascending node calculation details (simplified)
+  const now = Date.now();
+  if (_debugAscendingNodeLogEnabled && (now - _debugAscendingNodeLastLog > _debugAscendingNodeInterval)) {
+    _debugAscendingNodeLastLog = now;
+    console.log(`🔍 Ascending Node: Year ${currentYear.toFixed(2)}, Mercury Ω = ${o.mercuryAscendingNode.toFixed(2)}° (static: ${mercuryAscendingNode}°, diff: ${(o.mercuryAscendingNode - mercuryAscendingNode).toFixed(2)}°)`);
+    console.log(`🌍 DEBUG TEST v2 - code updated check`);
+
+    // Earth Invariable Plane debug
+    try {
+      const sunLongDeg = (sun && sun.ra !== undefined) ? sun.ra * 180 / Math.PI : 0;
+      const earthHelioLong = (sunLongDeg + 180 + 360) % 360;
+      const yearsSinceJ2000 = currentYear - 2000.5;
+      const earthPrecRate = 360 / earthPerihelionEclipticYears;
+      const earthAscNodeDyn = (earthAscendingNodeInvPlaneVerified + earthPrecRate * yearsSinceJ2000 + 360) % 360;
+      const angleFromAscNode = (earthHelioLong - earthAscNodeDyn + 360) % 360;
+      console.log(`🌍 EARTH INV PLANE: sun.ra=${sunLongDeg.toFixed(2)}°, earthHelioLong=${earthHelioLong.toFixed(2)}°`);
+      console.log(`   ascNodeJ2000=${earthAscendingNodeInvPlaneVerified}°, ascNodeDyn=${earthAscNodeDyn.toFixed(4)}°, angleFromNode=${angleFromAscNode.toFixed(2)}°`);
+      console.log(`   o.earthAscendingNodeInvPlane=${o.earthAscendingNodeInvPlane?.toFixed(4)}°, height=${o.earthHeightAboveInvPlane?.toFixed(6)} AU`);
+    } catch (e) {
+      console.log(`🌍 EARTH INV PLANE DEBUG ERROR: ${e.message}`);
+    }
+  }
+
+  // Venus
+  o.venusAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    venusRealPerihelionAtSun.orbitTilta, venusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.venusArgumentOfPeriapsis = ((o.venusPerihelion - o.venusAscendingNode) % 360 + 360) % 360;
+
+  // Mars - NOTE: Mars (1.85°) is within Earth's inclination range and will experience crossover
+  o.marsAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    marsRealPerihelionAtSun.orbitTilta, marsRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.marsArgumentOfPeriapsis = ((o.marsPerihelion - o.marsAscendingNode) % 360 + 360) % 360;
+
+  // Jupiter - NOTE: Jupiter (1.30°) is within Earth's inclination range and will experience crossover
+  o.jupiterAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    jupiterRealPerihelionAtSun.orbitTilta, jupiterRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.jupiterArgumentOfPeriapsis = ((o.jupiterPerihelion - o.jupiterAscendingNode) % 360 + 360) % 360;
+
+  // Saturn
+  o.saturnAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    saturnRealPerihelionAtSun.orbitTilta, saturnRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.saturnArgumentOfPeriapsis = ((o.saturnPerihelion - o.saturnAscendingNode) % 360 + 360) % 360;
+
+  // Uranus
+  o.uranusAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    uranusRealPerihelionAtSun.orbitTilta, uranusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.uranusArgumentOfPeriapsis = ((o.uranusPerihelion - o.uranusAscendingNode) % 360 + 360) % 360;
+
+  // Neptune
+  o.neptuneAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    neptuneRealPerihelionAtSun.orbitTilta, neptuneRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.neptuneArgumentOfPeriapsis = ((o.neptunePerihelion - o.neptuneAscendingNode) % 360 + 360) % 360;
+
+  // Pluto
+  o.plutoAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    plutoRealPerihelionAtSun.orbitTilta, plutoRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.plutoArgumentOfPeriapsis = ((o.plutoPerihelion - o.plutoAscendingNode) % 360 + 360) % 360;
+
+  // Halley's Comet
+  o.halleysAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    halleysRealPerihelionAtSun.orbitTilta, halleysRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.halleysArgumentOfPeriapsis = ((o.halleysPerihelion - o.halleysAscendingNode) % 360 + 360) % 360;
+
+  // Eros
+  o.erosAscendingNode = calculateDynamicAscendingNodeFromTilts(
+    erosRealPerihelionAtSun.orbitTilta, erosRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+  );
+  o.erosArgumentOfPeriapsis = ((o.erosPerihelion - o.erosAscendingNode) % 360 + 360) % 360;
+
+  // Update the visual orbital plane markers to reflect the dynamic ascending nodes
+  updateOrbitalPlaneRotations();
+}
+
+/**
+ * Update the orbital plane container rotations based on dynamic ascending node values.
+ * This ensures the visual markers (orbital plane, node markers) reflect the current
+ * ascending node rather than the static epoch 2000 values.
+ *
+ * The formula to convert ascending node Ω and inclination i to tilt values:
+ *   orbitTilta = cos((-90-Ω) * π/180) * -inclination
+ *   orbitTiltb = sin((-90-Ω) * π/180) * -inclination
+ *
+ * The containerObj.rotation uses:
+ *   rotation.x = orbitTilta * π/180
+ *   rotation.z = orbitTiltb * π/180
+ */
+function updateOrbitalPlaneRotations() {
+  const DEG2RAD = Math.PI / 180;
+  const RAD2DEG = 180 / Math.PI;
+
+  // Helper to update a planet's orbital plane rotation
+  const updatePlaneRotation = (planetData, ascendingNode, inclination, planetName) => {
+    if (!planetData.containerObj) {
+      if (_debugAscendingNodeLogEnabled && planetName === 'Mercury') {
+        console.warn(`⚠️ DEBUG: ${planetName} containerObj is missing!`);
+      }
+      return;
+    }
+
+    // Calculate new tilt values from dynamic ascending node
+    const angle = (-90 - ascendingNode) * DEG2RAD;
+    const newTilta = Math.cos(angle) * -inclination;
+    const newTiltb = Math.sin(angle) * -inclination;
+
+    // DEBUG: Log what we're setting
+    if (_debugAscendingNodeLogEnabled && planetName === 'Mercury') {
+      const now = Date.now();
+      if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 100) {
+        const oldX = planetData.containerObj.rotation.x;
+        const newX = newTilta * DEG2RAD;
+        console.log(`🔧 Mercury rotation: Ω=${ascendingNode.toFixed(2)}°, old.x=${oldX.toFixed(6)}, new.x=${newX.toFixed(6)}, diff=${(newX-oldX).toFixed(8)}`);
+      }
+    }
+
+    // Update container rotation
+    planetData.containerObj.rotation.x = newTilta * DEG2RAD;
+    planetData.containerObj.rotation.z = newTiltb * DEG2RAD;
+  };
+
+  // Update each planet's orbital plane using dynamic apparent inclination
+  updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, o.mercuryApparentInclination, 'Mercury');
+  updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, o.venusApparentInclination, 'Venus');
+  updatePlaneRotation(marsRealPerihelionAtSun, o.marsAscendingNode, o.marsApparentInclination, 'Mars');
+  updatePlaneRotation(jupiterRealPerihelionAtSun, o.jupiterAscendingNode, o.jupiterApparentInclination, 'Jupiter');
+  updatePlaneRotation(saturnRealPerihelionAtSun, o.saturnAscendingNode, o.saturnApparentInclination, 'Saturn');
+  updatePlaneRotation(uranusRealPerihelionAtSun, o.uranusAscendingNode, o.uranusApparentInclination, 'Uranus');
+  updatePlaneRotation(neptuneRealPerihelionAtSun, o.neptuneAscendingNode, o.neptuneApparentInclination, 'Neptune');
+  updatePlaneRotation(plutoRealPerihelionAtSun, o.plutoAscendingNode, o.plutoApparentInclination, 'Pluto');
+  updatePlaneRotation(halleysRealPerihelionAtSun, o.halleysAscendingNode, o.halleysApparentInclination, 'Halleys');
+  updatePlaneRotation(erosRealPerihelionAtSun, o.erosAscendingNode, o.erosApparentInclination, 'Eros');
+}
+
+/**
+ * Calculate Mean Anomaly and True Anomaly for all planets.
+ *
+ * Mean Anomaly (M): Angle measured at P (orbit center) from perihelion to planet
+ * True Anomaly (ν): Angle measured at Sun (focus) from perihelion to planet
+ *
+ * This function calculates anomalies based on actual 3D positions in the model,
+ * not time-based calculations. This ensures the displayed values match what
+ * is visually shown in the simulation.
+ *
+ * Called each frame after updateAscendingNodes() and before updateHierarchyLiveData().
+ */
+function updatePlanetAnomalies() {
+  // Get Sun position (common for all planets)
+  const sunPos = new THREE.Vector3();
+  sun.pivotObj.getWorldPosition(sunPos);
+
+  // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix]
+  const planets = [
+    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury' },
+    { planet: venus, fixedPerihelion: venusFixedPerihelionAtSun, key: 'venus' },
+    { planet: mars, fixedPerihelion: marsFixedPerihelionAtSun, key: 'mars' },
+    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter' },
+    { planet: saturn, fixedPerihelion: saturnFixedPerihelionAtSun, key: 'saturn' },
+    { planet: uranus, fixedPerihelion: uranusFixedPerihelionAtSun, key: 'uranus' },
+    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune' },
+    { planet: pluto, fixedPerihelion: plutoFixedPerihelionAtSun, key: 'pluto' },
+    { planet: halleys, fixedPerihelion: halleysFixedPerihelionAtSun, key: 'halleys' },
+    { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros' }
+  ];
+
+  // Reusable vectors for calculations
+  const pPos = new THREE.Vector3();
+  const planetPos = new THREE.Vector3();
+  const perihelionPos = new THREE.Vector3();
+
+  for (const { planet, fixedPerihelion, key } of planets) {
+    // Skip if objects don't exist
+    if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
+      continue;
+    }
+
+    // Get positions
+    fixedPerihelion.pivotObj.getWorldPosition(pPos);           // P = orbit center
+    planet.pivotObj.getWorldPosition(planetPos);               // Planet position
+    // Note: We don't need perihelionPos - see explanation below
+
+    // Calculate direction vectors in XZ plane (ecliptic)
+    // In an elliptical orbit:
+    // - P (center) is at the geometric center of the ellipse
+    // - Sun (focus) is between P and perihelion, at distance a*e from P
+    // - Perihelion is in the direction from P toward Sun, beyond the Sun
+    //
+    // Layout: P -------- Sun ------- Perihelion
+    //
+    // So perihelion direction from both P and Sun is: P → Sun direction
+    const periDirX = sunPos.x - pPos.x;
+    const periDirZ = sunPos.z - pPos.z;
+
+    // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
+    const periDirFromSunX = periDirX;
+    const periDirFromSunZ = periDirZ;
+    const periDirFromPX = periDirX;
+    const periDirFromPZ = periDirZ;
+
+    // Planet direction from Sun (for True Anomaly)
+    const planetDirFromSunX = planetPos.x - sunPos.x;
+    const planetDirFromSunZ = planetPos.z - sunPos.z;
+
+    // Planet direction from P (for Mean Anomaly)
+    const planetDirFromPX = planetPos.x - pPos.x;
+    const planetDirFromPZ = planetPos.z - pPos.z;
+
+    // Calculate angles using atan2 (negate Z for counter-clockwise measurement)
+    const periAngleSun = Math.atan2(-periDirFromSunZ, periDirFromSunX);
+    const planetAngleSun = Math.atan2(-planetDirFromSunZ, planetDirFromSunX);
+
+    const periAngleP = Math.atan2(-periDirFromPZ, periDirFromPX);
+    const planetAngleP = Math.atan2(-planetDirFromPZ, planetDirFromPX);
+
+    // True Anomaly: angle at Sun from perihelion to planet
+    let trueAnomalyRad = planetAngleSun - periAngleSun;
+
+    // Mean Anomaly: angle at P from perihelion to planet
+    let meanAnomalyRad = planetAngleP - periAngleP;
+
+    // Normalize to 0 to 2*PI range
+    trueAnomalyRad = ((trueAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+    meanAnomalyRad = ((meanAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+
+    // Convert to degrees and store in o object
+    o[key + 'TrueAnomaly'] = trueAnomalyRad * 180 / Math.PI;
+    o[key + 'MeanAnomaly'] = meanAnomalyRad * 180 / Math.PI;
+  }
+}
+
+/**
+ * Calculate each planet's height above/below the invariable plane.
+ *
+ * The invariable plane is the fundamental reference plane of the solar system,
+ * perpendicular to the total angular momentum vector. Each planet crosses this
+ * plane twice per orbit (at ascending and descending nodes).
+ *
+ * Height = sin(inclination_to_inv_plane) * sin(angle_from_ascending_node) * distance
+ *
+ * The ascending nodes on the invariable plane precess over time.
+ * Precession rates use <planet>PerihelionEclipticYears constants.
+ *
+ * Called each frame after updatePlanetAnomalies().
+ *
+ * Reference: Souami & Souchay (2012), "The solar system's invariable plane"
+ */
+function updatePlanetInvariablePlaneHeights() {
+  const DEG2RAD = Math.PI / 180;
+
+  // Years since J2000.0 epoch (year 2000.5)
+  const yearsSinceJ2000 = o.currentYear - 2000.5;
+
+  // Planet configuration for invariable plane calculations
+  // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
+  // Precession uses <planet>PerihelionEclipticYears constants
+  const planets = [
+    { key: 'mercury', obj: mercury, incl: mercuryInclination, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionEclipticYears },
+    { key: 'venus',   obj: venus,   incl: venusInclination,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
+    { key: 'earth',   obj: null,    incl: null,               ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified, precessionYears: earthPerihelionEclipticYears },
+    { key: 'mars',    obj: mars,    incl: marsInclination,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
+    { key: 'jupiter', obj: jupiter, incl: jupiterInclination, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionEclipticYears },
+    { key: 'saturn',  obj: saturn,  incl: saturnInclination,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionEclipticYears },
+    { key: 'uranus',  obj: uranus,  incl: uranusInclination,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionEclipticYears },
+    { key: 'neptune', obj: neptune, incl: neptuneInclination, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionEclipticYears },
+    { key: 'pluto',   obj: pluto,   incl: plutoInclination,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionEclipticYears },
+    { key: 'halleys', obj: halleys, incl: halleysInclination, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionEclipticYears },
+    { key: 'eros',    obj: eros,    incl: erosInclination,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
+  ];
+
+  for (const { key, obj, incl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planets) {
+    let eclipticLongitude;
+    let distanceAU;
+    let inclToInvPlane;
+
+    // Calculate dynamic ascending node on invariable plane (precesses over time)
+    // Precession rate = 360° / precessionYears (degrees per year)
+    const precessionRate = 360 / precessionYears;
+    // Use proper modulo that handles large negative values correctly
+    const rawSS = ascNodeJ2000 + precessionRate * yearsSinceJ2000;
+    const rawVerified = ascNodeJ2000Verified + precessionRate * yearsSinceJ2000;
+    const ascNodeDynamicSS = ((rawSS % 360) + 360) % 360;
+    const ascNodeDynamicVerified = ((rawVerified % 360) + 360) % 360;
+
+    // Store the dynamic ascending nodes for reference
+    // Primary value uses J2000-verified ascending nodes (matches J2000 apparent inclinations)
+    o[key + 'AscendingNodeInvPlane'] = ascNodeDynamicVerified;
+    // Also store Souami & Souchay value for comparison (including Earth)
+    o[key + 'AscendingNodeInvPlaneSouamiSouchay'] = ascNodeDynamicSS;
+
+    if (key === 'earth') {
+      // Earth is special: we don't have o.earthTrueAnomaly etc.
+      // Instead, use sun.ra (Sun's ecliptic longitude from Earth's view) + 180° to get Earth's heliocentric longitude
+      // sun.ra is in radians
+      const sunLongDeg = sun.ra * 180 / Math.PI;
+      eclipticLongitude = (sunLongDeg + 180 + 360) % 360;
+      distanceAU = earthWobbleCenter.sunDistAU || 1.0;
+      inclToInvPlane = o.inclinationEarth || 1.578;  // Use dynamic value, fallback to mean
+
+    } else {
+      // Get planet's true anomaly (already calculated in updatePlanetAnomalies)
+      const trueAnomaly = o[key + 'TrueAnomaly'] || 0;
+
+      // Get argument of periapsis (already calculated in updateOrbitOrientations)
+      const argPeriapsisEcliptic = o[key + 'ArgumentOfPeriapsis'] || 0;
+
+      // Get ascending node on ecliptic (dynamic value)
+      const ascNodeEcliptic = o[key + 'AscendingNode'] || 0;
+
+      // Get inclination to invariable plane (constant for non-Earth planets)
+      inclToInvPlane = incl;
+
+      // Get distance from Sun (in AU)
+      if (obj && obj.sunDistAU !== undefined) {
+        distanceAU = obj.sunDistAU;
+      } else {
+        distanceAU = 1.0; // Fallback
+      }
+
+      // Calculate the planet's ecliptic longitude
+      // Ecliptic longitude = Ascending node (ecliptic) + Argument of periapsis + True anomaly
+      eclipticLongitude = (ascNodeEcliptic + argPeriapsisEcliptic + trueAnomaly) % 360;
+    }
+
+    // Calculate angle from the ascending node on the invariable plane
+    // This is the ecliptic longitude minus the dynamic ascending node on invariable plane
+    // Using J2000-verified ascending node (primary value)
+    let angleFromInvAscNode = (eclipticLongitude - ascNodeDynamicVerified + 360) % 360;
+
+    // Convert to radians for sine calculation
+    const angleRad = angleFromInvAscNode * DEG2RAD;
+    const inclRad = inclToInvPlane * DEG2RAD;
+
+    // Calculate height above invariable plane
+    // Height = sin(inclination) * sin(angle from ascending node) * distance
+    const height = Math.sin(inclRad) * Math.sin(angleRad) * distanceAU;
+
+    // Store results in o object
+    o[key + 'HeightAboveInvPlane'] = height;
+    o[key + 'AboveInvPlane'] = height > 0;
+
+  }
+}
+
+/**
+ * Calculate dynamic apparent inclinations for all planets.
+ *
+ * The apparent inclination of a planet relative to Earth's orbital plane (ecliptic)
+ * changes over time because the ecliptic itself tilts relative to the invariable plane.
+ *
+ * Algorithm:
+ * 1. Calculate ecliptic normal vector from Earth's inclination and ascending node on invariable plane
+ * 2. For each planet, calculate its orbital plane normal from its inclination and ascending node
+ * 3. The angle between the two normals is the apparent inclination
+ *
+ * Uses existing constants (<planet>Inclination) for fixed inclination to invariable plane,
+ * and dynamic values (o.<planet>AscendingNodeInvPlane) for precessing ascending nodes.
+ *
+ * Output:
+ * - o.<planet>ApparentInclination: using J2000-verified ascending nodes (matches J2000 exactly)
+ * - o.<planet>ApparentInclinationSouamiSouchay: using original Souami & Souchay (2012) ascending nodes
+ */
+function updateDynamicInclinations() {
+  const DEG2RAD = Math.PI / 180;
+  const RAD2DEG = 180 / Math.PI;
+
+  // Get Earth's current orbital plane normals (ecliptic normals)
+  // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
+  // Normal vector formula: n = (sin(i)*sin(Ω), sin(i)*cos(Ω), cos(i))
+  const earthI = o.inclinationEarth * DEG2RAD;
+
+  // Ecliptic normal using S&S Earth ascending node (for ApparentInclinationSouamiSouchay)
+  const earthOmegaSS = o.earthAscendingNodeInvPlaneSouamiSouchay * DEG2RAD;
+  _eclipticNormalSS.set(
+    Math.sin(earthI) * Math.sin(earthOmegaSS),
+    Math.sin(earthI) * Math.cos(earthOmegaSS),
+    Math.cos(earthI)
+  );
+
+  // Ecliptic normal using Verified Earth ascending node (for ApparentInclination)
+  const earthOmegaVerified = o.earthAscendingNodeInvPlane * DEG2RAD;
+  _eclipticNormalVerified.set(
+    Math.sin(earthI) * Math.sin(earthOmegaVerified),
+    Math.sin(earthI) * Math.cos(earthOmegaVerified),
+    Math.cos(earthI)
+  );
+
+  // Planet configuration
+  // incl = Souami & Souchay (2012) inclinations to invariable plane (used for both calculations)
+  // ascNodeSS = Souami & Souchay (2012) ascending nodes (dynamic, precessing)
+  // ascNodeVerified = J2000-verified ascending nodes (dynamic, precessing) - now the primary value
+  const planets = [
+    { key: 'mercury', incl: mercuryInclination, ascNodeSS: o.mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.mercuryAscendingNodeInvPlane },
+    { key: 'venus',   incl: venusInclination,   ascNodeSS: o.venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeVerified: o.venusAscendingNodeInvPlane },
+    { key: 'mars',    incl: marsInclination,    ascNodeSS: o.marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.marsAscendingNodeInvPlane },
+    { key: 'jupiter', incl: jupiterInclination, ascNodeSS: o.jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.jupiterAscendingNodeInvPlane },
+    { key: 'saturn',  incl: saturnInclination,  ascNodeSS: o.saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.saturnAscendingNodeInvPlane },
+    { key: 'uranus',  incl: uranusInclination,  ascNodeSS: o.uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeVerified: o.uranusAscendingNodeInvPlane },
+    { key: 'neptune', incl: neptuneInclination, ascNodeSS: o.neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.neptuneAscendingNodeInvPlane },
+    { key: 'pluto',   incl: plutoInclination,   ascNodeSS: o.plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeVerified: o.plutoAscendingNodeInvPlane },
+    { key: 'halleys', incl: halleysInclination, ascNodeSS: o.halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.halleysAscendingNodeInvPlane },
+    { key: 'eros',    incl: erosInclination,    ascNodeSS: o.erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.erosAscendingNodeInvPlane }
+  ];
+
+  for (const { key, incl, ascNodeSS, ascNodeVerified } of planets) {
+    const pI = incl * DEG2RAD;
+
+    // Calculate using Souami & Souchay ascending node AND S&S ecliptic normal
+    const pOmegaSS = ascNodeSS * DEG2RAD;
+    _planetNormal.set(
+      Math.sin(pI) * Math.sin(pOmegaSS),
+      Math.sin(pI) * Math.cos(pOmegaSS),
+      Math.cos(pI)
+    );
+    const cosAngleSS = _planetNormal.dot(_eclipticNormalSS);
+    const apparentInclSS = Math.acos(Math.max(-1, Math.min(1, cosAngleSS))) * RAD2DEG;
+    o[key + 'ApparentInclinationSouamiSouchay'] = apparentInclSS;
+
+    // Calculate using J2000-verified ascending node AND Verified ecliptic normal
+    const pOmegaVerified = ascNodeVerified * DEG2RAD;
+    _planetNormal.set(
+      Math.sin(pI) * Math.sin(pOmegaVerified),
+      Math.sin(pI) * Math.cos(pOmegaVerified),
+      Math.cos(pI)
+    );
+    const cosAngleVerified = _planetNormal.dot(_eclipticNormalVerified);
+    const apparentInclVerified = Math.acos(Math.max(-1, Math.min(1, cosAngleVerified))) * RAD2DEG;
+    o[key + 'ApparentInclination'] = apparentInclVerified;
+  }
+}
 
 /**
  * Derive orbital inclination i, ascending node Ω, descending node Ωd,
@@ -6500,8 +13645,17 @@ function updatePerihelion() {
  *            descending:number, argument:number}}
  */
 function orbitalAnglesFromTilts(pd, peri) {
-  const ax = pd.orbitTilta;   // degrees
-  const az = pd.orbitTiltb;   // degrees
+  // Use dynamic container rotation if available (updated by updateOrbitalPlaneRotations),
+  // otherwise fall back to static values
+  let ax, az;
+  if (pd.containerObj) {
+    // Convert from radians back to degrees (container rotation is in radians)
+    ax = pd.containerObj.rotation.x * 180 / Math.PI;
+    az = pd.containerObj.rotation.z * 180 / Math.PI;
+  } else {
+    ax = pd.orbitTilta;   // degrees (static fallback)
+    az = pd.orbitTiltb;   // degrees
+  }
 
   /* ---- 1  inclination --------------------------------------------- */
   const i = Math.hypot(ax, az);       // √(ax² + az²)
@@ -6526,16 +13680,17 @@ function orbitalAnglesFromTilts(pd, peri) {
 
 function updateOrbitOrientations() {
   const planets = [
-    ["mercury",  mercuryPerihelionFromSun,  o.mercuryPerihelion],
-    ["venus",    venusPerihelionFromSun,    o.venusPerihelion],
-    ["mars",     marsPerihelionFromSun,     o.marsPerihelion],
-    ["jupiter",  jupiterPerihelionFromSun,  o.jupiterPerihelion],
-    ["saturn",   saturnPerihelionFromSun,   o.saturnPerihelion],
-    ["uranus",   uranusPerihelionFromSun,   o.uranusPerihelion],
-    ["neptune",  neptunePerihelionFromSun,  o.neptunePerihelion],
-    ["pluto",    plutoPerihelionFromSun,    o.plutoPerihelion],
-    ["halleys",  halleysPerihelionFromSun,  o.halleysPerihelion],
-    ["eros",     erosPerihelionFromSun,     o.erosPerihelion]
+    ["mercury",  mercuryRealPerihelionAtSun,  o.mercuryPerihelion],
+    ["venus",    venusRealPerihelionAtSun,    o.venusPerihelion],
+//    ["mercury2",    mercuryRealPerihelionAtSun,    o.mercuryPerihelion2],    
+    ["mars",     marsRealPerihelionAtSun,     o.marsPerihelion],
+    ["jupiter",  jupiterRealPerihelionAtSun,  o.jupiterPerihelion],
+    ["saturn",   saturnRealPerihelionAtSun,   o.saturnPerihelion],
+    ["uranus",   uranusRealPerihelionAtSun,   o.uranusPerihelion],
+    ["neptune",  neptuneRealPerihelionAtSun,  o.neptunePerihelion],
+    ["pluto",    plutoRealPerihelionAtSun,    o.plutoPerihelion],
+    ["halleys",  halleysRealPerihelionAtSun,  o.halleysPerihelion],
+    ["eros",     erosRealPerihelionAtSun,     o.erosPerihelion]
   ];
 
   for (const [name, pd, peri] of planets) {
@@ -6648,15 +13803,17 @@ function goldenspiralPerihelionObjects(...args) {
   /* ---------- 3. updater -------------------------------------------- */
   const world = new THREE.Vector3();
   const ndc   = new THREE.Vector3();
-  const visiblePts = [];                    // reused every frame
+  // Pre-allocate Vector3 array (one per perihelion point) - avoids clone() allocations
+  const visiblePts = [];
+  for (let i = 0; i < pds.length; i++) {
+    visiblePts.push(new THREE.Vector3());
+  }
 
   function updateGoldenSpiralLine() {
 
-    /* 3-a. gather **all** perihelion helpers ----------------------- */
-     visiblePts.length = 0;
-     for (const pd of pds) {
-       pd.pivotObj.getWorldPosition(world);
-       visiblePts.push(world.clone());
+    /* 3-a. gather **all** perihelion helpers into pre-allocated vectors */
+     for (let i = 0; i < pds.length; i++) {
+       pds[i].pivotObj.getWorldPosition(visiblePts[i]);
      }
 
     /* 3-b. build Catmull-Rom curve & sample points ------------------ */
@@ -6794,26 +13951,22 @@ function solarLongitudeDegLong(JD) {
 
 //Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
 function getElongationFromSun(targetPlanet) {
-  let sunPosition = new THREE.Vector3();
-  let earthPosition = new THREE.Vector3();
-  let targetPlanetPosition = new THREE.Vector3();
+  sun.planetObj.getWorldPosition(_elSunPos);
+  earth.planetObj.getWorldPosition(_elEarthPos);
+  targetPlanet.planetObj.getWorldPosition(_elTargetPos);
 
-  sun.planetObj.getWorldPosition(sunPosition);
-  earth.planetObj.getWorldPosition(earthPosition);
-  targetPlanet.planetObj.getWorldPosition(targetPlanetPosition);
+  const earthSunDistance = _elEarthPos.distanceTo(_elSunPos);
+  const earthTargetPlanetDistance = _elEarthPos.distanceTo(_elTargetPos);
+  const sunTargetPlanetDistance = _elSunPos.distanceTo(_elTargetPos);
 
-  let earthSunDistance = earthPosition.distanceTo(sunPosition);
-  let earthTargetPlanetDistance = earthPosition.distanceTo(targetPlanetPosition);
-  let sunTargetPlanetDistance = sunPosition.distanceTo(targetPlanetPosition);
-
-  let numerator =
+  const numerator =
     Math.pow(earthSunDistance, 2) +
     Math.pow(earthTargetPlanetDistance, 2) -
     Math.pow(sunTargetPlanetDistance, 2);
 
-  let denominator = 2.0 * earthSunDistance * earthTargetPlanetDistance;
+  const denominator = 2.0 * earthSunDistance * earthTargetPlanetDistance;
 
-  let elongationRadians = Math.acos(numerator / denominator);
+  const elongationRadians = Math.acos(numerator / denominator);
   return (180.0 * elongationRadians) / Math.PI;
 }
 

@@ -2,6 +2,7 @@
 ?family=Inter:wght@400;500;600\
 &family=IBM+Plex+Sans:wght@300;400;500;600;700\
 &family=IBM+Plex+Mono:wght@300;400;500;600;700\
+&family=Exo+2:wght@200;300;400;500\
 &display=swap");
 
 /* ───────────────────────────────────────────────
@@ -366,3 +367,454 @@ a:link {
 
 /* rare utility if you need it */
 .smallcaps{ font-variant:small-caps; }
+
+/* ===== Title Badge (Bottom Middle) ===== */
+.title-badge {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-family: 'Exo 2', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  pointer-events: auto;
+  cursor: default;
+  animation: titleBreathe 4s ease-in-out infinite;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.title-badge:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.title-badge .version {
+  opacity: 0.6;
+  font-weight: 300;
+  margin-left: 0.4em;
+}
+
+@keyframes titleBreathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* ===== Planet Hierarchy Inspector Panel ===== */
+#hierarchyInspector {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 10000;
+  width: min(420px, 90vw);
+  display: none;
+  flex-direction: column;
+  background: rgba(20, 24, 30, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  font-family: var(--pl-body-font);
+  font-size: 13px;
+  color: #e8e8e8;
+  overflow: hidden;
+}
+
+#hierarchyInspector.visible {
+  display: flex;
+}
+
+/* Header */
+.hi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hi-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.hi-close {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hi-close:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+.hi-close::before,
+.hi-close::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 16px;
+  background: #fff;
+  border-radius: 1px;
+}
+
+.hi-close::before { transform: rotate(45deg); }
+.hi-close::after { transform: rotate(-45deg); }
+
+/* Planet selector row */
+.hi-selector {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hi-selector label {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hi-selector select {
+  flex: 1;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.hi-selector select:focus {
+  border-color: rgba(100, 150, 255, 0.5);
+}
+
+.hi-selector select option {
+  background: #1a1e24;
+  color: #fff;
+  padding: 8px;
+}
+
+/* Step indicator */
+.hi-step-indicator {
+  padding: 10px 18px;
+  background: rgba(100, 150, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* Body - scrollable content */
+.hi-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 18px;
+  min-height: 0;
+}
+
+.hi-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hi-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+/* Section headings */
+.hi-section {
+  margin-bottom: 16px;
+}
+
+.hi-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Property grid */
+.hi-props {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 4px 12px;
+  font-size: 12px;
+}
+
+.hi-props .hi-key {
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.hi-props .hi-val {
+  font-family: var(--pl-mono-font);
+  color: #fff;
+  word-break: break-word;
+}
+
+.hi-props .hi-val.hi-warn {
+  color: #ffc107;
+}
+
+.hi-props .hi-val.hi-error {
+  color: #ff5252;
+}
+
+/* Validation items */
+.hi-validation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.hi-validation-item.valid {
+  color: #4caf50;
+}
+
+.hi-validation-item.warning {
+  color: #ffc107;
+}
+
+.hi-validation-item.error {
+  color: #ff5252;
+}
+
+.hi-validation-item.info {
+  color: #64b5f6;
+}
+
+.hi-validation-item.reference {
+  color: #888888;
+}
+
+.hi-validation-icon {
+  font-size: 14px;
+}
+
+/* Hierarchy tree */
+.hi-tree {
+  font-family: var(--pl-mono-font);
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: pre;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.hi-tree .hi-current {
+  color: #64b5f6;
+  font-weight: 600;
+}
+
+/* Footer - navigation */
+.hi-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 10px;
+}
+
+.hi-nav-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.hi-nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.hi-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hi-highlight-btn {
+  flex: 1;
+  background: rgba(100, 150, 255, 0.2);
+  border-color: rgba(100, 150, 255, 0.3);
+}
+
+.hi-highlight-btn:hover:not(:disabled) {
+  background: rgba(100, 150, 255, 0.3);
+}
+
+.hi-highlight-btn.active {
+  background: rgba(100, 150, 255, 0.4);
+  border-color: rgba(100, 150, 255, 0.5);
+}
+
+/* Visual helpers checkboxes */
+.hi-helpers {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.hi-helpers-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.hi-helper-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hi-helper-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+/* ===== Step 5 Position Report Styles ===== */
+.hi-report-section {
+  margin-bottom: 16px;
+}
+
+.hi-report-content {
+  position: relative;
+}
+
+.hi-report-loading {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.hi-report {
+  font-family: var(--pl-mono-font);
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  border-radius: 6px;
+  color: #e8e8e8;
+  user-select: text;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hi-report::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.hi-report::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.hi-report::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.hi-report-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hi-report-btn {
+  flex: 1;
+  padding: 8px 16px;
+  background: rgba(100, 181, 246, 0.2);
+  border: 1px solid rgba(100, 181, 246, 0.4);
+  border-radius: 6px;
+  color: #64b5f6;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.hi-report-btn:hover {
+  background: rgba(100, 181, 246, 0.35);
+  border-color: rgba(100, 181, 246, 0.6);
+}
+
+.hi-report-btn:active {
+  transform: scale(0.98);
+}
+
+.hi-report-btn.download {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(76, 175, 80, 0.4);
+  color: #4caf50;
+}
+
+.hi-report-btn.download:hover {
+  background: rgba(76, 175, 80, 0.35);
+  border-color: rgba(76, 175, 80, 0.6);
+}
+
+.hi-report-btn.copy {
+  background: rgba(100, 181, 246, 0.2);
+  border-color: rgba(100, 181, 246, 0.4);
+  color: #64b5f6;
+}
+
+.hi-report-btn.copy:hover {
+  background: rgba(100, 181, 246, 0.35);
+  border-color: rgba(100, 181, 246, 0.6);
+}
