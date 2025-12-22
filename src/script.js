@@ -58,6 +58,9 @@ const startAngleModel = 89.91949879;                      // The startdate of th
 const earthPerihelionEclipticYears = holisticyearLength/3;// Duration of Earth's orbital plane precession ~99,392 years against ICRF
 const inclinationPathZodiacOffsetDeg = 7;                 // Visual calibration offset for inclination path alignment with zodiac. Shifts the path 7° counterclockwise so lowest inclination appears in early Libra
 
+// Debg button on flag (set to true when needed)
+const debugOn = false;
+
 // Reference lengths used as INPUT for the Sun
 const sunTilt = 7.155;
 const milkywayDistance = 27500;
@@ -78,7 +81,7 @@ const moonStartposNodal = 64;                // Aligned to major lunar standstil
 const moonStartposMoon = 132.105;            // Needs to be at ~21h09m57s if start model is 2451716.5
 
 // Reference lengths used as INPUT for Mercury
-const mercurySolarYearInput = 87.96845;
+const mercurySolarYearInput = 87.96877;
 const mercuryOrbitalInclination =  7.00501638;
 const mercuryOrbitalEccentricity = 0.20562928;
 const mercuryInclination = 6.3472858;
@@ -88,11 +91,11 @@ const mercuryAscendingNode = 48.33033155;
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
 const mercuryAngleCorrection = 0.984431;     // To align the perihelion exactly. According to formula ~77.4569131
-const mercuryPerihelionEclipticYears = 243460; // Duration of perihelion precession to explain ~570 arcseconds per century
+const mercuryPerihelionEclipticYears = 243455.906064; // Duration of perihelion precession to explain ~570 arcseconds per century
 const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
-const venusSolarYearInput = 224.6957;
+const venusSolarYearInput = 224.6958;
 const venusOrbitalInclination = 3.3946018;
 const venusOrbitalEccentricity = 0.00674819;
 const venusInclination = 2.1545441;
@@ -106,7 +109,7 @@ const venusPerihelionEclipticYears = holisticyearLength*20000000; // Duration of
 const venusStartpos = 249.68;                // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
-const marsSolarYearInput = 686.937;
+const marsSolarYearInput = 686.942;
 const marsOrbitalInclination = 1.84971028;
 const marsOrbitalEccentricity = 0.09344726;
 const marsInclination = 1.6311858;
@@ -134,7 +137,7 @@ const jupiterPerihelionEclipticYears = holisticyearLength; // Duration of perihe
 const jupiterStartpos = 13.79;               // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
-const saturnSolarYearInput = 10745.6;
+const saturnSolarYearInput = 10744.6;
 const saturnOrbitalInclination = 2.4853834;
 const saturnOrbitalEccentricity = 0.0564781;
 const saturnInclination = 0.9254704;
@@ -2664,10 +2667,17 @@ let o = {
     controls.reset();
   },
 
-  'Today': function () {
-    const newPos = sDay * dateToDays(
-      new Intl.DateTimeFormat("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit" }).format(Date.now())
-    );
+  'Now (time in UTC)': function () {
+    const now = new Date();
+    // Get UTC date string (YYYY-MM-DD)
+    const dateStr = now.toISOString().slice(0, 10);
+    // Get UTC time string (HH:MM:SS)
+    const hh = String(now.getUTCHours()).padStart(2, '0');
+    const mm = String(now.getUTCMinutes()).padStart(2, '0');
+    const ss = String(now.getUTCSeconds()).padStart(2, '0');
+    const timeStr = `${hh}:${mm}:${ss}`;
+    // Calculate position: days + time offset
+    const newPos = sDay * dateToDays(dateStr) + timeToPos(timeStr);
     this.pos = newPos;
     controls.reset();
   },
@@ -3349,7 +3359,7 @@ zTexture.minFilter = THREE.LinearMipMapLinearFilter;
 zTexture.magFilter = THREE.LinearFilter;
 zTexture.needsUpdate = true;
 
-const zLabelGeometry = new THREE.RingGeometry(235, 250, 128);
+const zLabelGeometry = new THREE.RingGeometry(235, 250, 64);
 const zLabelMaterial = new THREE.MeshBasicMaterial({
     map: zTexture,
     side: THREE.DoubleSide,
@@ -3368,8 +3378,8 @@ zodiac.position.y = 0;
 zodiac.position.z = -(eccentricityAmplitude*Math.PI*2)/(holisticyearLength/13)*(startmodelyearwithCorrection-(perihelionalignmentYear-(1.5*(holisticyearLength/16))+(Math.round((startmodelyearwithCorrection-perihelionalignmentYear+((1.5*(holisticyearLength/16))))/(holisticyearLength/156)))*(holisticyearLength/156)))*100; //To align to start Aquarius
 zodiac.visible = false;
 
-// Add Glow effect of zodiac
-const glowGeometry = new THREE.RingGeometry(255, 265, 128);
+// Add Glow effect of zodiac (64 segments is sufficient for a smooth glow ring)
+const glowGeometry = new THREE.RingGeometry(255, 265, 64);
 const glowMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffaa,
     side: THREE.DoubleSide,
@@ -4053,7 +4063,9 @@ const _sunWS      = new THREE.Vector3();          // Sun (world space)
 const _planetWS   = new THREE.Vector3();          // Planet (world space)
 const _cornersLS  = [...Array(8)].map(() => new THREE.Vector3());
 const _wsBox      = new THREE.Box3();
+const _lsBox      = new THREE.Box3();             // Light-space AABB (reusable)
 const _invMat     = new THREE.Matrix4();
+const _camDir     = new THREE.Vector3();          // Camera direction (reusable in render loop)
 
 const EARTH_POS    = new THREE.Vector3();   // Earth centre (world)
 const SUN_POS      = new THREE.Vector3();   // Sun   centre (world)
@@ -6816,7 +6828,7 @@ function createInspectorPanel() {
   panel.id = 'hierarchyInspector';
   panel.innerHTML = `
     <div class="hi-header">
-      <h2>Planet Hierarchy Inspector</h2>
+      <h2>Planet Inspector</h2>
       <div class="hi-close" title="Close"></div>
     </div>
     <div class="hi-selector">
@@ -6853,6 +6865,10 @@ function createInspectorPanel() {
           <div class="hi-report-buttons">
             <button class="hi-report-btn download">Download Excel</button>
             <button class="hi-report-btn copy">Copy Report</button>
+            <label class="hi-report-checkbox-label">
+              <input type="checkbox" class="hi-report-show-all">
+              <span>Show all results</span>
+            </label>
           </div>
         </div>
       </div>
@@ -6983,6 +6999,29 @@ function createInspectorPanel() {
     }
   });
 
+  // Show all results checkbox (Step 5)
+  panel.querySelector('.hi-report-show-all').addEventListener('change', async (e) => {
+    const showAll = e.target.checked;
+    hierarchyInspector.showAllResults = showAll;
+
+    // Regenerate report with new setting
+    if (_currentReportData && _currentReportData.planetKey) {
+      const reportElement = panel.querySelector('.hi-report');
+      const loadingElement = panel.querySelector('.hi-report-loading');
+
+      loadingElement.style.display = 'block';
+      reportElement.style.display = 'none';
+
+      const result = await generatePlanetReport(_currentReportData.planetKey, showAll);
+
+      _currentReportData.screenReport = result.screenReport;
+      reportElement.innerHTML = result.screenReport;
+
+      loadingElement.style.display = 'none';
+      reportElement.style.display = 'block';
+    }
+  });
+
   // Keyboard navigation
   const keyHandler = (e) => {
     if (!panel.classList.contains('visible')) return;
@@ -7100,6 +7139,13 @@ const _liveDataNewAscPos = new THREE.Vector3(); // Reusable for ascending node p
 const _liveDataNewDescPos = new THREE.Vector3(); // Reusable for descending node position
 const _liveDataNewHighPos = new THREE.Vector3(); // Reusable for highest point position
 const _liveDataNewLowPos = new THREE.Vector3(); // Reusable for lowest point position
+const _liveDataEuler = new THREE.Euler(); // Reusable Euler for rotation calculations
+const _liveDataDebugLocal = new THREE.Vector3(); // Reusable for debug local position
+const _liveDataDebugWorld = new THREE.Vector3(); // Reusable for debug world position
+const _liveDataDebugMarker = new THREE.Vector3(); // Reusable for debug marker world position
+// Pre-allocated arrays for half-disc geometry (64 points + 1 wrap + 1 center = 66 vertices * 3 = 198 floats)
+const _halfDiscVertices = new Float32Array(198);
+const _halfDiscIndices = []; // Indices array reused between calls
 // Reusable vectors for hierarchy inspector validation and display
 const _hiObjWorldPos = new THREE.Vector3();
 const _hiSunWorldPos = new THREE.Vector3();
@@ -7111,6 +7157,12 @@ const _hiWorldPos = new THREE.Vector3();
 const _hiSunPos = new THREE.Vector3();
 const _hiPerihelionPos = new THREE.Vector3();
 const _hiEarthPos = new THREE.Vector3();
+const _hiPPos = new THREE.Vector3(); // P = orbit center position
+const _hiPlanetPos = new THREE.Vector3(); // Current planet position
+// Reusable vectors for updatePlanetAnomalies
+const _anomalySunPos = new THREE.Vector3();
+const _anomalyPPos = new THREE.Vector3();
+const _anomalyPlanetPos = new THREE.Vector3();
 const _hiPurpleWorldPos = new THREE.Vector3();
 const _hiGreenWorldPos = new THREE.Vector3();
 const _hiTempPos = new THREE.Vector3();
@@ -7783,23 +7835,17 @@ function updateHierarchyLiveData() {
 
     // We need: Sun position, P position (orbit center), Planet position, Perihelion position
     if (fixedPerihelionObj && childPlanet && sun && sun.pivotObj) {
-      // Reuse _liveDataVec3a-e for these calculations
-      const sunPos = new THREE.Vector3();
-      const pPos = new THREE.Vector3();
-      const planetPos = new THREE.Vector3();
-      const perihelionPos = new THREE.Vector3();
-
-      // Get world positions
-      sun.pivotObj.getWorldPosition(sunPos);
-      fixedPerihelionObj.pivotObj.getWorldPosition(pPos);  // P = orbit center
+      // Get world positions (using pooled vectors for performance)
+      sun.pivotObj.getWorldPosition(_hiSunPos);
+      fixedPerihelionObj.pivotObj.getWorldPosition(_hiPPos);  // P = orbit center
       if (childPlanet.planetObj) {
-        childPlanet.planetObj.getWorldPosition(planetPos);
+        childPlanet.planetObj.getWorldPosition(_hiPlanetPos);
       } else if (childPlanet.pivotObj) {
-        childPlanet.pivotObj.getWorldPosition(planetPos);
+        childPlanet.pivotObj.getWorldPosition(_hiPlanetPos);
       }
       // Perihelion point (the marker on the orbit)
       if (fixedPerihelionObj.planetObj) {
-        fixedPerihelionObj.planetObj.getWorldPosition(perihelionPos);
+        fixedPerihelionObj.planetObj.getWorldPosition(_hiPerihelionPos);
       }
 
       // Calculate direction vectors (in XZ plane - ecliptic)
@@ -7813,8 +7859,8 @@ function updateHierarchyLiveData() {
       // So perihelion direction from both P and Sun is: P → Sun direction
 
       // Perihelion direction (from P toward Sun and perihelion)
-      const periDirX = sunPos.x - pPos.x;
-      const periDirZ = sunPos.z - pPos.z;
+      const periDirX = _hiSunPos.x - _hiPPos.x;
+      const periDirZ = _hiSunPos.z - _hiPPos.z;
 
       // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
       const periDirFromSunX = periDirX;
@@ -7823,12 +7869,12 @@ function updateHierarchyLiveData() {
       const periDirFromPZ = periDirZ;
 
       // Planet direction from Sun (for True Anomaly)
-      const planetDirFromSunX = planetPos.x - sunPos.x;
-      const planetDirFromSunZ = planetPos.z - sunPos.z;
+      const planetDirFromSunX = _hiPlanetPos.x - _hiSunPos.x;
+      const planetDirFromSunZ = _hiPlanetPos.z - _hiSunPos.z;
 
       // Planet direction from P (for Mean Anomaly)
-      const planetDirFromPX = planetPos.x - pPos.x;
-      const planetDirFromPZ = planetPos.z - pPos.z;
+      const planetDirFromPX = _hiPlanetPos.x - _hiPPos.x;
+      const planetDirFromPZ = _hiPlanetPos.z - _hiPPos.z;
 
       // Calculate angles using atan2 (counter-clockwise from +X axis)
       // Note: Three.js uses right-handed coords, +Z toward viewer
@@ -7852,15 +7898,15 @@ function updateHierarchyLiveData() {
       // Update the new visualization lines (P→Planet and Sun→Planet)
       if (hierarchyInspector.pToPlanetLine) {
         const positions = hierarchyInspector.pToPlanetLine.geometry.attributes.position.array;
-        positions[0] = pPos.x; positions[1] = pPos.y; positions[2] = pPos.z;
-        positions[3] = planetPos.x; positions[4] = planetPos.y; positions[5] = planetPos.z;
+        positions[0] = _hiPPos.x; positions[1] = _hiPPos.y; positions[2] = _hiPPos.z;
+        positions[3] = _hiPlanetPos.x; positions[4] = _hiPlanetPos.y; positions[5] = _hiPlanetPos.z;
         hierarchyInspector.pToPlanetLine.geometry.attributes.position.needsUpdate = true;
       }
 
       if (hierarchyInspector.sunToPlanetLine) {
         const positions = hierarchyInspector.sunToPlanetLine.geometry.attributes.position.array;
-        positions[0] = sunPos.x; positions[1] = sunPos.y; positions[2] = sunPos.z;
-        positions[3] = planetPos.x; positions[4] = planetPos.y; positions[5] = planetPos.z;
+        positions[0] = _hiSunPos.x; positions[1] = _hiSunPos.y; positions[2] = _hiSunPos.z;
+        positions[3] = _hiPlanetPos.x; positions[4] = _hiPlanetPos.y; positions[5] = _hiPlanetPos.z;
         hierarchyInspector.sunToPlanetLine.geometry.attributes.position.needsUpdate = true;
       }
 
@@ -7873,9 +7919,9 @@ function updateHierarchyLiveData() {
         for (let i = 0; i <= arcSegments; i++) {
           const t = i / arcSegments;
           const angle = periAngleP + t * meanAnomalyRad;
-          positions[i * 3] = pPos.x + arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = pPos.y;
-          positions[i * 3 + 2] = pPos.z - arcRadius * Math.sin(angle);
+          positions[i * 3] = _hiPPos.x + arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = _hiPPos.y;
+          positions[i * 3 + 2] = _hiPPos.z - arcRadius * Math.sin(angle);
         }
         hierarchyInspector.meanAnomalyArcAtP.geometry.attributes.position.needsUpdate = true;
         hierarchyInspector.meanAnomalyArcAtP.computeLineDistances();
@@ -7890,9 +7936,9 @@ function updateHierarchyLiveData() {
         for (let i = 0; i <= arcSegments; i++) {
           const t = i / arcSegments;
           const angle = periAngleSun + t * trueAnomalyRad;
-          positions[i * 3] = sunPos.x + arcRadius * Math.cos(angle);
-          positions[i * 3 + 1] = sunPos.y;
-          positions[i * 3 + 2] = sunPos.z - arcRadius * Math.sin(angle);
+          positions[i * 3] = _hiSunPos.x + arcRadius * Math.cos(angle);
+          positions[i * 3 + 1] = _hiSunPos.y;
+          positions[i * 3 + 2] = _hiSunPos.z - arcRadius * Math.sin(angle);
         }
         hierarchyInspector.trueAnomalyArcAtSun.geometry.attributes.position.needsUpdate = true;
       }
@@ -8011,8 +8057,9 @@ function updateHierarchyLiveData() {
         _lastAscNodeTiltA = tiltaRad;
         _lastAscNodeTiltB = tiltbRad;
 
-        // Build the local-to-world transformation matrix (reuse pooled matrix)
-        _liveDataLocalToWorld.makeRotationFromEuler(new THREE.Euler(tiltaRad, 0, tiltbRad, 'XYZ'));
+        // Build the local-to-world transformation matrix (reuse pooled matrix and euler)
+        _liveDataEuler.set(tiltaRad, 0, tiltbRad, 'XYZ');
+        _liveDataLocalToWorld.makeRotationFromEuler(_liveDataEuler);
 
         // Get the scale used for the inclination plane
         const scale = hierarchyInspector._perihelionArrowScale || 100;
@@ -8089,31 +8136,34 @@ function updateHierarchyLiveData() {
             if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 500) {
               const testX = planeRadius * -Math.sin(ascNodeAngleRad);
               const testZ = planeRadius * -Math.cos(ascNodeAngleRad);
-              const testLocal = new THREE.Vector3(testX, 0, testZ);
-              const testWorld = testLocal.clone().applyMatrix4(_liveDataLocalToWorld);
+              _liveDataDebugLocal.set(testX, 0, testZ);
+              _liveDataDebugWorld.copy(_liveDataDebugLocal).applyMatrix4(_liveDataLocalToWorld);
               // Also get actual marker world position
-              const markerWorld = new THREE.Vector3();
               if (hierarchyInspector.ascendingNode) {
-                hierarchyInspector.ascendingNode.getWorldPosition(markerWorld);
+                hierarchyInspector.ascendingNode.getWorldPosition(_liveDataDebugMarker);
               }
-              console.log(`🟢🔴 Asc node: local(${testX.toFixed(1)}, 0, ${testZ.toFixed(1)}) → matrixY: ${testWorld.y.toFixed(4)}, actualWorldPos: (${markerWorld.x.toFixed(1)}, ${markerWorld.y.toFixed(4)}, ${markerWorld.z.toFixed(1)})`);
+              console.log(`🟢🔴 Asc node: local(${testX.toFixed(1)}, 0, ${testZ.toFixed(1)}) → matrixY: ${_liveDataDebugWorld.y.toFixed(4)}, actualWorldPos: (${_liveDataDebugMarker.x.toFixed(1)}, ${_liveDataDebugMarker.y.toFixed(4)}, ${_liveDataDebugMarker.z.toFixed(1)})`);
             }
           }
 
-          // Helper to rebuild half-disc geometry
+          // Helper to rebuild half-disc geometry (uses pooled arrays for performance)
           const rebuildHalfDiscGeometry = (mesh, isAbove) => {
-            const vertices = [0, 0, 0]; // Center point
-            const indices = [];
+            // Center point at index 0
+            _halfDiscVertices[0] = 0;
+            _halfDiscVertices[1] = 0;
+            _halfDiscVertices[2] = 0;
 
-            // Generate points and check world positions
+            // Generate points
             for (let i = 0; i <= numPoints; i++) {
               const angle = (i / numPoints) * Math.PI * 2;
-              const x = planeRadius * Math.cos(angle);
-              const z = planeRadius * Math.sin(angle);
-              vertices.push(x, 0, z);
+              const idx = (i + 1) * 3;
+              _halfDiscVertices[idx] = planeRadius * Math.cos(angle);
+              _halfDiscVertices[idx + 1] = 0;
+              _halfDiscVertices[idx + 2] = planeRadius * Math.sin(angle);
             }
 
-            // Create triangles based on world Y position
+            // Clear and rebuild indices based on world Y position
+            _halfDiscIndices.length = 0;
             for (let i = 1; i <= numPoints; i++) {
               const angle1 = ((i - 1) / numPoints) * Math.PI * 2;
               const angle2 = (i / numPoints) * Math.PI * 2;
@@ -8131,15 +8181,20 @@ function updateHierarchyLiveData() {
               const segmentIsAbove = midWorldY > 0;
 
               if (segmentIsAbove === isAbove) {
-                indices.push(0, i, i + 1);
+                _halfDiscIndices.push(0, i, i + 1);
               }
             }
 
-            // Update geometry
-            mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            mesh.geometry.setIndex(indices);
+            // Update geometry - reuse existing BufferAttribute if possible
+            const posAttr = mesh.geometry.attributes.position;
+            if (posAttr && posAttr.array.length === _halfDiscVertices.length) {
+              posAttr.array.set(_halfDiscVertices);
+              posAttr.needsUpdate = true;
+            } else {
+              mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(_halfDiscVertices.slice(), 3));
+            }
+            mesh.geometry.setIndex(_halfDiscIndices);
             mesh.geometry.computeVertexNormals();
-            mesh.geometry.attributes.position.needsUpdate = true;
             if (mesh.geometry.index) mesh.geometry.index.needsUpdate = true;
           };
 
@@ -8349,7 +8404,7 @@ function setupGUI() {
   ctrlFolder.add(o, 'Step forward' );
   ctrlFolder.add(o, 'Step backward' );
   ctrlFolder.add(o, 'Reset' );
-  ctrlFolder.add(o, 'Today' );
+  ctrlFolder.add(o, 'Now (time in UTC)' );
   
   let planetList = {}
   let isHelper = {}
@@ -8565,7 +8620,7 @@ function setupGUI() {
   let sFolder = gui.addFolder('Settings')
 
   // Hierarchy Inspector - first item in Settings
-  sFolder.add({ inspect: openHierarchyInspector }, 'inspect').name('Planet checks');
+  sFolder.add({ inspect: openHierarchyInspector }, 'inspect').name('Planet Inspector');
 
   sFolder.add(params, 'sizeBoost', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
   
@@ -8691,17 +8746,19 @@ function setupGUI() {
   folderCamera.add(o, 'worldCamDec').name('Dec').listen()
   folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
 
-  // Debug folder for ascending node debugging
-  let debugFolder = sFolder.addFolder('Debug');
-  debugFolder.add(o, 'debugAscendingNode').name('Log Ascending Nodes').onChange((val) => {
-    _debugAscendingNodeLogEnabled = val;
-    if (val) {
-      console.log('🔍 Ascending Node debugging ENABLED - check console for logs every second');
-      console.log('   Go to a date like 12000-07-16 to see drift behavior');
-    } else {
-      console.log('🔍 Ascending Node debugging DISABLED');
-    }
-  });
+  // Debug folder for ascending node debugging (only shown when debugOn flag is true)
+  if (debugOn) {
+    let debugFolder = sFolder.addFolder('Debug');
+    debugFolder.add(o, 'debugAscendingNode').name('Log Ascending Nodes').onChange((val) => {
+      _debugAscendingNodeLogEnabled = val;
+      if (val) {
+        console.log('🔍 Ascending Node debugging ENABLED - check console for logs every second');
+        console.log('   Go to a date like 12000-07-16 to see drift behavior');
+      } else {
+        console.log('🔍 Ascending Node debugging DISABLED');
+      }
+    });
+  }
 
   /* ---------------------------------------------------------
   * width-toggle badge (does NOT consume a controller slot)
@@ -8776,15 +8833,17 @@ function render(now) {
     const dist = camera.position.distanceTo(controls.target);
     if (dist < minDist) {
       // Push camera back to minimum distance
-      const dir = camera.position.clone().sub(controls.target).normalize();
-      camera.position.copy(controls.target).add(dir.multiplyScalar(minDist));
+      _camDir.copy(camera.position).sub(controls.target).normalize();
+      camera.position.copy(controls.target).add(_camDir.multiplyScalar(minDist));
     }
   }
 
   // 4) Throttle the human-readable GUI (20 Hz)
+  let uiUpdateThisFrame = false;
   uiElapsed += delta;
   if (uiElapsed >= 0.05) {
     uiElapsed -= 0.05;
+    uiUpdateThisFrame = true;
     o.Day           = posToDays(o.pos);
     o.Date          = daysToDate(o.Day);
     o.Time          = posToTime(o.pos);
@@ -8818,6 +8877,10 @@ function render(now) {
   updatePredictions();
   //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy. If you switch it on, also switch on the menu-items/ info-box-itms.
   updatePositions();
+  // Throttle display string updates (20 Hz) - must be after updatePositions() sets numeric values
+  if (uiUpdateThisFrame) {
+    updatePositionDisplayStrings();
+  }
   updateAscendingNodes(); // Must be before updateHierarchyLiveData() so dynamic values are current
   updatePlanetAnomalies(); // Must be after updateAscendingNodes(), calculates Mean/True Anomaly for all planets
   updatePlanetInvariablePlaneHeights(); // Must be after updatePlanetAnomalies(), calculates height above invariable plane
@@ -8924,7 +8987,7 @@ async function runSolsticeExport(years) {
   o.Run = false;
 
   /* B · rows */
-  const rows = [['Date', 'Time', 'JD', 'RA (°)', 'Obliquity (°)']];
+  const rows = [['Date', 'Time', 'Year', 'JD', 'RA (°)', 'Obliquity (°)']];
   const YIELD_EVERY = 25;
   let done = 0;
 
@@ -8935,6 +8998,7 @@ async function runSolsticeExport(years) {
     rows.push([
       o.Date,
       o.Time,
+      y,
       r.jd.toFixed(6),
       r.raDeg.toFixed(6),
       r.obliqDeg.toFixed(6)
@@ -9096,8 +9160,8 @@ async function runRATest() {
   }
 
   /* headers */
-  const earthRows  = [['JD', 'Date', 'Time', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
-  const periRows   = [['JD', 'Date', 'Time',
+  const earthRows  = [['JD', 'Date', 'Time', 'Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
+  const periRows   = [['JD', 'Date', 'Time', 'Year',
     'Mercury Perihelion', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Asc Node InvPlane', 'Mercury Apparent Incl',
     'Venus Perihelion', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Asc Node InvPlane', 'Venus Apparent Incl',
     'Earth Perihelion', 'Earth Asc Node InvPlane', 'Earth Incl to InvPlane',
@@ -9108,7 +9172,7 @@ async function runRATest() {
     'Neptune Perihelion', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Asc Node InvPlane', 'Neptune Apparent Incl'
   ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
-  const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
+  const planetRows = [['JD', 'Date', 'Time', 'Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
   //const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun','Pluto RA', 'Pluto Dec', 'Pluto Dist Earth', 'Pluto Dist Sun','Halleys RA', 'Halleys Dec', 'Halleys Dist Earth', 'Halleys Dist Sun', 'Eros RA', 'Eros Dec', 'Eros Dist Earth', 'Eros Dist Sun']]; 
 
   /* freeze viewer */
@@ -9225,11 +9289,12 @@ async function runRATest() {
     const erosDistE     = eros.distAU;
     const erosDistS     = eros.sunDistAU;
         
-        earthRows.push([jd, date, time, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
+        const year = Math.floor(o.currentYear);
+        earthRows.push([jd, date, time, year, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
     
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
-        periRows.push([jd, date, time,
+        periRows.push([jd, date, time, year,
           mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAscInv.toFixed(6), mercuryAppIncl.toFixed(6),
           venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAscInv.toFixed(6), venusAppIncl.toFixed(6),
           earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthIncl.toFixed(6),
@@ -9242,7 +9307,7 @@ async function runRATest() {
     
 //    planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6), plutoRA.toFixed(6), plutoDec.toFixed(6), plutoDistE.toFixed(6), plutoDistS.toFixed(6), halleysRA.toFixed(6), halleysDec.toFixed(6), halleysDistE.toFixed(6), halleysDistS.toFixed(6), erosRA.toFixed(6), erosDec.toFixed(6), erosDistE.toFixed(6), erosDistS.toFixed(6)]);
     
-        planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6)]);
+        planetRows.push([jd, date, time, year, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6)]);
     
   }
 
@@ -9720,24 +9785,26 @@ function buildDateSection(planetKey, testDate, data) {
       const companionLabel = PLANET_HIERARCHIES[companionKey]?.label || companionKey;
       const companionRARad = getCompanionPlanetRA(companionKey);
 
-      // Compare current planet RA to longitude reference
-      const planetRAStatus = compareRAToLongitude(data.position.planetRARad, refLongitude);
+      // Compare current planet RA to longitude reference (only if longitude provided)
+      const planetRAStatus = refLongitude != null ? compareRAToLongitude(data.position.planetRARad, refLongitude) : 'none';
       const planetRAColor = getColorFromStatus(planetRAStatus);
 
-      // Compare companion planet RA to longitude reference
-      const companionRAStatus = compareRAToLongitude(companionRARad, refLongitude);
+      // Compare companion planet RA to longitude reference (only if longitude provided)
+      const companionRAStatus = refLongitude != null ? compareRAToLongitude(companionRARad, refLongitude) : 'none';
       const companionRAColor = getColorFromStatus(companionRAStatus);
 
-      // Reference RA from longitude (no color - it's the reference)
-      const refRAValue = longitudeToRAHMS(refLongitude);
-      const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
-      section += `|  ${refRAContent}|\n`;
+      // Reference RA from longitude (only show if longitude provided)
+      if (refLongitude != null) {
+        const refRAValue = longitudeToRAHMS(refLongitude);
+        const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
+        section += `|  ${refRAContent}|\n`;
 
-      // Show longitude value
-      const longContent = `(from longitude ${refLongitude}°)`.padEnd(46);
-      section += `|  ${longContent}|\n`;
+        // Show longitude value
+        const longContent = `(from longitude ${refLongitude}°)`.padEnd(46);
+        section += `|  ${longContent}|\n`;
 
-      section += `|  ${'-'.repeat(W - 4)}  |\n`;
+        section += `|  ${'-'.repeat(W - 4)}  |\n`;
+      }
 
       // Current planet RA (color-coded)
       const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
@@ -9843,8 +9910,10 @@ function buildDateSection(planetKey, testDate, data) {
 
 /**
  * Generate the planet position report for Step 5
+ * @param {string} planetKey - The planet identifier
+ * @param {boolean} showAll - If true, show all results regardless of showOnScreen flag
  */
-async function generatePlanetReport(planetKey) {
+async function generatePlanetReport(planetKey, showAll = false) {
   const testDates = PLANET_TEST_DATES[planetKey];
   if (!testDates || testDates.length === 0) {
     return { screenReport: 'No test dates configured for this planet.', excelData: null };
@@ -9886,8 +9955,8 @@ async function generatePlanetReport(planetKey) {
       longitudeRows.push(data.longitudeRow);
     }
 
-    // Only add to screen report if showOnScreen is true
-    if (testDate.showOnScreen) {
+    // Add to screen report if showOnScreen is true OR showAll is enabled
+    if (testDate.showOnScreen || showAll) {
       screenReport += buildDateSection(planetKey, testDate, data);
     }
   }
@@ -10028,8 +10097,12 @@ async function generateAndDisplayReport(planetKey) {
   buttonsElement.style.display = 'none';
 
   try {
+    // Get current showAll state from checkbox
+    const showAllCheckbox = panel.querySelector('.hi-report-show-all');
+    const showAll = showAllCheckbox ? showAllCheckbox.checked : false;
+
     // Generate the report
-    const result = await generatePlanetReport(planetKey);
+    const result = await generatePlanetReport(planetKey, showAll);
 
     // Store for button handlers
     _currentReportData = {
@@ -12202,20 +12275,20 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   }
 
   /* 6. light-space AABB + padding -------------------------------- */
-  const lsBox = new THREE.Box3().setFromPoints(_cornersLS);
-  lsBox.min.multiplyScalar(pad);
-  lsBox.max.multiplyScalar(pad);
+  _lsBox.setFromPoints(_cornersLS);
+  _lsBox.min.multiplyScalar(pad);
+  _lsBox.max.multiplyScalar(pad);
 
   /* 7. write extents to the orthographic camera ------------------ */
   const cam = sunLight.shadow.camera;
-  cam.left   = lsBox.min.x;
-  cam.right  = lsBox.max.x;
-  cam.bottom = lsBox.min.y;
-  cam.top    = lsBox.max.y;
+  cam.left   = _lsBox.min.x;
+  cam.right  = _lsBox.max.x;
+  cam.bottom = _lsBox.min.y;
+  cam.top    = _lsBox.max.y;
 
   /* --- key change: keep near tiny, far big ---------------------- */
   cam.near = 0.1;                 // a fixed, small value near the Sun
-  cam.far  = -lsBox.min.z;        // always positive and > near
+  cam.far  = -_lsBox.min.z;       // always positive and > near
   cam.updateProjectionMatrix();
 
   /* 8. helper (for debugging) ------------------------------------ */
@@ -12255,10 +12328,10 @@ function updateLightingForFocus() {
   }
 }
 
-// Animation (pulsing)
+// Animation (pulsing) - only updates when zodiac is visible
 function animateGlow() {
+    if (!zodiac.visible) return;
     glowMaterial.opacity = 0.2 + 0.1 * Math.sin(Date.now() * 0.002);
-    //requestAnimationFrame(animateGlow);
 }
 
 function createEarthPolarLine() {
@@ -12380,16 +12453,11 @@ function updatePositions() {
     obj.distKm = auToKm(obj.distAU);                 // AU → km (live)
     obj.distMi = obj.distKm * KM_TO_MI;
 
-    obj.distDisplay =
-      (o.distanceUnit === 'AU') ? obj.distAU.toFixed(8) + ' AU' :
-      (o.distanceUnit === 'km') ? obj.distKm.toFixed(2) + ' km'  :
-                                  obj.distMi.toFixed(2) + ' mi';
-
-    /*  EARTH → PLANET  (direction for RA/Dec)  
+    /*  EARTH → PLANET  (direction for RA/Dec)
         We need the vector expressed in the Earth-equatorial frame, which
         already includes axial tilt *and* the 90° spin you applied on
         21 June (earth.containerObj.rotation.y = π/2).  The quickest way
-        is to transform the planet’s world position into the local
+        is to transform the planet's world position into the local
         coordinates of earth.rotationAxis.                                  */
     LOCAL.copy(PLANET_POS);
     earth.rotationAxis.worldToLocal(LOCAL);          // in-place
@@ -12398,26 +12466,13 @@ function updatePositions() {
     obj.ra  = SPHERICAL.theta;                       // radians
     obj.dec = SPHERICAL.phi;                         // radians
 
-    if (o.displayFormat === 'decimal') {
-      obj.raDisplay  = ((obj.ra * 180 / Math.PI + 360) % 360).toFixed(4) + '°';
-      obj.decDisplay = radiansToDecDecimal(obj.dec) + '°';
-    } else {
-      obj.raDisplay  = radiansToRa(obj.ra);
-      obj.decDisplay = radiansToDec(obj.dec);
-    }
-
     /*  SUN → PLANET (distance)  */
     DELTA.subVectors(PLANET_POS, SUN_POS);           // reuse DELTA
     const sunRadius   = DELTA.length();
     obj.sunDistAU     = sunRadius / 100;
     obj.sunDistKm     = auToKm(obj.sunDistAU);
     obj.sunDistMi     = obj.sunDistKm * KM_TO_MI;
-    obj.sunDistDisplay =
-      (o.distanceUnit === 'AU') ? obj.sunDistAU.toFixed(8) + ' AU' :
-      (o.distanceUnit === 'km') ? obj.sunDistKm.toFixed(2) + ' km'  :
-                                  obj.sunDistMi.toFixed(2) + ' mi';
-  
-  
+
       /*  PERIHELION-OF-EARTH → PERIHELION of planet (distance)  */
     DELTA.subVectors(PLANET_POS, WOBBLE_POS);           // reuse DELTA
     const perihelionRadius   = DELTA.length();
@@ -12432,17 +12487,51 @@ function updatePositions() {
   earth.rotationAxis.worldToLocal(CAM_LOCAL);        // into Earth frame
   SPHERICAL.setFromVector3(CAM_LOCAL);
 
-  const camDistAU = SPHERICAL.radius / 100;
-  const camDistKm = auToKm(camDistAU);
-  const camDistMi = camDistKm * KM_TO_MI;
-
-  o.worldCamDistDisplay =
-    (o.distanceUnit === 'AU') ? camDistAU.toFixed(8) + ' AU' :
-    (o.distanceUnit === 'km') ? camDistKm.toFixed(2) + ' km'  :
-                                camDistMi.toFixed(2) + ' mi';
-
   o.worldCamRa  = SPHERICAL.theta;
   o.worldCamDec = SPHERICAL.phi;
+  o._camDistAU  = SPHERICAL.radius / 100;            // store for display update
+}
+
+/** Updates display strings for UI - call at throttled rate (20 Hz) */
+function updatePositionDisplayStrings() {
+  // Update planet display strings
+  for (let i = 0, L = tracePlanets.length; i < L; i++) {
+    const obj = tracePlanets[i];
+
+    // Skip if values not yet initialized
+    if (obj.distAU == null) continue;
+
+    // Distance display
+    obj.distDisplay =
+      (o.distanceUnit === 'AU') ? obj.distAU.toFixed(8) + ' AU' :
+      (o.distanceUnit === 'km') ? obj.distKm.toFixed(2) + ' km'  :
+                                  obj.distMi.toFixed(2) + ' mi';
+
+    // RA/Dec display
+    if (o.displayFormat === 'decimal') {
+      obj.raDisplay  = ((obj.ra * 180 / Math.PI + 360) % 360).toFixed(4) + '°';
+      obj.decDisplay = radiansToDecDecimal(obj.dec) + '°';
+    } else {
+      obj.raDisplay  = radiansToRa(obj.ra);
+      obj.decDisplay = radiansToDec(obj.dec);
+    }
+
+    // Sun distance display
+    obj.sunDistDisplay =
+      (o.distanceUnit === 'AU') ? obj.sunDistAU.toFixed(8) + ' AU' :
+      (o.distanceUnit === 'km') ? obj.sunDistKm.toFixed(2) + ' km'  :
+                                  obj.sunDistMi.toFixed(2) + ' mi';
+  }
+
+  // Camera distance display
+  if (o._camDistAU != null) {
+    const camDistKm = auToKm(o._camDistAU);
+    const camDistMi = camDistKm * KM_TO_MI;
+    o.worldCamDistDisplay =
+      (o.distanceUnit === 'AU') ? o._camDistAU.toFixed(8) + ' AU' :
+      (o.distanceUnit === 'km') ? camDistKm.toFixed(2) + ' km'  :
+                                  camDistMi.toFixed(2) + ' mi';
+  }
 }
 
 function trace(pos) {
@@ -12508,7 +12597,7 @@ function setTraceMaterial(obj) {
   scene.add(obj.traceLine);
 }
 
-// Modified function
+// Modified function with adaptive step for high-speed performance
 function tracePlanet(obj, pos) {
   let update = false;
 
@@ -12541,22 +12630,42 @@ function tracePlanet(obj, pos) {
   const vertArray = positionAttr.array;
   const pointCount = vertArray.length / 3;
 
-  while (nextPos < pos) {
+  // Adaptive step: at high speeds, increase step size to reduce iterations
+  // Calculate how many iterations would be needed with base step
+  const gap = pos - nextPos;
+  const baseIterations = gap / obj.traceStep;
+
+  // Target max ~50 iterations per frame for smooth performance
+  const TARGET_ITERATIONS = 50;
+  let effectiveStep = obj.traceStep;
+
+  if (baseIterations > TARGET_ITERATIONS) {
+    // Scale up the step to limit iterations
+    const stepMultiplier = Math.ceil(baseIterations / TARGET_ITERATIONS);
+    effectiveStep = obj.traceStep * stepMultiplier;
+  }
+
+  // Safety limit in case calculation is off
+  const MAX_ITERATIONS = 100;
+  let iterations = 0;
+
+  while (nextPos < pos && iterations < MAX_ITERATIONS) {
+    iterations++;
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
-    obj.planetObj.getWorldPosition(_tracePos);     // <-- CHANGED: reuse vector
+    obj.planetObj.getWorldPosition(_tracePos);
 
     const writeIndex = (obj.traceArrIndex % pointCount) * 3;
-    vertArray[writeIndex + 0] = _tracePos.x;       // <-- CHANGED: use _tracePos
+    vertArray[writeIndex + 0] = _tracePos.x;
     vertArray[writeIndex + 1] = _tracePos.y;
     vertArray[writeIndex + 2] = _tracePos.z;
 
     obj.traceArrIndex++;
-    nextPos += obj.traceStep;
+    nextPos += effectiveStep;
   }
 
   positionAttr.needsUpdate = true;
-  obj.traceCurrPos = nextPos - obj.traceStep;
+  obj.traceCurrPos = nextPos - effectiveStep;
   obj.traceLine.visible = true;
 }
 
@@ -13351,9 +13460,8 @@ function updateOrbitalPlaneRotations() {
  * Called each frame after updateAscendingNodes() and before updateHierarchyLiveData().
  */
 function updatePlanetAnomalies() {
-  // Get Sun position (common for all planets)
-  const sunPos = new THREE.Vector3();
-  sun.pivotObj.getWorldPosition(sunPos);
+  // Get Sun position (common for all planets) - using pooled vector
+  sun.pivotObj.getWorldPosition(_anomalySunPos);
 
   // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix]
   const planets = [
@@ -13369,21 +13477,15 @@ function updatePlanetAnomalies() {
     { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros' }
   ];
 
-  // Reusable vectors for calculations
-  const pPos = new THREE.Vector3();
-  const planetPos = new THREE.Vector3();
-  const perihelionPos = new THREE.Vector3();
-
   for (const { planet, fixedPerihelion, key } of planets) {
     // Skip if objects don't exist
     if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
       continue;
     }
 
-    // Get positions
-    fixedPerihelion.pivotObj.getWorldPosition(pPos);           // P = orbit center
-    planet.pivotObj.getWorldPosition(planetPos);               // Planet position
-    // Note: We don't need perihelionPos - see explanation below
+    // Get positions (using pooled vectors)
+    fixedPerihelion.pivotObj.getWorldPosition(_anomalyPPos);           // P = orbit center
+    planet.pivotObj.getWorldPosition(_anomalyPlanetPos);               // Planet position
 
     // Calculate direction vectors in XZ plane (ecliptic)
     // In an elliptical orbit:
@@ -13394,8 +13496,8 @@ function updatePlanetAnomalies() {
     // Layout: P -------- Sun ------- Perihelion
     //
     // So perihelion direction from both P and Sun is: P → Sun direction
-    const periDirX = sunPos.x - pPos.x;
-    const periDirZ = sunPos.z - pPos.z;
+    const periDirX = _anomalySunPos.x - _anomalyPPos.x;
+    const periDirZ = _anomalySunPos.z - _anomalyPPos.z;
 
     // For both True Anomaly and Mean Anomaly, the perihelion reference is the same direction
     const periDirFromSunX = periDirX;
@@ -13404,12 +13506,12 @@ function updatePlanetAnomalies() {
     const periDirFromPZ = periDirZ;
 
     // Planet direction from Sun (for True Anomaly)
-    const planetDirFromSunX = planetPos.x - sunPos.x;
-    const planetDirFromSunZ = planetPos.z - sunPos.z;
+    const planetDirFromSunX = _anomalyPlanetPos.x - _anomalySunPos.x;
+    const planetDirFromSunZ = _anomalyPlanetPos.z - _anomalySunPos.z;
 
     // Planet direction from P (for Mean Anomaly)
-    const planetDirFromPX = planetPos.x - pPos.x;
-    const planetDirFromPZ = planetPos.z - pPos.z;
+    const planetDirFromPX = _anomalyPlanetPos.x - _anomalyPPos.x;
+    const planetDirFromPZ = _anomalyPlanetPos.z - _anomalyPPos.z;
 
     // Calculate angles using atan2 (negate Z for counter-clockwise measurement)
     const periAngleSun = Math.atan2(-periDirFromSunZ, periDirFromSunX);
