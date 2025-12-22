@@ -13660,10 +13660,10 @@ function orbitalAnglesFromTilts(pd, peri) {
   /* ---- 1  inclination --------------------------------------------- */
   const i = Math.hypot(ax, az);       // √(ax² + az²)
 
-  if (i < 1e-6) {
-    // Orbit lies exactly in the ecliptic: nodes & ω are undefined.
-    throw new RangeError(`${pd.name}: i ≃ 0°, nodes undefined`);
-  }
+  // if (i < 1e-6) {
+  //   // Orbit lies exactly in the ecliptic: nodes & ω are undefined.
+  //   throw new RangeError(`${pd.name}: i ≃ 0°, nodes undefined`);
+  // }
 
   /* ---- 2  longitude of the ascending node ------------------------- */
   let Ω = Math.atan2(ax, az) * 180 / Math.PI;   // atan2(sinΩ, cosΩ)
