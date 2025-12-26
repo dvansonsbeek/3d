@@ -3295,9 +3295,9 @@ let o = {
   halleysElongation: 0.01,
   erosElongation: 0.01,
 
+  // Earth-frame perihelion (equatorial RA - fluctuates with Earth's precession)
   mercuryPerihelion: 0,
   venusPerihelion: 0,
-//  mercuryPerihelion2: 0,
   earthPerihelion: 0,
   marsPerihelion: 0,
   jupiterPerihelion: 0,
@@ -3307,6 +3307,17 @@ let o = {
   plutoPerihelion: 0,
   halleysPerihelion: 0,
   erosPerihelion: 0,
+  // Ecliptic-frame perihelion (J2000 ecliptic - stable, true heliocentric value)
+  mercuryPerihelionEcliptic: 0,
+  venusPerihelionEcliptic: 0,
+  marsPerihelionEcliptic: 0,
+  jupiterPerihelionEcliptic: 0,
+  saturnPerihelionEcliptic: 0,
+  uranusPerihelionEcliptic: 0,
+  neptunePerihelionEcliptic: 0,
+  plutoPerihelionEcliptic: 0,
+  halleysPerihelionEcliptic: 0,
+  erosPerihelionEcliptic: 0,
   
   mercuryArgumentOfPeriapsis: 0,
   venusArgumentOfPeriapsis: 0,
@@ -9112,18 +9123,28 @@ function setupGUI() {
   let folderPerihelion = gui.addFolder('Perihelion Planets')
   folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
   addInfoButton( folderPerihelion, 'https://wgc.jpl.nasa.gov:8443/webgeocalc/#OrbitalElements' );
-  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury Perihelion")
-//  folderPerihelion.add(o,"mercuryPerihelion2").min(0.0).max(360.0).step(0.000001).listen().name("Mercury Perihelion2")
-  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus Perihelion")
+  // Earth-frame (fluctuates with Earth's precession cycles)
+  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Earth)")
+  folderPerihelion.add(o,"mercuryPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Ecliptic)")
+  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Earth)")
+  folderPerihelion.add(o,"venusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Ecliptic)")
   folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Earth Perihelion")
-  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars Perihelion")
-  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter Perihelion")
-  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn Perihelion")  
-  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus Perihelion") 
-  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune Perihelion")
-  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto Perihelion")
-  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys Perihelion")
-  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros Perihelion")   
+  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Earth)")
+  folderPerihelion.add(o,"marsPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Ecliptic)")
+  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Earth)")
+  folderPerihelion.add(o,"jupiterPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Ecliptic)")
+  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Earth)")
+  folderPerihelion.add(o,"saturnPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Ecliptic)")
+  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Earth)")
+  folderPerihelion.add(o,"uranusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Ecliptic)")
+  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Earth)")
+  folderPerihelion.add(o,"neptunePerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Ecliptic)")
+  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Earth)")
+  folderPerihelion.add(o,"plutoPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Ecliptic)")
+  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Earth)")
+  folderPerihelion.add(o,"halleysPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Ecliptic)")
+  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Earth)")
+  folderPerihelion.add(o,"erosPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Ecliptic)")   
   
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
@@ -15935,19 +15956,41 @@ function timeToPos(value) {
 }
 
 /**
- * Computes the apparent RA of pdB as seen from pdA (in the ecliptic plane),
- * then returns the 180°–opposite of that angle.
+ * Computes the apparent RA of pdB as seen from pdA in Earth's equatorial frame,
+ * then returns the 180°-opposite of that angle.
  *
- * @param {object} pdA – planet‐data with .name, .raDisplay (HHhMMmSSs) & .distKm
- * @param {object} pdB – another planet‐data object
- * @returns {number} opposite apparent RA in [0,360)
- * @throws  TypeError / RangeError on invalid input
+ * COORDINATE SYSTEM: Earth's Equatorial Frame
+ * The .ra values are computed by transforming world positions into earth.rotationAxis
+ * local coordinates (see updatePositions). This is Earth's equatorial frame, which
+ * includes axial tilt (~23.4°), axial precession, and other Earth orientation effects.
+ *
+ * 2D PROJECTION LIMITATION:
+ * This function uses a 2D projection that ignores declination:
+ *   x = r * cos(ra),  z = r * sin(ra)
+ *
+ * The correct 3D formula would be:
+ *   x = r * cos(dec) * cos(ra),  z = r * cos(dec) * sin(ra)
+ *
+ * Impact of ignoring declination:
+ * - For points at the same declination: No error (same scaling factor)
+ * - For points at different declinations: Angular errors can occur
+ * - Maximum error: ~8% radial compression at dec=±23.4° (ecliptic poles)
+ * - For perihelion markers (near ecliptic, similar dec): Error is small
+ *
+ * For high-precision work with objects at significantly different declinations,
+ * a full 3D approach should be used instead.
+ *
+ * @param {object} pdA - Reference object with .ra (radians) and .distKm
+ * @param {object} pdB - Target object with .ra (radians) and .distKm
+ * @returns {number} Opposite apparent RA in degrees [0, 360)
+ * @throws {TypeError} If ra or distKm values are invalid
+ * @throws {RangeError} If objects share identical coordinates
  */
 function apparentRaFromPdA(pdA, pdB) {
   const RAD2DEG = 180 / Math.PI;
   const TWO_PI  = 2 * Math.PI;
 
-  // 1) Pull raw ra‐in‐radians from each object
+  // 1) Pull raw RA in radians from each object (computed in Earth's equatorial frame)
   const ra1 = Number(pdA.ra);
   const ra2 = Number(pdB.ra);
 
@@ -15965,7 +16008,7 @@ function apparentRaFromPdA(pdA, pdB) {
   let θ2 = ra2 % TWO_PI;
   if (θ2 < 0) θ2 += TWO_PI;
 
-  // 3) Pull & validate distances (km)
+  // 3) Pull & validate distances from Earth (km)
   const r1 = Number(pdA.distKm);
   const r2 = Number(pdB.distKm);
 
@@ -15976,50 +16019,115 @@ function apparentRaFromPdA(pdA, pdB) {
     throw new TypeError(`distKm for ${pdB.name} is invalid: ${pdB.distKm}`);
   }
 
-  // 4) Compute each body’s (x, z) in the ecliptic plane:
-  //    x = r * cos(θ),  z = r * sin(θ)
+  // 4) Project each body's position onto the equatorial plane (2D approximation)
+  //    NOTE: This ignores declination. Full 3D would use r * cos(dec) * cos/sin(ra)
   const x1 = r1 * Math.cos(θ1);
   const z1 = r1 * Math.sin(θ1);
   const x2 = r2 * Math.cos(θ2);
   const z2 = r2 * Math.sin(θ2);
 
-  // 5) Vector from A → B in that same plane
+  // 5) Vector from A → B in the equatorial plane
   const dx = x2 - x1;
   const dz = z2 - z1;
 
-  // If they coincide exactly, the apparent RA is undefined.
+  // If they coincide exactly, the apparent RA is undefined
   if (dx === 0 && dz === 0) {
     throw new RangeError(
-      `${pdA.name} and ${pdB.name} share identical ecliptic coords`
+      `${pdA.name} and ${pdB.name} share identical equatorial coords`
     );
   }
 
-  // 6) Apparent RA = atan2(dz, dx), then normalized into [0, 2π)
-  let aparRad = Math.atan2(dz, dx); // yields (−π, +π]
+  // 6) Apparent RA = atan2(dz, dx), normalized into [0, 2π)
+  let aparRad = Math.atan2(dz, dx);
   if (aparRad < 0) {
-    aparRad += TWO_PI;             // now in [0, 2π)
+    aparRad += TWO_PI;
   }
 
-  // 7) Compute the “opposite” direction by adding π and re‐wrapping
-  let oppRad = aparRad + Math.PI;  // in [π, 3π)
+  // 7) Return the opposite direction (add π and re-wrap)
+  let oppRad = aparRad + Math.PI;
   if (oppRad >= TWO_PI) {
-    oppRad -= TWO_PI;              // wrap into [0, 2π)
+    oppRad -= TWO_PI;
   }
 
-  // final log
-  // console.log(
-  //  `${pdB.name} from ${pdA.name} → apparent RA: ${apar.toFixed(4)}°, `,
-  //  ` opposite RA: ${opposite.toFixed(4)}°`
-  //);
-
-  // 8) Convert back to degrees, in [0,360), and return
+  // 8) Convert to degrees [0, 360)
   return oppRad * RAD2DEG;
 }
 
+// ================================================================
+// PERIHELION LONGITUDE CALCULATION METHODS
+// ================================================================
+//
+// There are TWO different ways to measure perihelion longitude:
+//
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │ METHOD 1: EARTH-FRAME (apparentRaFromPdA)                                   │
+// ├─────────────────────────────────────────────────────────────────────────────┤
+// │ Reference frame: Earth's equatorial coordinate system                       │
+// │ Measures: Apparent RA of perihelion as seen from Earth                      │
+// │ Includes: Earth's axial tilt, precession, nutation, daily rotation          │
+// │ Use case: What an observer on Earth would measure in RA coordinates         │
+// │ Expected rate: ~532 arcsec/century mean (fluctuating ±100 around mean)      │
+// │ Fluctuation period: ~6,500 years (harmonic of Earth precession cycles)      │
+// │ Note: Over long periods (~300,000 years), averages to the Ecliptic value    │
+// └─────────────────────────────────────────────────────────────────────────────┘
+//
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │ METHOD 2: ECLIPTIC (perihelionLongitudeEcliptic)                            │
+// ├─────────────────────────────────────────────────────────────────────────────┤
+// │ Reference frame: J2000 Ecliptic plane (heliocentric)                        │
+// │ Measures: Pure precession angle from the model's precession layer           │
+// │ Includes: Only the configured precession rate, nothing else                 │
+// │ Use case: The "true" heliocentric precession rate                           │
+// │ Expected rate: Exactly 532.32 arcsec/century for Mercury (stable)           │
+// │ Fluctuation: NONE - perfectly stable by definition                          │
+// └─────────────────────────────────────────────────────────────────────────────┘
+//
+// COMPARISON:
+// - Ecliptic: Reads directly from precession layer rotation (perfectly stable)
+// - Earth-frame: Uses equatorial RA transformation (fluctuates due to Earth)
+//
+// ================================================================
+
+/**
+ * ECLIPTIC-FRAME Perihelion Longitude
+ * Computes the perihelion longitude in J2000 ecliptic coordinates.
+ *
+ * Reads directly from the precession layer's rotation.y, which represents
+ * the precession angle in the ecliptic plane (rotation around world Y-axis).
+ * This gives the "true" heliocentric precession, unaffected by Earth's
+ * reference frame transformations.
+ *
+ * @param {object} precessionLayer - The precession duration layer (e.g., mercuryPerihelionDurationEcliptic1)
+ * @param {number} longitudePerihelion - The J2000 longitude of perihelion in degrees
+ * @returns {number} Perihelion longitude in degrees [0, 360)
+ */
+function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
+  const RAD2DEG = 180 / Math.PI;
+  const TWO_PI = 2 * Math.PI;
+
+  // Get the precession angle directly from the layer's orbitObj rotation
+  // The rotation.y represents precession in the ecliptic plane
+  let precessionAngle = precessionLayer.orbitObj.rotation.y;
+
+  // Add the base longitude of perihelion (J2000 starting position)
+  let totalAngle = precessionAngle + (longitudePerihelion * Math.PI / 180);
+
+  // Normalize to [0, 2π)
+  totalAngle = totalAngle % TWO_PI;
+  if (totalAngle < 0) totalAngle += TWO_PI;
+
+  return totalAngle * RAD2DEG;
+}
+
 function updatePerihelion() {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EARTH-FRAME (Equatorial RA)
+  // What an observer on Earth measures in Right Ascension coordinates
+  // Includes Earth's axial tilt, precession cycles, and equatorial transformation
+  // Shows fluctuations due to Earth's reference frame - averages to Ecliptic value
+  // ═══════════════════════════════════════════════════════════════════════════
   o["mercuryPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth);
   o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth) % 360;
-//  o["mercuryPerihelion2"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth) % 360; 
   o["earthPerihelion"] = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
   o["marsPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, marsPerihelionFromEarth);
   o["jupiterPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, jupiterPerihelionFromEarth);
@@ -16029,6 +16137,22 @@ function updatePerihelion() {
   o["plutoPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, plutoPerihelionFromEarth);
   o["halleysPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, halleysPerihelionFromEarth);
   o["erosPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, erosPerihelionFromEarth);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ECLIPTIC-FRAME (J2000 Ecliptic Coordinates)
+  // Reads directly from precession layer rotation - the "true" heliocentric value
+  // Stable precession rate, unaffected by Earth's reference frame
+  // ═══════════════════════════════════════════════════════════════════════════
+  o["mercuryPerihelionEcliptic"] = perihelionLongitudeEcliptic(mercuryPerihelionDurationEcliptic1, mercuryLongitudePerihelion);
+  o["venusPerihelionEcliptic"] = perihelionLongitudeEcliptic(venusPerihelionDurationEcliptic1, venusLongitudePerihelion);
+  o["marsPerihelionEcliptic"] = perihelionLongitudeEcliptic(marsPerihelionDurationEcliptic1, marsLongitudePerihelion);
+  o["jupiterPerihelionEcliptic"] = perihelionLongitudeEcliptic(jupiterPerihelionDurationEcliptic1, jupiterLongitudePerihelion);
+  o["saturnPerihelionEcliptic"] = perihelionLongitudeEcliptic(saturnPerihelionDurationEcliptic1, saturnLongitudePerihelion);
+  o["uranusPerihelionEcliptic"] = perihelionLongitudeEcliptic(uranusPerihelionDurationEcliptic1, uranusLongitudePerihelion);
+  o["neptunePerihelionEcliptic"] = perihelionLongitudeEcliptic(neptunePerihelionDurationEcliptic1, neptuneLongitudePerihelion);
+  o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, plutoLongitudePerihelion);
+  o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, halleysLongitudePerihelion);
+  o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, erosLongitudePerihelion);
 };
 
 // ================================================================
