@@ -1462,6 +1462,23 @@ All celestial bodies have been updated with hover tooltips and info links:
 
 This section documents the perihelion precession formulas - purely Newtonian mechanics derived from observed precession rates.
 
+### Implementation Status
+
+| Section | Method | In OrbitalFormulas | Used in UI |
+|---------|--------|:------------------:|:----------:|
+| 9.1.1 | `precessionRateFromPeriod` | ✅ | ✅ |
+| 9.1.2 | `precessionPeriodFromRate` | ✅ | ❌ |
+| 9.2.1 | `precessionEclipticToICRF` | ✅ | ✅ |
+| 9.2.2 | `precessionICRFToEcliptic` | ✅ | ❌ |
+| 9.3.1 | `holisticPrecessionRatio` | ✅ | ✅ |
+| 9.3.2 | `precessionFromHolisticRatio` | ✅ | ❌ |
+| 9.4.1 | `precessionAngularVelocity` | ✅ | ✅ |
+| 9.4.2 | `perturbationStrength` | ✅ | ❌ |
+| 9.5.1 | `precessionDecomposition` | ✅ | ❌ |
+| 9.5.2 | `precessionRatio` | ✅ | ❌ |
+
+**Note:** Methods marked ❌ in "Used in UI" are utility/inverse functions available for calculations but not displayed in planetStats.
+
 ### 9.1 Precession Rate Fundamentals
 
 #### 9.1.1 Precession Rate from Period
