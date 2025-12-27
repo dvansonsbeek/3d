@@ -1385,6 +1385,9 @@ const renderVal = val => {
     const num = Number(raw);
     if (!Number.isFinite(num)) return '';          // guard NaN or ±∞
 
+    /* 5. show infinity symbol for very large numbers (> 1 billion) */
+    if (Math.abs(num) > 1e9) return '∞';
+
     const dec = val.dec ?? 0;
     const sep = val.sep ?? ',';
     return fmtNum(num, dec, sep);
@@ -6155,6 +6158,7 @@ function formatNum(val, precision = 4) {
   if (typeof val !== 'number') return String(val);
   if (isNaN(val)) return 'NaN';
   if (!isFinite(val)) return val > 0 ? 'Infinity' : '-Infinity';
+  if (Math.abs(val) > 1e9) return '∞';  // show infinity symbol for very large numbers
   return val.toFixed(precision);
 }
 
@@ -11972,21 +11976,17 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Orbital_inclination'},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
+      {label : () => `Perihelion Precession against Ecliptic`,
        value : [ { v: () => earthPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
-      {label : () => `Perihelion Precession Duration against ICRF`,
+      {label : () => `Perihelion Precession against ICRF`,
        value : [ { v: () => holisticyearLength/13, dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: ${fmtNum(holisticyearLength,0,',')} / 13`],
        static: true},
       {label : () => `Perihelion precession per century`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
        hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(earthPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(earthPerihelionEclipticYears,2,',')}`],
        static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
@@ -12601,25 +12601,29 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(mercuryPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(mercuryPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(mercuryPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate. Famous for the 43"/century relativistic anomaly discovered by Le Verrier (1859)`],
-       static: true},
     null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(mercuryPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears),2,',')} arcsec/century`],
+       static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
+    null,
+      {label : () => `Predicted missing advance (next century)`,
+       value : [ { v: () => calculatePredictedMissingAdvance(), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Predicted difference between Earth-frame and Ecliptic-frame perihelion advance from 2000 to 2100`]},
+    null,
+
+    {header : '—  Theorized Precession Breakdown —',
+     hover : [`The theorized precession breakdown numbers do not always align perfectly with observed precession values. See docs/precession-breakdown-implementation.md for details.`]},
       {label : () => `┌ Venus`,
        value : [ { v: () => getContribution(getMercuryPrecessionBreakdown(o), 'Venus'), dec:1, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Venus (outer): Dominant contributor due to proximity despite lower mass`]},
@@ -12645,9 +12649,6 @@ const planetStats = {
       {label : () => `Σ Calculated Total`,
        value : [ { v: () => { const b = getMercuryPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getMercuryPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. The missing ~8% includes the famous 43"/century relativistic correction`]},
     ],
     venus: [
     {header : '—  General Characteristics —' },
@@ -12935,53 +12936,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(venusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(venusPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(venusPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(venusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Jupiter`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Jupiter'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (outer): Dominant contributor due to enormous mass`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Earth'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (outer): Significant contributor due to proximity`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Saturn'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (outer): Contribution due to mass despite distance`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (outer): Small contribution due to low mass`]},
-      {label : () => `├ Mercury`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Negligible contribution`]},
-      {label : () => `└ Neptune`,
-       value : [ { v: () => getContribution(getVenusPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Negligible contribution`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getVenusPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getVenusPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 
     mars: [
@@ -13270,53 +13241,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(marsPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(marsPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(marsPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(marsPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Jupiter`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Jupiter'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (outer): Dominant contributor - nearest giant planet`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Saturn'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (outer): Second giant planet contribution`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Earth'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Mercury`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Small contribution due to distance`]},
-      {label : () => `└ Neptune`,
-       value : [ { v: () => getContribution(getMarsPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Small contribution due to distance`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getMarsPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getMarsPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 
     jupiter: [
@@ -13594,53 +13535,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(jupiterPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(jupiterPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(jupiterPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(jupiterPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Saturn`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Saturn'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (outer): Dominant contributor - nearest giant planet`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Outer ice giant contribution`]},
-      {label : () => `├ Neptune`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Outer ice giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Earth'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `└ Mercury`,
-       value : [ { v: () => getContribution(getJupiterPrecessionBreakdown(o), 'Mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getJupiterPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getJupiterPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 
     saturn: [
@@ -13929,53 +13840,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(saturnPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(saturnPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(saturnPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(saturnPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Jupiter`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Jupiter'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (inner): Dominant contributor - massive inner neighbor`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Outer ice giant contribution`]},
-      {label : () => `├ Neptune`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Outer ice giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Earth'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `└ Mercury`,
-       value : [ { v: () => getContribution(getSaturnPrecessionBreakdown(o), 'Mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getSaturnPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getSaturnPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 
     uranus: [
@@ -14264,53 +14145,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(uranusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(uranusPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(uranusPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(uranusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Neptune`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Outer neighbor contribution`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (inner): Inner gas giant contribution`]},
-      {label : () => `├ Jupiter`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (inner): Inner gas giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Mars'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Earth'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Venus'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `└ Mercury`,
-       value : [ { v: () => getContribution(getUranusPrecessionBreakdown(o), 'Mercury'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getUranusPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getUranusPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 
     neptune: [
@@ -14599,53 +14450,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(neptunePerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(neptunePerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(neptunePerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(neptunePerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Uranus`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (inner): Inner neighbor contribution`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (inner): Inner gas giant contribution`]},
-      {label : () => `├ Jupiter`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (inner): Inner gas giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Mars'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Earth'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Venus'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-      {label : () => `└ Mercury`,
-       value : [ { v: () => getContribution(getNeptunePrecessionBreakdown(o), 'Mercury'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Uses b₃/₂⁽²⁾ Laplace coefficient for interior perturber`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getNeptunePrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getNeptunePrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
     pluto: [
     {header : '—  General Characteristics —' },
@@ -14933,53 +14754,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(plutoPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(plutoPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(plutoPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(plutoPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('pluto'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('pluto'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Neptune`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (inner): Inner neighbor - 3:2 orbital resonance`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (inner): Inner ice giant contribution`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (inner): Inner gas giant contribution`]},
-      {label : () => `├ Jupiter`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (inner): Inner gas giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Mars'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Negligible contribution`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Earth'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Negligible contribution`]},
-      {label : () => `└ Venus`,
-       value : [ { v: () => getContribution(getPlutoPrecessionBreakdown(o), 'Venus'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Negligible contribution`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getPlutoPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getPlutoPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
     halleys: [
     {header : '—  General Characteristics —' },
@@ -15267,53 +15058,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(halleysPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(halleysPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(halleysPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(halleysPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('halleys'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('halleys'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Neptune`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Neptune (outer): Aphelion beyond Neptune's orbit`]},
-      {label : () => `├ Uranus`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Outer ice giant contribution`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (outer): Outer gas giant contribution`]},
-      {label : () => `├ Jupiter`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (outer): Dominant outer perturber`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (inner): Interior perturber`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Earth'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Interior perturber`]},
-      {label : () => `└ Venus`,
-       value : [ { v: () => getContribution(getHalleysPrecessionBreakdown(o), 'Venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Perihelion near Venus's orbit`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getHalleysPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getHalleysPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. Retrograde orbit makes secular theory less applicable`]},
+
     ],
     eros: [
     {header : '—  General Characteristics —' },
@@ -15601,53 +15362,23 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(erosPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
-      {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
-       static: true},
-      {label : () => `Holistic Precession Ratio`,
-       value : [ { v: () => OrbitalFormulas.holisticPrecessionRatio(erosPerihelionEclipticYears, holisticyearLength), dec:6, sep:',' },{ small: '' }],
-       hover : [`Ratio of Holistic Year to precession period: ${fmtNum(holisticyearLength,0,',')} / ${fmtNum(erosPerihelionEclipticYears,2,',')}`],
-       static: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
-
-    {header : '—  Precession Breakdown —' },
-      {label : () => `Observed Precession Rate`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Total observed perihelion precession rate from the model`],
+    null,
+      {label : () => `┌ Perihelion precession (Ecliptic)`,
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(erosPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears),2,',')} arcsec/century`],
        static: true},
+      {label : () => `├ Missing advance of perihelion`,
+       value : [ { v: () => calculateMissingPerihelionAdvance('eros'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
+      {label : () => `└ Perihelion precession (Earth)`,
+       value : [ { v: () => calculateEarthFramePrecession('eros'), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
-      {label : () => `┌ Jupiter`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Jupiter'), dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Jupiter (outer): Dominant perturber for near-Earth asteroid`]},
-      {label : () => `├ Saturn`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Saturn (outer): Outer gas giant contribution`]},
-      {label : () => `├ Mars`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mars (outer): Eros crosses Mars' orbit`]},
-      {label : () => `├ Earth`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Earth'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Earth (inner): Near-Earth asteroid`]},
-      {label : () => `├ Venus`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Venus (inner): Interior perturber`]},
-      {label : () => `├ Mercury`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Mercury (inner): Interior perturber`]},
-      {label : () => `└ Uranus`,
-       value : [ { v: () => getContribution(getErosPrecessionBreakdown(o), 'Uranus'), dec:3, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Uranus (outer): Negligible contribution`]},
-    null,
-      {label : () => `Σ Calculated Total`,
-       value : [ { v: () => { const b = getErosPrecessionBreakdown(o); return b ? b.calculatedTotal : 0; }, dec:1, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`Sum of all planetary contributions from Lagrange-Laplace secular theory`]},
-      {label : () => `Model Accuracy`,
-       value : [ { v: () => { const b = getErosPrecessionBreakdown(o); return b ? b.accuracy : 0; }, dec:1, sep:',' },{ small: '%' }],
-       hover : [`Calculated ÷ Observed × 100. First-order theory typically overestimates by ~4%`]},
+
     ],
 };
 
@@ -15812,6 +15543,14 @@ function updateDomLabel () {
 
     /* section header --------------------------------------------------------- */
     if (row?.header) {
+      // Resolve hover text for header if present
+      let headerHover = '';
+      if (row.hover !== undefined) {
+        const hv = (typeof row.hover === 'function') ? row.hover() : row.hover;
+        headerHover = Array.isArray(hv) ? hv[0] : hv;
+      }
+      const headerTitleAttr = headerHover ? ` title="${escapeAttr(headerHover)}"` : '';
+
       // Headers with dynamic dates are not cached
       if (row.date) {
         const rawDate = (typeof row.date === 'function') ? row.date() : row.date;
@@ -15824,13 +15563,17 @@ function updateDomLabel () {
                                                     : new Date(rawDate);
           dateStr = (!isNaN(d)) ? d.toLocaleDateString('en-GB') : String(rawDate);
         }
-        nextHTML += `<span class="pl-head">${row.header}${dateStr ? ` <span class="date">${dateStr}</span>` : ''}</span>`;
+        nextHTML += `<span class="pl-head"${headerTitleAttr}>${row.header}${dateStr ? ` <span class="date">${dateStr}</span>` : ''}</span>`;
       } else {
-        // Static header - use cache
-        if (cache[rowIdx] === undefined) {
+        // Static header - use cache (but only if no hover, since hover may need escaping)
+        if (row.hover === undefined && cache[rowIdx] === undefined) {
           cache[rowIdx] = `<span class="pl-head">${row.header}</span>`;
         }
-        nextHTML += cache[rowIdx];
+        if (row.hover === undefined) {
+          nextHTML += cache[rowIdx];
+        } else {
+          nextHTML += `<span class="pl-head"${headerTitleAttr}>${row.header}</span>`;
+        }
       }
       continue;
     }
@@ -16805,6 +16548,153 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
   if (totalAngle < 0) totalAngle += TWO_PI;
 
   return totalAngle * RAD2DEG;
+}
+
+// ================================================================
+// MISSING PERIHELION ADVANCE CALCULATION (Generic Implementation)
+//
+// Calculates the "missing advance" of perihelion by comparing:
+// - Earth-frame perihelion advance (o.mercuryPerihelion, etc.)
+// - Ecliptic-frame perihelion advance (o.mercuryPerihelionEcliptic, etc.)
+//
+// The difference reveals the portion of observed precession that cannot
+// be explained by the model's ecliptic-frame calculations.
+//
+// Key dates:
+// - JD 2415191.5 = ~January 1, 1900
+// - JD 2451716.5 = June 21, 2000 (model start)
+// - JD 2488069.5 = ~January 1, 2100
+//
+// ================================================================
+
+const JD_1900 = 2415191.5;  // ~January 1, 1900
+const JD_2000 = 2451716.5;  // June 21, 2000 (model start)
+const JD_2100 = 2488069.5;  // ~January 1, 2100
+
+// Cache for perihelion values by Julian Day (calculated once on demand per JD)
+const perihelionCache = {};
+
+/**
+ * Fetch perihelion values at a specific Julian Day for all planets.
+ * Uses save/jump/restore pattern like generatePlanetReport.
+ * Results are cached by JD since values at a specific date never change.
+ *
+ * @param {number} jd - Julian Day to fetch values for
+ * @returns {Object} Object with planet names as keys, each containing {earth, ecliptic} values
+ */
+function getPerihelionValuesAtDate(jd) {
+  // Return cached values if available
+  if (perihelionCache[jd]) return perihelionCache[jd];
+
+  // Save current state
+  const savedState = {
+    run: o.Run,
+    julianDay: o.julianDay,
+    time: o.Time,
+    pos: o.pos
+  };
+  o.Run = false;
+
+  // Jump to requested Julian Day
+  jumpToJulianDay(jd);
+  forceSceneUpdate();
+
+  // Read values for all planets
+  perihelionCache[jd] = {
+    mercury: { earth: o.mercuryPerihelion, ecliptic: o.mercuryPerihelionEcliptic },
+    venus:   { earth: o.venusPerihelion,   ecliptic: o.venusPerihelionEcliptic },
+    mars:    { earth: o.marsPerihelion,    ecliptic: o.marsPerihelionEcliptic },
+    jupiter: { earth: o.jupiterPerihelion, ecliptic: o.jupiterPerihelionEcliptic },
+    saturn:  { earth: o.saturnPerihelion,  ecliptic: o.saturnPerihelionEcliptic },
+    uranus:  { earth: o.uranusPerihelion,  ecliptic: o.uranusPerihelionEcliptic },
+    neptune: { earth: o.neptunePerihelion, ecliptic: o.neptunePerihelionEcliptic },
+    pluto:   { earth: o.plutoPerihelion,   ecliptic: o.plutoPerihelionEcliptic },
+    halleys: { earth: o.halleysPerihelion, ecliptic: o.halleysPerihelionEcliptic },
+    eros:    { earth: o.erosPerihelion,    ecliptic: o.erosPerihelionEcliptic }
+  };
+
+  // Restore state
+  o.Run = savedState.run;
+  jumpToJulianDay(savedState.julianDay);
+  o.Time = savedState.time;
+  o.pos = savedState.pos;
+  forceSceneUpdate();
+
+  return perihelionCache[jd];
+}
+
+// Wrapper functions for backwards compatibility
+function getPerihelion1900Values() { return getPerihelionValuesAtDate(JD_1900); }
+function getPerihelion2000Values() { return getPerihelionValuesAtDate(JD_2000); }
+function getPerihelion2100Values() { return getPerihelionValuesAtDate(JD_2100); }
+
+/**
+ * Calculate the "missing advance" of perihelion for a planet between two dates.
+ * Compares Earth-frame advance vs Ecliptic-frame advance.
+ *
+ * Missing advance = (Earth-frame advance) - (Ecliptic-frame advance)
+ *
+ * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
+ * @param {number} jdStart - Starting Julian Day
+ * @param {number} jdEnd - Ending Julian Day
+ * @returns {number} Missing advance in arcseconds
+ */
+function calculateMissingPerihelionAdvanceBetween(planetName, jdStart, jdEnd) {
+  const valStart = getPerihelionValuesAtDate(jdStart)[planetName];
+  const valEnd = getPerihelionValuesAtDate(jdEnd)[planetName];
+
+  if (!valStart || !valEnd) return 0;
+
+  // Calculate advances in degrees
+  const advanceEarthDeg = valEnd.earth - valStart.earth;
+  const advanceEclipticDeg = valEnd.ecliptic - valStart.ecliptic;
+
+  // Convert to arcseconds: degrees / 360 * 1296000
+  const advanceEarthArcsec = advanceEarthDeg / 360 * 1296000;
+  const advanceEclipticArcsec = advanceEclipticDeg / 360 * 1296000;
+
+  // Missing advance = Earth-frame advance - Ecliptic-frame advance
+  return advanceEarthArcsec - advanceEclipticArcsec;
+}
+
+/**
+ * Calculate the "missing advance" of perihelion for a planet (1900 to 2000).
+ * Wrapper for backwards compatibility.
+ *
+ * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
+ * @returns {number} Missing advance in arcseconds
+ */
+function calculateMissingPerihelionAdvance(planetName) {
+  return calculateMissingPerihelionAdvanceBetween(planetName, JD_1900, JD_2000);
+}
+
+/**
+ * Calculate the predicted "missing advance" of perihelion for Mercury (2000 to 2100).
+ *
+ * @returns {number} Predicted missing advance in arcseconds
+ */
+function calculatePredictedMissingAdvance() {
+  return calculateMissingPerihelionAdvanceBetween('mercury', JD_2000, JD_2100);
+}
+
+/**
+ * Calculate the perihelion precession as seen from Earth for a planet.
+ * This is the Earth-frame advance from 1900 to 2000.
+ *
+ * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
+ * @returns {number} Earth-frame precession in arcseconds
+ */
+function calculateEarthFramePrecession(planetName) {
+  const val1900 = getPerihelion1900Values()[planetName];
+  const val2000 = getPerihelion2000Values()[planetName];
+
+  if (!val1900 || !val2000) return 0;
+
+  // Calculate advance in degrees (2000 - 1900)
+  const advanceEarthDeg = val2000.earth - val1900.earth;
+
+  // Convert to arcseconds: degrees / 360 * 1296000
+  return advanceEarthDeg / 360 * 1296000;
 }
 
 function updatePerihelion() {
