@@ -83,7 +83,7 @@ const moonStartposNodal = 64;                // Aligned to major lunar standstil
 const moonStartposMoon = 132.105;            // Needs to be at ~21h09m57s if start model is 2451716.5
 
 // Reference lengths used as INPUT for Mercury
-const mercurySolarYearInput = 87.96877;
+const mercurySolarYearInput = 87.96855;
 const mercuryOrbitalInclination =  7.00501638;
 const mercuryOrbitalEccentricity = 0.20562928;
 const mercuryInclination = 6.3472858;
@@ -93,7 +93,7 @@ const mercuryAscendingNode = 48.33033155;
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
 const mercuryAngleCorrection = 0.984431;     // To align the perihelion exactly. According to formula ~77.4569131
-const mercuryPerihelionEclipticYears = 243455.906064; // Duration of perihelion precession to explain ~570 arcseconds per century
+const mercuryPerihelionEclipticYears = 242268; // Duration of perihelion precession to explain ~570 arcseconds per century
 const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
@@ -111,7 +111,7 @@ const venusPerihelionEclipticYears = holisticyearLength*20000000; // Duration of
 const venusStartpos = 249.68;                // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
-const marsSolarYearInput = 686.942;
+const marsSolarYearInput = 686.934;
 const marsOrbitalInclination = 1.84971028;
 const marsOrbitalEccentricity = 0.09344726;
 const marsInclination = 1.6311858;
@@ -139,7 +139,7 @@ const jupiterPerihelionEclipticYears = holisticyearLength; // Duration of perihe
 const jupiterStartpos = 13.79;               // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
-const saturnSolarYearInput = 10744.6;
+const saturnSolarYearInput = 10745.6;
 const saturnOrbitalInclination = 2.4853834;
 const saturnOrbitalEccentricity = 0.0564781;
 const saturnInclination = 0.9254704;
@@ -153,7 +153,7 @@ const saturnPerihelionEclipticYears = -holisticyearLength; // Duration of perihe
 const saturnStartpos = 11.344;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
-const uranusSolarYearInput = 30589;
+const uranusSolarYearInput = 30583;
 const uranusOrbitalInclination = 0.77234317;
 const uranusOrbitalEccentricity = 0.04519611;
 const uranusInclination = 0.9946692;
@@ -1385,8 +1385,8 @@ const renderVal = val => {
     const num = Number(raw);
     if (!Number.isFinite(num)) return '';          // guard NaN or ±∞
 
-    /* 5. show infinity symbol for very large numbers (> 1 billion) */
-    if (Math.abs(num) > 1e9) return '∞';
+    /* 5. show infinity symbol if explicitly requested for very large numbers */
+    if (val.infinity && Math.abs(num) > val.infinity) return '∞';
 
     const dec = val.dec ?? 0;
     const sep = val.sep ?? ',';
@@ -12594,7 +12594,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => mercuryPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => mercuryPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -12617,6 +12617,9 @@ const planetStats = {
        value : [ { v: () => calculateEarthFramePrecession('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
+      {label : () => `Missing advance 1800-1900 (Einstein's century)`,
+       value : [ { v: () => calculateEinsteinCenturyMissingAdvance(), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1800 to 1900`]},
       {label : () => `Predicted missing advance (next century)`,
        value : [ { v: () => calculatePredictedMissingAdvance(), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Predicted difference between Earth-frame and Ecliptic-frame perihelion advance from 2000 to 2100`]},
@@ -12929,7 +12932,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => venusPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => venusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -13234,7 +13237,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => marsPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => marsPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -13528,7 +13531,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => jupiterPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => jupiterPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -13833,7 +13836,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => saturnPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => saturnPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -14138,7 +14141,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => uranusPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => uranusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -14443,7 +14446,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => neptunePerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => neptunePerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -14747,7 +14750,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => plutoPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => plutoPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -15051,7 +15054,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => halleysPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => halleysPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -15355,7 +15358,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => erosPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => erosPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
@@ -16567,6 +16570,7 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 //
 // ================================================================
 
+const JD_1800 = 2378496.5;  // ~January 1, 1800
 const JD_1900 = 2415191.5;  // ~January 1, 1900
 const JD_2000 = 2451716.5;  // June 21, 2000 (model start)
 const JD_2100 = 2488069.5;  // ~January 1, 2100
@@ -16675,6 +16679,15 @@ function calculateMissingPerihelionAdvance(planetName) {
  */
 function calculatePredictedMissingAdvance() {
   return calculateMissingPerihelionAdvanceBetween('mercury', JD_2000, JD_2100);
+}
+
+/**
+ * Calculate the "missing advance" of perihelion for Mercury during Einstein's century (1800 to 1900).
+ *
+ * @returns {number} Missing advance in arcseconds
+ */
+function calculateEinsteinCenturyMissingAdvance() {
+  return calculateMissingPerihelionAdvanceBetween('mercury', JD_1800, JD_1900);
 }
 
 /**
