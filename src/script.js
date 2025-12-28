@@ -93,7 +93,7 @@ const mercuryAscendingNode = 48.33033155;
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
 const mercuryAngleCorrection = 0.984431;     // To align the perihelion exactly. According to formula ~77.4569131
-const mercuryPerihelionEclipticYears = 242268; // Duration of perihelion precession to explain ~570 arcseconds per century
+const mercuryPerihelionEclipticYears = 242268; // Duration of perihelion precession to explain ~574 arcseconds per century
 const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
@@ -4558,6 +4558,68 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   meanLabel1Obj.visible = false;
   meanLabel2Obj.visible = false;
 
+  // ===== EARTH HEIGHT INDICATOR (Annual Crossing) =====
+  // Shows Earth's current position above/below the invariable plane
+  // This changes over 1 year (NOT the 99,392-year cycle)
+  // Earth crosses the plane in early July (ascending) and early January (descending)
+
+  // Create a dashed line from Earth to the invariable plane
+  const earthHeightLineGeom = new THREE.BufferGeometry();
+  const linePositions = new Float32Array([
+    0, 0, 0,  // Start at plane (will be updated)
+    0, 0, 0   // End at Earth height (will be updated)
+  ]);
+  earthHeightLineGeom.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+
+  const earthHeightLineMat = new THREE.LineDashedMaterial({
+    color: 0x44ff44,  // Green (will change based on above/below)
+    dashSize: 5,
+    gapSize: 3,
+    linewidth: 2
+  });
+
+  const earthHeightLine = new THREE.Line(earthHeightLineGeom, earthHeightLineMat);
+  earthHeightLine.computeLineDistances(); // Required for dashed lines
+  earthHeightLine.name = 'EarthHeightLine';
+  group.add(earthHeightLine);
+
+  // Create Earth height label
+  const earthHeightLabelDiv = document.createElement('div');
+  earthHeightLabelDiv.innerHTML = '<span style="font-size:14px;font-weight:bold;">EARTH</span><br>0.000000 AU<br><span style="font-size:12px;">ABOVE</span>';
+  earthHeightLabelDiv.style.color = '#44ff44';
+  earthHeightLabelDiv.style.fontSize = '12px';
+  earthHeightLabelDiv.style.fontFamily = 'Arial, sans-serif';
+  earthHeightLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  earthHeightLabelDiv.style.pointerEvents = 'none';
+  earthHeightLabelDiv.style.textAlign = 'center';
+  earthHeightLabelDiv.style.lineHeight = '1.2';
+  earthHeightLabelDiv.style.background = 'rgba(0, 0, 0, 0.5)';
+  earthHeightLabelDiv.style.padding = '4px 8px';
+  earthHeightLabelDiv.style.borderRadius = '4px';
+
+  const earthHeightLabelObj = new CSS2DObject(earthHeightLabelDiv);
+  earthHeightLabelObj.position.set(0, 20, 0); // Will be updated dynamically
+  earthHeightLabelObj.visible = false; // Hidden by default (invariable plane starts hidden)
+  group.add(earthHeightLabelObj);
+
+  // Create a small sphere marker at Earth's projected position on the plane
+  const earthPlaneMarkerGeom = new THREE.SphereGeometry(6, 12, 12);
+  const earthPlaneMarkerMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.8
+  });
+  const earthPlaneMarker = new THREE.Mesh(earthPlaneMarkerGeom, earthPlaneMarkerMat);
+  earthPlaneMarker.position.set(0, 0, 0); // At Earth's projection on the plane
+  earthPlaneMarker.name = 'EarthPlaneMarker';
+  group.add(earthPlaneMarker);
+
+  // Store references for dynamic updates
+  group.userData.earthHeightLine = earthHeightLine;
+  group.userData.earthHeightLabelDiv = earthHeightLabelDiv;
+  group.userData.earthHeightLabelObj = earthHeightLabelObj;
+  group.userData.earthPlaneMarker = earthPlaneMarker;
+
   return group;
 }
 
@@ -4749,20 +4811,74 @@ function updateInclinationPathMarker() {
   }
 }
 
-// Update invariable plane Y position based on current inclination
-// The invariable plane should appear BELOW Earth when inclination > mean
-// and ABOVE Earth when inclination < mean
-// This makes Earth visually "above" or "below" the invariable plane correctly
+// Update invariable plane visualization - MOVES PLANE THROUGH EARTH
+//
+// VISUAL BEHAVIOR (Dec 2024):
+// The invariable plane moves up/down based on Earth's annual position, so you
+// physically see the plane passing through Earth twice per year:
+// - Early July: Plane moves DOWN through Earth (Earth ascending, going above)
+// - Early January: Plane moves UP through Earth (Earth descending, going below)
+//
+// When Earth is ABOVE the invariable plane, the plane appears BELOW Earth.
+// When Earth is BELOW the invariable plane, the plane appears ABOVE Earth.
+//
+// This annual crossing cycle (1 year) is independent of the 99,392-year
+// orbital plane tilt cycle shown by the inclination path visualization.
 function updateInvariablePlanePosition() {
   if (!invariablePlaneGroup || !invariablePlaneGroup.visible) return;
 
-  // Use same yScale as inclination path (50)
-  const yScale = 50;
-  const deviation = o.inclinationEarth - earthinclinationMean;
+  // Get Earth's current height above the invariable plane (in AU)
+  const heightAU = o.earthHeightAboveInvPlane || 0;
+  const isAbove = o.earthAboveInvPlane;
 
-  // Offset the invariable plane DOWN when Earth is above mean (positive deviation)
-  // So Earth appears ABOVE the plane
-  invariablePlaneGroup.position.y = -deviation * yScale;
+  // Scale factor: convert AU to visual units
+  // In this model, 1 AU = 100 visual units (sun.orbitRadius = 100)
+  // Earth's max excursion is about ±0.027 AU = ±2.7 visual units
+  const heightScale = 100; // Physically accurate: 1 AU = 100 units
+  const visualHeight = heightAU * heightScale;
+
+  // Move the plane OPPOSITE to Earth's height
+  // If Earth is +0.02 AU above the plane, move plane DOWN by visualHeight
+  // This makes the plane appear to pass through Earth as the year progresses
+  invariablePlaneGroup.position.y = -visualHeight;
+
+  // Update the Earth height indicator (line + label)
+  const heightLine = invariablePlaneGroup.userData.earthHeightLine;
+  const heightLabel = invariablePlaneGroup.userData.earthHeightLabelObj;
+  const heightLabelDiv = invariablePlaneGroup.userData.earthHeightLabelDiv;
+
+  if (!heightLine || !heightLabel) return;
+
+  // The line goes from the plane (now at local Y=0) up to Earth (at visualHeight in world space)
+  // But since the plane moved, Earth is at local position (0, visualHeight, 0) relative to plane
+  const positions = heightLine.geometry.attributes.position.array;
+  positions[0] = 0;  // Start X (on plane)
+  positions[1] = 0;  // Start Y (on plane, which is at Y=0 in local space)
+  positions[2] = 0;  // Start Z
+  positions[3] = 0;  // End X (at Earth)
+  positions[4] = visualHeight;  // End Y (Earth's position relative to plane)
+  positions[5] = 0;  // End Z
+  heightLine.geometry.attributes.position.needsUpdate = true;
+
+  // Recompute line distances for dashed material to work correctly
+  heightLine.computeLineDistances();
+  heightLine.geometry.attributes.lineDistance.needsUpdate = true;
+
+  // Update line color based on above/below
+  heightLine.material.color.set(isAbove ? 0x44ff44 : 0xff4444); // Green above, red below
+
+  // Update label position (near Earth, which is at visualHeight relative to plane)
+  heightLabel.position.set(0, visualHeight + (isAbove ? 20 : -20), 0);
+  const statusText = isAbove ? 'ABOVE' : 'BELOW';
+  const heightText = Math.abs(heightAU).toFixed(6);
+  heightLabelDiv.innerHTML = `<span style="font-size:14px;font-weight:bold;">EARTH</span><br>${heightText} AU<br><span style="font-size:12px;">${statusText}</span>`;
+  heightLabelDiv.style.color = isAbove ? '#44ff44' : '#ff4444';
+
+  // Update the Earth plane marker position (stays at plane level, Y=0 in local space)
+  const earthPlaneMarker = invariablePlaneGroup.userData.earthPlaneMarker;
+  if (earthPlaneMarker) {
+    earthPlaneMarker.position.y = 0; // Always on the plane
+  }
 }
 
 // Create invariable plane (tilted grid/disc)
@@ -9589,6 +9705,14 @@ function setupGUI() {
     if (invariablePlaneGroup.userData.meanLabel2Obj) {
       invariablePlaneGroup.userData.meanLabel2Obj.visible = value;
     }
+    // Earth height indicator label (annual crossing)
+    if (invariablePlaneGroup.userData.earthHeightLabelObj) {
+      invariablePlaneGroup.userData.earthHeightLabelObj.visible = value;
+    }
+    // Force immediate update of Earth height indicator when becoming visible
+    if (value) {
+      updateInvariablePlanePosition();
+    }
     needsLabelUpdate = true; // Force label renderer to redraw immediately
   });
   folderO.add(inclinationPathGroup, 'visible').name('Inclination path').onChange(function(value) {
@@ -11854,6 +11978,13 @@ const planetStats = {
       {label : () => `Position relative to Inv. Plane`,
        value : [ { v: () => o.earthAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }],
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
+    null,
+       {label : () => `Earth Mean Max Height above Inv. Plane`,
+       value : [ { v: () => Math.sin(o.inclinationEarth * Math.PI / 180), dec:6, sep:',' },{ small: 'AU' }],
+       hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × 1 AU. Actual values vary slightly with orbital position due to eccentricity.`]},
+      {label : () => `Earth Mean Max Height above Inv. Plane`,
+       value : [ { v: () => Math.sin(o.inclinationEarth * Math.PI / 180) * o.lengthofAU, dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Mean maximum height in km: ±sin(i) × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
       {label : () => `Mean Anomaly (M)`,

@@ -213,6 +213,7 @@ These formulas are already calculated and displayed in the simulation:
 | Argument of Periapsis | ω | `o.{planet}ArgumentOfPeriapsis` | `updateOrbitOrientations()` |
 | Heliocentric Distance | r | `{planet}.sunDistAU` | Real-time 3D position |
 | Height Above Invariable Plane | z | `o.{planet}HeightAboveInvPlane` | `updateInvariablePlaneHeights()` |
+| Mean Max Height Above Inv. Plane | z_max | `sin(i_inv)` | Earth planetStats |
 | Apparent Inclination | i_app | `o.{planet}ApparentInclination` | `updateDynamicInclinations()` |
 | Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
 | Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
@@ -1797,6 +1798,10 @@ h = √(GM·a·(1-e²))          Specific angular momentum
 ### Invariable Plane (already implemented)
 ```
 z = r·sin(i_inv)·sin(u)     Height above invariable plane
+z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
+                            (Actual max varies slightly with eccentricity:
+                             at perihelion: z_max = (1-e)·sin(i_inv)
+                             at aphelion:   z_max = (1+e)·sin(i_inv))
 β = arcsin(sin(i_inv)·sin(u)) Heliocentric latitude
 ```
 
