@@ -4886,6 +4886,367 @@ const invariablePlaneGroup = createInvariablePlaneVisualization(o.starDistance *
 earth.pivotObj.add(invariablePlaneGroup);
 invariablePlaneGroup.visible = false; // Off by default (labels also hidden by default)
 
+//*************************************************************
+// SUN-CENTERED INVARIABLE PLANE (works for all planets)
+//*************************************************************
+
+// Planet data lookup for invariable plane visualization
+// orbitRadiusAU is the semi-major axis used for fixed node marker positioning
+const PLANET_INV_PLANE_DATA = {
+  earth:   { obj: earth,   key: 'earth',   inclination: () => o.inclinationEarth, ascNode: () => o.earthAscendingNodeInvPlane,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
+  mercury: { obj: mercury, key: 'mercury', inclination: mercuryInclination,       ascNode: () => o.mercuryAscendingNodeInvPlane, height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
+  venus:   { obj: venus,   key: 'venus',   inclination: venusInclination,         ascNode: () => o.venusAscendingNodeInvPlane,   height: () => o.venusHeightAboveInvPlane,   orbitRadiusAU: venusOrbitDistance },
+  mars:    { obj: mars,    key: 'mars',    inclination: marsInclination,          ascNode: () => o.marsAscendingNodeInvPlane,    height: () => o.marsHeightAboveInvPlane,    orbitRadiusAU: marsOrbitDistance },
+  jupiter: { obj: jupiter, key: 'jupiter', inclination: jupiterInclination,       ascNode: () => o.jupiterAscendingNodeInvPlane, height: () => o.jupiterHeightAboveInvPlane, orbitRadiusAU: jupiterOrbitDistance },
+  saturn:  { obj: saturn,  key: 'saturn',  inclination: saturnInclination,        ascNode: () => o.saturnAscendingNodeInvPlane,  height: () => o.saturnHeightAboveInvPlane,  orbitRadiusAU: saturnOrbitDistance },
+  uranus:  { obj: uranus,  key: 'uranus',  inclination: uranusInclination,        ascNode: () => o.uranusAscendingNodeInvPlane,  height: () => o.uranusHeightAboveInvPlane,  orbitRadiusAU: uranusOrbitDistance },
+  neptune: { obj: neptune, key: 'neptune', inclination: neptuneInclination,       ascNode: () => o.neptuneAscendingNodeInvPlane, height: () => o.neptuneHeightAboveInvPlane, orbitRadiusAU: neptuneOrbitDistance },
+};
+
+// Reusable vectors to avoid allocation each frame
+const _sunCenteredPlane_sunPos = new THREE.Vector3();
+const _sunCenteredPlane_planetPos = new THREE.Vector3();
+
+/**
+ * Create Sun-centered invariable plane visualization
+ * This plane is fixed in space (relative to stars) and shows where planets cross it.
+ */
+function createSunCenteredInvPlane(size = 500, divisions = 20) {
+  const group = new THREE.Group();
+  group.name = 'SunCenteredInvariablePlane';
+
+  // The invariable plane orientation relative to the ecliptic is defined by:
+  // - Inclination: o.inclinationEarth (Earth's inclination TO the invariable plane)
+  // - Ascending node: o.earthAscendingNodeInvPlane + 180° (invariable plane's ascending node ON ecliptic)
+  // We'll set orientation in the update function since o.inclinationEarth is dynamic
+
+  // Grid helper (will be tilted in update function)
+  const gridHelper = new THREE.GridHelper(size, divisions, 0xaa44aa, 0x663366);
+  gridHelper.material.opacity = 0.3;
+  gridHelper.material.transparent = true;
+  group.add(gridHelper);
+
+  // Solid disc for better visibility
+  const discGeometry = new THREE.CircleGeometry(size / 2, 48);
+  const discMaterial = new THREE.MeshBasicMaterial({
+    color: 0x8844aa,
+    transparent: true,
+    opacity: 0.12,
+    side: THREE.DoubleSide
+  });
+  const disc = new THREE.Mesh(discGeometry, discMaterial);
+  disc.rotation.x = -Math.PI / 2; // Lay flat initially
+  group.add(disc);
+
+  // Edge ring
+  const ringGeometry = new THREE.RingGeometry(size/2 - 3, size/2, 64);
+  const ringMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff44ff,
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+  ring.rotation.x = -Math.PI / 2;
+  group.add(ring);
+
+  // Store references for orientation updates
+  group.userData.gridHelper = gridHelper;
+  group.userData.disc = disc;
+  group.userData.ring = ring;
+
+  return group;
+}
+
+/**
+ * Create node markers for a planet's orbit crossing the invariable plane
+ */
+function createPlanetNodeMarkersGroup() {
+  const group = new THREE.Group();
+  group.name = 'PlanetNodeMarkers';
+  group.visible = false; // Hidden by default
+
+  // Ascending node marker (green ☊)
+  const ascMarkerGeom = new THREE.SphereGeometry(4, 12, 12);
+  const ascMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+  const ascMarker = new THREE.Mesh(ascMarkerGeom, ascMarkerMat);
+  ascMarker.name = 'AscendingNodeMarker';
+  group.add(ascMarker);
+
+  // Ascending node label - ADD TO MARKER so it follows automatically
+  const ascLabelDiv = document.createElement('div');
+  ascLabelDiv.innerHTML = '<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC</span>';
+  ascLabelDiv.style.color = '#00ff88';
+  ascLabelDiv.style.fontSize = '12px';
+  ascLabelDiv.style.fontFamily = 'Arial, sans-serif';
+  ascLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  ascLabelDiv.style.pointerEvents = 'none';
+  ascLabelDiv.style.textAlign = 'center';
+  const ascLabelObj = new CSS2DObject(ascLabelDiv);
+  ascLabelObj.position.set(0, 15, 0); // Offset above marker in local coords
+  ascLabelObj.visible = false;
+  ascMarker.add(ascLabelObj); // Add to marker, not group
+
+  // Descending node marker (orange ☋)
+  const descMarkerGeom = new THREE.SphereGeometry(4, 12, 12);
+  const descMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff8800 });
+  const descMarker = new THREE.Mesh(descMarkerGeom, descMarkerMat);
+  descMarker.name = 'DescendingNodeMarker';
+  group.add(descMarker);
+
+  // Descending node label - ADD TO MARKER so it follows automatically
+  const descLabelDiv = document.createElement('div');
+  descLabelDiv.innerHTML = '<span style="font-size:18px;">☋</span><br><span style="font-size:11px;">DESC</span>';
+  descLabelDiv.style.color = '#ff8800';
+  descLabelDiv.style.fontSize = '12px';
+  descLabelDiv.style.fontFamily = 'Arial, sans-serif';
+  descLabelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  descLabelDiv.style.pointerEvents = 'none';
+  descLabelDiv.style.textAlign = 'center';
+  const descLabelObj = new CSS2DObject(descLabelDiv);
+  descLabelObj.position.set(0, 15, 0); // Offset above marker in local coords
+  descLabelObj.visible = false;
+  descMarker.add(descLabelObj); // Add to marker, not group
+
+  // Store references
+  group.userData.ascMarker = ascMarker;
+  group.userData.ascLabel = ascLabelObj;
+  group.userData.descMarker = descMarker;
+  group.userData.descLabel = descLabelObj;
+
+  return group;
+}
+
+/**
+ * Create height indicator label (shows planet's current height above/below plane)
+ * This is added to the SCENE directly (not to the plane group) to avoid transform issues
+ */
+function createHeightIndicatorLabel() {
+  const labelDiv = document.createElement('div');
+  labelDiv.innerHTML = '<span style="font-size:14px;font-weight:bold;">PLANET</span><br>0.000000 AU<br><span style="font-size:12px;">ABOVE</span>';
+  labelDiv.style.color = '#44ff44';
+  labelDiv.style.fontSize = '12px';
+  labelDiv.style.fontFamily = 'Arial, sans-serif';
+  labelDiv.style.textShadow = '2px 2px 4px black, -1px -1px 2px black';
+  labelDiv.style.pointerEvents = 'none';
+  labelDiv.style.textAlign = 'center';
+  labelDiv.style.lineHeight = '1.2';
+  labelDiv.style.background = 'rgba(0, 0, 0, 0.6)';
+  labelDiv.style.padding = '4px 8px';
+  labelDiv.style.borderRadius = '4px';
+
+  const labelObj = new CSS2DObject(labelDiv);
+  labelObj.name = 'SunCenteredHeightLabel';
+  labelObj.visible = false;
+
+  return { labelObj, labelDiv };
+}
+
+// Create the Sun-centered invariable plane
+const sunCenteredInvPlane = createSunCenteredInvPlane(o.starDistance * 2, 30);
+scene.add(sunCenteredInvPlane); // Add to scene, NOT to any pivot
+sunCenteredInvPlane.visible = false;
+
+// Create node markers - added to SCENE (not plane) so they stay fixed relative to stars
+const sunCenteredNodeMarkers = createPlanetNodeMarkersGroup();
+scene.add(sunCenteredNodeMarkers); // Add to scene, NOT to plane group
+sunCenteredNodeMarkers.visible = false;
+
+// Create height indicator label (added to scene directly to avoid transform issues)
+const { labelObj: sunCenteredHeightLabel, labelDiv: sunCenteredHeightLabelDiv } = createHeightIndicatorLabel();
+scene.add(sunCenteredHeightLabel);
+
+/**
+ * Update the Sun-centered invariable plane position and orientation.
+ * Should be called each frame when the plane is visible.
+ */
+function updateSunCenteredInvPlane() {
+  if (!sunCenteredInvPlane.visible) {
+    sunCenteredHeightLabel.visible = false;
+    return;
+  }
+
+  // Safety check - ensure sun object exists
+  if (!sun?.pivotObj) return;
+
+  // Get Sun's world position
+  sun.pivotObj.getWorldPosition(_sunCenteredPlane_sunPos);
+
+  // Center the plane at the Sun's position
+  // The invariable plane passes through the solar system barycenter (inside the Sun)
+  // By centering at the Sun, the plane will be at the correct position relative to planetary orbits
+  // The plane's ORIENTATION is fixed relative to stars (set by quaternion below)
+  // Only the POSITION follows the Sun - this is correct because in geocentric view,
+  // the Sun's position represents "where the center of the solar system is" from Earth's perspective
+  sunCenteredInvPlane.position.copy(_sunCenteredPlane_sunPos);
+
+  // Calculate plane orientation from Earth's relationship to the invariable plane
+  //
+  // Geometry:
+  // - The ecliptic (Earth's orbital plane) is the X-Z plane in this model
+  // - The invariable plane is tilted by o.inclinationEarth (~1.57°) relative to ecliptic
+  // - Earth's ascending node (o.earthAscendingNodeInvPlane) is where Earth crosses UP through the inv. plane
+  // - The HIGH point (max height above plane) is 90° AFTER the ascending node
+  // - The LOW point (max depth below plane) is 90° AFTER the descending node (= 270° after asc node)
+  //
+  // The invariable plane's tilt axis is the LINE OF NODES (the intersection of ecliptic and inv. plane)
+  // This line points toward the ascending node longitude.
+  //
+  // The plane should be tilted DOWN on the side 90° after ascending node (where HIGH point is)
+  // and UP on the side 90° before ascending node (where LOW point is)
+
+  const earthI = (o.inclinationEarth || earthinclinationMean) * Math.PI / 180;
+  const earthOmega = (o.earthAscendingNodeInvPlane || earthAscendingNodeInvPlaneVerified) * Math.PI / 180;
+
+  // The tilt axis is along the line of nodes, pointing toward ascending node
+  // In X-Z plane (ecliptic), ascending node at angle Omega from +X axis
+  // We need to rotate the ecliptic (Y=0 plane) around this axis by earthI degrees
+  //
+  // The axis of rotation is the line of nodes: direction (cos(Omega), 0, sin(Omega))
+  // But we need to tilt the plane such that the HIGH side (90° after asc node) goes DOWN
+  //
+  // After the ascending node, Earth goes ABOVE the plane, meaning the plane is BELOW Earth there
+  // So we tilt the plane DOWN on the +90° side of the ascending node
+
+  // Tilt axis: perpendicular to the direction from Sun to HIGH point
+  // HIGH point is at angle (Omega + 90°), so tilt axis is at angle Omega (toward ascending node)
+  const tiltAxisX = Math.cos(earthOmega);
+  const tiltAxisZ = Math.sin(earthOmega);
+  const tiltAxis = new THREE.Vector3(tiltAxisX, 0, tiltAxisZ).normalize();
+
+  // Create quaternion to rotate around the tilt axis by earthI
+  // Positive rotation tilts the +90° side DOWN (which is correct - that's where Earth is highest ABOVE)
+  const quaternion = new THREE.Quaternion();
+  quaternion.setFromAxisAngle(tiltAxis, earthI);
+  sunCenteredInvPlane.quaternion.copy(quaternion);
+
+  // Get the currently selected planet
+  const currentPlanetName = o.lookAtObj?.name?.toLowerCase();
+  const planetData = PLANET_INV_PLANE_DATA[currentPlanetName];
+
+  if (!planetData) {
+    // No valid planet selected - hide markers
+    sunCenteredNodeMarkers.visible = false;
+    sunCenteredHeightLabel.visible = false;
+    setCSS2DVisibility(sunCenteredNodeMarkers, false);
+    return;
+  }
+
+  // Get planet's orbit data
+  const planetObj = planetData.obj;
+  const inclinationDeg = typeof planetData.inclination === 'function' ? planetData.inclination() : planetData.inclination;
+  const ascNodeDeg = planetData.ascNode();
+  const heightAU = planetData.height() || 0;
+
+  // Get planet's world position
+  planetObj.pivotObj.getWorldPosition(_sunCenteredPlane_planetPos);
+
+  // GEOCENTRIC CORRECTION:
+  // In this model, Earth stays near origin while Sun orbits around it.
+  // We need to adjust the plane's Y position so that at the SELECTED PLANET's location,
+  // the visual height matches that planet's calculated height above the invariable plane.
+  //
+  // The plane is tilted and passes through the Sun. At the planet's X,Z position,
+  // the plane would be at some Y value. We want the planet to appear at the correct
+  // height above/below the plane.
+  //
+  // Calculate where the plane currently is at the planet's location, then offset
+  // the entire plane so the planet appears at the correct height.
+  const planetRelToSun = _sunCenteredPlane_planetPos.clone().sub(_sunCenteredPlane_sunPos);
+  const planeNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
+
+  // Current plane Y at planet's X,Z (before correction)
+  const dx = planetRelToSun.x;
+  const dz = planetRelToSun.z;
+  const currentPlaneYAtPlanet = _sunCenteredPlane_sunPos.y - (planeNormal.x * dx + planeNormal.z * dz) / planeNormal.y;
+
+  // Planet's actual Y and desired height above plane
+  const planetY = _sunCenteredPlane_planetPos.y;
+  const desiredHeightUnits = (heightAU || 0) * 100; // Convert AU to visual units
+
+  // The plane should be at: planetY - desiredHeightUnits
+  // Currently it's at: currentPlaneYAtPlanet
+  // So we need to shift the plane's position by the difference
+  const planeYCorrection = (planetY - desiredHeightUnits) - currentPlaneYAtPlanet;
+  sunCenteredInvPlane.position.y += planeYCorrection;
+
+  // Use fixed semi-major axis for node marker positioning (in visual units: 1 AU = 100 units)
+  const orbitRadius = planetData.orbitRadiusAU * 100;
+
+  // Show node markers
+  sunCenteredNodeMarkers.visible = true;
+  setCSS2DVisibility(sunCenteredNodeMarkers, true);
+
+  // Position node markers on the orbit at the ascending/descending node angles
+  // The ascending node is where the planet crosses the invariable plane going "up"
+  // Negate the angle because astronomical longitude increases CCW but we need CW rotation
+  const ascNodeRad = -ascNodeDeg * Math.PI / 180;
+
+  const ascMarker = sunCenteredNodeMarkers.userData.ascMarker;
+  const ascLabel = sunCenteredNodeMarkers.userData.ascLabel;
+  const descMarker = sunCenteredNodeMarkers.userData.descMarker;
+  const descLabel = sunCenteredNodeMarkers.userData.descLabel;
+
+  // Calculate position in plane-local coordinates (on the plane, Y=0)
+  // These are positions relative to the orbit center
+  const ascLocalX = Math.cos(ascNodeRad) * orbitRadius;
+  const ascLocalZ = Math.sin(ascNodeRad) * orbitRadius;
+
+  // Transform from plane-local to world coordinates:
+  // 1. Create local position vector (relative to orbit center)
+  // 2. Apply plane's quaternion to rotate into world orientation
+  // 3. Add orbit center position to get world coordinates
+  const ascLocalPos = new THREE.Vector3(ascLocalX, 0, ascLocalZ);
+  const descLocalPos = new THREE.Vector3(-ascLocalX, 0, -ascLocalZ);
+
+  // Apply plane's quaternion to transform to world orientation
+  // (The plane's quaternion represents the tilt of the invariable plane)
+  ascLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
+  descLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
+
+  // Determine the orbit center for node marker positioning:
+  // - For Earth: In the geocentric model, Earth stays near origin while Sun orbits Earth.
+  //   Earth's orbit is centered near the origin, not around the Sun.
+  // - For other planets: They orbit around the Sun, so use Sun's position.
+  const isEarth = currentPlanetName === 'earth';
+  const orbitCenter = isEarth ? new THREE.Vector3(0, 0, 0) : _sunCenteredPlane_sunPos;
+
+  // Add orbit center position to get world coordinates
+  ascLocalPos.add(orbitCenter);
+  descLocalPos.add(orbitCenter);
+
+  // Position markers (they're scene children, so world coords)
+  // Labels are children of markers, so they follow automatically
+  ascMarker.position.copy(ascLocalPos);
+  descMarker.position.copy(descLocalPos);
+
+  // Update height indicator label
+  sunCenteredHeightLabel.visible = true;
+
+  // Position label at the planet's world position
+  sunCenteredHeightLabel.position.copy(_sunCenteredPlane_planetPos);
+
+  // Update label content
+  const isAbove = heightAU > 0;
+  const planetName = planetData.key.toUpperCase();
+  const statusText = isAbove ? 'ABOVE' : 'BELOW';
+  const heightText = Math.abs(heightAU).toFixed(6);
+  sunCenteredHeightLabelDiv.innerHTML = `<span style="font-size:14px;font-weight:bold;">${planetName}</span><br>${heightText} AU<br><span style="font-size:12px;">${statusText}</span>`;
+  sunCenteredHeightLabelDiv.style.color = isAbove ? '#44ff44' : '#ff4444';
+}
+
+/**
+ * Helper to set visibility of all CSS2DObjects in a group
+ * CSS2DRenderer doesn't inherit visibility from parent, so we must set each label explicitly
+ */
+function setCSS2DVisibility(group, visible) {
+  group.traverse((child) => {
+    if (child.isCSS2DObject) {
+      child.visible = visible;
+    }
+  });
+}
+
 // Create inclination path (wobble curve showing 99,392-year cycle)
 // Add to earth.pivotObj (same as zodiac) so it can be toggled independently
 // The rotation is applied in moveModel() to match zodiac alignment
@@ -9689,7 +10050,18 @@ function setupGUI() {
 
   folderO.add(celestialSphere, 'visible').name('Celestial sphere')
   folderO.add(plane, 'visible').name('Ecliptic grid')
-  folderO.add(invariablePlaneGroup, 'visible').name('Invariable plane').onChange(function(value) {
+  folderO.add(sunCenteredInvPlane, 'visible').name('Invariable plane').onChange(function(value) {
+    // Show/hide node markers and height label when toggling
+    sunCenteredNodeMarkers.visible = value;
+    setCSS2DVisibility(sunCenteredNodeMarkers, value);
+    sunCenteredHeightLabel.visible = value;
+    // Force immediate update when becoming visible
+    if (value) {
+      updateSunCenteredInvPlane();
+    }
+    needsLabelUpdate = true;
+  });
+  folderO.add(invariablePlaneGroup, 'visible').name('Earth Inclination to Invariable plane').onChange(function(value) {
     // Show/hide all labels when toggling the plane
     // Must set CSS2DObject.visible property (not just div.style.display)
     // because the patched labelRenderer checks obj.visible and overrides display style
@@ -9713,9 +10085,8 @@ function setupGUI() {
     if (value) {
       updateInvariablePlanePosition();
     }
-    needsLabelUpdate = true; // Force label renderer to redraw immediately
-  });
-  folderO.add(inclinationPathGroup, 'visible').name('Inclination path').onChange(function(value) {
+    // Also toggle inclination path visibility
+    inclinationPathGroup.visible = value;
     if (value) {
       // Force immediate position update when becoming visible
       _lastInclinationUpdateYear = null; // Reset throttle
@@ -9726,7 +10097,7 @@ function setupGUI() {
       if (labelObject) labelObject.visible = false;
     }
     needsLabelUpdate = true; // Force label renderer to redraw immediately
-  })
+  });
 
   let sFolder = gui.addFolder('Settings')
 
@@ -10010,6 +10381,7 @@ function render(now) {
       updateHierarchyLiveData(); // Must be after updatePositions() which sets raDisplay/decDisplay
       updateInclinationPathMarker();
       updateInvariablePlanePosition();
+      updateSunCenteredInvPlane(); // Sun-centered invariable plane for all planets
     }
     // 6c) Throttle visual effects (30 Hz) - smooth enough for eye, saves CPU
     visualElapsed += delta;
