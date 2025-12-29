@@ -3846,6 +3846,28 @@ let o = {
   halleysApparentInclinationSouamiSouchay: 0,
   erosApparentInclinationSouamiSouchay: 0,
 
+  // Invariable Plane Positions Panel - mass-weighted balance
+  massWeightedBalance: 0,           // Mass-weighted height balance (AU)
+  planetsAboveInvPlane: 0,          // Count of planets above
+  planetsBelowInvPlane: 0,          // Count of planets below
+
+  // Validation: Option A vs Option B comparison
+  calculatedPlaneTilt: 0,           // Calculated tilt from angular momentum (°)
+  calculatedAscendingNode: 0,       // Calculated ascending node from angular momentum (°)
+  jupiterAngularMomentumPercent: 0, // Jupiter's % of total L
+  saturnAngularMomentumPercent: 0,  // Saturn's % of total L
+  optionABDifference: 0,            // Angular difference between methods (°)
+
+  // Balance Trend Analysis
+  balanceTrackingActive: false,     // Is tracking currently recording?
+  balanceTrackingStartYear: 0,      // Year when tracking started
+  balanceYearsTracked: 0,           // Duration of tracking (years)
+  balanceSampleCount: 0,            // Number of samples taken
+  balanceCumulativeSum: 0,          // Running sum of all balance samples
+  balanceLifetimeAverage: 0,        // Cumulative sum / sample count
+  balanceMinSeen: 0,                // Minimum balance observed
+  balanceMaxSeen: 0,                // Maximum balance observed
+
   Target: "",
   lookAtObj: {},
   
@@ -10099,6 +10121,107 @@ function setupGUI() {
     needsLabelUpdate = true; // Force label renderer to redraw immediately
   });
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // INVARIABLE PLANE POSITIONS PANEL
+  // Shows all planets' heights relative to the invariable plane
+  // ═══════════════════════════════════════════════════════════════════════════
+  const invPlanePositionsFolder = gui.addFolder('Invariable Plane Positions');
+
+  // Helper to add tooltip to dat.GUI controller
+  const addTooltip = (controller, text) => {
+    if (controller.domElement && controller.domElement.parentElement) {
+      controller.domElement.parentElement.title = text;
+    }
+    return controller;
+  };
+
+  // Planet heights (read-only displays via .listen())
+  // Use step(0.0001) to show 4 decimal places for small AU values
+  addTooltip(invPlanePositionsFolder.add(o, 'mercuryHeightAboveInvPlane', -1, 1).step(0.0001).name('Mercury (AU)').listen(),
+    'Height above invariable plane in AU. Positive = above, negative = below. Mercury has highest inclination (6.35°), max height ~0.05 AU.');
+  addTooltip(invPlanePositionsFolder.add(o, 'venusHeightAboveInvPlane', -1, 1).step(0.0001).name('Venus (AU)').listen(),
+    'Height above invariable plane in AU. Venus inclination: 2.15°, max height ~0.02 AU.');
+  addTooltip(invPlanePositionsFolder.add(o, 'earthHeightAboveInvPlane', -1, 1).step(0.0001).name('Earth (AU)').listen(),
+    'Height above invariable plane in AU. Earth inclination: 1.57°, max height ~0.027 AU. Crosses plane in July (ascending) and January (descending).');
+  addTooltip(invPlanePositionsFolder.add(o, 'marsHeightAboveInvPlane', -1, 1).step(0.0001).name('Mars (AU)').listen(),
+    'Height above invariable plane in AU. Mars inclination: 1.63°, max height ~0.04 AU.');
+  addTooltip(invPlanePositionsFolder.add(o, 'jupiterHeightAboveInvPlane', -1, 1).step(0.0001).name('Jupiter (AU)').listen(),
+    'Height above invariable plane in AU. Jupiter has lowest inclination (0.32°) because it dominates the plane. Max height ~0.03 AU.');
+  addTooltip(invPlanePositionsFolder.add(o, 'saturnHeightAboveInvPlane', -1, 1).step(0.0001).name('Saturn (AU)').listen(),
+    'Height above invariable plane in AU. Saturn inclination: 0.93°, max height ~0.15 AU due to large orbit.');
+  addTooltip(invPlanePositionsFolder.add(o, 'uranusHeightAboveInvPlane', -1, 1).step(0.0001).name('Uranus (AU)').listen(),
+    'Height above invariable plane in AU. Uranus inclination: 0.99°, max height ~0.34 AU.');
+  addTooltip(invPlanePositionsFolder.add(o, 'neptuneHeightAboveInvPlane', -1, 1).step(0.0001).name('Neptune (AU)').listen(),
+    'Height above invariable plane in AU. Neptune inclination: 0.74°, max height ~0.39 AU due to large orbit.');
+
+  // Balance indicators
+  addTooltip(invPlanePositionsFolder.add(o, 'massWeightedBalance', -1, 1).step(0.000001).name('Mass Balance (AU)').listen(),
+    'Mass-weighted average height: Σ(mass × height) / total_mass. Should oscillate around zero over long timescales. Jupiter (71%) and Saturn (21%) dominate.');
+  addTooltip(invPlanePositionsFolder.add(o, 'planetsAboveInvPlane').name('Planets Above').listen(),
+    'Number of planets currently above the invariable plane (positive height).');
+  addTooltip(invPlanePositionsFolder.add(o, 'planetsBelowInvPlane').name('Planets Below').listen(),
+    'Number of planets currently below the invariable plane (negative height).');
+
+  // Validation subfolder (Option A vs B comparison)
+  const validationFolder = invPlanePositionsFolder.addFolder('Validate position of Invariable plane (Option A vs B)');
+  addTooltip(validationFolder.add(o, 'calculatedPlaneTilt', 0, 10).step(0.0001).name('Calc. Tilt (°)').listen(),
+    'Invariable plane tilt from ecliptic, calculated from angular momentum vectors (Option A). Expected: 1.5787° (Souami & Souchay 2012). This is constant - defined by orbital elements.');
+  addTooltip(validationFolder.add(o, 'calculatedAscendingNode', 0, 360).step(0.01).name('Calc. Asc.Node (°)').listen(),
+    'Ascending node of invariable plane on ecliptic (Option A). Expected: ~107°. This is where the invariable plane crosses the ecliptic going north. Constant value.');
+  addTooltip(validationFolder.add(o, 'jupiterAngularMomentumPercent', 0, 100).step(0.01).name('Jupiter L (%)').listen(),
+    'Jupiter\'s contribution to total planetary angular momentum. Expected: 58-62%. Jupiter dominates the invariable plane orientation.');
+  addTooltip(validationFolder.add(o, 'saturnAngularMomentumPercent', 0, 100).step(0.01).name('Saturn L (%)').listen(),
+    'Saturn\'s contribution to total planetary angular momentum. Expected: 23-26%. Second largest contributor after Jupiter.');
+  addTooltip(validationFolder.add(o, 'optionABDifference', 0, 10).step(0.0001).name('A vs B Diff (°)').listen(),
+    'Difference between Option A (calculated) and Option B (Souami & Souchay data). Should be <0.5° if orbital elements are correct.');
+  validationFolder.close(); // Start collapsed
+
+  // Balance Trend Analysis subfolder
+  const trendFolder = invPlanePositionsFolder.addFolder('Balance Trend Analysis');
+
+  // Start/Stop button - changes label based on state
+  const trackingButton = { label: 'Start Tracking' };
+  const trackingController = trendFolder.add(trackingButton, 'label').name('▶ Start Tracking');
+  trackingController.domElement.parentElement.style.cursor = 'pointer';
+  trackingController.domElement.querySelector('input').style.display = 'none';
+  trackingController.domElement.parentElement.addEventListener('click', () => {
+    if (o.balanceTrackingActive) {
+      stopBalanceTracking();
+      trackingController.name('▶ Start Tracking');
+    } else {
+      startBalanceTracking();
+      trackingController.name('⏹ Stop Tracking');
+    }
+  });
+  trackingController.domElement.parentElement.title = 'Click to start/stop recording balance samples. Run for 165+ years (one Neptune orbit) for meaningful average.';
+
+  // Tracking status display
+  addTooltip(trendFolder.add(o, 'balanceTrackingActive').name('Tracking Active').listen(),
+    'Whether balance tracking is currently recording samples.');
+  addTooltip(trendFolder.add(o, 'balanceTrackingStartYear', -100000, 100000).step(0.1).name('Started (year)').listen(),
+    'Simulation year when tracking began.');
+  addTooltip(trendFolder.add(o, 'balanceYearsTracked', 0, 1000000).step(0.1).name('Years Tracked').listen(),
+    'Duration of tracking in simulated years. Need 165+ years (one Neptune orbit) for meaningful average.');
+  addTooltip(trendFolder.add(o, 'balanceSampleCount', 0, 1000000).step(1).name('Sample Count').listen(),
+    'Number of yearly samples collected. More samples = more accurate average.');
+  addTooltip(trendFolder.add(o, 'balanceCumulativeSum', -1000, 1000).step(0.000001).name('Cumulative Sum').listen(),
+    'Running sum of all balance samples. Divide by sample count to get lifetime average.');
+  addTooltip(trendFolder.add(o, 'balanceLifetimeAverage', -1, 1).step(0.000001).name('Lifetime Avg (AU)').listen(),
+    'KEY METRIC: Should converge to ~0 over 165+ years if invariable plane is correctly positioned. This validates the plane orientation.');
+  addTooltip(trendFolder.add(o, 'balanceMinSeen', -1, 1).step(0.000001).name('Min Seen (AU)').listen(),
+    'Most negative (below plane) balance observed during tracking. Shows lower bound of oscillation.');
+  addTooltip(trendFolder.add(o, 'balanceMaxSeen', -1, 1).step(0.000001).name('Max Seen (AU)').listen(),
+    'Most positive (above plane) balance observed during tracking. Shows upper bound of oscillation.');
+
+  // Reset button
+  const resetButton = { reset: () => { resetBalanceTracking(); trackingController.name('▶ Start Tracking'); } };
+  const resetController = trendFolder.add(resetButton, 'reset').name('↺ Reset Tracking');
+  resetController.domElement.parentElement.title = 'Clear all tracking data and start fresh. Use after jumping to a new simulation date.';
+
+  trendFolder.close(); // Start collapsed
+
+  invPlanePositionsFolder.close(); // Start collapsed
+
   let sFolder = gui.addFolder('Settings')
 
   // Hierarchy Inspector - first item in Settings
@@ -10378,6 +10501,10 @@ function render(now) {
       updatePlanetAnomalies(); // Must be after updateAscendingNodes(), calculates Mean/True Anomaly for all planets
       updatePlanetInvariablePlaneHeights(); // Must be after updatePlanetAnomalies(), calculates height above invariable plane
       updateDynamicInclinations(); // Must be after updatePlanetInvariablePlaneHeights(), calculates apparent inclination to ecliptic
+      updateInvariablePlaneBalance(); // Must be after updatePlanetInvariablePlaneHeights(), calculates mass-weighted balance
+      updateBalanceTrendAnalysis(); // Must be after updateInvariablePlaneBalance(), records samples when tracking active
+      updateBalanceMinMax(); // Must be after updateInvariablePlaneBalance(), tracks min/max every frame
+      calculateInvariablePlaneFromAngularMomentum(); // Validation: Option A calculation
       updateHierarchyLiveData(); // Must be after updatePositions() which sets raDisplay/decDisplay
       updateInclinationPathMarker();
       updateInvariablePlanePosition();
@@ -10638,6 +10765,8 @@ function forceSceneUpdate () {
   updatePlanetAnomalies();
   updatePlanetInvariablePlaneHeights();
   updateDynamicInclinations();
+  updateInvariablePlaneBalance();
+  calculateInvariablePlaneFromAngularMomentum();
   updateOrbitOrientations();
   // -- anything else your render loop does that affects .ra/.dec
 }
@@ -18033,6 +18162,243 @@ function updatePlanetInvariablePlaneHeights() {
     o[key + 'AboveInvPlane'] = height > 0;
 
   }
+}
+
+/**
+ * Update the mass-weighted balance of planets relative to the invariable plane.
+ *
+ * Calculates:
+ * - o.massWeightedBalance: Sum of (mass × height) / total mass (AU)
+ * - o.planetsAboveInvPlane: Count of planets above the plane
+ * - o.planetsBelowInvPlane: Count of planets below the plane
+ *
+ * The invariable plane is defined by the total angular momentum, so the mass-weighted
+ * balance should oscillate around zero over long timescales.
+ */
+function updateInvariablePlaneBalance() {
+  // Total mass of 8 major planets (in kg, from existing constants)
+  const TOTAL_MASS = M_MERCURY + M_VENUS + M_EARTH + M_MARS + M_JUPITER + M_SATURN + M_URANUS + M_NEPTUNE;
+
+  let weightedSum = 0;
+  let aboveCount = 0;
+  let belowCount = 0;
+
+  const planets = [
+    { key: 'mercury', mass: M_MERCURY },
+    { key: 'venus',   mass: M_VENUS },
+    { key: 'earth',   mass: M_EARTH },
+    { key: 'mars',    mass: M_MARS },
+    { key: 'jupiter', mass: M_JUPITER },
+    { key: 'saturn',  mass: M_SATURN },
+    { key: 'uranus',  mass: M_URANUS },
+    { key: 'neptune', mass: M_NEPTUNE }
+  ];
+
+  for (const { key, mass } of planets) {
+    const height = o[key + 'HeightAboveInvPlane'] || 0;
+    const isAbove = o[key + 'AboveInvPlane'];
+
+    weightedSum += mass * height;
+
+    if (isAbove) {
+      aboveCount++;
+    } else {
+      belowCount++;
+    }
+  }
+
+  o.massWeightedBalance = weightedSum / TOTAL_MASS;
+  o.planetsAboveInvPlane = aboveCount;
+  o.planetsBelowInvPlane = belowCount;
+}
+
+// Track last sampled year for balance trend analysis (module-level to persist across calls)
+let _lastBalanceSampleYear = null;
+
+/**
+ * Update balance trend analysis statistics.
+ *
+ * Only records samples when tracking is active (o.balanceTrackingActive = true).
+ * Samples once per simulated year to avoid oversampling during fast simulation.
+ *
+ * Updates:
+ * - o.balanceYearsTracked: Duration since tracking started
+ * - o.balanceSampleCount: Number of yearly samples
+ * - o.balanceCumulativeSum: Running sum of balance values
+ * - o.balanceLifetimeAverage: Should converge to ~0 over 165+ years
+ * - o.balanceMinSeen / o.balanceMaxSeen: Range of observed values
+ */
+function updateBalanceTrendAnalysis() {
+  // Only record when tracking is active
+  if (!o.balanceTrackingActive) return;
+
+  const currentYear = Math.floor(o.currentYear);
+
+  // Only sample once per simulated year
+  if (currentYear === _lastBalanceSampleYear) return;
+  _lastBalanceSampleYear = currentYear;
+
+  // First sample initializes min/max
+  if (o.balanceSampleCount === 0) {
+    o.balanceMinSeen = o.massWeightedBalance;
+    o.balanceMaxSeen = o.massWeightedBalance;
+  }
+
+  // Update statistics
+  o.balanceSampleCount++;
+  o.balanceCumulativeSum += o.massWeightedBalance;
+  o.balanceYearsTracked = o.currentYear - o.balanceTrackingStartYear;
+  o.balanceLifetimeAverage = o.balanceCumulativeSum / o.balanceSampleCount;
+
+  // Track min/max (always update, even between yearly samples, to catch extremes)
+  if (o.massWeightedBalance < o.balanceMinSeen) o.balanceMinSeen = o.massWeightedBalance;
+  if (o.massWeightedBalance > o.balanceMaxSeen) o.balanceMaxSeen = o.massWeightedBalance;
+}
+
+/**
+ * Update min/max tracking every frame (not just yearly samples).
+ * This ensures we catch extreme values even with large time steps.
+ */
+function updateBalanceMinMax() {
+  if (!o.balanceTrackingActive) return;
+
+  // Always track min/max every frame to catch extremes
+  if (o.balanceSampleCount === 0) {
+    // Not yet initialized - will be set on first yearly sample
+    return;
+  }
+  if (o.massWeightedBalance < o.balanceMinSeen) o.balanceMinSeen = o.massWeightedBalance;
+  if (o.massWeightedBalance > o.balanceMaxSeen) o.balanceMaxSeen = o.massWeightedBalance;
+}
+
+/**
+ * Start balance trend tracking from current simulation year.
+ */
+function startBalanceTracking() {
+  o.balanceTrackingActive = true;
+  o.balanceTrackingStartYear = o.currentYear;
+  o.balanceYearsTracked = 0;
+  o.balanceSampleCount = 0;
+  o.balanceCumulativeSum = 0;
+  o.balanceLifetimeAverage = 0;
+  o.balanceMinSeen = 0;
+  o.balanceMaxSeen = 0;
+  _lastBalanceSampleYear = null;
+}
+
+/**
+ * Stop balance trend tracking (preserves data for review).
+ */
+function stopBalanceTracking() {
+  o.balanceTrackingActive = false;
+}
+
+/**
+ * Reset balance trend tracking (clears all data).
+ */
+function resetBalanceTracking() {
+  o.balanceTrackingActive = false;
+  o.balanceTrackingStartYear = 0;
+  o.balanceYearsTracked = 0;
+  o.balanceSampleCount = 0;
+  o.balanceCumulativeSum = 0;
+  o.balanceLifetimeAverage = 0;
+  o.balanceMinSeen = 0;
+  o.balanceMaxSeen = 0;
+  _lastBalanceSampleYear = null;
+}
+
+/**
+ * Calculate the invariable plane orientation from angular momentum vectors.
+ * This is "Option A" - dynamic calculation from orbital elements.
+ *
+ * Used to validate against "Option B" (Souami & Souchay 2012 published data).
+ *
+ * Updates:
+ * - o.calculatedPlaneTilt: Angle from ecliptic (°)
+ * - o.calculatedAscendingNode: Ascending node on ecliptic (°)
+ * - o.jupiterAngularMomentumPercent: Jupiter's % of total L
+ * - o.saturnAngularMomentumPercent: Saturn's % of total L
+ * - o.optionABDifference: Difference between Option A and Option B (°)
+ */
+function calculateInvariablePlaneFromAngularMomentum() {
+  const DEG2RAD = Math.PI / 180;
+  const RAD2DEG = 180 / Math.PI;
+
+  // GM_SUN is in km³/s², lengthofAU is in km
+  const planets = [
+    { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricity, i: mercuryOrbitalInclination, node: mercuryAscendingNode },
+    { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: venusOrbitalEccentricity,   i: venusOrbitalInclination,   node: venusAscendingNode },
+    { key: 'earth',   mass: M_EARTH,   a: 1.0,                  e: o.eccentricityEarth,        i: 0,                         node: 0 },
+    { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: marsOrbitalEccentricity,    i: marsOrbitalInclination,    node: marsAscendingNode },
+    { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricity, i: jupiterOrbitalInclination, node: jupiterAscendingNode },
+    { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: saturnOrbitalEccentricity,  i: saturnOrbitalInclination,  node: saturnAscendingNode },
+    { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: uranusOrbitalEccentricity,  i: uranusOrbitalInclination,  node: uranusAscendingNode },
+    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity, i: neptuneOrbitalInclination, node: neptuneAscendingNode }
+  ];
+
+  let L_total_x = 0;
+  let L_total_y = 0;
+  let L_total_z = 0;
+  let totalL = 0;
+  let jupiterL = 0;
+  let saturnL = 0;
+
+  for (const planet of planets) {
+    // Specific angular momentum magnitude: h = sqrt(GM * a * (1 - e²))
+    // a is in AU, convert to km for consistency with GM_SUN (km³/s²)
+    const a_km = planet.a * o.lengthofAU;
+    const h = Math.sqrt(GM_SUN * a_km * (1 - planet.e * planet.e));
+
+    // Angular momentum magnitude: L = m * h
+    const L_mag = planet.mass * h;
+
+    // Orbital plane normal (perpendicular to orbit, in ecliptic coordinates)
+    const i_rad = planet.i * DEG2RAD;
+    const node_rad = planet.node * DEG2RAD;
+
+    // Normal vector to orbital plane points in direction of angular momentum
+    const nx = Math.sin(i_rad) * Math.sin(node_rad);
+    const ny = Math.cos(i_rad);
+    const nz = -Math.sin(i_rad) * Math.cos(node_rad);
+
+    // Weight by angular momentum magnitude
+    L_total_x += nx * L_mag;
+    L_total_y += ny * L_mag;
+    L_total_z += nz * L_mag;
+    totalL += L_mag;
+
+    // Track Jupiter and Saturn contributions
+    if (planet.key === 'jupiter') jupiterL = L_mag;
+    if (planet.key === 'saturn') saturnL = L_mag;
+  }
+
+  // Normalize to get invariable plane normal
+  const L_mag_total = Math.sqrt(L_total_x * L_total_x + L_total_y * L_total_y + L_total_z * L_total_z);
+  const nx = L_total_x / L_mag_total;
+  const ny = L_total_y / L_mag_total;
+  const nz = L_total_z / L_mag_total;
+
+  // Calculate tilt from ecliptic (angle between L_total and Y-axis)
+  // Y-axis is ecliptic normal in our coordinate system
+  const tiltDeg = Math.acos(ny) * RAD2DEG;
+
+  // Calculate ascending node on ecliptic
+  // This is the longitude where the invariable plane crosses the ecliptic going north
+  let ascNodeDeg = Math.atan2(nx, -nz) * RAD2DEG;
+  if (ascNodeDeg < 0) ascNodeDeg += 360;
+
+  // Store results
+  o.calculatedPlaneTilt = tiltDeg;
+  o.calculatedAscendingNode = ascNodeDeg;
+  o.jupiterAngularMomentumPercent = (jupiterL / totalL) * 100;
+  o.saturnAngularMomentumPercent = (saturnL / totalL) * 100;
+
+  // Calculate difference between Option A and Option B
+  // Option B reference: Souami & Souchay (2012) invariable plane tilt = 1.5787°
+  // Note: This is constant - the invariable plane orientation doesn't change over human timescales
+  const SOUAMI_SOUCHAY_TILT = 1.5787;  // From S&S 2012 paper
+  o.optionABDifference = Math.abs(tiltDeg - SOUAMI_SOUCHAY_TILT);
 }
 
 /**
