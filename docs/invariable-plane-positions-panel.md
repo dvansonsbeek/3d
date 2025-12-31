@@ -635,11 +635,199 @@ If the orbital elements are correct, Option A should produce:
 
 ---
 
+## Detailed Calculation: How "Calc. Tilt" (1.5785°) Is Derived
+
+### Background: What Is the Invariable Plane?
+
+The invariable plane is perpendicular to the **total angular momentum vector** of the solar system. Since angular momentum is conserved in an isolated system, this plane is fixed in space — unlike the ecliptic, which slowly precesses over time.
+
+Souami & Souchay (2012) determined the orientation with respect to the J2000 ecliptic as:
+- **Inclination**: 1°34'43.3" = **1.5787°**
+- **Ascending node**: 107°34'56" = **107.582°**
+
+Our simulation independently calculates these values from orbital elements to validate correctness.
+
+### The Physics: Angular Momentum of an Orbit
+
+For a planet in an elliptical orbit, the **specific angular momentum** (angular momentum per unit mass) is:
+
+```
+h = √(GM_☉ × a × (1 - e²))
+```
+
+Where:
+- `GM_☉` = Gravitational parameter of the Sun (1.32712440018 × 10¹¹ km³/s²)
+- `a` = Semi-major axis (km)
+- `e` = Orbital eccentricity
+
+The **total angular momentum** of a planet is:
+
+```
+L = m × h = m × √(GM_☉ × a × (1 - e²))
+```
+
+Where `m` is the planet's mass.
+
+### Step-by-Step Calculation
+
+#### Step 1: Calculate Each Planet's Angular Momentum Magnitude
+
+For each planet, compute `L = mass × √(GM_☉ × a × (1 - e²))`:
+
+| Planet | Mass (kg) | a (AU) | e | L (relative) |
+|--------|-----------|--------|---|--------------|
+| Mercury | 3.30 × 10²³ | 0.387 | 0.2056 | 0.0009 |
+| Venus | 4.87 × 10²⁴ | 0.723 | 0.0068 | 0.0199 |
+| Earth | 5.97 × 10²⁴ | 1.000 | 0.0167 | 0.0287 |
+| Mars | 6.42 × 10²³ | 1.524 | 0.0934 | 0.0048 |
+| **Jupiter** | 1.90 × 10²⁷ | 5.203 | 0.0485 | **60.19%** |
+| **Saturn** | 5.68 × 10²⁶ | 9.537 | 0.0556 | **24.54%** |
+| Uranus | 8.68 × 10²⁵ | 19.19 | 0.0472 | 5.22% |
+| Neptune | 1.02 × 10²⁶ | 30.07 | 0.0086 | 6.80% |
+
+> **Key insight**: Jupiter (60%) and Saturn (25%) contribute ~85% of the total angular momentum. The invariable plane orientation is dominated by these two gas giants.
+
+#### Step 2: Convert Angular Momentum to a 3D Vector
+
+Each planet's angular momentum vector points perpendicular to its orbital plane. In ecliptic coordinates, the direction is determined by the orbital inclination (`i`) and ascending node (`Ω`):
+
+```
+L_x = L × sin(i) × sin(Ω)
+L_y = L × cos(i)
+L_z = L × (-sin(i) × cos(Ω))
+```
+
+Where:
+- `L_y` points toward the ecliptic north pole (perpendicular to ecliptic)
+- `L_x` and `L_z` are in the ecliptic plane
+
+#### Step 3: Sum All Angular Momentum Vectors
+
+```
+L_total = Σ L_planet = (ΣL_x, ΣL_y, ΣL_z)
+```
+
+This gives the total angular momentum vector of the planetary system.
+
+#### Step 4: Calculate the Tilt Angle
+
+The invariable plane is perpendicular to `L_total`. The tilt from the ecliptic is the angle between `L_total` and the ecliptic normal (Y-axis):
+
+```
+tilt = arccos(L_total_y / |L_total|)
+```
+
+Where `|L_total| = √(L_x² + L_y² + L_z²)`
+
+#### Step 5: Calculate the Ascending Node
+
+The ascending node is where the invariable plane crosses the ecliptic going north:
+
+```
+ascending_node = atan2(L_total_x, -L_total_z)
+```
+
+### Implementation in Code
+
+```javascript
+function calculateInvariablePlaneFromAngularMomentum() {
+  let L_total_x = 0, L_total_y = 0, L_total_z = 0;
+
+  for (const planet of planets) {
+    // Step 1: Angular momentum magnitude
+    const a_km = planet.a * AU_IN_KM;
+    const h = Math.sqrt(GM_SUN * a_km * (1 - planet.e * planet.e));
+    const L_mag = planet.mass * h;
+
+    // Step 2: Direction vector (orbital plane normal)
+    const i_rad = planet.inclination * DEG2RAD;
+    const node_rad = planet.ascendingNode * DEG2RAD;
+
+    const nx = Math.sin(i_rad) * Math.sin(node_rad);
+    const ny = Math.cos(i_rad);
+    const nz = -Math.sin(i_rad) * Math.cos(node_rad);
+
+    // Step 3: Sum weighted vectors
+    L_total_x += nx * L_mag;
+    L_total_y += ny * L_mag;
+    L_total_z += nz * L_mag;
+  }
+
+  // Normalize
+  const L_mag_total = Math.sqrt(L_total_x**2 + L_total_y**2 + L_total_z**2);
+  const ny = L_total_y / L_mag_total;
+
+  // Step 4: Tilt from ecliptic
+  const tiltDeg = Math.acos(ny) * RAD2DEG;  // Result: 1.5785°
+
+  // Step 5: Ascending node
+  const ascNodeDeg = Math.atan2(L_total_x/L_mag_total, -L_total_z/L_mag_total) * RAD2DEG;
+}
+```
+
+### Why 1.5785° Instead of 1.5787°?
+
+Our calculated value (**1.5785°**) differs from Souami & Souchay's published value (1.5787°) by only **0.0002°** (about 0.7 arcseconds). This represents **99.987% accuracy**.
+
+#### Improvements Made (2024-12-31)
+
+To achieve this accuracy, the following updates were made:
+
+1. **Mass ratios updated to JPL DE440 values**:
+   - Jupiter: 1047.3486 → 1047.348625
+   - Saturn: 3497.898 → 3497.9018
+   - All planets updated to latest DE440 GM-derived ratios
+
+2. **Orbital elements verified against JPL J2000**:
+   - All inclinations match [ssd.jpl.nasa.gov/planets/approx_pos.html](https://ssd.jpl.nasa.gov/planets/approx_pos.html) exactly
+   - All ascending nodes match JPL J2000 exactly
+   - All eccentricities match JPL J2000 exactly
+
+3. **Added Pluto and Ceres** (matching Souami & Souchay's N=10 body system):
+   - Pluto: mass ratio 136,047,200 (DE440)
+   - Ceres: GM = 62.6274 km³/s² (Dawn spacecraft)
+
+#### Remaining 0.0002° Difference
+
+The small residual difference likely arises from:
+
+1. **GM_SUN derivation**: We derive GM_SUN from Kepler's third law (~0.03% difference from DE440's exact value of 1.3271244004×10¹¹ km³/s²)
+
+2. **Ephemeris precision**: Souami & Souchay used full numerical ephemerides (DE405/DE406/INPOP10a) with higher precision than simplified Keplerian elements
+
+3. **Sun's angular momentum**: S&S may have included the Sun's contribution from its rotation and barycentric motion
+
+4. **Additional minor bodies**: S&S methodology may have included contributions beyond the N=10 system
+
+The close agreement validates that our orbital elements and calculation method are correct.
+
+### Why Doesn't This Value Change?
+
+The "Calc. Tilt" value is **constant by design**:
+
+1. The invariable plane is perpendicular to the **total angular momentum**, which is conserved
+2. Our calculation uses **fixed orbital elements** (semi-major axes, eccentricities, inclinations)
+3. Souami & Souchay confirmed the orientation varies by **< 0.1 milliarcseconds per century**
+
+What DOES change during the simulation:
+- Each planet's **position** above/below the fixed invariable plane
+- The **mass-weighted balance** as planets orbit
+- Earth's **apparent inclination** due to precession cycles
+
+### Reference
+
+Souami, D. & Souchay, J. (2012). "The solar system's invariable plane." *Astronomy & Astrophysics*, 543, A133. [DOI: 10.1051/0004-6361/201219011](https://doi.org/10.1051/0004-6361/201219011)
+
+> "Considering the solar system as isolated, its total angular momentum vector is constant with respect to both spatial and time coordinates. Thus, the invariable plane is defined as the plane perpendicular to the total angular momentum vector of the solar system that passes through its barycentre. Being fixed, it provides a permanent natural reference plane, whereas the ecliptic slightly moves with time."
+
+---
+
 ## References
 
 1. [invariable-plane-enhancements-plan.md](invariable-plane-enhancements-plan.md) - Parent feature plan
 2. [Souami&Souchay_planetary-invariable-plane-crossings.md](../Souami&Souchay_planetary-invariable-plane-crossings.md) - Height calculations
 3. NASA Planetary Fact Sheet - Planet masses
+4. Souami & Souchay (2012) - [The solar system's invariable plane](https://doi.org/10.1051/0004-6361/201219011)
 
 ---
 
@@ -650,3 +838,5 @@ If the orbital elements are correct, Option A should produce:
 | 2024-12-29 | 1.0 | Initial specification | Claude (Opus 4.5) |
 | 2024-12-29 | 1.1 | Added Balance Trend Analysis subfolder specification | Claude (Opus 4.5) |
 | 2024-12-29 | 2.0 | Feature fully implemented, updated acceptance criteria, added validation results | Claude (Opus 4.5) |
+| 2024-12-31 | 2.1 | Added detailed calculation section explaining how "Calc. Tilt" is derived | Claude (Opus 4.5) |
+| 2024-12-31 | 2.2 | Updated mass ratios to DE440, added Pluto & Ceres, improved accuracy to 1.5785° (0.0002° from target) | Claude (Opus 4.5) |

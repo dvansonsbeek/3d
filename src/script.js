@@ -84,12 +84,12 @@ const moonStartposMoon = 132.105;            // Needs to be at ~21h09m57s if sta
 
 // Reference lengths used as INPUT for Mercury
 const mercurySolarYearInput = 87.96855;
-const mercuryOrbitalInclination =  7.00501638;
-const mercuryOrbitalEccentricity = 0.20562928;
+const mercuryOrbitalInclination = 7.00497902;   // JPL J2000 (was 7.00501638)
+const mercuryOrbitalEccentricity = 0.20563593;  // JPL J2000 (was 0.20562928)
 const mercuryInclination = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4569131;
-const mercuryAscendingNode = 48.33033155;
+const mercuryAscendingNode = 48.33076593;       // JPL J2000 (was 48.33033155)
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
 const mercuryAngleCorrection = 0.984431;     // To align the perihelion exactly. According to formula ~77.4569131
@@ -98,12 +98,12 @@ const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if st
 
 // Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.6958;
-const venusOrbitalInclination = 3.3946018;
-const venusOrbitalEccentricity = 0.00674819;
+const venusOrbitalInclination = 3.39467605;     // JPL J2000 (was 3.3946018)
+const venusOrbitalEccentricity = 0.00677672;    // JPL J2000 (was 0.00674819)
 const venusInclination = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.5765919;
-const venusAscendingNode = 76.67877109;
+const venusAscendingNode = 76.67984255;         // JPL J2000 (was 76.67877109)
 const venusMeanAnomaly = 324.9668371;
 const venusTrueAnomaly = 324.5198504;
 const venusAngleCorrection = -2.78364;       // To align the perihelion exactly. According to formula ~131.5765919
@@ -112,12 +112,12 @@ const venusStartpos = 249.68;                // Needs to be at ~6h11m08.61 if st
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.934;
-const marsOrbitalInclination = 1.84971028;
-const marsOrbitalEccentricity = 0.09344726;
+const marsOrbitalInclination = 1.84969142;      // JPL J2000 (was 1.84971028)
+const marsOrbitalEccentricity = 0.09339410;     // JPL J2000 (was 0.09344726)
 const marsInclination = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.0650681;
-const marsAscendingNode = 49.55737662;
+const marsAscendingNode = 49.55953891;          // JPL J2000 (was 49.55737662)
 const marsMeanAnomaly = 109.2630844;
 const marsTrueAnomaly = 118.9501056;
 const marsAngleCorrection = -2.10526;        // To align the perihelion exactly. According to formula ~336.0650681
@@ -126,12 +126,12 @@ const marsStartpos = 121.514;                // Needs to be at ~6h13m09.72 if st
 
 // Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
-const jupiterOrbitalInclination = 1.30450732;
-const jupiterOrbitalEccentricity = 0.04966799;
+const jupiterOrbitalInclination = 1.30439695;   // JPL J2000 (was 1.30450732)
+const jupiterOrbitalEccentricity = 0.04838624;  // JPL J2000 (was 0.04966799)
 const jupiterInclination = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.70659401;
-const jupiterAscendingNode = 100.4877868;
+const jupiterAscendingNode = 100.47390909;      // JPL J2000 (was 100.4877868)
 const jupiterMeanAnomaly = 32.47179744;
 const jupiterTrueAnomaly = 35.69428061;
 const jupiterAngleCorrection = 1.1019;       // To align the perihelion exactly. According to formula ~14.70659401
@@ -140,12 +140,12 @@ const jupiterStartpos = 13.79;               // Needs to be at ~3h43m48.25 if st
 
 // Reference lengths used as INPUT for Saturn
 const saturnSolarYearInput = 10745.6;
-const saturnOrbitalInclination = 2.4853834;
-const saturnOrbitalEccentricity = 0.0564781;
+const saturnOrbitalInclination = 2.48599187;    // JPL J2000 (was 2.4853834)
+const saturnOrbitalEccentricity = 0.05386179;   // JPL J2000 (was 0.0564781)
 const saturnInclination = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 92.12794343;
-const saturnAscendingNode = 113.6452856;
+const saturnAscendingNode = 113.66242448;       // JPL J2000 (was 113.6452856)
 const saturnMeanAnomaly = 325.663876;
 const saturnTrueAnomaly = 321.7910116;
 const saturnAngleCorrection = -0.175456;     // To align the perihelion exactly. According to formula ~92.12794343
@@ -154,12 +154,12 @@ const saturnStartpos = 11.344;               // Needs to be at ~3h34m49.4 if sta
 
 // Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30583;
-const uranusOrbitalInclination = 0.77234317;
-const uranusOrbitalEccentricity = 0.04519611;
+const uranusOrbitalInclination = 0.77263783;    // JPL J2000 (was 0.77234317)
+const uranusOrbitalEccentricity = 0.04725744;   // JPL J2000 (was 0.04519611)
 const uranusInclination = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 170.7308251;
-const uranusAscendingNode = 73.98118815;
+const uranusAscendingNode = 74.01692503;        // JPL J2000 (was 73.98118815)
 const uranusMeanAnomaly = 145.7292678;
 const uranusTrueAnomaly = 148.5142459;
 const uranusAngleCorrection = -0.77209;      // To align the perihelion exactly. According to formula ~170.7308251
@@ -168,12 +168,12 @@ const uranusStartpos = 44.676;               // Needs to be at ~21h32m43.04 if s
 
 // Reference lengths used as INPUT for Neptune
 const neptuneSolarYearInput = 59926;
-const neptuneOrbitalInclination = 1.768273;
-const neptuneOrbitalEccentricity = 0.009457;
+const neptuneOrbitalInclination = 1.77004347;   // JPL J2000 (was 1.768273)
+const neptuneOrbitalEccentricity = 0.00859048;  // JPL J2000 (was 0.009457)
 const neptuneInclination = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 45.80124471;
-const neptuneAscendingNode = 131.7853754;
+const neptuneAscendingNode = 131.78422574;      // JPL J2000 (was 131.7853754)
 const neptuneMeanAnomaly = 262.5003424;
 const neptuneTrueAnomaly = 261.2242728;
 const neptuneAngleCorrection = 2.406717;     // To align the perihelion exactly. According to formula ~45.80124471
@@ -225,6 +225,12 @@ const erosTrueAnomaly = 162.69081884;
 const erosAngleCorrection = -2.202;          // To align the perihelion exactly. According to formula ~123.05436
 const erosPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
+
+// Ceres orbital elements (for invariable plane calculation only, per Souami & Souchay 2012)
+const ceresOrbitDistance = 2.7658;           // AU (semi-major axis)
+const ceresOrbitalInclination = 10.58682;    // degrees (J2000 ecliptic)
+const ceresOrbitalEccentricity = 0.07913825; // JPL Small-Body Database
+const ceresAscendingNode = 80.39320;         // degrees (J2000 ecliptic)
 
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
@@ -390,44 +396,48 @@ const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
-const MASS_RATIO_SUN_MERCURY = 6023600;
+const MASS_RATIO_SUN_MERCURY = 6023625.5;  // DE440
 const GM_MERCURY = GM_SUN / MASS_RATIO_SUN_MERCURY;  // ~22,032 km³/s²
 const M_MERCURY = GM_MERCURY / G_CONSTANT;           // ~3.30 × 10²³ kg
 
 // Venus: No moons, mass determined from Venera, Magellan spacecraft
-const MASS_RATIO_SUN_VENUS = 408523.71;
+const MASS_RATIO_SUN_VENUS = 408523.72;  // DE440
 const GM_VENUS = GM_SUN / MASS_RATIO_SUN_VENUS;      // ~324,859 km³/s²
 const M_VENUS = GM_VENUS / G_CONSTANT;               // ~4.87 × 10²⁴ kg
 
 // Mars: Mass from Phobos/Deimos orbits and spacecraft tracking
-const MASS_RATIO_SUN_MARS = 3098703.59;
+const MASS_RATIO_SUN_MARS = 3098703.59;  // DE440
 const GM_MARS = GM_SUN / MASS_RATIO_SUN_MARS;        // ~42,828 km³/s²
 const M_MARS = GM_MARS / G_CONSTANT;                 // ~6.42 × 10²³ kg
 
 // Jupiter: Mass from Galilean moon orbits (Io, Europa, Ganymede, Callisto)
-const MASS_RATIO_SUN_JUPITER = 1047.3486;
-const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,686,534 km³/s²
+const MASS_RATIO_SUN_JUPITER = 1047.348625;  // DE440
+const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,712,764 km³/s²
 const M_JUPITER = GM_JUPITER / G_CONSTANT;           // ~1.90 × 10²⁷ kg
 
 // Saturn: Mass from Titan and other moon orbits
-const MASS_RATIO_SUN_SATURN = 3497.898;
-const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,931,187 km³/s²
+const MASS_RATIO_SUN_SATURN = 3497.9018;  // DE440
+const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,940,585 km³/s²
 const M_SATURN = GM_SATURN / G_CONSTANT;             // ~5.68 × 10²⁶ kg
 
 // Uranus: Mass from moon orbits (Titania, Oberon, etc.)
-const MASS_RATIO_SUN_URANUS = 22902.98;
-const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,793,939 km³/s²
+const MASS_RATIO_SUN_URANUS = 22902.944;  // DE440
+const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,794,556 km³/s²
 const M_URANUS = GM_URANUS / G_CONSTANT;             // ~8.68 × 10²⁵ kg
 
 // Neptune: Mass from Triton orbit and Voyager 2 flyby
-const MASS_RATIO_SUN_NEPTUNE = 19412.24;
-const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,529 km³/s²
+const MASS_RATIO_SUN_NEPTUNE = 19412.237;  // DE440
+const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,527 km³/s²
 const M_NEPTUNE = GM_NEPTUNE / G_CONSTANT;           // ~1.02 × 10²⁶ kg
 
 // Pluto: Mass from Charon orbit (binary system)
-const MASS_RATIO_SUN_PLUTO = 135200000;
-const GM_PLUTO = GM_SUN / MASS_RATIO_SUN_PLUTO;      // ~982 km³/s²
+const MASS_RATIO_SUN_PLUTO = 136047200;  // DE440
+const GM_PLUTO = GM_SUN / MASS_RATIO_SUN_PLUTO;      // ~975.5 km³/s²
 const M_PLUTO = GM_PLUTO / G_CONSTANT;               // ~1.47 × 10²² kg
+
+// Ceres: Mass from Dawn spacecraft (2015-2018)
+const GM_CERES = 62.6274;                            // km³/s² (Dawn radiometric tracking)
+const M_CERES = GM_CERES / G_CONSTANT;               // ~9.38 × 10²⁰ kg
 
 // Halley's Comet: Mass estimated from size (~11×8×8 km) and density (~0.6 g/cm³)
 // No spacecraft has orbited it, so mass is approximate
@@ -18326,6 +18336,7 @@ function calculateInvariablePlaneFromAngularMomentum() {
   const RAD2DEG = 180 / Math.PI;
 
   // GM_SUN is in km³/s², lengthofAU is in km
+  // Including Pluto as per Souami & Souchay (2012) who used N=10 body system
   const planets = [
     { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricity, i: mercuryOrbitalInclination, node: mercuryAscendingNode },
     { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: venusOrbitalEccentricity,   i: venusOrbitalInclination,   node: venusAscendingNode },
@@ -18334,7 +18345,10 @@ function calculateInvariablePlaneFromAngularMomentum() {
     { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricity, i: jupiterOrbitalInclination, node: jupiterAscendingNode },
     { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: saturnOrbitalEccentricity,  i: saturnOrbitalInclination,  node: saturnAscendingNode },
     { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: uranusOrbitalEccentricity,  i: uranusOrbitalInclination,  node: uranusAscendingNode },
-    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity, i: neptuneOrbitalInclination, node: neptuneAscendingNode }
+    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity, i: neptuneOrbitalInclination, node: neptuneAscendingNode },
+    { key: 'pluto',   mass: M_PLUTO,   a: plutoOrbitDistance,   e: plutoOrbitalEccentricity,   i: plutoOrbitalInclination,   node: plutoAscendingNode },
+    // Including Ceres as per Souami & Souchay (2012) who used N=10 body system
+    { key: 'ceres',   mass: M_CERES,   a: ceresOrbitDistance,   e: ceresOrbitalEccentricity,   i: ceresOrbitalInclination,   node: ceresAscendingNode }
   ];
 
   let L_total_x = 0;
