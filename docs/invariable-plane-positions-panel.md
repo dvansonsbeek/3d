@@ -500,21 +500,21 @@ function calculateInvariablePlaneFromAngularMomentum() {
 
   const planets = [
     { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricity,
-      i: mercuryOrbitalInclination, node: mercuryAscendingNode, trueAnomaly: o.mercuryTrueAnomaly },
+      i: mercuryEclipticInclinationJ2000, node: mercuryAscendingNode, trueAnomaly: o.mercuryTrueAnomaly },
     { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: venusOrbitalEccentricity,
-      i: venusOrbitalInclination,   node: venusAscendingNode,   trueAnomaly: o.venusTrueAnomaly },
+      i: venusEclipticInclinationJ2000,   node: venusAscendingNode,   trueAnomaly: o.venusTrueAnomaly },
     { key: 'earth',   mass: M_EARTH,   a: 1.0,                  e: o.eccentricityEarth,
       i: 0,                          node: 0,                   trueAnomaly: o.earthTrueAnomaly },
     { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: marsOrbitalEccentricity,
-      i: marsOrbitalInclination,    node: marsAscendingNode,    trueAnomaly: o.marsTrueAnomaly },
+      i: marsEclipticInclinationJ2000,    node: marsAscendingNode,    trueAnomaly: o.marsTrueAnomaly },
     { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricity,
-      i: jupiterOrbitalInclination, node: jupiterAscendingNode, trueAnomaly: o.jupiterTrueAnomaly },
+      i: jupiterEclipticInclinationJ2000, node: jupiterAscendingNode, trueAnomaly: o.jupiterTrueAnomaly },
     { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: saturnOrbitalEccentricity,
-      i: saturnOrbitalInclination,  node: saturnAscendingNode,  trueAnomaly: o.saturnTrueAnomaly },
+      i: saturnEclipticInclinationJ2000,  node: saturnAscendingNode,  trueAnomaly: o.saturnTrueAnomaly },
     { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: uranusOrbitalEccentricity,
-      i: uranusOrbitalInclination,  node: uranusAscendingNode,  trueAnomaly: o.uranusTrueAnomaly },
+      i: uranusEclipticInclinationJ2000,  node: uranusAscendingNode,  trueAnomaly: o.uranusTrueAnomaly },
     { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity,
-      i: neptuneOrbitalInclination, node: neptuneAscendingNode, trueAnomaly: o.neptuneTrueAnomaly }
+      i: neptuneEclipticInclinationJ2000, node: neptuneAscendingNode, trueAnomaly: o.neptuneTrueAnomaly }
   ];
 
   for (const planet of planets) {
@@ -842,7 +842,7 @@ Three new fields appear in the "Validate position of Invariable plane (Option A 
 
 | Aspect | J2000 (Fixed) Calculation | Dynamic Calculation |
 |--------|---------------------------|---------------------|
-| **Inclinations** | Fixed J2000 values (e.g., `mercuryInclination = 7.00497°`) | Current osculating values (`o.mercuryApparentInclination`) |
+| **Inclinations** | Fixed J2000 values (e.g., `mercuryInvPlaneInclinationJ2000 = 6.3472858°`) | Current osculating values (`o.mercuryEclipticInclinationDynamic`) |
 | **Ascending Nodes** | Fixed J2000 values (e.g., `mercuryAscendingNodeJ2000 = 48.33167°`) | Current osculating values (`o.mercuryAscendingNode`) |
 | **Result** | Constant value (1.5785°) | Changes over time as orbits precess |
 | **Purpose** | Validate against Souami & Souchay reference | Show effect of orbital precession |
@@ -869,10 +869,10 @@ function calculateInvariablePlaneFromAngularMomentumDynamic() {
       mass: M_MERCURY,
       a: mercuryOrbitDistance,
       e: mercuryOrbitalEccentricity,
-      i: o.mercuryApparentInclination,      // Dynamic inclination
+      i: o.mercuryEclipticInclinationDynamic,      // Dynamic inclination
       node: o.mercuryAscendingNode          // Dynamic ascending node
     },
-    // ... other planets using o.<planet>ApparentInclination
+    // ... other planets using o.<planet>EclipticInclinationDynamic
     //     and o.<planet>AscendingNode
   ];
 
@@ -904,7 +904,7 @@ function calculateInvariablePlaneFromAngularMomentumDynamic() {
 
 ### Key Differences in Input Data
 
-The dynamic calculation uses `o.<planet>ApparentInclination` and `o.<planet>AscendingNode`, which are the **osculating orbital elements** at the current simulation time. These values are calculated elsewhere in the simulation based on:
+The dynamic calculation uses `o.<planet>EclipticInclinationDynamic` and `o.<planet>AscendingNode`, which are the **osculating orbital elements** at the current simulation time. These values are calculated elsewhere in the simulation based on:
 
 1. **Planetary perturbations**: Gravitational effects from other planets
 2. **Secular theory**: Long-term periodic variations in orbital elements
@@ -935,7 +935,7 @@ By comparing J2000 (fixed) and dynamic calculations, we can:
 
 ### Important Note: The Ecliptic Is Not Fixed
 
-A key insight is that the **ecliptic itself precesses** over time. The orbital inclinations (`ApparentInclination`) are measured relative to the ecliptic of date, not a fixed J2000 ecliptic. This means:
+A key insight is that the **ecliptic itself precesses** over time. The orbital inclinations (`EclipticInclinationDynamic`) are measured relative to the ecliptic of date, not a fixed J2000 ecliptic. This means:
 
 - The J2000 calculation uses inclinations relative to the J2000 ecliptic (fixed reference)
 - The dynamic calculation uses inclinations relative to the current ecliptic (moving reference)
@@ -962,4 +962,4 @@ This difference is part of what the dynamic calculation reveals — the interpla
 | 2024-12-29 | 2.0 | Feature fully implemented, updated acceptance criteria, added validation results | Claude (Opus 4.5) |
 | 2024-12-31 | 2.1 | Added detailed calculation section explaining how "Calc. Tilt" is derived | Claude (Opus 4.5) |
 | 2024-12-31 | 2.2 | Updated mass ratios to DE440, added Pluto & Ceres, improved accuracy to 1.5785° (0.0002° from target) | Claude (Opus 4.5) |
-| 2024-12-31 | 2.3 | Added dynamic calculation using precessing orbital elements (ApparentInclination, AscendingNode) | Claude (Opus 4.5) |
+| 2024-12-31 | 2.3 | Added dynamic calculation using precessing orbital elements (EclipticInclinationDynamic, AscendingNode) | Claude (Opus 4.5) |

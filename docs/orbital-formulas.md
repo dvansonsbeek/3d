@@ -86,10 +86,10 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 |------------------|-------------------|-------------|
 | `{planet}SolarYearInput` | 87.96813 days | Orbital period input |
 | `{planet}OrbitalEccentricity` | 0.20562928 | Eccentricity (e) |
-| `{planet}InclinationMean` | 7.215° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
+| `{planet}InvPlaneInclinationMean` | 7.215° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
 | `{planet}InclinationAmplitude` | 2.645° (Mercury) | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationPhaseOffset` | 283.7° (Mercury) | Phase offset linking inclination to ascending node (Ω_J2000 - φ₀) |
-| `{planet}OrbitalInclination` | 7.00487° | J2000 orbital inclination to ecliptic |
+| `{planet}InclinationPhaseAngle` | 283.7° (Mercury) | Phase offset linking inclination to ascending node (Ω_J2000 - φ₀) |
+| `{planet}EclipticInclinationJ2000` | 7.00487° | J2000 orbital inclination to ecliptic |
 | `{planet}OrbitDistance` | 0.387 AU | Semi-major axis (a) - derived |
 | `{planet}PerihelionDistance` | varies | Distance at perihelion |
 | `{planet}Speed` | varies km/h | Mean orbital velocity |
@@ -126,9 +126,9 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `o.{planet}AscendingNodeInvPlaneSouamiSouchay` | `o.mercuryAscendingNodeInvPlaneSouamiSouchay` | Dynamic ascending node (original S&S values) | Live |
 | `o.{planet}HeightAboveInvPlane` | `o.mercuryHeightAboveInvPlane` | Current height above/below invariable plane (AU) | Live |
 | `o.{planet}AboveInvPlane` | `o.mercuryAboveInvPlane` | Boolean: is planet currently above invariable plane | Live |
-| `o.{planet}ApparentInclination` | `o.mercuryApparentInclination` | Dynamic apparent inclination to ecliptic | Live |
-| `o.{planet}ApparentInclinationSouamiSouchay` | `o.mercuryApparentInclinationSouamiSouchay` | Apparent inclination using S&S ascending nodes | Live |
-| `o.{planet}InclinationToInvPlane` | `o.mercuryInclinationToInvPlane` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
+| `o.{planet}EclipticInclinationDynamic` | `o.mercuryEclipticInclinationDynamic` | Dynamic apparent inclination to ecliptic | Live |
+| `o.{planet}EclipticInclinationSouamiSouchayDynamic` | `o.mercuryEclipticInclinationSouamiSouchayDynamic` | Apparent inclination using S&S ascending nodes | Live |
+| `o.{planet}InvPlaneInclinationDynamic` | `o.mercuryInvPlaneInclinationDynamic` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
 
 #### 1.3.3 Distance Variables (✅ Already Implemented)
 
@@ -145,7 +145,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `moonNodalMonthInput` | 27.21222082 days | Nodal/Draconic month |
 | `moonSynodicMonth` | derived | Synodic month |
 | `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
-| `moonOrbitalInclination` | 5.1453964° | Orbital inclination |
+| `moonEclipticInclinationJ2000` | 5.1453964° | Orbital inclination to ecliptic |
 | `moonOrbitalEccentricity` | 0.054900489 | Eccentricity |
 
 ### 1.5 Earth-Specific Variables
@@ -155,8 +155,8 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `earthtiltMean` | 23.42723° | Mean obliquity |
-| `earthinclinationMean` | 1.49514053° | Mean orbital inclination to invariable plane |
-| `tiltandinclinationAmplitude` | 0.564° | Amplitude of inclination/obliquity variation |
+| `earthInvPlaneInclinationMean` | 1.49514053° | Mean orbital inclination to invariable plane |
+| `earthInvPlaneInclinationAmplitude` | 0.564° | Amplitude of inclination/obliquity variation |
 | `eccentricityMean` | 0.01370018 | Mean eccentricity |
 | `eccentricityAmplitude` | 0.00308211 | Earth's eccentricity amplitude |
 | `earthPerihelionEclipticYears` | 99,392 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
@@ -165,7 +165,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 
 | Variable | Description |
 |----------|-------------|
-| `o.inclinationEarth` | Dynamic orbital inclination to invariable plane |
+| `o.earthInvPlaneInclinationDynamic` | Dynamic orbital inclination to invariable plane |
 | `o.obliquityEarth` | Dynamic axial tilt (obliquity) |
 | `o.eccentricityEarth` | Dynamic orbital eccentricity |
 | `o.earthAscendingNodeInvPlane` | Dynamic ascending node to invariable plane |
@@ -222,8 +222,8 @@ These formulas are already calculated and displayed in the simulation:
 | Heliocentric Distance | r | `{planet}.sunDistAU` | Real-time 3D position |
 | Height Above Invariable Plane | z | `o.{planet}HeightAboveInvPlane` | `updateInvariablePlaneHeights()` |
 | Mean Max Height Above Inv. Plane | z_max | `sin(i_inv)` | Earth planetStats |
-| Apparent Inclination | i_app | `o.{planet}ApparentInclination` | `updateDynamicInclinations()` |
-| **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InclinationToInvPlane` | `computePlanetInclinationToInvPlane()` |
+| Apparent Inclination | i_app | `o.{planet}EclipticInclinationDynamic` | `updateDynamicInclinations()` |
+| **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InvPlaneInclinationDynamic` | `computePlanetInvPlaneInclinationDynamic()` |
 | Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
 | Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
 | **Gravitational Parameter** | **GM** | `GM_SUN` (derived constant) | Sun's planetStats |
@@ -748,7 +748,7 @@ const OrbitalFormulas = {
 | Eccentric Anomaly | E | `o.{planet}EccentricAnomaly` |
 | Equation of Center | ν - M | planetStats display |
 | Height Above Inv. Plane | z | `o.{planet}HeightAboveInvPlane` |
-| Apparent Inclination | i_app | `o.{planet}ApparentInclination` |
+| Apparent Inclination | i_app | `o.{planet}EclipticInclinationDynamic` |
 | Ascending Node (Inv. Plane) | Ω_inv | `o.{planet}AscendingNodeInvPlane` |
 | Heliocentric Distance | r | `{planet}.sunDistAU` |
 | Elongation | - | `o.{planet}Elongation` |
@@ -1819,10 +1819,10 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 i(t) = mean + A·cos(Ω(t) - offset)   Dynamic inclination to invariable plane
 
 Where:
-  mean   = <planet>InclinationMean      Laplace-Lagrange midpoint
+  mean   = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
   A      = <planet>InclinationAmplitude Half of oscillation range
   Ω(t)   = Current ascending node on invariable plane (precesses)
-  offset = <planet>InclinationPhaseOffset = Ω_J2000 - φ₀
+  offset = <planet>InclinationPhaseAngle = Ω_J2000 - φ₀
 
 Phase offset derivation:
   i_J2000 = mean + A·cos(φ₀)           Solve for φ₀ from known J2000 value
@@ -1864,8 +1864,8 @@ All planets have these `o.{planet}` variables:
 - `AscendingNodeInvPlaneSouamiSouchay` - Ascending node on invariable plane (S&S)
 - `HeightAboveInvPlane` - Height above invariable plane (AU)
 - `AboveInvPlane` - Boolean: above invariable plane
-- `ApparentInclination` - Apparent inclination to ecliptic
-- `ApparentInclinationSouamiSouchay` - Apparent inclination (S&S method)
-- `InclinationToInvPlane` - Dynamic inclination to invariable plane (oscillates)
+- `EclipticInclinationDynamic` - Apparent inclination to ecliptic
+- `EclipticInclinationSouamiSouchayDynamic` - Apparent inclination (S&S method)
+- `InvPlaneInclinationDynamic` - Dynamic inclination to invariable plane (oscillates)
 
 Plus `{planet}.sunDistAU` for current heliocentric distance.

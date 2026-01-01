@@ -47,7 +47,7 @@ If we use the mean inclination:
 1. **Physical consistency**: The invariable plane is truly fixed. Earth's mean inclination represents the "neutral" position around which the ecliptic oscillates.
 
 2. **Mathematical elegance**: Using the mean as reference means:
-   - `o.inclinationEarth = earthinclinationMean` at the "balanced year"
+   - `o.earthInvPlaneInclinationDynamic = earthInvPlaneInclinationMean` at the "balanced year"
    - Deviations from mean are symmetric (±0.564°)
    - The model correctly represents the physics
 
@@ -60,7 +60,7 @@ If we use the mean inclination:
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| Earth mean inclination | 1.49514053° | Model constant (`earthinclinationMean`) |
+| Earth mean inclination | 1.49514053° | Model constant (`earthInvPlaneInclinationMean`) |
 | Earth J2000 inclination | ~1.578° | Computed from cycle position |
 | Planet inclinations | Souami & Souchay values | Unchanged |
 | Planet ascending nodes | **Adjusted** | To match J2000 apparent inclinations |
@@ -112,7 +112,7 @@ const plutoAscendingNodeInvPlane = 107.06;
 
 The optimal solution keeps invariable plane inclinations unchanged and only adjusts ascending nodes. This achieves errors < 0.0001° while preserving the original Souami & Souchay inclination data.
 
-**Inclinations**: We use the existing `<planet>Inclination` constants from the codebase (e.g., `mercuryInclination`, `venusInclination`, etc.). These are the original Souami & Souchay (2012) values and do not need separate "verified" versions.
+**Inclinations**: We use the existing `<planet>InvPlaneInclinationJ2000` constants from the codebase (e.g., `mercuryInvPlaneInclinationJ2000`, `venusInvPlaneInclinationJ2000`, etc.). These are the original Souami & Souchay (2012) values and do not need separate "verified" versions.
 
 **Ascending Nodes**: Only the ascending nodes are adjusted to match J2000 apparent inclinations:
 
@@ -156,14 +156,14 @@ The existing `<planet>Inclination` constants from Souami & Souchay (2012) are us
 
 | Planet | Constant Name | Value | Notes |
 |--------|---------------|-------|-------|
-| Mercury | `mercuryInclination` | 6.3472858° | S&S unchanged |
-| Venus | `venusInclination` | 2.1545441° | S&S unchanged |
-| Mars | `marsInclination` | 1.6311858° | S&S unchanged |
-| Jupiter | `jupiterInclination` | 0.3219652° | S&S unchanged |
-| Saturn | `saturnInclination` | 0.9254704° | S&S unchanged |
-| Uranus | `uranusInclination` | 0.9946692° | S&S unchanged |
-| Neptune | `neptuneInclination` | 0.7354155° | S&S unchanged |
-| Pluto | `plutoInclination` | 15.5639473° | **Adjusted** from S&S 15.5541473° (+0.0098°) |
+| Mercury | `mercuryInvPlaneInclinationJ2000` | 6.3472858° | S&S unchanged |
+| Venus | `venusInvPlaneInclinationJ2000` | 2.1545441° | S&S unchanged |
+| Mars | `marsInvPlaneInclinationJ2000` | 1.6311858° | S&S unchanged |
+| Jupiter | `jupiterInvPlaneInclinationJ2000` | 0.3219652° | S&S unchanged |
+| Saturn | `saturnInvPlaneInclinationJ2000` | 0.9254704° | S&S unchanged |
+| Uranus | `uranusInvPlaneInclinationJ2000` | 0.9946692° | S&S unchanged |
+| Neptune | `neptuneInvPlaneInclinationJ2000` | 0.7354155° | S&S unchanged |
+| Pluto | `plutoInvPlaneInclinationJ2000` | 15.5639473° | **Adjusted** from S&S 15.5541473° (+0.0098°) |
 
 ### Verification Results at J2000
 
@@ -206,16 +206,16 @@ Add properties for the Souami & Souchay variant:
 
 ```javascript
 // Apparent inclination using Souami & Souchay (2012) ascending nodes
-mercuryApparentInclinationSouamiSouchay: 0,
-venusApparentInclinationSouamiSouchay: 0,
-marsApparentInclinationSouamiSouchay: 0,
-jupiterApparentInclinationSouamiSouchay: 0,
-saturnApparentInclinationSouamiSouchay: 0,
-uranusApparentInclinationSouamiSouchay: 0,
-neptuneApparentInclinationSouamiSouchay: 0,
-plutoApparentInclinationSouamiSouchay: 0,
-halleysApparentInclinationSouamiSouchay: 0,
-erosApparentInclinationSouamiSouchay: 0,
+mercuryEclipticInclinationSouamiSouchayDynamic: 0,
+venusEclipticInclinationSouamiSouchayDynamic: 0,
+marsEclipticInclinationSouamiSouchayDynamic: 0,
+jupiterEclipticInclinationSouamiSouchayDynamic: 0,
+saturnEclipticInclinationSouamiSouchayDynamic: 0,
+uranusEclipticInclinationSouamiSouchayDynamic: 0,
+neptuneEclipticInclinationSouamiSouchayDynamic: 0,
+plutoEclipticInclinationSouamiSouchayDynamic: 0,
+halleysEclipticInclinationSouamiSouchayDynamic: 0,
+erosEclipticInclinationSouamiSouchayDynamic: 0,
 ```
 
 ### Step 3: Update `updateDynamicInclinations()` Function
@@ -228,7 +228,7 @@ function updateDynamicInclinations() {
   const RAD2DEG = 180 / Math.PI;
 
   // Get Earth's current orbital plane normal (ecliptic normal)
-  const earthI = o.inclinationEarth * DEG2RAD;
+  const earthI = o.earthInvPlaneInclinationDynamic * DEG2RAD;
   const earthOmega = o.earthAscendingNodeInvPlane * DEG2RAD;
   _eclipticNormal.set(
     Math.sin(earthI) * Math.sin(earthOmega),
@@ -238,34 +238,34 @@ function updateDynamicInclinations() {
 
   // Planet configuration - both original and verified ascending nodes
   const planets = [
-    { key: 'mercury', incl: mercuryInclination,
+    { key: 'mercury', incl: mercuryInvPlaneInclinationJ2000,
       ascNodeSS: o.mercuryAscendingNodeInvPlane,
       ascNodeVerified: o.mercuryAscendingNodeInvPlaneVerified },
-    { key: 'venus', incl: venusInclination,
+    { key: 'venus', incl: venusInvPlaneInclinationJ2000,
       ascNodeSS: o.venusAscendingNodeInvPlane,
       ascNodeVerified: o.venusAscendingNodeInvPlaneVerified },
-    { key: 'mars', incl: marsInclination,
+    { key: 'mars', incl: marsInvPlaneInclinationJ2000,
       ascNodeSS: o.marsAscendingNodeInvPlane,
       ascNodeVerified: o.marsAscendingNodeInvPlaneVerified },
-    { key: 'jupiter', incl: jupiterInclination,
+    { key: 'jupiter', incl: jupiterInvPlaneInclinationJ2000,
       ascNodeSS: o.jupiterAscendingNodeInvPlane,
       ascNodeVerified: o.jupiterAscendingNodeInvPlaneVerified },
-    { key: 'saturn', incl: saturnInclination,
+    { key: 'saturn', incl: saturnInvPlaneInclinationJ2000,
       ascNodeSS: o.saturnAscendingNodeInvPlane,
       ascNodeVerified: o.saturnAscendingNodeInvPlaneVerified },
-    { key: 'uranus', incl: uranusInclination,
+    { key: 'uranus', incl: uranusInvPlaneInclinationJ2000,
       ascNodeSS: o.uranusAscendingNodeInvPlane,
       ascNodeVerified: o.uranusAscendingNodeInvPlaneVerified },
-    { key: 'neptune', incl: neptuneInclination,
+    { key: 'neptune', incl: neptuneInvPlaneInclinationJ2000,
       ascNodeSS: o.neptuneAscendingNodeInvPlane,
       ascNodeVerified: o.neptuneAscendingNodeInvPlaneVerified },
-    { key: 'pluto', incl: plutoInclination,
+    { key: 'pluto', incl: plutoInvPlaneInclinationJ2000,
       ascNodeSS: o.plutoAscendingNodeInvPlane,
       ascNodeVerified: o.plutoAscendingNodeInvPlaneVerified },
-    { key: 'halleys', incl: halleysInclination,
+    { key: 'halleys', incl: halleysInvPlaneInclinationJ2000,
       ascNodeSS: o.halleysAscendingNodeInvPlane,
       ascNodeVerified: o.halleysAscendingNodeInvPlaneVerified },
-    { key: 'eros', incl: erosInclination,
+    { key: 'eros', incl: erosInvPlaneInclinationJ2000,
       ascNodeSS: o.erosAscendingNodeInvPlane,
       ascNodeVerified: o.erosAscendingNodeInvPlaneVerified }
   ];
@@ -282,7 +282,7 @@ function updateDynamicInclinations() {
     );
     const cosAngleSS = _planetNormal.dot(_eclipticNormal);
     const apparentInclSS = Math.acos(Math.max(-1, Math.min(1, cosAngleSS))) * RAD2DEG;
-    o[key + 'ApparentInclinationSouamiSouchay'] = apparentInclSS;
+    o[key + 'EclipticInclinationSouamiSouchayDynamic'] = apparentInclSS;
 
     // Calculate using verified ascending node (for o.<planet>Inclination display)
     const pOmegaVerified = ascNodeVerified * DEG2RAD;
@@ -293,7 +293,7 @@ function updateDynamicInclinations() {
     );
     const cosAngleVerified = _planetNormal.dot(_eclipticNormal);
     const apparentInclVerified = Math.acos(Math.max(-1, Math.min(1, cosAngleVerified))) * RAD2DEG;
-    o[key + 'ApparentInclination'] = apparentInclVerified;
+    o[key + 'EclipticInclinationDynamic'] = apparentInclVerified;
   }
 }
 ```
@@ -335,7 +335,7 @@ o[key + 'AscendingNodeInvPlaneVerified'] = (ascNodeJ2000Verified + yearsSinceJ20
 Use the verified apparent inclination for visual orbital plane tilts:
 
 ```javascript
-// Use o.<planet>ApparentInclination (which now uses verified ascending nodes)
+// Use o.<planet>EclipticInclinationDynamic (which now uses verified ascending nodes)
 // This is already the case - no changes needed
 ```
 
@@ -345,9 +345,9 @@ For each planet, show both values:
 
 ```javascript
 {label : () => `Apparent Inclination (i)`,
- value : [ { v: () => o.mercuryApparentInclination, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+ value : [ { v: () => o.mercuryEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
 {label : () => `Apparent Incl. (Souami&Souchay)`,
- value : [ { v: () => o.mercuryApparentInclinationSouamiSouchay, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+ value : [ { v: () => o.mercuryEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
 ```
 
 ## Verification
@@ -387,7 +387,7 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 
 ## Note on Dynamic Inclinations
 
-Since January 2025, the apparent inclination calculation uses **dynamic planet inclinations** (`o.<planet>InclinationToInvPlane`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
+Since January 2025, the apparent inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
 
 ```
 i(t) = mean + A × cos(Ω(t) - offset)

@@ -36,7 +36,7 @@ Therefore:
 
 ### Example: Venus
 ```javascript
-const venusOrbitalInclination = 3.394667;    // i = 3.39°
+const venusEclipticInclinationJ2000 = 3.394667;    // i = 3.39°
 const venusAscendingNode = 76.67877109;      // Ω = 76.68°
 
 // Calculated values:

@@ -29,9 +29,9 @@ All systems are driven by orbital plane precession: both Earth's and the other p
         ▼                   ▼                   ▼
 ┌───────────────────────────────────────────────────────┐
 │                                                       │
-│   computePlanetInclinationToInvPlane()               │
+│   computePlanetInvPlaneInclinationDynamic()               │
 │   → Uses Ω-based formula: i = mean + A·cos(Ω - φ)   │
-│   → Output: o.<planet>InclinationToInvPlane         │
+│   → Output: o.<planet>InvPlaneInclinationDynamic         │
 │                                                       │
 └───────────────────────────────────────────────────────┘
                             │
@@ -40,7 +40,7 @@ All systems are driven by orbital plane precession: both Earth's and the other p
 │                                                       │
 │   updateDynamicInclinations()                         │
 │   → Calculates angle between planet & Earth planes    │
-│   → Output: o.<planet>ApparentInclination            │
+│   → Output: o.<planet>EclipticInclinationDynamic            │
 │                                                       │
 └───────────────────────────────────────────────────────┘
                             │
@@ -62,10 +62,10 @@ All dynamic orbital element changes are driven by Earth's orbital plane variatio
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| Mean | 1.495° | `earthinclinationMean` |
+| Mean | 1.495° | `earthInvPlaneInclinationMean` |
 | Minimum | 0.931° | Mean - amplitude |
 | Maximum | 2.059° | Mean + amplitude |
-| Amplitude | 0.564° | `tiltandinclinationAmplitude` |
+| Amplitude | 0.564° | `earthInvPlaneInclinationAmplitude` |
 | Period | ~99,392 years | holisticyearLength/3 |
 | J2000 Value | ~1.579° | Above mean, **DECREASING** |
 
@@ -130,12 +130,12 @@ Where:
 ```
 
 **Inputs**:
-- `o.inclinationEarth` - Earth's current inclination to invariable plane
+- `o.earthInvPlaneInclinationDynamic` - Earth's current inclination to invariable plane
 - `o.earthAscendingNodeInvPlane` - Earth's current Ω on invariable plane
-- `o.<planet>InclinationToInvPlane` - Planet's **dynamic** inclination (from oscillation)
+- `o.<planet>InvPlaneInclinationDynamic` - Planet's **dynamic** inclination (from oscillation)
 - `o.<planet>AscendingNodeInvPlane` - Planet's current Ω on invariable plane
 
-**Output**: `o.<planet>ApparentInclination` (degrees)
+**Output**: `o.<planet>EclipticInclinationDynamic` (degrees)
 
 ## How the Systems Work Together
 
@@ -166,8 +166,8 @@ Apparent Inclination:
 
 | Calculation | Uses | Reason |
 |-------------|------|--------|
-| Ascending Node | Static `<planet>OrbitalInclination` | The crossing point depends on the planet's intrinsic orbit geometry |
-| Apparent Inclination | **Dynamic** `o.<planet>InclinationToInvPlane` | The angle between planes uses invariable plane as reference; planets oscillate around a mean |
+| Ascending Node | Static `<planet>EclipticInclinationJ2000` | The crossing point depends on the planet's intrinsic orbit geometry |
+| Apparent Inclination | **Dynamic** `o.<planet>InvPlaneInclinationDynamic` | The angle between planes uses invariable plane as reference; planets oscillate around a mean |
 
 ### Execution Order
 
@@ -227,7 +227,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 
 **Solution**: Each planet's inclination to the invariable plane now oscillates dynamically, similar to Earth's. This is based on Laplace-Lagrange secular theory. See [dynamic-inclination-oscillations.md](dynamic-inclination-oscillations.md) for full details.
 
-**Implementation**: Added `computePlanetInclinationToInvPlane()` function with amplitude values from Table 10.4 of the [Farside physics textbook](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html).
+**Implementation**: Added `computePlanetInvPlaneInclinationDynamic()` function with amplitude values from Table 10.4 of the [Farside physics textbook](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html).
 
 ## Detailed Planet Behavior
 
@@ -349,7 +349,7 @@ All three are **temporally correlated** through their shared precession periods.
 
 ### Why NOT to Mix Them
 
-Using `o.<planet>ApparentInclination` in the ascending node calculation would be **double-counting** the effect:
+Using `o.<planet>EclipticInclinationDynamic` in the ascending node calculation would be **double-counting** the effect:
 
 ```
 WRONG:
@@ -369,7 +369,7 @@ CORRECT:
 |----------|----------|---------|
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Updates Ω on invariable plane |
 | `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and apparent inclinations |
-| `computePlanetInclinationToInvPlane()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using Ω-based formula |
+| `computePlanetInvPlaneInclinationDynamic()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using Ω-based formula |
 | `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
 | `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |
 | `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Applies to 3D visualizations |
@@ -378,9 +378,9 @@ CORRECT:
 
 | Constant Type | Location | Purpose |
 |---------------|----------|---------|
-| `<planet>InclinationMean` | [script.js:292-332](../src/script.js#L292-L332) | Laplace-Lagrange midpoint (center of oscillation) |
+| `<planet>InvPlaneInclinationMean` | [script.js:292-332](../src/script.js#L292-L332) | Laplace-Lagrange midpoint (center of oscillation) |
 | `<planet>InclinationAmplitude` | [script.js:292-332](../src/script.js#L292-L332) | Half of oscillation range from Laplace-Lagrange bounds |
-| `<planet>InclinationPhaseOffset` | [script.js:359-369](../src/script.js#L359-L369) | Geometric link between Ω and inclination phase (Ω_J2000 - φ₀) |
+| `<planet>InclinationPhaseAngle` | [script.js:359-369](../src/script.js#L359-L369) | Geometric link between Ω and inclination phase (Ω_J2000 - φ₀) |
 
 ## References
 

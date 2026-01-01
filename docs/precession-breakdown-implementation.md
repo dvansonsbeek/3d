@@ -31,7 +31,7 @@ For any planet (e.g., Mars with ~1,739 arcsec/century), show:
 - Mass (M) - from `M_*` constants
 
 ### Dynamic Values (from `o` object)
-- Apparent inclination: `o.<planet>ApparentInclination` (e.g., `o.marsApparentInclination`)
+- Apparent inclination: `o.<planet>EclipticInclinationDynamic` (e.g., `o.marsEclipticInclinationDynamic`)
 - Current distance: `<planet>.sunDistAU`
 - True anomaly, mean anomaly, etc.
 
@@ -347,7 +347,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Mercury',
       a_km: mercuryOrbitDistance * o.lengthofAU,
       e: mercuryOrbitalEccentricity,
-      i_deg: o.mercuryApparentInclination,  // DYNAMIC
+      i_deg: o.mercuryEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.mercuryAscendingNode,
       mass: M_MERCURY,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(mercurySolarYearInput),
@@ -357,7 +357,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Venus',
       a_km: venusOrbitDistance * o.lengthofAU,
       e: venusOrbitalEccentricity,
-      i_deg: o.venusApparentInclination,    // DYNAMIC
+      i_deg: o.venusEclipticInclinationDynamic,    // DYNAMIC
       omega_deg: o.venusAscendingNode,
       mass: M_VENUS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(venusSolarYearInput),
@@ -367,7 +367,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Earth',
       a_km: earthOrbitDistance * o.lengthofAU,
       e: earthOrbitalEccentricity,
-      i_deg: o.earthApparentInclination,    // DYNAMIC
+      i_deg: o.earthEclipticInclinationDynamic,    // DYNAMIC
       omega_deg: o.earthAscendingNode,
       mass: M_EARTH,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(earthSolarYearInput),
@@ -377,7 +377,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Mars',
       a_km: marsOrbitDistance * o.lengthofAU,
       e: marsOrbitalEccentricity,
-      i_deg: o.marsApparentInclination,     // DYNAMIC
+      i_deg: o.marsEclipticInclinationDynamic,     // DYNAMIC
       omega_deg: o.marsAscendingNode,
       mass: M_MARS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(marsSolarYearInput),
@@ -387,7 +387,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Jupiter',
       a_km: jupiterOrbitDistance * o.lengthofAU,
       e: jupiterOrbitalEccentricity,
-      i_deg: o.jupiterApparentInclination,  // DYNAMIC
+      i_deg: o.jupiterEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.jupiterAscendingNode,
       mass: M_JUPITER,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(jupiterSolarYearInput),
@@ -397,7 +397,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Saturn',
       a_km: saturnOrbitDistance * o.lengthofAU,
       e: saturnOrbitalEccentricity,
-      i_deg: o.saturnApparentInclination,   // DYNAMIC
+      i_deg: o.saturnEclipticInclinationDynamic,   // DYNAMIC
       omega_deg: o.saturnAscendingNode,
       mass: M_SATURN,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(saturnSolarYearInput),
@@ -407,7 +407,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Uranus',
       a_km: uranusOrbitDistance * o.lengthofAU,
       e: uranusOrbitalEccentricity,
-      i_deg: o.uranusApparentInclination,   // DYNAMIC
+      i_deg: o.uranusEclipticInclinationDynamic,   // DYNAMIC
       omega_deg: o.uranusAscendingNode,
       mass: M_URANUS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(uranusSolarYearInput),
@@ -417,7 +417,7 @@ getPlanetPerturbationData: (o) => {
       name: 'Neptune',
       a_km: neptuneOrbitDistance * o.lengthofAU,
       e: neptuneOrbitalEccentricity,
-      i_deg: o.neptuneApparentInclination,  // DYNAMIC
+      i_deg: o.neptuneEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.neptuneAscendingNode,
       mass: M_NEPTUNE,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(neptuneSolarYearInput),
@@ -754,7 +754,7 @@ With eccentricity and inclination corrections:
 
 ### 7.3 Dynamic Validation
 
-Since we use dynamic inclinations (`o.<planet>ApparentInclination`), the values will vary slightly over time. Expected variation:
+Since we use dynamic inclinations (`o.<planet>EclipticInclinationDynamic`), the values will vary slightly over time. Expected variation:
 - Inclination correction: ±0.1% to ±2%
 - Total variation: ±1-5 arcsec/century
 
@@ -777,7 +777,7 @@ A **Precession Breakdown** feature that:
 
 1. **All 8 planets** as perturbers (Mercury through Neptune)
 2. **Detailed display** (10+ lines per planet including header and totals)
-3. **Dynamic calculation** using `o.<planet>ApparentInclination`
+3. **Dynamic calculation** using `o.<planet>EclipticInclinationDynamic`
 4. **No calibration** - shows true physics predictions
 5. **Accuracy display** comparing calculated to observed values
 

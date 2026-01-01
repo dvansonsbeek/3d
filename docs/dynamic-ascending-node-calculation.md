@@ -31,8 +31,8 @@ The key insight is that **Earth's own orbital inclination** (~1.5° relative to 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `earthtiltMean` | 23.42723° | Mean obliquity |
-| `earthinclinationMean` | 1.49514053° | Mean orbital inclination |
-| `tiltandinclinationAmplitude` | 0.564° | Amplitude of variation |
+| `earthInvPlaneInclinationMean` | 1.49514053° | Mean orbital inclination |
+| `earthInvPlaneInclinationAmplitude` | 0.564° | Amplitude of variation |
 | `holisticyearLength` | 298,176 years | Full cycle length |
 
 ### Earth's Inclination Range
@@ -135,8 +135,8 @@ Computes Earth's obliquity at any year using the formula:
 
 ```javascript
 obliquity = earthtiltMean
-  - tiltandinclinationAmplitude * cos(phase3)
-  + tiltandinclinationAmplitude * cos(phase8)
+  - earthInvPlaneInclinationAmplitude * cos(phase3)
+  + earthInvPlaneInclinationAmplitude * cos(phase8)
 ```
 
 Where `phase3` and `phase8` correspond to the 99,392-year and 37,272-year cycles.
@@ -146,8 +146,8 @@ Where `phase3` and `phase8` correspond to the 99,392-year and 37,272-year cycles
 Computes Earth's orbital inclination at any year:
 
 ```javascript
-inclination = earthinclinationMean
-  - tiltandinclinationAmplitude * cos(phase3)
+inclination = earthInvPlaneInclinationMean
+  - earthInvPlaneInclinationAmplitude * cos(phase3)
 ```
 
 #### `findInclinationCrossingYear()`
@@ -408,16 +408,16 @@ These are the ascending node values encoded in the `orbitTilta`/`orbitTiltb` par
 
 ### Two Independent Physical Effects
 
-The dynamic ascending node calculation and the dynamic apparent inclination (`o.<planet>ApparentInclination`) model **two separate physical phenomena**:
+The dynamic ascending node calculation and the dynamic apparent inclination (`o.<planet>EclipticInclinationDynamic`) model **two separate physical phenomena**:
 
 | Effect | What Changes | What Stays Fixed | Timescale |
 |--------|-------------|------------------|-----------|
 | **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | ~298,176 years |
 | **Apparent Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | ~99,392 years |
 
-### Why We Use Static Inclination (Not ApparentInclination)
+### Why We Use Static Inclination (Not EclipticInclinationDynamic)
 
-The ascending node calculation correctly uses the **static** `<planet>OrbitalInclination` (extracted from `orbitTilta/orbitTiltb`), not the dynamic `<planet>ApparentInclination`. Here's why:
+The ascending node calculation correctly uses the **static** `<planet>EclipticInclinationJ2000` (extracted from `orbitTilta/orbitTiltb`), not the dynamic `<planet>EclipticInclinationDynamic`. Here's why:
 
 1. **The planet's orbital plane doesn't change** - only our reference frame (the ecliptic) tilts over time
 2. The formula `dΩ/dε = -sin(Ω) / tan(i)` uses `i` = the planet's inclination to the **invariable plane** (or equivalently, to the mean ecliptic), not the current ecliptic
@@ -438,19 +438,19 @@ The **apparent inclination** measures the angle between two orbital planes:
 
 | Calculation | Uses | Why |
 |------------|------|-----|
-| `calculateDynamicAscendingNodeFromTilts` | Static `<planet>OrbitalInclination` (from orbitTilta/b) | Measures intrinsic planet orbit property |
-| `updateDynamicInclinations` | Static `<planet>OrbitalInclination` + dynamic Earth tilt | Calculates apparent angle between planes |
-| `updateOrbitOrientations` | Dynamic `o.<planet>ApparentInclination` | Rotates the visual orbit ring in 3D |
+| `calculateDynamicAscendingNodeFromTilts` | Static `<planet>EclipticInclinationJ2000` (from orbitTilta/b) | Measures intrinsic planet orbit property |
+| `updateDynamicInclinations` | Static `<planet>EclipticInclinationJ2000` + dynamic Earth tilt | Calculates apparent angle between planes |
+| `updateOrbitOrientations` | Dynamic `o.<planet>EclipticInclinationDynamic` | Rotates the visual orbit ring in 3D |
 
-### Why NOT to Use ApparentInclination Here
+### Why NOT to Use EclipticInclinationDynamic Here
 
-Using `ApparentInclination` in the ascending node formula would be **double-counting** the effect of Earth's tilting reference frame:
+Using `EclipticInclinationDynamic` in the ascending node formula would be **double-counting** the effect of Earth's tilting reference frame:
 
 1. The ascending node formula already accounts for Earth's tilt through:
    - The `earthInclination` parameter (used for direction determination)
    - The `currentObliquity` parameter (used for rate calculation)
 
-2. The `ApparentInclination` also incorporates Earth's tilt (that's what makes it "apparent")
+2. The `EclipticInclinationDynamic` also incorporates Earth's tilt (that's what makes it "apparent")
 
 3. Combining them would apply the Earth tilt effect twice, producing incorrect results
 
@@ -460,7 +460,7 @@ The two systems are **independent and both correct**:
 - The ascending node calculation models how the crossing point shifts as Earth's reference frame tilts
 - The apparent inclination calculation models how the angle between orbits appears to change
 
-Both use the static `<planet>OrbitalInclination` as their base, but apply different transformations to model different physical effects.
+Both use the static `<planet>EclipticInclinationJ2000` as their base, but apply different transformations to model different physical effects.
 
 ---
 

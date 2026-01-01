@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document describes a method to derive **dynamic inclination oscillations** for each planet relative to the invariable plane. Currently, only Earth has a modeled inclination oscillation (`tiltandinclinationAmplitude`). By comparing observed secular variation rates with our model's Earth-effect calculations, we can derive the "missing" oscillation for each planet.
+This document describes a method to derive **dynamic inclination oscillations** for each planet relative to the invariable plane. Currently, only Earth has a modeled inclination oscillation (`earthInvPlaneInclinationAmplitude`). By comparing observed secular variation rates with our model's Earth-effect calculations, we can derive the "missing" oscillation for each planet.
 
 ## The Problem
 
@@ -10,7 +10,7 @@ This document describes a method to derive **dynamic inclination oscillations** 
 
 Our model calculates apparent inclination (planet to ecliptic) using:
 1. **Earth's inclination to invariable plane** - Dynamic, oscillates 0.931° to 2.059°
-2. **Planet's inclination to invariable plane** - **FIXED** constants (e.g., `saturnInclination = 0.925°`)
+2. **Planet's inclination to invariable plane** - **FIXED** constants (e.g., `saturnInvPlaneInclinationJ2000 = 0.925°`)
 3. **Precessing ascending nodes** - Both Earth's and planet's Ω on invariable plane
 
 ### The Discrepancy
@@ -51,7 +51,7 @@ The observed secular variation in a planet's inclination to the ecliptic has two
 (di/dt)_planet_own = (di/dt)_observed - (di/dt)_earth_effect
 ```
 
-This "planet's own effect" represents the rate at which the planet's orbital plane tilts relative to the **invariable plane** — exactly analogous to Earth's `tiltandinclinationAmplitude` oscillation.
+This "planet's own effect" represents the rate at which the planet's orbital plane tilts relative to the **invariable plane** — exactly analogous to Earth's `earthInvPlaneInclinationAmplitude` oscillation.
 
 ## Data Sources
 
@@ -76,21 +76,21 @@ From our model (Souami & Souchay 2012 values):
 
 | Planet | Inclination to Inv. Plane | Variable Name |
 |--------|---------------------------|---------------|
-| Mercury | 6.3473° | `mercuryInclination` |
-| Venus | 2.1545° | `venusInclination` |
-| Earth | 1.4951° (mean) | `earthinclinationMean` |
-| Mars | 1.6312° | `marsInclination` |
-| Jupiter | 0.3220° | `jupiterInclination` |
-| Saturn | 0.9255° | `saturnInclination` |
-| Uranus | 0.9947° | `uranusInclination` |
-| Neptune | 0.7354° | `neptuneInclination` |
+| Mercury | 6.3473° | `mercuryInvPlaneInclinationJ2000` |
+| Venus | 2.1545° | `venusInvPlaneInclinationJ2000` |
+| Earth | 1.4951° (mean) | `earthInvPlaneInclinationMean` |
+| Mars | 1.6312° | `marsInvPlaneInclinationJ2000` |
+| Jupiter | 0.3220° | `jupiterInvPlaneInclinationJ2000` |
+| Saturn | 0.9255° | `saturnInvPlaneInclinationJ2000` |
+| Uranus | 0.9947° | `uranusInvPlaneInclinationJ2000` |
+| Neptune | 0.7354° | `neptuneInvPlaneInclinationJ2000` |
 
 ### Earth's Oscillation Parameters (Reference)
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `earthinclinationMean` | 1.4951° | Mean inclination to invariable plane |
-| `tiltandinclinationAmplitude` | 0.564° | Oscillation amplitude |
+| `earthInvPlaneInclinationMean` | 1.4951° | Mean inclination to invariable plane |
+| `earthInvPlaneInclinationAmplitude` | 0.564° | Oscillation amplitude |
 | Period | ~99,392 years | One-third of holistic year |
 | Range | 0.931° to 2.059° | Min to max inclination |
 
@@ -122,10 +122,10 @@ function calculateEarthEffectRate(planet) {
   const dt = 100; // years (1 century)
 
   // Calculate apparent inclination at J2000
-  const i_app_2000 = calculateApparentInclination(planet, 2000);
+  const i_app_2000 = calculateEclipticInclinationDynamic(planet, 2000);
 
   // Calculate apparent inclination at J2000 + 100 years
-  const i_app_2100 = calculateApparentInclination(planet, 2100);
+  const i_app_2100 = calculateEclipticInclinationDynamic(planet, 2100);
 
   // Rate in degrees per century
   return (i_app_2100 - i_app_2000);
@@ -241,50 +241,50 @@ The Ω-based approach requires three constants per planet:
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
-const mercuryInclinationMean = 7.215;       // (4.57 + 9.86) / 2
-const mercuryInclinationAmplitude = 2.645;  // (9.86 - 4.57) / 2
+const mercuryInvPlaneInclinationMean = 7.215;       // (4.57 + 9.86) / 2
+const mercuryInvPlaneInclinationAmplitude = 2.645;  // (9.86 - 4.57) / 2
 
 // Venus: Near-infinite period, no oscillation
-const venusInclinationMean = 2.155;
-const venusInclinationAmplitude = 0.0;
+const venusInvPlaneInclinationMean = 2.155;
+const venusInvPlaneInclinationAmplitude = 0.0;
 
 // Mars: Range 0.00° to 5.84° (from Laplace-Lagrange)
-const marsInclinationMean = 2.92;           // (0.00 + 5.84) / 2
-const marsInclinationAmplitude = 2.92;      // (5.84 - 0.00) / 2
+const marsInvPlaneInclinationMean = 2.92;           // (0.00 + 5.84) / 2
+const marsInvPlaneInclinationAmplitude = 2.92;      // (5.84 - 0.00) / 2
 
 // Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
-const jupiterInclinationMean = 0.365;       // (0.241 + 0.489) / 2
-const jupiterInclinationAmplitude = 0.124;  // (0.489 - 0.241) / 2
+const jupiterInvPlaneInclinationMean = 0.365;       // (0.241 + 0.489) / 2
+const jupiterInvPlaneInclinationAmplitude = 0.124;  // (0.489 - 0.241) / 2
 
 // Saturn: Range 0.797° to 1.02° (from Laplace-Lagrange)
-const saturnInclinationMean = 0.9085;       // (0.797 + 1.02) / 2
-const saturnInclinationAmplitude = 0.112;   // (1.02 - 0.797) / 2
+const saturnInvPlaneInclinationMean = 0.9085;       // (0.797 + 1.02) / 2
+const saturnInvPlaneInclinationAmplitude = 0.112;   // (1.02 - 0.797) / 2
 
 // Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
-const uranusInclinationMean = 1.006;        // (0.902 + 1.11) / 2
-const uranusInclinationAmplitude = 0.104;   // (1.11 - 0.902) / 2
+const uranusInvPlaneInclinationMean = 1.006;        // (0.902 + 1.11) / 2
+const uranusInvPlaneInclinationAmplitude = 0.104;   // (1.11 - 0.902) / 2
 
 // Neptune: Range 0.554° to 0.800° (from Laplace-Lagrange)
-const neptuneInclinationMean = 0.677;       // (0.554 + 0.800) / 2
-const neptuneInclinationAmplitude = 0.123;  // (0.800 - 0.554) / 2
+const neptuneInvPlaneInclinationMean = 0.677;       // (0.554 + 0.800) / 2
+const neptuneInvPlaneInclinationAmplitude = 0.123;  // (0.800 - 0.554) / 2
 
 // Pluto: Estimated (not in Laplace-Lagrange classical theory)
-const plutoInclinationMean = 15.564;
-const plutoInclinationAmplitude = 0.1;
+const plutoInvPlaneInclinationMean = 15.564;
+const plutoInvPlaneInclinationAmplitude = 0.1;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // PHASE OFFSETS: Ω_J2000 - φ₀
 // These link the inclination oscillation to the ascending node position
 // ══════════════════════════════════════════════════════════════════════════════
 
-const mercuryInclinationPhaseOffset = 283.7;  // Ω=32.81°, φ₀=109.1°
-const venusInclinationPhaseOffset = 0.0;      // No oscillation
-const marsInclinationPhaseOffset = 238.7;     // Ω=354.85°, φ₀=116.2°
-const jupiterInclinationPhaseOffset = 202.6;  // Ω=312.9°, φ₀=110.3°
-const saturnInclinationPhaseOffset = 37.8;    // Ω=119.04°, φ₀=+81.3° → INCREASING incl., matches observed +0.0025°/century
-const uranusInclinationPhaseOffset = 211.7;   // Ω=307.76°, φ₀=96.1°
-const neptuneInclinationPhaseOffset = 254.0;  // Ω=192.18°, φ₀=-61.8°
-const plutoInclinationPhaseOffset = 15.4;     // Ω=105.44°, φ₀=90°
+const mercuryInclinationPhaseAngle = 283.7;  // Ω=32.81°, φ₀=109.1°
+const venusInclinationPhaseAngle = 0.0;      // No oscillation
+const marsInclinationPhaseAngle = 238.7;     // Ω=354.85°, φ₀=116.2°
+const jupiterInclinationPhaseAngle = 202.6;  // Ω=312.9°, φ₀=110.3°
+const saturnInclinationPhaseAngle = 37.8;    // Ω=119.04°, φ₀=+81.3° → INCREASING incl., matches observed +0.0025°/century
+const uranusInclinationPhaseAngle = 211.7;   // Ω=307.76°, φ₀=96.1°
+const neptuneInclinationPhaseAngle = 254.0;  // Ω=192.18°, φ₀=-61.8°
+const plutoInclinationPhaseAngle = 15.4;     // Ω=105.44°, φ₀=90°
 ```
 
 ### Symmetry with Earth's Implementation
@@ -293,8 +293,8 @@ This approach mirrors exactly how Earth is already handled:
 
 | Component | Earth | Other Planets |
 |-----------|-------|---------------|
-| **Mean inclination** | `earthinclinationMean` | `<planet>Inclination` (existing) |
-| **Amplitude** | `tiltandinclinationAmplitude` | `<planet>InclinationAmplitude` (NEW) |
+| **Mean inclination** | `earthInvPlaneInclinationMean` | `<planet>Inclination` (existing) |
+| **Amplitude** | `earthInvPlaneInclinationAmplitude` | `<planet>InvPlaneInclinationAmplitude` (NEW) |
 | **Period** | `earthPerihelionEclipticYears` | `<planet>PerihelionEclipticYears` (existing) |
 | **Phase reference** | `balancedYear` | Same `balancedYear` or planet-specific |
 
@@ -309,13 +309,13 @@ This approach mirrors exactly how Earth is already handled:
  * @param {number} currentYear - Current simulation year
  * @returns {number} Dynamic inclination in degrees
  */
-function computePlanetInclinationToInvPlane(planet, currentYear) {
+function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Get constants (example for Saturn)
-  const i_mean = saturnInclinationMean;           // 0.9085° (Laplace-Lagrange midpoint)
-  const amplitude = saturnInclinationAmplitude;   // 0.112° (half of range)
+  const i_mean = saturnInvPlaneInclinationMean;           // 0.9085° (Laplace-Lagrange midpoint)
+  const amplitude = saturnInvPlaneInclinationAmplitude;   // 0.112° (half of range)
   const period = saturnPerihelionEclipticYears;   // -298176 years (retrograde)
   const ascNodeJ2000 = saturnAscendingNodeInvPlaneVerified;  // 119.04°
-  const phaseOffset = saturnInclinationPhaseOffset;          // 200.5°
+  const phaseOffset = saturnInclinationPhaseAngle;          // 200.5°
 
   // Calculate years since J2000
   const yearsSinceJ2000 = currentYear - 2000;
@@ -365,11 +365,11 @@ i(t) = mean + A × cos(Ω(t) - offset)
 ```javascript
 function updateDynamicInclinations() {
   // Get DYNAMIC Earth inclination (existing)
-  const earthI = o.inclinationEarth;  // Already oscillates
+  const earthI = o.earthInvPlaneInclinationDynamic;  // Already oscillates
 
   // Get DYNAMIC planet inclination (NEW)
-  const mercuryI = computePlanetInclinationToInvPlane('mercury', o.currentYear);
-  const saturnI = computePlanetInclinationToInvPlane('saturn', o.currentYear);
+  const mercuryI = computePlanetInvPlaneInclinationDynamic('mercury', o.currentYear);
+  const saturnI = computePlanetInvPlaneInclinationDynamic('saturn', o.currentYear);
   // ... etc
 
   // Calculate apparent inclination using BOTH dynamic values
@@ -414,9 +414,9 @@ For timescales under ~10,000 years, use the linear rate directly:
 ```javascript
 const saturnInclinationRate = +0.00220; // degrees per century (derived)
 
-function getSaturnInclinationToInvPlane(currentYear) {
+function getSaturnInvPlaneInclinationDynamic(currentYear) {
   const centuriesSinceJ2000 = (currentYear - 2000) / 100;
-  return saturnInclinationMean + saturnInclinationRate * centuriesSinceJ2000;
+  return saturnInvPlaneInclinationMean + saturnInclinationRate * centuriesSinceJ2000;
 }
 ```
 
@@ -487,7 +487,7 @@ Using `A = |rate| × |period| / (2π)`:
 | Neptune | +0.00035 | 298,176 | **0.017** | Very small oscillation, **positive rate** |
 
 **Comparison with Earth:**
-- Earth amplitude = `tiltandinclinationAmplitude` = **0.564°**
+- Earth amplitude = `earthInvPlaneInclinationAmplitude` = **0.564°**
 - Mercury amplitude ≈ 0.229° (about 40% of Earth's)
 - Other planets have smaller amplitudes
 
@@ -499,13 +499,13 @@ Based on the above calculations, here are the proposed amplitude constants:
 // Derived using: A = |JPL rate| × |period| / (2π)
 // These are upper-bound estimates assuming maximum rate at J2000
 
-const mercuryInclinationAmplitude = 0.229;  // ±0.229° around mean 6.347°
-const venusInclinationAmplitude = 0.0;      // Nearly fixed (period ≈ ∞)
-const marsInclinationAmplitude = 0.096;     // ±0.096° around mean 1.631°
-const jupiterInclinationAmplitude = 0.087;  // ±0.087° around mean 0.322°
-const saturnInclinationAmplitude = 0.092;   // ±0.092° around mean 0.925°
-const uranusInclinationAmplitude = 0.038;   // ±0.038° around mean 0.995°
-const neptuneInclinationAmplitude = 0.017;  // ±0.017° around mean 0.735°
+const mercuryInvPlaneInclinationAmplitude = 0.229;  // ±0.229° around mean 6.347°
+const venusInvPlaneInclinationAmplitude = 0.0;      // Nearly fixed (period ≈ ∞)
+const marsInvPlaneInclinationAmplitude = 0.096;     // ±0.096° around mean 1.631°
+const jupiterInvPlaneInclinationAmplitude = 0.087;  // ±0.087° around mean 0.322°
+const saturnInvPlaneInclinationAmplitude = 0.092;   // ±0.092° around mean 0.925°
+const uranusInvPlaneInclinationAmplitude = 0.038;   // ±0.038° around mean 0.995°
+const neptuneInvPlaneInclinationAmplitude = 0.017;  // ±0.017° around mean 0.735°
 ```
 
 ### Validation Check
@@ -535,52 +535,52 @@ This refinement can be done after the initial implementation to verify and tune 
 1. ✅ **Implemented mean inclination constants** in script.js (lines 292-332)
    - Using Laplace-Lagrange secular theory bounds from Farside physics textbook (Table 10.4)
    - Mean = midpoint of oscillation range (not J2000 value)
-   - `mercuryInclinationMean = 7.215` (range 4.57° to 9.86°)
-   - `venusInclinationMean = 2.155` (near-infinite period, no oscillation)
-   - `marsInclinationMean = 2.92` (range 0.00° to 5.84°)
-   - `jupiterInclinationMean = 0.365` (range 0.241° to 0.489°)
-   - `saturnInclinationMean = 0.9085` (range 0.797° to 1.02°)
-   - `uranusInclinationMean = 1.006` (range 0.902° to 1.11°)
-   - `neptuneInclinationMean = 0.677` (range 0.554° to 0.800°)
-   - `plutoInclinationMean = 15.564` (estimated, using J2000 value)
+   - `mercuryInvPlaneInclinationMean = 7.215` (range 4.57° to 9.86°)
+   - `venusInvPlaneInclinationMean = 2.155` (near-infinite period, no oscillation)
+   - `marsInvPlaneInclinationMean = 2.92` (range 0.00° to 5.84°)
+   - `jupiterInvPlaneInclinationMean = 0.365` (range 0.241° to 0.489°)
+   - `saturnInvPlaneInclinationMean = 0.9085` (range 0.797° to 1.02°)
+   - `uranusInvPlaneInclinationMean = 1.006` (range 0.902° to 1.11°)
+   - `neptuneInvPlaneInclinationMean = 0.677` (range 0.554° to 0.800°)
+   - `plutoInvPlaneInclinationMean = 15.564` (estimated, using J2000 value)
 
 2. ✅ **Implemented amplitude constants** in script.js (lines 292-332)
    - Amplitude = half of oscillation range
-   - `mercuryInclinationAmplitude = 2.645`
-   - `venusInclinationAmplitude = 0.0` (near-infinite period)
-   - `marsInclinationAmplitude = 2.92`
-   - `jupiterInclinationAmplitude = 0.124`
-   - `saturnInclinationAmplitude = 0.112`
-   - `uranusInclinationAmplitude = 0.104`
-   - `neptuneInclinationAmplitude = 0.123`
-   - `plutoInclinationAmplitude = 0.1` (estimated)
+   - `mercuryInvPlaneInclinationAmplitude = 2.645`
+   - `venusInvPlaneInclinationAmplitude = 0.0` (near-infinite period)
+   - `marsInvPlaneInclinationAmplitude = 2.92`
+   - `jupiterInvPlaneInclinationAmplitude = 0.124`
+   - `saturnInvPlaneInclinationAmplitude = 0.112`
+   - `uranusInvPlaneInclinationAmplitude = 0.104`
+   - `neptuneInvPlaneInclinationAmplitude = 0.123`
+   - `plutoInvPlaneInclinationAmplitude = 0.1` (estimated)
 
 3. ✅ **Implemented phase offset constants** in script.js (lines 359-369)
-   - Each planet has a `<planet>InclinationPhaseOffset` value (degrees)
+   - Each planet has a `<planet>InclinationPhaseAngle` value (degrees)
    - **Key insight**: Phase offset = Ω_J2000 - φ₀ (geometric relationship)
    - This links the inclination oscillation to the ascending node precession
-   - `mercuryInclinationPhaseOffset = 283.7` (Ω=32.81°, φ₀=109.1°)
-   - `venusInclinationPhaseOffset = 0.0` (no oscillation)
-   - `marsInclinationPhaseOffset = 238.7` (Ω=354.85°, φ₀=116.2°)
-   - `jupiterInclinationPhaseOffset = 202.6` (Ω=312.9°, φ₀=110.3°)
-   - `saturnInclinationPhaseOffset = 37.8` (Ω=119.04°, φ₀=+81.3° → matches observed +0.0025°/century trend)
-   - `uranusInclinationPhaseOffset = 211.7` (Ω=307.76°, φ₀=96.1°)
-   - `neptuneInclinationPhaseOffset = 254.0` (Ω=192.18°, φ₀=-61.8°)
-   - `plutoInclinationPhaseOffset = 15.4` (Ω=105.44°, φ₀=90°)
+   - `mercuryInclinationPhaseAngle = 283.7` (Ω=32.81°, φ₀=109.1°)
+   - `venusInclinationPhaseAngle = 0.0` (no oscillation)
+   - `marsInclinationPhaseAngle = 238.7` (Ω=354.85°, φ₀=116.2°)
+   - `jupiterInclinationPhaseAngle = 202.6` (Ω=312.9°, φ₀=110.3°)
+   - `saturnInclinationPhaseAngle = 37.8` (Ω=119.04°, φ₀=+81.3° → matches observed +0.0025°/century trend)
+   - `uranusInclinationPhaseAngle = 211.7` (Ω=307.76°, φ₀=96.1°)
+   - `neptuneInclinationPhaseAngle = 254.0` (Ω=192.18°, φ₀=-61.8°)
+   - `plutoInclinationPhaseAngle = 15.4` (Ω=105.44°, φ₀=90°)
 
-4. ✅ **Created `computePlanetInclinationToInvPlane()`** function (lines 19515-19585)
+4. ✅ **Created `computePlanetInvPlaneInclinationDynamic()`** function (lines 19515-19585)
    - **Ω-based approach**: Inclination phase linked to ascending node position
    - Formula: `i(t) = mean + A × cos(Ω(t) - offset)`
    - At J2000: `Ω(t) = Ω_J2000`, so `cos(Ω_J2000 - offset) = cos(φ₀)` returns J2000 value
    - Uses planet-specific precession periods from `<planet>PerihelionEclipticYears`
    - Handles retrograde precession (Saturn, Neptune) correctly
 
-5. ✅ **Updated `updateDynamicInclinations()`** to compute `o.<planet>InclinationToInvPlane` values
-   - Calls `computePlanetInclinationToInvPlane()` for each planet
+5. ✅ **Updated `updateDynamicInclinations()`** to compute `o.<planet>InvPlaneInclinationDynamic` values
+   - Calls `computePlanetInvPlaneInclinationDynamic()` for each planet
    - Uses dynamic inclinations instead of fixed constants in apparent inclination calculation
 
 6. ✅ **`calculateInvariablePlaneFromAngularMomentumDynamic()`** automatically benefits
-   - Uses `o.<planet>ApparentInclination` which now incorporates dynamic planet inclinations
+   - Uses `o.<planet>EclipticInclinationDynamic` which now incorporates dynamic planet inclinations
 
 ### The Ω-Based Approach
 
@@ -668,9 +668,9 @@ This approach reveals that:
 ║  │  ─────────────────────────────────────────────────────────────────────  │ ║
 ║  │  i(t) = mean + amplitude × cos(Ω(t) - offset)                          │ ║
 ║  │                                                                         │ ║
-║  │  Mean = <planet>InclinationMean (Laplace-Lagrange midpoint)            │ ║
+║  │  Mean = <planet>InvPlaneInclinationMean (Laplace-Lagrange midpoint)            │ ║
 ║  │  Amplitude = <planet>InclinationAmplitude (half of range)              │ ║
-║  │  Offset = <planet>InclinationPhaseOffset (Ω_J2000 - φ₀)                │ ║
+║  │  Offset = <planet>InclinationPhaseAngle (Ω_J2000 - φ₀)                │ ║
 ║  └─────────────────────────────────────────────────────────────────────────┘ ║
 ║                                                                               ║
 ║  Both effects are two aspects of the SAME physical precession motion.        ║
@@ -683,14 +683,14 @@ This approach reveals that:
 
 | Planet | Mean (NEW) | Amplitude (NEW) | Phase Offset (NEW) | Period (existing) |
 |--------|------------|-----------------|-------------------|-------------------|
-| Mercury | `mercuryInclinationMean` | `mercuryInclinationAmplitude` | `mercuryInclinationPhaseOffset` | `mercuryPerihelionEclipticYears` |
-| Venus | `venusInclinationMean` | `venusInclinationAmplitude` | — (no oscillation) | — |
-| Earth | `earthinclinationMean` | `tiltandinclinationAmplitude` | (uses balancedYear) | `earthPerihelionEclipticYears` |
-| Mars | `marsInclinationMean` | `marsInclinationAmplitude` | `marsInclinationPhaseOffset` | `marsPerihelionEclipticYears` |
-| Jupiter | `jupiterInclinationMean` | `jupiterInclinationAmplitude` | `jupiterInclinationPhaseOffset` | `jupiterPerihelionEclipticYears` |
-| Saturn | `saturnInclinationMean` | `saturnInclinationAmplitude` | `saturnInclinationPhaseOffset` | `saturnPerihelionEclipticYears` |
-| Uranus | `uranusInclinationMean` | `uranusInclinationAmplitude` | `uranusInclinationPhaseOffset` | `uranusPerihelionEclipticYears` |
-| Neptune | `neptuneInclinationMean` | `neptuneInclinationAmplitude` | `neptuneInclinationPhaseOffset` | `neptunePerihelionEclipticYears` |
+| Mercury | `mercuryInvPlaneInclinationMean` | `mercuryInvPlaneInclinationAmplitude` | `mercuryInclinationPhaseAngle` | `mercuryPerihelionEclipticYears` |
+| Venus | `venusInvPlaneInclinationMean` | `venusInvPlaneInclinationAmplitude` | — (no oscillation) | — |
+| Earth | `earthInvPlaneInclinationMean` | `earthInvPlaneInclinationAmplitude` | (uses balancedYear) | `earthPerihelionEclipticYears` |
+| Mars | `marsInvPlaneInclinationMean` | `marsInvPlaneInclinationAmplitude` | `marsInclinationPhaseAngle` | `marsPerihelionEclipticYears` |
+| Jupiter | `jupiterInvPlaneInclinationMean` | `jupiterInvPlaneInclinationAmplitude` | `jupiterInclinationPhaseAngle` | `jupiterPerihelionEclipticYears` |
+| Saturn | `saturnInvPlaneInclinationMean` | `saturnInvPlaneInclinationAmplitude` | `saturnInclinationPhaseAngle` | `saturnPerihelionEclipticYears` |
+| Uranus | `uranusInvPlaneInclinationMean` | `uranusInvPlaneInclinationAmplitude` | `uranusInclinationPhaseAngle` | `uranusPerihelionEclipticYears` |
+| Neptune | `neptuneInvPlaneInclinationMean` | `neptuneInvPlaneInclinationAmplitude` | `neptuneInclinationPhaseAngle` | `neptunePerihelionEclipticYears` |
 
 ## References
 

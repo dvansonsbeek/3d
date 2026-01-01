@@ -144,14 +144,14 @@ function calculateInvariablePlaneFromOrbits() {
   const L_total = new THREE.Vector3(0, 0, 0);
 
   const planets = [
-    { mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricity, i: mercuryOrbitalInclination, node: mercuryAscendingNode },
-    { mass: M_VENUS, a: venusOrbitDistance, e: venusOrbitalEccentricity, i: venusOrbitalInclination, node: venusAscendingNode },
+    { mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricity, i: mercuryEclipticInclinationJ2000, node: mercuryAscendingNode },
+    { mass: M_VENUS, a: venusOrbitDistance, e: venusOrbitalEccentricity, i: venusEclipticInclinationJ2000, node: venusAscendingNode },
     { mass: M_EARTH, a: 1.0, e: o.eccentricityEarth, i: 0, node: 0 }, // Ecliptic reference
-    { mass: M_MARS, a: marsOrbitDistance, e: marsOrbitalEccentricity, i: marsOrbitalInclination, node: marsAscendingNode },
-    { mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricity, i: jupiterOrbitalInclination, node: jupiterAscendingNode },
-    { mass: M_SATURN, a: saturnOrbitDistance, e: saturnOrbitalEccentricity, i: saturnOrbitalInclination, node: saturnAscendingNode },
-    { mass: M_URANUS, a: uranusOrbitDistance, e: uranusOrbitalEccentricity, i: uranusOrbitalInclination, node: uranusAscendingNode },
-    { mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity, i: neptuneOrbitalInclination, node: neptuneAscendingNode },
+    { mass: M_MARS, a: marsOrbitDistance, e: marsOrbitalEccentricity, i: marsEclipticInclinationJ2000, node: marsAscendingNode },
+    { mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricity, i: jupiterEclipticInclinationJ2000, node: jupiterAscendingNode },
+    { mass: M_SATURN, a: saturnOrbitDistance, e: saturnOrbitalEccentricity, i: saturnEclipticInclinationJ2000, node: saturnAscendingNode },
+    { mass: M_URANUS, a: uranusOrbitDistance, e: uranusOrbitalEccentricity, i: uranusEclipticInclinationJ2000, node: uranusAscendingNode },
+    { mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricity, i: neptuneEclipticInclinationJ2000, node: neptuneAscendingNode },
   ];
 
   for (const planet of planets) {
@@ -451,14 +451,14 @@ The **"Invariable plane"** feature (GUI toggle in Orbital folder) was implemente
 
 #### Planet Inclinations to Invariable Plane (Souami & Souchay 2012)
 ```javascript
-const mercuryInclination = 6.3472858;   // degrees
-const venusInclination = 2.1545441;
-const marsInclination = 1.6311858;
-const jupiterInclination = 0.3219652;   // Jupiter closest to plane (dominates it)
-const saturnInclination = 0.9254704;
-const uranusInclination = 0.9946692;
-const neptuneInclination = 0.7354155;
-const plutoInclination = 15.5639473;
+const mercuryInvPlaneInclinationJ2000 = 6.3472858;   // degrees
+const venusInvPlaneInclinationJ2000 = 2.1545441;
+const marsInvPlaneInclinationJ2000 = 1.6311858;
+const jupiterInvPlaneInclinationJ2000 = 0.3219652;   // Jupiter closest to plane (dominates it)
+const saturnInvPlaneInclinationJ2000 = 0.9254704;
+const uranusInvPlaneInclinationJ2000 = 0.9946692;
+const neptuneInvPlaneInclinationJ2000 = 0.7354155;
+const plutoInvPlaneInclinationJ2000 = 15.5639473;
 ```
 
 #### Ascending Nodes on Invariable Plane
@@ -483,10 +483,10 @@ const neptuneAscendingNodeInvPlaneVerified = 192.175;
 
 ```javascript
 const PLANET_INV_PLANE_DATA = {
-  earth:   { obj: earth,   inclination: () => o.inclinationEarth,
+  earth:   { obj: earth,   inclination: () => o.earthInvPlaneInclinationDynamic,
              ascNode: () => o.earthAscendingNodeInvPlane,
              height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
-  mercury: { obj: mercury, inclination: mercuryInclination,
+  mercury: { obj: mercury, inclination: mercuryInvPlaneInclinationJ2000,
              ascNode: () => o.mercuryAscendingNodeInvPlane,
              height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
   // ... all 8 planets
@@ -516,7 +516,7 @@ const ascNodeDynamic = ascNodeJ2000 + precessionRate * yearsSinceJ2000;
 The plane orientation is calculated from Earth's relationship to the invariable plane:
 
 ```javascript
-const earthI = o.inclinationEarth * Math.PI / 180;        // ~1.57°
+const earthI = o.earthInvPlaneInclinationDynamic * Math.PI / 180;        // ~1.57°
 const earthOmega = o.earthAscendingNodeInvPlane * Math.PI / 180;  // ~284°
 
 // Tilt axis is the line of nodes
@@ -557,20 +557,20 @@ The `updateDynamicInclinations()` function calculates how a planet's inclination
 3. Apparent inclination = arccos(dot product of the two normals)
 
 This produces two outputs per planet:
-- `o.<planet>ApparentInclination` - using J2000-verified ascending nodes
-- `o.<planet>ApparentInclinationSouamiSouchay` - using original S&S values
+- `o.<planet>EclipticInclinationDynamic` - using J2000-verified ascending nodes
+- `o.<planet>EclipticInclinationSouamiSouchayDynamic` - using original S&S values
 
 ### Two Types of Inclination Constants
 
 The codebase maintains two distinct inclination systems:
 
-1. **`<planet>OrbitalInclination`** - Inclination to the ecliptic (Earth's orbital plane)
+1. **`<planet>EclipticInclinationJ2000`** - Inclination to the ecliptic (Earth's orbital plane)
    - Used for visual orbit tilts in the 3D model
-   - Example: `mercuryOrbitalInclination = 7.00501638°`
+   - Example: `mercuryEclipticInclinationJ2000 = 7.00501638°`
 
-2. **`<planet>Inclination`** - Inclination to the invariable plane (Souami & Souchay 2012)
+2. **`<planet>InvPlaneInclinationJ2000`** - Inclination to the invariable plane (Souami & Souchay 2012)
    - Used for invariable plane height calculations
-   - Example: `mercuryInclination = 6.3472858°`
+   - Example: `mercuryInvPlaneInclinationJ2000 = 6.3472858°`
 
 ### Key Architecture Decisions
 
@@ -613,7 +613,7 @@ Since we already have Earth's relationship to the invariable plane, we can deriv
 // The invariable plane's orientation relative to the ecliptic is the INVERSE
 // of the ecliptic's orientation relative to the invariable plane
 
-const invI = o.inclinationEarth * DEG2RAD;
+const invI = o.earthInvPlaneInclinationDynamic * DEG2RAD;
 const invOmega = (o.earthAscendingNodeInvPlane + 180) * DEG2RAD; // Opposite ascending node
 
 const invariablePlaneNormal = new THREE.Vector3(
@@ -624,7 +624,7 @@ const invariablePlaneNormal = new THREE.Vector3(
 ```
 
 This approach:
-1. Uses existing live data (`o.inclinationEarth`, `o.earthAscendingNodeInvPlane`)
+1. Uses existing live data (`o.earthInvPlaneInclinationDynamic`, `o.earthAscendingNodeInvPlane`)
 2. Is dynamically correct (precesses over time)
 3. Requires no additional computation
 4. Gives identical results to the full angular momentum calculation

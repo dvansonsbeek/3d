@@ -161,7 +161,7 @@ The ecliptic's orientation changes with Earth's inclination:
 ```javascript
 function getEclipticNormal(currentYear) {
   // Earth's inclination to invariable plane at this year
-  const earthIncl = o.inclinationEarth;  // Already calculated each frame
+  const earthIncl = o.earthInvPlaneInclinationDynamic;  // Already calculated each frame
 
   // Earth's ascending node on invariable plane (dynamic, precesses over time)
   // Use the already-computed dynamic value from updatePlanetInvariablePlaneHeights()
@@ -174,7 +174,7 @@ function getEclipticNormal(currentYear) {
 ### Step 4: Calculate Apparent Inclination
 
 ```javascript
-function calculateApparentInclination(planetNormal, eclipticNormal) {
+function calculateEclipticInclinationDynamic(planetNormal, eclipticNormal) {
   // Dot product of unit normal vectors
   const cosAngle = planetNormal.dot(eclipticNormal);
 
@@ -212,19 +212,19 @@ function calculateAscendingNodeDirection(planetNormal, eclipticNormal) {
 
 ```javascript
 // EXISTING constants - inclinations relative to INVARIABLE PLANE:
-const mercuryInclination = 6.3472858;   // (vs mercuryOrbitalInclination = 7.00501638 for ecliptic)
-const venusInclination = 2.1545441;     // (vs venusOrbitalInclination = 3.3946018)
-const marsInclination = 1.6311858;      // (vs marsOrbitalInclination = 1.84971028)
-const jupiterInclination = 0.3219652;   // (vs jupiterOrbitalInclination = 1.30450732)
-const saturnInclination = 0.9254704;    // (vs saturnOrbitalInclination = 2.4853834)
-const uranusInclination = 0.9946692;    // (vs uranusOrbitalInclination = 0.77234317)
-const neptuneInclination = 0.7354155;   // (vs neptuneOrbitalInclination = 1.768273)
-const plutoInclination = 15.5541473;    // (vs plutoOrbitalInclination = 17.14175)
+const mercuryInvPlaneInclinationJ2000 = 6.3472858;   // (vs mercuryEclipticInclinationJ2000 = 7.00501638 for ecliptic)
+const venusInvPlaneInclinationJ2000 = 2.1545441;     // (vs venusEclipticInclinationJ2000 = 3.3946018)
+const marsInvPlaneInclinationJ2000 = 1.6311858;      // (vs marsEclipticInclinationJ2000 = 1.84971028)
+const jupiterInvPlaneInclinationJ2000 = 0.3219652;   // (vs jupiterEclipticInclinationJ2000 = 1.30450732)
+const saturnInvPlaneInclinationJ2000 = 0.9254704;    // (vs saturnEclipticInclinationJ2000 = 2.4853834)
+const uranusInvPlaneInclinationJ2000 = 0.9946692;    // (vs uranusEclipticInclinationJ2000 = 0.77234317)
+const neptuneInvPlaneInclinationJ2000 = 0.7354155;   // (vs neptuneEclipticInclinationJ2000 = 1.768273)
+const plutoInvPlaneInclinationJ2000 = 15.5541473;    // (vs plutoEclipticInclinationJ2000 = 17.14175)
 
 // For Earth's inclination to invariable plane (dynamic):
-// earthinclinationMean = 1.49514053
-// tiltandinclinationAmplitude = 0.564
-// o.inclinationEarth = computed value (0.931° to 2.059°) - already calculated each frame
+// earthInvPlaneInclinationMean = 1.49514053
+// earthInvPlaneInclinationAmplitude = 0.564
+// o.earthInvPlaneInclinationDynamic = computed value (0.931° to 2.059°) - already calculated each frame
 ```
 
 #### Ascending Node Constants (script.js lines 226-238)
@@ -265,21 +265,21 @@ Add to the `o` object:
 ```javascript
 // Dynamic APPARENT inclination (relative to tilting ecliptic)
 // This is DIFFERENT from the static <planet>Inclination constants (relative to invariable plane)
-o.mercuryApparentInclination = 0;  // Dynamic apparent inclination to ecliptic
-o.venusApparentInclination = 0;
-o.marsApparentInclination = 0;
-o.jupiterApparentInclination = 0;
-o.saturnApparentInclination = 0;
-o.uranusApparentInclination = 0;
-o.neptuneApparentInclination = 0;
-o.plutoApparentInclination = 0;
-// Note: No earthApparentInclination - Earth's inclination to ecliptic is always 0 by definition
+o.mercuryEclipticInclinationDynamic = 0;  // Dynamic apparent inclination to ecliptic
+o.venusEclipticInclinationDynamic = 0;
+o.marsEclipticInclinationDynamic = 0;
+o.jupiterEclipticInclinationDynamic = 0;
+o.saturnEclipticInclinationDynamic = 0;
+o.uranusEclipticInclinationDynamic = 0;
+o.neptuneEclipticInclinationDynamic = 0;
+o.plutoEclipticInclinationDynamic = 0;
+// Note: No earthEclipticInclinationDynamic - Earth's inclination to ecliptic is always 0 by definition
 ```
 
 **Naming convention clarification:**
 - `<planet>Inclination` (constant) = inclination to **invariable plane** (fixed, from script.js)
-- `<planet>OrbitalInclination` (constant) = inclination to **J2000 ecliptic** (fixed, from script.js)
-- `o.<planet>ApparentInclination` (dynamic) = inclination to **current ecliptic** (changes with Earth's tilt)
+- `<planet>EclipticInclinationJ2000` (constant) = inclination to **J2000 ecliptic** (fixed, from script.js)
+- `o.<planet>EclipticInclinationDynamic` (dynamic) = inclination to **current ecliptic** (changes with Earth's tilt)
 
 ### New Function: `updateDynamicInclinations()`
 
@@ -293,7 +293,7 @@ function updateDynamicInclinations() {
   const RAD2DEG = 180 / Math.PI;
 
   // Get Earth's current inclination to invariable plane (dynamic, already calculated)
-  const earthIncl = o.inclinationEarth;
+  const earthIncl = o.earthInvPlaneInclinationDynamic;
 
   // Get Earth's ascending node on invariable plane (dynamic, already calculated)
   const earthAscNode = o.earthAscendingNodeInvPlane;
@@ -309,14 +309,14 @@ function updateDynamicInclinations() {
 
   // Planet configuration: use existing constants
   const planets = [
-    { key: 'mercury', incl: mercuryInclination, ascNode: o.mercuryAscendingNodeInvPlane },
-    { key: 'venus',   incl: venusInclination,   ascNode: o.venusAscendingNodeInvPlane },
-    { key: 'mars',    incl: marsInclination,    ascNode: o.marsAscendingNodeInvPlane },
-    { key: 'jupiter', incl: jupiterInclination, ascNode: o.jupiterAscendingNodeInvPlane },
-    { key: 'saturn',  incl: saturnInclination,  ascNode: o.saturnAscendingNodeInvPlane },
-    { key: 'uranus',  incl: uranusInclination,  ascNode: o.uranusAscendingNodeInvPlane },
-    { key: 'neptune', incl: neptuneInclination, ascNode: o.neptuneAscendingNodeInvPlane },
-    { key: 'pluto',   incl: plutoInclination,   ascNode: o.plutoAscendingNodeInvPlane }
+    { key: 'mercury', incl: mercuryInvPlaneInclinationJ2000, ascNode: o.mercuryAscendingNodeInvPlane },
+    { key: 'venus',   incl: venusInvPlaneInclinationJ2000,   ascNode: o.venusAscendingNodeInvPlane },
+    { key: 'mars',    incl: marsInvPlaneInclinationJ2000,    ascNode: o.marsAscendingNodeInvPlane },
+    { key: 'jupiter', incl: jupiterInvPlaneInclinationJ2000, ascNode: o.jupiterAscendingNodeInvPlane },
+    { key: 'saturn',  incl: saturnInvPlaneInclinationJ2000,  ascNode: o.saturnAscendingNodeInvPlane },
+    { key: 'uranus',  incl: uranusInvPlaneInclinationJ2000,  ascNode: o.uranusAscendingNodeInvPlane },
+    { key: 'neptune', incl: neptuneInvPlaneInclinationJ2000, ascNode: o.neptuneAscendingNodeInvPlane },
+    { key: 'pluto',   incl: plutoInvPlaneInclinationJ2000,   ascNode: o.plutoAscendingNodeInvPlane }
   ];
 
   for (const { key, incl, ascNode } of planets) {
@@ -335,7 +335,7 @@ function updateDynamicInclinations() {
     const apparentIncl = Math.acos(clampedCos) * RAD2DEG;
 
     // Store in o object
-    o[key + 'ApparentInclination'] = apparentIncl;
+    o[key + 'EclipticInclinationDynamic'] = apparentIncl;
   }
 }
 ```
@@ -346,20 +346,20 @@ Change from using static inclination to dynamic:
 
 ```javascript
 // Before (using static J2000 ecliptic inclination) - current code at line 13126:
-updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, mercuryOrbitalInclination, 'Mercury');
-updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, venusOrbitalInclination, 'Venus');
+updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, mercuryEclipticInclinationJ2000, 'Mercury');
+updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, venusEclipticInclinationJ2000, 'Venus');
 // ... etc for all planets
 
 // After (using dynamic apparent inclination):
-updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, o.mercuryApparentInclination, 'Mercury');
-updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, o.venusApparentInclination, 'Venus');
-updatePlaneRotation(marsRealPerihelionAtSun, o.marsAscendingNode, o.marsApparentInclination, 'Mars');
-updatePlaneRotation(jupiterRealPerihelionAtSun, o.jupiterAscendingNode, o.jupiterApparentInclination, 'Jupiter');
-updatePlaneRotation(saturnRealPerihelionAtSun, o.saturnAscendingNode, o.saturnApparentInclination, 'Saturn');
-updatePlaneRotation(uranusRealPerihelionAtSun, o.uranusAscendingNode, o.uranusApparentInclination, 'Uranus');
-updatePlaneRotation(neptuneRealPerihelionAtSun, o.neptuneAscendingNode, o.neptuneApparentInclination, 'Neptune');
-updatePlaneRotation(plutoRealPerihelionAtSun, o.plutoAscendingNode, o.plutoApparentInclination, 'Pluto');
-// Note: Halley's and Eros keep static values (halleysOrbitalInclination, erosOrbitalInclination)
+updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic, 'Mercury');
+updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, o.venusEclipticInclinationDynamic, 'Venus');
+updatePlaneRotation(marsRealPerihelionAtSun, o.marsAscendingNode, o.marsEclipticInclinationDynamic, 'Mars');
+updatePlaneRotation(jupiterRealPerihelionAtSun, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic, 'Jupiter');
+updatePlaneRotation(saturnRealPerihelionAtSun, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic, 'Saturn');
+updatePlaneRotation(uranusRealPerihelionAtSun, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic, 'Uranus');
+updatePlaneRotation(neptuneRealPerihelionAtSun, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic, 'Neptune');
+updatePlaneRotation(plutoRealPerihelionAtSun, o.plutoAscendingNode, o.plutoEclipticInclinationDynamic, 'Pluto');
+// Note: Halley's and Eros keep static values (halleysEclipticInclinationJ2000, erosEclipticInclinationJ2000)
 ```
 
 ### Modify Half-Plane Visualization
@@ -394,7 +394,7 @@ The `rebuildHalfDiscGeometry` function should naturally handle asymmetric splits
 
 The transformation from ecliptic to invariable plane coordinates uses these values:
 
-1. **Earth's mean inclination to the invariable plane**: **1.49514053°** (model constant `earthinclinationMean`)
+1. **Earth's mean inclination to the invariable plane**: **1.49514053°** (model constant `earthInvPlaneInclinationMean`)
 2. **Earth's actual inclination at J2000**: **~1.578°** (computed from the ~99,392-year cycle)
 3. The ecliptic's ascending node on the invariable plane at J2000: **~284.51°** (from `earthAscendingNodeInvPlane`)
 
@@ -414,28 +414,28 @@ Update to show dynamic values:
 
 ```javascript
 // Current (static J2000 ecliptic):
-{ label: 'Orbital Inclination (i)', value: `${mercuryOrbitalInclination}°` }
+{ label: 'Orbital Inclination (i)', value: `${mercuryEclipticInclinationJ2000}°` }
 
 // New (dynamic apparent inclination):
-{ label: 'Orbital Inclination (i)', value: `${o.mercuryApparentInclination.toFixed(4)}°` }
+{ label: 'Orbital Inclination (i)', value: `${o.mercuryEclipticInclinationDynamic.toFixed(4)}°` }
 
 // Could also show both for reference:
-{ label: 'Inclination to ecliptic', value: `${o.mercuryApparentInclination.toFixed(4)}°` }
-{ label: 'Inclination to inv. plane', value: `${mercuryInclination}°` }  // Static constant
+{ label: 'Inclination to ecliptic', value: `${o.mercuryEclipticInclinationDynamic.toFixed(4)}°` }
+{ label: 'Inclination to inv. plane', value: `${mercuryInvPlaneInclinationJ2000}°` }  // Static constant
 ```
 
 ### Debug Output
 
 Add to ascending node debug logging:
 ```javascript
-console.log(`🔍 Dynamic Inclination: Mercury = ${o.mercuryApparentInclination.toFixed(4)}° (J2000: ${mercuryOrbitalInclination}°, inv.plane: ${mercuryInclination}°)`);
+console.log(`🔍 Dynamic Inclination: Mercury = ${o.mercuryEclipticInclinationDynamic.toFixed(4)}° (J2000: ${mercuryEclipticInclinationJ2000}°, inv.plane: ${mercuryInvPlaneInclinationJ2000}°)`);
 ```
 
 ## Dependencies
 
 This enhancement depends on:
 1. ✅ Dynamic ascending node calculation (already implemented - `o.<planet>AscendingNode`)
-2. ✅ Earth inclination calculation (already implemented - `o.inclinationEarth`)
+2. ✅ Earth inclination calculation (already implemented - `o.earthInvPlaneInclinationDynamic`)
 3. ✅ Invariable plane ascending nodes (already implemented - `o.<planet>AscendingNodeInvPlane`)
 4. ✅ Invariable plane inclination constants (already exist - `<planet>Inclination`)
 
@@ -447,14 +447,14 @@ Add after the existing `o.<planet>AscendingNodeInvPlane` properties:
 
 ```javascript
 // Dynamic apparent inclination (relative to current ecliptic, changes with Earth's tilt)
-mercuryApparentInclination: 0,
-venusApparentInclination: 0,
-marsApparentInclination: 0,
-jupiterApparentInclination: 0,
-saturnApparentInclination: 0,
-uranusApparentInclination: 0,
-neptuneApparentInclination: 0,
-plutoApparentInclination: 0,
+mercuryEclipticInclinationDynamic: 0,
+venusEclipticInclinationDynamic: 0,
+marsEclipticInclinationDynamic: 0,
+jupiterEclipticInclinationDynamic: 0,
+saturnEclipticInclinationDynamic: 0,
+uranusEclipticInclinationDynamic: 0,
+neptuneEclipticInclinationDynamic: 0,
+plutoEclipticInclinationDynamic: 0,
 ```
 
 ### Step 2: Add `updateDynamicInclinations()` function
@@ -473,7 +473,7 @@ updateOrbitalPlaneRotations();
 
 ### Step 4: Modify `updateOrbitalPlaneRotations()`
 
-Replace static `<planet>OrbitalInclination` with dynamic `o.<planet>ApparentInclination`.
+Replace static `<planet>EclipticInclinationJ2000` with dynamic `o.<planet>EclipticInclinationDynamic`.
 
 ### Step 5: Add pooled vectors at module level
 
@@ -496,9 +496,9 @@ const _planetNormal = new THREE.Vector3();
 ## Acceptance Criteria
 
 1. [ ] At year 2000, dynamic inclinations match static J2000 values within 0.01°
-2. [ ] At year 12000, Mercury apparent inclination differs from `mercuryOrbitalInclination` by ~0.1-0.3°
+2. [ ] At year 12000, Mercury apparent inclination differs from `mercuryEclipticInclinationJ2000` by ~0.1-0.3°
 3. [ ] Half-plane visualization shows asymmetric split at year 12000
-4. [ ] `o.mercuryApparentInclination` (etc.) values update in real-time
+4. [ ] `o.mercuryEclipticInclinationDynamic` (etc.) values update in real-time
 5. [ ] Hierarchy inspector shows dynamic inclination values
 6. [ ] No performance degradation (>55 FPS maintained)
 7. [ ] Smooth transitions when animating through time
@@ -575,8 +575,8 @@ When using the original Souami & Souchay (2012) ascending nodes with Earth's mea
 Rather than changing Earth's mean inclination (which would break the physical model), we adjusted the planet ascending nodes to match J2000 values exactly. See [Souami&Souchay_changed-ascending-nodes.md](Souami&Souchay_changed-ascending-nodes.md) for details.
 
 The implementation now calculates **both**:
-- `o.<planet>ApparentInclination` - using J2000-verified ascending nodes (matches J2000 exactly)
-- `o.<planet>ApparentInclinationSouamiSouchay` - using original S&S ascending nodes (for comparison)
+- `o.<planet>EclipticInclinationDynamic` - using J2000-verified ascending nodes (matches J2000 exactly)
+- `o.<planet>EclipticInclinationSouamiSouchayDynamic` - using original S&S ascending nodes (for comparison)
 
 ### Clarification: What Differs Between S&S and Verified Calculations
 
@@ -584,7 +584,7 @@ Both calculations use **identical inputs** except for the planet ascending node 
 
 | Input | S&S Calculation | Verified Calculation |
 |-------|-----------------|----------------------|
-| Earth's inclination to inv. plane | `o.inclinationEarth` (dynamic, ~1.578° at J2000) | Same |
+| Earth's inclination to inv. plane | `o.earthInvPlaneInclinationDynamic` (dynamic, ~1.578° at J2000) | Same |
 | Earth's ascending node on inv. plane | `o.earthAscendingNodeInvPlane` (dynamic) | Same |
 | Planet inclination to inv. plane | `<planet>Inclination` constant (fixed) | Same |
 | **Planet ascending node on inv. plane** | `o.<planet>AscendingNodeInvPlaneSouamiSouchay` | `o.<planet>AscendingNodeInvPlane` |
@@ -594,7 +594,7 @@ The **ONLY difference** is which ascending node constant is used for the planet:
 - **Verified**: Uses adjusted values calibrated to match J2000 reference inclinations exactly
 
 Both calculations use:
-1. **Dynamic** `o.inclinationEarth` (not the mean value `earthinclinationMean`)
+1. **Dynamic** `o.earthInvPlaneInclinationDynamic` (not the mean value `earthInvPlaneInclinationMean`)
 2. **Fixed** planet inclinations to the invariable plane (the `<planet>Inclination` constants)
 3. **Dynamic** Earth ascending node (`o.earthAscendingNodeInvPlane`)
 
@@ -604,7 +604,7 @@ This means the small discrepancies between S&S and Verified results are entirely
 
 ### Problem Statement
 
-Given a fixed value for `earthAscendingNodeInvPlaneVerified = 282.95°`, we need to find the optimal `<planet>AscendingNodeInvPlaneVerified` values such that `o.<planet>ApparentInclination` matches the J2000 `<planet>OrbitalInclination` exactly.
+Given a fixed value for `earthAscendingNodeInvPlaneVerified = 282.95°`, we need to find the optimal `<planet>AscendingNodeInvPlaneVerified` values such that `o.<planet>EclipticInclinationDynamic` matches the J2000 `<planet>EclipticInclinationJ2000` exactly.
 
 ### Mathematical Approach
 
@@ -629,7 +629,7 @@ Given:
 - Earth's ascending node on invariable plane: `Ω_E = 282.95°`
 - Earth's inclination to invariable plane: `i_E = 1.578°` (at J2000)
 - Planet's inclination to invariable plane: `i_P` (fixed constant)
-- Target apparent inclination: `i_target` (the J2000 OrbitalInclination value)
+- Target apparent inclination: `i_target` (the J2000 EclipticInclinationJ2000 value)
 
 We need to find `Ω_P` (planet's ascending node) such that:
 
@@ -695,19 +695,19 @@ const erosAscendingNodeInvPlaneVerified = 304.41;     // Approximation
 
 **After** (with earthAscendingNodeInvPlaneVerified = 282.95°):
 ```javascript
-// Calibrated with earthAscendingNodeInvPlaneVerified = 282.95° and o.inclinationEarth = 1.578° at J2000
-// Result: All planets match J2000 OrbitalInclination values with error < 0.0001°
+// Calibrated with earthAscendingNodeInvPlaneVerified = 282.95° and o.earthInvPlaneInclinationDynamic = 1.578° at J2000
+// Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
 const earthAscendingNodeInvPlaneVerified = 282.95;    // Adjusted from S&S 284.51°
-const mercuryAscendingNodeInvPlaneVerified = 31.28;   // Calibrated to match mercuryOrbitalInclination 7.00501638°
-const venusAscendingNodeInvPlaneVerified = 53.18;     // Calibrated to match venusOrbitalInclination 3.3946018°
-const marsAscendingNodeInvPlaneVerified = 353.33;     // Calibrated to match marsOrbitalInclination 1.84971028°
-const jupiterAscendingNodeInvPlaneVerified = 311.57;  // Calibrated to match jupiterOrbitalInclination 1.30450732°
-const saturnAscendingNodeInvPlaneVerified = 117.23;   // Calibrated to match saturnOrbitalInclination 2.4853834°
-const uranusAscendingNodeInvPlaneVerified = 306.26;   // Calibrated to match uranusOrbitalInclination 0.77234317°
-const neptuneAscendingNodeInvPlaneVerified = 190.58;  // Calibrated to match neptuneOrbitalInclination 1.768273°
-const plutoAscendingNodeInvPlaneVerified = 103.90;    // Calibrated to match plutoOrbitalInclination 17.14175°
+const mercuryAscendingNodeInvPlaneVerified = 31.28;   // Calibrated to match mercuryEclipticInclinationJ2000 7.00501638°
+const venusAscendingNodeInvPlaneVerified = 53.18;     // Calibrated to match venusEclipticInclinationJ2000 3.3946018°
+const marsAscendingNodeInvPlaneVerified = 353.33;     // Calibrated to match marsEclipticInclinationJ2000 1.84971028°
+const jupiterAscendingNodeInvPlaneVerified = 311.57;  // Calibrated to match jupiterEclipticInclinationJ2000 1.30450732°
+const saturnAscendingNodeInvPlaneVerified = 117.23;   // Calibrated to match saturnEclipticInclinationJ2000 2.4853834°
+const uranusAscendingNodeInvPlaneVerified = 306.26;   // Calibrated to match uranusEclipticInclinationJ2000 0.77234317°
+const neptuneAscendingNodeInvPlaneVerified = 190.58;  // Calibrated to match neptuneEclipticInclinationJ2000 1.768273°
+const plutoAscendingNodeInvPlaneVerified = 103.90;    // Calibrated to match plutoEclipticInclinationJ2000 17.14175°
 const halleysAscendingNodeInvPlaneVerified = 59.56;   // Retrograde orbit - no valid solution, kept as approximation
-const erosAscendingNodeInvPlaneVerified = 8.82;       // Calibrated to match erosOrbitalInclination 10.8290328658513°
+const erosAscendingNodeInvPlaneVerified = 8.82;       // Calibrated to match erosEclipticInclinationJ2000 10.8290328658513°
 ```
 
 ### Calculation Script
@@ -721,10 +721,10 @@ const RAD2DEG = 180 / Math.PI;
 
 // Fixed inputs
 const earthAscendingNodeInvPlaneVerified = 282.95; // degrees
-const earthInclinationToInvPlane = 1.578; // degrees at J2000 (approximate)
+const earthInvPlaneInclinationJ2000 = 1.578; // degrees at J2000 (approximate)
 
 // Earth ecliptic normal (Verified)
-const earthI = earthInclinationToInvPlane * DEG2RAD;
+const earthI = earthInvPlaneInclinationJ2000 * DEG2RAD;
 const earthOmega = earthAscendingNodeInvPlaneVerified * DEG2RAD;
 const eclipticNormal = {
   x: Math.sin(earthI) * Math.sin(earthOmega),
@@ -860,8 +860,8 @@ The highlighted row (year 29200) shows the ascending node at exactly 23.009°, m
 `earthAscendingNodeInvPlaneVerified` is set to 284.492° to place the ecliptic ascending node on the invariable plane at exactly 23.009° as published by Souami & Souchay (2012).
 
 ```javascript
-// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.inclinationEarth = 1.578° at J2000
-// Result: All planets match J2000 OrbitalInclination values with error < 0.0001°
+// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.earthInvPlaneInclinationDynamic = 1.578° at J2000
+// Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
 const earthAscendingNodeInvPlaneVerified = 284.492;   // Adjusted from S&S 284.51°
 const mercuryAscendingNodeInvPlaneVerified = 32.83;   // was 32.22, Δ = +0.61° (from S&S)
 const venusAscendingNodeInvPlaneVerified = 54.72;     // was 52.31, Δ = +2.41° (from S&S)
@@ -888,14 +888,14 @@ This document is part of a suite of related implementations:
 
 | Document | Purpose | Output Variables |
 |----------|---------|------------------|
-| **This document** | Calculate apparent inclination to tilting ecliptic | `o.<planet>ApparentInclination` |
+| **This document** | Calculate apparent inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
 | [planetary-invariable-plane-crossings.md](planetary-invariable-plane-crossings.md) | Calculate height above/below invariable plane | `o.<planet>HeightAboveInvPlane` |
 | [dynamic-ascending-node-calculation.md](dynamic-ascending-node-calculation.md) | Calculate ascending node on ecliptic | `o.<planet>AscendingNode` |
 
 **Shared data structures:**
 - Both use `INVARIABLE_PLANE_INCLINATIONS` (references existing `<planet>Inclination` constants)
 - Both use `INVARIABLE_PLANE_ASCENDING_NODES` (from Souami & Souchay 2012)
-- Both use `o.inclinationEarth` for Earth's dynamic inclination
+- Both use `o.earthInvPlaneInclinationDynamic` for Earth's dynamic inclination
 
 ## References
 
@@ -912,5 +912,5 @@ This document is part of a suite of related implementations:
 |------|---------|-------------|--------|
 | 2024-12-19 | 1.0 | Initial design document | Claude (Opus 4.5) |
 | 2024-12-19 | 1.1 | Updated with Souami & Souchay (2012) data: corrected ascending nodes (Earth=284.51°, not 174.8°), added precession periods | Claude (Opus 4.5) |
-| 2024-12-19 | 1.2 | Unified with planetary-invariable-plane-crossings.md: use existing `<planet>Inclination` constants, renamed output to `o.<planet>ApparentInclination`, added relationship section | Claude (Opus 4.5) |
+| 2024-12-19 | 1.2 | Unified with planetary-invariable-plane-crossings.md: use existing `<planet>Inclination` constants, renamed output to `o.<planet>EclipticInclinationDynamic`, added relationship section | Claude (Opus 4.5) |
 | 2024-12-20 | 2.0 | **Ready for implementation**: Updated all code examples to use actual constant names from codebase, added Implementation Steps section with line numbers, verified all dependencies are met | Claude (Opus 4.5) |

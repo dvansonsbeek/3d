@@ -191,28 +191,28 @@ const height = sin(inclination_to_invariable) * sin(angleFromNode) * r;
 
 | Planet | Model Constant | Inclination i (°) | Ascending Node Ω (°) | Notes |
 |--------|----------------|-------------------|---------------------|-------|
-| Mercury | `mercuryInclination` | 6.3472858 | 32.22 | Highest inclination |
-| Venus | `venusInclination` | 2.1545441 | 52.31 | |
-| **Earth** | `o.inclinationEarth` | varies* | 284.51 | *Range: `earthinclinationMean` ± `tiltandinclinationAmplitude` |
-| Mars | `marsInclination` | 1.6311858 | 352.95 | |
-| Jupiter | `jupiterInclination` | 0.3219652 | 306.92 | Closest to invariable plane |
-| Saturn | `saturnInclination` | 0.9254704 | 122.27 | |
-| Uranus | `uranusInclination` | 0.9946692 | 308.44 | |
-| Neptune | `neptuneInclination` | 0.7354155 | 189.28 | |
-| Pluto | `plutoInclination` | 15.5541473 | 107.06 | Dwarf planet |
+| Mercury | `mercuryInvPlaneInclinationJ2000` | 6.3472858 | 32.22 | Highest inclination |
+| Venus | `venusInvPlaneInclinationJ2000` | 2.1545441 | 52.31 | |
+| **Earth** | `o.earthInvPlaneInclinationDynamic` | varies* | 284.51 | *Range: `earthInvPlaneInclinationMean` ± `earthInvPlaneInclinationAmplitude` |
+| Mars | `marsInvPlaneInclinationJ2000` | 1.6311858 | 352.95 | |
+| Jupiter | `jupiterInvPlaneInclinationJ2000` | 0.3219652 | 306.92 | Closest to invariable plane |
+| Saturn | `saturnInvPlaneInclinationJ2000` | 0.9254704 | 122.27 | |
+| Uranus | `uranusInvPlaneInclinationJ2000` | 0.9946692 | 308.44 | |
+| Neptune | `neptuneInvPlaneInclinationJ2000` | 0.7354155 | 189.28 | |
+| Pluto | `plutoInvPlaneInclinationJ2000` | 15.5541473 | 107.06 | Dwarf planet |
 
 **Important distinction - Two types of inclination constants:**
-- `<planet>OrbitalInclination` = Inclination relative to **ecliptic** (e.g., `mercuryOrbitalInclination = 7.00501638°`)
-- `<planet>Inclination` = Inclination relative to **invariable plane** (e.g., `mercuryInclination = 6.3472858°`)
+- `<planet>EclipticInclinationJ2000` = Inclination relative to **ecliptic** (e.g., `mercuryEclipticInclinationJ2000 = 7.00501638°`)
+- `<planet>InvPlaneInclinationJ2000` = Inclination relative to **invariable plane** (e.g., `mercuryInvPlaneInclinationJ2000 = 6.3472858°`)
 
 For invariable plane crossings, always use `<planet>Inclination` (without "Orbital").
 
 **Earth's special case:**
-- Mean: `earthinclinationMean` = 1.49514053°
-- Amplitude: `tiltandinclinationAmplitude` = 0.564°
-- Minimum: `earthinclinationMean - tiltandinclinationAmplitude` = 0.931°
-- Maximum: `earthinclinationMean + tiltandinclinationAmplitude` = 2.059°
-- Live value: `o.inclinationEarth` (already calculated in model)
+- Mean: `earthInvPlaneInclinationMean` = 1.49514053°
+- Amplitude: `earthInvPlaneInclinationAmplitude` = 0.564°
+- Minimum: `earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude` = 0.931°
+- Maximum: `earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude` = 2.059°
+- Live value: `o.earthInvPlaneInclinationDynamic` (already calculated in model)
 
 **Key observations:**
 
@@ -316,12 +316,12 @@ For each planet, calculate its current height above/below the invariable plane:
 
 ```javascript
 // Invariable plane inclination - NOW DYNAMIC for all planets
-// Use o.<planet>InclinationToInvPlane (oscillates with ascending node precession)
+// Use o.<planet>InvPlaneInclinationDynamic (oscillates with ascending node precession)
 // The inclination oscillation formula: i(t) = mean + A × cos(Ω(t) - offset)
 // See dynamic-inclination-oscillations.md for details
 
-// For Earth: Use o.inclinationEarth (dynamic, 99,392-year cycle)
-// For other planets: Use o.<planet>InclinationToInvPlane (dynamic, varies with Ω)
+// For Earth: Use o.earthInvPlaneInclinationDynamic (dynamic, 99,392-year cycle)
+// For other planets: Use o.<planet>InvPlaneInclinationDynamic (dynamic, varies with Ω)
 
 // Ascending nodes on invariable plane (from Souami & Souchay 2012)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
@@ -342,11 +342,11 @@ function calculatePlanetHeightAboveInvariablePlane(planet) {
   const trueAnomaly = o[`${planet}TrueAnomaly`];  // Already calculated
 
   // Get planet's inclination relative to invariable plane (ALL NOW DYNAMIC)
-  // For Earth: o.inclinationEarth (99,392-year cycle)
-  // For other planets: o.<planet>InclinationToInvPlane (oscillates with Ω)
+  // For Earth: o.earthInvPlaneInclinationDynamic (99,392-year cycle)
+  // For other planets: o.<planet>InvPlaneInclinationDynamic (oscillates with Ω)
   const incl_inv = (planet === 'earth')
-    ? o.inclinationEarth
-    : o[`${planet}InclinationToInvPlane`];
+    ? o.earthInvPlaneInclinationDynamic
+    : o[`${planet}InvPlaneInclinationDynamic`];
 
   // Get ascending node on invariable plane (dynamic value, precessing)
   // Primary value uses J2000-verified ascending nodes
@@ -456,15 +456,15 @@ The current invariable plane visualization incorrectly uses the **99,392-year cy
 **Current (Wrong):**
 ```javascript
 // Y offset based on inclination deviation from mean (99,392-year cycle)
-// Uses earthinclinationMean constant for the mean value
-const deviation = o.inclinationEarth - earthinclinationMean;
+// Uses earthInvPlaneInclinationMean constant for the mean value
+const deviation = o.earthInvPlaneInclinationDynamic - earthInvPlaneInclinationMean;
 invariablePlaneGroup.position.y = -deviation * yScale;
 ```
 
 **Correct Approach:**
 ```javascript
 // Y offset based on Earth's CURRENT position in its annual orbit
-// Use o.inclinationEarth for inclination (dynamic over 99,392-year cycle)
+// Use o.earthInvPlaneInclinationDynamic for inclination (dynamic over 99,392-year cycle)
 // Use o.earthAscendingNodeInvariablePlane for ascending node (when implemented)
 const earthHeight = calculatePlanetHeightAboveInvariablePlane('earth');
 // The plane stays at Y=0; Earth's position naturally shows above/below
@@ -564,10 +564,10 @@ Jupiter takes ~12 years to orbit. Pick a known date and verify:
 
 ### Test 3: Extreme Heights
 
-At any given time (using `<planet>Inclination` constants):
-- Mercury's max height: sin(`mercuryInclination`) × 0.47 AU = sin(6.35°) × 0.47 AU ≈ 0.052 AU
-- Earth's max height: sin(`o.inclinationEarth`) × 1.0 AU ≈ sin(1.57°) × 1.0 AU ≈ 0.027 AU
-- Jupiter's max height: sin(`jupiterInclination`) × 5.2 AU = sin(0.32°) × 5.2 AU ≈ 0.029 AU
+At any given time (using `<planet>InvPlaneInclinationJ2000` constants):
+- Mercury's max height: sin(`mercuryInvPlaneInclinationJ2000`) × 0.47 AU = sin(6.35°) × 0.47 AU ≈ 0.052 AU
+- Earth's max height: sin(`o.earthInvPlaneInclinationDynamic`) × 1.0 AU ≈ sin(1.57°) × 1.0 AU ≈ 0.027 AU
+- Jupiter's max height: sin(`jupiterInvPlaneInclinationJ2000`) × 5.2 AU = sin(0.32°) × 5.2 AU ≈ 0.029 AU
 
 ## Relationship to Other Documents
 
@@ -576,7 +576,7 @@ This document is part of a suite of related implementations:
 | Document | Purpose | Output Variables |
 |----------|---------|------------------|
 | **This document** | Calculate height above/below invariable plane | `o.<planet>HeightAboveInvPlane`, `o.<planet>AboveInvPlane` |
-| [Souami&Souchay_dynamic-inclination-calculation.md](Souami&Souchay_dynamic-inclination-calculation.md) | Calculate apparent inclination to tilting ecliptic | `o.<planet>ApparentInclination` |
+| [Souami&Souchay_dynamic-inclination-calculation.md](Souami&Souchay_dynamic-inclination-calculation.md) | Calculate apparent inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
 | [dynamic-ascending-node-calculation.md](dynamic-ascending-node-calculation.md) | Calculate ascending node on ecliptic | `o.<planet>AscendingNode` |
 
 **Comparison:**
@@ -592,7 +592,7 @@ This document is part of a suite of related implementations:
 - Both use `<planet>Inclination` constants (from Souami & Souchay 2012)
 - Both use `<planet>AscendingNodeInvPlaneSouamiSouchay` constants (from Souami & Souchay 2012)
 - Both use `<planet>AscendingNodeInvPlaneVerified` constants (J2000-calibrated)
-- Both use `o.inclinationEarth` for Earth's dynamic inclination
+- Both use `o.earthInvPlaneInclinationDynamic` for Earth's dynamic inclination
 
 ## Related Documents
 
@@ -618,7 +618,7 @@ This document is part of a suite of related implementations:
 |------|---------|-------------|--------|
 | 2024-12-19 | 1.0 | Initial design document | Claude (Opus 4.5) |
 | 2024-12-19 | 1.1 | Updated with Souami & Souchay (2012) data: corrected ascending nodes, added precession periods, added scientific background | Claude (Opus 4.5) |
-| 2024-12-19 | 1.2 | Replaced hardcoded values with model constants: clarified `<planet>Inclination` vs `<planet>OrbitalInclination`, added constant tables for precession and orbital periods, updated implementation code to use proper constants | Claude (Opus 4.5) |
+| 2024-12-19 | 1.2 | Replaced hardcoded values with model constants: clarified `<planet>Inclination` vs `<planet>EclipticInclinationJ2000`, added constant tables for precession and orbital periods, updated implementation code to use proper constants | Claude (Opus 4.5) |
 | 2024-12-19 | 2.0 | **Phase 1 Implementation**: Added `updatePlanetInvariablePlaneHeights()` function, invariable plane ascending node constants, and `o.<planet>HeightAboveInvPlane` properties | Claude (Opus 4.5) |
 | 2024-12-19 | 2.1 | Added dynamic ascending node precession using `<planet>PerihelionEclipticYears` constants; verified July/January crossing dates via Souami & Souchay 2012 research | Claude (Opus 4.5) |
-| 2025-01-01 | 2.2 | Updated to use dynamic planet inclinations (`o.<planet>InclinationToInvPlane`) instead of fixed constants | Claude (Opus 4.5) |
+| 2025-01-01 | 2.2 | Updated to use dynamic planet inclinations (`o.<planet>InvPlaneInclinationDynamic`) instead of fixed constants | Claude (Opus 4.5) |

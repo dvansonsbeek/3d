@@ -305,7 +305,7 @@ const o = {
   // ═══════════════════════════════════════════════════════════════
   eccentricityEarth: 0.0167,     // Current orbital eccentricity
   obliquityEarth: 23.44,         // Current axial tilt (degrees)
-  inclinationEarth: 1.57,        // Inclination to invariable plane
+  earthInvPlaneInclinationDynamic: 1.57,  // Inclination to invariable plane
   longitudeOfPerihelion: 102.9,  // Longitude of perihelion (degrees)
 
   // ═══════════════════════════════════════════════════════════════
