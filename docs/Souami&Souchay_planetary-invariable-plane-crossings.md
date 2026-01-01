@@ -315,19 +315,13 @@ This means the dates when planets cross the invariable plane **shift over millen
 For each planet, calculate its current height above/below the invariable plane:
 
 ```javascript
-// Invariable plane inclination constants (from script.js)
-// These are the <planet>Inclination constants (NOT <planet>OrbitalInclination)
-const INVARIABLE_PLANE_INCLINATIONS = {
-  mercury: mercuryInclination,    // 6.3472858°
-  venus: venusInclination,        // 2.1545441°
-  earth: null,                    // Use o.inclinationEarth (dynamic)
-  mars: marsInclination,          // 1.6311858°
-  jupiter: jupiterInclination,    // 0.3219652°
-  saturn: saturnInclination,      // 0.9254704°
-  uranus: uranusInclination,      // 0.9946692°
-  neptune: neptuneInclination,    // 0.7354155°
-  pluto: plutoInclination         // 15.5541473°
-};
+// Invariable plane inclination - NOW DYNAMIC for all planets
+// Use o.<planet>InclinationToInvPlane (oscillates with ascending node precession)
+// The inclination oscillation formula: i(t) = mean + A × cos(Ω(t) - offset)
+// See dynamic-inclination-oscillations.md for details
+
+// For Earth: Use o.inclinationEarth (dynamic, 99,392-year cycle)
+// For other planets: Use o.<planet>InclinationToInvPlane (dynamic, varies with Ω)
 
 // Ascending nodes on invariable plane (from Souami & Souchay 2012)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
@@ -347,11 +341,12 @@ function calculatePlanetHeightAboveInvariablePlane(planet) {
   // Get planet's current position in its orbit (true anomaly)
   const trueAnomaly = o[`${planet}TrueAnomaly`];  // Already calculated
 
-  // Get planet's inclination relative to invariable plane
-  // For Earth, use dynamic value; for others, use constant
+  // Get planet's inclination relative to invariable plane (ALL NOW DYNAMIC)
+  // For Earth: o.inclinationEarth (99,392-year cycle)
+  // For other planets: o.<planet>InclinationToInvPlane (oscillates with Ω)
   const incl_inv = (planet === 'earth')
     ? o.inclinationEarth
-    : INVARIABLE_PLANE_INCLINATIONS[planet];
+    : o[`${planet}InclinationToInvPlane`];
 
   // Get ascending node on invariable plane (dynamic value, precessing)
   // Primary value uses J2000-verified ascending nodes
@@ -599,6 +594,12 @@ This document is part of a suite of related implementations:
 - Both use `<planet>AscendingNodeInvPlaneVerified` constants (J2000-calibrated)
 - Both use `o.inclinationEarth` for Earth's dynamic inclination
 
+## Related Documents
+
+- [Dynamic Orbital Elements Overview](dynamic-orbital-elements-overview.md) - Master overview of all dynamic systems
+- [Dynamic Inclination Oscillations](dynamic-inclination-oscillations.md) - Planet inclination oscillation (Ω-based approach)
+- [J2000-Verified Ascending Nodes](Souami&Souchay_improved-ascending-nodes.md) - Calibrated ascending node values
+
 ## References
 
 1. **Souami, D. & Souchay, J. (2012)** - "The solar system's invariable plane", Astronomy & Astrophysics, 543, A133
@@ -620,3 +621,4 @@ This document is part of a suite of related implementations:
 | 2024-12-19 | 1.2 | Replaced hardcoded values with model constants: clarified `<planet>Inclination` vs `<planet>OrbitalInclination`, added constant tables for precession and orbital periods, updated implementation code to use proper constants | Claude (Opus 4.5) |
 | 2024-12-19 | 2.0 | **Phase 1 Implementation**: Added `updatePlanetInvariablePlaneHeights()` function, invariable plane ascending node constants, and `o.<planet>HeightAboveInvPlane` properties | Claude (Opus 4.5) |
 | 2024-12-19 | 2.1 | Added dynamic ascending node precession using `<planet>PerihelionEclipticYears` constants; verified July/January crossing dates via Souami & Souchay 2012 research | Claude (Opus 4.5) |
+| 2025-01-01 | 2.2 | Updated to use dynamic planet inclinations (`o.<planet>InclinationToInvPlane`) instead of fixed constants | Claude (Opus 4.5) |

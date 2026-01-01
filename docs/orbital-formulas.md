@@ -4,7 +4,12 @@
 
 This document outlines the available input variables in the solar system simulation and proposes additional astronomical formulas that can be calculated and displayed.
 
-**Last Updated:** December 2024
+**Last Updated:** January 2025
+
+**Related Documents:**
+- [Dynamic Orbital Elements Overview](dynamic-orbital-elements-overview.md) - How dynamic systems work together
+- [Dynamic Inclination Oscillations](dynamic-inclination-oscillations.md) - Planet inclination oscillation (Ω-based approach)
+- [Dynamic Ascending Node Calculation](dynamic-ascending-node-calculation.md) - Ascending node shifts with obliquity
 
 ---
 
@@ -81,7 +86,9 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 |------------------|-------------------|-------------|
 | `{planet}SolarYearInput` | 87.96813 days | Orbital period input |
 | `{planet}OrbitalEccentricity` | 0.20562928 | Eccentricity (e) |
-| `{planet}Inclination` | 6.3472858° | Inclination to invariable plane (fixed) |
+| `{planet}InclinationMean` | 7.215° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
+| `{planet}InclinationAmplitude` | 2.645° (Mercury) | Inclination oscillation amplitude (half of L-L range) |
+| `{planet}InclinationPhaseOffset` | 283.7° (Mercury) | Phase offset linking inclination to ascending node (Ω_J2000 - φ₀) |
 | `{planet}OrbitalInclination` | 7.00487° | J2000 orbital inclination to ecliptic |
 | `{planet}OrbitDistance` | 0.387 AU | Semi-major axis (a) - derived |
 | `{planet}PerihelionDistance` | varies | Distance at perihelion |
@@ -121,6 +128,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `o.{planet}AboveInvPlane` | `o.mercuryAboveInvPlane` | Boolean: is planet currently above invariable plane | Live |
 | `o.{planet}ApparentInclination` | `o.mercuryApparentInclination` | Dynamic apparent inclination to ecliptic | Live |
 | `o.{planet}ApparentInclinationSouamiSouchay` | `o.mercuryApparentInclinationSouamiSouchay` | Apparent inclination using S&S ascending nodes | Live |
+| `o.{planet}InclinationToInvPlane` | `o.mercuryInclinationToInvPlane` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
 
 #### 1.3.3 Distance Variables (✅ Already Implemented)
 
@@ -215,6 +223,7 @@ These formulas are already calculated and displayed in the simulation:
 | Height Above Invariable Plane | z | `o.{planet}HeightAboveInvPlane` | `updateInvariablePlaneHeights()` |
 | Mean Max Height Above Inv. Plane | z_max | `sin(i_inv)` | Earth planetStats |
 | Apparent Inclination | i_app | `o.{planet}ApparentInclination` | `updateDynamicInclinations()` |
+| **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InclinationToInvPlane` | `computePlanetInclinationToInvPlane()` |
 | Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
 | Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
 | **Gravitational Parameter** | **GM** | `GM_SUN` (derived constant) | Sun's planetStats |
@@ -1805,6 +1814,24 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 β = arcsin(sin(i_inv)·sin(u)) Heliocentric latitude
 ```
 
+### Inclination Oscillation (Ω-based approach)
+```
+i(t) = mean + A·cos(Ω(t) - offset)   Dynamic inclination to invariable plane
+
+Where:
+  mean   = <planet>InclinationMean      Laplace-Lagrange midpoint
+  A      = <planet>InclinationAmplitude Half of oscillation range
+  Ω(t)   = Current ascending node on invariable plane (precesses)
+  offset = <planet>InclinationPhaseOffset = Ω_J2000 - φ₀
+
+Phase offset derivation:
+  i_J2000 = mean + A·cos(φ₀)           Solve for φ₀ from known J2000 value
+  offset = Ω_J2000 - φ₀                Geometric relationship
+
+Note: Two valid solutions exist for φ₀ (±acos). Choose the one that
+      produces the correct inclination change direction (increasing/decreasing).
+```
+
 ---
 
 ## Appendix B: Variable Cross-Reference
@@ -1839,5 +1866,6 @@ All planets have these `o.{planet}` variables:
 - `AboveInvPlane` - Boolean: above invariable plane
 - `ApparentInclination` - Apparent inclination to ecliptic
 - `ApparentInclinationSouamiSouchay` - Apparent inclination (S&S method)
+- `InclinationToInvPlane` - Dynamic inclination to invariable plane (oscillates)
 
 Plus `{planet}.sunDistAU` for current heliocentric distance.

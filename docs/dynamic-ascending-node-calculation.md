@@ -464,6 +464,12 @@ Both use the static `<planet>OrbitalInclination` as their base, but apply differ
 
 ---
 
+## Related Documents
+
+- [Dynamic Orbital Elements Overview](dynamic-orbital-elements-overview.md) - Master overview of all dynamic systems
+- [Dynamic Inclination Oscillations](dynamic-inclination-oscillations.md) - Planet inclination oscillation using Ω-based approach
+- [Dynamic Inclination to Ecliptic Calculation](dynamic-inclination-to-ecliptic-calculation-Souami&Souchay.md) - Apparent inclination formula
+
 ## Testing
 
 To verify the implementation:

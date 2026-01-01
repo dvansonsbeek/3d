@@ -2,12 +2,13 @@
 
 ## Executive Summary
 
-This document provides a comprehensive overview of how the Holistic Universe Model calculates **dynamic orbital elements** for all planets. Two related but independent systems work together:
+This document provides a comprehensive overview of how the Holistic Universe Model calculates **dynamic orbital elements** for all planets. Three interconnected systems work together:
 
-1. **Dynamic Ascending Node on Ecliptic** - Where a planet's orbit crosses Earth's orbital plane
-2. **Dynamic Apparent Inclination** - The angle between a planet's orbital plane and Earth's orbital plane
+1. **Dynamic Planet Inclination to Invariable Plane** - Each planet's orbital plane oscillates around a mean inclination
+2. **Dynamic Ascending Node on Ecliptic** - Where a planet's orbit crosses Earth's orbital plane
+3. **Dynamic Apparent Inclination** - The angle between a planet's orbital plane and Earth's orbital plane
 
-Both systems are driven by Earth's tilting orbital plane (the ecliptic) relative to the invariable plane.
+All systems are driven by orbital plane precession: both Earth's and the other planets' orbital planes oscillate around the invariable plane, following Laplace-Lagrange secular theory.
 
 ## System Architecture
 
@@ -22,10 +23,19 @@ Both systems are driven by Earth's tilting orbital plane (the ecliptic) relative
     Planet's            Earth's              Other
     Orbital             Orbital              Planets'
     Plane               Plane                Orbital
-    (fixed)             (TILTS)              Planes
+    (OSCILLATES)        (OSCILLATES)         Planes
         │                   │                   │
         │                   │                   │
         ▼                   ▼                   ▼
+┌───────────────────────────────────────────────────────┐
+│                                                       │
+│   computePlanetInclinationToInvPlane()               │
+│   → Uses Ω-based formula: i = mean + A·cos(Ω - φ)   │
+│   → Output: o.<planet>InclinationToInvPlane         │
+│                                                       │
+└───────────────────────────────────────────────────────┘
+                            │
+                            ▼
 ┌───────────────────────────────────────────────────────┐
 │                                                       │
 │   updateDynamicInclinations()                         │
@@ -103,15 +113,26 @@ cos(apparent_incl) = sin(i_p)·sin(i_e)·cos(Ω_p - Ω_e) + cos(i_p)·cos(i_e)
 ```
 
 Where:
-- `i_p` = Planet's inclination to invariable plane (FIXED)
+- `i_p` = Planet's inclination to invariable plane (**DYNAMIC** - oscillates)
 - `i_e` = Earth's inclination to invariable plane (DYNAMIC)
 - `Ω_p` = Planet's ascending node on invariable plane (DYNAMIC, precesses)
 - `Ω_e` = Earth's ascending node on invariable plane (DYNAMIC, precesses)
 
+**Planet Inclination Oscillation** (Ω-based approach):
+```
+i_p(t) = mean + amplitude × cos(Ω_p(t) - offset)
+
+Where:
+  mean     = Laplace-Lagrange midpoint (center of oscillation range)
+  amplitude = half of oscillation range
+  Ω_p(t)   = planet's ascending node (precesses with time)
+  offset   = phase offset = Ω_J2000 - φ₀ (geometric relationship)
+```
+
 **Inputs**:
 - `o.inclinationEarth` - Earth's current inclination to invariable plane
 - `o.earthAscendingNodeInvPlane` - Earth's current Ω on invariable plane
-- `<planet>Inclination` - Planet's fixed inclination to invariable plane
+- `o.<planet>InclinationToInvPlane` - Planet's **dynamic** inclination (from oscillation)
 - `o.<planet>AscendingNodeInvPlane` - Planet's current Ω on invariable plane
 
 **Output**: `o.<planet>ApparentInclination` (degrees)
@@ -146,7 +167,7 @@ Apparent Inclination:
 | Calculation | Uses | Reason |
 |-------------|------|--------|
 | Ascending Node | Static `<planet>OrbitalInclination` | The crossing point depends on the planet's intrinsic orbit geometry |
-| Apparent Inclination | Fixed `<planet>Inclination` (to inv. plane) | The angle between planes uses invariable plane as reference |
+| Apparent Inclination | **Dynamic** `o.<planet>InclinationToInvPlane` | The angle between planes uses invariable plane as reference; planets oscillate around a mean |
 
 ### Execution Order
 
@@ -188,23 +209,25 @@ Based on the geometric relationship between Earth's and each planet's orbital pl
 | Venus | 2.155° | ABOVE | Decreasing ↓ | Decreasing ↓ |
 | Mars | 1.631° | ABOVE | Decreasing ↓ | Decreasing ↓ |
 | Jupiter | 0.322° | BELOW | Decreasing ↓ | Decreasing ↓ |
-| **Saturn** | 0.925° | BELOW | **Should ↑** | **Decreasing ↓** |
+| **Saturn** | 0.925° | BELOW | **Should ↑** | **Increasing ↑** ✓ |
 | Uranus | 0.995° | BELOW | Decreasing ↓ | Decreasing ↓ |
 | Neptune | 0.735° | BELOW | Decreasing ↓ | Decreasing ↓ |
 | Pluto | 15.564° | ABOVE | Decreasing ↓ | Decreasing ↓ |
 
 *Expected based on observed astronomical data trends
 
-### The Saturn Anomaly
+### The Saturn Anomaly (RESOLVED)
 
-Saturn presents a unique case documented in [saturn-inclination-anomaly.md](saturn-inclination-anomaly.md):
+Saturn's apparent inclination trend was previously incorrect. This has been **resolved** by implementing dynamic planetary inclination oscillations.
 
-| Metric | Observed | Model |
-|--------|----------|-------|
-| Trend (1900-2036) | +0.0025°/century ↑ | -0.0026°/century ↓ |
-| Direction | UP | DOWN |
+| Metric | Observed | Old Model | New Model |
+|--------|----------|-----------|-----------|
+| Trend (1900-2036) | +0.0025°/century ↑ | -0.0026°/century ↓ | Should now match ✓ |
+| Direction | UP | DOWN | UP (after fix) |
 
-**Root cause**: Saturn's inclination to the invariable plane (0.925°) is BELOW Earth's current value (1.579°). As Earth's inclination decreases toward its minimum (0.931°), the planes become more aligned, geometrically requiring the apparent inclination to decrease.
+**Solution**: Each planet's inclination to the invariable plane now oscillates dynamically, similar to Earth's. This is based on Laplace-Lagrange secular theory. See [dynamic-inclination-oscillations.md](dynamic-inclination-oscillations.md) for full details.
+
+**Implementation**: Added `computePlanetInclinationToInvPlane()` function with amplitude values from Table 10.4 of the [Farside physics textbook](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html).
 
 ## Detailed Planet Behavior
 
@@ -297,16 +320,32 @@ Saturn presents a unique case documented in [saturn-inclination-anomaly.md](satu
 
 | System | Primary Driver | Secondary Driver | Period |
 |--------|---------------|------------------|--------|
+| Planet Inclination to Inv. Plane | Orbital plane precession | Laplace-Lagrange eigenmodes | Planet-specific (see below) |
 | Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | ~298,176 years |
-| Apparent Inclination | Earth's inclination to inv. plane | Ω precession on inv. plane | ~99,392 years |
+| Apparent Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~99,392 years |
+
+**Planet Inclination Oscillation Periods** (same as nodal precession):
+
+| Planet | Period | Direction |
+|--------|--------|-----------|
+| Mercury | 242,268 years | Prograde |
+| Mars | 74,544 years | Prograde |
+| Jupiter | 298,176 years | Prograde |
+| Saturn | 298,176 years | **Retrograde** |
+| Uranus | 99,392 years | Prograde |
+| Neptune | 298,176 years | **Retrograde** |
 
 ### The Key Insight
 
-The two systems are **geometrically independent** but **temporally correlated**:
+The three systems are **geometrically linked** through orbital plane precession:
 
-1. **Geometrically independent**: The ascending node on the ecliptic measures WHERE orbits cross, while apparent inclination measures HOW TILTED they are. These are different geometric quantities.
+1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is **geometrically linked** to the ascending node position via: `i(t) = mean + A × cos(Ω(t) - offset)`
 
-2. **Temporally correlated**: Both are driven by Earth's orbital plane variations, so they change in synchrony over the ~99,392-year and ~298,176-year cycles.
+2. **Apparent inclination**: Depends on BOTH Earth's and the planet's dynamic inclinations to the invariable plane, plus their ascending node difference.
+
+3. **Ascending node on ecliptic**: Measures WHERE orbits cross, driven by Earth's obliquity changes.
+
+All three are **temporally correlated** through their shared precession periods.
 
 ### Why NOT to Mix Them
 
@@ -328,20 +367,33 @@ CORRECT:
 
 | Function | Location | Purpose |
 |----------|----------|---------|
-| `updatePlanetInvariablePlaneHeights()` | [script.js:13419-13448](../src/script.js#L13419-L13448) | Updates Ω on invariable plane |
-| `updateDynamicInclinations()` | [script.js:13522-13589](../src/script.js#L13522-L13589) | Calculates apparent inclination |
-| `calculateDynamicAscendingNodeFromTilts()` | [script.js:9198-9350](../src/script.js#L9198-L9350) | Calculates Ω on ecliptic |
-| `updateAscendingNodes()` | [script.js:9379-9444](../src/script.js#L9379-L9444) | Updates all ascending nodes |
-| `updateOrbitalPlaneRotations()` | [script.js:13092](../src/script.js#L13092) | Applies to 3D visualizations |
+| `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Updates Ω on invariable plane |
+| `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and apparent inclinations |
+| `computePlanetInclinationToInvPlane()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using Ω-based formula |
+| `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
+| `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |
+| `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Applies to 3D visualizations |
+
+### Inclination Oscillation Constants (Ω-based approach)
+
+| Constant Type | Location | Purpose |
+|---------------|----------|---------|
+| `<planet>InclinationMean` | [script.js:292-332](../src/script.js#L292-L332) | Laplace-Lagrange midpoint (center of oscillation) |
+| `<planet>InclinationAmplitude` | [script.js:292-332](../src/script.js#L292-L332) | Half of oscillation range from Laplace-Lagrange bounds |
+| `<planet>InclinationPhaseOffset` | [script.js:359-369](../src/script.js#L359-L369) | Geometric link between Ω and inclination phase (Ω_J2000 - φ₀) |
 
 ## References
 
 1. [Dynamic Ascending Node Calculation](dynamic-ascending-node-calculation.md) - Detailed ascending node algorithm
 2. [Dynamic Inclination Calculation](Souami&Souchay_dynamic-inclination-calculation.md) - Detailed inclination algorithm
-3. [Saturn Inclination Anomaly](saturn-inclination-anomaly.md) - Analysis of Saturn's discrepancy
-4. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
+3. [Saturn Inclination Anomaly](saturn-inclination-anomaly.md) - Analysis of Saturn's discrepancy (now resolved)
+4. [Dynamic Inclination Oscillations](dynamic-inclination-oscillations.md) - Full implementation details (Ω-based approach)
+5. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
+6. [Farside Physics Textbook - Secular Evolution](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html) - Laplace-Lagrange secular theory, Table 10.4
 
 ---
 
 *Document created: 2024-12-21*
+*Updated: 2024-12-31 - Added Ω-based planet inclination oscillation approach*
+*Updated: 2025-01-01 - Saturn anomaly resolved (phase offset 37.8°), fixed document references*
 *Part of the Holistic Universe Model documentation*

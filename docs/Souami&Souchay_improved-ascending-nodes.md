@@ -379,8 +379,25 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 - Pluto shows a residual 0.014° error due to geometric constraints (high inclination limits precision)
 - Halley's and Eros values are approximations pending proper verification against reference data
 
+## Related Documents
+
+- [Dynamic Orbital Elements Overview](dynamic-orbital-elements-overview.md) - Master overview of all dynamic systems
+- [Dynamic Inclination Oscillations](dynamic-inclination-oscillations.md) - Planet inclination oscillation (Ω-based approach)
+- [Planetary Invariable Plane Crossings](Souami&Souchay_planetary-invariable-plane-crossings.md) - Height above/below invariable plane
+
+## Note on Dynamic Inclinations
+
+Since January 2025, the apparent inclination calculation uses **dynamic planet inclinations** (`o.<planet>InclinationToInvPlane`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
+
+```
+i(t) = mean + A × cos(Ω(t) - offset)
+```
+
+This means the verified ascending nodes work together with the dynamic inclination system to produce accurate apparent inclinations over long timescales.
+
 ## Change Log
 
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
 | 2024-12-20 | 1.0 | Initial implementation document | Claude (Opus 4.5) |
+| 2025-01-01 | 1.1 | Added note on dynamic inclination integration | Claude (Opus 4.5) |

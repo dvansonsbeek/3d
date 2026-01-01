@@ -822,6 +822,128 @@ Souami, D. & Souchay, J. (2012). "The solar system's invariable plane." *Astrono
 
 ---
 
+## Dynamic Calculation: Using Precessing Orbital Elements
+
+### Overview
+
+In addition to the fixed J2000 calculation (described above), the simulation now includes a **dynamic calculation** that uses the current precessing orbital elements instead of fixed J2000 values. This allows us to observe how planetary perturbations affect the calculated invariable plane orientation over time.
+
+### Menu Items
+
+Three new fields appear in the "Validate position of Invariable plane (Option A vs B)" subfolder:
+
+| Field | Description |
+|-------|-------------|
+| **Dynamic Tilt (°)** | Invariable plane tilt calculated using precessing orbital elements |
+| **Dyn. Asc.Node (°)** | Ascending node calculated using precessing orbital elements |
+| **Dyn vs J2000 (°)** | Absolute difference between dynamic and J2000 tilt values |
+
+### How It Differs from the J2000 Calculation
+
+| Aspect | J2000 (Fixed) Calculation | Dynamic Calculation |
+|--------|---------------------------|---------------------|
+| **Inclinations** | Fixed J2000 values (e.g., `mercuryInclination = 7.00497°`) | Current osculating values (`o.mercuryApparentInclination`) |
+| **Ascending Nodes** | Fixed J2000 values (e.g., `mercuryAscendingNodeJ2000 = 48.33167°`) | Current osculating values (`o.mercuryAscendingNode`) |
+| **Result** | Constant value (1.5785°) | Changes over time as orbits precess |
+| **Purpose** | Validate against Souami & Souchay reference | Show effect of orbital precession |
+
+### The Physics: Why Orbital Elements Precess
+
+Planetary orbits are not fixed in space. Due to gravitational interactions between planets:
+
+1. **Nodal precession**: The ascending node (Ω) slowly rotates around the ecliptic pole
+2. **Apsidal precession**: The argument of perihelion (ω) rotates within the orbital plane
+3. **Inclination oscillation**: Orbital inclinations oscillate due to secular perturbations
+
+These effects occur over timescales of thousands to millions of years:
+- Mercury's perihelion precesses ~5600"/century (including relativistic effects)
+- Earth's orbital plane precesses with a ~70,000-year period
+- Jupiter and Saturn interact strongly, exchanging angular momentum
+
+### Implementation
+
+```javascript
+function calculateInvariablePlaneFromAngularMomentumDynamic() {
+  const planets = [
+    {
+      mass: M_MERCURY,
+      a: mercuryOrbitDistance,
+      e: mercuryOrbitalEccentricity,
+      i: o.mercuryApparentInclination,      // Dynamic inclination
+      node: o.mercuryAscendingNode          // Dynamic ascending node
+    },
+    // ... other planets using o.<planet>ApparentInclination
+    //     and o.<planet>AscendingNode
+  ];
+
+  // Same angular momentum calculation as J2000 version
+  let L_total_x = 0, L_total_y = 0, L_total_z = 0;
+
+  for (const planet of planets) {
+    const a_km = planet.a * AU_IN_KM;
+    const h = Math.sqrt(GM_SUN * a_km * (1 - planet.e * planet.e));
+    const L_mag = planet.mass * h;
+
+    const i_rad = planet.i * DEG2RAD;
+    const node_rad = planet.node * DEG2RAD;
+
+    L_total_x += L_mag * Math.sin(i_rad) * Math.sin(node_rad);
+    L_total_y += L_mag * Math.cos(i_rad);
+    L_total_z += L_mag * (-Math.sin(i_rad) * Math.cos(node_rad));
+  }
+
+  // Calculate tilt and ascending node (same formulas as J2000)
+  const L_mag_total = Math.sqrt(L_total_x**2 + L_total_y**2 + L_total_z**2);
+  o.calculatedPlaneTiltDynamic = Math.acos(L_total_y / L_mag_total) * RAD2DEG;
+  o.calculatedAscendingNodeDynamic = Math.atan2(L_total_x, -L_total_z) * RAD2DEG;
+
+  // Track difference from J2000 calculation
+  o.dynamicVsJ2000TiltDiff = Math.abs(o.calculatedPlaneTiltDynamic - o.calculatedPlaneTilt);
+}
+```
+
+### Key Differences in Input Data
+
+The dynamic calculation uses `o.<planet>ApparentInclination` and `o.<planet>AscendingNode`, which are the **osculating orbital elements** at the current simulation time. These values are calculated elsewhere in the simulation based on:
+
+1. **Planetary perturbations**: Gravitational effects from other planets
+2. **Secular theory**: Long-term periodic variations in orbital elements
+3. **Reference frame**: All values are relative to the ecliptic of date (which itself precesses)
+
+### Expected Behavior
+
+1. **Short timescales** (years to decades): The dynamic value should remain very close to 1.5785°, with differences < 0.001°
+
+2. **Medium timescales** (centuries to millennia): Small oscillations may appear as planets exchange angular momentum through secular resonances
+
+3. **Long timescales** (millions of years): The simulation may show drift if it doesn't account for all perturbation effects
+
+4. **Stability check**: If `dynamicVsJ2000TiltDiff` grows significantly (> 0.1°), it may indicate:
+   - Numerical precision issues in the simulation
+   - Missing perturbation effects
+   - Reference frame inconsistencies
+
+### Why This Matters
+
+The invariable plane should be **extremely stable** because angular momentum is conserved. Souami & Souchay (2012) found variations of only ~0.1 milliarcseconds per century.
+
+By comparing J2000 (fixed) and dynamic calculations, we can:
+
+1. **Validate the simulation**: Large differences indicate potential bugs
+2. **Observe secular variations**: See how orbital precession affects the calculation
+3. **Understand limitations**: The ecliptic reference frame itself precesses, which affects the measured inclinations
+
+### Important Note: The Ecliptic Is Not Fixed
+
+A key insight is that the **ecliptic itself precesses** over time. The orbital inclinations (`ApparentInclination`) are measured relative to the ecliptic of date, not a fixed J2000 ecliptic. This means:
+
+- The J2000 calculation uses inclinations relative to the J2000 ecliptic (fixed reference)
+- The dynamic calculation uses inclinations relative to the current ecliptic (moving reference)
+
+This difference is part of what the dynamic calculation reveals — the interplay between a conserved quantity (total angular momentum) and a precessing reference frame (the ecliptic).
+
+---
+
 ## References
 
 1. [invariable-plane-enhancements-plan.md](invariable-plane-enhancements-plan.md) - Parent feature plan
@@ -840,3 +962,4 @@ Souami, D. & Souchay, J. (2012). "The solar system's invariable plane." *Astrono
 | 2024-12-29 | 2.0 | Feature fully implemented, updated acceptance criteria, added validation results | Claude (Opus 4.5) |
 | 2024-12-31 | 2.1 | Added detailed calculation section explaining how "Calc. Tilt" is derived | Claude (Opus 4.5) |
 | 2024-12-31 | 2.2 | Updated mass ratios to DE440, added Pluto & Ceres, improved accuracy to 1.5785° (0.0002° from target) | Claude (Opus 4.5) |
+| 2024-12-31 | 2.3 | Added dynamic calculation using precessing orbital elements (ApparentInclination, AscendingNode) | Claude (Opus 4.5) |
