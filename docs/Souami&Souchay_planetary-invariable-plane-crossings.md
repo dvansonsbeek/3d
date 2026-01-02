@@ -119,17 +119,28 @@ With Earth's ascending node on the invariable plane at Ω ≈ 284.5° (heliocent
 
 **Important geometric clarification (verified via Souami & Souchay 2012):**
 
-The ascending node values have a 180° relationship depending on perspective:
-- **Invariable plane's ascending node on the ecliptic**: Ω = **107.58°** (where invariable plane rises above ecliptic)
-- **Ecliptic's ascending node on the invariable plane**: 107.58° + 180° = **287.58°** ≈ 284.5° (where ecliptic rises above invariable plane)
+There are two related but distinct values to understand:
 
-Since Earth travels along the ecliptic:
+1. **Invariable plane's ascending node on the ecliptic**: Ω = **107.58°** (from Section 4.1 of the paper)
+   - This is where the invariable plane crosses *upward* through the ecliptic
+   - Measured in heliocentric ecliptic coordinates
+
+2. **Earth's ascending node on the invariable plane**: Ω = **284.51°** (from Table 9 of the paper)
+   - This is where Earth's orbit crosses *upward* through the invariable plane
+   - Measured directly, not derived from the 107.58° value
+
+**Why these differ by ~177° instead of exactly 180°:**
+- If you flip perspective (invariable→ecliptic vs ecliptic→invariable), you'd expect exactly 180° difference: 107.58° + 180° = 287.58°
+- But the measured value is 284.51°, about 3° different
+- This small discrepancy arises from measurement precision, epoch definitions, and the fact that "the ecliptic" is a defined mean plane, not identical to Earth's instantaneous orbit
+
+**The practical result for Earth:**
 - When Earth reaches heliocentric longitude ~284.5°, Earth crosses **from below to above** the invariable plane
 - This occurs in **early July** (Sun appears at ~104° from Earth's geocentric view)
 - Earth remains **above** the invariable plane from July to January
 - Earth remains **below** the invariable plane from January to July
 
-This is correct behavior: "where one goes 'up,' the other goes 'down'" - the ecliptic and invariable plane share the same line of nodes but cross in opposite directions.
+The key geometric principle still holds: the ecliptic and invariable plane share approximately the same line of nodes, but cross in opposite directions - "where one goes 'up,' the other goes 'down.'"
 
 ### Key Insight
 

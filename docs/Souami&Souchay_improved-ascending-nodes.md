@@ -119,36 +119,36 @@ The optimal solution keeps invariable plane inclinations unchanged and only adju
 ```javascript
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Result: All planets match J2000 values with error < 0.0001°
-const mercuryAscendingNodeInvPlaneVerified = 32.84;   // was 32.22, Δ = +0.62° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.75;     // was 52.31, Δ = +2.44° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.89;     // was 352.95, Δ = +1.94° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 313.09;  // was 306.92, Δ = +6.17° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.84;   // was 122.27, Δ = -3.43° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.84;   // was 308.44, Δ = -0.60° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192.06;  // was 189.28, Δ = +2.78° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 103.56;    // was 107.06, Δ = -3.50° (from S&S)
-
-// Earth unchanged - we adjust planets relative to Earth's reference frame
-const earthAscendingNodeInvPlane = 284.51;
+// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.earthInvPlaneInclinationDynamic = 1.5787° at J2000
+// Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
+const earthAscendingNodeInvPlaneVerified = 284.492;   // Adjusted from S&S 284.51°
+const mercuryAscendingNodeInvPlaneVerified = 32.81;   // was 32.22, Δ = +0.59° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.68;     // was 52.31, Δ = +2.37° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.84;     // was 352.95, Δ = +1.89° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.87;  // was 306.92, Δ = +5.95° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.82;   // was 122.27, Δ = -3.45° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.78;   // was 308.44, Δ = -0.66° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192;     // was 189.28, Δ = +2.72° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 105.44;    // was 107.06, Δ = -1.62° (from S&S)
 
 // Halley's and Eros - derived from ecliptic values, verified against J2000 data
-const halleysAscendingNodeInvPlaneVerified = 59.56;   // Approximation - needs verification
-const erosAscendingNodeInvPlaneVerified = 304.41;     // Approximation - needs verification
+const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
+const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (estimated)
 ```
 
 ### Comparison Table - Ascending Nodes
 
 | Planet | Souami & Souchay Ω | Verified Ω | Change |
 |--------|-------------------|------------|--------|
-| Mercury | 32.22° | 32.84° | +0.62° |
-| Venus | 52.31° | 54.75° | +2.44° |
-| Mars | 352.95° | 354.89° | +1.94° |
-| Jupiter | 306.92° | 313.09° | +6.17° |
-| Saturn | 122.27° | 118.84° | -3.43° |
-| Uranus | 308.44° | 307.84° | -0.60° |
-| Neptune | 189.28° | 192.06° | +2.78° |
-| Pluto | 107.06° | 103.56° | -3.50° |
+| Earth | 284.51° | 284.492° | -0.018° |
+| Mercury | 32.22° | 32.81° | +0.59° |
+| Venus | 52.31° | 54.68° | +2.37° |
+| Mars | 352.95° | 354.84° | +1.89° |
+| Jupiter | 306.92° | 312.87° | +5.95° |
+| Saturn | 122.27° | 118.82° | -3.45° |
+| Uranus | 308.44° | 307.78° | -0.66° |
+| Neptune | 189.28° | 192° | +2.72° |
+| Pluto | 107.06° | 105.44° | -1.62° |
 
 ### Inclinations
 
@@ -187,17 +187,19 @@ Add the verified ascending node constants:
 ```javascript
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Result: All planets match J2000 values with error < 0.0001°
-const mercuryAscendingNodeInvPlaneVerified = 32.84;   // was 32.22, Δ = +0.62° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.75;     // was 52.31, Δ = +2.44° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.89;     // was 352.95, Δ = +1.94° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 313.09;  // was 306.92, Δ = +6.17° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.84;   // was 122.27, Δ = -3.43° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.84;   // was 308.44, Δ = -0.60° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192.06;  // was 189.28, Δ = +2.78° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 103.56;    // was 107.06, Δ = -3.50° (from S&S)
-const halleysAscendingNodeInvPlaneVerified = 59.56;   // Approximation - needs verification
-const erosAscendingNodeInvPlaneVerified = 304.41;     // Approximation - needs verification
+// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.earthInvPlaneInclinationDynamic = 1.5787° at J2000
+// Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
+const earthAscendingNodeInvPlaneVerified = 284.492;   // Adjusted from S&S 284.51°
+const mercuryAscendingNodeInvPlaneVerified = 32.81;   // was 32.22, Δ = +0.59° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.68;     // was 52.31, Δ = +2.37° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.84;     // was 352.95, Δ = +1.89° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.87;  // was 306.92, Δ = +5.95° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.82;   // was 122.27, Δ = -3.45° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.78;   // was 308.44, Δ = -0.66° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192;     // was 189.28, Δ = +2.72° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 105.44;    // was 107.06, Δ = -1.62° (from S&S)
+const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
+const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (estimated)
 ```
 
 ### Step 2: Add State Properties (in `o` object around line 2828)
@@ -401,3 +403,4 @@ This means the verified ascending nodes work together with the dynamic inclinati
 |------|---------|-------------|--------|
 | 2024-12-20 | 1.0 | Initial implementation document | Claude (Opus 4.5) |
 | 2025-01-01 | 1.1 | Added note on dynamic inclination integration | Claude (Opus 4.5) |
+| 2025-01-02 | 1.2 | Updated ascending node values to match current script.js (Earth=284.492°, etc.) | Claude (Opus 4.5) |
