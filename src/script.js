@@ -11228,21 +11228,13 @@ async function runRATest() {
     await ensureSheetJs();
     const wb = XLSX.utils.book_new();
 
-    // Detect locale decimal separator (uses system regional settings)
-    const decimalSeparator = (1.1).toLocaleString().charAt(1);
-    const useCommaDecimal = decimalSeparator === ',';
-
-    // Convert string numbers to proper numbers for Excel, or adjust decimal separator
-    // Excel handles actual numbers correctly with locale, but .toFixed() creates strings
+    // Convert string numbers to actual numbers for Excel
+    // Excel stores numbers in binary format and displays according to user's locale
+    // This ensures consistent behavior regardless of export machine's locale
     const processRowsForExcel = (rows) => rows.map(row =>
       row.map(cell => {
-        // If it's a string that looks like a number with decimal point
+        // If it's a string that looks like a number with decimal point, convert to number
         if (typeof cell === 'string' && !isNaN(cell) && cell.includes('.')) {
-          if (useCommaDecimal) {
-            // For comma-decimal locales: replace dot with comma (Excel will treat as number)
-            return cell.replace('.', ',');
-          }
-          // For dot-decimal locales: convert to actual number
           return parseFloat(cell);
         }
         return cell;
