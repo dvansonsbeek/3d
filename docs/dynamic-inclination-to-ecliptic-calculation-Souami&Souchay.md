@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the implementation of **dynamic orbital inclination** for all planets in the Holistic Universe Model. Currently, planetary inclinations are static values measured relative to the J2000 ecliptic. This enhancement will calculate how the **apparent inclination** of each planet changes as Earth's orbital plane (the ecliptic) tilts over time.
+This document describes the implementation of **dynamic orbital inclination** for all planets in the Holistic Universe Model. Currently, planetary inclinations are static values measured relative to the J2000 ecliptic. This enhancement will calculate how the **ecliptic inclination** of each planet changes as Earth's orbital plane (the ecliptic) tilts over time.
 
 ## Status
 
@@ -43,7 +43,7 @@ These values are correct for epoch J2000 (year 2000), but the **ecliptic itself 
    - Range: 0.931° to 2.059°
    - Period: ~99,392 years (1/3 of holistic year)
 
-3. **Planetary inclinations** are traditionally measured relative to the ecliptic. When the ecliptic tilts, the apparent inclinations change.
+3. **Planetary inclinations** are traditionally measured relative to the ecliptic. When the ecliptic tilts, the ecliptic inclinations change.
 
 ### Visual Manifestation
 
@@ -53,7 +53,7 @@ At year 2000 (epoch):
 
 At year 12000:
 - Earth's inclination to invariable plane has changed by ~0.35°
-- Mercury's **apparent inclination** relative to the new ecliptic is different
+- Mercury's **ecliptic inclination** relative to the new ecliptic is different
 - Half-planes should show asymmetric split (e.g., 200°/160°)
 
 Currently, the visualization shows incorrect 180°/180° split at year 12000 because we use static inclination.
@@ -70,7 +70,7 @@ Currently, the visualization shows incorrect 180°/180° split at year 12000 bec
                            ↓
     ─────────────────── ECLIPTIC (tilts over time) ───────────────────
                            ↑
-                           | Planet's apparent inclination (changes)
+                           | Planet's ecliptic inclination (changes)
                            ↓
                     PLANET'S ORBITAL PLANE
 ```
@@ -85,7 +85,7 @@ The ecliptic can be described by:
 1. **Inclination to invariable plane** (i_E) - CHANGES over time
 2. **Ascending node on invariable plane** (Ω_E) - related to precession
 
-The **apparent inclination** of a planet relative to the ecliptic is found by calculating the angle between two planes in 3D space.
+The **ecliptic inclination** of a planet relative to the ecliptic is found by calculating the angle between two planes in 3D space.
 
 ### Vector Mathematics
 
@@ -98,12 +98,12 @@ n = (sin(i) * sin(Ω), sin(i) * cos(Ω), cos(i))
 
 The angle between two planes is:
 ```
-cos(θ) = n1 · n2 = |n1| * |n2| * cos(apparent_inclination)
+cos(θ) = n1 · n2 = |n1| * |n2| * cos(ecliptic_inclination)
 ```
 
 Since normal vectors are unit vectors:
 ```
-apparent_inclination = arccos(n_planet · n_ecliptic)
+ecliptic_inclination = arccos(n_planet · n_ecliptic)
 ```
 
 ## Algorithm
@@ -171,7 +171,7 @@ function getEclipticNormal(currentYear) {
 }
 ```
 
-### Step 4: Calculate Apparent Inclination
+### Step 4: Calculate Ecliptic Inclination
 
 ```javascript
 function calculateEclipticInclinationDynamic(planetNormal, eclipticNormal) {
@@ -181,7 +181,7 @@ function calculateEclipticInclinationDynamic(planetNormal, eclipticNormal) {
   // Clamp to handle numerical precision
   const clampedCos = Math.max(-1, Math.min(1, cosAngle));
 
-  // Apparent inclination in degrees
+  // Ecliptic inclination in degrees
   return Math.acos(clampedCos) * RAD2DEG;
 }
 ```
@@ -263,9 +263,9 @@ o.plutoAscendingNodeInvPlane
 
 Add to the `o` object:
 ```javascript
-// Dynamic APPARENT inclination (relative to tilting ecliptic)
+// Dynamic ECLIPTIC inclination (relative to tilting ecliptic)
 // This is DIFFERENT from the static <planet>Inclination constants (relative to invariable plane)
-o.mercuryEclipticInclinationDynamic = 0;  // Dynamic apparent inclination to ecliptic
+o.mercuryEclipticInclinationDynamic = 0;  // Dynamic ecliptic inclination to ecliptic
 o.venusEclipticInclinationDynamic = 0;
 o.marsEclipticInclinationDynamic = 0;
 o.jupiterEclipticInclinationDynamic = 0;
@@ -329,13 +329,13 @@ function updateDynamicInclinations() {
       Math.sin(pI) * Math.cos(pOmega)
     );
 
-    // Calculate apparent inclination (angle between planes)
+    // Calculate ecliptic inclination (angle between planes)
     const cosAngle = _planetNormal.dot(_eclipticNormal);
     const clampedCos = Math.max(-1, Math.min(1, cosAngle));
-    const apparentIncl = Math.acos(clampedCos) * RAD2DEG;
+    const eclipticIncl = Math.acos(clampedCos) * RAD2DEG;
 
     // Store in o object
-    o[key + 'EclipticInclinationDynamic'] = apparentIncl;
+    o[key + 'EclipticInclinationDynamic'] = eclipticIncl;
   }
 }
 ```
@@ -350,7 +350,7 @@ updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, mercuryE
 updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, venusEclipticInclinationJ2000, 'Venus');
 // ... etc for all planets
 
-// After (using dynamic apparent inclination):
+// After (using dynamic ecliptic inclination):
 updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic, 'Mercury');
 updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, o.venusEclipticInclinationDynamic, 'Venus');
 updatePlaneRotation(marsRealPerihelionAtSun, o.marsAscendingNode, o.marsEclipticInclinationDynamic, 'Mars');
@@ -374,7 +374,7 @@ The `rebuildHalfDiscGeometry` function should naturally handle asymmetric splits
 
 2. **Year 12000**:
    - Earth inclination: ~1.23° (below mean)
-   - Mercury apparent inclination: should differ from 7.005° by ~0.1-0.3°
+   - Mercury ecliptic inclination: should differ from 7.005° by ~0.1-0.3°
    - Half-plane split should be visibly asymmetric
 
 3. **Year -50000** (near max Earth inclination ~2.06°):
@@ -383,7 +383,7 @@ The `rebuildHalfDiscGeometry` function should naturally handle asymmetric splits
 
 ### Verification Steps
 
-1. Compare calculated apparent inclinations with published ephemeris data
+1. Compare calculated ecliptic inclinations with published ephemeris data
 2. Verify half-plane split angles match calculated inclinations
 3. Check smooth transitions when animating through time
 4. Validate crossover behavior for Mars, Jupiter, Neptune
@@ -416,7 +416,7 @@ Update to show dynamic values:
 // Current (static J2000 ecliptic):
 { label: 'Orbital Inclination (i)', value: `${mercuryEclipticInclinationJ2000}°` }
 
-// New (dynamic apparent inclination):
+// New (dynamic ecliptic inclination):
 { label: 'Orbital Inclination (i)', value: `${o.mercuryEclipticInclinationDynamic.toFixed(4)}°` }
 
 // Could also show both for reference:
@@ -446,7 +446,7 @@ This enhancement depends on:
 Add after the existing `o.<planet>AscendingNodeInvPlane` properties:
 
 ```javascript
-// Dynamic apparent inclination (relative to current ecliptic, changes with Earth's tilt)
+// Dynamic ecliptic inclination (relative to current ecliptic, changes with Earth's tilt)
 mercuryEclipticInclinationDynamic: 0,
 venusEclipticInclinationDynamic: 0,
 marsEclipticInclinationDynamic: 0,
@@ -467,7 +467,7 @@ Add call in `updateAscendingNodes()` (~line 13076) after `updatePlanetInvariable
 
 ```javascript
 updatePlanetInvariablePlaneHeights();
-updateDynamicInclinations();  // NEW: Calculate apparent inclinations
+updateDynamicInclinations();  // NEW: Calculate ecliptic inclinations
 updateOrbitalPlaneRotations();
 ```
 
@@ -496,7 +496,7 @@ const _planetNormal = new THREE.Vector3();
 ## Acceptance Criteria
 
 1. [ ] At year 2000, dynamic inclinations match static J2000 values within 0.01°
-2. [ ] At year 12000, Mercury apparent inclination differs from `mercuryEclipticInclinationJ2000` by ~0.1-0.3°
+2. [ ] At year 12000, Mercury ecliptic inclination differs from `mercuryEclipticInclinationJ2000` by ~0.1-0.3°
 3. [ ] Half-plane visualization shows asymmetric split at year 12000
 4. [ ] `o.mercuryEclipticInclinationDynamic` (etc.) values update in real-time
 5. [ ] Hierarchy inspector shows dynamic inclination values
@@ -505,14 +505,14 @@ const _planetNormal = new THREE.Vector3();
 
 ## Expected Long-Term Behavior
 
-The apparent inclination of each planet varies cyclically over time due to:
+The ecliptic inclination of each planet varies cyclically over time due to:
 
 1. **Earth's inclination to invariable plane** varies from ~0.93° to ~2.06° over ~99,392 years
 2. **Ascending node precession** - both Earth's and each planet's ascending nodes precess at different rates
 
 ### Cyclic Behavior Patterns
 
-The apparent inclination follows a quasi-sinusoidal pattern with:
+The ecliptic inclination follows a quasi-sinusoidal pattern with:
 - **Period**: Dominated by Earth's ~99,392 year inclination cycle, modulated by ascending node precession
 - **Amplitude**: Depends on the planet's geometry relative to Earth
 
@@ -529,7 +529,7 @@ The apparent inclination follows a quasi-sinusoidal pattern with:
 
 ### Minimum Points (Epochs of Closest Alignment)
 
-Testing shows planets reach their minimum apparent inclination at different epochs:
+Testing shows planets reach their minimum ecliptic inclination at different epochs:
 
 | Planet | Approx. Min Epoch | Behavior |
 |--------|-------------------|----------|
@@ -549,15 +549,15 @@ Testing shows planets reach their minimum apparent inclination at different epoc
 
 Mars and Jupiter have inclinations to the invariable plane (1.63° and 0.32°) that are similar to or smaller than Earth's maximum inclination to the invariable plane (2.06°). This means:
 
-- At certain epochs, Mars's orbital plane can become nearly parallel to the ecliptic (apparent inclination → 0°)
-- At other epochs, Mars's apparent inclination can exceed its invariable plane inclination
-- Jupiter, being closest to the invariable plane, shows the smallest variation in apparent inclination
+- At certain epochs, Mars's orbital plane can become nearly parallel to the ecliptic (ecliptic inclination → 0°)
+- At other epochs, Mars's ecliptic inclination can exceed its invariable plane inclination
+- Jupiter, being closest to the invariable plane, shows the smallest variation in ecliptic inclination
 
 ## J2000 Calibration Note
 
 ### Original Discrepancy (Using Souami & Souchay Values)
 
-When using the original Souami & Souchay (2012) ascending nodes with Earth's mean inclination, the calculated apparent inclinations show small discrepancies from published J2000 values:
+When using the original Souami & Souchay (2012) ascending nodes with Earth's mean inclination, the calculated ecliptic inclinations show small discrepancies from published J2000 values:
 
 | Planet | S&S Calculated | J2000 Reference | Difference |
 |--------|----------------|-----------------|------------|
@@ -608,10 +608,10 @@ Given a fixed value for `earthAscendingNodeInvPlaneVerified = 282.95°`, we need
 
 ### Mathematical Approach
 
-The formula for apparent inclination between two orbital planes is:
+The formula for ecliptic inclination between two orbital planes is:
 
 ```
-cos(apparent_incl) = n_planet · n_ecliptic
+cos(ecliptic_incl) = n_planet · n_ecliptic
 ```
 
 Where the normal vectors are:
@@ -629,7 +629,7 @@ Given:
 - Earth's ascending node on invariable plane: `Ω_E = 282.95°`
 - Earth's inclination to invariable plane: `i_E = 1.578°` (at J2000)
 - Planet's inclination to invariable plane: `i_P` (fixed constant)
-- Target apparent inclination: `i_target` (the J2000 EclipticInclinationJ2000 value)
+- Target ecliptic inclination: `i_target` (the J2000 EclipticInclinationJ2000 value)
 
 We need to find `Ω_P` (planet's ascending node) such that:
 
@@ -749,14 +749,14 @@ const planets = [
   { name: 'Eros', inclInv: 10.8290328658513, targetIncl: 10.8290328658513, currentAsc: 304.41 }
 ];
 
-// For each planet, find the ascending node that gives the target apparent inclination
+// For each planet, find the ascending node that gives the target ecliptic inclination
 console.log('Finding optimal ascending nodes...');
 console.log('');
 
 for (const planet of planets) {
   const pI = planet.inclInv * DEG2RAD;
-  const targetApparentIncl = planet.targetIncl;
-  const cosTarget = Math.cos(targetApparentIncl * DEG2RAD);
+  const targetEclipticIncl = planet.targetIncl;
+  const cosTarget = Math.cos(targetEclipticIncl * DEG2RAD);
 
   const A = Math.sin(pI);
   const B = Math.cos(pI);
@@ -782,7 +782,7 @@ for (const planet of planets) {
   const omega1Norm = ((omega1 % 360) + 360) % 360;
   const omega2Norm = ((omega2 % 360) + 360) % 360;
 
-  function calcApparentIncl(omega) {
+  function calcEclipticIncl(omega) {
     const pOmega = omega * DEG2RAD;
     const nx = Math.sin(pI) * Math.sin(pOmega);
     const ny = Math.sin(pI) * Math.cos(pOmega);
@@ -791,8 +791,8 @@ for (const planet of planets) {
     return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
   }
 
-  const incl1 = calcApparentIncl(omega1Norm);
-  const incl2 = calcApparentIncl(omega2Norm);
+  const incl1 = calcEclipticIncl(omega1Norm);
+  const incl2 = calcEclipticIncl(omega2Norm);
 
   const diff1 = Math.min(Math.abs(omega1Norm - planet.currentAsc), 360 - Math.abs(omega1Norm - planet.currentAsc));
   const diff2 = Math.min(Math.abs(omega2Norm - planet.currentAsc), 360 - Math.abs(omega2Norm - planet.currentAsc));
@@ -804,8 +804,8 @@ for (const planet of planets) {
   console.log('  Target J2000 orbital incl: ' + planet.targetIncl.toFixed(6) + ' deg');
   console.log('  Incl to inv plane: ' + planet.inclInv.toFixed(6) + ' deg');
   console.log('  Current Verified asc node: ' + planet.currentAsc.toFixed(2) + ' deg');
-  console.log('  Solution 1: asc node = ' + omega1Norm.toFixed(2) + ' deg -> apparent incl = ' + incl1.toFixed(6) + ' deg');
-  console.log('  Solution 2: asc node = ' + omega2Norm.toFixed(2) + ' deg -> apparent incl = ' + incl2.toFixed(6) + ' deg');
+  console.log('  Solution 1: asc node = ' + omega1Norm.toFixed(2) + ' deg -> ecliptic incl = ' + incl1.toFixed(6) + ' deg');
+  console.log('  Solution 2: asc node = ' + omega2Norm.toFixed(2) + ' deg -> ecliptic incl = ' + incl2.toFixed(6) + ' deg');
   console.log('  BEST: asc node = ' + bestOmega.toFixed(2) + ' deg');
   console.log('  Error: ' + (bestIncl - planet.targetIncl).toFixed(8) + ' deg');
   console.log('');
@@ -888,7 +888,7 @@ This document is part of a suite of related implementations:
 
 | Document | Purpose | Output Variables |
 |----------|---------|------------------|
-| **This document** | Calculate apparent inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
+| **This document** | Calculate ecliptic inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
 | [planetary-invariable-plane-crossings.md](planetary-invariable-plane-crossings.md) | Calculate height above/below invariable plane | `o.<planet>HeightAboveInvPlane` |
 | [dynamic-ascending-node-calculation.md](dynamic-ascending-node-calculation.md) | Calculate ascending node on ecliptic | `o.<planet>AscendingNode` |
 

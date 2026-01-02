@@ -126,8 +126,8 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `o.{planet}AscendingNodeInvPlaneSouamiSouchay` | `o.mercuryAscendingNodeInvPlaneSouamiSouchay` | Dynamic ascending node (original S&S values) | Live |
 | `o.{planet}HeightAboveInvPlane` | `o.mercuryHeightAboveInvPlane` | Current height above/below invariable plane (AU) | Live |
 | `o.{planet}AboveInvPlane` | `o.mercuryAboveInvPlane` | Boolean: is planet currently above invariable plane | Live |
-| `o.{planet}EclipticInclinationDynamic` | `o.mercuryEclipticInclinationDynamic` | Dynamic apparent inclination to ecliptic | Live |
-| `o.{planet}EclipticInclinationSouamiSouchayDynamic` | `o.mercuryEclipticInclinationSouamiSouchayDynamic` | Apparent inclination using S&S ascending nodes | Live |
+| `o.{planet}EclipticInclinationDynamic` | `o.mercuryEclipticInclinationDynamic` | Dynamic ecliptic inclination to ecliptic | Live |
+| `o.{planet}EclipticInclinationSouamiSouchayDynamic` | `o.mercuryEclipticInclinationSouamiSouchayDynamic` | Ecliptic inclination using S&S ascending nodes | Live |
 | `o.{planet}InvPlaneInclinationDynamic` | `o.mercuryInvPlaneInclinationDynamic` | Dynamic inclination to invariable plane (oscillates with Ω) | Live |
 
 #### 1.3.3 Distance Variables (✅ Already Implemented)
@@ -222,7 +222,7 @@ These formulas are already calculated and displayed in the simulation:
 | Heliocentric Distance | r | `{planet}.sunDistAU` | Real-time 3D position |
 | Height Above Invariable Plane | z | `o.{planet}HeightAboveInvPlane` | `updateInvariablePlaneHeights()` |
 | Mean Max Height Above Inv. Plane | z_max | `sin(i_inv)` | Earth planetStats |
-| Apparent Inclination | i_app | `o.{planet}EclipticInclinationDynamic` | `updateDynamicInclinations()` |
+| Ecliptic Inclination | i_app | `o.{planet}EclipticInclinationDynamic` | `updateDynamicInclinations()` |
 | **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InvPlaneInclinationDynamic` | `computePlanetInvPlaneInclinationDynamic()` |
 | Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
 | Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
@@ -748,7 +748,7 @@ const OrbitalFormulas = {
 | Eccentric Anomaly | E | `o.{planet}EccentricAnomaly` |
 | Equation of Center | ν - M | planetStats display |
 | Height Above Inv. Plane | z | `o.{planet}HeightAboveInvPlane` |
-| Apparent Inclination | i_app | `o.{planet}EclipticInclinationDynamic` |
+| Ecliptic Inclination | i_app | `o.{planet}EclipticInclinationDynamic` |
 | Ascending Node (Inv. Plane) | Ω_inv | `o.{planet}AscendingNodeInvPlane` |
 | Heliocentric Distance | r | `{planet}.sunDistAU` |
 | Elongation | - | `o.{planet}Elongation` |
@@ -1864,8 +1864,8 @@ All planets have these `o.{planet}` variables:
 - `AscendingNodeInvPlaneSouamiSouchay` - Ascending node on invariable plane (S&S)
 - `HeightAboveInvPlane` - Height above invariable plane (AU)
 - `AboveInvPlane` - Boolean: above invariable plane
-- `EclipticInclinationDynamic` - Apparent inclination to ecliptic
-- `EclipticInclinationSouamiSouchayDynamic` - Apparent inclination (S&S method)
+- `EclipticInclinationDynamic` - Ecliptic inclination to ecliptic
+- `EclipticInclinationSouamiSouchayDynamic` - Ecliptic inclination (S&S method)
 - `InvPlaneInclinationDynamic` - Dynamic inclination to invariable plane (oscillates)
 
 Plus `{planet}.sunDistAU` for current heliocentric distance.

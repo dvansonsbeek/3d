@@ -6,7 +6,7 @@ This document provides a comprehensive overview of how the Holistic Universe Mod
 
 1. **Dynamic Planet Inclination to Invariable Plane** - Each planet's orbital plane oscillates around a mean inclination
 2. **Dynamic Ascending Node on Ecliptic** - Where a planet's orbit crosses Earth's orbital plane
-3. **Dynamic Apparent Inclination** - The angle between a planet's orbital plane and Earth's orbital plane
+3. **Dynamic Ecliptic Inclination** - The angle between a planet's orbital plane and Earth's orbital plane
 
 All systems are driven by orbital plane precession: both Earth's and the other planets' orbital planes oscillate around the invariable plane, following Laplace-Lagrange secular theory.
 
@@ -101,7 +101,7 @@ dΩ/dε = -sin(Ω) / tan(i)
 - If **Earth's inclination > Planet's inclination**: Ω INCREASES when obliquity decreases
 - If **Earth's inclination < Planet's inclination**: Ω DECREASES when obliquity decreases
 
-### System 2: Dynamic Apparent Inclination
+### System 2: Dynamic Ecliptic Inclination
 
 **Purpose**: Calculate the angle between each planet's orbital plane and Earth's orbital plane
 
@@ -109,7 +109,7 @@ dΩ/dε = -sin(Ω) / tan(i)
 
 **Key Formula**:
 ```
-cos(apparent_incl) = sin(i_p)·sin(i_e)·cos(Ω_p - Ω_e) + cos(i_p)·cos(i_e)
+cos(ecliptic_incl) = sin(i_p)·sin(i_e)·cos(Ω_p - Ω_e) + cos(i_p)·cos(i_e)
 ```
 
 Where:
@@ -146,7 +146,7 @@ Both systems depend on the orientation of Earth's orbital plane, but in differen
 | System | Earth Parameter Used | What It Affects |
 |--------|---------------------|-----------------|
 | Ascending Node (Ecliptic) | Earth's obliquity + inclination | WHERE orbits cross |
-| Apparent Inclination | Earth's inclination to inv. plane + Ω | HOW TILTED orbits appear |
+| Ecliptic Inclination | Earth's inclination to inv. plane + Ω | HOW TILTED orbits appear |
 
 ### Independent Calculations
 
@@ -157,7 +157,7 @@ Ascending Node on Ecliptic:
   - WHERE the planet crosses the ecliptic (0°-360° longitude)
   - Changes because the ecliptic itself rotates in space
 
-Apparent Inclination:
+Ecliptic Inclination:
   - HOW TILTED the planet's orbit is relative to the ecliptic
   - Changes because the ecliptic tilts toward/away from the invariable plane
 ```
@@ -167,7 +167,7 @@ Apparent Inclination:
 | Calculation | Uses | Reason |
 |-------------|------|--------|
 | Ascending Node | Static `<planet>EclipticInclinationJ2000` | The crossing point depends on the planet's intrinsic orbit geometry |
-| Apparent Inclination | **Dynamic** `o.<planet>InvPlaneInclinationDynamic` | The angle between planes uses invariable plane as reference; planets oscillate around a mean |
+| Ecliptic Inclination | **Dynamic** `o.<planet>InvPlaneInclinationDynamic` | The angle between planes uses invariable plane as reference; planets oscillate around a mean |
 
 ### Execution Order
 
@@ -175,7 +175,7 @@ The systems must be called in this order in each frame:
 
 ```javascript
 1. updatePlanetInvariablePlaneHeights()  // Calculates dynamic Ω on invariable plane
-2. updateDynamicInclinations()            // Uses Ω values to calculate apparent inclinations
+2. updateDynamicInclinations()            // Uses Ω values to calculate ecliptic inclinations
 3. updateAscendingNodes()                 // Calculates Ω on ecliptic
 4. updateOrbitalPlaneRotations()          // Applies both values to 3D visualizations
 ```
@@ -199,7 +199,7 @@ Based on the relationship between Earth's inclination (~1.58° at J2000, decreas
 
 **Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) are within Earth's inclination range (0.93°-2.06°), so they will experience direction reversals during the ~99,392-year cycle.
 
-### Apparent Inclination Direction
+### Ecliptic Inclination Direction
 
 Based on the geometric relationship between Earth's and each planet's orbital planes on the invariable plane:
 
@@ -218,7 +218,7 @@ Based on the geometric relationship between Earth's and each planet's orbital pl
 
 ### The Saturn Anomaly (RESOLVED)
 
-Saturn's apparent inclination trend was previously incorrect. This has been **resolved** by implementing dynamic planetary inclination oscillations.
+Saturn's ecliptic inclination trend was previously incorrect. This has been **resolved** by implementing dynamic planetary inclination oscillations.
 
 | Metric | Observed | Old Model | New Model |
 |--------|----------|-----------|-----------|
@@ -239,7 +239,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 6.347° | Highest among inner planets |
 | Ω J2000 (ecliptic) | 48.33° | |
 | Ω J2000 (inv. plane) | 32.81° | |
-| Apparent incl. range | ~4.3° to ~8.4° | Large variation over ~99,392 years |
+| Ecliptic incl. range | ~4.3° to ~8.4° | Large variation over ~99,392 years |
 
 ### Venus
 
@@ -249,7 +249,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 2.155° | |
 | Ω J2000 (ecliptic) | 76.68° | |
 | Ω J2000 (inv. plane) | 54.68° | |
-| Apparent incl. range | ~1.3° to ~4.4° | |
+| Ecliptic incl. range | ~1.3° to ~4.4° | |
 
 ### Mars
 
@@ -259,7 +259,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 1.631° | |
 | Ω J2000 (ecliptic) | 49.56° | |
 | Ω J2000 (inv. plane) | 354.85° | |
-| Apparent incl. range | ~0.1° to ~3.2° | Can nearly align with ecliptic |
+| Ecliptic incl. range | ~0.1° to ~3.2° | Can nearly align with ecliptic |
 | Crossover epoch | ~55,000 years from now | Ω direction reverses |
 
 ### Jupiter
@@ -270,7 +270,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 0.322° | Closest to invariable plane |
 | Ω J2000 (ecliptic) | 100.49° | |
 | Ω J2000 (inv. plane) | 312.9° | |
-| Apparent incl. range | ~0.9° to ~1.6° | Smallest variation |
+| Ecliptic incl. range | ~0.9° to ~1.6° | Smallest variation |
 | Crossover epoch | ~9,700 years from now | Earth incl crosses Jupiter incl |
 
 ### Saturn
@@ -281,7 +281,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 0.925° | **BELOW** Earth's current value |
 | Ω J2000 (ecliptic) | 113.65° | |
 | Ω J2000 (inv. plane) | 119.04° | |
-| Apparent incl. range | ~1.5° to ~3.4° | |
+| Ecliptic incl. range | ~1.5° to ~3.4° | |
 | **Anomaly** | See [saturn-inclination-anomaly.md](saturn-inclination-anomaly.md) | Model vs observed discrepancy |
 
 ### Uranus
@@ -292,7 +292,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 0.995° | |
 | Ω J2000 (ecliptic) | 73.98° | |
 | Ω J2000 (inv. plane) | 307.76° | |
-| Apparent incl. range | ~0.2° to ~2.0° | Can nearly align with ecliptic |
+| Ecliptic incl. range | ~0.2° to ~2.0° | Can nearly align with ecliptic |
 
 ### Neptune
 
@@ -302,7 +302,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 0.735° | |
 | Ω J2000 (ecliptic) | 131.79° | |
 | Ω J2000 (inv. plane) | 192.18° | |
-| Apparent incl. range | ~1.0° to ~2.4° | |
+| Ecliptic incl. range | ~1.0° to ~2.4° | |
 
 ### Pluto
 
@@ -312,7 +312,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 15.564° | Highest inclination |
 | Ω J2000 (ecliptic) | 110.30° | |
 | Ω J2000 (inv. plane) | 105.44° | |
-| Apparent incl. range | ~13.5° to ~17.6° | Always highly inclined |
+| Ecliptic incl. range | ~13.5° to ~17.6° | Always highly inclined |
 
 ## Summary of Collaborative Behavior
 
@@ -322,7 +322,7 @@ Saturn's apparent inclination trend was previously incorrect. This has been **re
 |--------|---------------|------------------|--------|
 | Planet Inclination to Inv. Plane | Orbital plane precession | Laplace-Lagrange eigenmodes | Planet-specific (see below) |
 | Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | ~298,176 years |
-| Apparent Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~99,392 years |
+| Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~99,392 years |
 
 **Planet Inclination Oscillation Periods** (same as nodal precession):
 
@@ -341,7 +341,7 @@ The three systems are **geometrically linked** through orbital plane precession:
 
 1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is **geometrically linked** to the ascending node position via: `i(t) = mean + A × cos(Ω(t) - offset)`
 
-2. **Apparent inclination**: Depends on BOTH Earth's and the planet's dynamic inclinations to the invariable plane, plus their ascending node difference.
+2. **Ecliptic inclination**: Depends on BOTH Earth's and the planet's dynamic inclinations to the invariable plane, plus their ascending node difference.
 
 3. **Ascending node on ecliptic**: Measures WHERE orbits cross, driven by Earth's obliquity changes.
 
@@ -353,7 +353,7 @@ Using `o.<planet>EclipticInclinationDynamic` in the ascending node calculation w
 
 ```
 WRONG:
-  Ascending node uses apparent inclination (which already includes Earth tilt effect)
+  Ascending node uses ecliptic inclination (which already includes Earth tilt effect)
   + Also uses obliquity/inclination directly
   = Earth tilt effect applied TWICE
 
@@ -368,7 +368,7 @@ CORRECT:
 | Function | Location | Purpose |
 |----------|----------|---------|
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Updates Ω on invariable plane |
-| `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and apparent inclinations |
+| `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and ecliptic inclinations |
 | `computePlanetInvPlaneInclinationDynamic()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using Ω-based formula |
 | `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
 | `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |

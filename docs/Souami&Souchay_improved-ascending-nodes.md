@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document describes the implementation of J2000-verified ascending node constants that produce exact J2000 apparent inclination values when combined with our dynamic inclination calculation.
+This document describes the implementation of J2000-verified ascending node constants that produce exact J2000 ecliptic inclination values when combined with our dynamic inclination calculation.
 
 ## Background
 
-The Souami & Souchay (2012) paper provides ascending nodes relative to the invariable plane with 2-decimal precision. When used in our dynamic inclination calculation, these values produce apparent inclinations that differ from published J2000 ecliptic inclinations by 0.01° to 0.05°.
+The Souami & Souchay (2012) paper provides ascending nodes relative to the invariable plane with 2-decimal precision. When used in our dynamic inclination calculation, these values produce ecliptic inclinations that differ from published J2000 ecliptic inclinations by 0.01° to 0.05°.
 
-By reverse-engineering the ascending node values needed to reproduce exact J2000 apparent inclinations, we can:
+By reverse-engineering the ascending node values needed to reproduce exact J2000 ecliptic inclinations, we can:
 1. Validate our calculation methodology
 2. Provide higher-precision ascending node estimates
 3. Present these findings to Souami & Souchay as potential refinements
@@ -17,7 +17,7 @@ By reverse-engineering the ascending node values needed to reproduce exact J2000
 
 ### The Problem
 
-When computing apparent inclinations (planet inclination relative to the ecliptic) using invariable plane data, we face a calibration challenge:
+When computing ecliptic inclinations (planet inclination relative to the ecliptic) using invariable plane data, we face a calibration challenge:
 
 - **Planet inclinations to the invariable plane**: Fixed values from Souami & Souchay (2012)
 - **Earth's inclination to the invariable plane**: Varies from ~0.93° to ~2.06° over ~99,392 years
@@ -29,7 +29,7 @@ When computing apparent inclinations (planet inclination relative to the eclipti
 **Approach 1 (REJECTED): Use Earth's J2000 inclination (~1.578°)**
 
 If we set Earth's inclination to its actual J2000 value:
-- The Souami & Souchay ascending nodes would produce correct J2000 apparent inclinations
+- The Souami & Souchay ascending nodes would produce correct J2000 ecliptic inclinations
 - **Problem**: Earth's inclination changes over time, so:
   - At different epochs, the model would be calibrated incorrectly
   - The mean value is the natural reference around which Earth oscillates
@@ -40,7 +40,7 @@ If we set Earth's inclination to its actual J2000 value:
 If we use the mean inclination:
 - The reference frame is epoch-independent
 - Earth's position in its ~99,392-year cycle can be tracked as a deviation from mean
-- **Consequence**: The ascending nodes must be adjusted to produce correct J2000 apparent inclinations
+- **Consequence**: The ascending nodes must be adjusted to produce correct J2000 ecliptic inclinations
 
 ### Why This Is Correct
 
@@ -63,7 +63,7 @@ If we use the mean inclination:
 | Earth mean inclination | 1.49514053° | Model constant (`earthInvPlaneInclinationMean`) |
 | Earth J2000 inclination | ~1.578° | Computed from cycle position |
 | Planet inclinations | Souami & Souchay values | Unchanged |
-| Planet ascending nodes | **Adjusted** | To match J2000 apparent inclinations |
+| Planet ascending nodes | **Adjusted** | To match J2000 ecliptic inclinations |
 
 The adjusted ascending nodes differ from S&S by 0.6° to 6°, well within the precision uncertainty of the original 2-decimal-place data.
 
@@ -71,12 +71,12 @@ The adjusted ascending nodes differ from S&S by 0.6° to 6°, well within the pr
 
 ### The Calculation
 
-The apparent inclination between two orbital planes is calculated using the dot product of their normal vectors:
+The ecliptic inclination between two orbital planes is calculated using the dot product of their normal vectors:
 
 ```
 n = (sin(i) × sin(Ω), sin(i) × cos(Ω), cos(i))
 
-apparent_inclination = acos(n_earth · n_planet)
+ecliptic_inclination = acos(n_earth · n_planet)
 ```
 
 Where:
@@ -85,10 +85,10 @@ Where:
 
 ### Finding Optimal Ascending Nodes
 
-For each planet, we solve for the ascending node `Ω` that produces the exact J2000 apparent inclination:
+For each planet, we solve for the ascending node `Ω` that produces the exact J2000 ecliptic inclination:
 
 ```
-Given: i_earth, Ω_earth, i_planet, target_apparent_inclination
+Given: i_earth, Ω_earth, i_planet, target_ecliptic_inclination
 Find: Ω_planet such that acos(n_earth · n_planet) = target
 ```
 
@@ -114,10 +114,10 @@ The optimal solution keeps invariable plane inclinations unchanged and only adju
 
 **Inclinations**: We use the existing `<planet>InvPlaneInclinationJ2000` constants from the codebase (e.g., `mercuryInvPlaneInclinationJ2000`, `venusInvPlaneInclinationJ2000`, etc.). These are the original Souami & Souchay (2012) values and do not need separate "verified" versions.
 
-**Ascending Nodes**: Only the ascending nodes are adjusted to match J2000 apparent inclinations:
+**Ascending Nodes**: Only the ascending nodes are adjusted to match J2000 ecliptic inclinations:
 
 ```javascript
-// J2000-verified ascending nodes - optimized to reproduce exact J2000 apparent inclinations
+// J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
 // Result: All planets match J2000 values with error < 0.0001°
 const mercuryAscendingNodeInvPlaneVerified = 32.84;   // was 32.22, Δ = +0.62° (from S&S)
@@ -152,7 +152,7 @@ const erosAscendingNodeInvPlaneVerified = 304.41;     // Approximation - needs v
 
 ### Inclinations
 
-The existing `<planet>Inclination` constants from Souami & Souchay (2012) are used unchanged, **except for Pluto** which required a small adjustment to achieve J2000 apparent inclination match:
+The existing `<planet>Inclination` constants from Souami & Souchay (2012) are used unchanged, **except for Pluto** which required a small adjustment to achieve J2000 ecliptic inclination match:
 
 | Planet | Constant Name | Value | Notes |
 |--------|---------------|-------|-------|
@@ -185,7 +185,7 @@ The existing `<planet>Inclination` constants from Souami & Souchay (2012) are us
 Add the verified ascending node constants:
 
 ```javascript
-// J2000-verified ascending nodes - optimized to reproduce exact J2000 apparent inclinations
+// J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
 // Result: All planets match J2000 values with error < 0.0001°
 const mercuryAscendingNodeInvPlaneVerified = 32.84;   // was 32.22, Δ = +0.62° (from S&S)
@@ -205,7 +205,7 @@ const erosAscendingNodeInvPlaneVerified = 304.41;     // Approximation - needs v
 Add properties for the Souami & Souchay variant:
 
 ```javascript
-// Apparent inclination using Souami & Souchay (2012) ascending nodes
+// Ecliptic inclination using Souami & Souchay (2012) ascending nodes
 mercuryEclipticInclinationSouamiSouchayDynamic: 0,
 venusEclipticInclinationSouamiSouchayDynamic: 0,
 marsEclipticInclinationSouamiSouchayDynamic: 0,
@@ -281,8 +281,8 @@ function updateDynamicInclinations() {
       Math.cos(pI)
     );
     const cosAngleSS = _planetNormal.dot(_eclipticNormal);
-    const apparentInclSS = Math.acos(Math.max(-1, Math.min(1, cosAngleSS))) * RAD2DEG;
-    o[key + 'EclipticInclinationSouamiSouchayDynamic'] = apparentInclSS;
+    const eclipticInclSS = Math.acos(Math.max(-1, Math.min(1, cosAngleSS))) * RAD2DEG;
+    o[key + 'EclipticInclinationSouamiSouchayDynamic'] = eclipticInclSS;
 
     // Calculate using verified ascending node (for o.<planet>Inclination display)
     const pOmegaVerified = ascNodeVerified * DEG2RAD;
@@ -292,8 +292,8 @@ function updateDynamicInclinations() {
       Math.cos(pI)
     );
     const cosAngleVerified = _planetNormal.dot(_eclipticNormal);
-    const apparentInclVerified = Math.acos(Math.max(-1, Math.min(1, cosAngleVerified))) * RAD2DEG;
-    o[key + 'EclipticInclinationDynamic'] = apparentInclVerified;
+    const eclipticInclVerified = Math.acos(Math.max(-1, Math.min(1, cosAngleVerified))) * RAD2DEG;
+    o[key + 'EclipticInclinationDynamic'] = eclipticInclVerified;
   }
 }
 ```
@@ -332,7 +332,7 @@ o[key + 'AscendingNodeInvPlaneVerified'] = (ascNodeJ2000Verified + yearsSinceJ20
 
 ### Step 6: Update `updateOrbitalPlaneRotations()` Function
 
-Use the verified apparent inclination for visual orbital plane tilts:
+Use the verified ecliptic inclination for visual orbital plane tilts:
 
 ```javascript
 // Use o.<planet>EclipticInclinationDynamic (which now uses verified ascending nodes)
@@ -344,9 +344,9 @@ Use the verified apparent inclination for visual orbital plane tilts:
 For each planet, show both values:
 
 ```javascript
-{label : () => `Apparent Inclination (i)`,
+{label : () => `Ecliptic Inclination (i)`,
  value : [ { v: () => o.mercuryEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-{label : () => `Apparent Incl. (Souami&Souchay)`,
+{label : () => `Ecliptic Incl. (Souami&Souchay)`,
  value : [ { v: () => o.mercuryEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
 ```
 
@@ -370,7 +370,7 @@ At year 2000, the values should match J2000 reference data:
 The differences between Souami & Souchay (2012) ascending nodes and our verified values represent:
 
 1. **Precision refinement**: The original values were given to 2 decimal places; our verified values provide additional precision
-2. **Cross-validation**: The ability to reproduce J2000 apparent inclinations validates both our calculation methodology and the underlying orbital element data
+2. **Cross-validation**: The ability to reproduce J2000 ecliptic inclinations validates both our calculation methodology and the underlying orbital element data
 3. **Potential contribution**: These refined values could be presented to astronomers as empirically-derived corrections
 
 ## Notes
@@ -387,13 +387,13 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 
 ## Note on Dynamic Inclinations
 
-Since January 2025, the apparent inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
+Since January 2025, the ecliptic inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
 
 ```
 i(t) = mean + A × cos(Ω(t) - offset)
 ```
 
-This means the verified ascending nodes work together with the dynamic inclination system to produce accurate apparent inclinations over long timescales.
+This means the verified ascending nodes work together with the dynamic inclination system to produce accurate ecliptic inclinations over long timescales.
 
 ## Change Log
 

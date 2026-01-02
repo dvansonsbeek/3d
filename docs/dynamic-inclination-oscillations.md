@@ -8,7 +8,7 @@ This document describes a method to derive **dynamic inclination oscillations** 
 
 ### Current Model State
 
-Our model calculates apparent inclination (planet to ecliptic) using:
+Our model calculates ecliptic inclination (planet to ecliptic) using:
 1. **Earth's inclination to invariable plane** - Dynamic, oscillates 0.931° to 2.059°
 2. **Planet's inclination to invariable plane** - **FIXED** constants (e.g., `saturnInvPlaneInclinationJ2000 = 0.925°`)
 3. **Precessing ascending nodes** - Both Earth's and planet's Ω on invariable plane
@@ -98,10 +98,10 @@ From our model (Souami & Souchay 2012 values):
 
 ### Step 1: Calculate Earth's Effect Rate
 
-At any given time, the apparent inclination formula is:
+At any given time, the ecliptic inclination formula is:
 
 ```
-cos(i_apparent) = sin(i_p)·sin(i_e)·cos(ΔΩ) + cos(i_p)·cos(i_e)
+cos(i_ecliptic) = sin(i_p)·sin(i_e)·cos(ΔΩ) + cos(i_p)·cos(i_e)
 ```
 
 Where:
@@ -112,7 +112,7 @@ Where:
 The rate of change involves partial derivatives:
 
 ```
-d(i_apparent)/dt = ∂i/∂i_e · di_e/dt + ∂i/∂ΔΩ · dΔΩ/dt
+d(i_ecliptic)/dt = ∂i/∂i_e · di_e/dt + ∂i/∂ΔΩ · dΔΩ/dt
 ```
 
 For a numerical approximation at J2000:
@@ -121,10 +121,10 @@ For a numerical approximation at J2000:
 function calculateEarthEffectRate(planet) {
   const dt = 100; // years (1 century)
 
-  // Calculate apparent inclination at J2000
+  // Calculate ecliptic inclination at J2000
   const i_app_2000 = calculateEclipticInclinationDynamic(planet, 2000);
 
-  // Calculate apparent inclination at J2000 + 100 years
+  // Calculate ecliptic inclination at J2000 + 100 years
   const i_app_2100 = calculateEclipticInclinationDynamic(planet, 2100);
 
   // Rate in degrees per century
@@ -360,7 +360,7 @@ i(t) = mean + A × cos(Ω(t) - offset)
    - When `cos(phase) = -1`: `i = mean - A` (minimum)
    - These match the Laplace-Lagrange theoretical bounds
 
-### Integration with Apparent Inclination
+### Integration with Ecliptic Inclination
 
 ```javascript
 function updateDynamicInclinations() {
@@ -372,8 +372,8 @@ function updateDynamicInclinations() {
   const saturnI = computePlanetInvPlaneInclinationDynamic('saturn', o.currentYear);
   // ... etc
 
-  // Calculate apparent inclination using BOTH dynamic values
-  // cos(apparent) = sin(i_p)·sin(i_e)·cos(ΔΩ) + cos(i_p)·cos(i_e)
+  // Calculate ecliptic inclination using BOTH dynamic values
+  // cos(ecliptic) = sin(i_p)·sin(i_e)·cos(ΔΩ) + cos(i_p)·cos(i_e)
   // ... existing dot product calculation, but with dynamic i_p
 }
 ```
@@ -383,7 +383,7 @@ function updateDynamicInclinations() {
 ### For Each Planet:
 
 1. **Run the model** at year 2000 and year 2100 with FIXED planet inclinations
-2. **Calculate** `(di/dt)_earth_effect` = (apparent_2100 - apparent_2000) / 100
+2. **Calculate** `(di/dt)_earth_effect` = (ecliptic_2100 - ecliptic_2000) / 100
 3. **Look up** `(di/dt)_observed` from JPL table
 4. **Compute** `(di/dt)_planet_own` = observed - earth_effect
 5. **Estimate amplitude** using dominant secular period
@@ -391,7 +391,7 @@ function updateDynamicInclinations() {
 ### Example: Saturn
 
 ```
-Step 1-2: Model shows Saturn apparent incl decreasing at ~-0.94"/century
+Step 1-2: Model shows Saturn ecliptic incl decreasing at ~-0.94"/century
           (di/dt)_earth_effect ≈ -0.00026°/century
 
 Step 3:   (di/dt)_observed = +0.00194°/century (from JPL)
@@ -424,7 +424,7 @@ function getSaturnInvPlaneInclinationDynamic(currentYear) {
 
 After implementation, the model should show:
 
-| Planet | Apparent Incl Trend | Match JPL? |
+| Planet | Ecliptic Incl Trend | Match JPL? |
 |--------|---------------------|------------|
 | Mercury | Decreasing | Yes |
 | Venus | Decreasing | Yes |
@@ -510,7 +510,7 @@ const neptuneInvPlaneInclinationAmplitude = 0.017;  // ±0.017° around mean 0.7
 
 ### Validation Check
 
-After implementing these values, the model should produce apparent inclination rates that match JPL:
+After implementing these values, the model should produce ecliptic inclination rates that match JPL:
 
 | Planet | JPL Rate | Expected Model Rate |
 |--------|----------|---------------------|
@@ -577,7 +577,7 @@ This refinement can be done after the initial implementation to verify and tune 
 
 5. ✅ **Updated `updateDynamicInclinations()`** to compute `o.<planet>InvPlaneInclinationDynamic` values
    - Calls `computePlanetInvPlaneInclinationDynamic()` for each planet
-   - Uses dynamic inclinations instead of fixed constants in apparent inclination calculation
+   - Uses dynamic inclinations instead of fixed constants in ecliptic inclination calculation
 
 6. ✅ **`calculateInvariablePlaneFromAngularMomentumDynamic()`** automatically benefits
    - Uses `o.<planet>EclipticInclinationDynamic` which now incorporates dynamic planet inclinations
@@ -622,7 +622,7 @@ where:
 
 ### Pending
 
-7. **Validate** apparent inclination rates against JPL
+7. **Validate** ecliptic inclination rates against JPL
 8. **Fine-tune phase offset values** if needed based on observations
 
 ### Scientific Basis

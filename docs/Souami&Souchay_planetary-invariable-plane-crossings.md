@@ -576,7 +576,7 @@ This document is part of a suite of related implementations:
 | Document | Purpose | Output Variables |
 |----------|---------|------------------|
 | **This document** | Calculate height above/below invariable plane | `o.<planet>HeightAboveInvPlane`, `o.<planet>AboveInvPlane` |
-| [Souami&Souchay_dynamic-inclination-calculation.md](Souami&Souchay_dynamic-inclination-calculation.md) | Calculate apparent inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
+| [Souami&Souchay_dynamic-inclination-calculation.md](Souami&Souchay_dynamic-inclination-calculation.md) | Calculate ecliptic inclination to tilting ecliptic | `o.<planet>EclipticInclinationDynamic` |
 | [dynamic-ascending-node-calculation.md](dynamic-ascending-node-calculation.md) | Calculate ascending node on ecliptic | `o.<planet>AscendingNode` |
 
 **Comparison:**
@@ -586,7 +586,7 @@ This document is part of a suite of related implementations:
 | Time scale | 99,392 years | Orbital period (days to years) |
 | What changes | Angle between orbital planes | Planet position relative to invariable plane |
 | Reference | Ecliptic (which tilts) | Invariable plane (fixed) |
-| Effect | Apparent inclination varies | Height above/below varies |
+| Effect | Ecliptic inclination varies | Height above/below varies |
 
 **Shared data structures:**
 - Both use `<planet>Inclination` constants (from Souami & Souchay 2012)

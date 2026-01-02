@@ -31,7 +31,7 @@ For any planet (e.g., Mars with ~1,739 arcsec/century), show:
 - Mass (M) - from `M_*` constants
 
 ### Dynamic Values (from `o` object)
-- Apparent inclination: `o.<planet>EclipticInclinationDynamic` (e.g., `o.marsEclipticInclinationDynamic`)
+- Ecliptic inclination: `o.<planet>EclipticInclinationDynamic` (e.g., `o.marsEclipticInclinationDynamic`)
 - Current distance: `<planet>.sunDistAU`
 - True anomaly, mean anomaly, etc.
 

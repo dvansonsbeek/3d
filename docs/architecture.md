@@ -467,7 +467,7 @@ Critical ordering for dependent calculations:
        ↓
 3. updatePlanetInvariablePlaneHeights()  // Height above/below plane
        ↓
-4. updateDynamicInclinations()      // Apparent inclination to ecliptic
+4. updateDynamicInclinations()      // Ecliptic inclination to ecliptic
        ↓
 5. updateInvariablePlaneBalance()   // Mass-weighted balance calculation
        ↓

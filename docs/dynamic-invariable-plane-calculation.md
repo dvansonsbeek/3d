@@ -437,14 +437,14 @@ The **"Invariable plane"** feature (GUI toggle in Orbital folder) was implemente
 |-------|---------|
 | 89-191 | Planet inclinations to invariable plane (Souami & Souchay 2012 constants) |
 | 229-260 | Ascending node constants (S&S original + J2000-verified values) |
-| 3772-3847 | Dynamic state variables (`o.` object): heights, ascending nodes, apparent inclinations |
+| 3772-3847 | Dynamic state variables (`o.` object): heights, ascending nodes, ecliptic inclinations |
 | 4910-4959 | `createSunCenteredInvPlane()` - Creates the plane visualization |
 | 4961-5018 | `createPlanetNodeMarkersGroup()` - Creates ascending/descending node markers |
 | 5020-5043 | `createHeightIndicatorLabel()` - Creates the height label |
 | 5045-5058 | Instantiation: plane, markers, and label added to scene |
 | 5060-5248 | `updateSunCenteredInvPlane()` - Per-frame update function |
 | 17941-18036 | `updatePlanetInvariablePlaneHeights()` - Height calculation for all planets |
-| 18056-18120 | `updateDynamicInclinations()` - Apparent inclination calculation |
+| 18056-18120 | `updateDynamicInclinations()` - Ecliptic inclination calculation |
 | 10053-10062 | GUI toggle handler |
 
 ### Data Sources
@@ -465,7 +465,7 @@ const plutoInvPlaneInclinationJ2000 = 15.5639473;
 
 Two sets are maintained:
 1. **Souami & Souchay (2012) original** - for reference
-2. **J2000-Verified** - calibrated to match J2000 apparent inclinations exactly
+2. **J2000-Verified** - calibrated to match J2000 ecliptic inclinations exactly
 
 ```javascript
 // J2000-Verified values (primary)
@@ -538,7 +538,7 @@ quaternion.setFromAxisAngle(tiltAxis, earthI);
 ```javascript
 // In the render loop:
 updatePlanetInvariablePlaneHeights();  // Calculate heights
-updateDynamicInclinations();            // Calculate apparent inclinations
+updateDynamicInclinations();            // Calculate ecliptic inclinations
 updateSunCenteredInvPlane();            // Update visualization
 ```
 
@@ -548,13 +548,13 @@ updateSunCenteredInvPlane();            // Update visualization
 folderO.add(sunCenteredInvPlane, 'visible').name('Invariable plane').onChange(...)
 ```
 
-### Apparent Inclination Calculation
+### Ecliptic Inclination Calculation
 
 The `updateDynamicInclinations()` function calculates how a planet's inclination appears relative to the ecliptic, accounting for the fact that Earth's orbit also tilts relative to the invariable plane:
 
 1. Calculate Earth's orbital plane normal from its inclination and ascending node on inv. plane
 2. Calculate each planet's orbital plane normal similarly
-3. Apparent inclination = arccos(dot product of the two normals)
+3. Ecliptic inclination = arccos(dot product of the two normals)
 
 This produces two outputs per planet:
 - `o.<planet>EclipticInclinationDynamic` - using J2000-verified ascending nodes
