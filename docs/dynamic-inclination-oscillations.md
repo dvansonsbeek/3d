@@ -279,7 +279,7 @@ const plutoInvPlaneInclinationAmplitude = 0.648752;  // Range: 15.00° to 16.30�
 
 const mercuryInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.5"/cy
 const venusInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 22.3"/cy
-const earthInclinationPhaseAngle = 203;    // prograde, decreasing trend (reference)
+const earthInclinationPhaseAngle = 23;     // prograde, decreasing trend (reference)
 const marsInclinationPhaseAngle = 203;     // prograde, decreasing trend, error: 13.1"/cy
 const jupiterInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 12.3"/cy
 const saturnInclinationPhaseAngle = 23;    // RETROGRADE (= 203° - 180°), increasing trend, error: 0.0"/cy
