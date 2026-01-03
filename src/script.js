@@ -74,176 +74,176 @@ const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
 const moonDistance = 384399.07;
-const moonAtApogee = 405400;                    // km - Moon's apogee distance
+const moonAtApogee = 405400;                              // km - Moon's apogee distance
 const moonEclipticInclinationJ2000 = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 330;             // Aligned with stellarium data.
-const moonStartposNodal = 64;                // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 132.105;            // Needs to be at ~21h09m57s if start model is 2451716.5
+const moonStartposApsidal = 330;                          // Aligned with stellarium data.
+const moonStartposNodal = 64;                             // Aligned to major lunar standstill and minor lunar standstill
+const moonStartposMoon = 132.105;                         // Needs to be at ~21h09m57s if start model is 2451716.5
 
 // Reference lengths used as INPUT for Mercury
 const mercurySolarYearInput = 87.96855;
-const mercuryEclipticInclinationJ2000 = 7.00497902;   // JPL J2000 (was 7.00501638)
-const mercuryOrbitalEccentricity = 0.20563593;  // JPL J2000 (was 0.20562928)
+const mercuryEclipticInclinationJ2000 = 7.00497902;       // JPL J2000
+const mercuryOrbitalEccentricity = 0.20563593;            // JPL J2000
 const mercuryInvPlaneInclinationJ2000 = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4569131;
-const mercuryAscendingNode = 48.33076593;       // JPL J2000 (was 48.33033155)
+const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
-const mercuryAngleCorrection = 0.984416;     // To align the perihelion exactly. According to formula ~77.4569131
+const mercuryAngleCorrection = 0.984416;                  // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
-const mercuryStartpos = 86.25;               // Needs to be at ~7h24m46.43 if start model is 2451716.5
+const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.6958;
-const venusEclipticInclinationJ2000 = 3.39467605;     // JPL J2000 (was 3.3946018)
-const venusOrbitalEccentricity = 0.00677672;    // JPL J2000 (was 0.00674819)
+const venusEclipticInclinationJ2000 = 3.39467605;         // JPL J2000
+const venusOrbitalEccentricity = 0.00677672;              // JPL J2000
 const venusInvPlaneInclinationJ2000 = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.5765919;
-const venusAscendingNode = 76.67984255;         // JPL J2000 (was 76.67877109)
+const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
 const venusMeanAnomaly = 324.9668371;
 const venusTrueAnomaly = 324.5198504;
-const venusAngleCorrection = -2.78268;       // To align the perihelion exactly. According to formula ~131.5765919
+const venusAngleCorrection = -2.78268;                    // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~200 arcseconds per century
-const venusStartpos = 249.68;                // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
+const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.934;
-const marsEclipticInclinationJ2000 = 1.84969142;      // JPL J2000 (was 1.84971028)
-const marsOrbitalEccentricity = 0.09339410;     // JPL J2000 (was 0.09344726)
+const marsEclipticInclinationJ2000 = 1.84969142;          // JPL J2000
+const marsOrbitalEccentricity = 0.09339410;               // JPL J2000
 const marsInvPlaneInclinationJ2000 = 1.6311858;
 const marsTilt = 25.19;
 const marsLongitudePerihelion = 336.0650681;
-const marsAscendingNode = 49.55953891;          // JPL J2000 (was 49.55737662)
+const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
 const marsMeanAnomaly = 109.2630844;
 const marsTrueAnomaly = 118.9501056;
-const marsAngleCorrection = -2.105382;        // To align the perihelion exactly. According to formula ~336.0650681
+const marsAngleCorrection = -2.105382;                    // To align the perihelion exactly
 const marsPerihelionEclipticYears = holisticyearLength/4; // Duration of perihelion precession to explain ~1700 arcseconds per century
-const marsStartpos = 121.514;                // Needs to be at ~6h13m09.72 if start model is 2451716.5
+const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
-const jupiterEclipticInclinationJ2000 = 1.30439695;   // JPL J2000 (was 1.30450732)
-const jupiterOrbitalEccentricity = 0.04838624;  // JPL J2000 (was 0.04966799)
+const jupiterEclipticInclinationJ2000 = 1.30439695;       // JPL J2000
+const jupiterOrbitalEccentricity = 0.04838624;            // JPL J2000
 const jupiterInvPlaneInclinationJ2000 = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.70659401;
-const jupiterAscendingNode = 100.47390909;      // JPL J2000 (was 100.4877868)
+const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
 const jupiterMeanAnomaly = 32.47179744;
 const jupiterTrueAnomaly = 35.69428061;
-const jupiterAngleCorrection = 1.097882;       // To align the perihelion exactly. According to formula ~14.70659401
-const jupiterPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain ~400 arcseconds per century
-const jupiterStartpos = 13.79;               // Needs to be at ~3h43m48.25 if start model is 2451716.5
+const jupiterAngleCorrection = 1.097882;                  // To align the perihelion exactly
+const jupiterPerihelionEclipticYears = holisticyearLength;// Duration of perihelion precession to explain ~400 arcseconds per century
+const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
 const saturnSolarYearInput = 10745.6;
-const saturnEclipticInclinationJ2000 = 2.48599187;    // JPL J2000 (was 2.4853834)
-const saturnOrbitalEccentricity = 0.05386179;   // JPL J2000 (was 0.0564781)
+const saturnEclipticInclinationJ2000 = 2.48599187;        // JPL J2000
+const saturnOrbitalEccentricity = 0.05386179;             // JPL J2000
 const saturnInvPlaneInclinationJ2000 = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 92.12794343;
-const saturnAscendingNode = 113.66242448;       // JPL J2000 (was 113.6452856)
+const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
 const saturnMeanAnomaly = 325.663876;
 const saturnTrueAnomaly = 321.7910116;
-const saturnAngleCorrection = -0.175427;     // To align the perihelion exactly. According to formula ~92.12794343
+const saturnAngleCorrection = -0.175427;                  // To align the perihelion exactly
 const saturnPerihelionEclipticYears = -holisticyearLength/6; // Duration of perihelion precession to explain ~-400 arcseconds per century
-const saturnStartpos = 11.344;               // Needs to be at ~3h34m49.4 if start model is 2451716.5
+const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30583;
-const uranusEclipticInclinationJ2000 = 0.77263783;    // JPL J2000 (was 0.77234317)
-const uranusOrbitalEccentricity = 0.04725744;   // JPL J2000 (was 0.04519611)
+const uranusEclipticInclinationJ2000 = 0.77263783;        // JPL J2000
+const uranusOrbitalEccentricity = 0.04725744;             // JPL J2000
 const uranusInvPlaneInclinationJ2000 = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 170.7308251;
-const uranusAscendingNode = 74.01692503;        // JPL J2000 (was 73.98118815)
+const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
 const uranusMeanAnomaly = 145.7292678;
 const uranusTrueAnomaly = 148.5142459;
-const uranusAngleCorrection = -0.773944;      // To align the perihelion exactly. According to formula ~170.7308251
+const uranusAngleCorrection = -0.773944;                  // To align the perihelion exactly
 const uranusPerihelionEclipticYears = holisticyearLength/3; // Duration of perihelion precession to explain ~1200 arcseconds per century
-const uranusStartpos = 44.676;               // Needs to be at ~21h32m43.04 if start model is 2451716.5
+const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
 const neptuneSolarYearInput = 59926;
-const neptuneEclipticInclinationJ2000 = 1.77004347;   // JPL J2000 (was 1.768273)
-const neptuneOrbitalEccentricity = 0.00859048;  // JPL J2000 (was 0.009457)
+const neptuneEclipticInclinationJ2000 = 1.77004347;       // JPL J2000
+const neptuneOrbitalEccentricity = 0.00859048;            // JPL J2000
 const neptuneInvPlaneInclinationJ2000 = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 45.80124471;
-const neptuneAscendingNode = 131.78422574;      // JPL J2000 (was 131.7853754)
+const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
 const neptuneMeanAnomaly = 262.5003424;
 const neptuneTrueAnomaly = 261.2242728;
-const neptuneAngleCorrection = 2.401029;     // To align the perihelion exactly. According to formula ~45.80124471
+const neptuneAngleCorrection = 2.401029;                  // To align the perihelion exactly
 const neptunePerihelionEclipticYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~-400 arcseconds per century
-const neptuneStartpos = 47.917;              // Needs to be at ~20h33m40.34 if start model is 2451716.5
+const neptuneStartpos = 47.917;                           // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
 //*************************************************************
 
 // Reference lengths used as INPUT for Pluto
-const plutoSolarYearInput = 90465;             // Updated 2025-01-01: ~247.7 years (JPL Horizons J2000, was 89760)
-const plutoEclipticInclinationJ2000 = 17.14001;  // Updated 2025-01-01: JPL Horizons J2000 (was 17.14175)
-const plutoOrbitalEccentricity = 0.2488273;      // Updated 2025-01-01: JPL Horizons J2000 (was 0.24880766)
-const plutoInvPlaneInclinationJ2000 = 15.5639473;  // From Souami & Souchay (2012) - KEEP UNCHANGED
+const plutoSolarYearInput = 90465;               //  JPL Horizons J2000 (was 89760)
+const plutoEclipticInclinationJ2000 = 17.14001;  // JPL Horizons J2000 (was 17.14175)
+const plutoOrbitalEccentricity = 0.2488273;      // JPL Horizons J2000 (was 0.24880766)
+const plutoInvPlaneInclinationJ2000 = 15.5639473;// From Souami & Souchay (2012) - KEEP UNCHANGED
 const plutoTilt = 57.47;
-const plutoLongitudePerihelion = 224.06891;    // Updated 2025-01-01: JPL Horizons J2000 (was 224.06676)
-const plutoAscendingNode = 110.30393;          // Updated 2025-01-01: JPL Horizons J2000 (was 110.30347)
-const plutoMeanAnomaly = 15.55009;             // Updated 2025-01-01: JPL Horizons J2000 (was 15.83341625)
-const plutoTrueAnomaly = 26.31965048;          // Updated 2025-01-01: Calculated from M=15.55009°, e=0.2488273 (was 26.51719941)
-const plutoAngleCorrection = 2.469386;          // To align the perihelion exactly. According to formula ~224.06676
+const plutoLongitudePerihelion = 224.06891;      // JPL Horizons J2000 (was 224.06676)
+const plutoAscendingNode = 110.30393;            // JPL Horizons J2000 (was 110.30347)
+const plutoMeanAnomaly = 15.55009;               // JPL Horizons J2000 (was 15.83341625)
+const plutoTrueAnomaly = 26.31965048;            // Calculated from M=15.55009°, e=0.2488273 (was 26.51719941)
+const plutoAngleCorrection = 2.469386;           // To align the perihelion exactly
 const plutoPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const plutoStartpos = 71.555;                // Needs to be at ~16h44m12.72 if start model is 2451716.5
+const plutoStartpos = 71.555;                    // Needs to be at ~16h44m12.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Halleys
-const halleysSolarYearInput = 27503;           // Updated 2025-01-01: ~75.32 years (JPL Horizons J2000, was 27618)
-const halleysEclipticInclinationJ2000 = 162.26269;  // Updated 2025-01-01: JPL Horizons J2000 (was 162.192203847561)
-const halleysOrbitalEccentricity = 0.96714291;      // Updated 2025-01-01: JPL Horizons J2000 (was 0.9679427911271)
-const halleysInvPlaneInclinationJ2000 = 150;  // ⚠ PLACEHOLDER: Needs research for retrograde orbit
+const halleysSolarYearInput = 27503;             // JPL Horizons J2000 (was 27618)
+const halleysEclipticInclinationJ2000 = 162.26269; // JPL Horizons J2000 (was 162.192203847561)
+const halleysOrbitalEccentricity = 0.96714291;   // JPL Horizons J2000 (was 0.9679427911271)
+const halleysInvPlaneInclinationJ2000 = 150;     // ⚠ PLACEHOLDER: Needs research for retrograde orbit
 const halleysTilt = 0;
-const halleysLongitudePerihelion = 111.33249;  // Updated 2025-01-01: JPL Horizons J2000 (was 172.033036745069, CRITICAL: ~60° correction)
-const halleysAscendingNode = 58.42008;         // Updated 2025-01-01: JPL Horizons J2000 (was 59.5607834844014)
-const halleysMeanAnomaly = 38.77481;           // Updated 2025-01-01: JPL Horizons J2000 (was 13, TODO placeholder)
-const halleysTrueAnomaly = 166.26774708;       // Updated 2025-01-01: Calculated from M=38.77481°, e=0.96714291 (was 13 placeholder)
-const halleysAngleCorrection = -1.619784;       // To align the perihelion exactly. According to formula ~172.03304
+const halleysLongitudePerihelion = 111.33249;    // JPL Horizons J2000 (was 172.033036745069, CRITICAL: ~60° correction)
+const halleysAscendingNode = 58.42008;           // JPL Horizons J2000 (was 59.5607834844014)
+const halleysMeanAnomaly = 38.77481;             // JPL Horizons J2000 (was 13, TODO placeholder)
+const halleysTrueAnomaly = 166.26774708;         // Calculated from M=38.77481°, e=0.96714291 (was 13 placeholder)
+const halleysAngleCorrection = -1.619784;        // To align the perihelion exactly
 const halleysPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const halleysStartpos = 80;                  // Needs to be at ~08h43m12.79 if start model is 2451716.5
+const halleysStartpos = 80;                      // Needs to be at ~08h43m12.79 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Eros
-const erosSolarYearInput = 642.93;             // Updated 2025-01-01: ~1.76 years (JPL Horizons J2000, was 643.22295)
-const erosEclipticInclinationJ2000 = 10.82760;  // Updated 2025-01-01: JPL Horizons J2000 (was 10.8290328658513)
-const erosOrbitalEccentricity = 0.2229512;      // Updated 2025-01-01: JPL Horizons J2000 (was 0.222807894458402)
-const erosInvPlaneInclinationJ2000 = 9.25;     // Estimated (ecliptic - Earth offset) - Keep unchanged
+const erosSolarYearInput = 642.93;               // JPL Horizons J2000 (was 643.22295)
+const erosEclipticInclinationJ2000 = 10.82760;   // JPL Horizons J2000 (was 10.8290328658513)
+const erosOrbitalEccentricity = 0.2229512;       // JPL Horizons J2000 (was 0.222807894458402)
+const erosInvPlaneInclinationJ2000 = 9.25;       // Estimated (ecliptic - Earth offset) - Keep unchanged
 const erosTilt = 0;
-const erosLongitudePerihelion = 178.81322;     // Updated 2025-01-01: JPL Horizons J2000 (was 123.054362100533, CRITICAL: ~56° correction)
-const erosAscendingNode = 304.30993;           // Updated 2025-01-01: JPL Horizons J2000 (was 304.411578580454)
-const erosMeanAnomaly = 320.21552;             // Updated 2025-01-01: JPL Horizons J2000 (was 153.67797646)
-const erosTrueAnomaly = 299.91713740;          // Updated 2025-01-01: Calculated from M=320.21552°, e=0.2229512 (was 162.69081884)
-const erosAngleCorrection = 0.048021;          // To align the perihelion exactly. According to formula ~123.05436
+const erosLongitudePerihelion = 178.81322;       // JPL Horizons J2000 (was 123.054362100533, CRITICAL: ~56° correction)
+const erosAscendingNode = 304.30993;             // JPL Horizons J2000 (was 304.411578580454)
+const erosMeanAnomaly = 320.21552;               // JPL Horizons J2000 (was 153.67797646)
+const erosTrueAnomaly = 299.91713740;            // Calculated from M=320.21552°, e=0.2229512 (was 162.69081884)
+const erosAngleCorrection = 0.048021;            // To align the perihelion exactly
 const erosPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const erosStartpos = 57.402;                 // Needs to be at ~20h38m24.47 if start model is 2451716.5
+const erosStartpos = 57.402;                     // Needs to be at ~20h38m24.47 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Ceres
-const ceresSolarYearInput = 1680.5;            // Updated 2025-01-01: ~4.60 years (JPL Horizons J2000)
-const ceresEclipticInclinationJ2000 = 10.59407;  // Updated 2025-01-01: JPL Horizons J2000 (was 10.58682)
-const ceresOrbitalEccentricity = 0.0755347;      // Updated 2025-01-01: JPL Horizons J2000 (was 0.07913825)
+const ceresSolarYearInput = 1680.5;              // JPL Horizons J2000
+const ceresEclipticInclinationJ2000 = 10.59407;  // JPL Horizons J2000 (was 10.58682)
+const ceresOrbitalEccentricity = 0.0755347;      // JPL Horizons J2000 (was 0.07913825)
 const ceresInvPlaneInclinationJ2000 = 0.4331698; // Souami & Souchay (2012) Table 2 - Real data!
-const ceresTilt = 4;                            // Dawn spacecraft measurement (~4°)
-const ceresLongitudePerihelion = 73.59769;      // Updated 2025-01-01: JPL Horizons J2000
-const ceresAscendingNode = 80.30533;            // Updated 2025-01-01: JPL Horizons J2000 (was 80.39320)
-const ceresMeanAnomaly = 95.98772;              // Updated 2025-01-01: JPL Horizons J2000
-const ceresTrueAnomaly = 104.48097667;          // Updated 2025-01-01: Calculated from M=95.98772°, e=0.0755347
-const ceresAngleCorrection = 0;                 // To align the perihelion exactly
+const ceresTilt = 4;                             // Dawn spacecraft measurement (~4°)
+const ceresLongitudePerihelion = 73.59769;       // JPL Horizons J2000
+const ceresAscendingNode = 80.30533;             // JPL Horizons J2000
+const ceresMeanAnomaly = 95.98772;               // JPL Horizons J2000
+const ceresTrueAnomaly = 104.48097667;           // Calculated from M=95.98772°, e=0.0755347
+const ceresAngleCorrection = 0;                  // To align the perihelion exactly
 const ceresPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession
-const ceresOrbitDistance = 2.76596;             // Updated 2025-01-01: AU (JPL Horizons J2000, was 2.7658)
+const ceresOrbitDistance = 2.76596;              // JPL Horizons J2000
 
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
-const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;   // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
+const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
 const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
 const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
 const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
@@ -252,28 +252,26 @@ const saturnAscendingNodeInvPlaneSouamiSouchay = 122.27;
 const uranusAscendingNodeInvPlaneSouamiSouchay = 308.44;
 const neptuneAscendingNodeInvPlaneSouamiSouchay = 189.28;
 const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
-const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;    // From Souami & Souchay (2012) Table 2
-// TODO: Halley's and Eros invariable plane data are approximations (not from Souami & Souchay 2012)
-// Using ecliptic ascending node as placeholder - should be calculated from orbital elements
-const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56;  // Approximation from ecliptic value
-const erosAscendingNodeInvPlaneSouamiSouchay = 304.41;    // Approximation from ecliptic value
+const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56; // Approximation from ecliptic value
+const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from ecliptic value
+const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
 
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
 // Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.earthInvPlaneInclinationDynamic = 1.5787° at J2000
 // Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.492;   // Adjusted from S&S 284.51°
-const mercuryAscendingNodeInvPlaneVerified = 32.81;   // was 32.22, Δ = +0.59° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.68;     // was 52.31, Δ = +2.37° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.84;     // was 352.95, Δ = +1.89° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 312.87;  // was 306.92, Δ = +5.95° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.82;   // was 122.27, Δ = -3.45° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.78;   // was 308.44, Δ = -0.66° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192;     // was 189.28, Δ = +2.72° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 105.44;    // was 107.06, Δ = -1.62° (from S&S)
-const ceresAscendingNodeInvPlaneVerified = 80.89;     // From Souami & Souchay (2012) Table 2 (unchanged)
-const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
-const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (estimated)
+const earthAscendingNodeInvPlaneVerified = 284.492;      // Adjusted from S&S 284.51°
+const mercuryAscendingNodeInvPlaneVerified = 32.81;      // was 32.22, Δ = +0.59° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.68;        // was 52.31, Δ = +2.37° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.84;        // was 352.95, Δ = +1.89° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.87;     // was 306.92, Δ = +5.95° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.82;      // was 122.27, Δ = -3.45° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.78;      // was 308.44, Δ = -0.66° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192;        // was 189.28, Δ = +2.72° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 105.44;       // was 107.06, Δ = -1.62° (from S&S)
+const halleysAscendingNodeInvPlaneVerified = 59.56;      // Approximation from ecliptic value
+const erosAscendingNodeInvPlaneVerified = 10.36;         // Approximation from ecliptic value
+const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Souchay (2012) Table 2
 
 // ══════════════════════════════════════════════════════════════════════════════
 // PLANETARY INCLINATION OSCILLATION AMPLITUDES
@@ -295,7 +293,7 @@ const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22°
 // This gives smaller values as it assumes we're near maximum rate.
 //
 // We use the Laplace-Lagrange derived amplitudes as they represent the full
-// oscillation envelope and are based on analytical eigenmode calculations.
+// oscillation envelope are based on analytical eigenmode calculations.
 // The period for each planet equals its <planet>PerihelionEclipticYears constant.
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -340,6 +338,11 @@ const neptuneInvPlaneInclinationAmplitude = 0.091497;  // Range: 0.55° to 0.74�
 const plutoInvPlaneInclinationMean = 15.649300;
 const plutoInvPlaneInclinationAmplitude = 0.648752;  // Range: 15.00° to 16.30°
 
+// Halleys: Estimated from near-Earth asteroid dynamics
+// Ecliptic inclination ~162.26269°, Earth offset ~1.58°, gives ~150° to invariable plane
+const halleysInvPlaneInclinationMean = 150;
+const halleysInvPlaneInclinationAmplitude = 0.1;     // Estimated oscillation
+
 // Eros: Estimated from near-Earth asteroid dynamics
 // Ecliptic inclination ~10.83°, Earth offset ~1.58°, gives ~9.25° to invariable plane
 const erosInvPlaneInclinationMean = 9.25;
@@ -372,8 +375,9 @@ const saturnInclinationPhaseAngle = 23;    // RETROGRADE, increasing trend, erro
 const uranusInclinationPhaseAngle = 203;   // prograde, decreasing trend, error: 1.0"/cy
 const neptuneInclinationPhaseAngle = 203;  // prograde, increasing trend, error: 0.2"/cy
 const plutoInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 3.9"/cy
-const ceresInclinationPhaseAngle = 203;    // prograde (estimated)
+const halleysInclinationPhaseAngle = 23;   // RETROGRADE (estimated)
 const erosInclinationPhaseAngle = 203;     // prograde (estimated)
+const ceresInclinationPhaseAngle = 203;    // prograde (estimated)
 
 // Really fixed values
 const diameters = {
@@ -1253,7 +1257,7 @@ const precessionBreakdownCache = {
 // Get orbital data for all 8 major planets (used for precession breakdown calculations)
 // Uses FIXED J2000 ecliptic orbital elements for consistency with reference calculations
 // NOTE: period_days uses the CALCULATED period from the model (holisticyearLength/count * meansolaryearlengthinDays)
-//       i_deg uses the FIXED ecliptic orbital inclination (e.g., mercuryEclipticInclinationJ2000 = 7.005°)
+//       i_deg uses the FIXED ecliptic inclination (e.g., mercuryEclipticInclinationJ2000 = 7.005°)
 //       omega_deg uses the FIXED J2000 ascending node (e.g., mercuryAscendingNode = 48.33°)
 function getPlanetPerturbationData(oRef) {
   return [
@@ -5035,14 +5039,14 @@ invariablePlaneGroup.visible = false; // Off by default (labels also hidden by d
 // Planet data lookup for invariable plane visualization
 // orbitRadiusAU is the semi-major axis used for fixed node marker positioning
 const PLANET_INV_PLANE_DATA = {
-  earth:   { obj: earth,   key: 'earth',   inclination: () => o.earthInvPlaneInclinationDynamic, ascNode: () => o.earthAscendingNodeInvPlane,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
-  mercury: { obj: mercury, key: 'mercury', inclination: mercuryInvPlaneInclinationJ2000,       ascNode: () => o.mercuryAscendingNodeInvPlane, height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
-  venus:   { obj: venus,   key: 'venus',   inclination: venusInvPlaneInclinationJ2000,         ascNode: () => o.venusAscendingNodeInvPlane,   height: () => o.venusHeightAboveInvPlane,   orbitRadiusAU: venusOrbitDistance },
-  mars:    { obj: mars,    key: 'mars',    inclination: marsInvPlaneInclinationJ2000,          ascNode: () => o.marsAscendingNodeInvPlane,    height: () => o.marsHeightAboveInvPlane,    orbitRadiusAU: marsOrbitDistance },
-  jupiter: { obj: jupiter, key: 'jupiter', inclination: jupiterInvPlaneInclinationJ2000,       ascNode: () => o.jupiterAscendingNodeInvPlane, height: () => o.jupiterHeightAboveInvPlane, orbitRadiusAU: jupiterOrbitDistance },
-  saturn:  { obj: saturn,  key: 'saturn',  inclination: saturnInvPlaneInclinationJ2000,        ascNode: () => o.saturnAscendingNodeInvPlane,  height: () => o.saturnHeightAboveInvPlane,  orbitRadiusAU: saturnOrbitDistance },
-  uranus:  { obj: uranus,  key: 'uranus',  inclination: uranusInvPlaneInclinationJ2000,        ascNode: () => o.uranusAscendingNodeInvPlane,  height: () => o.uranusHeightAboveInvPlane,  orbitRadiusAU: uranusOrbitDistance },
-  neptune: { obj: neptune, key: 'neptune', inclination: neptuneInvPlaneInclinationJ2000,       ascNode: () => o.neptuneAscendingNodeInvPlane, height: () => o.neptuneHeightAboveInvPlane, orbitRadiusAU: neptuneOrbitDistance },
+  earth:   { obj: earth,   key: 'earth',   inclination: () => o.earthInvPlaneInclinationDynamic,   ascNode: () => o.earthAscendingNodeInvPlane,   height: () => o.earthHeightAboveInvPlane,   orbitRadiusAU: 1.0 },
+  mercury: { obj: mercury, key: 'mercury', inclination: () => o.mercuryInvPlaneInclinationDynamic, ascNode: () => o.mercuryAscendingNodeInvPlane, height: () => o.mercuryHeightAboveInvPlane, orbitRadiusAU: mercuryOrbitDistance },
+  venus:   { obj: venus,   key: 'venus',   inclination: () => o.venusInvPlaneInclinationDynamic,   ascNode: () => o.venusAscendingNodeInvPlane,   height: () => o.venusHeightAboveInvPlane,   orbitRadiusAU: venusOrbitDistance },
+  mars:    { obj: mars,    key: 'mars',    inclination: () => o.marsInvPlaneInclinationDynamic,    ascNode: () => o.marsAscendingNodeInvPlane,    height: () => o.marsHeightAboveInvPlane,    orbitRadiusAU: marsOrbitDistance },
+  jupiter: { obj: jupiter, key: 'jupiter', inclination: () => o.jupiterInvPlaneInclinationDynamic, ascNode: () => o.jupiterAscendingNodeInvPlane, height: () => o.jupiterHeightAboveInvPlane, orbitRadiusAU: jupiterOrbitDistance },
+  saturn:  { obj: saturn,  key: 'saturn',  inclination: () => o.saturnInvPlaneInclinationDynamic,  ascNode: () => o.saturnAscendingNodeInvPlane,  height: () => o.saturnHeightAboveInvPlane,  orbitRadiusAU: saturnOrbitDistance },
+  uranus:  { obj: uranus,  key: 'uranus',  inclination: () => o.uranusInvPlaneInclinationDynamic,  ascNode: () => o.uranusAscendingNodeInvPlane,  height: () => o.uranusHeightAboveInvPlane,  orbitRadiusAU: uranusOrbitDistance },
+  neptune: { obj: neptune, key: 'neptune', inclination: () => o.neptuneInvPlaneInclinationDynamic, ascNode: () => o.neptuneAscendingNodeInvPlane, height: () => o.neptuneHeightAboveInvPlane, orbitRadiusAU: neptuneOrbitDistance },
 };
 
 // Reusable vectors to avoid allocation each frame
@@ -12595,12 +12599,17 @@ const planetStats = {
     null,
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityEarth, dec:8, sep:',' },{ small: '' }]},
-      {label : () => `Orbital Inclination (i)`,
+    null,
+      {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:8, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+    null,
+      {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.earthInvPlaneInclinationDynamic, dec:8, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => earthInvPlaneInclinationMean, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       static: true},
+      {label : () => `Inclination to Inv. plane (amplitude)`,
+       value : [ { v: () => earthInvPlaneInclinationAmplitude, dec:6, sep:',' },{ small: '± degrees (°)' }],
        static: true},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -12966,7 +12975,7 @@ const planetStats = {
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
-      {label : () => `Orbital Inclination (i)`,
+      {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => moonEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
        static: true},
 
@@ -13290,18 +13299,12 @@ const planetStats = {
        value : [ { v: () => mercuryOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null, 
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => mercuryEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${mercuryEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.mercuryEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.mercuryEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.mercuryEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => mercuryInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${mercuryInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.mercuryInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => mercuryInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -13528,8 +13531,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(mercuryInvPlaneInclinationJ2000, o.mercuryArgumentOfPeriapsis, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.mercuryInvPlaneInclinationDynamic, o.mercuryArgumentOfPeriapsis, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.mercuryTrueAnomaly, o.mercuryPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -13649,18 +13652,12 @@ const planetStats = {
        value : [ { v: () => venusOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => venusEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${venusEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.venusEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.venusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.venusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => venusInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${venusInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.venusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => venusInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -13838,11 +13835,11 @@ const planetStats = {
        value : [ { v: () => (o.venusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => '—' },{ small: '' }],
-       hover : [`Venus has no inclination oscillation (amplitude = 0) due to its near-infinite precession period.`]},
+       value : [ { v: () => venusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ascending node longitude at which Venus's inclination to the invariable plane reaches maximum. This is a constant derived from J2000 observations.`]},
       {label : () => `Current Oscillation Phase`,
-       value : [ { v: () => '—' },{ small: '' }],
-       hover : [`Venus has no inclination oscillation (amplitude = 0) due to its near-infinite precession period.`]},
+       value : [ { v: () => ((o.venusAscendingNodeInvPlane - venusInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
     null,
       {label : () => `Height above Invariable Plane`,
        value : [ { v: () => o.venusHeightAboveInvPlane, dec:6, sep:',' },{ small: 'AU' }],
@@ -13887,8 +13884,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(venusInvPlaneInclinationJ2000, o.venusArgumentOfPeriapsis, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.venusInvPlaneInclinationDynamic, o.venusArgumentOfPeriapsis, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.venusTrueAnomaly, o.venusPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -13975,18 +13972,12 @@ const planetStats = {
        value : [ { v: () => marsOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,  
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => marsEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${marsEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.marsEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.marsEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-    null, 
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => marsInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.marsEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
+    null,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${marsInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.marsInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => marsInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -14213,8 +14204,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(marsInvPlaneInclinationJ2000, o.marsArgumentOfPeriapsis, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.marsInvPlaneInclinationDynamic, o.marsArgumentOfPeriapsis, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.marsTrueAnomaly, o.marsPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -14301,18 +14292,12 @@ const planetStats = {
        value : [ { v: () => jupiterOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => jupiterEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${jupiterEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.jupiterEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.jupiterEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.jupiterEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => jupiterInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${jupiterInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.jupiterInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => jupiterInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -14530,8 +14515,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(jupiterInvPlaneInclinationJ2000, o.jupiterArgumentOfPeriapsis, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.jupiterInvPlaneInclinationDynamic, o.jupiterArgumentOfPeriapsis, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.jupiterTrueAnomaly, o.jupiterPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -14618,18 +14603,12 @@ const planetStats = {
        value : [ { v: () => saturnOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => saturnEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${saturnEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.saturnEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.saturnEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.saturnEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => saturnInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${saturnInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.saturnInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => saturnInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -14856,8 +14835,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(saturnInvPlaneInclinationJ2000, o.saturnArgumentOfPeriapsis, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.saturnInvPlaneInclinationDynamic, o.saturnArgumentOfPeriapsis, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.saturnTrueAnomaly, o.saturnPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -14944,18 +14923,12 @@ const planetStats = {
        value : [ { v: () => uranusOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => uranusEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${uranusEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.uranusEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.uranusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.uranusEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => uranusInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${uranusInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.uranusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => uranusInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -15182,8 +15155,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(uranusInvPlaneInclinationJ2000, o.uranusArgumentOfPeriapsis, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.uranusInvPlaneInclinationDynamic, o.uranusArgumentOfPeriapsis, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.uranusTrueAnomaly, o.uranusPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -15270,18 +15243,12 @@ const planetStats = {
        value : [ { v: () => neptuneOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => neptuneEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${neptuneEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.neptuneEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.neptuneEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.neptuneEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => neptuneInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${neptuneInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.neptuneInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => neptuneInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -15508,8 +15475,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(neptuneInvPlaneInclinationJ2000, o.neptuneArgumentOfPeriapsis, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.neptuneInvPlaneInclinationDynamic, o.neptuneArgumentOfPeriapsis, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.neptuneTrueAnomaly, o.neptunePerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -15595,18 +15562,12 @@ const planetStats = {
        value : [ { v: () => plutoOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => plutoEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${plutoEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.plutoEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.plutoEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.plutoEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => plutoInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${plutoInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.plutoInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
       {label : () => `Inclination to Inv. plane (mean)`,
        value : [ { v: () => plutoInvPlaneInclinationMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -15833,8 +15794,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(plutoInvPlaneInclinationJ2000, o.plutoArgumentOfPeriapsis, o.plutoTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.plutoInvPlaneInclinationDynamic, o.plutoArgumentOfPeriapsis, o.plutoTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.plutoTrueAnomaly, o.plutoPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -15920,18 +15881,12 @@ const planetStats = {
        value : [ { v: () => halleysOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => halleysEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${halleysEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.halleysEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.halleysEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.halleysEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => halleysInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${halleysInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.halleysInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -16143,8 +16098,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(halleysInvPlaneInclinationJ2000, o.halleysArgumentOfPeriapsis, o.halleysTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.halleysInvPlaneInclinationDynamic, o.halleysArgumentOfPeriapsis, o.halleysTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.halleysTrueAnomaly, o.halleysPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -16230,18 +16185,12 @@ const planetStats = {
        value : [ { v: () => erosOrbitalEccentricity, dec:6, sep:',' },{ small: '' }],
        static: true},
     null,
-      {label : () => `Ecliptic Inclination J2000 (i)`,
-       value : [ { v: () => erosEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Ecliptic Inclination (dynamic) (i)`,
+      {label : () => `Ecliptic Inclination (i) (J2000: ${erosEclipticInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.erosEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
-      {label : () => `Ecliptic Incl. (dynamic) Souami&Souchay`,
-       value : [ { v: () => o.erosEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
+      {label : () => `<small>Ecliptic Inclination (i) Souami&Souchay</small>`,
+       value : [ { small: { v: () => o.erosEclipticInclinationSouamiSouchayDynamic, dec:6, sep:',' } },{ small: 'degrees (°)' }]},
     null,
-      {label : () => `Inclination to Inv. plane (J2000)`,
-       value : [ { v: () => erosInvPlaneInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       static: true},
-      {label : () => `Inclination to Inv. plane (dynamic)`,
+      {label : () => `Inclination to Inv. plane (I) (J2000: ${erosInvPlaneInclinationJ2000.toFixed(6)}°)`,
        value : [ { v: () => o.erosInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -16453,8 +16402,8 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(erosInvPlaneInclinationJ2000, o.erosArgumentOfPeriapsis, o.erosTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u)`]},
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(o.erosInvPlaneInclinationDynamic, o.erosArgumentOfPeriapsis, o.erosTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Angular distance above/below invariable plane: sin(β) = sin(i) × sin(u). Uses dynamic inclination.`]},
       {label : () => `Phase Angle to Earth (α)`,
        value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.erosTrueAnomaly, o.erosPerihelion), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, o.earthPerihelion)), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
@@ -18061,7 +18010,7 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
  * @param {number} orbitTilta - Encodes sin(Ω)*i in degrees
  * @param {number} orbitTiltb - Encodes cos(Ω)*i in degrees
  * @param {number} currentObliquity - Current Earth obliquity (degrees)
- * @param {number} earthInclination - Current Earth orbital inclination (degrees)
+ * @param {number} earthInclination - Current Earth ecliptic inclination (degrees)
  * @param {number} currentYear - Current year (needed for rate-based calculation)
  * @returns {number} Dynamic ascending node longitude (degrees, 0-360)
  */
@@ -18567,20 +18516,20 @@ function updatePlanetInvariablePlaneHeights() {
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
   // Precession uses <planet>PerihelionEclipticYears constants
   const planets = [
-    { key: 'mercury', obj: mercury, incl: mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionEclipticYears },
-    { key: 'venus',   obj: venus,   incl: venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
-    { key: 'earth',   obj: null,    incl: null,               ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified, precessionYears: earthPerihelionEclipticYears },
-    { key: 'mars',    obj: mars,    incl: marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
-    { key: 'jupiter', obj: jupiter, incl: jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionEclipticYears },
-    { key: 'saturn',  obj: saturn,  incl: saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionEclipticYears },
-    { key: 'uranus',  obj: uranus,  incl: uranusInvPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionEclipticYears },
-    { key: 'neptune', obj: neptune, incl: neptuneInvPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionEclipticYears },
-    { key: 'pluto',   obj: pluto,   incl: plutoInvPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionEclipticYears },
-    { key: 'halleys', obj: halleys, incl: halleysInvPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionEclipticYears },
-    { key: 'eros',    obj: eros,    incl: erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
+    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionEclipticYears },
+    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
+    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionEclipticYears },
+    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
+    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionEclipticYears },
+    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionEclipticYears },
+    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || uranusInvPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionEclipticYears },
+    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || neptuneInvPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionEclipticYears },
+    { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || plutoInvPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionEclipticYears },
+    { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || halleysInvPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionEclipticYears },
+    { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
   ];
 
-  for (const { key, obj, incl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planets) {
+  for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planets) {
     let eclipticLongitude;
     let distanceAU;
     let inclToInvPlane;
@@ -18600,6 +18549,9 @@ function updatePlanetInvariablePlaneHeights() {
     // Also store Souami & Souchay value for comparison (including Earth)
     o[key + 'AscendingNodeInvPlaneSouamiSouchay'] = ascNodeDynamicSS;
 
+    // Get dynamic inclination to invariable plane (with J2000 fallback)
+    inclToInvPlane = getIncl();
+
     if (key === 'earth') {
       // Earth is special: we don't have o.earthTrueAnomaly etc.
       // Instead, use sun.ra (Sun's ecliptic longitude from Earth's view) + 180° to get Earth's heliocentric longitude
@@ -18607,7 +18559,6 @@ function updatePlanetInvariablePlaneHeights() {
       const sunLongDeg = sun.ra * 180 / Math.PI;
       eclipticLongitude = (sunLongDeg + 180 + 360) % 360;
       distanceAU = earthWobbleCenter.sunDistAU || 1.0;
-      inclToInvPlane = o.earthInvPlaneInclinationDynamic || 1.578;  // Use dynamic value, fallback to mean
 
     } else {
       // Get planet's true anomaly (already calculated in updatePlanetAnomalies)
@@ -18618,9 +18569,6 @@ function updatePlanetInvariablePlaneHeights() {
 
       // Get ascending node on ecliptic (dynamic value)
       const ascNodeEcliptic = o[key + 'AscendingNode'] || 0;
-
-      // Get inclination to invariable plane (constant for non-Earth planets)
-      inclToInvPlane = incl;
 
       // Get distance from Sun (in AU)
       if (obj && obj.sunDistAU !== undefined) {
@@ -18928,9 +18876,9 @@ function updateDynamicInclinations() {
   o.uranusInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('uranus', o.currentYear);
   o.neptuneInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('neptune', o.currentYear);
   o.plutoInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('pluto', o.currentYear);
-  // Halley's and Eros use fixed inclinations (no oscillation data available)
-  o.halleysInvPlaneInclinationDynamic = halleysInvPlaneInclinationJ2000;
-  o.erosInvPlaneInclinationDynamic = erosInvPlaneInclinationJ2000;
+  o.halleysInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('halleys', o.currentYear);
+  o.erosInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('eros', o.currentYear);
+
 
   // Get Earth's current orbital plane normals (ecliptic normals)
   // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
@@ -18998,7 +18946,7 @@ function updateDynamicInclinations() {
 }
 
 /**
- * Derive orbital inclination i, ascending node Ω, descending node Ωd,
+ * Derive ecliptic inclination i, ascending node Ω, descending node Ωd,
  * and argument of periapsis ω from the two stored tilt components plus
  * the already-known longitude of perihelion ϖ.
  *
@@ -19657,7 +19605,7 @@ function computeObliquityEarth(currentYear) {
 }
 
 /**
- * Compute Earth’s orbital inclination for a given year.
+ * Compute Earth’s ecliptic inclination for a given year.
  *
  * @param {number} currentYear                   – the year you want to compute for
  * @param {number} balancedYear                  – the reference (“balanced”) year

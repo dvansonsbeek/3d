@@ -4,7 +4,7 @@
 
 This document outlines the available input variables in the solar system simulation and proposes additional astronomical formulas that can be calculated and displayed.
 
-**Last Updated:** January 2025
+**Last Updated:** January 2025 (heliocentricLatitude updated to use dynamic inclination on 2025-01-03)
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](dynamic-orbital-elements-overview.md) - How dynamic systems work together
@@ -960,16 +960,23 @@ areaSweepRate: (a_km, e) => OrbitalFormulas.specificAngularMomentum(a_km, e) / 2
 
 **Formula:** `sin(β) = sin(i) × sin(u)` where `u = ω + ν`
 
-**Physical Meaning:** Angular distance above or below the ecliptic plane (or invariable plane).
+**Physical Meaning:** Angular distance above or below the invariable plane.
 
-**Implementation:** ✅ Complete
+**Implementation:** ✅ Complete (updated 2025-01-03 to use dynamic inclination)
+
+**Usage:** All planets now use dynamic inclination (`o.<planet>InvPlaneInclinationDynamic`) instead of fixed J2000 values. This ensures heliocentric latitude reflects the oscillating inclination over secular timescales.
+
 ```javascript
-// Heliocentric latitude to ecliptic (degrees)
+// Heliocentric latitude to invariable plane (degrees)
+// Uses dynamic inclination that oscillates with ascending node precession
 heliocentricLatitude: (inclination_deg, omega_deg, nu_deg) => {
   const i = inclination_deg * Math.PI / 180;
   const u = (omega_deg + nu_deg) * Math.PI / 180;
   return Math.asin(Math.sin(i) * Math.sin(u)) * 180 / Math.PI;
 }
+
+// Example usage in planetStats:
+OrbitalFormulas.heliocentricLatitude(o.mercuryInvPlaneInclinationDynamic, o.mercuryArgumentOfPeriapsis, o.mercuryTrueAnomaly)
 ```
 
 ### 6.5 Inter-Planetary Calculations
