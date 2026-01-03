@@ -160,6 +160,48 @@ Year 50000 (minimum tilt):
 
 **Note**: The crossing dates shift over the ~100,000-year precession cycle as the ascending node circulates through 360°.
 
+### Coordinate Systems: ICRF vs Ecliptic
+
+**Important (2025-01-03)**: The ascending node on the invariable plane can be expressed in two different coordinate systems, which have **different precession rates**:
+
+#### Two Precession Rates
+
+| Coordinate System | Precession Period | Usage |
+|-------------------|-------------------|-------|
+| **ICRF (inertial)** | ~99,392 years (`holisticyearLength/3`) | Physical marker positions in 3D space |
+| **Ecliptic (precessing)** | ~18,636 years (`holisticyearLength/16`) | Height calculations, planet stats labels |
+
+#### Why This Matters
+
+The height calculation for "above/below invariable plane" uses `sun.ra` (Earth's position), which is measured in **precessing ecliptic coordinates**. If we use the ICRF ascending node (~99,392 year period), the height calculation becomes incorrect when moving away from J2000.
+
+**The fix**: We maintain **two ascending node values** for each planet:
+- `o.<planet>AscendingNodeInvPlane` - ICRF rate for visual marker positions
+- `o.<planet>AscendingNodeInvPlaneEcliptic` - Ecliptic rate for height calculations
+
+#### Implementation Details
+
+```javascript
+// ICRF rate: ~99,392 years (physical precession in inertial frame)
+const earthPerihelionEclipticYears = holisticyearLength/3;  // ~99,392 years
+
+// Ecliptic rate: ~18,636 years (apparent precession in precessing coordinates)
+const ascNodeInvPlaneEclipticYears = holisticyearLength/16; // ~18,636 years
+
+// Height calculation uses ecliptic-rate ascending node
+const precessionRateEcliptic = 360 / ascNodeInvPlaneEclipticYears;
+const ascNodeDynamicEcliptic = ascNodeJ2000 + precessionRateEcliptic * yearsSinceJ2000;
+let angleFromInvAscNode = (eclipticLongitude - ascNodeDynamicEcliptic + 360) % 360;
+```
+
+#### Planet Stats Panel
+
+All invariable plane values in the planet stats panels now show **ecliptic coordinates**:
+- **Ascending Node on Inv. Plane (Ω)** - Uses `o.<planet>AscendingNodeInvPlaneEcliptic`
+- **Descending Node on Inv. Plane** - Uses `(o.<planet>AscendingNodeInvPlaneEcliptic + 180) % 360`
+- **Ω at Max Inclination** - Calculated using ecliptic precession rate
+- **Current Oscillation Phase** - Unchanged (uses ICRF for phase tracking)
+
 ## Orbital Geometry
 
 ### Reference Frame
@@ -633,3 +675,4 @@ This document is part of a suite of related implementations:
 | 2024-12-19 | 2.0 | **Phase 1 Implementation**: Added `updatePlanetInvariablePlaneHeights()` function, invariable plane ascending node constants, and `o.<planet>HeightAboveInvPlane` properties | Claude (Opus 4.5) |
 | 2024-12-19 | 2.1 | Added dynamic ascending node precession using `<planet>PerihelionEclipticYears` constants; verified July/January crossing dates via Souami & Souchay 2012 research | Claude (Opus 4.5) |
 | 2025-01-01 | 2.2 | Updated to use dynamic planet inclinations (`o.<planet>InvPlaneInclinationDynamic`) instead of fixed constants | Claude (Opus 4.5) |
+| 2025-01-03 | 2.3 | **Coordinate system fix**: Added ICRF vs Ecliptic section explaining dual ascending node values (~99,392 yr ICRF vs ~18,636 yr ecliptic), fixed height calculations, updated planet stats to show ecliptic coordinates | Claude (Opus 4.5) |

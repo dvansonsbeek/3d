@@ -692,14 +692,19 @@ The s₈ eigenmode represents the **dominant long-period oscillation direction**
 
 #### UI Labels
 
-In the planet information panels, two related values are displayed:
+In the planet information panels, four invariable plane values are displayed:
 
-| UI Label | Variable | Type | Description |
-|----------|----------|------|-------------|
-| **Ω at Max Inclination** | `<planet>InclinationPhaseAngle` | Constant | The fixed ascending node longitude where inclination reaches maximum |
-| **Current Oscillation Phase** | `(Ω(t) - offset)` | Dynamic | Current position in the oscillation cycle (0° = max, 180° = min) |
+| UI Label | Variable | Coordinate System | Description |
+|----------|----------|-------------------|-------------|
+| **Ascending Node on Inv. Plane (Ω)** | `o.<planet>AscendingNodeInvPlaneEcliptic` | **Ecliptic** | Current ascending node longitude in ecliptic coordinates |
+| **Descending Node on Inv. Plane** | `(Ω + 180) % 360` | **Ecliptic** | Descending node = ascending node + 180° |
+| **Ω at Max Inclination** | Dynamic calculation | **Ecliptic** | Ascending node longitude where inclination reaches maximum, precesses at ~18,636 year rate |
+| **Current Oscillation Phase** | `(Ω(t) - offset)` | **ICRF** | Current position in the oscillation cycle (0° = max, 180° = min) |
 
-The first is a fixed constant; the second changes as the ascending node precesses.
+**Important (2025-01-03)**: The first three values use **ecliptic coordinates** (precession period ~18,636 years), while the oscillation phase uses **ICRF coordinates** (precession period ~99,392 years). This distinction is necessary because:
+- Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates
+- Height calculations must use ecliptic-rate ascending nodes to match
+- The oscillation phase tracks the physical motion in inertial space
 
 ### Pending
 
@@ -794,9 +799,10 @@ This approach reveals that:
 |------|---------|-------------|--------|
 | 2024-12-31 | 1.0 | Initial document with individual phase angles and L-L midpoint values | Claude (Opus 4.5) |
 | 2025-01-02 | 2.0 | **Major update**: Universal phase angles (203°/23°), exact J2000 optimized mean/amplitude values | Claude (Opus 4.5) |
+| 2025-01-03 | 2.1 | **Coordinate system update**: Updated UI Labels section to document ICRF vs Ecliptic distinction for planet stats panel values | Claude (Opus 4.5) |
 
 ---
 
 *Document created: 2024-12-31*
-*Last updated: 2025-01-02*
+*Last updated: 2025-01-03*
 *Part of the Holistic Universe Model documentation*

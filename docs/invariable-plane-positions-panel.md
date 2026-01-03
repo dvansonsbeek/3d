@@ -98,6 +98,24 @@ Angular Momentum Contributions:
 
 ## Implementation Details
 
+### Coordinate System: ICRF vs Ecliptic (2025-01-03)
+
+The height calculations require careful coordinate system handling:
+
+| Component | Coordinate System | Precession Rate |
+|-----------|-------------------|-----------------|
+| Visual markers (3D) | **ICRF** | ~99,392 years |
+| Height calculation | **Ecliptic** | ~18,636 years |
+| Planet stats labels | **Ecliptic** | ~18,636 years |
+
+**Key insight**: Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates. The height calculation must use the **ecliptic-rate ascending node** (`o.<planet>AscendingNodeInvPlaneEcliptic`) to produce correct above/below results when moving away from J2000.
+
+The `updatePlanetInvariablePlaneHeights()` function now maintains dual ascending node values:
+- `o.<planet>AscendingNodeInvPlane` - ICRF rate for visual marker positions
+- `o.<planet>AscendingNodeInvPlaneEcliptic` - Ecliptic rate for height calculations
+
+See [Souami&Souchay_planetary-invariable-plane-crossings.md](Souami&Souchay_planetary-invariable-plane-crossings.md#coordinate-systems-icrf-vs-ecliptic) for full details.
+
 ### Data Sources
 
 All data is already calculated each frame:
@@ -848,3 +866,4 @@ Souami, D. & Souchay, J. (2012). "The solar system's invariable plane." *Astrono
 | 2024-12-31 | 2.3 | Added dynamic calculation using precessing orbital elements (EclipticInclinationDynamic, AscendingNode) | Claude (Opus 4.5) |
 | 2025-01-01 | 2.4 | Removed dynamic calculation section - components removed from implementation per user request | Claude (Sonnet 4.5) |
 | 2025-01-03 | 2.5 | **SPICE ascending nodes**: Replaced JPL approximate values with SPICE ephemeris data, achieving 0.0001° accuracy (1.5786° vs S&S 1.5787°) | Claude (Opus 4.5) |
+| 2025-01-03 | 2.6 | **Coordinate system fix**: Added ICRF vs Ecliptic section - height calculations now use ecliptic-rate ascending nodes (~18,636 yr) for correct results away from J2000 | Claude (Opus 4.5) |
