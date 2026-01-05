@@ -30,7 +30,7 @@ This document describes how to visualize when each planet (including Earth) cros
 - Added `o.<planet>AscendingNodeInvPlaneSouamiSouchay` properties (dynamic, for comparison)
 - New function `updatePlanetInvariablePlaneHeights()` called every frame
 - Calculation uses: true anomaly, argument of periapsis, ecliptic ascending node, distance from Sun
-- Dynamic precession uses `<planet>PerihelionEclipticYears` constants
+- Dynamic precession uses `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth)
 - UI entries in planet label menus showing height and position relative to invariable plane
 - **Verified**: Earth crosses from below→above in early July, above→below in early January
 
@@ -280,28 +280,28 @@ The ascending nodes are **not fixed** - they precess over time.
 
 **Available Model Constants for Precession:**
 
-The perihelion precession periods are available as `<planet>PerihelionEclipticYears` constants:
+The perihelion precession periods are available as `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth):
 
 | Planet | Model Constant | Value (years) | Notes |
 |--------|---------------|---------------|-------|
-| Mercury | `mercuryPerihelionEclipticYears` | 243,580.394 | Explains ~570 arcsec/century |
-| Venus | `venusPerihelionEclipticYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
-| **Earth** | N/A | `holisticyearLength/3` = 99,392 | Direct orbital plane precession |
-| Mars | `marsPerihelionEclipticYears` | `holisticyearLength/3.666666` | Explains ~1600 arcsec/century |
-| Jupiter | `jupiterPerihelionEclipticYears` | `holisticyearLength` | Explains ~400 arcsec/century |
-| Saturn | `saturnPerihelionEclipticYears` | `holisticyearLength/5` | Explains ~2400 arcsec/century |
-| Uranus | `uranusPerihelionEclipticYears` | `holisticyearLength/3` | Explains ~1200 arcsec/century |
-| Neptune | `neptunePerihelionEclipticYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
-| Pluto | `plutoPerihelionEclipticYears` | `holisticyearLength*21` | TODO: verify |
-| Halley's | `halleysPerihelionEclipticYears` | `holisticyearLength*21` | TODO: verify |
-| Eros | `erosPerihelionEclipticYears` | `holisticyearLength*21` | TODO: verify |
+| Mercury | `mercuryPerihelionICRFYears` | 243,580.394 | Explains ~570 arcsec/century |
+| Venus | `venusPerihelionICRFYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
+| **Earth** | `earthPerihelionEclipticYears` | `holisticyearLength/3` = 99,392 | Direct orbital plane precession |
+| Mars | `marsPerihelionICRFYears` | `holisticyearLength/3.666666` | Explains ~1600 arcsec/century |
+| Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength` | Explains ~400 arcsec/century |
+| Saturn | `saturnPerihelionICRFYears` | `holisticyearLength/5` | Explains ~2400 arcsec/century |
+| Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | Explains ~1200 arcsec/century |
+| Neptune | `neptunePerihelionICRFYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
+| Pluto | `plutoPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
+| Halley's | `halleysPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
+| Eros | `erosPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
 
 **Formula for orbital plane precession period from perihelion precession:**
 ```javascript
 // For planets other than Earth:
 const orbitalPlanePrecessionYears = (((holisticyearLength/13) /
-  ((<planet>PerihelionEclipticYears) - (holisticyearLength/13))) *
-  (<planet>PerihelionEclipticYears));
+  ((<planet>PerihelionICRFYears) - (holisticyearLength/13))) *
+  (<planet>PerihelionICRFYears));
 
 // For Earth (directly available):
 const earthOrbitalPlanePrecessionYears = holisticyearLength / 3; // = 99,392 years
@@ -673,6 +673,6 @@ This document is part of a suite of related implementations:
 | 2024-12-19 | 1.1 | Updated with Souami & Souchay (2012) data: corrected ascending nodes, added precession periods, added scientific background | Claude (Opus 4.5) |
 | 2024-12-19 | 1.2 | Replaced hardcoded values with model constants: clarified `<planet>Inclination` vs `<planet>EclipticInclinationJ2000`, added constant tables for precession and orbital periods, updated implementation code to use proper constants | Claude (Opus 4.5) |
 | 2024-12-19 | 2.0 | **Phase 1 Implementation**: Added `updatePlanetInvariablePlaneHeights()` function, invariable plane ascending node constants, and `o.<planet>HeightAboveInvPlane` properties | Claude (Opus 4.5) |
-| 2024-12-19 | 2.1 | Added dynamic ascending node precession using `<planet>PerihelionEclipticYears` constants; verified July/January crossing dates via Souami & Souchay 2012 research | Claude (Opus 4.5) |
+| 2024-12-19 | 2.1 | Added dynamic ascending node precession using `<planet>PerihelionICRFYears` constants; verified July/January crossing dates via Souami & Souchay 2012 research | Claude (Opus 4.5) |
 | 2025-01-01 | 2.2 | Updated to use dynamic planet inclinations (`o.<planet>InvPlaneInclinationDynamic`) instead of fixed constants | Claude (Opus 4.5) |
 | 2025-01-03 | 2.3 | **Coordinate system fix**: Added ICRF vs Ecliptic section explaining dual ascending node values (~99,392 yr ICRF vs ~18,636 yr ecliptic), fixed height calculations, updated planet stats to show ecliptic coordinates | Claude (Opus 4.5) |

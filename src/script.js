@@ -94,7 +94,7 @@ const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (
 const mercuryMeanAnomaly = 156.6364301;
 const mercuryTrueAnomaly = 164.1669319;
 const mercuryAngleCorrection = 0.984416;                  // To align the perihelion exactly
-const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
+const mercuryPerihelionICRFYears = holisticyearLength/(1+(3/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
 const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
@@ -108,7 +108,7 @@ const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (
 const venusMeanAnomaly = 324.9668371;
 const venusTrueAnomaly = 324.5198504;
 const venusAngleCorrection = -2.78268;                    // To align the perihelion exactly
-const venusPerihelionEclipticYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~200 arcseconds per century
+const venusPerihelionICRFYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~200 arcseconds per century
 const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
@@ -122,7 +122,7 @@ const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (
 const marsMeanAnomaly = 109.2630844;
 const marsTrueAnomaly = 118.9501056;
 const marsAngleCorrection = -2.105382;                    // To align the perihelion exactly
-const marsPerihelionEclipticYears = holisticyearLength/4; // Duration of perihelion precession to explain ~1700 arcseconds per century
+const marsPerihelionICRFYears = holisticyearLength/4; // Duration of perihelion precession to explain ~1700 arcseconds per century
 const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
@@ -136,7 +136,7 @@ const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868
 const jupiterMeanAnomaly = 32.47179744;
 const jupiterTrueAnomaly = 35.69428061;
 const jupiterAngleCorrection = 1.097882;                  // To align the perihelion exactly
-const jupiterPerihelionEclipticYears = holisticyearLength/5;// Duration of perihelion precession to explain ~2000 arcseconds per century
+const jupiterPerihelionICRFYears = holisticyearLength/5;// Duration of perihelion precession to explain ~2000 arcseconds per century
 const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
@@ -150,7 +150,7 @@ const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856
 const saturnMeanAnomaly = 325.663876;
 const saturnTrueAnomaly = 321.7910116;
 const saturnAngleCorrection = -0.175427;                  // To align the perihelion exactly
-const saturnPerihelionEclipticYears = -holisticyearLength/8; // Duration of perihelion precession to explain ~-3800 arcseconds per century
+const saturnPerihelionICRFYears = -holisticyearLength/8; // Duration of perihelion precession to explain ~-3800 arcseconds per century
 const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
@@ -164,7 +164,7 @@ const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (
 const uranusMeanAnomaly = 145.7292678;
 const uranusTrueAnomaly = 148.5142459;
 const uranusAngleCorrection = -0.773944;                  // To align the perihelion exactly
-const uranusPerihelionEclipticYears = holisticyearLength/3; // Duration of perihelion precession to explain ~1200 arcseconds per century
+const uranusPerihelionICRFYears = holisticyearLength/3; // Duration of perihelion precession to explain ~1200 arcseconds per century
 const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
@@ -178,7 +178,7 @@ const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (
 const neptuneMeanAnomaly = 262.5003424;
 const neptuneTrueAnomaly = 261.2242728;
 const neptuneAngleCorrection = 2.401029;                  // To align the perihelion exactly
-const neptunePerihelionEclipticYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~-400 arcseconds per century
+const neptunePerihelionICRFYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneStartpos = 47.917;                           // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
 //*************************************************************
@@ -196,7 +196,7 @@ const plutoAscendingNode = 110.30393;            // JPL Horizons J2000 (was 110.
 const plutoMeanAnomaly = 15.55009;               // JPL Horizons J2000 (was 15.83341625)
 const plutoTrueAnomaly = 26.31965048;            // Calculated from M=15.55009°, e=0.2488273 (was 26.51719941)
 const plutoAngleCorrection = 2.469386;           // To align the perihelion exactly
-const plutoPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const plutoPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const plutoStartpos = 71.555;                    // Needs to be at ~16h44m12.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Halleys
@@ -210,7 +210,7 @@ const halleysAscendingNode = 58.42008;           // JPL Horizons J2000 (was 59.5
 const halleysMeanAnomaly = 38.77481;             // JPL Horizons J2000 (was 13, TODO placeholder)
 const halleysTrueAnomaly = 166.26774708;         // Calculated from M=38.77481°, e=0.96714291 (was 13 placeholder)
 const halleysAngleCorrection = -1.619784;        // To align the perihelion exactly
-const halleysPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const halleysPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const halleysStartpos = 80;                      // Needs to be at ~08h43m12.79 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Eros
@@ -224,7 +224,7 @@ const erosAscendingNode = 304.30993;             // JPL Horizons J2000 (was 304.
 const erosMeanAnomaly = 320.21552;               // JPL Horizons J2000 (was 153.67797646)
 const erosTrueAnomaly = 299.91713740;            // Calculated from M=320.21552°, e=0.2229512 (was 162.69081884)
 const erosAngleCorrection = 0.048021;            // To align the perihelion exactly
-const erosPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
+const erosPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const erosStartpos = 57.402;                     // Needs to be at ~20h38m24.47 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Ceres
@@ -238,7 +238,7 @@ const ceresAscendingNode = 80.30533;             // JPL Horizons J2000
 const ceresMeanAnomaly = 95.98772;               // JPL Horizons J2000
 const ceresTrueAnomaly = 104.48097667;           // Calculated from M=95.98772°, e=0.0755347
 const ceresAngleCorrection = 0;                  // To align the perihelion exactly
-const ceresPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession
+const ceresPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession
 const ceresOrbitDistance = 2.76596;              // JPL Horizons J2000
 
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
@@ -295,7 +295,7 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 //
 // We use the Laplace-Lagrange derived amplitudes as they represent the full
 // oscillation envelope are based on analytical eigenmode calculations.
-// The period for each planet equals its <planet>PerihelionEclipticYears constant.
+// The period for each planet equals its <planet>PerihelionICRFYears constant (earthPerihelionEclipticYears for Earth).
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
@@ -1270,7 +1270,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: mercuryAscendingNode,          // Fixed J2000 ascending node
       mass: M_MERCURY,
       period_days: (holisticyearLength / mercurySolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears)
     },
     {
       name: 'Venus',
@@ -1280,7 +1280,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: venusAscendingNode,            // Fixed J2000 ascending node
       mass: M_VENUS,
       period_days: (holisticyearLength / venusSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears)
     },
     {
       name: 'Earth',
@@ -1300,7 +1300,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: marsAscendingNode,             // Fixed J2000 ascending node
       mass: M_MARS,
       period_days: (holisticyearLength / marsSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears)
     },
     {
       name: 'Jupiter',
@@ -1310,7 +1310,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: jupiterAscendingNode,          // Fixed J2000 ascending node
       mass: M_JUPITER,
       period_days: (holisticyearLength / jupiterSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears)
     },
     {
       name: 'Saturn',
@@ -1320,7 +1320,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: saturnAscendingNode,           // Fixed J2000 ascending node
       mass: M_SATURN,
       period_days: (holisticyearLength / saturnSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears)
     },
     {
       name: 'Uranus',
@@ -1330,7 +1330,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: uranusAscendingNode,           // Fixed J2000 ascending node
       mass: M_URANUS,
       period_days: (holisticyearLength / uranusSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears)
     },
     {
       name: 'Neptune',
@@ -1340,7 +1340,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: neptuneAscendingNode,          // Fixed J2000 ascending node
       mass: M_NEPTUNE,
       period_days: (holisticyearLength / neptuneSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears)
     },
     {
       name: 'Pluto',
@@ -1350,7 +1350,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: plutoAscendingNode,            // Fixed J2000 ascending node
       mass: M_PLUTO,
       period_days: (holisticyearLength / plutoSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears)
     },
     {
       name: 'Halleys',
@@ -1360,7 +1360,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: halleysAscendingNode,          // Fixed J2000 ascending node
       mass: M_HALLEYS,
       period_days: (holisticyearLength / halleysSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears)
     },
     {
       name: 'Eros',
@@ -1370,7 +1370,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: erosAscendingNode,             // Fixed J2000 ascending node
       mass: M_EROS,
       period_days: (holisticyearLength / erosSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears)
     }
   ];
 }
@@ -2032,7 +2032,7 @@ const moon = {
 const mercuryPerihelionDurationEcliptic1 = {
   name: "Mercury Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/mercuryPerihelionEclipticYears,
+  speed: Math.PI*2/mercuryPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2081,7 +2081,7 @@ const mercuryPerihelionFromEarth = {
 const mercuryPerihelionDurationEcliptic2 = {
   name: "Mercury Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/mercuryPerihelionEclipticYears,
+  speed: -Math.PI*2/mercuryPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2175,7 +2175,7 @@ const mercury = {
 const venusPerihelionDurationEcliptic1 = {
   name: "Venus Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/venusPerihelionEclipticYears,
+  speed: Math.PI*2/venusPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2224,7 +2224,7 @@ const venusPerihelionFromEarth = {
 const venusPerihelionDurationEcliptic2 = {
   name: "Venus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/venusPerihelionEclipticYears,
+  speed: -Math.PI*2/venusPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2318,7 +2318,7 @@ const venus = {
 const marsPerihelionDurationEcliptic1 = {
   name: "Mars Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/marsPerihelionEclipticYears,
+  speed: Math.PI*2/marsPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2367,7 +2367,7 @@ const marsPerihelionFromEarth = {
 const marsPerihelionDurationEcliptic2 = {
   name: "Mars Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/marsPerihelionEclipticYears,
+  speed: -Math.PI*2/marsPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2461,7 +2461,7 @@ const mars = {
 const jupiterPerihelionDurationEcliptic1 = {
   name: "Jupiter Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/jupiterPerihelionEclipticYears,
+  speed: Math.PI*2/jupiterPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2510,7 +2510,7 @@ const jupiterPerihelionFromEarth = {
 const jupiterPerihelionDurationEcliptic2 = {
   name: "Jupiter Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/jupiterPerihelionEclipticYears,
+  speed: -Math.PI*2/jupiterPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2609,7 +2609,7 @@ const jupiter = {
 const saturnPerihelionDurationEcliptic1 = {
   name: "Saturn Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/saturnPerihelionEclipticYears,
+  speed: Math.PI*2/saturnPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2658,7 +2658,7 @@ const saturnPerihelionFromEarth = {
 const saturnPerihelionDurationEcliptic2 = {
   name: "Saturn Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/saturnPerihelionEclipticYears,
+  speed: -Math.PI*2/saturnPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2757,7 +2757,7 @@ const saturn = {
 const uranusPerihelionDurationEcliptic1 = {
   name: "Uranus Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/uranusPerihelionEclipticYears,
+  speed: Math.PI*2/uranusPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2806,7 +2806,7 @@ const uranusPerihelionFromEarth = {
 const uranusPerihelionDurationEcliptic2 = {
   name: "Uranus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/uranusPerihelionEclipticYears,
+  speed: -Math.PI*2/uranusPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2905,7 +2905,7 @@ const uranus = {
 const neptunePerihelionDurationEcliptic1 = {
   name: "Neptune Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/neptunePerihelionEclipticYears,
+  speed: Math.PI*2/neptunePerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -2954,7 +2954,7 @@ const neptunePerihelionFromEarth = {
 const neptunePerihelionDurationEcliptic2 = {
   name: "Neptune Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/neptunePerihelionEclipticYears,
+  speed: -Math.PI*2/neptunePerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3058,7 +3058,7 @@ const neptune = {
 const plutoPerihelionDurationEcliptic1 = {
   name: "Pluto Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/plutoPerihelionEclipticYears,
+  speed: Math.PI*2/plutoPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3107,7 +3107,7 @@ const plutoPerihelionFromEarth = {
 const plutoPerihelionDurationEcliptic2 = {
   name: "Pluto Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/plutoPerihelionEclipticYears,
+  speed: -Math.PI*2/plutoPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3201,7 +3201,7 @@ const pluto = {
 const halleysPerihelionDurationEcliptic1 = {
   name: "Halleys Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/halleysPerihelionEclipticYears,
+  speed: Math.PI*2/halleysPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3250,7 +3250,7 @@ const halleysPerihelionFromEarth = {
 const halleysPerihelionDurationEcliptic2 = {
   name: "Halleys Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/halleysPerihelionEclipticYears,
+  speed: -Math.PI*2/halleysPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3346,7 +3346,7 @@ const halleys = {
 const erosPerihelionDurationEcliptic1 = {
   name: "Eros Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/erosPerihelionEclipticYears,
+  speed: Math.PI*2/erosPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3395,7 +3395,7 @@ const erosPerihelionFromEarth = {
 const erosPerihelionDurationEcliptic2 = {
   name: "Eros Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/erosPerihelionEclipticYears,
+  speed: -Math.PI*2/erosPerihelionICRFYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -5458,14 +5458,8 @@ function updateSunCenteredInvPlane() {
     maxInclLocalPos.add(orbitCenter);
     maxInclMarker.position.copy(maxInclLocalPos);
 
-    // Calculate max inclination point in ecliptic coordinates
-    // The phaseOffset (203° or 23°) is fixed in ICRF, but appears to precess in ecliptic coords
-    const yearsSinceJ2000 = o.currentYear - 2000.5;
-    const precessionRateEcliptic = 360 / ascNodeInvPlaneEclipticYears;
-    const maxInclEclipticDeg = ((phaseOffset + precessionRateEcliptic * yearsSinceJ2000) % 360 + 360) % 360;
-
-    // Update label with ICRF value and ecliptic value
-    maxInclLabelDiv.innerHTML = `<span style="font-size:14px;">▲</span><br><span style="font-size:9px;">MAX i</span><br><span style="font-size:10px;color:#ffff88;">${maxInclEclipticDeg.toFixed(1)}°</span>`;
+    // Update label with fixed ICRF phase offset value
+    maxInclLabelDiv.innerHTML = `<span style="font-size:14px;">▲</span><br><span style="font-size:9px;">MAX i</span><br><span style="font-size:10px;color:#ffff88;">${phaseOffset.toFixed(0)}°</span>`;
   } else {
     // Hide marker for Earth or planets without phase offset data
     maxInclMarker.visible = false;
@@ -13599,22 +13593,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => mercuryPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(mercuryPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => mercuryPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(mercuryPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(mercuryPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(mercuryPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -13959,22 +13953,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => venusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(venusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => venusPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(venusPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(venusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(venusPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -14286,22 +14280,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => marsPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(marsPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => marsPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(marsPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(marsPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(marsPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -14604,22 +14598,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => jupiterPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(jupiterPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => jupiterPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(jupiterPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(jupiterPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(jupiterPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -14931,22 +14925,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => saturnPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(saturnPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => saturnPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(saturnPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(saturnPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(saturnPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -15258,22 +15252,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => uranusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(uranusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => uranusPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(uranusPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(uranusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(uranusPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -15585,22 +15579,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => neptunePerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(neptunePerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => neptunePerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(neptunePerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(neptunePerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(neptunePerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -15911,22 +15905,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => plutoPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(plutoPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => plutoPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(plutoPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(plutoPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(plutoPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('pluto'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -16215,22 +16209,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => halleysPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(halleysPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => halleysPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(halleysPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(halleysPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(halleysPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('halleys'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -16519,22 +16513,22 @@ const planetStats = {
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
-      {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => erosPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
-       static: true},
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(erosPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
+       value : [ { v: () => erosPerihelionICRFYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution in the inertial ICRF frame`],
+       static: true},
+      {label : () => `Perihelion Precession Duration against Ecliptic`,
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(erosPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Ecliptic)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
-       hover : [`1,296,000 / ${fmtNum(erosPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
+       hover : [`1,296,000 / ${fmtNum(erosPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('eros'), dec:2, sep:',' },{ small: 'arcsec/century' }],
@@ -18591,7 +18585,7 @@ function updatePlanetAnomalies() {
  * Height = sin(inclination_to_inv_plane) * sin(angle_from_ascending_node) * distance
  *
  * The ascending nodes on the invariable plane precess over time.
- * Precession rates use <planet>PerihelionEclipticYears constants.
+ * Precession rates use <planet>PerihelionICRFYears constants (earthPerihelionEclipticYears for Earth).
  *
  * Called each frame after updatePlanetAnomalies().
  *
@@ -18605,19 +18599,19 @@ function updatePlanetInvariablePlaneHeights() {
 
   // Planet configuration for invariable plane calculations
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
-  // Precession uses <planet>PerihelionEclipticYears constants
+  // Precession uses <planet>PerihelionICRFYears constants (earthPerihelionEclipticYears for Earth)
   const planets = [
-    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionEclipticYears },
-    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
+    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionICRFYears },
+    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionICRFYears },
     { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionEclipticYears },
-    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
-    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionEclipticYears },
-    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionEclipticYears },
-    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || uranusInvPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionEclipticYears },
-    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || neptuneInvPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionEclipticYears },
-    { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || plutoInvPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionEclipticYears },
-    { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || halleysInvPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionEclipticYears },
-    { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
+    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionICRFYears },
+    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionICRFYears },
+    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionICRFYears },
+    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || uranusInvPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionICRFYears },
+    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || neptuneInvPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionICRFYears },
+    { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || plutoInvPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionICRFYears },
+    { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || halleysInvPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionICRFYears },
+    { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionICRFYears }
   ];
 
   for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planets) {
@@ -19796,14 +19790,14 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
   // Planet precession periods (same period governs nodal precession and inclination oscillation)
   const periods = {
-    mercury: mercuryPerihelionEclipticYears,
-    venus: venusPerihelionEclipticYears,
-    mars: marsPerihelionEclipticYears,
-    jupiter: jupiterPerihelionEclipticYears,
-    saturn: saturnPerihelionEclipticYears,  // Negative = retrograde
-    uranus: uranusPerihelionEclipticYears,
-    neptune: neptunePerihelionEclipticYears,  // Negative = retrograde
-    pluto: plutoPerihelionEclipticYears
+    mercury: mercuryPerihelionICRFYears,
+    venus: venusPerihelionICRFYears,
+    mars: marsPerihelionICRFYears,
+    jupiter: jupiterPerihelionICRFYears,
+    saturn: saturnPerihelionICRFYears,  // Negative = retrograde
+    uranus: uranusPerihelionICRFYears,
+    neptune: neptunePerihelionICRFYears,  // Negative = retrograde
+    pluto: plutoPerihelionICRFYears
   };
 
   // J2000 ascending nodes on invariable plane

@@ -189,20 +189,20 @@ Both use the same period because they represent the same physical precession of 
 
 ### Implication for Other Planets
 
-**The inclination oscillation period for each planet should equal its `<planet>PerihelionEclipticYears` constant.**
+**The inclination oscillation period for each planet should equal its `<planet>PerihelionICRFYears` constant (`earthPerihelionEclipticYears` for Earth).**
 
 This means we don't need separate period constants — we reuse the existing precession periods:
 
 | Planet | Precession Period | Variable |
 |--------|-------------------|----------|
-| Mercury | 242,268 years | `mercuryPerihelionEclipticYears` |
-| Venus | ~6×10¹² years | `venusPerihelionEclipticYears` (nearly fixed) |
+| Mercury | 242,268 years | `mercuryPerihelionICRFYears` |
+| Venus | ~6×10¹² years | `venusPerihelionICRFYears` (nearly fixed) |
 | Earth | 99,392 years | `earthPerihelionEclipticYears` |
-| Mars | 74,544 years | `marsPerihelionEclipticYears` |
-| Jupiter | 298,176 years | `jupiterPerihelionEclipticYears` |
-| Saturn | -298,176 years | `saturnPerihelionEclipticYears` (retrograde) |
-| Uranus | 99,392 years | `uranusPerihelionEclipticYears` |
-| Neptune | -298,176 years | `neptunePerihelionEclipticYears` (retrograde) |
+| Mars | 74,544 years | `marsPerihelionICRFYears` |
+| Jupiter | 298,176 years | `jupiterPerihelionICRFYears` |
+| Saturn | -298,176 years | `saturnPerihelionICRFYears` (retrograde) |
+| Uranus | 99,392 years | `uranusPerihelionICRFYears` |
+| Neptune | -298,176 years | `neptunePerihelionICRFYears` (retrograde) |
 
 **Note:** Negative periods indicate retrograde precession (clockwise when viewed from north).
 
@@ -296,7 +296,7 @@ This approach mirrors exactly how Earth is already handled:
 |-----------|-------|---------------|
 | **Mean inclination** | `earthInvPlaneInclinationMean` | `<planet>Inclination` (existing) |
 | **Amplitude** | `earthInvPlaneInclinationAmplitude` | `<planet>InvPlaneInclinationAmplitude` (NEW) |
-| **Period** | `earthPerihelionEclipticYears` | `<planet>PerihelionEclipticYears` (existing) |
+| **Period** | `earthPerihelionEclipticYears` | `<planet>PerihelionICRFYears` (existing) |
 | **Phase reference** | `balancedYear` | Same `balancedYear` or planet-specific |
 
 ### Dynamic Calculation Function
@@ -314,7 +314,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Get constants (example for Saturn)
   const i_mean = saturnInvPlaneInclinationMean;           // 0.9085° (Laplace-Lagrange midpoint)
   const amplitude = saturnInvPlaneInclinationAmplitude;   // 0.112° (half of range)
-  const period = saturnPerihelionEclipticYears;   // -298176 years (retrograde)
+  const period = saturnPerihelionICRFYears;   // -298176 years (retrograde)
   const ascNodeJ2000 = saturnAscendingNodeInvPlaneVerified;  // 119.04°
   const phaseOffset = saturnInclinationPhaseAngle;          // 200.5°
 
@@ -462,7 +462,7 @@ A_typical = |di/dt|_planet_own × |P| / (2π × 0.7)
 
 Using the data:
 - **Observed rates**: From JPL Table 1 (°/century)
-- **Periods**: From existing `<planet>PerihelionEclipticYears` constants
+- **Periods**: From existing `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth)
 - **Earth effect**: Estimated from model (needs numerical calculation)
 
 #### Simplified Approach: Use Observed Rates Directly
@@ -571,7 +571,7 @@ This refinement can be done after the initial implementation to verify and tune 
    - **Ω-based approach**: Inclination phase linked to ascending node position
    - Formula: `i(t) = mean + A × cos(Ω(t) - phaseAngle)`
    - At J2000: Returns exact J2000 invariable plane inclination
-   - Uses planet-specific precession periods from `<planet>PerihelionEclipticYears`
+   - Uses planet-specific precession periods from `<planet>PerihelionICRFYears`
    - Handles retrograde precession (Saturn) correctly with 23° phase angle
 
 4. ✅ **Updated `updateDynamicInclinations()`** to compute `o.<planet>InvPlaneInclinationDynamic` values
@@ -745,7 +745,7 @@ This approach reveals that:
 ║  │  ─────────────────────────────────────────────────────────────────────  │ ║
 ║  │  Ω(t) = Ω_J2000 + (360° / period) × (t - 2000)                         │ ║
 ║  │                                                                         │ ║
-║  │  Period = <planet>PerihelionEclipticYears                              │ ║
+║  │  Period = <planet>PerihelionICRFYears                                  │ ║
 ║  │  (Negative period = retrograde precession)                              │ ║
 ║  └─────────────────────────────────────────────────────────────────────────┘ ║
 ║                              ↕ GEOMETRICALLY LINKED ↕                        ║

@@ -95,7 +95,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `{planet}Speed` | varies km/h | Mean orbital velocity |
 | `{planet}SolarYearCount` | derived | Number of orbits in Holistic-Year |
 | `{planet}PerihelionICRF` | varies | Perihelion precession period |
-| `{planet}PerihelionEclipticYears` | varies | Perihelion precession cycle length against ecliptic |
+| `{planet}PerihelionICRFYears` | varies | Perihelion precession cycle length against ICRF (use `earthPerihelionEclipticYears` for Earth) |
 | `{planet}AngleCorrection` | varies | Alignment correction angle |
 | `{planet}Tilt` | 0.034° | Axial tilt |
 | `{planet}RotationPeriod` | 1407.6 hours | Sidereal rotation period |
