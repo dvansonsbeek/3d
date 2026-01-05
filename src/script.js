@@ -136,7 +136,7 @@ const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868
 const jupiterMeanAnomaly = 32.47179744;
 const jupiterTrueAnomaly = 35.69428061;
 const jupiterAngleCorrection = 1.097882;                  // To align the perihelion exactly
-const jupiterPerihelionEclipticYears = holisticyearLength;// Duration of perihelion precession to explain ~400 arcseconds per century
+const jupiterPerihelionEclipticYears = holisticyearLength/5;// Duration of perihelion precession to explain ~2000 arcseconds per century
 const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
@@ -150,7 +150,7 @@ const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856
 const saturnMeanAnomaly = 325.663876;
 const saturnTrueAnomaly = 321.7910116;
 const saturnAngleCorrection = -0.175427;                  // To align the perihelion exactly
-const saturnPerihelionEclipticYears = -holisticyearLength/6; // Duration of perihelion precession to explain ~-400 arcseconds per century
+const saturnPerihelionEclipticYears = -holisticyearLength/8; // Duration of perihelion precession to explain ~-3800 arcseconds per century
 const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
@@ -316,13 +316,13 @@ const marsInvPlaneInclinationAmplitude = 2.236774;  // Range: 1.37° to 5.84°
 
 // Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
 // J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength, trend error: 12.3"/cy
-const jupiterInvPlaneInclinationMean = 0.363600;
-const jupiterInvPlaneInclinationAmplitude = 0.122496;  // Range: 0.24° to 0.49°
+const jupiterInvPlaneInclinationMean = 0.348015;
+const jupiterInvPlaneInclinationAmplitude = 0.076642;  // Range: 0.24° to 0.49°
 
 // Saturn: Range 0.43° to 1.53° (expanded from Laplace-Lagrange)
 // J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/6, trend error: 0.0"/cy
-const saturnInvPlaneInclinationMean = 0.943300;
-const saturnInvPlaneInclinationAmplitude = 0.175828;  // Range: 0.77° to 1.12°
+const saturnInvPlaneInclinationMean = 0.935080;
+const saturnInvPlaneInclinationAmplitude = 0.094763;  // Range: 0.77° to 1.12°
 
 // Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
 // J2000=0.9946692° (EXACT), phase 203°, period holisticyearLength/3, trend error: 1.0"/cy
@@ -11131,17 +11131,15 @@ async function runRATest() {
     const neptunePhaseAngle = (o.neptuneAscendingNodeInvPlane - neptuneInclinationPhaseAngle + 360) % 360;
     const neptuneInvPlaneIncl = o.neptuneInvPlaneInclinationDynamic;
 
-    // Ascending node at max inclination (ecliptic coords) - same as "Ω at Max Inclination" in planet stats
-    const eclipticPrecessionRate = 360 / ascNodeInvPlaneEclipticYears;
-    const yearsSinceJ2000 = o.currentYear - 2000.5;
-    const mercuryAscInvMaxIncl = ((mercuryInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const venusAscInvMaxIncl = ((venusInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const earthAscInvMaxIncl = ((earthInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const marsAscInvMaxIncl = ((marsInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const jupiterAscInvMaxIncl = ((jupiterInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const saturnAscInvMaxIncl = ((saturnInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const uranusAscInvMaxIncl = ((uranusInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
-    const neptuneAscInvMaxIncl = ((neptuneInclinationPhaseAngle + eclipticPrecessionRate * yearsSinceJ2000) % 360 + 360) % 360;
+    // Ascending node at max inclination - fixed ICRF values (phase angle offsets)
+    const mercuryAscInvMaxIncl = mercuryInclinationPhaseAngle;
+    const venusAscInvMaxIncl = venusInclinationPhaseAngle;
+    const earthAscInvMaxIncl = earthInclinationPhaseAngle;
+    const marsAscInvMaxIncl = marsInclinationPhaseAngle;
+    const jupiterAscInvMaxIncl = jupiterInclinationPhaseAngle;
+    const saturnAscInvMaxIncl = saturnInclinationPhaseAngle;
+    const uranusAscInvMaxIncl = uranusInclinationPhaseAngle;
+    const neptuneAscInvMaxIncl = neptuneInclinationPhaseAngle;
 
     const plutoPer     = o.plutoPerihelion;
     const halleysPer   = o.halleysPerihelion;
@@ -12821,8 +12819,8 @@ const planetStats = {
        value : [ { v: () => (o.earthAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((earthInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where Earth's inclination to the invariable plane reaches maximum. Fixed at 203° in ICRF, precesses in ecliptic coords.`]},
+       value : [ { v: () => earthInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Earth's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.earthAscendingNodeInvPlane - earthInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current position in inclination oscillation cycle: (Ω - offset). 0°=max incl (2.059°), 180°=min incl (0.931°)`]},
@@ -13519,8 +13517,8 @@ const planetStats = {
        value : [ { v: () => (o.mercuryAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((mercuryInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Mercury's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => mercuryInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Mercury's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.mercuryAscendingNodeInvPlane - mercuryInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -13879,8 +13877,8 @@ const planetStats = {
        value : [ { v: () => (o.venusAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((venusInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Venus's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => venusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Venus's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.venusAscendingNodeInvPlane - venusInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -14206,8 +14204,8 @@ const planetStats = {
        value : [ { v: () => (o.marsAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((marsInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Mars's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => marsInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Mars's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.marsAscendingNodeInvPlane - marsInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -14526,8 +14524,8 @@ const planetStats = {
        value : [ { v: () => (o.jupiterAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((jupiterInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Jupiter's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => jupiterInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Jupiter's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.jupiterAscendingNodeInvPlane - jupiterInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -14851,8 +14849,8 @@ const planetStats = {
        value : [ { v: () => (o.saturnAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((saturnInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Saturn's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => saturnInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Saturn's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.saturnAscendingNodeInvPlane - saturnInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -15178,8 +15176,8 @@ const planetStats = {
        value : [ { v: () => (o.uranusAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((uranusInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Uranus's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => uranusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Uranus's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.uranusAscendingNodeInvPlane - uranusInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -15505,8 +15503,8 @@ const planetStats = {
        value : [ { v: () => (o.neptuneAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((neptuneInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Neptune's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => neptuneInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Neptune's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.neptuneAscendingNodeInvPlane - neptuneInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -15831,8 +15829,8 @@ const planetStats = {
        value : [ { v: () => (o.plutoAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => ((plutoInclinationPhaseAngle + (360 / ascNodeInvPlaneEclipticYears) * (o.currentYear - 2000.5)) % 360 + 360) % 360, dec:1, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude of ascending node at which Pluto's inclination to the invariable plane reaches maximum.`]},
+       value : [ { v: () => plutoInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`Fixed ICRF longitude where Pluto's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.plutoAscendingNodeInvPlane - plutoInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Current phase in the inclination oscillation cycle: Ω(t) - offset. When phase = 0°, inclination is at maximum. When phase = 180°, inclination is at minimum.`]},
@@ -18637,8 +18635,8 @@ function updatePlanetInvariablePlaneHeights() {
     const ascNodeDynamicVerified = ((rawVerified % 360) + 360) % 360;
 
     // Calculate ascending node in ECLIPTIC coords (for height calculation)
-    // Uses apparent precession rate of ~18,636 years (how fast the node appears to move in precessing ecliptic coords)
-    const precessionRateEcliptic = 360 / ascNodeInvPlaneEclipticYears;
+    // Uses each planet's own ecliptic precession rate (e.g., Saturn = -49,696 years retrograde)
+    const precessionRateEcliptic = 360 / precessionYears;
     const rawEcliptic = ascNodeJ2000Verified + precessionRateEcliptic * yearsSinceJ2000;
     const ascNodeDynamicEcliptic = ((rawEcliptic % 360) + 360) % 360;
 
