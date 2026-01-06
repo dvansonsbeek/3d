@@ -58,7 +58,7 @@ const deltaTStart = 63.63;                                // Formula only ; usag
 const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
 const earthPerihelionEclipticYears = holisticyearLength/3;// Duration of Earth's orbital plane precession ~99,392 years against ICRF
 const ascNodeInvPlaneEclipticYears = holisticyearLength/16; // Apparent precession rate in ecliptic coords ~18,636 years (combined ICRF + ecliptic precession)
-const inclinationPathZodiacOffsetDeg = 7;                 // Visual calibration offset for inclination path alignment with zodiac. Shifts the path 7° counterclockwise so lowest inclination appears in early Libra
+const inclinationPathZodiacOffsetDeg = 187;               // Phase offset for inclination path alignment. Based on earthInclinationPhaseAngle (203°) minus 16° for zodiac alignment
 
 // Debg button on flag (set to true when needed)
 const debugOn = false;
@@ -315,14 +315,14 @@ const marsInvPlaneInclinationMean = 3.603200;
 const marsInvPlaneInclinationAmplitude = 2.236774;  // Range: 1.37° to 5.84°
 
 // Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
-// J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength, trend error: 12.3"/cy
+// J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength/5, trend error: 12.3"/cy
 const jupiterInvPlaneInclinationMean = 0.348015;
-const jupiterInvPlaneInclinationAmplitude = 0.076642;  // Range: 0.24° to 0.49°
+const jupiterInvPlaneInclinationAmplitude = 0.076642;  // Range: 0.27° to 0.43°
 
 // Saturn: Range 0.43° to 1.53° (expanded from Laplace-Lagrange)
-// J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/6, trend error: 0.0"/cy
+// J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
 const saturnInvPlaneInclinationMean = 0.935080;
-const saturnInvPlaneInclinationAmplitude = 0.094763;  // Range: 0.77° to 1.12°
+const saturnInvPlaneInclinationAmplitude = 0.094763;  // Range: 0.84° to 1.03°
 
 // Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
 // J2000=0.9946692° (EXACT), phase 203°, period holisticyearLength/3, trend error: 1.0"/cy
@@ -369,7 +369,7 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 
 const mercuryInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.5"/cy
 const venusInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 22.3"/cy
-const earthInclinationPhaseAngle = 23;     // prograde, decreasing trend (reference)
+const earthInclinationPhaseAngle = 203;    // prograde, decreasing trend (reference)
 const marsInclinationPhaseAngle = 203;     // prograde, decreasing trend, error: 13.1"/cy
 const jupiterInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 12.3"/cy
 const saturnInclinationPhaseAngle = 23;    // RETROGRADE, increasing trend, error: 0.0"/cy
