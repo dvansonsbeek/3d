@@ -56,9 +56,8 @@ const speedofSuninKM = 107225.047767317;                  // Formula only
 const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
-const earthPerihelionEclipticYears = holisticyearLength/3;// Duration of Earth's orbital plane precession ~99,392 years against ICRF
+const earthPerihelionICRFYears = holisticyearLength/3;    // Duration of Earth's orbital plane precession ~99,392 years against ICRF
 const ascNodeInvPlaneEclipticYears = holisticyearLength/16; // Apparent precession rate in ecliptic coords ~18,636 years (combined ICRF + ecliptic precession)
-const inclinationPathZodiacOffsetDeg = 187;               // Phase offset for inclination path alignment. Based on earthInclinationPhaseAngle (203°) minus 16° for zodiac alignment
 
 // Debg button on flag (set to true when needed)
 const debugOn = false;
@@ -295,7 +294,7 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 //
 // We use the Laplace-Lagrange derived amplitudes as they represent the full
 // oscillation envelope are based on analytical eigenmode calculations.
-// The period for each planet equals its <planet>PerihelionICRFYears constant (earthPerihelionEclipticYears for Earth).
+// The period for each planet equals its <planet>PerihelionICRFYears constant (earthPerihelionICRFYears for Earth).
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
@@ -379,6 +378,13 @@ const plutoInclinationPhaseAngle = 203;    // prograde, decreasing trend, error:
 const halleysInclinationPhaseAngle = 23;   // RETROGRADE (estimated)
 const erosInclinationPhaseAngle = 203;     // prograde (estimated)
 const ceresInclinationPhaseAngle = 203;    // prograde (estimated)
+
+// Derived phase offset for inclination path alignment with zodiac
+// The earthInvPlaneInclinationMean correction accounts for the projection offset when measuring
+// angles across two planes (ecliptic vs invariable plane) - the compound angle geometry
+// causes a systematic offset approximately equal to the mean inclination.
+// Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - earthInvPlaneInclinationMean
+const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - earthInvPlaneInclinationMean;
 
 // Really fixed values
 const diameters = {
@@ -1290,7 +1296,7 @@ function getPlanetPerturbationData(oRef) {
       omega_deg: 0,                             // Reference point
       mass: M_EARTH,
       period_days: meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
     },
     {
       name: 'Mars',
@@ -4518,21 +4524,30 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   const group = new THREE.Group();
   group.name = 'InvariablePlaneVisualization';
 
-  const MEAN_INCLINATION_RAD = earthInvPlaneInclinationMean * Math.PI / 180;
+  // Use the same orientation logic as the Sun-centered invariable plane
+  // Apply quaternion directly to the main group (like Sun-centered does)
+  // The orientation will be updated dynamically in updateInvariablePlanePosition()
+  const earthI = earthInvPlaneInclinationMean * Math.PI / 180;
+  const earthOmega = earthAscendingNodeInvPlaneVerified * Math.PI / 180;
 
-  // Phase offset to align HIGH/LOW/MEAN markers with zodiac signs
-  // Uses global inclinationPathZodiacOffsetDeg constant
-  const MARKER_PHASE_OFFSET = inclinationPathZodiacOffsetDeg * Math.PI / 180;
+  // Calculate tilt axis (line of nodes - points toward ascending node)
+  const tiltAxisX = Math.cos(earthOmega);
+  const tiltAxisZ = Math.sin(earthOmega);
+  const tiltAxis = new THREE.Vector3(tiltAxisX, 0, tiltAxisZ).normalize();
 
-  // Grid helper (tilted to represent invariable plane) - fewer divisions for performance
-  // Use a more visible purple/magenta color to distinguish from ecliptic
+  // Create quaternion to rotate around the tilt axis
+  // Apply to main group directly (not a subgroup) - same as Sun-centered plane
+  const quaternion = new THREE.Quaternion();
+  quaternion.setFromAxisAngle(tiltAxis, earthI);
+  group.quaternion.copy(quaternion);
+
+  // Grid helper - flat in the group, orientation applied via quaternion on group
   const gridHelper = new THREE.GridHelper(size, divisions, 0xaa44aa, 0x663366);
   gridHelper.material.opacity = 0.4;
   gridHelper.material.transparent = true;
-  gridHelper.rotation.x = -MEAN_INCLINATION_RAD; // Tilt DOWN from ecliptic
   group.add(gridHelper);
 
-  // Solid disc for better visibility (fewer segments) - purple tint
+  // Solid disc for better visibility
   const discGeometry = new THREE.CircleGeometry(size / 2, 32);
   const discMaterial = new THREE.MeshBasicMaterial({
     color: 0x8844aa,
@@ -4541,7 +4556,7 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
     side: THREE.DoubleSide
   });
   const disc = new THREE.Mesh(discGeometry, discMaterial);
-  disc.rotation.x = -Math.PI / 2 - MEAN_INCLINATION_RAD;
+  disc.rotation.x = -Math.PI / 2; // Lay flat in the group
   group.add(disc);
 
   // Edge ring - thicker and more visible (magenta)
@@ -4553,77 +4568,62 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
     side: THREE.DoubleSide
   });
   const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-  ring.rotation.x = -Math.PI / 2 - MEAN_INCLINATION_RAD;
+  ring.rotation.x = -Math.PI / 2;
   group.add(ring);
 
-  // Add a "tilt indicator" using a cylinder (tube) for better visibility
-  // This shows the tilt axis - from lowest point to highest point
+  // ===== FIXED MARKERS GROUP =====
+  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationPhaseAngle (203°)
+  // They do NOT precess with the ascending node
+  // These are added to a SEPARATE group that doesn't rotate with the plane
+  // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
+  const markersGroup = new THREE.Group();
+  markersGroup.name = 'InvPlaneMarkersGroup';
+
   const halfSize = size / 2;
-  const tubeRadius = 3;
+  const markerDist = halfSize * 0.95;
   const tubeLength = size * 0.9;
-  const indicatorGeometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, tubeLength, 8);
-  const indicatorMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffff00,
-    transparent: true,
-    opacity: 0.8
-  });
-  const indicatorTube = new THREE.Mesh(indicatorGeometry, indicatorMaterial);
-  // Cylinder is vertical by default, rotate to horizontal along X axis
-  indicatorTube.rotation.z = Math.PI / 2;
-  // Then apply the tilt
-  indicatorTube.rotation.x = -MEAN_INCLINATION_RAD;
-  // Apply the same phase offset as the markers (rotate around Y axis, negated)
-  indicatorTube.rotation.y = -MARKER_PHASE_OFFSET;
-  group.add(indicatorTube);
+  const phaseAngleRad = earthInclinationPhaseAngle * Math.PI / 180;
 
-  // Add a second tube at 90° for the MEAN axis (magenta color to match mean markers)
-  // This creates a cross showing both HIGH-LOW axis and MEAN-MEAN axis
-  const meanIndicatorGeometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, tubeLength, 8);
-  const meanIndicatorMaterial = new THREE.MeshBasicMaterial({
-    color: 0xff88ff, // Magenta to match mean markers
-    transparent: true,
-    opacity: 0.8
-  });
-  const meanIndicatorTube = new THREE.Mesh(meanIndicatorGeometry, meanIndicatorMaterial);
-  // Cylinder is vertical by default, rotate to horizontal along X axis
-  meanIndicatorTube.rotation.z = Math.PI / 2;
-  // Apply phase offset + 90° to be perpendicular to the HIGH-LOW axis
-  meanIndicatorTube.rotation.y = -MARKER_PHASE_OFFSET - Math.PI / 2;
-  group.add(meanIndicatorTube);
-
-  // Add larger spheres at the high and low points of the tilt
-  const markerGeom = new THREE.SphereGeometry(12, 12, 12); // Larger spheres
+  // HIGH marker angle: at the phase angle (where inclination is maximum)
+  const highAngle = -phaseAngleRad;  // Negate for correct ICRF orientation (like Sun-centered)
+  // LOW marker angle: 180° opposite (where inclination is minimum)
+  const lowAngle = highAngle + Math.PI;
 
   // Calculate inclination range values
-  const maxInclination = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude; // 2.059°
-  const minInclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude; // 0.931°
+  const maxInclination = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
+  const minInclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
 
-  // High point marker (yellow) - where Earth reaches MAXIMUM inclination (2.059°)
+  // ===== HIGH-LOW AXIS TUBE (yellow) =====
+  // This tube connects HIGH to LOW markers - shows the axis of maximum/minimum inclination
+  const highLowTubeGeom = new THREE.CylinderGeometry(3, 3, tubeLength, 8);
+  const highLowTubeMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6 });
+  const highLowTube = new THREE.Mesh(highLowTubeGeom, highLowTubeMat);
+  // Cylinder is along Y by default, rotate to lie flat then orient toward HIGH angle
+  highLowTube.rotation.z = Math.PI / 2;  // Lay flat (along X)
+  markersGroup.add(highLowTube);
+
+  // ===== MEAN AXIS TUBE (magenta) =====
+  // This tube is perpendicular to HIGH-LOW - shows where inclination equals the mean
+  const meanTubeGeom = new THREE.CylinderGeometry(3, 3, tubeLength, 8);
+  const meanTubeMat = new THREE.MeshBasicMaterial({ color: 0xff88ff, transparent: true, opacity: 0.6 });
+  const meanTube = new THREE.Mesh(meanTubeGeom, meanTubeMat);
+  meanTube.rotation.z = Math.PI / 2;  // Lay flat (along X)
+  markersGroup.add(meanTube);
+
+  // High point marker (yellow) - where Earth reaches MAXIMUM inclination
+  const markerGeom = new THREE.SphereGeometry(12, 12, 12);
   const highMarkerMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
   const highMarker = new THREE.Mesh(markerGeom, highMarkerMat);
-  // Position at edge of disc, rotated by MARKER_PHASE_OFFSET for zodiac alignment
-  const markerDist = halfSize * 0.95;
-  // HIGH is at angle 0 + offset, LOW is at angle π + offset
-  const highAngle = MARKER_PHASE_OFFSET;
-  const highXpos = Math.cos(highAngle) * markerDist;
-  const highZpos = Math.sin(highAngle) * markerDist;
-  const highYpos = Math.sin(MEAN_INCLINATION_RAD) * Math.cos(highAngle) * markerDist; // Y from tilt
-  highMarker.position.set(Math.cos(MEAN_INCLINATION_RAD) * highXpos, highYpos, highZpos);
-  group.add(highMarker);
+  markersGroup.add(highMarker);
 
-  // Low point marker (cyan) - where Earth reaches MINIMUM inclination (0.931°)
+  // Low point marker (cyan) - where Earth reaches MINIMUM inclination
   const lowMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
   const lowMarker = new THREE.Mesh(markerGeom, lowMarkerMat);
-  const lowAngle = Math.PI + MARKER_PHASE_OFFSET;
-  const lowXpos = Math.cos(lowAngle) * markerDist;
-  const lowZpos = Math.sin(lowAngle) * markerDist;
-  const lowYpos = Math.sin(MEAN_INCLINATION_RAD) * Math.cos(lowAngle) * markerDist;
-  lowMarker.position.set(Math.cos(MEAN_INCLINATION_RAD) * lowXpos, lowYpos, lowZpos);
-  group.add(lowMarker);
+  markersGroup.add(lowMarker);
 
   // Add labels for high/low points with inclination values
   const highLabelDiv = document.createElement('div');
-  highLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">HIGH</span><br>' + maxInclination.toFixed(4) + '°';
+  highLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">HIGH</span><br>' + maxInclination.toFixed(4) + '°<br><span style="font-size:10px;color:#ffff88;">' + earthInclinationPhaseAngle + '°</span>';
   highLabelDiv.style.color = '#ffff00';
   highLabelDiv.style.fontSize = '14px';
   highLabelDiv.style.fontFamily = 'Arial, sans-serif';
@@ -4633,11 +4633,11 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   highLabelDiv.style.lineHeight = '1.3';
   highLabelDiv.style.display = 'none'; // Hidden by default
   const highLabelObj = new CSS2DObject(highLabelDiv);
-  highLabelObj.position.set(Math.cos(MEAN_INCLINATION_RAD) * highXpos, highYpos + 20, highZpos);
-  group.add(highLabelObj);
+  highMarker.add(highLabelObj);  // Add to marker so it moves with it
+  highLabelObj.position.set(0, 20, 0);
 
   const lowLabelDiv = document.createElement('div');
-  lowLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">LOW</span><br>' + minInclination.toFixed(4) + '°';
+  lowLabelDiv.innerHTML = '<span style="font-size:16px;font-weight:bold;">LOW</span><br>' + minInclination.toFixed(4) + '°<br><span style="font-size:10px;color:#88ffff;">' + ((earthInclinationPhaseAngle + 180) % 360) + '°</span>';
   lowLabelDiv.style.color = '#00ffff';
   lowLabelDiv.style.fontSize = '14px';
   lowLabelDiv.style.fontFamily = 'Arial, sans-serif';
@@ -4647,33 +4647,27 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   lowLabelDiv.style.lineHeight = '1.3';
   lowLabelDiv.style.display = 'none'; // Hidden by default
   const lowLabelObj = new CSS2DObject(lowLabelDiv);
-  lowLabelObj.position.set(Math.cos(MEAN_INCLINATION_RAD) * lowXpos, lowYpos - 20, lowZpos);
-  group.add(lowLabelObj);
+  lowMarker.add(lowLabelObj);  // Add to marker so it moves with it
+  lowLabelObj.position.set(0, 20, 0);
 
-  // Add mean labels perpendicular to tilt axis (rotated by MARKER_PHASE_OFFSET)
-  // These show where Earth crosses the mean inclination
+  // Mean markers at 90° offset from phase angle (where inclination = mean value)
+  // These are FIXED in ICRF coordinates, not at the precessing ascending/descending nodes
   const meanMarkerGeom = new THREE.SphereGeometry(10, 12, 12);
   const meanMarkerMat = new THREE.MeshBasicMaterial({ color: 0xff88ff }); // Magenta
 
-  // Mean markers at 90° and 270° from HIGH, plus the offset
-  const mean1Angle = Math.PI / 2 + MARKER_PHASE_OFFSET;
-  const mean2Angle = 3 * Math.PI / 2 + MARKER_PHASE_OFFSET;
-  const mean1X = Math.cos(mean1Angle) * markerDist;
-  const mean1Z = Math.sin(mean1Angle) * markerDist;
-  const mean2X = Math.cos(mean2Angle) * markerDist;
-  const mean2Z = Math.sin(mean2Angle) * markerDist;
+  // Mean markers at 90° before and after the HIGH point
+  const mean1Angle = highAngle + Math.PI / 2;  // 90° after HIGH
+  const mean2Angle = highAngle - Math.PI / 2;  // 90° before HIGH
 
-  // Mean marker 1
+  // Mean marker 1 (90° after HIGH)
   const meanMarker1 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
-  meanMarker1.position.set(mean1X, 0, mean1Z);
-  group.add(meanMarker1);
+  markersGroup.add(meanMarker1);
 
-  // Mean marker 2
+  // Mean marker 2 (90° before HIGH)
   const meanMarker2 = new THREE.Mesh(meanMarkerGeom, meanMarkerMat);
-  meanMarker2.position.set(mean2X, 0, mean2Z);
-  group.add(meanMarker2);
+  markersGroup.add(meanMarker2);
 
-  // Mean labels
+  // Mean labels - attach to markers so they move with them
   const meanLabel1Div = document.createElement('div');
   meanLabel1Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthInvPlaneInclinationMean.toFixed(4) + '°';
   meanLabel1Div.style.color = '#ff88ff';
@@ -4685,8 +4679,8 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   meanLabel1Div.style.lineHeight = '1.3';
   meanLabel1Div.style.display = 'none'; // Hidden by default
   const meanLabel1Obj = new CSS2DObject(meanLabel1Div);
-  meanLabel1Obj.position.set(mean1X, 15, mean1Z);
-  group.add(meanLabel1Obj);
+  meanMarker1.add(meanLabel1Obj);  // Add to marker so it moves with it
+  meanLabel1Obj.position.set(0, 15, 0);
 
   const meanLabel2Div = document.createElement('div');
   meanLabel2Div.innerHTML = '<span style="font-size:14px;font-weight:bold;">MEAN</span><br>' + earthInvPlaneInclinationMean.toFixed(4) + '°';
@@ -4699,11 +4693,18 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   meanLabel2Div.style.lineHeight = '1.3';
   meanLabel2Div.style.display = 'none'; // Hidden by default
   const meanLabel2Obj = new CSS2DObject(meanLabel2Div);
-  meanLabel2Obj.position.set(mean2X, 15, mean2Z);
-  group.add(meanLabel2Obj);
+  meanMarker2.add(meanLabel2Obj);  // Add to marker so it moves with it
+  meanLabel2Obj.position.set(0, 15, 0);
 
-  // Store references to all labels for visibility control
-  // Store both the div elements and CSS2DObject instances
+  // Store references to markers and labels for dynamic updates
+  // Store markersGroup and angle data for position updates in updateInvariablePlanePosition()
+  group.userData.markersGroup = markersGroup;
+  group.userData.highMarker = highMarker;
+  group.userData.lowMarker = lowMarker;
+  group.userData.meanMarker1 = meanMarker1;
+  group.userData.meanMarker2 = meanMarker2;
+  group.userData.highLowTube = highLowTube;
+  group.userData.meanTube = meanTube;
   group.userData.highLabelDiv = highLabelDiv;
   group.userData.lowLabelDiv = lowLabelDiv;
   group.userData.meanLabel1Div = meanLabel1Div;
@@ -4712,6 +4713,12 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   group.userData.lowLabelObj = lowLabelObj;
   group.userData.meanLabel1Obj = meanLabel1Obj;
   group.userData.meanLabel2Obj = meanLabel2Obj;
+  group.userData.markerDist = markerDist;
+  group.userData.tubeLength = tubeLength;
+  group.userData.highAngle = highAngle;
+  group.userData.lowAngle = lowAngle;
+  group.userData.mean1Angle = mean1Angle;
+  group.userData.mean2Angle = mean2Angle;
 
   // Set all CSS2DObjects to not visible initially (this is what the patched renderer checks)
   highLabelObj.visible = false;
@@ -4985,8 +4992,105 @@ function updateInclinationPathMarker() {
 //
 // This annual crossing cycle (1 year) is independent of the 99,392-year
 // orbital plane tilt cycle shown by the inclination path visualization.
+// Debug flag for invariable plane comparison
+let _lastInvPlaneDebugTime = 0;
+let _invPlaneDebugEnabled = false; // Set to true to enable debug logging
+
+// Cached objects to prevent garbage collection (reused every frame)
+const _invPlane_tiltAxis = new THREE.Vector3();
+const _invPlane_quaternion = new THREE.Quaternion();
+const _invPlane_localPos = new THREE.Vector3();
+const _invPlane_tubeDir = new THREE.Vector3();
+const _invPlane_tubeQuat = new THREE.Quaternion();
+const _invPlane_yAxis = new THREE.Vector3(0, 1, 0);
+
 function updateInvariablePlanePosition() {
   if (!invariablePlaneGroup || !invariablePlaneGroup.visible) return;
+
+  // Update plane orientation to match dynamic ascending node (same as Sun-centered plane)
+  // Apply quaternion directly to invariablePlaneGroup (same structure as Sun-centered)
+  const earthI = (o.earthInvPlaneInclinationDynamic || earthInvPlaneInclinationMean) * Math.PI / 180;
+  const earthOmega = (o.earthAscendingNodeInvPlane || earthAscendingNodeInvPlaneVerified) * Math.PI / 180;
+
+  // Calculate tilt axis (line of nodes - points toward ascending node)
+  const tiltAxisX = Math.cos(earthOmega);
+  const tiltAxisZ = Math.sin(earthOmega);
+  _invPlane_tiltAxis.set(tiltAxisX, 0, tiltAxisZ).normalize();
+
+  // Create quaternion to rotate around the tilt axis (reuse cached quaternion)
+  _invPlane_quaternion.setFromAxisAngle(_invPlane_tiltAxis, earthI);
+  invariablePlaneGroup.quaternion.copy(_invPlane_quaternion);
+
+  // DEBUG: Log values every 2 seconds
+  const now = Date.now();
+  if (_invPlaneDebugEnabled && (now - _lastInvPlaneDebugTime > 2000)) {
+    console.log('%c═══════════════════════════════════════════════════════════', 'color: magenta');
+    console.log('%cEARTH-CENTERED INVARIABLE PLANE:', 'color: magenta; font-weight: bold');
+    console.log('  earthI (deg):', (earthI * 180 / Math.PI).toFixed(6));
+    console.log('  earthOmega (deg):', (earthOmega * 180 / Math.PI).toFixed(6));
+    console.log('  tiltAxis:', tiltAxisX.toFixed(6), 0, tiltAxisZ.toFixed(6));
+    console.log('  quaternion (calculated):', _invPlane_quaternion.x.toFixed(6), _invPlane_quaternion.y.toFixed(6), _invPlane_quaternion.z.toFixed(6), _invPlane_quaternion.w.toFixed(6));
+    console.log('  invariablePlaneGroup.quaternion:', invariablePlaneGroup.quaternion.x.toFixed(6), invariablePlaneGroup.quaternion.y.toFixed(6), invariablePlaneGroup.quaternion.z.toFixed(6), invariablePlaneGroup.quaternion.w.toFixed(6));
+    console.log('  invariablePlaneGroup.position:', invariablePlaneGroup.position.x.toFixed(2), invariablePlaneGroup.position.y.toFixed(2), invariablePlaneGroup.position.z.toFixed(2));
+    console.log('  parent:', invariablePlaneGroup.parent?.name || invariablePlaneGroup.parent?.type || 'unknown');
+    // Don't update timer here - let Sun-centered update it so both log together
+  }
+
+  // ===== UPDATE FIXED MARKERS AND TUBES (HIGH/LOW/MEAN) =====
+  // These are in a SEPARATE group (markersGroup) that doesn't rotate with the plane
+  // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
+  const markersGroup = invariablePlaneGroup.userData.markersGroup;
+  if (markersGroup) {
+    const markerDist = invariablePlaneGroup.userData.markerDist;
+    const highAngle = invariablePlaneGroup.userData.highAngle;
+    const lowAngle = invariablePlaneGroup.userData.lowAngle;
+    const mean1Angle = invariablePlaneGroup.userData.mean1Angle;
+    const mean2Angle = invariablePlaneGroup.userData.mean2Angle;
+
+    // HIGH marker - calculate local position then apply quaternion (reuse cached vector)
+    _invPlane_localPos.set(Math.cos(highAngle) * markerDist, 0, Math.sin(highAngle) * markerDist);
+    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
+    invariablePlaneGroup.userData.highMarker.position.copy(_invPlane_localPos);
+
+    // LOW marker
+    _invPlane_localPos.set(Math.cos(lowAngle) * markerDist, 0, Math.sin(lowAngle) * markerDist);
+    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
+    invariablePlaneGroup.userData.lowMarker.position.copy(_invPlane_localPos);
+
+    // MEAN marker 1 (90° after HIGH)
+    _invPlane_localPos.set(Math.cos(mean1Angle) * markerDist, 0, Math.sin(mean1Angle) * markerDist);
+    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
+    invariablePlaneGroup.userData.meanMarker1.position.copy(_invPlane_localPos);
+
+    // MEAN marker 2 (90° before HIGH)
+    _invPlane_localPos.set(Math.cos(mean2Angle) * markerDist, 0, Math.sin(mean2Angle) * markerDist);
+    _invPlane_localPos.applyQuaternion(_invPlane_quaternion);
+    invariablePlaneGroup.userData.meanMarker2.position.copy(_invPlane_localPos);
+
+    // HIGH-LOW tube - oriented along the HIGH-LOW axis on the tilted plane
+    const highLowTube = invariablePlaneGroup.userData.highLowTube;
+    if (highLowTube) {
+      // Tube direction in local space (points from LOW to HIGH)
+      _invPlane_tubeDir.set(Math.cos(highAngle), 0, Math.sin(highAngle));
+      _invPlane_tubeDir.applyQuaternion(_invPlane_quaternion);
+      // Create quaternion that rotates Y-axis to tube direction
+      _invPlane_tubeQuat.setFromUnitVectors(_invPlane_yAxis, _invPlane_tubeDir);
+      highLowTube.quaternion.copy(_invPlane_tubeQuat);
+      // Position at center (origin) - tube extends equally in both directions
+      highLowTube.position.set(0, 0, 0);
+    }
+
+    // MEAN tube - oriented perpendicular to HIGH-LOW axis
+    const meanTube = invariablePlaneGroup.userData.meanTube;
+    if (meanTube) {
+      // Mean tube direction in local space (perpendicular to HIGH-LOW)
+      _invPlane_tubeDir.set(Math.cos(mean1Angle), 0, Math.sin(mean1Angle));
+      _invPlane_tubeDir.applyQuaternion(_invPlane_quaternion);
+      _invPlane_tubeQuat.setFromUnitVectors(_invPlane_yAxis, _invPlane_tubeDir);
+      meanTube.quaternion.copy(_invPlane_tubeQuat);
+      meanTube.position.set(0, 0, 0);
+    }
+  }
 
   // Get Earth's current height above the invariable plane (in AU)
   const heightAU = o.earthHeightAboveInvPlane || 0;
@@ -5002,6 +5106,11 @@ function updateInvariablePlanePosition() {
   // If Earth is +0.02 AU above the plane, move plane DOWN by visualHeight
   // This makes the plane appear to pass through Earth as the year progresses
   invariablePlaneGroup.position.y = -visualHeight;
+
+  // Sync markersGroup Y position with the plane (markers are in separate group but should move together)
+  if (markersGroup) {
+    markersGroup.position.y = -visualHeight;
+  }
 
   // Update the Earth height indicator (line + label)
   const heightLine = invariablePlaneGroup.userData.earthHeightLine;
@@ -5043,9 +5152,19 @@ function updateInvariablePlanePosition() {
 }
 
 // Create invariable plane (tilted grid/disc)
+// Add to SCENE (not earth.pivotObj) so orientation is in world coordinates
+// This matches the Sun-centered invariable plane and avoids inheriting Earth's pivot transform
 const invariablePlaneGroup = createInvariablePlaneVisualization(o.starDistance * 2, 30);
-earth.pivotObj.add(invariablePlaneGroup);
+scene.add(invariablePlaneGroup);
 invariablePlaneGroup.visible = false; // Off by default (labels also hidden by default)
+
+// Add the markers group to the scene (separate from tilted plane group)
+// Markers are positioned in world space using quaternion transform (like Sun-centered max incl marker)
+const invPlaneMarkersGroup = invariablePlaneGroup.userData.markersGroup;
+if (invPlaneMarkersGroup) {
+  scene.add(invPlaneMarkersGroup);
+  invPlaneMarkersGroup.visible = false; // Sync visibility with main plane
+}
 
 //*************************************************************
 // SUN-CENTERED INVARIABLE PLANE (works for all planets)
@@ -5310,6 +5429,21 @@ function updateSunCenteredInvPlane() {
   quaternion.setFromAxisAngle(tiltAxis, earthI);
   sunCenteredInvPlane.quaternion.copy(quaternion);
 
+  // DEBUG: Log values every 2 seconds (uses same timer as Earth-centered)
+  const now = Date.now();
+  if (_invPlaneDebugEnabled && (now - _lastInvPlaneDebugTime > 2000)) {
+    console.log('%c───────────────────────────────────────────────────────────', 'color: cyan');
+    console.log('%cSUN-CENTERED INVARIABLE PLANE:', 'color: cyan; font-weight: bold');
+    console.log('  earthI (deg):', (earthI * 180 / Math.PI).toFixed(6));
+    console.log('  earthOmega (deg):', (earthOmega * 180 / Math.PI).toFixed(6));
+    console.log('  tiltAxis:', tiltAxisX.toFixed(6), 0, tiltAxisZ.toFixed(6));
+    console.log('  quaternion (calculated):', quaternion.x.toFixed(6), quaternion.y.toFixed(6), quaternion.z.toFixed(6), quaternion.w.toFixed(6));
+    console.log('  sunCenteredInvPlane.quaternion:', sunCenteredInvPlane.quaternion.x.toFixed(6), sunCenteredInvPlane.quaternion.y.toFixed(6), sunCenteredInvPlane.quaternion.z.toFixed(6), sunCenteredInvPlane.quaternion.w.toFixed(6));
+    console.log('  sunCenteredInvPlane.position:', sunCenteredInvPlane.position.x.toFixed(2), sunCenteredInvPlane.position.y.toFixed(2), sunCenteredInvPlane.position.z.toFixed(2));
+    console.log('  parent:', sunCenteredInvPlane.parent?.name || sunCenteredInvPlane.parent?.type || 'unknown');
+    _lastInvPlaneDebugTime = now; // Update timer here for Sun-centered
+  }
+
   // Get the currently selected planet
   const currentPlanetName = o.lookAtObj?.name?.toLowerCase();
   const planetData = PLANET_INV_PLANE_DATA[currentPlanetName];
@@ -5415,12 +5549,12 @@ function updateSunCenteredInvPlane() {
   const ascLabelDiv = sunCenteredNodeMarkers.userData.ascLabelDiv;
   const descLabelDiv = sunCenteredNodeMarkers.userData.descLabelDiv;
 
-  // Update ascending node label (show ECLIPTIC value - what the planet's longitude will be when crossing)
-  ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascNodeEclipticDeg.toFixed(1)}°</span>`;
+  // Update ascending node label (show ICRF value - fixed position in space)
+  ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascNodeDeg.toFixed(1)}°</span>`;
 
-  // Update descending node label (show ECLIPTIC value)
-  const descNodeEclipticDeg = (ascNodeEclipticDeg + 180) % 360;
-  descLabelDiv.innerHTML = `<span style="font-size:18px;">☋</span><br><span style="font-size:11px;">DESC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${descNodeEclipticDeg.toFixed(1)}°</span>`;
+  // Update descending node label (show ICRF value)
+  const descNodeDeg = (ascNodeDeg + 180) % 360;
+  descLabelDiv.innerHTML = `<span style="font-size:18px;">☋</span><br><span style="font-size:11px;">DESC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${descNodeDeg.toFixed(1)}°</span>`;
 
   // Get the phase offset for this planet (Ω_J2000 - φ₀)
   const phaseOffsetLookup = {
@@ -10308,6 +10442,10 @@ function setupGUI() {
     needsLabelUpdate = true;
   });
   folderO.add(invariablePlaneGroup, 'visible').name('Earth Inclination to Invariable plane').onChange(function(value) {
+    // Show/hide the markers group (separate from tilted plane)
+    if (invariablePlaneGroup.userData.markersGroup) {
+      invariablePlaneGroup.userData.markersGroup.visible = value;
+    }
     // Show/hide all labels when toggling the plane
     // Must set CSS2DObject.visible property (not just div.style.display)
     // because the patched labelRenderer checks obj.visible and overrides display style
@@ -11073,39 +11211,39 @@ async function runRATest() {
     const mercuryPer   = o.mercuryPerihelion;
     const mercuryAsc   = o.mercuryAscendingNode;
     const mercuryArg   = o.mercuryArgumentOfPeriapsis;
-    const mercuryAscInv = o.mercuryAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const mercuryAscInv = o.mercuryAscendingNodeInvPlane;  // ICRF coords
     const mercuryAppIncl = o.mercuryEclipticInclinationDynamic;
     const venusPer     = o.venusPerihelion;
     const venusAsc     = o.venusAscendingNode;
     const venusArg     = o.venusArgumentOfPeriapsis;
-    const venusAscInv  = o.venusAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const venusAscInv  = o.venusAscendingNodeInvPlane;  // ICRF coords
     const venusAppIncl = o.venusEclipticInclinationDynamic;
-    const earthAscInv  = o.earthAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const earthAscInv  = o.earthAscendingNodeInvPlane;  // ICRF coords
     const earthIncl    = o.earthInvPlaneInclinationDynamic;
     const marsPer      = o.marsPerihelion;
     const marsAsc      = o.marsAscendingNode;
     const marsArg      = o.marsArgumentOfPeriapsis;
-    const marsAscInv   = o.marsAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const marsAscInv   = o.marsAscendingNodeInvPlane;  // ICRF coords
     const marsAppIncl  = o.marsEclipticInclinationDynamic;
     const jupiterPer   = o.jupiterPerihelion;
     const jupiterAsc   = o.jupiterAscendingNode;
     const jupiterArg   = o.jupiterArgumentOfPeriapsis;
-    const jupiterAscInv = o.jupiterAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const jupiterAscInv = o.jupiterAscendingNodeInvPlane;  // ICRF coords
     const jupiterAppIncl = o.jupiterEclipticInclinationDynamic;
     const saturnPer    = o.saturnPerihelion;
     const saturnAsc    = o.saturnAscendingNode;
     const saturnArg    = o.saturnArgumentOfPeriapsis;
-    const saturnAscInv = o.saturnAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const saturnAscInv = o.saturnAscendingNodeInvPlane;  // ICRF coords
     const saturnAppIncl = o.saturnEclipticInclinationDynamic;
     const uranusPer    = o.uranusPerihelion;
     const uranusAsc    = o.uranusAscendingNode;
     const uranusArg    = o.uranusArgumentOfPeriapsis;
-    const uranusAscInv = o.uranusAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const uranusAscInv = o.uranusAscendingNodeInvPlane;  // ICRF coords
     const uranusAppIncl = o.uranusEclipticInclinationDynamic;
     const neptunePer   = o.neptunePerihelion;
     const neptuneAsc   = o.neptuneAscendingNode;
     const neptuneArg   = o.neptuneArgumentOfPeriapsis;
-    const neptuneAscInv = o.neptuneAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
+    const neptuneAscInv = o.neptuneAscendingNodeInvPlane;  // ICRF coords
     const neptuneAppIncl = o.neptuneEclipticInclinationDynamic;
 
     // Inclination phase angles (Ω - φ) and InvPlane inclinations (dynamic)
@@ -12806,12 +12944,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.earthAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where Earth's orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.earthAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where Earth's orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.earthAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.earthAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => earthInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Earth's inclination to the invariable plane reaches maximum.`]},
@@ -12955,7 +13093,7 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession against Ecliptic`,
-       value : [ { v: () => earthPerihelionEclipticYears, dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => earthPerihelionICRFYears, dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        static: true},
       {label : () => `Perihelion Precession against ICRF`,
@@ -12963,11 +13101,11 @@ const planetStats = {
        hover : [`Period in the inertial ICRF frame: ${fmtNum(holisticyearLength,0,',')} / 13`],
        static: true},
       {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
        hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
 
@@ -13504,12 +13642,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
        {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.mercuryAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.mercuryAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.mercuryAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.mercuryAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => mercuryInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Mercury's inclination to the invariable plane reaches maximum.`]},
@@ -13864,12 +14002,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.venusAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.venusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.venusAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.venusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => venusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Venus's inclination to the invariable plane reaches maximum.`]},
@@ -14191,12 +14329,12 @@ const planetStats = {
   
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.marsAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.marsAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.marsAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.marsAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => marsInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Mars's inclination to the invariable plane reaches maximum.`]},
@@ -14511,12 +14649,12 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.jupiterAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.jupiterAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.jupiterAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.jupiterAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => jupiterInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Jupiter's inclination to the invariable plane reaches maximum.`]},
@@ -14836,12 +14974,12 @@ const planetStats = {
    
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.saturnAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.saturnAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.saturnAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.saturnAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => saturnInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Saturn's inclination to the invariable plane reaches maximum.`]},
@@ -15163,12 +15301,12 @@ const planetStats = {
   
    {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.uranusAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.uranusAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.uranusAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.uranusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => uranusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Uranus's inclination to the invariable plane reaches maximum.`]},
@@ -15490,12 +15628,12 @@ const planetStats = {
  
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.neptuneAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.neptuneAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.neptuneAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.neptuneAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => neptuneInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Neptune's inclination to the invariable plane reaches maximum.`]},
@@ -15816,12 +15954,12 @@ const planetStats = {
   
    {header : '—  Orbital Orientation to Invariable Plane —' }, 
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => o.plutoAscendingNodeInvPlaneEcliptic, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going north`],
+       value : [ { v: () => o.plutoAscendingNodeInvPlane, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going north`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (o.plutoAscendingNodeInvPlaneEcliptic + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Ecliptic longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
+       value : [ { v: () => (o.plutoAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
        value : [ { v: () => plutoInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Pluto's inclination to the invariable plane reaches maximum.`]},
@@ -18318,7 +18456,7 @@ function updateAscendingNodes() {
       const sunLongDeg = (sun && sun.ra !== undefined) ? sun.ra * 180 / Math.PI : 0;
       const earthHelioLong = (sunLongDeg + 180 + 360) % 360;
       const yearsSinceJ2000 = currentYear - 2000.5;
-      const earthPrecRate = 360 / earthPerihelionEclipticYears;
+      const earthPrecRate = 360 / earthPerihelionICRFYears;
       const earthAscNodeDyn = (earthAscendingNodeInvPlaneVerified + earthPrecRate * yearsSinceJ2000 + 360) % 360;
       const angleFromAscNode = (earthHelioLong - earthAscNodeDyn + 360) % 360;
       console.log(`🌍 EARTH INV PLANE: sun.ra=${sunLongDeg.toFixed(2)}°, earthHelioLong=${earthHelioLong.toFixed(2)}°`);
@@ -18585,7 +18723,7 @@ function updatePlanetAnomalies() {
  * Height = sin(inclination_to_inv_plane) * sin(angle_from_ascending_node) * distance
  *
  * The ascending nodes on the invariable plane precess over time.
- * Precession rates use <planet>PerihelionICRFYears constants (earthPerihelionEclipticYears for Earth).
+ * Precession rates use <planet>PerihelionICRFYears constants (earthPerihelionICRFYears for Earth).
  *
  * Called each frame after updatePlanetAnomalies().
  *
@@ -18599,11 +18737,11 @@ function updatePlanetInvariablePlaneHeights() {
 
   // Planet configuration for invariable plane calculations
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
-  // Precession uses <planet>PerihelionICRFYears constants (earthPerihelionEclipticYears for Earth)
+  // Precession uses <planet>PerihelionICRFYears constants (earthPerihelionICRFYears for Earth)
   const planets = [
     { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionICRFYears },
     { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionICRFYears },
-    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionEclipticYears },
+    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionICRFYears },
     { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionICRFYears },
     { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionICRFYears },
     { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionICRFYears },
@@ -18629,8 +18767,17 @@ function updatePlanetInvariablePlaneHeights() {
     const ascNodeDynamicVerified = ((rawVerified % 360) + 360) % 360;
 
     // Calculate ascending node in ECLIPTIC coords (for height calculation)
-    // Uses each planet's own ecliptic precession rate (e.g., Saturn = -49,696 years retrograde)
-    const precessionRateEcliptic = 360 / precessionYears;
+    // Each planet needs its own ecliptic rate, derived from:
+    // - Planet's ICRF precession rate (precessionYears)
+    // - General precession of ecliptic coordinate system (holisticyearLength/13 ≈ 22,937 years)
+    // Formula: 1/eclipticPeriod = 1/icrfPeriod + 1/generalPrecession
+    // The rates ADD because both the orbital plane precession and ecliptic precession
+    // contribute to the apparent motion of the ascending node in ecliptic coordinates.
+    const generalPrecessionYears = holisticyearLength / 13;  // ~22,937 years
+    const icrfRate = 1 / precessionYears;  // rate in cycles/year
+    const generalRate = 1 / generalPrecessionYears;  // rate in cycles/year
+    const eclipticRate = icrfRate + generalRate;  // combined rate (rates add)
+    const precessionRateEcliptic = eclipticRate * 360;  // convert to degrees/year
     const rawEcliptic = ascNodeJ2000Verified + precessionRateEcliptic * yearsSinceJ2000;
     const ascNodeDynamicEcliptic = ((rawEcliptic % 360) + 360) % 360;
 

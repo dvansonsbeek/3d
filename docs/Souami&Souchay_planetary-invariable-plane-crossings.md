@@ -30,7 +30,7 @@ This document describes how to visualize when each planet (including Earth) cros
 - Added `o.<planet>AscendingNodeInvPlaneSouamiSouchay` properties (dynamic, for comparison)
 - New function `updatePlanetInvariablePlaneHeights()` called every frame
 - Calculation uses: true anomaly, argument of periapsis, ecliptic ascending node, distance from Sun
-- Dynamic precession uses `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth)
+- Dynamic precession uses `<planet>PerihelionICRFYears` constants
 - UI entries in planet label menus showing height and position relative to invariable plane
 - **Verified**: Earth crosses from below→above in early July, above→below in early January
 
@@ -183,7 +183,7 @@ The height calculation for "above/below invariable plane" uses `sun.ra` (Earth's
 
 ```javascript
 // ICRF rate: ~99,392 years (physical precession in inertial frame)
-const earthPerihelionEclipticYears = holisticyearLength/3;  // ~99,392 years
+const earthPerihelionICRFYears = holisticyearLength/3;  // ~99,392 years
 
 // Ecliptic rate: ~18,636 years (apparent precession in precessing coordinates)
 const ascNodeInvPlaneEclipticYears = holisticyearLength/16; // ~18,636 years
@@ -280,21 +280,21 @@ The ascending nodes are **not fixed** - they precess over time.
 
 **Available Model Constants for Precession:**
 
-The perihelion precession periods are available as `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth):
+The perihelion precession periods are available as `<planet>PerihelionICRFYears` constants:
 
 | Planet | Model Constant | Value (years) | Notes |
 |--------|---------------|---------------|-------|
-| Mercury | `mercuryPerihelionICRFYears` | 243,580.394 | Explains ~570 arcsec/century |
-| Venus | `venusPerihelionICRFYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
-| **Earth** | `earthPerihelionEclipticYears` | `holisticyearLength/3` = 99,392 | Direct orbital plane precession |
-| Mars | `marsPerihelionICRFYears` | `holisticyearLength/3.666666` | Explains ~1600 arcsec/century |
-| Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength` | Explains ~400 arcsec/century |
-| Saturn | `saturnPerihelionICRFYears` | `holisticyearLength/5` | Explains ~2400 arcsec/century |
-| Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | Explains ~1200 arcsec/century |
-| Neptune | `neptunePerihelionICRFYears` | `holisticyearLength*21` | Explains ~0 arcsec/century |
-| Pluto | `plutoPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
-| Halley's | `halleysPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
-| Eros | `erosPerihelionICRFYears` | `holisticyearLength*21` | TODO: verify |
+| Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/13))` ≈ 242,268 | Explains ~574 arcsec/century |
+| Venus | `venusPerihelionICRFYears` | `holisticyearLength*(2+(1/6))` ≈ 646,048 | Explains ~200 arcsec/century |
+| **Earth** | `earthPerihelionICRFYears` | `holisticyearLength/3` ≈ 99,392 | Direct orbital plane precession |
+| Mars | `marsPerihelionICRFYears` | `holisticyearLength/4` ≈ 74,544 | Explains ~1700 arcsec/century |
+| Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength/5` ≈ 59,635 | Explains ~2000 arcsec/century |
+| Saturn | `saturnPerihelionICRFYears` | `-holisticyearLength/8` ≈ -37,272 | RETROGRADE, explains ~-3800 arcsec/century |
+| Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` ≈ 99,392 | Explains ~1200 arcsec/century |
+| Neptune | `neptunePerihelionICRFYears` | `holisticyearLength*(2+(1/6))` ≈ 646,048 | Explains ~-400 arcsec/century |
+| Pluto | `plutoPerihelionICRFYears` | `holisticyearLength` ≈ 298,176 | TODO: verify |
+| Halley's | `halleysPerihelionICRFYears` | `holisticyearLength` ≈ 298,176 | TODO: verify |
+| Eros | `erosPerihelionICRFYears` | `holisticyearLength` ≈ 298,176 | TODO: verify |
 
 **Formula for orbital plane precession period from perihelion precession:**
 ```javascript

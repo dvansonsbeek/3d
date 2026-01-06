@@ -86,16 +86,16 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 |------------------|-------------------|-------------|
 | `{planet}SolarYearInput` | 87.96813 days | Orbital period input |
 | `{planet}OrbitalEccentricity` | 0.20562928 | Eccentricity (e) |
-| `{planet}InvPlaneInclinationMean` | 7.215° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
-| `{planet}InclinationAmplitude` | 2.645° (Mercury) | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationPhaseAngle` | 283.7° (Mercury) | Phase offset linking inclination to ascending node (Ω_J2000 - φ₀) |
+| `{planet}InvPlaneInclinationMean` | 8.0907° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
+| `{planet}InvPlaneInclinationAmplitude` | 1.769° (Mercury) | Inclination oscillation amplitude (half of L-L range) |
+| `{planet}InclinationPhaseAngle` | 203° (Mercury) | Phase offset linking inclination to ascending node |
 | `{planet}EclipticInclinationJ2000` | 7.00487° | J2000 orbital inclination to ecliptic |
 | `{planet}OrbitDistance` | 0.387 AU | Semi-major axis (a) - derived |
 | `{planet}PerihelionDistance` | varies | Distance at perihelion |
 | `{planet}Speed` | varies km/h | Mean orbital velocity |
 | `{planet}SolarYearCount` | derived | Number of orbits in Holistic-Year |
 | `{planet}PerihelionICRF` | varies | Perihelion precession period |
-| `{planet}PerihelionICRFYears` | varies | Perihelion precession cycle length against ICRF (use `earthPerihelionEclipticYears` for Earth) |
+| `{planet}PerihelionICRFYears` | varies | Perihelion precession cycle length against ICRF |
 | `{planet}AngleCorrection` | varies | Alignment correction angle |
 | `{planet}Tilt` | 0.034° | Axial tilt |
 | `{planet}RotationPeriod` | 1407.6 hours | Sidereal rotation period |
@@ -159,7 +159,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `earthInvPlaneInclinationAmplitude` | 0.564° | Amplitude of inclination/obliquity variation |
 | `eccentricityMean` | 0.01370018 | Mean eccentricity |
 | `eccentricityAmplitude` | 0.00308211 | Earth's eccentricity amplitude |
-| `earthPerihelionEclipticYears` | 99,392 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
+| `earthPerihelionICRFYears` | 99,392 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
 
 #### 1.5.2 Dynamic Orbital Parameters
 

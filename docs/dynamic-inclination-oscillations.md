@@ -182,27 +182,27 @@ These are two aspects of the same precession motion, analogous to how a spinning
 ### Evidence from Earth
 
 For Earth, we already model this correctly:
-- `earthPerihelionEclipticYears = holisticyearLength/3` ≈ **99,392 years**
+- `earthPerihelionICRFYears = holisticyearLength/3` ≈ **99,392 years**
 - Earth's inclination oscillation period = **~99,392 years**
 
 Both use the same period because they represent the same physical precession of Earth's orbital plane.
 
 ### Implication for Other Planets
 
-**The inclination oscillation period for each planet should equal its `<planet>PerihelionICRFYears` constant (`earthPerihelionEclipticYears` for Earth).**
+**The inclination oscillation period for each planet should equal its `<planet>PerihelionICRFYears` constant.**
 
 This means we don't need separate period constants — we reuse the existing precession periods:
 
 | Planet | Precession Period | Variable |
 |--------|-------------------|----------|
-| Mercury | 242,268 years | `mercuryPerihelionICRFYears` |
-| Venus | ~6×10¹² years | `venusPerihelionICRFYears` (nearly fixed) |
-| Earth | 99,392 years | `earthPerihelionEclipticYears` |
-| Mars | 74,544 years | `marsPerihelionICRFYears` |
-| Jupiter | 298,176 years | `jupiterPerihelionICRFYears` |
-| Saturn | -298,176 years | `saturnPerihelionICRFYears` (retrograde) |
-| Uranus | 99,392 years | `uranusPerihelionICRFYears` |
-| Neptune | -298,176 years | `neptunePerihelionICRFYears` (retrograde) |
+| Mercury | ~242,268 years | `mercuryPerihelionICRFYears` = `holisticyearLength/(1+(3/13))` |
+| Venus | ~646,048 years | `venusPerihelionICRFYears` = `holisticyearLength*(2+(1/6))` |
+| Earth | ~99,392 years | `earthPerihelionICRFYears` = `holisticyearLength/3` |
+| Mars | ~74,544 years | `marsPerihelionICRFYears` = `holisticyearLength/4` |
+| Jupiter | ~59,635 years | `jupiterPerihelionICRFYears` = `holisticyearLength/5` |
+| Saturn | ~-37,272 years | `saturnPerihelionICRFYears` = `-holisticyearLength/8` (retrograde) |
+| Uranus | ~99,392 years | `uranusPerihelionICRFYears` = `holisticyearLength/3` |
+| Neptune | ~646,048 years | `neptunePerihelionICRFYears` = `holisticyearLength*(2+(1/6))` |
 
 **Note:** Negative periods indicate retrograde precession (clockwise when viewed from north).
 
@@ -252,13 +252,13 @@ const venusInvPlaneInclinationAmplitude = 1.056359;  // Range: 2.00° to 4.11°
 const marsInvPlaneInclinationMean = 3.603200;
 const marsInvPlaneInclinationAmplitude = 2.236774;  // Range: 1.37° to 5.84°
 
-// Jupiter: J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength, trend error: 12.3"/cy
-const jupiterInvPlaneInclinationMean = 0.363600;
-const jupiterInvPlaneInclinationAmplitude = 0.122496;  // Range: 0.24° to 0.49°
+// Jupiter: J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength/5, trend error: 12.3"/cy
+const jupiterInvPlaneInclinationMean = 0.348015;
+const jupiterInvPlaneInclinationAmplitude = 0.076642;  // Range: 0.27° to 0.43°
 
-// Saturn: J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/6, trend error: 0.0"/cy
-const saturnInvPlaneInclinationMean = 0.943300;
-const saturnInvPlaneInclinationAmplitude = 0.175828;  // Range: 0.77° to 1.12°
+// Saturn: J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
+const saturnInvPlaneInclinationMean = 0.935080;
+const saturnInvPlaneInclinationAmplitude = 0.094763;  // Range: 0.84° to 1.03°
 
 // Uranus: J2000=0.9946692° (EXACT), phase 203°, period holisticyearLength/3, trend error: 1.0"/cy
 const uranusInvPlaneInclinationMean = 1.018100;
@@ -296,7 +296,7 @@ This approach mirrors exactly how Earth is already handled:
 |-----------|-------|---------------|
 | **Mean inclination** | `earthInvPlaneInclinationMean` | `<planet>Inclination` (existing) |
 | **Amplitude** | `earthInvPlaneInclinationAmplitude` | `<planet>InvPlaneInclinationAmplitude` (NEW) |
-| **Period** | `earthPerihelionEclipticYears` | `<planet>PerihelionICRFYears` (existing) |
+| **Period** | `earthPerihelionICRFYears` | `<planet>PerihelionICRFYears` (existing) |
 | **Phase reference** | `balancedYear` | Same `balancedYear` or planet-specific |
 
 ### Dynamic Calculation Function
@@ -462,7 +462,7 @@ A_typical = |di/dt|_planet_own × |P| / (2π × 0.7)
 
 Using the data:
 - **Observed rates**: From JPL Table 1 (°/century)
-- **Periods**: From existing `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth)
+- **Periods**: From existing `<planet>PerihelionICRFYears` constants
 - **Earth effect**: Estimated from model (needs numerical calculation)
 
 #### Simplified Approach: Use Observed Rates Directly

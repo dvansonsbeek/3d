@@ -371,7 +371,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.earthAscendingNode,
       mass: M_EARTH,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(earthSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
     },
     mars: {
       name: 'Mars',

@@ -129,10 +129,10 @@ For each planet, we need its orbital elements relative to the **invariable plane
 **Reference**: Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
 - [Full paper](https://www.aanda.org/articles/aa/full_html/2012/07/aa19011-12/aa19011-12.html)
 
-**Ascending node precession is already implemented**: The ascending nodes precess over time and this is already calculated dynamically using `<planet>PerihelionICRFYears` constants (`earthPerihelionEclipticYears` for Earth) in `updatePlanetInvariablePlaneHeights()`:
+**Ascending node precession is already implemented**: The ascending nodes precess over time and this is already calculated dynamically using `<planet>PerihelionICRFYears` constants in `updatePlanetInvariablePlaneHeights()`:
 - Earth: ~99,392 years (`holisticyearLength/3`)
-- Jupiter: derived from `jupiterPerihelionICRFYears` → ~51,000 year coupled precession
-- Saturn: derived from `saturnPerihelionICRFYears` → ~51,000 year coupled precession
+- Jupiter: ~59,635 years (`holisticyearLength/5`)
+- Saturn: ~-37,272 years (`-holisticyearLength/8`, retrograde)
 - All planets: `o.<planet>AscendingNodeInvPlane` values are updated each frame
 
 The `updateDynamicInclinations()` function uses these already-computed dynamic values (`o.mercuryAscendingNodeInvPlane`, etc.) rather than the static J2000 constants.
