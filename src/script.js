@@ -430,6 +430,7 @@ const meanearthRotationsinDays = meansolaryearlengthinDays+1;
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
 const balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
+const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
@@ -5193,6 +5194,14 @@ const PLANET_INV_PLANE_DATA = {
 // Reusable vectors to avoid allocation each frame
 const _sunCenteredPlane_sunPos = new THREE.Vector3();
 const _sunCenteredPlane_planetPos = new THREE.Vector3();
+const _sunCenteredPlane_tiltAxis = new THREE.Vector3();
+const _sunCenteredPlane_planeNormal = new THREE.Vector3();
+const _sunCenteredPlane_planetRelToSun = new THREE.Vector3();
+const _sunCenteredPlane_ascLocalPos = new THREE.Vector3();
+const _sunCenteredPlane_descLocalPos = new THREE.Vector3();
+const _sunCenteredPlane_maxInclLocalPos = new THREE.Vector3();
+const _sunCenteredPlane_orbitCenter = new THREE.Vector3();
+const _sunCenteredPlane_quaternion = new THREE.Quaternion();
 
 /**
  * Create Sun-centered invariable plane visualization
@@ -5426,13 +5435,12 @@ function updateSunCenteredInvPlane() {
   // HIGH point is at angle (Omega + 90°), so tilt axis is at angle Omega (toward ascending node)
   const tiltAxisX = Math.cos(earthOmega);
   const tiltAxisZ = Math.sin(earthOmega);
-  const tiltAxis = new THREE.Vector3(tiltAxisX, 0, tiltAxisZ).normalize();
+  _sunCenteredPlane_tiltAxis.set(tiltAxisX, 0, tiltAxisZ).normalize();
 
   // Create quaternion to rotate around the tilt axis by earthI
   // Positive rotation tilts the +90° side DOWN (which is correct - that's where Earth is highest ABOVE)
-  const quaternion = new THREE.Quaternion();
-  quaternion.setFromAxisAngle(tiltAxis, earthI);
-  sunCenteredInvPlane.quaternion.copy(quaternion);
+  _sunCenteredPlane_quaternion.setFromAxisAngle(_sunCenteredPlane_tiltAxis, earthI);
+  sunCenteredInvPlane.quaternion.copy(_sunCenteredPlane_quaternion);
 
   // DEBUG: Log values every 2 seconds (uses same timer as Earth-centered)
   const now = Date.now();
@@ -5442,7 +5450,7 @@ function updateSunCenteredInvPlane() {
     console.log('  earthI (deg):', (earthI * 180 / Math.PI).toFixed(6));
     console.log('  earthOmega (deg):', (earthOmega * 180 / Math.PI).toFixed(6));
     console.log('  tiltAxis:', tiltAxisX.toFixed(6), 0, tiltAxisZ.toFixed(6));
-    console.log('  quaternion (calculated):', quaternion.x.toFixed(6), quaternion.y.toFixed(6), quaternion.z.toFixed(6), quaternion.w.toFixed(6));
+    console.log('  quaternion (calculated):', _sunCenteredPlane_quaternion.x.toFixed(6), _sunCenteredPlane_quaternion.y.toFixed(6), _sunCenteredPlane_quaternion.z.toFixed(6), _sunCenteredPlane_quaternion.w.toFixed(6));
     console.log('  sunCenteredInvPlane.quaternion:', sunCenteredInvPlane.quaternion.x.toFixed(6), sunCenteredInvPlane.quaternion.y.toFixed(6), sunCenteredInvPlane.quaternion.z.toFixed(6), sunCenteredInvPlane.quaternion.w.toFixed(6));
     console.log('  sunCenteredInvPlane.position:', sunCenteredInvPlane.position.x.toFixed(2), sunCenteredInvPlane.position.y.toFixed(2), sunCenteredInvPlane.position.z.toFixed(2));
     console.log('  parent:', sunCenteredInvPlane.parent?.name || sunCenteredInvPlane.parent?.type || 'unknown');
@@ -5482,13 +5490,13 @@ function updateSunCenteredInvPlane() {
   //
   // Calculate where the plane currently is at the planet's location, then offset
   // the entire plane so the planet appears at the correct height.
-  const planetRelToSun = _sunCenteredPlane_planetPos.clone().sub(_sunCenteredPlane_sunPos);
-  const planeNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
+  _sunCenteredPlane_planetRelToSun.copy(_sunCenteredPlane_planetPos).sub(_sunCenteredPlane_sunPos);
+  _sunCenteredPlane_planeNormal.set(0, 1, 0).applyQuaternion(_sunCenteredPlane_quaternion);
 
   // Current plane Y at planet's X,Z (before correction)
-  const dx = planetRelToSun.x;
-  const dz = planetRelToSun.z;
-  const currentPlaneYAtPlanet = _sunCenteredPlane_sunPos.y - (planeNormal.x * dx + planeNormal.z * dz) / planeNormal.y;
+  const dx = _sunCenteredPlane_planetRelToSun.x;
+  const dz = _sunCenteredPlane_planetRelToSun.z;
+  const currentPlaneYAtPlanet = _sunCenteredPlane_sunPos.y - (_sunCenteredPlane_planeNormal.x * dx + _sunCenteredPlane_planeNormal.z * dz) / _sunCenteredPlane_planeNormal.y;
 
   // Planet's actual Y and desired height above plane
   const planetY = _sunCenteredPlane_planetPos.y;
@@ -5526,29 +5534,33 @@ function updateSunCenteredInvPlane() {
   // 1. Create local position vector (relative to orbit center)
   // 2. Apply plane's quaternion to rotate into world orientation
   // 3. Add orbit center position to get world coordinates
-  const ascLocalPos = new THREE.Vector3(ascLocalX, 0, ascLocalZ);
-  const descLocalPos = new THREE.Vector3(-ascLocalX, 0, -ascLocalZ);
+  _sunCenteredPlane_ascLocalPos.set(ascLocalX, 0, ascLocalZ);
+  _sunCenteredPlane_descLocalPos.set(-ascLocalX, 0, -ascLocalZ);
 
   // Apply plane's quaternion to transform to world orientation
   // (The plane's quaternion represents the tilt of the invariable plane)
-  ascLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
-  descLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
+  _sunCenteredPlane_ascLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
+  _sunCenteredPlane_descLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
 
   // Determine the orbit center for node marker positioning:
   // - For Earth: In the geocentric model, Earth stays near origin while Sun orbits Earth.
   //   Earth's orbit is centered near the origin, not around the Sun.
   // - For other planets: They orbit around the Sun, so use Sun's position.
   const isEarth = currentPlanetName === 'earth';
-  const orbitCenter = isEarth ? new THREE.Vector3(0, 0, 0) : _sunCenteredPlane_sunPos;
+  if (isEarth) {
+    _sunCenteredPlane_orbitCenter.set(0, 0, 0);
+  } else {
+    _sunCenteredPlane_orbitCenter.copy(_sunCenteredPlane_sunPos);
+  }
 
   // Add orbit center position to get world coordinates
-  ascLocalPos.add(orbitCenter);
-  descLocalPos.add(orbitCenter);
+  _sunCenteredPlane_ascLocalPos.add(_sunCenteredPlane_orbitCenter);
+  _sunCenteredPlane_descLocalPos.add(_sunCenteredPlane_orbitCenter);
 
   // Position markers (they're scene children, so world coords)
   // Labels are children of markers, so they follow automatically
-  ascMarker.position.copy(ascLocalPos);
-  descMarker.position.copy(descLocalPos);
+  ascMarker.position.copy(_sunCenteredPlane_ascLocalPos);
+  descMarker.position.copy(_sunCenteredPlane_descLocalPos);
 
   // Update node labels
   const ascLabelDiv = sunCenteredNodeMarkers.userData.ascLabelDiv;
@@ -5590,12 +5602,12 @@ function updateSunCenteredInvPlane() {
     const maxInclRad = -phaseOffset * Math.PI / 180; // Negate for CW rotation like other markers
     const maxInclLocalX = Math.cos(maxInclRad) * orbitRadius;
     const maxInclLocalZ = Math.sin(maxInclRad) * orbitRadius;
-    const maxInclLocalPos = new THREE.Vector3(maxInclLocalX, 0, maxInclLocalZ);
+    _sunCenteredPlane_maxInclLocalPos.set(maxInclLocalX, 0, maxInclLocalZ);
 
     // Apply plane's quaternion to transform to world orientation
-    maxInclLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
-    maxInclLocalPos.add(orbitCenter);
-    maxInclMarker.position.copy(maxInclLocalPos);
+    _sunCenteredPlane_maxInclLocalPos.applyQuaternion(sunCenteredInvPlane.quaternion);
+    _sunCenteredPlane_maxInclLocalPos.add(_sunCenteredPlane_orbitCenter);
+    maxInclMarker.position.copy(_sunCenteredPlane_maxInclLocalPos);
 
     // Update label with fixed ICRF phase offset value
     maxInclLabelDiv.innerHTML = `<span style="font-size:14px;">▲</span><br><span style="font-size:9px;">MAX i</span><br><span style="font-size:10px;color:#ffff88;">${phaseOffset.toFixed(0)}°</span>`;
@@ -18460,7 +18472,7 @@ function updateAscendingNodes() {
     try {
       const sunLongDeg = (sun && sun.ra !== undefined) ? sun.ra * 180 / Math.PI : 0;
       const earthHelioLong = (sunLongDeg + 180 + 360) % 360;
-      const yearsSinceJ2000 = currentYear - 2000.5;
+      const yearsSinceJ2000 = currentYear - startmodelyearwithCorrection;
       const earthPrecRate = 360 / earthPerihelionICRFYears;
       const earthAscNodeDyn = (earthAscendingNodeInvPlaneVerified + earthPrecRate * yearsSinceJ2000 + 360) % 360;
       const angleFromAscNode = (earthHelioLong - earthAscNodeDyn + 360) % 360;
@@ -18737,8 +18749,12 @@ function updatePlanetAnomalies() {
 function updatePlanetInvariablePlaneHeights() {
   const DEG2RAD = Math.PI / 180;
 
-  // Years since J2000.0 epoch (year 2000.5)
-  const yearsSinceJ2000 = o.currentYear - 2000.5;
+  // Years since balancedYear - using balancedYear as epoch ensures perfect synchronization
+  // over complete Holistic Year cycles (ascending nodes return to exact same values)
+  // Calculate from JD directly using mean solar year length to avoid calendar-based drift
+  const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
+
+  // yearsFromBalancedToJ2000 is a pre-computed constant (defined near line 434)
 
   // Planet configuration for invariable plane calculations
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
@@ -18765,9 +18781,16 @@ function updatePlanetInvariablePlaneHeights() {
     // Calculate dynamic ascending node on invariable plane in ICRF (precesses over time)
     // Precession rate = 360° / precessionYears (degrees per year) - this is the ICRF rate for visual markers
     const precessionRateICRF = 360 / precessionYears;
-    // Use proper modulo that handles large negative values correctly
-    const rawSS = ascNodeJ2000 + precessionRateICRF * yearsSinceJ2000;
-    const rawVerified = ascNodeJ2000Verified + precessionRateICRF * yearsSinceJ2000;
+
+    // Back-calculate ascending node at balancedYear from J2000 values
+    // Formula: ascNodeAtBalanced = ascNodeJ2000 - rate * yearsFromBalancedToJ2000
+    const ascNodeAtBalancedSS = ascNodeJ2000 - precessionRateICRF * yearsFromBalancedToJ2000;
+    const ascNodeAtBalancedVerified = ascNodeJ2000Verified - precessionRateICRF * yearsFromBalancedToJ2000;
+
+    // Calculate current ascending node from balancedYear reference
+    // This ensures perfect cycle synchronization over complete Holistic Years
+    const rawSS = ascNodeAtBalancedSS + precessionRateICRF * yearsSinceBalanced;
+    const rawVerified = ascNodeAtBalancedVerified + precessionRateICRF * yearsSinceBalanced;
     const ascNodeDynamicSS = ((rawSS % 360) + 360) % 360;
     const ascNodeDynamicVerified = ((rawVerified % 360) + 360) % 360;
 
@@ -18783,7 +18806,10 @@ function updatePlanetInvariablePlaneHeights() {
     const generalRate = 1 / generalPrecessionYears;  // rate in cycles/year
     const eclipticRate = icrfRate + generalRate;  // combined rate (rates add)
     const precessionRateEcliptic = eclipticRate * 360;  // convert to degrees/year
-    const rawEcliptic = ascNodeJ2000Verified + precessionRateEcliptic * yearsSinceJ2000;
+
+    // Back-calculate ecliptic ascending node at balancedYear
+    const ascNodeAtBalancedEcliptic = ascNodeJ2000Verified - precessionRateEcliptic * yearsFromBalancedToJ2000;
+    const rawEcliptic = ascNodeAtBalancedEcliptic + precessionRateEcliptic * yearsSinceBalanced;
     const ascNodeDynamicEcliptic = ((rawEcliptic % 360) + 360) % 360;
 
     // Store the dynamic ascending nodes for reference
@@ -20004,18 +20030,28 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   //   Ω(t) = current ascending node on invariable plane
   //   offset = geometric phase offset (Ω_J2000 - φ₀)
   //
-  // The ascending node precesses with time:
-  //   Ω(t) = Ω_J2000 + (360° / period) × (t - 2000)
+  // The ascending node precesses with time, using balancedYear as epoch:
+  //   Ω_balanced = Ω_J2000 - rate × (J2000 - balancedYear)
+  //   Ω(t) = Ω_balanced + rate × (t - balancedYear)
   //
-  // At J2000: Ω(2000) = Ω_J2000, so phase = Ω_J2000 - offset = φ₀
-  // This guarantees i(2000) = mean + A × cos(φ₀) = i_J2000
+  // This ensures perfect cycle synchronization over complete Holistic Years
+  // while still producing correct J2000 values for verification
 
-  // Calculate years since J2000
-  const yearsSinceJ2000 = currentYear - 2000;
+  // Use balancedYear as epoch for perfect Holistic Year cycle synchronization
+  // This ensures inclination values return to exactly the same values after one complete cycle
+  // Calculate from JD directly using mean solar year length to avoid calendar-based drift
+  const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
 
-  // Calculate current ascending node (precesses with time)
+  // yearsFromBalancedToJ2000 is a pre-computed constant (defined near line 434)
+
+  // Calculate precession rate
   const precessionRate = 360 / period;  // degrees per year (negative for retrograde)
-  const ascNodeCurrent = ascNodeJ2000 + precessionRate * yearsSinceJ2000;
+
+  // Back-calculate ascending node at balancedYear from J2000 values
+  const ascNodeAtBalanced = ascNodeJ2000 - precessionRate * yearsFromBalancedToJ2000;
+
+  // Calculate current ascending node from balancedYear reference
+  const ascNodeCurrent = ascNodeAtBalanced + precessionRate * yearsSinceBalanced;
 
   // Calculate current phase from ascending node
   const currentPhaseDeg = ascNodeCurrent - phaseOffset;
