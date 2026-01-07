@@ -23,6 +23,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md) | How orbital elements change over time |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | The invariable plane extension (Souami & Souchay work) |
 | [06 - Scene Graph Hierarchy](06-scene-graph-hierarchy.md) | Three.js nested rotation layers - how the model works |
+| [07 - Verification Data Reference](07-verification-data-reference.md) | Astronomical verification data: transits, oppositions, conjunctions |
 
 ### Technical Reference - Constants & Formulas
 
