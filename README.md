@@ -185,13 +185,21 @@ orbitContainer → holds full orbit structure
 
 ## 📚 Documentation
 
-Detailed documentation is available in the `/docs` folder:
+Detailed documentation is available in the `/docs` folder. Start with the [Documentation Readme](docs/00-readme.md) for the complete reading order.
 
-- [Dynamic Orbital Elements Overview](docs/dynamic-orbital-elements-overview.md)
-- [Dynamic Ascending Node Calculation](docs/dynamic-ascending-node-calculation.md)
-- [Dynamic Inclination Calculation](docs/Souami&Souchay_dynamic-inclination-calculation.md)
-- [Planet Hierarchy Inspector](docs/planet-hierarchy-inspector.md)
-- [Saturn Inclination Anomaly](docs/saturn-inclination-anomaly.md)
+**Getting Started:**
+- [Introduction](docs/01-introduction.md) - Core concepts and the Holistic-Year
+- [User Guide](docs/02-user-guide.md) - How to use the 3D simulation
+- [Glossary](docs/03-glossary.md) - Essential terms and definitions
+
+**Conceptual Overview:**
+- [Dynamic Elements Overview](docs/04-dynamic-elements-overview.md) - How orbital elements change over time
+- [Invariable Plane Overview](docs/05-invariable-plane-overview.md) - The invariable plane reference frame
+- [Scene Graph Hierarchy](docs/06-scene-graph-hierarchy.md) - Three.js nested rotation layers
+
+**Technical Reference:**
+- [Constants Reference](docs/10-constants-reference.md) - All constants and their sources
+- [Orbital Formulas Reference](docs/11-orbital-formulas-reference.md) - Formula implementations
 
 ---
 
