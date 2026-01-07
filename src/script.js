@@ -40,8 +40,8 @@ const temperatureGraphMostLikely = 14.5;
 const earthRAAngle = 1.12;                                
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
 const earthtiltMean = 23.42723;                           // 3D model + formula
-const earthInvPlaneInclinationAmplitude = 0.564;                // 3D model + formula
-const earthInvPlaneInclinationMean = 1.49514053;                  // Formula only
+const earthInvPlaneInclinationAmplitude = 0.564;          // 3D model + formula
+const earthInvPlaneInclinationMean = 1.49514053;          // 3D model + Formula
 const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricitySinusCorrection = 0.652;                // Formula only
@@ -57,7 +57,6 @@ const speedOfLight = 299792.458;                          // Speed of light in k
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
 const earthPerihelionICRFYears = holisticyearLength/3;    // Duration of Earth's orbital plane precession ~99,392 years against ICRF
-const ascNodeInvPlaneEclipticYears = holisticyearLength/16; // Apparent precession rate in ecliptic coords ~18,636 years (combined ICRF + ecliptic precession)
 
 // Debg button on flag (set to true when needed)
 const debugOn = false;
@@ -74,7 +73,7 @@ const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
 const moonDistance = 384399.07;
-const moonAtApogee = 405400;                              // km - Moon's apogee distance
+const moonAtApogee = 405400;                              // Moon's apogee distance in km
 const moonEclipticInclinationJ2000 = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
@@ -90,8 +89,8 @@ const mercuryInvPlaneInclinationJ2000 = 6.3472858;
 const mercuryTilt = 0.03;
 const mercuryLongitudePerihelion = 77.4569131;
 const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
-const mercuryMeanAnomaly = 156.6364301;
-const mercuryTrueAnomaly = 164.1669319;
+const mercuryMeanAnomaly = 156.6364301;                   // Reference only
+const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.984416;                  // To align the perihelion exactly
 const mercuryPerihelionICRFYears = holisticyearLength/(1+(3/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
 const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
@@ -104,8 +103,8 @@ const venusInvPlaneInclinationJ2000 = 2.1545441;
 const venusTilt = 2.6392;
 const venusLongitudePerihelion = 131.5765919;
 const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
-const venusMeanAnomaly = 324.9668371;
-const venusTrueAnomaly = 324.5198504;
+const venusMeanAnomaly = 324.9668371;                     // Reference only
+const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.78268;                    // To align the perihelion exactly
 const venusPerihelionICRFYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~200 arcseconds per century
 const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
@@ -115,13 +114,13 @@ const marsSolarYearInput = 686.934;
 const marsEclipticInclinationJ2000 = 1.84969142;          // JPL J2000
 const marsOrbitalEccentricity = 0.09339410;               // JPL J2000
 const marsInvPlaneInclinationJ2000 = 1.6311858;
-const marsTilt = 25.19;
+const marsTilt = 25.19;  
 const marsLongitudePerihelion = 336.0650681;
 const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
-const marsMeanAnomaly = 109.2630844;
-const marsTrueAnomaly = 118.9501056;
+const marsMeanAnomaly = 109.2630844;                      // Reference only
+const marsTrueAnomaly = 118.9501056;                      // Reference only
 const marsAngleCorrection = -2.105382;                    // To align the perihelion exactly
-const marsPerihelionICRFYears = holisticyearLength/4; // Duration of perihelion precession to explain ~1700 arcseconds per century
+const marsPerihelionICRFYears = holisticyearLength/4;     // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
@@ -132,10 +131,10 @@ const jupiterInvPlaneInclinationJ2000 = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.70659401;
 const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
-const jupiterMeanAnomaly = 32.47179744;
-const jupiterTrueAnomaly = 35.69428061;
+const jupiterMeanAnomaly = 32.47179744;                   // Reference only
+const jupiterTrueAnomaly = 35.69428061;                   // Reference only
 const jupiterAngleCorrection = 1.097882;                  // To align the perihelion exactly
-const jupiterPerihelionICRFYears = holisticyearLength/5;// Duration of perihelion precession to explain ~2000 arcseconds per century
+const jupiterPerihelionICRFYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~2000 arcseconds per century
 const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
@@ -146,10 +145,10 @@ const saturnInvPlaneInclinationJ2000 = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 92.12794343;
 const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
-const saturnMeanAnomaly = 325.663876;
-const saturnTrueAnomaly = 321.7910116;
+const saturnMeanAnomaly = 325.663876;                     // Reference only
+const saturnTrueAnomaly = 321.7910116;                    // Reference only
 const saturnAngleCorrection = -0.175427;                  // To align the perihelion exactly
-const saturnPerihelionICRFYears = -holisticyearLength/8; // Duration of perihelion precession to explain ~-3800 arcseconds per century
+const saturnPerihelionICRFYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3500 arcseconds per century
 const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
@@ -160,10 +159,10 @@ const uranusInvPlaneInclinationJ2000 = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 170.7308251;
 const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
-const uranusMeanAnomaly = 145.7292678;
-const uranusTrueAnomaly = 148.5142459;
+const uranusMeanAnomaly = 145.7292678;                    // Reference only
+const uranusTrueAnomaly = 148.5142459;                    // Reference only
 const uranusAngleCorrection = -0.773944;                  // To align the perihelion exactly
-const uranusPerihelionICRFYears = holisticyearLength/3; // Duration of perihelion precession to explain ~1200 arcseconds per century
+const uranusPerihelionICRFYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1200 arcseconds per century
 const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
@@ -174,8 +173,8 @@ const neptuneInvPlaneInclinationJ2000 = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 45.80124471;
 const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
-const neptuneMeanAnomaly = 262.5003424;
-const neptuneTrueAnomaly = 261.2242728;
+const neptuneMeanAnomaly = 262.5003424;                   // Reference only
+const neptuneTrueAnomaly = 261.2242728;                   // Reference only
 const neptuneAngleCorrection = 2.401029;                  // To align the perihelion exactly
 const neptunePerihelionICRFYears = holisticyearLength*(2+(1/6)); // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneStartpos = 47.917;                           // Needs to be at ~20h33m40.34 if start model is 2451716.5
@@ -185,7 +184,7 @@ const neptuneStartpos = 47.917;                           // Needs to be at ~20h
 //*************************************************************
 
 // Reference lengths used as INPUT for Pluto
-const plutoSolarYearInput = 90465;               //  JPL Horizons J2000 (was 89760)
+const plutoSolarYearInput = 90465;               // JPL Horizons J2000 (was 89760)
 const plutoEclipticInclinationJ2000 = 17.14001;  // JPL Horizons J2000 (was 17.14175)
 const plutoOrbitalEccentricity = 0.2488273;      // JPL Horizons J2000 (was 0.24880766)
 const plutoInvPlaneInclinationJ2000 = 15.5639473;// From Souami & Souchay (2012) - KEEP UNCHANGED
@@ -258,17 +257,17 @@ const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Soucha
 
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Calibrated with earthAscendingNodeInvPlaneVerified = 284.492° and o.earthInvPlaneInclinationDynamic = 1.5787° at J2000
+// Earth's ascending node = longitudePerihelion + 180° + inclination = 102.9517° + 180° + 1.5787° = 284.5304°
 // Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.492;      // Adjusted from S&S 284.51°
-const mercuryAscendingNodeInvPlaneVerified = 32.81;      // was 32.22, Δ = +0.59° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.68;        // was 52.31, Δ = +2.37° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.84;        // was 352.95, Δ = +1.89° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 312.87;     // was 306.92, Δ = +5.95° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.82;      // was 122.27, Δ = -3.45° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.78;      // was 308.44, Δ = -0.66° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192;        // was 189.28, Δ = +2.72° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 105.44;       // was 107.06, Δ = -1.62° (from S&S)
+const earthAscendingNodeInvPlaneVerified = 284.5304;     // = perihelion(102.95°) + 180° + incl(1.58°)
+const mercuryAscendingNodeInvPlaneVerified = 32.85;      // was 32.22, Δ = +0.63° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.72;        // was 52.31, Δ = +2.41° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.89;        // was 352.95, Δ = +1.94° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.91;     // was 306.92, Δ = +5.99° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.83;      // was 122.27, Δ = -3.44° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.82;      // was 308.44, Δ = -0.62° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192.06;     // was 189.28, Δ = +2.78° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 101.08;       // was 107.06, Δ = -5.98° (from S&S)
 const halleysAscendingNodeInvPlaneVerified = 59.56;      // Approximation from ecliptic value
 const erosAscendingNodeInvPlaneVerified = 10.36;         // Approximation from ecliptic value
 const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Souchay (2012) Table 2
@@ -279,14 +278,16 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // the invariable plane during its precession cycle.
 //
 // Scientific basis: Laplace-Lagrange secular theory (Farside physics textbook, Table 10.4)
-// - Mercury: 4.57° to 9.86° → amplitude ~2.65°
-// - Venus: 0.72° to 4.11° → amplitude ~1.70°
-// - Earth: 0.00° to 2.96° → amplitude ~1.48° (we use 0.564° from more recent data)
-// - Mars: 0.00° to 5.84° → amplitude ~2.92°
-// - Jupiter: 0.241° to 0.489° → amplitude ~0.124°
-// - Saturn: 0.797° to 1.02° → amplitude ~0.112°
-// - Uranus: 0.902° to 1.11° → amplitude ~0.104°
-// - Neptune: 0.554° to 0.800° → amplitude ~0.123°
+// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+// These are theoretical bounds from Table 10.4:
+// - Mercury: 4.57° to 9.86°
+// - Venus: 0.00° to 3.38° (we use 0.72° to 4.11° for J2000 calibration)
+// - Earth: 0.00° to 2.95° (we use 0.93° to 2.06° for J2000 calibration)
+// - Mars: 0.00° to 5.84°
+// - Jupiter: 0.241° to 0.489°
+// - Saturn: 0.797° to 1.02° (we use 0.43° to 1.53° expanded for retrograde)
+// - Uranus: 0.902° to 1.11°
+// - Neptune: 0.554° to 0.800°
 //
 // Alternative derivation from JPL secular rates (°/century):
 // A = |rate| × |period| / (2π)
@@ -299,44 +300,44 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
 // J2000=6.3472858° (EXACT), phase 203°, period holisticyearLength/(1+(3/13)), trend error: 0.5"/cy
-const mercuryInvPlaneInclinationMean = 8.090700;
-const mercuryInvPlaneInclinationAmplitude = 1.769284;  // Range: 6.32° to 9.86°
+const mercuryInvPlaneInclinationMean = 8.090595;
+const mercuryInvPlaneInclinationAmplitude = 1.769392;  // Range: 6.32° to 9.86°
 
 // Venus: Range 0.72° to 4.11° (from Laplace-Lagrange)
-// J2000=2.1545441° (EXACT), phase 203°, period holisticyearLength*(2+(1/6)), trend error: 22.3"/cy
+// J2000=2.1545441° (EXACT), phase 203°, period holisticyearLength*(2+(1/6)), trend error: 21.2"/cy
 // Note: Large error due to long period - Venus motion too slow to counteract Earth's contribution
-const venusInvPlaneInclinationMean = 3.053500;
-const venusInvPlaneInclinationAmplitude = 1.056359;  // Range: 2.00° to 4.11°
+const venusInvPlaneInclinationMean = 3.053776;
+const venusInvPlaneInclinationAmplitude = 1.057139;  // Range: 2.00° to 4.11°
 
 // Mars: Range 0.00° to 5.84° (from Laplace-Lagrange)
 // J2000=1.6311858° (EXACT), phase 203°, period holisticyearLength/4, trend error: 13.1"/cy
-const marsInvPlaneInclinationMean = 3.603200;
-const marsInvPlaneInclinationAmplitude = 2.236774;  // Range: 1.37° to 5.84°
+const marsInvPlaneInclinationMean = 3.603964;
+const marsInvPlaneInclinationAmplitude = 2.236597;  // Range: 1.37° to 5.84°
 
 // Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
-// J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength/5, trend error: 12.3"/cy
-const jupiterInvPlaneInclinationMean = 0.348015;
-const jupiterInvPlaneInclinationAmplitude = 0.076642;  // Range: 0.27° to 0.43°
+// J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength/5, trend error: 0.0"/cy
+const jupiterInvPlaneInclinationMean = 0.359000;
+const jupiterInvPlaneInclinationAmplitude = 0.108752;  // Range: 0.25° to 0.47°
 
 // Saturn: Range 0.43° to 1.53° (expanded from Laplace-Lagrange)
 // J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
-const saturnInvPlaneInclinationMean = 0.935080;
-const saturnInvPlaneInclinationAmplitude = 0.094763;  // Range: 0.84° to 1.03°
+const saturnInvPlaneInclinationMean = 0.938300;
+const saturnInvPlaneInclinationAmplitude = 0.126304;  // Range: 0.81° to 1.06°
 
 // Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
 // J2000=0.9946692° (EXACT), phase 203°, period holisticyearLength/3, trend error: 1.0"/cy
-const uranusInvPlaneInclinationMean = 1.018100;
-const uranusInvPlaneInclinationAmplitude = 0.091846;  // Range: 0.93° to 1.11°
+const uranusInvPlaneInclinationMean = 1.018300;
+const uranusInvPlaneInclinationAmplitude = 0.092386;  // Range: 0.93° to 1.11°
 
 // Neptune: Range 0.554° to 0.800° (from Laplace-Lagrange)
 // J2000=0.7354155° (EXACT), phase 203°, period holisticyearLength*(2+(1/6)), trend error: 0.2"/cy
-const neptuneInvPlaneInclinationMean = 0.645600;
-const neptuneInvPlaneInclinationAmplitude = 0.091497;  // Range: 0.55° to 0.74°
+const neptuneInvPlaneInclinationMean = 0.645100;
+const neptuneInvPlaneInclinationAmplitude = 0.091987;  // Range: 0.55° to 0.74°
 
 // Pluto: Range 15.0° to 16.5° (estimated)
-// J2000=15.5639473° (EXACT), phase 203°, period holisticyearLength, trend error: 3.9"/cy
-const plutoInvPlaneInclinationMean = 15.649300;
-const plutoInvPlaneInclinationAmplitude = 0.648752;  // Range: 15.00° to 16.30°
+// J2000=15.5639473° (EXACT), phase 203°, period holisticyearLength, trend error: 5.1"/cy
+const plutoInvPlaneInclinationMean = 15.710950;
+const plutoInvPlaneInclinationAmplitude = 0.711720;  // Range: 15.00° to 16.42°
 
 // Halleys: Estimated from near-Earth asteroid dynamics
 // Ecliptic inclination ~162.26269°, Earth offset ~1.58°, gives ~150° to invariable plane
@@ -367,17 +368,33 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 // ══════════════════════════════════════════════════════════════════════════════
 
 const mercuryInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.5"/cy
-const venusInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 22.3"/cy
+const venusInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 21.2"/cy
 const earthInclinationPhaseAngle = 203;    // prograde, decreasing trend (reference)
 const marsInclinationPhaseAngle = 203;     // prograde, decreasing trend, error: 13.1"/cy
-const jupiterInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 12.3"/cy
+const jupiterInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.0"/cy
 const saturnInclinationPhaseAngle = 23;    // RETROGRADE, increasing trend, error: 0.0"/cy
 const uranusInclinationPhaseAngle = 203;   // prograde, decreasing trend, error: 1.0"/cy
 const neptuneInclinationPhaseAngle = 203;  // prograde, increasing trend, error: 0.2"/cy
-const plutoInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 3.9"/cy
+const plutoInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 5.1"/cy
 const halleysInclinationPhaseAngle = 23;   // RETROGRADE (estimated)
 const erosInclinationPhaseAngle = 203;     // prograde (estimated)
 const ceresInclinationPhaseAngle = 203;    // prograde (estimated)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// JPL ECLIPTIC INCLINATION TREND RATES (degrees/century)
+// ══════════════════════════════════════════════════════════════════════════════
+// Source: JPL Approximate Positions of the Planets
+// https://ssd.jpl.nasa.gov/planets/approx_pos.html
+// These are the target rates that our model should reproduce for verification.
+// ══════════════════════════════════════════════════════════════════════════════
+const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
+const venusEclipticInclinationTrendJPL = -0.00079;    // degrees/century (DECREASING)
+const marsEclipticInclinationTrendJPL = -0.00813;     // degrees/century (DECREASING)
+const jupiterEclipticInclinationTrendJPL = -0.00184;  // degrees/century (DECREASING)
+const saturnEclipticInclinationTrendJPL = +0.00194;   // degrees/century (INCREASING)
+const uranusEclipticInclinationTrendJPL = -0.00243;   // degrees/century (DECREASING)
+const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREASING)
+const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
 
 // Derived phase offset for inclination path alignment with zodiac
 // The earthInvPlaneInclinationMean correction accounts for the projection offset when measuring
@@ -517,42 +534,42 @@ const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
-const MASS_RATIO_SUN_MERCURY = 6023625.5;  // DE440
+const MASS_RATIO_SUN_MERCURY = 6023625.5;            // DE440
 const GM_MERCURY = GM_SUN / MASS_RATIO_SUN_MERCURY;  // ~22,032 km³/s²
 const M_MERCURY = GM_MERCURY / G_CONSTANT;           // ~3.30 × 10²³ kg
 
 // Venus: No moons, mass determined from Venera, Magellan spacecraft
-const MASS_RATIO_SUN_VENUS = 408523.72;  // DE440
+const MASS_RATIO_SUN_VENUS = 408523.72;              // DE440
 const GM_VENUS = GM_SUN / MASS_RATIO_SUN_VENUS;      // ~324,859 km³/s²
 const M_VENUS = GM_VENUS / G_CONSTANT;               // ~4.87 × 10²⁴ kg
 
 // Mars: Mass from Phobos/Deimos orbits and spacecraft tracking
-const MASS_RATIO_SUN_MARS = 3098703.59;  // DE440
+const MASS_RATIO_SUN_MARS = 3098703.59;              // DE440
 const GM_MARS = GM_SUN / MASS_RATIO_SUN_MARS;        // ~42,828 km³/s²
 const M_MARS = GM_MARS / G_CONSTANT;                 // ~6.42 × 10²³ kg
 
 // Jupiter: Mass from Galilean moon orbits (Io, Europa, Ganymede, Callisto)
-const MASS_RATIO_SUN_JUPITER = 1047.348625;  // DE440
+const MASS_RATIO_SUN_JUPITER = 1047.348625;          // DE440
 const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,712,764 km³/s²
 const M_JUPITER = GM_JUPITER / G_CONSTANT;           // ~1.90 × 10²⁷ kg
 
 // Saturn: Mass from Titan and other moon orbits
-const MASS_RATIO_SUN_SATURN = 3497.9018;  // DE440
+const MASS_RATIO_SUN_SATURN = 3497.9018;             // DE440
 const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,940,585 km³/s²
 const M_SATURN = GM_SATURN / G_CONSTANT;             // ~5.68 × 10²⁶ kg
 
 // Uranus: Mass from moon orbits (Titania, Oberon, etc.)
-const MASS_RATIO_SUN_URANUS = 22902.944;  // DE440
+const MASS_RATIO_SUN_URANUS = 22902.944;             // DE440
 const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,794,556 km³/s²
 const M_URANUS = GM_URANUS / G_CONSTANT;             // ~8.68 × 10²⁵ kg
 
 // Neptune: Mass from Triton orbit and Voyager 2 flyby
-const MASS_RATIO_SUN_NEPTUNE = 19412.237;  // DE440
+const MASS_RATIO_SUN_NEPTUNE = 19412.237;            // DE440
 const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,527 km³/s²
 const M_NEPTUNE = GM_NEPTUNE / G_CONSTANT;           // ~1.02 × 10²⁶ kg
 
 // Pluto: Mass from Charon orbit (binary system)
-const MASS_RATIO_SUN_PLUTO = 136047200;  // DE440
+const MASS_RATIO_SUN_PLUTO = 136047200;              // DE440
 const GM_PLUTO = GM_SUN / MASS_RATIO_SUN_PLUTO;      // ~975.5 km³/s²
 const M_PLUTO = GM_PLUTO / G_CONSTANT;               // ~1.47 × 10²² kg
 
@@ -694,10 +711,6 @@ const OrbitalFormulas = {
     return Math.sqrt(GM_SUN / p) * (1 + e * Math.cos(nu));
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  // Part 2 Formulas - Added December 2024
-  // ═══════════════════════════════════════════════════════════════
-
   // Escape velocity from Sun at distance r (km/s)
   // v_esc = √(2GM/r)
   escapeVelocity: (r_km) => Math.sqrt(2 * GM_SUN / r_km),
@@ -779,11 +792,6 @@ const OrbitalFormulas = {
     return P_seconds / o.lengthofDay;
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  // Part 3 Formulas - Added December 2024
-  // Gravitational Influence Zones, Relativistic, and Barycenter
-  // ═══════════════════════════════════════════════════════════════
-
   // Hill Sphere Radius (km)
   // r_Hill = a × (m / 3M)^(1/3)
   // Region where body's gravity dominates over the primary's gravity
@@ -837,10 +845,6 @@ const OrbitalFormulas = {
     return -GM / r_km;
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  // Surface & Physical Properties (require radius)
-  // ═══════════════════════════════════════════════════════════════
-
   // Surface Gravity (m/s²)
   // g = GM / R²
   // Gravitational acceleration at the surface
@@ -892,7 +896,7 @@ const OrbitalFormulas = {
   meanMotionFromGM: (GM, a_km) => Math.sqrt(GM / Math.pow(a_km, 3)),
 
   // ═══════════════════════════════════════════════════════════════
-  // Part 4 Formulas - Precession & Newtonian Dynamics
+  // Precession & Newtonian Dynamics
   // ═══════════════════════════════════════════════════════════════
 
   // Precession rate from precession period (arcsec/century)
@@ -990,7 +994,7 @@ const OrbitalFormulas = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // Part 5 Formulas - Precession Breakdown (Lagrange-Laplace Secular Theory)
+  // Precession Breakdown (Lagrange-Laplace Secular Theory)
   // ═══════════════════════════════════════════════════════════════
 
   // Laplace coefficient b_{3/2}^{(1)}(α) - for outer perturber on inner planet
@@ -1273,7 +1277,7 @@ function getPlanetPerturbationData(oRef) {
       a_km: mercuryOrbitDistance * oRef.lengthofAU,
       e: mercuryOrbitalEccentricity,
       i_deg: mercuryEclipticInclinationJ2000,        // Fixed ecliptic inclination (7.005°)
-      omega_deg: mercuryAscendingNode,          // Fixed J2000 ascending node
+      omega_deg: mercuryAscendingNode,               // Fixed J2000 ascending node
       mass: M_MERCURY,
       period_days: (holisticyearLength / mercurySolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears)
@@ -1282,18 +1286,18 @@ function getPlanetPerturbationData(oRef) {
       name: 'Venus',
       a_km: venusOrbitDistance * oRef.lengthofAU,
       e: venusOrbitalEccentricity,
-      i_deg: venusEclipticInclinationJ2000,           // Fixed ecliptic inclination (3.39°)
-      omega_deg: venusAscendingNode,            // Fixed J2000 ascending node
+      i_deg: venusEclipticInclinationJ2000,          // Fixed ecliptic inclination (3.39°)
+      omega_deg: venusAscendingNode,                 // Fixed J2000 ascending node
       mass: M_VENUS,
       period_days: (holisticyearLength / venusSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears)
     },
     {
       name: 'Earth',
-      a_km: oRef.lengthofAU,  // Earth = 1 AU
-      e: eccentricityMean,                      // Fixed mean eccentricity
-      i_deg: 0,                                 // Earth defines the ecliptic (0° by definition)
-      omega_deg: 0,                             // Reference point
+      a_km: oRef.lengthofAU,                        // Earth = 1 AU
+      e: eccentricityMean,                          // Fixed mean eccentricity
+      i_deg: 0,                                     // Earth defines the ecliptic (0° by definition)
+      omega_deg: 0,                                 // Reference point
       mass: M_EARTH,
       period_days: meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
@@ -1302,8 +1306,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Mars',
       a_km: marsOrbitDistance * oRef.lengthofAU,
       e: marsOrbitalEccentricity,
-      i_deg: marsEclipticInclinationJ2000,            // Fixed ecliptic inclination (1.85°)
-      omega_deg: marsAscendingNode,             // Fixed J2000 ascending node
+      i_deg: marsEclipticInclinationJ2000,          // Fixed ecliptic inclination (1.85°)
+      omega_deg: marsAscendingNode,                 // Fixed J2000 ascending node
       mass: M_MARS,
       period_days: (holisticyearLength / marsSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears)
@@ -1312,8 +1316,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Jupiter',
       a_km: jupiterOrbitDistance * oRef.lengthofAU,
       e: jupiterOrbitalEccentricity,
-      i_deg: jupiterEclipticInclinationJ2000,         // Fixed ecliptic inclination (1.30°)
-      omega_deg: jupiterAscendingNode,          // Fixed J2000 ascending node
+      i_deg: jupiterEclipticInclinationJ2000,       // Fixed ecliptic inclination (1.30°)
+      omega_deg: jupiterAscendingNode,              // Fixed J2000 ascending node
       mass: M_JUPITER,
       period_days: (holisticyearLength / jupiterSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears)
@@ -1322,8 +1326,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Saturn',
       a_km: saturnOrbitDistance * oRef.lengthofAU,
       e: saturnOrbitalEccentricity,
-      i_deg: saturnEclipticInclinationJ2000,          // Fixed ecliptic inclination (2.49°)
-      omega_deg: saturnAscendingNode,           // Fixed J2000 ascending node
+      i_deg: saturnEclipticInclinationJ2000,        // Fixed ecliptic inclination (2.49°)
+      omega_deg: saturnAscendingNode,               // Fixed J2000 ascending node
       mass: M_SATURN,
       period_days: (holisticyearLength / saturnSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears)
@@ -1332,8 +1336,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Uranus',
       a_km: uranusOrbitDistance * oRef.lengthofAU,
       e: uranusOrbitalEccentricity,
-      i_deg: uranusEclipticInclinationJ2000,          // Fixed ecliptic inclination (0.77°)
-      omega_deg: uranusAscendingNode,           // Fixed J2000 ascending node
+      i_deg: uranusEclipticInclinationJ2000,        // Fixed ecliptic inclination (0.77°)
+      omega_deg: uranusAscendingNode,               // Fixed J2000 ascending node
       mass: M_URANUS,
       period_days: (holisticyearLength / uranusSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears)
@@ -1342,8 +1346,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Neptune',
       a_km: neptuneOrbitDistance * oRef.lengthofAU,
       e: neptuneOrbitalEccentricity,
-      i_deg: neptuneEclipticInclinationJ2000,         // Fixed ecliptic inclination (1.77°)
-      omega_deg: neptuneAscendingNode,          // Fixed J2000 ascending node
+      i_deg: neptuneEclipticInclinationJ2000,       // Fixed ecliptic inclination (1.77°)
+      omega_deg: neptuneAscendingNode,              // Fixed J2000 ascending node
       mass: M_NEPTUNE,
       period_days: (holisticyearLength / neptuneSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears)
@@ -1352,8 +1356,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Pluto',
       a_km: plutoOrbitDistance * oRef.lengthofAU,
       e: plutoOrbitalEccentricity,
-      i_deg: plutoEclipticInclinationJ2000,           // Fixed ecliptic inclination (17.14°)
-      omega_deg: plutoAscendingNode,            // Fixed J2000 ascending node
+      i_deg: plutoEclipticInclinationJ2000,         // Fixed ecliptic inclination (17.14°)
+      omega_deg: plutoAscendingNode,                // Fixed J2000 ascending node
       mass: M_PLUTO,
       period_days: (holisticyearLength / plutoSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears)
@@ -1362,8 +1366,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Halleys',
       a_km: halleysOrbitDistance * oRef.lengthofAU,
       e: halleysOrbitalEccentricity,
-      i_deg: halleysEclipticInclinationJ2000,         // Fixed ecliptic inclination (162.19° - retrograde)
-      omega_deg: halleysAscendingNode,          // Fixed J2000 ascending node
+      i_deg: halleysEclipticInclinationJ2000,       // Fixed ecliptic inclination (162.19° - retrograde)
+      omega_deg: halleysAscendingNode,              // Fixed J2000 ascending node
       mass: M_HALLEYS,
       period_days: (holisticyearLength / halleysSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears)
@@ -1372,8 +1376,8 @@ function getPlanetPerturbationData(oRef) {
       name: 'Eros',
       a_km: erosOrbitDistance * oRef.lengthofAU,
       e: erosOrbitalEccentricity,
-      i_deg: erosEclipticInclinationJ2000,            // Fixed ecliptic inclination (10.83°)
-      omega_deg: erosAscendingNode,             // Fixed J2000 ascending node
+      i_deg: erosEclipticInclinationJ2000,          // Fixed ecliptic inclination (10.83°)
+      omega_deg: erosAscendingNode,                 // Fixed J2000 ascending node
       mass: M_EROS,
       period_days: (holisticyearLength / erosSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears)
@@ -3818,6 +3822,7 @@ let o = {
   plutoPerihelion: 0,
   halleysPerihelion: 0,
   erosPerihelion: 0,
+
   // Ecliptic-frame perihelion (J2000 ecliptic - stable, true heliocentric value)
   mercuryPerihelionEcliptic: 0,
   venusPerihelionEcliptic: 0,
@@ -3952,7 +3957,7 @@ let o = {
   erosAscendingNodeInvPlaneSouamiSouchay: 0,
 
   // Dynamic ascending nodes on invariable plane in ECLIPTIC coords (for height calculation)
-  // Uses apparent precession rate of ~18,636 years (ascNodeInvPlaneEclipticYears)
+  // Uses apparent precession rate (eg 18,636 years for Earth)
   mercuryAscendingNodeInvPlaneEcliptic: 0,
   venusAscendingNodeInvPlaneEcliptic: 0,
   earthAscendingNodeInvPlaneEcliptic: 0,
@@ -5566,7 +5571,7 @@ function updateSunCenteredInvPlane() {
     uranus: uranusInclinationPhaseAngle,
     neptune: neptuneInclinationPhaseAngle,
     pluto: plutoInclinationPhaseAngle,
-    earth: earthInclinationPhaseAngle  // Ω=284.492°, φ₀=81.5° → 203.0°
+    earth: earthInclinationPhaseAngle  // Ω=284.5304°, φ₀=81.5° → 203.0°
   };
   const phaseOffset = phaseOffsetLookup[planetData.key] ?? 0;
 
@@ -5879,13 +5884,13 @@ const _lsBox      = new THREE.Box3();             // Light-space AABB (reusable)
 const _invMat     = new THREE.Matrix4();
 const _camDir     = new THREE.Vector3();          // Camera direction (reusable in render loop)
 
-const EARTH_POS    = new THREE.Vector3();   // Earth centre (world)
-const SUN_POS      = new THREE.Vector3();   // Sun   centre (world)
-const WOBBLE_POS  = new THREE.Vector3();   // WOBBLE   centre (world)
+const EARTH_POS    = new THREE.Vector3();         // Earth centre (world)
+const SUN_POS      = new THREE.Vector3();         // Sun   centre (world)
+const WOBBLE_POS  = new THREE.Vector3();          // WOBBLE   centre (world)
 const PERIHELION_OF_EARTH_POS  = new THREE.Vector3();   // PERIHELION-OF-EARTH   centre (world)
-const DELTA        = new THREE.Vector3();   // reusable difference-vector
-const LOCAL        = new THREE.Vector3();   // world-to-Earth local
-const CAM_LOCAL    = new THREE.Vector3();   // camera in Earth local
+const DELTA        = new THREE.Vector3();         // reusable difference-vector
+const LOCAL        = new THREE.Vector3();         // world-to-Earth local
+const CAM_LOCAL    = new THREE.Vector3();         // camera in Earth local
 const CAMERA_POS   = new THREE.Vector3();
 const PLANET_POS   = new THREE.Vector3();
 const LOOK_DIR     = new THREE.Vector3();
@@ -6943,13 +6948,13 @@ const hierarchyInspector = {
   inclinationPlane: null,
   ascendingNode: null,
   descendingNode: null,
-  aboveHalfPlane: null,  // GREEN half-plane (above ecliptic)
-  belowHalfPlane: null,  // RED half-plane (below ecliptic)
-  highestPointMarker: null,  // GREEN sphere at highest point (90° after ascending node)
-  lowestPointMarker: null,   // RED sphere at lowest point (90° after descending node)
+  aboveHalfPlane: null,       // GREEN half-plane (above ecliptic)
+  belowHalfPlane: null,       // RED half-plane (below ecliptic)
+  highestPointMarker: null,   // GREEN sphere at highest point (90° after ascending node)
+  lowestPointMarker: null,    // RED sphere at lowest point (90° after descending node)
   perihelionDot: null,
   perihelionArrow: null,
-  earthPerihelionArrow: null,  // Green arrow from planet perihelion to Earth perihelion (Step 2)
+  earthPerihelionArrow: null, // Green arrow from planet perihelion to Earth perihelion (Step 2)
   // Anomaly visualization elements (updated live)
   anomalyGroup: null,
   perihelionLine: null,
@@ -17806,7 +17811,7 @@ function apparentRaFromPdA(pdA, pdB) {
 // │ Measures: Pure precession angle from the model's precession layer           │
 // │ Includes: Only the configured precession rate, nothing else                 │
 // │ Use case: The "true" heliocentric precession rate                           │
-// │ Expected rate: Exactly 532.32 arcsec/century for Mercury (stable)           │
+// │ Expected rate: Exactly 534.94 arcsec/century for Mercury (stable)           │
 // │ Fluctuation: NONE - perfectly stable by definition                          │
 // └─────────────────────────────────────────────────────────────────────────────┘
 //
