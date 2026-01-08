@@ -238,7 +238,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to ecliptic | 7.005° | Always above Earth, Ω always decreases |
 | Incl. to inv. plane | 6.347° | Highest among inner planets |
 | Ω J2000 (ecliptic) | 48.33° | |
-| Ω J2000 (inv. plane) | 32.85° | |
+| Ω J2000 (inv. plane) | 32.83° | |
 | Ecliptic incl. range | ~4.3° to ~8.4° | Large variation over ~99,392 years |
 
 ### Venus
@@ -248,7 +248,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to ecliptic | 3.395° | Always above Earth, Ω always decreases |
 | Incl. to inv. plane | 2.155° | |
 | Ω J2000 (ecliptic) | 76.68° | |
-| Ω J2000 (inv. plane) | 54.72° | |
+| Ω J2000 (inv. plane) | 54.70° | |
 | Ecliptic incl. range | ~1.3° to ~4.4° | |
 
 ### Mars
@@ -258,7 +258,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to ecliptic | 1.850° | WITHIN Earth's range - crossovers possible |
 | Incl. to inv. plane | 1.631° | |
 | Ω J2000 (ecliptic) | 49.56° | |
-| Ω J2000 (inv. plane) | 354.89° | |
+| Ω J2000 (inv. plane) | 354.87° | |
 | Ecliptic incl. range | ~0.1° to ~3.2° | Can nearly align with ecliptic |
 | Crossover epoch | ~55,000 years from now | Ω direction reverses |
 
@@ -269,7 +269,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to ecliptic | 1.305° | WITHIN Earth's range - crossover possible |
 | Incl. to inv. plane | 0.322° | Closest to invariable plane |
 | Ω J2000 (ecliptic) | 100.49° | |
-| Ω J2000 (inv. plane) | 312.91° | |
+| Ω J2000 (inv. plane) | 312.89° | |
 | Ecliptic incl. range | ~0.9° to ~1.6° | Smallest variation |
 | Crossover epoch | ~9,700 years from now | Earth incl crosses Jupiter ecliptic incl |
 
@@ -280,7 +280,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to ecliptic | 2.485° | Always above Earth, Ω always decreases |
 | Incl. to inv. plane | 0.925° | **BELOW** Earth's current value |
 | Ω J2000 (ecliptic) | 113.65° | |
-| Ω J2000 (inv. plane) | 118.82° | |
+| Ω J2000 (inv. plane) | 118.81° | |
 | Ecliptic incl. range | ~1.5° to ~3.4° | |
 | **Anomaly** | Resolved - see Saturn section | Model vs observed discrepancy (now fixed) |
 

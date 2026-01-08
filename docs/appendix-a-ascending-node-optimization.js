@@ -36,9 +36,8 @@ const RAD2DEG = 180 / Math.PI;
 const earthConfig = {
   // Dynamic inclination at J2000 (from oscillation formula)
   inclJ2000: 1.57867339,
-  // Earth's ascending node = longitudePerihelion + 180° + inclination
-  // = 102.9517° + 180° + 1.5787° = 284.5304°
-  ascNodeVerified: 284.5304
+  // Earth's ascending node from Souami & Souchay (2012)
+  ascNodeVerified: 284.51
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

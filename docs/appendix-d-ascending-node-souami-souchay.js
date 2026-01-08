@@ -29,11 +29,9 @@ const holisticyearLength = 298176;
 const earthConfig = {
   // Dynamic inclination at J2000
   inclJ2000: 1.57867339,  // Earth's inclination to invariable plane at J2000
-  // Original Souami & Souchay ascending node
+  // Earth's ascending node from Souami & Souchay (2012) - used for both
   ascNodeSouamiSouchay: 284.51,
-  // J2000-Verified ascending node = longitudePerihelion + 180° + inclination
-  // = 102.9517° + 180° + 1.5787° = 284.5304°
-  ascNodeVerified: 284.5304
+  ascNodeVerified: 284.51
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -89,15 +87,15 @@ const ascendingNodesSouamiSouchay = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ascendingNodesVerified = {
-  earth: 284.5304,
-  mercury: 32.85,
-  venus: 54.72,
-  mars: 354.89,
-  jupiter: 312.91,
-  saturn: 118.83,
-  uranus: 307.82,
-  neptune: 192.06,
-  pluto: 101.08
+  earth: 284.51,
+  mercury: 32.83,
+  venus: 54.70,
+  mars: 354.87,
+  jupiter: 312.89,
+  saturn: 118.81,
+  uranus: 307.80,
+  neptune: 192.04,
+  pluto: 101.06
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -319,7 +319,7 @@ To calculate a planet's height above the invariable plane:
 | `earthInvPlaneInclinationMean` | 1.49514° | Mean orbital inclination to invariable plane |
 | `earthInvPlaneInclinationAmplitude` | 0.564° | Oscillation amplitude |
 | `earthAscendingNodeInvPlaneSouamiSouchay` | 284.51° | J2000 ascending node (S&S) |
-| `earthAscendingNodeInvPlaneVerified` | 284.53° | J2000 ascending node (verified) |
+| `earthAscendingNodeInvPlaneVerified` | 284.51° | J2000 ascending node (S&S 2012) |
 | `earthPerihelionICRFYears` | 99,392 | Orbital plane precession period (ICRF) |
 
 ### 5.2 Obliquity

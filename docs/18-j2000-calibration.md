@@ -119,17 +119,17 @@ The optimal solution keeps invariable plane inclinations unchanged and only adju
 ```javascript
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Earth's ascending node = longitudePerihelion + 180° + inclination = 102.9517° + 180° + 1.5787° = 284.5304°
+// Earth's ascending node = 284.51° from Souami & Souchay (2012)
 // Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.5304;  // = perihelion(102.95°) + 180° + incl(1.58°)
-const mercuryAscendingNodeInvPlaneVerified = 32.85;   // was 32.22, Δ = +0.63° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.72;     // was 52.31, Δ = +2.41° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.89;     // was 352.95, Δ = +1.94° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 312.91;  // was 306.92, Δ = +5.99° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.83;   // was 122.27, Δ = -3.44° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.82;   // was 308.44, Δ = -0.62° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192.06;  // was 189.28, Δ = +2.78° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 101.08;    // was 107.06, Δ = -5.98° (from S&S)
+const earthAscendingNodeInvPlaneVerified = 284.51;    // Souami & Souchay (2012)
+const mercuryAscendingNodeInvPlaneVerified = 32.83;   // was 32.22, Δ = +0.61° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.70;     // was 52.31, Δ = +2.39° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.87;     // was 352.95, Δ = +1.92° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.89;  // was 306.92, Δ = +5.97° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.81;   // was 122.27, Δ = -3.46° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.80;   // was 308.44, Δ = -0.64° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192.04;  // was 189.28, Δ = +2.76° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 101.06;    // was 107.06, Δ = -6.00° (from S&S)
 
 // Halley's and Eros - derived from ecliptic values, verified against J2000 data
 const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
@@ -140,15 +140,15 @@ const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22°
 
 | Planet | Souami & Souchay Ω | Verified Ω | Change |
 |--------|-------------------|------------|--------|
-| Earth | 284.51° | 284.5304° | +0.02° |
-| Mercury | 32.22° | 32.85° | +0.63° |
-| Venus | 52.31° | 54.72° | +2.41° |
-| Mars | 352.95° | 354.89° | +1.94° |
-| Jupiter | 306.92° | 312.91° | +5.99° |
-| Saturn | 122.27° | 118.83° | -3.44° |
-| Uranus | 308.44° | 307.82° | -0.62° |
-| Neptune | 189.28° | 192.06° | +2.78° |
-| Pluto | 107.06° | 101.08° | -5.98° |
+| Earth | 284.51° | 284.51° | 0.00° |
+| Mercury | 32.22° | 32.83° | +0.61° |
+| Venus | 52.31° | 54.70° | +2.39° |
+| Mars | 352.95° | 354.87° | +1.92° |
+| Jupiter | 306.92° | 312.89° | +5.97° |
+| Saturn | 122.27° | 118.81° | -3.46° |
+| Uranus | 308.44° | 307.80° | -0.64° |
+| Neptune | 189.28° | 192.04° | +2.76° |
+| Pluto | 107.06° | 101.06° | -6.00° |
 
 ### Inclinations
 
@@ -187,17 +187,17 @@ Add the verified ascending node constants:
 ```javascript
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Earth's ascending node = longitudePerihelion + 180° + inclination = 102.9517° + 180° + 1.5787° = 284.5304°
+// Earth's ascending node = 284.51° from Souami & Souchay (2012)
 // Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.5304;  // = perihelion(102.95°) + 180° + incl(1.58°)
-const mercuryAscendingNodeInvPlaneVerified = 32.85;   // was 32.22, Δ = +0.63° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.72;     // was 52.31, Δ = +2.41° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.89;     // was 352.95, Δ = +1.94° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 312.91;  // was 306.92, Δ = +5.99° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.83;   // was 122.27, Δ = -3.44° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.82;   // was 308.44, Δ = -0.62° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192.06;  // was 189.28, Δ = +2.78° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 101.08;    // was 107.06, Δ = -5.98° (from S&S)
+const earthAscendingNodeInvPlaneVerified = 284.51;    // Souami & Souchay (2012)
+const mercuryAscendingNodeInvPlaneVerified = 32.83;   // was 32.22, Δ = +0.61° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.70;     // was 52.31, Δ = +2.39° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.87;     // was 352.95, Δ = +1.92° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.89;  // was 306.92, Δ = +5.97° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.81;   // was 122.27, Δ = -3.46° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.80;   // was 308.44, Δ = -0.64° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192.04;  // was 189.28, Δ = +2.76° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 101.06;    // was 107.06, Δ = -6.00° (from S&S)
 const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograde orbit
 const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (estimated)
 ```
@@ -377,7 +377,7 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 
 ## Notes
 
-- Earth's ascending node (284.51°) is kept unchanged - all adjustments are to planet ascending nodes
+- Earth's ascending node (284.51° - Souami & Souchay 2012) is the reference - all other ascending nodes are adjusted relative to this
 - Pluto shows a residual 0.014° error due to geometric constraints (high inclination limits precision)
 - Halley's and Eros values are approximations pending proper verification against reference data
 

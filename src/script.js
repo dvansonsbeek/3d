@@ -257,17 +257,17 @@ const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Soucha
 
 // J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
 // These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Earth's ascending node = longitudePerihelion + 180° + inclination = 102.9517° + 180° + 1.5787° = 284.5304°
+// Earth's ascending node is set the same as Souami & Souchay value
 // Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.5304;     // = perihelion(102.95°) + 180° + incl(1.58°)
-const mercuryAscendingNodeInvPlaneVerified = 32.85;      // was 32.22, Δ = +0.63° (from S&S)
-const venusAscendingNodeInvPlaneVerified = 54.72;        // was 52.31, Δ = +2.41° (from S&S)
-const marsAscendingNodeInvPlaneVerified = 354.89;        // was 352.95, Δ = +1.94° (from S&S)
-const jupiterAscendingNodeInvPlaneVerified = 312.91;     // was 306.92, Δ = +5.99° (from S&S)
-const saturnAscendingNodeInvPlaneVerified = 118.83;      // was 122.27, Δ = -3.44° (from S&S)
-const uranusAscendingNodeInvPlaneVerified = 307.82;      // was 308.44, Δ = -0.62° (from S&S)
-const neptuneAscendingNodeInvPlaneVerified = 192.06;     // was 189.28, Δ = +2.78° (from S&S)
-const plutoAscendingNodeInvPlaneVerified = 101.08;       // was 107.06, Δ = -5.98° (from S&S)
+const earthAscendingNodeInvPlaneVerified = 284.51;       // Souami & Souchay (2012)
+const mercuryAscendingNodeInvPlaneVerified = 32.83;      // was 32.22, Δ = +0.61° (from S&S)
+const venusAscendingNodeInvPlaneVerified = 54.70;        // was 52.31, Δ = +2.39° (from S&S)
+const marsAscendingNodeInvPlaneVerified = 354.87;        // was 352.95, Δ = +1.92° (from S&S)
+const jupiterAscendingNodeInvPlaneVerified = 312.89;     // was 306.92, Δ = +5.97° (from S&S)
+const saturnAscendingNodeInvPlaneVerified = 118.81;      // was 122.27, Δ = -3.46° (from S&S)
+const uranusAscendingNodeInvPlaneVerified = 307.80;      // was 308.44, Δ = -0.64° (from S&S)
+const neptuneAscendingNodeInvPlaneVerified = 192.04;     // was 189.28, Δ = +2.76° (from S&S)
+const plutoAscendingNodeInvPlaneVerified = 101.06;       // was 107.06, Δ = -6.00° (from S&S)
 const halleysAscendingNodeInvPlaneVerified = 59.56;      // Approximation from ecliptic value
 const erosAscendingNodeInvPlaneVerified = 10.36;         // Approximation from ecliptic value
 const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Souchay (2012) Table 2
@@ -299,45 +299,45 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
-// J2000=6.3472858° (EXACT), phase 203°, period holisticyearLength/(1+(3/13)), trend error: 0.5"/cy
-const mercuryInvPlaneInclinationMean = 8.090595;
-const mercuryInvPlaneInclinationAmplitude = 1.769392;  // Range: 6.32° to 9.86°
+// J2000=6.3472858° (EXACT), phase 203.0272°, period holisticyearLength/(1+(3/13)), trend error: 0.5"/cy
+const mercuryInvPlaneInclinationMean = 8.091124;
+const mercuryInvPlaneInclinationAmplitude = 1.769676;  // Range: 6.32° to 9.86°
 
 // Venus: Range 0.72° to 4.11° (from Laplace-Lagrange)
-// J2000=2.1545441° (EXACT), phase 203°, period holisticyearLength*(2+(1/6)), trend error: 21.2"/cy
+// J2000=2.1545441° (EXACT), phase 203.0272°, period holisticyearLength*(2+(1/6)), trend error: 21.2"/cy
 // Note: Large error due to long period - Venus motion too slow to counteract Earth's contribution
 const venusInvPlaneInclinationMean = 3.053776;
-const venusInvPlaneInclinationAmplitude = 1.057139;  // Range: 2.00° to 4.11°
+const venusInvPlaneInclinationAmplitude = 1.056602;  // Range: 2.00° to 4.11°
 
 // Mars: Range 0.00° to 5.84° (from Laplace-Lagrange)
-// J2000=1.6311858° (EXACT), phase 203°, period holisticyearLength/4, trend error: 13.1"/cy
-const marsInvPlaneInclinationMean = 3.603964;
-const marsInvPlaneInclinationAmplitude = 2.236597;  // Range: 1.37° to 5.84°
+// J2000=1.6311858° (EXACT), phase 203.0272°, period holisticyearLength/4, trend error: 13.1"/cy
+const marsInvPlaneInclinationMean = 3.603380;
+const marsInvPlaneInclinationAmplitude = 2.236920;  // Range: 1.37° to 5.84°
 
 // Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
-// J2000=0.3219652° (EXACT), phase 203°, period holisticyearLength/5, trend error: 0.0"/cy
-const jupiterInvPlaneInclinationMean = 0.359000;
-const jupiterInvPlaneInclinationAmplitude = 0.108752;  // Range: 0.25° to 0.47°
+// J2000=0.3219652° (EXACT), phase 203.0272°, period holisticyearLength/5, trend error: 0.0"/cy
+const jupiterInvPlaneInclinationMean = 0.358900;
+const jupiterInvPlaneInclinationAmplitude = 0.108706;  // Range: 0.25° to 0.47°
 
 // Saturn: Range 0.43° to 1.53° (expanded from Laplace-Lagrange)
-// J2000=0.9254704° (EXACT), phase 23° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
-const saturnInvPlaneInclinationMean = 0.938300;
-const saturnInvPlaneInclinationAmplitude = 0.126304;  // Range: 0.81° to 1.06°
+// J2000=0.9254704° (EXACT), phase 23.0272° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
+const saturnInvPlaneInclinationMean = 0.938190;
+const saturnInvPlaneInclinationAmplitude = 0.126240;  // Range: 0.81° to 1.06°
 
 // Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
-// J2000=0.9946692° (EXACT), phase 203°, period holisticyearLength/3, trend error: 1.0"/cy
+// J2000=0.9946692° (EXACT), phase 203.0272°, period holisticyearLength/3, trend error: 1.0"/cy
 const uranusInvPlaneInclinationMean = 1.018300;
-const uranusInvPlaneInclinationAmplitude = 0.092386;  // Range: 0.93° to 1.11°
+const uranusInvPlaneInclinationAmplitude = 0.092675;  // Range: 0.93° to 1.11°
 
 // Neptune: Range 0.554° to 0.800° (from Laplace-Lagrange)
-// J2000=0.7354155° (EXACT), phase 203°, period holisticyearLength*(2+(1/6)), trend error: 0.2"/cy
+// J2000=0.7354155° (EXACT), phase 203.0272°, period holisticyearLength*(2+(1/6)), trend error: 0.2"/cy
 const neptuneInvPlaneInclinationMean = 0.645100;
-const neptuneInvPlaneInclinationAmplitude = 0.091987;  // Range: 0.55° to 0.74°
+const neptuneInvPlaneInclinationAmplitude = 0.092002;  // Range: 0.55° to 0.74°
 
 // Pluto: Range 15.0° to 16.5° (estimated)
-// J2000=15.5639473° (EXACT), phase 203°, period holisticyearLength, trend error: 5.1"/cy
-const plutoInvPlaneInclinationMean = 15.710950;
-const plutoInvPlaneInclinationAmplitude = 0.711720;  // Range: 15.00° to 16.42°
+// J2000=15.5639473° (EXACT), phase 203.0272°, period holisticyearLength, trend error: 5.1"/cy
+const plutoInvPlaneInclinationMean = 15.711700;
+const plutoInvPlaneInclinationAmplitude = 0.712570;  // Range: 15.00° to 16.42°
 
 // Halleys: Estimated from near-Earth asteroid dynamics
 // Ecliptic inclination ~162.26269°, Earth offset ~1.58°, gives ~150° to invariable plane
@@ -360,25 +360,25 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 // All planets use a universal phase angle derived from the s₈ eigenmode of
 // Laplace-Lagrange secular theory (γ₈ = 202.8°).
 //
-// PROGRADE precession planets use: 203°
-// RETROGRADE precession planets use: 23° (= 203° - 180°)
+// PROGRADE precession planets use: 203.0272°
+// RETROGRADE precession planets use: 23.0272° (= 203.0272° - 180°)
 //
 // The 180° offset for retrograde planets compensates for the reversed direction
 // of precession - both values represent the same physical direction in space.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const mercuryInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.5"/cy
-const venusInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 21.2"/cy
-const earthInclinationPhaseAngle = 203;    // prograde, decreasing trend (reference)
-const marsInclinationPhaseAngle = 203;     // prograde, decreasing trend, error: 13.1"/cy
-const jupiterInclinationPhaseAngle = 203;  // prograde, decreasing trend, error: 0.0"/cy
-const saturnInclinationPhaseAngle = 23;    // RETROGRADE, increasing trend, error: 0.0"/cy
-const uranusInclinationPhaseAngle = 203;   // prograde, decreasing trend, error: 1.0"/cy
-const neptuneInclinationPhaseAngle = 203;  // prograde, increasing trend, error: 0.2"/cy
-const plutoInclinationPhaseAngle = 203;    // prograde, decreasing trend, error: 5.1"/cy
-const halleysInclinationPhaseAngle = 23;   // RETROGRADE (estimated)
-const erosInclinationPhaseAngle = 203;     // prograde (estimated)
-const ceresInclinationPhaseAngle = 203;    // prograde (estimated)
+const mercuryInclinationPhaseAngle = 203.0272;  // prograde, decreasing trend, error: 0.5"/cy
+const venusInclinationPhaseAngle = 203.0272;    // prograde, decreasing trend, error: 21.2"/cy
+const earthInclinationPhaseAngle = 203.0272;    // prograde, decreasing trend (reference)
+const marsInclinationPhaseAngle = 203.0272;     // prograde, decreasing trend, error: 13.1"/cy
+const jupiterInclinationPhaseAngle = 203.0272;  // prograde, decreasing trend, error: 0.0"/cy
+const saturnInclinationPhaseAngle = 23.0272;    // RETROGRADE, increasing trend, error: 0.0"/cy
+const uranusInclinationPhaseAngle = 203.0272;   // prograde, decreasing trend, error: 1.0"/cy
+const neptuneInclinationPhaseAngle = 203.0272;  // prograde, increasing trend, error: 0.2"/cy
+const plutoInclinationPhaseAngle = 203.0272;    // prograde, decreasing trend, error: 5.1"/cy
+const halleysInclinationPhaseAngle = 23.0272;   // RETROGRADE (estimated)
+const erosInclinationPhaseAngle = 203.0272;     // prograde (estimated)
+const ceresInclinationPhaseAngle = 203.0272;    // prograde (estimated)
 
 // ══════════════════════════════════════════════════════════════════════════════
 // JPL ECLIPTIC INCLINATION TREND RATES (degrees/century)
@@ -4578,7 +4578,7 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   group.add(ring);
 
   // ===== FIXED MARKERS GROUP =====
-  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationPhaseAngle (203°)
+  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationPhaseAngle (203.0272°)
   // They do NOT precess with the ascending node
   // These are added to a SEPARATE group that doesn't rotate with the plane
   // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
@@ -5583,7 +5583,7 @@ function updateSunCenteredInvPlane() {
     uranus: uranusInclinationPhaseAngle,
     neptune: neptuneInclinationPhaseAngle,
     pluto: plutoInclinationPhaseAngle,
-    earth: earthInclinationPhaseAngle  // Ω=284.5304°, φ₀=81.5° → 203.0°
+    earth: earthInclinationPhaseAngle  // Ω=284.51°, φ₀=81.5° → 203.0272.0°
   };
   const phaseOffset = phaseOffsetLookup[planetData.key] ?? 0;
 
@@ -12968,7 +12968,7 @@ const planetStats = {
        value : [ { v: () => (o.earthAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => earthInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => earthInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Earth's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.earthAscendingNodeInvPlane - earthInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -13666,7 +13666,7 @@ const planetStats = {
        value : [ { v: () => (o.mercuryAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => mercuryInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => mercuryInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Mercury's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.mercuryAscendingNodeInvPlane - mercuryInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -14026,7 +14026,7 @@ const planetStats = {
        value : [ { v: () => (o.venusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => venusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => venusInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Venus's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.venusAscendingNodeInvPlane - venusInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -14353,7 +14353,7 @@ const planetStats = {
        value : [ { v: () => (o.marsAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => marsInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => marsInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Mars's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.marsAscendingNodeInvPlane - marsInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -14673,7 +14673,7 @@ const planetStats = {
        value : [ { v: () => (o.jupiterAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => jupiterInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => jupiterInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Jupiter's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.jupiterAscendingNodeInvPlane - jupiterInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -14998,7 +14998,7 @@ const planetStats = {
        value : [ { v: () => (o.saturnAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => saturnInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => saturnInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Saturn's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.saturnAscendingNodeInvPlane - saturnInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -15325,7 +15325,7 @@ const planetStats = {
        value : [ { v: () => (o.uranusAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => uranusInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => uranusInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Uranus's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.uranusAscendingNodeInvPlane - uranusInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -15652,7 +15652,7 @@ const planetStats = {
        value : [ { v: () => (o.neptuneAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => neptuneInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => neptuneInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Neptune's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.neptuneAscendingNodeInvPlane - neptuneInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],
@@ -15978,7 +15978,7 @@ const planetStats = {
        value : [ { v: () => (o.plutoAscendingNodeInvPlane + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`ICRF longitude where orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Ω at Max Inclination`,
-       value : [ { v: () => plutoInclinationPhaseAngle, dec:1, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => plutoInclinationPhaseAngle, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Fixed ICRF longitude where Pluto's inclination to the invariable plane reaches maximum.`]},
       {label : () => `Current Oscillation Phase`,
        value : [ { v: () => ((o.plutoAscendingNodeInvPlane - plutoInclinationPhaseAngle + 360) % 360), dec:1, sep:',' },{ small: 'degrees (°)' }],

@@ -95,15 +95,15 @@ Each planet's inclination oscillates around a mean value with a specific amplitu
 
 | Planet | Mean (°) | Amplitude (°) | Range (°) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 8.0911 | 1.7697 | 6.32 - 9.86 | 203° | 0.5"/cy |
-| Venus | 3.0538 | 1.0568 | 2.00 - 4.11 | 203° | 21.2"/cy |
+| Mercury | 8.0911 | 1.7697 | 6.32 - 9.86 | 203.0272° | 0.5"/cy |
+| Venus | 3.0538 | 1.0566 | 2.00 - 4.11 | 203.0272° | 21.2"/cy |
 | Earth | 1.4951 | 0.5640 | 0.93 - 2.06 | 203° | (reference) |
-| Mars | 3.6034 | 2.2368 | 1.37 - 5.84 | 203° | 13.1"/cy |
-| Jupiter | 0.3589 | 0.1087 | 0.25 - 0.47 | 203° | 0.0"/cy |
-| Saturn | 0.9382 | 0.1261 | 0.81 - 1.06 | 23° (retrograde) | 0.0"/cy |
-| Uranus | 1.0183 | 0.0926 | 0.93 - 1.11 | 203° | 1.0"/cy |
-| Neptune | 0.6451 | 0.0920 | 0.55 - 0.74 | 203° | 0.2"/cy |
-| Pluto | 15.7116 | 0.7123 | 15.00 - 16.42 | 203° | 5.1"/cy |
+| Mars | 3.6034 | 2.2369 | 1.37 - 5.84 | 203.0272° | 13.1"/cy |
+| Jupiter | 0.3589 | 0.1087 | 0.25 - 0.47 | 203.0272° | 0.0"/cy |
+| Saturn | 0.9382 | 0.1262 | 0.81 - 1.06 | 23.0272° (retrograde) | 0.0"/cy |
+| Uranus | 1.0183 | 0.0927 | 0.93 - 1.11 | 203.0272° | 1.0"/cy |
+| Neptune | 0.6451 | 0.0920 | 0.55 - 0.74 | 203.0272° | 0.2"/cy |
+| Pluto | 15.7117 | 0.7126 | 15.00 - 16.42 | 203.0272° | 5.1"/cy |
 
 **Formula**: `i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)`
 
@@ -132,15 +132,15 @@ These values are calibrated to reproduce exact J2000 ecliptic inclinations (opti
 
 | Planet | Variable | Value (°) | Δ from S&S |
 |--------|----------|-----------|------------|
-| Earth | `earthAscendingNodeInvPlaneVerified` | 284.5304 | +0.02° (FIXED) |
-| Mercury | `mercuryAscendingNodeInvPlaneVerified` | 32.85 | +0.63° |
-| Venus | `venusAscendingNodeInvPlaneVerified` | 54.72 | +2.41° |
-| Mars | `marsAscendingNodeInvPlaneVerified` | 354.89 | +1.94° |
-| Jupiter | `jupiterAscendingNodeInvPlaneVerified` | 312.91 | +5.99° |
-| Saturn | `saturnAscendingNodeInvPlaneVerified` | 118.83 | -3.44° |
-| Uranus | `uranusAscendingNodeInvPlaneVerified` | 307.82 | -0.62° |
-| Neptune | `neptuneAscendingNodeInvPlaneVerified` | 192.06 | +2.78° |
-| Pluto | `plutoAscendingNodeInvPlaneVerified` | 101.08 | -5.98° |
+| Earth | `earthAscendingNodeInvPlaneVerified` | 284.51 | 0.00° (S&S 2012) |
+| Mercury | `mercuryAscendingNodeInvPlaneVerified` | 32.83 | +0.61° |
+| Venus | `venusAscendingNodeInvPlaneVerified` | 54.70 | +2.39° |
+| Mars | `marsAscendingNodeInvPlaneVerified` | 354.87 | +1.92° |
+| Jupiter | `jupiterAscendingNodeInvPlaneVerified` | 312.89 | +5.97° |
+| Saturn | `saturnAscendingNodeInvPlaneVerified` | 118.81 | -3.46° |
+| Uranus | `uranusAscendingNodeInvPlaneVerified` | 307.80 | -0.64° |
+| Neptune | `neptuneAscendingNodeInvPlaneVerified` | 192.04 | +2.76° |
+| Pluto | `plutoAscendingNodeInvPlaneVerified` | 101.06 | -6.00° |
 
 See [18-j2000-calibration.md](18-j2000-calibration.md) for the methodology.
 

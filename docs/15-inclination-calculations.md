@@ -72,15 +72,15 @@ All planets use a **universal phase angle** derived from the s₈ eigenmode of L
 
 | Planet | Phase Angle | Precession Direction | Inclination Trend at J2000 |
 |--------|-------------|---------------------|---------------------------|
-| Mercury | 203° | Prograde | Decreasing |
-| Venus | 203° | Prograde | Decreasing |
+| Mercury | 203.0272° | Prograde | Decreasing |
+| Venus | 203.0272° | Prograde | Decreasing |
 | Earth | 203° | Prograde | Decreasing |
-| Mars | 203° | Prograde | Decreasing |
-| Jupiter | 203° | Prograde | Decreasing |
-| **Saturn** | **23°** | **Retrograde** | **Increasing** |
-| Uranus | 203° | Prograde | Decreasing |
-| Neptune | 203° | Prograde | Increasing |
-| Pluto | 203° | Prograde | Decreasing |
+| Mars | 203.0272° | Prograde | Decreasing |
+| Jupiter | 203.0272° | Prograde | Decreasing |
+| **Saturn** | **23.0272°** | **Retrograde** | **Increasing** |
+| Uranus | 203.0272° | Prograde | Decreasing |
+| Neptune | 203.0272° | Prograde | Increasing |
+| Pluto | 203.0272° | Prograde | Decreasing |
 
 **Key insight**: Saturn uses 23° (= 203° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction.
 
@@ -91,14 +91,14 @@ All values optimized for **exact J2000 invariable plane inclination match** (ver
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
 | Mercury | 8.0911 | 1.7697 | 6.3473 | 6.32 - 9.86 | 0.5"/cy |
-| Venus | 3.0538 | 1.0568 | 2.1545 | 2.00 - 4.11 | 21.2"/cy |
+| Venus | 3.0538 | 1.0566 | 2.1545 | 2.00 - 4.11 | 21.2"/cy |
 | Earth | 1.4951 | 0.564 | 1.578 | 0.93 - 2.06 | (reference) |
-| Mars | 3.6034 | 2.2368 | 1.6312 | 1.37 - 5.84 | 13.1"/cy |
+| Mars | 3.6034 | 2.2369 | 1.6312 | 1.37 - 5.84 | 13.1"/cy |
 | Jupiter | 0.3589 | 0.1087 | 0.3220 | 0.25 - 0.47 | 0.0"/cy |
-| Saturn | 0.9382 | 0.1261 | 0.9255 | 0.81 - 1.06 | 0.0"/cy |
-| Uranus | 1.0183 | 0.0926 | 0.9947 | 0.93 - 1.11 | 1.0"/cy |
+| Saturn | 0.9382 | 0.1262 | 0.9255 | 0.81 - 1.06 | 0.0"/cy |
+| Uranus | 1.0183 | 0.0927 | 0.9947 | 0.93 - 1.11 | 1.0"/cy |
 | Neptune | 0.6451 | 0.0920 | 0.7354 | 0.55 - 0.74 | 0.2"/cy |
-| Pluto | 15.7116 | 0.7123 | 15.5639 | 15.00 - 16.42 | 5.1"/cy |
+| Pluto | 15.7117 | 0.7126 | 15.5639 | 15.00 - 16.42 | 5.1"/cy |
 
 ### Implementation
 
@@ -109,7 +109,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const period = mercuryPerihelionICRFYears;
   const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
-  const phaseAngle = mercuryInclinationPhaseAngle;  // 203°
+  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.0272°
 
   // Calculate current ascending node
   const yearsSinceJ2000 = currentYear - 2000;
@@ -271,7 +271,7 @@ The model needs to produce exact J2000 ecliptic inclinations while using a physi
 
 For each planet, the ascending node is adjusted so that at J2000:
 - Using dynamic Earth inclination (~1.578°)
-- Using Earth's verified ascending node (284.5304°)
+- Using Earth's ascending node (284.51° - Souami & Souchay 2012)
 - The calculated ecliptic inclination matches the J2000 reference
 
 The mathematical solution:
@@ -297,31 +297,23 @@ Where:
 
 ### Verified Ascending Node Values
 
-Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.5304°`:
+Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.51°` (Souami & Souchay 2012):
 
 | Planet | S&S Value (°) | Verified Value (°) | Δ from S&S |
 |--------|---------------|--------------------|-----------|
-| Mercury | 32.22 | 32.85 | +0.63° |
-| Venus | 52.31 | 54.72 | +2.41° |
-| Earth | 284.51 | 284.5304 | +0.02° |
-| Mars | 352.95 | 354.89 | +1.94° |
-| Jupiter | 306.92 | 312.91 | +5.99° |
-| Saturn | 122.27 | 118.83 | -3.44° |
-| Uranus | 308.44 | 307.82 | -0.62° |
-| Neptune | 189.28 | 192.06 | +2.78° |
-| Pluto | 107.06 | 101.08 | -5.98° |
+| Mercury | 32.22 | 32.83 | +0.61° |
+| Venus | 52.31 | 54.70 | +2.39° |
+| Earth | 284.51 | 284.51 | 0.00° |
+| Mars | 352.95 | 354.87 | +1.92° |
+| Jupiter | 306.92 | 312.89 | +5.97° |
+| Saturn | 122.27 | 118.81 | -3.46° |
+| Uranus | 308.44 | 307.80 | -0.64° |
+| Neptune | 189.28 | 192.04 | +2.76° |
+| Pluto | 107.06 | 101.06 | -6.00° |
 
-### Earth's Ascending Node Derivation
+### Earth's Ascending Node
 
-The value 284.5304° for `earthAscendingNodeInvPlaneVerified` is derived geometrically from:
-
-```
-earthAscendingNodeInvPlaneVerified = longitudePerihelion + 180° + inclination
-                                   = 102.9517° + 180° + 1.5787°
-                                   = 284.5304°
-```
-
-This formula relates Earth's ascending node on the invariable plane to its perihelion longitude and inclination at the balance year (when axial tilt exactly opposes orbital inclination)
+The value 284.51° for `earthAscendingNodeInvPlaneVerified` is the original Souami & Souchay (2012) value for Earth's ascending node on the invariable plane at J2000.
 
 ---
 

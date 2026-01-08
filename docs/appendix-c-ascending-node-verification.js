@@ -32,9 +32,8 @@ const holisticyearLength = 298176;
 const earthConfig = {
   // Dynamic inclination at J2000
   inclJ2000: 1.57867339,  // Earth's inclination to invariable plane at J2000
-  // J2000-Verified ascending node = longitudePerihelion + 180° + inclination
-  // = 102.9517° + 180° + 1.5787° = 284.5304°
-  ascNodeVerified: 284.5304
+  // Earth's ascending node from Souami & Souchay (2012)
+  ascNodeVerified: 284.51
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -74,15 +73,15 @@ const invPlaneInclinationsJ2000 = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ascendingNodesVerified = {
-  earth: 284.5304,    // Reference for ecliptic normal (FIXED) = perihelion + 180° + incl
-  mercury: 32.85,     // was S&S 32.22, Δ = +0.63°
-  venus: 54.72,       // was S&S 52.31, Δ = +2.41°
-  mars: 354.89,       // was S&S 352.95, Δ = +1.94°
-  jupiter: 312.91,    // was S&S 306.92, Δ = +5.99°
-  saturn: 118.83,     // was S&S 122.27, Δ = -3.44°
-  uranus: 307.82,     // was S&S 308.44, Δ = -0.62°
-  neptune: 192.06,    // was S&S 189.28, Δ = +2.78°
-  pluto: 101.08       // was S&S 107.06, Δ = -5.98°
+  earth: 284.51,      // Souami & Souchay (2012)
+  mercury: 32.83,     // was S&S 32.22, Δ = +0.61°
+  venus: 54.70,       // was S&S 52.31, Δ = +2.39°
+  mars: 354.87,       // was S&S 352.95, Δ = +1.92°
+  jupiter: 312.89,    // was S&S 306.92, Δ = +5.97°
+  saturn: 118.81,     // was S&S 122.27, Δ = -3.46°
+  uranus: 307.80,     // was S&S 308.44, Δ = -0.64°
+  neptune: 192.04,    // was S&S 189.28, Δ = +2.76°
+  pluto: 101.06       // was S&S 107.06, Δ = -6.00°
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

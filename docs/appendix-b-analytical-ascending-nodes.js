@@ -39,7 +39,7 @@ const RAD2DEG = 180 / Math.PI;
 
 // Earth reference
 const earthInclInvPlane = 1.57867339;  // Earth's J2000 inclination to invariable plane
-const earthAscNodeInvPlane = 284.5304; // Earth's ascending node (derived from perihelion formula)
+const earthAscNodeInvPlane = 284.51;   // Earth's ascending node from Souami & Souchay (2012)
 
 // JPL J2000 ecliptic inclinations (TARGET values - what we see from Earth)
 const jplEclipticIncl = {
@@ -79,14 +79,14 @@ const ssAscNodes = {
 
 // Our numerically optimized values (from Appendix A)
 const optimizedAscNodes = {
-  mercury: 32.85,
-  venus: 54.72,
-  mars: 354.89,
-  jupiter: 312.91,
-  saturn: 118.83,
-  uranus: 307.82,
-  neptune: 192.06,
-  pluto: 101.08
+  mercury: 32.83,
+  venus: 54.70,
+  mars: 354.87,
+  jupiter: 312.89,
+  saturn: 118.81,
+  uranus: 307.80,
+  neptune: 192.04,
+  pluto: 101.06
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -301,7 +301,7 @@ console.log('');
 console.log('The ascending nodes can be calculated ANALYTICALLY from:');
 console.log('  1. JPL J2000 ecliptic inclinations (observed from Earth)');
 console.log('  2. Souami & Souchay invariable plane inclinations');
-console.log('  3. Earth\'s ascending node (284.5304° - our derived value)');
+console.log('  3. Earth\'s ascending node (284.51° - Souami & Souchay 2012)');
 console.log('');
 console.log('The formula is pure spherical trigonometry - the angle between two planes');
 console.log('inclined to a reference plane (the invariable plane).');

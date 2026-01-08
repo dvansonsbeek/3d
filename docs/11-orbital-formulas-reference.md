@@ -99,7 +99,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `{planet}AngleCorrection` | varies | Alignment correction angle |
 | `{planet}Tilt` | 0.034° | Axial tilt |
 | `{planet}RotationPeriod` | 1407.6 hours | Sidereal rotation period |
-| `{planet}AscendingNodeInvPlaneVerified` | 32.85° (Mercury) | J2000-calibrated ascending node to invariable plane |
+| `{planet}AscendingNodeInvPlaneVerified` | 32.83° (Mercury) | J2000-calibrated ascending node to invariable plane |
 | `{planet}AscendingNodeInvPlaneSouamiSouchay` | 32.22° (Mercury) | Original Souami & Souchay (2012) ascending node |
 | `diameters.{planet}Diameter` | 4,879.4 km | Planet diameter |
 

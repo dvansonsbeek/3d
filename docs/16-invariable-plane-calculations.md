@@ -85,17 +85,17 @@ const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
 Calibrated to match J2000 ecliptic inclinations exactly:
 
 ```javascript
-// Verified ascending nodes (calibrated with earthAscendingNodeInvPlaneVerified = 284.5304°)
-// Earth's value = longitudePerihelion + 180° + inclination = 102.9517° + 180° + 1.5787°
-const mercuryAscendingNodeInvPlaneVerified = 32.85;
-const venusAscendingNodeInvPlaneVerified = 54.72;
-const earthAscendingNodeInvPlaneVerified = 284.5304;
-const marsAscendingNodeInvPlaneVerified = 354.89;
-const jupiterAscendingNodeInvPlaneVerified = 312.91;
-const saturnAscendingNodeInvPlaneVerified = 118.83;
-const uranusAscendingNodeInvPlaneVerified = 307.82;
-const neptuneAscendingNodeInvPlaneVerified = 192.06;
-const plutoAscendingNodeInvPlaneVerified = 101.08;
+// Verified ascending nodes (calibrated with earthAscendingNodeInvPlaneVerified = 284.51°)
+// Earth's value from Souami & Souchay (2012)
+const mercuryAscendingNodeInvPlaneVerified = 32.83;
+const venusAscendingNodeInvPlaneVerified = 54.70;
+const earthAscendingNodeInvPlaneVerified = 284.51;
+const marsAscendingNodeInvPlaneVerified = 354.87;
+const jupiterAscendingNodeInvPlaneVerified = 312.89;
+const saturnAscendingNodeInvPlaneVerified = 118.81;
+const uranusAscendingNodeInvPlaneVerified = 307.80;
+const neptuneAscendingNodeInvPlaneVerified = 192.04;
+const plutoAscendingNodeInvPlaneVerified = 101.06;
 ```
 
 ### Output Variables
