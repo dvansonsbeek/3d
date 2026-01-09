@@ -35,13 +35,13 @@ const correctionDays = -0.294993564486504;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
 const correctionSun = 0.28;
 // Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
-const temperatureGraphMostLikely = 14.5;                  
+const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthRAAngle = 1.12;                                
+const earthRAAngle = 1.125508;
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
-const earthtiltMean = 23.42723;                           // 3D model + formula
-const earthInvPlaneInclinationAmplitude = 0.564;          // 3D model + formula
-const earthInvPlaneInclinationMean = 1.49514053;          // 3D model + Formula
+const earthtiltMean = 23.427168;                           // 3D model + formula (optimized for IAU 2006)
+const earthInvPlaneInclinationAmplitude = 0.566701;       // 3D model + formula (optimized for IAU 2006 rate)
+const earthInvPlaneInclinationMean = 1.494734;          // 3D model + Formula
 const eccentricityMean = 0.01370018;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.00308211;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricitySinusCorrection = 0.652;                // Formula only
@@ -60,6 +60,70 @@ const earthPerihelionICRFYears = holisticyearLength/3;    // Duration of Earth's
 
 // Debg button on flag (set to true when needed)
 const debugOn = false;
+
+//*************************************************************
+// ASTRONOMICAL REFERENCE VALUES
+// Used for model calibration and validation
+//*************************************************************
+const ASTRO_REFERENCE = {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // J2000.0 EPOCH VALUES (Jan 1, 2000 12:00 TT, JD 2451545.0)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // IAU 2006 Obliquity of the Ecliptic
+  // Source: IAU 2006 precession model (Capitaine et al. 2003)
+  // ε₀ = 84381.406" at J2000.0, rate = -46.836769"/century
+  obliquityJ2000_arcsec: 84381.406,
+  obliquityJ2000_deg: 84381.406 / 3600,              // = 23.439279°
+  obliquityRate_arcsecPerCentury: -46.836769,
+  obliquityRate_degPerCentury: -46.836769 / 3600,    // = -0.013010°/century
+
+  // Earth's orbital inclination to the Invariable Plane at J2000.0
+  // Source: Astronomical Almanac, formula: 1°34'59" - 18"×T (T in centuries from 1900)
+  // At J2000 (T=1): 1°34'59" - 18" = 1°34'41" ≈ 1.57806°
+  // More commonly cited value: 1.57869° (1°34'43.3")
+  earthInclinationJ2000_deg: 1.57869,
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MODEL EPOCH VALUES (June 21, 2000 00:00 UTC, JD 2451716.5)
+  // Adjusted from J2000.0 for the 171.5 day offset (0.004696 centuries)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Time offset from J2000.0 to model start
+  // J2000.0 = JD 2451545.0, Model start = JD 2451716.5
+  // Offset = 171.5 days = 0.469623 years = 0.00469623 centuries
+  modelEpochOffsetDays: 171.5,
+  modelEpochOffsetCenturies: 171.5 / 36525,          // = 0.00469623
+
+  // Obliquity at model epoch (June 21, 2000)
+  // = obliquityJ2000 + rate × offset
+  // = 84381.406" + (-46.836769" × 0.00469623) = 84381.186"
+  // = 23.439279° - 0.000061° = 23.439218°
+  get obliquityModelEpoch_arcsec() {
+    return this.obliquityJ2000_arcsec + this.obliquityRate_arcsecPerCentury * this.modelEpochOffsetCenturies;
+  },
+  get obliquityModelEpoch_deg() {
+    return this.obliquityModelEpoch_arcsec / 3600;   // ≈ 23.439218°
+  },
+
+  // Earth's inclination at model epoch (June 21, 2000)
+  // Inclination rate: -18"/century (from Astronomical Almanac formula)
+  // Change over 171.5 days: -18" × 0.00469623 = -0.085" ≈ negligible
+  // For practical purposes, same as J2000 value
+  earthInclinationRate_arcsecPerCentury: -18,
+  get earthInclinationModelEpoch_deg() {
+    const changeArcsec = this.earthInclinationRate_arcsecPerCentury * this.modelEpochOffsetCenturies;
+    return this.earthInclinationJ2000_deg + changeArcsec / 3600;  // ≈ 1.57869°
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SOLSTICE REFERENCE TIMES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // June Solstice reference times (for solstice timing validation)
+  // Source: USNO / timeanddate.com astronomical tables
+  juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
+};
 
 // Reference lengths used as INPUT for the Sun
 const sunTilt = 7.155;
@@ -4035,7 +4099,17 @@ let o = {
   solRangeStart  : 2000,
   solRangeEnd    : 2025,
   runSolToggle   : false,
-  _solBusy       : false 
+  _solBusy       : false,
+
+  // Obliquity Calibration Test state
+  runCalibrationTest    : false,
+  runFindOptimalRA      : false,
+  runTropicalYearAnalysis : false,
+  runInvestigateParams  : false,
+  runVerifyObliquityRate: false,
+  calibrationYearStart  : 1990,
+  calibrationYearEnd    : 2025,
+  _calibrationBusy      : false
 };
 
 const params = { sizeBoost: 0 }; 
@@ -10688,7 +10762,108 @@ function setupGUI() {
     o._solBusy = false;
   }
   });
-  
+
+  /* --- Obliquity Calibration Tests ---------------------------------------- */
+  const calibFolder = sFolder.addFolder('Obliquity Calibration Tests');
+
+  const calibTestCtrl = calibFolder
+    .add(o, 'runCalibrationTest')
+    .name('Run Full Test (console)')
+    .listen();
+
+  const calibOptimalCtrl = calibFolder
+    .add(o, 'runFindOptimalRA')
+    .name('Find Optimal earthRAAngle')
+    .listen();
+
+  calibFolder.add(o, 'calibrationYearStart').name('Start year').step(1);
+  calibFolder.add(o, 'calibrationYearEnd').name('End year').step(1);
+
+  const calibTropicalCtrl = calibFolder
+    .add(o, 'runTropicalYearAnalysis')
+    .name('Analyze Tropical Year')
+    .listen();
+
+  const calibInvestigateCtrl = calibFolder
+    .add(o, 'runInvestigateParams')
+    .name('Investigate Parameters')
+    .listen();
+
+  const calibVerifyRateCtrl = calibFolder
+    .add(o, 'runVerifyObliquityRate')
+    .name('Verify Obliquity Rate')
+    .listen();
+
+  /* --- Run Full Calibration Test ------------------------------------------ */
+  calibTestCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await runObliquityCalibrationTest();
+    } finally {
+      o.runCalibrationTest = false;
+      calibTestCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
+  /* --- Find Optimal earthRAAngle ------------------------------------------ */
+  calibOptimalCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await findOptimalEarthRAAngle();
+    } finally {
+      o.runFindOptimalRA = false;
+      calibOptimalCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
+  /* --- Tropical Year Analysis --------------------------------------------- */
+  calibTropicalCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await analyzeTropicalYearLength();
+    } finally {
+      o.runTropicalYearAnalysis = false;
+      calibTropicalCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
+  /* --- Investigate Parameter Effects -------------------------------------- */
+  calibInvestigateCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await investigateParameterEffects();
+    } finally {
+      o.runInvestigateParams = false;
+      calibInvestigateCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
+  /* --- Verify Obliquity Rate ---------------------------------------------- */
+  calibVerifyRateCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await verifyObliquityRate();
+    } finally {
+      o.runVerifyObliquityRate = false;
+      calibVerifyRateCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
   let folderPlanets = sFolder.addFolder('Planets show/hide');
   folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
     showHideOrbits();
@@ -10960,35 +11135,63 @@ function solsticeForYear(year) {
         ((year + 0.5) - startmodelYear) * meansolaryearlengthinDays;
 
   const step    = 0.5 / 24;         // 0.5 h in days
-  let bestJD    = NaN;
+  let bestK     = 0;
   let bestObliq = -Infinity;
 
+  /* Phase 1: Coarse search with 30-minute samples */
+  const samples = [];                             // store all samples for interpolation
   for (let k = -288; k <= 288; ++k) {             // 288*2+1 samples of 30 minutes interval around the approxJD.
     const jd   = approxJD + k * step;
-    const frac = jd - Math.floor(jd);
 
-    o.Time = fracDayToTimeStr(frac);              // sync viewer clock
+    // Jump to JD and let forceSceneUpdate derive o.Time from o.pos
+    // (Fixed: removed manual o.Time setting which used wrong epoch)
     jumpToJulianDay(jd);
     forceSceneUpdate();
 
     if (!Number.isFinite(sun?.dec)) continue;
 
     const obDeg = 90 - sun.dec * 180 / Math.PI;
-    if (obDeg > bestObliq) { bestObliq = obDeg; bestJD = jd; }
+    samples[k + 288] = { k, jd, obDeg };
+    if (obDeg > bestObliq) { bestObliq = obDeg; bestK = k; }
   }
 
-  if (!Number.isFinite(bestJD)) return null;
+  const bestIdx = bestK + 288;
+  if (!samples[bestIdx]) return null;
 
-  /* final, unrounded values */
-  const bestFrac = bestJD - Math.floor(bestJD);
-  o.Time = fracDayToTimeStr(bestFrac);
-  jumpToJulianDay(bestJD);
+  /* Phase 2: Parabolic interpolation for sub-sample precision
+   * Given 3 points around maximum: (t₋₁, y₋₁), (t₀, y₀), (t₊₁, y₊₁)
+   * The vertex of the fitted parabola is at:
+   *   t_max = t₀ + (step/2) × (y₋₁ - y₊₁) / (y₋₁ - 2y₀ + y₊₁)
+   */
+  let refinedJD = samples[bestIdx].jd;
+  let refinedObliq = bestObliq;
+
+  if (samples[bestIdx - 1] && samples[bestIdx + 1]) {
+    const y_m1 = samples[bestIdx - 1].obDeg;      // y at t-1
+    const y_0  = samples[bestIdx].obDeg;          // y at t0 (best)
+    const y_p1 = samples[bestIdx + 1].obDeg;      // y at t+1
+
+    const denom = y_m1 - 2 * y_0 + y_p1;
+    if (Math.abs(denom) > 1e-12) {                // avoid division by zero
+      const offset = (step / 2) * (y_m1 - y_p1) / denom;
+      refinedJD = samples[bestIdx].jd + offset;
+
+      // Also interpolate the obliquity value at the refined time
+      // Using parabola: y = a*t² + b*t + c, evaluated at t = offset/step
+      const t = offset / step;                    // normalized offset (-0.5 to 0.5)
+      refinedObliq = y_0 + 0.5 * t * (y_p1 - y_m1) + 0.5 * t * t * (y_p1 - 2 * y_0 + y_m1);
+    }
+  }
+
+  /* Final scene state at refined time */
+  // Jump to refined JD and let forceSceneUpdate derive o.Date/o.Time from o.pos
+  jumpToJulianDay(refinedJD);
   forceSceneUpdate();
 
   return {
-    jd      : bestJD,
+    jd      : o.julianDay,  // Return actual model state for consistency
     raDeg   : (sun.ra * 180 / Math.PI + 360) % 360,
-    obliqDeg: bestObliq
+    obliqDeg: refinedObliq
   };
 }
 
@@ -11087,6 +11290,1241 @@ function buildYearArray() {
   return yrs;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   OBLIQUITY CALIBRATION TEST FUNCTIONS
+   These functions test the model's obliquity and solstice alignment against
+   astronomical reference data (IAU 2006, Laskar 1986, USNO ephemeris).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// Reference June solstice Julian Dates (Source: astropixels.com, Jean Meeus algorithms)
+// JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC
+// Example: JD 2451716.5 = June 21, 2000 00:00 UTC
+const JUNE_SOLSTICE_REFERENCE = {
+  1990: { jd: 2448091.148148, time: '15:33' },   // June 21, 1990 15:33 UTC
+  1995: { jd: 2449919.357639, time: '20:34' },   // June 21, 1995 20:34 UTC
+  2000: { jd: 2451716.575000, time: '01:48' },   // June 21, 2000 01:48 UTC
+  2005: { jd: 2453542.781944, time: '06:46' },   // June 21, 2005 06:46 UTC
+  2010: { jd: 2455368.977778, time: '11:28' },   // June 21, 2010 11:28 UTC
+  2015: { jd: 2457195.193056, time: '16:38' },   // June 21, 2015 16:38 UTC
+  2020: { jd: 2459021.404861, time: '21:43' },   // June 20, 2020 21:43 UTC
+  2025: { jd: 2460847.612500, time: '02:42' },   // June 21, 2025 02:42 UTC
+};
+
+/** Calculate mean obliquity using IAU 2006 formula (P03 model) */
+function meanObliquityIAU2006(year) {
+  const T = (year - 2000) / 100;
+  // IAU 2006 polynomial: ε = ε₀ + rate*T + higher order terms
+  const eps_arcsec = ASTRO_REFERENCE.obliquityJ2000_arcsec
+    + ASTRO_REFERENCE.obliquityRate_arcsecPerCentury * T
+    - 0.0001831 * T * T + 0.00200340 * T * T * T;
+  return eps_arcsec / 3600;
+}
+
+/** Calculate mean obliquity using Laskar (1986) formula - valid ±10,000 years */
+function meanObliquityLaskar1986(year) {
+  const t = (year - 2000) / 10000;
+  const eps_arcsec = 84381.448
+    - 4680.93 * t - 1.55 * Math.pow(t, 2) + 1999.25 * Math.pow(t, 3)
+    - 51.38 * Math.pow(t, 4) - 249.67 * Math.pow(t, 5) - 39.05 * Math.pow(t, 6)
+    + 7.12 * Math.pow(t, 7) + 27.87 * Math.pow(t, 8) + 5.79 * Math.pow(t, 9)
+    + 2.45 * Math.pow(t, 10);
+  return eps_arcsec / 3600;
+}
+
+/** Main calibration test - runs comprehensive tests against reference data */
+async function runObliquityCalibrationTest() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           OBLIQUITY CALIBRATION TEST (IN-MODEL)                          ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+
+  const savedJD = o.julianDay;
+  const savedTime = o.Time;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  // TEST 1: Current parameters
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 1: Current Model Parameters');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`earthtiltMean                    = ${earthtiltMean}°`);
+  console.log(`earthInvPlaneInclinationAmplitude = ${earthInvPlaneInclinationAmplitude}°`);
+  console.log(`earthRAAngle                     = ${earthRAAngle}°`);
+  console.log(`temperatureGraphMostLikely       = ${temperatureGraphMostLikely}`);
+  console.log(`balancedYear                     = ${balancedYear}`);
+  console.log('');
+
+  // TEST 2: Scene object tilts at model start
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 2: Tilt Values at Model Start (JD ' + startmodelJD + ')');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  jumpToJulianDay(startmodelJD);
+  forceSceneUpdate();
+  await new Promise(r => setTimeout(r, 100));
+
+  const eclipticTiltX = earthEclipticPrecession.containerObj.rotation.x * 180 / Math.PI;
+  const eclipticTiltZ = earthEclipticPrecession.containerObj.rotation.z * 180 / Math.PI;
+  const obliquityTiltX = earthObliquityPrecession.containerObj.rotation.x * 180 / Math.PI;
+  const obliquityTiltZ = earthObliquityPrecession.containerObj.rotation.z * 180 / Math.PI;
+  const netTiltX = eclipticTiltX + obliquityTiltX;
+  const netTiltZ = eclipticTiltZ + obliquityTiltZ;
+  const netTilt = Math.sqrt(netTiltX * netTiltX + netTiltZ * netTiltZ);
+
+  console.log(`earthEclipticPrecession:  x=${eclipticTiltX.toFixed(6)}°, z=${eclipticTiltZ.toFixed(6)}°`);
+  console.log(`earthObliquityPrecession: x=${obliquityTiltX.toFixed(6)}°, z=${obliquityTiltZ.toFixed(6)}°`);
+  console.log(`Net tilt (sum):           x=${netTiltX.toFixed(6)}°, z=${netTiltZ.toFixed(6)}°, mag=${netTilt.toFixed(6)}°`);
+  console.log(`o.obliquityEarth:         ${o.obliquityEarth?.toFixed(8) || 'N/A'}°`);
+  console.log('');
+
+  // TEST 3: Solstice detection vs reference
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 3: June Solstice Detection vs Astronomical Reference');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('╔══════╤═══════════════════╤═══════════════════╤══════════════╤══════════╗');
+  console.log('║ Year │ Reference JD      │ Model JD          │ Δ (hours)    │ Δ (min)  ║');
+  console.log('╠══════╪═══════════════════╪═══════════════════╪══════════════╪══════════╣');
+
+  const testYears = [2000, 2005, 2010, 2015, 2020];
+  const solsticeResults = [];
+
+  for (const year of testYears) {
+    const ref = JUNE_SOLSTICE_REFERENCE[year];
+    if (!ref) continue;
+    const result = solsticeForYear(year);
+    if (!result) {
+      console.log(`║ ${year} │ ${ref.jd.toFixed(6)}      │ FAILED            │              │          ║`);
+      continue;
+    }
+    const deltaJD = result.jd - ref.jd;
+    const deltaHours = deltaJD * 24;
+    const deltaMinutes = deltaJD * 24 * 60;
+    solsticeResults.push({ year, ref: ref.jd, model: result.jd, deltaHours, deltaMinutes });
+    console.log(`║ ${year} │ ${ref.jd.toFixed(6)}      │ ${result.jd.toFixed(6)}      │ ${deltaHours >= 0 ? '+' : ''}${deltaHours.toFixed(4)}      │ ${deltaMinutes >= 0 ? '+' : ''}${deltaMinutes.toFixed(1)}    ║`);
+  }
+  console.log('╚══════╧═══════════════════╧═══════════════════╧══════════════╧══════════╝');
+
+  if (solsticeResults.length >= 2) {
+    const first = solsticeResults[0];
+    const last = solsticeResults[solsticeResults.length - 1];
+    const yearSpan = last.year - first.year;
+    const driftMinutes = last.deltaMinutes - first.deltaMinutes;
+    const driftSecondsPerYear = (driftMinutes / yearSpan) * 60;
+    console.log(`\nDrift over ${yearSpan} years: ${driftMinutes.toFixed(2)} min (${driftSecondsPerYear.toFixed(2)} sec/year)`);
+  }
+  console.log('');
+
+  // TEST 4: Obliquity vs IAU/Laskar
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 4: Model Obliquity vs IAU 2006 / Laskar 1986');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('╔══════╤═══════════════╤═══════════════╤═══════════════╤═══════════╤═══════════╗');
+  console.log('║ Year │ IAU 2006 (°)  │ Laskar (°)    │ Model (°)     │ Δ IAU (") │ Δ Lask(") ║');
+  console.log('╠══════╪═══════════════╪═══════════════╪═══════════════╪═══════════╪═══════════╣');
+
+  for (const year of [1900, 1950, 2000, 2050, 2100, 2500, 3000]) {
+    const oblIAU = meanObliquityIAU2006(year);
+    const oblLaskar = meanObliquityLaskar1986(year);
+    const jd = startmodelJD + (year - 2000) * meansolaryearlengthinDays;
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    await new Promise(r => setTimeout(r, 50));
+    const oblModel = o.obliquityEarth || earthtiltMean;
+    const deltaIAU = (oblModel - oblIAU) * 3600;
+    const deltaLaskar = (oblModel - oblLaskar) * 3600;
+    console.log(`║ ${year} │ ${oblIAU.toFixed(5)}°     │ ${oblLaskar.toFixed(5)}°     │ ${oblModel.toFixed(5)}°     │ ${deltaIAU >= 0 ? '+' : ''}${deltaIAU.toFixed(1).padStart(6)}   │ ${deltaLaskar >= 0 ? '+' : ''}${deltaLaskar.toFixed(1).padStart(6)}   ║`);
+  }
+  console.log('╚══════╧═══════════════╧═══════════════╧═══════════════╧═══════════╧═══════════╝');
+  console.log('');
+
+  // TEST 5: earthRAAngle analysis
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST 5: earthRAAngle Relationships');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`2 × amplitude = ${(2 * earthInvPlaneInclinationAmplitude).toFixed(6)}°`);
+  console.log(`earthRAAngle  = ${earthRAAngle}°`);
+  console.log(`Difference    = ${(2 * earthInvPlaneInclinationAmplitude - earthRAAngle).toFixed(6)}°`);
+  console.log(`Net tilt      = ${netTilt.toFixed(6)}°`);
+  console.log(`2×amp - (2/3)×net = ${(2 * earthInvPlaneInclinationAmplitude - 2/3 * netTilt).toFixed(6)}°`);
+  console.log('');
+
+  // Restore
+  jumpToJulianDay(savedJD);
+  o.Time = savedTime;
+  forceSceneUpdate();
+  o.Run = savedRun;
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('TEST COMPLETE - Model state restored');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  return { solsticeResults, netTilt };
+}
+
+/** Find optimal parameter values for earthRAAngle, earthtiltMean, and earthInvPlaneInclinationAmplitude
+ *
+ * This function analyzes:
+ * 1. Solstice timing errors across multiple years
+ * 2. Obliquity accuracy vs IAU 2006
+ * 3. Drift rate (change in error over time)
+ *
+ * And suggests optimal values for all three parameters.
+ */
+async function findOptimalEarthRAAngle() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           FIND OPTIMAL PARAMETERS                                        ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TOLERANCE CONFIGURATION (High precision - research grade)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const TOLERANCES = {
+    geometry: 0.1,        // arcseconds - sun.dec must match obliquity at solstice
+    timing: 5,            // minutes - solstice timing error
+    sunRA: 75,            // arcseconds (= 5 seconds of time)
+    obliquity: 0.05,      // arcseconds - obliquity vs IAU 2006
+    obliquityRate: 0.1,   // arcseconds/century - obliquity rate vs IAU 2006
+    inclination: 0.001,   // degrees - Earth inclination to invariable plane at J2000
+  };
+
+  // Derived values
+  const sunRA_timeSec = TOLERANCES.sunRA / 15;  // 15" = 1 second of time
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 1: Measure solstice errors across multiple years
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('PART 1: Solstice Timing Analysis');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  const testYears = [2000, 2005, 2010, 2015, 2020];
+  const errors = {};
+  let totalError = 0;
+
+  for (const year of testYears) {
+    if (JUNE_SOLSTICE_REFERENCE[year]) {
+      const result = solsticeForYear(year);
+      if (result) {
+        const refJD = JUNE_SOLSTICE_REFERENCE[year].jd;
+        const errorMin = (result.jd - refJD) * 24 * 60;
+        errors[year] = errorMin;
+        totalError += errorMin;
+        console.log(`  ${year}: ${errorMin >= 0 ? '+' : ''}${errorMin.toFixed(1)} min`);
+      }
+    }
+  }
+
+  const avgError = totalError / testYears.length;
+  const error2000 = errors[2000] || 0;
+  const error2020 = errors[2020] || 0;
+  const driftOver20Years = error2020 - error2000;
+  const driftPerYear = driftOver20Years / 20;
+
+  console.log('');
+  console.log(`  Average error:     ${avgError >= 0 ? '+' : ''}${avgError.toFixed(1)} min`);
+  console.log(`  Drift 2000→2020:   ${driftOver20Years >= 0 ? '+' : ''}${driftOver20Years.toFixed(1)} min (${driftPerYear.toFixed(2)} min/year)`);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 2: Obliquity analysis vs IAU 2006
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('PART 2: Obliquity Analysis vs IAU 2006');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  // IAU 2006 reference values at MODEL EPOCH (June 21, 2000)
+  // Adjusted from J2000 for the 171.5 day offset
+  const IAU_obliquity_modelEpoch = ASTRO_REFERENCE.obliquityModelEpoch_deg;
+  const IAU_rate_per_century = ASTRO_REFERENCE.obliquityRate_degPerCentury;
+
+  // Get model obliquity at model epoch (June 21, 2000)
+  jumpToJulianDay(startmodelJD);  // JD 2451716.5
+  forceSceneUpdate();
+  await new Promise(r => setTimeout(r, 50));
+  const modelObliquityAtEpoch = o.obliquityEarth;
+
+  // Get model obliquity at model epoch + 100 years to compute rate
+  jumpToJulianDay(startmodelJD + 36525);  // June 21, 2100
+  forceSceneUpdate();
+  await new Promise(r => setTimeout(r, 50));
+  const modelObliquityAtEpoch100 = o.obliquityEarth;
+
+  const modelRatePerCentury = modelObliquityAtEpoch100 - modelObliquityAtEpoch;
+
+  const obliquityErrorArcsec = (modelObliquityAtEpoch - IAU_obliquity_modelEpoch) * 3600;
+  const rateErrorArcsec = (modelRatePerCentury - IAU_rate_per_century) * 3600;
+
+  const obliquityNeedsFix = Math.abs(obliquityErrorArcsec) > TOLERANCES.obliquity;
+  const obliquityRateNeedsFix = Math.abs(rateErrorArcsec) > TOLERANCES.obliquityRate;
+
+  console.log(`  Reference epoch: Model start (June 21, 2000, JD ${startmodelJD})`);
+  console.log(`  Model obliquity:   ${modelObliquityAtEpoch.toFixed(6)}° (IAU 2006: ${IAU_obliquity_modelEpoch.toFixed(6)}°)`);
+  console.log(`  Obliquity error:   ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" ${obliquityNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquity}")`);
+  console.log(`  Model rate:        ${(modelRatePerCentury * 3600).toFixed(2)}"/century (IAU: ${(IAU_rate_per_century * 3600).toFixed(2)}"/century)`);
+  console.log(`  Rate error:        ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century ${obliquityRateNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquityRate}"/century)`);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 2.3: Earth's Inclination to Invariable Plane at Model Epoch
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('PART 2.3: Earth Inclination to Invariable Plane');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  // Calculate model's inclination at model epoch (June 21, 2000) using the formula:
+  // inclination = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * cos(phase3)
+  // Model epoch is at year 2000.469 (171.5 days after Jan 1)
+  const modelEpochYear = 2000 + ASTRO_REFERENCE.modelEpochOffsetDays / 365.25;
+  const inclT_modelEpoch = modelEpochYear - balancedYear;
+  const inclCycle3 = holisticyearLength / 3;
+  const inclPhase3_modelEpoch = (inclT_modelEpoch / inclCycle3) * 2 * Math.PI;
+  const modelInclinationAtEpoch = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude * Math.cos(inclPhase3_modelEpoch);
+
+  const IAU_inclination_modelEpoch = ASTRO_REFERENCE.earthInclinationModelEpoch_deg;
+  const inclinationErrorDeg = modelInclinationAtEpoch - IAU_inclination_modelEpoch;
+  const inclinationErrorArcsec = inclinationErrorDeg * 3600;
+  const inclinationNeedsFix = Math.abs(inclinationErrorDeg) > TOLERANCES.inclination;
+
+  console.log(`  Reference epoch: Model start (June 21, 2000, JD ${startmodelJD})`);
+  console.log(`  Reference value: ${IAU_inclination_modelEpoch.toFixed(5)}° (adjusted from J2000: ${ASTRO_REFERENCE.earthInclinationJ2000_deg}°)`);
+  console.log(`  Model value:     ${modelInclinationAtEpoch.toFixed(5)}°`);
+  console.log(`  Error:           ${inclinationErrorDeg >= 0 ? '+' : ''}${inclinationErrorDeg.toFixed(5)}° (${inclinationErrorArcsec >= 0 ? '+' : ''}${inclinationErrorArcsec.toFixed(1)}") ${inclinationNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'}`);
+  console.log('');
+  console.log('  Current parameters:');
+  console.log(`    earthInvPlaneInclinationMean      = ${earthInvPlaneInclinationMean}°`);
+  console.log(`    earthInvPlaneInclinationAmplitude = ${earthInvPlaneInclinationAmplitude}° (fixed - from obliquity rate)`);
+  console.log(`    cos(phase3 at model epoch)        = ${Math.cos(inclPhase3_modelEpoch).toFixed(6)}`);
+
+  // Calculate what the mean should be to match reference at model epoch
+  // Reference = Mean - Amplitude * cos(phase3)
+  // Mean = Reference + Amplitude * cos(phase3)
+  const optimalMeanInclination = IAU_inclination_modelEpoch + earthInvPlaneInclinationAmplitude * Math.cos(inclPhase3_modelEpoch);
+  const meanAdjustment = optimalMeanInclination - earthInvPlaneInclinationMean;
+
+  if (inclinationNeedsFix) {
+    console.log('');
+    console.log(`  ⚠️  To match reference at model epoch:`);
+    console.log(`      Optimal earthInvPlaneInclinationMean = ${optimalMeanInclination.toFixed(6)}°`);
+    console.log(`      Adjustment needed: ${meanAdjustment >= 0 ? '+' : ''}${meanAdjustment.toFixed(6)}°`);
+  } else {
+    console.log('');
+    console.log('  ✓  Inclination matches reference within tolerance');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 2.5: Verify sun.dec matches obliquity at solstice (geometry check)
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('PART 2.5: Geometry Verification (sun.dec vs obliquity at solstice)');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  // Find the year 2000 solstice and check sun.dec there
+  const solstice2000Result = solsticeForYear(2000);
+  let sunDecAtSolstice = null;
+  let obliquityAtSolstice = null;
+  let geometryError = null;
+  let geometryErrorDeg = null;
+  let geometryWarning = false;
+  let earthRAAngle_geometrySensitivity = null;
+  let earthRAAngle_geometryAdjustment = null;
+
+  if (solstice2000Result) {
+    jumpToJulianDay(solstice2000Result.jd);
+    forceSceneUpdate();
+    await new Promise(r => setTimeout(r, 50));
+
+    // sun.dec is in radians, convert to degrees (90 - dec gives declination from equator)
+    sunDecAtSolstice = sun.dec ? (90 - sun.dec * 180 / Math.PI) : null;
+    obliquityAtSolstice = o.obliquityEarth;
+
+    if (sunDecAtSolstice !== null && obliquityAtSolstice !== null) {
+      geometryErrorDeg = sunDecAtSolstice - obliquityAtSolstice;
+      geometryError = geometryErrorDeg * 3600;  // arcseconds
+
+      console.log(`  At year 2000 solstice (JD ${solstice2000Result.jd.toFixed(4)}):`);
+      console.log(`    sun.dec (max):       ${sunDecAtSolstice.toFixed(6)}°`);
+      console.log(`    o.obliquityEarth:    ${obliquityAtSolstice.toFixed(6)}°`);
+      console.log(`    Difference:          ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}"`);
+
+      // Measure earthRAAngle sensitivity by testing a small perturbation
+      // We temporarily adjust the tilt and measure the effect on sun.dec
+      const testDelta = 0.01;  // Test with 0.01° change
+      const originalTilt = earthPerihelionPrecession1.orbitTilta;
+
+      // Apply test perturbation
+      earthPerihelionPrecession1.orbitTilta = originalTilt - testDelta;  // earthRAAngle is negated
+      earthPerihelionPrecession1.containerObj.rotation.x = earthPerihelionPrecession1.orbitTilta * Math.PI / 180;
+      forceSceneUpdate();
+      await new Promise(r => setTimeout(r, 50));
+
+      const sunDecPerturbed = sun.dec ? (90 - sun.dec * 180 / Math.PI) : null;
+
+      // Restore original
+      earthPerihelionPrecession1.orbitTilta = originalTilt;
+      earthPerihelionPrecession1.containerObj.rotation.x = originalTilt * Math.PI / 180;
+      forceSceneUpdate();
+      await new Promise(r => setTimeout(r, 50));
+
+      if (sunDecPerturbed !== null) {
+        // Sensitivity: how much does sun.dec change per degree of earthRAAngle?
+        const sunDecChange = sunDecPerturbed - sunDecAtSolstice;
+        earthRAAngle_geometrySensitivity = sunDecChange / testDelta;  // degrees sun.dec per degree earthRAAngle
+
+        console.log('');
+        console.log('  Geometry sensitivity analysis:');
+        console.log(`    earthRAAngle sensitivity: ${earthRAAngle_geometrySensitivity.toFixed(4)}° sun.dec per 1° earthRAAngle`);
+
+        // If geometry error is significant, do an iterative search to find optimal earthRAAngle
+        // The linear approximation can be very inaccurate due to non-linear sensitivity
+        if (Math.abs(geometryError) > TOLERANCES.geometry) {
+          console.log('');
+          console.log('  Iterative search for optimal earthRAAngle:');
+
+          // Search range: try values from current-0.2 to current+0.3 in steps of 0.01
+          let bestRAAngle = earthRAAngle;
+          let bestGeometryError = Math.abs(geometryError);
+          const searchStart = earthRAAngle - 0.2;
+          const searchEnd = earthRAAngle + 0.3;
+          const searchStep = 0.02;
+
+          for (let testRA = searchStart; testRA <= searchEnd; testRA += searchStep) {
+            // Apply test value
+            earthPerihelionPrecession1.orbitTilta = -testRA;
+            earthPerihelionPrecession1.containerObj.rotation.x = earthPerihelionPrecession1.orbitTilta * Math.PI / 180;
+            forceSceneUpdate();
+            await new Promise(r => setTimeout(r, 30));
+
+            // Find solstice with this value
+            const testSolstice = solsticeForYear(2000);
+            if (testSolstice) {
+              jumpToJulianDay(testSolstice.jd);
+              forceSceneUpdate();
+              await new Promise(r => setTimeout(r, 30));
+
+              const testSunDec = sun.dec ? (90 - sun.dec * 180 / Math.PI) : null;
+              const testObliquity = o.obliquityEarth;
+
+              if (testSunDec !== null && testObliquity !== null) {
+                const testError = Math.abs(testSunDec - testObliquity) * 3600;
+                if (testError < bestGeometryError) {
+                  bestGeometryError = testError;
+                  bestRAAngle = testRA;
+                }
+              }
+            }
+          }
+
+          // Restore original
+          earthPerihelionPrecession1.orbitTilta = -earthRAAngle;
+          earthPerihelionPrecession1.containerObj.rotation.x = earthPerihelionPrecession1.orbitTilta * Math.PI / 180;
+          forceSceneUpdate();
+          await new Promise(r => setTimeout(r, 50));
+
+          earthRAAngle_geometryAdjustment = bestRAAngle - earthRAAngle;
+          console.log(`    Best earthRAAngle found: ${bestRAAngle.toFixed(6)}° (geometry error: ${bestGeometryError.toFixed(2)}")`);
+          console.log(`    Adjustment needed: ${earthRAAngle_geometryAdjustment >= 0 ? '+' : ''}${earthRAAngle_geometryAdjustment.toFixed(6)}°`);
+        } else {
+          // Geometry is OK, use linear approximation for small adjustments
+          if (Math.abs(earthRAAngle_geometrySensitivity) > 0.001) {
+            earthRAAngle_geometryAdjustment = -geometryErrorDeg / earthRAAngle_geometrySensitivity;
+          }
+          if (earthRAAngle_geometryAdjustment !== null) {
+            console.log(`    To fix geometry error: adjust earthRAAngle by ${earthRAAngle_geometryAdjustment >= 0 ? '+' : ''}${earthRAAngle_geometryAdjustment.toFixed(6)}°`);
+            console.log(`    Suggested earthRAAngle for geometry: ${(earthRAAngle + earthRAAngle_geometryAdjustment).toFixed(6)}°`);
+          }
+        }
+      }
+
+      // Physical constraint: sun.dec should equal obliquity at solstice (within tolerance)
+      if (Math.abs(geometryError) > TOLERANCES.geometry) {
+        geometryWarning = true;
+        console.log('');
+        console.log(`  ⚠️  WARNING: sun.dec does not match obliquity at solstice (tolerance: ${TOLERANCES.geometry}")`);
+        if (geometryError > 0) {
+          console.log('      sun.dec EXCEEDS obliquity - this is physically impossible!');
+        } else {
+          console.log('      sun.dec is below obliquity at solstice moment.');
+        }
+        console.log('      This can be corrected by adjusting earthRAAngle (see above).');
+      } else {
+        console.log('');
+        console.log(`  ✓  Geometry OK: sun.dec matches obliquity within ${TOLERANCES.geometry}"`);
+      }
+    }
+  } else {
+    console.log('  Could not detect year 2000 solstice for geometry check.');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 2.6: Verify Sun's RA at model start (21 June 2000 00:00 UTC)
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('PART 2.6: Sun RA Verification at model start');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  // At June solstice, Sun's RA = exactly 6h 00m 00s (90°)
+  // The 2000 solstice was at 01:47 UTC on June 21
+  // At 00:00 UTC (1h 47m = 1.783h earlier), Sun's RA should be slightly less than 6h
+  // Sun moves ~360° in 365.25 days = 0.9856°/day = 0.04107°/hour in ecliptic longitude
+  // But RA near solstice moves faster due to obliquity - approximately 1°/day in RA = 4min RA / hour
+
+  // Jump to model start: 21 June 2000 00:00 UTC
+  // Julian Day convention: JD X.0 = noon UTC, JD X.5 = midnight UTC of previous day
+  // So June 21, 2000 00:00 UTC = JD 2451716.5 - 0.5 = JD 2451716.0
+  // But actually: JD 2451545.0 = Jan 1, 2000 12:00 TT
+  // JD 2451716.5 is used as model start in the code (see line 28)
+  // Let's use the actual model start JD from the constant
+  const modelStartJD = startmodelJD;  // Use the actual model start JD (2451716.5)
+  jumpToJulianDay(modelStartJD);
+  forceSceneUpdate();
+  await new Promise(r => setTimeout(r, 50));
+
+  // Get Sun's RA at model start
+  const sunRAatStart = sun.ra !== undefined ? (sun.ra * 180 / Math.PI + 360) % 360 : null;
+
+  // Calculate expected RA based on astronomical reference solstice time
+  // Reference solstice is 2000-06-21 01:47:51 UTC = JD 2451716.575
+  // At solstice, Sun RA = exactly 90° (6h 00m 00s)
+  const refSolsticeJD = JUNE_SOLSTICE_REFERENCE[2000]?.jd || 2451716.575;
+  const hoursFromRefSolstice = (modelStartJD - refSolsticeJD) * 24;  // Negative = before solstice
+
+  // Sun's RA motion: The Sun moves through 360° of RA in one tropical year
+  // Near solstice, RA motion is approximately equal to ecliptic longitude motion
+  // because the ecliptic is nearly parallel to the equator at this point
+  // Average rate: 360° / 365.25 days = 0.9856°/day = 0.04107°/hour
+  // But we should measure from the MODEL's solstice, not the reference
+  // Since timing error is small, use reference + timing error as effective model solstice
+  const modelSolsticeJD = refSolsticeJD + (error2000 / (24 * 60));  // Adjust by timing error
+  const hoursFromModelSolstice = (modelStartJD - modelSolsticeJD) * 24;
+
+  // RA motion rate: approximately 0.04107°/hour (average) but faster near solstice
+  // Let's use the more accurate value based on tropical year
+  const raMotionPerHour = 360 / (365.2422 * 24);  // ~0.04107°/hour
+  const expectedRAoffset = hoursFromModelSolstice * raMotionPerHour;
+  const expectedRA = 90 + expectedRAoffset;  // 90° at solstice, adjust by time offset
+
+  // Convert to hours:minutes:seconds format
+  const sunRAhours = sunRAatStart / 15;  // 15° per hour
+  const sunRAh = Math.floor(sunRAhours);
+  const sunRAm = Math.floor((sunRAhours - sunRAh) * 60);
+  const sunRAs = ((sunRAhours - sunRAh) * 60 - sunRAm) * 60;
+
+  const expectedRAhours = expectedRA / 15;
+  const expectedRAh = Math.floor(expectedRAhours);
+  const expectedRAm = Math.floor((expectedRAhours - expectedRAh) * 60);
+  const expectedRAs = ((expectedRAhours - expectedRAh) * 60 - expectedRAm) * 60;
+
+  // Calculate error in arcseconds of RA
+  const raErrorDeg = sunRAatStart - expectedRA;
+  const raErrorArcsec = raErrorDeg * 3600;
+  const raErrorTimeSec = raErrorDeg * 240;  // 1° = 4 min = 240 sec of time
+
+  // Convert JD to approximate time for display
+  // JD 2451716.5 = June 21, 2000 12:00 UTC; JD 2451716.0 = June 21, 2000 00:00 UTC
+  const jdFraction = modelStartJD - Math.floor(modelStartJD);
+  const utcHour = ((jdFraction + 0.5) % 1) * 24;  // JD .5 = 00:00 UTC, JD .0 = 12:00 UTC
+  const displayHour = Math.floor(utcHour);
+  const displayMin = Math.floor((utcHour - displayHour) * 60);
+  console.log(`  At model start (JD ${modelStartJD.toFixed(4)}, ~${displayHour.toString().padStart(2,'0')}:${displayMin.toString().padStart(2,'0')} UTC):`);
+  console.log(`    Hours from model solstice: ${hoursFromModelSolstice >= 0 ? '+' : ''}${hoursFromModelSolstice.toFixed(2)}h (negative = before)`);
+  console.log(`    Sun RA (model):    ${sunRAh}h ${sunRAm.toString().padStart(2,'0')}m ${sunRAs.toFixed(1).padStart(4,'0')}s (${sunRAatStart.toFixed(4)}°)`);
+  console.log(`    Sun RA (expected): ${expectedRAh}h ${expectedRAm.toString().padStart(2,'0')}m ${expectedRAs.toFixed(1).padStart(4,'0')}s (${expectedRA.toFixed(4)}°)`);
+  console.log(`    RA error:          ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" (${raErrorTimeSec >= 0 ? '+' : ''}${raErrorTimeSec.toFixed(1)}s of time)`);
+
+  // Check if RA error is acceptable
+  const raWarning = Math.abs(raErrorArcsec) > TOLERANCES.sunRA;
+  // Calculate correctionSun adjustment needed to fix RA error
+  // correctionSun directly shifts sun's position in degrees
+  const correctionSunForRA = -raErrorDeg;
+
+  if (raWarning) {
+    console.log('');
+    console.log(`  ⚠️  WARNING: Sun RA error exceeds ${TOLERANCES.sunRA}" (${sunRA_timeSec.toFixed(0)}s of time)`);
+    console.log('      This indicates correctionSun may need adjustment.');
+    console.log(`      Suggested correctionSun adjustment for RA: ${correctionSunForRA >= 0 ? '+' : ''}${correctionSunForRA.toFixed(6)}°`);
+  } else {
+    console.log('');
+    console.log(`  ✓  Sun RA OK: within ${TOLERANCES.sunRA}" (${sunRA_timeSec.toFixed(0)}s) of expected value`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 3: Calculate optimal parameter adjustments
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('PART 3: Optimal Parameter Calculations');
+  console.log('───────────────────────────────────────────────────────────────────────────');
+
+  // Sensitivity constants (empirically derived)
+  // earthRAAngle affects BOTH geometry (sun.dec) AND timing
+  // correctionSun affects ONLY timing (Sun's orbital starting position)
+  const earthRAAngle_minPerDeg = 3708;  // 1° earthRAAngle ≈ 3708 min shift in solstice
+  const correctionSun_minPerDeg = 365.25 * 24 * 60 / 360;  // ~1461 min/degree (Sun moves 360° in one year)
+
+  // For obliquity parameters, we use analytical relationships from the model formula:
+  // obliquity = earthtiltMean - A*cos(phase3) + A*cos(phase8)
+  //
+  // At J2000:
+  // - Changing earthtiltMean by Δ changes obliquity by Δ (direct 1:1)
+  // - Changing amplitude affects both obliquity value AND rate
+
+  // Phase values at J2000 (from balanced year)
+  const t_J2000 = 2000 - balancedYear;
+  const cycle3 = holisticyearLength / 3;
+  const cycle8 = holisticyearLength / 8;
+  const phase3 = (t_J2000 / cycle3) * 2 * Math.PI;
+  const phase8 = (t_J2000 / cycle8) * 2 * Math.PI;
+
+  const cos3 = Math.cos(phase3);
+  const cos8 = Math.cos(phase8);
+  const sin3 = Math.sin(phase3);
+  const sin8 = Math.sin(phase8);
+
+  // Obliquity sensitivity to amplitude: d(obliquity)/d(A) = -cos(phase3) + cos(phase8)
+  const obliq_sens_to_amp = -cos3 + cos8;
+
+  // Rate sensitivity to amplitude (per century):
+  // rate = A*sin(phase3)*(2π/cycle3) - A*sin(phase8)*(2π/cycle8)  [per year]
+  // rate per century = rate * 100
+  // d(rate_century)/d(A) = [sin(phase3)*(2π/cycle3) - sin(phase8)*(2π/cycle8)] * 100
+  const rate_sens_to_amp_per_century = (sin3 * (2 * Math.PI / cycle3) - sin8 * (2 * Math.PI / cycle8)) * 100;
+
+  // Rate error in degrees per century
+  const rateErrorDegPerCentury = modelRatePerCentury - IAU_rate_per_century;
+
+  // Solve for optimal amplitude from rate constraint
+  // Need: Δamp * rate_sens_to_amp_per_century = -rateError (to cancel error)
+  let optimalAmpAdjustment = -rateErrorDegPerCentury / rate_sens_to_amp_per_century;
+
+  // Sanity check: limit amplitude adjustment to reasonable range (±0.01°)
+  // Current obliquity is already excellent, so we shouldn't need large changes
+  const maxAmpAdjustment = 0.01;
+  if (Math.abs(optimalAmpAdjustment) > maxAmpAdjustment) {
+    console.log(`  WARNING: Amplitude adjustment ${optimalAmpAdjustment.toFixed(6)}° exceeds limit, clamping to ±${maxAmpAdjustment}°`);
+    optimalAmpAdjustment = Math.sign(optimalAmpAdjustment) * maxAmpAdjustment;
+  }
+
+  // After amplitude adjustment, calculate remaining obliquity error
+  const obliqAfterAmpAdj = modelObliquityAtEpoch + optimalAmpAdjustment * obliq_sens_to_amp;
+  const remainingObliqError = obliqAfterAmpAdj - IAU_obliquity_modelEpoch;
+
+  // Adjust earthtiltMean to fix remaining obliquity error
+  let optimalMeanAdjustment = -remainingObliqError;
+
+  // Sanity check: limit mean adjustment to reasonable range (±0.001°)
+  const maxMeanAdjustment = 0.001;
+  if (Math.abs(optimalMeanAdjustment) > maxMeanAdjustment) {
+    console.log(`  WARNING: Mean adjustment ${optimalMeanAdjustment.toFixed(6)}° exceeds limit, clamping to ±${maxMeanAdjustment}°`);
+    optimalMeanAdjustment = Math.sign(optimalMeanAdjustment) * maxMeanAdjustment;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Parameter roles:
+  // - earthRAAngle: affects BOTH geometry (sun.dec) AND timing
+  // - correctionSun: affects ONLY timing (Sun's orbital starting position)
+  //
+  // Strategy: First fix geometry with earthRAAngle, then fix timing with correctionSun
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const geometryAdjustment = earthRAAngle_geometryAdjustment || 0;
+
+  // Calculate suggested earthRAAngle for geometry (this is the primary constraint)
+  const suggestedRAAngle_forGeometry = earthRAAngle + geometryAdjustment;
+
+  // Geometry tolerance in degrees
+  const geometryTolerance = TOLERANCES.geometry / 3600;  // convert arcsec to degrees
+  let geometryRangeMin = null;
+  let geometryRangeMax = null;
+  if (earthRAAngle_geometrySensitivity && Math.abs(earthRAAngle_geometrySensitivity) > 0.001) {
+    geometryRangeMin = earthRAAngle + (geometryErrorDeg - geometryTolerance) / (-earthRAAngle_geometrySensitivity);
+    geometryRangeMax = earthRAAngle + (geometryErrorDeg + geometryTolerance) / (-earthRAAngle_geometrySensitivity);
+    if (geometryRangeMin > geometryRangeMax) {
+      [geometryRangeMin, geometryRangeMax] = [geometryRangeMax, geometryRangeMin];
+    }
+  }
+
+  // Check if geometry needs fixing (used in calculations below)
+  const geometryNeedsFix = Math.abs(geometryError) > TOLERANCES.geometry;
+
+  // Calculate suggested earthRAAngle considering BOTH geometry AND timing
+  // Strategy:
+  // - earthRAAngle must fix geometry (sun.dec = obliquity)
+  // - But we also want timing to be reasonable so correctionSun doesn't need huge adjustment
+  // - correctionSun has sensitivity ~1461 min/degree, max reasonable adjustment is ~0.5°
+  // - So timing error after earthRAAngle fix should be within ±730 min (correctable by correctionSun ±0.5°)
+
+  let suggestedRAAngle = suggestedRAAngle_forGeometry;
+  let optimalRAAngleAdj = geometryAdjustment;
+
+  // If geometry is already OK, keep current earthRAAngle
+  if (!geometryNeedsFix) {
+    suggestedRAAngle = earthRAAngle;
+    optimalRAAngleAdj = 0;
+  }
+
+  // Calculate timing error AFTER applying suggested earthRAAngle
+  let timingAfterGeometryFix = error2000 - (optimalRAAngleAdj * earthRAAngle_minPerDeg);
+
+  // If timing after geometry fix is way off, we need to find a better balance
+  // The geometry-based suggestion might not be accurate due to sensitivity measurement at wrong point
+  // Try to find earthRAAngle that gives both good geometry AND reasonable timing
+  const maxCorrectionSunAdjustment = 0.5;  // degrees
+  const maxTimingCorrectable = maxCorrectionSunAdjustment * correctionSun_minPerDeg;  // ~730 min
+
+  if (Math.abs(timingAfterGeometryFix) > maxTimingCorrectable && geometryNeedsFix) {
+    // The geometry-only fix leads to timing that can't be corrected by correctionSun
+    // This suggests the sensitivity measurement is inaccurate at this earthRAAngle value
+    // Fall back to calculating earthRAAngle from timing, then verify geometry
+    const timingBasedAdjustment = -error2000 / earthRAAngle_minPerDeg;
+    const timingBasedRAAngle = earthRAAngle + timingBasedAdjustment;
+
+    // Check if timing-based earthRAAngle is within geometry valid range
+    if (geometryRangeMin !== null && geometryRangeMax !== null) {
+      if (timingBasedRAAngle >= geometryRangeMin && timingBasedRAAngle <= geometryRangeMax) {
+        // Timing-based value is within geometry tolerance - use it
+        suggestedRAAngle = timingBasedRAAngle;
+        optimalRAAngleAdj = timingBasedAdjustment;
+        timingAfterGeometryFix = 0;
+      } else {
+        // Need a compromise - use edge of geometry range closest to timing-based value
+        if (timingBasedRAAngle < geometryRangeMin) {
+          suggestedRAAngle = geometryRangeMin;
+        } else {
+          suggestedRAAngle = geometryRangeMax;
+        }
+        optimalRAAngleAdj = suggestedRAAngle - earthRAAngle;
+        timingAfterGeometryFix = error2000 - (optimalRAAngleAdj * earthRAAngle_minPerDeg);
+      }
+    }
+  }
+
+  // Determine what else needs to be fixed
+  const timingNeedsFix = Math.abs(timingAfterGeometryFix) > TOLERANCES.timing;
+  const raNeedsFix = Math.abs(raErrorArcsec) > TOLERANCES.sunRA;
+
+  // Calculate correctionSun adjustment
+  // Strategy:
+  // - If earthRAAngle is being changed significantly, use TIMING-based correction
+  //   (because RA error measured with wrong earthRAAngle is meaningless)
+  // - Only use RA-based correction when geometry is already correct
+  let correctionSunAdjustment;
+  let correctionSunBasis;  // Track which method was used
+
+  // If we're making a significant earthRAAngle adjustment, RA measurement is unreliable
+  // Use timing-based correction instead
+  const significantGeometryAdjustment = Math.abs(optimalRAAngleAdj) > 0.01;  // More than 0.01° change
+
+  if (significantGeometryAdjustment) {
+    // earthRAAngle is being adjusted significantly - use timing-based correctionSun
+    // RA error is unreliable when orbital geometry is wrong
+    if (Math.abs(timingAfterGeometryFix) > TOLERANCES.timing) {
+      correctionSunAdjustment = -timingAfterGeometryFix / correctionSun_minPerDeg;
+      correctionSunBasis = 'timing (geometry adjustment)';
+    } else {
+      correctionSunAdjustment = 0;
+      correctionSunBasis = 'none (timing OK after geometry fix)';
+    }
+  } else if (timingNeedsFix) {
+    // Geometry is OK, but timing needs fixing
+    correctionSunAdjustment = -timingAfterGeometryFix / correctionSun_minPerDeg;
+    correctionSunBasis = 'timing';
+  } else if (raNeedsFix) {
+    // Both geometry and timing are OK, but RA is off
+    // Check if RA fix would break timing
+    const timingImpactOfRAfix = Math.abs(correctionSunForRA * correctionSun_minPerDeg);
+    if (timingImpactOfRAfix <= TOLERANCES.timing) {
+      correctionSunAdjustment = correctionSunForRA;
+      correctionSunBasis = 'RA';
+    } else {
+      // RA fix would break timing - skip it
+      correctionSunAdjustment = 0;
+      correctionSunBasis = 'none (RA fix would break timing)';
+    }
+  } else {
+    // All are acceptable - no change needed
+    correctionSunAdjustment = 0;
+    correctionSunBasis = 'none';
+  }
+  const suggestedCorrectionSun = correctionSun + correctionSunAdjustment;
+
+  // Calculate suggested values for obliquity parameters
+  const suggestedAmplitude = earthInvPlaneInclinationAmplitude + optimalAmpAdjustment;
+  const suggestedMean = earthtiltMean + optimalMeanAdjustment;
+
+  console.log('');
+  console.log('  Parameter sensitivities:');
+  console.log(`    earthRAAngle: ${earthRAAngle_minPerDeg.toFixed(0)} min/degree (affects timing AND geometry)`);
+  console.log(`    correctionSun: ${correctionSun_minPerDeg.toFixed(0)} min/degree (affects timing ONLY)`);
+  if (earthRAAngle_geometrySensitivity) {
+    console.log(`    earthRAAngle geometry: ${(earthRAAngle_geometrySensitivity * 3600).toFixed(2)}"/degree sun.dec`);
+  }
+
+  console.log('');
+  console.log('  Current status:');
+  console.log(`    Geometry error:     ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" ${geometryNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.geometry}")`);
+  console.log(`    Timing error:       ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min ${Math.abs(error2000) > TOLERANCES.timing ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.timing} min)`);
+  console.log(`    Sun RA error:       ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" (${raErrorTimeSec >= 0 ? '+' : ''}${raErrorTimeSec.toFixed(1)}s) ${raNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.sunRA}" = ${sunRA_timeSec.toFixed(0)}s)`);
+  console.log(`    Obliquity error:    ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" ${obliquityNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquity}")`);
+  console.log(`    Obliquity rate:     ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century ${obliquityRateNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquityRate}"/century)`);
+  console.log(`    Inclination error:  ${inclinationErrorDeg >= 0 ? '+' : ''}${inclinationErrorDeg.toFixed(5)}° ${inclinationNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.inclination}°)`);
+
+  if (geometryRangeMin !== null) {
+    console.log('');
+    console.log(`  Valid earthRAAngle range for geometry (±${TOLERANCES.geometry}"):`);
+    console.log(`    ${geometryRangeMin.toFixed(6)}° to ${geometryRangeMax.toFixed(6)}°`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PART 4: Suggested values
+  // ═══════════════════════════════════════════════════════════════════════════
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SUGGESTED PARAMETER VALUES');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+
+  // Show what needs to be fixed
+  // Note: timingNeedsFix refers to timing AFTER geometry fix, not current timing
+  const currentTimingNeedsFix = Math.abs(error2000) > TOLERANCES.timing;
+  const allOK = !geometryNeedsFix && !currentTimingNeedsFix && !raNeedsFix && !obliquityNeedsFix && !obliquityRateNeedsFix && !inclinationNeedsFix;
+
+  if (allOK) {
+    console.log('');
+    console.log('✓ All parameters are within acceptable tolerances. No changes needed.');
+  } else {
+    console.log('');
+    if (geometryNeedsFix) {
+      console.log(`⚠️  GEOMETRY needs correction (error > ${TOLERANCES.geometry}")`);
+      if (timingNeedsFix) {
+        console.log('    → This will also require TIMING correction via correctionSun');
+      }
+    }
+    if (currentTimingNeedsFix && !geometryNeedsFix) {
+      console.log(`⚠️  TIMING needs correction (error > ${TOLERANCES.timing} min)`);
+    }
+    if (raNeedsFix && !geometryNeedsFix) {
+      console.log(`⚠️  SUN RA needs correction (error > ${TOLERANCES.sunRA}" = ${sunRA_timeSec.toFixed(0)}s)`);
+    }
+    if (obliquityNeedsFix) {
+      console.log(`⚠️  OBLIQUITY needs correction (error > ${TOLERANCES.obliquity}")`);
+      console.log('    → Adjust earthtiltMean parameter');
+    }
+    if (obliquityRateNeedsFix) {
+      console.log(`⚠️  OBLIQUITY RATE needs correction (error > ${TOLERANCES.obliquityRate}"/century)`);
+      console.log('    → Adjust earthInvPlaneInclinationAmplitude parameter');
+    }
+    if (inclinationNeedsFix) {
+      console.log(`⚠️  INCLINATION needs correction (error > ${TOLERANCES.inclination}°)`);
+      console.log('    → Adjust earthInvPlaneInclinationMean parameter');
+      console.log(`    → Suggested: ${optimalMeanInclination.toFixed(6)}°`);
+    }
+  }
+
+  // Calculate suggested inclination mean
+  const suggestedInclinationMean = inclinationNeedsFix ? optimalMeanInclination : earthInvPlaneInclinationMean;
+
+  console.log('');
+  console.log('┌─────────────────────────────────────┬─────────────┬─────────────┬───────────┐');
+  console.log('│ Parameter                           │ Current     │ Suggested   │ Change    │');
+  console.log('├─────────────────────────────────────┼─────────────┼─────────────┼───────────┤');
+  console.log(`│ earthRAAngle (geometry+timing)      │ ${earthRAAngle.toFixed(6)}°   │ ${suggestedRAAngle.toFixed(6)}°   │ ${optimalRAAngleAdj >= 0 ? '+' : ''}${optimalRAAngleAdj.toFixed(6)}° │`);
+  console.log(`│ correctionSun (RA+timing)           │ ${correctionSun >= 0 ? '+' : ''}${correctionSun.toFixed(6)}° │ ${suggestedCorrectionSun >= 0 ? '+' : ''}${suggestedCorrectionSun.toFixed(6)}° │ ${correctionSunAdjustment >= 0 ? '+' : ''}${correctionSunAdjustment.toFixed(6)}° │`);
+  console.log('├─────────────────────────────────────┼─────────────┼─────────────┼───────────┤');
+  console.log(`│ earthInvPlaneInclinationAmplitude   │ ${earthInvPlaneInclinationAmplitude.toFixed(6)}°   │ ${suggestedAmplitude.toFixed(6)}°   │ ${optimalAmpAdjustment >= 0 ? '+' : ''}${optimalAmpAdjustment.toFixed(6)}° │`);
+  console.log(`│ earthInvPlaneInclinationMean        │ ${earthInvPlaneInclinationMean.toFixed(6)}°   │ ${suggestedInclinationMean.toFixed(6)}°   │ ${meanAdjustment >= 0 ? '+' : ''}${meanAdjustment.toFixed(6)}° │`);
+  console.log(`│ earthtiltMean                       │ ${earthtiltMean.toFixed(5)}°  │ ${suggestedMean.toFixed(5)}°  │ ${optimalMeanAdjustment >= 0 ? '+' : ''}${optimalMeanAdjustment.toFixed(6)}° │`);
+  console.log('└─────────────────────────────────────┴─────────────┴─────────────┴───────────┘');
+
+  console.log('');
+  if (allOK) {
+    console.log('Current values are optimal - no changes needed.');
+  } else {
+    console.log('Expected results after applying suggested values:');
+    console.log(`  Correction basis: ${correctionSunBasis}`);
+    console.log(`  • Geometry error: ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" → ~0" (sun.dec = obliquity)`);
+    if (correctionSunBasis === 'RA') {
+      console.log(`  • Sun RA error:   ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" → ~0"`);
+    } else {
+      console.log(`  • Sun RA error:   ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" (will improve with correct geometry)`);
+    }
+    // Expected timing after BOTH earthRAAngle change and correctionSun adjustment:
+    // - earthRAAngle change: shifts timing by (optimalRAAngleAdj * earthRAAngle_minPerDeg)
+    // - correctionSun change: shifts timing by (correctionSunAdjustment * correctionSun_minPerDeg)
+    const timingShiftFromRAAngle = optimalRAAngleAdj * earthRAAngle_minPerDeg;
+    const timingShiftFromCorrectionSun = correctionSunAdjustment * correctionSun_minPerDeg;
+    const expectedTiming = error2000 - timingShiftFromRAAngle + timingShiftFromCorrectionSun;
+    console.log(`  • Timing error:   ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min → ~${expectedTiming.toFixed(1)} min`);
+    console.log(`      (earthRAAngle: ${timingShiftFromRAAngle >= 0 ? '+' : ''}${timingShiftFromRAAngle.toFixed(1)} min, correctionSun: ${timingShiftFromCorrectionSun >= 0 ? '+' : ''}${timingShiftFromCorrectionSun.toFixed(1)} min)`);
+    console.log(`  • Obliquity:      ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" → ~0"`);
+    console.log(`  • Obliquity rate: ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century → ~0"/century`);
+  }
+
+  console.log('');
+  console.log('HOW THE PARAMETERS WORK:');
+  console.log('  • earthRAAngle: Controls geometry (sun.dec at solstice). Also affects timing.');
+  console.log('  • correctionSun: Controls Sun RA position. Also affects timing.');
+  console.log('  • Strategy: First set earthRAAngle for correct geometry,');
+  console.log('              then adjust correctionSun to fix Sun RA (and timing).');
+
+  console.log('');
+  console.log('NOTE: Drift of ~' + driftPerYear.toFixed(1) + ' min/year is inherent to model year length');
+  console.log('      (mean solar year vs tropical year difference of ~17 sec/year)');
+
+  console.log('');
+  console.log('To apply, edit these values in script.js and reload the page.');
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+
+  return {
+    current: {
+      earthInvPlaneInclinationAmplitude,
+      earthInvPlaneInclinationMean,
+      earthtiltMean,
+      earthRAAngle,
+      correctionSun
+    },
+    suggested: {
+      earthInvPlaneInclinationAmplitude: suggestedAmplitude,
+      earthInvPlaneInclinationMean: suggestedInclinationMean,
+      earthtiltMean: suggestedMean,
+      earthRAAngle: suggestedRAAngle,
+      correctionSun: suggestedCorrectionSun
+    },
+    errors: {
+      solstice2000: error2000,
+      avgSolstice: avgError,
+      drift20Years: driftOver20Years,
+      obliquityArcsec: obliquityErrorArcsec,
+      rateArcsec: rateErrorArcsec,
+      geometryArcsec: geometryError,
+      geometryWarning: geometryWarning,
+      raArcsec: raErrorArcsec,
+      raWarning: raWarning,
+      inclinationDeg: inclinationErrorDeg,
+      inclinationNeedsFix: inclinationNeedsFix
+    },
+    sensitivities: {
+      earthRAAngle_timing: earthRAAngle_minPerDeg,
+      earthRAAngle_geometry: earthRAAngle_geometrySensitivity,
+      correctionSun_timing: correctionSun_minPerDeg
+    },
+    ranges: {
+      geometryRange: { min: geometryRangeMin, max: geometryRangeMax }
+    },
+    reference: {
+      earthInclinationJ2000: ASTRO_REFERENCE.earthInclinationJ2000_deg
+    }
+  };
+}
+
+/**
+ * Investigate how each parameter affects solstice drift independently.
+ * Tests small variations of each parameter while keeping others constant.
+ */
+async function investigateParameterEffects() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           PARAMETER SENSITIVITY INVESTIGATION                            ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+  console.log('Testing how each parameter affects solstice timing and drift...');
+  console.log('');
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  // Store original values
+  const originalAmplitude = earthInvPlaneInclinationAmplitude;
+  const originalMean = earthtiltMean;
+  const originalRAAngle = earthRAAngle;
+
+  // Helper function to measure solstice errors
+  async function measureErrors() {
+    const testYears = [2000, 2010, 2020];
+    const errors = {};
+
+    for (const year of testYears) {
+      if (JUNE_SOLSTICE_REFERENCE[year]) {
+        const result = solsticeForYear(year);
+        if (result) {
+          errors[year] = (result.jd - JUNE_SOLSTICE_REFERENCE[year].jd) * 24 * 60;
+        }
+      }
+    }
+
+    const drift = (errors[2020] || 0) - (errors[2000] || 0);
+    return { errors, drift, error2000: errors[2000] || 0, error2010: errors[2010] || 0 };
+  }
+
+  // Get baseline
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('BASELINE (current values):');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`  earthInvPlaneInclinationAmplitude = ${originalAmplitude}°`);
+  console.log(`  earthtiltMean = ${originalMean}°`);
+  console.log(`  earthRAAngle = ${originalRAAngle}°`);
+
+  const baseline = await measureErrors();
+  console.log(`  Year 2000 error: ${baseline.error2000.toFixed(1)} min`);
+  console.log(`  Year 2010 error: ${baseline.error2010.toFixed(1)} min`);
+  console.log(`  Drift (2000→2020): ${baseline.drift.toFixed(1)} min`);
+  console.log('');
+
+  // Note: We can't actually change the const values at runtime, but we can
+  // calculate what the theoretical effect would be based on the sensitivities
+  // we've already measured.
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('THEORETICAL SENSITIVITY ANALYSIS:');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+
+  // earthRAAngle sensitivity (already known: 3708 min per degree)
+  console.log('1. earthRAAngle:');
+  console.log('   - Effect: Shifts ALL solstice times uniformly');
+  console.log('   - Sensitivity: 1° ≈ 3708 min shift (61.8 hours)');
+  console.log('   - Effect on drift: NONE (affects all years equally)');
+  console.log('   - Use: Fine-tune epoch (year 2000) alignment');
+  console.log('');
+
+  // earthtiltMean sensitivity
+  console.log('2. earthtiltMean:');
+  console.log('   - Effect: Changes mean obliquity');
+  console.log('   - Effect on solstice timing: Minimal direct effect');
+  console.log('   - Effect on drift: Minimal');
+  console.log('   - Use: Match IAU 2006 obliquity at J2000');
+  console.log('');
+
+  // earthInvPlaneInclinationAmplitude sensitivity
+  console.log('3. earthInvPlaneInclinationAmplitude:');
+  console.log('   - Effect: Changes obliquity oscillation range');
+  console.log('   - Effect on obliquity rate: -82.70"/century per degree');
+  console.log('   - Effect on solstice timing: Complex (affects when max dec occurs)');
+  console.log('   - Effect on drift: POTENTIALLY affects drift rate');
+  console.log('   - Use: Match IAU 2006 obliquity rate');
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('DRIFT ANALYSIS:');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+  console.log('Current drift: +14.5 min over 20 years = +0.725 min/year = +43.5 sec/year');
+  console.log('');
+  console.log('Possible causes:');
+  console.log('  1. Model uses mean solar year (365.242273 days)');
+  console.log('  2. June solstice tropical year is ~365.2416 days (shorter!)');
+  console.log('  3. Difference: ~59 sec/year → explains most of the drift');
+  console.log('');
+  console.log('The drift is primarily a year-length issue, not a parameter tuning issue.');
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('OPTIMIZATION STRATEGIES (relative to test range 2000-2020):');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+  console.log('NOTE: These strategies only shift WHERE the error is zero within the test');
+  console.log('      range. They do NOT eliminate the inherent drift (~43 sec/year).');
+  console.log('');
+  console.log('Strategy A: Optimize for Year 2000 (current) ← RECOMMENDED');
+  console.log('  - earthRAAngle tuned for J2000 epoch (astronomical standard reference)');
+  console.log('  - Result: 2000 ≈ 0 min, 2010 ≈ +7 min, 2020 ≈ +15 min');
+  console.log('  - Best accuracy at the reference epoch where obliquity is calibrated');
+  console.log('');
+  console.log('Strategy B: Optimize for middle of test range (2010)');
+  const shift2010 = baseline.error2010 / 3708;  // degrees needed to zero out 2010
+  console.log(`  - Increase earthRAAngle by ${shift2010.toFixed(6)}° to center on 2010`);
+  console.log(`  - Suggested earthRAAngle: ${(originalRAAngle + shift2010).toFixed(6)}°`);
+  console.log('  - Result: 2000 ≈ -7 min, 2010 ≈ 0 min, 2020 ≈ +7 min');
+  console.log('  - Minimizes max error within test range, but 2010 is not special astronomically');
+  console.log('');
+  console.log('Strategy C: Optimize for minimum RMS error over test range');
+  const avgError = (baseline.error2000 + baseline.error2010 + (baseline.errors[2020] || 0)) / 3;
+  const shiftRMS = avgError / 3708;
+  console.log(`  - Increase earthRAAngle by ${shiftRMS.toFixed(6)}° to minimize average error`);
+  console.log(`  - Suggested earthRAAngle: ${(originalRAAngle + shiftRMS).toFixed(6)}°`);
+  console.log('');
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('RECOMMENDATION:');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+  console.log('The ~43 sec/year drift cannot be eliminated by parameter tuning alone.');
+  console.log('It stems from the model\'s year length vs June solstice tropical year.');
+  console.log('');
+  console.log('Keep Strategy A (optimize for J2000) because:');
+  console.log('  - J2000 is the standard astronomical epoch');
+  console.log('  - Obliquity is calibrated to IAU 2006 at J2000');
+  console.log('  - Scientifically meaningful to have best accuracy at reference epoch');
+  console.log(`  - Current earthRAAngle = ${originalRAAngle.toFixed(6)}°`);
+  console.log('');
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+
+  return {
+    baseline,
+    strategies: {
+      A: { earthRAAngle: originalRAAngle, description: 'Optimize for 2000' },
+      B: { earthRAAngle: originalRAAngle + shift2010, description: 'Optimize for 2010 (centered)' },
+      C: { earthRAAngle: originalRAAngle + shiftRMS, description: 'Minimize RMS error' }
+    }
+  };
+}
+
+/** Verify obliquity rate against IAU 2006 */
+async function verifyObliquityRate() {
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           OBLIQUITY RATE VERIFICATION                                    ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+  console.log('Comparing model obliquity to IAU 2006 reference...');
+  console.log('');
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  // IAU 2006 reference (from ASTRO_REFERENCE)
+  const IAU_OBLIQUITY_J2000 = ASTRO_REFERENCE.obliquityJ2000_deg;
+  const IAU_RATE = ASTRO_REFERENCE.obliquityRate_arcsecPerCentury;
+  const IAU_RATE_DEG = ASTRO_REFERENCE.obliquityRate_degPerCentury;
+
+  // J2000.0 = JD 2451545.0 (2000-01-01 12:00 TT)
+  const JD_J2000 = 2451545.0;
+
+  const years = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025];
+  const results = [];
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('Year      Model (°)      IAU 2006 (°)    Diff (")    Rate Error ("/cen)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+
+  for (const year of years) {
+    // Jump to Jan 1 of each year at noon
+    const jd = dateToJulianDay(year, 1, 1) + 0.5;
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    // Get model obliquity
+    const modelObliquity = o.obliquityEarth;
+
+    // Calculate IAU 2006 expected obliquity
+    const centuriesFromJ2000 = (jd - JD_J2000) / 36525;
+    const iauObliquity = IAU_OBLIQUITY_J2000 + IAU_RATE_DEG * centuriesFromJ2000;
+
+    // Difference in arcseconds
+    const diffArcsec = (modelObliquity - iauObliquity) * 3600;
+
+    results.push({
+      year,
+      jd,
+      model: modelObliquity,
+      iau: iauObliquity,
+      diff: diffArcsec,
+      centuries: centuriesFromJ2000
+    });
+
+    console.log(`${year}      ${modelObliquity.toFixed(6)}°      ${iauObliquity.toFixed(6)}°     ${diffArcsec >= 0 ? '+' : ''}${diffArcsec.toFixed(2)}"      -`);
+  }
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+
+  // Calculate rate from model
+  const first = results[0];
+  const last = results[results.length - 1];
+  const modelChange = last.model - first.model;  // degrees
+  const timeSpan = (last.jd - first.jd) / 36525;  // centuries
+  const modelRate = (modelChange * 3600) / timeSpan;  // arcsec/century
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('RATE ANALYSIS (1990-2025):');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log(`  Model change:    ${(modelChange * 3600).toFixed(2)}" over ${(timeSpan * 100).toFixed(1)} years`);
+  console.log(`  Model rate:      ${modelRate.toFixed(2)}"/century`);
+  console.log(`  IAU 2006 rate:   ${IAU_RATE.toFixed(2)}"/century`);
+  console.log(`  Rate error:      ${(modelRate - IAU_RATE).toFixed(2)}"/century`);
+  console.log('');
+
+  // Summary
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('SUMMARY:');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  const avgDiff = results.reduce((sum, r) => sum + Math.abs(r.diff), 0) / results.length;
+  const maxDiff = Math.max(...results.map(r => Math.abs(r.diff)));
+  console.log(`  Average offset:  ${avgDiff.toFixed(2)}"`);
+  console.log(`  Max offset:      ${maxDiff.toFixed(2)}"`);
+  console.log(`  Rate match:      ${Math.abs(modelRate - IAU_RATE) < 1 ? 'GOOD' : 'POOR'} (${Math.abs(modelRate - IAU_RATE).toFixed(2)}"/cen error)`);
+  console.log('');
+
+  console.log('Current parameters:');
+  console.log(`  earthtiltMean = ${earthtiltMean}°`);
+  console.log(`  earthInvPlaneInclinationAmplitude = ${earthInvPlaneInclinationAmplitude}°`);
+  console.log('');
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+
+  return { results, modelRate, iauRate: IAU_RATE, rateError: modelRate - IAU_RATE };
+}
+
+/** Analyze tropical year length from solstice intervals */
+async function analyzeTropicalYearLength(startYear, endYear) {
+  startYear = startYear || o.calibrationYearStart;
+  endYear = endYear || o.calibrationYearEnd;
+
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           TROPICAL YEAR LENGTH ANALYSIS                                  ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log(`Analyzing years ${startYear} to ${endYear}...`);
+  console.log('');
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  const solstices = [];
+  for (let year = startYear; year <= endYear; year++) {
+    const result = solsticeForYear(year);
+    if (result) solstices.push({ year, jd: result.jd });
+    if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
+  }
+
+  const intervals = [];
+  for (let i = 1; i < solstices.length; i++) {
+    intervals.push({
+      year: solstices[i].year,
+      interval: solstices[i].jd - solstices[i - 1].jd
+    });
+  }
+
+  const mean = intervals.reduce((sum, i) => sum + i.interval, 0) / intervals.length;
+  const expectedTropical = 365.24219;
+
+  console.log('╔═══════════════════════════════╤═══════════════════╗');
+  console.log('║ Metric                        │ Value (days)      ║');
+  console.log('╠═══════════════════════════════╪═══════════════════╣');
+  console.log(`║ Model configured              │ ${meansolaryearlengthinDays.toFixed(9)}    ║`);
+  console.log(`║ Mean measured interval        │ ${mean.toFixed(9)}    ║`);
+  console.log(`║ IAU tropical year             │ ${expectedTropical.toFixed(9)}    ║`);
+  console.log(`║ Diff (measured - configured)  │ ${((mean - meansolaryearlengthinDays) * 86400).toFixed(2)} seconds   ║`);
+  console.log(`║ Diff (measured - IAU)         │ ${((mean - expectedTropical) * 86400).toFixed(2)} seconds   ║`);
+  console.log('╚═══════════════════════════════╧═══════════════════╝');
+
+  if (intervals.length > 10) {
+    const firstFive = intervals.slice(0, 5);
+    const lastFive = intervals.slice(-5);
+    const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
+    const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
+    const yearSpan = lastFive[4].year - firstFive[0].year;
+    const drift = (lastMean - firstMean) / yearSpan * 86400;
+    console.log(`\nTrend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in tropical year`);
+  }
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+  return { solstices, intervals, mean };
+}
+
 function buildJdArray () {
 
   if (o.testMode === 'List') {
@@ -11120,9 +12558,10 @@ function buildJdArray () {
 function jumpToJulianDay (jd) {
   o.julianDay = jd;
 
-  // replicate the onFinishChange() logic you already have
+  // Calculate position from JD alone - Day already contains the time fraction
+  // (Fixed: removed "+ timeToPos(o.Time)" which caused double-counting of time)
   o.Day = o.julianDay - startmodelJD;
-  o.pos = sDay * o.Day + timeToPos(o.Time);
+  o.pos = sDay * o.Day;
 
   const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
   o.perihelionDate = `${p.date}`;
