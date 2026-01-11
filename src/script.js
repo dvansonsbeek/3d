@@ -4160,6 +4160,7 @@ let o = {
   runVerifyPerihelionRate: false,
   runEquinoxAnalysis    : false,
   runAnoministicAnalysis: false,
+  runSiderealYearAnalysis: false,
   runAllAlignments      : false,
   runSiderealDayAnalysis : false,
   runSolarDayAnalysis   : false,
@@ -10848,6 +10849,11 @@ function setupGUI() {
     .name('Analyze Anomalistic Year')
     .listen();
 
+  const calibSiderealYearCtrl = calibFolder
+    .add(o, 'runSiderealYearAnalysis')
+    .name('Analyze Sidereal Year')
+    .listen();
+
   const calibAllAlignmentsCtrl = calibFolder
     .add(o, 'runAllAlignments')
     .name('Analyze All Alignments')
@@ -10999,6 +11005,20 @@ function setupGUI() {
     } finally {
       o.runAnoministicAnalysis = false;
       calibAnoministicCtrl.updateDisplay();
+      o._calibrationBusy = false;
+    }
+  });
+
+  /* --- Sidereal Year Analysis --------------------------------------------- */
+  calibSiderealYearCtrl.onChange(async ticked => {
+    if (!ticked || o._calibrationBusy) return;
+    o._calibrationBusy = true;
+    try {
+      console.clear();
+      await analyzeSiderealYear();
+    } finally {
+      o.runSiderealYearAnalysis = false;
+      calibSiderealYearCtrl.updateDisplay();
       o._calibrationBusy = false;
     }
   });
@@ -13525,6 +13545,218 @@ async function analyzeAnoministicYear(startYear, endYear) {
   return { perihelions, aphelions, periIntervals, apheIntervals, periMean, apheMean };
 }
 
+/**
+ * Analyze sidereal year length using two methods:
+ * - Method A: Direct ICRF longitude measurement (sun.ra + precession offset)
+ * - Method B: Derived from tropical year + precession rate
+ *
+ * The sidereal year is the time for the Sun to return to the same position
+ * relative to fixed stars (ICRF reference frame), approximately 365.256363 days.
+ */
+async function analyzeSiderealYear(startYear, endYear) {
+  startYear = startYear || o.calibrationYearStart;
+  endYear = endYear || o.calibrationYearEnd;
+
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║           SIDEREAL YEAR LENGTH ANALYSIS                                  ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log(`Analyzing years ${startYear} to ${endYear}...`);
+  console.log('');
+  console.log('The sidereal year is the time for the Sun to return to the same position');
+  console.log('relative to fixed stars (ICRF reference frame).');
+  console.log('');
+  console.log('Method: Direct measurement of Sun\'s absolute world position angle.');
+  console.log('This measures when the Sun physically returns to the same orbital position.');
+  console.log('');
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  // Helper to get Sun's absolute world angle
+  const getSunWorldAngle = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    // Get Sun's world position
+    const sunPos = new THREE.Vector3();
+    sun.planetObj.getWorldPosition(sunPos);
+
+    // Calculate angle in XZ plane from origin
+    let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
+    angle = ((angle % 360) + 360) % 360;
+    return angle;
+  };
+
+  // Find when Sun returns to the same world angle
+  const methodDCrossings = [];
+  let firstCrossingJD_D = null;
+  let targetAngle_D = null;
+
+  for (let year = startYear; year <= endYear; year++) {
+    let approxJD;
+    let searchRange;
+
+    if (firstCrossingJD_D !== null) {
+      const prevCrossing = methodDCrossings[methodDCrossings.length - 1];
+      approxJD = prevCrossing.jd + 365.256;
+      searchRange = 288;  // ±6 days
+    } else {
+      const yearFraction = 0.47;  // June
+      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+      searchRange = 960;  // ±20 days
+    }
+
+    const step = 0.5 / 24;  // 0.5 hours
+    const samples = [];
+
+    for (let k = -searchRange; k <= searchRange; ++k) {
+      const jd = approxJD + k * step;
+      const angle = getSunWorldAngle(jd);
+      samples.push({ k, jd, angle });
+    }
+
+    let crossingJD = null;
+
+    if (firstCrossingJD_D === null) {
+      // First year: use sun.ra = 90° as reference, then record world angle
+      const target = 90;
+      for (let i = 1; i < samples.length; i++) {
+        jumpToJulianDay(samples[i-1].jd);
+        forceSceneUpdate();
+        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
+
+        jumpToJulianDay(samples[i].jd);
+        forceSceneUpdate();
+        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
+
+        if (ra1 < target && ra2 >= target) {
+          const t = (target - ra1) / (ra2 - ra1);
+          crossingJD = samples[i-1].jd + t * step;
+          firstCrossingJD_D = crossingJD;
+          targetAngle_D = getSunWorldAngle(crossingJD);
+          break;
+        }
+      }
+    } else {
+      // Subsequent years: find when world angle returns to target
+      if (year === startYear + 1) {
+        const minAngle = Math.min(...samples.map(s => s.angle));
+        const maxAngle = Math.max(...samples.map(s => s.angle));
+        console.log(`  Debug year ${year}: angle range [${minAngle.toFixed(2)}° - ${maxAngle.toFixed(2)}°], target=${targetAngle_D.toFixed(2)}°`);
+      }
+
+      for (let i = 1; i < samples.length; i++) {
+        let a1 = samples[i-1].angle;
+        let a2 = samples[i].angle;
+
+        // Handle wraparound
+        if (Math.abs(a2 - a1) > 180) {
+          if (a2 > a1) a1 += 360;
+          else a2 += 360;
+        }
+
+        let adjustedTarget = targetAngle_D;
+        if (a1 > 360 || a2 > 360) {
+          if (targetAngle_D < 180) adjustedTarget = targetAngle_D + 360;
+        }
+
+        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
+        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
+
+        if (crossingUp || crossingDown) {
+          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
+          crossingJD = samples[i-1].jd + t * step;
+          if (year === startYear + 1) {
+            console.log(`    Found ${crossingUp ? 'upward' : 'downward'} crossing`);
+          }
+          break;
+        }
+      }
+    }
+
+    if (crossingJD) {
+      const currentAngle = getSunWorldAngle(crossingJD);
+      methodDCrossings.push({ year, jd: crossingJD, angle: currentAngle });
+    }
+
+    if (year % 5 === 0) await new Promise(r => setTimeout(r, 10));
+  }
+
+  // Calculate intervals for Method D
+  const methodDIntervals = [];
+  for (let i = 1; i < methodDCrossings.length; i++) {
+    methodDIntervals.push({
+      year: methodDCrossings[i].year,
+      interval: methodDCrossings[i].jd - methodDCrossings[i - 1].jd
+    });
+  }
+
+  const methodDMean = methodDIntervals.length > 0
+    ? methodDIntervals.reduce((sum, i) => sum + i.interval, 0) / methodDIntervals.length
+    : 0;
+
+  console.log(`  Target world angle: ${targetAngle_D?.toFixed(4) ?? 'N/A'}°`);
+  console.log(`  Detected ${methodDCrossings.length} crossings of this angle`);
+  console.log(`  Calculated ${methodDIntervals.length} intervals`);
+  if (methodDCrossings.length >= 2) {
+    console.log(`  First crossing: ${methodDCrossings[0].year} at JD ${methodDCrossings[0].jd.toFixed(4)}`);
+    console.log(`  Last crossing:  ${methodDCrossings[methodDCrossings.length-1].year} at JD ${methodDCrossings[methodDCrossings.length-1].jd.toFixed(4)}`);
+  }
+  console.log('');
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COMPARISON WITH IAU REFERENCE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const iauSiderealYear = ASTRO_REFERENCE.siderealYearJ2000;
+  const iauTropicalYear = ASTRO_REFERENCE.tropicalYearMeanJ2000;
+
+  // IAU-implied precession: sidereal - tropical difference
+  const iauPrecessionContrib = iauSiderealYear - iauTropicalYear;
+
+  const meanSiderealYear = methodDMean;
+  const diffFromIAU = (meanSiderealYear - iauSiderealYear) * 86400;
+  const siderealMinusTropical = (meanSiderealYear - iauTropicalYear) * 86400;
+
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('RESULTS');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+  console.log('╔═════════════════════════════════════╤═══════════════════╗');
+  console.log('║ Metric                              │ Value (days)      ║');
+  console.log('╠═════════════════════════════════════╪═══════════════════╣');
+  console.log(`║ Measured sidereal year              │ ${meanSiderealYear.toFixed(9)}    ║`);
+  console.log(`║ IAU sidereal year (J2000)           │ ${iauSiderealYear.toFixed(9)}    ║`);
+  console.log(`║ Difference from IAU                 │ ${diffFromIAU >= 0 ? '+' : ''}${diffFromIAU.toFixed(2)} seconds   ║`);
+  console.log('╠═════════════════════════════════════╪═══════════════════╣');
+  console.log(`║ Sidereal - Tropical (model)         │ ${siderealMinusTropical.toFixed(2)} seconds   ║`);
+  console.log(`║ Sidereal - Tropical (IAU)           │ ${(iauPrecessionContrib * 86400).toFixed(2)} seconds   ║`);
+  console.log('╚═════════════════════════════════════╧═══════════════════╝');
+
+  // Show trend if enough data
+  if (methodDIntervals.length > 10) {
+    const firstFive = methodDIntervals.slice(0, 5);
+    const lastFive = methodDIntervals.slice(-5);
+    const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
+    const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
+    const yearSpan = lastFive[4].year - firstFive[0].year;
+    const drift = (lastMean - firstMean) / yearSpan * 86400;
+    console.log('');
+    console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year`);
+  }
+
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+
+  return {
+    crossings: methodDCrossings,
+    intervals: methodDIntervals,
+    mean: meanSiderealYear,
+    iauReference: iauSiderealYear
+  };
+}
+
 /** Comprehensive analysis of all alignment intervals */
 async function analyzeAllAlignments(startYear, endYear) {
   startYear = startYear || o.calibrationYearStart;
@@ -13588,6 +13820,111 @@ async function analyzeAllAlignments(startYear, endYear) {
     }
     if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
   }
+
+  // Collect sidereal year data (Sun world position method)
+  console.log('Collecting sidereal year crossings (Sun world position)...');
+  const siderealCrossings = [];
+  let firstSiderealJD = null;
+  let targetSiderealAngle = null;
+
+  // Helper to get Sun's absolute world angle
+  const getSunWorldAngle = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    const sunPos = new THREE.Vector3();
+    sun.planetObj.getWorldPosition(sunPos);
+    let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
+
+  for (let year = startYear; year <= endYear; year++) {
+    let approxJD;
+    let searchRange;
+
+    if (firstSiderealJD !== null) {
+      const prevCrossing = siderealCrossings[siderealCrossings.length - 1];
+      approxJD = prevCrossing.jd + 365.256;
+      searchRange = 288;  // ±6 days
+    } else {
+      const yearFraction = 0.47;  // June
+      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+      searchRange = 960;  // ±20 days
+    }
+
+    const step = 0.5 / 24;  // 0.5 hours
+    const samples = [];
+
+    for (let k = -searchRange; k <= searchRange; ++k) {
+      const jd = approxJD + k * step;
+      const angle = getSunWorldAngle(jd);
+      samples.push({ k, jd, angle });
+    }
+
+    let crossingJD = null;
+
+    if (firstSiderealJD === null) {
+      // First year: use sun.ra = 90° as reference, then record world angle
+      const target = 90;
+      for (let i = 1; i < samples.length; i++) {
+        jumpToJulianDay(samples[i-1].jd);
+        forceSceneUpdate();
+        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
+
+        jumpToJulianDay(samples[i].jd);
+        forceSceneUpdate();
+        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
+
+        if (ra1 < target && ra2 >= target) {
+          const t = (target - ra1) / (ra2 - ra1);
+          crossingJD = samples[i-1].jd + t * step;
+          firstSiderealJD = crossingJD;
+          targetSiderealAngle = getSunWorldAngle(crossingJD);
+          break;
+        }
+      }
+    } else {
+      // Subsequent years: find when world angle returns to target
+      for (let i = 1; i < samples.length; i++) {
+        let a1 = samples[i-1].angle;
+        let a2 = samples[i].angle;
+
+        // Handle wraparound
+        if (Math.abs(a2 - a1) > 180) {
+          if (a2 > a1) a1 += 360;
+          else a2 += 360;
+        }
+
+        let adjustedTarget = targetSiderealAngle;
+        if (a1 > 360 || a2 > 360) {
+          if (targetSiderealAngle < 180) adjustedTarget = targetSiderealAngle + 360;
+        }
+
+        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
+        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
+
+        if (crossingUp || crossingDown) {
+          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
+          crossingJD = samples[i-1].jd + t * step;
+          break;
+        }
+      }
+    }
+
+    if (crossingJD) {
+      siderealCrossings.push({ year, jd: crossingJD });
+    }
+
+    if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
+  }
+
+  // Calculate sidereal year intervals
+  const siderealIntervals = [];
+  for (let i = 1; i < siderealCrossings.length; i++) {
+    siderealIntervals.push(siderealCrossings[i].jd - siderealCrossings[i - 1].jd);
+  }
+  const meanSiderealYear = siderealIntervals.length > 0
+    ? siderealIntervals.reduce((a, b) => a + b, 0) / siderealIntervals.length
+    : 0;
 
   // Calculate intervals for each cardinal point
   for (const key of Object.keys(cardinalData)) {
@@ -13659,6 +13996,15 @@ async function analyzeAllAlignments(startYear, endYear) {
   const apheDiffSec = (meanAphelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
   console.log(`║   Perihelion to perihelion:      ${meanPerihelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${periDiffSec >= 0 ? '+' : ''}${periDiffSec.toFixed(2)}s ║`);
   console.log(`║   Aphelion to aphelion:          ${meanAphelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${apheDiffSec >= 0 ? '+' : ''}${apheDiffSec.toFixed(2)}s ║`);
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log('║ SIDEREAL YEAR (Sun world position)                  Measured          IAU Ref         ║');
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
+  const siderealDiffSec = (meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
+  const siderealTropicalDiff = (meanSiderealYear - meanTropicalYear) * 86400;
+  const iauSiderealTropicalDiff = (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  console.log(`║   Sidereal year:                 ${meanSiderealYear.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${siderealDiffSec >= 0 ? '+' : ''}${siderealDiffSec.toFixed(2)}s ║`);
+  console.log(`║   Sidereal - Tropical (model):   ${siderealTropicalDiff.toFixed(2)} seconds                                        ║`);
+  console.log(`║   Sidereal - Tropical (IAU):     ${iauSiderealTropicalDiff.toFixed(2)} seconds                                        ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════╝');
 
   // Output data table for each year
@@ -13700,6 +14046,7 @@ async function analyzeAllAlignments(startYear, endYear) {
     cardinalData,
     perihelions,
     aphelions,
+    siderealCrossings,
     means: {
       VE: cardinalData.VE.mean,
       SS: cardinalData.SS.mean,
@@ -13707,7 +14054,8 @@ async function analyzeAllAlignments(startYear, endYear) {
       WS: cardinalData.WS.mean,
       meanTropical: meanTropicalYear,
       perihelion: meanPerihelion,
-      aphelion: meanAphelion
+      aphelion: meanAphelion,
+      sidereal: meanSiderealYear
     },
     parameters: {
       obliquity,
