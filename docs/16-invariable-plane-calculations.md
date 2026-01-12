@@ -183,12 +183,12 @@ The ascending node can be expressed in two coordinate systems with **different p
 
 | Coordinate System | Precession Period | Usage |
 |-------------------|-------------------|-------|
-| **ICRF (inertial)** | ~99,392 years | Physical marker positions in 3D space |
-| **Ecliptic (precessing)** | ~18,636 years | Height calculations |
+| **ICRF (inertial)** | ~111,296 years | Physical marker positions in 3D space |
+| **Ecliptic (precessing)** | ~20,868 years | Height calculations |
 
 ### Why This Matters
 
-The height calculation uses `sun.ra` (Earth's position), which is measured in **precessing ecliptic coordinates**. If we use the ICRF ascending node (~99,392 year period), the height calculation becomes incorrect when moving away from J2000.
+The height calculation uses `sun.ra` (Earth's position), which is measured in **precessing ecliptic coordinates**. If we use the ICRF ascending node (~111,296 year period), the height calculation becomes incorrect when moving away from J2000.
 
 ### Implementation
 
@@ -196,19 +196,19 @@ We maintain **two ascending node values** for each planet:
 
 ```javascript
 // ICRF rate for visual markers
-o.<planet>AscendingNodeInvPlane  // ~99,392 year period
+o.<planet>AscendingNodeInvPlane  // ~111,296 year period
 
 // Ecliptic rate for height calculations
-o.<planet>AscendingNodeInvPlaneEcliptic  // ~18,636 year period
+o.<planet>AscendingNodeInvPlaneEcliptic  // ~20,868 year period
 ```
 
 ### Precession Calculation
 
 ```javascript
-// ICRF rate: ~99,392 years
+// ICRF rate: ~111,296 years
 const earthPerihelionICRFYears = holisticyearLength / 3;
 
-// Ecliptic rate: ~18,636 years
+// Ecliptic rate: ~20,868 years
 const ascNodeInvPlaneEclipticYears = holisticyearLength / 16;
 
 // Calculate dynamic ascending node (ecliptic rate for height)

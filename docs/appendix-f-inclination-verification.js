@@ -17,7 +17,7 @@
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-const holisticyearLength = 298176;
+const holisticyearLength = 333888;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EARTH REFERENCE (FIXED)
@@ -25,11 +25,11 @@ const holisticyearLength = 298176;
 
 const earthConfig = {
   omegaJ2000: 284.51,                     // Souami & Souchay (2012)
-  period: holisticyearLength / 3,         // 99,392 years
-  mean: 1.49514053,
-  amplitude: 0.564,
+  period: holisticyearLength / 3,         // 111,296 years
+  mean: 1.481592,
+  amplitude: 0.633849,
   inclJ2000: 1.57867339,
-  phaseAngle: 203
+  phaseAngle: 203.3195
 };
 
 // Calculate Earth's initial phase from J2000 constraint
@@ -66,74 +66,74 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 8.091124,
-    amplitude: 1.769676,
-    phaseAngle: 203.0272,
+    mean: 6.347540,
+    amplitude: 0.000258,
+    phaseAngle: 203.3195,
     omegaJ2000: 32.83,
-    period: holisticyearLength / (1 + 3/13),  // ~242,268 years
+    period: holisticyearLength / (1 + 5/13),  // ~241,164 years
     inclJ2000: 6.3472858,
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
   venus: {
-    mean: 3.053776,
-    amplitude: 1.056602,
-    phaseAngle: 203.0272,
+    mean: 3.055471,
+    amplitude: 1.055286,
+    phaseAngle: 203.3195,
     omegaJ2000: 54.70,
-    period: holisticyearLength * (2 + 1/6),  // ~646,048 years
+    period: holisticyearLength * 2,  // 667,776 years
     inclJ2000: 2.1545441,
     jplTrend: venusEclipticInclinationTrendJPL
   },
   mars: {
-    mean: 3.603380,
-    amplitude: 2.236920,
-    phaseAngle: 203.0272,
+    mean: 3.600460,
+    amplitude: 2.239753,
+    phaseAngle: 203.3195,
     omegaJ2000: 354.87,
-    period: holisticyearLength / 4,  // 74,544 years
+    period: holisticyearLength / (4 + 5/13),  // ~76,144 years
     inclJ2000: 1.6311858,
     jplTrend: marsEclipticInclinationTrendJPL
   },
   jupiter: {
-    mean: 0.358900,
-    amplitude: 0.108706,
-    phaseAngle: 203.0272,
+    mean: 0.363200,
+    amplitude: 0.123101,
+    phaseAngle: 203.3195,
     omegaJ2000: 312.89,
-    period: holisticyearLength / 5,  // 59,635 years
+    period: holisticyearLength / 5,  // 66,778 years
     inclJ2000: 0.3219652,
     jplTrend: jupiterEclipticInclinationTrendJPL
   },
   saturn: {
-    mean: 0.938190,
-    amplitude: 0.126240,
-    phaseAngle: 23.0272,  // 203.0272 - 180 for retrograde
+    mean: 0.941380,
+    amplitude: 0.166278,
+    phaseAngle: 23.3195,  // 203.3195 - 180 for retrograde
     omegaJ2000: 118.81,
-    period: -holisticyearLength / 8,  // -37,272 years (retrograde)
+    period: -holisticyearLength / 8,  // -41,736 years (retrograde)
     inclJ2000: 0.9254704,
     jplTrend: saturnEclipticInclinationTrendJPL
   },
   uranus: {
-    mean: 1.018300,
-    amplitude: 0.092675,
-    phaseAngle: 203.0272,
+    mean: 1.017900,
+    amplitude: 0.092904,
+    phaseAngle: 203.3195,
     omegaJ2000: 307.80,
-    period: holisticyearLength / 3,  // 99,392 years
+    period: holisticyearLength / 3,  // 111,296 years
     inclJ2000: 0.9946692,
     jplTrend: uranusEclipticInclinationTrendJPL
   },
   neptune: {
     mean: 0.645100,
-    amplitude: 0.092002,
-    phaseAngle: 203.0272,
+    amplitude: 0.092094,
+    phaseAngle: 203.3195,
     omegaJ2000: 192.04,
-    period: holisticyearLength * (2 + 1/6),  // ~646,048 years
+    period: holisticyearLength * 2,  // 667,776 years
     inclJ2000: 0.7354155,
     jplTrend: neptuneEclipticInclinationTrendJPL
   },
   pluto: {
-    mean: 15.711700,
-    amplitude: 0.712570,
-    phaseAngle: 203.0272,
+    mean: 15.716200,
+    amplitude: 0.717024,
+    phaseAngle: 203.3195,
     omegaJ2000: 101.06,
-    period: holisticyearLength,  // 298,176 years
+    period: holisticyearLength,  // 333,888 years
     inclJ2000: 15.5639473,
     jplTrend: plutoEclipticInclinationTrendJPL
   }
@@ -273,7 +273,7 @@ console.log(`│ Inclination Period:           ${earthConfig.period.toLocaleStri
 console.log(`│ Mean Inclination:             ${earthConfig.mean}°`);
 console.log(`│ Amplitude:                    ${earthConfig.amplitude}°`);
 console.log(`│ Phase Angle:                  ${earthConfig.phaseAngle}°`);
-console.log(`│ J2000 Inclination:            ${earthConfig.inclJ2000}° (range: 0.93° - 2.06°)`);
+console.log(`│ J2000 Inclination:            ${earthConfig.inclJ2000}° (range: 0.85° - 2.12°)`);
 console.log('└─────────────────────────────────────────────────────────────────────────────┘');
 console.log('');
 
@@ -378,13 +378,13 @@ console.log('');
 
 for (const [name, p] of Object.entries(currentCodeValues)) {
   const periodExpr =
-    name === 'mercury' ? 'holisticyearLength/(1+(3/13))' :
-    name === 'venus' ? 'holisticyearLength*(2+(1/6))' :
-    name === 'mars' ? 'holisticyearLength/4' :
+    name === 'mercury' ? 'holisticyearLength/(1+(5/13))' :
+    name === 'venus' ? 'holisticyearLength*2' :
+    name === 'mars' ? 'holisticyearLength/(4+(5/13))' :
     name === 'jupiter' ? 'holisticyearLength/5' :
     name === 'saturn' ? '-holisticyearLength/8' :
     name === 'uranus' ? 'holisticyearLength/3' :
-    name === 'neptune' ? 'holisticyearLength*(2+(1/6))' :
+    name === 'neptune' ? 'holisticyearLength*2' :
     'holisticyearLength';
 
   const retro = p.period < 0 ? '  // RETROGRADE' : '';

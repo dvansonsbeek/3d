@@ -23,7 +23,7 @@
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-const holisticyearLength = 298176;
+const holisticyearLength = 333888;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EARTH REFERENCE VALUES (at J2000)

@@ -10,19 +10,19 @@ This document is the **single source of truth** for all constants used in the Ho
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `holisticyearLength` | **298,176** years | The complete Holistic-Year cycle |
-| Axial Precession | ~22,937 years | `holisticyearLength / 13` |
-| Inclination Precession | 99,392 years | `holisticyearLength / 3` |
-| Perihelion Precession | 18,636 years | `holisticyearLength / 16` |
+| `holisticyearLength` | **333,888** years | The complete Holistic-Year cycle |
+| Axial Precession | ~25,684 years | `holisticyearLength / 13` |
+| Inclination Precession | 111,296 years | `holisticyearLength / 3` |
+| Perihelion Precession | 20,868 years | `holisticyearLength / 16` |
 
 ### Time Constants
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `meansolaryearlengthinDays` | ~365.2422730 | Mean solar year in days |
-| `meansiderealyearlengthinSeconds` | 31,558,149.6846777 | Mean sidereal year in seconds |
-| `meanlengthofday` | ~86,399.566 | Mean solar day in SI seconds |
-| `meanSiderealday` | ~86,163.653 | Mean sidereal day in SI seconds |
+| `inputmeanlengthsolaryearindays` | 365.2421897 | Input solar year in days |
+| `meansolaryearlengthinDays` | 365.2421890 | Mean solar year rounded to HY/16 precision |
+| `meansiderealyearlengthinSeconds` | 31,558,149.68 | Mean sidereal year in seconds |
+| `meanlengthofday` | 86,399.9886 | Mean solar day in SI seconds (at year 1246 AD) |
 | Reference Date | December 14, 1245 AD | Perihelion-solstice alignment |
 | J2000 Epoch | January 1, 2000, 12:00 TT | Standard astronomical epoch |
 
@@ -42,8 +42,8 @@ This document is the **single source of truth** for all constants used in the Ho
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Mean Eccentricity | `eccentricityMean` | 0.01370018 | Mean orbital eccentricity |
-| Eccentricity Amplitude | `eccentricityAmplitude` | 0.00308211 | Oscillation amplitude |
+| Mean Eccentricity | `eccentricityMean` | 0.015313 | Mean orbital eccentricity |
+| Eccentricity Amplitude | `eccentricityAmplitude` | 0.001431 | Oscillation amplitude |
 | Semi-major Axis | - | 1 AU | By definition |
 | Orbital Period | - | ~365.2422 days | Mean solar year |
 
@@ -51,23 +51,23 @@ This document is the **single source of truth** for all constants used in the Ho
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Mean Obliquity | `earthtiltMean` | 23.42723° | Mean axial tilt |
-| Obliquity Range | - | 22.36° to 24.58° | Full oscillation range |
+| Mean Obliquity | `earthtiltMean` | 23.41398° | Mean axial tilt |
+| Obliquity Range | - | 22.15° to 24.68° | Full oscillation range |
 
 ### Inclination to Invariable Plane
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Mean Inclination | `earthInvPlaneInclinationMean` | 1.49514053° | Mean orbital inclination |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.564° | Oscillation amplitude |
-| Inclination Range | - | ~0.93° to ~2.06° | Full oscillation range |
+| Mean Inclination | `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination |
+| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.633849° | Oscillation amplitude |
+| Inclination Range | - | ~0.848° to ~2.115° | Full oscillation range |
 
 ### Precession Periods
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Earth Perihelion ICRF | `earthPerihelionICRFYears` | 99,392 years | `holisticyearLength/3` |
-| Inclination Phase Angle | `earthInclinationPhaseAngle` | 203° | Phase offset for inclination oscillation |
+| Earth Perihelion ICRF | `earthPerihelionICRFYears` | 111,296 years | `holisticyearLength/3` |
+| Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195° | Phase offset for inclination oscillation |
 
 ---
 
@@ -81,7 +81,7 @@ These are the fixed J2000 reference values from Souami & Souchay (2012):
 |--------|----------|-------------|--------|
 | Mercury | `mercuryInvPlaneInclinationJ2000` | 6.3472858° | S&S 2012 |
 | Venus | `venusInvPlaneInclinationJ2000` | 2.1545441° | S&S 2012 |
-| Earth | `earthInvPlaneInclinationMean` | 1.49514053° | Model |
+| Earth | `earthInvPlaneInclinationJ2000` | 1.57867339° | S&S 2012 |
 | Mars | `marsInvPlaneInclinationJ2000` | 1.6311858° | S&S 2012 |
 | Jupiter | `jupiterInvPlaneInclinationJ2000` | 0.3219652° | S&S 2012 |
 | Saturn | `saturnInvPlaneInclinationJ2000` | 0.9254704° | S&S 2012 |
@@ -95,15 +95,15 @@ Each planet's inclination oscillates around a mean value with a specific amplitu
 
 | Planet | Mean (°) | Amplitude (°) | Range (°) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 8.0911 | 1.7697 | 6.32 - 9.86 | 203.0272° | 0.5"/cy |
-| Venus | 3.0538 | 1.0566 | 2.00 - 4.11 | 203.0272° | 21.2"/cy |
-| Earth | 1.4951 | 0.5640 | 0.93 - 2.06 | 203° | (reference) |
-| Mars | 3.6034 | 2.2369 | 1.37 - 5.84 | 203.0272° | 13.1"/cy |
-| Jupiter | 0.3589 | 0.1087 | 0.25 - 0.47 | 203.0272° | 0.0"/cy |
-| Saturn | 0.9382 | 0.1262 | 0.81 - 1.06 | 23.0272° (retrograde) | 0.0"/cy |
-| Uranus | 1.0183 | 0.0927 | 0.93 - 1.11 | 203.0272° | 1.0"/cy |
-| Neptune | 0.6451 | 0.0920 | 0.55 - 0.74 | 203.0272° | 0.2"/cy |
-| Pluto | 15.7117 | 0.7126 | 15.00 - 16.42 | 203.0272° | 5.1"/cy |
+| Mercury | 6.347540 | 0.000258 | 6.35 - 6.35 | 203.3195° | ~0"/cy |
+| Venus | 3.055471 | 1.055286 | 2.00 - 4.11 | 203.3195° | ~21"/cy |
+| Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195° | (reference) |
+| Mars | 3.600460 | 2.239753 | 1.36 - 5.84 | 203.3195° | ~13"/cy |
+| Jupiter | 0.363200 | 0.123101 | 0.24 - 0.49 | 203.3195° | ~0"/cy |
+| Saturn | 0.941380 | 0.166278 | 0.78 - 1.11 | 23.3195° (retrograde) | ~0"/cy |
+| Uranus | 1.017900 | 0.092904 | 0.92 - 1.11 | 203.3195° | ~1"/cy |
+| Neptune | 0.645100 | 0.092094 | 0.55 - 0.74 | 203.3195° | ~0"/cy |
+| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.3195° | ~4"/cy |
 
 **Formula**: `i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)`
 
@@ -189,14 +189,14 @@ These are the observed secular variation rates for ecliptic inclinations:
 
 | Planet | Variable | Formula | Period (years) |
 |--------|----------|---------|----------------|
-| Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/13))` | 242,268 |
-| Venus | `venusPerihelionICRFYears` | `holisticyearLength*(2+(1/6))` | 646,048 |
-| Earth | `earthPerihelionICRFYears` | `holisticyearLength/3` | 99,392 |
-| Mars | `marsPerihelionICRFYears` | `holisticyearLength/4` | 74,544 |
-| Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength/5` | 59,635 |
-| Saturn | `saturnPerihelionICRFYears` | `-holisticyearLength/8` | -37,272 (retrograde) |
-| Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | 99,392 |
-| Neptune | `neptunePerihelionICRFYears` | `holisticyearLength*(2+(1/6))` | 646,048 |
+| Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/13))` | ~241,164 |
+| Venus | `venusPerihelionICRFYears` | `holisticyearLength*2` | ~667,776 |
+| Earth | `earthPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |
+| Mars | `marsPerihelionICRFYears` | `holisticyearLength/(4+(5/13))` | ~76,144 |
+| Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength/5` | 66,778 |
+| Saturn | `saturnPerihelionICRFYears` | `-holisticyearLength/8` | -41,736 (retrograde) |
+| Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |
+| Neptune | `neptunePerihelionICRFYears` | `holisticyearLength*2` | ~667,776 |
 
 ---
 
@@ -299,9 +299,9 @@ The following values are derived from the Holistic Universe Model theory:
 
 | Value | Derivation |
 |-------|------------|
-| Holistic Year (298,176 years) | Model foundation |
+| Holistic Year (333,888 years) | Model foundation |
 | Precession periods (HY/3, HY/5, HY/8, HY/13, HY/16) | Integer divisions of Holistic Year |
-| Mean obliquity (23.42723°) | Model prediction |
+| Mean obliquity (23.41398°) | Model prediction |
 | Eccentricity mean/amplitude | Model prediction |
 
 ---

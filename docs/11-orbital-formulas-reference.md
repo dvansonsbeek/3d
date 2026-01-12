@@ -21,11 +21,11 @@ This document provides a complete reference for all orbital calculation function
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `holisticyearLength` | 298,176 | Length of Holistic-Year in Earth solar years |
-| `meansolaryearlengthinDays` | ~365.2422730 (derived) | Mean solar year in days |
-| `meansiderealyearlengthinSeconds` | 31,558,149.6846777 | Mean sidereal year in seconds |
-| `meanlengthofday` | ~86,399.566 (derived) | Mean solar day in SI seconds |
-| `meanSiderealday` | ~86,163.653 (derived) | Mean sidereal day in SI seconds |
+| `holisticyearLength` | 333,888 | Length of Holistic-Year in Earth solar years |
+| `meansolaryearlengthinDays` | 365.2421890 | Mean solar year in days (rounded to HY/16 precision) |
+| `meansiderealyearlengthinSeconds` | 31,558,149.68 | Mean sidereal year in seconds |
+| `meanlengthofday` | 86,399.9886 | Mean solar day in SI seconds (at year 1246 AD) |
+| `meanSiderealday` | ~86,164.09 (derived) | Mean sidereal day in SI seconds |
 | `meanStellarday` | derived | Mean stellar day in SI seconds |
 | `meanAnomalisticYearinDays` | derived | Mean anomalistic year in days |
 | `speedofSuninKM` | 107,225.047767317 | Earth's orbital speed around Sun (km/h) |
@@ -154,12 +154,12 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `earthtiltMean` | 23.42723° | Mean obliquity |
-| `earthInvPlaneInclinationMean` | 1.49514053° | Mean orbital inclination to invariable plane |
-| `earthInvPlaneInclinationAmplitude` | 0.564° | Amplitude of inclination/obliquity variation |
-| `eccentricityMean` | 0.01370018 | Mean eccentricity |
-| `eccentricityAmplitude` | 0.00308211 | Earth's eccentricity amplitude |
-| `earthPerihelionICRFYears` | 99,392 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
+| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination to invariable plane |
+| `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of inclination oscillation |
+| `eccentricityMean` | 0.015313 | Mean eccentricity |
+| `eccentricityAmplitude` | 0.001431 | Earth's eccentricity amplitude |
+| `earthPerihelionICRFYears` | 111,296 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
 
 #### 1.5.2 Dynamic Orbital Parameters
 
@@ -1729,11 +1729,11 @@ precessionRateFromPeriod: (period_years) => {
 **Example Values:**
 | Planet | Precession Period (years) | Rate (arcsec/century) |
 |--------|---------------------------|----------------------|
-| Mercury | 243,455.91 | ~532 |
-| Mars | 74,544 (holistic/4) | ~1,739 |
-| Earth | 99,392 (holistic/3) | ~1,304 |
-| Jupiter | 298,176 (holistic) | ~435 |
-| Saturn | -298,176 (retrograde) | ~-435 |
+| Mercury | ~241,164 | ~537 |
+| Mars | 76,144 (holistic/4) | ~1,739 |
+| Earth | 111,296 (holistic/3) | ~1,304 |
+| Jupiter | 333,888 (holistic) | ~435 |
+| Saturn | -333,888 (retrograde) | ~-435 |
 
 #### 10.1.2 Precession Period from Rate
 
@@ -1759,7 +1759,7 @@ precessionPeriodFromRate: (arcsec_per_century) => {
 
 **Where:**
 - `ecliptic_period` = precession period against the ecliptic
-- `reference_period` = nodal precession period (holisticyearLength/13 ≈ 22,937 years)
+- `reference_period` = nodal precession period (holisticyearLength/13 ≈ 25,684 years)
 
 **Physical Meaning:** Converts precession measured against the moving ecliptic to precession against the fixed ICRF (International Celestial Reference Frame).
 
@@ -1775,9 +1775,9 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- Ecliptic period: 243,455.91 years
-- Reference (holistic/13): 22,936.62 years
-- ICRF period: (243,455.91 × 22,936.62) / (243,455.91 - 22,936.62) ≈ 25,322 years
+- ICRF period: ~241,164 years
+- Reference (holistic/13): ~25,684 years
+- Ecliptic period: ~28,745 years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
 
@@ -1800,19 +1800,19 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 
 **Formula:** `ratio = holisticyearLength / precession_period`
 
-**Physical Meaning:** Shows how precession periods relate to the fundamental holistic year (298,176 years).
+**Physical Meaning:** Shows how precession periods relate to the fundamental holistic year (333,888 years).
 
 **Observed Patterns:**
 | Planet | Ratio | Expression |
 |--------|-------|------------|
-| Mercury | ~1.22 | Custom (243,455.91 years) |
-| Venus | ~0 | Essentially no precession |
+| Mercury | ~1.38 | Custom (~241,164 years) |
+| Venus | ~0.5 | holisticyearLength * 2 |
 | Earth | 3 | holisticyearLength / 3 |
-| Mars | 4 | holisticyearLength / 4 |
-| Jupiter | 1 | holisticyearLength |
-| Saturn | -1 | -holisticyearLength (retrograde) |
+| Mars | ~4.38 | holisticyearLength / (4+5/13) |
+| Jupiter | 5 | holisticyearLength / 5 |
+| Saturn | -8 | -holisticyearLength / 8 (retrograde) |
 | Uranus | 3 | holisticyearLength / 3 |
-| Neptune | -1 | -holisticyearLength (retrograde) |
+| Neptune | ~0.5 | holisticyearLength * 2 |
 
 **Implementation:**
 ```javascript
@@ -1943,16 +1943,16 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 
 ### 10.6 Current Precession Values (Implemented)
 
-| Planet | Ecliptic Period (years) | ICRF Period (years) | Rate (arcsec/century) | Holistic Ratio |
-|--------|------------------------|---------------------|----------------------|----------------|
-| **Mercury** | 243,455.91 | ~25,322 | ~532 | ~1.22 |
-| **Venus** | ~6×10¹² | ~22,937 | ~0 | ~0 |
-| **Earth** | 99,392 | ~28,973 | ~1,304 | 3 |
-| **Mars** | 74,544 | ~33,182 | ~1,739 | 4 |
-| **Jupiter** | 298,176 | ~24,882 | ~435 | 1 |
-| **Saturn** | -298,176 | ~-27,135 | ~-435 | -1 |
-| **Uranus** | 99,392 | ~28,973 | ~1,304 | 3 |
-| **Neptune** | -298,176 | ~-27,135 | ~-435 | -1 |
+| Planet | ICRF Period (years) | Ecliptic Period (years) | Rate (arcsec/century) | Holistic Ratio |
+|--------|---------------------|------------------------|----------------------|----------------|
+| **Mercury** | ~241,164 | ~28,745 | ~537 | ~1.22 |
+| **Venus** | ~667,776 | ~26,711 | ~0 | ~0 |
+| **Earth** | 111,296 | ~33,389 | ~1,304 | 3 |
+| **Mars** | ~76,150 | ~38,755 | ~1,739 | 4 |
+| **Jupiter** | 66,778 | 41,736 | ~435 | 1 |
+| **Saturn** | -41,736 | ~15,899 | ~-435 | -1 |
+| **Uranus** | 111,296 | ~33,389 | ~1,304 | 3 |
+| **Neptune** | ~667,776 | ~26,711 | ~-435 | -1 |
 
 **Note:** Negative values indicate retrograde precession (opposite to orbital motion).
 

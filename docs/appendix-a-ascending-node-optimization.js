@@ -11,7 +11,7 @@
 // INPUTS (fixed):
 //   - Planet's inclination to invariable plane (Souami & Souchay 2012)
 //   - Earth's inclination to invariable plane at J2000
-//   - Earth's ascending node (284.5304° - derived from perihelion formula)
+//   - Earth's ascending node (284.51° - Souami & Souchay 2012)
 //   - JPL J2000 ecliptic inclination (target)
 //
 // OUTPUT (calculated):

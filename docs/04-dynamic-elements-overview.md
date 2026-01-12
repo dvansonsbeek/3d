@@ -62,11 +62,11 @@ All dynamic orbital element changes are driven by Earth's orbital plane variatio
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| Mean | 1.495° | `earthInvPlaneInclinationMean` |
-| Minimum | 0.931° | Mean - amplitude |
-| Maximum | 2.059° | Mean + amplitude |
-| Amplitude | 0.564° | `earthInvPlaneInclinationAmplitude` |
-| Period | ~99,392 years | holisticyearLength/3 |
+| Mean | 1.482° | `earthInvPlaneInclinationMean` |
+| Minimum | 0.848° | Mean - amplitude |
+| Maximum | 2.115° | Mean + amplitude |
+| Amplitude | 0.634° | `earthInvPlaneInclinationAmplitude` |
+| Period | ~111,296 years | holisticyearLength/3 |
 | J2000 Value | ~1.579° | Above mean, **DECREASING** |
 
 ### Earth's Ascending Node on Invariable Plane
@@ -74,7 +74,7 @@ All dynamic orbital element changes are driven by Earth's orbital plane variatio
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | J2000 Value | ~284.5° (Verified) | `earthAscendingNodeInvPlaneVerified` |
-| Precession Period | ~99,392 years | holisticyearLength/3 |
+| Precession Period | ~111,296 years | holisticyearLength/3 |
 | Direction | Increasing | Same direction as inclination cycle |
 
 ## The Two Dynamic Systems
@@ -186,7 +186,7 @@ The systems must be called in this order in each frame:
 
 Based on the relationship between Earth's inclination (~1.58° at J2000, decreasing) and each planet's inclination:
 
-| Planet | Incl. to Ecliptic | vs Earth Mean (1.495°) | vs Earth J2000 (1.579°) | Ω Direction (2000-2100) |
+| Planet | Incl. to Ecliptic | vs Earth Mean (1.482°) | vs Earth J2000 (1.579°) | Ω Direction (2000-2100) |
 |--------|-------------------|------------------------|-------------------------|-------------------------|
 | Mercury | 7.005° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Venus | 3.395° | ABOVE | ABOVE | **DECREASING** ↓ |
@@ -197,13 +197,13 @@ Based on the relationship between Earth's inclination (~1.58° at J2000, decreas
 | Neptune | 1.768° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Pluto | 17.142° | ABOVE | ABOVE | **DECREASING** ↓ |
 
-**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.93°-2.06°). The ascending node algorithm compares these values, so these planets will experience Ω direction reversals during the ~99,392-year cycle when Earth's inclination crosses theirs.
+**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets will experience Ω direction reversals during the ~111,296-year cycle when Earth's inclination crosses theirs.
 
 ### Ecliptic Inclination Direction
 
 Based on the geometric relationship between Earth's and each planet's orbital planes on the invariable plane:
 
-| Planet | Incl. to Inv. Plane | vs Earth Mean (1.495°) | Expected Trend* | Actual Trend (Model) |
+| Planet | Incl. to Inv. Plane | vs Earth Mean (1.482°) | Expected Trend* | Actual Trend (Model) |
 |--------|---------------------|------------------------|-----------------|----------------------|
 | Mercury | 6.347° | ABOVE | Decreasing ↓ | Decreasing ↓ |
 | Venus | 2.155° | ABOVE | Decreasing ↓ | Decreasing ↓ |
@@ -239,7 +239,7 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Incl. to inv. plane | 6.347° | Highest among inner planets |
 | Ω J2000 (ecliptic) | 48.33° | |
 | Ω J2000 (inv. plane) | 32.83° | |
-| Ecliptic incl. range | ~4.3° to ~8.4° | Large variation over ~99,392 years |
+| Ecliptic incl. range | ~4.3° to ~8.4° | Large variation over ~111,296 years |
 
 ### Venus
 
@@ -321,19 +321,21 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | System | Primary Driver | Secondary Driver | Period |
 |--------|---------------|------------------|--------|
 | Planet Inclination to Inv. Plane | Orbital plane precession | Laplace-Lagrange eigenmodes | Planet-specific (see below) |
-| Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | ~298,176 years |
-| Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~99,392 years |
+| Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | ~333,888 years |
+| Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~111,296 years |
 
 **Planet Inclination Oscillation Periods** (same as nodal precession):
 
 | Planet | Period | Direction |
 |--------|--------|-----------|
-| Mercury | 242,268 years | Prograde |
-| Mars | 74,544 years | Prograde |
-| Jupiter | 298,176 years | Prograde |
-| Saturn | 298,176 years | **Retrograde** |
-| Uranus | 99,392 years | Prograde |
-| Neptune | 298,176 years | **Retrograde** |
+| Mercury | 241,164 years | Prograde |
+| Venus | 667,776 years | Prograde |
+| Mars | 76,144 years | Prograde |
+| Jupiter | 66,778 years | Prograde |
+| Saturn | 41,736 years | **Retrograde** |
+| Uranus | 111,296 years | Prograde |
+| Neptune | 667,776 years | Prograde |
+| Pluto | 333,888 years | Prograde |
 
 ### The Key Insight
 

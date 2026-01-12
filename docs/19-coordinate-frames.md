@@ -39,7 +39,7 @@ The ICRF is the fundamental celestial reference frame defined by the positions o
 
 **In the simulation:**
 - Perihelion precession periods are given in ICRF coordinates
-- Example: `earthPerihelionICRFYears = 99,392 years`
+- Example: `earthPerihelionICRFYears = 111,296 years`
 
 ### 1.2 Ecliptic Coordinates
 
@@ -148,7 +148,7 @@ ecliptic_period = (ICRF × reference) / (ICRF + reference)
 ```
 
 Where:
-- reference = general precession period (~22,937 years = holisticyearLength/13)
+- reference = general precession period (~25,684 years = holisticyearLength/13)
 
 **Implementation (lines 916-931):**
 
@@ -267,7 +267,7 @@ Earth's axial tilt oscillates with the holistic year cycle.
 i = i_mean - A × cos(phase)
 ```
 
-**Range:** ~0.93° to ~2.05° (inclination to invariable plane)
+**Range:** ~0.85° to ~2.12° (inclination to invariable plane)
 
 **Implementation (lines 19862-19881):**
 - Function: `computeInclinationEarth()`
@@ -316,25 +316,25 @@ To calculate a planet's height above the invariable plane:
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `earthInvPlaneInclinationMean` | 1.49514° | Mean orbital inclination to invariable plane |
-| `earthInvPlaneInclinationAmplitude` | 0.564° | Oscillation amplitude |
+| `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination to invariable plane |
+| `earthInvPlaneInclinationAmplitude` | 0.633849° | Oscillation amplitude |
 | `earthAscendingNodeInvPlaneSouamiSouchay` | 284.51° | J2000 ascending node (S&S) |
 | `earthAscendingNodeInvPlaneVerified` | 284.51° | J2000 ascending node (S&S 2012) |
-| `earthPerihelionICRFYears` | 99,392 | Orbital plane precession period (ICRF) |
+| `earthPerihelionICRFYears` | 111,296 | Orbital plane precession period (ICRF) |
 
 ### 5.2 Obliquity
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `earthtiltMean` | 23.42723° | Mean obliquity |
+| `earthtiltMean` | 23.41398° | Mean obliquity |
 | Default fallback | 23.4393° | Used when dynamic value unavailable |
 
 ### 5.3 General Precession
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| General precession | ~22,937 years | holisticyearLength/13 |
-| Holistic year | 298,176 years | Complete precession cycle |
+| General precession | ~25,684 years | holisticyearLength/13 |
+| Holistic year | 333,888 years | Complete precession cycle |
 
 ---
 

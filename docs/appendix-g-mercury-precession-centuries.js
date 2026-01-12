@@ -24,27 +24,27 @@
 // Run with: node appendix-g-mercury-precession-centuries.js
 // ═══════════════════════════════════════════════════════════════════════════
 
-const holisticyearLength = 298176;
+const holisticyearLength = 333888;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury's perihelion precession period (ICRF frame)
-const mercuryPerihelionICRFYears = holisticyearLength / (1 + 3/13);  // ~242,268 years
+const mercuryPerihelionICRFYears = holisticyearLength / (1 + 5/13);  // ~241,164 years
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()
 const eclipticRate = 129600000 / mercuryPerihelionICRFYears;
 
 // Earth precession cycles (affect Earth-frame measurements)
-const earthAxialPrecessionPeriod = holisticyearLength / 13;        // ~22,937 years
-const earthObliquityPeriod = holisticyearLength / 8;               // ~37,272 years
-const earthInclinationPrecessionPeriod = holisticyearLength / 3;   // ~99,392 years
-const earthEclipticPrecessionPeriod = holisticyearLength / 5;      // ~59,635 years
+const earthAxialPrecessionPeriod = holisticyearLength / 13;        // ~25,684 years
+const earthObliquityPeriod = holisticyearLength / 8;               // ~41,736 years
+const earthInclinationPrecessionPeriod = holisticyearLength / 3;   // ~111,296 years
+const earthEclipticPrecessionPeriod = holisticyearLength / 5;      // ~66,778 years
 
 // Dominant fluctuation period (beat frequency between Earth's cycles)
-const dominantFluctuationPeriod = holisticyearLength / 45;         // ~6,626 years
+const dominantFluctuationPeriod = holisticyearLength / 45;         // ~7,420 years
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MAIN OUTPUT
@@ -86,7 +86,7 @@ console.log(`│ 1800-1900   │       ${eclipticRate.toFixed(2)}  │    varies
 console.log(`│ 1900-2000   │       ${eclipticRate.toFixed(2)}  │    varies   │    varies   │ Measurement cent.  │`);
 console.log(`│ 2000-2100   │       ${eclipticRate.toFixed(2)}  │    varies   │    varies   │ Prediction         │`);
 console.log('│                                                                             │');
-console.log('│ Note: Earth-frame values fluctuate with ~6,500 year period                 │');
+console.log('│ Note: Earth-frame values fluctuate with ~7,400 year period                 │');
 console.log('│ Range: approximately ±100 arcsec/century around the ecliptic rate          │');
 console.log('│                                                                             │');
 console.log('│ To get actual values, run the simulation and check Planet Stats > Mercury  │');
@@ -107,7 +107,7 @@ console.log('2. EARTH-FRAME (apparentRaFromPdA function):');
 console.log('   - Transforms through Earth\'s equatorial coordinate system');
 console.log('   - Rate: FLUCTUATES due to Earth\'s precession cycles');
 console.log('   - Range: approximately ±100 arcsec/century variation');
-console.log('   - Dominant period: ~6,500 years');
+console.log('   - Dominant period: ~7,400 years');
 console.log('   - Long-term average equals the ecliptic rate');
 console.log('');
 
@@ -115,18 +115,18 @@ console.log('══════════════════════�
 console.log('FLUCTUATION MECHANISM');
 console.log('═══════════════════════════════════════════════════════════════════════════');
 console.log('');
-console.log('The ~6,500 year period arises from beat frequencies between:');
+console.log('The ~7,400 year period arises from beat frequencies between:');
 console.log('');
-console.log('  Earth\'s inclination precession:    1/3 of Holistic Year   (99,392 years)');
-console.log('  Earth\'s ecliptic precession:       1/5 of Holistic Year   (59,635 years)');
+console.log('  Earth\'s inclination precession:    1/3 of Holistic Year   (111,296 years)');
+console.log('  Earth\'s ecliptic precession:       1/5 of Holistic Year   (66,778 years)');
 console.log('');
-console.log('  Beat frequency: 1/(1/3 - 1/5) = 15/2 → ~39,756 years fundamental');
-console.log('  Further harmonics divide this to produce ~6,500 year observed period');
+console.log('  Beat frequency: 1/(1/3 - 1/5) = 15/2 → ~44,518 years fundamental');
+console.log('  Further harmonics divide this to produce ~7,400 year observed period');
 console.log('');
 console.log('Scene graph hierarchy in script.js:');
 console.log('  └── earth');
-console.log('        └── earthInclinationPrecession      ← 99,392 year cycle');
-console.log('              └── earthEclipticPrecession   ← 59,635 year cycle');
+console.log('        └── earthInclinationPrecession      ← 111,296 year cycle');
+console.log('              └── earthEclipticPrecession   ← 66,778 year cycle');
 console.log('                    └── earthObliquityPrecession');
 console.log('                          └── earthPerihelionPrecession1');
 console.log('                                └── mercuryPerihelionDurationEcliptic1');
@@ -140,8 +140,8 @@ console.log('');
 console.log('The "missing advance" = Earth-frame rate - Ecliptic-frame rate');
 console.log('');
 console.log('This is a COORDINATE ARTIFACT, not a physical effect:');
-console.log('  - It fluctuates with ~6,500 year period');
-console.log('  - It averages to ZERO over ~300,000 years (one Holistic Year)');
+console.log('  - It fluctuates with ~7,400 year period');
+console.log('  - It averages to ZERO over ~334,000 years (one Holistic Year)');
 console.log('  - Sometimes adds to apparent rate, sometimes subtracts');
 console.log('');
 console.log('This is NOT the same as the relativistic 43 arcsec/century:');
@@ -168,7 +168,7 @@ console.log('The Earth-frame fluctuations shown by this model are DIFFERENT:');
 console.log('  - They are reference frame artifacts');
 console.log('  - They average out over time');
 console.log('  - The ~575 arcsec/century we might see currently is coincidental');
-console.log('    (we happen to be at a certain phase of the ~6,500 year cycle)');
+console.log('    (we happen to be at a certain phase of the ~7,400 year cycle)');
 console.log('');
 
 console.log('═══════════════════════════════════════════════════════════════════════════');

@@ -23,7 +23,7 @@ The model introduces two key gravitational centers that govern all observed prec
 This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
 
 - Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **22,937 years**
+- One complete orbit takes approximately **25,684 years**
 - This is what causes the equinox to move westward through the zodiac
 - The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
 
@@ -34,7 +34,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **99,392 years** (inclination precession)
+- One complete orbit takes approximately **111,296 years** (inclination precession)
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -42,23 +42,23 @@ In the 3D simulation, this appears as a white dot.
 ### Opposing Rotations Create Balance
 
 The two movements interact:
-- Earth moves clockwise around EARTH-WOBBLE-CENTER (~22,937 years)
-- PERIHELION-OF-EARTH moves counter-clockwise (~99,392 years)
-- They meet and realign every **18,636 years** (perihelion precession cycle)
+- Earth moves clockwise around EARTH-WOBBLE-CENTER (~25,684 years)
+- PERIHELION-OF-EARTH moves counter-clockwise (~111,296 years)
+- They meet and realign every **20,868 years** (perihelion precession cycle)
 
 This creates 16 meeting points per Holistic-Year as the solstice and perihelion alignment moves around the zodiac.
 
 ---
 
-## The Holistic-Year: 298,176 Years
+## The Holistic-Year: 333,888 Years
 
-The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **298,176 years**, this cycle integrates:
+The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **333,888 years**, this cycle integrates:
 
 | Cycle | Period | Count per Holistic-Year |
 |-------|--------|------------------------|
-| Axial Precession | ~22,937 years | 13 cycles |
-| Inclination Precession | ~99,392 years | 3 cycles |
-| Perihelion Precession | 18,636 years | 16 cycles |
+| Axial Precession | ~25,684 years | 13 cycles |
+| Inclination Precession | ~111,296 years | 3 cycles |
+| Perihelion Precession | 20,868 years | 16 cycles |
 
 ### The Fibonacci Connection
 
@@ -66,17 +66,16 @@ The ratio between axial and inclination precession cycles follows a Fibonacci pa
 - **3:13** - inclination to axial cycles
 - This suggests the solar system naturally tends toward balanced, harmonious relationships
 
-### The Seven Determining Factors
+### The Six Determining Factors
 
-The 298,176-year duration is uniquely determined by seven constraints:
+The 333,888-year duration is uniquely determined by six constraints:
 
 1. **Planetary Alignment**: All major planetary orbits must realign within one cycle
 2. **1246 AD Calibration**: Historical alignment of December solstice with perihelion
 3. **Climate Cycle Correlation**: Matches observed ~300,000-year patterns in ice core data
 4. **Earth-Wobble-Center Dynamics**: Required by the ratio between sidereal and solar year differences
 5. **Eccentricity Compliance**: Maintains eccentricity within observed ranges
-6. **Rounded Solar Day Count**: Produces exactly 6,806,655 solar days per perihelion cycle
-7. **Mercury's Perihelion Precession**: Aligns with observed planetary precession rates
+6. **Mercury's Perihelion Precession**: Aligns with observed planetary precession rates
 
 ### Reference Point: December 14, 1245 AD
 
@@ -97,9 +96,9 @@ Earth's axial tilt is not constant but oscillates over approximately 41,000 year
 
 | Parameter | Value |
 |-----------|-------|
-| Mean Obliquity | 23.42723° |
-| Minimum | ~22.36° |
-| Maximum | ~24.58° |
+| Mean Obliquity | 23.41398° |
+| Minimum | ~22.15° |
+| Maximum | ~24.68° |
 | Current (J2000) | ~23.44° |
 
 ### Orbital Eccentricity
@@ -108,9 +107,9 @@ Earth's orbit varies between more circular and more elliptical:
 
 | Parameter | Value |
 |-----------|-------|
-| Mean Eccentricity | 0.01370018 |
-| Amplitude | ±0.00308211 |
-| Range | ~0.0106 to ~0.0168 |
+| Mean Eccentricity | 0.015313 |
+| Amplitude | ±0.001431 |
+| Range | ~0.0139 to ~0.0167 |
 
 ### Inclination to Invariable Plane
 
@@ -118,9 +117,9 @@ Earth's orbital plane tilts relative to the solar system's invariable plane:
 
 | Parameter | Value |
 |-----------|-------|
-| Mean Inclination | 1.49514053° |
-| Amplitude | ±0.564° |
-| Range | ~0.93° to ~2.06° |
+| Mean Inclination | 1.481592° |
+| Amplitude | ±0.633849° |
+| Range | ~0.85° to ~2.12° |
 
 ---
 
@@ -169,7 +168,7 @@ The model is **heliocentric** (Earth orbits the Sun) but viewed from a **geocent
 For the complete scientific background with 19 detailed chapters:
 
 - [Model Basics](https://holisticuniverse.com/en/chapters/modelbasics) - Detailed explanation of the two control points
-- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - Full derivation of the 298,176-year cycle
+- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - Full derivation of the 333,888-year cycle
 - [Precession](https://holisticuniverse.com/en/chapters/precession) - Complete precession theory
 - [Obliquity & Inclination](https://holisticuniverse.com/en/chapters/obliquityinclination) - Earth's tilt variations
 - [Full Glossary](https://holisticuniverse.com/en/glossary) - 138 terms defined

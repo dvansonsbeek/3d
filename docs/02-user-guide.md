@@ -91,13 +91,13 @@ The display shows:
 
 ### EARTH-WOBBLE-CENTER ("The Death Star")
 
-This gray sphere represents the gravitational center around which Earth's axis wobbles over ~22,937 years. It's the pivot point for axial precession.
+This gray sphere represents the gravitational center around which Earth's axis wobbles over ~25,684 years. It's the pivot point for axial precession.
 
 **To observe**: Speed up time to 1,000+ years and watch Earth orbit this point.
 
 ### PERIHELION-OF-EARTH (White Dot)
 
-This white dot marks the point closest to the Sun in Earth's orbit. It slowly moves counter-clockwise over ~99,392 years.
+This white dot marks the point closest to the Sun in Earth's orbit. It slowly moves counter-clockwise over ~111,296 years.
 
 **To observe**: Speed up time to 10,000+ years and watch it drift through the zodiac.
 
@@ -238,7 +238,7 @@ When the Hierarchy Inspector panel is open:
 
 ## Common Exploration Tasks
 
-### Watch Axial Precession (~22,937 years)
+### Watch Axial Precession (~25,684 years)
 
 1. Set time speed to **10,000 years per second**
 2. Enable the **Polar Line**

@@ -10,13 +10,13 @@ This glossary defines the key terms used throughout the documentation. For a com
 A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and inclination precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
 
 ### Holistic-Year
-The 298,176-year grand cycle where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles.
+The 333,888-year grand cycle where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles.
 
 ### EARTH-WOBBLE-CENTER
-A gravitational control point around which Earth's axis wobbles over approximately 22,937 years. This creates the precession of the equinoxes. Visualized as "The Death Star" in the simulation.
+A gravitational control point around which Earth's axis wobbles over approximately 25,684 years. This creates the precession of the equinoxes. Visualized as "The Death Star" in the simulation.
 
 ### PERIHELION-OF-EARTH
-A gravitational control point that determines Earth's closest approach to the Sun. It orbits counter-clockwise around the EARTH-WOBBLE-CENTER in approximately 99,392 years. Appears as a white dot in the simulation.
+A gravitational control point that determines Earth's closest approach to the Sun. It orbits counter-clockwise around the EARTH-WOBBLE-CENTER in approximately 111,296 years. Appears as a white dot in the simulation.
 
 ### Geo-heliocentric
 A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Earth's perspective. Produces identical predictions to standard heliocentric models.
@@ -26,13 +26,13 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 ## Precession Types
 
 ### Axial Precession
-The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: approximately 22,937 years in the Holistic Model (observed as ~25,772 years due to combined effects).
+The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: approximately 25,684 years in the Holistic Model.
 
 ### Inclination Precession
-The slow rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER. Period: approximately 99,392 years. Causes Earth's orbital plane to tilt relative to the invariable plane.
+The slow rotation of PERIHELION-OF-EARTH around the EARTH-WOBBLE-CENTER. Period: approximately 111,296 years. Causes Earth's orbital plane to tilt relative to the invariable plane.
 
 ### Perihelion Precession
-The advancement of the perihelion point (closest approach to Sun) through the zodiac. Period: 18,636 years. Results from the interaction of axial and inclination precession.
+The advancement of the perihelion point (closest approach to Sun) through the zodiac. Period: 20,868 years. Results from the interaction of axial and inclination precession.
 
 ### Nodal Precession
 The westward drift of orbital nodes (where an orbit crosses a reference plane). For the Moon, this takes approximately 18.6 years.
@@ -48,7 +48,7 @@ The rotation of an orbit's line of apsides (the line connecting perihelion and a
 Half the longest diameter of an elliptical orbit. Determines the orbit's size and, via Kepler's third law, the orbital period.
 
 ### Eccentricity (e)
-A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's mean eccentricity is 0.01370018.
+A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's mean eccentricity is 0.015313.
 
 ### Inclination (i)
 The angle between an orbital plane and a reference plane (usually the ecliptic or invariable plane). Measured in degrees.
@@ -132,7 +132,7 @@ The point in an orbit closest to the Sun. Earth reaches perihelion around Januar
 The point in an orbit farthest from the Sun. Earth reaches aphelion around July 4.
 
 ### Obliquity
-The angle between Earth's rotational axis and the perpendicular to its orbital plane. Currently about 23.44°, but oscillates between 22.36° and 24.58° over ~41,000 years.
+The angle between Earth's rotational axis and the perpendicular to its orbital plane. Currently about 23.44°, but oscillates between 22.15° and 24.68° over ~41,000 years.
 
 ---
 

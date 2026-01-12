@@ -155,7 +155,7 @@ Where:
 
 ### Coordinate System Notes
 
-Height calculations use **ecliptic-rate ascending nodes** (~18,636 year period) rather than ICRF-rate (~99,392 years). This is necessary because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
+Height calculations use **ecliptic-rate ascending nodes** (~20,868 year period) rather than ICRF-rate (~111,296 years). This is necessary because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
 
 ---
 

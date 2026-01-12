@@ -22,7 +22,7 @@ This document describes the two methods used to calculate perihelion longitude i
 | Metric | Mercury Example |
 |--------|-----------------|
 | Current rate (year 2000) | ~575 arcsec/century |
-| Long-term average | ~532 arcsec/century |
+| Long-term average | ~537 arcsec/century |
 | Fluctuation range | ±100 arcsec/century |
 | Fluctuation period | ~6,500 years |
 
@@ -39,7 +39,7 @@ This document describes the two methods used to calculate perihelion longitude i
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Rate | Exactly 534.94 arcsec/century |
+| Rate | Exactly 537.4 arcsec/century |
 | Fluctuation | None |
 | Starting longitude (J2000) | 77.46° |
 
@@ -66,9 +66,9 @@ obj.dec = SPHERICAL.phi;    // Declination in radians (polar angle)
 
 This transformation includes all of Earth's orientation effects:
 - Axial tilt (~23.4°)
-- Axial precession (~22,937 year cycle)
-- Obliquity variations (~37,272 year cycle)
-- Inclination precession (~99,392 year cycle)
+- Axial precession (~25,684 year cycle)
+- Obliquity variations (~41,736 year cycle)
+- Inclination precession (~111,296 year cycle)
 
 The `apparentRaFromPdA` function then computes the angle between two objects:
 
@@ -175,7 +175,7 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 | Metric | Value |
 |--------|-------|
-| Mean rate | 534.9 arcsec/century |
+| Mean rate | 537.4 arcsec/century |
 | Minimum rate | 427 arcsec/century |
 | Maximum rate | 710 arcsec/century |
 | Range | 283 arcsec/century |
@@ -186,8 +186,8 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 The ~6,500 year period corresponds to `holisticyearLength / 45 = 6,626 years`, which is a harmonic interaction between:
 
-1. **Earth's Inclination Precession**: Period = holisticyearLength / 3 ≈ 99,392 years
-2. **Earth's Ecliptic Precession**: Period = holisticyearLength / 5 ≈ 59,635 years
+1. **Earth's Inclination Precession**: Period = holisticyearLength / 3 ≈ 111,296 years
+2. **Earth's Ecliptic Precession**: Period = holisticyearLength / 5 ≈ 66,778 years
 
 The beat frequency between these two precession cycles:
 
@@ -221,7 +221,7 @@ When measuring in Earth's equatorial frame, all these rotations compound to crea
 
 ### Why the Average Converges
 
-Over a complete cycle of all Earth precession periods (the Holistic Year of ~298,176 years), the oscillations in each direction cancel out:
+Over a complete cycle of all Earth precession periods (the Holistic Year of ~333,888 years), the oscillations in each direction cancel out:
 
 - Sometimes Earth's orientation adds to the apparent precession rate
 - Sometimes it subtracts from it

@@ -20,9 +20,9 @@ By reverse-engineering the ascending node values needed to reproduce exact J2000
 When computing ecliptic inclinations (planet inclination relative to the ecliptic) using invariable plane data, we face a calibration challenge:
 
 - **Planet inclinations to the invariable plane**: Fixed values from Souami & Souchay (2012)
-- **Earth's inclination to the invariable plane**: Varies from ~0.93° to ~2.06° over ~99,392 years
+- **Earth's inclination to the invariable plane**: Varies from ~0.85° to ~2.12° over ~111,296 years
 - **At J2000 (year 2000)**: Earth's actual inclination is ~1.578°
-- **Mean inclination**: 1.49514053° (the "balanced" reference point)
+- **Mean inclination**: 1.481592° (the "balanced" reference point)
 
 ### Two Possible Approaches
 
@@ -35,11 +35,11 @@ If we set Earth's inclination to its actual J2000 value:
   - The mean value is the natural reference around which Earth oscillates
   - Using J2000-specific values breaks the generality of the model
 
-**Approach 2 (ACCEPTED): Use Earth's mean inclination (1.495°) and adjust ascending nodes**
+**Approach 2 (ACCEPTED): Use Earth's mean inclination (1.482°) and adjust ascending nodes**
 
 If we use the mean inclination:
 - The reference frame is epoch-independent
-- Earth's position in its ~99,392-year cycle can be tracked as a deviation from mean
+- Earth's position in its ~111,296-year cycle can be tracked as a deviation from mean
 - **Consequence**: The ascending nodes must be adjusted to produce correct J2000 ecliptic inclinations
 
 ### Why This Is Correct
@@ -48,7 +48,7 @@ If we use the mean inclination:
 
 2. **Mathematical elegance**: Using the mean as reference means:
    - `o.earthInvPlaneInclinationDynamic = earthInvPlaneInclinationMean` at the "balanced year"
-   - Deviations from mean are symmetric (±0.564°)
+   - Deviations from mean are symmetric (±0.634°)
    - The model correctly represents the physics
 
 3. **Calibration clarity**: By adjusting ascending nodes:
@@ -60,7 +60,7 @@ If we use the mean inclination:
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| Earth mean inclination | 1.49514053° | Model constant (`earthInvPlaneInclinationMean`) |
+| Earth mean inclination | 1.481592° | Model constant (`earthInvPlaneInclinationMean`) |
 | Earth J2000 inclination | ~1.578° | Computed from cycle position |
 | Planet inclinations | Souami & Souchay values | Unchanged |
 | Planet ascending nodes | **Adjusted** | To match J2000 ecliptic inclinations |

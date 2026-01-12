@@ -19,7 +19,7 @@
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-const holisticyearLength = 298176;
+const holisticyearLength = 333888;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EARTH REFERENCE (FIXED - these are inputs, not optimized)
@@ -27,9 +27,9 @@ const holisticyearLength = 298176;
 
 const earthConfig = {
   omegaJ2000: 284.51,                     // Souami & Souchay (2012)
-  period: holisticyearLength / 3,         // 99,392 years
-  mean: 1.49514053,
-  amplitude: 0.564,
+  period: holisticyearLength / 3,         // 111,296 years
+  mean: 1.481592,
+  amplitude: 0.633849,
   inclJ2000: 1.57867339,
   phaseAngle: 203
 };
@@ -89,64 +89,64 @@ const planetInputs = {
     name: 'Mercury',
     omegaJ2000: 32.83,                              // Verified ascending node
     inclJ2000: 6.3472858,                           // J2000 inv plane inclination (S&S 2012)
-    period: holisticyearLength / (1 + 3/13),        // ~242,268 years
-    phaseAngle: 203.0272,                           // Prograde
-    periodExpr: 'holisticyearLength/(1+(3/13))'
+    period: holisticyearLength / (1 + 5/13),        // ~241,164 years
+    phaseAngle: 203.3195,                           // Prograde
+    periodExpr: 'holisticyearLength/(1+(5/13))'
   },
   venus: {
     name: 'Venus',
     omegaJ2000: 54.70,
     inclJ2000: 2.1545441,
-    period: holisticyearLength * (2 + 1/6),         // ~646,048 years
-    phaseAngle: 203.0272,
-    periodExpr: 'holisticyearLength*(2+(1/6))'
+    period: holisticyearLength * 2,                 // 667,776 years
+    phaseAngle: 203.3195,
+    periodExpr: 'holisticyearLength*2'
   },
   mars: {
     name: 'Mars',
     omegaJ2000: 354.87,
     inclJ2000: 1.6311858,
-    period: holisticyearLength / 4,                 // 74,544 years
-    phaseAngle: 203.0272,
-    periodExpr: 'holisticyearLength/4'
+    period: holisticyearLength / (4 + 5/13),        // ~77,207 years
+    phaseAngle: 203.3195,
+    periodExpr: 'holisticyearLength/(4+(5/13))'
   },
   jupiter: {
     name: 'Jupiter',
     omegaJ2000: 312.89,
     inclJ2000: 0.3219652,
-    period: holisticyearLength / 5,                 // 59,635 years
-    phaseAngle: 203.0272,
+    period: holisticyearLength / 5,                 // 66,778 years
+    phaseAngle: 203.3195,
     periodExpr: 'holisticyearLength/5'
   },
   saturn: {
     name: 'Saturn',
     omegaJ2000: 118.81,
     inclJ2000: 0.9254704,
-    period: -holisticyearLength / 8,                // -37,272 years (RETROGRADE)
-    phaseAngle: 23.0272,                            // 203.0272 - 180 for retrograde
+    period: -holisticyearLength / 8,                // -41,736 years (RETROGRADE)
+    phaseAngle: 23.3195,                            // 203.3195 - 180 for retrograde
     periodExpr: '-holisticyearLength/8'
   },
   uranus: {
     name: 'Uranus',
     omegaJ2000: 307.80,
     inclJ2000: 0.9946692,
-    period: holisticyearLength / 3,                 // 99,392 years
-    phaseAngle: 203.0272,
+    period: holisticyearLength / 3,                 // 111,296 years
+    phaseAngle: 203.3195,
     periodExpr: 'holisticyearLength/3'
   },
   neptune: {
     name: 'Neptune',
     omegaJ2000: 192.04,
     inclJ2000: 0.7354155,
-    period: holisticyearLength * (2 + 1/6),         // ~646,048 years
-    phaseAngle: 203.0272,
-    periodExpr: 'holisticyearLength*(2+(1/6))'
+    period: holisticyearLength * 2,                 // 667,776 years
+    phaseAngle: 203.3195,
+    periodExpr: 'holisticyearLength*2'
   },
   pluto: {
     name: 'Pluto',
     omegaJ2000: 101.06,
     inclJ2000: 15.5639473,
-    period: holisticyearLength,                     // 298,176 years
-    phaseAngle: 203.0272,
+    period: holisticyearLength,                     // 333,888 years
+    phaseAngle: 203.3195,
     periodExpr: 'holisticyearLength'
   }
 };

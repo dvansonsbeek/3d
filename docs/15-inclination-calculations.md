@@ -32,7 +32,7 @@ These effects are geometrically linked—they're two aspects of the same physica
                            ↓
                     PLANET'S ORBITAL PLANE
                            ↑
-                           | Earth's inclination (oscillates 0.93° - 2.06°)
+                           | Earth's inclination (oscillates 0.85° - 2.12°)
                            ↓
     ─────────────────── ECLIPTIC (tilts over time) ───────────────────
 ```
@@ -68,21 +68,21 @@ When an orbital plane precesses around the invariable plane:
 
 ### Universal Phase Angles (s₈ Eigenmode)
 
-All planets use a **universal phase angle** derived from the s₈ eigenmode of Laplace-Lagrange secular theory (γ₈ = 202.8° ≈ 203°):
+All planets use a **universal phase angle** derived from the s₈ eigenmode of Laplace-Lagrange secular theory (γ₈ ≈ 203.3195°):
 
 | Planet | Phase Angle | Precession Direction | Inclination Trend at J2000 |
 |--------|-------------|---------------------|---------------------------|
-| Mercury | 203.0272° | Prograde | Decreasing |
-| Venus | 203.0272° | Prograde | Decreasing |
-| Earth | 203° | Prograde | Decreasing |
-| Mars | 203.0272° | Prograde | Decreasing |
-| Jupiter | 203.0272° | Prograde | Decreasing |
-| **Saturn** | **23.0272°** | **Retrograde** | **Increasing** |
-| Uranus | 203.0272° | Prograde | Decreasing |
-| Neptune | 203.0272° | Prograde | Increasing |
-| Pluto | 203.0272° | Prograde | Decreasing |
+| Mercury | 203.3195° | Prograde | Decreasing |
+| Venus | 203.3195° | Prograde | Decreasing |
+| Earth | 203.3195° | Prograde | Decreasing |
+| Mars | 203.3195° | Prograde | Decreasing |
+| Jupiter | 203.3195° | Prograde | Decreasing |
+| **Saturn** | **23.3195°** | **Retrograde** | **Increasing** |
+| Uranus | 203.3195° | Prograde | Decreasing |
+| Neptune | 203.3195° | Prograde | Increasing |
+| Pluto | 203.3195° | Prograde | Decreasing |
 
-**Key insight**: Saturn uses 23° (= 203° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction.
+**Key insight**: Saturn uses 23.3195° (= 203.3195° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction.
 
 ### Inclination Constants
 
@@ -90,15 +90,15 @@ All values optimized for **exact J2000 invariable plane inclination match** (ver
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 8.0911 | 1.7697 | 6.3473 | 6.32 - 9.86 | 0.5"/cy |
-| Venus | 3.0538 | 1.0566 | 2.1545 | 2.00 - 4.11 | 21.2"/cy |
-| Earth | 1.4951 | 0.564 | 1.578 | 0.93 - 2.06 | (reference) |
-| Mars | 3.6034 | 2.2369 | 1.6312 | 1.37 - 5.84 | 13.1"/cy |
-| Jupiter | 0.3589 | 0.1087 | 0.3220 | 0.25 - 0.47 | 0.0"/cy |
-| Saturn | 0.9382 | 0.1262 | 0.9255 | 0.81 - 1.06 | 0.0"/cy |
-| Uranus | 1.0183 | 0.0927 | 0.9947 | 0.93 - 1.11 | 1.0"/cy |
-| Neptune | 0.6451 | 0.0920 | 0.7354 | 0.55 - 0.74 | 0.2"/cy |
-| Pluto | 15.7117 | 0.7126 | 15.5639 | 15.00 - 16.42 | 5.1"/cy |
+| Mercury | 6.347540 | 0.000258 | 6.3473 | 6.35 - 6.35 | ~0"/cy |
+| Venus | 3.055471 | 1.055286 | 2.1545 | 2.00 - 4.11 | ~21"/cy |
+| Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
+| Mars | 3.600460 | 2.239753 | 1.6312 | 1.36 - 5.84 | ~13"/cy |
+| Jupiter | 0.363200 | 0.123101 | 0.3220 | 0.24 - 0.49 | ~0"/cy |
+| Saturn | 0.941380 | 0.166278 | 0.9255 | 0.78 - 1.11 | ~0"/cy |
+| Uranus | 1.017900 | 0.092904 | 0.9947 | 0.92 - 1.11 | ~1"/cy |
+| Neptune | 0.645100 | 0.092094 | 0.7354 | 0.55 - 0.74 | ~0"/cy |
+| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~4"/cy |
 
 ### Implementation
 
@@ -109,7 +109,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const period = mercuryPerihelionICRFYears;
   const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
-  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.0272°
+  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.3195°
 
   // Calculate current ascending node
   const yearsSinceJ2000 = currentYear - 2000;
@@ -130,14 +130,15 @@ The inclination oscillation period equals the ascending node precession period f
 
 | Planet | Period (years) | Period Expression |
 |--------|----------------|-------------------|
-| Mercury | ~242,268 | `holisticyearLength/(1+(3/13))` |
-| Venus | ~646,048 | `holisticyearLength*(2+(1/6))` |
-| Earth | ~99,392 | `holisticyearLength/3` |
-| Mars | ~74,544 | `holisticyearLength/4` |
-| Jupiter | ~59,635 | `holisticyearLength/5` |
-| Saturn | ~-37,272 | `-holisticyearLength/8` (retrograde) |
-| Uranus | ~99,392 | `holisticyearLength/3` |
-| Neptune | ~646,048 | `holisticyearLength*(2+(1/6))` |
+| Mercury | ~241,164 | `holisticyearLength/(1+(5/13))` |
+| Venus | ~667,776 | `holisticyearLength*2` |
+| Earth | ~111,296 | `holisticyearLength/3` |
+| Mars | ~76,144 | `holisticyearLength/(4+(5/13))` |
+| Jupiter | 66,778 | `holisticyearLength/5` |
+| Saturn | -41,736 | `-holisticyearLength/8` (retrograde) |
+| Uranus | ~111,296 | `holisticyearLength/3` |
+| Neptune | ~667,776 | `holisticyearLength*2` |
+| Pluto | 333,888 | `holisticyearLength` |
 
 ---
 
@@ -322,7 +323,7 @@ The value 284.51° for `earthAscendingNodeInvPlaneVerified` is the original Soua
 ### Ecliptic Inclination Variations
 
 The ecliptic inclination of each planet varies cyclically due to:
-1. **Earth's inclination** oscillating between 0.93° and 2.06°
+1. **Earth's inclination** oscillating between 0.85° and 2.12°
 2. **Planet's inclination** oscillating within its Laplace-Lagrange bounds
 3. **Both ascending nodes** precessing at different rates
 
@@ -341,11 +342,11 @@ The ecliptic inclination of each planet varies cyclically due to:
 
 ### Special Cases: Mars, Saturn, and Uranus
 
-**Mars** has an invariable plane inclination range (1.37° - 5.84°) that overlaps Earth's range (0.93° - 2.06°). When their inclinations are equal and ascending nodes align, Mars's orbital plane can become **nearly parallel to the ecliptic** (ecliptic inclination approaching 0°).
+**Mars** has an invariable plane inclination range (1.36° - 5.84°) that overlaps Earth's range (0.85° - 2.12°). When their inclinations are equal and ascending nodes align, Mars's orbital plane can become **nearly parallel to the ecliptic** (ecliptic inclination approaching 0°).
 
-**Saturn** (0.84° - 1.03°) and **Uranus** (0.93° - 1.11°) also have ranges that overlap Earth's minimum values. These planets can experience very low ecliptic inclinations when the geometry aligns.
+**Saturn** (0.78° - 1.11°) and **Uranus** (0.92° - 1.11°) also have ranges that overlap Earth's minimum values. These planets can experience very low ecliptic inclinations when the geometry aligns.
 
-**Jupiter** (0.27° - 0.43°) and **Neptune** (0.55° - 0.74°) have inclination ranges entirely **below** Earth's minimum (0.93°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close (minimum ecliptic inclination ~0.5° for Jupiter).
+**Jupiter** (0.24° - 0.49°) and **Neptune** (0.55° - 0.74°) have inclination ranges entirely **below** Earth's minimum (0.85°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close (minimum ecliptic inclination ~0.4° for Jupiter).
 
 ---
 
@@ -384,7 +385,7 @@ The planet information panels display four invariable plane values:
 | **Ω at Max Inclination** | Where inclination reaches maximum (precesses) |
 | **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
 
-**Note**: The first three values use ecliptic coordinates (precession period ~18,636 years), while the oscillation phase uses ICRF coordinates (precession period ~99,392 years).
+**Note**: The first three values use ecliptic coordinates (precession period ~20,868 years), while the oscillation phase uses ICRF coordinates (precession period ~111,296 years).
 
 ---
 

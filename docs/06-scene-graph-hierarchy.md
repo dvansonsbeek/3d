@@ -15,7 +15,7 @@ This document describes the Three.js scene graph hierarchy used in the Holistic 
 
 ## Overview
 
-The simulation models complex astronomical cycles (precession periods from 18 years to 298,000+ years) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
+The simulation models complex astronomical cycles (precession periods from 18 years to 333,888+ years) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
 
 **Key Principle:** A child object inherits all parent rotations. When measuring positions from different reference frames (e.g., Earth-equatorial vs. ecliptic), different portions of this hierarchy apply.
 
@@ -32,7 +32,7 @@ At its core, the entire simulation is based upon two surprisingly simple calcula
 
 Since the circumference of a circle is `2π × r`, all calculations derive from these two values:
 
-- **Length of a Solar year:** 1 year = 2π radians = 365.242273 days
+- **Length of a Solar year:** 1 year = 2π radians = 365.2421897 days
 - **Length of an AU:** 100 scene units = 149,597,870.698828 km (currently)
 
 All other calculations are relative to:
@@ -45,16 +45,16 @@ All other calculations are relative to:
 
 ## Part 2: The Holistic Year Structure
 
-All Earth precession cycles derive from the **Holistic Year** (298,176 years) divided by integers:
+All Earth precession cycles derive from the **Holistic Year** (333,888 years) divided by integers:
 
 | Cycle | Divisor | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| **Holistic Year** | 1 | 298,176 | - |
-| **Inclination Precession** | 3 | 99,392 | Counter-clockwise |
-| **Ecliptic Precession** | 5 | 59,635.2 | Counter-clockwise |
-| **Obliquity Cycle** | 8 | 37,272 | Clockwise (negative) |
-| **Axial Precession** | 13 | 22,937 | Clockwise (negative) |
-| **Perihelion Precession** | 16 | 18,636 | Both directions |
+| **Holistic Year** | 1 | 333,888 | - |
+| **Inclination Precession** | 3 | 111,296 | Counter-clockwise |
+| **Ecliptic Precession** | 5 | 66,778 | Counter-clockwise |
+| **Obliquity Cycle** | 8 | 41,736 | Clockwise (negative) |
+| **Axial Precession** | 13 | 25,684 | Clockwise (negative) |
+| **Perihelion Precession** | 16 | 20,868 | Both directions |
 
 This rational subdivision creates the interconnected cycles that produce Earth's climate variations and astronomical phenomena.
 
@@ -104,13 +104,13 @@ The complete nesting order from the technical guide:
 
 ```
 Earth (pivot)
-├── Inclination Precession (container)         ← HY/3 = 99,392 years
+├── Inclination Precession (container)         ← HY/3 = 111,296 years
 │   ├── Mid-Eccentricity Orbit (container)     ← Reference for eccentricity
 │   │
-│   └── Ecliptic Precession (container)        ← HY/5 = 59,635 years
-│       └── Obliquity Cycle (container)        ← HY/8 = 37,272 years
-│           └── Perihelion Precession 1        ← HY/16 = 18,636 years
-│               └── Perihelion Precession 2    ← HY/16 = 18,636 years (reverse)
+│   └── Ecliptic Precession (container)        ← HY/5 = 66,778 years
+│       └── Obliquity Cycle (container)        ← HY/8 = 41,736 years
+│           └── Perihelion Precession 1        ← HY/16 = 20,868 years
+│               └── Perihelion Precession 2    ← HY/16 = 20,868 years (reverse)
 │                   └── Barycenter Sun (pivot)
 │                       └── PERIHELION-OF-EARTH
 │                           └── Sun
@@ -131,16 +131,16 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | -eccentricityAmplitude × 100 | -0.00308211 × 100 |
-| speed | -2π / (HY/13) | Clockwise axial precession (~22,937 years) |
+| orbitRadius | -eccentricityAmplitude × 100 | -0.001431 × 100 |
+| speed | -2π / (HY/13) | Clockwise axial precession (~25,684 years) |
 | rotationSpeed | 2π × (mean solar year + 1 day) | Daily rotation |
-| tilt | -23.42723° | Mean axial tilt (obliquity) |
+| tilt | -23.41398° | Mean axial tilt (obliquity) |
 
 ### 4.2 Inclination Precession
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (HY/3) | Counter-clockwise (~99,392 years) |
+| speed | +2π / (HY/3) | Counter-clockwise (~111,296 years) |
 | startPos | Calculated from balanced year | Phase alignment |
 
 **Purpose:** Opposes Earth's axial precession motion. The inclination precession and axial precession are "balancing out in both ways" - they have opposite directions.
@@ -149,8 +149,8 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (HY/5) | Counter-clockwise (~59,635 years) |
-| orbitTiltb | -0.564° | Negative tilt amplitude |
+| speed | +2π / (HY/5) | Counter-clockwise (~66,778 years) |
+| orbitTiltb | -0.634° | Negative tilt amplitude |
 
 **Purpose:** Models the ecliptic plane's precession component.
 
@@ -158,12 +158,12 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | -2π / (HY/8) | Clockwise (~37,272 years) |
-| orbitTiltb | +0.564° | Positive tilt amplitude (opposite of ecliptic) |
+| speed | -2π / (HY/8) | Clockwise (~41,736 years) |
+| orbitTiltb | +0.634° | Positive tilt amplitude (opposite of ecliptic) |
 
 **Purpose:** Explains Earth's temperature variation cycles. The obliquity oscillates between approximately 22.1° and 24.5°.
 
-**Key insight:** The ecliptic and obliquity layers have **opposite tilt values** (-0.564° and +0.564°) that balance each other.
+**Key insight:** The ecliptic and obliquity layers have **opposite tilt values** (-0.634° and +0.634°) that balance each other.
 
 ### 4.5 Perihelion Precession 1 & 2
 
@@ -172,7 +172,7 @@ Both layers use the same period but opposite signs:
 | Property | Perihelion 1 | Perihelion 2 |
 |----------|--------------|--------------|
 | speed | +2π / (HY/16) | -2π / (HY/16) |
-| orbitTilta | -1.12 rad (~64°) | 0 |
+| orbitTilta | -1.26 rad (~64°) | 0 |
 | orbitCentera | 0 | -eccentricityMean × 100 |
 
 **Purpose:** "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
@@ -183,12 +183,12 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 | Layer | Period | HY Ratio | Speed Sign | orbitTiltb |
 |-------|--------|----------|------------|------------|
-| Earth (Axial) | 22,937 | HY/13 | Negative | - |
-| Inclination | 99,392 | HY/3 | Positive | - |
-| Ecliptic | 59,635 | HY/5 | Positive | -0.564° |
-| Obliquity | 37,272 | HY/8 | Negative | +0.564° |
-| Perihelion 1 | 18,636 | HY/16 | Positive | - |
-| Perihelion 2 | 18,636 | HY/16 | Negative | - |
+| Earth (Axial) | 25,684 | HY/13 | Negative | - |
+| Inclination | 111,296 | HY/3 | Positive | - |
+| Ecliptic | 66,778 | HY/5 | Positive | -0.634° |
+| Obliquity | 41,736 | HY/8 | Negative | +0.634° |
+| Perihelion 1 | 20,868 | HY/16 | Positive | - |
+| Perihelion 2 | 20,868 | HY/16 | Negative | - |
 
 ---
 
@@ -196,7 +196,7 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 The **Balanced Year** is a critical concept for understanding the model's phase alignments.
 
-**Value:** -268,976 BC (Julian Day -96,520,356)
+**Value:** -301,340 BC (Julian Day -108,341,031.5)
 
 **Definition:** The moment when all tilt and inclination parameters aligned oppositely yet symmetrically.
 
@@ -282,13 +282,13 @@ Each planet has a 4-layer precession structure with forward and reverse componen
 
 | Planet | HY Formula | ICRF Precession Period |
 |--------|------------|----------------------|
-| Mercury | HY/(1+3/13) | ~242,268 years |
-| Venus | HY×(2+1/6) | ~646,048 years |
-| Mars | HY/4 | 74,544 years |
-| Jupiter | HY/5 | 59,635 years |
-| Saturn | -HY/8 | -37,272 years (retrograde) |
-| Uranus | HY/3 | 99,392 years |
-| Neptune | HY×(2+1/6) | ~646,048 years |
+| Mercury | HY/(1+3/13) | ~241,164 years |
+| Venus | HY×2 | ~667,776 years |
+| Mars | HY/(4+5/13) | ~76,144 years |
+| Jupiter | HY/5 | 66,778 years |
+| Saturn | -HY/8 | -41,736 years (retrograde) |
+| Uranus | HY/3 | 111,296 years |
+| Neptune | HY×2 | ~667,776 years |
 
 **Note:** Saturn's negative value indicates retrograde precession (clockwise motion). Venus and Neptune share the same formula.
 
@@ -334,14 +334,14 @@ Updates occur after every precession frame, reflecting live tilt changes.
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| 1 Solar year | 2π radians | 365.242273 days |
+| 1 Solar year | 2π radians | 365.2421897 days |
 | 1 AU | 100 scene units | 149,597,870.698828 km |
-| Mean solar year | 31,556,929.19 s | At year 1246 AD |
-| Mean solar day | 86,399.9913 s | At year 1246 AD |
-| Mean obliquity | 23.42723° | Earth's mean axial tilt |
-| Inclination amplitude | 0.564° | Earth's orbital tilt oscillation |
-| Mean eccentricity | 0.01370018 | Earth's mean orbital eccentricity |
-| Eccentricity amplitude | 0.00308211 | Earth's eccentricity oscillation |
+| Mean sidereal year | 31,558,149.68 s | At year 1246 AD |
+| Mean solar day | 86,399.9886 s | At year 1246 AD |
+| Mean obliquity | 23.41398° | Earth's mean axial tilt |
+| Inclination amplitude | 0.634° | Earth's orbital tilt oscillation |
+| Mean eccentricity | 0.015313 | Earth's mean orbital eccentricity |
+| Eccentricity amplitude | 0.001431 | Earth's eccentricity oscillation |
 
 ---
 
@@ -353,7 +353,7 @@ The perihelion precession layers demonstrate a key principle: "Both have complet
 
 This applies throughout the model:
 - Axial precession (clockwise) vs. Inclination precession (counter-clockwise)
-- Ecliptic tilt (-0.564°) vs. Obliquity tilt (+0.564°)
+- Ecliptic tilt (-0.634°) vs. Obliquity tilt (+0.634°)
 - Perihelion 1 (forward) vs. Perihelion 2 (reverse)
 
 ### 12.2 Nested Rotation Benefits
@@ -373,19 +373,19 @@ This applies throughout the model:
 │                           SCENE HIERARCHY                                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  Earth (Axial Precession: HY/13 = 22,937 years, clockwise)                  │
+│  Earth (Axial Precession: HY/13 = 25,684 years, clockwise)                  │
 │    │                                                                         │
 │    ├── Moon Hierarchy (apsidal, nodal, Royer cycles)                        │
 │    │                                                                         │
-│    └── Inclination Precession (HY/3 = 99,392 years, counter-clockwise)      │
+│    └── Inclination Precession (HY/3 = 111,296 years, counter-clockwise)     │
 │          │                                                                   │
-│          └── Ecliptic Precession (HY/5 = 59,635 years, tilt: -0.564°)       │
+│          └── Ecliptic Precession (HY/5 = 66,778 years, tilt: -0.634°)       │
 │                │                                                             │
-│                └── Obliquity Cycle (HY/8 = 37,272 years, tilt: +0.564°)     │
+│                └── Obliquity Cycle (HY/8 = 41,736 years, tilt: +0.634°)     │
 │                      │                                                       │
-│                      └── Perihelion 1 (HY/16 = 18,636 years, forward)       │
+│                      └── Perihelion 1 (HY/16 = 20,868 years, forward)       │
 │                            │                                                 │
-│                            └── Perihelion 2 (HY/16 = 18,636 years, reverse) │
+│                            └── Perihelion 2 (HY/16 = 20,868 years, reverse) │
 │                                  │                                           │
 │                                  └── Barycenter → Sun → All Planets         │
 │                                                                              │

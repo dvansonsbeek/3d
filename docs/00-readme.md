@@ -65,7 +65,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix E - Inclination Optimization](appendix-e-inclination-optimization.js) | Calculates optimal mean/amplitude for inclination oscillations |
 | [Appendix F - Inclination Verification](appendix-f-inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [Appendix G - Mercury Precession](appendix-g-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (298,176 years) |
+| [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization
@@ -85,19 +85,19 @@ Both produce identical results, proving the geometric validity of the approach.
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Holistic-Year | 298,176 years | Complete cycle unifying all precession movements |
-| Axial Precession | ~22,937 years | Earth's wobble around EARTH-WOBBLE-CENTER |
-| Inclination Precession | ~99,392 years | PERIHELION-OF-EARTH orbit period |
-| Perihelion Precession | 18,636 years | Combined cycle (axial + inclination meeting) |
-| Mean Obliquity | 23.42723° | Earth's mean axial tilt |
-| Obliquity Range | 22.36° - 24.58° | Earth's tilt oscillation range |
-| Mean Inclination | 1.49514° | Earth's mean orbital inclination to invariable plane |
+| Holistic-Year | 333,888 years | Complete cycle unifying all precession movements |
+| Axial Precession | ~25,684 years | Earth's wobble around EARTH-WOBBLE-CENTER |
+| Inclination Precession | ~111,296 years | PERIHELION-OF-EARTH orbit period |
+| Perihelion Precession | 20,868 years | Combined cycle (axial + inclination meeting) |
+| Mean Obliquity | 23.41398° | Earth's mean axial tilt |
+| Obliquity Range | 22.15° - 24.68° | Earth's tilt oscillation range |
+| Mean Inclination | 1.481592° | Earth's mean orbital inclination to invariable plane |
 
 ## Further Reading
 
 For the complete scientific background, visit the [Holistic Universe website](https://holisticuniverse.com):
 
 - [Model Basics](https://holisticuniverse.com/en/chapters/modelbasics) - The two gravitational control points
-- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - The 298,176-year cycle explained
+- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - The 333,888-year cycle explained
 - [Precession](https://holisticuniverse.com/en/chapters/precession) - Axial, inclination, and perihelion precession
 - [Full Glossary](https://holisticuniverse.com/en/glossary) - 138 terms defined

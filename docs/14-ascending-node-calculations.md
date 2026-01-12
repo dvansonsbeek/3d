@@ -30,29 +30,29 @@ The key insight is that **Earth's own orbital inclination** (~1.5° relative to 
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `earthtiltMean` | 23.42723° | Mean obliquity |
-| `earthInvPlaneInclinationMean` | 1.49514053° | Mean orbital inclination |
-| `earthInvPlaneInclinationAmplitude` | 0.564° | Amplitude of variation |
-| `holisticyearLength` | 298,176 years | Full cycle length |
+| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination |
+| `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of variation |
+| `holisticyearLength` | 333,888 years | Full cycle length |
 
 ### Earth's Inclination Range
 
 Earth's orbital inclination oscillates between:
-- **Minimum**: 1.495° - 0.564° = **0.931°**
-- **Maximum**: 1.495° + 0.564° = **2.059°**
+- **Minimum**: 1.482° - 0.634° = **0.848°**
+- **Maximum**: 1.482° + 0.634° = **2.115°**
 
 ### Planet Orbital Inclinations
 
 | Planet | Ecliptic Incl. (J2000) | Relation to Earth Incl. Range | Crossover Possible? |
 |--------|------------------------|-------------------------------|---------------------|
-| Mercury | 7.005° | ABOVE (> 2.06°) | No |
-| Venus | 3.395° | ABOVE (> 2.06°) | No |
-| Mars | 1.850° | **Within** (0.93° - 2.06°) | **Yes** |
-| Jupiter | 1.305° | **Within** (0.93° - 2.06°) | **Yes** |
-| Saturn | 2.485° | ABOVE (> 2.06°) | No |
+| Mercury | 7.005° | ABOVE (> 2.12°) | No |
+| Venus | 3.395° | ABOVE (> 2.12°) | No |
+| Mars | 1.850° | **Within** (0.85° - 2.12°) | **Yes** |
+| Jupiter | 1.305° | **Within** (0.85° - 2.12°) | **Yes** |
+| Saturn | 2.485° | ABOVE (> 2.12°) | No |
 | Uranus | 0.772° | BELOW (< 0.93°) | No |
-| Neptune | 1.770° | **Within** (0.93° - 2.06°) | **Yes** |
-| Pluto | 17.142° | ABOVE (> 2.06°) | No |
+| Neptune | 1.770° | **Within** (0.85° - 2.12°) | **Yes** |
+| Pluto | 17.142° | ABOVE (> 2.12°) | No |
 
 **Note**: The algorithm compares planet **ecliptic inclinations** (from `orbitTilta/orbitTiltb`) against Earth's **invariable plane inclination** (`o.earthInvPlaneInclinationDynamic`). This comparison determines when Earth's tilting reference frame causes direction reversals for the ascending node shift.
 
@@ -141,7 +141,7 @@ obliquity = earthtiltMean
   + earthInvPlaneInclinationAmplitude * cos(phase8)
 ```
 
-Where `phase3` and `phase8` correspond to the 99,392-year and 37,272-year cycles.
+Where `phase3` and `phase8` correspond to the 111,296-year and 41,736-year cycles.
 
 #### `getEarthInclinationAtYear(year)`
 
@@ -414,8 +414,8 @@ The dynamic ascending node calculation and the dynamic ecliptic inclination (`o.
 
 | Effect | What Changes | What Stays Fixed | Timescale |
 |--------|-------------|------------------|-----------|
-| **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | ~298,176 years |
-| **Ecliptic Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | ~99,392 years |
+| **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | ~333,888 years |
+| **Ecliptic Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | ~111,296 years |
 
 ### Why We Use Static Inclination (Not EclipticInclinationDynamic)
 
@@ -433,7 +433,7 @@ The **ascending node** is defined as where a planet's orbit crosses the **refere
 - But it doesn't change the planet's actual orbital tilt in space
 
 The **ecliptic inclination** measures the angle between two orbital planes:
-- Earth's orbital plane (which tilts with the 99,392-year cycle)
+- Earth's orbital plane (which tilts with the 111,296-year cycle)
 - The planet's orbital plane (which stays essentially fixed in space)
 
 ### What Each Calculation Uses
