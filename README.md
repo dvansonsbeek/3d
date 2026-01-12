@@ -8,7 +8,7 @@
 
 > **[🚀 Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser
 
-The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets coming together in a Holistic-Year cycle of 298,176 years, an Axial precession cycle of ~22,937 years, an Inclination precession cycle of 99,392 years and a Perihelion precession cycle of 18,636 years.
+The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets coming together in a Holistic-Year cycle of 333,888 years, an Axial precession cycle of ~25,684 years, an Inclination precession cycle of 111,296 years and a Perihelion precession cycle of 20,868 years.
 
 ---
 
@@ -49,18 +49,18 @@ npm run build
 ### How it is modelled
 
 - The **EARTH-WOBBLE-CENTER** is the center of our solar system.
-- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,937 solar years, also known as Axial precession and therefore the Axial tilt changes.
-- The **PERIHELION-OF-EARTH** is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of 99,392 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-- Axial precession meets Inclination precession every 18,636 years.
+- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~25,684 solar years, also known as Axial precession and therefore the Axial tilt changes.
+- The **PERIHELION-OF-EARTH** is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of 111,296 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+- Axial precession meets Inclination precession every 20,868 years.
 - Our Sun is orbiting the PERIHELION-OF-EARTH in a period of 1 solar year.
 - Therefore it shows as if the Sun is orbiting Earth.
 
 ### What is actually happening
 
 - The Sun is (still) the center of our solar system.
-- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~22,937 solar years, also known as Axial precession and therefore the Axial tilt changes.
-- The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of 99,392 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-- Axial precession meets Inclination precession every 18,636 years.
+- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~25,684 solar years, also known as Axial precession and therefore the Axial tilt changes.
+- The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of 111,296 solar years, also known as Inclination precession and therefore the inclination tilt changes.
+- Axial precession meets Inclination precession every 20,868 years.
 - Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
 - Therefore it shows Earth is actually orbiting the Sun.
 - So we still live in a Heliocentric solar system.
@@ -71,7 +71,7 @@ npm run build
 - The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth's axis (J2000 value +23°26'21").
 - There are only two counter movements around Earth working against each other in a ratio of 3:13 ; Inclination:Axial which explains all movements around Earth (precession, eccentricity, obliquity, inclination, etc)
 - The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is 13/16th of Axial precession: ~25,771×13/16 = ~20,939 years)
-- The Perihelion precession cycle of 18,636 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
+- The Perihelion precession cycle of 20,868 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
 - The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION-OF-EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
 - The difference between the sidereal day - stellar day leads to the difference solar year – sidereal year.
 
@@ -79,21 +79,21 @@ For more details see [holisticuniverse.com](https://holisticuniverse.com).
 
 ---
 
-## 🎯 Why 298,176 Years?
+## 🎯 Why 333,888 Years?
 
-This number fits all observations best:
+This number fits all observations best and aligns all year and day calculations:
 
 1. Historic value longitude of perihelion 90°: 1245-12-14
-2. J2000 value longitude of perihelion: 6h51m47s = ~102.947°
+2. J2000 value longitude of perihelion: 6h51m48s = ~102.95°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values:
-   - 1246 Length of solar day in SI seconds was ~31,556,929.19 SI seconds
+   - 1246 Length of solar year in SI seconds was ~31,556,929.19 SI seconds
    - 1246 Length of sidereal year in SI seconds was ~31,558,149.6847 SI seconds
-   - 1246 Length of solar day was ~86,399.9913 SI seconds because of historic Delta T predictions
-4. Climate graphs with ~100k cycles as a cycle of 99,392 years (three times 99,392 years = 298,176 years)
+   - 1246 Length of solar day was ~86,399.9886 SI seconds because of historic Delta T predictions
+4. Climate graphs with ~100k cycles as a cycle of 111,296 years (three times 111,296 years = 333,888 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger Dryas around 9800 BC
-6. **KEY EVIDENCE:** Mercury perihelion precession aligned to exactly 532.3 arc seconds per century
-7. **KEY EVIDENCE:** Ratio Earth to EARTH-WOBBLE-CENTER compared to Earth to the Sun (~324.5) explains the difference sidereal day - stellar day leads to the difference solar year - sidereal year (~324.5/13×16 = ~399.3)
-8. **KEY EVIDENCE:** Difference stellar day and sidereal day exactly according to theory (86164.0989036905-86164.0905308328)×1000 = 8.37286 ms
+6. **KEY EVIDENCE:** Mercury perihelion precession aligned to exactly ~535 arc seconds per century
+7. **KEY EVIDENCE:** The difference sidereal day - stellar day leads to the difference solar year - sidereal year
+8. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, and sidereal year all align perfectly with 333,888 year cycle
 9. Obliquity correct both historic and current values
 10. Orbital Inclination to ICRF correct both historic and current values
 11. Eccentricity correct both historic and current values
