@@ -42,8 +42,8 @@ const earthRAAngle = 1.258454;
 const earthtiltMean = 23.41398;                           // 3D model + formula (optimized for IAU 2006)
 const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate)
 const earthInvPlaneInclinationMean = 1.481592;          // 3D model + Formula
-const eccentricityMean = 0.015313;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.001431;                   // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityMean = 0.015321;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.0014226;               // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricitySinusCorrection = 0.7;                  // Formula only
 const mideccentricitypointAmplitude = 2.461586;           // Formula only
 const helionpointAmplitude = 11.2153826318;               // Formula only
@@ -531,11 +531,11 @@ const ASTRO_REFERENCE = {
   solarDayJ2000: 86400.0,             // Mean solar day (exact by definition)
 
   // Sidereal day (rotation relative to vernal equinox)
-  siderealDayJ2000: 86164.0905,       // ~23h 56m 4.0905s
+  siderealDayJ2000: 86164.09053083288,       // ~23h 56m 4.0905s
 
   // Stellar day (rotation relative to fixed stars)
   // Slightly longer than sidereal day due to precession
-  stellarDayJ2000: 86164.09890,       // ~23h 56m 4.0989s
+  stellarDayJ2000: 86164.0989036905,       // ~23h 56m 4.0989s
 };
 
 const perihelionCycleLength = holisticyearLength / 16;
@@ -11582,6 +11582,220 @@ function sunRACrossingForYear(year, targetRA, prevJD = null, debug = false) {
 }
 
 /**
+ * Detect when sun RA (from wobble center) crosses a target angle - Method B
+ * Uses calculateRAFromWobbleCenter() to eliminate the ~26s wobble parallax artifact.
+ * This gives the "true" tropical year as measured from a stable reference point.
+ *
+ * @param {number} year - The year to search in
+ * @param {number} targetRA - Target RA in degrees (0, 90, 180, or 270)
+ * @param {number|null} prevJD - Previous crossing JD for chaining (improves accuracy)
+ * @param {boolean} debug - Enable debug output
+ * @returns {object|null} - { jd, raDeg, decDeg } or null if not found
+ */
+function sunRACrossingForYearMethodB(year, targetRA, prevJD = null, debug = false) {
+  let approxJD;
+  let searchRange;
+
+  if (prevJD !== null) {
+    // Chain from previous - tropical year is ~365.24 days
+    approxJD = prevJD + 365.24;
+    searchRange = 288;  // ±6 days is enough when chained
+  } else {
+    // First search: estimate from target RA
+    const yearFraction = 0.21 + (targetRA / 360);  // Approximate
+    approxJD = startmodelJD +
+          ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+    searchRange = 960;  // ±20 days for first search
+  }
+
+  if (debug) {
+    console.log(`sunRACrossingForYearMethodB(${year}, targetRA=${targetRA}°): approxJD=${approxJD.toFixed(2)}, searchRange=±${searchRange}`);
+  }
+
+  const step = 0.5 / 24;  // 0.5 h in days
+
+  /* Phase 1: Coarse search - sample sun RA from wobble center */
+  const samples = [];
+  for (let k = -searchRange; k <= searchRange; ++k) {
+    const jd = approxJD + k * step;
+
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    // Use wobble-center RA instead of Earth-based RA
+    const sunRAFromWobble = calculateRAFromWobbleCenter(sun);
+    if (!Number.isFinite(sunRAFromWobble)) continue;
+
+    const raDeg = (sunRAFromWobble * 180 / Math.PI + 360) % 360;
+    samples[k + searchRange] = { k, jd, raDeg };
+  }
+
+  /* Phase 2: Find the crossing of targetRA */
+  let refinedJD = null;
+
+  for (let i = 1; i < samples.length; i++) {
+    if (!samples[i] || !samples[i-1]) continue;
+
+    let ra1 = samples[i-1].raDeg;
+    let ra2 = samples[i].raDeg;
+
+    // Handle wraparound at 0°/360°
+    if (targetRA === 0) {
+      // Looking for RA crossing 0° (wraparound from ~359° to ~1°)
+      if (ra1 > 300 && ra2 < 60) {
+        ra2 += 360;
+        const t = (360 - ra1) / (ra2 - ra1);
+        refinedJD = samples[i-1].jd + t * step;
+        if (debug) {
+          console.log(`  Found 0° crossing at i=${i}: ra1=${samples[i-1].raDeg.toFixed(4)}°, ra2=${samples[i].raDeg.toFixed(4)}°, t=${t.toFixed(4)}`);
+        }
+        break;
+      }
+    } else {
+      // Looking for RA crossing targetRA (90°, 180°, or 270°)
+      if (ra1 < targetRA && ra2 >= targetRA) {
+        const t = (targetRA - ra1) / (ra2 - ra1);
+        refinedJD = samples[i-1].jd + t * step;
+        if (debug) {
+          console.log(`  Found ${targetRA}° crossing at i=${i}: ra1=${ra1.toFixed(4)}°, ra2=${ra2.toFixed(4)}°, t=${t.toFixed(4)}`);
+        }
+        break;
+      }
+    }
+  }
+
+  if (refinedJD === null) {
+    if (debug) {
+      const validSamples = samples.filter(s => s);
+      if (validSamples.length > 0) {
+        const minRA = Math.min(...validSamples.map(s => s.raDeg));
+        const maxRA = Math.max(...validSamples.map(s => s.raDeg));
+        console.log(`  WARNING: No ${targetRA}° crossing found! RA range: ${minRA.toFixed(2)}° to ${maxRA.toFixed(2)}°`);
+      }
+    }
+    return null;
+  }
+
+  /* Final scene state at refined time */
+  jumpToJulianDay(refinedJD);
+  forceSceneUpdate();
+
+  const finalRA = calculateRAFromWobbleCenter(sun);
+  return {
+    jd: refinedJD,
+    raDeg: (finalRA * 180 / Math.PI + 360) % 360,
+    decDeg: 90 - sun.dec * 180 / Math.PI
+  };
+}
+
+/**
+ * Detect when sun RA (from earthPerihelionFromEarth) crosses a target angle - Method C
+ * Uses calculateRAFromEarthPerihelion() to measure RA from the perihelion point.
+ * This is for comparison with Method A (Earth-based) and Method B (wobble-center).
+ *
+ * @param {number} year - The year to search in
+ * @param {number} targetRA - Target RA in degrees (0, 90, 180, or 270)
+ * @param {number|null} prevJD - Previous crossing JD for chaining (improves accuracy)
+ * @param {boolean} debug - Enable debug output
+ * @returns {object|null} - { jd, raDeg, decDeg } or null if not found
+ */
+function sunRACrossingForYearMethodC(year, targetRA, prevJD = null, debug = false) {
+  let approxJD;
+  let searchRange;
+
+  if (prevJD !== null) {
+    // Chain from previous - tropical year is ~365.24 days
+    approxJD = prevJD + 365.24;
+    searchRange = 288;  // ±6 days is enough when chained
+  } else {
+    // First search: estimate from target RA
+    const yearFraction = 0.21 + (targetRA / 360);  // Approximate
+    approxJD = startmodelJD +
+          ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+    searchRange = 960;  // ±20 days for first search
+  }
+
+  if (debug) {
+    console.log(`sunRACrossingForYearMethodC(${year}, targetRA=${targetRA}°): approxJD=${approxJD.toFixed(2)}, searchRange=±${searchRange}`);
+  }
+
+  const step = 0.5 / 24;  // 0.5 h in days
+
+  /* Phase 1: Coarse search - sample sun RA from perihelion point */
+  const samples = [];
+  for (let k = -searchRange; k <= searchRange; ++k) {
+    const jd = approxJD + k * step;
+
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    // Use perihelion-point RA instead of Earth-based RA
+    const sunRAFromPeri = calculateRAFromEarthPerihelion(sun);
+    if (!Number.isFinite(sunRAFromPeri)) continue;
+
+    const raDeg = (sunRAFromPeri * 180 / Math.PI + 360) % 360;
+    samples[k + searchRange] = { k, jd, raDeg };
+  }
+
+  /* Phase 2: Find the crossing of targetRA */
+  let refinedJD = null;
+
+  for (let i = 1; i < samples.length; i++) {
+    if (!samples[i] || !samples[i-1]) continue;
+
+    let ra1 = samples[i-1].raDeg;
+    let ra2 = samples[i].raDeg;
+
+    // Handle wraparound at 0°/360°
+    if (targetRA === 0) {
+      // Looking for RA crossing 0° (wraparound from ~359° to ~1°)
+      if (ra1 > 300 && ra2 < 60) {
+        ra2 += 360;
+        const t = (360 - ra1) / (ra2 - ra1);
+        refinedJD = samples[i-1].jd + t * step;
+        if (debug) {
+          console.log(`  Found 0° crossing at i=${i}: ra1=${samples[i-1].raDeg.toFixed(4)}°, ra2=${samples[i].raDeg.toFixed(4)}°, t=${t.toFixed(4)}`);
+        }
+        break;
+      }
+    } else {
+      // Looking for RA crossing targetRA (90°, 180°, or 270°)
+      if (ra1 < targetRA && ra2 >= targetRA) {
+        const t = (targetRA - ra1) / (ra2 - ra1);
+        refinedJD = samples[i-1].jd + t * step;
+        if (debug) {
+          console.log(`  Found ${targetRA}° crossing at i=${i}: ra1=${ra1.toFixed(4)}°, ra2=${ra2.toFixed(4)}°, t=${t.toFixed(4)}`);
+        }
+        break;
+      }
+    }
+  }
+
+  if (refinedJD === null) {
+    if (debug) {
+      const validSamples = samples.filter(s => s);
+      if (validSamples.length > 0) {
+        const minRA = Math.min(...validSamples.map(s => s.raDeg));
+        const maxRA = Math.max(...validSamples.map(s => s.raDeg));
+        console.log(`  WARNING: No ${targetRA}° crossing found! RA range: ${minRA.toFixed(2)}° to ${maxRA.toFixed(2)}°`);
+      }
+    }
+    return null;
+  }
+
+  /* Final scene state at refined time */
+  jumpToJulianDay(refinedJD);
+  forceSceneUpdate();
+
+  const finalRA = calculateRAFromEarthPerihelion(sun);
+  return {
+    jd: refinedJD,
+    raDeg: (finalRA * 180 / Math.PI + 360) % 360,
+    decDeg: 90 - sun.dec * 180 / Math.PI
+  };
+}
+
+/**
  * Legacy wrapper for equinoxForYear - calls sunRACrossingForYear
  */
 function equinoxForYear(year, which = 0, prevEquinoxJD = null, debug = false) {
@@ -13224,7 +13438,7 @@ async function investigateParameterEffects() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('');
   const modelYearLength = inputmeanlengthsolaryearindays;
-  const juneSolsticeTropicalYear = 365.2416; // approximate
+  const juneSolsticeTropicalYear = ASTRO_REFERENCE.tropicalYearSSJ2000;
   const yearLengthDiff = (modelYearLength - juneSolsticeTropicalYear) * 86400; // seconds
   const drift20yr = baseline.drift;
   console.log(`Current drift: ${(drift20yr).toFixed(1)} min over 20 years = ${(drift20yr/20).toFixed(3)} min/year = ${(drift20yr/20*60).toFixed(1)} sec/year`);
@@ -13646,14 +13860,34 @@ async function analyzeDecemberSolsticeYearLength(startYear, endYear) {
   return { solstices, intervals, mean };
 }
 
-/** Analyze tropical year length from all 4 cardinal points (sun.ra = 0°, 90°, 180°, 270°) */
+/**
+ * Analyze tropical year length from all 4 cardinal points (sun.ra = 0°, 90°, 180°, 270°)
+ * Uses both Method A (Earth-based RA) and Method B (Wobble-center RA) for comparison.
+ *
+ * KNOWN LIMITATION: This model uses a circular orbit with an offset center to simulate
+ * eccentricity. The Sun moves at constant angular velocity around Earth. In reality
+ * (and in IAU calculations), the orbit is elliptical and Kepler's 2nd Law causes
+ * variable orbital velocity - faster at perihelion, slower at aphelion.
+ *
+ * This results in ~±26s deviation at solstices compared to IAU reference values:
+ * - Summer Solstice (near aphelion): Model shows ~+26s longer than IAU
+ * - Winter Solstice (near perihelion): Model shows ~-25s shorter than IAU
+ *
+ * The model correctly simulates mean tropical year, distance variations, and all
+ * precession cycles, but cannot replicate the ~96s spread in tropical year lengths
+ * at different cardinal points caused by Kepler's 2nd Law velocity variations.
+ */
 async function analyzeEquinoxIntervals(startYear, endYear) {
   startYear = startYear || o.calibrationYearStart;
   endYear = endYear || o.calibrationYearEnd;
 
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║       CARDINAL POINTS ANALYSIS (Sun RA = 0°, 90°, 180°, 270°)           ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗');
+  console.log('║                              CARDINAL POINTS ANALYSIS (Sun RA = 0°, 90°, 180°, 270°)                                                  ║');
+  console.log('╠══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log('║ Method A: Earth-based RA (sun.ra) - includes wobble parallax                                                                            ║');
+  console.log('║ Method B: Wobble-center RA (calculateRAFromWobbleCenter) - stable reference frame                                                       ║');
+  console.log('║ Method C: Perihelion-point RA (calculateRAFromEarthPerihelion) - perihelion as origin                                                   ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝');
   console.log(`Analyzing years ${startYear} to ${endYear}...`);
   console.log('');
 
@@ -13668,62 +13902,160 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
     { ra: 270, name: 'RA=270° (Winter Solstice)', shortName: 'WS', iauRef: ASTRO_REFERENCE.tropicalYearWSJ2000 }
   ];
 
-  const results = {};
+  const resultsA = {};  // Method A: Earth-based
+  const resultsB = {};  // Method B: Wobble-center
+  const resultsC = {};  // Method C: Perihelion-point
 
   for (const point of cardinalPoints) {
-    // Debug output suppressed - set shouldDebug = true to re-enable
-    const events = [];
-    let prevJD = null;
+    // Method A: Earth-based RA
+    const eventsA = [];
+    let prevJDA = null;
 
     for (let year = startYear; year <= endYear; year++) {
-      const shouldDebug = false;  // Was: (year === startYear)
-      const result = sunRACrossingForYear(year, point.ra, prevJD, shouldDebug);
+      const result = sunRACrossingForYear(year, point.ra, prevJDA, false);
       if (result) {
-        events.push({ year, jd: result.jd, raDeg: result.raDeg });
-        prevJD = result.jd;
+        eventsA.push({ year, jd: result.jd, raDeg: result.raDeg });
+        prevJDA = result.jd;
       }
       if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
-    // Calculate intervals
-    const intervals = [];
-    for (let i = 1; i < events.length; i++) {
-      intervals.push(events[i].jd - events[i - 1].jd);
+    const intervalsA = [];
+    for (let i = 1; i < eventsA.length; i++) {
+      intervalsA.push(eventsA[i].jd - eventsA[i - 1].jd);
+    }
+    const meanA = intervalsA.length > 0 ? intervalsA.reduce((sum, i) => sum + i, 0) / intervalsA.length : 0;
+    resultsA[point.ra] = { events: eventsA, intervals: intervalsA, mean: meanA, name: point.name, shortName: point.shortName, iauRef: point.iauRef };
+
+    // Method B: Wobble-center RA
+    const eventsB = [];
+    let prevJDB = null;
+
+    for (let year = startYear; year <= endYear; year++) {
+      const result = sunRACrossingForYearMethodB(year, point.ra, prevJDB, false);
+      if (result) {
+        eventsB.push({ year, jd: result.jd, raDeg: result.raDeg });
+        prevJDB = result.jd;
+      }
+      if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
-    const mean = intervals.length > 0
-      ? intervals.reduce((sum, i) => sum + i, 0) / intervals.length
-      : 0;
+    const intervalsB = [];
+    for (let i = 1; i < eventsB.length; i++) {
+      intervalsB.push(eventsB[i].jd - eventsB[i - 1].jd);
+    }
+    const meanB = intervalsB.length > 0 ? intervalsB.reduce((sum, i) => sum + i, 0) / intervalsB.length : 0;
+    resultsB[point.ra] = { events: eventsB, intervals: intervalsB, mean: meanB, name: point.name, shortName: point.shortName, iauRef: point.iauRef };
 
-    results[point.ra] = { events, intervals, mean, name: point.name, shortName: point.shortName, iauRef: point.iauRef };
+    // Method C: Perihelion-point RA
+    const eventsC = [];
+    let prevJDC = null;
+
+    for (let year = startYear; year <= endYear; year++) {
+      const result = sunRACrossingForYearMethodC(year, point.ra, prevJDC, false);
+      if (result) {
+        eventsC.push({ year, jd: result.jd, raDeg: result.raDeg });
+        prevJDC = result.jd;
+      }
+      if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
+    }
+
+    const intervalsC = [];
+    for (let i = 1; i < eventsC.length; i++) {
+      intervalsC.push(eventsC[i].jd - eventsC[i - 1].jd);
+    }
+    const meanC = intervalsC.length > 0 ? intervalsC.reduce((sum, i) => sum + i, 0) / intervalsC.length : 0;
+    resultsC[point.ra] = { events: eventsC, intervals: intervalsC, mean: meanC, name: point.name, shortName: point.shortName, iauRef: point.iauRef };
   }
 
+  // Display results
   console.log('');
-  console.log('╔═════════════════════════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗');
-  console.log('║ Cardinal Point                      │ Year Length (days)│ IAU Reference     │ Diff from IAU (s) ║');
-  console.log('╠═════════════════════════════════════╪═══════════════════╪═══════════════════╪═══════════════════╣');
+  console.log('╔═════════════════════════════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗');
+  console.log('║ Cardinal Point                      │ Method A (days)   │ Method B (days)   │ Method C (days)   │ IAU Reference     │ A - IAU (s)       ║');
+  console.log('╠═════════════════════════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╣');
 
   for (const point of cardinalPoints) {
-    const r = results[point.ra];
-    const diffSec = (r.mean - point.iauRef) * 86400;
-    const meanStr = r.mean > 0 ? r.mean.toFixed(9) : 'N/A';
+    const rA = resultsA[point.ra];
+    const rB = resultsB[point.ra];
+    const rC = resultsC[point.ra];
+    const diffSecA = (rA.mean - point.iauRef) * 86400;
+    const meanAStr = rA.mean > 0 ? rA.mean.toFixed(9) : 'N/A';
+    const meanBStr = rB.mean > 0 ? rB.mean.toFixed(9) : 'N/A';
+    const meanCStr = rC.mean > 0 ? rC.mean.toFixed(9) : 'N/A';
     const iauStr = point.iauRef.toFixed(9);
-    const diffStr = r.mean > 0 ? diffSec.toFixed(2).padStart(8) : 'N/A';
-    console.log(`║ ${point.name.padEnd(35)} │ ${meanStr.padStart(17)} │ ${iauStr.padStart(17)} │ ${diffStr.padStart(17)} ║`);
+    const diffAStr = rA.mean > 0 ? diffSecA.toFixed(2).padStart(8) : 'N/A';
+    console.log(`║ ${point.name.padEnd(35)} │ ${meanAStr.padStart(17)} │ ${meanBStr.padStart(17)} │ ${meanCStr.padStart(17)} │ ${iauStr.padStart(17)} │ ${diffAStr.padStart(17)} ║`);
   }
 
-  console.log('╠═════════════════════════════════════╪═══════════════════╪═══════════════════╪═══════════════════╣');
-  console.log(`║ IAU mean tropical year              │                   │ ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9).padStart(17)} │                   ║`);
-  console.log(`║ Model configured                    │ ${meansolaryearlengthinDays.toFixed(9).padStart(17)} │                   │                   ║`);
-  console.log('╚═════════════════════════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝');
+  // Calculate mean of Method A (average of 4 cardinal points)
+  const meanA = (resultsA[0].mean + resultsA[90].mean + resultsA[180].mean + resultsA[270].mean) / 4;
+  const meanADiff = (meanA - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
 
-  // Show comparison between solstice-based (max dec) and RA-based (90°) measurements
+  console.log('╠═════════════════════════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╪═══════════════════╣');
+  console.log(`║ IAU mean tropical year              │                   │                   │                   │ ${ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9).padStart(17)} │                   ║`);
+  console.log(`║ Model configured                    │                   │ ${meansolaryearlengthinDays.toFixed(9).padStart(17)} │                   │                   │                   ║`);
+  console.log(`║ Method A mean (4 cardinals)         │ ${meanA.toFixed(9).padStart(17)} │                   │                   │                   │ ${meanADiff.toFixed(2).padStart(8)}          ║`);
+  console.log('╚═════════════════════════════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝');
+
+  // Show difference between methods
   console.log('');
-  console.log('Note: RA=90° should match the solstice-based tropical year measurement');
+  console.log('════════════════════════════════════════════════════════════════════════════════════════════════');
+  console.log('METHOD COMPARISON (difference in seconds):');
+  console.log('────────────────────────────────────────────────────────────────────────────────────────────────');
+  console.log('         A - B (wobble)       B - C (perihelion)     A - C (total)');
+  console.log('────────────────────────────────────────────────────────────────────────────────────────────────');
+  for (const point of cardinalPoints) {
+    const rA = resultsA[point.ra];
+    const rB = resultsB[point.ra];
+    const rC = resultsC[point.ra];
+    const diffAB = (rA.mean - rB.mean) * 86400;
+    const diffBC = (rB.mean - rC.mean) * 86400;
+    const diffAC = (rA.mean - rC.mean) * 86400;
+    console.log(`  ${point.shortName}:    ${diffAB >= 0 ? '+' : ''}${diffAB.toFixed(3).padStart(8)}s          ${diffBC >= 0 ? '+' : ''}${diffBC.toFixed(3).padStart(8)}s          ${diffAC >= 0 ? '+' : ''}${diffAC.toFixed(3).padStart(8)}s`);
+  }
+  console.log('────────────────────────────────────────────────────────────────────────────────────────────────');
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
+  console.log('METHOD COMPARISON EXPLANATION:');
+  console.log('───────────────────────────────────────────────────────────────────────────────────────────────');
+  console.log('');
+  console.log('A - B (wobble parallax): ~0s difference');
+  console.log('  The wobble parallax from Earth\'s axial precession is negligible for tropical year');
+  console.log('  measurements. Methods A and B produce essentially identical results.');
+  console.log('');
+  console.log('B - C (perihelion offset): ~±22.5s at solstices, ~±5.2s at equinoxes');
+  console.log('  This is the geometric parallax between the wobble-center and perihelion point.');
+  console.log('  At solstices, Earth is perpendicular to the perihelion-aphelion axis, maximizing');
+  console.log('  the parallax angle. At equinoxes, Earth is closer to that axis, reducing parallax.');
+  console.log('  Method C "washes out" the eccentricity effect, converging all cardinal points to');
+  console.log('  nearly the same value (~365.2421887 days) - very close to IAU mean tropical year.');
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
+  console.log('WHY THE MODEL DIFFERS FROM IAU AT SOLSTICES (~±26s):');
+  console.log('───────────────────────────────────────────────────────────────────────────────────────────────');
+  console.log('This model uses a CIRCULAR orbit with an offset center (perihelion point)');
+  console.log('to simulate eccentricity. The Sun moves at constant angular velocity.');
+  console.log('');
+  console.log('IAU calculations use an ELLIPTICAL orbit where Earth (and thus the Sun');
+  console.log('from our geocentric view) moves faster at perihelion and slower at aphelion');
+  console.log('(Kepler\'s 2nd Law: equal areas in equal times).');
+  console.log('');
+  console.log('This velocity variation causes the IAU tropical year to vary by ~96s:');
+  console.log('  - SS (near aphelion):  365.241626 days (shortest - slow motion)');
+  console.log('  - WS (near perihelion): 365.242740 days (longest - fast motion)');
+  console.log('');
+  console.log('The circular orbit model correctly simulates:');
+  console.log('  ✓ Mean tropical year length');
+  console.log('  ✓ Distance variations (perihelion/aphelion)');
+  console.log('  ✓ All precession cycles');
+  console.log('');
+  console.log('But cannot replicate variable orbital velocity (Kepler\'s 2nd Law),');
+  console.log('hence the ~26s deviation at solstices vs IAU reference values.');
+  console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
   o.Run = savedRun;
-  return results;
+  return { methodA: resultsA, methodB: resultsB, methodC: resultsC };
 }
 
 /** Analyze anomalistic year length from perihelion and aphelion intervals */
@@ -13812,6 +14144,28 @@ async function analyzeAnoministicYear(startYear, endYear) {
   }
   const apheMean = apheIntervals.reduce((sum, i) => sum + i.interval, 0) / apheIntervals.length;
 
+  // === TRUE ANOMALISTIC YEAR - APHELION (WobbleCenter-Sun distance - fixed reference) ===
+  const aphelionsB = [];
+  let prevApheJD_B = null;
+  for (let year = startYear; year <= endYear; year++) {
+    const shouldDebug = false;
+    const result = aphelionForYearMethodB(year, shouldDebug, prevApheJD_B);
+    if (result) {
+      aphelionsB.push({ year, jd: result.jd, distance: result.distance });
+      prevApheJD_B = result.jd;
+    }
+    if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
+  }
+
+  const apheIntervalsB = [];
+  for (let i = 1; i < aphelionsB.length; i++) {
+    apheIntervalsB.push({
+      year: aphelionsB[i].year,
+      interval: aphelionsB[i].jd - aphelionsB[i - 1].jd
+    });
+  }
+  const apheMeanB = apheIntervalsB.reduce((sum, i) => sum + i.interval, 0) / apheIntervalsB.length;
+
   const iauAnomalistic = ASTRO_REFERENCE.anomalisticYearJ2000;
 
   // Calculate theoretical anomalistic year from perihelion precession rate
@@ -13820,16 +14174,23 @@ async function analyzeAnoministicYear(startYear, endYear) {
 
   console.log('');
   console.log('╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗');
-  console.log('║                                 PERIHELION INTERVAL RESULTS                                           ║');
+  console.log('║                                 ANOMALISTIC YEAR RESULTS                                              ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ Measurement                                     │ Value (days)      │ Diff from IAU                  ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log('║ EARTH-FRAME (Earth→Sun distance)                                                                      ║');
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   const periADiff = (periMean - iauAnomalistic) * 86400;
-  const periBDiff = (periMeanB - iauAnomalistic) * 86400;
   const apheDiff = (apheMean - iauAnomalistic) * 86400;
-  console.log(`║ Earth-Frame Perihelion Interval (Earth→Sun)     │ ${periMean.toFixed(9)}    │ ${periADiff >= 0 ? '+' : ''}${periADiff.toFixed(2)} seconds              ║`);
-  console.log(`║ Anomalistic Year (WobbleCenter→Sun)             │ ${periMeanB.toFixed(9)}    │ ${periBDiff >= 0 ? '+' : ''}${periBDiff.toFixed(2)} seconds               ║`);
-  console.log(`║ Earth-Frame Aphelion Interval                   │ ${apheMean.toFixed(9)}    │ ${apheDiff >= 0 ? '+' : ''}${apheDiff.toFixed(2)} seconds              ║`);
+  console.log(`║   Perihelion Interval                           │ ${periMean.toFixed(9)}    │ ${periADiff >= 0 ? '+' : ''}${periADiff.toFixed(2)} seconds              ║`);
+  console.log(`║   Aphelion Interval                             │ ${apheMean.toFixed(9)}    │ ${apheDiff >= 0 ? '+' : ''}${apheDiff.toFixed(2)} seconds              ║`);
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log('║ WOBBLE-CENTER FRAME (WobbleCenter→Sun distance)                                                       ║');
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
+  const periBDiff = (periMeanB - iauAnomalistic) * 86400;
+  const apheBDiff = (apheMeanB - iauAnomalistic) * 86400;
+  console.log(`║   Perihelion Interval                           │ ${periMeanB.toFixed(9)}    │ ${periBDiff >= 0 ? '+' : ''}${periBDiff.toFixed(2)} seconds               ║`);
+  console.log(`║   Aphelion Interval                             │ ${apheMeanB.toFixed(9)}    │ ${apheBDiff >= 0 ? '+' : ''}${apheBDiff.toFixed(2)} seconds               ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log(`║ IAU anomalistic year (J2000)                    │ ${iauAnomalistic.toFixed(9)}    │ (reference)                    ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
@@ -13840,9 +14201,11 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ FRAME COMPARISON                                                                                      ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
-  const methodDiff = (periMean - periMeanB) * 86400;
-  console.log(`║ Earth-Frame - True Anomalistic                  │ ${methodDiff >= 0 ? '+' : ''}${methodDiff.toFixed(2)} seconds                                          ║`);
-  console.log(`║ (Negative = Earth wobble shifts perihelion detection EARLIER than inertial frame)                    ║`);
+  const periMethodDiff = (periMean - periMeanB) * 86400;
+  const apheMethodDiff = (apheMean - apheMeanB) * 86400;
+  console.log(`║ Perihelion: Earth-Frame - WobbleCenter          │ ${periMethodDiff >= 0 ? '+' : ''}${periMethodDiff.toFixed(2)} seconds                                          ║`);
+  console.log(`║ Aphelion:   Earth-Frame - WobbleCenter          │ ${apheMethodDiff >= 0 ? '+' : ''}${apheMethodDiff.toFixed(2)} seconds                                          ║`);
+  console.log(`║ (Negative = Earth wobble shifts detection EARLIER than inertial frame)                               ║`);
   console.log(`║ This offset oscillates over the 25,684 year axial precession cycle.                                  ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝');
 
@@ -13864,168 +14227,219 @@ async function analyzeAnoministicYear(startYear, endYear) {
 
   jumpToJulianDay(savedJD);
   o.Run = savedRun;
-  return { perihelions, perihelionsB, aphelions, periIntervals, periIntervalsB, apheIntervals, periMean, periMeanB, apheMean };
+  return { perihelions, perihelionsB, aphelions, aphelionsB, periIntervals, periIntervalsB, apheIntervals, apheIntervalsB, periMean, periMeanB, apheMean, apheMeanB };
 }
 
 /**
- * Analyze sidereal year length using two methods:
- * - Method A: Direct ICRF longitude measurement (sun.ra + precession offset)
- * - Method B: Derived from tropical year + precession rate
+ * Analyze sidereal year length using four independent position-based methods:
+ * - Method A: Origin→Sun world angle (Sun's absolute position from scene origin)
+ * - Method B: WobbleCenter→Sun angle (Sun's position from Earth's wobble center)
+ * - Method C: Heliocentric Sun→Earth angle (Earth's position as seen from Sun - includes wobble)
+ * - Method D: Heliocentric Sun→WobbleCenter angle (WobbleCenter as seen from Sun - wobble-free)
  *
  * The sidereal year is the time for the Sun to return to the same position
  * relative to fixed stars (ICRF reference frame), approximately 365.256363 days.
+ *
+ * Methods A, B, and D should all agree (wobble-free measurements).
+ * Method C includes Earth's wobble motion, showing the ~1.76s wobble contribution.
  */
 async function analyzeSiderealYear(startYear, endYear) {
   startYear = startYear || o.calibrationYearStart;
   endYear = endYear || o.calibrationYearEnd;
 
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║           SIDEREAL YEAR LENGTH ANALYSIS                                  ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗');
+  console.log('║                              SIDEREAL YEAR LENGTH ANALYSIS                                            ║');
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log('║ Method A: Origin→Sun world angle (Sun\'s absolute position from scene origin)                         ║');
+  console.log('║ Method B: WobbleCenter→Sun angle (Sun\'s position from Earth\'s wobble center)                         ║');
+  console.log('║ Method C: Heliocentric Sun→Earth angle (Earth\'s position as seen from Sun - includes wobble)         ║');
+  console.log('║ Method D: Heliocentric Sun→WobbleCenter angle (WobbleCenter as seen from Sun - wobble-free)           ║');
+  console.log('╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝');
   console.log(`Analyzing years ${startYear} to ${endYear}...`);
   console.log('');
   console.log('The sidereal year is the time for the Sun to return to the same position');
   console.log('relative to fixed stars (ICRF reference frame).');
-  console.log('');
-  console.log('Method: Direct measurement of Sun\'s absolute world position angle.');
-  console.log('This measures when the Sun physically returns to the same orbital position.');
   console.log('');
 
   const savedJD = o.julianDay;
   const savedRun = o.Run;
   o.Run = false;
 
-  // Helper to get Sun's absolute world angle
-  const getSunWorldAngle = (jd) => {
+  // Reusable vectors to avoid allocation in loops
+  const _sunPos = new THREE.Vector3();
+  const _wobblePos = new THREE.Vector3();
+  const _earthPos = new THREE.Vector3();
+  const _direction = new THREE.Vector3();
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HELPER FUNCTIONS FOR EACH METHOD
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Method A: Origin→Sun world angle (absolute world position)
+  const getAngleMethodA = (jd) => {
     jumpToJulianDay(jd);
     forceSceneUpdate();
-
-    // Get Sun's world position
-    const sunPos = new THREE.Vector3();
-    sun.planetObj.getWorldPosition(sunPos);
-
-    // Calculate angle in XZ plane from origin
-    let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
-    angle = ((angle % 360) + 360) % 360;
-    return angle;
+    sun.planetObj.getWorldPosition(_sunPos);
+    let angle = Math.atan2(_sunPos.z, _sunPos.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
   };
 
-  // Find when Sun returns to the same world angle
-  const methodDCrossings = [];
-  let firstCrossingJD_D = null;
-  let targetAngle_D = null;
+  // Method B: WobbleCenter→Sun angle (from Earth's wobble center)
+  const getAngleMethodB = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
+    sun.planetObj.getWorldPosition(_sunPos);
+    _direction.copy(_sunPos).sub(_wobblePos);
+    let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
 
-  for (let year = startYear; year <= endYear; year++) {
-    let approxJD;
-    let searchRange;
+  // Method C: Heliocentric Sun→Earth angle (Earth as seen from Sun)
+  // Note: This includes Earth's wobble motion, causing ~1.76s difference from A/B
+  const getAngleMethodC = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    sun.planetObj.getWorldPosition(_sunPos);
+    earth.planetObj.getWorldPosition(_earthPos);
+    _direction.copy(_earthPos).sub(_sunPos);
+    let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
 
-    if (firstCrossingJD_D !== null) {
-      const prevCrossing = methodDCrossings[methodDCrossings.length - 1];
-      approxJD = prevCrossing.jd + 365.256;
-      searchRange = 288;  // ±6 days
-    } else {
-      const yearFraction = 0.47;  // June
-      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
-      searchRange = 960;  // ±20 days
-    }
+  // Method D: Heliocentric Sun→WobbleCenter angle (WobbleCenter as seen from Sun)
+  // This removes Earth's wobble and should match Methods A/B exactly
+  const getAngleMethodD = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    sun.planetObj.getWorldPosition(_sunPos);
+    earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
+    _direction.copy(_wobblePos).sub(_sunPos);
+    let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
 
-    const step = 0.5 / 24;  // 0.5 hours
-    const samples = [];
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GENERIC CROSSING DETECTION FUNCTION
+  // ═══════════════════════════════════════════════════════════════════════════
 
-    for (let k = -searchRange; k <= searchRange; ++k) {
-      const jd = approxJD + k * step;
-      const angle = getSunWorldAngle(jd);
-      samples.push({ k, jd, angle });
-    }
+  const findCrossingsForMethod = async (getAngleFunc, methodName) => {
+    const crossings = [];
+    let firstCrossingJD = null;
+    let targetAngle = null;
 
-    let crossingJD = null;
+    for (let year = startYear; year <= endYear; year++) {
+      let approxJD;
+      let searchRange;
 
-    if (firstCrossingJD_D === null) {
-      // First year: use sun.ra = 90° as reference, then record world angle
-      const target = 90;
-      for (let i = 1; i < samples.length; i++) {
-        jumpToJulianDay(samples[i-1].jd);
-        forceSceneUpdate();
-        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
-
-        jumpToJulianDay(samples[i].jd);
-        forceSceneUpdate();
-        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
-
-        if (ra1 < target && ra2 >= target) {
-          const t = (target - ra1) / (ra2 - ra1);
-          crossingJD = samples[i-1].jd + t * step;
-          firstCrossingJD_D = crossingJD;
-          targetAngle_D = getSunWorldAngle(crossingJD);
-          break;
-        }
+      if (firstCrossingJD !== null) {
+        const prevCrossing = crossings[crossings.length - 1];
+        approxJD = prevCrossing.jd + 365.256;
+        searchRange = 288;  // ±6 days
+      } else {
+        const yearFraction = 0.47;  // June
+        approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+        searchRange = 960;  // ±20 days
       }
-    } else {
-      // Subsequent years: find when world angle returns to target
-      if (year === startYear + 1) {
-        const minAngle = Math.min(...samples.map(s => s.angle));
-        const maxAngle = Math.max(...samples.map(s => s.angle));
-        console.log(`  Debug year ${year}: angle range [${minAngle.toFixed(2)}° - ${maxAngle.toFixed(2)}°], target=${targetAngle_D.toFixed(2)}°`);
+
+      const step = 0.5 / 24;  // 0.5 hours
+      const samples = [];
+
+      for (let k = -searchRange; k <= searchRange; ++k) {
+        const jd = approxJD + k * step;
+        const angle = getAngleFunc(jd);
+        samples.push({ k, jd, angle });
       }
 
-      for (let i = 1; i < samples.length; i++) {
-        let a1 = samples[i-1].angle;
-        let a2 = samples[i].angle;
+      let crossingJD = null;
 
-        // Handle wraparound
-        if (Math.abs(a2 - a1) > 180) {
-          if (a2 > a1) a1 += 360;
-          else a2 += 360;
-        }
+      if (firstCrossingJD === null) {
+        // First year: use sun.ra = 90° as reference, then record the method's angle
+        const target = 90;
+        for (let i = 1; i < samples.length; i++) {
+          jumpToJulianDay(samples[i-1].jd);
+          forceSceneUpdate();
+          const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
 
-        let adjustedTarget = targetAngle_D;
-        if (a1 > 360 || a2 > 360) {
-          if (targetAngle_D < 180) adjustedTarget = targetAngle_D + 360;
-        }
+          jumpToJulianDay(samples[i].jd);
+          forceSceneUpdate();
+          const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
 
-        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
-        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
-
-        if (crossingUp || crossingDown) {
-          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
-          crossingJD = samples[i-1].jd + t * step;
-          if (year === startYear + 1) {
-            console.log(`    Found ${crossingUp ? 'upward' : 'downward'} crossing`);
+          if (ra1 < target && ra2 >= target) {
+            const t = (target - ra1) / (ra2 - ra1);
+            crossingJD = samples[i-1].jd + t * step;
+            firstCrossingJD = crossingJD;
+            targetAngle = getAngleFunc(crossingJD);
+            break;
           }
-          break;
+        }
+      } else {
+        // Subsequent years: find when angle returns to target
+        for (let i = 1; i < samples.length; i++) {
+          let a1 = samples[i-1].angle;
+          let a2 = samples[i].angle;
+
+          // Handle wraparound
+          if (Math.abs(a2 - a1) > 180) {
+            if (a2 > a1) a1 += 360;
+            else a2 += 360;
+          }
+
+          let adjustedTarget = targetAngle;
+          if (a1 > 360 || a2 > 360) {
+            if (targetAngle < 180) adjustedTarget = targetAngle + 360;
+          }
+
+          const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
+          const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
+
+          if (crossingUp || crossingDown) {
+            const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
+            crossingJD = samples[i-1].jd + t * step;
+            break;
+          }
         }
       }
+
+      if (crossingJD) {
+        const currentAngle = getAngleFunc(crossingJD);
+        crossings.push({ year, jd: crossingJD, angle: currentAngle });
+      }
+
+      if (year % 5 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
-    if (crossingJD) {
-      const currentAngle = getSunWorldAngle(crossingJD);
-      methodDCrossings.push({ year, jd: crossingJD, angle: currentAngle });
+    // Calculate intervals
+    const intervals = [];
+    for (let i = 1; i < crossings.length; i++) {
+      intervals.push({
+        year: crossings[i].year,
+        interval: crossings[i].jd - crossings[i - 1].jd
+      });
     }
 
-    if (year % 5 === 0) await new Promise(r => setTimeout(r, 10));
-  }
+    const mean = intervals.length > 0
+      ? intervals.reduce((sum, i) => sum + i.interval, 0) / intervals.length
+      : 0;
 
-  // Calculate intervals for Method D
-  const methodDIntervals = [];
-  for (let i = 1; i < methodDCrossings.length; i++) {
-    methodDIntervals.push({
-      year: methodDCrossings[i].year,
-      interval: methodDCrossings[i].jd - methodDCrossings[i - 1].jd
-    });
-  }
+    return { crossings, intervals, mean, targetAngle };
+  };
 
-  const methodDMean = methodDIntervals.length > 0
-    ? methodDIntervals.reduce((sum, i) => sum + i.interval, 0) / methodDIntervals.length
-    : 0;
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RUN ALL FOUR METHODS
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  console.log(`  Target world angle: ${targetAngle_D?.toFixed(4) ?? 'N/A'}°`);
-  console.log(`  Detected ${methodDCrossings.length} crossings of this angle`);
-  console.log(`  Calculated ${methodDIntervals.length} intervals`);
-  if (methodDCrossings.length >= 2) {
-    console.log(`  First crossing: ${methodDCrossings[0].year} at JD ${methodDCrossings[0].jd.toFixed(4)}`);
-    console.log(`  Last crossing:  ${methodDCrossings[methodDCrossings.length-1].year} at JD ${methodDCrossings[methodDCrossings.length-1].jd.toFixed(4)}`);
-  }
-  console.log('');
+  console.log('Running Method A: Origin→Sun world angle...');
+  const resultA = await findCrossingsForMethod(getAngleMethodA, 'A');
+
+  console.log('Running Method B: WobbleCenter→Sun angle...');
+  const resultB = await findCrossingsForMethod(getAngleMethodB, 'B');
+
+  console.log('Running Method C: Heliocentric Sun→Earth angle...');
+  const resultC = await findCrossingsForMethod(getAngleMethodC, 'C');
+
+  console.log('Running Method D: Heliocentric Sun→WobbleCenter angle...');
+  const resultD = await findCrossingsForMethod(getAngleMethodD, 'D');
 
   // ═══════════════════════════════════════════════════════════════════════════
   // COMPARISON WITH IAU REFERENCE
@@ -14033,48 +14447,76 @@ async function analyzeSiderealYear(startYear, endYear) {
 
   const iauSiderealYear = ASTRO_REFERENCE.siderealYearJ2000;
   const iauTropicalYear = ASTRO_REFERENCE.tropicalYearMeanJ2000;
-
-  // IAU-implied precession: sidereal - tropical difference
   const iauPrecessionContrib = iauSiderealYear - iauTropicalYear;
 
-  const meanSiderealYear = methodDMean;
-  const diffFromIAU = (meanSiderealYear - iauSiderealYear) * 86400;
-  const siderealMinusTropical = (meanSiderealYear - iauTropicalYear) * 86400;
+  const diffA = (resultA.mean - iauSiderealYear) * 86400;
+  const diffB = (resultB.mean - iauSiderealYear) * 86400;
+  const diffC = (resultC.mean - iauSiderealYear) * 86400;
+  const diffD = (resultD.mean - iauSiderealYear) * 86400;
 
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('RESULTS');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
+  // Method agreement
+  const diffAB = (resultA.mean - resultB.mean) * 86400;
+  const diffAD = (resultA.mean - resultD.mean) * 86400;
+  const diffCD = (resultC.mean - resultD.mean) * 86400;
+
   console.log('');
-  console.log('╔═════════════════════════════════════╤═══════════════════╗');
-  console.log('║ Metric                              │ Value (days)      ║');
-  console.log('╠═════════════════════════════════════╪═══════════════════╣');
-  console.log(`║ Measured sidereal year              │ ${meanSiderealYear.toFixed(9)}    ║`);
-  console.log(`║ IAU sidereal year (J2000)           │ ${iauSiderealYear.toFixed(9)}    ║`);
-  console.log(`║ Difference from IAU                 │ ${diffFromIAU >= 0 ? '+' : ''}${diffFromIAU.toFixed(2)} seconds   ║`);
-  console.log('╠═════════════════════════════════════╪═══════════════════╣');
-  console.log(`║ Sidereal - Tropical (model)         │ ${siderealMinusTropical.toFixed(2)} seconds   ║`);
-  console.log(`║ Sidereal - Tropical (IAU)           │ ${(iauPrecessionContrib * 86400).toFixed(2)} seconds   ║`);
-  console.log('╚═════════════════════════════════════╧═══════════════════╝');
+  console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
+  console.log('RESULTS');
+  console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
+  console.log('');
+  console.log('╔═════════════════════════════════════════════════════════╤═══════════════════╤═══════════════════════╗');
+  console.log('║ Method                                                  │ Value (days)      │ Diff from IAU         ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ A: Origin→Sun world angle                               │ ${resultA.mean.toFixed(9)}    │ ${diffA >= 0 ? '+' : ''}${diffA.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║ B: WobbleCenter→Sun angle                               │ ${resultB.mean.toFixed(9)}    │ ${diffB >= 0 ? '+' : ''}${diffB.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║ D: Heliocentric Sun→WobbleCenter angle                  │ ${resultD.mean.toFixed(9)}    │ ${diffD >= 0 ? '+' : ''}${diffD.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ C: Heliocentric Sun→Earth angle (includes wobble)       │ ${resultC.mean.toFixed(9)}    │ ${diffC >= 0 ? '+' : ''}${diffC.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ IAU sidereal year (J2000)                               │ ${iauSiderealYear.toFixed(9)}    │ (reference)           ║`);
+  console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
 
-  // Show trend if enough data
-  if (methodDIntervals.length > 10) {
-    const firstFive = methodDIntervals.slice(0, 5);
-    const lastFive = methodDIntervals.slice(-5);
+  console.log('');
+  console.log('╔═════════════════════════════════════════════════════════╤═══════════════════════╗');
+  console.log('║ Method Agreement (wobble-free methods)                  │ Difference            ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  console.log(`║ Method A - Method B                                     │ ${diffAB >= 0 ? '+' : ''}${diffAB.toFixed(3).padStart(7)} seconds     ║`);
+  console.log(`║ Method A - Method D                                     │ ${diffAD >= 0 ? '+' : ''}${diffAD.toFixed(3).padStart(7)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  console.log('║ Earth Wobble Effect (C vs D)                            │                       ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  console.log(`║ Method C - Method D (wobble contribution)               │ ${diffCD >= 0 ? '+' : ''}${diffCD.toFixed(3).padStart(7)} seconds     ║`);
+  console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
+
+  console.log('');
+  console.log('╔═════════════════════════════════════════════════════════╤═══════════════════════╗');
+  console.log('║ Precession Validation                                   │ Value                 ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  const siderealMinusTropicalA = (resultA.mean - iauTropicalYear) * 86400;
+  console.log(`║ Sidereal - Tropical (Method A)                          │ ${siderealMinusTropicalA.toFixed(2).padStart(7)} seconds     ║`);
+  console.log(`║ Sidereal - Tropical (IAU)                               │ ${(iauPrecessionContrib * 86400).toFixed(2).padStart(7)} seconds     ║`);
+  console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
+
+  // Show trend if enough data (using Method A as primary)
+  if (resultA.intervals.length > 10) {
+    const firstFive = resultA.intervals.slice(0, 5);
+    const lastFive = resultA.intervals.slice(-5);
     const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
     const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
     const yearSpan = lastFive[4].year - firstFive[0].year;
     const drift = (lastMean - firstMean) / yearSpan * 86400;
     console.log('');
-    console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year`);
+    console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year (Method A)`);
   }
 
   jumpToJulianDay(savedJD);
   o.Run = savedRun;
 
   return {
-    crossings: methodDCrossings,
-    intervals: methodDIntervals,
-    mean: meanSiderealYear,
+    methodA: { crossings: resultA.crossings, intervals: resultA.intervals, mean: resultA.mean },
+    methodB: { crossings: resultB.crossings, intervals: resultB.intervals, mean: resultB.mean },
+    methodC: { crossings: resultC.crossings, intervals: resultC.intervals, mean: resultC.mean },
+    methodD: { crossings: resultD.crossings, intervals: resultD.intervals, mean: resultD.mean },
     iauReference: iauSiderealYear
   };
 }
@@ -14304,6 +14746,10 @@ async function analyzeAllAlignments(startYear, endYear) {
     const diffSec = (p.mean - p.iauRef) * 86400;
     console.log(`║   ${p.name.padEnd(30)} ${p.mean.toFixed(9)}    ${p.iauRef.toFixed(9)}   ${diffSec >= 0 ? '+' : ''}${diffSec.toFixed(2)}s ║`);
   }
+  console.log('║───────────────────────────────────────────────────────────────────────────────────────║');
+  console.log('║   Note: Model uses circular orbit (constant angular velocity). IAU uses elliptical   ║');
+  console.log('║   orbit (Kepler\'s 2nd Law). This causes ~±26s deviation at solstices where orbital   ║');
+  console.log('║   velocity difference is maximum. Mean tropical year cancels this effect.            ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ MEAN TROPICAL YEAR (average of 4 cardinal points)                                     ║');
   const meanDiffSec = (meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
@@ -14512,10 +14958,10 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('│ EXPECTED VS ACTUAL PATTERN (IAU Reference)                                             │');
   console.log('├─────────────────────────────────────────────────────────────────────────────────────────┤');
   console.log('│ IAU J2000 tropical year lengths by cardinal point:                                     │');
-  console.log('│   SS (June) = 365.241626 days - SHORTEST (aphelion in middle, fast start/end)         │');
-  console.log('│   AE (Sept) = 365.242018 days - medium                                                 │');
-  console.log('│   VE (Mar)  = 365.242374 days - medium                                                 │');
-  console.log('│   WS (Dec)  = 365.242740 days - LONGEST (perihelion in middle, slow start/end)        │');
+  console.log(`│   SS (June) = ${ASTRO_REFERENCE.tropicalYearSSJ2000} days - SHORTEST (aphelion in middle, fast start/end)        │`);
+  console.log(`│   AE (Sept) = ${ASTRO_REFERENCE.tropicalYearAEJ2000} days - medium                                                │`);
+  console.log(`│   VE (Mar)  = ${ASTRO_REFERENCE.tropicalYearVEJ2000} days - medium                                                │`);
+  console.log(`│   WS (Dec)  = ${ASTRO_REFERENCE.tropicalYearWSJ2000} days - LONGEST (perihelion in middle, slow start/end)       │`);
   console.log('├─────────────────────────────────────────────────────────────────────────────────────────┤');
   const vePattern = (cardinalData.VE.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
   const ssPattern = (cardinalData.SS.mean - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
@@ -14990,7 +15436,7 @@ function diagnoseRARate() {
   console.log('════════════════════════════════════════════════════════════════════════════');
 
   const yearStartJD = 2451545.0;  // J2000 epoch
-  const yearDays = 365.2421897;   // One tropical year
+  const yearDays = ASTRO_REFERENCE.tropicalYearMeanJ2000;
 
   // Test OLD method (worldToLocal)
   jumpToJulianDay(yearStartJD);
@@ -15828,25 +16274,16 @@ async function analyzeSolarDay(startYear, endYear) {
     }
   }
 
-  console.log('');
-  console.log('Extremes:');
-  console.log(`  Shortest day: Day ${minDay.idx} = ${minDay.val.toFixed(3)}s (${(minDay.val - 86400).toFixed(3)}s from mean)`);
-  console.log(`  Longest day:  Day ${maxDay.idx} = ${maxDay.val.toFixed(3)}s (${(maxDay.val - 86400).toFixed(3)}s from mean)`);
-  console.log(`  Total cumulative drift: ${cumulativeDrift.toFixed(3)}s over ${solarIntervals.length} days`);
-  console.log(`  Average daily drift: ${(cumulativeDrift / solarIntervals.length * 1000).toFixed(3)} ms/day`);
+  // Calculate dates for extremes (days are counted from the summer solstice start)
+  const minDayJD = firstSolarNoon + minDay.idx;
+  const maxDayJD = firstSolarNoon + maxDay.idx;
+  const minDayDate = jdToDateString(minDayJD).date;
+  const maxDayDate = jdToDateString(maxDayJD).date;
 
-  // Calculate what the mean would be if we started at different points
   console.log('');
-  console.log('Starting point sensitivity (mean if started at different days):');
-  const quarterYear = Math.floor(solarIntervals.length / 4);
-  for (let offset = 0; offset < solarIntervals.length; offset += quarterYear) {
-    let sum = 0;
-    for (let i = 0; i < solarIntervals.length; i++) {
-      sum += solarIntervals[(i + offset) % solarIntervals.length];
-    }
-    const offsetMean = sum / solarIntervals.length;
-    console.log(`  Start at day ${String(offset).padStart(3)}: mean = ${offsetMean.toFixed(6)}s (diff: ${((offsetMean - 86400) * 1000).toFixed(3)} ms)`);
-  }
+  console.log('Extremes (days counted from summer solstice):');
+  console.log(`  Shortest day: Day ${minDay.idx} (${minDayDate}) = ${minDay.val.toFixed(3)}s (${(minDay.val - 86400).toFixed(3)}s from 86400)`);
+  console.log(`  Longest day:  Day ${maxDay.idx} (${maxDayDate}) = ${maxDay.val.toFixed(3)}s (${(maxDay.val - 86400).toFixed(3)}s from 86400)`);
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════');
@@ -15874,50 +16311,36 @@ async function analyzeSolarDay(startYear, endYear) {
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('COMPARISON & INTERPRETATION');
+  console.log('RESULTS SUMMARY');
   console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log(`  Method A (Earth-frame):  ${meanSolar.toFixed(6)} seconds`);
-  console.log(`  Method B (derived):      ${derivedSolar.toFixed(6)} seconds`);
-  console.log(`  Method C (fixed-frame):  ${meanSolarB.toFixed(6)} seconds`);
   console.log('');
-  console.log(`  A - B difference:        ${((meanSolar - derivedSolar) * 1000000).toFixed(3)} microseconds`);
-  console.log(`  A - C difference:        ${((meanSolar - meanSolarB) * 1000).toFixed(3)} milliseconds`);
-  console.log(`  C - B difference:        ${((meanSolarB - derivedSolar) * 1000000).toFixed(3)} microseconds`);
+  console.log('╔════════════════════════════════╤══════════════════════╤════════════════════╗');
+  console.log('║ Method                         │ Mean Solar Day (s)   │ Diff from Model    ║');
+  console.log('╠════════════════════════════════╪══════════════════════╪════════════════════╣');
+
+  const diffAModel = (meanSolar - expectedSolarDay) * 1000;
+  const diffBModel = (derivedSolar - expectedSolarDay) * 1000;
+  const diffCModel = (meanSolarB - expectedSolarDay) * 1000;
+
+  console.log(`║ A: Earth-frame (physical)      │ ${meanSolar.toFixed(6).padStart(16)}     │ ${(diffAModel >= 0 ? '+' : '') + diffAModel.toFixed(3).padStart(10)} ms   ║`);
+  console.log(`║ B: Derived from sidereal       │ ${derivedSolar.toFixed(6).padStart(16)}     │ ${(diffBModel >= 0 ? '+' : '') + diffBModel.toFixed(3).padStart(10)} ms   ║`);
+  console.log(`║ C: Fixed-frame (reference)     │ ${meanSolarB.toFixed(6).padStart(16)}     │ ${(diffCModel >= 0 ? '+' : '') + diffCModel.toFixed(3).padStart(10)} ms   ║`);
+  console.log('╠════════════════════════════════╪══════════════════════╪════════════════════╣');
+  console.log(`║ Model expected                 │ ${expectedSolarDay.toFixed(6).padStart(16)}     │         —          ║`);
+  console.log(`║ IAU reference (at epoch)       │ ${(86400).toFixed(6).padStart(16)}     │ ${((86400 - expectedSolarDay) * 1000 >= 0 ? '+' : '') + ((86400 - expectedSolarDay) * 1000).toFixed(3).padStart(10)} ms   ║`);
+  console.log('╚════════════════════════════════╧══════════════════════╧════════════════════╝');
   console.log('');
-  console.log(`  Model expected:          ${expectedSolarDay.toFixed(6)} seconds`);
-  console.log(`  A diff from model:       ${((meanSolar - expectedSolarDay) * 1000).toFixed(3)} milliseconds`);
-  console.log(`  C diff from model:       ${((meanSolarB - expectedSolarDay) * 1000).toFixed(3)} milliseconds`);
-  console.log('');
-  console.log(`  IAU reference:           86400.000000 seconds (by definition at epoch)`);
-  console.log(`  A diff from 86400:       ${((meanSolar - 86400) * 1000).toFixed(3)} milliseconds`);
-  console.log(`  C diff from 86400:       ${((meanSolarB - 86400) * 1000).toFixed(3)} milliseconds`);
+  console.log('Over a full perihelion cycle (20,868 years), Method A is the physically correct');
+  console.log('measurement. The ~11ms offset from 86400s reflects that at 1246 AD (perihelion');
+  console.log('alignment), the mean solar day was 86399.9886s per the model configuration.');
   console.log('');
   console.log('───────────────────────────────────────────────────────────────────────────');
-  console.log('WHY THE METHODS DIFFER:');
+  console.log('METHOD DESCRIPTIONS:');
   console.log('───────────────────────────────────────────────────────────────────────────');
-  console.log('');
-  console.log('Method A (Earth-frame) - THE PHYSICALLY CORRECT MEASUREMENT');
-  console.log('  Uses sun.ra (Right Ascension) measured from Earth\'s equatorial plane.');
-  console.log('  This is how solar time is actually defined - relative to Earth\'s rotation');
-  console.log('  axis and equatorial coordinate system. Shows equation of time variation');
-  console.log('  (±20-25s daily) due to Earth\'s orbital eccentricity and axial tilt.');
-  console.log('');
-  console.log('Method B (Derived) - MATHEMATICAL CROSS-CHECK');
-  console.log('  Derives solar day from sidereal day using the fundamental relationship:');
-  console.log('  In one year, Earth rotates (tropical year + 1) times relative to stars,');
-  console.log('  but only (tropical year) times relative to the Sun. This provides an');
-  console.log('  independent verification of the sidereal/solar day relationship.');
-  console.log('');
-  console.log('Method C (Fixed-frame) - SIMULATION REFERENCE');
-  console.log('  Measures Sun\'s angular position in world XZ plane (ignoring Earth\'s tilt).');
-  console.log('  Always gives exactly 86400s because the simulation uses Julian Days where');
-  console.log('  1 JD = 86400s by definition. This is a tautology - it confirms the model');
-  console.log('  time step, not physical solar day length. Shows no daily variation since');
-  console.log('  it ignores the equatorial coordinate system that causes the equation of time.');
-  console.log('');
-  console.log('The ~11ms difference between A and C reflects the model\'s mean solar day');
-  console.log('constant (meanlengthofday = 86399.989s), which correctly accounts for the');
-  console.log('relationship between tropical year length and sidereal day length.');
+  console.log('A: Uses sun.ra (Right Ascension) from Earth\'s equatorial plane. Shows');
+  console.log('   equation of time variation (±20-25s daily) from eccentricity and tilt.');
+  console.log('B: Derives solar day from sidereal day: solarDay = siderealDay × (Y+1)/Y');
+  console.log('C: Measures Sun angle in world XZ plane. Always 86400s (confirms JD step).');
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -16329,11 +16752,11 @@ async function analyzeStellarDay(startYear) {
 
   // Reference values
   const siderealDayIAU = ASTRO_REFERENCE.siderealDayJ2000;
-  const stellarDayIAU = 86164.09890;  // Approximate IAU stellar day
+  const stellarDayIAU = ASTRO_REFERENCE.stellarDayJ2000;
 
   console.log('Reference values:');
   console.log(`  IAU Sidereal day:  ${siderealDayIAU} seconds`);
-  console.log(`  IAU Stellar day:   ~${stellarDayIAU} seconds (approx)`);
+  console.log(`  IAU Stellar day:   ${stellarDayIAU} seconds`);
   console.log(`  Expected diff:     ~${((stellarDayIAU - siderealDayIAU) * 1000).toFixed(3)} ms`);
   console.log('');
 
@@ -22639,6 +23062,39 @@ function calculateRAFromWobbleCenter(obj) {
 
   _wobbleRA_SPHERICAL.setFromVector3(_wobbleRA_DIRECTION);
   return _wobbleRA_SPHERICAL.theta;
+}
+
+// Reusable objects for calculateRAFromEarthPerihelion
+const _periRA_PLANET_POS = new THREE.Vector3();
+const _periRA_PERI_POS = new THREE.Vector3();
+const _periRA_DIRECTION = new THREE.Vector3();
+const _periRA_ROT_MATRIX = new THREE.Matrix4();
+const _periRA_SPHERICAL = new THREE.Spherical();
+
+/**
+ * Calculate RA from the earthPerihelionFromEarth point instead of Earth's position.
+ * This uses the perihelion point as the origin for RA calculation, which may
+ * provide different results compared to Earth-based or wobble-center-based RA.
+ *
+ * @param {Object} obj - Planet object with planetObj property
+ * @returns {number} - RA in radians from perihelion point perspective
+ */
+function calculateRAFromEarthPerihelion(obj) {
+  obj.planetObj.getWorldPosition(_periRA_PLANET_POS);
+  earthPerihelionFromEarth.planetObj.getWorldPosition(_periRA_PERI_POS);
+
+  // Direction from perihelion point to planet
+  _periRA_DIRECTION.copy(_periRA_PLANET_POS).sub(_periRA_PERI_POS);
+
+  // Extract just the rotation from earth.rotationAxis (ignore position)
+  _periRA_ROT_MATRIX.extractRotation(earth.rotationAxis.matrixWorld);
+  _periRA_ROT_MATRIX.invert();
+
+  // Apply rotation to get direction in Earth's equatorial frame
+  _periRA_DIRECTION.applyMatrix4(_periRA_ROT_MATRIX);
+
+  _periRA_SPHERICAL.setFromVector3(_periRA_DIRECTION);
+  return _periRA_SPHERICAL.theta;
 }
 
 function updatePositions() {

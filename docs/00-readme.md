@@ -66,6 +66,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix F - Inclination Verification](appendix-f-inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [Appendix G - Mercury Precession](appendix-g-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
 | [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |
+| [Appendix I - Tropical Year Formula Proposal](appendix-i-tropical-year-formula-proposal.md) | Tropical year and day length analysis: measurement methods, validation results, proposed formulas |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization

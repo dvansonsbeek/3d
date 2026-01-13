@@ -850,8 +850,8 @@ Update in script.js:
    - `analyzeAllAlignments(start, end)` - Comprehensive analysis of all intervals
 
 3. **Anomalistic Year Validation**
-   - Both perihelion (min distance) and aphelion (max distance) give consistent results: ~365.2585 days
-   - ~95 seconds shorter than IAU anomalistic year (365.259636 days)
+   - True Anomalistic Year (WobbleCenter→Sun): 365.259692495 days (+4.88 seconds from IAU)
+   - Earth-Frame measurements show ~122 second offset due to wobble parallax
    - ~23 minutes longer than tropical year (as expected)
    - Aphelion alignment check confirms geometry: `sunToEarth = periToSun + periToEarth` (diff ≈ 0)
 
@@ -1057,9 +1057,9 @@ These values are determined by the model's fundamental constants and do not chan
 | **Stellar day** | 86164.099675 seconds | `siderealDay × (1 + 1/(precessionPeriod × rotationsPerYear))` |
 | **Stellar - Sidereal difference** | +9.158 ms | Precession period (HY/13 = 25,683.7 years) |
 | **Mean solar day** (yearly average) | 86399.988589 seconds | `meansiderealyearlengthinSeconds / meansiderealyearlengthinDays` |
-| **Sidereal year** | 365.256358 days | Orbital period in inertial frame |
-| **Anomalistic year** | 365.259692 days | Perihelion-to-perihelion (HY/16 cycle) |
-| **Sidereal - Tropical difference** | ~1224.5 seconds | Precession period (HY/13) |
+| **Sidereal year** | 365.256359512 days | Orbital period in inertial frame (measured 1990-2010) |
+| **Anomalistic year** | 365.259692495 days | Perihelion-to-perihelion (HY/16 cycle) |
+| **Sidereal - Tropical difference** | 1224.39 seconds | Precession period (HY/13) |
 
 **Why these are constant:**
 - They measure pure rotations or orbital returns in inertial (ICRF) reference frames
@@ -1080,14 +1080,16 @@ These values vary over the perihelion precession cycle (HY/16 = 20,868 years):
 
 ### Cardinal Point Year Lengths: Current vs Shifted Perihelion
 
-**Current pattern (perihelion in early January, ~1246 AD):**
+**Current pattern (perihelion in early January, measured 1990-2010):**
 
-| Cardinal Point | Year Length | Relative to Mean | Reason |
-|----------------|-------------|------------------|--------|
-| Summer Solstice (SS) | 365.241919 days | SHORTEST (-23s) | Aphelion in middle → fast orbital speed |
-| Vernal Equinox (VE) | 365.242184 days | Medium (-0.5s) | Transition period |
-| Autumnal Equinox (AE) | 365.242184 days | Medium (-0.5s) | Transition period |
-| Winter Solstice (WS) | 365.242455 days | LONGEST (+23s) | Perihelion in middle → slow orbital speed |
+| Cardinal Point | Year Length | Diff from IAU | Relative to Mean | Reason |
+|----------------|-------------|---------------|------------------|--------|
+| Summer Solstice (SS) | 365.241925931 days | +25.91s | SHORTEST (-22.8s) | Aphelion in middle → fast orbital speed |
+| Autumnal Equinox (AE) | 365.242129149 days | +9.60s | Medium (-5.2s) | Transition period |
+| Vernal Equinox (VE) | 365.242249945 days | -10.72s | Medium (+5.2s) | Transition period |
+| Winter Solstice (WS) | 365.242448513 days | -25.18s | LONGEST (+22.4s) | Perihelion in middle → slow orbital speed |
+
+**Note:** The ~±26s deviation from IAU at solstices is expected because the model uses a circular orbit (constant angular velocity) while IAU uses elliptical orbit (Kepler's 2nd Law). The mean of all four cardinal points cancels this effect.
 
 **Pattern when perihelion shifts to July (~11,680 AD, half-cycle later):**
 
@@ -1307,6 +1309,24 @@ const meanSolarDay = meansiderealyearlengthinSeconds / meansiderealyearlengthinD
    - Results: Measured 86164.090517s vs Derived 86164.090532s vs IAU 86164.0905s
    - All three values agree within 0.02ms, confirming model accuracy
 
+### Validation Summary (1990-2010 Analysis)
+
+Comprehensive alignment analysis for years 1990-2010 confirms excellent model accuracy:
+
+| Metric | Measured | IAU Reference | Difference |
+|--------|----------|---------------|------------|
+| **Mean Tropical Year** | 365.242188384 days | 365.242189700 days | **-0.11 seconds** |
+| **Sidereal Year** | 365.256359512 days | 365.256363000 days | **-0.30 seconds** |
+| **Anomalistic Year** | 365.259692495 days | 365.259636000 days | **+4.88 seconds** |
+| **Sidereal - Tropical** | 1224.39 seconds | 1224.57 seconds | **-0.18 seconds** |
+
+**Key Findings:**
+- Mean tropical year accuracy: sub-second (0.11s)
+- Sidereal year accuracy: sub-second (0.30s)
+- All four cardinal points show correct pattern (SS shortest, WS longest)
+- Precession rate validated by sidereal-tropical difference
+- Four independent sidereal year measurement methods (A, B, C, D) all agree
+
 ### Next Steps
 
 1. **Collect sample data** at key years for formula fitting (Step 5)
@@ -1315,4 +1335,4 @@ const meanSolarDay = meansiderealyearlengthinSeconds / meansiderealyearlengthinD
 
 ---
 
-*Document updated: January 2026 - Added conclusions section (fixed vs varying quantities), proposed formulas for cardinal point years and equation of time date shift*
+*Document updated: January 2026 - Updated validation results from 1990-2010 comprehensive alignment analysis, updated cardinal point values, added sidereal year multi-method validation*
