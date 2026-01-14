@@ -23,8 +23,8 @@ const perihelionalignmentJD = 2176142;
 // Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const inputmeanlengthsolaryearindays = 365.2421897;
 // Reference length of solar year in days.
-const meansiderealyearlengthinSeconds = 31558149.6846777;
-// Reference length of sidereal year in seconds in 1246 AD according to EPOCH document = MEAN
+const meansiderealyearlengthinSeconds = 31558153.91;
+// Reference length of sidereal year in seconds = MEAN of sinusoidal variation (at phase 90°/270°, years ~6463/16897 AD)
 const startmodelJD = 2451716.5;
 // By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const startmodelYear = 2000.5;
@@ -41,18 +41,17 @@ const earthRAAngle = 1.258454;
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
 const earthtiltMean = 23.41398;                           // 3D model + formula (optimized for IAU 2006)
 const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate)
-const earthInvPlaneInclinationMean = 1.481592;          // 3D model + Formula
-const eccentricityMean = 0.015321;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.0014226;               // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricitySinusCorrection = 0.7;                  // Formula only
-const mideccentricitypointAmplitude = 2.461586;           // Formula only
-const helionpointAmplitude = 11.2153826318;               // Formula only
-const meansiderealyearAmplitudeinSeconds = 0.2960802;     // Formula only
-const meansolardayAmplitudeinSeconds = 0.270111704;       // Formula only 
-const meansolaryearAmplitudeinDays = 0.0003806795;        // Formula only
-const meansolaryearAmplitude = 2.575;                     // Formula only
+const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula
+const eccentricityMean = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.0014226;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricitySinusCorrection = 0.8;                  // Formula only
+const mideccentricitypointAmplitude = 2.4587;             // Formula only
+const helionpointAmplitude = 5.05;                        // Formula only
+const meansiderealyearAmplitudeinSeconds = -4.4;          // Formula only
+const meansolardayAmplitudeinSeconds = 0.0022;            // Formula only 
+const meansolaryearAmplitudeinDays = 0.000023;            // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
-const speedofSuninKM = 107225.047767317;                  // Formula only
+const speedofSuninKM = 107225.048229864;                  // Formula only
 const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
@@ -91,7 +90,7 @@ const mercuryLongitudePerihelion = 77.4569131;
 const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
-const mercuryAngleCorrection = 0.984416;                  // To align the perihelion exactly
+const mercuryAngleCorrection = 0.984366;                  // To align the perihelion exactly
 const mercuryPerihelionICRFYears = holisticyearLength/(1+(5/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
 const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
@@ -105,7 +104,7 @@ const venusLongitudePerihelion = 131.5765919;
 const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
 const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
-const venusAngleCorrection = -2.78268;                    // To align the perihelion exactly
+const venusAngleCorrection = -2.782986;                    // To align the perihelion exactly
 const venusPerihelionICRFYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~200 arcseconds per century
 const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
@@ -119,7 +118,7 @@ const marsLongitudePerihelion = 336.0650681;
 const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
 const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
-const marsAngleCorrection = -2.105382;                    // To align the perihelion exactly
+const marsAngleCorrection = -2.10564;                    // To align the perihelion exactly
 const marsPerihelionICRFYears = holisticyearLength/(4+(5/13)); // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
@@ -133,7 +132,7 @@ const jupiterLongitudePerihelion = 14.70659401;
 const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
 const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
-const jupiterAngleCorrection = 1.097882;                  // To align the perihelion exactly
+const jupiterAngleCorrection = 1.097601;                  // To align the perihelion exactly
 const jupiterPerihelionICRFYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~2000 arcseconds per century
 const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
@@ -147,7 +146,7 @@ const saturnLongitudePerihelion = 92.12794343;
 const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
 const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
-const saturnAngleCorrection = -0.175427;                  // To align the perihelion exactly
+const saturnAngleCorrection = -0.175436;                  // To align the perihelion exactly
 const saturnPerihelionICRFYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3500 arcseconds per century
 const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
@@ -161,7 +160,7 @@ const uranusLongitudePerihelion = 170.7308251;
 const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
 const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
-const uranusAngleCorrection = -0.773944;                  // To align the perihelion exactly
+const uranusAngleCorrection = -0.774123;                  // To align the perihelion exactly
 const uranusPerihelionICRFYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1200 arcseconds per century
 const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
@@ -175,7 +174,7 @@ const neptuneLongitudePerihelion = 45.80124471;
 const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
 const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
-const neptuneAngleCorrection = 2.401029;                  // To align the perihelion exactly
+const neptuneAngleCorrection = 2.400885;                  // To align the perihelion exactly
 const neptunePerihelionICRFYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneStartpos = 47.917;                           // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
@@ -193,7 +192,7 @@ const plutoLongitudePerihelion = 224.06891;      // JPL Horizons J2000 (was 224.
 const plutoAscendingNode = 110.30393;            // JPL Horizons J2000 (was 110.30347)
 const plutoMeanAnomaly = 15.55009;               // JPL Horizons J2000 (was 15.83341625)
 const plutoTrueAnomaly = 26.31965048;            // Calculated from M=15.55009°, e=0.2488273 (was 26.51719941)
-const plutoAngleCorrection = 2.469386;           // To align the perihelion exactly
+const plutoAngleCorrection = 2.469281;           // To align the perihelion exactly
 const plutoPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const plutoStartpos = 71.555;                    // Needs to be at ~16h44m12.72 if start model is 2451716.5
 
@@ -207,7 +206,7 @@ const halleysLongitudePerihelion = 111.33249;    // JPL Horizons J2000 (was 172.
 const halleysAscendingNode = 58.42008;           // JPL Horizons J2000 (was 59.5607834844014)
 const halleysMeanAnomaly = 38.77481;             // JPL Horizons J2000 (was 13, TODO placeholder)
 const halleysTrueAnomaly = 166.26774708;         // Calculated from M=38.77481°, e=0.96714291 (was 13 placeholder)
-const halleysAngleCorrection = -1.619784;        // To align the perihelion exactly
+const halleysAngleCorrection = -1.619816;        // To align the perihelion exactly
 const halleysPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const halleysStartpos = 80;                      // Needs to be at ~08h43m12.79 if start model is 2451716.5
 
@@ -221,7 +220,7 @@ const erosLongitudePerihelion = 178.81322;       // JPL Horizons J2000 (was 123.
 const erosAscendingNode = 304.30993;             // JPL Horizons J2000 (was 304.411578580454)
 const erosMeanAnomaly = 320.21552;               // JPL Horizons J2000 (was 153.67797646)
 const erosTrueAnomaly = 299.91713740;            // Calculated from M=320.21552°, e=0.2229512 (was 162.69081884)
-const erosAngleCorrection = 0.048021;            // To align the perihelion exactly
+const erosAngleCorrection = 0.047888;            // To align the perihelion exactly
 const erosPerihelionICRFYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
 const erosStartpos = 57.402;                     // Needs to be at ~20h38m24.47 if start model is 2451716.5
 
@@ -548,7 +547,7 @@ const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearleng
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
-const meanStellarday = ((meansiderealyearlengthinSeconds-(meansolaryearlengthinDays*meanlengthofday))/(1/eccentricityAmplitude/13*16))/(meansolaryearlengthinDays+1)+meanSiderealday;
+const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 
 //sDAY IS USED IN 3D MODEL CALCULATIONS 
@@ -567,7 +566,7 @@ const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkyw
 // Moon calculations
 const moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-0);
 // You can tweak the last number +/-1 (See Moon characteristics)
-const moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonAnomalisticMonthInput)-1);
+const moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonAnomalisticMonthInput)-0);
 // You can tweak the last number +/-1 (See Moon characteristics)
 const moonNodalMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonNodalMonthInput)-0);
 // You can tweak the last number +/-1 (See Moon characteristics)
@@ -10466,16 +10465,16 @@ function setupGUI() {
       //orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
     orbitalFolder.open(); 
   
-      let ephemerisFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
+  //    let ephemerisFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
   //      ephemerisFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
   //      ephemerisFolder.add(predictions, 'predictedDeltatPerYear').name('ΔT change (sec/year)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofsolarDay').name('86400 sec/day - Length of Solar Day (sec)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofstellarDay').name('86400 sec/day - Length of Stellar Day (sec)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofsolarYearinDays').name('86400 sec/day - Length of Solar Year (days)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
-      ephemerisFolder.add(predictions, 'lengthofanomalisticYearinDays').name('86400 sec/day - Length of Anomalistic Year (days)').step(0.000001).listen();
-    ephemerisFolder.open();
+  //    ephemerisFolder.add(predictions, 'lengthofsolarDay').name('86400 sec/day - Length of Solar Day (sec)').step(0.000001).listen();
+  //    ephemerisFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
+  //    ephemerisFolder.add(predictions, 'lengthofstellarDay').name('86400 sec/day - Length of Stellar Day (sec)').step(0.000001).listen();
+  //    ephemerisFolder.add(predictions, 'lengthofsolarYearinDays').name('86400 sec/day - Length of Solar Year (days)').step(0.000001).listen();
+  //    ephemerisFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
+  //    ephemerisFolder.add(predictions, 'lengthofanomalisticYearinDays').name('86400 sec/day - Length of Anomalistic Year (days)').step(0.000001).listen();
+  //  ephemerisFolder.open();
   
   astroFolder.close();
   
@@ -13437,7 +13436,7 @@ async function investigateParameterEffects() {
   console.log('DRIFT ANALYSIS:');
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('');
-  const modelYearLength = inputmeanlengthsolaryearindays;
+  const modelYearLength = meansolaryearlengthinDays;
   const juneSolsticeTropicalYear = ASTRO_REFERENCE.tropicalYearSSJ2000;
   const yearLengthDiff = (modelYearLength - juneSolsticeTropicalYear) * 86400; // seconds
   const drift20yr = baseline.drift;
@@ -15312,7 +15311,7 @@ function diagnoseRARate() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   // Expected mean RA rate
-  const expectedMeanRARate = 360 / inputmeanlengthsolaryearindays;  // ~0.9856°/day
+  const expectedMeanRARate = 360 / meansolaryearlengthinDays;  // ~0.9856°/day
   console.log(`Expected mean RA rate: ${expectedMeanRARate.toFixed(6)}°/day`);
   console.log(`Expected mean solar day: ${meanlengthofday.toFixed(6)} seconds`);
   console.log('');
@@ -15504,7 +15503,7 @@ function diagnoseRARate() {
   // After 365 mean solar days (using the MODEL's mean solar day length)
   const testDays = 365;
   const expectedHAChange = testDays * 2 * Math.PI;  // 365 × 360° in radians
-  // NOTE: meanlengthofday is the MODEL's expected mean solar day (~86399.989s)
+  // NOTE: meanlengthofday is the MODEL's expected mean solar day (~86400s at mean phase)
   // One JD = 86400 seconds exactly
   const testEndJD = haTestStart + testDays * (meanlengthofday / 86400);
 
@@ -15970,6 +15969,96 @@ function solarNoonForJDMethodB(startJD, debug = false) {
 }
 
 /**
+ * Solar noon detection using sun.ra directly from Earth's actual position (Method D)
+ * This measures from Earth's real position, INCLUDING the wobble parallax effect.
+ * Unlike Method A (which uses wobble center), this captures the full Earth-frame experience.
+ *
+ * @param {number} startJD - Julian day to start from
+ * @param {boolean} debug - Enable debug output
+ * @param {object|null} cumulativeState - State from previous call for tracking RA wrap-around
+ * @returns {object} - { jd, cumulativeState } at solar noon
+ */
+function solarNoonForJDMethodD(startJD, debug = false, cumulativeState = null) {
+  // Initialize or use provided cumulative state
+  let cumulativeSunRA = cumulativeState ? cumulativeState.cumulativeSunRA : 0;
+  let lastSunRA = cumulativeState ? cumulativeState.lastSunRA : null;
+
+  // Helper to get cumulative hour angle using sun.ra directly (Earth's actual position)
+  // This INCLUDES the wobble parallax effect, unlike Method A which uses wobble center
+  const getCumulativeHA = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+
+    // Get sun.ra directly - this is calculated from Earth's actual position
+    const sunRA = sun.ra;
+
+    // Track cumulative sun RA
+    if (lastSunRA !== null) {
+      let deltaRA = sunRA - lastSunRA;
+      // Handle wrap-around: if delta is large negative, RA wrapped from ~2π to ~0
+      if (deltaRA < -Math.PI) deltaRA += 2 * Math.PI;
+      // If delta is large positive, RA wrapped from ~0 to ~2π (shouldn't happen going forward)
+      if (deltaRA > Math.PI) deltaRA -= 2 * Math.PI;
+      cumulativeSunRA += deltaRA;
+    }
+    lastSunRA = sunRA;
+
+    return earth.planetObj.rotation.y - cumulativeSunRA;
+  };
+
+  // Save state at start for binary search resets
+  const savedCumulativeRA = cumulativeSunRA;
+  const savedLastRA = lastSunRA;
+
+  // Get starting hour angle
+  const startHA = getCumulativeHA(startJD);
+  const targetHA = startHA + 2 * Math.PI;  // Target: start + 360°
+
+  // Binary search for the crossing point
+  let lo = startJD + 0.99;  // Slightly less than 1 day
+  let hi = startJD + 1.01;  // Slightly more than 1 day
+
+  for (let iter = 0; iter < 40; iter++) {  // 40 iterations = sub-microsecond precision
+    const mid = (lo + hi) / 2;
+
+    // Reset cumulative tracking for each probe
+    cumulativeSunRA = savedCumulativeRA;
+    lastSunRA = savedLastRA;
+    getCumulativeHA(startJD);  // Re-establish baseline
+
+    const midHA = getCumulativeHA(mid);
+
+    if (midHA < targetHA) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+
+  const refinedJD = (lo + hi) / 2;
+
+  // Update cumulative state for the final position
+  cumulativeSunRA = savedCumulativeRA;
+  lastSunRA = savedLastRA;
+  getCumulativeHA(startJD);
+  getCumulativeHA(refinedJD);
+
+  if (debug) {
+    const finalHA = getCumulativeHA(refinedJD);
+    console.log(`solarNoonForJDMethodD: start=${startJD.toFixed(6)}, refined=${refinedJD.toFixed(6)}`);
+    console.log(`  Interval: ${((refinedJD - startJD) * 86400).toFixed(3)} seconds`);
+  }
+
+  return {
+    jd: refinedJD,
+    cumulativeState: {
+      cumulativeSunRA,
+      lastSunRA
+    }
+  };
+}
+
+/**
  * Analyze sidereal day length over a period
  * Measures the interval between successive sidereal noons (Earth completing one 360° rotation)
  *
@@ -16107,9 +16196,10 @@ async function analyzeSolarDay(startYear, endYear) {
 
   // Measure solar days over one tropical year
   const numDays = Math.floor(meansolaryearlengthinDays);  // ~365 solar days per year
-  const solarIntervals = [];      // Method A: Earth-frame (sun.ra)
+  const solarIntervals = [];      // Method A: Wobble-center RA (calculateRAFromWobbleCenter)
   const solarIntervalsB = [];     // Method C: Fixed-frame (sun world angle from origin)
   const siderealIntervals = [];   // For Method B derivation
+  const solarIntervalsD = [];     // Method D: Earth-frame RA (sun.ra directly) with cumulative tracking
 
   // First, find the first solar noon AFTER the solstice to establish a baseline
   // This ensures we start from an actual solar noon, not an arbitrary time
@@ -16157,11 +16247,13 @@ async function analyzeSolarDay(startYear, endYear) {
 
   let prevSolarJD = firstSolarNoon;
   let prevSolarJD_B = firstSolarNoon;  // Method C uses same starting point
+  let prevSolarJD_D = firstSolarNoon;  // Method D uses same starting point
   let prevSiderealJD = startSolstice.jd;
-  let cumulativeState = null;  // Track cumulative RA state across calls
+  let cumulativeState = null;  // Track cumulative RA state across calls (Method A)
+  let cumulativeStateD = null; // Track cumulative RA state for Method D
 
   for (let i = 0; i < numDays; i++) {
-    // Method A: Direct solar noon detection (Earth-frame using sun.ra with cumulative tracking)
+    // Method A: Wobble-center RA (calculateRAFromWobbleCenter) - eliminates wobble parallax
     const solarResult = solarNoonForJD(prevSolarJD, false, cumulativeState);
     if (solarResult) {
       const interval = (solarResult.jd - prevSolarJD) * 86400;  // Convert to seconds
@@ -16176,6 +16268,15 @@ async function analyzeSolarDay(startYear, endYear) {
       const interval = (solarResultB.jd - prevSolarJD_B) * 86400;
       solarIntervalsB.push(interval);
       prevSolarJD_B = solarResultB.jd;
+    }
+
+    // Method D: Earth-frame RA (sun.ra directly) - includes wobble parallax
+    const solarResultD = solarNoonForJDMethodD(prevSolarJD_D, false, cumulativeStateD);
+    if (solarResultD) {
+      const interval = (solarResultD.jd - prevSolarJD_D) * 86400;
+      solarIntervalsD.push(interval);
+      prevSolarJD_D = solarResultD.jd;
+      cumulativeStateD = solarResultD.cumulativeState;
     }
 
     // Also measure sidereal day for Method B derivation
@@ -16193,7 +16294,7 @@ async function analyzeSolarDay(startYear, endYear) {
     }
   }
 
-  // Calculate statistics for Method A (direct Earth-frame)
+  // Calculate statistics for Method A (wobble-center RA)
   const meanSolar = solarIntervals.reduce((a, b) => a + b, 0) / solarIntervals.length;
   const minSolar = Math.min(...solarIntervals);
   const maxSolar = Math.max(...solarIntervals);
@@ -16202,6 +16303,11 @@ async function analyzeSolarDay(startYear, endYear) {
   const meanSolarB = solarIntervalsB.reduce((a, b) => a + b, 0) / solarIntervalsB.length;
   const minSolarB = Math.min(...solarIntervalsB);
   const maxSolarB = Math.max(...solarIntervalsB);
+
+  // Calculate statistics for Method D (Earth-frame sun.ra)
+  const meanSolarD = solarIntervalsD.reduce((a, b) => a + b, 0) / solarIntervalsD.length;
+  const minSolarD = Math.min(...solarIntervalsD);
+  const maxSolarD = Math.max(...solarIntervalsD);
 
   // Calculate Method B (derived from sidereal)
   const meanSidereal = siderealIntervals.reduce((a, b) => a + b, 0) / siderealIntervals.length;
@@ -16311,6 +16417,19 @@ async function analyzeSolarDay(startYear, endYear) {
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('METHOD D: EARTH-POSITION RA (sun.ra directly)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('Measures sun.ra from Earth\'s ACTUAL position (includes wobble parallax).');
+  console.log('This is the "true" Earth observer experience, unlike Method A (wobble center).');
+  console.log('');
+  console.log(`  Measurements:    ${solarIntervalsD.length} solar days`);
+  console.log(`  Mean:            ${meanSolarD.toFixed(6)} seconds`);
+  console.log(`  Min:             ${minSolarD.toFixed(6)} seconds`);
+  console.log(`  Max:             ${maxSolarD.toFixed(6)} seconds`);
+  console.log(`  Range:           ${(maxSolarD - minSolarD).toFixed(6)} seconds`);
+
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('RESULTS SUMMARY');
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('');
@@ -16321,26 +16440,26 @@ async function analyzeSolarDay(startYear, endYear) {
   const diffAModel = (meanSolar - expectedSolarDay) * 1000;
   const diffBModel = (derivedSolar - expectedSolarDay) * 1000;
   const diffCModel = (meanSolarB - expectedSolarDay) * 1000;
+  const diffDModel = (meanSolarD - expectedSolarDay) * 1000;
 
-  console.log(`║ A: Earth-frame (physical)      │ ${meanSolar.toFixed(6).padStart(16)}     │ ${(diffAModel >= 0 ? '+' : '') + diffAModel.toFixed(3).padStart(10)} ms   ║`);
+  console.log(`║ A: Wobble-center RA            │ ${meanSolar.toFixed(6).padStart(16)}     │ ${(diffAModel >= 0 ? '+' : '') + diffAModel.toFixed(3).padStart(10)} ms   ║`);
   console.log(`║ B: Derived from sidereal       │ ${derivedSolar.toFixed(6).padStart(16)}     │ ${(diffBModel >= 0 ? '+' : '') + diffBModel.toFixed(3).padStart(10)} ms   ║`);
   console.log(`║ C: Fixed-frame (reference)     │ ${meanSolarB.toFixed(6).padStart(16)}     │ ${(diffCModel >= 0 ? '+' : '') + diffCModel.toFixed(3).padStart(10)} ms   ║`);
+  console.log(`║ D: Earth-pos RA (cumulative)   │ ${meanSolarD.toFixed(6).padStart(16)}     │ ${(diffDModel >= 0 ? '+' : '') + diffDModel.toFixed(3).padStart(10)} ms   ║`);
   console.log('╠════════════════════════════════╪══════════════════════╪════════════════════╣');
   console.log(`║ Model expected                 │ ${expectedSolarDay.toFixed(6).padStart(16)}     │         —          ║`);
   console.log(`║ IAU reference (at epoch)       │ ${(86400).toFixed(6).padStart(16)}     │ ${((86400 - expectedSolarDay) * 1000 >= 0 ? '+' : '') + ((86400 - expectedSolarDay) * 1000).toFixed(3).padStart(10)} ms   ║`);
   console.log('╚════════════════════════════════╧══════════════════════╧════════════════════╝');
   console.log('');
-  console.log('Over a full perihelion cycle (20,868 years), Method A is the physically correct');
-  console.log('measurement. The ~11ms offset from 86400s reflects that at 1246 AD (perihelion');
-  console.log('alignment), the mean solar day was 86399.9886s per the model configuration.');
+  console.log('Method A vs D difference: ' + ((meanSolarD - meanSolar) * 1000).toFixed(3) + ' ms');
   console.log('');
   console.log('───────────────────────────────────────────────────────────────────────────');
   console.log('METHOD DESCRIPTIONS:');
   console.log('───────────────────────────────────────────────────────────────────────────');
-  console.log('A: Uses sun.ra (Right Ascension) from Earth\'s equatorial plane. Shows');
-  console.log('   equation of time variation (±20-25s daily) from eccentricity and tilt.');
+  console.log('A: Uses RA from wobble center (calculateRAFromWobbleCenter). Eliminates wobble parallax.');
   console.log('B: Derives solar day from sidereal day: solarDay = siderealDay × (Y+1)/Y');
   console.log('C: Measures Sun angle in world XZ plane. Always 86400s (confirms JD step).');
+  console.log('D: Uses sun.ra with cumulative tracking from Earth\'s position.');
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -16364,8 +16483,15 @@ async function analyzeSolarDay(startYear, endYear) {
       min: minSolarB,
       max: maxSolarB
     },
+    methodD: {
+      count: solarIntervalsD.length,
+      mean: meanSolarD,
+      min: minSolarD,
+      max: maxSolarD
+    },
     differenceAB: meanSolar - derivedSolar,
     differenceAC: meanSolar - meanSolarB,
+    differenceAD: meanSolar - meanSolarD,
     differenceCB: meanSolarB - derivedSolar
   };
 }
@@ -18029,7 +18155,6 @@ function resetDeltaTForJump() {
         balancedYear,
         perihelionCycleLength,
         o.perihelionprecessioncycleYear,
-        helionpointAmplitude,
         meansolardayAmplitudeinSeconds,
         meanlengthofday
       );
@@ -18063,7 +18188,6 @@ function resetDeltaTForJump() {
         balancedYear,
         perihelionCycleLength,
         o.perihelionprecessioncycleYear,
-        helionpointAmplitude,
         meansolardayAmplitudeinSeconds,
         meanlengthofday
       );
@@ -25375,7 +25499,7 @@ function updatePredictions() {
     }
   }
   
-  predictions.lengthofDay = o.lengthofDay = computeLengthofDay(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, helionpointAmplitude, meansolardayAmplitudeinSeconds, meanlengthofday);
+  predictions.lengthofDay = o.lengthofDay = computeLengthofDay(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolardayAmplitudeinSeconds, meanlengthofday);
   
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansolaryearAmplitudeinDays, meansolaryearlengthinDays);
   predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear, balancedYear, perihelionCycleLength, o.perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds);
@@ -25385,11 +25509,11 @@ function updatePredictions() {
   predictions.computeAxialPrecessionRealLOD = o.axialPrecessionRealLOD = computeAxialPrecessionRealLOD(o.lengthofsiderealYear, o.lengthofsolarYear, o.lengthofDay);
   predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.axialPrecessionRealLOD*13/16;
 
-  predictions.lengthofsolarYearinDays = o.lengthofsolarYearinDays = o.lengthofsolarYearSecRealLOD/86400;
+  predictions.lengthofsolarYearinDays = o.lengthofsolarYearinDays = o.lengthofsolarYearSecRealLOD/o.lengthofDay;
   predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYearinDays+1);
   predictions.lengthofstellarDay = o.lengthofstellarDay = (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDay;
   
-  predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/86400; 
+  predictions.lengthofsiderealYearDays = o.lengthofsiderealYear/o.lengthofDay; 
   
   predictions.perihelionPrecession = o.perihelionPrecession = o.axialPrecession*13/16;
   predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYear, o.lengthofsolarYear);
@@ -25397,8 +25521,8 @@ function updatePredictions() {
   predictions.obliquityPrecession = o.obliquityPrecession = o.axialPrecession*13/8;
   predictions.eclipticPrecession = o.eclipticPrecession = o.axialPrecession*13/5;
   
-  predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYear+1);
-  predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (((o.lengthofsiderealYear-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDayRealLOD;
+  predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = (o.lengthofsolarYear*86400)/(o.lengthofsolarYear+1);
+  predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (o.lengthofsiderealDay/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+o.lengthofsiderealDay;
   
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -25406,7 +25530,7 @@ function updatePredictions() {
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear/o.lengthofDay;
   predictions.lengthofanomalisticYearRealLOD = o.lengthofanomalisticYearRealLOD = computeLengthofanomalisticYearRealLOD(o.perihelionPrecessionRealLOD, o.lengthofsolarYear, o.lengthofDay);
 
-  predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearRealLOD/86400;
+  predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearRealLOD/o.lengthofDay;
   predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearRealLOD/o.lengthofDay;
 
   predictions.inclinationPrecessionRealLOD = o.inclinationPrecessionRealLOD = o.axialPrecessionRealLOD*13/3;
@@ -25422,7 +25546,6 @@ function updatePredictions() {
   predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
   
   predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYear/60/60 * speedofSuninKM) / (2 * Math.PI);
-  //predictions.anomalisticMercury = o.anomalisticMercury = computeAnomalisticMercury(o.currentYear);
 
 }
 
@@ -25433,7 +25556,6 @@ function updatePredictions() {
  * @param {number} balancedYear                     – the reference (“balanced”) year
  * @param {number} perihelionCycleLength            – length of the perihelion cycle (in years)
  * @param {number} perihelionprecessioncycleYear    – the precession cycle year threshold
- * @param {number} helionpointAmplitude             – amplitude of the perihelion‐point variation (in degrees)
  * @param {number} meansolardayAmplitudeinSeconds   – amplitude of the mean solar‐day variation (in seconds)
  * @param {number} meanlengthofday                  – the base mean length of day (in seconds)
  * @returns {number} lengthofDay (in seconds)
@@ -25443,7 +25565,6 @@ function computeLengthofDay(
   balancedYear,
   perihelionCycleLength,
   perihelionprecessioncycleYear,
-  helionpointAmplitude,
   meansolardayAmplitudeinSeconds,
   meanlengthofday
   ) {
@@ -25455,21 +25576,18 @@ function computeLengthofDay(
     ? delta
     : perihelionprecessioncycleYear;
 
-  // factor: helionpointAmplitude / ((360/perihelionCycleLength) * 100)
-  //const firstFactor = helionpointAmplitude / ((360 / perihelionCycleLength) * 100);
-
   // angle for the first COS term (in radians):
   // (cycleValue / perihelionCycleLength) * 360°
-  const angle1 = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
-  const term1 = -meansolardayAmplitudeinSeconds * meansolaryearAmplitude * Math.cos(angle1);
+  //const angle1 = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
+  //const term1 = -meansolardayAmplitudeinSeconds * meansolaryearAmplitude * Math.sin(angle1);
 
-  // angle for the second COS term (in radians):
+  // angle for the SIN term (in radians):
   // (cycleValue / (perihelionCycleLength/2)) * 360°
-  const angle2 = (cycleValue / (perihelionCycleLength / 2)) * 360 * Math.PI / 180;
+  const angle2 = (cycleValue / (perihelionCycleLength )) * 360 * Math.PI / 180;
   const term2 = -meansolardayAmplitudeinSeconds * Math.cos(angle2);
 
   // sum both terms + base mean length of day
-  return term1 + term2 + meanlengthofday;
+  return term2 + meanlengthofday;
 }
 
 /**
@@ -25538,7 +25656,7 @@ function computeLengthofsiderealYear(
   const angle = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
 
   // formula: − amplitude × sin(angle) + base length
-  return -meansiderealyearAmplitudeinSeconds * Math.sin(angle)
+  return -meansiderealyearAmplitudeinSeconds * Math.cos(angle)
          + meansiderealyearlengthinSeconds;
 }
 
