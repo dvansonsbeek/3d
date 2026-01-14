@@ -22,8 +22,8 @@ const perihelionalignmentYear = 1246;
 const perihelionalignmentJD = 2176142;
 // Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const inputmeanlengthsolaryearindays = 365.2421897;
-// Reference length of solar year in days.
-const meansiderealyearlengthinSeconds = 31558153.91;
+// Reference length of solar year in days. THIS IS USED AS INPUT. The actual mean lenght is calculated based upon this input and the lenght of the holistic year
+const meansiderealyearlengthinSeconds = 31558153.82478;
 // Reference length of sidereal year in seconds = MEAN of sinusoidal variation (at phase 90°/270°, years ~6463/16897 AD)
 const startmodelJD = 2451716.5;
 // By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
@@ -47,11 +47,11 @@ const eccentricityAmplitude = 0.0014226;                  // 3D model + formula 
 const eccentricitySinusCorrection = 0.8;                  // Formula only
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
-const meansiderealyearAmplitudeinSeconds = -4.4;          // Formula only
-const meansolardayAmplitudeinSeconds = 0.0022;            // Formula only 
+const meansiderealyearAmplitudeinSeconds = -4.418496;     // Formula only
+const meansolardayAmplitudeinSeconds = 0.00219;           // Formula only 
 const meansolaryearAmplitudeinDays = 0.000023;            // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
-const speedofSuninKM = 107225.048229864;                  // Formula only
+const speedofSuninKM = 107225.048580526;                  // Formula only
 const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
@@ -4149,6 +4149,14 @@ let o = {
   solRangeEnd    : 2025,
   runSolToggle   : false,
   _solBusy       : false,
+
+  // Year Analysis Report settings
+  yearAnalysisMode       : 'Range',          // 'Range' | 'List'
+  yearAnalysisYearsText  : '2000, 2005, etc.',
+  yearAnalysisRangeStart : 2000,
+  yearAnalysisRangeEnd   : 2025,
+  runYearAnalysisToggle  : false,
+  _yearAnalysisBusy      : false,
 
   // Obliquity Calibration Test state
   runCalibrationTest    : false,
@@ -10824,6 +10832,47 @@ function setupGUI() {
   }
   });
 
+  /* --- Year Analysis Report ------------------------------------------------- */
+  const yearAnalysisFolder = sFolder.addFolder('Create Year Analysis Report');
+
+  const modeCtrl3  = yearAnalysisFolder.add(o, 'yearAnalysisMode', ['Range', 'List']).name('Mode');
+  const yearList3  = yearAnalysisFolder.add(o, 'yearAnalysisYearsText').name('Year list (CSV)');
+  const startCtrl3 = yearAnalysisFolder.add(o, 'yearAnalysisRangeStart').name('Start year').step(1);
+  const endCtrl3   = yearAnalysisFolder.add(o, 'yearAnalysisRangeEnd').name('End year').step(1);
+
+  const runCtrl3 = yearAnalysisFolder
+    .add(o, 'runYearAnalysisToggle')
+    .name('Create file (be patient)')
+    .listen();
+
+  /* --- show only the relevant rows ------------------------------------------ */
+  function syncYearAnalysisVis() {
+    const list = o.yearAnalysisMode === 'List';
+    toggleCtrl(yearList3,  list);      // show list box only in List mode
+    toggleCtrl(startCtrl3, !list);     // show range fields only in Range mode
+    toggleCtrl(endCtrl3,   !list);
+  }
+  syncYearAnalysisVis();
+  modeCtrl3.onChange(syncYearAnalysisVis);
+
+  /* --- run button ----------------------------------------------------------- */
+  runCtrl3.onChange(async ticked => {
+    if (!ticked || o._yearAnalysisBusy) return;   // ignore untick or double-click
+    o._yearAnalysisBusy = true;
+    try {
+      const yrs = buildYearAnalysisArray();       // builds array from List or Range
+      if (!yrs.length) {
+        alert('No valid years — check your input.');
+        return;
+      }
+      await runYearAnalysisExport(yrs);           // heavy work
+    } finally {
+      o.runYearAnalysisToggle = false;            // untick when finished
+      runCtrl3.updateDisplay();
+      o._yearAnalysisBusy = false;
+    }
+  });
+
   /* --- Console Tests (F12) ------------------------------------------------- */
   const calibFolder = sFolder.addFolder('Console Tests (F12)');
 
@@ -12329,6 +12378,464 @@ async function runSolsticeExport(years) {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   YEAR ANALYSIS REPORT EXPORT
+   Creates an Excel file with comprehensive alignment analysis data
+   (same data as "Analyze All Alignments" console test but in Excel format)
+
+   TRUE SINGLE-PASS IMPLEMENTATION: All data is collected in one loop through
+   the year range for optimal performance and clear progress indication.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+async function runYearAnalysisExport(years) {
+  if (!years || years.length < 1) {
+    alert('Need at least 1 year to generate report.');
+    return;
+  }
+
+  // Sort and dedupe the requested years
+  const requestedYears = [...new Set(years)].sort((a, b) => a - b);
+
+  // For intervals, we need year-1 for each requested year
+  // Build a set of all years we need to collect
+  const yearsToCollect = new Set();
+  for (const y of requestedYears) {
+    yearsToCollect.add(y - 1);  // Previous year for interval calculation
+    yearsToCollect.add(y);      // The requested year itself
+  }
+  const sortedCollectYears = [...yearsToCollect].sort((a, b) => a - b);
+
+  const startYear = Math.min(...requestedYears);
+  const endYear = Math.max(...requestedYears);
+
+  console.log('Year Analysis Report for years:', requestedYears.join(', '));
+
+  /* A · freeze viewer */
+  const oldRun = o.Run;
+  const oldJD = o.julianDay;
+  o.Run = false;
+
+  const YIELD_EVERY = 5;
+
+  /* B · Data structures for all measurements */
+  const cardinalData = {
+    VE: { ra: 0, name: 'Vernal Equinox', iauRef: ASTRO_REFERENCE.tropicalYearVEJ2000, events: [] },
+    SS: { ra: 90, name: 'Summer Solstice', iauRef: ASTRO_REFERENCE.tropicalYearSSJ2000, events: [] },
+    AE: { ra: 180, name: 'Autumnal Equinox', iauRef: ASTRO_REFERENCE.tropicalYearAEJ2000, events: [] },
+    WS: { ra: 270, name: 'Winter Solstice', iauRef: ASTRO_REFERENCE.tropicalYearWSJ2000, events: [] }
+  };
+
+  const perihelions = [];
+  const aphelions = [];
+  const siderealCrossings = [];
+  const yearlyOrbitalParams = []; // Store obliquity/eccentricity per year
+
+  // State trackers for each measurement type (maintained across years)
+  let prevJD_VE = null, prevJD_SS = null, prevJD_AE = null, prevJD_WS = null;
+  let prevPeriJD = null;
+  let prevAphelionJD = null;
+  let firstSiderealJD = null;
+  let targetSiderealAngle = null;
+
+  // Helper for sidereal angle calculation
+  const getSunWorldAngle = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    const sunPos = new THREE.Vector3();
+    sun.planetObj.getWorldPosition(sunPos);
+    let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
+
+  /* C · SINGLE PASS: Collect ALL data for each year we need */
+  // sortedCollectYears includes requested years + their year-1 for interval calculation
+  const totalToCollect = sortedCollectYears.length;
+  console.log(`Collecting all measurements for ${totalToCollect} years...`);
+
+  // Track previous year for each measurement type to determine if years are consecutive
+  let prevYear_VE = null, prevYear_SS = null, prevYear_AE = null, prevYear_WS = null;
+  let prevYear_Peri = null, prevYear_Aph = null, prevYear_Sid = null;
+
+  for (let idx = 0; idx < sortedCollectYears.length; idx++) {
+    const year = sortedCollectYears[idx];
+    const progress = ((idx + 1) / totalToCollect * 100).toFixed(0);
+    if (idx % YIELD_EVERY === 0) {
+      console.log(`Processing year ${year} (${progress}%)`);
+      await new Promise(r => setTimeout(r, 10));
+    }
+
+    // 1. Collect all 4 cardinal points for this year
+    // Only use prevJD if years are consecutive (for consistent results between Range and List mode)
+    const useVEPrev = (prevYear_VE !== null && year - prevYear_VE === 1) ? prevJD_VE : null;
+    const veResult = sunRACrossingForYear(year, 0, useVEPrev);
+    if (veResult) {
+      cardinalData.VE.events.push({ year, jd: veResult.jd });
+      prevJD_VE = veResult.jd;
+      prevYear_VE = year;
+    }
+
+    const useSSPrev = (prevYear_SS !== null && year - prevYear_SS === 1) ? prevJD_SS : null;
+    const ssResult = sunRACrossingForYear(year, 90, useSSPrev);
+    if (ssResult) {
+      cardinalData.SS.events.push({ year, jd: ssResult.jd });
+      prevJD_SS = ssResult.jd;
+      prevYear_SS = year;
+    }
+
+    const useAEPrev = (prevYear_AE !== null && year - prevYear_AE === 1) ? prevJD_AE : null;
+    const aeResult = sunRACrossingForYear(year, 180, useAEPrev);
+    if (aeResult) {
+      cardinalData.AE.events.push({ year, jd: aeResult.jd });
+      prevJD_AE = aeResult.jd;
+      prevYear_AE = year;
+    }
+
+    const useWSPrev = (prevYear_WS !== null && year - prevYear_WS === 1) ? prevJD_WS : null;
+    const wsResult = sunRACrossingForYear(year, 270, useWSPrev);
+    if (wsResult) {
+      cardinalData.WS.events.push({ year, jd: wsResult.jd });
+      prevJD_WS = wsResult.jd;
+      prevYear_WS = year;
+    }
+
+    // 2. Collect perihelion for this year
+    const usePeriPrev = (prevYear_Peri !== null && year - prevYear_Peri === 1) ? prevPeriJD : null;
+    const periResult = perihelionForYearMethodB(year, false, usePeriPrev);
+    if (periResult) {
+      perihelions.push({ year, jd: periResult.jd, distance: periResult.distance });
+      prevPeriJD = periResult.jd;
+      prevYear_Peri = year;
+    }
+
+    // 3. Collect aphelion for this year
+    const useAphPrev = (prevYear_Aph !== null && year - prevYear_Aph === 1) ? prevAphelionJD : null;
+    const aphResult = aphelionForYearMethodB(year, false, useAphPrev);
+    if (aphResult) {
+      aphelions.push({ year, jd: aphResult.jd, distance: aphResult.distance });
+      prevAphelionJD = aphResult.jd;
+      prevYear_Aph = year;
+    }
+
+    // 4. Collect sidereal crossing for this year
+    // Only use previous crossing optimization if years are consecutive (for consistent results)
+    let approxJD, searchRange;
+    const useSiderealPrev = (prevYear_Sid !== null && year - prevYear_Sid === 1);
+    if (firstSiderealJD !== null && useSiderealPrev) {
+      const prevCrossing = siderealCrossings[siderealCrossings.length - 1];
+      approxJD = prevCrossing.jd + 365.256;
+      searchRange = 288;
+    } else {
+      // For non-consecutive years or first crossing, use absolute calculation
+      const yearFraction = 0.47;
+      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+      searchRange = 960;
+    }
+
+    const step = 0.5 / 24;
+    const samples = [];
+    for (let k = -searchRange; k <= searchRange; ++k) {
+      const jd = approxJD + k * step;
+      const angle = getSunWorldAngle(jd);
+      samples.push({ k, jd, angle });
+    }
+
+    let crossingJD = null;
+    if (firstSiderealJD === null) {
+      const target = 90;
+      for (let i = 1; i < samples.length; i++) {
+        jumpToJulianDay(samples[i - 1].jd);
+        forceSceneUpdate();
+        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
+        jumpToJulianDay(samples[i].jd);
+        forceSceneUpdate();
+        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
+        if (ra1 < target && ra2 >= target) {
+          const t = (target - ra1) / (ra2 - ra1);
+          crossingJD = samples[i - 1].jd + t * step;
+          firstSiderealJD = crossingJD;
+          targetSiderealAngle = getSunWorldAngle(crossingJD);
+          break;
+        }
+      }
+    } else {
+      for (let i = 1; i < samples.length; i++) {
+        let a1 = samples[i - 1].angle;
+        let a2 = samples[i].angle;
+        if (Math.abs(a2 - a1) > 180) {
+          if (a2 > a1) a1 += 360;
+          else a2 += 360;
+        }
+        let adjustedTarget = targetSiderealAngle;
+        if (a1 > 360 || a2 > 360) {
+          if (targetSiderealAngle < 180) adjustedTarget = targetSiderealAngle + 360;
+        }
+        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
+        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
+        if (crossingUp || crossingDown) {
+          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
+          crossingJD = samples[i - 1].jd + t * step;
+          break;
+        }
+      }
+    }
+    if (crossingJD) {
+      siderealCrossings.push({ year, jd: crossingJD });
+      prevYear_Sid = year;
+    }
+
+    // 5. Collect orbital parameters (obliquity, eccentricity) at mid-year
+    jumpToJulianDay(startmodelJD + (year + 0.5 - startmodelYear) * meansolaryearlengthinDays);
+    forceSceneUpdate();
+    yearlyOrbitalParams.push({
+      year,
+      obliquity: o.obliquityEarth || 0,
+      eccentricity: o.eccentricityEarth || 0
+    });
+  }
+
+  console.log('Data collection complete.');
+
+  /* D · Calculate intervals - keyed by year for correct lookup in List mode */
+  // For each data type, create a Map: year -> interval (from previous year to this year)
+  for (const key of Object.keys(cardinalData)) {
+    const point = cardinalData[key];
+    point.intervalsByYear = new Map();
+    for (let i = 1; i < point.events.length; i++) {
+      const prevYear = point.events[i - 1].year;
+      const currYear = point.events[i].year;
+      // Only calculate interval if years are consecutive (currYear - prevYear === 1)
+      if (currYear - prevYear === 1) {
+        point.intervalsByYear.set(currYear, point.events[i].jd - point.events[i - 1].jd);
+      }
+    }
+    // Calculate mean from requested years only
+    const requestedIntervals = requestedYears
+      .map(y => point.intervalsByYear.get(y))
+      .filter(v => v !== undefined);
+    point.mean = requestedIntervals.length > 0
+      ? requestedIntervals.reduce((a, b) => a + b, 0) / requestedIntervals.length
+      : 0;
+  }
+
+  const perihelionIntervalsByYear = new Map();
+  for (let i = 1; i < perihelions.length; i++) {
+    const prevYear = perihelions[i - 1].year;
+    const currYear = perihelions[i].year;
+    if (currYear - prevYear === 1) {
+      perihelionIntervalsByYear.set(currYear, perihelions[i].jd - perihelions[i - 1].jd);
+    }
+  }
+  const requestedPeriIntervals = requestedYears
+    .map(y => perihelionIntervalsByYear.get(y))
+    .filter(v => v !== undefined);
+  const meanPerihelion = requestedPeriIntervals.length > 0
+    ? requestedPeriIntervals.reduce((a, b) => a + b, 0) / requestedPeriIntervals.length
+    : 0;
+
+  const aphelionIntervalsByYear = new Map();
+  for (let i = 1; i < aphelions.length; i++) {
+    const prevYear = aphelions[i - 1].year;
+    const currYear = aphelions[i].year;
+    if (currYear - prevYear === 1) {
+      aphelionIntervalsByYear.set(currYear, aphelions[i].jd - aphelions[i - 1].jd);
+    }
+  }
+  const requestedAphIntervals = requestedYears
+    .map(y => aphelionIntervalsByYear.get(y))
+    .filter(v => v !== undefined);
+  const meanAphelion = requestedAphIntervals.length > 0
+    ? requestedAphIntervals.reduce((a, b) => a + b, 0) / requestedAphIntervals.length
+    : 0;
+
+  const siderealIntervalsByYear = new Map();
+  for (let i = 1; i < siderealCrossings.length; i++) {
+    const prevYear = siderealCrossings[i - 1].year;
+    const currYear = siderealCrossings[i].year;
+    if (currYear - prevYear === 1) {
+      siderealIntervalsByYear.set(currYear, siderealCrossings[i].jd - siderealCrossings[i - 1].jd);
+    }
+  }
+  const requestedSiderealIntervals = requestedYears
+    .map(y => siderealIntervalsByYear.get(y))
+    .filter(v => v !== undefined);
+  const meanSiderealYear = requestedSiderealIntervals.length > 0
+    ? requestedSiderealIntervals.reduce((a, b) => a + b, 0) / requestedSiderealIntervals.length
+    : 0;
+
+  const meanTropicalYear = (cardinalData.VE.mean + cardinalData.SS.mean +
+    cardinalData.AE.mean + cardinalData.WS.mean) / 4;
+
+  // Get orbital parameters at middle year from our collected data
+  const midYearIndex = Math.floor(yearlyOrbitalParams.length / 2);
+  const midYear = yearlyOrbitalParams[midYearIndex]?.year || Math.floor((startYear + endYear) / 2);
+  const obliquity = yearlyOrbitalParams[midYearIndex]?.obliquity || 0;
+  const eccentricity = yearlyOrbitalParams[midYearIndex]?.eccentricity || 0;
+
+  /* E · Build Excel sheets */
+  await ensureSheetJs();
+
+  // Sheet 1: Summary
+  const summaryRows = [
+    ['YEAR ANALYSIS REPORT'],
+    ['Generated', new Date().toISOString()],
+    ['Analysis Period', `${startYear} to ${endYear} (${endYear - startYear} years)`],
+    [],
+    ['ORBITAL PARAMETERS (at mid-point year ' + midYear + ')'],
+    ['Obliquity (°)', obliquity?.toFixed(6) || 'N/A'],
+    ['Eccentricity', eccentricity?.toFixed(8) || 'N/A'],
+    [],
+    ['TROPICAL YEAR BY CARDINAL POINT', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
+    ['Vernal Equinox (RA=0°)', cardinalData.VE.mean.toFixed(9), cardinalData.VE.iauRef.toFixed(9), ((cardinalData.VE.mean - cardinalData.VE.iauRef) * 86400).toFixed(2)],
+    ['Summer Solstice (RA=90°)', cardinalData.SS.mean.toFixed(9), cardinalData.SS.iauRef.toFixed(9), ((cardinalData.SS.mean - cardinalData.SS.iauRef) * 86400).toFixed(2)],
+    ['Autumnal Equinox (RA=180°)', cardinalData.AE.mean.toFixed(9), cardinalData.AE.iauRef.toFixed(9), ((cardinalData.AE.mean - cardinalData.AE.iauRef) * 86400).toFixed(2)],
+    ['Winter Solstice (RA=270°)', cardinalData.WS.mean.toFixed(9), cardinalData.WS.iauRef.toFixed(9), ((cardinalData.WS.mean - cardinalData.WS.iauRef) * 86400).toFixed(2)],
+    [],
+    ['MEAN TROPICAL YEAR (average of 4 cardinal points)'],
+    ['Measured Mean', meanTropicalYear.toFixed(9)],
+    ['IAU Mean J2000', ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)],
+    ['Difference (seconds)', ((meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2)],
+    ['Model Configured', meansolaryearlengthinDays.toFixed(9)],
+    [],
+    ['ANOMALISTIC YEAR', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
+    ['Perihelion to Perihelion', meanPerihelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanPerihelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
+    ['Aphelion to Aphelion', meanAphelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanAphelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
+    [],
+    ['SIDEREAL YEAR', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
+    ['Sidereal Year', meanSiderealYear.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['Sidereal - Tropical (model)', '', '', ((meanSiderealYear - meanTropicalYear) * 86400).toFixed(2)],
+    ['Sidereal - Tropical (IAU)', '', '', ((ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2)]
+  ];
+
+  // Helper to get interval by year from a Map
+  const getInterval = (map, year) => {
+    const val = map.get(year);
+    return val !== undefined ? val.toFixed(9) : '';
+  };
+
+  // Build lookup maps for events by year (for JD values)
+  const veEventsByYear = new Map(cardinalData.VE.events.map(e => [e.year, e]));
+  const ssEventsByYear = new Map(cardinalData.SS.events.map(e => [e.year, e]));
+  const aeEventsByYear = new Map(cardinalData.AE.events.map(e => [e.year, e]));
+  const wsEventsByYear = new Map(cardinalData.WS.events.map(e => [e.year, e]));
+  const periByYear = new Map(perihelions.map(e => [e.year, e]));
+  const aphByYear = new Map(aphelions.map(e => [e.year, e]));
+  const siderealByYear = new Map(siderealCrossings.map(e => [e.year, e]));
+  const orbParamsByYear = new Map(yearlyOrbitalParams.map(e => [e.year, e]));
+
+  // Sheet 2: Cardinal Points Detail (filter to user-requested years only)
+  const cardinalRows = [
+    ['Year', 'VE JD', 'VE Interval (days)', 'SS JD', 'SS Interval (days)', 'AE JD', 'AE Interval (days)', 'WS JD', 'WS Interval (days)']
+  ];
+  for (const year of requestedYears) {
+    const veEvent = veEventsByYear.get(year);
+    const ssEvent = ssEventsByYear.get(year);
+    const aeEvent = aeEventsByYear.get(year);
+    const wsEvent = wsEventsByYear.get(year);
+    const row = [
+      year,
+      veEvent?.jd?.toFixed(6) || '',
+      getInterval(cardinalData.VE.intervalsByYear, year),
+      ssEvent?.jd?.toFixed(6) || '',
+      getInterval(cardinalData.SS.intervalsByYear, year),
+      aeEvent?.jd?.toFixed(6) || '',
+      getInterval(cardinalData.AE.intervalsByYear, year),
+      wsEvent?.jd?.toFixed(6) || '',
+      getInterval(cardinalData.WS.intervalsByYear, year)
+    ];
+    cardinalRows.push(row);
+  }
+
+  // Sheet 3: Anomalistic Data (filter to user-requested years only)
+  const anomalisticRows = [
+    ['Year', 'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)', 'Aphelion JD', 'Aphelion Dist (AU)', 'Aph Interval (days)']
+  ];
+  for (const year of requestedYears) {
+    const peri = periByYear.get(year);
+    const aph = aphByYear.get(year);
+    const row = [
+      year,
+      peri?.jd?.toFixed(6) || '',
+      peri?.distance?.toFixed(8) || '',
+      getInterval(perihelionIntervalsByYear, year),
+      aph?.jd?.toFixed(6) || '',
+      aph?.distance?.toFixed(8) || '',
+      getInterval(aphelionIntervalsByYear, year)
+    ];
+    anomalisticRows.push(row);
+  }
+
+  // Sheet 4: Sidereal Data (filter to user-requested years only)
+  const siderealRows = [
+    ['Year', 'Sidereal Crossing JD', 'Sidereal Interval (days)']
+  ];
+  for (const year of requestedYears) {
+    const sid = siderealByYear.get(year);
+    const row = [
+      year,
+      sid?.jd?.toFixed(6) || '',
+      getInterval(siderealIntervalsByYear, year)
+    ];
+    siderealRows.push(row);
+  }
+
+  // Sheet 5: Detailed Combined Data (using already-collected orbital params)
+  const detailedRows = [
+    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sidereal Interval']
+  ];
+
+  for (const year of requestedYears) {
+    const orbParams = orbParamsByYear.get(year) || {};
+
+    // Calculate mean tropical year for this specific year (average of 4 cardinal intervals)
+    const veInt = cardinalData.VE.intervalsByYear.get(year);
+    const ssInt = cardinalData.SS.intervalsByYear.get(year);
+    const aeInt = cardinalData.AE.intervalsByYear.get(year);
+    const wsInt = cardinalData.WS.intervalsByYear.get(year);
+    const meanTropicalForYear = (veInt !== undefined && ssInt !== undefined && aeInt !== undefined && wsInt !== undefined)
+      ? ((veInt + ssInt + aeInt + wsInt) / 4).toFixed(9)
+      : '';
+
+    detailedRows.push([
+      year,
+      (orbParams.obliquity || 0).toFixed(6),
+      (orbParams.eccentricity || 0).toFixed(8),
+      meanTropicalForYear,
+      getInterval(cardinalData.VE.intervalsByYear, year),
+      getInterval(cardinalData.SS.intervalsByYear, year),
+      getInterval(cardinalData.AE.intervalsByYear, year),
+      getInterval(cardinalData.WS.intervalsByYear, year),
+      getInterval(perihelionIntervalsByYear, year),
+      getInterval(aphelionIntervalsByYear, year),
+      getInterval(siderealIntervalsByYear, year)
+    ]);
+  }
+
+  /* E · Create workbook and download */
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cardinalRows), 'Cardinal Points');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(anomalisticRows), 'Anomalistic');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(siderealRows), 'Sidereal');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(detailedRows), 'Detailed');
+
+  const url = URL.createObjectURL(workbookToBlob(wb));
+  // Filename: use range format for consecutive years, or list first/last for sparse lists
+  const filename = requestedYears.length === (endYear - startYear + 1)
+    ? `Holistic_year_analysis_${startYear}_${endYear}.xlsx`
+    : `Holistic_year_analysis_${requestedYears.length}_years.xlsx`;
+  Object.assign(document.createElement('a'), {
+    href: url,
+    download: filename
+  }).click();
+  URL.revokeObjectURL(url);
+
+  /* F · restore viewer */
+  jumpToJulianDay(oldJD);
+  o.Run = oldRun;
+
+  console.log(`Year Analysis Report finished – ${requestedYears.length} years analyzed`);
+}
+
 /* ----------------------------------------------------------------------
    fracDayToTimeStr() helper  (unchanged)
 ---------------------------------------------------------------------- */
@@ -12361,6 +12868,33 @@ function buildYearArray() {
 
   if (!Number.isFinite(s) || !Number.isFinite(e)) {
     console.error('Solstice “Range” values must be numbers:', s, e);
+    return [];
+  }
+  const step = s <= e ? 1 : -1;
+  const yrs  = [];
+  for (let y = s; step > 0 ? y <= e : y >= e; y += step) yrs.push(y);
+  return yrs;
+}
+
+/* ----------------------------------------------------------------------
+   Build array of integer years for Year Analysis Report.
+---------------------------------------------------------------------- */
+function buildYearAnalysisArray() {
+
+  if (o.yearAnalysisMode === 'List') {
+    const raw = document.querySelector('input[data-property="yearAnalysisYearsText"]')
+               ?.value || o.yearAnalysisYearsText;
+    return (raw.match(/-?\d+/g) || [])          // ['1999','2000', …]
+           .map(Number)
+           .filter(Number.isFinite);
+  }
+
+  /* --- Range mode ---------------------------------------------------- */
+  const s = Number(o.yearAnalysisRangeStart);
+  const e = Number(o.yearAnalysisRangeEnd);
+
+  if (!Number.isFinite(s) || !Number.isFinite(e)) {
+    console.error('Year Analysis "Range" values must be numbers:', s, e);
     return [];
   }
   const step = s <= e ? 1 : -1;

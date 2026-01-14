@@ -1641,6 +1641,64 @@ The difference between Method C (Earth-frame) and Method D (wobble-free inverse)
 
 **Conclusion:** The Earth-wobble parallax effect adds a **constant ~1.75 seconds** to the sidereal year when measured from Earth's position. This offset does NOT vary with epoch.
 
+#### Mathematical Derivation of the 1.748 Second Offset
+
+The 1.748-second offset can be derived exactly from first principles using the model's geometry.
+
+**The Setup:**
+
+In the geocentric model, Earth orbits around a fixed "wobble center" (at the origin) with:
+- Wobble radius: `r = eccentricityAmplitude = 0.0014226 AU`
+- Wobble period: `T_wobble = HY/13 = 333,888/13 = 25,683.69 years` (axial precession)
+- Sun distance: `D = 1 AU`
+- Sidereal year: `T_sidereal = 365.2564 days = 31,558,150 seconds`
+
+**The Physics:**
+
+When measuring the Sun's angular position from Earth instead of from the fixed wobble center, there is a parallax effect. The wobble displacement vector rotates slowly (one revolution per 25,684 years), which causes an apparent angular velocity difference in the Sun's motion.
+
+The angular velocity of the wobble is:
+```
+ω_wobble = 2π / T_wobble = 2π / 25,683.69 radians/year
+```
+
+The wobble displacement creates a parallax angle proportional to `r/D`. As the wobble rotates, this parallax changes, adding an effective angular velocity contribution to the Sun's apparent motion when viewed from Earth:
+
+```
+Δω = (r/D) × ω_wobble = (0.0014226 / 1) × (2π / 25,683.69) radians/year
+```
+
+**The Calculation:**
+
+The extra time needed for the Sun to complete a full 360° from Earth's perspective (compared to the wobble center) is:
+
+```
+ΔT = (r/D) × (T_sidereal / T_wobble) × T_sidereal
+   = (0.0014226 / 1) × (1 / 25,683.69) × 31,558,150 seconds
+   = 0.0014226 × 3.894 × 10⁻⁵ × 31,558,150 seconds
+   = 1.748 seconds
+```
+
+**Verification:**
+
+| Parameter | Value | Source |
+|-----------|-------|--------|
+| r (wobble radius) | 0.0014226 AU | `eccentricityAmplitude` in script.js |
+| D (Sun distance) | 1 AU | Mean orbital radius |
+| T_wobble | 25,683.69 years | `HY/13 = 333,888/13` |
+| T_sidereal | 31,558,150 s | IAU sidereal year |
+| **Calculated ΔT** | **1.748 s** | Formula above |
+| **Measured (C-D)** | **1.748 s** | Model measurement |
+
+**Interpretation:**
+
+The 1.748-second offset is a **geometric consequence** of measuring from a moving platform (Earth orbiting the wobble center) rather than from a fixed point. It represents the annual parallax contribution from Earth's axial precession wobble.
+
+This offset is:
+- **Constant** across all epochs (the wobble geometry doesn't change)
+- **Always positive** (Earth-frame sidereal year is always longer)
+- **Independent of perihelion position** (not affected by the 20,868-year perihelion cycle)
+
 ### Key Finding 2: The ~8.5s Variation is Real (Not a Wobble Artifact)
 
 The cyclical variation appears **equally in ALL methods**:
