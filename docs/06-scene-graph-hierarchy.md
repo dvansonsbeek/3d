@@ -336,8 +336,9 @@ Updates occur after every precession frame, reflecting live tilt changes.
 |----------|-------|-------------|
 | 1 Solar year | 2π radians | 365.2421897 days |
 | 1 AU | 100 scene units | 149,597,870.698828 km |
-| Mean sidereal year | 31,558,149.68 s | At year 1246 AD |
-| Mean solar day | 86,399.9886 s | At year 1246 AD |
+| Mean sidereal year | 31,558,153.91 s | Mean across perihelion cycle |
+| Sidereal year at 1246 AD | 31,558,149.68 s | At perihelion-solstice alignment |
+| Mean solar day | ~86,400 s | Mean across perihelion cycle |
 | Mean obliquity | 23.41398° | Earth's mean axial tilt |
 | Inclination amplitude | 0.634° | Earth's orbital tilt oscillation |
 | Mean eccentricity | 0.015313 | Earth's mean orbital eccentricity |

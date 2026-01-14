@@ -403,4 +403,4 @@ This means the verified ascending nodes work together with the dynamic inclinati
 |------|---------|-------------|--------|
 | 2025-12-20 | 1.0 | Initial implementation document | Claude (Opus 4.5) |
 | 2026-01-01 | 1.1 | Added note on dynamic inclination integration | Claude (Opus 4.5) |
-| 2026-01-02 | 1.2 | Updated ascending node values to match current script.js (Earth=284.492°, etc.) | Claude (Opus 4.5) |
+| 2026-01-02 | 1.2 | Updated ascending node values to match current script.js (Earth=284.51°, etc.) | Claude (Opus 4.5) |

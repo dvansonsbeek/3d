@@ -38,7 +38,7 @@ const RAD2DEG = 180 / Math.PI;
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Earth reference
-const earthInclInvPlane = 1.57867339;  // Earth's J2000 inclination to invariable plane
+const earthInclInvPlane = 1.57866663;  // Earth's J2000 inclination to invariable plane
 const earthAscNodeInvPlane = 284.51;   // Earth's ascending node from Souami & Souchay (2012)
 
 // JPL J2000 ecliptic inclinations (TARGET values - what we see from Earth)

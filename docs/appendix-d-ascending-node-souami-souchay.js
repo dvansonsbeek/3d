@@ -28,7 +28,7 @@ const holisticyearLength = 333888;
 
 const earthConfig = {
   // Dynamic inclination at J2000
-  inclJ2000: 1.57867339,  // Earth's inclination to invariable plane at J2000
+  inclJ2000: 1.57866663,  // Earth's inclination to invariable plane at J2000
   // Earth's ascending node from Souami & Souchay (2012) - used for both
   ascNodeSouamiSouchay: 284.51,
   ascNodeVerified: 284.51

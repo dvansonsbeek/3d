@@ -35,7 +35,7 @@ const RAD2DEG = 180 / Math.PI;
 
 const earthConfig = {
   // Dynamic inclination at J2000 (from oscillation formula)
-  inclJ2000: 1.57867339,
+  inclJ2000: 1.57866663,
   // Earth's ascending node from Souami & Souchay (2012)
   ascNodeVerified: 284.51
 };

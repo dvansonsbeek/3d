@@ -21,8 +21,9 @@ This document is the **single source of truth** for all constants used in the Ho
 |----------|-------|-------------|
 | `inputmeanlengthsolaryearindays` | 365.2421897 | Input solar year in days |
 | `meansolaryearlengthinDays` | 365.2421890 | Mean solar year rounded to HY/16 precision |
-| `meansiderealyearlengthinSeconds` | 31,558,149.68 | Mean sidereal year in seconds |
-| `meanlengthofday` | 86,399.9886 | Mean solar day in SI seconds (at year 1246 AD) |
+| `meansiderealyearlengthinSeconds` | 31,558,153.91 | Mean sidereal year in seconds |
+| `siderealyearlengthinSecondsAt1246` | 31,558,149.68 | Sidereal year in seconds at year 1246 AD |
+| `meanlengthofday` | ~86,400 | Mean solar day in SI seconds |
 | Reference Date | December 14, 1245 AD | Perihelion-solstice alignment |
 | J2000 Epoch | January 1, 2000, 12:00 TT | Standard astronomical epoch |
 
@@ -81,7 +82,7 @@ These are the fixed J2000 reference values from Souami & Souchay (2012):
 |--------|----------|-------------|--------|
 | Mercury | `mercuryInvPlaneInclinationJ2000` | 6.3472858° | S&S 2012 |
 | Venus | `venusInvPlaneInclinationJ2000` | 2.1545441° | S&S 2012 |
-| Earth | `earthInvPlaneInclinationJ2000` | 1.57867339° | S&S 2012 |
+| Earth | `earthInvPlaneInclinationJ2000` | 1.57866663° | S&S 2012 |
 | Mars | `marsInvPlaneInclinationJ2000` | 1.6311858° | S&S 2012 |
 | Jupiter | `jupiterInvPlaneInclinationJ2000` | 0.3219652° | S&S 2012 |
 | Saturn | `saturnInvPlaneInclinationJ2000` | 0.9254704° | S&S 2012 |

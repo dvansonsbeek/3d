@@ -30,7 +30,7 @@ const earthConfig = {
   period: holisticyearLength / 3,         // 111,296 years
   mean: 1.481592,
   amplitude: 0.633849,
-  inclJ2000: 1.57867339,
+  inclJ2000: 1.57866663,
   phaseAngle: 203
 };
 

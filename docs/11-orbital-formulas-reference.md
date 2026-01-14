@@ -23,8 +23,9 @@ This document provides a complete reference for all orbital calculation function
 |----------|-------|-------------|
 | `holisticyearLength` | 333,888 | Length of Holistic-Year in Earth solar years |
 | `meansolaryearlengthinDays` | 365.2421890 | Mean solar year in days (rounded to HY/16 precision) |
-| `meansiderealyearlengthinSeconds` | 31,558,149.68 | Mean sidereal year in seconds |
-| `meanlengthofday` | 86,399.9886 | Mean solar day in SI seconds (at year 1246 AD) |
+| `meansiderealyearlengthinSeconds` | 31,558,153.91 | Mean sidereal year in seconds |
+| `siderealyearlengthinSecondsAt1246` | 31,558,149.68 | Sidereal year in seconds at year 1246 AD |
+| `meanlengthofday` | ~86,400 | Mean solar day in SI seconds |
 | `meanSiderealday` | ~86,164.09 (derived) | Mean sidereal day in SI seconds |
 | `meanStellarday` | derived | Mean stellar day in SI seconds |
 | `meanAnomalisticYearinDays` | derived | Mean anomalistic year in days |

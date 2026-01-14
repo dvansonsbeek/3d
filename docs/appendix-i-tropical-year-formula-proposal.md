@@ -135,7 +135,7 @@ function computeDayLength(tropicalYear) {
 ```
 
 Where:
-- `siderealYearSeconds` = 31558149.6846777 seconds
+- `siderealYearSeconds` = 31558153.91 seconds
 - `precessionCycle` = holisticyearLength / 13 = 25,684 years
 
 ## Sample Data Requirements

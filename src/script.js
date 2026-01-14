@@ -398,9 +398,9 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 // Derived phase offset for inclination path alignment with zodiac
 // The earthInvPlaneInclinationMean correction accounts for the projection offset when measuring
 // angles across two planes (ecliptic vs invariable plane) - the compound angle geometry
-// causes a systematic offset approximately equal to the mean inclination.
-// Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - earthInvPlaneInclinationMean
-const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - earthInvPlaneInclinationMean;
+// causes a systematic offset approximately equal to the current inclination.
+// Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - <number 1.5 - 2 >
+const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - 2;
 
 // Really fixed values
 const diameters = {
@@ -530,7 +530,7 @@ const ASTRO_REFERENCE = {
   solarDayJ2000: 86400.0,             // Mean solar day (exact by definition)
 
   // Sidereal day (rotation relative to vernal equinox)
-  siderealDayJ2000: 86164.09053083288,       // ~23h 56m 4.0905s
+  siderealDayJ2000: 86164.09053083288,     // ~23h 56m 4.0905s
 
   // Stellar day (rotation relative to fixed stars)
   // Slightly longer than sidereal day due to precession

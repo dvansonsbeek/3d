@@ -70,7 +70,7 @@ Each planet's orbit is tilted relative to the invariable plane. These values are
 |--------|---------------------------|------------------------|-------|
 | Mercury | 6.35° | 7.01° | Highest inclination |
 | Venus | 2.15° | 3.39° | |
-| Earth | 1.50° (mean) | 0° (by definition) | Oscillates 0.85° - 2.12° |
+| Earth | 1.48° (mean) | 0° (by definition) | Oscillates 0.85° - 2.12° |
 | Mars | 1.63° | 1.85° | |
 | Jupiter | 0.32° | 1.30° | Closest to invariable plane |
 | Saturn | 0.93° | 2.49° | |
@@ -143,7 +143,7 @@ Year 2000:
 Year 50000 (minimum tilt):
 - Earth's orbit tilted ~0.85° from invariable plane
 - Earth STILL crosses invariable plane twice per year
-- Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km
+- Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
 ```
 
 The crossing dates shift over the ~111,296-year precession cycle as the ascending node circulates through 360°.
