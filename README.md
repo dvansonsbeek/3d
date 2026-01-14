@@ -85,13 +85,10 @@ This number fits all observations best and aligns all year and day calculations:
 
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. J2000 value longitude of perihelion: 6h51m48s = ~102.95°
-3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values:
-   - 1246 Length of solar year in SI seconds was ~31,556,929.19 SI seconds
-   - 1246 Length of sidereal year in SI seconds was ~31,558,149.6847 SI seconds
-   - 1246 Length of solar day was ~86,399.9886 SI seconds because of historic Delta T predictions
+3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
 4. Climate graphs with ~100k cycles as a cycle of 111,296 years (three times 111,296 years = 333,888 years)
 5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger Dryas around 9800 BC
-6. **KEY EVIDENCE:** Mercury perihelion precession aligned to exactly ~535 arc seconds per century
+6. **KEY EVIDENCE:** Mercury perihelion precession aligned to ~535 arc seconds per century
 7. **KEY EVIDENCE:** The difference sidereal day - stellar day leads to the difference solar year - sidereal year
 8. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, and sidereal year all align perfectly with 333,888 year cycle
 9. Obliquity correct both historic and current values
