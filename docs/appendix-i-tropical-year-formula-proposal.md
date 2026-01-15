@@ -1699,70 +1699,6 @@ This offset is:
 - **Always positive** (Earth-frame sidereal year is always longer)
 - **Independent of perihelion position** (not affected by the 20,868-year perihelion cycle)
 
-#### The Residual Wobble Parallax Effect on Precession (0.146 seconds)
-
-The wobble parallax of 1.748 seconds affects sidereal year measurements from Earth. When calculating axial precession using:
-
-```
-P = Sidereal / (Sidereal - Tropical)
-```
-
-most of this parallax cancels between numerator and denominator because both years are measured from the same Earth-frame. However, a **residual fraction** remains uncanceled due to the geometric relationship between the annual orbit and the precession cycle.
-
-**The Formula:**
-
-```
-Residual wobble parallax = Full wobble parallax / (Precession divisor - 1)
-                         = 1.748 s / (13 - 1)
-                         = 1.748 s / 12
-                         = 0.1457 seconds
-```
-
-Where:
-- 13 is the axial precession divisor (H/13 = P_axial = 25,683.69 years)
-- The "-1" accounts for the fact that precession removes one sidereal day per cycle from the tropical year count
-
-**Converting to Days:**
-
-```
-0.1457 seconds / 86400 seconds/day = 0.000001686 days per year
-```
-
-**Effect on Precession Calculation:**
-
-When the sidereal year measured from the wobble center (Method A/B/D) is:
-```
-Sidereal (wobble-free) = 365.256359537 days
-```
-
-The Earth-frame sidereal year (accounting for residual wobble parallax) becomes:
-```
-Sidereal (Earth-frame) = 365.256359537 + 0.000001686 = 365.256361223 days
-```
-
-Using this corrected value with the tropical year:
-```
-P = 365.256361223 / (365.256361223 - 365.242189) = 25,771.57 years
-```
-
-This matches the IAU J2000 precession value of **25,771.5 years** almost exactly.
-
-**Physical Interpretation:**
-
-The residual wobble parallax represents the portion of Earth's wobble motion that contributes to the **apparent** precession rate when measured from Earth. While the full 1.748s parallax affects absolute year length measurements, only 1/12th of this (where 12 = 13-1) affects the differential measurement that determines precession.
-
-This is analogous to how the 11.4ms/day solar day offset (caused by perihelion precession at H/16) accumulates to exactly one extra day over the perihelion cycle. Here, the wobble parallax divided by (precession cycles - 1) gives the residual contribution to precession measurement.
-
-**Summary Table:**
-
-| Quantity | Value | Derivation |
-|----------|-------|------------|
-| Full wobble parallax | 1.748 s | (r/D) × (T_sid/T_wobble) × T_sid |
-| Residual parallax divisor | 12 | 13 - 1 (precession cycles minus 1) |
-| Residual wobble parallax | 0.1457 s | 1.748 / 12 |
-| Daily contribution | 0.000001686 d | 0.1457 / 86400 |
-| Precession with correction | 25,771.57 years | Matches IAU J2000 |
-
 ### Key Finding 2: The ~8.5s Variation is Real (Not a Wobble Artifact)
 
 The cyclical variation appears **equally in ALL methods**:
@@ -1910,13 +1846,15 @@ This explains why Methods A and D consistently measure ~86399.989s rather than 8
 
 The following formulas have been implemented and verified in `script.js`. All use the perihelion cycle (HY/16 = 20,868 years) with phase referenced to the balanced year (1246 AD = 180° phase, half-cycle point).
 
-### Formula Constants
+### Formula Constants (Legacy - see updated formulas below)
 
 ```javascript
-const meansolardayAmplitudeinSeconds = 0.0022;    // LOD oscillation amplitude
-const meansolaryearAmplitudeinDays = -0.000023;   // Solar year oscillation (~2 seconds)
-const meansiderealyearAmplitudeinSeconds = -4.15; // Sidereal year oscillation
+const meansolardayAmplitudeinSeconds = 0.0022;    // LOD oscillation amplitude (legacy)
+const meansolaryearAmplitudeinDays = -0.000023;   // Solar year oscillation (~2 seconds) (legacy)
+// Note: meansiderealyearAmplitudeinSeconds is no longer used - sidereal year in seconds is constant
 ```
+
+**Important:** The formulas in this section are **legacy sinusoidal approximations**. The current implementation uses obliquity-based and eccentricity-based formulas documented in the "Tropical Year Formula Based on Obliquity" and "Sidereal Year Formula Based on Eccentricity" sections below.
 
 ### 1. Length of Day (`computeLengthofDay`)
 
@@ -1965,29 +1903,21 @@ function computeLengthofsolarYear(currentYear, balancedYear, perihelionCycleLeng
 | 270° | 6463 AD | Mean + amplitude (**maximum**) |
 | 360° | 11680 AD | Mean (zero crossing) |
 
-### 3. Length of Sidereal Year (`computeLengthofsiderealYear`)
+### 3. Length of Sidereal Year - OBSOLETE
 
-The sidereal year oscillates by approximately ±4.2 seconds over the perihelion cycle.
+**This sinusoidal formula is obsolete.** The sidereal year **in seconds** is now understood to be constant (the orbital period). The sidereal year **in days** varies with eccentricity because day length changes.
 
+See the "Sidereal Year Formula Based on Eccentricity" section below for the current implementation:
 ```javascript
-function computeLengthofsiderealYear(currentYear, balancedYear, perihelionCycleLength,
-                                      perihelionprecessioncycleYear, meansiderealyearAmplitudeinSeconds, meansiderealyearlengthinSeconds) {
-  const delta = currentYear - balancedYear;
-  const cycleValue = (delta / perihelionCycleLength) < 1 ? delta : perihelionprecessioncycleYear;
-  const angle = (cycleValue / perihelionCycleLength) * 360 * Math.PI / 180;
-
-  // Uses -amplitude × cos: minimum at 180° (1246 AD), maximum at 0°/360°
-  return -meansiderealyearAmplitudeinSeconds * Math.cos(angle) + meansiderealyearlengthinSeconds;
+// Current formula (eccentricity-based):
+function computeLengthofsiderealYear(eccentricity) {
+  const k = 3058;  // seconds per unit eccentricity
+  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityMean);
 }
-```
 
-**Phase alignment (with amplitude = -4.15):**
-| Phase | Year | Sidereal Year |
-|-------|------|---------------|
-| 0° | Balanced year | Mean + amplitude (maximum) |
-| 180° | **1246 AD** | Mean - amplitude (**minimum**) |
-| 270° | 6463 AD | Mean (rising) |
-| 360° | **11680 AD** | Mean + amplitude (**maximum**) |
+// Sidereal year in seconds is CONSTANT:
+lengthofsiderealYearInSeconds = meansiderealyearlengthinSeconds;  // 31,558,149.724 s
+```
 
 ### 4. Length of Sidereal Day
 
@@ -2028,15 +1958,19 @@ function computeLengthofanomalisticYearRealLOD(perihelionPrecession, lengthofsol
 
 ---
 
-### Summary of Waveforms
+### Summary of Legacy Waveforms
 
-| Quantity | Waveform | Min at | Max at | Amplitude |
-|----------|----------|--------|--------|-----------|
-| LOD | `-cos` | 0°/360° | **180° (1246 AD)** | ±2.2 ms |
-| Solar Year | `sin` (neg amp) | **90° (-3971 BC)** | 270° (6463 AD) | ±2 s |
-| Sidereal Year | `-cos` (neg amp) | **180° (1246 AD)** | 0°/360° (11680 AD) | ±4.2 s |
+**Note:** These sinusoidal waveforms are legacy approximations. The current implementation uses:
+- **Tropical Year**: Obliquity-based formula (see below)
+- **Sidereal Year**: Eccentricity-based formula (see below)
+- **Length of Day**: Derived from constant sidereal year in seconds / variable sidereal year in days
 
-**Note:** The `cycleValue` conditional handles the first perihelion cycle from the balanced year specially, ensuring smooth behavior at cycle boundaries.
+| Quantity | Legacy Waveform | Current Formula |
+|----------|-----------------|-----------------|
+| LOD | `-cos` ±2.2 ms | Derived: `meansiderealyearlengthinSeconds / siderealYear(days)` |
+| Solar Year | `sin` ±2 s | Obliquity-based: coefficient 2.3 s/° |
+| Sidereal Year (days) | `-cos` ±4.2 s | Eccentricity-based: coefficient 3058 s/unit |
+| Sidereal Year (seconds) | Varied | **CONSTANT**: 31,558,149.724 s |
 
 ---
 

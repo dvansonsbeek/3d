@@ -553,19 +553,6 @@ const ASTRO_REFERENCE = {
     return (r / D) * (T_sidereal_seconds / (T_wobble_years * 365.256363 * 86400)) * T_sidereal_seconds;
   },
 
-  // Residual Wobble Parallax (0.146 seconds)
-  // The wobble parallax affects sidereal year measurements from Earth.
-  // Only 1/12th (where 12 = 13-1, axial precession cycles minus 1) contributes
-  // to the precession calculation, as most cancels in Sidereal/(Sidereal-Tropical).
-  // Formula: wobbleParallax / (13 - 1) = 1.748s / 12 = 0.1457s = 0.000001686 days
-  // Adding this to measured sidereal year gives Earth-frame sidereal year.
-  get residualWobbleParallaxSeconds() {
-    return 1.748 / 12;  // 0.1457 seconds
-  },
-  get residualWobbleParallaxDays() {
-    return this.residualWobbleParallaxSeconds / 86400;  // 0.000001686 days
-  },
-
   // IAU J2000 axial precession period
   iauPrecessionJ2000: 25771.57634,  // years
 
@@ -12776,32 +12763,19 @@ async function runYearAnalysisExport(years) {
     ['  Formula: ΔT = (r/D) × (T_sid/T_wobble) × T_sid'],
     ['  Where: r = 0.0014226 AU, D = 1 AU, T_wobble = H/13 = 25,683.69 years'],
     ['  Wobble parallax (C-D difference)', '', '', ASTRO_REFERENCE.wobbleParallaxSeconds.toFixed(3) + ' s (constant)'],
-    [''],
-    ['Residual Wobble Parallax for Precession'],
-    ['  Formula: wobbleParallax / (13 - 1) = 1.748 / 12'],
-    ['  Residual parallax', '', '', ASTRO_REFERENCE.residualWobbleParallaxSeconds.toFixed(4) + ' s = ' + ASTRO_REFERENCE.residualWobbleParallaxDays.toFixed(9) + ' days'],
-    ['  (Only 1/12th contributes to precession; rest cancels in Sid/(Sid-Trop))'],
     [],
     ['PRECESSION CALCULATION'],
-    ['Sidereal Year (wobble-center measured)', meanSiderealYear.toFixed(9), '', ''],
-    ['Sidereal Year (Earth-frame)', (meanSiderealYear + ASTRO_REFERENCE.residualWobbleParallaxDays).toFixed(9), '', '+' + (ASTRO_REFERENCE.residualWobbleParallaxDays * 86400).toFixed(4) + ' s correction'],
+    ['Sidereal Year (measured)', meanSiderealYear.toFixed(9), '', ''],
     ['Mean Tropical Year', meanTropicalYear.toFixed(9), '', ''],
     [''],
     ['Precession = Sidereal / (Sidereal - Tropical)'],
-    ['  Using wobble-center sidereal', (meanSiderealYear / (meanSiderealYear - meanTropicalYear)).toFixed(2) + ' years', '', ''],
-    ['  Using Earth-frame sidereal', ((meanSiderealYear + ASTRO_REFERENCE.residualWobbleParallaxDays) / ((meanSiderealYear + ASTRO_REFERENCE.residualWobbleParallaxDays) - meanTropicalYear)).toFixed(2) + ' years', ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years (IAU J2000)', '']
+    ['  Calculated precession', (meanSiderealYear / (meanSiderealYear - meanTropicalYear)).toFixed(2) + ' years', ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years (IAU J2000)', '']
   ];
 
   // Helper to get interval by year from a Map
   const getInterval = (map, year) => {
     const val = map.get(year);
     return val !== undefined ? val.toFixed(9) : '';
-  };
-
-  // Helper to get corrected sidereal interval (with residual wobble parallax)
-  const getCorrectedSiderealInterval = (map, year) => {
-    const val = map.get(year);
-    return val !== undefined ? (val + ASTRO_REFERENCE.residualWobbleParallaxDays).toFixed(9) : '';
   };
 
   // Build lookup maps for events by year (for JD values)
@@ -12858,22 +12832,21 @@ async function runYearAnalysisExport(years) {
 
   // Sheet 4: Sidereal Data (filter to user-requested years only)
   const siderealRows = [
-    ['Year', 'Sidereal Crossing JD', 'Sidereal Interval (measured)', 'Sidereal Interval (Earth-frame)']
+    ['Year', 'Sidereal Crossing JD', 'Sidereal Interval (days)']
   ];
   for (const year of requestedYears) {
     const sid = siderealByYear.get(year);
     const row = [
       year,
       sid?.jd?.toFixed(6) || '',
-      getInterval(siderealIntervalsByYear, year),
-      getCorrectedSiderealInterval(siderealIntervalsByYear, year)
+      getInterval(siderealIntervalsByYear, year)
     ];
     siderealRows.push(row);
   }
 
   // Sheet 5: Detailed Combined Data (using already-collected orbital params)
   const detailedRows = [
-    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sidereal Interval (measured)', 'Sidereal Interval (Earth-frame)']
+    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sidereal Interval (days)']
   ];
 
   for (const year of requestedYears) {
@@ -12899,8 +12872,7 @@ async function runYearAnalysisExport(years) {
       getInterval(cardinalData.WS.intervalsByYear, year),
       getInterval(perihelionIntervalsByYear, year),
       getInterval(aphelionIntervalsByYear, year),
-      getInterval(siderealIntervalsByYear, year),
-      getCorrectedSiderealInterval(siderealIntervalsByYear, year)
+      getInterval(siderealIntervalsByYear, year)
     ]);
   }
 
@@ -15124,30 +15096,18 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log(`║ Sidereal - Tropical (IAU)                               │ ${(iauPrecessionContrib * 86400).toFixed(2).padStart(7)} seconds     ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
 
-  // Calculate precession with and without residual wobble parallax correction
-  const precessionUncorrected = resultA.mean / (resultA.mean - iauTropicalYear);
-  const correctedSidereal = resultA.mean + ASTRO_REFERENCE.residualWobbleParallaxDays;
-  const precessionCorrected = correctedSidereal / (correctedSidereal - iauTropicalYear);
+  // Calculate precession
+  const precessionCalculated = resultA.mean / (resultA.mean - iauTropicalYear);
 
   console.log('');
   console.log('-------------------------------------------------------------------------------');
-  console.log('RESIDUAL WOBBLE PARALLAX EFFECT ON PRECESSION');
+  console.log('PRECESSION CALCULATION');
   console.log('-------------------------------------------------------------------------------');
-  console.log('The sidereal year measured from wobble-center (Methods A/B/D) is slightly');
-  console.log('shorter than the Earth-frame sidereal year due to residual wobble parallax');
-  console.log('');
-  console.log('Wobble parallax (C-D difference):     ' + ASTRO_REFERENCE.wobbleParallaxSeconds.toFixed(3) + ' seconds (constant)');
-  console.log('Residual parallax divisor:            12 (= 13 - 1, axial precession cycles minus 1)');
-  console.log('Residual wobble parallax:             ' + ASTRO_REFERENCE.residualWobbleParallaxSeconds.toFixed(4) + ' s = ' + ASTRO_REFERENCE.residualWobbleParallaxDays.toFixed(9) + ' days');
-  console.log('');
-  console.log('Formula: residualParallax = wobbleParallax / (13 - 1) = 1.748 / 12');
-  console.log('');
-  console.log('Sidereal Year (wobble-center):        ' + resultA.mean.toFixed(9) + ' days');
-  console.log('Sidereal Year (Earth-frame):          ' + correctedSidereal.toFixed(9) + ' days (+' + (ASTRO_REFERENCE.residualWobbleParallaxDays * 86400).toFixed(4) + 's)');
+  console.log('Sidereal Year (measured):             ' + resultA.mean.toFixed(9) + ' days');
+  console.log('Tropical Year (IAU):                  ' + iauTropicalYear.toFixed(9) + ' days');
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
-  console.log('  Using wobble-center sidereal:       ' + precessionUncorrected.toFixed(2) + ' years');
-  console.log('  Using Earth-frame sidereal:         ' + precessionCorrected.toFixed(2) + ' years');
+  console.log('  Calculated precession:              ' + precessionCalculated.toFixed(2) + ' years');
   console.log('  IAU J2000 precession:               ' + ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years');
   console.log('-------------------------------------------------------------------------------');
 
@@ -15429,30 +15389,18 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log(`║   Sidereal - Tropical (IAU):     ${iauSiderealTropicalDiff.toFixed(2)} seconds                                        ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════╝');
 
-  // Calculate precession with and without residual wobble parallax correction
-  const precessionUncorrected = meanSiderealYear / (meanSiderealYear - meanTropicalYear);
-  const correctedSidereal = meanSiderealYear + ASTRO_REFERENCE.residualWobbleParallaxDays;
-  const precessionCorrected = correctedSidereal / (correctedSidereal - meanTropicalYear);
+  // Calculate precession
+  const precessionCalculated = meanSiderealYear / (meanSiderealYear - meanTropicalYear);
 
   console.log('');
   console.log('-------------------------------------------------------------------------------');
-  console.log('RESIDUAL WOBBLE PARALLAX EFFECT ON PRECESSION');
+  console.log('PRECESSION CALCULATION');
   console.log('-------------------------------------------------------------------------------');
-  console.log('The sidereal year measured from wobble-center is slightly shorter than the');
-  console.log('Earth-frame sidereal year due to residual wobble parallax');
-  console.log('');
-  console.log('Wobble parallax (C-D difference):     ' + ASTRO_REFERENCE.wobbleParallaxSeconds.toFixed(3) + ' seconds (constant)');
-  console.log('Residual parallax divisor:            12 (= 13 - 1, axial precession cycles minus 1)');
-  console.log('Residual wobble parallax:             ' + ASTRO_REFERENCE.residualWobbleParallaxSeconds.toFixed(4) + ' s = ' + ASTRO_REFERENCE.residualWobbleParallaxDays.toFixed(9) + ' days');
-  console.log('');
-  console.log('Formula: residualParallax = wobbleParallax / (13 - 1) = 1.748 / 12');
-  console.log('');
-  console.log('Sidereal Year (wobble-center):        ' + meanSiderealYear.toFixed(9) + ' days');
-  console.log('Sidereal Year (Earth-frame):          ' + correctedSidereal.toFixed(9) + ' days (+' + (ASTRO_REFERENCE.residualWobbleParallaxDays * 86400).toFixed(4) + 's)');
+  console.log('Sidereal Year (measured):             ' + meanSiderealYear.toFixed(9) + ' days');
+  console.log('Tropical Year (measured):             ' + meanTropicalYear.toFixed(9) + ' days');
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
-  console.log('  Using wobble-center sidereal:       ' + precessionUncorrected.toFixed(2) + ' years');
-  console.log('  Using Earth-frame sidereal:         ' + precessionCorrected.toFixed(2) + ' years');
+  console.log('  Calculated precession:              ' + precessionCalculated.toFixed(2) + ' years');
   console.log('  IAU J2000 precession:               ' + ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years');
   console.log('-------------------------------------------------------------------------------');
 
