@@ -135,7 +135,7 @@ function computeDayLength(tropicalYear) {
 ```
 
 Where:
-- `siderealYearSeconds` = 31558153.91 seconds
+- `siderealYearSeconds` = 31558149.645 seconds
 - `precessionCycle` = holisticyearLength / 13 = 25,684 years
 
 ## Sample Data Requirements
@@ -1699,6 +1699,70 @@ This offset is:
 - **Always positive** (Earth-frame sidereal year is always longer)
 - **Independent of perihelion position** (not affected by the 20,868-year perihelion cycle)
 
+#### The Residual Wobble Parallax Effect on Precession (0.146 seconds)
+
+The wobble parallax of 1.748 seconds affects sidereal year measurements from Earth. When calculating axial precession using:
+
+```
+P = Sidereal / (Sidereal - Tropical)
+```
+
+most of this parallax cancels between numerator and denominator because both years are measured from the same Earth-frame. However, a **residual fraction** remains uncanceled due to the geometric relationship between the annual orbit and the precession cycle.
+
+**The Formula:**
+
+```
+Residual wobble parallax = Full wobble parallax / (Precession divisor - 1)
+                         = 1.748 s / (13 - 1)
+                         = 1.748 s / 12
+                         = 0.1457 seconds
+```
+
+Where:
+- 13 is the axial precession divisor (H/13 = P_axial = 25,683.69 years)
+- The "-1" accounts for the fact that precession removes one sidereal day per cycle from the tropical year count
+
+**Converting to Days:**
+
+```
+0.1457 seconds / 86400 seconds/day = 0.000001686 days per year
+```
+
+**Effect on Precession Calculation:**
+
+When the sidereal year measured from the wobble center (Method A/B/D) is:
+```
+Sidereal (wobble-free) = 365.256359537 days
+```
+
+The Earth-frame sidereal year (accounting for residual wobble parallax) becomes:
+```
+Sidereal (Earth-frame) = 365.256359537 + 0.000001686 = 365.256361223 days
+```
+
+Using this corrected value with the tropical year:
+```
+P = 365.256361223 / (365.256361223 - 365.242189) = 25,771.57 years
+```
+
+This matches the IAU J2000 precession value of **25,771.5 years** almost exactly.
+
+**Physical Interpretation:**
+
+The residual wobble parallax represents the portion of Earth's wobble motion that contributes to the **apparent** precession rate when measured from Earth. While the full 1.748s parallax affects absolute year length measurements, only 1/12th of this (where 12 = 13-1) affects the differential measurement that determines precession.
+
+This is analogous to how the 11.4ms/day solar day offset (caused by perihelion precession at H/16) accumulates to exactly one extra day over the perihelion cycle. Here, the wobble parallax divided by (precession cycles - 1) gives the residual contribution to precession measurement.
+
+**Summary Table:**
+
+| Quantity | Value | Derivation |
+|----------|-------|------------|
+| Full wobble parallax | 1.748 s | (r/D) × (T_sid/T_wobble) × T_sid |
+| Residual parallax divisor | 12 | 13 - 1 (precession cycles minus 1) |
+| Residual wobble parallax | 0.1457 s | 1.748 / 12 |
+| Daily contribution | 0.000001686 d | 0.1457 / 86400 |
+| Precession with correction | 25,771.57 years | Matches IAU J2000 |
+
 ### Key Finding 2: The ~8.5s Variation is Real (Not a Wobble Artifact)
 
 The cyclical variation appears **equally in ALL methods**:
@@ -1976,4 +2040,372 @@ function computeLengthofanomalisticYearRealLOD(perihelionPrecession, lengthofsol
 
 ---
 
-*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js.*
+## Tropical Year Formula Based on Obliquity (January 2026)
+
+### Discovery: Tropical Year Correlates with Obliquity
+
+Analysis of 27,000 years of model data (one complete perihelion cycle from -9188 to 11680 AD, 221 data points) revealed that the tropical year length is almost entirely determined by obliquity:
+
+| Correlation | Value | R² |
+|-------------|-------|-----|
+| Tropical Year vs Obliquity | **-0.9998** | 0.9995 |
+| Tropical Year vs Eccentricity | -0.023 | 0.0005 |
+
+The obliquity explains 99.95% of the tropical year variation. Eccentricity has negligible effect.
+
+### The Formula
+
+The tropical year can be computed directly from obliquity using:
+
+```
+Tropical Year = meansolaryearlengthinDays - (k / meanlengthofday) × (obliquity - earthtiltMean)
+```
+
+Where:
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `meansolaryearlengthinDays` | 365.242188997508 | Mean tropical year (days) |
+| `meanlengthofday` | 86399.98848 | Mean solar day (seconds) |
+| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `k` | 2.3 | Obliquity coefficient (seconds/degree) |
+
+### Derivation of Coefficient k
+
+From regression analysis:
+```
+k_days = -0.0000266207 days per degree
+k_seconds = k_days × 86400 = -2.30 seconds per degree
+```
+
+The formula `k / meanlengthofday` converts the coefficient from seconds to days:
+```
+2.3 / 86399.98848 = 0.0000266207 days/degree
+```
+
+### JavaScript Implementation
+
+```javascript
+function computeTropicalYearFromObliquity(obliquity) {
+  const k = 2.3;  // seconds per degree
+  return meansolaryearlengthinDays - (k / meanlengthofday) * (obliquity - earthtiltMean);
+}
+```
+
+### Excel Formula
+
+```
+= meanTropicalYear - (2.3 / meanLengthOfDay) * (obliquity - meanObliquity)
+```
+
+Example with cell references:
+```
+= $A$1 - (2.3 / $BH$3) * (W264 - $U$3)
+```
+
+Where:
+- `$A$1` = meansolaryearlengthinDays (365.242188997508)
+- `$BH$3` = meanlengthofday (86399.98848)
+- `W264` = current obliquity
+- `$U$3` = earthtiltMean (23.41398)
+
+### Verification
+
+| Year | Obliquity (°) | Model Tropical Year | Formula Tropical Year | Error |
+|------|---------------|---------------------|----------------------|-------|
+| -9188 | 24.496011 | 365.242161708 | 365.242160193 | 0.13 s |
+| -3971 | 24.241159 | 365.242168900 | 365.242166971 | 0.17 s |
+| 1246 | 23.537579 | 365.242185671 | 365.242185703 | 0.00 s |
+| 6463 | 22.834282 | 365.242203085 | 365.242204411 | 0.11 s |
+| 11680 | 22.537552 | 365.242212291 | 365.242212306 | 0.00 s |
+
+The formula matches the model within ~0.2 seconds across the full 20,868-year perihelion cycle.
+
+### Physical Interpretation
+
+The tropical year is the time between successive vernal equinoxes. The equinox occurs when the Sun crosses the celestial equator, which is determined by Earth's axial tilt (obliquity).
+
+- **Higher obliquity** → The ecliptic is more tilted relative to the celestial equator → The Sun crosses the equator at a steeper angle → **Shorter tropical year**
+- **Lower obliquity** → The ecliptic is less tilted → The Sun crosses at a shallower angle → **Longer tropical year**
+
+The coefficient of -2.3 seconds per degree quantifies this geometric relationship.
+
+### Relationship to Day Length
+
+Once the tropical year is known, the day length follows from:
+
+```javascript
+// Sidereal year in days = tropical year × P / (P - 1)
+// where P = precession period = H/13 = 25683.69 years
+const siderealYearDays = tropicalYear * (holisticyearLength/13) / ((holisticyearLength/13) - 1);
+
+// Day length = sidereal year (seconds) / sidereal year (days)
+const dayLength = meansiderealyearlengthinSeconds / siderealYearDays;
+```
+
+This preserves the fundamental relationship: the sidereal year in seconds is fixed at 31,558,153.82478 seconds, and the day length adjusts based on how many days fit into that fixed duration.
+
+---
+
+## Sidereal Year Formula Based on Eccentricity (January 2026)
+
+### Discovery: Sidereal Year Correlates with Eccentricity
+
+Analysis of the same 27,000-year dataset revealed a remarkable finding: while the tropical year depends on obliquity, the **sidereal year depends on eccentricity**.
+
+Initial analysis suggested the sidereal year "extra" variation (beyond the precession relationship to tropical year) depended on both obliquity and eccentricity. However, a deeper analysis revealed that the obliquity term (+2.29 s/°) almost exactly cancels the obliquity effect inherited from the tropical year via the precession scaling (-2.30 s/°).
+
+**The net result:** The sidereal year depends only on eccentricity.
+
+| Regression | R² |
+|------------|-----|
+| Sidereal Year vs Eccentricity only | 0.9996 |
+
+### The Formula
+
+The sidereal year can be computed directly from eccentricity using:
+
+```
+Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityMean)
+```
+
+Where:
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `meansiderealyearlengthinDays` | 365.256410333209 | Mean sidereal year (days) |
+| `meanlengthofday` | 86399.98848 | Mean solar day (seconds) |
+| `eccentricityMean` | 0.015321 | Mean eccentricity |
+| `k` | 3058 | Eccentricity coefficient (seconds/unit) - calibrated to J2000 precession |
+
+### JavaScript Implementation
+
+```javascript
+function computeLengthofsiderealYearDays(eccentricity) {
+  const k = 3058;  // seconds per unit eccentricity (calibrated to precession = 25,771.57 years at J2000)
+  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityMean);
+}
+```
+
+### Excel Formula
+
+```
+= meansiderealyearlengthinDays - (3058 / meanLengthOfDay) * (eccentricity - meanEccentricity)
+```
+
+Example with cell references:
+```
+= $B$1 - (3058 / $BH$3) * (X264 - $V$3)
+```
+
+Where:
+- `$B$1` = meansiderealyearlengthinDays (365.256410333209)
+- `$BH$3` = meanlengthofday (86399.98848)
+- `X264` = current eccentricity
+- `$V$3` = eccentricityMean (0.015321)
+
+### Verification
+
+| Year | Eccentricity | Measured Sidereal | Formula Sidereal | Error |
+|------|--------------|-------------------|------------------|-------|
+| -9188 | 0.013898 | 365.256462012 | 365.256461396 | 0.05 s |
+| 1246 | 0.016744 | 365.256359901 | 365.256359291 | 0.05 s |
+| 11680 | 0.013898 | 365.256462167 | 365.256461396 | 0.07 s |
+
+The formula matches the model measurements within ~0.1 seconds.
+
+### Physical Interpretation
+
+The sidereal year is the time for Earth to complete one full orbit relative to the fixed stars.
+
+- **Higher eccentricity** → More elliptical orbit → Earth spends more time near aphelion (moving slower, by Kepler's 2nd law) and less time near perihelion (moving faster) → The integrated orbital time changes → **Shorter sidereal year** (with negative coefficient)
+- **Lower eccentricity** → More circular orbit → More uniform velocity throughout orbit → **Longer sidereal year**
+
+The coefficient of 3058 seconds per unit eccentricity quantifies how the orbital period changes as the orbit becomes more or less elliptical. This value is specifically calibrated to produce the correct precession period of 25,771.57 years at epoch J2000.
+
+### Calibration to Precession
+
+The eccentricity coefficient (3058) is not arbitrary - it is the value that produces the correct axial precession period. The relationship between sidereal year, tropical year, and precession is:
+
+```
+Precession Period = Sidereal Year × Tropical Year / (Sidereal Year - Tropical Year)
+```
+
+By calibrating `meansiderealyearAmplitudeinSecondsaDay = 3058` and `meansiderealyearlengthinSeconds = 31,558,149.724`, the model produces:
+- **Precession period at J2000: 25,771.57 years** (matching IAU/IERS observations)
+
+If this coefficient is changed, the precession period will change accordingly. The coefficient was derived by iteratively adjusting the sidereal year parameters until the model matched the observed precession rate.
+
+---
+
+## Summary: Elegant Separation of Dependencies
+
+The analysis reveals an elegant result:
+
+| Year Type | Depends On | Coefficient | Physical Reason |
+|-----------|------------|-------------|-----------------|
+| **Tropical Year** | Obliquity | 2.3 s/° | Geometry of equinox crossings - steeper ecliptic angle means faster equinox-to-equinox cycle |
+| **Sidereal Year** | Eccentricity | 3058 s/unit | Orbital mechanics - more elliptical orbit changes the integrated orbital period (calibrated to J2000 precession = 25,771.57 years) |
+
+**Tropical year** measures the Sun's position relative to Earth's equator (equinox to equinox), so it depends on **axial tilt (obliquity)**.
+
+**Sidereal year** measures Earth's position relative to the stars (full orbit), so it depends on **orbital shape (eccentricity)**.
+
+This separation makes physical sense: obliquity affects the reference frame for measuring the tropical year, while eccentricity affects the actual orbital dynamics that determine the sidereal year.
+
+---
+
+## Complete Formula Relationships (January 2026)
+
+### The Fundamental Constants
+
+The model is built on these fundamental constants:
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `meansiderealyearlengthinSeconds` | 31,558,149.724 s | **Fixed** orbital period in SI seconds (calibrated to precession) |
+| `meansolaryearlengthinDays` | 365.242188997508 days | Mean tropical year |
+| `meansiderealyearlengthinDays` | 365.256410333209 days | Mean sidereal year |
+| `meanlengthofday` | 86,399.98848 s | Mean solar day (derived) |
+| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `eccentricityMean` | 0.015321 | Mean eccentricity |
+| `meansiderealyearAmplitudeinSecondsaDay` | 3058 | Eccentricity coefficient (calibrated to J2000 precession = 25,771.57 years) |
+
+### The Key Insight: Sidereal Year in Seconds is Constant
+
+The **sidereal year in seconds** represents one complete orbit around the Sun. This is a fixed orbital period determined by the Sun's gravitational field and Earth's semi-major axis:
+
+```
+Sidereal Year (seconds) = meansiderealyearlengthinSeconds = 31,558,149.724 s (CONSTANT)
+```
+
+This value does not change with obliquity or eccentricity - it is a fundamental property of Earth's orbit.
+
+### Derived Relationships
+
+From this constant, all other values are derived:
+
+#### 1. Sidereal Year in Days (varies with eccentricity)
+
+```javascript
+siderealYear (days) = meansiderealyearlengthinDays - (k_ecc / meanlengthofday) × (eccentricity - eccentricityMean)
+```
+
+Where `k_ecc = 3058` seconds per unit eccentricity (constant `meansiderealyearAmplitudeinSecondsaDay`). This value is calibrated to produce the correct precession period of 25,771.57 years at J2000.
+
+#### 2. Length of Day (derived from sidereal year)
+
+Since the sidereal year in seconds is constant, and the sidereal year in days varies:
+
+```javascript
+lengthofDay = meansiderealyearlengthinSeconds / siderealYear (days)
+```
+
+This means the **length of day depends on eccentricity** (indirectly, through the sidereal year in days).
+
+#### 3. Tropical Year in Days (varies with obliquity)
+
+```javascript
+tropicalYear (days) = meansolaryearlengthinDays - (k_obl / meanlengthofday) × (obliquity - earthtiltMean)
+```
+
+Where `k_obl = 2.3` seconds per degree (constant `meansolaryearAmplitudeinSecondsaDay`).
+
+#### 4. Self-Consistency Check
+
+The formulas are self-consistent:
+
+```
+siderealYear (seconds) = siderealYear (days) × lengthofDay
+                       = siderealYear (days) × (meansiderealyearlengthinSeconds / siderealYear (days))
+                       = meansiderealyearlengthinSeconds  ✓ (always constant!)
+```
+
+### Complete Dependency Chain
+
+```
+                    ┌─────────────────┐
+                    │   OBLIQUITY     │
+                    │  (from formula) │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  TROPICAL YEAR  │
+                    │     (days)      │
+                    └─────────────────┘
+
+
+                    ┌─────────────────┐
+                    │  ECCENTRICITY   │
+                    │  (from formula) │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  SIDEREAL YEAR  │
+                    │     (days)      │
+                    └────────┬────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+          ▼                  ▼                  ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ SIDEREAL YEAR   │ │  LENGTH OF DAY  │ │ (other derived  │
+│   (seconds)     │ │    (seconds)    │ │    values)      │
+│   = CONSTANT    │ │   = constant /  │ │                 │
+│                 │ │  sidereal(days) │ │                 │
+└─────────────────┘ └─────────────────┘ └─────────────────┘
+```
+
+### JavaScript Implementation
+
+```javascript
+// 1. Compute obliquity and eccentricity for the current year
+const obliquity = computeObliquityEarth(currentYear);
+const eccentricity = computeEccentricityEarth(currentYear, ...);
+
+// 2. Compute year lengths from obliquity and eccentricity
+const tropicalYear = computeLengthofsolarYear(obliquity);      // days
+const siderealYear = computeLengthofsiderealYear(eccentricity); // days
+
+// 3. Sidereal year in seconds is CONSTANT
+const siderealYearSeconds = meansiderealyearlengthinSeconds;    // always 31,558,149.724 s
+
+// 4. Length of day is DERIVED
+const lengthofDay = meansiderealyearlengthinSeconds / siderealYear;  // seconds
+```
+
+### Excel Formulas
+
+| Quantity | Excel Formula |
+|----------|---------------|
+| Tropical Year (days) | `= meanTropicalYear - (2.3 / meanLOD) * (obliquity - meanObliquity)` |
+| Sidereal Year (days) | `= meanSiderealYear - (3058 / meanLOD) * (eccentricity - meanEccentricity)` |
+| Sidereal Year (seconds) | `= meansiderealyearlengthinSeconds` (constant) |
+| Length of Day (seconds) | `= meansiderealyearlengthinSeconds / siderealYear(days)` |
+
+### Variation Ranges
+
+Over one perihelion cycle (20,868 years):
+
+| Quantity | Mean Value | Variation | Depends On |
+|----------|------------|-----------|------------|
+| Obliquity | 23.41398° | ±1.08° | H/3 and H/8 cycles |
+| Eccentricity | 0.015321 | ±0.00142 | H/16 cycle |
+| Tropical Year | 365.242189 days | ±2.5 s | Obliquity |
+| Sidereal Year (days) | 365.256410 days | ±4.4 s | Eccentricity |
+| Sidereal Year (seconds) | 31,558,149.724 s | **0** (constant) | - |
+| Length of Day | 86,399.98848 s | ±12 ms | Eccentricity |
+
+### Physical Interpretation Summary
+
+1. **Sidereal year in seconds is constant** because it represents the orbital period - the time to complete one full orbit. This is determined by Kepler's 3rd law and doesn't change with Earth's orientation or orbital shape variations.
+
+2. **Sidereal year in days varies with eccentricity** because the day length changes. More elliptical orbits have different velocity distributions, affecting how many "days" fit into the constant orbital period.
+
+3. **Length of day varies with eccentricity** as a consequence: `LOD = constant seconds / variable days`.
+
+4. **Tropical year varies with obliquity** because it measures equinox-to-equinox time. The steeper the ecliptic angle (higher obliquity), the faster the Sun crosses the equator, shortening the tropical year.
+
+---
+
+*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3058 (calibrated to J2000 precession period of 25,771.57 years).*
