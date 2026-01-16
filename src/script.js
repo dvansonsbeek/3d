@@ -88,7 +88,7 @@ const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.984366;                  // To align the perihelion exactly
-const mercuryPerihelionICRFYears = holisticyearLength/(1+(5/13)); // Duration of perihelion precession to explain ~574 arcseconds per century
+const mercuryPerihelionICRFYears = holisticyearLength/(1+(5/13)); // Duration of perihelion precession to explain ~575 arcseconds per century
 const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
@@ -102,7 +102,7 @@ const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (
 const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.782986;                    // To align the perihelion exactly
-const venusPerihelionICRFYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~200 arcseconds per century
+const venusPerihelionICRFYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
 const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
@@ -130,7 +130,7 @@ const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868
 const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
 const jupiterAngleCorrection = 1.097601;                  // To align the perihelion exactly
-const jupiterPerihelionICRFYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~2000 arcseconds per century
+const jupiterPerihelionICRFYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
 const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
@@ -144,7 +144,7 @@ const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856
 const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
 const saturnAngleCorrection = -0.175436;                  // To align the perihelion exactly
-const saturnPerihelionICRFYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3500 arcseconds per century
+const saturnPerihelionICRFYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
 const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
@@ -158,7 +158,7 @@ const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (
 const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
 const uranusAngleCorrection = -0.774123;                  // To align the perihelion exactly
-const uranusPerihelionICRFYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1200 arcseconds per century
+const uranusPerihelionICRFYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
 const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
