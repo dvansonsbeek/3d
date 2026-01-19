@@ -53,6 +53,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [21 - Planet Inspector Reference](21-planet-inspector-reference.md) | Planet inspector panel implementation |
 | [22 - UI Panels Reference](22-ui-panels-reference.md) | UI panel implementations |
 | [23 - Data Export Reference](23-data-export-reference.md) | Report generation and data export systems |
+| [24 - Analysis & Export Tools](24-analysis-export-tools.md) | Analysis tools and export functionality in the Settings panel |
 
 ### Appendices - Verification & Optimization Scripts
 
