@@ -165,13 +165,12 @@ The model is **heliocentric** (Earth orbits the Sun) but viewed from a **geocent
 
 ## Further Reading
 
-For the complete scientific background with 19 detailed chapters:
+For the complete scientific background:
 
-- [Model Basics](https://holisticuniverse.com/en/chapters/modelbasics) - Detailed explanation of the two control points
-- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - Full derivation of the 333,888-year cycle
-- [Precession](https://holisticuniverse.com/en/chapters/precession) - Complete precession theory
-- [Obliquity & Inclination](https://holisticuniverse.com/en/chapters/obliquityinclination) - Earth's tilt variations
-- [Full Glossary](https://holisticuniverse.com/en/glossary) - 138 terms defined
+- [How it Works](https://www.holisticuniverse.com/en/model/how-it-works) - Detailed explanation of the model
+- [Precession](https://www.holisticuniverse.com/en/model/precession) - Complete precession theory
+- [Obliquity & Inclination](https://www.holisticuniverse.com/en/model/obliquity) - Earth's tilt variations
+- [Full Glossary](https://www.holisticuniverse.com/en/reference/glossary) - Terms defined
 
 ---
 

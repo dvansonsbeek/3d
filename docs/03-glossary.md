@@ -1,6 +1,6 @@
 # Glossary of Essential Terms
 
-This glossary defines the key terms used throughout the documentation. For a complete glossary of 138 terms, see the [website glossary](https://holisticuniverse.com/en/glossary).
+This glossary defines the key terms used throughout the documentation. For a complete glossary, see the [website glossary](https://www.holisticuniverse.com/en/reference/glossary).
 
 ---
 
@@ -164,8 +164,8 @@ The difference between True Anomaly and Mean Anomaly (ν - M). Represents how mu
 
 ## Further Reading
 
-For the complete 138-term glossary with detailed explanations, visit:
-**[Holistic Universe Glossary](https://holisticuniverse.com/en/glossary)**
+For the complete glossary with detailed explanations, visit:
+**[Holistic Universe Glossary](https://www.holisticuniverse.com/en/reference/glossary)**
 
 ---
 

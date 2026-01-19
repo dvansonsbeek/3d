@@ -9,7 +9,7 @@ This document describes the Three.js scene graph hierarchy used in the Holistic 
 - [20 - Architecture](20-architecture.md) - Overall code structure
 - [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md) - What orbital elements change over time
 
-**Source:** [Technical Guide](https://www.holisticuniverse.com/en/chapters/technicalguide) on the Holistic Universe website
+**Source:** [Technical Guide](https://www.holisticuniverse.com/en/simulation/technical-guide) on the Holistic Universe website
 
 ---
 

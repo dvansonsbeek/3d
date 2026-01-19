@@ -4,7 +4,7 @@ Welcome to the technical documentation for the Holistic Universe Model 3D Solar 
 
 ## About This Documentation
 
-This documentation is **self-contained** - you can understand the model and use the simulation by reading these documents alone. For deeper exploration, the [Holistic Universe website](https://holisticuniverse.com) provides 19 detailed chapters covering the complete scientific background.
+This documentation is **self-contained** - you can understand the model and use the simulation by reading these documents alone. For deeper exploration, the [Holistic Universe website](https://holisticuniverse.com) provides additional information covering the complete scientific background.
 
 ## Reading Order
 
@@ -96,9 +96,8 @@ Both produce identical results, proving the geometric validity of the approach.
 
 ## Further Reading
 
-For the complete scientific background, visit the [Holistic Universe website](https://holisticuniverse.com):
+For the complete scientific background, visit the [Holistic Universe website](https://www.holisticuniverse.com/en):
 
-- [Model Basics](https://holisticuniverse.com/en/chapters/modelbasics) - The two gravitational control points
-- [The Holistic-Year](https://holisticuniverse.com/en/chapters/theholisticyear) - The 333,888-year cycle explained
-- [Precession](https://holisticuniverse.com/en/chapters/precession) - Axial, inclination, and perihelion precession
-- [Full Glossary](https://holisticuniverse.com/en/glossary) - 138 terms defined
+- [How it Works](https://www.holisticuniverse.com/en/model/how-it-works) - The model explained
+- [Precession](https://www.holisticuniverse.com/en/model/precession) - Axial, inclination, and perihelion precession
+- [Full Glossary](https://www.holisticuniverse.com/en/reference/glossary) - Terms defined
