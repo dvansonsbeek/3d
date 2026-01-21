@@ -2076,7 +2076,7 @@ const siderealYearDays = tropicalYear * (holisticyearLength/13) / ((holisticyear
 const dayLength = meansiderealyearlengthinSeconds / siderealYearDays;
 ```
 
-This preserves the fundamental relationship: the sidereal year in seconds is fixed at 31,558,153.82478 seconds, and the day length adjusts based on how many days fit into that fixed duration.
+This preserves the fundamental relationship: the sidereal year in seconds is fixed at 31,558,149.724 seconds, and the day length adjusts based on how many days fit into that fixed duration.
 
 ---
 
