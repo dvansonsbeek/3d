@@ -496,6 +496,25 @@ const ASTRO_REFERENCE = {
   eccentricityJ2000: 0.01671022,                     // Distance to Earth in AU (eccentricity)
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // PERIHELION PRECESSION RATES (1900-2100 trend)
+  // Source: Derived from JPL SPICE/WebGeoCalc analysis using modern ephemerides
+  // Values represent the linear trend over 1900-2100 AD
+  // Note: Rates fluctuate over time; these are not valid for long-term predictions
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Values in arcseconds per century, with min/max range where applicable
+  perihelionPrecessionRates: {
+    mercury: { min: 570, max: 575 },
+    venus:   { min: 0, max: 400 },
+    earth:   { value: 1163 },
+    mars:    { min: 1550, max: 1650 },
+    jupiter: { min: 800, max: 1800 },
+    saturn:  { min: -3400, max: -2000 },  // retrograde
+    uranus:  { min: 1100, max: 1300 },
+    neptune: { min: -200, max: 200 },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // YEAR LENGTH REFERENCE VALUES (J2000.0)
   // Source: Meeus & Savoie (1992) "The history of the tropical year"
   // Journal of the British Astronomical Association, 102(1), 40-42
