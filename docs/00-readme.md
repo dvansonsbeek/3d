@@ -68,6 +68,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix G - Mercury Precession](appendix-g-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
 | [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |
 | [Appendix I - Length of Day& Year Formulas](appendix-i-length-day-year-formulas.md) | Tropical year and day length analysis: measurement methods, validation results, proposed formulas |
+| [Appendix J - Holistic Year Analysis Data](appendix-j-holistic-year-analysis.xlsx) | Excel export of 64 points in time for year analysis spanning one complete Holistic Year (333,888 years) |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization
