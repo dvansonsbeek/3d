@@ -282,9 +282,9 @@ Each planet has a 4-layer precession structure with forward and reverse componen
 
 | Planet | HY Formula | ICRF Precession Period |
 |--------|------------|----------------------|
-| Mercury | HY/(1+3/13) | ~241,164 years |
+| Mercury | HY/(1+3/8) | ~242,828 years |
 | Venus | HY×2 | ~667,776 years |
-| Mars | HY/(4+5/13) | ~76,144 years |
+| Mars | HY/(4+1/3) | ~77,047 years |
 | Jupiter | HY/5 | 66,778 years |
 | Saturn | -HY/8 | -41,736 years (retrograde) |
 | Uranus | HY/3 | 111,296 years |

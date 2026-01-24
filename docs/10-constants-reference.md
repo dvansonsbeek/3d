@@ -96,7 +96,7 @@ Each planet's inclination oscillates around a mean value with a specific amplitu
 
 | Planet | Mean (°) | Amplitude (°) | Range (°) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.347540 | 0.000258 | 6.35 - 6.35 | 203.3195° | ~0"/cy |
+| Mercury | 6.359178 | 0.012058 | 6.35 - 6.37 | 203.3195° | ~0"/cy |
 | Venus | 3.055471 | 1.055286 | 2.00 - 4.11 | 203.3195° | ~21"/cy |
 | Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195° | (reference) |
 | Mars | 3.600460 | 2.239753 | 1.36 - 5.84 | 203.3195° | ~13"/cy |
@@ -190,10 +190,10 @@ These are the observed secular variation rates for ecliptic inclinations:
 
 | Planet | Variable | Formula | Period (years) |
 |--------|----------|---------|----------------|
-| Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/13))` | ~241,164 |
+| Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/8))` | ~242,828 |
 | Venus | `venusPerihelionICRFYears` | `holisticyearLength*2` | ~667,776 |
 | Earth | `earthPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |
-| Mars | `marsPerihelionICRFYears` | `holisticyearLength/(4+(5/13))` | ~76,144 |
+| Mars | `marsPerihelionICRFYears` | `holisticyearLength/(4+(1/3))` | ~77,047 |
 | Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength/5` | 66,778 |
 | Saturn | `saturnPerihelionICRFYears` | `-holisticyearLength/8` | -41,736 (retrograde) |
 | Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |

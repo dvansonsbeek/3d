@@ -89,9 +89,9 @@ const planetInputs = {
     name: 'Mercury',
     omegaJ2000: 32.83,                              // Verified ascending node
     inclJ2000: 6.3472858,                           // J2000 inv plane inclination (S&S 2012)
-    period: holisticyearLength / (1 + 5/13),        // ~241,164 years
+    period: holisticyearLength / (1 + 3/8),         // ~242,828 years
     phaseAngle: 203.3195,                           // Prograde
-    periodExpr: 'holisticyearLength/(1+(5/13))'
+    periodExpr: 'holisticyearLength/(1+(3/8))'
   },
   venus: {
     name: 'Venus',
@@ -105,9 +105,9 @@ const planetInputs = {
     name: 'Mars',
     omegaJ2000: 354.87,
     inclJ2000: 1.6311858,
-    period: holisticyearLength / (4 + 5/13),        // ~77,207 years
+    period: holisticyearLength / (4 + 1/3),         // ~77,047 years
     phaseAngle: 203.3195,
-    periodExpr: 'holisticyearLength/(4+(5/13))'
+    periodExpr: 'holisticyearLength/(4+(1/3))'
   },
   jupiter: {
     name: 'Jupiter',

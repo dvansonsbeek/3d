@@ -88,7 +88,7 @@ const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.984366;                  // To align the perihelion exactly
-const mercuryPerihelionICRFYears = holisticyearLength/(1+(5/13)); // Duration of perihelion precession to explain ~575 arcseconds per century
+const mercuryPerihelionICRFYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
 const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
@@ -116,7 +116,7 @@ const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (
 const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
 const marsAngleCorrection = -2.10564;                    // To align the perihelion exactly
-const marsPerihelionICRFYears = holisticyearLength/(4+(5/13)); // Duration of perihelion precession to explain ~1600 arcseconds per century
+const marsPerihelionICRFYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
@@ -295,9 +295,9 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
-// J2000=6.3472858° (EXACT), phase 203.3195°, period holisticyearLength/(1+(5/13)), trend error: 0.8"/cy
-const mercuryInvPlaneInclinationMean = 6.347540;
-const mercuryInvPlaneInclinationAmplitude = 0.000258;  // Range: 6.35° to 6.35°
+// J2000=6.3472858° (EXACT), phase 203.3195°, period holisticyearLength/(1+(3/8)), trend error: 0.0"/cy
+const mercuryInvPlaneInclinationMean = 6.359178;
+const mercuryInvPlaneInclinationAmplitude = 0.012058;  // Range: 6.35° to 6.37°
 
 // Venus: Range 0.72° to 4.11° (from Laplace-Lagrange)
 // J2000=2.1545441° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 18.3"/cy
@@ -306,7 +306,7 @@ const venusInvPlaneInclinationMean = 3.055471;
 const venusInvPlaneInclinationAmplitude = 1.055286;  // Range: 2.00° to 4.11°
 
 // Mars: Range 0.00° to 5.84° (from Laplace-Lagrange)
-// J2000=1.6311858° (EXACT), phase 203.3195°, period holisticyearLength/(4+(5/13)), trend error: 16.6"/cy
+// J2000=1.6311858° (EXACT), phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 15.4"/cy
 const marsInvPlaneInclinationMean = 3.600460;
 const marsInvPlaneInclinationAmplitude = 2.239753;  // Range: 1.36° to 5.84°
 

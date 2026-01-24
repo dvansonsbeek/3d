@@ -66,11 +66,11 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 6.347540,
-    amplitude: 0.000258,
+    mean: 6.359178,
+    amplitude: 0.012058,
     phaseAngle: 203.3195,
     omegaJ2000: 32.83,
-    period: holisticyearLength / (1 + 5/13),  // ~241,164 years
+    period: holisticyearLength / (1 + 3/8),  // ~242,828 years
     inclJ2000: 6.3472858,
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
@@ -88,7 +88,7 @@ const currentCodeValues = {
     amplitude: 2.239753,
     phaseAngle: 203.3195,
     omegaJ2000: 354.87,
-    period: holisticyearLength / (4 + 5/13),  // ~76,144 years
+    period: holisticyearLength / (4 + 1/3),  // ~77,047 years
     inclJ2000: 1.6311858,
     jplTrend: marsEclipticInclinationTrendJPL
   },
@@ -378,9 +378,9 @@ console.log('');
 
 for (const [name, p] of Object.entries(currentCodeValues)) {
   const periodExpr =
-    name === 'mercury' ? 'holisticyearLength/(1+(5/13))' :
+    name === 'mercury' ? 'holisticyearLength/(1+(3/8))' :
     name === 'venus' ? 'holisticyearLength*2' :
-    name === 'mars' ? 'holisticyearLength/(4+(5/13))' :
+    name === 'mars' ? 'holisticyearLength/(4+(1/3))' :
     name === 'jupiter' ? 'holisticyearLength/5' :
     name === 'saturn' ? '-holisticyearLength/8' :
     name === 'uranus' ? 'holisticyearLength/3' :

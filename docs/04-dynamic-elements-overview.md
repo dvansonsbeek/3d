@@ -328,9 +328,9 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 
 | Planet | Period | Direction |
 |--------|--------|-----------|
-| Mercury | 241,164 years | Prograde |
+| Mercury | 242,828 years | Prograde |
 | Venus | 667,776 years | Prograde |
-| Mars | 76,144 years | Prograde |
+| Mars | 77,047 years | Prograde |
 | Jupiter | 66,778 years | Prograde |
 | Saturn | 41,736 years | **Retrograde** |
 | Uranus | 111,296 years | Prograde |

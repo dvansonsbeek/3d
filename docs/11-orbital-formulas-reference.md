@@ -1730,8 +1730,8 @@ precessionRateFromPeriod: (period_years) => {
 **Example Values:**
 | Planet | Precession Period (years) | Rate (arcsec/century) |
 |--------|---------------------------|----------------------|
-| Mercury | ~241,164 | ~537 |
-| Mars | 76,144 (holistic/4) | ~1,739 |
+| Mercury | ~242,828 | ~534 |
+| Mars | ~77,047 | ~1,682 |
 | Earth | 111,296 (holistic/3) | ~1,304 |
 | Jupiter | 333,888 (holistic) | ~435 |
 | Saturn | -333,888 (retrograde) | ~-435 |
@@ -1776,7 +1776,7 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- ICRF period: ~241,164 years
+- ICRF period: ~242,828 years
 - Reference (holistic/13): ~25,684 years
 - Ecliptic period: ~28,745 years
 
@@ -1806,10 +1806,10 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 **Observed Patterns:**
 | Planet | Ratio | Expression |
 |--------|-------|------------|
-| Mercury | ~1.38 | Custom (~241,164 years) |
+| Mercury | 1.375 | holisticyearLength / (1+3/8) |
 | Venus | ~0.5 | holisticyearLength * 2 |
 | Earth | 3 | holisticyearLength / 3 |
-| Mars | ~4.38 | holisticyearLength / (4+5/13) |
+| Mars | 4.333 | holisticyearLength / (4+1/3) |
 | Jupiter | 5 | holisticyearLength / 5 |
 | Saturn | -8 | -holisticyearLength / 8 (retrograde) |
 | Uranus | 3 | holisticyearLength / 3 |
@@ -1946,10 +1946,10 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 
 | Planet | ICRF Period (years) | Ecliptic Period (years) | Rate (arcsec/century) | Holistic Ratio |
 |--------|---------------------|------------------------|----------------------|----------------|
-| **Mercury** | ~241,164 | ~28,745 | ~537 | ~1.22 |
+| **Mercury** | ~242,828 | ~28,745 | ~534 | 1.375 |
 | **Venus** | ~667,776 | ~26,711 | ~0 | ~0 |
 | **Earth** | 111,296 | ~33,389 | ~1,304 | 3 |
-| **Mars** | ~76,150 | ~38,755 | ~1,739 | 4 |
+| **Mars** | ~77,047 | ~38,755 | ~1,682 | 4.333 |
 | **Jupiter** | 66,778 | 41,736 | ~435 | 1 |
 | **Saturn** | -41,736 | ~15,899 | ~-435 | -1 |
 | **Uranus** | 111,296 | ~33,389 | ~1,304 | 3 |

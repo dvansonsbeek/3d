@@ -90,7 +90,7 @@ All values optimized for **exact J2000 invariable plane inclination match** (ver
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 6.347540 | 0.000258 | 6.3473 | 6.35 - 6.35 | ~0"/cy |
+| Mercury | 6.359178 | 0.012058 | 6.3473 | 6.35 - 6.37 | ~0"/cy |
 | Venus | 3.055471 | 1.055286 | 2.1545 | 2.00 - 4.11 | ~21"/cy |
 | Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
 | Mars | 3.600460 | 2.239753 | 1.6312 | 1.36 - 5.84 | ~13"/cy |
@@ -130,10 +130,10 @@ The inclination oscillation period equals the ascending node precession period f
 
 | Planet | Period (years) | Period Expression |
 |--------|----------------|-------------------|
-| Mercury | ~241,164 | `holisticyearLength/(1+(5/13))` |
+| Mercury | ~242,828 | `holisticyearLength/(1+(3/8))` |
 | Venus | ~667,776 | `holisticyearLength*2` |
 | Earth | ~111,296 | `holisticyearLength/3` |
-| Mars | ~76,144 | `holisticyearLength/(4+(5/13))` |
+| Mars | ~77,047 | `holisticyearLength/(4+(1/3))` |
 | Jupiter | 66,778 | `holisticyearLength/5` |
 | Saturn | -41,736 | `-holisticyearLength/8` (retrograde) |
 | Uranus | ~111,296 | `holisticyearLength/3` |

@@ -31,7 +31,7 @@ const holisticyearLength = 333888;
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury's perihelion precession period (ICRF frame)
-const mercuryPerihelionICRFYears = holisticyearLength / (1 + 5/13);  // ~241,164 years
+const mercuryPerihelionICRFYears = holisticyearLength / (1 + 3/8);  // ~242,828 years
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()
