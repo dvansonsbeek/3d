@@ -22,7 +22,7 @@ This document describes the two methods used to calculate perihelion longitude i
 | Metric | Mercury Example |
 |--------|-----------------|
 | Current rate (year 2000) | ~575 arcsec/century |
-| Long-term average | ~537 arcsec/century |
+| Long-term average | ~534 arcsec/century |
 | Fluctuation range | ±100 arcsec/century |
 | Fluctuation period | ~6,500 years |
 
@@ -39,7 +39,7 @@ This document describes the two methods used to calculate perihelion longitude i
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Rate | Exactly 537.4 arcsec/century |
+| Rate | Exactly 533.7 arcsec/century |
 | Fluctuation | None |
 | Starting longitude (J2000) | 77.46° |
 
@@ -175,7 +175,7 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 | Metric | Value |
 |--------|-------|
-| Mean rate | 537.4 arcsec/century |
+| Mean rate | 533.7 arcsec/century |
 | Minimum rate | 427 arcsec/century |
 | Maximum rate | 710 arcsec/century |
 | Range | 283 arcsec/century |
