@@ -49,6 +49,7 @@ const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
 const meansiderealyearAmplitudeinSecondsaDay = 3058;      // Formula only
 const meansolaryearAmplitudeinSecondsaDay = 2.3;          // Formula only
+const meanAnomalisticYearAmplitudeinSecondsaDay = 6;      // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
@@ -4259,12 +4260,7 @@ let predictions = {
   lengthofsolarYearSecRealLOD: 0,
   lengthofsiderealYearDaysRealLOD: 0,
   lengthofanomalisticDaysRealLOD: 0,
-  lengthofanomalisticYearRealLOD: 0,
-  perihelionPrecession: 0,
-  axialPrecession: 0,
-  inclinationPrecession: 0,
-  obliquityPrecession: 0,
-  eclipticPrecession: 0,
+  lengthofanomalisticYearSecRealLOD: 0,
   perihelionPrecessionRealLOD: 0,
   axialPrecessionRealLOD: 0,
   inclinationPrecessionRealLOD: 0,
@@ -10512,7 +10508,7 @@ function setupGUI() {
     siderealFolder.open(); 
   
     let anomalisticFolder = astroFolder.addFolder('Length of Anomalistic Year - Predictions');
-      anomalisticFolder.add(predictions, 'lengthofanomalisticYearRealLOD').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
+      anomalisticFolder.add(predictions, 'lengthofanomalisticYearSecRealLOD').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
       anomalisticFolder.add(predictions, 'lengthofanomalisticDaysRealLOD').name('Length of Anomalistic Year (days)').step(0.000001).listen();
     anomalisticFolder.open(); 
   
@@ -19571,9 +19567,9 @@ const planetStats = {
        value : [ { small: meansiderealyearlengthinDays },{ v: () => o.lengthofsiderealYear, dec:11, sep:',' }]},
      null,
       {label : () => `Anomalistic year (SI seconds)`,
-       value : [ { small: meanAnomalisticYearinDays*meanlengthofday },{ v: () => o.lengthofanomalisticYearRealLOD, dec:6, sep:',' }]},
+       value : [ { small: meanAnomalisticYearinDays*meanlengthofday },{ v: () => o.lengthofanomalisticYearSecRealLOD, dec:6, sep:',' }]},
       {label : () => `Anomalistic year (days)`,
-       value : [ { small: meanAnomalisticYearinDays },{ v: () => o.lengthofanomalisticYearRealLOD/o.lengthofDay, dec:11, sep:',' }]},
+       value : [ { small: (meanAnomalisticYearinDays*meanlengthofday)/86400 },{ v: () => o.lengthofanomalisticYearinDays, dec:11, sep:',' }]},
      null,
       {label : () => `Obliquity (degrees)`,
        value : [ { small: earthtiltMean },{ v: () => o.obliquityEarth, dec:12, sep:',' }]},
@@ -26158,19 +26154,13 @@ function updatePredictions() {
   // Compute these early - they are dependencies for calculations below
   predictions.lengthofsolarYearSecRealLOD = o.lengthofsolarYearSecRealLOD = o.lengthofsolarYear*o.lengthofDay;
   predictions.computeAxialPrecessionRealLOD = o.axialPrecessionRealLOD = computeAxialPrecessionRealLOD(o.lengthofsiderealYearInSeconds, o.lengthofsolarYear, o.lengthofDay);
-  predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.axialPrecessionRealLOD*13/16;
+  // perihelionPrecessionRealLOD is computed after anomalistic year (depends on it)
 
   predictions.lengthofsolarYearinDays = o.lengthofsolarYearinDays = o.lengthofsolarYearSecRealLOD/o.lengthofDay;
   predictions.lengthofsiderealDay = o.lengthofsiderealDay = o.lengthofsolarYearSecRealLOD/(o.lengthofsolarYearinDays+1);
   predictions.lengthofstellarDay = o.lengthofstellarDay = (((o.lengthofsiderealYearInSeconds-o.lengthofsolarYearSecRealLOD)/(1/eccentricityAmplitude/13*16))/(o.lengthofsolarYear+1))+o.lengthofsiderealDay;
   
   predictions.lengthofsiderealYearDays = o.lengthofsiderealYear; 
-  
-  predictions.perihelionPrecession = o.perihelionPrecession = o.axialPrecession*13/16;
-  predictions.axialPrecession = o.axialPrecession = computeAxialPrecession(o.lengthofsiderealYearInSeconds, o.lengthofsolarYear);
-  predictions.inclinationPrecession = o.inclinationPrecession = o.axialPrecession*13/3;
-  predictions.obliquityPrecession = o.obliquityPrecession = o.axialPrecession*13/8;
-  predictions.eclipticPrecession = o.eclipticPrecession = o.axialPrecession*13/5;
   
   predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = (o.lengthofsolarYear*86400)/(o.lengthofsolarYear+1);
   predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (o.lengthofsiderealDay/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+o.lengthofsiderealDay;
@@ -26179,12 +26169,13 @@ function updatePredictions() {
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
   
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear;
-  predictions.lengthofanomalisticYearRealLOD = o.lengthofanomalisticYearRealLOD = computeLengthofanomalisticYearRealLOD(o.perihelionPrecessionRealLOD, o.lengthofsolarYear, o.lengthofDay);
+  predictions.lengthofanomalisticYearSecRealLOD = o.lengthofanomalisticYearSecRealLOD = computeLengthofanomalisticYearRealLOD(o.eccentricityEarth, o.lengthofDay);
 
-  predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearRealLOD/o.lengthofDay;
-  predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearRealLOD/o.lengthofDay;
+  predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearSecRealLOD/86400;
+  predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearSecRealLOD/o.lengthofDay;
 
-  predictions.inclinationPrecessionRealLOD = o.inclinationPrecessionRealLOD = o.axialPrecessionRealLOD*13/3;
+  predictions.perihelionPrecessionRealLOD = o.perihelionPrecessionRealLOD = o.lengthofanomalisticYearSecRealLOD/(o.lengthofanomalisticYearSecRealLOD-o.lengthofsolarYearSecRealLOD);
+  predictions.inclinationPrecessionRealLOD = o.inclinationPrecessionRealLOD = o.lengthofanomalisticYearSecRealLOD/(o.lengthofanomalisticYearSecRealLOD-o.lengthofsiderealYearInSeconds);
   predictions.obliquityPrecessionRealLOD = o.obliquityPrecessionRealLOD = o.axialPrecessionRealLOD*13/8;
   predictions.eclipticPrecessionRealLOD =o.eclipticPrecessionRealLOD = o.axialPrecessionRealLOD*13/5;
   
@@ -26244,17 +26235,28 @@ function computeLengthofsiderealYear(eccentricity) {
 /**
  * Compute the length of the anomalistic year (in seconds) with Real LOD.
  *
- * @param {number} perihelionPrecession – the perihelion precession value
- * @param {number} lengthofsolarYear    – the length of the solar year (in days)
- * @returns {number} lengthofanomalisticYearRealLOD (in seconds)
+ * Three-step process:
+ * 1. Raw anomalistic year in days (varies with eccentricity, coefficient -6)
+ * 2. Apsidal correction using factors 13/3 and 16/3 to get seconds on Earth
+ * 3. Result is in seconds (divide by 86400 externally for IAU-compatible days)
+ *
+ * @param {number} eccentricity – the current eccentricity
+ * @param {number} lengthofDay  – the current length of day (in seconds)
+ * @returns {number} lengthofanomalisticYearSecRealLOD (in seconds)
  */
 function computeLengthofanomalisticYearRealLOD(
-  perihelionPrecession,
-  lengthofsolarYear,
+  eccentricity,
   lengthofDay
   ) {
-  return ((perihelionPrecession * lengthofsolarYear) /
-          (perihelionPrecession - 1)) * lengthofDay;
+  // Step 1: Raw anomalistic year in days (eccentricity variation)
+  const rawAnomDays = meanAnomalisticYearinDays -
+    (meanAnomalisticYearAmplitudeinSecondsaDay / meanlengthofday) *
+    (eccentricity - eccentricityMean);
+  // Step 2: Apsidal correction (seconds experienced on Earth)
+  const rawSeconds = rawAnomDays * lengthofDay;
+  const meanSeconds = meanAnomalisticYearinDays * meanlengthofday;
+  const apsidalCorrection = ((rawSeconds - meanSeconds) / (13/3)) * (16/3);
+  return rawSeconds - apsidalCorrection;
 }
 
 /**

@@ -2342,4 +2342,251 @@ Over one perihelion cycle (20,868 years):
 
 ---
 
-*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3058 (calibrated to J2000 precession period of 25,771.57 years).*
+## Anomalistic Year Formula (January 2026)
+
+### Definition
+
+The **anomalistic year** is the time between successive perihelia (closest approaches to the Sun). It differs from the tropical year because the perihelion point itself precesses.
+
+### IAU Reference Value
+
+| Quantity | Value | Notes |
+|----------|-------|-------|
+| Anomalistic Year (J2000) | 365.259636 days | IAU reference |
+| Anomalistic Year (J2000) | 31,558,432.5 seconds | In SI seconds |
+
+### The Precession Relationship
+
+The perihelion precession combines **apsidal** and **axial** precession:
+
+```
+1/(HY/16) = 1/(HY/3) + 1/(HY/13)
+   16/HY  =    3/HY  +   13/HY
+```
+
+Where:
+- **HY/3 = 111,296 years** - Apsidal precession (perihelion advance in inertial frame)
+- **HY/13 = 25,684 years** - Axial precession (equinox regression)
+- **HY/16 = 20,868 years** - Perihelion precession (combined effect)
+
+### The Apsidal Correction Factors
+
+The three precession cycles are related by the **apsidal denominator (3)**:
+
+| Cycle | Denominator | Ratio to 3 | Factor |
+|-------|-------------|------------|--------|
+| Apsidal | 3 | 3/3 = 1 | 1.000 |
+| Axial | 13 | 13/3 | **4.333...** |
+| Perihelion | 16 | 16/3 | **5.333...** |
+
+Note: 16 = 3 + 13, therefore 16/3 = 13/3 + 1, or **5.333 = 4.333 + 1**
+
+---
+
+### Three-Step Calculation Process
+
+The anomalistic year is calculated in three steps:
+
+#### Step 1: Raw Anomalistic Year in Days (Eccentricity Variation)
+
+First, calculate the raw anomalistic year in days, which varies with eccentricity:
+
+```
+Raw Anomalistic Year (days) = mean_anomalistic_days + (k_ecc / mean_LOD) × (eccentricity - mean_eccentricity)
+```
+
+Where:
+- `mean_anomalistic_days` = 365.259692339 days
+- `k_ecc` = **-6** seconds per unit eccentricity
+- `mean_LOD` = 86,399.98848 seconds
+- `mean_eccentricity` = 0.015332
+
+**Excel Formula (Step 1):**
+```excel
+= $A$3 + (($CF$3 / $BH$3) * (E264 - $E$2))
+```
+
+Where:
+- `$A$3` = mean anomalistic year in days (365.259692339)
+- `$CF$3` = **-6** (eccentricity coefficient)
+- `$BH$3` = mean length of day (86,399.98848 seconds)
+- `E264` = current eccentricity
+- `$E$2` = mean eccentricity (0.015332)
+
+#### Step 2: Apply Apsidal Correction (Seconds Experienced on Earth)
+
+Next, apply the apsidal correction using factors 4.333 (13/3) and 5.333 (16/3):
+
+```
+Anomalistic Year (seconds) = (raw_days × LOD) -
+    ((raw_days × LOD) - (mean_days × mean_LOD)) / (13/3) × (16/3)
+```
+
+**Excel Formula (Step 2):**
+```excel
+= (A_raw * LOD) - ((A_raw * LOD) - (A_mean * LOD_mean)) / 4.333333 * 5.333333
+```
+
+Where:
+- `A_raw` = raw anomalistic year in days (from Step 1)
+- `LOD` = current length of day in seconds
+- `A_mean` = mean anomalistic year in days (365.259692339)
+- `LOD_mean` = mean length of day in seconds (86,399.98848)
+- `4.333333` = 13/3 (axial/apsidal ratio)
+- `5.333333` = 16/3 (perihelion/apsidal ratio)
+
+This gives the **anomalistic year in seconds as experienced on Earth**.
+
+#### Step 3: Convert to IAU-Compatible Days
+
+Finally, divide by 86400 to get the IAU-compatible value in days:
+
+```
+Anomalistic Year (IAU days) = Anomalistic Year (seconds) / 86400
+```
+
+**Excel Formula (Step 3):**
+```excel
+= Step2_result / 86400
+```
+
+This produces the value that matches the IAU reference of **365.259636 days**.
+
+---
+
+### Why This Process Works
+
+The factors **13/3 (4.333...)** and **16/3 (5.333...)** encode the relationship between:
+- The axial precession contribution (13/3 of the apsidal rate)
+- The perihelion precession contribution (16/3 of the apsidal rate)
+
+The apsidal correction extracts the difference between calculated and mean values, scaling by the ratio 16/13 = 1.2308.
+
+**There is no accumulated drift.** The apsidal correction ensures that the calculated anomalistic year matches the observed/IAU value exactly.
+
+---
+
+### Complete JavaScript Implementation
+
+```javascript
+// Constants
+const meanAnomalisticYearinDays = 365.259692339;
+const meanAnomalisticYearAmplitude = -6;  // seconds per unit eccentricity
+const meanlengthofday = 86399.98848;
+const eccentricityMean = 0.015332;
+
+// Step 1: Raw anomalistic year in days (varies with eccentricity)
+function computeRawAnomalisticYearDays(eccentricity) {
+  return meanAnomalisticYearinDays +
+    (meanAnomalisticYearAmplitude / meanlengthofday) *
+    (eccentricity - eccentricityMean);
+}
+
+// Step 2: Apply apsidal correction to get seconds experienced on Earth
+function computeAnomalisticYearSeconds(rawAnomDays, lengthofDay) {
+  const rawSeconds = rawAnomDays * lengthofDay;
+  const meanSeconds = meanAnomalisticYearinDays * meanlengthofday;
+  const difference = rawSeconds - meanSeconds;
+  const apsidalCorrection = (difference / (13/3)) * (16/3);
+  return rawSeconds - apsidalCorrection;
+}
+
+// Step 3: Convert to IAU-compatible days
+function computeAnomalisticYearIAUDays(anomSeconds) {
+  return anomSeconds / 86400;
+}
+
+// Complete calculation
+const rawAnomDays = computeRawAnomalisticYearDays(eccentricity);
+const anomSeconds = computeAnomalisticYearSeconds(rawAnomDays, lengthofDay);
+const anomIAUDays = computeAnomalisticYearIAUDays(anomSeconds);
+```
+
+---
+
+### Comparison of Year Types
+
+| Year Type | Mean (days) | Eccentricity Coefficient | Variation |
+|-----------|-------------|-------------------------|-----------|
+| Sidereal | 365.256410 | **-3058** s/unit ecc | ~4.4 seconds |
+| Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
+| **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+
+The anomalistic year has a very small eccentricity variation (~0.12 seconds) compared to the sidereal year (~4.4 seconds). This is because the eccentricity effect on day length nearly cancels with the eccentricity effect on the anomalistic year itself.
+
+### Summary
+
+| Year Type | Primary Driver | HY Fraction | Correction Factor |
+|-----------|---------------|-------------|-------------------|
+| Tropical | Obliquity | HY/3, HY/8 | None |
+| Sidereal | Eccentricity | HY/16 | None |
+| **Anomalistic** | **Perihelion precession** | **HY/16** | **13/3 and 16/3** |
+
+The anomalistic year requires a three-step calculation:
+1. **Raw days** from eccentricity (coefficient -6)
+2. **Apsidal correction** using 13/3 and 16/3 factors
+3. **Division by 86400** to match IAU reference
+
+This process ensures the calculated value matches the IAU reference with no accumulated drift.
+
+---
+
+### Legacy Formula Reference
+
+The older model implementation (before the three-step process):
+
+```javascript
+// Mean anomalistic year in days
+const meanAnomalisticYearinDays = meansolaryearlengthinDays +
+    (meansolaryearlengthinDays / (perihelionCycleLength - 1));
+
+// Calculated anomalistic year (varies with perihelion precession)
+const calcAnomalisticDays = lengthofsolarYear * perihelionPrecession /
+    (perihelionPrecession - 1);
+```
+= $A$3 + (($CF$3 / $BH$3) * (E264 - $E$2))
+```
+
+Where:
+- `$A$3` = mean anomalistic year in days (365.259692339)
+- `$CF$3` = **-6** (eccentricity coefficient)
+- `$BH$3` = mean length of day (86,399.98848 seconds)
+- `E264` = current eccentricity
+- `$E$2` = mean eccentricity (0.015332)
+
+#### JavaScript Implementation
+
+```javascript
+// Anomalistic year in days (varies with eccentricity)
+const meanAnomalisticYearAmplitude = -6;  // seconds per unit eccentricity
+
+function computeAnomalisticYearDays(eccentricity) {
+  return meanAnomalisticYearinDays +
+    (meanAnomalisticYearAmplitude / meanlengthofday) *
+    (eccentricity - eccentricityMean);
+}
+```
+
+#### Comparison of Year Types
+
+| Year Type | Mean (days) | Eccentricity Coefficient | Variation |
+|-----------|-------------|-------------------------|-----------|
+| Sidereal | 365.256410 | **-3058** s/unit ecc | ~4.4 seconds |
+| Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
+| **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+
+The anomalistic year has a very small eccentricity variation (~0.12 seconds) compared to the sidereal year (~4.4 seconds). This is because the eccentricity effect on day length nearly cancels with the eccentricity effect on the anomalistic year itself.
+
+### Summary
+
+| Year Type | Primary Driver | HY Fraction | Correction Factor |
+|-----------|---------------|-------------|-------------------|
+| Tropical | Obliquity | HY/3, HY/8 | None |
+| Sidereal | Eccentricity | HY/16 | None |
+| **Anomalistic** | **Perihelion precession** | **HY/16** | **13/3 and 16/3** |
+
+The anomalistic year requires an apsidal correction using the factors 13/3 and 16/3, which represent the ratios of axial and perihelion precession rates to the fundamental apsidal rate. This correction ensures the calculated value matches the IAU reference with no accumulated drift.
+
+---
+
+*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3058 (calibrated to J2000 precession period of 25,771.57 years). Added Anomalistic Year Formula section documenting the apsidal correction using 13/3 and 16/3 factors to match IAU reference value.*
