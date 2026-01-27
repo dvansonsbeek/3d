@@ -1731,7 +1731,7 @@ precessionRateFromPeriod: (period_years) => {
 | Planet | Precession Period (years) | Rate (arcsec/century) |
 |--------|---------------------------|----------------------|
 | Mercury | ~242,828 | ~534 |
-| Mars | ~77,047 | ~1,682 |
+| Mars | ~77,051 | ~1,682 |
 | Earth | 111,296 (holistic/3) | ~1,304 |
 | Jupiter | 333,888 (holistic) | ~435 |
 | Saturn | -333,888 (retrograde) | ~-435 |
@@ -1949,7 +1949,7 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 | **Mercury** | ~242,828 | ~28,745 | ~534 | 1.375 |
 | **Venus** | ~667,776 | ~26,711 | ~0 | ~0 |
 | **Earth** | 111,296 | ~33,389 | ~1,304 | 3 |
-| **Mars** | ~77,047 | ~38,755 | ~1,682 | 4.333 |
+| **Mars** | ~77,051 | ~38,755 | ~1,682 | 4.333 |
 | **Jupiter** | 66,778 | 41,736 | ~435 | 1 |
 | **Saturn** | -41,736 | ~15,899 | ~-435 | -1 |
 | **Uranus** | 111,296 | ~33,389 | ~1,304 | 3 |

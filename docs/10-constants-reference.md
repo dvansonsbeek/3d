@@ -193,7 +193,7 @@ These are the observed secular variation rates for ecliptic inclinations:
 | Mercury | `mercuryPerihelionICRFYears` | `holisticyearLength/(1+(3/8))` | ~242,828 |
 | Venus | `venusPerihelionICRFYears` | `holisticyearLength*2` | ~667,776 |
 | Earth | `earthPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |
-| Mars | `marsPerihelionICRFYears` | `holisticyearLength/(4+(1/3))` | ~77,047 |
+| Mars | `marsPerihelionICRFYears` | `holisticyearLength/(4+(1/3))` | ~77,051 |
 | Jupiter | `jupiterPerihelionICRFYears` | `holisticyearLength/5` | 66,778 |
 | Saturn | `saturnPerihelionICRFYears` | `-holisticyearLength/8` | -41,736 (retrograde) |
 | Uranus | `uranusPerihelionICRFYears` | `holisticyearLength/3` | 111,296 |

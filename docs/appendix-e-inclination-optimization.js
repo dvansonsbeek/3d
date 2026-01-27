@@ -105,7 +105,7 @@ const planetInputs = {
     name: 'Mars',
     omegaJ2000: 354.87,
     inclJ2000: 1.6311858,
-    period: holisticyearLength / (4 + 1/3),         // ~77,047 years
+    period: holisticyearLength / (4 + 1/3),         // ~77,051 years
     phaseAngle: 203.3195,
     periodExpr: 'holisticyearLength/(4+(1/3))'
   },

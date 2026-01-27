@@ -88,7 +88,7 @@ const currentCodeValues = {
     amplitude: 2.239753,
     phaseAngle: 203.3195,
     omegaJ2000: 354.87,
-    period: holisticyearLength / (4 + 1/3),  // ~77,047 years
+    period: holisticyearLength / (4 + 1/3),  // ~77,051 years
     inclJ2000: 1.6311858,
     jplTrend: marsEclipticInclinationTrendJPL
   },

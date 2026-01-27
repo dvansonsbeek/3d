@@ -133,7 +133,7 @@ The inclination oscillation period equals the ascending node precession period f
 | Mercury | ~242,828 | `holisticyearLength/(1+(3/8))` |
 | Venus | ~667,776 | `holisticyearLength*2` |
 | Earth | ~111,296 | `holisticyearLength/3` |
-| Mars | ~77,047 | `holisticyearLength/(4+(1/3))` |
+| Mars | ~77,051 | `holisticyearLength/(4+(1/3))` |
 | Jupiter | 66,778 | `holisticyearLength/5` |
 | Saturn | -41,736 | `-holisticyearLength/8` (retrograde) |
 | Uranus | ~111,296 | `holisticyearLength/3` |
