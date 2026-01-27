@@ -61,24 +61,17 @@ function computeObliquityEarth(currentYear) {
 
 ```javascript
 function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLength,
-                                   eccentricityMean, eccentricityAmplitude,
-                                   eccentricitySinusCorrection) {
-  const root = Math.sqrt(eccentricityMean² + eccentricityAmplitude²);
+                                   eccentricityMean, eccentricityAmplitude) {
+  // 1. root = √(eₘ² + a²) — derived mean eccentricity
+  const root = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
 
+  // 2. θ in radians
   const degrees = ((currentYear - balancedYear) / perihelionCycleLength) * 360;
-  const θ = degrees * Math.PI / 180;
+  const cosθ = Math.cos(degrees * Math.PI / 180);
 
-  const cosθ = Math.cos(θ);
-  const absCosθ = Math.abs(cosθ);
-  const signCosθ = Math.sign(cosθ);
-
-  const term1 = signCosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
-  const term2 = cosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
-
-  const e1 = root + (-eccentricityAmplitude + (eccentricityMean - root) * term1) * cosθ;
-  const e2 = root + (-eccentricityAmplitude + (eccentricityMean - root) * term2) * cosθ;
-
-  return e1 > root ? e1 : e2;
+  // 3. e(t) = e₀ + (-A - (e₀ - e_base)·cos(θ))·cos(θ)
+  const h1 = root - eccentricityMean;
+  return root + (-eccentricityAmplitude - h1 * cosθ) * cosθ;
 }
 ```
 
@@ -87,7 +80,6 @@ function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLeng
 |-----------|-------|-------------|
 | `eccentricityMean` | 0.015313 | Mean eccentricity |
 | `eccentricityAmplitude` | 0.001431 | Amplitude of variation |
-| `eccentricitySinusCorrection` | 0.652 | Non-linear correction factor |
 | `perihelionCycleLength` | 20,868 years | = holisticyearLength / 16 |
 
 **Eccentricity range:** ~0.0139 to ~0.0167 (approximately)
@@ -99,7 +91,7 @@ function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLeng
 ```javascript
 function computeTropicalYear(obliquity, eccentricity) {
   const Δobl = obliquity - obliquityMean;
-  const Δecc = eccentricity - eccentricityMean;
+  const Δecc = eccentricity - eccentricityDerivedMean;
 
   return meanTropicalYear
        + k_obl × Δobl
@@ -113,7 +105,7 @@ Or potentially with squared terms if non-linear effects are significant:
 ```javascript
 function computeTropicalYear(obliquity, eccentricity) {
   const Δobl = obliquity - obliquityMean;
-  const Δecc = eccentricity - eccentricityMean;
+  const Δecc = eccentricity - eccentricityDerivedMean;
 
   return meanTropicalYear
        + k_obl × Δobl
@@ -1178,7 +1170,7 @@ function meanTropicalYear(year) {
   const k_obl_ecc = 0;   // Interaction term
 
   const Δobl = obliquity - 23.41398;      // earthtiltMean
-  const Δecc = eccentricity - 0.015313;   // eccentricityMean
+  const Δecc = eccentricity - eccentricityDerivedMean;   // √(eccentricityMean² + eccentricityAmplitude²)
 
   return baseTropical + k_obl * Δobl + k_ecc * Δecc + k_obl_ecc * Δobl * Δecc;
 }
@@ -1911,8 +1903,8 @@ See the "Sidereal Year Formula Based on Eccentricity" section below for the curr
 ```javascript
 // Current formula (eccentricity-based):
 function computeLengthofsiderealYear(eccentricity) {
-  const k = 3058;  // seconds per unit eccentricity
-  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityMean);
+  const k = 3208;  // seconds per unit eccentricity
+  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityDerivedMean);
 }
 
 // Sidereal year in seconds is CONSTANT:
@@ -1969,7 +1961,7 @@ function computeLengthofanomalisticYearRealLOD(perihelionPrecession, lengthofsol
 |----------|-----------------|-----------------|
 | LOD | `-cos` ±2.2 ms | Derived: `meansiderealyearlengthinSeconds / siderealYear(days)` |
 | Solar Year | `sin` ±2 s | Obliquity-based: coefficient 2.3 s/° |
-| Sidereal Year (days) | `-cos` ±4.2 s | Eccentricity-based: coefficient 3058 s/unit |
+| Sidereal Year (days) | `-cos` ±4.2 s | Eccentricity-based: coefficient 3208 s/unit |
 | Sidereal Year (seconds) | Varied | **CONSTANT**: 31,558,149.724 s |
 
 ---
@@ -2099,7 +2091,7 @@ Initial analysis suggested the sidereal year "extra" variation (beyond the prece
 The sidereal year can be computed directly from eccentricity using:
 
 ```
-Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityMean)
+Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityDerivedMean)
 ```
 
 Where:
@@ -2107,34 +2099,34 @@ Where:
 |----------|-------|-------------|
 | `meansiderealyearlengthinDays` | 365.256410333209 | Mean sidereal year (days) |
 | `meanlengthofday` | 86399.98848 | Mean solar day (seconds) |
-| `eccentricityMean` | 0.015321 | Mean eccentricity |
-| `k` | 3058 | Eccentricity coefficient (seconds/unit) - calibrated to J2000 precession |
+| `eccentricityDerivedMean` | √(eₘ² + a²) | Derived mean eccentricity |
+| `k` | 3208 | Eccentricity coefficient (seconds/unit) - calibrated to J2000 precession |
 
 ### JavaScript Implementation
 
 ```javascript
 function computeLengthofsiderealYearDays(eccentricity) {
-  const k = 3058;  // seconds per unit eccentricity (calibrated to precession = 25,771.57 years at J2000)
-  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityMean);
+  const k = 3208;  // seconds per unit eccentricity (calibrated to precession = 25,771.57 years at J2000)
+  return meansiderealyearlengthinDays - (k / meanlengthofday) * (eccentricity - eccentricityDerivedMean);
 }
 ```
 
 ### Excel Formula
 
 ```
-= meansiderealyearlengthinDays - (3058 / meanLengthOfDay) * (eccentricity - meanEccentricity)
+= meansiderealyearlengthinDays - (3208 / meanLengthOfDay) * (eccentricity - eccentricityDerivedMean)
 ```
 
 Example with cell references:
 ```
-= $B$1 - (3058 / $BH$3) * (X264 - $V$3)
+= $B$1 - (3208 / $BH$3) * (X264 - $V$3)
 ```
 
 Where:
 - `$B$1` = meansiderealyearlengthinDays (365.256410333209)
 - `$BH$3` = meanlengthofday (86399.98848)
 - `X264` = current eccentricity
-- `$V$3` = eccentricityMean (0.015321)
+- `$V$3` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
 
 ### Verification
 
@@ -2153,17 +2145,17 @@ The sidereal year is the time for Earth to complete one full orbit relative to t
 - **Higher eccentricity** → More elliptical orbit → Earth spends more time near aphelion (moving slower, by Kepler's 2nd law) and less time near perihelion (moving faster) → The integrated orbital time changes → **Shorter sidereal year** (with negative coefficient)
 - **Lower eccentricity** → More circular orbit → More uniform velocity throughout orbit → **Longer sidereal year**
 
-The coefficient of 3058 seconds per unit eccentricity quantifies how the orbital period changes as the orbit becomes more or less elliptical. This value is specifically calibrated to produce the correct precession period of 25,771.57 years at epoch J2000.
+The coefficient of 3208 seconds per unit eccentricity quantifies how the orbital period changes as the orbit becomes more or less elliptical. This value is specifically calibrated to produce the correct precession period of 25,771.57 years at epoch J2000.
 
 ### Calibration to Precession
 
-The eccentricity coefficient (3058) is not arbitrary - it is the value that produces the correct axial precession period. The relationship between sidereal year, tropical year, and precession is:
+The eccentricity coefficient (3208) is not arbitrary - it is the value that produces the correct axial precession period. The relationship between sidereal year, tropical year, and precession is:
 
 ```
 Precession Period = Sidereal Year × Tropical Year / (Sidereal Year - Tropical Year)
 ```
 
-By calibrating `meansiderealyearAmplitudeinSecondsaDay = 3058` and `meansiderealyearlengthinSeconds = 31,558,149.724`, the model produces:
+By calibrating `meansiderealyearAmplitudeinSecondsaDay = 3208` and `meansiderealyearlengthinSeconds = 31,558,149.724`, the model produces:
 - **Precession period at J2000: 25,771.57 years** (matching IAU/IERS observations)
 
 If this coefficient is changed, the precession period will change accordingly. The coefficient was derived by iteratively adjusting the sidereal year parameters until the model matched the observed precession rate.
@@ -2177,7 +2169,7 @@ The analysis reveals an elegant result:
 | Year Type | Depends On | Coefficient | Physical Reason |
 |-----------|------------|-------------|-----------------|
 | **Tropical Year** | Obliquity | 2.3 s/° | Geometry of equinox crossings - steeper ecliptic angle means faster equinox-to-equinox cycle |
-| **Sidereal Year** | Eccentricity | 3058 s/unit | Orbital mechanics - more elliptical orbit changes the integrated orbital period (calibrated to J2000 precession = 25,771.57 years) |
+| **Sidereal Year** | Eccentricity | 3208 s/unit | Orbital mechanics - more elliptical orbit changes the integrated orbital period (calibrated to J2000 precession = 25,771.57 years) |
 
 **Tropical year** measures the Sun's position relative to Earth's equator (equinox to equinox), so it depends on **axial tilt (obliquity)**.
 
@@ -2200,8 +2192,8 @@ The model is built on these fundamental constants:
 | `meansiderealyearlengthinDays` | 365.256410333209 days | Mean sidereal year |
 | `meanlengthofday` | 86,399.98848 s | Mean solar day (derived) |
 | `earthtiltMean` | 23.41398° | Mean obliquity |
-| `eccentricityMean` | 0.015321 | Mean eccentricity |
-| `meansiderealyearAmplitudeinSecondsaDay` | 3058 | Eccentricity coefficient (calibrated to J2000 precession = 25,771.57 years) |
+| `eccentricityDerivedMean` | √(eₘ² + a²) | Derived mean eccentricity |
+| `meansiderealyearAmplitudeinSecondsaDay` | 3208 | Eccentricity coefficient (calibrated to J2000 precession = 25,771.57 years) |
 
 ### The Key Insight: Sidereal Year in Seconds is Constant
 
@@ -2220,10 +2212,10 @@ From this constant, all other values are derived:
 #### 1. Sidereal Year in Days (varies with eccentricity)
 
 ```javascript
-siderealYear (days) = meansiderealyearlengthinDays - (k_ecc / meanlengthofday) × (eccentricity - eccentricityMean)
+siderealYear (days) = meansiderealyearlengthinDays - (k_ecc / meanlengthofday) × (eccentricity - eccentricityDerivedMean)
 ```
 
-Where `k_ecc = 3058` seconds per unit eccentricity (constant `meansiderealyearAmplitudeinSecondsaDay`). This value is calibrated to produce the correct precession period of 25,771.57 years at J2000.
+Where `k_ecc = 3208` seconds per unit eccentricity (constant `meansiderealyearAmplitudeinSecondsaDay`). This value is calibrated to produce the correct precession period of 25,771.57 years at J2000.
 
 #### 2. Length of Day (derived from sidereal year)
 
@@ -2313,7 +2305,7 @@ const lengthofDay = meansiderealyearlengthinSeconds / siderealYear;  // seconds
 | Quantity | Excel Formula |
 |----------|---------------|
 | Tropical Year (days) | `= meanTropicalYear - (2.3 / meanLOD) * (obliquity - meanObliquity)` |
-| Sidereal Year (days) | `= meanSiderealYear - (3058 / meanLOD) * (eccentricity - meanEccentricity)` |
+| Sidereal Year (days) | `= meanSiderealYear - (3208 / meanLOD) * (eccentricity - meanEccentricity)` |
 | Sidereal Year (seconds) | `= meansiderealyearlengthinSeconds` (constant) |
 | Length of Day (seconds) | `= meansiderealyearlengthinSeconds / siderealYear(days)` |
 
@@ -2392,14 +2384,14 @@ The anomalistic year is calculated in three steps:
 First, calculate the raw anomalistic year in days, which varies with eccentricity:
 
 ```
-Raw Anomalistic Year (days) = mean_anomalistic_days + (k_ecc / mean_LOD) × (eccentricity - mean_eccentricity)
+Raw Anomalistic Year (days) = mean_anomalistic_days + (k_ecc / mean_LOD) × (eccentricity - eccentricityDerivedMean)
 ```
 
 Where:
 - `mean_anomalistic_days` = 365.259692339 days
 - `k_ecc` = **-6** seconds per unit eccentricity
 - `mean_LOD` = 86,399.98848 seconds
-- `mean_eccentricity` = 0.015332
+- `eccentricityDerivedMean` = √(eccentricityMean² + eccentricityAmplitude²)
 
 **Excel Formula (Step 1):**
 ```excel
@@ -2411,7 +2403,7 @@ Where:
 - `$CF$3` = **-6** (eccentricity coefficient)
 - `$BH$3` = mean length of day (86,399.98848 seconds)
 - `E264` = current eccentricity
-- `$E$2` = mean eccentricity (0.015332)
+- `$E$2` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
 
 #### Step 2: Apply Apsidal Correction (Seconds Experienced on Earth)
 
@@ -2473,13 +2465,13 @@ The apsidal correction extracts the difference between calculated and mean value
 const meanAnomalisticYearinDays = 365.259692339;
 const meanAnomalisticYearAmplitude = -6;  // seconds per unit eccentricity
 const meanlengthofday = 86399.98848;
-const eccentricityMean = 0.015332;
+const eccentricityDerivedMean = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
 
 // Step 1: Raw anomalistic year in days (varies with eccentricity)
 function computeRawAnomalisticYearDays(eccentricity) {
   return meanAnomalisticYearinDays +
     (meanAnomalisticYearAmplitude / meanlengthofday) *
-    (eccentricity - eccentricityMean);
+    (eccentricity - eccentricityDerivedMean);
 }
 
 // Step 2: Apply apsidal correction to get seconds experienced on Earth
@@ -2508,7 +2500,7 @@ const anomIAUDays = computeAnomalisticYearIAUDays(anomSeconds);
 
 | Year Type | Mean (days) | Eccentricity Coefficient | Variation |
 |-----------|-------------|-------------------------|-----------|
-| Sidereal | 365.256410 | **-3058** s/unit ecc | ~4.4 seconds |
+| Sidereal | 365.256410 | **-3208** s/unit ecc | ~4.4 seconds |
 | Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
 | **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
 
@@ -2552,7 +2544,7 @@ Where:
 - `$CF$3` = **-6** (eccentricity coefficient)
 - `$BH$3` = mean length of day (86,399.98848 seconds)
 - `E264` = current eccentricity
-- `$E$2` = mean eccentricity (0.015332)
+- `$E$2` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
 
 #### JavaScript Implementation
 
@@ -2563,7 +2555,7 @@ const meanAnomalisticYearAmplitude = -6;  // seconds per unit eccentricity
 function computeAnomalisticYearDays(eccentricity) {
   return meanAnomalisticYearinDays +
     (meanAnomalisticYearAmplitude / meanlengthofday) *
-    (eccentricity - eccentricityMean);
+    (eccentricity - eccentricityDerivedMean);
 }
 ```
 
@@ -2571,7 +2563,7 @@ function computeAnomalisticYearDays(eccentricity) {
 
 | Year Type | Mean (days) | Eccentricity Coefficient | Variation |
 |-----------|-------------|-------------------------|-----------|
-| Sidereal | 365.256410 | **-3058** s/unit ecc | ~4.4 seconds |
+| Sidereal | 365.256410 | **-3208** s/unit ecc | ~4.4 seconds |
 | Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
 | **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
 
@@ -2589,4 +2581,4 @@ The anomalistic year requires an apsidal correction using the factors 13/3 and 1
 
 ---
 
-*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3058 (calibrated to J2000 precession period of 25,771.57 years). Added Anomalistic Year Formula section documenting the apsidal correction using 13/3 and 16/3 factors to match IAU reference value.*
+*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3208 (calibrated to J2000 precession period of 25,771.57 years). Added Anomalistic Year Formula section documenting the apsidal correction using 13/3 and 16/3 factors to match IAU reference value.*

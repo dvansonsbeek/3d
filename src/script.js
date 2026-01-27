@@ -44,11 +44,10 @@ const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula 
 const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula
 const eccentricityMean = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.0014226;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricitySinusCorrection = 0.8;                  // Formula only
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
-const meansiderealyearAmplitudeinSecondsaDay = 3058;      // Formula only
-const meansolaryearAmplitudeinSecondsaDay = 2.3;          // Formula only
+const meansiderealyearAmplitudeinSecondsaDay = 3208;      // Formula only
+const meansolaryearAmplitudeinSecondsaDay = 2.29;          // Formula only
 const meanAnomalisticYearAmplitudeinSecondsaDay = 6;      // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
 const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
@@ -607,6 +606,7 @@ const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthin
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
 const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
+const eccentricityDerivedMean = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
 const earthPerihelionICRFYears = holisticyearLength/3;
 
@@ -18813,7 +18813,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
+      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
       const siderealYear = computeLengthofsiderealYear(eccentricity);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
@@ -18835,7 +18835,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
+      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
       const siderealYear = computeLengthofsiderealYear(eccentricity);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
@@ -26139,7 +26139,7 @@ function updatePredictions() {
   
   // Compute obliquity and eccentricity first - needed for year calculations
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
-  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude, eccentricitySinusCorrection);
+  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
 
   // Tropical year depends on obliquity, Sidereal year depends on eccentricity
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.obliquityEarth);
@@ -26228,7 +26228,7 @@ function computeLengthofsolarYear(obliquity) {
  * @returns {number} lengthofsiderealYear (in days)
  */
 function computeLengthofsiderealYear(eccentricity) {
-  return meansiderealyearlengthinDays - (meansiderealyearAmplitudeinSecondsaDay / meanlengthofday) * (eccentricity - eccentricityMean);
+  return meansiderealyearlengthinDays - (meansiderealyearAmplitudeinSecondsaDay / meanlengthofday) * (eccentricity - eccentricityDerivedMean);
 }
 
 
@@ -26251,7 +26251,7 @@ function computeLengthofanomalisticYearRealLOD(
   // Step 1: Raw anomalistic year in days (eccentricity variation)
   const rawAnomDays = meanAnomalisticYearinDays -
     (meanAnomalisticYearAmplitudeinSecondsaDay / meanlengthofday) *
-    (eccentricity - eccentricityMean);
+    (eccentricity - eccentricityDerivedMean);
   // Step 2: Apsidal correction (seconds experienced on Earth)
   const rawSeconds = rawAnomDays * lengthofDay;
   const meanSeconds = meanAnomalisticYearinDays * meanlengthofday;
@@ -26299,7 +26299,6 @@ function computeAxialPrecessionRealLOD(
  * @param {number} perihelionCycleLength
  * @param {number} eccentricityMean
  * @param {number} eccentricityAmplitude
- * @param {number} eccentricitySinusCorrection
  * @returns {number}
  */
 function computeEccentricityEarth(
@@ -26307,10 +26306,9 @@ function computeEccentricityEarth(
   balancedYear,
   perihelionCycleLength,
   eccentricityMean,
-  eccentricityAmplitude,
-  eccentricitySinusCorrection
-  ) {
-  // 1. root = √(eₘ² + a²)
+  eccentricityAmplitude
+) {
+  // 1. root = √(eₘ² + a²) — derived mean eccentricity
   const root = Math.sqrt(
     eccentricityMean * eccentricityMean +
     eccentricityAmplitude * eccentricityAmplitude
@@ -26318,32 +26316,13 @@ function computeEccentricityEarth(
 
   // 2. θ in radians
   const degrees = ((currentYear - balancedYear) / perihelionCycleLength) * 360;
-  const θ = degrees * Math.PI / 180;
+  const cosθ = Math.cos(degrees * Math.PI / 180);
 
-  const cosθ = Math.cos(θ);
-  const absCosθ = Math.abs(cosθ);
-  const signCosθ = Math.sign(cosθ);
-
-  // 3. pull the sign out of the exponentiation
-  const term1 = signCosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
-  const term2 =      cosθ * Math.pow(absCosθ, eccentricitySinusCorrection);
-
-  // 4. two candidate eccentricities
-  const e1 = root +
-    (
-      -eccentricityAmplitude +
-      (eccentricityMean - root) * term1
-    ) * cosθ;
-
-  const e2 = root +
-    (
-      -eccentricityAmplitude +
-      (eccentricityMean - root) * term2
-    ) * cosθ;
-
-  // 5. pick the branch
-  return e1 > root ? e1 : e2;
+  // 3. e(t) = e₀ + (-A - (e₀ - e_base)·cos(θ))·cos(θ)
+  const h1 = root - eccentricityMean;
+  return root + (-eccentricityAmplitude - h1 * cosθ) * cosθ;
 }
+
 
 /**
  * Compute Earth's obliquity (tilt) for a given decimal year.
