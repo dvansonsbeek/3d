@@ -42,7 +42,7 @@ const earthRAAngle = 1.258454;
 const earthtiltMean = 23.41398;                           // 3D model + formula (optimized for IAU 2006)
 const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate)
 const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula
-const eccentricityMean = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityBase = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.0014226;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
@@ -606,7 +606,7 @@ const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthin
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
 const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
-const eccentricityDerivedMean = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
+const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
 const earthPerihelionICRFYears = holisticyearLength/3;
 
@@ -1469,7 +1469,7 @@ function getPlanetPerturbationData(oRef) {
     {
       name: 'Earth',
       a_km: oRef.lengthofAU,                        // Earth = 1 AU
-      e: eccentricityMean,                          // Fixed mean eccentricity
+      e: eccentricityBase,                          // Fixed base eccentricity
       i_deg: 0,                                     // Earth defines the ecliptic (0° by definition)
       omega_deg: 0,                                 // Reference point
       mass: M_EARTH,
@@ -1845,7 +1845,7 @@ const midEccentricityOrbit = {
   speed: Math.PI*2/(holisticyearLength/13),
   rotationSpeed: 0,
   tilt: 0,
-  orbitRadius: eccentricityMean*100,
+  orbitRadius: eccentricityBase*100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
@@ -1986,7 +1986,7 @@ const earthPerihelionPrecession2 = {
   speed: -Math.PI*2/(holisticyearLength/16),
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: -eccentricityMean*100,
+  orbitCentera: -eccentricityBase*100,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
@@ -14220,10 +14220,10 @@ async function verifyObliquityRate() {
  * Verify perihelion longitude and eccentricity against J2000.0 reference values.
  *
  * CALIBRATION NOTES:
- * Both eccentricityMean and eccentricityAmplitude affect both RA and Eccentricity,
+ * Both eccentricityBase and eccentricityAmplitude affect both RA and Eccentricity,
  * but with different sensitivities:
  *
- * - eccentricityMean: Primarily affects Eccentricity. Increasing it increases Eccentricity.
+ * - eccentricityBase: Primarily affects Eccentricity. Increasing it increases Eccentricity.
  * - eccentricityAmplitude: Primarily affects RA, with secondary effect on Eccentricity.
  *   The relationship is NON-LINEAR and very sensitive:
  *   - Amplitude 0.003020 → RA ≈ -0.003° (too low)
@@ -14233,7 +14233,7 @@ async function verifyObliquityRate() {
  *
  * CALIBRATION STRATEGY:
  * 1. First adjust eccentricityAmplitude to get RA within tolerance (use bisection)
- * 2. Then fine-tune eccentricityMean to get Eccentricity within tolerance
+ * 2. Then fine-tune eccentricityBase to get Eccentricity within tolerance
  * 3. Iterate if needed since both parameters have cross-effects
  */
 async function verifyPerihelionRate() {
@@ -14300,12 +14300,12 @@ async function verifyPerihelionRate() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('CURRENT INPUT PARAMETERS:');
   console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log(`  eccentricityMean      = ${eccentricityMean}`);
+  console.log(`  eccentricityBase      = ${eccentricityBase}`);
   console.log(`  eccentricityAmplitude = ${eccentricityAmplitude}`);
   console.log('');
 
   // Calculate recommended values for exact eccentricity match
-  const recommendedEccMean = eccentricityMean - eccError;
+  const recommendedEccMean = eccentricityBase - eccError;
   const recommendedEccAmplitude = eccentricityAmplitude - eccError;
 
   console.log('═══════════════════════════════════════════════════════════════════════════');
@@ -14313,11 +14313,11 @@ async function verifyPerihelionRate() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
   console.log('');
   console.log('  CALIBRATION STRATEGY:');
-  console.log('    1. First fix RA by adjusting eccentricityMean (use very small steps)');
+  console.log('    1. First fix RA by adjusting eccentricityBase (use very small steps)');
   console.log('    2. Then fix eccentricity by adjusting eccentricityAmplitude');
   console.log('    3. If RA drifts out of tolerance, go back to step 1');
   console.log('');
-  console.log('  To fix RA (adjust eccentricityMean):');
+  console.log('  To fix RA (adjust eccentricityBase):');
   if (raError > 0) {
     console.log(`    RA is too HIGH by ${raError.toFixed(6)}° → DECREASE mean`);
   } else if (raError < 0) {
@@ -14325,7 +14325,7 @@ async function verifyPerihelionRate() {
   } else {
     console.log('    RA is exactly on target!');
   }
-  console.log(`    Current: eccentricityMean = ${eccentricityMean}`);
+  console.log(`    Current: eccentricityBase = ${eccentricityBase}`);
   console.log('');
   console.log('  To fix ECCENTRICITY (adjust eccentricityAmplitude):');
   console.log(`    Eccentricity error: ${eccError >= 0 ? '+' : ''}${eccError.toFixed(8)} AU`);
@@ -18813,7 +18813,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
+      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
       const siderealYear = computeLengthofsiderealYear(eccentricity);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
@@ -18835,7 +18835,7 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
+      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
       const siderealYear = computeLengthofsiderealYear(eccentricity);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
@@ -19387,7 +19387,7 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.focalDistance(1, o.eccentricityEarth), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
       {label : () => `PERIHELION-OF-EARTH Distance`,
-       value : [ { v: () => eccentricityMean, dec:8, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => eccentricityBase, dec:8, sep:',' },{ small: 'AU' }],
        static: true},
 
     {header : '—  Velocities —' },
@@ -19574,7 +19574,7 @@ const planetStats = {
       {label : () => `Obliquity (degrees)`,
        value : [ { small: earthtiltMean },{ v: () => o.obliquityEarth, dec:12, sep:',' }]},
       {label : () => `Orbital Eccentricity`,
-       value : [ { small: eccentricityMean },{ v: () => o.eccentricityEarth, dec:13, sep:',' }]},
+       value : [ { small: eccentricityBase },{ v: () => o.eccentricityEarth, dec:13, sep:',' }]},
       {label : () => `Inclination to Invariable plane (degrees)`,
        value : [ { small: earthInvPlaneInclinationMean },{ v: () => o.earthInvPlaneInclinationDynamic, dec:13, sep:',' }]},
      null,
@@ -25277,7 +25277,7 @@ function updatePlanetAnomalies() {
     o.earthArgumentOfPeriapsis = earthLonPeri;
 
     // Get current eccentricity (dynamic)
-    const earthE = o.eccentricityEarth || eccentricityMean;
+    const earthE = o.eccentricityEarth || eccentricityBase;
 
     // Convert True Anomaly to Eccentric Anomaly using exact formula:
     // tan(E/2) = sqrt((1-e)/(1+e)) * tan(ν/2)
@@ -26139,7 +26139,7 @@ function updatePredictions() {
   
   // Compute obliquity and eccentricity first - needed for year calculations
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
-  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityMean, eccentricityAmplitude);
+  predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
 
   // Tropical year depends on obliquity, Sidereal year depends on eccentricity
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.obliquityEarth);
@@ -26217,7 +26217,7 @@ function computeLengthofsolarYear(obliquity) {
  * The sidereal year depends on eccentricity (R² = 0.9996).
  * Formula derived from regression analysis of 27,000 years of model data.
  *
- * Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityMean)
+ * Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityBase)
  *
  * Where k = meansiderealyearAmplitudeinSecondsaDay = -3097 seconds per unit eccentricity change.
  *
@@ -26297,7 +26297,7 @@ function computeAxialPrecessionRealLOD(
  * @param {number} currentYear
  * @param {number} balancedYear
  * @param {number} perihelionCycleLength
- * @param {number} eccentricityMean
+ * @param {number} eccentricityBase
  * @param {number} eccentricityAmplitude
  * @returns {number}
  */
@@ -26305,12 +26305,12 @@ function computeEccentricityEarth(
   currentYear,
   balancedYear,
   perihelionCycleLength,
-  eccentricityMean,
+  eccentricityBase,
   eccentricityAmplitude
 ) {
   // 1. root = √(eₘ² + a²) — derived mean eccentricity
   const root = Math.sqrt(
-    eccentricityMean * eccentricityMean +
+    eccentricityBase * eccentricityBase +
     eccentricityAmplitude * eccentricityAmplitude
   );
 
@@ -26319,7 +26319,7 @@ function computeEccentricityEarth(
   const cosθ = Math.cos(degrees * Math.PI / 180);
 
   // 3. e(t) = e₀ + (-A - (e₀ - e_base)·cos(θ))·cos(θ)
-  const h1 = root - eccentricityMean;
+  const h1 = root - eccentricityBase;
   return root + (-eccentricityAmplitude - h1 * cosθ) * cosθ;
 }
 

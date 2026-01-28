@@ -61,16 +61,16 @@ function computeObliquityEarth(currentYear) {
 
 ```javascript
 function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLength,
-                                   eccentricityMean, eccentricityAmplitude) {
+                                   eccentricityBase, eccentricityAmplitude) {
   // 1. root = √(eₘ² + a²) — derived mean eccentricity
-  const root = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
+  const root = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 
   // 2. θ in radians
   const degrees = ((currentYear - balancedYear) / perihelionCycleLength) * 360;
   const cosθ = Math.cos(degrees * Math.PI / 180);
 
   // 3. e(t) = e₀ + (-A - (e₀ - e_base)·cos(θ))·cos(θ)
-  const h1 = root - eccentricityMean;
+  const h1 = root - eccentricityBase;
   return root + (-eccentricityAmplitude - h1 * cosθ) * cosθ;
 }
 ```
@@ -78,7 +78,7 @@ function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLeng
 **Constants:**
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `eccentricityMean` | 0.015313 | Mean eccentricity |
+| `eccentricityBase` | 0.015321 | Base eccentricity |
 | `eccentricityAmplitude` | 0.001431 | Amplitude of variation |
 | `perihelionCycleLength` | 20,868 years | = holisticyearLength / 16 |
 
@@ -1170,7 +1170,7 @@ function meanTropicalYear(year) {
   const k_obl_ecc = 0;   // Interaction term
 
   const Δobl = obliquity - 23.41398;      // earthtiltMean
-  const Δecc = eccentricity - eccentricityDerivedMean;   // √(eccentricityMean² + eccentricityAmplitude²)
+  const Δecc = eccentricity - eccentricityDerivedMean;   // √(eccentricityBase² + eccentricityAmplitude²)
 
   return baseTropical + k_obl * Δobl + k_ecc * Δecc + k_obl_ecc * Δobl * Δecc;
 }
@@ -2126,7 +2126,7 @@ Where:
 - `$B$1` = meansiderealyearlengthinDays (365.256410333209)
 - `$BH$3` = meanlengthofday (86399.98848)
 - `X264` = current eccentricity
-- `$V$3` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
+- `$V$3` = eccentricityDerivedMean = √(eccentricityBase² + eccentricityAmplitude²)
 
 ### Verification
 
@@ -2388,10 +2388,10 @@ Raw Anomalistic Year (days) = mean_anomalistic_days + (k_ecc / mean_LOD) × (ecc
 ```
 
 Where:
-- `mean_anomalistic_days` = 365.259692339 days
+- `mean_anomalistic_days` = 365.259692337 days
 - `k_ecc` = **-6** seconds per unit eccentricity
 - `mean_LOD` = 86,399.98848 seconds
-- `eccentricityDerivedMean` = √(eccentricityMean² + eccentricityAmplitude²)
+- `eccentricityDerivedMean` = √(eccentricityBase² + eccentricityAmplitude²)
 
 **Excel Formula (Step 1):**
 ```excel
@@ -2399,11 +2399,11 @@ Where:
 ```
 
 Where:
-- `$A$3` = mean anomalistic year in days (365.259692339)
+- `$A$3` = mean anomalistic year in days (365.259692337)
 - `$CF$3` = **-6** (eccentricity coefficient)
 - `$BH$3` = mean length of day (86,399.98848 seconds)
 - `E264` = current eccentricity
-- `$E$2` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
+- `$E$2` = eccentricityDerivedMean = √(eccentricityBase² + eccentricityAmplitude²)
 
 #### Step 2: Apply Apsidal Correction (Seconds Experienced on Earth)
 
@@ -2422,12 +2422,12 @@ Anomalistic Year (seconds) = (raw_days × LOD) -
 Where:
 - `A_raw` = raw anomalistic year in days (from Step 1)
 - `LOD` = current length of day in seconds
-- `A_mean` = mean anomalistic year in days (365.259692339)
+- `A_mean` = mean anomalistic year in days (365.259692337)
 - `LOD_mean` = mean length of day in seconds (86,399.98848)
 - `4.333333` = 13/3 (axial/apsidal ratio)
 - `5.333333` = 16/3 (perihelion/apsidal ratio)
 
-This gives the **anomalistic year in seconds as experienced on Earth**.
+This gives the **anomalistic year in seconds as experienced on Earth** (mean: 365.2596445 days).
 
 #### Step 3: Convert to IAU-Compatible Days
 
@@ -2462,10 +2462,10 @@ The apsidal correction extracts the difference between calculated and mean value
 
 ```javascript
 // Constants
-const meanAnomalisticYearinDays = 365.259692339;
+const meanAnomalisticYearinDays = 365.259692337;
 const meanAnomalisticYearAmplitude = -6;  // seconds per unit eccentricity
 const meanlengthofday = 86399.98848;
-const eccentricityDerivedMean = Math.sqrt(eccentricityMean * eccentricityMean + eccentricityAmplitude * eccentricityAmplitude);
+const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 
 // Step 1: Raw anomalistic year in days (varies with eccentricity)
 function computeRawAnomalisticYearDays(eccentricity) {
@@ -2502,7 +2502,8 @@ const anomIAUDays = computeAnomalisticYearIAUDays(anomSeconds);
 |-----------|-------------|-------------------------|-----------|
 | Sidereal | 365.256410 | **-3208** s/unit ecc | ~4.4 seconds |
 | Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
-| **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+| **Anomalistic (raw)** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+| **Anomalistic (experienced)** | **365.2596445** | (after apsidal correction) | |
 
 The anomalistic year has a very small eccentricity variation (~0.12 seconds) compared to the sidereal year (~4.4 seconds). This is because the eccentricity effect on day length nearly cancels with the eccentricity effect on the anomalistic year itself.
 
@@ -2540,11 +2541,11 @@ const calcAnomalisticDays = lengthofsolarYear * perihelionPrecession /
 ```
 
 Where:
-- `$A$3` = mean anomalistic year in days (365.259692339)
+- `$A$3` = mean anomalistic year in days (365.259692337)
 - `$CF$3` = **-6** (eccentricity coefficient)
 - `$BH$3` = mean length of day (86,399.98848 seconds)
 - `E264` = current eccentricity
-- `$E$2` = eccentricityDerivedMean = √(eccentricityMean² + eccentricityAmplitude²)
+- `$E$2` = eccentricityDerivedMean = √(eccentricityBase² + eccentricityAmplitude²)
 
 #### JavaScript Implementation
 
@@ -2565,7 +2566,8 @@ function computeAnomalisticYearDays(eccentricity) {
 |-----------|-------------|-------------------------|-----------|
 | Sidereal | 365.256410 | **-3208** s/unit ecc | ~4.4 seconds |
 | Tropical | 365.242189 | (via obliquity) | ~2.5 seconds |
-| **Anomalistic** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+| **Anomalistic (raw)** | **365.259692** | **-6** s/unit ecc | **~0.12 seconds** |
+| **Anomalistic (experienced)** | **365.2596445** | (after apsidal correction) | |
 
 The anomalistic year has a very small eccentricity variation (~0.12 seconds) compared to the sidereal year (~4.4 seconds). This is because the eccentricity effect on day length nearly cancels with the eccentricity effect on the anomalistic year itself.
 

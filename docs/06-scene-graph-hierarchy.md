@@ -173,7 +173,7 @@ Both layers use the same period but opposite signs:
 |----------|--------------|--------------|
 | speed | +2π / (HY/16) | -2π / (HY/16) |
 | orbitTilta | -1.26 rad (~64°) | 0 |
-| orbitCentera | 0 | -eccentricityMean × 100 |
+| orbitCentera | 0 | -eccentricityBase × 100 |
 
 **Purpose:** "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
 
@@ -341,7 +341,7 @@ Updates occur after every precession frame, reflecting live tilt changes.
 | Mean solar day | ~86,400 s | Mean across perihelion cycle |
 | Mean obliquity | 23.41398° | Earth's mean axial tilt |
 | Inclination amplitude | 0.634° | Earth's orbital tilt oscillation |
-| Mean eccentricity | 0.015313 | Earth's mean orbital eccentricity |
+| Base eccentricity | 0.015321 | Earth's base orbital eccentricity |
 | Eccentricity amplitude | 0.001431 | Earth's eccentricity oscillation |
 
 ---

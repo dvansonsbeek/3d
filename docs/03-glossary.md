@@ -48,7 +48,7 @@ The rotation of an orbit's line of apsides (the line connecting perihelion and a
 Half the longest diameter of an elliptical orbit. Determines the orbit's size and, via Kepler's third law, the orbital period.
 
 ### Eccentricity (e)
-A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's mean eccentricity is 0.015313.
+A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's base eccentricity is 0.015321.
 
 ### Inclination (i)
 The angle between an orbital plane and a reference plane (usually the ecliptic or invariable plane). Measured in degrees.

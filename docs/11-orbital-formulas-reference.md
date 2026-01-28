@@ -158,7 +158,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 | `earthtiltMean` | 23.41398° | Mean obliquity |
 | `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination to invariable plane |
 | `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of inclination oscillation |
-| `eccentricityMean` | 0.015313 | Mean eccentricity |
+| `eccentricityBase` | 0.015321 | Base eccentricity |
 | `eccentricityAmplitude` | 0.001431 | Earth's eccentricity amplitude |
 | `earthPerihelionICRFYears` | 111,296 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
 

@@ -43,7 +43,7 @@ This document is the **single source of truth** for all constants used in the Ho
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Mean Eccentricity | `eccentricityMean` | 0.015313 | Mean orbital eccentricity |
+| Base Eccentricity | `eccentricityBase` | 0.015321 | Base orbital eccentricity |
 | Eccentricity Amplitude | `eccentricityAmplitude` | 0.001431 | Oscillation amplitude |
 | Semi-major Axis | - | 1 AU | By definition |
 | Orbital Period | - | ~365.2422 days | Mean solar year |

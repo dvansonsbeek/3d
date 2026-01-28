@@ -70,10 +70,9 @@ npm run build
 
 - The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth's axis (J2000 value +23°26'21").
 - There are only two counter movements around Earth working against each other in a ratio of 3:13 ; Inclination:Axial which explains all movements around Earth (precession, eccentricity, obliquity, inclination, etc)
-- The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is 13/16th of Axial precession: ~25,771×13/16 = ~20,939 years)
+- The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is around 13/16th of Axial precession: ~25,771×13/16 = ~20,939 years)
 - The Perihelion precession cycle of 20,868 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
 - The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION-OF-EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
-- The difference between the sidereal day - stellar day leads to the difference solar year – sidereal year.
 
 For more details see [holisticuniverse.com](https://holisticuniverse.com).
 
@@ -86,14 +85,15 @@ This number fits all observations best and aligns all year and day calculations:
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. J2000 value longitude of perihelion: 6h51m48s = ~102.95°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
-4. Climate graphs with ~100k cycles as a cycle of 111,296 years (three times 111,296 years = 333,888 years)
-5. End of Last Glacial Maximum (LGM) around 21,000 BC and end of Younger Dryas around 9800 BC
-6. **KEY EVIDENCE:** Mercury perihelion precession aligned to ~535 arc seconds per century
-7. **KEY EVIDENCE:** The difference sidereal day - stellar day leads to the difference solar year - sidereal year
-8. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, and sidereal year all align perfectly with 333,888 year cycle
-9. Obliquity correct both historic and current values
-10. Orbital Inclination to ICRF correct both historic and current values
-11. Eccentricity correct both historic and current values
+4. Climate graphs with ~111k cycles as a cycle of 111,296 years (three times 111,296 years = 333,888 years)
+5. End of Last Glacial Maximum (LGM) around 23,100 BC when inclination to inv plane was max
+6. End of Younger Dryas just after 11000 BC when obliquity was max
+7. **KEY EVIDENCE:** Mercury perihelion precession aligned to ~575 arc seconds per century
+8. **KEY EVIDENCE:** The difference sidereal day - stellar day leads to the difference solar year - sidereal year
+9. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, sidereal year and anomaliztic year all align perfectly with 333,888 year cycle
+10. Obliquity correct both historic and current values
+11. Orbital Inclination to ICRF correct both historic and current values
+12. Eccentricity correct for current values
 
 ---
 

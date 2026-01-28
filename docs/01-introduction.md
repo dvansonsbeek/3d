@@ -107,7 +107,7 @@ Earth's orbit varies between more circular and more elliptical:
 
 | Parameter | Value |
 |-----------|-------|
-| Mean Eccentricity | 0.015313 |
+| Base Eccentricity | 0.015321 |
 | Amplitude | ±0.001431 |
 | Range | ~0.0139 to ~0.0167 |
 
