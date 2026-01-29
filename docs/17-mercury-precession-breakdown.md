@@ -168,15 +168,15 @@ Accurate perihelion precession requires:
 
 ### 1.6 Historical Context
 
-First-order secular theory **overestimates by ~4%** compared to Park et al. (2017) for Mercury:
+First-order secular theory **overestimates by ~0.4%** compared to Park et al. (2017) for Mercury:
 
 | Source | Mercury Total |
 |--------|---------------|
-| Our calculation | 552"/cy |
+| Our calculation | 534"/cy |
 | Park et al. (2017) | 532"/cy |
-| Overestimate | ~3.7% |
+| Overestimate | ~0.4% |
 
-The ~4% overestimate is expected from first-order theory, which doesn't include:
+The small overestimate reflects the limitations of first-order theory, which doesn't include:
 - **Indirect effects** - Venus perturbing Earth which then perturbs Mercury (Park includes cross-terms like "Venus+Earth/Moon = -0.0209"/cy")
 - **Higher-order terms** in the disturbing function expansion
 - **Eccentricity/inclination corrections** - contribute ~2-3% for Mercury
@@ -486,20 +486,20 @@ With the full formula including eccentricity and inclination corrections, we exp
 - Closest giant planet to Mars (α = 0.293)
 - Inner planets contribute negatively but are small
 
-### 3.2 Mercury Precession Breakdown (Target: ~532 arcsec/century)
+### 3.2 Mercury Precession Breakdown (Target: ~534 arcsec/century)
 
 | Perturber | Position | α ratio | Contribution | Percentage |
 |-----------|----------|---------|--------------|------------|
 | Venus | Outer | 0.534 | +278 | ~52% |
-| Jupiter | Outer | 0.074 | +153 | ~29% |
-| Earth | Outer | 0.387 | +85 | ~16% |
-| Saturn | Outer | 0.040 | +12 | ~2% |
-| Mars | Outer | 0.254 | +6 | ~1% |
+| Jupiter | Outer | 0.074 | +154 | ~29% |
+| Earth | Outer | 0.387 | +90 | ~17% |
+| Saturn | Outer | 0.040 | +7 | ~1% |
+| Mars | Outer | 0.254 | +3 | <1% |
 | Uranus | Outer | 0.020 | +1 | <1% |
-| Neptune | Outer | 0.013 | +0.5 | <1% |
-| **Calculated Total** | | | **~535** | |
-| **Observed** | | | **532** | |
-| **Accuracy** | | | **~101%** | |
+| Neptune | Outer | 0.013 | +1 | <1% |
+| **Calculated Total** | | | **~534** | |
+| **Observed (Park et al.)** | | | **532** | |
+| **Accuracy** | | | **~100%** | |
 
 **Insight:** All planets are outer to Mercury, so all contributions are positive.
 Venus dominates despite lower mass because of highest α ratio (0.534).
@@ -690,7 +690,7 @@ With eccentricity and inclination corrections:
 
 **Saturn (~78% accuracy):** The Jupiter-Saturn 5:2 near-resonance creates additional secular effects not captured in our first-order theory. This is a known limitation.
 
-**Mercury (relativity):** Our Newtonian model gives ~530 arcsec/century. The remaining ~43 arcsec/century is the famous relativistic contribution - a triumph of Einstein's General Relativity.
+**Mercury (relativity):** Our Newtonian model gives ~534 arcsec/century. The remaining ~43 arcsec/century is the famous relativistic contribution - a triumph of Einstein's General Relativity.
 
 ---
 
@@ -732,7 +732,7 @@ With eccentricity and inclination corrections:
 
 | Planet | Observed (arcsec/century) | Our Model | Accuracy |
 |--------|--------------------------|-----------|----------|
-| Mercury | 532 | ~535 | ~101% |
+| Mercury | 532 | ~534 | ~100% |
 | Venus | ~8 | ~8 | ~100% |
 | Earth | 1,304 | ~1,240 | ~95% |
 | Mars | 1,739 | ~1,649 | ~95% |
@@ -784,8 +784,8 @@ A **Precession Breakdown** feature that:
 ### Historical Significance
 
 For Mercury, this breakdown historically demonstrated:
-- Newtonian mechanics predicts ~530 arcsec/century
-- Observed value is ~574 arcsec/century
+- Newtonian mechanics predicts ~532 arcsec/century
+- Observed value is ~575 arcsec/century
 - The ~43 arcsec/century discrepancy was unexplained until Einstein's General Relativity (1915)
 
 This feature brings that same analysis to all planets!

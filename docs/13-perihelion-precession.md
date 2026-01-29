@@ -274,8 +274,8 @@ The Earth-frame showing ~575 arcsec/century currently might be coincidental - we
 ### GUI Display
 
 Both values are shown in the "Perihelion Planets" folder for each planet:
-- `Mercury (Earth)` - Earth-frame value (fluctuates)
-- `Mercury (Ecliptic)` - Ecliptic-frame value (stable)
+- `Mercury (Geocentric)` - Earth-frame value (fluctuates)
+- `Mercury (Heliocentric)` - Ecliptic-frame value (stable)
 
 ---
 

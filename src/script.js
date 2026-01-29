@@ -10577,28 +10577,28 @@ function setupGUI() {
   let folderPerihelion = gui.addFolder('Perihelion Planets')
   folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
   addInfoButton( folderPerihelion, 'https://wgc.jpl.nasa.gov:8443/webgeocalc/#OrbitalElements' );
-  // Earth-frame (fluctuates with Earth's precession cycles)
-  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Earth)")
-  folderPerihelion.add(o,"mercuryPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Ecliptic)")
-  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Earth)")
-  folderPerihelion.add(o,"venusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Ecliptic)")
+  // Geocentric (fluctuates with Earth's precession cycles) vs Heliocentric (constant Newtonian rate)
+  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Geocentric)")
+  folderPerihelion.add(o,"mercuryPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Heliocentric)")
+  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Geocentric)")
+  folderPerihelion.add(o,"venusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Heliocentric)")
   folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Earth Perihelion")
-  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Earth)")
-  folderPerihelion.add(o,"marsPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Ecliptic)")
-  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Earth)")
-  folderPerihelion.add(o,"jupiterPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Ecliptic)")
-  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Earth)")
-  folderPerihelion.add(o,"saturnPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Ecliptic)")
-  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Earth)")
-  folderPerihelion.add(o,"uranusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Ecliptic)")
-  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Earth)")
-  folderPerihelion.add(o,"neptunePerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Ecliptic)")
-  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Earth)")
-  folderPerihelion.add(o,"plutoPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Ecliptic)")
-  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Earth)")
-  folderPerihelion.add(o,"halleysPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Ecliptic)")
-  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Earth)")
-  folderPerihelion.add(o,"erosPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Ecliptic)")   
+  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Geocentric)")
+  folderPerihelion.add(o,"marsPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Heliocentric)")
+  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Geocentric)")
+  folderPerihelion.add(o,"jupiterPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Heliocentric)")
+  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Geocentric)")
+  folderPerihelion.add(o,"saturnPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Heliocentric)")
+  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Geocentric)")
+  folderPerihelion.add(o,"uranusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Heliocentric)")
+  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Geocentric)")
+  folderPerihelion.add(o,"neptunePerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Heliocentric)")
+  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Geocentric)")
+  folderPerihelion.add(o,"plutoPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Heliocentric)")
+  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Geocentric)")
+  folderPerihelion.add(o,"halleysPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Heliocentric)")
+  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Geocentric)")
+  folderPerihelion.add(o,"erosPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Heliocentric)")   
   
   let folderO = gui.addFolder('Celestial Tools')
   folderO.add(zodiac, 'visible').name('Zodiac');
@@ -20256,14 +20256,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(mercuryPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('mercury'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -20616,14 +20616,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(venusPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('venus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -20943,14 +20943,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(marsPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('mars'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -21261,14 +21261,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(jupiterPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('jupiter'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -21588,14 +21588,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(saturnPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('saturn'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -21915,14 +21915,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(uranusPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('uranus'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -22242,14 +22242,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(neptunePerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('neptune'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -22568,14 +22568,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(plutoPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('pluto'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('pluto'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -22872,14 +22872,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(halleysPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('halleys'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('halleys'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,
@@ -23176,14 +23176,14 @@ const planetStats = {
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
-      {label : () => `┌ Perihelion precession (Ecliptic)`,
+      {label : () => `┌ Perihelion precession (Heliocentric)`,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`1,296,000 / ${fmtNum(erosPerihelionICRFYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionICRFYears),2,',')} arcsec/century`],
        static: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('eros'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Difference between Earth-frame and Ecliptic-frame perihelion advance from 1900 to 2000`]},
-      {label : () => `└ Perihelion precession (Earth)`,
+      {label : () => `└ Perihelion precession (Geocentric)`,
        value : [ { v: () => calculateEarthFramePrecession('eros'), dec:2, sep:',' },{ small: 'arcsec/century' }],
        hover : [`Earth-frame perihelion advance from 1900 to 2000 (sum of ecliptic precession + missing advance)`]},
     null,

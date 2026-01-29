@@ -186,10 +186,10 @@ console.log('');
 console.log('  "Predicted missing advance (next century)"');
 console.log('    → Difference between Earth-frame and Ecliptic-frame (2000-2100)');
 console.log('');
-console.log('  "Perihelion precession (Ecliptic)"');
+console.log('  "Perihelion precession (Heliocentric)"');
 console.log(`    → Should show ~${eclipticRate.toFixed(2)} arcsec/century (constant)`);
 console.log('');
-console.log('  "Perihelion precession (Earth)"');
+console.log('  "Perihelion precession (Geocentric)"');
 console.log('    → Earth-frame rate = Ecliptic rate + Missing advance');
 console.log('');
 
