@@ -78,7 +78,7 @@ const moonStartposNodal = 64;                             // Aligned to major lu
 const moonStartposMoon = 132.105;                         // Needs to be at ~21h09m57s if start model is 2451716.5
 
 // Reference lengths used as INPUT for Mercury
-const mercurySolarYearInput = 87.96855;
+const mercurySolarYearInput = 87.96845;
 const mercuryEclipticInclinationJ2000 = 7.00497902;       // JPL J2000
 const mercuryOrbitalEccentricity = 0.20563593;            // JPL J2000
 const mercuryInvPlaneInclinationJ2000 = 6.3472858;
@@ -89,10 +89,10 @@ const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.984366;                  // To align the perihelion exactly
 const mercuryPerihelionICRFYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
-const mercuryStartpos = 86.25;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
+const mercuryStartpos = 84.205;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
-const venusSolarYearInput = 224.6958;
+const venusSolarYearInput = 224.6965;
 const venusEclipticInclinationJ2000 = 3.39467605;         // JPL J2000
 const venusOrbitalEccentricity = 0.00677672;              // JPL J2000
 const venusInvPlaneInclinationJ2000 = 2.1545441;
@@ -103,7 +103,7 @@ const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.782986;                    // To align the perihelion exactly
 const venusPerihelionICRFYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
-const venusStartpos = 249.68;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
+const venusStartpos = 249.69;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.934;
@@ -117,7 +117,7 @@ const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
 const marsAngleCorrection = -2.10564;                    // To align the perihelion exactly
 const marsPerihelionICRFYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
-const marsStartpos = 121.514;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
+const marsStartpos = 121.512;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.595;
@@ -131,10 +131,10 @@ const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
 const jupiterAngleCorrection = 1.097601;                  // To align the perihelion exactly
 const jupiterPerihelionICRFYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
-const jupiterStartpos = 13.79;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
+const jupiterStartpos = 13.76;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
-const saturnSolarYearInput = 10745.6;
+const saturnSolarYearInput = 10746.6;
 const saturnEclipticInclinationJ2000 = 2.48599187;        // JPL J2000
 const saturnOrbitalEccentricity = 0.05386179;             // JPL J2000
 const saturnInvPlaneInclinationJ2000 = 0.9254704;
@@ -145,7 +145,7 @@ const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
 const saturnAngleCorrection = -0.175436;                  // To align the perihelion exactly
 const saturnPerihelionICRFYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
-const saturnStartpos = 11.344;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
+const saturnStartpos = 11.397;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30583;
@@ -159,10 +159,10 @@ const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
 const uranusAngleCorrection = -0.774123;                  // To align the perihelion exactly
 const uranusPerihelionICRFYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
-const uranusStartpos = 44.676;                            // Needs to be at ~21h32m43.04 if start model is 2451716.5
+const uranusStartpos = 44.71;                             // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
-const neptuneSolarYearInput = 59926;
+const neptuneSolarYearInput = 59896;
 const neptuneEclipticInclinationJ2000 = 1.77004347;       // JPL J2000
 const neptuneOrbitalEccentricity = 0.00859048;            // JPL J2000
 const neptuneInvPlaneInclinationJ2000 = 0.7354155;
@@ -173,7 +173,7 @@ const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
 const neptuneAngleCorrection = 2.400885;                  // To align the perihelion exactly
 const neptunePerihelionICRFYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
-const neptuneStartpos = 47.917;                           // Needs to be at ~20h33m40.34 if start model is 2451716.5
+const neptuneStartpos = 47.95;                            // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
@@ -2214,7 +2214,7 @@ const moon = {
 };
 
 const mercuryPerihelionDurationEcliptic1 = {
-  name: "Mercury Perihelion Duration Ecliptic1",
+  name: "Mercury Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/mercuryPerihelionICRFYears,
   tilt: 0,
@@ -2263,7 +2263,7 @@ const mercuryPerihelionFromEarth = {
 };
 
 const mercuryPerihelionDurationEcliptic2 = {
-  name: "Mercury Perihelion Duration Ecliptic2",
+  name: "Mercury Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/mercuryPerihelionICRFYears,
   tilt: 0,
@@ -2292,7 +2292,7 @@ const mercuryRealPerihelionAtSun = {
   tilt: 0,
   orbitRadius: mercuryElipticOrbit,
   orbitCentera: 100,
-  orbitCenterb: mercuryEccentricityPerihelion,
+  orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
@@ -2357,7 +2357,7 @@ const mercury = {
 };
 
 const venusPerihelionDurationEcliptic1 = {
-  name: "Venus Perihelion Duration Ecliptic1",
+  name: "Venus Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/venusPerihelionICRFYears,
   tilt: 0,
@@ -2406,7 +2406,7 @@ const venusPerihelionFromEarth = {
 };
 
 const venusPerihelionDurationEcliptic2 = {
-  name: "Venus Perihelion Duration Ecliptic2",
+  name: "Venus Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/venusPerihelionICRFYears,
   tilt: 0,
@@ -2435,7 +2435,7 @@ const venusRealPerihelionAtSun = {
   tilt: 0,
   orbitRadius: venusElipticOrbit,
   orbitCentera: 100,
-  orbitCenterb: venusEccentricityPerihelion,
+  orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
@@ -2500,7 +2500,7 @@ const venus = {
 };
 
 const marsPerihelionDurationEcliptic1 = {
-  name: "Mars Perihelion Duration Ecliptic1",
+  name: "Mars Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/marsPerihelionICRFYears,
   tilt: 0,
@@ -2549,7 +2549,7 @@ const marsPerihelionFromEarth = {
 };
 
 const marsPerihelionDurationEcliptic2 = {
-  name: "Mars Perihelion Duration Ecliptic2",
+  name: "Mars Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/marsPerihelionICRFYears,
   tilt: 0,
@@ -2643,7 +2643,7 @@ const mars = {
 };
 
 const jupiterPerihelionDurationEcliptic1 = {
-  name: "Jupiter Perihelion Duration Ecliptic1",
+  name: "Jupiter Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/jupiterPerihelionICRFYears,
   tilt: 0,
@@ -2692,7 +2692,7 @@ const jupiterPerihelionFromEarth = {
 };
 
 const jupiterPerihelionDurationEcliptic2 = {
-  name: "Jupiter Perihelion Duration Ecliptic2",
+  name: "Jupiter Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/jupiterPerihelionICRFYears,
   tilt: 0,
@@ -2791,7 +2791,7 @@ const jupiter = {
 };
 
 const saturnPerihelionDurationEcliptic1 = {
-  name: "Saturn Perihelion Duration Ecliptic1",
+  name: "Saturn Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/saturnPerihelionICRFYears,
   tilt: 0,
@@ -2840,7 +2840,7 @@ const saturnPerihelionFromEarth = {
 };
 
 const saturnPerihelionDurationEcliptic2 = {
-  name: "Saturn Perihelion Duration Ecliptic2",
+  name: "Saturn Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/saturnPerihelionICRFYears,
   tilt: 0,
@@ -2939,7 +2939,7 @@ const saturn = {
 };
 
 const uranusPerihelionDurationEcliptic1 = {
-  name: "Uranus Perihelion Duration Ecliptic1",
+  name: "Uranus Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/uranusPerihelionICRFYears,
   tilt: 0,
@@ -2988,7 +2988,7 @@ const uranusPerihelionFromEarth = {
 };
 
 const uranusPerihelionDurationEcliptic2 = {
-  name: "Uranus Perihelion Duration Ecliptic2",
+  name: "Uranus Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/uranusPerihelionICRFYears,
   tilt: 0,
@@ -3087,7 +3087,7 @@ const uranus = {
 };
 
 const neptunePerihelionDurationEcliptic1 = {
-  name: "Neptune Perihelion Duration Ecliptic1",
+  name: "Neptune Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/neptunePerihelionICRFYears,
   tilt: 0,
@@ -3136,7 +3136,7 @@ const neptunePerihelionFromEarth = {
 };
 
 const neptunePerihelionDurationEcliptic2 = {
-  name: "Neptune Perihelion Duration Ecliptic2",
+  name: "Neptune Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/neptunePerihelionICRFYears,
   tilt: 0,
@@ -3240,7 +3240,7 @@ const neptune = {
 // orbitSemiMinor: 519.969067802053*Math.sqrt(1-0.048499*0.048499),
 
 const plutoPerihelionDurationEcliptic1 = {
-  name: "Pluto Perihelion Duration Ecliptic1",
+  name: "Pluto Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/plutoPerihelionICRFYears,
   tilt: 0,
@@ -3289,7 +3289,7 @@ const plutoPerihelionFromEarth = {
 };
 
 const plutoPerihelionDurationEcliptic2 = {
-  name: "Pluto Perihelion Duration Ecliptic2",
+  name: "Pluto Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/plutoPerihelionICRFYears,
   tilt: 0,
@@ -3383,7 +3383,7 @@ const pluto = {
 };
 
 const halleysPerihelionDurationEcliptic1 = {
-  name: "Halleys Perihelion Duration Ecliptic1",
+  name: "Halleys Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/halleysPerihelionICRFYears,
   tilt: 0,
@@ -3432,7 +3432,7 @@ const halleysPerihelionFromEarth = {
 };
 
 const halleysPerihelionDurationEcliptic2 = {
-  name: "Halleys Perihelion Duration Ecliptic2",
+  name: "Halleys Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/halleysPerihelionICRFYears,
   tilt: 0,
@@ -3528,7 +3528,7 @@ const halleys = {
 };
 
 const erosPerihelionDurationEcliptic1 = {
-  name: "Eros Perihelion Duration Ecliptic1",
+  name: "Eros Perihelion Duration ICRF1",
   startPos: 0,
   speed: Math.PI*2/erosPerihelionICRFYears,
   tilt: 0,
@@ -3577,7 +3577,7 @@ const erosPerihelionFromEarth = {
 };
 
 const erosPerihelionDurationEcliptic2 = {
-  name: "Eros Perihelion Duration Ecliptic2",
+  name: "Eros Perihelion Duration ICRF2",
   startPos: 0,
   speed: -Math.PI*2/erosPerihelionICRFYears,
   tilt: 0,
@@ -6149,6 +6149,7 @@ let visualElapsed = 0;  // Throttle for visual effects (30 Hz)
 
 let cameraMoved = true; // Force first update
 let positionChanged = false; // Set true when date/time changed externally (GUI, jump, etc.)
+let _needsInitialSceneUpdate = true; // Force forceSceneUpdate() on first render frame
 let eggTriggered = false;
 
 const DEG = Math.PI / 180;
@@ -11490,6 +11491,13 @@ function render(now) {
     labelRenderer.render(scene, camera);
 
     needsLabelUpdate = false;
+  }
+  // 11) First-frame: recalculate positions after renderer.render() has
+  //     established correct scene state, so Celestial Positions are accurate
+  if (_needsInitialSceneUpdate) {
+    _needsInitialSceneUpdate = false;
+    forceSceneUpdate();
+    updatePositionDisplayStrings();
   }
   //stats.end();
 }
@@ -19277,7 +19285,8 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => o.eccentricityEarth, dec:8, sep:',' },{ small: '' }]},
+       value : [ { v: () => earthPerihelionFromEarth.distAU, dec:8, sep:',' },{ small: 'AU' }],
+       hover : [`Actual orbital eccentricity from PERIHELION-OF-EARTH distance to Earth`]},
     null,
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:8, sep:',' },{ small: 'degrees (°)' }]},
