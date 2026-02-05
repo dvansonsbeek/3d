@@ -10,6 +10,8 @@ The Interactive 3D Solar System Simulation shows the precession / eccentricity /
 
 Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with ~10 parameters per planet/moon our complete solar system appears.
 
+Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v1
+
 For more information, see https://holisticuniverse.com */
 
 //*************************************************************

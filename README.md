@@ -7,6 +7,8 @@
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
 > **[🚀 Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser
+>
+> **[📄 Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v1)** — Read the accompanying research paper
 
 The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets coming together in a Holistic-Year cycle of 333,888 years, an Axial precession cycle of ~25,684 years, an Inclination precession cycle of 111,296 years and a Perihelion precession cycle of 20,868 years.
 
