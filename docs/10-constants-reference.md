@@ -21,8 +21,7 @@ This document is the **single source of truth** for all constants used in the Ho
 |----------|-------|-------------|
 | `inputmeanlengthsolaryearindays` | 365.2421897 | Input solar year in days |
 | `meansolaryearlengthinDays` | 365.2421890 | Mean solar year rounded to HY/16 precision |
-| `meansiderealyearlengthinSeconds` | 31,558,153.91 | Mean sidereal year in seconds |
-| `siderealyearlengthinSecondsAt1246` | 31,558,149.68 | Sidereal year in seconds at year 1246 AD |
+| `meansiderealyearlengthinSeconds` | 31,558,149.724 | Mean sidereal year in seconds |
 | `meanlengthofday` | ~86,400 | Mean solar day in SI seconds |
 | Reference Date | December 14, 1245 AD | Perihelion-solstice alignment |
 | J2000 Epoch | January 1, 2000, 12:00 TT | Standard astronomical epoch |
