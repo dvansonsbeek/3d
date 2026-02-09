@@ -72,7 +72,7 @@ All planets use a **universal phase angle** derived from the s₈ eigenmode of L
 
 | Planet | Phase Angle | Precession Direction | Inclination Trend at J2000 |
 |--------|-------------|---------------------|---------------------------|
-| Mercury | 203.3195° | Prograde | Decreasing |
+| Mercury | 23.3195° | Prograde | Increasing |
 | Venus | 203.3195° | Prograde | Decreasing |
 | Earth | 203.3195° | Prograde | Decreasing |
 | Mars | 203.3195° | Prograde | Decreasing |
@@ -82,7 +82,7 @@ All planets use a **universal phase angle** derived from the s₈ eigenmode of L
 | Neptune | 203.3195° | Prograde | Increasing |
 | Pluto | 203.3195° | Prograde | Decreasing |
 
-**Key insight**: Saturn uses 23.3195° (= 203.3195° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction.
+**Key insight**: Saturn uses 23.3195° (= 203.3195° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction. Mercury also uses 23.3195° to match the observed increasing inclination trend.
 
 ### Inclination Constants
 
@@ -90,7 +90,7 @@ All values optimized for **exact J2000 invariable plane inclination match** (ver
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 6.359178 | 0.012058 | 6.3473 | 6.35 - 6.37 | ~0"/cy |
+| Mercury | 5.468532 | 0.891000 | 6.3473 | 4.58 - 6.36 | ~1.4"/cy |
 | Venus | 3.055471 | 1.055286 | 2.1545 | 2.00 - 4.11 | ~21"/cy |
 | Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
 | Mars | 3.600460 | 2.239753 | 1.6312 | 1.36 - 5.84 | ~13"/cy |
@@ -109,7 +109,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const period = mercuryPerihelionICRFYears;
   const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
-  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.3195°
+  const phaseAngle = mercuryInclinationPhaseAngle;  // 23.3195°
 
   // Calculate current ascending node
   const yearsSinceJ2000 = currentYear - 2000;

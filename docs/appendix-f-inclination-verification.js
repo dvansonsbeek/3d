@@ -66,9 +66,9 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 6.359178,
-    amplitude: 0.012058,
-    phaseAngle: 203.3195,
+    mean: 5.468532,
+    amplitude: 0.891000,
+    phaseAngle: 23.3195,
     omegaJ2000: 32.83,
     period: holisticyearLength / (1 + 3/8),  // ~242,828 years
     inclJ2000: 6.3472858,

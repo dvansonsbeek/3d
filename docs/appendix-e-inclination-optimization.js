@@ -90,8 +90,9 @@ const planetInputs = {
     omegaJ2000: 32.83,                              // Verified ascending node
     inclJ2000: 6.3472858,                           // J2000 inv plane inclination (S&S 2012)
     period: holisticyearLength / (1 + 3/8),         // ~242,828 years
-    phaseAngle: 203.3195,                           // Prograde
-    periodExpr: 'holisticyearLength/(1+(3/8))'
+    phaseAngle: 23.3195,                            // Same as Saturn (retrograde eigenmode)
+    periodExpr: 'holisticyearLength/(1+(3/8))',
+    fixedAmplitude: 0.891                           // Fixed amplitude, mean derived from J2000 constraint
   },
   venus: {
     name: 'Venus',
@@ -192,6 +193,28 @@ function optimizePlanet(key) {
     // Dot product gives cos(angle between planes)
     const dot = pnx*enx + pny*eny + pnz*enz;
     return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
+  }
+
+  // If fixedAmplitude is set, derive mean directly from J2000 constraint
+  if (input.fixedAmplitude !== undefined) {
+    const amplitude = input.fixedAmplitude;
+    const mean = inclJ2000 - amplitude * cosPhaseJ2000;
+
+    const ecl1900 = calcEclipticIncl(1900, mean, amplitude);
+    const ecl2100 = calcEclipticIncl(2100, mean, amplitude);
+    const trend = (ecl2100 - ecl1900) / 2;
+    const trendError = Math.abs(trend - targetTrend);
+
+    return {
+      mean,
+      amplitude,
+      trend,
+      trendError,
+      i2000_inv: mean + amplitude * cosPhaseJ2000,
+      rangeMin: mean - amplitude,
+      rangeMax: mean + amplitude,
+      directionMatch: (targetTrend >= 0) === (trend >= 0)
+    };
   }
 
   let best = null;

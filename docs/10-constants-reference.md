@@ -95,7 +95,7 @@ Each planet's inclination oscillates around a mean value with a specific amplitu
 
 | Planet | Mean (°) | Amplitude (°) | Range (°) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.359178 | 0.012058 | 6.35 - 6.37 | 203.3195° | ~0"/cy |
+| Mercury | 5.468532 | 0.891000 | 4.58 - 6.36 | 23.3195° | ~1.4"/cy |
 | Venus | 3.055471 | 1.055286 | 2.00 - 4.11 | 203.3195° | ~21"/cy |
 | Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195° | (reference) |
 | Mars | 3.600460 | 2.239753 | 1.36 - 5.84 | 203.3195° | ~13"/cy |

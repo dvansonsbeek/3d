@@ -280,7 +280,7 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // These are theoretical bounds from Table 10.4:
 // - Mercury: 4.57° to 9.86°
 // - Venus: 0.00° to 3.38° (we use 0.72° to 4.11° for J2000 calibration)
-// - Earth: 0.00° to 2.95° (we use 0.93° to 2.06° for J2000 calibration)
+// - Earth: 0.00° to 2.95° (we use 0.85° to 2.12° for J2000 calibration)
 // - Mars: 0.00° to 5.84°
 // - Jupiter: 0.241° to 0.489°
 // - Saturn: 0.797° to 1.02° (we use 0.43° to 1.53° expanded for retrograde)
@@ -297,9 +297,9 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
-// J2000=6.3472858° (EXACT), phase 203.3195°, period holisticyearLength/(1+(3/8)), trend error: 0.0"/cy
-const mercuryInvPlaneInclinationMean = 6.359178;
-const mercuryInvPlaneInclinationAmplitude = 0.012058;  // Range: 6.35° to 6.37°
+// J2000=6.3472858° (EXACT), phase 23.3195°, period holisticyearLength/(1+(3/8)), trend error: 1.4"/cy
+const mercuryInvPlaneInclinationMean = 5.468532;
+const mercuryInvPlaneInclinationAmplitude = 0.891000;  // Range: 4.58° to 6.36°
 
 // Venus: Range 0.72° to 4.11° (from Laplace-Lagrange)
 // J2000=2.1545441° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 18.3"/cy
@@ -365,7 +365,7 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 // of precession - both values represent the same physical direction in space.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const mercuryInclinationPhaseAngle = 203.3195;  // prograde, decreasing trend, error: 0.5"/cy
+const mercuryInclinationPhaseAngle = 23.3195;   // same phase as Saturn, increasing trend, error: 1.4"/cy
 const venusInclinationPhaseAngle = 203.3195;    // prograde, decreasing trend, error: 21.2"/cy
 const earthInclinationPhaseAngle = 203.3195;    // prograde, decreasing trend (reference)
 const marsInclinationPhaseAngle = 203.3195;     // prograde, decreasing trend, error: 13.1"/cy
@@ -24648,7 +24648,7 @@ function updatePerihelion() {
 //   - The RATE of obliquity change (dε/dt), not total deviation from mean
 //   - The relative inclination between Earth and the planet at each moment
 //
-// Earth inclination range: ~0.93° to ~2.06° (mean 1.495°, amplitude 0.564°)
+// Earth inclination range: ~0.85° to ~2.12° (mean 1.482°, amplitude 0.634°)
 // Planets affected by inclination crossover: Jupiter (1.30°), Mars (1.85°)
 // ================================================================
 
