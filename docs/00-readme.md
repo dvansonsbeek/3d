@@ -45,6 +45,12 @@ This documentation is **self-contained** - you can understand the model and use 
 | [18 - J2000 Calibration](18-j2000-calibration.md) | J2000-verified ascending nodes methodology |
 | [19 - Coordinate Frames](19-coordinate-frames.md) | ICRF, ecliptic, equatorial, and invariable plane transformations |
 
+### Research & Derivations
+
+| Document | Description |
+|----------|-------------|
+| [26 - Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md) | Fibonacci-derived inclination amplitudes with invariable plane balance condition |
+
 ### Developer Reference
 
 | Document | Description |
@@ -63,7 +69,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix B - Analytical Ascending Nodes](appendix-b-analytical-ascending-nodes.js) | Analytical (closed-form) calculation of ascending nodes |
 | [Appendix C - Ascending Node Verification](appendix-c-ascending-node-verification.js) | Verifies J2000-verified ascending nodes produce correct ecliptic inclinations |
 | [Appendix D - Ascending Node Comparison](appendix-d-ascending-node-souami-souchay.js) | Compares S&S original vs Verified ascending node accuracy |
-| [Appendix E - Inclination Optimization](appendix-e-inclination-optimization.js) | Calculates optimal mean/amplitude for inclination oscillations |
+| [Appendix E - Inclination Computation](appendix-e-inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
 | [Appendix F - Inclination Verification](appendix-f-inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [Appendix G - Mercury Precession](appendix-g-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
 | [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |

@@ -42,8 +42,8 @@ const temperatureGraphMostLikely = 14.5;
 const earthRAAngle = 1.258454;
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
 const earthtiltMean = 23.41398;                           // 3D model + formula (optimized for IAU 2006)
-const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate)
-const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula
+const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.635185
+const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula. Fibonacci predicts 1.481388
 const eccentricityBase = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.0014226;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
@@ -291,49 +291,48 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // A = |rate| × |period| / (2π)
 // This gives smaller values as it assumes we're near maximum rate.
 //
-// We use the Laplace-Lagrange derived amplitudes as they represent the full
-// oscillation envelope are based on analytical eigenmode calculations.
-// The period for each planet equals its <planet>PerihelionICRFYears constant (earthPerihelionICRFYears for Earth).
+// Amplitudes from Fibonacci Laws: amp = ψ_g / (d × √m), means from J2000 constraint.
+// ψ₃/ψ₁ determined by invariable plane balance: Σ(203°) L×amp = Σ(23°) L×amp
+// See: docs/26-fibonacci-laws.md, docs/appendix-e-inclination-optimization.js
 // ══════════════════════════════════════════════════════════════════════════════
 
-// Mercury: Range 4.57° to 9.86° (from Laplace-Lagrange)
-// J2000=6.3472858° (EXACT), phase 23.3195°, period holisticyearLength/(1+(3/8)), trend error: 1.4"/cy
-const mercuryInvPlaneInclinationMean = 5.468532;
-const mercuryInvPlaneInclinationAmplitude = 0.891000;  // Range: 4.58° to 6.36°
+// Mercury: LL bounds [4.57°, 9.86°], 23° balance group
+// J2000=6.3472858° (EXACT), phase 23.3195°, period holisticyearLength/(1+(3/8)), trend error: 0.7"/cy
+const mercuryInvPlaneInclinationMean = 5.900556;
+const mercuryInvPlaneInclinationAmplitude = 0.452956;  // Range: 5.45° to 6.35°
 
-// Venus: Range 0.72° to 4.11° (from Laplace-Lagrange)
-// J2000=2.1545441° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 18.3"/cy
-// Note: Large error due to long period - Venus motion too slow to counteract Earth's contribution
-const venusInvPlaneInclinationMean = 3.055471;
-const venusInvPlaneInclinationAmplitude = 1.055286;  // Range: 2.00° to 4.11°
+// Venus: LL bounds [0.72°, 4.11°], 203° balance group
+// J2000=2.1545441° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 20"/cy
+const venusInvPlaneInclinationMean = 3.055450;
+const venusInvPlaneInclinationAmplitude = 1.055261;  // Range: 2.00° to 4.11°
 
-// Mars: Range 0.00° to 5.84° (from Laplace-Lagrange)
-// J2000=1.6311858° (EXACT), phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 15.4"/cy
-const marsInvPlaneInclinationMean = 3.600460;
-const marsInvPlaneInclinationAmplitude = 2.239753;  // Range: 1.36° to 5.84°
+// Mars: LL bounds [0.00°, 5.84°], 203° balance group
+// J2000=1.6311858° (EXACT), phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 15"/cy
+const marsInvPlaneInclinationMean = 3.596827;
+const marsInvPlaneInclinationAmplitude = 2.235621;  // Range: 1.36° to 5.83°
 
-// Jupiter: Range 0.241° to 0.489° (from Laplace-Lagrange)
-// J2000=0.3219652° (EXACT), phase 203.3195°, period holisticyearLength/5, trend error: 0.3"/cy
-const jupiterInvPlaneInclinationMean = 0.363200;
-const jupiterInvPlaneInclinationAmplitude = 0.123101;  // Range: 0.24° to 0.49°
+// Jupiter: LL bounds [0.241°, 0.489°], 203° balance group
+// J2000=0.3219652° (EXACT), phase 203.3195°, period holisticyearLength/5, trend error: 1.9"/cy
+const jupiterInvPlaneInclinationMean = 0.342972;
+const jupiterInvPlaneInclinationAmplitude = 0.062713;  // Range: 0.28° to 0.41°
 
-// Saturn: Range 0.43° to 1.53° (expanded from Laplace-Lagrange)
-// J2000=0.9254704° (EXACT), phase 23.3195° (retrograde), period -holisticyearLength/8, trend error: 0.0"/cy
-const saturnInvPlaneInclinationMean = 0.941380;
-const saturnInvPlaneInclinationAmplitude = 0.166278;  // Range: 0.78° to 1.11°
+// Saturn: LL bounds [0.43°, 1.53°], 23° balance group (retrograde)
+// J2000=0.9254704° (EXACT), phase 23.3195° (retrograde), period -holisticyearLength/8, trend error: 0.1"/cy
+const saturnInvPlaneInclinationMean = 0.941281;
+const saturnInvPlaneInclinationAmplitude = 0.165248;  // Range: 0.78° to 1.11°
 
-// Uranus: Range 0.902° to 1.11° (from Laplace-Lagrange)
-// J2000=0.9946692° (EXACT), phase 203.3195°, period holisticyearLength/3, trend error: 1.1"/cy
-const uranusInvPlaneInclinationMean = 1.017900;
-const uranusInvPlaneInclinationAmplitude = 0.092904;  // Range: 0.92° to 1.11°
+// Uranus: LL bounds [0.902°, 1.11°], 23° balance group
+// J2000=0.9946692° (EXACT), phase 23.3195°, period holisticyearLength/3, trend error: 3.0"/cy
+const uranusInvPlaneInclinationMean = 0.979050;
+const uranusInvPlaneInclinationAmplitude = 0.062465;  // Range: 0.92° to 1.04°
 
-// Neptune: Range 0.554° to 0.800° (from Laplace-Lagrange)
-// J2000=0.7354155° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 0.4"/cy
-const neptuneInvPlaneInclinationMean = 0.645100;
-const neptuneInvPlaneInclinationAmplitude = 0.092094;  // Range: 0.55° to 0.74°
+// Neptune: LL bounds [0.554°, 0.800°], 203° balance group
+// J2000=0.7354155° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 1.7"/cy
+const neptuneInvPlaneInclinationMean = 0.679019;
+const neptuneInvPlaneInclinationAmplitude = 0.057508;  // Range: 0.62° to 0.74°
 
-// Pluto: Range 15.0° to 16.5° (estimated)
-// J2000=15.5639473° (EXACT), phase 203.3195°, period holisticyearLength, trend error: 4.2"/cy
+// Pluto: LL bounds [15.0°, 16.5°] (estimated, not in Fibonacci theory)
+// J2000=15.5639473° (EXACT), phase 203.3195°, period holisticyearLength, trend error: 5.6"/cy
 const plutoInvPlaneInclinationMean = 15.716200;
 const plutoInvPlaneInclinationAmplitude = 0.717024;  // Range: 15.00° to 16.43°
 
@@ -365,15 +364,15 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 // of precession - both values represent the same physical direction in space.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const mercuryInclinationPhaseAngle = 23.3195;   // same phase as Saturn, increasing trend, error: 1.4"/cy
-const venusInclinationPhaseAngle = 203.3195;    // prograde, decreasing trend, error: 21.2"/cy
-const earthInclinationPhaseAngle = 203.3195;    // prograde, decreasing trend (reference)
-const marsInclinationPhaseAngle = 203.3195;     // prograde, decreasing trend, error: 13.1"/cy
-const jupiterInclinationPhaseAngle = 203.3195;  // prograde, decreasing trend, error: 0.0"/cy
-const saturnInclinationPhaseAngle = 23.3195;    // RETROGRADE, increasing trend, error: 0.0"/cy
-const uranusInclinationPhaseAngle = 203.3195;   // prograde, decreasing trend, error: 1.0"/cy
-const neptuneInclinationPhaseAngle = 203.3195;  // prograde, increasing trend, error: 0.2"/cy
-const plutoInclinationPhaseAngle = 203.3195;    // prograde, decreasing trend, error: 5.1"/cy
+const mercuryInclinationPhaseAngle = 23.3195;   // 23° balance group, error: 0.7"/cy
+const venusInclinationPhaseAngle = 203.3195;    // 203° balance group, error: 20"/cy
+const earthInclinationPhaseAngle = 203.3195;    // 203° balance group (reference)
+const marsInclinationPhaseAngle = 203.3195;     // 203° balance group, error: 15"/cy
+const jupiterInclinationPhaseAngle = 203.3195;  // 203° balance group, error: 1.9"/cy
+const saturnInclinationPhaseAngle = 23.3195;    // 23° balance group (RETROGRADE), error: 0.1"/cy
+const uranusInclinationPhaseAngle = 23.3195;    // 23° balance group, error: 3.0"/cy
+const neptuneInclinationPhaseAngle = 203.3195;  // 203° balance group, error: 1.7"/cy
+const plutoInclinationPhaseAngle = 203.3195;    // 203° (not in balance theory), error: 5.6"/cy
 const halleysInclinationPhaseAngle = 23.3195;   // RETROGRADE (estimated)
 const erosInclinationPhaseAngle = 203.3195;     // prograde (estimated)
 const ceresInclinationPhaseAngle = 203.3195;    // prograde (estimated)

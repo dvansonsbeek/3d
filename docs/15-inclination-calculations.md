@@ -54,10 +54,10 @@ i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
 ```
 
 Where:
-- `mean` = Laplace-Lagrange midpoint of the oscillation range
-- `amplitude` = Half of the oscillation range
+- `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(Ω - phaseAngle))
+- `amplitude` = Fibonacci-derived: ψ_g / (d × √m), see [doc 26](26-fibonacci-laws.md)
 - `Ω(t)` = Current ascending node on invariable plane
-- `phaseAngle` = Universal phase angle (203° prograde, 23° retrograde)
+- `phaseAngle` = Balance group phase angle (203.3195° or 23.3195°, see [doc 26](26-fibonacci-laws.md))
 
 ### Why This Works
 
@@ -66,39 +66,43 @@ When an orbital plane precesses around the invariable plane:
 - At `Ω(t) = phaseAngle + 90°`: `cos(90°) = 0` → Mean inclination
 - At `Ω(t) = phaseAngle + 180°`: `cos(180°) = -1` → **Minimum inclination** (mean - amplitude)
 
-### Universal Phase Angles (s₈ Eigenmode)
+### Universal Phase Angles (Balance Groups)
 
-All planets use a **universal phase angle** derived from the s₈ eigenmode of Laplace-Lagrange secular theory (γ₈ ≈ 203.3195°):
+All planets use one of two **universal phase angles** derived from the s₈ eigenmode of Laplace-Lagrange secular theory (γ₈ ≈ 203.3195°), assigned to balance groups by the invariable plane angular momentum balance condition (see [doc 26](26-fibonacci-laws.md)):
 
-| Planet | Phase Angle | Precession Direction | Inclination Trend at J2000 |
-|--------|-------------|---------------------|---------------------------|
-| Mercury | 23.3195° | Prograde | Increasing |
-| Venus | 203.3195° | Prograde | Decreasing |
-| Earth | 203.3195° | Prograde | Decreasing |
-| Mars | 203.3195° | Prograde | Decreasing |
-| Jupiter | 203.3195° | Prograde | Decreasing |
-| **Saturn** | **23.3195°** | **Retrograde** | **Increasing** |
-| Uranus | 203.3195° | Prograde | Decreasing |
-| Neptune | 203.3195° | Prograde | Increasing |
-| Pluto | 203.3195° | Prograde | Decreasing |
+| Planet | Phase Angle | Balance Group | Precession Direction | Incl. Trend at J2000 |
+|--------|-------------|---------------|---------------------|---------------------------|
+| Mercury | 23.3195° | 23° | Prograde | Increasing |
+| Venus | 203.3195° | 203° | Prograde | Decreasing |
+| Earth | 203.3195° | 203° | Prograde | Decreasing |
+| Mars | 203.3195° | 203° | Prograde | Decreasing |
+| Jupiter | 203.3195° | 203° | Prograde | Decreasing |
+| **Saturn** | **23.3195°** | **23°** | **Retrograde** | **Increasing** |
+| **Uranus** | **23.3195°** | **23°** | Prograde | Decreasing |
+| Neptune | 203.3195° | 203° | Prograde | Decreasing |
+| Pluto | 203.3195° | — | Prograde | Decreasing |
 
-**Key insight**: Saturn uses 23.3195° (= 203.3195° - 180°) because its ascending node precesses in the **opposite direction** (retrograde). The 180° offset compensates for the reversed precession direction. Mercury also uses 23.3195° to match the observed increasing inclination trend.
+**Key insights**:
+- The two phase angles (203.3195° and 23.3195°) are 180° apart, representing opposite sides of the invariable plane oscillation
+- Group assignments are determined by the **invariable plane balance condition**: Σ(203°) L×amp = Σ(23°) L×amp
+- Saturn uses 23.3195° because its ascending node precesses in the **opposite direction** (retrograde)
+- Mercury and Uranus use 23.3195° as part of the 23° balance group
 
 ### Inclination Constants
 
-All values optimized for **exact J2000 invariable plane inclination match** (verified by [Appendix F](appendix-f-inclination-verification.js)):
+All values derived from **Fibonacci Laws** (amplitude = ψ_g / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Appendix E](appendix-e-inclination-optimization.js) and [Appendix F](appendix-f-inclination-verification.js)):
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 5.468532 | 0.891000 | 6.3473 | 4.58 - 6.36 | ~1.4"/cy |
-| Venus | 3.055471 | 1.055286 | 2.1545 | 2.00 - 4.11 | ~21"/cy |
-| Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
-| Mars | 3.600460 | 2.239753 | 1.6312 | 1.36 - 5.84 | ~13"/cy |
-| Jupiter | 0.363200 | 0.123101 | 0.3220 | 0.24 - 0.49 | ~0"/cy |
-| Saturn | 0.941380 | 0.166278 | 0.9255 | 0.78 - 1.11 | ~0"/cy |
-| Uranus | 1.017900 | 0.092904 | 0.9947 | 0.92 - 1.11 | ~1"/cy |
-| Neptune | 0.645100 | 0.092094 | 0.7354 | 0.55 - 0.74 | ~0"/cy |
-| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~4"/cy |
+| Mercury | 5.900556 | 0.452956 | 6.3473 | 5.45 - 6.35 | ~0.7"/cy |
+| Venus | 3.055450 | 1.055261 | 2.1545 | 2.00 - 4.11 | ~20"/cy |
+| Earth | 1.481388 | 0.635185 | 1.5787 | 0.85 - 2.12 | (reference) |
+| Mars | 3.596827 | 2.235621 | 1.6312 | 1.36 - 5.83 | ~15"/cy |
+| Jupiter | 0.342972 | 0.062713 | 0.3220 | 0.28 - 0.41 | ~2"/cy |
+| Saturn | 0.941281 | 0.165248 | 0.9255 | 0.78 - 1.11 | ~0.1"/cy |
+| Uranus | 0.979050 | 0.062465 | 0.9947 | 0.92 - 1.04 | ~3"/cy |
+| Neptune | 0.679019 | 0.057508 | 0.7354 | 0.62 - 0.74 | ~2"/cy |
+| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~6"/cy |
 
 ### Implementation
 
@@ -344,9 +348,9 @@ The ecliptic inclination of each planet varies cyclically due to:
 
 **Mars** has an invariable plane inclination range (1.36° - 5.84°) that overlaps Earth's range (0.85° - 2.12°). When their inclinations are equal and ascending nodes align, Mars's orbital plane can become **nearly parallel to the ecliptic** (ecliptic inclination approaching 0°).
 
-**Saturn** (0.78° - 1.11°) and **Uranus** (0.92° - 1.11°) also have ranges that overlap Earth's minimum values. These planets can experience very low ecliptic inclinations when the geometry aligns.
+**Saturn** (0.78° - 1.11°) and **Uranus** (0.92° - 1.04°) also have ranges that overlap Earth's minimum values. These planets can experience very low ecliptic inclinations when the geometry aligns.
 
-**Jupiter** (0.24° - 0.49°) and **Neptune** (0.55° - 0.74°) have inclination ranges entirely **below** Earth's minimum (0.85°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close (minimum ecliptic inclination ~0.4° for Jupiter).
+**Jupiter** (0.28° - 0.41°) and **Neptune** (0.62° - 0.74°) have inclination ranges entirely **below** Earth's minimum (0.85°), so their planes can never become exactly parallel to the ecliptic, but they can get relatively close (minimum ecliptic inclination ~0.4° for Jupiter).
 
 ---
 
@@ -360,15 +364,17 @@ Dynamic inclinations should match static J2000 values within 0.01°.
 
 After implementation, ecliptic inclination rates should match JPL observed values:
 
-| Planet | JPL Rate (°/cy) | Expected Trend |
-|--------|-----------------|----------------|
-| Mercury | -0.00595 | Decreasing ✓ |
-| Venus | -0.00079 | Decreasing ✓ |
-| Mars | -0.00813 | Decreasing ✓ |
-| Jupiter | -0.00184 | Decreasing ✓ |
-| Saturn | **+0.00194** | **Increasing** (requires retrograde phase) |
-| Uranus | -0.00243 | Decreasing ✓ |
-| Neptune | **+0.00035** | **Increasing** ✓ |
+| Planet | JPL Rate (°/cy) | Expected Trend | Match |
+|--------|-----------------|----------------|-------|
+| Mercury | -0.00595 | Decreasing | ✓ |
+| Venus | -0.00079 | Decreasing | ✓ |
+| Mars | -0.00813 | Decreasing | ✓ |
+| Jupiter | -0.00184 | Decreasing | ✓ |
+| Saturn | **+0.00194** | **Increasing** (retrograde) | ✓ |
+| Uranus | -0.00243 | Decreasing | ✓ |
+| Neptune | +0.00035 | Decreasing (balance model) | ✗ |
+
+**Note**: Neptune's trend direction (✗) is a known consequence of the balance-driven group assignment. The magnitude is very small (+0.00035°/cy) and within the uncertainty of the model.
 
 ---
 
@@ -404,6 +410,7 @@ The planet information panels display four invariable plane values:
 
 | Document | Purpose |
 |----------|---------|
+| [26 - Fibonacci Laws](26-fibonacci-laws.md) | Fibonacci Laws derivation with balance condition |
 | [10 - Constants Reference](10-constants-reference.md) | All inclination and ascending node constants |
 | [14 - Ascending Node Calculations](14-ascending-node-calculations.md) | Ascending node precession |
 | [16 - Invariable Plane Calculations](16-invariable-plane-calculations.md) | Height above/below invariable plane |

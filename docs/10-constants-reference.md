@@ -89,21 +89,21 @@ These are the fixed J2000 reference values from Souami & Souchay (2012):
 | Neptune | `neptuneInvPlaneInclinationJ2000` | 0.7354155° | S&S 2012 |
 | Pluto | `plutoInvPlaneInclinationJ2000` | 15.5639473° | S&S 2012 (adjusted) |
 
-### Dynamic Inclination Parameters (Laplace-Lagrange Oscillation)
+### Dynamic Inclination Parameters (Fibonacci Laws + Balance)
 
-Each planet's inclination oscillates around a mean value with a specific amplitude (values verified by [Appendix F](appendix-f-inclination-verification.js)):
+Amplitudes derived from Fibonacci Laws: `amp = ψ_g / (d × √m)`, with ψ₃/ψ₁ from invariable plane balance. Means from J2000 constraint. See [doc 26](26-fibonacci-laws.md), verified by [Appendix E](appendix-e-inclination-optimization.js) and [Appendix F](appendix-f-inclination-verification.js):
 
 | Planet | Mean (°) | Amplitude (°) | Range (°) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 5.468532 | 0.891000 | 4.58 - 6.36 | 23.3195° | ~1.4"/cy |
-| Venus | 3.055471 | 1.055286 | 2.00 - 4.11 | 203.3195° | ~21"/cy |
-| Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195° | (reference) |
-| Mars | 3.600460 | 2.239753 | 1.36 - 5.84 | 203.3195° | ~13"/cy |
-| Jupiter | 0.363200 | 0.123101 | 0.24 - 0.49 | 203.3195° | ~0"/cy |
-| Saturn | 0.941380 | 0.166278 | 0.78 - 1.11 | 23.3195° (retrograde) | ~0"/cy |
-| Uranus | 1.017900 | 0.092904 | 0.92 - 1.11 | 203.3195° | ~1"/cy |
-| Neptune | 0.645100 | 0.092094 | 0.55 - 0.74 | 203.3195° | ~0"/cy |
-| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.3195° | ~4"/cy |
+| Mercury | 5.900556 | 0.452956 | 5.45 - 6.35 | 23.3195° (23° group) | ~0.7"/cy |
+| Venus | 3.055450 | 1.055261 | 2.00 - 4.11 | 203.3195° (203° group) | ~20"/cy |
+| Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195° (203° group) | (reference) |
+| Mars | 3.596827 | 2.235621 | 1.36 - 5.83 | 203.3195° (203° group) | ~15"/cy |
+| Jupiter | 0.342972 | 0.062713 | 0.28 - 0.41 | 203.3195° (203° group) | ~2"/cy |
+| Saturn | 0.941281 | 0.165248 | 0.78 - 1.11 | 23.3195° (23° group, retrograde) | ~0.1"/cy |
+| Uranus | 0.979050 | 0.062465 | 0.92 - 1.04 | 23.3195° (23° group) | ~3"/cy |
+| Neptune | 0.679019 | 0.057508 | 0.62 - 0.74 | 203.3195° (203° group) | ~2"/cy |
+| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.3195° | ~6"/cy |
 
 **Formula**: `i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)`
 
