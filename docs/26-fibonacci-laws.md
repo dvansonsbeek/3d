@@ -486,15 +486,75 @@ At J2000 epoch, `i(2000) = mean + amplitude × cos(Ω_J2000 - φ_group)` should 
 
 ---
 
+## Testable Prediction: ψ₃/ψ₁ = 1/φ
+
+### Hypothesis
+
+The 8-planet balance yields ψ₃/ψ₁ = 0.5869. The golden ratio inverse is 1/φ = 0.6180. We hypothesize that the **complete solar system** balance — including dwarf planets and trans-Neptunian objects (TNOs) — converges to exactly:
+
+```
+ψ₃/ψ₁ = 1/φ = (√5 − 1)/2 = 0.6180339887...
+
+equivalently:  ψ₁/ψ₃ = φ = (1 + √5)/2 = 1.6180339887...
+```
+
+This would mean the two ψ-coupling constants are connected by the golden ratio — the same self-similar scaling law that defines the Fibonacci sequence (F_{n+1}/F_n → φ). The full expressions would then be:
+
+```
+ψ₁ = F₅ × F₈² / (2H) = 2205 / 667,776
+
+ψ₃ = ψ₁ / φ = 2205(√5 − 1) / (4 × 333,888)
+```
+
+### Evidence: The Gap Matches TNO Contributions
+
+The structural weight gap between the 8-planet ratio (0.5869) and 1/φ (0.6180) is:
+
+```
+Δw = 2.194 × 10⁻³   (needed in the 23° ψ₁ group)
+```
+
+This is ~61% of Uranus's structural weight and ~45% of Neptune's — exactly the scale of the trans-Neptunian population.
+
+**Known dwarf planets** (with d=1, all in 23° group) provide a total structural weight of 2.82 × 10⁻³, which is **128.5% of the gap** — more than enough. With optimal group assignment (brute-force search over all 2¹² splits of 12 known dwarf planets):
+
+| Scenario | r₃ | Error from 1/φ |
+|----------|-----|----------------|
+| 8 planets only | 0.5869 | 5.3% |
+| +12 known dwarfs (best split, d=1) | 0.6179 | 0.019% |
+| +Kuiper Belt ~3% M_Earth (effective) | ~0.618 | ~0% |
+
+The best split places 9 objects (Pluto, Eris, Haumea, Makemake, Gonggong, Sedna, Orcus, Salacia, Varda) in the 23° group and 3 (Quaoar, Varuna, Ixion) in the 203° group, reaching r₃ = 0.61792 — within 1.2 × 10⁻⁴ of 1/φ.
+
+### What This Would Imply
+
+If confirmed, this prediction would establish that **every level of the Fibonacci framework** is governed by Fibonacci/golden-ratio structure:
+
+1. **Quantum numbers** d_j — Fibonacci numbers and ratios
+2. **ψ₁** — defined by Fibonacci numbers F₅ and F₈
+3. **ψ₃ = ψ₁/φ** — the two coupling constants connected by the golden ratio
+4. **Phase groups** — determined by the balance condition that enforces this φ-ratio
+
+### How to Test
+
+As TNO masses become better determined (e.g., by the Vera Rubin Observatory/LSST survey), the following quantities can be computed for each TNO:
+
+1. Assign Fibonacci quantum numbers d based on the Fibonacci pattern
+2. Determine phase group (203° or 23°) from the ascending node on the invariable plane
+3. Compute structural weight: w = √(m × a × (1 − e²)) / d
+4. Add to the balance equation and check whether the sum converges to 1/φ
+
+The prediction is falsifiable: if the complete balance consistently yields a value different from 1/φ (e.g., if it converges to some other irrational number), the golden-ratio hypothesis is ruled out.
+
+---
+
 ## Open Questions
 
-1. **Is ψ₃/ψ₁ = 0.587 a Fibonacci ratio?** The balance-determined value does not obviously correspond to a ratio of Fibonacci numbers. It may be that the balance condition is the more fundamental principle, with Fibonacci structure emerging from the quantum numbers d and the periods T/H, but not necessarily from the ψ-ratios.
+1. **Can the ψ₃/ψ₁ = 1/φ prediction be confirmed?** The 8-planet balance gives 0.5869, and including known dwarf planets can reach 0.6179 (see [Testable Prediction](#testable-prediction-ψ₃ψ₁--1φ) above). The key unknowns are the Fibonacci quantum numbers and phase group assignments for TNOs.
 
-2. **Should Uranus remain in ψ₂ or join ψ₁?** With r₂ = 1 (ψ₂ = ψ₁), the model simplifies to two levels. With r₂ = 5/8 or 8/13 (Fibonacci ratios), three levels are preserved but Uranus has a smaller amplitude. The current observations cannot distinguish these options.
+2. **Uranus joins ψ₁: two-level system adopted** *(resolved)* — The previous model used three ψ-levels (ψ₁, ψ₂, ψ₃) with Uranus in a separate ψ₂ group (ψ₂/ψ₁ = 3/2). The balance analysis shows that with r₂ = 1 (ψ₂ = ψ₁), the system achieves 0.0000% balance imbalance, all 8 planets fit Laplace-Lagrange bounds, and 7/8 match JPL trend directions. The two-level system (ψ₁ and ψ₃ only) is both simpler and fully consistent. **Proposed website update**: the three-level ψ structure at [holisticuniverse.com/en/reference/fibonacci-laws-derivation](https://www.holisticuniverse.com/en/reference/fibonacci-laws-derivation) should be updated to a two-level system where Uranus uses ψ₁ with d = F₆ = 8.
 
-3. **Is Neptune's d really F₆=8?** Changing Neptune from d=5 to d=8 is the most significant structural change. Both are Fibonacci numbers, and d=8 allows Neptune to fit the balance model. The physical motivation is that Neptune's long period (2H) and position near the 203° ascending node require a larger quantum number to keep its amplitude within bounds.
-
-4. **Law 1 (eccentricity) integration** — The eccentricity and inclination amplitudes are connected through the AMD (Angular Momentum Deficit). A complete theory should derive both from a single framework. The balance condition for inclination suggests there may be an analogous balance condition for eccentricity.
+3. **Law 1 (eccentricity) integration** — The eccentricity and inclination amplitudes are connected through the AMD (Angular Momentum Deficit). A complete theory should derive both from a single framework. The balance condition for inclination suggests there may be an analogous balance condition for eccentricity.
 
 ---
 
