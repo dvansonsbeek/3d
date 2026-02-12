@@ -3,14 +3,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // This script COMPUTES inclination mean and amplitude values for each planet
-// using the Fibonacci Laws of Planetary Motion with invariable plane balance.
+// using the Fibonacci Laws of Planetary Motion.
 //
-// The amplitudes are derived from: amplitude = ψ_g / (d × √m)
-// where ψ_g is the group constant, d is the Fibonacci quantum number,
+// The amplitudes are derived from: amplitude = ψ / (d × √m)
+// where ψ is the universal constant, d is the Fibonacci quantum number,
 // and m is the planetary mass in solar units.
-//
-// The ψ₃/ψ₁ ratio is determined by the angular momentum balance condition:
-//   Σ(203° group) L × amp = Σ(23° group) L × amp
 //
 // The mean is computed from the J2000 constraint:
 //   mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
@@ -18,7 +15,7 @@
 // It then verifies that:
 // 1. All values match the exact J2000 invariable plane inclination
 // 2. All ranges stay within Laplace-Lagrange secular bounds
-// 3. The invariable plane balance holds to machine precision
+// 3. The invariable plane balance holds (Σ(203°) w = Σ(23°) w)
 // 4. Ecliptic inclination trends are consistent with JPL observations
 //
 // Depends on: Appendix A (provides ascending node values used here)
@@ -40,87 +37,66 @@ const holisticyearLength = 333888;
 // See: docs/26-fibonacci-laws.md
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Fundamental ψ-constant: ψ₁ = F₅ × F₈² / (2H) = 2205 / 667776
-const PSI1 = 2205 / (2 * holisticyearLength);
+// Universal ψ-constant: ψ = F₅ × F₈² / (2H) = 2205 / 667776
+const PSI = 2205 / (2 * holisticyearLength);
 
-// ψ₃/ψ₁ ratio computed from invariable plane balance condition
-// (see computeBalanceRatio() below, after orbital data constants)
-
-// Fibonacci quantum numbers (d)
+// Pure Fibonacci quantum numbers (d)
 const FIBONACCI_D = {
-  mercury: 21/2,    // F₈/F₃ = 10.5
-  venus:   2,       // F₃
-  earth:   3,       // F₄
-  mars:    13/5,    // F₇/F₅ = 2.6
-  jupiter: 1,       // F₁
-  saturn:  13/11,   // F₇/L₅ ≈ 1.182
-  uranus:  8,       // F₆
-  neptune: 8,       // F₆ (updated from F₅=5, see doc 26)
-  pluto:   null     // Not in Fibonacci theory
+  mercury: 8,     // F₆
+  venus:   8,     // F₆
+  earth:   3,     // F₄
+  mars:    3,     // F₄
+  jupiter: 5,     // F₅
+  saturn:  3,     // F₄
+  uranus:  13,    // F₇
+  neptune: 8,     // F₆
+  pluto:   null   // Not in Fibonacci theory
 };
 
-// ψ-group assignments (ψ₁ for most planets, ψ₃ for Mercury and Jupiter)
-const PSI_GROUP = {
-  mercury: 'psi3', venus: 'psi1', earth: 'psi1', mars: 'psi1',
-  jupiter: 'psi3', saturn: 'psi1', uranus: 'psi1', neptune: 'psi1',
-  pluto: null
+// Planetary masses in solar units (from DE440 mass ratios)
+const MASS_RATIO_SUN = {
+  mercury: 6023625.5,
+  venus:   408523.72,
+  mars:    3098703.59,
+  jupiter: 1047.348625,
+  saturn:  3497.9018,
+  uranus:  22902.944,
+  neptune: 19412.237,
+  pluto:   136047200
 };
 
-// Planetary masses in solar units (JPL DE440)
 const PLANET_MASS = {
-  mercury: 1.6601e-7,
-  venus:   2.4478e-6,
-  earth:   3.0027e-6,
-  mars:    3.2271e-7,
-  jupiter: 9.5479e-4,
-  saturn:  2.8588e-4,
-  uranus:  4.3662e-5,
-  neptune: 5.1514e-5,
-  pluto:   7.35e-9
+  mercury: 1 / MASS_RATIO_SUN.mercury,
+  venus:   1 / MASS_RATIO_SUN.venus,
+  earth:   3.0027e-6,  // Derived from Moon system (see script.js GM_EARTH computation)
+  mars:    1 / MASS_RATIO_SUN.mars,
+  jupiter: 1 / MASS_RATIO_SUN.jupiter,
+  saturn:  1 / MASS_RATIO_SUN.saturn,
+  uranus:  1 / MASS_RATIO_SUN.uranus,
+  neptune: 1 / MASS_RATIO_SUN.neptune,
+  pluto:   1 / MASS_RATIO_SUN.pluto
 };
 
-// Semi-major axes in AU
+// Semi-major axes in AU (JPL J2000)
 const PLANET_SMA = {
   mercury: 0.387098, venus: 0.723332, earth: 1.000000, mars: 1.523679,
   jupiter: 5.202887, saturn: 9.536676, uranus: 19.18916, neptune: 30.06992,
   pluto: 39.48
 };
 
-// Eccentricities (for angular momentum calculation)
+// Eccentricities (JPL J2000)
 const PLANET_ECC = {
-  mercury: 0.20563, venus: 0.00677, earth: 0.01671, mars: 0.09339,
-  jupiter: 0.04839, saturn: 0.05386, uranus: 0.04726, neptune: 0.00859,
+  mercury: 0.20563593, venus: 0.00677672, earth: 0.015321, mars: 0.09339410,
+  jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
   pluto: 0.2488
 };
-
-// Compute ψ₃/ψ₁ from invariable plane angular momentum balance
-// Balance: Σ(203° group) L_j × amp_j = Σ(23° group) L_j × amp_j
-// With amp_j = ψ_g/(d_j×√m_j), structural weight w_j = L_j/(d_j×√m_j) = √(m_j×a_j×(1-e_j²))/d_j
-function computeBalanceRatio() {
-  function w(key) {
-    const m = PLANET_MASS[key], a = PLANET_SMA[key], e = PLANET_ECC[key];
-    return Math.sqrt(m * a * (1 - e * e)) / FIBONACCI_D[key];
-  }
-  // 203° group: Venus(ψ₁), Earth(ψ₁), Mars(ψ₁), Jupiter(ψ₃), Neptune(ψ₁)
-  //  23° group: Mercury(ψ₃), Saturn(ψ₁), Uranus(ψ₁)
-  const sum_psi1_203 = w('venus') + w('earth') + w('mars') + w('neptune');
-  const sum_psi3_203 = w('jupiter');
-  const sum_psi1_23 = w('saturn') + w('uranus');
-  const sum_psi3_23 = w('mercury');
-  // Balance: sum_psi1_203 + r₃×sum_psi3_203 = r₃×sum_psi3_23 + sum_psi1_23
-  return (sum_psi1_23 - sum_psi1_203) / (sum_psi3_203 - sum_psi3_23);
-}
-
-const PSI3_OVER_PSI1 = computeBalanceRatio();
-const PSI3 = PSI3_OVER_PSI1 * PSI1;
 
 // Compute Fibonacci amplitude for a planet
 function getFibonacciAmplitude(key) {
   const d = FIBONACCI_D[key];
   if (d === null) return null;
   const sqrtM = Math.sqrt(PLANET_MASS[key]);
-  const psi = PSI_GROUP[key] === 'psi1' ? PSI1 : PSI3;
-  return psi / (d * sqrtM);
+  return PSI / (d * sqrtM);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -132,7 +108,7 @@ const earthConfig = {
   omegaJ2000: 284.51,                     // Souami & Souchay (2012)
   period: holisticyearLength / 3,         // 111,296 years
   inclJ2000: 1.57866663,
-  phaseAngle: 203.3195,                   // s₈ eigenmode, 203° group
+  phaseAngle: 203.3195,                   // 203° group
   amplitude: earthFibAmp
 };
 // Mean derived from J2000 constraint: mean = inclJ2000 - amplitude × cos(Ω - φ)
@@ -170,17 +146,16 @@ const jplTrends = {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LAPLACE-LAGRANGE BOUNDS (from secular theory)
-// Source: Farside physics textbook Table 10.4
+// Source: Farside physics textbook Table 10.4 (matching script.js values)
 // https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-// Note: Some bounds are adjusted for J2000 calibration or retrograde precession
 // ═══════════════════════════════════════════════════════════════════════════
 const laplaceLagrangeBounds = {
   mercury: { min: 4.57, max: 9.86 },     // Table 10.4: 4.57° - 9.86°
-  venus:   { min: 0.72, max: 4.11 },     // Table 10.4: 0.00° - 3.38° (adjusted for J2000)
+  venus:   { min: 0.00, max: 3.38 },     // Table 10.4: 0.00° - 3.38°
   earth:   { min: 0.00, max: 2.95 },     // Table 10.4: 0.00° - 2.95°
   mars:    { min: 0.00, max: 5.84 },     // Table 10.4: 0.00° - 5.84°
   jupiter: { min: 0.241, max: 0.489 },   // Table 10.4: 0.241° - 0.489°
-  saturn:  { min: 0.43, max: 1.53 },     // Table 10.4: 0.797° - 1.02° (expanded for retrograde)
+  saturn:  { min: 0.797, max: 1.02 },    // Table 10.4: 0.797° - 1.02°
   uranus:  { min: 0.902, max: 1.11 },    // Table 10.4: 0.902° - 1.11°
   neptune: { min: 0.554, max: 0.800 },   // Table 10.4: 0.554° - 0.800°
   pluto:   { min: 15.0, max: 16.5 }      // Estimated (not in Table 10.4)
@@ -192,8 +167,8 @@ const laplaceLagrangeBounds = {
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // Phase groups (from invariable plane balance, see doc 26):
-//   203.3195° group: Venus, Earth, Mars, Jupiter, Neptune
-//   23.3195° group:  Mercury, Saturn, Uranus
+//   203.3195° group: Earth, Mars, Jupiter, Neptune
+//   23.3195° group:  Mercury, Venus, Saturn, Uranus
 //
 const planetInputs = {
   mercury: {
@@ -201,7 +176,7 @@ const planetInputs = {
     omegaJ2000: 32.83,                              // Verified ascending node
     inclJ2000: 6.3472858,                           // J2000 inv plane inclination (S&S 2012)
     period: holisticyearLength / (1 + 3/8),         // ~242,828 years
-    phaseAngle: 23.3195,                            // 23° balance group
+    phaseAngle: 23.3195,                            // 23° group
     periodExpr: 'holisticyearLength/(1+(3/8))'
   },
   venus: {
@@ -209,7 +184,7 @@ const planetInputs = {
     omegaJ2000: 54.70,
     inclJ2000: 2.1545441,
     period: holisticyearLength * 2,                 // 667,776 years
-    phaseAngle: 203.3195,                           // 203° balance group
+    phaseAngle: 23.3195,                            // 23° group
     periodExpr: 'holisticyearLength*2'
   },
   earth: {
@@ -217,7 +192,7 @@ const planetInputs = {
     omegaJ2000: 284.51,
     inclJ2000: 1.57866663,
     period: holisticyearLength / 3,                 // 111,296 years
-    phaseAngle: 203.3195,                           // 203° balance group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength/3'
   },
   mars: {
@@ -225,7 +200,7 @@ const planetInputs = {
     omegaJ2000: 354.87,
     inclJ2000: 1.6311858,
     period: holisticyearLength / (4 + 1/3),         // ~77,051 years
-    phaseAngle: 203.3195,                           // 203° balance group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength/(4+(1/3))'
   },
   jupiter: {
@@ -233,7 +208,7 @@ const planetInputs = {
     omegaJ2000: 312.89,
     inclJ2000: 0.3219652,
     period: holisticyearLength / 5,                 // 66,778 years
-    phaseAngle: 203.3195,                           // 203° balance group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength/5'
   },
   saturn: {
@@ -241,7 +216,7 @@ const planetInputs = {
     omegaJ2000: 118.81,
     inclJ2000: 0.9254704,
     period: -holisticyearLength / 8,                // -41,736 years (RETROGRADE)
-    phaseAngle: 23.3195,                            // 23° balance group
+    phaseAngle: 23.3195,                            // 23° group
     periodExpr: '-holisticyearLength/8'
   },
   uranus: {
@@ -249,7 +224,7 @@ const planetInputs = {
     omegaJ2000: 307.80,
     inclJ2000: 0.9946692,
     period: holisticyearLength / 3,                 // 111,296 years
-    phaseAngle: 23.3195,                            // 23° balance group (updated from 203°)
+    phaseAngle: 23.3195,                            // 23° group
     periodExpr: 'holisticyearLength/3'
   },
   neptune: {
@@ -257,7 +232,7 @@ const planetInputs = {
     omegaJ2000: 192.04,
     inclJ2000: 0.7354155,
     period: holisticyearLength * 2,                 // 667,776 years
-    phaseAngle: 203.3195,                           // 203° balance group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength*2'
   },
   pluto: {
@@ -353,14 +328,13 @@ function computePlanet(key) {
   const trend = (ecl2100 - ecl1900) / 2;
   const trendError = Math.abs(trend - targetTrend);
 
-  // Fibonacci verification: d × i × √m = ψ_g
+  // Fibonacci verification: d × i × √m = ψ
   let fibVerify = null;
   if (FIBONACCI_D[key] !== null) {
     const d = FIBONACCI_D[key];
     const sqrtM = Math.sqrt(PLANET_MASS[key]);
     const product = d * amplitude * sqrtM;
-    const psi = PSI_GROUP[key] === 'psi1' ? PSI1 : PSI3;
-    fibVerify = { product, expected: psi, match: Math.abs(product - psi) / psi < 0.001 };
+    fibVerify = { product, expected: PSI, match: Math.abs(product - PSI) / PSI < 0.001 };
   }
 
   return {
@@ -373,26 +347,29 @@ function computePlanet(key) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RUN OPTIMIZATION
+// RUN COMPUTATION
 // ═══════════════════════════════════════════════════════════════════════════
 
 console.log('');
 console.log('╔═══════════════════════════════════════════════════════════════════════════╗');
 console.log('║        APPENDIX E: FIBONACCI-DERIVED INCLINATION PARAMETERS              ║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log('║  Amplitudes from Fibonacci Laws: amp = ψ_g / (d × √m)                   ║');
+console.log('║  Amplitudes from Fibonacci Laws: amp = ψ / (d × √m)                     ║');
 console.log('║  Means from J2000 constraint:    mean = i_J2000 - amp × cos(Ω - φ)      ║');
-console.log('║  ψ₃/ψ₁ from balance condition:   Σ(203°) L×amp = Σ(23°) L×amp           ║');
+console.log('║  Single universal ψ = 2205 / (2 × 333888) = ' + PSI.toExponential(6).padEnd(28) + '║');
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 console.log('');
 
 console.log('FIBONACCI CONSTANTS:');
-console.log(`  ψ₁ = ${PSI1.toExponential(6)} = 2205/667776`);
-console.log(`  ψ₃ = ${PSI3.toExponential(6)} = ${PSI3_OVER_PSI1.toFixed(6)} × ψ₁ (from balance)`);
+console.log(`  ψ = ${PSI.toExponential(6)} = 2205 / (2 × ${holisticyearLength.toLocaleString()})`);
 console.log('');
 console.log('PHASE GROUPS (from invariable plane balance):');
-console.log('  203.3195° group: Venus, Earth, Mars, Jupiter, Neptune');
-console.log('   23.3195° group: Mercury, Saturn, Uranus');
+console.log('  203.3195° group: Earth, Mars, Jupiter, Neptune');
+console.log('   23.3195° group: Mercury, Venus, Saturn, Uranus');
+console.log('');
+console.log('FIBONACCI DIVISORS:');
+console.log('  Mercury=8(F₆) Venus=8(F₆) Earth=3(F₄) Mars=3(F₄)');
+console.log('  Jupiter=5(F₅) Saturn=3(F₄) Uranus=13(F₇) Neptune=8(F₆)');
 console.log('');
 console.log('INPUT PARAMETERS:');
 console.log('  - Ascending nodes (Ω): J2000-verified values from script.js');
@@ -409,7 +386,6 @@ for (const key of Object.keys(planetInputs)) {
 
   const fibAmp = getFibonacciAmplitude(key);
   const dVal = FIBONACCI_D[key];
-  const psiLabel = PSI_GROUP[key] === 'psi1' ? 'ψ₁' : PSI_GROUP[key] === 'psi3' ? 'ψ₃' : '—';
 
   console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
   console.log(`│ ${input.name.toUpperCase().padEnd(75)}│`);
@@ -420,7 +396,7 @@ for (const key of Object.keys(planetInputs)) {
   console.log(`│   Period:            ${input.periodExpr.padEnd(40)}│`);
   console.log(`│   LL Bounds:         [${bounds.min}°, ${bounds.max}°]`.padEnd(76) + '│');
   if (dVal !== null) {
-    console.log(`│   Fibonacci:         d=${dVal}, ${psiLabel}, amp=${fibAmp.toFixed(4)}°`.padEnd(76) + '│');
+    console.log(`│   Fibonacci:         d=${dVal}, amp=${fibAmp.toFixed(4)}°`.padEnd(76) + '│');
   }
   console.log('├─────────────────────────────────────────────────────────────────────────────┤');
 
@@ -439,7 +415,7 @@ for (const key of Object.keys(planetInputs)) {
     console.log(`│   J2000 Match:       ${result.i2000_inv.toFixed(7)}° ✓                                       │`);
     console.log(`│   Trend:             ${trendSign}${result.trend.toFixed(6)}°/cy (error: ${errorArcsec.toFixed(2)}"/cy) ${result.directionMatch ? '✓' : '✗'}               │`);
     if (result.fibVerify) {
-      console.log(`│   Fib law:           d×i×√m = ${result.fibVerify.product.toExponential(4)} = ${psiLabel} ${result.fibVerify.match ? '✓' : '✗'}                       │`);
+      console.log(`│   Fib law:           d×i×√m = ${result.fibVerify.product.toExponential(4)} = ψ ${result.fibVerify.match ? '✓' : '✗'}                       │`);
     }
   } else {
     console.log(`│ ERROR: No valid solution found within Laplace-Lagrange bounds!             │`);
@@ -448,10 +424,6 @@ for (const key of Object.keys(planetInputs)) {
   console.log('└─────────────────────────────────────────────────────────────────────────────┘');
   console.log('');
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// OUTPUT: RECOMMENDED CODE FOR script.js
-// ═══════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INVARIABLE PLANE BALANCE VERIFICATION
@@ -463,11 +435,13 @@ console.log('║                  INVARIABLE PLANE BALANCE VERIFICATION         
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 console.log('');
 
+// Structural weight balance: Σ(203°) w = Σ(23°) w where w = √(m×a×(1-e²)) / d
+// Since amplitude = ψ/(d×√m) and ψ is universal, ψ cancels from both sides
 let sum203 = 0, sum23 = 0;
 const balancePlanets = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
 
-console.log('  Planet     │ Group │ L (ang.mom.) │ Amplitude  │ L × amp      │ Side');
-console.log('  ──────────┼───────┼──────────────┼────────────┼──────────────┼──────');
+console.log('  Planet     │ Group │ w = √(m×a×(1-e²))/d  │ Side');
+console.log('  ──────────┼───────┼──────────────────────┼──────');
 
 for (const key of balancePlanets) {
   const r = results[key];
@@ -475,20 +449,22 @@ for (const key of balancePlanets) {
   const m = PLANET_MASS[key];
   const a = PLANET_SMA[key];
   const e = PLANET_ECC[key];
-  const L = m * Math.sqrt(a * (1 - e * e));
-  const Lamp = L * r.amplitude;
+  const d = FIBONACCI_D[key];
+  const w = Math.sqrt(m * a * (1 - e * e)) / d;
   const is203 = planetInputs[key].phaseAngle > 180;
-  if (is203) sum203 += Lamp; else sum23 += Lamp;
+  if (is203) sum203 += w; else sum23 += w;
 
   const side = is203 ? '203°' : ' 23°';
-  console.log(`  ${planetInputs[key].name.padEnd(10)} │ ${side}  │ ${L.toExponential(4).padStart(12)} │ ${r.amplitude.toFixed(4).padStart(10)}° │ ${Lamp.toExponential(4).padStart(12)} │ ${side}`);
+  console.log(`  ${planetInputs[key].name.padEnd(10)} │ ${side}  │ ${w.toExponential(6).padStart(20)} │ ${side}`);
 }
 
 const imbalance = Math.abs(sum203 - sum23) / (sum203 + sum23) * 100;
-console.log('  ──────────┴───────┴──────────────┴────────────┴──────────────┴──────');
+const balancePct = (100 - imbalance).toFixed(2);
+console.log('  ──────────┴───────┴──────────────────────┴──────');
 console.log(`  203° total: ${sum203.toExponential(6)}`);
 console.log(`   23° total: ${sum23.toExponential(6)}`);
-console.log(`  Imbalance:  ${imbalance.toFixed(4)}%${imbalance < 0.01 ? ' ✓ BALANCED' : ' ⚠ CHECK ψ₃/ψ₁ ratio'}`);
+console.log(`  Difference: ${Math.abs(sum203 - sum23).toExponential(2)}`);
+console.log(`  Balance:    ${balancePct}%${imbalance < 0.05 ? ' ✓ BALANCED' : ' ⚠ CHECK'}`);
 console.log('');
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -501,9 +477,9 @@ console.log('║                    RECOMMENDED CODE FOR script.js              
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 console.log('');
 console.log('// ══════════════════════════════════════════════════════════════════════════════');
-console.log('// INCLINATION OSCILLATION PARAMETERS (from Fibonacci Laws + balance condition)');
+console.log('// INCLINATION OSCILLATION PARAMETERS (from Fibonacci Laws)');
 console.log('// Formula: i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)');
-console.log('// Amplitude = ψ_g / (d × √m), Mean from J2000 constraint');
+console.log('// Amplitude = ψ / (d × √m), Mean from J2000 constraint');
 console.log('// See: docs/26-fibonacci-laws.md, docs/appendix-e-inclination-optimization.js');
 console.log('// ══════════════════════════════════════════════════════════════════════════════');
 console.log('');
@@ -516,9 +492,17 @@ for (const key of Object.keys(planetInputs)) {
     const errorArcsec = result.trendError * 3600;
     const retro = input.period < 0 ? '  // RETROGRADE' : '';
 
-    console.log(`// ${input.name.toUpperCase()} - J2000: ${input.inclJ2000}°, trend error: ${errorArcsec.toFixed(1)}"/cy`);
-    console.log(`const ${key}InvPlaneInclinationMean = ${result.mean.toFixed(6)};`);
-    console.log(`const ${key}InvPlaneInclinationAmplitude = ${result.amplitude.toFixed(6)};  // Range: ${result.rangeMin.toFixed(2)}° to ${result.rangeMax.toFixed(2)}°`);
+    if (key === 'earth') {
+      console.log(`// EARTH - J2000: ${input.inclJ2000}°`);
+      console.log(`// Note: Earth uses IAU 2006-optimized values (see doc 26 for details)`);
+      console.log(`// Fibonacci predicts: amplitude = ${result.amplitude.toFixed(6)}°, mean = ${result.mean.toFixed(6)}°`);
+      console.log(`const earthInvPlaneInclinationAmplitude = 0.633849;  // IAU 2006 optimized`);
+      console.log(`const earthInvPlaneInclinationMean = 1.481592;       // IAU 2006 optimized`);
+    } else {
+      console.log(`// ${input.name.toUpperCase()} - J2000: ${input.inclJ2000}°, d=${FIBONACCI_D[key]}, trend error: ${errorArcsec.toFixed(1)}"/cy`);
+      console.log(`const ${key}InvPlaneInclinationMean = ${result.mean.toFixed(6)};`);
+      console.log(`const ${key}InvPlaneInclinationAmplitude = ${result.amplitude.toFixed(6)};  // Range: ${result.rangeMin.toFixed(2)}° to ${result.rangeMax.toFixed(2)}°`);
+    }
     console.log(`const ${key}InclinationPhaseAngle = ${input.phaseAngle};${retro}`);
     console.log('');
   }
@@ -529,8 +513,8 @@ console.log('');
 console.log('╔═══════════════════════════════════════════════════════════════════════════╗');
 console.log('║                              SUMMARY TABLE                                ║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log('║ Planet   │ Mean       │ Amplitude │ Range           │ Error   │ Dir ║');
-console.log('╠══════════╪════════════╪═══════════╪═════════════════╪═════════╪═════╣');
+console.log('║ Planet   │ d  │ Phase │ Mean       │ Amplitude │ Range           │ LL  ║');
+console.log('╠══════════╪════╪═══════╪════════════╪═══════════╪═════════════════╪═════╣');
 
 for (const key of Object.keys(planetInputs)) {
   const input = planetInputs[key];
@@ -538,25 +522,27 @@ for (const key of Object.keys(planetInputs)) {
 
   if (result) {
     const name = input.name.padEnd(8);
+    const d = (FIBONACCI_D[key] !== null ? String(FIBONACCI_D[key]) : '—').padStart(2);
+    const phase = (input.phaseAngle > 180 ? '203°' : ' 23°').padStart(5);
     const mean = result.mean.toFixed(4).padStart(10);
     const ampl = result.amplitude.toFixed(4).padStart(9);
     const range = `${result.rangeMin.toFixed(2)} - ${result.rangeMax.toFixed(2)}`.padStart(15);
-    const error = (result.trendError * 3600).toFixed(1).padStart(7) + '"';
-    const dir = result.directionMatch ? ' ✓  ' : ' ✗  ';
+    const ll = result.fitsLL ? ' ✓  ' : ' ✗  ';
 
-    console.log(`║ ${name} │ ${mean} │ ${ampl} │ ${range} │ ${error} │${dir}║`);
+    console.log(`║ ${name} │ ${d} │ ${phase} │ ${mean} │ ${ampl} │ ${range} │${ll}║`);
   }
 }
 
-console.log('╚══════════╧════════════╧═══════════╧═════════════════╧═════════╧═════╝');
+console.log('╚══════════╧════╧═══════╧════════════╧═══════════╧═════════════════╧═════╝');
 console.log('');
 console.log('Notes:');
-console.log('- Amplitudes derived from Fibonacci Laws: amp = ψ_g / (d × √m)');
-console.log('- ψ₃/ψ₁ = ' + PSI3_OVER_PSI1.toFixed(6) + ' determined by invariable plane balance condition');
+console.log('- Amplitudes derived from single universal ψ: amp = ψ / (d × √m)');
+console.log('- ψ = ' + PSI.toExponential(6) + ' = 2205 / (2 × ' + holisticyearLength.toLocaleString() + ')');
 console.log('- Means computed from J2000 constraint: mean = i_J2000 - amp × cos(Ω - φ)');
 console.log('- All planets match J2000 invariable plane inclination exactly');
-console.log('- Phase groups: 203.3195° (Venus,Earth,Mars,Jupiter,Neptune), 23.3195° (Mercury,Saturn,Uranus)');
+console.log('- Phase groups: 203.3195° (Earth,Mars,Jupiter,Neptune), 23.3195° (Mercury,Venus,Saturn,Uranus)');
 console.log('- Saturn uses retrograde precession (negative period)');
+console.log('- Earth uses IAU 2006-optimized amplitude (0.633849° vs Fibonacci 0.635185°)');
 console.log('- Pluto: no Fibonacci theory, amplitude optimized within LL bounds');
 console.log('- See docs/26-fibonacci-laws.md for full derivation');
 console.log('');

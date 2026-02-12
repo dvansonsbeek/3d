@@ -279,11 +279,11 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
 // These are theoretical bounds from Table 10.4:
 // - Mercury: 4.57° to 9.86°
-// - Venus: 0.00° to 3.38° (we use 0.72° to 4.11° for J2000 calibration)
-// - Earth: 0.00° to 2.95° (we use 0.85° to 2.12° for J2000 calibration)
+// - Venus: 0.00° to 3.38°
+// - Earth: 0.00° to 2.95°
 // - Mars: 0.00° to 5.84°
 // - Jupiter: 0.241° to 0.489°
-// - Saturn: 0.797° to 1.02° (we use 0.43° to 1.53° expanded for retrograde)
+// - Saturn: 0.797° to 1.02°
 // - Uranus: 0.902° to 1.11°
 // - Neptune: 0.554° to 0.800°
 //
@@ -291,43 +291,77 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // A = |rate| × |period| / (2π)
 // This gives smaller values as it assumes we're near maximum rate.
 //
-// Amplitudes from Fibonacci Laws: amp = ψ_g / (d × √m), means from J2000 constraint.
-// ψ₃/ψ₁ determined by invariable plane balance: Σ(203°) L×amp = Σ(23°) L×amp
+// Amplitudes from Fibonacci Laws: amp = ψ / (d × √m), means from J2000 constraint.
+// Single universal ψ = 2205/(2×333888), balance: Σ(203°) w = Σ(23°) w
 // See: docs/26-fibonacci-laws.md, docs/appendix-e-inclination-optimization.js
 // ══════════════════════════════════════════════════════════════════════════════
 
-// Mercury: LL bounds [4.57°, 9.86°], 23° balance group
-// J2000=6.3472858° (EXACT), phase 23.3195°, period holisticyearLength/(1+(3/8)), trend error: 0.7"/cy
-const mercuryInvPlaneInclinationMean = 5.900556;
-const mercuryInvPlaneInclinationAmplitude = 0.452956;  // Range: 5.45° to 6.35°
+// Laplace-Lagrange bounds from secular theory (degrees)
+// Source: Farside Table 10.4 — https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+const mercuryLLBoundsMin = 4.57;
+const mercuryLLBoundsMax = 9.86;
+const venusLLBoundsMin = 0.00;
+const venusLLBoundsMax = 3.38;
+const earthLLBoundsMin = 0.00;
+const earthLLBoundsMax = 2.95;
+const marsLLBoundsMin = 0.00;
+const marsLLBoundsMax = 5.84;
+const jupiterLLBoundsMin = 0.241;
+const jupiterLLBoundsMax = 0.489;
+const saturnLLBoundsMin = 0.797;
+const saturnLLBoundsMax = 1.02;
+const uranusLLBoundsMin = 0.902;
+const uranusLLBoundsMax = 1.11;
+const neptuneLLBoundsMin = 0.554;
+const neptuneLLBoundsMax = 0.800;
 
-// Venus: LL bounds [0.72°, 4.11°], 203° balance group
-// J2000=2.1545441° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 20"/cy
-const venusInvPlaneInclinationMean = 3.055450;
-const venusInvPlaneInclinationAmplitude = 1.055261;  // Range: 2.00° to 4.11°
+// Laplace-Lagrange inclination eigenmode phase angles (degrees)
+// Source: Farside Table 10.1 (Brouwer & van Woerkom refinement)
+// https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+// f₅ = 0 (invariable plane, no evolution) is excluded — 7 active modes remain
+const EIGENMODE_PHASES = [
+  { value: 202.8,  label: 'γ₈ = 202.8°' },
+  { value: 20.23,  label: 'γ₁ = 20.23°' },
+  { value: 255.6,  label: 'γ₃ = 255.6°' },
+  { value: 296.9,  label: 'γ₄ = 296.9°' },
+  { value: 127.3,  label: 'γ₆ = 127.3°' },
+  { value: 315.6,  label: 'γ₇ = 315.6°' },
+  { value: 318.3,  label: 'γ₂ = 318.3°' },
+  { value: 'custom', label: 'Custom...' }
+];
+
+// Mercury: LL bounds [4.57°, 9.86°], 23° balance group
+// J2000=6.3472858° (EXACT), d=8, phase 23.3195°, period holisticyearLength/(1+(3/8)), trend error: 1.6"/cy
+const mercuryInvPlaneInclinationMean = 5.348192;
+const mercuryInvPlaneInclinationAmplitude = 1.013017;  // Range: 4.34° to 6.36°
+
+// Venus: LL bounds [0.00°, 3.38°], 23° balance group
+// J2000=2.1545441° (EXACT), d=8, phase 23.3195°, period holisticyearLength*2, trend error: 21.7"/cy
+const venusInvPlaneInclinationMean = 1.929319;
+const venusInvPlaneInclinationAmplitude = 0.263813;  // Range: 1.67° to 2.19°
 
 // Mars: LL bounds [0.00°, 5.84°], 203° balance group
-// J2000=1.6311858° (EXACT), phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 15"/cy
-const marsInvPlaneInclinationMean = 3.596827;
-const marsInvPlaneInclinationAmplitude = 2.235621;  // Range: 1.36° to 5.83°
+// J2000=1.6311858° (EXACT), d=3, phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 17.9"/cy
+const marsInvPlaneInclinationMean = 3.334727;
+const marsInvPlaneInclinationAmplitude = 1.937522;  // Range: 1.40° to 5.27°
 
 // Jupiter: LL bounds [0.241°, 0.489°], 203° balance group
-// J2000=0.3219652° (EXACT), phase 203.3195°, period holisticyearLength/5, trend error: 1.9"/cy
-const jupiterInvPlaneInclinationMean = 0.342972;
-const jupiterInvPlaneInclinationAmplitude = 0.062713;  // Range: 0.28° to 0.41°
+// J2000=0.3219652° (EXACT), d=5, phase 203.3195°, period holisticyearLength/5, trend error: 3.0"/cy
+const jupiterInvPlaneInclinationMean = 0.329124;
+const jupiterInvPlaneInclinationAmplitude = 0.021372;  // Range: 0.31° to 0.35°
 
-// Saturn: LL bounds [0.43°, 1.53°], 23° balance group (retrograde)
-// J2000=0.9254704° (EXACT), phase 23.3195° (retrograde), period -holisticyearLength/8, trend error: 0.1"/cy
-const saturnInvPlaneInclinationMean = 0.941281;
-const saturnInvPlaneInclinationAmplitude = 0.165248;  // Range: 0.78° to 1.11°
+// Saturn: LL bounds [0.797°, 1.02°], 23° balance group (retrograde)
+// J2000=0.9254704° (EXACT), d=3, phase 23.3195° (retrograde), period -holisticyearLength/8, trend error: 5.4"/cy
+const saturnInvPlaneInclinationMean = 0.931699;
+const saturnInvPlaneInclinationAmplitude = 0.065097;  // Range: 0.87° to 1.00°
 
 // Uranus: LL bounds [0.902°, 1.11°], 23° balance group
-// J2000=0.9946692° (EXACT), phase 23.3195°, period holisticyearLength/3, trend error: 3.0"/cy
-const uranusInvPlaneInclinationMean = 0.979050;
-const uranusInvPlaneInclinationAmplitude = 0.062465;  // Range: 0.92° to 1.04°
+// J2000=0.9946692° (EXACT), d=13, phase 23.3195°, period holisticyearLength/3, trend error: 2.7"/cy
+const uranusInvPlaneInclinationMean = 0.985057;
+const uranusInvPlaneInclinationAmplitude = 0.038440;  // Range: 0.95° to 1.02°
 
 // Neptune: LL bounds [0.554°, 0.800°], 203° balance group
-// J2000=0.7354155° (EXACT), phase 203.3195°, period holisticyearLength*2, trend error: 1.7"/cy
+// J2000=0.7354155° (EXACT), d=8, phase 203.3195°, period holisticyearLength*2, trend error: 1.7"/cy
 const neptuneInvPlaneInclinationMean = 0.679019;
 const neptuneInvPlaneInclinationAmplitude = 0.057508;  // Range: 0.62° to 0.74°
 
@@ -365,7 +399,7 @@ const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagra
 // ══════════════════════════════════════════════════════════════════════════════
 
 const mercuryInclinationPhaseAngle = 23.3195;   // 23° balance group, error: 0.7"/cy
-const venusInclinationPhaseAngle = 203.3195;    // 203° balance group, error: 20"/cy
+const venusInclinationPhaseAngle = 23.3195;     // 23° balance group, error: 21.7"/cy
 const earthInclinationPhaseAngle = 203.3195;    // 203° balance group (reference)
 const marsInclinationPhaseAngle = 203.3195;     // 203° balance group, error: 15"/cy
 const jupiterInclinationPhaseAngle = 203.3195;  // 203° balance group, error: 1.9"/cy
@@ -9160,6 +9194,563 @@ function closeHierarchyInspector() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FIBONACCI BALANCE EXPLORER
+// Interactive modal for testing ψ-group, phase group, and d-value assignments
+// See docs/26-fibonacci-laws.md for theory
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+
+// d-value dropdown options: common Fibonacci/Lucas ratios
+const D_VALUE_OPTIONS = [
+  { value: 1,        label: '1 (F₁)' },
+  { value: 2,        label: '2 (F₃)' },
+  { value: 3,        label: '3 (F₄)' },
+  { value: 5,        label: '5 (F₅)' },
+  { value: 8,        label: '8 (F₆)' },
+  { value: 13,       label: '13 (F₇)' },
+  { value: 21,       label: '21 (F₈)' },
+  { value: 34,       label: '34 (F₉)' },
+  { value: 55,       label: '55 (F₁₀)' },
+  { value: 'custom', label: 'Custom...' }
+];
+
+// Earth J2000 inclination (not stored as a named constant — computed here)
+const earthInvPlaneInclJ2000 = earthInvPlaneInclinationMean +
+  earthInvPlaneInclinationAmplitude *
+  Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
+
+const BALANCE_CONFIG = {
+  mercury: {
+    name: 'Mercury',
+    mass: M_MERCURY / M_SUN,
+    sma: mercuryOrbitDistance,
+    ecc: mercuryOrbitalEccentricity,
+    defaultD: 8,
+    inclJ2000: mercuryInvPlaneInclinationJ2000,
+    omegaJ2000: mercuryAscendingNodeInvPlaneVerified,
+    period: mercuryPerihelionICRFYears,
+    trendJPL: mercuryEclipticInclinationTrendJPL,
+    llBounds: { min: mercuryLLBoundsMin, max: mercuryLLBoundsMax },
+    defaultPhaseAngle: 23.3195,
+    locked: false
+  },
+  venus: {
+    name: 'Venus',
+    mass: M_VENUS / M_SUN,
+    sma: venusOrbitDistance,
+    ecc: venusOrbitalEccentricity,
+    defaultD: 8,
+    inclJ2000: venusInvPlaneInclinationJ2000,
+    omegaJ2000: venusAscendingNodeInvPlaneVerified,
+    period: venusPerihelionICRFYears,
+    trendJPL: venusEclipticInclinationTrendJPL,
+    llBounds: { min: venusLLBoundsMin, max: venusLLBoundsMax },
+    defaultPhaseAngle: 23.3195,
+    locked: false
+  },
+  earth: {
+    name: 'Earth',
+    mass: M_EARTH / M_SUN,
+    sma: 1.0,
+    ecc: eccentricityBase,
+    defaultD: 3,
+    inclJ2000: earthInvPlaneInclJ2000,
+    omegaJ2000: earthAscendingNodeInvPlaneVerified,
+    period: earthPerihelionICRFYears,
+    trendJPL: 0,  // Earth defines the ecliptic — no self-trend
+    llBounds: { min: earthLLBoundsMin, max: earthLLBoundsMax },
+    defaultPhaseAngle: 203.3195,
+    locked: true
+  },
+  mars: {
+    name: 'Mars',
+    mass: M_MARS / M_SUN,
+    sma: marsOrbitDistance,
+    ecc: marsOrbitalEccentricity,
+    defaultD: 3,
+    inclJ2000: marsInvPlaneInclinationJ2000,
+    omegaJ2000: marsAscendingNodeInvPlaneVerified,
+    period: marsPerihelionICRFYears,
+    trendJPL: marsEclipticInclinationTrendJPL,
+    llBounds: { min: marsLLBoundsMin, max: marsLLBoundsMax },
+    defaultPhaseAngle: 203.3195,
+    locked: false
+  },
+  jupiter: {
+    name: 'Jupiter',
+    mass: M_JUPITER / M_SUN,
+    sma: jupiterOrbitDistance,
+    ecc: jupiterOrbitalEccentricity,
+    defaultD: 5,
+    inclJ2000: jupiterInvPlaneInclinationJ2000,
+    omegaJ2000: jupiterAscendingNodeInvPlaneVerified,
+    period: jupiterPerihelionICRFYears,
+    trendJPL: jupiterEclipticInclinationTrendJPL,
+    llBounds: { min: jupiterLLBoundsMin, max: jupiterLLBoundsMax },
+    defaultPhaseAngle: 203.3195,
+    locked: false
+  },
+  saturn: {
+    name: 'Saturn',
+    mass: M_SATURN / M_SUN,
+    sma: saturnOrbitDistance,
+    ecc: saturnOrbitalEccentricity,
+    defaultD: 3,
+    inclJ2000: saturnInvPlaneInclinationJ2000,
+    omegaJ2000: saturnAscendingNodeInvPlaneVerified,
+    period: saturnPerihelionICRFYears,
+    trendJPL: saturnEclipticInclinationTrendJPL,
+    llBounds: { min: saturnLLBoundsMin, max: saturnLLBoundsMax },
+    defaultPhaseAngle: 23.3195,
+    locked: false
+  },
+  uranus: {
+    name: 'Uranus',
+    mass: M_URANUS / M_SUN,
+    sma: uranusOrbitDistance,
+    ecc: uranusOrbitalEccentricity,
+    defaultD: 13,
+    inclJ2000: uranusInvPlaneInclinationJ2000,
+    omegaJ2000: uranusAscendingNodeInvPlaneVerified,
+    period: uranusPerihelionICRFYears,
+    trendJPL: uranusEclipticInclinationTrendJPL,
+    llBounds: { min: uranusLLBoundsMin, max: uranusLLBoundsMax },
+    defaultPhaseAngle: 23.3195,
+    locked: false
+  },
+  neptune: {
+    name: 'Neptune',
+    mass: M_NEPTUNE / M_SUN,
+    sma: neptuneOrbitDistance,
+    ecc: neptuneOrbitalEccentricity,
+    defaultD: 8,
+    inclJ2000: neptuneInvPlaneInclinationJ2000,
+    omegaJ2000: neptuneAscendingNodeInvPlaneVerified,
+    period: neptunePerihelionICRFYears,
+    trendJPL: neptuneEclipticInclinationTrendJPL,
+    llBounds: { min: neptuneLLBoundsMin, max: neptuneLLBoundsMax },
+    defaultPhaseAngle: 203.3195,
+    locked: false
+  }
+};
+
+// Ecliptic trend calculation: apparent inclination at a given year
+// Ported from docs/appendix-e-inclination-optimization.js
+function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
+  const DEG2RAD = Math.PI / 180;
+  const RAD2DEG = 180 / Math.PI;
+
+  // Planet at given year
+  const planetOmega = planetOmegaJ2000 + (360 / planetPeriod) * (year - 2000);
+  const planetPhase = (planetOmega - planetPhaseAngle) * DEG2RAD;
+  const planetI = (planetMean + planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
+  const planetOmegaRad = planetOmega * DEG2RAD;
+
+  // Earth at given year
+  const earthPeriod = holisticyearLength / 3;
+  const earthCosPhase0 = (earthInvPlaneInclJ2000 - earthInvPlaneInclinationMean) / earthInvPlaneInclinationAmplitude;
+  const earthPhase0 = Math.acos(earthCosPhase0);
+  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthPeriod;
+  const earthI = (earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
+  const earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthPeriod) * (year - 2000)) * DEG2RAD;
+
+  // Normal vectors
+  const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
+  const pny = Math.sin(planetI) * Math.cos(planetOmegaRad);
+  const pnz = Math.cos(planetI);
+
+  const enx = Math.sin(earthI) * Math.sin(earthOmega);
+  const eny = Math.sin(earthI) * Math.cos(earthOmega);
+  const enz = Math.cos(earthI);
+
+  const dot = pnx * enx + pny * eny + pnz * enz;
+  return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
+}
+
+// Main calculation engine
+function computeBalanceResults(state) {
+  const PSI = 2205 / (2 * holisticyearLength);
+  const DEG2RAD = Math.PI / 180;
+
+  // Structural weight: w = sqrt(m * a * (1-e^2)) / d
+  function w(key) {
+    const cfg = BALANCE_CONFIG[key];
+    const d = state[key].d;
+    if (d <= 0) return 0;
+    return Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
+  }
+
+  // Per-planet results
+  const planetResults = {};
+  for (const key of BALANCE_PLANETS) {
+    const cfg = BALANCE_CONFIG[key];
+    const d = state[key].d;
+    const sqrtM = Math.sqrt(cfg.mass);
+    const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
+    const cosPhaseJ2000 = Math.cos((cfg.omegaJ2000 - state[key].phaseAngle) * DEG2RAD);
+    const mean = cfg.inclJ2000 - amplitude * cosPhaseJ2000;
+    const rangeMin = mean - amplitude;
+    const rangeMax = mean + amplitude;
+    const fitsLL = rangeMin >= cfg.llBounds.min - 0.01 && rangeMax <= cfg.llBounds.max + 0.01;
+    const dxixsqrtm = d * amplitude * sqrtM;
+
+    // Ecliptic trend (skip for Earth — it defines the ecliptic)
+    let trend = NaN, trendError = NaN, directionMatch = false;
+    if (key !== 'earth') {
+      const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, state[key].period, cfg.omegaJ2000, state[key].phaseAngle);
+      const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, state[key].period, cfg.omegaJ2000, state[key].phaseAngle);
+      trend = (i2100 - i1900) / 2;  // degrees/century
+      trendError = Math.abs(trend - cfg.trendJPL);
+      directionMatch = (cfg.trendJPL >= 0) === (trend >= 0);
+    }
+
+    planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, dxixsqrtm, trend, trendError, directionMatch };
+  }
+
+  // Vector balance verification: Σ w×amp×cos(phase) ≈ 0 and Σ w×amp×sin(phase) ≈ 0
+  let balanceCos = 0, balanceSin = 0, totalLamp = 0;
+  for (const key of BALANCE_PLANETS) {
+    const cfg = BALANCE_CONFIG[key];
+    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
+    const Lamp = L * planetResults[key].amplitude;
+    const phaseRad = state[key].phaseAngle * DEG2RAD;
+    balanceCos += Lamp * Math.cos(phaseRad);
+    balanceSin += Lamp * Math.sin(phaseRad);
+    totalLamp += Lamp;
+  }
+  const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
+  const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
+
+  return { PSI, planetResults, balanceCos, balanceSin, balanceResidual, totalLamp, imbalance };
+}
+
+// Build d-value select HTML
+function fbeBuildDSelect(planet, defaultD) {
+  const disabled = BALANCE_CONFIG[planet].locked ? 'disabled' : '';
+  let options = D_VALUE_OPTIONS.map(opt => {
+    if (opt.value === 'custom') {
+      return `<option value="custom">${opt.label}</option>`;
+    }
+    const selected = Math.abs(opt.value - defaultD) < 0.0001 ? 'selected' : '';
+    return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
+  }).join('');
+
+  // If default is not in presets, add it
+  const isPreset = D_VALUE_OPTIONS.some(o => o.value !== 'custom' && Math.abs(o.value - defaultD) < 0.0001);
+  if (!isPreset) {
+    options = `<option value="${defaultD}" selected>${defaultD}</option>` + options;
+  }
+
+  return `<select class="fbe-d-select" data-planet="${planet}" ${disabled}>${options}</select>` +
+    `<input type="number" class="fbe-d-custom" data-planet="${planet}" step="0.001" min="0.001" placeholder="d" ${disabled}>`;
+}
+
+// Build phase angle select HTML
+function fbeBuildPhaseSelect(planet, defaultPhase) {
+  const disabled = BALANCE_CONFIG[planet].locked ? 'disabled' : '';
+  let options = EIGENMODE_PHASES.map(opt => {
+    if (opt.value === 'custom') {
+      return `<option value="custom">${opt.label}</option>`;
+    }
+    const selected = Math.abs(opt.value - defaultPhase) < 0.01 ? 'selected' : '';
+    return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
+  }).join('');
+
+  // If default is not in presets, add it as first option
+  const isPreset = EIGENMODE_PHASES.some(o => o.value !== 'custom' && Math.abs(o.value - defaultPhase) < 0.01);
+  if (!isPreset) {
+    options = `<option value="${defaultPhase}" selected>${defaultPhase}\u00B0</option>` + options;
+  }
+
+  return `<select class="fbe-phase-select" data-planet="${planet}" ${disabled}>${options}</select>` +
+    `<input type="number" class="fbe-phase-custom" data-planet="${planet}" step="0.1" min="0" max="360" placeholder="\u03B3\u00B0" ${disabled}>`;
+}
+
+let balanceExplorerPanel = null;
+let balanceExplorerState = null;
+
+function createBalanceExplorerPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'fibBalanceExplorer';
+
+  // Initialize state with defaults
+  const state = {};
+  for (const key of BALANCE_PLANETS) {
+    const cfg = BALANCE_CONFIG[key];
+    state[key] = {
+      phaseAngle: cfg.defaultPhaseAngle,
+      period: cfg.period,
+      d: cfg.defaultD
+    };
+  }
+  balanceExplorerState = state;
+
+  panel.innerHTML = `
+    <div class="fbe-overlay"></div>
+    <div class="fbe-dialog">
+      <div class="fbe-header">
+        <h2>Invariable Plane Balance Explorer</h2>
+        <div class="fbe-close" title="Close"></div>
+      </div>
+      <div class="fbe-body">
+        <div class="fbe-section">
+          <div class="fbe-section-title">Planet Assignments</div>
+          <div class="fbe-grid-header">
+            <span>Planet</span>
+            <span class="fbe-header-tip">Phase angle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The phase angle \u03B3 determines the direction of each planet\u2019s inclination oscillation. By default, all planets are assigned to two groups exactly 180\u00B0 apart (23\u00B0 and 203\u00B0). This guarantees that the vector balance reduces to a simple equality between two opposing groups, enabling near-100% balance of the invariable plane.<br><br>You can also select individual eigenmode phases (\u03B3\u2081\u2013\u03B3\u2088) from Laplace-Lagrange secular theory, or enter any custom angle.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Secular Perturbation Theory \u2192</a></span></span>
+            <span class="fbe-header-tip">\u03A9 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The longitude of ascending node relative to the invariable plane at J2000 epoch.<br><br>When the ascending node \u03A9 aligns with the phase angle \u03B3, the planet reaches its maximum inclination to the invariable plane. This column is read-only for reference.</span></span>
+            <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
+            <span class="fbe-header-tip">Period (yr) <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The perihelion precession period determines how fast the ascending node to the invariable plane rotates. This affects the inclination trend (rate of change) and direction.<br><br>Default values are from the 3D model\u2019s orbital mechanics. Edit to explore how different precession rates affect the predicted trends.</span></span>
+            <span></span>
+            <span class="fbe-header-tip">Base trend <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The base precession rate in arcseconds per century, calculated as 360\u00B0\u00D7100\u00D73600 / period.<br><br>This represents the Newtonian gravitational contribution to the perihelion precession \u2014 the rate at which the ascending node to the invariable plane rotates due to gravitational perturbations from other planets.</span></span>
+          </div>
+          <div class="fbe-planet-grid">
+            ${BALANCE_PLANETS.map(key => {
+              const cfg = BALANCE_CONFIG[key];
+              const locked = cfg.locked ? 'locked' : '';
+              const disabled = cfg.locked ? 'disabled' : '';
+              return `<div class="fbe-planet-row ${locked}" data-planet="${key}">
+                <span class="fbe-planet-name">${cfg.name}${cfg.locked ? ' <span class="fbe-lock-tip">\uD83D\uDD12<span class="fbe-lock-tip-content">Earth is locked because the formula <b>amp = \u03C8 / (d \u00D7 \u221Am)</b> was derived from Earth\u2019s observed inclination amplitude (0.635185\u00B0) with Fibonacci divisor d\u2009=\u20093.<br><br>All other planet amplitudes follow from this calibration.<br><br><a href="https://github.com/dvansonsbeek/3d/blob/main/docs/26-fibonacci-laws.md" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>' : ''}</span>
+                <div class="fbe-phase-cell">
+                  ${fbeBuildPhaseSelect(key, cfg.defaultPhaseAngle)}
+                </div>
+                <div class="fbe-omega-cell">
+                  <span class="fbe-omega-display">${cfg.omegaJ2000.toFixed(2)}\u00B0</span>
+                </div>
+                <div class="fbe-d-cell">
+                  ${fbeBuildDSelect(key, cfg.defaultD)}
+                </div>
+                <div class="fbe-period-cell">
+                  <input type="number" class="fbe-period-input" data-planet="${key}" value="${Math.round(cfg.period)}" step="1" ${disabled}>
+                </div>
+                <div class="fbe-dir-cell">
+                  <span class="fbe-period-dir ${cfg.period < 0 ? 'retrograde' : 'prograde'}" data-planet="${key}">${cfg.period < 0 ? 'RETROGRADE' : 'PROGRADE'}</span>
+                </div>
+                <div class="fbe-trend-cell">
+                  <span class="fbe-period-trend" data-planet="${key}">${(129600000 / cfg.period).toFixed(2)}"/cy</span>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="fbe-section">
+          <div class="fbe-section-title">Balance Results</div>
+          <div class="fbe-ratio-display">
+            <span class="fbe-ratio-label">Balance </span>
+            <span class="fbe-ratio-value"></span>
+          </div>
+        </div>
+        <div class="fbe-section">
+          <div class="fbe-section-title">Per-Planet Results</div>
+          <div class="fbe-table-wrapper">
+            <table class="fbe-results-table">
+              <thead>
+                <tr>
+                  <th>Planet</th>
+                  <th>Amplitude</th>
+                  <th>Mean</th>
+                  <th>Range</th>
+                  <th>LL</th>
+                  <th>Trend (\u00B0/cy)</th>
+                  <th>JPL (\u00B0/cy)</th>
+                  <th>Err</th>
+                  <th>Dir</th>
+                  <th>d\u00D7i\u00D7\u221Am</th>
+                </tr>
+              </thead>
+              <tbody class="fbe-results-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="fbe-section">
+          <div class="fbe-section-title">Vector Balance Verification</div>
+          <div class="fbe-balance-line"></div>
+          <div class="fbe-status"></div>
+          <div class="fbe-psi-line"></div>
+          <div class="fbe-balance-explain">Each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. Balance measures how well these oscillations cancel vectorially when weighted by angular momentum: \u03A3 L\u00D7amp\u00D7cos(\u03B3) \u2248 0 and \u03A3 L\u00D7amp\u00D7sin(\u03B3) \u2248 0. At 100%, the invariable plane is a perfect center of symmetry for all inclination evolution.</div>
+          <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(panel);
+
+  // Close handlers
+  panel.querySelector('.fbe-close').addEventListener('click', closeBalanceExplorer);
+  panel.querySelector('.fbe-overlay').addEventListener('click', closeBalanceExplorer);
+
+  // Phase select handlers
+  panel.querySelectorAll('.fbe-phase-select:not([disabled])').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      const planet = e.target.dataset.planet;
+      const customInput = panel.querySelector(`.fbe-phase-custom[data-planet="${planet}"]`);
+      if (e.target.value === 'custom') {
+        customInput.classList.add('visible');
+        customInput.focus();
+      } else {
+        customInput.classList.remove('visible');
+        state[planet].phaseAngle = parseFloat(e.target.value);
+        updateBalanceExplorerResults(panel, state);
+      }
+    });
+  });
+
+  // Phase custom input handlers
+  panel.querySelectorAll('.fbe-phase-custom:not([disabled])').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const planet = e.target.dataset.planet;
+      const val = parseFloat(e.target.value);
+      if (isFinite(val) && val >= 0 && val <= 360) {
+        state[planet].phaseAngle = val;
+        updateBalanceExplorerResults(panel, state);
+      }
+    });
+  });
+
+  // Period input handlers
+  panel.querySelectorAll('.fbe-period-input:not([disabled])').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const planet = e.target.dataset.planet;
+      const val = parseFloat(e.target.value);
+      if (isFinite(val) && val !== 0) {
+        state[planet].period = val;
+        const dirLabel = panel.querySelector(`.fbe-period-dir[data-planet="${planet}"]`);
+        dirLabel.textContent = val < 0 ? 'RETROGRADE' : 'PROGRADE';
+        dirLabel.className = 'fbe-period-dir ' + (val < 0 ? 'retrograde' : 'prograde');
+        const trendLabel = panel.querySelector(`.fbe-period-trend[data-planet="${planet}"]`);
+        trendLabel.textContent = (129600000 / val).toFixed(2) + '"/cy';
+        updateBalanceExplorerResults(panel, state);
+      }
+    });
+  });
+
+  // d-value select handlers
+  panel.querySelectorAll('.fbe-d-select:not([disabled])').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      const planet = e.target.dataset.planet;
+      const customInput = panel.querySelector(`.fbe-d-custom[data-planet="${planet}"]`);
+      if (e.target.value === 'custom') {
+        customInput.classList.add('visible');
+        customInput.focus();
+      } else {
+        customInput.classList.remove('visible');
+        state[planet].d = parseFloat(e.target.value);
+        updateBalanceExplorerResults(panel, state);
+      }
+    });
+  });
+
+  // d-value custom input handlers
+  panel.querySelectorAll('.fbe-d-custom:not([disabled])').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const planet = e.target.dataset.planet;
+      const val = parseFloat(e.target.value);
+      if (val > 0 && isFinite(val)) {
+        state[planet].d = val;
+        updateBalanceExplorerResults(panel, state);
+      }
+    });
+  });
+
+  // Initial calculation
+  updateBalanceExplorerResults(panel, state);
+
+  return panel;
+}
+
+function updateBalanceExplorerResults(panel, state) {
+  const results = computeBalanceResults(state);
+
+  // Balance percentage display (100% = perfect vector balance)
+  const balancePct = 100 - results.imbalance;
+  const ratioDisplay = panel.querySelector('.fbe-ratio-display');
+  const ratioValue = panel.querySelector('.fbe-ratio-value');
+  ratioValue.textContent = balancePct.toFixed(2) + '%';
+  ratioDisplay.classList.toggle('invalid', balancePct < 90);
+
+  // Status line: LL pass count and direction match count
+  let llPass = 0, dirPass = 0;
+  for (const key of BALANCE_PLANETS) {
+    const r = results.planetResults[key];
+    if (r.fitsLL) llPass++;
+    if (key !== 'earth' && r.directionMatch) dirPass++;
+  }
+  const status = panel.querySelector('.fbe-status');
+  status.textContent =
+    `LL bounds: ${llPass}/8  |  Direction: ${dirPass}/7  |  ` +
+    `amp = \u03C8 / (d \u00D7 \u221Am)`;
+
+  // PSI formula line
+  const psiLine = panel.querySelector('.fbe-psi-line');
+  psiLine.textContent =
+    `\u03C8 = 2205 / (2 \u00D7 ${holisticyearLength.toLocaleString()}) = ${results.PSI.toExponential(6)}`;
+
+  // Per-planet table
+  const tbody = panel.querySelector('.fbe-results-tbody');
+  tbody.innerHTML = BALANCE_PLANETS.map(key => {
+    const r = results.planetResults[key];
+    const cfg = BALANCE_CONFIG[key];
+
+    const ampStr = r.amplitude.toFixed(4) + '\u00B0';
+    const meanStr = r.mean.toFixed(4) + '\u00B0';
+    const rangeStr = `[${r.rangeMin.toFixed(2)}, ${r.rangeMax.toFixed(2)}]`;
+
+    let trendStr, jplStr, errStr, dirStr;
+    if (key === 'earth') {
+      trendStr = '\u2014';
+      jplStr = '\u2014';
+      errStr = '\u2014';
+      dirStr = '\u2014';
+    } else {
+      trendStr = (r.trend >= 0 ? '+' : '') + r.trend.toFixed(5);
+      jplStr = (cfg.trendJPL >= 0 ? '+' : '') + cfg.trendJPL.toFixed(5);
+      errStr = (r.trendError * 3600).toFixed(1) + '"';
+      dirStr = r.directionMatch ? '\u2713' : '\u2717';
+    }
+
+    const dxiStr = r.dxixsqrtm.toExponential(3);
+
+    return `<tr>
+      <td class="planet-cell">${cfg.name}</td>
+      <td>${ampStr}</td>
+      <td>${meanStr}</td>
+      <td>${rangeStr}</td>
+      <td class="${r.fitsLL ? 'pass' : 'fail'} fbe-ll-cell"><span class="fbe-ll-tip">${r.fitsLL ? '\u2713' : '\u2717'}<span class="fbe-ll-tip-content">Laplace-Lagrange bounds for ${cfg.name}:<br><b>${cfg.llBounds.min.toFixed(3)}\u00B0 \u2013 ${cfg.llBounds.max.toFixed(3)}\u00B0</b><br>3D model predicted range: ${r.rangeMin.toFixed(3)}\u00B0 \u2013 ${r.rangeMax.toFixed(3)}\u00B0<br><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Table 10.4 \u2192</a></span></span></td>
+      <td>${trendStr}</td>
+      <td>${jplStr}</td>
+      <td>${errStr}</td>
+      <td class="${key === 'earth' ? '' : (r.directionMatch ? 'pass' : 'fail')}">${dirStr}</td>
+      <td>${dxiStr}</td>
+    </tr>`;
+  }).join('');
+
+  // Vector balance verification
+  const balanceLine = panel.querySelector('.fbe-balance-line');
+  const angle = Math.atan2(results.balanceSin, results.balanceCos) * 180 / Math.PI;
+  balanceLine.innerHTML =
+    `\u03A3L\u00D7amp\u00D7cos(\u03B3) = ${results.balanceCos.toExponential(4)}  |  ` +
+    `\u03A3L\u00D7amp\u00D7sin(\u03B3) = ${results.balanceSin.toExponential(4)}  |  ` +
+    `Residual: ${results.imbalance.toFixed(2)}% ` +
+    (results.imbalance < 1
+      ? '<span class="pass">\u2713 BALANCED</span>'
+      : '<span class="fail">\u26A0 ' + results.imbalance.toFixed(1) + '%</span>');
+}
+
+function openBalanceExplorer() {
+  if (!balanceExplorerPanel) {
+    balanceExplorerPanel = createBalanceExplorerPanel();
+  }
+  balanceExplorerPanel.classList.add('visible');
+}
+
+function closeBalanceExplorer() {
+  if (balanceExplorerPanel) {
+    balanceExplorerPanel.classList.remove('visible');
+  }
+}
+
 // Update live data in hierarchy inspector (called from render loop)
 let _lastLiveDataJD = null;
 let _lastLiveDataPlanet = null; // Track planet changes to force refresh
@@ -10714,6 +11305,11 @@ function setupGUI() {
     }
     return controller;
   };
+
+  // Invariable Plane Balance Explorer button - first item for easy access
+  const fbeButton = { explore: openBalanceExplorer };
+  const fbeController = invPlanePositionsFolder.add(fbeButton, 'explore').name('Invariable Plane Balance Explorer');
+  addTooltip(fbeController, 'Open interactive modal to test different ψ-group, phase group, and d-value assignments. See docs/26-fibonacci-laws.md for theory.');
 
   // Validation subfolder (Option A vs B comparison) - at top for easy access
   const validationFolder = invPlanePositionsFolder.addFolder('Validate position of Invariable plane (Option A vs B)');

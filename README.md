@@ -68,6 +68,16 @@ npm run build
 - So we still live in a Heliocentric solar system.
 - All planets in our solar system are orbiting their perihelion-point according to Kepler's 3rd law.
 
+### Fibonacci Laws of Planetary Motion
+
+The model implements three Fibonacci Laws connecting planetary orbital parameters through mass-weighted quantities:
+
+1. **Inner Planet Eccentricity Ladder** — The mass-weighted eccentricities of the four inner planets form a Fibonacci ratio sequence converging toward the golden ratio.
+2. **Inclination Amplitude Law** — Each planet's inclination amplitude satisfies `d x amplitude x sqrt(mass) = psi`, where `d` is a pure Fibonacci number (3, 5, 8, or 13) and `psi` is a universal constant derived from Fibonacci numbers and the Holistic Year.
+3. **Invariable Plane Balance** — The Fibonacci divisors are validated by the angular momentum balance condition: the structural weights of the two phase groups balance to 99.99%, grounding the theory in conservation of angular momentum.
+
+See [Fibonacci Laws documentation](docs/26-fibonacci-laws.md) for the full derivation and predictions.
+
 ### Additional explanation
 
 - The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth's axis (J2000 value +23°26'21").

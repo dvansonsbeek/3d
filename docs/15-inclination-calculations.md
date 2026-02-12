@@ -55,7 +55,7 @@ i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
 
 Where:
 - `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(Ω - phaseAngle))
-- `amplitude` = Fibonacci-derived: ψ_g / (d × √m), see [doc 26](26-fibonacci-laws.md)
+- `amplitude` = Fibonacci-derived: ψ / (d × √m), see [doc 26](26-fibonacci-laws.md)
 - `Ω(t)` = Current ascending node on invariable plane
 - `phaseAngle` = Balance group phase angle (203.3195° or 23.3195°, see [doc 26](26-fibonacci-laws.md))
 
@@ -72,8 +72,8 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 
 | Planet | Phase Angle | Balance Group | Precession Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|---------------------|---------------------------|
-| Mercury | 23.3195° | 23° | Prograde | Increasing |
-| Venus | 203.3195° | 203° | Prograde | Decreasing |
+| Mercury | 23.3195° | 23° | Prograde | Decreasing |
+| Venus | 23.3195° | 23° | Prograde | Decreasing |
 | Earth | 203.3195° | 203° | Prograde | Decreasing |
 | Mars | 203.3195° | 203° | Prograde | Decreasing |
 | Jupiter | 203.3195° | 203° | Prograde | Decreasing |
@@ -84,25 +84,25 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 
 **Key insights**:
 - The two phase angles (203.3195° and 23.3195°) are 180° apart, representing opposite sides of the invariable plane oscillation
-- Group assignments are determined by the **invariable plane balance condition**: Σ(203°) L×amp = Σ(23°) L×amp
+- Group assignments are determined by the **invariable plane balance condition**: Σ(203°) w = Σ(23°) w
 - Saturn uses 23.3195° because its ascending node precesses in the **opposite direction** (retrograde)
-- Mercury and Uranus use 23.3195° as part of the 23° balance group
+- Mercury, Venus, and Uranus use 23.3195° as part of the 23° balance group
 
 ### Inclination Constants
 
-All values derived from **Fibonacci Laws** (amplitude = ψ_g / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Appendix E](appendix-e-inclination-optimization.js) and [Appendix F](appendix-f-inclination-verification.js)):
+All values derived from **Fibonacci Laws** (amplitude = ψ / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Appendix E](appendix-e-inclination-optimization.js) and [Appendix F](appendix-f-inclination-verification.js)):
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 5.900556 | 0.452956 | 6.3473 | 5.45 - 6.35 | ~0.7"/cy |
-| Venus | 3.055450 | 1.055261 | 2.1545 | 2.00 - 4.11 | ~20"/cy |
-| Earth | 1.481388 | 0.635185 | 1.5787 | 0.85 - 2.12 | (reference) |
-| Mars | 3.596827 | 2.235621 | 1.6312 | 1.36 - 5.83 | ~15"/cy |
-| Jupiter | 0.342972 | 0.062713 | 0.3220 | 0.28 - 0.41 | ~2"/cy |
-| Saturn | 0.941281 | 0.165248 | 0.9255 | 0.78 - 1.11 | ~0.1"/cy |
-| Uranus | 0.979050 | 0.062465 | 0.9947 | 0.92 - 1.04 | ~3"/cy |
-| Neptune | 0.679019 | 0.057508 | 0.7354 | 0.62 - 0.74 | ~2"/cy |
-| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~6"/cy |
+| Mercury | 5.348192 | 1.013017 | 6.3473 | 4.34 - 6.36 | ~1.6"/cy |
+| Venus | 1.929319 | 0.263813 | 2.1545 | 1.67 - 2.19 | ~21.7"/cy |
+| Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
+| Mars | 3.334727 | 1.937522 | 1.6312 | 1.40 - 5.27 | ~17.9"/cy |
+| Jupiter | 0.329124 | 0.021372 | 0.3220 | 0.31 - 0.35 | ~3.0"/cy |
+| Saturn | 0.931699 | 0.065097 | 0.9255 | 0.87 - 1.00 | ~5.4"/cy |
+| Uranus | 0.985057 | 0.038440 | 0.9947 | 0.95 - 1.02 | ~2.7"/cy |
+| Neptune | 0.679019 | 0.057508 | 0.7354 | 0.62 - 0.74 | ~1.7"/cy |
+| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~5.6"/cy |
 
 ### Implementation
 

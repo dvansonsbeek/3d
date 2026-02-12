@@ -66,8 +66,8 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 5.900556,
-    amplitude: 0.452956,
+    mean: 5.348192,
+    amplitude: 1.013017,
     phaseAngle: 23.3195,       // 23° balance group
     omegaJ2000: 32.83,
     period: holisticyearLength / (1 + 3/8),  // ~242,828 years
@@ -75,17 +75,17 @@ const currentCodeValues = {
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
   venus: {
-    mean: 3.055450,
-    amplitude: 1.055261,
-    phaseAngle: 203.3195,      // 203° balance group
+    mean: 1.929319,
+    amplitude: 0.263813,
+    phaseAngle: 23.3195,       // 23° balance group
     omegaJ2000: 54.70,
     period: holisticyearLength * 2,  // 667,776 years
     inclJ2000: 2.1545441,
     jplTrend: venusEclipticInclinationTrendJPL
   },
   mars: {
-    mean: 3.596827,
-    amplitude: 2.235621,
+    mean: 3.334727,
+    amplitude: 1.937522,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 354.87,
     period: holisticyearLength / (4 + 1/3),  // ~77,051 years
@@ -93,8 +93,8 @@ const currentCodeValues = {
     jplTrend: marsEclipticInclinationTrendJPL
   },
   jupiter: {
-    mean: 0.342972,
-    amplitude: 0.062713,
+    mean: 0.329124,
+    amplitude: 0.021372,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 312.89,
     period: holisticyearLength / 5,  // 66,778 years
@@ -102,8 +102,8 @@ const currentCodeValues = {
     jplTrend: jupiterEclipticInclinationTrendJPL
   },
   saturn: {
-    mean: 0.941281,
-    amplitude: 0.165248,
+    mean: 0.931699,
+    amplitude: 0.065097,
     phaseAngle: 23.3195,       // 23° balance group (retrograde)
     omegaJ2000: 118.81,
     period: -holisticyearLength / 8,  // -41,736 years (retrograde)
@@ -111,8 +111,8 @@ const currentCodeValues = {
     jplTrend: saturnEclipticInclinationTrendJPL
   },
   uranus: {
-    mean: 0.979050,
-    amplitude: 0.062465,
+    mean: 0.985057,
+    amplitude: 0.038440,
     phaseAngle: 23.3195,       // 23° balance group
     omegaJ2000: 307.80,
     period: holisticyearLength / 3,  // 111,296 years
@@ -145,10 +145,10 @@ const currentCodeValues = {
 
 const laplaceLagrangeBounds = {
   mercury: { min: 4.57, max: 9.86 },
-  venus:   { min: 0.72, max: 4.11 },
+  venus:   { min: 0.00, max: 3.38 },
   mars:    { min: 0.00, max: 5.84 },
   jupiter: { min: 0.241, max: 0.489 },
-  saturn:  { min: 0.43, max: 1.53 },
+  saturn:  { min: 0.797, max: 1.02 },
   uranus:  { min: 0.902, max: 1.11 },
   neptune: { min: 0.554, max: 0.800 },
   pluto:   { min: 15.0, max: 16.5 }
