@@ -329,6 +329,55 @@ The law `d × amplitude × √m = ψ_g` is verified exactly for all 8 planets:
 | Uranus | 3.302 × 10⁻³ | ψ₁ = 3.302 × 10⁻³ | exact |
 | Neptune | 3.302 × 10⁻³ | ψ₁ = 3.302 × 10⁻³ | exact |
 
+### Worked Example: Earth's Inclination Amplitude
+
+Earth is a ψ₁ planet with Fibonacci quantum number d = 3 (= F₄). The amplitude derivation:
+
+```
+amplitude = ψ₁ / (d × √m)
+```
+
+Step by step:
+
+| Quantity | Expression | Value |
+|----------|-----------|-------|
+| ψ₁ | F₅ × F₈² / (2H) = 5 × 21² / 667,776 | 2205 / 667,776 = 3.302005 × 10⁻³ |
+| d | F₄ | 3 |
+| m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
+| √m | | 1.7329 × 10⁻³ |
+| d × √m | 3 × 1.7329 × 10⁻³ | 5.1986 × 10⁻³ |
+| **amplitude** | **3.302005 × 10⁻³ / 5.1986 × 10⁻³** | **0.635185°** |
+
+The mean is then computed from the J2000 constraint:
+
+```
+mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
+     = 1.57867° - 0.635185° × cos(284.51° - 203.3195°)
+     = 1.57867° - 0.635185° × cos(81.19°)
+     = 1.57867° - 0.635185° × 0.15314
+     = 1.57867° - 0.09728°
+     = 1.481388°
+```
+
+#### Fibonacci vs IAU 2006-Optimized Values
+
+The 3D simulation (`script.js`) currently uses a slightly different value optimized for the IAU 2006 obliquity rate:
+
+| Parameter | Fibonacci prediction | IAU 2006 optimized | Difference |
+|-----------|---------------------|-------------------|------------|
+| Amplitude | 0.635185° | 0.633849° | 0.001336° (4.8") |
+| Mean | 1.481388° | 1.481592° | 0.000204° (0.7") |
+
+The IAU 2006-optimized value was derived by calibrating the model's obliquity rate to match the IAU 2006 precession model (Capitaine et al. 2003), which specifies a rate of −46.836769"/century. In the 3D model, the obliquity depends on `earthInvPlaneInclinationAmplitude` through:
+
+```
+obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
+```
+
+where A is the amplitude, phase₃ is the 111,296-year inclination cycle, and phase₈ is the ~25,684-year axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude, so the optimization adjusted the amplitude from the Fibonacci value (0.635185°) downward by 0.001336° to match the observed rate exactly.
+
+The Fibonacci prediction (0.635185°) represents the theoretical long-term value from the balance condition, while the IAU 2006-optimized value (0.633849°) is calibrated to the currently observed obliquity rate over recent centuries. The 0.21% difference is within the model's tolerance.
+
 ---
 
 ## Comparison with Previous Model
