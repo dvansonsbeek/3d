@@ -595,6 +595,8 @@ As TNO masses become better determined (e.g., by the Vera Rubin Observatory/LSST
 
 The prediction is falsifiable: if the complete balance consistently yields a value different from 1/φ (e.g., if it converges to some other irrational number), the golden-ratio hypothesis is ruled out.
 
+The full brute-force computation is implemented in [Appendix K](appendix-k-psi-ratio-golden-test.js).
+
 ---
 
 ## Open Questions
@@ -616,6 +618,7 @@ The prediction is falsifiable: if the complete balance consistently yields a val
 | [16 - Invariable Plane Calculations](16-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Appendix E - Inclination Optimization](appendix-e-inclination-optimization.js) | Optimization script |
+| [Appendix K - Golden Ratio Hypothesis Test](appendix-k-psi-ratio-golden-test.js) | ψ₃/ψ₁ = 1/φ brute-force test |
 
 ---
 
