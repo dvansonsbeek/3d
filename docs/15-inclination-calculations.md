@@ -72,13 +72,13 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 
 | Planet | Phase Angle | Balance Group | Precession Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|---------------------|---------------------------|
-| Mercury | 23.3195° | 23° | Prograde | Decreasing |
-| Venus | 23.3195° | 23° | Prograde | Decreasing |
+| Mercury | 203.3195° | 203° | Prograde | Decreasing |
+| Venus | 203.3195° | 203° | Prograde | Decreasing |
 | Earth | 203.3195° | 203° | Prograde | Decreasing |
 | Mars | 203.3195° | 203° | Prograde | Decreasing |
 | Jupiter | 203.3195° | 203° | Prograde | Decreasing |
 | **Saturn** | **23.3195°** | **23°** | **Retrograde** | **Increasing** |
-| **Uranus** | **23.3195°** | **23°** | Prograde | Decreasing |
+| Uranus | 203.3195° | 203° | Prograde | Decreasing |
 | Neptune | 203.3195° | 203° | Prograde | Decreasing |
 | Pluto | 203.3195° | — | Prograde | Decreasing |
 
@@ -86,7 +86,7 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 - The two phase angles (203.3195° and 23.3195°) are 180° apart, representing opposite sides of the invariable plane oscillation
 - Group assignments are determined by the **invariable plane balance condition**: Σ(203°) w = Σ(23°) w
 - Saturn uses 23.3195° because its ascending node precesses in the **opposite direction** (retrograde)
-- Mercury, Venus, and Uranus use 23.3195° as part of the 23° balance group
+- Saturn is the **sole planet** in the 23° group; all other planets use 203.3195°
 
 ### Inclination Constants
 
@@ -94,14 +94,14 @@ All values derived from **Fibonacci Laws** (amplitude = ψ / (d × √m)) with m
 
 | Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
 |--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 5.348192 | 1.013017 | 6.3473 | 4.34 - 6.36 | ~1.6"/cy |
-| Venus | 1.929319 | 0.263813 | 2.1545 | 1.67 - 2.19 | ~21.7"/cy |
+| Mercury | 6.727893 | 0.385911 | 6.3473 | 6.34 - 7.11 | ~1.6"/cy |
+| Venus | 2.207538 | 0.062074 | 2.1545 | 2.15 - 2.27 | ~21.7"/cy |
 | Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
-| Mars | 3.334727 | 1.937522 | 1.6312 | 1.40 - 5.27 | ~17.9"/cy |
+| Mars | 2.653311 | 1.162513 | 1.6312 | 1.49 - 3.82 | ~17.9"/cy |
 | Jupiter | 0.329124 | 0.021372 | 0.3220 | 0.31 - 0.35 | ~3.0"/cy |
 | Saturn | 0.931699 | 0.065097 | 0.9255 | 0.87 - 1.00 | ~5.4"/cy |
-| Uranus | 0.985057 | 0.038440 | 0.9947 | 0.95 - 1.02 | ~2.7"/cy |
-| Neptune | 0.679019 | 0.057508 | 0.7354 | 0.62 - 0.74 | ~1.7"/cy |
+| Uranus | 1.000619 | 0.023796 | 0.9947 | 0.98 - 1.02 | ~2.7"/cy |
+| Neptune | 0.722146 | 0.013531 | 0.7354 | 0.71 - 0.74 | ~1.7"/cy |
 | Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~5.6"/cy |
 
 ### Implementation
@@ -113,7 +113,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const period = mercuryPerihelionICRFYears;
   const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
-  const phaseAngle = mercuryInclinationPhaseAngle;  // 23.3195°
+  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.3195°
 
   // Calculate current ascending node
   const yearsSinceJ2000 = currentYear - 2000;

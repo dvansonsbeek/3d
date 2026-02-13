@@ -40,16 +40,16 @@ const holisticyearLength = 333888;
 // Universal ψ-constant: ψ = F₅ × F₈² / (2H) = 2205 / 667776
 const PSI = 2205 / (2 * holisticyearLength);
 
-// Pure Fibonacci quantum numbers (d)
+// Pure Fibonacci quantum numbers (d) — Config #27 (unique mirror-symmetric config)
 const FIBONACCI_D = {
-  mercury: 8,     // F₆
-  venus:   8,     // F₆
+  mercury: 21,    // F₈
+  venus:   34,    // F₉
   earth:   3,     // F₄
-  mars:    3,     // F₄
+  mars:    5,     // F₅
   jupiter: 5,     // F₅
   saturn:  3,     // F₄
-  uranus:  13,    // F₇
-  neptune: 8,     // F₆
+  uranus:  21,    // F₈
+  neptune: 34,    // F₉
   pluto:   null   // Not in Fibonacci theory
 };
 
@@ -167,8 +167,8 @@ const laplaceLagrangeBounds = {
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // Phase groups (from invariable plane balance, see doc 26):
-//   203.3195° group: Earth, Mars, Jupiter, Neptune
-//   23.3195° group:  Mercury, Venus, Saturn, Uranus
+//   203.3195° group: Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune
+//   23.3195° group:  Saturn (sole retrograde)
 //
 const planetInputs = {
   mercury: {
@@ -176,7 +176,7 @@ const planetInputs = {
     omegaJ2000: 32.83,                              // Verified ascending node
     inclJ2000: 6.3472858,                           // J2000 inv plane inclination (S&S 2012)
     period: holisticyearLength / (1 + 3/8),         // ~242,828 years
-    phaseAngle: 23.3195,                            // 23° group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength/(1+(3/8))'
   },
   venus: {
@@ -184,7 +184,7 @@ const planetInputs = {
     omegaJ2000: 54.70,
     inclJ2000: 2.1545441,
     period: holisticyearLength * 2,                 // 667,776 years
-    phaseAngle: 23.3195,                            // 23° group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength*2'
   },
   earth: {
@@ -224,7 +224,7 @@ const planetInputs = {
     omegaJ2000: 307.80,
     inclJ2000: 0.9946692,
     period: holisticyearLength / 3,                 // 111,296 years
-    phaseAngle: 23.3195,                            // 23° group
+    phaseAngle: 203.3195,                           // 203° group
     periodExpr: 'holisticyearLength/3'
   },
   neptune: {
@@ -364,12 +364,12 @@ console.log('FIBONACCI CONSTANTS:');
 console.log(`  ψ = ${PSI.toExponential(6)} = 2205 / (2 × ${holisticyearLength.toLocaleString()})`);
 console.log('');
 console.log('PHASE GROUPS (from invariable plane balance):');
-console.log('  203.3195° group: Earth, Mars, Jupiter, Neptune');
-console.log('   23.3195° group: Mercury, Venus, Saturn, Uranus');
+console.log('  203.3195° group: Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune');
+console.log('   23.3195° group: Saturn (sole retrograde)');
 console.log('');
-console.log('FIBONACCI DIVISORS:');
-console.log('  Mercury=8(F₆) Venus=8(F₆) Earth=3(F₄) Mars=3(F₄)');
-console.log('  Jupiter=5(F₅) Saturn=3(F₄) Uranus=13(F₇) Neptune=8(F₆)');
+console.log('FIBONACCI DIVISORS (Config #27 — unique mirror-symmetric):');
+console.log('  Mercury=21(F₈) Venus=34(F₉) Earth=3(F₄) Mars=5(F₅)');
+console.log('  Jupiter=5(F₅)  Saturn=3(F₄) Uranus=21(F₈) Neptune=34(F₉)');
 console.log('');
 console.log('INPUT PARAMETERS:');
 console.log('  - Ascending nodes (Ω): J2000-verified values from script.js');
@@ -540,7 +540,7 @@ console.log('- Amplitudes derived from single universal ψ: amp = ψ / (d × √
 console.log('- ψ = ' + PSI.toExponential(6) + ' = 2205 / (2 × ' + holisticyearLength.toLocaleString() + ')');
 console.log('- Means computed from J2000 constraint: mean = i_J2000 - amp × cos(Ω - φ)');
 console.log('- All planets match J2000 invariable plane inclination exactly');
-console.log('- Phase groups: 203.3195° (Earth,Mars,Jupiter,Neptune), 23.3195° (Mercury,Venus,Saturn,Uranus)');
+console.log('- Phase groups: 203.3195° (Mercury,Venus,Earth,Mars,Jupiter,Uranus,Neptune), 23.3195° (Saturn)');
 console.log('- Saturn uses retrograde precession (negative period)');
 console.log('- Earth uses IAU 2006-optimized amplitude (0.633849° vs Fibonacci 0.635185°)');
 console.log('- Pluto: no Fibonacci theory, amplitude optimized within LL bounds');

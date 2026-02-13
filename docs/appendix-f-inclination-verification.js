@@ -66,26 +66,26 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 5.348192,
-    amplitude: 1.013017,
-    phaseAngle: 23.3195,       // 23° balance group
+    mean: 6.727893,
+    amplitude: 0.385911,
+    phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 32.83,
     period: holisticyearLength / (1 + 3/8),  // ~242,828 years
     inclJ2000: 6.3472858,
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
   venus: {
-    mean: 1.929319,
-    amplitude: 0.263813,
-    phaseAngle: 23.3195,       // 23° balance group
+    mean: 2.207538,
+    amplitude: 0.062074,
+    phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 54.70,
     period: holisticyearLength * 2,  // 667,776 years
     inclJ2000: 2.1545441,
     jplTrend: venusEclipticInclinationTrendJPL
   },
   mars: {
-    mean: 3.334727,
-    amplitude: 1.937522,
+    mean: 2.653311,
+    amplitude: 1.162513,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 354.87,
     period: holisticyearLength / (4 + 1/3),  // ~77,051 years
@@ -111,17 +111,17 @@ const currentCodeValues = {
     jplTrend: saturnEclipticInclinationTrendJPL
   },
   uranus: {
-    mean: 0.985057,
-    amplitude: 0.038440,
-    phaseAngle: 23.3195,       // 23° balance group
+    mean: 1.000619,
+    amplitude: 0.023796,
+    phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 307.80,
     period: holisticyearLength / 3,  // 111,296 years
     inclJ2000: 0.9946692,
     jplTrend: uranusEclipticInclinationTrendJPL
   },
   neptune: {
-    mean: 0.679019,
-    amplitude: 0.057508,
+    mean: 0.722146,
+    amplitude: 0.013531,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 192.04,
     period: holisticyearLength * 2,  // 667,776 years

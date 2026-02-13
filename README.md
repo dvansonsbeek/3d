@@ -70,13 +70,13 @@ npm run build
 
 ### Fibonacci Laws of Planetary Motion
 
-The model implements three Fibonacci Laws connecting planetary orbital parameters through mass-weighted quantities:
+The model implements three Fibonacci Laws connecting planetary orbital parameters through pure Fibonacci numbers:
 
-1. **Inner Planet Eccentricity Ladder** — The mass-weighted eccentricities of the four inner planets form a Fibonacci ratio sequence converging toward the golden ratio.
-2. **Inclination Amplitude Law** — Each planet's inclination amplitude satisfies `d x amplitude x sqrt(mass) = psi`, where `d` is a pure Fibonacci number (3, 5, 8, or 13) and `psi` is a universal constant derived from Fibonacci numbers and the Holistic Year.
-3. **Invariable Plane Balance** — The Fibonacci divisors are validated by the angular momentum balance condition: the structural weights of the two phase groups balance to 99.99%, grounding the theory in conservation of angular momentum.
+1. **Law 1 — Inclination Amplitude**: Each planet's inclination amplitude satisfies `d × amplitude × √mass = ψ`, where `d` is a pure Fibonacci number and `ψ = 2205/(2×333888)` is a universal constant. Config #27 (the unique mirror-symmetric configuration) assigns d = 21, 34, 3, 5, 5, 3, 21, 34 to Mercury through Neptune.
+2. **Law 2 — Inclination Balance**: The structural weights `w = √(m·a(1-e²)) / d` of the two phase groups (203° and 23°) balance to **99.9998%**, grounding the theory in conservation of angular momentum. Saturn is the sole retrograde (23°) planet.
+3. **Law 3 — Eccentricity Balance**: The eccentricity weights `v = √m × a^(3/2) × e / √d` balance to **99.88%** between the same two phase groups — an independent constraint using different powers of mass, distance, and d.
 
-See [Fibonacci Laws documentation](docs/26-fibonacci-laws.md) for the full derivation and predictions.
+The mirror-symmetric d-assignments (Mercury↔Uranus=21, Venus↔Neptune=34, Earth↔Saturn=3, Mars↔Jupiter=5) uniquely identify Config #27 as the only valid configuration out of 755 candidates. See [Fibonacci Laws documentation](docs/26-fibonacci-laws.md) for the full derivation, [Appendix L](docs/appendix-l-verify-laws.js) for comprehensive verification (49/49 checks pass).
 
 ### Additional explanation
 

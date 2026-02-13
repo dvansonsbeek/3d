@@ -49,7 +49,8 @@ This documentation is **self-contained** - you can understand the model and use 
 
 | Document | Description |
 |----------|-------------|
-| [26 - Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md) | Fibonacci-derived inclination amplitudes with invariable plane balance condition |
+| [25 - Ascending Node Calculations Limitations](25-ascending-node-calculations-limitations.md) | Limitations of the ascending node precession model |
+| [26 - Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md) | Three Fibonacci Laws governing inclination amplitudes, inclination balance, and eccentricity balance |
 
 ### Developer Reference
 
@@ -75,7 +76,8 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |
 | [Appendix I - Length of Day& Year Formulas](appendix-i-length-day-year-formulas.md) | Tropical year and day length analysis: measurement methods, validation results, proposed formulas |
 | [Appendix J - Holistic Year Analysis Data](appendix-j-holistic-year-analysis.xlsx) | Excel export of 64 points in time for year analysis spanning one complete Holistic Year (333,888 years) |
-
+| [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive search of all valid Fibonacci divisor configurations; generates balance-presets.json |
+| [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all three Fibonacci Laws, six findings, and predictions (49 checks) |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization
