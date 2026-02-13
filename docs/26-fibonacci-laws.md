@@ -608,6 +608,36 @@ npx parcel build src/index.html --no-cache
 
 ---
 
+## Relation to Existing Physics
+
+### What builds on established theory
+
+**Law 2 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 99.9998%.
+
+**Phase angles** (203.3195° and 23.3195°) originate from the **s₈ eigenmode of Laplace-Lagrange secular perturbation theory**, a framework established in classical celestial mechanics (18th–19th century). Saturn's retrograde ascending node precession is also a known result from secular theory.
+
+**Law 3 (Eccentricity Balance)** connects to **Angular Momentum Deficit (AMD) conservation**, a known conserved quantity in secular theory. The weight `√m × a^(3/2) × e / √d` contains factors related to how AMD is partitioned among planets. However, the linear dependence on eccentricity (rather than quadratic, as in the AMD itself) and the `1/√d` scaling distinguish it from the standard AMD formulation.
+
+### What appears genuinely new
+
+1. **Fibonacci quantization of inclination amplitudes** — No known physical theory predicts that Fibonacci numbers should appear as divisors in planetary inclination amplitudes. The relationship `d × amplitude × √m = ψ`, with `d` restricted to pure Fibonacci numbers, cannot be derived from Newtonian gravity, general relativity, or Laplace-Lagrange secular perturbation theory.
+
+2. **The universal constant ψ = 2205/(2×333888)** — This value has no known first-principles derivation. The numerator `2205 = 5 × 21²` (a product of Fibonacci numbers) is suggestive of a deeper structure, but no theoretical framework explains it.
+
+3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
+
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 3 uses `1/√d` scaling while Law 2 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #27 is the only one that is also mirror-symmetric.
+
+### Assessment
+
+The balance conditions (Laws 2 and 3) combine known conservation principles with a novel Fibonacci structure that modulates the planetary weights. The conservation laws guarantee that inclination and eccentricity oscillations balance around the invariable plane — but they do not predict that integer Fibonacci divisors should preserve that balance to such high precision.
+
+Law 1 (Inclination Amplitude quantization) is the most genuinely novel claim — no existing theory predicts that `d × amplitude × √m` should be constant across all planets when `d` is a Fibonacci number.
+
+The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the triple-constraint uniqueness of Config #27 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+
+---
+
 ## Related Documents
 
 | Document | Purpose |
