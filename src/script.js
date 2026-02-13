@@ -9533,10 +9533,16 @@ function computeBalanceResults(state) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, dxixsqrtm, trend, trendError, directionMatch };
   }
 
-  // Vector balance verification: Σ w×amp×cos(phase) ≈ 0 and Σ w×amp×sin(phase) ≈ 0
+  // Inclination balance (Law 2): w = √(m·a(1-e²)) / d — group sums
+  let inclSum203 = 0, inclSum23 = 0;
   let balanceCos = 0, balanceSin = 0, totalLamp = 0;
   for (const key of BALANCE_PLANETS) {
     const cfg = BALANCE_CONFIG[key];
+    const d = state[key].d;
+    if (d <= 0) continue;
+    const wVal = Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
+    if (state[key].phaseAngle > 180) inclSum203 += wVal; else inclSum23 += wVal;
+    // Vector balance verification
     const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
     const Lamp = L * planetResults[key].amplitude;
     const phaseRad = state[key].phaseAngle * DEG2RAD;
@@ -9547,7 +9553,21 @@ function computeBalanceResults(state) {
   const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
   const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
 
-  return { PSI, planetResults, balanceCos, balanceSin, balanceResidual, totalLamp, imbalance };
+  // Eccentricity balance (Law 3): v = √m × a^(3/2) × e / √d
+  let eccSum203 = 0, eccSum23 = 0;
+  for (const key of BALANCE_PLANETS) {
+    const cfg = BALANCE_CONFIG[key];
+    const d = state[key].d;
+    if (d <= 0) continue;
+    const v = Math.sqrt(cfg.mass) * Math.pow(cfg.sma, 1.5) * cfg.ecc / Math.sqrt(d);
+    planetResults[key].eccWeight = v;
+    if (state[key].phaseAngle > 180) eccSum203 += v; else eccSum23 += v;
+  }
+  const eccResidual = Math.abs(eccSum203 - eccSum23);
+  const eccTotal = eccSum203 + eccSum23;
+  const eccImbalance = eccTotal > 0 ? (eccResidual / eccTotal) * 100 : 0;
+
+  return { PSI, planetResults, inclSum203, inclSum23, balanceCos, balanceSin, balanceResidual, totalLamp, imbalance, eccSum203, eccSum23, eccImbalance };
 }
 
 // Build d-value select HTML
@@ -9670,9 +9690,17 @@ function createBalanceExplorerPanel() {
         </div>
         <div class="fbe-section">
           <div class="fbe-section-title">Balance Results</div>
-          <div class="fbe-ratio-display">
-            <span class="fbe-ratio-label">Balance </span>
-            <span class="fbe-ratio-value"></span>
+          <div class="fbe-ratio-row">
+            <div class="fbe-ratio-display fbe-ratio-incl">
+              <div class="fbe-ratio-label">Inclination Balance (Law 2)</div>
+              <div class="fbe-ratio-value"></div>
+              <div class="fbe-ratio-formula">w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d</div>
+            </div>
+            <div class="fbe-ratio-display fbe-ratio-ecc">
+              <div class="fbe-ratio-label">Eccentricity Balance (Law 3)</div>
+              <div class="fbe-ratio-ecc-value"></div>
+              <div class="fbe-ratio-formula">v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad</div>
+            </div>
           </div>
         </div>
         <div class="fbe-section">
@@ -9691,6 +9719,7 @@ function createBalanceExplorerPanel() {
                   <th>Err</th>
                   <th>Dir</th>
                   <th>d\u00D7i\u00D7\u221Am</th>
+                  <th>v (ecc)</th>
                 </tr>
               </thead>
               <tbody class="fbe-results-tbody"></tbody>
@@ -9698,11 +9727,13 @@ function createBalanceExplorerPanel() {
           </div>
         </div>
         <div class="fbe-section">
-          <div class="fbe-section-title">Vector Balance Verification</div>
-          <div class="fbe-balance-line"></div>
+          <div class="fbe-section-title">Balance Verification</div>
+          <div class="fbe-balance-line fbe-balance-incl-line"></div>
+          <div class="fbe-balance-line fbe-balance-ecc-line"></div>
           <div class="fbe-status"></div>
           <div class="fbe-psi-line"></div>
-          <div class="fbe-balance-explain">Each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. Balance measures how well these oscillations cancel vectorially when weighted by angular momentum: \u03A3 L\u00D7amp\u00D7cos(\u03B3) \u2248 0 and \u03A3 L\u00D7amp\u00D7sin(\u03B3) \u2248 0. At 100%, the invariable plane is a perfect center of symmetry for all inclination evolution.</div>
+          <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 2): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two phase groups must cancel: \u03A3(203\u00B0) w = \u03A3(23\u00B0) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
+          <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 3): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two phase groups balance: \u03A3(203\u00B0) v = \u03A3(23\u00B0) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
         </div>
       </div>
@@ -9837,12 +9868,19 @@ function createBalanceExplorerPanel() {
 function updateBalanceExplorerResults(panel, state) {
   const results = computeBalanceResults(state);
 
-  // Balance percentage display (100% = perfect vector balance)
-  const balancePct = 100 - results.imbalance;
-  const ratioDisplay = panel.querySelector('.fbe-ratio-display');
-  const ratioValue = panel.querySelector('.fbe-ratio-value');
-  ratioValue.textContent = balancePct.toFixed(4) + '%';
-  ratioDisplay.classList.toggle('invalid', balancePct < 90);
+  // Inclination balance percentage display
+  const inclPct = 100 - results.imbalance;
+  const inclDisplay = panel.querySelector('.fbe-ratio-incl');
+  const inclValue = panel.querySelector('.fbe-ratio-value');
+  inclValue.textContent = inclPct.toFixed(4) + '%';
+  inclDisplay.classList.toggle('invalid', inclPct < 90);
+
+  // Eccentricity balance percentage display
+  const eccPct = 100 - results.eccImbalance;
+  const eccDisplay = panel.querySelector('.fbe-ratio-ecc');
+  const eccValue = panel.querySelector('.fbe-ratio-ecc-value');
+  eccValue.textContent = eccPct.toFixed(2) + '%';
+  eccDisplay.classList.toggle('invalid', eccPct < 90);
 
   // Status line: LL pass count and direction match count
   let llPass = 0, dirPass = 0;
@@ -9885,6 +9923,7 @@ function updateBalanceExplorerResults(panel, state) {
     }
 
     const dxiStr = r.dxixsqrtm.toExponential(3);
+    const eccStr = r.eccWeight != null ? r.eccWeight.toExponential(3) : '\u2014';
 
     return `<tr>
       <td class="planet-cell">${cfg.name}</td>
@@ -9897,19 +9936,31 @@ function updateBalanceExplorerResults(panel, state) {
       <td>${errStr}</td>
       <td class="${key === 'earth' ? '' : (r.directionMatch ? 'pass' : 'fail')}">${dirStr}</td>
       <td>${dxiStr}</td>
+      <td>${eccStr}</td>
     </tr>`;
   }).join('');
 
-  // Vector balance verification
-  const balanceLine = panel.querySelector('.fbe-balance-line');
-  const angle = Math.atan2(results.balanceSin, results.balanceCos) * 180 / Math.PI;
-  balanceLine.innerHTML =
-    `\u03A3L\u00D7amp\u00D7cos(\u03B3) = ${results.balanceCos.toExponential(4)}  |  ` +
-    `\u03A3L\u00D7amp\u00D7sin(\u03B3) = ${results.balanceSin.toExponential(4)}  |  ` +
-    `Residual: ${results.imbalance.toFixed(4)}% ` +
+  // Inclination balance verification line
+  const inclLine = panel.querySelector('.fbe-balance-incl-line');
+  const inclPctVal = 100 - results.imbalance;
+  inclLine.innerHTML =
+    `<b>Incl:</b>  \u03A3(203\u00B0) w = ${results.inclSum203.toExponential(4)}  |  ` +
+    `\u03A3(23\u00B0) w = ${results.inclSum23.toExponential(4)}  |  ` +
+    `Balance: ${inclPctVal.toFixed(4)}% ` +
     (results.imbalance < 1
-      ? '<span class="pass">\u2713 BALANCED</span>'
-      : '<span class="fail">\u26A0 ' + results.imbalance.toFixed(4) + '%</span>');
+      ? '<span class="pass">\u2713</span>'
+      : '<span class="fail">\u26A0</span>');
+
+  // Eccentricity balance verification line
+  const eccLine = panel.querySelector('.fbe-balance-ecc-line');
+  const eccPctVal = 100 - results.eccImbalance;
+  eccLine.innerHTML =
+    `<b>Ecc:</b>   \u03A3(203\u00B0) v = ${results.eccSum203.toExponential(4)}  |  ` +
+    `\u03A3(23\u00B0) v = ${results.eccSum23.toExponential(4)}  |  ` +
+    `Balance: ${eccPctVal.toFixed(2)}% ` +
+    (results.eccImbalance < 1
+      ? '<span class="pass">\u2713</span>'
+      : '<span class="fail">\u26A0</span>');
 }
 
 function openBalanceExplorer() {

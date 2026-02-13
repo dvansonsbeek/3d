@@ -1298,25 +1298,40 @@ a:link {
 }
 
 /* Balance ratio display */
+.fbe-ratio-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .fbe-ratio-display {
+  flex: 1;
   padding: 12px 16px;
   background: rgba(76, 175, 80, 0.1);
   border: 1px solid rgba(76, 175, 80, 0.3);
   border-radius: 8px;
   text-align: center;
-  margin-bottom: 8px;
 }
 
 .fbe-ratio-label {
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
 }
 
-.fbe-ratio-value {
+.fbe-ratio-value,
+.fbe-ratio-ecc-value {
   font-family: var(--pl-mono-font);
   font-size: 22px;
   font-weight: 700;
   color: #4caf50;
+}
+
+.fbe-ratio-formula {
+  font-family: var(--pl-mono-font);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 4px;
 }
 
 .fbe-ratio-display.invalid {
@@ -1324,7 +1339,8 @@ a:link {
   border-color: rgba(255, 82, 82, 0.3);
 }
 
-.fbe-ratio-display.invalid .fbe-ratio-value {
+.fbe-ratio-display.invalid .fbe-ratio-value,
+.fbe-ratio-display.invalid .fbe-ratio-ecc-value {
   color: #ff5252;
   font-size: 16px;
 }
@@ -1454,15 +1470,19 @@ a:link {
   display: block;
 }
 
-/* Balance verification line */
+/* Balance verification lines */
 .fbe-balance-line {
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
   font-family: var(--pl-mono-font);
   font-size: 11px;
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
+}
+
+.fbe-balance-line + .fbe-balance-line {
+  margin-top: 4px;
 }
 
 .fbe-balance-line .pass {
