@@ -11534,7 +11534,7 @@ function setupGUI() {
   // Invariable Plane Balance Explorer button - first item for easy access
   const fbeButton = { explore: openBalanceExplorer };
   const fbeController = invPlanePositionsFolder.add(fbeButton, 'explore').name('Invariable Plane Balance Explorer');
-  addTooltip(fbeController, 'Open interactive modal to test different ψ-group, phase group, and d-value assignments. See docs/26-fibonacci-laws.md for theory.');
+  addTooltip(fbeController, 'Open interactive modal to test different phase group, and d-value assignments. See docs/26-fibonacci-laws.md for theory.');
 
   // Validation subfolder (Option A vs B comparison) - at top for easy access
   const validationFolder = invPlanePositionsFolder.addFolder('Validate position of Invariable plane (Option A vs B)');
