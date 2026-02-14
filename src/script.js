@@ -9326,7 +9326,7 @@ function fbePresetLabel(row, index) {
   return `#${index+1} ${row[1].toFixed(4)}% ${parts.join(' ')} [${row[0]}]`;
 }
 
-// d-value dropdown options: common Fibonacci/Lucas ratios
+// d-value dropdown options: common Fibonacci values
 const D_VALUE_OPTIONS = [
   { value: 1,        label: '1 (F₁)' },
   { value: 2,        label: '2 (F₃)' },

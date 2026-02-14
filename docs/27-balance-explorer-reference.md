@@ -104,7 +104,7 @@ Displays each planet's longitude of ascending node on the invariable plane at th
 
 ### Fibonacci Divisor (d)
 
-A dropdown per planet with common Fibonacci and Lucas number ratios:
+A dropdown per planet with common Fibonacci number values:
 
 | Value | Label | Expression |
 |-------|-------|------------|

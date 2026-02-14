@@ -246,7 +246,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | Feature | Description |
 |---------|-------------|
 | **Phase angle selection** | Choose between model phases (203°/23°), Laplace-Lagrange eigenmodes, or custom angles |
-| **Fibonacci divisor dropdown** | Common Fibonacci/Lucas values (1–55) plus custom input |
+| **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
 | **755 presets** | Pre-computed configurations with ≥99.994% inclination balance |
 | **Dual balance display** | Inclination (Law 2) and eccentricity (Law 3) balance percentages |
