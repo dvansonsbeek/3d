@@ -175,7 +175,7 @@ Earth–Saturn is the only pair with opposite phase groups (203° vs 23°). The 
 
 ### Finding 2: Configuration Uniqueness
 
-Out of 755 valid configurations found by exhaustive search (all with inclination balance > 99.994%, the TNO margin — see [Exhaustive Search](#exhaustive-search-and-preset-generation)), **Config #27 is the only one with mirror-symmetric d-assignments.** Since Earth is locked at d=3, only Scenario A (Sa=3) can satisfy the Earth↔Saturn mirror symmetry. No other d-assignment produces both the required mirror pairing and the balance constraints.
+Out of 755 valid configurations found by exhaustive search (all with inclination balance > 99.994%, the TNO margin — see [Exhaustive Search](#exhaustive-search-and-preset-generation)), **Config #32 is the only one with mirror-symmetric d-assignments.** Since Earth is locked at d=3, only Scenario A (Sa=3) can satisfy the Earth↔Saturn mirror symmetry. No other d-assignment produces both the required mirror pairing and the balance constraints.
 
 The mirror symmetry, combined with the three laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -732,7 +732,7 @@ npx parcel build src/index.html --no-cache
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
-4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 3 uses `1/√d` scaling while Law 2 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #27 is the only one that is also mirror-symmetric.
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 3 uses `1/√d` scaling while Law 2 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #32 is the only one that is also mirror-symmetric.
 
 5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Finding 7), predicting all 8 eccentricities to 8.57% total error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance at 99.93% without imposing it (Finding 8). No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations.
 
@@ -742,7 +742,7 @@ The balance conditions (Laws 2 and 3) combine known conservation principles with
 
 Law 1 (Inclination Amplitude quantization) is the most genuinely novel claim — no existing theory predicts that `d × amplitude × √m` should be constant across all planets when `d` is a Fibonacci number.
 
-The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the triple-constraint uniqueness of Config #27 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the triple-constraint uniqueness of Config #32 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
 
 ---
 

@@ -133,7 +133,7 @@ const PSI = 2205 / (2 * holisticyearLength);
 
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
-// Config #27 — the unique mirror-symmetric configuration
+// Config #32 — the unique mirror-symmetric configuration
 const config = {
   mercury: { d: 21, phase: 203.3195 }, venus: { d: 34, phase: 203.3195 },
   earth: { d: 3, phase: 203.3195 }, mars: { d: 5, phase: 203.3195 },
@@ -382,7 +382,7 @@ for (const [inner, outer, level] of mirrorPairs) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  FINDING 2: Configuration Uniqueness (Config #27 only mirror-symmetric)  │');
+console.log('│  FINDING 2: Configuration Uniqueness (Config #32 only mirror-symmetric)  │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 const presetsPath = path.join(__dirname, '..', 'public', 'input', 'balance-presets.json');
@@ -426,7 +426,7 @@ if (presetData) {
 
   console.log(`Total valid configurations: ${presetData.presets.length}`);
   console.log(`Mirror-symmetric configs:   ${mirrorCount}`);
-  check('Config #27 found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
+  check('Config #32 found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
   check('Only 1 mirror config', mirrorCount === 1, `found ${mirrorCount}`);
 }
 

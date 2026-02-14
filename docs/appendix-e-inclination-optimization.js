@@ -40,7 +40,7 @@ const holisticyearLength = 333888;
 // Universal ψ-constant: ψ = F₅ × F₈² / (2H) = 2205 / 667776
 const PSI = 2205 / (2 * holisticyearLength);
 
-// Pure Fibonacci quantum numbers (d) — Config #27 (unique mirror-symmetric config)
+// Pure Fibonacci quantum numbers (d) — Config #32 (unique mirror-symmetric config)
 const FIBONACCI_D = {
   mercury: 21,    // F₈
   venus:   34,    // F₉
@@ -367,7 +367,7 @@ console.log('PHASE GROUPS (from invariable plane balance):');
 console.log('  203.3195° group: Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune');
 console.log('   23.3195° group: Saturn (sole retrograde)');
 console.log('');
-console.log('FIBONACCI DIVISORS (Config #27 — unique mirror-symmetric):');
+console.log('FIBONACCI DIVISORS (Config #32 — unique mirror-symmetric):');
 console.log('  Mercury=21(F₈) Venus=34(F₉) Earth=3(F₄) Mars=5(F₅)');
 console.log('  Jupiter=5(F₅)  Saturn=3(F₄) Uranus=21(F₈) Neptune=34(F₉)');
 console.log('');
