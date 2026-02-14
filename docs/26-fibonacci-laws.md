@@ -55,6 +55,8 @@ Derived from Fibonacci numbers and the Holistic Year:
 
 Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invariable plane at J2000, Ω J2000 = longitude of ascending node on the invariable plane at J2000 epoch (Souami & Souchay 2012, verified).
 
+**Note on Earth's eccentricity:** The J2000 value (0.0167) is used for the balance calculations (Laws 2 and 3), consistent with all other planets. Earth's mean eccentricity over the Holistic Year (0.0153, used in the 3D simulation) differs due to long-term oscillation. The impact on balance is negligible — Earth's eccentricity weight is tiny compared to the gas giants — but Findings 5 (mean table), 6, and 7 use the mean value for long-term structural relationships.
+
 ---
 
 ## The Three Laws
