@@ -202,16 +202,29 @@ e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 ### Finding 5: AMD Partition Ratios
 
-The AMD (Angular Momentum Deficit) partition ratio `n = e / i_rad` — where `i_rad` is the J2000 invariable plane inclination in radians — shows Fibonacci structure within mirror pairs. The pair sums of n² values are Fibonacci ratios:
+The AMD (Angular Momentum Deficit) partition ratio `R = e / i_rad` — where `i_rad` is the invariable plane inclination in radians — shows Fibonacci structure within mirror pairs. The pair sums of R² values are Fibonacci ratios.
 
-| Mirror pair | n²_A + n²_B | Fibonacci ratio | Error |
+Using J2000 inclinations:
+
+| Mirror pair | R²_A + R²_B | Fibonacci ratio | Error |
 |-------------|------------|-----------------|-------|
 | Mercury / Uranus | 10.856 | 55/5 = 11 | 1.33% |
 | Earth / Saturn | 11.432 | 34/3 = 11.33 | 0.86% |
 | Venus / Neptune | 0.480 | 1/2 = 0.5 | 4.08% |
 | Mars / Jupiter | 84.905 | 89 | 4.82% |
 
-This connects to AMD theory (Laskar 1997): `C_k ≈ Λ_k(e²/2 + i²/2)` for small e and i. The ratio `n² + 1 = (e² + i²) / i²` determines how each planet partitions its angular momentum deficit between eccentricity and inclination.
+Using mean inclinations (more stable than J2000 snapshot):
+
+| Mirror pair | R²_A + R²_B | Fibonacci ratio | Error |
+|-------------|------------|-----------------|-------|
+| Mercury / Uranus | 10.389 | 21/2 = 10.5 | 1.07% |
+| Earth / Saturn | 11.322 | 34/3 = 11.33 | 0.10% |
+| Venus / Neptune | 0.496 | 1/2 = 0.5 | 0.91% |
+| Mars / Jupiter | 75.020 | 377/5 = 75.4 | 0.51% |
+
+The pair sums alone provide one equation for two unknowns. Crucially, **pair products and ratios are also Fibonacci** (see Finding 7), providing a second equation that determines individual eccentricities.
+
+This connects to AMD theory (Laskar 1997): `C_k ≈ Λ_k(e²/2 + i²/2)` for small e and i. The ratio `R² + 1 = (e² + i²) / i²` determines how each planet partitions its angular momentum deficit between eccentricity and inclination.
 
 ### Finding 6: Inner Planet Eccentricity Ladder
 
@@ -222,6 +235,87 @@ The mass-weighted eccentricities of the four inner planets form a Fibonacci rati
 ```
 
 Where `ξ = e × √m`. Consecutive ratios are 5/2, 2, 8/5 — all converging toward the golden ratio φ ≈ 1.618.
+
+### Finding 7: Eccentricity Prediction from AMD Partition
+
+The AMD partition ratio `R = e / i_mean_rad` measures how each planet splits its angular momentum deficit between eccentricity and inclination. Within each mirror pair, R values satisfy **two** independent Fibonacci constraints — a sum constraint and a product or ratio constraint — providing two equations for two unknowns.
+
+**Fibonacci pair constraints (using mean inclinations):**
+
+| Mirror pair | Constraint 1 | Fibonacci | Constraint 2 | Fibonacci |
+|-------------|-------------|-----------|-------------|-----------|
+| Mercury / Uranus | R²_Me + R²_Ur | 21/2 = 10.5 | R_Me / R_Ur | 2/3 |
+| Venus / Neptune | R²_Ve + R²_Ne | 1/2 = 0.5 | R_Ve / R_Ne | 2/8 = 0.25 |
+| Earth / Saturn | R²_Ea + R²_Sa | 34/3 ≈ 11.33 | R_Ea × R_Sa | 2 |
+| Mars / Jupiter | R²_Ma + R²_Ju | 377/5 = 75.4 | R_Ma × R_Ju | 34/2 = 17 |
+
+Solving each pair (e.g. for Mercury/Uranus: R²_sum = 10.5 and R_Me/R_Ur = 2/3 → R_Ur = √(10.5 × 9/13), R_Me = (2/3) × R_Ur) gives predicted R values, and thus predicted eccentricities via `e_pred = R_pred × i_mean_rad`:
+
+| Planet | e predicted | e actual (JPL) | Error |
+|--------|------------|----------------|-------|
+| Mercury | 0.21106 | 0.20563 | +2.64% |
+| Venus | 0.00661 | 0.00678 | −2.50% |
+| Earth | 0.01562 | 0.01533 | +1.92% |
+| Mars | 0.09320 | 0.09340 | −0.21% |
+| Jupiter | 0.04852 | 0.04839 | +0.28% |
+| Saturn | 0.05386 | 0.05386 | −0.01% |
+| Uranus | 0.04709 | 0.04726 | −0.36% |
+| Neptune | 0.00865 | 0.00859 | +0.65% |
+
+**Total |error|: 8.57%. Eccentricity balance: 99.93%.**
+
+Mars/Jupiter achieves extraordinary precision (0.49% pair error), and Saturn is predicted to within 0.01%. The inner pairs (Mercury/Uranus, Venus/Neptune) show 2–3% errors per planet, which trace to the mathematical amplification of the smaller R value in each pair rather than any systematic inner/outer asymmetry.
+
+This finding partially resolves Open Question 1: while no universal closed-form eccentricity formula exists (exhaustive search shows any power-law ansatz requires per-planet numerators with >300% spread), all eight eccentricities are predicted from inclinations via Fibonacci pair constraints on the AMD partition ratio.
+
+### Finding 8: Three-Layer Fibonacci Hierarchy
+
+The Fibonacci structure forms a three-layer hierarchy, with each layer reducing the degrees of freedom:
+
+**Layer 1 — Fibonacci divisors determine inclinations (0 free parameters):**
+Law 1 (`amplitude = ψ / (d × √m)`) predicts all 8 inclination amplitudes from the divisor assignments alone. The divisors are uniquely determined by mirror symmetry + balance (Finding 2).
+
+**Layer 2 — Fibonacci pair constraints determine eccentricities (8 empirical parameters):**
+Finding 7 shows that 8 Fibonacci ratios (2 per mirror pair) predict all 8 eccentricities from the inclinations. These 8 constraint values are:
+
+| Mirror pair | C1: R²_sum | C2: product or ratio |
+|-------------|-----------|---------------------|
+| Mercury / Uranus (d=21) | 21/2 | R_Me/R_Ur = 2/3 |
+| Venus / Neptune (d=34) | 1/2 | R_Ve/R_Ne = 2/8 |
+| Earth / Saturn (d=3) | 34/3 | R_Ea×R_Sa = 2 |
+| Mars / Jupiter (d=5) | 377/5 | R_Ma×R_Ju = 34/2 |
+
+**Layer 3 — Partial structure within the 8 constraints (partially resolved):**
+The R²_sum values show internal Fibonacci structure, but in two distinct regimes:
+
+*Belt-adjacent pairs* (d=3, d=5) — R²_sum = F_k/d, where F_k is a single Fibonacci number:
+
+| Pair | R²_sum × d | Fibonacci | Error |
+|------|-----------|-----------|-------|
+| Earth / Saturn (d=3) | 33.97 | 34 (F₉) | 0.10% |
+| Mars / Jupiter (d=5) | 375.10 | 377 (F₁₄) | 0.49% |
+
+The Fibonacci indices in the numerators (9, 14) arise from cross-group index addition: 9 = idx(d=3) + idx(d=5) = 4+5, and 14 = idx(d=5) + idx(d=34) = 5+9.
+
+*Outer pairs* (d=21, d=34) — R²_sum = F_k/2, with denominator 2 instead of d:
+
+| Pair | R²_sum × 2 | Fibonacci | Error |
+|------|-----------|-----------|-------|
+| Venus / Neptune (d=34) | 0.991 | 1 (F₁) | 0.92% |
+| Mercury / Uranus (d=21) | 20.78 | 21 (F₈) | 1.07% |
+
+The R²_sum × d pattern breaks for d=21 (6.79% error vs F₁₃=233) because Mercury uniquely has a balanced R² split (29.5/70.5%) compared to ~5/95% for all other pairs. This pushes R²_sum × d into a gap between consecutive Fibonacci numbers where no close match exists.
+
+**Cross-pair relationships** are also Fibonacci:
+
+| Ratio | Value | Fibonacci | Error |
+|-------|-------|-----------|-------|
+| R²_sum(Me/Ur) / R²_sum(Ve/Ne) | 20.94 | 21 | 0.14% |
+| R²_sum(belt) / R²_sum(outer) | 7.933 | 8 | 0.84% |
+
+**Overconstrained system:** The 8 pair constraints plus Law 3 (eccentricity balance) provide 9 equations for 8 unknowns (the eccentricities). The system is overconstrained by one equation, explaining the 99.93% predicted balance — it is not imposed but follows from the Fibonacci constraints.
+
+**What remains open:** The 8 Fibonacci constraint values cannot yet be derived from a single formula. The belt-adjacent and outer pairs follow different structural rules, and the second constraints (products/ratios) show no clear derivation pattern. Whether a unifying principle exists, or whether the two regimes reflect genuinely different physics (proximity to the asteroid belt vs. outer solar system dynamics), is unresolved.
 
 ---
 
@@ -531,6 +625,16 @@ Compute Saturn's eccentricity from the eccentricity balance equation and verify 
 
 At J2000 epoch, `i(2000) = mean + amplitude × cos(Ω_J2000 - φ_group)` should match observed invariable plane inclinations.
 
+### Test 7: Eccentricity Prediction from AMD Partition
+
+Solve the Fibonacci pair constraints (Finding 7) for all 4 mirror pairs and verify:
+- Total |error| across all 8 predicted eccentricities < 10%
+- Eccentricity balance with predicted values > 99.5%
+
+### Test 8: Overconstrained System Consistency
+
+Verify that the 8 pair constraints (Finding 7) plus Law 3 form an overconstrained system (9 equations, 8 unknowns) by confirming that the eccentricity balance is not imposed but emerges from the pair constraints alone, with predicted balance > 99.5%.
+
 ---
 
 ## Exhaustive Search and Preset Generation
@@ -600,7 +704,7 @@ npx parcel build src/index.html --no-cache
 
 ## Open Questions
 
-1. **Eccentricity formula** — The inclination amplitudes follow `amplitude = ψ / (d × √m)` with a universal ψ-constant. Is there an analogous direct formula for eccentricities, e.g. `e = ψ_e × F / (d² × √m)` where F is a planet-specific Fibonacci number? The n² pair sum finding (Finding 5) suggests such a formula may exist but it has not been found in closed form.
+1. **Eccentricity formula** — *Partially resolved.* No universal closed-form formula `e = f(d, m, a)` exists — exhaustive search shows that any power-law ansatz requires per-planet Fibonacci numerators F_e with >300% spread across planets. However, eccentricities **are** predicted from inclinations via Fibonacci pair constraints on the AMD partition ratio R = e / i_mean_rad (Finding 7). The R²_sum values show partial internal structure — belt-adjacent pairs follow R²_sum = F_k/d while outer pairs follow R²_sum = F_k/2 — but no single formula unifies both regimes (Finding 8). The second constraints (products/ratios) remain empirical.
 
 2. **Physical derivation of eccentricity balance** — The inclination balance follows from angular momentum conservation. What conservation law or secular perturbation mechanism produces the eccentricity balance? The linear (rather than quadratic) dependence on e distinguishes it from AMD conservation.
 
@@ -628,6 +732,8 @@ npx parcel build src/index.html --no-cache
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 3 uses `1/√d` scaling while Law 2 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #27 is the only one that is also mirror-symmetric.
 
+5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Finding 7), predicting all 8 eccentricities to 8.57% total error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance at 99.93% without imposing it (Finding 8). No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations.
+
 ### Assessment
 
 The balance conditions (Laws 2 and 3) combine known conservation principles with a novel Fibonacci structure that modulates the planetary weights. The conservation laws guarantee that inclination and eccentricity oscillations balance around the invariable plane — but they do not predict that integer Fibonacci divisors should preserve that balance to such high precision.
@@ -648,7 +754,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Appendix E - Inclination Optimization](appendix-e-inclination-optimization.js) | Optimization script |
 | [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive Fibonacci divisor search |
-| [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all three laws, six findings, and predictions |
+| [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all three laws, eight findings, and predictions |
 
 ---
 
