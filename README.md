@@ -189,6 +189,7 @@ orbitContainer → holds full orbit structure
 - Zodiac glow toggle
 - Time controls (play, pause, speed)
 - Export functionality for solstice dates and object positions
+- [Invariable Plane Balance Explorer](docs/27-balance-explorer-reference.md) for interactive Fibonacci Law testing
 
 ---
 

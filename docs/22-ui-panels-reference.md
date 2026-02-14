@@ -13,6 +13,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Planet Hierarchy Inspector** | Inspect the 5-step hierarchy chain for each planet |
 | **Invariable Plane Positions** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
+| **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
 
 ---
 
@@ -228,6 +229,43 @@ o.balanceMaxSeen = 0;                // Maximum observed
 
 ---
 
+## Invariable Plane Balance Explorer
+
+### Purpose
+
+An interactive modal for testing different planetary group assignments and Fibonacci divisors for the Fibonacci Laws of Planetary Motion. Users can experiment with alternative configurations and see instant feedback on inclination balance (Law 2), eccentricity balance (Law 3), Laplace-Lagrange bounds, and ecliptic trend matching.
+
+### Accessing the Explorer
+
+1. Open the dat.GUI Settings menu
+2. Expand "Invariable Plane Positions"
+3. Click "Invariable Plane Balance Explorer"
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Phase angle selection** | Choose between model phases (203°/23°), Laplace-Lagrange eigenmodes, or custom angles |
+| **Fibonacci divisor dropdown** | Common Fibonacci/Lucas values (1–55) plus custom input |
+| **Editable precession periods** | Modify ascending node precession rates |
+| **755 presets** | Pre-computed configurations with ≥99.994% inclination balance |
+| **Dual balance display** | Inclination (Law 2) and eccentricity (Law 3) balance percentages |
+| **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
+| **Earth locked** | Earth's parameters (d=3, 203°) are derived from the temperature model and cannot be changed |
+
+### Default Configuration Result
+
+- Inclination balance: **99.9998%**
+- Eccentricity balance: **99.88%**
+- LL bounds: **8/8 pass**
+- Trend directions: **7/7 match**
+
+### Full Reference
+
+See [27 - Balance Explorer Reference](27-balance-explorer-reference.md) for complete documentation including calculation details, all controls, and interpretation guide.
+
+---
+
 ## Validation: Angular Momentum Calculation
 
 ### Purpose
@@ -272,6 +310,7 @@ This 99.994% accuracy validates that our orbital elements are consistent with pu
 | Document | Purpose |
 |----------|---------|
 | [21 - Planet Inspector Reference](21-planet-inspector-reference.md) | Planet inspector calculations |
+| [27 - Balance Explorer Reference](27-balance-explorer-reference.md) | Balance explorer calculations and controls |
 | [16 - Invariable Plane Calculations](16-invariable-plane-calculations.md) | Height calculation formulas |
 | [10 - Constants Reference](10-constants-reference.md) | Planet masses and orbital elements |
 

@@ -61,6 +61,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [22 - UI Panels Reference](22-ui-panels-reference.md) | UI panel implementations |
 | [23 - Data Export Reference](23-data-export-reference.md) | Report generation and data export systems |
 | [24 - Analysis & Export Tools](24-analysis-export-tools.md) | Analysis tools and export functionality in the Settings panel |
+| [27 - Balance Explorer Reference](27-balance-explorer-reference.md) | Invariable Plane Balance Explorer - interactive Fibonacci Law testing |
 
 ### Appendices - Verification & Optimization Scripts
 
