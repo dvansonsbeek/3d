@@ -9997,6 +9997,32 @@ function fbePresetLabel(row, index) {
   return `#${index+1} ${row[1].toFixed(4)}% ${parts.join(' ')} [${row[0]}]`;
 }
 
+// Find which preset number matches the default BALANCE_CONFIG settings
+function fbeMatchDefaultPreset() {
+  const SCENARIOS = { '5,3': 'A', '8,5': 'B', '13,8': 'C', '21,13': 'D' };
+  const scenario = SCENARIOS[BALANCE_CONFIG.jupiter.defaultD + ',' + BALANCE_CONFIG.saturn.defaultD];
+  if (!scenario) return null;
+  const phaseIdx = (ph) => Math.abs(ph - 203.3195) < 1 ? 0 : 1;
+  const defaults = [
+    scenario, 0,
+    BALANCE_CONFIG.mercury.defaultD, phaseIdx(BALANCE_CONFIG.mercury.defaultPhaseAngle),
+    BALANCE_CONFIG.venus.defaultD,   phaseIdx(BALANCE_CONFIG.venus.defaultPhaseAngle),
+    BALANCE_CONFIG.mars.defaultD,    phaseIdx(BALANCE_CONFIG.mars.defaultPhaseAngle),
+    BALANCE_CONFIG.jupiter.defaultD, phaseIdx(BALANCE_CONFIG.jupiter.defaultPhaseAngle),
+    BALANCE_CONFIG.saturn.defaultD,  phaseIdx(BALANCE_CONFIG.saturn.defaultPhaseAngle),
+    BALANCE_CONFIG.uranus.defaultD,  phaseIdx(BALANCE_CONFIG.uranus.defaultPhaseAngle),
+    BALANCE_CONFIG.neptune.defaultD, phaseIdx(BALANCE_CONFIG.neptune.defaultPhaseAngle),
+  ];
+  for (let i = 0; i < BALANCE_PRESETS.length; i++) {
+    const row = BALANCE_PRESETS[i];
+    if (row[0] !== defaults[0]) continue;
+    let match = true;
+    for (let j = 2; j < 16; j++) { if (row[j] !== defaults[j]) { match = false; break; } }
+    if (match) return i + 1;
+  }
+  return null;
+}
+
 // d-value dropdown options: common Fibonacci values
 const D_VALUE_OPTIONS = [
   { value: 1,        label: '1 (F₁)' },
@@ -10303,11 +10329,13 @@ function createBalanceExplorerPanel() {
   }
   balanceExplorerState = state;
 
+  const defaultConfigNum = fbeMatchDefaultPreset();
+
   panel.innerHTML = `
     <div class="fbe-overlay"></div>
     <div class="fbe-dialog">
       <div class="fbe-header">
-        <h2>Invariable Plane Balance Explorer</h2>
+        <h2>Invariable Plane Balance Explorer${defaultConfigNum ? ' <span style="color: #4CAF50" title="The most likely configuration of our solar system is shown by default. It is configuration #' + defaultConfigNum + ' in the list of presets.">#' + defaultConfigNum + '</span>' : ''}</h2>
         <div class="fbe-header-right">
           <select class="fbe-preset-select">
             <option value="">${BALANCE_PRESETS.length} Presets (\u2265 99.994%)...</option>
