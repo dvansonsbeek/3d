@@ -245,6 +245,109 @@ This is Config #27 out of 755 valid configurations — the only one with mirror-
 
 ---
 
+## Input Variables
+
+Each calculation in the Balance Explorer uses a mix of **fixed constants** (from JPL DE440 / model calibration, not editable) and **user-adjustable parameters** (controlled via the UI). The table below shows which variables feed into which calculation.
+
+### Fixed Constants (per planet)
+
+These are read from the model's orbital element constants and cannot be changed in the explorer:
+
+| Variable | Symbol | Description | Source |
+|----------|--------|-------------|--------|
+| Mass | m | Planet mass in solar units (M_planet / M_sun) | JPL DE440 mass ratios |
+| Semi-major axis | a | Orbital semi-major axis in AU | JPL orbital elements |
+| Eccentricity | e | Orbital eccentricity at J2000 epoch | JPL J2000 orbital elements |
+| J2000 inclination | i_J2000 | Inclination to invariable plane at J2000 | Souami & Souchay (2012) |
+| Ascending node | Ω_J2000 | Longitude of ascending node on invariable plane at J2000 | Souami & Souchay (2012), verified |
+| JPL trend | trend_JPL | Observed ecliptic inclination trend (°/century) | JPL ephemerides |
+| LL bounds | LL_min, LL_max | Laplace-Lagrange secular theory inclination bounds | Secular perturbation theory |
+| Holistic Year | H | 333,888 years — used to derive ψ | Model calibration |
+
+### User-Adjustable Parameters (per planet)
+
+These can be changed via the UI controls (except for Earth, which is locked):
+
+| Variable | Symbol | Description | Default |
+|----------|--------|-------------|---------|
+| Fibonacci divisor | d | Fibonacci number dividing the amplitude | See [Default Configuration](#default-configuration) |
+| Phase angle | γ | Oscillation phase group angle | 203.3195° or 23.3195° |
+| Precession period | T | Ascending node precession period in years | From model constants |
+
+### Variables Used Per Calculation
+
+#### Inclination Amplitude (Law 1)
+
+Determines each planet's oscillation amplitude around its mean inclination.
+
+| Variable | Type | Role |
+|----------|------|------|
+| ψ = 2205/(2×H) | Fixed | Universal coupling constant |
+| d | **User-adjustable** | Fibonacci divisor |
+| m | Fixed | Planet mass (via √m) |
+
+#### Mean and Range
+
+Derives the center and bounds of inclination oscillation from the amplitude.
+
+| Variable | Type | Role |
+|----------|------|------|
+| amplitude | Computed | From Law 1 above |
+| i_J2000 | Fixed | J2000 inclination snapshot |
+| Ω_J2000 | Fixed | Ascending node at J2000 |
+| γ | **User-adjustable** | Phase angle (determines cos_phase) |
+
+#### Inclination Balance (Law 2)
+
+Tests whether the structural weights cancel between the two phase groups.
+
+| Variable | Type | Role |
+|----------|------|------|
+| m | Fixed | Planet mass (via √m) |
+| a | Fixed | Semi-major axis |
+| e | Fixed | Eccentricity (via 1−e²) |
+| d | **User-adjustable** | Fibonacci divisor (denominator) |
+| γ | **User-adjustable** | Phase angle (determines group membership: >180° → 203° group, ≤180° → 23° group) |
+
+#### Eccentricity Balance (Law 3)
+
+Tests whether the eccentricity weights cancel between the two phase groups.
+
+| Variable | Type | Role |
+|----------|------|------|
+| m | Fixed | Planet mass (via √m) |
+| a | Fixed | Semi-major axis (via a^(3/2)) |
+| e | Fixed | Eccentricity (direct multiplier) |
+| d | **User-adjustable** | Fibonacci divisor (via √d) |
+| γ | **User-adjustable** | Phase angle (determines group membership) |
+
+Note: Law 3 uses **different powers** of the same variables compared to Law 2 — `a^(3/2)` instead of `a^(1/2)`, `e` directly instead of `(1−e²)`, and `1/√d` instead of `1/d`. This is why the two balance conditions are independent.
+
+#### Laplace-Lagrange Bounds Check
+
+Verifies the oscillation range fits within secular theory predictions.
+
+| Variable | Type | Role |
+|----------|------|------|
+| mean | Computed | From Mean calculation above |
+| amplitude | Computed | From Law 1 above |
+| LL_min, LL_max | Fixed | Secular theory bounds per planet |
+
+#### Ecliptic Trend
+
+Computes the apparent change in ecliptic inclination over 1900–2100 by comparing orbital pole normal vectors.
+
+| Variable | Type | Role |
+|----------|------|------|
+| mean | Computed | From Mean calculation above |
+| amplitude | Computed | From Law 1 above |
+| Ω_J2000 | Fixed | Planet ascending node at J2000 |
+| γ | **User-adjustable** | Phase angle |
+| T | **User-adjustable** | Precession period (determines Ω drift rate) |
+| Earth constants | Fixed | Earth's mean, amplitude, Ω, and period (H/3) for the reference frame |
+
+---
+
 ## Calculation Details
 
 ### Inclination Amplitude (Law 1)

@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // APPENDIX L: Comprehensive Verification of the Fibonacci Laws
 //
-// Verifies all three laws and six findings from docs/26-fibonacci-laws.md
+// Verifies all three laws and eight findings from docs/26-fibonacci-laws.md
 // Uses the EXACT computation chain from appendix-k-balance-search.js
 //
 // Usage: node docs/appendix-l-verify-laws.js
@@ -66,10 +66,17 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
   (1 - moonAtApogee / meanAUDistance);
 mass.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
-// Eccentricities (JPL J2000)
+// Eccentricities (JPL J2000) — used for Laws 2/3 balance calculations
 const ecc = {
-  mercury: 0.20563593, venus: 0.00677672, earth: 0.015321, mars: 0.09339410,
+  mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
   jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
+};
+
+// Mean eccentricities — used for Findings 6, 7 (long-term structural relationships)
+// For Earth, the mean eccentricity (model parameter eccentricityBase) differs from J2000
+const eccMean = {
+  ...ecc,
+  earth: 0.015321,  // Model mean eccentricity (eccentricityBase)
 };
 
 // Invariable plane inclinations J2000
@@ -193,7 +200,7 @@ function check(name, condition, detail) {
 
 console.log('╔═══════════════════════════════════════════════════════════════════════════╗');
 console.log('║  APPENDIX L: Comprehensive Verification of the Fibonacci Laws           ║');
-console.log('║  Three Laws + Six Findings + Predictions                                ║');
+console.log('║  Three Laws + Eight Findings + Predictions                              ║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
 console.log(`║  ψ = ${PSI.toExponential(6)}  (= 2205 / ${2 * holisticyearLength})`.padEnd(76) + '║');
 console.log(`║  H = ${holisticyearLength}`.padEnd(76) + '║');
@@ -556,12 +563,12 @@ console.log('\n┌────────────────────�
 console.log('│  FINDING 6: Inner Planet Eccentricity Ladder                             │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
-console.log('ξ = e × √m (mass-weighted eccentricity)\n');
+console.log('ξ = e × √m (mass-weighted eccentricity, using mean eccentricities)\n');
 
 const innerPlanets = ['venus', 'earth', 'mars', 'mercury'];
 const xi = {};
 for (const key of innerPlanets) {
-  xi[key] = ecc[key] * Math.sqrt(mass[key]);
+  xi[key] = eccMean[key] * Math.sqrt(mass[key]);
 }
 
 // Normalize to Venus
@@ -570,14 +577,14 @@ for (const key of innerPlanets) {
   xiNorm[key] = xi[key] / xi.venus;
 }
 
-console.log('Planet       e           √m              ξ = e√m         ξ/ξ_Venus   Fib prediction');
-console.log('─'.repeat(90));
+console.log('Planet       e (mean)    √m              ξ = e√m         ξ/ξ_Venus   Fib prediction');
+console.log('─'.repeat(95));
 
 const fibPredicted = { venus: 1, earth: 5/2, mars: 5, mercury: 8 };
 for (const key of innerPlanets) {
   const err = (xiNorm[key] - fibPredicted[key]) / fibPredicted[key] * 100;
   console.log(
-    `${key.padEnd(12)} ${ecc[key].toFixed(8)}  ${Math.sqrt(mass[key]).toExponential(4).padStart(12)}  ${xi[key].toExponential(6).padStart(14)}  ${xiNorm[key].toFixed(4).padStart(10)}   ${fibPredicted[key].toFixed(1).padStart(5)} (${err >= 0 ? '+' : ''}${err.toFixed(1)}%)`
+    `${key.padEnd(12)} ${eccMean[key].toFixed(8)}  ${Math.sqrt(mass[key]).toExponential(4).padStart(12)}  ${xi[key].toExponential(6).padStart(14)}  ${xiNorm[key].toFixed(4).padStart(10)}   ${fibPredicted[key].toFixed(1).padStart(5)} (${err >= 0 ? '+' : ''}${err.toFixed(1)}%)`
   );
 }
 
@@ -653,10 +660,17 @@ console.log('└─────────────────────�
 
 // For each mirror pair, use the best Fibonacci S (n² sum) and R (n² ratio)
 // to predict both eccentricities. Saturn gets an independent prediction from balance.
+// Uses MEAN eccentricities and inclinations for long-term structural relationships.
+const nValuesMean = {};
+for (const key of planets) {
+  const iRad = means[key] * DEG2RAD;
+  nValuesMean[key] = eccMean[key] / iRad;
+}
+
 const pairSR = {};
 for (const [a, b] of pairDefs) {
-  const n2a = nValues[a] * nValues[a];
-  const n2b = nValues[b] * nValues[b];
+  const n2a = nValuesMean[a] * nValuesMean[a];
+  const n2b = nValuesMean[b] * nValuesMean[b];
   const n2sum = n2a + n2b;
   const n2ratio = n2a / n2b;
   const bestS = findBestFibRatio(n2sum);
@@ -668,8 +682,8 @@ const eccPredicted = {};
 for (const [a, b] of pairDefs) {
   const key = `${a}/${b}`;
   const { S, R } = pairSR[key];
-  const iA = inclJ2000[a] * DEG2RAD;
-  const iB = inclJ2000[b] * DEG2RAD;
+  const iA = means[a] * DEG2RAD;
+  const iB = means[b] * DEG2RAD;
   const n2b = S / (R + 1);
   const n2a = S * R / (R + 1);
   eccPredicted[a] = Math.sqrt(n2a) * iA;
@@ -686,13 +700,13 @@ for (const key of planets) {
 const satCoeff2 = Math.sqrt(mass.saturn) * Math.pow(orbitDistance.saturn, 1.5) / Math.sqrt(config.saturn.d);
 const satFromBalance = balSum / satCoeff2;
 
-console.log('Planet       S (n²sum)    R (n²ratio)   e_predicted   e_actual      Error');
-console.log('─'.repeat(90));
+console.log('Planet       S (n²sum)    R (n²ratio)   e_predicted   e_actual (mean)  Error');
+console.log('─'.repeat(95));
 
 let rmsErr = 0;
 for (const key of planets) {
   const ePred = (key === 'saturn') ? satFromBalance : eccPredicted[key];
-  const err = (ePred - ecc[key]) / ecc[key] * 100;
+  const err = (ePred - eccMean[key]) / eccMean[key] * 100;
   rmsErr += err * err;
 
   // Find which pair this planet belongs to
@@ -704,7 +718,7 @@ for (const key of planets) {
   const source = (key === 'saturn') ? 'balance' : `S=${sr.Sstr}, R=${sr.Rstr}`;
 
   console.log(
-    `${key.padEnd(12)} ${source.padEnd(24)} ${ePred.toFixed(8).padStart(12)}  ${ecc[key].toFixed(8)}  ${err >= 0 ? '+' : ''}${err.toFixed(3)}%`
+    `${key.padEnd(12)} ${source.padEnd(24)} ${ePred.toFixed(8).padStart(12)}  ${eccMean[key].toFixed(8)}  ${err >= 0 ? '+' : ''}${err.toFixed(3)}%`
   );
 }
 rmsErr = Math.sqrt(rmsErr / 8);

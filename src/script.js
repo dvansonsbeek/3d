@@ -9378,7 +9378,7 @@ const BALANCE_CONFIG = {
     name: 'Earth',
     mass: M_EARTH / M_SUN,
     sma: 1.0,
-    ecc: eccentricityBase,
+    ecc: 0.01671,              // JPL J2000 eccentricity (consistent with other planets)
     defaultD: 3,
     inclJ2000: earthInvPlaneInclJ2000,
     omegaJ2000: earthAscendingNodeInvPlaneVerified,

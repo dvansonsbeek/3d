@@ -72,7 +72,7 @@ mass.earth = M_EARTH / M_SUN;
 
 // Eccentricities (JPL J2000 — same in code and script)
 const ecc = {
-  mercury: 0.20563593, venus: 0.00677672, earth: 0.015321, mars: 0.09339410,
+  mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
   jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
 };
 
