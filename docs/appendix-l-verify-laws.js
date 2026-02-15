@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // APPENDIX L: Comprehensive Verification of the Fibonacci Laws
 //
-// Verifies all three laws and eight findings from docs/26-fibonacci-laws.md
+// Verifies all six laws and five findings from docs/26-fibonacci-laws.md
 // Uses the EXACT computation chain from appendix-k-balance-search.js
 //
 // Usage: node docs/appendix-l-verify-laws.js
@@ -66,7 +66,7 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
   (1 - moonAtApogee / meanAUDistance);
 mass.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
-// Eccentricities (JPL J2000) — used for Laws 2/3 balance calculations
+// Eccentricities (JPL J2000) — used for Laws 3/5 balance calculations
 const ecc = {
   mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
   jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
@@ -631,7 +631,7 @@ check('e^1.0 balance > e^0.9 and e^1.1', true, 'peak at linear e confirmed above
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  PREDICTIONS: Inclination Amplitudes (from Law 1)                        │');
+console.log('│  PREDICTIONS: Inclination Amplitudes (from Law 2)                        │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 console.log('Planet       d    Predicted amp (°)  Mean (°)    Range (°)          LL bounds (°)        Margin (°)');
@@ -757,9 +757,9 @@ console.log('╠═════════════════════�
 console.log(`║  Checks passed: ${String(passCount).padStart(3)} / ${String(passCount + failCount).padStart(3)}`.padEnd(76) + '║');
 console.log(`║  Checks failed: ${String(failCount).padStart(3)} / ${String(passCount + failCount).padStart(3)}`.padEnd(76) + '║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log(`║  Law 1 — Inclination amplitude: d×amp×√m = ψ for all 8 planets`.padEnd(76) + '║');
-console.log(`║  Law 2 — Inclination balance:   ${inclBalance.toFixed(4)}%`.padEnd(76) + '║');
-console.log(`║  Law 3 — Eccentricity balance:  ${eccBalance.toFixed(4)}%`.padEnd(76) + '║');
+console.log(`║  Law 2 — Inclination amplitude: d×amp×√m = ψ for all 8 planets`.padEnd(76) + '║');
+console.log(`║  Law 3 — Inclination balance:   ${inclBalance.toFixed(4)}%`.padEnd(76) + '║');
+console.log(`║  Law 5 — Eccentricity balance:  ${eccBalance.toFixed(4)}%`.padEnd(76) + '║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
 console.log(`║  Saturn e predicted:  ${satPredicted.toFixed(8)} (actual: ${ecc.saturn.toFixed(8)}, err: ${satError.toFixed(3)}%)`.padEnd(76) + '║');
 console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(2)}% (8-planet pair + balance prediction)`.padEnd(76) + '║');

@@ -233,7 +233,7 @@ o.balanceMaxSeen = 0;                // Maximum observed
 
 ### Purpose
 
-An interactive modal for testing different planetary group assignments and Fibonacci divisors for the Fibonacci Laws of Planetary Motion. Users can experiment with alternative configurations and see instant feedback on inclination balance (Law 2), eccentricity balance (Law 3), Laplace-Lagrange bounds, and ecliptic trend matching.
+An interactive modal for testing different planetary group assignments and Fibonacci divisors for the Fibonacci Laws of Planetary Motion. Users can experiment with alternative configurations and see instant feedback on inclination balance (Law 3), eccentricity balance (Law 5), Laplace-Lagrange bounds, and ecliptic trend matching.
 
 ### Accessing the Explorer
 
@@ -249,7 +249,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
 | **755 presets** | Pre-computed configurations with ≥99.994% inclination balance |
-| **Dual balance display** | Inclination (Law 2) and eccentricity (Law 3) balance percentages |
+| **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
 | **Earth locked** | Earth's parameters (d=3, 203°) are derived from the temperature model and cannot be changed |
 

@@ -10230,7 +10230,7 @@ function computeBalanceResults(state) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, dxixsqrtm, trend, trendError, directionMatch };
   }
 
-  // Inclination balance (Law 2): w = √(m·a(1-e²)) / d — group sums
+  // Inclination balance (Law 3): w = √(m·a(1-e²)) / d — group sums
   let inclSum203 = 0, inclSum23 = 0;
   let balanceCos = 0, balanceSin = 0, totalLamp = 0;
   for (const key of BALANCE_PLANETS) {
@@ -10250,7 +10250,7 @@ function computeBalanceResults(state) {
   const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
   const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
 
-  // Eccentricity balance (Law 3): v = √m × a^(3/2) × e / √d
+  // Eccentricity balance (Law 5): v = √m × a^(3/2) × e / √d
   let eccSum203 = 0, eccSum23 = 0;
   for (const key of BALANCE_PLANETS) {
     const cfg = BALANCE_CONFIG[key];
@@ -10391,12 +10391,12 @@ function createBalanceExplorerPanel() {
           <div class="fbe-section-title">Balance Results</div>
           <div class="fbe-ratio-row">
             <div class="fbe-ratio-display fbe-ratio-incl">
-              <div class="fbe-ratio-label">Inclination Balance (Law 2)</div>
+              <div class="fbe-ratio-label">Inclination Balance (Law 3)</div>
               <div class="fbe-ratio-value"></div>
               <div class="fbe-ratio-formula">w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d</div>
             </div>
             <div class="fbe-ratio-display fbe-ratio-ecc">
-              <div class="fbe-ratio-label">Eccentricity Balance (Law 3)</div>
+              <div class="fbe-ratio-label">Eccentricity Balance (Law 5)</div>
               <div class="fbe-ratio-ecc-value"></div>
               <div class="fbe-ratio-formula">v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad</div>
             </div>
@@ -10431,8 +10431,8 @@ function createBalanceExplorerPanel() {
           <div class="fbe-balance-line fbe-balance-ecc-line"></div>
           <div class="fbe-status"></div>
           <div class="fbe-psi-line"></div>
-          <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 2): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two phase groups must cancel: \u03A3(203\u00B0) w = \u03A3(23\u00B0) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
-          <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 3): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two phase groups balance: \u03A3(203\u00B0) v = \u03A3(23\u00B0) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
+          <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 3): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two phase groups must cancel: \u03A3(203\u00B0) w = \u03A3(23\u00B0) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
+          <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 5): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two phase groups balance: \u03A3(203\u00B0) v = \u03A3(23\u00B0) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
         </div>
       </div>

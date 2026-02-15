@@ -70,13 +70,16 @@ npm run build
 
 ### Fibonacci Laws of Planetary Motion
 
-The model implements three Fibonacci Laws connecting planetary orbital parameters through pure Fibonacci numbers:
+The model implements six Fibonacci Laws connecting planetary orbital parameters through pure Fibonacci numbers:
 
-1. **Law 1 — Inclination Amplitude**: Each planet's inclination amplitude satisfies `d × amplitude × √mass = ψ`, where `d` is a pure Fibonacci number and `ψ = 2205/(2×333888)` is a universal constant. Config #27 (the unique mirror-symmetric configuration) assigns d = 21, 34, 3, 5, 5, 3, 21, 34 to Mercury through Neptune.
-2. **Law 2 — Inclination Balance**: The structural weights `w = √(m·a(1-e²)) / d` of the two phase groups (203° and 23°) balance to **99.9998%**, grounding the theory in conservation of angular momentum. Saturn is the sole retrograde (23°) planet.
-3. **Law 3 — Eccentricity Balance**: The eccentricity weights `v = √m × a^(3/2) × e / √d` balance to **99.88%** between the same two phase groups — an independent constraint using different powers of mass, distance, and d.
+1. **Law 1 — Fibonacci Cycle Hierarchy**: The Holistic Year H = 333,888 years divided by Fibonacci numbers F(n) produces all major precession periods (H/3 = inclination cycle, H/13 = axial precession, H/16 = perihelion precession), with beat-frequency relationships between them.
+2. **Law 2 — The Inclination Constant**: Each planet's inclination amplitude satisfies `d × amplitude × √mass = ψ`, where `d` is a pure Fibonacci number and `ψ = 2205/(2×333888)` is a universal constant. Config #32 (the unique mirror-symmetric configuration) assigns d = 21, 34, 3, 5, 5, 3, 21, 34 to Mercury through Neptune.
+3. **Law 3 — The Inclination Balance**: The structural weights `w = √(m·a(1-e²)) / d` of the two phase groups (203° and 23°) balance to **99.9998%**, grounding the theory in conservation of angular momentum. Saturn is the sole retrograde (23°) planet.
+4. **Law 4 — The Eccentricity Constant**: The AMD (Angular Momentum Deficit) partition ratio `R² = AMD_planet / AMD_total` for each planet equals a ratio of Fibonacci numbers, linking eccentricity to the same d-assignments.
+5. **Law 5 — The Eccentricity Balance**: The eccentricity weights `v = √m × a^(3/2) × e / √d` balance to **99.88%** between the same two phase groups — an independent constraint using different powers of mass, distance, and d.
+6. **Law 6 — Saturn-Jupiter-Earth Resonance**: Saturn's inclination precession, Jupiter's inclination precession, and Earth's axial precession form a closed beat-frequency loop, connecting inner and outer solar system dynamics.
 
-The mirror-symmetric d-assignments (Mercury↔Uranus=21, Venus↔Neptune=34, Earth↔Saturn=3, Mars↔Jupiter=5) uniquely identify Config #27 as the only valid configuration out of 755 candidates. See [Fibonacci Laws documentation](docs/26-fibonacci-laws.md) for the full derivation, [Appendix L](docs/appendix-l-verify-laws.js) for comprehensive verification (49/49 checks pass).
+The mirror-symmetric d-assignments (Mercury↔Uranus=21, Venus↔Neptune=34, Earth↔Saturn=3, Mars↔Jupiter=5) uniquely identify Config #32 as the only valid configuration out of 755 candidates. See [Fibonacci Laws documentation](docs/26-fibonacci-laws.md) for the full derivation, [Appendix L](docs/appendix-l-verify-laws.js) for comprehensive verification (49/49 checks pass).
 
 ### Additional explanation
 

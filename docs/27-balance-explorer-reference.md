@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Invariable Plane Balance Explorer is an interactive modal for testing planetary group assignments and Fibonacci divisors for the [Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md). It provides instant visual feedback on whether a given configuration satisfies the inclination balance (Law 2), eccentricity balance (Law 3), and fits within Laplace-Lagrange secular theory bounds.
+The Invariable Plane Balance Explorer is an interactive modal for testing planetary group assignments and Fibonacci divisors for the [Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md). It provides instant visual feedback on whether a given configuration satisfies the inclination balance (Law 3), eccentricity balance (Law 5), and fits within Laplace-Lagrange secular theory bounds.
 
-The explorer allows users to experiment with alternative configurations to understand why certain planetary assignments are uniquely constrained — for example, why the mirror-symmetric d-assignments are the only solution satisfying all three laws simultaneously.
+The explorer allows users to experiment with alternative configurations to understand why certain planetary assignments are uniquely constrained — for example, why the mirror-symmetric d-assignments are the only solution satisfying all six laws simultaneously.
 
 **Related Documentation:**
-- [Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md) — the three laws and their derivations
+- [Fibonacci Laws of Planetary Motion](26-fibonacci-laws.md) — the six laws and their derivations
 - [UI Panels Reference](22-ui-panels-reference.md) — overview of all UI panels
 - [Invariable Plane Calculations](16-invariable-plane-calculations.md) — height calculation formulas
 
@@ -47,8 +47,8 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │                                                                  │
 │  BALANCE RESULTS                                                 │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │ Inclination (Law 2): w = √(m·a(1-e²))/d    99.9998%        │  │
-│  │ Eccentricity (Law 3): v = √m·a^(3/2)·e/√d  99.88%          │  │
+│  │ Inclination (Law 3): w = √(m·a(1-e²))/d    99.9998%        │  │
+│  │ Eccentricity (Law 5): v = √m·a^(3/2)·e/√d  99.88%          │  │
 │  └────────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  PER-PLANET RESULTS                                              │
@@ -141,13 +141,13 @@ Every control change triggers immediate recalculation — no "Calculate" button 
 
 Two summary lines show the balance percentage for each law:
 
-**Inclination Balance (Law 2):**
+**Inclination Balance (Law 3):**
 ```
 w = √(m · a(1-e²)) / d
 ```
 The structural weights of the 203° group must equal those of the 23° group. Displayed as a percentage (100% = perfect balance). Turns red if below 90%.
 
-**Eccentricity Balance (Law 3):**
+**Eccentricity Balance (Law 5):**
 ```
 v = √m × a^(3/2) × e / √d
 ```
@@ -276,7 +276,7 @@ These can be changed via the UI controls (except for Earth, which is locked):
 
 ### Variables Used Per Calculation
 
-#### Inclination Amplitude (Law 1)
+#### Inclination Amplitude (Law 2)
 
 Determines each planet's oscillation amplitude around its mean inclination.
 
@@ -292,12 +292,12 @@ Derives the center and bounds of inclination oscillation from the amplitude.
 
 | Variable | Type | Role |
 |----------|------|------|
-| amplitude | Computed | From Law 1 above |
+| amplitude | Computed | From Law 2 above |
 | i_J2000 | Fixed | J2000 inclination snapshot |
 | Ω_J2000 | Fixed | Ascending node at J2000 |
 | γ | **User-adjustable** | Phase angle (determines cos_phase) |
 
-#### Inclination Balance (Law 2)
+#### Inclination Balance (Law 3)
 
 Tests whether the structural weights cancel between the two phase groups.
 
@@ -309,7 +309,7 @@ Tests whether the structural weights cancel between the two phase groups.
 | d | **User-adjustable** | Fibonacci divisor (denominator) |
 | γ | **User-adjustable** | Phase angle (determines group membership: >180° → 203° group, ≤180° → 23° group) |
 
-#### Eccentricity Balance (Law 3)
+#### Eccentricity Balance (Law 5)
 
 Tests whether the eccentricity weights cancel between the two phase groups.
 
@@ -321,7 +321,7 @@ Tests whether the eccentricity weights cancel between the two phase groups.
 | d | **User-adjustable** | Fibonacci divisor (via √d) |
 | γ | **User-adjustable** | Phase angle (determines group membership) |
 
-Note: Law 3 uses **different powers** of the same variables compared to Law 2 — `a^(3/2)` instead of `a^(1/2)`, `e` directly instead of `(1−e²)`, and `1/√d` instead of `1/d`. This is why the two balance conditions are independent.
+Note: Law 5 uses **different powers** of the same variables compared to Law 3 — `a^(3/2)` instead of `a^(1/2)`, `e` directly instead of `(1−e²)`, and `1/√d` instead of `1/d`. This is why the two balance conditions are independent.
 
 #### Laplace-Lagrange Bounds Check
 
@@ -330,7 +330,7 @@ Verifies the oscillation range fits within secular theory predictions.
 | Variable | Type | Role |
 |----------|------|------|
 | mean | Computed | From Mean calculation above |
-| amplitude | Computed | From Law 1 above |
+| amplitude | Computed | From Law 2 above |
 | LL_min, LL_max | Fixed | Secular theory bounds per planet |
 
 #### Ecliptic Trend
@@ -340,7 +340,7 @@ Computes the apparent change in ecliptic inclination over 1900–2100 by compari
 | Variable | Type | Role |
 |----------|------|------|
 | mean | Computed | From Mean calculation above |
-| amplitude | Computed | From Law 1 above |
+| amplitude | Computed | From Law 2 above |
 | Ω_J2000 | Fixed | Planet ascending node at J2000 |
 | γ | **User-adjustable** | Phase angle |
 | T | **User-adjustable** | Precession period (determines Ω drift rate) |
@@ -350,7 +350,7 @@ Computes the apparent change in ecliptic inclination over 1900–2100 by compari
 
 ## Calculation Details
 
-### Inclination Amplitude (Law 1)
+### Inclination Amplitude (Law 2)
 
 ```
 amplitude = ψ / (d × √m)
@@ -362,7 +362,7 @@ Where:
   m = planet mass in solar units
 ```
 
-### Inclination Balance (Law 2)
+### Inclination Balance (Law 3)
 
 The structural weight per planet:
 ```
@@ -374,7 +374,7 @@ Balance condition:
 Σ(203° group) w = Σ(23° group) w
 ```
 
-### Eccentricity Balance (Law 3)
+### Eccentricity Balance (Law 5)
 
 The eccentricity weight per planet:
 ```
@@ -431,7 +431,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 
 | Document | Purpose |
 |----------|---------|
-| [26 - Fibonacci Laws](26-fibonacci-laws.md) | The three laws, derivations, and findings |
+| [26 - Fibonacci Laws](26-fibonacci-laws.md) | The six laws, derivations, and findings |
 | [22 - UI Panels Reference](22-ui-panels-reference.md) | Overview of all UI panels |
 | [16 - Invariable Plane Calculations](16-invariable-plane-calculations.md) | Height calculation formulas |
 | [10 - Constants Reference](10-constants-reference.md) | Planet masses and orbital elements |
