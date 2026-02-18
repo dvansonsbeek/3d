@@ -81,6 +81,7 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all six Fibonacci Laws, five findings, and predictions (49 checks) |
 | [Appendix M - Configuration Analysis](appendix-m-configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
 | [Appendix N - Eccentricity Balance](appendix-n-eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity analysis, TNO closed-system argument |
+| [Appendix O - Epoch Independence](appendix-o-epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization
