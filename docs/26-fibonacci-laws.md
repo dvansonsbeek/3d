@@ -142,7 +142,7 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 99.88% balance.** See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment.
+**Result: 99.88% balance** (J2000 eccentricities), rising to **99.9952%** when Saturn's eccentricity is evaluated at the model-predicted value from Law 4. See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment.
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
@@ -269,7 +269,9 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 - The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 99.88%
 - Random eccentricity values in the same weight formula give 50–85% balance
 
-### Finding 4: Saturn Eccentricity Prediction
+The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [Appendix N — Eccentricity Balance](appendix-n-eccentricity-balance.js) for the quantitative analysis.
+
+### Finding 4: Saturn Eccentricity Prediction and Law Convergence
 
 Since Saturn is the sole retrograde planet, the eccentricity balance directly predicts its eccentricity from the other seven:
 
@@ -277,11 +279,15 @@ Since Saturn is the sole retrograde planet, the eccentricity balance directly pr
 e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 ```
 
-| Quantity | Value |
-|----------|-------|
-| Predicted e_Saturn | 0.05373 |
-| Actual e_Saturn (JPL) | 0.05386 |
-| Error | −0.24% |
+| Source | e_Saturn | Balance (%) |
+|--------|----------|-------------|
+| Law 4 prediction (AMD pair constraints) | 0.05373 | 99.9952% |
+| Law 5 perfect balance | 0.05374 | 100.0000% |
+| J2000 observed (JPL DE440) | 0.05386 | 99.8824% |
+
+**Law convergence:** Laws 4 and 5 independently predict the same Saturn eccentricity to within **0.01%**. Law 4 derives it from AMD partition ratios between the Earth–Saturn mirror pair. Law 5 derives it from the balance equation. The two values differ by only 5.2 × 10⁻⁶ — effectively identical. This convergence confirms that the eccentricity balance is not an independent free parameter but an emergent consequence of the Fibonacci pair structure.
+
+The 0.12% gap between the observed balance (99.88%) and perfect balance traces to Saturn's J2000 eccentricity (0.05386) being 0.24% above the model prediction (0.05373). Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09; the model prediction represents the value at which the eccentricity balance is exact. See [Appendix N — Eccentricity Balance](appendix-n-eccentricity-balance.js) for the full analysis.
 
 ### Finding 5: Inner Planet Eccentricity Ladder
 
@@ -420,6 +426,20 @@ Balance: 99.88%
 ```
 
 Saturn alone carries the entire 23° contribution. The 203° group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
+
+### Mirror Pair Decomposition
+
+The gap decomposes by mirror pair into four contributions that nearly cancel:
+
+| Pair | d | Gap contribution | % of total gap |
+|------|---|-----------------|----------------|
+| Earth ↔ Saturn | 3 | +1.545 × 10⁻² | +42,504% |
+| Mars ↔ Jupiter | 5 | −7.973 × 10⁻³ | −21,928% |
+| Mercury ↔ Uranus | 21 | −5.710 × 10⁻³ | −15,704% |
+| Venus ↔ Neptune | 34 | −1.735 × 10⁻³ | −4,773% |
+| **Sum** | | **3.636 × 10⁻⁵** | **100%** |
+
+Four numbers spanning ±42,000% cancel to leave a 0.12% residual. The Earth–Saturn pair dominates because Saturn (23° group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three 203°-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
 
 ### Non-Triviality
 
@@ -682,11 +702,11 @@ Verify `Σ(203°) w_j = Σ(23°) w_j` to within 99.9998% (< 0.0002% imbalance).
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(203°) v_j = Σ(23°) v_j` to within 99.5% (exact: 99.88%).
+Verify `Σ(203°) v_j = Σ(23°) v_j` to within 99.5% (exact: 99.88% at J2000, 99.9952% with predicted Saturn e).
 
-### Test 5: Saturn Eccentricity Prediction
+### Test 5: Saturn Eccentricity Prediction and Law Convergence
 
-Compute Saturn's eccentricity from the eccentricity balance equation and verify error < 0.3%.
+Compute Saturn's eccentricity from the eccentricity balance equation (Law 5) and from the AMD pair constraints (Law 4). Verify: (a) both predict e_Saturn within 0.3% of observed, and (b) the two predictions agree to within 0.01%.
 
 ### Test 6: J2000 Inclination Match
 
@@ -787,7 +807,7 @@ npx parcel build src/index.html --no-cache
 
 **Phase angles** (203.3195° and 23.3195°) originate from the **s₈ eigenmode of Laplace-Lagrange secular perturbation theory**, a framework established in classical celestial mechanics (18th–19th century). Saturn's retrograde ascending node precession is also a known result from secular theory.
 
-**Law 5 (Eccentricity Balance)** connects to **Angular Momentum Deficit (AMD) conservation**, a known conserved quantity in secular theory. The weight `√m × a^(3/2) × e / √d` contains factors related to how AMD is partitioned among planets. However, the linear dependence on eccentricity (rather than quadratic, as in the AMD itself) and the `1/√d` scaling distinguish it from the standard AMD formulation.
+**Law 5 (Eccentricity Balance)** connects to **Angular Momentum Deficit (AMD) conservation**, a known conserved quantity in secular theory. The weight `√m × a^(3/2) × e / √d` contains factors related to how AMD is partitioned among planets. However, the linear dependence on eccentricity (rather than quadratic, as in the AMD itself) and the `1/√d` scaling distinguish it from the standard AMD formulation. The balance operates as a **closed 8-planet system** — the mirror pairs exchange AMD as communicating vessels, while TNOs and other small bodies cannot participate (the a^(3/2) weighting makes them disproportionately heavy, and they lack paired counterparts). This contrasts with the inclination balance (Law 3), which is a global property where all solar system mass contributes.
 
 ### What appears genuinely new
 
@@ -799,7 +819,7 @@ npx parcel build src/index.html --no-cache
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #32 is the only one that is also mirror-symmetric.
 
-5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to 8.57% total error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance at 99.93% without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations.
+5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to 8.57% total error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance at 99.93% without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations. Most strikingly, the Saturn eccentricity predicted by Law 4 (0.05373) independently matches the value required for 100% eccentricity balance by Law 5 (0.05374) to within 0.01% — two entirely different Fibonacci constraints converge on the same physical value.
 
 ### Assessment
 
@@ -823,6 +843,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive Fibonacci divisor search |
 | [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
 | [Appendix M - Configuration Analysis](appendix-m-configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
+| [Appendix N - Eccentricity Balance](appendix-n-eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity, TNO closed-system argument |
 
 ---
 

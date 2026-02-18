@@ -79,6 +79,8 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix J - Holistic Year Analysis Data](appendix-j-holistic-year-analysis.xlsx) | Excel export of 64 points in time for year analysis spanning one complete Holistic Year (333,888 years) |
 | [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive search of all valid Fibonacci divisor configurations; generates balance-presets.json |
 | [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all six Fibonacci Laws, five findings, and predictions (49 checks) |
+| [Appendix M - Configuration Analysis](appendix-m-configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
+| [Appendix N - Eccentricity Balance](appendix-n-eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity analysis, TNO closed-system argument |
 
 **Note on Appendix A vs B**: Both calculate the same ascending node values using different methods:
 - **Appendix A** uses brute-force numerical optimization
