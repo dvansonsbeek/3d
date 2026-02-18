@@ -8,8 +8,9 @@
 //   4. Sensitivity: what parameter changes close the gap
 //   5. Why TNOs cannot participate (closed-system argument)
 //
-// Key finding: Law 4 predicts Saturn e = 0.05373, Law 5 requires
-// e = 0.05374 for 100% balance — they agree to 0.01%.
+// Key finding: Law 4 (R² pair constraint) predicts Saturn e = 0.05389,
+// Law 5 (eccentricity balance) predicts e = 0.05374 — they agree to
+// 0.30%, both bracketing J2000 observed (0.05386).
 //
 // Usage: node docs/appendix-n-eccentricity-balance.js
 // ═══════════════════════════════════════════════════════════════
@@ -191,33 +192,33 @@ const a32_sa = Math.pow(orbitDistance.saturn, 1.5);
 const d_sa = config32.saturn.d;
 const e_perfect = j2000.sum203 * Math.sqrt(d_sa) / (sqrtM_sa * a32_sa);
 
-const e_predicted = 0.05373;  // Law 4 AMD partition prediction (Finding 4)
+const e_law4 = 0.05389;      // Law 4 R² pair constraint prediction
 const e_j2000 = 0.05386179;  // JPL J2000 observed
 
 // Verify
 const balPerfect = computeBalance({ ...eccJ2000, saturn: e_perfect });
-const balPredicted = computeBalance({ ...eccJ2000, saturn: e_predicted });
+const balLaw4 = computeBalance({ ...eccJ2000, saturn: e_law4 });
 
 console.log('Saturn eccentricity from three sources:\n');
-console.log('| Source                        | e_Saturn   | Balance (%)  |');
-console.log('|-------------------------------|------------|--------------|');
-console.log(`| Law 4 prediction (AMD pair)   | ${e_predicted.toFixed(5).padStart(10)} | ${balPredicted.balance.toFixed(4).padStart(12)} |`);
-console.log(`| Law 5 perfect balance         | ${e_perfect.toFixed(5).padStart(10)} | ${balPerfect.balance.toFixed(4).padStart(12)} |`);
-console.log(`| J2000 observed (JPL DE440)    | ${e_j2000.toFixed(5).padStart(10)} | ${j2000.balance.toFixed(4).padStart(12)} |`);
+console.log('| Source                            | e_Saturn   | vs J2000     |');
+console.log('|-----------------------------------|------------|--------------|');
+console.log(`| Law 4 (R² pair constraint)        | ${e_law4.toFixed(5).padStart(10)} | ${((e_law4 - e_j2000)/e_j2000 * 100).toFixed(2).padStart(10)}%  |`);
+console.log(`| Law 5 (eccentricity balance)      | ${e_perfect.toFixed(5).padStart(10)} | ${((e_perfect - e_j2000)/e_j2000 * 100).toFixed(2).padStart(10)}%  |`);
+console.log(`| J2000 observed (JPL DE440)        | ${e_j2000.toFixed(5).padStart(10)} |          —   |`);
 
 console.log(`\nAgreement between Law 4 and Law 5:`);
-console.log(`  Law 4 predicted:    ${e_predicted.toFixed(8)}`);
-console.log(`  Law 5 perfect:      ${e_perfect.toFixed(8)}`);
-console.log(`  Difference:         ${(e_predicted - e_perfect).toExponential(4)}  (${(Math.abs(e_predicted - e_perfect)/e_perfect * 100).toFixed(4)}%)`);
-console.log(`\n  J2000 vs perfect:   ${(e_j2000 - e_perfect).toExponential(4)}  (${((e_j2000 - e_perfect)/e_j2000 * 100).toFixed(4)}%)`);
-console.log(`  J2000 vs predicted: ${(e_j2000 - e_predicted).toExponential(4)}  (${((e_j2000 - e_predicted)/e_j2000 * 100).toFixed(4)}%)`);
+console.log(`  Law 4 (R² pair):    ${e_law4.toFixed(8)}`);
+console.log(`  Law 5 (balance):    ${e_perfect.toFixed(8)}`);
+console.log(`  Difference:         ${(e_law4 - e_perfect).toExponential(4)}  (${(Math.abs(e_law4 - e_perfect)/e_j2000 * 100).toFixed(2)}%)`);
+console.log(`\n  J2000 vs Law 4:     ${(e_j2000 - e_law4).toExponential(4)}  (${((e_j2000 - e_law4)/e_j2000 * 100).toFixed(4)}%)`);
+console.log(`  J2000 vs Law 5:     ${(e_j2000 - e_perfect).toExponential(4)}  (${((e_j2000 - e_perfect)/e_j2000 * 100).toFixed(4)}%)`);
 
-console.log('\n  ★ KEY FINDING: Laws 4 and 5 independently converge on the');
-console.log('    same Saturn eccentricity to within 0.01%. Two independent');
-console.log('    Fibonacci constraints — AMD partition ratios (Law 4) and');
-console.log('    eccentricity balance (Law 5) — predict essentially the');
-console.log('    same value: e_Saturn ≈ 0.05373.');
-console.log('    With this value, the eccentricity balance reaches 99.9952%.');
+console.log('\n  ★ KEY FINDING: Laws 4 and 5 independently predict Saturn\'s');
+console.log('    eccentricity to within 0.30% of each other, both bracketing');
+console.log('    the J2000 observed value. Two independent Fibonacci constraints');
+console.log('    — R² pair ratios (Law 4) and eccentricity balance (Law 5) —');
+console.log('    converge on the same physical value across a factor-of-9');
+console.log('    secular range.');
 
 // ══════════════════════════════════════════════════════════════════
 // SECTION 4: Balance scan across Saturn eccentricity range
@@ -236,7 +237,7 @@ const scanValues = [
   [0.010, 'Near secular minimum'],
   [0.030, ''],
   [0.050, ''],
-  [e_predicted, 'Law 4 AMD prediction'],
+  [e_law4, 'Law 4 R² pair constraint'],
   [e_perfect, 'PERFECT BALANCE (Law 5)'],
   [e_j2000, 'J2000 observed (JPL)'],
   [0.060, ''],
@@ -379,7 +380,7 @@ console.log(`| Weight formula           | w = √(m·a(1-e²))/d | v = √m·a^(
 console.log(`| d scaling                | 1/d                 | 1/√d                  |`);
 console.log(`| a scaling                | √a                  | a^(3/2)               |`);
 console.log(`| Balance (J2000)          | ${inclBalance.toFixed(4)}%          | ${j2000.balance.toFixed(4)}%            |`);
-console.log(`| Balance (predicted e_Sa) | ${inclBalance.toFixed(4)}%          | ${balPredicted.balance.toFixed(4)}%            |`);
+console.log(`| Balance (Law 4 e_Sa)    | ${inclBalance.toFixed(4)}%          | ${balLaw4.balance.toFixed(4)}%            |`);
 console.log(`| Gap                      | ${inclGap.toExponential(3).padStart(12)}        | ${j2000.gap.toExponential(3).padStart(12)}          |`);
 console.log(`| TNO correction possible  | Yes (tiny, 0.0002%) | No (a^(3/2) too heavy)|`);
 console.log(`| System type              | Global (all mass)   | Closed (8 planets)    |`);
@@ -392,14 +393,14 @@ console.log('SECTION 8: SUMMARY');
 console.log('───────────────────────────────────────────────────────────────\n');
 
 console.log('1. BALANCE: The 8-planet eccentricity balance is 99.88% with');
-console.log('   J2000 eccentricities. With the model\'s predicted Saturn');
-console.log('   eccentricity (Law 4: e = 0.05373), it reaches 99.9952%.');
+console.log('   J2000 eccentricities.');
 console.log();
-console.log('2. LAW CONVERGENCE: Laws 4 and 5 independently predict the');
-console.log('   same Saturn eccentricity to 0.01%:');
-console.log(`     Law 4 (AMD partition):  e = ${e_predicted}`);
-console.log(`     Law 5 (perfect balance): e = ${e_perfect.toFixed(5)}`);
-console.log(`     Difference:              ${Math.abs(e_predicted - e_perfect).toExponential(2)}`);
+console.log('2. LAW CONVERGENCE: Laws 4 and 5 independently predict Saturn\'s');
+console.log('   eccentricity to within 0.30%, both bracketing J2000:');
+console.log(`     Law 4 (R² pair constraint): e = ${e_law4}`);
+console.log(`     Law 5 (balance equation):   e = ${e_perfect.toFixed(5)}`);
+console.log(`     J2000 observed:             e = ${e_j2000.toFixed(5)}`);
+console.log(`     Law 4 vs Law 5 difference:  ${Math.abs(e_law4 - e_perfect).toExponential(2)}  (${(Math.abs(e_law4 - e_perfect)/e_j2000 * 100).toFixed(2)}%)`);
 console.log();
 console.log('3. PAIR CANCELLATION: Four mirror pairs with contributions');
 console.log('   spanning ±42,000% of the gap cancel to 0.12%. The balance');

@@ -407,6 +407,6 @@ console.log('  3. The Fibonacci divisors that define the v-weight formula are th
 console.log('     same constants that set the secular eigenmode frequencies. The');
 console.log('     balance is maintained because the formula and the dynamics share');
 console.log('     the same structural origin.\n');
-console.log('  The Law 4/5 convergence to 0.01% is therefore not a coincidence');
+console.log('  The Law 4/5 convergence (0.30%) is therefore not a coincidence');
 console.log('  of the current epoch — it is a structural property of the solar');
 console.log('  system\'s Fibonacci architecture.');
