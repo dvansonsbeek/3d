@@ -218,7 +218,45 @@ Earth–Saturn is the only pair with opposite phase groups (203° vs 23°). The 
 
 ### Finding 2: Configuration Uniqueness
 
-Out of 755 valid configurations found by exhaustive search (all with inclination balance > 99.994%, the TNO margin — see [Exhaustive Search](#exhaustive-search-and-preset-generation)), **Config #32 is the only one with mirror-symmetric d-assignments.** Since Earth is locked at d=3, only Scenario A (Sa=3) can satisfy the Earth↔Saturn mirror symmetry. No other d-assignment produces both the required mirror pairing and the balance constraints.
+The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Four independent filters constrain the solution space:
+
+- **Balance ≥ 99.994%** — the inclination balance exceeds the TNO margin
+- **Mirror symmetry** — inner/outer d-values match across the asteroid belt (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju)
+- **Saturn-solo** — Saturn is the only planet at the 23° phase angle (all others at 203°)
+- **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
+
+These are overlapping, not nested, constraints (full analysis: [Appendix M](appendix-m-configuration-analysis.js)):
+
+| Filter | Count | % of total |
+|--------|------:|------------|
+| Total search space | 7,558,272 | 100% |
+| **Single filters** | | |
+| Balance ≥ 99.994% | 755 | 0.0100% |
+| Mirror-symmetric | 2,592 | 0.0343% |
+| Saturn-solo | 236,196 | 3.125% |
+| LL bounds | 739,200 | 9.780% |
+| **Two-filter intersections** | | |
+| Mirror ∩ Balance | 1 | 0.0000132% |
+| Saturn-solo ∩ Balance | 17 | 0.000225% |
+| Saturn-solo ∩ LL bounds | 36,288 | 0.480% |
+| Mirror ∩ Saturn-solo | 81 | 0.00107% |
+| Mirror ∩ LL bounds | 380 | 0.00503% |
+| Balance ∩ LL bounds | 177 | 0.00234% |
+| **Three-filter intersections** | | |
+| Saturn-solo ∩ Balance ∩ LL bounds | 7 | 0.0000926% |
+| Mirror ∩ Saturn-solo ∩ LL bounds | 36 | 0.000476% |
+| Mirror ∩ Saturn-solo ∩ Balance | 1 | 0.0000132% |
+| Mirror ∩ Balance ∩ LL bounds | 1 | 0.0000132% |
+| **All four filters** | | |
+| Mirror ∩ Saturn-solo ∩ LL bounds ∩ Balance ≥ 99.994% | **1** | 0.0000132% |
+
+That single configuration is **Config #32** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
+
+**Key structural constraints:**
+
+- **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric configurations.
+- **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune). Of the 81 mirror + Saturn-solo configs, 36 pass LL bounds — exactly the 6 × 6 grid where both pair d-values are ≥ 5.
+- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #32 achieves balance ≥ 99.994% (at 99.9998%).
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -784,6 +822,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [Appendix E - Inclination Optimization](appendix-e-inclination-optimization.js) | Optimization script |
 | [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive Fibonacci divisor search |
 | [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
+| [Appendix M - Configuration Analysis](appendix-m-configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
 
 ---
 
