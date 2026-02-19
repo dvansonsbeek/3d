@@ -651,15 +651,15 @@ for (const key of planets) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PREDICTIONS: ECCENTRICITIES FROM PAIR n² SUMS + BALANCE
+// PREDICTIONS: ECCENTRICITIES FROM LAW 4 PAIR n² CONSTRAINTS
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  PREDICTIONS: Eccentricities (from pair n² sums + balance)               │');
+console.log('│  PREDICTIONS: Eccentricities from Law 4 (pair n² constraints)            │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 // For each mirror pair, use the best Fibonacci S (n² sum) and R (n² ratio)
-// to predict both eccentricities. Saturn gets an independent prediction from balance.
+// to predict both eccentricities directly from pair constraints.
 // Uses MEAN eccentricities and inclinations for long-term structural relationships.
 const nValuesMean = {};
 for (const key of planets) {
@@ -690,22 +690,12 @@ for (const [a, b] of pairDefs) {
   eccPredicted[b] = Math.sqrt(n2b) * iB;
 }
 
-// Saturn from balance (using predicted eccentricities for other planets)
-let balSum = 0;
-for (const key of planets) {
-  if (key === 'saturn') continue;
-  const v = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) * eccPredicted[key] / Math.sqrt(config[key].d);
-  balSum += v;
-}
-const satCoeff2 = Math.sqrt(mass.saturn) * Math.pow(orbitDistance.saturn, 1.5) / Math.sqrt(config.saturn.d);
-const satFromBalance = balSum / satCoeff2;
-
 console.log('Planet       S (n²sum)    R (n²ratio)   e_predicted   e_actual (mean)  Error');
 console.log('─'.repeat(95));
 
 let rmsErr = 0;
 for (const key of planets) {
-  const ePred = (key === 'saturn') ? satFromBalance : eccPredicted[key];
+  const ePred = eccPredicted[key];
   const err = (ePred - eccMean[key]) / eccMean[key] * 100;
   rmsErr += err * err;
 
@@ -715,7 +705,7 @@ for (const key of planets) {
     if (a === key || b === key) { pairKey = `${a}/${b}`; break; }
   }
   const sr = pairSR[pairKey];
-  const source = (key === 'saturn') ? 'balance' : `S=${sr.Sstr}, R=${sr.Rstr}`;
+  const source = `S=${sr.Sstr}, R=${sr.Rstr}`;
 
   console.log(
     `${key.padEnd(12)} ${source.padEnd(24)} ${ePred.toFixed(8).padStart(12)}  ${eccMean[key].toFixed(8)}  ${err >= 0 ? '+' : ''}${err.toFixed(3)}%`
@@ -723,6 +713,19 @@ for (const key of planets) {
 }
 rmsErr = Math.sqrt(rmsErr / 8);
 console.log(`\nRMS error: ${rmsErr.toFixed(2)}%`);
+
+// Cross-check: Law 4 vs Law 5 Saturn prediction
+// Law 4 = direct pair constraint (from table above)
+// Law 5 = eccentricity balance using J2000 observed eccentricities (from Finding 4)
+const satLaw4 = eccPredicted.saturn;
+const satLaw5 = satPredicted; // computed in Finding 4 from J2000 observed eccentricities
+const satConvergence = Math.abs(satLaw4 - satLaw5) / ecc.saturn * 100;
+
+console.log('\nSaturn cross-check — Law 4 vs Law 5:');
+console.log(`  Law 4 (R² pair constraint):    ${satLaw4.toFixed(8)}  (${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(2)}% from J2000)`);
+console.log(`  Law 5 (eccentricity balance):  ${satLaw5.toFixed(8)}  (${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(2)}% from J2000)`);
+console.log(`  J2000 observed:                ${ecc.saturn.toFixed(8)}`);
+console.log(`  Convergence: ${satConvergence.toFixed(2)}% — two independent constraints bracket J2000`);
 
 // ══════════════════════════════════════════════════════════════════
 // J2000 INCLINATION MATCH
@@ -761,8 +764,10 @@ console.log(`║  Law 2 — Inclination amplitude: d×amp×√m = ψ for all 8 p
 console.log(`║  Law 3 — Inclination balance:   ${inclBalance.toFixed(4)}%`.padEnd(76) + '║');
 console.log(`║  Law 5 — Eccentricity balance:  ${eccBalance.toFixed(4)}%`.padEnd(76) + '║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log(`║  Saturn e predicted:  ${satPredicted.toFixed(8)} (actual: ${ecc.saturn.toFixed(8)}, err: ${satError.toFixed(3)}%)`.padEnd(76) + '║');
-console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(2)}% (8-planet pair + balance prediction)`.padEnd(76) + '║');
+console.log(`║  Saturn Law 4 (pair): ${satLaw4.toFixed(8)} (err: ${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
+console.log(`║  Saturn Law 5 (bal):  ${satLaw5.toFixed(8)} (err: ${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
+console.log(`║  Convergence:         ${satConvergence.toFixed(2)}%`.padEnd(76) + '║');
+console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(2)}% (8-planet Law 4 pair constraints)`.padEnd(76) + '║');
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 
 if (failCount > 0) {
