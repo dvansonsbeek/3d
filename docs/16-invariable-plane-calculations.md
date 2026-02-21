@@ -222,6 +222,65 @@ let angleFromInvAscNode = (eclipticLongitude - ascNodeDynamicEcliptic + 360) % 3
 
 ---
 
+## Argument of Perihelion with Respect to the Invariable Plane
+
+### Definition
+
+The **argument of perihelion (ω)** is the angular distance from the ascending node to the perihelion, measured in the orbital plane in the direction of motion:
+
+```
+ω = ϖ - Ω
+```
+
+Where:
+- `ϖ` = longitude of perihelion
+- `Ω` = longitude of ascending node
+
+This quantity depends on which reference plane defines the ascending node. For the invariable plane:
+
+```
+ω_inv = ϖ - Ω_inv
+```
+
+### Why ω_inv is Not Constant
+
+Both the longitude of perihelion and the ascending node on the invariable plane precess at the same underlying ICRF rate (`<planet>PerihelionICRFYears`). If both were computed in the same coordinate frame, their difference would be constant. However, the two values displayed in the planet stats panels are computed in **different reference frames**:
+
+| Value | UI Label | Variable | Frame | Method |
+|-------|----------|----------|-------|--------|
+| ϖ | Longitude of perihelion (ϖ) | `o.<planet>Perihelion` | Earth equatorial | `apparentRaFromPdA()` |
+| Ω_inv | Ascending Node on Inv. Plane (Ω) | `o.<planet>AscendingNodeInvPlane` | ICRF | Linear precession |
+
+The longitude of perihelion is computed by `apparentRaFromPdA()` (line 25830), which:
+1. Reads the 3D world positions of the perihelion marker objects
+2. Transforms them into Earth's equatorial frame via `earth.rotationAxis.worldToLocal()`
+3. Returns the apparent direction as seen from Earth
+
+This Earth-frame transformation introduces oscillations of **±100 arcsec/century** with a period of **~6,500 years** (a harmonic of Earth's precession cycles). The ascending node on the invariable plane, by contrast, is a perfectly stable linear precession in ICRF.
+
+The result: ω_inv oscillates over time despite both underlying quantities sharing the same ICRF precession rate.
+
+### Comparison with Ecliptic Argument of Periapsis
+
+The model also computes the classical ecliptic argument of periapsis:
+
+```javascript
+o.<planet>ArgumentOfPeriapsis = (o.<planet>Perihelion - o.<planet>AscendingNode) % 360
+```
+
+This uses `o.<planet>AscendingNode` (the **ecliptic** ascending node from `calculateDynamicAscendingNodeFromTilts()`), not the invariable plane ascending node. Both values in this subtraction are in the Earth/ecliptic frame, making them more comparable — though the ecliptic argument of periapsis also fluctuates because both inputs are affected by Earth-frame transformations.
+
+| Quantity | Formula | Constant? |
+|----------|---------|-----------|
+| ω_ecliptic | ϖ_equatorial − Ω_ecliptic | No (both fluctuate, but in same frame) |
+| ω_invariable | ϖ_equatorial − Ω_ICRF | No (frame mismatch causes ~6,500-year oscillation) |
+
+### Resolution
+
+To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (line 25945) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv.
+
+---
+
 ## Expected Values
 
 ### Maximum Heights
