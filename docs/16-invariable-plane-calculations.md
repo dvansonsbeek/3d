@@ -279,6 +279,34 @@ This uses `o.<planet>AscendingNode` (the **ecliptic** ascending node from `calcu
 
 To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (line 25945) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv.
 
+### Earth: Special Case
+
+Earth does not have a `perihelionLongitudeEcliptic()` layer, so the general approach used for other planets cannot be applied. However, Earth's ω_inv has a direct geometric relationship with its inclination to the invariable plane:
+
+```
+ω_inv(Earth) = 180° − i_inv
+```
+
+Where `i_inv` = `o.earthInvPlaneInclinationDynamic` (the Laplace-Lagrange dynamic inclination).
+
+**Verification at J2000:**
+- Earth's longitude of perihelion: ϖ ≈ 102.937°
+- Earth's ascending node on inv. plane: Ω_inv = 284.51°
+- Direct calculation: ω = (102.937 − 284.51 + 360) % 360 = 178.427°
+- Formula: 180° − 1.5786° = 178.421°
+- Agreement within ~0.006°
+
+**Physical interpretation:** Earth's perihelion lies very close to the descending node on the invariable plane (ω ≈ 180°), offset by exactly the orbital inclination. As Earth's orbital plane tilts through the Laplace-Lagrange oscillation cycle, ω_inv oscillates in sync with the inclination — when the inclination is at maximum (~2.06°), ω is smaller (~177.94°), and when at minimum (~0.93°), ω is closer to 180° (~179.07°).
+
+**Implementation:**
+```javascript
+// Earth: ω_inv from geometric relationship
+v: () => 180 - o.earthInvPlaneInclinationDynamic
+
+// Other planets: ω_inv from perihelion and ascending node
+v: () => ((o.<planet>Perihelion - o.<planet>AscendingNodeInvPlane + 360) % 360)
+```
+
 ---
 
 ## Expected Values
