@@ -281,27 +281,33 @@ To obtain a stable ω_inv, both values would need to be in the same frame. The m
 
 ### Earth: Special Case
 
-Earth does not have a `perihelionLongitudeEcliptic()` layer, so the general approach used for other planets cannot be applied. However, Earth's ω_inv has a direct geometric relationship with its inclination to the invariable plane:
+Earth does not have a `perihelionLongitudeEcliptic()` layer, so the general approach used for other planets cannot be applied. Instead, Earth's ω_inv is computed from the ecliptic-frame ascending node on the invariable plane:
 
 ```
-ω_inv(Earth) = 180° − i_inv
+ω_inv(Earth) = ϖ − Ω_inv(ecliptic)
 ```
 
-Where `i_inv` = `o.earthInvPlaneInclinationDynamic` (the Laplace-Lagrange dynamic inclination).
+Where:
+- `ϖ` = `earthPerihelionFromEarth.ra` converted to degrees (equatorial-frame longitude of perihelion)
+- `Ω_inv(ecliptic)` = `o.earthAscendingNodeInvPlaneEcliptic` (ascending node using combined ecliptic precession rate)
+
+This value oscillates ~±7° due to the equatorial-frame perihelion fluctuation (~6,500-year period from `apparentRaFromPdA()`).
+
+**Mean value relationship:** The mean ω_inv equals `180° − i_inv`, where `i_inv` = `o.earthInvPlaneInclinationDynamic` (the Laplace-Lagrange dynamic inclination). Earth's perihelion lies very close to the descending node on the invariable plane (ω ≈ 180°), offset by the orbital inclination.
 
 **Verification at J2000:**
 - Earth's longitude of perihelion: ϖ ≈ 102.937°
 - Earth's ascending node on inv. plane: Ω_inv = 284.51°
 - Direct calculation: ω = (102.937 − 284.51 + 360) % 360 = 178.427°
-- Formula: 180° − 1.5786° = 178.421°
+- Mean formula: 180° − 1.5786° = 178.421°
 - Agreement within ~0.006°
-
-**Physical interpretation:** Earth's perihelion lies very close to the descending node on the invariable plane (ω ≈ 180°), offset by exactly the orbital inclination. As Earth's orbital plane tilts through the Laplace-Lagrange oscillation cycle, ω_inv oscillates in sync with the inclination — when the inclination is at maximum (~2.06°), ω is smaller (~177.94°), and when at minimum (~0.93°), ω is closer to 180° (~179.07°).
 
 **Implementation:**
 ```javascript
-// Earth: ω_inv from geometric relationship
-v: () => 180 - o.earthInvPlaneInclinationDynamic
+// Earth: ω_inv from perihelion and ecliptic ascending node (oscillates ~±7°)
+v: () => ((((earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360)
+           - o.earthAscendingNodeInvPlaneEcliptic + 360) % 360)
+// Mean value: 180 - o.earthInvPlaneInclinationDynamic
 
 // Other planets: ω_inv from perihelion and ascending node
 v: () => ((o.<planet>Perihelion - o.<planet>AscendingNodeInvPlane + 360) % 360)
