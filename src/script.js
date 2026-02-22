@@ -19228,14 +19228,14 @@ async function runRATest() {
   /* headers */
   const earthRows  = [['JD', 'Date', 'Time', 'Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
   const periRows   = [['JD', 'Date', 'Time', 'Year',
-    'Mercury Perihelion', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury Asc Node InvPlane', 'Mercury Asc Node InvPlane MaxIncl', 'Mercury Inclination Phase Angle', 'Mercury InvPlane Inclination',
-    'Venus Perihelion', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus Asc Node InvPlane', 'Venus Asc Node InvPlane MaxIncl', 'Venus Inclination Phase Angle', 'Venus InvPlane Inclination',
+    'Mercury Perihelion (Ecliptic)', 'Mercury Asc Node InvPlane (Ecliptic)', 'Mercury Perihelion ICRF', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury Asc Node InvPlane ICRF', 'Mercury Asc Node InvPlane MaxIncl', 'Mercury Inclination Phase Angle', 'Mercury InvPlane Inclination',
+    'Venus Perihelion (Ecliptic)', 'Venus Asc Node InvPlane (Ecliptic)', 'Venus Perihelion ICRF', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus Asc Node InvPlane ICRF', 'Venus Asc Node InvPlane MaxIncl', 'Venus Inclination Phase Angle', 'Venus InvPlane Inclination',
     'Earth Perihelion (Ecliptic)', 'Earth Asc Node InvPlane (Ecliptic)', 'Earth Perihelion ICRF', 'Earth Asc Node InvPlane ICRF', 'Earth Asc Node InvPlane MaxIncl', 'Earth InvPlane Inclination',
-    'Mars Perihelion', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars Asc Node InvPlane', 'Mars Asc Node InvPlane MaxIncl', 'Mars Inclination Phase Angle', 'Mars InvPlane Inclination',
-    'Jupiter Perihelion', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter Asc Node InvPlane', 'Jupiter Asc Node InvPlane MaxIncl', 'Jupiter Inclination Phase Angle', 'Jupiter InvPlane Inclination',
-    'Saturn Perihelion', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn Asc Node InvPlane', 'Saturn Asc Node InvPlane MaxIncl', 'Saturn Inclination Phase Angle', 'Saturn InvPlane Inclination',
-    'Uranus Perihelion', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus Asc Node InvPlane', 'Uranus Asc Node InvPlane MaxIncl', 'Uranus Inclination Phase Angle', 'Uranus InvPlane Inclination',
-    'Neptune Perihelion', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune Asc Node InvPlane', 'Neptune Asc Node InvPlane MaxIncl', 'Neptune Inclination Phase Angle', 'Neptune InvPlane Inclination'
+    'Mars Perihelion (Ecliptic)', 'Mars Asc Node InvPlane (Ecliptic)', 'Mars Perihelion ICRF', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars Asc Node InvPlane ICRF', 'Mars Asc Node InvPlane MaxIncl', 'Mars Inclination Phase Angle', 'Mars InvPlane Inclination',
+    'Jupiter Perihelion (Ecliptic)', 'Jupiter Asc Node InvPlane (Ecliptic)', 'Jupiter Perihelion ICRF', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter Asc Node InvPlane ICRF', 'Jupiter Asc Node InvPlane MaxIncl', 'Jupiter Inclination Phase Angle', 'Jupiter InvPlane Inclination',
+    'Saturn Perihelion (Ecliptic)', 'Saturn Asc Node InvPlane (Ecliptic)', 'Saturn Perihelion ICRF', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn Asc Node InvPlane ICRF', 'Saturn Asc Node InvPlane MaxIncl', 'Saturn Inclination Phase Angle', 'Saturn InvPlane Inclination',
+    'Uranus Perihelion (Ecliptic)', 'Uranus Asc Node InvPlane (Ecliptic)', 'Uranus Perihelion ICRF', 'Uranus Asc Node', 'Uranus Arg Peri', 'Uranus Ecliptic Inclination', 'Uranus Asc Node InvPlane ICRF', 'Uranus Asc Node InvPlane MaxIncl', 'Uranus Inclination Phase Angle', 'Uranus InvPlane Inclination',
+    'Neptune Perihelion (Ecliptic)', 'Neptune Asc Node InvPlane (Ecliptic)', 'Neptune Perihelion ICRF', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune Asc Node InvPlane ICRF', 'Neptune Asc Node InvPlane MaxIncl', 'Neptune Inclination Phase Angle', 'Neptune InvPlane Inclination'
   ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
   const planetRows = [['JD', 'Date', 'Time', 'Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
@@ -19274,43 +19274,57 @@ async function runRATest() {
     const earthMidDistS  = midEccentricityOrbit.sunDistAU;
                             
     const mercuryPer   = o.mercuryPerihelion;
+    const mercuryPerEcl = o.mercuryPerihelionEcliptic;
     const mercuryAsc   = o.mercuryAscendingNode;
     const mercuryArg   = o.mercuryArgumentOfPeriapsis;
     const mercuryAscInv = o.mercuryAscendingNodeInvPlane;  // ICRF coords
+    const mercuryAscInvEcl = o.mercuryAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const mercuryAppIncl = o.mercuryEclipticInclinationDynamic;
     const venusPer     = o.venusPerihelion;
+    const venusPerEcl  = o.venusPerihelionEcliptic;
     const venusAsc     = o.venusAscendingNode;
     const venusArg     = o.venusArgumentOfPeriapsis;
     const venusAscInv  = o.venusAscendingNodeInvPlane;  // ICRF coords
+    const venusAscInvEcl = o.venusAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const venusAppIncl = o.venusEclipticInclinationDynamic;
     const earthAscInv  = o.earthAscendingNodeInvPlane;  // ICRF coords
     const earthAscInvEcl = o.earthAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const earthIncl    = o.earthInvPlaneInclinationDynamic;
     const earthPerEcl  = (earthAscInvEcl + (180 - earthIncl) + 360) % 360;  // ϖ_ecliptic = Ω_ecliptic + ω, where ω = 180° − i
     const marsPer      = o.marsPerihelion;
+    const marsPerEcl   = o.marsPerihelionEcliptic;
     const marsAsc      = o.marsAscendingNode;
     const marsArg      = o.marsArgumentOfPeriapsis;
     const marsAscInv   = o.marsAscendingNodeInvPlane;  // ICRF coords
+    const marsAscInvEcl = o.marsAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const marsAppIncl  = o.marsEclipticInclinationDynamic;
     const jupiterPer   = o.jupiterPerihelion;
+    const jupiterPerEcl = o.jupiterPerihelionEcliptic;
     const jupiterAsc   = o.jupiterAscendingNode;
     const jupiterArg   = o.jupiterArgumentOfPeriapsis;
     const jupiterAscInv = o.jupiterAscendingNodeInvPlane;  // ICRF coords
+    const jupiterAscInvEcl = o.jupiterAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const jupiterAppIncl = o.jupiterEclipticInclinationDynamic;
     const saturnPer    = o.saturnPerihelion;
+    const saturnPerEcl = o.saturnPerihelionEcliptic;
     const saturnAsc    = o.saturnAscendingNode;
     const saturnArg    = o.saturnArgumentOfPeriapsis;
     const saturnAscInv = o.saturnAscendingNodeInvPlane;  // ICRF coords
+    const saturnAscInvEcl = o.saturnAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const saturnAppIncl = o.saturnEclipticInclinationDynamic;
     const uranusPer    = o.uranusPerihelion;
+    const uranusPerEcl = o.uranusPerihelionEcliptic;
     const uranusAsc    = o.uranusAscendingNode;
     const uranusArg    = o.uranusArgumentOfPeriapsis;
     const uranusAscInv = o.uranusAscendingNodeInvPlane;  // ICRF coords
+    const uranusAscInvEcl = o.uranusAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const uranusAppIncl = o.uranusEclipticInclinationDynamic;
     const neptunePer   = o.neptunePerihelion;
+    const neptunePerEcl = o.neptunePerihelionEcliptic;
     const neptuneAsc   = o.neptuneAscendingNode;
     const neptuneArg   = o.neptuneArgumentOfPeriapsis;
     const neptuneAscInv = o.neptuneAscendingNodeInvPlane;  // ICRF coords
+    const neptuneAscInvEcl = o.neptuneAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const neptuneAppIncl = o.neptuneEclipticInclinationDynamic;
 
     // Inclination phase angles (Ω - φ) and InvPlane inclinations (dynamic)
@@ -19395,14 +19409,14 @@ async function runRATest() {
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
         periRows.push([jd, date, time, year,
-          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryAscInv.toFixed(6), mercuryAscInvMaxIncl.toFixed(6), mercuryPhaseAngle.toFixed(6), mercuryInvPlaneIncl.toFixed(6),
-          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusAscInv.toFixed(6), venusAscInvMaxIncl.toFixed(6), venusPhaseAngle.toFixed(6), venusInvPlaneIncl.toFixed(6),
+          mercuryPerEcl.toFixed(6), mercuryAscInvEcl.toFixed(6), mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryAscInv.toFixed(6), mercuryAscInvMaxIncl.toFixed(6), mercuryPhaseAngle.toFixed(6), mercuryInvPlaneIncl.toFixed(6),
+          venusPerEcl.toFixed(6), venusAscInvEcl.toFixed(6), venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusAscInv.toFixed(6), venusAscInvMaxIncl.toFixed(6), venusPhaseAngle.toFixed(6), venusInvPlaneIncl.toFixed(6),
           earthPerEcl.toFixed(6), earthAscInvEcl.toFixed(6), earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthAscInvMaxIncl.toFixed(6), earthIncl.toFixed(6),
-          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsAscInv.toFixed(6), marsAscInvMaxIncl.toFixed(6), marsPhaseAngle.toFixed(6), marsInvPlaneIncl.toFixed(6),
-          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterAscInv.toFixed(6), jupiterAscInvMaxIncl.toFixed(6), jupiterPhaseAngle.toFixed(6), jupiterInvPlaneIncl.toFixed(6),
-          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnAscInv.toFixed(6), saturnAscInvMaxIncl.toFixed(6), saturnPhaseAngle.toFixed(6), saturnInvPlaneIncl.toFixed(6),
-          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusAscInv.toFixed(6), uranusAscInvMaxIncl.toFixed(6), uranusPhaseAngle.toFixed(6), uranusInvPlaneIncl.toFixed(6),
-          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneAscInv.toFixed(6), neptuneAscInvMaxIncl.toFixed(6), neptunePhaseAngle.toFixed(6), neptuneInvPlaneIncl.toFixed(6)
+          marsPerEcl.toFixed(6), marsAscInvEcl.toFixed(6), marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsAscInv.toFixed(6), marsAscInvMaxIncl.toFixed(6), marsPhaseAngle.toFixed(6), marsInvPlaneIncl.toFixed(6),
+          jupiterPerEcl.toFixed(6), jupiterAscInvEcl.toFixed(6), jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterAscInv.toFixed(6), jupiterAscInvMaxIncl.toFixed(6), jupiterPhaseAngle.toFixed(6), jupiterInvPlaneIncl.toFixed(6),
+          saturnPerEcl.toFixed(6), saturnAscInvEcl.toFixed(6), saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnAscInv.toFixed(6), saturnAscInvMaxIncl.toFixed(6), saturnPhaseAngle.toFixed(6), saturnInvPlaneIncl.toFixed(6),
+          uranusPerEcl.toFixed(6), uranusAscInvEcl.toFixed(6), uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusAscInv.toFixed(6), uranusAscInvMaxIncl.toFixed(6), uranusPhaseAngle.toFixed(6), uranusInvPlaneIncl.toFixed(6),
+          neptunePerEcl.toFixed(6), neptuneAscInvEcl.toFixed(6), neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneAscInv.toFixed(6), neptuneAscInvMaxIncl.toFixed(6), neptunePhaseAngle.toFixed(6), neptuneInvPlaneIncl.toFixed(6)
         ]);
     
 //    planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6), plutoRA.toFixed(6), plutoDec.toFixed(6), plutoDistE.toFixed(6), plutoDistS.toFixed(6), halleysRA.toFixed(6), halleysDec.toFixed(6), halleysDistE.toFixed(6), halleysDistS.toFixed(6), erosRA.toFixed(6), erosDec.toFixed(6), erosDistE.toFixed(6), erosDistS.toFixed(6)]);
