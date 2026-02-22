@@ -19230,7 +19230,7 @@ async function runRATest() {
   const periRows   = [['JD', 'Date', 'Time', 'Year',
     'Mercury Perihelion', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury Asc Node InvPlane', 'Mercury Asc Node InvPlane MaxIncl', 'Mercury Inclination Phase Angle', 'Mercury InvPlane Inclination',
     'Venus Perihelion', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus Asc Node InvPlane', 'Venus Asc Node InvPlane MaxIncl', 'Venus Inclination Phase Angle', 'Venus InvPlane Inclination',
-    'Earth Perihelion', 'Earth Asc Node InvPlane', 'Earth Asc Node InvPlane MaxIncl', 'Earth InvPlane Inclination',
+    'Earth Perihelion (Ecliptic)', 'Earth Asc Node InvPlane (Ecliptic)', 'Earth Perihelion ICRF', 'Earth Asc Node InvPlane ICRF', 'Earth Asc Node InvPlane MaxIncl', 'Earth InvPlane Inclination',
     'Mars Perihelion', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars Asc Node InvPlane', 'Mars Asc Node InvPlane MaxIncl', 'Mars Inclination Phase Angle', 'Mars InvPlane Inclination',
     'Jupiter Perihelion', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter Asc Node InvPlane', 'Jupiter Asc Node InvPlane MaxIncl', 'Jupiter Inclination Phase Angle', 'Jupiter InvPlane Inclination',
     'Saturn Perihelion', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn Asc Node InvPlane', 'Saturn Asc Node InvPlane MaxIncl', 'Saturn Inclination Phase Angle', 'Saturn InvPlane Inclination',
@@ -19284,7 +19284,9 @@ async function runRATest() {
     const venusAscInv  = o.venusAscendingNodeInvPlane;  // ICRF coords
     const venusAppIncl = o.venusEclipticInclinationDynamic;
     const earthAscInv  = o.earthAscendingNodeInvPlane;  // ICRF coords
+    const earthAscInvEcl = o.earthAscendingNodeInvPlaneEcliptic;  // Ecliptic coords
     const earthIncl    = o.earthInvPlaneInclinationDynamic;
+    const earthPerEcl  = (earthAscInvEcl + (180 - earthIncl) + 360) % 360;  // ϖ_ecliptic = Ω_ecliptic + ω, where ω = 180° − i
     const marsPer      = o.marsPerihelion;
     const marsAsc      = o.marsAscendingNode;
     const marsArg      = o.marsArgumentOfPeriapsis;
@@ -19395,7 +19397,7 @@ async function runRATest() {
         periRows.push([jd, date, time, year,
           mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryAscInv.toFixed(6), mercuryAscInvMaxIncl.toFixed(6), mercuryPhaseAngle.toFixed(6), mercuryInvPlaneIncl.toFixed(6),
           venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusAscInv.toFixed(6), venusAscInvMaxIncl.toFixed(6), venusPhaseAngle.toFixed(6), venusInvPlaneIncl.toFixed(6),
-          earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthAscInvMaxIncl.toFixed(6), earthIncl.toFixed(6),
+          earthPerEcl.toFixed(6), earthAscInvEcl.toFixed(6), earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthAscInvMaxIncl.toFixed(6), earthIncl.toFixed(6),
           marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsAscInv.toFixed(6), marsAscInvMaxIncl.toFixed(6), marsPhaseAngle.toFixed(6), marsInvPlaneIncl.toFixed(6),
           jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterAscInv.toFixed(6), jupiterAscInvMaxIncl.toFixed(6), jupiterPhaseAngle.toFixed(6), jupiterInvPlaneIncl.toFixed(6),
           saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnAscInv.toFixed(6), saturnAscInvMaxIncl.toFixed(6), saturnPhaseAngle.toFixed(6), saturnInvPlaneIncl.toFixed(6),
