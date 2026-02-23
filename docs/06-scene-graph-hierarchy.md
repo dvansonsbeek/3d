@@ -239,7 +239,7 @@ earth.pivotObj
 └── moonApsidalPrecession.containerObj              ← ~8.85 year apsidal cycle
     └── moonApsidalNodalPrecession1.containerObj    ← ~206 day beat
         └── moonApsidalNodalPrecession2.containerObj    ← ~206 day (reverse)
-            └── moonRoyerCyclePrecession.containerObj    ← Royer cycle
+            └── moonLunarLevelingCyclePrecession.containerObj    ← Lunar Leveling cycle
                 └── moonNodalPrecession.containerObj    ← ~18.6 year nodal cycle
                     └── moon.containerObj
                         └── moon.orbitObj    ← ~27.3 day lunar month
@@ -252,7 +252,7 @@ earth.pivotObj
 | **Apsidal Precession** | ~3,232 days (~8.85 years) | Lunar perigee precession |
 | **Apsidal-Nodal 1** | ~206 days | Apsidal-nodal beat frequency |
 | **Apsidal-Nodal 2** | ~206 days (reverse) | Counter-rotation for beat |
-| **Royer Cycle** | Variable | Long-term lunar cycle |
+| **Lunar Leveling Cycle** | Variable | Long-term lunar cycle |
 | **Nodal Precession** | ~6,798 days (~18.6 years) | Lunar node regression |
 | **Moon** | ~27.32 days | Sidereal lunar month |
 
@@ -376,7 +376,7 @@ This applies throughout the model:
 │                                                                              │
 │  Earth (Axial Precession: HY/13 = 25,684 years, clockwise)                  │
 │    │                                                                         │
-│    ├── Moon Hierarchy (apsidal, nodal, Royer cycles)                        │
+│    ├── Moon Hierarchy (apsidal, nodal, Lunar Leveling cycles)                        │
 │    │                                                                         │
 │    └── Inclination Precession (HY/3 = 111,296 years, counter-clockwise)     │
 │          │                                                                   │
