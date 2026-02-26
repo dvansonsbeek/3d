@@ -1127,10 +1127,10 @@ const OrbitalFormulas = {
   },
 
   // Convert precession against Ecliptic to precession against ICRF
-  // ICRF_period = (ecliptic × reference) / (ecliptic - reference)
-  // Reference is typically holisticyearLength/13 (nodal precession contribution)
+  // From ω_ICRF = ω_ecl - ω_ref → T_ICRF = (T_ecl × T_ref) / (T_ref - T_ecl)
+  // Reference is typically holisticyearLength/13 (general precession)
   precessionEclipticToICRF: (ecliptic_years, reference_years) => {
-    const diff = ecliptic_years - reference_years;
+    const diff = reference_years - ecliptic_years;
     if (diff === 0) return Infinity;
     return (ecliptic_years * reference_years) / diff;
   },
@@ -21139,8 +21139,8 @@ const planetStats = {
 
     {header : '—  Precession Cycles —' },
       {label : () => `Axial precession (years)`,
-       value : [ { small: { v: () => holisticyearLength/13, dec:2, sep:',' }},{ v: () => o.axialPrecessionRealLOD, dec:9, sep:',' }],
-       hover : [`The mean value for axial precession is calculated as ${fmtNum(holisticyearLength,0,',')}/13`],
+       value : [ { small: { v: () => -holisticyearLength/13, dec:2, sep:',' }},{ v: () => -o.axialPrecessionRealLOD, dec:9, sep:',' }],
+       hover : [`The mean value for axial precession is calculated as -${fmtNum(holisticyearLength,0,',')}/13 (retrograde)`],
        info  : 'https://en.wikipedia.org/wiki/Axial_precession'},
       {label : () => `Inclination precession (years)`,
        value : [ { small: { v: () => holisticyearLength/3, dec:2, sep:',' }},{ v: () => o.inclinationPrecessionRealLOD, dec:8, sep:',' }],
@@ -21161,19 +21161,19 @@ const planetStats = {
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession against Ecliptic`,
-       value : [ { v: () => earthPerihelionICRFYears, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
+       value : [ { v: () => OrbitalFormulas.precessionICRFToEcliptic(earthPerihelionICRFYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane: T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`],
        static: true},
       {label : () => `Perihelion Precession against ICRF`,
-       value : [ { v: () => holisticyearLength/13, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Period in the inertial ICRF frame: ${fmtNum(holisticyearLength,0,',')} / 13`],
+       value : [ { v: () => earthPerihelionICRFYears, dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Period in the inertial ICRF frame: ${fmtNum(holisticyearLength,0,',')} / 3`],
        static: true},
       {label : () => `Perihelion precession per century`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
-       hover : [`Rate = 129,600,000 / period_years arcseconds per century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(OrbitalFormulas.precessionICRFToEcliptic(earthPerihelionICRFYears, holisticyearLength/13)), dec:2, sep:',' },{ small: 'arcsec/100 yrs' }],
+       hover : [`Rate = 129,600,000 / ecliptic_period arcseconds per century`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(OrbitalFormulas.precessionICRFToEcliptic(earthPerihelionICRFYears, holisticyearLength/13))) * 1e9, dec:6, sep:',' },{ small: '×10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
 
