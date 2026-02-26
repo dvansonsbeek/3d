@@ -38,8 +38,8 @@ The ICRF is the fundamental celestial reference frame defined by the positions o
 - Used as the "fixed" background reference
 
 **In the simulation:**
-- Perihelion precession periods are given in ICRF coordinates
-- Example: `earthPerihelionICRFYears = 111,296 years`
+- Earth's perihelion precession period is given in ICRF coordinates: `earthPerihelionICRFYears = 111,296 years`
+- Other planets use ecliptic coordinates: `<planet>PerihelionEclipticYears`
 
 ### 1.2 Ecliptic Coordinates
 

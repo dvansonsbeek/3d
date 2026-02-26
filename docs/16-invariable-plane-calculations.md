@@ -244,7 +244,7 @@ This quantity depends on which reference plane defines the ascending node. For t
 
 ### Why ω_inv is Not Constant
 
-Both the longitude of perihelion and the ascending node on the invariable plane precess at the same underlying ICRF rate (`<planet>PerihelionICRFYears`). If both were computed in the same coordinate frame, their difference would be constant. However, the two values displayed in the planet stats panels are computed in **different reference frames**:
+Both the longitude of perihelion and the ascending node on the invariable plane precess at the same underlying ecliptic rate (`<planet>PerihelionEclipticYears`). If both were computed in the same coordinate frame, their difference would be constant. However, the two values displayed in the planet stats panels are computed in **different reference frames**:
 
 | Value | UI Label | Variable | Frame | Method |
 |-------|----------|----------|-------|--------|

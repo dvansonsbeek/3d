@@ -372,7 +372,7 @@ console.log('║                         CURRENT script.js VALUES               
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 console.log('');
 console.log('// Inclination oscillation parameters (mean, amplitude, phase)');
-console.log('// Period uses <planet>PerihelionICRFYears for ascending node precession rate');
+console.log('// Period uses <planet>PerihelionEclipticYears for ascending node precession rate');
 console.log('// Formula: i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)');
 console.log('');
 

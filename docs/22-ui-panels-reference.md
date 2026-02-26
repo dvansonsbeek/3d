@@ -29,7 +29,7 @@ For each planet (e.g., Venus), the hierarchy is:
 
 ```
 startingPoint (root)
-    └── [Planet]PerihelionDurationICRF      (Step 1: ICRF precession)
+    └── [Planet]PerihelionDurationEcliptic      (Step 1: Ecliptic precession)
             └── [Planet]PerihelionFromEarth (Step 2: Perihelion position offset)
                     └── [Planet]PerihelionDurationEcliptic (Step 3: Ecliptic precession)
                             └── [Planet]PerihelionFromSun   (Step 4: Heliocentric orbit setup)
@@ -40,7 +40,7 @@ startingPoint (root)
 
 | Step | Object Name Pattern | Purpose |
 |------|---------------------|---------|
-| 1 | `[Planet]PerihelionDurationICRF` | Handles perihelion precession in ICRF |
+| 1 | `[Planet]PerihelionDurationEcliptic` | Handles perihelion precession relative to ecliptic |
 | 2 | `[Planet]PerihelionFromEarth` | Positions the perihelion point as seen from Earth |
 | 3 | `[Planet]PerihelionDurationEcliptic` | Handles perihelion precession relative to ecliptic |
 | 4 | `[Planet]PerihelionFromSun` | Sets up the heliocentric orbit |

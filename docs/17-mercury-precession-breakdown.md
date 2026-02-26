@@ -351,7 +351,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.mercuryAscendingNode,
       mass: M_MERCURY,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(mercurySolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)
     },
     venus: {
       name: 'Venus',
@@ -361,7 +361,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.venusAscendingNode,
       mass: M_VENUS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(venusSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)
     },
     earth: {
       name: 'Earth',
@@ -381,7 +381,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.marsAscendingNode,
       mass: M_MARS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(marsSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)
     },
     jupiter: {
       name: 'Jupiter',
@@ -391,7 +391,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.jupiterAscendingNode,
       mass: M_JUPITER,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(jupiterSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)
     },
     saturn: {
       name: 'Saturn',
@@ -401,7 +401,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.saturnAscendingNode,
       mass: M_SATURN,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(saturnSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)
     },
     uranus: {
       name: 'Uranus',
@@ -411,7 +411,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.uranusAscendingNode,
       mass: M_URANUS,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(uranusSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)
     },
     neptune: {
       name: 'Neptune',
@@ -421,7 +421,7 @@ getPlanetPerturbationData: (o) => {
       omega_deg: o.neptuneAscendingNode,
       mass: M_NEPTUNE,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(neptuneSolarYearInput),
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionICRFYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)
     }
   };
 }
@@ -551,7 +551,7 @@ For Mars, the display will show all 7 planetary contributions plus totals:
 ```javascript
 {header : '—  Precession Breakdown —' },
   {label : () => `Observed Precession Rate`,
-   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionICRFYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
+   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
    hover : [`Total observed perihelion precession rate from astronomical observations`],
    static: true},
 null,
@@ -621,7 +621,7 @@ Each planet gets its own breakdown section. Here's the pattern for Mercury (wher
 // MERCURY - All outer perturbers
 {header : '—  Precession Breakdown —' },
   {label : () => `Observed Precession Rate`,
-   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionICRFYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
+   value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:1, sep:',' },{ small: 'arcsec/century' }],
    hover : [`Famous for the 43 arcsec/century relativistic anomaly discovered by Le Verrier`],
    static: true},
 null,

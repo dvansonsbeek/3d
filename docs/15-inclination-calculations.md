@@ -111,7 +111,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Get planet-specific constants
   const mean = mercuryInvPlaneInclinationMean;
   const amplitude = mercuryInvPlaneInclinationAmplitude;
-  const period = mercuryPerihelionICRFYears;
+  const period = mercuryPerihelionEclipticYears;
   const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
   const phaseAngle = mercuryInclinationPhaseAngle;  // 203.3195°
 

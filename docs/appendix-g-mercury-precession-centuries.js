@@ -30,12 +30,12 @@ const holisticyearLength = 333888;
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Mercury's perihelion precession period (ICRF frame)
-const mercuryPerihelionICRFYears = holisticyearLength / (1 + 3/8);  // ~242,828 years
+// Mercury's perihelion precession period (ecliptic frame)
+const mercuryPerihelionEclipticYears = holisticyearLength / (1 + 3/8);  // ~242,828 years
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()
-const eclipticRate = 129600000 / mercuryPerihelionICRFYears;
+const eclipticRate = 129600000 / mercuryPerihelionEclipticYears;
 
 // Earth precession cycles (affect Earth-frame measurements)
 const earthAxialPrecessionPeriod = holisticyearLength / 13;        // ~25,684 years
@@ -62,7 +62,7 @@ console.log('┌─────────────────────�
 console.log('│ MODEL CONFIGURATION                                                        │');
 console.log('├─────────────────────────────────────────────────────────────────────────────┤');
 console.log(`│ Holistic Year:                      ${holisticyearLength.toFixed(0).padStart(12)} years                │`);
-console.log(`│ Mercury Perihelion ICRF Period:    ${mercuryPerihelionICRFYears.toFixed(2).padStart(12)} years                │`);
+console.log(`│ Mercury Perihelion Ecliptic Period: ${mercuryPerihelionEclipticYears.toFixed(2).padStart(12)} years                │`);
 console.log(`│ Ecliptic Precession Rate:          ${eclipticRate.toFixed(2).padStart(12)} arcsec/century      │`);
 console.log('│                                                                             │');
 console.log('│ Earth Precession Cycles:                                                    │');
