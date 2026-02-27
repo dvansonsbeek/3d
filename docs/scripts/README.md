@@ -86,8 +86,8 @@ The `archive/` directory contains earlier investigation scripts that were supers
 
 | File | Description |
 |------|-------------|
-| `holistic-year-objects-data.csv` | Simulation output data: orbital parameters across one Holistic-Year (333,888 years) |
-| `../appendix-h-holistic-year-objects-data.xlsx` | Excel version of the same data with additional sheets |
+| `holistic-year-objects-data.csv` | Simulation output data: orbital parameters across one Holistic-Year (333,888 years) (predictive formula scripts depend on this file) |
+| [`../appendix-h-holistic-year-objects-data.xlsx`](../appendix-h-holistic-year-objects-data.xlsx) | Excel version of the same data with additional sheets (perihelion scripts depend on this file — it must be present in the parent `docs/` directory) |
 
 ---
 
