@@ -100,7 +100,6 @@ All dependencies are standard scientific Python packages.
 
 ## Related Resources
 
-- [Preprint: Fibonacci Laws of Planetary Motion](https://doi.org/10.21203/rs.3.rs-8758810/v1)
 - [Interactive 3D Simulation](https://3d.holisticuniverse.com)
 - [Model Documentation](https://www.holisticuniverse.com)
 - [Data Visualization](https://data.holisticuniverse.com)
