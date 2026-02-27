@@ -44,6 +44,7 @@ python fibonacci_trappist1_deep.py
 | `fibonacci_311_deep.py` | Deep investigation of R ≈ 311 as a Fibonacci primitive root prime |
 | `fibonacci_311_analysis.py` | Analysis of the 311 constant across planetary systems |
 | `fibonacci_trappist1_deep.py` | TRAPPIST-1 exoplanet system: Fibonacci period ratios and super-period = 311 × P_b |
+| `fibonacci_psi_amd.py` | AMD interpretation of ψ: mass cancellation proof, budget equation, eccentricity parallel |
 | `fibonacci_exoplanet_test.py` | Broader exoplanet Fibonacci ratio tests |
 | `fibonacci_balance_year_verify.py` | Verification of the balance year concept |
 | `fibonacci_law4_search.py` | Search for Law 4 (perihelion argument) formulas |
