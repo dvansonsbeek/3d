@@ -366,7 +366,7 @@ These formulas handle precession calculations and secular perturbation theory.
 |----------|---------|-------------|
 | `precessionRateFromPeriod(period_years)` | Rate = 129,600,000 / P | Convert period to arcsec/century |
 | `precessionPeriodFromRate(arcsec_per_century)` | Period = 129,600,000 / Rate | Convert rate to full-cycle period (years) |
-| `precessionEclipticToICRF(ecliptic_years, ref_years)` | ICRF = (ecl × ref)/(ecl - ref) | Transform ecliptic to ICRF frame |
+| `precessionEclipticToICRF(ecliptic_years, ref_years)` | ICRF = (ecl × ref)/(ref - ecl) | Transform ecliptic to ICRF frame |
 | `precessionICRFToEcliptic(ICRF_years, ref_years)` | ecl = (ICRF × ref)/(ICRF + ref) | Transform ICRF to ecliptic frame |
 | `holisticPrecessionRatio(prec_period, holistic_year)` | ratio = HY / period | Ratio showing resonance structure |
 | `precessionFromHolisticRatio(holistic_year, ratio)` | period = HY / n | Period from integer ratio |

@@ -214,6 +214,9 @@ Detailed documentation is available in the `/docs` folder. Start with the [Docum
 - [Constants Reference](docs/10-constants-reference.md) - All constants and their sources
 - [Orbital Formulas Reference](docs/11-orbital-formulas-reference.md) - Formula implementations
 
+**Investigation & Verification Scripts:**
+- [Python Scripts](docs/scripts/) - Statistical significance tests, perihelion precession analysis, exoplanet Fibonacci tests, and predictive formula system
+
 ---
 
 ## 🔜 Roadmap
