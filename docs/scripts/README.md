@@ -76,10 +76,6 @@ python fibonacci_trappist1_deep.py
 |------|-------------|
 | `PREDICTIVE_FORMULA_GUIDE.mdx` | Detailed guide to the predictive formula system |
 
-### Archive
-
-The `archive/` directory contains earlier investigation scripts that were superseded by the active scripts above. They are preserved for research reproducibility.
-
 ---
 
 ## Data Files
