@@ -1585,7 +1585,7 @@ def _p2_section_7():
 
     The old idx(F) = 2k-4 selection rule and d = b × F decomposition have been
     superseded. The new framework finds pure Fibonacci d-values by exhaustive
-    search (Config #27 of 755 valid configurations).
+    search (Config #32 of 755 valid configurations).
     """
     pass
 
@@ -1804,7 +1804,7 @@ def _p2_section_10(R):
     print("  ═══ D-VALUE ASSIGNMENT ═══")
     print()
     print("  The d-values are now pure Fibonacci numbers found by exhaustive search")
-    print("  (Config #27 of 755 valid configurations). Mirror symmetry is exact")
+    print("  (Config #32 of 755 valid configurations). Mirror symmetry is exact")
     print("  for all 4 inner/outer pairs: {Mars↔Jupiter(5), Earth↔Saturn(3),")
     print("  Venus↔Neptune(34), Mercury↔Uranus(21)}.")
     print()

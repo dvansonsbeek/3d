@@ -7,9 +7,9 @@ Tests whether the three Fibonacci Laws of Planetary Motion (discovered for
 the Solar System) apply to exoplanet systems.
 
 Solar System Laws (reference):
-  Law 1: d × amplitude × √m = ψ (inclination amplitude, single ψ constant)
-  Law 2: Σ(203°) w_j = Σ(23°) w_j (inclination balance, 99.9998%)
-  Law 3: Σ(203°) v_j = Σ(23°) v_j (eccentricity balance, 99.88%)
+  Law 2: d × amplitude × √m = ψ (inclination amplitude, single ψ constant)
+  Law 3: Σ(203°) w_j = Σ(23°) w_j (inclination balance, 99.9998%)
+  Law 5: Σ(203°) v_j = Σ(23°) v_j (eccentricity balance, 99.88%)
   Additional: ξ = e × √m forms Fibonacci-ratio ladders (inner planets)
 
 Key variables:

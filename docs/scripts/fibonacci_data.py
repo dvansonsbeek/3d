@@ -21,7 +21,8 @@ Framework (2025):
   - Single ψ-constant for all 8 planets
   - Pure Fibonacci divisors d ∈ {3, 5, 21, 34}
   - Saturn sole retrograde planet (23° phase group)
-  - Three laws: Inclination Amplitude, Inclination Balance, Eccentricity Balance
+  - Six laws: Inclination Amplitude, Inclination Balance, Eccentricity Balance,
+    Perihelion Argument, Eccentricity Formation, and Precession Rate
 """
 
 import math
@@ -118,8 +119,9 @@ ECC = ECCENTRICITIES
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Pure Fibonacci divisor assignments — Config #27, the unique mirror-symmetric
-# configuration from exhaustive search of 7,558,272 candidates.
+# Pure Fibonacci divisor assignments — Config #32, the unique mirror-symmetric
+# configuration from exhaustive search of 7,558,272 candidates (755 achieve
+# balance above 99.994%; this is the only one with exact mirror symmetry).
 D = {
     "Mercury": 21,  # F_8
     "Venus":   34,  # F_9
@@ -400,7 +402,7 @@ XI_BASE = {p: xi_base(p) for p in PLANET_NAMES}
 # ═══════════════════════════════════════════════════════════════════════════
 
 def inclination_weight(planet):
-    """Law 2 structural weight: w_j = √(m × a × (1-e²)) / d"""
+    """Law 3 structural weight: w_j = √(m × a × (1-e²)) / d"""
     m = MASS[planet]
     a = SMA[planet]
     e = ECC[planet]
@@ -409,7 +411,7 @@ def inclination_weight(planet):
 
 
 def eccentricity_weight(planet):
-    """Law 3 eccentricity weight: v_j = √m × a^(3/2) × e / √d"""
+    """Law 5 eccentricity weight: v_j = √m × a^(3/2) × e / √d"""
     m = MASS[planet]
     a = SMA[planet]
     e = ECC[planet]
@@ -418,7 +420,7 @@ def eccentricity_weight(planet):
 
 
 def verify_law2():
-    """Verify Law 2: inclination balance between phase groups.
+    """Verify Law 3: inclination balance between phase groups.
     Returns (sum_203, sum_23, balance_pct).
     """
     sum_203 = sum(inclination_weight(p) for p in GROUP_203)
@@ -428,7 +430,7 @@ def verify_law2():
 
 
 def verify_law3():
-    """Verify Law 3: eccentricity balance between phase groups.
+    """Verify Law 5: eccentricity balance between phase groups.
     Returns (sum_203, sum_23, balance_pct).
     """
     sum_203 = sum(eccentricity_weight(p) for p in GROUP_203)
