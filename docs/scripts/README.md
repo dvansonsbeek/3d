@@ -1,6 +1,6 @@
 # Fibonacci Laws — Investigation & Verification Scripts
 
-Python scripts for investigating, verifying, and reproducing the results of the [Fibonacci Laws of Planetary Motion](https://doi.org/10.21203/rs.3.rs-8758810/v1) paper.
+Python scripts for investigating, verifying, and reproducing the results of the [Fibonacci Laws of Planetary Motion](https://www.holisticuniverse.com).
 
 These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Holistic-Year timescale (H = 333,888 years).
 
