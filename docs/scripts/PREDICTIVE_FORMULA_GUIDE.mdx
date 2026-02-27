@@ -53,7 +53,7 @@ All planets are calibrated to their official J2000 (year 2000) perihelion longit
 
 ```
 docs/
-├── formulas/
+├── scripts/
 │   ├── predictive_formula.py     # Core system: constants, features, calculations
 │   ├── observed_formula.py       # Observed formula: feature builders (225/328 terms)
 │   ├── train_precession.py       # Predictive training script (ridge regression)
@@ -62,11 +62,9 @@ docs/
 │   ├── validate_precession.py    # Validation against observed data
 │   ├── *_coeffs_unified.py       # Predictive coefficients (7 files, 273 terms)
 │   ├── *_coeffs.py               # Observed coefficients (7 files, 225/328 terms)
+│   ├── holistic-year-objects-data.csv  # Training data
 │   └── PREDICTIVE_FORMULA_GUIDE.mdx  # This guide
-├── paper/                        # LaTeX sources and compiled PDFs
-├── strategy/                     # Publication and outreach documents
-├── future/                       # Future development specs
-└── holistic-year-objects-data.csv  # Training data
+└── appendix-h-holistic-year-objects-data.xlsx  # Excel version of training data
 ```
 
 ## Quick Start
@@ -76,7 +74,7 @@ docs/
 From the command line:
 
 ```bash
-cd holisticuniverse/docs/formulas
+cd docs/scripts
 python predict_precession.py 2000
 ```
 
@@ -131,7 +129,7 @@ Note: Uses semicolon (`;`) as delimiter and comma (`,`) as decimal separator (Eu
 ### 2. Run Training
 
 ```bash
-cd holisticuniverse/docs/formulas
+cd docs/scripts
 python train_precession.py
 ```
 
