@@ -134,7 +134,7 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | -eccentricityAmplitude × 100 | -0.001431 × 100 |
+| orbitRadius | -eccentricityAmplitude × 100 | -0.0014226 × 100 |
 | speed | -2π / (HY/13) | Clockwise axial precession (~25,684 years) |
 | rotationSpeed | 2π × (mean solar year + 1 day) | Daily rotation |
 | tilt | -23.41398° | Mean axial tilt (obliquity) |
@@ -175,7 +175,7 @@ Both layers use the same period but opposite signs:
 | Property | Perihelion 1 | Perihelion 2 |
 |----------|--------------|--------------|
 | speed | +2π / (HY/16) | -2π / (HY/16) |
-| orbitTilta | -1.26 rad (~64°) | 0 |
+| orbitTilta | -1.258454° | 0 |
 | orbitCentera | 0 | -eccentricityBase × 100 |
 
 **Purpose:** "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
@@ -339,13 +339,13 @@ Updates occur after every precession frame, reflecting live tilt changes.
 |----------|-------|-------------|
 | 1 Solar year | 2π radians | 365.2421897 days |
 | 1 AU | 100 scene units | 149,597,870.698828 km |
-| Mean sidereal year | 31,558,153.91 s | Mean across perihelion cycle |
+| Mean sidereal year | 31,558,149.724 s | Mean across perihelion cycle |
 | Sidereal year at 1246 AD | 31,558,149.68 s | At perihelion-solstice alignment |
 | Mean solar day | ~86,400 s | Mean across perihelion cycle |
 | Mean obliquity | 23.41398° | Earth's mean axial tilt |
 | Inclination amplitude | 0.634° | Earth's orbital tilt oscillation |
 | Base eccentricity | 0.015321 | Earth's base orbital eccentricity |
-| Eccentricity amplitude | 0.001431 | Earth's eccentricity oscillation |
+| Eccentricity amplitude | 0.0014226 | Earth's eccentricity oscillation |
 
 ---
 

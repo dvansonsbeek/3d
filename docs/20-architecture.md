@@ -219,11 +219,10 @@ The monolithic script.js is organized into logical sections:
 │  - Data objects for every celestial body and helper                  │
 │  - Planet hierarchical precession layers                             │
 │  - Moon precession layers                                           │
-│  - Global state object 'o' definition                               │
-│  - GUI-bound values and live calculation results                    │
 ├─────────────────────────────────────────────────────────────────────┤
 │  SECTION 5: MASTER ARRAYS & SCENE SETUP (Lines 3713-4624)           │
 │  - planetObjects / tracePlanets arrays                               │
+│  - Global state object 'o' definition (~line 3900)                  │
 │  - Renderer initialization (WebGL, shadows, tone mapping)           │
 │  - Camera setup (perspective, orbit controls)                       │
 │  - createPlanet calls and hierarchy wiring (.add() calls)           │
@@ -273,14 +272,13 @@ The monolithic script.js is organized into logical sections:
 The global state object `o` contains all simulation state:
 
 ```javascript
-const o = {
+let o = {
   // ═══════════════════════════════════════════════════════════════
   // TIME & SIMULATION CONTROL
   // ═══════════════════════════════════════════════════════════════
-  pos: 0,                        // Current position in time (days from epoch)
-  runIt: false,                  // Simulation running flag
+  pos: 0,                        // Current position in time (years from epoch)
+  Run: false,                    // Simulation running flag
   speed: 1,                      // Speed multiplier (-5 to +5)
-  timeUnit: 'sDay',              // Time unit per second
 
   // ═══════════════════════════════════════════════════════════════
   // DATE/TIME DISPLAY
@@ -295,8 +293,7 @@ const o = {
   // ═══════════════════════════════════════════════════════════════
   eccentricityEarth: 0.0167,     // Current orbital eccentricity
   obliquityEarth: 23.44,         // Current axial tilt (degrees)
-  earthInvPlaneInclinationDynamic: 1.57,  // Inclination to invariable plane
-  longitudeOfPerihelion: 102.9,  // Longitude of perihelion (degrees)
+  earthInvPlaneInclinationDynamic: 0,  // Inclination to invariable plane
 
   // ═══════════════════════════════════════════════════════════════
   // PLANET ANOMALIES (Per-planet calculations)
@@ -342,17 +339,11 @@ const o = {
   saturnAngularMomentumPercent: 0,
   optionABDifference: 0,
 
-  // ═══════════════════════════════════════════════════════════════
-  // VISUAL SETTINGS
-  // ═══════════════════════════════════════════════════════════════
-  showOrbits: true,
-  showStars: true,
-  showConstellations: false,
-  showInvariablePlane: true,
-  sizeBoost: 0.5,                // Planet size multiplier
-
   // ... additional properties ...
 };
+
+// Visual settings are on a separate params object:
+const params = { sizeBoost: 0 };   // Planet size multiplier
 ```
 
 ### State Update Flow
@@ -453,13 +444,13 @@ Critical ordering for dependent calculations:
 ```
 1. updatePredictions()                          // Year lengths, precession, obliquity
        ↓
-2. updateDynamicInclinations()                  // Planet inclination oscillations
+2. updateAscendingNodes()                       // Orbital plane intersections
        ↓
-3. updateAscendingNodes()                       // Orbital plane intersections
+3. updatePlanetAnomalies()                      // Mean/True anomaly for all planets
        ↓
-4. updatePlanetAnomalies()                      // Mean/True anomaly for all planets
+4. updatePlanetInvariablePlaneHeights()         // Height above/below plane
        ↓
-5. updatePlanetInvariablePlaneHeights()         // Height above/below plane
+5. updateDynamicInclinations()                  // Planet inclination oscillations
        ↓
 6. updateInvariablePlaneBalance()               // Mass-weighted balance calculation
        ↓
@@ -468,6 +459,14 @@ Critical ordering for dependent calculations:
 8. updateBalanceMinMax()                        // Min/max every frame
        ↓
 9. calculateInvariablePlaneFromAngularMomentum()  // Option A validation
+       ↓
+10. updateHierarchyLiveData()                    // Live hierarchy inspector
+       ↓
+11. updateInclinationPathMarker()                // Inclination visualization
+       ↓
+12. updateInvariablePlanePosition()              // Invariable plane scene object
+       ↓
+13. updateSunCenteredInvPlane()                  // Sun-centered invariable plane
 ```
 
 ---
