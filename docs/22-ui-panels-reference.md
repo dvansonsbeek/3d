@@ -28,11 +28,11 @@ Each planet in the Holistic Universe Model is built using a **5-step hierarchica
 For each planet (e.g., Venus), the hierarchy is:
 
 ```
-startingPoint (root)
-    └── [Planet]PerihelionDurationEcliptic      (Step 1: Ecliptic precession)
-            └── [Planet]PerihelionFromEarth (Step 2: Perihelion position offset)
-                    └── [Planet]PerihelionDurationEcliptic (Step 3: Ecliptic precession)
-                            └── [Planet]PerihelionFromSun   (Step 4: Heliocentric orbit setup)
+barycenterEarthAndSun (root for all planets)
+    └── [Planet]PerihelionDurationEcliptic1     (Step 1: Forward ecliptic precession)
+            └── [Planet]PerihelionFromEarth     (Step 2: Perihelion position offset)
+                    └── [Planet]PerihelionDurationEcliptic2 (Step 3: Reverse ecliptic precession)
+                            └── [Planet]RealPerihelionAtSun (Step 4: Heliocentric orbit setup)
                                     └── [planet]            (Step 5: The actual planet)
 ```
 
@@ -40,10 +40,10 @@ startingPoint (root)
 
 | Step | Object Name Pattern | Purpose |
 |------|---------------------|---------|
-| 1 | `[Planet]PerihelionDurationEcliptic` | Handles perihelion precession relative to ecliptic |
-| 2 | `[Planet]PerihelionFromEarth` | Positions the perihelion point as seen from Earth |
-| 3 | `[Planet]PerihelionDurationEcliptic` | Handles perihelion precession relative to ecliptic |
-| 4 | `[Planet]PerihelionFromSun` | Sets up the heliocentric orbit |
+| 1 | `[Planet]PerihelionDurationEcliptic1` | Forward perihelion precession (+ω rate) |
+| 2 | `[Planet]PerihelionFromEarth` | Geocentric transform (+2π/yr) + perihelion offset |
+| 3 | `[Planet]PerihelionDurationEcliptic2` | Reverse perihelion precession (−ω, cancels Step 1) |
+| 4 | `[Planet]RealPerihelionAtSun` | Heliocentric orbit frame: inclination tilt, −2π/yr |
 | 5 | `[planet]` | The actual planet with size, texture, rotation |
 
 ### Properties Displayed Per Step

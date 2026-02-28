@@ -66,12 +66,14 @@ Every object in the scene follows this internal structure:
 
 ```
 containerObj (orbitContainer)
-├── orbitObj          → Rotation layer (rotation.y = angular position)
-├── pivotObj          → Translation layer (position on ellipse)
-├── rotationAxis      → Axial tilt + daily rotation
-│   └── planetObj     → The actual sphere mesh
-└── orbitLine         → Orbit path visualization (optional)
+└── orbitObj          → Rotation layer (rotation.y = angular position)
+    ├── orbitLine     → Orbit path visualization (optional)
+    ├── pivotObj      → Translation layer (position on ellipse); children attach here
+    └── rotationAxis  → Axial tilt + daily rotation
+        └── planetObj → The actual sphere mesh
 ```
+
+Note: `pivotObj` and `rotationAxis` are **siblings** under `orbitObj`, not top-level children of `containerObj`. The hierarchy wiring (`.add()` calls) attaches child objects to `pivotObj`. The visual mesh lives under `rotationAxis`.
 
 ### 2.1 Component Purposes
 
@@ -103,20 +105,21 @@ Where:
 The complete nesting order from the technical guide:
 
 ```
-Earth (pivot)
-├── Inclination Precession (container)         ← HY/3 = 111,296 years
-│   ├── Mid-Eccentricity Orbit (container)     ← Reference for eccentricity
-│   │
-│   └── Ecliptic Precession (container)        ← HY/5 = 66,778 years
-│       └── Obliquity Cycle (container)        ← HY/8 = 41,736 years
-│           └── Perihelion Precession 1        ← HY/16 = 20,868 years
-│               └── Perihelion Precession 2    ← HY/16 = 20,868 years (reverse)
-│                   └── Barycenter Sun (pivot)
-│                       └── PERIHELION-OF-EARTH
-│                           └── Sun
-│                               └── [All outer planets]
-│
-└── Moon Hierarchy (see Part 5)
+startingPoint (scene root)
+└── Earth (pivot)                                     ← Axial Precession: HY/13
+    ├── Inclination Precession (container)            ← HY/3 = 111,296 years
+    │   ├── Mid-Eccentricity Orbit (container)        ← Reference for eccentricity
+    │   │
+    │   └── Ecliptic Precession (container)           ← HY/5 = 66,778 years
+    │       └── Obliquity Cycle (container)           ← HY/8 = 41,736 years
+    │           └── Perihelion Precession 1           ← HY/16 = 20,868 years
+    │               └── Perihelion Precession 2       ← HY/16 = 20,868 years (reverse)
+    │                   └── Barycenter (pivot)
+    │                       ├── Sun                   ← sibling, NOT parent
+    │                       ├── PERIHELION-OF-EARTH   ← sibling
+    │                       └── [All planet chains]   ← siblings of Sun
+    │
+    └── Moon Hierarchy (see Part 7)
 ```
 
 Each nesting layer applies its rotation to all children, creating composite precession movements.
@@ -260,20 +263,20 @@ earth.pivotObj
 
 ## Part 8: Outer Planet Hierarchy
 
-All planets from Mercury to Neptune (plus Pluto, Halley's Comet, and Eros) are children of the Sun/PERIHELION-OF-EARTH structure.
+All planets from Mercury to Neptune (plus Pluto, Halley's Comet, and Eros) are **siblings** of the Sun under `barycenterEarthAndSun`, not children of the Sun.
 
 ```
 barycenterEarthAndSun.pivotObj
-└── sun.containerObj
-    └── [Planet]PerihelionDurationEcliptic1.containerObj    ← Forward precession
-        └── [Planet]PerihelionFromEarth.containerObj
-            └── [Planet]PerihelionDurationEcliptic2.containerObj    ← Reverse precession
-                └── [Planet]RealPerihelionAtSun.containerObj
-                    └── [planet].containerObj
-                        └── [planet].orbitObj
-                            └── [planet].pivotObj
-                                └── [planet].rotationAxis
-                                    └── [planet].planetObj
+├── sun.containerObj                                           ← sibling
+├── earthPerihelionFromEarth.containerObj                      ← sibling
+├── [Planet]PerihelionDurationEcliptic1.containerObj            ← sibling (one per planet)
+│     └── [Planet]PerihelionFromEarth.containerObj
+│           └── [Planet]PerihelionDurationEcliptic2.containerObj    ← Reverse precession
+│                 ├── [Planet]RealPerihelionAtSun.containerObj
+│                 │     └── [planet].containerObj → orbitObj → [pivotObj, rotationAxis → planetObj]
+│                 └── [Planet]FixedPerihelionAtSun.containerObj     ← sibling
+├── [Next Planet]PerihelionDurationEcliptic1.containerObj       ← sibling
+│     └── ...
 ```
 
 ### 8.1 Planet Perihelion Precession Pattern
@@ -370,27 +373,30 @@ This applies throughout the model:
 ## Part 13: Summary Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           SCENE HIERARCHY                                    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  Earth (Axial Precession: HY/13 = 25,684 years, clockwise)                  │
-│    │                                                                         │
-│    ├── Moon Hierarchy (apsidal, nodal, Lunar Leveling cycles)                        │
-│    │                                                                         │
-│    └── Inclination Precession (HY/3 = 111,296 years, counter-clockwise)     │
-│          │                                                                   │
-│          └── Ecliptic Precession (HY/5 = 66,778 years, tilt: -0.634°)       │
-│                │                                                             │
-│                └── Obliquity Cycle (HY/8 = 41,736 years, tilt: +0.634°)     │
-│                      │                                                       │
-│                      └── Perihelion 1 (HY/16 = 20,868 years, forward)       │
-│                            │                                                 │
-│                            └── Perihelion 2 (HY/16 = 20,868 years, reverse) │
-│                                  │                                           │
-│                                  └── Barycenter → Sun → All Planets         │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           SCENE HIERARCHY                                     │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  startingPoint (scene root)                                                   │
+│    └── Earth (Axial Precession: HY/13 = 25,684 years, clockwise)             │
+│          │                                                                    │
+│          ├── Moon Hierarchy (apsidal, nodal, Lunar Leveling cycles)           │
+│          │                                                                    │
+│          └── Inclination Precession (HY/3 = 111,296 years, CCW)              │
+│                │                                                              │
+│                └── Ecliptic Precession (HY/5 = 66,778 years, -0.634°)        │
+│                      │                                                        │
+│                      └── Obliquity Cycle (HY/8 = 41,736 years, +0.634°)      │
+│                            │                                                  │
+│                            └── Perihelion 1 (HY/16 = 20,868 years, fwd)      │
+│                                  │                                            │
+│                                  └── Perihelion 2 (HY/16, reverse)           │
+│                                        │                                      │
+│                                        └── Barycenter                        │
+│                                              ├── Sun (sibling)               │
+│                                              └── All Planet Chains           │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---

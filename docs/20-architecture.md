@@ -29,7 +29,7 @@
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Holistic Universe Model. It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~21,000 lines)
+- Single monolithic script.js (~30,000 lines)
 - 11 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
@@ -130,7 +130,7 @@ WebGL Render (60 FPS target)
 /home/dennis/code/3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~21,000 lines)
+│   ├── script.js               # Main application (~30,000 lines)
 │   └── style.css               # GUI and label styling
 │
 ├── public/
@@ -193,72 +193,62 @@ The monolithic script.js is organized into logical sections:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  SECTION 1: INPUT CONSTANTS (Lines 16-280)                          │
+│  SECTION 1: INPUT CONSTANTS (Lines 17-801)                          │
 │  - Holistic Year parameters (333,888-year cycle)                    │
 │  - Earth orbital parameters (tilt, eccentricity, precession)        │
 │  - All planet orbital elements (Mercury through Neptune)            │
 │  - Moon parameters (sidereal, anomalistic, nodal months)            │
-│  - Physical constants (diameters, masses, distances)                │
+│  - Physical constants (diameters, masses, distances, GM values)     │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 2: CALCULATED CONSTANTS (Lines 283-440)                    │
-│  - Derived orbital parameters (Kepler's 3rd Law)                    │
-│  - Gravitational parameters (GM values)                             │
-│  - Mean motion calculations                                         │
-│  - Precession period derivations                                    │
-├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 3: ORBITAL FORMULAS LIBRARY (Lines 443-1010)               │
+│  SECTION 2: ORBITAL FORMULAS LIBRARY (Lines 804-1359)               │
 │  - OrbitalFormulas object with 50+ methods                          │
 │  - Kepler equation solver                                           │
 │  - Anomaly conversions (mean, eccentric, true)                      │
-│  - Velocity calculations                                            │
-│  - Perturbation theory (Lagrange-Laplace)                          │
+│  - Velocity calculations, Laplace coefficients                      │
+│  - Frame conversion (Ecliptic ↔ ICRF)                               │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 4: ASTRONOMICAL FUNCTIONS (Lines 1010-3500)                │
-│  - Julian Day conversions                                           │
-│  - Calendar systems (Gregorian, Julian, Perihelion)                 │
+│  SECTION 3: DERIVED VALUES (Lines 1361-1829)                        │
+│  - Derived orbital parameters (Kepler's 3rd Law)                    │
+│  - Mean motion calculations                                         │
+│  - Precession period derivations                                    │
+│  - Julian Day conversions, calendar systems                         │
 │  - Coordinate transforms (Equatorial ↔ Ecliptic)                    │
-│  - Solstice/Equinox detection                                       │
-│  - RA/Dec calculations                                              │
-│  - Elongation calculations                                          │
+│  - Solstice/Equinox detection, RA/Dec calculations                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 5: STATE OBJECT (Lines 3550-3870)                          │
+│  SECTION 4: OBJECT DEFINITIONS (Lines 1834-3708)                    │
+│  - Data objects for every celestial body and helper                  │
+│  - Planet hierarchical precession layers                             │
+│  - Moon precession layers                                           │
 │  - Global state object 'o' definition                               │
-│  - All simulation parameters                                        │
-│  - GUI-bound values                                                 │
-│  - Live calculation results                                         │
+│  - GUI-bound values and live calculation results                    │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 6: THREE.JS SCENE SETUP (Lines 3956-5600)                  │
+│  SECTION 5: MASTER ARRAYS & SCENE SETUP (Lines 3713-4624)           │
+│  - planetObjects / tracePlanets arrays                               │
 │  - Renderer initialization (WebGL, shadows, tone mapping)           │
 │  - Camera setup (perspective, orbit controls)                       │
-│  - Lighting (ambient, directional, point lights)                    │
-│  - Planet mesh creation                                             │
-│  - Starfield and constellation rendering                            │
-│  - Visual effects (glows, rings, traces)                           │
+│  - createPlanet calls and hierarchy wiring (.add() calls)           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 7: PLANET SYSTEMS (Lines 5600-9500)                        │
-│  - Individual planet setup (Earth, Moon, all planets)               │
-│  - Orbit visualization                                              │
-│  - Invariable plane system                                          │
-│  - Hierarchy inspector                                              │
-│  - Trace path rendering                                             │
+│  SECTION 6: PLANET SYSTEMS & VISUAL EFFECTS (Lines 4625-11854)      │
+│  - Orbit visualization, starfield, constellations                   │
+│  - Invariable plane system and hierarchy inspector                  │
+│  - Trace path rendering, visual effects                             │
+│  - Export functions (solstice, year analysis, bulk, planet reports)  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 8: GUI SETUP (Lines 9766-10388)                            │
+│  SECTION 7: GUI SETUP (Lines 11855-12818)                           │
 │  - dat.GUI folder structure                                         │
-│  - Control bindings                                                 │
-│  - Event handlers                                                   │
+│  - Control bindings and event handlers                              │
 │  - Prediction displays                                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 9: RENDER LOOP (Lines 10392-10572)                         │
+│  SECTION 8: RENDER LOOP (Lines 12838-13025)                         │
 │  - Main animation frame callback                                    │
-│  - Throttled update cycles                                          │
+│  - Throttled update cycles (20/10/5/30 Hz)                          │
 │  - Performance monitoring                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 10: UPDATE FUNCTIONS (Lines 10572-21000)                   │
-│  - Position update functions                                        │
-│  - Precession calculations                                          │
-│  - Invariable plane updates                                         │
-│  - Balance trend analysis                                           │
-│  - Export functions                                                 │
+│  SECTION 9: UPDATE & CALCULATION FUNCTIONS (Lines 13026-29992)      │
+│  - Position update functions (moveModel, updatePositions)           │
+│  - Precession calculations (obliquity, inclination, dynamic)        │
+│  - Invariable plane updates and balance trend analysis              │
+│  - createPlanet function                                            │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -461,21 +451,23 @@ function render() {
 Critical ordering for dependent calculations:
 
 ```
-1. updateAscendingNodes()           // Orbital plane intersections
+1. updatePredictions()                          // Year lengths, precession, obliquity
        ↓
-2. updatePlanetAnomalies()          // Mean/True anomaly for all planets
+2. updateDynamicInclinations()                  // Planet inclination oscillations
        ↓
-3. updatePlanetInvariablePlaneHeights()  // Height above/below plane
+3. updateAscendingNodes()                       // Orbital plane intersections
        ↓
-4. updateDynamicInclinations()      // Ecliptic inclination to ecliptic
+4. updatePlanetAnomalies()                      // Mean/True anomaly for all planets
        ↓
-5. updateInvariablePlaneBalance()   // Mass-weighted balance calculation
+5. updatePlanetInvariablePlaneHeights()         // Height above/below plane
        ↓
-6. updateBalanceTrendAnalysis()     // Yearly samples when tracking
+6. updateInvariablePlaneBalance()               // Mass-weighted balance calculation
        ↓
-7. updateBalanceMinMax()            // Min/max every frame
+7. updateBalanceTrendAnalysis()                 // Yearly samples when tracking
        ↓
-8. calculateInvariablePlaneFromAngularMomentum()  // Option A validation
+8. updateBalanceMinMax()                        // Min/max every frame
+       ↓
+9. calculateInvariablePlaneFromAngularMomentum()  // Option A validation
 ```
 
 ---
