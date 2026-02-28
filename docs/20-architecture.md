@@ -30,7 +30,7 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 
 **Key Statistics:**
 - Single monolithic script.js (~30,000 lines)
-- 11 celestial bodies with full orbital mechanics
+- 13 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
 - Support for date ranges spanning ±50,000 years
@@ -169,7 +169,7 @@ WebGL Render (60 FPS target)
 |-------|------------|---------|---------|
 | **3D Engine** | Three.js | ^0.175.0 | WebGL rendering, scene management |
 | **UI Controls** | dat.GUI | ^0.7.9 | Parameter control panels |
-| **Bundler** | Parcel | ^2.16.3 | Build system, dev server, HMR |
+| **Bundler** | Parcel | ^2.16.4 | Build system, dev server, HMR |
 | **Language** | JavaScript | ES2021 | Application logic |
 | **Rendering** | WebGL 2.0 | - | Hardware-accelerated graphics |
 | **Labels** | CSS2DRenderer | Three.js | HTML labels in 3D space |
@@ -283,16 +283,15 @@ let o = {
   // ═══════════════════════════════════════════════════════════════
   // DATE/TIME DISPLAY
   // ═══════════════════════════════════════════════════════════════
-  Date: "2025-01-01",            // Current date string (GUI bound)
+  Date: "",                      // Current date string (set dynamically)
   Time: "00:00:00",              // Current time string (GUI bound)
-  julianDay: 2451545.0,          // Julian Day Number
-  currentYear: 2025,             // Decimal year
+  julianDay: "",                 // Julian Day Number (set dynamically)
 
   // ═══════════════════════════════════════════════════════════════
-  // EARTH ORBITAL PARAMETERS (Live Calculated)
+  // EARTH ORBITAL PARAMETERS (computed at runtime by updatePredictions)
   // ═══════════════════════════════════════════════════════════════
-  eccentricityEarth: 0.0167,     // Current orbital eccentricity
-  obliquityEarth: 23.44,         // Current axial tilt (degrees)
+  eccentricityEarth: 0,          // Current orbital eccentricity
+  obliquityEarth: 0,             // Current axial tilt (degrees)
   earthInvPlaneInclinationDynamic: 0,  // Inclination to invariable plane
 
   // ═══════════════════════════════════════════════════════════════
@@ -417,6 +416,18 @@ function render() {
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // POSITION TRACKING (10 Hz / 100ms) — second 10Hz block
+  // ═══════════════════════════════════════════════════════════════
+  posElapsed += delta;
+  if (posElapsed >= 0.1) {
+    posElapsed = 0;
+    // - updateElongations()
+    // - updatePerihelion()
+    // - updateOrbitOrientations()
+    // - golden.update()
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // VISUAL EFFECTS (30 Hz / 33ms)
   // ═══════════════════════════════════════════════════════════════
   visualElapsed += delta;
@@ -424,6 +435,16 @@ function render() {
     visualElapsed = 0;
     // - Lighting updates for focus
     // - Lens flare updates
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // LIGHTING & GLOW (10 Hz / 100ms) — third 10Hz block
+  // ═══════════════════════════════════════════════════════════════
+  lightElapsed += delta;
+  if (lightElapsed >= 0.1) {
+    lightElapsed = 0;
+    // - updateFocusRing()
+    // - animateGlow()
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -477,7 +498,7 @@ Critical ordering for dependent calculations:
 
 | Feature | Description | Implementation |
 |---------|-------------|----------------|
-| **Keplerian Orbits** | Elliptical orbits using 6 orbital elements | `OrbitalFormulas.keplerSolve()` |
+| **Keplerian Orbits** | Elliptical orbits using 6 orbital elements | `OrbitalFormulas.eccentricAnomaly()` |
 | **True Anomaly** | Actual position in orbit | Newton-Raphson iteration |
 | **Heliocentric Positions** | 3D coordinates relative to Sun | Spherical → Cartesian transform |
 | **Orbital Velocity** | Speed at any point in orbit | Vis-viva equation |
@@ -489,7 +510,7 @@ Critical ordering for dependent calculations:
 | **Axial Precession** | ~25,684 years | Earth's rotational axis wobble |
 | **Perihelion Precession** | ~111,296 years | Closest approach point shifts |
 | **Inclination Precession** | ~111,296 years | Orbital plane tilt variation |
-| **Obliquity Cycle** | ~41,000 years | Axial tilt oscillation (22.1° - 24.5°) |
+| **Obliquity Cycle** | ~41,736 years | Axial tilt oscillation (22.1° - 24.5°) |
 | **Eccentricity Cycle** | ~413,000 years | Orbital shape variation |
 
 ### Invariable Plane System
@@ -517,7 +538,7 @@ Features:
 | Venus | Planet | Full Keplerian | Retrograde rotation |
 | Earth | Planet | Full Keplerian | Clouds, atmosphere shader, axial tilt |
 | Moon | Satellite | Earth-centered | Apsidal/nodal precession |
-| Mars | Planet | Full Keplerian | Two moons (visual) |
+| Mars | Planet | Full Keplerian | - |
 | Jupiter | Planet | Full Keplerian | Great Red Spot texture |
 | Saturn | Planet | Full Keplerian | Ring system |
 | Uranus | Planet | Full Keplerian | Extreme axial tilt |
@@ -542,7 +563,7 @@ dat.GUI Root (300px width)
 │
 ├─▼ Simulation Controls
 │  ├─ Run                        [toggle]
-│  ├─ 1 second equals            [dropdown: sDay → 1000 years]
+│  ├─ 1 second equals            [dropdown: 1 second → 1000 years]
 │  ├─ Speed                      [slider: -5 to +5]
 │  ├─ Step Forward               [button]
 │  ├─ Step Backward              [button]
@@ -562,6 +583,12 @@ dat.GUI Root (300px width)
 │  ├─▼ Anomalistic Year
 │  ├─▼ Precession Cycles
 │  └─▼ Orbital Elements
+│
+├─▼ Celestial Positions              (RA/Dec for all planets)
+│
+├─▼ Perihelion Planets               (perihelion data per planet)
+│
+├─▼ Celestial Tools                  (elongation, orbit orientation)
 │
 ├─▼ Invariable Plane Positions
 │  ├─ Mercury (AU)               [live value]
@@ -653,58 +680,35 @@ The application is fully self-contained with no runtime API dependencies. All ca
 
 ## Key Algorithms
 
-### Kepler Equation Solver
+### Kepler Equation Solver (`OrbitalFormulas.eccentricAnomaly`, line 809)
 
 ```javascript
 // Newton-Raphson iteration for eccentric anomaly
-function keplerSolve(M, e, tolerance = 1e-8) {
+// Input: M in degrees, e (eccentricity)
+// Output: E in degrees
+eccentricAnomaly: (M_deg, e) => {
+  const M = M_deg * Math.PI / 180;
   let E = M; // Initial guess
   for (let i = 0; i < 30; i++) {
     const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
     E -= dE;
-    if (Math.abs(dE) < tolerance) break;
+    if (Math.abs(dE) < 1e-10) break;
   }
-  return E;
-}
+  return E * 180 / Math.PI;
+},
 ```
 
-### True Anomaly from Eccentric Anomaly
+### True Anomaly (`updatePlanetAnomalies`, line ~26774)
 
-```javascript
-function trueAnomalyFromEccentric(E, e) {
-  return 2 * Math.atan2(
-    Math.sqrt(1 + e) * Math.sin(E / 2),
-    Math.sqrt(1 - e) * Math.cos(E / 2)
-  );
-}
-```
+True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly.
 
-### Height Above Invariable Plane
+### Height Above Invariable Plane (`updatePlanetInvariablePlaneHeights`)
 
-```javascript
-function calculateHeightAboveInvPlane(position, invPlaneNormal) {
-  // Dot product gives signed distance from plane
-  return position.dot(invPlaneNormal);
-}
-```
+Height is calculated inside `updatePlanetInvariablePlaneHeights()` using dot product of the planet's world position vector with the invariable plane normal.
 
-### Mass-Weighted Balance
+### Mass-Weighted Balance (`updateInvariablePlaneBalance`)
 
-```javascript
-function calculateMassWeightedBalance() {
-  let weightedSum = 0;
-  const planets = ['mercury', 'venus', 'earth', 'mars',
-                   'jupiter', 'saturn', 'uranus', 'neptune'];
-
-  for (const planet of planets) {
-    const height = o[`${planet}HeightAboveInvPlane`];
-    const mass = PLANET_MASSES[planet];
-    weightedSum += mass * height;
-  }
-
-  return weightedSum / TOTAL_PLANET_MASS;
-}
-```
+The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `mass × height` for all 8 planets and dividing by total mass.
 
 ---
 
