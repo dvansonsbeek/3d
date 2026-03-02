@@ -79,7 +79,7 @@ function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLeng
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `eccentricityBase` | 0.015321 | Base eccentricity |
-| `eccentricityAmplitude` | 0.001431 | Amplitude of variation |
+| `eccentricityAmplitude` | 0.0014226 | Amplitude of variation |
 | `perihelionCycleLength` | 20,868 years | = holisticyearLength / 16 |
 
 **Eccentricity range:** ~0.0139 to ~0.0167 (approximately)

@@ -1,20 +1,16 @@
 @import url("https://fonts.googleapis.com/css2\
 ?family=Inter:wght@400;500;600\
-&family=IBM+Plex+Sans:wght@300;400;500;600;700\
-&family=IBM+Plex+Mono:wght@300;400;500;600;700\
-&family=Exo+2:wght@200;300;400;500\
+&family=IBM+Plex+Mono:wght@400;500\
+&family=Exo+2:wght@200;300;400\
 &display=swap");
 
 /* ───────────────────────────────────────────────
    0.  GLOBAL FONT TOKENS
    ─────────────────────────────────────────────── */
 :root{
-  /* swap families here and every panel updates */
-  --pl-body-font: "Inter", "IBM Plex Sans", system-ui, -apple-system,
+  --pl-body-font: "Inter", system-ui, -apple-system,
                   "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-
-  /* mono family for your numeric column */
-  --pl-mono-font: "IBM Plex Mono", Menlo, Consolas, monospace;
+  --pl-mono-font: "IBM Plex Mono", "Menlo", "Consolas", monospace;
 }
 
 main { position: absolute; top: 100px; left: 100px; }
@@ -28,36 +24,645 @@ canvas {
   display: block;
 }
 
-/*Make dat gui panel unselectable so it doesent get selected during mouse drag*/
-#gui {  
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
+/* ── Tweakpane theme — modern glassmorphism ── */
+:root {
+  /* Base panel */
+  --tp-base-background-color: hsla(220, 30%, 6%, 0.88);
+  --tp-base-shadow-color: hsla(0, 0%, 0%, 0.4);
+  --tp-base-font-family: "Inter", system-ui, sans-serif;
+  --tp-base-border-radius: 8px;
+
+  /* Labels — warm neutral gray, recede behind values */
+  --tp-label-foreground-color: hsla(30, 6%, 52%, 1);
+  --tp-blade-label-foreground-color: hsla(30, 6%, 52%, 1);
+  --tp-blade-label-width: 40%;
+
+  /* Values / inputs — bright, focal point */
+  --tp-blade-value-background-color: hsla(220, 30%, 14%, 0.85);
+  --tp-blade-value-foreground-color: hsla(0, 0%, 97%, 1);
+  --tp-blade-border-radius: 6px;
+
+  /* Containers (folders, blade rows) */
+  --tp-container-background-color: hsla(220, 25%, 10%, 0.6);
+  --tp-container-background-color-active: hsla(220, 25%, 18%, 0.8);
+  --tp-container-background-color-focus: hsla(220, 25%, 20%, 0.8);
+  --tp-container-background-color-hover: hsla(220, 25%, 15%, 0.7);
+  --tp-container-foreground-color: hsla(0, 0%, 90%, 1);
+
+  /* Buttons */
+  --tp-button-background-color: hsla(215, 40%, 22%, 0.85);
+  --tp-button-background-color-active: hsla(215, 50%, 35%, 1);
+  --tp-button-background-color-focus: hsla(215, 40%, 30%, 0.9);
+  --tp-button-background-color-hover: hsla(215, 45%, 28%, 0.9);
+  --tp-button-foreground-color: hsla(0, 0%, 96%, 1);
+
+  /* Inputs */
+  --tp-input-background-color: hsla(220, 30%, 12%, 0.85);
+  --tp-input-background-color-hover: hsla(220, 30%, 18%, 0.8);
+  --tp-input-background-color-focus: hsla(220, 35%, 22%, 0.9);
+
+  /* Slider groove */
+  --tp-groove-foreground-color: hsla(210, 60%, 50%, 1);
+
+  /* Monitors (readonly) */
+  --tp-monitor-background-color: hsla(220, 25%, 10%, 0.75);
+}
+
+/* ── Panel: glassmorphism + floating ── */
+#gui {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  user-select: none;
+  width: 350px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: hsla(210, 30%, 40%, 0.5) transparent;
+}
+#gui::-webkit-scrollbar {
+  width: 6px;
+}
+#gui::-webkit-scrollbar-thumb {
+  background: hsla(210, 30%, 40%, 0.5);
+  border-radius: 3px;
+}
+#gui::-webkit-scrollbar-thumb:hover {
+  background: hsla(210, 30%, 50%, 0.7);
+}
+#gui::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#gui > .tp-rotv {
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid hsla(220, 30%, 32%, 0.65);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px hsla(220, 40%, 4%, 0.6),
+    0 1px 0 hsla(220, 40%, 40%, 0.08) inset;
+  overflow: hidden;
+}
+
+/* ── Title bar (the button element that wraps title text + expand arrow) ── */
+#gui .tp-rotv_b {
+  background: linear-gradient(135deg, hsla(215, 35%, 16%, 0.95), hsla(220, 30%, 10%, 0.95));
+  height: auto;
+  min-height: calc(var(--cnt-usz) + 4px);
+  padding: 8px 12px;
+  padding-right: calc(4px + var(--cnt-usz) + var(--cnt-hp));
+  line-height: 1.5;
+  border-bottom: 1px solid hsla(220, 30%, 25%, 0.3);
+}
+/* ── Title text (div inside the button) ── */
+#gui .tp-rotv_t {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* ── Labels: regular weight, muted — recede behind values ── */
+#gui .tp-lblv_l {
+  font-weight: 400;
+  font-size: 11px;
+}
+
+/* ── Values: mono, tabular figures, bright — the focal point ── */
+#gui .tp-txtv_i,
+#gui .tp-sglv_i {
+  font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+}
+
+/* ── All interactive elements: smooth transitions ── */
+#gui .tp-btnv_b,
+#gui .tp-txtv_i,
+#gui .tp-lstv_s,
+#gui .tp-ckbv_w,
+#gui .tp-sldv_k,
+#gui .tp-fldv_b {
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ── Buttons: clean shape, medium weight ── */
+#gui .tp-btnv_b {
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  border: 1px solid hsla(220, 30%, 35%, 0.55);
+  line-height: calc(var(--cnt-usz, 20px) - 2px);
+}
+#gui .tp-btnv_b:hover {
+  border-color: hsla(215, 50%, 50%, 0.75);
+  box-shadow: 0 0 8px hsla(215, 60%, 50%, 0.15);
+}
+
+/* ── Text inputs: refined ── */
+#gui .tp-txtv_i {
+  border-radius: 5px;
+  border: 1px solid hsla(220, 25%, 35%, 0.7);
+  padding: 2px 6px;
+}
+/* ── Focus: visible only for keyboard navigation (WCAG 2.4.7) ── */
+#gui .tp-txtv_i:focus-visible,
+#gui .tp-lstv_s:focus-visible,
+#gui .tp-btnv_b:focus-visible,
+#gui .tp-ckbv_w:focus-visible,
+#gui .tp-fldv_b:focus-visible,
+#gui .tp-rotv_b:focus-visible,
+#gui .tp-sldv_k:focus-visible {
+  outline: 2px solid hsl(215, 80%, 65%);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px hsla(0, 0%, 0%, 0.7);
+}
+#gui .tp-txtv_i:focus:not(:focus-visible),
+#gui .tp-lstv_s:focus:not(:focus-visible),
+#gui .tp-btnv_b:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ── Dropdowns / selects ── */
+#gui .tp-lstv_s {
+  border-radius: 5px;
+  border: 1px solid hsla(220, 25%, 35%, 0.7);
+  font-weight: 400;
+  font-size: 11px;
+  padding-left: 8px;
+  padding-right: 8px;
+  line-height: calc(var(--cnt-usz, 20px) - 2px);
+}
+#gui .tp-lstv_s:hover {
+  border-color: hsla(215, 50%, 50%, 0.75);
+}
+
+/* ── Checkboxes: modern toggle feel ── */
+#gui .tp-ckbv_w {
+  border-radius: 4px;
+  border: 1px solid hsla(220, 25%, 35%, 0.7);
+}
+#gui .tp-ckbv_w:hover {
+  border-color: hsla(215, 50%, 50%, 0.75);
+}
+
+/* ── Slider: modern track + fill + thumb ── */
+#gui .tp-sldv_t {
+  height: 20px;
+}
+#gui .tp-sldv_t::before {
+  height: 4px;
+  border-radius: 2px;
+  background-color: hsla(220, 20%, 25%, 0.8);
+}
+#gui .tp-sldv_k::before {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, hsla(210, 55%, 42%, 1), hsla(210, 65%, 58%, 1));
+}
+#gui .tp-sldv_k::after {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  right: -7px;
+  background-color: hsla(210, 60%, 65%, 1);
+  box-shadow: 0 1px 4px hsla(0, 0%, 0%, 0.4);
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+#gui .tp-sldv_t:hover .tp-sldv_k::after {
+  background-color: hsla(210, 70%, 72%, 1);
+  transform: scale(1.15);
+  box-shadow: 0 1px 6px hsla(210, 60%, 50%, 0.4);
+}
+#gui .tp-sldv_t:active .tp-sldv_k::after {
+  background-color: hsla(210, 80%, 78%, 1);
+  transform: scale(1.05);
+}
+
+/* ── Folder titles: medium weight, consistent ── */
+#gui .tp-fldv_b {
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  background: hsla(220, 25%, 14%, 0.65);
+}
+#gui .tp-fldv_b:hover {
+  background: hsla(220, 25%, 18%, 0.65);
+}
+
+/* ── Folder content area: subtle inset ── */
+#gui .tp-fldv_c {
+  border-left: 1px solid hsla(220, 25%, 20%, 0.2);
+  margin-left: 2px;
+}
+
+/* ── Color legend ── */
+.tp-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 5px 12px 6px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: hsla(210, 15%, 65%, 1);
+  border-bottom: 1px solid hsla(220, 25%, 20%, 0.3);
+  background: hsla(220, 25%, 12%, 0.3);
+}
+
+/* ── Root controls: primary time-navigation group ── */
+#gui .root-control {
+  background: hsla(220, 25%, 11%, 0.55);
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+#gui .root-control .tp-lblv_l {
+  color: hsla(0, 0%, 72%, 1);
+  font-weight: 500;
+  font-size: 11px;
+}
+#gui .root-control .tp-txtv_i {
+  color: hsla(45, 80%, 78%, 1);
+  background: hsla(220, 30%, 14%, 0.85);
+  border-color: hsla(45, 30%, 28%, 0.4);
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+/* Readonly perihelion: fully opaque gray matching composited monitor color */
+#gui .root-control-readonly .tp-lblv_l {
+  color: hsla(225, 5%, 55%, 1);
+}
+#gui .root-control-readonly .tp-sglv_i {
+  background: hsla(220, 30%, 14%, 0.85);
+  border: 1px solid hsla(220, 25%, 30%, 0.4);
+  border-radius: 5px;
+  color: hsla(225, 5%, 55%, 1);
+}
+/* Bottom separator: breathing room before folders */
+#gui .root-control-last {
+  margin-bottom: 4px;
+  border-bottom: 1px solid hsla(220, 25%, 25%, 0.3);
+  padding-bottom: 3px;
+}
+
+/* ── Category color-coding (Okabe-Ito colorblind-safe palette) ── */
+/* Border accent on the folder button (.tp-fldv_b is direct child of .tp-fldv) */
+/* Text color on the title div (.tp-fldv_t is inside .tp-fldv_b) */
+
+/* Observed: Sky Blue #56B4E9 — real measurements from scene graph */
+#gui [data-category="observed"] > .tp-fldv_b {
+  border-left: 4px solid #56B4E9;
+  padding-left: 8px;
+}
+#gui [data-category="observed"] .tp-fldv_t { color: #56B4E9; }
+
+/* Calculated: Orange #E69F00 — model predictions / computed values */
+#gui [data-category="calculated"] > .tp-fldv_b {
+  border-left: 4px solid #E69F00;
+  padding-left: 8px;
+}
+#gui [data-category="calculated"] .tp-fldv_t { color: #E69F00; }
+
+/* Controls: Blue #3399CC (lightened from #0072B2 for 3:1 on dark bg) */
+#gui [data-category="controls"] > .tp-fldv_b {
+  border-left: 4px solid #3399CC;
+  padding-left: 8px;
+}
+#gui [data-category="controls"] .tp-lblv_l {
+  color: hsla(0, 0%, 62%, 1);
+}
+
+/* Visualization: Reddish Purple #CC79A7 */
+#gui [data-category="visualization"] > .tp-fldv_b {
+  border-left: 4px solid #D98AB5;
+  padding-left: 8px;
+}
+
+/* Tools: Gray #999999 */
+#gui [data-category="tools"] > .tp-fldv_b {
+  border-left: 4px solid #BCBCBC;
+  padding-left: 8px;
+}
+#gui [data-category="tools"] .tp-txtv_i,
+#gui [data-category="tools"] .tp-lstv_s {
+  color: hsla(45, 80%, 78%, 1);
+}
+
+/* ── Fold arrow: more visible ── */
+#gui .tp-rotv_m,
+#gui .tp-fldv_m {
+  opacity: 0.8;
+}
+#gui .tp-rotv_b:hover .tp-rotv_m,
+#gui .tp-fldv_b:hover .tp-fldv_m {
+  opacity: 1;
+}
+
+/* ── Consistent vertical rhythm between blades ── */
+#gui .tp-lblv {
+  border-bottom: 1px solid hsla(220, 20%, 16%, 0.25);
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+/* ── Navigation toolbar (step/reset/now) ── */
+.tp-nav-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px 8px;
+  justify-content: center;
+  margin-bottom: 2px;
+  border-bottom: 1px solid hsla(220, 25%, 25%, 0.3);
+  padding-bottom: 8px;
+}
+.tp-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 0 4px;
+  border: 1px solid hsla(220, 30%, 28%, 0.4);
+  border-radius: 6px;
+  background: hsla(215, 40%, 22%, 0.85);
+  color: hsla(0, 0%, 96%, 1);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  font-family: inherit;
+}
+.tp-nav-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+.tp-nav-label {
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: hsla(210, 15%, 65%, 1);
+}
+.tp-nav-btn:hover {
+  background: hsla(215, 45%, 30%, 0.9);
+  border-color: hsla(215, 50%, 50%, 0.65);
+  box-shadow: 0 0 10px hsla(215, 60%, 50%, 0.2);
+  transform: translateY(-1px);
+}
+.tp-nav-btn:active {
+  background: hsla(215, 50%, 35%, 1);
+  transform: translateY(0);
+}
+
+/* ── Play/Pause toggle button ── */
+#gui .play-btn .tp-btnv_b {
+  background: linear-gradient(135deg, hsla(140, 45%, 22%, 0.9), hsla(160, 40%, 18%, 0.9));
+  border: 1px solid hsla(140, 40%, 35%, 0.4);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+#gui .play-btn .tp-btnv_b:hover {
+  background: linear-gradient(135deg, hsla(140, 50%, 28%, 1), hsla(160, 45%, 24%, 1));
+  border-color: hsla(140, 50%, 45%, 0.6);
+  box-shadow: 0 0 12px hsla(140, 60%, 40%, 0.2);
+}
+#gui .play-btn.active .tp-btnv_b {
+  background: linear-gradient(135deg, hsla(140, 55%, 30%, 1), hsla(160, 50%, 25%, 1));
+  border-color: hsla(140, 60%, 50%, 0.6);
+  box-shadow: 0 0 8px hsla(140, 60%, 45%, 0.25) inset;
+}
+
+/* ── Gauge bars (shared base) ── */
+#gui .elong-gauge,
+#gui .inv-gauge {
+  position: relative;
+  overflow: hidden;
+}
+/* Left-anchored gauge (elongations, perihelion longitudes) */
+#gui .elong-gauge::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  right: auto;
+  width: var(--elong-pct, 0%);
+  background: hsla(210, 60%, 45%, 0.25);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  pointer-events: none;
+}
+/* Centered gauge (invariable plane heights: ± around zero) */
+#gui .inv-gauge::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: var(--gauge-left, 50%);
+  width: var(--gauge-width, 0%);
+  background: var(--gauge-color, hsla(210, 60%, 45%, 0.25));
+  border-radius: 4px;
+  transition: left 0.3s ease, width 0.3s ease, background 0.3s ease;
+  pointer-events: none;
+}
+/* Center tick mark for centered gauges */
+#gui .inv-gauge::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: hsla(210, 20%, 55%, 0.5);
+  border-radius: 1px;
+  pointer-events: none;
+}
+/* Expandable detail row (asc. node + inclination side by side) */
+#gui .inv-detail {
+  display: flex;
+  gap: 12px;
+  padding: 2px 8px 4px;
+  background: hsla(220, 25%, 12%, 0.4);
+  border-radius: 0 0 4px 4px;
+  margin: -1px 0 2px;
+}
+#gui .inv-detail-item {
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+}
+#gui .inv-detail-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: hsla(30, 6%, 48%, 0.8);
+  white-space: nowrap;
+}
+#gui .inv-detail-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: hsla(0, 0%, 85%, 1);
+  white-space: nowrap;
+}
+/* Inner/outer planet separator */
+#gui .inv-plane-separator {
+  height: 1px;
+  margin: 4px 8px;
+  background: hsla(210, 20%, 40%, 0.3);
+}
+/* Summary row styling */
+#gui .inv-summary {
+  background: hsla(220, 25%, 14%, 0.5);
+  border-radius: 4px;
+  margin-top: 1px;
+}
+#gui .inv-summary .tp-lblv_l {
+  font-weight: 500;
+  font-style: italic;
+  color: hsla(30, 8%, 72%, 1);
+}
+#gui .inv-summary .tp-lblv_v .tp-sglv_i {
+  font-weight: 500;
+}
+
+/* ── Trace chip grid ── */
+.trace-chip-container {
+  padding: 2px 6px 6px;
+}
+.trace-chip-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsla(30, 8%, 52%, 0.8);
+  margin: 6px 0 3px;
+}
+.trace-chip-label:first-child {
+  margin-top: 2px;
+}
+.trace-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.trace-chip {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid hsla(220, 30%, 32%, 0.4);
+  background: hsla(220, 25%, 12%, 0.5);
+  color: hsla(30, 6%, 52%, 1);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
   user-select: none;
 }
+.trace-chip:hover {
+  background: hsla(220, 25%, 18%, 0.7);
+  border-color: hsla(220, 30%, 40%, 0.6);
+  color: hsla(210, 15%, 70%, 1);
+}
+.trace-chip.active {
+  background: hsla(210, 60%, 25%, 0.6);
+  border-color: hsla(210, 60%, 50%, 0.7);
+  color: hsl(0, 0%, 93%);
+  box-shadow: 0 0 8px hsla(210, 60%, 45%, 0.2);
+}
+.trace-chip.active:hover {
+  background: hsla(210, 60%, 30%, 0.7);
+  border-color: hsla(210, 60%, 55%, 0.8);
+}
+.trace-chip:focus-visible {
+  outline: 2px solid hsl(215, 80%, 65%);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px hsla(0, 0%, 0%, 0.7);
+}
+.trace-chip:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ── Category value tinting (readonly monitors — Okabe-Ito) ── */
+/* Observed: Sky Blue tinted values */
+#gui [data-category="observed"] .tp-sglv_i,
+#gui [data-category="observed"] .tp-txtv_i {
+  color: #6EC0E8;
+}
+/* Editable inputs inside observed folders look interactive, not readonly */
+#gui [data-editable="true"] .tp-txtv_i,
+#gui [data-editable="true"] .tp-lstv_s {
+  color: hsla(45, 80%, 78%, 1);
+}
+/* Calculated: Orange tinted values */
+#gui [data-category="calculated"] .tp-sglv_i,
+#gui [data-category="calculated"] .tp-txtv_i {
+  color: #EFC04A;
+}
+
+/* Readonly monitors inherit the mono styling from the .tp-sglv_i rule above */
+
+/* ── High contrast mode (OS-level accessibility preference) ── */
+@media (prefers-contrast: more) {
+  :root {
+    --tp-label-foreground-color: hsla(30, 6%, 72%, 1);
+    --tp-blade-label-foreground-color: hsla(30, 6%, 72%, 1);
+    --tp-blade-value-foreground-color: hsla(0, 0%, 100%, 1);
+    --tp-blade-value-background-color: hsla(220, 30%, 14%, 1);
+    --tp-input-background-color: hsla(220, 30%, 12%, 1);
+    --tp-container-background-color: hsla(220, 25%, 10%, 1);
+    --tp-base-background-color: hsla(220, 30%, 6%, 0.95);
+  }
+  #gui .tp-txtv_i,
+  #gui .tp-lstv_s,
+  #gui .tp-ckbv_w {
+    border-color: hsla(220, 25%, 45%, 0.9);
+  }
+  #gui > .tp-rotv {
+    border-color: hsla(220, 30%, 40%, 0.7);
+  }
+  .trace-chip {
+    border-color: hsla(220, 25%, 45%, 0.9);
+    color: hsla(30, 8%, 78%, 1);
+  }
+  .trace-chip.active {
+    border-color: hsla(210, 60%, 55%, 0.9);
+    background: hsla(210, 60%, 25%, 0.8);
+  }
+}
+
+/* ── Reduced motion (OS-level accessibility preference) ── */
+@media (prefers-reduced-motion: reduce) {
+  #gui .tp-btnv_b,
+  #gui .tp-txtv_i,
+  #gui .tp-lstv_s,
+  #gui .tp-ckbv_w,
+  #gui .tp-sldv_k,
+  #gui .tp-fldv_b,
+  #gui .tp-sldv_k::after,
+  .tp-nav-btn,
+  .trace-chip {
+    transition: none;
+  }
+  #gui .elong-gauge::before,
+  #gui .inv-gauge::before {
+    transition: none;
+  }
+  .tp-nav-btn:hover {
+    transform: none;
+  }
+}
+
 a {color: white;
 }
 a:link {
   text-decoration: none;
 }
-
-#footerleft {
-  font-family: "Inter", sans-serif;
-  position: absolute;
-  display: block;
-  width: 100%;
-  font-size: 70%;
-  bottom: 3px;
-  left: 5px;
-  z-index: 1000;
-  color: #f2f5f0;
-  font-size: 0.6em;
-  opacity: 0.4;
-  text-align: left;
-  text-decoration: none;
-  position: fixed;
-} 
 
 #footerright {
   font-family: "Inter", sans-serif;
@@ -76,64 +681,19 @@ a:link {
   position: fixed;
 } 
 
-.highlight-perihelion input[type="text"] {
+/* Fibonacci Spiral (3-5-8) triad highlight — pale gold left border */
+#gui .fib-triad-highlight {
+  border-left: 3px solid hsla(48, 90%, 75%, 0.7);
+}
+
+/* Legacy dat.GUI perihelion highlight — kept for compatibility */
+.highlight-perihelion input[type=”text”] {
   background: none !important;
   border: none !important;
   color: grey !important;
   font-weight: bold !important;
   text-align: right !important;
   pointer-events: none !important;
-}
-
-.dg {
-  z-index: 10 !important;
-}
-
-/* 1) Hide the native checkbox visuals */
-.dg li .c input[type="checkbox"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 32px;
-  height: 16px;
-  background: #ccc;
-  border-radius: 8px;
-  position: relative;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-/* 2) The “knob” */
-.dg li .c input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  transition: left 0.2s ease;
-}
-
-/* 3) Checked state */
-.dg li .c input[type="checkbox"]:checked {
-  background: #4caf50;
-}
-
-.dg li .c input[type="checkbox"]:checked::after {
-  left: 18px;
-}
-
-/* first reset the default on everything */
-.dg li .c {
-  overflow: visible !important;
-}
-/* then only clamp the boolean rows */
-.dg li.cr.boolean .c {
-  overflow: hidden;
 }
 
 .star-label {
@@ -367,47 +927,6 @@ a:link {
 
 /* rare utility if you need it */
 .smallcaps{ font-variant:small-caps; }
-
-/* ===== Title Badge (Bottom Middle) ===== */
-.title-badge {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  font-family: 'Exo 2', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.85);
-  text-transform: uppercase;
-  pointer-events: auto;
-  cursor: default;
-  animation: titleBreathe 4s ease-in-out infinite;
-  transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-.title-badge:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.title-badge .version {
-  opacity: 0.6;
-  font-weight: 300;
-  margin-left: 0.4em;
-}
-
-@keyframes titleBreathe {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
-}
 
 /* ===== Planet Hierarchy Inspector Panel ===== */
 #hierarchyInspector {

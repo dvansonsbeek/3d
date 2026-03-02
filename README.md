@@ -1,8 +1,8 @@
-# 🌌 Interactive 3D Solar System Simulation
+# 🌌 Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-4.0-green.svg)](https://github.com/dvansonsbeek/3d)
-[![Three.js](https://img.shields.io/badge/Three.js-r152-orange.svg)](https://threejs.org/)
+[![Version](https://img.shields.io/badge/version-6-green.svg)](https://github.com/dvansonsbeek/3d)
+[![Three.js](https://img.shields.io/badge/Three.js-0.175-orange.svg)](https://threejs.org/)
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
 
@@ -10,7 +10,7 @@
 >
 > **[📄 Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v1)** — Read the accompanying research paper
 
-The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets coming together in a Holistic-Year cycle of 333,888 years, an Axial precession cycle of ~25,684 years, an Inclination precession cycle of 111,296 years and a Perihelion precession cycle of 20,868 years.
+Interactive 3D simulation of the Fibonacci Laws of Planetary Motion. Six laws and only 6 free parameters model the precession, eccentricity, inclination, obliquity and perihelion movements of all planets from a geo-heliocentric frame of reference. The Holistic-Year cycle of 333,888 years unifies axial precession (~25,684 yr, H/13), inclination precession (~111,296 yr, H/3) and perihelion precession (~20,868 yr, H/16) through Fibonacci number ratios. Earth is defined by 25 parameters, the Moon by 9, and each planet by 13.
 
 ---
 
@@ -188,9 +188,11 @@ orbitContainer → holds full orbit structure
 
 ## 🧠 UI Features
 
-- `dat.GUI` panel for visibility toggles
-- Zodiac glow toggle
-- Time controls (play, pause, speed)
+- [Tweakpane v4](https://tweakpane.github.io/docs/) control panel with collapsible folders
+- About section with the Six Laws, free parameters, calibration inputs and all model parameters
+- Chip-grid toggles for tracing orbits and show/hide of objects
+- Time controls (play, pause, speed) and date/time navigation
+- Console tests for year length, day length and calibration verification
 - Export functionality for solstice dates and object positions
 - [Invariable Plane Balance Explorer](docs/27-balance-explorer-reference.md) for interactive Fibonacci Law testing
 

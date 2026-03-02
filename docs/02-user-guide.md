@@ -158,19 +158,9 @@ Shows which planets are currently above or below the invariable plane:
 
 ## Visualization Options
 
-### Objects Show/Hide
+### Show / Hide
 
-Toggle visibility of various elements:
-
-| Object | Description |
-|--------|-------------|
-| **Planets** | Show/hide individual planets |
-| **Orbits** | Show orbital paths |
-| **Moon** | Show Earth's Moon |
-| **Moon Nodes** | Show lunar nodal precession |
-| **Moon Apsides** | Show lunar apsidal precession |
-| **Invariable Plane** | Show the plane and crossings |
-| **Ecliptic** | Show Earth's orbital plane |
+The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by planet (Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros). Click any chip to toggle visibility of that object. Groups include both physical bodies and their associated reference objects (perihelion points, precession layers, etc.).
 
 ### Celestial Tools
 
@@ -190,13 +180,12 @@ Enable traces to see the path a body has traveled over time. Useful for:
 
 ### Planet Size and Orbits
 
-In the **Settings > Planets show/hide** folder:
+In the **Visualization** folder:
 
 | Control | Description |
 |---------|-------------|
-| **Orbits** | Toggle all orbital path lines on/off |
-| **Size** | Slider (0.4 - 1.4) to scale planet sizes for visibility |
-| **Individual planets** | Toggle each planet's visibility |
+| **Orbits** | Toggle all orbital path lines on/off (also available as a chip in Show / Hide) |
+| **Planets Size Boost** | Slider to scale planet sizes for visibility |
 
 ### Elongations Display
 

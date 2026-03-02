@@ -5,7 +5,7 @@ This document describes the astronomical verification data embedded in the simul
 **Last Updated:** January 2026
 
 **Related Documents:**
-- [23 - Data Export Reference](23-data-export-reference.md) - Planet report generation
+- [24 - Analysis & Export Tools](24-analysis-export-tools.md) - Planet report generation and data export
 - [21 - Planet Inspector Reference](21-planet-inspector-reference.md) - Where reports are displayed
 - [10 - Constants Reference](10-constants-reference.md) - Orbital constants and sources
 
@@ -176,7 +176,7 @@ Each verification entry has the following structure:
 
 ### Planet Report Generation
 
-The `generatePlanetReport()` function (line ~12000) iterates through `PLANET_TEST_DATES` for the selected planet:
+The `generatePlanetReport()` function (line ~20624) iterates through `PLANET_TEST_DATES` for the selected planet:
 
 1. **Jump to date:** Simulation moves to the verification date (JD)
 2. **Calculate position:** Model computes RA/Dec or longitude
@@ -294,9 +294,9 @@ To add new verification entries:
 
 | Function | Location | Description |
 |----------|----------|-------------|
-| `generatePlanetReport()` | Line ~12000 | Main report generator |
-| `buildDateSection()` | Line ~11858 | Formats individual date comparison |
-| `calculateRADecForPlanet()` | Line ~11500 | Computes model RA/Dec |
+| `generatePlanetReport()` | Line ~20624 | Main report generator |
+| `buildDateSection()` | Line ~20458 | Formats individual date comparison |
+| `collectPlanetDataForDate()` | Line ~20146 | Computes model RA/Dec |
 
 ---
 

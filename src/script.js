@@ -2,17 +2,25 @@ import * as THREE        from 'three';
 import Stats             from 'three/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import * as dat from 'dat.gui';
+import { Pane } from 'tweakpane';
 
-/*This software is licensed under the GNU General Public License (GPL-3.0). For more information, visit <https://www.gnu.org/licenses/>.
+/*
+  Fibonacci Laws of Planetary Motion — Holistic Universe Model v6
 
-The Interactive 3D Solar System Simulation shows the precession / eccentricity / inclination / obliquity / perihelion date movements of Earth, Moon, Sun and Planets modelled from a geo-heliocentric frame of reference, coming together in a Holistic-Year cycle, an Axial precession cycle (holisticyearLength/13), an Inclination precession cycle (holisticyearLength/3) and a Perihelion precession cycle (holisticyearLength/16).
+  This software is licensed under the GNU General Public License (GPL-3.0).
+  For more information, visit <https://www.gnu.org/licenses/>.
 
-Earths solar system movements and observations for length of day/year can be exactly simulated by tuning ~20 parameters. Additionally with ~10 parameters per planet/moon our complete solar system appears.
+  Interactive 3D simulation of the solar system modelled from a geo-heliocentric
+  frame of reference. Six Fibonacci Laws and only 6 free parameters describe the
+  precession, eccentricity, inclination, obliquity and perihelion movements of
+  all planets. The Holistic-Year cycle (333,888 yr) unifies axial precession
+  (H/13), inclination precession (H/3) and perihelion precession (H/16) through
+  Fibonacci number ratios. Earth is defined by 25 parameters, the Moon by 9, and
+  each planet by 13.
 
-Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v1
-
-For more information, see https://holisticuniverse.com */
+  Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v1
+  Website:  https://holisticuniverse.com
+*/
 
 //*************************************************************
 // ALL INPUT CONSTANTS
@@ -3979,6 +3987,9 @@ let o = {
   worldCamDistKm: '0',
   worldCamRa: '0',
   worldCamDec: '0',
+  worldCamRaDisplay: '0',
+  worldCamDecDisplay: '0',
+  worldCamDistDisplay: '0',
 
   Day: "",
   julianDay: "",
@@ -4236,8 +4247,8 @@ let o = {
   
   testMode        : 'Range',         // 'Range' | 'List'
   testJDsText     : "2451717, 2627033, etc.",    // list of Julian Days you want to probe
-  rangeStart      : startmodelJD-(meansolaryearlengthinDays*25200), 
-  rangeEnd        : startmodelJD+(meansolaryearlengthinDays*23800),
+  rangeStart      : Math.round(startmodelJD-(meansolaryearlengthinDays*25200)),
+  rangeEnd        : Math.round(startmodelJD+(meansolaryearlengthinDays*23800)),
   rangePieces     : ((25200+23800)/100)+1,
   runRATestToggle : false,
   _raTestBusy     : false,
@@ -4313,6 +4324,30 @@ let predictions = {
   longitudePerihelionDateAp: 0,
   lengthofAU: currentAUDistance,
   anomalisticMercury: 0,
+
+  // IAU / J2000 reference values (for side-by-side comparison in GUI)
+  iauSolarDayRef: ASTRO_REFERENCE.solarDayJ2000,
+  iauSiderealDayRef: ASTRO_REFERENCE.siderealDayJ2000,
+  iauStellarDayRef: ASTRO_REFERENCE.stellarDayJ2000,
+  iauTropicalYearRef: ASTRO_REFERENCE.tropicalYearMeanJ2000,
+  iauSiderealYearRef: ASTRO_REFERENCE.siderealYearJ2000,
+  iauAnomalisticYearRef: ASTRO_REFERENCE.anomalisticYearJ2000,
+  iauPrecessionRef: ASTRO_REFERENCE.iauPrecessionJ2000,
+  iauEccentricityRef: ASTRO_REFERENCE.eccentricityJ2000,
+  iauObliquityRef: 0,
+  iauInclinationRef: ASTRO_REFERENCE.earthInclinationJ2000_deg,
+
+  // Model − IAU differences (computed in updatePredictions)
+  diffSolarDay: 0,
+  diffSiderealDay: 0,
+  diffStellarDay: 0,
+  diffTropicalYear: 0,
+  diffSiderealYear: 0,
+  diffAnomalisticYear: 0,
+  diffPrecession: 0,
+  diffEccentricity: 0,
+  diffObliquity: 0,
+  diffInclination: 0,
 };
 
 const planetColorHex = {
@@ -6201,13 +6236,9 @@ const state = {
 
 // create the golden-spiral line (returns { line, update })
 const golden = goldenspiralPerihelionObjects(
-  mercuryPerihelionFromEarth,
-  venusPerihelionFromEarth,
-  marsPerihelionFromEarth,
+  earthPerihelionFromEarth,
   jupiterPerihelionFromEarth,
-  neptunePerihelionFromEarth,
   saturnPerihelionFromEarth,
-  uranusPerihelionFromEarth,
   camera,
   scene
 );
@@ -11853,967 +11884,1463 @@ function updateHierarchyLiveData() {
 //*************************************************************
 // CREATE SETTINGS AND SETUP GUI
 //*************************************************************
+// Pre-populate date/time fields so they display immediately in the GUI
+// (Cannot call daysToDate() here — GREG_START_JDN const is not yet initialised)
+o.Day            = posToDays(o.pos);
+const elongGaugeEls = {};
+const periGaugeEls = {};
+const periDetailEls = {};
+const invPlaneGaugeEls = {};
+const invPlaneMaxes = {};
+const invPlaneTooltipEls = {};
+const aboveColor = 'hsla(35, 70%, 50%, 0.30)';
+const belowColor = 'hsla(210, 60%, 45%, 0.30)';
+function setInvGaugeProps(el, value, maxH) {
+  const pct = Math.min(Math.abs(value) / maxH, 1) * 50;
+  el.style.setProperty('--gauge-left', value >= 0 ? '50%' : (50 - pct) + '%');
+  el.style.setProperty('--gauge-width', pct + '%');
+  el.style.setProperty('--gauge-color', value >= 0 ? aboveColor : belowColor);
+}
+{
+  const JDN = Math.floor(startmodelJD + o.Day + 0.5);
+  const { y, m, d } = gregorianFromJdn(JDN);
+  o.Date = `${y}-${pad2(m)}-${pad2(d)}`;
+}
+o.Time           = posToTime(o.pos);
+o.julianDay      = dateTimeToJulianDay(o.Date, o.Time);
+const pInit      = dayToDateNew(o.julianDay, 'julianday', 'perihelion-calendar');
+o.perihelionDate = `${pInit.date} ${pInit.time}`;
+
 setupGUI()
 function setupGUI() {
-  const gui = new dat.GUI({ width: 300 });
-  gui.domElement.id = 'gui';
-  gui.add(o, 'Date').name('Date (Y-M-D)').listen().onFinishChange(() => {
-    if (isValidDate(o.Date)) {
-      updatePosition();
-    }
-  });
-  
-  gui.add(o, 'Time').name('Time (UTC)').listen().onFinishChange(function() {
-    if (isValidTime(o.Time)) {
-      updatePosition();
-    } 
-  });
+  const gui = new Pane({ title: 'Fibonacci Laws of Planetary Motion', expanded: true });
+  gui.element.id = 'gui';
+  gui.element.setAttribute('role', 'region');
+  gui.element.setAttribute('aria-label', 'Simulation Controls');
+  o._guiPane = gui; // expose for render-loop refresh
 
-//  gui.add(o, 'julianDay').name('Julian day').listen().onFinishChange(() => {
-//    if (isNumeric(o.julianDay)) {
-//      o.Day = o.julianDay - startmodelJD;
-//      o.pos = sDay * o.Day + timeToPos(o.Time);
-//      const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-//      o.perihelionDate = `${p.date}`;
-//    }
-//  });
-  
-  gui.add(o, 'julianDay').name('Julian day').listen()
-  .onFinishChange(() => {
-    if (!isNumeric(o.julianDay)) return;
-    
-    const newJD = Number(o.julianDay);
-    const currentJD = dateTimeToJulianDay(o.Date, o.Time);
-    
-    // Skip if value hasn't meaningfully changed
-    if (Math.abs(newJD - currentJD) < 0.0000001) {
-      return;
-    }
-
-    // Convert Julian Day to date and time  <-- THIS IS THE MISSING PART
-    const converted = dayToDate(newJD);
-    o.Date = converted.date;
-    o.Time = converted.time;
-
-    // Update internal state (now using the NEW o.Time)
-    o.Day = newJD - startmodelJD;
-    o.pos = sDay * o.Day;  // Day already includes the time fraction
-
-    // Update perihelion calendar display
-    const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
-    o.perihelionDate = `${p.date}`;
-
-    positionChanged = true; // Signal animation loop to update scene
-  });
-  
-  const perihelionController = gui.add(o, 'perihelionDate')
-  .name('Perihelion Date')
-  .listen(); // display-only
-
-  if (perihelionController.__li) {
-  perihelionController.__li.classList.add('highlight-perihelion');
+  // Version subtitle under panel title
+  const titleEl = gui.element.querySelector('.tp-rotv_t');
+  if (titleEl) {
+    const versionEl = document.createElement('div');
+    versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px;';
+    versionEl.textContent = 'Holistic Universe Model v6';
+    titleEl.appendChild(versionEl);
   }
-  
-  let ctrlFolder = gui.addFolder('Simulation Controls')
-  ctrlFolder.add(o, 'Run').listen();
-  ctrlFolder.add(o, '1 second equals', 
-                 {  '1 second': sSecond, 
-                    '1 minute': sMinute, 
-                    '1 hour': sHour, 
-                    '1 day': sDay, 
-                    '1 week': sWeek, 
-                    '1 month': sMonth,  
-                    '1 year': sYear, 
-                    '10 years': sYear*10,
-                    '100 years': sYear*100,
-                    '1000 years': sYear*1000,
-                 }).onFinishChange(function() {
-    o.speedFact = Number(o['1 second equals']);});
-  ctrlFolder.add(o, 'speed', -5, 5).step(0.5).name('Speed multiplier');
-  
-  function toggleCtrl (ctrl, show) {
-  if (ctrl && ctrl.__li) ctrl.__li.style.display = show ? '' : 'none';
-  }
-  
-  ctrlFolder.add(o, 'traceBtn').name('Enable Tracing').onFinishChange(() => {
-  if (o.traceBtn) {
-    // Tracing turned ON → reset and re-init
-    resetAllTraces();
-  } else {
-    // Tracing turned OFF → remove all traces and stop drawing
-    tracePlanets.forEach(obj => {
-      if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
-        scene.remove(obj.traceLine);
-      }
-      obj.traceLine = undefined;
-      obj.traceArrIndex = 0;
-      obj.traceStartPos = o.pos;
-      obj.traceCurrPos = o.pos;
-    });
-  }
-  });
 
-  let folderT = ctrlFolder.addFolder('Select objects to Trace')  
-  
-  tracePlanets.forEach(obj => {
-    folderT.add(obj, 'traceOn').name(obj.name).onFinishChange(()=>{resetAllTraces(obj)})
-  });
+  // Color legend below pane title
+  const legendEl = document.createElement('div');
+  legendEl.className = 'tp-legend';
+  legendEl.innerHTML =
+    '<span style="color:#56B4E9" title="Values directly measured in the 3D model">\u25CF Observed</span>' +
+    '<span style="color:#E69F00" title="Values derived from the observations in the 3D model">\u25CF Calculated</span>';
+  const rotvc = gui.element.querySelector('.tp-rotv_c');
+  if (rotvc) rotvc.prepend(legendEl);
 
-  ctrlFolder.add(o, 'Step forward' );
-  ctrlFolder.add(o, 'Step backward' );
-  ctrlFolder.add(o, 'Reset' );
-  ctrlFolder.add(o, 'Now (time in UTC)' );
-  
-  let planetList = {}
-  let isHelper = {}
-  
-  planetObjects.forEach(obj => {
-    const isHelperObj =
-        (obj.isNotPhysicalObject === true) || (obj.visible === false);
-    if (isHelperObj) {
-      isHelper[obj.name]  = obj.name;   // put in helper list
-    } else {
-      planetList[obj.name] = obj.name;  // put in normal-planet list
+  // Helper to add tooltip to Tweakpane blade (label only, not children)
+  // Buttons: target the <button> element (.tp-btnv_b) which covers the click area
+  // Bindings: target the label element (.tp-lblv_l) to avoid propagating to value children
+  const addTooltip = (blade, text) => {
+    if (blade && blade.element) {
+      const btn = blade.element.querySelector('.tp-btnv_b');
+      const target = btn
+        || blade.element.querySelector('.tp-lblv_l')
+        || blade.element;
+      target.title = text;
     }
-  });
-
-  ctrlFolder
-  .add(o, 'Target', { 'Please select': "", ...planetList }).name('Look at').onFinishChange(value => {
-
-    /* value === ''  →  no planet selected */
-    o.lookAtObj = planetObjects.find(p => p.name === value) || undefined;
-
-    /* Disable hierarchy inspector camera control when user manually changes target */
-    hierarchyInspector._cameraControlActive = false;
-    hierarchyInspector._cameraTarget = null;
-
-    /* Signal animation loop to update scene (needed when idle) */
-    positionChanged = true;
-
-    /* Reset camera parameters for the new target */
-    focusPlanet(o.lookAtObj);
-
-    /* hide every orbit-plane helper … */
-    planetObjects.forEach(p => {
-      if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false;
-    });
-
-    /* … and show only the helper of the chosen planet (if any) */
-    if (o.lookAtObj?.orbitPlaneHelper) {
-      o.lookAtObj.orbitPlaneHelper.visible = true;
-    }
-  });
-  focusPlanet(o.lookAtObj);
-  ctrlFolder.open() 
-  
-  let astroFolder = gui.addFolder('Predictions Holistic Universe Model');
-
-    let daysFolder = astroFolder.addFolder('Length of Days Predictions');
-      daysFolder.add(predictions, 'lengthofDay').name('Length of Day (sec)').step(0.000001).listen();
-      daysFolder.add(predictions, 'lengthofsiderealDayRealLOD').name('Length of Sidereal Day (sec)').step(0.000001).listen();
-      daysFolder.add(predictions, 'lengthofstellarDayRealLOD').name('Length of Stellar Day (sec)').step(0.000001).listen();  
-    daysFolder.open();
-  
-    let yearsFolder = astroFolder.addFolder('Length of Solar Year Predictions'); 
-      yearsFolder.add(predictions, 'lengthofsolarYearSecRealLOD').name('Length of Solar Year (sec)').step(0.000001).listen();
-      yearsFolder.add(predictions, 'lengthofsolarYear').name('Length of Solar Year (days)').step(0.000001).listen();
-    yearsFolder.open(); 
-  
-    let siderealFolder = astroFolder.addFolder('Length of Sidreal Year Predictions'); 
-      siderealFolder.add(predictions, 'lengthofsiderealYearInSeconds').name('Length of Sidereal Year (sec)').step(0.000001).listen(); 
-      siderealFolder.add(predictions, 'lengthofsiderealYearDaysRealLOD').name('Length of Sidereal Year (days)').step(0.000001).listen();
-    siderealFolder.open(); 
-  
-    let anomalisticFolder = astroFolder.addFolder('Length of Anomalistic Year - Predictions');
-      anomalisticFolder.add(predictions, 'lengthofanomalisticYearSecRealLOD').name('Length of Anomalistic Year (sec)').step(0.000001).listen();
-      anomalisticFolder.add(predictions, 'lengthofanomalisticDaysRealLOD').name('Length of Anomalistic Year (days)').step(0.000001).listen();
-    anomalisticFolder.open(); 
-  
-    let precessionFolder = astroFolder.addFolder('Length of Precession - Predictions');
-      precessionFolder.add(predictions, 'perihelionPrecessionRealLOD').name('Perihelion Precession (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'axialPrecessionRealLOD').name('Axial Precession (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'inclinationPrecessionRealLOD').name('Inclination Precession (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'eclipticPrecessionRealLOD').name('Length Ecliptic Cycle (yrs)').step(0.000001).listen();
-      precessionFolder.add(predictions, 'obliquityPrecessionRealLOD').name('Length Obliquity Cycle (yrs)').step(0.000001).listen();
-    precessionFolder.open(); 
-  
-    let orbitalFolder = astroFolder.addFolder('Orbital Elements Predictions');
-      orbitalFolder.add(predictions, 'eccentricityEarth').name('Earth Orbital Eccentricity (AU)').step(0.000001).listen();
-      orbitalFolder.add(predictions, 'obliquityEarth').name('Earth Obliquity (°)').step(0.000001).listen();
-      orbitalFolder.add(predictions, 'earthInvPlaneInclinationDynamic').name('Earth Inclination to invariable plane (°)').step(0.000001).listen();
-      orbitalFolder.add(predictions, 'longitudePerihelion').name('Earth Longitude of Perihelion (°)').step(0.000001).listen();
-      orbitalFolder.add(predictions, 'lengthofAU').name('Length of AU (km)').step(0.000001).listen();
-      //orbitalFolder.add(predictions, 'anomalisticMercury').name('Missing Mercury Advance (arcsec)').step(0.000001).listen();
-    orbitalFolder.open(); 
-  
-  //    let ephemerisFolder = astroFolder.addFolder('86400 sec/day - Predictions'); 
-  //      ephemerisFolder.add(predictions, 'predictedDeltat').name('Delta-T (sec)').step(0.000001).listen();
-  //      ephemerisFolder.add(predictions, 'predictedDeltatPerYear').name('ΔT change (sec/year)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofsolarDay').name('86400 sec/day - Length of Solar Day (sec)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofsiderealDay').name('86400 sec/day - Length of Sidereal Day (sec)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofstellarDay').name('86400 sec/day - Length of Stellar Day (sec)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofsolarYearinDays').name('86400 sec/day - Length of Solar Year (days)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofsiderealYearDays').name('86400 sec/day - Length of Sidereal Year (days)').step(0.000001).listen();
-  //    ephemerisFolder.add(predictions, 'lengthofanomalisticYearinDays').name('86400 sec/day - Length of Anomalistic Year (days)').step(0.000001).listen();
-  //  ephemerisFolder.open();
-  
-  astroFolder.close();
-  
-  let posFolder = gui.addFolder('Celestial Positions')
-  posFolder
-  .add(o, 'displayFormat', ['sexagesimal', 'decimal'])
-  .name('RA/Dec Format')
-  .onChange(() => {
-    updatePositions();
-    updatePositionDisplayStrings(); // Update display strings immediately
-  });
-
-  posFolder
-  .add(o, 'distanceUnit', ['AU', 'km', 'mi'])
-  .name('Distance Format')
-  .onChange(() => {
-    updatePositions();
-    updatePositionDisplayStrings(); // Update display strings immediately
-  });
-  
-  const helperFolder = posFolder.addFolder('Show Helper Objects');
-  
-  tracePlanets.forEach(obj => {
-  const isHelperObj  = Boolean(isHelper[obj.name]);
-  // helpers → helperFolder, planets → posFolder directly
-  const targetFolder = isHelperObj ? helperFolder : posFolder;
-
-  const sub = targetFolder.addFolder(obj.name);
-  sub.add(obj, 'raDisplay').name('RA').listen();
-  sub.add(obj, 'decDisplay').name('Dec').listen();
-  sub.add(obj, 'distDisplay').name('Distance to Earth').listen();
-  sub.add(obj, 'sunDistDisplay').name('Distance to Sun').listen();
-  sub.open();
-  });
-  
-  let folderPerihelion = gui.addFolder('Perihelion Planets')
-  folderPerihelion.add(golden.goldenLine, 'visible').name('Perihelion Spiral').onChange( v => golden.setHelpersVisible(v) );
-  addInfoButton( folderPerihelion, 'https://wgc.jpl.nasa.gov:8443/webgeocalc/#OrbitalElements' );
-  // Geocentric (fluctuates with Earth's precession cycles) vs Heliocentric (constant Newtonian rate)
-  folderPerihelion.add(o,"mercuryPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Geocentric)")
-  folderPerihelion.add(o,"mercuryPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mercury (Heliocentric)")
-  folderPerihelion.add(o,"venusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Geocentric)")
-  folderPerihelion.add(o,"venusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Venus (Heliocentric)")
-  folderPerihelion.add(o,"earthPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Earth Perihelion")
-  folderPerihelion.add(o,"marsPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Geocentric)")
-  folderPerihelion.add(o,"marsPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Mars (Heliocentric)")
-  folderPerihelion.add(o,"jupiterPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Geocentric)")
-  folderPerihelion.add(o,"jupiterPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Jupiter (Heliocentric)")
-  folderPerihelion.add(o,"saturnPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Geocentric)")
-  folderPerihelion.add(o,"saturnPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Saturn (Heliocentric)")
-  folderPerihelion.add(o,"uranusPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Geocentric)")
-  folderPerihelion.add(o,"uranusPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Uranus (Heliocentric)")
-  folderPerihelion.add(o,"neptunePerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Geocentric)")
-  folderPerihelion.add(o,"neptunePerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Neptune (Heliocentric)")
-  folderPerihelion.add(o,"plutoPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Geocentric)")
-  folderPerihelion.add(o,"plutoPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Pluto (Heliocentric)")
-  folderPerihelion.add(o,"halleysPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Geocentric)")
-  folderPerihelion.add(o,"halleysPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Halleys (Heliocentric)")
-  folderPerihelion.add(o,"erosPerihelion").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Geocentric)")
-  folderPerihelion.add(o,"erosPerihelionEcliptic").min(0.0).max(360.0).step(0.000001).listen().name("Eros (Heliocentric)")   
-  
-  let folderO = gui.addFolder('Celestial Tools')
-  folderO.add(zodiac, 'visible').name('Zodiac');
-  folderO.add(o, 'zodiacSize', 0.01, 10).step(0.1).name('Zodiac size').onChange(()=>{changeZodiacScale()})
-  folderO.add(o, 'Polar line').onFinishChange(()=>{
-    polarLine.visible = o['Polar line']
-  });
-  folderO.add(o, 'polarLineLength', 0.1, 50).name('Line length').onChange(()=>{
-      polarLine.scale.y = o.polarLineLength
-  });
-  
-  folderO.add(sceneObjects.stars, 'visible').name('Stars visible');
-
-  folderO.add(o, 'starNamesVisible').name('Star names')
-  .onChange(visible => {
-    sceneObjects.stars.children.forEach(child => {
-      if (child instanceof CSS2DObject) {
-        child.visible = visible;
-      }
-    });
-    needsLabelUpdate = true;  // ensure your next frame re‐draws all labels
-  });
-
-  folderO.add(sceneObjects.constellations, 'visible').name('Constellations visible');
-  folderO.add(o, 'constellationLayout', {
-  'Traditional (Asterism)': 'asterism',
-  'Artistic (Curved)':  'stellarium'
-  })
-  .name('Constellation Style')
-  .onChange(() => {
-    initConstellations();   // re–draw with the new style
-  });
-  
-  folderO.add(o, 'starDistanceScaleFact', 0.1, 2).step(0.1).name('Star distance').onChange(factor => {
-
-    // scale all Three.js objects (Mesh, Group, etc.)
-    scalableObjects.forEach(obj => obj.scale.setScalar(factor));
-
-    // 2 – tell the label renderer that it has to recompute the screen-space position of every CSS2DObject next frame
-    needsLabelUpdate = true;
-    
-  });
-
-  // ← no star-size here; that slider lives inside initStars()
-
-  folderO.add(celestialSphere, 'visible').name('Celestial sphere')
-  folderO.add(plane, 'visible').name('Ecliptic grid')
-  folderO.add(sunCenteredInvPlane, 'visible').name('Invariable plane').onChange(function(value) {
-    // Show/hide node markers and height label when toggling
-    sunCenteredNodeMarkers.visible = value;
-    setCSS2DVisibility(sunCenteredNodeMarkers, value);
-    sunCenteredHeightLabel.visible = value;
-    // Force immediate update when becoming visible
-    if (value) {
-      updateSunCenteredInvPlane();
-    }
-    needsLabelUpdate = true;
-  });
-  folderO.add(invariablePlaneGroup, 'visible').name('Earth Inclination to Invariable plane').onChange(function(value) {
-    // Show/hide the markers group (separate from tilted plane)
-    if (invariablePlaneGroup.userData.markersGroup) {
-      invariablePlaneGroup.userData.markersGroup.visible = value;
-    }
-    // Show/hide all labels when toggling the plane
-    // Must set CSS2DObject.visible property (not just div.style.display)
-    // because the patched labelRenderer checks obj.visible and overrides display style
-    if (invariablePlaneGroup.userData.highLabelObj) {
-      invariablePlaneGroup.userData.highLabelObj.visible = value;
-    }
-    if (invariablePlaneGroup.userData.lowLabelObj) {
-      invariablePlaneGroup.userData.lowLabelObj.visible = value;
-    }
-    if (invariablePlaneGroup.userData.meanLabel1Obj) {
-      invariablePlaneGroup.userData.meanLabel1Obj.visible = value;
-    }
-    if (invariablePlaneGroup.userData.meanLabel2Obj) {
-      invariablePlaneGroup.userData.meanLabel2Obj.visible = value;
-    }
-    // Earth height indicator label (annual crossing)
-    if (invariablePlaneGroup.userData.earthHeightLabelObj) {
-      invariablePlaneGroup.userData.earthHeightLabelObj.visible = value;
-    }
-    // Force immediate update of Earth height indicator when becoming visible
-    if (value) {
-      updateInvariablePlanePosition();
-    }
-    // Also toggle inclination path visibility
-    inclinationPathGroup.visible = value;
-    if (value) {
-      // Force immediate position update when becoming visible
-      _lastInclinationUpdateYear = null; // Reset throttle
-      updateInclinationPathMarker();
-    } else {
-      // Hide label immediately when toggling off
-      const labelObject = inclinationPathGroup.userData.labelObject;
-      if (labelObject) labelObject.visible = false;
-    }
-    needsLabelUpdate = true; // Force label renderer to redraw immediately
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // INVARIABLE PLANE POSITIONS PANEL
-  // Shows all planets' heights relative to the invariable plane
-  // ═══════════════════════════════════════════════════════════════════════════
-  const invPlanePositionsFolder = gui.addFolder('Invariable Plane Positions');
-
-  // Helper to add tooltip to dat.GUI controller
-  const addTooltip = (controller, text) => {
-    if (controller.domElement && controller.domElement.parentElement) {
-      controller.domElement.parentElement.title = text;
-    }
-    return controller;
+    return blade;
   };
 
-  // Invariable Plane Balance Explorer button - first item for easy access
-  const fbeButton = { explore: openBalanceExplorer };
-  const fbeController = invPlanePositionsFolder.add(fbeButton, 'explore').name('Invariable Plane Balance Explorer');
-  addTooltip(fbeController, 'Open interactive modal to test different phase group, and d-value assignments. See docs/26-fibonacci-laws.md for theory.');
-
-  // Validation subfolder (Option A vs B comparison) - at top for easy access
-  const validationFolder = invPlanePositionsFolder.addFolder('Validate position of Invariable plane (Option A vs B)');
-  addTooltip(validationFolder.add(o, 'calculatedPlaneTilt', 0, 10).step(0.0001).name('Calc. Tilt (°)').listen(),
-    'Invariable plane tilt from ecliptic, calculated from angular momentum vectors (Option A). Expected: 1.5787° (Souami & Souchay 2012). This is constant - defined by orbital elements.');
-  addTooltip(validationFolder.add(o, 'calculatedAscendingNode', 0, 360).step(0.01).name('Calc. Asc.Node (°)').listen(),
-    'Ascending node of invariable plane on ecliptic (Option A). Expected: ~107°. This is where the invariable plane crosses the ecliptic going north. Constant value.');
-  addTooltip(validationFolder.add(o, 'jupiterAngularMomentumPercent', 0, 100).step(0.01).name('Jupiter L (%)').listen(),
-    'Jupiter\'s contribution to total planetary angular momentum. Expected: 58-62%. Jupiter dominates the invariable plane orientation.');
-  addTooltip(validationFolder.add(o, 'saturnAngularMomentumPercent', 0, 100).step(0.01).name('Saturn L (%)').listen(),
-    'Saturn\'s contribution to total planetary angular momentum. Expected: 23-26%. Second largest contributor after Jupiter.');
-  addTooltip(validationFolder.add(o, 'optionABDifference', 0, 10).step(0.0001).name('A vs B Diff (°)').listen(),
-    'Difference between Option A (calculated) and Option B (Souami & Souchay data). Should be <0.5° if orbital elements are correct.');
-
-  validationFolder.close(); // Start collapsed
-
-  // Planet heights (read-only displays via .listen())
-  // Use step(0.0001) to show 4 decimal places for small AU values
-  addTooltip(invPlanePositionsFolder.add(o, 'mercuryHeightAboveInvPlane', -1, 1).step(0.0001).name('Mercury (AU)').listen(),
-    'Height above invariable plane in AU. Positive = above, negative = below. Mercury has highest inclination (6.35°), max height ~0.05 AU.');
-  addTooltip(invPlanePositionsFolder.add(o, 'venusHeightAboveInvPlane', -1, 1).step(0.0001).name('Venus (AU)').listen(),
-    'Height above invariable plane in AU. Venus inclination: 2.15°, max height ~0.02 AU.');
-  addTooltip(invPlanePositionsFolder.add(o, 'earthHeightAboveInvPlane', -1, 1).step(0.0001).name('Earth (AU)').listen(),
-    'Height above invariable plane in AU. Earth inclination: 1.57°, max height ~0.027 AU. Crosses plane in July (ascending) and January (descending).');
-  addTooltip(invPlanePositionsFolder.add(o, 'marsHeightAboveInvPlane', -1, 1).step(0.0001).name('Mars (AU)').listen(),
-    'Height above invariable plane in AU. Mars inclination: 1.63°, max height ~0.04 AU.');
-  addTooltip(invPlanePositionsFolder.add(o, 'jupiterHeightAboveInvPlane', -1, 1).step(0.0001).name('Jupiter (AU)').listen(),
-    'Height above invariable plane in AU. Jupiter has lowest inclination (0.32°) because it dominates the plane. Max height ~0.03 AU.');
-  addTooltip(invPlanePositionsFolder.add(o, 'saturnHeightAboveInvPlane', -1, 1).step(0.0001).name('Saturn (AU)').listen(),
-    'Height above invariable plane in AU. Saturn inclination: 0.93°, max height ~0.15 AU due to large orbit.');
-  addTooltip(invPlanePositionsFolder.add(o, 'uranusHeightAboveInvPlane', -1, 1).step(0.0001).name('Uranus (AU)').listen(),
-    'Height above invariable plane in AU. Uranus inclination: 0.99°, max height ~0.34 AU.');
-  addTooltip(invPlanePositionsFolder.add(o, 'neptuneHeightAboveInvPlane', -1, 1).step(0.0001).name('Neptune (AU)').listen(),
-    'Height above invariable plane in AU. Neptune inclination: 0.74°, max height ~0.39 AU due to large orbit.');
-
-  // Balance indicators
-  addTooltip(invPlanePositionsFolder.add(o, 'massWeightedBalance', -1, 1).step(0.000001).name('Mass Balance (AU)').listen(),
-    'Mass-weighted average height: Σ(mass × height) / total_mass. Should oscillate around zero over long timescales. Jupiter (71%) and Saturn (21%) dominate.');
-  addTooltip(invPlanePositionsFolder.add(o, 'planetsAboveInvPlane').name('Planets Above').listen(),
-    'Number of planets currently above the invariable plane (positive height).');
-  addTooltip(invPlanePositionsFolder.add(o, 'planetsBelowInvPlane').name('Planets Below').listen(),
-    'Number of planets currently below the invariable plane (negative height).');
-
-  // Balance Trend Analysis subfolder
-  const trendFolder = invPlanePositionsFolder.addFolder('Balance Trend Analysis');
-
-  // Start/Stop button - changes label based on state
-  const trackingButton = { label: 'Start Tracking' };
-  const trackingController = trendFolder.add(trackingButton, 'label').name('▶ Start Tracking');
-  trackingController.domElement.parentElement.style.cursor = 'pointer';
-  trackingController.domElement.querySelector('input').style.display = 'none';
-  trackingController.domElement.parentElement.addEventListener('click', () => {
-    if (o.balanceTrackingActive) {
-      stopBalanceTracking();
-      trackingController.name('▶ Start Tracking');
-    } else {
-      startBalanceTracking();
-      trackingController.name('⏹ Stop Tracking');
+  // Helper to add tooltip to Tweakpane folder (title bar only, not children)
+  const addFolderTooltip = (folder, text) => {
+    if (folder && folder.element) {
+      const titleBar = folder.element.querySelector('.tp-fldv_b');
+      (titleBar || folder.element).title = text;
     }
-  });
-  trackingController.domElement.parentElement.title = 'Click to start/stop recording balance samples. Run for 165+ years (one Neptune orbit) for meaningful average.';
+    return folder;
+  };
 
-  // Tracking status display
-  addTooltip(trendFolder.add(o, 'balanceTrackingActive').name('Tracking Active').listen(),
-    'Whether balance tracking is currently recording samples.');
-  addTooltip(trendFolder.add(o, 'balanceTrackingStartYear', -100000, 100000).step(0.1).name('Started (year)').listen(),
-    'Simulation year when tracking began.');
-  addTooltip(trendFolder.add(o, 'balanceYearsTracked', 0, 1000000).step(0.1).name('Years Tracked').listen(),
-    'Duration of tracking in simulated years. Need 165+ years (one Neptune orbit) for meaningful average.');
-  addTooltip(trendFolder.add(o, 'balanceSampleCount', 0, 1000000).step(1).name('Sample Count').listen(),
-    'Number of yearly samples collected. More samples = more accurate average.');
-  addTooltip(trendFolder.add(o, 'balanceCumulativeSum', -1000, 1000).step(0.000001).name('Cumulative Sum').listen(),
-    'Running sum of all balance samples. Divide by sample count to get lifetime average.');
-  addTooltip(trendFolder.add(o, 'balanceLifetimeAverage', -1, 1).step(0.000001).name('Lifetime Avg (AU)').listen(),
-    'KEY METRIC: Should converge to ~0 over 165+ years if invariable plane is correctly positioned. This validates the plane orientation.');
-  addTooltip(trendFolder.add(o, 'balanceMinSeen', -1, 1).step(0.000001).name('Min Seen (AU)').listen(),
-    'Most negative (below plane) balance observed during tracking. Shows lower bound of oscillation.');
-  addTooltip(trendFolder.add(o, 'balanceMaxSeen', -1, 1).step(0.000001).name('Max Seen (AU)').listen(),
-    'Most positive (above plane) balance observed during tracking. Shows upper bound of oscillation.');
+  // Helper to make a folder title act as a visibility toggle.
+  // Click title text = toggle on/off, click arrow = expand/collapse settings.
+  // Returns { folder, setActive(bool) } so callers can sync state.
+  const makeToggleFolder = (parent, title, target, prop, onChange, tooltip) => {
+    const isOn = !!target[prop];
+    const folder = parent.addFolder({ title, expanded: isOn });
+    const titleBar = folder.element.querySelector('.tp-fldv_b');
+    const titleText = folder.element.querySelector('.tp-fldv_t');
+    const mark = folder.element.querySelector('.tp-fldv_m');  // arrow icon
 
-  // Reset button
-  const resetButton = { reset: () => { resetBalanceTracking(); trackingController.name('▶ Start Tracking'); } };
-  const resetController = trendFolder.add(resetButton, 'reset').name('↺ Reset Tracking');
-  resetController.domElement.parentElement.title = 'Clear all tracking data and start fresh. Use after jumping to a new simulation date.';
+    // Visual state + folder expanded synced with on/off
+    const updateVisual = () => {
+      const on = !!target[prop];
+      titleText.style.opacity = on ? '1' : '0.4';
+      folder.expanded = on;
+    };
 
-  trendFolder.close(); // Start collapsed
+    // Intercept clicks: title text toggles, arrow still expands/collapses
+    titleBar.addEventListener('click', (e) => {
+      // If click is on the arrow mark, let Tweakpane handle expand/collapse
+      if (mark && mark.contains(e.target)) return;
+      // Otherwise toggle visibility
+      e.stopPropagation();
+      e.preventDefault();
+      target[prop] = !target[prop];
+      updateVisual();
+      if (onChange) onChange(target[prop]);
+    });
+    titleText.style.cursor = 'pointer';
 
-  invPlanePositionsFolder.close(); // Start collapsed
+    if (tooltip) {
+      titleText.title = tooltip;
+    }
 
-  let sFolder = gui.addFolder('Settings')
+    updateVisual();
+    return folder;
+  };
 
-  // Hierarchy Inspector - first item in Settings
-  sFolder.add({ inspect: openHierarchyInspector }, 'inspect').name('Planet Inspector');
-
-  sFolder.add(params, 'sizeBoost', 0, 1, 0.01).name('Planet size  0  = real').onChange(updatePlanetSizes);
-  
-  /* --- Output file  -------------------------------------------- */
-  const testSettings = sFolder.addFolder('Create Object File');
-
-  const modeCtrl   = testSettings.add(o, 'testMode', ['List', 'Range']).name('Mode');
-  const listCtrl   = testSettings.add(o, 'testJDsText').name('JD list (CSV)');
-  const startCtrl  = testSettings.add(o, 'rangeStart').name('Start JD');
-  const endCtrl    = testSettings.add(o, 'rangeEnd').name('End JD');
-  const pieceCtrl  = testSettings.add(o, 'rangePieces').name('# points').min(2).step(1);
-
-  //testSettings.add(o, 'runRATestButton').name('Create file (be patient)');
-  const runCtrl = testSettings
-  .add(o, 'runRATestToggle')
-  .name('Create file (be patient)')
-  .listen();
-  
-  runCtrl.onChange(async val => {
-  if (!val || o._raTestBusy) return;   // only react on first tick
-
-  o._raTestBusy = true;
-  try {
-    await runRATest();                // heavy work runs **after** the UI paints
-  } finally {
-    o.runRATestToggle = false;        // untick when finished
-    runCtrl.updateDisplay();
-    o._raTestBusy = false;
+  // Show/hide a Tweakpane blade
+  function toggleCtrl(ctrl, show) {
+    if (ctrl) ctrl.hidden = !show;
   }
-  });
-  
-  /* --- show only the relevant rows ------------------------------- */
-  function syncVis () {
-  const list = o.testMode === 'List';
-  toggleCtrl(listCtrl,  list);
-  toggleCtrl(startCtrl, !list);
-  toggleCtrl(endCtrl,   !list);
-  toggleCtrl(pieceCtrl, !list);
-  }
-  syncVis();
-  modeCtrl.onChange(syncVis);
-  
-  /* --- Solstice file --------------------------------------------------- */
-  const solFolder = sFolder.addFolder('Create Solstice File');
 
-  const modeCtrl2  = solFolder.add(o, 'solMode', ['Range', 'List']).name('Mode');
-  const yearList   = solFolder.add(o, 'solYearsText').name('Year list (CSV)');
-  const startCtrl2 = solFolder.add(o, 'solRangeStart').name('Start year').step(1);
-  const endCtrl2   = solFolder.add(o, 'solRangeEnd').name('End year').step(1);
+  // ── About ── (Laws, Free Parameters, Calibration Inputs, Model Parameters)
+  const aboutFolder = gui.addFolder({ title: 'About', expanded: false });
+  addFolderTooltip(aboutFolder, 'Six Fibonacci Laws, 6 free parameters, and all calibration and model parameters that define the solar system.');
 
-  const runCtrl2 = solFolder
-  .add(o, 'runSolToggle')
-  .name('Create file (be patient)')
-  .listen();
-
-  /* --- show only the relevant rows ------------------------------------ */
-  function syncSolVis() {
-  const list = o.solMode === 'List';
-  toggleCtrl(yearList,  list);      // show list box only in List mode
-  toggleCtrl(startCtrl2, !list);    // show range fields only in Range mode
-  toggleCtrl(endCtrl2,   !list);
-  }
-  syncSolVis();
-  modeCtrl2.onChange(syncSolVis);
-
-  /* --- run button ------------------------------------------------------ */
-  runCtrl2.onChange(async ticked => {
-  if (!ticked || o._solBusy) return;   // ignore untick or double-click
-  o._solBusy = true;
-  try {
-    const yrs = buildYearArray();      // builds array from List or Range
-    if (!yrs.length) {
-      alert('No valid years — check your input.');
-      return;
-    }
-    await runSolsticeExport(yrs);      // heavy work
-  } finally {
-    o.runSolToggle = false;            // untick when finished
-    runCtrl2.updateDisplay();
-    o._solBusy = false;
-  }
-  });
-
-  /* --- Year Analysis Report ------------------------------------------------- */
-  const yearAnalysisFolder = sFolder.addFolder('Create Year Analysis Report');
-
-  const modeCtrl3  = yearAnalysisFolder.add(o, 'yearAnalysisMode', ['Range', 'List']).name('Mode');
-  const yearList3  = yearAnalysisFolder.add(o, 'yearAnalysisYearsText').name('Year list (CSV)');
-  const startCtrl3 = yearAnalysisFolder.add(o, 'yearAnalysisRangeStart').name('Start year').step(1);
-  const endCtrl3   = yearAnalysisFolder.add(o, 'yearAnalysisRangeEnd').name('End year').step(1);
-
-  const runCtrl3 = yearAnalysisFolder
-    .add(o, 'runYearAnalysisToggle')
-    .name('Create file (be patient)')
-    .listen();
-
-  /* --- show only the relevant rows ------------------------------------------ */
-  function syncYearAnalysisVis() {
-    const list = o.yearAnalysisMode === 'List';
-    toggleCtrl(yearList3,  list);      // show list box only in List mode
-    toggleCtrl(startCtrl3, !list);     // show range fields only in Range mode
-    toggleCtrl(endCtrl3,   !list);
-  }
-  syncYearAnalysisVis();
-  modeCtrl3.onChange(syncYearAnalysisVis);
-
-  /* --- run button ----------------------------------------------------------- */
-  runCtrl3.onChange(async ticked => {
-    if (!ticked || o._yearAnalysisBusy) return;   // ignore untick or double-click
-    o._yearAnalysisBusy = true;
-    try {
-      const yrs = buildYearAnalysisArray();       // builds array from List or Range
-      if (!yrs.length) {
-        alert('No valid years — check your input.');
-        return;
-      }
-      await runYearAnalysisExport(yrs);           // heavy work
-    } finally {
-      o.runYearAnalysisToggle = false;            // untick when finished
-      runCtrl3.updateDisplay();
-      o._yearAnalysisBusy = false;
-    }
-  });
-
-  /* --- Console Tests (F12) ------------------------------------------------- */
-  const calibFolder = sFolder.addFolder('Console Tests (F12)');
-
-  // Configuration
-  calibFolder.add(o, 'calibrationYearStart').name('Start year').step(1);
-  calibFolder.add(o, 'calibrationYearEnd').name('End year').step(1);
-
-  // Year Length Analysis
-  const calibTropicalCtrl = calibFolder
-    .add(o, 'runTropicalYearAnalysis')
-    .name('Analyze Year at June Solstice')
-    .listen();
-
-  const calibDecemberSolsticeCtrl = calibFolder
-    .add(o, 'runDecemberSolsticeAnalysis')
-    .name('Analyze Year at December Solstice')
-    .listen();
-
-  const calibEquinoxCtrl = calibFolder
-    .add(o, 'runEquinoxAnalysis')
-    .name('Analyze Year Length by Cardinal')
-    .listen();
-
-  const calibAnoministicCtrl = calibFolder
-    .add(o, 'runAnoministicAnalysis')
-    .name('Analyze Anomalistic Year')
-    .listen();
-
-  const calibSiderealYearCtrl = calibFolder
-    .add(o, 'runSiderealYearAnalysis')
-    .name('Analyze Sidereal Year')
-    .listen();
-
-  const calibAllAlignmentsCtrl = calibFolder
-    .add(o, 'runAllAlignments')
-    .name('Analyze All Alignments')
-    .listen();
-
-  // Day Length Analysis
-  const calibSiderealDayCtrl = calibFolder
-    .add(o, 'runSiderealDayAnalysis')
-    .name('Analyze Sidereal Day')
-    .listen();
-
-  const calibSolarDayCtrl = calibFolder
-    .add(o, 'runSolarDayAnalysis')
-    .name('Analyze Solar Day')
-    .listen();
-
-  const calibStellarDayCtrl = calibFolder
-    .add(o, 'runStellarDayAnalysis')
-    .name('Analyze Stellar Day')
-    .listen();
-
-  // Day Rotation Diagnostics - hidden, call diagnoseDayRotation() from console if needed
-  // const calibDayDiagnosticsCtrl = calibFolder
-  //   .add(o, 'runDayDiagnostics')
-  //   .name('Day Rotation Diagnostics')
-  //   .listen();
-
-  // RA Rate Diagnostics - hidden, call diagnoseRARate() from console if needed
-  // const calibRADiagnosticsCtrl = calibFolder
-  //   .add(o, 'runRADiagnostics')
-  //   .name('RA Rate Diagnostics')
-  //   .listen();
-
-  // Parameter Verification
-  const calibTestCtrl = calibFolder
-    .add(o, 'runCalibrationTest')
-    .name('Verify Obliquity Calibration')
-    .listen();
-
-  const calibVerifyPerihelionCtrl = calibFolder
-    .add(o, 'runVerifyPerihelionRate')
-    .name('Verify Perihelion Rate')
-    .listen();
-
-  const calibInvestigateCtrl = calibFolder
-    .add(o, 'runInvestigateParams')
-    .name('Investigate Parameters')
-    .listen();
-
-  // Optimization
-  const calibOptimalCtrl = calibFolder
-    .add(o, 'runFindOptimalRA')
-    .name('Find Optimal earthRAAngle')
-    .listen();
-
-  /* --- Tropical Year Analysis (June Solstice) ----------------------------- */
-  calibTropicalCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeTropicalYearLength();
-    } finally {
-      o.runTropicalYearAnalysis = false;
-      calibTropicalCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- December Solstice Year Analysis ------------------------------------ */
-  calibDecemberSolsticeCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeDecemberSolsticeYearLength();
-    } finally {
-      o.runDecemberSolsticeAnalysis = false;
-      calibDecemberSolsticeCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Verify Obliquity Calibration ---------------------------------------- */
-  calibTestCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await runObliquityCalibrationTest();
-    } finally {
-      o.runCalibrationTest = false;
-      calibTestCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Investigate Parameter Effects -------------------------------------- */
-  calibInvestigateCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await investigateParameterEffects();
-    } finally {
-      o.runInvestigateParams = false;
-      calibInvestigateCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Find Optimal earthRAAngle ------------------------------------------ */
-  calibOptimalCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await findOptimalEarthRAAngle();
-    } finally {
-      o.runFindOptimalRA = false;
-      calibOptimalCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Verify Perihelion Rate --------------------------------------------- */
-  calibVerifyPerihelionCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await verifyPerihelionRate();
-    } finally {
-      o.runVerifyPerihelionRate = false;
-      calibVerifyPerihelionCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Equinox Intervals Analysis ----------------------------------------- */
-  calibEquinoxCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeEquinoxIntervals();
-    } finally {
-      o.runEquinoxAnalysis = false;
-      calibEquinoxCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Anomalistic Year Analysis ------------------------------------------ */
-  calibAnoministicCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeAnoministicYear();
-    } finally {
-      o.runAnoministicAnalysis = false;
-      calibAnoministicCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Sidereal Year Analysis --------------------------------------------- */
-  calibSiderealYearCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeSiderealYear();
-    } finally {
-      o.runSiderealYearAnalysis = false;
-      calibSiderealYearCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- All Alignments Analysis -------------------------------------------- */
-  calibAllAlignmentsCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeAllAlignments();
-    } finally {
-      o.runAllAlignments = false;
-      calibAllAlignmentsCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Analyze Sidereal Day ------------------------------------------------ */
-  calibSiderealDayCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeSiderealDay();
-    } finally {
-      o.runSiderealDayAnalysis = false;
-      calibSiderealDayCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Analyze Solar Day --------------------------------------------------- */
-  calibSolarDayCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeSolarDay();
-    } finally {
-      o.runSolarDayAnalysis = false;
-      calibSolarDayCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  /* --- Analyze Stellar Day ------------------------------------------------- */
-  calibStellarDayCtrl.onChange(async ticked => {
-    if (!ticked || o._calibrationBusy) return;
-    o._calibrationBusy = true;
-    try {
-      console.clear();
-      await analyzeStellarDay();
-    } finally {
-      o.runStellarDayAnalysis = false;
-      calibStellarDayCtrl.updateDisplay();
-      o._calibrationBusy = false;
-    }
-  });
-
-  // /* --- Day Rotation Diagnostics -------------------------------------------- */
-  // calibDayDiagnosticsCtrl.onChange(async ticked => {
-  //   if (!ticked || o._calibrationBusy) return;
-  //   o._calibrationBusy = true;
-  //   try {
-  //     console.clear();
-  //     // Use the June solstice of calibration start year as starting point
-  //     const startSolstice = solsticeForYear(o.calibrationYearStart);
-  //     if (startSolstice) {
-  //       diagnoseDayRotation(startSolstice.jd, 25);
-  //     } else {
-  //       console.error('Could not find solstice for diagnostic');
-  //     }
-  //   } finally {
-  //     o.runDayDiagnostics = false;
-  //     calibDayDiagnosticsCtrl.updateDisplay();
-  //     o._calibrationBusy = false;
-  //   }
-  // });
-
-  // /* --- RA Rate Diagnostics ------------------------------------------------- */
-  // calibRADiagnosticsCtrl.onChange(async ticked => {
-  //   if (!ticked || o._calibrationBusy) return;
-  //   o._calibrationBusy = true;
-  //   try {
-  //     console.clear();
-  //     diagnoseRARate();
-  //   } finally {
-  //     o.runRADiagnostics = false;
-  //     calibRADiagnosticsCtrl.updateDisplay();
-  //     o._calibrationBusy = false;
-  //   }
-  // });
-
-  let folderPlanets = sFolder.addFolder('Planets show/hide');
-  folderPlanets.add(o, 'Orbits' ).onFinishChange(()=>{
-    showHideOrbits();
-  });
-
-  folderPlanets.add(o, 'Size', 0.4, 1.4).onChange(()=>{changePlanetScale()})
-  planetObjects.forEach(obj => {
-    if (!obj.isNotPhysicalObject) {
-      folderPlanets.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
-        showHideObject(obj);
-      });
-    }
-  })
- 
-  let folderDef = sFolder.addFolder('Objects show/hide');
-  planetObjects.forEach(obj => {
-    if (obj.isNotPhysicalObject) {
-      folderDef.add(obj, 'visible').name(obj.name).onFinishChange(()=>{
-        showHideObject(obj);
-      });
-    }
-  })
-  
-  let folderElongations=sFolder.addFolder("Elongations show/hide");
-  folderElongations.add(o,"moonElongation").min(0.0).max(180.0).listen().name("Moon")
-  folderElongations.add(o,"mercuryElongation").min(0.0).max(180.0).listen().name("Mercury")
-  folderElongations.add(o,"venusElongation").min(0.0).max(180.0).listen().name("Venus")
-  folderElongations.add(o,"marsElongation").min(0.0).max(180.0).listen().name("Mars")
-  folderElongations.add(o,"jupiterElongation").min(0.0).max(180.0).listen().name("Jupiter")
-  folderElongations.add(o,"saturnElongation").min(0.0).max(180.0).listen().name("Saturn")  
-  folderElongations.add(o,"uranusElongation").min(0.0).max(180.0).listen().name("Uranus") 
-  folderElongations.add(o,"neptuneElongation").min(0.0).max(180.0).listen().name("Neptune") 
-  folderElongations.add(o,"plutoElongation").min(0.0).max(180.0).listen().name("Pluto") 
-  folderElongations.add(o,"halleysElongation").min(0.0).max(180.0).listen().name("Halleys") 
-  folderElongations.add(o,"erosElongation").min(0.0).max(180.0).listen().name("Eros") 
-  
-  let folderCamera = sFolder.addFolder('Camera show/hide')
-
-  folderCamera.add(o, 'worldCamRa').name('RA').listen()
-  folderCamera.add(o, 'worldCamDec').name('Dec').listen()
-  folderCamera.add(o, 'worldCamDist').name('AU distance').listen()
-
-  // Debug folder for ascending node debugging (only shown when debugOn flag is true)
-  if (debugOn) {
-    let debugFolder = sFolder.addFolder('Debug');
-    debugFolder.add(o, 'debugAscendingNode').name('Log Ascending Nodes').onChange((val) => {
-      _debugAscendingNodeLogEnabled = val;
-      if (val) {
-        console.log('🔍 Ascending Node debugging ENABLED - check console for logs every second');
-        console.log('   Go to a date like 12000-07-16 to see drift behavior');
-      } else {
-        console.log('🔍 Ascending Node debugging DISABLED');
-      }
+  // --- The Six Laws (custom DOM for full-width readability) ---
+  {
+    const lawsFolder = aboutFolder.addFolder({ title: 'The Six Laws', expanded: false });
+    const laws = [
+      { n: 1, title: 'Fibonacci Cycle Hierarchy',
+        desc: 'Dividing the Holistic-Year by successive Fibonacci numbers produces the major precession periods of the solar system.' },
+      { n: 2, title: 'Inclination Constant',
+        desc: 'Each planet\u2019s mass-weighted inclination amplitude, multiplied by a Fibonacci divisor, equals the same universal constant \u03C8.' },
+      { n: 3, title: 'Inclination Balance',
+        desc: 'The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn\u2019s alone (99.9998%).' },
+      { n: 4, title: 'Eccentricity Constant',
+        desc: 'Within each mirror pair, Fibonacci constraints determine all eight eccentricities from the inclinations alone \u2014 zero free parameters.' },
+      { n: 5, title: 'Eccentricity Balance',
+        desc: 'The same Fibonacci divisors and phase groups produce an independent balance condition on eccentricities (99.88%).' },
+      { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
+        desc: 'Saturn\u2019s ecliptic-retrograde precession creates a closed resonance loop with Jupiter and Earth, linking the Fibonacci timescale to orbital structure.' },
+    ];
+    // Inject after all Tweakpane children are set up
+    const lawsContainer = lawsFolder.element.querySelector('.tp-fldv_c');
+    laws.forEach(l => {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding: 4px 8px; font-size: 11px; line-height: 1.45; color: hsla(210,15%,75%,1); cursor: default;';
+      item.title = l.desc;
+      const num = document.createElement('span');
+      num.style.cssText = 'color: hsla(210,60%,65%,1); font-weight: 600; margin-right: 6px;';
+      num.textContent = 'Law ' + l.n;
+      const title = document.createElement('span');
+      title.style.fontWeight = '500';
+      title.textContent = l.title;
+      const desc = document.createElement('div');
+      desc.style.cssText = 'font-size: 10px; color: hsla(210,10%,55%,1); margin-top: 2px;';
+      desc.textContent = l.desc;
+      item.appendChild(num);
+      item.appendChild(title);
+      item.appendChild(desc);
+      lawsContainer.appendChild(item);
     });
   }
 
-  /* ---------------------------------------------------------
-  * width-toggle badge (does NOT consume a controller slot)
-  * --------------------------------------------------------- */
+  // --- Free Parameters (6 DOF, matching holisticuniverse.com/model/foundations) ---
+  {
+    const freeFolder = aboutFolder.addFolder({ title: 'Free Parameters (6 DOF)', expanded: false });
+    addFolderTooltip(freeFolder, 'The six true degrees of freedom that define the model. Everything else is derived or taken from observations.');
+    const freeParams = {
+      fpHolisticYear: String(holisticyearLength) + ' years',
+      fpAnchorYear: '-301,340 (derived)',
+      fpFibDivisors: '3, 5, 8, 13, 21, 34',
+      fpMeanObliquity: earthtiltMean + '\u00B0',
+      fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
+      fpConfig: 'Config #32 (unique)',
+    };
+    addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
+      '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
+    const anchorBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpAnchorYear', { label: 'Anchor year', readonly: true }),
+      '0 DOF \u2014 Calculated from Holistic-Year and 1246 AD. Not independently free.');
+    anchorBlade.element.style.opacity = '0.65';
+    addTooltip(freeFolder.addBinding(freeParams, 'fpFibDivisors', { label: 'Fibonacci divisors', readonly: true }),
+      '3 DOF \u2014 Assumed; not independently derived. Used to divide the Holistic-Year into precession periods (H/3, H/5, H/8, H/13, etc.).');
+    addTooltip(freeFolder.addBinding(freeParams, 'fpMeanObliquity', { label: 'Mean obliquity', readonly: true }),
+      '1 DOF \u2014 Fitted to observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
+    addTooltip(freeFolder.addBinding(freeParams, 'fpAmplitude', { label: 'Amplitude', readonly: true }),
+      '1 DOF \u2014 Earth inclination amplitude on the invariable plane. Fibonacci predicts 0.635185\u00B0.');
+    const configBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpConfig', { label: 'Planet config', readonly: true }),
+      '0 DOF \u2014 Exhaustive search of 7,558,272 configurations yields exactly 1 unique mirror-symmetric solution.');
+    configBlade.element.style.opacity = '0.65';
+  }
+
+  // --- Calibration Inputs (from ASTRO_REFERENCE + website) ---
+  {
+    const R = ASTRO_REFERENCE;
+    const calibInputs = {
+      ciAlignment: '1246 AD',
+      ciLongPeri: R.perihelionLongitudeJ2000_deg + '\u00B0',
+      ciObliquity: (R.obliquityJ2000_arcsec / 3600).toFixed(6) + '\u00B0',
+      ciObliquityRate: R.obliquityRate_arcsecPerCentury + '"/cy',
+      ciObliquityRange: '~22.1\u00B0 to ~24.5\u00B0',
+      ciEarthIncl: R.earthInclinationJ2000_deg + '\u00B0',
+      ciEccentricity: String(R.eccentricityJ2000),
+      ciSiderealYear: R.siderealYearJ2000 + ' days',
+      ciTropicalYear: R.tropicalYearMeanJ2000 + ' days',
+      ciTropicalVE: R.tropicalYearVEJ2000 + ' days',
+      ciTropicalSS: R.tropicalYearSSJ2000 + ' days',
+      ciTropicalAE: R.tropicalYearAEJ2000 + ' days',
+      ciTropicalWS: R.tropicalYearWSJ2000 + ' days',
+      ciAnomalYear: R.anomalisticYearJ2000 + ' days',
+      ciTropicalRate: R.tropicalYearRateSecPerCentury + ' s/cy',
+      ciPrecession: R.iauPrecessionJ2000.toFixed(2) + ' yr',
+      ciSolsticeJD: String(R.juneSolstice2000_JD),
+      ciSolarDay: R.solarDayJ2000 + ' s',
+      ciSiderealDay: R.siderealDayJ2000.toFixed(6) + ' s',
+      ciStellarDay: R.stellarDayJ2000.toFixed(6) + ' s',
+    };
+    const calibCount = Object.keys(calibInputs).length;
+    const calibInputFolder = aboutFolder.addFolder({ title: 'Calibration Inputs (' + calibCount + ')', expanded: false });
+    addFolderTooltip(calibInputFolder, 'Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor the model.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciAlignment', { label: 'Perihelion-solstice', readonly: true }),
+      'Year when perihelion aligned with the December solstice (Meeus).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciLongPeri', { label: 'Long. perihelion (J2000)', readonly: true }),
+      'Longitude of perihelion at J2000 epoch.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquity', { label: 'Obliquity (J2000)', readonly: true }),
+      'Obliquity of the ecliptic at J2000 (IAU 2006, Capitaine et al. 2003).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquityRate', { label: 'Obliquity rate (J2000)', readonly: true }),
+      'Rate of change of obliquity in arcseconds per century (IAU 2006).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquityRange', { label: 'Obliquity range', readonly: true }),
+      'Observed range of obliquity oscillation over the precession cycle (Laskar 1993).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciEarthIncl', { label: 'Earth incl. (J2000)', readonly: true }),
+      'Earth orbital inclination to the invariable plane at J2000 (Astronomical Almanac).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciEccentricity', { label: 'Eccentricity (J2000)', readonly: true }),
+      'Earth orbital eccentricity at J2000 (JPL Horizons).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSiderealYear', { label: 'Sidereal year (J2000)', readonly: true }),
+      'Sidereal year length in days (JPL Horizons).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalYear', { label: 'Tropical year (J2000)', readonly: true }),
+      'Mean tropical year length in days (Meeus & Savoie 1992).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalVE', { label: 'Trop. yr VE (J2000)', readonly: true }),
+      'Tropical year measured from Vernal Equinox to Vernal Equinox.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalSS', { label: 'Trop. yr SS (J2000)', readonly: true }),
+      'Tropical year measured from Summer Solstice to Summer Solstice.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalAE', { label: 'Trop. yr AE (J2000)', readonly: true }),
+      'Tropical year measured from Autumnal Equinox to Autumnal Equinox.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalWS', { label: 'Trop. yr WS (J2000)', readonly: true }),
+      'Tropical year measured from Winter Solstice to Winter Solstice.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciAnomalYear', { label: 'Anomalistic yr (J2000)', readonly: true }),
+      'Anomalistic year: perihelion to perihelion in days.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalRate', { label: 'Tropical yr rate', readonly: true }),
+      'Secular change in tropical year length (seconds per century).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciPrecession', { label: 'Axial prec. (J2000)', readonly: true }),
+      'IAU J2000 axial precession period in years.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSolsticeJD', { label: 'June Solstice 2000 JD', readonly: true }),
+      'Julian Day of the June 2000 solstice (USNO).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSolarDay', { label: 'Solar day (J2000)', readonly: true }),
+      'Mean solar day in SI seconds (exact by definition at epoch).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSiderealDay', { label: 'Sidereal day (J2000)', readonly: true }),
+      'Rotation period relative to the vernal equinox (~23h 56m 4.0905s).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciStellarDay', { label: 'Stellar day (J2000)', readonly: true }),
+      'Rotation period relative to fixed stars (~23h 56m 4.0989s).');
+  }
+
+  // --- Model Parameters (all parameters from the top of script.js) ---
+  {
+    const constFolder = aboutFolder.addFolder({ title: 'Model Parameters', expanded: false });
+    let totalModelParams = 0;
+
+    // Helper: add a read-only string binding
+    const addConst = (folder, obj, key, label, tip) => {
+      addTooltip(folder.addBinding(obj, key, { label, readonly: true }), tip);
+    };
+    // Helper: format a number with unit
+    const fmtD = (v) => v + ' days';
+    const fmtDeg = (v) => v + '\u00B0';
+    const fmtKm = (v) => v.toLocaleString('en-US') + ' km';
+    const fmtYr = (v) => v.toLocaleString('en-US') + ' yr';
+
+    // -- Earth (includes fundamental parameters — model is geocentrically defined) --
+    const fundVals = {
+      holisticYear: fmtYr(holisticyearLength),
+      perihelionAlignYear: perihelionalignmentYear + ' AD',
+      perihelionAlignJD: String(perihelionalignmentJD),
+      tropicalYear: fmtD(inputmeanlengthsolaryearindays),
+      siderealYearSec: meansiderealyearlengthinSeconds + ' s',
+      startJD: String(startmodelJD),
+      startYear: String(startmodelYear),
+      correctionDays: String(correctionDays),
+      correctionSun: fmtDeg(correctionSun),
+      tempGraphPos: String(temperatureGraphMostLikely),
+      startAngle: fmtDeg(startAngleModel),
+      earthRAAngle: String(earthRAAngle),
+      earthTiltMean: fmtDeg(earthtiltMean),
+      inclAmp: fmtDeg(earthInvPlaneInclinationAmplitude),
+      inclMean: fmtDeg(earthInvPlaneInclinationMean),
+      phaseAngle: fmtDeg(earthInclinationPhaseAngle),
+      ascNodeVerified: fmtDeg(earthAscendingNodeInvPlaneVerified),
+      eccBase: String(eccentricityBase),
+      eccAmp: String(eccentricityAmplitude),
+      midEccAmp: fmtDeg(mideccentricitypointAmplitude),
+      helionAmp: fmtDeg(helionpointAmplitude),
+      siderealDayAmp: meansiderealyearAmplitudeinSecondsaDay + ' s',
+      solarYearAmp: meansolaryearAmplitudeinSecondsaDay + ' s',
+      anomYearAmp: meanAnomalisticYearAmplitudeinSecondsaDay + ' s',
+      auDist: fmtKm(currentAUDistance),
+      deltaT: String(deltaTStart),
+    };
+    const fundCount = Object.keys(fundVals).length;
+    totalModelParams += fundCount;
+    const fundFolder = constFolder.addFolder({ title: 'Earth (' + fundCount + ')', expanded: false });
+    addFolderTooltip(fundFolder, 'With ' + fundCount + ' parameters, all orbital behaviours of the Earth can be modelled.');
+    addConst(fundFolder, fundVals, 'holisticYear', 'Holistic-Year', 'The fundamental cycle unifying all precession movements.');
+    addConst(fundFolder, fundVals, 'perihelionAlignYear', 'Perihelion align.', 'Last year perihelion aligned with December solstice (Meeus).');
+    addConst(fundFolder, fundVals, 'perihelionAlignJD', 'Perihelion align. JD', 'Same alignment in Julian Day number.');
+    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. May differ from the actual mean tropical year, which is calculated from this input and the Holistic-Year length.');
+    addConst(fundFolder, fundVals, 'siderealYearSec', 'Sidereal year', 'Sidereal year length in seconds (fixed).');
+    addConst(fundFolder, fundVals, 'startJD', 'Start model JD', 'Julian Day of the model start date (June Solstice 2000).');
+    addConst(fundFolder, fundVals, 'startYear', 'Start model year', 'Decimal year of the model start date.');
+    addConst(fundFolder, fundVals, 'correctionDays', 'Correction days', 'Small correction because 21 June 00:00 UTC is not exactly at solstice.');
+    addConst(fundFolder, fundVals, 'correctionSun', 'Correction Sun', 'Degree correction for solstice alignment at ~01:47 UTC.');
+    addConst(fundFolder, fundVals, 'tempGraphPos', 'Obliquity cycle pos.', 'Position (0\u201316) in the obliquity cycle for temperature graph.');
+    addConst(fundFolder, fundVals, 'startAngle', 'Start angle', 'Sun ecliptic longitude at model start (just before 90\u00B0).');
+    addConst(fundFolder, fundVals, 'earthRAAngle', 'RA angle', 'Right-ascension angle; determined by obliquity cycle position, mean tilt, and inclination amplitude.');
+    addConst(fundFolder, fundVals, 'earthTiltMean', 'Mean obliquity', 'Mean obliquity of the ecliptic (optimized for IAU 2006).');
+    addConst(fundFolder, fundVals, 'inclAmp', 'Incl. amplitude', 'Earth inclination oscillation amplitude on invariable plane. Fibonacci predicts 0.635185\u00B0.');
+    addConst(fundFolder, fundVals, 'inclMean', 'Incl. mean', 'Mean inclination to the invariable plane. Fibonacci predicts 1.481388\u00B0.');
+    addConst(fundFolder, fundVals, 'phaseAngle', 'Incl. phase angle', 'Phase group angle for the Fibonacci balance (203\u00B0 group).');
+    addConst(fundFolder, fundVals, 'ascNodeVerified', 'Asc. node inv. plane (J2000)', 'J2000-verified ascending node on the invariable plane (Souami & Souchay 2012).');
+    addConst(fundFolder, fundVals, 'eccBase', 'Eccentricity base', 'Base eccentricity for the long-term oscillation.');
+    addConst(fundFolder, fundVals, 'eccAmp', 'Eccentricity ampl.', 'Amplitude of the eccentricity oscillation.');
+    addConst(fundFolder, fundVals, 'midEccAmp', 'Mid-ecc. amplitude', 'Mid-eccentricity point amplitude (formula only).');
+    addConst(fundFolder, fundVals, 'helionAmp', 'Helion point ampl.', 'Helion point amplitude (formula only).');
+    addConst(fundFolder, fundVals, 'siderealDayAmp', 'Sidereal day ampl.', 'Sidereal year amplitude in seconds per day (formula only).');
+    addConst(fundFolder, fundVals, 'solarYearAmp', 'Solar year ampl.', 'Mean solar year amplitude in seconds per day (formula only).');
+    addConst(fundFolder, fundVals, 'anomYearAmp', 'Anomalistic yr ampl.', 'Mean anomalistic year amplitude in seconds per day (formula only).');
+    addConst(fundFolder, fundVals, 'auDist', 'AU distance', 'Current Earth\u2013Sun distance in km.');
+    addConst(fundFolder, fundVals, 'deltaT', 'Delta-T start', 'Initial Delta-T value in seconds (formula only).');
+
+    // -- Moon --
+    const moonVals = {
+      sidereal: fmtD(moonSiderealMonthInput),
+      anomalistic: fmtD(moonAnomalisticMonthInput),
+      nodal: fmtD(moonNodalMonthInput),
+      distance: fmtKm(moonDistance),
+      eclInc: fmtDeg(moonEclipticInclinationJ2000),
+      ecc: String(moonOrbitalEccentricity),
+      startApsidal: fmtDeg(moonStartposApsidal),
+      startNodal: fmtDeg(moonStartposNodal),
+      startMoon: fmtDeg(moonStartposMoon),
+    };
+    const moonCount = Object.keys(moonVals).length;
+    totalModelParams += moonCount;
+    const moonFolder = constFolder.addFolder({ title: 'Moon (' + moonCount + ')', expanded: false });
+    addFolderTooltip(moonFolder, 'With ' + moonCount + ' parameters, all orbital behaviours of the Moon can be modelled.');
+    addConst(moonFolder, moonVals, 'sidereal', 'Sidereal month', 'Sidereal orbital period of the Moon.');
+    addConst(moonFolder, moonVals, 'anomalistic', 'Anomalistic month', 'Anomalistic orbital period (perigee to perigee).');
+    addConst(moonFolder, moonVals, 'nodal', 'Nodal month', 'Nodal orbital period (node to node).');
+    addConst(moonFolder, moonVals, 'distance', 'Mean distance', 'Mean Earth\u2013Moon distance.');
+    addConst(moonFolder, moonVals, 'eclInc', 'Incl. ecliptic', 'Inclination to the ecliptic at J2000.');
+    addConst(moonFolder, moonVals, 'ecc', 'Eccentricity', 'Orbital eccentricity.');
+    addConst(moonFolder, moonVals, 'startApsidal', 'Start pos. apsidal', 'Initial apsidal precession angle.');
+    addConst(moonFolder, moonVals, 'startNodal', 'Start pos. nodal', 'Initial nodal precession angle.');
+    addConst(moonFolder, moonVals, 'startMoon', 'Start pos. Moon', 'Initial Moon position angle.');
+
+    // -- Per-planet data (Mercury through Neptune) --
+    const allPlanets = [
+      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricity, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle },
+      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricity,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle },
+
+      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricity,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle },
+      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricity, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle },
+      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricity,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle },
+      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricity,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle },
+      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricity, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle },
+    ];
+    allPlanets.forEach(p => {
+      const v = {
+        period: fmtD(p.period),
+        ecc: String(p.ecc),
+        incEcl: p.incEcl != null ? fmtDeg(p.incEcl) : '\u2014',
+        incInv: p.incInv != null ? fmtDeg(p.incInv) : '\u2014',
+        longPeri: p.longPeri != null ? fmtDeg(p.longPeri) : '\u2014',
+        ascNode: p.ascNode != null ? fmtDeg(p.ascNode) : '\u2014',
+        ascNodeVerified: fmtDeg(p.ascNodeVerified),
+        inclMean: fmtDeg(p.inclMean),
+        inclAmp: fmtDeg(p.inclAmp),
+        phaseAngle: fmtDeg(p.phaseAngle),
+        angleCorr: p.angleCorr != null ? fmtDeg(p.angleCorr) : '\u2014',
+        periYears: p.periYears,
+        startpos: p.startpos != null ? fmtDeg(p.startpos) : '\u2014',
+      };
+      const pCount = Object.keys(v).length;
+      totalModelParams += pCount;
+      const pf = constFolder.addFolder({ title: p.name + ' (' + pCount + ')', expanded: false });
+      addFolderTooltip(pf, 'With ' + pCount + ' parameters, all orbital behaviours of ' + p.name + ' can be modelled.');
+      // J2000 reference values first
+      addConst(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
+      addConst(pf, v, 'ecc', 'Eccentricity (J2000)', 'Orbital eccentricity at J2000 (JPL).');
+      addConst(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
+      addConst(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
+      addConst(pf, v, 'longPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 (JPL).');
+      addConst(pf, v, 'ascNode', 'Asc. node ecliptic (J2000)', 'Longitude of ascending node on the ecliptic at J2000 (SPICE).');
+      addConst(pf, v, 'ascNodeVerified', 'Asc. node inv. plane (J2000)', 'J2000-verified ascending node on the invariable plane.');
+      addConst(pf, v, 'angleCorr', 'Angle correction (J2000)', 'Small correction to align perihelion exactly at J2000.');
+      // Model-derived values — visual separator
+      pf.addBlade({ view: 'separator' });
+      addConst(pf, v, 'inclMean', 'Incl. inv. mean', 'Mean inclination to the invariable plane over the precession cycle.');
+      addConst(pf, v, 'inclAmp', 'Incl. inv. amplitude', 'Oscillation amplitude of inclination on the invariable plane.');
+      addConst(pf, v, 'phaseAngle', 'Incl. phase angle', 'Phase group angle for the Fibonacci balance (203\u00B0 or 23\u00B0).');
+      addConst(pf, v, 'periYears', 'Perihelion prec.', 'Duration of perihelion precession cycle.');
+      addConst(pf, v, 'startpos', 'Start position', 'Initial angular position at model start.');
+    });
+    constFolder.title = 'Model Parameters (' + totalModelParams + ')';
+    addFolderTooltip(constFolder, 'All ' + totalModelParams + ' input constants used by the 3D model, grouped by body.');
+  }
+
+  // --- Website reference ---
+  {
+    const aboutContainer = aboutFolder.element.querySelector('.tp-fldv_c');
+    const linkEl = document.createElement('div');
+    linkEl.style.cssText = 'padding: 6px 8px; font-size: 10px; line-height: 1.5; color: hsla(210,10%,55%,1); cursor: default; border-top: 1px solid hsla(0,0%,100%,0.06);';
+    linkEl.innerHTML = 'Full documentation & methodology: <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener" style="color: hsla(210,60%,65%,1); text-decoration: none;">holisticuniverse.com</a>';
+    aboutContainer.appendChild(linkEl);
+  }
+
+  // ── Root controls ──
+  // Blur the active input after a confirmed change so the cursor disappears,
+  // giving clear visual feedback that the value was accepted.
+  function blurActiveInput() {
+    const el = document.activeElement;
+    if (el && el.closest('#gui') && typeof el.blur === 'function') el.blur();
+  }
+
+  // Guard against re-entrant / rapid-fire confirmed changes
+  let _rootUpdating = false;
+  // When Date or Time changes → recompute position, then refresh JD + perihelion display
+  const dateCtrl = gui.addBinding(o, 'Date', { label: 'Date (Y-M-D)' })
+    .on('change', ({ value, last }) => {
+      if (!last || !isValidDate(value) || _rootUpdating || o._renderLoopRefreshing) return;
+      _rootUpdating = true;
+      updatePosition();
+      jdCtrl.refresh();
+      periCtrl.refresh();
+      blurActiveInput();
+      _rootUpdating = false;
+    });
+
+  const timeCtrl = gui.addBinding(o, 'Time', { label: 'Time (UTC)' })
+    .on('change', ({ value, last }) => {
+      if (!last || !isValidTime(value) || _rootUpdating || o._renderLoopRefreshing) return;
+      _rootUpdating = true;
+      updatePosition();
+      jdCtrl.refresh();
+      periCtrl.refresh();
+      blurActiveInput();
+      _rootUpdating = false;
+    });
+
+  // When Julian Day changes → convert back to Date/Time, then refresh those displays
+  const jdCtrl = gui.addBinding(o, 'julianDay', { label: 'Julian Day', format: v => parseFloat(v.toFixed(8)).toString() })
+    .on('change', ({ value, last }) => {
+      if (!last || !isNumeric(value) || _rootUpdating || o._renderLoopRefreshing) return;
+      _rootUpdating = true;
+      const newJD = Number(value);
+      const currentJD = dateTimeToJulianDay(o.Date, o.Time);
+      if (Math.abs(newJD - currentJD) < 0.0000001) { _rootUpdating = false; return; }
+      const converted = dayToDate(newJD);
+      o.Date = converted.date;
+      o.Time = converted.time;
+      o.Day = newJD - startmodelJD;
+      o.pos = sDay * o.Day;
+      const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
+      o.perihelionDate = `${p.date}`;
+      positionChanged = true;
+      dateCtrl.refresh();
+      timeCtrl.refresh();
+      periCtrl.refresh();
+      blurActiveInput();
+      _rootUpdating = false;
+    });
+
+  const periCtrl = gui.addBinding(o, 'perihelionDate', { label: 'Perihelion Date', readonly: true });
+
+  // Store root controls for selective render-loop refresh
+  o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl, periCtrl };
+
+  // Make root controls visually prominent
+  [dateCtrl, timeCtrl, jdCtrl, periCtrl].forEach(c => {
+    c.element.classList.add('root-control');
+  });
+  periCtrl.element.classList.add('root-control-last', 'root-control-readonly');
+
+  // ── Simulation Controls ──
+  const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
+  ctrlFolder.element.dataset.category = 'controls';
+  addFolderTooltip(ctrlFolder, 'Playback controls, time step, speed, planet tracing, and camera focus.');
+
+  // Play/pause toggle button
+  const playBtn = ctrlFolder.addButton({ title: '\u25B6  Play' });
+  playBtn.on('click', () => {
+    o.Run = !o.Run;
+    playBtn.title = o.Run ? '\u23F8  Pause' : '\u25B6  Play';
+    playBtn.element.classList.toggle('active', o.Run);
+  });
+  playBtn.element.classList.add('play-btn');
+
+  ctrlFolder.addBinding(o, '1 second equals', {
+    label: 'Time step',
+    options: {
+      '1 second': sSecond,
+      '1 minute': sMinute,
+      '1 hour': sHour,
+      '1 day': sDay,
+      '1 week': sWeek,
+      '1 month': sMonth,
+      '1 year': sYear,
+      '10 years': sYear * 10,
+      '100 years': sYear * 100,
+      '1000 years': sYear * 1000,
+    }
+  }).on('change', () => { o.speedFact = Number(o['1 second equals']); });
+  ctrlFolder.addBinding(o, 'speed', { label: 'Speed \u00D7', min: -5, max: 5, step: 0.5 });
+
+  // Navigation toolbar — compact button row
+  const navRow = document.createElement('div');
+  navRow.className = 'tp-nav-toolbar';
+  const navButtons = [
+    { icon: '\u23EE', label: 'Back',  tip: 'Step backward', fn: () => o['Step backward']() },
+    { icon: '\u23ED', label: 'Fwd',   tip: 'Step forward',  fn: () => o['Step forward']() },
+    { icon: '\u23CF', label: 'Reset', tip: 'Reset to startdate', fn: () => o['Reset']() },
+    { icon: '\u29D7', label: 'Now',   tip: 'Now (UTC)',      fn: () => o['Now (time in UTC)']() },
+  ];
+  navButtons.forEach(({ icon, label, tip, fn }) => {
+    const btn = document.createElement('button');
+    btn.className = 'tp-nav-btn';
+    btn.innerHTML = `<span class="tp-nav-icon">${icon}</span><span class="tp-nav-label">${label}</span>`;
+    btn.title = tip;
+    btn.setAttribute('aria-label', tip);
+    btn.addEventListener('click', fn);
+    navRow.appendChild(btn);
+  });
+  // Insert toolbar into folder body
+  const ctrlBody = ctrlFolder.element.querySelector('.tp-fldv_c');
+  if (ctrlBody) ctrlBody.appendChild(navRow);
+
+  // Look-at planet selector
+  let planetList = {};
+  let isHelper = {};
+  planetObjects.forEach(obj => {
+    const isHelperObj = (obj.isNotPhysicalObject === true) || (obj.visible === false);
+    if (isHelperObj) {
+      isHelper[obj.name] = obj.name;
+    } else {
+      planetList[obj.name] = obj.name;
+    }
+  });
+
+  ctrlFolder.addBinding(o, 'Target', {
+    label: 'Focus',
+    options: { 'Free camera': '', ...planetList }
+  }).on('change', ({ value }) => {
+    o.lookAtObj = planetObjects.find(p => p.name === value) || undefined;
+    hierarchyInspector._cameraControlActive = false;
+    hierarchyInspector._cameraTarget = null;
+    positionChanged = true;
+    focusPlanet(o.lookAtObj);
+    planetObjects.forEach(p => { if (p.orbitPlaneHelper) p.orbitPlaneHelper.visible = false; });
+    if (o.lookAtObj?.orbitPlaneHelper) o.lookAtObj.orbitPlaneHelper.visible = true;
+  });
+  focusPlanet(o.lookAtObj);
+
+  // Tracing — standard sub-folder with Enable checkbox + chip grid
+  const folderT = ctrlFolder.addFolder({ title: 'Tracing', expanded: false });
+
+  folderT.addBinding(o, 'traceBtn', { label: 'Enable' })
+    .on('change', ({ value }) => {
+      if (value) {
+        resetAllTraces();
+      } else {
+        tracePlanets.forEach(obj => {
+          if (obj.traceLine && obj.traceLine instanceof THREE.Object3D) {
+            scene.remove(obj.traceLine);
+          }
+          obj.traceLine = undefined;
+          obj.traceArrIndex = 0;
+          obj.traceStartPos = o.pos;
+          obj.traceCurrPos = o.pos;
+        });
+      }
+    });
+
+  // Short display names for chips
+  const chipNames = {
+    'EARTH-WOBBLE-CENTER': 'Wobble',
+    'EARTH-MID-ECCENTRICITY-ORBIT': 'Mid-Ecc',
+    'PERIHELION-OF-EARTH': 'Earth',
+    'PERIHELION MERCURY': 'Mercury',
+    'PERIHELION VENUS': 'Venus',
+    'PERIHELION MARS': 'Mars',
+    'PERIHELION JUPITER': 'Jupiter',
+    'PERIHELION SATURN': 'Saturn',
+    'PERIHELION URANUS': 'Uranus',
+    'PERIHELION NEPTUNE': 'Neptune',
+    'PERIHELION PLUTO': 'Pluto',
+    'PERIHELION HALLEYS': "Halley's",
+    'PERIHELION EROS': 'Eros',
+  };
+
+  // Split tracePlanets into groups
+  const planetBodies = tracePlanets.filter(obj =>
+    !obj.name.startsWith('PERIHELION') && !obj.name.startsWith('EARTH-')
+  );
+  const perihelionObjs = tracePlanets.filter(obj =>
+    obj.name.startsWith('PERIHELION') || obj.name.startsWith('EARTH-')
+  );
+
+  // Build chip grid inside the folder
+  const chipContainer = document.createElement('div');
+  chipContainer.className = 'trace-chip-container';
+  chipContainer.setAttribute('role', 'group');
+  chipContainer.setAttribute('aria-label', 'Trace selection');
+
+  function createChipGroup(label, objects) {
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'trace-chip-label';
+    groupLabel.textContent = label;
+    chipContainer.appendChild(groupLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'trace-chip-grid';
+    objects.forEach(obj => {
+      const chip = document.createElement('button');
+      chip.className = 'trace-chip' + (obj.traceOn ? ' active' : '');
+      chip.textContent = chipNames[obj.name] || obj.name;
+      chip.title = obj.name;
+      chip.setAttribute('aria-pressed', String(obj.traceOn));
+      chip.addEventListener('click', () => {
+        obj.traceOn = !obj.traceOn;
+        chip.classList.toggle('active', obj.traceOn);
+        chip.setAttribute('aria-pressed', String(obj.traceOn));
+        resetAllTraces(obj);
+      });
+      grid.appendChild(chip);
+    });
+    chipContainer.appendChild(grid);
+  }
+
+  createChipGroup('Planets', planetBodies);
+  createChipGroup('Perihelion', perihelionObjs);
+
+  folderT.element.querySelector('.tp-fldv_c').appendChild(chipContainer);
+  
+  // ── Positions (Ecliptic) — top-level, observed category ──
+  const posFolder = gui.addFolder({ title: 'Positions (Ecliptic)', expanded: false });
+  posFolder.element.dataset.category = 'observed';
+  addFolderTooltip(posFolder, 'Real-time sky coordinates in the ecliptic reference frame, measured from the 3D scene graph. Verify against Stellarium or JPL Horizons.');
+
+  posFolder.addBinding(o, 'displayFormat', {
+    label: 'RA/Dec Format',
+    options: { 'Sexagesimal': 'sexagesimal', 'Decimal': 'decimal' }
+  }).on('change', () => { updatePositions(); updatePositionDisplayStrings(); });
+
+  posFolder.addBinding(o, 'distanceUnit', {
+    label: 'Distance Format',
+    options: { 'AU': 'AU', 'km': 'km', 'mi': 'mi' }
+  }).on('change', () => { updatePositions(); updatePositionDisplayStrings(); });
+
+  // Helper objects first (collapsed, but contents expanded when opened)
+  const helperFolder = posFolder.addFolder({ title: 'Show Helper Objects', expanded: false });
+  tracePlanets.forEach(obj => {
+    if (isHelper[obj.name]) {
+      const sub = helperFolder.addFolder({ title: obj.name, expanded: true });
+      sub.addBinding(obj, 'raDisplay', { label: 'RA', readonly: true });
+      sub.addBinding(obj, 'decDisplay', { label: 'Dec', readonly: true });
+      sub.addBinding(obj, 'distDisplay', { label: 'Distance to Earth', readonly: true });
+      sub.addBinding(obj, 'sunDistDisplay', { label: 'Distance to Sun', readonly: true });
+    }
+  });
+
+  // Planet position subfolders (expanded by default)
+  tracePlanets.forEach(obj => {
+    if (!isHelper[obj.name]) {
+      const sub = posFolder.addFolder({ title: obj.name, expanded: true });
+      sub.addBinding(obj, 'raDisplay', { label: 'RA', readonly: true });
+      sub.addBinding(obj, 'decDisplay', { label: 'Dec', readonly: true });
+      sub.addBinding(obj, 'distDisplay', { label: 'Distance to Earth', readonly: true });
+      sub.addBinding(obj, 'sunDistDisplay', { label: 'Distance to Sun', readonly: true });
+    }
+  });
+
+  // Elongations — readonly text + CSS gauge bar (0°–180°)
+  const folderElongations = posFolder.addFolder({ title: 'Elongations', expanded: true });
+  const elongFmt = v => v.toFixed(1) + '\u00B0';
+  const elongKeys = [
+    ['moonElongation', 'Moon'], ['mercuryElongation', 'Mercury'],
+    ['venusElongation', 'Venus'], ['marsElongation', 'Mars'],
+    ['jupiterElongation', 'Jupiter'], ['saturnElongation', 'Saturn'],
+    ['uranusElongation', 'Uranus'], ['neptuneElongation', 'Neptune'],
+    ['plutoElongation', 'Pluto'], ['halleysElongation', "Halley's"],
+    ['erosElongation', 'Eros']
+  ];
+  // (elongGaugeEls hoisted — see declaration before GUI block)
+  elongKeys.forEach(([key, label]) => {
+    const b = folderElongations.addBinding(o, key, { label, readonly: true, format: elongFmt });
+    const valEl = b.element.querySelector('.tp-lblv_v');
+    valEl.classList.add('elong-gauge');
+    valEl.style.setProperty('--elong-pct', ((o[key] / 180) * 100) + '%');
+    elongGaugeEls[key] = valEl;
+  });
+  folderElongations.element.classList.add('elongation-gauges');
+
+  // ── Perihelion Longitudes (Ecliptic) — top-level, observed category ──
+  const periFolder = gui.addFolder({ title: 'Perihelion Longitudes (Ecliptic)', expanded: false });
+  periFolder.element.dataset.category = 'observed';
+  addFolderTooltip(periFolder, 'Perihelion longitude angles in the ecliptic reference frame, measured from the 3D scene graph. Verify against JPL WebGeoCalc.');
+
+  const triadBlades = {};  // collect Earth/Jupiter/Saturn blade elements
+  addTooltip(
+    periFolder.addBinding(golden.goldenLine, 'visible', { label: 'E-J-S Resonance' })
+      .on('change', ({ value }) => {
+        golden.setHelpersVisible(value);
+        if (value) golden.update();  // build geometry immediately (render loop skips when idle)
+        for (const key in triadBlades) {
+          triadBlades[key].classList.toggle('fib-triad-highlight', value);
+        }
+      }),
+    'Twice the Sun\u2013Jupiter perihelion distance equals the Sun\u2013Saturn perihelion distance. The Earth\u2013Jupiter\u2013Saturn alignment recurs every axial precession cycle. Toggle to visualize this with the Fibonacci spiral.'
+  );
+  const periFmt = v => v.toFixed(6);
+  // [planetKey, geoKey, label, precessionYears] — Earth has no detail row
+  const periPlanets = [
+    ['mercury', 'mercuryPerihelion', 'Mercury', mercuryPerihelionEclipticYears],
+    ['venus', 'venusPerihelion', 'Venus', venusPerihelionEclipticYears],
+    ['earth', 'earthPerihelion', 'Earth', earthPerihelionICRFYears],
+    ['mars', 'marsPerihelion', 'Mars', marsPerihelionEclipticYears],
+    ['jupiter', 'jupiterPerihelion', 'Jupiter', jupiterPerihelionEclipticYears],
+    ['saturn', 'saturnPerihelion', 'Saturn', saturnPerihelionEclipticYears],
+    ['uranus', 'uranusPerihelion', 'Uranus', uranusPerihelionEclipticYears],
+    ['neptune', 'neptunePerihelion', 'Neptune', neptunePerihelionEclipticYears]
+  ];
+  periPlanets.forEach(([planetKey, geoKey, name, precYears]) => {
+    // Geocentric row with gauge bar (always visible)
+    const b = periFolder.addBinding(o, geoKey, { label: name, readonly: true, format: periFmt });
+    const valEl = b.element.querySelector('.tp-lblv_v');
+    valEl.classList.add('elong-gauge');
+    valEl.style.setProperty('--elong-pct', ((o[geoKey] / 360) * 100) + '%');
+    periGaugeEls[geoKey] = valEl;
+    if (planetKey === 'earth' || planetKey === 'jupiter' || planetKey === 'saturn') {
+      triadBlades[planetKey] = b.element;
+    }
+
+    // Expandable detail row (hidden by default)
+    const ascKey = planetKey === 'earth' ? null : planetKey + 'AscendingNode';
+    const argKey = planetKey + 'ArgumentOfPeriapsis';
+    const precColor = precYears >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
+    const precSign = precYears >= 0 ? '+' : '\u2212';
+    const detail = document.createElement('div');
+    detail.className = 'inv-detail';
+    detail.style.display = 'none';
+    detail.innerHTML =
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Asc.\u00A0Node</span>' +
+        '<span class="inv-detail-val"' + (ascKey ? ' data-key="' + ascKey + '"' : '') + '>' +
+          (ascKey ? (o[ascKey] || 0).toFixed(2) + '\u00B0' : '0\u00B0 (def.)') +
+        '</span>' +
+      '</span>' +
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Arg.\u00A0Per.</span>' +
+        '<span class="inv-detail-val" data-key="' + argKey + '">' + (o[argKey] || 0).toFixed(2) + '\u00B0</span>' +
+      '</span>' +
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Prec.</span>' +
+        '<span class="inv-detail-val" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
+      '</span>';
+    b._detailEl = detail;
+    periDetailEls[geoKey] = {
+      row: detail,
+      bladeEl: b.element,
+      ascEl: ascKey ? detail.querySelector('[data-key="' + ascKey + '"]') : null,
+      argEl: detail.querySelector('[data-key="' + argKey + '"]'),
+      ascKey: ascKey,
+      argKey: argKey
+    };
+
+    b.element.style.cursor = 'pointer';
+    b.element.addEventListener('click', () => {
+      detail.style.display = detail.style.display === 'none' ? '' : 'none';
+    });
+  });
+  // Deferred insertion for perihelion detail rows
+  Object.keys(periDetailEls).forEach(geoKey => {
+    const dt = periDetailEls[geoKey];
+    if (dt && dt.bladeEl) dt.bladeEl.after(dt.row);
+  });
+
+  // ── Positions (Invariable Plane) — top-level, calculated category ──
+  const invPlaneFolder = gui.addFolder({ title: 'Positions (Invariable Plane)', expanded: false });
+  invPlaneFolder.element.dataset.category = 'calculated';
+  addFolderTooltip(invPlaneFolder, 'Planet heights in the invariable plane reference frame. Validates the Fibonacci Laws of Planetary Motion.');
+
+  // Invariable plane heights with centered gauge bars + expandable detail rows
+  const invPlaneFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+  const invPlanePlanets = [
+    ['mercury', 'Mercury (AU)', 6.35, 0.467, mercuryPerihelionEclipticYears],
+    ['venus', 'Venus (AU)', 2.15, 0.728, venusPerihelionEclipticYears],
+    ['earth', 'Earth (AU)', 1.57, 1.017, earthPerihelionICRFYears],
+    ['mars', 'Mars (AU)', 1.63, 1.666, marsPerihelionEclipticYears],
+    'separator',
+    ['jupiter', 'Jupiter (AU)', 0.32, 5.455, jupiterPerihelionEclipticYears],
+    ['saturn', 'Saturn (AU)', 0.93, 10.054, saturnPerihelionEclipticYears],
+    ['uranus', 'Uranus (AU)', 0.99, 20.083, uranusPerihelionEclipticYears],
+    ['neptune', 'Neptune (AU)', 0.74, 30.33, neptunePerihelionEclipticYears]
+  ];
+  const fldContent = invPlaneFolder.element.querySelector('.tp-fldv_c');
+  invPlanePlanets.forEach(item => {
+    if (item === 'separator') {
+      const sep = document.createElement('div');
+      sep.className = 'inv-plane-separator';
+      fldContent.appendChild(sep);
+      return;
+    }
+    const [planetKey, label, inclDeg, aphelionAU, precYears] = item;
+    const heightKey = planetKey + 'HeightAboveInvPlane';
+    const ascNodeKey = planetKey + 'AscendingNodeInvPlane';
+    const inclKey = planetKey + 'InvPlaneInclinationDynamic';
+    const maxH = Math.sin(inclDeg * Math.PI / 180) * aphelionAU;
+    invPlaneMaxes[heightKey] = maxH;
+
+    // Ensure o properties exist for binding
+    if (o[ascNodeKey] === undefined) o[ascNodeKey] = 0;
+    if (o[inclKey] === undefined) o[inclKey] = inclDeg;
+
+    // Height binding with gauge bar (always visible)
+    const b = invPlaneFolder.addBinding(o, heightKey, { label, readonly: true, format: invPlaneFmt });
+    const valEl = b.element.querySelector('.tp-lblv_v');
+    valEl.classList.add('inv-gauge');
+    setInvGaugeProps(valEl, o[heightKey], maxH);
+    invPlaneGaugeEls[heightKey] = valEl;
+
+    // Expandable detail row (hidden by default)
+    const detail = document.createElement('div');
+    detail.className = 'inv-detail';
+    detail.style.display = 'none';
+    const precColor = precYears >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
+    const precSign = precYears >= 0 ? '+' : '\u2212';
+    detail.innerHTML =
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Asc.Node</span>' +
+        '<span class="inv-detail-val" data-key="' + ascNodeKey + '">' + o[ascNodeKey].toFixed(2) + '\u00B0</span>' +
+      '</span>' +
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Incl.</span>' +
+        '<span class="inv-detail-val" data-key="' + inclKey + '">' + (o[inclKey] || inclDeg).toFixed(4) + '\u00B0</span>' +
+      '</span>' +
+      '<span class="inv-detail-item">' +
+        '<span class="inv-detail-label">Prec.</span>' +
+        '<span class="inv-detail-val" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
+      '</span>';
+    // Store binding+detail pair for deferred DOM insertion
+    b._detailEl = detail;
+
+    // Store detail value elements for live updates
+    invPlaneTooltipEls[heightKey] = {
+      row: detail,
+      bladeEl: b.element,
+      ascEl: detail.querySelector('[data-key="' + ascNodeKey + '"]'),
+      inclEl: detail.querySelector('[data-key="' + inclKey + '"]'),
+      ascKey: ascNodeKey,
+      inclKey: inclKey,
+      phaseAngle: {
+        mercury: mercuryInclinationPhaseAngle,
+        venus: venusInclinationPhaseAngle,
+        earth: earthInclinationPhaseAngle,
+        mars: marsInclinationPhaseAngle,
+        jupiter: jupiterInclinationPhaseAngle,
+        saturn: saturnInclinationPhaseAngle,
+        uranus: uranusInclinationPhaseAngle,
+        neptune: neptuneInclinationPhaseAngle
+      }[planetKey] || 203.3195
+    };
+
+    // Click row to toggle detail
+    b.element.style.cursor = 'pointer';
+    b.element.addEventListener('click', () => {
+      detail.style.display = detail.style.display === 'none' ? '' : 'none';
+    });
+  });
+
+  // Separator before summary rows
+  const sumSep = document.createElement('div');
+  sumSep.className = 'inv-plane-separator';
+  invPlaneFolder.element.querySelector('.tp-fldv_c').appendChild(sumSep);
+
+  // Summary rows — visually distinct
+  const massBalB = invPlaneFolder.addBinding(o, 'massWeightedBalance', {
+    label: 'Mass Balance (AU)', readonly: true, format: invPlaneFmt
+  });
+  addTooltip(massBalB, 'Mass-weighted average height above the invariable plane. Expected to oscillate around zero.');
+  massBalB.element.classList.add('inv-summary');
+  const aboveB = invPlaneFolder.addBinding(o, 'planetsAboveInvPlane', { label: 'Planets Above', readonly: true });
+  addTooltip(aboveB, 'Planets currently above the invariable plane at this moment in time.');
+  aboveB.element.classList.add('inv-summary');
+  const belowB = invPlaneFolder.addBinding(o, 'planetsBelowInvPlane', { label: 'Planets Below', readonly: true });
+  addTooltip(belowB, 'Planets currently below the invariable plane at this moment in time.');
+  belowB.element.classList.add('inv-summary');
+
+  const trendFolder = invPlaneFolder.addFolder({ title: 'Balance Trend Analysis', expanded: false });
+  addFolderTooltip(trendFolder, 'Tracks the mass-weighted balance of planets above and below the invariable plane over time. Run for 165+ years (one Neptune orbit) to verify the lifetime average converges to zero.');
+  const trackingBtn = trendFolder.addButton({ title: '\u25B6 Start Tracking' }).on('click', () => {
+    if (o.balanceTrackingActive) {
+      stopBalanceTracking();
+      trackingBtn.title = '\u25B6 Start Tracking';
+    } else {
+      startBalanceTracking();
+      trackingBtn.title = '\u23F9 Stop Tracking';
+    }
+  });
+  addTooltip(trackingBtn, 'Start or stop recording balance samples. Run for 165+ years for a meaningful average.');
+  addTooltip(trendFolder.addBinding(o, 'balanceTrackingActive', { label: 'Tracking Active', readonly: true }),
+    'Indicates whether balance tracking is currently recording samples.');
+  addTooltip(trendFolder.addBinding(o, 'balanceTrackingStartYear', {
+    label: 'Started (year)', readonly: true, format: v => v.toFixed(1)
+  }), 'Simulated year when balance tracking started.');
+  addTooltip(trendFolder.addBinding(o, 'balanceYearsTracked', {
+    label: 'Years Tracked', readonly: true, format: v => v.toFixed(1)
+  }), 'Total duration tracked in simulated years.');
+  addTooltip(trendFolder.addBinding(o, 'balanceSampleCount', {
+    label: 'Sample Count', readonly: true, format: v => String(Math.round(v))
+  }), 'Total number of yearly balance samples collected.');
+  addTooltip(trendFolder.addBinding(o, 'balanceCumulativeSum', {
+    label: 'Cumulative Sum', readonly: true, format: v => v.toFixed(6)
+  }), 'Running cumulative sum of all balance samples.');
+  addTooltip(trendFolder.addBinding(o, 'balanceLifetimeAverage', {
+    label: 'Lifetime Avg (AU)', readonly: true, format: v => v.toFixed(6)
+  }), 'Lifetime average of the mass balance. Expected to converge to ~0 over 165+ years.');
+  addTooltip(trendFolder.addBinding(o, 'balanceMinSeen', {
+    label: 'Min Seen (AU)', readonly: true, format: v => v.toFixed(6)
+  }), 'Most negative balance value observed during tracking.');
+  addTooltip(trendFolder.addBinding(o, 'balanceMaxSeen', {
+    label: 'Max Seen (AU)', readonly: true, format: v => v.toFixed(6)
+  }), 'Most positive balance value observed during tracking.');
+  addTooltip(trendFolder.addButton({ title: '\u21BA Reset Tracking' }).on('click', () => {
+    resetBalanceTracking();
+    trackingBtn.title = '\u25B6 Start Tracking';
+  }), 'Clear all tracking data and start a fresh recording.');
+
+  // Plane Verification — compares dynamic calculation vs Souami & Souchay (2012) reference
+  const validationFolder = invPlaneFolder.addFolder({ title: 'Plane Verification', expanded: false });
+  addFolderTooltip(validationFolder, 'Compares two independent methods for the invariable plane orientation: Option A calculates it from planetary angular momentum vectors, Option B uses the Souami & Souchay (2012) published reference. A small difference confirms correct placement.');
+  addTooltip(validationFolder.addBinding(o, 'calculatedPlaneTilt', {
+    label: 'Calc. Tilt (\u00B0)', readonly: true, format: v => v.toFixed(4)
+  }), 'Invariable plane tilt from the ecliptic (Option A). Expected: 1.5787\u00B0.');
+  addTooltip(validationFolder.addBinding(o, 'calculatedAscendingNode', {
+    label: 'Calc. Asc.Node (\u00B0)', readonly: true, format: v => v.toFixed(2)
+  }), 'Ascending node on the ecliptic (Option A). Expected: ~107\u00B0.');
+  addTooltip(validationFolder.addBinding(o, 'jupiterAngularMomentumPercent', {
+    label: 'Jupiter L (%)', readonly: true, format: v => v.toFixed(2)
+  }), 'Jupiter angular momentum contribution. Expected: 58\u201362%.');
+  addTooltip(validationFolder.addBinding(o, 'saturnAngularMomentumPercent', {
+    label: 'Saturn L (%)', readonly: true, format: v => v.toFixed(2)
+  }), 'Saturn angular momentum contribution. Expected: 23\u201326%.');
+  addTooltip(validationFolder.addBinding(o, 'optionABDifference', {
+    label: 'A vs B Diff (\u00B0)', readonly: true, format: v => v.toFixed(4)
+  }), 'Angular difference between Option A (calculated) and Option B (Souami & Souchay 2012). Expected: < 0.1\u00B0.');
+
+  // Deferred insertion: place detail rows right after their planet binding rows
+  // (must happen after all folder content is built so DOM order is final)
+  Object.keys(invPlaneTooltipEls).forEach(heightKey => {
+    const dt = invPlaneTooltipEls[heightKey];
+    if (dt && dt.bladeEl) {
+      dt.bladeEl.after(dt.row);
+    }
+  });
+
+  // ── Model Predictions for Earth (compact: inline Δ shows IAU difference) ──
+  const astroFolder = gui.addFolder({ title: 'Predictions for Earth', expanded: false });
+  astroFolder.element.dataset.category = 'calculated';
+  addFolderTooltip(astroFolder, 'Analytical predictions from the Fibonacci Laws of Planetary Motion.');
+
+  const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
+  addTooltip(daysFolder.addBinding(predictions, 'lengthofDay', {
+    label: 'Solar Day (s)', readonly: true, format: v => v.toFixed(6)
+  }), 'Noon to noon. Includes Earth\u2019s orbital motion around the Sun.');
+  addTooltip(daysFolder.addBinding(predictions, 'lengthofsiderealDayRealLOD', {
+    label: 'Sidereal Day (s)', readonly: true, format: v => v.toFixed(6)
+  }), 'One rotation relative to the vernal equinox. Shorter than a solar day by ~235.9 s.');
+  addTooltip(daysFolder.addBinding(predictions, 'lengthofstellarDayRealLOD', {
+    label: 'Stellar Day (s)', readonly: true, format: v => v.toFixed(6)
+  }), 'One rotation relative to the fixed stars. Shorter than a sidereal day by ~9.16 ms.');
+
+  const yearsFolder = astroFolder.addFolder({ title: 'Solar Year' });
+  addTooltip(yearsFolder.addBinding(predictions, 'lengthofsolarYearSecRealLOD', {
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+  }), 'Tropical year in seconds. Equinox to equinox.');
+  addTooltip(yearsFolder.addBinding(predictions, 'lengthofsolarYear', {
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+  }), 'Tropical year in days. Equinox to equinox.');
+
+  const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
+  addTooltip(siderealYrFolder.addBinding(predictions, 'lengthofsiderealYearInSeconds', {
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+  }), 'Sidereal year in seconds. One orbit relative to the fixed stars.');
+  addTooltip(siderealYrFolder.addBinding(predictions, 'lengthofsiderealYearDaysRealLOD', {
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+  }), 'Sidereal year in days. One orbit relative to the fixed stars.');
+
+  const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
+  addTooltip(anomalisticFolder.addBinding(predictions, 'lengthofanomalisticYearSecRealLOD', {
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+  }), 'Anomalistic year in seconds. Perihelion to perihelion.');
+  addTooltip(anomalisticFolder.addBinding(predictions, 'lengthofanomalisticDaysRealLOD', {
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+  }), 'Anomalistic year in days. Perihelion to perihelion.');
+
+  const precessionFolder = astroFolder.addFolder({ title: 'Precession Periods' });
+  addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecessionRealLOD', {
+    label: 'Perihelion (yrs)', readonly: true, format: v => v.toFixed(6)
+  }), 'Time for the perihelion direction to complete one full revolution.');
+  addTooltip(precessionFolder.addBinding(predictions, 'axialPrecessionRealLOD', {
+    label: 'Axial (yrs)', readonly: true, format: v => v.toFixed(6)
+  }), 'Time for Earth\u2019s rotation axis to trace one full cone (H/8).');
+  addTooltip(precessionFolder.addBinding(predictions, 'inclinationPrecessionRealLOD', {
+    label: 'Inclination (yrs)', readonly: true, format: v => v.toFixed(6)
+  }), 'Time for Earth\u2019s orbital plane to precess around the invariable plane (H/3).');
+  addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecessionRealLOD', {
+    label: 'Ecliptic Cycle (yrs)', readonly: true, format: v => v.toFixed(6)
+  }), 'Combined cycle of axial and orbital plane precession.');
+
+  const orbitalFolder = astroFolder.addFolder({ title: 'Orbital Elements' });
+  addTooltip(orbitalFolder.addBinding(predictions, 'eccentricityEarth', {
+    label: 'Eccentricity', readonly: true, format: v => v.toFixed(6)
+  }), 'Shape of Earth\u2019s orbit. 0 = circle, 1 = parabola.');
+  addTooltip(orbitalFolder.addBinding(predictions, 'obliquityEarth', {
+    label: 'Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
+  }), 'Axial tilt relative to the ecliptic. Drives the seasons.');
+  addTooltip(orbitalFolder.addBinding(predictions, 'earthInvPlaneInclinationDynamic', {
+    label: 'Inclination (\u00B0)', readonly: true, format: v => v.toFixed(6)
+  }), 'Tilt of Earth\u2019s orbital plane relative to the invariable plane.');
+  addTooltip(orbitalFolder.addBinding(predictions, 'longitudePerihelion', {
+    label: 'Long. Perihelion (\u00B0)', readonly: true, format: v => v.toFixed(6)
+  }), 'Ecliptic longitude where Earth is closest to the Sun.');
+  addTooltip(orbitalFolder.addBinding(predictions, 'lengthofAU', {
+    label: 'Length of AU (km)', readonly: true, format: v => v.toFixed(6)
+  }), 'Mean Sun\u2013Earth distance derived from the model.');
+
+  // ── Visualization ──
+  const visFolder = gui.addFolder({ title: 'Visualization', expanded: false });
+  visFolder.element.dataset.category = 'visualization';
+  addFolderTooltip(visFolder, 'Visual overlays, reference planes, and planet visibility.');
+
+  // ── Show / Hide (chip grid grouped by planet) ──
+  const showHideFolder = visFolder.addFolder({ title: 'Show / Hide', expanded: false });
+  addFolderTooltip(showHideFolder, 'Toggle visibility of planets, orbits, and reference objects.');
+
+  // Explicit chip name overrides (only needed for non-obvious names)
+  const visChipOverrides = {
+    'Starting Point': null,  // exclude from UI
+    'Barycenter Earth and Sun': 'Barycenter',
+    'EARTH-WOBBLE-CENTER': 'Wobble Center',
+    'EARTH-MID-ECCENTRICITY-ORBIT': 'Mid-Eccentricity',
+    'Halleys': "Halley's",
+  };
+
+  // Auto-generate short chip name by stripping planet prefix from object name
+  function visChipName(objName) {
+    if (objName in visChipOverrides) return visChipOverrides[objName];
+    // "PERIHELION X" or "PERIHELION-OF-X" → "Perihelion"
+    if (objName.startsWith('PERIHELION')) return 'Perihelion';
+    // Strip planet prefix: "Mercury Perihelion Duration Ecliptic1" → "Perihelion Duration Ecliptic1"
+    // Then shorten common suffixes
+    const suffixMap = [
+      [/Perihelion Duration Ecliptic(\d)/, 'Ecliptic Dur. $1'],
+      [/Real Perihelion At Sun/, 'Real Perihelion'],
+      [/Fixed Perihelion At Sun/, 'Fixed Perihelion'],
+      [/Inclination Precession/, 'Incl. Precession'],
+      [/Ecliptic Precession/, 'Ecliptic Precession'],
+      [/Obliquity Precession/, 'Obliquity Precession'],
+      [/Perihelion Precession(\d)/, 'Perihelion Prec. $1'],
+      [/Apsidal Nodal Precession(\d)/, 'Apsidal Nodal $1'],
+      [/Apsidal Precession/, 'Apsidal Precession'],
+      [/Nodal Precession/, 'Nodal Precession'],
+      [/Lunar Leveling Cycle/, 'Lunar Leveling'],
+    ];
+    for (const [re, replacement] of suffixMap) {
+      if (re.test(objName)) return objName.replace(re, replacement).replace(/^\S+\s/, '').trim() || objName.match(re)?.[0]?.replace(re, replacement) || replacement;
+    }
+    return objName;  // fallback: use full name
+  }
+
+  // Planet groups: each has a match function that auto-discovers objects from planetObjects.
+  // New objects matching the pattern are automatically included — no manual updates needed.
+  const groupOrder = [
+    { label: 'Sun',      match: n => n === 'Sun' || n.includes('Barycenter') },
+    { label: 'Mercury',  match: n => n === 'Mercury' || n.includes('MERCURY') || n.startsWith('Mercury ') },
+    { label: 'Venus',    match: n => n === 'Venus' || n.includes('VENUS') || n.startsWith('Venus ') },
+    { label: 'Earth',    match: n => n === 'Earth' || n.startsWith('Earth ') || n.startsWith('EARTH-') || n === 'PERIHELION-OF-EARTH' },
+    { label: 'Moon',     match: n => n === 'Moon' || n.startsWith('Moon ') },
+    { label: 'Mars',     match: n => n === 'Mars' || n.includes('MARS') || n.startsWith('Mars ') },
+    { label: 'Jupiter',  match: n => n === 'Jupiter' || n.includes('JUPITER') || n.startsWith('Jupiter ') },
+    { label: 'Saturn',   match: n => n === 'Saturn' || n.includes('SATURN') || n.startsWith('Saturn ') },
+    { label: 'Uranus',   match: n => n === 'Uranus' || n.includes('URANUS') || n.startsWith('Uranus ') },
+    { label: 'Neptune',  match: n => n === 'Neptune' || n.includes('NEPTUNE') || n.startsWith('Neptune ') },
+    { label: 'Pluto',    match: n => n === 'Pluto' || n.includes('PLUTO') || n.startsWith('Pluto ') },
+    { label: "Halley's", match: n => n === 'Halleys' || n.includes('HALLEYS') || n.startsWith('Halleys ') },
+    { label: 'Eros',     match: n => n === 'Eros' || n.includes('EROS') || n.startsWith('Eros ') },
+  ];
+
+  // Auto-assign each planetObject to its group
+  const claimed = new Set();
+  const planetGroups = groupOrder.map(g => {
+    const objs = planetObjects.filter(obj => {
+      if (claimed.has(obj)) return false;
+      if (visChipOverrides[obj.name] === null) return false;  // excluded
+      if (g.match(obj.name)) { claimed.add(obj); return true; }
+      return false;
+    });
+    // Put the physical planet first in each group
+    objs.sort((a, b) => (a.isNotPhysicalObject ? 1 : 0) - (b.isNotPhysicalObject ? 1 : 0));
+    return { label: g.label, objects: objs };
+  });
+
+  // Catch-all group for any objects not matched by the groups above
+  const unclaimed = planetObjects.filter(obj =>
+    !claimed.has(obj) && visChipOverrides[obj.name] !== null
+  );
+  if (unclaimed.length > 0) {
+    unclaimed.sort((a, b) => (a.isNotPhysicalObject ? 1 : 0) - (b.isNotPhysicalObject ? 1 : 0));
+    planetGroups.push({ label: 'Other', objects: unclaimed });
+  }
+
+  // Build chip container
+  const visChipContainer = document.createElement('div');
+  visChipContainer.className = 'trace-chip-container';
+  visChipContainer.setAttribute('role', 'group');
+  visChipContainer.setAttribute('aria-label', 'Visibility toggles');
+
+  function createVisChipGroup(label, objects) {
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'trace-chip-label';
+    groupLabel.textContent = label;
+    if (label === 'Other') {
+      groupLabel.title = 'Ungrouped objects. To create a proper group, add a { label, match } entry to groupOrder in script.js.';
+    }
+    visChipContainer.appendChild(groupLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'trace-chip-grid';
+    objects.forEach(obj => {
+      const chipName = visChipName(obj.name);
+      const chip = document.createElement('button');
+      chip.className = 'trace-chip' + (obj.visible ? ' active' : '');
+      chip.textContent = chipName;
+      chip.title = obj.name;
+      chip.setAttribute('aria-pressed', String(!!obj.visible));
+      chip.addEventListener('click', () => {
+        obj.visible = !obj.visible;
+        chip.classList.toggle('active', obj.visible);
+        chip.setAttribute('aria-pressed', String(obj.visible));
+        showHideObject(obj);
+      });
+      grid.appendChild(chip);
+    });
+    visChipContainer.appendChild(grid);
+  }
+
+  // Generic group (Orbits, expandable later)
+  {
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'trace-chip-label';
+    groupLabel.textContent = 'Generic';
+    visChipContainer.appendChild(groupLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'trace-chip-grid';
+    const orbitsChip = document.createElement('button');
+    orbitsChip.className = 'trace-chip' + (o.Orbits ? ' active' : '');
+    orbitsChip.textContent = 'Orbits';
+    orbitsChip.title = 'Show or hide all orbital paths';
+    orbitsChip.setAttribute('aria-pressed', String(!!o.Orbits));
+    orbitsChip.addEventListener('click', () => {
+      o.Orbits = !o.Orbits;
+      orbitsChip.classList.toggle('active', o.Orbits);
+      orbitsChip.setAttribute('aria-pressed', String(o.Orbits));
+      showHideOrbits();
+    });
+    grid.appendChild(orbitsChip);
+    visChipContainer.appendChild(grid);
+  }
+
+  // Planet groups
+  planetGroups.forEach(g => {
+    if (g.objects.length > 0) createVisChipGroup(g.label, g.objects);
+  });
+
+  showHideFolder.element.querySelector('.tp-fldv_c').appendChild(visChipContainer);
+
+  // ── Earth Zodiac (title = toggle, expand = size slider) ──
+  const zodiacFolder = makeToggleFolder(visFolder, 'Earth Zodiac', zodiac, 'visible', null,
+    'Zodiac band with the 12 astrological signs. Click to toggle.');
+  addTooltip(zodiacFolder.addBinding(o, 'zodiacSize', { label: 'Size', min: 0.01, max: 10, step: 0.1 })
+    .on('change', () => changeZodiacScale()),
+    'Scale the zodiac band.');
+
+  // ── Earth Polar Line (title = toggle, expand = length slider) ──
+  const polarFolder = makeToggleFolder(visFolder, 'Earth Polar Line', o, 'Polar line',
+    (v) => { polarLine.visible = v; },
+    'Line along Earth\u2019s rotation axis. Click to toggle.');
+  addTooltip(polarFolder.addBinding(o, 'polarLineLength', { label: 'Length', min: 0.1, max: 50 })
+    .on('change', () => { polarLine.scale.y = o.polarLineLength; }),
+    'Extend or shorten the polar axis line.');
+
+  // ── Planets Size Boost ──
+  addTooltip(visFolder.addBinding(params, 'sizeBoost', { label: 'Planets Size Boost', min: 0, max: 1, step: 0.01 })
+    .on('change', ({ value }) => updatePlanetSizes(value)),
+    'Exaggerate planet sizes for better visibility. 0 = real scale.');
+
+  // ── Stars (title = toggle, expand = names checkbox) ──
+  const starsFolder = makeToggleFolder(visFolder, 'Stars', sceneObjects.stars, 'visible', null,
+    'Background stars from the Hipparcos catalogue. Click to toggle.');
+  addTooltip(starsFolder.addBinding(o, 'starNamesVisible', { label: 'Names' })
+    .on('change', ({ value }) => {
+      sceneObjects.stars.children.forEach(child => {
+        if (child instanceof CSS2DObject) child.visible = value;
+      });
+      needsLabelUpdate = true;
+    }),
+    'Show star name labels.');
+
+  // ── Constellations (title = toggle, expand = style dropdown) ──
+  const constFolder = makeToggleFolder(visFolder, 'Constellations', sceneObjects.constellations, 'visible', null,
+    'Constellation line patterns on the celestial sphere. Click to toggle.');
+  addTooltip(constFolder.addBinding(o, 'constellationLayout', {
+    label: 'Style',
+    options: { 'Traditional (Asterism)': 'asterism', 'Artistic (Curved)': 'stellarium' }
+  }).on('change', () => initConstellations()),
+    'Traditional stick figures or artistic curved lines.');
+
+  // ── Reference Planes (regular folder, 4 independent toggles) ──
+  const refFolder = visFolder.addFolder({ title: 'Reference Planes', expanded: true });
+  addFolderTooltip(refFolder, 'Reference planes and coordinate grids.');
+  addTooltip(refFolder.addBinding(celestialSphere, 'visible', { label: 'Celestial sphere' }),
+    'Transparent sphere showing the celestial coordinate grid.');
+  addTooltip(refFolder.addBinding(plane, 'visible', { label: 'Ecliptic grid' }),
+    'Grid on the ecliptic plane (Earth\u2019s orbital plane).');
+  addTooltip(refFolder.addBinding(sunCenteredInvPlane, 'visible', { label: 'Invariable plane' })
+    .on('change', ({ value }) => {
+      sunCenteredNodeMarkers.visible = value;
+      setCSS2DVisibility(sunCenteredNodeMarkers, value);
+      sunCenteredHeightLabel.visible = value;
+      if (value) updateSunCenteredInvPlane();
+      needsLabelUpdate = true;
+    }),
+    'Disc on the invariable plane, perpendicular to the solar system\u2019s angular momentum.');
+  addTooltip(refFolder.addBinding(invariablePlaneGroup, 'visible', { label: 'Earth Inclination Path' })
+    .on('change', ({ value }) => {
+      if (invariablePlaneGroup.userData.markersGroup) invariablePlaneGroup.userData.markersGroup.visible = value;
+      if (invariablePlaneGroup.userData.highLabelObj) invariablePlaneGroup.userData.highLabelObj.visible = value;
+      if (invariablePlaneGroup.userData.lowLabelObj) invariablePlaneGroup.userData.lowLabelObj.visible = value;
+      if (invariablePlaneGroup.userData.meanLabel1Obj) invariablePlaneGroup.userData.meanLabel1Obj.visible = value;
+      if (invariablePlaneGroup.userData.meanLabel2Obj) invariablePlaneGroup.userData.meanLabel2Obj.visible = value;
+      if (invariablePlaneGroup.userData.earthHeightLabelObj) invariablePlaneGroup.userData.earthHeightLabelObj.visible = value;
+      if (value) updateInvariablePlanePosition();
+      inclinationPathGroup.visible = value;
+      if (value) {
+        _lastInclinationUpdateYear = null;
+        updateInclinationPathMarker();
+      } else {
+        const labelObject = inclinationPathGroup.userData.labelObject;
+        if (labelObject) labelObject.visible = false;
+      }
+      needsLabelUpdate = true;
+    }),
+    'Path of Earth\u2019s orbital plane inclination as it precesses around the invariable plane.');
+
+  // ── Distance (root level) ──
+  addTooltip(visFolder.addBinding(o, 'starDistanceScaleFact', { label: 'Distance', min: 0.1, max: 2, step: 0.1 })
+    .on('change', ({ value }) => {
+      scalableObjects.forEach(obj => obj.scale.setScalar(value));
+      needsLabelUpdate = true;
+    }),
+    'Scale the distance to background objects like stars and the celestial sphere.');
+
+  // ── Reports (observed — data exported from scene graph) ──
+  const reportsFolder = gui.addFolder({ title: 'Reports', expanded: false });
+  reportsFolder.element.dataset.category = 'observed';
+  reportsFolder.element.dataset.editable = 'true';
+  addFolderTooltip(reportsFolder, 'Export observation data measured from the 3D scene graph to CSV files.');
+
+  /* --- Create Object File -------------------------------------------- */
+  const testSettings = reportsFolder.addFolder({ title: 'Planet Positions & Orbits', expanded: false });
+  addFolderTooltip(testSettings, 'Export planet positions (RA/Dec), distances, and orbital elements at specific Julian dates.');
+  const modeCtrl = testSettings.addBinding(o, 'testMode', {
+    label: 'Mode', options: { 'List': 'List', 'Range': 'Range' }
+  });
+  const listCtrl = testSettings.addBinding(o, 'testJDsText', { label: 'JD list (CSV)' });
+  const startCtrl = testSettings.addBinding(o, 'rangeStart', { label: 'Start JD', step: 1 });
+  const endCtrl = testSettings.addBinding(o, 'rangeEnd', { label: 'End JD', step: 1 });
+  const pieceCtrl = testSettings.addBinding(o, 'rangePieces', { label: '# points', min: 2, step: 1 });
+  testSettings.addButton({ title: 'Create file (be patient)' }).on('click', async () => {
+    if (o._raTestBusy) return;
+    o._raTestBusy = true;
+    try { await runRATest(); } finally { o._raTestBusy = false; }
+  });
+  function syncVis() {
+    const list = o.testMode === 'List';
+    toggleCtrl(listCtrl, list);
+    toggleCtrl(startCtrl, !list);
+    toggleCtrl(endCtrl, !list);
+    toggleCtrl(pieceCtrl, !list);
+  }
+  syncVis();
+  modeCtrl.on('change', syncVis);
+
+  /* --- Create Solstice File ------------------------------------------- */
+  const solFolder = reportsFolder.addFolder({ title: 'Solstices & Equinoxes', expanded: false });
+  addFolderTooltip(solFolder, 'Export solstice and equinox dates with RA and obliquity for selected years.');
+  const modeCtrl2 = solFolder.addBinding(o, 'solMode', {
+    label: 'Mode', options: { 'Range': 'Range', 'List': 'List' }
+  });
+  const yearList = solFolder.addBinding(o, 'solYearsText', { label: 'Year list (CSV)' });
+  const startCtrl2 = solFolder.addBinding(o, 'solRangeStart', { label: 'Start year', step: 1 });
+  const endCtrl2 = solFolder.addBinding(o, 'solRangeEnd', { label: 'End year', step: 1 });
+  solFolder.addButton({ title: 'Create file (be patient)' }).on('click', async () => {
+    if (o._solBusy) return;
+    o._solBusy = true;
+    try {
+      const yrs = buildYearArray();
+      if (!yrs.length) { alert('No valid years \u2014 check your input.'); return; }
+      await runSolsticeExport(yrs);
+    } finally { o._solBusy = false; }
+  });
+  function syncSolVis() {
+    const list = o.solMode === 'List';
+    toggleCtrl(yearList, list);
+    toggleCtrl(startCtrl2, !list);
+    toggleCtrl(endCtrl2, !list);
+  }
+  syncSolVis();
+  modeCtrl2.on('change', syncSolVis);
+
+  /* --- Create Year Analysis Report ---------------------------------------- */
+  const yearAnalysisFolder = reportsFolder.addFolder({ title: 'Year Length Analysis', expanded: false });
+  addFolderTooltip(yearAnalysisFolder, 'Export tropical, anomalistic, and sidereal year lengths compared to IAU J2000 references.');
+  const modeCtrl3 = yearAnalysisFolder.addBinding(o, 'yearAnalysisMode', {
+    label: 'Mode', options: { 'Range': 'Range', 'List': 'List' }
+  });
+  const yearList3 = yearAnalysisFolder.addBinding(o, 'yearAnalysisYearsText', { label: 'Year list (CSV)' });
+  const startCtrl3 = yearAnalysisFolder.addBinding(o, 'yearAnalysisRangeStart', { label: 'Start year', step: 1 });
+  const endCtrl3 = yearAnalysisFolder.addBinding(o, 'yearAnalysisRangeEnd', { label: 'End year', step: 1 });
+  yearAnalysisFolder.addButton({ title: 'Create file (be patient)' }).on('click', async () => {
+    if (o._yearAnalysisBusy) return;
+    o._yearAnalysisBusy = true;
+    try {
+      const yrs = buildYearAnalysisArray();
+      if (!yrs.length) { alert('No valid years \u2014 check your input.'); return; }
+      await runYearAnalysisExport(yrs);
+    } finally { o._yearAnalysisBusy = false; }
+  });
+  function syncYearAnalysisVis() {
+    const list = o.yearAnalysisMode === 'List';
+    toggleCtrl(yearList3, list);
+    toggleCtrl(startCtrl3, !list);
+    toggleCtrl(endCtrl3, !list);
+  }
+  syncYearAnalysisVis();
+  modeCtrl3.on('change', syncYearAnalysisVis);
+
+  // ── Tools ──
+  const toolsFolder = gui.addFolder({ title: 'Tools', expanded: false });
+  toolsFolder.element.dataset.category = 'tools';
+  addFolderTooltip(toolsFolder, 'Planet hierarchy inspector, invariable plane inspector, and console validation tests.');
+
+  addTooltip(toolsFolder.addButton({ title: 'Planet Inspector' }).on('click', () => openHierarchyInspector()),
+    'Open the planet hierarchy inspector. Shows orbital elements, scene graph, and live positional data for each planet.');
+  addTooltip(toolsFolder.addButton({ title: 'Invariable Plane Inspector' }).on('click', () => openBalanceExplorer()),
+    'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
+
+  /* --- Console Tests (F12) ------------------------------------------------ */
+  const calibFolder = toolsFolder.addFolder({ title: 'Console Tests (F12)', expanded: false });
+  addFolderTooltip(calibFolder, 'Run astronomical validation tests. Open Developer Console (F12) first to see results.');
+  calibFolder.addBinding(o, 'calibrationYearStart', { label: 'Start year', step: 1 });
+  calibFolder.addBinding(o, 'calibrationYearEnd', { label: 'End year', step: 1 });
+
+  // Helper for console test buttons with optional tooltip
+  const addTestButton = (title, fn, tooltip) => {
+    const btn = calibFolder.addButton({ title }).on('click', async () => {
+      if (o._calibrationBusy) return;
+      o._calibrationBusy = true;
+      try { console.clear(); await fn(); } finally { o._calibrationBusy = false; }
+    });
+    if (tooltip) addTooltip(btn, tooltip);
+    return btn;
+  };
+
+  // Year Length
+  const firstYearBtn = addTestButton('Analyze Year at June Solstice', analyzeTropicalYearLength,
+    'Measure tropical year length at the June solstice (Sun at RA 90°).');
+  addTestButton('Analyze Year at December Solstice', analyzeDecemberSolsticeYearLength,
+    'Measure tropical year length at the December solstice (Sun at RA 270°).');
+  addTestButton('Analyze Year Length by Cardinal', analyzeEquinoxIntervals,
+    'Measure tropical year at all 4 cardinal points (both equinoxes and solstices).');
+  addTestButton('Analyze Anomalistic Year', analyzeAnoministicYear,
+    'Measure the perihelion-to-perihelion interval (anomalistic year).');
+  addTestButton('Analyze Sidereal Year', analyzeSiderealYear,
+    'Measure the time for the Sun to return to the same position relative to the stars.');
+  addTestButton('Analyze All Alignments', analyzeAllAlignments,
+    'Combined analysis of tropical, anomalistic, and sidereal year lengths.');
+
+  // Day Length
+  const firstDayBtn = addTestButton('Analyze Sidereal Day', analyzeSiderealDay,
+    'Measure Earth\'s rotation period relative to the vernal equinox.');
+  addTestButton('Analyze Solar Day', analyzeSolarDay,
+    'Measure Earth\'s rotation period relative to the Sun (mean solar day).');
+  addTestButton('Analyze Stellar Day', analyzeStellarDay,
+    'Measure Earth\'s rotation period relative to distant stars.');
+
+  // Calibration
+  const firstCalibBtn = addTestButton('Verify Obliquity Calibration', runObliquityCalibrationTest,
+    'Check that the model\'s obliquity matches IAU reference values over time.');
+  addTestButton('Verify Perihelion Rate', verifyPerihelionRate,
+    'Verify the rate of perihelion precession against reference data.');
+  addTestButton('Investigate Parameters', investigateParameterEffects,
+    'Explore how changing orbital parameters affects year length and precession.');
+  addTestButton('Find Optimal earthRAAngle', findOptimalEarthRAAngle,
+    'Search for the earthRAAngle value that best matches IAU tropical year references.');
+
+  // Insert group labels before the first button of each group
+  const calibContainer = calibFolder.element.querySelector('.tp-fldv_c');
+  const insertGroupLabel = (text, beforeBlade) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'trace-chip-label';
+    lbl.style.padding = '0 8px';
+    lbl.style.marginTop = '8px';
+    lbl.textContent = text;
+    calibContainer.insertBefore(lbl, beforeBlade.element);
+  };
+  insertGroupLabel('Year Length', firstYearBtn);
+  insertGroupLabel('Day Length', firstDayBtn);
+  insertGroupLabel('Calibration', firstCalibBtn);
+
+  /* --- Camera -------------------------------------------------------------- */
+  const cameraFolder = toolsFolder.addFolder({ title: 'Camera', expanded: false });
+  cameraFolder.addBinding(o, 'worldCamRaDisplay', { label: 'RA', readonly: true });
+  cameraFolder.addBinding(o, 'worldCamDecDisplay', { label: 'Dec', readonly: true });
+  cameraFolder.addBinding(o, 'worldCamDistDisplay', { label: 'Distance', readonly: true });
+
+  /* --- Debug --------------------------------------------------------------- */
+  if (debugOn) {
+    const debugFolder = toolsFolder.addFolder({ title: 'Debug' });
+    debugFolder.addBinding(o, 'debugAscendingNode', { label: 'Log Ascending Nodes' })
+      .on('change', ({ value }) => {
+        _debugAscendingNodeLogEnabled = value;
+        if (value) {
+          console.log('Ascending Node debugging ENABLED - check console for logs every second');
+        } else {
+          console.log('Ascending Node debugging DISABLED');
+        }
+      });
+  }
+
   addWidthToggle(gui);
 }  
 
@@ -12916,6 +13443,22 @@ function render(now) {
     o.worldCamX = Math.round(x);
     o.worldCamY = Math.round(y);
     o.worldCamZ = Math.round(z);
+
+    // Refresh only the root controls that need live updating.
+    // dat.GUI used .listen() which auto-polled individual fields without
+    // disrupting other controls. Tweakpane has no equivalent, so we
+    // selectively refresh only the root date/time/JD/perihelion controls.
+    // _renderLoopRefreshing prevents the change handlers from running
+    // blurActiveInput() which would close open dropdowns elsewhere in the GUI.
+    if (o._rootCtrls) {
+      const ae = document.activeElement;
+      const ctrls = o._rootCtrls;
+      o._renderLoopRefreshing = true;
+      [ctrls.dateCtrl, ctrls.timeCtrl, ctrls.jdCtrl, ctrls.periCtrl].forEach(c => {
+        if (c && !c.element.contains(ae)) c.refresh();
+      });
+      o._renderLoopRefreshing = false;
+    }
   }
 
   // 5) Advance the simulation time (once per frame)
@@ -12943,6 +13486,7 @@ function render(now) {
     if (astroCalcElapsed >= 0.1 || forceAllUpdates) {
       astroCalcElapsed = 0;
       updatePredictions(); // Heavy - 50+ computations, values change slowly
+      updatePerihelion(); // Must be before updateAscendingNodes() so perihelion values are current
       updateAscendingNodes(); // Must be before updateHierarchyLiveData() so dynamic values are current
       updatePlanetAnomalies(); // Must be after updateAscendingNodes(), calculates Mean/True Anomaly for all planets
       updatePlanetInvariablePlaneHeights(); // Must be after updatePlanetAnomalies(), calculates height above invariable plane
@@ -12972,8 +13516,7 @@ function render(now) {
     if (posElapsed >= 0.1 || forceAllUpdates) {
       posElapsed = 0;
       updateElongations();
-      updatePerihelion();
-      // updateAscendingNodes() is now called every frame before updateHierarchyLiveData()
+      // updatePerihelion() is now called in block 6b before updateAscendingNodes()
       updateOrbitOrientations();
       golden.update();
     }
@@ -20482,40 +21025,40 @@ function updatePlanetSizes(t) {
   });
 }
 
-function addWidthToggle(gui, sizes = [300, 550]) {
+function addWidthToggle(gui, sizes = [350, 550]) {
   let idx = 0;
 
   /* create the floating badge */
   const badge = document.createElement('div');
   badge.id = 'guiWidthToggle';
-  badge.textContent = '⇆';
+  badge.textContent = '\u21C6';
   document.body.appendChild(badge);
+
+  /* Tweakpane uses .element instead of .domElement */
+  const panelEl = gui.element;
 
   /* positioning — centred beside the panel */
   function align() {
-    const r  = gui.domElement.getBoundingClientRect();
+    const r  = panelEl.getBoundingClientRect();
     const bh = badge.getBoundingClientRect().height;
     badge.style.left = `${r.left - badge.offsetWidth}px`;
     badge.style.top  = `${r.top + (r.height - bh) / 2}px`;
   }
-  align();                               // first run
+  align();
 
-  /* keep badge in place on window resizes */
   window.addEventListener('resize', align);
 
-  /*—--- feature-detect ResizeObserver ----*/
   if ('ResizeObserver' in window) {
-    new ResizeObserver(align).observe(gui.domElement);
+    new ResizeObserver(align).observe(panelEl);
   } else {
-    /* fallback: re-align every 1 s on browsers without the API */
     setInterval(align, 1000);
   }
 
   /* click / tap toggles the panel width */
   badge.onclick = () => {
     idx = 1 - idx;
-    gui.domElement.style.width = `${sizes[idx]}px`;
-    align();                             // badge tracks the new width
+    panelEl.style.width = `${sizes[idx]}px`;
+    align();
   };
 }
 
@@ -25305,8 +25848,10 @@ function changeZodiacScale() {
 
 function updatePosition() {
   o.pos = sDay * dateToDays(o.Date) + timeToPos(o.Time);
+  o.Day = posToDays(o.pos);
+  o.julianDay = dateTimeToJulianDay(o.Date, o.Time);
   const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-  o.perihelionDate = `${p.date}`;
+  o.perihelionDate = `${p.date} ${p.time}`;
   positionChanged = true; // Signal animation loop to update scene
 }
 
@@ -25573,6 +26118,17 @@ function updatePositionDisplayStrings() {
       (o.distanceUnit === 'AU') ? obj.sunDistAU.toFixed(8) + ' AU' :
       (o.distanceUnit === 'km') ? obj.sunDistKm.toFixed(2) + ' km'  :
                                   obj.sunDistMi.toFixed(2) + ' mi';
+  }
+
+  // Camera RA/Dec display
+  if (o.worldCamRa != null) {
+    if (o.displayFormat === 'decimal') {
+      o.worldCamRaDisplay  = ((o.worldCamRa * 180 / Math.PI + 360) % 360).toFixed(4) + '\u00B0';
+      o.worldCamDecDisplay = radiansToDecDecimal(o.worldCamDec) + '\u00B0';
+    } else {
+      o.worldCamRaDisplay  = radiansToRa(o.worldCamRa);
+      o.worldCamDecDisplay = radiansToDec(o.worldCamDec);
+    }
   }
 
   // Camera distance display
@@ -26213,6 +26769,10 @@ function updatePerihelion() {
   o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, plutoLongitudePerihelion);
   o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, halleysLongitudePerihelion);
   o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, erosLongitudePerihelion);
+  // Update perihelion gauge bars
+  for (const key in periGaugeEls) {
+    if (periGaugeEls[key]) periGaugeEls[key].style.setProperty('--elong-pct', ((o[key] / 360) * 100) + '%');
+  }
 };
 
 // ================================================================
@@ -26886,6 +27446,16 @@ function updatePlanetAnomalies() {
     earthMeanAnom = ((earthMeanAnom % 360) + 360) % 360;
     o.earthMeanAnomaly = earthMeanAnom;
   }
+
+  // Update perihelion detail DOM values (ascending node, argument of periapsis)
+  // Must be here (after all ArgumentOfPeriapsis values are computed) to stay in sync with planet stats
+  for (const geoKey in periDetailEls) {
+    const dt = periDetailEls[geoKey];
+    if (dt) {
+      if (dt.ascEl) dt.ascEl.textContent = (o[dt.ascKey] || 0).toFixed(2) + '\u00B0';
+      if (dt.argEl) dt.argEl.textContent = (o[dt.argKey] || 0).toFixed(2) + '\u00B0';
+    }
+  }
 }
 
 /**
@@ -27028,6 +27598,25 @@ function updatePlanetInvariablePlaneHeights() {
     o[key + 'HeightAboveInvPlane'] = height;
     o[key + 'AboveInvPlane'] = height > 0;
 
+    // Update centered gauge bar with directional color
+    const gaugeKey = key + 'HeightAboveInvPlane';
+    const el = invPlaneGaugeEls[gaugeKey];
+    if (el && invPlaneMaxes[gaugeKey]) {
+      setInvGaugeProps(el, height, invPlaneMaxes[gaugeKey]);
+    }
+    // Update expandable detail values (always update so values are correct when revealed)
+    const dt = invPlaneTooltipEls[gaugeKey];
+    if (dt) {
+      dt.ascEl.textContent = o[dt.ascKey].toFixed(2) + '\u00B0';
+      dt.inclEl.textContent = o[dt.inclKey].toFixed(4) + '\u00B0';
+      // Color inclination based on InclinationPhaseAngle
+      // Phase = (Ω - φ₀ + 360) % 360: 180°–360° = increasing, 0°–180° = decreasing
+      const phase = ((o[dt.ascKey] - dt.phaseAngle) % 360 + 360) % 360;
+      const increasing = phase >= 180;
+      dt.inclEl.style.color = increasing
+        ? 'hsla(140, 65%, 55%, 1)'  // green = increasing
+        : 'hsla(0, 70%, 60%, 1)';   // red = decreasing
+    }
   }
 }
 
@@ -27517,8 +28106,9 @@ function goldenspiralPerihelionObjects(...args) {
   const scene  = args[args.length - 1];
   const pds    = args.slice(0, -2);
 
-  for (const pd of pds) (pd.planetObj ?? pd).visible = false;
-  
+  // Perihelion marker visibility is managed by the Show/Hide panel;
+  // do NOT force-hide them here (was suppressing default-visible markers).
+
   /* ---------- 1. constants ------------------------------------------ */
   const SMOOTH_SEGMENTS   = 32;   // Catmull-Rom samples / segment
   const TUBE_RADIUS       = 0.08; // 0.02-0.06 looks nice
@@ -27580,8 +28170,26 @@ function goldenspiralPerihelionObjects(...args) {
   }
  
   /* ---------- NEW utility: flip markers on/off ------------------- */
+  // Remember which markers were already visible before the spiral was toggled on,
+  // so toggling the spiral off restores them instead of hiding everything.
+  const savedVisible = new Map();
+
   function setHelpersVisible(v) {
-    for (const pd of pds) (pd.planetObj ?? pd).visible = v;
+    if (v) {
+      // Turning ON: snapshot current state, then show all
+      for (const pd of pds) {
+        const obj = pd.planetObj ?? pd;
+        savedVisible.set(pd, obj.visible);
+        obj.visible = true;
+      }
+    } else {
+      // Turning OFF: restore each marker to its state before the spiral was toggled on
+      for (const pd of pds) {
+        const obj = pd.planetObj ?? pd;
+        obj.visible = savedVisible.has(pd) ? savedVisible.get(pd) : false;
+      }
+      savedVisible.clear();
+    }
   }
   
   /* ---------- 4. export -------------------------------------------- */
@@ -27719,6 +28327,10 @@ function updateElongations() {
   o["plutoElongation"]=getElongationFromSun(pluto);
   o["halleysElongation"]=getElongationFromSun(halleys);
   o["erosElongation"]=getElongationFromSun(eros);
+  // Update gauge bar CSS
+  for (const key in elongGaugeEls) {
+    elongGaugeEls[key].style.setProperty('--elong-pct', ((o[key] / 180) * 100) + '%');
+  }
 };
 
 function updatePredictions() {
@@ -27755,7 +28367,7 @@ function updatePredictions() {
   predictions.lengthofsiderealYearDays = o.lengthofsiderealYear; 
   
   predictions.lengthofsiderealDayRealLOD = o.lengthofsiderealDayRealLOD = (o.lengthofsolarYear*86400)/(o.lengthofsolarYear+1);
-  predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (o.lengthofsiderealDay/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+o.lengthofsiderealDay;
+  predictions.lengthofstellarDayRealLOD = o.lengthofstellarDayRealLOD = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+o.lengthofsiderealDayRealLOD;
   
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -27779,6 +28391,19 @@ function updatePredictions() {
   predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(((earthPerihelionFromEarth.ra * 180 / Math.PI + 360)-earthRAAngle % 360), o.currentYear)
   
   predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYearInSeconds/60/60 * speedofSuninKM) / (2 * Math.PI);
+
+  // IAU comparison differences (Model − IAU reference)
+  predictions.diffSolarDay = (predictions.lengthofDay - ASTRO_REFERENCE.solarDayJ2000) * 1000;
+  predictions.diffSiderealDay = (predictions.lengthofsiderealDayRealLOD - ASTRO_REFERENCE.siderealDayJ2000) * 1000;
+  predictions.diffStellarDay = (predictions.lengthofstellarDayRealLOD - ASTRO_REFERENCE.stellarDayJ2000) * 1000;
+  predictions.diffTropicalYear = (predictions.lengthofsolarYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
+  predictions.diffSiderealYear = (predictions.lengthofsiderealYearDaysRealLOD - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
+  predictions.diffAnomalisticYear = (predictions.lengthofanomalisticDaysRealLOD - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400;
+  predictions.diffPrecession = predictions.axialPrecessionRealLOD - ASTRO_REFERENCE.iauPrecessionJ2000;
+  predictions.diffEccentricity = predictions.eccentricityEarth - ASTRO_REFERENCE.eccentricityJ2000;
+  predictions.iauObliquityRef = meanObliquityIAU2006(o.currentYear || 2000);
+  predictions.diffObliquity = predictions.obliquityEarth - predictions.iauObliquityRef;
+  predictions.diffInclination = predictions.earthInvPlaneInclinationDynamic - ASTRO_REFERENCE.earthInclinationJ2000_deg;
 
 }
 
@@ -28011,7 +28636,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnInvPlaneInclinationJ2000,
     uranus: uranusInvPlaneInclinationJ2000,
     neptune: neptuneInvPlaneInclinationJ2000,
-    pluto: plutoInvPlaneInclinationJ2000
+    pluto: plutoInvPlaneInclinationJ2000,
+    halleys: halleysInvPlaneInclinationJ2000,
+    eros: erosInvPlaneInclinationJ2000
   };
 
   // Mean inclinations (midpoint of Laplace-Lagrange bounds)
@@ -28024,7 +28651,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnInvPlaneInclinationMean,
     uranus: uranusInvPlaneInclinationMean,
     neptune: neptuneInvPlaneInclinationMean,
-    pluto: plutoInvPlaneInclinationMean
+    pluto: plutoInvPlaneInclinationMean,
+    halleys: halleysInvPlaneInclinationMean,
+    eros: erosInvPlaneInclinationMean
   };
 
   // Planet inclination oscillation amplitudes (from Laplace-Lagrange secular theory)
@@ -28036,7 +28665,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnInvPlaneInclinationAmplitude,
     uranus: uranusInvPlaneInclinationAmplitude,
     neptune: neptuneInvPlaneInclinationAmplitude,
-    pluto: plutoInvPlaneInclinationAmplitude
+    pluto: plutoInvPlaneInclinationAmplitude,
+    halleys: halleysInvPlaneInclinationAmplitude,
+    eros: erosInvPlaneInclinationAmplitude
   };
 
   // Planet precession periods (same period governs nodal precession and inclination oscillation)
@@ -28048,7 +28679,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnPerihelionEclipticYears,  // Negative = retrograde
     uranus: uranusPerihelionEclipticYears,
     neptune: neptunePerihelionEclipticYears,  // Negative = retrograde
-    pluto: plutoPerihelionEclipticYears
+    pluto: plutoPerihelionEclipticYears,
+    halleys: halleysPerihelionEclipticYears,
+    eros: erosPerihelionEclipticYears
   };
 
   // J2000 ascending nodes on invariable plane
@@ -28060,7 +28693,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnAscendingNodeInvPlaneVerified,
     uranus: uranusAscendingNodeInvPlaneVerified,
     neptune: neptuneAscendingNodeInvPlaneVerified,
-    pluto: plutoAscendingNodeInvPlaneVerified
+    pluto: plutoAscendingNodeInvPlaneVerified,
+    halleys: halleysAscendingNodeInvPlaneVerified,
+    eros: erosAscendingNodeInvPlaneVerified
   };
 
   // Phase offsets: the geometric relationship between Ω and the inclination phase
@@ -28073,7 +28708,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     saturn: saturnInclinationPhaseAngle,
     uranus: uranusInclinationPhaseAngle,
     neptune: neptuneInclinationPhaseAngle,
-    pluto: plutoInclinationPhaseAngle
+    pluto: plutoInclinationPhaseAngle,
+    halleys: halleysInclinationPhaseAngle,
+    eros: erosInclinationPhaseAngle
   };
 
   const i_J2000 = j2000Inclinations[planet];
@@ -29203,7 +29840,11 @@ function brighten(hex, f = 0.5) {
 function addInfoButton ( ctrl, url ) {
   const labelEl =
         ctrl.$name ||                                        // lil-gui
-        ( ctrl.domElement &&                                 // dat.gui ≥0.7
+        ( ctrl.element &&                                    // Tweakpane
+          ctrl.element.querySelector('.tp-fldv_t') ) ||
+        ( ctrl.element &&                                    // Tweakpane blade
+          ctrl.element.querySelector('.tp-lblv_l') ) ||
+        ( ctrl.domElement &&                                 // dat.gui \u22650.7
           ctrl.domElement.querySelector('.property-name') ) ||
         ( ctrl.__li &&
           ctrl.__li.querySelector('.property-name') );
@@ -29216,7 +29857,7 @@ function addInfoButton ( ctrl, url ) {
   a.target        = '_blank';
   a.rel           = 'noopener';
   a.title         = 'Background information';
-  a.textContent   = ' ⓘ';                  // NBSP + circled-I
+  a.textContent   = ' \u24D8';                  // NBSP + circled-I
   a.style.cssText = 'margin-left:4px; text-decoration:none; ' +
                     'cursor:pointer; user-select:none; font-weight:600;';
 

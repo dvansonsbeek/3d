@@ -108,7 +108,7 @@ Earth's orbit varies between more circular and more elliptical:
 | Parameter | Value |
 |-----------|-------|
 | Base Eccentricity | 0.015321 |
-| Amplitude | ±0.001431 |
+| Amplitude | ±0.0014226 |
 | Range | ~0.0139 to ~0.0167 |
 
 ### Inclination to Invariable Plane

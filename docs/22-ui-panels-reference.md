@@ -11,7 +11,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | Panel | Purpose |
 |-------|---------|
 | **Planet Hierarchy Inspector** | Inspect the 5-step hierarchy chain for each planet |
-| **Invariable Plane Positions** | View planet heights above/below the invariable plane |
+| **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
 
@@ -61,8 +61,8 @@ barycenterEarthAndSun (root for all planets)
 
 ### Accessing the Inspector
 
-1. Open the dat.GUI Settings menu
-2. Click "🔍 Inspect Planet Hierarchy"
+1. Open the Tweakpane Tools folder
+2. Click "Planet Inspector"
 3. Select a planet from the dropdown
 4. Use Prev/Next buttons to navigate steps
 
@@ -83,14 +83,14 @@ When Step 4 (RealPerihelionAtSun) is selected:
 
 | Component | Location |
 |-----------|----------|
-| `hierarchyInspector` state | script.js:7189-7239 |
-| `PLANET_HIERARCHIES` registry | script.js:6271-6392 |
-| `createVisualHelpers()` | script.js:7450-8408 |
-| `updateHierarchyLiveData()` | script.js:10734-11851 |
+| `hierarchyInspector` state | script.js:7213-7263 |
+| `PLANET_HIERARCHIES` registry | script.js:6295-6416 |
+| `createVisualHelpers()` | script.js:7474-8432 |
+| `updateHierarchyLiveData()` | script.js:10758-11875 |
 
 ---
 
-## Invariable Plane Positions Panel
+## Invariable Plane Analysis Panel
 
 ### Purpose
 
@@ -100,7 +100,7 @@ Displays all planets' heights relative to the invariable plane, along with a mas
 
 ```
 ┌─────────────────────────────────────────────┐
-│ INVARIABLE PLANE POSITIONS            [−]   │
+│ INVARIABLE PLANE ANALYSIS             [−]   │
 ├─────────────────────────────────────────────┤
 │ Mercury    +0.0234 AU   ▲ ABOVE             │
 │ Venus      −0.0081 AU   ▼ BELOW             │
@@ -237,9 +237,8 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 ### Accessing the Explorer
 
-1. Open the dat.GUI Settings menu
-2. Expand "Invariable Plane Positions"
-3. Click "Invariable Plane Balance Explorer"
+1. Expand the "Observed Positions" folder, then the "Invariable Plane Analysis" subfolder
+2. Click "Invariable Plane Balance Explorer"
 
 ### Key Features
 

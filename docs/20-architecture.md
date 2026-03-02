@@ -57,7 +57,7 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 │  │                                                                    │ │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐ │ │
 │  │  │  UI Controls │  │ Time Engine  │  │     3D Renderer          │ │ │
-│  │  │  (dat.GUI)   │  │ (Simulation) │  │     (Three.js)           │ │ │
+│  │  │ (Tweakpane)  │  │ (Simulation) │  │     (Three.js)           │ │ │
 │  │  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────────┘ │ │
 │  │         │                 │                      │                 │ │
 │  │         └────────┬────────┴──────────┬───────────┘                 │ │
@@ -80,7 +80,7 @@ The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astron
 │  ┌────────────────────────────────────────────────────────────────────┐ │
 │  │                       Foundation Layer                             │ │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │ │
-│  │  │   Three.js   │  │   dat.GUI    │  │    Parcel    │             │ │
+│  │  │   Three.js   │  │  Tweakpane   │  │    Parcel    │             │ │
 │  │  │   (WebGL)    │  │  (Controls)  │  │  (Bundler)   │             │ │
 │  │  └──────────────┘  └──────────────┘  └──────────────┘             │ │
 │  └────────────────────────────────────────────────────────────────────┘ │
@@ -168,7 +168,7 @@ WebGL Render (60 FPS target)
 | Layer | Technology | Version | Purpose |
 |-------|------------|---------|---------|
 | **3D Engine** | Three.js | ^0.175.0 | WebGL rendering, scene management |
-| **UI Controls** | dat.GUI | ^0.7.9 | Parameter control panels |
+| **UI Controls** | Tweakpane | ^4.0.5 | Parameter control panels |
 | **Bundler** | Parcel | ^2.16.4 | Build system, dev server, HMR |
 | **Language** | JavaScript | ES2021 | Application logic |
 | **Rendering** | WebGL 2.0 | - | Hardware-accelerated graphics |
@@ -234,7 +234,7 @@ The monolithic script.js is organized into logical sections:
 │  - Export functions (solstice, year analysis, bulk, planet reports)  │
 ├─────────────────────────────────────────────────────────────────────┤
 │  SECTION 7: GUI SETUP (Lines 11855-12818)                           │
-│  - dat.GUI folder structure                                         │
+│  - Tweakpane folder structure (addFolder/addBinding/addButton)      │
 │  - Control bindings and event handlers                              │
 │  - Prediction displays                                              │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -261,7 +261,7 @@ The monolithic script.js is organized into logical sections:
 | `camera` | Perspective camera | View frustum, position |
 | `renderer` | WebGL renderer | Render settings, shadow maps |
 | `controls` | OrbitControls | Camera interaction |
-| `gui` | dat.GUI instance | All control panels |
+| `gui` | Tweakpane instance | All control panels |
 
 ---
 
@@ -351,7 +351,7 @@ const params = { sizeBoost: 0 };   // Planet size multiplier
 GUI Input Change
     │
     ▼
-dat.GUI onChange callback
+Tweakpane onChange callback
     │
     ▼
 Update o.property
@@ -553,77 +553,98 @@ Features:
 
 ### Main Panel Organization
 
+The GUI is built with Tweakpane v4, using `addBinding()` for data-bound controls,
+`addButton()` for actions, and `addFolder()` for collapsible sections.
+
 ```
-dat.GUI Root (300px width)
+Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 │
-├─ Date Input                    [Y-M-D picker]
-├─ Time Input                    [HH:MM:SS]
-├─ Julian Day                    [numeric]
-├─ Perihelion Date               [read-only display]
+├─▼ About                          (collapsed)
+│  ├─▼ The Six Laws               (custom DOM, full-width)
+│  ├─▼ Free Parameters (6 DOF)    (0 DOF items dimmed)
+│  ├─▼ Calibration Inputs (20)    (from ASTRO_REFERENCE)
+│  ├─▼ Model Parameters (125)     (Earth 25, Moon 9, 7 planets × 13)
+│  └─ Website link                (holisticuniverse.com)
+│
+├─ Date                          [binding: text input]
+├─ Time                          [binding: text input]
+├─ JD                            [binding: numeric]
+├─ Perihelion Date               [binding: read-only display]
 │
 ├─▼ Simulation Controls
-│  ├─ Run                        [toggle]
-│  ├─ 1 second equals            [dropdown: 1 second → 1000 years]
-│  ├─ Speed                      [slider: -5 to +5]
+│  ├─ Run                        [binding: toggle]
+│  ├─ 1 second equals            [binding: dropdown]
+│  ├─ Speed                      [binding: slider -5 to +5]
 │  ├─ Step Forward               [button]
 │  ├─ Step Backward              [button]
 │  ├─ Reset                      [button]
 │  ├─ Now                        [button]
-│  ├─ Enable Tracing             [toggle]
+│  ├─ Enable Tracing             [binding: toggle]
 │  │  └─▼ Trace Selection
-│  │     ├─ Mercury              [checkbox]
-│  │     ├─ Venus                [checkbox]
+│  │     ├─ Mercury              [binding: checkbox]
+│  │     ├─ Venus                [binding: checkbox]
 │  │     └─ ... all planets
-│  └─ Look At                    [planet dropdown]
+│  └─ Look At                    [binding: planet dropdown]
 │
-├─▼ Predictions: Holistic Universe Model
-│  ├─▼ Length of Days
-│  ├─▼ Solar Year
-│  ├─▼ Sidereal Year
-│  ├─▼ Anomalistic Year
-│  ├─▼ Precession Cycles
-│  └─▼ Orbital Elements
+├─▼ Model Predictions               (compact inline Δ format, 1 row per prediction)
+│  ├─ Day Lengths                Model value  Δ IAU (inline)
+│  ├─ Solar Year                 Model value  Δ IAU (inline)
+│  ├─ Sidereal Year              Model value  Δ IAU (inline)
+│  ├─ Anomalistic Year           Model value  Δ IAU (inline)
+│  ├─ Precession Periods         Model value  Δ IAU (inline)
+│  └─ Orbital Elements           Model value  Δ ref (inline)
 │
-├─▼ Celestial Positions              (RA/Dec for all planets)
+├─▼ Observed Positions               (3D scene measurements)
+│  ├─▼ Perihelion Angles          Geocentric / Heliocentric pairs
+│  ├─▼ Elongations
+│  ├─▼ [Planet subfolders]        RA, Dec, distances
+│  ├─▼ Helper Objects
+│  └─▼ Invariable Plane Analysis
+│     ├─ Balance Explorer           [button]
+│     ├─ Mercury–Neptune (AU)       [live values]
+│     ├─ Mass Balance (AU)          [live value]
+│     ├─ Planets Above / Below      [counts]
+│     │
+│     ├─▼ Validate position (Option A vs B)
+│     │  ├─ Calc. Tilt (°)          [~1.5787°]
+│     │  ├─ Calc. Asc.Node (°)      [~107°]
+│     │  ├─ Jupiter L (%)           [~60%]
+│     │  ├─ Saturn L (%)            [~25%]
+│     │  └─ A vs B Diff (°)         [<0.1°]
+│     │
+│     └─▼ Balance Trend Analysis
+│        ├─ Start/Stop Tracking     [button]
+│        ├─ Tracking Active         [binding: toggle]
+│        ├─ Started (year)          [binding: value]
+│        ├─ Years Tracked           [binding: value]
+│        ├─ Sample Count            [binding: value]
+│        ├─ Cumulative Sum          [binding: value]
+│        ├─ Lifetime Avg (AU)       [KEY METRIC]
+│        ├─ Min Seen (AU)           [binding: value]
+│        ├─ Max Seen (AU)           [binding: value]
+│        └─ Reset Tracking          [button]
 │
-├─▼ Perihelion Planets               (perihelion data per planet)
+├─▼ Visualization                    (visual toggles)
+│  ├─ Zodiac                     [binding: toggle]
+│  ├─ Stars                      [binding: toggle]
+│  ├─ Constellations             [binding: toggle]
+│  ├─ Celestial Sphere           [binding: toggle]
+│  ├─ Ecliptic                   [binding: toggle]
+│  ├─ Invariable Plane           [binding: toggle]
+│  ├─▼ Tracing                  (chip-grid toggles by planet)
+│  └─▼ Show / Hide              (chip-grid toggles by planet)
 │
-├─▼ Celestial Tools                  (elongation, orbit orientation)
+├─▼ Reports                       [observed category]
+│  ├─▼ Planet Positions & Orbits
+│  ├─▼ Solstices & Equinoxes
+│  └─▼ Year Length Analysis
 │
-├─▼ Invariable Plane Positions
-│  ├─ Mercury (AU)               [live value]
-│  ├─ Venus (AU)                 [live value]
-│  ├─ ... all planets
-│  ├─ Mass Balance (AU)          [live value]
-│  ├─ Planets Above              [count]
-│  ├─ Planets Below              [count]
-│  │
-│  ├─▼ Validate position (Option A vs B)
-│  │  ├─ Calc. Tilt (°)          [~1.5787°]
-│  │  ├─ Calc. Asc.Node (°)      [~107°]
-│  │  ├─ Jupiter L (%)           [~60%]
-│  │  ├─ Saturn L (%)            [~25%]
-│  │  └─ A vs B Diff (°)         [<0.1°]
-│  │
-│  └─▼ Balance Trend Analysis
-│     ├─ Start/Stop Tracking     [button]
-│     ├─ Tracking Active         [toggle]
-│     ├─ Started (year)          [value]
-│     ├─ Years Tracked           [value]
-│     ├─ Sample Count            [value]
-│     ├─ Cumulative Sum          [value]
-│     ├─ Lifetime Avg (AU)       [KEY METRIC]
-│     ├─ Min Seen (AU)           [value]
-│     ├─ Max Seen (AU)           [value]
-│     └─ Reset Tracking          [button]
-│
-└─▼ Settings
+└─▼ Tools
    ├─ Planet Inspector           [button]
-   ├─ Planet Size                [slider]
-   ├─ Show Orbits                [toggle]
-   ├─ Show Stars                 [toggle]
-   ├─ Show Constellations        [toggle]
-   └─ ... visual options
+   ├─ Invariable Plane Inspector [button]
+   ├─▼ Console Tests (F12)       (buttons, not toggles)
+   ├─▼ Camera
+   └─▼ Debug
 ```
 
 ---
@@ -744,7 +765,7 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 ## References
 
 1. **Three.js Documentation** - https://threejs.org/docs/
-2. **dat.GUI** - https://github.com/dataarts/dat.gui
+2. **Tweakpane v4** - https://tweakpane.github.io/docs/
 3. **Meeus, Jean** - "Astronomical Algorithms" (1998)
 4. **Souami & Souchay** - "The solar system's invariable plane" (2012)
 5. **NASA JPL Horizons** - https://ssd.jpl.nasa.gov/horizons/

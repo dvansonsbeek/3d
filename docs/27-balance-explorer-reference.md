@@ -15,7 +15,7 @@ The explorer allows users to experiment with alternative configurations to under
 
 ## Accessing the Explorer
 
-1. Open the dat.GUI Settings menu
+1. Open the Tweakpane control panel
 2. Expand the **"Invariable Plane Positions"** folder
 3. Click **"Invariable Plane Balance Explorer"**
 4. The modal overlay appears centered on screen
@@ -422,7 +422,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | `createBalanceExplorerPanel()` | [script.js:9619](../src/script.js#L9619) |
 | `updateBalanceExplorerResults()` | [script.js:9868](../src/script.js#L9868) |
 | `openBalanceExplorer()` / `closeBalanceExplorer()` | [script.js:9966](../src/script.js#L9966) |
-| Menu button in dat.GUI | [script.js:11535](../src/script.js#L11535) |
+| Menu button in Tweakpane panel | [script.js:11535](../src/script.js#L11535) |
 | CSS styles (`.fbe-` prefix) | [style.css](../src/style.css) |
 
 ---

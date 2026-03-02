@@ -1,26 +1,200 @@
 # Analysis and Export Tools Reference
 
+This document describes all data export, report generation, and validation systems in the Holistic Universe Model simulation.
+
+**Last Updated:** March 2026
+
+**Related Documents:**
+- [21 - Planet Inspector Reference](21-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
+- [22 - UI Panels Reference](22-ui-panels-reference.md) - Panel system overview
+- [11 - Orbital Formulas Reference](11-orbital-formulas-reference.md) - Calculations used in exports
+
+---
+
 ## Overview
 
-The Holistic Model includes several powerful analysis and export tools accessible via the Settings panel (gear icon). These tools allow users to generate detailed reports, validate astronomical calculations, and export data for external analysis.
+The simulation provides four export / validation systems:
+
+| System | Purpose | Output Format | Location |
+|--------|---------|---------------|----------|
+| **Planet Positions & Orbits** | All planets over a date range | Excel (.xlsx) or TSV | Reports menu |
+| **Solstices & Equinoxes** | Annual solstice/equinox data | Excel (.xlsx) | Reports menu |
+| **Year Length Analysis** | Tropical, anomalistic, sidereal year lengths | Excel (.xlsx) | Reports menu |
+| **Planet Position Reports** | Detailed validation for individual planets | Excel (.xlsx) or Clipboard | Hierarchy Inspector |
+
+Console validation tests are under **Tools > Console Tests (F12)**.
+
+All Excel exports use the [SheetJS library](https://sheetjs.com/) loaded on-demand from CDN.
 
 ---
 
 ## Location in UI
 
-All analysis tools are found in the **Settings panel** under the following folders:
-
 ```
-Settings (gear icon)
-├── Create Object File
-├── Create Solstice File
-├── Create Year Analysis Report
+Reports (observed category)
+├── Planet Positions & Orbits
+├── Solstices & Equinoxes
+└── Year Length Analysis
+
+Tools
+├── Planet Inspector          [opens Hierarchy Inspector]
+├── Invariable Plane Inspector
 └── Console Tests (F12)
 ```
 
 ---
 
-## Create Year Analysis Report
+## Part 1: Planet Positions & Orbits
+
+### Purpose
+
+Exports comprehensive planetary position and orbital element data for all objects over a configurable date range.
+
+### Location
+
+`Reports > Planet Positions & Orbits`
+
+### Controls
+
+| Control | Description |
+|---------|-------------|
+| **Mode** | `Range` or `List` — determines how dates are specified |
+| **JD list (CSV)** | Comma-separated Julian Day numbers (List mode only) |
+| **Start JD** | First Julian Day in range (Range mode only) |
+| **End JD** | Last Julian Day in range (Range mode only) |
+| **# points** | Number of evenly-spaced sample points (Range mode only) |
+| **Create file (be patient)** | Button to trigger export |
+
+### Output Files
+
+**For small datasets (< 5000 rows):**
+- Single file: `Holistic_objects_results.xlsx`
+- Contains 3 sheets
+
+**For large datasets (>= 5000 rows):**
+- Three TSV files:
+  - `Holistic_objects_EarthLongitude.tsv`
+  - `Holistic_objects_PerihelionPlanets.tsv`
+  - `Holistic_objects_SunPlanets.tsv`
+
+#### Sheet 1: Earth Longitude
+
+Earth-specific position data from different reference frames.
+
+| Column | Description |
+|--------|-------------|
+| JD | Julian Day number |
+| Date | Formatted date |
+| Time | Formatted time |
+| Year | Calendar year |
+| Earth Wobble RA | RA from wobble center frame |
+| Earth Wobble Dec | Dec from wobble center frame |
+| Earth Wobble Dist Earth | Distance (always 0) |
+| Earth Wobble Dist Sun | Sun distance (AU) |
+| Earth Longitude RA | RA from longitude frame |
+| Earth Longitude Dec | Dec from longitude frame |
+| Earth Longitude Dist Earth | Distance (AU) |
+| Earth Longitude Dist Sun | Sun distance (AU) |
+| Mid-eccentricity Orbit RA | RA from mean eccentricity frame |
+| Mid-eccentricity Orbit Dec | Dec from mean eccentricity frame |
+| Mid-eccentricity Orbit Dist Earth | Distance (AU) |
+| Mid-eccentricity Orbit Dist Sun | Sun distance (AU) |
+
+#### Sheet 2: Perihelion Planets
+
+Orbital elements for all planets (Mercury through Neptune).
+
+| Column | Description |
+|--------|-------------|
+| JD | Julian Day number |
+| Date | Formatted date |
+| Time | Formatted time |
+| Year | Calendar year |
+| {Planet} Perihelion | Longitude of perihelion (deg) |
+| {Planet} Ascending Node | Ascending node on ecliptic (deg) |
+| {Planet} Arg Periapsis | Argument of periapsis (deg) |
+| {Planet} Ecliptic Inclination | Inclination to ecliptic (deg) |
+| {Planet} Asc Node InvPlane | Ascending node on invariable plane, ICRF (deg) |
+| {Planet} Asc Node InvPlane Max Incl | Node at maximum inclination, ICRF (deg) |
+| {Planet} Inclination Phase Angle | Phase angle for inclination oscillation (deg) |
+| {Planet} InvPlane Inclination | Dynamic inclination to invariable plane (deg) |
+
+#### Sheet 3: Sun & Planets
+
+Position data for Sun and all planets.
+
+| Column | Description |
+|--------|-------------|
+| JD | Julian Day number |
+| Date | Formatted date |
+| Time | Formatted time |
+| Year | Calendar year |
+| Sun RA | Sun's Right Ascension (deg) |
+| Sun Dec | Sun's Declination (deg) |
+| Sun Distance Earth | Earth-Sun distance (AU) |
+| {Planet} RA | Planet Right Ascension (deg) |
+| {Planet} Dec | Planet Declination (deg) |
+| {Planet} Distance Earth | Earth-Planet distance (AU) |
+| {Planet} Distance Sun | Sun-Planet distance (AU) |
+
+#### TSV Format Notes
+
+- Uses system locale decimal separator (comma or period)
+- Tab-separated values for easy import
+- Compatible with Excel, LibreOffice, Google Sheets
+
+### Functions
+
+| Function | Line | Description |
+|----------|------|-------------|
+| `runRATest()` | ~19744 | Main export function |
+| `buildJdArray()` | ~19661 | Build Julian Day array from config |
+| `forceSceneUpdate()` | ~19706 | Force calculation update |
+
+---
+
+## Part 2: Solstices & Equinoxes
+
+### Purpose
+
+Exports solstice and equinox timing data with RA and obliquity for a range of years to an Excel file.
+
+### Location
+
+`Reports > Solstices & Equinoxes`
+
+### Controls
+
+| Control | Description |
+|---------|-------------|
+| **Mode** | `Range` or `List` — determines how years are specified |
+| **Year list (CSV)** | Comma-separated list of specific years (List mode only) |
+| **Start year** | First year in range (Range mode only) |
+| **End year** | Last year in range (Range mode only) |
+| **Create file (be patient)** | Button to trigger export |
+
+### Output
+
+Excel file (`Holistic_solstice_results.xlsx`) with columns:
+
+| Column | Description |
+|--------|-------------|
+| Date | Solstice date |
+| Time | Solstice time (UTC) |
+| Year | Calendar year |
+| JD | Julian Day number |
+| RA | Sun's Right Ascension (deg) |
+| Obliquity | Earth's axial tilt (deg) |
+
+### Technical Implementation
+
+**Source**: `script.js` line ~14435
+
+**Function**: `runSolsticeExport(years)`
+
+---
+
+## Part 3: Year Length Analysis
 
 ### Purpose
 
@@ -28,17 +202,17 @@ Generates a comprehensive Excel file containing year-by-year astronomical measur
 
 ### Location
 
-`Settings > Create Year Analysis Report`
+`Reports > Year Length Analysis`
 
 ### Controls
 
 | Control | Description |
 |---------|-------------|
-| **Mode** | `Range` or `List` - determines how years are specified |
+| **Mode** | `Range` or `List` — determines how years are specified |
 | **Year list (CSV)** | Comma-separated list of specific years (List mode only) |
 | **Start year** | First year in range (Range mode only) |
 | **End year** | Last year in range (Range mode only) |
-| **Create file** | Checkbox to trigger report generation |
+| **Create file (be patient)** | Button to trigger report generation |
 
 ### Output
 
@@ -57,10 +231,10 @@ Downloads an Excel file (`Holistic_year_analysis_YYYY_YYYY.xlsx`) containing 5 s
 #### Sheet 2: Cardinal Points
 
 Year-by-year Julian Day and interval data for each cardinal point:
-- Vernal Equinox (RA=0°)
-- Summer Solstice (RA=90°)
-- Autumnal Equinox (RA=180°)
-- Winter Solstice (RA=270°)
+- Vernal Equinox (RA=0 deg)
+- Summer Solstice (RA=90 deg)
+- Autumnal Equinox (RA=180 deg)
+- Winter Solstice (RA=270 deg)
 
 #### Sheet 3: Anomalistic
 
@@ -86,7 +260,7 @@ Combined view of all measurements per year:
 
 ### Technical Implementation
 
-**Source**: `script.js` lines 12423-12903
+**Source**: `script.js` line ~14499
 
 **Function**: `runYearAnalysisExport(years)`
 
@@ -109,63 +283,120 @@ Combined view of all measurements per year:
 
 ---
 
-## Create Solstice File
+## Part 4: Planet Position Reports
 
-### Purpose
+Planet position reports provide detailed validation data comparing calculated positions against NASA, JPL, and other reference sources. Reports are generated from the **Hierarchy Inspector** panel.
 
-Exports solstice timing data for a range of years to an Excel file.
+### Accessing Reports
 
-### Location
+1. Open the **Hierarchy Inspector** (`Tools > Planet Inspector`)
+2. Navigate to **Step 5** (planet validation)
+3. Click on a planet name to generate its report
+4. Use **Download Excel** or **Copy to Clipboard** buttons
 
-`Settings > Create Solstice File`
+### Report Contents
 
-### Controls
+Each report contains two data sheets plus documentation:
 
-| Control | Description |
-|---------|-------------|
-| **Mode** | `Range` or `List` - determines how years are specified |
-| **Year list (CSV)** | Comma-separated list of specific years (List mode only) |
-| **Start year** | First year in range (Range mode only) |
-| **End year** | Last year in range (Range mode only) |
-| **Create file** | Checkbox to trigger export |
+#### Sheet 1: Documentation
 
-### Output
+| Field | Description |
+|-------|-------------|
+| Report Title | Planet name and "Position Report" |
+| Generation Date | When the report was created |
+| Model Start Date | Simulation reference date |
+| Data Sources | NASA GSFC, JPL Horizons, Wikipedia, etc. |
+| Column Descriptions | Explanation of each data column |
+| Calculation Methods | Longitude to RA conversion formula |
+| Color Legend | Green/Amber/Red accuracy thresholds |
 
-Excel file with solstice dates and times for the specified years.
+#### Sheet 2: Position Data
 
-### Technical Implementation
+| Column | Description |
+|--------|-------------|
+| JD | Julian Day number |
+| Date | Formatted date (UTC) |
+| Time | Formatted time (UTC) |
+| Label | Event type (NASA date, Opposition, Occultation, etc.) |
+| Planet RA | Calculated Right Ascension |
+| Planet Dec | Calculated Declination |
+| Reference RA | Source data RA (if provided) |
+| Reference Dec | Source data Declination (if provided) |
+| Reference Longitude | Ecliptic longitude (for conjunctions) |
+| Compare Planet | Companion planet (for occultations) |
+| Companion RA | Companion planet Right Ascension |
+| Companion Dec | Companion planet Declination |
+| Planet Distance Earth | Distance from Earth (AU) |
+| Planet Distance Sun | Distance from Sun (AU) |
+| Sun RA | Sun's Right Ascension |
+| Sun Dec | Sun's Declination |
+| Sun Distance Earth | Earth-Sun distance (AU) |
 
-**Source**: `script.js` lines 10836-10874
+#### Sheet 3: Longitude Data
+
+| Column | Description |
+|--------|-------------|
+| JD | Julian Day number |
+| Date | Formatted date (UTC) |
+| Time | Formatted time (UTC) |
+| Label | Event type |
+| Long Perihelion Calc | Calculated longitude of perihelion (deg) |
+| Long Perihelion Ref | Reference longitude of perihelion (deg) |
+| Long Perihelion Diff | Difference (deg) |
+| Asc Node Calc | Calculated ascending node (deg) |
+| Asc Node Ref | Reference ascending node (deg) |
+| Asc Node Diff | Difference (deg) |
+| Arg Periapsis Calc | Calculated argument of periapsis (deg) |
+
+### Accuracy Color Coding
+
+The on-screen report uses color coding to indicate accuracy:
+
+| Color | RA Difference | Meaning |
+|-------|---------------|---------|
+| Green | <= 5 minutes | Excellent accuracy |
+| Amber | 5-15 minutes | Acceptable accuracy |
+| Red | > 15 minutes | Needs investigation |
+
+### Event Types
+
+Reports include various astronomical events:
+
+| Event Type | Description | Comparison Method |
+|------------|-------------|-------------------|
+| NASA date | Transit/inferior conjunction | Planet RA vs Sun RA |
+| Opposition | Planet opposite to Sun | Planet RA vs Sun RA + 12h |
+| Occultation | Close conjunction | Both planets vs reference longitude |
+| JPL reference | JPL Horizons validation | Direct RA/Dec comparison |
+
+### Functions
+
+| Function | Line | Description |
+|----------|------|-------------|
+| `generatePlanetReport(planetKey, showAll)` | ~20624 | Main report generator |
+| `exportPlanetReportToExcel(planetKey, excelData)` | ~20688 | Excel export |
+| `copyReportToClipboard(reportText)` | ~20768 | Clipboard copy |
+| `collectPlanetDataForDate(planetKey, testDate)` | ~20146 | Data collection helper |
+| `buildReportHeader(planetKey)` | ~20252 | Screen header builder |
+| `buildDateSection(planetKey, testDate, data)` | ~20458 | Screen section builder |
+| `generateAndDisplayReport(planetKey)` | ~20792 | UI integration |
+
+### Global State
+
+```javascript
+_currentReportData = {
+  planetKey: string,        // Planet identifier
+  screenReport: string,     // HTML-formatted report
+  excelData: {
+    positionRows: array,    // Position data rows
+    longitudeRows: array    // Longitude data rows
+  }
+}
+```
 
 ---
 
-## Create Object File
-
-### Purpose
-
-Exports position and property data for celestial objects.
-
-### Location
-
-`Settings > Create Object File`
-
-### Controls
-
-| Control | Description |
-|---------|-------------|
-| **Mode** | `Range` or `List` |
-| **Year list (CSV)** | Comma-separated list (List mode) |
-| **Start year** | First year (Range mode) |
-| **End year** | Last year (Range mode) |
-| **Create file** | Trigger export |
-
-### Technical Implementation
-
-**Source**: `script.js` lines 10797-10835
-
----
-
-## Console Tests (F12)
+## Part 5: Console Tests (F12)
 
 ### Purpose
 
@@ -173,7 +404,7 @@ Runs detailed astronomical validation tests with output to the browser's Develop
 
 ### Location
 
-`Settings > Console Tests (F12)`
+`Tools > Console Tests (F12)`
 
 ### Configuration
 
@@ -214,13 +445,10 @@ Results are printed to the browser console with:
 ### Example Console Output
 
 ```
-══════════════════════════════════════════════════════════════════════════
 TROPICAL YEAR ANALYSIS (VERNAL EQUINOX)
-══════════════════════════════════════════════════════════════════════════
 Year range: 2000 to 2025
 
 Year    VE Julian Day    Interval (days)    IAU Ref (days)    Diff (seconds)
-─────────────────────────────────────────────────────────────────────────
 2001    2451991.234567   365.242374         365.242374        +0.12
 2002    2452356.477891   365.243324         365.242374        +82.15
 ...
@@ -229,35 +457,8 @@ SUMMARY:
   Mean tropical year: 365.242374 days
   IAU J2000 reference: 365.242374 days
   Difference: +0.05 seconds
-  Status: ✓ PASS (within ±1 second tolerance)
+  Status: PASS (within +/-1 second tolerance)
 ```
-
-### Technical Implementation
-
-**Source**: `script.js` lines 10918-10969 (UI setup), various analysis functions
-
-**Key Functions**:
-- `sunRACrossingForYear()` - Finds when Sun crosses a specific RA
-- `perihelionForYearMethodB()` - Finds perihelion using distance minimization
-- `aphelionForYearMethodB()` - Finds aphelion using distance maximization
-
----
-
-## Planet Report Export
-
-### Purpose
-
-Exports detailed statistics for a specific planet to Excel format.
-
-### Location
-
-Available via the Planet Stats panel when viewing a planet's details.
-
-### Technical Implementation
-
-**Source**: `script.js` lines 18602+
-
-**Function**: `exportPlanetReportToExcel(planetKey, excelData)`
 
 ---
 
@@ -266,6 +467,8 @@ Available via the Planet Stats panel when viewing a planet's details.
 ### sunRACrossingForYear(year, targetRA, prevJD)
 
 Finds the Julian Day when the Sun crosses a specific Right Ascension value.
+
+**Location**: line ~13644
 
 **Parameters**:
 - `year` - Calendar year
@@ -278,6 +481,8 @@ Finds the Julian Day when the Sun crosses a specific Right Ascension value.
 
 Finds the perihelion (closest approach to Sun) for a given year.
 
+**Location**: line ~14109
+
 **Parameters**:
 - `year` - Calendar year
 - `verbose` - Boolean for console logging
@@ -288,6 +493,8 @@ Finds the perihelion (closest approach to Sun) for a given year.
 ### aphelionForYearMethodB(year, verbose, prevJD)
 
 Finds the aphelion (farthest point from Sun) for a given year.
+
+**Location**: line ~14209
 
 **Parameters**:
 - `year` - Calendar year
@@ -300,6 +507,8 @@ Finds the aphelion (farthest point from Sun) for a given year.
 
 Calculates the apparent Right Ascension angle between two planet data objects in Earth's equatorial frame.
 
+**Location**: line ~26429
+
 **Parameters**:
 - `pdA` - First planet data object
 - `pdB` - Second planet data object
@@ -307,6 +516,42 @@ Calculates the apparent Right Ascension angle between two planet data objects in
 **Returns**: Angle in radians
 
 **Usage**: Used for perihelion longitude calculations. See [13-perihelion-precession.md](13-perihelion-precession.md) for details.
+
+---
+
+## Utility Functions
+
+### Library Loading
+
+| Function | Line | Description |
+|----------|------|-------------|
+| `ensureSheetJs()` | ~19727 | Load SheetJS from CDN on-demand |
+| `workbookToBlob(wb)` | ~19738 | Convert workbook to downloadable blob |
+
+### Coordinate Conversion
+
+| Function | Line | Description |
+|----------|------|-------------|
+| `raToHMSFromRadians(rad)` | ~20052 | Radians to HMS format |
+| `raDecimalHoursToHMS(decimalHours)` | ~20065 | Decimal hours to HMS |
+| `decDecimalDegreesToDMS(decimalDegrees)` | ~20078 | Decimal degrees to DMS |
+| `longitudeToRAHMS(longitudeDeg, obliquityDeg)` | ~20388 | Ecliptic longitude to RA |
+
+**Longitude to RA Formula:**
+```
+RA = atan2(sin(l) * cos(e), cos(l))
+```
+Where l = ecliptic longitude, e = obliquity
+
+### Validation Functions
+
+| Function | Line | Description |
+|----------|------|-------------|
+| `compareRAToSun(planetRARad, sunRARad)` | ~20283 | NASA transit validation |
+| `compareRAOpposition(planetRARad, sunRARad)` | ~20306 | Opposition alignment check |
+| `compareRAToReference(planetRARad, refRA)` | ~20334 | Reference data comparison |
+| `compareRAToLongitude(planetRARad, longitudeDeg, obliquityDeg)` | ~20419 | Occultation validation |
+| `compareDecValues(calculatedDecRad, refDecStr)` | ~20261 | Declination within 1 deg |
 
 ---
 
@@ -327,14 +572,54 @@ The analysis tools compare against these IAU J2000 reference values:
 
 ---
 
-## Tips for Using Analysis Tools
+## Data Sources
 
-1. **Performance**: Year Analysis Report can take several minutes for large year ranges. The console shows progress updates.
+Reports compare against these reference sources:
 
-2. **List Mode**: Use comma-separated years for non-consecutive analysis (e.g., "2000, 2025, 2050, 2100").
+| Source | URL | Data Type |
+|--------|-----|-----------|
+| NASA GSFC | gsfc.nasa.gov | Transit dates, positions |
+| JPL Horizons | ssd.jpl.nasa.gov | Orbital elements, ephemerides |
+| Wikipedia | wikipedia.org | Opposition dates, conjunctions |
+| IAU | iau.org | Standard values |
 
-3. **Console Tests**: Open Developer Tools (F12) before running to see detailed output.
+---
 
-4. **Validation**: Compare model output against IAU references to verify accuracy.
+## Technical Notes
 
-5. **Export Formats**: All exports use Excel format (.xlsx) via the SheetJS library.
+### Performance
+
+- Report generation pauses the simulation (`o.Run = false`)
+- Jumps to each test date sequentially
+- Uses `requestAnimationFrame` yielding every 25 rows
+- Restores previous state after completion
+- Year Analysis can take several minutes for large year ranges; the console shows progress
+
+### Memory Management
+
+- Large datasets (>= 5000 rows) use TSV to avoid memory issues
+- Excel files are generated in-memory before download
+- SheetJS library loaded only when needed
+
+### Browser Compatibility
+
+- Uses `navigator.clipboard.writeText()` for clipboard
+- Uses `URL.createObjectURL()` for downloads
+- Requires modern browser with Blob support
+
+---
+
+## Tips
+
+1. **List Mode**: Use comma-separated years for non-consecutive analysis (e.g., "2000, 2025, 2050, 2100").
+
+2. **Console Tests**: Open Developer Tools (F12) before running to see detailed output.
+
+3. **Validation**: Compare model output against IAU references to verify accuracy.
+
+4. **Export Formats**: All exports use Excel format (.xlsx) via the SheetJS library. Large bulk exports fall back to TSV.
+
+---
+
+**Previous**: [22 - UI Panels Reference](22-ui-panels-reference.md)
+**Next**: [26 - Fibonacci Laws](26-fibonacci-laws.md)
