@@ -932,6 +932,94 @@ a:link {
   animation:pl-pulse 1.8s ease-in-out 3;
 }
 
+/* ─── Helper toggle eye icon ─── */
+
+/* hidden in expanded handle (too narrow) */
+.pl-handle-eye{ display:none; }
+
+/* visible in collapsed handle */
+#planetLabel.pl-collapsed .pl-handle-eye{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:22px; height:22px;
+  position:absolute;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06);
+  cursor:pointer;
+  transition:background .15s, border-color .15s, opacity .15s;
+  opacity:.7;
+}
+#planetLabel.pl-collapsed .pl-handle-eye:hover{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,255,255,.4);
+  opacity:1;
+}
+#planetLabel.pl-collapsed .pl-handle-eye svg{
+  width:13px; height:13px;
+  fill:none;
+  stroke:rgba(255,255,255,.8);
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+/* slashed state */
+#planetLabel.pl-collapsed .pl-handle-eye.eye-off{
+  opacity:.35;
+  border-color:rgba(255,255,255,.15);
+}
+#planetLabel.pl-collapsed .pl-handle-eye.eye-off svg{
+  stroke:rgba(255,255,255,.5);
+}
+
+/* nav bar eye button (expanded panel) — pill shape to stand out from nav arrows */
+.pl-nav-eye{
+  width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(239,192,74,.3);
+  border-radius:13px;
+  background:rgba(239,192,74,.08);
+  cursor:pointer;
+  flex-shrink:0;
+  transition:background .15s, border-color .15s, opacity .15s;
+  user-select:none;
+  opacity:.85;
+}
+.pl-nav-eye:hover{
+  background:rgba(239,192,74,.16);
+  border-color:rgba(239,192,74,.45);
+  opacity:1;
+}
+.pl-nav-eye svg{
+  width:14px; height:14px;
+  fill:none;
+  stroke:rgba(239,192,74,.85);
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.pl-nav-eye-label{
+  font:500 9px/1 var(--pl-body-font);
+  color:rgba(239,192,74,.75);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.pl-nav-eye.eye-off{
+  opacity:.4;
+  border-color:rgba(255,255,255,.1);
+  background:rgba(255,255,255,.03);
+}
+.pl-nav-eye.eye-off svg{
+  stroke:rgba(255,255,255,.4);
+}
+.pl-nav-eye.eye-off .pl-nav-eye-label{
+  color:rgba(255,255,255,.35);
+}
+
 /* ─── Scene watermark ─── */
 #sceneWatermark{
   position:fixed;

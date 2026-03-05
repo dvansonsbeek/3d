@@ -4991,6 +4991,56 @@ erosPerihelionDurationEcliptic2.pivotObj.add(erosFixedPerihelionAtSun.containerO
 // b) We need to be able to point to polaris + pointing to the EARTH-WOBBLE-CENTER at RA 6h
 // c) Close to J2000 values so we can check and compare all values
 earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
+
+//*************************************************************
+// FLOATING LABELS for helper objects (CSS2DObject)
+//*************************************************************
+
+const helperLabelStyle =
+  'text-align:center;pointer-events:none;line-height:1.35;' +
+  'padding:5px 10px 3px;border-radius:8px;' +
+  'background:rgba(8,12,18,.72);' +
+  'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);' +
+  'border:1px solid rgba(255,255,255,.12);' +
+  'box-shadow:0 2px 10px rgba(0,0,0,.4);' +
+  'transition:opacity .4s ease;opacity:0;';
+
+const helperPointer = '<div style="margin-top:3px;color:rgba(255,255,255,.3);font-size:8px;line-height:1;">&#9660;</div>';
+
+/* — Earth Wobble Center label — */
+const wobbleLabelDiv = document.createElement('div');
+wobbleLabelDiv.style.cssText = helperLabelStyle;
+wobbleLabelDiv.innerHTML =
+  '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Precession Center</div>' +
+  '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of Earth\'s wobble</div>' +
+  helperPointer;
+const wobbleLabelObj = new CSS2DObject(wobbleLabelDiv);
+wobbleLabelObj.position.set(0, 0.04, 0);
+earthWobbleCenter.rotationAxis.add(wobbleLabelObj);
+earthWobbleCenter.labelObj = wobbleLabelObj;
+earthWobbleCenter._labelDiv = wobbleLabelDiv;
+
+/* — Perihelion of Earth label — */
+const periLabelDiv = document.createElement('div');
+periLabelDiv.style.cssText = helperLabelStyle;
+periLabelDiv.innerHTML =
+  '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(254,170,13,.95);letter-spacing:.03em;">Earth Perihelion</div>' +
+  '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(254,170,13,.45);margin-top:2px;">Sun orbits this point at 1 AU</div>' +
+  '<div style="margin-top:3px;color:rgba(254,170,13,.35);font-size:8px;line-height:1;">&#9660;</div>';
+const periLabelObj = new CSS2DObject(periLabelDiv);
+periLabelObj.position.set(0, 0.08, 0);
+earthPerihelionFromEarth.rotationAxis.add(periLabelObj);
+earthPerihelionFromEarth.labelObj = periLabelObj;
+earthPerihelionFromEarth._labelDiv = periLabelDiv;
+
+/* Distance thresholds for fade-in/out (scene units; 100 = 1 AU) */
+const HELPER_LABEL_FADE_IN  = 5;     /* fully visible below 0.05 AU */
+const HELPER_LABEL_FADE_OUT = 20;    /* start fading in below 0.2 AU */
+const _helperLabelObjects = [
+  { obj: earthWobbleCenter,        div: wobbleLabelDiv },
+  { obj: earthPerihelionFromEarth,  div: periLabelDiv },
+];
+
 //END CREATE AND CONFIGURE PLANETS
 
 //*************************************************************
@@ -13905,6 +13955,16 @@ function render(now) {
       domElapsed = 0;
       updateDomLabel();
       dateHUD.textContent = o.Date;
+
+      /* fade helper labels based on camera distance */
+      const camDist = camera.position.distanceTo(controls.target);
+      for (const hl of _helperLabelObjects) {
+        if (!hl.obj.visible) { hl.div.style.opacity = '0'; continue; }
+        const a = camDist <= HELPER_LABEL_FADE_IN  ? 1
+                : camDist >= HELPER_LABEL_FADE_OUT ? 0
+                : 1 - (camDist - HELPER_LABEL_FADE_IN) / (HELPER_LABEL_FADE_OUT - HELPER_LABEL_FADE_IN);
+        hl.div.style.opacity = a.toFixed(3);
+      }
     }
 
     // 8) Throttle lighting/glow (10 Hz)
@@ -26856,6 +26916,38 @@ function updateDomLabel () {
       }
     });
 
+    /* ── SVG eye icons (open / slashed) ── */
+    const EYE_OPEN_SVG  = '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const EYE_CLOSE_SVG = '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line x1="4" y1="20" x2="20" y2="4"/></svg>';
+
+    /* ── Helper-object toggle state ── */
+    let helpersVisible = true;
+    const helperObjects = [earthWobbleCenter, earthPerihelionFromEarth];
+
+    function toggleHelpers () {
+      helpersVisible = !helpersVisible;
+      for (const obj of helperObjects) {
+        obj.visible = helpersVisible;
+        showHideObject(obj);
+      }
+      /* update both eye icon elements */
+      const method = helpersVisible ? 'remove' : 'add';
+      handleEye.classList[method]('eye-off');
+      handleEye.innerHTML = helpersVisible ? EYE_OPEN_SVG : EYE_CLOSE_SVG;
+      handleEye.title = helpersVisible ? 'Hide helper objects' : 'Show helper objects';
+      navEye.classList[method]('eye-off');
+      navEye.innerHTML = helpersVisible ? EYE_OPEN_SVG : EYE_CLOSE_SVG;
+      navEye.title = handleEye.title;
+      positionChanged = true;          // force scene refresh
+    }
+
+    /* ── Nav-bar eye button (expanded panel) ── */
+    const navEye = document.createElement('span');
+    navEye.className = 'pl-nav-eye';
+    navEye.innerHTML = EYE_OPEN_SVG;
+    navEye.title = 'Hide helper objects';
+    navEye.addEventListener('click', e => { e.stopPropagation(); toggleHelpers(); });
+
     /* planet navigation bar (persistent — includes close button) */
     const navBar = document.createElement('div');
     navBar.className = 'pl-nav';
@@ -26863,7 +26955,8 @@ function updateDomLabel () {
       '<button class="pl-nav-arrow pl-nav-prev" aria-label="Previous planet">\u2039</button>' +
       '<button class="pl-nav-name"></button>' +
       '<button class="pl-nav-arrow pl-nav-next" aria-label="Next planet">\u203A</button>';
-    navBar.appendChild(closeBtn);   // × as rightmost nav element
+    navBar.appendChild(navEye);      // 👁 before × in nav bar
+    navBar.appendChild(closeBtn);    // × as rightmost nav element
 
     /* dropdown for direct planet selection */
     const dropdown = document.createElement('div');
@@ -26941,10 +27034,12 @@ function updateDomLabel () {
     /* collapsible handle — direct child of label, visible even when content is hidden */
     const handle = document.createElement('div');
     handle.className = 'pl-handle';
-    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-dot"></span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span>';
+    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-dot"></span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span><span class="pl-handle-eye" title="Hide helper objects">' + EYE_OPEN_SVG + '</span>';
     handle.title = 'Click to expand planet information panel';
     handle.addEventListener('click', e => {
       e.stopPropagation();
+      /* ignore clicks on the eye icon — it has its own handler */
+      if (e.target.closest('.pl-handle-eye')) return;
       const isCollapsed = label.classList.toggle('pl-collapsed');
       handle.querySelector('.pl-handle-chevron').textContent = isCollapsed ? '\u203A' : '\u2039';
       if (!isCollapsed) {
@@ -26953,6 +27048,10 @@ function updateDomLabel () {
         updateDomLabel();
       }
     });
+
+    /* handle eye icon — toggle helper objects */
+    const handleEye = handle.querySelector('.pl-handle-eye');
+    handleEye.addEventListener('click', e => { e.stopPropagation(); toggleHelpers(); });
 
     /* assemble */
     content.appendChild(navBar);     // persistent planet nav (includes close btn)
@@ -31370,12 +31469,15 @@ function showHideObject(obj) {
       if (obj.visible) {
         obj.axisHelper.visible = o['Axis helpers']
       } else {
-        obj.axisHelper.visible = obj.visible;                       
+        obj.axisHelper.visible = obj.visible;
       }
-    }  
+    }
     if (obj.ringObj) {
     obj.ringObj.visible = obj.visible;
   }
+    if (obj.labelObj) {
+      obj.labelObj.visible = obj.visible;
+    }
 }
 
 function showHideAxisHelpers() {
