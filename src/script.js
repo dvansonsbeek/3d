@@ -4709,7 +4709,7 @@ scene.background = new THREE.Color( o.background );
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 // —– setup once —–
 const labelRenderer = new CSS2DRenderer();
@@ -6364,6 +6364,8 @@ let needsLabelUpdate = true;
 // 2) Whenever you know the labels need repositioning:
 //    • On camera move:
 controls.addEventListener('change', () => { needsLabelUpdate = true; });
+//    • On user interaction start (wakes render loop from idle for controls.update):
+controls.addEventListener('start', () => { positionChanged = true; });
 //    • On zoom (if separate):
 camera.addEventListener('zoom',   () => { needsLabelUpdate = true; });
 
@@ -6482,7 +6484,6 @@ const flares = [
 //*************************************************************
 // START SCENE
 //*************************************************************
-const clock = new THREE.Clock(); 
 
 // --------------------------------------------------------
 // initial setup — run ONCE, right after you create renderer,
@@ -6598,6 +6599,7 @@ let lightElapsed =0;
 let updatePredictionElapsed = 0;
 let astroCalcElapsed = 0;  // Throttle for heavy astronomical calculations (10 Hz)
 let visualElapsed = 0;  // Throttle for visual effects (30 Hz)
+let labelElapsed = 0;   // Throttle for CSS2D label updates during playback (30 Hz)
 
 let cameraMoved = true; // Force first update
 let positionChanged = false; // Set true when date/time changed externally (GUI, jump, etc.)
@@ -12301,6 +12303,12 @@ function setupGUI() {
   gui.element.setAttribute('aria-label', 'Simulation Controls');
   o._guiPane = gui; // expose for render-loop refresh
 
+  // Any GUI change triggers a render (visibility toggles, sliders, colors etc.)
+  // Guard: ignore changes fired by the render loop's own .refresh() calls
+  gui.on('change', () => {
+    if (!o._renderLoopRefreshing) positionChanged = true;
+  });
+
   // Version subtitle under panel title
   const titleEl = gui.element.querySelector('.tp-rotv_t');
   if (titleEl) {
@@ -13792,16 +13800,38 @@ document.addEventListener('keydown', e => {
 //*************************************************************
 function render(now) {
   requestAnimationFrame(render);
+
+  // 0) Cap at ~60 FPS — skip redundant frames on high-refresh displays
+  if (now - lastFrameTime < 16.0) return;
+
+  // 1) Delta
+  const deltaMs = now - lastFrameTime;
+  lastFrameTime = now;
+  const delta = deltaMs * 0.001;
+
+  // 2) Did the camera move? (epsilon threshold lets OrbitControls damping settle)
+  const { x, y, z } = camera.position;
+  const CAM_EPS = 1e-6;
+  cameraMoved = (Math.abs(x - lastCameraX) > CAM_EPS ||
+                 Math.abs(y - lastCameraY) > CAM_EPS ||
+                 Math.abs(z - lastCameraZ) > CAM_EPS);
+  if (cameraMoved) { lastCameraX = x; lastCameraY = y; lastCameraZ = z; }
+
+  // ★ 3) IDLE CHECK — skip everything when nothing changed → ~0% CPU
+  // Wake triggers: o.Run, cameraMoved, positionChanged (GUI/resize/drag),
+  //                needsLabelUpdate (camera zoom/orbit events)
+  const active = o.Run || cameraMoved || positionChanged || needsLabelUpdate;
+  if (!active) return;
+
   //stats.begin();
   //stats.update();
 
-  // 1) Delta and FPS throttle
-  const deltaMs = now - lastFrameTime;
-  lastFrameTime = now;
-  const delta   = deltaMs * 0.001;    // seconds/frame
-  const fps     = 1000 / deltaMs;
-  smoothedFps   = smoothedFps * 0.9 + fps * 0.1;
+  const forceAllUpdates = positionChanged;
+  positionChanged = false;
 
+  // 4) FPS smoothing + adaptive pixel ratio
+  const fps = 1000 / deltaMs;
+  smoothedFps = smoothedFps * 0.9 + fps * 0.1;
   if (smoothedFps < 30 && !lowPerformanceMode) {
     renderer.setPixelRatio(1);
     lowPerformanceMode = true;
@@ -13810,45 +13840,51 @@ function render(now) {
     lowPerformanceMode = false;
   }
 
-  // 2) Did the camera move?
-  const { x, y, z } = camera.position;
-  cameraMoved = (x !== lastCameraX || y !== lastCameraY || z !== lastCameraZ);
-  lastCameraX = x; lastCameraY = y; lastCameraZ = z;
-
-  // 3) OrbitControls: point at your selected pivot
-  // If hierarchy inspector is controlling camera, use its target instead
-  if (hierarchyInspector._cameraControlActive && hierarchyInspector._cameraTarget?.pivotObj) {
-    controls.target.copy(
-      hierarchyInspector._cameraTarget.pivotObj.getWorldPosition(tmpVec)
-    );
-  } else if (o.lookAtObj && o.lookAtObj.pivotObj) {
-    controls.target.copy(
-      o.lookAtObj.pivotObj.getWorldPosition(tmpVec)
-    );
+  // 5) OrbitControls: point at your selected pivot
+  // Only recompute target when scene objects moved (Run/positionChanged),
+  // NOT on pure camera movement — getWorldPosition() matrix math causes
+  // floating-point micro-jitter that prevents damping from ever settling.
+  if (o.Run || forceAllUpdates) {
+    if (hierarchyInspector._cameraControlActive && hierarchyInspector._cameraTarget?.pivotObj) {
+      controls.target.copy(
+        hierarchyInspector._cameraTarget.pivotObj.getWorldPosition(tmpVec)
+      );
+    } else if (o.lookAtObj && o.lookAtObj.pivotObj) {
+      controls.target.copy(
+        o.lookAtObj.pivotObj.getWorldPosition(tmpVec)
+      );
+    }
   }
   controls.update();
 
-  // Enforce minimum distance after damping (prevents drifting into planet)
-  // Skip when hierarchy inspector is controlling camera (it has its own targets)
+  // Enforce minimum distance (prevents drifting into planet)
   if (!hierarchyInspector._cameraControlActive && o.lookAtObj?.planetObj && o.lookAtObj.size) {
-    // Use rotationAxis scale (where blow-up slider applies) not planetObj scale
     const scale = o.lookAtObj.rotationAxis?.scale?.x ?? 1;
     const visualRadius = o.lookAtObj.size * scale;
     const multiplier = getCameraMinDistMultiplier(o.lookAtObj.name);
     const minDist = visualRadius * multiplier;
     const dist = camera.position.distanceTo(controls.target);
     if (dist < minDist) {
-      // Push camera back to minimum distance
       _camDir.copy(camera.position).sub(controls.target).normalize();
       camera.position.copy(controls.target).add(_camDir.multiplyScalar(minDist));
     }
   }
 
-  // 4) Throttle the human-readable GUI (20 Hz)
-  //    Also force update when positionChanged (position jumped externally)
+  // 6) Advance the simulation time (once per frame)
+  if (o.Run) {
+    o.pos += Number(o.speedFact) * o.speed * delta;
+    // Throttle CSS2D label updates to 30 Hz during playback
+    labelElapsed += delta;
+    if (labelElapsed >= 0.033) {
+      labelElapsed = 0;
+      needsLabelUpdate = true;
+    }
+  }
+
+  // 7) Throttle the human-readable GUI (20 Hz)
   let uiUpdateThisFrame = false;
   uiElapsed += delta;
-  if (uiElapsed >= 0.05 || positionChanged) {
+  if (uiElapsed >= 0.05 || forceAllUpdates) {
     if (uiElapsed >= 0.05) uiElapsed = 0;
     uiUpdateThisFrame = true;
     o.Day           = posToDays(o.pos);
@@ -13861,7 +13897,6 @@ function render(now) {
     o.perihelionprecessioncycleYear = yearInCycle(o.currentYear, balancedYear, holisticyearLength);
 
     o.juliandaysbalancedJD = o.julianDay - balancedJD;
-    //console.log(o.perihelionprecessioncycleYear)
     // Easter egg/ Can be added later
     //     if (isPerihelionCycle(o.periheliondate, 'perihelionday', ) && !eggTriggered) {
     //       eggTriggered = true;
@@ -13872,10 +13907,7 @@ function render(now) {
     o.worldCamY = Math.round(y);
     o.worldCamZ = Math.round(z);
 
-    // Refresh only the root controls that need live updating.
-    // dat.GUI used .listen() which auto-polled individual fields without
-    // disrupting other controls. Tweakpane has no equivalent, so we
-    // selectively refresh only the root date/time/JD/perihelion controls.
+    // Refresh root controls (date/time/JD/perihelion) for live updating.
     // _renderLoopRefreshing prevents the change handlers from running
     // blurActiveInput() which would close open dropdowns elsewhere in the GUI.
     if (o._rootCtrls) {
@@ -13889,122 +13921,100 @@ function render(now) {
     }
   }
 
-  // 5) Advance the simulation time (once per frame)
-  if (o.Run) {
-    o.pos += Number(o.speedFact) * o.speed * delta;
-    needsLabelUpdate = true;       // CSS2D labels must follow moving objects
+  // 8) Update models, positions, and all throttled subsystems
+  trace(o.pos);
+  moveModel(o.pos);
+  //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy
+  updatePositions();
+
+  // Throttle display string updates (20 Hz) - must be after updatePositions()
+  if (uiUpdateThisFrame || forceAllUpdates) {
+    updatePositionDisplayStrings();
   }
 
-  // 6) Skip heavy updates when idle (not running and camera not moving)
-  const needsUpdate = o.Run || cameraMoved || positionChanged;
-  const forceAllUpdates = positionChanged; // When position jumps, force all throttled updates immediately
+  // 8b) Throttle heavy astronomical calculations (10 Hz)
+  astroCalcElapsed += delta;
+  if (astroCalcElapsed >= 0.1 || forceAllUpdates) {
+    astroCalcElapsed = 0;
+    updatePredictions();
+    updatePerihelion();
+    updateAscendingNodes();
+    updatePlanetAnomalies();
+    updateMoonOrbitalElements();
+    updatePlanetInvariablePlaneHeights();
+    updateDynamicInclinations();
+    updateInvariablePlaneBalance();
+    updateBalanceTrendAnalysis();
+    updateBalanceMinMax();
+    calculateInvariablePlaneFromAngularMomentum();
+    updateHierarchyLiveData();
+    updateInclinationPathMarker();
+    updateInvariablePlanePosition();
+    updateSunCenteredInvPlane();
+  }
 
-  if (needsUpdate) {
-    positionChanged = false; // Reset flag after handling
-    // 6a) Must-run-every-frame: updates your models
-    trace(o.pos);
-    moveModel(o.pos);
-    //detectAndUpdateDeltaT(); // can calculate Delta T but is quite heavy. If you switch it on, also switch on the menu-items/ info-box-itms.
-    updatePositions();
-    // Throttle display string updates (20 Hz) - must be after updatePositions() sets numeric values
-    if (uiUpdateThisFrame || forceAllUpdates) {
-      updatePositionDisplayStrings();
-    }
-    // 6b) Throttle heavy astronomical calculations (10 Hz)
-    astroCalcElapsed += delta;
-    if (astroCalcElapsed >= 0.1 || forceAllUpdates) {
-      astroCalcElapsed = 0;
-      updatePredictions(); // Heavy - 50+ computations, values change slowly
-      updatePerihelion(); // Must be before updateAscendingNodes() so perihelion values are current
-      updateAscendingNodes(); // Must be before updateHierarchyLiveData() so dynamic values are current
-      updatePlanetAnomalies(); // Must be after updateAscendingNodes(), calculates Mean/True Anomaly for all planets
-      updateMoonOrbitalElements(); // Must be after updatePlanetAnomalies(), calculates Moon anomalies with Earth as focus
-      updatePlanetInvariablePlaneHeights(); // Must be after updatePlanetAnomalies(), calculates height above invariable plane
-      updateDynamicInclinations(); // Must be after updatePlanetInvariablePlaneHeights(), calculates ecliptic inclination to ecliptic
-      updateInvariablePlaneBalance(); // Must be after updatePlanetInvariablePlaneHeights(), calculates mass-weighted balance
-      updateBalanceTrendAnalysis(); // Must be after updateInvariablePlaneBalance(), records samples when tracking active
-      updateBalanceMinMax(); // Must be after updateInvariablePlaneBalance(), tracks min/max every frame
-      calculateInvariablePlaneFromAngularMomentum(); // Validation: Option A calculation (fixed J2000 elements)
-      updateHierarchyLiveData(); // Must be after updatePositions() which sets raDisplay/decDisplay
-      updateInclinationPathMarker();
-      updateInvariablePlanePosition();
-      updateSunCenteredInvPlane(); // Sun-centered invariable plane for all planets
-    }
-    // 6c) Throttle visual effects (30 Hz) - smooth enough for eye, saves CPU
-    visualElapsed += delta;
-    if (visualElapsed >= 0.033 || forceAllUpdates) {
-      visualElapsed = 0;
-      updateLightingForFocus();
-      updateFlares();
-    }
-    if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
-    if (earth._updateEraFunc)    earth._updateEraFunc(o.julianDay);
-    updateSunGlow();
+  // 8c) Throttle visual effects (30 Hz)
+  visualElapsed += delta;
+  if (visualElapsed >= 0.033 || forceAllUpdates) {
+    visualElapsed = 0;
+    updateLightingForFocus();
+    updateFlares();
+  }
+  if (earth._updateSunDirFunc) earth._updateSunDirFunc(sun.planetObj);
+  if (earth._updateEraFunc)    earth._updateEraFunc(o.julianDay);
+  updateSunGlow();
 
-    // 7) Throttle astro-heavy updates (10 Hz)
-    posElapsed += delta;
-    if (posElapsed >= 0.1 || forceAllUpdates) {
-      posElapsed = 0;
-      updateElongations();
-      // updatePerihelion() is now called in block 6b before updateAscendingNodes()
-      updateOrbitOrientations();
-      golden.update();
+  // 8d) Throttle astro-heavy updates (10 Hz)
+  posElapsed += delta;
+  if (posElapsed >= 0.1 || forceAllUpdates) {
+    posElapsed = 0;
+    updateElongations();
+    updateOrbitOrientations();
+    golden.update();
+  }
+
+  // 8e) Throttle DOM label updates (5 Hz)
+  domElapsed += delta;
+  if (domElapsed >= 0.2 || forceAllUpdates) {
+    domElapsed = 0;
+    updateDomLabel();
+    dateHUD.textContent = o.Date;
+
+    const periDistEl = document.getElementById('periDistHUD');
+    if (periDistEl && earthPerihelionFromEarth.distAU != null) {
+      periDistEl.textContent = earthPerihelionFromEarth.distAU.toFixed(8) + ' AU';
     }
 
-    // 7b) Throttle DOM label updates (5 Hz) - separated from astro updates for performance
-    domElapsed += delta;
-    if (domElapsed >= 0.2 || forceAllUpdates) {
-      domElapsed = 0;
-      updateDomLabel();
-      dateHUD.textContent = o.Date;
-
-      /* update perihelion distance on floating label */
-      const periDistEl = document.getElementById('periDistHUD');
-      if (periDistEl && earthPerihelionFromEarth.distAU != null) {
-        periDistEl.textContent = earthPerihelionFromEarth.distAU.toFixed(8) + ' AU';
-      }
-
-      /* fade helper labels based on camera distance */
-      const camDist = camera.position.distanceTo(controls.target);
-      for (const hl of _helperLabelObjects) {
-        if (!hl.obj.visible) { hl.div.style.opacity = '0'; continue; }
-        const a = camDist <= HELPER_LABEL_FADE_IN  ? 1
-                : camDist >= HELPER_LABEL_FADE_OUT ? 0
-                : 1 - (camDist - HELPER_LABEL_FADE_IN) / (HELPER_LABEL_FADE_OUT - HELPER_LABEL_FADE_IN);
-        hl.div.style.opacity = a.toFixed(3);
-      }
-    }
-
-    // 8) Throttle lighting/glow (10 Hz)
-    lightElapsed += delta;
-    if (lightElapsed >= 0.1 || forceAllUpdates) {
-      lightElapsed = 0;
-      updateFocusRing();
-      animateGlow(); // zodiac animation
+    const camDist = camera.position.distanceTo(controls.target);
+    for (const hl of _helperLabelObjects) {
+      if (!hl.obj.visible) { hl.div.style.opacity = '0'; continue; }
+      const a = camDist <= HELPER_LABEL_FADE_IN  ? 1
+              : camDist >= HELPER_LABEL_FADE_OUT ? 0
+              : 1 - (camDist - HELPER_LABEL_FADE_IN) / (HELPER_LABEL_FADE_OUT - HELPER_LABEL_FADE_IN);
+      hl.div.style.opacity = a.toFixed(3);
     }
   }
 
-  // Always run cloud animation (even when idle)
+  // 8f) Throttle lighting/glow (10 Hz)
+  lightElapsed += delta;
+  if (lightElapsed >= 0.1 || forceAllUpdates) {
+    lightElapsed = 0;
+    updateFocusRing();
+    animateGlow();
+  }
+
+  // 9) Cloud animation
   if (earth._updateCloudsFunc) earth._updateCloudsFunc(delta);
 
-  // 9) Camera-move-dependent fades & flares
-  if (cameraMoved) {
-    // star‐tag fades
-  }
-
-  // 10) Last thing: draw
+  // 10) Draw
   renderer.render(scene, camera);
   if (needsLabelUpdate) {
-    // 3a) sync the CSS2D internal size
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
-
-    // 3b) call your patched render (it will clear & re-append all labels)
     labelRenderer.render(scene, camera);
-
     needsLabelUpdate = false;
   }
-  // 11) First-frame: recalculate positions after renderer.render() has
-  //     established correct scene state, so Celestial Positions are accurate
+
+  // 11) First-frame: recalculate after renderer establishes correct scene state
   if (_needsInitialSceneUpdate) {
     _needsInitialSceneUpdate = false;
     forceSceneUpdate();
@@ -28174,6 +28184,8 @@ function onWindowResize() {
   /* ---------- star sprite size ------- */
   const dpr = renderer.getPixelRatio();      // 1, 2, 3, …
   starMaterial.size = 2 / dpr;               // stays ~2 CSS-px on any screen
+
+  try { positionChanged = true; } catch(e) {} // trigger a render after resize (safe during init)
 }
 
 function addPolarGridHelper(inplanet, planetSize = 10) {

@@ -1,5 +1,5 @@
 {
-  "name": "threejs-r175-app",
+  "name": "threejs-r183-app",
   "version": "1.0.0",
   "scripts": {
     "start": "parcel src/index.html",
@@ -7,7 +7,7 @@
     "build": "parcel build src/index.html --dist-dir dist"
   },
   "dependencies": {
-    "three": "^0.175.0",
+    "three": "^0.183.0",
     "tweakpane": "^4.0.5"
   },
   "devDependencies": {

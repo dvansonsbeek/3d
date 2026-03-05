@@ -167,7 +167,7 @@ WebGL Render (60 FPS target)
 
 | Layer | Technology | Version | Purpose |
 |-------|------------|---------|---------|
-| **3D Engine** | Three.js | ^0.175.0 | WebGL rendering, scene management |
+| **3D Engine** | Three.js | ^0.183.0 | WebGL rendering, scene management |
 | **UI Controls** | Tweakpane | ^4.0.5 | Parameter control panels |
 | **Bundler** | Parcel | ^2.16.4 | Build system, dev server, HMR |
 | **Language** | JavaScript | ES2021 | Application logic |
