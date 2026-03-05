@@ -251,7 +251,7 @@ Both the longitude of perihelion and the ascending node on the invariable plane 
 | ϖ | Longitude of perihelion (ϖ) | `o.<planet>Perihelion` | Earth equatorial | `apparentRaFromPdA()` |
 | Ω_inv | Ascending Node on Inv. Plane (Ω) | `o.<planet>AscendingNodeInvPlane` | ICRF | Linear precession |
 
-The longitude of perihelion is computed by `apparentRaFromPdA()` (line 25830), which:
+The longitude of perihelion is computed by `apparentRaFromPdA()` (line 28092), which:
 1. Reads the 3D world positions of the perihelion marker objects
 2. Transforms them into Earth's equatorial frame via `earth.rotationAxis.worldToLocal()`
 3. Returns the apparent direction as seen from Earth
@@ -277,7 +277,7 @@ This uses `o.<planet>AscendingNode` (the **ecliptic** ascending node from `calcu
 
 ### Resolution
 
-To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (line 25945) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv.
+To obtain a stable ω_inv, both values would need to be in the same frame. The model has `perihelionLongitudeEcliptic()` (line 28207) which reads the perihelion longitude directly from the precession layer rotation in ecliptic/ICRF coordinates — this gives a perfectly stable precession rate. Using that instead of `apparentRaFromPdA()` would produce a constant ω_inv.
 
 ### Earth: Special Case
 

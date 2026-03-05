@@ -202,7 +202,7 @@ const halleysAscendingNodeInvPlaneVerified = 59.56;   // No solution - retrograd
 const erosAscendingNodeInvPlaneVerified = 10.36;      // was 10.58, Δ = -0.22° (estimated)
 ```
 
-### Step 2: Add State Properties (in `o` object around line 2828)
+### Step 2: Add State Properties (in `o` object around line 4226)
 
 Add properties for the Souami & Souchay variant:
 

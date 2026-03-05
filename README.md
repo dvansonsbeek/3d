@@ -181,7 +181,7 @@ orbitContainer → holds full orbit structure
 - **Focus ring:** Shown around Earth when Sun is selected
 - **Sun glow:** Dynamically scaled by camera distance
 - **Name tags and constellations:** Fading and scaling based on camera distance
-- **DOM overlay label:** Follows selected planet on screen
+- **Planet info sidebar:** Collapsible panel with per-planet data, charts, and precession analysis (mobile-responsive)
 - **Planet Hierarchy Inspector:** Debug and analysis tool for orbital mechanics
 
 ---

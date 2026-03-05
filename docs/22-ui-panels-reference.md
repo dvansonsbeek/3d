@@ -11,6 +11,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | Panel | Purpose |
 |-------|---------|
 | **Planet Hierarchy Inspector** | Inspect the 5-step hierarchy chain for each planet |
+| **PlanetStats Panel** | Per-planet data display with collapsible groups, charts, and dynamic rows |
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
@@ -83,10 +84,132 @@ When Step 4 (RealPerihelionAtSun) is selected:
 
 | Component | Location |
 |-----------|----------|
-| `hierarchyInspector` state | script.js:7213-7263 |
-| `PLANET_HIERARCHIES` registry | script.js:6295-6416 |
-| `createVisualHelpers()` | script.js:7474-8432 |
-| `updateHierarchyLiveData()` | script.js:10758-11875 |
+| `hierarchyInspector` state | script.js:7547-7597 |
+| `PLANET_HIERARCHIES` registry | script.js:6629-6750 |
+| `createVisualHelpers()` | script.js:7808+ |
+| `updateHierarchyLiveData()` | script.js:11096+ |
+
+---
+
+## PlanetStats Panel
+
+### Purpose
+
+The PlanetStats panel is the primary per-planet data display. When a planet is selected (clicked or via "Look At"), a collapsible sidebar handle appears on the left edge of the screen. Clicking the handle expands the full panel showing orbital parameters, precession data, and interactive charts organized in a tabbed interface.
+
+#### Collapsible Sidebar
+
+The panel uses a collapsible sidebar pattern controlled by the `pl-collapsed` CSS class:
+
+| State | Width | Content |
+|-------|-------|---------|
+| **Collapsed** (default) | 36px | Handle with "i" icon, "PLANET INFO" label, and chevron |
+| **Expanded** | 33.333vw (desktop) / 85vw (mobile) | Full panel with tabs, data rows, and charts |
+
+- Panel always starts collapsed when a planet is first selected
+- Click the handle to expand; click the thin left edge strip to collapse
+- Close (×) button collapses the panel and hides orbit lines
+- Switching to Free Camera keeps the sidebar collapsed with the last planet's data
+- Performance: grid rebuild is skipped while collapsed; a fresh rebuild is triggered immediately on expand
+
+### Tabbed View
+
+Rows are distributed across tabs to reduce scrolling. The tab bar appears between the planet header and the data rows.
+
+#### Tab Layout by Planet Type
+
+| Planet Type | Tabs | Notes |
+|-------------|------|-------|
+| **Standard planets** (Mercury–Neptune, Pluto, Halley's, Eros) | GENERAL, ORBIT, POSITION, PRECESSION | 4 tabs |
+| **Earth** | GENERAL, ORBIT, POSITION, PRECESSION | Same 4 tabs; extra Date Specific + Precession Cycles sections go into PRECESSION |
+| **Moon** | GENERAL, ORBIT, CYCLES | 3 tabs; eclipse cycles in CYCLES |
+| **Sun** | *(no tab bar)* | All sections shown flat |
+
+#### Tab-to-Section Mapping (Standard Planets)
+
+| Tab 0: GENERAL | Tab 1: ORBIT | Tab 2: POSITION | Tab 3: PRECESSION |
+|----------------|--------------|------------------|-------------------|
+| General Characteristics | Orbital Period & Motion | Orbital Orientation to Ecliptic | Perihelion Precession |
+| Gravitational Influence Zones | Orbital Shape & Geometry | Orbital Orientation to Invariable Plane | Theorized Precession Breakdown |
+| Surface & Physical Properties | Velocities | Position & Anomalies | |
+| | Energy & Momentum | Time Calculations | |
+
+#### Tab Behavior
+
+- Active tab has bright background; inactive tabs are dimmed
+- Switching tabs resets scroll position
+- Column widths are cached independently per planet + tab combination
+- Switching planets preserves the active tab (tab memory), with fallback to GENERAL if the remembered tab isn't populated for the new planet (e.g., Sun only has tab 0)
+- Configuration is in the `TAB_CONFIG` object with `headerMap` and per-planet overrides
+
+### Row Types and Color Coding
+
+Each row has a semantic type that determines its color:
+
+| Type | Property | Color | Meaning |
+|------|----------|-------|---------|
+| **Constant** | `constant: true` | Green (#8FBC8F) | Derived from model constants, never changes |
+| **Static** | `static: true` | White (rgba 255,255,255,.85) | Fixed reference values (e.g., GR prediction) |
+| **Observed** | `observed: true` | Blue (#56B4E9) | Values from external observations/references |
+| **Dynamic** | (default) | Gold (#EFC04A) | Computed from simulation state, updates in real-time |
+
+### Row Grouping
+
+Within each tab, rows are organized under section headers (e.g., "Perihelion Precession", "Orbital Shape & Geometry"). Related sub-rows use box-drawing characters (`┌ ├ └`) to visually indicate grouped values.
+
+### Inline SVG Charts
+
+Two chart types are embedded as inline SVG within planetStats rows:
+
+#### Perihelion Precession Chart
+
+Shows one full precession cycle with:
+- **Blue curve**: geocentric precession rate over time (from predictive formula)
+- **Green dashed line**: heliocentric baseline rate
+- **Yellow marker**: current simulation year position
+- **Red marker**: fixed reference position (year 2000)
+- **Cycle windowing**: markers only render when within the current cycle window (no modulo wrapping)
+
+#### Obliquity Chart (Earth only)
+
+Shows one full obliquity cycle (~41,736 years) with:
+- **Curve**: obliquity variation over the cycle
+- **Markers**: current year and reference positions
+- **Same cycle windowing** logic as perihelion chart
+- **Phase group peaks**: Hover text on 203.3° phase group peak markers includes Glacial Maximum information (no separate LGM marker)
+
+### Predictive Formula Rows
+
+For Mercury through Neptune, the "Perihelion Precession" group includes dynamically computed rows:
+
+| Row | Source | Description |
+|-----|--------|-------------|
+| **Missing advance of perihelion** | `predictGeocentricPrecession()` − baseline | Fluctuation above/below heliocentric rate at current year |
+| **Perihelion precession (Geocentric)** | `predictGeocentricPrecession()` | Total geocentric rate at current year (baseline + fluctuation) |
+
+These use the 273-term predictive formula system (ported from Python) with trained coefficients per planet.
+
+#### Mercury-Specific Rows
+
+Mercury has additional grouped rows comparing the model to General Relativity:
+
+| Row | Value | Color |
+|-----|-------|-------|
+| `┌ Missing advance around 1900 AD (Model)` | `predictGeocentricPrecession(1900, 'mercury') − baseline` | Amber (dynamic) |
+| `└ Missing advance (GR)` | 42.98″/century (fixed) | White (static) |
+
+### Code Locations
+
+| Component | Location |
+|-----------|----------|
+| `TAB_CONFIG` | script.js:~26140 |
+| `planetStats` row definitions | script.js:~21689–26135 |
+| `updateDomLabel()` | script.js:~26770 (renders rows, tab filtering, color classes) |
+| `buildObliquityChart()` | script.js:~26280 |
+| `buildPerihelionChart()` | script.js:~26489 |
+| `predictGeocentricPrecession()` | script.js:~30641 |
+| Collapsible sidebar CSS | style.css (`.pl-handle`, `.pl-collapsed`, `@keyframes pl-pulse`) |
+| Tab bar + color coding CSS | style.css (`.pl-tab-bar`, `.pl-static`, `.pl-dynamic`) |
 
 ---
 

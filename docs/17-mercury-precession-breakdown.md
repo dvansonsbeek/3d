@@ -166,7 +166,18 @@ Accurate perihelion precession requires:
 
 ---
 
-### 1.6 Historical Context
+### 1.6 Mercury's Missing Advance Display
+
+The planetStats panel for Mercury includes a grouped pair comparing the Holistic Model prediction to General Relativity:
+
+| Row | Value | Color | Source |
+|-----|-------|-------|--------|
+| `┌ Missing advance around 1900 AD (Model)` | ~44″/century | Amber (dynamic) | `predictGeocentricPrecession(1900, 'mercury') − baseline` |
+| `└ Missing advance (GR)` | 42.98″/century | White (static) | Einstein's General Relativity prediction |
+
+The model value uses the predictive formula at year 1900 (the epoch of Le Verrier's and Einstein's analyses). The GR value of 42.98″/century is the standard textbook result for Mercury's relativistic perihelion advance due to spacetime curvature near the Sun.
+
+### 1.7 Historical Context
 
 First-order secular theory **overestimates by ~0.4%** compared to Park et al. (2017) for Mercury:
 

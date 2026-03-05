@@ -267,9 +267,9 @@ canvas {
 .tp-legend {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   padding: 5px 12px 6px;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.02em;
   color: hsla(210, 15%, 65%, 1);
@@ -744,27 +744,43 @@ a:link {
   overflow:hidden;            /* clip anything outside the drawer    */
   display:none;
   z-index:9999;
+  transition:width 280ms cubic-bezier(.25,.8,.25,1);
 
   /* design-tokens (can be overridden by themes) */
-  --planet-info-font-size:13px;
-  --panel-bg     : rgba(20,24,30,.80);
+  --planet-info-font-size:12px;
+  --panel-bg     : rgba(20,24,30,.65);
   --panel-border : rgba(255,255,255,.15);
+
+  /* ── Colour tokens: single source of truth for data rows ── */
+  --pl-key-dynamic  : rgba(239,192,74,.85);      /* gold label               */
+  --pl-val-dynamic  : #EFC04A;                   /* gold value               */
+  --pl-alt-dynamic  : rgba(239,192,74,.75);      /* gold unit                */
+  --pl-key-static   : rgba(255,255,255,.75);     /* white label              */
+  --pl-val-static   : rgba(255,255,255,.85);     /* white value              */
+  --pl-alt-static   : rgba(255,255,255,.70);     /* white unit               */
+  --pl-key-observed : rgba(86,180,233,.85);      /* blue label               */
+  --pl-val-observed : #56B4E9;                   /* blue value               */
+  --pl-alt-observed : rgba(86,180,233,.75);      /* blue unit                */
+  --pl-key-constant : rgba(143,188,143,.85);     /* green label              */
+  --pl-val-constant : #8FBC8F;                   /* green value              */
+  --pl-alt-constant : rgba(143,188,143,.75);     /* green unit               */
+  --pl-head-color   : rgba(255,255,255,.75);     /* group headers            */
 }
 
-/* per-planet colour themes (override 2 CSS variables) */
-#planetLabel.theme-earth   { --panel-bg:rgba( 46,100,190,.58); --panel-border:rgba( 46,100,190,.28); }
-#planetLabel.theme-moon    { --panel-bg:rgba(120,120,120,.58); --panel-border:rgba(255,255,255,.28); }
-#planetLabel.theme-mercury { --panel-bg:rgba(110,110,110,.58); --panel-border:rgba(255,255,255,.28); }
-#planetLabel.theme-venus   { --panel-bg:rgba(213,171, 55,.58); --panel-border:rgba(213,171, 55,.28); }
-#planetLabel.theme-mars    { --panel-bg:rgba(176, 58, 46,.58); --panel-border:rgba(176, 58, 46,.28); }
-#planetLabel.theme-jupiter { --panel-bg:rgba(201,126, 79,.58); --panel-border:rgba(201,126, 79,.28); }
-#planetLabel.theme-saturn  { --panel-bg:rgba(217,182, 92,.58); --panel-border:rgba(217,182, 92,.28); }
-#planetLabel.theme-uranus  { --panel-bg:rgba( 55,198,208,.58); --panel-border:rgba( 55,198,208,.28); }
-#planetLabel.theme-neptune { --panel-bg:rgba( 44, 83,158,.58); --panel-border:rgba( 44, 83,158,.28); }
-#planetLabel.theme-pluto   { --panel-bg:rgba(201,178,154,.58); --panel-border:rgba(201,178,154,.28); } 
-#planetLabel.theme-halleys { --panel-bg:rgba(158,203,255,.58); --panel-border:rgba(158,203,255,.28); } 
-#planetLabel.theme-eros    { --panel-bg:rgba(142,128,116,.58); --panel-border:rgba(142,128,116,.28); } 
-#planetLabel.theme-sun     { --panel-bg:rgba(255,174,  0,.60); --panel-border:rgba(255,174,  0,.30); }
+/* per-planet colour themes — subtle tint over dark base for readability */
+#planetLabel.theme-earth   { --panel-bg:rgba( 30, 65,130,.45); --panel-border:rgba( 46,100,190,.30); }
+#planetLabel.theme-moon    { --panel-bg:rgba( 70, 70, 70,.40); --panel-border:rgba(180,180,180,.25); }
+#planetLabel.theme-mercury { --panel-bg:rgba( 65, 65, 65,.40); --panel-border:rgba(160,160,160,.25); }
+#planetLabel.theme-venus   { --panel-bg:rgba(120, 95, 30,.40); --panel-border:rgba(213,171, 55,.25); }
+#planetLabel.theme-mars    { --panel-bg:rgba(110, 35, 28,.40); --panel-border:rgba(176, 58, 46,.25); }
+#planetLabel.theme-jupiter { --panel-bg:rgba(110, 70, 44,.40); --panel-border:rgba(201,126, 79,.25); }
+#planetLabel.theme-saturn  { --panel-bg:rgba(115, 96, 48,.40); --panel-border:rgba(217,182, 92,.25); }
+#planetLabel.theme-uranus  { --panel-bg:rgba( 28,100,108,.40); --panel-border:rgba( 55,198,208,.25); }
+#planetLabel.theme-neptune { --panel-bg:rgba( 25, 48,100,.45); --panel-border:rgba( 44, 83,158,.30); }
+#planetLabel.theme-pluto   { --panel-bg:rgba(100, 88, 76,.40); --panel-border:rgba(201,178,154,.25); }
+#planetLabel.theme-halleys { --panel-bg:rgba( 60, 78,100,.40); --panel-border:rgba(158,203,255,.25); }
+#planetLabel.theme-eros    { --panel-bg:rgba( 70, 64, 58,.40); --panel-border:rgba(142,128,116,.25); }
+#planetLabel.theme-sun     { --panel-bg:rgba(130, 88,  0,.40); --panel-border:rgba(255,174,  0,.25); }
 
 /* drawer slide-in effect (optional) */
 #planetLabel[style*="display: block"]{
@@ -775,23 +791,123 @@ a:link {
   to  { transform:none;            opacity:1; }
 }
 
+/* ─── Collapsible handle (direct child of #planetLabel, always visible) ─── */
+.pl-handle{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:14px;                        /* thin edge strip when expanded */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  cursor:pointer;
+  z-index:3;                         /* above labelContent */
+  color:rgba(255,255,255,.35);
+  background:rgba(255,255,255,.03);
+  border-right:1px solid rgba(255,255,255,.06);
+  transition:background .15s, color .15s, width 280ms cubic-bezier(.25,.8,.25,1);
+  user-select:none;
+  touch-action:manipulation;
+  overflow:hidden;
+}
+.pl-handle:hover{
+  color:rgba(255,255,255,.85);
+  background:rgba(255,255,255,.08);
+}
+/* hide icon + label in expanded state (only chevron visible) */
+.pl-handle-icon,
+.pl-handle-label{
+  display:none;
+}
+.pl-handle-chevron{
+  font-size:14px;
+  line-height:1;
+}
+
+/* ─── Collapsed state ─── */
+#planetLabel.pl-collapsed{
+  width:36px;
+}
+#planetLabel.pl-collapsed .labelContent{
+  opacity:0;
+  pointer-events:none;
+}
+#planetLabel.pl-collapsed .pl-handle{
+  width:100%;
+  background:var(--panel-bg);
+  border-right:1px solid var(--panel-border);
+  backdrop-filter:blur(14px);
+  color:rgba(255,255,255,.65);
+  gap:10px;
+  padding:0;
+}
+#planetLabel.pl-collapsed .pl-handle:hover{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+/* show icon + label vertically in collapsed state */
+#planetLabel.pl-collapsed .pl-handle-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:22px; height:22px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.06);
+  font-size:12px;
+  font-weight:700;
+  font-style:italic;
+  font-family:Georgia, "Times New Roman", serif;
+  line-height:1;
+  flex-shrink:0;
+  color:rgba(255,255,255,.8);
+}
+#planetLabel.pl-collapsed .pl-handle-label{
+  display:block;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  font:600 10px/1 var(--pl-body-font);
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  color:rgba(255,255,255,.75);
+}
+#planetLabel.pl-collapsed .pl-handle-chevron{
+  font-size:16px;
+  opacity:.6;
+}
+/* gentle glow pulse on first appearance to attract attention */
+@keyframes pl-pulse{
+  0%, 100%{ background:var(--panel-bg); }
+  50%{ background:rgba(255,255,255,.08); }
+}
+#planetLabel.pl-collapsed .pl-handle{
+  animation:pl-pulse 1.8s ease-in-out 3;  /* pulse 3 times then stop */
+}
+
+/* mobile: expanded panel takes more space */
+@media (max-width:768px){
+  #planetLabel:not(.pl-collapsed){ width:85vw; }
+}
+
 /* ───────────────────────────────────────────────
    2.  GLASS PANEL BODY   (.labelContent)
    ─────────────────────────────────────────────── */
 #planetLabel .labelContent{
   /* full-size glass card */
-  position:relative;
-  width:100%;
-  height:100%;
+  position:absolute;
+  left:14px; top:0; right:0; bottom:0;   /* offset for handle strip */
   display:flex;
   flex-direction:column;
   padding:14px 18px 16px;
   box-sizing:border-box;
+  transition:opacity 200ms ease;
 
-  /* frosted look */
+  /* frosted look — theme colours are kept subtle for readability */
   background:var(--panel-bg);
   border:1px solid var(--panel-border);
-  backdrop-filter:blur(6px);
+  backdrop-filter:blur(14px);
   border-radius:0;            /* flush with drawer edges */
   box-shadow:0 6px 18px rgba(0,0,0,.35);
 
@@ -800,48 +916,166 @@ a:link {
   font:var(--planet-info-font-size)/1.1 var(--pl-body-font);
 }
 
-/* ───── close (×) button ───── */
+/* ───── close (×) button — sits inside .pl-nav row ───── */
 #planetLabel .closeBtn{
-  position:absolute; top:8px; right:12px;
-  width:20px; height:20px; cursor:pointer; 
-  user-select:none; opacity:.8;
-  transition:opacity .15s, transform .3s cubic-bezier(.34,1.56,.64,1);
+  width:28px; height:28px; cursor:pointer;
+  user-select:none;
+  flex-shrink:0;
+  margin-left:2px;
 
-  /* center the pseudo lines */
+  /* match nav-arrow styling */
   display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;
+  background:rgba(255,255,255,.05);
+  position:relative;
+  transition:background .15s, border-color .15s;
 }
 #planetLabel .closeBtn:hover{
-  opacity:1; transform:rotate(180deg);
+  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.2);
 }
 
 /* draw the two bars */
 #planetLabel .closeBtn::before,
 #planetLabel .closeBtn::after{
   content:''; position:absolute;
-  width:2px; height:18px; background:#fff;
+  width:1.5px; height:14px; background:rgba(255,255,255,.7);
   border-radius:1px;
+  transition:background .15s;
 }
+#planetLabel .closeBtn:hover::before,
+#planetLabel .closeBtn:hover::after{ background:#fff; }
 #planetLabel .closeBtn::before{ transform:rotate(45deg); }
 #planetLabel .closeBtn::after { transform:rotate(-45deg); }
 
 /* ───────────────────────────────────────────────
-   3.  HEADER ZONE (title + intro + image)
+   3.  HEADER ZONE (planet nav + intro + image)
    ─────────────────────────────────────────────── */
-.pl-title{
-  display:flex; align-items:center; gap:.35em;
-  margin:0 0 .65em;
-  font:600 1.15em/1.1 inherit;
-  letter-spacing:.02em;
-  text-shadow:0 0 3px rgba(0,0,0,.35);
+
+/* — Planet navigation bar — */
+.pl-nav{
+  display:flex; align-items:center; gap:6px;
+  margin:0 0 8px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  position:relative;     /* anchor for dropdown */
+  flex-shrink:0;
+}
+.pl-nav-arrow{
+  width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.7);
+  font-size:18px; line-height:1;
+  cursor:pointer;
+  transition:background .15s, color .15s, border-color .15s;
+  user-select:none;
+  flex-shrink:0;
+}
+.pl-nav-arrow:hover{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border-color:rgba(255,255,255,.2);
+}
+.pl-nav-arrow:active{ transform:scale(.92); }
+.pl-nav-arrow.disabled{
+  opacity:.2;
+  pointer-events:none;
+}
+
+.pl-nav-name{
+  flex:1;
+  display:flex; align-items:center; justify-content:center; gap:.35em;
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:6px;
+  background:rgba(255,255,255,.04);
+  color:#fff;
+  font:600 14px/1.2 inherit;
+  letter-spacing:.03em;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+  cursor:pointer;
+  transition:background .15s, border-color .15s;
+  user-select:none;
+}
+.pl-nav-name:hover{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.15);
+}
+.pl-nav-caret{
+  font-size:10px;
+  opacity:.5;
+  margin-left:2px;
+}
+.pl-symbol{ font-size:1.3em; line-height:1; opacity:.9; }
+.pl-name  { font-variant:small-caps; letter-spacing:.06em; }
+
+/* — Planet dropdown — */
+.pl-nav-dropdown{
+  position:absolute;
+  top:100%; left:0; right:0;
+  margin-top:4px;
+  max-height:60vh;
+  overflow-y:auto;
+  background:rgba(15,18,25,.95);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  backdrop-filter:blur(12px);
+  z-index:100;
+  padding:4px;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+.pl-nav-option{
+  display:flex; align-items:center; gap:.4em;
+  padding:7px 10px;
+  border:none; border-radius:5px;
+  background:none;
+  color:rgba(255,255,255,.75);
+  font:500 12px/1.3 inherit;
+  cursor:pointer;
+  transition:background .1s, color .1s;
+  text-align:left;
+}
+.pl-nav-option:hover{
+  background:rgba(255,255,255,.1);
   color:#fff;
 }
-.pl-symbol{ font-size:1.35em; line-height:1; opacity:.9; }
-.pl-name  { font-variant:small-caps; }
+.pl-nav-option.active{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-weight:600;
+}
 
-.pl-intro{ margin:.5em 0 1em; line-height:1.3; }
+.pl-intro{
+  margin:.4em 0 .8em;
+  line-height:1.45;
+  font-size:11.5px;
+  color:rgba(255,255,255,.8);
+  /* clamp to 4 lines — max-height as robust fallback */
+  display:-webkit-box;
+  -webkit-line-clamp:4;
+  line-clamp:4;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  max-height:calc(4 * 1.45 * 11.5px);   /* 66.7px — exactly 4 lines */
+  flex-shrink:0;                         /* never collapse in flex column */
+}
 .pl-img{
-  width:100%; max-height:28vh; object-fit:cover;
-  border-radius:8px; margin:0 0 1em;
+  width:100%; max-height:22vh; object-fit:cover;
+  border-radius:6px; margin:0 0 10px;
+  border:1px solid rgba(255,255,255,.10);
+  filter:brightness(.82) contrast(1.08) saturate(.92);
+  transition:filter .3s;
+  flex-shrink:0;
+}
+.pl-img:hover{
+  filter:brightness(.92) contrast(1.05) saturate(1);
 }
 
 /* ───────────────────────────────────────────────
@@ -865,9 +1099,10 @@ a:link {
   flex:1 1 auto;      /* fill remaining height                     */
   min-height:0;       /* let it shrink when the grid is taller     */
   min-width:0;        /* ← KEY: allows grid to shrink horizontally */
-  overflow:auto;      /* vertical + horizontal scrollbars          */
+  overflow-y:scroll;  /* always show scrollbar — prevents layout shift on tab switch */
+  overflow-x:hidden;
   overscroll-behavior:contain;
-  padding-right:6px;  /* leave room for the vertical scrollbar     */
+  scrollbar-gutter:stable;   /* reserve space even when not scrollable */
   max-width:100%;
 }
 
@@ -886,16 +1121,21 @@ a:link {
    ─────────────────────────────────────────────── */
 .pl-grid{
   display:grid;
-  column-gap:.75em; row-gap:.3em;
+  column-gap:0; row-gap:3px;          /* gaps handled by cell padding */
   align-items:center;
   min-width:100%;                      /* prevents width jump */
 }
 
-/* zebra stripes (apply to each row’s 3 spans) */
-.pl-grid span:nth-child(6n+1),
-.pl-grid span:nth-child(6n+2),
-.pl-grid span:nth-child(6n+3){
-  background:rgba(255,255,255,.03);
+/* data row wrapper — subgrid so columns stay aligned, hover is seamless */
+.pl-row{
+  display:grid;
+  grid-template-columns:subgrid;
+  grid-column:1/-1;
+  border-radius:3px;
+  transition:background .1s;
+}
+.pl-row:hover{
+  background-color:rgba(255,255,255,.06);
 }
 
 /* cell roles */
@@ -903,18 +1143,157 @@ a:link {
   font:inherit;
   font-variant-numeric:tabular-nums;
 }
-.pl-key{ white-space:nowrap; text-align:left; }
+.pl-key{
+  white-space:nowrap; text-align:left;
+  padding:3.5px 10px 3.5px 4px;       /* wide right gap before values */
+}
 
-/* NEW → mono family for aligned numbers */
+/* mono family for aligned numbers */
 .pl-val{
   text-align:right;
   font-family:var(--pl-mono-font);
+  padding:3.5px 3px 3.5px 4px;        /* tight right → unit sits close */
 }
-.pl-alt{ text-align:left;  opacity:.9; }
+.pl-alt{
+  text-align:left;
+  font-size:10.5px;
+  padding:3.5px 4px 3.5px 3px;        /* tight left → close to value */
+  white-space:nowrap;                  /* units never wrap */
+}
 
-/* header row + blank row helpers */
-.pl-head{ grid-column:1/-1; text-align:center; font-weight:600; padding:.2em 0; }
-.pl-blank{ height:.6em; }
+/* section header — collapsible, centered uppercase bar */
+.pl-head{
+  grid-column:1/-1;
+  text-align:center;
+  text-transform:uppercase;
+  font-weight:600;
+  font-size:10px;
+  letter-spacing:.07em;
+  color:var(--pl-head-color);
+  padding:7px 10px 6px;
+  margin:8px 0 0;
+  background:rgba(255,255,255,.09);
+  border-left:2px solid var(--panel-border);
+  border-radius:4px;
+  cursor:pointer;
+  user-select:none;
+  transition:background .15s, color .15s;
+}
+.pl-head:hover{
+  background:rgba(255,255,255,.13);
+  color:rgba(255,255,255,.85);
+}
+.pl-head.open{
+  margin-bottom:4px;
+  border-radius:4px 4px 0 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+/* collapsed headers stacking — small gap between them */
+.pl-head + .pl-head{ margin-top:4px; }
+/* first header — no top margin */
+.pl-grid .pl-head:first-child{ margin-top:0; }
+
+/* no chevron — open/closed state shown by border-bottom + data rows appearing */
+
+.pl-blank{ height:4px; }
+.pl-row.pl-empty{ pointer-events:none; }
+.pl-row.pl-empty:hover{ background:transparent; }
+
+/* sub-rows: compact "years" lines tied to the parent row above */
+.pl-row.pl-sub              { margin-top:-2px; }
+.pl-row.pl-sub .pl-key      { opacity:.55; font-size:10px; padding-top:0; padding-bottom:2px; }
+.pl-row.pl-sub .pl-val      { opacity:.78; font-size:11px; padding-top:0; padding-bottom:2px; }
+.pl-row.pl-sub .pl-alt      { opacity:.78; font-size:10px; padding-top:0; padding-bottom:2px; }
+
+/* ─── Precession visualization: inline proportion bars ─── */
+.pl-has-bar {
+  background-image: linear-gradient(
+    to right,
+    rgba(239,192,74,0.25) 0%,
+    rgba(239,192,74,0.25) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+.pl-has-bar.pl-bar-fund {
+  background-image: linear-gradient(
+    to right,
+    rgba(239,192,74,0.25) 0%,
+    rgba(239,192,74,0.25) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+.pl-has-bar.pl-bar-left {
+  background-image: linear-gradient(
+    to left,
+    rgba(235,100,100,0.25) 0%,
+    rgba(235,100,100,0.25) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+.pl-row:hover.pl-has-bar {
+  background-image: linear-gradient(
+    to right,
+    rgba(239,192,74,0.35) 0%,
+    rgba(239,192,74,0.35) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+.pl-row:hover.pl-has-bar.pl-bar-fund {
+  background-image: linear-gradient(
+    to right,
+    rgba(239,192,74,0.35) 0%,
+    rgba(239,192,74,0.35) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+.pl-row:hover.pl-has-bar.pl-bar-left {
+  background-image: linear-gradient(
+    to left,
+    rgba(235,100,100,0.35) 0%,
+    rgba(235,100,100,0.35) var(--bar-w),
+    transparent var(--bar-w)
+  );
+}
+
+/* highlight row (e.g. Holistic Year) */
+.pl-row.pl-highlight .pl-key { font-weight:600; font-size:12px; }
+.pl-row.pl-highlight .pl-val { font-weight:600; font-size:13px; }
+.pl-row.pl-highlight .pl-alt { font-weight:600; }
+.pl-row.pl-highlight {
+  padding:3px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+/* fraction badge */
+.pl-frac {
+  display:inline-block;
+  font:600 8.5px/1 var(--pl-mono-font, monospace);
+  padding:1px 4px;
+  margin-left:3px;
+  border-radius:3px;
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.55);
+  vertical-align:middle;
+  letter-spacing:0.02em;
+}
+
+/* direction arrows */
+.pl-dir {
+  display:inline-block;
+  width:14px;
+  text-align:center;
+  font-weight:700;
+  margin-right:2px;
+}
+.pl-dir-retro { color:rgba(235,100,100,0.9); }
+.pl-dir-pro   { color:rgba(239,192,74,0.9); }
+
+/* precession relationship diagram */
+.pl-prec-viz {
+  grid-column:1/-1;
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
 
 /* info-tip icon */
 .pl-info{ margin-right:.25em; text-decoration:none; opacity:.8; cursor:help; }
@@ -924,6 +1303,83 @@ a:link {
 .pl-val strong, .pl-alt strong{ font-weight:600; color:#fff; }
 .pl-val em,     .pl-alt em    { font-style:italic; opacity:.9; }
 .pl-val small,  .pl-alt small { font-size:.85em;   opacity:.85; }
+
+/* ═══════════════════════════════════════════
+   PLANETSTATS TAB BAR
+   ═══════════════════════════════════════════ */
+.pl-tab-bar{
+  display:flex;
+  gap:4px;
+  padding:0 0 8px;
+  margin:0 0 6px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.pl-tab{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1px;
+  padding:6px 0 5px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:6px;
+  background:rgba(255,255,255,.07);
+  color:rgba(255,255,255,.5);
+  font:600 10px/1.2 var(--pl-body-font);
+  letter-spacing:.04em;
+  cursor:pointer;
+  transition:background .15s, color .15s, border-color .15s, box-shadow .15s;
+  user-select:none;
+}
+.pl-tab:hover{
+  background:rgba(255,255,255,.12);
+  color:rgba(255,255,255,.75);
+  border-color:rgba(255,255,255,.18);
+}
+.pl-tab.active{
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  border-color:rgba(255,255,255,.22);
+  border-bottom:2px solid var(--panel-border);
+  box-shadow:0 1px 8px rgba(0,0,0,.25);
+}
+.pl-tab-icon{
+  font-size:13px;
+  line-height:1;
+  opacity:.7;
+}
+.pl-tab.active .pl-tab-icon{ opacity:1; }
+.pl-tab.disabled{
+  opacity:.25;
+  cursor:default;
+  pointer-events:none;
+}
+
+/* ═══════════════════════════════════════════
+   VALUE COLOR CODING (dynamic vs static)
+   — all colours driven by --pl-* tokens on #planetLabel
+   ═══════════════════════════════════════════ */
+/* Dynamic rows: muted labels, gold values (matches Tweakpane calculated) */
+.pl-dynamic .pl-key  { color:var(--pl-key-dynamic); }
+.pl-dynamic .pl-val  { color:var(--pl-val-dynamic); }
+.pl-dynamic .pl-alt  { color:var(--pl-alt-dynamic); }
+
+/* Static rows: dimmer labels, brighter values (constants that never change) */
+.pl-static .pl-key   { color:var(--pl-key-static); }
+.pl-static .pl-val   { color:var(--pl-val-static); }
+.pl-static .pl-alt   { color:var(--pl-alt-static); }
+
+/* Observed rows: blue tones for live scene-graph reads */
+.pl-observed .pl-key { color:var(--pl-key-observed); }
+.pl-observed .pl-val { color:var(--pl-val-observed); }
+.pl-observed .pl-alt { color:var(--pl-alt-observed); }
+
+/* Constant rows: sage green for true physical constants */
+.pl-constant .pl-key { color:var(--pl-key-constant); }
+.pl-constant .pl-val { color:var(--pl-val-constant); }
+.pl-constant .pl-alt { color:var(--pl-alt-constant); }
+
 
 /* rare utility if you need it */
 .smallcaps{ font-variant:small-caps; }

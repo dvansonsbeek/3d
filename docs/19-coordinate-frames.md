@@ -58,7 +58,7 @@ The ecliptic frame uses Earth's orbital plane as the reference.
 | Ecliptic latitude (β) | Angle above/below ecliptic plane |
 | Ecliptic inclination | Planet's orbital tilt relative to ecliptic |
 
-**Calculation (line 18825):**
+**Calculation (line 29317):**
 ```
 Ecliptic longitude = Ascending node + Argument of periapsis + True anomaly
 ```

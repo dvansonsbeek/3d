@@ -4,7 +4,7 @@
 
 This document provides a complete reference for all orbital calculation functions available in the solar system simulation, including input variables, the `OrbitalFormulas` helper library, and implementation details.
 
-**Last Updated:** January 2026
+**Last Updated:** March 2026
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
@@ -138,15 +138,43 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 
 ### 1.4 Moon-Specific Variables
 
+#### 1.4.1 Static Constants
+
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `moonSiderealMonthInput` | 27.32166156 days | Sidereal month |
 | `moonAnomalisticMonthInput` | 27.55454988 days | Anomalistic month |
 | `moonNodalMonthInput` | 27.21222082 days | Nodal/Draconic month |
 | `moonSynodicMonth` | derived | Synodic month |
+| `moonTropicalMonth` | derived | Tropical month (used for orbital speed) |
 | `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
 | `moonEclipticInclinationJ2000` | 5.1453964° | Orbital inclination to ecliptic |
 | `moonOrbitalEccentricity` | 0.054900489 | Eccentricity |
+| `moonTilt` | 6.687° | Axial tilt |
+| `moonStartposNodal` | 64° | Nodal precession start position (calibration) |
+| `moonStartposApsidal` | 330° | Apsidal precession start position (calibration) |
+| `moonStartposMoon` | 132.105° | Moon orbital start position (calibration) |
+
+#### 1.4.2 Dynamic Orbital Elements (computed by `updateMoonOrbitalElements()`)
+
+These variables are computed each frame from the 3D scene geometry, using Earth as the gravitational focus instead of the Sun. The function follows the same pattern as `updatePlanetAnomalies()`.
+
+| Variable | Symbol | Description | Source |
+|----------|--------|-------------|--------|
+| `o.moonAscendingNode` | Ω | Ecliptic longitude of ascending node (°) | Orbit plane normal from `moonNodalPrecession.containerObj.matrixWorld` |
+| `o.moonDescendingNode` | — | Ecliptic longitude of descending node (°) | Ω + 180° |
+| `o.moonLongitudeOfPerigee` | ϖ | Ecliptic longitude of perigee (°) | `atan2()` of Earth − orbit center world positions |
+| `o.moonArgumentOfPerigee` | ω | Argument of perigee (°) | ϖ − Ω |
+| `o.moonTrueAnomaly` | ν | True anomaly — angle at Earth from perigee to Moon (°) | 3D positions: Earth (focus), Moon, orbit center P |
+| `o.moonMeanAnomaly` | M | Mean anomaly — angle at orbit center P from perigee to Moon (°) | 3D positions: orbit center P, Moon, perigee direction |
+| `o.moonEccentricAnomaly` | E | Eccentric anomaly from Kepler's equation (°) | `OrbitalFormulas.eccentricAnomaly(M, e)` |
+| `o.moonDistanceFromEarthKm` | r | Current geocentric distance (km) | 3D distance: `moon.pivotObj` to `earth.pivotObj` |
+| `o.moonPhaseAngle` | — | Full 0–360° Sun-Earth-Moon phase angle (°) | 3D positions: Sun, Earth, Moon |
+| `o.moonElongation` | — | Angular separation from Sun (0–180°) | `getElongationFromSun(moon)` (pre-existing) |
+
+**Key design difference from planets:** The Moon orbits Earth, not the Sun. The orbit center P is at `moonApsidalPrecession.pivotObj` (offset from Earth by a×e), and Earth replaces the Sun as the gravitational focus in all angle measurements.
+
+**Ascending node extraction:** The ascending node Ω is computed geometrically from the orbit plane normal. The `moonNodalPrecession.containerObj.matrixWorld` encodes all parent transforms (Earth orbital position, apsidal precession through tilted frame, coupling layers). The local Y direction of this matrix gives the orbit normal in world space, from which the line of nodes is derived via cross product with the ecliptic normal (0,1,0).
 
 ### 1.5 Earth-Specific Variables
 
@@ -429,6 +457,11 @@ These formulas are already calculated and displayed in the simulation:
 | Ecliptic Inclination | i_app | `o.{planet}EclipticInclinationDynamic` | `updateDynamicInclinations()` |
 | **Dynamic Inclination to Inv. Plane** | **i_inv(t)** | `o.{planet}InvPlaneInclinationDynamic` | `computePlanetInvPlaneInclinationDynamic()` |
 | Elongation | - | `o.{planet}Elongation` | `updateElongations()` |
+| **Moon Anomalies** | **M, ν, E** | `o.moonMeanAnomaly`, etc. | `updateMoonOrbitalElements()` |
+| **Moon Ascending Node** | **Ω** | `o.moonAscendingNode` | `updateMoonOrbitalElements()` |
+| **Moon Longitude of Perigee** | **ϖ** | `o.moonLongitudeOfPerigee` | `updateMoonOrbitalElements()` |
+| **Moon Phase Angle** | **—** | `o.moonPhaseAngle` | `updateMoonOrbitalElements()` |
+| **Moon Distance** | **r** | `o.moonDistanceFromEarthKm` | `updateMoonOrbitalElements()` |
 | Synodic Period | P_syn | Calculated for Earth-planet pairs | planetStats |
 | **Gravitational Parameter** | **GM** | `GM_SUN` (derived constant) | Sun's planetStats |
 | **Current Orbital Velocity** | **v** | `OrbitalFormulas.orbitalVelocity()` | All planets' planetStats |
@@ -2082,3 +2115,26 @@ All planets have these `o.{planet}` variables:
 - `InvPlaneInclinationDynamic` - Dynamic inclination to invariable plane (oscillates)
 
 Plus `{planet}.sunDistAU` for current heliocentric distance.
+
+### Moon Live Variables
+
+The Moon has its own set of `o.moon*` variables computed by `updateMoonOrbitalElements()`, using Earth as the gravitational focus:
+
+| Variable | Symbol | Description |
+|----------|--------|-------------|
+| `o.moonAscendingNode` | Ω | Ascending node on ecliptic (°) |
+| `o.moonDescendingNode` | — | Descending node on ecliptic (°) |
+| `o.moonLongitudeOfPerigee` | ϖ | Longitude of perigee (°) |
+| `o.moonArgumentOfPerigee` | ω | Argument of perigee (°) |
+| `o.moonTrueAnomaly` | ν | True anomaly (°) |
+| `o.moonMeanAnomaly` | M | Mean anomaly (°) |
+| `o.moonEccentricAnomaly` | E | Eccentric anomaly (°) |
+| `o.moonDistanceFromEarthKm` | r | Geocentric distance (km) |
+| `o.moonPhaseAngle` | — | Full phase angle 0–360° (°) |
+| `o.moonElongation` | — | Elongation from Sun 0–180° (°) |
+
+The Moon POSITION tab (tab 2) also displays derived values using `OrbitalFormulas` helpers with lunar parameters:
+- Mean/True Longitude (L, λ), Argument of Latitude (u), Flight Path Angle (γ)
+- Ecliptic Latitude (β), True/Eccentric Anomaly Rates (dν/dt, dE/dt)
+- Radius of Curvature (ρ), Time since/to perigee
+- Lunar age (days since New Moon), Lunar phase name (8 traditional phases)

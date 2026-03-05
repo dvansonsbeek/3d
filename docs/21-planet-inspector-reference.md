@@ -208,12 +208,13 @@ The geometry uses LOCAL positions (flat at y=0), but the coloring decision uses 
 | Component | File | Description |
 |-----------|------|-------------|
 | Venus constants | [script.js:91-103](../src/script.js#L91-L103) | Orbital parameters |
-| hierarchyInspector state | [script.js:3660-3695](../src/script.js#L3660-L3695) | Inspector state with all marker references |
-| Inclination visualization creation | [script.js:4022-4296](../src/script.js#L4022-L4296) | Node detection and half-plane rendering |
-| Live data updates | [script.js:5586-5771](../src/script.js#L5586-L5771) | Dynamic marker position updates |
-| Dynamic ascending node calculation | [script.js:9436-9588](../src/script.js#L9436-L9588) | Main calculation function |
-| updateAscendingNodes() | [script.js:9617-9684](../src/script.js#L9617-L9684) | Updates all planet ascending nodes |
-| updateOrbitalPlaneRotations() | [script.js:9699-9730](../src/script.js#L9699-L9730) | Updates container rotations |
+| hierarchyInspector state | [script.js:7547-7597](../src/script.js#L7547-L7597) | Inspector state with all marker references |
+| PLANET_HIERARCHIES registry | [script.js:6629-6750](../src/script.js#L6629-L6750) | Per-planet 5-step hierarchy definitions |
+| createVisualHelpers() | [script.js:7808+](../src/script.js#L7808) | Node detection and half-plane rendering |
+| Live data updates | [script.js:11096+](../src/script.js#L11096) | Dynamic marker position updates |
+| Dynamic ascending node calculation | [script.js:28619+](../src/script.js#L28619) | Main calculation function |
+| updateAscendingNodes() | [script.js:28815+](../src/script.js#L28815) | Updates all planet ascending nodes |
+| updateOrbitalPlaneRotations() | [script.js:28920+](../src/script.js#L28920) | Updates container rotations |
 
 ---
 
@@ -338,3 +339,4 @@ const angleFromAsc = ((eclipticLongitude - ascNodeAngleDeg) % 360 + 360) % 360;
 - **Height above ecliptic** is the actual 3D world Y position, not a formula
 - **Angle from ascending node** uses the dynamic ascending node, updated each frame
 - These values can be used to verify the orbital mechanics are working correctly
+

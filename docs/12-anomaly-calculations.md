@@ -286,7 +286,7 @@ The difference (ν - M ≈ 9.69°) is the Equation of the Center for Mars at thi
 ### Phase 1: Update PLANET_HIERARCHIES Registry
 Add `fixedPerihelionAtSun` reference to each planet entry so we can access the P point.
 
-**Location:** `script.js` around line 4179-4288
+**Location:** `script.js` around line 6629-6750
 
 ```javascript
 // Example for Mars:
@@ -300,7 +300,7 @@ mars: {
 ### Phase 2: Fix Anomaly Calculation
 Replace the incorrect calculation in `updateHierarchyLiveData()`.
 
-**Location:** `script.js` around line 7770-7843
+**Location:** `script.js` around line 11096+ (in updateHierarchyLiveData)
 
 **Current (WRONG):**
 ```javascript
@@ -354,7 +354,7 @@ window._meanAnomaly = meanAnomalyDeg;
 ### Phase 3: Add Visualization Lines
 Add the P→Planet (Red) and Sun→Planet (Amber) lines to `createVisualHelpers()`.
 
-**Location:** `script.js` around line 5951-5966 (in the anomaly visualization section)
+**Location:** `script.js` around line 8292+ (in createVisualHelpers, anomaly visualization section)
 
 ```javascript
 // P → Planet line (Red) - for Mean Anomaly visualization
@@ -375,7 +375,7 @@ hierarchyInspector.anomalyGroup.add(hierarchyInspector.sunToPlanetLine);
 ### Phase 4: Add Anomaly Arcs
 Add the Mean Anomaly Arc (Red, dashed, centered at P) and True Anomaly Arc (Amber, solid, centered at Sun).
 
-**Location:** `script.js` around line 5970-5993
+**Location:** `script.js` around line 8296+ (in createVisualHelpers)
 
 ```javascript
 const arcSegments = 64; // Smooth arc
@@ -409,7 +409,7 @@ hierarchyInspector._trueArcAtSunRadius = ellipticOrbitRadius * 0.4; // Slightly 
 ### Phase 5: Update Lines and Arcs Dynamically
 Update all visualization elements in the animation loop.
 
-**Location:** `script.js` around line 7846-7890
+**Location:** `script.js` around line 11096+ (in updateHierarchyLiveData)
 
 ```javascript
 // Update P → Planet line
@@ -467,7 +467,7 @@ if (hierarchyInspector.trueAnomalyArcAtSun) {
 ### Phase 6: Cleanup
 Add cleanup for all new visualization elements in `removeVisualHelpers()`.
 
-**Location:** `script.js` around line 6426-6451
+**Location:** `script.js` around line 8886+ (cleanup section)
 
 ```javascript
 hierarchyInspector.pToPlanetLine = null;
@@ -481,7 +481,7 @@ hierarchyInspector._trueArcAtSunRadius = null;
 ### Phase 7: Add to hierarchyInspector State Object
 Add new properties to track the visualization elements.
 
-**Location:** `script.js` around line 5122-5127 (hierarchyInspector state object)
+**Location:** `script.js` around line 7547-7597 (hierarchyInspector state object)
 
 ```javascript
 // Add these to the hierarchyInspector object:
@@ -548,7 +548,7 @@ For Mars:
 
 In addition to the hierarchy inspector visualization, the anomalies are calculated for ALL planets and stored in the `o` object for programmatic access.
 
-**Location:** `script.js` around line 13297-13371 (`updateAllPlanetAnomalies()` function)
+**Location:** `script.js` — `updatePlanetAnomalies()` function
 
 **Output Properties:**
 ```javascript
@@ -565,6 +565,81 @@ These values are updated each frame and can be used for:
 - Data export
 - Debug displays
 - Other calculations that need anomaly values
+
+---
+
+## Moon Anomaly Calculations (Geocentric)
+
+### Overview
+
+The Moon's anomalies are calculated by `updateMoonOrbitalElements()`, which follows the **same position-based geometry** as the planet anomaly calculations but with one critical difference: **Earth is the gravitational focus** instead of the Sun.
+
+### Key Differences from Planets
+
+| Aspect | Planets | Moon |
+|--------|---------|------|
+| **Focus** | Sun (`sun.pivotObj`) | Earth (`earth.pivotObj`) |
+| **Orbit center (P)** | `[planet]FixedPerihelionAtSun.pivotObj` | `moonApsidalPrecession.pivotObj` |
+| **Apsidal reference** | Perihelion | Perigee |
+| **Function** | `updatePlanetAnomalies()` | `updateMoonOrbitalElements()` |
+| **Orbital period for rates** | Planet's solar year | `moonAnomalisticMonth` |
+
+### Moon Orbit Geometry
+
+```
+                    Moon
+                      *
+                     /|\
+                    / | \
+                   /  |  \
+                  /   |   \
+                 / M  | ν  \
+                /_____|_____\
+              P       |       Earth
+       (orbit center) |      (focus)
+                      |
+                      v
+                 Perigee direction
+```
+
+- **P (orbit center)**: `moonApsidalPrecession.pivotObj` — offset from Earth by a×e in anti-perigee direction
+- **M (Mean Anomaly)**: Angle at P from perigee direction to Moon
+- **ν (True Anomaly)**: Angle at Earth from perigee direction to Moon
+
+### How the Orbit Center P Works
+
+The `moonApsidalPrecession` object has:
+```javascript
+orbitRadius: -(moonDistance/currentAUDistance) * (moonOrbitalEccentricity * 100)
+```
+This negative offset places `pivotObj` at `a × e` from Earth in the anti-perigee direction — exactly the geometric center of the elliptical orbit. This is the same pattern as `[planet]FixedPerihelionAtSun.pivotObj` for planets.
+
+### Ascending Node Extraction
+
+Unlike planets (which use `calculateDynamicAscendingNodeFromTilts()`), the Moon's ascending node is extracted **geometrically from the 3D orbit plane normal**:
+
+```javascript
+// Get orbit plane normal from matrixWorld (includes all parent transforms)
+const m = moonNodalPrecession.containerObj.matrixWorld.elements;
+const nx = m[4], ny = m[5], nz = m[6];  // Local Y in world space
+
+// Line of nodes = ecliptic_normal × orbit_normal
+// Ascending node ecliptic longitude from atan2
+```
+
+**Why this works:** The `moonNodalPrecession.containerObj` has a static tilt defining the 5.14° orbit inclination. Its parent chain includes Y-rotations from the apsidal precession (through a tilted frame), coupling layers, and Earth's orbital motion. These Y-rotations through the tilted apsidal frame correctly precess the ascending node direction in world space.
+
+### Output Properties
+
+Computes 10 dynamic `o.moon*` variables (Ω, ϖ, ω, ν, M, E, distance, phase angle, elongation, descending node). See [Section 1.4.2 of the Orbital Formulas Reference](11-orbital-formulas-reference.md) for the complete variable list.
+
+### Execution Order
+
+`updateMoonOrbitalElements()` is called immediately after `updatePlanetAnomalies()` in the animation loop:
+```
+updatePlanetAnomalies()       // All planets (Sun as focus)
+updateMoonOrbitalElements()   // Moon (Earth as focus)
+```
 
 ---
 

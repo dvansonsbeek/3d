@@ -365,6 +365,37 @@ CORRECT:
   = Each effect applied ONCE
 ```
 
+## Moon Dynamic Orbital Elements
+
+The Moon's dynamic elements are computed separately from the planets by `updateMoonOrbitalElements()`. Unlike planets, the Moon's dynamics are **not driven by Earth's invariable plane oscillation** — they are driven by the Moon's own precession cycles modeled in the 3D scene hierarchy.
+
+### How the Moon Differs from Planets
+
+| Aspect | Planets | Moon |
+|--------|---------|------|
+| **Ascending node source** | `calculateDynamicAscendingNodeFromTilts()` — from orbit tilt values | Orbit plane normal from `moonNodalPrecession.containerObj.matrixWorld` |
+| **What drives Ω** | Earth's obliquity + inclination changes | 3D nodal precession chain (~18.6 yr retrograde) |
+| **What drives ω/ϖ** | Perihelion precession from `apparentRaFromPdA()` | 3D apsidal precession chain (~8.85 yr prograde) |
+| **Anomaly focus** | Sun | Earth |
+| **Inclination oscillation** | Ω-based: `i = mean + A·cos(Ω − φ)` | Not applicable (fixed 5.14° to ecliptic) |
+
+### Moon Dynamic Variables
+
+10 dynamic `o.moon*` variables are computed each frame (Ω, ϖ, ω, ν, M, E, distance, phase angle, elongation, descending node). See [Section 1.4.2 of the Orbital Formulas Reference](11-orbital-formulas-reference.md) for the complete variable list with symbols, descriptions, and 3D sources.
+
+### 3D Precession Hierarchy
+
+The Moon's precessions are encoded as nested Y-rotations in the scene graph:
+```
+earth.pivotObj
+  └── moonApsidalPrecession    (Y-rot: ~8.85yr prograde, tilt: −1.54°)
+      └── coupling layers       (apsidal-nodal interaction)
+          └── moonNodalPrecession  (Y-rot: ~18.6yr retrograde, tilt: 5.14°)
+              └── moon             (Y-rot: ~27.3 day orbital motion)
+```
+
+The Y-rotations through the tilted apsidal frame cause the ascending node to precess in world space. This is extracted geometrically from `matrixWorld` rather than computed analytically.
+
 ## Code Locations
 
 | Function | Location | Purpose |
@@ -375,6 +406,7 @@ CORRECT:
 | `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
 | `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |
 | `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Applies to 3D visualizations |
+| `updateMoonOrbitalElements()` | [script.js](../src/script.js) | Moon Ω, ϖ, anomalies, phase (Earth as focus) |
 
 ### Inclination Oscillation Constants (Ω-based approach)
 

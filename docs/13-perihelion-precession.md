@@ -2,11 +2,11 @@
 
 ## Overview
 
-This document describes the two methods used to calculate perihelion longitude in the 3D Solar System model, their technical implementation, and the fluctuation patterns observed in Earth-frame measurements.
+This document describes the three methods used to calculate perihelion longitude and precession rates in the 3D Solar System model, their technical implementation, and the fluctuation patterns observed in Earth-frame measurements.
 
 ---
 
-## The Two Methods
+## The Three Methods
 
 ### Method 1: Earth-Frame (Equatorial RA)
 
@@ -164,6 +164,44 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 ```
 
 This method reads directly from `precessionLayer.orbitObj.rotation.y`, which represents the pure precession angle in the ecliptic plane (rotation around the world Y-axis). This completely bypasses the scene graph hierarchy and Earth's reference frame effects.
+
+### Method 3: Predictive Dynamic (273-term formula)
+
+**What it measures:** The instantaneous geocentric perihelion precession rate at any simulation year, computed analytically from a trained predictive formula.
+
+**Physical meaning:** A machine-learned model of how Earth's reference frame distorts the observed precession rate, capturing all significant harmonics from Earth's obliquity, eccentricity, and perihelion cycles.
+
+**Characteristics:**
+- Dynamic — updates with the current simulation year
+- Analytical — no need to sample the simulation over centuries
+- Covers all 7 planets (Mercury through Neptune)
+- Ported from Python (`docs/scripts/predictive_formula.py`)
+
+| Metric | Mercury Example |
+|--------|-----------------|
+| Rate at year 1900 | ~574 arcsec/century |
+| Rate at year 2000 | ~574 arcsec/century |
+| Fluctuation range | ±100 arcsec/century (varies by epoch) |
+| Feature count | 273 terms in 16 groups |
+
+**How it works:**
+
+```
+1. Build 273-term feature vector from:
+   - Planet/Earth angle differences and their sin/cos
+   - Earth obliquity (normalized), eccentricity (normalized)
+   - Earth Rate Deviation (ERD) — derivative of Earth perihelion
+   - Periodic terms, cross-terms, beat frequencies
+   - Venus-specific interactions, higher harmonics
+
+2. Dot product with trained coefficients → fluctuation (″/cy)
+
+3. Total = baseline heliocentric rate + fluctuation
+```
+
+**Usage in planetStats:**
+- "Missing advance of perihelion" = `predictGeocentricPrecession(year, planet)` − baseline
+- "Perihelion precession (Geocentric)" = `predictGeocentricPrecession(year, planet)`
 
 ---
 

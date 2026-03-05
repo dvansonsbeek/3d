@@ -130,7 +130,7 @@ Use these values to verify against other planetariums like Stellarium.
 
 ### Planet Inspector
 
-Click on any planet to open detailed information:
+Click on any planet to show a collapsible sidebar handle on the left edge. Click the handle to expand the full information panel:
 
 **Orbital Elements:**
 - Semi-major axis (a)

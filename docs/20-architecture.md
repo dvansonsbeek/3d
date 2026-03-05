@@ -29,7 +29,7 @@
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Holistic Universe Model. It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~30,000 lines)
+- Single monolithic script.js (~32,700 lines)
 - 13 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
@@ -130,7 +130,7 @@ WebGL Render (60 FPS target)
 /home/dennis/code/3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~30,000 lines)
+│   ├── script.js               # Main application (~32,000 lines)
 │   └── style.css               # GUI and label styling
 │
 ├── public/
@@ -193,21 +193,23 @@ The monolithic script.js is organized into logical sections:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  SECTION 1: INPUT CONSTANTS (Lines 17-801)                          │
+│  SECTION 1: INPUT CONSTANTS (Lines 17-782)                          │
 │  - Holistic Year parameters (333,888-year cycle)                    │
 │  - Earth orbital parameters (tilt, eccentricity, precession)        │
 │  - All planet orbital elements (Mercury through Neptune)            │
+│  - Predictive formula constants (PERI_HARMONICS, PREDICT_PLANETS)   │
+│  - Predictive coefficients (7×273 trained arrays, PREDICT_COEFFS)   │
 │  - Moon parameters (sidereal, anomalistic, nodal months)            │
 │  - Physical constants (diameters, masses, distances, GM values)     │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 2: ORBITAL FORMULAS LIBRARY (Lines 804-1359)               │
+│  SECTION 2: ORBITAL FORMULAS LIBRARY (Lines 1130-1685)              │
 │  - OrbitalFormulas object with 50+ methods                          │
 │  - Kepler equation solver                                           │
 │  - Anomaly conversions (mean, eccentric, true)                      │
 │  - Velocity calculations, Laplace coefficients                      │
 │  - Frame conversion (Ecliptic ↔ ICRF)                               │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 3: DERIVED VALUES (Lines 1361-1829)                        │
+│  SECTION 3: DERIVED VALUES (Lines 1687-2155)                        │
 │  - Derived orbital parameters (Kepler's 3rd Law)                    │
 │  - Mean motion calculations                                         │
 │  - Precession period derivations                                    │
@@ -215,35 +217,35 @@ The monolithic script.js is organized into logical sections:
 │  - Coordinate transforms (Equatorial ↔ Ecliptic)                    │
 │  - Solstice/Equinox detection, RA/Dec calculations                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 4: OBJECT DEFINITIONS (Lines 1834-3708)                    │
+│  SECTION 4: OBJECT DEFINITIONS (Lines 2160-4034)                    │
 │  - Data objects for every celestial body and helper                  │
 │  - Planet hierarchical precession layers                             │
 │  - Moon precession layers                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 5: MASTER ARRAYS & SCENE SETUP (Lines 3713-4624)           │
+│  SECTION 5: MASTER ARRAYS & SCENE SETUP (Lines 4039-4999)           │
 │  - planetObjects / tracePlanets arrays                               │
-│  - Global state object 'o' definition (~line 3900)                  │
+│  - Global state object 'o' definition (~line 4226)                  │
 │  - Renderer initialization (WebGL, shadows, tone mapping)           │
 │  - Camera setup (perspective, orbit controls)                       │
 │  - createPlanet calls and hierarchy wiring (.add() calls)           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 6: PLANET SYSTEMS & VISUAL EFFECTS (Lines 4625-11854)      │
+│  SECTION 6: PLANET SYSTEMS & VISUAL EFFECTS (Lines 5000-12245)      │
 │  - Orbit visualization, starfield, constellations                   │
 │  - Invariable plane system and hierarchy inspector                  │
 │  - Trace path rendering, visual effects                             │
 │  - Export functions (solstice, year analysis, bulk, planet reports)  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 7: GUI SETUP (Lines 11855-12818)                           │
+│  SECTION 7: GUI SETUP (Lines 12246-13683)                           │
 │  - Tweakpane folder structure (addFolder/addBinding/addButton)      │
 │  - Control bindings and event handlers                              │
 │  - Prediction displays                                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 8: RENDER LOOP (Lines 12838-13025)                         │
+│  SECTION 8: RENDER LOOP (Lines 13703-13906)                         │
 │  - Main animation frame callback                                    │
 │  - Throttled update cycles (20/10/5/30 Hz)                          │
 │  - Performance monitoring                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 9: UPDATE & CALCULATION FUNCTIONS (Lines 13026-29992)      │
+│  SECTION 9: UPDATE & CALCULATION FUNCTIONS (Lines 13907-32676)      │
 │  - Position update functions (moveModel, updatePositions)           │
 │  - Precession calculations (obliquity, inclination, dynamic)        │
 │  - Invariable plane updates and balance trend analysis              │
@@ -469,6 +471,8 @@ Critical ordering for dependent calculations:
        ↓
 3. updatePlanetAnomalies()                      // Mean/True anomaly for all planets
        ↓
+3b. updateMoonOrbitalElements()                 // Moon anomalies (Earth as focus), Ω, ϖ, phase
+       ↓
 4. updatePlanetInvariablePlaneHeights()         // Height above/below plane
        ↓
 5. updateDynamicInclinations()                  // Planet inclination oscillations
@@ -502,6 +506,7 @@ Critical ordering for dependent calculations:
 | **True Anomaly** | Actual position in orbit | Newton-Raphson iteration |
 | **Heliocentric Positions** | 3D coordinates relative to Sun | Spherical → Cartesian transform |
 | **Orbital Velocity** | Speed at any point in orbit | Vis-viva equation |
+| **Moon Orbital Elements** | Geocentric anomalies, Ω, ϖ, phase | `updateMoonOrbitalElements()` |
 
 ### Precession Cycles
 
@@ -528,6 +533,25 @@ Features:
 │   └── Option B: Souami & Souchay 2012 orbital elements
 └── Angular momentum contribution display (Jupiter ~60%, Saturn ~25%)
 ```
+
+### Predictive Formula System
+
+A 273-term feature matrix system for computing dynamic geocentric perihelion precession rates:
+
+```
+Architecture:
+├── PERI_HARMONICS (12 terms) → Earth perihelion longitude model
+├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year
+├── calcERD(year) → Earth Rate Deviation (derivative)
+├── buildPredictiveFeatures(year, period, theta0) → 273-term feature vector
+│   └── 16 groups: angle terms, obliquity, eccentricity, ERD, periodic,
+│       cross-terms, beat frequencies, Venus-specific, higher harmonics
+├── PREDICT_COEFFS (7 × 273 trained arrays) → per-planet coefficients
+└── predictGeocentricPrecession(year, planetKey) → total rate (″/century)
+    └── baseline + dot(features, coefficients)
+```
+
+Ported from Python (`docs/scripts/predictive_formula.py`). Reuses existing `computeObliquityEarth()` and `computeEccentricityEarth()`.
 
 ### Celestial Bodies
 
@@ -701,7 +725,7 @@ The application is fully self-contained with no runtime API dependencies. All ca
 
 ## Key Algorithms
 
-### Kepler Equation Solver (`OrbitalFormulas.eccentricAnomaly`, line 809)
+### Kepler Equation Solver (`OrbitalFormulas.eccentricAnomaly`, line 1135)
 
 ```javascript
 // Newton-Raphson iteration for eccentric anomaly

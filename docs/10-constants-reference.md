@@ -363,6 +363,52 @@ These values align each planet's perihelion and orbital position to match J2000 
 
 ---
 
+## Predictive Formula Constants
+
+### Earth Perihelion Harmonics
+
+The `PERI_HARMONICS` array models Earth's perihelion longitude with 12 Fourier terms:
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `PERI_HARMONICS` | 12-term array | `[period, sin_coeff, cos_coeff]` per term |
+| `PERI_OFFSET` | -0.3071 deg | Global offset correction |
+
+Periods are Fibonacci fractions of the Holistic Year: H/16, H/32, H/48, H/64, H/3, H/8, H/29, H/24, H, H/2, H/40.
+
+### Predictive Planet Parameters (`PREDICT_PLANETS`)
+
+Per-planet configuration for the predictive formula:
+
+| Planet | Period (years) | Theta0 (deg) | Baseline (″/cy) |
+|--------|---------------|---------------|-----------------|
+| Mercury | H×8/11 (~242,828) | 77.4569131 | 1296000/period×100 |
+| Venus | H×2 (~667,776) | 131.5765919 | 1296000/period×100 |
+| Mars | H×3/13 (~77,051) | 336.0650681 | 1296000/period×100 |
+| Jupiter | H/5 (~66,778) | 14.70659401 | 1296000/period×100 |
+| Saturn | H/8 (~41,736) | 92.12794343 | −1296000/period×100 (retrograde) |
+| Uranus | H/3 (~111,296) | 170.7308251 | 1296000/period×100 |
+| Neptune | H×2 (~667,776) | 45.80124471 | 1296000/period×100 |
+
+- **Period**: ecliptic perihelion precession period (from Holistic Year fractions)
+- **Theta0**: J2000 longitude of perihelion (deg, from JPL)
+- **Baseline**: heliocentric precession rate converted to arcsec/century
+
+### Predictive Coefficients (`PREDICT_COEFFS`)
+
+7 arrays of 273 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`docs/scripts/*_coeffs_unified.py`). The dot product of the 273-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
+
+### Predictive Normalization Constants
+
+| Constant | Variable | Value | Description |
+|----------|----------|-------|-------------|
+| Obliquity mean | `PREDICT_OBLIQ_MEAN` | 23.414 deg | Normalization center for obliquity features |
+| Eccentricity base | `PREDICT_ECC_BASE` | 0.015321 | Base eccentricity for normalization |
+| Eccentricity amplitude | `PREDICT_ECC_AMP` | 0.0014226 | Eccentricity amplitude for normalization |
+| Eccentricity mean | `PREDICT_ECC_MEAN` | √(base² + amp²) ≈ 0.01539 | Normalization center for eccentricity features |
+
+---
+
 ## References
 
 ### Primary Source
