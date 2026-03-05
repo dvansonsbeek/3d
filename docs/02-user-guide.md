@@ -42,6 +42,14 @@ Click the **RESET** button or the **3D** button in the top right to return to th
 | **Pinch** | Zoom in/out |
 | **Two finger drag** | Pan view |
 
+### Mobile Layout
+
+On phones and tablets, the interface adapts automatically:
+
+- **Control panel**: Hidden by default. Tap the **gear icon** (⚙) in the top-right corner to open it as an overlay. Tap the dark backdrop or the gear again to close.
+- **Planet info panel**: Automatically switches to a 2-column layout (label + value) when the panel is narrow, hiding the unit column.
+- **Touch targets**: Buttons and inputs are enlarged for easier tapping on touchscreens.
+
 ---
 
 ## Time Controls

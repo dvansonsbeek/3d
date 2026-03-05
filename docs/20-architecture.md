@@ -1,7 +1,7 @@
 # Interactive 3D Solar System Simulation - Architecture Document
 
-**Version:** 2.0
-**Date:** 2025-12-29
+**Version:** 2.1
+**Date:** 2026-03-05
 **Status:** Current Implementation Documentation
 
 ---
@@ -372,93 +372,63 @@ Update 3D scene accordingly
 
 ## Render Loop Architecture
 
-### Hierarchical Throttling System
+### Idle-Optimized Render Loop
 
-The render loop uses multiple update frequencies to balance responsiveness with performance:
+The render loop is idle-optimized: CPU drops to ~3% when nothing changes (paused, camera still).
 
 ```javascript
-function render() {
+function render(now) {
   requestAnimationFrame(render);
 
-  const delta = clock.getDelta();
+  // ═══════════════════════════════════════════════════════════════
+  // FRAME GATE
+  // ═══════════════════════════════════════════════════════════════
+  if (now - lastFrameTime < 16.0) return;     // 60 FPS cap
+  const delta = (now - lastFrameTime) * 0.001;
+  lastFrameTime = now;
+
+  // Camera epsilon: only count movement > 1e-6 per axis
+  const CAM_EPS = 1e-6;
+  cameraMoved = (Math.abs(x - lastCameraX) > CAM_EPS || ...);
+
+  // IDLE CHECK — skip everything when nothing changed
+  const active = o.Run || cameraMoved || positionChanged || needsLabelUpdate;
+  if (!active) return;  // no render, no updates, no GPU work
 
   // ═══════════════════════════════════════════════════════════════
-  // EVERY FRAME (60 FPS)
+  // ACTIVE FRAME
   // ═══════════════════════════════════════════════════════════════
-  // - Delta time calculation
-  // - FPS monitoring
-  // - Adaptive quality scaling
-  // - Camera movement detection
-  // - OrbitControls update
-  // - Three.js render call
+  forceAllUpdates = positionChanged;  // bypasses all throttles for one frame
+  positionChanged = false;
 
-  // ═══════════════════════════════════════════════════════════════
-  // UI UPDATES (20 Hz / 50ms)
-  // ═══════════════════════════════════════════════════════════════
-  uiElapsed += delta;
-  if (uiElapsed >= 0.05) {
-    uiElapsed = 0;
-    // - Date/Time string updates
-    // - Julian Day display
-    // - Camera position display
+  // controls.target recomputed ONLY when scene moves (not on camera-only moves)
+  // This prevents floating-point micro-jitter from getWorldPosition() matrix math
+  if (o.Run || forceAllUpdates) {
+    controls.target.copy(lookAtObj.pivotObj.getWorldPosition(tmpVec));
   }
+  controls.update();
 
   // ═══════════════════════════════════════════════════════════════
-  // HEAVY ASTRONOMY (10 Hz / 100ms)
+  // THROTTLED UPDATES (only when active)
   // ═══════════════════════════════════════════════════════════════
-  astroElapsed += delta;
-  if (astroElapsed >= 0.1) {
-    astroElapsed = 0;
-    // - Ascending node updates
-    // - Planet anomaly calculations
-    // - Invariable plane heights
-    // - Dynamic inclinations
-    // - Balance trend analysis
-    // - Angular momentum validation
-  }
+  // 30 Hz — CSS2D label flag (labelElapsed counter)
+  // 20 Hz — UI: date/time strings, Julian Day, camera position
+  // 10 Hz — Heavy astronomy: predictions, ascending nodes, anomalies,
+  //          inclinations, invariable plane, hierarchy inspector
+  // 10 Hz — Position tracking: elongations, perihelion, orientations
+  //  5 Hz — DOM labels: planet panel grid rebuild
+  // 30 Hz — Visual effects: lighting, flares
+  // 10 Hz — Lighting/glow: focus ring, glow animation
 
-  // ═══════════════════════════════════════════════════════════════
-  // POSITION TRACKING (10 Hz / 100ms) — second 10Hz block
-  // ═══════════════════════════════════════════════════════════════
-  posElapsed += delta;
-  if (posElapsed >= 0.1) {
-    posElapsed = 0;
-    // - updateElongations()
-    // - updatePerihelion()
-    // - updateOrbitOrientations()
-    // - golden.update()
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // VISUAL EFFECTS (30 Hz / 33ms)
-  // ═══════════════════════════════════════════════════════════════
-  visualElapsed += delta;
-  if (visualElapsed >= 0.033) {
-    visualElapsed = 0;
-    // - Lighting updates for focus
-    // - Lens flare updates
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // LIGHTING & GLOW (10 Hz / 100ms) — third 10Hz block
-  // ═══════════════════════════════════════════════════════════════
-  lightElapsed += delta;
-  if (lightElapsed >= 0.1) {
-    lightElapsed = 0;
-    // - updateFocusRing()
-    // - animateGlow()
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // DOM LABELS (5 Hz / 200ms)
-  // ═══════════════════════════════════════════════════════════════
-  labelElapsed += delta;
-  if (labelElapsed >= 0.2) {
-    labelElapsed = 0;
-    // - CSS2D label position updates
-  }
+  renderer.render(scene, camera);
+  if (needsLabelUpdate) CSS2DRenderer.render(scene, camera);  // 30 Hz throttled
 }
 ```
+
+**Key idle detection mechanisms:**
+- **`positionChanged`** is set by: `gui.on('change')` global listener, `controls.addEventListener('start')`, `onWindowResize()`, and any code that modifies scene state
+- **`cameraMoved`** uses epsilon threshold so OrbitControls damping eventually settles to zero
+- **`controls.target`** is NOT recomputed on pure camera movement — only when scene moves. This prevents floating-point jitter from keeping the loop awake indefinitely
 
 ### Update Function Call Order
 
@@ -679,19 +649,25 @@ Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 
 | Strategy | Implementation | Benefit |
 |----------|---------------|---------|
-| **Adaptive Quality** | Reduce pixel ratio when FPS < 30 | Maintains responsiveness |
+| **Idle Early-Return** | Single `active` check skips entire frame when nothing changes | ~3% CPU when idle (down from ~10%) |
+| **60 FPS Cap** | Skip frame if < 16ms since last | Prevents unnecessary work |
+| **Camera Epsilon** | Only detect movement > 1e-6 per axis | OrbitControls damping settles to zero |
+| **Controls Target Guard** | Only recompute `controls.target` when scene moves | Prevents getWorldPosition() micro-jitter |
+| **CSS2D 30Hz Throttle** | Label renderer only called when `needsLabelUpdate` | Reduces DOM layout work |
 | **Throttled Updates** | Different Hz for UI/Astronomy/Effects | Reduces CPU load |
 | **Object Pooling** | Pre-allocated Vector3/Matrix4 | Avoids GC pressure |
 | **Geometry Reuse** | Shared sphere geometry, scaled per planet | Reduces memory |
 | **Visibility Culling** | Optional bodies can be hidden | Reduces draw calls |
 | **Label Throttling** | DOM updates at 5 Hz | Reduces layout thrashing |
+| **GUI Change Listener** | `gui.on('change')` sets `positionChanged = true` | Wakes idle loop only when needed |
 
 ### Performance Budgets
 
 | Metric | Target | Actual |
 |--------|--------|--------|
 | FPS (Desktop) | 60 | 60 ✅ |
-| FPS (Mobile) | 30 | ~25 ⚠ |
+| FPS (Mobile) | 30 | ~30 ✅ |
+| CPU Idle (paused, camera still) | <5% | ~3% ✅ |
 | Initial Load | <3s | ~2.5s ✅ |
 | Bundle Size | <3MB | ~2.7MB ✅ |
 | Memory (Desktop) | <500MB | ~400MB ✅ |

@@ -112,6 +112,33 @@ The panel uses a collapsible sidebar pattern controlled by the `pl-collapsed` CS
 - Switching to Free Camera keeps the sidebar collapsed with the last planet's data
 - Performance: grid rebuild is skipped while collapsed; a fresh rebuild is triggered immediately on expand
 
+#### Mobile Responsive Layout
+
+The panel uses CSS **container queries** to automatically switch between 2-column and 3-column layouts based on actual panel width (not viewport width):
+
+| Panel width | Columns | What's shown |
+|------------|---------|-------------|
+| > 380px | 3 | Label, Value, Unit |
+| ≤ 380px | 2 | Label, Value (unit column hidden) |
+
+The value column (`auto`) always gets priority over the label column (`minmax(0,1fr)`), which truncates with ellipsis when space is tight.
+
+Panel width varies by device:
+- **Desktop**: 33.333vw ≈ 640px → 3 columns
+- **iPad landscape**: 33.333vw ≈ 393px → 3 columns
+- **iPad portrait**: 33.333vw ≈ 270px → 2 columns
+- **iPhone portrait**: 85vw ≈ 352px → 2 columns
+- **iPhone landscape**: 33.333vw ≈ 299px → 2 columns
+
+#### Tweakpane Mobile Toggle
+
+On mobile/tablet, the Tweakpane control panel is hidden by default to give the 3D scene full screen space:
+
+- A **gear icon** (⚙) button appears in the top-right corner on screens < 768px wide or < 500px tall
+- Tapping the gear slides the Tweakpane panel in as an overlay (85vw on portrait, 50vw on landscape)
+- A dark **backdrop overlay** appears behind the panel; tapping it closes the panel
+- Touch targets are enlarged on touch devices via `@media (pointer: coarse)`
+
 ### Tabbed View
 
 Rows are distributed across tabs to reduce scrolling. The tab bar appears between the planet header and the data rows.
