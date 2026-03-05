@@ -806,7 +806,8 @@ a:link {
   color:rgba(255,255,255,.35);
   background:rgba(255,255,255,.03);
   border-right:1px solid rgba(255,255,255,.06);
-  transition:background .15s, color .15s, width 280ms cubic-bezier(.25,.8,.25,1);
+  border-left:2px solid transparent;
+  transition:background .15s, color .15s, border-left-color .15s, width 280ms cubic-bezier(.25,.8,.25,1);
   user-select:none;
   touch-action:manipulation;
   overflow:hidden;
@@ -815,9 +816,10 @@ a:link {
   color:rgba(255,255,255,.85);
   background:rgba(255,255,255,.08);
 }
-/* hide icon + label in expanded state (only chevron visible) */
+/* hide icon + label + dot in expanded state (only chevron visible) */
 .pl-handle-icon,
-.pl-handle-label{
+.pl-handle-label,
+.pl-handle-dot{
   display:none;
 }
 .pl-handle-chevron{
@@ -827,7 +829,8 @@ a:link {
 
 /* ─── Collapsed state ─── */
 #planetLabel.pl-collapsed{
-  width:36px;
+  width:42px;
+  overflow:visible;          /* allow glass edge + shadow to peek out */
 }
 #planetLabel.pl-collapsed .labelContent{
   opacity:0;
@@ -835,18 +838,53 @@ a:link {
 }
 #planetLabel.pl-collapsed .pl-handle{
   width:100%;
+  overflow:visible;          /* allow pseudo-elements to render */
   background:var(--panel-bg);
   border-right:1px solid var(--panel-border);
-  backdrop-filter:blur(14px);
+  border-radius:0 6px 6px 0;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:2px 0 12px rgba(0,0,0,.3),
+             inset -1px 0 0 rgba(255,255,255,.08);
   color:rgba(255,255,255,.65);
   gap:10px;
   padding:0;
 }
+/* glass highlight edge — right side light catch */
+#planetLabel.pl-collapsed .pl-handle::after{
+  content:'';
+  position:absolute;
+  top:0; right:-1px; bottom:0;
+  width:1px;
+  border-radius:0 6px 6px 0;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,.15),
+    rgba(255,255,255,.04) 30%,
+    rgba(255,255,255,.04) 70%,
+    rgba(255,255,255,.15));
+  pointer-events:none;
+}
+/* top/bottom vignette — depth framing */
+#planetLabel.pl-collapsed .pl-handle::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:0 6px 6px 0;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,.07),
+    transparent 18%,
+    transparent 82%,
+    rgba(0,0,0,.18));
+  pointer-events:none;
+}
 #planetLabel.pl-collapsed .pl-handle:hover{
   background:rgba(255,255,255,.1);
   color:#fff;
+  border-left-color:rgba(239,192,74,.6);
+  box-shadow:2px 0 16px rgba(0,0,0,.35),
+             inset -1px 0 0 rgba(255,255,255,.12);
 }
-/* show icon + label vertically in collapsed state */
+/* show icon + label + dot vertically in collapsed state */
 #planetLabel.pl-collapsed .pl-handle-icon{
   display:flex;
   align-items:center;
@@ -863,27 +901,86 @@ a:link {
   flex-shrink:0;
   color:rgba(255,255,255,.8);
 }
+#planetLabel.pl-collapsed .pl-handle-dot{
+  display:block;
+  width:8px; height:8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.3);
+  flex-shrink:0;
+  transition:background .2s;
+}
 #planetLabel.pl-collapsed .pl-handle-label{
   display:block;
   writing-mode:vertical-rl;
   text-orientation:mixed;
-  font:600 10px/1 var(--pl-body-font);
-  letter-spacing:.10em;
+  font:600 11px/1 var(--pl-body-font);
+  letter-spacing:.12em;
   text-transform:uppercase;
   white-space:nowrap;
   color:rgba(255,255,255,.75);
 }
 #planetLabel.pl-collapsed .pl-handle-chevron{
-  font-size:16px;
-  opacity:.6;
+  font-size:18px;
+  opacity:.75;
 }
-/* gentle glow pulse on first appearance to attract attention */
+/* gentle glow pulse to attract attention */
 @keyframes pl-pulse{
   0%, 100%{ background:var(--panel-bg); }
   50%{ background:rgba(255,255,255,.08); }
 }
-#planetLabel.pl-collapsed .pl-handle{
-  animation:pl-pulse 1.8s ease-in-out 3;  /* pulse 3 times then stop */
+#planetLabel.pl-collapsed .pl-handle.pl-pulse-active{
+  animation:pl-pulse 1.8s ease-in-out 3;
+}
+
+/* ─── Scene watermark ─── */
+#sceneWatermark{
+  position:fixed;
+  bottom:8px; right:8px;
+  z-index:5;
+  font:400 11px/1.4 var(--pl-body-font);
+  color:#fff;
+  opacity:.2;
+  pointer-events:auto;
+  user-select:none;
+  transition:opacity .25s;
+}
+#sceneWatermark:hover{ opacity:.5; }
+#sceneWatermark a{
+  color:hsla(210,60%,75%,1);
+  text-decoration:none;
+}
+#sceneWatermark a:hover{ text-decoration:underline; }
+#sceneWatermark .wm-version{
+  font-size:9px;
+  opacity:.7;
+  margin-left:4px;
+}
+
+/* ─── Simulation date HUD ─── */
+#dateHUD{
+  position:fixed;
+  bottom:8px; left:58px;
+  z-index:5;
+  font:400 11px/1 var(--pl-mono-font);
+  color:#fff;
+  opacity:.35;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* ─── Keyboard hint ─── */
+#keyHint{
+  position:fixed;
+  bottom:32px; left:58px;
+  z-index:5;
+  font:400 10px/1 var(--pl-body-font);
+  color:rgba(255,255,255,.5);
+  pointer-events:none;
+  animation:keyHintFade 5s ease-out forwards;
+}
+@keyframes keyHintFade{
+  0%,60%{ opacity:1; }
+  100%  { opacity:0; }
 }
 
 /* mobile: expanded panel takes more space */

@@ -13698,6 +13698,45 @@ if (!o.Performance) stats.dom.style.display = 'none';
 //stats.dom.style.visibility = 'visible';
 
 //*************************************************************
+// SCENE OVERLAYS: watermark, date HUD, keyboard hint
+//*************************************************************
+
+/* Watermark / branding — bottom-right */
+const sceneWatermark = document.createElement('div');
+sceneWatermark.id = 'sceneWatermark';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v6.01</span>';
+document.body.appendChild(sceneWatermark);
+
+/* Simulation date HUD — bottom-left */
+const dateHUD = document.createElement('div');
+dateHUD.id = 'dateHUD';
+dateHUD.textContent = o.Date || '';
+document.body.appendChild(dateHUD);
+
+/* Keyboard hint — fades out after 5 seconds */
+const keyHint = document.createElement('div');
+keyHint.id = 'keyHint';
+keyHint.textContent = 'Press I for planet info';
+document.body.appendChild(keyHint);
+
+/* Keyboard shortcut: "I" toggles planet info sidepanel */
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.key === 'i' || e.key === 'I') {
+    const label = document.getElementById('planetLabel');
+    if (!label || label.style.display === 'none') return;
+    const handle = label._handle;
+    if (!handle) return;
+    const isCollapsed = label.classList.toggle('pl-collapsed');
+    handle.querySelector('.pl-handle-chevron').textContent = isCollapsed ? '\u203A' : '\u2039';
+    if (!isCollapsed) {
+      labelPrevHTML = '';
+      updateDomLabel();
+    }
+  }
+});
+
+//*************************************************************
 // THE ANIMATE/RENDER LOOP (BE CAREFUL WITH ADDING/ CHANGING)
 //*************************************************************
 function render(now) {
@@ -13865,6 +13904,7 @@ function render(now) {
     if (domElapsed >= 0.2 || forceAllUpdates) {
       domElapsed = 0;
       updateDomLabel();
+      dateHUD.textContent = o.Date;
     }
 
     // 8) Throttle lighting/glow (10 Hz)
@@ -26901,7 +26941,7 @@ function updateDomLabel () {
     /* collapsible handle — direct child of label, visible even when content is hidden */
     const handle = document.createElement('div');
     handle.className = 'pl-handle';
-    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span>';
+    handle.innerHTML = '<span class="pl-handle-icon">i</span><span class="pl-handle-dot"></span><span class="pl-handle-label">Planet Info</span><span class="pl-handle-chevron">\u203A</span>';
     handle.title = 'Click to expand planet information panel';
     handle.addEventListener('click', e => {
       e.stopPropagation();
@@ -26921,8 +26961,9 @@ function updateDomLabel () {
     label.appendChild(handle);       // handle OUTSIDE content — always visible
     label.appendChild(content);
 
-    /* start collapsed */
+    /* start collapsed with initial pulse */
     label.classList.add('pl-collapsed');
+    handle.classList.add('pl-pulse-active');
 
     /* keep a reference so we can reach it later */
     label._body   = body;
@@ -26991,6 +27032,21 @@ function updateDomLabel () {
   if (selName !== prevPlanetName) {
     labelDismissed = false;
     prevPlanetName = selName;
+
+    /* update colour dot on collapsed handle */
+    const dot = label._handle?.querySelector('.pl-handle-dot');
+    if (dot && selObj?.color != null) {
+      dot.style.background = '#' + selObj.color.toString(16).padStart(6, '0');
+    }
+
+    /* re-trigger pulse animation so user notices the planet changed */
+    const hdl = label._handle;
+    if (hdl) {
+      hdl.classList.remove('pl-pulse-active');
+      void hdl.offsetWidth;                    // force reflow to restart animation
+      hdl.classList.add('pl-pulse-active');
+    }
+
     // Clear static cache for fresh evaluation on planet change
     staticValueCache[selName] = {};
 
