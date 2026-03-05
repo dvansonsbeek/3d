@@ -12309,6 +12309,23 @@ function setupGUI() {
     if (!o._renderLoopRefreshing) positionChanged = true;
   });
 
+  // Mobile: gear icon to show/hide GUI panel
+  const guiToggle = document.createElement('div');
+  guiToggle.id = 'guiToggle';
+  guiToggle.innerHTML = '&#9881;'; // ⚙
+  document.body.appendChild(guiToggle);
+
+  const guiBackdrop = document.createElement('div');
+  guiBackdrop.id = 'guiBackdrop';
+  document.body.appendChild(guiBackdrop);
+
+  function toggleMobileGui() {
+    const isOpen = gui.element.classList.toggle('gui-open');
+    guiBackdrop.classList.toggle('gui-open', isOpen);
+  }
+  guiToggle.addEventListener('click', toggleMobileGui);
+  guiBackdrop.addEventListener('click', toggleMobileGui);
+
   // Version subtitle under panel title
   const titleEl = gui.element.querySelector('.tp-rotv_t');
   if (titleEl) {
@@ -27262,7 +27279,7 @@ function updateDomLabel () {
       }
     }
     const altCh = Math.ceil(maxAltLen * 0.5) + 1;
-    columnCache._global = `1fr ${maxValLen + 1}ch ${altCh}ch`;
+    columnCache._global = `minmax(0,1fr) auto minmax(0,${altCh}ch)`;
   }
 
   for (let rowIdx = 0; rowIdx < stats.length; rowIdx++) {
