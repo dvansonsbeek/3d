@@ -5026,6 +5026,7 @@ periLabelDiv.style.cssText = helperLabelStyle;
 periLabelDiv.innerHTML =
   '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(254,170,13,.95);letter-spacing:.03em;">Earth Perihelion</div>' +
   '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(254,170,13,.45);margin-top:2px;">Sun orbits this point at 1 AU</div>' +
+  '<div id="periDistHUD" style="font:500 9px/1.2 Inter,system-ui,sans-serif;color:rgba(254,170,13,.7);margin-top:3px;font-variant-numeric:tabular-nums;"></div>' +
   '<div style="margin-top:3px;color:rgba(254,170,13,.35);font-size:8px;line-height:1;">&#9660;</div>';
 const periLabelObj = new CSS2DObject(periLabelDiv);
 periLabelObj.position.set(0, 0.08, 0);
@@ -13891,6 +13892,7 @@ function render(now) {
   // 5) Advance the simulation time (once per frame)
   if (o.Run) {
     o.pos += Number(o.speedFact) * o.speed * delta;
+    needsLabelUpdate = true;       // CSS2D labels must follow moving objects
   }
 
   // 6) Skip heavy updates when idle (not running and camera not moving)
@@ -13955,6 +13957,12 @@ function render(now) {
       domElapsed = 0;
       updateDomLabel();
       dateHUD.textContent = o.Date;
+
+      /* update perihelion distance on floating label */
+      const periDistEl = document.getElementById('periDistHUD');
+      if (periDistEl && earthPerihelionFromEarth.distAU != null) {
+        periDistEl.textContent = earthPerihelionFromEarth.distAU.toFixed(8) + ' AU';
+      }
 
       /* fade helper labels based on camera distance */
       const camDist = camera.position.distanceTo(controls.target);
@@ -27123,6 +27131,9 @@ function updateDomLabel () {
       label.style.display = 'none';
       return;
     }
+    /* only auto-collapse if the user hasn't manually expanded the panel;
+       if expanded, keep showing last planet's data (don't re-collapse) */
+    if (!label.classList.contains('pl-collapsed')) return;
     label.classList.add('pl-collapsed');
     const chev = label._handle?.querySelector('.pl-handle-chevron');
     if (chev) chev.textContent = '\u203A';
