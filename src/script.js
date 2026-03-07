@@ -25,7 +25,7 @@ import { Pane } from 'tweakpane';
 //*************************************************************
 // ALL INPUT CONSTANTS
 //*************************************************************
-const holisticyearLength = 333888;
+const holisticyearLength = 335008;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
 // Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
@@ -33,7 +33,7 @@ const perihelionalignmentJD = 2176142;
 // Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const inputmeanlengthsolaryearindays = 365.2421897;
 // Reference length of solar year in days. THIS IS USED AS INPUT. The actual mean lenght is calculated based upon this input and the lenght of the holistic year
-const meansiderealyearlengthinSeconds = 31558149.724;
+const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
 const startmodelJD = 2451716.5;
 // By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
@@ -41,22 +41,27 @@ const startmodelYear = 2000.5;
 // By default the model is pointing to the June Solstice in year 2000. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
-const correctionDays = -0.231598615646362;
+const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.277377;
+const correctionSun = 0.511153;
 // Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
+const useVariableSpeed = true;
+// Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
+// When useVariableSpeed = false, correctionSun should be 0.913280
+const perihelionPhaseOffset = 2; // degrees — independent offset to perihelion direction
+const eocEccentricity = 0.0085; // Equation of center eccentricity (reduced — geometric offset provides partial speed variation)
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 const earthRAAngle = 1.258454;
 // 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
-const earthtiltMean = 23.41398;                           // 3D model + formula (optimized for IAU 2006)
-const earthInvPlaneInclinationAmplitude = 0.633849;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.635185
-const earthInvPlaneInclinationMean = 1.481592;            // 3D model + Formula. Fibonacci predicts 1.481388
-const eccentricityBase = 0.015321;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.0014226;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
+const earthInvPlaneInclinationAmplitude = 0.635956;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.635185
+const earthInvPlaneInclinationMean = 1.481180;            // 3D model + Formula. Fibonacci predicts 1.481388
+const eccentricityBase = 0.015373;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.001370;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
-const meansiderealyearAmplitudeinSecondsaDay = 3208;      // Formula only
+const meansiderealyearAmplitudeinSecondsaDay = 60;      // Formula only
 const meansolaryearAmplitudeinSecondsaDay = 2.29;          // Formula only
 const meanAnomalisticYearAmplitudeinSecondsaDay = 6;      // Formula only
 const currentAUDistance = 149597870.698828;               // 3D model + formula
@@ -2428,6 +2433,9 @@ const sun = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  eccentricity: eocEccentricity,
+  perihelionPhaseJ2000: -correctionSun * (Math.PI / 180) - 2 * Math.PI * (startmodelJD - 2451547.042) / meansolaryearlengthinDays + perihelionPhaseOffset * (Math.PI / 180), // 2451547.042 = JD of Earth perihelion 2000 (Jan 3.542)
+  perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 16), // perihelion advances at H/16 rate
   
   size: (diameters.sunDiameter/ currentAUDistance)*100,   
   color: 0x333333,
@@ -2564,6 +2572,7 @@ const moon = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  eccentricity: moonOrbitalEccentricity,
 
   size: (diameters.moonDiameter/ currentAUDistance)*100,
   color: 0x8b8b8b,
@@ -2707,6 +2716,7 @@ const mercury = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
+  eccentricity: mercuryOrbitalEccentricity,
 
   size: (diameters.mercuryDiameter/ currentAUDistance)*100,
   color: 0x868485,
@@ -2850,7 +2860,8 @@ const venus = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: venusOrbitalEccentricity,
+
   size: (diameters.venusDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
@@ -2993,7 +3004,8 @@ const mars = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: marsOrbitalEccentricity,
+
   size: (diameters.marsDiameter/ currentAUDistance)*100,
   color: 0xFF0000,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
@@ -3136,7 +3148,8 @@ const jupiter = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: jupiterOrbitalEccentricity,
+
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
   color: 0xCDC2B2,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
@@ -3274,7 +3287,7 @@ const saturnFixedPerihelionAtSun = {
 
 const saturn = {
   name: "Saturn",
-  startPos: saturnStartpos,    
+  startPos: saturnStartpos,
   speed: Math.PI*2/(holisticyearLength/saturnSolarYearCount),
   rotationSpeed: Math.PI*2*((saturnRotationPeriod/24)/meansolaryearlengthinDays),
   tilt: -saturnTilt,
@@ -3284,7 +3297,8 @@ const saturn = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: saturnOrbitalEccentricity,
+
   size: (diameters.saturnDiameter/ currentAUDistance)*100,
   color: 0xA79662,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
@@ -3432,7 +3446,8 @@ const uranus = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: uranusOrbitalEccentricity,
+
   size: (diameters.uranusDiameter/ currentAUDistance)*100,
   color: 0xD2F9FA,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
@@ -3580,7 +3595,8 @@ const neptune = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: neptuneOrbitalEccentricity,
+
   size: (diameters.neptuneDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
@@ -3733,7 +3749,8 @@ const pluto = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: plutoOrbitalEccentricity,
+
   size: (diameters.plutoDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
@@ -3878,7 +3895,8 @@ const halleys = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: halleysOrbitalEccentricity,
+
   size: (diameters.halleysDiameter/ currentAUDistance)*100,
   color: 0x00FF00,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
@@ -4019,7 +4037,8 @@ const eros = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  
+  eccentricity: erosOrbitalEccentricity,
+
   size: (diameters.erosDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
@@ -6825,416 +6844,1345 @@ const PLANET_HIERARCHIES = {
 const PLANET_TEST_DATES = {
   mercury: [
     // Model start date: ra is in decimal hours (e.g., 7.682 = 7h 40m 55s)
-    { jd: 2451716.5, ra: '7.412897222', dec: '20.8486', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '7.412897222', dec: '20.8486', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
     // NASA Mercury Transit Catalog: https://eclipse.gsfc.nasa.gov/transit/catalog/MercuryCatalog.html
-    { jd: 2307579.3, dec: '-14.68', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2311048.9, dec: '15.61', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2312330.1, dec: '-15.49', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2315800.2, dec: '16.52', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2317080.8, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2321831.5, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2324381.5, dec: '-15.01', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2327851.2, dec: '15.94', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2329132.3, dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2332602.5, dec: '16.84', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2333883.0, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2338633.7, dec: '-17.32', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2341183.7, dec: '-15.33', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2344653.5, dec: '16.27', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2345934.5, dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2350685.2, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2355435.9, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2356704.5, dec: '15.68', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2357985.9, dec: '-15.65', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2361455.8, dec: '16.59', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2362736.7, dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2367487.4, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2370037.4, dec: '-14.91', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2372238.1, dec: '-17.88', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2373506.7, dec: '16.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2374788.1, dec: '-15.96', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2378258.0, dec: '16.90', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2379538.9, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2384289.6, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2386839.6, dec: '-15.50', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2390309.0, dec: '16.34', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2391590.3, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2395060.3, dec: '17.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2396341.1, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2401091.8, dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2403641.8, dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2407111.3, dec: '16.66', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2408392.5, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2411862.6, dec: '17.52', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2413143.3, dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2417894.0, dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2420444.0, dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2423913.6, dec: '16.97', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2425194.7, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2428664.9, dec: '17.81', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2429945.5, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2434696.2, dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2435964.6, dec: '16.41', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2437246.2, dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2440715.8, dec: '17.28', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2441996.9, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2446747.7, dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2449297.7, dec: '-15.97', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2451498.4, dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2452766.8, dec: '16.73', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2454048.4, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2457518.1, dec: '17.58', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2458799.1, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2463549.9, dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2466099.9, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2469569.1, dec: '17.04', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2470850.6, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2474320.4, dec: '17.88', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2475601.3, dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2480352.1, dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2482902.1, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2486371.4, dec: '17.35', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2487652.8, dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2491122.7, dec: '18.16', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2492403.5, dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2497154.3, dec: '-18.67', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2499704.3, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2503173.7, dec: '17.65', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2504455.0, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2507925.0, dec: '18.45', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2509205.7, dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2513956.5, dec: '-18.92', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2515224.6, dec: '17.12', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2516506.5, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2519975.9, dec: '17.94', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2521257.2, dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2526007.9, dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2528557.9, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2532026.9, dec: '17.41', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2533308.7, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2536778.2, dec: '18.23', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2538059.4, dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2542810.1, dec: '-18.80', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2545360.1, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2548829.2, dec: '17.71', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2550110.9, dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2553580.5, dec: '18.50', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2554861.6, dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2559612.3, dec: '-19.04', type: 'position', label: 'NASA date', showOnScreen: false },
+    { jd: 2307579.3, dec: '-14.68', type: 'position', label: 'NASA date', showOnScreen: true, tier: 3, weight: 0 },
+    { jd: 2311048.9, dec: '15.61', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2312330.1, dec: '-15.49', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2315800.2, dec: '16.52', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2317080.8, dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2321831.5, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2324381.5, dec: '-15.01', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2327851.2, dec: '15.94', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2329132.3, dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2332602.5, dec: '16.84', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2333883, dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2338633.7, dec: '-17.32', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2341183.7, dec: '-15.33', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2344653.5, dec: '16.27', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2345934.5, dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2350685.2, dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2355435.9, dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2356704.5, dec: '15.68', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2357985.9, dec: '-15.65', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2361455.8, dec: '16.59', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2362736.7, dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2367487.4, dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2370037.4, dec: '-14.91', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2372238.1, dec: '-17.88', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2373506.7, dec: '16.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2374788.1, dec: '-15.96', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2378258, dec: '16.90', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2379538.9, ra: '226.55741°', dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2384289.6, ra: '229.10150°', dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2386839.6, ra: '222.04550°', dec: '-15.50', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2390309, ra: '44.79446°', dec: '16.34', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2391590.3, ra: '224.56760°', dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2395060.3, ra: '47.81259°', dec: '17.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2396341.1, ra: '226.98210°', dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2401091.8, ra: '229.52465°', dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2403641.8, ra: '222.46723°', dec: '-15.81', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2407111.3, ra: '45.27221°', dec: '16.66', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2408392.5, ra: '224.99823°', dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2411862.6, ra: '48.31312°', dec: '17.52', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2413143.3, ra: '227.40906°', dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2417894, ra: '229.94945°', dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2420444, ra: '222.89087°', dec: '-16.12', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2423913.6, ra: '45.76339°', dec: '16.97', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2425194.7, ra: '225.42089°', dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2428664.9, ra: '48.79635°', dec: '17.81', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429945.5, ra: '227.83217°', dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2434696.2, ra: '230.38142°', dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2435964.6, ra: '43.23750°', dec: '16.41', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2437246.2, ra: '223.31221°', dec: '-16.42', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2440715.8, ra: '46.29412°', dec: '17.28', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2441996.9, ra: '225.84093°', dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2446747.7, ra: '228.25437°', dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2449297.7, ra: '221.22331°', dec: '-15.97', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2451498.4, ra: '230.80683°', dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2452766.8, ra: '43.77867°', dec: '16.73', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2454048.4, ra: '223.73827°', dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2457518.1, ra: '46.78620°', dec: '17.58', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2458799.1, ra: '226.26339°', dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2463549.9, ra: '228.67674°', dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2466099.9, ra: '221.64423°', dec: '-16.27', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2469569.1, ra: '44.25077°', dec: '17.04', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2470850.6, ra: '224.16649°', dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2474320.4, ra: '47.27550°', dec: '17.88', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2475601.3, ra: '226.69369°', dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2480352.1, ra: '229.10640°', dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2482902.1, ra: '222.06647°', dec: '-16.58', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2486371.4, ra: '44.74519°', dec: '17.35', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2487652.8, ra: '224.58908°', dec: '-17.31', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2491122.7, ra: '47.76470°', dec: '18.16', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2492403.5, ra: '227.12033°', dec: '-18.01', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2497154.3, ra: '229.54400°', dec: '-18.67', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2499704.3, ra: '222.48725°', dec: '-16.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2503173.7, ra: '45.23214°', dec: '17.65', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2504455, ra: '225.00757°', dec: '-17.59', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2507925, ra: '48.26256°', dec: '18.45', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2509205.7, ra: '227.54850°', dec: '-18.28', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2513956.5, ra: '229.97222°', dec: '-18.92', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2515224.6, ra: '42.78444°', dec: '17.12', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2516506.5, ra: '222.91105°', dec: '-17.17', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2519975.9, ra: '45.78177°', dec: '17.94', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2521257.2, ra: '225.43088°', dec: '-17.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2526007.9, dec: '-18.54', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2528557.9, dec: '-16.73', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2532026.9, dec: '17.41', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2533308.7, dec: '-17.45', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2536778.2, dec: '18.23', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538059.4, dec: '-18.14', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2542810.1, dec: '-18.80', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2545360.1, dec: '-17.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2548829.2, dec: '17.71', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2550110.9, dec: '-17.73', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553580.5, dec: '18.50', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2554861.6, dec: '-18.41', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2559612.3, dec: '-19.04', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
   ],
   // VENUS TRANSIT DATA
   // NASA Venus Transit Catalog: https://eclipse.gsfc.nasa.gov/transit/catalog/VenusCatalog.html
   venus: [
-    { jd: 2451716.5, ra: '6.185725', dec: '23.8844', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
-    { jd: 991610.0, dec: '-15.31', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1030146.3, dec: '16.16', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1033066.0, dec: '15.50', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1077446.5, dec: '-16.65', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1080366.0, dec: '-15.91', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1118902.5, dec: '16.83', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1121822.3, dec: '16.20', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1166202.5, dec: '-17.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1169122.0, dec: '-16.48', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1207658.7, dec: '17.47', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1210578.5, dec: '16.86', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1254958.5, dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1257878.1, dec: '-17.04', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1296415.0, dec: '18.08', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1299334.7, dec: '17.50', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1343714.5, dec: '-18.25', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1346634.1, dec: '-17.58', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1385171.2, dec: '18.67', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1388090.9, dec: '18.11', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1432470.5, dec: '-18.74', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1435390.1, dec: '-18.10', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1476847.1, dec: '18.69', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1521226.5, dec: '-19.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1524146.1, dec: '-18.59', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1565603.3, dec: '19.25', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1609982.5, dec: '-19.66', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1654359.5, dec: '19.76', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1698738.5, dec: '-20.08', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1743115.6, dec: '20.25', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1787494.5, dec: '-20.48', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1831871.8, dec: '20.71', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1876250.5, dec: '-20.86', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1920628.0, dec: '21.13', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1923547.7, dec: '20.72', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 1965006.4, dec: '-21.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2009384.1, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2012303.9, dec: '21.14', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2053762.4, dec: '-21.53', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2098140.3, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2101060.0, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2142518.4, dec: '-21.83', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2186896.4, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2189816.2, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2231274.3, dec: '-22.10', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2275652.6, dec: '22.45', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2278572.3, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2317110.7, dec: '-22.64', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2320030.3, dec: '-22.34', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2364408.7, dec: '22.69', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2367328.4, dec: '22.44', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2405866.7, dec: '-22.82', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2408786.2, dec: '-22.56', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2453164.8, dec: '22.89', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2456084.6, dec: '22.68', type: 'position', label: 'NASA date', showOnScreen: true },
-    { jd: 2494622.6, dec: '-22.97', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2497542.2, dec: '-22.74', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2541921.0, dec: '23.05', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2544840.7, dec: '22.87', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2583378.6, dec: '-23.09', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2586298.1, dec: '-22.90', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2630677.1, dec: '23.17', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2633596.8, dec: '23.02', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2672134.5, dec: '-23.18', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2675054.1, dec: '-23.03', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2719433.2, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2722352.9, dec: '23.14', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2760890.5, dec: '-23.24', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2763810.0, dec: '-23.12', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2808189.3, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2811109.0, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2849646.4, dec: '-23.27', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2896945.4, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2899865.1, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2938402.3, dec: '-23.26', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2985701.5, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 2988621.2, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 3027158.3, dec: '-23.23', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 3074457.6, dec: '23.16', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 3077377.3, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 3115914.2, dec: '-23.16', type: 'position', label: 'NASA date', showOnScreen: false },
-    { jd: 3166133.4, dec: '23.13', type: 'position', label: 'NASA date', showOnScreen: false },
-// VENUS OCCULTATIONS (9 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1388944.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1601453.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1618742.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1864578.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1997689.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2012028.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2222501.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2355634.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2500459.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
+    { jd: 2451716.5, ra: '6.185725', dec: '23.8844', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 991610, dec: '-15.31', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1030146.3, dec: '16.16', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1033066, dec: '15.50', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1077446.5, dec: '-16.65', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1080366, dec: '-15.91', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1118902.5, dec: '16.83', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1121822.3, dec: '16.20', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1166202.5, dec: '-17.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1169122, dec: '-16.48', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1207658.7, dec: '17.47', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1210578.5, dec: '16.86', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1254958.5, dec: '-17.74', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1257878.1, dec: '-17.04', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1296415, dec: '18.08', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1299334.7, dec: '17.50', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1343714.5, dec: '-18.25', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1346634.1, dec: '-17.58', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1385171.2, dec: '18.67', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1388090.9, dec: '18.11', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1432470.5, dec: '-18.74', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1435390.1, dec: '-18.10', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1476847.1, dec: '18.69', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1521226.5, dec: '-19.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1524146.1, dec: '-18.59', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1565603.3, dec: '19.25', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1609982.5, dec: '-19.66', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1654359.5, dec: '19.76', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1698738.5, dec: '-20.08', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1743115.6, dec: '20.25', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1787494.5, dec: '-20.48', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1831871.8, dec: '20.71', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1876250.5, dec: '-20.86', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1920628, dec: '21.13', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1923547.7, dec: '20.72', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1965006.4, dec: '-21.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2009384.1, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2012303.9, dec: '21.14', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2053762.4, dec: '-21.53', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2098140.3, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2101060, dec: '21.52', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2142518.4, dec: '-21.83', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2186896.4, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2189816.2, dec: '21.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2231274.3, dec: '-22.10', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2275652.6, dec: '22.45', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2278572.3, dec: '22.18', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2317110.7, dec: '-22.64', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2320030.3, dec: '-22.34', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2364408.7, dec: '22.69', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2367328.4, dec: '22.44', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2405866.7, ra: '257.78049°', dec: '-22.82', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2408786.2, ra: '254.93549°', dec: '-22.56', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2453164.8, ra: '76.83754°', dec: '22.89', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2456084.6, ra: '74.28583°', dec: '22.68', type: 'position', label: 'NASA date', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2494622.6, ra: '256.30099°', dec: '-22.97', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2497542.2, ra: '253.42264°', dec: '-22.74', type: 'position', label: 'NASA date', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2541921, dec: '23.05', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2544840.7, dec: '22.87', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2583378.6, dec: '-23.09', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2586298.1, dec: '-22.90', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2630677.1, dec: '23.17', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2633596.8, dec: '23.02', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2672134.5, dec: '-23.18', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2675054.1, dec: '-23.03', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2719433.2, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2722352.9, dec: '23.14', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2760890.5, dec: '-23.24', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2763810, dec: '-23.12', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2808189.3, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2811109, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2849646.4, dec: '-23.27', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2896945.4, dec: '23.28', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2899865.1, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2938402.3, dec: '-23.26', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2985701.5, dec: '23.24', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2988621.2, dec: '23.25', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 3027158.3, dec: '-23.23', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 3074457.6, dec: '23.16', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 3077377.3, dec: '23.21', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 3115914.2, dec: '-23.16', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 3166133.4, dec: '23.13', type: 'position', label: 'NASA date', showOnScreen: false, tier: 3, weight: 0 },
+    // VENUS OCCULTATIONS (9 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1388944.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1601453, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1618742, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1864578.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1997689.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2012028.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2222501.8, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2355634.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2500459.1, ra: '252.20299°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
   ],
   // MARS OPPOSITION DATA
   // Sources: https://stjerneskinn.com/mars-at-opposition.htm (Jean Meeus tables)
   //          https://www.nakedeyeplanets.com/mars-oppositions.htm
   mars: [
-    { jd: 2451716.5, ra: '6.219366667', dec: '24.2058', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '6.219366667', dec: '24.2058', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
     // Mars Opposition dates - declination values from astronomical tables
-    { jd: 2414673.5, dec: '24.70', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2415437.8, dec: '14.53', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2416202.8, dec: '-0.08', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2416974.3, dec: '-16.95', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2417763.1, dec: '-27.98', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2418573.9, dec: '-4.22', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2419365.7, dec: '21.72', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2420138.3, dec: '26.57', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2420903.6, dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2421667.8, dec: '5.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2422435.9, dec: '-10.35', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2423216.1, dec: '-25.93', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2424021.2, dec: '-17.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2424823.9, dec: '14.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2425602.1, dec: '26.65', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2426369.3, dec: '22.90', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2427133.3, dec: '11.43', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2427899.2, dec: '-3.87', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2428673.3, dec: '-20.67', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2429467.8, dec: '-26.40', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2430278.0, dec: '3.50', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2431064.3, dec: '24.40', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2431834.5, dec: '25.60', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2432599.2, dec: '16.42', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2433363.7, dec: '2.33', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2434133.6, dec: '-14.28', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2434918.2, dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2435727.4, dec: '-10.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2436524.1, dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2437298.9, dec: '26.82', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2438065.0, dec: '20.70', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2438829.0, dec: '8.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2439596.0, dec: '-7.72', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2440373.2, dec: '-23.95', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2441173.8, dec: '-22.25', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2441980.6, dec: '10.30', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2442762.1, dec: '26.05', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2443530.5, dec: '24.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2444294.7, dec: '13.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2445059.9, dec: '-1.35', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2445831.9, dec: '-18.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2446621.7, dec: '-27.73', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2447432.6, dec: '-2.12', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2448223.4, dec: '22.63', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2448995.4, dec: '26.27', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2449760.6, dec: '18.17', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2450524.8, dec: '4.67', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2451293.2, dec: '-11.62', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2452074.2, dec: '-26.50', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2452880.2, dec: '-15.82', type: 'position', label: 'Opposition', showOnScreen: true},
-    { jd: 2453681.8, dec: '15.90', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2454459.3, dec: '26.77', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2455226.3, dec: '22.15', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2455990.3, dec: '10.28', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2456756.4, dec: '-5.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2457531.0, dec: '-21.65', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2458326.7, dec: '-25.50', type: 'position', label: 'Opposition', showOnScreen: true },
-    { jd: 2459136.5, dec: '5.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2459921.7, dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: true },
-    { jd: 2460691.6, dec: '25.12', type: 'position', label: 'Opposition', showOnScreen: true },
-    { jd: 2461456.2, dec: '15.37', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2462220.8, dec: '1.07', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2462991.0, dec: '-15.48', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2463776.6, dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2464586.3, dec: '-8.03', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2465381.9, dec: '20.27', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2466156.1, dec: '26.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2466922.0, dec: '19.83', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2467686.0, dec: '6.93', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2468453.2, dec: '-9.00', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2469231.1, dec: '-24.75', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2470032.8, dec: '-20.73', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2470838.8, dec: '11.97', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2471619.4, dec: '26.33', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2472387.6, dec: '23.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2473151.7, dec: '12.33', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2473917.0, dec: '-2.63', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2474689.4, dec: '-19.18', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2475480.4, dec: '-27.32', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2476291.3, dec: '-0.02', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2477080.9, dec: '23.43', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2477852.5, dec: '25.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2478617.6, dec: '17.20', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2479381.9, dec: '3.43', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2480150.6, dec: '-12.85', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2480932.3, dec: '-26.97', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2481739.2, dec: '-13.88', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2482539.8, dec: '17.27', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2483316.6, dec: '26.80', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2484083.3, dec: '21.35', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2484847.3, dec: '9.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2485613.6, dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2486388.8, dec: '-22.60', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2487185.6, dec: '-24.43', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2487994.8, dec: '7.33', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2488779.2, dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2489548.7, dec: '24.57', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2490313.1, dec: '14.30', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2491077.9, dec: '-0.18', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2491848.4, dec: '-16.62', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2492635.0, dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2493445.2, dec: '-5.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2494239.6, dec: '21.32', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2495013.3, dec: '26.47', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2495779.0, dec: '18.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2496543.1, dec: '5.70', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2497310.5, dec: '-10.25', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2498089.0, dec: '-25.43', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2498891.8, dec: '-19.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2499696.9, dec: '13.57', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2500476.8, dec: '26.55', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2501244.6, dec: '22.73', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2502008.7, dec: '11.20', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2502774.2, dec: '-3.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2503547.1, dec: '-20.25', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2504339.1, dec: '-26.72', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2505149.9, dec: '2.02', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2505938.4, dec: '24.15', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2506709.7, dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2507474.6, dec: '16.18', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2508238.9, dec: '2.18', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2509007.9, dec: '-14.05', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2509790.5, dec: '-27.30', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2510598.3, dec: '-11.85', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2511397.6, dec: '18.55', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2512173.8, dec: '26.73', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2512940.3, dec: '20.52', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2513704.3, dec: '7.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2514470.8, dec: '-7.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2515246.5, dec: '-23.47', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2516044.5, dec: '-23.23', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2516853.1, dec: '9.15', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2517636.6, dec: '25.90', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2518405.8, dec: '23.95', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2519170.1, dec: '13.20', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2519935.0, dec: '-1.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2520706.0, dec: '-17.77', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2521493.5, dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2522304.0, dec: '-3.78', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2523097.3, dec: '22.27', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2523870.4, dec: '26.18', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2524636.0, dec: '17.95', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2525400.1, dec: '4.48', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2526167.8, dec: '-11.47', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2526947.0, dec: '-26.02', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2527750.9, dec: '-17.33', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2528554.9, dec: '15.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2529334.0, dec: '26.67', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2530101.6, dec: '21.98', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2530865.7, dec: '10.03', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2531631.3, dec: '-5.17', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2532404.7, dec: '-21.23', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2533197.8, dec: '-25.98', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2534008.4, dec: '4.02', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2534796.0, dec: '24.78', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2535566.8, dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2536331.5, dec: '15.13', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2537096.0, dec: '0.93', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2537865.3, dec: '-15.23', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2538648.8, dec: '-27.52', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2539457.3, dec: '-9.77', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2540255.5, dec: '19.73', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2541031.0, dec: '26.60', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2541797.3, dec: '19.63', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2542561.3, dec: '6.72', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2543328.0, dec: '-8.92', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2544104.3, dec: '-24.25', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2544903.5, dec: '-21.87', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2545711.4, dec: '10.90', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2546494.0, dec: '26.22', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2547262.8, dec: '23.30', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2548027.1, dec: '12.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2548792.1, dec: '-2.72', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2549563.5, dec: '-18.83', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2550352.0, dec: '-27.38', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2551162.7, dec: '-1.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2551954.9, dec: '23.10', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2552727.6, dec: '25.82', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2553493.0, dec: '16.97', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2554257.1, dec: '3.25', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2555025.1, dec: '-12.68', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2555805.1, dec: '-26.53', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2556610.0, dec: '-15.47', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2557413.0, dec: '16.53', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2558191.3, dec: '26.70', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2558958.6, dec: '21.17', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2559722.7, dec: '8.87', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2560488.5, dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2561262.3, dec: '-22.15', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2562056.6, dec: '-25.08', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2562866.9, dec: '5.97', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2563653.5, dec: '25.30', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2564423.8, dec: '24.45', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2565188.5, dec: '14.07', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2565953.0, dec: '-0.32', type: 'position', label: 'Opposition', showOnScreen: false },
-    { jd: 2566722.7, dec: '-16.37', type: 'position', label: 'Opposition', showOnScreen: false },
-// MARS OCCULTATIONS (12 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1382451.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1541461.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1561025.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1623446.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1705389.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1837063.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1932304.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2083530.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2302080.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2480621.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2497775.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2571132.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+    { jd: 2414673.5, ra: '123.32238°', dec: '24.70', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2415437.8, ra: '157.84380°', dec: '14.53', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2416202.8, ra: '189.30715°', dec: '-0.08', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2416974.3, ra: '226.44321°', dec: '-16.95', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2417763.1, ra: '286.59911°', dec: '-27.98', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2418573.9, ra: '3.76783°', dec: '-4.22', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2419365.7, ra: '60.74845°', dec: '21.72', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2420138.3, ra: '107.65321°', dec: '26.57', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2420903.6, ra: '145.13338°', dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2421667.8, ra: '176.92563°', dec: '5.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422435.9, ra: '210.39488°', dec: '-10.35', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2423216.1, ra: '258.83330°', dec: '-25.93', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2424021.2, ra: '335.83810°', dec: '-17.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2424823.9, ra: '40.03325°', dec: '14.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2425602.1, ra: '90.50033°', dec: '26.65', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2426369.3, ra: '131.52438°', dec: '22.90', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2427133.3, ra: '164.83150°', dec: '11.43', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2427899.2, ra: '196.58180°', dec: '-3.87', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2428673.3, ra: '236.77914°', dec: '-20.67', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429467.8, ra: '304.12844°', dec: '-26.40', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2430278, ra: '17.55036°', dec: '3.50', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2431064.3, ra: '71.85598°', dec: '24.40', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2431834.5, ra: '116.72995°', dec: '25.60', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2432599.2, ra: '152.41197°', dec: '16.42', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2433363.7, ra: '183.87712°', dec: '2.33', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2434133.6, ra: '219.08218°', dec: '-14.28', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2434918.2, ra: '273.68664°', dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2435727.4, ra: '352.00198°', dec: '-10.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2436524.1, ra: '51.82327°', dec: '19.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2437298.9, ra: '100.40316°', dec: '26.82', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2438065, ra: '139.36213°', dec: '20.70', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2438829, ra: '171.67634°', dec: '8.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2439596, ra: '204.15587°', dec: '-7.72', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2440373.2, ra: '248.47758°', dec: '-23.95', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2441173.8, ra: '322.07575°', dec: '-22.25', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2441980.6, ra: '30.41997°', dec: '10.30', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2442762.1, ra: '82.53488°', dec: '26.05', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2443530.5, ra: '125.25188°', dec: '24.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444294.7, ra: '159.49715°', dec: '13.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2445059.9, ra: '190.94230°', dec: '-1.35', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2445831.9, ra: '228.58188°', dec: '-18.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2446621.7, ra: '290.18488°', dec: '-27.73', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2447432.6, ra: '6.75627°', dec: '-2.12', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2448223.4, ra: '63.24485°', dec: '22.63', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2448995.4, ra: '109.84396°', dec: '26.27', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2449760.6, ra: '146.87046°', dec: '18.17', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2450524.8, ra: '178.54717°', dec: '4.67', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2451293.2, ra: '212.33017°', dec: '-11.62', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2452074.2, ra: '261.91168°', dec: '-26.50', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2452880.2, ra: '339.32972°', dec: '-15.82', type: 'position', label: 'Opposition', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2453681.8, ra: '42.61264°', dec: '15.90', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2454459.3, ra: '92.80157°', dec: '26.77', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2455226.3, ra: '133.39603°', dec: '22.15', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2455990.3, ra: '166.41701°', dec: '10.28', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2456756.4, ra: '198.22267°', dec: '-5.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2457531, ra: '239.17933°', dec: '-21.65', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2458326.7, ra: '307.89056°', dec: '-25.50', type: 'position', label: 'Opposition', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2459136.5, ra: '20.32468°', dec: '5.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2459921.7, ra: '74.30075°', dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2460691.6, ra: '118.72473°', dec: '25.12', type: 'position', label: 'Opposition', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2461456.2, ra: '154.06849°', dec: '15.37', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2462220.8, ra: '185.48271°', dec: '1.07', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2462991, ra: '221.11646°', dec: '-15.48', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2463776.6, ra: '277.00740°', dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2464586.3, ra: '355.18096°', dec: '-8.03', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2465381.9, ra: '54.36306°', dec: '20.27', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2466156.1, ra: '102.63367°', dec: '26.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2466922, ra: '141.15141°', dec: '19.83', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2467686, ra: '173.27195°', dec: '6.93', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2468453.2, ra: '205.98329°', dec: '-9.00', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2469231.1, ra: '251.27721°', dec: '-24.75', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2470032.8, ra: '325.77283°', dec: '-20.73', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2470838.8, ra: '33.03343°', dec: '11.97', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2471619.4, ra: '84.90296°', dec: '26.33', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2472387.6, ra: '127.17267°', dec: '23.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2473151.7, ra: '161.12139°', dec: '12.33', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2473917, ra: '192.57132°', dec: '-2.63', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2474689.4, ra: '230.80722°', dec: '-19.18', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2475480.4, ra: '293.81400°', dec: '-27.32', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2476291.3, ra: '9.70043°', dec: '-0.02', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2477080.9, ra: '65.73929°', dec: '23.43', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2477852.5, ra: '111.91220°', dec: '25.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2478617.6, ra: '148.55389°', dec: '17.20', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2479381.9, ra: '180.10767°', dec: '3.43', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2480150.6, ra: '214.19046°', dec: '-12.85', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2480932.3, ra: '264.96229°', dec: '-26.97', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2481739.2, ra: '342.70814°', dec: '-13.88', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2482539.8, ra: '45.16821°', dec: '17.27', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2483316.6, ra: '95.10048°', dec: '26.80', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2484083.3, ra: '135.26480°', dec: '21.35', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2484847.3, ra: '168.02338°', dec: '9.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2485613.6, ra: '199.96413°', dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2486388.8, ra: '241.71267°', dec: '-22.60', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2487185.6, ra: '311.68455°', dec: '-24.43', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2487994.8, ra: '23.09096°', dec: '7.33', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2488779.2, ra: '76.65761°', dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2489548.7, ra: '120.70795°', dec: '24.57', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2490313.1, ra: '155.75676°', dec: '14.30', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2491077.9, ra: '187.05052°', dec: '-0.18', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2491848.4, ra: '223.14731°', dec: '-16.62', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2492635, ra: '280.41245°', dec: '-27.82', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2493445.2, ra: '358.30391°', dec: '-5.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2494239.6, ra: '56.87711°', dec: '21.32', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2495013.3, ra: '104.76726°', dec: '26.47', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2495779, ra: '142.88449°', dec: '18.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2496543.1, ra: '174.82608°', dec: '5.70', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2497310.5, ra: '207.77754°', dec: '-10.25', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2498089, ra: '254.05581°', dec: '-25.43', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2498891.8, ra: '329.35187°', dec: '-19.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2499696.9, ra: '35.68174°', dec: '13.57', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2500476.8, ra: '87.23805°', dec: '26.55', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2501244.6, ra: '129.10714°', dec: '22.73', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2502008.7, ra: '162.73307°', dec: '11.20', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2502774.2, ra: '194.21250°', dec: '-3.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2503547.1, ra: '233.09351°', dec: '-20.25', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2504339.1, ra: '297.55988°', dec: '-26.72', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2505149.9, ra: '12.57445°', dec: '2.02', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2505938.4, ra: '68.18660°', dec: '24.15', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2506709.7, ra: '113.94789°', dec: '25.48', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2507474.6, ra: '150.24810°', dec: '16.18', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2508238.9, ra: '181.69909°', dec: '2.18', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2509007.9, ra: '216.11145°', dec: '-14.05', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2509790.5, ra: '268.07388°', dec: '-27.30', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2510598.3, ra: '346.05470°', dec: '-11.85', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2511397.6, ra: '47.77948°', dec: '18.55', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2512173.8, ra: '97.32858°', dec: '26.73', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2512940.3, ra: '137.04472°', dec: '20.52', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2513704.3, ra: '169.60408°', dec: '7.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2514470.8, ra: '201.67613°', dec: '-7.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2515246.5, ra: '244.23947°', dec: '-23.47', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2516044.5, ra: '315.37319°', dec: '-23.23', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2516853.1, ra: '25.79612°', dec: '9.15', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2517636.6, ra: '79.07992°', dec: '25.90', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2518405.8, ra: '122.69903°', dec: '23.95', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2519170.1, ra: '157.39628°', dec: '13.20', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2519935, ra: '188.68096°', dec: '-1.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2520706, ra: '225.27229°', dec: '-17.77', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2521493.5, ra: '283.97489°', dec: '-27.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2522304, ra: '1.40432°', dec: '-3.78', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2523097.3, ra: '59.37017°', dec: '22.27', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2523870.4, ra: '106.93276°', dec: '26.18', type: 'position', label: 'Opposition', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2524636, dec: '17.95', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2525400.1, dec: '4.48', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2526167.8, dec: '-11.47', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2526947, dec: '-26.02', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2527750.9, dec: '-17.33', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2528554.9, dec: '15.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2529334, dec: '26.67', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2530101.6, dec: '21.98', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2530865.7, dec: '10.03', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2531631.3, dec: '-5.17', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2532404.7, dec: '-21.23', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2533197.8, dec: '-25.98', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2534008.4, dec: '4.02', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2534796, dec: '24.78', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2535566.8, dec: '25.00', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2536331.5, dec: '15.13', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2537096, dec: '0.93', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2537865.3, dec: '-15.23', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538648.8, dec: '-27.52', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2539457.3, dec: '-9.77', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2540255.5, dec: '19.73', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2541031, dec: '26.60', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2541797.3, dec: '19.63', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2542561.3, dec: '6.72', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2543328, dec: '-8.92', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2544104.3, dec: '-24.25', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2544903.5, dec: '-21.87', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2545711.4, dec: '10.90', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2546494, dec: '26.22', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2547262.8, dec: '23.30', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2548027.1, dec: '12.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2548792.1, dec: '-2.72', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2549563.5, dec: '-18.83', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2550352, dec: '-27.38', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2551162.7, dec: '-1.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2551954.9, dec: '23.10', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2552727.6, dec: '25.82', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553493, dec: '16.97', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2554257.1, dec: '3.25', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2555025.1, dec: '-12.68', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2555805.1, dec: '-26.53', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2556610, dec: '-15.47', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2557413, dec: '16.53', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2558191.3, dec: '26.70', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2558958.6, dec: '21.17', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2559722.7, dec: '8.87', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2560488.5, dec: '-6.42', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2561262.3, dec: '-22.15', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2562056.6, dec: '-25.08', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2562866.9, dec: '5.97', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2563653.5, dec: '25.30', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2564423.8, dec: '24.45', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2565188.5, dec: '14.07', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2565953, dec: '-0.32', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2566722.7, dec: '-16.37', type: 'position', label: 'Opposition', showOnScreen: false, tier: 3, weight: 0 },
+    // MARS OCCULTATIONS (12 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1382451.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1541461.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1561025.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1623446.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1705389.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1837063.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1932304.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2083530.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2302080.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2480621.6, ra: '128.97053°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2497775.2, ra: '117.68586°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2571132.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    // ────────────────────────────────────────────────────────
+    // TYCHO BRAHE MARS OBSERVATIONS (1582-1600)
+    // Source: Tychonis Brahe Dani Opera Omnia, vols. 10 & 13
+    // Digitized by Wayne Pafko (2000). Accuracy: 1-2 arcminutes.
+    // Tier 1C: Pre-telescope precision observation (declination only)
+    // ────────────────────────────────────────────────────────
+    { jd: 2299198.5, dec: '23.12', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299246.5, dec: '26.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299243.5, dec: '26.37', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299265.5, dec: '27.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299931.06, dec: '15.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299944.59, dec: '14.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299967.5, dec: '14.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299968.5, dec: '14.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299968.5, dec: '14.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299985.5, dec: '15.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299987.5, dec: '15.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2299993.19, dec: '16.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300001.12, dec: '17.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300009.5, dec: '18.72', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300012.9, dec: '19.02', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300012.9, dec: '19.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300012.76, dec: '19.03', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300013.88, dec: '19.16', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300013.84, dec: '19.13', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300013.78, dec: '19.16', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300026.91, dec: '20.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300026.9, dec: '20.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300026.91, dec: '20.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300049.89, dec: '20.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300053.83, dec: '20.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300056.84, dec: '20.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300063.85, dec: '19.73', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300083.91, dec: '17.64', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300083.91, dec: '17.65', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300094.91, dec: '16.14', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300105.98, dec: '14.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300105.89, dec: '14.37', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300105.97, dec: '14.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300110.5, dec: '13.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300115.98, dec: '12.64', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300116.94, dec: '12.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300609.72, dec: '18.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300610.66, dec: '17.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300626.61, dec: '15.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300626.61, dec: '15.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300626.76, dec: '13.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300626.76, dec: '13.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300640.77, dec: '12.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300641.72, dec: '12.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300641.72, dec: '12.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300641.73, dec: '12.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300648.71, dec: '11.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300649.7, dec: '11.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300655.77, dec: '10.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300657.81, dec: '9.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300657.81, dec: '9.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300658.68, dec: '9.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300658.8, dec: '9.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300670.76, dec: '7.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300670.81, dec: '7.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300670.81, dec: '7.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300678.82, dec: '6.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300678.82, dec: '6.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300693.75, dec: '3.89', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300693.75, dec: '3.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300704.67, dec: '2.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300704.67, dec: '2.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300704.79, dec: '2.65', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300704.66, dec: '2.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300704.67, dec: '2.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300709.8, dec: '2.19', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300709.8, dec: '2.21', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300717.77, dec: '1.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300717.77, dec: '1.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300718.72, dec: '1.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300719.78, dec: '1.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300719.78, dec: '1.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300722.82, dec: '1.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300722.82, dec: '1.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300722.83, dec: '1.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300722.83, dec: '1.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300723.7, dec: '1.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300723.7, dec: '1.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300724.7, dec: '1.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300734.69, dec: '1.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300734.69, dec: '1.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300734.76, dec: '1.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300734.76, dec: '1.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300736.68, dec: '1.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300736.68, dec: '1.31', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300736.72, dec: '1.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300737.72, dec: '1.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300737.76, dec: '1.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300748.75, dec: '1.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300748.81, dec: '1.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300749.71, dec: '1.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300749.72, dec: '1.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300753.79, dec: '1.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300754.16, dec: '1.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300754.2, dec: '1.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300755.16, dec: '1.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300760.88, dec: '3.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300760.93, dec: '3.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300760.93, dec: '3.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300762.86, dec: '3.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300762.58, dec: '3.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300766.68, dec: '4.02', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300766.68, dec: '4.02', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300766.83, dec: '4.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.56, dec: '4.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.56, dec: '4.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.71, dec: '4.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.72, dec: '4.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.81, dec: '4.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.82, dec: '4.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.83, dec: '4.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.83, dec: '4.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.85, dec: '4.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300770.9, dec: '4.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.81, dec: '4.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.81, dec: '4.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.82, dec: '4.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.82, dec: '4.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.96, dec: '4.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.54, dec: '4.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.57, dec: '4.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300771.8, dec: '4.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300774.92, dec: '5.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300776.89, dec: '5.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300776.89, dec: '5.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300776.9, dec: '5.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300776.9, dec: '5.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300776.97, dec: '5.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300777.78, dec: '5.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300777.8, dec: '5.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300779.88, dec: '5.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300779.89, dec: '5.85', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300779.89, dec: '5.85', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300784.93, dec: '6.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300784.95, dec: '6.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300784.95, dec: '6.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300794.9, dec: '7.31', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300794.91, dec: '7.31', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300799.88, dec: '7.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300799.89, dec: '7.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300799.9, dec: '7.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300803.86, dec: '7.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300811.87, dec: '7.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300819.89, dec: '7.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2300819.91, dec: '7.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301440.49, dec: '3.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301362.5, dec: '9.11', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301362.5, dec: '9.12', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301362.5, dec: '9.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301362.5, dec: '9.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301384.75, dec: '4.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301384.75, dec: '4.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301384.75, dec: '4.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301388.75, dec: '3.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301388.75, dec: '3.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301388.75, dec: '3.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301413.75, dec: '2.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301413.75, dec: '2.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301413.75, dec: '2.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301482.71, dec: '-13.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301482.71, dec: '-13.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301507.67, dec: '-13.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301507.67, dec: '-13.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301507.67, dec: '-13.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301507.67, dec: '-13.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301508.58, dec: '-13.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301508.58, dec: '-13.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301510.58, dec: '-13.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301510.58, dec: '-13.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301512.58, dec: '-13.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301512.58, dec: '-13.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301514.58, dec: '-13.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301514.58, dec: '-13.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301521.58, dec: '-13.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301521.58, dec: '-13.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301521.63, dec: '-13.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301533.92, dec: '-12.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301533.96, dec: '-12.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301533.96, dec: '-12.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301538, dec: '-12.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301542.96, dec: '-12.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301542.96, dec: '-12.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301543, dec: '-11.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301543, dec: '-11.89', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301549.92, dec: '-11.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301549.92, dec: '-11.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301549.96, dec: '-11.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301549.96, dec: '-11.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301534.96, dec: '-12.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301534.96, dec: '-12.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301538, dec: '-12.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301543, dec: '-12.03', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301545, dec: '-11.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301550, dec: '-11.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301552, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301552, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301552.92, dec: '-11.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301552.92, dec: '-11.21', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301553.92, dec: '-11.15', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301553.92, dec: '-11.16', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301555.96, dec: '-11.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301555.96, dec: '-11.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301565.96, dec: '-10.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301697.5, dec: '-24.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301744.75, dec: '-23.37', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2301867.79, dec: '-9.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302083.5, dec: '-6.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302083.5, dec: '-6.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302083.5, dec: '-6.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302083.5, dec: '-6.21', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302087.71, dec: '-5.20', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302087.71, dec: '-5.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302087.71, dec: '-5.19', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302087.71, dec: '-5.20', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302108.5, dec: '0.02', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302108.5, dec: '0.03', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302108.5, dec: '0.02', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302108.5, dec: '0.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302133.5, dec: '-5.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302133.5, dec: '-6.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302133.5, dec: '-5.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302156.79, dec: '-11.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302156.79, dec: '-11.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302157.79, dec: '-11.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302157.79, dec: '-11.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302157.79, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302157.79, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302157.79, dec: '-11.31', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302158.79, dec: '-11.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302158.79, dec: '-11.65', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302158.79, dec: '-11.65', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302158.79, dec: '-11.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302158.79, dec: '-11.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302166.75, dec: '-13.10', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302166.75, dec: '-13.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302166.79, dec: '-13.09', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302166.79, dec: '-13.10', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302174.75, dec: '-14.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302191.75, dec: '-17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302191.75, dec: '-17.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302191.75, dec: '-17.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302191.75, dec: '-17.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302192.75, dec: '-18.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302192.75, dec: '-18.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302203.71, dec: '-19.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302219.71, dec: '-20.84', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302219.71, dec: '-20.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.81', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.84', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302288.54, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302289.04, dec: '-24.83', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302289.04, dec: '-24.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302303, dec: '-25.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302303, dec: '-25.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302302.54, dec: '-25.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302302.54, dec: '-25.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302304, dec: '-25.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302304, dec: '-25.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302303.54, dec: '-25.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302303.54, dec: '-25.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302303.54, dec: '-25.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302311, dec: '-26.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302314.04, dec: '-26.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302314.04, dec: '-26.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302314.04, dec: '-26.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302319, dec: '-26.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302319, dec: '-26.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302319, dec: '-26.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302319.04, dec: '-26.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302319.04, dec: '-26.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302327, dec: '-27.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302327, dec: '-27.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302327, dec: '-27.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302327, dec: '-27.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302330.96, dec: '-27.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302330.96, dec: '-27.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302330.96, dec: '-27.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302330.96, dec: '-27.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302331.96, dec: '-27.65', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302332.96, dec: '-27.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302332.96, dec: '-27.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302333, dec: '-27.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302333, dec: '-27.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302332.96, dec: '-27.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302347.96, dec: '-27.96', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302347.96, dec: '-27.97', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302348.88, dec: '-27.82', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302348.88, dec: '-27.82', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302348.92, dec: '-27.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302366.88, dec: '-27.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302366.88, dec: '-27.81', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302366.92, dec: '-27.73', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302366.88, dec: '-27.95', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-24.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-24.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-24.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-24.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-24.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302435.75, dec: '-25.03', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302439.75, dec: '-25.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302439.75, dec: '-25.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302439.79, dec: '-25.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302439.79, dec: '-25.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302442.75, dec: '-25.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302442.75, dec: '-25.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302444.75, dec: '-25.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302444.75, dec: '-25.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302444.75, dec: '-25.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302451.75, dec: '-23.18', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302451.75, dec: '-23.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302452.75, dec: '-23.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302452.75, dec: '-21.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302452.75, dec: '-22.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302452.75, dec: '-22.03', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302483.79, dec: '-16.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302483.79, dec: '-16.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302484.71, dec: '-16.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302484.71, dec: '-16.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302484.71, dec: '-16.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302513.71, dec: '-8.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302513.71, dec: '-8.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302557.5, dec: '4.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.71, dec: '7.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.75, dec: '7.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.75, dec: '7.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.75, dec: '7.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.75, dec: '7.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302568.75, dec: '7.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302571.75, dec: '8.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302578.75, dec: '10.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302578.75, dec: '10.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302578.75, dec: '10.43', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302582.75, dec: '11.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302582.75, dec: '11.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302582.79, dec: '11.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302582.79, dec: '11.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302583.75, dec: '11.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302583.75, dec: '11.74', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302583.79, dec: '11.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302583.79, dec: '11.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.75, dec: '12.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.79, dec: '12.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.79, dec: '12.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.79, dec: '12.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2302585.79, dec: '-12.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303065.54, dec: '-12.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303081, dec: '-10.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303081, dec: '-10.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.54, dec: '-10.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.58, dec: '-10.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303080.58, dec: '-10.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303084, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303084, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.54, dec: '-10.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.54, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.54, dec: '-10.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.54, dec: '-10.56', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.58, dec: '-10.57', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303083.58, dec: '-10.57', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303103.58, dec: '-10.15', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303103.63, dec: '-10.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303103.63, dec: '-10.18', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303103.54, dec: '-10.15', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303106.54, dec: '-10.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303106.54, dec: '-10.24', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.54, dec: '-10.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.54, dec: '-10.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.54, dec: '-10.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.58, dec: '-10.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.58, dec: '-10.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303112.54, dec: '-10.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303123.5, dec: '-11.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303123.5, dec: '-11.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303123.54, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303123.54, dec: '-11.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.5, dec: '-11.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.5, dec: '-11.91', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.54, dec: '-11.92', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.54, dec: '-11.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.54, dec: '-11.91', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303130.5, dec: '-11.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.5, dec: '-12.16', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.5, dec: '-12.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.54, dec: '-12.17', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.96, dec: '-12.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.96, dec: '-12.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.5, dec: '-12.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.5, dec: '-12.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303133.5, dec: '-12.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.92, dec: '-12.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.92, dec: '-12.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.92, dec: '-12.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.92, dec: '-12.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.5, dec: '-12.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303134.5, dec: '-12.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303135.92, dec: '-12.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303135.92, dec: '-12.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303135.92, dec: '-12.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303135.92, dec: '-12.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136, dec: '-12.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136, dec: '-12.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136.92, dec: '-12.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136.92, dec: '-12.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136.92, dec: '-12.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303136.92, dec: '-12.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.88, dec: '-12.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.88, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.92, dec: '-12.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.92, dec: '-12.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.96, dec: '-12.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303141.96, dec: '-12.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303151.92, dec: '-13.11', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303151.92, dec: '-13.13', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303151.92, dec: '-13.12', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303163.92, dec: '-12.84', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.88, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.88, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.88, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.92, dec: '-12.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.92, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.92, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303164.92, dec: '-12.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303169.83, dec: '-12.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303169.88, dec: '-12.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.83, dec: '-12.21', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.83, dec: '-12.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.83, dec: '-12.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.88, dec: '-12.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.88, dec: '-12.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303171.92, dec: '-12.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303176.83, dec: '-11.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303176.83, dec: '-11.71', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303176.88, dec: '-11.71', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303176.88, dec: '-11.72', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303185.83, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303185.83, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303185.88, dec: '-10.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.75, dec: '-7.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.75, dec: '-7.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.75, dec: '-7.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.79, dec: '-7.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.79, dec: '-7.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.79, dec: '-7.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.83, dec: '-7.62', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303202.83, dec: '-7.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.79, dec: '-7.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.79, dec: '-7.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.79, dec: '-7.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.79, dec: '-7.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.83, dec: '-7.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303203.83, dec: '-7.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303230.75, dec: '-1.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303230.79, dec: '-1.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303230.79, dec: '-1.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303231.79, dec: '-1.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303235.79, dec: '-0.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303235.83, dec: '-0.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303235.83, dec: '-0.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303241.79, dec: '-1.13', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303241.83, dec: '-1.13', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303241.83, dec: '-1.14', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303242.71, dec: '-1.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303242.75, dec: '-1.37', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303242.75, dec: '-1.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303242.75, dec: '-1.37', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303244.79, dec: '-1.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303244.83, dec: '1.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303247.79, dec: '2.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303247.79, dec: '2.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303253.71, dec: '4.70', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303253.75, dec: '4.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303253.75, dec: '4.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303253.75, dec: '4.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303253.75, dec: '4.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303263.71, dec: '6.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303263.71, dec: '6.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303263.75, dec: '6.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303263.75, dec: '6.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303264.75, dec: '6.79', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303264.75, dec: '6.80', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303268.75, dec: '7.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303268.75, dec: '7.76', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303310.75, dec: '17.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303310.75, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303598.75, dec: '-16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303598.75, dec: '-16.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303598.75, dec: '-16.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303598.75, dec: '-16.97', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303609.75, dec: '-19.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303609.75, dec: '-19.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303627.79, dec: '-21.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303633.79, dec: '-22.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303634.79, dec: '-22.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303634.79, dec: '-22.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303832.54, dec: '10.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303832.54, dec: '10.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303833.58, dec: '10.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303833.58, dec: '10.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303833.58, dec: '10.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303833.58, dec: '10.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.58, dec: '16.87', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.58, dec: '16.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.58, dec: '16.87', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.58, dec: '16.85', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.63, dec: '16.87', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.63, dec: '16.86', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303880.63, dec: '16.88', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303883.58, dec: '17.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303884.63, dec: '17.14', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303884.63, dec: '17.14', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303884.63, dec: '17.14', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303885.67, dec: '17.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303885.67, dec: '17.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303885.67, dec: '17.23', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303885.67, dec: '17.22', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303888.58, dec: '17.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303891.67, dec: '17.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303891.67, dec: '17.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303895.67, dec: '17.68', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '18.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '18.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '18.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '18.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.83, dec: '17.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.88, dec: '17.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303915.88, dec: '17.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.87', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.87', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.89', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.89', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303919.63, dec: '17.90', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.75, dec: '17.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.79, dec: '17.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.79, dec: '17.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.79, dec: '17.53', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303928.83, dec: '17.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.75, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.79, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.83, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.83, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.83, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.83, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.92, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.96, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.96, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.96, dec: '17.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303929.96, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.48', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.75, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.83, dec: '17.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.83, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.79, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303930.96, dec: '17.45', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931, dec: '17.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931, dec: '17.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.75, dec: '17.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.75, dec: '17.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.40', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.79, dec: '17.39', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.92, dec: '17.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.92, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.96, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.96, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.96, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303931.96, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303932, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303932, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303932, dec: '17.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303932, dec: '17.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.79, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303933.83, dec: '17.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.05', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303937.96, dec: '17.04', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.86', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.84', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.84', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.85', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.85', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303941.83, dec: '16.86', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303947.79, dec: '16.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303947.79, dec: '16.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303947.83, dec: '16.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303947.83, dec: '16.61', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.88, dec: '16.52', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.88, dec: '16.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.92, dec: '16.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.92, dec: '16.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.92, dec: '16.51', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303949.92, dec: '16.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303955.88, dec: '16.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303955.88, dec: '16.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303955.88, dec: '16.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303955.88, dec: '16.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303955.88, dec: '16.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303957.88, dec: '16.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303957.88, dec: '16.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303957.88, dec: '16.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.36', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303968.83, dec: '16.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303969.83, dec: '16.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303969.83, dec: '16.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303969.83, dec: '16.38', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.41', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303970.83, dec: '16.42', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.75, dec: '16.95', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.79, dec: '16.93', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.83, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303981.83, dec: '16.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.71, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.71, dec: '16.99', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.71, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.75, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.75, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.75, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.75, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '17.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.83, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.83, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.83, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.83, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.83, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.88, dec: '17.01', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.88, dec: '17.00', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303982.79, dec: '16.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303997.75, dec: '18.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303997.79, dec: '18.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303997.79, dec: '17.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303997.79, dec: '18.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303997.79, dec: '18.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.75, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.75, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.75, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.75, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.79, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2303998.79, dec: '18.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304007.75, dec: '19.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304007.75, dec: '19.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304007.75, dec: '19.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304007.75, dec: '19.25', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304007.75, dec: '19.26', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.66', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304011.75, dec: '19.67', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.73', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.73', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304021.75, dec: '20.75', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.08', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304024.75, dec: '21.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304026.75, dec: '21.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304026.75, dec: '21.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304026.75, dec: '15.47', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304026.75, dec: '15.46', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.59', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.71, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304029.75, dec: '21.60', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304050.75, dec: '23.57', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304050.75, dec: '23.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304050.79, dec: '23.57', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304050.79, dec: '23.58', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.75, dec: '24.31', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.79, dec: '24.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.79, dec: '24.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.79, dec: '24.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.79, dec: '24.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304060.79, dec: '23.29', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304064.79, dec: '24.55', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304064.79, dec: '24.54', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304069.79, dec: '24.77', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304069.79, dec: '24.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304069.79, dec: '24.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304069.79, dec: '24.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304069.79, dec: '24.78', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.06', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304077.83, dec: '25.07', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304111.83, dec: '24.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304111.83, dec: '24.49', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304111.83, dec: '24.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304111.83, dec: '24.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304111.88, dec: '24.50', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.27', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.28', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.30', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.34', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.88, dec: '23.35', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.92, dec: '23.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.92, dec: '23.32', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.92, dec: '23.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2304126.92, dec: '23.33', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305476.92, dec: '21.44', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305478.92, dec: '21.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305480.92, dec: '21.94', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305518.92, dec: '24.13', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305525.88, dec: '23.98', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305531.88, dec: '23.69', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
+    { jd: 2305532.88, dec: '23.63', type: 'observation', label: 'Tycho Brahe', showOnScreen: false, tier: '1C', weight: 5 },
   ],
   // JUPITER-SATURN GREAT CONJUNCTIONS (Occultations)
   // Sources: https://astropixels.com/ephemeris/planets/jupiter2020.html (JPL DE405 ephemeris)
@@ -7242,127 +8190,127 @@ const PLANET_TEST_DATES = {
   //          https://en.wikipedia.org/wiki/Great_conjunction
   // Longitude values in ecliptic coordinates (tropical zodiac)
   jupiter: [
-    { jd: 2451716.5, ra: '3.730069444', dec: '18.8969', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '3.730069444', dec: '18.8969', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
     // Jupiter-Saturn conjunctions with ecliptic longitude reference
-    { jd: 2161655.0, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2168918.0, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
-    { jd: 2176423.0, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2183305.0, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2190769.0, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2198068.0, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2198184.0, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2198274.0, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2205166.0, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2212402.0, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2219922.0, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2227028.0, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2234250.0, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2241584.0, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2241616.0, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2241777.0, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2248674.0, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2255882.0, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2263411.0, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2270539.0, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2277729.0, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2285265.0, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2292180.0, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2299361.0, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2306895.0, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2314045.0, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
-    { jd: 2321208.0, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2328747.0, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2335695.0, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2335803.0, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2335901.0, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2342843.0, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2350377.0, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2357554.0, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2364694.0, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2372231.0, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2379424.0, longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2386336.0, longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2393862.0, longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2401070.0, longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2408189.0, longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2415717.0, longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2422943.0, longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2429850.0, longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2429923.0, longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2430041.0, longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2437350.0, longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2444605.0, longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2444668.0, longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2444810.0, longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2451693.0, longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2459205.0, longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
-    { jd: 2466459.0, longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2473557.0, longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2480839.0, longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true },
-    { jd: 2488330.0, longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2495204.0, longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2502692.0, longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2509973.0, longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2517071.0, longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2524325.0, longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2531836.0, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2538722.0, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2538850.0, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2538918.0, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2546176.0, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2553484.0, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2553574.0, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2553690.0, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2560580.0, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2567808.0, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2575332.0, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2582444.0, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2589655.0, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-    { jd: 2597186.0, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false },
-// JUPITER OCCULTATIONS (42 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1363901.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1367887.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1395865.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1423361.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1439704.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1458892.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1479205.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1494378.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1508687.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1519101.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1534273.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1552248.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1624407.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1653936.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1667476.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1720860.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1820586.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1853752.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1877682.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1901285.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1907175.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1970158.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1976993.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1988594.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2024120.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2102311.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2148655.4, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2156435.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2160931.3, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2163270.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2227923.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2294535.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2343999.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2345171.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2385073.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2475612.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2483987.1, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2485975.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2496726.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2533329.0, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2574181.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2626372.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+    { jd: 2161655, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2168918, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true, tier: 3, weight: 0 },
+    { jd: 2176423, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2183305, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2190769, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198068, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198184, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198274, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2205166, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2212402, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2219922, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2227028, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2234250, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241584, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241616, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241777, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2248674, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2255882, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2263411, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2270539, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2277729, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2285265, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2292180, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2299361, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2306895, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2314045, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true, tier: 3, weight: 0 },
+    { jd: 2321208, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2328747, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335695, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335803, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335901, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2342843, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2350377, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2357554, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2364694, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2372231, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2379424, ra: '159.87232°', longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2386336, ra: '25.59625°', longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2393862, ra: '282.13295°', longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2401070, ra: '171.48927°', longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2408189, ra: '31.36640°', longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2415717, ra: '286.66465°', longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422943, ra: '178.37586°', longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429850, ra: '43.22994°', longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429923, ra: '41.23110°', longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2430041, ra: '37.87903°', longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2437350, ra: '297.87881°', longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444605, ra: '189.46178°', longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444668, ra: '188.33190°', longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444810, ra: '185.29631°', longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2451693, ra: '50.50823°', longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2459205, ra: '302.44033°', longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2466459, ra: '196.44228°', longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2473557, ra: '57.80512°', longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2480839, ra: '313.42548°', longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2488330, ra: '202.65731°', longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2495204, ra: '71.75719°', longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2502692, ra: '317.76035°', longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2509973, ra: '213.88346°', longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2517071, ra: '79.82435°', longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2524325, ra: '327.95837°', longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2531836, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538722, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538850, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538918, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2546176, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553484, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553574, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553690, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2560580, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2567808, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2575332, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2582444, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2589655, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2597186, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'saturn', showOnScreen: false, tier: 3, weight: 0 },
+    // JUPITER OCCULTATIONS (42 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1363901, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1367887, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1395865.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1423361.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1439704, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1458892.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1479205.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1494378, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1508687.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1519101.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1534273.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1552248.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1624407.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1653936.2, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1667476.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1720860.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1820586.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1853752.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1877682.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1901285.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1907175.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1970158.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1976993.2, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1988594.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2024120.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2102311.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2148655.4, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2156435.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2160931.3, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2163270, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2227923.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2294535.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2343999.5, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2345171, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2385073.4, ra: '269.03974°', type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2475612, ra: '229.83554°', type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2483987.1, ra: '207.63876°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2485975, ra: '14.61756°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2496726.1, ra: '185.83606°', type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2533329, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2574181.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2626372.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
   ],
   // SATURN-JUPITER GREAT CONJUNCTIONS (Occultations)
   // Sources: https://astropixels.com/ephemeris/planets/saturn2020.html (JPL DE405 ephemeris)
@@ -7370,188 +8318,188 @@ const PLANET_TEST_DATES = {
   //          https://en.wikipedia.org/wiki/Great_conjunction
   // Longitude values in ecliptic coordinates (tropical zodiac)
   saturn: [
-    { jd: 2451716.5, ra: '3.580388889', dec: '17.1936', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '3.580388889', dec: '17.1936', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
     // Saturn-Jupiter conjunctions with ecliptic longitude reference
-    { jd: 2161655.0, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2168918.0, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2176423.0, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2183305.0, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2190769.0, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2198068.0, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2198184.0, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2198274.0, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2205166.0, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2212402.0, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2219922.0, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2227028.0, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2234250.0, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2241584.0, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2241616.0, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2241777.0, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2248674.0, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2255882.0, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2263411.0, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2270539.0, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2277729.0, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2285265.0, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2292180.0, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2299361.0, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2306895.0, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2314045.0, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2321208.0, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2328747.0, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2335695.0, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2335803.0, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2335901.0, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2342843.0, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2350377.0, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2357554.0, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2364694.0, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2372231.0, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2379424.0, longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2386336.0, longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2393862.0, longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2401070.0, longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2408189.0, longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2415717.0, longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2422943.0, longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2429850.0, longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2429923.0, longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2430041.0, longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2437350.0, longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2444605.0, longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2444668.0, longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2444810.0, longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2451693.0, longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2459205.0, longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2466459.0, longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2473557.0, longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2480839.0, longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2488330.0, longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2495204.0, longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2502692.0, longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2509973.0, longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2517071.0, longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2524325.0, longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2531836.0, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2538722.0, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2538850.0, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2538918.0, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2546176.0, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2553484.0, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2553574.0, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2553690.0, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2560580.0, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2567808.0, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2575332.0, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2582444.0, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2589655.0, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2597186.0, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-// SATURN OCCULTATIONS (19 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1359023.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1661510.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1717800.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1750343.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1797617.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1809331.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1933280.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2055100.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2056972.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2095910.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2179057.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2238472.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2260754.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2260814.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2276995.8, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2368145.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2381761.4, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2540521.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2640765.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+    { jd: 2161655, longitude: '55.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2168918, longitude: '302.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 3, weight: 0 },
+    { jd: 2176423, longitude: '199.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2183305, longitude: '69.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2190769, longitude: '308.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198068, longitude: '210.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198184, longitude: '208.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2198274, longitude: '206.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2205166, longitude: '77.88', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2212402, longitude: '319.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2219922, longitude: '217.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2227028, longitude: '85.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2234250, longitude: '323.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241584, longitude: '227.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241616, longitude: '226.55', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2241777, longitude: '222.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2248674, longitude: '98.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2255882, longitude: '334.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2263411, longitude: '233.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2270539, longitude: '106.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2277729, longitude: '339.23', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2285265, longitude: '238.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2292180, longitude: '119.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2299361, longitude: '350.18', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2306895, longitude: '248.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2314045, longitude: '126.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 3, weight: 0 },
+    { jd: 2321208, longitude: '355.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2328747, longitude: '252.97', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335695, longitude: '139.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335803, longitude: '136.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2335901, longitude: '134.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2342843, longitude: '6.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2350377, longitude: '263.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2357554, longitude: '147.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2364694, longitude: '12.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2372231, longitude: '268.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2379424, ra: '160.15624°', longitude: '155.13', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2386336, ra: '26.03814°', longitude: '24.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2393862, ra: '282.05608°', longitude: '278.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2401070, ra: '171.80400°', longitude: '168.37', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2408189, ra: '31.79316°', longitude: '31.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2415717, ra: '286.63141°', longitude: '284.00', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422943, ra: '178.72697°', longitude: '176.60', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429850, ra: '43.56165°', longitude: '44.45', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2429923, ra: '41.62584°', longitude: '42.47', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2430041, ra: '38.27728°', longitude: '39.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2437350, ra: '297.77665°', longitude: '295.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444605, ra: '189.88794°', longitude: '189.50', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444668, ra: '188.73666°', longitude: '188.10', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2444810, ra: '185.71333°', longitude: '184.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2451693, ra: '50.82936°', longitude: '52.72', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2459205, ra: '302.44800°', longitude: '300.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2466459, ra: '196.87457°', longitude: '197.93', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2473557, ra: '58.09911°', longitude: '60.77', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2480839, ra: '313.40809°', longitude: '311.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2488330, ra: '203.14421°', longitude: '205.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2495204, ra: '71.93236°', longitude: '74.87', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2502692, ra: '317.85473°', longitude: '317.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2509973, ra: '214.25740°', longitude: '217.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2517071, ra: '79.84862°', longitude: '83.05', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2524325, ra: '328.14749°', longitude: '328.32', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2531836, longitude: '224.70', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538722, longitude: '96.63', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538850, longitude: '93.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2538918, longitude: '91.68', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2546176, longitude: '333.25', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553484, longitude: '235.98', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553574, longitude: '233.85', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2553690, longitude: '231.12', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2560580, longitude: '104.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2567808, longitude: '344.22', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2575332, longitude: '242.02', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2582444, longitude: '112.53', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2589655, longitude: '348.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2597186, longitude: '247.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    // SATURN OCCULTATIONS (19 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm   , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1359023.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1661510.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1717800.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1750343, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1797617.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1809331.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1933280.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2055100.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2056972, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2095910.3, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2179057.9, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2238472.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2260754.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2260814.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2276995.8, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2368145.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2381761.4, ra: '238.41971°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2540521.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2640765.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
   ],
   uranus: [
-    { jd: 2451716.5, ra: '21.54528889', dec: '-15.3240', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
-    { jd: 2314075.2, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2345089.0, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-    { jd: 2376141.7, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-// URANUS OCCULTATIONS (14 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1466919.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 1517868.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1707826.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1842746.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2073791.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2218697.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2226429.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2314075.2, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-     { jd: 2345089.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2376141.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2543283.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2563927.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2579841.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2604944.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
+    { jd: 2451716.5, ra: '21.54528889', dec: '-15.3240', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2314075.2, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2345089, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2376141.7, longitude: 'N/A', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    // URANUS OCCULTATIONS (14 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses   , https://www.projectpluto.com/mut_pln.htm    , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1466919.5, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1517868.3, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1707826.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1842746.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2073791.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2218697, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2226429.1, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2314075.2, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2345089, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2376141.7, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2543283, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2563927.4, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2579841.2, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2604944.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
   ],
   neptune: [
-    { jd: 2451716.5, ra: '20.56120556', dec: '-18.5374', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
-    { jd: 2361567.0, longitude: '125.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2366314.0, longitude: '152.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2371065.0, longitude: '180.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2375586.0, longitude: '233.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2375660.0, longitude: '239.07', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2375811.0, longitude: '237.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2380321.0, longitude: '267.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2385064.0, longitude: '294.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2389802.0, longitude: '321.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2394300.0, longitude: '320.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2394455.0, longitude: '319.33', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2394488.0, longitude: '318.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2399010.0, longitude: '344.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2403755.0, longitude: '15.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2408250.0, longitude: '45.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2412981.0, longitude: '73.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2417718.0, longitude: '100.83', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2422226.0, longitude: '130.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2422392.0, longitude: '129.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2422439.0, longitude: '128.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2426970.0, longitude: '155.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2431721.0, longitude: '185.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2436471.0, longitude: '213.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2440984.0, longitude: '242.78', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2441094.0, longitude: '241.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2441211.0, longitude: '240.62', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2445719.0, longitude: '270.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2450458.0, longitude: '297.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2454979.0, longitude: '326.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true },
-    { jd: 2455023.0, longitude: '326.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2455187.0, longitude: '324.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-    { jd: 2459682.0, longitude: '353.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false }, 
-// NEPTUNE OCCULTATIONS (16 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm     , https://www.bogan.ca/astro/occultations/occltlst.htm
-// ============================================================
-     { jd: 1405723.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 1439150.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1442495.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1528047.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 1918050.3, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-     { jd: 1981572.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2157251.0, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2188084.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
-     { jd: 2191071.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2242510.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2249744.9, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-     { jd: 2310199.4, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-     { jd: 2342964.1, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false },
-     { jd: 2476212.0, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false },
-     { jd: 2489762.6, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false },
-     { jd: 2639740.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false },
+    { jd: 2451716.5, ra: '20.56120556', dec: '-18.5374', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2361567, longitude: '125.08', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2366314, longitude: '152.67', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2371065, longitude: '180.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2375586, longitude: '233.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2375660, longitude: '239.07', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2375811, longitude: '237.65', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2380321, ra: '238.07969°', longitude: '267.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2385064, ra: '266.67307°', longitude: '294.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2389802, ra: '295.57272°', longitude: '321.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2394300, ra: '325.57009°', longitude: '320.95', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2394455, ra: '324.01003°', longitude: '319.33', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2394488, ra: '323.46859°', longitude: '318.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2399010, ra: '350.89166°', longitude: '344.35', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2403755, ra: '16.67939°', longitude: '15.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2408250, ra: '45.28008°', longitude: '45.58', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2412981, ra: '73.51252°', longitude: '73.17', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2417718, ra: '103.10544°', longitude: '100.83', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422226, ra: '134.39966°', longitude: '130.82', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422392, ra: '132.75962°', longitude: '129.20', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2422439, ra: '132.30417°', longitude: '128.75', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2426970, ra: '161.23957°', longitude: '155.42', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2431721, ra: '186.68459°', longitude: '185.90', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2436471, ra: '212.22674°', longitude: '213.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2440984, ra: '241.48359°', longitude: '242.78', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2441094, ra: '240.39727°', longitude: '241.73', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2441211, ra: '239.24015°', longitude: '240.62', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2445719, ra: '270.26474°', longitude: '270.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2450458, ra: '299.15921°', longitude: '297.15', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2454979, ra: '328.71380°', longitude: '326.48', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: true, tier: 2, weight: 1 },
+    { jd: 2455023, ra: '328.27909°', longitude: '326.03', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2455187, ra: '326.60719°', longitude: '324.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2459682, ra: '354.63882°', longitude: '353.30', type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 2, weight: 1 },
+    // NEPTUNE OCCULTATIONS (16 events) https://en.wikipedia.org/wiki/List_of_mutual_planetary_eclipses    , https://www.projectpluto.com/mut_pln.htm     , https://www.bogan.ca/astro/occultations/occltlst.htm
+    // ============================================================
+    { jd: 1405723.6, type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1439150.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1442495.5, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1528047.9, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1918050.3, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 1981572.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2157251, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2188084.1, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2191071.7, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2242510.8, type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2249744.9, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2310199.4, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2342964.1, type: 'position', label: 'Occultation', comparePlanet: 'jupiter', showOnScreen: false, tier: 3, weight: 0 },
+    { jd: 2476212, ra: '94.08825°', type: 'position', label: 'Occultation', comparePlanet: 'mercury', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2489762.6, ra: '174.35005°', type: 'position', label: 'Occultation', comparePlanet: 'venus', showOnScreen: false, tier: 2, weight: 1 },
+    { jd: 2639740.9, type: 'position', label: 'Occultation', comparePlanet: 'mars', showOnScreen: false, tier: 3, weight: 0 },
   ],
   pluto: [
-    { jd: 2451716.5, ra: '16.73686667', dec: '-10.9377', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '16.73686667', dec: '-10.9377', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
   ],
   halleys: [
-    { jd: 2451716.5, ra: '8.720219444', dec: '0.5128', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '8.720219444', dec: '0.5128', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
   ],
   eros: [
-    { jd: 2451716.5, ra: '20.64013056', dec: '-26.1392', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true },
+    { jd: 2451716.5, ra: '20.64013056', dec: '-26.1392', type: 'both', label: 'Model start date (21 Jun 2000)', showOnScreen: true, tier: 2, weight: 1 },
   ]
 };
 
@@ -15029,15 +15977,19 @@ async function runYearAnalysisExport(years) {
 
   const perihelions = [];
   const aphelions = [];
-  const siderealCrossings = [];
+  // 4-angle sidereal measurement (analogous to 4 cardinal points for tropical year)
+  const siderealData = {
+    S0:   { angle: 0,   crossings: [], name: '0° ICRF',   firstJD: null, prevYear: null },
+    S90:  { angle: 90,  crossings: [], name: '90° ICRF',  firstJD: null, prevYear: null },
+    S180: { angle: 180, crossings: [], name: '180° ICRF', firstJD: null, prevYear: null },
+    S270: { angle: 270, crossings: [], name: '270° ICRF', firstJD: null, prevYear: null }
+  };
   const yearlyOrbitalParams = []; // Store obliquity/eccentricity per year
 
   // State trackers for each measurement type (maintained across years)
   let prevJD_VE = null, prevJD_SS = null, prevJD_AE = null, prevJD_WS = null;
   let prevPeriJD = null;
   let prevAphelionJD = null;
-  let firstSiderealJD = null;
-  let targetSiderealAngle = null;
 
   // Helper for sidereal angle calculation
   const getSunWorldAngle = (jd) => {
@@ -15056,7 +16008,7 @@ async function runYearAnalysisExport(years) {
 
   // Track previous year for each measurement type to determine if years are consecutive
   let prevYear_VE = null, prevYear_SS = null, prevYear_AE = null, prevYear_WS = null;
-  let prevYear_Peri = null, prevYear_Aph = null, prevYear_Sid = null;
+  let prevYear_Peri = null, prevYear_Aph = null;
 
   for (let idx = 0; idx < sortedCollectYears.length; idx++) {
     const year = sortedCollectYears[idx];
@@ -15118,53 +16070,13 @@ async function runYearAnalysisExport(years) {
       prevYear_Aph = year;
     }
 
-    // 4. Collect sidereal crossing for this year
-    // Only use previous crossing optimization if years are consecutive (for consistent results)
-    let approxJD, searchRange;
-    const useSiderealPrev = (prevYear_Sid !== null && year - prevYear_Sid === 1);
-    if (firstSiderealJD !== null && useSiderealPrev) {
-      const prevCrossing = siderealCrossings[siderealCrossings.length - 1];
-      approxJD = prevCrossing.jd + 365.256;
-      searchRange = 288;
-    } else {
-      // For non-consecutive years or first crossing, use absolute calculation
-      // Reset the target angle since it drifts with precession over large year gaps
-      firstSiderealJD = null;
-      targetSiderealAngle = null;
-      const yearFraction = 0.47;
-      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
-      searchRange = 960;
-    }
+    // 4. Collect sidereal crossings at 4 reference angles (0°, 90°, 180°, 270°)
+    // Analogous to 4 cardinal points for the tropical year — averages out variable-speed effects
+    const sidStepFine = 0.5 / 24;  // 0.5 hours
+    const sidStepCoarse = 6 / 24;  // 6 hours (for first-year wide search)
 
-    const step = 0.5 / 24;
-    const samples = [];
-    for (let k = -searchRange; k <= searchRange; ++k) {
-      const jd = approxJD + k * step;
-      const angle = getSunWorldAngle(jd);
-      samples.push({ k, jd, angle });
-    }
-
-    let crossingJD = null;
-    if (firstSiderealJD === null) {
-      // Find crossing using sun.ra = 90° as reference, then record the world angle
-      const target = 90;
-      for (let i = 1; i < samples.length; i++) {
-        jumpToJulianDay(samples[i - 1].jd);
-        forceSceneUpdate();
-        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
-        jumpToJulianDay(samples[i].jd);
-        forceSceneUpdate();
-        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
-        if (ra1 < target && ra2 >= target) {
-          const t = (target - ra1) / (ra2 - ra1);
-          crossingJD = samples[i - 1].jd + t * step;
-          firstSiderealJD = crossingJD;
-          targetSiderealAngle = getSunWorldAngle(crossingJD);
-          break;
-        }
-      }
-    } else {
-      // Consecutive year: find when world angle returns to target
+    // Helper: find world-angle crossing in a set of samples
+    const findSidCrossing = (samples, targetAngle, step) => {
       for (let i = 1; i < samples.length; i++) {
         let a1 = samples[i - 1].angle;
         let a2 = samples[i].angle;
@@ -15172,22 +16084,63 @@ async function runYearAnalysisExport(years) {
           if (a2 > a1) a1 += 360;
           else a2 += 360;
         }
-        let adjustedTarget = targetSiderealAngle;
+        let adj = targetAngle;
         if (a1 > 360 || a2 > 360) {
-          if (targetSiderealAngle < 180) adjustedTarget = targetSiderealAngle + 360;
+          if (targetAngle < 180) adj = targetAngle + 360;
         }
-        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
-        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
-        if (crossingUp || crossingDown) {
-          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
-          crossingJD = samples[i - 1].jd + t * step;
-          break;
+        const up = a1 < adj && a2 >= adj;
+        const down = a1 > adj && a2 <= adj;
+        if (up || down) {
+          const t = Math.abs(adj - a1) / Math.abs(a2 - a1);
+          return samples[i - 1].jd + t * step;
         }
       }
-    }
-    if (crossingJD) {
-      siderealCrossings.push({ year, jd: crossingJD });
-      prevYear_Sid = year;
+      return null;
+    };
+
+    for (const key of Object.keys(siderealData)) {
+      const sd = siderealData[key];
+      const usePrev = (sd.prevYear !== null && year - sd.prevYear === 1);
+
+      let sidCrossingJD = null;
+
+      if (sd.firstJD !== null && usePrev) {
+        // Subsequent years: narrow fine search around expected crossing
+        const prevCrossing = sd.crossings[sd.crossings.length - 1];
+        const approxJD = prevCrossing.jd + 365.256;
+        const samples = [];
+        for (let k = -288; k <= 288; ++k) {
+          const jd = approxJD + k * sidStepFine;
+          samples.push({ jd, angle: getSunWorldAngle(jd) });
+        }
+        sidCrossingJD = findSidCrossing(samples, sd.angle, sidStepFine);
+      } else {
+        // First year: coarse search over full year, then refine
+        sd.firstJD = null;
+        const yearStartJD = startmodelJD + (year - startmodelYear) * meansolaryearlengthinDays;
+        const coarseSamples = [];
+        // Search full year at 6-hour steps (1460 samples)
+        for (let k = 0; k <= 1460; ++k) {
+          const jd = yearStartJD + k * sidStepCoarse;
+          coarseSamples.push({ jd, angle: getSunWorldAngle(jd) });
+        }
+        const coarseJD = findSidCrossing(coarseSamples, sd.angle, sidStepCoarse);
+        if (coarseJD) {
+          // Refine with 0.5-hour steps in ±12 hour window
+          const fineSamples = [];
+          for (let k = -24; k <= 24; ++k) {
+            const jd = coarseJD + k * sidStepFine;
+            fineSamples.push({ jd, angle: getSunWorldAngle(jd) });
+          }
+          sidCrossingJD = findSidCrossing(fineSamples, sd.angle, sidStepFine);
+        }
+      }
+
+      if (sidCrossingJD) {
+        if (sd.firstJD === null) sd.firstJD = sidCrossingJD;
+        sd.crossings.push({ year, jd: sidCrossingJD });
+        sd.prevYear = year;
+      }
     }
 
     // 5. Collect orbital parameters (obliquity, eccentricity) at mid-year
@@ -15254,20 +16207,23 @@ async function runYearAnalysisExport(years) {
     ? requestedAphIntervals.reduce((a, b) => a + b, 0) / requestedAphIntervals.length
     : 0;
 
-  const siderealIntervalsByYear = new Map();
-  for (let i = 1; i < siderealCrossings.length; i++) {
-    const prevYear = siderealCrossings[i - 1].year;
-    const currYear = siderealCrossings[i].year;
-    if (currYear - prevYear === 1) {
-      siderealIntervalsByYear.set(currYear, siderealCrossings[i].jd - siderealCrossings[i - 1].jd);
+  // Compute intervals and means for each sidereal reference angle
+  for (const key of Object.keys(siderealData)) {
+    const sd = siderealData[key];
+    sd.intervalsByYear = new Map();
+    for (let i = 1; i < sd.crossings.length; i++) {
+      const prevYear = sd.crossings[i - 1].year;
+      const currYear = sd.crossings[i].year;
+      if (currYear - prevYear === 1) {
+        sd.intervalsByYear.set(currYear, sd.crossings[i].jd - sd.crossings[i - 1].jd);
+      }
     }
+    const intervals = requestedYears.map(y => sd.intervalsByYear.get(y)).filter(v => v !== undefined);
+    sd.mean = intervals.length > 0 ? intervals.reduce((a, b) => a + b, 0) / intervals.length : 0;
   }
-  const requestedSiderealIntervals = requestedYears
-    .map(y => siderealIntervalsByYear.get(y))
-    .filter(v => v !== undefined);
-  const meanSiderealYear = requestedSiderealIntervals.length > 0
-    ? requestedSiderealIntervals.reduce((a, b) => a + b, 0) / requestedSiderealIntervals.length
-    : 0;
+  const meanSiderealYear = (siderealData.S0.mean + siderealData.S90.mean + siderealData.S180.mean + siderealData.S270.mean) / 4;
+  // Keep a combined intervalsByYear map for the Excel export (use 90° as representative)
+  const siderealIntervalsByYear = siderealData.S90.intervalsByYear;
 
   const meanTropicalYear = (cardinalData.VE.mean + cardinalData.SS.mean +
     cardinalData.AE.mean + cardinalData.WS.mean) / 4;
@@ -15307,8 +16263,14 @@ async function runYearAnalysisExport(years) {
     ['Perihelion to Perihelion', meanPerihelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanPerihelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
     ['Aphelion to Aphelion', meanAphelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanAphelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
     [],
-    ['SIDEREAL YEAR', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
-    ['Sidereal Year (wobble-center)', meanSiderealYear.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['SIDEREAL YEAR BY REFERENCE ANGLE', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
+    ['At 0° ICRF', siderealData.S0.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S0.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['At 90° ICRF', siderealData.S90.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S90.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['At 180° ICRF', siderealData.S180.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S180.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['At 270° ICRF', siderealData.S270.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S270.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    [],
+    ['MEAN SIDEREAL YEAR (average of 4 reference angles)'],
+    ['Measured Mean', meanSiderealYear.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
     ['Sidereal - Tropical (model)', '', '', ((meanSiderealYear - meanTropicalYear) * 86400).toFixed(2)],
     ['Sidereal - Tropical (IAU)', '', '', ((ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2)],
     [],
@@ -15326,7 +16288,7 @@ async function runYearAnalysisExport(years) {
     ['  Wobble parallax (C-D difference)', '', '', ASTRO_REFERENCE.wobbleParallaxSeconds.toFixed(3) + ' s (constant)'],
     [],
     ['PRECESSION CALCULATION'],
-    ['Sidereal Year (measured)', meanSiderealYear.toFixed(9), '', ''],
+    ['Sidereal Year (4-pt mean)', meanSiderealYear.toFixed(9), '', ''],
     ['Mean Tropical Year', meanTropicalYear.toFixed(9), '', ''],
     [''],
     ['Precession = Sidereal / (Sidereal - Tropical)'],
@@ -15346,7 +16308,7 @@ async function runYearAnalysisExport(years) {
   const wsEventsByYear = new Map(cardinalData.WS.events.map(e => [e.year, e]));
   const periByYear = new Map(perihelions.map(e => [e.year, e]));
   const aphByYear = new Map(aphelions.map(e => [e.year, e]));
-  const siderealByYear = new Map(siderealCrossings.map(e => [e.year, e]));
+  const siderealByYear = new Map(siderealData.S90.crossings.map(e => [e.year, e]));
   const orbParamsByYear = new Map(yearlyOrbitalParams.map(e => [e.year, e]));
 
   // Sheet 2: Cardinal Points Detail (filter to user-requested years only)
@@ -15391,23 +16353,30 @@ async function runYearAnalysisExport(years) {
     anomalisticRows.push(row);
   }
 
-  // Sheet 4: Sidereal Data (filter to user-requested years only)
+  // Sheet 4: Sidereal Data (filter to user-requested years only, 4-angle breakdown)
   const siderealRows = [
-    ['Year', 'Sidereal Crossing JD', 'Sidereal Interval (days)']
+    ['Year', 'Interval at 0° (days)', 'Interval at 90° (days)', 'Interval at 180° (days)', 'Interval at 270° (days)', 'Mean Sidereal (days)']
   ];
   for (const year of requestedYears) {
-    const sid = siderealByYear.get(year);
-    const row = [
+    const i0   = siderealData.S0.intervalsByYear.get(year);
+    const i90  = siderealData.S90.intervalsByYear.get(year);
+    const i180 = siderealData.S180.intervalsByYear.get(year);
+    const i270 = siderealData.S270.intervalsByYear.get(year);
+    const mean = (i0 !== undefined && i90 !== undefined && i180 !== undefined && i270 !== undefined)
+      ? ((i0 + i90 + i180 + i270) / 4).toFixed(9) : '';
+    siderealRows.push([
       year,
-      sid?.jd?.toFixed(6) || '',
-      getInterval(siderealIntervalsByYear, year)
-    ];
-    siderealRows.push(row);
+      i0?.toFixed(9) || '',
+      i90?.toFixed(9) || '',
+      i180?.toFixed(9) || '',
+      i270?.toFixed(9) || '',
+      mean
+    ]);
   }
 
   // Sheet 5: Detailed Combined Data (using already-collected orbital params)
   const detailedRows = [
-    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sidereal Interval (days)']
+    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sid 0°', 'Sid 90°', 'Sid 180°', 'Sid 270°', 'Mean Sidereal']
   ];
 
   for (const year of requestedYears) {
@@ -15422,6 +16391,13 @@ async function runYearAnalysisExport(years) {
       ? ((veInt + ssInt + aeInt + wsInt) / 4).toFixed(9)
       : '';
 
+    const si0   = siderealData.S0.intervalsByYear.get(year);
+    const si90  = siderealData.S90.intervalsByYear.get(year);
+    const si180 = siderealData.S180.intervalsByYear.get(year);
+    const si270 = siderealData.S270.intervalsByYear.get(year);
+    const meanSidForYear = (si0 !== undefined && si90 !== undefined && si180 !== undefined && si270 !== undefined)
+      ? ((si0 + si90 + si180 + si270) / 4).toFixed(9) : '';
+
     detailedRows.push([
       year,
       (orbParams.obliquity || 0).toFixed(6),
@@ -15433,7 +16409,11 @@ async function runYearAnalysisExport(years) {
       getInterval(cardinalData.WS.intervalsByYear, year),
       getInterval(perihelionIntervalsByYear, year),
       getInterval(aphelionIntervalsByYear, year),
-      getInterval(siderealIntervalsByYear, year)
+      getInterval(siderealData.S0.intervalsByYear, year),
+      getInterval(siderealData.S90.intervalsByYear, year),
+      getInterval(siderealData.S180.intervalsByYear, year),
+      getInterval(siderealData.S270.intervalsByYear, year),
+      meanSidForYear
     ]);
   }
 
@@ -17483,39 +18463,84 @@ async function analyzeSiderealYear(startYear, endYear) {
   // GENERIC CROSSING DETECTION FUNCTION
   // ═══════════════════════════════════════════════════════════════════════════
 
-  const findCrossingsForMethod = async (getAngleFunc, methodName) => {
+  // findCrossingsForMethod: measures when the Sun's world angle crosses a target
+  // If fixedTargetAngle is provided, uses that directly instead of discovering from sun.ra
+  const findCrossingsForMethod = async (getAngleFunc, methodName, fixedTargetAngle) => {
     const crossings = [];
     let firstCrossingJD = null;
-    let targetAngle = null;
+    let targetAngle = fixedTargetAngle !== undefined ? fixedTargetAngle : null;
+
+    const stepFine = 0.5 / 24;   // 0.5 hours
+    const stepCoarse = 6 / 24;   // 6 hours
+
+    // Helper: find angle crossing in samples
+    const findCrossing = (samps, target, stp) => {
+      for (let i = 1; i < samps.length; i++) {
+        let a1 = samps[i-1].angle;
+        let a2 = samps[i].angle;
+        if (Math.abs(a2 - a1) > 180) {
+          if (a2 > a1) a1 += 360;
+          else a2 += 360;
+        }
+        let adj = target;
+        if (a1 > 360 || a2 > 360) {
+          if (target < 180) adj = target + 360;
+        }
+        const up = a1 < adj && a2 >= adj;
+        const down = a1 > adj && a2 <= adj;
+        if (up || down) {
+          const t = Math.abs(adj - a1) / Math.abs(a2 - a1);
+          return samps[i-1].jd + t * stp;
+        }
+      }
+      return null;
+    };
 
     for (let year = startYear; year <= endYear; year++) {
-      let approxJD;
-      let searchRange;
+      let crossingJD = null;
 
       if (firstCrossingJD !== null) {
         const prevCrossing = crossings[crossings.length - 1];
-        approxJD = prevCrossing.jd + 365.256;
-        searchRange = 288;  // ±6 days
-      } else {
+        const approxJD = prevCrossing.jd + 365.256;
+        const samples = [];
+        for (let k = -288; k <= 288; ++k) {
+          const jd = approxJD + k * stepFine;
+          samples.push({ jd, angle: getAngleFunc(jd) });
+        }
+        if (fixedTargetAngle !== undefined) {
+          crossingJD = findCrossing(samples, fixedTargetAngle, stepFine);
+        } else {
+          crossingJD = findCrossing(samples, targetAngle, stepFine);
+        }
+        if (crossingJD && firstCrossingJD === null) firstCrossingJD = crossingJD;
+      } else if (fixedTargetAngle !== undefined) {
+        // First year with fixed target: coarse search over full year, then refine
+        const yearStartJD = startmodelJD + (year - startmodelYear) * meansolaryearlengthinDays;
+        const coarseSamples = [];
+        for (let k = 0; k <= 1460; ++k) {
+          const jd = yearStartJD + k * stepCoarse;
+          coarseSamples.push({ jd, angle: getAngleFunc(jd) });
+        }
+        const coarseJD = findCrossing(coarseSamples, fixedTargetAngle, stepCoarse);
+        if (coarseJD) {
+          const fineSamples = [];
+          for (let k = -24; k <= 24; ++k) {
+            const jd = coarseJD + k * stepFine;
+            fineSamples.push({ jd, angle: getAngleFunc(jd) });
+          }
+          crossingJD = findCrossing(fineSamples, fixedTargetAngle, stepFine);
+          if (crossingJD) firstCrossingJD = crossingJD;
+        }
+      } else if (firstCrossingJD === null) {
+        // Legacy mode: first year uses sun.ra = 90° as reference, then record the method's angle
         const yearFraction = 0.47;  // June
-        approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
-        searchRange = 960;  // ±20 days
-      }
-
-      const step = 0.5 / 24;  // 0.5 hours
-      const samples = [];
-
-      for (let k = -searchRange; k <= searchRange; ++k) {
-        const jd = approxJD + k * step;
-        const angle = getAngleFunc(jd);
-        samples.push({ k, jd, angle });
-      }
-
-      let crossingJD = null;
-
-      if (firstCrossingJD === null) {
-        // First year: use sun.ra = 90° as reference, then record the method's angle
-        const target = 90;
+        const approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+        const samples = [];
+        for (let k = -960; k <= 960; ++k) {
+          const jd = approxJD + k * stepFine;
+          samples.push({ jd, angle: getAngleFunc(jd) });
+        }
+        const raTarget = 90;
         for (let i = 1; i < samples.length; i++) {
           jumpToJulianDay(samples[i-1].jd);
           forceSceneUpdate();
@@ -17525,37 +18550,11 @@ async function analyzeSiderealYear(startYear, endYear) {
           forceSceneUpdate();
           const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
 
-          if (ra1 < target && ra2 >= target) {
-            const t = (target - ra1) / (ra2 - ra1);
-            crossingJD = samples[i-1].jd + t * step;
+          if (ra1 < raTarget && ra2 >= raTarget) {
+            const t = (raTarget - ra1) / (ra2 - ra1);
+            crossingJD = samples[i-1].jd + t * stepFine;
             firstCrossingJD = crossingJD;
             targetAngle = getAngleFunc(crossingJD);
-            break;
-          }
-        }
-      } else {
-        // Subsequent years: find when angle returns to target
-        for (let i = 1; i < samples.length; i++) {
-          let a1 = samples[i-1].angle;
-          let a2 = samples[i].angle;
-
-          // Handle wraparound
-          if (Math.abs(a2 - a1) > 180) {
-            if (a2 > a1) a1 += 360;
-            else a2 += 360;
-          }
-
-          let adjustedTarget = targetAngle;
-          if (a1 > 360 || a2 > 360) {
-            if (targetAngle < 180) adjustedTarget = targetAngle + 360;
-          }
-
-          const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
-          const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
-
-          if (crossingUp || crossingDown) {
-            const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
-            crossingJD = samples[i-1].jd + t * step;
             break;
           }
         }
@@ -17586,20 +18585,30 @@ async function analyzeSiderealYear(startYear, endYear) {
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // RUN ALL FOUR METHODS
+  // RUN ALL FOUR METHODS AT 4 REFERENCE ANGLES
   // ═══════════════════════════════════════════════════════════════════════════
+  // Measure at 4 equally spaced world angles (0°, 90°, 180°, 270°) and average.
+  // This cancels out the variable-speed effect from the equation of center,
+  // analogous to how the tropical year is measured at 4 cardinal RA points.
 
-  console.log('Running Method A: Origin→Sun world angle...');
-  const resultA = await findCrossingsForMethod(getAngleMethodA, 'A');
+  const siderealRefAngles = [0, 90, 180, 270];
 
-  console.log('Running Method B: WobbleCenter→Sun angle...');
-  const resultB = await findCrossingsForMethod(getAngleMethodB, 'B');
+  const runMethodAt4Angles = async (getAngleFunc, methodName) => {
+    const angleResults = [];
+    for (const angle of siderealRefAngles) {
+      console.log(`Running Method ${methodName} at ${angle}°...`);
+      const result = await findCrossingsForMethod(getAngleFunc, methodName, angle);
+      angleResults.push({ angle, ...result });
+    }
+    const validMeans = angleResults.filter(r => r.mean > 0).map(r => r.mean);
+    const mean4pt = validMeans.length > 0 ? validMeans.reduce((a, b) => a + b, 0) / validMeans.length : 0;
+    return { angleResults, mean4pt };
+  };
 
-  console.log('Running Method C: Heliocentric Sun→Earth angle...');
-  const resultC = await findCrossingsForMethod(getAngleMethodC, 'C');
-
-  console.log('Running Method D: Heliocentric Sun→WobbleCenter angle...');
-  const resultD = await findCrossingsForMethod(getAngleMethodD, 'D');
+  const resultA = await runMethodAt4Angles(getAngleMethodA, 'A');
+  const resultB = await runMethodAt4Angles(getAngleMethodB, 'B');
+  const resultC = await runMethodAt4Angles(getAngleMethodC, 'C');
+  const resultD = await runMethodAt4Angles(getAngleMethodD, 'D');
 
   // ═══════════════════════════════════════════════════════════════════════════
   // COMPARISON WITH IAU REFERENCE
@@ -17609,29 +18618,43 @@ async function analyzeSiderealYear(startYear, endYear) {
   const iauTropicalYear = ASTRO_REFERENCE.tropicalYearMeanJ2000;
   const iauPrecessionContrib = iauSiderealYear - iauTropicalYear;
 
-  const diffA = (resultA.mean - iauSiderealYear) * 86400;
-  const diffB = (resultB.mean - iauSiderealYear) * 86400;
-  const diffC = (resultC.mean - iauSiderealYear) * 86400;
-  const diffD = (resultD.mean - iauSiderealYear) * 86400;
+  const diffA = (resultA.mean4pt - iauSiderealYear) * 86400;
+  const diffB = (resultB.mean4pt - iauSiderealYear) * 86400;
+  const diffC = (resultC.mean4pt - iauSiderealYear) * 86400;
+  const diffD = (resultD.mean4pt - iauSiderealYear) * 86400;
 
   // Method agreement
-  const diffAB = (resultA.mean - resultB.mean) * 86400;
-  const diffAD = (resultA.mean - resultD.mean) * 86400;
-  const diffCD = (resultC.mean - resultD.mean) * 86400;
+  const diffAB = (resultA.mean4pt - resultB.mean4pt) * 86400;
+  const diffAD = (resultA.mean4pt - resultD.mean4pt) * 86400;
+  const diffCD = (resultC.mean4pt - resultD.mean4pt) * 86400;
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
-  console.log('RESULTS');
+  console.log('RESULTS (4-point average at 0°, 90°, 180°, 270° world angles)');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
+
+  // Show per-angle breakdown for Method A
   console.log('');
   console.log('╔═════════════════════════════════════════════════════════╤═══════════════════╤═══════════════════════╗');
-  console.log('║ Method                                                  │ Value (days)      │ Diff from IAU         ║');
+  console.log('║ Method A: Per-angle breakdown                           │ Value (days)      │ Diff from IAU         ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
-  console.log(`║ A: Origin→Sun world angle                               │ ${resultA.mean.toFixed(9)}    │ ${diffA >= 0 ? '+' : ''}${diffA.toFixed(2).padStart(6)} seconds     ║`);
-  console.log(`║ B: WobbleCenter→Sun angle                               │ ${resultB.mean.toFixed(9)}    │ ${diffB >= 0 ? '+' : ''}${diffB.toFixed(2).padStart(6)} seconds     ║`);
-  console.log(`║ D: Heliocentric Sun→WobbleCenter angle                  │ ${resultD.mean.toFixed(9)}    │ ${diffD >= 0 ? '+' : ''}${diffD.toFixed(2).padStart(6)} seconds     ║`);
+  for (const ar of resultA.angleResults) {
+    const d = (ar.mean - iauSiderealYear) * 86400;
+    console.log(`║   At ${String(ar.angle).padStart(3)}° world angle                                │ ${ar.mean.toFixed(9)}    │ ${d >= 0 ? '+' : ''}${d.toFixed(2).padStart(6)} seconds     ║`);
+  }
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
-  console.log(`║ C: Heliocentric Sun→Earth angle (includes wobble)       │ ${resultC.mean.toFixed(9)}    │ ${diffC >= 0 ? '+' : ''}${diffC.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║   4-point mean                                          │ ${resultA.mean4pt.toFixed(9)}    │ ${diffA >= 0 ? '+' : ''}${diffA.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
+
+  console.log('');
+  console.log('╔═════════════════════════════════════════════════════════╤═══════════════════╤═══════════════════════╗');
+  console.log('║ Method (4-point mean)                                   │ Value (days)      │ Diff from IAU         ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ A: Origin→Sun world angle                               │ ${resultA.mean4pt.toFixed(9)}    │ ${diffA >= 0 ? '+' : ''}${diffA.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║ B: WobbleCenter→Sun angle                               │ ${resultB.mean4pt.toFixed(9)}    │ ${diffB >= 0 ? '+' : ''}${diffB.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║ D: Heliocentric Sun→WobbleCenter angle                  │ ${resultD.mean4pt.toFixed(9)}    │ ${diffD >= 0 ? '+' : ''}${diffD.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ C: Heliocentric Sun→Earth angle (includes wobble)       │ ${resultC.mean4pt.toFixed(9)}    │ ${diffC >= 0 ? '+' : ''}${diffC.toFixed(2).padStart(6)} seconds     ║`);
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
   console.log(`║ IAU sidereal year (J2000)                               │ ${iauSiderealYear.toFixed(9)}    │ (reference)           ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
@@ -17652,19 +18675,19 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('╔═════════════════════════════════════════════════════════╤═══════════════════════╗');
   console.log('║ Precession Validation                                   │ Value                 ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
-  const siderealMinusTropicalA = (resultA.mean - iauTropicalYear) * 86400;
-  console.log(`║ Sidereal - Tropical (Method A)                          │ ${siderealMinusTropicalA.toFixed(2).padStart(7)} seconds     ║`);
+  const siderealMinusTropicalA = (resultA.mean4pt - iauTropicalYear) * 86400;
+  console.log(`║ Sidereal - Tropical (Method A, 4pt mean)                │ ${siderealMinusTropicalA.toFixed(2).padStart(7)} seconds     ║`);
   console.log(`║ Sidereal - Tropical (IAU)                               │ ${(iauPrecessionContrib * 86400).toFixed(2).padStart(7)} seconds     ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
 
   // Calculate precession
-  const precessionCalculated = resultA.mean / (resultA.mean - iauTropicalYear);
+  const precessionCalculated = resultA.mean4pt / (resultA.mean4pt - iauTropicalYear);
 
   console.log('');
   console.log('-------------------------------------------------------------------------------');
   console.log('PRECESSION CALCULATION');
   console.log('-------------------------------------------------------------------------------');
-  console.log('Sidereal Year (measured):             ' + resultA.mean.toFixed(9) + ' days');
+  console.log('Sidereal Year (4-pt mean):            ' + resultA.mean4pt.toFixed(9) + ' days');
   console.log('Tropical Year (IAU):                  ' + iauTropicalYear.toFixed(9) + ' days');
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
@@ -17672,26 +18695,27 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('  IAU J2000 precession:               ' + ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years');
   console.log('-------------------------------------------------------------------------------');
 
-  // Show trend if enough data (using Method A as primary)
-  if (resultA.intervals.length > 10) {
-    const firstFive = resultA.intervals.slice(0, 5);
-    const lastFive = resultA.intervals.slice(-5);
+  // Show trend if enough data (using Method A at 90° as primary for trend)
+  const trendResult = resultA.angleResults.find(r => r.angle === 90);
+  if (trendResult && trendResult.intervals.length > 10) {
+    const firstFive = trendResult.intervals.slice(0, 5);
+    const lastFive = trendResult.intervals.slice(-5);
     const firstMean = firstFive.reduce((s, i) => s + i.interval, 0) / 5;
     const lastMean = lastFive.reduce((s, i) => s + i.interval, 0) / 5;
     const yearSpan = lastFive[4].year - firstFive[0].year;
     const drift = (lastMean - firstMean) / yearSpan * 86400;
     console.log('');
-    console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year (Method A)`);
+    console.log(`Trend over ${yearSpan} years: ${drift.toFixed(3)} sec/year change in sidereal year (Method A at 90°)`);
   }
 
   jumpToJulianDay(savedJD);
   o.Run = savedRun;
 
   return {
-    methodA: { crossings: resultA.crossings, intervals: resultA.intervals, mean: resultA.mean },
-    methodB: { crossings: resultB.crossings, intervals: resultB.intervals, mean: resultB.mean },
-    methodC: { crossings: resultC.crossings, intervals: resultC.intervals, mean: resultC.mean },
-    methodD: { crossings: resultD.crossings, intervals: resultD.intervals, mean: resultD.mean },
+    methodA: { angleResults: resultA.angleResults, mean4pt: resultA.mean4pt },
+    methodB: { angleResults: resultB.angleResults, mean4pt: resultB.mean4pt },
+    methodC: { angleResults: resultC.angleResults, mean4pt: resultC.mean4pt },
+    methodD: { angleResults: resultD.angleResults, mean4pt: resultD.mean4pt },
     iauReference: iauSiderealYear
   };
 }
@@ -17760,11 +18784,16 @@ async function analyzeAllAlignments(startYear, endYear) {
     if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
   }
 
-  // Collect sidereal year data (Sun world position method)
-  console.log('Collecting sidereal year crossings (Sun world position)...');
-  const siderealCrossings = [];
-  let firstSiderealJD = null;
-  let targetSiderealAngle = null;
+  // Collect sidereal year data at 4 reference angles (0°, 90°, 180°, 270°)
+  // Analogous to 4 cardinal points for the tropical year — averages out variable-speed effects
+  console.log('Collecting sidereal year crossings at 4 reference angles...');
+
+  const siderealData = {
+    S0:   { angle: 0,   crossings: [], name: '0° ICRF',   firstJD: null },
+    S90:  { angle: 90,  crossings: [], name: '90° ICRF',  firstJD: null },
+    S180: { angle: 180, crossings: [], name: '180° ICRF', firstJD: null },
+    S270: { angle: 270, crossings: [], name: '270° ICRF', firstJD: null }
+  };
 
   // Helper to get Sun's absolute world angle
   const getSunWorldAngle = (jd) => {
@@ -17776,94 +18805,89 @@ async function analyzeAllAlignments(startYear, endYear) {
     return ((angle % 360) + 360) % 360;
   };
 
+  const sidStepFine = 0.5 / 24;   // 0.5 hours
+  const sidStepCoarse = 6 / 24;   // 6 hours (for first-year wide search)
+
+  // Helper: find world-angle crossing in a set of samples
+  const findSidCrossing = (samples, targetAngle, step) => {
+    for (let i = 1; i < samples.length; i++) {
+      let a1 = samples[i - 1].angle;
+      let a2 = samples[i].angle;
+      if (Math.abs(a2 - a1) > 180) {
+        if (a2 > a1) a1 += 360;
+        else a2 += 360;
+      }
+      let adj = targetAngle;
+      if (a1 > 360 || a2 > 360) {
+        if (targetAngle < 180) adj = targetAngle + 360;
+      }
+      const up = a1 < adj && a2 >= adj;
+      const down = a1 > adj && a2 <= adj;
+      if (up || down) {
+        const t = Math.abs(adj - a1) / Math.abs(a2 - a1);
+        return samples[i - 1].jd + t * step;
+      }
+    }
+    return null;
+  };
+
   for (let year = startYear; year <= endYear; year++) {
-    let approxJD;
-    let searchRange;
+    for (const key of Object.keys(siderealData)) {
+      const sd = siderealData[key];
 
-    if (firstSiderealJD !== null) {
-      const prevCrossing = siderealCrossings[siderealCrossings.length - 1];
-      approxJD = prevCrossing.jd + 365.256;
-      searchRange = 288;  // ±6 days
-    } else {
-      const yearFraction = 0.47;  // June
-      approxJD = startmodelJD + ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
-      searchRange = 960;  // ±20 days
-    }
+      let crossingJD = null;
 
-    const step = 0.5 / 24;  // 0.5 hours
-    const samples = [];
-
-    for (let k = -searchRange; k <= searchRange; ++k) {
-      const jd = approxJD + k * step;
-      const angle = getSunWorldAngle(jd);
-      samples.push({ k, jd, angle });
-    }
-
-    let crossingJD = null;
-
-    if (firstSiderealJD === null) {
-      // First year: use sun.ra = 90° as reference, then record world angle
-      const target = 90;
-      for (let i = 1; i < samples.length; i++) {
-        jumpToJulianDay(samples[i-1].jd);
-        forceSceneUpdate();
-        const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
-
-        jumpToJulianDay(samples[i].jd);
-        forceSceneUpdate();
-        const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
-
-        if (ra1 < target && ra2 >= target) {
-          const t = (target - ra1) / (ra2 - ra1);
-          crossingJD = samples[i-1].jd + t * step;
-          firstSiderealJD = crossingJD;
-          targetSiderealAngle = getSunWorldAngle(crossingJD);
-          break;
+      if (sd.firstJD !== null) {
+        // Subsequent years: narrow fine search around expected crossing
+        const prevCrossing = sd.crossings[sd.crossings.length - 1];
+        const approxJD = prevCrossing.jd + 365.256;
+        const samples = [];
+        for (let k = -288; k <= 288; ++k) {
+          const jd = approxJD + k * sidStepFine;
+          samples.push({ jd, angle: getSunWorldAngle(jd) });
+        }
+        crossingJD = findSidCrossing(samples, sd.angle, sidStepFine);
+      } else {
+        // First year: coarse search over full year, then refine
+        const yearStartJD = startmodelJD + (year - startmodelYear) * meansolaryearlengthinDays;
+        const coarseSamples = [];
+        for (let k = 0; k <= 1460; ++k) {
+          const jd = yearStartJD + k * sidStepCoarse;
+          coarseSamples.push({ jd, angle: getSunWorldAngle(jd) });
+        }
+        const coarseJD = findSidCrossing(coarseSamples, sd.angle, sidStepCoarse);
+        if (coarseJD) {
+          const fineSamples = [];
+          for (let k = -24; k <= 24; ++k) {
+            const jd = coarseJD + k * sidStepFine;
+            fineSamples.push({ jd, angle: getSunWorldAngle(jd) });
+          }
+          crossingJD = findSidCrossing(fineSamples, sd.angle, sidStepFine);
         }
       }
-    } else {
-      // Subsequent years: find when world angle returns to target
-      for (let i = 1; i < samples.length; i++) {
-        let a1 = samples[i-1].angle;
-        let a2 = samples[i].angle;
 
-        // Handle wraparound
-        if (Math.abs(a2 - a1) > 180) {
-          if (a2 > a1) a1 += 360;
-          else a2 += 360;
-        }
-
-        let adjustedTarget = targetSiderealAngle;
-        if (a1 > 360 || a2 > 360) {
-          if (targetSiderealAngle < 180) adjustedTarget = targetSiderealAngle + 360;
-        }
-
-        const crossingUp = a1 < adjustedTarget && a2 >= adjustedTarget;
-        const crossingDown = a1 > adjustedTarget && a2 <= adjustedTarget;
-
-        if (crossingUp || crossingDown) {
-          const t = Math.abs(adjustedTarget - a1) / Math.abs(a2 - a1);
-          crossingJD = samples[i-1].jd + t * step;
-          break;
-        }
+      if (crossingJD) {
+        if (sd.firstJD === null) sd.firstJD = crossingJD;
+        sd.crossings.push({ year, jd: crossingJD });
       }
-    }
-
-    if (crossingJD) {
-      siderealCrossings.push({ year, jd: crossingJD });
     }
 
     if (year % 10 === 0) await new Promise(r => setTimeout(r, 10));
   }
 
-  // Calculate sidereal year intervals
-  const siderealIntervals = [];
-  for (let i = 1; i < siderealCrossings.length; i++) {
-    siderealIntervals.push(siderealCrossings[i].jd - siderealCrossings[i - 1].jd);
+  // Calculate sidereal year intervals and means for each reference angle
+  for (const key of Object.keys(siderealData)) {
+    const sd = siderealData[key];
+    sd.intervals = [];
+    for (let i = 1; i < sd.crossings.length; i++) {
+      sd.intervals.push(sd.crossings[i].jd - sd.crossings[i - 1].jd);
+    }
+    sd.mean = sd.intervals.length > 0
+      ? sd.intervals.reduce((a, b) => a + b, 0) / sd.intervals.length
+      : 0;
   }
-  const meanSiderealYear = siderealIntervals.length > 0
-    ? siderealIntervals.reduce((a, b) => a + b, 0) / siderealIntervals.length
-    : 0;
+  const meanSiderealYear = (siderealData.S0.mean + siderealData.S90.mean +
+    siderealData.S180.mean + siderealData.S270.mean) / 4;
 
   // Calculate intervals for each cardinal point
   for (const key of Object.keys(cardinalData)) {
@@ -17940,12 +18964,18 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log(`║   Perihelion to perihelion:      ${meanPerihelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${periDiffSec >= 0 ? '+' : ''}${periDiffSec.toFixed(2)}s ║`);
   console.log(`║   Aphelion to aphelion:          ${meanAphelion.toFixed(9)}    ${ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)}   ${apheDiffSec >= 0 ? '+' : ''}${apheDiffSec.toFixed(2)}s ║`);
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
-  console.log('║ SIDEREAL YEAR (Sun world position)                  Measured          IAU Ref         ║');
+  console.log('║ SIDEREAL YEAR (4-angle average: 0°, 90°, 180°, 270°)  Measured          IAU Ref       ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
+  for (const key of Object.keys(siderealData)) {
+    const sd = siderealData[key];
+    const d = (sd.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
+    console.log(`║   At ${sd.name.padEnd(10)}:              ${sd.mean.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${d >= 0 ? '+' : ''}${d.toFixed(2)}s ║`);
+  }
   const siderealDiffSec = (meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400;
   const siderealTropicalDiff = (meanSiderealYear - meanTropicalYear) * 86400;
   const iauSiderealTropicalDiff = (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
-  console.log(`║   Sidereal year:                 ${meanSiderealYear.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${siderealDiffSec >= 0 ? '+' : ''}${siderealDiffSec.toFixed(2)}s ║`);
+  console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
+  console.log(`║   4-point mean:                  ${meanSiderealYear.toFixed(9)}    ${ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)}   ${siderealDiffSec >= 0 ? '+' : ''}${siderealDiffSec.toFixed(2)}s ║`);
   console.log(`║   Sidereal - Tropical (model):   ${siderealTropicalDiff.toFixed(2)} seconds                                        ║`);
   console.log(`║   Sidereal - Tropical (IAU):     ${iauSiderealTropicalDiff.toFixed(2)} seconds                                        ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════╝');
@@ -17957,7 +18987,7 @@ async function analyzeAllAlignments(startYear, endYear) {
   console.log('-------------------------------------------------------------------------------');
   console.log('PRECESSION CALCULATION');
   console.log('-------------------------------------------------------------------------------');
-  console.log('Sidereal Year (measured):             ' + meanSiderealYear.toFixed(9) + ' days');
+  console.log('Sidereal Year (4-pt mean):            ' + meanSiderealYear.toFixed(9) + ' days');
   console.log('Tropical Year (measured):             ' + meanTropicalYear.toFixed(9) + ' days');
   console.log('');
   console.log('Precession = Sidereal / (Sidereal - Tropical):');
@@ -18220,7 +19250,7 @@ async function analyzeAllAlignments(startYear, endYear) {
     cardinalData,
     perihelions,
     aphelions,
-    siderealCrossings,
+    siderealData,
     means: {
       VE: cardinalData.VE.mean,
       SS: cardinalData.SS.mean,
@@ -20964,11 +21994,12 @@ function buildDateSection(planetKey, testDate, data) {
   section += `+${HR}+\n`;
 
   // Position data
-  if (testDate.type === 'position' || testDate.type === 'both') {
+  if (testDate.type === 'position' || testDate.type === 'both' || testDate.type === 'observation') {
     // Determine comparison mode based on label and comparePlanet field
     const isNasaDate = testDate.label.toLowerCase().includes('nasa');
     const isOpposition = testDate.label.toLowerCase().includes('opposition');
     const isOccultation = !!data.position.comparePlanet;  // Has companion planet to compare
+    const isObservation = testDate.type === 'observation'; // Historical observation (e.g., Tycho Brahe)
 
     // Helper to get color from status
     const getColorFromStatus = (status) => {
@@ -20978,8 +22009,10 @@ function buildDateSection(planetKey, testDate, data) {
       return '#e8e8e8'; // 'none' - no reference, use default white
     };
 
-    section += `|  POSITION DATA`.padEnd(W + 1) + `|\n`;
-    section += `|  ${'-'.repeat(W - 4)}  |\n`;
+    if (!isObservation) {
+      section += `|  POSITION DATA`.padEnd(W + 1) + `|\n`;
+      section += `|  ${'-'.repeat(W - 4)}  |\n`;
+    }
 
     if (isOccultation) {
       // Occultation: Compare both planets against reference longitude-derived RA
@@ -21029,6 +22062,43 @@ function buildDateSection(planetKey, testDate, data) {
       const companionPlanet = PLANET_OBJECTS[companionKey]();
       const companionDecValue = decToDMSFromRadians(companionPlanet.dec);
       section += `|  ${(`${companionLabel} Dec:`.padEnd(24) + companionDecValue.padStart(22))}|\n`;
+
+    } else if (isObservation) {
+      // Historical observation comparison (e.g., Tycho Brahe)
+      // Compare model's computed Dec against observed Dec, show error
+      const decValue = decToDMSFromRadians(data.position.planetDecRad);
+      // Convert spherical phi to standard declination degrees (same formula as decToDMSFromRadians)
+      const phiRad = data.position.planetDecRad;
+      const decRad = (phiRad <= 0) ? phiRad + Math.PI / 2 : Math.PI / 2 - phiRad;
+      const modelDecDeg = decRad * (180 / Math.PI);
+
+      section += `|  OBSERVATION DATA (Tier ${testDate.tier || '?'})`.padEnd(W + 1) + `|\n`;
+      section += `|  ${'-'.repeat(W - 4)}  |\n`;
+
+      // Model Dec
+      section += `|  ${(`${planetLabel} Dec (model):`.padEnd(24) + decValue.padStart(22))}|\n`;
+
+      // Observed Dec
+      if (data.position.refDec) {
+        const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
+        section += `|  ${('Observed Dec:'.padEnd(24) + refDecValue.padStart(22))}|\n`;
+
+        // Error in arcminutes
+        const obsDec = parseFloat(data.position.refDec);
+        const errorDeg = modelDecDeg - obsDec;
+        const errorArcmin = errorDeg * 60;
+        const errorStatus = Math.abs(errorArcmin) < 2 ? 'green' : Math.abs(errorArcmin) < 10 ? 'amber' : 'red';
+        const errorColor = getColorFromStatus(errorStatus);
+        const errorStr = (errorArcmin >= 0 ? '+' : '') + errorArcmin.toFixed(2) + "'";
+        const errorContent = 'Error:'.padEnd(24) + errorStr.padStart(22);
+        section += `|  <span style="color:${errorColor}">${errorContent}</span>|\n`;
+      }
+
+      // Model RA (informational)
+      const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
+      section += `|  ${(`${planetLabel} RA (model):`.padEnd(24) + planetRAValue.padStart(22))}|\n`;
+
+      section += `|  ${(`${planetLabel} Dist Earth:`.padEnd(24) + (data.position.planetDistE.toFixed(6) + ' AU').padStart(22))}|\n`;
 
     } else {
       // Standard comparison (NASA, Opposition, Model start date, etc.)
@@ -21151,7 +22221,7 @@ async function generatePlanetReport(planetKey, showAll = false) {
     const data = collectPlanetDataForDate(planetKey, testDate);
 
     // Always add to Excel data
-    if (testDate.type === 'position' || testDate.type === 'both') {
+    if (testDate.type === 'position' || testDate.type === 'both' || testDate.type === 'observation') {
       positionRows.push(data.positionRow);
     }
     if (testDate.type === 'longitude' || testDate.type === 'both') {
@@ -28125,8 +29195,16 @@ function moveModel(pos) {
 
   planetObjects.forEach(obj => {
 
-    // current mean (or true) anomaly, same formula you already used
-    const θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
+    // current angular position (mean anomaly for uniform motion)
+    let θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
+
+    // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
+    if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
+      const e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || 0.0167);
+      const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
+      const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
+      θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+    }
 
     const a = obj.a ?? obj.orbitRadius;   // semi-major (or radius)
     const b = obj.b ?? obj.orbitRadius;   // semi-minor (or radius)
