@@ -43,13 +43,12 @@ const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.511153;
+const correctionSun = 0.471334;
 // Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
 // When useVariableSpeed = false, correctionSun should be 0.913280
-const perihelionPhaseOffset = 2; // degrees — independent offset to perihelion direction
-const eocEccentricity = 0.0085; // Equation of center eccentricity (reduced — geometric offset provides partial speed variation)
+// eocEccentricity and perihelionPhaseOffset are derived constants — see derived section after eccentricityDerivedMean (~line 979)
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 const earthRAAngle = 1.258454;
@@ -84,16 +83,15 @@ const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
 const moonNodalMonthInput = 27.21222082;
 const moonDistance = 384399.07;
-const moonAtApogee = 405400;                              // Moon's apogee distance in km
 const moonEclipticInclinationJ2000 = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 330;                          // Aligned with stellarium data.
-const moonStartposNodal = 64;                             // Aligned to major lunar standstill and minor lunar standstill
-const moonStartposMoon = 132.105;                         // Needs to be at ~21h09m57s if start model is 2451716.5
+const moonStartposApsidal = 347.622;                      // Optimized against JPL Horizons 2000-2025 (7-day sampling)
+const moonStartposNodal = -83.630;                        // Optimized against JPL Horizons 2000-2025 (7-day sampling)
+const moonStartposMoon = 131.930;                         // Optimized against JPL Horizons 2000-2025 (7-day sampling)
 
 // Reference lengths used as INPUT for Mercury
-const mercurySolarYearInput = 87.96845;
+const mercurySolarYearInput = 87.9686;
 const mercuryEclipticInclinationJ2000 = 7.00497902;       // JPL J2000
 const mercuryOrbitalEccentricity = 0.20563593;            // JPL J2000
 const mercuryInvPlaneInclinationJ2000 = 6.3472858;
@@ -102,12 +100,12 @@ const mercuryLongitudePerihelion = 77.4569131;
 const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
-const mercuryAngleCorrection = 0.984366;                  // To align the perihelion exactly
+const mercuryAngleCorrection = 0.984218;                  // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
 const mercuryStartpos = 84.205;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Venus
-const venusSolarYearInput = 224.6965;
+const venusSolarYearInput = 224.6967;
 const venusEclipticInclinationJ2000 = 3.39467605;         // JPL J2000
 const venusOrbitalEccentricity = 0.00677672;              // JPL J2000
 const venusInvPlaneInclinationJ2000 = 2.1545441;
@@ -116,7 +114,7 @@ const venusLongitudePerihelion = 131.5765919;
 const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
 const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
-const venusAngleCorrection = -2.782986;                    // To align the perihelion exactly
+const venusAngleCorrection = -2.783252;                    // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
 const venusStartpos = 249.69;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
 
@@ -130,12 +128,12 @@ const marsLongitudePerihelion = 336.0650681;
 const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
 const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
-const marsAngleCorrection = -2.10564;                    // To align the perihelion exactly
+const marsAngleCorrection = -2.107087;                    // To align the perihelion exactly
 const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsStartpos = 121.512;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Jupiter
-const jupiterSolarYearInput = 4330.595;
+const jupiterSolarYearInput = 4330.6;
 const jupiterEclipticInclinationJ2000 = 1.30439695;       // JPL J2000
 const jupiterOrbitalEccentricity = 0.04838624;            // JPL J2000
 const jupiterInvPlaneInclinationJ2000 = 0.3219652;
@@ -144,7 +142,7 @@ const jupiterLongitudePerihelion = 14.70659401;
 const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
 const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
-const jupiterAngleCorrection = 1.097601;                  // To align the perihelion exactly
+const jupiterAngleCorrection = 1.095885;                  // To align the perihelion exactly
 const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
 const jupiterStartpos = 13.76;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
@@ -158,7 +156,7 @@ const saturnLongitudePerihelion = 92.12794343;
 const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
 const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
-const saturnAngleCorrection = -0.175436;                  // To align the perihelion exactly
+const saturnAngleCorrection = -0.175438;                  // To align the perihelion exactly
 const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
 const saturnStartpos = 11.397;                            // Needs to be at ~3h34m49.4 if start model is 2451716.5
 
@@ -172,12 +170,12 @@ const uranusLongitudePerihelion = 170.7308251;
 const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
 const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
-const uranusAngleCorrection = -0.774123;                  // To align the perihelion exactly
+const uranusAngleCorrection = -0.775884;                  // To align the perihelion exactly
 const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
 const uranusStartpos = 44.71;                             // Needs to be at ~21h32m43.04 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Neptune
-const neptuneSolarYearInput = 59896;
+const neptuneSolarYearInput = 59980;
 const neptuneEclipticInclinationJ2000 = 1.77004347;       // JPL J2000
 const neptuneOrbitalEccentricity = 0.00859048;            // JPL J2000
 const neptuneInvPlaneInclinationJ2000 = 0.7354155;
@@ -186,7 +184,7 @@ const neptuneLongitudePerihelion = 45.80124471;
 const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
 const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
-const neptuneAngleCorrection = 2.400885;                  // To align the perihelion exactly
+const neptuneAngleCorrection = 2.40008;                  // To align the perihelion exactly
 const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneStartpos = 47.95;                            // Needs to be at ~20h33m40.34 if start model is 2451716.5
 
@@ -349,38 +347,38 @@ const EIGENMODE_PHASES = [
 
 // Mercury: LL bounds [4.57°, 9.86°], 203° balance group
 // J2000=6.3472858° (EXACT), d=21, phase 203.3195°, period holisticyearLength/(1+(3/8)), trend error: 1.6"/cy
-const mercuryInvPlaneInclinationMean = 6.727893;
-const mercuryInvPlaneInclinationAmplitude = 0.385911;  // Range: 6.34° to 7.11°
+const mercuryInvPlaneInclinationMean = 6.726620;
+const mercuryInvPlaneInclinationAmplitude = 0.384621;  // Range: 6.34° to 7.11°
 
 // Venus: LL bounds [0.00°, 3.38°], 203° balance group
 // J2000=2.1545441° (EXACT), d=34, phase 203.3195°, period holisticyearLength*2, trend error: 21.7"/cy
-const venusInvPlaneInclinationMean = 2.207538;
-const venusInvPlaneInclinationAmplitude = 0.062074;  // Range: 2.15° to 2.27°
+const venusInvPlaneInclinationMean = 2.207361;
+const venusInvPlaneInclinationAmplitude = 0.061866;  // Range: 2.15° to 2.27°
 
 // Mars: LL bounds [0.00°, 5.84°], 203° balance group
 // J2000=1.6311858° (EXACT), d=5, phase 203.3195°, period holisticyearLength/(4+(1/3)), trend error: 17.9"/cy
-const marsInvPlaneInclinationMean = 2.653311;
-const marsInvPlaneInclinationAmplitude = 1.162513;  // Range: 1.49° to 3.82°
+const marsInvPlaneInclinationMean = 2.649893;
+const marsInvPlaneInclinationAmplitude = 1.158626;  // Range: 1.49° to 3.81°
 
 // Jupiter: LL bounds [0.241°, 0.489°], 203° balance group
 // J2000=0.3219652° (EXACT), d=5, phase 203.3195°, period holisticyearLength/5, trend error: 3.0"/cy
-const jupiterInvPlaneInclinationMean = 0.329124;
-const jupiterInvPlaneInclinationAmplitude = 0.021372;  // Range: 0.31° to 0.35°
+const jupiterInvPlaneInclinationMean = 0.329100;
+const jupiterInvPlaneInclinationAmplitude = 0.021301;  // Range: 0.31° to 0.35°
 
 // Saturn: LL bounds [0.797°, 1.02°], 23° balance group (retrograde)
 // J2000=0.9254704° (EXACT), d=3, phase 23.3195° (retrograde), period -holisticyearLength/8, trend error: 5.4"/cy
-const saturnInvPlaneInclinationMean = 0.931699;
-const saturnInvPlaneInclinationAmplitude = 0.065097;  // Range: 0.87° to 1.00°
+const saturnInvPlaneInclinationMean = 0.931678;
+const saturnInvPlaneInclinationAmplitude = 0.064879;  // Range: 0.87° to 1.00°
 
 // Uranus: LL bounds [0.902°, 1.11°], 203° balance group
 // J2000=0.9946692° (EXACT), d=21, phase 203.3195°, period holisticyearLength/3, trend error: 2.7"/cy
-const uranusInvPlaneInclinationMean = 1.000619;
-const uranusInvPlaneInclinationAmplitude = 0.023796;  // Range: 0.98° to 1.02°
+const uranusInvPlaneInclinationMean = 1.000600;
+const uranusInvPlaneInclinationAmplitude = 0.023716;  // Range: 0.98° to 1.02°
 
 // Neptune: LL bounds [0.554°, 0.800°], 203° balance group
 // J2000=0.7354155° (EXACT), d=34, phase 203.3195°, period holisticyearLength*2, trend error: 1.7"/cy
-const neptuneInvPlaneInclinationMean = 0.722146;
-const neptuneInvPlaneInclinationAmplitude = 0.013531;  // Range: 0.71° to 0.74°
+const neptuneInvPlaneInclinationMean = 0.722190;
+const neptuneInvPlaneInclinationAmplitude = 0.013486;  // Range: 0.71° to 0.74°
 
 // Pluto: LL bounds [15.0°, 16.5°] (estimated, not in Fibonacci theory)
 // J2000=15.5639473° (EXACT), phase 203.3195°, period holisticyearLength, trend error: 5.6"/cy
@@ -857,6 +855,10 @@ const ASTRO_REFERENCE = {
   // PERIHELION REFERENCE VALUES (J2000.0)
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // Earth's perihelion passage near J2000.0
+  // Source: USNO / Astronomical Almanac — Earth perihelion 2000 Jan 3 13:00 UTC
+  perihelionPassageJ2000_JD: 2451547.042,
+
   // Earth's longitude of perihelion at J2000.0
   // Source: JPL Horizons / Astronomical Almanac
   perihelionLongitudeJ2000_deg: 102.947,             // RA of perihelion in degrees
@@ -864,6 +866,22 @@ const ASTRO_REFERENCE = {
   // Earth's orbital eccentricity at J2000.0
   // Source: JPL Horizons / Astronomical Almanac
   eccentricityJ2000: 0.01671022,                     // Distance to Earth in AU (eccentricity)
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LUNAR MEAN LONGITUDE COEFFICIENTS (J2000.0)
+  // Source: Meeus, "Astronomical Algorithms", Ch. 47
+  // Used for lunar perturbation corrections (equation of center, evection, variation, annual equation)
+  // ═══════════════════════════════════════════════════════════════════════════
+  moonMeanAnomalyJ2000_deg: 134.9634,                // Moon's mean anomaly at J2000.0 (degrees)
+  moonMeanAnomalyRate_degPerDay: 13.06499295,         // Moon's mean anomaly rate (degrees/day)
+  moonMeanElongationJ2000_deg: 297.8502,              // Mean elongation Moon-Sun at J2000.0 (degrees)
+  moonMeanElongationRate_degPerDay: 12.19074912,      // Mean elongation rate (degrees/day)
+  sunMeanAnomalyJ2000_deg: 357.5291,                  // Sun's mean anomaly at J2000.0 (degrees)
+  sunMeanAnomalyRate_degPerDay: 0.98560028,           // Sun's mean anomaly rate (degrees/day)
+  moonArgLatJ2000_deg: 93.2720993,                    // Moon's argument of latitude F at J2000.0 (degrees)
+  moonArgLatRate_degPerCentury: 483202.0175273,        // F rate (degrees/Julian century)
+  moonMeanElongationJ2000Full_deg: 297.8502042,        // D at J2000.0 (full precision for latitude)
+  moonMeanElongationRate_degPerCentury: 445267.1115168, // D rate (degrees/Julian century)
 
   // ═══════════════════════════════════════════════════════════════════════════
   // PERIHELION PRECESSION RATES (1900-2100 trend)
@@ -977,6 +995,17 @@ const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1)
 const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
+
+// Equation of center eccentricity — derived, not a free parameter.
+// The off-center orbit geometry provides apparent speed variation with amplitude e_geom (first order).
+// The explicit EoC adds 2·eoc. Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
+const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
+
+// Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
+// Aligns the EoC perihelion with the geometric perihelion set by the EP1 precession phase at J2000.
+const perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / (holisticyearLength / 16) * 360
+  + correctionSun + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;
+
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
 const earthPerihelionICRFYears = holisticyearLength/3;
 
@@ -1042,27 +1071,30 @@ const MASS_RATIO_EARTH_MOON = 81.3007;
 // GM_system = (2π)² × a³ / P² - this gives G(M_Earth + M_Moon)
 const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
 
-// Solar perturbation correction factor using Moon's apogee ratio to AU
-// The 1/(1 - moonApogee/AU) factor ≈ 1.00271 corrects for solar perturbation effects:
-// - Kepler's law applied to Moon's orbit uses observed distance/period which include solar effects
-// - At apogee, Moon is closest to Earth's Hill sphere edge, maximizing solar influence
-// - The quadrupole solar perturbation (~5.6×10⁻³) scales with orbital size ratio. https://farside.ph.utexas.edu/teaching/celestial/Celestial/node100.html
-// - This represents the "effective radius" reconciling Kepler-derived with measured GM values
+// Solar/sidereal day correction for Kepler-derived GM
+// Kepler's 3rd law (GM = 4π²a³/P²) uses the Moon's sidereal period, measured against
+// the stars. But the gravitational dynamics occur in a frame rotating with Earth's orbit
+// around the Sun. The ratio of solar day to sidereal day (meanlengthofday / meanSiderealday
+// ≈ 1.002738) corrects for this extra rotation — the same reason a solar day is ~3m56s
+// longer than a sidereal day. Without this correction, GM is underestimated by ~0.27%.
+// Observation: moonApogee / AU (405400 / 149597870 ≈ 0.002710) is within 1% of
+// solarDay/siderealDay - 1 (≈ 0.002738) — a numerical coincidence that allowed an
+// earlier apogee-based formula to also produce accurate GM values.
+const SOLAR_SIDEREAL_DAY_RATIO = meanlengthofday / meanSiderealday;
 
-// Earth's gravitational parameter (corrected for Moon's mass and solar perturbation)
-// GM_Earth = GM_system × (ratio / (ratio + 1)) / (1 - moonApogee/AU)
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) / (1 - moonAtApogee / meanAUDistance);
-// Result: ~398,600 km³/s² (matches JPL value)
+// Earth's gravitational parameter (corrected for Moon's mass and solar/sidereal frame)
+// GM_Earth = GM_system × (ratio / (ratio + 1)) × (solarDay / siderealDay)
+const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) * SOLAR_SIDEREAL_DAY_RATIO;
+// Result: ~398,600 km³/s² (JPL: 398600.435, error: 0.001%)
 
 // Earth's mass derived from gravitational parameter (kg)
 // M_EARTH = GM_EARTH / G ≈ 5.97 × 10²⁴ kg
 const M_EARTH = GM_EARTH / G_CONSTANT;
 
 // Moon's gravitational parameter (km³/s²)
-// GM_Moon = GM_system / (ratio + 1) with same solar perturbation correction
-// The entire GM_EARTH_MOON_SYSTEM is affected by solar perturbation
-const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1) / (1 - moonAtApogee / meanAUDistance);
-// Result: ~4,902.8 km³/s² (matches GRAIL value)
+// GM_Moon = GM_system / (ratio + 1) × (solarDay / siderealDay)
+const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1) * SOLAR_SIDEREAL_DAY_RATIO;
+// Result: ~4,902.9 km³/s² (GRAIL: 4902.800, error: 0.001%)
 
 // Moon's mass derived from gravitational parameter (kg)
 // M_MOON = GM_MOON / G ≈ 7.35 × 10²² kg
@@ -2434,7 +2466,7 @@ const sun = {
   orbitTilta: 0,
   orbitTiltb: 0,
   eccentricity: eocEccentricity,
-  perihelionPhaseJ2000: -correctionSun * (Math.PI / 180) - 2 * Math.PI * (startmodelJD - 2451547.042) / meansolaryearlengthinDays + perihelionPhaseOffset * (Math.PI / 180), // 2451547.042 = JD of Earth perihelion 2000 (Jan 3.542)
+  perihelionPhaseJ2000: -correctionSun * (Math.PI / 180) - 2 * Math.PI * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays + perihelionPhaseOffset * (Math.PI / 180),
   perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 16), // perihelion advances at H/16 rate
   
   size: (diameters.sunDiameter/ currentAUDistance)*100,   
@@ -2459,7 +2491,7 @@ const moonApsidalPrecession = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: moonEclipticInclinationJ2000-moonTilt,
+  orbitTilta: 0,
   orbitTiltb: 0,
 
   size: 0.01,
@@ -2573,6 +2605,7 @@ const moon = {
   orbitTilta: 0,
   orbitTiltb: 0,
   eccentricity: moonOrbitalEccentricity,
+  lunarPerturbations: true,
 
   size: (diameters.moonDiameter/ currentAUDistance)*100,
   color: 0x8b8b8b,
@@ -10565,7 +10598,7 @@ function closeHierarchyInspector() {
 
 const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
-// 755 preset configurations with >= 99.994% vector balance (TNO margin)
+// 748 preset configurations with >= 99.994% vector balance (TNO margin)
 // Generated by exhaustive search over Fibonacci d-values {1,2,3,5,8,13,21,34,55}
 // and two phase groups (203.3195° and 23.3195°) — see docs/appendix-k-balance-search.md
 // Format: [scenario, balance%, me_d, me_phase, ve_d, ve_phase, ma_d, ma_phase, ju_d, ju_phase, sa_d, sa_phase, ur_d, ur_phase, ne_d, ne_phase]
@@ -10573,761 +10606,754 @@ const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn
 // Scenarios: A = Ju5/Sa3, B = Ju8/Sa5, C = Ju13/Sa8, D = Ju21/Sa13
 /* eslint-disable */
 const BALANCE_PRESETS = [
-["A",99.999999,34,1,2,1,1,1,5,0,3,1,13,0,21,0],
-["A",99.999995,1,0,55,1,21,1,5,0,3,1,21,0,34,0],
-["D",99.999984,2,0,55,0,1,1,21,0,13,1,55,1,34,0],
-["A",99.999976,1,0,21,0,8,1,5,0,3,1,55,1,13,0],
-["B",99.999971,5,1,55,0,13,0,8,0,5,1,34,1,21,0],
-["A",99.999967,2,0,13,1,13,1,5,0,3,1,5,0,13,1],
-["B",99.999966,1,1,55,1,34,1,8,0,5,1,2,0,3,1],
-["B",99.999962,1,1,1,1,3,0,8,0,5,1,55,0,21,0],
-["B",99.99996,55,1,55,1,55,0,8,0,5,1,13,0,34,1],
-["A",99.999941,21,0,5,0,8,1,5,0,3,1,21,0,34,0],
-["A",99.99994,3,1,21,0,55,1,5,0,3,1,5,0,13,1],
-["D",99.99993,13,1,5,0,5,0,21,0,13,1,34,0,34,1],
-["A",99.999928,5,0,5,0,3,0,5,0,3,1,34,1,13,0],
-["D",99.999922,55,0,3,0,1,0,21,0,13,1,13,1,34,0],
-["C",99.999918,3,0,1,1,3,1,13,0,8,1,34,0,34,0],
-["C",99.999915,8,0,8,0,34,0,13,0,8,1,34,1,34,0],
-["C",99.999912,55,1,2,1,1,0,13,0,8,1,21,1,21,0],
-["C",99.999909,3,0,3,1,34,0,13,0,8,1,5,0,8,1],
-["A",99.999884,2,0,13,1,34,1,5,0,3,1,34,0,21,0],
-["B",99.999883,13,1,2,1,13,0,8,0,5,1,55,0,34,0],
-["A",99.999879,13,1,21,0,55,1,5,0,3,1,13,1,8,0],
-["B",99.999855,55,1,5,0,55,1,8,0,5,1,13,1,13,0],
-["D",99.999854,13,1,13,1,55,0,21,0,13,1,55,1,55,0],
-["A",99.999846,8,0,55,0,8,1,5,0,3,1,5,0,13,1],
-["C",99.999845,1,0,1,0,21,1,13,0,8,1,34,0,21,1],
-["A",99.99983,21,0,5,0,13,1,5,0,3,1,55,1,13,0],
-["A",99.999821,5,1,21,0,55,1,5,0,3,1,34,0,21,0],
-["B",99.999821,1,0,8,0,5,0,8,0,5,1,21,1,21,0],
-["B",99.999814,2,1,2,0,55,0,8,0,5,1,21,1,21,0],
-["D",99.999814,55,1,8,0,13,0,21,0,13,1,34,1,55,0],
-["A",99.99981,1,0,3,0,2,0,5,0,3,1,55,0,34,0],
-["A",99.999809,21,0,34,0,5,0,5,0,3,1,21,0,34,0],
-["D",99.999795,1,1,34,1,3,0,21,0,13,1,34,0,55,1],
-["B",99.999789,1,0,1,0,21,1,8,0,5,1,21,0,21,1],
-["B",99.999776,5,1,5,0,1,0,8,0,5,1,34,0,55,1],
-["B",99.999771,21,0,2,1,5,0,8,0,5,1,34,0,55,0],
-["B",99.99977,8,0,34,0,2,0,8,0,5,1,55,1,34,0],
-["A",99.999767,34,0,8,0,1,1,5,0,3,1,21,0,21,0],
-["C",99.999767,8,0,3,1,2,0,13,0,8,1,8,0,13,1],
-["A",99.99976,21,0,2,0,1,0,5,0,3,1,55,1,21,0],
-["A",99.99975,3,1,21,0,34,0,5,0,3,1,34,0,21,0],
-["D",99.999749,1,1,21,1,1,0,21,0,13,1,34,0,34,1],
-["B",99.999742,13,0,34,1,1,1,8,0,5,1,3,0,5,1],
-["B",99.999737,55,1,2,1,1,0,8,0,5,1,34,1,21,0],
-["B",99.999734,13,1,2,1,8,0,8,0,5,1,21,1,13,0],
-["B",99.99973,3,0,1,1,3,1,8,0,5,1,21,0,34,0],
-["D",99.999719,13,1,3,1,8,1,21,0,13,1,55,1,34,0],
-["C",99.999709,3,1,1,1,1,0,13,0,8,1,55,0,55,0],
-["B",99.999703,2,1,3,1,13,0,8,0,5,1,34,0,55,0],
-["C",99.999699,1,1,55,0,8,0,13,0,8,1,21,0,55,1],
-["B",99.999677,8,1,13,0,8,1,8,0,5,1,13,0,34,1],
-["A",99.999667,8,1,3,0,8,1,5,0,3,1,55,0,21,0],
-["B",99.999666,5,0,13,0,21,0,8,0,5,1,5,0,8,1],
-["B",99.99962,34,1,21,0,2,1,8,0,5,1,2,0,3,1],
-["A",99.999619,21,1,5,0,55,0,5,0,3,1,8,0,34,1],
-["C",99.999594,2,1,55,1,2,1,13,0,8,1,34,1,21,0],
-["A",99.999588,55,1,21,0,3,1,5,0,3,1,8,0,55,1],
-["C",99.999588,3,0,1,1,21,0,13,0,8,1,8,0,21,1],
-["C",99.999585,55,0,21,1,8,0,13,0,8,1,21,1,21,0],
-["A",99.99958,55,0,21,1,1,0,5,0,3,1,5,1,5,0],
-["A",99.999578,5,0,13,1,13,0,5,0,3,1,34,0,21,0],
-["A",99.999552,21,1,34,1,1,1,5,0,3,1,3,1,3,0],
-["C",99.99955,5,1,55,0,13,0,13,0,8,1,21,1,21,0],
-["D",99.999549,2,1,1,1,3,1,21,0,13,1,3,0,5,1],
-["C",99.999547,5,0,13,1,13,1,13,0,8,1,55,1,34,0],
-["A",99.999539,1,1,8,0,2,0,5,0,3,1,8,0,34,1],
-["C",99.999531,21,1,2,0,2,1,13,0,8,1,21,0,34,1],
-["C",99.999521,5,0,3,1,13,0,13,0,8,1,5,0,8,1],
-["A",99.999508,5,0,13,1,34,0,5,0,3,1,5,0,13,1],
-["B",99.999485,55,1,8,0,8,0,8,0,5,1,13,1,13,0],
-["B",99.999484,13,0,55,0,3,1,8,0,5,1,55,0,55,0],
-["A",99.999476,1,1,5,0,1,0,5,0,3,1,34,0,34,0],
-["C",99.999471,8,1,5,1,34,0,13,0,8,1,13,1,13,0],
-["A",99.999463,55,1,34,0,3,0,5,0,3,1,8,0,34,1],
-["A",99.99946,21,0,8,0,55,0,5,0,3,1,21,0,34,0],
-["A",99.999459,3,0,55,1,3,1,5,0,3,1,8,0,55,1],
-["A",99.999459,34,0,2,0,21,1,5,0,3,1,5,1,5,0],
-["C",99.999458,2,0,3,0,3,1,13,0,8,1,55,1,55,0],
-["B",99.99944,5,1,3,1,34,1,8,0,5,1,34,0,55,0],
-["C",99.999425,1,0,21,1,21,0,13,0,8,1,34,1,34,0],
-["D",99.999408,2,1,3,1,55,1,21,0,13,1,21,0,55,1],
-["A",99.999396,2,0,8,1,3,0,5,0,3,1,21,0,34,0],
-["B",99.999395,55,1,1,0,8,1,8,0,5,1,55,0,55,1],
-["B",99.999392,13,0,55,1,21,0,8,0,5,1,34,1,21,0],
-["D",99.999375,2,0,8,0,34,1,21,0,13,1,55,0,55,1],
-["C",99.999372,8,0,1,1,2,1,13,0,8,1,34,1,13,0],
-["A",99.999369,8,0,21,1,21,0,5,0,3,1,34,0,21,0],
-["B",99.999365,55,0,21,1,8,0,8,0,5,1,34,1,21,0],
-["A",99.999346,55,0,34,1,5,1,5,0,3,1,8,0,55,1],
-["B",99.999326,55,1,13,0,8,0,8,0,5,1,5,0,8,1],
-["C",99.999321,21,1,3,1,2,0,13,0,8,1,55,1,34,0],
-["A",99.999315,3,0,13,1,34,0,5,0,3,1,34,0,21,0],
-["A",99.999312,8,0,5,1,34,0,5,0,3,1,13,0,55,0],
-["D",99.999297,3,0,3,0,5,1,21,0,13,1,34,0,34,1],
-["B",99.999294,5,0,21,0,2,0,8,0,5,1,8,0,13,1],
-["A",99.999293,1,0,13,0,2,1,5,0,3,1,34,0,21,0],
-["D",99.999282,21,0,1,1,13,0,21,0,13,1,55,1,21,0],
-["D",99.999278,2,1,13,1,8,0,21,0,13,1,21,0,34,1],
-["A",99.999266,2,0,8,0,2,0,5,0,3,1,5,1,5,0],
-["A",99.999246,55,0,55,1,34,0,5,0,3,1,34,0,21,0],
-["A",99.999246,21,0,1,0,5,0,5,0,3,1,55,0,55,0],
-["D",99.999237,34,0,5,1,21,0,21,0,13,1,34,1,34,0],
-["A",99.999237,55,1,34,0,21,1,5,0,3,1,34,0,21,0],
-["B",99.999223,1,1,3,0,13,0,8,0,5,1,13,1,13,0],
-["D",99.999216,2,1,8,1,34,0,21,0,13,1,13,0,21,1],
-["D",99.999211,2,0,5,1,21,0,21,0,13,1,55,1,55,0],
-["D",99.999191,1,0,2,0,3,0,21,0,13,1,13,1,34,0],
-["B",99.999183,1,1,55,1,34,0,8,0,5,1,8,1,8,0],
-["A",99.99916,34,0,34,1,21,0,5,0,3,1,34,0,21,0],
-["A",99.999154,1,1,2,1,8,0,5,0,3,1,55,0,13,0],
-["A",99.999144,3,0,13,1,55,1,5,0,3,1,5,0,13,1],
-["C",99.999134,13,1,2,0,55,0,13,0,8,1,34,1,55,0],
-["A",99.999127,21,0,1,0,21,0,5,0,3,1,55,1,21,0],
-["A",99.999112,55,0,5,1,8,0,5,0,3,1,8,0,55,1],
-["B",99.999107,5,1,5,0,3,1,8,0,5,1,13,0,34,1],
-["D",99.999105,1,0,8,1,2,0,21,0,13,1,13,1,21,0],
-["A",99.999099,5,0,8,1,1,1,5,0,3,1,21,1,8,0],
-["A",99.999085,55,0,55,1,55,1,5,0,3,1,5,0,13,1],
-["B",99.999085,55,0,1,0,34,0,8,0,5,1,34,0,34,1],
-["B",99.999073,5,0,8,0,21,0,8,0,5,1,13,1,13,0],
-["C",99.99907,8,0,3,0,5,1,13,0,8,1,55,1,55,0],
-["D",99.99906,3,1,34,1,1,0,21,0,13,1,21,0,21,1],
-["D",99.999053,21,0,8,0,3,1,21,0,13,1,34,0,55,1],
-["B",99.999053,1,0,8,1,13,1,8,0,5,1,34,1,21,0],
-["B",99.999041,2,0,1,1,5,1,8,0,5,1,55,0,21,0],
-["A",99.999041,13,0,8,0,5,0,5,0,3,1,55,0,21,0],
-["A",99.99903,1,1,5,0,3,1,5,0,3,1,13,0,55,0],
-["B",99.99903,55,1,13,0,2,1,8,0,5,1,8,1,8,0],
-["A",99.999029,2,1,13,0,13,0,5,0,3,1,13,1,8,0],
-["C",99.999006,1,1,1,1,34,0,13,0,8,1,5,1,5,0],
-["A",99.998998,3,0,21,1,55,0,5,0,3,1,13,1,8,0],
-["B",99.998995,1,0,55,0,8,1,8,0,5,1,5,0,8,1],
-["A",99.998981,13,0,21,1,55,0,5,0,3,1,5,0,13,1],
-["A",99.998977,2,0,34,1,5,0,5,0,3,1,55,1,13,0],
-["A",99.998972,2,1,8,0,1,1,5,0,3,1,13,0,34,0],
-["B",99.998968,1,1,34,0,8,1,8,0,5,1,55,1,21,0],
-["A",99.998966,55,0,8,0,13,0,5,0,3,1,55,1,13,0],
-["C",99.998953,34,0,55,1,1,1,13,0,8,1,55,0,55,0],
-["B",99.998951,1,0,13,0,2,0,8,0,5,1,13,0,21,1],
-["A",99.998941,5,0,34,0,8,1,5,0,3,1,34,0,21,0],
-["B",99.998937,2,1,55,0,2,0,8,0,5,1,13,1,13,0],
-["A",99.998936,34,1,1,1,21,1,5,0,3,1,13,0,21,0],
-["A",99.99892,55,0,8,0,5,1,5,0,3,1,13,1,8,0],
-["A",99.998909,2,0,34,1,13,1,5,0,3,1,13,1,8,0],
-["A",99.998908,34,0,21,1,8,0,5,0,3,1,13,1,8,0],
-["D",99.998901,13,1,1,1,8,0,21,0,13,1,2,0,3,1],
-["A",99.998899,8,1,55,1,8,0,5,0,3,1,13,1,8,0],
-["A",99.998893,8,0,55,0,13,1,5,0,3,1,34,0,21,0],
-["B",99.998892,21,1,3,0,55,1,8,0,5,1,55,1,34,0],
-["A",99.99885,21,1,5,0,1,0,5,0,3,1,3,0,5,1],
-["A",99.998843,13,1,5,0,34,0,5,0,3,1,8,0,34,1],
-["A",99.998829,3,1,55,0,1,0,5,0,3,1,5,1,5,0],
-["A",99.998824,8,0,34,1,3,0,5,0,3,1,55,1,13,0],
-["B",99.998822,8,0,1,0,2,0,8,0,5,1,21,1,55,0],
-["B",99.998808,2,1,21,0,3,1,8,0,5,1,2,0,3,1],
-["A",99.998797,34,0,1,1,5,0,5,0,3,1,5,0,21,1],
-["D",99.998781,1,1,2,1,2,1,21,0,13,1,2,0,3,1],
-["A",99.998771,1,0,34,0,34,1,5,0,3,1,8,0,34,1],
-["B",99.998769,55,0,55,1,1,1,8,0,5,1,3,0,5,1],
-["A",99.998766,5,1,2,1,21,1,5,0,3,1,3,1,3,0],
-["B",99.998761,13,0,3,1,1,1,8,0,5,1,34,1,13,0],
-["B",99.998758,3,1,3,1,55,0,8,0,5,1,34,0,55,0],
-["C",99.998753,21,1,34,1,55,1,13,0,8,1,8,0,13,1],
-["B",99.998733,34,1,2,0,1,0,8,0,5,1,34,0,34,1],
-["C",99.998732,2,0,3,1,34,1,13,0,8,1,5,0,8,1],
-["C",99.998728,13,0,3,1,1,1,13,0,8,1,21,1,13,0],
-["B",99.998717,3,1,8,1,3,0,8,0,5,1,13,0,34,1],
-["B",99.998714,3,0,13,1,1,1,8,0,5,1,3,0,5,1],
-["B",99.998706,34,0,13,0,5,0,8,0,5,1,13,1,13,0],
-["A",99.998685,13,0,34,0,3,1,5,0,3,1,8,0,55,1],
-["D",99.99868,3,0,1,1,1,0,21,0,13,1,55,1,34,0],
-["A",99.998663,3,1,1,0,21,1,5,0,3,1,13,0,55,1],
-["A",99.998659,21,1,21,1,5,1,5,0,3,1,13,0,55,0],
-["A",99.998651,55,0,8,1,55,1,5,0,3,1,8,0,55,1],
-["C",99.99864,13,0,55,1,21,0,13,0,8,1,21,1,21,0],
-["D",99.998639,5,0,8,0,13,0,21,0,13,1,55,0,55,1],
-["A",99.998638,34,0,1,0,1,1,5,0,3,1,5,1,5,0],
-["A",99.998628,8,0,2,0,34,0,5,0,3,1,34,0,34,0],
-["A",99.998621,13,1,21,1,2,0,5,0,3,1,8,0,34,1],
-["A",99.998597,13,1,1,1,34,1,5,0,3,1,13,0,21,0],
-["A",99.998596,5,1,2,0,2,1,5,0,3,1,8,0,34,1],
-["A",99.998578,55,0,2,1,8,1,5,0,3,1,3,1,3,0],
-["D",99.998574,1,0,34,0,55,0,21,0,13,1,21,1,34,0],
-["B",99.998574,3,1,3,1,3,0,8,0,5,1,2,0,3,1],
-["A",99.998549,5,1,13,0,34,1,5,0,3,1,13,1,8,0],
-["B",99.998545,8,0,3,0,55,1,8,0,5,1,8,0,13,1],
-["B",99.998527,3,0,8,0,5,0,8,0,5,1,21,0,55,1],
-["D",99.998526,8,1,2,1,8,1,21,0,13,1,5,0,8,1],
-["B",99.998523,34,1,1,0,13,1,8,0,5,1,21,1,34,0],
-["D",99.998519,1,1,34,1,1,1,21,0,13,1,13,0,34,1],
-["B",99.998501,34,1,55,0,21,1,8,0,5,1,13,0,34,1],
-["C",99.998485,55,0,21,1,3,0,13,0,8,1,13,0,21,1],
-["A",99.998479,8,0,1,0,1,0,5,0,3,1,21,0,55,1],
-["A",99.998473,21,0,21,1,1,1,5,0,3,1,3,1,3,0],
-["C",99.998468,34,0,3,0,3,1,13,0,8,1,34,1,34,0],
-["A",99.998467,21,1,21,0,5,0,5,0,3,1,21,0,34,0],
-["A",99.998465,13,0,5,1,21,0,5,0,3,1,13,0,55,0],
-["B",99.998464,21,0,3,1,5,0,8,0,5,1,2,0,3,1],
-["D",99.998462,13,1,5,0,1,0,21,0,13,1,5,1,8,0],
-["A",99.998459,8,1,3,1,1,0,5,0,3,1,55,1,13,0],
-["B",99.998448,5,1,13,0,2,1,8,0,5,1,55,1,21,0],
-["C",99.998435,3,1,21,0,8,1,13,0,8,1,55,1,34,0],
-["B",99.998432,13,1,5,1,21,0,8,0,5,1,8,1,8,0],
-["A",99.998428,5,0,34,1,34,0,5,0,3,1,13,1,8,0],
-["A",99.998426,21,1,21,0,34,1,5,0,3,1,13,1,8,0],
-["C",99.998422,3,0,8,1,34,0,13,0,8,1,8,0,13,1],
-["B",99.998409,34,0,5,1,21,1,8,0,5,1,2,0,3,1],
-["C",99.998407,5,0,3,1,1,0,13,0,8,1,21,0,34,1],
-["C",99.998395,55,0,1,0,13,0,13,0,8,1,5,1,8,0],
-["D",99.998389,8,1,55,1,13,1,21,0,13,1,55,1,55,0],
-["A",99.998383,8,1,8,0,2,1,5,0,3,1,13,0,55,0],
-["A",99.998364,55,0,1,1,2,1,5,0,3,1,21,0,13,0],
-["B",99.998354,8,1,8,1,13,1,8,0,5,1,8,1,8,0],
-["D",99.998348,21,1,21,1,34,0,21,0,13,1,34,0,55,1],
-["D",99.998337,3,0,1,0,55,0,21,0,13,1,55,0,21,1],
-["B",99.998335,34,0,3,1,34,1,8,0,5,1,13,0,55,1],
-["C",99.99833,13,0,21,1,3,1,13,0,8,1,13,1,13,0],
-["D",99.998317,55,0,3,0,3,1,21,0,13,1,34,1,55,0],
-["B",99.998295,8,1,34,0,34,0,8,0,5,1,34,1,21,0],
-["B",99.998293,1,0,21,1,1,1,8,0,5,1,34,0,55,0],
-["A",99.998291,34,0,8,1,2,0,5,0,3,1,21,0,34,0],
-["A",99.998288,13,0,55,0,1,1,5,0,3,1,13,0,34,0],
-["A",99.998266,55,0,34,0,55,1,5,0,3,1,13,1,8,0],
-["A",99.998247,1,0,55,0,13,0,5,0,3,1,55,0,21,0],
-["D",99.998245,55,0,1,0,8,0,21,0,13,1,2,1,3,0],
-["B",99.998242,13,1,2,1,21,1,8,0,5,1,3,0,5,1],
-["A",99.998217,13,1,34,1,1,0,5,0,3,1,5,1,5,0],
-["A",99.998209,2,1,3,1,8,1,5,0,3,1,13,0,34,0],
-["A",99.998208,2,1,13,1,55,0,5,0,3,1,13,0,55,0],
-["A",99.998198,3,0,55,0,5,1,5,0,3,1,5,0,13,1],
-["A",99.998185,13,0,34,1,34,0,5,0,3,1,34,0,21,0],
-["A",99.998181,13,0,34,1,55,1,5,0,3,1,5,0,13,1],
-["C",99.998177,1,0,8,1,13,1,13,0,8,1,21,1,21,0],
-["A",99.99817,3,1,13,0,55,0,5,0,3,1,13,1,8,0],
-["C",99.998164,55,1,34,1,3,1,13,0,8,1,13,1,13,0],
-["B",99.998162,3,0,34,1,3,1,8,0,5,1,55,0,55,0],
-["A",99.998156,34,1,55,1,21,0,5,0,3,1,34,0,21,0],
-["A",99.998156,8,0,2,1,34,1,5,0,3,1,13,0,34,0],
-["D",99.998143,13,0,55,0,1,0,21,0,13,1,21,1,55,0],
-["A",99.998142,55,0,13,0,5,1,5,0,3,1,5,0,13,1],
-["B",99.998138,3,0,1,0,55,1,8,0,5,1,13,1,21,0],
-["B",99.998136,2,1,34,1,2,0,8,0,5,1,5,0,8,1],
-["B",99.998122,3,1,21,0,3,1,8,0,5,1,8,1,8,0],
-["D",99.998119,34,1,1,1,2,1,21,0,13,1,3,0,5,1],
-["A",99.998118,5,1,1,0,5,0,5,0,3,1,8,1,8,0],
-["A",99.998117,21,0,3,1,1,0,5,0,3,1,8,0,34,1],
-["B",99.998104,8,1,34,1,13,0,8,0,5,1,13,0,34,1],
-["A",99.998104,55,1,55,0,55,0,5,0,3,1,13,1,8,0],
-["A",99.998098,2,1,21,1,55,0,5,0,3,1,8,0,55,1],
-["A",99.998066,55,1,8,1,5,0,5,0,3,1,5,0,13,1],
-["B",99.998059,55,0,21,0,1,1,8,0,5,1,55,0,34,0],
-["C",99.998059,8,1,34,0,34,0,13,0,8,1,21,1,21,0],
-["A",99.998054,2,1,34,0,13,0,5,0,3,1,5,0,13,1],
-["A",99.998051,34,1,21,0,8,1,5,0,3,1,5,0,13,1],
-["A",99.998049,3,0,34,1,55,1,5,0,3,1,13,1,8,0],
-["C",99.99802,13,0,21,1,2,0,13,0,8,1,21,0,34,1],
-["B",99.998013,2,1,2,0,1,0,8,0,5,1,55,0,55,1],
-["A",99.998005,3,0,13,0,5,0,5,0,3,1,55,0,21,0],
-["A",99.998002,8,1,2,1,1,0,5,0,3,1,34,0,21,0],
-["D",99.997998,5,1,3,1,8,1,21,0,13,1,21,0,55,1],
-["C",99.997957,1,1,3,0,5,0,13,0,8,1,55,1,55,0],
-["C",99.997947,5,0,8,1,13,0,13,0,8,1,8,0,13,1],
-["B",99.997931,13,0,21,0,13,1,8,0,5,1,34,1,21,0],
-["C",99.997927,13,0,13,1,13,1,13,0,8,1,21,0,55,1],
-["A",99.997914,3,0,2,1,3,1,5,0,3,1,21,1,8,0],
-["A",99.997914,55,0,8,0,34,0,5,0,3,1,21,0,34,0],
-["D",99.997906,8,1,13,1,2,0,21,0,13,1,34,1,55,0],
-["D",99.997901,2,1,13,0,8,1,21,0,13,1,55,1,55,0],
-["A",99.997897,8,1,2,1,13,1,5,0,3,1,3,1,3,0],
-["B",99.997889,34,0,21,0,2,0,8,0,5,1,55,1,34,0],
-["A",99.997885,55,1,1,0,13,0,5,0,3,1,2,0,3,1],
-["C",99.997881,13,1,55,1,34,1,13,0,8,1,8,0,13,1],
-["B",99.997878,55,1,8,0,1,0,8,0,5,1,55,1,55,0],
-["D",99.997862,5,1,13,1,55,0,21,0,13,1,21,0,34,1],
-["B",99.997856,3,1,21,0,1,1,8,0,5,1,3,0,5,1],
-["B",99.997828,3,1,55,0,8,0,8,0,5,1,34,1,21,0],
-["A",99.997824,8,1,1,1,34,0,5,0,3,1,34,1,8,0],
-["B",99.997814,8,0,55,0,2,1,8,0,5,1,2,0,3,1],
-["C",99.997814,34,0,1,0,55,1,13,0,8,1,13,0,13,1],
-["D",99.997809,21,0,21,1,8,1,21,0,13,1,21,0,34,1],
-["B",99.997797,8,0,8,0,55,1,8,0,5,1,5,0,8,1],
-["C",99.997788,8,1,2,0,1,1,13,0,8,1,8,0,13,1],
-["A",99.997771,21,0,55,1,34,1,5,0,3,1,5,0,13,1],
-["D",99.997768,5,0,5,1,13,1,21,0,13,1,13,0,21,1],
-["B",99.997749,55,0,34,0,3,1,8,0,5,1,55,0,55,0],
-["B",99.997727,21,1,55,1,34,0,8,0,5,1,13,0,34,1],
-["A",99.997725,1,1,5,0,55,0,5,0,3,1,13,1,8,0],
-["D",99.997718,3,1,5,0,1,0,21,0,13,1,13,0,13,1],
-["A",99.997702,21,0,55,1,55,0,5,0,3,1,34,0,21,0],
-["B",99.997702,34,1,8,0,2,1,8,0,5,1,55,0,55,0],
-["D",99.997701,13,0,2,1,5,0,21,0,13,1,8,0,13,1],
-["C",99.997694,3,1,34,0,3,1,13,0,8,1,13,1,13,0],
-["A",99.997691,21,0,1,1,34,1,5,0,3,1,34,1,8,0],
-["D",99.997686,5,1,8,1,13,1,21,0,13,1,13,0,21,1],
-["B",99.997683,13,0,3,1,21,1,8,0,5,1,13,0,55,1],
-["C",99.997683,2,1,2,1,55,0,13,0,8,1,8,1,8,0],
-["A",99.997677,13,0,1,0,2,0,5,0,3,1,34,1,21,0],
-["D",99.997666,3,0,8,0,34,0,21,0,13,1,55,0,55,1],
-["D",99.997642,8,0,55,1,3,1,21,0,13,1,34,1,34,0],
-["B",99.99764,34,1,5,1,34,1,8,0,5,1,2,0,3,1],
-["C",99.997638,13,0,5,0,2,1,13,0,8,1,8,0,13,1],
-["D",99.997638,1,0,2,0,1,1,21,0,13,1,34,1,55,0],
-["B",99.997633,1,1,55,0,3,1,8,0,5,1,13,0,55,1],
-["B",99.99763,5,1,3,0,2,0,8,0,5,1,34,1,34,0],
-["A",99.99759,5,1,34,0,34,1,5,0,3,1,5,0,13,1],
-["A",99.997588,21,0,21,1,34,0,5,0,3,1,5,0,13,1],
-["A",99.997587,3,1,5,1,2,0,5,0,3,1,34,0,21,0],
-["B",99.997578,34,0,34,0,5,0,8,0,5,1,5,0,8,1],
-["A",99.99757,1,0,3,1,34,0,5,0,3,1,8,0,55,1],
-["D",99.997561,8,0,1,0,34,0,21,0,13,1,8,0,8,1],
-["D",99.997557,2,0,34,1,5,1,21,0,13,1,34,0,55,1],
-["B",99.997546,5,0,1,0,34,0,8,0,5,1,13,1,21,0],
-["A",99.997544,34,1,1,0,13,0,5,0,3,1,2,0,3,1],
-["C",99.997541,13,0,21,0,13,1,13,0,8,1,21,1,21,0],
-["A",99.997527,1,1,2,1,1,0,5,0,3,1,13,0,55,0],
-["B",99.997521,13,1,55,0,34,1,8,0,5,1,13,0,34,1],
-["A",99.997519,13,0,5,0,1,0,5,0,3,1,8,0,21,1],
-["A",99.997509,3,0,34,1,1,1,5,0,3,1,13,0,34,0],
-["A",99.997508,55,1,2,0,34,1,5,0,3,1,5,1,5,0],
-["B",99.997504,8,0,8,1,13,1,8,0,5,1,55,0,55,0],
-["B",99.997493,3,1,1,1,21,1,8,0,5,1,55,1,13,0],
-["A",99.997489,8,1,2,0,2,0,5,0,3,1,8,0,21,1],
-["A",99.997472,3,1,8,0,5,0,5,0,3,1,55,1,13,0],
-["C",99.997467,1,1,34,1,13,1,13,0,8,1,5,0,8,1],
-["A",99.997466,3,0,1,0,21,1,5,0,3,1,2,0,3,1],
-["A",99.997458,5,1,55,1,5,1,5,0,3,1,13,0,55,0],
-["A",99.997453,3,1,2,0,21,1,5,0,3,1,34,1,13,0],
-["A",99.997442,1,0,3,0,13,1,5,0,3,1,5,1,5,0],
-["A",99.997433,55,1,34,1,55,0,5,0,3,1,5,0,13,1],
-["B",99.997424,5,1,13,1,5,1,8,0,5,1,2,0,3,1],
-["B",99.997415,1,1,2,0,3,1,8,0,5,1,5,0,8,1],
-["D",99.997412,3,1,3,1,13,1,21,0,13,1,21,0,55,1],
-["B",99.997395,34,1,55,0,3,0,8,0,5,1,13,1,13,0],
-["C",99.997395,3,1,55,0,8,0,13,0,8,1,21,1,21,0],
-["B",99.997393,1,0,5,1,3,1,8,0,5,1,8,1,8,0],
-["B",99.997389,34,0,21,0,8,1,8,0,5,1,13,0,34,1],
-["C",99.997366,8,1,34,0,2,1,13,0,8,1,5,0,8,1],
-["B",99.997355,55,0,21,1,3,1,8,0,5,1,2,0,3,1],
-["A",99.997322,13,0,55,0,55,1,5,0,3,1,13,1,8,0],
-["A",99.997319,1,0,5,0,21,0,5,0,3,1,34,1,13,0],
-["D",99.997314,1,1,1,1,55,0,21,0,13,1,21,1,13,0],
-["A",99.997311,3,0,21,1,3,1,5,0,3,1,13,0,55,0],
-["B",99.997309,34,0,5,0,8,1,8,0,5,1,5,0,8,1],
-["B",99.997303,55,1,5,0,3,1,8,0,5,1,34,1,21,0],
-["B",99.997291,13,1,2,0,13,0,8,0,5,1,13,0,21,1],
-["C",99.997277,13,1,13,1,1,1,13,0,8,1,2,0,3,1],
-["A",99.997265,55,0,34,0,1,1,5,0,3,1,13,0,34,0],
-["B",99.997264,34,0,3,1,5,0,8,0,5,1,55,1,21,0],
-["B",99.997255,5,0,8,0,1,0,8,0,5,1,34,0,55,1],
-["B",99.997242,21,0,8,1,5,1,8,0,5,1,2,0,3,1],
-["D",99.997233,8,1,2,0,21,0,21,0,13,1,8,1,13,0],
-["A",99.997226,3,1,34,0,55,0,5,0,3,1,5,0,13,1],
-["C",99.997211,8,1,13,0,3,0,13,0,8,1,21,0,34,1],
-["A",99.997207,55,1,3,1,3,0,5,0,3,1,13,0,55,0],
-["C",99.997204,3,0,13,0,21,0,13,0,8,1,34,1,34,0],
-["D",99.997194,2,1,13,0,1,1,21,0,13,1,13,1,13,0],
-["D",99.997192,3,0,8,0,21,1,21,0,13,1,34,1,55,0],
-["C",99.997191,3,0,8,0,5,0,13,0,8,1,34,0,55,1],
-["A",99.997185,3,1,55,1,5,0,5,0,3,1,13,1,8,0],
-["A",99.997184,5,0,3,0,5,0,5,0,3,1,21,0,55,0],
-["A",99.997182,21,0,8,1,34,1,5,0,3,1,8,0,55,1],
-["B",99.997181,55,0,1,1,34,1,8,0,5,1,55,0,21,0],
-["A",99.997163,13,1,34,0,55,0,5,0,3,1,13,1,8,0],
-["D",99.99714,3,1,1,1,55,1,21,0,13,1,13,0,55,1],
-["D",99.997131,34,1,3,0,5,0,21,0,13,1,21,0,21,1],
-["A",99.997126,55,1,13,1,5,0,5,0,3,1,13,1,8,0],
-["B",99.997101,8,0,5,1,1,0,8,0,5,1,8,0,13,1],
-["A",99.997089,8,0,1,0,55,0,5,0,3,1,55,1,21,0],
-["A",99.997076,1,0,21,1,5,0,5,0,3,1,55,0,21,0],
-["A",99.997066,34,1,3,1,1,1,5,0,3,1,34,0,13,0],
-["A",99.997016,55,0,5,0,13,0,5,0,3,1,55,0,21,0],
-["A",99.997014,21,0,21,1,13,0,5,0,3,1,34,0,21,0],
-["B",99.997013,34,1,1,0,21,0,8,0,5,1,34,0,34,1],
-["C",99.99699,13,1,1,0,55,0,13,0,8,1,13,0,13,1],
-["B",99.996988,3,0,13,1,3,1,8,0,5,1,8,1,8,0],
-["C",99.996986,2,0,8,1,34,1,13,0,8,1,8,0,13,1],
-["A",99.99698,21,1,2,1,34,0,5,0,3,1,13,0,34,0],
-["C",99.996939,3,1,2,1,21,0,13,0,8,1,55,0,55,0],
-["D",99.996938,3,1,8,1,34,1,21,0,13,1,13,0,21,1],
-["C",99.996924,3,1,55,1,3,1,13,0,8,1,5,0,8,1],
-["A",99.996923,1,0,5,1,55,1,5,0,3,1,5,0,13,1],
-["A",99.996918,13,1,13,1,13,1,5,0,3,1,8,0,55,1],
-["A",99.996917,34,0,3,1,8,1,5,0,3,1,21,0,21,0],
-["B",99.996912,13,1,1,1,13,1,8,0,5,1,8,0,34,1],
-["B",99.996911,5,1,1,1,2,0,8,0,5,1,5,1,5,0],
-["A",99.996908,13,1,3,0,3,1,5,0,3,1,21,0,34,0],
-["A",99.996897,21,0,34,0,34,1,5,0,3,1,13,1,8,0],
-["B",99.996892,55,0,55,1,3,1,8,0,5,1,8,1,8,0],
-["B",99.99687,5,1,2,1,1,0,8,0,5,1,13,0,34,1],
-["B",99.996866,5,1,5,0,21,0,8,0,5,1,13,1,13,0],
-["B",99.996862,34,1,34,1,3,0,8,0,5,1,5,0,8,1],
-["A",99.996849,5,1,34,0,55,0,5,0,3,1,34,0,21,0],
-["C",99.996827,55,1,13,1,3,1,13,0,8,1,5,0,8,1],
-["B",99.996816,2,0,1,0,13,1,8,0,5,1,13,1,21,0],
-["B",99.996816,3,0,13,0,1,1,8,0,5,1,34,0,55,0],
-["A",99.996812,3,0,21,1,1,0,5,0,3,1,34,0,34,0],
-["A",99.996784,13,0,2,0,13,1,5,0,3,1,21,0,55,0],
-["A",99.996783,5,0,5,0,2,1,5,0,3,1,5,0,13,1],
-["B",99.996765,21,0,1,0,55,0,8,0,5,1,34,0,34,1],
-["B",99.996749,34,0,8,0,55,0,8,0,5,1,5,0,8,1],
-["A",99.996735,21,1,55,0,34,0,5,0,3,1,13,1,8,0],
-["A",99.996732,8,1,5,0,21,0,5,0,3,1,8,0,34,1],
-["D",99.996728,34,0,55,1,3,0,21,0,13,1,34,1,55,0],
-["D",99.996728,2,0,5,1,8,0,21,0,13,1,34,0,55,1],
-["B",99.996727,5,0,8,0,3,1,8,0,5,1,13,0,34,1],
-["A",99.996691,21,1,2,0,34,1,5,0,3,1,21,0,55,0],
-["A",99.996691,1,1,1,1,13,0,5,0,3,1,8,1,5,0],
-["B",99.996681,1,1,13,1,13,0,8,0,5,1,55,1,21,0],
-["A",99.996678,3,1,1,0,3,0,5,0,3,1,55,0,55,0],
-["D",99.996671,55,1,3,1,21,0,21,0,13,1,21,1,21,0],
-["B",99.996664,1,1,5,0,21,1,8,0,5,1,13,0,34,1],
-["C",99.996662,13,1,5,1,1,1,13,0,8,1,13,0,55,1],
-["C",99.996661,55,1,5,0,3,1,13,0,8,1,21,1,21,0],
-["B",99.996643,21,1,2,1,55,1,8,0,5,1,8,0,21,1],
-["C",99.996642,55,0,1,1,3,1,13,0,8,1,5,1,5,0],
-["B",99.996638,21,1,3,1,3,1,8,0,5,1,8,0,21,1],
-["A",99.996632,55,0,8,1,13,1,5,0,3,1,13,0,55,0],
-["C",99.996628,13,1,5,0,8,0,13,0,8,1,55,1,55,0],
-["A",99.996626,3,0,1,0,1,1,5,0,3,1,34,0,34,0],
-["B",99.996625,3,1,55,0,3,1,8,0,5,1,2,0,3,1],
-["B",99.996615,2,1,5,1,5,0,8,0,5,1,8,1,8,0],
-["B",99.996612,1,0,2,0,13,1,8,0,5,1,55,1,55,0],
-["C",99.996597,8,0,2,1,2,1,13,0,8,1,13,0,55,1],
-["B",99.99659,3,1,1,0,34,0,8,0,5,1,21,1,34,0],
-["B",99.996573,13,1,34,1,8,0,8,0,5,1,34,1,21,0],
-["C",99.996544,13,0,13,1,34,0,13,0,8,1,8,0,13,1],
-["A",99.99654,13,1,55,1,3,0,5,0,3,1,21,0,34,0],
-["B",99.996534,5,1,5,1,34,0,8,0,5,1,55,1,21,0],
-["A",99.996528,13,1,55,1,55,0,5,0,3,1,5,0,13,1],
-["A",99.996527,1,1,5,1,3,1,5,0,3,1,3,1,3,0],
-["B",99.99651,55,1,5,1,34,1,8,0,5,1,2,0,3,1],
-["A",99.996493,3,1,1,0,1,1,5,0,3,1,34,1,13,0],
-["A",99.996489,2,1,21,0,1,0,5,0,3,1,5,1,5,0],
-["A",99.996482,34,1,2,0,34,1,5,0,3,1,5,1,5,0],
-["C",99.996477,13,1,21,1,13,1,13,0,8,1,21,0,55,1],
-["D",99.996475,8,0,2,1,13,0,21,0,13,1,21,0,55,1],
-["A",99.996458,13,1,13,0,5,0,5,0,3,1,55,1,13,0],
-["D",99.996457,8,1,1,0,34,0,21,0,13,1,55,1,55,1],
-["A",99.996456,1,0,21,0,55,0,5,0,3,1,55,0,21,0],
-["B",99.996444,55,1,3,0,34,1,8,0,5,1,55,1,34,0],
-["A",99.996443,2,0,5,1,21,1,5,0,3,1,8,0,55,1],
-["A",99.996442,13,1,8,1,55,0,5,0,3,1,8,0,55,1],
-["B",99.99644,13,1,2,1,2,1,8,0,5,1,5,1,5,0],
-["A",99.996435,2,1,34,0,8,0,5,0,3,1,34,0,21,0],
-["C",99.996425,3,1,55,0,3,0,13,0,8,1,13,0,21,1],
-["C",99.996423,3,1,1,0,5,0,13,0,8,1,5,1,8,0],
-["A",99.996421,34,1,21,0,13,1,5,0,3,1,34,0,21,0],
-["C",99.996421,3,1,34,0,34,1,13,0,8,1,8,0,13,1],
-["C",99.99642,13,0,2,0,2,1,13,0,8,1,55,1,55,0],
-["A",99.996408,13,0,13,1,2,0,5,0,3,1,8,0,34,1],
-["A",99.996391,3,1,13,0,3,1,5,0,3,1,13,0,55,0],
-["A",99.996389,2,1,13,1,13,0,5,0,3,1,8,0,55,1],
-["A",99.996382,2,1,3,0,13,1,5,0,3,1,8,0,34,1],
-["B",99.99638,8,0,2,1,13,1,8,0,5,1,8,0,21,1],
-["D",99.996374,21,1,21,1,21,1,21,0,13,1,55,1,55,0],
-["A",99.996371,8,1,5,0,3,1,5,0,3,1,34,0,21,0],
-["A",99.996371,13,0,2,0,21,0,5,0,3,1,34,0,34,0],
-["A",99.996348,21,1,2,0,55,1,5,0,3,1,5,1,5,0],
-["A",99.996337,5,0,13,1,1,1,5,0,3,1,3,1,3,0],
-["B",99.996323,3,1,8,1,2,1,8,0,5,1,21,1,13,0],
-["A",99.996317,55,0,1,1,55,1,5,0,3,1,34,1,8,0],
-["C",99.996316,3,1,34,1,1,1,13,0,8,1,2,0,3,1],
-["B",99.996315,2,0,21,1,21,1,8,0,5,1,34,1,21,0],
-["A",99.99631,55,1,55,0,3,1,5,0,3,1,13,0,55,0],
-["B",99.996286,21,0,13,0,2,0,8,0,5,1,8,0,13,1],
-["B",99.996277,2,1,34,1,8,1,8,0,5,1,8,1,8,0],
-["A",99.996251,2,0,1,0,21,1,5,0,3,1,8,1,8,0],
-["B",99.996251,2,0,3,0,55,1,8,0,5,1,21,1,21,0],
-["B",99.996244,2,1,1,0,21,0,8,0,5,1,55,0,55,1],
-["A",99.996241,1,1,1,1,8,1,5,0,3,1,55,1,8,0],
-["A",99.996216,2,1,5,0,5,1,5,0,3,1,34,0,21,0],
-["A",99.996206,2,0,3,0,34,1,5,0,3,1,34,1,13,0],
-["A",99.996189,34,1,55,0,1,0,5,0,3,1,34,0,34,0],
-["C",99.996181,3,0,13,1,8,1,13,0,8,1,55,1,34,0],
-["B",99.996178,8,1,2,1,34,1,8,0,5,1,3,0,5,1],
-["D",99.996177,3,0,1,1,55,1,21,0,13,1,2,0,3,1],
-["A",99.99617,8,1,2,0,8,1,5,0,3,1,34,1,13,0],
-["D",99.996169,55,0,1,0,3,1,21,0,13,1,34,0,21,1],
-["B",99.996155,5,1,21,1,5,1,8,0,5,1,8,1,8,0],
-["C",99.996152,55,1,34,0,5,0,13,0,8,1,13,0,21,1],
-["C",99.996149,5,0,21,1,2,0,13,0,8,1,55,1,55,0],
-["B",99.996137,3,1,5,1,13,0,8,0,5,1,55,1,21,0],
-["C",99.996129,5,0,8,1,34,1,13,0,8,1,21,0,55,1],
-["C",99.996129,5,1,3,0,2,0,13,0,8,1,21,1,34,0],
-["A",99.996128,3,0,5,0,2,1,5,0,3,1,34,0,21,0],
-["A",99.99612,21,1,34,1,34,0,5,0,3,1,5,0,13,1],
-["B",99.996119,2,0,21,0,3,0,8,0,5,1,55,1,34,0],
-["A",99.996118,8,0,13,0,2,1,5,0,3,1,13,0,55,0],
-["C",99.996113,13,1,55,1,3,1,13,0,8,1,13,1,13,0],
-["A",99.996104,34,0,8,0,2,1,5,0,3,1,8,0,55,1],
-["D",99.996093,21,1,55,0,1,0,21,0,13,1,55,0,34,1],
-["D",99.996082,2,1,3,0,2,0,21,0,13,1,8,1,13,0],
-["A",99.996078,1,0,5,1,34,0,5,0,3,1,34,0,21,0],
-["A",99.996072,34,1,5,0,21,1,5,0,3,1,55,1,13,0],
-["B",99.996026,13,1,34,1,3,1,8,0,5,1,2,0,3,1],
-["C",99.996005,55,0,5,0,21,0,13,0,8,1,21,0,34,1],
-["A",99.995997,13,0,3,0,8,0,5,0,3,1,34,1,13,0],
-["B",99.995983,1,1,21,1,34,0,8,0,5,1,2,0,3,1],
-["C",99.99598,55,0,55,1,8,1,13,0,8,1,55,1,34,0],
-["C",99.995979,2,0,3,0,2,1,13,0,8,1,34,1,34,0],
-["B",99.995974,2,1,13,0,1,1,8,0,5,1,3,0,5,1],
-["A",99.99597,13,1,34,0,13,1,5,0,3,1,5,0,13,1],
-["A",99.995956,2,1,55,1,1,0,5,0,3,1,34,1,13,0],
-["C",99.995955,55,1,34,1,34,1,13,0,8,1,8,0,13,1],
-["B",99.995954,5,1,1,0,55,1,8,0,5,1,21,1,34,0],
-["C",99.995943,5,1,34,0,13,1,13,0,8,1,8,0,13,1],
-["C",99.99593,8,1,3,0,1,0,13,0,8,1,8,1,13,0],
-["D",99.995928,3,1,34,1,55,0,21,0,13,1,55,1,55,0],
-["B",99.995921,8,0,55,1,34,0,8,0,5,1,34,1,21,0],
-["B",99.995918,3,1,5,0,1,1,8,0,5,1,34,0,55,0],
-["A",99.99591,3,1,8,1,21,0,5,0,3,1,13,0,55,0],
-["B",99.995904,2,1,8,0,3,1,8,0,5,1,55,0,55,0],
-["B",99.995904,34,1,21,1,13,0,8,0,5,1,13,0,34,1],
-["B",99.9959,2,0,34,0,1,0,8,0,5,1,55,1,55,0],
-["A",99.995895,21,1,55,0,55,1,5,0,3,1,34,0,21,0],
-["D",99.995888,2,1,34,0,13,1,21,0,13,1,21,0,34,1],
-["B",99.995885,3,1,2,1,1,1,8,0,5,1,55,1,13,0],
-["A",99.99588,3,1,13,0,1,0,5,0,3,1,34,0,34,0],
-["B",99.995869,13,0,34,0,2,1,8,0,5,1,2,0,3,1],
-["A",99.995864,5,1,13,1,34,1,5,0,3,1,8,0,55,1],
-["A",99.995843,3,1,34,1,13,1,5,0,3,1,8,0,55,1],
-["D",99.995835,2,1,34,0,1,1,21,0,13,1,5,0,8,1],
-["B",99.995829,8,1,34,0,1,1,8,0,5,1,8,0,21,1],
-["A",99.995804,34,1,13,1,5,0,5,0,3,1,13,1,8,0],
-["B",99.995798,21,1,5,1,1,0,8,0,5,1,55,1,34,0],
-["A",99.995796,55,1,55,0,1,0,5,0,3,1,34,0,34,0],
-["D",99.995789,13,1,13,1,1,0,21,0,13,1,21,0,21,1],
-["A",99.995781,34,1,55,0,3,1,5,0,3,1,13,0,55,0],
-["C",99.995769,21,1,2,1,5,1,13,0,8,1,2,0,3,1],
-["D",99.995769,5,0,1,1,34,0,21,0,13,1,2,0,3,1],
-["A",99.99576,21,0,3,0,3,1,5,0,3,1,55,1,13,0],
-["A",99.995752,34,1,34,1,55,0,5,0,3,1,5,0,13,1],
-["B",99.995743,55,0,5,1,21,1,8,0,5,1,2,0,3,1],
-["A",99.995737,3,1,34,0,3,0,5,0,3,1,21,0,34,0],
-["A",99.995735,21,0,55,0,3,0,5,0,3,1,8,0,34,1],
-["A",99.995735,2,1,8,1,3,1,5,0,3,1,21,0,21,0],
-["A",99.995721,5,1,5,1,2,0,5,0,3,1,13,1,8,0],
-["B",99.995711,5,1,1,1,21,0,8,0,5,1,55,0,21,0],
-["A",99.995686,5,0,3,0,13,0,5,0,3,1,34,1,13,0],
-["A",99.995685,2,1,2,0,2,1,5,0,3,1,21,0,34,0],
-["B",99.995685,13,0,5,1,2,1,8,0,5,1,21,1,13,0],
-["C",99.995678,55,1,5,0,8,1,13,0,8,1,13,0,21,1],
-["A",99.995677,3,1,8,0,13,1,5,0,3,1,13,1,8,0],
-["D",99.995664,21,1,2,0,8,0,21,0,13,1,21,1,55,0],
-["B",99.99566,1,1,5,1,1,0,8,0,5,1,5,0,8,1],
-["C",99.995636,21,0,21,1,55,1,13,0,8,1,8,0,13,1],
-["A",99.995623,55,1,21,1,1,0,5,0,3,1,21,0,55,0],
-["A",99.995623,3,0,2,0,3,0,5,0,3,1,8,0,21,1],
-["B",99.995608,55,1,3,1,1,0,8,0,5,1,13,1,13,0],
-["C",99.995605,13,1,34,1,8,0,13,0,8,1,21,1,21,0],
-["B",99.995602,13,0,34,1,3,1,8,0,5,1,8,1,8,0],
-["D",99.995591,2,0,1,0,21,1,21,0,13,1,2,1,3,0],
-["B",99.995583,34,1,1,0,5,1,8,0,5,1,34,1,55,0],
-["A",99.995577,8,1,8,0,8,0,5,0,3,1,55,1,13,0],
-["D",99.995574,34,0,3,1,34,0,21,0,13,1,21,1,21,0],
-["A",99.995563,21,1,55,1,5,1,5,0,3,1,8,0,55,1],
-["D",99.995546,3,0,34,1,1,0,21,0,13,1,21,1,55,0],
-["B",99.995544,2,0,55,1,1,1,8,0,5,1,21,1,13,0],
-["C",99.995529,3,0,8,1,13,1,13,0,8,1,21,0,55,1],
-["D",99.995521,8,1,21,0,8,1,21,0,13,1,34,0,55,1],
-["A",99.99552,55,0,1,0,1,1,5,0,3,1,5,1,5,0],
-["A",99.995519,13,1,21,0,1,1,5,0,3,1,13,0,34,0],
-["C",99.995499,1,0,3,0,21,1,13,0,8,1,34,1,55,0],
-["A",99.995489,55,1,2,1,55,0,5,0,3,1,13,0,34,0],
-["B",99.995483,55,0,5,0,34,1,8,0,5,1,13,1,13,0],
-["A",99.995479,55,1,34,1,3,0,5,0,3,1,21,0,34,0],
-["B",99.995466,8,1,5,0,55,0,8,0,5,1,13,1,13,0],
-["D",99.995466,5,1,5,0,13,0,21,0,13,1,55,0,55,1],
-["A",99.995458,3,0,8,1,2,0,5,0,3,1,8,0,34,1],
-["A",99.995458,3,1,13,1,55,0,5,0,3,1,8,0,55,1],
-["A",99.99545,34,0,8,1,13,1,5,0,3,1,13,0,55,0],
-["A",99.995434,3,0,3,0,34,0,5,0,3,1,34,1,13,0],
-["A",99.995418,13,1,34,0,34,1,5,0,3,1,34,0,21,0],
-["D",99.995411,13,0,21,0,2,0,21,0,13,1,13,1,21,0],
-["D",99.995408,1,0,1,0,1,1,21,0,13,1,13,0,13,1],
-["B",99.995407,13,1,21,0,5,0,8,0,5,1,5,0,8,1],
-["A",99.995407,1,1,5,1,5,1,5,0,3,1,13,0,34,0],
-["D",99.995399,13,0,2,0,1,0,21,0,13,1,8,0,8,1],
-["A",99.995396,1,1,34,0,21,0,5,0,3,1,8,0,55,1],
-["D",99.99539,2,1,13,0,21,1,21,0,13,1,34,0,55,1],
-["B",99.995381,21,1,5,1,55,1,8,0,5,1,2,0,3,1],
-["A",99.995374,1,0,3,1,34,1,5,0,3,1,13,0,55,0],
-["A",99.995363,34,1,1,0,13,0,5,0,3,1,55,1,21,0],
-["A",99.995357,13,0,3,1,3,1,5,0,3,1,13,0,34,0],
-["C",99.995356,5,1,5,0,8,0,13,0,8,1,21,0,34,1],
-["A",99.995353,3,0,2,0,21,1,5,0,3,1,34,0,34,0],
-["A",99.995343,21,0,1,1,13,1,5,0,3,1,13,0,21,0],
-["C",99.99534,1,0,55,0,13,1,13,0,8,1,34,1,34,0],
-["B",99.995335,34,0,34,0,1,0,8,0,5,1,34,1,34,0],
-["A",99.995331,21,0,1,0,21,0,5,0,3,1,2,0,3,1],
-["C",99.995328,3,0,3,0,2,0,13,0,8,1,13,1,21,0],
-["A",99.995328,8,1,8,0,13,0,5,0,3,1,21,0,34,0],
-["A",99.995319,21,0,8,0,8,0,5,0,3,1,8,0,34,1],
-["A",99.995314,34,1,8,0,21,0,5,0,3,1,21,0,34,0],
-["B",99.995311,13,1,1,0,3,0,8,0,5,1,21,0,21,1],
-["A",99.995303,55,0,3,1,8,1,5,0,3,1,21,0,21,0],
-["A",99.995292,21,1,34,1,13,0,5,0,3,1,34,0,21,0],
-["B",99.995281,3,0,55,1,2,1,8,0,5,1,2,0,3,1],
-["D",99.995273,2,0,1,1,13,1,21,0,13,1,2,0,3,1],
-["A",99.995269,21,0,55,0,21,1,5,0,3,1,34,0,21,0],
-["D",99.995268,1,1,3,0,34,0,21,0,13,1,34,1,55,0],
-["A",99.995265,13,1,34,0,3,1,5,0,3,1,13,0,55,0],
-["C",99.995248,5,1,55,1,21,1,13,0,8,1,55,1,34,0],
-["C",99.995243,1,0,2,1,5,0,13,0,8,1,13,1,13,0],
-["B",99.99524,21,0,8,1,5,0,8,0,5,1,13,0,34,1],
-["B",99.995235,34,0,3,0,55,0,8,0,5,1,8,0,13,1],
-["B",99.995226,55,0,3,0,1,1,8,0,5,1,8,1,8,0],
-["D",99.995218,2,1,3,1,1,1,21,0,13,1,55,1,21,0],
-["A",99.995216,2,0,21,0,5,0,5,0,3,1,55,0,21,0],
-["B",99.995214,3,1,5,1,13,0,8,0,5,1,2,0,3,1],
-["C",99.995209,21,1,21,1,55,0,13,0,8,1,8,0,13,1],
-["B",99.995199,34,1,5,1,34,0,8,0,5,1,8,1,8,0],
-["B",99.995198,13,0,8,0,1,1,8,0,5,1,34,0,55,0],
-["B",99.995194,1,0,3,0,5,0,8,0,5,1,21,0,34,1],
-["B",99.995191,8,0,34,0,8,1,8,0,5,1,13,0,34,1],
-["A",99.995179,8,1,55,0,3,0,5,0,3,1,55,1,13,0],
-["C",99.995169,8,1,21,1,55,1,13,0,8,1,55,1,34,0],
-["A",99.995161,34,1,8,1,5,0,5,0,3,1,5,0,13,1],
-["D",99.995156,55,0,21,0,3,0,21,0,13,1,21,1,34,0],
-["B",99.995154,21,1,34,1,5,1,8,0,5,1,55,0,55,0],
-["C",99.995153,55,0,2,1,13,1,13,0,8,1,55,0,55,0],
-["B",99.995127,5,0,34,1,1,1,8,0,5,1,8,0,21,1],
-["B",99.995123,13,1,21,0,1,0,8,0,5,1,34,1,34,0],
-["A",99.995115,8,1,5,0,55,1,5,0,3,1,55,1,13,0],
-["A",99.995085,8,1,1,0,2,1,5,0,3,1,3,0,5,1],
-["A",99.995075,34,0,13,0,5,1,5,0,3,1,5,0,13,1],
-["A",99.995072,13,1,2,1,5,1,5,0,3,1,55,0,13,0],
-["B",99.995063,55,1,5,1,34,0,8,0,5,1,8,1,8,0],
-["A",99.995063,55,1,55,0,13,1,5,0,3,1,5,0,13,1],
-["A",99.995059,5,1,55,0,2,0,5,0,3,1,55,0,21,0],
-["A",99.995059,5,1,13,0,5,0,5,0,3,1,21,0,34,0],
-["A",99.995059,8,0,21,0,3,0,5,0,3,1,55,0,21,0],
-["B",99.995054,8,0,2,0,3,1,8,0,5,1,8,0,13,1],
-["A",99.995053,13,1,2,0,55,1,5,0,3,1,21,0,55,0],
-["A",99.995026,3,1,13,0,13,1,5,0,3,1,5,0,13,1],
-["B",99.995014,5,1,5,1,34,0,8,0,5,1,2,0,3,1],
-["A",99.995011,5,1,3,1,21,1,5,0,3,1,21,0,21,0],
-["B",99.995009,13,0,2,1,2,0,8,0,5,1,55,1,21,0],
-["C",99.995008,1,1,55,0,13,1,13,0,8,1,13,1,13,0],
-["C",99.99498,2,1,34,0,34,0,13,0,8,1,8,0,13,1],
-["B",99.994979,55,0,5,1,21,1,8,0,5,1,55,1,21,0],
-["A",99.994973,2,1,34,0,8,1,5,0,3,1,8,0,55,1],
-["D",99.994967,2,0,8,1,55,1,21,0,13,1,34,0,55,1],
-["A",99.994966,34,0,5,0,13,0,5,0,3,1,55,0,21,0],
-["A",99.994961,1,0,5,0,1,0,5,0,3,1,13,0,55,1],
-["C",99.994958,1,1,1,1,55,0,13,0,8,1,21,0,55,0],
-["A",99.994954,3,0,8,1,13,0,5,0,3,1,5,0,13,1],
-["A",99.994938,2,0,8,0,21,0,5,0,3,1,55,0,21,0],
-["B",99.994936,1,1,3,1,2,1,8,0,5,1,21,0,55,0],
-["A",99.994933,1,0,8,0,8,1,5,0,3,1,55,0,21,0],
-["B",99.994921,13,0,1,1,21,1,8,0,5,1,55,0,21,0],
-["A",99.994919,2,1,34,1,55,1,5,0,3,1,8,0,55,1],
-["A",99.994913,8,1,1,0,8,1,5,0,3,1,13,0,55,1],
-["B",99.994887,5,1,8,0,8,1,8,0,5,1,34,1,21,0],
-["C",99.994883,55,0,2,0,2,0,13,0,8,1,21,0,21,1],
-["A",99.994883,2,0,3,1,2,0,5,0,3,1,13,1,8,0],
-["A",99.994873,21,0,5,0,55,1,5,0,3,1,8,0,34,1],
-["B",99.994862,1,1,55,0,21,0,8,0,5,1,55,0,55,0],
-["A",99.994858,13,0,34,1,13,0,5,0,3,1,13,1,8,0],
-["C",99.994854,8,1,5,1,3,0,13,0,8,1,8,0,13,1],
-["B",99.994842,3,1,55,1,2,1,8,0,5,1,13,0,55,1],
-["A",99.994823,2,1,8,0,55,1,5,0,3,1,13,1,8,0],
-["D",99.994796,34,0,3,0,34,1,21,0,13,1,13,1,21,0],
-["D",99.994795,34,0,8,1,34,0,21,0,13,1,21,0,34,1],
-["B",99.994791,13,1,21,0,3,1,8,0,5,1,55,0,55,0],
-["A",99.994789,34,1,55,0,55,0,5,0,3,1,13,1,8,0],
-["A",99.994787,34,0,2,0,2,1,5,0,3,1,55,0,21,0],
-["B",99.994787,21,1,5,1,8,0,8,0,5,1,55,0,55,0],
-["B",99.994777,8,1,13,0,2,0,8,0,5,1,55,1,34,0],
-["B",99.994768,13,0,8,0,3,0,8,0,5,1,55,1,34,0],
-["C",99.994768,1,0,8,0,1,0,13,0,8,1,8,1,13,0],
-["C",99.99476,13,0,8,0,21,0,13,0,8,1,34,1,34,0],
-["B",99.994759,2,0,34,0,34,0,8,0,5,1,5,0,8,1],
-["A",99.994748,13,1,13,0,13,1,5,0,3,1,13,1,8,0],
-["B",99.994743,55,1,13,1,2,1,8,0,5,1,13,0,55,1],
-["C",99.994738,13,1,34,1,3,0,13,0,8,1,13,0,21,1],
-["A",99.994736,13,1,34,0,1,0,5,0,3,1,34,0,34,0],
-["A",99.994719,13,1,13,1,8,0,5,0,3,1,5,0,13,1],
-["D",99.99471,55,0,34,0,1,0,21,0,13,1,21,1,55,0],
-["C",99.994702,21,0,5,1,8,1,13,0,8,1,5,0,8,1],
-["B",99.99469,13,1,1,0,8,0,8,0,5,1,13,1,21,0],
-["B",99.994685,1,1,34,0,34,0,8,0,5,1,55,0,55,0],
-["C",99.994681,13,0,8,0,55,1,13,0,8,1,13,0,21,1],
-["D",99.99468,3,0,2,1,21,0,21,0,13,1,55,1,34,0],
-["A",99.994677,21,0,2,0,1,0,5,0,3,1,2,0,3,1],
-["A",99.994652,34,1,8,1,2,1,5,0,3,1,21,0,21,0],
-["D",99.994651,21,1,8,0,3,0,21,0,13,1,34,0,34,1],
-["C",99.994638,55,1,8,0,55,0,13,0,8,1,13,0,21,1],
-["D",99.994633,34,1,5,1,3,1,21,0,13,1,8,0,13,1],
-["A",99.99463,34,0,34,0,55,1,5,0,3,1,13,1,8,0],
-["A",99.994616,2,0,21,1,3,1,5,0,3,1,8,0,55,1],
-["A",99.99461,5,1,34,0,3,0,5,0,3,1,55,1,13,0],
-["A",99.994607,55,1,2,0,13,0,5,0,3,1,34,0,34,0],
-["A",99.994583,1,1,21,0,55,0,5,0,3,1,8,0,55,1],
-["B",99.994574,55,1,2,1,34,1,8,0,5,1,8,0,21,1],
-["C",99.994573,2,0,13,0,13,1,13,0,8,1,13,0,21,1],
-["C",99.99457,21,0,21,0,5,1,13,0,8,1,8,0,13,1],
-["C",99.994566,2,1,8,1,55,0,13,0,8,1,13,1,13,0],
-["B",99.994545,55,1,21,0,2,1,8,0,5,1,2,0,3,1],
-["A",99.994532,55,0,2,0,21,1,5,0,3,1,5,1,5,0],
-["C",99.994532,1,0,3,0,1,0,13,0,8,1,5,1,8,0],
-["D",99.994518,3,0,3,1,13,1,21,0,13,1,21,1,21,0],
-["A",99.99451,5,1,34,1,8,1,5,0,3,1,8,0,55,1],
-["B",99.994508,1,0,5,1,1,1,8,0,5,1,3,0,5,1],
-["D",99.994465,21,0,2,0,21,0,21,0,13,1,55,0,34,1],
-["A",99.994465,8,0,8,0,2,0,5,0,3,1,34,1,13,0],
-["B",99.994448,3,0,5,0,2,0,8,0,5,1,13,0,21,1],
-["A",99.994444,5,1,8,0,8,1,5,0,3,1,13,1,8,0],
-["A",99.99444,5,0,21,1,34,1,5,0,3,1,5,0,13,1],
-["A",99.994439,8,0,21,1,5,1,5,0,3,1,8,0,55,1],
-["A",99.994421,3,0,3,0,1,1,5,0,3,1,8,0,55,1],
-["B",99.994415,2,0,3,1,2,0,8,0,5,1,34,1,21,0],
-["A",99.994412,8,1,21,0,3,0,5,0,3,1,8,0,34,1],
-["A",99.994409,21,1,13,1,1,1,5,0,3,1,21,1,8,0],
-["B",99.994406,55,0,3,0,55,0,8,0,5,1,8,0,13,1],
-["D",99.994377,8,1,3,1,21,1,21,0,13,1,8,0,13,1],
-["A",99.994351,55,1,55,0,34,1,5,0,3,1,34,0,21,0],
-["A",99.994315,5,1,5,1,5,0,5,0,3,1,8,0,55,1],
-["A",99.994311,3,1,13,0,34,1,5,0,3,1,34,0,21,0],
-["C",99.994309,8,1,13,0,2,1,13,0,8,1,13,1,13,0],
-["D",99.994308,5,1,34,1,34,1,21,0,13,1,55,1,55,0],
-["B",99.9943,21,1,1,1,5,1,8,0,5,1,21,0,34,0],
-["B",99.994299,13,1,13,0,13,1,8,0,5,1,34,1,21,0],
-["B",99.994295,8,0,13,0,13,0,8,0,5,1,5,0,8,1],
-["A",99.994272,21,1,2,1,5,1,5,0,3,1,21,1,8,0],
-["D",99.994266,8,0,3,0,8,1,21,0,13,1,34,0,34,1],
-["C",99.994265,2,0,21,1,21,1,13,0,8,1,21,1,21,0],
-["A",99.994245,2,1,13,0,2,0,5,0,3,1,55,0,21,0],
-["A",99.994244,8,1,21,0,21,1,5,0,3,1,34,0,21,0],
-["B",99.994232,2,1,8,0,55,1,8,0,5,1,34,1,21,0],
-["A",99.994225,3,0,21,1,13,1,5,0,3,1,5,0,13,1],
-["D",99.994214,1,0,3,1,8,0,21,0,13,1,55,1,55,0],
-["A",99.994204,2,1,13,0,55,1,5,0,3,1,5,0,13,1],
-["D",99.994203,34,0,1,0,8,0,21,0,13,1,2,1,3,0],
-["A",99.994202,2,1,3,0,2,1,5,0,3,1,5,0,13,1],
-["A",99.994184,34,1,2,1,5,1,5,0,3,1,21,1,8,0],
-["B",99.994167,55,0,8,0,55,0,8,0,5,1,5,0,8,1],
-["B",99.994164,34,1,55,0,55,0,8,0,5,1,34,1,21,0],
-["A",99.994149,13,0,21,0,5,0,5,0,3,1,55,1,13,0],
-["B",99.994143,2,0,55,1,8,0,8,0,5,1,5,0,8,1],
-["C",99.994138,34,0,2,0,55,1,13,0,8,1,34,1,55,0],
-["A",99.994134,2,0,8,1,55,0,5,0,3,1,5,0,13,1],
-["B",99.994126,2,1,1,0,34,1,8,0,5,1,34,1,55,0],
-["A",99.994098,34,0,55,1,55,1,5,0,3,1,5,0,13,1],
-["B",99.994097,2,0,34,0,8,0,8,0,5,1,13,1,13,0],
-["C",99.994096,21,1,3,1,8,1,13,0,8,1,13,0,34,1],
-["B",99.994095,21,0,34,1,55,0,8,0,5,1,13,0,34,1],
-["C",99.994072,3,0,1,0,2,0,13,0,8,1,55,1,55,1],
-["A",99.994061,13,0,13,1,13,0,5,0,3,1,5,0,13,1],
-["B",99.994052,8,0,13,0,1,0,8,0,5,1,21,0,34,1],
-["A",99.994048,5,1,13,0,13,1,5,0,3,1,34,0,21,0],
-["A",99.994026,8,0,1,0,34,0,5,0,3,1,2,0,3,1],
-["A",99.994026,1,1,21,1,5,0,5,0,3,1,8,0,55,1],
-["A",99.994022,34,0,8,0,5,1,5,0,3,1,13,1,8,0],
-["D",99.994017,1,1,1,1,34,1,21,0,13,1,55,0,34,0]
+["B",100,8,0,2,0,3,1,8,0,5,1,8,0,13,1],
+["A",99.999983,13,1,13,0,5,0,5,0,3,1,55,1,13,0],
+["B",99.999973,21,1,55,1,34,0,8,0,5,1,13,0,34,1],
+["A",99.999958,13,1,13,0,13,1,5,0,3,1,13,1,8,0],
+["D",99.999954,8,1,1,0,34,0,21,0,13,1,55,1,55,1],
+["C",99.99995,5,1,1,1,5,0,13,0,8,1,3,0,5,1],
+["A",99.999927,21,0,55,1,55,0,5,0,3,1,34,0,21,0],
+["A",99.99992,2,0,3,1,2,0,5,0,3,1,13,1,8,0],
+["A",99.999901,2,1,8,0,55,1,5,0,3,1,13,1,8,0],
+["A",99.999899,34,1,55,0,55,0,5,0,3,1,13,1,8,0],
+["A",99.999887,8,0,5,1,34,0,5,0,3,1,13,0,55,0],
+["D",99.999879,3,0,8,1,1,1,21,0,13,1,5,0,8,1],
+["B",99.999878,1,1,13,1,13,0,8,0,5,1,55,1,21,0],
+["A",99.999855,1,0,5,1,55,1,5,0,3,1,5,0,13,1],
+["D",99.999843,1,0,2,0,1,1,21,0,13,1,34,1,55,0],
+["D",99.999828,8,0,2,1,8,1,21,0,13,1,13,1,13,0],
+["A",99.999821,1,1,5,0,3,1,5,0,3,1,13,0,55,0],
+["B",99.99982,13,1,55,0,34,1,8,0,5,1,13,0,34,1],
+["B",99.999802,21,1,3,1,3,1,8,0,5,1,8,0,21,1],
+["A",99.999796,3,0,13,0,5,0,5,0,3,1,55,0,21,0],
+["D",99.999792,55,1,1,1,2,1,21,0,13,1,3,0,5,1],
+["A",99.999787,13,1,55,1,55,0,5,0,3,1,5,0,13,1],
+["A",99.999772,13,0,5,0,1,0,5,0,3,1,8,0,21,1],
+["D",99.999771,21,1,8,0,3,0,21,0,13,1,34,0,34,1],
+["A",99.999771,3,1,5,1,2,0,5,0,3,1,34,0,21,0],
+["B",99.99976,34,0,3,1,34,1,8,0,5,1,13,0,55,1],
+["A",99.99974,8,1,2,0,2,0,5,0,3,1,8,0,21,1],
+["D",99.999738,34,1,55,1,1,0,21,0,13,1,8,1,13,0],
+["B",99.999734,34,0,3,0,55,0,8,0,5,1,8,0,13,1],
+["A",99.99972,5,1,8,0,8,1,5,0,3,1,13,1,8,0],
+["B",99.999713,2,1,2,0,1,0,8,0,5,1,55,0,55,1],
+["A",99.999707,13,1,5,0,34,0,5,0,3,1,8,0,34,1],
+["A",99.999698,3,1,1,0,21,1,5,0,3,1,13,0,55,1],
+["A",99.999693,2,1,8,0,1,1,5,0,3,1,13,0,34,0],
+["B",99.99969,2,0,21,1,21,1,8,0,5,1,34,1,21,0],
+["C",99.999685,13,1,34,1,3,0,13,0,8,1,13,0,21,1],
+["D",99.999663,3,1,3,1,13,1,21,0,13,1,21,0,55,1],
+["A",99.99966,21,1,2,1,5,1,5,0,3,1,21,1,8,0],
+["A",99.999657,13,0,1,0,2,0,5,0,3,1,34,1,21,0],
+["D",99.999656,1,1,1,0,5,1,21,0,13,1,5,1,8,0],
+["D",99.999656,13,1,2,0,34,0,21,0,13,1,8,1,13,0],
+["A",99.999639,2,0,3,0,34,1,5,0,3,1,34,1,13,0],
+["C",99.999618,55,1,8,0,55,0,13,0,8,1,13,0,21,1],
+["B",99.999618,34,0,55,1,1,1,8,0,5,1,3,0,5,1],
+["D",99.999615,34,0,8,1,34,0,21,0,13,1,21,0,34,1],
+["B",99.99961,3,1,2,1,21,0,8,0,5,1,3,0,5,1],
+["D",99.999607,3,1,3,1,34,0,21,0,13,1,8,0,13,1],
+["A",99.999603,34,0,8,1,2,0,5,0,3,1,21,0,34,0],
+["A",99.999592,13,0,34,1,34,0,5,0,3,1,34,0,21,0],
+["A",99.999586,8,1,2,0,8,1,5,0,3,1,34,1,13,0],
+["B",99.999577,8,1,5,0,55,0,8,0,5,1,13,1,13,0],
+["B",99.999562,5,1,3,0,2,0,8,0,5,1,34,1,34,0],
+["B",99.999536,8,0,2,1,13,1,8,0,5,1,8,0,21,1],
+["A",99.999521,3,1,34,0,55,0,5,0,3,1,5,0,13,1],
+["A",99.999521,34,0,21,1,1,1,5,0,3,1,3,1,3,0],
+["B",99.999503,34,1,1,0,21,0,8,0,5,1,34,0,34,1],
+["A",99.9995,55,1,21,0,3,1,5,0,3,1,8,0,55,1],
+["C",99.999475,3,0,13,1,8,1,13,0,8,1,55,1,34,0],
+["A",99.999462,21,1,21,1,5,1,5,0,3,1,13,0,55,0],
+["D",99.999449,3,1,1,1,55,1,21,0,13,1,13,0,55,1],
+["B",99.999397,13,0,8,1,5,1,8,0,5,1,2,0,3,1],
+["C",99.999393,55,1,5,0,8,1,13,0,8,1,13,0,21,1],
+["B",99.999378,55,0,1,1,34,1,8,0,5,1,55,0,21,0],
+["A",99.999377,21,1,34,1,34,0,5,0,3,1,5,0,13,1],
+["B",99.999366,3,1,1,1,1,0,8,0,5,1,3,0,5,1],
+["C",99.999343,3,0,1,0,8,1,13,0,8,1,13,0,13,1],
+["B",99.999335,2,0,55,1,1,1,8,0,5,1,21,1,13,0],
+["B",99.999322,34,0,3,1,5,0,8,0,5,1,55,1,21,0],
+["C",99.999321,55,1,55,1,21,1,13,0,8,1,8,0,13,1],
+["B",99.999319,8,0,55,1,34,0,8,0,5,1,34,1,21,0],
+["D",99.999315,8,0,3,0,8,1,21,0,13,1,34,0,34,1],
+["C",99.999309,55,0,55,1,8,1,13,0,8,1,55,1,34,0],
+["A",99.999309,55,1,34,1,55,0,5,0,3,1,5,0,13,1],
+["D",99.999303,2,1,34,0,13,1,21,0,13,1,21,0,34,1],
+["B",99.9993,55,0,8,1,2,0,8,0,5,1,5,0,8,1],
+["B",99.999293,21,1,13,1,5,1,8,0,5,1,8,1,8,0],
+["A",99.999293,2,0,8,1,3,0,5,0,3,1,21,0,34,0],
+["A",99.999267,1,0,21,1,5,0,5,0,3,1,55,0,21,0],
+["A",99.999264,1,1,5,0,1,0,5,0,3,1,34,0,34,0],
+["A",99.999243,1,0,5,0,21,0,5,0,3,1,34,1,13,0],
+["A",99.999242,21,0,3,0,3,1,5,0,3,1,55,1,13,0],
+["A",99.999215,55,0,5,0,13,0,5,0,3,1,55,0,21,0],
+["B",99.999198,13,1,2,0,13,0,8,0,5,1,13,0,21,1],
+["B",99.999175,21,0,5,1,21,1,8,0,5,1,2,0,3,1],
+["A",99.999157,21,0,21,1,34,0,5,0,3,1,5,0,13,1],
+["A",99.999156,5,1,34,0,34,1,5,0,3,1,5,0,13,1],
+["C",99.999149,2,0,21,1,21,1,13,0,8,1,21,1,21,0],
+["B",99.999144,5,1,1,1,21,0,8,0,5,1,55,0,21,0],
+["A",99.999132,8,0,1,0,55,0,5,0,3,1,55,1,21,0],
+["C",99.999131,13,1,21,1,34,0,13,0,8,1,8,0,13,1],
+["A",99.999124,5,0,3,0,13,0,5,0,3,1,34,1,13,0],
+["A",99.999099,8,1,8,0,8,0,5,0,3,1,55,1,13,0],
+["C",99.999088,13,1,2,0,55,0,13,0,8,1,34,1,55,0],
+["A",99.999087,55,1,34,0,3,0,5,0,3,1,8,0,34,1],
+["B",99.999086,21,1,8,0,21,0,8,0,5,1,5,0,8,1],
+["B",99.99907,21,1,3,0,55,1,8,0,5,1,55,1,34,0],
+["B",99.999056,1,1,55,0,3,1,8,0,5,1,13,0,55,1],
+["D",99.999049,55,1,1,1,3,1,21,0,13,1,21,1,13,0],
+["D",99.999047,3,1,34,1,55,0,21,0,13,1,55,1,55,0],
+["A",99.999046,3,1,8,0,13,1,5,0,3,1,13,1,8,0],
+["D",99.99904,2,1,13,0,8,1,21,0,13,1,55,1,55,0],
+["C",99.999036,2,1,2,1,21,1,13,0,8,1,55,1,21,0],
+["A",99.999033,5,1,2,0,34,0,5,0,3,1,5,1,5,0],
+["D",99.999031,34,0,3,0,34,1,21,0,13,1,13,1,21,0],
+["A",99.99903,1,1,8,0,2,0,5,0,3,1,8,0,34,1],
+["A",99.999026,34,1,5,0,1,0,5,0,3,1,3,0,5,1],
+["A",99.999016,3,1,8,0,5,0,5,0,3,1,55,1,13,0],
+["D",99.999006,8,0,8,0,3,0,21,0,13,1,13,1,21,0],
+["B",99.998994,2,1,3,1,13,0,8,0,5,1,34,0,55,0],
+["B",99.998992,55,1,8,0,1,0,8,0,5,1,55,1,55,0],
+["D",99.998991,5,1,5,0,13,0,21,0,13,1,55,0,55,1],
+["C",99.998983,55,0,8,0,3,1,13,0,8,1,8,0,13,1],
+["B",99.998983,34,1,8,0,2,1,8,0,5,1,55,0,55,0],
+["C",99.998963,5,1,3,0,2,0,13,0,8,1,21,1,34,0],
+["B",99.998937,21,0,2,1,5,0,8,0,5,1,34,0,55,0],
+["B",99.998935,55,0,2,1,13,1,8,0,5,1,3,0,5,1],
+["D",99.998932,55,0,3,0,3,1,21,0,13,1,34,1,55,0],
+["B",99.998916,1,1,5,0,21,1,8,0,5,1,13,0,34,1],
+["A",99.998912,34,1,13,1,5,0,5,0,3,1,13,1,8,0],
+["A",99.998885,34,1,1,1,21,1,5,0,3,1,13,0,21,0],
+["A",99.998871,3,0,3,0,34,0,5,0,3,1,34,1,13,0],
+["C",99.998869,55,1,34,0,5,0,13,0,8,1,13,0,21,1],
+["A",99.998867,1,0,34,0,2,0,5,0,3,1,5,1,5,0],
+["A",99.998867,21,0,34,0,5,0,5,0,3,1,21,0,34,0],
+["C",99.998864,1,0,34,0,2,1,13,0,8,1,8,0,13,1],
+["A",99.998836,3,1,2,0,13,0,5,0,3,1,5,1,5,0],
+["B",99.998833,2,0,55,1,8,0,8,0,5,1,5,0,8,1],
+["B",99.998803,13,1,1,1,13,1,8,0,5,1,8,0,34,1],
+["C",99.998785,5,0,55,1,8,1,13,0,8,1,8,0,13,1],
+["B",99.998779,34,1,2,0,1,0,8,0,5,1,34,0,34,1],
+["C",99.998768,1,1,21,1,21,0,13,0,8,1,13,1,13,0],
+["A",99.99876,13,0,8,0,5,0,5,0,3,1,55,0,21,0],
+["C",99.998732,21,1,13,1,1,1,13,0,8,1,2,0,3,1],
+["A",99.998727,13,1,34,1,8,0,5,0,3,1,13,1,8,0],
+["C",99.998704,13,1,21,1,13,1,13,0,8,1,21,0,55,1],
+["A",99.9987,2,1,34,0,13,0,5,0,3,1,5,0,13,1],
+["C",99.9987,8,0,34,1,13,1,13,0,8,1,8,0,13,1],
+["A",99.998699,34,1,21,0,8,1,5,0,3,1,5,0,13,1],
+["A",99.998696,55,1,8,1,5,0,5,0,3,1,5,0,13,1],
+["B",99.998683,21,0,13,0,2,0,8,0,5,1,8,0,13,1],
+["A",99.998676,1,0,55,1,21,1,5,0,3,1,21,0,34,0],
+["B",99.998676,1,1,34,1,21,0,8,0,5,1,8,1,8,0],
+["D",99.998675,3,0,5,1,3,1,21,0,13,1,21,1,21,0],
+["B",99.998669,8,0,13,0,13,0,8,0,5,1,5,0,8,1],
+["A",99.998654,1,0,21,0,55,0,5,0,3,1,55,0,21,0],
+["C",99.998642,8,1,13,0,2,1,13,0,8,1,13,1,13,0],
+["C",99.998641,3,1,55,0,3,0,13,0,8,1,13,0,21,1],
+["A",99.998634,8,1,5,0,55,1,5,0,3,1,55,1,13,0],
+["A",99.998624,21,0,5,0,8,1,5,0,3,1,21,0,34,0],
+["C",99.998617,34,0,13,1,21,0,13,0,8,1,8,0,13,1],
+["D",99.998615,5,1,3,1,55,1,21,0,13,1,8,0,13,1],
+["C",99.998614,8,0,55,1,34,0,13,0,8,1,21,1,21,0],
+["A",99.998584,21,0,1,0,5,0,5,0,3,1,55,0,55,0],
+["C",99.998581,5,1,55,1,21,1,13,0,8,1,55,1,34,0],
+["D",99.998566,2,0,8,0,5,0,21,0,13,1,13,1,21,0],
+["A",99.998561,1,0,3,0,2,0,5,0,3,1,55,0,34,0],
+["C",99.998559,13,1,5,0,8,0,13,0,8,1,55,1,55,0],
+["B",99.998553,34,1,3,1,1,0,8,0,5,1,13,1,13,0],
+["A",99.998549,3,0,55,1,3,1,5,0,3,1,8,0,55,1],
+["C",99.998544,13,0,21,1,2,0,13,0,8,1,21,0,34,1],
+["B",99.998536,34,1,13,0,2,1,8,0,5,1,8,1,8,0],
+["A",99.998529,55,0,55,1,34,0,5,0,3,1,34,0,21,0],
+["B",99.998519,2,1,55,1,5,1,8,0,5,1,2,0,3,1],
+["C",99.998516,34,1,2,1,5,1,13,0,8,1,2,0,3,1],
+["B",99.998503,3,1,8,1,2,1,8,0,5,1,21,1,13,0],
+["C",99.998501,8,1,21,1,55,1,13,0,8,1,55,1,34,0],
+["A",99.9985,5,0,2,1,5,1,5,0,3,1,3,1,3,0],
+["D",99.998484,8,1,55,1,13,1,21,0,13,1,55,1,55,0],
+["B",99.998482,55,1,3,0,34,1,8,0,5,1,55,1,34,0],
+["A",99.99847,3,0,13,1,34,0,5,0,3,1,34,0,21,0],
+["A",99.998432,55,0,34,1,5,1,5,0,3,1,8,0,55,1],
+["C",99.998414,2,0,21,0,55,1,13,0,8,1,13,0,21,1],
+["A",99.998412,8,0,21,1,21,0,5,0,3,1,34,0,21,0],
+["B",99.998404,8,1,55,1,3,1,8,0,5,1,2,0,3,1],
+["B",99.998361,3,1,1,0,34,0,8,0,5,1,21,1,34,0],
+["B",99.998358,13,0,2,1,2,0,8,0,5,1,55,1,21,0],
+["B",99.998354,8,1,1,1,8,1,8,0,5,1,55,1,13,0],
+["A",99.998345,55,1,5,0,3,1,5,0,3,1,13,1,8,0],
+["C",99.998332,5,0,34,1,2,1,13,0,8,1,5,0,8,1],
+["A",99.998327,21,1,2,1,34,0,5,0,3,1,13,0,34,0],
+["A",99.998318,34,0,13,0,5,1,5,0,3,1,5,0,13,1],
+["C",99.998314,2,1,8,1,55,0,13,0,8,1,13,1,13,0],
+["A",99.998311,3,0,5,0,2,1,5,0,3,1,34,0,21,0],
+["A",99.998303,1,1,1,1,8,1,5,0,3,1,55,1,8,0],
+["A",99.998301,1,1,2,1,1,0,5,0,3,1,13,0,55,0],
+["A",99.99828,55,0,2,0,21,1,5,0,3,1,5,1,5,0],
+["B",99.99828,5,0,34,1,1,1,8,0,5,1,8,0,21,1],
+["D",99.998271,13,0,13,1,1,1,21,0,13,1,5,0,8,1],
+["C",99.998262,3,1,21,0,8,1,13,0,8,1,55,1,34,0],
+["C",99.998244,1,1,3,1,8,1,13,0,8,1,8,1,8,0],
+["D",99.998217,8,0,21,0,3,1,21,0,13,1,21,0,34,1],
+["A",99.998207,5,0,13,1,13,0,5,0,3,1,34,0,21,0],
+["A",99.998203,55,0,5,1,8,0,5,0,3,1,8,0,55,1],
+["A",99.998197,21,0,2,0,1,0,5,0,3,1,55,1,21,0],
+["A",99.998194,3,0,8,1,13,0,5,0,3,1,5,0,13,1],
+["B",99.998188,13,0,55,0,3,1,8,0,5,1,55,0,55,0],
+["B",99.998186,8,0,34,0,2,0,8,0,5,1,55,1,34,0],
+["A",99.99818,8,1,5,0,21,0,5,0,3,1,8,0,34,1],
+["A",99.998169,21,1,5,0,55,0,5,0,3,1,8,0,34,1],
+["A",99.998149,8,1,3,0,8,1,5,0,3,1,55,0,21,0],
+["D",99.998143,55,1,3,0,5,1,21,0,13,1,21,1,34,0],
+["A",99.998136,21,0,8,0,55,0,5,0,3,1,21,0,34,0],
+["B",99.99813,5,1,3,1,34,1,8,0,5,1,34,0,55,0],
+["A",99.998128,5,1,34,0,3,0,5,0,3,1,55,1,13,0],
+["B",99.998126,5,1,13,0,2,1,8,0,5,1,55,1,21,0],
+["C",99.998121,5,0,1,0,13,1,13,0,8,1,13,0,13,1],
+["A",99.99812,21,1,55,0,55,1,5,0,3,1,34,0,21,0],
+["D",99.998111,21,1,2,0,8,0,21,0,13,1,21,1,55,0],
+["B",99.99811,5,1,5,0,1,0,8,0,5,1,34,0,55,1],
+["C",99.998108,1,1,55,0,8,0,13,0,8,1,21,0,55,1],
+["A",99.998103,8,1,3,1,1,0,5,0,3,1,55,1,13,0],
+["B",99.998097,2,0,3,1,21,0,8,0,5,1,2,0,3,1],
+["D",99.998081,1,0,21,1,1,0,21,0,13,1,13,0,13,1],
+["C",99.998075,1,1,13,1,55,0,13,0,8,1,5,0,8,1],
+["B",99.998039,8,1,13,0,8,1,8,0,5,1,13,0,34,1],
+["C",99.998031,8,1,1,0,8,0,13,0,8,1,5,1,8,0],
+["A",99.998008,3,1,55,0,8,0,5,0,3,1,13,1,8,0],
+["A",99.998001,55,1,3,1,3,0,5,0,3,1,13,0,55,0],
+["A",99.997967,8,1,55,1,1,1,5,0,3,1,3,1,3,0],
+["B",99.997967,8,0,5,1,1,0,8,0,5,1,8,0,13,1],
+["A",99.997959,5,1,21,0,55,1,5,0,3,1,34,0,21,0],
+["C",99.997952,8,1,3,0,1,0,13,0,8,1,8,1,13,0],
+["D",99.997952,1,1,2,0,55,0,21,0,13,1,13,1,21,0],
+["B",99.997946,2,1,1,0,21,0,8,0,5,1,55,0,55,1],
+["A",99.997943,13,0,21,0,13,1,5,0,3,1,13,1,8,0],
+["C",99.99792,1,0,2,1,5,0,13,0,8,1,13,1,13,0],
+["C",99.997904,21,1,21,1,55,0,13,0,8,1,8,0,13,1],
+["A",99.997903,8,0,8,0,2,0,5,0,3,1,34,1,13,0],
+["B",99.997901,8,0,1,0,2,0,8,0,5,1,21,1,55,0],
+["A",99.997884,13,0,1,0,21,0,5,0,3,1,2,0,3,1],
+["C",99.997881,1,1,55,0,13,1,13,0,8,1,13,1,13,0],
+["D",99.997872,21,1,5,1,5,0,21,0,13,1,21,0,34,1],
+["A",99.997862,13,1,55,1,3,0,5,0,3,1,21,0,34,0],
+["D",99.997859,1,1,1,0,34,0,21,0,13,1,34,0,21,1],
+["A",99.997853,3,0,1,0,1,1,5,0,3,1,34,0,34,0],
+["A",99.997823,34,1,2,1,1,1,5,0,3,1,13,0,21,0],
+["B",99.997798,34,1,5,1,55,1,8,0,5,1,2,0,3,1],
+["A",99.997795,21,0,34,0,34,1,5,0,3,1,13,1,8,0],
+["C",99.997781,3,1,1,1,1,0,13,0,8,1,55,0,55,0],
+["A",99.997774,13,0,34,0,3,1,5,0,3,1,8,0,55,1],
+["D",99.997764,2,0,5,1,21,0,21,0,13,1,55,1,55,0],
+["A",99.997763,13,0,21,1,55,0,5,0,3,1,5,0,13,1],
+["A",99.997737,55,0,8,1,55,1,5,0,3,1,8,0,55,1],
+["B",99.997729,5,1,1,0,55,1,8,0,5,1,21,1,34,0],
+["A",99.997728,8,1,34,0,34,0,5,0,3,1,13,1,8,0],
+["B",99.997722,13,1,2,1,13,0,8,0,5,1,55,0,34,0],
+["B",99.99772,1,0,2,0,13,1,8,0,5,1,55,1,55,0],
+["D",99.997715,34,1,2,0,13,0,21,0,13,1,55,0,34,1],
+["B",99.997688,55,1,1,0,8,1,8,0,5,1,55,0,55,1],
+["D",99.997679,2,1,3,1,1,1,21,0,13,1,55,1,21,0],
+["A",99.997678,13,0,21,0,5,0,5,0,3,1,55,1,13,0],
+["A",99.997672,2,0,13,1,34,1,5,0,3,1,34,0,21,0],
+["A",99.997664,13,0,5,1,21,0,5,0,3,1,13,0,55,0],
+["B",99.997659,55,1,55,1,55,0,8,0,5,1,13,0,34,1],
+["A",99.997641,13,1,34,0,34,1,5,0,3,1,34,0,21,0],
+["D",99.997628,8,0,55,1,3,1,21,0,13,1,34,1,34,0],
+["B",99.997618,3,0,1,1,3,1,8,0,5,1,21,0,34,0],
+["B",99.997614,1,0,3,0,5,0,8,0,5,1,21,0,34,1],
+["B",99.997609,5,0,3,1,5,0,8,0,5,1,8,1,8,0],
+["B",99.997608,1,0,8,1,13,1,8,0,5,1,34,1,21,0],
+["C",99.997594,34,0,21,0,2,1,13,0,8,1,13,1,13,0],
+["A",99.997587,8,1,8,0,2,1,5,0,3,1,13,0,55,0],
+["B",99.997587,1,1,34,0,8,1,8,0,5,1,55,1,21,0],
+["C",99.997585,2,0,3,0,3,1,13,0,8,1,55,1,55,0],
+["A",99.997582,34,0,8,0,1,1,5,0,3,1,21,0,21,0],
+["D",99.997579,34,0,3,1,34,0,21,0,13,1,21,1,21,0],
+["C",99.997558,2,0,1,1,21,1,13,0,8,1,3,0,5,1],
+["B",99.997553,13,1,1,0,8,0,8,0,5,1,13,1,21,0],
+["B",99.997553,2,0,1,1,5,1,8,0,5,1,55,0,21,0],
+["B",99.997534,1,0,13,0,2,0,8,0,5,1,13,0,21,1],
+["A",99.997534,3,1,21,0,34,0,5,0,3,1,34,0,21,0],
+["A",99.99752,21,0,1,1,13,1,5,0,3,1,13,0,21,0],
+["A",99.997519,13,0,2,0,13,1,5,0,3,1,21,0,55,0],
+["B",99.997514,21,0,8,1,5,0,8,0,5,1,13,0,34,1],
+["B",99.997512,34,1,5,1,34,0,8,0,5,1,8,1,8,0],
+["A",99.99751,55,0,3,1,8,1,5,0,3,1,21,0,21,0],
+["A",99.997493,55,0,1,0,1,1,5,0,3,1,5,1,5,0],
+["A",99.997467,34,1,55,0,1,0,5,0,3,1,34,0,34,0],
+["D",99.997457,34,0,34,1,1,0,21,0,13,1,8,1,13,0],
+["B",99.99745,3,1,3,1,55,0,8,0,5,1,34,0,55,0],
+["A",99.997436,55,0,8,1,13,1,5,0,3,1,13,0,55,0],
+["D",99.997435,5,1,34,1,34,1,21,0,13,1,55,1,55,0],
+["B",99.997421,2,0,21,1,2,1,8,0,5,1,2,0,3,1],
+["A",99.997405,2,1,13,1,55,0,5,0,3,1,13,0,55,0],
+["A",99.997395,2,1,3,0,2,1,5,0,3,1,5,0,13,1],
+["A",99.997373,2,0,8,1,55,0,5,0,3,1,5,0,13,1],
+["A",99.997368,13,0,55,0,55,1,5,0,3,1,13,1,8,0],
+["A",99.997365,8,0,1,0,1,0,5,0,3,1,21,0,55,1],
+["C",99.99736,55,1,34,1,2,0,13,0,8,1,21,0,34,1],
+["A",99.997358,34,0,55,1,55,1,5,0,3,1,5,0,13,1],
+["D",99.997357,21,0,21,1,8,1,21,0,13,1,21,0,34,1],
+["A",99.997356,13,1,8,1,55,0,5,0,3,1,8,0,55,1],
+["D",99.997352,3,1,2,1,21,1,21,0,13,1,5,0,8,1],
+["A",99.997351,8,0,2,0,34,0,5,0,3,1,34,0,34,0],
+["A",99.997336,3,1,1,0,3,0,5,0,3,1,55,0,55,0],
+["B",99.997331,21,0,13,0,8,1,8,0,5,1,34,1,21,0],
+["A",99.997322,1,0,34,0,34,1,5,0,3,1,8,0,34,1],
+["C",99.997316,21,0,1,0,3,1,13,0,8,1,8,1,13,0],
+["A",99.99731,13,0,13,1,13,0,5,0,3,1,5,0,13,1],
+["A",99.997303,1,1,2,1,8,0,5,0,3,1,55,0,13,0],
+["A",99.9973,2,1,13,1,13,0,5,0,3,1,8,0,55,1],
+["A",99.997288,5,1,13,1,1,0,5,0,3,1,34,1,13,0],
+["C",99.997275,1,1,3,0,34,1,13,0,8,1,13,0,21,1],
+["C",99.997274,1,0,3,0,21,1,13,0,8,1,34,1,55,0],
+["D",99.997266,1,0,2,0,3,0,21,0,13,1,13,1,34,0],
+["A",99.997252,5,1,55,0,2,0,5,0,3,1,55,0,21,0],
+["A",99.997231,13,0,2,0,1,0,5,0,3,1,2,0,3,1],
+["A",99.997218,5,1,3,1,21,1,5,0,3,1,21,0,21,0],
+["B",99.99721,13,0,55,1,21,0,8,0,5,1,34,1,21,0],
+["C",99.997204,13,1,3,1,2,1,13,0,8,1,2,0,3,1],
+["B",99.997194,3,1,5,0,1,1,8,0,5,1,34,0,55,0],
+["B",99.997189,2,1,13,0,3,1,8,0,5,1,8,1,8,0],
+["A",99.997186,21,0,55,0,3,0,5,0,3,1,8,0,34,1],
+["B",99.997185,2,1,8,0,3,1,8,0,5,1,55,0,55,0],
+["A",99.997184,2,1,21,1,55,0,5,0,3,1,8,0,55,1],
+["D",99.997182,13,1,13,1,1,0,21,0,13,1,21,0,21,1],
+["A",99.997177,13,1,21,1,2,0,5,0,3,1,8,0,34,1],
+["A",99.997176,5,1,2,0,2,1,5,0,3,1,8,0,34,1],
+["C",99.997172,8,0,3,0,5,1,13,0,8,1,55,1,55,0],
+["C",99.997144,5,0,13,1,13,1,13,0,8,1,55,1,34,0],
+["A",99.997143,21,1,21,0,5,0,5,0,3,1,21,0,34,0],
+["A",99.997137,2,0,8,0,21,0,5,0,3,1,55,0,21,0],
+["C",99.997122,1,1,8,0,1,1,13,0,8,1,8,1,8,0],
+["A",99.997118,55,0,21,1,8,0,5,0,3,1,13,1,8,0],
+["A",99.99711,1,0,13,0,2,1,5,0,3,1,34,0,21,0],
+["B",99.997109,13,0,34,1,3,1,8,0,5,1,8,1,8,0],
+["A",99.997088,2,1,2,1,21,0,5,0,3,1,3,1,3,0],
+["A",99.997084,21,0,1,0,21,0,5,0,3,1,55,1,21,0],
+["D",99.997083,1,0,34,0,55,0,21,0,13,1,21,1,34,0],
+["D",99.997078,2,0,8,0,34,1,21,0,13,1,55,0,55,1],
+["B",99.997061,13,1,21,0,1,0,8,0,5,1,34,1,34,0],
+["A",99.997055,3,1,34,0,3,0,5,0,3,1,21,0,34,0],
+["C",99.997044,8,1,21,0,5,1,13,0,8,1,55,1,34,0],
+["B",99.997035,2,1,2,0,55,0,8,0,5,1,21,1,21,0],
+["A",99.997028,1,1,5,0,55,0,5,0,3,1,13,1,8,0],
+["B",99.997014,1,0,21,1,1,1,8,0,5,1,34,0,55,0],
+["A",99.997014,55,1,34,0,21,1,5,0,3,1,34,0,21,0],
+["C",99.997013,1,0,8,1,13,1,13,0,8,1,21,1,21,0],
+["A",99.99701,5,0,8,1,8,0,5,0,3,1,5,0,13,1],
+["C",99.997007,1,1,1,1,55,0,13,0,8,1,21,0,55,0],
+["A",99.997005,55,1,2,1,1,0,5,0,3,1,13,1,8,0],
+["D",99.996997,21,1,34,1,8,1,21,0,13,1,21,0,34,1],
+["D",99.996992,8,0,1,1,21,0,21,0,13,1,55,1,21,0],
+["C",99.996986,13,1,5,1,13,1,13,0,8,1,5,0,8,1],
+["B",99.99697,2,0,13,0,34,0,8,0,5,1,13,1,13,0],
+["B",99.996951,1,0,34,1,34,1,8,0,5,1,5,0,8,1],
+["A",99.996943,13,0,55,0,1,1,5,0,3,1,13,0,34,0],
+["A",99.996942,34,0,2,0,2,1,5,0,3,1,55,0,21,0],
+["A",99.996938,34,0,34,1,21,0,5,0,3,1,34,0,21,0],
+["D",99.996931,55,1,8,0,13,0,21,0,13,1,34,1,55,0],
+["B",99.996926,3,0,8,0,5,0,8,0,5,1,21,0,55,1],
+["C",99.996919,8,0,8,0,34,0,13,0,8,1,34,1,34,0],
+["A",99.996915,8,0,13,0,2,1,5,0,3,1,13,0,55,0],
+["B",99.996908,3,1,21,1,5,1,8,0,5,1,2,0,3,1],
+["B",99.99688,13,0,21,1,3,0,8,0,5,1,5,0,8,1],
+["B",99.996871,3,0,34,1,3,1,8,0,5,1,55,0,55,0],
+["C",99.99687,3,0,1,1,3,1,13,0,8,1,34,0,34,0],
+["A",99.996861,2,1,3,1,8,1,5,0,3,1,13,0,34,0],
+["B",99.996854,5,1,5,0,3,1,8,0,5,1,13,0,34,1],
+["A",99.996852,34,0,1,1,5,0,5,0,3,1,5,0,21,1],
+["C",99.996847,34,0,55,1,1,1,13,0,8,1,55,0,55,0],
+["A",99.996837,55,1,2,1,55,0,5,0,3,1,13,0,34,0],
+["B",99.996837,8,1,3,0,1,1,8,0,5,1,2,0,3,1],
+["D",99.996827,21,1,55,1,3,1,21,0,13,1,13,0,21,1],
+["C",99.996824,1,0,3,0,5,0,13,0,8,1,34,0,34,1],
+["A",99.996824,21,0,1,1,2,1,5,0,3,1,55,1,8,0],
+["C",99.996815,3,1,34,0,2,0,13,0,8,1,21,0,34,1],
+["B",99.996812,13,0,8,0,3,0,8,0,5,1,55,1,34,0],
+["A",99.996809,8,0,2,1,34,1,5,0,3,1,13,0,34,0],
+["A",99.9968,55,1,34,1,3,0,5,0,3,1,21,0,34,0],
+["D",99.996791,55,0,1,0,3,1,21,0,13,1,34,0,21,1],
+["A",99.996779,13,0,5,0,2,0,5,0,3,1,5,1,5,0],
+["A",99.996778,5,1,13,1,34,1,5,0,3,1,8,0,55,1],
+["A",99.996766,5,1,55,0,13,0,5,0,3,1,13,1,8,0],
+["A",99.996751,8,1,1,1,34,0,5,0,3,1,34,1,8,0],
+["B",99.996748,34,1,1,0,13,1,8,0,5,1,21,1,34,0],
+["D",99.996736,13,1,13,1,55,0,21,0,13,1,55,1,55,0],
+["C",99.996731,1,0,55,0,21,0,13,0,8,1,21,0,34,1],
+["C",99.996731,13,0,34,1,8,1,13,0,8,1,55,1,34,0],
+["A",99.996726,2,0,13,1,13,1,5,0,3,1,5,0,13,1],
+["A",99.996725,5,0,34,0,8,1,5,0,3,1,34,0,21,0],
+["A",99.99672,3,0,2,1,3,1,5,0,3,1,21,1,8,0],
+["A",99.996712,3,1,8,1,21,0,5,0,3,1,13,0,55,0],
+["C",99.996708,55,0,5,0,13,1,13,0,8,1,34,1,34,0],
+["A",99.996704,13,0,3,1,3,1,5,0,3,1,13,0,34,0],
+["A",99.996701,21,0,3,1,1,0,5,0,3,1,8,0,34,1],
+["D",99.996701,34,1,5,1,3,1,21,0,13,1,8,0,13,1],
+["A",99.99669,3,1,21,0,55,1,5,0,3,1,5,0,13,1],
+["A",99.996673,8,0,55,0,13,1,5,0,3,1,34,0,21,0],
+["A",99.996669,1,0,3,1,34,0,5,0,3,1,8,0,55,1],
+["B",99.996662,1,1,1,1,3,0,8,0,5,1,55,0,21,0],
+["B",99.996662,1,0,5,1,1,1,8,0,5,1,3,0,5,1],
+["A",99.996655,5,1,55,1,5,1,5,0,3,1,13,0,55,0],
+["A",99.996652,3,0,34,1,55,1,5,0,3,1,13,1,8,0],
+["A",99.996649,8,1,8,0,13,0,5,0,3,1,21,0,34,0],
+["B",99.996637,1,0,8,0,5,0,8,0,5,1,21,1,21,0],
+["D",99.996631,21,1,1,1,8,0,21,0,13,1,2,0,3,1],
+["A",99.996627,3,0,2,0,21,1,5,0,3,1,34,0,34,0],
+["B",99.996625,21,1,21,0,2,1,8,0,5,1,55,1,21,0],
+["D",99.996608,21,1,2,0,55,0,21,0,13,1,8,1,13,0],
+["B",99.996606,34,1,1,0,5,1,8,0,5,1,34,1,55,0],
+["A",99.9966,13,1,34,1,1,1,5,0,3,1,3,1,3,0],
+["B",99.996597,1,0,1,0,21,1,8,0,5,1,21,0,21,1],
+["A",99.996597,8,0,1,0,34,0,5,0,3,1,2,0,3,1],
+["B",99.996595,34,0,21,1,3,1,8,0,5,1,2,0,3,1],
+["A",99.996594,8,0,55,0,8,1,5,0,3,1,5,0,13,1],
+["B",99.996594,55,0,1,0,34,0,8,0,5,1,34,0,34,1],
+["A",99.99659,55,0,8,0,34,0,5,0,3,1,21,0,34,0],
+["C",99.996588,13,0,13,1,34,0,13,0,8,1,8,0,13,1],
+["A",99.996583,34,1,55,0,3,1,5,0,3,1,13,0,55,0],
+["B",99.996582,5,1,55,0,13,0,8,0,5,1,34,1,21,0],
+["A",99.996576,55,1,55,0,34,1,5,0,3,1,34,0,21,0],
+["C",99.996571,55,0,21,1,3,0,13,0,8,1,13,0,21,1],
+["B",99.996564,1,1,13,0,1,0,8,0,5,1,21,1,21,0],
+["B",99.996547,5,1,21,1,5,1,8,0,5,1,8,1,8,0],
+["D",99.996538,1,1,34,1,3,0,21,0,13,1,34,0,55,1],
+["D",99.996533,55,0,3,0,1,0,21,0,13,1,13,1,34,0],
+["B",99.996531,8,0,5,1,13,1,8,0,5,1,2,0,3,1],
+["A",99.996526,3,1,13,0,34,1,5,0,3,1,34,0,21,0],
+["B",99.996521,55,1,2,1,1,0,8,0,5,1,34,1,21,0],
+["A",99.996512,3,0,21,1,3,1,5,0,3,1,13,0,55,0],
+["A",99.99649,5,0,5,0,3,0,5,0,3,1,34,1,13,0],
+["D",99.996483,2,1,3,1,55,1,21,0,13,1,21,0,55,1],
+["A",99.996477,1,0,34,1,55,0,5,0,3,1,55,1,13,0],
+["B",99.996471,8,0,13,0,1,0,8,0,5,1,21,0,34,1],
+["A",99.996466,1,0,21,0,8,1,5,0,3,1,55,1,13,0],
+["D",99.996465,13,0,5,1,34,0,21,0,13,1,34,1,34,0],
+["A",99.996463,8,1,21,0,21,1,5,0,3,1,34,0,21,0],
+["B",99.996459,3,1,8,1,3,0,8,0,5,1,13,0,34,1],
+["A",99.996456,2,1,1,1,1,0,5,0,3,1,3,1,3,0],
+["B",99.996455,21,1,34,1,5,1,8,0,5,1,55,0,55,0],
+["B",99.996453,55,0,34,0,3,1,8,0,5,1,55,0,55,0],
+["A",99.996446,5,0,3,0,5,0,5,0,3,1,21,0,55,0],
+["C",99.996431,13,0,55,1,21,0,13,0,8,1,21,1,21,0],
+["B",99.996427,21,1,1,1,5,1,8,0,5,1,21,0,34,0],
+["B",99.996425,5,0,13,1,3,1,8,0,5,1,2,0,3,1],
+["A",99.996425,55,0,34,0,55,1,5,0,3,1,13,1,8,0],
+["C",99.99642,21,1,8,0,34,0,13,0,8,1,13,0,21,1],
+["A",99.996419,13,1,1,1,34,1,5,0,3,1,13,0,21,0],
+["D",99.996418,3,1,8,1,5,0,21,0,13,1,55,1,55,0],
+["D",99.996413,3,1,8,1,34,1,21,0,13,1,13,0,21,1],
+["A",99.996395,13,0,55,1,21,0,5,0,3,1,13,1,8,0],
+["B",99.996394,21,0,34,1,55,0,8,0,5,1,13,0,34,1],
+["A",99.996371,3,1,13,1,55,0,5,0,3,1,8,0,55,1],
+["C",99.996371,2,0,34,0,13,0,13,0,8,1,34,1,34,0],
+["A",99.996359,55,1,21,1,1,0,5,0,3,1,21,0,55,0],
+["C",99.996358,3,1,3,0,1,1,13,0,8,1,5,0,8,1],
+["A",99.99635,2,1,21,0,1,0,5,0,3,1,5,1,5,0],
+["A",99.996329,34,1,2,0,34,1,5,0,3,1,5,1,5,0],
+["A",99.996313,21,0,5,0,13,1,5,0,3,1,55,1,13,0],
+["C",99.996294,2,0,2,1,1,1,13,0,8,1,3,0,5,1],
+["C",99.996286,1,0,21,1,21,0,13,0,8,1,34,1,34,0],
+["A",99.99627,21,1,21,0,34,1,5,0,3,1,13,1,8,0],
+["A",99.996269,5,0,34,1,34,0,5,0,3,1,13,1,8,0],
+["B",99.996268,3,1,55,1,2,1,8,0,5,1,13,0,55,1],
+["A",99.996268,21,0,8,1,34,1,5,0,3,1,8,0,55,1],
+["D",99.996264,1,0,1,1,5,1,21,0,13,1,8,1,8,0],
+["A",99.996262,5,1,13,0,13,1,5,0,3,1,34,0,21,0],
+["B",99.99626,13,0,3,1,21,1,8,0,5,1,13,0,55,1],
+["A",99.996259,5,0,13,1,34,0,5,0,3,1,5,0,13,1],
+["B",99.996255,1,1,3,1,2,1,8,0,5,1,21,0,55,0],
+["B",99.996247,5,1,21,1,5,0,8,0,5,1,34,1,21,0],
+["B",99.996238,1,1,13,0,5,1,8,0,5,1,2,0,3,1],
+["A",99.996228,1,0,8,1,13,1,5,0,3,1,13,1,8,0],
+["C",99.99622,21,1,2,0,2,1,13,0,8,1,21,0,34,1],
+["B",99.996215,34,0,8,0,55,0,8,0,5,1,5,0,8,1],
+["D",99.996208,5,0,1,0,2,0,21,0,13,1,21,0,13,1],
+["B",99.996207,8,0,8,1,13,1,8,0,5,1,55,0,55,0],
+["C",99.996206,2,0,8,1,34,1,13,0,8,1,8,0,13,1],
+["B",99.996202,34,1,55,0,21,1,8,0,5,1,13,0,34,1],
+["A",99.996199,34,0,1,1,34,1,5,0,3,1,34,1,8,0],
+["C",99.996198,13,0,5,1,5,0,13,0,8,1,55,1,34,0],
+["B",99.99617,55,1,13,1,2,1,8,0,5,1,13,0,55,1],
+["A",99.996168,3,0,34,1,1,1,5,0,3,1,13,0,34,0],
+["A",99.996167,1,0,3,1,34,1,5,0,3,1,13,0,55,0],
+["B",99.996156,1,1,55,0,21,0,8,0,5,1,55,0,55,0],
+["B",99.996154,8,0,21,0,2,1,8,0,5,1,8,1,8,0],
+["C",99.996142,21,1,3,1,2,0,13,0,8,1,55,1,34,0],
+["D",99.996137,13,0,1,1,13,0,21,0,13,1,2,0,3,1],
+["B",99.996125,34,1,34,1,3,0,8,0,5,1,5,0,8,1],
+["A",99.996114,21,1,13,0,3,0,5,0,3,1,55,0,21,0],
+["A",99.996093,3,1,55,0,1,1,5,0,3,1,3,1,3,0],
+["C",99.996087,1,1,3,0,5,0,13,0,8,1,55,1,55,0],
+["B",99.996078,21,1,5,1,8,0,8,0,5,1,55,0,55,0],
+["A",99.996048,1,0,55,0,13,0,5,0,3,1,55,0,21,0],
+["A",99.996046,13,0,34,0,8,1,5,0,3,1,5,0,13,1],
+["A",99.996029,2,0,1,1,13,0,5,0,3,1,34,0,13,0],
+["A",99.99601,5,0,21,1,55,0,5,0,3,1,34,0,21,0],
+["A",99.996004,13,1,13,1,13,1,5,0,3,1,8,0,55,1],
+["B",99.995985,8,0,2,1,2,0,8,0,5,1,2,0,3,1],
+["B",99.995979,55,0,21,1,8,0,8,0,5,1,34,1,21,0],
+["B",99.995977,2,1,21,0,8,0,8,0,5,1,34,1,21,0],
+["D",99.995959,5,1,21,0,1,0,21,0,13,1,55,0,34,1],
+["A",99.995955,21,1,2,0,34,1,5,0,3,1,21,0,55,0],
+["A",99.995933,34,1,55,1,21,0,5,0,3,1,34,0,21,0],
+["A",99.99592,55,0,34,0,1,1,5,0,3,1,13,0,34,0],
+["B",99.995903,55,0,21,0,1,1,8,0,5,1,55,0,34,0],
+["A",99.995897,3,0,13,1,55,1,5,0,3,1,5,0,13,1],
+["A",99.995885,2,1,34,0,8,1,5,0,3,1,8,0,55,1],
+["A",99.995884,55,1,2,0,13,0,5,0,3,1,34,0,34,0],
+["A",99.995859,8,1,2,1,1,0,5,0,3,1,34,0,21,0],
+["B",99.995845,34,0,21,0,2,0,8,0,5,1,55,1,34,0],
+["C",99.995845,13,0,13,0,13,0,13,0,8,1,13,0,21,1],
+["A",99.995825,55,0,55,1,55,1,5,0,3,1,5,0,13,1],
+["C",99.995823,5,1,21,1,1,1,13,0,8,1,2,0,3,1],
+["A",99.995815,1,1,5,1,55,1,5,0,3,1,21,0,21,0],
+["B",99.995812,55,0,55,1,3,1,8,0,5,1,8,1,8,0],
+["B",99.995811,8,1,34,1,13,0,8,0,5,1,13,0,34,1],
+["A",99.995804,55,0,8,0,5,1,5,0,3,1,13,1,8,0],
+["A",99.995803,2,0,34,1,13,1,5,0,3,1,13,1,8,0],
+["A",99.995799,1,0,8,1,5,0,5,0,3,1,55,1,13,0],
+["A",99.995796,34,0,21,1,8,0,5,0,3,1,13,1,8,0],
+["C",99.995789,21,0,13,0,8,1,13,0,8,1,21,1,21,0],
+["D",99.995758,21,0,8,0,3,1,21,0,13,1,34,0,55,1],
+["B",99.995755,3,0,13,1,3,1,8,0,5,1,8,1,8,0],
+["D",99.995743,3,0,13,0,1,0,21,0,13,1,13,0,13,1],
+["D",99.995738,1,1,55,1,3,1,21,0,13,1,8,0,13,1],
+["D",99.995732,21,0,21,0,5,0,21,0,13,1,34,1,55,0],
+["A",99.99573,2,1,13,0,34,0,5,0,3,1,34,0,21,0],
+["C",99.995721,13,0,3,1,8,0,13,0,8,1,5,0,8,1],
+["C",99.995706,13,0,13,1,13,1,13,0,8,1,21,0,55,1],
+["A",99.995703,55,0,5,1,3,0,5,0,3,1,5,0,13,1],
+["B",99.995695,34,0,5,0,8,1,8,0,5,1,5,0,8,1],
+["D",99.995688,13,0,55,0,1,0,21,0,13,1,21,1,55,0],
+["A",99.995673,8,1,1,0,8,0,5,0,3,1,2,0,3,1],
+["D",99.995665,5,1,8,1,13,1,21,0,13,1,13,0,21,1],
+["B",99.995649,2,1,3,0,3,0,8,0,5,1,21,1,21,0],
+["A",99.995645,3,1,1,1,3,0,5,0,3,1,5,0,21,1],
+["C",99.995639,1,1,8,0,34,0,13,0,8,1,8,0,13,1],
+["B",99.995606,55,1,1,1,55,1,8,0,5,1,55,0,21,0],
+["A",99.995604,13,1,3,0,3,1,5,0,3,1,21,0,34,0],
+["A",99.995593,3,1,13,0,3,1,5,0,3,1,13,0,55,0],
+["A",99.995587,3,0,21,1,34,1,5,0,3,1,34,0,21,0],
+["B",99.995581,5,0,8,0,1,0,8,0,5,1,34,0,55,1],
+["A",99.995554,3,1,5,0,5,0,5,0,3,1,55,0,21,0],
+["A",99.995538,3,0,21,1,1,0,5,0,3,1,34,0,34,0],
+["C",99.995537,5,1,55,0,13,0,13,0,8,1,21,1,21,0],
+["A",99.995535,2,0,5,1,21,1,5,0,3,1,8,0,55,1],
+["B",99.99553,3,0,13,0,1,1,8,0,5,1,34,0,55,0],
+["C",99.995529,55,1,2,1,1,0,13,0,8,1,21,1,21,0],
+["A",99.995527,5,0,8,1,1,1,5,0,3,1,21,1,8,0],
+["A",99.995525,2,0,21,1,3,1,5,0,3,1,8,0,55,1],
+["C",99.99551,3,0,1,1,21,0,13,0,8,1,8,0,21,1],
+["A",99.995508,55,1,55,0,3,1,5,0,3,1,13,0,55,0],
+["A",99.995494,1,1,21,0,55,0,5,0,3,1,8,0,55,1],
+["D",99.995465,2,1,34,1,13,0,21,0,13,1,55,1,55,0],
+["A",99.995461,55,0,21,1,1,1,5,0,3,1,3,1,3,0],
+["A",99.995457,2,0,34,1,5,0,5,0,3,1,55,1,13,0],
+["A",99.995438,55,0,8,0,13,0,5,0,3,1,55,1,13,0],
+["C",99.99543,1,0,5,1,1,1,13,0,8,1,55,0,55,0],
+["D",99.995414,1,1,21,1,1,0,21,0,13,1,34,0,34,1],
+["B",99.995405,1,1,55,1,55,1,8,0,5,1,2,0,3,1],
+["C",99.995401,34,0,3,0,3,1,13,0,8,1,34,1,34,0],
+["C",99.99539,13,1,21,0,1,0,13,0,8,1,21,1,34,0],
+["B",99.995387,34,0,34,0,5,0,8,0,5,1,5,0,8,1],
+["B",99.995383,8,1,3,0,5,0,8,0,5,1,21,1,21,0],
+["A",99.995377,1,0,3,0,13,1,5,0,3,1,5,1,5,0],
+["A",99.995376,13,0,3,0,5,1,5,0,3,1,55,0,21,0],
+["A",99.99536,3,0,55,1,8,1,5,0,3,1,5,0,13,1],
+["A",99.995352,8,0,21,1,5,1,5,0,3,1,8,0,55,1],
+["B",99.995337,3,0,55,0,5,0,8,0,5,1,13,1,13,0],
+["C",99.995328,13,0,5,0,34,0,13,0,8,1,21,0,34,1],
+["A",99.995318,3,1,3,0,5,1,5,0,3,1,55,1,13,0],
+["A",99.995315,55,1,2,1,8,1,5,0,3,1,3,1,3,0],
+["A",99.99531,3,0,3,0,1,1,5,0,3,1,8,0,55,1],
+["C",99.995304,3,1,1,0,5,0,13,0,8,1,5,1,8,0],
+["A",99.995304,8,0,34,1,3,0,5,0,3,1,55,1,13,0],
+["D",99.995304,8,1,1,1,5,0,21,0,13,1,8,1,8,0],
+["A",99.995293,13,1,21,1,13,0,5,0,3,1,5,0,13,1],
+["B",99.99529,5,1,21,0,55,0,8,0,5,1,34,1,21,0],
+["B",99.995275,3,0,1,0,55,1,8,0,5,1,13,1,21,0],
+["D",99.995266,2,0,55,0,1,1,21,0,13,1,55,1,34,0],
+["D",99.995262,13,1,8,0,1,1,21,0,13,1,55,1,34,0],
+["B",99.995259,21,1,8,1,55,1,8,0,5,1,55,0,55,0],
+["B",99.995247,55,0,13,0,5,0,8,0,5,1,13,1,13,0],
+["B",99.995232,8,1,55,0,21,0,8,0,5,1,34,1,21,0],
+["C",99.99523,5,0,8,1,13,0,13,0,8,1,8,0,13,1],
+["D",99.9952,2,1,8,0,1,0,21,0,13,1,21,1,55,0],
+["A",99.995198,34,0,8,0,2,1,5,0,3,1,8,0,55,1],
+["A",99.995192,1,1,13,1,2,0,5,0,3,1,34,0,21,0],
+["B",99.995184,55,1,5,0,55,1,8,0,5,1,13,1,13,0],
+["B",99.995169,3,0,13,0,3,0,8,0,5,1,55,1,34,0],
+["B",99.995169,3,1,21,1,1,0,8,0,5,1,21,1,21,0],
+["B",99.995167,13,0,5,1,3,0,8,0,5,1,13,0,34,1],
+["A",99.995157,13,1,2,0,55,1,5,0,3,1,5,1,5,0],
+["B",99.995135,5,1,21,0,3,0,8,0,5,1,13,1,13,0],
+["C",99.995133,5,0,3,1,1,0,13,0,8,1,21,0,34,1],
+["B",99.995123,13,0,3,1,5,0,8,0,5,1,2,0,3,1],
+["C",99.9951,8,0,13,0,1,0,13,0,8,1,34,0,34,1],
+["B",99.995099,34,0,21,0,8,1,8,0,5,1,13,0,34,1],
+["D",99.995096,8,1,13,1,2,0,21,0,13,1,34,1,55,0],
+["A",99.995094,13,0,2,0,21,0,5,0,3,1,34,0,34,0],
+["A",99.995085,8,0,34,1,34,1,5,0,3,1,5,0,13,1],
+["D",99.995077,5,0,8,0,13,0,21,0,13,1,55,0,55,1],
+["D",99.995073,5,1,3,1,8,1,21,0,13,1,21,0,55,1],
+["A",99.995063,55,0,34,1,21,0,5,0,3,1,34,0,21,0],
+["C",99.995061,5,0,8,1,1,1,13,0,8,1,2,0,3,1],
+["C",99.995061,8,1,21,1,21,0,13,0,8,1,8,0,13,1],
+["D",99.995057,21,0,3,1,2,1,21,0,13,1,5,0,8,1],
+["D",99.99505,2,1,1,1,3,0,21,0,13,1,8,1,8,0],
+["B",99.995034,21,0,34,1,13,0,8,0,5,1,34,1,21,0],
+["C",99.995028,34,0,1,0,55,1,13,0,8,1,13,0,13,1],
+["D",99.995019,3,0,2,1,5,1,21,0,13,1,13,1,13,0],
+["D",99.995017,13,0,1,1,1,1,21,0,13,1,21,0,55,0],
+["C",99.994998,3,1,5,0,21,0,13,0,8,1,34,1,34,0],
+["C",99.994992,5,1,55,1,55,0,13,0,8,1,8,0,13,1],
+["A",99.994989,13,0,21,1,3,0,5,0,3,1,21,0,34,0],
+["A",99.994986,34,1,34,0,21,1,5,0,3,1,34,0,21,0],
+["B",99.994983,8,1,8,0,13,0,8,0,5,1,5,0,8,1],
+["A",99.994966,13,0,13,1,2,0,5,0,3,1,8,0,34,1],
+["C",99.994963,13,1,55,1,2,0,13,0,8,1,21,0,34,1],
+["A",99.994954,3,0,55,0,5,1,5,0,3,1,5,0,13,1],
+["B",99.994953,13,1,5,1,55,1,8,0,5,1,55,1,21,0],
+["D",99.994946,21,1,21,1,34,0,21,0,13,1,34,0,55,1],
+["A",99.994945,2,1,3,0,13,1,5,0,3,1,8,0,34,1],
+["A",99.994942,3,0,8,0,34,0,5,0,3,1,8,0,34,1],
+["A",99.994937,21,1,8,1,2,1,5,0,3,1,21,0,21,0],
+["A",99.994933,1,1,21,1,5,0,5,0,3,1,8,0,55,1],
+["A",99.994929,3,1,34,1,13,1,5,0,3,1,8,0,55,1],
+["A",99.994925,1,0,34,1,34,1,5,0,3,1,21,0,34,0],
+["A",99.994924,13,0,34,1,55,1,5,0,3,1,5,0,13,1],
+["B",99.994911,21,1,3,0,21,0,8,0,5,1,8,0,13,1],
+["B",99.994904,2,1,34,1,2,0,8,0,5,1,5,0,8,1],
+["B",99.9949,8,1,34,0,34,0,8,0,5,1,34,1,21,0],
+["A",99.994899,55,0,13,0,5,1,5,0,3,1,5,0,13,1],
+["A",99.994895,55,0,1,1,2,1,5,0,3,1,21,0,13,0],
+["B",99.994878,8,1,2,1,34,1,8,0,5,1,3,0,5,1],
+["D",99.994862,1,0,8,1,2,0,21,0,13,1,13,1,21,0],
+["D",99.994861,13,1,3,1,8,1,21,0,13,1,55,1,34,0],
+["A",99.99486,21,1,5,0,21,1,5,0,3,1,55,1,13,0],
+["A",99.994858,13,0,2,1,1,1,5,0,3,1,34,1,8,0],
+["C",99.994838,3,1,2,1,21,0,13,0,8,1,55,0,55,0],
+["C",99.994835,2,1,5,0,21,0,13,0,8,1,13,0,21,1],
+["C",99.994823,13,1,5,1,1,1,13,0,8,1,13,0,55,1],
+["B",99.99482,55,1,34,1,3,0,8,0,5,1,5,0,8,1],
+["A",99.994817,13,1,21,0,55,1,5,0,3,1,13,1,8,0],
+["D",99.994816,13,1,5,0,5,0,21,0,13,1,34,0,34,1],
+["C",99.994811,3,0,8,0,5,0,13,0,8,1,34,0,55,1],
+["A",99.994795,21,0,21,1,13,0,5,0,3,1,34,0,21,0],
+["B",99.994785,2,0,34,0,1,0,8,0,5,1,55,1,55,0],
+["A",99.994778,5,1,34,1,8,0,5,0,3,1,34,0,21,0],
+["C",99.994772,8,0,34,0,2,1,13,0,8,1,13,1,13,0],
+["C",99.994769,34,1,1,0,5,1,13,0,8,1,21,1,55,0],
+["C",99.994766,8,0,2,1,2,1,13,0,8,1,13,0,55,1],
+["C",99.994761,8,1,8,1,5,1,13,0,8,1,5,0,8,1],
+["C",99.994756,3,0,8,1,34,0,13,0,8,1,8,0,13,1],
+["B",99.994737,1,0,3,0,5,1,8,0,5,1,21,1,21,0],
+["D",99.994732,1,0,5,1,3,0,21,0,13,1,34,1,55,0],
+["A",99.994723,8,1,55,1,13,0,5,0,3,1,34,0,21,0],
+["A",99.99471,34,0,3,1,8,1,5,0,3,1,21,0,21,0],
+["B",99.99471,21,0,2,1,13,0,8,0,5,1,21,1,13,0],
+["A",99.99471,55,0,8,0,1,1,5,0,3,1,21,0,21,0],
+["B",99.994698,5,1,2,1,1,0,8,0,5,1,13,0,34,1],
+["A",99.994694,5,0,8,0,13,0,5,0,3,1,8,0,34,1],
+["B",99.994691,3,1,2,1,3,0,8,0,5,1,34,0,55,0],
+["B",99.994681,21,0,2,1,21,1,8,0,5,1,8,0,21,1],
+["C",99.99468,55,0,21,1,8,0,13,0,8,1,21,1,21,0],
+["B",99.994679,5,0,1,0,34,0,8,0,5,1,13,1,21,0],
+["A",99.994649,21,1,55,1,5,1,5,0,3,1,8,0,55,1],
+["A",99.994647,34,0,8,1,13,1,5,0,3,1,13,0,55,0],
+["A",99.994638,34,0,8,1,55,1,5,0,3,1,8,0,55,1],
+["B",99.994635,8,1,8,1,8,1,8,0,5,1,2,0,3,1],
+["C",99.994629,1,0,1,0,21,1,13,0,8,1,34,0,21,1],
+["A",99.994629,2,0,21,1,21,1,5,0,3,1,13,1,8,0],
+["A",99.994628,5,1,34,0,55,0,5,0,3,1,34,0,21,0],
+["D",99.994625,13,0,1,0,21,0,21,0,13,1,8,0,8,1],
+["B",99.994612,3,1,21,0,3,1,8,0,5,1,8,1,8,0],
+["A",99.994608,3,1,13,0,1,0,5,0,3,1,34,0,34,0],
+["A",99.994606,8,0,1,1,3,1,5,0,3,1,8,1,5,0],
+["B",99.994596,13,1,2,1,8,0,8,0,5,1,21,1,13,0],
+["C",99.994587,2,1,55,1,55,0,13,0,8,1,21,0,55,1],
+["C",99.994577,13,0,2,0,2,1,13,0,8,1,55,1,55,0],
+["A",99.994573,3,1,1,0,5,0,5,0,3,1,2,0,3,1],
+["C",99.994555,13,0,21,1,3,1,13,0,8,1,13,1,13,0],
+["B",99.994552,3,1,34,0,3,0,8,0,5,1,5,0,8,1],
+["D",99.994551,1,1,34,1,1,1,21,0,13,1,13,0,34,1],
+["B",99.994543,13,0,21,0,13,1,8,0,5,1,34,1,21,0],
+["A",99.994535,1,0,34,0,1,0,5,0,3,1,8,0,21,1],
+["D",99.99453,8,1,2,0,21,0,21,0,13,1,8,1,13,0],
+["C",99.99453,2,1,55,1,2,1,13,0,8,1,34,1,21,0],
+["B",99.994519,55,1,8,0,8,0,8,0,5,1,13,1,13,0],
+["A",99.994518,55,1,55,0,1,0,5,0,3,1,34,0,34,0],
+["D",99.994515,34,0,5,1,21,0,21,0,13,1,34,1,34,0],
+["A",99.994513,21,0,55,1,34,1,5,0,3,1,5,0,13,1],
+["D",99.994513,2,1,13,1,8,0,21,0,13,1,21,0,34,1],
+["A",99.994503,55,1,21,0,8,1,5,0,3,1,5,0,13,1],
+["A",99.994485,1,1,34,0,21,0,5,0,3,1,8,0,55,1],
+["D",99.994485,3,0,3,0,5,0,21,0,13,1,8,1,13,0],
+["B",99.994472,5,0,1,0,5,1,8,0,5,1,55,0,55,1],
+["B",99.994471,34,1,8,0,8,0,8,0,5,1,13,1,13,0],
+["A",99.99447,55,0,2,0,1,1,5,0,3,1,5,0,13,1],
+["B",99.994465,5,0,8,0,3,1,8,0,5,1,13,0,34,1],
+["D",99.994464,3,0,1,1,1,0,21,0,13,1,55,1,34,0],
+["B",99.994464,34,0,1,1,2,1,8,0,5,1,34,0,21,0],
+["A",99.994463,13,1,34,0,3,1,5,0,3,1,13,0,55,0],
+["B",99.994448,3,1,55,0,8,0,8,0,5,1,34,1,21,0],
+["B",99.994432,55,1,21,1,13,0,8,0,5,1,13,0,34,1],
+["C",99.994427,55,0,1,1,8,0,13,0,8,1,3,0,5,1],
+["A",99.994397,2,1,2,0,2,1,5,0,3,1,21,0,34,0],
+["A",99.994396,8,0,55,1,34,0,5,0,3,1,13,1,8,0],
+["B",99.994367,34,0,3,0,21,1,8,0,5,1,55,1,34,0],
+["B",99.99435,1,1,3,0,13,0,8,0,5,1,13,1,13,0],
+["D",99.994327,3,0,8,0,21,1,21,0,13,1,34,1,55,0],
+["A",99.994317,13,1,2,0,55,1,5,0,3,1,21,0,55,0],
+["D",99.994299,3,0,3,0,5,1,21,0,13,1,34,0,34,1],
+["C",99.994288,55,1,2,0,13,0,13,0,8,1,55,0,55,1],
+["B",99.994288,8,1,5,1,55,0,8,0,5,1,2,0,3,1],
+["B",99.994286,13,1,5,1,21,0,8,0,5,1,8,1,8,0],
+["B",99.994274,21,0,1,0,55,0,8,0,5,1,34,0,34,1],
+["C",99.994272,21,1,1,1,5,1,13,0,8,1,34,0,34,0],
+["A",99.994265,21,1,3,1,1,1,5,0,3,1,34,0,13,0],
+["B",99.994263,5,0,21,0,2,0,8,0,5,1,8,0,13,1],
+["C",99.994258,2,1,55,1,8,0,13,0,8,1,8,0,13,1],
+["C",99.994251,5,1,21,1,5,0,13,0,8,1,21,1,21,0],
+["B",99.99425,55,0,34,0,1,0,8,0,5,1,34,1,34,0],
+["B",99.99425,21,0,5,0,5,0,8,0,5,1,55,1,34,0],
+["C",99.994229,5,0,21,1,2,0,13,0,8,1,55,1,55,0],
+["D",99.994226,2,0,34,1,5,1,21,0,13,1,34,0,55,1],
+["A",99.994223,2,1,34,0,8,0,5,0,3,1,34,0,21,0],
+["A",99.994208,34,0,5,1,8,0,5,0,3,1,8,0,55,1],
+["D",99.994207,8,0,1,0,13,0,21,0,13,1,2,1,3,0],
+["D",99.994202,2,1,3,0,34,1,21,0,13,1,21,1,34,0],
+["A",99.994202,34,1,21,0,13,1,5,0,3,1,34,0,21,0],
+["A",99.994194,2,0,8,0,34,1,5,0,3,1,8,0,34,1],
+["A",99.994186,3,0,5,1,21,1,5,0,3,1,13,0,55,0],
+["A",99.994178,8,1,5,0,3,1,5,0,3,1,34,0,21,0],
+["C",99.994176,1,1,8,0,13,1,13,0,8,1,21,0,55,1],
+["A",99.994176,13,1,21,0,1,1,5,0,3,1,13,0,34,0],
+["A",99.994164,5,0,55,1,13,1,5,0,3,1,5,0,13,1],
+["D",99.994157,2,1,8,1,34,0,21,0,13,1,13,0,21,1],
+["D",99.994128,8,0,21,1,1,0,21,0,13,1,8,1,13,0],
+["C",99.994126,55,1,13,1,3,1,13,0,8,1,5,0,8,1],
+["A",99.99412,8,0,1,0,13,0,5,0,3,1,8,1,8,0],
+["C",99.994113,34,1,8,1,2,0,13,0,8,1,13,0,21,1],
+["B",99.994105,5,0,8,0,21,0,8,0,5,1,13,1,13,0],
+["D",99.994103,3,0,8,0,34,0,21,0,13,1,55,0,55,1],
+["B",99.994083,55,0,34,1,34,0,8,0,5,1,13,0,34,1],
+["B",99.994075,2,0,21,0,3,0,8,0,5,1,55,1,34,0],
+["A",99.994068,21,1,1,0,13,0,5,0,3,1,55,1,21,0],
+["A",99.994058,1,1,5,1,5,1,5,0,3,1,13,0,34,0],
+["C",99.994038,3,0,13,0,21,0,13,0,8,1,34,1,34,0],
+["A",99.994037,3,1,2,0,21,1,5,0,3,1,34,1,13,0],
+["C",99.994028,3,1,55,1,3,1,13,0,8,1,5,0,8,1],
+["A",99.994022,2,1,5,0,5,1,5,0,3,1,34,0,21,0],
+["A",99.994021,3,0,8,1,2,0,5,0,3,1,8,0,34,1],
+["B",99.994016,2,1,55,0,2,0,8,0,5,1,13,1,13,0],
+["D",99.994015,13,1,21,1,1,1,21,0,13,1,5,0,8,1],
+["A",99.994005,2,1,34,1,55,1,5,0,3,1,8,0,55,1]
 ];
 /* eslint-enable */
 
@@ -28906,6 +28932,9 @@ function calculateRAFromEarthPerihelion(obj) {
   return _periRA_SPHERICAL.theta;
 }
 
+const _moonVisualCorrection = new THREE.Vector3();
+const _moonVisualMatrix = new THREE.Matrix4();
+
 function updatePositions() {
   // 0.  Update world matrices for objects we need (optimized)
   //     Instead of scene.updateMatrixWorld(true) which traverses ALL objects,
@@ -28969,6 +28998,35 @@ function updatePositions() {
     SPHERICAL.setFromVector3(LOCAL);                 // Earth local frame
     obj.ra  = SPHERICAL.theta;                       // radians
     obj.dec = SPHERICAL.phi;                         // radians
+
+    // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
+    // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
+    if (obj._meeusLonDeg !== undefined && obj._meeusLatRad !== undefined) {
+      const eps = (23.4393 - 0.01300 * (obj._meeusT || 0)) * (Math.PI / 180);
+      const cosE = Math.cos(eps), sinE = Math.sin(eps);
+      const lamR = obj._meeusLonDeg * (Math.PI / 180);
+      const betR = obj._meeusLatRad;
+      const sinLam = Math.sin(lamR), cosLam = Math.cos(lamR);
+      const sinBet = Math.sin(betR), cosBet = Math.cos(betR);
+
+      // Ecliptic → equatorial (Meeus eq. 13.3, 13.4)
+      let newRA = Math.atan2(sinLam * cosE - Math.tan(betR) * sinE, cosLam);
+      if (newRA < 0) newRA += 2 * Math.PI;
+      const newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+
+      obj.ra  = newRA;                     // override RA
+      obj.dec = Math.PI / 2 - newDec;      // override Dec (phi convention)
+
+      // Correct 3D visual position to match Meeus-corrected RA+Dec
+      SPHERICAL.theta = obj.ra;
+      SPHERICAL.phi = obj.dec;
+      _moonVisualCorrection.setFromSpherical(SPHERICAL);
+      _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);          // local → world
+      _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
+      _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);                      // world → orbitObj local
+      obj.pivotObj.position.copy(_moonVisualCorrection);
+      obj.rotationAxis.position.copy(_moonVisualCorrection);
+    }
 
     /*  SUN → PLANET (distance)  */
     DELTA.subVectors(PLANET_POS, SUN_POS);           // reuse DELTA
@@ -29204,6 +29262,115 @@ function moveModel(pos) {
       const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+    }
+
+    // Full Meeus Ch. 47 lunar perturbations (longitude + latitude)
+    // Replaces the simplified 4-term longitude + 13-term latitude with the complete series.
+    // Geocentric accuracy: ~0.04° residual RMS at eclipses (verified against NASA GSFC catalog).
+    if (useVariableSpeed && obj.lunarPerturbations) {
+      const d = (startmodelJD - 2451545.0) + pos * meansolaryearlengthinDays;
+      const _d2r = Math.PI / 180;
+      const T = d / 36525;
+      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+
+      // Fundamental arguments (Meeus Ch. 47, degrees → radians)
+      const Lp = (218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000) * _d2r;
+      const Dr = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * _d2r;
+      const Mr = ((357.5291092 + 35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * _d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * _d2r;
+      const Fr = ((93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * _d2r;
+
+      // E correction for Sun's eccentricity
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E * E;
+
+      // Additional arguments
+      const A1 = (119.75 + 131.849*T) * _d2r;
+      const A2 = (53.09 + 479264.290*T) * _d2r;
+      const A3 = (313.45 + 481266.484*T) * _d2r;
+
+      // ── Sigma_l: longitude series (Table 47.A, 60 terms) ──
+      // Table-driven to avoid sign errors: [D, M, M', F, coeff_l (×10⁻⁶ deg)]
+      const MOON_L = [
+        [0,0,1,0, 6288774],[2,0,-1,0, 1274027],[2,0,0,0, 658314],[0,0,2,0, 213618],
+        [0,1,0,0, -185116],[0,0,0,2, -114332],[2,0,-2,0, 58793],[2,-1,-1,0, 57066],
+        [2,0,1,0, 53322],[2,-1,0,0, 45758],[0,1,-1,0, -40923],[1,0,0,0, -34720],
+        [0,1,1,0, -30383],[2,0,0,-2, 15327],[0,0,1,2, -12528],[0,0,1,-2, 10980],
+        [4,0,-1,0, 10675],[0,0,3,0, 10034],[4,0,-2,0, 8548],[2,1,-1,0, -7888],
+        [2,1,0,0, -6766],[1,0,-1,0, -5163],[1,1,0,0, 4987],[2,-1,1,0, 4036],
+        [2,0,2,0, 3994],[4,0,0,0, 3861],[2,0,-3,0, 3665],[0,1,-2,0, -2689],
+        [2,0,-1,2, -2602],[2,-1,-2,0, 2390],[1,0,1,0, -2348],[2,-2,0,0, 2236],
+        [0,1,2,0, -2120],[0,2,0,0, -2069],[2,-2,-1,0, 2048],[2,0,1,-2, -1773],
+        [2,0,0,2, -1595],[4,-1,-1,0, 1215],[0,0,2,2, -1110],[3,0,-1,0, -892],
+        [2,1,1,0, -810],[4,-1,-2,0, 759],[0,2,-1,0, -713],[2,2,-1,0, -700],
+        [2,1,-2,0, 691],[2,-1,0,-2, 596],[4,0,1,0, 549],[0,0,4,0, 537],
+        [4,-1,0,0, 520],[1,0,-2,0, -487],[2,1,0,-2, -399],[0,0,2,-2, -381],
+        [1,1,1,0, 351],[3,0,-2,0, -340],[4,0,-3,0, 330],[2,-1,2,0, 327],
+        [0,2,1,0, -323],[1,1,-1,0, 299],[2,0,3,0, 294],
+      ];
+      let Sl = 0;
+      for (let i = 0; i < MOON_L.length; i++) {
+        const r = MOON_L[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      // Additional longitude corrections
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp - Fr) + 318*Math.sin(A2);
+
+      // Subtract EoC portion already provided by the off-center orbit geometry.
+      // Meeus main term: 6288774*sin(M') ≈ 6.289°; geometry provides half (e/2).
+      const eocHalf = moonOrbitalEccentricity / 2;
+      Sl -= (2 * eocHalf / _d2r * 1e6) * Math.sin(Mpr);
+      Sl -= (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
+
+      θ += Sl * 1e-6 * _d2r;
+
+      // ── Sigma_b: latitude series (Table 47.B, 60 terms) ──
+      // [D, M, M', F, coeff_b (×10⁻⁶ deg)]
+      const MOON_B = [
+        [0,0,0,1, 5128122],[0,0,1,1, 280602],[0,0,1,-1, 277693],[2,0,0,-1, 173237],
+        [2,0,-1,1, 55413],[2,0,-1,-1, 46271],[2,0,0,1, 32573],[0,0,2,1, 17198],
+        [2,0,1,-1, 9266],[0,0,2,-1, 8822],[2,-1,0,-1, 8216],[2,0,-2,-1, 4324],
+        [2,0,1,1, 4200],[2,1,0,-1, -3359],[2,-1,-1,1, 2463],[2,-1,0,1, 2211],
+        [2,-1,-1,-1, 2065],[0,1,-1,-1, -1870],[4,0,-1,-1, 1828],[0,1,0,1, -1794],
+        [0,0,0,3, -1749],[0,1,-1,1, -1565],[1,0,0,1, -1491],[0,1,1,1, -1475],
+        [0,1,1,-1, -1410],[0,1,0,-1, -1344],[1,0,0,-1, -1335],[0,0,3,1, 1107],
+        [4,0,0,-1, 1021],[4,0,-1,1, 833],[0,0,1,-3, 777],[4,0,-2,1, 671],
+        [2,0,0,-3, 607],[2,0,2,-1, 596],[2,-1,1,-1, 491],[2,0,-2,1, -451],
+        [0,0,3,-1, 439],[2,0,2,1, 422],[2,0,-3,-1, 421],[2,1,-1,1, -366],
+        [2,1,0,1, -351],[4,0,0,1, 331],[2,-1,1,1, 315],[2,-2,0,-1, 302],
+        [0,0,1,3, -283],[2,1,1,-1, -229],[1,1,0,-1, 223],[1,1,0,1, 223],
+        [0,1,-2,-1, -220],[2,1,-1,-1, -220],[1,0,1,1, -185],[2,-1,-2,-1, 181],
+        [0,1,2,1, -177],[4,0,-2,-1, 176],[4,-1,-1,-1, 166],[1,0,1,-1, -164],
+        [4,0,1,-1, 132],[1,0,-1,-1, -119],[4,-1,0,-1, 115],[2,-2,0,1, 107],
+      ];
+      let Sb = 0;
+      for (let i = 0; i < MOON_B.length; i++) {
+        const r = MOON_B[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      // Additional latitude corrections
+      Sb += -2235*Math.sin(Lp) + 382*Math.sin(A3);
+      Sb += 175*Math.sin(A1 - Fr) + 175*Math.sin(A1 + Fr);
+      Sb += 127*Math.sin(Lp - Mpr) - 115*Math.sin(Lp + Mpr);
+
+      obj._meeusLatRad = Sb * 1e-6 * _d2r;
+
+      // Store full Meeus ecliptic longitude for post-hoc RA+Dec override in updatePositions.
+      // Re-add the EoC half that was subtracted from Sl for the hierarchy θ correction.
+      const fullSl = Sl + (2 * eocHalf / _d2r * 1e6) * Math.sin(Mpr)
+                       + (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
+      obj._meeusLonDeg = Lp / _d2r + fullSl * 1e-6;  // ecliptic longitude in degrees
+      obj._meeusT = T;  // store T for obliquity computation
     }
 
     const a = obj.a ?? obj.orbitRadius;   // semi-major (or radius)

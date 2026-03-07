@@ -165,14 +165,14 @@ Amplitudes derived from Fibonacci Laws: `amp = psi / (d x sqrt(m))`, with single
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | Trend Error |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.727893 | 0.385911 | 6.34 - 7.11 | 203.3195 deg (203 deg group) | ~1.6"/cy |
-| Venus | 2.207538 | 0.062074 | 2.15 - 2.27 | 203.3195 deg (203 deg group) | ~21.7"/cy |
+| Mercury | 6.726620 | 0.384621 | 6.34 - 7.11 | 203.3195 deg (203 deg group) | ~1.6"/cy |
+| Venus | 2.207361 | 0.061866 | 2.15 - 2.27 | 203.3195 deg (203 deg group) | ~21.7"/cy |
 | Earth | 1.481592 | 0.633849 | 0.85 - 2.12 | 203.3195 deg (203 deg group) | (reference) |
-| Mars | 2.653311 | 1.162513 | 1.49 - 3.82 | 203.3195 deg (203 deg group) | ~17.9"/cy |
-| Jupiter | 0.329124 | 0.021372 | 0.31 - 0.35 | 203.3195 deg (203 deg group) | ~3.0"/cy |
-| Saturn | 0.931699 | 0.065097 | 0.87 - 1.00 | 23.3195 deg (23 deg group, retrograde) | ~5.4"/cy |
-| Uranus | 1.000619 | 0.023796 | 0.98 - 1.02 | 203.3195 deg (203 deg group) | ~2.7"/cy |
-| Neptune | 0.722146 | 0.013531 | 0.71 - 0.74 | 203.3195 deg (203 deg group) | ~1.7"/cy |
+| Mars | 2.649893 | 1.158626 | 1.49 - 3.81 | 203.3195 deg (203 deg group) | ~17.9"/cy |
+| Jupiter | 0.329100 | 0.021301 | 0.31 - 0.35 | 203.3195 deg (203 deg group) | ~3.0"/cy |
+| Saturn | 0.931678 | 0.064879 | 0.87 - 1.00 | 23.3195 deg (23 deg group, retrograde) | ~5.4"/cy |
+| Uranus | 1.000600 | 0.023716 | 0.98 - 1.02 | 203.3195 deg (203 deg group) | ~2.7"/cy |
+| Neptune | 0.722190 | 0.013486 | 0.71 - 0.74 | 203.3195 deg (203 deg group) | ~1.7"/cy |
 | Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.3195 deg | ~5.6"/cy |
 
 **Formula**: `i(t) = mean + amplitude x cos(omega(t) - phaseAngle)`

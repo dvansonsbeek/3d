@@ -11,7 +11,7 @@ const perihelionalignmentYear = 1246;
 const startmodelJD = 2451716.5;
 const startmodelYear = 2000.5;
 const correctionDays = -0.23328398168087;
-const correctionSun = 0.511153;
+const correctionSun = 0.471334;
 const temperatureGraphMostLikely = 14.5;
 const earthRAAngle = 1.258454;
 const earthtiltMean = 23.41357;
@@ -22,8 +22,7 @@ const eccentricityAmplitude = 0.001370;
 const startAngleModel = 89.91949879;
 const currentAUDistance = 149597870.698828;
 const useVariableSpeed = true; // Toggle equation of center (must match script.js)
-const perihelionPhaseOffset = 2; // degrees — independent offset to perihelion direction
-const eocEccentricity = 0.0085; // Equation of center eccentricity (reduced — geometric offset provides partial speed variation)
+// eocEccentricity and perihelionPhaseOffset are derived below (after eccentricityDerivedMean)
 
 // --- Moon input constants (lines 78-88) ---
 const moonSiderealMonthInput = 27.32166156;
@@ -33,21 +32,21 @@ const moonDistance = 384399.07;
 const moonEclipticInclinationJ2000 = 5.1453964;
 const moonOrbitalEccentricity = 0.054900489;
 const moonTilt = 6.687;
-const moonStartposApsidal = 330;
-const moonStartposNodal = 64;
-const moonStartposMoon = 132.105;
+const moonStartposApsidal = 347.622;
+const moonStartposNodal = -83.630;
+const moonStartposMoon = 131.930;
 
 // --- Per-planet input constants (lines 91-186) ---
 const planets = {
   mercury: {
     name: 'Mercury',
-    solarYearInput: 87.96845,
+    solarYearInput: 87.9686,
     eclipticInclinationJ2000: 7.00497902,
     orbitalEccentricity: 0.20563593,
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
-    angleCorrection: 0.984366,
+    angleCorrection: 0.984218,
     perihelionEclipticYears: H / (1 + 3/8),
     startpos: 84.205,
     invPlaneInclinationMean: null, // filled below
@@ -59,13 +58,13 @@ const planets = {
   },
   venus: {
     name: 'Venus',
-    solarYearInput: 224.6965,
+    solarYearInput: 224.6967,
     eclipticInclinationJ2000: 3.39467605,
     orbitalEccentricity: 0.00677672,
     invPlaneInclinationJ2000: 2.1545441,
     longitudePerihelion: 131.5765919,
     ascendingNode: 76.67877109,
-    angleCorrection: -2.782986,
+    angleCorrection: -2.783252,
     perihelionEclipticYears: H * 2,
     startpos: 249.69,
     invPlaneInclinationMean: null,
@@ -83,7 +82,7 @@ const planets = {
     invPlaneInclinationJ2000: 1.6311858,
     longitudePerihelion: 336.0650681,
     ascendingNode: 49.55737662,
-    angleCorrection: -2.10564,
+    angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
     startpos: 121.512,
     invPlaneInclinationMean: null,
@@ -95,13 +94,13 @@ const planets = {
   },
   jupiter: {
     name: 'Jupiter',
-    solarYearInput: 4330.595,
+    solarYearInput: 4330.6,
     eclipticInclinationJ2000: 1.30439695,
     orbitalEccentricity: 0.04838624,
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
     ascendingNode: 100.4877868,
-    angleCorrection: 1.097601,
+    angleCorrection: 1.095885,
     perihelionEclipticYears: H / 5,
     startpos: 13.76,
     invPlaneInclinationMean: null,
@@ -119,7 +118,7 @@ const planets = {
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
     ascendingNode: 113.6452856,
-    angleCorrection: -0.175436,
+    angleCorrection: -0.175438,
     perihelionEclipticYears: -H / 8,
     startpos: 11.397,
     invPlaneInclinationMean: null,
@@ -137,7 +136,7 @@ const planets = {
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
     ascendingNode: 74.00919023,
-    angleCorrection: -0.774123,
+    angleCorrection: -0.775884,
     perihelionEclipticYears: H / 3,
     startpos: 44.71,
     invPlaneInclinationMean: null,
@@ -149,13 +148,13 @@ const planets = {
   },
   neptune: {
     name: 'Neptune',
-    solarYearInput: 59896,
+    solarYearInput: 59980,
     eclipticInclinationJ2000: 1.77004347,
     orbitalEccentricity: 0.00859048,
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
     ascendingNode: 131.7853754,
-    angleCorrection: 2.400885,
+    angleCorrection: 2.40008,
     perihelionEclipticYears: H * 2,
     startpos: 47.95,
     invPlaneInclinationMean: null,
@@ -204,6 +203,30 @@ const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLeng
 const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1) + meanSiderealDay;
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
+
+// Equation of center eccentricity — derived, not a free parameter.
+// Off-center geometry provides amplitude e_geom (first order); EoC adds 2·eoc.
+// Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
+const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
+
+// Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
+const perihelionRefJD = 2451547.042; // JD of Earth perihelion 2000 (Jan 3.542)
+const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / (H / 16) * 360
+  + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
+
+// Lunar mean longitude coefficients at J2000.0 (Meeus, "Astronomical Algorithms", Ch. 47)
+const ASTRO_REFERENCE = {
+  moonMeanAnomalyJ2000_deg: 134.9634,
+  moonMeanAnomalyRate_degPerDay: 13.06499295,
+  moonMeanElongationJ2000_deg: 297.8502,
+  moonMeanElongationRate_degPerDay: 12.19074912,
+  sunMeanAnomalyJ2000_deg: 357.5291,
+  sunMeanAnomalyRate_degPerDay: 0.98560028,
+  moonArgLatJ2000_deg: 93.2720993,
+  moonArgLatRate_degPerCentury: 483202.0175273,
+  moonMeanElongationJ2000Full_deg: 297.8502042,
+  moonMeanElongationRate_degPerCentury: 445267.1115168,
+};
 
 // --- Moon derived cycles (lines 992-1011) ---
 const totalDaysInH = H * meanSolarYearDays;
@@ -266,13 +289,13 @@ function computePlanetDerived(key) {
 
 // --- Fill in invPlaneInclination mean/amplitude from script.js ~lines 345-398 ---
 const planetInclinationData = {
-  mercury: { mean: 6.727893, amplitude: 0.385911 },
-  venus:   { mean: 2.207538, amplitude: 0.062074 },
-  mars:    { mean: 2.653311, amplitude: 1.162513 },
-  jupiter: { mean: 0.329124, amplitude: 0.021372 },
-  saturn:  { mean: 0.931699, amplitude: 0.065097 },
-  uranus:  { mean: 1.000619, amplitude: 0.023796 },
-  neptune: { mean: 0.722146, amplitude: 0.013531 },
+  mercury: { mean: 6.726620, amplitude: 0.384621 },
+  venus:   { mean: 2.207361, amplitude: 0.061866 },
+  mars:    { mean: 2.649893, amplitude: 1.158626 },
+  jupiter: { mean: 0.329100, amplitude: 0.021301 },
+  saturn:  { mean: 0.931678, amplitude: 0.064879 },
+  uranus:  { mean: 1.000600, amplitude: 0.023716 },
+  neptune: { mean: 0.722190, amplitude: 0.013486 },
 };
 for (const [key, data] of Object.entries(planetInclinationData)) {
   if (planets[key]) {
@@ -443,6 +466,8 @@ module.exports = {
   useVariableSpeed,
   perihelionPhaseOffset,
   eocEccentricity,
+  perihelionRefJD,
+  ASTRO_REFERENCE,
 
   // Moon inputs
   moonSiderealMonthInput,

@@ -24,27 +24,27 @@
 // Run with: node appendix-g-mercury-precession-centuries.js
 // ═══════════════════════════════════════════════════════════════════════════
 
-const holisticyearLength = 333888;
+const holisticyearLength = 335008;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury's perihelion precession period (ecliptic frame)
-const mercuryPerihelionEclipticYears = holisticyearLength / (1 + 3/8);  // ~242,828 years
+const mercuryPerihelionEclipticYears = holisticyearLength / (1 + 3/8);  // ~243,642 years
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()
 const eclipticRate = 129600000 / mercuryPerihelionEclipticYears;
 
 // Earth precession cycles (affect Earth-frame measurements)
-const earthAxialPrecessionPeriod = holisticyearLength / 13;        // ~25,684 years
-const earthObliquityPeriod = holisticyearLength / 8;               // ~41,736 years
-const earthInclinationPrecessionPeriod = holisticyearLength / 3;   // ~111,296 years
-const earthEclipticPrecessionPeriod = holisticyearLength / 5;      // ~66,778 years
+const earthAxialPrecessionPeriod = holisticyearLength / 13;        // ~25,770 years
+const earthObliquityPeriod = holisticyearLength / 8;               // ~41,876 years
+const earthInclinationPrecessionPeriod = holisticyearLength / 3;   // ~111,669 years
+const earthEclipticPrecessionPeriod = holisticyearLength / 5;      // ~67,002 years
 
 // Dominant fluctuation period (beat frequency between Earth's cycles)
-const dominantFluctuationPeriod = holisticyearLength / 45;         // ~7,420 years
+const dominantFluctuationPeriod = holisticyearLength / 45;         // ~7,445 years
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MAIN OUTPUT
@@ -117,16 +117,16 @@ console.log('══════════════════════�
 console.log('');
 console.log('The ~7,400 year period arises from beat frequencies between:');
 console.log('');
-console.log('  Earth\'s inclination precession:    1/3 of Holistic Year   (111,296 years)');
-console.log('  Earth\'s ecliptic precession:       1/5 of Holistic Year   (66,778 years)');
+console.log('  Earth\'s inclination precession:    1/3 of Holistic Year   (111,669 years)');
+console.log('  Earth\'s ecliptic precession:       1/5 of Holistic Year   (67,002 years)');
 console.log('');
 console.log('  Beat frequency: 1/(1/3 - 1/5) = 15/2 → ~44,518 years fundamental');
 console.log('  Further harmonics divide this to produce ~7,400 year observed period');
 console.log('');
 console.log('Scene graph hierarchy in script.js:');
 console.log('  └── earth');
-console.log('        └── earthInclinationPrecession      ← 111,296 year cycle');
-console.log('              └── earthEclipticPrecession   ← 66,778 year cycle');
+console.log('        └── earthInclinationPrecession      ← 111,669 year cycle');
+console.log('              └── earthEclipticPrecession   ← 67,002 year cycle');
 console.log('                    └── earthObliquityPrecession');
 console.log('                          └── earthPerihelionPrecession1');
 console.log('                                └── mercuryPerihelionDurationEcliptic1');

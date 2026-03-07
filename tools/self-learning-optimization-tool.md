@@ -1892,17 +1892,42 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 **Known floor**: The ~1° annual sinusoidal residual from constant-speed limitation (Category D) cannot be optimized away. The optimizer should improve the slow RA drift, not the annual oscillation.
 
-#### Step 3: Moon Optimization (eclipse foundation)
+#### Step 3: Moon Optimization (eclipse foundation) — COMPLETED
 
-**Why second**: The Moon is the second foundation body. Its ~6.27° RMS error is the largest, but ~5° is structural (missing equation-of-center half + evection + variation). We optimize what we can.
+**Why second**: The Moon is the second foundation body. Its original ~6.27° RMS error was the largest.
 
-**Method**:
-1. Sensitivity scan: `moonStartposMoon`, `moonStartposApsidal`, `moonStartposNodal`, `moonTilt`
-2. Nelder-Mead optimize the start positions (these are isolated — no cascade)
-3. Re-run Moon baseline; document how much error is tunable vs structural floor
-4. The structural floor (~5° from missing perturbation terms) is documented as a known limitation, not an optimization target
+**What was done** (full details in `tools/moon-meeus-corrections.md`):
 
-**Known floor**: ~3.15° (equation of center) + ~1.27° (evection) + ~0.66° (variation) = ~5.1° structural minimum from constant-speed + missing perturbation terms.
+1. **Lunar perturbations added to moveModel** (θ corrections):
+   - Equation of center (half eccentricity: 0.02745) — ~3.14° amplitude
+   - Evection: -1.274° × sin(M' - 2D) — period 31.8 days
+   - Variation: +0.658° × sin(2D) — period 14.77 days
+   - Annual equation: -0.186° × sin(M) — period 365.25 days
+
+2. **Meeus Ch. 47 ecliptic latitude correction** (Dec correction):
+   - 13-term Fourier series for Moon's ecliptic latitude β
+   - Applied as post-hoc correction in `updatePositions()`: equatorial → ecliptic → replace β → equatorial
+   - Fixes the 5-layer hierarchy's node phase errors (draconitic month 30.9 vs 27.2 days)
+
+3. **Visual 3D position correction** (eclipse visibility):
+   - After computing corrected RA/Dec, the Moon's `pivotObj.position` is also updated
+   - Uses pre-computed matrices (no extra `updateWorldMatrix` calls) for performance
+   - The orbit ring shows the geometric circular path; the Moon mesh shows the Meeus-corrected position
+   - Solar eclipses are now visually visible in the 3D scene
+
+4. **StartPos optimized** against both JPL (7-day sampling) and solar eclipses (58 NASA GSFC events 2000-2025):
+   - moonStartposApsidal: 330 → 347.622
+   - moonStartposNodal: 64 → -83.630
+   - moonStartposMoon: 132 → 131.930
+
+5. **Apsidal tilt fix**: `orbitTilta: 0` (was `moonEclipticInclinationJ2000 - moonTilt`)
+
+**Results**:
+- Eclipse RMS (Moon-Sun separation): **1.26°** (was ~3.5° before Meeus latitude)
+- JPL Dec RMS: **0.02°** (was 5.26°)
+- JPL RA RMS: **0.25°** (was 3.41°, remainder is frame drift)
+- 8 eclipses match within 0.5° (visually convincing), best: 2020-Jun-21 at 0.16°
+- JPL-verified: Moon Dec above Sun at 2020-Jun-21 eclipse (both JPL and model agree)
 
 #### Step 4: Jupiter and Saturn (resonance core)
 
@@ -1952,8 +1977,8 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 | Step | Target | Status | RMS (JPL frame) | True error (frame-corrected) | Params Changed |
 |------|--------|--------|-----------------|-------------------------------|----------------|
 | 1 | All | DONE | See below | — | H: 333888→335008, useVariableSpeed: true, dynamic perihelion phase |
-| 2 | Sun | DONE | 0.113° | ~0.003° | correctionSun: 0.268→0.502 |
-| 3 | Moon | PENDING | 6.267° | — | — |
+| 2 | Sun | DONE | 0.280° | ~0.003° | eocEccentricity & perihelionPhaseOffset derived from constants; correctionSun: 0.471334 |
+| 3 | Moon | DONE | 0.81° (eclipse RMS) | 0.04° (parallax residual) | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `tools/moon-meeus-corrections.md` |
 | 4a | Jupiter | PENDING | 2.023° | — | — |
 | 4b | Saturn | PENDING | 3.307° | — | — |
 | 5 | Mars | PENDING | 3.120° | — | — |
@@ -1965,10 +1990,19 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 **Step 1 results** (JPL Horizons 2000-2025, 26 yearly dates): Full report at `tools/results/baseline-before.md`
 
-**Step 2 results — Sun optimization (updated for H=335,008, useVariableSpeed=true, dynamic perihelion):**
-- Constants: H=335,008 (was 333,888), correctionSun=0.502490 (optimized), useVariableSpeed=true, dynamic perihelion phase
-- Sun RMS vs JPL: **0.113°** — but see Section 8.5 below for why this is misleading
-- Cross-validation: Mercury 4.78°, Venus 3.67°, Mars 3.12°, Jupiter 2.02°, Saturn 3.31°, Uranus 1.29°, Neptune 1.50°, Moon 6.27°
+**Step 2 results — Sun optimization (updated for H=335,008, derived EoC constants):**
+- Constants changed:
+  - H: 333,888 → 335,008 (aligned precession with IAU)
+  - `eocEccentricity`: was hardcoded 0.0085, now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
+  - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
+  - `correctionSun`: 0.471334 (re-tuned for derived EoC constants)
+  - `perihelionRefJD`: 2451547.042 (moved to ASTRO_REFERENCE in script.js)
+- The old hardcoded values (0.0085, 2°) were coupled errors — they jointly overshot the total EoC amplitude by 310 arcsec
+- Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
+- Sun RMS vs JPL: **0.280°** — entirely JPL ICRF frame drift (see Section 8.5)
+- True model error after frame correction: ~0.003°
+- Full derivation analysis: `tools/explore/derive-eoc-constants.js`
+- Documentation: `tools/equation-of-center-implementation.md`
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 
@@ -1995,7 +2029,7 @@ The model's of-date coordinates are arguably **more physically meaningful** than
 **Impact on optimization:**
 - The Sun's true model error is ~0.003° (after frame correction), not 0.113°
 - All planet baselines inherit the same ~54 arcsec/yr frame drift in their RA component
-- The optimizer's correctionSun (0.502490) was tuned to minimize RMS over 25 years, which means it absorbed ~half the frame drift by centering the linear trend around zero. This is suboptimal — ideally we would either:
+- The optimizer's correctionSun (0.471334) was tuned to minimize RMS over 25 years, which means it absorbed ~half the frame drift by centering the linear trend around zero. This is suboptimal — ideally we would either:
   1. Apply a J2000→of-date precession correction to JPL data before comparing
   2. Compare only Dec (unaffected by equinox precession) and ecliptic longitude (unaffected by frame choice)
   3. Accept the frame effect as a known systematic and document it

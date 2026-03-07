@@ -397,7 +397,7 @@ function buildSceneGraph() {
     startPos: C.correctionSun,
     speed: Math.PI * 2,
     eccentricity: C.eocEccentricity,
-    perihelionPhaseJ2000: -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - 2451547.042) / C.meanSolarYearDays + (C.perihelionPhaseOffset || 0) * d2r, // JD 2451547.042 = Earth perihelion 2000
+    perihelionPhaseJ2000: -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays + C.perihelionPhaseOffset * d2r,
     perihelionPrecessionRate: Math.PI * 2 / C.perihelionCycleLength, // perihelion advances at H/16 rate
   };
   const sunNodes = makeObjectNodes('sun', sunDef);
@@ -407,7 +407,7 @@ function buildSceneGraph() {
   const moonApsidalPrec = makePrecessionNode('moonApsidalPrecession', {
     orbitRadius: -(C.moonDistance / C.currentAUDistance) * (C.moonOrbitalEccentricity * 100),
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: C.moonEclipticInclinationJ2000 - C.moonTilt, orbitTiltb: 0,
+    orbitTilta: 0, orbitTiltb: 0, // apsidal precession rotates perigee within the orbital plane — no plane tilt
     tilt: 0,
     startPos: C.moonStartposApsidal,
     speed: (Math.PI * 2) / (C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays),
@@ -456,6 +456,7 @@ function buildSceneGraph() {
     startPos: C.moonStartposMoon,
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonTropicalMonth)),
     eccentricity: C.moonOrbitalEccentricity,
+    lunarPerturbations: true,
   };
   const moonNodes = makeObjectNodes('moon', moonDef);
   moonNodalPrec.pivot.addChild(moonNodes.container);
@@ -549,6 +550,97 @@ function moveModel(graph, pos) {
       const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+    }
+    // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
+    if (C.useVariableSpeed && def.lunarPerturbations) {
+      const d = (C.startmodelJD - 2451545.0) + pos * C.meanSolarYearDays;
+      const T = d / 36525;
+      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+
+      const Lp = (218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000) * d2r;
+      const Dr = ((297.8501921 + 445267.1114034*T - 0.0018819*T2 + T3/545868 - T4/113065000) % 360) * d2r;
+      const Mr = ((357.5291092 + 35999.0502909*T - 0.0001536*T2 + T3/24490000) % 360) * d2r;
+      const Mpr = ((134.9633964 + 477198.8675055*T + 0.0087414*T2 + T3/69699 - T4/14712000) % 360) * d2r;
+      const Fr = ((93.2720950 + 483202.0175233*T - 0.0036539*T2 - T3/3526000 + T4/863310000) % 360) * d2r;
+
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const E2 = E * E;
+      const A1 = (119.75 + 131.849*T) * d2r;
+      const A2 = (53.09 + 479264.290*T) * d2r;
+      const A3 = (313.45 + 481266.484*T) * d2r;
+
+      // Table 47.A longitude terms [D, M, M', F, coeff_l]
+      const ML = [
+        [0,0,1,0, 6288774],[2,0,-1,0, 1274027],[2,0,0,0, 658314],[0,0,2,0, 213618],
+        [0,1,0,0, -185116],[0,0,0,2, -114332],[2,0,-2,0, 58793],[2,-1,-1,0, 57066],
+        [2,0,1,0, 53322],[2,-1,0,0, 45758],[0,1,-1,0, -40923],[1,0,0,0, -34720],
+        [0,1,1,0, -30383],[2,0,0,-2, 15327],[0,0,1,2, -12528],[0,0,1,-2, 10980],
+        [4,0,-1,0, 10675],[0,0,3,0, 10034],[4,0,-2,0, 8548],[2,1,-1,0, -7888],
+        [2,1,0,0, -6766],[1,0,-1,0, -5163],[1,1,0,0, 4987],[2,-1,1,0, 4036],
+        [2,0,2,0, 3994],[4,0,0,0, 3861],[2,0,-3,0, 3665],[0,1,-2,0, -2689],
+        [2,0,-1,2, -2602],[2,-1,-2,0, 2390],[1,0,1,0, -2348],[2,-2,0,0, 2236],
+        [0,1,2,0, -2120],[0,2,0,0, -2069],[2,-2,-1,0, 2048],[2,0,1,-2, -1773],
+        [2,0,0,2, -1595],[4,-1,-1,0, 1215],[0,0,2,2, -1110],[3,0,-1,0, -892],
+        [2,1,1,0, -810],[4,-1,-2,0, 759],[0,2,-1,0, -713],[2,2,-1,0, -700],
+        [2,1,-2,0, 691],[2,-1,0,-2, 596],[4,0,1,0, 549],[0,0,4,0, 537],
+        [4,-1,0,0, 520],[1,0,-2,0, -487],[2,1,0,-2, -399],[0,0,2,-2, -381],
+        [1,1,1,0, 351],[3,0,-2,0, -340],[4,0,-3,0, 330],[2,-1,2,0, 327],
+        [0,2,1,0, -323],[1,1,-1,0, 299],[2,0,3,0, 294],
+      ];
+      let Sl = 0;
+      for (let i = 0; i < ML.length; i++) {
+        const r = ML[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sl += term;
+      }
+      Sl += 3958*Math.sin(A1) + 1962*Math.sin(Lp - Fr) + 318*Math.sin(A2);
+      const eocHalf = C.moonOrbitalEccentricity / 2;
+      Sl -= (2 * eocHalf / d2r * 1e6) * Math.sin(Mpr);
+      Sl -= (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
+      θ += Sl * 1e-6 * d2r;
+
+      // Table 47.B latitude terms [D, M, M', F, coeff_b]
+      const MB = [
+        [0,0,0,1, 5128122],[0,0,1,1, 280602],[0,0,1,-1, 277693],[2,0,0,-1, 173237],
+        [2,0,-1,1, 55413],[2,0,-1,-1, 46271],[2,0,0,1, 32573],[0,0,2,1, 17198],
+        [2,0,1,-1, 9266],[0,0,2,-1, 8822],[2,-1,0,-1, 8216],[2,0,-2,-1, 4324],
+        [2,0,1,1, 4200],[2,1,0,-1, -3359],[2,-1,-1,1, 2463],[2,-1,0,1, 2211],
+        [2,-1,-1,-1, 2065],[0,1,-1,-1, -1870],[4,0,-1,-1, 1828],[0,1,0,1, -1794],
+        [0,0,0,3, -1749],[0,1,-1,1, -1565],[1,0,0,1, -1491],[0,1,1,1, -1475],
+        [0,1,1,-1, -1410],[0,1,0,-1, -1344],[1,0,0,-1, -1335],[0,0,3,1, 1107],
+        [4,0,0,-1, 1021],[4,0,-1,1, 833],[0,0,1,-3, 777],[4,0,-2,1, 671],
+        [2,0,0,-3, 607],[2,0,2,-1, 596],[2,-1,1,-1, 491],[2,0,-2,1, -451],
+        [0,0,3,-1, 439],[2,0,2,1, 422],[2,0,-3,-1, 421],[2,1,-1,1, -366],
+        [2,1,0,1, -351],[4,0,0,1, 331],[2,-1,1,1, 315],[2,-2,0,-1, 302],
+        [0,0,1,3, -283],[2,1,1,-1, -229],[1,1,0,-1, 223],[1,1,0,1, 223],
+        [0,1,-2,-1, -220],[2,1,-1,-1, -220],[1,0,1,1, -185],[2,-1,-2,-1, 181],
+        [0,1,2,1, -177],[4,0,-2,-1, 176],[4,-1,-1,-1, 166],[1,0,1,-1, -164],
+        [4,0,1,-1, 132],[1,0,-1,-1, -119],[4,-1,0,-1, 115],[2,-2,0,1, 107],
+      ];
+      let Sb = 0;
+      for (let i = 0; i < MB.length; i++) {
+        const r = MB[i];
+        const arg = r[0]*Dr + r[1]*Mr + r[2]*Mpr + r[3]*Fr;
+        let term = r[4] * Math.sin(arg);
+        const absM = r[1] < 0 ? -r[1] : r[1];
+        if (absM === 1) term *= E;
+        else if (absM === 2) term *= E2;
+        Sb += term;
+      }
+      Sb += -2235*Math.sin(Lp) + 382*Math.sin(A3);
+      Sb += 175*Math.sin(A1 - Fr) + 175*Math.sin(A1 + Fr);
+      Sb += 127*Math.sin(Lp - Mpr) - 115*Math.sin(Lp + Mpr);
+      nodes._meeusLatDeg = Sb * 1e-6;
+
+      // Full Meeus ecliptic longitude for post-hoc RA override
+      const fullSl = Sl + (2 * eocHalf / d2r * 1e6) * Math.sin(Mpr)
+                       + (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
+      nodes._meeusLonDeg = Lp / d2r + fullSl * 1e-6;
+      nodes._meeusT = T;
     }
     if (nodes.isEllipse) {
       const x = Math.cos(θ) * nodes.a;
@@ -671,6 +763,25 @@ function computePlanetPosition(target, jd) {
 
   // Convert to spherical (matches Three.js Spherical.setFromVector3)
   const sph = cartesianToSpherical(local[0], local[1], local[2]);
+
+  // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
+  if (target === 'moon' && C.useVariableSpeed &&
+      graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {
+    const T = graph.moonNodes._meeusT || 0;
+    const eps = (23.4393 - 0.01300 * T) * d2r;
+    const cosE = Math.cos(eps), sinE = Math.sin(eps);
+    const lamR = graph.moonNodes._meeusLonDeg * d2r;
+    const betR = graph.moonNodes._meeusLatDeg * d2r;
+    const sinLam = Math.sin(lamR), cosLam = Math.cos(lamR);
+    const sinBet = Math.sin(betR), cosBet = Math.cos(betR);
+
+    let newRA = Math.atan2(sinLam * cosE - Math.tan(betR) * sinE, cosLam);
+    if (newRA < 0) newRA += 2 * Math.PI;
+    const newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+
+    sph.theta = newRA;
+    sph.phi = Math.PI / 2 - newDec;
+  }
 
   return {
     ra: sph.theta,   // radians

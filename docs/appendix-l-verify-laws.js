@@ -12,13 +12,13 @@ const path = require('path');
 
 // ── Step 1: Reproduce the exact computation chain from script.js ──
 
-const holisticyearLength = 333888;
+const holisticyearLength = 335008;
 const inputmeanlengthsolaryearindays = 365.2421897;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 
 const solarYearInputs = {
-  mercury: 87.96845, venus: 224.6965, mars: 686.934,
-  jupiter: 4330.595, saturn: 10746.6, uranus: 30583, neptune: 59896,
+  mercury: 87.9686, venus: 224.6967, mars: 686.934,
+  jupiter: 4330.6, saturn: 10746.6, uranus: 30583, neptune: 59980,
 };
 
 const solarYearCounts = {};
@@ -32,7 +32,7 @@ for (const [k, c] of Object.entries(solarYearCounts)) {
 }
 
 // Mass computation chain
-const meansiderealyearlengthinSeconds = 31558149.724;
+const meansiderealyearlengthinSeconds = 31558149.8;
 const currentAUDistance = 149597870.698828;
 const meansiderealyearlengthinDays = meansolaryearlengthinDays * (holisticyearLength/13) / ((holisticyearLength/13) - 1);
 const meanlengthofday = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays;
@@ -58,12 +58,13 @@ const moonDistance = 384399.07;
 const moonSiderealMonthInput = 27.32166156;
 const moonSiderealMonth = (holisticyearLength * meansolaryearlengthinDays) /
   Math.ceil((holisticyearLength * meansolaryearlengthinDays) / moonSiderealMonthInput - 0);
-const moonAtApogee = 405400;
 const MASS_RATIO_EARTH_MOON = 81.3007;
 const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) /
   Math.pow(moonSiderealMonth * meanlengthofday, 2);
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) /
-  (1 - moonAtApogee / meanAUDistance);
+const meanSiderealday = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
+const SOLAR_SIDEREAL_DAY_RATIO = meanlengthofday / meanSiderealday;
+const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) *
+  SOLAR_SIDEREAL_DAY_RATIO;
 mass.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
 // Eccentricities (JPL J2000) — used for Laws 3/5 balance calculations
@@ -84,8 +85,8 @@ const inclJ2000 = {
   mercury: 6.3472858, venus: 2.1545441, mars: 1.6311858,
   jupiter: 0.3219652, saturn: 0.9254704, uranus: 0.9946692, neptune: 0.7354155,
 };
-const earthInvPlaneInclinationAmplitude = 0.633849;
-const earthInvPlaneInclinationMean = 1.481592;
+const earthInvPlaneInclinationAmplitude = 0.635956;
+const earthInvPlaneInclinationMean = 1.481180;
 const earthAscNodeInvPlane = 284.51;
 const earthPhaseAngle = 203.3195;
 const DEG2RAD = Math.PI / 180;

@@ -17,7 +17,7 @@
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-const holisticyearLength = 333888;
+const holisticyearLength = 335008;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EARTH REFERENCE (FIXED)
@@ -25,9 +25,9 @@ const holisticyearLength = 333888;
 
 const earthConfig = {
   omegaJ2000: 284.51,                     // Souami & Souchay (2012)
-  period: holisticyearLength / 3,         // 111,296 years
-  mean: 1.481592,
-  amplitude: 0.633849,
+  period: holisticyearLength / 3,         // 111,669 years
+  mean: 1.481180,
+  amplitude: 0.635956,
   inclJ2000: 1.57866663,
   phaseAngle: 203.3195
 };
@@ -66,65 +66,65 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 6.727893,
-    amplitude: 0.385911,
+    mean: 6.726620,
+    amplitude: 0.384621,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 32.83,
-    period: holisticyearLength / (1 + 3/8),  // ~242,828 years
+    period: holisticyearLength / (1 + 3/8),  // ~243,642 years
     inclJ2000: 6.3472858,
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
   venus: {
-    mean: 2.207538,
-    amplitude: 0.062074,
+    mean: 2.207361,
+    amplitude: 0.061866,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 54.70,
-    period: holisticyearLength * 2,  // 667,776 years
+    period: holisticyearLength * 2,  // 670,016 years
     inclJ2000: 2.1545441,
     jplTrend: venusEclipticInclinationTrendJPL
   },
   mars: {
-    mean: 2.653311,
-    amplitude: 1.162513,
+    mean: 2.649893,
+    amplitude: 1.158626,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 354.87,
-    period: holisticyearLength / (4 + 1/3),  // ~77,051 years
+    period: holisticyearLength / (4 + 1/3),  // ~77,310 years
     inclJ2000: 1.6311858,
     jplTrend: marsEclipticInclinationTrendJPL
   },
   jupiter: {
-    mean: 0.329124,
-    amplitude: 0.021372,
+    mean: 0.329100,
+    amplitude: 0.021301,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 312.89,
-    period: holisticyearLength / 5,  // 66,778 years
+    period: holisticyearLength / 5,  // 67,002 years
     inclJ2000: 0.3219652,
     jplTrend: jupiterEclipticInclinationTrendJPL
   },
   saturn: {
-    mean: 0.931699,
-    amplitude: 0.065097,
+    mean: 0.931678,
+    amplitude: 0.064879,
     phaseAngle: 23.3195,       // 23° balance group (retrograde)
     omegaJ2000: 118.81,
-    period: -holisticyearLength / 8,  // -41,736 years (retrograde)
+    period: -holisticyearLength / 8,  // -41,876 years (retrograde)
     inclJ2000: 0.9254704,
     jplTrend: saturnEclipticInclinationTrendJPL
   },
   uranus: {
-    mean: 1.000619,
-    amplitude: 0.023796,
+    mean: 1.000600,
+    amplitude: 0.023716,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 307.80,
-    period: holisticyearLength / 3,  // 111,296 years
+    period: holisticyearLength / 3,  // 111,669 years
     inclJ2000: 0.9946692,
     jplTrend: uranusEclipticInclinationTrendJPL
   },
   neptune: {
-    mean: 0.722146,
-    amplitude: 0.013531,
+    mean: 0.722190,
+    amplitude: 0.013486,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 192.04,
-    period: holisticyearLength * 2,  // 667,776 years
+    period: holisticyearLength * 2,  // 670,016 years
     inclJ2000: 0.7354155,
     jplTrend: neptuneEclipticInclinationTrendJPL
   },

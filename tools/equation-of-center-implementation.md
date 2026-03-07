@@ -39,10 +39,42 @@ the off-center viewing position.
 The standard equation of center formula was designed for pure Keplerian orbits
 where the mean anomaly advances uniformly and ALL speed variation must be added
 by the formula. In our model, the off-center geometry already provides
-approximately 55% of the correct speed variation. Adding the full equation of
-center on top produces ~155% of the real effect.
+approximately half of the correct speed variation. Adding the full equation of
+center on top would produce roughly double the real effect.
 
-### Observable consequence
+### Quantitative analysis
+
+For a circular orbit of radius `a` centered at point C, observed from point O
+displaced by `d = e_geom * a`:
+
+```
+apparent angle ~ M + e_geom * sin(M)     (first-order geometric parallax)
+```
+
+The real Keplerian equation of center gives:
+
+```
+true anomaly ~ M + 2 * e_real * sin(M)   (first-order)
+```
+
+The geometric offset provides amplitude `e_geom`, while the full Keplerian
+effect has amplitude `2 * e_real`. The geometric offset contributes exactly
+**half** the first-order effect for the same eccentricity value.
+
+When we add an explicit EoC with eccentricity `eoc`, the total first-order
+amplitude becomes:
+
+```
+total = e_geom + 2 * eoc
+```
+
+Setting this equal to the desired Keplerian amplitude `2 * e_real`:
+
+```
+eoc = e_real - e_geom / 2
+```
+
+### Observable consequence of using full eccentricity
 
 With the full geometric eccentricity (0.0154) used in the equation of center,
 the season lengths become too asymmetric. The spring/summer half-year is too
@@ -56,22 +88,82 @@ long, autumn/winter too short:
 | Winter Solstice | +8.0 |
 | **RMS** | **14.7** |
 
-### The fix: Separate EoC eccentricity
-
-The equation of center needs a **reduced eccentricity** (`eocEccentricity`)
-that only provides the ~45% of speed variation not already captured by the
-off-center geometry.
-
 ---
 
-## Current Parameters
+## Derived Parameters (no free parameters)
 
-| Parameter | Value | Purpose |
-|-----------|-------|---------|
-| `eocEccentricity` | 0.0085 | Eccentricity for the equation of center formula (~55% of geometric eccentricity) |
-| `perihelionPhaseOffset` | 2 degrees | Fine-tunes the direction where the EoC peaks relative to the geometric perihelion |
-| `correctionSun` | 0.511153 | Sun starting position on orbit (aligns summer solstice with new EoC eccentricity) |
-| `useVariableSpeed` | true | Master toggle for the equation of center |
+Both `eocEccentricity` and `perihelionPhaseOffset` are **derived from existing
+model constants** -- they are not tunable free parameters.
+
+### eocEccentricity
+
+**Formula:**
+```
+eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2
+```
+
+Where:
+- `eccentricityDerivedMean = sqrt(eccentricityBase^2 + eccentricityAmplitude^2)` -- the mean geometric eccentricity over a full precession cycle
+- `eccentricityBase` -- the fixed component of the Earth-barycenter offset
+
+**Physics:**
+- The geometric offset provides apparent speed variation with amplitude `e_geom` (first order)
+- The explicit EoC adds `2 * eoc`
+- Total must equal the real Keplerian amplitude `2 * e_real`
+- Therefore: `eoc = e_real - e_geom / 2`
+
+**Why eccentricityDerivedMean is the right e_real:**
+The Earth-barycenter distance oscillates over the H/16 precession cycle. The
+*mean* distance over a full cycle equals `sqrt(base^2 + amp^2)` -- this is a
+mathematical identity for the mean of a vector sum where one component is fixed
+and the other rotates. Using the mean ensures the EoC is correct on average
+across all precession phases.
+
+**Numerical value:** `sqrt(0.015373^2 + 0.001370^2) - 0.015373/2 = 0.007747`
+
+**Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
+by 310 arcsec. The correction was discovered through numerical analysis using
+the scene-graph tools (`tools/explore/derive-eoc-constants.js`).
+
+### perihelionPhaseOffset
+
+**Formula:**
+```
+perihelionPhaseOffset = ((startModelYear - balancedYear) / (H/16) * 360
+                        + correctionSun
+                        + 360 * (startmodelJD - perihelionRefJD) / yearDays) % 360
+```
+
+Where `perihelionRefJD = 2451547.042` (JD of Earth perihelion 2000, Jan 3.542),
+stored in `ASTRO_REFERENCE.perihelionPassageJ2000_JD`.
+
+**Physics:** This aligns the EoC perihelion direction with the geometric
+perihelion direction set by the EP1 precession phase at J2000. The formula
+computes the angular difference between:
+1. Where the Sun is at the reference perihelion date (from correctionSun and
+   the time offset from model start to perihelion)
+2. Where the geometric eccentricity vector points at J2000 (from the EP1
+   precession phase, which depends on balancedYear and H/16)
+
+**Numerical value:** ~0.51 degrees (analytical, ignoring small tilt corrections
+from earthRAAngle; full scene-graph computation gives -0.79 degrees, but the
+difference has negligible effect on Sun position: <0.001 degrees)
+
+**Previous hardcoded value was 2 degrees** -- this was co-tuned with the
+incorrect eocEccentricity of 0.0085 to jointly compensate for the EoC
+overshoot.
+
+### correctionSun
+
+The only remaining tunable parameter. Sets the Sun's starting angular position
+on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
+
+| Parameter | Value | How determined |
+|-----------|-------|----------------|
+| `eocEccentricity` | 0.007747 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
+| `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
+| `correctionSun` | 0.471334 | **Tuned**: aligns summer solstice timing |
+| `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:
 - `eccentricityBase` = 0.015373 (offset of circle center from Earth)
@@ -79,18 +171,51 @@ The geometric orbit offset parameters are **unchanged**:
 
 ### Results
 
-| Cardinal Point | Error (hours) |
-|----------------|---------------|
-| Vernal Equinox | -0.2 |
-| Summer Solstice | 0.0 |
-| Autumnal Equinox | +0.4 |
-| Winter Solstice | +0.5 |
-| **RMS** | **0.36** |
+Sun baseline vs JPL Horizons (2000-2025, 26 yearly dates):
+- RMS RA: 0.28 degrees (entirely JPL ICRF frame drift at ~54 arcsec/yr)
+- RMS Dec: 0.002 degrees
+- True model error after frame correction: ~0.003 degrees
 
 Year lengths:
 - Mean Tropical Year: 365.242190835 days (IAU: 365.242189700, diff +0.10s)
 - Mean Sidereal Year: 365.256363246 days (IAU: 365.256363000, diff +0.02s)
 - Anomalistic Year: 365.259636199 days (IAU: 365.259636000, diff +0.02s)
+
+### Understanding the ~54 arcsec/yr RA drift
+
+The 0.28° RMS RA error is **not a model error** -- it is a coordinate frame mismatch
+between JPL Horizons (fixed ICRF/J2000 equinox) and our model (of-date equatorial
+frame where the equinox precesses naturally).
+
+The precession of the equinoxes is 50.29 arcsec/yr in **ecliptic longitude**. However,
+the drift we measure is in **Right Ascension**, which requires projecting through the
+obliquity of the ecliptic. The standard formula for precession in RA is:
+
+```
+Δα = m + n · sin(α) · tan(δ)
+```
+
+Where:
+- `m = 46.1 arcsec/yr` -- general precession in RA
+- `n = 20.04 arcsec/yr` -- precession coupling term from obliquity
+- `α` = Sun's RA at measurement point
+- `δ` = Sun's Dec at measurement point
+
+At the June solstice (α ≈ 90°, δ ≈ 23.44°):
+
+```
+Δα = 46.1 + 20.04 · sin(90°) · tan(23.44°)
+   = 46.1 + 20.04 · 1.0 · 0.4336
+   = 46.1 + 8.69
+   = 54.8 arcsec/yr
+```
+
+This matches our observed baseline drift of ~54.1 arcsec/yr to within 1.3%. The extra
+~4.5 arcsec/yr beyond the raw 50.29 comes from the obliquity projection term -- precession
+tilts the equatorial coordinate grid relative to the ecliptic, and at the solstice position
+this tilt maximally affects RA.
+
+After correcting for this frame drift, the true Sun model error is ~0.003 degrees.
 
 ---
 
@@ -98,39 +223,14 @@ Year lengths:
 
 | Parameter | Start-date dependent? | Explanation |
 |-----------|-----------------------|-------------|
-| `eocEccentricity` | No | Depends only on the geometric offset size (eccentricityBase) |
-| `perihelionPhaseOffset` | No | Corrects phase relationship between geometric and EoC mechanisms |
+| `eocEccentricity` | No | Derived from mean eccentricity over full precession cycle |
+| `perihelionPhaseOffset` | No | Derived from precession phases and perihelion reference date |
 | `correctionSun` | Yes | Aligns Sun position at model start (June 21 2000); would differ for March 21 start |
 
-If the model started on a different date, only `correctionSun` would change.
-The `eocEccentricity` and `perihelionPhaseOffset` describe a structural
-interaction between the off-center geometry and the equation of center -- they
-are independent of where the Sun is on any particular date.
-
----
-
-## Dynamic vs Fixed Values
-
-### Currently fixed
-
-**`eocEccentricity`** (0.0085): The geometric eccentricity oscillates over the
-H/16 perihelion cycle between `eccentricityBase - eccentricityAmplitude`
-(0.014003) and `eccentricityBase + eccentricityAmplitude` (0.016743). When the
-geometric eccentricity is larger, the off-center geometry provides more speed
-variation, so the EoC needs less -- and vice versa.
-
-The variation is small (~10% over the 20,868-year cycle) and the fixed value
-works well for the present epoch. Making it dynamic would improve long-timescale
-accuracy but is not essential for current use.
-
-**`perihelionPhaseOffset`** (2 degrees): Could vary slightly with eccentricity
-changes but the effect is negligible.
-
-### Already dynamic
-
-**Perihelion direction**: The `perihelionPhaseJ2000` precesses at the H/16 rate
-(~20,868 years). This is essential -- the direction of fastest/slowest motion
-rotates over time.
+Both derived constants use the *mean* geometric eccentricity and the J2000
+precession state. Since the perihelion direction already precesses dynamically
+via `perihelionPrecessionRate * pos`, the fixed offset correctly anchors the
+J2000 reference direction. No dynamic update is needed.
 
 ---
 
@@ -156,9 +256,8 @@ M = theta - perihelionPhase
 The perihelion phase is computed from:
 - Sun's theta at model start: `-correctionSun * PI/180`
 - Angular distance from model start to perihelion: `2*PI * (days_since_perihelion / year_length)`
-- Earth perihelion 2000: JD 2451547.042 (January 3.542)
-- Model start: JD 2451716.5 (June 21.0)
-- Plus the `perihelionPhaseOffset` (2 degrees)
+- Earth perihelion 2000: JD 2451547.042 (January 3.542), stored in `ASTRO_REFERENCE.perihelionPassageJ2000_JD`
+- Plus the derived `perihelionPhaseOffset`
 
 The phase precesses dynamically at `2*PI / (H/16)` radians per simulation year.
 
@@ -189,11 +288,14 @@ errors (2-7 degrees RMS) and will be absorbed during future planet optimization.
 ## Code Locations
 
 - `src/script.js`:
-  - Constants: lines 46-52 (`correctionSun`, `useVariableSpeed`, `perihelionPhaseOffset`, `eocEccentricity`)
-  - Sun object: ~line 2434 (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`)
+  - Input constants: line ~48 (`useVariableSpeed`)
+  - Astronomical reference: `ASTRO_REFERENCE.perihelionPassageJ2000_JD` (line ~862)
+  - Derived constants: after `eccentricityDerivedMean` (~line 980): `eocEccentricity`, `perihelionPhaseOffset`
+  - Sun object: ~line 2447 (`eccentricity: eocEccentricity`, `perihelionPhaseJ2000`)
   - moveModel: ~line 29200 (equation of center gate and formula)
-- `tools/lib/constants.js`: lines 14, 25-26 (shared constants)
+- `tools/lib/constants.js`: lines 208-216 (derived constants)
 - `tools/lib/scene-graph.js`: line 399 (Sun eccentricity), line 547 (moveModel)
+- `tools/explore/derive-eoc-constants.js`: numerical verification script
 
 ---
 
@@ -210,7 +312,7 @@ only passes for the Sun.
 
 When adding variable speed to planets, each would face the same double-counting
 issue. Each planet would need its own reduced EoC eccentricity, following the
-pattern established here.
+same derivation: `eoc = e_real - e_geom / 2`.
 
 Additional considerations for planets:
 - Planets with large eccentricity (Mercury e=0.206) have a large equation of
@@ -232,3 +334,5 @@ After any future changes to this system:
 5. Verify Sun visually speeds up in January and slows down in July
 6. Check equation of center display in UI shows correct values
 7. No NaN values in any object positions
+8. Run `node tools/optimize.js diagnose sun` -- eccentricity ratio ~1.08
+9. Run `node tools/optimize.js baseline sun` -- RA drift ~54 arcsec/yr (frame effect)
