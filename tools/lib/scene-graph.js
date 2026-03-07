@@ -517,6 +517,21 @@ function buildSceneGraph() {
       speed: pd.planetSpeed,
       eccentricity: pd.p.orbitalEccentricity,
     };
+    // Add equation of center for Type III planets (same pattern as Sun EoC)
+    const periRefMap = {
+      jupiter: C.ASTRO_REFERENCE.jupiterPerihelionRef_JD,
+      saturn: C.ASTRO_REFERENCE.saturnPerihelionRef_JD,
+      uranus: C.ASTRO_REFERENCE.uranusPerihelionRef_JD,
+      neptune: C.ASTRO_REFERENCE.neptunePerihelionRef_JD,
+    };
+    if (periRefMap[key]) {
+      const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
+      const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
+      planetDef.eccentricity = pd.p.orbitalEccentricity / 2;
+      planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
+        + (pd.planetSpeed - periPrecRate) * pos_peri;
+      planetDef.perihelionPrecessionRate = periPrecRate;
+    }
     const planetNodes = makeObjectNodes(key, planetDef);
     realPeri.pivot.addChild(planetNodes.container);
 
@@ -680,12 +695,28 @@ function moveModel(graph, pos) {
   for (const nodes of moonLayers) animateObject(nodes, nodes.def);
   animateObject(graph.moonNodes, graph.moonNodes.def);
 
+  // Dynamic Earth ecliptic perihelion longitude (for geocentric elipticOrbit)
+  const earthPeriPrec1Angle = graph.earthPeriPrec1.orbit.ry;
+  const earthPeriEcl = ((earthPeriPrec1Angle + C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
   // Planets
   for (const key of Object.keys(graph.planetNodeMap)) {
     const pm = graph.planetNodeMap[key];
     animateObject(pm.eclip1, pm.eclip1.def);
     animateObject(pm.periFromE, pm.periFromE.def);
     animateObject(pm.eclip2, pm.eclip2.def);
+
+    // Dynamic geocentric elipticOrbit for Type III planets
+    if (pm.sceneData && pm.sceneData.p.type === 'III') {
+      const planetPrecAngle = pm.eclip1.orbit.ry;
+      const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+      const dw = earthPeriEcl - planetPeriEcl;
+      let eo = 2 * C.ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
+      if (key === 'saturn') eo = -eo;
+      pm.realPeri.pivot.px = eo;
+      pm.realPeri.rotAxis.px = eo;
+    }
+
     animateObject(pm.realPeri, pm.realPeri.def);
     animateObject(pm.planet, pm.planet.def);
   }

@@ -102,7 +102,7 @@ const planets = {
     ascendingNode: 100.4877868,
     angleCorrection: 1.095885,
     perihelionEclipticYears: H / 5,
-    startpos: 13.76,
+    startpos: 13.62,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -120,7 +120,7 @@ const planets = {
     ascendingNode: 113.6452856,
     angleCorrection: -0.175438,
     perihelionEclipticYears: -H / 8,
-    startpos: 11.397,
+    startpos: 11.34,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
@@ -226,6 +226,15 @@ const ASTRO_REFERENCE = {
   moonArgLatRate_degPerCentury: 483202.0175273,
   moonMeanElongationJ2000Full_deg: 297.8502042,
   moonMeanElongationRate_degPerCentury: 445267.1115168,
+  // Earth orbital parameters (for geocentric eccentricity correction)
+  earthEccentricityJ2000: 0.01671022,
+  earthPerihelionLongitudeJ2000: 102.947,  // degrees
+  // Planet perihelion passages (for equation of center phase references)
+  // Source: JPL Horizons
+  jupiterPerihelionRef_JD: 2459965.667,   // 2023 Jan 21 04:00 UTC
+  saturnPerihelionRef_JD: 2452846.0,      // 2003 Jul 26
+  uranusPerihelionRef_JD: 2439275.0,      // 1966 May 20
+  neptunePerihelionRef_JD: 2406600.0,     // 1876 Aug 27
 };
 
 // --- Moon derived cycles (lines 992-1011) ---
@@ -271,9 +280,14 @@ function computePlanetDerived(key) {
                  + (p.orbitalEccentricity * orbitDistance - realOrbitalEccentricity * orbitDistance) * 100;
     perihelionDistance = (orbitDistance * p.orbitalEccentricity * 100) + elipticOrbit;
   } else { // Type III
-    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
-    elipticOrbit = (p.orbitalEccentricity * orbitDistance - realOrbitalEccentricity * orbitDistance) * 100;
-    perihelionDistance = realOrbitalEccentricity * orbitDistance * 2 * 100;
+    realOrbitalEccentricity = p.orbitalEccentricity;
+    // Geocentric correction: Earth's eccentricity creates an annual parallax
+    // variation that depends on the angle between Earth's and planet's perihelion.
+    // When aligned (Saturn), periFromEarth layer absorbs it. When perpendicular
+    // (Jupiter), the realPeri layer must compensate.
+    const dw = (ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - p.longitudePerihelion) * Math.PI / 180;
+    elipticOrbit = 2 * ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
+    perihelionDistance = p.orbitalEccentricity * orbitDistance * 100;
   }
 
   return {
