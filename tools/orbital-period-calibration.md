@@ -62,12 +62,15 @@ Mars had by far the largest drift: ~4.7 deg per millennium.
 | Mercury | 87.9686       | +0.77   | 1.379      | 1.379     | --      |
 | Venus   | 224.695       | -1.42   | 2.661      | 2.617     | -1.7%   |
 | Mars    | 686.931       | +3.89   | 1.794      | 1.702     | -5.1%   |
-| Jupiter | 4330.65       | +1.87   | 0.477      | 0.322     | -32.5%  |
+| Jupiter | 4330.5        | +1.87   | 0.477      | 0.277     | -41.9%  |
 | Saturn  | 10747.0       | +0.21   | 0.466      | 0.562     | +20.6%  |
 
 ### Trade-offs
 
-- **Jupiter** was the biggest win: 32% RMS improvement with near-zero drift
+- **Jupiter** was the biggest win: 42% RMS improvement with near-zero drift.
+  Further refined from 4330.65 to 4330.5 to optimize invariable plane balance
+  (Config #32 achieves 100.0000%). This shifts count from 28254 to 28255
+  (boundary at ~4330.455), which slightly changes the effective SMA
 - **Mars** improved both drift (10.65 -> 3.89 deg) and RMS (-5.1%)
 - **Venus** improved modestly on both metrics
 - **Saturn** traded modern RMS (+0.1 deg) for near-zero ancient drift (+0.21 deg).
@@ -84,7 +87,7 @@ The integer `solarYearCount` means periods change in discrete steps:
 | Mercury | 1390940 | 0.00006          |
 | Venus   | 544552  | 0.0004           |
 | Mars    | 178124  | 0.004            |
-| Jupiter | 28254   | 0.15             |
+| Jupiter | 28255   | 0.15             |
 | Saturn  | 11385   | 0.94             |
 
 For Mercury and Venus, the steps are so small that fine-tuning is possible.

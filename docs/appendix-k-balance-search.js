@@ -71,10 +71,13 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
 const M_EARTH = GM_EARTH / G_CONSTANT;
 mass.earth = M_EARTH / M_SUN;
 
-// Eccentricities (JPL J2000 — same in code and script)
+// Eccentricities — dual-balanced (maximizes BOTH inclination and eccentricity balance)
+// J2000 values: Me=0.20563593, Ve=0.00677672, Ea=0.01671, Ma=0.09339410,
+//               Ju=0.04838624, Sa=0.05386179, Ur=0.04725744, Ne=0.00859048
+// Inner planets unchanged; outer planets adjusted within secular oscillation ranges
 const ecc = {
   mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
-  jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
+  jupiter: 0.04823000, saturn: 0.05378200, uranus: 0.04777200, neptune: 0.00846248,
 };
 
 // Invariable plane inclinations J2000
