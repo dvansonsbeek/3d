@@ -104,6 +104,7 @@ const mercuryAngleCorrection = 0.971049;                  // To align the perihe
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
 const mercuryStartpos = 83.62;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
 const mercuryEocFraction = -0.50;                           // Derived: -e/2 for Type I with large eccentricity (geometric offset over-compensates)
+const mercuryPerihelionRef_JD = 2460336.1;                  // EoC phase reference — phase-optimized (+113° from 2023-Dec-29)
 
 // Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.695;
@@ -119,6 +120,7 @@ const venusAngleCorrection = -2.784782;                    // To align the perih
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
 const venusStartpos = 249.33;                              // Tuned for start-date RA match (enriched JPL, 48 pts)
 const venusEocFraction = 1.0;                               // Full eccentricity: Type I circular orbit, EoC handles full Keplerian speed variation
+const venusPerihelionRef_JD = 2460602.0;                    // EoC phase reference — phase-optimized (+161° from 2024-Jul-09)
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.931;
@@ -134,6 +136,7 @@ const marsAngleCorrection = -2.107087;                    // To align the perihe
 const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsStartpos = 121.46;                              // Tuned for start-date RA match (enriched JPL, 184 pts)
 const marsEocFraction = -0.0624;                            // Per-planet EoC fraction (geocentric parallax interaction)
+const marsPerihelionRef_JD = 2459253.2;                     // EoC phase reference — phase-optimized (306° shift from 2018-Sep-16)
 
 // Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.65;
@@ -149,6 +152,7 @@ const jupiterAngleCorrection = 0.92974;                  // To align the perihel
 const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
 const jupiterStartpos = 13.82;                            // Tuned for start-date RA match (enriched JPL, 70 pts)
 const jupiterEocFraction = 0.50;                          // Derived: e/2 for Type III (geocentric parallax interaction)
+const jupiterPerihelionRef_JD = 2464224.5;                 // EoC phase reference — phase-optimized (-6° from 2023-Jan-21)
 
 // Reference lengths used as INPUT for Saturn
 const saturnSolarYearInput = 10747.0;
@@ -164,6 +168,7 @@ const saturnAngleCorrection = -0.174771;                  // To align the perihe
 const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
 const saturnStartpos = 11.32;                             // Tuned for start-date RA match (enriched JPL, 67 pts)
 const saturnEocFraction = 0.50;                           // Derived: e/2 for Type III (geocentric parallax interaction)
+const saturnPerihelionRef_JD = 2452875.9;                  // EoC phase reference — phase-optimized (+1° from 2003-Jul-26)
 
 // Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30586;
@@ -179,6 +184,7 @@ const uranusAngleCorrection = -0.732843;                  // To align the perihe
 const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
 const uranusStartpos = 44.88;                              // Retuned after removing correctionSun from PeriFromEarth
 const uranusEocFraction = 0.50;                            // Derived: e/2 for Type III (geocentric parallax interaction)
+const uranusPerihelionRef_JD = 2439699.8;                  // EoC phase reference — phase-optimized (+5° from 1966-May-20)
 
 // Reference lengths used as INPUT for Neptune
 const neptuneSolarYearInput = 59980;
@@ -194,6 +200,7 @@ const neptuneAngleCorrection = 2.333047;                  // To align the perihe
 const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneStartpos = 47.96;                             // Tuned for start-date RA match (enriched JPL, 69 pts)
 const neptuneEocFraction = 0.50;                           // Derived: e/2 for Type III (geocentric parallax interaction)
+const neptunePerihelionRef_JD = 2409432.4;                 // EoC phase reference — phase-optimized (+17° from 1876-Aug-27)
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
@@ -865,16 +872,6 @@ const ASTRO_REFERENCE = {
   // Earth's perihelion passage near J2000.0
   // Source: USNO / Astronomical Almanac — Earth perihelion 2000 Jan 3 13:00 UTC
   perihelionPassageJ2000_JD: 2451547.042,
-
-  // Planet perihelion passages (for equation of center phase references)
-  // Source: JPL Horizons (inner planets phase-optimized for geocentric EoC)
-  mercuryPerihelionRef_JD: 2460336.1,     // Phase-optimized (+113° from 2023-Dec-29)
-  venusPerihelionRef_JD: 2460602.0,       // Phase-optimized (+161° from 2024-Jul-09)
-  marsPerihelionRef_JD: 2459253.2,        // Phase-optimized (306° shift from 2018-Sep-16)
-  jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
-  saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
-  uranusPerihelionRef_JD: 2439699.8,      // Phase-optimized (+5° from 1966-May-20)
-  neptunePerihelionRef_JD: 2409432.4,     // Phase-optimized (+17° from 1876 Aug 27)
 
   // Earth's longitude of perihelion at J2000.0
   // Source: JPL Horizons / Astronomical Almanac
@@ -2797,7 +2794,7 @@ const mercury = {
   eccentricity: mercuryOrbitalEccentricity * mercuryEocFraction,
   perihelionPhaseJ2000: -mercuryStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / mercurySolarYearCount) - Math.PI * 2 / mercuryPerihelionEclipticYears)
-    * (ASTRO_REFERENCE.mercuryPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (mercuryPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / mercuryPerihelionEclipticYears,
 
   size: (diameters.mercuryDiameter/ currentAUDistance)*100,
@@ -2945,7 +2942,7 @@ const venus = {
   eccentricity: venusOrbitalEccentricity * venusEocFraction,
   perihelionPhaseJ2000: -venusStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / venusSolarYearCount) - Math.PI * 2 / venusPerihelionEclipticYears)
-    * (ASTRO_REFERENCE.venusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (venusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / venusPerihelionEclipticYears,
 
   size: (diameters.venusDiameter/ currentAUDistance)*100,
@@ -3098,7 +3095,7 @@ const mars = {
   eccentricity: marsOrbitalEccentricity * marsEocFraction,
   perihelionPhaseJ2000: -marsStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / marsSolarYearCount) - Math.PI * 2 / marsPerihelionEclipticYears)
-    * (ASTRO_REFERENCE.marsPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (marsPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / marsPerihelionEclipticYears,
 
   size: (diameters.marsDiameter/ currentAUDistance)*100,
@@ -3249,7 +3246,7 @@ const jupiter = {
   eccentricity: jupiterOrbitalEccentricity * jupiterEocFraction,
   perihelionPhaseJ2000: -jupiterStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / (holisticyearLength / 5))
-    * (ASTRO_REFERENCE.jupiterPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (jupiterPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 5),
 
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
@@ -3405,7 +3402,7 @@ const saturn = {
   eccentricity: saturnOrbitalEccentricity * saturnEocFraction,
   perihelionPhaseJ2000: -saturnStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / saturnPerihelionEclipticYears)
-    * (ASTRO_REFERENCE.saturnPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (saturnPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / saturnPerihelionEclipticYears,
 
   size: (diameters.saturnDiameter/ currentAUDistance)*100,
@@ -3561,7 +3558,7 @@ const uranus = {
   eccentricity: uranusOrbitalEccentricity * uranusEocFraction,
   perihelionPhaseJ2000: -uranusStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / uranusPerihelionEclipticYears)
-    * (ASTRO_REFERENCE.uranusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (uranusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / uranusPerihelionEclipticYears,
 
   size: (diameters.uranusDiameter/ currentAUDistance)*100,
@@ -3717,7 +3714,7 @@ const neptune = {
   eccentricity: neptuneOrbitalEccentricity * neptuneEocFraction,
   perihelionPhaseJ2000: -neptuneStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / neptunePerihelionEclipticYears)
-    * (ASTRO_REFERENCE.neptunePerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (neptunePerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / neptunePerihelionEclipticYears,
 
   size: (diameters.neptuneDiameter/ currentAUDistance)*100,
