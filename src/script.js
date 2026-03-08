@@ -100,9 +100,9 @@ const mercuryLongitudePerihelion = 77.4569131;
 const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
-const mercuryAngleCorrection = 0.984218;                  // To align the perihelion exactly
+const mercuryAngleCorrection = 0.971049;                  // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
-const mercuryStartpos = 83.17;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
+const mercuryStartpos = 83.62;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
 const mercuryEocFraction = -0.5155;                         // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Venus
@@ -117,7 +117,7 @@ const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.783252;                    // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
-const venusStartpos = 249.72;                              // Tuned for start-date RA match (enriched JPL, 48 pts)
+const venusStartpos = 249.39;                              // Tuned for start-date RA match (enriched JPL, 48 pts)
 const venusEocFraction = 3.3924;                            // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Mars
@@ -132,7 +132,7 @@ const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
 const marsAngleCorrection = -2.107087;                    // To align the perihelion exactly
 const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
-const marsStartpos = 121.58;                              // Tuned for start-date RA match (enriched JPL, 184 pts)
+const marsStartpos = 121.46;                              // Tuned for start-date RA match (enriched JPL, 184 pts)
 const marsEocFraction = -0.0624;                            // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Jupiter
@@ -147,7 +147,7 @@ const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
 const jupiterAngleCorrection = 0.945267;                  // To align the perihelion exactly
 const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
-const jupiterStartpos = 13.78;                            // Tuned for start-date RA match (enriched JPL, 70 pts)
+const jupiterStartpos = 13.82;                            // Tuned for start-date RA match (enriched JPL, 70 pts)
 const jupiterEocFraction = 0.5145;                        // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Saturn
@@ -162,7 +162,7 @@ const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
 const saturnAngleCorrection = -0.17484;                  // To align the perihelion exactly
 const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
-const saturnStartpos = 11.35;                             // Tuned for start-date RA match (enriched JPL, 67 pts)
+const saturnStartpos = 11.32;                             // Tuned for start-date RA match (enriched JPL, 67 pts)
 const saturnEocFraction = 0.5605;                         // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Uranus
@@ -177,7 +177,7 @@ const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
 const uranusAngleCorrection = -0.736726;                  // To align the perihelion exactly
 const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
-const uranusStartpos = 44.89;                              // Retuned after removing correctionSun from PeriFromEarth
+const uranusStartpos = 44.88;                              // Retuned after removing correctionSun from PeriFromEarth
 const uranusEocFraction = 0.54;                            // Per-planet EoC fraction (geocentric parallax interaction)
 
 // Reference lengths used as INPUT for Neptune
@@ -192,8 +192,8 @@ const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
 const neptuneAngleCorrection = 2.334258;                  // To align the perihelion exactly
 const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
-const neptuneStartpos = 47.98;                             // Tuned for start-date RA match (enriched JPL, 69 pts)
-const neptuneEocFraction = 0.55;                           // Per-planet EoC fraction (phase-optimized geocentric parallax)
+const neptuneStartpos = 47.96;                             // Tuned for start-date RA match (enriched JPL, 69 pts)
+const neptuneEocFraction = 0.50;                           // Per-planet EoC fraction (phase-optimized geocentric parallax)
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
@@ -868,12 +868,12 @@ const ASTRO_REFERENCE = {
 
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons (inner planets phase-optimized for geocentric EoC)
-  mercuryPerihelionRef_JD: 2460335.6,     // Phase-optimized (+111° from 2024-Jan-02)
-  venusPerihelionRef_JD: 2460582.0,       // Phase-optimized (+129° from Venus perihelion)
-  marsPerihelionRef_JD: 2458669.2,        // Phase-optimized (+153° from 2018-Sep-16)
-  jupiterPerihelionRef_JD: 2459965.667,   // 2023 Jan 21 04:00 UTC
-  saturnPerihelionRef_JD: 2452846.0,      // 2003 Jul 26
-  uranusPerihelionRef_JD: 2439275.0,      // 1966 May 20
+  mercuryPerihelionRef_JD: 2460336.1,     // Phase-optimized (+113° from 2023-Dec-29)
+  venusPerihelionRef_JD: 2460586.4,       // Phase-optimized (+136° from 2024-Jul-09)
+  marsPerihelionRef_JD: 2459253.2,        // Phase-optimized (306° shift from 2018-Sep-16)
+  jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
+  saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
+  uranusPerihelionRef_JD: 2439699.8,      // Phase-optimized (+5° from 1966-May-20)
   neptunePerihelionRef_JD: 2409432.4,     // Phase-optimized (+17° from 1876 Aug 27)
 
   // Earth's longitude of perihelion at J2000.0
@@ -1004,8 +1004,8 @@ const ASTRO_REFERENCE = {
   // changes reference frame. These empirical J2000 corrections align ecliptic
   // latitude with JPL Horizons. For Type III planets, approximately = startpos * 2.
   ascNodeTiltCorrection: {
-    mercury: 123.2, venus: 69.8, mars: 135.8,
-    jupiter: 27.3, saturn: 24.5, uranus: 93.8, neptune: 96.7,
+    mercury: 134, venus: 102, mars: 136,
+    jupiter: 29, saturn: 23, uranus: 90, neptune: 96,
   },
 };
 

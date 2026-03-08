@@ -47,9 +47,9 @@ const planets = {
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
-    angleCorrection: 0.984218,
+    angleCorrection: 0.971049,
     perihelionEclipticYears: H / (1 + 3/8),
-    startpos: 83.17,
+    startpos: 83.62,
     invPlaneInclinationMean: null, // filled below
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -69,7 +69,7 @@ const planets = {
     ascendingNode: 76.67877109,
     angleCorrection: -2.783252,
     perihelionEclipticYears: H * 2,
-    startpos: 249.72,
+    startpos: 249.39,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -89,7 +89,7 @@ const planets = {
     ascendingNode: 49.55737662,
     angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
-    startpos: 121.58,
+    startpos: 121.46,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -109,7 +109,7 @@ const planets = {
     ascendingNode: 100.4877868,
     angleCorrection: 0.945267,
     perihelionEclipticYears: H / 5,
-    startpos: 13.78,
+    startpos: 13.82,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -129,7 +129,7 @@ const planets = {
     ascendingNode: 113.6452856,
     angleCorrection: -0.17484,
     perihelionEclipticYears: -H / 8,
-    startpos: 11.35,
+    startpos: 11.32,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
@@ -149,7 +149,7 @@ const planets = {
     ascendingNode: 74.00919023,
     angleCorrection: -0.736726,
     perihelionEclipticYears: H / 3,
-    startpos: 44.89,
+    startpos: 44.88,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -163,13 +163,13 @@ const planets = {
     solarYearInput: 59980,
     eclipticInclinationJ2000: 1.77004347,
     orbitalEccentricity: 0.00859048,
-    eocFraction: 0.55,
+    eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
     ascendingNode: 131.7853754,
     angleCorrection: 2.334258,
     perihelionEclipticYears: H * 2,
-    startpos: 47.98,
+    startpos: 47.96,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
@@ -245,12 +245,12 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
-  mercuryPerihelionRef_JD: 2460335.6,     // Phase-optimized (+111° from 2023-Dec-29)
-  venusPerihelionRef_JD: 2460582.0,       // Phase-optimized (+129° from 2024-Jul-09)
-  marsPerihelionRef_JD: 2458669.2,        // Phase-optimized (+153° from 2018-Sep-16)
-  jupiterPerihelionRef_JD: 2459965.667,   // 2023 Jan 21 04:00 UTC
-  saturnPerihelionRef_JD: 2452846.0,      // 2003 Jul 26
-  uranusPerihelionRef_JD: 2439275.0,      // 1966 May 20
+  mercuryPerihelionRef_JD: 2460336.1,     // Phase-optimized (+113° from 2023-Dec-29)
+  venusPerihelionRef_JD: 2460586.4,       // Phase-optimized (+136° from 2024-Jul-09)
+  marsPerihelionRef_JD: 2459253.2,        // Phase-optimized (306° shift from 2018-Sep-16)
+  jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
+  saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
+  uranusPerihelionRef_JD: 2439699.8,      // Phase-optimized (+5° from 1966-May-20)
   neptunePerihelionRef_JD: 2409432.4,     // Phase-optimized (+17° from 1876 Aug 27)
   // Invariable plane parameters for dynamic ecliptic inclination
   earthAscendingNodeInvPlane: 284.51,     // Souami & Souchay (2012)
@@ -263,8 +263,8 @@ const ASTRO_REFERENCE = {
   // changes reference frame. These empirical J2000 corrections align ecliptic
   // latitude with JPL Horizons. For Type III planets, approximately = startpos * 2.
   ascNodeTiltCorrection: {
-    mercury: 123.2, venus: 69.8, mars: 135.8,
-    jupiter: 27.3, saturn: 24.5, uranus: 93.8, neptune: 96.7,
+    mercury: 134, venus: 102, mars: 136,
+    jupiter: 29, saturn: 23, uranus: 90, neptune: 96,
   },
 };
 
