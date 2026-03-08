@@ -172,7 +172,7 @@ const planets = {
     startpos: 47.96,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
-    inclinationPhaseAngle: 23.3195,
+    inclinationPhaseAngle: 203.3195,
     ascendingNodeInvPlane: 192.04,  // Verified J2000
     type: 'III',
     mirrorPair: 'venus',

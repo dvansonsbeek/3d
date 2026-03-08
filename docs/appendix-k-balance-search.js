@@ -17,8 +17,8 @@ const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (h
 
 // SolarYearInput values (orbital periods in days)
 const solarYearInputs = {
-  mercury: 87.9686, venus: 224.6967, mars: 686.934,
-  jupiter: 4330.6, saturn: 10746.6, uranus: 30583, neptune: 59980,
+  mercury: 87.9686, venus: 224.695, mars: 686.931,
+  jupiter: 4330.65, saturn: 10747.0, uranus: 30586, neptune: 59980,
 };
 
 // SolarYearCount = Math.round(HY * meansolaryear / input)
