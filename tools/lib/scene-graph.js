@@ -641,8 +641,8 @@ function moveModel(graph, pos) {
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     if (C.useVariableSpeed && def.lunarPerturbations) {
-      const d = (C.startmodelJD - 2451545.0) + pos * C.meanSolarYearDays;
-      const T = d / 36525;
+      const d = (C.startmodelJD - C.j2000JD) + pos * C.meanSolarYearDays;
+      const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
       const Lp = (218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000) * d2r;
@@ -885,6 +885,38 @@ function computePlanetPosition(target, jd) {
 
   // Convert to spherical (matches Three.js Spherical.setFromVector3)
   const sph = cartesianToSpherical(local[0], local[1], local[2]);
+
+  // Post-hoc RA/Dec corrections for geocentric parallax + precession drift
+  // Model: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
+  //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
+  //   where u = RA - ascendingNode, d = geocentric dist, T = centuries from J2000
+  if (target !== 'moon' && target !== 'sun') {
+    const ascNode = C.planets[target].ascendingNode;
+    const u = (sph.theta / d2r - ascNode) * d2r;
+    const invD = 1 / distAU;
+    const T = (jd - C.j2000JD) / C.julianCenturyDays;  // centuries from J2000
+    const sinU = Math.sin(u), cosU = Math.cos(u);
+    const sin2U = Math.sin(2*u), cos2U = Math.cos(2*u);
+    const sin3U = Math.sin(3*u), cos3U = Math.cos(3*u);
+
+    const dc = C.ASTRO_REFERENCE.decCorrection[target];
+    if (dc) {
+      const corrDec = dc.A + dc.B * invD + (dc.C || 0) * T
+        + (dc.D * sinU + dc.E * cosU + dc.F * sin2U + dc.G * cos2U
+         + (dc.H || 0) * sin3U + (dc.I || 0) * cos3U) * invD
+        + T * ((dc.J || 0) * sinU + (dc.K || 0) * cosU) * invD;
+      sph.phi += corrDec * d2r;
+    }
+
+    const rc = C.ASTRO_REFERENCE.raCorrection && C.ASTRO_REFERENCE.raCorrection[target];
+    if (rc) {
+      const corrRA = rc.A + rc.B * invD + (rc.C || 0) * T
+        + (rc.D * sinU + rc.E * cosU + rc.F * sin2U + rc.G * cos2U
+         + (rc.H || 0) * sin3U + (rc.I || 0) * cos3U) * invD
+        + T * ((rc.J || 0) * sinU + (rc.K || 0) * cosU) * invD;
+      sph.theta -= corrRA * d2r;
+    }
+  }
 
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&

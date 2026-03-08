@@ -32,14 +32,15 @@ Commands:
                            --range=lo,hi  (default: current ± 5)
                            --steps=N      (default: 50)
   optimize <planet> [params]  Nelder-Mead optimization
-                              params: comma-separated (default: startpos,angleCorrection)
+                              params: comma-separated (default: startpos)
                               --max-iter=N  (default: 500)
   eccentricity             Compare model vs Keplerian eccentricity for all planets
 
 Targets: mercury, venus, mars, jupiter, saturn, uranus, neptune, sun, moon
-Planet params: startpos, angleCorrection, solarYearInput, longitudePerihelion,
+Planet params: startpos, solarYearInput, longitudePerihelion,
                ascendingNode, eclipticInclinationJ2000, orbitalEccentricity,
-               perihelionEclipticYears, eocFraction
+               perihelionEclipticYears, eocFraction, perihelionRef_JD,
+               decCorrA, decCorrB, decCorrC, decCorrD, decCorrE, decCorrF
 Sun params:    correctionSun, eccentricityBase, eccentricityAmplitude,
                earthRAAngle, earthtiltMean
 Moon params:   moonStartposApsidal, moonStartposNodal, moonStartposMoon,
@@ -321,7 +322,7 @@ if (command === 'diagnose') {
   }
 
 } else if (command === 'optimize') {
-  const paramStr = args[1] || 'startpos,angleCorrection';
+  const paramStr = args[1] || 'startpos';
   const paramNames = paramStr.split(',');
   const maxIter = parseInt(parseFlag(args, 'max-iter', '500'));
 

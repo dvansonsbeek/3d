@@ -43,13 +43,13 @@ const planets = {
     solarYearInput: 87.9686,
     eclipticInclinationJ2000: 7.00497902,
     orbitalEccentricity: 0.20563593,
-    eocFraction: -0.50,
+    eocFraction: -0.49,
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
     angleCorrection: 0.971049,
     perihelionEclipticYears: H / (1 + 3/8),
-    startpos: 83.62,
+    startpos: 83.47,
     invPlaneInclinationMean: null, // filled below
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -63,13 +63,13 @@ const planets = {
     solarYearInput: 224.695,
     eclipticInclinationJ2000: 3.39467605,
     orbitalEccentricity: 0.00677672,
-    eocFraction: 1.0,
+    eocFraction: 0.547,
     invPlaneInclinationJ2000: 2.1545441,
     longitudePerihelion: 131.5765919,
     ascendingNode: 76.67877109,
     angleCorrection: -2.784782,
     perihelionEclipticYears: H * 2,
-    startpos: 249.33,
+    startpos: 249.31,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -83,13 +83,13 @@ const planets = {
     solarYearInput: 686.931,
     eclipticInclinationJ2000: 1.84969142,
     orbitalEccentricity: 0.09339410,
-    eocFraction: -0.0624,
+    eocFraction: -0.066,
     invPlaneInclinationJ2000: 1.6311858,
     longitudePerihelion: 336.0650681,
     ascendingNode: 49.55737662,
     angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
-    startpos: 121.46,
+    startpos: 121.47,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -102,14 +102,14 @@ const planets = {
     name: 'Jupiter',
     solarYearInput: 4330.5,
     eclipticInclinationJ2000: 1.30439695,
-    orbitalEccentricity: 0.04838624,
-    eocFraction: 0.50,
+    orbitalEccentricity: 0.04823000,  // Dual-balanced (J2000: 0.04838624, -0.32%)
+    eocFraction: 0.484,
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
     ascendingNode: 100.4877868,
     angleCorrection: 0.92974,
     perihelionEclipticYears: H / 5,
-    startpos: 13.82,
+    startpos: 13.85,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -122,12 +122,12 @@ const planets = {
     name: 'Saturn',
     solarYearInput: 10747.0,
     eclipticInclinationJ2000: 2.48599187,
-    orbitalEccentricity: 0.05386179,
-    eocFraction: 0.50,
+    orbitalEccentricity: 0.05378200,  // Dual-balanced (J2000: 0.05386179, -0.15%)
+    eocFraction: 0.543,
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
     ascendingNode: 113.6452856,
-    angleCorrection: -0.174771,
+    angleCorrection: -0.17477,
     perihelionEclipticYears: -H / 8,
     startpos: 11.32,
     invPlaneInclinationMean: null,
@@ -142,12 +142,12 @@ const planets = {
     name: 'Uranus',
     solarYearInput: 30586,
     eclipticInclinationJ2000: 0.77263783,
-    orbitalEccentricity: 0.04725744,
+    orbitalEccentricity: 0.04777200,  // Dual-balanced (J2000: 0.04725744, +1.09%)
     eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
     ascendingNode: 74.00919023,
-    angleCorrection: -0.732843,
+    angleCorrection: -0.733732,
     perihelionEclipticYears: H / 3,
     startpos: 44.88,
     invPlaneInclinationMean: null,
@@ -162,12 +162,12 @@ const planets = {
     name: 'Neptune',
     solarYearInput: 59980,
     eclipticInclinationJ2000: 1.77004347,
-    orbitalEccentricity: 0.00859048,
+    orbitalEccentricity: 0.00846248,  // Dual-balanced (J2000: 0.00859048, -1.49%)
     eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
     ascendingNode: 131.7853754,
-    angleCorrection: 2.333047,
+    angleCorrection: 2.33091,
     perihelionEclipticYears: H * 2,
     startpos: 47.96,
     invPlaneInclinationMean: null,
@@ -218,6 +218,10 @@ const meanStellarDay = (meanSiderealDay / (H / 13)) / (meanSolarYearDays + 1) + 
 const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)) + meanSolarYearDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 
+// J2000.0 epoch and Julian century derived from model constants
+const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meanSolarYearDays;
+const julianCenturyDays = 100 * meanSolarYearDays;
+
 // Equation of center eccentricity — derived, not a free parameter.
 // Off-center geometry provides amplitude e_geom (first order); EoC adds 2·eoc.
 // Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
@@ -245,9 +249,9 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
-  mercuryPerihelionRef_JD: 2460336.1,     // Phase-optimized (+113° from 2023-Dec-29)
-  venusPerihelionRef_JD: 2460602.0,       // Phase-optimized (+161° from 2024-Jul-09)
-  marsPerihelionRef_JD: 2459253.2,        // Phase-optimized (306° shift from 2018-Sep-16)
+  mercuryPerihelionRef_JD: 2460335.7,     // Phase-optimized
+  venusPerihelionRef_JD: 2460639.3,       // Phase-optimized
+  marsPerihelionRef_JD: 2456505.6,        // Re-optimized with Dec correction
   jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
   saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
   uranusPerihelionRef_JD: 2439699.8,      // Phase-optimized (+5° from 1966-May-20)
@@ -262,13 +266,39 @@ const ASTRO_REFERENCE = {
   //   Type I/II (inner): 180 - ascendingNode (anti-node direction)
   //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
   ascNodeTiltCorrection: {
-    mercury: Math.round(180 - planets.mercury.ascendingNode),
-    venus:   Math.round(180 - planets.venus.ascendingNode),
-    mars:    Math.round(180 - planets.mars.ascendingNode),
-    jupiter: Math.round(2 * planets.jupiter.startpos),
-    saturn:  Math.round(2 * planets.saturn.startpos),
-    uranus:  Math.round(2 * planets.uranus.startpos),
-    neptune: Math.round(2 * planets.neptune.startpos),
+    mercury: 180 - planets.mercury.ascendingNode,
+    venus:   180 - planets.venus.ascendingNode,
+    mars:    180 - planets.mars.ascendingNode,
+    jupiter: 2 * planets.jupiter.startpos,
+    saturn:  2 * planets.saturn.startpos,
+    uranus:  2 * planets.uranus.startpos,
+    neptune: 2 * planets.neptune.startpos,
+  },
+
+  // Post-hoc RA/Dec correction for geocentric parallax effect.
+  // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u) + H*sin(3u) + I*cos(3u))/d
+  //              + T*(J*sin(u) + K*cos(u))/d
+  //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
+  //         T = (year - 2000) / 100 (centuries from J2000)
+  // Fitted from JPL reference data via linear least squares (11 terms).
+  // Corrects tilt-direction error + precession drift + higher harmonics.
+  decCorrection: {
+    mercury: { A: 0.1783, B: 3.5673, C: 0.1559, D:-5.4328, E:-0.2678, F: 0.0940, G:-3.1939, H: 1.0857, I: 0.0850, J:-0.0311, K:-0.1880 },
+    venus:   { A: 0.0437, B:-0.0966, C: 0.0577, D:-0.4116, E:-0.0168, F: 0.4793, G: 0.1413, H:-0.2270, I:-0.0256, J:-0.0123, K:-0.0418 },
+    mars:    { A:-0.0887, B:-0.3737, C: 0.1854, D:-0.0387, E:-0.2556, F:-0.0694, G:-0.1293, H: 0.0104, I: 0.0586, J: 0.1899, K:-0.1338 },
+    jupiter: { A:-0.0443, B:-0.1734, C: 0.0249, D: 0.2952, E:-0.0468, F: 0.0134, G:-0.0571, H: 0.0116, I:-0.0349, J:-0.4416, K: 0.1897 },
+    saturn:  { A: 0.1007, B:-1.4316, C: 0.0095, D:-0.8950, E:-0.3876, F: 0.0600, G: 0.0278, H: 0.0153, I: 0.0706, J: 1.6760, K: 0.8588 },
+    uranus:  { A:-5.4965, B:106.1258, C:-0.0140, D:-4.2419, E: 6.2516, F:-0.1521, G: 0.0548, H:-0.0808, I:-0.1954, J: 0.9457, K:-0.0454 },
+    neptune: { A:-0.0236, B:-0.0319, C: 0.0054, D:-1.8929, E:-1.4210, F:-0.1843, G: 0.1434, H:-0.0085, I: 0.0308, J: 5.7511, K: 5.3847 },
+  },
+  raCorrection: {
+    mercury: { A:-0.0539, B:-4.9193, C: 0.3245, D: 1.5397, E: 5.2298, F:-2.3940, G: 4.6703, H:-1.2783, I:-5.6792, J:-0.4133, K: 0.2514 },
+    venus:   { A: 0.6074, B:-1.2066, C: 0.0150, D: 1.2003, E: 0.4581, F:-0.3214, G: 1.0958, H:-0.1873, I:-0.4883, J:-0.0605, K: 0.0400 },
+    mars:    { A: 0.6145, B:-0.2738, C:-0.1009, D: 0.1439, E:-0.0011, F: 0.2643, G:-0.0099, H:-0.0396, I:-0.0327, J:-0.4061, K: 0.0487 },
+    jupiter: { A: 0.3774, B:-2.6427, C: 0.2077, D: 0.1446, E:-0.1472, F:-0.2493, G: 0.0295, H: 0.0788, I: 0.0801, J:-0.6651, K:-0.1367 },
+    saturn:  { A: 0.6307, B:-3.4158, C:-0.4651, D:-0.0388, E:-1.8985, F: 0.5727, G:-0.0705, H:-0.2016, I:-0.0477, J:-0.7648, K: 1.9948 },
+    uranus:  { A:52.8271, B:-1007.7449, C:-0.1175, D:29.4285, E:-57.3179, F: 0.7051, G:-0.3225, H: 0.1894, I: 1.4402, J: 1.2335, K: 0.0234 },
+    neptune: { A:-0.0198, B: 6.9895, C:-0.6160, D: 1.5396, E: 0.6993, F: 0.5250, G:-0.1262, H: 0.1078, I:-0.2092, J:-1.6152, K:-0.0952 },
   },
 };
 
@@ -558,6 +588,8 @@ module.exports = {
   meanStellarDay,
   meanAnomalisticYearDays,
   eccentricityDerivedMean,
+  j2000JD,
+  julianCenturyDays,
   totalDaysInH,
 
   // Moon derived

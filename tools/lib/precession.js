@@ -28,11 +28,13 @@
 //   celestialprogramming.com/snippets/precessionMeeus.html
 // ═══════════════════════════════════════════════════════════════════════════
 
+const C = require('./constants.js');
 const DEG = Math.PI / 180;
 const ARCSEC = DEG / 3600;
 
-// J2000.0 epoch in Julian Days
-const J2000_JD = 2451545.0;
+// J2000.0 epoch and Julian century derived from model constants
+const J2000_JD = C.j2000JD;
+const JULIAN_CENTURY = C.julianCenturyDays;
 
 /**
  * Compute IAU 1976 precession angles from J2000.0 to a given epoch.
@@ -42,7 +44,7 @@ const J2000_JD = 2451545.0;
  */
 function precessionAngles(jd) {
   // t = Julian centuries from J2000.0
-  const t = (jd - J2000_JD) / 36525.0;
+  const t = (jd - J2000_JD) / JULIAN_CENTURY;
 
   // IAU 1976 precession angles (arcseconds), precessing FROM J2000 (T=0)
   const zetaA  = (2306.2181 * t + 0.30188 * t*t + 0.017998 * t*t*t) * ARCSEC;
