@@ -22,8 +22,8 @@ const inputmeanlengthsolaryearindays = 365.2421897;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 
 const solarYearInputs = {
-  mercury: 87.9686, venus: 224.6967, mars: 686.934,
-  jupiter: 4330.6, saturn: 10746.6, uranus: 30583, neptune: 59980,
+  mercury: 87.9686, venus: 224.695, mars: 686.931,
+  jupiter: 4330.5, saturn: 10747.0, uranus: 30586, neptune: 59980,
 };
 
 const solarYearCounts = {};

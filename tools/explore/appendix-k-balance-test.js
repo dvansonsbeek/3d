@@ -1,13 +1,9 @@
 // ═══════════════════════════════════════════════════════════════
-// Exhaustive balance search using EXACT values from script.js
-// Reproduces the full computation chain: HY → SolarYearCount → OrbitDistance → mass → L → w
+// Balance search TEST copy — for experimentation
+// Based on appendix-k-balance-search.js but does NOT write output files
 //
-// Usage: node docs/appendix-k-balance-search.js
-// Output: public/input/balance-presets.json (sorted best to worst)
+// Usage: node docs/appendix-k-balance-test.js
 // ═══════════════════════════════════════════════════════════════
-
-const fs = require('fs');
-const path = require('path');
 
 // ── Step 1: Reproduce the exact computation chain from script.js ──
 
@@ -18,7 +14,7 @@ const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (h
 // SolarYearInput values (orbital periods in days)
 const solarYearInputs = {
   mercury: 87.9686, venus: 224.695, mars: 686.931,
-  jupiter: 4330.5, saturn: 10747.0, uranus: 30586, neptune: 59980,
+  jupiter: 4330.50, saturn: 10747.0, uranus: 30586, neptune: 59980,
 };
 
 // SolarYearCount = Math.round(HY * meansolaryear / input)
@@ -71,11 +67,17 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
 const M_EARTH = GM_EARTH / G_CONSTANT;
 mass.earth = M_EARTH / M_SUN;
 
-// Eccentricities (JPL J2000 — same in code and script)
-const ecc = {
+// Eccentricities (JPL J2000)
+const eccJPL = {
   mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
   jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
 };
+
+// RealOrbitalEccentricity = e / (1 + e) — circular orbit model eccentricity
+const eccReal = {};
+for (const [k, e] of Object.entries(eccJPL)) {
+  eccReal[k] = e / (1 + e);
+}
 
 // Invariable plane inclinations J2000
 const inclJ2000 = {
@@ -157,8 +159,8 @@ function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, pl
   return Math.acos(Math.min(1, Math.max(-1, cosAngle))) * 180 / Math.PI;
 }
 
-// ── Balance computation (reproduces computeBalanceResults from script.js) ──
-function computeBalance(config) {
+// ── Balance computation ──
+function computeBalance(config, ecc) {
   const planetResults = {};
   let allPass = true;
 
@@ -185,7 +187,7 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
   }
 
-  // Vector balance (identical to computeBalanceResults in script.js)
+  // Vector balance
   let balanceCos = 0, balanceSin = 0, totalLamp = 0;
   for (const key of planets) {
     const cfg_mass = mass[key];
@@ -206,16 +208,8 @@ function computeBalance(config) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VERIFICATION
+// SENSITIVITY ANALYSIS: Which inputs have most leverage on Config #32 balance?
 // ══════════════════════════════════════════════════════════════════
-
-console.log('═══════════════════════════════════════════════════════════════');
-console.log('VERIFICATION: Exact values from script.js computation chain');
-console.log('═══════════════════════════════════════════════════════════════');
-console.log('Planet      SMA (code)       Mass (M/M_SUN)     Ecc');
-for (const p of planets) {
-  console.log(`${p.padEnd(10)} ${orbitDistance[p].toFixed(8).padStart(14)} ${mass[p].toExponential(8).padStart(18)} ${ecc[p].toFixed(8)}`);
-}
 
 const currentConfig = {
   mercury: { d: 21, phase: 203.3195 }, venus: { d: 34, phase: 203.3195 },
@@ -224,121 +218,172 @@ const currentConfig = {
   uranus: { d: 21, phase: 203.3195 }, neptune: { d: 34, phase: 203.3195 },
 };
 
-const curResult = computeBalance(currentConfig);
-console.log(`\nCurrent config balance: ${curResult.balance.toFixed(4)}%`);
-console.log(`All LL+Dir pass: ${curResult.allPass}`);
-
-// ══════════════════════════════════════════════════════════════════
-// EXHAUSTIVE SEARCH
-// ══════════════════════════════════════════════════════════════════
-
-console.log('\n═══════════════════════════════════════════════════════════════');
-console.log('EXHAUSTIVE SEARCH');
+const baseline = computeBalance(currentConfig, eccJPL);
 console.log('═══════════════════════════════════════════════════════════════');
+console.log('SENSITIVITY ANALYSIS FOR CONFIG #32');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log(`Baseline balance: ${baseline.balance.toFixed(8)}%  (imbalance: ${baseline.imbalance.toExponential(6)}%)`);
 
-const fibNumbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-const phases = [203.3195, 23.3195];
+// ── Per-planet weight decomposition ──
+console.log('\n── Per-planet balance weights ──');
+console.log('Planet      mass(M/Msun)   SMA          ecc         w=√(m·a(1-e²))/d   L·amp          phase');
+for (const key of planets) {
+  const cfg_mass = mass[key];
+  const cfg_sma = orbitDistance[key];
+  const cfg_ecc = eccJPL[key];
+  const d = currentConfig[key].d;
+  const sqrtM = Math.sqrt(cfg_mass);
+  const amplitude = PSI / (d * sqrtM);
+  const L = cfg_mass * Math.sqrt(cfg_sma * (1 - cfg_ecc * cfg_ecc));
+  const Lamp = L * amplitude;
+  const w = Math.sqrt(cfg_mass * cfg_sma * (1 - cfg_ecc * cfg_ecc)) / d;
+  const ph = currentConfig[key].phase > 180 ? '203°' : ' 23°';
+  console.log(`${key.padEnd(10)} ${cfg_mass.toExponential(6).padStart(13)} ${cfg_sma.toFixed(8).padStart(12)} ${cfg_ecc.toFixed(8)} ${w.toExponential(6).padStart(19)} ${Lamp.toExponential(6).padStart(14)}  ${ph}`);
+}
 
-const scenarios = [
-  { name: 'A', jupiter: { d: 5, phase: 203.3195 }, saturn: { d: 3, phase: 23.3195 } },
-  { name: 'B', jupiter: { d: 8, phase: 203.3195 }, saturn: { d: 5, phase: 23.3195 } },
-  { name: 'C', jupiter: { d: 13, phase: 203.3195 }, saturn: { d: 8, phase: 23.3195 } },
-  { name: 'D', jupiter: { d: 21, phase: 203.3195 }, saturn: { d: 13, phase: 23.3195 } },
-];
+// ── 1. SolarYearInput sensitivity ──
+console.log('\n═══════════════════════════════════════════════════════════════');
+console.log('1. SOLAR YEAR INPUT SENSITIVITY');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('Tweaking each SolarYearInput by small amounts to see effect on balance.\n');
 
-const THRESHOLD = 99.994;
-const allConfigs = [];
+// Helper: recompute everything with modified SolarYearInput for one planet
+function balanceWithModifiedSYI(planet, newSYI) {
+  const modifiedInputs = { ...solarYearInputs, [planet]: newSYI };
+  const modCounts = {};
+  for (const [k, v] of Object.entries(modifiedInputs)) {
+    modCounts[k] = Math.round((holisticyearLength * meansolaryearlengthinDays) / v);
+  }
+  const modOD = { earth: 1.0 };
+  for (const [k, c] of Object.entries(modCounts)) {
+    modOD[k] = Math.pow(Math.pow(holisticyearLength / c, 2), 1/3);
+  }
+  // Temporarily swap orbitDistance
+  const savedOD = {};
+  for (const k of Object.keys(modOD)) savedOD[k] = orbitDistance[k];
+  for (const k of Object.keys(modOD)) orbitDistance[k] = modOD[k];
+  const result = computeBalance(currentConfig, eccJPL);
+  for (const k of Object.keys(savedOD)) orbitDistance[k] = savedOD[k];
+  return { balance: result.balance, count: modCounts[planet], sma: modOD[planet] };
+}
 
-for (const scenario of scenarios) {
-  let count = 0;
+for (const planet of Object.keys(solarYearInputs)) {
+  const base = solarYearInputs[planet];
+  const baseCount = solarYearCounts[planet];
+  console.log(`${planet.toUpperCase()} (current: ${base} days, count: ${baseCount}, SMA: ${orbitDistance[planet].toFixed(8)})`);
 
-  for (let mi = 0; mi < fibNumbers.length; mi++) {
-    for (let mp = 0; mp < 2; mp++) {
-      for (let vi = 0; vi < fibNumbers.length; vi++) {
-        for (let vp = 0; vp < 2; vp++) {
-          for (let mai = 0; mai < fibNumbers.length; mai++) {
-            for (let map = 0; map < 2; map++) {
-              for (let ui = 0; ui < fibNumbers.length; ui++) {
-                for (let up = 0; up < 2; up++) {
-                  for (let ni = 0; ni < fibNumbers.length; ni++) {
-                    for (let np = 0; np < 2; np++) {
-                      const config = {
-                        mercury: { d: fibNumbers[mi], phase: phases[mp] },
-                        venus: { d: fibNumbers[vi], phase: phases[vp] },
-                        earth: { d: 3, phase: 203.3195 },
-                        mars: { d: fibNumbers[mai], phase: phases[map] },
-                        jupiter: scenario.jupiter,
-                        saturn: scenario.saturn,
-                        uranus: { d: fibNumbers[ui], phase: phases[up] },
-                        neptune: { d: fibNumbers[ni], phase: phases[np] },
-                      };
-
-                      const result = computeBalance(config);
-
-                      if (result.balance >= THRESHOLD) {
-                        count++;
-                        const p = (phase) => Math.abs(phase - 203.3195) < 1 ? 0 : 1;
-                        allConfigs.push({
-                          scenario: scenario.name,
-                          balance: result.balance,
-                          allPass: result.allPass,
-                          failCount: planets.filter(pl =>
-                            !result.planetResults[pl].fitsLL || !result.planetResults[pl].directionMatch
-                          ).length,
-                          row: [
-                            scenario.name,
-                            parseFloat(result.balance.toFixed(6)),
-                            config.mercury.d, p(config.mercury.phase),
-                            config.venus.d, p(config.venus.phase),
-                            config.mars.d, p(config.mars.phase),
-                            config.jupiter.d, p(config.jupiter.phase),
-                            config.saturn.d, p(config.saturn.phase),
-                            config.uranus.d, p(config.uranus.phase),
-                            config.neptune.d, p(config.neptune.phase),
-                          ],
-                        });
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+  // Scan a range of small perturbations
+  const steps = [];
+  // Find range where count changes
+  for (let delta = -0.5; delta <= 0.5; delta += 0.001) {
+    const newSYI = base + delta;
+    const newCount = Math.round((holisticyearLength * meansolaryearlengthinDays) / newSYI);
+    if (newCount !== baseCount) {
+      steps.push({ delta, newSYI, newCount });
     }
   }
 
-  console.log(`Scenario ${scenario.name} (Ju=${scenario.jupiter.d}, Sa=${scenario.saturn.d}): ${count} configs >= ${THRESHOLD}%`);
+  // Also test fine perturbations that don't change count (continuous SMA effect)
+  const testDeltas = [-0.1, -0.05, -0.01, -0.005, -0.001, 0.001, 0.005, 0.01, 0.05, 0.1];
+  for (const delta of testDeltas) {
+    const r = balanceWithModifiedSYI(planet, base + delta);
+    const improved = r.balance > baseline.balance;
+    if (Math.abs(r.balance - baseline.balance) > 1e-8) {
+      // Only show if there's a meaningful change
+    }
+  }
+
+  // Find nearest count transitions
+  const transitions = new Map();
+  for (const s of steps) {
+    if (!transitions.has(s.newCount)) transitions.set(s.newCount, s);
+  }
+
+  // Test each count transition + fine scan around it
+  let bestForPlanet = { balance: baseline.balance, delta: 0, syi: base };
+  for (const [count, s] of transitions) {
+    const r = balanceWithModifiedSYI(planet, s.newSYI);
+    if (r.balance > bestForPlanet.balance) {
+      bestForPlanet = { balance: r.balance, delta: s.delta, syi: s.newSYI, count: r.count };
+    }
+  }
+
+  // Fine scan: continuous SMA changes without count flip
+  for (let delta = -0.2; delta <= 0.2; delta += 0.0001) {
+    const r = balanceWithModifiedSYI(planet, base + delta);
+    if (r.balance > bestForPlanet.balance) {
+      bestForPlanet = { balance: r.balance, delta, syi: +(base + delta).toFixed(4), count: r.count };
+    }
+  }
+
+  const improvement = bestForPlanet.balance - baseline.balance;
+  console.log(`  Best: SYI=${bestForPlanet.syi} (delta=${bestForPlanet.delta > 0 ? '+' : ''}${bestForPlanet.delta.toFixed(4)}) → balance=${bestForPlanet.balance.toFixed(8)}% (${improvement > 0 ? '+' : ''}${improvement.toExponential(4)}%)`);
+  console.log('');
 }
 
-// Sort by balance descending
-allConfigs.sort((a, b) => b.balance - a.balance);
+// ── 2. Eccentricity sensitivity ──
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('2. ECCENTRICITY SENSITIVITY');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('Tweaking each eccentricity to find value that maximizes balance.\n');
 
-console.log(`\nTotal: ${allConfigs.length} configs >= ${THRESHOLD}%`);
-console.log(`All pass LL+Dir: ${allConfigs.filter(c => c.allPass).length}`);
+for (const planet of planets) {
+  const baseEcc = eccJPL[planet];
+  let bestEcc = baseEcc, bestBal = baseline.balance;
 
-// ══════════════════════════════════════════════════════════════════
-// WRITE OUTPUT FILE
-// ══════════════════════════════════════════════════════════════════
+  // Scan ±50% of eccentricity in fine steps
+  const minE = Math.max(0.0001, baseEcc * 0.5);
+  const maxE = baseEcc * 1.5;
+  const step = (maxE - minE) / 10000;
 
-const outputDir = path.join(__dirname, '..', 'public', 'input');
-const outputPath = path.join(outputDir, 'balance-presets.json');
+  for (let e = minE; e <= maxE; e += step) {
+    const modEcc = { ...eccJPL, [planet]: e };
+    const r = computeBalance(currentConfig, modEcc);
+    if (r.balance > bestBal) {
+      bestBal = r.balance;
+      bestEcc = e;
+    }
+  }
 
-const output = {
-  generated: new Date().toISOString(),
-  threshold: THRESHOLD,
-  count: allConfigs.length,
-  scenarios: {
-    A: 'Ju=5, Sa=3',
-    B: 'Ju=8, Sa=5',
-    C: 'Ju=13, Sa=8',
-    D: 'Ju=21, Sa=13',
-  },
-  format: ['scenario','balance','me_d','me_phase','ve_d','ve_phase','ma_d','ma_phase','ju_d','ju_phase','sa_d','sa_phase','ur_d','ur_phase','ne_d','ne_phase'],
-  phaseAngles: [203.3195, 23.3195],
-  presets: allConfigs.map(c => c.row),
-};
+  const improvement = bestBal - baseline.balance;
+  const pctChange = ((bestEcc - baseEcc) / baseEcc * 100).toFixed(3);
+  console.log(`${planet.padEnd(10)} current=${baseEcc.toFixed(8)}  best=${bestEcc.toFixed(8)} (${pctChange}%)  → balance=${bestBal.toFixed(8)}% (${improvement > 0 ? '+' : ''}${improvement.toExponential(4)}%)`);
+}
 
-fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
-console.log(`\nWritten ${allConfigs.length} presets to ${outputPath}`);
+// ── 3. Mass ratio sensitivity ──
+console.log('\n═══════════════════════════════════════════════════════════════');
+console.log('3. MASS RATIO SENSITIVITY');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('Tweaking each mass ratio to find value that maximizes balance.\n');
+
+for (const planet of Object.keys(massRatios)) {
+  const baseRatio = massRatios[planet];
+  const baseMass = mass[planet];
+  let bestRatio = baseRatio, bestBal = baseline.balance;
+
+  // Scan ±1% of mass ratio
+  const minR = baseRatio * 0.99;
+  const maxR = baseRatio * 1.01;
+  const step = (maxR - minR) / 10000;
+
+  for (let r = minR; r <= maxR; r += step) {
+    const savedMass = mass[planet];
+    mass[planet] = 1 / r;  // mass = 1/ratio (simplified, see earlier verification)
+    const result = computeBalance(currentConfig, eccJPL);
+    mass[planet] = savedMass;
+    if (result.balance > bestBal) {
+      bestBal = result.balance;
+      bestRatio = r;
+    }
+  }
+
+  const improvement = bestBal - baseline.balance;
+  const pctChange = ((bestRatio - baseRatio) / baseRatio * 100).toFixed(4);
+  console.log(`${planet.padEnd(10)} current=${baseRatio.toFixed(4).padStart(14)}  best=${bestRatio.toFixed(4).padStart(14)} (${pctChange}%)  → ${improvement > 0 ? '+' : ''}${improvement.toExponential(4)}%`);
+}
+
+// ── 4. Combined: which single parameter gives the most improvement? ──
+console.log('\n═══════════════════════════════════════════════════════════════');
+console.log('4. RANKING: BIGGEST LEVERAGE ON CONFIG #32 BALANCE');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log('(Run the numbers above and compare the improvement magnitudes)');

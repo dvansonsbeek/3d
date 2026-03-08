@@ -100,7 +100,7 @@ const planets = {
   },
   jupiter: {
     name: 'Jupiter',
-    solarYearInput: 4330.65,
+    solarYearInput: 4330.5,
     eclipticInclinationJ2000: 1.30439695,
     orbitalEccentricity: 0.04838624,
     eocFraction: 0.50,
