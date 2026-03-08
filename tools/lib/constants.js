@@ -43,7 +43,7 @@ const planets = {
     solarYearInput: 87.9686,
     eclipticInclinationJ2000: 7.00497902,
     orbitalEccentricity: 0.20563593,
-    eocFraction: -0.5155,
+    eocFraction: -0.50,
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
@@ -63,13 +63,13 @@ const planets = {
     solarYearInput: 224.695,
     eclipticInclinationJ2000: 3.39467605,
     orbitalEccentricity: 0.00677672,
-    eocFraction: 3.3924,
+    eocFraction: 1.0,
     invPlaneInclinationJ2000: 2.1545441,
     longitudePerihelion: 131.5765919,
     ascendingNode: 76.67877109,
     angleCorrection: -2.784782,
     perihelionEclipticYears: H * 2,
-    startpos: 249.39,
+    startpos: 249.33,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -103,7 +103,7 @@ const planets = {
     solarYearInput: 4330.65,
     eclipticInclinationJ2000: 1.30439695,
     orbitalEccentricity: 0.04838624,
-    eocFraction: 0.5145,
+    eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
     ascendingNode: 100.4877868,
@@ -123,7 +123,7 @@ const planets = {
     solarYearInput: 10747.0,
     eclipticInclinationJ2000: 2.48599187,
     orbitalEccentricity: 0.05386179,
-    eocFraction: 0.5605,
+    eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
     ascendingNode: 113.6452856,
@@ -143,7 +143,7 @@ const planets = {
     solarYearInput: 30586,
     eclipticInclinationJ2000: 0.77263783,
     orbitalEccentricity: 0.04725744,
-    eocFraction: 0.54,
+    eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
     ascendingNode: 74.00919023,
@@ -246,7 +246,7 @@ const ASTRO_REFERENCE = {
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
   mercuryPerihelionRef_JD: 2460336.1,     // Phase-optimized (+113° from 2023-Dec-29)
-  venusPerihelionRef_JD: 2460586.4,       // Phase-optimized (+136° from 2024-Jul-09)
+  venusPerihelionRef_JD: 2460602.0,       // Phase-optimized (+161° from 2024-Jul-09)
   marsPerihelionRef_JD: 2459253.2,        // Phase-optimized (306° shift from 2018-Sep-16)
   jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
   saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
@@ -258,13 +258,17 @@ const ASTRO_REFERENCE = {
   earthInvPlanePrecessionYears: H / 3,    // Earth's Ω precession period on inv. plane
 
   // Ascending node frame corrections for planet-level tilt placement (degrees).
-  // When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
-  // annual rotation) to planet.containerObj (below), the ascending node direction
-  // changes reference frame. These empirical J2000 corrections align ecliptic
-  // latitude with JPL Horizons. For Type III planets, approximately = startpos * 2.
+  // DERIVED — not tuned:
+  //   Type I/II (inner): 180 - ascendingNode (anti-node direction)
+  //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
   ascNodeTiltCorrection: {
-    mercury: 134, venus: 102, mars: 136,
-    jupiter: 29, saturn: 23, uranus: 90, neptune: 96,
+    mercury: Math.round(180 - planets.mercury.ascendingNode),
+    venus:   Math.round(180 - planets.venus.ascendingNode),
+    mars:    Math.round(180 - planets.mars.ascendingNode),
+    jupiter: Math.round(2 * planets.jupiter.startpos),
+    saturn:  Math.round(2 * planets.saturn.startpos),
+    uranus:  Math.round(2 * planets.uranus.startpos),
+    neptune: Math.round(2 * planets.neptune.startpos),
   },
 };
 
