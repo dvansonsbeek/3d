@@ -131,6 +131,75 @@ if (command === 'diagnose') {
     console.log('  No reference data available:', e.message);
   }
 
+} else if ((command === 'baseline' || command === 'baseline-jpl') && planet === 'all') {
+  const jplModule = require('./lib/horizons-client');
+  const sg = require('./lib/scene-graph');
+
+  async function runBaselineAll() {
+    const targets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const jd0 = C.startmodelJD;
+    const fmtRA = (deg) => {
+      if (deg < 0) deg += 360;
+      const h = Math.floor(deg / 15);
+      const m = Math.floor((deg / 15 - h) * 60);
+      const s = ((deg / 15 - h) * 60 - m) * 60;
+      return h + 'h' + String(m).padStart(2, '0') + 'm' + s.toFixed(1).padStart(5, '0') + 's';
+    };
+
+    console.log('═══════════════════════════════════════════════════════════════');
+    console.log('  BASELINE SUMMARY — All Planets vs JPL Reference');
+    console.log('═══════════════════════════════════════════════════════════════\n');
+
+    console.log(
+      'Planet'.padEnd(10),
+      'RMS RA'.padStart(7),
+      'RMS Dec'.padStart(8),
+      'RMS Tot'.padStart(8),
+      'n'.padStart(4),
+      'startpos'.padStart(10),
+      'Model RA'.padEnd(15),
+      'JPL RA'.padEnd(15),
+      'ΔRA'.padStart(8),
+      'ΔDec'.padStart(8)
+    );
+    console.log('-'.repeat(110));
+
+    for (const name of targets) {
+      const bl = opt.baseline(name);
+      const pDef = C.planets[name];
+
+      const model = sg.computePlanetPosition(name, jd0);
+      const modelRA = sg.thetaToRaDeg(model.ra);
+      const modelDec = sg.phiToDecDeg(model.dec);
+
+      let dRA = 0, dDec = 0;
+      let jplRAStr = '?';
+      try {
+        const jpl = await jplModule.getPosition(name, jd0);
+        dRA = modelRA - jpl.ra;
+        if (dRA > 180) dRA -= 360;
+        if (dRA < -180) dRA += 360;
+        dDec = modelDec - jpl.dec;
+        jplRAStr = fmtRA(jpl.ra);
+      } catch (e) { /* no JPL data */ }
+
+      console.log(
+        name.padEnd(10),
+        bl.rmsRA.toFixed(2).padStart(7),
+        bl.rmsDec.toFixed(2).padStart(8),
+        bl.rmsTotal.toFixed(2).padStart(8),
+        String(bl.entries.length).padStart(4),
+        String(pDef.startpos).padStart(10),
+        fmtRA(modelRA).padEnd(15),
+        jplRAStr.padEnd(15),
+        ((dRA >= 0 ? '+' : '') + dRA.toFixed(2)).padStart(8),
+        ((dDec >= 0 ? '+' : '') + dDec.toFixed(2)).padStart(8)
+      );
+    }
+  }
+
+  runBaselineAll().catch(e => { console.error('ERROR:', e.message); process.exit(1); });
+
 } else if (command === 'baseline' || command === 'baseline-jpl') {
   const jplModule = require('./lib/horizons-client');
 
@@ -154,9 +223,49 @@ if (command === 'diagnose') {
     console.log('═══════════════════════════════════════════════════════════════\n');
 
     const bl = opt.baseline(planet, null, refDates);
+
+    // Show tunable parameters
+    const pDef = C.planets[planet];
+    if (pDef) {
+      console.log('─── Tunable Parameters ───\n');
+      console.log('  startpos:              ', pDef.startpos);
+      console.log();
+    }
+
     console.log('RMS RA:', bl.rmsRA.toFixed(4) + '°  RMS Dec:', bl.rmsDec.toFixed(4) + '°  RMS Total:', bl.rmsTotal.toFixed(4) + '°');
     console.log('Max RA:', bl.maxRA.toFixed(4) + '°  Max Dec:', bl.maxDec.toFixed(4) + '°');
     console.log('Entries:', bl.entries.length);
+
+    // Start-date comparison vs JPL
+    const sg = require('./lib/scene-graph');
+    const jd0 = C.startmodelJD;
+    const model = sg.computePlanetPosition(planet, jd0);
+    const modelRA = sg.thetaToRaDeg(model.ra);
+    const modelDec = sg.phiToDecDeg(model.dec);
+    try {
+      const jpl = await jplModule.getPosition(planet, jd0);
+      let dRA = modelRA - jpl.ra;
+      if (dRA > 180) dRA -= 360;
+      if (dRA < -180) dRA += 360;
+      const dDec = modelDec - jpl.dec;
+      const fmtRA = (deg) => {
+        if (deg < 0) deg += 360;
+        const h = Math.floor(deg / 15);
+        const m = Math.floor((deg / 15 - h) * 60);
+        const s = ((deg / 15 - h) * 60 - m) * 60;
+        return h + 'h' + String(m).padStart(2, '0') + 'm' + s.toFixed(1).padStart(5, '0') + 's';
+      };
+      console.log('\n─── Start Date (JD ' + jd0 + ') vs JPL ───\n');
+      console.log('  Model RA:  ', fmtRA(modelRA).padEnd(16), '(' + modelRA.toFixed(3) + '°)');
+      console.log('  JPL RA:    ', fmtRA(jpl.ra).padEnd(16), '(' + jpl.ra.toFixed(3) + '°)');
+      console.log('  ΔRA:       ', (dRA >= 0 ? '+' : '') + dRA.toFixed(3) + '°');
+      console.log('  Model Dec: ', modelDec.toFixed(3) + '°');
+      console.log('  JPL Dec:   ', jpl.dec.toFixed(3) + '°');
+      console.log('  ΔDec:      ', (dDec >= 0 ? '+' : '') + dDec.toFixed(3) + '°');
+    } catch (e) {
+      console.log('\n  (Could not fetch JPL start-date position:', e.message + ')');
+    }
+
     console.log('\n' + 'JD'.padEnd(14) + 'Year'.padEnd(10) + 'Tier'.padEnd(6) + 'ΔRA°'.padStart(10) + 'ΔDec°'.padStart(10) + '  Label');
 
     for (const e of bl.entries) {

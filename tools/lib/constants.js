@@ -48,10 +48,11 @@ const planets = {
     ascendingNode: 48.33033155,
     angleCorrection: 0.984218,
     perihelionEclipticYears: H / (1 + 3/8),
-    startpos: 84.205,
+    startpos: 80.55,
     invPlaneInclinationMean: null, // filled below
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
+    ascendingNodeInvPlane: 32.83,   // Verified J2000 (Souami & Souchay 2012, adjusted)
     type: 'I',
     mirrorPair: 'uranus',
     fibonacciD: 21,
@@ -66,10 +67,11 @@ const planets = {
     ascendingNode: 76.67877109,
     angleCorrection: -2.783252,
     perihelionEclipticYears: H * 2,
-    startpos: 249.69,
+    startpos: 248.59,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
+    ascendingNodeInvPlane: 54.70,   // Verified J2000
     type: 'I',
     mirrorPair: 'neptune',
     fibonacciD: 34,
@@ -84,10 +86,11 @@ const planets = {
     ascendingNode: 49.55737662,
     angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
-    startpos: 121.512,
+    startpos: 121.67,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
+    ascendingNodeInvPlane: 354.87,  // Verified J2000
     type: 'II',
     mirrorPair: 'jupiter',
     fibonacciD: 5,
@@ -100,12 +103,13 @@ const planets = {
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
     ascendingNode: 100.4877868,
-    angleCorrection: 1.095885,
+    angleCorrection: 0.945267,
     perihelionEclipticYears: H / 5,
-    startpos: 13.62,
+    startpos: 13.82,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
+    ascendingNodeInvPlane: 312.89,  // Verified J2000
     type: 'III',
     mirrorPair: 'mars',
     fibonacciD: 5,
@@ -118,12 +122,13 @@ const planets = {
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
     ascendingNode: 113.6452856,
-    angleCorrection: -0.175438,
+    angleCorrection: -0.17484,
     perihelionEclipticYears: -H / 8,
-    startpos: 11.34,
+    startpos: 11.40,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
+    ascendingNodeInvPlane: 118.81,  // Verified J2000
     type: 'III',
     mirrorPair: 'earth',
     fibonacciD: 3,
@@ -136,12 +141,13 @@ const planets = {
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
     ascendingNode: 74.00919023,
-    angleCorrection: -0.775884,
+    angleCorrection: -0.736726,
     perihelionEclipticYears: H / 3,
-    startpos: 44.71,
+    startpos: 44.89,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
+    ascendingNodeInvPlane: 307.80,  // Verified J2000
     type: 'III',
     mirrorPair: 'mercury',
     fibonacciD: 21,
@@ -154,12 +160,13 @@ const planets = {
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
     ascendingNode: 131.7853754,
-    angleCorrection: 2.40008,
+    angleCorrection: 2.334258,
     perihelionEclipticYears: H * 2,
-    startpos: 47.95,
+    startpos: 48.01,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
+    ascendingNodeInvPlane: 192.04,  // Verified J2000
     type: 'III',
     mirrorPair: 'venus',
     fibonacciD: 34,
@@ -231,10 +238,25 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
+  marsPerihelionRef_JD: 2458377.167,      // 2018 Sep 16 16:00 UTC
   jupiterPerihelionRef_JD: 2459965.667,   // 2023 Jan 21 04:00 UTC
   saturnPerihelionRef_JD: 2452846.0,      // 2003 Jul 26
   uranusPerihelionRef_JD: 2439275.0,      // 1966 May 20
   neptunePerihelionRef_JD: 2406600.0,     // 1876 Aug 27
+  // Invariable plane parameters for dynamic ecliptic inclination
+  earthAscendingNodeInvPlane: 284.51,     // Souami & Souchay (2012)
+  earthInclinationPhaseAngle: 203.3195,
+  earthInvPlanePrecessionYears: H / 3,    // Earth's Ω precession period on inv. plane
+
+  // Ascending node frame corrections for planet-level tilt placement (degrees).
+  // When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
+  // annual rotation) to planet.containerObj (below), the ascending node direction
+  // changes reference frame. These empirical J2000 corrections align ecliptic
+  // latitude with JPL Horizons. For Type III planets, approximately = startpos * 2.
+  ascNodeTiltCorrection: {
+    mercury: 123.2, venus: 69.8, mars: 135.8,
+    jupiter: 27.3, saturn: 24.5, uranus: 93.8, neptune: 96.7,
+  },
 };
 
 // --- Moon derived cycles (lines 992-1011) ---
@@ -275,9 +297,11 @@ function computePlanetDerived(key) {
     elipticOrbit = perihelionDistance / 2;
     realOrbitalEccentricity = p.orbitalEccentricity;
   } else if (p.type === 'II') {
-    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
-    elipticOrbit = ((realOrbitalEccentricity * orbitDistance) / 2) * 100
-                 + (p.orbitalEccentricity * orbitDistance - realOrbitalEccentricity * orbitDistance) * 100;
+    realOrbitalEccentricity = p.orbitalEccentricity;
+    // Type II: orbit center offset = half the eccentricity distance (static base).
+    // The geocentric Earth parallax component is added dynamically in moveModel,
+    // same as Type III but with: eccDist/2 - geocentric/2.
+    elipticOrbit = (p.orbitalEccentricity * orbitDistance * 100) / 2;
     perihelionDistance = (orbitDistance * p.orbitalEccentricity * 100) + elipticOrbit;
   } else { // Type III
     realOrbitalEccentricity = p.orbitalEccentricity;

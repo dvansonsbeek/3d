@@ -251,6 +251,9 @@ const sDay = 1 / C.meanSolarYearDays;
 const correctionYears = C.correctionDays / C.meanSolarYearDays;
 const startModelYearWithCorrection = C.startmodelYear + correctionYears;
 
+// Ascending node frame corrections from ASTRO_REFERENCE (see constants.js)
+const ascNodeToolCorrection = C.ASTRO_REFERENCE.ascNodeTiltCorrection;
+
 // Per-planet variables computed from constants (replicating script.js lines 1687-1770)
 function getPlanetSceneData(key) {
   const p = C.planets[key];
@@ -270,9 +273,12 @@ function getPlanetSceneData(key) {
   const periFromEarthA = Math.cos((longPeri + angleCorr + 90) * d2r) * periDist;
   const periFromEarthB = Math.cos((90 - (longPeri + angleCorr - 90)) * d2r) * periDist;
 
-  // RealPerihelion tilts (ecliptic inclination decomposed via ascending node)
-  const realPeriTiltA = Math.cos((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
-  const realPeriTiltB = Math.sin((-90 - p.ascendingNode) * d2r) * -p.eclipticInclinationJ2000;
+  // Ascending node corrected for planet-level tilt placement
+  const correctedAscNode = p.ascendingNode + (ascNodeToolCorrection[key] || 0);
+
+  // RealPerihelion tilts (ecliptic inclination decomposed via corrected ascending node)
+  const realPeriTiltA = Math.cos((-90 - correctedAscNode) * d2r) * -p.eclipticInclinationJ2000;
+  const realPeriTiltB = Math.sin((-90 - correctedAscNode) * d2r) * -p.eclipticInclinationJ2000;
 
   // Speed for RealPerihelionAtSun — differs by type
   let realPeriSpeed, realPeriStartPos;
@@ -482,7 +488,7 @@ function buildSceneGraph() {
       orbitRadius: 0,
       orbitCentera: pd.periFromEarthA, orbitCenterb: pd.periFromEarthB, orbitCenterc: 0,
       orbitTilta: 0, orbitTiltb: 0, tilt: 0,
-      startPos: C.correctionSun,
+      startPos: 0,
       speed: Math.PI * 2,
     });
     eclip1.pivot.addChild(periFromE.container);
@@ -497,36 +503,44 @@ function buildSceneGraph() {
     periFromE.pivot.addChild(eclip2.container);
 
     // Layer 4: RealPerihelionAtSun
+    // NOTE: Orbital plane tilt is applied at the PLANET container level (below the
+    // annual rotation), not here. Placing it here causes the tilt's latitude effect
+    // to oscillate annually in the tilted frame; at opposition dates (which recur at
+    // the synodic period), the combined angle changes by exactly -2pi, making the
+    // sampled latitude constant. Moving the tilt below the annual rotation ensures
+    // the latitude varies with the planet's sidereal orbital angle.
     const realPeri = makePrecessionNode(key + 'RealPerihelionAtSun', {
       orbitRadius: pd.elipticOrbitRadius,
       orbitCentera: 100, orbitCenterb: 0, orbitCenterc: 0,
-      orbitTilta: pd.realPeriTiltA, orbitTiltb: pd.realPeriTiltB,
+      orbitTilta: 0, orbitTiltb: 0,
       tilt: 0,
       startPos: pd.realPeriStartPos,
       speed: pd.realPeriSpeed,
     });
     eclip2.pivot.addChild(realPeri.container);
 
-    // Planet itself
+    // Planet itself — orbital plane tilt applied here (below annual rotation)
     const planetDef = {
       orbitRadius: pd.orbitRadiusScene,
       orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-      orbitTilta: 0, orbitTiltb: 0,
+      orbitTilta: pd.realPeriTiltA, orbitTiltb: pd.realPeriTiltB,
       tilt: 0,  // tilt only affects axial spin, not position
       startPos: pd.p.startpos,
       speed: pd.planetSpeed,
       eccentricity: pd.p.orbitalEccentricity,
     };
-    // Add equation of center for Type III planets (same pattern as Sun EoC)
+    // Add equation of center (variable speed) for planets
     const periRefMap = {
+      mars: C.ASTRO_REFERENCE.marsPerihelionRef_JD,
       jupiter: C.ASTRO_REFERENCE.jupiterPerihelionRef_JD,
       saturn: C.ASTRO_REFERENCE.saturnPerihelionRef_JD,
       uranus: C.ASTRO_REFERENCE.uranusPerihelionRef_JD,
       neptune: C.ASTRO_REFERENCE.neptunePerihelionRef_JD,
     };
-    if (periRefMap[key]) {
+    if (periRefMap[key] && pd.p.type !== 'II') {
       const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
       const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
+      // Type III: half-eccentricity to correct for double-counting with geometric offset
       planetDef.eccentricity = pd.p.orbitalEccentricity / 2;
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
         + (pd.planetSpeed - periPrecRate) * pos_peri;
@@ -550,6 +564,63 @@ function buildSceneGraph() {
     moonLunarLevel, moonNodalPrec,
     planetNodeMap,
   };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DYNAMIC ECLIPTIC INCLINATION — From invariable plane dynamics
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Compute the dynamic ecliptic inclination for a planet at a given time.
+ *
+ * Replicates the logic from script.js:
+ *   computeInclinationEarth() — Earth's inv. plane inclination oscillation
+ *   computePlanetInvPlaneInclinationDynamic() — planet's inv. plane oscillation
+ *   updateDynamicInclinations() — normal vector dot product → ecliptic inclination
+ *
+ * @param {string} key — planet key (e.g. 'saturn')
+ * @param {number} yearsSinceBalanced — years since the balanced year epoch
+ * @returns {number} ecliptic inclination in degrees
+ */
+function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
+  const p = C.planets[key];
+
+  // --- Earth's orbital plane normal in invariable plane coords ---
+  // Earth: i = mean - amplitude × cos(2π × years / (H/3))
+  const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
+  const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
+  const earthI = (C.earthInvPlaneInclinationMean
+    - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
+
+  // Earth Ω on invariable plane (precesses at 360/period per year)
+  const earthOmegaRate = 360 / earthPrecYears;
+  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
+    - earthOmegaRate * C.yearsFromBalancedToJ2000
+    + earthOmegaRate * yearsSinceBalanced) * d2r;
+
+  // --- Planet's orbital plane normal ---
+  // Planet: i = mean + amplitude × cos(Ω - phaseAngle)
+  const planetOmegaRate = 360 / p.perihelionEclipticYears;
+  const planetOmegaDeg = p.ascendingNodeInvPlane
+    - planetOmegaRate * C.yearsFromBalancedToJ2000
+    + planetOmegaRate * yearsSinceBalanced;
+  const planetOmega = planetOmegaDeg * d2r;
+
+  const planetPhaseDeg = planetOmegaDeg - p.inclinationPhaseAngle;
+  const planetI = (p.invPlaneInclinationMean
+    + p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+
+  // --- Dot product of normal vectors → angle between orbital planes ---
+  const eNx = Math.sin(earthI) * Math.sin(earthOmega);
+  const eNy = Math.sin(earthI) * Math.cos(earthOmega);
+  const eNz = Math.cos(earthI);
+
+  const pNx = Math.sin(planetI) * Math.sin(planetOmega);
+  const pNy = Math.sin(planetI) * Math.cos(planetOmega);
+  const pNz = Math.cos(planetI);
+
+  const cosAngle = eNx * pNx + eNy * pNy + eNz * pNz;
+  return Math.acos(Math.max(-1, Math.min(1, cosAngle))) * (180 / Math.PI);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -699,6 +770,10 @@ function moveModel(graph, pos) {
   const earthPeriPrec1Angle = graph.earthPeriPrec1.orbit.ry;
   const earthPeriEcl = ((earthPeriPrec1Angle + C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
+  // Compute yearsSinceBalanced for dynamic ecliptic inclination
+  const currentJD = C.startmodelJD + pos * C.meanSolarYearDays;
+  const yearsSinceBalanced = (currentJD - C.balancedJD) / C.meanSolarYearDays;
+
   // Planets
   for (const key of Object.keys(graph.planetNodeMap)) {
     const pm = graph.planetNodeMap[key];
@@ -706,15 +781,29 @@ function moveModel(graph, pos) {
     animateObject(pm.periFromE, pm.periFromE.def);
     animateObject(pm.eclip2, pm.eclip2.def);
 
-    // Dynamic geocentric elipticOrbit for Type III planets
-    if (pm.sceneData && pm.sceneData.p.type === 'III') {
+    // Dynamic geocentric elipticOrbit for Type II + III planets
+    if (pm.sceneData && (pm.sceneData.p.type === 'III' || pm.sceneData.p.type === 'II')) {
       const planetPrecAngle = pm.eclip1.orbit.ry;
       const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const dw = earthPeriEcl - planetPeriEcl;
       let eo = 2 * C.ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
       if (key === 'saturn') eo = -eo;
+      if (pm.sceneData.p.type === 'II') {
+        // Type II: static Mars orbit center offset + half Earth geocentric correction
+        const eccDist = pm.sceneData.p.orbitalEccentricity * pm.sceneData.d.orbitDistance * 100;
+        eo = eccDist / 2 - eo / 2;
+      }
       pm.realPeri.pivot.px = eo;
       pm.realPeri.rotAxis.px = eo;
+    }
+
+    // Dynamic orbital plane: update planet container tilt from dynamic ecliptic inclination
+    if (pm.sceneData && pm.sceneData.p.ascendingNodeInvPlane !== undefined) {
+      const dynamicIncl = computeDynamicEclipticInclination(key, yearsSinceBalanced);
+      const correctedAscNode = pm.sceneData.p.ascendingNode + (ascNodeToolCorrection[key] || 0);
+      const angle = (-90 - correctedAscNode) * d2r;
+      pm.planet.container.rx = Math.cos(angle) * -dynamicIncl * d2r;
+      pm.planet.container.rz = Math.sin(angle) * -dynamicIncl * d2r;
     }
 
     animateObject(pm.realPeri, pm.realPeri.def);

@@ -18,7 +18,7 @@ import { Pane } from 'tweakpane';
   Fibonacci number ratios. Earth is defined by 25 parameters, the Moon by 9, and
   each planet by 13.
 
-  Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v1
+  Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v2
   Website:  https://holisticuniverse.com
 */
 
@@ -102,7 +102,7 @@ const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.984218;                  // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
-const mercuryStartpos = 84.205;                            // Needs to be at ~7h24m46.43 if start model is 2451716.5
+const mercuryStartpos = 80.55;                              // Retuned after removing correctionSun from PeriFromEarth
 
 // Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.6967;
@@ -116,7 +116,7 @@ const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.783252;                    // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
-const venusStartpos = 249.69;                             // Needs to be at ~6h11m08.61 if start model is 2451716.5 (34.715?)
+const venusStartpos = 248.59;                              // Retuned after removing correctionSun from PeriFromEarth
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.934;
@@ -130,7 +130,7 @@ const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
 const marsAngleCorrection = -2.107087;                    // To align the perihelion exactly
 const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
-const marsStartpos = 121.512;                             // Needs to be at ~6h13m09.72 if start model is 2451716.5
+const marsStartpos = 121.67;                              // Optimized for start-date RA match
 
 // Reference lengths used as INPUT for Jupiter
 const jupiterSolarYearInput = 4330.6;
@@ -142,9 +142,9 @@ const jupiterLongitudePerihelion = 14.70659401;
 const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
 const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
-const jupiterAngleCorrection = 1.095885;                  // To align the perihelion exactly
+const jupiterAngleCorrection = 0.945267;                  // To align the perihelion exactly
 const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
-const jupiterStartpos = 13.62;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
+const jupiterStartpos = 13.82;                            // Needs to be at ~3h43m48.25 if start model is 2451716.5
 
 // Reference lengths used as INPUT for Saturn
 const saturnSolarYearInput = 10746.6;
@@ -156,9 +156,9 @@ const saturnLongitudePerihelion = 92.12794343;
 const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
 const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
-const saturnAngleCorrection = -0.175438;                  // To align the perihelion exactly
+const saturnAngleCorrection = -0.17484;                  // To align the perihelion exactly
 const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
-const saturnStartpos = 11.34;                             // Optimized for GC + opposition timing
+const saturnStartpos = 11.40;                             // Optimized for GC + opposition timing
 
 // Reference lengths used as INPUT for Uranus
 const uranusSolarYearInput = 30583;
@@ -170,9 +170,9 @@ const uranusLongitudePerihelion = 170.7308251;
 const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
 const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
-const uranusAngleCorrection = -0.775884;                  // To align the perihelion exactly
+const uranusAngleCorrection = -0.736726;                  // To align the perihelion exactly
 const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
-const uranusStartpos = 44.71;                             // Needs to be at ~21h32m43.04 if start model is 2451716.5
+const uranusStartpos = 44.89;                              // Retuned after removing correctionSun from PeriFromEarth
 
 // Reference lengths used as INPUT for Neptune
 const neptuneSolarYearInput = 59980;
@@ -184,9 +184,9 @@ const neptuneLongitudePerihelion = 45.80124471;
 const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
 const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
-const neptuneAngleCorrection = 2.40008;                  // To align the perihelion exactly
+const neptuneAngleCorrection = 2.334258;                  // To align the perihelion exactly
 const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
-const neptuneStartpos = 47.95;                            // Needs to be at ~20h33m40.34 if start model is 2451716.5
+const neptuneStartpos = 48.01;                             // Retuned after removing correctionSun from PeriFromEarth
 
 //*************************************************************
 // The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
@@ -987,6 +987,16 @@ const ASTRO_REFERENCE = {
   // Stellar day (rotation relative to fixed stars)
   // Slightly longer than sidereal day due to precession
   stellarDayJ2000: 86164.0989036905,       // ~23h 56m 4.0989s
+
+  // Ascending node frame corrections for planet-level tilt placement (degrees).
+  // When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
+  // annual rotation) to planet.containerObj (below), the ascending node direction
+  // changes reference frame. These empirical J2000 corrections align ecliptic
+  // latitude with JPL Horizons. For Type III planets, approximately = startpos * 2.
+  ascNodeTiltCorrection: {
+    mercury: 123.2, venus: 69.8, mars: 135.8,
+    jupiter: 27.3, saturn: 24.5, uranus: 93.8, neptune: 96.7,
+  },
 };
 
 const perihelionCycleLength = holisticyearLength / 16;
@@ -2658,7 +2668,7 @@ const mercuryPerihelionDurationEcliptic1 = {
 
 const mercuryPerihelionFromEarth = {
   name: "PERIHELION MERCURY",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -2704,6 +2714,9 @@ const mercuryPerihelionDurationEcliptic2 = {
   pivotObj:"",
   isNotPhysicalObject: true,
 };
+
+// Ascending node frame corrections from ASTRO_REFERENCE (see above)
+const ascNodeToolCorrection = ASTRO_REFERENCE.ascNodeTiltCorrection;
 
 const mercuryRealPerihelionAtSun = {
   name: "Mercury Real Perihelion At Sun",
@@ -2761,8 +2774,8 @@ const mercury = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
   eccentricity: mercuryOrbitalEccentricity,
 
   size: (diameters.mercuryDiameter/ currentAUDistance)*100,
@@ -2802,7 +2815,7 @@ const venusPerihelionDurationEcliptic1 = {
 
 const venusPerihelionFromEarth = {
   name: "PERIHELION VENUS",
-  startPos: correctionSun, 
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -2905,8 +2918,8 @@ const venus = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
   eccentricity: venusOrbitalEccentricity,
 
   size: (diameters.venusDiameter/ currentAUDistance)*100,
@@ -2946,7 +2959,7 @@ const marsPerihelionDurationEcliptic1 = {
 
 const marsPerihelionFromEarth = {
   name: "PERIHELION MARS",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3005,6 +3018,11 @@ const marsRealPerihelionAtSun = {
   orbitCenterc: 0,
   orbitTilta: Math.cos(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
+  eclipticPrecLayer: marsPerihelionDurationEcliptic1,
+  longitudePerihelion: marsLongitudePerihelion,
+  planetType: 'II',
+  _orbitalEccentricity: marsOrbitalEccentricity,
+  _orbitDistance: marsOrbitDistance,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -3049,8 +3067,8 @@ const mars = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
   eccentricity: marsOrbitalEccentricity,
 
   size: (diameters.marsDiameter/ currentAUDistance)*100,
@@ -3090,7 +3108,7 @@ const jupiterPerihelionDurationEcliptic1 = {
 
 const jupiterPerihelionFromEarth = {
   name: "PERIHELION JUPITER",
-  startPos: correctionSun,
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3196,8 +3214,8 @@ const jupiter = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
   eccentricity: jupiterOrbitalEccentricity / 2,
   perihelionPhaseJ2000: -jupiterStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / (holisticyearLength / 5))
@@ -3246,7 +3264,7 @@ const saturnPerihelionDurationEcliptic1 = {
 
 const saturnPerihelionFromEarth = {
   name: "PERIHELION SATURN",
-  startPos: correctionSun,
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3352,8 +3370,8 @@ const saturn = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
   eccentricity: saturnOrbitalEccentricity / 2,
   perihelionPhaseJ2000: -saturnStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / saturnPerihelionEclipticYears)
@@ -3402,7 +3420,7 @@ const uranusPerihelionDurationEcliptic1 = {
 
 const uranusPerihelionFromEarth = {
   name: "PERIHELION URANUS",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3508,8 +3526,8 @@ const uranus = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
   eccentricity: uranusOrbitalEccentricity / 2,
   perihelionPhaseJ2000: -uranusStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / uranusPerihelionEclipticYears)
@@ -3558,7 +3576,7 @@ const neptunePerihelionDurationEcliptic1 = {
 
 const neptunePerihelionFromEarth = {
   name: "PERIHELION NEPTUNE",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3664,8 +3682,8 @@ const neptune = {
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: 0,
-  orbitTiltb: 0,
+  orbitTilta: Math.cos(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
   eccentricity: neptuneOrbitalEccentricity / 2,
   perihelionPhaseJ2000: -neptuneStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / neptunePerihelionEclipticYears)
@@ -3719,7 +3737,7 @@ const plutoPerihelionDurationEcliptic1 = {
 
 const plutoPerihelionFromEarth = {
   name: "PERIHELION PLUTO",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3863,7 +3881,7 @@ const halleysPerihelionDurationEcliptic1 = {
 
 const halleysPerihelionFromEarth = {
   name: "PERIHELION HALLEYS",
-  startPos: correctionSun,    
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4009,7 +4027,7 @@ const erosPerihelionDurationEcliptic1 = {
 
 const erosPerihelionFromEarth = {
   name: "PERIHELION EROS",
-  startPos: correctionSun,
+  startPos: 0,
   speed: Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4976,9 +4994,19 @@ renderer.domElement.addEventListener('wheel', (event) => {
 //*************************************************************
 //First add the default settings of the planets
 planetObjects.forEach(obj => createPlanet(obj));
+
+// Move visual elements into tilt groups for RealPerihelionAtSun objects.
+// This zeroes containerObj rotation (so planet positions use corrected tilt
+// applied at the planet.containerObj level) while preserving visual tilt
+// for orbital plane helpers and node markers.
+[mercuryRealPerihelionAtSun, venusRealPerihelionAtSun, marsRealPerihelionAtSun,
+ jupiterRealPerihelionAtSun, saturnRealPerihelionAtSun, uranusRealPerihelionAtSun,
+ neptuneRealPerihelionAtSun, plutoRealPerihelionAtSun, halleysRealPerihelionAtSun,
+ erosRealPerihelionAtSun].forEach(setupVisualTiltGroup);
+
 updatePlanetSizes(0);
 
-//Now adding the order of all objects 
+//Now adding the order of all objects
 startingPoint.pivotObj.add(earth.containerObj);
 
 earth.pivotObj.add(earthInclinationPrecession.containerObj);
@@ -9274,7 +9302,7 @@ function createVisualHelpers(stepData, options = {}) {
     // The inclinationPlane should only inherit the orbital tilt (rotation.x, rotation.z)
     // but NOT the orbit.rotation.y which changes with startPos and animation.
     // The ascending/descending nodes are fixed points in space relative to the ecliptic.
-    obj.containerObj.add(hierarchyInspector.inclinationPlane);
+    (obj.tiltGroupObj || obj.containerObj).add(hierarchyInspector.inclinationPlane);
   }
 
   // Arrow from P (FixedPerihelionAtSun) to Sun (Step 4 only)
@@ -9570,10 +9598,11 @@ function createVisualHelpers(stepData, options = {}) {
           // Rotate so local +X points toward P (away from Sun center)
           hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
 
-          // Apply orbital plane tilt
-          if (obj && obj.containerObj) {
-            hierarchyInspector.anomalyGroup.rotation.x = obj.containerObj.rotation.x;
-            hierarchyInspector.anomalyGroup.rotation.z = obj.containerObj.rotation.z;
+          // Apply orbital plane tilt (use visual tilt group if available)
+          const tiltSrc1 = (obj && obj.tiltGroupObj) || (obj && obj.containerObj);
+          if (tiltSrc1) {
+            hierarchyInspector.anomalyGroup.rotation.x = tiltSrc1.rotation.x;
+            hierarchyInspector.anomalyGroup.rotation.z = tiltSrc1.rotation.z;
           }
 
           // Initialize Earth-Sun line rotation
@@ -12773,10 +12802,11 @@ function updateHierarchyLiveData() {
       // Rotate so local +X points toward P (away from Sun center, toward perihelion)
       hierarchyInspector.anomalyGroup.rotation.y = -perihelionAngle + Math.PI;
 
-      // Apply orbital plane tilt (if any) - this tilts the entire anomaly visualization
-      if (obj && obj.containerObj) {
-        hierarchyInspector.anomalyGroup.rotation.x = obj.containerObj.rotation.x;
-        hierarchyInspector.anomalyGroup.rotation.z = obj.containerObj.rotation.z;
+      // Apply orbital plane tilt (use visual tilt group if available)
+      const tiltSrc2 = (obj && obj.tiltGroupObj) || (obj && obj.containerObj);
+      if (tiltSrc2) {
+        hierarchyInspector.anomalyGroup.rotation.x = tiltSrc2.rotation.x;
+        hierarchyInspector.anomalyGroup.rotation.z = tiltSrc2.rotation.z;
       }
     }
 
@@ -13023,9 +13053,10 @@ function updateHierarchyLiveData() {
     const obj = realPerihelionObjects[planetKey];
 
     if (obj && obj.containerObj) {
-      // Get the current container rotation (which reflects the dynamic ascending node)
-      const tiltaRad = obj.containerObj.rotation.x;
-      const tiltbRad = obj.containerObj.rotation.z;
+      // Get the current tilt rotation (use visual tilt group if available)
+      const tiltSrc = obj.tiltGroupObj || obj.containerObj;
+      const tiltaRad = tiltSrc.rotation.x;
+      const tiltbRad = tiltSrc.rotation.z;
 
       // PERFORMANCE: Skip expensive recalculation if tilt hasn't changed significantly (>0.0001 rad ≈ 0.006°)
       const tiltChanged = _lastAscNodeTiltA === null ||
@@ -29415,13 +29446,23 @@ function moveModel(pos) {
       obj._meeusT = T;  // store T for obliquity computation
     }
 
-    // Dynamic geocentric elipticOrbit for Type III planets
+    // Dynamic geocentric elipticOrbit for Type II + III planets
     // earthPerihelionPrecession1 is earlier in planetObjects, so its rotation.y is already current
     if (obj.eclipticPrecLayer) {
       const earthPeriEcl = perihelionLongitudeEcliptic(earthPerihelionPrecession1, ASTRO_REFERENCE.perihelionLongitudeJ2000_deg);
       const planetPeriEcl = perihelionLongitudeEcliptic(obj.eclipticPrecLayer, obj.longitudePerihelion);
       const dw = (earthPeriEcl - planetPeriEcl) * Math.PI / 180;
-      obj.orbitRadius = obj.signFlip * 2 * ASTRO_REFERENCE.eccentricityJ2000 * 100 * Math.sin(dw);
+      let eo = 2 * ASTRO_REFERENCE.eccentricityJ2000 * 100 * Math.sin(dw);
+      if (obj.planetType === 'II') {
+        // Type II: static Mars orbit center offset + half Earth geocentric correction
+        const eccDist = obj._orbitalEccentricity * obj._orbitDistance * 100;
+        eo = eccDist / 2 - eo / 2;
+      } else {
+        eo = (obj.signFlip || 1) * eo;
+      }
+      obj.orbitRadius = eo;
+      obj.pivotObj.position.x = eo;
+      obj.rotationAxis.position.x = eo;
     }
 
     const a = obj.a ?? obj.orbitRadius;   // semi-major (or radius)
@@ -29439,7 +29480,7 @@ function moveModel(pos) {
       obj.orbitObj.rotation.y = 0;              // keep the path still
     } else {
       // -------- orbitradius circular logic ----
-      obj.orbitObj.rotation.y = θ; 
+      obj.orbitObj.rotation.y = θ;
     }
 
     // planet’s own day-night spin
@@ -30412,46 +30453,40 @@ function updateOrbitalPlaneRotations() {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
-  // Helper to update a planet's orbital plane rotation
-  const updatePlaneRotation = (planetData, ascendingNode, inclination, planetName) => {
-    if (!planetData.containerObj) {
-      if (_debugAscendingNodeLogEnabled && planetName === 'Mercury') {
-        console.warn(`⚠️ DEBUG: ${planetName} containerObj is missing!`);
-      }
-      return;
-    }
-
-    // Calculate new tilt values from dynamic ascending node
+  // Helper to update a planet's orbital plane rotation.
+  // Updates BOTH the visual tilt group (for orbital plane grid, node markers)
+  // AND the planet's containerObj (for correct ecliptic latitude position).
+  const updatePlaneRotation = (realPeriData, planetData, ascendingNode, inclination, planetName) => {
+    // Visual tilt (orbital plane grid, node markers) — standard ascending node
     const angle = (-90 - ascendingNode) * DEG2RAD;
     const newTilta = Math.cos(angle) * -inclination;
     const newTiltb = Math.sin(angle) * -inclination;
 
-    // DEBUG: Log what we're setting
-    if (_debugAscendingNodeLogEnabled && planetName === 'Mercury') {
-      const now = Date.now();
-      if (now - _debugAscendingNodeLastLog < _debugAscendingNodeInterval + 100) {
-        const oldX = planetData.containerObj.rotation.x;
-        const newX = newTilta * DEG2RAD;
-        console.log(`🔧 Mercury rotation: Ω=${ascendingNode.toFixed(2)}°, old.x=${oldX.toFixed(6)}, new.x=${newX.toFixed(6)}, diff=${(newX-oldX).toFixed(8)}`);
-      }
+    if (realPeriData.tiltGroupObj) {
+      realPeriData.tiltGroupObj.rotation.x = newTilta * DEG2RAD;
+      realPeriData.tiltGroupObj.rotation.z = newTiltb * DEG2RAD;
     }
 
-    // Update container rotation
-    planetData.containerObj.rotation.x = newTilta * DEG2RAD;
-    planetData.containerObj.rotation.z = newTiltb * DEG2RAD;
+    // Position tilt (planet placement) — corrected ascending node
+    if (planetData && planetData.containerObj) {
+      const correction = ascNodeToolCorrection[planetName.toLowerCase()] || 0;
+      const corrAngle = (-90 - (ascendingNode + correction)) * DEG2RAD;
+      planetData.containerObj.rotation.x = Math.cos(corrAngle) * -inclination * DEG2RAD;
+      planetData.containerObj.rotation.z = Math.sin(corrAngle) * -inclination * DEG2RAD;
+    }
   };
 
   // Update each planet's orbital plane using dynamic ecliptic inclination
-  updatePlaneRotation(mercuryRealPerihelionAtSun, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic, 'Mercury');
-  updatePlaneRotation(venusRealPerihelionAtSun, o.venusAscendingNode, o.venusEclipticInclinationDynamic, 'Venus');
-  updatePlaneRotation(marsRealPerihelionAtSun, o.marsAscendingNode, o.marsEclipticInclinationDynamic, 'Mars');
-  updatePlaneRotation(jupiterRealPerihelionAtSun, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic, 'Jupiter');
-  updatePlaneRotation(saturnRealPerihelionAtSun, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic, 'Saturn');
-  updatePlaneRotation(uranusRealPerihelionAtSun, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic, 'Uranus');
-  updatePlaneRotation(neptuneRealPerihelionAtSun, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic, 'Neptune');
-  updatePlaneRotation(plutoRealPerihelionAtSun, o.plutoAscendingNode, o.plutoEclipticInclinationDynamic, 'Pluto');
-  updatePlaneRotation(halleysRealPerihelionAtSun, o.halleysAscendingNode, o.halleysEclipticInclinationDynamic, 'Halleys');
-  updatePlaneRotation(erosRealPerihelionAtSun, o.erosAscendingNode, o.erosEclipticInclinationDynamic, 'Eros');
+  updatePlaneRotation(mercuryRealPerihelionAtSun, mercury, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic, 'Mercury');
+  updatePlaneRotation(venusRealPerihelionAtSun, venus, o.venusAscendingNode, o.venusEclipticInclinationDynamic, 'Venus');
+  updatePlaneRotation(marsRealPerihelionAtSun, mars, o.marsAscendingNode, o.marsEclipticInclinationDynamic, 'Mars');
+  updatePlaneRotation(jupiterRealPerihelionAtSun, jupiter, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic, 'Jupiter');
+  updatePlaneRotation(saturnRealPerihelionAtSun, saturn, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic, 'Saturn');
+  updatePlaneRotation(uranusRealPerihelionAtSun, uranus, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic, 'Uranus');
+  updatePlaneRotation(neptuneRealPerihelionAtSun, neptune, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic, 'Neptune');
+  updatePlaneRotation(plutoRealPerihelionAtSun, pluto, o.plutoAscendingNode, o.plutoEclipticInclinationDynamic, 'Pluto');
+  updatePlaneRotation(halleysRealPerihelionAtSun, halleys, o.halleysAscendingNode, o.halleysEclipticInclinationDynamic, 'Halleys');
+  updatePlaneRotation(erosRealPerihelionAtSun, eros, o.erosAscendingNode, o.erosEclipticInclinationDynamic, 'Eros');
 }
 
 /**
@@ -31205,10 +31240,11 @@ function orbitalAnglesFromTilts(pd, peri) {
   // Use dynamic container rotation if available (updated by updateOrbitalPlaneRotations),
   // otherwise fall back to static values
   let ax, az;
-  if (pd.containerObj) {
+  const src = pd.tiltGroupObj || pd.containerObj;
+  if (src) {
     // Convert from radians back to degrees (container rotation is in radians)
-    ax = pd.containerObj.rotation.x * 180 / Math.PI;
-    az = pd.containerObj.rotation.z * 180 / Math.PI;
+    ax = src.rotation.x * 180 / Math.PI;
+    az = src.rotation.z * 180 / Math.PI;
   } else {
     ax = pd.orbitTilta;   // degrees (static fallback)
     az = pd.orbitTiltb;   // degrees
@@ -32735,6 +32771,24 @@ function createPlanet(pd) {           // pd = Planet Data
   //}
 
   scene.add(orbitContainer);
+}
+
+/**
+ * Move visual elements (orbital plane helper, inclination plane) into a dedicated
+ * tilt group inside a RealPerihelionAtSun containerObj. The containerObj rotation
+ * is then zeroed so it no longer tilts planet positions (tilt is applied at the
+ * planet.containerObj level instead for correct ecliptic latitude).
+ */
+function setupVisualTiltGroup(pd) {
+  if (!pd.containerObj) return;
+  const tiltGroup = new THREE.Object3D();
+  tiltGroup.rotation.x = pd.containerObj.rotation.x;
+  tiltGroup.rotation.z = pd.containerObj.rotation.z;
+  pd.containerObj.add(tiltGroup);
+  pd.containerObj.rotation.x = 0;
+  pd.containerObj.rotation.z = 0;
+  pd.tiltGroupObj = tiltGroup;
+  if (pd.orbitPlaneHelper) tiltGroup.add(pd.orbitPlaneHelper);
 }
 
 /**
