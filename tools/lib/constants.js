@@ -43,12 +43,13 @@ const planets = {
     solarYearInput: 87.9686,
     eclipticInclinationJ2000: 7.00497902,
     orbitalEccentricity: 0.20563593,
+    eocFraction: -0.5155,
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
     angleCorrection: 0.984218,
     perihelionEclipticYears: H / (1 + 3/8),
-    startpos: 80.55,
+    startpos: 83.17,
     invPlaneInclinationMean: null, // filled below
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -59,15 +60,16 @@ const planets = {
   },
   venus: {
     name: 'Venus',
-    solarYearInput: 224.6967,
+    solarYearInput: 224.695,
     eclipticInclinationJ2000: 3.39467605,
     orbitalEccentricity: 0.00677672,
+    eocFraction: 3.3924,
     invPlaneInclinationJ2000: 2.1545441,
     longitudePerihelion: 131.5765919,
     ascendingNode: 76.67877109,
     angleCorrection: -2.783252,
     perihelionEclipticYears: H * 2,
-    startpos: 248.59,
+    startpos: 249.72,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -78,15 +80,16 @@ const planets = {
   },
   mars: {
     name: 'Mars',
-    solarYearInput: 686.934,
+    solarYearInput: 686.931,
     eclipticInclinationJ2000: 1.84969142,
     orbitalEccentricity: 0.09339410,
+    eocFraction: -0.0624,
     invPlaneInclinationJ2000: 1.6311858,
     longitudePerihelion: 336.0650681,
     ascendingNode: 49.55737662,
     angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
-    startpos: 121.67,
+    startpos: 121.58,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -97,15 +100,16 @@ const planets = {
   },
   jupiter: {
     name: 'Jupiter',
-    solarYearInput: 4330.6,
+    solarYearInput: 4330.65,
     eclipticInclinationJ2000: 1.30439695,
     orbitalEccentricity: 0.04838624,
+    eocFraction: 0.5145,
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
     ascendingNode: 100.4877868,
     angleCorrection: 0.945267,
     perihelionEclipticYears: H / 5,
-    startpos: 13.82,
+    startpos: 13.78,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -116,15 +120,16 @@ const planets = {
   },
   saturn: {
     name: 'Saturn',
-    solarYearInput: 10746.6,
+    solarYearInput: 10747.0,
     eclipticInclinationJ2000: 2.48599187,
     orbitalEccentricity: 0.05386179,
+    eocFraction: 0.5605,
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
     ascendingNode: 113.6452856,
     angleCorrection: -0.17484,
     perihelionEclipticYears: -H / 8,
-    startpos: 11.40,
+    startpos: 11.35,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
@@ -135,9 +140,10 @@ const planets = {
   },
   uranus: {
     name: 'Uranus',
-    solarYearInput: 30583,
+    solarYearInput: 30586,
     eclipticInclinationJ2000: 0.77263783,
     orbitalEccentricity: 0.04725744,
+    eocFraction: 0.54,
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
     ascendingNode: 74.00919023,
@@ -157,12 +163,13 @@ const planets = {
     solarYearInput: 59980,
     eclipticInclinationJ2000: 1.77004347,
     orbitalEccentricity: 0.00859048,
+    eocFraction: 0.55,
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
     ascendingNode: 131.7853754,
     angleCorrection: 2.334258,
     perihelionEclipticYears: H * 2,
-    startpos: 48.01,
+    startpos: 47.98,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 23.3195,
@@ -238,11 +245,13 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
-  marsPerihelionRef_JD: 2458377.167,      // 2018 Sep 16 16:00 UTC
+  mercuryPerihelionRef_JD: 2460335.6,     // Phase-optimized (+111° from 2023-Dec-29)
+  venusPerihelionRef_JD: 2460582.0,       // Phase-optimized (+129° from 2024-Jul-09)
+  marsPerihelionRef_JD: 2458669.2,        // Phase-optimized (+153° from 2018-Sep-16)
   jupiterPerihelionRef_JD: 2459965.667,   // 2023 Jan 21 04:00 UTC
   saturnPerihelionRef_JD: 2452846.0,      // 2003 Jul 26
   uranusPerihelionRef_JD: 2439275.0,      // 1966 May 20
-  neptunePerihelionRef_JD: 2406600.0,     // 1876 Aug 27
+  neptunePerihelionRef_JD: 2409432.4,     // Phase-optimized (+17° from 1876 Aug 27)
   // Invariable plane parameters for dynamic ecliptic inclination
   earthAscendingNodeInvPlane: 284.51,     // Souami & Souchay (2012)
   earthInclinationPhaseAngle: 203.3195,
@@ -293,25 +302,24 @@ function computePlanetDerived(key) {
   let perihelionDistance, elipticOrbit, realOrbitalEccentricity;
 
   if (p.type === 'I') {
-    perihelionDistance = orbitDistance * p.orbitalEccentricity * 100;
+    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+    perihelionDistance = orbitDistance * realOrbitalEccentricity * 100;
     elipticOrbit = perihelionDistance / 2;
-    realOrbitalEccentricity = p.orbitalEccentricity;
   } else if (p.type === 'II') {
-    realOrbitalEccentricity = p.orbitalEccentricity;
-    // Type II: orbit center offset = half the eccentricity distance (static base).
-    // The geocentric Earth parallax component is added dynamically in moveModel,
-    // same as Type III but with: eccDist/2 - geocentric/2.
-    elipticOrbit = (p.orbitalEccentricity * orbitDistance * 100) / 2;
+    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+    // Type II: orbit center offset = half the real eccentricity distance + remainder.
+    // Matches script.js: (realEcc*orbitDist/2)*100 + (ecc-realEcc)*orbitDist*100
+    elipticOrbit = (realOrbitalEccentricity * orbitDistance * 100) / 2 + (p.orbitalEccentricity - realOrbitalEccentricity) * orbitDistance * 100;
     perihelionDistance = (orbitDistance * p.orbitalEccentricity * 100) + elipticOrbit;
   } else { // Type III
-    realOrbitalEccentricity = p.orbitalEccentricity;
+    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
     // Geocentric correction: Earth's eccentricity creates an annual parallax
     // variation that depends on the angle between Earth's and planet's perihelion.
     // When aligned (Saturn), periFromEarth layer absorbs it. When perpendicular
     // (Jupiter), the realPeri layer must compensate.
     const dw = (ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - p.longitudePerihelion) * Math.PI / 180;
     elipticOrbit = 2 * ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
-    perihelionDistance = p.orbitalEccentricity * orbitDistance * 100;
+    perihelionDistance = realOrbitalEccentricity * orbitDistance * 100;
   }
 
   return {

@@ -531,17 +531,19 @@ function buildSceneGraph() {
     };
     // Add equation of center (variable speed) for planets
     const periRefMap = {
+      mercury: C.ASTRO_REFERENCE.mercuryPerihelionRef_JD,
+      venus: C.ASTRO_REFERENCE.venusPerihelionRef_JD,
       mars: C.ASTRO_REFERENCE.marsPerihelionRef_JD,
       jupiter: C.ASTRO_REFERENCE.jupiterPerihelionRef_JD,
       saturn: C.ASTRO_REFERENCE.saturnPerihelionRef_JD,
       uranus: C.ASTRO_REFERENCE.uranusPerihelionRef_JD,
       neptune: C.ASTRO_REFERENCE.neptunePerihelionRef_JD,
     };
-    if (periRefMap[key] && pd.p.type !== 'II') {
+    if (periRefMap[key]) {
       const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
       const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
-      // Type III: half-eccentricity to correct for double-counting with geometric offset
-      planetDef.eccentricity = pd.p.orbitalEccentricity / 2;
+      // Type III: per-planet EoC fraction to correct for double-counting with geometric offset
+      planetDef.eccentricity = pd.p.orbitalEccentricity * (pd.p.eocFraction ?? 0.5);
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
         + (pd.planetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;

@@ -95,6 +95,15 @@ The legacy formula remains in script.js as a historical artifact.
 
 ---
 
+## Derived Eccentricity: e/(1+e) Circular-Orbit Equivalent
+
+Mars uses `e/(1+e) = 0.08541762` (from J2000 e = 0.09339410) for the orbit
+offset calculation. See the
+[Type III doc, "Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)"](type-iii-geocentric-parallax.md#perihelion-distance-circular-orbit-eccentricity-e1e)
+section for the full derivation and physical basis.
+
+---
+
 ## Scene Graph Chain
 
 Mars uses the same 5-layer hierarchy as Type III planets:
@@ -179,46 +188,56 @@ calculation on the first frame, so its exact value is inconsequential.
 
 **`tools/lib/constants.js`:**
 - Mars planet entry: lines 79-97
-- Mars perihelion reference JD: line 241 (`2458377.167`, 2018 Sep 16)
+- Mars perihelion reference JD: line 250 (`2458669.2`, phase-optimized from 2018 Sep 16)
 
 ---
 
-## No Equation of Center for Mars
+## Equation of Center for Mars
 
-### Why Mars is excluded
+### Near-zero EoC fraction
 
-Type III planets use an equation of center (EoC) with `eccentricity / 2` to
-model variable orbital speed (Kepler's 2nd law). Mars is explicitly excluded
-from the EoC (`pd.p.type !== 'II'` guard at scene-graph.js line 540).
+Mars now has an equation of center with `eocFraction = -0.0624`, producing
+an effective eccentricity of `0.09339 * -0.0624 = -0.00583`. This is very
+small compared to Type III planets (fractions ~0.50), confirming that Mars's
+eccentricity is primarily captured by the geometric orbit offset.
 
-### Empirical validation
+The EoC is applied using the same formula as all other planets:
 
-Testing every EoC fraction from -0.30 to +0.50 confirms that **zero** is
-optimal for Mars:
+```javascript
+theta += 2 * (e * eocFraction) * sin(M) + 1.25 * (e * eocFraction)^2 * sin(2M)
+```
 
-| EoC Fraction | RMS RA   | RMS Dec  | RMS Total |
-|--------------|----------|----------|-----------|
-| -0.10        | 2.63 deg | 0.73 deg | 2.73 deg  |
-| -0.05        | 1.99 deg | 0.72 deg | 2.12 deg  |
-| -0.02        | 1.82 deg | 0.75 deg | 1.97 deg  |
-| -0.01        | 1.81 deg | 0.76 deg | 1.97 deg  |
-| **0.00**     | **1.83 deg** | **0.78 deg** | **1.99 deg** |
-| +0.02        | 1.95 deg | 0.82 deg | 2.12 deg  |
-| +0.05        | 2.28 deg | 0.91 deg | 2.45 deg  |
-| +0.10        | 3.08 deg | 1.07 deg | 3.26 deg  |
-| +0.50 (half) | 11.68 deg | 2.85 deg | 12.02 deg |
+With a phase-optimized perihelion reference:
 
-The minimum is at -0.01 to -0.02 with an improvement of only 0.025 deg
-over zero -- essentially noise. Any positive EoC fraction makes Mars
-significantly worse.
+```
+perihelionRef_JD: 2458669.2  (phase-optimized, +153° from 2018-Sep-16)
+```
 
-### Physical explanation
+### Why the fraction is near zero
 
-Mars's Type II formula already captures the eccentricity effect through the
-geometric orbit offset (`eccDist/2`). Adding EoC speed variation on top
-double-counts the effect. The off-center orbit geometry provides the speed
-variation implicitly through positional displacement, unlike Type III planets
-where the eccentricity effect is primarily a parallax correction.
+The original empirical tests (documented in the circular-vs-elliptical test)
+showed zero EoC was optimal when testing the standard `e/2` formula. With
+phase-optimized reference dates and unconstrained fractions, a small negative
+value (-0.0624) provides marginal improvement. The negative sign means the
+speed variation is opposite to the Keplerian direction — consistent with the
+geometric orbit offset already providing the dominant eccentricity effect.
+
+### Historical context
+
+Mars was originally excluded from EoC by an explicit `pd.p.type !== 'II'`
+guard. This guard was removed to allow all planets to use the same EoC
+infrastructure. The near-zero fraction confirms the original finding that
+Mars's eccentricity is primarily geometric, while still allowing the small
+phase correction that the EoC provides.
+
+### Impact
+
+| Metric    | Without EoC | With EoC (frac=-0.0624) |
+|-----------|-------------|------------------------|
+| RMS Total | 1.89 deg    | 1.70 deg               |
+
+The improvement is modest (~10%) compared to Type III planets (22-96%), but
+consistent with the small fraction value.
 
 ---
 
@@ -254,18 +273,13 @@ The `setupVisualTiltGroup()` function zeroes the container rotation on
 
 ## Current Baseline (JPL, 2000-2200)
 
-144 opposition reference points, Tier 2 (JPL Horizons DE441):
+184 reference points, Tier 2 (JPL Horizons DE441, 2000-2200):
 
-| Metric        | Value     |
-|---------------|-----------|
-| RMS RA        | 1.83 deg  |
-| RMS Dec       | 0.78 deg  |
-| RMS Total     | 1.99 deg  |
-| Max RA error  | 3.45 deg  |
-| Max Dec error | 1.42 deg  |
-| Start RA err  | -0.009 deg |
-| Start Dec err | -0.149 deg |
-| Entries       | 144       |
+| Metric        | Value      |
+|---------------|------------|
+| RMS Total     | 1.70 deg   |
+| Start RA err  | -0.008 deg |
+| Entries       | 184        |
 
 ---
 
@@ -349,7 +363,7 @@ best tradeoff.
 | **angleCorrection**       | -2.107     | -4.0       | 0.90 deg      | 0.78 deg    | High     |
 | **longitudePerihelion**   | 336.065    | 330.0      | 0.78 deg      | 0.93 deg    | High     |
 | **orbitalEccentricity**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
-| solarYearInput            | 686.934    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
+| solarYearInput            | 686.931    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
 | ascendingNode             | 49.557     | 55.0       | 1.11 deg      | 0.69 deg    | Low      |
 | inclinationPhaseAngle     | 203.320    | 205.0      | 1.15 deg      | 0.79 deg    | Minimal  |
 | eclipticInclinationJ2000  | 1.850      | (no effect)| 1.20 deg      | 0.78 deg    | None     |
@@ -372,7 +386,7 @@ of phase shift per step.
 | solarYearInput | Tycho Dec  | JPL Dec   | Notes        |
 |----------------|------------|-----------|--------------|
 | 686.928        | 1.48 deg   | 0.73 deg  |              |
-| 686.934        | 1.20 deg   | 0.78 deg  | Current      |
+| 686.931        | 1.20 deg   | 0.78 deg  | Current      |
 | 686.942        | 1.08 deg   | 0.87 deg  | Best Tycho   |
 | 686.950        | 1.36 deg   | 0.99 deg  |              |
 | 686.980        | 3.27 deg   | 1.13 deg  | IAU sidereal |
@@ -388,7 +402,7 @@ best combined Tycho + JPL Dec configuration:
 
 | Configuration | angleCorr | longPeri | ecc    | Tycho Dec | JPL Dec  | Combined |
 |---------------|-----------|----------|--------|-----------|----------|----------|
-| Current       | -2.107    | 336.065  | 0.0934 | 1.20 deg  | 0.78 deg | 1.43 deg |
+| Current       | -2.107    | 336.065  | 0.0934 | 1.20 deg  | 0.78 deg | 1.43 deg  |
 | **Best comb.**| **-4.5**  | **336**  | **0.10**| **0.69 deg** | **0.76 deg** | **1.03 deg** |
 
 The best combined configuration:
@@ -449,7 +463,7 @@ optimizations.
 | Dominant eccentricity        | Planet's own (e=0.093)            | Earth's (e=0.017)                   |
 | Static orbit offset          | eccDist / 2                       | 2 * e_Earth * sin(delta_omega)      |
 | Dynamic geocentric           | eccDist/2 - eo_geo/2              | eo_geo (full)                       |
-| Equation of center           | **None** (zero fraction optimal)  | e_planet / 2                        |
+| Equation of center           | eocFraction=-0.06 (near zero)     | Per-planet eocFraction (0.49-0.56)  |
 | Planet speed sign             | Negative (-2pi/count)             | Positive (+2pi/count)               |
 | RealPeri speed               | Synodic rate                      | -2pi (annual)                       |
 | Mirror pair                  | Jupiter                           | N/A                                 |
@@ -484,15 +498,8 @@ maximal (~3.3). The planet's own eccentricity plays **no role** in the
 orbit offset -- it only enters through the equation of center (speed
 variation).
 
-Type III also applies an equation of center with half-eccentricity:
-
-```
-theta += 2 * (e_planet / 2) * sin(M) + 1.25 * (e_planet / 2)^2 * sin(2M)
-```
-
-This models Kepler's 2nd law (faster at perihelion, slower at aphelion).
-The `/2` avoids double-counting with the geometric speed variation already
-present from the off-center orbit.
+For full EoC details, see the
+[Type III doc, "Equation of Center"](type-iii-geocentric-parallax.md#equation-of-center-for-type-iii-planets) section.
 
 ### Type II elipticOrbit formula (Mars)
 
@@ -503,19 +510,19 @@ eo = (e_Mars * d * 100) / 2  -  e_Earth * 100 * sin(delta_omega)
 ```
 
 The first term (half Mars eccentricity distance, ~7.12) dominates. The
-second term (Earth parallax, ~1.34) is a correction. Mars does **not** use
-an equation of center -- the geometric orbit offset already captures the
-full speed variation effect.
+second term (Earth parallax, ~1.34) is a correction. Mars uses a near-zero
+EoC fraction (-0.0624), confirming that the geometric orbit offset captures
+most of the speed variation effect.
 
 ### J2000 comparison
 
 | Planet  | omega_planet | delta_omega | elipticOrbit | Formula      | EoC          |
 |---------|-------------|-------------|-------------|--------------|--------------|
-| Mars    | 336.1 deg   | -233.1 deg  | ~5.78       | eccDist/2 - eo_geo/2 | None  |
-| Jupiter | 14.3 deg    | 88.6 deg    | +3.34       | 2*e_E*sin(dw)| e/2 = 0.024  |
-| Saturn  | 92.4 deg    | 10.5 deg    | +0.61       | 2*e_E*sin(dw)| e/2 = 0.027  |
-| Uranus  | 170.9 deg   | -68.0 deg   | -3.10       | 2*e_E*sin(dw)| e/2 = 0.024  |
-| Neptune | 44.9 deg    | 58.0 deg    | +2.83       | 2*e_E*sin(dw)| e/2 = 0.004  |
+| Mars    | 336.1 deg   | -233.1 deg  | ~5.78       | eccDist/2 - eo_geo/2 | frac=-0.06   |
+| Jupiter | 14.3 deg    | 88.6 deg    | +3.34       | 2*e_E*sin(dw)| frac=0.51    |
+| Saturn  | 92.4 deg    | 10.5 deg    | +0.61       | 2*e_E*sin(dw)| frac=0.56    |
+| Uranus  | 170.9 deg   | -68.0 deg   | -3.10       | 2*e_E*sin(dw)| frac=0.54    |
+| Neptune | 44.9 deg    | 58.0 deg    | +2.83       | 2*e_E*sin(dw)| frac=0.55    |
 
 Mars's elipticOrbit is the largest because it includes the planet's own
 eccentricity. For Type III planets, the elipticOrbit is purely from Earth's
@@ -544,25 +551,26 @@ involving the planet's eccentricity in the offset calculation.
 ### Current values (tools/lib/constants.js and src/script.js)
 
 ```
-solarYearInput:            686.934       (orbital period in days)
+solarYearInput:            686.931       (orbital period in days, calibrated from ISAW drift)
 eclipticInclinationJ2000:  1.84969142    (ecliptic inclination, degrees)
 orbitalEccentricity:       0.09339410    (J2000 eccentricity)
+eocFraction:               -0.0624       (EoC multiplier, near-zero = mostly geometric)
 longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)
 angleCorrection:           -2.107087     (perihelion alignment offset, degrees)
-startpos:                  121.67        (orbital phase at model start, degrees)
+startpos:                  121.58        (orbital phase at model start, degrees)
 perihelionEclipticYears:   H / (4+1/3)  (perihelion precession period)
+perihelionRef_JD:          2458669.2     (phase-optimized, +153° from 2018-Sep-16)
 inclinationPhaseAngle:     203.3195      (inclination variation phase)
 ascNodeToolCorrection:     135.8         (tilt placement frame correction)
 type:                      'II'          (formula selector)
 mirrorPair:                'jupiter'     (paired planet)
-perihelionRef_JD:          2458377.167   (2018 Sep 16 16:00 UTC)
 ```
 
 ### Derived values
 
 ```
-solarYearCount:            178123        (integer orbit count in H)
+solarYearCount:            178124        (integer orbit count in H)
 orbitDistance:              1.5237        (AU, from Kepler's 3rd law)
 eccDist:                   9.33          (eccentricity * orbitDistance * 100)
 elipticOrbit (static):     4.67          (eccDist / 2, overwritten dynamically)

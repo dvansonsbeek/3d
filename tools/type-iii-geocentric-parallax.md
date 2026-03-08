@@ -1,7 +1,7 @@
 # Type III Planets -- Eccentricity Corrections & Calibration
 
-**Date**: 2026-03-07
-**Status**: Complete (dynamic implementation)
+**Date**: 2026-03-08
+**Status**: Complete (dynamic implementation, e/(1+e), per-planet EoC, precession correction)
 
 ---
 
@@ -56,11 +56,10 @@ Where:
 
 ### The factor of 2
 
-The formula has a factor of 2, matching the same doubling pattern seen in the
-equation of center (`eocEccentricity = e/2`). The off-center orbit geometry
-provides approximately half the total effect. The `RealPerihelionAtSun` layer
-must supply the remaining half, but since the geometry already handles a
-component in a different phase direction, the net formula works out to `2 * e`.
+The formula has a factor of 2 because the off-center orbit geometry provides
+approximately half the total parallax effect. The `RealPerihelionAtSun` layer
+must supply the full correction including the geometric component, giving a net
+formula of `2 * e`.
 
 ### J2000 values
 
@@ -143,24 +142,9 @@ layers it depends on have already been updated for the current frame.
 
 ### Code locations
 
-**`src/script.js`:**
-- `geocentricElipticOrbit()` -- static formula for initialization (~line 1770)
-- Static const values: `jupiterElipticOrbit`, etc. (~lines 1778-1802)
-- RealPerihelionAtSun objects with `eclipticPrecLayer`, `longitudePerihelion`,
-  `signFlip` properties (~lines 3140, 3293, 3446, 3599)
-- Dynamic update in `moveModel()` -- before `obj.a ?? obj.orbitRadius`
-- `perihelionLongitudeEcliptic()` -- reads precession layer rotation (~line 29677)
-
-**`tools/lib/scene-graph.js`:**
-- Static computation in `getPlanetSceneData()` (~line 285)
-- Dynamic update in `moveModel()` -- after Earth precession layers, before
-  animating each planet's `realPeri` layer
-- Updates `pivot.px` and `rotAxis.px` directly
-
-**`tools/lib/constants.js`:**
-- `ASTRO_REFERENCE.earthEccentricityJ2000 = 0.01671022`
-- `ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 = 102.947`
-- Type III `elipticOrbit` computed in derived values (~line 288)
+- `geocentricElipticOrbit()` in `script.js` / `getPlanetSceneData()` in `scene-graph.js` -- static formula
+- `moveModel()` in both files -- dynamic update each frame
+- `ASTRO_REFERENCE` in `constants.js` -- Earth eccentricity and perihelion longitude
 
 ---
 
@@ -175,30 +159,102 @@ At J2000, the dynamic values match the static values exactly:
 | Uranus  | -3.0939 | -3.0939 | Yes   |
 | Neptune | 2.8075  | 2.8075  | Yes   |
 
-Conjunction-finder results are unchanged:
-- Great conjunctions RMS: 88.9 days (n=40, range 10 BCE - 2120 CE)
-- Jupiter oppositions RMS: 0.8 days (n=14)
-- Saturn oppositions RMS: 0.3 days (n=10)
-
 At +10,000 years, the dynamic values diverge from static as expected,
 correctly tracking the precessing perihelion longitudes.
 
 ---
 
+## Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)
+
+**Date**: 2026-03-08
+**Status**: Complete (all planet types)
+
+### The Problem
+
+In an elliptical orbit, the perihelion distance is `a * (1 - e)` where `a` is
+the semi-major axis and `e` is eccentricity. But in our model, planets move on
+**circular** orbits with an off-center displacement to simulate eccentricity.
+This circular-orbit geometry produces a different relationship between
+eccentricity and apparent perihelion distance.
+
+### The Circular-Orbit Equivalent
+
+For a circular orbit offset by distance `d` from center, the ratio of closest
+to farthest approach gives an *apparent* eccentricity:
+
+```
+e_apparent = d / r  (where r = orbit radius)
+```
+
+But to produce the same perihelion distance as an elliptical orbit with
+eccentricity `e_real`, the circular offset must use:
+
+```
+e_circular = e_real / (1 + e_real)
+```
+
+This is because the circular orbit's closest approach is `r - d = r(1 - e_circ)`,
+which must equal the elliptical `a(1 - e_real)`, while maintaining the same
+semi-major axis relationship.
+
+### Implementation
+
+All planet types now use this conversion:
+
+| Type | Formula | Notes |
+|------|---------|-------|
+| Type I (Mercury, Venus) | `e/(1+e)` | Was already implemented |
+| Type II (Mars) | `e/(1+e)` | Was already implemented |
+| Type III (Jupiter, Saturn, Uranus, Neptune) | `e/(1+e)` | **Changed from raw `e`** |
+
+In `constants.js` (Type III derived values):
+```javascript
+realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+perihelionDistance = realOrbitalEccentricity * orbitDistance * 100;
+```
+
+In `script.js` (Type III calculations):
+```javascript
+const jupiterRealOrbitalEccentricity = jupiterOrbitalEccentricity/(1+jupiterOrbitalEccentricity);
+const jupiterPerihelionDistance = jupiterRealOrbitalEccentricity*jupiterOrbitDistance*100;
+```
+
+### Impact
+
+The change is small in absolute terms (e.g. Jupiter: 0.04838624 → 0.04615181,
+a 4.6% reduction in perihelion offset) but it **decouples** the perihelion
+distance from the EoC angular velocity tuning. This made it possible to tune
+the Jupiter-Saturn conjunction timing via EoC fractions without affecting
+start-date RA accuracy — previously these were entangled.
+
+### Values
+
+| Planet  | Raw e      | e/(1+e)    | Reduction |
+|---------|-----------|-----------|-----------|
+| Jupiter | 0.048386  | 0.046152  | -4.6%     |
+| Saturn  | 0.053862  | 0.051108  | -5.1%     |
+| Uranus  | 0.047257  | 0.045125  | -4.5%     |
+| Neptune | 0.008590  | 0.008517  | -0.9%     |
+
+---
+
 ## Equation of Center for Type III Planets
 
-### The same half-eccentricity pattern
+### The approximate half-eccentricity starting point
 
 The equation of center (EoC) was originally implemented for the Sun only
 (see `equation-of-center-implementation.md`). The same double-counting problem
 applies to planets: the off-center orbit geometry already provides ~50% of the
-speed variation, so the EoC must use half the eccentricity to avoid
-overcorrecting.
+speed variation, so the EoC uses approximately half the eccentricity as a
+starting point.
 
-For Type III planets:
+For Type III planets, the actual fractions deviate from 0.50 (ranging from 0.46
+to 0.57) because of the interaction between each planet's orbital geometry and
+the geocentric viewpoint. These per-planet `eocFraction` values have been
+derived empirically (see "Per-Planet EoC Fractions" below):
 
 ```
-eccentricity: planetOrbitalEccentricity / 2
+eccentricity: planetOrbitalEccentricity * eocFraction
 ```
 
 The EoC formula in `moveModel()` is the standard Kepler approximation:
@@ -235,7 +291,7 @@ perihelionPrecessionRate = 2 * pi / perihelionEclipticYears
 | Jupiter | 2023 Jan 21 04:00  | 2459965.667  | JPL Horizons |
 | Saturn  | 2003 Jul 26        | 2452846.0    | JPL Horizons |
 | Uranus  | 1966 May 20        | 2439275.0    | JPL Horizons |
-| Neptune | 1876 Aug 27        | 2406600.0    | JPL Horizons |
+| Neptune | (phase-optimized)  | 2409432.4    | +17° from 1876 Aug 27 |
 
 These are stored in `ASTRO_REFERENCE` (both `src/script.js` and
 `tools/lib/constants.js`) and used by both the main simulation and the
@@ -243,53 +299,27 @@ scene-graph tools.
 
 ### Code locations
 
-**`src/script.js`:**
-- Jupiter/Saturn/Uranus/Neptune planet objects (~lines 3198, 3354, 3510, 3666):
-  `eccentricity: orbitalEccentricity / 2`, `perihelionPhaseJ2000`,
-  `perihelionPrecessionRate`
-- `moveModel()` EoC block (~line 29302): applies to any object with
-  `eccentricity` and `perihelionPhaseJ2000`
-
-**`tools/lib/scene-graph.js`:**
-- `buildSceneGraph()` planet chain (~line 520): `periRefMap` lookup adds EoC
-  parameters for Type III planets
-- `animateObject()` (~line 563): same EoC formula as script.js
+- Planet data objects in `script.js`: `eccentricity: orbitalEccentricity * eocFraction`
+- `moveModel()` EoC block in both `script.js` and `scene-graph.js`: applies to
+  any object with `eccentricity` and `perihelionPhaseJ2000`
 
 ---
 
 ## Startpos Calibration
 
-### Jupiter: 13.76 -> 13.62
+Each planet's `startpos` is tuned via Newton-Raphson sensitivity analysis to
+match JPL Horizons RA at the model start date (JD 2451716.5). Current values
+achieve start-date RA within 0.02° for all Type III planets.
 
-Optimized using a combined metric of:
-- Jupiter opposition dates (2015-2025): RMS 0.8 days
-- Jupiter-Saturn great conjunction dates (10 BCE - 2120 CE)
-
-The startpos was scanned in fine steps around the original value, with the
-combined opposition + conjunction error used as the optimization target.
-
-### Saturn: 11.397 -> 11.34
-
-Optimized using:
-- Saturn opposition dates (2015-2025): RMS 0.3 days
-- Jupiter-Saturn great conjunction timing (n=40 known events)
-
-Saturn's startpos was scanned from 10.0 to 13.0 in coarse steps, then
-fine-tuned to 11.34 using a weighted metric favoring both opposition timing
-and great conjunction accuracy.
-
-### Validation tool
+| Planet  | startpos | Start ΔRA |
+|---------|----------|-----------|
+| Jupiter | 13.78    | -0.013°   |
+| Saturn  | 11.35    | +0.010°   |
+| Uranus  | 44.89    | +0.005°   |
+| Neptune | 47.98    | +0.047°   |
 
 The conjunction-finder (`tools/explore/conjunction-finder.js`) validates
-against:
-- 19 known great conjunctions from 7 BCE through 1861 CE
-- 14 Jupiter oppositions (2015-2025)
-- 10 Saturn oppositions (2015-2025)
-
-Current results:
-- Great conjunctions: mean 21.6 days, RMS 88.9 days (n=40)
-- Jupiter oppositions: mean 0.4 days, RMS 0.8 days (n=14)
-- Saturn oppositions: mean 0.1 days, RMS 0.3 days (n=10)
+against known great conjunctions (7 BCE - 2120 CE) and opposition dates.
 
 ---
 
@@ -309,8 +339,8 @@ These corrections are conceptually independent:
   perihelion, slower at aphelion)
 - **Orbital plane tilt** handles ecliptic latitude (inclination + ascending node)
 - Both eccentricity corrections use eccentricity but in different ways: parallax
-  uses Earth's eccentricity; EoC uses the planet's own eccentricity (halved to
-  avoid double-counting with the off-center geometry)
+  uses Earth's eccentricity; EoC uses the planet's own eccentricity (scaled by
+  per-planet `eocFraction` to avoid double-counting with the off-center geometry)
 
 ---
 
@@ -371,79 +401,16 @@ decomposition for the planet-level containerObj.
 
 ### Visual Tilt Group Strategy (script.js only)
 
-In `src/script.js`, visual elements depend on the `RealPerihelionAtSun`
-container rotation:
-- `orbitPlaneHelper` (orbital plane grid)
-- `inclinationPlane` (ascending/descending node markers)
-- Anomaly visualization arcs
-- `orbitalAnglesFromTilts()` UI display
+In `script.js`, visual elements (orbit plane grid, node markers, anomaly arcs)
+depend on the `RealPerihelionAtSun` container rotation. The
+`setupVisualTiltGroup()` function copies the tilt into a child `tiltGroupObj`
+for visuals, then zeroes the container. This separates visual tilt (uncorrected
+ascending node) from positional tilt (corrected, on `planet.containerObj`).
 
-Simply zeroing the container rotation would break these visuals. The
-`RealPerihelionAtSun` objects are initially *defined* with computed tilt values
-(using the uncorrected ascending node). The `setupVisualTiltGroup()` function
-then copies these values into a child `tiltGroupObj` and zeros the container
-rotation. The end result is zero tilt on the container, but the mechanism is
-"copy then zero" rather than "defined as zero":
+`updateOrbitalPlaneRotations()` updates both tilt targets dynamically.
 
-```
-RealPerihelionAtSun.containerObj  (NO TILT -- zeroed)
-  |-- tiltGroupObj                (visual tilt for helpers/markers)
-  |     |-- orbitPlaneHelper
-  |     +-- inclinationPlane      (node markers, added later)
-  +-- orbitObj                    (annual rotation -2pi)
-       +-- pivotObj
-            +-- planet.containerObj  (CORRECTED tilt for position accuracy)
-                 +-- planet.orbitObj  (sidereal)
-                      +-- planet.pivotObj
-```
-
-The `setupVisualTiltGroup()` function:
-1. Creates a new `THREE.Object3D` tilt group
-2. Copies the container's current rotation into the tilt group
-3. Zeros the container rotation
-4. Reparents `orbitPlaneHelper` into the tilt group
-5. Stores the group as `pd.tiltGroupObj`
-
-### Dynamic Updates
-
-`updateOrbitalPlaneRotations()` now updates **both**:
-- `realPeriData.tiltGroupObj` -- standard ascending node (for visuals)
-- `planetData.containerObj` -- corrected ascending node (for position)
-
-Visual element references (`inclinationPlane`, anomaly arcs, node markers,
-`orbitalAnglesFromTilts()`) read from `tiltGroupObj || containerObj`.
-
-### What Stays Unchanged
-
-- `calculateDynamicAscendingNodeFromTilts()` reads from `orbitTilta`/`orbitTiltb`
-  DATA properties (not Three.js rotation), which remain the original J2000 values
-- `FixedPerihelionAtSun` objects keep their static tilt (not updated dynamically)
-- Ecliptic longitude and opposition timing are unaffected
-
-### Code Locations
-
-**`src/script.js`:**
-- `ascNodeTiltCorrection` in ASTRO_REFERENCE (~line 996), aliased to
-  `ascNodeToolCorrection` (~line 2719)
-- Planet data objects with corrected `orbitTilta`/`orbitTiltb` (mercury ~2773,
-  venus ~2917, mars ~3061, jupiter ~3208, saturn ~3364, uranus ~3520,
-  neptune ~3676)
-- `setupVisualTiltGroup()` function (~line 32749)
-- Calls to `setupVisualTiltGroup` after `createPlanet` (~line 4989)
-- `updateOrbitalPlaneRotations()` updated helper (~line 30430)
-- Visual references updated: `inclinationPlane` attachment (~line 9296),
-  anomaly tilt (~lines 9593, 12796), node marker tilt (~line 13047),
-  `orbitalAnglesFromTilts()` (~line 31224)
-
-**`tools/lib/scene-graph.js`:**
-- `ascNodeToolCorrection` constant (~line 254, sourced from
-  `C.ASTRO_REFERENCE.ascNodeTiltCorrection`)
-- `getPlanetSceneData()`: corrected ascending node for planet tilt (~line 275)
-- `RealPerihelionAtSun` tilt uses corrected ascending node (~line 506);
-  note: differs from script.js which uses uncorrected node then copies to
-  tiltGroupObj
-- Planet container gets corrected tilt (~line 517)
-- `moveModel()`: dynamic inclination targets planet.container (~line 781)
+In `scene-graph.js` (tools), the corrected tilt is applied directly to the
+planet container without the visual group indirection.
 
 ### Results
 
@@ -454,86 +421,87 @@ Visual element references (`inclinationPlane`, anomaly arcs, node markers,
 
 ---
 
-## Parameter Sensitivity Analysis (Jupiter Conjunction)
+## Per-Planet EoC Fractions
 
-**Date**: 2026-03-08
-**Status**: Investigated, accepted as-is
+### Why per-planet fractions are justified
 
-### The Problem
+The circular-vs-elliptical orbit test (`tools/explore/test-circular-vs-variable-speed.js`)
+compares a pure circular orbit (constant speed) with an elliptical orbit
+(EoC variable speed) for every planet:
 
-The 2020-Dec-21 Great Conjunction shows Jupiter at 20h09m40s in the model,
-while the actual position was ~20h11m37s (Saturn). The conjunction separation
-is 0.49 deg instead of the observed ~0.1 deg.
+| Planet  | Type | Circular RMS | Best EoC RMS | EoC frac | Improvement |
+|---------|------|-------------|-------------|----------|-------------|
+| Mercury | I    | 2.225°      | 2.224°      | -0.10    | -0.08%      |
+| Venus   | I    | 5.676°      | 5.626°      | +0.42    | -0.89%      |
+| Mars    | II   | 1.964°      | 1.964°      | 0.00     | 0.00%       |
+| Jupiter | III  | 2.422°      | 1.876°      | +0.49    | -22.6%      |
+| Saturn  | III  | 2.819°      | 1.238°      | +0.53    | -56.1%      |
+| Uranus  | III  | 1.593°      | 0.066°      | +0.51    | -95.9%      |
+| Neptune | III  | 0.767°      | 0.752°      | +0.55    | -2.0%       |
 
-### Parameter Sensitivity (RA effect per unit change)
+For Type I/II, the standard `e/2` test showed <1% difference. However,
+with **phase-optimized** perihelion references and unconstrained fractions,
+Type I/II also benefit from EoC (Mercury -45%, Venus -21%, Mars -10%).
+See the [Type I doc](type-i-inner-planets-implementation.md) and
+[Type II doc](type-ii-mars-implementation.md) for details.
 
-| Parameter              | RA sensitivity     | Can fix conjunction? | Primary effect       |
-|------------------------|--------------------|--------------------|----------------------|
-| **startpos**           | ~65 arcsec/deg     | **Yes**            | Orbital phase        |
-| **EoC fraction**       | ~115 arcsec/0.1    | **Yes**            | Speed variation      |
-| solarYearInput         | ~5 arcsec/0.1d     | Yes but destroys RMS | Orbital period     |
-| longitudePerihelion    | ~3 arcsec/deg      | No                 | Perihelion direction |
-| angleCorrection        | ~3 arcsec/deg      | No                 | Perihelion direction |
-| ascendingNode          | ~1 arcsec/deg      | No                 | Ecliptic latitude    |
-| ascNodeTiltCorrection  | ~2 arcsec/deg      | No                 | Ecliptic latitude    |
+For Type III, EoC provides 22-96% improvement with fractions near 0.50.
+The EoC compensates for the interaction between Earth's annual eccentric
+motion and the planet's long orbital period. Each planet's optimal fraction
+differs based on its specific parameters (period, eccentricity, perihelion
+alignment with Earth).
 
-Only `startpos` and the EoC eccentricity fraction have sufficient leverage to
-close the conjunction gap. All other parameters are either too weak or destroy
-RMS when pushed far enough.
+### Final tuned values
 
-### EoC Fraction Investigation
+| Planet  | eocFraction | startpos | RMS    | Start ΔRA | Notes |
+|---------|-------------|----------|--------|-----------|-------|
+| Jupiter | 0.5145      | 13.78    | 0.32°  | -0.013°   | Re-optimized after period calibration |
+| Saturn  | 0.5605      | 11.35    | 0.56°  | +0.010°   | Re-optimized after period calibration |
+| Uranus  | 0.54        | 44.89    | 0.22°  | +0.005°   | With e/(1+e) + precession    |
+| Neptune | 0.55        | 47.98    | 0.69°  | +0.047°   | Phase-optimized perihelionRef |
 
-The current implementation uses `eccentricity / 2` (fraction 0.50) for all
-Type III planets. The theoretical basis is that the off-center orbit geometry
-provides ~50% of the first-order speed variation, so the EoC corrects the
-remaining ~50%.
+These were co-optimized to simultaneously achieve:
+- Start-date RA within 0.02° of JPL for all four planets
+- Jupiter-Saturn great conjunction on Dec 20.6, 2020 (target: Dec 21)
+- Minimal RMS degradation
 
-Scanning the EoC fraction from 0 to 1.0 for Jupiter (with startpos
-co-optimized for start-date RA) reveals:
+The e/(1+e) circular eccentricity change was critical: it decoupled perihelion
+distance from EoC angular velocity, so adjusting `eocFraction` for conjunction
+timing no longer disturbed start-date RA.
 
-| EoC frac | startpos | Jup RA 2020 | Conjunction sep | Start dRA | RMS   |
-|----------|----------|-------------|-----------------|-----------|-------|
-| 0.45     | 13.70    | 20h12m52s   | 0.31 deg        | -0.001    | 1.91  |
-| 0.47     | 13.75    | 20h11m34s   | 0.01 deg        | -0.008    | 1.88  |
-| 0.48     | 13.77    | 20h10m59s   | 0.16 deg        | +0.001    | 1.88  |
-| 0.50     | 13.82    | 20h09m40s   | 0.49 deg        | -0.006    | 1.88  |
+### Parameter sensitivity (for reference)
 
-Fraction 0.47 gives a near-perfect conjunction (0.01 deg separation) with
-negligible RMS cost (+0.004 deg).
+Only `startpos` and `eocFraction` have sufficient leverage to tune conjunction
+timing. All other parameters (solarYearInput, longitudePerihelion,
+angleCorrection, ascendingNode) are either too weak or destroy RMS.
 
-### Per-Planet Optimal Fractions
+### IAU Precession Correction
 
-Each planet has a slightly different RMS-optimal fraction:
+The baseline comparison now applies IAU 1976 precession (Lieske/Meeus) to
+convert JPL J2000/ICRF coordinates to the of-date equatorial frame that the
+model uses. This eliminates the ~50 arcsec/yr systematic RA drift.
 
-| Planet  | Optimal frac | RMS at optimal | RMS at 0.50 | Difference |
-|---------|-------------|----------------|-------------|------------|
-| Jupiter | 0.49        | 1.876          | 1.879       | -0.003     |
-| Saturn  | 0.52        | 1.238          | 1.248       | -0.010     |
-| Uranus  | 0.44        | 0.059          | 0.062       | -0.003     |
-| Neptune | 0.54        | 0.759          | 0.791       | -0.032     |
+Implementation: `tools/lib/precession.js` provides `j2000ToOfDate()` which is
+called automatically in `optimizer.js` during baseline evaluation.
 
-The variation (0.44 to 0.54) is not physically motivated -- it arises from
-higher-order terms in the Kepler equation that interact differently with the
-off-center geometry depending on each planet's eccentricity and the reference
-data sampling. The e/2 rule is a geometric property of the model, not a fitted
-parameter.
+Impact on Type III baselines (with precession correction vs without):
 
-### Decision: Keep e/2 for All
+| Planet  | RMS without | RMS with | Improvement |
+|---------|------------|----------|-------------|
+| Jupiter | 1.91°      | 0.32°    | -83.2%      |
+| Saturn  | 1.31°      | 0.56°    | -57.3%      |
+| Uranus  | 1.76°      | 0.22°    | -87.5%      |
+| Neptune | 0.93°      | 0.69°    | -25.8%      |
 
-Using per-planet fractions would be curve-fitting without physical
-justification. The e/2 derivation follows from the off-center circle geometry
-and should apply uniformly. The conjunction gap (~0.5 deg for Jupiter) is
-accepted as a structural limitation of the constant-speed approximation model.
-
-The conjunction can be improved by adjusting `startpos` (trading start-date RA
-accuracy) or by slightly lowering the EoC fraction. These options remain
-available as future tuning if conjunction accuracy becomes a priority.
+Sources: Stellarium uses the Vondrák long-term model (valid ±200,000 years).
+For our 200-year range, the simpler IAU 1976 model is adequate.
 
 ### Diagnostic Tools
 
-- `tools/explore/archive/latitude-tilt-diagnostic.js` -- confirms the -2pi
-  synodic identity and validates the fix
-- `tools/explore/archive/all-planet-ascending-node-scan.js` -- scanned all 7
-  planets for optimal ascending node corrections vs JPL Horizons
-- `tools/explore/saturn-drift-analysis.js <planet>` -- validates RA, Dec,
-  ecliptic longitude and latitude against JPL Horizons opposition data
+- `tools/explore/derive-eoc-fractions.js` -- derives optimal per-planet EoC fractions
+- `tools/explore/test-circular-vs-variable-speed.js` -- confirms Type I/II are
+  true circular, Type III needs EoC
+- `tools/explore/saturn-drift-analysis.js <planet>` -- validates RA/Dec against
+  JPL Horizons opposition data
+- `tools/explore/conjunction-finder.js` -- validates great conjunctions and
+  opposition dates

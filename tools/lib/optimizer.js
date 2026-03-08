@@ -13,6 +13,7 @@
 const C = require('./constants');
 const sg = require('./scene-graph');
 const jpl = require('./horizons-client');
+const { j2000ToOfDate } = require('./precession');
 const fs = require('fs');
 const path = require('path');
 
@@ -89,6 +90,7 @@ function getParamAccessors(target) {
     eclipticInclinationJ2000: { get: () => p.eclipticInclinationJ2000, set: v => { p.eclipticInclinationJ2000 = v; } },
     orbitalEccentricity:    { get: () => p.orbitalEccentricity,    set: v => { p.orbitalEccentricity = v; } },
     perihelionEclipticYears:{ get: () => p.perihelionEclipticYears, set: v => { p.perihelionEclipticYears = v; } },
+    eocFraction:            { get: () => p.eocFraction,            set: v => { p.eocFraction = v; } },
   };
 }
 
@@ -448,7 +450,14 @@ function baseline(target, overrides, refDates) {
           refRA = refRA * 15; // hours to degrees
         }
       }
-      const refDec = parseFloat(ref.dec);
+      let refDec = parseFloat(ref.dec);
+
+      // Apply IAU precession: convert J2000/ICRF reference to of-date frame
+      // Our model computes in the of-date equatorial frame (precessing equator),
+      // but JPL returns fixed J2000/ICRF coordinates. The difference is ~50"/yr.
+      const ofDate = j2000ToOfDate(refRA, refDec, ref.jd);
+      refRA = ofDate.ra;
+      refDec = ofDate.dec;
 
       // Angular difference (handle wrap-around)
       let dRA = modelRA - refRA;
@@ -564,7 +573,7 @@ function sensitivityScan(planet, paramName, lo, hi, steps = 100, refDates) {
  * @returns {Object} { params, values, initialError, finalError, iterations }
  */
 function nelderMead(planet, paramNames, options = {}) {
-  const { maxIter = 500, tol = 1e-8, initialScale } = options;
+  const { maxIter = 500, tol = 1e-8, initialScale, startDateWeight = 0 } = options;
   let { refDates } = options;
   const n = paramNames.length;
 
@@ -584,7 +593,13 @@ function nelderMead(planet, paramNames, options = {}) {
     const overrides = {};
     for (let i = 0; i < n; i++) overrides[paramNames[i]] = x[i];
     const bl = baseline(planet, overrides, refDates);
-    return bl.rmsTotal;
+    let cost = bl.rmsTotal;
+    // Penalize start-date RA drift if weight > 0
+    if (startDateWeight > 0) {
+      const e0 = bl.entries.find(e => Math.abs(e.year - 2000.5) < 1);
+      if (e0) cost += startDateWeight * Math.abs(e0.dRA);
+    }
+    return cost;
   }
 
   // Build initial simplex (n+1 vertices)
