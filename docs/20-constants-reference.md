@@ -4,6 +4,14 @@ This document is the **single source of truth** for all constants used in the Ho
 
 > **Last synchronized with `tools/lib/constants.js` on 2026-03-09.**
 
+### Code organization
+
+Constants in `src/script.js` are organized into 11 numbered sections with sub-headers:
+
+1. Foundational Model Constants — 2. Model Start & Physical Constants — 3. Sun & Moon Input Constants — 4. Planet Input Constants (4a. major planets, 4b. minor bodies, 4c. ascending nodes) — 5. Inclination System (5a–5d) — 6. Predictive Formula System — 7. Body Diameters — 8. Astronomical Reference Values / ASTRO_REFERENCE (8a–8g) — 9. Derived Constants (9a–9e) — 10. Mass Calculations (10a–10b) — 11. Orbital Formulas (11a–11c)
+
+The shared tools module `tools/lib/constants.js` mirrors these with its own 14-section structure.
+
 ### How other documents should reference constants
 
 - **Rule A — Formulas stay, computed numbers go.** Write "H/13" not a specific year count.
@@ -189,6 +197,22 @@ Input constants used in the formulas above:
 | Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | 0.015434 |
 | EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | 0.007747 |
 | Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~0.470 deg |
+
+## Ascending Node Frame Corrections
+
+When orbital plane tilt is moved from `RealPerihelionAtSun.containerObj` (above annual rotation) to `planet.containerObj` (below), the ascending node direction changes reference frame. These corrections compensate for that shift. **Derived, not tuned.**
+
+| Planet | `ascNodeTiltCorrection` | Formula |
+|--------|------------------------|---------|
+| Mercury | ~131.67 | 180 - ascendingNode |
+| Venus | ~103.32 | 180 - ascendingNode |
+| Mars | ~130.44 | 180 - ascendingNode |
+| Jupiter | ~27.70 | 2 × startpos |
+| Saturn | ~22.64 | 2 × startpos |
+| Uranus | ~89.76 | 2 × startpos |
+| Neptune | ~95.92 | 2 × startpos |
+
+Type I/II (inner): `180 - ascendingNode` (anti-node direction). Type III (outer): `2 × startpos` (compensates orbital phase in tilt frame).
 
 ## Mass Computation & Universal Constants
 
@@ -557,6 +581,24 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
+### Inclination Eigenmode Phase Angles (`EIGENMODE_PHASES`)
+
+The model uses two universal phase angles derived from the s₈ eigenmode (γ₈ = 202.8°). The `EIGENMODE_PHASES` array in `script.js` provides a dropdown for the UI:
+
+| Value | Label | Source |
+|-------|-------|--------|
+| **203.3195°** | φ₁ (prograde group) | Model-defined |
+| **23.3195°** | φ₂ (retrograde group) | Model-defined (= φ₁ − 180°) |
+| 202.8° | γ₈ | Farside Table 10.1 |
+| 20.23° | γ₁ | Farside Table 10.1 |
+| 255.6° | γ₃ | Farside Table 10.1 |
+| 296.9° | γ₄ | Farside Table 10.1 |
+| 127.3° | γ₆ | Farside Table 10.1 |
+| 315.6° | γ₇ | Farside Table 10.1 |
+| 318.3° | γ₂ | Farside Table 10.1 |
+
+f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagrange modes remain.
+
 ## Minor Bodies
 
 ### Pluto
@@ -566,6 +608,8 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 | Orbital Period | `solarYearInput` | 90,465 days | JPL Horizons |
 | Eccentricity | `orbitalEccentricity` | 0.2488273 | JPL Horizons |
 | Long. Perihelion | `longitudePerihelion` | 224.06891 deg | JPL Horizons |
+| Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | 136,047,200 | DE440 |
+| GM | `GM_PLUTO` | ~975.5 km³/s² | Derived from Charon orbit |
 
 ### Halley's Comet
 
@@ -576,6 +620,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 | Orbital Period | `solarYearInput` | 27,503 days | JPL |
 | Eccentricity | `orbitalEccentricity` | 0.96714291 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 111.33249 deg | JPL Horizons |
+| Mass | `M_HALLEYS` | ~2.2 × 10¹⁴ kg | Estimated (~11×8×8 km, ~0.6 g/cm³) |
 
 ### Eros
 
@@ -586,6 +631,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 | Orbital Period | `solarYearInput` | 642.93 days | JPL |
 | Eccentricity | `orbitalEccentricity` | 0.2229512 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 178.81322 deg | JPL Horizons |
+| Mass | `M_EROS` | 6.687 × 10¹⁵ kg | NEAR Shoemaker (2000–2001) |
 
 ### Ceres
 
@@ -598,6 +644,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 | Eccentricity | `orbitalEccentricity` | 0.0755347 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 73.59769 deg | JPL Horizons |
 | Orbit Distance | `orbitDistanceOverride` | 2.76596 AU | JPL Horizons |
+| GM | `GM_CERES` | 62.6274 km³/s² | Dawn spacecraft (2015–2018) |
 
 ---
 

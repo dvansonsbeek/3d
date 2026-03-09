@@ -22,9 +22,10 @@ import { Pane } from 'tweakpane';
   Website:  https://holisticuniverse.com
 */
 
-//*************************************************************
-// ALL INPUT CONSTANTS
-//*************************************************************
+// ─── 1. FOUNDATIONAL MODEL CONSTANTS ────────────────────────────────────
+// The six free parameters and related Earth constants that define the model.
+// Changing any of these changes the theory itself.
+// ─────────────────────────────────────────────────────────────────────────
 const holisticyearLength = 335008;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
@@ -35,6 +36,19 @@ const inputmeanlengthsolaryearindays = 365.2421897;
 // Reference length of solar year in days. THIS IS USED AS INPUT. The actual mean lenght is calculated based upon this input and the lenght of the holistic year
 const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
+const temperatureGraphMostLikely = 14.5;
+// 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
+const earthRAAngle = 1.258454;
+// 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
+const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
+const earthInvPlaneInclinationAmplitude = 0.635956;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.635185
+const earthInvPlaneInclinationMean = 1.481180;            // 3D model + Formula. Fibonacci predicts 1.481388
+const eccentricityBase = 0.015373;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.001370;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+
+// ─── 2. MODEL START & PHYSICAL CONSTANTS ────────────────────────────────
+// Model epoch, calibration corrections, toggles, and physical constants.
+// ─────────────────────────────────────────────────────────────────────────
 const startmodelJD = 2451716.5;
 // By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const startmodelYear = 2000.5;
@@ -48,35 +62,27 @@ const correctionSun = 0.471334;
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
 // When useVariableSpeed = false, correctionSun should be 0.913280
-// eocEccentricity and perihelionPhaseOffset are derived constants — see derived section after eccentricityDerivedMean (~line 979)
-const temperatureGraphMostLikely = 14.5;
-// 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthRAAngle = 1.258454;
-// 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
-const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
-const earthInvPlaneInclinationAmplitude = 0.635956;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.635185
-const earthInvPlaneInclinationMean = 1.481180;            // 3D model + Formula. Fibonacci predicts 1.481388
-const eccentricityBase = 0.015373;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.001370;                  // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+// eocEccentricity and perihelionPhaseOffset are derived constants — see derived section after eccentricityDerivedMean
+const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
+const currentAUDistance = 149597870.698828;               // 3D model + formula
+const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
+const debugOn = false;                                     // Debug button flag (set to true when needed)
+
+// Formula-only amplitude parameters
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
 const meansiderealyearAmplitudeinSecondsaDay = 60;      // Formula only
 const meansolaryearAmplitudeinSecondsaDay = 2.29;          // Formula only
 const meanAnomalisticYearAmplitudeinSecondsaDay = 6;      // Formula only
-const currentAUDistance = 149597870.698828;               // 3D model + formula
-const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
-const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
 
-// --- Early derived constants (needed before ASTRO_REFERENCE) ---
+// Early derived constants (needed before ASTRO_REFERENCE)
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meansolaryearlengthinDays;
 const julianCenturyDays = 100 * meansolaryearlengthinDays;
 
-// Debg button on flag (set to true when needed)
-const debugOn = false;
-
+// ─── 3. SUN & MOON INPUT CONSTANTS ─────────────────────────────────────
 // Reference lengths used as INPUT for the Sun
 const sunTilt = 7.155;
 const milkywayDistance = 27500;
@@ -95,6 +101,13 @@ const moonTilt = 6.687;
 const moonStartposApsidal = 347.622;                      // Optimized against JPL Horizons 2000-2025 (7-day sampling)
 const moonStartposNodal = -83.630;                        // Optimized against JPL Horizons 2000-2025 (7-day sampling)
 const moonStartposMoon = 131.930;                         // Optimized against JPL Horizons 2000-2025 (7-day sampling)
+
+// ─── 4. PLANET INPUT CONSTANTS ──────────────────────────────────────────
+// Per-planet J2000 orbital elements, tuned parameters (startpos, angleCorrection,
+// eocFraction, perihelionRef_JD), and perihelion precession periods.
+// ─────────────────────────────────────────────────────────────────────────
+
+// --- 4a. Major planets (Mercury–Neptune) ---
 
 // Reference lengths used as INPUT for Mercury
 const mercurySolarYearInput = 87.9686;
@@ -215,9 +228,8 @@ const neptuneStartpos = 47.96;                             // Tuned for start-da
 const neptuneEocFraction = 0.50;                           // Derived: e/2 for Type III (geocentric parallax interaction)
 const neptunePerihelionRef_JD = 2409432.4;                 // EoC phase reference — phase-optimized (+17° from 1876-Aug-27)
 
-//*************************************************************
-// The accurate orbits of Pluto and Halleys and Eros can be added later. They are switched off via the visibility flag.
-//*************************************************************
+// --- 4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
+// Approximate orbits — switched off via visibility flag. Can be refined later.
 
 // Reference lengths used as INPUT for Pluto
 const plutoSolarYearInput = 90465;               // JPL Horizons J2000 (was 89760)
@@ -275,6 +287,7 @@ const ceresAngleCorrection = 0;                  // To align the perihelion exac
 const ceresPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession
 const ceresOrbitDistance = 2.76596;              // JPL Horizons J2000
 
+// --- 4c. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
@@ -308,34 +321,14 @@ const halleysAscendingNodeInvPlaneVerified = 59.56;      // Approximation from e
 const erosAscendingNodeInvPlaneVerified = 10.36;         // Approximation from ecliptic value
 const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Souchay (2012) Table 2
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PLANETARY INCLINATION OSCILLATION AMPLITUDES
-// These represent how much each planet's orbital plane tilts toward/away from
-// the invariable plane during its precession cycle.
-//
-// Scientific basis: Laplace-Lagrange secular theory (Farside physics textbook, Table 10.4)
-// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-// These are theoretical bounds from Table 10.4:
-// - Mercury: 4.57° to 9.86°
-// - Venus: 0.00° to 3.38°
-// - Earth: 0.00° to 2.95°
-// - Mars: 0.00° to 5.84°
-// - Jupiter: 0.241° to 0.489°
-// - Saturn: 0.797° to 1.02°
-// - Uranus: 0.902° to 1.11°
-// - Neptune: 0.554° to 0.800°
-//
-// Alternative derivation from JPL secular rates (°/century):
-// A = |rate| × |period| / (2π)
-// This gives smaller values as it assumes we're near maximum rate.
-//
-// Amplitudes from Fibonacci Laws: amp = ψ / (d × √m), means from J2000 constraint.
-// Single universal ψ = 2205/(2×H), balance: Σ(203°) w = Σ(23°) w
-// See: docs/10-fibonacci-laws.md, docs/84-inclination-optimization.js
-// ══════════════════════════════════════════════════════════════════════════════
+// ─── 5. INCLINATION SYSTEM ──────────────────────────────────────────────
+// Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
+// JPL ecliptic inclination trend rates, and eigenmode phase angles.
+// ─────────────────────────────────────────────────────────────────────────
 
-// Laplace-Lagrange bounds from secular theory (degrees)
-// Source: Farside Table 10.4 — https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+// --- 5a. Laplace-Lagrange bounds & eigenmode phases ---
+// Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
+// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
 const mercuryLLBoundsMin = 4.57;
 const mercuryLLBoundsMax = 9.86;
 const venusLLBoundsMin = 0.00;
@@ -371,6 +364,11 @@ const EIGENMODE_PHASES = [
   { value: 318.3,  label: 'γ₂ = 318.3°' },
   { value: 'custom', label: 'Custom...' }
 ];
+
+// --- 5b. Inclination means & amplitudes (Fibonacci Laws) ---
+// Amplitudes: amp = ψ / (d × √m), means from J2000 constraint
+// Universal ψ = psiNumerator/(2×H), balance: Σ(203°) w = Σ(23°) w
+const psiNumerator = 2205;                               // Fibonacci-derived: 5 × 441 = 5 × 21²
 
 // Mercury: LL bounds [4.57°, 9.86°], 203° balance group
 // J2000=6.3472858° (EXACT), d=21, phase 203.3195°, period holisticyearLength/(1+(3/8)), trend error: 1.6"/cy
@@ -427,18 +425,8 @@ const erosInvPlaneInclinationAmplitude = 0.5;     // Estimated oscillation
 const ceresInvPlaneInclinationMean = 0.43;
 const ceresInvPlaneInclinationAmplitude = 0.05;   // Estimated (no Laplace-Lagrange data for asteroids)
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PLANETARY INCLINATION PHASE ANGLES
-//
-// All planets use a universal phase angle derived from the s₈ eigenmode of
-// Laplace-Lagrange secular theory (γ₈ = 202.8°).
-//
-// PROGRADE precession planets use: 203.3195°
-// RETROGRADE precession planets use: 23.3195° (= 203.3195° - 180°)
-//
-// The 180° offset for retrograde planets compensates for the reversed direction
-// of precession - both values represent the same physical direction in space.
-// ══════════════════════════════════════════════════════════════════════════════
+// --- 5c. Inclination phase angles ---
+// Universal phase from s₈ eigenmode (γ₈ = 202.8°): prograde = 203.3195°, retrograde = 23.3195°
 
 const mercuryInclinationPhaseAngle = 203.3195;  // 203° balance group, error: 0.7"/cy
 const venusInclinationPhaseAngle = 203.3195;    // 203° balance group, error: 21.7"/cy
@@ -453,13 +441,9 @@ const halleysInclinationPhaseAngle = 23.3195;   // RETROGRADE (estimated)
 const erosInclinationPhaseAngle = 203.3195;     // prograde (estimated)
 const ceresInclinationPhaseAngle = 203.3195;    // prograde (estimated)
 
-// ══════════════════════════════════════════════════════════════════════════════
-// JPL ECLIPTIC INCLINATION TREND RATES (degrees/century)
-// ══════════════════════════════════════════════════════════════════════════════
-// Source: JPL Approximate Positions of the Planets
-// https://ssd.jpl.nasa.gov/planets/approx_pos.html
-// These are the target rates that our model should reproduce for verification.
-// ══════════════════════════════════════════════════════════════════════════════
+// --- 5d. JPL ecliptic inclination trend rates (°/century) ---
+// Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
+// Target rates for model verification.
 const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
 const venusEclipticInclinationTrendJPL = -0.00079;    // degrees/century (DECREASING)
 const marsEclipticInclinationTrendJPL = -0.00813;     // degrees/century (DECREASING)
@@ -476,10 +460,11 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 // Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - <number 1.5 - 2 >
 const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - 2;
 
-// =============================================================================
-// PREDICTIVE FORMULA SYSTEM — Constants for dynamic geocentric precession
+// ─── 6. PREDICTIVE FORMULA SYSTEM ───────────────────────────────────────
+// PERI_HARMONICS (perihelion longitude Fourier terms), PREDICT_PLANETS
+// (precession periods), and PREDICT_COEFFS (per-planet correction arrays).
 // Ported from docs/scripts/predictive_formula.py
-// =============================================================================
+// ─────────────────────────────────────────────────────────────────────────
 const H = holisticyearLength;
 const PERI_HARMONICS = [
   [H/16, 5.05, 0.0], [H/32, 2.46, 0.0], [H/32, 0.2206, 0.2439],
@@ -794,7 +779,7 @@ const PREDICT_COEFFS = {
   ],
 };
 
-// Really fixed values
+// ─── 7. BODY DIAMETERS ──────────────────────────────────────────────────
 const diameters = {
   sunDiameter      : 1392684.00,
   moonDiameter     : 3474.8,
@@ -811,94 +796,64 @@ const diameters = {
   erosDiameter     : 16.84,
 };
 
-//*************************************************************
-// ALL CONSTANTS ARE CALCULATED FROM HERE ONWARDS
-//*************************************************************
-
-//*************************************************************
-// ASTRONOMICAL REFERENCE VALUES
-// Used for model calibration and validation
-//*************************************************************
+// ─── 8. ASTRONOMICAL REFERENCE VALUES (ASTRO_REFERENCE) ─────────────────
+// J2000 epoch values, year/day lengths, perihelion reference, Meeus
+// coefficients, perihelion precession rates, and measurement offsets.
+// ─────────────────────────────────────────────────────────────────────────
 const ASTRO_REFERENCE = {
-  // ═══════════════════════════════════════════════════════════════════════════
-  // J2000.0 EPOCH VALUES (Jan 1, 2000 12:00 TT, JD 2451545.0)
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // IAU 2006 Obliquity of the Ecliptic
+  // --- 8a. Earth J2000 reference values ---
   // Source: IAU 2006 precession model (Capitaine et al. 2003)
-  // ε₀ = 84381.406" at J2000.0, rate = -46.836769"/century
-  obliquityJ2000_arcsec: 84381.406,
+  obliquityJ2000_arcsec: 84381.406,                  // ε₀ at J2000.0
   obliquityJ2000_deg: 84381.406 / 3600,              // = 23.439279°
   obliquityRate_arcsecPerCentury: -46.836769,
   obliquityRate_degPerCentury: -46.836769 / 3600,    // = -0.013010°/century
-
-  // Earth's orbital inclination to the Invariable Plane at J2000.0
-  // Source: Astronomical Almanac, formula: 1°34'59" - 18"×T (T in centuries from 1900)
-  // At J2000 (T=1): 1°34'59" - 18" = 1°34'41" ≈ 1.57806°
-  // More commonly cited value: 1.57869° (1°34'43.3")
+  // Source: Astronomical Almanac, 1°34'43.3" at J2000.0, rate -18"/cy
   earthInclinationJ2000_deg: 1.57869,
+  earthInclinationRate_arcsecPerCentury: -18,
+  // Source: JPL Horizons / Astronomical Almanac
+  eccentricityJ2000: 0.01671022,                     // Earth eccentricity at J2000.0
+  perihelionLongitudeJ2000_deg: 102.947,             // Longitude of perihelion at J2000.0
+  perihelionPassageJ2000_JD: 2451547.042,            // Earth perihelion 2000 Jan 3 13:00 UTC (USNO)
+  // Source: IAU 2006
+  iauPrecessionJ2000: 25771.57634,                   // Axial precession period (years)
+  // Source: USNO / timeanddate.com
+  juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // MODEL EPOCH VALUES (June 21, 2000 00:00 UTC, JD 2451716.5)
+  // --- 8b. Model epoch offsets (June 21, 2000 00:00 UTC, JD 2451716.5) ---
   // Adjusted from J2000.0 for the 171.5 day offset (0.004696 centuries)
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Time offset from J2000.0 to model start
-  // J2000.0 = JD 2451545.0, Model start = JD 2451716.5
-  // Offset = 171.5 days = 0.469623 years = 0.00469623 centuries
   modelEpochOffsetDays: startmodelJD - j2000JD,
   modelEpochOffsetCenturies: (startmodelJD - j2000JD) / julianCenturyDays,
-
-  // Obliquity at model epoch (June 21, 2000)
-  // = obliquityJ2000 + rate × offset
-  // = 84381.406" + (-46.836769" × 0.00469623) = 84381.186"
-  // = 23.439279° - 0.000061° = 23.439218°
+  // Obliquity at model epoch: obliquityJ2000 + rate × offset ≈ 23.439218°
   get obliquityModelEpoch_arcsec() {
     return this.obliquityJ2000_arcsec + this.obliquityRate_arcsecPerCentury * this.modelEpochOffsetCenturies;
   },
   get obliquityModelEpoch_deg() {
     return this.obliquityModelEpoch_arcsec / 3600;   // ≈ 23.439218°
   },
-
-  // Earth's inclination at model epoch (June 21, 2000)
-  // Inclination rate: -18"/century (from Astronomical Almanac formula)
-  // Change over 171.5 days: -18" × 0.00469623 = -0.085" ≈ negligible
-  // For practical purposes, same as J2000 value
-  earthInclinationRate_arcsecPerCentury: -18,
+  // Earth inclination at model epoch (change over 171.5 days is negligible)
   get earthInclinationModelEpoch_deg() {
     const changeArcsec = this.earthInclinationRate_arcsecPerCentury * this.modelEpochOffsetCenturies;
     return this.earthInclinationJ2000_deg + changeArcsec / 3600;  // ≈ 1.57869°
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // SOLSTICE REFERENCE TIMES
-  // ═══════════════════════════════════════════════════════════════════════════
+  // --- 8c. Year & day lengths (J2000.0) ---
+  // Source: Meeus & Savoie (1992) "The history of the tropical year"
+  tropicalYearVEJ2000: 365.242374,                   // Vernal Equinox to Vernal Equinox
+  tropicalYearSSJ2000: 365.241626,                   // Summer Solstice to Summer Solstice
+  tropicalYearAEJ2000: 365.242018,                   // Autumnal Equinox to Autumnal Equinox
+  tropicalYearWSJ2000: 365.242740,                   // Winter Solstice to Winter Solstice
+  tropicalYearMeanJ2000: 365.2421897,                // Mean tropical year at J2000.0
+  tropicalYearRateSecPerCentury: -0.53,              // Secular change in tropical year length
+  // Source: JPL Horizons
+  anomalisticYearJ2000: 365.259636,                  // Perihelion to perihelion
+  siderealYearJ2000: 365.256363,                     // Fixed star reference (one complete orbit)
+  // Source: IERS Conventions / IAU definitions
+  solarDayJ2000: 86400.0,                            // Mean solar day (SI definition)
+  siderealDayJ2000: 86164.09053083288,               // ~23h 56m 4.0905s
+  stellarDayJ2000: 86164.0989036905,                 // ~23h 56m 4.0989s (slightly longer due to precession)
 
-  // June Solstice reference times (for solstice timing validation)
-  // Source: USNO / timeanddate.com astronomical tables
-  juneSolstice2000_JD: 2451716.575,                  // June 21, 2000 01:48 UTC
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PERIHELION REFERENCE VALUES (J2000.0)
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Earth's perihelion passage near J2000.0
-  // Source: USNO / Astronomical Almanac — Earth perihelion 2000 Jan 3 13:00 UTC
-  perihelionPassageJ2000_JD: 2451547.042,
-
-  // Earth's longitude of perihelion at J2000.0
-  // Source: JPL Horizons / Astronomical Almanac
-  perihelionLongitudeJ2000_deg: 102.947,             // RA of perihelion in degrees
-
-  // Earth's orbital eccentricity at J2000.0
-  // Source: JPL Horizons / Astronomical Almanac
-  eccentricityJ2000: 0.01671022,                     // Distance to Earth in AU (eccentricity)
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LUNAR MEAN LONGITUDE COEFFICIENTS (J2000.0)
-  // Source: Meeus, "Astronomical Algorithms", Ch. 47
-  // Used for lunar perturbation corrections (equation of center, evection, variation, annual equation)
-  // ═══════════════════════════════════════════════════════════════════════════
+  // --- 8d. Lunar mean longitude coefficients (Meeus Ch. 47) ---
+  // Used for lunar perturbation corrections (EoC, evection, variation, annual equation)
   moonMeanAnomalyJ2000_deg: 134.9634,                // Moon's mean anomaly at J2000.0 (degrees)
   moonMeanAnomalyRate_degPerDay: 13.06499295,         // Moon's mean anomaly rate (degrees/day)
   moonMeanElongationJ2000_deg: 297.8502,              // Mean elongation Moon-Sun at J2000.0 (degrees)
@@ -910,14 +865,8 @@ const ASTRO_REFERENCE = {
   moonMeanElongationJ2000Full_deg: 297.8502042,        // D at J2000.0 (full precision for latitude)
   moonMeanElongationRate_degPerCentury: 445267.1115168, // D rate (degrees/Julian century)
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PERIHELION PRECESSION RATES (1900-2100 trend)
-  // Source: Derived from JPL SPICE/WebGeoCalc analysis using modern ephemerides
-  // Values represent the linear trend over 1900-2100 AD
-  // Note: Rates fluctuate over time; these are not valid for long-term predictions
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Values in arcseconds per century, with min/max range where applicable
+  // --- 8e. Perihelion precession rates (1900–2100 trend) ---
+  // Source: JPL SPICE/WebGeoCalc. Fluctuate over time; not valid for long-term predictions.
   perihelionPrecessionRates: {
     mercury: { min: 570, max: 575 },
     venus:   { min: 0, max: 400 },
@@ -929,38 +878,13 @@ const ASTRO_REFERENCE = {
     neptune: { min: -200, max: 200 },
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // YEAR LENGTH REFERENCE VALUES (J2000.0)
-  // Source: Meeus & Savoie (1992) "The history of the tropical year"
-  // Journal of the British Astronomical Association, 102(1), 40-42
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Tropical year measured from each cardinal point (days)
-  // These differ due to Earth's elliptical orbit
-  tropicalYearVEJ2000: 365.242374,    // Vernal Equinox to Vernal Equinox
-  tropicalYearSSJ2000: 365.241626,    // Summer Solstice to Summer Solstice
-  tropicalYearAEJ2000: 365.242018,    // Autumnal Equinox to Autumnal Equinox
-  tropicalYearWSJ2000: 365.242740,    // Winter Solstice to Winter Solstice
-
-  // Mean tropical year (average of all cardinal points)
-  tropicalYearMeanJ2000: 365.2421897, // Mean tropical year at J2000.0
-
-  // Other year types
-  anomalisticYearJ2000: 365.259636,   // Perihelion to perihelion
-  siderealYearJ2000: 365.256363,      // Fixed star reference (one complete orbit)
-
-  // ---------------------------------------------------------------------------
-  // MEASUREMENT OFFSET CORRECTIONS (Computed from model geometry)
-  // These offsets arise from measuring from Earth's position rather than
-  // from fixed reference points, due to precession cycles.
-  // ---------------------------------------------------------------------------
+  // --- 8f. Measurement offset corrections (derived from model geometry) ---
+  // These offsets arise from measuring from Earth's precessing position rather
+  // than from fixed reference points.
 
   // Solar Day Offset (11.4 ms/day)
   // Perihelion precession causes the measured solar day to be ~11.4ms short.
-  // This accumulates to 1 extra day over one perihelion cycle (H/16).
-  // Formula: (meanLengthOfDay / perihelionCycle) / meanSolarDaysPerYear
-  //        = (86400 / (H/16)) / 365.242189 = 0.01134 s = 11.34 ms
-  // Yearly accumulation: 11.4ms × 365.24 days = 4.16 seconds/year
+  // Accumulates to 1 extra day over one perihelion cycle (H/16).
   get solarDayOffsetMs() {
     const perihelionCycle = holisticyearLength / 16;  // H/16 years
     return (86400 / perihelionCycle) / 365.2421897 * 1000;  // ~11.34 ms
@@ -970,60 +894,17 @@ const ASTRO_REFERENCE = {
   },
 
   // Wobble Parallax (1.748 seconds)
-  // Earth orbits the wobble center, creating a parallax effect when measuring
-  // the Sun's position. This adds a constant offset to the sidereal year when measured from Earth.
-  // Formula: ΔT = (r/D) × (T_sidereal / T_wobble) × T_sidereal
-  //   where: r = eccentricityAmplitude = 0.0014226 AU (wobble radius)
-  //          D = 1 AU (Sun distance)
-  //          T_wobble = H/13 = 25,683.69 years (axial precession period)
-  //          T_sidereal = 31,558,150 seconds
-  // Result: (0.0014226/1) × (1/25683.69) × 31558150 = 1.748 seconds
+  // Earth orbits the wobble center (radius = eccentricityAmplitude AU),
+  // creating a parallax offset to the sidereal year when measured from Earth.
   get wobbleParallaxSeconds() {
     const r = eccentricityAmplitude;  // eccentricityAmplitude in AU
     const D = 1;          // Sun distance in AU
     const T_wobble_years = holisticyearLength / 13;  // 25,683.69 years
     const T_sidereal_seconds = 365.256363 * 86400;  // ~31,558,150 seconds
-    // Formula: ΔT = (r/D) × (T_sidereal / T_wobble) × T_sidereal
     return (r / D) * (T_sidereal_seconds / (T_wobble_years * 365.256363 * 86400)) * T_sidereal_seconds;
   },
 
-  // IAU J2000 axial precession period
-  iauPrecessionJ2000: 25771.57634,  // years
-
-  // Secular change in tropical year length
-  tropicalYearRateSecPerCentury: -0.53,
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // DAY LENGTH REFERENCE VALUES (J2000.0)
-  // Source: IERS Conventions / IAU definitions
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // Solar day (SI seconds) - by definition at epoch
-  solarDayJ2000: 86400.0,             // Mean solar day (exact by definition)
-
-  // Sidereal day (rotation relative to vernal equinox)
-  siderealDayJ2000: 86164.09053083288,     // ~23h 56m 4.0905s
-
-  // Stellar day (rotation relative to fixed stars)
-  // Slightly longer than sidereal day due to precession
-  stellarDayJ2000: 86164.0989036905,       // ~23h 56m 4.0989s
-
-  // Ascending node frame corrections for planet-level tilt placement (degrees).
-  // When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
-  // annual rotation) to planet.containerObj (below), the ascending node direction
-  // changes reference frame. DERIVED — not tuned:
-  //   Type I/II (inner): 180 - ascendingNode (anti-node direction)
-  //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
-  ascNodeTiltCorrection: {
-    mercury: 180 - mercuryAscendingNode,
-    venus:   180 - venusAscendingNode,
-    mars:    180 - marsAscendingNode,
-    jupiter: 2 * jupiterStartpos,
-    saturn:  2 * saturnStartpos,
-    uranus:  2 * uranusStartpos,
-    neptune: 2 * neptuneStartpos,
-  },
-
+  // --- 8g. Parallax correction coefficients ---
   // Post-hoc RA/Dec correction for geocentric parallax effect (15-param model).
   // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
   //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
@@ -1053,6 +934,12 @@ const ASTRO_REFERENCE = {
   },
 };
 
+// ─── 9. DERIVED CONSTANTS ───────────────────────────────────────────────
+// Computed from foundational constants. Time units, EoC parameters,
+// Moon cycles, speeds, and orbital distances.
+// ─────────────────────────────────────────────────────────────────────────
+
+// --- 9a. Time units & year lengths ---
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
 const balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));
@@ -1064,7 +951,9 @@ const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1)
 const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
+const psiConstant = psiNumerator / (2 * holisticyearLength);  // ≈ 3.291×10⁻³
 
+// --- 9b. Equation of center (EoC) derived parameters ---
 // Equation of center eccentricity — derived, not a free parameter.
 // The off-center orbit geometry provides apparent speed variation with amplitude e_geom (first order).
 // The explicit EoC adds 2·eoc. Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
@@ -1075,10 +964,27 @@ const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
 const perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / (holisticyearLength / 16) * 360
   + correctionSun + 360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360 + 360) % 360;
 
+// Ascending node frame corrections for planet-level tilt placement (degrees).
+// When orbital plane tilt is moved from RealPerihelionAtSun.containerObj (above
+// annual rotation) to planet.containerObj (below), the ascending node direction
+// changes reference frame. DERIVED — not tuned:
+//   Type I/II (inner): 180 - ascendingNode (anti-node direction)
+//   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
+const ascNodeTiltCorrection = {
+  mercury: 180 - mercuryAscendingNode,
+  venus:   180 - venusAscendingNode,
+  mars:    180 - marsAscendingNode,
+  jupiter: 2 * jupiterStartpos,
+  saturn:  2 * saturnStartpos,
+  uranus:  2 * uranusStartpos,
+  neptune: 2 * neptuneStartpos,
+};
+
+// --- 9c. Speeds & distances ---
 const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
 const earthPerihelionICRFYears = holisticyearLength/3;
 
-//sDAY IS USED IN 3D MODEL CALCULATIONS 
+// --- 9d. Simulation time steps (fractions of a tropical year) ---
 const sDay = 1/meansolaryearlengthinDays;
 const sYear = sDay*365;
 const sMonth = sDay*30;
@@ -1091,7 +997,7 @@ const lightYear = speedOfLight*meanlengthofday*meansolaryearlengthinDays;
 const sunOrbitPeriod = (lightYear*milkywayDistance*Math.PI*2)/(sunSpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
 const milkywayOrbitPeriod = (lightYear*greatattractorDistance*Math.PI*2)/(milkywaySpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
 
-// Moon calculations
+// --- 9e. Moon derived cycles ---
 const moonSiderealMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonSiderealMonthInput)-0);
 // You can tweak the last number +/-1 (See Moon characteristics)
 const moonAnomalisticMonth = (holisticyearLength*meansolaryearlengthinDays)/Math.ceil(((holisticyearLength*meansolaryearlengthinDays)/moonAnomalisticMonthInput)-0);
@@ -1117,6 +1023,13 @@ const moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // meanAU = (P_seconds / 3600 * v_km/h) / (2π) = orbital circumference / 2π
 const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSuninKM) / (2 * Math.PI);
 // Result: 149,597,870.345632 km
+
+// ─── 10. MASS CALCULATIONS ──────────────────────────────────────────────
+// GM and mass for Sun, Earth, Moon, and all planets. Derived from
+// Kepler's 3rd Law, DE440 mass ratios, and Moon orbital mechanics.
+// ─────────────────────────────────────────────────────────────────────────
+
+// --- 10a. Sun, Earth, Moon masses (Kepler's 3rd Law) ---
 
 // Gravitational parameter of the Sun (derived from Kepler's 3rd Law)
 // GM = (2π)² × a³ / P² where a = mean AU in km, P = mean sidereal year in seconds
@@ -1172,11 +1085,8 @@ const M_MOON = GM_MOON / G_CONSTANT;
 // Mass ratio Sun/Earth ≈ 332,946
 const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Planetary Mass Ratios (Sun/Planet) - From IAU/JPL measurements
-// These ratios were determined from moon observations and spacecraft tracking
+// --- 10b. Planetary mass ratios (Sun/Planet) — IAU/JPL DE440 ---
 // GM_planet = GM_SUN / ratio, then M_planet = GM_planet / G
-// ═══════════════════════════════════════════════════════════════════════════
 
 // Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
 const MASS_RATIO_SUN_MERCURY = 6023625.5;            // DE440
@@ -1231,9 +1141,13 @@ const GM_HALLEYS = M_HALLEYS * G_CONSTANT;           // ~1.47 × 10⁻⁵ km³/s
 const M_EROS = 6.687e15;                             // 6.687 × 10¹⁵ kg (measured)
 const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s²
 
-// Orbital Formulas Helper Object
-// Contains functions to calculate derived orbital elements
+// ─── 11. ORBITAL FORMULAS ───────────────────────────────────────────────
+// Pure helper functions for orbital mechanics. No model-specific state.
+// Used by the About panel and orbital element displays.
+// ─────────────────────────────────────────────────────────────────────────
 const OrbitalFormulas = {
+  // --- 11a. Kepler's equation & orbital elements ---
+
   // Solve Kepler's equation for Eccentric Anomaly using Newton-Raphson
   // M = E - e·sin(E)  →  solve for E given M and e
   // Input: M in degrees, e (eccentricity)
@@ -1540,9 +1454,7 @@ const OrbitalFormulas = {
   // Angular velocity in radians per second
   meanMotionFromGM: (GM, a_km) => Math.sqrt(GM / Math.pow(a_km, 3)),
 
-  // ═══════════════════════════════════════════════════════════════
-  // Precession & Newtonian Dynamics
-  // ═══════════════════════════════════════════════════════════════
+  // --- 11b. Precession & Newtonian dynamics ---
 
   // Precession rate from precession period (arcsec/century)
   // Rate = 360° × 3600"/° × 100 years / Period_years = 129,600,000 / Period_years
@@ -1638,9 +1550,7 @@ const OrbitalFormulas = {
     return `≈ Holistic Year / ${absRatio.toFixed(2)}${sign}`;
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  // Precession Breakdown (Lagrange-Laplace Secular Theory)
-  // ═══════════════════════════════════════════════════════════════
+  // --- 11c. Precession breakdown (Lagrange-Laplace secular theory) ---
 
   // Laplace coefficient b_{3/2}^{(1)}(α) - for outer perturber on inner planet
   // Computed using numerical integration of the defining integral:
@@ -1790,6 +1700,10 @@ const OrbitalFormulas = {
   }
 };
 
+// ─── END OF CONSTANTS SECTION ───────────────────────────────────────────
+// Everything below this line uses the constants defined above.
+// ─────────────────────────────────────────────────────────────────────────
+
 // Planet calculations TYPE I
 const mercurySolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/mercurySolarYearInput));
 const mercuryOrbitDistance = (((holisticyearLength/mercurySolarYearCount)**2)**(1/3));
@@ -1900,9 +1814,7 @@ const fmtScientific = (n, dec = 12) => {
   return `${mantissa} × 10${superExp}`;
 };
 
-// ═══════════════════════════════════════════════════════════════
-// Precession Breakdown Helper Functions
-// ═══════════════════════════════════════════════════════════════
+// --- Precession breakdown helper functions ---
 
 // Cache for precession breakdown calculations (avoid recalculating every frame)
 const precessionBreakdownCache = {
@@ -2770,7 +2682,7 @@ const mercuryPerihelionDurationEcliptic2 = {
 };
 
 // Ascending node frame corrections from ASTRO_REFERENCE (see above)
-const ascNodeToolCorrection = ASTRO_REFERENCE.ascNodeTiltCorrection;
+const ascNodeToolCorrection = ascNodeTiltCorrection;
 
 // Ascending node lookup by planet name (for post-hoc RA/Dec correction)
 const _planetAscNodeLookup = {
@@ -11497,11 +11409,11 @@ const BALANCE_PRESETS = [
 
 // Decode a preset row into a state object
 function fbeDecodePreset(row) {
-  const PHASES = [203.3195, 23.3195];
+  const PHASES = [earthInclinationPhaseAngle, saturnInclinationPhaseAngle];
   return {
     mercury:  { d: row[2],  phase: PHASES[row[3]] },
     venus:    { d: row[4],  phase: PHASES[row[5]] },
-    earth:    { d: 3,       phase: 203.3195 },
+    earth:    { d: 3,       phase: earthInclinationPhaseAngle },
     mars:     { d: row[6],  phase: PHASES[row[7]] },
     jupiter:  { d: row[8],  phase: PHASES[row[9]] },
     saturn:   { d: row[10], phase: PHASES[row[11]] },
@@ -11512,8 +11424,8 @@ function fbeDecodePreset(row) {
 
 // Build dropdown label for a preset
 function fbePresetLabel(row, index) {
-  const PHASES = [203.3195, 23.3195];
-  const pLabel = (ph) => Math.abs(ph - 203.3195) < 1 ? '203' : '23';
+  const PHASES = [earthInclinationPhaseAngle, saturnInclinationPhaseAngle];
+  const pLabel = (ph) => Math.abs(ph - earthInclinationPhaseAngle) < 1 ? '203' : '23';
   const planets = ['Me','Ve','Ma','Ju','Sa','Ur','Ne'];
   const indices = [2,4,6,8,10,12,14]; // d positions in row
   const parts = planets.map((p, i) => `${p}${row[indices[i]]}@${pLabel(PHASES[row[indices[i]+1]])}`);
@@ -11525,7 +11437,7 @@ function fbeMatchDefaultPreset() {
   const SCENARIOS = { '5,3': 'A', '8,5': 'B', '13,8': 'C', '21,13': 'D' };
   const scenario = SCENARIOS[BALANCE_CONFIG.jupiter.defaultD + ',' + BALANCE_CONFIG.saturn.defaultD];
   if (!scenario) return null;
-  const phaseIdx = (ph) => Math.abs(ph - 203.3195) < 1 ? 0 : 1;
+  const phaseIdx = (ph) => Math.abs(ph - earthInclinationPhaseAngle) < 1 ? 0 : 1;
   const defaults = [
     scenario, 0,
     BALANCE_CONFIG.mercury.defaultD, phaseIdx(BALANCE_CONFIG.mercury.defaultPhaseAngle),
@@ -11577,7 +11489,7 @@ const BALANCE_CONFIG = {
     period: mercuryPerihelionEclipticYears,
     trendJPL: mercuryEclipticInclinationTrendJPL,
     llBounds: { min: mercuryLLBoundsMin, max: mercuryLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: mercuryInclinationPhaseAngle,
     locked: false
   },
   venus: {
@@ -11591,21 +11503,21 @@ const BALANCE_CONFIG = {
     period: venusPerihelionEclipticYears,
     trendJPL: venusEclipticInclinationTrendJPL,
     llBounds: { min: venusLLBoundsMin, max: venusLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: venusInclinationPhaseAngle,
     locked: false
   },
   earth: {
     name: 'Earth',
     mass: M_EARTH / M_SUN,
     sma: 1.0,
-    ecc: 0.01671,              // JPL J2000 eccentricity (consistent with other planets)
+    ecc: ASTRO_REFERENCE.eccentricityJ2000,
     defaultD: 3,
     inclJ2000: earthInvPlaneInclJ2000,
     omegaJ2000: earthAscendingNodeInvPlaneVerified,
     period: earthPerihelionICRFYears,
     trendJPL: 0,  // Earth defines the ecliptic — no self-trend
     llBounds: { min: earthLLBoundsMin, max: earthLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: earthInclinationPhaseAngle,
     locked: true
   },
   mars: {
@@ -11619,7 +11531,7 @@ const BALANCE_CONFIG = {
     period: marsPerihelionEclipticYears,
     trendJPL: marsEclipticInclinationTrendJPL,
     llBounds: { min: marsLLBoundsMin, max: marsLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: marsInclinationPhaseAngle,
     locked: false
   },
   jupiter: {
@@ -11633,7 +11545,7 @@ const BALANCE_CONFIG = {
     period: jupiterPerihelionEclipticYears,
     trendJPL: jupiterEclipticInclinationTrendJPL,
     llBounds: { min: jupiterLLBoundsMin, max: jupiterLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: jupiterInclinationPhaseAngle,
     locked: false
   },
   saturn: {
@@ -11647,7 +11559,7 @@ const BALANCE_CONFIG = {
     period: saturnPerihelionEclipticYears,
     trendJPL: saturnEclipticInclinationTrendJPL,
     llBounds: { min: saturnLLBoundsMin, max: saturnLLBoundsMax },
-    defaultPhaseAngle: 23.3195,
+    defaultPhaseAngle: saturnInclinationPhaseAngle,
     locked: false
   },
   uranus: {
@@ -11661,7 +11573,7 @@ const BALANCE_CONFIG = {
     period: uranusPerihelionEclipticYears,
     trendJPL: uranusEclipticInclinationTrendJPL,
     llBounds: { min: uranusLLBoundsMin, max: uranusLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: uranusInclinationPhaseAngle,
     locked: false
   },
   neptune: {
@@ -11675,7 +11587,7 @@ const BALANCE_CONFIG = {
     period: neptunePerihelionEclipticYears,
     trendJPL: neptuneEclipticInclinationTrendJPL,
     llBounds: { min: neptuneLLBoundsMin, max: neptuneLLBoundsMax },
-    defaultPhaseAngle: 203.3195,
+    defaultPhaseAngle: neptuneInclinationPhaseAngle,
     locked: false
   }
 };
@@ -11715,7 +11627,7 @@ function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, pl
 
 // Main calculation engine
 function computeBalanceResults(state) {
-  const PSI = 2205 / (2 * holisticyearLength);
+  const PSI = psiConstant;
   const DEG2RAD = Math.PI / 180;
 
   // Structural weight: w = sqrt(m * a * (1-e^2)) / d
@@ -11828,7 +11740,7 @@ function fbeBuildPhaseSelect(planet, defaultPhase) {
     options = `<option value="${defaultPhase}" selected>${defaultPhase}\u00B0</option>` + options;
   }
 
-  const retroClass = Math.abs(defaultPhase - 23.3195) < 0.01 ? ' fbe-phase-retrograde' : '';
+  const retroClass = Math.abs(defaultPhase - saturnInclinationPhaseAngle) < 0.01 ? ' fbe-phase-retrograde' : '';
   return `<select class="fbe-phase-select${retroClass}" data-planet="${planet}" ${disabled}>${options}</select>` +
     `<input type="number" class="fbe-phase-custom" data-planet="${planet}" step="0.1" min="0" max="360" placeholder="\u03B3\u00B0" ${disabled}>`;
 }
@@ -11989,7 +11901,7 @@ function createBalanceExplorerPanel() {
         phaseCustom.classList.add('visible');
         phaseCustom.value = preset[key].phase;
       }
-      phaseSel.classList.toggle('fbe-phase-retrograde', Math.abs(preset[key].phase - 23.3195) < 0.01);
+      phaseSel.classList.toggle('fbe-phase-retrograde', Math.abs(preset[key].phase - saturnInclinationPhaseAngle) < 0.01);
       // Update d select UI
       const dSel = panel.querySelector(`.fbe-d-select[data-planet="${key}"]`);
       const dCustom = panel.querySelector(`.fbe-d-custom[data-planet="${key}"]`);
@@ -12018,7 +11930,7 @@ function createBalanceExplorerPanel() {
         customInput.classList.remove('visible');
         const val = parseFloat(e.target.value);
         state[planet].phaseAngle = val;
-        e.target.classList.toggle('fbe-phase-retrograde', Math.abs(val - 23.3195) < 0.01);
+        e.target.classList.toggle('fbe-phase-retrograde', Math.abs(val - saturnInclinationPhaseAngle) < 0.01);
         updateBalanceExplorerResults(panel, state);
       }
     });
@@ -12119,7 +12031,7 @@ function updateBalanceExplorerResults(panel, state) {
   // PSI formula line
   const psiLine = panel.querySelector('.fbe-psi-line');
   psiLine.textContent =
-    `\u03C8 = 2205 / (2 \u00D7 ${holisticyearLength.toLocaleString()}) = ${results.PSI.toExponential(6)}`;
+    `\u03C8 = ${psiNumerator} / (2 \u00D7 ${holisticyearLength.toLocaleString()}) = ${results.PSI.toExponential(6)}`;
 
   // Per-planet table
   const tbody = panel.querySelector('.fbe-results-tbody');
@@ -14316,7 +14228,7 @@ function setupGUI() {
         saturn: saturnInclinationPhaseAngle,
         uranus: uranusInclinationPhaseAngle,
         neptune: neptuneInclinationPhaseAngle
-      }[planetKey] || 203.3195
+      }[planetKey] || earthInclinationPhaseAngle
     };
 
     // Click row to toggle detail
@@ -15193,7 +15105,7 @@ function solsticeForYear(year, prevSolsticeJD = null) {
 
   if (prevSolsticeJD !== null) {
     // Chain from previous solstice - tropical year is ~365.24 days
-    approxJD = prevSolsticeJD + 365.24;
+    approxJD = prevSolsticeJD + meansolaryearlengthinDays;
     searchRange = 288;  // ±6 days is enough when chained
   } else {
     // First search: estimate from year + 0.5 (June solstice is mid-year)
@@ -15609,7 +15521,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
 
   if (prevPerihelionJD !== null) {
     // Anomalistic year is ~365.26 days - search around that offset from previous
-    approxJD = prevPerihelionJD + 365.26;
+    approxJD = prevPerihelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
     searchRange = 288;  // ±6 days is enough when we have a good prior
   } else {
     // First search: estimate perihelion position accounting for precession
@@ -15747,7 +15659,7 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
   let searchRange;
 
   if (prevPerihelionJD !== null) {
-    approxJD = prevPerihelionJD + 365.26;
+    approxJD = prevPerihelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
     searchRange = 288;
   } else {
     // First search: estimate perihelion position accounting for precession
@@ -15847,7 +15759,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
   let searchRange;
 
   if (prevAphelionJD !== null) {
-    approxJD = prevAphelionJD + 365.26;
+    approxJD = prevAphelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
     searchRange = 288;
   } else {
     // First search: estimate aphelion position accounting for precession
@@ -15950,7 +15862,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
   let searchRange;
 
   if (prevAphelionJD !== null) {
-    approxJD = prevAphelionJD + 365.26;
+    approxJD = prevAphelionJD + ASTRO_REFERENCE.anomalisticYearJ2000;
     searchRange = 288;  // ±6 days
   } else {
     // First search: estimate aphelion position accounting for precession
@@ -22085,7 +21997,7 @@ function longitudeToRARad(longitudeDeg, obliquityDeg) {
   if (isNaN(lon)) return null;
 
   // Use provided obliquity or get from global o object
-  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || 23.4393);
+  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || ASTRO_REFERENCE.obliquityJ2000_deg);
   const obliquityRad = obliquity * Math.PI / 180;
   const lonRad = lon * Math.PI / 180;
 
@@ -22110,7 +22022,7 @@ function longitudeToRAHMS(longitudeDeg, obliquityDeg) {
   if (isNaN(lon)) return longitudeDeg;
 
   // Use provided obliquity or get from global o object
-  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || 23.4393);
+  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || ASTRO_REFERENCE.obliquityJ2000_deg);
   const obliquityRad = obliquity * Math.PI / 180;
   const lonRad = lon * Math.PI / 180;
 
@@ -29490,7 +29402,7 @@ function moveModel(pos) {
 
     // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
     if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
-      const e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || 0.0167);
+      const e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
       const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
