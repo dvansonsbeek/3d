@@ -10,7 +10,7 @@
 >
 > **[📄 Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v1)** — Read the accompanying research paper
 
-Interactive 3D simulation of the Fibonacci Laws of Planetary Motion. Six laws and only 6 free parameters model the precession, eccentricity, inclination, obliquity and perihelion movements of all planets from a geo-heliocentric frame of reference. The Holistic-Year cycle of 333,888 years unifies axial precession (~25,684 yr, H/13), inclination precession (~111,296 yr, H/3) and perihelion precession (~20,868 yr, H/16) through Fibonacci number ratios. Earth is defined by 25 parameters, the Moon by 9, and each planet by 13.
+Interactive 3D simulation of the Fibonacci Laws of Planetary Motion. Six laws and only 6 free parameters model the precession, eccentricity, inclination, obliquity and perihelion movements of all planets from a geo-heliocentric frame of reference. The Holistic-Year cycle (H = 335,008 years) unifies axial precession (~25,770 yr, H/13), inclination precession (~111,669 yr, H/3) and perihelion precession (~20,938 yr, H/16) through Fibonacci number ratios. Earth is defined by 26 parameters, the Moon by 9, and each planet by 15.
 
 ---
 
@@ -51,18 +51,18 @@ npm run build
 ### How it is modelled
 
 - The **EARTH-WOBBLE-CENTER** is the center of our solar system.
-- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~25,684 solar years, also known as Axial precession and therefore the Axial tilt changes.
-- The **PERIHELION-OF-EARTH** is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of 111,296 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-- Axial precession meets Inclination precession every 20,868 years.
+- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of H/13 (~25,770) solar years, also known as Axial precession and therefore the Axial tilt changes.
+- The **PERIHELION-OF-EARTH** is orbiting the EARTH-WOBBLE-CENTER - and therefore Earth - counter-clockwise in a period of H/3 (~111,669) solar years, also known as Inclination precession and therefore the inclination tilt changes.
+- Axial precession meets Inclination precession every H/16 (~20,938) years.
 - Our Sun is orbiting the PERIHELION-OF-EARTH in a period of 1 solar year.
 - Therefore it shows as if the Sun is orbiting Earth.
 
 ### What is actually happening
 
 - The Sun is (still) the center of our solar system.
-- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of ~25,684 solar years, also known as Axial precession and therefore the Axial tilt changes.
-- The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of 111,296 solar years, also known as Inclination precession and therefore the inclination tilt changes.
-- Axial precession meets Inclination precession every 20,868 years.
+- Earth is wobbling clockwise around the EARTH-WOBBLE-CENTER in a period of H/13 (~25,770) solar years, also known as Axial precession and therefore the Axial tilt changes.
+- The PERIHELION-OF-EARTH is wobbling around the Sun counter-clockwise in a period of H/3 (~111,669) solar years, also known as Inclination precession and therefore the inclination tilt changes.
+- Axial precession meets Inclination precession every H/16 (~20,938) years.
 - Earth is orbiting the PERIHELION-OF-EARTH - close to the Sun - in a period of 1 solar year.
 - Therefore it shows Earth is actually orbiting the Sun.
 - So we still live in a Heliocentric solar system.
@@ -72,8 +72,8 @@ npm run build
 
 The model implements six Fibonacci Laws connecting planetary orbital parameters through pure Fibonacci numbers:
 
-1. **Law 1 — Fibonacci Cycle Hierarchy**: The Holistic Year H = 333,888 years divided by Fibonacci numbers F(n) produces all major precession periods (H/3 = inclination cycle, H/13 = axial precession, H/16 = perihelion precession), with beat-frequency relationships between them.
-2. **Law 2 — The Inclination Constant**: Each planet's inclination amplitude satisfies `d × amplitude × √mass = ψ`, where `d` is a pure Fibonacci number and `ψ = 2205/(2×333888)` is a universal constant. Config #32 (the unique mirror-symmetric configuration) assigns d = 21, 34, 3, 5, 5, 3, 21, 34 to Mercury through Neptune.
+1. **Law 1 — Fibonacci Cycle Hierarchy**: The Holistic Year H = 335,008 years divided by Fibonacci numbers F(n) produces all major precession periods (H/3 = inclination cycle, H/13 = axial precession, H/16 = perihelion precession), with beat-frequency relationships between them.
+2. **Law 2 — The Inclination Constant**: Each planet's inclination amplitude satisfies `d × amplitude × √mass = ψ`, where `d` is a pure Fibonacci number and `ψ = 2205/(2×H)` is a universal constant. Config #32 (the unique mirror-symmetric configuration) assigns d = 21, 34, 3, 5, 5, 3, 21, 34 to Mercury through Neptune.
 3. **Law 3 — The Inclination Balance**: The structural weights `w = √(m·a(1-e²)) / d` of the two phase groups (203° and 23°) balance to **99.9998%**, grounding the theory in conservation of angular momentum. Saturn is the sole retrograde (23°) planet.
 4. **Law 4 — The Eccentricity Constant**: The AMD (Angular Momentum Deficit) partition ratio `R² = AMD_planet / AMD_total` for each planet equals a ratio of Fibonacci numbers, linking eccentricity to the same d-assignments.
 5. **Law 5 — The Eccentricity Balance**: The eccentricity weights `v = √m × a^(3/2) × e / √d` balance to **99.88%** between the same two phase groups — an independent constraint using different powers of mass, distance, and d.
@@ -86,26 +86,26 @@ The mirror-symmetric d-assignments (Mercury↔Uranus=21, Venus↔Neptune=34, Ear
 - The inclination (J2000 value ~1.57869°) and axial tilt together result in the obliquity of Earth's axis (J2000 value +23°26'21").
 - There are only two counter movements around Earth working against each other in a ratio of 3:13 ; Inclination:Axial which explains all movements around Earth (precession, eccentricity, obliquity, inclination, etc)
 - The currently experienced precession is NOT the mean value and all precession movements are always experienced in the same ratio (e.g. experienced perihelion precession is around 13/16th of Axial precession: ~25,771×13/16 = ~20,939 years)
-- The Perihelion precession cycle of 20,868 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
+- The Perihelion precession cycle of H/16 years determines the natural cycles of the length of solar days, sidereal days, solar years, sidereal years and anomalistic years.
 - The EARTH-WOBBLE-CENTER was aligned in 1246 AD with the PERIHELION-OF-EARTH and therefore the length of solar year in days and the length of sidereal year in seconds were MEAN in 1246 AD.
 
 For more details see [holisticuniverse.com](https://holisticuniverse.com).
 
 ---
 
-## 🎯 Why 333,888 Years?
+## 🎯 Why H = 335,008 Years?
 
 This number fits all observations best and aligns all year and day calculations:
 
 1. Historic value longitude of perihelion 90°: 1245-12-14
 2. J2000 value longitude of perihelion: 6h51m48s = ~102.95°
 3. The Length of solar day, solar year in days, sidereal year in seconds aligned to 3D longitude values and historic values
-4. Climate graphs with ~111k cycles as a cycle of 111,296 years (three times 111,296 years = 333,888 years)
+4. Climate graphs with ~111k cycles as a cycle of H/3 years (three times H/3 = H)
 5. End of Last Glacial Maximum (LGM) around 23,100 BC when inclination to inv plane was max
 6. End of Younger Dryas just after 11000 BC when obliquity was max
 7. **KEY EVIDENCE:** Mercury perihelion precession aligned to ~575 arc seconds per century
 8. **KEY EVIDENCE:** The difference sidereal day - stellar day leads to the difference solar year - sidereal year
-9. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, sidereal year and anomaliztic year all align perfectly with 333,888 year cycle
+9. **KEY EVIDENCE:** Solar day, sidereal day, tropical year, sidereal year and anomalistic year all align perfectly with the Holistic-Year cycle
 10. Obliquity correct both historic and current values
 11. Orbital Inclination to ICRF correct both historic and current values
 12. Eccentricity correct for current values

@@ -25,7 +25,7 @@ The **ecliptic** (Earth's orbital plane) is traditionally used as the reference 
 This creates a confusing situation:
 - Planetary inclinations measured relative to the ecliptic change over time
 - Even if a planet's orbit relative to the invariable plane is stable, its "ecliptic inclination" varies
-- The ~111,296-year precession cycle means measurements from different epochs aren't directly comparable
+- The H/3-year precession cycle means measurements from different epochs aren't directly comparable
 
 ### The Invariable Plane Solution
 
@@ -66,17 +66,19 @@ These values differ by ~177° (not exactly 180°) due to measurement precision a
 
 Each planet's orbit is tilted relative to the invariable plane. These values are fundamentally more stable than ecliptic inclinations:
 
+For current values, see [Constants Reference](10-constants-reference.md).
+
 | Planet | Inclination to Inv. Plane | Inclination to Ecliptic | Notes |
 |--------|---------------------------|------------------------|-------|
-| Mercury | 6.35° | 7.01° | Highest inclination |
-| Venus | 2.15° | 3.39° | |
-| Earth | 1.48° (mean) | 0° (by definition) | Oscillates 0.85° - 2.12° |
-| Mars | 1.63° | 1.85° | |
-| Jupiter | 0.32° | 1.30° | Closest to invariable plane |
-| Saturn | 0.93° | 2.49° | |
-| Uranus | 0.99° | 0.77° | |
-| Neptune | 0.74° | 1.77° | |
-| Pluto | 15.55° | 17.14° | Dwarf planet |
+| Mercury | `mercuryInvPlaneInclinationMean` | 7.01° | Highest inclination |
+| Venus | `venusInvPlaneInclinationMean` | 3.39° | |
+| Earth | `earthInvPlaneInclinationMean` | 0° (by definition) | Oscillates mean ± amplitude |
+| Mars | `marsInvPlaneInclinationMean` | 1.85° | |
+| Jupiter | `jupiterInvPlaneInclinationMean` | 1.30° | Closest to invariable plane |
+| Saturn | `saturnInvPlaneInclinationMean` | 2.49° | |
+| Uranus | `uranusInvPlaneInclinationMean` | 0.77° | |
+| Neptune | `neptuneInvPlaneInclinationMean` | 1.77° | |
+| Pluto | `plutoInvPlaneInclinationMean` | 17.14° | Dwarf planet |
 
 **Key observations:**
 
@@ -127,12 +129,12 @@ The maximum height a planet reaches above/below the invariable plane depends on:
 
 ## The Inclination Cycle vs. Annual Crossings
 
-A common misconception is that Earth's position relative to the invariable plane follows the ~111,296-year inclination cycle. In reality:
+A common misconception is that Earth's position relative to the invariable plane follows the H/3-year inclination cycle. In reality:
 
 | Timescale | What Changes | Effect |
 |-----------|-------------|--------|
 | **1 year** | Earth's position in its orbit | Earth crosses plane twice per year |
-| **~111,296 years** | Earth's orbital plane tilt | Changes HOW FAR above/below Earth gets |
+| **H/3 years** | Earth's orbital plane tilt | Changes HOW FAR above/below Earth gets |
 
 ```
 Year 2000:
@@ -146,7 +148,7 @@ Year 50000 (minimum tilt):
 - Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
 ```
 
-The crossing dates shift over the ~111,296-year precession cycle as the ascending node circulates through 360°.
+The crossing dates shift over the H/3-year precession cycle as the ascending node circulates through 360°.
 
 ---
 
@@ -156,7 +158,7 @@ All planetary orbital planes **precess around the invariable plane** like spinni
 
 | Body | Precession Period | Notes |
 |------|-------------------|-------|
-| Earth | ~111,296 years | One-third of holistic year |
+| Earth | H/3 years | One-third of holistic year |
 | Jupiter-Saturn | ~50,000-60,000 years | Coupled motion |
 | Invariable plane | Essentially fixed | Varies < 0.1 mas over 100 years |
 
@@ -337,7 +339,7 @@ The invariable plane provides a fixed reference frame for understanding the sola
 - **Physics-based** - Perpendicular to total angular momentum
 - **Universal reference** - All planetary motions can be measured consistently
 
-Every planet, including Earth, crosses this plane twice per orbit. The ~111,296-year precession cycle determines how tilted each orbit is, but the crossings happen on orbital timescales (1 year for Earth, 12 years for Jupiter, etc.).
+Every planet, including Earth, crosses this plane twice per orbit. The H/3-year precession cycle determines how tilted each orbit is, but the crossings happen on orbital timescales (1 year for Earth, 12 years for Jupiter, etc.).
 
 The angular momentum validation (Option A vs B) and mass-weighted balance tracking provide continuous verification that the simulation accurately represents the solar system's physics.
 

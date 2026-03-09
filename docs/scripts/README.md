@@ -2,7 +2,7 @@
 
 Python scripts for investigating, verifying, and reproducing the results of the [Fibonacci Laws of Planetary Motion](https://www.holisticuniverse.com).
 
-These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Holistic-Year timescale (H = 333,888 years).
+These scripts were used during the research to discover and verify the six Fibonacci Laws that connect planetary orbital tilts, eccentricities, and precession rates to the Holistic-Year timescale (H; see [Constants Reference](../10-constants-reference.md)).
 
 ---
 
@@ -83,7 +83,7 @@ python fibonacci_trappist1_deep.py
 
 | File | Description |
 |------|-------------|
-| `holistic-year-objects-data.csv` | Simulation output data: orbital parameters across one Holistic-Year (333,888 years) (predictive formula scripts depend on this file) |
+| `holistic-year-objects-data.csv` | Simulation output data: orbital parameters across one Holistic-Year (H) (predictive formula scripts depend on this file) |
 | [`../appendix-h-holistic-year-objects-data.xlsx`](../appendix-h-holistic-year-objects-data.xlsx) | Excel version of the same data with additional sheets (perihelion scripts depend on this file — it must be present in the parent `docs/` directory) |
 
 ---

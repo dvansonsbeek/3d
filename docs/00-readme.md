@@ -73,9 +73,9 @@ This documentation is **self-contained** - you can understand the model and use 
 | [Appendix E - Inclination Computation](appendix-e-inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
 | [Appendix F - Inclination Verification](appendix-f-inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [Appendix G - Mercury Precession](appendix-g-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (333,888 years) |
+| [Appendix H - Holistic Year Objects Data](appendix-h-holistic-year-objects-data.xlsx) | Excel export of planetary positions and orbital elements spanning one complete Holistic Year (H) |
 | [Appendix I - Length of Day& Year Formulas](appendix-i-length-day-year-formulas.md) | Tropical year and day length analysis: measurement methods, validation results, proposed formulas |
-| [Appendix J - Holistic Year Analysis Data](appendix-j-holistic-year-analysis.xlsx) | Excel export of 64 points in time for year analysis spanning one complete Holistic Year (333,888 years) |
+| [Appendix J - Holistic Year Analysis Data](appendix-j-holistic-year-analysis.xlsx) | Excel export of 64 points in time for year analysis spanning one complete Holistic Year (H) |
 | [Appendix K - Balance Search](appendix-k-balance-search.js) | Exhaustive search of all valid Fibonacci divisor configurations; generates balance-presets.json |
 | [Appendix L - Verify Laws](appendix-l-verify-laws.js) | Comprehensive verification of all six Fibonacci Laws, five findings, and predictions (49 checks) |
 | [Appendix M - Configuration Analysis](appendix-m-configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
@@ -100,13 +100,13 @@ Both produce identical results, proving the geometric validity of the approach.
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Holistic-Year | 333,888 years | Complete cycle unifying all precession movements |
-| Axial Precession | ~25,684 years | Earth's wobble around EARTH-WOBBLE-CENTER |
-| Inclination Precession | ~111,296 years | PERIHELION-OF-EARTH orbit period |
-| Perihelion Precession | 20,868 years | Combined cycle (axial + inclination meeting) |
-| Mean Obliquity | 23.41398° | Earth's mean axial tilt |
-| Obliquity Range | 22.15° - 24.68° | Earth's tilt oscillation range |
-| Mean Inclination | 1.481592° | Earth's mean orbital inclination to invariable plane |
+| Holistic-Year (H) | See [Constants Reference](10-constants-reference.md) | Complete cycle unifying all precession movements |
+| Axial Precession | H / 13 | Earth's wobble around EARTH-WOBBLE-CENTER |
+| Inclination Precession | H / 3 | PERIHELION-OF-EARTH orbit period |
+| Perihelion Precession | H / 16 | Combined cycle (axial + inclination meeting) |
+| Mean Obliquity | `earthtiltMean` | Earth's mean axial tilt |
+| Obliquity Range | ~22.2° - ~24.7° | Earth's tilt oscillation range |
+| Mean Inclination | `earthInvPlaneInclinationMean` | Earth's mean orbital inclination to invariable plane |
 
 ## Further Reading
 

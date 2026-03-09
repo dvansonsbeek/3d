@@ -34,7 +34,7 @@ from typing import List, Tuple, Dict
 # SECTION A: FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-H = 333888                      # Holistic Year (fundamental cycle)
+H = 335008                      # Holistic Year (fundamental cycle)
 ANCHOR_YEAR = -301340           # Start of H-cycle (time reference)
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
@@ -57,29 +57,29 @@ EARTH_INCLIN_AMPL = 0.633849   # Inclination amplitude (degrees)
 # =============================================================================
 
 # Earth cycles
-EARTH_PERI_PERIOD = H / 16      # 20,868 years - perihelion precession
-EARTH_PERI_2 = H / 32           # 10,434 years - 2nd harmonic
-EARTH_PERI_3 = H / 48           # 6,956 years - 3rd harmonic
-EARTH_PERI_4 = H / 64           # 5,217 years - 4th harmonic
-OBLIQ_CYCLE = H / 8             # 41,736 years - obliquity
-INCLIN_CYCLE = H / 3            # 111,296 years - inclination
+EARTH_PERI_PERIOD = H / 16      # H/16 - perihelion precession
+EARTH_PERI_2 = H / 32           # H/32 - 2nd harmonic
+EARTH_PERI_3 = H / 48           # H/48 - 3rd harmonic
+EARTH_PERI_4 = H / 64           # H/64 - 4th harmonic
+OBLIQ_CYCLE = H / 8             # H/8 - obliquity
+INCLIN_CYCLE = H / 3            # H/3 - inclination
 
 # Additional periods
-H_DIV_4 = H / 4                 # 83,472 years
-H_DIV_5 = H / 5                 # 66,778 years
-H_DIV_12 = H / 12               # 27,824 years
-H_DIV_13 = H / 13               # 25,684 years (axial precession)
-H_DIV_24 = H / 24               # 13,912 years
-H_DIV_29 = H / 29               # 11,513 years
-H_DIV_40 = H / 40               # 8,347 years
+H_DIV_4 = H / 4                 # H/4
+H_DIV_5 = H / 5                 # H/5
+H_DIV_12 = H / 12               # H/12
+H_DIV_13 = H / 13               # H/13 (axial precession)
+H_DIV_24 = H / 24               # H/24
+H_DIV_29 = H / 29               # H/29
+H_DIV_40 = H / 40               # H/40
 
 # Additional periods for Venus accuracy
-H_DIV_21 = H / 21               # 15,899 years
-H_DIV_55 = H / 55               # 6,071 years
-H_DIV_77 = H / 77               # 4,336 years
-H_DIV_78 = H / 78               # 4,281 years
-H_DIV_80 = H / 80               # 4,174 years (5th harmonic of Earth perihelion)
-H_DIV_94 = H / 94               # 3,552 years
+H_DIV_21 = H / 21               # H/21
+H_DIV_55 = H / 55               # H/55
+H_DIV_77 = H / 77               # H/77
+H_DIV_78 = H / 78               # H/78
+H_DIV_80 = H / 80               # H/80 (5th harmonic of Earth perihelion)
+H_DIV_94 = H / 94               # H/94
 
 # =============================================================================
 # SECTION B: PLANET CONFIGURATIONS
@@ -90,54 +90,54 @@ H_DIV_94 = H / 94               # 3,552 years
 PLANETS = {
     'mercury': {
         'name': 'Mercury',
-        'period': H * 8 / 11,       # 242,828 years
+        'period': H * 8 / 11,       # H × 8/11
         'theta0': 77.4569131,       # J2000 perihelion longitude
-        'baseline': 1296000 / (H * 8 / 11) * 100,  # +533.7 "/cy
+        'baseline': 1296000 / (H * 8 / 11) * 100,
     },
     'venus': {
         'name': 'Venus',
-        'period': H * 2,            # 667,776 years
+        'period': H * 2,            # H × 2
         'theta0': 131.5765919,
-        'baseline': 1296000 / (H * 2) * 100,       # +194.1 "/cy
+        'baseline': 1296000 / (H * 2) * 100,
     },
     'mars': {
         'name': 'Mars',
-        'period': H * 3 / 13,       # 77,051 years
+        'period': H * 3 / 13,       # H × 3/13
         'theta0': 336.0650681,
-        'baseline': 1296000 / (H * 3 / 13) * 100,  # +1682.0 "/cy
+        'baseline': 1296000 / (H * 3 / 13) * 100,
     },
     'jupiter': {
         'name': 'Jupiter',
-        'period': H / 5,            # 66,778 years
+        'period': H / 5,            # H/5
         'theta0': 14.70659401,
-        'baseline': 1296000 / (H / 5) * 100,       # +1940.8 "/cy
+        'baseline': 1296000 / (H / 5) * 100,
     },
     'saturn': {
         'name': 'Saturn',
-        'period': H / 8,            # 41,736 years (retrograde, = obliquity cycle)
+        'period': H / 8,            # H/8 (retrograde, = obliquity cycle)
         'theta0': 92.12794343,
-        'baseline': -1296000 / (H / 8) * 100,      # -3105.2 "/cy
+        'baseline': -1296000 / (H / 8) * 100,
         # Note: Saturn's period equals the obliquity cycle, creating strong
         # coupling with Earth's obliquity/eccentricity variations (GROUP 15)
     },
     'uranus': {
         'name': 'Uranus',
-        'period': H / 3,            # 111,296 years
+        'period': H / 3,            # H/3
         'theta0': 170.7308251,
-        'baseline': 1296000 / (H / 3) * 100,       # +1164.5 "/cy
+        'baseline': 1296000 / (H / 3) * 100,
     },
     'neptune': {
         'name': 'Neptune',
-        'period': H * 2,            # 667,776 years
+        'period': H * 2,            # H × 2
         'theta0': 45.80124471,
-        'baseline': 1296000 / (H * 2) * 100,       # +194.1 "/cy
+        'baseline': 1296000 / (H * 2) * 100,
     },
 }
 
 # Earth mean values for normalization
 EARTH_OBLIQ_MEAN = 23.414
-EARTH_ECC_BASE = 0.015321                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.0014226                                     # (max - min) / 2
+EARTH_ECC_BASE = 0.015373                                      # (max + min) / 2
+EARTH_ECC_AMP  = 0.001370                                      # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
 
 # Earth perihelion harmonics (for perihelion and ERD calculation)
@@ -213,7 +213,7 @@ def calc_eccentricity(year: int) -> float:
     """Calculate Earth's orbital eccentricity at given year.
 
     Formula: e(t) = e₀ + (-A - (e₀ - e_base)·cos(φ))·cos(φ)
-    where e₀ = sqrt(e_base² + A²), e_base = 0.015321, A = 0.0014226
+    where e₀ = sqrt(e_base² + A²), e_base = 0.015373, A = 0.001370
     Only 2 free parameters: extremes are exactly e_base ± A.
     """
     t = time_offset(year)
@@ -283,12 +283,12 @@ def calc_sidereal_year(year: int) -> float:
 
     Formula: Y_sid = Y₀ × P_A / (P_A - 1) + k_e · (e - e₀)
 
-    Where P_A = H/13 = 25,684 years (axial precession period).
+    Where P_A = H/13 (axial precession period).
     The sidereal year is slightly longer than the solar year because
     the solar year must "lose" one full turn per precession cycle.
     """
     ecc = calc_eccentricity(year)
-    axial_prec = H / 13  # 25,684 years
+    axial_prec = H / 13  # H/13
     base = MEAN_SOLAR_YEAR_DAYS * axial_prec / (axial_prec - 1)
     return base + ECC_SENSITIVITY * (ecc - EARTH_ECC_MEAN)
 
@@ -414,7 +414,7 @@ def calc_axial_precession(year: int) -> float:
 
     Coin rotation paradox: the precession period equals the sidereal year
     divided by the difference between sidereal and solar years.
-    At the mean: H/13 = 25,684 years.
+    At the mean: H/13.
     """
     sid = calc_sidereal_year(year)
     sol = calc_solar_year(year)
@@ -428,7 +428,7 @@ def calc_perihelion_precession(year: int) -> float:
     Formula: P_P = Y_anom(s) / (Y_anom(s) - Y_solar(s))
 
     Coin rotation paradox applied to the anomalistic and solar years
-    in seconds. At the mean: H/16 = 20,868 years.
+    in seconds. At the mean: H/16.
     """
     anom_s = calc_anomalistic_year_seconds(year)
     sol_s = calc_solar_year_seconds(year)
@@ -442,7 +442,7 @@ def calc_inclination_precession(year: int) -> float:
     Formula: P_I = Y_anom(s) / (Y_anom(s) - Y_sid(s))
 
     Coin rotation paradox applied to the anomalistic and sidereal years
-    in seconds. At the mean: H/3 = 111,296 years.
+    in seconds. At the mean: H/3.
     """
     anom_s = calc_anomalistic_year_seconds(year)
     sid_s = calc_sidereal_year_seconds(year)

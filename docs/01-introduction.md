@@ -23,7 +23,7 @@ The model introduces two key gravitational centers that govern all observed prec
 This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
 
 - Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **25,684 years**
+- One complete orbit takes approximately **H/13 years** (~25,770 years; see [Constants Reference](10-constants-reference.md))
 - This is what causes the equinox to move westward through the zodiac
 - The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
 
@@ -34,7 +34,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **111,296 years** (inclination precession)
+- One complete orbit takes approximately **H/3 years** (~111,669 years, inclination precession; see [Constants Reference](10-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -42,23 +42,23 @@ In the 3D simulation, this appears as a white dot.
 ### Opposing Rotations Create Balance
 
 The two movements interact:
-- Earth moves clockwise around EARTH-WOBBLE-CENTER (~25,684 years)
-- PERIHELION-OF-EARTH moves counter-clockwise (~111,296 years)
-- They meet and realign every **20,868 years** (perihelion precession cycle)
+- Earth moves clockwise around EARTH-WOBBLE-CENTER (H/13 years)
+- PERIHELION-OF-EARTH moves counter-clockwise (H/3 years)
+- They meet and realign every **H/16 years** (perihelion precession cycle)
 
 This creates 16 meeting points per Holistic-Year as the solstice and perihelion alignment moves around the zodiac.
 
 ---
 
-## The Holistic-Year: 333,888 Years
+## The Holistic-Year (H)
 
-The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **333,888 years**, this cycle integrates:
+The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](10-constants-reference.md) for the current value), this cycle integrates:
 
-| Cycle | Period | Count per Holistic-Year |
-|-------|--------|------------------------|
-| Axial Precession | ~25,684 years | 13 cycles |
-| Inclination Precession | ~111,296 years | 3 cycles |
-| Perihelion Precession | 20,868 years | 16 cycles |
+| Cycle | Formula | Count per Holistic-Year |
+|-------|---------|------------------------|
+| Axial Precession | H / 13 | 13 cycles |
+| Inclination Precession | H / 3 | 3 cycles |
+| Perihelion Precession | H / 16 | 16 cycles |
 
 ### The Fibonacci Connection
 
@@ -68,7 +68,7 @@ The ratio between axial and inclination precession cycles follows a Fibonacci pa
 
 ### The Six Determining Factors
 
-The 333,888-year duration is uniquely determined by six constraints:
+The Holistic-Year duration is uniquely determined by six constraints:
 
 1. **Planetary Alignment**: All major planetary orbits must realign within one cycle
 2. **1246 AD Calibration**: Historical alignment of December solstice with perihelion
@@ -92,34 +92,7 @@ Several Earth parameters oscillate over long timescales:
 
 ### Obliquity (Axial Tilt)
 
-Earth's axial tilt is not constant but oscillates over approximately 41,000 years:
-
-| Parameter | Value |
-|-----------|-------|
-| Mean Obliquity | 23.41398° |
-| Minimum | ~22.15° |
-| Maximum | ~24.68° |
-| Current (J2000) | ~23.44° |
-
-### Orbital Eccentricity
-
-Earth's orbit varies between more circular and more elliptical:
-
-| Parameter | Value |
-|-----------|-------|
-| Base Eccentricity | 0.015321 |
-| Amplitude | ±0.0014226 |
-| Range | ~0.0139 to ~0.0167 |
-
-### Inclination to Invariable Plane
-
-Earth's orbital plane tilts relative to the solar system's invariable plane:
-
-| Parameter | Value |
-|-----------|-------|
-| Mean Inclination | 1.481592° |
-| Amplitude | ±0.633849° |
-| Range | ~0.85° to ~2.12° |
+Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,876 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Holistic-Year. See [Constants Reference](10-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
 
 ---
 

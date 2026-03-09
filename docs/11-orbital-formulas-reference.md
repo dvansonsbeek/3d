@@ -19,48 +19,50 @@ This document provides a complete reference for all orbital calculation function
 
 #### 1.1.1 Time & Distance Constants
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `holisticyearLength` | 333,888 | Length of Holistic-Year in Earth solar years |
-| `meansolaryearlengthinDays` | 365.2421890 | Mean solar year in days (rounded to HY/16 precision) |
-| `meansiderealyearlengthinSeconds` | 31,558,149.724 | Mean sidereal year in seconds |
-| `meanlengthofday` | ~86,400 | Mean solar day in SI seconds |
-| `meanSiderealday` | ~86,164.09 (derived) | Mean sidereal day in SI seconds |
-| `meanStellarday` | derived | Mean stellar day in SI seconds |
-| `meanAnomalisticYearinDays` | derived | Mean anomalistic year in days |
-| `speedofSuninKM` | 107,225.047767317 | Earth's orbital speed around Sun (km/h) |
-| `currentAUDistance` / `o.lengthofAU` | 149,597,870.698828 | Astronomical Unit in km (dynamic) |
-| `lightYear` | derived (~9.46 × 10¹² km) | Light year in km |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Variable | Description |
+|----------|-------------|
+| `holisticyearLength` | Length of Holistic-Year (H) in Earth solar years |
+| `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/16 precision) |
+| `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds |
+| `meanlengthofday` | Mean solar day in SI seconds |
+| `meanSiderealday` | Mean sidereal day in SI seconds (derived) |
+| `meanStellarday` | Mean stellar day in SI seconds (derived) |
+| `meanAnomalisticYearinDays` | Mean anomalistic year in days (derived) |
+| `speedofSuninKM` | Earth's orbital speed around Sun (km/h) |
+| `currentAUDistance` / `o.lengthofAU` | Astronomical Unit in km (dynamic) |
+| `lightYear` | Light year in km (derived) |
 
 #### 1.1.2 Mathematical Constants
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `DEG2RAD` | π/180 | Degrees to radians conversion |
-| `RAD2DEG` | 180/π | Radians to degrees conversion |
+| Variable | Description |
+|----------|-------------|
+| `DEG2RAD` | Degrees to radians conversion (π/180) |
+| `RAD2DEG` | Radians to degrees conversion (180/π) |
 
 #### 1.1.3 Galactic Constants
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `sunOrbitPeriod` | derived | Sun's orbital period around Milky Way (years) |
-| `milkywayDistance` | 27,500 | Distance to Milky Way center (light-years) |
-| `sunSpeed` | 828,000 | Sun's speed around Milky Way (km/h) |
-| `greatattractorDistance` | 200,000,000 | Distance to Great Attractor (light-years) |
-| `milkywaySpeed` | 2,160,000 | Milky Way speed toward Great Attractor (km/h) |
-| `milkywayOrbitPeriod` | derived | Milky Way orbital period around Great Attractor (years) |
+| Variable | Description |
+|----------|-------------|
+| `sunOrbitPeriod` | Sun's orbital period around Milky Way (years, derived) |
+| `milkywayDistance` | Distance to Milky Way center (light-years) |
+| `sunSpeed` | Sun's speed around Milky Way (km/h) |
+| `greatattractorDistance` | Distance to Great Attractor (light-years) |
+| `milkywaySpeed` | Milky Way speed toward Great Attractor (km/h) |
+| `milkywayOrbitPeriod` | Milky Way orbital period around Great Attractor (years, derived) |
 
 #### 1.1.4 Physical Constants
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `speedOfLight` | 299,792.458 km/s | Speed of light (fundamental constant) ✅ |
+| Constant | Description |
+|----------|-------------|
+| `speedOfLight` | Speed of light (km/s) |
 
 #### 1.1.5 Derived Constants (Now Implemented ✅)
 
-| Constant | Value | Implementation | Used By |
-|----------|-------|----------------|---------|
-| `GM_SUN` | ~1.327 × 10¹¹ km³/s² | ✅ Derived from Kepler's 3rd Law | `OrbitalFormulas.orbitalVelocity`, etc. |
+| Constant | Description |
+|----------|-------------|
+| `GM_SUN` | Gravitational parameter, derived from Kepler's 3rd Law. Used by `OrbitalFormulas.orbitalVelocity`, etc. |
 
 **GM_SUN derivation (implemented at line ~307-310):**
 ```javascript
@@ -82,26 +84,28 @@ const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
 
 For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Halley's, Eros):
 
-| Variable Pattern | Example (Mercury) | Description |
-|------------------|-------------------|-------------|
-| `{planet}SolarYearInput` | 87.96813 days | Orbital period input |
-| `{planet}OrbitalEccentricity` | 0.20562928 | Eccentricity (e) |
-| `{planet}InvPlaneInclinationMean` | 8.0907° (Mercury) | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
-| `{planet}InvPlaneInclinationAmplitude` | 1.769° (Mercury) | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationPhaseAngle` | 203° (Mercury) | Phase offset linking inclination to ascending node |
-| `{planet}EclipticInclinationJ2000` | 7.00487° | J2000 orbital inclination to ecliptic |
-| `{planet}OrbitDistance` | 0.387 AU | Semi-major axis (a) - derived |
-| `{planet}PerihelionDistance` | varies | Distance at perihelion |
-| `{planet}Speed` | varies km/h | Mean orbital velocity |
-| `{planet}SolarYearCount` | derived | Number of orbits in Holistic-Year |
-| `{planet}PerihelionEcliptic` | varies | Perihelion precession period |
-| `{planet}PerihelionEclipticYears` | varies | Perihelion precession cycle length against ecliptic |
-| `{planet}AngleCorrection` | varies | Alignment correction angle |
-| `{planet}Tilt` | 0.034° | Axial tilt |
-| `{planet}RotationPeriod` | 1407.6 hours | Sidereal rotation period |
-| `{planet}AscendingNodeInvPlaneVerified` | 32.83° (Mercury) | J2000-calibrated ascending node to invariable plane |
-| `{planet}AscendingNodeInvPlaneSouamiSouchay` | 32.22° (Mercury) | Original Souami & Souchay (2012) ascending node |
-| `diameters.{planet}Diameter` | 4,879.4 km | Planet diameter |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Variable Pattern | Description |
+|------------------|-------------|
+| `{planet}SolarYearInput` | Orbital period input (days) |
+| `{planet}OrbitalEccentricity` | Eccentricity (e) |
+| `{planet}InvPlaneInclinationMean` | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
+| `{planet}InvPlaneInclinationAmplitude` | Inclination oscillation amplitude (half of L-L range) |
+| `{planet}InclinationPhaseAngle` | Phase offset linking inclination to ascending node |
+| `{planet}EclipticInclinationJ2000` | J2000 orbital inclination to ecliptic |
+| `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
+| `{planet}PerihelionDistance` | Distance at perihelion |
+| `{planet}Speed` | Mean orbital velocity (km/h) |
+| `{planet}SolarYearCount` | Number of orbits in Holistic-Year (derived) |
+| `{planet}PerihelionEcliptic` | Perihelion precession period |
+| `{planet}PerihelionEclipticYears` | Perihelion precession cycle length against ecliptic |
+| `{planet}AngleCorrection` | Alignment correction angle |
+| `{planet}Tilt` | Axial tilt |
+| `{planet}RotationPeriod` | Sidereal rotation period (hours) |
+| `{planet}AscendingNodeInvPlaneVerified` | J2000-calibrated ascending node to invariable plane |
+| `{planet}AscendingNodeInvPlaneSouamiSouchay` | Original Souami & Souchay (2012) ascending node |
+| `diameters.{planet}Diameter` | Planet diameter (km) |
 
 ### 1.3 Per-Planet Live/Dynamic Variables (accessible via `o.`)
 
@@ -140,20 +144,22 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, 
 
 #### 1.4.1 Static Constants
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `moonSiderealMonthInput` | 27.32166156 days | Sidereal month |
-| `moonAnomalisticMonthInput` | 27.55454988 days | Anomalistic month |
-| `moonNodalMonthInput` | 27.21222082 days | Nodal/Draconic month |
-| `moonSynodicMonth` | derived | Synodic month |
-| `moonTropicalMonth` | derived | Tropical month (used for orbital speed) |
-| `moonDistance` | 384,399.07 km | Mean Earth-Moon distance |
-| `moonEclipticInclinationJ2000` | 5.1453964° | Orbital inclination to ecliptic |
-| `moonOrbitalEccentricity` | 0.054900489 | Eccentricity |
-| `moonTilt` | 6.687° | Axial tilt |
-| `moonStartposNodal` | 64° | Nodal precession start position (calibration) |
-| `moonStartposApsidal` | 330° | Apsidal precession start position (calibration) |
-| `moonStartposMoon` | 132.105° | Moon orbital start position (calibration) |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Variable | Description |
+|----------|-------------|
+| `moonSiderealMonthInput` | Sidereal month (days) |
+| `moonAnomalisticMonthInput` | Anomalistic month (days) |
+| `moonNodalMonthInput` | Nodal/Draconic month (days) |
+| `moonSynodicMonth` | Synodic month (derived) |
+| `moonTropicalMonth` | Tropical month, used for orbital speed (derived) |
+| `moonDistance` | Mean Earth-Moon distance (km) |
+| `moonEclipticInclinationJ2000` | Orbital inclination to ecliptic |
+| `moonOrbitalEccentricity` | Eccentricity |
+| `moonTilt` | Axial tilt |
+| `moonStartposNodal` | Nodal precession start position (calibration) |
+| `moonStartposApsidal` | Apsidal precession start position (calibration) |
+| `moonStartposMoon` | Moon orbital start position (calibration) |
 
 #### 1.4.2 Dynamic Orbital Elements (computed by `updateMoonOrbitalElements()`)
 
@@ -180,14 +186,16 @@ These variables are computed each frame from the 3D scene geometry, using Earth 
 
 #### 1.5.1 Static Constants
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `earthtiltMean` | 23.41398° | Mean obliquity |
-| `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination to invariable plane |
-| `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of inclination oscillation |
-| `eccentricityBase` | 0.015321 | Base eccentricity |
-| `eccentricityAmplitude` | 0.0014226 | Earth's eccentricity amplitude |
-| `earthPerihelionICRFYears` | 111,296 (holisticyearLength/3) | Earth's orbital plane precession against ICRF |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Variable | Description |
+|----------|-------------|
+| `earthtiltMean` | Mean obliquity |
+| `earthInvPlaneInclinationMean` | Mean orbital inclination to invariable plane |
+| `earthInvPlaneInclinationAmplitude` | Amplitude of inclination oscillation |
+| `eccentricityBase` | Base eccentricity |
+| `eccentricityAmplitude` | Earth's eccentricity amplitude |
+| `earthPerihelionICRFYears` | Earth's orbital plane precession against ICRF (H/3) |
 
 #### 1.5.2 Dynamic Orbital Parameters
 
@@ -396,8 +404,8 @@ These formulas handle precession calculations and secular perturbation theory.
 | `precessionPeriodFromRate(arcsec_per_century)` | Period = 129,600,000 / Rate | Convert rate to full-cycle period (years) |
 | `precessionEclipticToICRF(ecliptic_years, ref_years)` | ICRF = (ecl × ref)/(ref - ecl) | Transform ecliptic to ICRF frame |
 | `precessionICRFToEcliptic(ICRF_years, ref_years)` | ecl = (ICRF × ref)/(ICRF + ref) | Transform ICRF to ecliptic frame |
-| `holisticPrecessionRatio(prec_period, holistic_year)` | ratio = HY / period | Ratio showing resonance structure |
-| `precessionFromHolisticRatio(holistic_year, ratio)` | period = HY / n | Period from integer ratio |
+| `holisticPrecessionRatio(prec_period, holistic_year)` | ratio = H / period | Ratio showing resonance structure |
+| `precessionFromHolisticRatio(holistic_year, ratio)` | period = H / n | Period from integer ratio |
 | `precessionAngularVelocity(arcsec_per_century)` | ω = (rate/100) × (π/648000) | Angular velocity (rad/year) |
 | `perturbationStrength(a_p, a_pert, m_pert, M_sun)` | strength = (m/M) × (a_ratio)² | Relative influence of perturbing planet |
 | `precessionRatio(rate1_arcsec, rate2_arcsec)` | ratio = rate₁ / rate₂ | Ratio between two precession rates |
@@ -1759,14 +1767,7 @@ precessionRateFromPeriod: (period_years) => {
 }
 ```
 
-**Example Values:**
-| Planet | Precession Period (years) | Rate (arcsec/century) |
-|--------|---------------------------|----------------------|
-| Mercury | ~242,828 | ~534 |
-| Mars | ~77,051 | ~1,682 |
-| Earth | 111,296 (holistic/3) | ~1,304 |
-| Jupiter | 333,888 (holistic) | ~435 |
-| Saturn | -333,888 (retrograde) | ~-435 |
+**Example Values:** For current precession periods and their H-based formulas, see [Constants Reference — Perihelion Precession Periods](10-constants-reference.md#perihelion-precession-periods-ecliptic). Rates are computed as `129,600,000 / period`.
 
 #### 10.1.2 Precession Period from Rate
 
@@ -1792,7 +1793,7 @@ precessionPeriodFromRate: (arcsec_per_century) => {
 
 **Where:**
 - `ecliptic_period` = precession period against the ecliptic
-- `reference_period` = nodal precession period (holisticyearLength/13 ≈ 25,684 years)
+- `reference_period` = nodal precession period (H/13)
 
 **Physical Meaning:** Converts precession measured against the moving ecliptic to precession against the fixed ICRF (International Celestial Reference Frame).
 
@@ -1808,9 +1809,9 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- ICRF period: ~242,828 years
-- Reference (holistic/13): ~25,684 years
-- Ecliptic period: ~28,745 years
+- ICRF period: ~243,642 years
+- Reference (H/13): ~25,770 years
+- Ecliptic period: ~28,818 years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
 
@@ -1833,7 +1834,7 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 
 **Formula:** `ratio = holisticyearLength / precession_period`
 
-**Physical Meaning:** Shows how precession periods relate to the fundamental holistic year (333,888 years).
+**Physical Meaning:** Shows how precession periods relate to the fundamental Holistic Year (H).
 
 **Observed Patterns:**
 | Planet | Ratio | Expression |
@@ -1976,18 +1977,20 @@ precessionRatio: (rate1_arcsec, rate2_arcsec) => {
 
 ### 10.6 Current Precession Values (Implemented)
 
-| Planet | ICRF Period (years) | Ecliptic Period (years) | Rate (arcsec/century) | Holistic Ratio |
-|--------|---------------------|------------------------|----------------------|----------------|
-| **Mercury** | ~242,828 | ~28,745 | ~534 | 1.375 |
-| **Venus** | ~667,776 | ~26,711 | ~0 | ~0 |
-| **Earth** | 111,296 | ~33,389 | ~1,304 | 3 |
-| **Mars** | ~77,051 | ~38,755 | ~1,682 | 4.333 |
-| **Jupiter** | 66,778 | 41,736 | ~435 | 1 |
-| **Saturn** | -41,736 | ~15,899 | ~-435 | -1 |
-| **Uranus** | 111,296 | ~33,389 | ~1,304 | 3 |
-| **Neptune** | ~667,776 | ~26,711 | ~-435 | -1 |
+For current computed values, see [Constants Reference](10-constants-reference.md).
 
-**Note:** Negative values indicate retrograde precession (opposite to orbital motion).
+| Planet | ICRF Period | Ecliptic Period | Holistic Ratio |
+|--------|-------------|-----------------|----------------|
+| **Mercury** | `mercuryPerihelionEcliptic` | derived | H / (1+3/8) |
+| **Venus** | `venusPerihelionEcliptic` | derived | H × 2 |
+| **Earth** | H/3 | derived | 3 |
+| **Mars** | `marsPerihelionEcliptic` | derived | H / (4+1/3) |
+| **Jupiter** | `jupiterPerihelionEcliptic` | derived | H / 5 |
+| **Saturn** | `saturnPerihelionEcliptic` | derived | H / 8 (retrograde) |
+| **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
+| **Neptune** | `neptunePerihelionEcliptic` | derived | H × 2 |
+
+**Note:** Saturn has retrograde precession (opposite to orbital motion).
 
 ### 10.7 Formula Quick Reference
 
@@ -2084,17 +2087,25 @@ Note: Two valid solutions exist for φ₀ (±acos). Choose the one that
 
 ### Static Constants by Planet
 
+For current values, see [Constants Reference](10-constants-reference.md).
+
 | Planet | Eccentricity | Inclination (inv) | Semi-major (AU) | Period (days) |
 |--------|--------------|-------------------|-----------------|---------------|
-| Mercury | 0.20562928 | 6.3472858° | 0.387 | 87.97 |
-| Venus | 0.00674819 | 2.1958348° | 0.723 | 224.70 |
-| Earth | ~0.0167 (dynamic) | ~1.578° (dynamic) | 1.000 | 365.24 |
-| Mars | 0.09344726 | 1.6690088° | 1.524 | 686.97 |
-| Jupiter | 0.04966799 | 0.3229076° | 5.203 | 4,332.59 |
-| Saturn | 0.0564781 | 0.9254843° | 9.537 | 10,759.22 |
-| Uranus | 0.04519611 | 1.0205039° | 19.191 | 30,688.5 |
-| Neptune | 0.009457 | 0.7241032° | 30.069 | 60,182.0 |
-| Pluto | 0.24880766 | 15.5541618° | 39.482 | 90,560.0 |
+| Mercury | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Venus | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Earth | dynamic | dynamic | 1.000 | `meanSolarYearDays` |
+| Mars | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Jupiter | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Saturn | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Uranus | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Neptune | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Pluto | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+
+**How values are sourced:**
+- **Eccentricity**: Input constant per planet (`planets.{name}.orbitalEccentricity`)
+- **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [Fibonacci Laws](26-fibonacci-laws.md))
+- **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = meanSolarYearDays / solarYearInput`
+- **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
 
 ### Live Variables Summary
 

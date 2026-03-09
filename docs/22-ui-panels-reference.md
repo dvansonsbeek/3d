@@ -199,7 +199,7 @@ Shows one full precession cycle with:
 
 #### Obliquity Chart (Earth only)
 
-Shows one full obliquity cycle (~41,736 years) with:
+Shows one full obliquity cycle (H/8) with:
 - **Curve**: obliquity variation over the cycle
 - **Markers**: current year and reference positions
 - **Same cycle windowing** logic as perihelion chart
@@ -306,7 +306,7 @@ Where:
 
 ### Coordinate System Notes
 
-Height calculations use **ecliptic-rate ascending nodes** (~20,868 year period) rather than ICRF-rate (~111,296 years). This is necessary because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
+Height calculations use **ecliptic-rate ascending nodes** (H/16 period) rather than ICRF-rate (H/3). This is necessary because Earth's position (`sun.ra`) is measured in precessing ecliptic coordinates.
 
 ---
 

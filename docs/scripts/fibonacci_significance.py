@@ -976,7 +976,7 @@ def print_observed_detail():
     spread = (max(psi_products) - min(psi_products)) / psi_obs
     print(f"  {'ψ mean':>16} = {psi_obs:.6e}")
     print(f"  {'ψ theory':>16} = {PSI1_THEORY:.6e}  "
-          f"(F₅×F₈²/(2H) = 2205/667776)")
+          f"(F₅×F₈²/(2H) = 2205/{2*H})")
     print(f"  {'Match':>16} = {abs(psi_obs/PSI1_THEORY-1)*100:.4f}%")
     print(f"  {'Spread':>16} = {spread*100:.4f}%")
     print()

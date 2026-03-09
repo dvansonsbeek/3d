@@ -719,7 +719,7 @@ def section_8():
     print("=" * 80)
     print()
 
-    # In the Solar System, H = 333,888 years is the fundamental period
+    # In the Solar System, H = 335,008 years is the fundamental period
     # Can we find a fundamental period for TRAPPIST-1?
 
     # One approach: find the LCM-like combination of all periods
@@ -800,7 +800,7 @@ def section_8():
 
     print()
     print(f"  Super-period in years: {best_T/365.25:.2f} years")
-    print(f"  Compare: Solar System H = 333,888 years")
+    print(f"  Compare: Solar System H = 335,008 years")
     print()
     print("  Note: TRAPPIST-1's super-period is vastly shorter because all")
     print("  orbital periods are < 20 days (vs years for the Solar System).")

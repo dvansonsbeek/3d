@@ -30,16 +30,18 @@ The key insight is that **Earth's own orbital inclination** (~1.5° relative to 
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `earthtiltMean` | 23.41398° | Mean obliquity |
-| `earthInvPlaneInclinationMean` | 1.481592° | Mean orbital inclination |
-| `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of variation |
-| `holisticyearLength` | 333,888 years | Full cycle length |
+| `earthtiltMean` | see [Constants Reference](10-constants-reference.md) | Mean obliquity |
+| `earthInvPlaneInclinationMean` | see [Constants Reference](10-constants-reference.md) | Mean orbital inclination |
+| `earthInvPlaneInclinationAmplitude` | see [Constants Reference](10-constants-reference.md) | Amplitude of variation |
+| `holisticyearLength` (H) | see [Constants Reference](10-constants-reference.md) | Full cycle length |
 
 ### Earth's Inclination Range
 
 Earth's orbital inclination oscillates between:
-- **Minimum**: 1.482° - 0.634° = **0.848°**
-- **Maximum**: 1.482° + 0.634° = **2.115°**
+- **Minimum**: `earthInvPlaneInclinationMean` - `earthInvPlaneInclinationAmplitude`
+- **Maximum**: `earthInvPlaneInclinationMean` + `earthInvPlaneInclinationAmplitude`
+
+For current values, see [Constants Reference](10-constants-reference.md).
 
 ### Planet Orbital Inclinations
 
@@ -141,7 +143,7 @@ obliquity = earthtiltMean
   + earthInvPlaneInclinationAmplitude * cos(phase8)
 ```
 
-Where `phase3` and `phase8` correspond to the 111,296-year and 41,736-year cycles.
+Where `phase3` and `phase8` correspond to the H/3 and H/8 cycles.
 
 #### `getEarthInclinationAtYear(year)`
 
@@ -414,8 +416,8 @@ The dynamic ascending node calculation and the dynamic ecliptic inclination (`o.
 
 | Effect | What Changes | What Stays Fixed | Timescale |
 |--------|-------------|------------------|-----------|
-| **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | ~333,888 years |
-| **Ecliptic Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | ~111,296 years |
+| **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | H years |
+| **Ecliptic Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | H/3 years |
 
 ### Why We Use Static Inclination (Not EclipticInclinationDynamic)
 
@@ -433,7 +435,7 @@ The **ascending node** is defined as where a planet's orbit crosses the **refere
 - But it doesn't change the planet's actual orbital tilt in space
 
 The **ecliptic inclination** measures the angle between two orbital planes:
-- Earth's orbital plane (which tilts with the 111,296-year cycle)
+- Earth's orbital plane (which tilts with the H/3 cycle)
 - The planet's orbital plane (which stays essentially fixed in space)
 
 ### What Each Calculation Uses

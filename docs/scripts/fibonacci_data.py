@@ -31,11 +31,11 @@ import math
 # FUNDAMENTAL CONSTANTS
 # ═══════════════════════════════════════════════════════════════════════════
 
-H = 333888  # Holistic-Year (years)
+H = 335008  # Holistic-Year (years)
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 
 # Earth base eccentricity (from 3D simulation — arithmetic midpoint)
-EARTH_BASE_ECCENTRICITY = 0.015321
+EARTH_BASE_ECCENTRICITY = 0.015373
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees
@@ -91,7 +91,7 @@ ECC_J2000 = {
 ECC_BASE = {
     "Mercury": 0.20853,
     "Venus":   0.00679,
-    "Earth":   0.015321,
+    "Earth":   0.015373,
     "Mars":    0.09347,
     "Jupiter": 0.04839,
     "Saturn":  0.05386,
@@ -104,7 +104,7 @@ ECC_BASE = {
 ECCENTRICITIES = {
     "Mercury": 0.20563593,
     "Venus":   0.00677672,
-    "Earth":   0.015321,    # base eccentricity from Holistic model
+    "Earth":   0.015373,    # base eccentricity from Holistic model
     "Mars":    0.09339410,
     "Jupiter": 0.04838624,
     "Saturn":  0.05386179,
@@ -167,7 +167,7 @@ GROUP_23 = [p for p in PLANET_NAMES if PHASE_GROUP[p] == 23]
 FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
 
 # Theoretical ψ from H and Fibonacci numbers (exact, zero free parameters)
-# ψ = F_5 × F_8² / (2H) = 5 × 21² / (2 × 333888) = 2205/667776
+# ψ = F_5 × F_8² / (2H) = 5 × 21² / (2 × 335008) = 2205/670016
 PSI = FIB[5] * FIB[8]**2 / (2 * H)
 
 # Backwards compatibility aliases
@@ -189,7 +189,7 @@ INCLINATION_AMPS = INCL_AMP
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Semi-major axes (AU) — from Holistic computation chain
-# Derived from orbital periods via Kepler's 3rd law with H = 333,888
+# Derived from orbital periods via Kepler's 3rd law with H = 335,008
 SEMI_MAJOR = {
     "Mercury": 0.3871067366,
     "Venus":   0.7233418423,
@@ -254,14 +254,14 @@ INCL_ECLIPTIC = {
 
 # Inclination oscillation periods (years)
 INCL_PERIOD = {
-    "Mercury": 242828,
-    "Venus":   667776,
-    "Earth":   111296,
-    "Mars":     77051,
-    "Jupiter":  66778,
-    "Saturn":   41736,
-    "Uranus":  111296,
-    "Neptune": 667776,
+    "Mercury": round(H * 8 / 11),  # H × 8/11
+    "Venus":   H * 2,               # H × 2
+    "Earth":   round(H / 3),        # H/3
+    "Mars":    round(H * 3 / 13),   # H × 3/13
+    "Jupiter": round(H / 5),        # H/5
+    "Saturn":  round(H / 8),        # H/8
+    "Uranus":  round(H / 3),        # H/3
+    "Neptune": H * 2,               # H × 2
 }
 
 # ═══════════════════════════════════════════════════════════════════════════

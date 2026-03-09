@@ -362,7 +362,7 @@ if excel_data:
     # All planets show ~360° range — this is the ICRF frame artifact
     if any(omega_stats[p]['range'] > 300 for p in PLANET_NAMES if p in omega_stats):
         print(f"\n  NOTE: All ICRF ω values cycle through ~360° (range ≈ {omega_stats['Mercury']['range']:.0f}°)")
-        print(f"  This is Earth's equatorial precession artifact (period ≈ H/13 = 25,684 yr).")
+        print(f"  This is Earth's equatorial precession artifact (period ≈ H/13).")
         print(f"  The ECLIPTIC-frame ω is constant — see Section 3 for true ω₀ values.")
 else:
     print("\n  Excel not available. Using J2000 values only.")

@@ -9,7 +9,7 @@
 - [84-type-iii-outer-planets.md](84-type-iii-outer-planets.md) — Type III eccentricity (Jupiter–Neptune)
 - [85-equation-of-center.md](85-equation-of-center.md) — Variable speed / Kepler's 2nd law
 - [86-moon-meeus-corrections.md](86-moon-meeus-corrections.md) — Meeus Ch. 47 lunar perturbations
-- [87-planet-parallax-corrections.md](87-planet-parallax-corrections.md) — 24-parameter parallax correction
+- [87-planet-parallax-corrections.md](87-planet-parallax-corrections.md) — Up to 36-parameter parallax correction
 - [88-orbital-period-calibration.md](88-orbital-period-calibration.md) — Ancient observation calibration
 - [89-optimization-baseline.md](89-optimization-baseline.md) — Baseline results
 
@@ -17,7 +17,7 @@
 
 ## 1. Background & Motivation
 
-The solar system simulation (`src/script.js`, ~32,900 lines) models long-term planetary orbital mechanics using the Holistic-Year framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
+The solar system simulation (`src/script.js`, ~34,400 lines) models long-term planetary orbital mechanics using the Holistic-Year framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
 
 The model is now mature. The next step is building a **feedback loop**: compare the model's predictions against authoritative astronomical data, identify where it deviates, and systematically improve it — either by tuning existing parameters or by discovering missing perturbation terms.
 
@@ -42,7 +42,7 @@ The model is fundamentally built on **Fibonacci number relationships between pla
 
 ### 2.1 How Orbit Counts Work
 
-Each planet has an integer orbit count in the Holistic Year (H = 333,888 solar years):
+Each planet has an integer orbit count in the Holistic Year (H = 335,008 solar years):
 
 ```
 SolarYearCount = round(H x meanSolarYear / SolarYearInput)
@@ -63,13 +63,13 @@ Documented in detail in `docs/26-fibonacci-laws.md`. Summary:
 
 | F(n) | Period = H/F(n) | Astronomical meaning |
 |------|-----------------|---------------------|
-| 3 | 111,296 yr | Earth inclination precession |
-| 5 | 66,778 yr | Jupiter perihelion precession |
-| 8 | 41,736 yr | Saturn perihelion precession (retrograde) |
-| 13 | 25,684 yr | Earth axial precession |
-| 16 | 20,868 yr | Perihelion precession cycle |
-| 21 | 15,899 yr | Beat: axial + obliquity |
-| 34 | 9,820 yr | Beat: axial + ecliptic |
+| 3 | H/3 | Earth inclination precession |
+| 5 | H/5 | Jupiter perihelion precession |
+| 8 | H/8 | Saturn perihelion precession (retrograde) |
+| 13 | H/13 | Earth axial precession |
+| 16 | H/16 | Perihelion precession cycle |
+| 21 | H/21 | Beat: axial + obliquity |
+| 34 | H/34 | Beat: axial + ecliptic |
 
 **Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between two phase groups (203 deg and 23 deg) to **99.9998% balance**.
 
@@ -78,9 +78,9 @@ Documented in detail in `docs/26-fibonacci-laws.md`. Summary:
 **Law 6 -- Saturn-Jupiter-Earth Resonance Loop** (the 3-5-8-13-21 loop):
 
 ```
-Jupiter (H/5=66,778yr) + Saturn (H/8=41,736yr) -> Axial (H/13=25,684yr)
-Jupiter - Saturn                                -> Earth inclination (H/3=111,296yr)
-Axial - Earth inclination                       -> Obliquity (H/8=41,736yr) -> Saturn
+Jupiter (H/5) + Saturn (H/8)  -> Axial (H/13)
+Jupiter - Saturn              -> Earth inclination (H/3)
+Axial - Earth inclination     -> Obliquity (H/8) -> Saturn
 ```
 
 Each beat frequency returns another H/Fibonacci period. The loop closes because F(n)+F(n+1)=F(n+2).
@@ -112,20 +112,20 @@ Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
 
 ### 3.1 Input Constants (lines 25-460 of script.js)
 
-**Global constants:**
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `holisticyearLength` | 333,888 years | Fundamental cycle constant |
-| `perihelionalignmentYear` | 1246 AD | Perihelion-solstice alignment epoch |
-| `startmodelJD` | 2451716.5 | Model start: 21 June 2000 |
-| `earthtiltMean` | 23.41398 deg | Mean obliquity |
-| `earthRAAngle` | 1.258454 deg | Equatorial frame orientation |
-| `earthInvPlaneInclinationAmplitude` | 0.633849 deg | Obliquity oscillation range |
-| `earthInvPlaneInclinationMean` | 1.481592 deg | Mean Earth inclination to inv. plane |
-| `eccentricityBase` | 0.015321 AU | Orbital radius of PERIHELION-OF-EARTH around Sun |
-| `eccentricityAmplitude` | 0.0014226 AU | Orbital radius of Earth around EARTH-WOBBLE-CENTER |
-| `correctionSun` | 0.277377 deg | Solstice alignment correction |
-| `startAngleModel` | 89.91949879 deg | Start angle for 21 June 2000 |
+**Global constants** (for current values, see [Constants Reference](10-constants-reference.md)):
+| Constant | Purpose |
+|----------|---------|
+| `holisticyearLength` | Fundamental cycle constant |
+| `perihelionalignmentYear` | Perihelion-solstice alignment epoch |
+| `startmodelJD` | Model start: 21 June 2000 |
+| `earthtiltMean` | Mean obliquity |
+| `earthRAAngle` | Equatorial frame orientation |
+| `earthInvPlaneInclinationAmplitude` | Obliquity oscillation range |
+| `earthInvPlaneInclinationMean` | Mean Earth inclination to inv. plane |
+| `eccentricityBase` | Orbital radius of PERIHELION-OF-EARTH around Sun |
+| `eccentricityAmplitude` | Orbital radius of Earth around EARTH-WOBBLE-CENTER |
+| `correctionSun` | Solstice alignment correction |
+| `startAngleModel` | Start angle for 21 June 2000 |
 
 **Per-planet constants (13 each, Mercury-Neptune + Pluto, Halley's, Eros, Ceres):**
 | Constant | Example (Mercury) | Purpose |
@@ -137,22 +137,22 @@ Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
 | `LongitudePerihelion` | 77.4569131 deg | Perihelion longitude (JPL J2000) |
 | `AscendingNode` | 48.33033155 deg | Ecliptic ascending node (SPICE) |
 | `AngleCorrection` | 0.984366 deg | Perihelion alignment fine-tune |
-| `PerihelionEclipticYears` | H/(1+3/8) = 242,827 yr | Perihelion precession period |
+| `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
 | `Startpos` | 84.205 deg | Starting orbital position |
 | `InvPlaneInclinationMean` | 6.727893 deg | Inclination oscillation center |
 | `InvPlaneInclinationAmplitude` | 0.385911 deg | Inclination oscillation range |
 | `InclinationPhaseAngle` | 203.3195 deg | Phase group (203 deg or 23 deg) |
 
 ### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
-| Planet | Formula | Period (years) | Direction |
-|--------|---------|---------------|-----------|
-| Mercury | H/(1+3/8) | ~242,827 | Prograde |
-| Venus | Hx2 | 667,776 | Prograde |
-| Mars | H/(4+1/3) | ~77,051 | Prograde |
-| Jupiter | H/5 | 66,778 | Prograde |
-| Saturn | -H/8 | -41,736 | **Retrograde** |
-| Uranus | H/3 | 111,296 | Prograde |
-| Neptune | Hx2 | 667,776 | Prograde |
+| Planet | Formula | Direction |
+|--------|---------|-----------|
+| Mercury | H/(1+3/8) | Prograde |
+| Venus | Hx2 | Prograde |
+| Mars | H/(4+1/3) | Prograde |
+| Jupiter | H/5 | Prograde |
+| Saturn | -H/8 | **Retrograde** |
+| Uranus | H/3 | Prograde |
+| Neptune | Hx2 | Prograde |
 
 ### 3.3 How the Model Computes Planet Positions
 
@@ -170,7 +170,7 @@ startingPoint (origin)
               -> barycenterEarthAndSun   radius: eccAmplitude x 100
                 -> sun / earthPerihelionFromEarth
 ```
-Counter-rotating motions: Earth orbits EARTH-WOBBLE-CENTER (CW, H/13) while PERIHELION-OF-EARTH orbits Sun (CCW, H/3). Meeting frequency: 1/(H/13) + 1/(H/3) = 16/H → H/16 = 20,868 yr perihelion cycle.
+Counter-rotating motions: Earth orbits EARTH-WOBBLE-CENTER (CW, H/13) while PERIHELION-OF-EARTH orbits Sun (CCW, H/3). Meeting frequency: 1/(H/13) + 1/(H/3) = 16/H → H/16 perihelion cycle.
 Observed eccentricity = distance(Earth, PERIHELION-OF-EARTH): ranges 0.0139 (opposite) to 0.0167 (aligned, matches J2000).
 Note: `earthWobbleCenter` and `midEccentricityOrbit` are NOT in the positional chain (used for visualization/tracking only).
 
@@ -547,16 +547,18 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 
 **Earth input constants -- HIGH IMPACT, change with extreme care:**
 
-| Parameter | Current value | What it controls | Why dangerous |
-|-----------|--------------|------------------|---------------|
-| `earthtiltMean` | 23.41398 deg | Earth object `tilt` property -> obliquity of equatorial frame | **Affects ALL planets' RA/Dec** -- this defines the equatorial coordinate frame |
-| `earthRAAngle` | 1.258454 deg | `orbitTilta` of `earthPerihelionPrecession1` | **Affects ALL planets' RA** -- rotates the entire equatorial reference frame |
-| `earthInvPlaneInclinationAmplitude` | 0.633849 deg | `orbitTiltb` of both `earthEclipticPrecession` (negative) and `earthObliquityPrecession` (positive) | **Affects ALL planets' Dec** -- controls Earth's inclination oscillation amplitude |
-| `earthInvPlaneInclinationMean` | 1.481592 deg | Used in inclination computation formulas | Less dangerous -- affects Earth inclination calculation |
-| `eccentricityBase` | 0.015321 AU | `orbitCentera` of `earthPerihelionPrecession2` = `-eccentricityBase*100` | Orbital radius of PERIHELION-OF-EARTH around Sun |
-| `eccentricityAmplitude` | 0.0014226 AU | Earth `orbitRadius` = `-eccentricityAmplitude*100` and barycenter `orbitRadius` = `eccentricityAmplitude*100` | Orbital radius of Earth around EARTH-WOBBLE-CENTER |
-| `correctionSun` | 0.277377 deg | Sun and PerihelionFromEarth `startPos` | Affects solar/perihelion angular alignment |
-| `temperatureGraphMostLikely` | 14.5 | Determines `balancedYear` -> all Earth precession `startPos` values | **Affects ALL precession starting angles** |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Parameter | What it controls | Why dangerous |
+|-----------|------------------|---------------|
+| `earthtiltMean` | Earth object `tilt` property -> obliquity of equatorial frame | **Affects ALL planets' RA/Dec** -- this defines the equatorial coordinate frame |
+| `earthRAAngle` | `orbitTilta` of `earthPerihelionPrecession1` | **Affects ALL planets' RA** -- rotates the entire equatorial reference frame |
+| `earthInvPlaneInclinationAmplitude` | `orbitTiltb` of both `earthEclipticPrecession` (negative) and `earthObliquityPrecession` (positive) | **Affects ALL planets' Dec** -- controls Earth's inclination oscillation amplitude |
+| `earthInvPlaneInclinationMean` | Used in inclination computation formulas | Less dangerous -- affects Earth inclination calculation |
+| `eccentricityBase` | `orbitCentera` of `earthPerihelionPrecession2` = `-eccentricityBase*100` | Orbital radius of PERIHELION-OF-EARTH around Sun |
+| `eccentricityAmplitude` | Earth `orbitRadius` = `-eccentricityAmplitude*100` and barycenter `orbitRadius` = `eccentricityAmplitude*100` | Orbital radius of Earth around EARTH-WOBBLE-CENTER |
+| `correctionSun` | Sun and PerihelionFromEarth `startPos` | Affects solar/perihelion angular alignment |
+| `temperatureGraphMostLikely` | Determines `balancedYear` -> all Earth precession `startPos` values | **Affects ALL precession starting angles** |
 
 ### 6.2 Category B: Derived Calculations (lines 960-1770)
 
@@ -617,7 +619,7 @@ Additionally, there are less well-known cycles that may need modeling:
 | **Sun-barycenter oscillation** | Sun's distance variation from SSB | New node affecting Sun/barycenter position | ~39.5 years |
 | **Short-period perturbation** | Jupiter's gravitational pull on Mars/inner planets | Between PerihelionDurationEcliptic2 and RealPerihelionAtSun | ~12 years (Jupiter), ~29 years (Saturn) |
 | **Additional inclination harmonic** | Multi-mode inclination oscillation | New node under existing planet chain | Various eigenmode periods |
-| **Eccentricity-coupled tilt** | Orbit plane wobble correlated with eccentricity cycle | Modify existing orbitTilt to be time-dependent | H/16 (~20,868 years) |
+| **Eccentricity-coupled tilt** | Orbit plane wobble correlated with eccentricity cycle | Modify existing orbitTilt to be time-dependent | H/16 |
 | **Nodal regression correction** | Secular drift in ascending node | New precession node per planet | Planet-dependent |
 | **Lunar nodal effect on ecliptic** | 18.6-year nutation component | New node in Earth chain | ~18.6 years |
 | **Moon evection** | Solar perturbation of lunar orbit | New node in Moon chain | ~31.8 days |
@@ -636,7 +638,7 @@ Additionally, there are less well-known cycles that may need modeling:
 | `InvPlaneInclinationJ2000` | Souami & Souchay (2012) research paper |
 | `LongitudePerihelion` | JPL J2000 reference -- defines perihelion direction |
 | `PerihelionEclipticYears` | Derived from H/n -- the Fibonacci/Holistic-Year structure is fundamental |
-| `holisticyearLength` | Core model constant (333,888) -- the entire model is built on this |
+| `holisticyearLength` | Core model constant (335,008) -- the entire model is built on this |
 | `perihelionalignmentYear` | Historical reference (1246 AD) |
 | `AscendingNodeInvPlaneVerified` | Optimized from Souami & Souchay to match J2000 ecliptic inclinations |
 | `moonEclipticInclinationJ2000` | 5.1453964 deg -- observational data |

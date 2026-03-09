@@ -15,7 +15,7 @@ This document describes the Three.js scene graph hierarchy used in the Holistic 
 
 ## Overview
 
-The simulation models complex astronomical cycles (precession periods from 18 years to 333,888+ years) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
+The simulation models complex astronomical cycles (precession periods from 18 years to H+ years) by nesting rotation layers in a parent-child hierarchy. Each layer applies one rotation, and the final world position of any object is the composition of all parent transformations.
 
 **Key Principle:** A child object inherits all parent rotations. When measuring positions from different reference frames (e.g., Earth-equatorial vs. ecliptic), different portions of this hierarchy apply.
 
@@ -45,16 +45,16 @@ All other calculations are relative to:
 
 ## Part 2: The Holistic Year Structure
 
-All Earth precession cycles derive from the **Holistic Year** (333,888 years) divided by integers:
+All Earth precession cycles derive from the **Holistic Year** (H) divided by integers. See [Constants Reference](10-constants-reference.md) for the current value of H and all derived periods:
 
-| Cycle | Divisor | Period (years) | Direction |
-|-------|---------|----------------|-----------|
-| **Holistic Year** | 1 | 333,888 | - |
-| **Inclination Precession** | 3 | 111,296 | Counter-clockwise |
-| **Ecliptic Precession** | 5 | 66,778 | Counter-clockwise |
-| **Obliquity Cycle** | 8 | 41,736 | Clockwise (negative) |
-| **Axial Precession** | 13 | 25,684 | Clockwise (negative) |
-| **Perihelion Precession** | 16 | 20,868 | Both directions |
+| Cycle | Divisor | Formula | Direction |
+|-------|---------|---------|-----------|
+| **Holistic Year** | 1 | H | - |
+| **Inclination Precession** | 3 | H / 3 | Counter-clockwise |
+| **Ecliptic Precession** | 5 | H / 5 | Counter-clockwise |
+| **Obliquity Cycle** | 8 | H / 8 | Clockwise (negative) |
+| **Axial Precession** | 13 | H / 13 | Clockwise (negative) |
+| **Perihelion Precession** | 16 | H / 16 | Both directions |
 
 This rational subdivision creates the interconnected cycles that produce Earth's climate variations and astronomical phenomena.
 
@@ -106,14 +106,14 @@ The complete nesting order from the technical guide:
 
 ```
 startingPoint (scene root)
-└── Earth (pivot)                                     ← Axial Precession: HY/13
-    ├── Inclination Precession (container)            ← HY/3 = 111,296 years
+└── Earth (pivot)                                     ← Axial Precession: H/13
+    ├── Inclination Precession (container)            ← H/3
     │   ├── Mid-Eccentricity Orbit (container)        ← Reference for eccentricity
     │   │
-    │   └── Ecliptic Precession (container)           ← HY/5 = 66,778 years
-    │       └── Obliquity Cycle (container)           ← HY/8 = 41,736 years
-    │           └── Perihelion Precession 1           ← HY/16 = 20,868 years
-    │               └── Perihelion Precession 2       ← HY/16 = 20,868 years (reverse)
+    │   └── Ecliptic Precession (container)           ← H/5
+    │       └── Obliquity Cycle (container)           ← H/8
+    │           └── Perihelion Precession 1           ← H/16
+    │               └── Perihelion Precession 2       ← H/16 (reverse)
     │                   └── Barycenter (pivot)
     │                       ├── Sun                   ← sibling, NOT parent
     │                       ├── PERIHELION-OF-EARTH   ← sibling
@@ -134,16 +134,16 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| orbitRadius | -eccentricityAmplitude × 100 | -0.0014226 × 100 |
-| speed | -2π / (HY/13) | Clockwise axial precession (~25,684 years) |
+| orbitRadius | -`eccentricityAmplitude` × 100 | Derived from constants |
+| speed | -2π / (H/13) | Clockwise axial precession |
 | rotationSpeed | 2π × (mean solar year + 1 day) | Daily rotation |
-| tilt | -23.41398° | Mean axial tilt (obliquity) |
+| tilt | -`earthtiltMean` | Mean axial tilt (obliquity) |
 
 ### 4.2 Inclination Precession
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (HY/3) | Counter-clockwise (~111,296 years) |
+| speed | +2π / (H/3) | Counter-clockwise |
 | startPos | Calculated from balanced year | Phase alignment |
 
 **Purpose:** Opposes Earth's axial precession motion. The inclination precession and axial precession are "balancing out in both ways" - they have opposite directions.
@@ -152,8 +152,8 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | +2π / (HY/5) | Counter-clockwise (~66,778 years) |
-| orbitTiltb | -0.634° | Negative tilt amplitude |
+| speed | +2π / (H/5) | Counter-clockwise |
+| orbitTiltb | -`earthInvPlaneInclinationAmplitude` | Negative tilt amplitude |
 
 **Purpose:** Models the ecliptic plane's precession component.
 
@@ -161,12 +161,12 @@ The Earth object itself represents **Axial Precession**:
 
 | Property | Value | Meaning |
 |----------|-------|---------|
-| speed | -2π / (HY/8) | Clockwise (~41,736 years) |
-| orbitTiltb | +0.634° | Positive tilt amplitude (opposite of ecliptic) |
+| speed | -2π / (H/8) | Clockwise |
+| orbitTiltb | +`earthInvPlaneInclinationAmplitude` | Positive tilt amplitude (opposite of ecliptic) |
 
-**Purpose:** Explains Earth's temperature variation cycles. The obliquity oscillates between approximately 22.1° and 24.5°.
+**Purpose:** Explains Earth's temperature variation cycles. The obliquity oscillates between approximately ~22.2° and ~24.7°.
 
-**Key insight:** The ecliptic and obliquity layers have **opposite tilt values** (-0.634° and +0.634°) that balance each other.
+**Key insight:** The ecliptic and obliquity layers have **opposite tilt values** (-`earthInvPlaneInclinationAmplitude` and +`earthInvPlaneInclinationAmplitude`) that balance each other.
 
 ### 4.5 Perihelion Precession 1 & 2
 
@@ -174,8 +174,8 @@ Both layers use the same period but opposite signs:
 
 | Property | Perihelion 1 | Perihelion 2 |
 |----------|--------------|--------------|
-| speed | +2π / (HY/16) | -2π / (HY/16) |
-| orbitTilta | -1.258454° | 0 |
+| speed | +2π / (H/16) | -2π / (H/16) |
+| orbitTilta | -`earthRAAngle` | 0 |
 | orbitCentera | 0 | -eccentricityBase × 100 |
 
 **Purpose:** "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
@@ -184,14 +184,14 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 ### 4.6 Summary Table
 
-| Layer | Period | HY Ratio | Speed Sign | orbitTiltb |
-|-------|--------|----------|------------|------------|
-| Earth (Axial) | 25,684 | HY/13 | Negative | - |
-| Inclination | 111,296 | HY/3 | Positive | - |
-| Ecliptic | 66,778 | HY/5 | Positive | -0.634° |
-| Obliquity | 41,736 | HY/8 | Negative | +0.634° |
-| Perihelion 1 | 20,868 | HY/16 | Positive | - |
-| Perihelion 2 | 20,868 | HY/16 | Negative | - |
+| Layer | Period | Speed Sign | orbitTiltb |
+|-------|--------|------------|------------|
+| Earth (Axial) | H/13 | Negative | - |
+| Inclination | H/3 | Positive | - |
+| Ecliptic | H/5 | Positive | -`earthInvPlaneInclinationAmplitude` |
+| Obliquity | H/8 | Negative | +`earthInvPlaneInclinationAmplitude` |
+| Perihelion 1 | H/16 | Positive | - |
+| Perihelion 2 | H/16 | Negative | - |
 
 ---
 
@@ -199,7 +199,7 @@ The paired inverse rotations maintain equilibrium during Earth's two counter-mot
 
 The **Balanced Year** is a critical concept for understanding the model's phase alignments.
 
-**Value:** -301,340 BC (Julian Day -108,341,031.5)
+**Value:** Derived from `perihelionalignmentYear - (14.5 × H/16)`. See [Constants Reference](10-constants-reference.md) for current value.
 
 **Definition:** The moment when all tilt and inclination parameters aligned oppositely yet symmetrically.
 
@@ -228,7 +228,7 @@ This 14.5-cycle offset positions the obliquity fluctuation to correctly explain 
 |----------|-------|---------|
 | orbitRadius | 100 (1 AU) | Always 1 AU from perihelion point |
 | speed | 2π | Exactly one solar year |
-| startPos | +0.28° | June 21, 2000 alignment correction |
+| startPos | `correctionSun` | June 21, 2000 alignment correction |
 | rotation tilt | -7.155° | Solar axis inclination |
 
 ---
@@ -252,11 +252,11 @@ earth.pivotObj
 
 | Layer | Period | Physical Meaning |
 |-------|--------|------------------|
-| **Apsidal Precession** | ~3,232 days (~8.85 years) | Lunar perigee precession |
-| **Apsidal-Nodal 1** | ~206 days | Apsidal-nodal beat frequency |
-| **Apsidal-Nodal 2** | ~206 days (reverse) | Counter-rotation for beat |
-| **Lunar Leveling Cycle** | Variable | Long-term lunar cycle |
-| **Nodal Precession** | ~6,798 days (~18.6 years) | Lunar node regression |
+| **Apsidal Precession** | ~3,233 days (~8.85 years) | Lunar perigee precession |
+| **Apsidal-Nodal 1** | ~2,190 days (~6 years) | Apsidal-nodal beat frequency |
+| **Apsidal-Nodal 2** | ~2,190 days (~6 years, reverse) | Counter-rotation for beat |
+| **Lunar Leveling Cycle** | ~6,167 days (~16.9 years) | Long-term lunar cycle |
+| **Nodal Precession** | ~6,794 days (~18.6 years) | Lunar node regression |
 | **Moon** | ~27.32 days | Sidereal lunar month |
 
 ---
@@ -283,15 +283,17 @@ barycenterEarthAndSun.pivotObj
 
 Each planet has a 4-layer precession structure with forward and reverse components (similar to Earth's perihelion layers).
 
-| Planet | HY Formula | ICRF Precession Period |
-|--------|------------|----------------------|
-| Mercury | HY/(1+3/8) | ~242,828 years |
-| Venus | HY×2 | ~667,776 years |
-| Mars | HY/(4+1/3) | ~77,051 years |
-| Jupiter | HY/5 | 66,778 years |
-| Saturn | -HY/8 | -41,736 years (retrograde) |
-| Uranus | HY/3 | 111,296 years |
-| Neptune | HY×2 | ~667,776 years |
+For current computed values, see [Constants Reference](10-constants-reference.md).
+
+| Planet | H Formula | Direction |
+|--------|-----------|-----------|
+| Mercury | H / (1+3/8) | Prograde |
+| Venus | H × 2 | Prograde |
+| Mars | H / (4+1/3) | Prograde |
+| Jupiter | H / 5 | Prograde |
+| Saturn | H / 8 | **Retrograde** |
+| Uranus | H / 3 | Prograde |
+| Neptune | H × 2 | Prograde |
 
 **Note:** Saturn's negative value indicates retrograde precession (clockwise motion). Venus and Neptune share the same formula.
 
@@ -335,17 +337,16 @@ Updates occur after every precession frame, reflecting live tilt changes.
 
 ## Part 11: Mathematical Constants
 
+For current values, see [Constants Reference](10-constants-reference.md).
+
 | Constant | Value | Description |
 |----------|-------|-------------|
-| 1 Solar year | 2π radians | 365.2421897 days |
+| 1 Solar year | 2π radians | `meanSolarYearDays` days |
 | 1 AU | 100 scene units | 149,597,870.698828 km |
-| Mean sidereal year | 31,558,149.724 s | Mean across perihelion cycle |
-| Sidereal year at 1246 AD | 31,558,149.68 s | At perihelion-solstice alignment |
-| Mean solar day | ~86,400 s | Mean across perihelion cycle |
-| Mean obliquity | 23.41398° | Earth's mean axial tilt |
-| Inclination amplitude | 0.634° | Earth's orbital tilt oscillation |
-| Base eccentricity | 0.015321 | Earth's base orbital eccentricity |
-| Eccentricity amplitude | 0.0014226 | Earth's eccentricity oscillation |
+| Mean obliquity | `earthtiltMean` | Earth's mean axial tilt |
+| Inclination amplitude | `earthInvPlaneInclinationAmplitude` | Earth's orbital tilt oscillation |
+| Base eccentricity | `eccentricityBase` | Earth's base orbital eccentricity |
+| Eccentricity amplitude | `eccentricityAmplitude` | Earth's eccentricity oscillation |
 
 ---
 
@@ -357,7 +358,7 @@ The perihelion precession layers demonstrate a key principle: "Both have complet
 
 This applies throughout the model:
 - Axial precession (clockwise) vs. Inclination precession (counter-clockwise)
-- Ecliptic tilt (-0.634°) vs. Obliquity tilt (+0.634°)
+- Ecliptic tilt (-amplitude) vs. Obliquity tilt (+amplitude)
 - Perihelion 1 (forward) vs. Perihelion 2 (reverse)
 
 ### 12.2 Nested Rotation Benefits
@@ -378,19 +379,19 @@ This applies throughout the model:
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                               │
 │  startingPoint (scene root)                                                   │
-│    └── Earth (Axial Precession: HY/13 = 25,684 years, clockwise)             │
+│    └── Earth (Axial Precession: H/13, clockwise)                             │
 │          │                                                                    │
 │          ├── Moon Hierarchy (apsidal, nodal, Lunar Leveling cycles)           │
 │          │                                                                    │
-│          └── Inclination Precession (HY/3 = 111,296 years, CCW)              │
+│          └── Inclination Precession (H/3, CCW)                               │
 │                │                                                              │
-│                └── Ecliptic Precession (HY/5 = 66,778 years, -0.634°)        │
+│                └── Ecliptic Precession (H/5, -amplitude)                     │
 │                      │                                                        │
-│                      └── Obliquity Cycle (HY/8 = 41,736 years, +0.634°)      │
+│                      └── Obliquity Cycle (H/8, +amplitude)                   │
 │                            │                                                  │
-│                            └── Perihelion 1 (HY/16 = 20,868 years, fwd)      │
+│                            └── Perihelion 1 (H/16, fwd)                      │
 │                                  │                                            │
-│                                  └── Perihelion 2 (HY/16, reverse)           │
+│                                  └── Perihelion 2 (H/16, reverse)           │
 │                                        │                                      │
 │                                        └── Barycenter                        │
 │                                              ├── Sun (sibling)               │

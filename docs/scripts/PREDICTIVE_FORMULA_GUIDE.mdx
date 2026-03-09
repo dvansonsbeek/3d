@@ -9,7 +9,7 @@ This system predicts how planetary precession rates deviate from their baseline 
 - Earth's perihelion longitude and its rate of change (ERD)
 - Planet perihelion longitudes relative to Earth
 - Earth's obliquity and eccentricity variations
-- Multiple harmonic periods derived from the Holistic Year (H = 333,888 years)
+- Multiple harmonic periods derived from the Holistic Year (H; see [Constants Reference](../10-constants-reference.md))
 
 All 7 planets use the **same feature structure** with planet-specific coefficients trained via ridge regression.
 
@@ -17,29 +17,29 @@ All 7 planets use the **same feature structure** with planet-specific coefficien
 
 ### Holistic Year (H)
 
-The fundamental cycle of 333,888 years from which all other periods are derived:
+The fundamental cycle of H years from which all other periods are derived (see [Constants Reference](../10-constants-reference.md) for current value):
 
-| Period | Value | Description |
-|--------|-------|-------------|
-| H | 333,888 years | Master cycle |
-| H/3 | 111,296 years | Inclination cycle |
-| H/8 | 41,736 years | Obliquity cycle |
-| H/13 | 25,684 years | Axial precession |
-| H/16 | 20,868 years | Earth perihelion |
+| Period | Description |
+|--------|-------------|
+| H | Master cycle |
+| H/3 | Inclination cycle |
+| H/8 | Obliquity cycle |
+| H/13 | Axial precession |
+| H/16 | Earth perihelion |
 
 ### Planet Periods
 
 Each planet's precession period is derived from H using Fibonacci-related fractions:
 
-| Planet | Period Formula | Period (years) | Baseline Rate |
-|--------|---------------|----------------|---------------|
-| Mercury | H × 8/11 | 242,828 | +533.7 "/cy |
-| Venus | H × 2 | 667,776 | +194.1 "/cy |
-| Mars | H × 3/13 | 77,051 | +1682.0 "/cy |
-| Jupiter | H / 5 | 66,778 | +1940.8 "/cy |
-| Saturn | H / 8 | 41,736 | -3105.2 "/cy |
-| Uranus | H / 3 | 111,296 | +1164.5 "/cy |
-| Neptune | H × 2 | 667,776 | +194.1 "/cy |
+| Planet | Period Formula | Baseline Rate |
+|--------|---------------|---------------|
+| Mercury | H × 8/11 | +531.9 "/cy |
+| Venus | H × 2 | +193.4 "/cy |
+| Mars | H × 3/13 | +1676.4 "/cy |
+| Jupiter | H / 5 | +1934.3 "/cy |
+| Saturn | H / 8 | -3094.9 "/cy |
+| Uranus | H / 3 | +1160.6 "/cy |
+| Neptune | H × 2 | +193.4 "/cy |
 
 ### J2000 Calibration
 
@@ -176,7 +176,7 @@ The 273-term unified feature matrix is organized into 16 groups:
 
 ### Saturn Note
 
-Saturn's precession period (H/8 = 41,736 years) equals the obliquity cycle, creating strong coupling with Earth's obliquity/eccentricity variations. The GROUP 15 terms are critical for Saturn's accuracy - without them, Saturn RMSE was 2.32"/cy; with them it drops to 0.29"/cy.
+Saturn's precession period (H/8) equals the obliquity cycle, creating strong coupling with Earth's obliquity/eccentricity variations. The GROUP 15 terms are critical for Saturn's accuracy - without them, Saturn RMSE was 2.32"/cy; with them it drops to 0.29"/cy.
 
 ## Training Metrics
 
@@ -247,4 +247,4 @@ The model captures how these parameters interact across multiple timescales to p
 
 - Holistic Universe Model documentation
 - J2000 perihelion values from NASA JPL Horizons
-- Training data spans ~333,888 years of calculated values (one full Holistic Year, 3,009 data points)
+- Training data spans one full Holistic Year (H years) of calculated values (3,009 data points)

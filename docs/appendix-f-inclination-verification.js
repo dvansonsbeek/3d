@@ -133,7 +133,7 @@ const currentCodeValues = {
     amplitude: 0.717024,
     phaseAngle: 203.3195,      // not in balance theory
     omegaJ2000: 101.06,
-    period: holisticyearLength,  // 333,888 years
+    period: holisticyearLength,  // H years
     inclJ2000: 15.5639473,
     jplTrend: plutoEclipticInclinationTrendJPL
   }

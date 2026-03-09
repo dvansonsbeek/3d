@@ -13,10 +13,10 @@ import { Pane } from 'tweakpane';
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
   frame of reference. Six Fibonacci Laws and only 6 free parameters describe the
   precession, eccentricity, inclination, obliquity and perihelion movements of
-  all planets. The Holistic-Year cycle (333,888 yr) unifies axial precession
+  all planets. The Holistic-Year cycle (H) unifies axial precession
   (H/13), inclination precession (H/3) and perihelion precession (H/16) through
-  Fibonacci number ratios. Earth is defined by 25 parameters, the Moon by 9, and
-  each planet by 13.
+  Fibonacci number ratios. Earth is defined by 26 parameters, the Moon by 9, and
+  each planet by 15.
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v2
   Website:  https://holisticuniverse.com
@@ -330,7 +330,7 @@ const ceresAscendingNodeInvPlaneVerified = 80.89;        // From Souami & Soucha
 // This gives smaller values as it assumes we're near maximum rate.
 //
 // Amplitudes from Fibonacci Laws: amp = ψ / (d × √m), means from J2000 constraint.
-// Single universal ψ = 2205/(2×333888), balance: Σ(203°) w = Σ(23°) w
+// Single universal ψ = 2205/(2×H), balance: Σ(203°) w = Σ(23°) w
 // See: docs/26-fibonacci-laws.md, docs/appendix-e-inclination-optimization.js
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -959,10 +959,10 @@ const ASTRO_REFERENCE = {
   // Perihelion precession causes the measured solar day to be ~11.4ms short.
   // This accumulates to 1 extra day over one perihelion cycle (H/16).
   // Formula: (meanLengthOfDay / perihelionCycle) / meanSolarDaysPerYear
-  //        = (86400 / 20868) / 365.242189 = 0.01134 s = 11.34 ms
+  //        = (86400 / (H/16)) / 365.242189 = 0.01134 s = 11.34 ms
   // Yearly accumulation: 11.4ms × 365.24 days = 4.16 seconds/year
   get solarDayOffsetMs() {
-    const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+    const perihelionCycle = holisticyearLength / 16;  // H/16 years
     return (86400 / perihelionCycle) / 365.2421897 * 1000;  // ~11.34 ms
   },
   get solarDayOffsetYearlySeconds() {
@@ -13575,7 +13575,7 @@ function setupGUI() {
     addFolderTooltip(freeFolder, 'The six true degrees of freedom that define the model. Everything else is derived or taken from observations.');
     const freeParams = {
       fpHolisticYear: String(holisticyearLength) + ' years',
-      fpAnchorYear: '-301,340 (derived)',
+      fpBalancedYear: Math.round(balancedYear).toLocaleString('en-US') + ' (derived)',
       fpFibDivisors: '3, 5, 8, 13, 21, 34',
       fpMeanObliquity: earthtiltMean + '\u00B0',
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
@@ -13583,9 +13583,9 @@ function setupGUI() {
     };
     addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
-    const anchorBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpAnchorYear', { label: 'Anchor year', readonly: true }),
+    const balancedBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpBalancedYear', { label: 'Balanced year', readonly: true }),
       '0 DOF \u2014 Calculated from Holistic-Year and 1246 AD. Not independently free.');
-    anchorBlade.element.style.opacity = '0.65';
+    balancedBlade.element.style.opacity = '0.65';
     addTooltip(freeFolder.addBinding(freeParams, 'fpFibDivisors', { label: 'Fibonacci divisors', readonly: true }),
       '3 DOF \u2014 Assumed; not independently derived. Used to divide the Holistic-Year into precession periods (H/3, H/5, H/8, H/13, etc.).');
     addTooltip(freeFolder.addBinding(freeParams, 'fpMeanObliquity', { label: 'Mean obliquity', readonly: true }),
@@ -13621,6 +13621,14 @@ function setupGUI() {
       ciSolarDay: R.solarDayJ2000 + ' s',
       ciSiderealDay: R.siderealDayJ2000.toFixed(6) + ' s',
       ciStellarDay: R.stellarDayJ2000.toFixed(6) + ' s',
+      ciPeriPassage: String(R.perihelionPassageJ2000_JD),
+      ciMoonMeanAnom: R.moonMeanAnomalyJ2000_deg + '\u00B0',
+      ciMoonMeanAnomRate: R.moonMeanAnomalyRate_degPerDay + '\u00B0/day',
+      ciMoonElongation: R.moonMeanElongationJ2000_deg + '\u00B0',
+      ciMoonElongRate: R.moonMeanElongationRate_degPerDay + '\u00B0/day',
+      ciSunMeanAnom: R.sunMeanAnomalyJ2000_deg + '\u00B0',
+      ciSunMeanAnomRate: R.sunMeanAnomalyRate_degPerDay + '\u00B0/day',
+      ciMoonArgLat: R.moonArgLatJ2000_deg + '\u00B0',
     };
     const calibCount = Object.keys(calibInputs).length;
     const calibInputFolder = aboutFolder.addFolder({ title: 'Calibration Inputs (' + calibCount + ')', expanded: false });
@@ -13665,6 +13673,23 @@ function setupGUI() {
       'Rotation period relative to the vernal equinox (~23h 56m 4.0905s).');
     addTooltip(calibInputFolder.addBinding(calibInputs, 'ciStellarDay', { label: 'Stellar day (J2000)', readonly: true }),
       'Rotation period relative to fixed stars (~23h 56m 4.0989s).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciPeriPassage', { label: 'Perihelion passage JD', readonly: true }),
+      'Julian Day of Earth perihelion passage at J2000 (2000 Jan 3 13:00 UTC).');
+    calibInputFolder.addBlade({ view: 'separator' });
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonMeanAnom', { label: 'Moon mean anom. (J2000)', readonly: true }),
+      'Moon mean anomaly at J2000.0 (Meeus Ch. 47).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonMeanAnomRate', { label: 'Moon mean anom. rate', readonly: true }),
+      'Moon mean anomaly rate in degrees per day.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonElongation', { label: 'Moon elongation (J2000)', readonly: true }),
+      'Mean elongation Moon\u2013Sun at J2000.0 (Meeus Ch. 47).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonElongRate', { label: 'Moon elongation rate', readonly: true }),
+      'Mean elongation rate in degrees per day.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSunMeanAnom', { label: 'Sun mean anom. (J2000)', readonly: true }),
+      'Sun mean anomaly at J2000.0 (Meeus Ch. 47).');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSunMeanAnomRate', { label: 'Sun mean anom. rate', readonly: true }),
+      'Sun mean anomaly rate in degrees per day.');
+    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonArgLat', { label: 'Moon arg. lat. (J2000)', readonly: true }),
+      'Moon argument of latitude F at J2000.0 (Meeus Ch. 47).');
   }
 
   // --- Model Parameters (all parameters from the top of script.js) ---
@@ -13770,14 +13795,14 @@ function setupGUI() {
 
     // -- Per-planet data (Mercury through Neptune) --
     const allPlanets = [
-      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricity, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle },
-      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricity,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle },
+      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricity, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: mercuryEocFraction, periRefJD: mercuryPerihelionRef_JD },
+      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricity,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: venusEocFraction, periRefJD: venusPerihelionRef_JD },
 
-      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricity,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle },
-      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricity, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle },
-      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricity,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle },
-      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricity,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle },
-      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricity, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle },
+      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricity,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: marsEocFraction, periRefJD: marsPerihelionRef_JD },
+      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricity, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle, eocFrac: jupiterEocFraction, periRefJD: jupiterPerihelionRef_JD },
+      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricity,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle, eocFrac: saturnEocFraction, periRefJD: saturnPerihelionRef_JD },
+      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricity,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle, eocFrac: uranusEocFraction, periRefJD: uranusPerihelionRef_JD },
+      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricity, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle, eocFrac: neptuneEocFraction, periRefJD: neptunePerihelionRef_JD },
     ];
     allPlanets.forEach(p => {
       const v = {
@@ -13794,6 +13819,8 @@ function setupGUI() {
         angleCorr: p.angleCorr != null ? fmtDeg(p.angleCorr) : '\u2014',
         periYears: p.periYears,
         startpos: p.startpos != null ? fmtDeg(p.startpos) : '\u2014',
+        eocFrac: String(p.eocFrac),
+        periRefJD: String(p.periRefJD),
       };
       const pCount = Object.keys(v).length;
       totalModelParams += pCount;
@@ -13815,6 +13842,8 @@ function setupGUI() {
       addConst(pf, v, 'phaseAngle', 'Incl. phase angle', 'Phase group angle for the Fibonacci balance (203\u00B0 or 23\u00B0).');
       addConst(pf, v, 'periYears', 'Perihelion prec.', 'Duration of perihelion precession cycle.');
       addConst(pf, v, 'startpos', 'Start position', 'Initial angular position at model start.');
+      addConst(pf, v, 'eocFrac', 'EoC fraction', 'Equation of Center fraction: how much variable-speed is EoC vs geometric offset.');
+      addConst(pf, v, 'periRefJD', 'Perihelion ref. JD', 'Julian Day reference for EoC phase alignment.');
     });
     constFolder.title = 'Model Parameters (' + totalModelParams + ')';
     addFolderTooltip(constFolder, 'All ' + totalModelParams + ' input constants used by the 3D model, grouped by body.');
@@ -15585,8 +15614,8 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
   } else {
     // First search: estimate perihelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is in early January (~0.03 into year)
-    // Perihelion precesses through the year over HY/16 = 20,868 years
-    const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+    // Perihelion precesses through the year over H/16 years
+    const perihelionCycle = holisticyearLength / 16;  // H/16 years
     const perihelionAtReference = 0.03;  // Fraction of year (early January at 1246)
 
     // Calculate how much perihelion has shifted from reference year
@@ -15703,7 +15732,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
  *
  * 1. EARTH-FRAME PERIHELION INTERVAL (perihelionForYear):
  *    - Measures minimum Earth→Sun distance
- *    - Earth moves due to axial precession wobble (HY/13 = 25,684 years clockwise)
+ *    - Earth moves due to axial precession wobble (H/13 years clockwise)
  *    - This is what an observer on Earth would measure
  *    - ~127 seconds shorter than true anomalistic year (currently)
  *    - Will oscillate faster/slower than true anomalistic year over the wobble cycle
@@ -15723,8 +15752,8 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
   } else {
     // First search: estimate perihelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is in early January (~0.03 into year)
-    // Perihelion precesses through the year over HY/16 = 20,868 years
-    const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+    // Perihelion precesses through the year over H/16 years
+    const perihelionCycle = holisticyearLength / 16;  // H/16 years
     const perihelionAtReference = 0.03;  // Fraction of year (early January at 1246)
 
     // Calculate how much perihelion has shifted from reference year
@@ -15824,7 +15853,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
     // First search: estimate aphelion position accounting for precession
     // Aphelion is 180° (0.5 year) opposite to perihelion
     // At perihelionalignmentYear (1246), perihelion is at ~0.03 into year, so aphelion is at ~0.53
-    const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+    const perihelionCycle = holisticyearLength / 16;  // H/16 years
     const aphelionAtReference = 0.53;  // Fraction of year (early July at 1246)
 
     // Calculate how much aphelion has shifted from reference year
@@ -15926,7 +15955,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
   } else {
     // First search: estimate aphelion position accounting for precession
     // At perihelionalignmentYear (1246), perihelion is at ~0.03 into year, so aphelion is at ~0.53
-    const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+    const perihelionCycle = holisticyearLength / 16;  // H/16 years
     const aphelionAtReference = 0.53;  // Fraction of year (early July at 1246)
 
     // Calculate how much aphelion has shifted from reference year
@@ -16446,7 +16475,7 @@ async function runYearAnalysisExport(years) {
     ['  Formula: (meanLengthOfDay / perihelionCycle) / solarDaysPerYear'],
     ['  Daily offset', '', '', ASTRO_REFERENCE.solarDayOffsetMs.toFixed(2) + ' ms/day'],
     ['  Yearly accumulation', '', '', ASTRO_REFERENCE.solarDayOffsetYearlySeconds.toFixed(2) + ' s/year'],
-    ['  Effect: adds 1 extra day over perihelion cycle (H/16 = 20,868 years)'],
+    ['  Effect: adds 1 extra day over perihelion cycle (H/16)'],
     [''],
     ['Wobble Parallax (Earth-wobble measurement effect)'],
     ['  Formula: ΔT = (r/D) × (T_sid/T_wobble) × T_sid'],
@@ -18475,7 +18504,7 @@ async function analyzeAnoministicYear(startYear, endYear) {
   const iauAnomalistic = ASTRO_REFERENCE.anomalisticYearJ2000;
 
   // Calculate theoretical anomalistic year from perihelion precession rate
-  const perihelionPrecessionYears = holisticyearLength / 16;  // 20,868 years
+  const perihelionPrecessionYears = holisticyearLength / 16;  // H/16 years
   const theoreticalAnomalistic = meansolaryearlengthinDays * perihelionPrecessionYears / (perihelionPrecessionYears - 1);
 
   console.log('');
@@ -18512,7 +18541,7 @@ async function analyzeAnoministicYear(startYear, endYear) {
   console.log(`║ Perihelion: Earth-Frame - WobbleCenter          │ ${periMethodDiff >= 0 ? '+' : ''}${periMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ Aphelion:   Earth-Frame - WobbleCenter          │ ${apheMethodDiff >= 0 ? '+' : ''}${apheMethodDiff.toFixed(2)} seconds                                          ║`);
   console.log(`║ (Negative = Earth wobble shifts detection EARLIER than inertial frame)                               ║`);
-  console.log(`║ This offset oscillates over the 25,684 year axial precession cycle.                                  ║`);
+  console.log(`║ This offset oscillates over the H/13 (${Math.round(holisticyearLength/13).toLocaleString('en-US')}) year axial precession cycle.                              ║`);
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝');
 
   // Debug output suppressed - first 3 JD values available in returned object

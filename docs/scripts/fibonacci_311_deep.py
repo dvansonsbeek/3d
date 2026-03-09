@@ -290,7 +290,7 @@ def section_3():
     print()
 
     # Compute precise R
-    psi1 = PSI1_THEORY  # = 2205/(2*H) = 2205/667776
+    psi1 = PSI1_THEORY  # = 2205/(2*H)
     xi_V = XI_BASE["Venus"]
     R = psi1 / xi_V
 
@@ -542,11 +542,11 @@ def section_5(fib_prim_roots):
     # What range of R is allowed by Earth's eccentricity?
     print("  Range of R from e_E constraints:")
     print("  Earth eccentricity varies between ~0.005 and ~0.058 (BvW range)")
-    for e_test in [0.005, 0.010, 0.015321, 0.020, 0.058]:
+    for e_test in [0.005, 0.010, 0.015373, 0.020, 0.058]:
         xi_test = e_test * SQRT_M["Earth"]
         R_test = 2.5 * psi1 / xi_test
         fpr_near = min(fib_prim_roots, key=lambda p: abs(p - R_test) if p > 10 else 999)
-        marker = " ←" if abs(e_test - 0.015321) < 0.001 else ""
+        marker = " ←" if abs(e_test - 0.015373) < 0.001 else ""
         print(f"    e_E = {e_test:.6f} → R = {R_test:.1f}, nearest FPR prime = {fpr_near}{marker}")
     print()
 

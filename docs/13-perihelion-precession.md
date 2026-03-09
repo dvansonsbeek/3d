@@ -21,8 +21,8 @@ This document describes the three methods used to calculate perihelion longitude
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Current rate (year 2000) | ~575 arcsec/century |
-| Long-term average | ~534 arcsec/century |
+| Current rate (year 2000) | ~570 arcsec/century |
+| Long-term average | ~532 arcsec/century |
 | Fluctuation range | ±100 arcsec/century |
 | Fluctuation period | ~6,500 years |
 
@@ -39,7 +39,7 @@ This document describes the three methods used to calculate perihelion longitude
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Rate | Exactly 533.7 arcsec/century |
+| Rate | Exactly 531.9 arcsec/century |
 | Fluctuation | None |
 | Starting longitude (J2000) | 77.46° |
 
@@ -66,9 +66,9 @@ obj.dec = SPHERICAL.phi;    // Declination in radians (polar angle)
 
 This transformation includes all of Earth's orientation effects:
 - Axial tilt (~23.4°)
-- Axial precession (~25,684 year cycle)
-- Obliquity variations (~41,736 year cycle)
-- Inclination precession (~111,296 year cycle)
+- Axial precession (H/13 year cycle)
+- Obliquity variations (H/8 year cycle)
+- Inclination precession (H/3 year cycle)
 
 The `apparentRaFromPdA` function then computes the angle between two objects:
 
@@ -180,7 +180,7 @@ This method reads directly from `precessionLayer.orbitObj.rotation.y`, which rep
 | Metric | Mercury Example |
 |--------|-----------------|
 | Rate at year 1900 | ~574 arcsec/century |
-| Rate at year 2000 | ~574 arcsec/century |
+| Rate at year 2000 | ~570 arcsec/century |
 | Fluctuation range | ±100 arcsec/century (varies by epoch) |
 | Feature count | 273 terms in 16 groups |
 
@@ -213,7 +213,7 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 | Metric | Value |
 |--------|-------|
-| Mean rate | 533.7 arcsec/century |
+| Mean rate | 531.9 arcsec/century |
 | Minimum rate | 427 arcsec/century |
 | Maximum rate | 710 arcsec/century |
 | Range | 283 arcsec/century |
@@ -222,17 +222,17 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 ### Root Cause
 
-The ~6,500 year period corresponds to `holisticyearLength / 45 = 6,626 years`, which is a harmonic interaction between:
+The ~6,500 year period corresponds to `H / 45`, which is a harmonic interaction between:
 
-1. **Earth's Inclination Precession**: Period = holisticyearLength / 3 ≈ 111,296 years
-2. **Earth's Ecliptic Precession**: Period = holisticyearLength / 5 ≈ 66,778 years
+1. **Earth's Inclination Precession**: Period = H/3
+2. **Earth's Ecliptic Precession**: Period = H/5
 
 The beat frequency between these two precession cycles:
 
 ```
 1/(1/3 - 1/5) = 1/(2/15) = 15/2 = 7.5
 
-holisticyearLength / 7.5 ≈ 39,756 years (fundamental beat)
+H / 7.5 (fundamental beat)
 
 Further harmonics divide this, producing the ~6,500 year observed period.
 ```
@@ -259,7 +259,7 @@ When measuring in Earth's equatorial frame, all these rotations compound to crea
 
 ### Why the Average Converges
 
-Over a complete cycle of all Earth precession periods (the Holistic Year of ~333,888 years), the oscillations in each direction cancel out:
+Over a complete cycle of all Earth precession periods (the Holistic Year H), the oscillations in each direction cancel out:
 
 - Sometimes Earth's orientation adds to the apparent precession rate
 - Sometimes it subtracts from it

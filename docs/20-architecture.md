@@ -194,7 +194,7 @@ The monolithic script.js is organized into logical sections:
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  SECTION 1: INPUT CONSTANTS (Lines 17-782)                          │
-│  - Holistic Year parameters (333,888-year cycle)                    │
+│  - Holistic Year parameters (H-year cycle)                          │
 │  - Earth orbital parameters (tilt, eccentricity, precession)        │
 │  - All planet orbital elements (Mercury through Neptune)            │
 │  - Predictive formula constants (PERI_HARMONICS, PREDICT_PLANETS)   │
@@ -482,10 +482,10 @@ Critical ordering for dependent calculations:
 
 | Cycle | Period | Description |
 |-------|--------|-------------|
-| **Axial Precession** | ~25,684 years | Earth's rotational axis wobble |
-| **Perihelion Precession** | ~111,296 years | Closest approach point shifts |
-| **Inclination Precession** | ~111,296 years | Orbital plane tilt variation |
-| **Obliquity Cycle** | ~41,736 years | Axial tilt oscillation (22.1° - 24.5°) |
+| **Axial Precession** | H/13 | Earth's rotational axis wobble |
+| **Perihelion Precession** | H/3 | Closest approach point shifts |
+| **Inclination Precession** | H/3 | Orbital plane tilt variation |
+| **Obliquity Cycle** | H/8 | Axial tilt oscillation (~22.2° - ~24.7°) |
 | **Eccentricity Cycle** | ~413,000 years | Orbital shape variation |
 
 ### Invariable Plane System

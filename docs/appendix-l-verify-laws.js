@@ -78,7 +78,7 @@ const ecc = {
 // For Earth, the mean eccentricity (model parameter eccentricityBase) differs from J2000
 const eccMean = {
   ...ecc,
-  earth: 0.015321,  // Model mean eccentricity (eccentricityBase)
+  earth: 0.015373,  // Model mean eccentricity (eccentricityBase)
 };
 
 // Invariable plane inclinations J2000

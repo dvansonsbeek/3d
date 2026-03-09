@@ -12,14 +12,14 @@ IMPORTANT: This script uses OBSERVED values from the CSV data file:
 
 For predictive formulas using calculated values, see: predictive_formula.py
 
-PLANETARY PERIODS (derived from H = 333,888 years):
-  Mercury:  242,828 years (H × 8/11)
-  Venus:    667,776 years (H × 2)
-  Mars:      77,051 years (H × 3/13)
-  Jupiter:   66,778 years (H/5)
-  Saturn:    41,736 years (H/8, retrograde)
-  Uranus:   111,296 years (H/3)
-  Neptune:  667,776 years (H × 2)
+PLANETARY PERIODS (derived from H):
+  Mercury:  H × 8/11
+  Venus:    H × 2
+  Mars:     H × 3/13
+  Jupiter:  H/5
+  Saturn:   H/8 (retrograde)
+  Uranus:   H/3
+  Neptune:  H × 2
 
 RESULTS (using observed perihelion from CSV):
   Mercury:  R² = 1.0000, RMSE = 0.08 arcsec/century (225 terms)
@@ -43,36 +43,36 @@ from typing import Dict, List, Tuple, Optional
 # FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-H = 333888  # Master Holistic-Year cycle
+H = 335008  # Master Holistic-Year cycle
 ANCHOR = 301340  # Reference year offset (year 0 of current cycle = -301340)
 
 # Earth precession cycles
-EARTH_PERI_PERIOD = H // 16     # 20,868 years (effective perihelion)
-EARTH_PERI_2 = H // 32          # 10,434 years
-EARTH_PERI_3 = H // 48          # 6,956 years
-EARTH_PERI_4 = H // 64          # 5,217 years
-OBLIQ_CYCLE = H // 8            # 41,736 years
-INCLIN_CYCLE = H // 3           # 111,296 years
+EARTH_PERI_PERIOD = H // 16     # H/16 (effective perihelion)
+EARTH_PERI_2 = H // 32          # H/32
+EARTH_PERI_3 = H // 48          # H/48
+EARTH_PERI_4 = H // 64          # H/64
+OBLIQ_CYCLE = H // 8            # H/8
+INCLIN_CYCLE = H // 3           # H/3
 
 # Additional periods
-H_DIV_4 = H // 4                # 83,472 years
-H_DIV_5 = H // 5                # 66,778 years
-H_DIV_12 = H // 12              # 27,824 years
-H_DIV_13 = H // 13              # 25,684 years (axial precession)
+H_DIV_4 = H // 4                # H/4
+H_DIV_5 = H // 5                # H/5
+H_DIV_12 = H // 12              # H/12
+H_DIV_13 = H // 13              # H/13 (axial precession)
 
 # Planetary perihelion periods
-MERCURY_PERIOD = int(H * 8 / 11)    # 242,828 years
-VENUS_PERIOD = H * 2                 # 667,776 years
-MARS_PERIOD = int(H * 3 / 13)        # 77,051 years
-JUPITER_PERIOD = H_DIV_5             # 66,778 years
-SATURN_PERIOD = OBLIQ_CYCLE          # 41,736 years (retrograde)
-URANUS_PERIOD = INCLIN_CYCLE         # 111,296 years
-NEPTUNE_PERIOD = H * 2               # 667,776 years
+MERCURY_PERIOD = int(H * 8 / 11)    # H × 8/11
+VENUS_PERIOD = H * 2                 # H × 2
+MARS_PERIOD = int(H * 3 / 13)        # H × 3/13
+JUPITER_PERIOD = H_DIV_5             # H/5
+SATURN_PERIOD = OBLIQ_CYCLE          # H/8 (retrograde)
+URANUS_PERIOD = INCLIN_CYCLE         # H/3
+NEPTUNE_PERIOD = H * 2               # H × 2
 
 # Earth mean values for normalization
 EARTH_OBLIQ_MEAN = 23.414
-EARTH_ECC_BASE = 0.015321                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.0014226                                     # (max - min) / 2
+EARTH_ECC_BASE = 0.015373                                      # (max + min) / 2
+EARTH_ECC_AMP  = 0.001370                                      # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
 
 # =============================================================================
@@ -497,7 +497,7 @@ def build_feature_matrix_venus(year: int, theta_E: float, erd: float,
     features.append(erd * math.cos(4 * diff))
     features.append(erd * math.sin(4 * diff))
 
-    # ERD² × OBLIQ_CYCLE (41736)
+    # ERD² × OBLIQ_CYCLE (H/8)
     phase = 2 * math.pi * t / OBLIQ_CYCLE
     sin_p = math.sin(phase)
     cos_p = math.cos(phase)
@@ -508,7 +508,7 @@ def build_feature_matrix_venus(year: int, theta_E: float, erd: float,
     features.append(erd2 * cos_p * math.cos(diff))
     features.append(erd2 * cos_p * math.sin(diff))
 
-    # ERD² × H (333888)
+    # ERD² × H
     phase = 2 * math.pi * t / H
     sin_p = math.sin(phase)
     cos_p = math.cos(phase)
@@ -517,7 +517,7 @@ def build_feature_matrix_venus(year: int, theta_E: float, erd: float,
     features.append(erd2 * cos_p * math.cos(diff))
     features.append(erd2 * cos_p * math.sin(diff))
 
-    # ERD² × INCLIN_CYCLE (111296)
+    # ERD² × INCLIN_CYCLE (H/3)
     phase = 2 * math.pi * t / INCLIN_CYCLE
     sin_p = math.sin(phase)
     cos_p = math.cos(phase)

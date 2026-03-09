@@ -7,7 +7,7 @@ Merged investigation combining two analyses:
 
 Part 1 — CAN ψ BE DERIVED FROM H?
   Investigates whether the inclination ψ-constant can be expressed in terms of
-  H = 333,888, φ, π, Fibonacci numbers, and/or Earth's base eccentricity.
+  H = 335,008, φ, π, Fibonacci numbers, and/or Earth's base eccentricity.
   Also investigates the master ratio R = ψ/ξ_V connecting inclination to
   eccentricity constants.
   (10 sections, originally fibonacci_psi_from_H.py)
@@ -473,8 +473,8 @@ def _p1_section_5(psi1):
     print()
 
     # Factorize H
-    print("  H = 333,888")
-    n = 333888
+    print(f"  H = {H:,}")
+    n = H
     factors = []
     temp = n
     for p in [2, 3, 5, 7, 11, 13, 17, 19, 23]:
@@ -763,17 +763,18 @@ def _p1_section_8(psi1, xi_V, R):
     print()
     print("  10 = 2 × 5 = F_3 × F_5")
     print("  So ψ = (F_4 + F_6) / (F_3 × F_5 × H)")
-    print(f"  = (3 + 8) / (2 × 5 × 333888)")
-    print(f"  = 11 / 3338880")
-    print(f"  = {11/3338880:.10e}")
+    print(f"  = (3 + 8) / (2 × 5 × {H})")
+    approx_psi = 11 / (10 * H)
+    print(f"  = 11 / {10 * H}")
+    print(f"  = {approx_psi:.10e}")
     print(f"  actual ψ = {psi1:.10e}")
-    print(f"  error: {(11/3338880 / psi1 - 1)*100:+.4f}%")
+    print(f"  error: {(approx_psi / psi1 - 1)*100:+.4f}%")
     print()
 
     print("  FULL PREDICTIVE CHAIN (if ψ = 11/(10H)):")
     print()
     print("  INPUT: planet name → determines m, b, F, k_ecc, ψ-group")
-    print("  UNIVERSAL CONSTANTS: H = 333888, ψ = 11/(10H), e_E = 0.015321")
+    print(f"  UNIVERSAL CONSTANTS: H = {H}, ψ = 11/(10H), e_E = {EARTH_BASE_ECCENTRICITY}")
     print()
     print("  OUTPUT (inclination):")
 
@@ -935,7 +936,7 @@ def _p1_section_10(psi1, xi_V):
 
     print("  Current state: 2 free parameters")
     print("    ψ = 3.2995 × 10⁻³")
-    print("    e_E = 0.015321")
+    print("    e_E = 0.015373")
     print()
     print("  Can we reduce to 1 free parameter?")
     print("  Can we reduce to 0 free parameters?")

@@ -92,17 +92,19 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 
 All values derived from **Fibonacci Laws** (amplitude = ψ / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Appendix E](appendix-e-inclination-optimization.js) and [Appendix F](appendix-f-inclination-verification.js)):
 
-| Planet | Mean (°) | Amplitude (°) | J2000 Value (°) | Range (°) | Trend Error |
-|--------|----------|---------------|-----------------|-----------|-------------|
-| Mercury | 6.726620 | 0.384621 | 6.3473 | 6.34 - 7.11 | ~1.6"/cy |
-| Venus | 2.207361 | 0.061866 | 2.1545 | 2.15 - 2.27 | ~21.7"/cy |
-| Earth | 1.481592 | 0.633849 | 1.5787 | 0.85 - 2.12 | (reference) |
-| Mars | 2.649893 | 1.158626 | 1.6312 | 1.49 - 3.81 | ~17.9"/cy |
-| Jupiter | 0.329100 | 0.021301 | 0.3220 | 0.31 - 0.35 | ~3.0"/cy |
-| Saturn | 0.931678 | 0.064879 | 0.9255 | 0.87 - 1.00 | ~5.4"/cy |
-| Uranus | 1.000600 | 0.023716 | 0.9947 | 0.98 - 1.02 | ~2.7"/cy |
-| Neptune | 0.722190 | 0.013486 | 0.7354 | 0.71 - 0.74 | ~1.7"/cy |
-| Pluto | 15.716200 | 0.717024 | 15.5639 | 15.00 - 16.43 | ~5.6"/cy |
+For current values, see [Constants Reference](10-constants-reference.md).
+
+| Planet | Mean | Amplitude |
+|--------|------|-----------|
+| Mercury | `mercuryInvPlaneInclinationMean` | `mercuryInvPlaneInclinationAmplitude` |
+| Venus | `venusInvPlaneInclinationMean` | `venusInvPlaneInclinationAmplitude` |
+| Earth | `earthInvPlaneInclinationMean` | `earthInvPlaneInclinationAmplitude` |
+| Mars | `marsInvPlaneInclinationMean` | `marsInvPlaneInclinationAmplitude` |
+| Jupiter | `jupiterInvPlaneInclinationMean` | `jupiterInvPlaneInclinationAmplitude` |
+| Saturn | `saturnInvPlaneInclinationMean` | `saturnInvPlaneInclinationAmplitude` |
+| Uranus | `uranusInvPlaneInclinationMean` | `uranusInvPlaneInclinationAmplitude` |
+| Neptune | `neptuneInvPlaneInclinationMean` | `neptuneInvPlaneInclinationAmplitude` |
+| Pluto | `plutoInvPlaneInclinationMean` | `plutoInvPlaneInclinationAmplitude` |
 
 ### Implementation
 
@@ -132,17 +134,19 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
 The inclination oscillation period equals the ascending node precession period for each planet. This is because both effects arise from the same physical mechanism:
 
-| Planet | Period (years) | Period Expression |
-|--------|----------------|-------------------|
-| Mercury | ~242,828 | `holisticyearLength/(1+(3/8))` |
-| Venus | ~667,776 | `holisticyearLength*2` |
-| Earth | ~111,296 | `holisticyearLength/3` |
-| Mars | ~77,051 | `holisticyearLength/(4+(1/3))` |
-| Jupiter | 66,778 | `holisticyearLength/5` |
-| Saturn | -41,736 | `-holisticyearLength/8` (retrograde) |
-| Uranus | ~111,296 | `holisticyearLength/3` |
-| Neptune | ~667,776 | `holisticyearLength*2` |
-| Pluto | 333,888 | `holisticyearLength` |
+| Planet | Period Formula |
+|--------|---------------|
+| Mercury | `H / (1 + 3/8)` |
+| Venus | `H × 2` |
+| Earth | `H / 3` |
+| Mars | `H / (4 + 1/3)` |
+| Jupiter | `H / 5` |
+| Saturn | `-H / 8` (retrograde) |
+| Uranus | `H / 3` |
+| Neptune | `H × 2` |
+| Pluto | `H` |
+
+For computed period values, see [Constants Reference](10-constants-reference.md).
 
 ---
 
@@ -391,7 +395,7 @@ The planet information panels display four invariable plane values:
 | **Ω at Max Inclination** | Where inclination reaches maximum (precesses) |
 | **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
 
-**Note**: The first three values use ecliptic coordinates (precession period ~20,868 years), while the oscillation phase uses ICRF coordinates (precession period ~111,296 years).
+**Note**: The first three values use ecliptic coordinates (precession period H/16), while the oscillation phase uses ICRF coordinates (precession period H/3).
 
 ---
 

@@ -91,7 +91,7 @@ checkIdentity(
 // freq(5) - freq(8) = (5-8)/H = -3/H
 // The magnitude gives period H/3, direction is retrograde
 console.log('  Note: result is -3/H, meaning period H/3 in retrograde direction.');
-console.log('  This matches Earth inclination precession (H/3 = 111,296 yr).');
+console.log('  This matches Earth inclination precession (H/3).');
 console.log();
 
 // Identity 3: 1/(H/13) - 1/(H/3) = ?

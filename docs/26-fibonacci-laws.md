@@ -31,8 +31,7 @@ Where:
 ### The Holistic Year
 
 ```
-H = 333,888 years
-2H = 667,776 years
+H = see Constants Reference for current value
 ```
 
 ### The ψ-Constant
@@ -40,7 +39,7 @@ H = 333,888 years
 Derived from Fibonacci numbers and the Holistic Year:
 
 ```
-ψ = (F₅ × F₈²) / (2H) = (5 × 21²) / 667,776 = 2205 / 667,776 = 3.302005 × 10⁻³
+ψ = (F₅ × F₈²) / (2H) = (5 × 21²) / (2H) = 2205 / (2H)
 ```
 
 ### Planetary Data (JPL DE440)
@@ -70,12 +69,12 @@ All major precession periods derive from the Holistic Year divided by Fibonacci 
 
 | F(n) | Period = H/F(n) | Astronomical meaning |
 |------|-----------------|---------------------|
-| 3 | 111,296 yr | Earth inclination precession |
-| 5 | 66,778 yr | Jupiter perihelion precession |
-| 8 | 41,736 yr | Saturn perihelion precession (retrograde) |
-| 13 | 25,684 yr | Earth axial precession |
-| 21 | 15,899 yr | Beat: axial + obliquity |
-| 34 | 9,820 yr | Beat: axial + ecliptic |
+| 3 | H/3 | Earth inclination precession |
+| 5 | H/5 | Jupiter perihelion precession |
+| 8 | H/8 | Saturn perihelion precession (retrograde) |
+| 13 | H/13 | Earth axial precession |
+| 21 | H/21 | Beat: axial + obliquity |
+| 34 | H/34 | Beat: axial + ecliptic |
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence.
 
@@ -149,9 +148,9 @@ v_j = T_j × e_j × √(m_j / d_j)
 Saturn's retrograde precession creates a closed beat-frequency loop linking the three dominant precession periods:
 
 ```
-Jupiter + Saturn → Axial:       1/66,778 + 1/41,736 = 1/25,684
-Jupiter − Saturn → Earth incl:  1/66,778 − 1/(−41,736) = 1/111,296
-Axial − Earth   → Obliquity:    1/25,684 − 1/111,296 = 1/41,736 → Saturn
+Jupiter + Saturn → Axial:       1/(H/5) + 1/(H/8) = 1/(H/13)
+Jupiter − Saturn → Earth incl:  1/(H/5) − 1/(−H/8) = 1/(H/3)
+Axial − Earth   → Obliquity:    1/(H/13) − 1/(H/3) = 1/(H/8) → Saturn
 ```
 
 Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, H/3). The loop closes because the Fibonacci recurrence `F(n) + F(n+1) = F(n+2)` maps directly to beat frequencies: `1/H(n) + 1/H(n+1) = 1/H(n+2)`.
@@ -186,16 +185,16 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 
 ### Precession Periods
 
-| Planet | Precession Period (years) | Expression |
-|--------|--------------------------|------------|
-| Mercury | 242,828 | 8H/11 |
-| Venus | 667,776 | 2H |
-| Earth | 111,296 | H/3 |
-| Mars | 77,051 | 3H/13 |
-| Jupiter | 66,778 | H/5 |
-| Saturn | −41,736 | −H/8 (retrograde) |
-| Uranus | 111,296 | H/3 |
-| Neptune | 667,776 | 2H |
+| Planet | Expression |
+|--------|------------|
+| Mercury | H / (1+3/8) |
+| Venus | 2H |
+| Earth | H/3 |
+| Mars | H / (4+1/3) |
+| Jupiter | H/5 |
+| Saturn | −H/8 (retrograde) |
+| Uranus | H/3 |
+| Neptune | 2H |
 
 ---
 
@@ -589,7 +588,7 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 
 | Quantity | Expression | Value |
 |----------|-----------|-------|
-| ψ | F₅ × F₈² / (2H) = 5 × 21² / 667,776 | 2205 / 667,776 = 3.302005 × 10⁻³ |
+| ψ | F₅ × F₈² / (2H) = 5 × 21² / (2H) | 2205 / (2H) |
 | d | F₄ | 3 |
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
 | √m | | 1.7329 × 10⁻³ |
@@ -609,20 +608,22 @@ mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
 
 The 3D simulation (`script.js`) uses a slightly different value optimized for the IAU 2006 obliquity rate:
 
-| Parameter | Fibonacci prediction | IAU 2006 optimized | Difference |
-|-----------|---------------------|-------------------|------------|
-| Amplitude | 0.635185° | 0.633849° | 0.001336° (4.8") |
-| Mean | 1.481370° | 1.481592° | 0.000222° (0.8") |
+| Parameter | Fibonacci prediction (ψ formula) | Current model value |
+|-----------|----------------------------------|-------------------|
+| Amplitude | ψ / (d × √m) for Earth | `earthInvPlaneInclinationAmplitude` |
+| Mean | derived from J2000 constraint | `earthInvPlaneInclinationMean` |
 
-The IAU 2006-optimized value was derived by calibrating the model's obliquity rate to match the IAU 2006 precession model (Capitaine et al. 2003), which specifies a rate of −46.836769"/century. In the 3D model, the obliquity depends on `earthInvPlaneInclinationAmplitude` through:
+For current values, see [Constants Reference](10-constants-reference.md).
+
+The model value was derived by calibrating the obliquity rate to match the IAU 2006 precession model (Capitaine et al. 2003), which specifies a rate of −46.836769"/century. In the 3D model, the obliquity depends on `earthInvPlaneInclinationAmplitude` through:
 
 ```
 obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
 ```
 
-where A is the amplitude, phase₃ is the 111,296-year inclination cycle, and phase₈ is the ~25,684-year axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude, so the optimization adjusted the amplitude from the Fibonacci value (0.635185°) downward by 0.001336° to match the observed rate exactly.
+where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is the H/13 axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude.
 
-The Fibonacci prediction (0.635185°) represents the theoretical long-term value from the balance condition, while the IAU 2006-optimized value (0.633849°) is calibrated to the currently observed obliquity rate over recent centuries. The 0.21% difference is within the model's tolerance.
+The Fibonacci prediction (0.635185°) represents the theoretical long-term value from the balance condition, while the model value is calibrated to the currently observed obliquity rate. The difference is within the model's tolerance.
 
 ---
 
@@ -630,8 +631,8 @@ The Fibonacci prediction (0.635185°) represents the theoretical long-term value
 
 ```javascript
 // Fundamental constants
-const H = 333888;
-const PSI = 2205 / (2 * H);  // = 3.302005 × 10⁻³
+const H = 335008; // See Constants Reference for current value
+const PSI = 2205 / (2 * H);  // = 3.291 × 10⁻³
 
 // Fibonacci divisors
 const FIBONACCI_D = {
@@ -817,7 +818,7 @@ npx parcel build src/index.html --no-cache
 
 1. **Fibonacci quantization of inclination amplitudes** — No known physical theory predicts that Fibonacci numbers should appear as divisors in planetary inclination amplitudes. The relationship `d × amplitude × √m = ψ`, with `d` restricted to pure Fibonacci numbers, cannot be derived from Newtonian gravity, general relativity, or Laplace-Lagrange secular perturbation theory.
 
-2. **The universal constant ψ = 2205/(2×333888)** — This value has no known first-principles derivation. The numerator `2205 = 5 × 21²` (a product of Fibonacci numbers) is suggestive of a deeper structure, but no theoretical framework explains it.
+2. **The universal constant ψ = 2205/(2H)** — This value has no known first-principles derivation. The numerator `2205 = 5 × 21²` (a product of Fibonacci numbers) is suggestive of a deeper structure, but no theoretical framework explains it.
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 

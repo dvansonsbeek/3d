@@ -89,7 +89,7 @@ JPL's rates represent **actual gravitational precession** of each planet's orbit
 | **Physical cause** | Reference frame rotation | Gravitational torques |
 | **What moves** | The coordinate system | The orbital plane itself |
 | **Reference frame** | Moving (current) ecliptic | Fixed J2000 ecliptic |
-| **Timescale** | 333,888 year obliquity cycle | 10^4 to 10^7 year precession periods |
+| **Timescale** | H-year obliquity cycle | 10^4 to 10^7 year precession periods |
 
 **Conclusion**: The model and JPL measure fundamentally different effects. They are not directly comparable and should not be expected to match.
 

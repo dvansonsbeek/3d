@@ -2,10 +2,10 @@
 
 ## Overview
 
-The current formulas for tropical year length and day length use a simplified sinusoidal model based on the perihelion cycle (holisticyearLength / 16 = 20,868 years). However, the actual variation is driven by two fundamental orbital parameters:
+The current formulas for tropical year length and day length use a simplified sinusoidal model based on the perihelion cycle (holisticyearLength / 16 = H/16 years). However, the actual variation is driven by two fundamental orbital parameters:
 
-1. **Obliquity** (axial tilt) - varies over the full holisticyear cycle (333,888 years)
-2. **Eccentricity** (orbital shape) - varies over the perihelion cycle (20,868 years)
+1. **Obliquity** (axial tilt) - varies over the full Holistic Year cycle (H years)
+2. **Eccentricity** (orbital shape) - varies over the perihelion cycle (H/16 years)
 
 This document proposes a new approach that derives the tropical year and day length from these underlying physical parameters.
 
@@ -35,8 +35,8 @@ The model can measure the actual tropical year by detecting solstices, which giv
 function computeObliquityEarth(currentYear) {
   const t = currentYear - balancedYear;
 
-  const cycle3 = holisticyearLength / 3;   // 111,296 years
-  const cycle8 = holisticyearLength / 8;   // 41,736 years
+  const cycle3 = holisticyearLength / 3;   // H/3
+  const cycle8 = holisticyearLength / 8;   // H/8
 
   const phase3 = (t / cycle3) * 2 * Math.PI;
   const phase8 = (t / cycle8) * 2 * Math.PI;
@@ -50,10 +50,10 @@ function computeObliquityEarth(currentYear) {
 **Constants:**
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `earthtiltMean` | 23.41398° | Mean obliquity |
-| `earthInvPlaneInclinationAmplitude` | 0.633849° | Amplitude of variation |
-| `holisticyearLength` | 333,888 years | Full holistic cycle |
-| `balancedYear` | -301,340 | Reference year (1246 - 14.5 × 20868) |
+| `earthtiltMean` | See [Constants Reference](10-constants-reference.md) | Mean obliquity |
+| `earthInvPlaneInclinationAmplitude` | See [Constants Reference](10-constants-reference.md) | Amplitude of variation |
+| `holisticyearLength` (H) | See [Constants Reference](10-constants-reference.md) | Full holistic cycle |
+| `balancedYear` | See [Constants Reference](10-constants-reference.md) | Reference year (1246 - 14.5 × H/16) |
 
 **Obliquity range:** ~22.15° to ~24.68° (approximately ±1.27° from mean)
 
@@ -78,9 +78,9 @@ function computeEccentricityEarth(currentYear, balancedYear, perihelionCycleLeng
 **Constants:**
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| `eccentricityBase` | 0.015321 | Base eccentricity |
-| `eccentricityAmplitude` | 0.0014226 | Amplitude of variation |
-| `perihelionCycleLength` | 20,868 years | = holisticyearLength / 16 |
+| `eccentricityBase` | See [Constants Reference](10-constants-reference.md) | Base eccentricity |
+| `eccentricityAmplitude` | See [Constants Reference](10-constants-reference.md) | Amplitude of variation |
+| `perihelionCycleLength` | H/16 years | = holisticyearLength / 16 |
 
 **Eccentricity range:** ~0.0139 to ~0.0167 (approximately)
 
@@ -128,7 +128,7 @@ function computeDayLength(tropicalYear) {
 
 Where:
 - `siderealYearSeconds` = 31558149.645 seconds
-- `precessionCycle` = holisticyearLength / 13 = 25,684 years
+- `precessionCycle` = holisticyearLength / 13 = H/13 years
 
 ## Sample Data Requirements
 
@@ -285,7 +285,7 @@ For each year, output:
 ## Expected Outcomes
 
 1. **Physics-based formulas** that use `o.obliquityEarth` and `o.eccentricityEarth`
-2. **Valid across the entire 333,888 year holisticyear** (not just 20,868 year perihelion cycle)
+2. **Valid across the entire H-year holisticyear** (not just H/16 year perihelion cycle)
 3. **Consistent behavior** where tropical year and day length are properly linked
 4. **Better accuracy** at cycle boundaries where the current simplified formula has errors
 5. **Day length correctly derived** from tropical year rather than independent sinusoid
@@ -306,15 +306,15 @@ The 3D model uses **radians** as the fundamental unit of time, with one solar ye
 ```javascript
 // The mean solar year is rounded to align with the holisticyear cycle:
 const meansolaryearlengthinDays = Math.round(input * (holisticyearLength / 16)) / (holisticyearLength / 16);
-// This yields: 7621874 / 20868 = 365.242188997... days (meansolaryearlengthinDays)
+// This yields: 7647441 / 20938 = 365.242191231... days (meansolaryearlengthinDays)
 
-const meanearthRotationsinDays = meansolaryearlengthinDays + 1;  // = 366.242188997... rotations/year
-const meansiderealyearlengthinDays = meansolaryearlengthinDays * (HY/13) / ((HY/13) - 1);
+const meanearthRotationsinDays = meansolaryearlengthinDays + 1;  // = 366.242191231... rotations/year
+const meansiderealyearlengthinDays = meansolaryearlengthinDays * (H/13) / ((H/13) - 1);
 const meanlengthofday = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
 ```
 
-**Important:** The `meansolaryearlengthinDays` (365.242188997...) is the value actually used in the model. It is derived by rounding to ensure alignment with the holisticyear/16 cycle (20,868 years).
+**Important:** The `meansolaryearlengthinDays` (365.242191231...) is the value actually used in the model. It is derived by rounding to ensure alignment with the H/16 cycle.
 
 ### Time Unit Conversions
 
@@ -362,7 +362,7 @@ To collect comprehensive data, we need a generic measurement system that can det
 | **Sun at 180°** | Sun crosses autumnal equinox direction | Tropical year (AE to AE) | ~365.24 days | Days |
 | **Sun at 270°** | Sun at winter solstice position | Tropical year (WS to WS) | ~365.24 days | Days |
 | **Sun World Angle** | Sun returns to same ICRF position | Sidereal year | ~365.26 days | Days |
-| **Sun-Earth-Wobble Center** | Sun aligned between Earth and wobble center | Precession reference | ~25,684 years | Years |
+| **Sun-Earth-Wobble Center** | Sun aligned between Earth and wobble center | Precession reference | ~H/13 years | Years |
 | **Sun-Earth-Perihelion** | Sun aligned between Earth and perihelion point | Anomalistic year | ~365.26 days | Days |
 | **Meridian-Sun** | Earth meridian aligned with Sun | Mean solar day | ~86,400 sec | Seconds |
 | **Meridian-Star** | Earth meridian aligned with fixed star/vernal point | Sidereal day | ~86,164 sec | Seconds |
@@ -382,7 +382,7 @@ To collect comprehensive data, we need a generic measurement system that can det
 3. **Years** (6 decimal places) for long-cycle measurements:
    - Natural unit for multi-millennia cycles
    - 6 decimals gives ~30 second precision
-   - Range: ~25,684 years
+   - Range: ~H/13 years
 
 ### Generic Measurement Function
 
@@ -667,7 +667,7 @@ The anomalistic year measurement requires understanding the geocentric model str
 
 **The Problem with Earth→Sun Distance:**
 
-In the geocentric model, Earth is NOT stationary at the origin. Earth orbits the `earthWobbleCenter` (fixed at origin) with a period of HY/13 = 25,684 years (clockwise), simulating axial precession. This means measuring the minimum Earth→Sun distance gives an "Earth-Frame Perihelion Interval" that is affected by Earth's wobble position.
+In the geocentric model, Earth is NOT stationary at the origin. Earth orbits the `earthWobbleCenter` (fixed at origin) with a period of H/13 years (clockwise), simulating axial precession. This means measuring the minimum Earth→Sun distance gives an "Earth-Frame Perihelion Interval" that is affected by Earth's wobble position.
 
 **The Solution - Two Reference Frames:**
 
@@ -715,21 +715,20 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
 | Earth-Frame Perihelion Interval (Earth→Sun) | 365.258225538 | -121.86 seconds |
 | Earth-Frame Aphelion Interval | 365.258225575 | -121.86 seconds |
 | IAU anomalistic year (J2000) | 365.259636000 | (reference) |
-| HY/16 Formula prediction | 365.259692337 | +4.87 seconds |
+| H/16 Formula prediction | 365.259692337 | +4.87 seconds |
 
 **Key Findings:**
 
-1. **True Anomalistic Year matches HY/16 formula within 0.01 seconds** - The model's perihelion precession period (HY/16 = 20,868 years) correctly predicts the anomalistic year length.
+1. **True Anomalistic Year matches H/16 formula within 0.01 seconds** - The model's perihelion precession period (H/16 years) correctly predicts the anomalistic year length.
 
-2. **Earth-Frame offset oscillates** - The ~127 second difference between Earth-Frame and True measurements oscillates over the 25,684 year axial precession cycle.
+2. **Earth-Frame offset oscillates** - The ~127 second difference between Earth-Frame and True measurements oscillates over the H/13 year axial precession cycle.
 
 3. **Perihelion and aphelion measurements agree** - Both give identical intervals (to within 0.001 seconds), confirming the detection algorithm works correctly.
 
 **Theoretical Formula:**
 ```
-anomalisticYear = tropicalYear × perihelionPrecessionYears / (perihelionPrecessionYears - 1)
-                = 365.2421890 × 20868 / 20867
-                = 365.259692337 days
+anomalisticYear = tropicalYear × (H/16) / ((H/16) - 1)
+                = meansolaryearlengthinDays × (H/16) / ((H/16) - 1)
 ```
 
 This matches the measured True Anomalistic Year (365.259692495 days) within 0.01 seconds.
@@ -811,7 +810,7 @@ Update in script.js:
 - Match IAU 2000 AD within 0.01 seconds
 - Match 1246 AD reference value
 - Day length = 86400 seconds at 2000 AD
-- Valid across full 333,888 year holisticyear
+- Valid across full H-year holisticyear
 
 ---
 
@@ -936,7 +935,7 @@ The relationship `solarDay = siderealDay × (tropicalYear + 1) / tropicalYear` h
 | **Stellar day** | Time for Earth to rotate 360° relative to fixed stars (ICRF, inertial frame) | ~86164.0997 seconds |
 | **Solar day** | Time for Sun to return to same position in sky | ~86400 seconds |
 
-The stellar day is ~9.16ms longer than the sidereal day due to axial precession. As the vernal equinox precesses westward over the 25,684 year cycle, Earth must rotate slightly less than 360° in inertial space to complete one rotation relative to the precessing equinox.
+The stellar day is ~9.16ms longer than the sidereal day due to axial precession. As the vernal equinox precesses westward over the H/13 year cycle, Earth must rotate slightly less than 360° in inertial space to complete one rotation relative to the precessing equinox.
 
 The `siderealNoonForJD()` function measures the sidereal day by tracking `earth.planetObj.rotation.y`.
 The `stellarNoonMethodA/B/C()` functions measure the stellar day using three independent methods.
@@ -991,7 +990,7 @@ Extracts the Y-rotation component directly from Earth's world transformation mat
 #### Method C: Mathematical Derivation
 Derives the stellar day from the sidereal day using the precession period:
 ```
-precessionPeriodYears = holisticyearLength / 13 = 25,683.692 years
+precessionPeriodYears = holisticyearLength / 13 = H/13 years
 rotationsPerYear = meansolaryearlengthinDays + 1 = 366.242189
 stellarDayFactor = 1 + 1 / (precessionPeriodYears × rotationsPerYear)
 stellarDay = siderealDay × stellarDayFactor
@@ -1000,7 +999,7 @@ stellarDay = siderealDay × stellarDayFactor
 | Metric | Value |
 |--------|-------|
 | Sidereal day (input) | 86164.090517 seconds |
-| Precession period | 25,683.692 years |
+| Precession period | H/13 years |
 | Stellar day factor | 1.000000106 |
 | **Stellar day** | **86164.099675 seconds** |
 
@@ -1047,11 +1046,11 @@ These values are determined by the model's fundamental constants and do not chan
 |----------|-------|---------------|
 | **Sidereal day** | 86164.090517 seconds | `meansolaryearlengthinDays / (meansolaryearlengthinDays + 1) × 86400` |
 | **Stellar day** | 86164.099675 seconds | `siderealDay × (1 + 1/(precessionPeriod × rotationsPerYear))` |
-| **Stellar - Sidereal difference** | +9.158 ms | Precession period (HY/13 = 25,683.7 years) |
+| **Stellar - Sidereal difference** | +9.158 ms | Precession period (H/13 years) |
 | **Mean solar day** (yearly average) | 86399.988589 seconds | `meansiderealyearlengthinSeconds / meansiderealyearlengthinDays` |
 | **Sidereal year** | 365.256359512 days | Orbital period in inertial frame (measured 1990-2010) |
-| **Anomalistic year** | 365.259692495 days | Perihelion-to-perihelion (HY/16 cycle) |
-| **Sidereal - Tropical difference** | 1224.39 seconds | Precession period (HY/13) |
+| **Anomalistic year** | 365.259692495 days | Perihelion-to-perihelion (H/16 cycle) |
+| **Sidereal - Tropical difference** | 1224.39 seconds | Precession period (H/13) |
 
 **Why these are constant:**
 - They measure pure rotations or orbital returns in inertial (ICRF) reference frames
@@ -1060,15 +1059,15 @@ These values are determined by the model's fundamental constants and do not chan
 
 ### Time-Varying Values (Change Over Perihelion Cycle)
 
-These values vary over the perihelion precession cycle (HY/16 = 20,868 years):
+These values vary over the perihelion precession cycle (H/16 years):
 
 | Quantity | Variation Period | Cause |
 |----------|------------------|-------|
-| **Cardinal point tropical years** (VE, SS, AE, WS) | 20,868 years | Perihelion precession through seasons |
-| **Mean tropical year** | 20,868 years (and HY) | Obliquity + eccentricity interaction |
-| **Solar day longest/shortest dates** | 20,868 years | Equation of time pattern shifts with perihelion |
-| **Obliquity** | 333,888 years (HY) | Full holisticyear cycle |
-| **Eccentricity** | 20,868 years | Perihelion cycle (HY/16) |
+| **Cardinal point tropical years** (VE, SS, AE, WS) | H/16 years | Perihelion precession through seasons |
+| **Mean tropical year** | H/16 years (and H) | Obliquity + eccentricity interaction |
+| **Solar day longest/shortest dates** | H/16 years | Equation of time pattern shifts with perihelion |
+| **Obliquity** | H years | Full holisticyear cycle |
+| **Eccentricity** | H/16 years | Perihelion cycle |
 
 ### Cardinal Point Year Lengths: Current vs Shifted Perihelion
 
@@ -1114,11 +1113,11 @@ The tropical year measured from each cardinal point depends on where perihelion 
 ```javascript
 // Perihelion longitude (degrees from vernal equinox, 0-360°)
 // At year 1246: perihelion ≈ 282° (early January, ~12 days after WS)
-// Precesses at rate: 360° / 20868 years = 0.01725°/year
+// Precesses at rate: 360° / (H/16) years
 
 function perihelionLongitude(year) {
   const balancedYear = 1246;
-  const perihelionCycle = holisticyearLength / 16;  // 20,868 years
+  const perihelionCycle = holisticyearLength / 16;  // H/16 years
   const perihelionAtBalanced = 282;  // degrees from VE at year 1246
 
   return (perihelionAtBalanced + (year - balancedYear) * 360 / perihelionCycle) % 360;
@@ -1169,7 +1168,7 @@ function meanTropicalYear(year) {
   const k_ecc = 0;       // Effect of eccentricity deviation
   const k_obl_ecc = 0;   // Interaction term
 
-  const Δobl = obliquity - 23.41398;      // earthtiltMean
+  const Δobl = obliquity - earthtiltMean;
   const Δecc = eccentricity - eccentricityDerivedMean;   // √(eccentricityBase² + eccentricityAmplitude²)
 
   return baseTropical + k_obl * Δobl + k_ecc * Δecc + k_obl_ecc * Δobl * Δecc;
@@ -1214,7 +1213,7 @@ const siderealDay = meansolaryearlengthinDays / (meansolaryearlengthinDays + 1) 
 // = 86164.090532 seconds
 
 // Stellar day (constant)
-const precessionPeriod = holisticyearLength / 13;  // 25,683.7 years
+const precessionPeriod = holisticyearLength / 13;  // H/13 years
 const rotationsPerYear = meansolaryearlengthinDays + 1;
 const stellarDayFactor = 1 + 1 / (precessionPeriod * rotationsPerYear);
 const stellarDay = siderealDay * stellarDayFactor;
@@ -1249,7 +1248,7 @@ const meanSolarDay = meansiderealyearlengthinSeconds / meansiderealyearlengthinD
    - Match IAU 2000 AD within 0.01 seconds
    - Match 1246 AD reference value
    - Day length = 86400 seconds at 2000 AD
-   - Valid across full 333,888 year holisticyear
+   - Valid across full H-year holisticyear
 
 ### ✅ Recently Completed
 
@@ -1292,7 +1291,7 @@ const meanSolarDay = meansiderealyearlengthinSeconds / meansiderealyearlengthinD
    - **Method B (World Matrix Y-Rotation):** Extracts Y-rotation via Euler decomposition from world matrix
    - **Method C (Mathematical Derivation):** Derives from sidereal day using precession factor
    - All three methods agree: **86164.099675 seconds** (9.158ms longer than sidereal day)
-   - The stellar-sidereal difference matches the model's precession period (HY/13 = 25,683.7 years)
+   - The stellar-sidereal difference matches the model's precession period (H/13 years)
    - GUI button: "Analyze Stellar Day"
 
 7. **Sidereal Day Analysis Update** (January 2026)
@@ -1329,7 +1328,7 @@ Comprehensive alignment analysis for years 1990-2010 confirms excellent model ac
 
 ## Step 5 Results: Collected Sample Data (One Full Perihelion Cycle)
 
-Data was collected at 9 key years spanning from 1000 AD to 22000 AD, covering one complete perihelion precession cycle (~20,868 years). This provides comprehensive validation of which quantities are constant vs. time-varying.
+Data was collected at 9 key years spanning from 1000 AD to 22000 AD, covering one complete perihelion precession cycle (~H/16 years). This provides comprehensive validation of which quantities are constant vs. time-varying.
 
 ### Complete Data Collection Table
 
@@ -1400,7 +1399,7 @@ The mean solar day shows a small cyclical variation (~±2ms amplitude) tied to t
 | ~17100 AD | 270° | ~86399.989 s | Midpoint (rising) |
 | ~22100 AD | 360° | ~86399.991 s | Return to peak high |
 
-**Total variation:** ~4-5 ms peak-to-peak over the 20,868-year perihelion cycle.
+**Total variation:** ~4-5 ms peak-to-peak over the H/16-year perihelion cycle.
 
 **Why the variation occurs:** The mean solar day measurement uses the Earth-wobble-center frame (which simulates axial precession). As perihelion precesses through the seasons, the interaction between Earth's orbital eccentricity and the measurement reference frame causes small systematic variations in the averaged solar day length.
 
@@ -1418,7 +1417,7 @@ The dates of longest/shortest solar days shift with perihelion precession:
 
 At year 13000 (perihelion in July), the equation of time pattern is shifted ~180 days compared to year 2000. The longest solar days occur in June instead of December, and the shortest days occur in March instead of September.
 
-### 2. CONFIRMED CYCLICAL Values (Perihelion Cycle = 20,868 years)
+### 2. CONFIRMED CYCLICAL Values (Perihelion Cycle = H/16 years)
 
 #### Cardinal Point Tropical Year Pattern Rotation
 
@@ -1432,7 +1431,7 @@ The cardinal point tropical years follow a sinusoidal pattern that completes one
 | ~17100 | VE | AE | October (near AE) |
 | 22000 | SS (-23.2s) | WS (+23.1s) | January (returned) |
 
-**Pattern confirmed:** At year 22000 (one full perihelion cycle from ~1130 AD), the pattern has returned to SS shortest / WS longest, validating the 20,868-year cycle.
+**Pattern confirmed:** At year 22000 (one full perihelion cycle from ~1130 AD), the pattern has returned to SS shortest / WS longest, validating the H/16-year cycle.
 
 #### Sidereal Year - Unexpected Cyclical Variation
 
@@ -1476,7 +1475,7 @@ The cardinal point years follow a sinusoidal pattern:
 
 ```javascript
 function cardinalTropicalYear(year, cardinalPoint) {
-  const PERIHELION_CYCLE = 20868;  // HY/16
+  const PERIHELION_CYCLE = holisticyearLength / 16;  // H/16
   const MEAN_TROPICAL = 365.242189;  // days
   const AMPLITUDE = 0.000262;  // days (~22.6 seconds)
 
@@ -1507,7 +1506,7 @@ The sidereal year follows a sinusoidal pattern with the perihelion cycle:
 
 ```javascript
 function siderealYear(year) {
-  const PERIHELION_CYCLE = 20868;  // HY/16
+  const PERIHELION_CYCLE = holisticyearLength / 16;  // H/16
   const MEAN_SIDEREAL = 365.256408;  // days (mean value at phase 90°/270°)
   const AMPLITUDE = 0.000049;  // days (~4.2 seconds half-amplitude)
   const PEAK_LOW_YEAR = 1246;  // balanced year = peak low (0° phase)
@@ -1583,18 +1582,18 @@ The small residual differences (~0.5-0.8 seconds) are within measurement precisi
 
 | Quantity | Period | Amplitude | Driver |
 |----------|--------|-----------|--------|
-| Cardinal tropical years | 20,868 y | ±22.6 s | Perihelion position relative to seasons |
-| Sidereal year | 20,868 y | ±4.2 s | Perihelion precession effect on Sun position |
-| Mean tropical year | 20,868 y | ±1.0 s | Average of cardinal point variations |
-| Mean solar day | 20,868 y | ±2 ms | Earth-wobble-center frame interaction |
-| Equation of time dates | 20,868 y | ±180 days | Longest/shortest day calendar dates shift |
+| Cardinal tropical years | H/16 y | ±22.6 s | Perihelion position relative to seasons |
+| Sidereal year | H/16 y | ±4.2 s | Perihelion precession effect on Sun position |
+| Mean tropical year | H/16 y | ±1.0 s | Average of cardinal point variations |
+| Mean solar day | H/16 y | ±2 ms | Earth-wobble-center frame interaction |
+| Equation of time dates | H/16 y | ±180 days | Longest/shortest day calendar dates shift |
 
 ### Long-Cycle (Use Formulas with Holistic Year)
 
 | Quantity | Period | Amplitude | Driver |
 |----------|--------|-----------|--------|
-| Obliquity | 333,888 y | ±1.27° | Full holistic year cycle |
-| Eccentricity | 20,868 y | ±0.0014 | Perihelion cycle |
+| Obliquity | H y | ±1.27° | Full holistic year cycle |
+| Eccentricity | H/16 y | ±0.0014 | Perihelion cycle |
 
 ---
 
@@ -1611,7 +1610,7 @@ The sidereal year was measured using four independent methods to understand the 
 | **C** | Sun→Earth | Inverse measurement from Sun perspective (Earth-frame) |
 | **D** | Sun→WobbleCenter | Inverse measurement from Sun to fixed wobble center |
 
-Methods A, B, and D all measure from **fixed reference points** (origin or wobble center), providing "wobble-free" measurements. Method C measures from the **Earth's position**, which includes the Earth-wobble effect (Earth orbits the wobble center over the 25,684-year precession cycle).
+Methods A, B, and D all measure from **fixed reference points** (origin or wobble center), providing "wobble-free" measurements. Method C measures from the **Earth's position**, which includes the Earth-wobble effect (Earth orbits the wobble center over the H/13 year precession cycle).
 
 ### Raw Data: Four Methods at Three Epochs
 
@@ -1640,24 +1639,24 @@ The 1.748-second offset can be derived exactly from first principles using the m
 **The Setup:**
 
 In the geocentric model, Earth orbits around a fixed "wobble center" (at the origin) with:
-- Wobble radius: `r = eccentricityAmplitude = 0.0014226 AU`
-- Wobble period: `T_wobble = HY/13 = 333,888/13 = 25,683.69 years` (axial precession)
+- Wobble radius: `r = eccentricityAmplitude` (see [Constants Reference](10-constants-reference.md))
+- Wobble period: `T_wobble = H/13 years` (axial precession)
 - Sun distance: `D = 1 AU`
 - Sidereal year: `T_sidereal = 365.2564 days = 31,558,150 seconds`
 
 **The Physics:**
 
-When measuring the Sun's angular position from Earth instead of from the fixed wobble center, there is a parallax effect. The wobble displacement vector rotates slowly (one revolution per 25,684 years), which causes an apparent angular velocity difference in the Sun's motion.
+When measuring the Sun's angular position from Earth instead of from the fixed wobble center, there is a parallax effect. The wobble displacement vector rotates slowly (one revolution per H/13 years), which causes an apparent angular velocity difference in the Sun's motion.
 
 The angular velocity of the wobble is:
 ```
-ω_wobble = 2π / T_wobble = 2π / 25,683.69 radians/year
+ω_wobble = 2π / T_wobble = 2π / (H/13) radians/year
 ```
 
 The wobble displacement creates a parallax angle proportional to `r/D`. As the wobble rotates, this parallax changes, adding an effective angular velocity contribution to the Sun's apparent motion when viewed from Earth:
 
 ```
-Δω = (r/D) × ω_wobble = (0.0014226 / 1) × (2π / 25,683.69) radians/year
+Δω = (r/D) × ω_wobble = (eccentricityAmplitude / 1) × (2π / (H/13)) radians/year
 ```
 
 **The Calculation:**
@@ -1666,8 +1665,7 @@ The extra time needed for the Sun to complete a full 360° from Earth's perspect
 
 ```
 ΔT = (r/D) × (T_sidereal / T_wobble) × T_sidereal
-   = (0.0014226 / 1) × (1 / 25,683.69) × 31,558,150 seconds
-   = 0.0014226 × 3.894 × 10⁻⁵ × 31,558,150 seconds
+   = (eccentricityAmplitude / 1) × (1 / (H/13)) × 31,558,150 seconds
    = 1.748 seconds
 ```
 
@@ -1675,9 +1673,9 @@ The extra time needed for the Sun to complete a full 360° from Earth's perspect
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| r (wobble radius) | 0.0014226 AU | `eccentricityAmplitude` in script.js |
+| r (wobble radius) | `eccentricityAmplitude` | See [Constants Reference](10-constants-reference.md) |
 | D (Sun distance) | 1 AU | Mean orbital radius |
-| T_wobble | 25,683.69 years | `HY/13 = 333,888/13` |
+| T_wobble | H/13 years | Axial precession period |
 | T_sidereal | 31,558,150 s | IAU sidereal year |
 | **Calculated ΔT** | **1.748 s** | Formula above |
 | **Measured (C-D)** | **1.748 s** | Model measurement |
@@ -1689,7 +1687,7 @@ The 1.748-second offset is a **geometric consequence** of measuring from a movin
 This offset is:
 - **Constant** across all epochs (the wobble geometry doesn't change)
 - **Always positive** (Earth-frame sidereal year is always longer)
-- **Independent of perihelion position** (not affected by the 20,868-year perihelion cycle)
+- **Independent of perihelion position** (not affected by the H/16-year perihelion cycle)
 
 ### Key Finding 2: The ~8.5s Variation is Real (Not a Wobble Artifact)
 
@@ -1708,7 +1706,7 @@ The cyclical variation appears **equally in ALL methods**:
 | Quantity | Value | Character |
 |----------|-------|-----------|
 | Wobble parallax offset (C-D) | +1.75 s | **CONSTANT** |
-| Sidereal year cyclical variation | ±4.2 s | **CYCLICAL** (20,868-year period) |
+| Sidereal year cyclical variation | ±4.2 s | **CYCLICAL** (H/16-year period) |
 | Sidereal year at 2000 (Earth-frame, Method C) | 365.256379769 d | +1.45s from IAU |
 | Sidereal year at 2000 (wobble-free, Method A/B/D) | 365.256359537 d | -0.30s from IAU |
 
@@ -1769,7 +1767,7 @@ The ~11.4ms/day offset is **not an error** - it is a real physical effect of per
 **The math:**
 ```
 11.4 ms/day × 365.24 days/year = 4.16 seconds/year
-4.16 s/year × 20,868 years = 86,812 seconds ≈ 1.005 days
+4.16 s/year × H/16 years = 86,812 seconds ≈ 1.005 days
 ```
 
 **One extra day over one perihelion cycle.**
@@ -1779,9 +1777,9 @@ The ~11.4ms/day offset is **not an error** - it is a real physical effect of per
 Let's verify this relationship from first principles:
 
 ```
-Perihelion cycle: 20,868 years
+Perihelion cycle: H/16 years
 Days per year: 365.242189
-Total days in one perihelion cycle: 20,868 × 365.242189 = 7,622,683.4 days
+Total days in one perihelion cycle: (H/16) × 365.242189 days
 
 If perihelion precession adds 1 extra day over this cycle:
 Extra time per day = 86400 s / 7,622,683.4 days = 0.01134 s = 11.34 ms
@@ -1791,7 +1789,7 @@ This matches the observed **11.4 ms** almost exactly.
 
 ### Physical Interpretation
 
-As perihelion slowly precesses around Earth's orbit (completing one circuit in 20,868 years):
+As perihelion slowly precesses around Earth's orbit (completing one circuit in H/16 years):
 
 1. **The Sun's apparent path through the sky shifts slightly each year** relative to the fixed stars
 2. **The relationship between tropical year and solar day evolves** - the Sun needs to travel slightly further (or less) to return to the same hour angle
@@ -1822,7 +1820,7 @@ The perihelion precession contribution to solar day length:
 
 ```javascript
 // Perihelion precession adds 1 day per perihelion cycle
-const PERIHELION_CYCLE_YEARS = 20868;  // HY/16
+const PERIHELION_CYCLE_YEARS = holisticyearLength / 16;  // H/16
 const DAYS_PER_CYCLE = PERIHELION_CYCLE_YEARS * 365.242189;
 const EXTRA_TIME_PER_DAY = 86400 / DAYS_PER_CYCLE;  // = 0.01134 seconds = 11.34 ms
 
@@ -1836,7 +1834,7 @@ This explains why Methods A and D consistently measure ~86399.989s rather than 8
 
 ## Implemented Formulas (January 2026)
 
-The following formulas have been implemented and verified in `script.js`. All use the perihelion cycle (HY/16 = 20,868 years) with phase referenced to the balanced year (1246 AD = 180° phase, half-cycle point).
+The following formulas have been implemented and verified in `script.js`. All use the perihelion cycle (H/16 years) with phase referenced to the balanced year (1246 AD = 180° phase, half-cycle point).
 
 ### Formula Constants (Legacy - see updated formulas below)
 
@@ -1990,9 +1988,9 @@ Tropical Year = meansolaryearlengthinDays - (k / meanlengthofday) × (obliquity 
 Where:
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `meansolaryearlengthinDays` | 365.242188997508 | Mean tropical year (days) |
-| `meanlengthofday` | 86399.98848 | Mean solar day (seconds) |
-| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `meansolaryearlengthinDays` | See [Constants Reference](10-constants-reference.md) | Mean tropical year (days) |
+| `meanlengthofday` | See [Constants Reference](10-constants-reference.md) | Mean solar day (seconds) |
+| `earthtiltMean` | See [Constants Reference](10-constants-reference.md) | Mean obliquity |
 | `k` | 2.3 | Obliquity coefficient (seconds/degree) |
 
 ### Derivation of Coefficient k
@@ -2029,10 +2027,10 @@ Example with cell references:
 ```
 
 Where:
-- `$A$1` = meansolaryearlengthinDays (365.242188997508)
-- `$BH$3` = meanlengthofday (86399.98848)
+- `$A$1` = `meansolaryearlengthinDays`
+- `$BH$3` = `meanlengthofday`
 - `W264` = current obliquity
-- `$U$3` = earthtiltMean (23.41398)
+- `$U$3` = `earthtiltMean`
 
 ### Verification
 
@@ -2044,7 +2042,7 @@ Where:
 | 6463 | 22.834282 | 365.242203085 | 365.242204411 | 0.11 s |
 | 11680 | 22.537552 | 365.242212291 | 365.242212306 | 0.00 s |
 
-The formula matches the model within ~0.2 seconds across the full 20,868-year perihelion cycle.
+The formula matches the model within ~0.2 seconds across the full H/16-year perihelion cycle.
 
 ### Physical Interpretation
 
@@ -2188,10 +2186,10 @@ The model is built on these fundamental constants:
 | Constant | Value | Description |
 |----------|-------|-------------|
 | `meansiderealyearlengthinSeconds` | 31,558,149.724 s | **Fixed** orbital period in SI seconds (calibrated to precession) |
-| `meansolaryearlengthinDays` | 365.242188997508 days | Mean tropical year |
-| `meansiderealyearlengthinDays` | 365.256410333209 days | Mean sidereal year |
-| `meanlengthofday` | 86,399.98848 s | Mean solar day (derived) |
-| `earthtiltMean` | 23.41398° | Mean obliquity |
+| `meansolaryearlengthinDays` | See [Constants Reference](10-constants-reference.md) | Mean tropical year |
+| `meansiderealyearlengthinDays` | See [Constants Reference](10-constants-reference.md) | Mean sidereal year |
+| `meanlengthofday` | See [Constants Reference](10-constants-reference.md) | Mean solar day (derived) |
+| `earthtiltMean` | See [Constants Reference](10-constants-reference.md) | Mean obliquity |
 | `eccentricityDerivedMean` | √(eₘ² + a²) | Derived mean eccentricity |
 | `meansiderealyearAmplitudeinSecondsaDay` | 3208 | Eccentricity coefficient (calibrated to J2000 precession = 25,771.57 years) |
 
@@ -2311,12 +2309,12 @@ const lengthofDay = meansiderealyearlengthinSeconds / siderealYear;  // seconds
 
 ### Variation Ranges
 
-Over one perihelion cycle (20,868 years):
+Over one perihelion cycle (H/16 years):
 
 | Quantity | Mean Value | Variation | Depends On |
 |----------|------------|-----------|------------|
-| Obliquity | 23.41398° | ±1.08° | H/3 and H/8 cycles |
-| Eccentricity | 0.015321 | ±0.00142 | H/16 cycle |
+| Obliquity | `earthtiltMean` | ±1.08° | H/3 and H/8 cycles |
+| Eccentricity | `eccentricityBase` | ±`eccentricityAmplitude` | H/16 cycle |
 | Tropical Year | 365.242189 days | ±2.5 s | Obliquity |
 | Sidereal Year (days) | 365.256410 days | ±4.4 s | Eccentricity |
 | Sidereal Year (seconds) | 31,558,149.724 s | **0** (constant) | - |
@@ -2352,14 +2350,14 @@ The **anomalistic year** is the time between successive perihelia (closest appro
 The perihelion precession combines **apsidal** and **axial** precession:
 
 ```
-1/(HY/16) = 1/(HY/3) + 1/(HY/13)
-   16/HY  =    3/HY  +   13/HY
+1/(H/16) = 1/(H/3) + 1/(H/13)
+   16/H  =    3/H  +   13/H
 ```
 
 Where:
-- **HY/3 = 111,296 years** - Apsidal precession (perihelion advance in inertial frame)
-- **HY/13 = 25,684 years** - Axial precession (equinox regression)
-- **HY/16 = 20,868 years** - Perihelion precession (combined effect)
+- **H/3** - Apsidal precession (perihelion advance in inertial frame)
+- **H/13** - Axial precession (equinox regression)
+- **H/16** - Perihelion precession (combined effect)
 
 ### The Apsidal Correction Factors
 
@@ -2509,11 +2507,11 @@ The anomalistic year has a very small eccentricity variation (~0.12 seconds) com
 
 ### Summary
 
-| Year Type | Primary Driver | HY Fraction | Correction Factor |
+| Year Type | Primary Driver | H Fraction | Correction Factor |
 |-----------|---------------|-------------|-------------------|
-| Tropical | Obliquity | HY/3, HY/8 | None |
-| Sidereal | Eccentricity | HY/16 | None |
-| **Anomalistic** | **Perihelion precession** | **HY/16** | **13/3 and 16/3** |
+| Tropical | Obliquity | H/3, H/8 | None |
+| Sidereal | Eccentricity | H/16 | None |
+| **Anomalistic** | **Perihelion precession** | **H/16** | **13/3 and 16/3** |
 
 The anomalistic year requires a three-step calculation:
 1. **Raw days** from eccentricity (coefficient -6)
@@ -2573,14 +2571,14 @@ The anomalistic year has a very small eccentricity variation (~0.12 seconds) com
 
 ### Summary
 
-| Year Type | Primary Driver | HY Fraction | Correction Factor |
+| Year Type | Primary Driver | H Fraction | Correction Factor |
 |-----------|---------------|-------------|-------------------|
-| Tropical | Obliquity | HY/3, HY/8 | None |
-| Sidereal | Eccentricity | HY/16 | None |
-| **Anomalistic** | **Perihelion precession** | **HY/16** | **13/3 and 16/3** |
+| Tropical | Obliquity | H/3, H/8 | None |
+| Sidereal | Eccentricity | H/16 | None |
+| **Anomalistic** | **Perihelion precession** | **H/16** | **13/3 and 16/3** |
 
 The anomalistic year requires an apsidal correction using the factors 13/3 and 16/3, which represent the ratios of axial and perihelion precession rates to the fundamental apsidal rate. This correction ensures the calculated value matches the IAU reference with no accumulated drift.
 
 ---
 
-*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the 20,868-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3208 (calibrated to J2000 precession period of 25,771.57 years). Added Anomalistic Year Formula section documenting the apsidal correction using 13/3 and 16/3 factors to match IAU reference value.*
+*Document updated: January 2026 - Added sidereal year four-methods analysis confirming that wobble parallax is constant (+1.75s) while the ~8.5s cyclical variation is a real model effect. Updated sidereal year formula with correct phase alignment: 1246 AD = peak low, 11680 AD = peak high. Added calibration approach to achieve mean LOD = 86400s. Added Key Discovery section explaining that the 11.4ms solar day offset is correct behavior (sinusoidal, not constant) - perihelion precession adds exactly 1 extra day over the H/16-year cycle. Added Implemented Formulas section documenting all corrected formulas in script.js. Updated constants: meansiderealyearlengthinSeconds = 31,558,149.724 s, meansiderealyearAmplitudeinSecondsaDay = 3208 (calibrated to J2000 precession period of 25,771.57 years). Added Anomalistic Year Formula section documenting the apsidal correction using 13/3 and 16/3 factors to match IAU reference value.*

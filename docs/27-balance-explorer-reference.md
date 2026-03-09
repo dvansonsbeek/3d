@@ -35,14 +35,14 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  ┌────────┬──────────┬────────┬────┬────────────┬─────┬───────┐  │
 │  │ Planet │ Phase(γ) │ Ω J2000│ d  │ Period(yr) │ Dir │ Trend │  │
 │  ├────────┼──────────┼────────┼────┼────────────┼─────┼───────┤  │
-│  │ Mercury│ [▼ 203°] │ 32.83  │[▼] │ 242828     │ PRO │ +0.53 │  │
-│  │ Venus  │ [▼ 203°] │ 54.70  │[▼] │ 667776     │ PRO │ +0.19 │  │
-│  │ Earth🔒│  203°    │ 284.51 │ 3  │ 111296     │ PRO │ +1.16 │  │
-│  │ Mars   │ [▼ 203°] │ 354.87 │[▼] │ 77051      │ PRO │ +1.68 │  │
-│  │ Jupiter│ [▼ 203°] │ 312.89 │[▼] │ 66778      │ PRO │ +1.94 │  │
-│  │ Saturn │ [▼  23°] │ 118.81 │[▼] │ -41736     │ RET │ -3.11 │  │
-│  │ Uranus │ [▼ 203°] │ 307.80 │[▼] │ 111296     │ PRO │ +1.16 │  │
-│  │ Neptune│ [▼ 203°] │ 192.04 │[▼] │ 667776     │ PRO │ +0.19 │  │
+│  │ Mercury│ [▼ 203°] │ 32.83  │[▼] │ H×8/11     │ PRO │ +0.53 │  │
+│  │ Venus  │ [▼ 203°] │ 54.70  │[▼] │ H×2        │ PRO │ +0.19 │  │
+│  │ Earth🔒│  203°    │ 284.51 │ 3  │ H/3        │ PRO │ +1.16 │  │
+│  │ Mars   │ [▼ 203°] │ 354.87 │[▼] │ H×3/13     │ PRO │ +1.68 │  │
+│  │ Jupiter│ [▼ 203°] │ 312.89 │[▼] │ H/5        │ PRO │ +1.94 │  │
+│  │ Saturn │ [▼  23°] │ 118.81 │[▼] │ -H/8       │ RET │ -3.11 │  │
+│  │ Uranus │ [▼ 203°] │ 307.80 │[▼] │ H/3        │ PRO │ +1.16 │  │
+│  │ Neptune│ [▼ 203°] │ 192.04 │[▼] │ H×2        │ PRO │ +0.19 │  │
 │  └────────┴──────────┴────────┴────┴────────────┴─────┴───────┘  │
 │                                                                  │
 │  BALANCE RESULTS                                                 │
@@ -64,7 +64,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  Incl: Σ203°=X  Σ23°=Y  →  99.9998%  ✓                           │
 │  Ecc:  Σ203°=X  Σ23°=Y  →  99.88%    ✓                           │
 │  LL: 8/8 pass | Dir: 7/7 match                                   │
-│  ψ = 2205 / (2 × 333888) = 3.302005e-3                           │
+│  ψ = 2205 / (2 × H) = 3.291e-3                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -176,7 +176,7 @@ Below the results table:
 - **Inclination verification**: Sum of 203° group weights, sum of 23° group weights, balance percentage, pass/fail indicator
 - **Eccentricity verification**: Same format for eccentricity weights
 - **Status line**: Count of LL bounds passes (out of 8) and direction matches (out of 7, Earth excluded)
-- **ψ formula**: `ψ = 2205 / (2 × 333888) = 3.302005 × 10⁻³`
+- **ψ formula**: `ψ = 2205 / (2 × H)` (see [Constants Reference](10-constants-reference.md) for current value)
 - **Explanatory text**: Brief description of the TNO margin (~0.006%, ~1.25 arcseconds) and balance conditions
 
 ---
@@ -262,7 +262,7 @@ These are read from the model's orbital element constants and cannot be changed 
 | Ascending node | Ω_J2000 | Longitude of ascending node on invariable plane at J2000 | Souami & Souchay (2012), verified |
 | JPL trend | trend_JPL | Observed ecliptic inclination trend (°/century) | JPL ephemerides |
 | LL bounds | LL_min, LL_max | Laplace-Lagrange secular theory inclination bounds | Secular perturbation theory |
-| Holistic Year | H | 333,888 years — used to derive ψ | Model calibration |
+| Holistic Year | H | See [Constants Reference](10-constants-reference.md) — used to derive ψ | Model calibration |
 
 ### User-Adjustable Parameters (per planet)
 
@@ -356,8 +356,8 @@ Computes the apparent change in ecliptic inclination over 1900–2100 by compari
 amplitude = ψ / (d × √m)
 
 Where:
-  ψ = 2205 / (2 × H) = 3.302005 × 10⁻³
-  H = 333,888 years (Holistic Year)
+  ψ = 2205 / (2 × H)
+  H = Holistic Year (see Constants Reference for current value)
   d = Fibonacci divisor
   m = planet mass in solar units
 ```

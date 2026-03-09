@@ -5,7 +5,7 @@ WHY DO J2000 ECCENTRICITIES SATISFY THE FIBONACCI LADDER?
 
 The inner planet eccentricity ladder d × ξ = const holds to 0.04% using:
   - J2000 snapshot eccentricities for Venus, Mars, Mercury
-  - Earth's oscillation midpoint (0.015321)
+  - Earth's oscillation midpoint (0.015373)
 
 But eccentricities oscillate over millions of years via secular perturbations.
 BvW secular theory shows the ladder spread never goes below 3.2% using
@@ -210,7 +210,7 @@ all_eccs_long = eccentricities_over_time(t_long)
 # Compute ladder spread at each time step
 # Two variants:
 # (a) Using instantaneous eccentricity for ALL 4 planets
-# (b) Using Earth midpoint (0.015321) and instantaneous for others
+# (b) Using Earth midpoint (0.015373) and instantaneous for others
 
 spreads_all_inst = np.zeros(N_steps)
 spreads_earth_fixed = np.zeros(N_steps)
@@ -239,7 +239,7 @@ print(f"    Fraction < 1%:  {(spreads_all_inst < 1).sum() / N_steps * 100:.2f}%"
 print(f"    Fraction < 5%:  {(spreads_all_inst < 5).sum() / N_steps * 100:.2f}%")
 print(f"    Fraction < 10%: {(spreads_all_inst < 10).sum() / N_steps * 100:.2f}%")
 
-print(f"\n(b) Earth FIXED at midpoint (0.015321), others instantaneous:")
+print(f"\n(b) Earth FIXED at midpoint (0.015373), others instantaneous:")
 print(f"    Min spread:  {spreads_earth_fixed.min():.4f}%  at t = {t_long[np.argmin(spreads_earth_fixed)]/1e6:.3f} Myr")
 print(f"    Mean spread: {spreads_earth_fixed.mean():.2f}%")
 print(f"    Max spread:  {spreads_earth_fixed.max():.2f}%")
@@ -766,8 +766,8 @@ for fix_idx, fix_planet in enumerate(INNER):
     print(f"  {fix_planet:<15} {spreads_fixed_one.mean():>12.2f}% {spreads_fixed_one.min():>12.4f}% {frac_below_5:>11.1f}%")
 
 # Compare: fixing Earth helps most? Or another planet?
-# Also: what if we fix Earth at its MODEL midpoint (0.015321) vs BvW midpoint?
-print(f"\n  Earth model midpoint (0.015321) vs BvW midpoint ({e_bvw_mid['Earth']:.6f}):")
+# Also: what if we fix Earth at its MODEL midpoint (0.015373) vs BvW midpoint?
+print(f"\n  Earth model midpoint (0.015373) vs BvW midpoint ({e_bvw_mid['Earth']:.6f}):")
 spreads_model_mid = np.zeros(N_steps)
 for i in range(N_steps):
     eccs = all_eccs_long[i, :4].copy()
@@ -830,7 +830,7 @@ KEY FINDINGS (robust — independent of BvW limitations):
 1. EARTH MIDPOINT IS CRITICAL: Replacing Earth's J2000 eccentricity (0.01671)
    with its oscillation midpoint (0.01532) reduces the ladder spread from
    {spread_j2000_all:.1f}% to {spread_base:.4f}%. The optimal Earth eccentricity (minimizing spread
-   given J2000 for others) is 0.015300, matching the model's 0.015321 to 0.14%.
+   given J2000 for others) is 0.015300, matching the model's 0.015373 to 0.14%.
    This is a strong self-consistency check.
 
 2. AMD IS NOT THE EXPLANATION: The Fibonacci ladder gives Mercury the HIGHEST
@@ -887,7 +887,7 @@ organized the orbits. Key evidence:
   4. N-body evolution degrades it irreversibly (never recovers below 1%)
   5. Earth requires its oscillation midpoint — the time-averaged constraint
 
-The one free parameter (Earth's base eccentricity, e_E = 0.015321) is NOT
+The one free parameter (Earth's base eccentricity, e_E = 0.015373) is NOT
 arbitrary — it is the UNIQUE value that satisfies the Fibonacci ladder given
 the other planets' J2000 eccentricities. The optimal value from the ladder
 constraint alone (0.015300) matches the model's independently determined

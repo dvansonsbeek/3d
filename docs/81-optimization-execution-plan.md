@@ -1,7 +1,7 @@
 # Optimization Tool — Execution Plan
 
-**Status**: Active optimization campaign
-**Date**: 2026-03-06 (infrastructure complete)
+**Status**: Complete — all phases and execution steps done
+**Date**: 2026-03-06 (infrastructure complete), 2026-03-09 (campaign complete)
 
 **Companion document:** [80-optimization-tool-overview.md](80-optimization-tool-overview.md) — Architecture, constraints, reference data, parameter classification
 
@@ -52,34 +52,34 @@ startingPoint -> earth -> earthInclinationPrecession -> earthEclipticPrecession
 Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking only). `midEccentricityOrbit` is a **sibling** of `earthEclipticPrecession` under `earthInclinationPrecession` (visualization only, not in the positional chain).
 
 **Key geometric mechanism — counter-rotating motions:**
-- **Earth** orbits EARTH-WOBBLE-CENTER clockwise at H/13 = 25,684 yr (mean axial precession)
-- **PERIHELION-OF-EARTH** orbits the Sun counter-clockwise at H/3 = 111,296 yr (inclination precession)
-- Because they rotate in **opposite directions**, their meeting frequency is additive: 1/25,684 + 1/111,296 = **1/20,868** (perihelion precession cycle, H/16)
-- The **observed/experienced** precession period (~25,772 yr currently) differs from the mean (25,684 yr) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
+- **Earth** orbits EARTH-WOBBLE-CENTER clockwise at H/13 (mean axial precession)
+- **PERIHELION-OF-EARTH** orbits the Sun counter-clockwise at H/3 (inclination precession)
+- Because they rotate in **opposite directions**, their meeting frequency is additive: 1/(H/13) + 1/(H/3) = 16/H (perihelion precession cycle, H/16)
+- The **observed/experienced** precession period (~25,772 yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
 
 **Fibonacci precession periods:**
 
 | Node | Period | Fibonacci | Known comparison | Notes |
 |------|--------|-----------|-----------------|-------|
-| `earth` | H/13 = 25,684 yr | 13 | ~25,772 yr (current obs.) | Mean is correct; current obs. rate varies |
-| `earthInclinationPrecession` | H/3 = 111,296 yr | 3 | Inclination precession | Counter-clockwise, drives perihelion-of-earth |
-| `earthEclipticPrecession` | H/5 = 66,778 yr | 5 | ~68,000-70,000 yr | Ecliptic pole precession |
-| `earthObliquityPrecession` | H/8 = 41,736 yr | 8 | ~41,000 yr (Milankovitch) | Retrograde; matches climate records |
-| `earthPerihelionPrecession1/2` | H/16 = 20,868 yr | 16 (=13+3) | ~21,000 yr (climatic) | Counter-rotating pair; from meeting frequency |
+| `earth` | H/13 | 13 | ~25,772 yr (current obs.) | Mean is correct; current obs. rate varies |
+| `earthInclinationPrecession` | H/3 | 3 | Inclination precession | Counter-clockwise, drives perihelion-of-earth |
+| `earthEclipticPrecession` | H/5 | 5 | ~68,000-70,000 yr | Ecliptic pole precession |
+| `earthObliquityPrecession` | H/8 | 8 | ~41,000 yr (Milankovitch) | Retrograde; matches climate records |
+| `earthPerihelionPrecession1/2` | H/16 | 16 (=13+3) | ~21,000 yr (climatic) | Counter-rotating pair; from meeting frequency |
 
 **Eccentricity mechanism — two offset circles:**
-- `eccentricityBase` (0.015321 AU) = orbital radius of PERIHELION-OF-EARTH around the Sun
-- `eccentricityAmplitude` (0.0014226 AU) = orbital radius of Earth around EARTH-WOBBLE-CENTER
+- `eccentricityBase` = orbital radius of PERIHELION-OF-EARTH around the Sun (see [Constants Reference](10-constants-reference.md))
+- `eccentricityAmplitude` = orbital radius of Earth around EARTH-WOBBLE-CENTER (see [Constants Reference](10-constants-reference.md))
 - **Observed eccentricity** = distance between Earth and PERIHELION-OF-EARTH at any given time
-  - **Maximum** (same side): 0.015321 + 0.0014226 = **0.01674** — matches J2000 observed 0.01671022
-  - **Minimum** (opposite sides): 0.015321 − 0.0014226 = **0.01390**
-  - Range: ~0.0139 to ~0.0167, oscillating with the 20,868-year perihelion cycle
+  - **Maximum** (same side): `eccentricityBase + eccentricityAmplitude` — matches J2000 observed 0.01671022
+  - **Minimum** (opposite sides): `eccentricityBase − eccentricityAmplitude`
+  - Range: ~0.0139 to ~0.0167, oscillating with the H/16 perihelion cycle
 - At J2000 we are near maximum eccentricity (last perihelion alignment: 1246 AD)
 - The model correctly reproduces the J2000 eccentricity without additional tuning
 
 **Obliquity mechanism — counter-tilting nodes:**
-- `earthEclipticPrecession.orbitTiltb = -0.633849°` (H/5 period)
-- `earthObliquityPrecession.orbitTiltb = +0.633849°` (H/8 period, retrograde)
+- `earthEclipticPrecession.orbitTiltb = -earthInvPlaneInclinationAmplitude` (H/5 period)
+- `earthObliquityPrecession.orbitTiltb = +earthInvPlaneInclinationAmplitude` (H/8 period, retrograde)
 - When both tilts add: max obliquity = 23.414° + 2 × 0.634° = **~24.71°**
 - When both tilts cancel: min obliquity = 23.414° − 2 × 0.634° = **~22.21°**
 - Total range: ±1.268° from mean — matches Milankovitch cycle and Laskar (1993) within 0.2° for ±10,000 yr
@@ -89,7 +89,7 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - Free core nutation (~430d, <0.1 arcsec)
 - Secular acceleration of precession — constant-speed approximation is adequate for ~200-year windows
 
-**Assessment conclusion for Earth chain**: The chain is geometrically sound. All precession periods derive from Fibonacci divisions of H = 333,888 years. The eccentricity and obliquity mechanisms correctly reproduce observed J2000 values and long-term oscillation ranges. The main tunable constants are: `eccentricityBase`, `eccentricityAmplitude`, `earthInvPlaneInclinationAmplitude`, `earthRAAngle`, and `earthtiltMean`.
+**Assessment conclusion for Earth chain**: The chain is geometrically sound. All precession periods derive from Fibonacci divisions of H (see [Constants Reference](10-constants-reference.md)). The eccentricity and obliquity mechanisms correctly reproduce observed J2000 values and long-term oscillation ranges. The main tunable constants are: `eccentricityBase`, `eccentricityAmplitude`, `earthInvPlaneInclinationAmplitude`, `earthRAAngle`, and `earthtiltMean`.
 
 #### Step 2: Investigate the Sun's apparent motion -- observation or model artifact?
 
@@ -402,13 +402,13 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 
 | Planet | PerihelionEclipticYears | Fibonacci | Arcsec/century |
 |--------|----------------------|-----------|----------------|
-| Mercury | H/(1+3/8) = 242,828 | — | ~575 |
-| Venus | H×2 = 667,776 | — | ~400 |
-| Mars | H/(4+1/3) = 77,050 | — | ~1,600 |
-| Jupiter | H/5 = 66,778 | 5 | ~1,800 |
-| Saturn | −H/8 = −41,736 | 8 (retrograde) | ~−3,400 |
-| Uranus | H/3 = 111,296 | 3 | ~1,100 |
-| Neptune | H×2 = 667,776 | — | ~400 |
+| Mercury | H/(1+3/8) | — | ~575 |
+| Venus | H×2 | — | ~400 |
+| Mars | H/(4+1/3) | — | ~1,600 |
+| Jupiter | H/5 | 5 | ~1,800 |
+| Saturn | −H/8 | 8 (retrograde) | ~−3,400 |
+| Uranus | H/3 | 3 | ~1,100 |
+| Neptune | H×2 | — | ~400 |
 
 Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter, Saturn, and Uranus use clean Fibonacci divisions. Venus and Neptune share the same period (H×2).
 
@@ -626,7 +626,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 **2. Resonance loop (resonance-loop.js):**
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
-- Psi-constant: ψ = (5 × 21²) / (2 × 333,888) = 3.302005 × 10⁻³
+- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.291 × 10⁻³ (H=335,008)
 - Clean Fibonacci perihelion precession: Jupiter (H/5), Saturn (-H/8), Uranus (H/3). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**
@@ -1121,11 +1121,11 @@ node tools/optimize.js optimize <target> [params] [--max-iter=N]           # Nel
 
 ## 8. Execution Plan — Optimization Campaign
 
-**Status**: ACTIVE
-**Date**: 2026-03-06
+**Status**: COMPLETE
+**Date**: 2026-03-06 (started), 2026-03-09 (completed)
 **Prerequisite**: All infrastructure phases (1-9) complete
 
-All tooling is built and validated. This section defines the concrete execution plan for using the tools to systematically improve model accuracy.
+All tooling is built and validated. This section documents the execution plan and results from the systematic optimization campaign.
 
 ### 8.1 Guiding Principles
 
@@ -1296,35 +1296,60 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 ### 8.4 Progress Tracking
 
-| Step | Target | Status | RMS (JPL frame) | True error (frame-corrected) | Params Changed |
-|------|--------|--------|-----------------|-------------------------------|----------------|
-| 1 | All | DONE | See below | — | H: 333888→335008, useVariableSpeed: true, dynamic perihelion phase |
-| 2 | Sun | DONE | 0.280° | ~0.003° | eocEccentricity & perihelionPhaseOffset derived from constants; correctionSun: 0.471334 |
-| 3 | Moon | DONE | 0.81° (eclipse RMS) | 0.04° (parallax residual) | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/86-moon-meeus-corrections.md` |
-| 4a | Jupiter | PENDING | 2.023° | — | — |
-| 4b | Saturn | PENDING | 3.307° | — | — |
-| 5 | Mars | PENDING | 3.120° | — | — |
-| 6a | Mercury | PENDING | 4.779° | — | — |
-| 6b | Uranus | PENDING | 1.293° | — | — |
-| 6c | Venus | PENDING | 3.673° | — | — |
-| 6d | Neptune | PENDING | 1.495° | — | — |
-| 7 | All | PENDING | — | — | — |
+| Step | Target | Status | Before RMS | After RMS | Params Changed |
+|------|--------|--------|-----------|-----------|----------------|
+| 1 | All | DONE | See below | — | H=335008, useVariableSpeed: true, dynamic perihelion phase |
+| 2 | Sun | DONE | 0.714° | 0.065° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.471334 |
+| 3 | Moon | DONE | 6.267° | 0.01° | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/86-moon-meeus-corrections.md` |
+| 4a | Jupiter | DONE | 1.974° | 0.06° | solarYearInput: 4330.5, eocFraction: 0.484, startpos: 13.85, 36p parallax |
+| 4b | Saturn | DONE | 3.291° | 0.10° | solarYearInput: 10747, eocFraction: 0.543, startpos: 11.32, 24p parallax |
+| 5 | Mars | DONE | 3.121° | 0.02° | solarYearInput: 686.931, eocFraction: -0.066, startpos: 121.47, 30p parallax |
+| 6a | Mercury | DONE | 4.908° | 0.01° | eocFraction: -0.527, startpos: 83.53, 36p parallax |
+| 6b | Uranus | DONE | 1.372° | 0.01° | eocFraction: 0.5, startpos: 44.88, 15p parallax |
+| 6c | Venus | DONE | 3.709° | 0.24° | solarYearInput: 224.695, eocFraction: 0.436, startpos: 249.312, 36p parallax |
+| 6d | Neptune | DONE | 1.496° | 0.01° | eocFraction: 0.5, startpos: 47.96, 18p parallax |
+| 7 | All | DONE | — | All ≤0.24° | Cross-validated; see `docs/87-planet-parallax-corrections.md` §5 |
 
-**Step 1 results** (JPL Horizons 2000-2025, 26 yearly dates): Full report at `tools/results/baseline-before.md`
+**Step 1 results** (JPL Horizons 2000-2025, 26 yearly dates): Full report at `tools/results/baseline-before.md` and `docs/89-optimization-baseline.md`
 
 **Step 2 results — Sun optimization (updated for H=335,008, derived EoC constants):**
 - Constants changed:
-  - H: 333,888 → 335,008 (aligned precession with IAU)
-  - `eocEccentricity`: was hardcoded 0.0085, now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
+  - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
   - `correctionSun`: 0.471334 (re-tuned for derived EoC constants)
   - `perihelionRefJD`: 2451547.042 (moved to ASTRO_REFERENCE in script.js)
-- The old hardcoded values (0.0085, 2°) were coupled errors — they jointly overshot the total EoC amplitude by 310 arcsec
 - Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
-- Sun RMS vs JPL: **0.280°** — entirely JPL ICRF frame drift (see Section 8.5)
-- True model error after frame correction: ~0.003°
+- Sun RMS: **0.065°** (with IAU precession frame correction)
 - Full derivation analysis: `tools/explore/derive-eoc-constants.js`
 - Documentation: `docs/85-equation-of-center.md`
+
+**Steps 3-7 results — Planet optimization campaign:**
+
+The remaining steps were executed as a systematic campaign covering:
+
+1. **Per-planet EoC fractions** (Type I/II/III): Derived empirically via `tools/explore/derive-eoc-fractions.js`. Each planet gets `eocFraction × orbitalEccentricity` as its effective EoC eccentricity.
+
+2. **Orbital period calibration**: `solarYearInput` values tuned using ISAW ancient observation data (800 BCE–1650 CE) to minimize long-term drift. See `docs/88-orbital-period-calibration.md`.
+
+3. **Empirical parallax correction**: Up to 36-parameter correction per planet (basis functions A–AK), fitted by linear least squares against enriched JPL reference data. Per-planet tier selection via LOOCV/k-fold CV. Venus, Jupiter, Saturn enriched to ~2500 reference points. See `docs/87-planet-parallax-corrections.md`.
+
+4. **IAU precession correction**: `tools/lib/precession.js` applies IAU 1976 precession to convert JPL J2000 RA/Dec to of-date frame before comparison, resolving the frame mismatch documented in Section 8.5.
+
+**Final results** (all 9 targets, 2000–2200):
+
+| Target | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Sun | 0.714° | 0.065° | 91% |
+| Moon | 6.267° | 0.01° | 99.8% |
+| Mercury | 4.908° | 0.01° | 99.8% |
+| Venus | 3.709° | 0.24° | 93.5% |
+| Mars | 3.121° | 0.02° | 99.4% |
+| Jupiter | 1.974° | 0.06° | 97.0% |
+| Saturn | 3.291° | 0.10° | 97.0% |
+| Uranus | 1.372° | 0.01° | 99.3% |
+| Neptune | 1.496° | 0.01° | 99.3% |
+
+All 9 targets within 0.24°. Seven under 0.10°. Average improvement: 97%.
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 
@@ -1348,14 +1373,17 @@ Observed drift: 54.1 arcsec/yr (match to 1.3%)
 **Implication:**
 The model's of-date coordinates are arguably **more physically meaningful** than JPL's frozen J2000 frame. JPL's ICRF is an arbitrary convention — they previously used B1950, switched to J2000 in 1984, and the frame will need updating again as the equinox continues to precess. The model tracks the actual moving equinox naturally through its precession layers.
 
-**Impact on optimization:**
-- The Sun's true model error is ~0.003° (after frame correction), not 0.113°
-- All planet baselines inherit the same ~54 arcsec/yr frame drift in their RA component
-- The optimizer's correctionSun (0.471334) was tuned to minimize RMS over 25 years, which means it absorbed ~half the frame drift by centering the linear trend around zero. This is suboptimal — ideally we would either:
-  1. Apply a J2000→of-date precession correction to JPL data before comparing
-  2. Compare only Dec (unaffected by equinox precession) and ecliptic longitude (unaffected by frame choice)
-  3. Accept the frame effect as a known systematic and document it
-- **Decision: Option 3** — JPL is Tier 2 (fitted model, not observation). The frame mismatch is a JPL limitation, not a model error. Tier 1 observational data (e.g., eclipse timings, transit contact times) does not depend on RA coordinate conventions.
+**Resolution — IAU 1976 Precession Correction (implemented):**
+
+The frame mismatch was resolved by implementing IAU 1976 precession correction in `tools/lib/precession.js`. The `j2000ToOfDate()` function converts JPL J2000 RA/Dec to the model's of-date frame before comparison. This is applied automatically in the optimizer's baseline function.
+
+Impact of the correction:
+- Jupiter: 1.91° → 0.37° (81% improvement)
+- Saturn: 1.31° → 0.46° (65% improvement)
+- Uranus: 1.76° → 0.20° (89% improvement)
+- Sun: frame drift eliminated, true model error visible
+
+All baselines reported in the progress table above include the precession correction.
 
 ---
 
@@ -1417,19 +1445,16 @@ Once the tool is built, Claude runs this self-improving loop in two stages:
 
 | File | Lines | What to extract/reference |
 |------|-------|--------------------------|
-| `src/script.js` | 25-460 | All input constants (including Moon constants at lines 78-88) |
-| `src/script.js` | 884-973 | Year-length calculations (tropical, sidereal, anomalistic) |
-| `src/script.js` | 960-1010 | Derived quantities (orbit distances, speeds, Moon cycles) |
-| `src/script.js` | 1687-1770 | Planet derived calculations |
-| `src/script.js` | 2160-2722 | Planet and Moon object creation (orbital parameters) |
-| `src/script.js` | 4888-4946 | Scene graph hierarchy wiring (including Moon at 4901-4906) |
-| `src/script.js` | 6825-7580 | `PLANET_TEST_DATES` reference data (~700 entries) |
-| `src/script.js` | 15761-16625 | Existing optimization functions |
-| `src/script.js` | 20641-21178 | Report generation pipeline |
-| `src/script.js` | 27839-27927 | `updatePositions()` -- RA/Dec computation |
-| `src/script.js` | 28122-28168 | `moveModel()` -- orbital position updates |
-| `src/script.js` | 22634-22690 | Eclipse cycle calculations (Saros, Exeligmos, Callippic) |
-| `src/script.js` | 30453-30990 | Obliquity, eccentricity, inclination functions |
+| `src/script.js` | 28-447 | All input constants (including Moon constants at lines 78-88) |
+| `src/script.js` | 2160-4220 | Planet and Moon object creation (orbital parameters) |
+| `src/script.js` | 5074-5172 | Scene graph hierarchy wiring |
+| `src/script.js` | 29078+ | `updatePositions()` -- RA/Dec computation |
+| `src/script.js` | 29453+ | `moveModel()` -- orbital position updates + EoC |
+| `src/script.js` | 31916-32000 | Obliquity, eccentricity, inclination functions |
+| `tools/lib/constants.js` | all | Shared constants (mirrors script.js) |
+| `tools/lib/scene-graph.js` | all | Standalone scene-graph engine |
+| `tools/lib/optimizer.js` | all | Nelder-Mead optimizer |
+| `tools/lib/precession.js` | all | IAU 1976 precession correction |
 | `docs/06-scene-graph-hierarchy.md` | all | Complete scene graph hierarchy documentation |
 | `docs/26-fibonacci-laws.md` | all | Six Fibonacci Laws, mirror pairs, resonance loop, psi-constant |
 | `docs/hidden/testscripts/*.js` | all | ~80 existing standalone optimization scripts |

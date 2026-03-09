@@ -37,7 +37,7 @@ const holisticyearLength = 335008;
 // See: docs/26-fibonacci-laws.md
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Universal ψ-constant: ψ = F₅ × F₈² / (2H) = 2205 / 667776
+// Universal ψ-constant: ψ = F₅ × F₈² / (2H) = 2205 / (2H)
 const PSI = 2205 / (2 * holisticyearLength);
 
 // Pure Fibonacci quantum numbers (d) — Config #32 (unique mirror-symmetric config)
@@ -118,9 +118,8 @@ function getFibonacciAmplitude(key) {
 // This is NOT circular: the Fibonacci amplitude uniquely determines the
 // ratio (i_J2000 - mean) / amplitude = cos(Ω - φ), and this ratio is
 // H-INDEPENDENT. When H changes, both amplitude and mean shift
-// proportionally, preserving the arccos argument. Verified numerically:
-//   H = 333888 → phaseAngle = 203.3195°
-//   H = 335008 → phaseAngle = 203.3195°
+// proportionally, preserving the arccos argument. Verified numerically
+// for different H values: phaseAngle = 203.3195° in all cases.
 //
 // The value 203.3195° corresponds to the s₈ eigenmode of Laplace-Lagrange
 // secular perturbation theory (Farside Table 10.1 gives γ₈ = 202.8°).
@@ -275,7 +274,7 @@ const planetInputs = {
     name: 'Pluto',
     omegaJ2000: 101.06,
     inclJ2000: 15.5639473,
-    period: holisticyearLength,                     // 333,888 years
+    period: holisticyearLength,                     // H years
     phaseAngle: 203.3195,                           // No Fibonacci theory (not in classical LL)
     periodExpr: 'holisticyearLength'
   }

@@ -60,21 +60,23 @@ All dynamic orbital element changes are driven by Earth's orbital plane variatio
 
 ### Earth's Inclination to Invariable Plane
 
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| Mean | 1.482° | `earthInvPlaneInclinationMean` |
-| Minimum | 0.848° | Mean - amplitude |
-| Maximum | 2.115° | Mean + amplitude |
-| Amplitude | 0.634° | `earthInvPlaneInclinationAmplitude` |
-| Period | ~111,296 years | holisticyearLength/3 |
-| J2000 Value | ~1.579° | Above mean, **DECREASING** |
+For current values of mean, amplitude, min, and max, see [Constants Reference](10-constants-reference.md).
+
+| Parameter | Description |
+|-----------|-------------|
+| Mean | `earthInvPlaneInclinationMean` |
+| Minimum | Mean - amplitude |
+| Maximum | Mean + amplitude |
+| Amplitude | `earthInvPlaneInclinationAmplitude` |
+| Period | H/3 years |
+| J2000 Value | Above mean, **DECREASING** |
 
 ### Earth's Ascending Node on Invariable Plane
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | J2000 Value | ~284.5° (Verified) | `earthAscendingNodeInvPlaneVerified` |
-| Precession Period | ~111,296 years | holisticyearLength/3 |
+| Precession Period | H/3 years | holisticyearLength/3 |
 | Direction | Increasing | Same direction as inclination cycle |
 
 ## The Two Dynamic Systems
@@ -186,7 +188,7 @@ The systems must be called in this order in each frame:
 
 Based on the relationship between Earth's inclination (~1.58° at J2000, decreasing) and each planet's inclination:
 
-| Planet | Incl. to Ecliptic | vs Earth Mean (1.482°) | vs Earth J2000 (1.579°) | Ω Direction (2000-2100) |
+| Planet | Incl. to Ecliptic | vs Earth Mean | vs Earth J2000 (1.579°) | Ω Direction (2000-2100) |
 |--------|-------------------|------------------------|-------------------------|-------------------------|
 | Mercury | 7.005° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Venus | 3.395° | ABOVE | ABOVE | **DECREASING** ↓ |
@@ -197,22 +199,22 @@ Based on the relationship between Earth's inclination (~1.58° at J2000, decreas
 | Neptune | 1.768° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Pluto | 17.142° | ABOVE | ABOVE | **DECREASING** ↓ |
 
-**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets will experience Ω direction reversals during the ~111,296-year cycle when Earth's inclination crosses theirs.
+**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets will experience Ω direction reversals during the H/3-year cycle when Earth's inclination crosses theirs.
 
 ### Ecliptic Inclination Direction
 
 Based on the geometric relationship between Earth's and each planet's orbital planes on the invariable plane:
 
-| Planet | Incl. to Inv. Plane | vs Earth Mean (1.482°) | Expected Trend* | Actual Trend (Model) |
-|--------|---------------------|------------------------|-----------------|----------------------|
-| Mercury | 6.347° | ABOVE | Decreasing ↓ | Decreasing ↓ |
-| Venus | 2.155° | ABOVE | Decreasing ↓ | Decreasing ↓ |
-| Mars | 1.631° | ABOVE | Decreasing ↓ | Decreasing ↓ |
-| Jupiter | 0.322° | BELOW | Decreasing ↓ | Decreasing ↓ |
-| **Saturn** | 0.925° | BELOW | **Should ↑** | **Increasing ↑** ✓ |
-| Uranus | 0.995° | BELOW | Decreasing ↓ | Decreasing ↓ |
-| Neptune | 0.735° | BELOW | Decreasing ↓ | Decreasing ↓ |
-| Pluto | 15.564° | ABOVE | Decreasing ↓ | Decreasing ↓ |
+| Planet | Incl. to Inv. Plane | vs Earth Mean | Expected Trend* | Actual Trend (Model) |
+|--------|---------------------|---------------|-----------------|----------------------|
+| Mercury | `mercuryInvPlaneInclinationMean` | ABOVE | Decreasing ↓ | Decreasing ↓ |
+| Venus | `venusInvPlaneInclinationMean` | ABOVE | Decreasing ↓ | Decreasing ↓ |
+| Mars | `marsInvPlaneInclinationMean` | ABOVE | Decreasing ↓ | Decreasing ↓ |
+| Jupiter | `jupiterInvPlaneInclinationMean` | BELOW | Decreasing ↓ | Decreasing ↓ |
+| **Saturn** | `saturnInvPlaneInclinationMean` | BELOW | **Should ↑** | **Increasing ↑** ✓ |
+| Uranus | `uranusInvPlaneInclinationMean` | BELOW | Decreasing ↓ | Decreasing ↓ |
+| Neptune | `neptuneInvPlaneInclinationMean` | BELOW | Decreasing ↓ | Decreasing ↓ |
+| Pluto | `plutoInvPlaneInclinationMean` | ABOVE | Decreasing ↓ | Decreasing ↓ |
 
 *Expected based on observed astronomical data trends
 
@@ -231,88 +233,17 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 
 ## Detailed Planet Behavior
 
-### Mercury
+For all per-planet values (inclinations to ecliptic and invariable plane, ascending nodes, ecliptic inclination ranges), see [Constants Reference](10-constants-reference.md).
 
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 7.005° | Always above Earth, Ω always decreases |
-| Incl. to inv. plane | 6.347° | Highest among inner planets |
-| Ω J2000 (ecliptic) | 48.33° | |
-| Ω J2000 (inv. plane) | 32.83° | |
-| Ecliptic incl. range | ~4.3° to ~8.4° | Large variation over ~111,296 years |
+Key behavioral notes:
 
-### Venus
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 3.395° | Always above Earth, Ω always decreases |
-| Incl. to inv. plane | 2.155° | |
-| Ω J2000 (ecliptic) | 76.68° | |
-| Ω J2000 (inv. plane) | 54.70° | |
-| Ecliptic incl. range | ~1.3° to ~4.4° | |
-
-### Mars
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 1.850° | WITHIN Earth's range - crossovers possible |
-| Incl. to inv. plane | 1.631° | |
-| Ω J2000 (ecliptic) | 49.56° | |
-| Ω J2000 (inv. plane) | 354.87° | |
-| Ecliptic incl. range | ~0.1° to ~3.2° | Can nearly align with ecliptic |
-| Crossover epoch | ~55,000 years from now | Ω direction reverses |
-
-### Jupiter
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 1.305° | WITHIN Earth's range - crossover possible |
-| Incl. to inv. plane | 0.322° | Closest to invariable plane |
-| Ω J2000 (ecliptic) | 100.49° | |
-| Ω J2000 (inv. plane) | 312.89° | |
-| Ecliptic incl. range | ~0.9° to ~1.6° | Smallest variation |
-| Crossover epoch | ~9,700 years from now | Earth incl crosses Jupiter ecliptic incl |
-
-### Saturn
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 2.485° | Always above Earth, Ω always decreases |
-| Incl. to inv. plane | 0.925° | **BELOW** Earth's current value |
-| Ω J2000 (ecliptic) | 113.65° | |
-| Ω J2000 (inv. plane) | 118.81° | |
-| Ecliptic incl. range | ~1.5° to ~3.4° | |
-| **Anomaly** | Resolved - see Saturn section | Model vs observed discrepancy (now fixed) |
-
-### Uranus
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 0.772° | Always BELOW Earth, Ω always increases |
-| Incl. to inv. plane | 0.995° | |
-| Ω J2000 (ecliptic) | 73.98° | |
-| Ω J2000 (inv. plane) | 307.76° | |
-| Ecliptic incl. range | ~0.2° to ~2.0° | Can nearly align with ecliptic |
-
-### Neptune
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 1.768° | WITHIN Earth's range - crossovers possible |
-| Incl. to inv. plane | 0.735° | |
-| Ω J2000 (ecliptic) | 131.79° | |
-| Ω J2000 (inv. plane) | 192.18° | |
-| Ecliptic incl. range | ~1.0° to ~2.4° | |
-
-### Pluto
-
-| Property | Value | Notes |
-|----------|-------|-------|
-| Incl. to ecliptic | 17.142° | Always far above Earth |
-| Incl. to inv. plane | 15.564° | Highest inclination |
-| Ω J2000 (ecliptic) | 110.30° | |
-| Ω J2000 (inv. plane) | 105.44° | |
-| Ecliptic incl. range | ~13.5° to ~17.6° | Always highly inclined |
+- **Mercury, Venus, Saturn, Pluto**: Always above Earth's inclination — Ω always decreases
+- **Jupiter, Uranus**: Always below Earth's inclination — Ω always increases
+- **Mars, Neptune**: WITHIN Earth's inclination range — crossovers possible, Ω direction reverses during H/3-year cycle
+- **Jupiter**: Closest to invariable plane (smallest inclination), smallest ecliptic inclination variation
+- **Saturn**: Inclination to inv. plane is **below** Earth's current value (Saturn anomaly resolved — see below)
+- **Mars**: Crossover epoch ~55,000 years from now
+- **Jupiter**: Crossover epoch ~9,700 years from now
 
 ## Summary of Collaborative Behavior
 
@@ -321,21 +252,21 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | System | Primary Driver | Secondary Driver | Period |
 |--------|---------------|------------------|--------|
 | Planet Inclination to Inv. Plane | Orbital plane precession | Laplace-Lagrange eigenmodes | Planet-specific (see below) |
-| Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | ~333,888 years |
-| Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | ~111,296 years |
+| Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | H years |
+| Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | H/3 years |
 
-**Planet Inclination Oscillation Periods** (same as nodal precession):
+**Planet Inclination Oscillation Periods** (same as nodal precession). For current computed values see [Constants Reference](10-constants-reference.md):
 
-| Planet | Period | Direction |
-|--------|--------|-----------|
-| Mercury | 242,828 years | Prograde |
-| Venus | 667,776 years | Prograde |
-| Mars | 77,051 years | Prograde |
-| Jupiter | 66,778 years | Prograde |
-| Saturn | 41,736 years | **Retrograde** |
-| Uranus | 111,296 years | Prograde |
-| Neptune | 667,776 years | Prograde |
-| Pluto | 333,888 years | Prograde |
+| Planet | Formula | Direction |
+|--------|---------|-----------|
+| Mercury | H / (1 + 3/8) | Prograde |
+| Venus | H × 2 | Prograde |
+| Mars | H / (4 + 1/3) | Prograde |
+| Jupiter | H / 5 | Prograde |
+| Saturn | H / 8 | **Retrograde** |
+| Uranus | H / 3 | Prograde |
+| Neptune | H × 2 | Prograde |
+| Pluto | H | Prograde |
 
 ### The Key Insight
 
