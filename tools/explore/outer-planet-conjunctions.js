@@ -182,8 +182,8 @@ console.log();
 console.log('  Current solarYearInput values:');
 for (const name of ['jupiter', 'saturn', 'uranus', 'neptune']) {
   const p = C.planets[name];
-  const count = Math.round(335008 * 365.2421897 / p.solarYearInput);
-  const effectivePeriod = 335008 * 365.2421897 / count;
+  const count = Math.round(C.totalDaysInH / p.solarYearInput);
+  const effectivePeriod = C.totalDaysInH / count;
   console.log(`    ${name}: input=${p.solarYearInput}  count=${count}  effective=${effectivePeriod.toFixed(3)} days`);
 }
 console.log();

@@ -4,7 +4,7 @@
 //                  and the general Fibonacci beat frequency rule
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  RESONANCE LOOP — Fibonacci Beat Frequency Verification');
@@ -144,7 +144,7 @@ checkIdentity(
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('─── 3. The Resonance Loop — Closed Cycle ────────────────────');
 console.log();
-console.log('  The 3-5-8-13 loop (from docs/26-fibonacci-laws.md Law 6):');
+console.log('  The 3-5-8-13 loop (from docs/10-fibonacci-laws.md Law 6):');
 console.log();
 
 // The loop as described:

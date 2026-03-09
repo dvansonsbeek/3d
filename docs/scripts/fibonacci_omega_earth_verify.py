@@ -41,7 +41,7 @@ def norm180(a):
 # ║  LOAD EXCEL DATA                                                       ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
-xlsx_path = os.path.join(os.path.dirname(__file__), '..', 'appendix-h-holistic-year-objects-data.xlsx')
+xlsx_path = os.path.join(os.path.dirname(__file__), '..', '98-holistic-year-objects-data.xlsx')
 df = pd.read_excel(xlsx_path, 'Perihelion Planets')
 years = df.iloc[:, 3].values
 n = len(years)

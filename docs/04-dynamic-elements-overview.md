@@ -60,7 +60,7 @@ All dynamic orbital element changes are driven by Earth's orbital plane variatio
 
 ### Earth's Inclination to Invariable Plane
 
-For current values of mean, amplitude, min, and max, see [Constants Reference](10-constants-reference.md).
+For current values of mean, amplitude, min, and max, see [Constants Reference](20-constants-reference.md).
 
 | Parameter | Description |
 |-----------|-------------|
@@ -85,7 +85,7 @@ For current values of mean, amplitude, min, and max, see [Constants Reference](1
 
 **Purpose**: Calculate where each planet's orbit crosses Earth's orbital plane
 
-**Documentation**: [14-ascending-node-calculations.md](14-ascending-node-calculations.md)
+**Documentation**: [31-ascending-node-calculations.md](31-ascending-node-calculations.md)
 
 **Key Formula**:
 ```
@@ -107,7 +107,7 @@ dΩ/dε = -sin(Ω) / tan(i)
 
 **Purpose**: Calculate the angle between each planet's orbital plane and Earth's orbital plane
 
-**Documentation**: [15-inclination-calculations.md](15-inclination-calculations.md)
+**Documentation**: [32-inclination-calculations.md](32-inclination-calculations.md)
 
 **Key Formula**:
 ```
@@ -227,13 +227,13 @@ Saturn's ecliptic inclination trend was previously incorrect. This has been **re
 | Trend (1900-2036) | +0.0025°/century ↑ | -0.0026°/century ↓ | Should now match ✓ |
 | Direction | UP | DOWN | UP (after fix) |
 
-**Solution**: Each planet's inclination to the invariable plane now oscillates dynamically, similar to Earth's. This is based on Laplace-Lagrange secular theory. See [15-inclination-calculations.md](15-inclination-calculations.md) for full details.
+**Solution**: Each planet's inclination to the invariable plane now oscillates dynamically, similar to Earth's. This is based on Laplace-Lagrange secular theory. See [32-inclination-calculations.md](32-inclination-calculations.md) for full details.
 
 **Implementation**: Added `computePlanetInvPlaneInclinationDynamic()` function with amplitude values from Table 10.4 of the [Farside physics textbook](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html).
 
 ## Detailed Planet Behavior
 
-For all per-planet values (inclinations to ecliptic and invariable plane, ascending nodes, ecliptic inclination ranges), see [Constants Reference](10-constants-reference.md).
+For all per-planet values (inclinations to ecliptic and invariable plane, ascending nodes, ecliptic inclination ranges), see [Constants Reference](20-constants-reference.md).
 
 Key behavioral notes:
 
@@ -255,7 +255,7 @@ Key behavioral notes:
 | Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | H years |
 | Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | H/3 years |
 
-**Planet Inclination Oscillation Periods** (same as nodal precession). For current computed values see [Constants Reference](10-constants-reference.md):
+**Planet Inclination Oscillation Periods** (same as nodal precession). For current computed values see [Constants Reference](20-constants-reference.md):
 
 | Planet | Formula | Direction |
 |--------|---------|-----------|
@@ -312,7 +312,7 @@ The Moon's dynamic elements are computed separately from the planets by `updateM
 
 ### Moon Dynamic Variables
 
-10 dynamic `o.moon*` variables are computed each frame (Ω, ϖ, ω, ν, M, E, distance, phase angle, elongation, descending node). See [Section 1.4.2 of the Orbital Formulas Reference](11-orbital-formulas-reference.md) for the complete variable list with symbols, descriptions, and 3D sources.
+10 dynamic `o.moon*` variables are computed each frame (Ω, ϖ, ω, ν, M, E, distance, phase angle, elongation, descending node). See [Section 1.4.2 of the Orbital Formulas Reference](21-orbital-formulas-reference.md) for the complete variable list with symbols, descriptions, and 3D sources.
 
 ### 3D Precession Hierarchy
 
@@ -349,12 +349,12 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 
 ## References
 
-1. [14 - Ascending Node Calculations](14-ascending-node-calculations.md) - Detailed ascending node algorithm
-2. [15 - Inclination Calculations](15-inclination-calculations.md) - Detailed inclination algorithm and oscillation approach
-3. [10 - Constants Reference](10-constants-reference.md) - All planetary constants
+1. [14 - Ascending Node Calculations](31-ascending-node-calculations.md) - Detailed ascending node algorithm
+2. [15 - Inclination Calculations](32-inclination-calculations.md) - Detailed inclination algorithm and oscillation approach
+3. [10 - Constants Reference](20-constants-reference.md) - All planetary constants
 4. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
 5. [Farside Physics Textbook - Secular Evolution](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html) - Laplace-Lagrange secular theory, Table 10.4
-6. [Appendix F - Inclination Verification](appendix-f-inclination-verification.js) - Verification script for mean/amplitude values
+6. [Appendix F (85) — Inclination Verification](85-inclination-verification.js) - Verification script for mean/amplitude values
 
 ---
 

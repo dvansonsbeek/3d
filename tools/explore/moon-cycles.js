@@ -4,7 +4,7 @@
 //               eclipse cycles (Saros, Exeligmos, Callippic)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  MOON CYCLES — Lunar Cycle Verification');

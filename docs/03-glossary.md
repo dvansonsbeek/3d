@@ -10,7 +10,7 @@ This glossary defines the key terms used throughout the documentation. For a com
 A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and inclination precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
 
 ### Holistic-Year
-The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](10-constants-reference.md) for the current value of H.
+The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H.
 
 ### EARTH-WOBBLE-CENTER
 A gravitational control point around which Earth's axis wobbles over approximately H/13 years. This creates the precession of the equinoxes. Visualized as "The Death Star" in the simulation.
@@ -48,7 +48,7 @@ The rotation of an orbit's line of apsides (the line connecting perihelion and a
 Half the longest diameter of an elliptical orbit. Determines the orbit's size and, via Kepler's third law, the orbital period.
 
 ### Eccentricity (e)
-A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's base eccentricity is defined in the [Constants Reference](10-constants-reference.md).
+A measure of how elliptical an orbit is. Range: 0 (perfect circle) to 1 (parabola). Earth's base eccentricity is defined in the [Constants Reference](20-constants-reference.md).
 
 ### Inclination (i)
 The angle between an orbital plane and a reference plane (usually the ecliptic or invariable plane). Measured in degrees.

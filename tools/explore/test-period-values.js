@@ -5,9 +5,7 @@
 const C = require('../lib/constants');
 const { computePlanetPosition, _invalidateGraph } = require('../lib/scene-graph');
 
-const H = 335008;
-const meanSolarYear = 365.2421897;
-const totalDays = H * meanSolarYear;
+const totalDays = C.totalDaysInH;
 
 function raDiff(planet1, planet2, jd) {
   const p1 = computePlanetPosition(planet1, jd);

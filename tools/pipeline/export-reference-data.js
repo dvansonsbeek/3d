@@ -138,9 +138,7 @@ for (const [planet, entries] of Object.entries(parsedData)) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function jdToYear(jd) {
-  // Simplified Julian Date to calendar year conversion
-  // J2000.0 = JD 2451545.0 = year 2000.0
-  return 2000.0 + (jd - 2451545.0) / 365.25;
+  return C.jdToYear(jd);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

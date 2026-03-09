@@ -102,7 +102,8 @@ const planets = {
     name: 'Jupiter',
     solarYearInput: 4330.5,
     eclipticInclinationJ2000: 1.30439695,
-    orbitalEccentricity: 0.04823000,  // Dual-balanced (J2000: 0.04838624, -0.32%)
+    orbitalEccentricity: 0.04823000,  // Dual-balanced (-0.32% from J2000)
+    orbitalEccentricityJ2000: 0.04838624,
     eocFraction: 0.484,
     invPlaneInclinationJ2000: 0.3219652,
     longitudePerihelion: 14.70659401,
@@ -122,7 +123,8 @@ const planets = {
     name: 'Saturn',
     solarYearInput: 10747.0,
     eclipticInclinationJ2000: 2.48599187,
-    orbitalEccentricity: 0.05378200,  // Dual-balanced (J2000: 0.05386179, -0.15%)
+    orbitalEccentricity: 0.05378200,  // Dual-balanced (-0.15% from J2000)
+    orbitalEccentricityJ2000: 0.05386179,
     eocFraction: 0.543,
     invPlaneInclinationJ2000: 0.9254704,
     longitudePerihelion: 92.12794343,
@@ -142,7 +144,8 @@ const planets = {
     name: 'Uranus',
     solarYearInput: 30586,
     eclipticInclinationJ2000: 0.77263783,
-    orbitalEccentricity: 0.04777200,  // Dual-balanced (J2000: 0.04725744, +1.09%)
+    orbitalEccentricity: 0.04777200,  // Dual-balanced (+1.09% from J2000)
+    orbitalEccentricityJ2000: 0.04725744,
     eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.9946692,
     longitudePerihelion: 170.7308251,
@@ -162,7 +165,8 @@ const planets = {
     name: 'Neptune',
     solarYearInput: 59980,
     eclipticInclinationJ2000: 1.77004347,
-    orbitalEccentricity: 0.00846248,  // Dual-balanced (J2000: 0.00859048, -1.49%)
+    orbitalEccentricity: 0.00846248,  // Dual-balanced (-1.49% from J2000)
+    orbitalEccentricityJ2000: 0.00859048,
     eocFraction: 0.50,
     invPlaneInclinationJ2000: 0.7354155,
     longitudePerihelion: 45.80124471,
@@ -329,6 +333,48 @@ const moonApsidalMeetsNodalDays = (moonNodalMonth / (moonAnomalisticMonth - moon
 const moonLunarLevelingCycleDays = (moonNodalPrecessionDaysEarth / (moonNodalPrecessionDaysEarth - moonApsidalPrecessionDaysEarth) * (moonApsidalPrecessionDaysEarth / meanSolarYearDays)) * meanSolarYearDays;
 const moonDraconicYearICRF = 1 / ((1 / meanSolarYearDays) + (1 / moonNodalPrecessionDaysEarth));
 const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearICRF) - 13);
+
+// --- Planet mass fractions (M_planet / M_SUN) ---
+// DE440 Sun/planet mass ratios (Sun mass / planet mass)
+const massRatioDE440 = {
+  mercury: 6023625.5, venus: 408523.72, mars: 3098703.59,
+  jupiter: 1047.348625, saturn: 3497.9018, uranus: 22902.944, neptune: 19412.237,
+};
+const G_CONSTANT = 6.6743e-20; // km³/(kg·s²)
+const MASS_RATIO_EARTH_MOON = 81.3007;
+
+// GM_SUN from Kepler's 3rd law (currentAUDistance is mean heliocentric distance)
+const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
+const M_SUN = GM_SUN / G_CONSTANT;
+
+// Non-Earth planets: M_planet/M_SUN = 1/ratio (GM chain cancels)
+const massFraction = {};
+for (const [k, ratio] of Object.entries(massRatioDE440)) {
+  massFraction[k] = 1 / ratio;
+}
+
+// Earth mass via Moon orbital mechanics (same chain as script.js)
+const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) /
+  Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
+const SOLAR_SIDEREAL_DAY_RATIO = meanLengthOfDay / meanSiderealDay;
+const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) *
+  SOLAR_SIDEREAL_DAY_RATIO;
+massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
+
+// PSI constant (inclination formula parameter: ψ = 2205 / (2H))
+const PSI = 2205 / (2 * H);
+
+// J2000 eccentricities for all 8 planets (inner planets are unchanged, outer are pre-dual-balance)
+const eccJ2000 = {
+  mercury: planets.mercury.orbitalEccentricity,        // 0.20563593 (same)
+  venus:   planets.venus.orbitalEccentricity,           // 0.00677672 (same)
+  earth:   ASTRO_REFERENCE.earthEccentricityJ2000,      // 0.01671022
+  mars:    planets.mars.orbitalEccentricity,            // 0.09339410 (same)
+  jupiter: planets.jupiter.orbitalEccentricityJ2000,    // 0.04838624
+  saturn:  planets.saturn.orbitalEccentricityJ2000,     // 0.05386179
+  uranus:  planets.uranus.orbitalEccentricityJ2000,     // 0.04725744
+  neptune: planets.neptune.orbitalEccentricityJ2000,    // 0.00859048
+};
 
 // --- Planet derived calculations (lines 1687-1770) ---
 function computePlanetDerived(key) {
@@ -612,6 +658,16 @@ module.exports = {
   moonLunarLevelingCycleDays,
   moonDraconicYearICRF,
   moonDraconicYearEarth,
+
+  // Mass
+  massRatioDE440,
+  G_CONSTANT,
+  MASS_RATIO_EARTH_MOON,
+  GM_SUN,
+  M_SUN,
+  massFraction,
+  PSI,
+  eccJ2000,
 
   // Planet derived
   derived,

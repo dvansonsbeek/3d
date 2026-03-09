@@ -77,7 +77,7 @@ console.log('  Geometric perihelion (bary frame):', (geomPeriBary * r2d).toFixed
 
 console.log('\n─── Step 3: Verify via model perihelion search ───\n');
 
-const periJDref = 2451547.042; // observed perihelion Jan 3.542, 2000
+const periJDref = C.perihelionRefJD; // observed perihelion Jan 3.542, 2000
 let minDist = Infinity;
 let periJDFound = 0;
 

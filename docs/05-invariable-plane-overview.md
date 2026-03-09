@@ -66,7 +66,7 @@ These values differ by ~177° (not exactly 180°) due to measurement precision a
 
 Each planet's orbit is tilted relative to the invariable plane. These values are fundamentally more stable than ecliptic inclinations:
 
-For current values, see [Constants Reference](10-constants-reference.md).
+For current values, see [Constants Reference](20-constants-reference.md).
 
 | Planet | Inclination to Inv. Plane | Inclination to Ecliptic | Notes |
 |--------|---------------------------|------------------------|-------|
@@ -348,13 +348,13 @@ The angular momentum validation (Option A vs B) and mass-weighted balance tracki
 ## Further Reading
 
 For technical implementation details:
-- [16 - Invariable Plane Calculations](16-invariable-plane-calculations.md) - Height calculation formulas and code
-- [15 - Inclination Calculations](15-inclination-calculations.md) - Dynamic inclination oscillations
+- [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculation formulas and code
+- [15 - Inclination Calculations](32-inclination-calculations.md) - Dynamic inclination oscillations
 
 For constants and data:
-- [10 - Constants Reference](10-constants-reference.md) - All invariable plane constants
+- [10 - Constants Reference](20-constants-reference.md) - All invariable plane constants
 
 ---
 
 **Previous**: [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md)
-**Next**: [10 - Constants Reference](10-constants-reference.md)
+**Next**: [10 - Constants Reference](20-constants-reference.md)

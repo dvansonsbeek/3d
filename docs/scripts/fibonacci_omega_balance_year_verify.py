@@ -191,7 +191,7 @@ def nearest_cardinal(angle):
 # ║  LOAD EXCEL DATA                                                       ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
-xlsx_path = os.path.join(os.path.dirname(__file__), '..', 'appendix-h-holistic-year-objects-data.xlsx')
+xlsx_path = os.path.join(os.path.dirname(__file__), '..', '98-holistic-year-objects-data.xlsx')
 try:
     df = pd.read_excel(xlsx_path, 'Perihelion Planets')
     HAVE_EXCEL = True

@@ -50,7 +50,7 @@ PLANET_NAMES = ["Mercury", "Venus", "Earth", "Mars",
 # ═══════════════════════════════════════════════════════════════════════════
 # MASSES (solar mass units, from Holistic computation chain)
 # Derived from JPL mass ratios via the model's GM_SUN calculation.
-# Earth uses Moon-based derivation (see appendix-l-verify-laws.js).
+# Earth uses Moon-based derivation (see 88-verify-laws.js).
 # ═══════════════════════════════════════════════════════════════════════════
 
 MASS = {

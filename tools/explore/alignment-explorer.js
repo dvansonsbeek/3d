@@ -4,7 +4,7 @@
 //                      patterns, and the trigon cycle
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  ALIGNMENT EXPLORER — Conjunction Dates and Patterns');

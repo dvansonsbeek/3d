@@ -9,7 +9,7 @@ Compares two angular quantities for all planets:
 Investigates whether the difference (Ω_inv - Ω_ecl) relates to
 the difference between invariable-plane and ecliptic inclinations.
 
-Data source: appendix-h-holistic-year-objects-data.xlsx
+Data source: 98-holistic-year-objects-data.xlsx
   Excel row 0 corresponds to year -301,334 (closest to balance year -301,340).
 
 Key finding: OMEGA0 values are DC components from sinusoidal fitting of ICRF ω

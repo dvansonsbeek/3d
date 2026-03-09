@@ -30,11 +30,12 @@ License: MIT
 import math
 from typing import List, Tuple, Dict
 
+from fibonacci_data import H
+
 # =============================================================================
 # SECTION A: FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-H = 335008                      # Holistic Year (fundamental cycle)
 ANCHOR_YEAR = -301340           # Start of H-cycle (time reference)
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 

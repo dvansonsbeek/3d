@@ -180,7 +180,7 @@ console.log('R from scene graph: 180.2497°');
 // perihelionPhaseOffset = geomPeriBary - formulaWithoutOffset
 
 // Let's compute everything
-const formulaWithoutOffset = -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - 2451547.042) / C.meanSolarYearDays;
+const formulaWithoutOffset = -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays;
 console.log('\nformulaWithoutOffset:', (formulaWithoutOffset * r2d).toFixed(4) + '°');
 
 const geomPeriBary = geomPeriWorld - R_analytical;

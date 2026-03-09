@@ -9,59 +9,28 @@
 // Usage: node tools/explore/eccentricity-balance-explore.js
 // ═══════════════════════════════════════════════════════════════
 
-const H = 335008;
-const inputMSY = 365.2421897;
-const MSY = Math.round(inputMSY * (H / 16)) / (H / 16);
+const C = require('../lib/constants');
+
+const H = C.H;
+const MSY = C.meanSolarYearDays;
 
 // Current SolarYearInputs
-const SYI = {
-  mercury: 87.9686, venus: 224.695, mars: 686.931,
-  jupiter: 4330.50, saturn: 10747.0, uranus: 30586, neptune: 59980,
-};
-
-// Masses (simplified: mass = 1/ratio for non-Earth)
-const massRatios = {
-  mercury: 6023625.5, venus: 408523.72, mars: 3098703.59,
-  jupiter: 1047.348625, saturn: 3497.9018, uranus: 22902.944, neptune: 19412.237,
-};
-
-// Earth mass via Moon chain (exact from script.js)
-const meansiderealyearlengthinSeconds = 31558149.8;
-const currentAUDistance = 149597870.698828;
-const meansiderealyearlengthinDays = MSY * (H/13) / ((H/13) - 1);
-const meanlengthofday = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays;
-const speedofSuninKM = (currentAUDistance * 2 * Math.PI) / (meansiderealyearlengthinSeconds / 3600);
-const meanAUDistance = (meansiderealyearlengthinSeconds / 3600 * speedofSuninKM) / (2 * Math.PI);
-const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(meanAUDistance, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
-const G_CONSTANT = 6.6743e-20;
-const M_SUN = GM_SUN / G_CONSTANT;
-const moonDistance = 384399.07;
-const moonSiderealMonthInput = 27.32166156;
-const moonSiderealMonth = (H * MSY) / Math.ceil((H * MSY) / moonSiderealMonthInput);
-const MASS_RATIO_EARTH_MOON = 81.3007;
-const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
-const meanSiderealday = (MSY / (MSY + 1)) * meanlengthofday;
-const SOLAR_SIDEREAL_DAY_RATIO = meanlengthofday / meanSiderealday;
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) * SOLAR_SIDEREAL_DAY_RATIO;
-const M_EARTH = GM_EARTH / G_CONSTANT;
+const SYI = {};
+for (const [k, p] of Object.entries(C.planets)) SYI[k] = p.solarYearInput;
 
 function getMass(planet) {
-  if (planet === 'earth') return M_EARTH / M_SUN;
-  return 1 / massRatios[planet];
+  return C.massFraction[planet];
 }
 
 function getSMA(planet, syiOverrides) {
   if (planet === 'earth') return 1.0;
   const syi = syiOverrides?.[planet] ?? SYI[planet];
-  const count = Math.round((H * MSY) / syi);
+  const count = Math.round(C.totalDaysInH / syi);
   return Math.pow(Math.pow(H / count, 2), 1/3);
 }
 
-// J2000 eccentricities (JPL DE440)
-const eccJ2000 = {
-  mercury: 0.20563593, venus: 0.00677672, earth: 0.01671, mars: 0.09339410,
-  jupiter: 0.04838624, saturn: 0.05386179, uranus: 0.04725744, neptune: 0.00859048,
-};
+// J2000 eccentricities (all 8 planets from constants.js)
+const eccJ2000 = C.eccJ2000;
 
 // Circular orbit eccentricities: e/(1+e)
 const eccCircular = {};

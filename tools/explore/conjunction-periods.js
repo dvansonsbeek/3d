@@ -4,7 +4,7 @@
 //                       focus on Jupiter-Saturn great conjunctions
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  CONJUNCTION PERIODS — Synodic Period Verification');

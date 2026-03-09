@@ -21,7 +21,7 @@ Original scripts consolidated:
   fibonacci_omega_formula_search.py, fibonacci_omega_frame_correction.py,
   fibonacci_omega_trappist1.py, fibonacci_omega_eigenmodes.py
 
-Self-contained: does NOT import fibonacci_data.py (matches original pattern).
+Uses H and PHI from fibonacci_data.py (shared constants module).
 """
 
 import math
@@ -29,6 +29,8 @@ import os
 import random
 import statistics
 import time
+
+from fibonacci_data import H, PHI
 
 try:
     import openpyxl
@@ -39,11 +41,7 @@ except ImportError:
 # ==============================================================
 # CONSTANTS & HELPERS
 # ==============================================================
-
-H = 333_888
-BALANCE_YEAR = -301_340
 J2000_YEAR = 2000
-PHI = (1 + math.sqrt(5)) / 2
 GOLDEN_ANGLE = 360.0 / PHI**2  # 137.5078°
 
 FIB = {0: 0, 1: 1}
@@ -250,7 +248,7 @@ def best_fib_expression(abs_omega, max_err=5.0):
 def read_excel_omega():
     """Read ω time series from Excel for all planets.
     Returns dict: planet_name -> list of (year, omega_deg)."""
-    excel_path = os.path.join(os.path.dirname(__file__), '..', 'appendix-h-holistic-year-objects-data.xlsx')
+    excel_path = os.path.join(os.path.dirname(__file__), '..', '98-holistic-year-objects-data.xlsx')
     if not HAS_EXCEL or not os.path.exists(excel_path):
         return None
 

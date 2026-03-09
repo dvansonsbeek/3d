@@ -4,7 +4,7 @@
 //                season length asymmetry, and day length relationships
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  YEAR LENGTHS — Year and Day Length Verification');

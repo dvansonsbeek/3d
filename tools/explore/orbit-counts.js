@@ -4,7 +4,7 @@
 //                and sensitivity to SolarYearInput changes
 // ═══════════════════════════════════════════════════════════════════════════
 
-const C = require('./constants');
+const C = require('../lib/constants');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  ORBIT COUNTS — Fibonacci Orbital Structure Verification');

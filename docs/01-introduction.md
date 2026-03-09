@@ -23,7 +23,7 @@ The model introduces two key gravitational centers that govern all observed prec
 This point simulates **axial precession** - Earth's historical "precession of the equinoxes."
 
 - Earth orbits this center in a **clockwise** direction
-- One complete orbit takes approximately **H/13 years** (~25,770 years; see [Constants Reference](10-constants-reference.md))
+- One complete orbit takes approximately **H/13 years** (~25,770 years; see [Constants Reference](20-constants-reference.md))
 - This is what causes the equinox to move westward through the zodiac
 - The mechanism involves tidal forces from the Sun and Moon acting on Earth's equatorial bulge
 
@@ -34,7 +34,7 @@ In the 3D simulation, this point is visualized as "The Death Star."
 This point determines Earth's varying distance to the Sun throughout the year (perihelion around January 3rd, aphelion around July 4th).
 
 - It orbits **counter-clockwise** around the EARTH-WOBBLE-CENTER
-- One complete orbit takes approximately **H/3 years** (~111,669 years, inclination precession; see [Constants Reference](10-constants-reference.md))
+- One complete orbit takes approximately **H/3 years** (~111,669 years, inclination precession; see [Constants Reference](20-constants-reference.md))
 - This slowly changes Earth's argument of periapsis relative to the fixed stars
 
 In the 3D simulation, this appears as a white dot.
@@ -52,7 +52,7 @@ This creates 16 meeting points per Holistic-Year as the solstice and perihelion 
 
 ## The Holistic-Year (H)
 
-The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](10-constants-reference.md) for the current value), this cycle integrates:
+The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](20-constants-reference.md) for the current value), this cycle integrates:
 
 | Cycle | Formula | Count per Holistic-Year |
 |-------|---------|------------------------|
@@ -92,7 +92,7 @@ Several Earth parameters oscillate over long timescales:
 
 ### Obliquity (Axial Tilt)
 
-Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,876 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Holistic-Year. See [Constants Reference](10-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
+Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,876 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Holistic-Year. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
 
 ---
 
