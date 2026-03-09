@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// Greedy forward selection: find best 19th, 20th, 21st params per planet
+// Greedy forward selection: find best 31st–40th params per planet
+// Uses 10-fold CV for large datasets (>200 points) instead of LOOCV
+// Base: current 30p basis (24p + 6 terms from previous round)
 
 const { computePlanetPosition } = require('../lib/scene-graph.js');
 const sg = require('../lib/scene-graph.js');
@@ -14,39 +16,95 @@ C.ASTRO_REFERENCE.decCorrection = {};
 C.ASTRO_REFERENCE.raCorrection = {};
 sg._invalidateGraph();
 
-const targets = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
+const targets = ['venus','mercury','mars','jupiter','saturn'];
 
 const candidateDefs = [
-  { name: 'S: T*cos(u)/s',      fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(pt.u)/pt.sunDist; }},
-  { name: 'T: T*sin(2u)/s',     fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(2*pt.u)/pt.sunDist; }},
-  { name: 'U: T*cos(2u)/s',     fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(2*pt.u)/pt.sunDist; }},
-  { name: 'V: cos(u)/d²',       fn: pt => Math.cos(pt.u)/(pt.d*pt.d) },
-  { name: 'W: sin(2u)/d²',      fn: pt => Math.sin(2*pt.u)/(pt.d*pt.d) },
-  { name: 'X: cos(2u)/d²',      fn: pt => Math.cos(2*pt.u)/(pt.d*pt.d) },
-  { name: 'Y: sin(3u)/d²',      fn: pt => Math.sin(3*pt.u)/(pt.d*pt.d) },
-  { name: 'Z: cos(3u)/d²',      fn: pt => Math.cos(3*pt.u)/(pt.d*pt.d) },
-  { name: 'AA: T²',             fn: pt => { const T=(pt.year-2000)/100; return T*T; }},
-  { name: 'AB: T²*sin(u)/d',    fn: pt => { const T=(pt.year-2000)/100; return T*T*Math.sin(pt.u)/pt.d; }},
-  { name: 'AC: T²*cos(u)/d',    fn: pt => { const T=(pt.year-2000)/100; return T*T*Math.cos(pt.u)/pt.d; }},
-  { name: 'AD: T*sin(3u)/d',    fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(3*pt.u)/pt.d; }},
-  { name: 'AE: T*cos(3u)/d',    fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(3*pt.u)/pt.d; }},
-  { name: 'AF: sin(4u)/d',      fn: pt => Math.sin(4*pt.u)/pt.d },
-  { name: 'AG: cos(4u)/d',      fn: pt => Math.cos(4*pt.u)/pt.d },
-  { name: 'AH: 1/d²',          fn: pt => 1/(pt.d*pt.d) },
-  { name: 'AI: 1/s²',          fn: pt => 1/(pt.sunDist*pt.sunDist) },
-  { name: 'AJ: sin(u)/s²',     fn: pt => Math.sin(pt.u)/(pt.sunDist*pt.sunDist) },
-  { name: 'AK: cos(u)/s²',     fn: pt => Math.cos(pt.u)/(pt.sunDist*pt.sunDist) },
-  { name: 'AL: T/d',            fn: pt => { const T=(pt.year-2000)/100; return T/pt.d; }},
-  { name: 'AM: T/s',            fn: pt => { const T=(pt.year-2000)/100; return T/pt.sunDist; }},
-  { name: 'AN: sin(u)/(d*s)',   fn: pt => Math.sin(pt.u)/(pt.d*pt.sunDist) },
-  { name: 'AO: cos(u)/(d*s)',   fn: pt => Math.cos(pt.u)/(pt.d*pt.sunDist) },
-  { name: 'AP: sin(2u)/(d*s)',  fn: pt => Math.sin(2*pt.u)/(pt.d*pt.sunDist) },
-  { name: 'AQ: cos(2u)/(d*s)',  fn: pt => Math.cos(2*pt.u)/(pt.d*pt.sunDist) },
-  { name: 'AR: sin(3u)/s',      fn: pt => Math.sin(3*pt.u)/pt.sunDist },
-  { name: 'AS: cos(3u)/s',      fn: pt => Math.cos(3*pt.u)/pt.sunDist },
-  { name: 'AT: T*sin(u)/d²',   fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(pt.u)/(pt.d*pt.d); }},
-  { name: 'AU: T*cos(u)/d²',   fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(pt.u)/(pt.d*pt.d); }},
+  // Higher-order distance terms (1/d³) — key for Venus close-approach errors
+  { name: '1/d³',            fn: pt => 1/(pt.d*pt.d*pt.d) },
+  { name: 'sin(u)/d³',       fn: pt => Math.sin(pt.u)/(pt.d*pt.d*pt.d) },
+  { name: 'cos(u)/d³',       fn: pt => Math.cos(pt.u)/(pt.d*pt.d*pt.d) },
+  { name: 'sin(2u)/d³',      fn: pt => Math.sin(2*pt.u)/(pt.d*pt.d*pt.d) },
+  { name: 'cos(2u)/d³',      fn: pt => Math.cos(2*pt.u)/(pt.d*pt.d*pt.d) },
+  { name: 'sin(3u)/d³',      fn: pt => Math.sin(3*pt.u)/(pt.d*pt.d*pt.d) },
+  { name: 'cos(3u)/d³',      fn: pt => Math.cos(3*pt.u)/(pt.d*pt.d*pt.d) },
+  // Cross terms 1/(d²*s)
+  { name: '1/(d²*s)',         fn: pt => 1/(pt.d*pt.d*pt.sunDist) },
+  { name: 'sin(u)/(d²*s)',    fn: pt => Math.sin(pt.u)/(pt.d*pt.d*pt.sunDist) },
+  { name: 'cos(u)/(d²*s)',    fn: pt => Math.cos(pt.u)/(pt.d*pt.d*pt.sunDist) },
+  { name: 'sin(2u)/(d²*s)',   fn: pt => Math.sin(2*pt.u)/(pt.d*pt.d*pt.sunDist) },
+  { name: 'cos(2u)/(d²*s)',   fn: pt => Math.cos(2*pt.u)/(pt.d*pt.d*pt.sunDist) },
+  // Higher harmonics
+  { name: 'sin(4u)/d',        fn: pt => Math.sin(4*pt.u)/pt.d },
+  { name: 'cos(4u)/d',        fn: pt => Math.cos(4*pt.u)/pt.d },
+  { name: 'sin(4u)/d²',       fn: pt => Math.sin(4*pt.u)/(pt.d*pt.d) },
+  { name: 'cos(4u)/d²',       fn: pt => Math.cos(4*pt.u)/(pt.d*pt.d) },
+  { name: 'sin(5u)/d',        fn: pt => Math.sin(5*pt.u)/pt.d },
+  { name: 'cos(5u)/d',        fn: pt => Math.cos(5*pt.u)/pt.d },
+  { name: 'sin(4u)/s',        fn: pt => Math.sin(4*pt.u)/pt.sunDist },
+  { name: 'cos(4u)/s',        fn: pt => Math.cos(4*pt.u)/pt.sunDist },
+  // Time-distance cross terms
+  { name: 'T*sin(u)/d²',     fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(pt.u)/(pt.d*pt.d); }},
+  { name: 'T*cos(u)/d²',     fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(pt.u)/(pt.d*pt.d); }},
+  { name: 'T*sin(2u)/d²',    fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(2*pt.u)/(pt.d*pt.d); }},
+  { name: 'T*cos(2u)/d²',    fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(2*pt.u)/(pt.d*pt.d); }},
+  { name: 'T²',               fn: pt => { const T=(pt.year-2000)/100; return T*T; }},
+  { name: 'T²*sin(u)/d',      fn: pt => { const T=(pt.year-2000)/100; return T*T*Math.sin(pt.u)/pt.d; }},
+  { name: 'T²*cos(u)/d',      fn: pt => { const T=(pt.year-2000)/100; return T*T*Math.cos(pt.u)/pt.d; }},
+  { name: 'T²/d',             fn: pt => { const T=(pt.year-2000)/100; return T*T/pt.d; }},
+  { name: 'T*cos(u)/s',       fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(pt.u)/pt.sunDist; }},
+  { name: 'T*cos(2u)/s',      fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(2*pt.u)/pt.sunDist; }},
+  { name: 'T*sin(3u)/d',      fn: pt => { const T=(pt.year-2000)/100; return T*Math.sin(3*pt.u)/pt.d; }},
+  { name: 'T*cos(3u)/d',      fn: pt => { const T=(pt.year-2000)/100; return T*Math.cos(3*pt.u)/pt.d; }},
+  { name: 'sin(2u)/d²',       fn: pt => Math.sin(2*pt.u)/(pt.d*pt.d) },
+  { name: 'cos(2u)/d²',       fn: pt => Math.cos(2*pt.u)/(pt.d*pt.d) },
+  { name: 'sin(3u)/d²',       fn: pt => Math.sin(3*pt.u)/(pt.d*pt.d) },
+  { name: 'cos(u)/(d*s)',     fn: pt => Math.cos(pt.u)/(pt.d*pt.sunDist) },
+  { name: 'sin(2u)/(d*s)',    fn: pt => Math.sin(2*pt.u)/(pt.d*pt.sunDist) },
+  { name: 'cos(2u)/s²',       fn: pt => Math.cos(2*pt.u)/(pt.sunDist*pt.sunDist) },
+  { name: 'cos(u)/s²',        fn: pt => Math.cos(pt.u)/(pt.sunDist*pt.sunDist) },
+  { name: 'sin(3u)/s²',       fn: pt => Math.sin(3*pt.u)/(pt.sunDist*pt.sunDist) },
+  { name: 'cos(3u)/s²',       fn: pt => Math.cos(3*pt.u)/(pt.sunDist*pt.sunDist) },
 ];
+
+// Base 30-param basis (24p + 6 from previous greedy round)
+const base30 = (pt) => {
+  const T = (pt.year - 2000) / 100;
+  const d = pt.d, s = pt.sunDist;
+  const invD = 1/d, invS = 1/s, invD2 = invD*invD, invS2 = invS*invS;
+  const invDS = invD * invS;
+  const sinU = Math.sin(pt.u), cosU = Math.cos(pt.u);
+  const sin2U = Math.sin(2*pt.u), cos2U = Math.cos(2*pt.u);
+  const sin3U = Math.sin(3*pt.u), cos3U = Math.cos(3*pt.u);
+  return [
+    1, invD, T,
+    sinU*invD, cosU*invD,
+    sin2U*invD, cos2U*invD,
+    sin3U*invD, cos3U*invD,
+    T*sinU*invD, T*cosU*invD,
+    invS,
+    sinU*invD2,
+    sin2U*invS,
+    cosU*invS,
+    T*sin2U*invD,
+    T*cos2U*invD,
+    T*sinU*invS,
+    T*invD,
+    cosU*invD2,
+    invS2,
+    sinU*invS2,
+    cos3U*invS,
+    sin3U*invS,
+    // 6 terms from previous greedy round
+    invDS,              // Z: 1/(d*s)
+    sinU*invDS,         // AA: sin(u)/(d*s)
+    cos2U*invDS,        // AB: cos(2u)/(d*s)
+    T*sin2U*invS,       // AC: T*sin(2u)/s
+    cos3U*invD2,        // AD: cos(3u)/d²
+    sin2U*invS2,        // AE: sin(2u)/s²
+  ];
+};
+
+const validCandidates = candidateDefs;
 
 for (const target of targets) {
   const allPoints = refData.planets[target] || [];
@@ -70,73 +128,80 @@ for (const target of targets) {
   }
 
   const n = data.length;
+  const useKFold = n > 200;
+  const K_FOLDS = 10;
+  const cvFn = useKFold ? kfoldCV : loocv;
+  const cvLabel = useKFold ? `${K_FOLDS}-fold CV` : 'LOOCV';
 
-  // Base 18-param basis
-  const base18 = (pt) => {
-    const T = (pt.year - 2000) / 100;
-    return [
-      1, 1/pt.d, T,
-      Math.sin(pt.u)/pt.d, Math.cos(pt.u)/pt.d,
-      Math.sin(2*pt.u)/pt.d, Math.cos(2*pt.u)/pt.d,
-      Math.sin(3*pt.u)/pt.d, Math.cos(3*pt.u)/pt.d,
-      T*Math.sin(pt.u)/pt.d, T*Math.cos(pt.u)/pt.d,
-      1/pt.sunDist,
-      Math.sin(pt.u)/(pt.d*pt.d),
-      Math.sin(2*pt.u)/pt.sunDist,
-      Math.cos(pt.u)/pt.sunDist,
-      T*Math.sin(2*pt.u)/pt.d,
-      T*Math.cos(2*pt.u)/pt.d,
-      T*Math.sin(pt.u)/pt.sunDist,
-    ];
-  };
+  const baseCV = cvFn(data, base30, pt => pt.dDec, pt => pt.dRA);
+  console.log(`\n${target.toUpperCase()} (n=${n}, ${cvLabel})  30p CV=${baseCV.total.toFixed(4)}`);
 
-  const cv18 = loocv(data, base18, pt => pt.dDec, pt => pt.dRA);
-  console.log(`\n${target.toUpperCase()} (n=${n})  18p CV=${cv18.total.toFixed(4)}`);
-
-  // Greedy forward: find best 19th
+  // Greedy forward: find best 31st–40th
   let selected = [];
-  let currentBasis = base18;
-  let currentCV = cv18.total;
+  let currentCV = baseCV.total;
 
-  for (let round = 0; round < 3; round++) {
-    let bestIdx = -1, bestCV = currentCV;
-    for (let ci = 0; ci < candidateDefs.length; ci++) {
+  for (let round = 0; round < 10; round++) {
+    let bestIdx = -1, bestCVVal = currentCV;
+    for (let ci = 0; ci < validCandidates.length; ci++) {
       if (selected.includes(ci)) continue;
       const extras = [...selected, ci];
       const testBasis = (pt) => {
-        const b = base18(pt);
-        for (const idx of extras) b.push(candidateDefs[idx].fn(pt));
+        const b = base30(pt);
+        for (const idx of extras) b.push(validCandidates[idx].fn(pt));
         return b;
       };
-      const cv = loocv(data, testBasis, pt => pt.dDec, pt => pt.dRA);
-      if (cv.total < bestCV) { bestCV = cv.total; bestIdx = ci; }
+      const cv = cvFn(data, testBasis, pt => pt.dDec, pt => pt.dRA);
+      if (cv.total < bestCVVal) { bestCVVal = cv.total; bestIdx = ci; }
     }
-    if (bestIdx >= 0) {
+    if (bestIdx >= 0 && bestCVVal < currentCV * 0.999) {  // require 0.1% improvement
       selected.push(bestIdx);
-      const impr = (1 - bestCV / currentCV) * 100;
-      console.log(`  +${candidateDefs[bestIdx].name.padEnd(22)} CV=${bestCV.toFixed(4)} (${impr.toFixed(1)}% improvement)`);
-      currentCV = bestCV;
+      const impr = (1 - bestCVVal / currentCV) * 100;
+      console.log(`  +${validCandidates[bestIdx].name.padEnd(22)} CV=${bestCVVal.toFixed(4)} (${impr.toFixed(1)}% improvement)`);
+      currentCV = bestCVVal;
     } else {
       console.log(`  No further improvement found`);
       break;
     }
   }
 
-  // Final result with all selected extras
   if (selected.length > 0) {
-    const finalBasis = (pt) => {
-      const b = base18(pt);
-      for (const idx of selected) b.push(candidateDefs[idx].fn(pt));
-      return b;
-    };
-    const finalFit18 = linearFit(data, base18, pt => pt.dDec);
-    const finalFitExt = linearFit(data, finalBasis, pt => pt.dDec);
-    console.log(`  Total: 18p CV=${cv18.total.toFixed(4)} → ${(18+selected.length)}p CV=${currentCV.toFixed(4)} (${((1-currentCV/cv18.total)*100).toFixed(1)}% total improvement)`);
+    console.log(`  Total: 30p CV=${baseCV.total.toFixed(4)} → ${(30+selected.length)}p CV=${currentCV.toFixed(4)} (${((1-currentCV/baseCV.total)*100).toFixed(1)}% total improvement)`);
   }
 }
 
 C.ASTRO_REFERENCE.decCorrection = savedDec;
 C.ASTRO_REFERENCE.raCorrection = savedRA;
+
+function kfoldCV(data, basisFn, decFn, raFn) {
+  const n = data.length;
+  const K = 10;
+  // Shuffle indices deterministically
+  const indices = Array.from({length: n}, (_, i) => i);
+  // Simple deterministic shuffle based on index
+  for (let i = n - 1; i > 0; i--) {
+    const j = (i * 7919 + 104729) % (i + 1);  // deterministic pseudo-random
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const foldSize = Math.ceil(n / K);
+  let ssDec = 0, ssRA = 0, total = 0;
+  for (let fold = 0; fold < K; fold++) {
+    const testStart = fold * foldSize;
+    const testEnd = Math.min(testStart + foldSize, n);
+    const testIndices = new Set(indices.slice(testStart, testEnd));
+    const train = data.filter((_, i) => !testIndices.has(i));
+    const decFit = linearFit(train, basisFn, decFn);
+    const raFit = linearFit(train, basisFn, raFn);
+    for (const ti of testIndices) {
+      const xi = basisFn(data[ti]);
+      let predDec = 0, predRA = 0;
+      for (let j = 0; j < xi.length; j++) { predDec += decFit.beta[j] * xi[j]; predRA += raFit.beta[j] * xi[j]; }
+      ssDec += (decFn(data[ti]) - predDec) ** 2;
+      ssRA += (raFn(data[ti]) - predRA) ** 2;
+      total++;
+    }
+  }
+  return { dec: Math.sqrt(ssDec/total), ra: Math.sqrt(ssRA/total), total: Math.sqrt((ssDec+ssRA)/total) };
+}
 
 function loocv(data, basisFn, decFn, raFn) {
   const n = data.length;

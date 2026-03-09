@@ -49,16 +49,32 @@ const basisFn = (pt) => {
     Math.sin(pt.u)/(pt.sunDist*pt.sunDist), // W: sin(u)/s²
     Math.cos(3*pt.u)/pt.sunDist,   // X: cos(3u)/s
     Math.sin(3*pt.u)/pt.sunDist,   // Y: sin(3u)/s
+    // Extended terms (25-30) found by greedy forward selection round 1
+    1/(pt.d*pt.sunDist),            // Z: 1/(d*s)
+    Math.sin(pt.u)/(pt.d*pt.sunDist), // AA: sin(u)/(d*s)
+    Math.cos(2*pt.u)/(pt.d*pt.sunDist), // AB: cos(2u)/(d*s)
+    T*Math.sin(2*pt.u)/pt.sunDist,  // AC: T*sin(2u)/s
+    Math.cos(3*pt.u)/(pt.d*pt.d),   // AD: cos(3u)/d²
+    Math.sin(2*pt.u)/(pt.sunDist*pt.sunDist), // AE: sin(2u)/s²
+    // Extended terms (31-36) found by greedy forward selection round 2
+    Math.sin(3*pt.u)/(pt.sunDist*pt.sunDist), // AF: sin(3u)/s²
+    Math.cos(3*pt.u)/(pt.sunDist*pt.sunDist), // AG: cos(3u)/s²
+    Math.cos(pt.u)/(pt.sunDist*pt.sunDist),   // AH: cos(u)/s²
+    Math.sin(pt.u)/(pt.d*pt.d*pt.sunDist),    // AI: sin(u)/(d²*s)
+    Math.cos(4*pt.u)/pt.sunDist,               // AJ: cos(4u)/s
+    Math.sin(2*pt.u)/(pt.d*pt.d*pt.sunDist),  // AK: sin(2u)/(d²*s)
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK'];
 
-// Tier sizes: 15, 18, 24
+// Tier sizes: 15, 18, 24, 30, 36
 const tiers = [
   { name: '15p', count: 15 },
   { name: '18p', count: 18 },
   { name: '24p', count: 24 },
+  { name: '30p', count: 30 },
+  { name: '36p', count: 36 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
@@ -98,19 +114,23 @@ for (const target of targets) {
   const origTot = Math.sqrt(origRmsRA**2 + origRmsDec**2);
 
   // Test each tier
+  const useKFold = n > 200;
+  const cvFn = useKFold ? kfoldCV : loocv;
+  const cvLabel = useKFold ? '10-fold CV' : 'LOOCV';
   let bestTier = null, bestCV = Infinity;
   const tierResults = [];
   for (const tier of tiers) {
+    if (tier.count > n) continue;  // skip tiers with more params than data
     const basis = (pt) => basisFn(pt).slice(0, tier.count);
     const decR = linearFit(data, basis, pt => pt.dDec);
     const raR = linearFit(data, basis, pt => pt.dRA);
     const fit = Math.sqrt(raR.rms**2 + decR.rms**2);
-    const cv = loocv(data, basis, pt => pt.dDec, pt => pt.dRA);
+    const cv = cvFn(data, basis, pt => pt.dDec, pt => pt.dRA);
     tierResults.push({ tier, fit, cv: cv.total, decBeta: decR.beta, raBeta: raR.beta });
     if (cv.total < bestCV) { bestCV = cv.total; bestTier = tierResults[tierResults.length - 1]; }
   }
 
-  console.log(`${target.toUpperCase()} (n=${n})  orig: Tot=${origTot.toFixed(4)}`);
+  console.log(`${target.toUpperCase()} (n=${n}, ${cvLabel})  orig: Tot=${origTot.toFixed(4)}`);
   for (const tr of tierResults) {
     const marker = tr === bestTier ? ' <-- BEST' : '';
     console.log(`  ${tr.tier.name}: fit=${tr.fit.toFixed(4)} CV=${tr.cv.toFixed(4)}${marker}`);
@@ -125,6 +145,35 @@ for (const target of targets) {
 
 C.ASTRO_REFERENCE.decCorrection = savedDec;
 C.ASTRO_REFERENCE.raCorrection = savedRA;
+
+function kfoldCV(data, basisFn, decFn, raFn) {
+  const n = data.length;
+  const K = 10;
+  const indices = Array.from({length: n}, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = (i * 7919 + 104729) % (i + 1);
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const foldSize = Math.ceil(n / K);
+  let ssDec = 0, ssRA = 0, total = 0;
+  for (let fold = 0; fold < K; fold++) {
+    const testStart = fold * foldSize;
+    const testEnd = Math.min(testStart + foldSize, n);
+    const testIndices = new Set(indices.slice(testStart, testEnd));
+    const train = data.filter((_, i) => !testIndices.has(i));
+    const decFit = linearFit(train, basisFn, decFn);
+    const raFit = linearFit(train, basisFn, raFn);
+    for (const ti of testIndices) {
+      const xi = basisFn(data[ti]);
+      let predDec = 0, predRA = 0;
+      for (let j = 0; j < xi.length; j++) { predDec += decFit.beta[j] * xi[j]; predRA += raFit.beta[j] * xi[j]; }
+      ssDec += (decFn(data[ti]) - predDec) ** 2;
+      ssRA += (raFn(data[ti]) - predRA) ** 2;
+      total++;
+    }
+  }
+  return { dec: Math.sqrt(ssDec/total), ra: Math.sqrt(ssRA/total), total: Math.sqrt((ssDec+ssRA)/total) };
+}
 
 function loocv(data, basisFn, decFn, raFn) {
   const n = data.length;

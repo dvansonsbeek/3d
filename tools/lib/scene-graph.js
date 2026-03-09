@@ -640,9 +640,10 @@ function moveModel(graph, pos) {
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
+    // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
     if (C.useVariableSpeed && def.lunarPerturbations) {
-      const d = (C.startmodelJD - C.j2000JD) + pos * C.meanSolarYearDays;
-      const T = d / C.julianCenturyDays;
+      const d = (C.startmodelJD - 2451545.0) + pos * C.meanSolarYearDays;
+      const T = d / 36525;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
       const Lp = (218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000) * d2r;
@@ -907,6 +908,7 @@ function computePlanetPosition(target, jd) {
 
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
+      const invDS = invD * invS;
       const corrDec = dc.A + dc.B * invD + (dc.C || 0) * T
         + (dc.D * sinU + dc.E * cosU + dc.F * sin2U + dc.G * cos2U
          + (dc.H || 0) * sin3U + (dc.I || 0) * cos3U) * invD
@@ -917,12 +919,19 @@ function computePlanetPosition(target, jd) {
         + (dc.R || 0) * T * sinU * invS
         + (dc.S || 0) * T * invD + (dc.U || 0) * cosU * invD2
         + (dc.V || 0) * invS2 + (dc.W || 0) * sinU * invS2
-        + (dc.X || 0) * cos3U * invS + (dc.Y || 0) * sin3U * invS;
+        + (dc.X || 0) * cos3U * invS + (dc.Y || 0) * sin3U * invS
+        + (dc.Z || 0) * invDS + (dc.AA || 0) * sinU * invDS
+        + (dc.AB || 0) * cos2U * invDS + (dc.AC || 0) * T * sin2U * invS
+        + (dc.AD || 0) * cos3U * invD2 + (dc.AE || 0) * sin2U * invS2
+        + (dc.AF || 0) * sin3U * invS2 + (dc.AG || 0) * cos3U * invS2
+        + (dc.AH || 0) * cosU * invS2 + (dc.AI || 0) * sinU * invD2 * invS
+        + (dc.AJ || 0) * Math.cos(4*u) * invS + (dc.AK || 0) * sin2U * invD2 * invS;
       sph.phi += corrDec * d2r;
     }
 
     const rc = C.ASTRO_REFERENCE.raCorrection && C.ASTRO_REFERENCE.raCorrection[target];
     if (rc) {
+      const invDS = invD * invS;
       const corrRA = rc.A + rc.B * invD + (rc.C || 0) * T
         + (rc.D * sinU + rc.E * cosU + rc.F * sin2U + rc.G * cos2U
          + (rc.H || 0) * sin3U + (rc.I || 0) * cos3U) * invD
@@ -933,7 +942,13 @@ function computePlanetPosition(target, jd) {
         + (rc.R || 0) * T * sinU * invS
         + (rc.S || 0) * T * invD + (rc.U || 0) * cosU * invD2
         + (rc.V || 0) * invS2 + (rc.W || 0) * sinU * invS2
-        + (rc.X || 0) * cos3U * invS + (rc.Y || 0) * sin3U * invS;
+        + (rc.X || 0) * cos3U * invS + (rc.Y || 0) * sin3U * invS
+        + (rc.Z || 0) * invDS + (rc.AA || 0) * sinU * invDS
+        + (rc.AB || 0) * cos2U * invDS + (rc.AC || 0) * T * sin2U * invS
+        + (rc.AD || 0) * cos3U * invD2 + (rc.AE || 0) * sin2U * invS2
+        + (rc.AF || 0) * sin3U * invS2 + (rc.AG || 0) * cos3U * invS2
+        + (rc.AH || 0) * cosU * invS2 + (rc.AI || 0) * sinU * invD2 * invS
+        + (rc.AJ || 0) * Math.cos(4*u) * invS + (rc.AK || 0) * sin2U * invD2 * invS;
       sph.theta -= corrRA * d2r;
     }
   }

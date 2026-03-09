@@ -137,7 +137,7 @@ if (command === 'diagnose') {
   const sg = require('./lib/scene-graph');
 
   async function runBaselineAll() {
-    const targets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const targets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'moon'];
     const jd0 = C.startmodelJD;
     const fmtRA = (deg) => {
       if (deg < 0) deg += 360;
@@ -190,7 +190,7 @@ if (command === 'diagnose') {
         bl.rmsDec.toFixed(2).padStart(8),
         bl.rmsTotal.toFixed(2).padStart(8),
         String(bl.entries.length).padStart(4),
-        String(pDef.startpos).padStart(10),
+        String(pDef ? pDef.startpos : '—').padStart(10),
         fmtRA(modelRA).padEnd(15),
         jplRAStr.padEnd(15),
         ((dRA >= 0 ? '+' : '') + dRA.toFixed(2)).padStart(8),
@@ -207,8 +207,8 @@ if (command === 'diagnose') {
   async function runBaseline() {
     let refDates = undefined;
 
-    if (command === 'baseline-jpl' || planet === 'sun' || planet === 'moon') {
-      // Fetch from JPL for sun/moon or when explicitly requested
+    if (command === 'baseline-jpl' || planet === 'sun') {
+      // Fetch from JPL for sun or when explicitly requested
       console.log(`Fetching JPL reference positions for ${planet}...`);
       const jds = opt.defaultReferenceDates();
       const positions = await jplModule.getPositions(planet, jds);

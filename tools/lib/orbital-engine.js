@@ -5,6 +5,8 @@
 // All functions here compute orbital ELEMENTS (eccentricity, obliquity,
 // inclination, year lengths, perihelion longitude, precession) as
 // functions of time. They do NOT compute scene graph positions.
+//
+// Primary consumer: tools/tuning/validate-scene-graph.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
