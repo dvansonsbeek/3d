@@ -43,13 +43,13 @@ const planets = {
     solarYearInput: 87.9686,
     eclipticInclinationJ2000: 7.00497902,
     orbitalEccentricity: 0.20563593,
-    eocFraction: -0.49,
+    eocFraction: -0.527,
     invPlaneInclinationJ2000: 6.3472858,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
     angleCorrection: 0.971049,
     perihelionEclipticYears: H / (1 + 3/8),
-    startpos: 83.47,
+    startpos: 83.53,
     invPlaneInclinationMean: null, // filled below
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -63,13 +63,13 @@ const planets = {
     solarYearInput: 224.695,
     eclipticInclinationJ2000: 3.39467605,
     orbitalEccentricity: 0.00677672,
-    eocFraction: 0.547,
+    eocFraction: 0.598,
     invPlaneInclinationJ2000: 2.1545441,
     longitudePerihelion: 131.5765919,
     ascendingNode: 76.67877109,
     angleCorrection: -2.784782,
     perihelionEclipticYears: H * 2,
-    startpos: 249.31,
+    startpos: 249.30,
     invPlaneInclinationMean: null,
     invPlaneInclinationAmplitude: null,
     inclinationPhaseAngle: 203.3195,
@@ -249,8 +249,8 @@ const ASTRO_REFERENCE = {
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   // Planet perihelion passages (for equation of center phase references)
   // Source: JPL Horizons
-  mercuryPerihelionRef_JD: 2460335.7,     // Phase-optimized
-  venusPerihelionRef_JD: 2460639.3,       // Phase-optimized
+  mercuryPerihelionRef_JD: 2460335.9,     // Phase-optimized
+  venusPerihelionRef_JD: 2459978.8,       // Phase-optimized
   marsPerihelionRef_JD: 2456505.6,        // Re-optimized with Dec correction
   jupiterPerihelionRef_JD: 2464224.5,     // Phase-optimized (-6° from 2023-Jan-21)
   saturnPerihelionRef_JD: 2452875.9,      // Phase-optimized (+1° from 2003-Jul-26)
@@ -280,25 +280,27 @@ const ASTRO_REFERENCE = {
   //              + T*(J*sin(u) + K*cos(u))/d
   //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
   //         T = (year - 2000) / 100 (centuries from J2000)
-  // Fitted from JPL reference data via linear least squares (11 terms).
-  // Corrects tilt-direction error + precession drift + higher harmonics.
+  // Fitted from JPL reference data via linear least squares (15/18/24 terms per planet).
+  // L = 1/sunDist, M = sin(u)/d², N = sin(2u)/sunDist, O = cos(u)/sunDist
+  // P = T*sin(2u)/d, Q = T*cos(2u)/d, R = T*sin(u)/sunDist
+  // S = T/d, U = cos(u)/d², V = 1/s², W = sin(u)/s², X = cos(3u)/s, Y = sin(3u)/s
   decCorrection: {
-    mercury: { A: 0.1783, B: 3.5673, C: 0.1559, D:-5.4328, E:-0.2678, F: 0.0940, G:-3.1939, H: 1.0857, I: 0.0850, J:-0.0311, K:-0.1880 },
-    venus:   { A: 0.0437, B:-0.0966, C: 0.0577, D:-0.4116, E:-0.0168, F: 0.4793, G: 0.1413, H:-0.2270, I:-0.0256, J:-0.0123, K:-0.0418 },
-    mars:    { A:-0.0887, B:-0.3737, C: 0.1854, D:-0.0387, E:-0.2556, F:-0.0694, G:-0.1293, H: 0.0104, I: 0.0586, J: 0.1899, K:-0.1338 },
-    jupiter: { A:-0.0443, B:-0.1734, C: 0.0249, D: 0.2952, E:-0.0468, F: 0.0134, G:-0.0571, H: 0.0116, I:-0.0349, J:-0.4416, K: 0.1897 },
-    saturn:  { A: 0.1007, B:-1.4316, C: 0.0095, D:-0.8950, E:-0.3876, F: 0.0600, G: 0.0278, H: 0.0153, I: 0.0706, J: 1.6760, K: 0.8588 },
-    uranus:  { A:-5.4965, B:106.1258, C:-0.0140, D:-4.2419, E: 6.2516, F:-0.1521, G: 0.0548, H:-0.0808, I:-0.1954, J: 0.9457, K:-0.0454 },
-    neptune: { A:-0.0236, B:-0.0319, C: 0.0054, D:-1.8929, E:-1.4210, F:-0.1843, G: 0.1434, H:-0.0085, I: 0.0308, J: 5.7511, K: 5.3847 },
+    mercury: { A:-26.4765, B: 1.9425, C: 0.4257, D: 19.0275, E: 8.4947, F:-0.7686, G: 2.1238, H: 2.4495, I:-1.9044, J: 0.5150, K:-0.1849, L: 4.4249, M:-6.1584, N:-0.7988, O: 0.7045, P: 0.0169, Q: 0.2211, R:-0.1242, S:-0.4228, U:-3.6292, V: 1.3188, W:-1.2350, X: 0.4720, Y:-2.0000 },
+    venus:   { A: 23.0780, B: 0.2344, C: 0.0373, D: 0.0093, E:-0.3313, F: 0.6052, G: 0.0168, H:-0.0410, I:-0.0198, J:-0.0009, K:-0.0482, L:-17.2428, M:-0.2810, N:-0.2073, O: 0.7496 },
+    mars:    { A: 59.9806, B: 0.0946, C: 0.0470, D:-1.5432, E:-0.3812, F: 0.1680, G:-0.0738, H:-0.0323, I:-0.0571, J: 0.3839, K:-0.1671, L:-172.1433, M: 0.4768, N:-0.7131, O: 2.0208, P:-0.1159, Q:-0.0882, R:-0.4348, S: 0.1019, U:-0.2218, V: 120.7398, W: 1.1695, X: 0.1863, Y: 0.1744 },
+    jupiter: { A:-2.0257, B: 0.2950, C: 0.0243, D: 0.1798, E: 0.9869, F: 0.9763, G: 0.0123, H: 0.0735, I:-0.0236, J:-0.4330, K: 0.1228, L: 9.9315, M: 3.5390, N:-0.8411, O:-0.9972 },
+    saturn:  { A: 1.6120, B:-0.8469, C: 0.0006, D:-2.8336, E: 0.7513, F: 2.9286, G: 0.2602, H: 0.1197, I: 0.1416, J: 4.3383, K: 0.7489, L:-14.9014, M: 14.9579, N:-2.5999, O:-0.3548, P:-0.2013, Q:-0.2767, R:-2.5001 },
+    uranus:  { A: 379.1954, B: 5839.3621, C:-0.0183, D: 1865.4010, E: 756.2219, F: 473.2574, G:-11.7285, H: 3.1282, I:-3.0679, J: 0.9773, K:-2.0333, L:-13060.4948, M:-27401.0619, N:-485.8414, O:-484.2592 },
+    neptune: { A: 7.1372, B:-0.7932, C: 0.0048, D:-12.3813, E: 0.8775, F: 4.3492, G: 0.1761, H: 0.0541, I: 0.0986, J: 2.1350, K: 5.3214, L:-213.9709, M: 260.2405, N:-4.5325, O:-2.2516, P: 0.0979, Q:-0.0525, R: 3.6117 },
   },
   raCorrection: {
-    mercury: { A:-0.0539, B:-4.9193, C: 0.3245, D: 1.5397, E: 5.2298, F:-2.3940, G: 4.6703, H:-1.2783, I:-5.6792, J:-0.4133, K: 0.2514 },
-    venus:   { A: 0.6074, B:-1.2066, C: 0.0150, D: 1.2003, E: 0.4581, F:-0.3214, G: 1.0958, H:-0.1873, I:-0.4883, J:-0.0605, K: 0.0400 },
-    mars:    { A: 0.6145, B:-0.2738, C:-0.1009, D: 0.1439, E:-0.0011, F: 0.2643, G:-0.0099, H:-0.0396, I:-0.0327, J:-0.4061, K: 0.0487 },
-    jupiter: { A: 0.3774, B:-2.6427, C: 0.2077, D: 0.1446, E:-0.1472, F:-0.2493, G: 0.0295, H: 0.0788, I: 0.0801, J:-0.6651, K:-0.1367 },
-    saturn:  { A: 0.6307, B:-3.4158, C:-0.4651, D:-0.0388, E:-1.8985, F: 0.5727, G:-0.0705, H:-0.2016, I:-0.0477, J:-0.7648, K: 1.9948 },
-    uranus:  { A:52.8271, B:-1007.7449, C:-0.1175, D:29.4285, E:-57.3179, F: 0.7051, G:-0.3225, H: 0.1894, I: 1.4402, J: 1.2335, K: 0.0234 },
-    neptune: { A:-0.0198, B: 6.9895, C:-0.6160, D: 1.5396, E: 0.6993, F: 0.5250, G:-0.1262, H: 0.1078, I:-0.2092, J:-1.6152, K:-0.0952 },
+    mercury: { A:-3.6801, B:-3.0623, C:-0.7149, D:-15.6859, E:-16.2090, F: 5.7831, G:-3.5344, H:-4.3628, I: 4.2560, J:-0.2216, K: 0.1318, L: 12.6151, M: 6.2031, N:-2.4448, O: 1.4961, P: 0.0679, Q: 0.0024, R: 0.1391, S: 0.5567, U: 7.6022, V:-2.9180, W: 0.2100, X:-2.1092, Y: 3.0535 },
+    venus:   { A: 118.2311, B: 0.4462, C:-0.0230, D: 0.2556, E:-1.3715, F:-0.4588, G: 0.1874, H:-0.1210, I: 0.1398, J: 0.0964, K: 0.0345, L:-87.2124, M: 0.1170, N: 0.7311, O: 2.8064 },
+    mars:    { A:-32.2620, B:-0.7909, C: 0.0656, D: 1.5278, E: 2.9112, F:-0.6596, G:-0.0551, H: 0.0147, I: 0.0797, J:-0.4271, K: 0.0608, L: 73.3673, M:-0.2008, N: 2.3454, O:-4.8123, P: 0.0064, Q:-0.0029, R:-0.0241, S:-0.1047, U:-0.8254, V:-32.7017, W:-1.1194, X:-0.0970, Y:-0.1603 },
+    jupiter: { A:-10.9022, B:-3.2132, C: 0.2060, D: 6.5904, E:-1.8190, F: 1.4691, G:-0.0282, H: 0.1637, I: 0.0817, J:-0.5991, K:-0.1257, L: 59.0984, M:-18.2508, N:-1.4502, O: 0.9280 },
+    saturn:  { A:-1.1690, B: 0.5568, C:-0.4688, D:-1.4093, E: 2.4082, F:-14.2228, G: 0.2189, H:-0.7966, I:-0.1699, J:-15.1481, K: 2.1039, L: 13.6421, M: 14.2687, N: 14.0067, O:-4.5073, P: 0.0074, Q:-0.3005, R: 13.7955 },
+    uranus:  { A: 217.1693, B:-47.9845, C:-0.1194, D: 812.0404, E: 376.7047, F: 106.8457, G:-0.7141, H: 0.5422, I: 2.1292, J: 1.1602, K:-0.8075, L:-4084.2447, M:-11872.7872, N:-112.5690, O:-399.2762 },
+    neptune: { A:-11.1233, B: 8.2146, C:-0.6126, D: 28.5941, E: 2.7089, F:-10.6928, G: 0.1093, H:-0.0421, I:-0.1884, J:-12.3265, K:-0.0386, L: 331.6762, M:-738.0130, N: 10.0551, O:-2.2888, P: 1.5160, Q:-0.4591, R: 11.6274 },
   },
 };
 

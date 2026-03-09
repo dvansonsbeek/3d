@@ -886,14 +886,20 @@ function computePlanetPosition(target, jd) {
   // Convert to spherical (matches Three.js Spherical.setFromVector3)
   const sph = cartesianToSpherical(local[0], local[1], local[2]);
 
-  // Post-hoc RA/Dec corrections for geocentric parallax + precession drift
+  // Post-hoc RA/Dec corrections for geocentric parallax + precession drift (15/18/24-param)
   // Model: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
   //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
-  //   where u = RA - ascendingNode, d = geocentric dist, T = centuries from J2000
+  //              + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
+  //              + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
+  //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
+  //   where u = RA - ascendingNode, d = geocentric dist, s = sunDist, T = centuries from J2000
   if (target !== 'moon' && target !== 'sun') {
     const ascNode = C.planets[target].ascendingNode;
     const u = (sph.theta / d2r - ascNode) * d2r;
     const invD = 1 / distAU;
+    const invD2 = invD * invD;
+    const invS = 1 / sunDistAU;
+    const invS2 = invS * invS;
     const T = (jd - C.j2000JD) / C.julianCenturyDays;  // centuries from J2000
     const sinU = Math.sin(u), cosU = Math.cos(u);
     const sin2U = Math.sin(2*u), cos2U = Math.cos(2*u);
@@ -904,7 +910,14 @@ function computePlanetPosition(target, jd) {
       const corrDec = dc.A + dc.B * invD + (dc.C || 0) * T
         + (dc.D * sinU + dc.E * cosU + dc.F * sin2U + dc.G * cos2U
          + (dc.H || 0) * sin3U + (dc.I || 0) * cos3U) * invD
-        + T * ((dc.J || 0) * sinU + (dc.K || 0) * cosU) * invD;
+        + T * ((dc.J || 0) * sinU + (dc.K || 0) * cosU) * invD
+        + (dc.L || 0) * invS + (dc.M || 0) * sinU * invD2
+        + (dc.N || 0) * sin2U * invS + (dc.O || 0) * cosU * invS
+        + (dc.P || 0) * T * sin2U * invD + (dc.Q || 0) * T * cos2U * invD
+        + (dc.R || 0) * T * sinU * invS
+        + (dc.S || 0) * T * invD + (dc.U || 0) * cosU * invD2
+        + (dc.V || 0) * invS2 + (dc.W || 0) * sinU * invS2
+        + (dc.X || 0) * cos3U * invS + (dc.Y || 0) * sin3U * invS;
       sph.phi += corrDec * d2r;
     }
 
@@ -913,7 +926,14 @@ function computePlanetPosition(target, jd) {
       const corrRA = rc.A + rc.B * invD + (rc.C || 0) * T
         + (rc.D * sinU + rc.E * cosU + rc.F * sin2U + rc.G * cos2U
          + (rc.H || 0) * sin3U + (rc.I || 0) * cos3U) * invD
-        + T * ((rc.J || 0) * sinU + (rc.K || 0) * cosU) * invD;
+        + T * ((rc.J || 0) * sinU + (rc.K || 0) * cosU) * invD
+        + (rc.L || 0) * invS + (rc.M || 0) * sinU * invD2
+        + (rc.N || 0) * sin2U * invS + (rc.O || 0) * cosU * invS
+        + (rc.P || 0) * T * sin2U * invD + (rc.Q || 0) * T * cos2U * invD
+        + (rc.R || 0) * T * sinU * invS
+        + (rc.S || 0) * T * invD + (rc.U || 0) * cosU * invD2
+        + (rc.V || 0) * invS2 + (rc.W || 0) * sinU * invS2
+        + (rc.X || 0) * cos3U * invS + (rc.Y || 0) * sin3U * invS;
       sph.theta -= corrRA * d2r;
     }
   }

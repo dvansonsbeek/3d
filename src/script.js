@@ -109,9 +109,9 @@ const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
 const mercuryAngleCorrection = 0.971049;                  // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
-const mercuryStartpos = 83.47;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
-const mercuryEocFraction = -0.49;                           // Derived: -e/2 for Type I with large eccentricity (geometric offset over-compensates)
-const mercuryPerihelionRef_JD = 2460335.7;                  // EoC phase reference — phase-optimized
+const mercuryStartpos = 83.53;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
+const mercuryEocFraction = -0.527;                          // Derived: -e/2 for Type I with large eccentricity (geometric offset over-compensates)
+const mercuryPerihelionRef_JD = 2460335.9;                  // EoC phase reference — phase-optimized
 
 // Reference lengths used as INPUT for Venus
 const venusSolarYearInput = 224.695;
@@ -126,9 +126,9 @@ const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
 const venusAngleCorrection = -2.784782;                    // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
-const venusStartpos = 249.31;                              // Tuned for start-date RA match (enriched JPL, 48 pts)
-const venusEocFraction = 0.547;                             // Optimized: Type I, ~half eccentricity from EoC (geometric offset handles rest)
-const venusPerihelionRef_JD = 2460639.3;                    // EoC phase reference — phase-optimized
+const venusStartpos = 249.30;                              // Tuned for start-date RA match (enriched JPL, 48 pts)
+const venusEocFraction = 0.598;                             // Optimized: Type I, ~half eccentricity from EoC (geometric offset handles rest)
+const venusPerihelionRef_JD = 2459978.8;                    // EoC phase reference — phase-optimized
 
 // Reference lengths used as INPUT for Mars
 const marsSolarYearInput = 686.931;
@@ -1024,29 +1024,32 @@ const ASTRO_REFERENCE = {
     neptune: 2 * neptuneStartpos,
   },
 
-  // Post-hoc RA/Dec correction for geocentric parallax effect (11-param model).
+  // Post-hoc RA/Dec correction for geocentric parallax effect (15-param model).
   // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
   //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
+  //              + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
+  //              + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
+  //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
   //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
-  //         T = (JD - j2000JD) / julianCenturyDays (centuries from J2000)
-  // Fitted from JPL reference data via linear least squares.
+  //         s = heliocentric distance (AU), T = centuries from J2000
+  // Fitted from JPL reference data via linear least squares (15/18/24 terms per planet).
   decCorrection: {
-    Mercury: { A: 0.1783, B: 3.5673, C: 0.1559, D:-5.4328, E:-0.2678, F: 0.0940, G:-3.1939, H: 1.0857, I: 0.0850, J:-0.0311, K:-0.1880 },
-    Venus:   { A: 0.0437, B:-0.0966, C: 0.0577, D:-0.4116, E:-0.0168, F: 0.4793, G: 0.1413, H:-0.2270, I:-0.0256, J:-0.0123, K:-0.0418 },
-    Mars:    { A:-0.0887, B:-0.3737, C: 0.1854, D:-0.0387, E:-0.2556, F:-0.0694, G:-0.1293, H: 0.0104, I: 0.0586, J: 0.1899, K:-0.1338 },
-    Jupiter: { A:-0.0443, B:-0.1734, C: 0.0249, D: 0.2952, E:-0.0468, F: 0.0134, G:-0.0571, H: 0.0116, I:-0.0349, J:-0.4416, K: 0.1897 },
-    Saturn:  { A: 0.1007, B:-1.4316, C: 0.0095, D:-0.8950, E:-0.3876, F: 0.0600, G: 0.0278, H: 0.0153, I: 0.0706, J: 1.6760, K: 0.8588 },
-    Uranus:  { A:-5.4965, B:106.1258, C:-0.0140, D:-4.2419, E: 6.2516, F:-0.1521, G: 0.0548, H:-0.0808, I:-0.1954, J: 0.9457, K:-0.0454 },
-    Neptune: { A:-0.0236, B:-0.0319, C: 0.0054, D:-1.8929, E:-1.4210, F:-0.1843, G: 0.1434, H:-0.0085, I: 0.0308, J: 5.7511, K: 5.3847 },
+    Mercury: { A:-26.4765, B: 1.9425, C: 0.4257, D: 19.0275, E: 8.4947, F:-0.7686, G: 2.1238, H: 2.4495, I:-1.9044, J: 0.5150, K:-0.1849, L: 4.4249, M:-6.1584, N:-0.7988, O: 0.7045, P: 0.0169, Q: 0.2211, R:-0.1242, S:-0.4228, U:-3.6292, V: 1.3188, W:-1.2350, X: 0.4720, Y:-2.0000 },
+    Venus:   { A: 23.0780, B: 0.2344, C: 0.0373, D: 0.0093, E:-0.3313, F: 0.6052, G: 0.0168, H:-0.0410, I:-0.0198, J:-0.0009, K:-0.0482, L:-17.2428, M:-0.2810, N:-0.2073, O: 0.7496 },
+    Mars:    { A: 59.9806, B: 0.0946, C: 0.0470, D:-1.5432, E:-0.3812, F: 0.1680, G:-0.0738, H:-0.0323, I:-0.0571, J: 0.3839, K:-0.1671, L:-172.1433, M: 0.4768, N:-0.7131, O: 2.0208, P:-0.1159, Q:-0.0882, R:-0.4348, S: 0.1019, U:-0.2218, V: 120.7398, W: 1.1695, X: 0.1863, Y: 0.1744 },
+    Jupiter: { A:-2.0257, B: 0.2950, C: 0.0243, D: 0.1798, E: 0.9869, F: 0.9763, G: 0.0123, H: 0.0735, I:-0.0236, J:-0.4330, K: 0.1228, L: 9.9315, M: 3.5390, N:-0.8411, O:-0.9972 },
+    Saturn:  { A: 1.6120, B:-0.8469, C: 0.0006, D:-2.8336, E: 0.7513, F: 2.9286, G: 0.2602, H: 0.1197, I: 0.1416, J: 4.3383, K: 0.7489, L:-14.9014, M: 14.9579, N:-2.5999, O:-0.3548, P:-0.2013, Q:-0.2767, R:-2.5001 },
+    Uranus:  { A: 379.1954, B: 5839.3621, C:-0.0183, D: 1865.4010, E: 756.2219, F: 473.2574, G:-11.7285, H: 3.1282, I:-3.0679, J: 0.9773, K:-2.0333, L:-13060.4948, M:-27401.0619, N:-485.8414, O:-484.2592 },
+    Neptune: { A: 7.1372, B:-0.7932, C: 0.0048, D:-12.3813, E: 0.8775, F: 4.3492, G: 0.1761, H: 0.0541, I: 0.0986, J: 2.1350, K: 5.3214, L:-213.9709, M: 260.2405, N:-4.5325, O:-2.2516, P: 0.0979, Q:-0.0525, R: 3.6117 },
   },
   raCorrection: {
-    Mercury: { A:-0.0539, B:-4.9193, C: 0.3245, D: 1.5397, E: 5.2298, F:-2.3940, G: 4.6703, H:-1.2783, I:-5.6792, J:-0.4133, K: 0.2514 },
-    Venus:   { A: 0.6074, B:-1.2066, C: 0.0150, D: 1.2003, E: 0.4581, F:-0.3214, G: 1.0958, H:-0.1873, I:-0.4883, J:-0.0605, K: 0.0400 },
-    Mars:    { A: 0.6145, B:-0.2738, C:-0.1009, D: 0.1439, E:-0.0011, F: 0.2643, G:-0.0099, H:-0.0396, I:-0.0327, J:-0.4061, K: 0.0487 },
-    Jupiter: { A: 0.3774, B:-2.6427, C: 0.2077, D: 0.1446, E:-0.1472, F:-0.2493, G: 0.0295, H: 0.0788, I: 0.0801, J:-0.6651, K:-0.1367 },
-    Saturn:  { A: 0.6307, B:-3.4158, C:-0.4651, D:-0.0388, E:-1.8985, F: 0.5727, G:-0.0705, H:-0.2016, I:-0.0477, J:-0.7648, K: 1.9948 },
-    Uranus:  { A:52.8271, B:-1007.7449, C:-0.1175, D:29.4285, E:-57.3179, F: 0.7051, G:-0.3225, H: 0.1894, I: 1.4402, J: 1.2335, K: 0.0234 },
-    Neptune: { A:-0.0198, B: 6.9895, C:-0.6160, D: 1.5396, E: 0.6993, F: 0.5250, G:-0.1262, H: 0.1078, I:-0.2092, J:-1.6152, K:-0.0952 },
+    Mercury: { A:-3.6801, B:-3.0623, C:-0.7149, D:-15.6859, E:-16.2090, F: 5.7831, G:-3.5344, H:-4.3628, I: 4.2560, J:-0.2216, K: 0.1318, L: 12.6151, M: 6.2031, N:-2.4448, O: 1.4961, P: 0.0679, Q: 0.0024, R: 0.1391, S: 0.5567, U: 7.6022, V:-2.9180, W: 0.2100, X:-2.1092, Y: 3.0535 },
+    Venus:   { A: 118.2311, B: 0.4462, C:-0.0230, D: 0.2556, E:-1.3715, F:-0.4588, G: 0.1874, H:-0.1210, I: 0.1398, J: 0.0964, K: 0.0345, L:-87.2124, M: 0.1170, N: 0.7311, O: 2.8064 },
+    Mars:    { A:-32.2620, B:-0.7909, C: 0.0656, D: 1.5278, E: 2.9112, F:-0.6596, G:-0.0551, H: 0.0147, I: 0.0797, J:-0.4271, K: 0.0608, L: 73.3673, M:-0.2008, N: 2.3454, O:-4.8123, P: 0.0064, Q:-0.0029, R:-0.0241, S:-0.1047, U:-0.8254, V:-32.7017, W:-1.1194, X:-0.0970, Y:-0.1603 },
+    Jupiter: { A:-10.9022, B:-3.2132, C: 0.2060, D: 6.5904, E:-1.8190, F: 1.4691, G:-0.0282, H: 0.1637, I: 0.0817, J:-0.5991, K:-0.1257, L: 59.0984, M:-18.2508, N:-1.4502, O: 0.9280 },
+    Saturn:  { A:-1.1690, B: 0.5568, C:-0.4688, D:-1.4093, E: 2.4082, F:-14.2228, G: 0.2189, H:-0.7966, I:-0.1699, J:-15.1481, K: 2.1039, L: 13.6421, M: 14.2687, N: 14.0067, O:-4.5073, P: 0.0074, Q:-0.3005, R: 13.7955 },
+    Uranus:  { A: 217.1693, B:-47.9845, C:-0.1194, D: 812.0404, E: 376.7047, F: 106.8457, G:-0.7141, H: 0.5422, I: 2.1292, J: 1.1602, K:-0.8075, L:-4084.2447, M:-11872.7872, N:-112.5690, O:-399.2762 },
+    Neptune: { A:-11.1233, B: 8.2146, C:-0.6126, D: 28.5941, E: 2.7089, F:-10.6928, G: 0.1093, H:-0.0421, I:-0.1884, J:-12.3265, K:-0.0386, L: 331.6762, M:-738.0130, N: 10.0551, O:-2.2888, P: 1.5160, Q:-0.4591, R: 11.6274 },
   },
 };
 
@@ -29136,15 +29139,21 @@ function updatePositions() {
     obj.ra  = SPHERICAL.theta;                       // radians
     obj.dec = SPHERICAL.phi;                         // radians
 
-    // Post-hoc RA/Dec correction for geocentric parallax (11-param model)
+    // Post-hoc RA/Dec correction for geocentric parallax (15/18/24-param model)
     // Model: dX = A + B/d + C*T + (D*sin + E*cos + F*sin2 + G*cos2 + H*sin3 + I*cos3)/d
-    //            + T*(J*sin + K*cos)/d
+    //            + T*(J*sin + K*cos)/d + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
+    //            + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
+    //            + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
     const _dc = ASTRO_REFERENCE.decCorrection[obj.name];
     const _rc = ASTRO_REFERENCE.raCorrection && ASTRO_REFERENCE.raCorrection[obj.name];
     if (_dc || _rc) {
       const _ascNode = _planetAscNodeLookup[obj.name];
       const _u = (obj.ra * (180 / Math.PI) - _ascNode) * (Math.PI / 180);
       const _invD = 1 / obj.distAU;
+      const _invD2 = _invD * _invD;
+      DELTA.subVectors(PLANET_POS, SUN_POS);
+      const _invS = 100 / DELTA.length();
+      const _invS2 = _invS * _invS;
       const _T = (o.julianDay - j2000JD) / julianCenturyDays;
       const _sinU = Math.sin(_u), _cosU = Math.cos(_u);
       const _sin2U = Math.sin(2*_u), _cos2U = Math.cos(2*_u);
@@ -29153,14 +29162,28 @@ function updatePositions() {
         const _corrDec = _dc.A + _dc.B * _invD + (_dc.C || 0) * _T
           + (_dc.D * _sinU + _dc.E * _cosU + _dc.F * _sin2U + _dc.G * _cos2U
            + (_dc.H || 0) * _sin3U + (_dc.I || 0) * _cos3U) * _invD
-          + _T * ((_dc.J || 0) * _sinU + (_dc.K || 0) * _cosU) * _invD;
+          + _T * ((_dc.J || 0) * _sinU + (_dc.K || 0) * _cosU) * _invD
+          + (_dc.L || 0) * _invS + (_dc.M || 0) * _sinU * _invD2
+          + (_dc.N || 0) * _sin2U * _invS + (_dc.O || 0) * _cosU * _invS
+          + (_dc.P || 0) * _T * _sin2U * _invD + (_dc.Q || 0) * _T * _cos2U * _invD
+          + (_dc.R || 0) * _T * _sinU * _invS
+          + (_dc.S || 0) * _T * _invD + (_dc.U || 0) * _cosU * _invD2
+          + (_dc.V || 0) * _invS2 + (_dc.W || 0) * _sinU * _invS2
+          + (_dc.X || 0) * _cos3U * _invS + (_dc.Y || 0) * _sin3U * _invS;
         obj.dec += _corrDec * (Math.PI / 180);
       }
       if (_rc) {
         const _corrRA = _rc.A + _rc.B * _invD + (_rc.C || 0) * _T
           + (_rc.D * _sinU + _rc.E * _cosU + _rc.F * _sin2U + _rc.G * _cos2U
            + (_rc.H || 0) * _sin3U + (_rc.I || 0) * _cos3U) * _invD
-          + _T * ((_rc.J || 0) * _sinU + (_rc.K || 0) * _cosU) * _invD;
+          + _T * ((_rc.J || 0) * _sinU + (_rc.K || 0) * _cosU) * _invD
+          + (_rc.L || 0) * _invS + (_rc.M || 0) * _sinU * _invD2
+          + (_rc.N || 0) * _sin2U * _invS + (_rc.O || 0) * _cosU * _invS
+          + (_rc.P || 0) * _T * _sin2U * _invD + (_rc.Q || 0) * _T * _cos2U * _invD
+          + (_rc.R || 0) * _T * _sinU * _invS
+          + (_rc.S || 0) * _T * _invD + (_rc.U || 0) * _cosU * _invD2
+          + (_rc.V || 0) * _invS2 + (_rc.W || 0) * _sinU * _invS2
+          + (_rc.X || 0) * _cos3U * _invS + (_rc.Y || 0) * _sin3U * _invS;
         obj.ra -= _corrRA * (Math.PI / 180);
       }
     }

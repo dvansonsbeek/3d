@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-// Fit extended RA/Dec correction: 3 harmonics + time-dependent terms
+// Fit extended RA/Dec correction: 3 harmonics + heliocentric distance terms
 // Model: A + B/d + T*C + (D*sin + E*cos + F*sin2 + G*cos2 + H*sin3 + I*cos3)/d
-//        + T*(J*sin + K*cos)/d
-// where T = (year - 2000) / 100, u = RA - ascendingNode, d = geocentric dist
+//        + T*(J*sin + K*cos)/d + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
+//        + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
+//        + S*T/d + U*cos(u)/d² + V*1/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
+// where T = (year - 2000) / 100, u = RA - ascendingNode, d = geocentric dist, s = sunDist
 
 const { computePlanetPosition } = require('../lib/scene-graph.js');
 const sg = require('../lib/scene-graph.js');
@@ -34,12 +36,32 @@ const basisFn = (pt) => {
     Math.cos(3*pt.u)/pt.d,        // I: cos(3u)/d
     T*Math.sin(pt.u)/pt.d,        // J: T*sin(u)/d
     T*Math.cos(pt.u)/pt.d,        // K: T*cos(u)/d
+    1/pt.sunDist,                 // L: 1/sunDist
+    Math.sin(pt.u)/(pt.d*pt.d),   // M: sin(u)/d²
+    Math.sin(2*pt.u)/pt.sunDist,   // N: sin(2u)/sunDist
+    Math.cos(pt.u)/pt.sunDist,     // O: cos(u)/sunDist
+    T*Math.sin(2*pt.u)/pt.d,       // P: T*sin(2u)/d
+    T*Math.cos(2*pt.u)/pt.d,       // Q: T*cos(2u)/d
+    T*Math.sin(pt.u)/pt.sunDist,   // R: T*sin(u)/sunDist
+    T/pt.d,                        // S: T/d
+    Math.cos(pt.u)/(pt.d*pt.d),    // U: cos(u)/d²
+    1/(pt.sunDist*pt.sunDist),     // V: 1/s²
+    Math.sin(pt.u)/(pt.sunDist*pt.sunDist), // W: sin(u)/s²
+    Math.cos(3*pt.u)/pt.sunDist,   // X: cos(3u)/s
+    Math.sin(3*pt.u)/pt.sunDist,   // Y: sin(3u)/s
   ];
 };
 
-const labels = ['A','B','C','D','E','F','G','H','I','J','K'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y'];
 
-console.log('Extended correction coefficients (11 params per coordinate per planet)\n');
+// Tier sizes: 15, 18, 24
+const tiers = [
+  { name: '15p', count: 15 },
+  { name: '18p', count: 18 },
+  { name: '24p', count: 24 },
+];
+
+console.log('Extended correction coefficients with multi-tier CV selection\n');
 
 for (const target of targets) {
   const allPoints = refData.planets[target] || [];
@@ -65,7 +87,7 @@ for (const target of targets) {
     const year = C.jdToYear(pt.jd);
     const dd = result.distAU;
     const u = (modelRA - ascNode) * d2r;
-    data.push({ dRA, dDec, d: dd, u, year });
+    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU });
   }
 
   const n = data.length;
@@ -73,27 +95,55 @@ for (const target of targets) {
   for (const pt of data) { origRmsRA += pt.dRA**2; origRmsDec += pt.dDec**2; }
   origRmsRA = Math.sqrt(origRmsRA / n);
   origRmsDec = Math.sqrt(origRmsDec / n);
-
-  // Fit Dec
-  const decResult = linearFit(data, basisFn, pt => pt.dDec);
-  // Fit RA
-  const raResult = linearFit(data, basisFn, pt => pt.dRA);
-
   const origTot = Math.sqrt(origRmsRA**2 + origRmsDec**2);
-  const newTot = Math.sqrt(raResult.rms**2 + decResult.rms**2);
 
-  console.log(`${target.toUpperCase()} (n=${n})  orig: RA=${origRmsRA.toFixed(3)} Dec=${origRmsDec.toFixed(3)} Tot=${origTot.toFixed(3)}`);
-  console.log(`         corr: RA=${raResult.rms.toFixed(3)} Dec=${decResult.rms.toFixed(3)} Tot=${newTot.toFixed(3)}  impr=${((1-newTot/origTot)*100).toFixed(0)}%`);
+  // Test each tier
+  let bestTier = null, bestCV = Infinity;
+  const tierResults = [];
+  for (const tier of tiers) {
+    const basis = (pt) => basisFn(pt).slice(0, tier.count);
+    const decR = linearFit(data, basis, pt => pt.dDec);
+    const raR = linearFit(data, basis, pt => pt.dRA);
+    const fit = Math.sqrt(raR.rms**2 + decR.rms**2);
+    const cv = loocv(data, basis, pt => pt.dDec, pt => pt.dRA);
+    tierResults.push({ tier, fit, cv: cv.total, decBeta: decR.beta, raBeta: raR.beta });
+    if (cv.total < bestCV) { bestCV = cv.total; bestTier = tierResults[tierResults.length - 1]; }
+  }
 
-  // Output in JS format
-  const fmtCoeffs = (beta) => labels.map((l, i) => `${l}:${fmt(beta[i])}`).join(', ');
-  console.log(`  dec: { ${fmtCoeffs(decResult.beta)} },`);
-  console.log(`  ra:  { ${fmtCoeffs(raResult.beta)} },`);
+  console.log(`${target.toUpperCase()} (n=${n})  orig: Tot=${origTot.toFixed(4)}`);
+  for (const tr of tierResults) {
+    const marker = tr === bestTier ? ' <-- BEST' : '';
+    console.log(`  ${tr.tier.name}: fit=${tr.fit.toFixed(4)} CV=${tr.cv.toFixed(4)}${marker}`);
+  }
+
+  const usedLabels = allLabels.slice(0, bestTier.tier.count);
+  const fmtCoeffs = (beta) => usedLabels.map((l, i) => `${l}:${fmt(beta[i])}`).join(', ');
+  console.log(`  dec: { ${fmtCoeffs(bestTier.decBeta)} },`);
+  console.log(`  ra:  { ${fmtCoeffs(bestTier.raBeta)} },`);
   console.log('');
 }
 
 C.ASTRO_REFERENCE.decCorrection = savedDec;
 C.ASTRO_REFERENCE.raCorrection = savedRA;
+
+function loocv(data, basisFn, decFn, raFn) {
+  const n = data.length;
+  let ssDec = 0, ssRA = 0;
+  for (let i = 0; i < n; i++) {
+    const train = data.filter((_, j) => j !== i);
+    const decFit = linearFit(train, basisFn, decFn);
+    const raFit = linearFit(train, basisFn, raFn);
+    const xi = basisFn(data[i]);
+    let predDec = 0, predRA = 0;
+    for (let j = 0; j < xi.length; j++) {
+      predDec += decFit.beta[j] * xi[j];
+      predRA += raFit.beta[j] * xi[j];
+    }
+    ssDec += (decFn(data[i]) - predDec) ** 2;
+    ssRA += (raFn(data[i]) - predRA) ** 2;
+  }
+  return { dec: Math.sqrt(ssDec/n), ra: Math.sqrt(ssRA/n), total: Math.sqrt((ssDec+ssRA)/n) };
+}
 
 function fmt(v) { return (v >= 0 ? ' ' : '') + v.toFixed(4); }
 
