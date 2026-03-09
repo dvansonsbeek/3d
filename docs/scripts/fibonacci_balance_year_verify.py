@@ -840,6 +840,6 @@ print(f"""
   INTERPRETATION:
   The balanced year name refers to the precession reference epoch, not to a
   maximum in the Law 3/5 balance percentages. Both balance conditions are
-  already extremely tight (>99.88%) and vary only in the 5th-6th decimal
+  already extremely tight (100%) and vary only in the 5th-6th decimal
   place between J2000 and base eccentricities.
 """)

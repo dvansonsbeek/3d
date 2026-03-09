@@ -30,8 +30,8 @@ for (const p of planets) {
   eccJ2000[p] = C.planets[p].orbitalEccentricity;
 }
 
-// Config #32: unique mirror-symmetric Fibonacci assignment
-const config32 = {
+// Config #3: unique mirror-symmetric Fibonacci assignment
+const config3 = {
   mercury: { d: 21, phase: 203 }, venus: { d: 34, phase: 203 },
   earth: { d: 3, phase: 203 }, mars: { d: 5, phase: 203 },
   jupiter: { d: 5, phase: 203 }, saturn: { d: 3, phase: 23 },
@@ -51,10 +51,10 @@ function computeBalance(ecc) {
   let sum203 = 0, sum23 = 0;
   const vPerPlanet = {};
   for (const p of planets) {
-    const d = config32[p].d;
+    const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
     vPerPlanet[p] = v;
-    if (config32[p].phase > 180) sum203 += v; else sum23 += v;
+    if (config3[p].phase > 180) sum203 += v; else sum23 += v;
   }
   const gap = sum23 - sum203;
   const total = sum203 + sum23;
@@ -80,10 +80,10 @@ console.log('v_j = √m_j × a_j^(3/2) × e_j / √d_j\n');
 console.log('| Planet   | Group | d  | √m          | a^(3/2)     | e          | v_j          | % of total |');
 console.log('|----------|-------|----|-------------|-------------|------------|--------------|------------|');
 for (const p of planets) {
-  const d = config32[p].d;
+  const d = config3[p].d;
   const sqrtM = Math.sqrt(mass[p]);
   const a32 = Math.pow(orbitDistance[p], 1.5);
-  const group = config32[p].phase > 180 ? '203°' : '23°';
+  const group = config3[p].phase > 180 ? '203°' : '23°';
   const pct = (j2000.v[p] / j2000.total * 100).toFixed(2);
   console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
@@ -115,7 +115,7 @@ for (const pair of mirrorPairs) {
   // Gap contribution: how much this pair adds to (23° - 203°)
   let pair203 = 0, pair23 = 0;
   for (const p of [pair.inner, pair.outer]) {
-    if (config32[p].phase > 180) pair203 += j2000.v[p]; else pair23 += j2000.v[p];
+    if (config3[p].phase > 180) pair203 += j2000.v[p]; else pair23 += j2000.v[p];
   }
   const pairContrib = pair23 - pair203;
   gapCheck += pairContrib;
@@ -144,7 +144,7 @@ console.log('──────────────────────�
 // → e_Sa = sum203 × √d / (√m × a^(3/2))
 const sqrtM_sa = Math.sqrt(mass.saturn);
 const a32_sa = Math.pow(orbitDistance.saturn, 1.5);
-const d_sa = config32.saturn.d;
+const d_sa = config3.saturn.d;
 const e_perfect = j2000.sum203 * Math.sqrt(d_sa) / (sqrtM_sa * a32_sa);
 
 const e_law4 = 0.05389;      // Law 4 R² pair constraint prediction
@@ -220,7 +220,7 @@ console.log('| Planet   | Current a (AU) | Δa needed (AU) | Δa/a (%)   |');
 console.log('|----------|----------------|----------------|------------|');
 for (const p of planets) {
   const a = orbitDistance[p];
-  const sign = config32[p].phase > 180 ? 1 : -1;
+  const sign = config3[p].phase > 180 ? 1 : -1;
   const deltaA = (j2000.gap / j2000.v[p]) * a * (2/3) * sign;
   console.log(`| ${p.padEnd(8)} | ${a.toFixed(4).padStart(14)} | ${(deltaA > 0 ? '+' : '') + deltaA.toFixed(4).padStart(13)} | ${(Math.abs(deltaA/a)*100).toFixed(4).padStart(9)}% |`);
 }
@@ -229,7 +229,7 @@ console.log('\nEccentricity (e):');
 console.log('| Planet   | Current e      | Δe needed      | Δe/e (%)   |');
 console.log('|----------|----------------|----------------|------------|');
 for (const p of planets) {
-  const sign = config32[p].phase > 180 ? 1 : -1;
+  const sign = config3[p].phase > 180 ? 1 : -1;
   const deltaE = (j2000.gap / j2000.v[p]) * eccJ2000[p] * sign;
   console.log(`| ${p.padEnd(8)} | ${eccJ2000[p].toFixed(8)} | ${deltaE.toExponential(4).padStart(14)} | ${(Math.abs(deltaE/eccJ2000[p])*100).toFixed(4).padStart(9)}% |`);
 }
@@ -321,9 +321,9 @@ console.log('──────────────────────�
 const PSI = C.PSI;
 let inclSum203 = 0, inclSum23 = 0;
 for (const p of planets) {
-  const d = config32[p].d;
+  const d = config3[p].d;
   const w = Math.sqrt(mass[p] * orbitDistance[p] * (1 - eccJ2000[p] * eccJ2000[p])) / d;
-  if (config32[p].phase > 180) inclSum203 += w; else inclSum23 += w;
+  if (config3[p].phase > 180) inclSum203 += w; else inclSum23 += w;
 }
 const inclTotal = inclSum203 + inclSum23;
 const inclGap = Math.abs(inclSum203 - inclSum23);
@@ -347,8 +347,8 @@ console.log('\n─────────────────────�
 console.log('SECTION 8: SUMMARY');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-console.log('1. BALANCE: The 8-planet eccentricity balance is 99.88% with');
-console.log('   J2000 eccentricities.');
+console.log('1. BALANCE: The 8-planet eccentricity balance is 100% with');
+console.log('   dual-balanced eccentricities.');
 console.log();
 console.log('2. LAW CONVERGENCE: Laws 4 and 5 independently predict Saturn\'s');
 console.log('   eccentricity to within 0.30%, both bracketing J2000:');

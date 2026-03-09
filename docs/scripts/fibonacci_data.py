@@ -119,7 +119,7 @@ ECC = ECCENTRICITIES
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Pure Fibonacci divisor assignments — Config #32, the unique mirror-symmetric
+# Pure Fibonacci divisor assignments — Config #3, the unique mirror-symmetric
 # configuration from exhaustive search of 7,558,272 candidates (755 achieve
 # balance above 99.994%; this is the only one with exact mirror symmetry).
 D = {

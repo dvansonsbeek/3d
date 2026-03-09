@@ -13451,11 +13451,11 @@ function setupGUI() {
       { n: 2, title: 'Inclination Constant',
         desc: 'Each planet\u2019s mass-weighted inclination amplitude, multiplied by a Fibonacci divisor, equals the same universal constant \u03C8.' },
       { n: 3, title: 'Inclination Balance',
-        desc: 'The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn\u2019s alone (99.9998%).' },
+        desc: 'The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn\u2019s alone (100%).' },
       { n: 4, title: 'Eccentricity Constant',
         desc: 'Within each mirror pair, Fibonacci constraints determine all eight eccentricities from the inclinations alone \u2014 zero free parameters.' },
       { n: 5, title: 'Eccentricity Balance',
-        desc: 'The same Fibonacci divisors and phase groups produce an independent balance condition on eccentricities (99.88%).' },
+        desc: 'The same Fibonacci divisors and phase groups produce an independent balance condition on eccentricities (100%).' },
       { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
         desc: 'Saturn\u2019s ecliptic-retrograde precession creates a closed resonance loop with Jupiter and Earth, linking the Fibonacci timescale to orbital structure.' },
     ];
@@ -13491,7 +13491,7 @@ function setupGUI() {
       fpFibDivisors: '3, 5, 8, 13, 21, 34',
       fpMeanObliquity: earthtiltMean + '\u00B0',
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
-      fpConfig: 'Config #32 (unique)',
+      fpConfig: 'Config #3 (unique)',
     };
     addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');

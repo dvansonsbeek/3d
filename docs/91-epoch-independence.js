@@ -32,8 +32,8 @@ for (const p of planets) {
   eccJ2000[p] = C.planets[p].orbitalEccentricity;
 }
 
-// Config #32: unique mirror-symmetric Fibonacci assignment
-const config32 = {
+// Config #3: unique mirror-symmetric Fibonacci assignment
+const config3 = {
   mercury: { d: 21, phase: 203 }, venus: { d: 34, phase: 203 },
   earth: { d: 3, phase: 203 }, mars: { d: 5, phase: 203 },
   jupiter: { d: 5, phase: 203 }, saturn: { d: 3, phase: 23 },
@@ -53,9 +53,9 @@ const mirrorPairs = [
 function computeBalance(ecc) {
   let sum203 = 0, sum23 = 0;
   for (const p of planets) {
-    const d = config32[p].d;
+    const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
-    if (config32[p].phase > 180) sum203 += v; else sum23 += v;
+    if (config3[p].phase > 180) sum203 += v; else sum23 += v;
   }
   const total = sum203 + sum23;
   const balance = (1 - Math.abs(sum203 - sum23) / total) * 100;
@@ -261,7 +261,7 @@ for (const eSa of [0.015, 0.020, 0.030, 0.040, 0.050, 0.05386, 0.060, 0.070, 0.0
   let sum203 = 0;
   for (const p of planets) {
     if (p === 'saturn') continue;
-    const d = config32[p].d;
+    const d = config3[p].d;
     sum203 += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc3[p] / Math.sqrt(d);
   }
   const ePerfect = sum203 * sqrtD_sa / (sqrtM_sa * a32_sa);
@@ -318,7 +318,7 @@ console.log('The question is: how large is the required correction?\n');
 let sum203_fixed = 0;
 for (const p of planets) {
   if (p === 'saturn') continue;
-  sum203_fixed += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * eccJ2000[p] / Math.sqrt(config32[p].d);
+  sum203_fixed += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * eccJ2000[p] / Math.sqrt(config3[p].d);
 }
 const e_perf = sum203_fixed * sqrtD_sa / (sqrtM_sa * a32_sa);
 

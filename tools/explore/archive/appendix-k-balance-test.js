@@ -138,7 +138,7 @@ function computeBalance(config, ecc) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// SENSITIVITY ANALYSIS: Which inputs have most leverage on Config #32 balance?
+// SENSITIVITY ANALYSIS: Which inputs have most leverage on Config #3 balance?
 // ══════════════════════════════════════════════════════════════════
 
 const currentConfig = {
@@ -150,7 +150,7 @@ const currentConfig = {
 
 const baseline = computeBalance(currentConfig, eccJPL);
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('SENSITIVITY ANALYSIS FOR CONFIG #32');
+console.log('SENSITIVITY ANALYSIS FOR CONFIG #3');
 console.log('═══════════════════════════════════════════════════════════════');
 console.log(`Baseline balance: ${baseline.balance.toFixed(8)}%  (imbalance: ${baseline.imbalance.toExponential(6)}%)`);
 

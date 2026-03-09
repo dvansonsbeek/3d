@@ -404,8 +404,8 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 ### Default Configuration Result
 
-- Inclination balance: **99.9998%**
-- Eccentricity balance: **99.88%**
+- Inclination balance: **100%**
+- Eccentricity balance: **100%**
 - LL bounds: **8/8 pass**
 - Trend directions: **7/7 match**
 

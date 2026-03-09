@@ -47,8 +47,8 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │                                                                  │
 │  BALANCE RESULTS                                                 │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │ Inclination (Law 3): w = √(m·a(1-e²))/d    99.9998%        │  │
-│  │ Eccentricity (Law 5): v = √m·a^(3/2)·e/√d  99.88%          │  │
+│  │ Inclination (Law 3): w = √(m·a(1-e²))/d    100%             │  │
+│  │ Eccentricity (Law 5): v = √m·a^(3/2)·e/√d  100%             │  │
 │  └────────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  PER-PLANET RESULTS                                              │
@@ -61,8 +61,8 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  └──────┴──────┴──────┴──────────┴──┴───────┴──────┴────┴───┘    │
 │                                                                  │
 │  BALANCE VERIFICATION                                            │
-│  Incl: Σ203°=X  Σ23°=Y  →  99.9998%  ✓                           │
-│  Ecc:  Σ203°=X  Σ23°=Y  →  99.88%    ✓                           │
+│  Incl: Σ203°=X  Σ23°=Y  →  100%       ✓                           │
+│  Ecc:  Σ203°=X  Σ23°=Y  →  100%       ✓                           │
 │  LL: 8/8 pass | Dir: 7/7 match                                   │
 │  ψ = 2205 / (2 × H) = 3.291e-3                                  │
 └──────────────────────────────────────────────────────────────────┘
@@ -190,7 +190,7 @@ A configuration is valid when:
 | Check | Criterion |
 |-------|-----------|
 | **Inclination balance** | ≥99.994% (TNO margin) |
-| **Eccentricity balance** | High percentage (99.88% for the model configuration) |
+| **Eccentricity balance** | High percentage (100% for the model configuration) |
 | **LL bounds** | All 8 planets within Laplace-Lagrange bounds (8/8 ✓) |
 | **Trend directions** | All 7 planets match JPL direction (7/7 ✓) |
 
@@ -204,7 +204,7 @@ Useful experiments to try:
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 755 valid configurations |
-| Look for Config #32 (Scenario A) | The unique mirror-symmetric solution |
+| Look for Config #3 (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
 
@@ -236,12 +236,12 @@ The model's default (and uniquely determined) configuration:
 | Neptune | 203° | 34 | F₉ | Venus |
 
 Expected results:
-- Inclination balance: **99.9998%**
-- Eccentricity balance: **99.88%**
+- Inclination balance: **100%**
+- Eccentricity balance: **100%**
 - LL bounds: **8/8 pass**
 - Trend directions: **7/7 match**
 
-This is Config #32 out of 755 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is Config #3 out of 755 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 

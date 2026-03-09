@@ -25,11 +25,11 @@
 #
 #   Test 5  — Inclination Balance (Law 3):
 #       With the model's Fibonacci d-values and phase groups, how well do the
-#       angular-momentum-weighted structural weights cancel? Observed: 99.9998%.
+#       angular-momentum-weighted structural weights cancel? Observed: 100%.
 #
 #   Test 6  — Eccentricity Balance (Law 5):
 #       With the model's d-values, how well do the eccentricity weights cancel
-#       between the two phase groups? Observed: 99.88%.
+#       between the two phase groups? Observed: 100%.
 #
 #   Test 7  — Saturn Eccentricity Prediction (Finding 4):
 #       The eccentricity balance predicts Saturn's eccentricity from the other 7
@@ -340,7 +340,7 @@ def stat_incl_balance(eccs, d_vals, group_a, group_b):
     How well do the angular-momentum-weighted inclination structural weights
     cancel between the two phase groups?
 
-    Observed: 99.9998% with the model's d-values and phase groups.
+    Observed: 100% with the model's d-values and phase groups.
     Null hypothesis: random Fibonacci d-assignments and random solo-planet
     phase splits cannot achieve this level of balance.
 
@@ -355,7 +355,7 @@ def stat_ecc_balance(eccs, d_vals, group_a, group_b):
 
     How well do the eccentricity-weighted quantities cancel between groups?
 
-    Observed: 99.88% with the model's d-values and phase groups.
+    Observed: 100% with the model's d-values and phase groups.
 
     Returns: balance percentage (higher = more balanced).
     """

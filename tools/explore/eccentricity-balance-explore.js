@@ -38,7 +38,7 @@ for (const [k, e] of Object.entries(eccJ2000)) {
   eccCircular[k] = e / (1 + e);
 }
 
-// Config #32 d-values and phases
+// Config #3 d-values and phases
 const d = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
 const isSaturn23 = true; // Saturn is the only 23° planet
 
@@ -100,7 +100,7 @@ console.log(`
 The v-weight formula is: v = √m × a^(3/2) × e / √d
 
 Parameters in the formula:
-  d  — Fixed by Config #32 (Fibonacci assignment). NOT tweakable.
+  d  — Fixed by Config #3 (Fibonacci assignment). NOT tweakable.
   m  — Planet masses from DE440 ratios. NOT tweakable (physical constants).
   a  — Semi-major axis from SolarYearInput via Kepler's 3rd law.
        Quantized by integer SolarYearCount. TWEAKABLE within count step.
