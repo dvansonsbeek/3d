@@ -332,13 +332,17 @@ All Moon cycles are derived from the 3 input months (sidereal, anomalistic, noda
 
 Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exeligmos = 3 × Saros, Callippic = 940 synodic ≈ 76 solar years.
 
-## Year & Day Amplitude Parameters
+## Year-Length Fourier Harmonics
 
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Sidereal Year Amplitude | `meanSiderealYearAmplitudeSecPerDay` | 60 s | Sidereal year amplitude per day |
-| Solar Year Amplitude | `meanSolarYearAmplitudeSecPerDay` | 2.29 s | Solar year amplitude per day |
-| Anomalistic Year Amplitude | `meanAnomalisticYearAmplitudeSecPerDay` | 6 s | Anomalistic year amplitude per day |
+Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/16) / (H/16)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from 491 data points spanning ±25,000 years).
+
+Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divisor.
+
+| Array | Harmonics | RMS | Dominant term |
+|-------|-----------|-----|---------------|
+| `TROPICAL_YEAR_HARMONICS` | H/8, H/3, H/16 | 0.006 s | H/8: 1.819s amp |
+| `SIDEREAL_YEAR_HARMONICS` | H/8, H/3 | 0.003 s | H/8: 0.108s amp |
+| `ANOMALISTIC_YEAR_HARMONICS` | H/8, H/3, H/16, H/24 | 0.011 s | H/24: 0.038s amp |
 
 ## Earth Perihelion Harmonics
 

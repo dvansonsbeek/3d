@@ -273,10 +273,25 @@ const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
 const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / (H / 16) * 360
   + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
 
-// Year-length formula amplitudes
-const meanSolarYearAmplitudeSecPerDay = 2.29;
-const meanSiderealYearAmplitudeSecPerDay = 60;
-const meanAnomalisticYearAmplitudeSecPerDay = 6;
+// Fourier harmonic coefficients for year-length formulas (fitted from 491 data points, ±25000 yr)
+// Means are DERIVED: tropical = meanSolarYearDays, sidereal = meanSiderealYearDays,
+// anomalistic = meanAnomalisticYearDays. Only coefficients need refitting if H changes.
+// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
+const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.006 s
+  [8,  -1.315685778131e-06, -2.101615481220e-05],         // H/8:  1.819s amp
+  [3,  +6.745126392744e-07, +7.955457410219e-06],         // H/3:  0.690s amp
+  [16, -6.145697256116e-09, -3.622604401125e-07],          // H/16: 0.031s amp
+];
+const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.003 s
+  [8, -1.255070074367e-06, -1.783278998075e-08],           // H/8:  0.108s amp
+  [3, +5.794170454941e-07, +1.019398849945e-07],           // H/3:  0.051s amp
+];
+const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.011 s
+  [8,  -2.111981801448e-07, +2.544662242077e-08],          // H/8:  0.018s amp
+  [3,  -6.755570533516e-08, -5.963699950444e-10],          // H/3:  0.006s amp
+  [16, -5.074517345509e-08, +8.665832935489e-08],          // H/16: 0.009s amp
+  [24, -4.432336424626e-07, +1.845872180598e-08],          // H/24: 0.038s amp
+];
 
 
 // ─── 7. MOON DERIVED CYCLES ─────────────────────────────────────────────
@@ -676,9 +691,9 @@ module.exports = {
   julianCenturyDays,
   eocEccentricity,
   perihelionPhaseOffset,
-  meanSolarYearAmplitudeSecPerDay,
-  meanSiderealYearAmplitudeSecPerDay,
-  meanAnomalisticYearAmplitudeSecPerDay,
+  TROPICAL_YEAR_HARMONICS,
+  SIDEREAL_YEAR_HARMONICS,
+  ANOMALISTIC_YEAR_HARMONICS,
 
   // Moon derived
   moonSiderealMonth,

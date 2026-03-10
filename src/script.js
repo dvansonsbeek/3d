@@ -71,9 +71,27 @@ const debugOn = false;                                     // Debug button flag 
 // Formula-only amplitude parameters
 const mideccentricitypointAmplitude = 2.4587;             // Formula only
 const helionpointAmplitude = 5.05;                        // Formula only
-const meansiderealyearAmplitudeinSecondsaDay = 60;      // Formula only
-const meansolaryearAmplitudeinSecondsaDay = 2.29;          // Formula only
-const meanAnomalisticYearAmplitudeinSecondsaDay = 6;      // Formula only
+
+// Fourier harmonic coefficients for year-length formulas (fitted from 491 data points, ±25000 yr)
+// Means are DERIVED (not fitted): tropical = meansolaryearlengthinDays,
+// sidereal = meansiderealyearlengthinDays, anomalistic = meanAnomalisticYearinDays.
+// Only these coefficients need refitting if H changes.
+// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = holisticyearLength / divisor
+const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.006 s
+  [8,  -1.315685778131e-06, -2.101615481220e-05],         // H/8:  1.819s amp
+  [3,  +6.745126392744e-07, +7.955457410219e-06],         // H/3:  0.690s amp
+  [16, -6.145697256116e-09, -3.622604401125e-07],          // H/16: 0.031s amp
+];
+const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.003 s
+  [8, -1.255070074367e-06, -1.783278998075e-08],           // H/8:  0.108s amp
+  [3, +5.794170454941e-07, +1.019398849945e-07],           // H/3:  0.051s amp
+];
+const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.011 s
+  [8,  -2.111981801448e-07, +2.544662242077e-08],          // H/8:  0.018s amp
+  [3,  -6.755570533516e-08, -5.963699950444e-10],          // H/3:  0.006s amp
+  [16, -5.074517345509e-08, +8.665832935489e-08],          // H/16: 0.009s amp
+  [24, -4.432336424626e-07, +1.845872180598e-08],          // H/24: 0.038s amp
+];
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 
 // Early derived constants (needed before ASTRO_REFERENCE)
@@ -13642,9 +13660,9 @@ function setupGUI() {
       eccAmp: String(eccentricityAmplitude),
       midEccAmp: fmtDeg(mideccentricitypointAmplitude),
       helionAmp: fmtDeg(helionpointAmplitude),
-      siderealDayAmp: meansiderealyearAmplitudeinSecondsaDay + ' s',
-      solarYearAmp: meansolaryearAmplitudeinSecondsaDay + ' s',
-      anomYearAmp: meanAnomalisticYearAmplitudeinSecondsaDay + ' s',
+      siderealYearRMS: '0.0002 s (Fourier)',
+      solarYearRMS: '0.003 s (Fourier)',
+      anomYearRMS: '0.002 s (Fourier)',
       auDist: fmtKm(currentAUDistance),
       deltaT: String(deltaTStart),
     };
@@ -13673,9 +13691,9 @@ function setupGUI() {
     addConst(fundFolder, fundVals, 'eccAmp', 'Eccentricity ampl.', 'Amplitude of the eccentricity oscillation.');
     addConst(fundFolder, fundVals, 'midEccAmp', 'Mid-ecc. amplitude', 'Mid-eccentricity point amplitude (formula only).');
     addConst(fundFolder, fundVals, 'helionAmp', 'Helion point ampl.', 'Helion point amplitude (formula only).');
-    addConst(fundFolder, fundVals, 'siderealDayAmp', 'Sidereal day ampl.', 'Sidereal year amplitude in seconds per day (formula only).');
-    addConst(fundFolder, fundVals, 'solarYearAmp', 'Solar year ampl.', 'Mean solar year amplitude in seconds per day (formula only).');
-    addConst(fundFolder, fundVals, 'anomYearAmp', 'Anomalistic yr ampl.', 'Mean anomalistic year amplitude in seconds per day (formula only).');
+    addConst(fundFolder, fundVals, 'siderealYearRMS', 'Sidereal year RMS', 'Sidereal year Fourier fit RMS residual.');
+    addConst(fundFolder, fundVals, 'solarYearRMS', 'Solar year RMS', 'Tropical year Fourier fit RMS residual.');
+    addConst(fundFolder, fundVals, 'anomYearRMS', 'Anomalistic yr RMS', 'Anomalistic year Fourier fit RMS residual.');
     addConst(fundFolder, fundVals, 'auDist', 'AU distance', 'Current Earth\u2013Sun distance in km.');
     addConst(fundFolder, fundVals, 'deltaT', 'Delta-T start', 'Initial Delta-T value in seconds (formula only).');
 
@@ -22638,12 +22656,10 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
-      const siderealYear = computeLengthofsiderealYear(eccentricity);
+      const siderealYear = computeLengthofsiderealYear(sourceYear);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
-      const obliquity = computeObliquityEarth(sourceYear);
-      const solarYear = computeLengthofsolarYear(obliquity);
+      const solarYear = computeLengthofsolarYear(sourceYear);
 
       const dTchangePerYr = (lod - 86_400) * solarYear;       // seconds/yr
       deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;         // fraction
@@ -22660,12 +22676,10 @@ function resetDeltaTForJump() {
       const subYear    = y + i / SUBSTEPS_PER_YEAR;
       const sourceYear = subYear - 1;
 
-      const eccentricity = computeEccentricityEarth(sourceYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
-      const siderealYear = computeLengthofsiderealYear(eccentricity);
+      const siderealYear = computeLengthofsiderealYear(sourceYear);
       const lod = meansiderealyearlengthinSeconds / siderealYear;
 
-      const obliquity = computeObliquityEarth(sourceYear);
-      const solarYear = computeLengthofsolarYear(obliquity);
+      const solarYear = computeLengthofsolarYear(sourceYear);
 
       const dTchangePerYr = (lod - 86_400) * solarYear;
       deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;
@@ -31771,9 +31785,9 @@ function updatePredictions() {
   predictions.obliquityEarth = o.obliquityEarth = computeObliquityEarth(o.currentYear);
   predictions.eccentricityEarth = o.eccentricityEarth = computeEccentricityEarth(o.currentYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
 
-  // Tropical year depends on obliquity, Sidereal year depends on eccentricity
-  predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.obliquityEarth);
-  predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.eccentricityEarth);
+  // Year lengths from Fourier harmonics (fitted over ±25,000 years)
+  predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear);
+  predictions.lengthofsiderealYear = o.lengthofsiderealYear = computeLengthofsiderealYear(o.currentYear);
 
   // Sidereal year in seconds is constant (the orbital period)
   predictions.lengthofsiderealYearInSeconds = o.lengthofsiderealYearInSeconds = meansiderealyearlengthinSeconds;
@@ -31799,7 +31813,7 @@ function updatePredictions() {
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
   
   predictions.lengthofsiderealYearDaysRealLOD = o.lengthofsiderealYear;
-  predictions.lengthofanomalisticYearSecRealLOD = o.lengthofanomalisticYearSecRealLOD = computeLengthofanomalisticYearRealLOD(o.eccentricityEarth, o.lengthofDay);
+  predictions.lengthofanomalisticYearSecRealLOD = o.lengthofanomalisticYearSecRealLOD = computeLengthofanomalisticYearRealLOD(o.currentYear, o.lengthofDay);
 
   predictions.lengthofanomalisticYearinDays = o.lengthofanomalisticYearinDays = o.lengthofanomalisticYearSecRealLOD/86400;
   predictions.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticDaysRealLOD = o.lengthofanomalisticYearSecRealLOD/o.lengthofDay;
@@ -31834,72 +31848,63 @@ function updatePredictions() {
 }
 
 /**
- * Compute the length of the tropical (solar) year (in days) based on obliquity.
+ * Evaluate a Fourier harmonic series for year-length prediction.
  *
- * The tropical year is almost entirely determined by obliquity (R² = 0.9995).
- * Formula derived from regression analysis of 27,000 years of model data.
- *
- * Tropical Year = meansolaryearlengthinDays - (k / meanlengthofday) × (obliquity - earthtiltMean)
- *
- * Where k = 2.3 seconds per degree of obliquity change.
- *
- * Physical interpretation: Higher obliquity means the ecliptic is more tilted
- * relative to the celestial equator, causing the Sun to cross the equator at
- * a steeper angle, resulting in a shorter tropical year.
- *
- * @param {number} obliquity – the current obliquity in degrees (from computeObliquityEarth)
- * @returns {number} lengthofsolarYear (in days)
+ * @param {number} currentYear – the calendar year
+ * @param {number} mean – the mean year length (days)
+ * @param {Array} harmonics – array of [period_divisor, sin_coeff, cos_coeff]
+ * @returns {number} year length in days
  */
-function computeLengthofsolarYear(obliquity) {
-  return meansolaryearlengthinDays - (meansolaryearAmplitudeinSecondsaDay / meanlengthofday) * (obliquity - earthtiltMean);
+function evalYearFourier(currentYear, mean, harmonics) {
+  const t = currentYear - balancedYear;
+  let result = mean;
+  for (const [div, sinC, cosC] of harmonics) {
+    const phase = 2 * Math.PI * t / (holisticyearLength / div);
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
 }
 
 /**
- * Compute the length of the sidereal year (in days) based on eccentricity.
+ * Compute the length of the tropical (solar) year (in days) using Fourier harmonics.
  *
- * The sidereal year depends on eccentricity (R² = 0.9996).
- * Formula derived from regression analysis of 27,000 years of model data.
+ * Fitted from 491 data points spanning ±25,000 years. Dominant periods: H/8 (obliquity
+ * cycle, 41,876 yr) and H/3 (inclination cycle, 111,669 yr). RMS residual: 0.003 s.
  *
- * Sidereal Year (days) = meansiderealyearlengthinDays - (k / meanlengthofday) × (eccentricity - eccentricityBase)
- *
- * Where k = meansiderealyearAmplitudeinSecondsaDay = -3097 seconds per unit eccentricity change.
- *
- * Physical interpretation: Higher eccentricity means a more elliptical orbit,
- * which changes the integrated orbital time via Kepler's 2nd law.
- *
- * @param {number} eccentricity – the current eccentricity (from computeEccentricityEarth)
- * @returns {number} lengthofsiderealYear (in days)
+ * @param {number} currentYear – the calendar year
+ * @returns {number} lengthofsolarYear (in days)
  */
-function computeLengthofsiderealYear(eccentricity) {
-  return meansiderealyearlengthinDays - (meansiderealyearAmplitudeinSecondsaDay / meanlengthofday) * (eccentricity - eccentricityDerivedMean);
+function computeLengthofsolarYear(currentYear) {
+  return evalYearFourier(currentYear, meansolaryearlengthinDays, TROPICAL_YEAR_HARMONICS);
 }
 
+/**
+ * Compute the length of the sidereal year (in days) using Fourier harmonics.
+ *
+ * Fitted from 491 data points spanning ±25,000 years. Dominant periods: H/8 and H/3.
+ * RMS residual: 0.0002 s.
+ *
+ * @param {number} currentYear – the calendar year
+ * @returns {number} lengthofsiderealYear (in days)
+ */
+function computeLengthofsiderealYear(currentYear) {
+  return evalYearFourier(currentYear, meansiderealyearlengthinDays, SIDEREAL_YEAR_HARMONICS);
+}
 
 /**
  * Compute the length of the anomalistic year (in seconds) with Real LOD.
  *
- * Three-step process:
- * 1. Raw anomalistic year in days (varies with eccentricity, coefficient -6)
- * 2. Apsidal correction using factors 13/3 and 16/3 to get seconds on Earth
- * 3. Result is in seconds (divide by 86400 externally for IAU-compatible days)
+ * Uses Fourier harmonics fitted from 491 data points. The anomalistic year has
+ * four significant periods: H/8, H/3, H/16, and H/24 (beat frequency of H/3 and H/8).
+ * RMS residual: 0.002 s.
  *
- * @param {number} eccentricity – the current eccentricity
- * @param {number} lengthofDay  – the current length of day (in seconds)
+ * @param {number} currentYear – the calendar year
+ * @param {number} lengthofDay – the current length of day (in seconds)
  * @returns {number} lengthofanomalisticYearSecRealLOD (in seconds)
  */
-function computeLengthofanomalisticYearRealLOD(
-  eccentricity,
-  lengthofDay
-  ) {
-  // Step 1: Raw anomalistic year in days (eccentricity variation)
-  const rawAnomDays = meanAnomalisticYearinDays -
-    (meanAnomalisticYearAmplitudeinSecondsaDay / meanlengthofday) *
-    (eccentricity - eccentricityDerivedMean);
-  // Step 2: Apsidal correction (seconds experienced on Earth)
-  const rawSeconds = rawAnomDays * lengthofDay;
-  const meanSeconds = meanAnomalisticYearinDays * meanlengthofday;
-  const apsidalCorrection = ((rawSeconds - meanSeconds) / (13/3)) * (16/3);
-  return rawSeconds - apsidalCorrection;
+function computeLengthofanomalisticYearRealLOD(currentYear, lengthofDay) {
+  const anomDays = evalYearFourier(currentYear, meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+  return anomDays * lengthofDay;
 }
 
 /**

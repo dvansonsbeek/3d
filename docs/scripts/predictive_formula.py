@@ -33,8 +33,9 @@ from typing import List, Tuple, Dict
 from constants_scripts import (
     H, BALANCE_YEAR, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
     EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_MEAN, EARTH_INCLINATION_AMPLITUDE,
-    _INPUT_MEAN_SOLAR_YEAR, _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS,
-    _MEAN_SIDEREAL_YEAR_DAYS, _MEAN_LENGTH_OF_DAY,
+    _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
+    _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
+    TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
 )
 
 # =============================================================================
@@ -44,16 +45,21 @@ from constants_scripts import (
 ANCHOR_YEAR = BALANCE_YEAR      # from constants_scripts (1246 - 14.5*(H/16))
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
-# --- Day & Year constants (from constants_scripts, sourced from constants.js) ---
+# --- Day & Year constants (all derived in constants_scripts) ---
 MEAN_SOLAR_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS
 SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S
 MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY
-OBLIQ_SENSITIVITY = 2.29 / MEAN_DAY_LENGTH  # days/degree obliquity change
-ECC_SENSITIVITY = -60 / MEAN_DAY_LENGTH     # days/unit eccentricity change (sidereal)
-ANOM_ECC_AMPLITUDE = -6                     # seconds/unit eccentricity (anomalistic)
-MEAN_ANOM_YEAR_DAYS = MEAN_SOLAR_YEAR_DAYS * (H / 16) / ((H / 16) - 1)  # ~365.2597 days
+MEAN_ANOM_YEAR_DAYS = _MEAN_ANOM_YEAR_DAYS
 
-# --- Earth parameters (from constants_scripts, sourced from constants.js) ---
+# --- Year-length Fourier means (derived, not fitted) ---
+# tropical = round(input × H/16) / (H/16)
+# sidereal = tropical × H / (H - 13)
+# anomalistic = tropical × H / (H - 16)
+TROPICAL_YEAR_MEAN = _MEAN_SOLAR_YEAR_DAYS
+SIDEREAL_YEAR_MEAN = _MEAN_SIDEREAL_YEAR_DAYS
+ANOMALISTIC_YEAR_MEAN = _MEAN_ANOM_YEAR_DAYS
+
+# --- Earth parameters (from constants_scripts) ---
 EARTH_INCLIN_MEAN = EARTH_INCLINATION_MEAN
 EARTH_INCLIN_AMPL = EARTH_INCLINATION_AMPLITUDE
 
@@ -143,7 +149,7 @@ PLANETS = {
 EARTH_OBLIQ_MEAN = EARTH_OBLIQUITY_MEAN
 EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
 EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
-EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
+EARTH_ECC_MEAN = _ECCENTRICITY_DERIVED_MEAN
 
 # Earth perihelion harmonics (for perihelion and ERD calculation)
 PERI_HARMONICS = [
@@ -268,33 +274,44 @@ def calc_planet_perihelion(theta0: float, period: float, year: int) -> float:
 # all derived from obliquity and eccentricity formulas above.
 # =============================================================================
 
+def _eval_fourier(t: float, mean: float,
+                   harmonics: list) -> float:
+    """Evaluate a Fourier harmonic series: mean + Σ(sin_c·sin(2πt/T) + cos_c·cos(2πt/T))."""
+    result = mean
+    for period, sin_c, cos_c in harmonics:
+        phase = 2 * math.pi * t / period
+        result += sin_c * math.sin(phase) + cos_c * math.cos(phase)
+    return result
+
+
 def calc_solar_year(year: int) -> float:
     """
     Calculate the length of the solar (tropical) year in days.
 
-    Formula: Y_solar = Y₀ - k_ε · (ε - ε₀)
+    Fourier harmonic formula (March 2026):
+      Y_solar(t) = mean + Σ harmonics at H/8, H/3, H/16
+      where t = year - ANCHOR_YEAR
 
-    The solar year shortens when obliquity is above the mean and
-    lengthens when obliquity is below the mean.
+    Fitted from 491 data points spanning the full Holistic Year.
+    RMS = 0.003 seconds.  Dominant term: H/8 (obliquity cycle, 1.82s).
     """
-    obliq = calc_obliquity(year)
-    return MEAN_SOLAR_YEAR_DAYS - OBLIQ_SENSITIVITY * (obliq - EARTH_OBLIQ_MEAN)
+    t = time_offset(year)
+    return _eval_fourier(t, TROPICAL_YEAR_MEAN, TROPICAL_YEAR_HARMONICS)
 
 
 def calc_sidereal_year(year: int) -> float:
     """
     Calculate the length of the sidereal year in days.
 
-    Formula: Y_sid = Y₀ × P_A / (P_A - 1) + k_e · (e - e₀)
+    Fourier harmonic formula (March 2026):
+      Y_sid(t) = mean + Σ harmonics at H/8, H/3
+      where t = year - ANCHOR_YEAR
 
-    Where P_A = H/13 (axial precession period).
-    The sidereal year is slightly longer than the solar year because
-    the solar year must "lose" one full turn per precession cycle.
+    Fitted from 491 data points spanning the full Holistic Year.
+    RMS = 0.0002 seconds.  Both terms ~0.09s amplitude.
     """
-    ecc = calc_eccentricity(year)
-    axial_prec = H / 13  # H/13
-    base = MEAN_SOLAR_YEAR_DAYS * axial_prec / (axial_prec - 1)
-    return base + ECC_SENSITIVITY * (ecc - EARTH_ECC_MEAN)
+    t = time_offset(year)
+    return _eval_fourier(t, SIDEREAL_YEAR_MEAN, SIDEREAL_YEAR_HARMONICS)
 
 
 def calc_day_length(year: int) -> float:
@@ -331,46 +348,32 @@ def calc_sidereal_year_seconds(year: int) -> float:
     return SIDEREAL_YEAR_SECONDS
 
 
-def calc_anomalistic_year_seconds(year: int) -> float:
-    """
-    Calculate the length of the anomalistic year in SI seconds.
-
-    Three-step process:
-    1. Raw anomalistic year in days (varies with eccentricity, coefficient -6)
-    2. Convert to seconds using current day length
-    3. Apsidal correction using factors 13/3 and 16/3
-
-    The anomalistic year (perihelion to perihelion) is slightly longer than
-    the solar year because Earth must catch up to its advancing perihelion.
-    The eccentricity modulates this: higher eccentricity → shorter anomalistic year.
-    """
-    ecc = calc_eccentricity(year)
-    day_len = calc_day_length(year)
-
-    # Step 1: Raw anomalistic year in days (eccentricity variation)
-    raw_anom_days = MEAN_ANOM_YEAR_DAYS - (
-        ANOM_ECC_AMPLITUDE / MEAN_DAY_LENGTH
-    ) * (ecc - EARTH_ECC_MEAN)
-
-    # Step 2: Convert to seconds using current day length
-    raw_seconds = raw_anom_days * day_len
-
-    # Step 3: Apsidal correction (seconds experienced on Earth)
-    mean_seconds = MEAN_ANOM_YEAR_DAYS * MEAN_DAY_LENGTH
-    apsidal_correction = ((raw_seconds - mean_seconds) / (13 / 3)) * (16 / 3)
-
-    return raw_seconds - apsidal_correction
-
-
 def calc_anomalistic_year(year: int) -> float:
     """
     Calculate the length of the anomalistic year in days.
 
-    Formula: Y_anom(days) = Y_anom(s) / 86400
+    Fourier harmonic formula (March 2026):
+      Y_anom(t) = mean + Σ harmonics at H/8, H/3, H/16, H/24
+      where t = year - ANCHOR_YEAR
 
-    Based on 86400-second solar days.
+    Fitted from 491 data points spanning the full Holistic Year.
+    RMS = 0.002 seconds.  Dominant term: H/3 (inclination cycle, 0.17s).
+    H/24 = H/(3×8) is the beat frequency between H/3 and H/8.
     """
-    return calc_anomalistic_year_seconds(year) / 86400
+    t = time_offset(year)
+    return _eval_fourier(t, ANOMALISTIC_YEAR_MEAN, ANOMALISTIC_YEAR_HARMONICS)
+
+
+def calc_anomalistic_year_seconds(year: int) -> float:
+    """
+    Calculate the length of the anomalistic year in SI seconds.
+
+    Formula: Y_anom(s) = Y_anom(days) × D(s)
+
+    Uses the Fourier-based anomalistic year in days multiplied by the
+    current day length.
+    """
+    return calc_anomalistic_year(year) * calc_day_length(year)
 
 
 def calc_sidereal_day(year: int) -> float:

@@ -94,44 +94,53 @@ function computeObliquityIntegrals(currentYear) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Compute the length of the solar (tropical) year based on obliquity.
+ * Evaluate a Fourier harmonic series for year-length prediction.
  *
- * @param {number} obliquity - current obliquity in degrees
+ * @param {number} year - calendar year
+ * @param {number} mean - mean year length (days)
+ * @param {Array} harmonics - array of [period_divisor, sin_coeff, cos_coeff]
+ * @returns {number} year length in days
+ */
+function evalYearFourier(year, mean, harmonics) {
+  const t = year - C.balancedYear;
+  let result = mean;
+  for (const [div, sinC, cosC] of harmonics) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
+}
+
+/**
+ * Compute the length of the tropical year using Fourier harmonics.
+ *
+ * @param {number} year - calendar year
  * @returns {number} solar year in days
  */
-function computeLengthOfSolarYear(obliquity) {
-  return C.meanSolarYearDays
-    - (C.meanSolarYearAmplitudeSecPerDay / C.meanLengthOfDay)
-    * (obliquity - C.earthtiltMean);
+function computeLengthOfSolarYear(year) {
+  return evalYearFourier(year, C.meanSolarYearDays, C.TROPICAL_YEAR_HARMONICS);
 }
 
 /**
- * Compute the length of the sidereal year based on eccentricity.
+ * Compute the length of the sidereal year using Fourier harmonics.
  *
- * @param {number} eccentricity - current eccentricity
+ * @param {number} year - calendar year
  * @returns {number} sidereal year in days
  */
-function computeLengthOfSiderealYear(eccentricity) {
-  return C.meanSiderealYearDays
-    - (C.meanSiderealYearAmplitudeSecPerDay / C.meanLengthOfDay)
-    * (eccentricity - C.eccentricityDerivedMean);
+function computeLengthOfSiderealYear(year) {
+  return evalYearFourier(year, C.meanSiderealYearDays, C.SIDEREAL_YEAR_HARMONICS);
 }
 
 /**
- * Compute the length of the anomalistic year with Real LOD.
+ * Compute the length of the anomalistic year with Real LOD using Fourier harmonics.
  *
- * @param {number} eccentricity - current eccentricity
+ * @param {number} year - calendar year
  * @param {number} lengthOfDay - current length of day in seconds
  * @returns {number} anomalistic year in seconds
  */
-function computeLengthOfAnomalisticYearRealLOD(eccentricity, lengthOfDay) {
-  const rawAnomDays = C.meanAnomalisticYearDays
-    - (C.meanAnomalisticYearAmplitudeSecPerDay / C.meanLengthOfDay)
-    * (eccentricity - C.eccentricityDerivedMean);
-  const rawSeconds = rawAnomDays * lengthOfDay;
-  const meanSeconds = C.meanAnomalisticYearDays * C.meanLengthOfDay;
-  const apsidalCorrection = ((rawSeconds - meanSeconds) / (13 / 3)) * (16 / 3);
-  return rawSeconds - apsidalCorrection;
+function computeLengthOfAnomalisticYearRealLOD(year, lengthOfDay) {
+  const anomDays = evalYearFourier(year, C.meanAnomalisticYearDays, C.ANOMALISTIC_YEAR_HARMONICS);
+  return anomDays * lengthOfDay;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -276,8 +285,8 @@ function computeEarthOrbitalElements(year) {
   const eccentricity = computeEccentricityEarth(year);
   const obliquity = computeObliquityEarth(year);
   const inclination = computeInclinationEarth(year);
-  const solarYearDays = computeLengthOfSolarYear(obliquity);
-  const siderealYearDays = computeLengthOfSiderealYear(eccentricity);
+  const solarYearDays = computeLengthOfSolarYear(year);
+  const siderealYearDays = computeLengthOfSiderealYear(year);
   const siderealYearSec = siderealYearDays * C.meanLengthOfDay;
   const precession = computeAxialPrecession(siderealYearSec, solarYearDays);
   const perihelionLong = calcEarthPerihelionPredictive(year);

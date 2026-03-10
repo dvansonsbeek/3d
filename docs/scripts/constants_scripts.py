@@ -81,6 +81,32 @@ _MEAN_SIDEREAL_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS * (H / 13) / ((H / 13) - 1)
 _MEAN_LENGTH_OF_DAY = _SIDEREAL_YEAR_S / _MEAN_SIDEREAL_YEAR_DAYS  # seconds
 _MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _MEAN_LENGTH_OF_DAY
 _TOTAL_DAYS_IN_H = H * _MEAN_SOLAR_YEAR_DAYS
+_MEAN_ANOM_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS * (H / 16) / ((H / 16) - 1)
+_ECCENTRICITY_DERIVED_MEAN = math.sqrt(
+    EARTH_BASE_ECCENTRICITY**2 + EARTH_ECCENTRICITY_AMPLITUDE**2
+)
+
+# Fourier harmonic coefficients for year-length formulas (March 2026)
+# Fitted from 491 data points spanning ±25,000 years.
+# Means are DERIVED from _MEAN_SOLAR_YEAR_DAYS (not fitted), so they update
+# automatically if H or _INPUT_MEAN_SOLAR_YEAR changes. Only coefficients
+# need refitting. Each entry: (period, sin_coeff_days, cos_coeff_days).
+# Reference: t = year - BALANCE_YEAR
+TROPICAL_YEAR_HARMONICS = [                                # RMS = 0.006 s
+    (H / 8,  -1.315685778131e-06, -2.101615481220e-05),   # H/8:  1.819s amp
+    (H / 3,  +6.745126392744e-07, +7.955457410219e-06),   # H/3:  0.690s amp
+    (H / 16, -6.145697256116e-09, -3.622604401125e-07),    # H/16: 0.031s amp
+]
+SIDEREAL_YEAR_HARMONICS = [                                # RMS = 0.003 s
+    (H / 8, -1.255070074367e-06, -1.783278998075e-08),     # H/8:  0.108s amp
+    (H / 3, +5.794170454941e-07, +1.019398849945e-07),     # H/3:  0.051s amp
+]
+ANOMALISTIC_YEAR_HARMONICS = [                             # RMS = 0.011 s
+    (H / 8,  -2.111981801448e-07, +2.544662242077e-08),    # H/8:  0.018s amp
+    (H / 3,  -6.755570533516e-08, -5.963699950444e-10),    # H/3:  0.006s amp
+    (H / 16, -5.074517345509e-08, +8.665832935489e-08),    # H/16: 0.009s amp
+    (H / 24, -4.432336424626e-07, +1.845872180598e-08),    # H/24: 0.038s amp
+]
 
 # Moon sidereal month (constants.js section 7)
 _MOON_SIDEREAL_MONTH = _TOTAL_DAYS_IN_H / math.ceil(_TOTAL_DAYS_IN_H / _MOON_SIDEREAL_MONTH_INPUT)
