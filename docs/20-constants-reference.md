@@ -33,7 +33,7 @@ The six true degrees of freedom that define the model. Everything else is derive
 | 2 | Balanced year | `balancedYear` | −302,355 (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 | 4 | Mean obliquity | `earthtiltMean` | 23.41357° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.635956° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 6 | Planet config | Config #3 | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
@@ -93,12 +93,12 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | 0.015373 | Base orbital eccentricity |
-| Eccentricity Amplitude | `eccentricityAmplitude` | 0.001370 | Oscillation amplitude |
+| Base Eccentricity | `eccentricityBase` | 0.015372 | Base orbital eccentricity |
+| Eccentricity Amplitude | `eccentricityAmplitude` | 0.00137032 | Oscillation amplitude |
 | Mean Obliquity | `earthtiltMean` | 23.41357 deg | Mean axial tilt |
 | RA Angle | `earthRAAngle` | 1.258454 | Derived from obliquity cycle position |
-| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481180 deg | Mean orbital inclination to invariable plane |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.635956 deg | Oscillation amplitude |
+| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481179 deg | Mean orbital inclination to invariable plane |
+| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970 deg | Oscillation amplitude |
 | Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195 deg | Phase offset for inclination oscillation |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
 
@@ -270,7 +270,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Appendix E (84)](84-inc
 |--------|----------|---------------|-----------|-------------|
 | Mercury | 6.726620 | 0.384621 | 6.34 - 7.11 | 203.3195 deg |
 | Venus | 2.207361 | 0.061866 | 2.15 - 2.27 | 203.3195 deg |
-| Earth | 1.481180 | 0.635956 | 0.85 - 2.12 | 203.3195 deg |
+| Earth | 1.481179 | 0.635970 | 0.85 - 2.12 | 203.3195 deg |
 | Mars | 2.649893 | 1.158626 | 1.49 - 3.81 | 203.3195 deg |
 | Jupiter | 0.329100 | 0.021301 | 0.31 - 0.35 | 203.3195 deg |
 | Saturn | 0.931678 | 0.064879 | 0.87 - 1.00 | 23.3195 deg (retrograde) |

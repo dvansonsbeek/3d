@@ -8,7 +8,7 @@ constraints across mirror-symmetric planet pairs.
 
 Sections:
   1. R = e / i_mean_rad for all planets
-  2. Full 8-planet prediction chain from e_E = 0.015373 (1 free param)
+  2. Full 8-planet prediction chain from e_E = 0.015372 (1 free param)
   3. Three scenario comparison: e_E ref / Saturn-Law3 ref / pure Law 4
   4. Product vs ratio assignment rule analysis
   5. Balance equation independence (DOF + Monte Carlo)
@@ -166,7 +166,7 @@ for pair in MIRROR_PAIRS:
 # ═══════════════════════════════════════════════════════════════════════════
 
 print("\n" + "=" * 78)
-print("Section 2: Full 8-planet prediction chain from e_E = 0.015373")
+print("Section 2: Full 8-planet prediction chain from e_E = 0.015372")
 print("=" * 78)
 
 e_E = EARTH_BASE_ECCENTRICITY
@@ -275,7 +275,7 @@ pred_A = predict_eccentricities('A')
 pred_B = predict_eccentricities('B')
 pred_C = predict_eccentricities('C')
 
-print(f"\n  Scenario A: e_E = 0.015373 as reference (1 free parameter)")
+print(f"\n  Scenario A: e_E = 0.015372 as reference (1 free parameter)")
 print(f"  Scenario B: Saturn from Law 3 as reference (0 free parameters)")
 print(f"  Scenario C: Pure Law 4 — all from Fibonacci constraints (0 free parameters)")
 

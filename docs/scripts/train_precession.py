@@ -13,10 +13,12 @@ Output: Coefficient files for each planet
 Author: Holistic Universe Model
 """
 
-import csv
 import math
+import os
 from pathlib import Path
 from typing import List, Tuple, Dict
+
+import pandas as pd
 
 # Import unified feature builder
 from predictive_formula import (
@@ -25,41 +27,39 @@ from predictive_formula import (
 )
 
 
-def load_csv_data(csv_path: str) -> Dict[str, List[Tuple[int, float]]]:
+PLANET_FLUCTUATION_COLS = {
+    'mercury': 'Mercury Precession Fluctuation',
+    'venus': 'Venus Precession Fluctuation',
+    'mars': 'Mars Precession Fluctuation',
+    'jupiter': 'Jupiter Precession Fluctuation',
+    'saturn': 'Saturn Precession Fluctuation',
+    'uranus': 'Uranus Precession Fluctuation',
+    'neptune': 'Neptune Precession Fluctuation',
+}
+
+
+def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
     """
-    Load observed fluctuations from CSV file.
+    Load observed fluctuations from Excel file.
 
     Returns dict: planet_key -> [(year, fluctuation), ...]
     """
-    planet_columns = {
-        'mercury': 'Mercury Precession Fluctuation',
-        'venus': 'Venus Precession Fluctuation',
-        'mars': 'Mars Precession Fluctuation',
-        'jupiter': 'Jupiter Precession Fluctuation',
-        'saturn': 'Saturn Precession Fluctuation',
-        'uranus': 'Uranus Precession Fluctuation',
-        'neptune': 'Neptune Precession Fluctuation',
-    }
+    df = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
 
-    data = {key: [] for key in planet_columns}
+    data = {key: [] for key in PLANET_FLUCTUATION_COLS}
 
-    with open(csv_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f, delimiter=';')
+    for _, row in df.iterrows():
+        try:
+            year = int(row['Year'])
+        except (ValueError, KeyError):
+            continue
 
-        for row in reader:
+        for planet_key, col_name in PLANET_FLUCTUATION_COLS.items():
             try:
-                year = int(row['Year'])
+                value = float(row[col_name])
+                data[planet_key].append((year, value))
             except (ValueError, KeyError):
-                continue
-
-            for planet_key, col_name in planet_columns.items():
-                try:
-                    # European format: comma as decimal separator
-                    value_str = row[col_name].replace(',', '.')
-                    value = float(value_str)
-                    data[planet_key].append((year, value))
-                except (ValueError, KeyError):
-                    pass
+                pass
 
     return data
 
@@ -275,12 +275,12 @@ def main():
 
     # Paths
     script_dir = Path(__file__).parent
-    csv_path = script_dir / "holistic-year-objects-data.csv"
+    excel_path = script_dir / '..' / '98-holistic-year-objects-data.xlsx'
     output_dir = script_dir
 
     # Load data
-    print("Loading observed data from CSV...")
-    data = load_csv_data(str(csv_path))
+    print("Loading observed data from Excel...")
+    data = load_excel_data(str(excel_path))
 
     # Show data counts
     print("\nData points per planet:")

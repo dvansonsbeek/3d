@@ -62,9 +62,8 @@ docs/
 │   ├── validate_precession.py    # Validation against observed data
 │   ├── *_coeffs_unified.py       # Predictive coefficients (7 files, 273 terms)
 │   ├── *_coeffs.py               # Observed coefficients (7 files, 225/328 terms)
-│   ├── holistic-year-objects-data.csv  # Training data
 │   └── PREDICTIVE_FORMULA_GUIDE.mdx  # This guide
-└── 98-holistic-year-objects-data.xlsx  # Excel version of training data
+└── 98-holistic-year-objects-data.xlsx  # Training data (Excel, multiple sheets)
 ```
 
 ## Quick Start
@@ -115,16 +114,17 @@ If you have updated observed data, you can retrain the coefficients:
 
 ### 1. Prepare Training Data
 
-The training data CSV (`holistic-year-objects-data.csv`) contains 84+ columns accessed by numeric index via `CSV_COLS` in `observed_formula.py`. Key columns include:
-- Column 3: `Year` - Calendar year
-- Column 24: `EARTH LONGITUDE FORMULA` - Earth perihelion longitude
-- Column 25: `EARTH ERD HELPER` - Earth Rate Deviation
-- Column 26: `EARTH Eccentricity`
-- Column 27: `EARTH OBLIQUITY (deg)`
-- Columns 4, 14, 34, 44, 54, 64, 74: Planet perihelion longitudes
-- Columns 13, 23, 43, 53, 63, 73, 83: Planet precession fluctuations (″/century)
+The training data is in `98-holistic-year-objects-data.xlsx` (Excel format), accessed by column name via `EXCEL_COLS` in `observed_formula.py`. Data comes from two sheets:
 
-Note: Uses semicolon (`;`) as delimiter and comma (`,`) as decimal separator (European format).
+**Sheet 'Perihelion Planets':**
+- `Year` — Calendar year
+- `EARTH Eccentricity`, `EARTH OBLIQUITY (deg)` — Earth parameters
+- `{Planet} Perihelion ICRF` — Planet perihelion longitudes (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune)
+- `{Planet} Precession Fluctuation` — Observed fluctuations (″/century)
+
+**Sheet 'Earth Longitude':**
+- `Earth Longitude RA` — Observed Earth longitude (used as theta_E feature)
+- ERD (Earth Rate Deviation) is derived as the numerical derivative of this column.
 
 ### 2. Run Training
 
@@ -184,13 +184,13 @@ Current model performance:
 
 | Planet | RMSE ("/cy) | R² |
 |--------|-------------|-----|
-| Mercury | 2.44 | 0.9990 |
-| Venus | 21.64 | 0.9983 |
+| Mercury | 3.21 | 0.9987 |
+| Venus | 21.39 | 0.9983 |
 | Mars | 0.75 | 0.9999 |
-| Jupiter | 0.52 | 0.9999 |
-| Saturn | 0.29 | 1.0000 |
-| Uranus | 0.28 | 0.9999 |
-| Neptune | 0.20 | 0.9999 |
+| Jupiter | 0.93 | 0.9999 |
+| Saturn | 0.32 | 1.0000 |
+| Uranus | 0.31 | 0.9999 |
+| Neptune | 0.41 | 0.9997 |
 
 ## Extending the Model
 

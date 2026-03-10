@@ -8,16 +8,15 @@ matrix (225 terms for most planets, 328 terms for Venus).
 
 Unlike train_precession.py which uses the predictive 273-term feature matrix,
 this script uses the observed formula's feature builders that take actual
-CSV-observed values (perihelion, ERD, obliquity, eccentricity) as inputs.
+Excel-observed values (perihelion, ERD, obliquity, eccentricity) as inputs.
 
-Training target: Observed CSV fluctuations
+Training target: Observed Excel fluctuations
 Method: Least-squares via SVD (numpy.linalg.lstsq)
 Output: Coefficient files for each planet (*_coeffs.py)
 
 Author: Holistic Universe Model
 """
 
-import csv
 import math
 import numpy as np
 from pathlib import Path
@@ -26,43 +25,33 @@ from typing import List, Dict
 # Import observed feature builders and constants
 from observed_formula import (
     build_feature_matrix, build_feature_matrix_venus,
-    PLANETS, H, ANCHOR, CSV_COLS,
-    EARTH_ECC_MEAN,
+    PLANETS, H, ANCHOR, EXCEL_COLS,
+    EARTH_ECC_MEAN, load_excel_data,
 )
 
 
-def load_csv_data(csv_path: str) -> List[Dict]:
+def load_training_data() -> List[Dict]:
     """
-    Load all observed data from CSV file.
+    Load all observed data from Excel file.
 
     Returns list of row dicts with year, earth params, planet perihelions,
     and planet fluctuations.
     """
+    data = load_excel_data()
+
     rows = []
-
-    with open(csv_path, 'r', encoding='utf-8') as f:
-        reader = csv.reader(f, delimiter=';')
-        header = next(reader)  # Skip header
-
-        for row in reader:
-            if len(row) < 84:
-                continue
-            try:
-                entry = {
-                    'year': int(row[CSV_COLS['year']]),
-                    'theta_E': float(row[CSV_COLS['earth_longitude']].replace(',', '.')),
-                    'erd': float(row[CSV_COLS['earth_erd']].replace(',', '.')),
-                    'eccentricity': float(row[CSV_COLS['earth_eccentricity']].replace(',', '.')),
-                    'obliquity': float(row[CSV_COLS['earth_obliquity']].replace(',', '.')),
-                }
-                for planet_key in PLANETS:
-                    entry[f'{planet_key}_perihelion'] = float(
-                        row[CSV_COLS[f'{planet_key}_perihelion']].replace(',', '.'))
-                    entry[f'{planet_key}_fluctuation'] = float(
-                        row[CSV_COLS[f'{planet_key}_fluctuation']].replace(',', '.'))
-                rows.append(entry)
-            except (ValueError, IndexError):
-                continue
+    for year, d in data.items():
+        entry = {
+            'year': year,
+            'theta_E': d['theta_E'],
+            'erd': d['erd'],
+            'eccentricity': d['eccentricity'],
+            'obliquity': d['obliquity'],
+        }
+        for planet_key in PLANETS:
+            entry[f'{planet_key}_perihelion'] = d[f'{planet_key}_perihelion']
+            entry[f'{planet_key}_fluctuation'] = d[f'{planet_key}_actual']
+        rows.append(entry)
 
     return rows
 
@@ -174,13 +163,11 @@ def main():
     print()
 
     # Paths
-    script_dir = Path(__file__).parent
-    csv_path = script_dir / "holistic-year-objects-data.csv"
-    output_dir = script_dir
+    output_dir = Path(__file__).parent
 
     # Load data
-    print("Loading observed data from CSV...")
-    rows = load_csv_data(str(csv_path))
+    print("Loading observed data from Excel...")
+    rows = load_training_data()
     print(f"Loaded {len(rows)} data points")
     print()
 

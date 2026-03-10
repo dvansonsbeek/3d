@@ -91,8 +91,8 @@ function getFibonacciAmplitude(key) {
 // secular perturbation theory (Farside Table 10.1 gives γ₈ = 202.8°).
 // Saturn uses 23.3195° (= 203.3195° - 180°) due to retrograde precession.
 //
-// Note: script.js uses IAU 2006-optimized Earth values (mean = 1.481180,
-// amplitude = 0.635956) which give phaseAngle = 203.3277° — a 0.008°
+// Note: script.js uses IAU 2006-optimized Earth values (see constants.js for
+// current values) which give phaseAngle ≈ 203.33° — a small
 // offset from the Fibonacci-derived value. This is negligible.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -497,8 +497,8 @@ for (const key of Object.keys(planetInputs)) {
       console.log(`// EARTH - J2000: ${input.inclJ2000}°`);
       console.log(`// Note: Earth uses IAU 2006-optimized values (see Fibonacci Laws (doc 10) for details)`);
       console.log(`// Fibonacci predicts: amplitude = ${result.amplitude.toFixed(6)}°, mean = ${result.mean.toFixed(6)}°`);
-      console.log(`const earthInvPlaneInclinationAmplitude = 0.635956;  // IAU 2006 optimized`);
-      console.log(`const earthInvPlaneInclinationMean = 1.481180;       // IAU 2006 optimized`);
+      console.log(`const earthInvPlaneInclinationAmplitude = ${C.earthInvPlaneInclinationAmplitude};  // IAU 2006 optimized`);
+      console.log(`const earthInvPlaneInclinationMean = ${C.earthInvPlaneInclinationMean};       // IAU 2006 optimized`);
     } else {
       console.log(`// ${input.name.toUpperCase()} - J2000: ${input.inclJ2000}°, d=${FIBONACCI_D[key]}, trend error: ${errorArcsec.toFixed(1)}"/cy`);
       console.log(`const ${key}InvPlaneInclinationMean = ${result.mean.toFixed(6)};`);
@@ -543,7 +543,7 @@ console.log('- Means computed from J2000 constraint: mean = i_J2000 - amp × cos
 console.log('- All planets match J2000 invariable plane inclination exactly');
 console.log('- Phase groups: 203.3195° (Mercury,Venus,Earth,Mars,Jupiter,Uranus,Neptune), 23.3195° (Saturn)');
 console.log('- Saturn uses retrograde precession (negative period)');
-console.log('- Earth uses IAU 2006-optimized amplitude (0.635956° vs Fibonacci ' + earthFibAmp.toFixed(6) + '°)');
+console.log('- Earth uses IAU 2006-optimized amplitude (' + C.earthInvPlaneInclinationAmplitude + '° vs Fibonacci ' + earthFibAmp.toFixed(6) + '°)');
 console.log('- Pluto: no Fibonacci theory, amplitude optimized within LL bounds');
 console.log('- See docs/10-fibonacci-laws.md for full derivation');
 console.log('');

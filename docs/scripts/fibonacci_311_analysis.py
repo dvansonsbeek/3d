@@ -936,7 +936,7 @@ def _p1_section_10(psi1, xi_V):
 
     print("  Current state: 2 free parameters")
     print("    ψ = 3.2995 × 10⁻³")
-    print("    e_E = 0.015373")
+    print("    e_E = 0.015372")
     print()
     print("  Can we reduce to 1 free parameter?")
     print("  Can we reduce to 0 free parameters?")

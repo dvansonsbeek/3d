@@ -119,7 +119,7 @@ mathematical identity for the mean of a vector sum where one component is fixed
 and the other rotates. Using the mean ensures the EoC is correct on average
 across all precession phases.
 
-**Numerical value:** `sqrt(0.015373^2 + 0.001370^2) - 0.015373/2 = 0.007747`
+**Numerical value:** `sqrt(0.015372^2 + 0.00137032^2) - 0.015372/2 = 0.007748`
 
 **Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
 by 310 arcsec. The correction was discovered through numerical analysis using
@@ -166,8 +166,8 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 | `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:
-- `eccentricityBase` = 0.015373 (offset of circle center from Earth)
-- `eccentricityAmplitude` = 0.001370 (oscillation amplitude over H/16 cycle)
+- `eccentricityBase` = 0.015372 (offset of circle center from Earth)
+- `eccentricityAmplitude` = 0.00137032 (oscillation amplitude over H/16 cycle)
 
 ### Results
 

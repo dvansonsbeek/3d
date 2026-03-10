@@ -57,10 +57,10 @@ const massRatioDE440 = {
 
 const earthRAAngle = 1.258454;
 const earthtiltMean = 23.41357;
-const earthInvPlaneInclinationMean = 1.481180;
-const earthInvPlaneInclinationAmplitude = 0.635956;
-const eccentricityBase = 0.015373;
-const eccentricityAmplitude = 0.001370;
+const earthInvPlaneInclinationMean = 1.481179;
+const earthInvPlaneInclinationAmplitude = 0.635970;
+const eccentricityBase = 0.015372;
+const eccentricityAmplitude = 0.00137032;
 const perihelionRefJD = 2451547.042; // JD of Earth perihelion 2000 (Jan 3.542)
 
 

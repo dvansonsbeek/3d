@@ -15,22 +15,22 @@
 // Reference: Laplace-Lagrange secular theory, Souami & Souchay (2012)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const { H: holisticyearLength } = require("../tools/lib/constants");
+const C = require("../tools/lib/constants");
+const holisticyearLength = C.H;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
-const { H: holisticyearLength } = require("../tools/lib/constants");
 
 // ═══════════════════════════════════════════════════════════════════════════
-// EARTH REFERENCE (FIXED)
+// EARTH REFERENCE (from constants.js)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const earthConfig = {
-  omegaJ2000: 284.51,                     // Souami & Souchay (2012)
-  period: holisticyearLength / 3,         // 111,669 years
-  mean: 1.481180,
-  amplitude: 0.635956,
+  omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane,
+  period: holisticyearLength / 3,
+  mean: C.earthInvPlaneInclinationMean,
+  amplitude: C.earthInvPlaneInclinationAmplitude,
   inclJ2000: 1.57866663,
-  phaseAngle: 203.3195
+  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle
 };
 
 // Calculate Earth's initial phase from J2000 constraint

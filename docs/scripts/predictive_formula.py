@@ -36,7 +36,7 @@ from fibonacci_data import H
 # SECTION A: FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-ANCHOR_YEAR = -301340           # Start of H-cycle (time reference)
+ANCHOR_YEAR = -302355           # balancedYear: 1246 - 14.5*(H/16)
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
 # --- Day & Year constants ---
@@ -137,8 +137,8 @@ PLANETS = {
 
 # Earth mean values for normalization
 EARTH_OBLIQ_MEAN = 23.414
-EARTH_ECC_BASE = 0.015373                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.001370                                      # (max - min) / 2
+EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
+EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
 
 # Earth perihelion harmonics (for perihelion and ERD calculation)
@@ -214,7 +214,7 @@ def calc_eccentricity(year: int) -> float:
     """Calculate Earth's orbital eccentricity at given year.
 
     Formula: e(t) = e₀ + (-A - (e₀ - e_base)·cos(φ))·cos(φ)
-    where e₀ = sqrt(e_base² + A²), e_base = 0.015373, A = 0.001370
+    where e₀ = sqrt(e_base² + A²), e_base = 0.015372, A = 0.00137032
     Only 2 free parameters: extremes are exactly e_base ± A.
     """
     t = time_offset(year)

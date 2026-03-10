@@ -3,11 +3,12 @@
 Observed Precession Fluctuation Formulas for All Planets
 
 This script calculates the precession fluctuation for all planets using
-the observed perihelion data from the Holistic Universe model's CSV file.
+the observed perihelion data from the Holistic Universe model's Excel file.
 
-IMPORTANT: This script uses OBSERVED values from the CSV data file:
-- Observed perihelion angles for each planet
-- Earth Rate Deviation (ERD) from numerical derivative
+IMPORTANT: This script uses OBSERVED values from the Excel data file:
+- Observed perihelion angles for each planet (from 'Perihelion Planets' sheet)
+- Earth Longitude RA (from 'Earth Longitude' sheet)
+- Earth Rate Deviation (ERD) derived as numerical derivative of longitude
 - Earth obliquity and eccentricity
 
 For predictive formulas using calculated values, see: predictive_formula.py
@@ -21,30 +22,31 @@ PLANETARY PERIODS (derived from H):
   Uranus:   H/3
   Neptune:  H × 2
 
-RESULTS (using observed perihelion from CSV):
-  Mercury:  R² = 1.0000, RMSE = 0.08 arcsec/century (225 terms)
-  Venus:    R² = 1.0000, RMSE = 0.27 arcsec/century (328 terms, V3_VENUS)
-  Mars:     R² = 1.0000, RMSE = 0.02 arcsec/century (225 terms)
-  Jupiter:  R² = 1.0000, RMSE = 0.03 arcsec/century (225 terms)
-  Saturn:   R² = 1.0000, RMSE = 0.03 arcsec/century (225 terms)
-  Uranus:   R² = 1.0000, RMSE = 0.01 arcsec/century (225 terms)
-  Neptune:  R² = 1.0000, RMSE = 0.01 arcsec/century (225 terms)
+RESULTS (using observed perihelion from Excel):
+  Mercury:  R² = 0.999994, RMSE = 0.22 arcsec/century (225 terms)
+  Venus:    R² = 0.999999, RMSE = 0.46 arcsec/century (328 terms, V3_VENUS)
+  Mars:     R² = 1.000000, RMSE = 0.03 arcsec/century (225 terms)
+  Jupiter:  R² = 1.000000, RMSE = 0.06 arcsec/century (225 terms)
+  Saturn:   R² = 1.000000, RMSE = 0.05 arcsec/century (225 terms)
+  Uranus:   R² = 1.000000, RMSE = 0.01 arcsec/century (225 terms)
+  Neptune:  R² = 0.999999, RMSE = 0.02 arcsec/century (225 terms)
 
 Author: Holistic Universe Model
 License: MIT
 """
 
-import csv
 import math
 import os
 from typing import Dict, List, Tuple, Optional
+
+import pandas as pd
 
 # =============================================================================
 # FUNDAMENTAL CONSTANTS
 # =============================================================================
 
 H = 335008  # Master Holistic-Year cycle
-ANCHOR = 301340  # Reference year offset (year 0 of current cycle = -301340)
+ANCHOR = 302355  # Reference year offset: balancedYear = 1246 - 14.5*(H/16)
 
 # Earth precession cycles
 EARTH_PERI_PERIOD = H // 16     # H/16 (effective perihelion)
@@ -71,37 +73,45 @@ NEPTUNE_PERIOD = H * 2               # H × 2
 
 # Earth mean values for normalization
 EARTH_OBLIQ_MEAN = 23.414
-EARTH_ECC_BASE = 0.015373                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.001370                                      # (max - min) / 2
+EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
+EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
 
 # =============================================================================
-# CSV COLUMN INDICES (0-indexed)
+# EXCEL COLUMN MAPPINGS
 # =============================================================================
 
-CSV_COLS = {
-    'year': 3,
-    'earth_longitude': 24,
-    'earth_erd': 25,
-    'earth_eccentricity': 26,
-    'earth_obliquity': 27,
-    # Perihelion columns
-    'mercury_perihelion': 4,
-    'venus_perihelion': 14,
-    'mars_perihelion': 34,
-    'jupiter_perihelion': 44,
-    'saturn_perihelion': 54,
-    'uranus_perihelion': 64,
-    'neptune_perihelion': 74,
+# Excel file: 98-holistic-year-objects-data.xlsx
+# Data comes from two sheets:
+#   'Perihelion Planets' — planet perihelions, fluctuations, Earth eccentricity/obliquity
+#   'Earth Longitude'    — Earth Longitude RA (real observed data)
+# ERD (Earth Rate Deviation) is derived as numerical derivative of longitude.
+
+EXCEL_COLS = {
+    'year': 'Year',
+    'earth_longitude': 'Earth Longitude RA',  # from 'Earth Longitude' sheet
+    'earth_eccentricity': 'EARTH Eccentricity',
+    'earth_obliquity': 'EARTH OBLIQUITY (deg)',
+    # Perihelion columns (ICRF frame)
+    'mercury_perihelion': 'Mercury Perihelion ICRF',
+    'venus_perihelion': 'Venus Perihelion ICRF',
+    'mars_perihelion': 'Mars Perihelion ICRF',
+    'jupiter_perihelion': 'Jupiter Perihelion ICRF',
+    'saturn_perihelion': 'Saturn Perihelion ICRF',
+    'uranus_perihelion': 'Uranus Perihelion ICRF',
+    'neptune_perihelion': 'Neptune Perihelion ICRF',
     # Precession fluctuation columns
-    'mercury_fluctuation': 13,
-    'venus_fluctuation': 23,
-    'mars_fluctuation': 43,
-    'jupiter_fluctuation': 53,
-    'saturn_fluctuation': 63,
-    'uranus_fluctuation': 73,
-    'neptune_fluctuation': 83,
+    'mercury_fluctuation': 'Mercury Precession Fluctuation',
+    'venus_fluctuation': 'Venus Precession Fluctuation',
+    'mars_fluctuation': 'Mars Precession Fluctuation',
+    'jupiter_fluctuation': 'Jupiter Precession Fluctuation',
+    'saturn_fluctuation': 'Saturn Precession Fluctuation',
+    'uranus_fluctuation': 'Uranus Precession Fluctuation',
+    'neptune_fluctuation': 'Neptune Precession Fluctuation',
 }
+
+# Keep CSV_COLS as alias for backward compatibility (used by train_observed.py)
+CSV_COLS = EXCEL_COLS
 
 # =============================================================================
 # COEFFICIENTS (imported from individual files or embedded)
@@ -136,50 +146,50 @@ PLANETS = {
         'name': 'Mercury',
         'period': MERCURY_PERIOD,
         'coeffs': MERCURY_COEFFS,
-        'perihelion_col': CSV_COLS['mercury_perihelion'],
-        'fluctuation_col': CSV_COLS['mercury_fluctuation'],
+        'perihelion_col': EXCEL_COLS['mercury_perihelion'],
+        'fluctuation_col': EXCEL_COLS['mercury_fluctuation'],
     },
     'venus': {
         'name': 'Venus',
         'period': VENUS_PERIOD,
         'coeffs': VENUS_COEFFS,
-        'perihelion_col': CSV_COLS['venus_perihelion'],
-        'fluctuation_col': CSV_COLS['venus_fluctuation'],
+        'perihelion_col': EXCEL_COLS['venus_perihelion'],
+        'fluctuation_col': EXCEL_COLS['venus_fluctuation'],
     },
     'mars': {
         'name': 'Mars',
         'period': MARS_PERIOD,
         'coeffs': MARS_COEFFS,
-        'perihelion_col': CSV_COLS['mars_perihelion'],
-        'fluctuation_col': CSV_COLS['mars_fluctuation'],
+        'perihelion_col': EXCEL_COLS['mars_perihelion'],
+        'fluctuation_col': EXCEL_COLS['mars_fluctuation'],
     },
     'jupiter': {
         'name': 'Jupiter',
         'period': JUPITER_PERIOD,
         'coeffs': JUPITER_COEFFS,
-        'perihelion_col': CSV_COLS['jupiter_perihelion'],
-        'fluctuation_col': CSV_COLS['jupiter_fluctuation'],
+        'perihelion_col': EXCEL_COLS['jupiter_perihelion'],
+        'fluctuation_col': EXCEL_COLS['jupiter_fluctuation'],
     },
     'saturn': {
         'name': 'Saturn',
         'period': SATURN_PERIOD,
         'coeffs': SATURN_COEFFS,
-        'perihelion_col': CSV_COLS['saturn_perihelion'],
-        'fluctuation_col': CSV_COLS['saturn_fluctuation'],
+        'perihelion_col': EXCEL_COLS['saturn_perihelion'],
+        'fluctuation_col': EXCEL_COLS['saturn_fluctuation'],
     },
     'uranus': {
         'name': 'Uranus',
         'period': URANUS_PERIOD,
         'coeffs': URANUS_COEFFS,
-        'perihelion_col': CSV_COLS['uranus_perihelion'],
-        'fluctuation_col': CSV_COLS['uranus_fluctuation'],
+        'perihelion_col': EXCEL_COLS['uranus_perihelion'],
+        'fluctuation_col': EXCEL_COLS['uranus_fluctuation'],
     },
     'neptune': {
         'name': 'Neptune',
         'period': NEPTUNE_PERIOD,
         'coeffs': NEPTUNE_COEFFS,
-        'perihelion_col': CSV_COLS['neptune_perihelion'],
-        'fluctuation_col': CSV_COLS['neptune_fluctuation'],
+        'perihelion_col': EXCEL_COLS['neptune_perihelion'],
+        'fluctuation_col': EXCEL_COLS['neptune_fluctuation'],
     },
 }
 
@@ -826,64 +836,108 @@ def calculate_fluctuation(planet_key: str, year: int, theta_E: float, erd: float
     return sum(coeffs[i] * features[i] for i in range(n_features))
 
 # =============================================================================
-# CSV DATA LOADING
+# EXCEL DATA LOADING
 # =============================================================================
 
-def load_csv_data(csv_path: str) -> Dict[int, Dict]:
+def _get_excel_path() -> str:
+    """Return path to the Excel data file (one level up from scripts/)."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, '..', '98-holistic-year-objects-data.xlsx')
+
+
+def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     """
-    Load data from the Holistic Year Objects CSV file.
+    Load data from the Holistic Year Objects Excel file.
+
+    Reads planet data from 'Perihelion Planets' sheet and Earth longitude
+    from 'Earth Longitude' sheet. ERD is derived as the numerical derivative
+    of Earth Longitude RA.
+
+    Args:
+        excel_path: Path to Excel file. If None, uses default location.
 
     Returns:
         Dictionary mapping year to data values
     """
+    if excel_path is None:
+        excel_path = _get_excel_path()
+
+    # Read both sheets
+    df_peri = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
+    df_long = pd.read_excel(excel_path, sheet_name='Earth Longitude',
+                            usecols=['Year', 'Earth Longitude RA'])
+
+    # Compute ERD as numerical derivative of Earth Longitude RA
+    years = df_long['Year'].values
+    longitudes = df_long['Earth Longitude RA'].values
+    erd_values = [0.0] * len(years)
+    for i in range(1, len(years) - 1):
+        dt = years[i + 1] - years[i - 1]
+        if dt != 0:
+            erd_values[i] = (longitudes[i + 1] - longitudes[i - 1]) / dt
+    # Endpoints: forward/backward difference
+    if len(years) > 1:
+        dt0 = years[1] - years[0]
+        if dt0 != 0:
+            erd_values[0] = (longitudes[1] - longitudes[0]) / dt0
+        dtn = years[-1] - years[-2]
+        if dtn != 0:
+            erd_values[-1] = (longitudes[-1] - longitudes[-2]) / dtn
+
+    # Build lookup by year
+    long_by_year = {}
+    for i, yr in enumerate(years):
+        long_by_year[int(yr)] = (longitudes[i], erd_values[i])
+
     data = {}
-
-    with open(csv_path, 'r') as f:
-        reader = csv.reader(f, delimiter=';')
-        header = next(reader)  # Skip header
-
-        for row in reader:
-            if len(row) < 84:  # Need all columns
-                continue
-            try:
-                year = int(row[CSV_COLS['year']])
-                data[year] = {
-                    'theta_E': float(row[CSV_COLS['earth_longitude']].replace(',', '.')),
-                    'erd': float(row[CSV_COLS['earth_erd']].replace(',', '.')),
-                    'eccentricity': float(row[CSV_COLS['earth_eccentricity']].replace(',', '.')),
-                    'obliquity': float(row[CSV_COLS['earth_obliquity']].replace(',', '.')),
-                    'mercury_perihelion': float(row[CSV_COLS['mercury_perihelion']].replace(',', '.')),
-                    'venus_perihelion': float(row[CSV_COLS['venus_perihelion']].replace(',', '.')),
-                    'mars_perihelion': float(row[CSV_COLS['mars_perihelion']].replace(',', '.')),
-                    'jupiter_perihelion': float(row[CSV_COLS['jupiter_perihelion']].replace(',', '.')),
-                    'saturn_perihelion': float(row[CSV_COLS['saturn_perihelion']].replace(',', '.')),
-                    'uranus_perihelion': float(row[CSV_COLS['uranus_perihelion']].replace(',', '.')),
-                    'neptune_perihelion': float(row[CSV_COLS['neptune_perihelion']].replace(',', '.')),
-                    'mercury_actual': float(row[CSV_COLS['mercury_fluctuation']].replace(',', '.')),
-                    'venus_actual': float(row[CSV_COLS['venus_fluctuation']].replace(',', '.')),
-                    'mars_actual': float(row[CSV_COLS['mars_fluctuation']].replace(',', '.')),
-                    'jupiter_actual': float(row[CSV_COLS['jupiter_fluctuation']].replace(',', '.')),
-                    'saturn_actual': float(row[CSV_COLS['saturn_fluctuation']].replace(',', '.')),
-                    'uranus_actual': float(row[CSV_COLS['uranus_fluctuation']].replace(',', '.')),
-                    'neptune_actual': float(row[CSV_COLS['neptune_fluctuation']].replace(',', '.')),
-                }
-            except (ValueError, IndexError):
-                continue
+    C = EXCEL_COLS
+    for _, row in df_peri.iterrows():
+        try:
+            year = int(row[C['year']])
+            earth_long, erd = long_by_year.get(year, (0.0, 0.0))
+            data[year] = {
+                'theta_E': float(earth_long),
+                'erd': float(erd),
+                'eccentricity': float(row[C['earth_eccentricity']]),
+                'obliquity': float(row[C['earth_obliquity']]),
+                'mercury_perihelion': float(row[C['mercury_perihelion']]),
+                'venus_perihelion': float(row[C['venus_perihelion']]),
+                'mars_perihelion': float(row[C['mars_perihelion']]),
+                'jupiter_perihelion': float(row[C['jupiter_perihelion']]),
+                'saturn_perihelion': float(row[C['saturn_perihelion']]),
+                'uranus_perihelion': float(row[C['uranus_perihelion']]),
+                'neptune_perihelion': float(row[C['neptune_perihelion']]),
+                'mercury_actual': float(row[C['mercury_fluctuation']]),
+                'venus_actual': float(row[C['venus_fluctuation']]),
+                'mars_actual': float(row[C['mars_fluctuation']]),
+                'jupiter_actual': float(row[C['jupiter_fluctuation']]),
+                'saturn_actual': float(row[C['saturn_fluctuation']]),
+                'uranus_actual': float(row[C['uranus_fluctuation']]),
+                'neptune_actual': float(row[C['neptune_fluctuation']]),
+            }
+        except (ValueError, KeyError):
+            continue
 
     return data
 
-def calculate_all_planets(csv_path: str, year: int) -> Optional[Dict[str, float]]:
+
+# Backward-compatible alias
+def load_csv_data(csv_path: str = None) -> Dict[int, Dict]:
+    """Legacy wrapper — loads from Excel file regardless of csv_path."""
+    return load_excel_data()
+
+def calculate_all_planets(excel_path: str, year: int) -> Optional[Dict[str, float]]:
     """
     Calculate precession fluctuation for all planets at a given year.
 
     Args:
-        csv_path: Path to the CSV data file
+        excel_path: Path to the Excel data file
         year: The year to calculate for
 
     Returns:
         Dictionary with calculated values for each planet, or None if year not in data
     """
-    data = load_csv_data(csv_path)
+    data = load_excel_data(excel_path)
 
     if year not in data:
         return None
@@ -905,14 +959,14 @@ def calculate_all_planets(csv_path: str, year: int) -> Optional[Dict[str, float]
 # VALIDATION
 # =============================================================================
 
-def validate_formulas(csv_path: str) -> Dict[str, Dict]:
+def validate_formulas(excel_path: str = None) -> Dict[str, Dict]:
     """
-    Validate formulas against actual CSV data.
+    Validate formulas against actual Excel data.
 
     Returns:
         Dictionary with RMSE, R², and max error for each planet
     """
-    data = load_csv_data(csv_path)
+    data = load_excel_data(excel_path)
 
     results = {}
 
@@ -966,12 +1020,11 @@ def validate_formulas(csv_path: str) -> Dict[str, Dict]:
 if __name__ == '__main__':
     import sys
 
-    # Find CSV file
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(script_dir, 'holistic-year-objects-data.csv')
+    # Find Excel file
+    excel_path = _get_excel_path()
 
-    if not os.path.exists(csv_path):
-        print(f"ERROR: Cannot find CSV file at {csv_path}")
+    if not os.path.exists(excel_path):
+        print(f"ERROR: Cannot find Excel file at {excel_path}")
         sys.exit(1)
 
     print("=" * 70)
@@ -979,7 +1032,7 @@ if __name__ == '__main__':
     print("=" * 70)
     print()
     print(f"Master cycle H = {H:,} years")
-    print(f"CSV file: {os.path.basename(csv_path)}")
+    print(f"Data file: {os.path.basename(excel_path)}")
     print()
 
     # Print planetary periods
@@ -994,10 +1047,10 @@ if __name__ == '__main__':
     print()
 
     # Validate formulas
-    print("Validating formulas against CSV data...")
+    print("Validating formulas against Excel data...")
     print()
 
-    results = validate_formulas(csv_path)
+    results = validate_formulas(excel_path)
 
     print("=" * 70)
     print("VALIDATION RESULTS")
@@ -1018,7 +1071,7 @@ if __name__ == '__main__':
     print("=" * 70)
     print()
 
-    data = load_csv_data(csv_path)
+    data = load_excel_data(excel_path)
     if 2022 in data:
         row = data[2022]
         print(f"Earth longitude: {row['theta_E']:.4f}°")
@@ -1041,7 +1094,7 @@ if __name__ == '__main__':
             error = predicted - actual
             print(f"{PLANETS[planet_key]['name']:<10} {peri:<12.4f} {predicted:<15.4f} {actual:<15.4f} {error:+.4f}")
     else:
-        print("Year 2022 not found in CSV data")
+        print("Year 2022 not found in data")
 
     print()
     print("Done!")

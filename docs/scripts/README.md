@@ -83,8 +83,7 @@ python fibonacci_trappist1_deep.py
 
 | File | Description |
 |------|-------------|
-| `holistic-year-objects-data.csv` | Simulation output data: orbital parameters across one Holistic-Year (H) (predictive formula scripts depend on this file) |
-| [`../98-holistic-year-objects-data.xlsx`](../98-holistic-year-objects-data.xlsx) | Excel version of the same data with additional sheets (perihelion scripts depend on this file — it must be present in the parent `docs/` directory) |
+| [`../98-holistic-year-objects-data.xlsx`](../98-holistic-year-objects-data.xlsx) | Excel data file with multiple sheets: 'Perihelion Planets' (planet perihelions, fluctuations, Earth eccentricity/obliquity), 'Earth Longitude' (Earth Longitude RA), and more. All scripts read from this file. |
 
 ---
 

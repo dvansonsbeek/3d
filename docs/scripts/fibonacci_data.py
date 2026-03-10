@@ -35,7 +35,7 @@ H = 335008  # Holistic-Year (years)
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 
 # Earth base eccentricity (from 3D simulation — arithmetic midpoint)
-EARTH_BASE_ECCENTRICITY = 0.015373
+EARTH_BASE_ECCENTRICITY = 0.015372
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees
@@ -91,7 +91,7 @@ ECC_J2000 = {
 ECC_BASE = {
     "Mercury": 0.20853,
     "Venus":   0.00679,
-    "Earth":   0.015373,
+    "Earth":   0.015372,
     "Mars":    0.09347,
     "Jupiter": 0.04839,
     "Saturn":  0.05386,
@@ -104,7 +104,7 @@ ECC_BASE = {
 ECCENTRICITIES = {
     "Mercury": 0.20563593,
     "Venus":   0.00677672,
-    "Earth":   0.015373,    # base eccentricity from Holistic model
+    "Earth":   0.015372,    # base eccentricity from Holistic model
     "Mars":    0.09339410,
     "Jupiter": 0.04838624,
     "Saturn":  0.05386179,
