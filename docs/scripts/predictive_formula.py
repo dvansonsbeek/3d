@@ -143,20 +143,19 @@ EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.0153869045
 
 # Earth perihelion harmonics (for perihelion and ERD calculation)
 PERI_HARMONICS = [
-    (EARTH_PERI_PERIOD, 5.05, 0.0),
-    (EARTH_PERI_2, 2.46, 0.0),
-    (EARTH_PERI_2, 0.2206, 0.2439),
-    (EARTH_PERI_3, 0.2310, 0.0205),
-    (EARTH_PERI_4, 0.0715, 0.0127),
-    (INCLIN_CYCLE, -0.1445, 0.0072),
-    (OBLIQ_CYCLE, 0.1150, -0.0070),
-    (H_DIV_29, -0.1305, -0.0052),
-    (H_DIV_24, 0.1279, 0.0059),
-    (H, -0.0392, -0.0002),
-    (H / 2, -0.0196, 0.0),
-    (H_DIV_40, 0.0154, 0.0006),
+    (EARTH_PERI_PERIOD, 4.8906, -0.0223),
+    (EARTH_PERI_2, 2.6637, 0.2477),
+    (EARTH_PERI_3, 0.2217, 0.0202),
+    (EARTH_PERI_4, 0.0708, 0.0123),
+    (INCLIN_CYCLE, -0.1318, 0.0073),
+    (OBLIQ_CYCLE, 0.1200, -0.0078),
+    (H_DIV_29, -0.1309, -0.0060),
+    (H_DIV_24, 0.1303, 0.0060),
+    (H_DIV_40, 0.0163, 0.0007),
+    (H_DIV_13, 0.0118, 0.0005),
+    (H_DIV_80, 0.0105, 0.0019),
 ]
-PERI_OFFSET = -0.3071
+PERI_OFFSET = -0.2608
 
 # =============================================================================
 # SECTION C: EARTH ORBITAL PARAMETERS
