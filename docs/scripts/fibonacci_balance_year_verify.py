@@ -36,10 +36,11 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fibonacci_data import (
     PLANET_NAMES, MASS, SQRT_M, SEMI_MAJOR, D, H, FIB,
-    ECC_J2000, ECC_BASE, ECCENTRICITIES,
+    ECC_J2000, ECC_BASE, ECC_DUAL_BALANCED, ECCENTRICITIES,
     INCL_J2000, OMEGA_J2000, INCL_AMP, INCL_PERIOD,
     PHASE_GROUP, GROUP_203, GROUP_23,
     PSI, MIRROR_PAIRS,
+    BALANCE_YEAR, J2000_YEAR,
 )
 
 
@@ -47,9 +48,7 @@ from fibonacci_data import (
 # Constants
 # ═══════════════════════════════════════════════════════════════════════════
 
-BALANCE_YEAR = -301_340
-J2000_YEAR = 2000
-DT = J2000_YEAR - BALANCE_YEAR  # 303,340 years
+DT = J2000_YEAR - BALANCE_YEAR
 
 PHASE_ANGLE = 203.3195  # s₈ eigenmode phase (degrees)
 
@@ -441,20 +440,16 @@ print()
 
 bal_j2000, sum_a_j, sum_b_j = incl_balance(ECC_J2000, D, GROUP_203, GROUP_23)
 bal_base, sum_a_b, sum_b_b = incl_balance(ECC_BASE, D, GROUP_203, GROUP_23)
-bal_default, sum_a_d, sum_b_d = incl_balance(ECCENTRICITIES, D, GROUP_203, GROUP_23)
+bal_dual, sum_a_dual, sum_b_dual = incl_balance(ECC_DUAL_BALANCED, D, GROUP_203, GROUP_23)
 
 print(f"  Eccentricity set      Balance (%)    Σ_203°         Σ_23°")
 print(f"  {'─'*20}  {'─'*13}  {'─'*14}  {'─'*14}")
 print(f"  {'J2000 (snapshot)':20s}  {bal_j2000:13.6f}  {sum_a_j:14.10f}  {sum_b_j:14.10f}")
 print(f"  {'Base (balanced yr)':20s}  {bal_base:13.6f}  {sum_a_b:14.10f}  {sum_b_b:14.10f}")
-print(f"  {'Default (mixed)':20s}  {bal_default:13.6f}  {sum_a_d:14.10f}  {sum_b_d:14.10f}")
+print(f"  {'Dual-balanced':20s}  {bal_dual:13.6f}  {sum_a_dual:14.10f}  {sum_b_dual:14.10f}")
 
-incl_improvement = bal_base - bal_j2000
-print(f"\n  Improvement (base vs J2000): {incl_improvement:+.6f}%")
-if incl_improvement > 0:
-    print(f"  → Base eccentricities give BETTER inclination balance")
-elif incl_improvement < 0:
-    print(f"  → J2000 eccentricities give better balance (base is slightly worse)")
+incl_improvement = bal_dual - bal_j2000
+print(f"\n  Improvement (dual-balanced vs J2000): {incl_improvement:+.6f}%")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -470,16 +465,16 @@ print()
 
 ebal_j2000, ea_j, eb_j = ecc_balance(ECC_J2000, D, GROUP_203, GROUP_23)
 ebal_base, ea_b, eb_b = ecc_balance(ECC_BASE, D, GROUP_203, GROUP_23)
-ebal_default, ea_d, eb_d = ecc_balance(ECCENTRICITIES, D, GROUP_203, GROUP_23)
+ebal_dual, ea_dual, eb_dual = ecc_balance(ECC_DUAL_BALANCED, D, GROUP_203, GROUP_23)
 
 print(f"  Eccentricity set      Balance (%)    Σ_203°         Σ_23°")
 print(f"  {'─'*20}  {'─'*13}  {'─'*14}  {'─'*14}")
 print(f"  {'J2000 (snapshot)':20s}  {ebal_j2000:13.6f}  {ea_j:14.10f}  {eb_j:14.10f}")
 print(f"  {'Base (balanced yr)':20s}  {ebal_base:13.6f}  {ea_b:14.10f}  {eb_b:14.10f}")
-print(f"  {'Default (mixed)':20s}  {ebal_default:13.6f}  {ea_d:14.10f}  {eb_d:14.10f}")
+print(f"  {'Dual-balanced':20s}  {ebal_dual:13.6f}  {ea_dual:14.10f}  {eb_dual:14.10f}")
 
-ecc_improvement = ebal_base - ebal_j2000
-print(f"\n  Improvement (base vs J2000): {ecc_improvement:+.6f}%")
+ecc_improvement = ebal_dual - ebal_j2000
+print(f"\n  Improvement (dual-balanced vs J2000): {ecc_improvement:+.6f}%")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -495,13 +490,13 @@ print()
 
 pred_j, act_j, err_j = saturn_prediction(ECC_J2000, D, GROUP_203, "Saturn")
 pred_b, act_b, err_b = saturn_prediction(ECC_BASE, D, GROUP_203, "Saturn")
-pred_d, act_d, err_d = saturn_prediction(ECCENTRICITIES, D, GROUP_203, "Saturn")
+pred_dual, act_dual, err_dual = saturn_prediction(ECC_DUAL_BALANCED, D, GROUP_203, "Saturn")
 
 print(f"  {'Eccentricity set':20s}  {'Predicted':>12s}  {'Actual':>12s}  {'Error':>10s}")
 print(f"  {'─'*20}  {'─'*12}  {'─'*12}  {'─'*10}")
 print(f"  {'J2000 (snapshot)':20s}  {pred_j:12.8f}  {act_j:12.8f}  {err_j:+10.4f}%")
 print(f"  {'Base (balanced yr)':20s}  {pred_b:12.8f}  {act_b:12.8f}  {err_b:+10.4f}%")
-print(f"  {'Default (mixed)':20s}  {pred_d:12.8f}  {act_d:12.8f}  {err_d:+10.4f}%")
+print(f"  {'Dual-balanced':20s}  {pred_dual:12.8f}  {act_dual:12.8f}  {err_dual:+10.4f}%")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -814,18 +809,19 @@ print(f"""
      Saturn perihelion (187.3°) only 7.3° from Jupiter
 
   4. INCLINATION BALANCE (Law 3):
-     J2000:       {bal_j2000:.6f}%
-     Base (bal.): {bal_base:.6f}%
-     Difference:  {incl_improvement:+.6f}%
+     J2000:         {bal_j2000:.6f}%
+     Base (bal.):   {bal_base:.6f}%
+     Dual-balanced: {bal_dual:.6f}%
 
   5. ECCENTRICITY BALANCE (Law 5):
-     J2000:       {ebal_j2000:.6f}%
-     Base (bal.): {ebal_base:.6f}%
-     Difference:  {ecc_improvement:+.6f}%
+     J2000:         {ebal_j2000:.6f}%
+     Base (bal.):   {ebal_base:.6f}%
+     Dual-balanced: {ebal_dual:.6f}%
 
-  6. SATURN PREDICTION:
-     J2000 error: {err_j:+.4f}%
-     Base error:  {err_b:+.4f}%
+  6. SATURN PREDICTION (Law 5):
+     J2000 error:         {err_j:+.4f}%
+     Base error:          {err_b:+.4f}%
+     Dual-balanced error: {err_dual:+.4f}%
 
   7. INVARIABLE PLANE:
      Option A (J2000):    i = {ip_incl_a:.4f}°, Ω = {ip_node_a:.3f}°

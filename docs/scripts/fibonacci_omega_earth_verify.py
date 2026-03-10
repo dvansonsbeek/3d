@@ -24,9 +24,9 @@ import pandas as pd
 # ║  CONSTANTS & DATA                                                      ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
-H = 333_888
-BALANCE_YEAR = -301_340
-J2000_YEAR = 2000
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fibonacci_data import H, BALANCE_YEAR, J2000_YEAR
 I_MEAN = 1.481592  # Earth's mean inclination to invariable plane (degrees)
 
 def norm360(a):

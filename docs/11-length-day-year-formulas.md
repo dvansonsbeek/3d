@@ -1080,7 +1080,7 @@ These values vary over the perihelion precession cycle (H/16 years):
 | Vernal Equinox (VE) | 365.242249945 days | -10.72s | Medium (+5.2s) | Transition period |
 | Winter Solstice (WS) | 365.242448513 days | -25.18s | LONGEST (+22.4s) | Perihelion in middle → slow orbital speed |
 
-**Note:** The ~±26s deviation from IAU at solstices is expected because the model uses a circular orbit (constant angular velocity) while IAU uses elliptical orbit (Kepler's 2nd Law). The mean of all four cardinal points cancels this effect.
+**Note:** With the equation of center enabled (`useVariableSpeed = true`), the model approximates Kepler's 2nd Law via `2e·sin(M) + 1.25e²·sin(2M)`, reducing the solstice deviation to ~±3-5s (from ~±26s without EoC). The residual is due to the geometric offset approach (circular path vs true ellipse). The mean of all four cardinal points cancels this effect.
 
 **Pattern when perihelion shifts to July (~11,680 AD, half-cycle later):**
 

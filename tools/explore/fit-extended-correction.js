@@ -63,18 +63,26 @@ const basisFn = (pt) => {
     Math.sin(pt.u)/(pt.d*pt.d*pt.sunDist),    // AI: sin(u)/(d²*s)
     Math.cos(4*pt.u)/pt.sunDist,               // AJ: cos(4u)/s
     Math.sin(2*pt.u)/(pt.d*pt.d*pt.sunDist),  // AK: sin(2u)/(d²*s)
+    // Extended terms (37-42) targeting inferior conjunction geometry
+    Math.sin(4*pt.u)/pt.d,                     // AL: sin(4u)/d — 4th harmonic geocentric
+    Math.cos(4*pt.u)/pt.d,                     // AM: cos(4u)/d — 4th harmonic geocentric
+    T*Math.sin(pt.u)/(pt.d*pt.d),              // AN: T*sin(u)/d² — time-modulated close approach
+    T*Math.cos(pt.u)/(pt.d*pt.d),              // AO: T*cos(u)/d² — time-modulated close approach
+    Math.sin(pt.u)/(pt.d*pt.d*pt.d),           // AP: sin(u)/d³ — cubic close approach
+    Math.cos(pt.u)/(pt.d*pt.d*pt.d),           // AQ: cos(u)/d³ — cubic close approach
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ'];
 
-// Tier sizes: 15, 18, 24, 30, 36
+// Tier sizes: 15, 18, 24, 30, 36, 42
 const tiers = [
   { name: '15p', count: 15 },
   { name: '18p', count: 18 },
   { name: '24p', count: 24 },
   { name: '30p', count: 30 },
   { name: '36p', count: 36 },
+  { name: '42p', count: 42 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');

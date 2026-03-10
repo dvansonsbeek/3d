@@ -283,10 +283,10 @@ e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 | Source | e_Saturn | vs J2000 |
 |--------|----------|----------|
 | Law 4 prediction (R² pair constraint) | 0.05389 | +0.05% |
-| Law 5 prediction (eccentricity balance) | 0.05373 | −0.24% |
+| Law 5 prediction (eccentricity balance) | 0.05374 | −0.22% |
 | J2000 observed (JPL DE440) | 0.05386 | — |
 
-**Law convergence:** Laws 4 and 5 independently predict Saturn's eccentricity to within **0.30%** of each other. Law 4 derives it from the R² pair constraint (n²_sum = 34/3, R_Ea × R_Sa = 2) — a purely structural Fibonacci relation. Law 5 derives it from the global balance equation — involving all eight planets simultaneously. Both bracket the J2000 observed value: Law 4 overshoots by 0.05%, Law 5 undershoots by 0.24%.
+**Law convergence:** Laws 4 and 5 independently predict Saturn's eccentricity to within **0.30%** of each other. Law 4 derives it from the R² pair constraint (n²_sum = 34/3, R_Ea × R_Sa = 2) — a purely structural Fibonacci relation. Law 5 derives it from the global balance equation — involving all eight planets simultaneously. Both bracket the J2000 observed value: Law 4 overshoots by 0.05%, Law 5 undershoots by 0.22%.
 
 **Why this is significant:** Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09 (a factor-of-9 dynamic range). Two structurally different Fibonacci constraints — one using only the Earth–Saturn pair, the other using all eight planets — independently predict a value within 0.3% of each other and within 0.25% of J2000 across this range. The Fibonacci divisors were originally chosen to match precession periods (Law 1) and inclination balance (Law 3); the eccentricity predictions were never optimized for. That two independent equations, drawing on different subsets of planetary data, converge on the same value confirms that the eccentricity balance is not an independent free parameter but an emergent consequence of the Fibonacci pair structure.
 
@@ -826,7 +826,7 @@ npx parcel build src/index.html --no-cache
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 755 valid configurations, Config #3 is the only one that is also mirror-symmetric.
 
-5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to RMS 2.19% error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations. The Saturn eccentricity predicted by Law 4 (0.05389) and the value predicted by Law 5 eccentricity balance (0.05373) agree to within 0.30%, both bracketing the J2000 observed value (0.05386) — two entirely different Fibonacci constraints converge on the same physical value.
+5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to RMS 2.19% error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations. The Saturn eccentricity predicted by Law 4 (0.05389) and the value predicted by Law 5 eccentricity balance (0.05374) agree to within 0.28%, both bracketing the J2000 observed value (0.05386) — two entirely different Fibonacci constraints converge on the same physical value.
 
 ### Assessment
 

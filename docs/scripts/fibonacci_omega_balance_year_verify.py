@@ -31,11 +31,11 @@ from itertools import combinations
 # ║  CONSTANTS & DATA                                                      ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
-H = 333_888
-PHI = (1 + math.sqrt(5)) / 2
-BALANCE_YEAR = -301_340
-J2000_YEAR = 2000
-DT = J2000_YEAR - BALANCE_YEAR  # 303,340 years
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fibonacci_data import H, PHI, BALANCE_YEAR, J2000_YEAR
+
+DT = J2000_YEAR - BALANCE_YEAR
 
 ORDER = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']
 
@@ -203,7 +203,7 @@ except Exception as e:
 if HAVE_EXCEL:
     years = df.iloc[:, 3].values
     n_rows = len(years)
-    bal_idx = 0  # Balance year is first row
+    bal_idx = np.argmin(np.abs(years - BALANCE_YEAR))
     j2000_idx = np.argmin(np.abs(years - J2000_YEAR))
 
     # Extract balance-year values for all planets

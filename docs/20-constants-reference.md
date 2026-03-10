@@ -96,7 +96,7 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 | Base Eccentricity | `eccentricityBase` | 0.015372 | Base orbital eccentricity |
 | Eccentricity Amplitude | `eccentricityAmplitude` | 0.00137032 | Oscillation amplitude |
 | Mean Obliquity | `earthtiltMean` | 23.41357 deg | Mean axial tilt |
-| RA Angle | `earthRAAngle` | 1.258454 | Derived from obliquity cycle position |
+| RA Angle | `earthRAAngle` | 1.282779 | Derived from obliquity cycle position |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481179 deg | Mean orbital inclination to invariable plane |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970 deg | Oscillation amplitude |
 | Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195 deg | Phase offset for inclination oscillation |
@@ -656,7 +656,7 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Correction Sun | `correctionSun` | 0.471334 deg | Degree correction for Sun position (EoC-enabled) |
+| Correction Sun | `correctionSun` | 0.5292 deg | Degree correction for Sun position (EoC-enabled); optimized vs 26 JPL points, validated 1600-2200 |
 
 ## Planet Orbital Periods (Tuned)
 
@@ -679,10 +679,10 @@ Outer planets use "dual-balanced" eccentricities optimized for both inclination 
 | Mercury | 0.20563593 | 0.20563593 | 0% | J2000 |
 | Venus | 0.00677672 | 0.00677672 | 0% | J2000 |
 | Mars | 0.09339410 | 0.09339410 | 0% | J2000 |
-| Jupiter | 0.04823000 | 0.04838624 | -0.32% | Dual-balanced |
-| Saturn | 0.05378200 | 0.05386179 | -0.15% | Dual-balanced |
-| Uranus | 0.04777200 | 0.04725744 | +1.09% | Dual-balanced |
-| Neptune | 0.00846248 | 0.00859048 | -1.49% | Dual-balanced |
+| Jupiter | 0.04821478 | 0.04838624 | -0.35% | Dual-balanced |
+| Saturn | 0.05374486 | 0.05386179 | -0.22% | Dual-balanced (= Law 5 prediction) |
+| Uranus | 0.04734421 | 0.04725744 | +0.18% | Dual-balanced |
+| Neptune | 0.00867761 | 0.00859048 | +1.01% | Dual-balanced |
 
 ## Per-Planet EoC Fractions
 
@@ -734,7 +734,7 @@ See [34-j2000-calibration.md](34-j2000-calibration.md) for the methodology.
 | Planet | `perihelionRef_JD` | Notes |
 |--------|-------------------|-------|
 | Mercury | 2460335.9 | Phase-optimized |
-| Venus | 2455464.42 | Re-optimized with 36p correction |
+| Venus | 2455464.42 | Re-optimized with 42p correction |
 | Mars | 2456505.6 | Re-optimized with Dec correction |
 | Jupiter | 2464224.5 | Phase-optimized (-6 deg from 2023-Jan-21) |
 | Saturn | 2452875.9 | Phase-optimized (+1 deg from 2003-Jul-26) |
@@ -755,13 +755,13 @@ Per-planet empirical parallax correction for geocentric RA and Dec. Coefficients
 
 | Planet | RA Parameters | Dec Parameters | Total | Selection |
 |--------|-------------|---------------|-------|-----------|
-| Mercury | 36 | 36 | 72 | Full 36p tier |
-| Venus | 36 | 36 | 72 | Full 36p tier |
+| Mercury | 42 | 42 | 84 | Full 42p tier |
+| Venus | 42 | 42 | 84 | Full 42p tier |
 | Mars | 30 | 30 | 60 | 30p tier |
-| Jupiter | 36 | 36 | 72 | Full 36p tier |
-| Saturn | 24 | 24 | 48 | 24p tier |
-| Uranus | 15 | 15 | 30 | 15p tier |
-| Neptune | 18 | 18 | 36 | 18p tier |
+| Jupiter | 42 | 42 | 84 | Full 42p tier |
+| Saturn | 36 | 36 | 72 | 36p tier |
+| Uranus | 24 | 24 | 48 | 24p tier |
+| Neptune | 24 | 24 | 48 | 24p tier |
 
 Tier selection by per-planet LOOCV/k-fold cross-validation. See [Planet Parallax Corrections](67-planet-parallax-corrections.md).
 

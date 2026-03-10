@@ -41,8 +41,8 @@ Planet params: startpos, solarYearInput, longitudePerihelion,
                ascendingNode, eclipticInclinationJ2000, orbitalEccentricity,
                perihelionEclipticYears, eocFraction, perihelionRef_JD,
                decCorrA, decCorrB, decCorrC, decCorrD, decCorrE, decCorrF
-Sun params:    correctionSun, eccentricityBase, eccentricityAmplitude,
-               earthRAAngle, earthtiltMean
+Sun params:    correctionSun, perihelionRefJD, eccentricityBase,
+               eccentricityAmplitude, earthRAAngle, earthtiltMean
 Moon params:   moonStartposApsidal, moonStartposNodal, moonStartposMoon,
                moonTilt, moonEclipticInclinationJ2000, moonOrbitalEccentricity
 `);

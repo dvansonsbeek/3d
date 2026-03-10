@@ -38,8 +38,8 @@ const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthRAAngle = 1.258454;
-// 3D model = the only value which is very hard to derive. Determined by temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude values.
+const earthRAAngle = 1.282779;
+// Optimized for solstice timing (3708 min/deg) and geometry (sun.dec at solstice, 3.2"/deg). Also depends on temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude.
 const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
 const earthInvPlaneInclinationAmplitude = 0.635970;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.6329789
 const earthInvPlaneInclinationMean = 1.481179;            // 3D model + Formula. Fibonacci predicts 1.481727
@@ -57,8 +57,8 @@ const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.471334;
-// Small correction in degrees because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice but needs to be around 01:47 UTC See https://www.timeanddate.com/calendar/seasons.html?year=2000&n=1440.
+const correctionSun = 0.5292;
+// Sun's orbital starting angle in degrees. Optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200). Also feeds EoC perihelion phase and planet PerihelionFromEarth startPos. Sensitivity: 1461 min/deg on timing. IMPORTANT: changing this value requires re-tuning earthRAAngle for solstice timing.
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
 // When useVariableSpeed = false, correctionSun should be increased (0.913280 or so)
@@ -164,7 +164,7 @@ const marsPerihelionRef_JD = 2456505.6;                     // EoC phase referen
 const jupiterSolarYearInput = 4330.5;
 const jupiterEclipticInclinationJ2000 = 1.30439695;       // JPL J2000
 const jupiterOrbitalEccentricityJ2000 = 0.04838624;       // JPL J2000
-const jupiterOrbitalEccentricity = 0.04823000;            // Dual-balanced (-0.32% from J2000)
+const jupiterOrbitalEccentricity = 0.04821478;            // Dual-balanced (-0.35% from J2000)
 const jupiterInvPlaneInclinationJ2000 = 0.3219652;
 const jupiterTilt = 3.13;
 const jupiterLongitudePerihelion = 14.70659401;
@@ -181,7 +181,7 @@ const jupiterPerihelionRef_JD = 2464224.5;                 // EoC phase referenc
 const saturnSolarYearInput = 10747.0;
 const saturnEclipticInclinationJ2000 = 2.48599187;        // JPL J2000
 const saturnOrbitalEccentricityJ2000 = 0.05386179;        // JPL J2000
-const saturnOrbitalEccentricity = 0.05378200;             // Dual-balanced (-0.15% from J2000)
+const saturnOrbitalEccentricity = 0.05374486;             // Dual-balanced = Law 5 prediction (-0.22% from J2000)
 const saturnInvPlaneInclinationJ2000 = 0.9254704;
 const saturnTilt = 26.73;
 const saturnLongitudePerihelion = 92.12794343;
@@ -198,7 +198,7 @@ const saturnPerihelionRef_JD = 2452875.9;                  // EoC phase referenc
 const uranusSolarYearInput = 30586;
 const uranusEclipticInclinationJ2000 = 0.77263783;        // JPL J2000
 const uranusOrbitalEccentricityJ2000 = 0.04725744;        // JPL J2000
-const uranusOrbitalEccentricity = 0.04777200;             // Dual-balanced (+1.09% from J2000)
+const uranusOrbitalEccentricity = 0.04734421;             // Dual-balanced (+0.18% from J2000)
 const uranusInvPlaneInclinationJ2000 = 0.9946692;
 const uranusTilt = 82.23;
 const uranusLongitudePerihelion = 170.7308251;
@@ -215,7 +215,7 @@ const uranusPerihelionRef_JD = 2439699.8;                  // EoC phase referenc
 const neptuneSolarYearInput = 59980;
 const neptuneEclipticInclinationJ2000 = 1.77004347;       // JPL J2000
 const neptuneOrbitalEccentricityJ2000 = 0.00859048;       // JPL J2000
-const neptuneOrbitalEccentricity = 0.00846248;            // Dual-balanced (-1.49% from J2000)
+const neptuneOrbitalEccentricity = 0.00867761;            // Dual-balanced (+1.01% from J2000)
 const neptuneInvPlaneInclinationJ2000 = 0.7354155;
 const neptuneTilt = 28.32;
 const neptuneLongitudePerihelion = 45.80124471;
@@ -913,24 +913,24 @@ const ASTRO_REFERENCE = {
   //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
   //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
   //         s = heliocentric distance (AU), T = centuries from J2000
-  // Fitted from JPL reference data via linear least squares (15/18/24 terms per planet).
+  // Fitted from JPL reference data via linear least squares (15/18/24/30/36/42 terms per planet).
   decCorrection: {
-    Mercury: { A: 73.3492, B:-63.8145, C: 0.2008, D:-197.5373, E: 5.9623, F:-28.4653, G: 56.6935, H:-7.7239, I:-15.4142, J: 0.6948, K:-0.1873, L:-61.6525, M: 174.4996, N: 33.4157, O:-16.0290, P:-0.1052, Q: 0.2800, R:-0.1954, S:-0.3344, U:-0.6694, V: 11.9730, W:-11.7323, X: 17.8478, Y:-1.9591, Z: 23.9930, AA: 141.9200, AB:-18.9322, AC: 0.0971, AD: 2.9726, AE:-11.1944, AF: 1.3010, AG:-4.5994, AH: 5.6255, AI:-94.6831, AJ:-0.9540, AK: 4.3778 },
-    Venus:   { A: 38.9275, B:-0.2933, C:-0.0051, D: 8.3821, E: 0.0944, F: 0.1190, G: 2.5467, H:-0.0207, I: 0.0518, J: 0.0219, K:-0.0188, L:-55.4648, M:-5.6056, N: 3.1751, O: 1.3896, P:-0.0092, Q: 0.0008, R:-0.0225, S: 0.0059, U:-0.0519, V: 19.7579, W:-0.0930, X: 1.8857, Y:-1.6660, Z: 0.1540, AA:-6.0969, AB:-1.7862, AC: 0.0078, AD:-0.0110, AE:-2.3113, AF: 1.2297, AG:-1.3875, AH:-0.9459, AI: 4.0752, AJ: 0.0169, AK:-0.0086 },
-    Mars:    { A:-6.3430, B: 12.1915, C: 0.1172, D: 13.1287, E:-0.1521, F: 0.3753, G:-4.1396, H: 0.1716, I: 0.1739, J: 0.4717, K:-0.1686, L: 18.1511, M:-0.2757, N:-7.9661, O: 0.5266, P:-0.2010, Q:-0.0967, R:-0.7148, S: 0.0735, U: 0.0733, V:-11.8156, W:-1.3543, X:-0.5818, Y:-0.1145, Z:-20.4726, AA:-20.7400, AB: 7.0116, AC: 0.2506, AD:-0.0558, AE: 11.3169 },
-    Jupiter: { A:-100.2199, B:-1.7305, C: 0.0007, D: 91.2465, E: 0.8920, F: 2.5902, G: 1.5672, H: 0.0391, I: 0.0358, J:-0.4651, K: 0.0602, L: 1041.5829, M:-199.3219, N:-6.8010, O:-13.4651, P:-0.0047, Q:-0.1129, R: 0.0023, S: 0.1034, U:-1.9513, V:-2708.5488, W:-0.3631, X: 1.8412, Y: 8.6813, Z: 5.7172, AA:-476.5141, AB:-5.6059, AC: 0.0121, AD: 0.1583, AE: 30.5704, AF:-45.4712, AG:-10.3617, AH: 68.0192, AI: 1058.7296, AJ: 0.2220, AK:-33.1048 },
-    Saturn:  { A: 9.4615, B:-0.6707, C:-0.0103, D:-3.3275, E:-3.0075, F: 0.0518, G: 0.0940, H:-0.0436, I:-0.0083, J: 1.9187, K: 0.8800, L:-186.9485, M: 18.2656, N: 0.2042, O: 0.6355, P:-0.2200, Q:-0.3194, R:-0.1216, S: 0.1942, U: 16.2624, V: 922.5315, W: 4.5634, X: 0.0034, Y: 0.0092 },
-    Uranus:  { A: 379.1954, B: 5839.3621, C:-0.0183, D: 1865.4010, E: 756.2219, F: 473.2574, G:-11.7285, H: 3.1282, I:-3.0679, J: 0.9773, K:-2.0333, L:-13060.4948, M:-27401.0619, N:-485.8414, O:-484.2592 },
-    Neptune: { A: 7.1372, B:-0.7932, C: 0.0048, D:-12.3813, E: 0.8775, F: 4.3492, G: 0.1761, H: 0.0541, I: 0.0986, J: 2.1350, K: 5.3214, L:-213.9709, M: 260.2405, N:-4.5325, O:-2.2516, P: 0.0979, Q:-0.0525, R: 3.6117 },
+    Mercury: { A:-27.2525, B:-145.9324, C: 0.0124, D:-59.7539, E: 113.7188, F: 59.6579, G: 67.0522, H:-38.1228, I: 37.0312, J: 0.4275, K: 0.0352, L: 91.2047, M: 128.1251, N:-39.7702, O:-101.7942, P: 0.0247, Q: 0.2567, R:-0.0911, S:-0.2310, U:-52.4784, V:-18.4280, W:-9.0806, X:-10.3781, Y: 34.6320, Z: 38.8751, AA: 29.2897, AB:-30.1238, AC: 0.0486, AD:-4.2652, AE: 6.2752, AF:-4.1682, AG:-2.1692, AH: 23.4720, AI:-36.3581, AJ: 9.3066, AK:-5.1554, AL:-1.5851, AM:-15.6415, AN: 0.0215, AO:-0.1225, AP:-16.2210, AQ: 14.9281 },
+    Venus:   { A: 51.9923, B:-0.2648, C:-0.0004, D: 7.7020, E: 0.0224, F: 0.0672, G: 2.2244, H:-0.0251, I: 0.0317, J:-0.0049, K: 0.0473, L:-74.0972, M:-5.3111, N: 3.7029, O: 1.5380, P: 0.0018, Q:-0.0103, R:-0.0111, S:-0.0004, U:-0.0219, V: 26.3944, W:-0.1085, X: 2.2845, Y:-1.5185, Z: 0.1374, AA:-5.5921, AB:-1.5382, AC: 0.0010, AD:-0.0057, AE:-2.6761, AF: 1.1263, AG:-1.6720, AH:-1.0446, AI: 3.8586, AJ: 0.0275, AK:-0.0004, AL:-0.0048, AM:-0.0129, AN: 0.0097, AO:-0.0251, AP:-0.0009, AQ:-0.0015 },
+    Mars:    { A:-7.0444, B: 12.2608, C: 0.1169, D: 13.1932, E:-0.1976, F: 0.3850, G:-4.1237, H: 0.1724, I: 0.1798, J: 0.4719, K:-0.1686, L: 20.0096, M:-0.2539, N:-7.9590, O: 0.6092, P:-0.2011, Q:-0.0967, R:-0.7152, S: 0.0737, U: 0.0856, V:-13.0864, W:-1.2679, X:-0.5909, Y:-0.1169, Z:-20.5555, AA:-20.9375, AB: 6.9872, AC: 0.2507, AD:-0.0571, AE: 11.2683 },
+    Jupiter: { A:-68.8543, B:-3.6939, C: 0.0060, D: 39.2352, E:-8.1538, F: 2.8293, G: 0.9880, H: 0.0251, I:-0.3986, J: 1.4267, K: 0.0495, L: 718.4219, M:-273.5972, N:-7.0498, O:-2.2764, P: 0.0014, Q:-0.0888, R:-0.9571, S: 0.0527, U: 42.9855, V:-1876.1536, W:-129.6377, X: 0.0979, Y: 8.9645, Z: 17.1203, AA: 176.5562, AB:-3.8218, AC: 0.0127, AD: 1.2973, AE: 30.3970, AF:-46.8972, AG:-0.1710, AH: 26.0509, AI:-512.6597, AJ: 0.2095, AK:-36.8296, AL: 0.0564, AM: 0.0068, AN:-4.7527, AO: 0.0525, AP: 637.1818, AQ:-74.1388 },
+    Saturn:  { A: 29.6988, B:-71.1983, C:-0.0111, D: 6.2907, E:-1.9522, F: 22.8634, G: 8.9502, H: 0.8847, I: 1.0729, J: 1.9589, K: 0.8763, L:-501.2850, M:-120.0924, N:-27.7394, O: 9.7509, P:-0.2102, Q:-0.3179, R:-0.1599, S: 0.2028, U:-5.3932, V: 2078.8928, W:-16.9710, X:-2.1605, Y:-1.1237, Z: 673.7108, AA:-71.0465, AB:-84.4232, AC:-0.0093, AD:-2.0208, AE: 158.9704, AF: 2.5975, AG: 14.8834, AH:-74.0474, AI: 1329.0012, AJ:-0.0304, AK:-1046.6948 },
+    Uranus:  { A:-12014.6239, B: 6873.6495, C:-0.7184, D:-48488.8423, E:-13468.0076, F: 2866.3330, G: 729.4721, H: 182.3813, I: 374.8878, J:-16.0452, K:-6.1177, L: 477888.9432, M: 495697.5751, N:-2797.4461, O: 9686.7120, P: 3.0726, Q: 0.2925, R: 15.6626, S: 14.7123, U: 77867.0939, V:-4895604.0585, W: 456739.5927, X:-374.1009, Y:-141.3021 },
+    Neptune: { A:-59.6725, B: 0.6590, C:-0.0683, D: 14.1351, E:-91.9172, F: 5.2460, G: 0.1904, H: 1.0200, I: 0.7024, J: 0.2904, K: 5.3726, L: 3790.3287, M:-160.7379, N:-5.2246, O: 43.7001, P: 0.0780, Q:-0.0708, R: 5.4363, S: 2.2203, U: 1391.4686, V:-60044.9027, W:-389.3905, X:-0.5954, Y:-0.9426 },
   },
   raCorrection: {
-    Mercury: { A: 122.7268, B:-51.4293, C:-0.8385, D: 615.3271, E:-31.4068, F:-16.7433, G:-30.1347, H: 4.8775, I: 20.8749, J:-1.0333, K: 0.1190, L:-40.3046, M:-324.4868, N: 35.3118, O:-0.0730, P: 0.4029, Q:-0.1690, R: 0.5547, S: 0.7855, U: 18.5793, V: 0.4229, W: 29.9627, X:-20.6475, Y:-3.2670, Z: 14.1471, AA:-391.7318, AB: 12.0555, AC:-0.2215, AD:-3.3256, AE:-6.6691, AF: 0.3706, AG: 4.4697, AH: 0.2600, AI: 190.7973, AJ:-0.4704, AK:-3.5218 },
-    Venus:   { A:-74.4189, B: 22.6246, C: 0.0896, D:-19.4921, E:-0.4298, F:-0.1227, G: 15.2694, H:-0.0361, I: 0.1306, J:-0.0527, K:-0.0056, L: 96.2726, M: 3.5347, N:-1.2310, O:-9.4273, P:-0.0728, Q: 0.0049, R: 0.0301, S:-0.0779, U: 0.0467, V:-30.4552, W: 0.0867, X: 6.2174, Y:-8.2753, Z:-16.3885, AA: 14.1935, AB:-11.0426, AC: 0.0492, AD:-0.0428, AE: 0.8003, AF: 6.0278, AG:-4.5013, AH: 6.9000, AI:-2.4705, AJ: 0.0594, AK: 0.0604 },
-    Mars:    { A:-24.2589, B:-19.2576, C:-0.0257, D:-22.6315, E:-0.7300, F: 0.3758, G: 2.3358, H:-0.1641, I: 0.4468, J:-0.4944, K: 0.0521, L: 71.9193, M: 1.6845, N: 9.9485, O: 3.3922, P: 0.0390, Q: 0.0069, R: 0.2091, S:-0.0625, U:-0.5939, V:-58.7923, W: 9.9829, X:-0.0565, Y: 0.3422, Z: 33.1509, AA: 29.5482, AB:-5.1849, AC:-0.1184, AD:-0.1624, AE:-18.5534 },
-    Jupiter: { A: 152.2230, B: 424.8277, C:-0.0031, D:-113.5641, E: 3.7499, F:-1.2311, G:-13.2228, H: 0.6853, I:-1.3815, J:-0.4787, K: 0.0438, L:-2044.7529, M: 348.9164, N: 19.3128, O: 24.7348, P:-0.0457, Q: 0.1028, R:-0.0503, S: 1.2498, U: 1.9859, V: 6529.6981, W: 235.0650, X: 0.6788, Y:-6.5420, Z:-2222.2783, AA: 250.5522, AB: 65.8734, AC: 0.0437, AD: 3.2167, AE:-101.0384, AF: 32.2615, AG: 2.2128, AH:-155.6197, AI:-1226.2928, AJ:-0.1522, AK: 16.2654 },
-    Saturn:  { A: 14.3035, B:-0.8976, C: 0.0160, D:-58.5440, E: 8.3569, F:-1.5766, G:-0.3632, H:-0.0608, I: 0.0316, J:-2.0190, K: 1.7064, L:-242.2844, M: 284.3647, N:-0.0104, O:-3.8572, P: 0.4101, Q:-0.1654, R: 0.8167, S:-4.9372, U:-45.1968, V: 1051.0138, W: 274.2713, X:-0.0136, Y: 0.0152 },
-    Uranus:  { A: 217.1693, B:-47.9845, C:-0.1194, D: 812.0404, E: 376.7047, F: 106.8457, G:-0.7141, H: 0.5422, I: 2.1292, J: 1.1602, K:-0.8075, L:-4084.2447, M:-11872.7872, N:-112.5690, O:-399.2762 },
-    Neptune: { A:-11.1233, B: 8.2146, C:-0.6126, D: 28.5941, E: 2.7089, F:-10.6928, G: 0.1093, H:-0.0421, I:-0.1884, J:-12.3265, K:-0.0386, L: 331.6762, M:-738.0130, N: 10.0551, O:-2.2888, P: 1.5160, Q:-0.4591, R: 11.6274 },
+    Mercury: { A: 26.9619, B:-139.3448, C:-0.3545, D: 240.9854, E:-89.9732, F: 18.8930, G: 130.9174, H:-38.3574, I:-5.8991, J:-0.4392, K:-0.1111, L:-27.7598, M:-47.6916, N:-57.8867, O: 80.0358, P:-0.2833, Q: 0.0035, R: 0.0010, S: 0.3269, U: 43.0186, V:-2.3664, W: 9.9486, X:-23.5736, Y: 20.0624, Z: 64.9564, AA:-96.4733, AB:-47.7634, AC: 0.1379, AD: 4.8227, AE: 14.3596, AF:-0.4951, AG: 6.6242, AH:-18.9598, AI: 10.5280, AJ: 6.3304, AK: 0.2040, AL: 5.6282, AM:-9.4510, AN: 0.3584, AO: 0.1513, AP: 11.4077, AQ:-8.7992 },
+    Venus:   { A:-43.3374, B: 26.2334, C: 0.1009, D:-20.3682, E: 0.1597, F:-0.1089, G: 12.7674, H:-0.0314, I: 0.0933, J: 0.0076, K:-0.0215, L: 49.4747, M: 3.3663, N:-1.9758, O:-8.8199, P:-0.0475, Q:-0.0098, R:-0.0028, S:-0.0898, U:-0.2850, V:-12.8790, W: 0.0650, X: 5.8361, Y:-8.4415, Z:-18.9897, AA: 14.9148, AB:-9.2298, AC: 0.0322, AD:-0.0363, AE: 1.3454, AF: 6.1399, AG:-4.2154, AH: 6.3235, AI:-2.4125, AJ: 0.1021, AK: 0.0500, AL:-0.0045, AM:-0.0573, AN:-0.0050, AO: 0.0015, AP: 0.0109, AQ: 0.0528 },
+    Mars:    { A:-22.1972, B:-19.3845, C:-0.0253, D:-22.8814, E:-0.6000, F: 0.3459, G: 2.3001, H:-0.1659, I: 0.4348, J:-0.4945, K: 0.0522, L: 66.1332, M: 1.6301, N: 9.9363, O: 3.2280, P: 0.0390, Q: 0.0069, R: 0.2095, S:-0.0626, U:-0.6311, V:-54.6154, W: 9.6688, X:-0.0381, Y: 0.3470, Z: 33.2943, AA: 30.1784, AB:-5.1325, AC:-0.1184, AD:-0.1598, AE:-18.4057 },
+    Jupiter: { A: 140.3836, B: 430.3146, C:-0.0006, D:-89.7748, E:-99.5248, F: 3.9313, G:-14.6947, H: 0.7612, I:-0.0426, J: 0.6963, K:-0.1462, L:-1927.5444, M: 407.4097, N: 12.2714, O: 92.9143, P:-0.0194, Q: 0.1166, R:-0.6468, S: 1.2214, U: 525.0291, V: 6240.3539, W: 306.8034, X: 4.2562, Y:-8.7139, Z:-2251.7565, AA:-79.5990, AB: 74.8584, AC: 0.0257, AD: 0.2943, AE:-77.2564, AF: 43.3544, AG:-20.4140, AH:-327.5758, AI:-507.6906, AJ:-0.1896, AK:-51.5832, AL:-0.1349, AM: 0.0131, AN:-2.9503, AO: 0.9489, AP:-324.1987, AQ:-877.3065 },
+    Saturn:  { A:-189.0593, B: 495.6457, C: 0.0143, D: 343.5186, E: 16.7424, F: 30.7582, G: 34.6408, H: 1.4504, I: 3.8380, J:-2.1038, K: 1.6970, L: 3128.4136, M:-1988.3745, N:-28.9460, O:-198.4383, P: 0.4154, Q:-0.1492, R: 0.9111, S:-4.9323, U: 28.6747, V:-12649.8852, W: 851.0975, X:-15.1739, Y:-7.4635, Z:-4712.4469, AA:-4893.2001, AB:-350.1263, AC:-0.0179, AD:-13.3232, AE: 163.5543, AF: 57.2587, AG: 130.0275, AH: 1703.6317, AI: 26325.2675, AJ:-0.3106, AK:-1639.2763 },
+    Uranus:  { A:-35750.6325, B: 5129.6885, C: 5.3603, D:-113637.6142, E: 4680.4764, F: 1192.3829, G: 1949.6947, H:-176.2244, I: 1133.1761, J: 46.1370, K:-0.9884, L: 1343793.9527, M: 863849.9118, N:-1621.2899, O: 947.5969, P: 8.3174, Q:-0.3366, R:-41.4316, S:-104.0760, U:-99376.3414, V:-12764049.9756, W: 1295582.5558, X:-1104.2651, Y: 228.8723 },
+    Neptune: { A: 2355.2216, B: 6.9777, C:-0.4299, D:-881.9059, E:-853.1589, F:-5.3832, G:-1.0066, H:-3.0844, I: 0.8322, J:-4.8617, K:-0.0769, L:-141516.2932, M: 13116.7306, N: 6.6443, O: 423.9811, P: 1.6345, Q:-0.2767, R: 4.2930, S:-5.5389, U: 12874.1003, V: 2125791.9571, W: 13428.0366, X:-0.9840, Y: 3.0822 },
   },
 };
 
@@ -15126,7 +15126,7 @@ function solsticeForYear(year, prevSolsticeJD = null) {
     // Jump to JD and let forceSceneUpdate derive o.Time from o.pos
     // (Fixed: removed manual o.Time setting which used wrong epoch)
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('light');
 
     if (!Number.isFinite(sun?.dec)) continue;
 
@@ -15166,7 +15166,7 @@ function solsticeForYear(year, prevSolsticeJD = null) {
   /* Final scene state at refined time */
   // Jump to refined JD and let forceSceneUpdate derive o.Date/o.Time from o.pos
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('light');
 
   return {
     jd      : refinedJD,  // Use refinedJD directly for precision
@@ -15221,7 +15221,7 @@ function sunRACrossingForYear(year, targetRA, prevJD = null, debug = false) {
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('light');
 
     if (!Number.isFinite(sun?.ra)) continue;
 
@@ -15277,7 +15277,7 @@ function sunRACrossingForYear(year, targetRA, prevJD = null, debug = false) {
 
   /* Final scene state at refined time */
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('light');
 
   return {
     jd: refinedJD,
@@ -15325,7 +15325,7 @@ function sunRACrossingForYearMethodB(year, targetRA, prevJD = null, debug = fals
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
 
     // Use wobble-center RA instead of Earth-based RA
     const sunRAFromWobble = calculateRAFromWobbleCenter(sun);
@@ -15383,7 +15383,7 @@ function sunRACrossingForYearMethodB(year, targetRA, prevJD = null, debug = fals
 
   /* Final scene state at refined time */
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('minimal');
 
   const finalRA = calculateRAFromWobbleCenter(sun);
   return {
@@ -15432,7 +15432,7 @@ function sunRACrossingForYearMethodC(year, targetRA, prevJD = null, debug = fals
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
 
     // Use perihelion-point RA instead of Earth-based RA
     const sunRAFromPeri = calculateRAFromEarthPerihelion(sun);
@@ -15490,7 +15490,7 @@ function sunRACrossingForYearMethodC(year, targetRA, prevJD = null, debug = fals
 
   /* Final scene state at refined time */
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('minimal');
 
   const finalRA = calculateRAFromEarthPerihelion(sun);
   return {
@@ -15555,7 +15555,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('light');
 
     // Get Earth-Sun distance from the sun object (distAU is computed in updatePositions)
     const distance = sun.distAU;
@@ -15599,7 +15599,7 @@ function perihelionForYear(year, debug = false, prevPerihelionJD = null) {
 
   /* Final scene state at refined time */
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('light');
 
   if (debug) {
     const windowDays = (searchRange * step).toFixed(1);
@@ -15693,7 +15693,7 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
 
     // Get WobbleCenter-Sun distance instead of Earth-Sun distance
     earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);
@@ -15731,7 +15731,7 @@ function perihelionForYearMethodB(year, debug = false, prevPerihelionJD = null) 
   }
 
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('minimal');
 
   if (debug) {
     const jdToDate = (jd) => {
@@ -15793,7 +15793,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
 
     // Get WobbleCenter-Sun distance instead of Earth-Sun distance
     earthWobbleCenter.planetObj.getWorldPosition(WOBBLE_POS);
@@ -15831,7 +15831,7 @@ function aphelionForYearMethodB(year, debug = false, prevAphelionJD = null) {
   }
 
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('minimal');
 
   if (debug) {
     const jdToDate = (jd) => {
@@ -15894,7 +15894,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
     const jd = approxJD + k * step;
 
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('light');
 
     const distance = sun.distAU;
     if (distance < minDist) minDist = distance;
@@ -15937,7 +15937,7 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
 
   /* Final scene state at refined time */
   jumpToJulianDay(refinedJD);
-  forceSceneUpdate();
+  forceSceneUpdate('light');
 
   // Calculate alignment difference
   let alignmentDiff = null;
@@ -16101,7 +16101,7 @@ async function runYearAnalysisExport(years) {
   // Helper for sidereal angle calculation
   const getSunWorldAngle = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     const sunPos = new THREE.Vector3();
     sun.planetObj.getWorldPosition(sunPos);
     let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
@@ -17216,9 +17216,9 @@ async function findOptimalEarthRAAngle() {
 
   if (raWarning) {
     console.log('');
-    console.log(`  ⚠️  WARNING: Sun RA error exceeds ${TOLERANCES.sunRA}" (${sunRA_timeSec.toFixed(0)}s of time)`);
-    console.log('      This indicates correctionSun may need adjustment.');
-    console.log(`      Suggested correctionSun adjustment for RA: ${correctionSunForRA >= 0 ? '+' : ''}${correctionSunForRA.toFixed(6)}°`);
+    console.log(`  ⚠️  WARNING: Sun RA error exceeds ${TOLERANCES.sunRA}" (${sunRA_timeSec.toFixed(0)}s of time) at model start epoch.`);
+    console.log('      Note: correctionSun is optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200).');
+    console.log('      This single-epoch error does not reflect the full-dataset accuracy. Use "node tools/optimize.js baseline sun" to verify.');
   } else {
     console.log('');
     console.log(`  ✓  Sun RA OK: within ${TOLERANCES.sunRA}" (${sunRA_timeSec.toFixed(0)}s) of expected value`);
@@ -17297,7 +17297,7 @@ async function findOptimalEarthRAAngle() {
   // ═══════════════════════════════════════════════════════════════════════════
   // Parameter roles:
   // - earthRAAngle: affects BOTH geometry (sun.dec) AND timing
-  // - correctionSun: affects ONLY timing (Sun's orbital starting position)
+  // - correctionSun: affects Sun RA position AND timing (optimized vs 26 JPL points, validated 1600-2200)
   //
   // Strategy: First fix geometry with earthRAAngle, then fix timing with correctionSun
   // ═══════════════════════════════════════════════════════════════════════════
@@ -17430,7 +17430,7 @@ async function findOptimalEarthRAAngle() {
   console.log('');
   console.log('  Parameter sensitivities:');
   console.log(`    earthRAAngle: ${earthRAAngle_minPerDeg.toFixed(0)} min/degree (affects timing AND geometry)`);
-  console.log(`    correctionSun: ${correctionSun_minPerDeg.toFixed(0)} min/degree (affects timing ONLY)`);
+  console.log(`    correctionSun: ${correctionSun_minPerDeg.toFixed(0)} min/degree (affects Sun RA AND timing)`);
   if (earthRAAngle_geometrySensitivity) {
     console.log(`    earthRAAngle geometry: ${(earthRAAngle_geometrySensitivity * 3600).toFixed(2)}"/degree sun.dec`);
   }
@@ -17536,10 +17536,12 @@ async function findOptimalEarthRAAngle() {
 
   console.log('');
   console.log('HOW THE PARAMETERS WORK:');
-  console.log('  • earthRAAngle: Controls geometry (sun.dec at solstice). Also affects timing.');
-  console.log('  • correctionSun: Controls Sun RA position. Also affects timing.');
-  console.log('  • Strategy: First set earthRAAngle for correct geometry,');
-  console.log('              then adjust correctionSun to fix Sun RA (and timing).');
+  console.log('  • earthRAAngle: Controls geometry (sun.dec at solstice) and timing (3708 min/deg).');
+  console.log('  • correctionSun: Sun orbital starting angle. Controls Sun RA (optimized vs 26 JPL points,');
+  console.log('    RMS 0.003°, validated 1600-2200). Also affects timing (1461 min/deg).');
+  console.log('  • Strategy: First set earthRAAngle for correct geometry + timing,');
+  console.log('              then fine-tune correctionSun with optimizer tool for best Sun RA.');
+  console.log('  • IMPORTANT: Changing correctionSun shifts timing, so earthRAAngle must be re-tuned afterwards.');
 
   console.log('');
   console.log('NOTE: Drift of ~' + driftPerYear.toFixed(1) + ' min/year is inherent to model year length');
@@ -18111,18 +18113,15 @@ async function analyzeDecemberSolsticeYearLength(startYear, endYear) {
  * Analyze tropical year length from all 4 cardinal points (sun.ra = 0°, 90°, 180°, 270°)
  * Uses both Method A (Earth-based RA) and Method B (Wobble-center RA) for comparison.
  *
- * KNOWN LIMITATION: This model uses a circular orbit with an offset center to simulate
- * eccentricity. The Sun moves at constant angular velocity around Earth. In reality
- * (and in IAU calculations), the orbit is elliptical and Kepler's 2nd Law causes
- * variable orbital velocity - faster at perihelion, slower at aphelion.
+ * This model uses a circular orbit with an offset center to simulate eccentricity,
+ * plus an equation of center (EoC: 2e·sin(M) + 1.25e²·sin(2M)) that applies variable
+ * angular velocity — approximating Kepler's 2nd Law (faster at perihelion, slower at
+ * aphelion). When useVariableSpeed is enabled, the model replicates most of the ~96s
+ * spread in tropical year lengths at different cardinal points.
  *
- * This results in ~±26s deviation at solstices compared to IAU reference values:
- * - Summer Solstice (near aphelion): Model shows ~+26s longer than IAU
- * - Winter Solstice (near perihelion): Model shows ~-25s shorter than IAU
- *
- * The model correctly simulates mean tropical year, distance variations, and all
- * precession cycles, but cannot replicate the ~96s spread in tropical year lengths
- * at different cardinal points caused by Kepler's 2nd Law velocity variations.
+ * A residual ~±3-5s deviation at solstices vs IAU remains due to the geometric offset
+ * approach (circular path vs true ellipse). The mean tropical year is accurately
+ * simulated regardless.
  */
 async function analyzeEquinoxIntervals(startYear, endYear) {
   startYear = startYear || o.calibrationYearStart;
@@ -18278,26 +18277,28 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
   console.log('  nearly the same value (~365.2421887 days) - very close to IAU mean tropical year.');
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
-  console.log('WHY THE MODEL DIFFERS FROM IAU AT SOLSTICES (~±26s):');
+  console.log('MODEL VS IAU AT SOLSTICES:');
   console.log('───────────────────────────────────────────────────────────────────────────────────────────────');
   console.log('This model uses a CIRCULAR orbit with an offset center (perihelion point)');
-  console.log('to simulate eccentricity. The Sun moves at constant angular velocity.');
+  console.log('to simulate eccentricity, plus an Equation of Center (EoC) that applies');
+  console.log('variable angular velocity: 2e·sin(M) + 1.25e²·sin(2M).');
   console.log('');
-  console.log('IAU calculations use an ELLIPTICAL orbit where Earth (and thus the Sun');
-  console.log('from our geocentric view) moves faster at perihelion and slower at aphelion');
-  console.log('(Kepler\'s 2nd Law: equal areas in equal times).');
+  console.log('With useVariableSpeed enabled, the model approximates Kepler\'s 2nd Law:');
+  console.log('  - Sun moves faster at perihelion, slower at aphelion');
+  console.log('  - Replicates most of the ~96s spread in tropical year lengths');
   console.log('');
-  console.log('This velocity variation causes the IAU tropical year to vary by ~96s:');
+  console.log('IAU reference tropical year variation by cardinal point (~96s spread):');
   console.log('  - SS (near aphelion):  365.241626 days (shortest - slow motion)');
   console.log('  - WS (near perihelion): 365.242740 days (longest - fast motion)');
   console.log('');
-  console.log('The circular orbit model correctly simulates:');
+  console.log('The model correctly simulates:');
   console.log('  ✓ Mean tropical year length');
   console.log('  ✓ Distance variations (perihelion/aphelion)');
   console.log('  ✓ All precession cycles');
+  console.log('  ✓ Variable orbital velocity (via EoC, when useVariableSpeed = true)');
   console.log('');
-  console.log('But cannot replicate variable orbital velocity (Kepler\'s 2nd Law),');
-  console.log('hence the ~26s deviation at solstices vs IAU reference values.');
+  console.log('A residual ~±3-5s deviation at solstices remains due to the geometric');
+  console.log('offset approach (circular path vs true ellipse).');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -18501,6 +18502,9 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('║ Method B: WobbleCenter→Sun angle (Sun\'s position from Earth\'s wobble center)                         ║');
   console.log('║ Method C: Heliocentric Sun→Earth angle (Earth\'s position as seen from Sun - includes wobble)         ║');
   console.log('║ Method D: Heliocentric Sun→WobbleCenter angle (WobbleCenter as seen from Sun - wobble-free)           ║');
+  console.log('║ Method E: OrbitCenter→Sun angle (Sun as seen from perihelion/orbit center - no EoC bias?)           ║');
+  console.log('║ Method F: Origin→Sun at 2 opposite angles (0°+180°) — half-cost version of A                       ║');
+  console.log('║ Method G: OrbitCenter→Sun at 2 opposite angles (0°+180°) — half-cost version of E                   ║');
   console.log('╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝');
   console.log(`Analyzing years ${startYear} to ${endYear}...`);
   console.log('');
@@ -18525,7 +18529,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   // Method A: Origin→Sun world angle (absolute world position)
   const getAngleMethodA = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     sun.planetObj.getWorldPosition(_sunPos);
     let angle = Math.atan2(_sunPos.z, _sunPos.x) * 180 / Math.PI;
     return ((angle % 360) + 360) % 360;
@@ -18534,7 +18538,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   // Method B: WobbleCenter→Sun angle (from Earth's wobble center)
   const getAngleMethodB = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
     sun.planetObj.getWorldPosition(_sunPos);
     _direction.copy(_sunPos).sub(_wobblePos);
@@ -18546,7 +18550,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   // Note: This includes Earth's wobble motion, causing ~1.76s difference from A/B
   const getAngleMethodC = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     sun.planetObj.getWorldPosition(_sunPos);
     earth.planetObj.getWorldPosition(_earthPos);
     _direction.copy(_earthPos).sub(_sunPos);
@@ -18558,10 +18562,24 @@ async function analyzeSiderealYear(startYear, endYear) {
   // This removes Earth's wobble and should match Methods A/B exactly
   const getAngleMethodD = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     sun.planetObj.getWorldPosition(_sunPos);
     earthWobbleCenter.planetObj.getWorldPosition(_wobblePos);
     _direction.copy(_wobblePos).sub(_sunPos);
+    let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
+    return ((angle % 360) + 360) % 360;
+  };
+
+  // Method E: OrbitCenter→Sun world angle (Sun as seen from perihelion/orbit center)
+  // Measures from barycenterEarthAndSun — the geometric center of Earth's orbit.
+  // Eliminates geometric position bias but EoC velocity variation remains (~±8.5s).
+  const _baryPos = new THREE.Vector3();
+  const getAngleMethodE = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate('minimal');
+    barycenterEarthAndSun.planetObj.getWorldPosition(_baryPos);
+    sun.planetObj.getWorldPosition(_sunPos);
+    _direction.copy(_sunPos).sub(_baryPos);
     let angle = Math.atan2(_direction.z, _direction.x) * 180 / Math.PI;
     return ((angle % 360) + 360) % 360;
   };
@@ -18650,11 +18668,11 @@ async function analyzeSiderealYear(startYear, endYear) {
         const raTarget = 90;
         for (let i = 1; i < samples.length; i++) {
           jumpToJulianDay(samples[i-1].jd);
-          forceSceneUpdate();
+          forceSceneUpdate('light');
           const ra1 = (sun.ra * 180 / Math.PI + 360) % 360;
 
           jumpToJulianDay(samples[i].jd);
-          forceSceneUpdate();
+          forceSceneUpdate('light');
           const ra2 = (sun.ra * 180 / Math.PI + 360) % 360;
 
           if (ra1 < raTarget && ra2 >= raTarget) {
@@ -18700,22 +18718,31 @@ async function analyzeSiderealYear(startYear, endYear) {
 
   const siderealRefAngles = [0, 90, 180, 270];
 
-  const runMethodAt4Angles = async (getAngleFunc, methodName) => {
+  const runMethodAtAngles = async (getAngleFunc, methodName, angles) => {
     const angleResults = [];
-    for (const angle of siderealRefAngles) {
+    for (const angle of angles) {
       console.log(`Running Method ${methodName} at ${angle}°...`);
       const result = await findCrossingsForMethod(getAngleFunc, methodName, angle);
       angleResults.push({ angle, ...result });
     }
     const validMeans = angleResults.filter(r => r.mean > 0).map(r => r.mean);
-    const mean4pt = validMeans.length > 0 ? validMeans.reduce((a, b) => a + b, 0) / validMeans.length : 0;
-    return { angleResults, mean4pt };
+    const meanNpt = validMeans.length > 0 ? validMeans.reduce((a, b) => a + b, 0) / validMeans.length : 0;
+    return { angleResults, mean4pt: meanNpt };
   };
+
+  // Convenience wrapper for 4-angle runs
+  const runMethodAt4Angles = (getAngleFunc, methodName) => runMethodAtAngles(getAngleFunc, methodName, siderealRefAngles);
 
   const resultA = await runMethodAt4Angles(getAngleMethodA, 'A');
   const resultB = await runMethodAt4Angles(getAngleMethodB, 'B');
   const resultC = await runMethodAt4Angles(getAngleMethodC, 'C');
   const resultD = await runMethodAt4Angles(getAngleMethodD, 'D');
+  const resultE = await runMethodAt4Angles(getAngleMethodE, 'E');
+
+  // Method F: Origin→Sun with 2 opposite angles (0° + 180°) — same as A but half the cost
+  const resultF = await runMethodAtAngles(getAngleMethodA, 'F', [0, 180]);
+  // Method G: OrbitCenter→Sun with 2 opposite angles (0° + 180°) — same as E but half the cost
+  const resultG = await runMethodAtAngles(getAngleMethodE, 'G', [0, 180]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // COMPARISON WITH IAU REFERENCE
@@ -18729,11 +18756,17 @@ async function analyzeSiderealYear(startYear, endYear) {
   const diffB = (resultB.mean4pt - iauSiderealYear) * 86400;
   const diffC = (resultC.mean4pt - iauSiderealYear) * 86400;
   const diffD = (resultD.mean4pt - iauSiderealYear) * 86400;
+  const diffE = (resultE.mean4pt - iauSiderealYear) * 86400;
+  const diffF = (resultF.mean4pt - iauSiderealYear) * 86400;
+  const diffG = (resultG.mean4pt - iauSiderealYear) * 86400;
 
   // Method agreement
   const diffAB = (resultA.mean4pt - resultB.mean4pt) * 86400;
   const diffAD = (resultA.mean4pt - resultD.mean4pt) * 86400;
   const diffCD = (resultC.mean4pt - resultD.mean4pt) * 86400;
+  const diffAE = (resultA.mean4pt - resultE.mean4pt) * 86400;
+  const diffAF = (resultA.mean4pt - resultF.mean4pt) * 86400;
+  const diffAG = (resultA.mean4pt - resultG.mean4pt) * 86400;
 
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════');
@@ -18753,6 +18786,24 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log(`║   4-point mean                                          │ ${resultA.mean4pt.toFixed(9)}    │ ${diffA >= 0 ? '+' : ''}${diffA.toFixed(2).padStart(6)} seconds     ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
 
+  // Show per-angle breakdown for Method E (orbit center)
+  console.log('');
+  console.log('╔═════════════════════════════════════════════════════════╤═══════════════════╤═══════════════════════╗');
+  console.log('║ Method E: Per-angle breakdown (OrbitCenter→Sun)         │ Value (days)      │ Diff from IAU         ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  for (const ar of resultE.angleResults) {
+    const d = (ar.mean - iauSiderealYear) * 86400;
+    console.log(`║   At ${String(ar.angle).padStart(3)}° world angle                                │ ${ar.mean.toFixed(9)}    │ ${d >= 0 ? '+' : ''}${d.toFixed(2).padStart(6)} seconds     ║`);
+  }
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║   4-point mean                                          │ ${resultE.mean4pt.toFixed(9)}    │ ${diffE >= 0 ? '+' : ''}${diffE.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
+  // Check if E per-angle values converge (spread < 1s means single angle suffices)
+  const eAngles = resultE.angleResults.filter(r => r.mean > 0).map(r => r.mean);
+  const eSpread = eAngles.length > 0 ? (Math.max(...eAngles) - Math.min(...eAngles)) * 86400 : 0;
+  console.log(`  → Method E angle spread: ${eSpread.toFixed(2)} seconds (A spread: ${(() => { const a = resultA.angleResults.filter(r => r.mean > 0).map(r => r.mean); return a.length > 0 ? ((Math.max(...a) - Math.min(...a)) * 86400).toFixed(2) : '0'; })() } seconds)`);
+  console.log(`  → If E spread ≈ 0: single angle measurement is sufficient (4× faster)`);
+
   console.log('');
   console.log('╔═════════════════════════════════════════════════════════╤═══════════════════╤═══════════════════════╗');
   console.log('║ Method (4-point mean)                                   │ Value (days)      │ Diff from IAU         ║');
@@ -18762,6 +18813,11 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log(`║ D: Heliocentric Sun→WobbleCenter angle                  │ ${resultD.mean4pt.toFixed(9)}    │ ${diffD >= 0 ? '+' : ''}${diffD.toFixed(2).padStart(6)} seconds     ║`);
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
   console.log(`║ C: Heliocentric Sun→Earth angle (includes wobble)       │ ${resultC.mean4pt.toFixed(9)}    │ ${diffC >= 0 ? '+' : ''}${diffC.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ E: OrbitCenter→Sun angle (4 angles)                     │ ${resultE.mean4pt.toFixed(9)}    │ ${diffE >= 0 ? '+' : ''}${diffE.toFixed(2).padStart(6)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
+  console.log(`║ F: Origin→Sun (2 opp. angles: 0°+180°)                 │ ${resultF.mean4pt.toFixed(9)}    │ ${diffF >= 0 ? '+' : ''}${diffF.toFixed(2).padStart(6)} seconds     ║`);
+  console.log(`║ G: OrbitCenter→Sun (2 opp. angles: 0°+180°)            │ ${resultG.mean4pt.toFixed(9)}    │ ${diffG >= 0 ? '+' : ''}${diffG.toFixed(2).padStart(6)} seconds     ║`);
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════╪═══════════════════════╣');
   console.log(`║ IAU sidereal year (J2000)                               │ ${iauSiderealYear.toFixed(9)}    │ (reference)           ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════╧═══════════════════════╝');
@@ -18776,6 +18832,12 @@ async function analyzeSiderealYear(startYear, endYear) {
   console.log('║ Earth Wobble Effect (C vs D)                            │                       ║');
   console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
   console.log(`║ Method C - Method D (wobble contribution)               │ ${diffCD >= 0 ? '+' : ''}${diffCD.toFixed(3).padStart(7)} seconds     ║`);
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  console.log('║ Orbit Center & 2-Angle Methods                          │                       ║');
+  console.log('╠═════════════════════════════════════════════════════════╪═══════════════════════╣');
+  console.log(`║ A(4pt) - E(4pt) orbit center effect                     │ ${diffAE >= 0 ? '+' : ''}${diffAE.toFixed(3).padStart(7)} seconds     ║`);
+  console.log(`║ A(4pt) - F(2pt) 4-angle vs 2-opposite (from origin)    │ ${diffAF >= 0 ? '+' : ''}${diffAF.toFixed(3).padStart(7)} seconds     ║`);
+  console.log(`║ A(4pt) - G(2pt) 4-angle vs 2-opposite (from center)    │ ${diffAG >= 0 ? '+' : ''}${diffAG.toFixed(3).padStart(7)} seconds     ║`);
   console.log('╚═════════════════════════════════════════════════════════╧═══════════════════════╝');
 
   console.log('');
@@ -18823,6 +18885,9 @@ async function analyzeSiderealYear(startYear, endYear) {
     methodB: { angleResults: resultB.angleResults, mean4pt: resultB.mean4pt },
     methodC: { angleResults: resultC.angleResults, mean4pt: resultC.mean4pt },
     methodD: { angleResults: resultD.angleResults, mean4pt: resultD.mean4pt },
+    methodE: { angleResults: resultE.angleResults, mean4pt: resultE.mean4pt },
+    methodF: { angleResults: resultF.angleResults, mean2pt: resultF.mean4pt },
+    methodG: { angleResults: resultG.angleResults, mean2pt: resultG.mean4pt },
     iauReference: iauSiderealYear
   };
 }
@@ -18905,7 +18970,7 @@ async function analyzeAllAlignments(startYear, endYear) {
   // Helper to get Sun's absolute world angle
   const getSunWorldAngle = (jd) => {
     jumpToJulianDay(jd);
-    forceSceneUpdate();
+    forceSceneUpdate('minimal');
     const sunPos = new THREE.Vector3();
     sun.planetObj.getWorldPosition(sunPos);
     let angle = Math.atan2(sunPos.z, sunPos.x) * 180 / Math.PI;
@@ -19053,9 +19118,9 @@ async function analyzeAllAlignments(startYear, endYear) {
     console.log(`║   ${p.name.padEnd(30)} ${p.mean.toFixed(9)}    ${p.iauRef.toFixed(9)}   ${diffSec >= 0 ? '+' : ''}${diffSec.toFixed(2)}s ║`);
   }
   console.log('║───────────────────────────────────────────────────────────────────────────────────────║');
-  console.log('║   Note: Model uses circular orbit (constant angular velocity). IAU uses elliptical   ║');
-  console.log('║   orbit (Kepler\'s 2nd Law). This causes ~±26s deviation at solstices where orbital   ║');
-  console.log('║   velocity difference is maximum. Mean tropical year cancels this effect.            ║');
+  console.log('║   Note: Model uses circular orbit + EoC variable speed (approximates Kepler\'s 2nd     ║');
+  console.log('║   Law). Residual ~±3-5s at solstices from geometric offset vs true ellipse.         ║');
+  console.log('║   Mean tropical year cancels this effect.                                           ║');
   console.log('╠═══════════════════════════════════════════════════════════════════════════════════════╣');
   console.log('║ MEAN TROPICAL YEAR (average of 4 cardinal points)                                     ║');
   const meanDiffSec = (meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400;
@@ -21332,14 +21397,34 @@ function jumpToJulianDay (jd) {
   positionChanged = true; // Signal animation loop to update scene
 }
 
-/* Force all the astro calculations that the render loop usually so RA & DEC are up-to-date. */
-function forceSceneUpdate () {
+/* Force all the astro calculations that the render loop usually does so RA & DEC are up-to-date.
+   Supports three modes for performance optimization:
+   - 'minimal': moveModel + matrix updates only (for getWorldPosition/worldToLocal measurements)
+   - 'light':   + updatePositions (for sun.ra/dec/distAU measurements)
+   - default:   full update (all 13 functions — traces, predictions, perihelion, etc.) */
+function forceSceneUpdate (mode) {
+  moveModel(o.pos);
+
+  if (mode === 'minimal') {
+    // Tier 0: Only need world positions (getWorldPosition, worldToLocal)
+    startingPoint.pivotObj.updateMatrixWorld(true);
+    earthWobbleCenter.pivotObj.updateMatrixWorld(true);
+    return;
+  }
+
   o.Day           = posToDays(o.pos);
   o.Date          = daysToDate(o.Day);
   o.Time          = posToTime(o.pos);
   o.currentYear   = julianDateToDecimalYear(o.julianDay); // Required for updatePredictions & updateAscendingNodes
+
+  if (mode === 'light') {
+    // Tier 1: Need sun.ra, sun.dec, sun.distAU (includes matrix updates)
+    updatePositions();
+    return;
+  }
+
+  // Tier 2 (default): Full update — all functions
   trace(o.pos);
-  moveModel(o.pos);
   updatePredictions();
   updatePositions();
   updatePerihelion();
@@ -21351,7 +21436,6 @@ function forceSceneUpdate () {
   updateInvariablePlaneBalance();
   calculateInvariablePlaneFromAngularMomentum();
   updateOrbitOrientations();
-  // -- anything else your render loop does that affects .ra/.dec
   labelPrevHTML = '';                 // invalidate panel cache so next render picks up fresh values
 }
 
@@ -29117,7 +29201,10 @@ function updatePositions() {
           + (_dc.AD || 0) * _cos3U * _invD2 + (_dc.AE || 0) * _sin2U * _invS2
           + (_dc.AF || 0) * _sin3U * _invS2 + (_dc.AG || 0) * _cos3U * _invS2
           + (_dc.AH || 0) * _cosU * _invS2 + (_dc.AI || 0) * _sinU * _invD2 * _invS
-          + (_dc.AJ || 0) * Math.cos(4*_u) * _invS + (_dc.AK || 0) * _sin2U * _invD2 * _invS;
+          + (_dc.AJ || 0) * Math.cos(4*_u) * _invS + (_dc.AK || 0) * _sin2U * _invD2 * _invS
+          + (_dc.AL || 0) * Math.sin(4*_u) * _invD + (_dc.AM || 0) * Math.cos(4*_u) * _invD
+          + (_dc.AN || 0) * _T * _sinU * _invD2 + (_dc.AO || 0) * _T * _cosU * _invD2
+          + (_dc.AP || 0) * _sinU * _invD2 * _invD + (_dc.AQ || 0) * _cosU * _invD2 * _invD;
         obj.dec += _corrDec * (Math.PI / 180);
       }
       if (_rc) {
@@ -29138,7 +29225,10 @@ function updatePositions() {
           + (_rc.AD || 0) * _cos3U * _invD2 + (_rc.AE || 0) * _sin2U * _invS2
           + (_rc.AF || 0) * _sin3U * _invS2 + (_rc.AG || 0) * _cos3U * _invS2
           + (_rc.AH || 0) * _cosU * _invS2 + (_rc.AI || 0) * _sinU * _invD2 * _invS
-          + (_rc.AJ || 0) * Math.cos(4*_u) * _invS + (_rc.AK || 0) * _sin2U * _invD2 * _invS;
+          + (_rc.AJ || 0) * Math.cos(4*_u) * _invS + (_rc.AK || 0) * _sin2U * _invD2 * _invS
+          + (_rc.AL || 0) * Math.sin(4*_u) * _invD + (_rc.AM || 0) * Math.cos(4*_u) * _invD
+          + (_rc.AN || 0) * _T * _sinU * _invD2 + (_rc.AO || 0) * _T * _cosU * _invD2
+          + (_rc.AP || 0) * _sinU * _invD2 * _invD + (_rc.AQ || 0) * _cosU * _invD2 * _invD;
         obj.ra -= _corrRA * (Math.PI / 180);
       }
     }

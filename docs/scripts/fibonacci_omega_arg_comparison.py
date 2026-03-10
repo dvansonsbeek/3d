@@ -9,106 +9,48 @@ Compares two angular quantities for all planets:
 Investigates whether the difference (Ω_inv - Ω_ecl) relates to
 the difference between invariable-plane and ecliptic inclinations.
 
-Data source: 98-holistic-year-objects-data.xlsx
-  Excel row 0 corresponds to year -301,334 (closest to balance year -301,340).
+Data source: 98-holistic-year-objects-data.xlsx (read dynamically at balance year row)
 
 Key finding: OMEGA0 values are DC components from sinusoidal fitting of ICRF ω
 time series (§7.4), NOT simple column subtraction. Both ICRF and ecliptic-frame
 ω cycle through ~360° for non-Earth planets.
 """
 
+import sys
+import os
 import numpy as np
+import pandas as pd
 
-H = 333_888
-BALANCE_YEAR = -301_340
-
-print("=" * 80)
-print("ARGUMENT OF PERIAPSIS vs ARGUMENT OF PERIHELION")
-print(f"Data from Excel row closest to balance year t = {BALANCE_YEAR:,}")
-print("(Excel row 0 = year -301,334)")
-print("=" * 80)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fibonacci_data import H, BALANCE_YEAR
 
 # ─────────────────────────────────────────────────────
-# SECTION 1: Raw data from Excel (first row, year -301,334)
+# Load data from Excel at balance year row
 # ─────────────────────────────────────────────────────
-print("\n" + "=" * 80)
-print("SECTION 1: Raw Data from Excel (year -301,334)")
-print("=" * 80)
+EXCEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '98-holistic-year-objects-data.xlsx')
+df = pd.read_excel(EXCEL_PATH, sheet_name='Perihelion Planets')
+bal_idx = np.argmin(np.abs(df['Year'] - BALANCE_YEAR))
+bal_year = int(df['Year'].iloc[bal_idx])
+row = df.iloc[bal_idx]
 
-# All values in degrees, from Excel row 0 (year -301,334)
-# ICRF frame values
 planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']
 
-# Perihelion longitude (ICRF)
-peri_icrf = {
-    'Mercury':  348.342973,
-    'Venus':    326.182329,
-    'Earth':    270.000028,
-    'Mars':     356.160383,
-    'Jupiter':  180.083098,
-    'Saturn':   187.347856,
-    'Uranus':   268.655565,
-    'Neptune':  242.625387,
-}
+# Extract orbital elements from Excel row
+peri_icrf = {}
+asc_node_ecl_icrf = {}
+arg_peri_excel = {}
+asc_node_inv_icrf = {}
+i_ecl = {}
+i_inv = {}
 
-# Ascending node on ecliptic (ICRF) — "Asc Node" column
-# Note: Earth doesn't have this (ecliptic IS its reference)
-asc_node_ecl_icrf = {
-    'Mercury':   48.176543,
-    'Venus':     76.263785,
-    'Mars':      48.962271,
-    'Jupiter':  169.316286,
-    'Saturn':   113.111544,
-    'Uranus':    75.812397,
-    'Neptune':  131.174926,
-}
-
-# Argument of periapsis from Excel — "Arg Peri" column
-# This is ϖ_ICRF - Ω_ecl_ICRF (frame-independent for ecliptic nodes)
-arg_peri_excel = {
-    'Mercury':  300.166429,
-    'Venus':    249.918544,
-    'Mars':     307.198112,
-    'Jupiter':   10.766812,
-    'Saturn':    74.236312,
-    'Uranus':   192.843168,
-    'Neptune':  111.450461,
-}
-
-# Ascending node on invariable plane (ICRF) — "Asc Node InvPlane ICRF"
-asc_node_inv_icrf = {
-    'Mercury':  303.117682,
-    'Venus':    251.168248,
-    'Earth':     23.319488,
-    'Mars':      17.594815,
-    'Jupiter':  117.572479,
-    'Saturn':   215.318033,
-    'Uranus':    46.609488,
-    'Neptune':   28.508248,
-}
-
-# Ecliptic inclination — "Ecliptic Inclination"
-i_ecl = {
-    'Mercury':  6.571028,
-    'Venus':    2.887305,
-    'Mars':     0.658531,
-    'Jupiter':  0.932530,
-    'Saturn':   1.706371,
-    'Uranus':   0.390355,
-    'Neptune':  0.155771,
-}
-
-# Invariable plane inclination — "InvPlane Inclination"
-i_inv = {
-    'Mercury':  6.662219,
-    'Venus':    2.249195,
-    'Earth':    0.847743,
-    'Mars':     1.496596,
-    'Jupiter':  0.330709,
-    'Saturn':   0.868024,
-    'Uranus':   0.978762,
-    'Neptune':  0.708670,
-}
+for p in planets:
+    peri_icrf[p] = row[f'{p} Perihelion ICRF']
+    asc_node_inv_icrf[p] = row[f'{p} Asc Node InvPlane ICRF']
+    i_inv[p] = row[f'{p} InvPlane Inclination']
+    if p != 'Earth':
+        asc_node_ecl_icrf[p] = row[f'{p} Asc Node']
+        arg_peri_excel[p] = row[f'{p} Arg Peri']
+        i_ecl[p] = row[f'{p} Ecliptic Inclination']
 
 # OMEGA0 values from the model (§7.4 — DC component of sinusoidal fit)
 # These are NOT simple column differences but fitted constants from ICRF ω time series.
@@ -123,6 +65,11 @@ omega0_model = {
     'Uranus':  -138.104,
     'Neptune': -144.051,
 }
+
+print("=" * 80)
+print("ARGUMENT OF PERIAPSIS vs ARGUMENT OF PERIHELION")
+print(f"Data from Excel row {bal_idx} (year {bal_year:,}), balance year = {BALANCE_YEAR:,}")
+print("=" * 80)
 
 print("\nPlanet       | ϖ (ICRF)    | Ω_ecl (ICRF) | Ω_inv (ICRF) | Arg Peri    | i_ecl      | i_inv")
 print("-" * 110)

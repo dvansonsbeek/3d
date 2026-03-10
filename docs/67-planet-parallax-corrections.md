@@ -1,7 +1,7 @@
 # Planet Geocentric Parallax Corrections — Implementation Reference
 
 **Date**: 2026-03-09
-**Status**: Complete (up to 36-term correction, all 7 planets, JPL-verified)
+**Status**: Complete (up to 42-term correction, all 7 planets, JPL-verified)
 
 ---
 
@@ -33,7 +33,7 @@ The scene graph models each planet's orbital plane as a tilted circle. The tilt 
 
 ## 2. The Correction Formula
 
-Applied to both RA and Dec independently (up to 36 coefficients per coordinate per planet):
+Applied to both RA and Dec independently (up to 42 coefficients per coordinate per planet):
 
 ```
 dX = A + B/d + C·T
@@ -46,6 +46,8 @@ dX = A + B/d + C·T
    + AD·cos(3u)/d² + AE·sin(2u)/s²
    + AF·sin(3u)/s² + AG·cos(3u)/s² + AH·cos(u)/s² + AI·sin(u)/(d²·s)
    + AJ·cos(4u)/s + AK·sin(2u)/(d²·s)
+   + AL·sin(4u)/d + AM·cos(4u)/d + AN·T·sin(u)/d² + AO·T·cos(u)/d²
+   + AP·sin(u)/d³ + AQ·cos(u)/d³
 ```
 
 Where:
@@ -86,6 +88,12 @@ Note: The letter T is skipped as a coefficient name to avoid confusion with the 
 | AI | sin(u)/(d²·s) | Triple-distance | d²×s coupling |
 | AJ | cos(4u)/s | Heliocentric | 4th harmonic heliocentric |
 | AK | sin(2u)/(d²·s) | Triple-distance | 2nd harmonic d²×s coupling |
+| AL | sin(4u)/d | Harmonics/d | 4th harmonic parallax |
+| AM | cos(4u)/d | Harmonics/d | 4th harmonic parallax (cos) |
+| AN | T·sin(u)/d² | T×Nonlinear/d² | Precessing close-approach 1st harmonic |
+| AO | T·cos(u)/d² | T×Nonlinear/d² | Precessing close-approach 1st harmonic (cos) |
+| AP | sin(u)/d³ | Cubic/d³ | Ultra-close-approach parallax |
+| AQ | cos(u)/d³ | Cubic/d³ | Ultra-close-approach parallax (cos) |
 
 ### Discovery Process
 
@@ -96,6 +104,7 @@ The correction grew incrementally from 6 to 36 parameters:
 3. **15→18 params**: Added time-modulated 2nd harmonics (P,Q,R). Cross-validated per planet — only Mercury, Mars, Saturn, Neptune benefited.
 4. **18→24 params**: Systematic search of candidate basis functions via greedy forward selection with LOOCV. Tested each candidate as a 19th parameter, picked the best, then searched for 20th given the 19th, etc.
 5. **24→30→36 params**: Extended with cross-distance terms (1/(d·s), harmonics/(d·s)), quadratic heliocentric terms (harmonics/s²), triple-distance coupling (harmonics/(d²·s)), and 4th harmonic. Applied after enriching reference data to 2000+ points for Venus, Jupiter, Saturn. Per-planet tier selection via LOOCV determines optimal count.
+6. **36→42 params**: Added 4th harmonic parallax terms (AL,AM), precessing close-approach terms (AN,AO), and cubic close-approach terms (AP,AQ) targeting Venus inferior conjunction errors. Venus enriched to 3800+ points with IC-dense sampling.
 
 ### Fitting Method
 
@@ -107,17 +116,17 @@ The sin/cos decomposition eliminates phase parameters — `amplitude·sin(u − 
 
 ## 3. Per-Planet Tier Selection
 
-Not all planets benefit from all 36 terms. Each planet uses the tier with the lowest leave-one-out cross-validation (LOOCV) or k-fold CV error:
+Not all planets benefit from all 42 terms. Each planet uses the tier with the lowest leave-one-out cross-validation (LOOCV) or k-fold CV error:
 
 | Planet | n pts | Tier | RMS Tot | Notes |
 |--------|-------|------|---------|-------|
-| Mercury | 95 | 36p (A–AK) | 0.01° | All 36 terms validated |
-| Venus | 2481 | 36p (A–AK) | 0.24° | Enriched from 48 to 2481 pts (2000–2200) |
-| Mars | 184 | 30p (A–AE) | 0.02° | 36p shows multicollinearity |
-| Jupiter | 2499 | 36p (A–AK) | 0.06° | Enriched from 70 to 2499 pts |
-| Saturn | 2502 | 24p (A–Y) | 0.10° | Higher tiers overfit despite large dataset |
-| Uranus | 41 | 15p (A–O) | 0.01° | Already excellent at 15p |
-| Neptune | 69 | 18p (A–R) | 0.01° | P,Q,R validated by CV |
+| Mercury | 95 | 42p (A–AQ) | 0.01° | All 42 terms validated |
+| Venus | 3812 | 42p (A–AQ) | 0.22° | Enriched to 3812 pts incl. IC-dense sampling |
+| Mars | 184 | 30p (A–AE) | 0.02° | Higher tiers show multicollinearity |
+| Jupiter | 2499 | 42p (A–AQ) | 0.06° | Enriched from 70 to 2499 pts |
+| Saturn | 2502 | 36p (A–AK) | 0.10° | Higher tiers overfit despite large dataset |
+| Uranus | 41 | 24p (A–Y) | 0.01° | Small dataset limits tier |
+| Neptune | 69 | 24p (A–Y) | 0.01° | 24p validated by CV |
 
 Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
@@ -125,11 +134,11 @@ Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
 ## 4. Overfitting Protection
 
-**LOOCV / k-fold CV**: For each candidate tier (15p, 18p, 24p, 30p, 36p), every data point is held out once (LOOCV for small datasets) or 10-fold CV is used (for enriched datasets with 2000+ points). The tier with lowest CV error wins.
+**LOOCV / k-fold CV**: For each candidate tier (15p, 18p, 24p, 30p, 36p, 42p), every data point is held out once (LOOCV for small datasets) or 10-fold CV is used (for enriched datasets with 2000+ points). The tier with lowest CV error wins.
 
 **Multicollinearity rejection**: Outer planets develop huge coefficients (millions) for 1/s² and 1/(d²·s) terms because at large heliocentric distances these become nearly collinear with simpler terms. These tiers are rejected even when CV appears slightly better, as the coefficients are numerically unstable for extrapolation beyond the training range.
 
-**Data ratio**: At 36 params (72 coefficients for RA+Dec), a planet needs substantial data for reliable fitting. Uranus (41 pts) is restricted to 15p. Enriched planets (Venus, Jupiter, Saturn with 2400+ pts) can support higher tiers where cross-validation confirms benefit.
+**Data ratio**: At 42 params (84 coefficients for RA+Dec), a planet needs substantial data for reliable fitting. Uranus (41 pts) is restricted to 24p. Enriched planets (Venus with 3800+ pts, Jupiter/Saturn with 2400+ pts) can support higher tiers where cross-validation confirms benefit.
 
 ---
 
@@ -139,15 +148,15 @@ Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
 | Planet | n pts | Tier | RMS Tot |
 |--------|-------|------|---------|
-| Mercury | 95 | 36p | **0.01°** |
-| Venus | 2481 | 36p | **0.24°** |
+| Mercury | 95 | 42p | **0.01°** |
+| Venus | 3812 | 42p | **0.22°** |
 | Mars | 184 | 30p | **0.02°** |
-| Jupiter | 2499 | 36p | **0.06°** |
-| Saturn | 2502 | 24p | **0.10°** |
-| Uranus | 41 | 15p | **0.01°** |
-| Neptune | 69 | 18p | **0.01°** |
+| Jupiter | 2499 | 42p | **0.06°** |
+| Saturn | 2502 | 36p | **0.10°** |
+| Uranus | 41 | 24p | **0.01°** |
+| Neptune | 69 | 24p | **0.01°** |
 
-All 7 planets within 0.24°. Five under 0.06°.
+All 7 planets within 0.22°. Five under 0.06°.
 
 ### Remaining Error Sources
 
@@ -155,7 +164,7 @@ All 7 planets within 0.24°. Five under 0.06°.
 
 2. **Mutual perturbations**: Jupiter–Saturn gravitational interaction causes ~1° longitude perturbations over their ~20-year conjunction cycle. Partially absorbed by harmonic correction.
 
-3. **Per-planet specialization**: The current universal 36-term formula is the practical limit for a shared formula. Beyond this, planet-specific branches would be needed.
+3. **Per-planet specialization**: The current universal 42-term formula is the practical limit for a shared formula. Beyond this, planet-specific branches would be needed.
 
 ---
 
@@ -200,7 +209,7 @@ Planet visual positions in the 3D scene are NOT corrected — the corrections ar
 
 | Tool | Purpose |
 |------|---------|
-| `tools/explore/fit-extended-correction.js` | Fit 15p/18p/24p/30p/36p tiers, LOOCV/k-fold selection, output coefficients |
+| `tools/explore/fit-extended-correction.js` | Fit 15p/18p/24p/30p/36p/42p tiers, LOOCV/k-fold selection, output coefficients |
 | `tools/explore/archive/search-next-params.js` | Test 30 candidates as next parameter, ranked by LOOCV (superseded by greedy-forward-select) |
 | `tools/explore/greedy-forward-select.js` | Sequential best-3 selection per planet |
 
@@ -243,4 +252,4 @@ The empirical approach works because it operates directly in RA/Dec output space
 
 ## 9. Reference Data
 
-JPL Horizons ephemeris data in `config/reference-data.json`. Each planet has 41–2502 data points spanning 2000–2200, with RA/Dec in J2000 frame. The precession module (`tools/lib/precession.js`) converts J2000 to of-date frame before comparison with the model. Venus, Jupiter, and Saturn have been enriched to ~2500 points for robust higher-tier fitting.
+JPL Horizons ephemeris data in `config/reference-data.json`. Each planet has 41–3812 data points spanning 2000–2200, with RA/Dec in J2000 frame. The precession module (`tools/lib/precession.js`) converts J2000 to of-date frame before comparison with the model. Venus has been enriched to 3812 points (including IC-dense sampling near 125 inferior conjunctions). Jupiter and Saturn have been enriched to ~2500 points for robust higher-tier fitting.

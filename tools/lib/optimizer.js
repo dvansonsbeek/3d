@@ -57,6 +57,7 @@ function getParamAccessors(target) {
   if (target === 'sun') {
     return {
       correctionSun:        { get: () => C.correctionSun, set: v => { C.correctionSun = v; } },
+      perihelionRefJD:      { get: () => C.perihelionRefJD, set: v => { C.perihelionRefJD = v; } },
       eccentricityBase:     { get: () => C.eccentricityBase, set: v => { C.eccentricityBase = v; } },
       eccentricityAmplitude:{ get: () => C.eccentricityAmplitude, set: v => { C.eccentricityAmplitude = v; } },
       earthRAAngle:         { get: () => C.earthRAAngle, set: v => { C.earthRAAngle = v; } },

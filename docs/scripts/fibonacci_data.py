@@ -33,12 +33,64 @@ import math
 
 H = 335008  # Holistic-Year (years)
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
+J2000_YEAR = 2000
+BALANCE_YEAR = round(1246 - 14.5 * (H / 16))  # balance year: 1246 - 14.5*(H/16)
 
 # Earth base eccentricity (from 3D simulation — arithmetic midpoint)
 EARTH_BASE_ECCENTRICITY = 0.015372
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees
+
+# Physical & astronomical constants (constants.js section 2)
+_AU_KM = 149597870.698828            # km
+_SIDEREAL_YEAR_S = 31558149.8        # seconds
+_G = 6.6743e-20                      # km³/(kg·s²)
+_MASS_RATIO_EARTH_MOON = 81.3007
+_INPUT_MEAN_SOLAR_YEAR = 365.2421897 # days
+
+# Moon input constants (constants.js section 4)
+_MOON_SIDEREAL_MONTH_INPUT = 27.32166156  # days
+_MOON_DISTANCE_KM = 384399.07            # km
+
+# DE440 Sun/planet mass ratios (constants.js section 2)
+_MASS_RATIO_DE440 = {
+    "Mercury": 6023625.5, "Venus": 408523.72, "Mars": 3098703.59,
+    "Jupiter": 1047.348625, "Saturn": 3497.9018,
+    "Uranus": 22902.944, "Neptune": 19412.237,
+}
+
+# Planet solarYearInput values (constants.js section 5)
+_SOLAR_YEAR_INPUT = {
+    "Mercury": 87.9686, "Venus": 224.695, "Mars": 686.931,
+    "Jupiter": 4330.5, "Saturn": 10747.0,
+    "Uranus": 30586, "Neptune": 59980,
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DERIVED CONSTANTS — replicates constants.js computation chain (sections 6-10)
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Year and day lengths (constants.js section 6)
+_MEAN_SOLAR_YEAR_DAYS = round(_INPUT_MEAN_SOLAR_YEAR * (H / 16)) / (H / 16)
+_MEAN_SIDEREAL_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS * (H / 13) / ((H / 13) - 1)
+_MEAN_LENGTH_OF_DAY = _SIDEREAL_YEAR_S / _MEAN_SIDEREAL_YEAR_DAYS  # seconds
+_MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _MEAN_LENGTH_OF_DAY
+_TOTAL_DAYS_IN_H = H * _MEAN_SOLAR_YEAR_DAYS
+
+# Moon sidereal month (constants.js section 7)
+_MOON_SIDEREAL_MONTH = _TOTAL_DAYS_IN_H / math.ceil(_TOTAL_DAYS_IN_H / _MOON_SIDEREAL_MONTH_INPUT)
+
+# GM_SUN from Kepler's 3rd law (constants.js section 9)
+_GM_SUN = (4 * math.pi**2 * _AU_KM**3) / _SIDEREAL_YEAR_S**2
+_M_SUN = _GM_SUN / _G
+
+# Earth mass via Moon orbital mechanics (constants.js section 9)
+_SOLAR_SIDEREAL_DAY_RATIO = _MEAN_LENGTH_OF_DAY / _MEAN_SIDEREAL_DAY
+_GM_EARTH_MOON_SYSTEM = (4 * math.pi**2 * _MOON_DISTANCE_KM**3) / \
+    (_MOON_SIDEREAL_MONTH * _MEAN_LENGTH_OF_DAY)**2
+_GM_EARTH = _GM_EARTH_MOON_SYSTEM * \
+    (_MASS_RATIO_EARTH_MOON / (_MASS_RATIO_EARTH_MOON + 1)) * _SOLAR_SIDEREAL_DAY_RATIO
 
 # ═══════════════════════════════════════════════════════════════════════════
 # PLANET LIST (inner → outer)
@@ -48,21 +100,13 @@ PLANET_NAMES = ["Mercury", "Venus", "Earth", "Mars",
                 "Jupiter", "Saturn", "Uranus", "Neptune"]
 
 # ═══════════════════════════════════════════════════════════════════════════
-# MASSES (solar mass units, from Holistic computation chain)
-# Derived from JPL mass ratios via the model's GM_SUN calculation.
-# Earth uses Moon-based derivation (see 88-verify-laws.js).
+# MASSES (solar mass units) — computed from DE440 mass ratios
+# Replicates constants.js section 9: massFraction[k] = 1 / ratio
+# Earth via Moon orbital mechanics (same chain as constants.js)
 # ═══════════════════════════════════════════════════════════════════════════
 
-MASS = {
-    "Mercury": 1.66012977e-7,
-    "Venus":   2.44783828e-6,
-    "Earth":   3.00345781e-6,  # Earth + Moon system (Moon-based derivation)
-    "Mars":    3.22715604e-7,
-    "Jupiter": 9.54791916e-4,
-    "Saturn":  2.85885670e-4,
-    "Uranus":  4.36625091e-5,
-    "Neptune": 5.15138982e-5,
-}
+MASS = {p: 1.0 / _MASS_RATIO_DE440[p] for p in PLANET_NAMES if p != "Earth"}
+MASS["Earth"] = (_GM_EARTH / _G) / _M_SUN
 
 # Alias used in some scripts
 MASSES = MASS
@@ -110,6 +154,20 @@ ECCENTRICITIES = {
     "Saturn":  0.05386179,
     "Uranus":  0.04725744,
     "Neptune": 0.00859048,
+}
+
+# Dual-balanced eccentricities: inner planets use J2000, outer planets
+# optimized for simultaneous 100% inclination + eccentricity balance.
+# From constants.js orbitalEccentricity (see docs/20-constants-reference.md §675).
+ECC_DUAL_BALANCED = {
+    "Mercury": 0.20563593,  # J2000
+    "Venus":   0.00677672,  # J2000
+    "Earth":   0.01671022,  # J2000 (dual-balanced outer planets were optimized with this value)
+    "Mars":    0.09339410,  # J2000
+    "Jupiter": 0.04821478,  # Dual-balanced (-0.35% from J2000)
+    "Saturn":  0.05374486,  # Dual-balanced = Law 5 prediction (-0.22% from J2000)
+    "Uranus":  0.04734421,  # Dual-balanced (+0.18% from J2000)
+    "Neptune": 0.00867761,  # Dual-balanced (+1.01% from J2000)
 }
 
 # Alias
@@ -188,33 +246,22 @@ INCLINATION_AMPS = INCL_AMP
 # ORBITAL PROPERTIES
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Semi-major axes (AU) — from Holistic computation chain
-# Derived from orbital periods via Kepler's 3rd law with H = 335,008
-SEMI_MAJOR = {
-    "Mercury": 0.3871067366,
-    "Venus":   0.7233418423,
-    "Earth":   1.0000000000,
-    "Mars":    1.5236643290,
-    "Jupiter": 5.1997058190,
-    "Saturn":  9.5306163820,
-    "Uranus":  19.138024550,
-    "Neptune": 29.960474780,
-}
+# Semi-major axes (AU) and orbital periods — computed from Holistic chain
+# Replicates constants.js section 10:
+#   solarYearCount = round(totalDaysInH / solarYearInput)
+#   orbitDistance = ((H / solarYearCount)²)^(1/3)     [Kepler's 3rd law]
+#   period = H / solarYearCount                       [in solar years]
+_SOLAR_YEAR_COUNT = {}
+SEMI_MAJOR = {"Earth": 1.0}
+ORBITAL_PERIOD = {"Earth": 1.0}
+for _p, _syi in _SOLAR_YEAR_INPUT.items():
+    _syc = round(_TOTAL_DAYS_IN_H / _syi)
+    _SOLAR_YEAR_COUNT[_p] = _syc
+    SEMI_MAJOR[_p] = ((H / _syc) ** 2) ** (1/3)
+    ORBITAL_PERIOD[_p] = H / _syc
 
 # Alias
 SMA = SEMI_MAJOR
-
-# Orbital periods (years)
-ORBITAL_PERIOD = {
-    "Mercury": 0.24085,
-    "Venus":   0.61520,
-    "Earth":   1.00002,
-    "Mars":    1.88085,
-    "Jupiter": 11.8622,
-    "Saturn":  29.4571,
-    "Uranus":  84.0107,
-    "Neptune": 164.790,
-}
 
 # J2000 invariable plane inclinations (degrees) — Souami & Souchay 2012
 INCL_J2000 = {

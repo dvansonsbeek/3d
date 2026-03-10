@@ -10,7 +10,7 @@
 //
 // Key finding: Law 4 (R² pair constraint) predicts Saturn e = 0.05389,
 // Law 5 (eccentricity balance) predicts e = 0.05374 — they agree to
-// 0.30%, both bracketing J2000 observed (0.05386).
+// 0.28%, both bracketing J2000 observed (0.05386).
 //
 // Usage: node docs/90-eccentricity-balance.js
 // ═══════════════════════════════════════════════════════════════
@@ -169,7 +169,7 @@ console.log(`\n  J2000 vs Law 4:     ${(e_j2000 - e_law4).toExponential(4)}  (${
 console.log(`  J2000 vs Law 5:     ${(e_j2000 - e_perfect).toExponential(4)}  (${((e_j2000 - e_perfect)/e_j2000 * 100).toFixed(4)}%)`);
 
 console.log('\n  ★ KEY FINDING: Laws 4 and 5 independently predict Saturn\'s');
-console.log('    eccentricity to within 0.30% of each other, both bracketing');
+console.log('    eccentricity to within 0.28% of each other, both bracketing');
 console.log('    the J2000 observed value. Two independent Fibonacci constraints');
 console.log('    — R² pair ratios (Law 4) and eccentricity balance (Law 5) —');
 console.log('    converge on the same physical value across a factor-of-9');
@@ -250,7 +250,7 @@ for (const r of ranked) {
 console.log('\n  The 3 most sensitive planets are the outer gas/ice giants (Saturn,');
 console.log('  Jupiter, Uranus), which dominate the eccentricity weights. The 0.12%');
 console.log('  gap requires only a 0.16% change in Saturn\'s orbital distance or');
-console.log('  0.24% change in Saturn\'s eccentricity — both well within secular');
+console.log('  0.22% change in Saturn\'s eccentricity — both well within secular');
 console.log('  oscillation ranges.');
 
 // ══════════════════════════════════════════════════════════════════
@@ -351,7 +351,7 @@ console.log('1. BALANCE: The 8-planet eccentricity balance is 100% with');
 console.log('   dual-balanced eccentricities.');
 console.log();
 console.log('2. LAW CONVERGENCE: Laws 4 and 5 independently predict Saturn\'s');
-console.log('   eccentricity to within 0.30%, both bracketing J2000:');
+console.log('   eccentricity to within 0.28%, both bracketing J2000:');
 console.log(`     Law 4 (R² pair constraint): e = ${e_law4}`);
 console.log(`     Law 5 (balance equation):   e = ${e_perfect.toFixed(5)}`);
 console.log(`     J2000 observed:             e = ${e_j2000.toFixed(5)}`);
@@ -366,7 +366,7 @@ console.log('   (a) they lack mirror-pair counterparts for AMD exchange,');
 console.log('   (b) the a^(3/2) weighting makes them far too heavy, and');
 console.log('   (c) they are test particles, not eigenmode-defining masses.');
 console.log();
-console.log('5. SENSITIVITY: The gap corresponds to a 0.24% change in');
+console.log('5. SENSITIVITY: The gap corresponds to a 0.22% change in');
 console.log('   Saturn\'s eccentricity — within the secular oscillation');
 console.log('   range of 0.01 to 0.09. The balance crosses 100% as Saturn\'s');
 console.log('   eccentricity passes through its model-predicted mean value.');

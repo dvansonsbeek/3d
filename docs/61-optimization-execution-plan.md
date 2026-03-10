@@ -1299,7 +1299,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 | Step | Target | Status | Before RMS | After RMS | Params Changed |
 |------|--------|--------|-----------|-----------|----------------|
 | 1 | All | DONE | See below | — | H=335008, useVariableSpeed: true, dynamic perihelion phase |
-| 2 | Sun | DONE | 0.714° | 0.065° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.471334 |
+| 2 | Sun | DONE | 0.714° | 0.003° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.5292; earthRAAngle: 1.282779; validated 1600-2200 (600yr) |
 | 3 | Moon | DONE | 6.267° | 0.01° | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/66-moon-meeus-corrections.md` |
 | 4a | Jupiter | DONE | 1.974° | 0.06° | solarYearInput: 4330.5, eocFraction: 0.484, startpos: 13.85, 36p parallax |
 | 4b | Saturn | DONE | 3.291° | 0.10° | solarYearInput: 10747, eocFraction: 0.543, startpos: 11.32, 24p parallax |
@@ -1316,10 +1316,12 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 - Constants changed:
   - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
-  - `correctionSun`: 0.471334 (re-tuned for derived EoC constants)
+  - `correctionSun`: 0.5292 (optimized for Sun RA across 26 JPL reference points 2000-2025, validated across 1600-2200)
+  - `earthRAAngle`: 1.282779 (re-tuned for solstice timing alignment after correctionSun change)
   - `perihelionRefJD`: 2451547.042 (moved to ASTRO_REFERENCE in script.js)
 - Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
-- Sun RMS: **0.065°** (with IAU precession frame correction)
+- Sun RMS: **0.003°** — 20× improvement from 0.065° (with IAU precession frame correction)
+- Validated across 600 years (1600-2200) with only ~0.23 arcsec/century drift from slight precession rate mismatch
 - Full derivation analysis: `tools/explore/derive-eoc-constants.js`
 - Documentation: `docs/65-equation-of-center.md`
 
