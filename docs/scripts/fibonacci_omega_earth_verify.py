@@ -26,7 +26,7 @@ import pandas as pd
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fibonacci_data import H, BALANCE_YEAR, J2000_YEAR
+from constants_scripts import H, BALANCE_YEAR, J2000_YEAR
 I_MEAN = 1.481592  # Earth's mean inclination to invariable plane (degrees)
 
 def norm360(a):

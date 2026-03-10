@@ -33,7 +33,7 @@ from itertools import combinations
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fibonacci_data import H, PHI, BALANCE_YEAR, J2000_YEAR
+from constants_scripts import H, PHI, BALANCE_YEAR, J2000_YEAR
 
 DT = J2000_YEAR - BALANCE_YEAR
 

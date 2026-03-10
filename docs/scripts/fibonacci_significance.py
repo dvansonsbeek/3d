@@ -74,7 +74,7 @@ import argparse
 import time
 from collections import defaultdict
 
-from fibonacci_data import (
+from constants_scripts import (
     PLANET_NAMES, MASSES, ECCENTRICITIES, ECC_DUAL_BALANCED, INCLINATION_AMPS,
     D_INCL, PSI1_THEORY, SEMI_MAJOR, PHASE_GROUP, GROUP_203, GROUP_23,
     MIRROR_PAIRS, INCL_PERIOD, PERIOD_FRAC, H,

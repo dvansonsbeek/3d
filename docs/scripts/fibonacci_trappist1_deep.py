@@ -78,7 +78,7 @@ TRAPPIST1_I["sqrt_m"] = math.sqrt(TRAPPIST1_I["m_ratio"])
 TRAPPIST1_I["xi"] = TRAPPIST1_I["e"] * TRAPPIST1_I["sqrt_m"]
 
 # Solar System reference
-from fibonacci_data import (
+from constants_scripts import (
     PLANET_NAMES, MASS, SQRT_M, ECC_BASE, ECC_J2000, SEMI_MAJOR,
     FIB, FIB_MATCH, nearest_fib_ratio, H
 )

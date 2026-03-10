@@ -25,7 +25,7 @@ import math
 from fractions import Fraction
 from collections import Counter
 
-from fibonacci_data import (
+from constants_scripts import (
     H, PHI, PLANET_NAMES, MASS, ECC_BASE, INCL_AMP, SEMI_MAJOR, SMA,
     PERIOD_FRAC, D_INCL, K_ECC,
     FIB, FIB_MATCH, FIB_INDEX, FIB_SET,

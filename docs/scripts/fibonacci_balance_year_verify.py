@@ -34,7 +34,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fibonacci_data import (
+from constants_scripts import (
     PLANET_NAMES, MASS, SQRT_M, SEMI_MAJOR, D, H, FIB,
     ECC_J2000, ECC_BASE, ECC_DUAL_BALANCED, ECCENTRICITIES,
     INCL_J2000, OMEGA_J2000, INCL_AMP, INCL_PERIOD,

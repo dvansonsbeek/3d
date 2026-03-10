@@ -26,7 +26,7 @@ import statistics
 from itertools import combinations_with_replacement, product as iter_product
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fibonacci_data import *
+from constants_scripts import *
 
 
 # ═══════════════════════════════════════════════════════════════════════════

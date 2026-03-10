@@ -27,7 +27,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(__file__))
-from fibonacci_data import *
+from constants_scripts import *
 
 # ═══════════════════════════════════════════════════════════════════════════
 # SECTION 1: Proper AMD computation

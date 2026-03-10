@@ -21,7 +21,7 @@ Original scripts consolidated:
   fibonacci_omega_formula_search.py, fibonacci_omega_frame_correction.py,
   fibonacci_omega_trappist1.py, fibonacci_omega_eigenmodes.py
 
-Uses H and PHI from fibonacci_data.py (shared constants module).
+Uses H and PHI from constants_scripts.py (shared constants module).
 """
 
 import math
@@ -30,7 +30,7 @@ import random
 import statistics
 import time
 
-from fibonacci_data import H, PHI
+from constants_scripts import H, PHI
 
 try:
     import openpyxl

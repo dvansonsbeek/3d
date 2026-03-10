@@ -6,7 +6,7 @@ SHARED CONSTANTS AND UTILITIES FOR FIBONACCI LAWS OF PLANETARY MOTION
 This module provides the common data and helper functions used across all
 Fibonacci investigation scripts. Import with:
 
-    from fibonacci_data import *
+    from constants_scripts import *
 
 Data sources:
   - Masses: JPL DE440 (solar mass units)
@@ -36,8 +36,12 @@ PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = round(1246 - 14.5 * (H / 16))  # balance year: 1246 - 14.5*(H/16)
 
-# Earth base eccentricity (from 3D simulation — arithmetic midpoint)
-EARTH_BASE_ECCENTRICITY = 0.015372
+# Earth parameters (constants.js section 3)
+EARTH_BASE_ECCENTRICITY = 0.015372           # eccentricityBase: (max + min) / 2
+EARTH_ECCENTRICITY_AMPLITUDE = 0.00137032    # eccentricityAmplitude: (max - min) / 2
+EARTH_OBLIQUITY_MEAN = 23.41357              # earthtiltMean
+EARTH_INCLINATION_MEAN = 1.481179            # earthInvPlaneInclinationMean
+EARTH_INCLINATION_AMPLITUDE = 0.635970       # earthInvPlaneInclinationAmplitude
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees

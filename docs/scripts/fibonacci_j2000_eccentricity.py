@@ -33,7 +33,7 @@ import numpy as np
 import math
 import sys
 sys.path.insert(0, '.')
-from fibonacci_data import *
+from constants_scripts import *
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BvW SECULAR MODE DATA (from Brouwer & van Woerkom 1950, widely used)

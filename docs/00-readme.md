@@ -207,7 +207,7 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 
 | File | Description |
 |------|-------------|
-| `fibonacci_data.py` | Shared constants and planet data for all Python scripts |
+| `constants_scripts.py` | Shared constants and planet data for all Python scripts |
 | `fibonacci_significance.py` | Fisher's exact test for statistical significance of Fibonacci structure |
 | `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
 | `fibonacci_law4_verify.py` | Law 4 (eccentricity constant) verification |

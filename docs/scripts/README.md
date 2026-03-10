@@ -33,7 +33,7 @@ python fibonacci_trappist1_deep.py
 
 | Script | Description |
 |--------|-------------|
-| `fibonacci_data.py` | Shared constants (H, PHI, planet masses, orbital elements) and utility functions — imported by most other scripts |
+| `constants_scripts.py` | Shared constants (H, PHI, planet masses, orbital elements) and utility functions — imported by most other scripts |
 
 ### Key Investigation Scripts
 

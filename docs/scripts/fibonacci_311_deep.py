@@ -26,7 +26,7 @@ Run: python3 fibonacci_311_deep.py
 
 import math
 from fractions import Fraction
-from fibonacci_data import (
+from constants_scripts import (
     H, PHI, PLANET_NAMES, MASS, SQRT_M,
     ECC_BASE, INCL_AMP, SEMI_MAJOR, ORBITAL_PERIOD,
     PERIOD_FRAC, D_INCL, K_ECC,

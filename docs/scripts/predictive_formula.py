@@ -30,29 +30,32 @@ License: MIT
 import math
 from typing import List, Tuple, Dict
 
-from fibonacci_data import H
+from constants_scripts import (
+    H, BALANCE_YEAR, EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE,
+    EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_MEAN, EARTH_INCLINATION_AMPLITUDE,
+    _INPUT_MEAN_SOLAR_YEAR, _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS,
+    _MEAN_SIDEREAL_YEAR_DAYS, _MEAN_LENGTH_OF_DAY,
+)
 
 # =============================================================================
 # SECTION A: FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-ANCHOR_YEAR = -302355           # balancedYear: 1246 - 14.5*(H/16)
+ANCHOR_YEAR = BALANCE_YEAR      # from constants_scripts (1246 - 14.5*(H/16))
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
-# --- Day & Year constants ---
-_INPUT_SOLAR_YEAR = 365.2421897             # Input value (matches script.js)
-MEAN_SOLAR_YEAR_DAYS = round(_INPUT_SOLAR_YEAR * (H / 16)) / (H / 16)  # Computed mean (same as script.js)
-SIDEREAL_YEAR_SECONDS = 31558149.8          # Fixed sidereal year (SI seconds, matches script.js)
-MEAN_SIDEREAL_YEAR_DAYS = MEAN_SOLAR_YEAR_DAYS * (H / 13) / ((H / 13) - 1)  # ~365.2564 days
-MEAN_DAY_LENGTH = SIDEREAL_YEAR_SECONDS / MEAN_SIDEREAL_YEAR_DAYS            # ~86400.0 SI seconds
+# --- Day & Year constants (from constants_scripts, sourced from constants.js) ---
+MEAN_SOLAR_YEAR_DAYS = _MEAN_SOLAR_YEAR_DAYS
+SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S
+MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY
 OBLIQ_SENSITIVITY = 2.29 / MEAN_DAY_LENGTH  # days/degree obliquity change
-ECC_SENSITIVITY = -60 / MEAN_DAY_LENGTH     # days/unit eccentricity change (sidereal, matches script.js)
+ECC_SENSITIVITY = -60 / MEAN_DAY_LENGTH     # days/unit eccentricity change (sidereal)
 ANOM_ECC_AMPLITUDE = -6                     # seconds/unit eccentricity (anomalistic)
 MEAN_ANOM_YEAR_DAYS = MEAN_SOLAR_YEAR_DAYS * (H / 16) / ((H / 16) - 1)  # ~365.2597 days
 
-# --- Inclination constants ---
-EARTH_INCLIN_MEAN = 1.481179   # Mean inclination to invariable plane (degrees, matches script.js)
-EARTH_INCLIN_AMPL = 0.635970   # Inclination amplitude (degrees, matches script.js)
+# --- Earth parameters (from constants_scripts, sourced from constants.js) ---
+EARTH_INCLIN_MEAN = EARTH_INCLINATION_MEAN
+EARTH_INCLIN_AMPL = EARTH_INCLINATION_AMPLITUDE
 
 # =============================================================================
 # SECTION A (cont.): DERIVED PERIODS (all from H)
@@ -136,10 +139,10 @@ PLANETS = {
     },
 }
 
-# Earth mean values for normalization
-EARTH_OBLIQ_MEAN = 23.41357                                        # matches script.js earthtiltMean
-EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
+# Earth mean values for normalization (from constants_scripts, sourced from constants.js)
+EARTH_OBLIQ_MEAN = EARTH_OBLIQUITY_MEAN
+EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
+EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
 
 # Earth perihelion harmonics (for perihelion and ERD calculation)
