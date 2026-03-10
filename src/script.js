@@ -22224,83 +22224,60 @@ function buildDateSection(planetKey, testDate, data) {
     }
 
     if (isOccultation) {
-      // Occultation: Compare both planets against reference longitude-derived RA
+      // Occultation: color-code based on separation between the two planets
       const refLongitude = data.position.refLongitude;
       const companionKey = data.position.comparePlanet;
       const companionLabel = PLANET_HIERARCHIES[companionKey]?.label || companionKey;
-      const companionRARad = getCompanionPlanetRA(companionKey);
+      const companionPlanet = PLANET_OBJECTS[companionKey]();
+      const companionRARad = companionPlanet.ra;
 
-      // Compare current planet RA to longitude reference (only if longitude provided)
-      const planetRAStatus = refLongitude != null ? compareRAToLongitude(data.position.planetRARad, refLongitude) : 'none';
-      const planetRAColor = getColorFromStatus(planetRAStatus);
+      // Compute RA separation between the two planets (what defines an occultation)
+      let raDiff = Math.abs(data.position.planetRARad - companionRARad);
+      if (raDiff > Math.PI) raDiff = 2 * Math.PI - raDiff;
+      const raSepMinutes = raDiff * (12 / Math.PI) * 60; // RA separation in time-minutes
+      const sepStatus = raSepMinutes < 5 ? 'green' : raSepMinutes < 15 ? 'amber' : 'red';
+      const sepColor = getColorFromStatus(sepStatus);
 
-      // Compare companion planet RA to longitude reference (only if longitude provided)
-      const companionRAStatus = refLongitude != null ? compareRAToLongitude(companionRARad, refLongitude) : 'none';
-      const companionRAColor = getColorFromStatus(companionRAStatus);
+      // RA separation line (color-coded)
+      const sepStr = raSepMinutes.toFixed(1) + 'm';
+      const sepContent = 'RA separation:'.padEnd(24) + sepStr.padStart(22);
+      section += `|  <span style="color:${sepColor}">${sepContent}</span>|\n`;
+      section += `|  ${'-'.repeat(W - 4)}  |\n`;
 
-      // Reference RA from longitude (only show if longitude provided)
-      if (refLongitude != null) {
-        const refRAValue = longitudeToRAHMS(refLongitude);
-        const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
-        section += `|  ${refRAContent}|\n`;
-
-        // Show longitude value
-        const longContent = `(from longitude ${refLongitude}°)`.padEnd(46);
-        section += `|  ${longContent}|\n`;
-
-        section += `|  ${'-'.repeat(W - 4)}  |\n`;
-      }
-
-      // Current planet RA (color-coded)
+      // Current planet RA and Dec (plain)
       const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
-      const planetRAContentLine = `${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22);
-      section += `|  <span style="color:${planetRAColor}">${planetRAContentLine}</span>|\n`;
-
-      // Current planet Dec
+      section += `|  ${(`${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22))}|\n`;
       const decValue = decToDMSFromRadians(data.position.planetDecRad);
       section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
 
       section += `|  ${'-'.repeat(W - 4)}  |\n`;
 
-      // Companion planet RA (color-coded independently)
+      // Companion planet RA and Dec (plain)
       const companionRAValue = raToHMSFromRadians(companionRARad);
-      const companionRAContentLine = `${companionLabel} RA:`.padEnd(24) + companionRAValue.padStart(22);
-      section += `|  <span style="color:${companionRAColor}">${companionRAContentLine}</span>|\n`;
-
-      // Companion planet Dec
-      const companionPlanet = PLANET_OBJECTS[companionKey]();
+      section += `|  ${(`${companionLabel} RA:`.padEnd(24) + companionRAValue.padStart(22))}|\n`;
       const companionDecValue = decToDMSFromRadians(companionPlanet.dec);
       section += `|  ${(`${companionLabel} Dec:`.padEnd(24) + companionDecValue.padStart(22))}|\n`;
 
-    } else if (isObservation) {
-      // Historical observation comparison (e.g., Tycho Brahe)
-      // Compare model's computed Dec against observed Dec, show error
-      const decValue = decToDMSFromRadians(data.position.planetDecRad);
-      // Convert spherical phi to standard declination degrees (same formula as decToDMSFromRadians)
-      const phiRad = data.position.planetDecRad;
-      const decRad = (phiRad <= 0) ? phiRad + Math.PI / 2 : Math.PI / 2 - phiRad;
-      const modelDecDeg = decRad * (180 / Math.PI);
+      // Reference longitude (informational, no color)
+      if (refLongitude != null) {
+        section += `|  ${'-'.repeat(W - 4)}  |\n`;
+        section += `|  ${(`Ref longitude:`.padEnd(24) + (refLongitude + '°').padStart(22))}|\n`;
+      }
 
-      section += `|  OBSERVATION DATA (Tier ${testDate.tier || '?'})`.padEnd(W + 1) + `|\n`;
+    } else if (isObservation) {
+      // Historical observation data (e.g., Tycho Brahe) — informational only, no error scoring
+      const decValue = decToDMSFromRadians(data.position.planetDecRad);
+
+      section += `|  HISTORICAL OBSERVATION (${testDate.label || 'Unknown'})`.padEnd(W + 1) + `|\n`;
       section += `|  ${'-'.repeat(W - 4)}  |\n`;
 
       // Model Dec
       section += `|  ${(`${planetLabel} Dec (model):`.padEnd(24) + decValue.padStart(22))}|\n`;
 
-      // Observed Dec
+      // Reference Dec (informational, no error calculation)
       if (data.position.refDec) {
         const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
-        section += `|  ${('Observed Dec:'.padEnd(24) + refDecValue.padStart(22))}|\n`;
-
-        // Error in arcminutes
-        const obsDec = parseFloat(data.position.refDec);
-        const errorDeg = modelDecDeg - obsDec;
-        const errorArcmin = errorDeg * 60;
-        const errorStatus = Math.abs(errorArcmin) < 2 ? 'green' : Math.abs(errorArcmin) < 10 ? 'amber' : 'red';
-        const errorColor = getColorFromStatus(errorStatus);
-        const errorStr = (errorArcmin >= 0 ? '+' : '') + errorArcmin.toFixed(2) + "'";
-        const errorContent = 'Error:'.padEnd(24) + errorStr.padStart(22);
-        section += `|  <span style="color:${errorColor}">${errorContent}</span>|\n`;
+        section += `|  ${(`${testDate.label || 'Historical'} Ref:`.padEnd(24) + refDecValue.padStart(22))}|\n`;
       }
 
       // Model RA (informational)
@@ -22311,40 +22288,59 @@ function buildDateSection(planetKey, testDate, data) {
 
     } else {
       // Standard comparison (NASA, Opposition, Model start date, etc.)
-      let raStatus;
-      if (isOpposition) {
-        // Opposition dates: Planet RA should be ~12h away from Sun RA
-        raStatus = compareRAOpposition(data.position.planetRARad, data.position.sunRARad);
-      } else if (isNasaDate) {
-        // NASA dates: compare Planet RA vs Sun RA (transit check)
-        raStatus = compareRAToSun(data.position.planetRARad, data.position.sunRARad);
-      } else {
-        // Other dates (e.g., Model start date): compare Planet RA vs Reference RA
-        raStatus = compareRAToReference(data.position.planetRARad, data.position.refRA);
-      }
-
-      const raColor = getColorFromStatus(raStatus);
-
-      // Color-coded Planet RA
       const planetRAValue = raToHMSFromRadians(data.position.planetRARad);
-      const planetRAContent = `${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22);
-      section += `|  <span style="color:${raColor}">${planetRAContent}</span>|\n`;
-
-      // Show reference RA if provided (for non-NASA dates) - same color as Planet RA
-      if (!isNasaDate && !isOpposition && data.position.refRA) {
-        const refRAValue = raDecimalHoursToHMS(data.position.refRA);
-        const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
-        section += `|  <span style="color:${raColor}">${refRAContent}</span>|\n`;
-      }
-
-      // Dec line (no color coding)
       const decValue = decToDMSFromRadians(data.position.planetDecRad);
-      section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
+      let raColor = '';
 
-      // Show reference Dec if provided (no color coding)
-      if (data.position.refDec) {
-        const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
-        section += `|  ${('Reference Dec:'.padEnd(24) + refDecValue.padStart(22))}|\n`;
+      if (isOpposition) {
+        // Opposition: color-code Dec comparison (model vs reference), RA shown plain
+        let decColor = '';
+        if (data.position.refDec) {
+          const phiRad = data.position.planetDecRad;
+          const decRad = (phiRad <= 0) ? phiRad + Math.PI / 2 : Math.PI / 2 - phiRad;
+          const modelDecDeg = decRad * (180 / Math.PI);
+          const obsDec = parseFloat(data.position.refDec);
+          const errorArcmin = Math.abs(modelDecDeg - obsDec) * 60;
+          const decStatus = errorArcmin < 15 ? 'green' : errorArcmin < 30 ? 'amber' : 'red';
+          decColor = getColorFromStatus(decStatus);
+        }
+
+        section += `|  ${(`${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22))}|\n`;
+
+        if (decColor) {
+          const decContent = `${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22);
+          section += `|  <span style="color:${decColor}">${decContent}</span>|\n`;
+          const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
+          const refDecContent = 'Reference Dec:'.padEnd(24) + refDecValue.padStart(22);
+          section += `|  <span style="color:${decColor}">${refDecContent}</span>|\n`;
+        } else {
+          section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
+        }
+      } else {
+        // Non-opposition: color-code RA comparison
+        let raStatus;
+        if (isNasaDate) {
+          raStatus = compareRAToSun(data.position.planetRARad, data.position.sunRARad);
+        } else {
+          raStatus = compareRAToReference(data.position.planetRARad, data.position.refRA);
+        }
+        raColor = getColorFromStatus(raStatus);
+
+        const planetRAContent = `${planetLabel} RA:`.padEnd(24) + planetRAValue.padStart(22);
+        section += `|  <span style="color:${raColor}">${planetRAContent}</span>|\n`;
+
+        if (!isNasaDate && data.position.refRA) {
+          const refRAValue = raDecimalHoursToHMS(data.position.refRA);
+          const refRAContent = 'Reference RA:'.padEnd(24) + refRAValue.padStart(22);
+          section += `|  <span style="color:${raColor}">${refRAContent}</span>|\n`;
+        }
+
+        section += `|  ${(`${planetLabel} Dec:`.padEnd(24) + decValue.padStart(22))}|\n`;
+
+        if (data.position.refDec) {
+          const refDecValue = decDecimalDegreesToDMS(data.position.refDec);
+          section += `|  ${('Reference Dec:'.padEnd(24) + refDecValue.padStart(22))}|\n`;
+        }
       }
       section += `|  ${(`${planetLabel} Dist Earth:`.padEnd(24) + (data.position.planetDistE.toFixed(6) + ' AU').padStart(22))}|\n`;
       section += `|  ${(`${planetLabel} Dist Sun:`.padEnd(24) + (data.position.planetDistS.toFixed(6) + ' AU').padStart(22))}|\n`;
@@ -22353,10 +22349,15 @@ function buildDateSection(planetKey, testDate, data) {
       if (isNasaDate || isOpposition) {
         section += `|  ${'-'.repeat(W - 4)}  |\n`;
 
-        // Color-coded Sun RA (same color as Planet RA since they're being compared)
         const sunRAValue = raToHMSFromRadians(data.position.sunRARad);
-        const sunRAContent = 'Sun RA:'.padEnd(24) + sunRAValue.padStart(22);
-        section += `|  <span style="color:${raColor}">${sunRAContent}</span>|\n`;
+        if (isOpposition) {
+          // Opposition: Sun RA shown plain
+          section += `|  ${('Sun RA:'.padEnd(24) + sunRAValue.padStart(22))}|\n`;
+        } else {
+          // NASA dates: Sun RA color-coded same as Planet RA
+          const sunRAContent = 'Sun RA:'.padEnd(24) + sunRAValue.padStart(22);
+          section += `|  <span style="color:${raColor}">${sunRAContent}</span>|\n`;
+        }
 
         section += `|  ${('Sun Dec:'.padEnd(24) + decToDMSFromRadians(data.position.sunDecRad).padStart(22))}|\n`;
         section += `|  ${('Sun Dist Earth:'.padEnd(24) + (data.position.sunDistE.toFixed(6) + ' AU').padStart(22))}|\n`;
