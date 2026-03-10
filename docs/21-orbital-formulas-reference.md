@@ -10,6 +10,7 @@ This document provides a complete reference for all orbital calculation function
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
 - [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (Ω-based approach)
 - [Ascending Node Calculations](31-ascending-node-calculations.md) - Ascending node shifts with obliquity
+- [Formula Derivation](35-formula-derivation.md) - Theoretical derivation of precession formulas from Fibonacci periods
 
 ---
 

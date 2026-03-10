@@ -13,6 +13,8 @@ The six Fibonacci Laws form a layered architecture:
 - **Laws 4–5** (Eccentricity Constant + Balance) — all 8 eccentricities are determined by Fibonacci pair constraints on the AMD partition ratio, and satisfy an independent balance condition
 - **Law 6** (Saturn-Jupiter-Earth Resonance) — a closed beat-frequency loop linking three dominant precession periods
 
+For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
+
 The central formula for inclination amplitudes is:
 
 ```
