@@ -40,18 +40,19 @@ ANCHOR_YEAR = -302355           # balancedYear: 1246 - 14.5*(H/16)
 J2000 = 2000                    # J2000 epoch (perihelion reference)
 
 # --- Day & Year constants ---
-MEAN_SOLAR_YEAR_DAYS = 365.242188997508     # Mean solar year (days)
-SIDEREAL_YEAR_SECONDS = 31558149.724        # Fixed sidereal year (SI seconds)
+_INPUT_SOLAR_YEAR = 365.2421897             # Input value (matches script.js)
+MEAN_SOLAR_YEAR_DAYS = round(_INPUT_SOLAR_YEAR * (H / 16)) / (H / 16)  # Computed mean (same as script.js)
+SIDEREAL_YEAR_SECONDS = 31558149.8          # Fixed sidereal year (SI seconds, matches script.js)
 MEAN_SIDEREAL_YEAR_DAYS = MEAN_SOLAR_YEAR_DAYS * (H / 13) / ((H / 13) - 1)  # ~365.2564 days
 MEAN_DAY_LENGTH = SIDEREAL_YEAR_SECONDS / MEAN_SIDEREAL_YEAR_DAYS            # ~86400.0 SI seconds
 OBLIQ_SENSITIVITY = 2.29 / MEAN_DAY_LENGTH  # days/degree obliquity change
-ECC_SENSITIVITY = -3208 / MEAN_DAY_LENGTH   # days/unit eccentricity change (sidereal)
+ECC_SENSITIVITY = -60 / MEAN_DAY_LENGTH     # days/unit eccentricity change (sidereal, matches script.js)
 ANOM_ECC_AMPLITUDE = -6                     # seconds/unit eccentricity (anomalistic)
 MEAN_ANOM_YEAR_DAYS = MEAN_SOLAR_YEAR_DAYS * (H / 16) / ((H / 16) - 1)  # ~365.2597 days
 
 # --- Inclination constants ---
-EARTH_INCLIN_MEAN = 1.481592   # Mean inclination to invariable plane (degrees)
-EARTH_INCLIN_AMPL = 0.633849   # Inclination amplitude (degrees)
+EARTH_INCLIN_MEAN = 1.481179   # Mean inclination to invariable plane (degrees, matches script.js)
+EARTH_INCLIN_AMPL = 0.635970   # Inclination amplitude (degrees, matches script.js)
 
 # =============================================================================
 # SECTION A (cont.): DERIVED PERIODS (all from H)
@@ -136,7 +137,7 @@ PLANETS = {
 }
 
 # Earth mean values for normalization
-EARTH_OBLIQ_MEAN = 23.414
+EARTH_OBLIQ_MEAN = 23.41357                                        # matches script.js earthtiltMean
 EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
 EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
@@ -204,8 +205,8 @@ def calc_obliquity(year: int) -> float:
     """Calculate Earth's obliquity at given year (degrees)."""
     t = time_offset(year)
     obliq = EARTH_OBLIQ_MEAN
-    obliq -= 0.634 * math.cos(2 * math.pi * t / INCLIN_CYCLE)
-    obliq += 0.634 * math.cos(2 * math.pi * t / OBLIQ_CYCLE)
+    obliq -= EARTH_INCLIN_AMPL * math.cos(2 * math.pi * t / INCLIN_CYCLE)
+    obliq += EARTH_INCLIN_AMPL * math.cos(2 * math.pi * t / OBLIQ_CYCLE)
     return obliq
 
 
