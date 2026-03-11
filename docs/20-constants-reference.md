@@ -407,19 +407,20 @@ These come from external astronomical sources and do not change with the model.
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
 
-## Measurement Offset Corrections (Derived)
+## Coin Rotation Offsets (Derived)
 
-These offsets arise from measuring from Earth's precessing position rather than fixed reference points.
+These offsets arise from the coin rotation paradox — precessing reference frames cause systematic measurement biases that cancel with multi-angle averaging.
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Solar Day Offset | `solarDayOffsetMs` | 86400 / (H/16) / 365.2422 × 1000 | ~11.34 ms/day |
-| Yearly accumulation | `solarDayOffsetYearlySeconds` | offset × 365.2422 | ~4.14 s/year |
-| Wobble Parallax | `wobbleParallaxSeconds` | (r/D) × (T_sid / T_wobble) × T_sid | ~1.748 s |
+| Perihelion Coin Rotation | `perihelionCoinRotationMs` | meanlengthofday / (H/16) / meansolaryearlengthinDays × 1000 | ~11.34 ms/day |
+| Yearly accumulation | `perihelionCoinRotationYearlySeconds` | offset × meansolaryearlengthinDays | ~4.14 s/year |
+| Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / (H/13) / (meansolaryearlengthinDays + 1) × 1000 | ~9.12 ms/sidereal day |
+| Yearly accumulation | `axialCoinRotationYearlySeconds` | offset × (meansolaryearlengthinDays + 1) | ~3.34 s/year |
 
-**Solar Day Offset**: Perihelion precession causes the measured solar day to be ~11.4 ms short. This accumulates to 1 extra day over one perihelion cycle (H/16).
+**Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle. Note: RA-based solar day measurements (Method A) show a mean offset of ~14.2 ms shorter than `meanlengthofday`, confirmed across 65 epochs over one full H. The physical cause of this 14.2 ms offset is not yet explained — perihelion precession produces only a sinusoidal modulation (~7.1 ms amplitude) that cancels in the mean.
 
-**Wobble Parallax**: Earth orbits the wobble center (radius = `eccentricityAmplitude` AU), creating a parallax effect when measuring the Sun's position. This adds a constant offset to the sidereal year when measured from Earth.
+**Axial Coin Rotation**: Axial precession (H/13) causes the stellar day to exceed the sidereal day by ~9.1 ms. This accumulates to 1 extra sidereal day over one axial precession cycle.
 
 ## Moon Constants (External)
 

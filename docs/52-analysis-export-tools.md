@@ -225,7 +225,7 @@ Downloads an Excel file (`Holistic_year_analysis_YYYY_YYYY.xlsx`) containing 5 s
 - **Mean Tropical Year**: Average of 4 cardinal points with IAU comparison
 - **Anomalistic Year**: Perihelion-to-perihelion and aphelion-to-aphelion intervals
 - **Sidereal Year**: Measured sidereal year with IAU comparison
-- **Measurement Offset Corrections**: Solar day offset and wobble parallax values
+- **Coin Rotation Effects**: Orbital, perihelion, and axial coin rotation offsets
 - **Precession Calculation**: Derived precession period from sidereal/tropical difference
 
 #### Sheet 2: Cardinal Points

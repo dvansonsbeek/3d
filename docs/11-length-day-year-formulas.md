@@ -45,8 +45,9 @@ All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the
 | Anomalistic | `tropical × H / (H − 16)` | 365.259636051010 |
 
 The ratios `H/(H−13)` and `H/(H−16)` come from the coin rotation paradox:
-- The sidereal year exceeds the tropical year by 1 part in `H/13 − 1` (axial precession)
-- The anomalistic year exceeds the tropical year by 1 part in `H/16 − 1` (perihelion precession)
+- In one axial precession cycle (H/13), there is exactly **1 fewer sidereal year than tropical years** — the precessing equinox "absorbs" one full orbit
+- In one perihelion precession cycle (H/16), there is exactly **1 fewer anomalistic year than tropical years** — the precessing perihelion "absorbs" one full orbit
+- In one inclination precession cycle (H/3), there is exactly **1 fewer anomalistic year than sidereal years**
 
 
 ## Fourier Harmonic Variations
@@ -141,9 +142,9 @@ stellarDay = siderealDay × (1 + 1/(precessionPeriod × rotationsPerYear))
 
 This adds ~9.1 ms to the sidereal day at the current epoch.
 
-### Perihelion Precession Effect on Solar Day
+### RA Solar Day Measurement Offset
 
-RA-based solar day measurements (tracking the Sun's right ascension from Earth's wobble center or Earth's position) show the mean solar day ~8.5 ms shorter than 86,400 s. This is not an error — it is a real effect of perihelion precession (H/16 ≈ 20,938 yr cycle) slowly shifting the RA reference frame. Methods that use a fixed reference frame or derive from the sidereal day correctly yield ~86,400.000 s.
+RA-based solar day measurements (tracking the Sun's right ascension from Earth's wobble center or Earth's position) show the mean solar day ~14.2 ms shorter than `meanlengthofday`. This has been confirmed by the "Solar day multiepoch" test: 65 measurements evenly distributed across one full holistic year (H), mean offset −14.194 ms/day. The physical cause is not yet fully explained and requires further investigation. Methods that use a fixed reference frame or derive from the sidereal day correctly yield `meanlengthofday` ≈ 86,400 s.
 
 ### J2000 Day-Length Values
 
@@ -168,6 +169,15 @@ All precession periods emerge from ratios of year lengths:
 | Ecliptic | axial × 13/5 | H/5 ≈ 67,002 yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
+
+The coin rotation paradox manifests at every timescale — years, days, and seconds all follow the same pattern of "1 fewer cycle per precession period":
+
+| Timescale | Precession | Cycle absorbed | Offset per cycle |
+|-----------|------------|---------------|-----------------|
+| Years | Axial (H/13) | 1 fewer sidereal year than tropical years | ~20 min/year |
+| Years | Perihelion (H/16) | 1 fewer anomalistic year than tropical years | ~15 min/year |
+| Days | Orbital (1 year) | 1 fewer solar day than sidereal days | ~3m 56s/day |
+| Days | Axial (H/13) | 1 fewer sidereal day than stellar days | ~9.1 ms/day |
 
 
 ## J2000 Reference Values
@@ -209,22 +219,57 @@ siderealYear(seconds) = siderealYear(days) × dayLength
 
 No matter how year lengths vary over millennia, the sidereal year in SI seconds remains constant — it is the orbital period, determined by Kepler's 3rd law and the Sun's gravitational field. All variation in other quantities ultimately traces back to changes in how many *days* fit into this fixed number of seconds.
 
-### The 11.4ms Solar Day Offset (Perihelion Precession)
+### The 14.2ms RA Solar Day Offset (Unknown Cause)
 
-RA-based solar day measurements (Methods A and D) consistently show the mean solar day ~11.4 ms shorter than 86,400 s. This accumulates to exactly **one extra day per perihelion cycle**:
+RA-based solar day measurements (Methods A and D) consistently show the mean solar day ~14.2 ms shorter than `meanlengthofday`. This has been confirmed by the "Solar day multiepoch" test across 65 epochs spanning one full holistic year H. The physical cause of the mean offset is not yet fully explained and requires further investigation. Perihelion precession produces a sinusoidal modulation (~7.1 ms amplitude, period H/16) that cancels in the mean and does not explain the constant offset.
+
+#### Fourier Decomposition of the Offset
+
+A regression analysis of the 65-epoch dataset (R² = 0.994, RMS = 0.324 ms) reveals two modulation components on top of the unexplained mean:
 
 ```
-11.4 ms/day × 365.24 days/year × H/16 years = 86,812 s ≈ 1.005 days
+offset(t) = −14.194 − 5.640 × cos(2π·t/(H/16)) − 1.684 × cos(2π·t/(H/8))   [ms/day]
+```
+
+where `t` is time in tropical years relative to the balanced reference epoch.
+
+Equivalent linear form using orbital parameters at each epoch:
+
+```
+offset ≈ −45.92 + 4116.85 × ecc − 1.3494 × obliq   [ms/day]
+```
+
+where `ecc` is orbital eccentricity and `obliq` is axial obliquity in degrees.
+
+| Component | Period | Amplitude | Driver |
+|-----------|--------|-----------|--------|
+| Mean offset | — | −14.194 ms | unknown (constant term) |
+| Cosine term 1 | H/16 = 20,938 yr | ±5.640 ms | Eccentricity (perihelion precession) |
+| Cosine term 2 | H/8 = 41,876 yr | ±1.684 ms | Obliquity (obliquity cycle) |
+
+The dominant modulation tracks eccentricity over the perihelion precession cycle (H/16), and the secondary term tracks obliquity over the obliquity cycle (H/8). The constant mean of −14.194 ms itself remains unexplained from first principles.
+
+### The 9.1ms Stellar-Sidereal Day Offset (Axial Precession)
+
+The stellar day (rotation relative to fixed stars) exceeds the sidereal day (rotation relative to the precessing vernal equinox) by ~9.1 ms. This accumulates to exactly **one extra sidereal day per axial precession cycle**:
+
+```
+9.12 ms/day × 366.24 sidereal days/year × H/13 years = 86,064 s ≈ 1.00 sidereal days
 ```
 
 Verification from first principles:
 
 ```
-Total days in one perihelion cycle: (H/16) × 365.242 = 7,622,683 days
-One extra day spread over the cycle: 86400 s / 7,622,683 = 11.34 ms/day  ✓
+Total sidereal days in one axial precession cycle: (H/13) × 366.242 = 9,440,850 sidereal days
+One extra sidereal day spread over the cycle: 86164 s / 9,440,850 = 9.13 ms/sidereal day  ✓
 ```
 
-This is analogous to how the sidereal year exceeds the tropical year by one day per axial precession cycle — but here it is perihelion precession (not axial precession) creating the effect. The Sun's apparent RA path shifts slightly each year as perihelion drifts, and over one complete H/16 circuit, this accumulates to exactly one extra solar day.
+The two offsets form a symmetric pair — both arising from the coin rotation paradox:
+
+| Effect | Daily offset | Days/year | Precession cycle | Accumulates to |
+|--------|-------------|-----------|-----------------|----------------|
+| RA solar day offset | ~14.2 ms | 365.24 solar | unknown | unknown (under investigation) |
+| Stellar-sidereal offset | ~9.1 ms | 366.24 sidereal | H/13 (axial) | 1 extra sidereal day |
 
 ### Cardinal Point Tropical Year Variation
 

@@ -656,7 +656,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Mean sidereal year: 365.2564103 days — 4.1 seconds longer than known (0.13 ppm)
 - Mean anomalistic year: 365.2596923 days — 4.9 seconds longer than known (0.15 ppm)
 - Frequency relationship 1/tropical = 1/sidereal + 1/precession: **EXACT** (algebraic identity from the derivation)
-- Day length: model solar day = 86399.989 seconds (11.3 ms short of 86400 — this IS the perihelion precession contribution, accumulated over H/16 years = exactly 1 extra day)
+- Day length: RA-based solar day measurements show a mean offset of ~14.2 ms shorter than `meanlengthofday`, confirmed across 65 epochs over one full H. The physical cause is under investigation; perihelion precession contributes sinusoidal modulation (±5.6 ms, period H/16) but does not explain the constant offset.
 - Season asymmetry: model captures ~50% of observed asymmetry (±0.97° vs Kepler's ±1.92°) — confirms the constant-speed limitation analysis from Phase 1
 
 ##### What these results confirm:

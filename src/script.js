@@ -900,28 +900,6 @@ const ASTRO_REFERENCE = {
   // These offsets arise from measuring from Earth's precessing position rather
   // than from fixed reference points.
 
-  // Solar Day Offset (11.4 ms/day)
-  // Perihelion precession causes the measured solar day to be ~11.4ms short.
-  // Accumulates to 1 extra day over one perihelion cycle (H/16).
-  get solarDayOffsetMs() {
-    const perihelionCycle = holisticyearLength / 16;  // H/16 years
-    return (86400 / perihelionCycle) / 365.2421897 * 1000;  // ~11.34 ms
-  },
-  get solarDayOffsetYearlySeconds() {
-    return this.solarDayOffsetMs * 365.2421897 / 1000;  // ~4.14 seconds/year
-  },
-
-  // Wobble Parallax (1.748 seconds)
-  // Earth orbits the wobble center (radius = eccentricityAmplitude AU),
-  // creating a parallax offset to the sidereal year when measured from Earth.
-  get wobbleParallaxSeconds() {
-    const r = eccentricityAmplitude;  // eccentricityAmplitude in AU
-    const D = 1;          // Sun distance in AU
-    const T_wobble_years = holisticyearLength / 13;  // 25,683.69 years
-    const T_sidereal_seconds = 365.256363 * 86400;  // ~31,558,150 seconds
-    return (r / D) * (T_sidereal_seconds / (T_wobble_years * 365.256363 * 86400)) * T_sidereal_seconds;
-  },
-
   // --- 8g. Parallax correction coefficients ---
   // Post-hoc RA/Dec correction for geocentric parallax effect (15-param model).
   // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
@@ -967,6 +945,14 @@ const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLen
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
 const meanSiderealday = (meansolaryearlengthinDays/(meansolaryearlengthinDays+1))*meanlengthofday;
 const meanStellarday = (meanSiderealday/(holisticyearLength/13))/(meansolaryearlengthinDays+1)+meanSiderealday;
+// --- Coin rotation offsets (derived from day/year lengths and precession cycles) ---
+// Perihelion coin rotation: 1 extra solar day over H/16 cycle
+const perihelionCoinRotationMs = (meanlengthofday / (holisticyearLength / 16)) / meansolaryearlengthinDays * 1000;
+const perihelionCoinRotationYearlySeconds = perihelionCoinRotationMs * meansolaryearlengthinDays / 1000;
+// Axial coin rotation: 1 extra sidereal day over H/13 cycle
+const axialCoinRotationMs = (meanSiderealday / (holisticyearLength / 13)) / (meansolaryearlengthinDays + 1) * 1000;
+const axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengthinDays + 1) / 1000;
+
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 const psiConstant = psiNumerator / (2 * holisticyearLength);  // ≈ 3.291×10⁻³
@@ -14781,6 +14767,8 @@ function setupGUI() {
     'Measure Earth\'s rotation period relative to the vernal equinox.');
   addTestButton('Analyze Solar Day', analyzeSolarDay,
     'Measure Earth\'s rotation period relative to the Sun (mean solar day).');
+  addTestButton('Solar Day Multi-Epoch', analyzeSolarDayMultiEpoch,
+    'Measure solar day offset at 65 epochs (H/64 steps) across one full holistic year.');
   addTestButton('Analyze Stellar Day', analyzeStellarDay,
     'Measure Earth\'s rotation period relative to distant stars.');
 
@@ -16331,6 +16319,7 @@ async function runYearAnalysisExport(years) {
   const meanAphelion = requestedAphIntervals.length > 0
     ? requestedAphIntervals.reduce((a, b) => a + b, 0) / requestedAphIntervals.length
     : 0;
+  const meanAnomalisticYear = (meanPerihelion + meanAphelion) / 2;
 
   // Compute intervals and means for each sidereal reference angle
   for (const key of Object.keys(siderealData)) {
@@ -16364,60 +16353,88 @@ async function runYearAnalysisExport(years) {
 
   // Sheet 1: Summary
   const summaryRows = [
-    ['YEAR ANALYSIS REPORT'],
-    ['Generated', new Date().toISOString()],
-    ['Analysis Period', `${startYear} to ${endYear} (${endYear - startYear} years)`],
+    ['DAYS & YEARS & PRECESSION REPORT'],
+    ['GENERATED', new Date().toISOString()],
+    ['ANALYSIS PERIOD', `${startYear} to ${endYear} (${endYear - startYear} years)`],
     [],
-    ['ORBITAL PARAMETERS (at mid-point year ' + midYear + ')'],
-    ['Obliquity (°)', obliquity?.toFixed(6) || 'N/A'],
-    ['Eccentricity', eccentricity?.toFixed(8) || 'N/A'],
+    ['0. MODEL CONSTANTS (configured & derived)'],
+    ['1a) Days'],
+    ['Mean Solar Day in Seconds', meanlengthofday.toFixed(9)],
+    ['Mean Sidereal Day in Seconds', meanSiderealday.toFixed(9)],
+    ['Mean Stellar Day in Seconds', meanStellarday.toFixed(9)],
     [],
-    ['TROPICAL YEAR BY CARDINAL POINT', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
-    ['Vernal Equinox (RA=0°)', cardinalData.VE.mean.toFixed(9), cardinalData.VE.iauRef.toFixed(9), ((cardinalData.VE.mean - cardinalData.VE.iauRef) * 86400).toFixed(2)],
-    ['Summer Solstice (RA=90°)', cardinalData.SS.mean.toFixed(9), cardinalData.SS.iauRef.toFixed(9), ((cardinalData.SS.mean - cardinalData.SS.iauRef) * 86400).toFixed(2)],
-    ['Autumnal Equinox (RA=180°)', cardinalData.AE.mean.toFixed(9), cardinalData.AE.iauRef.toFixed(9), ((cardinalData.AE.mean - cardinalData.AE.iauRef) * 86400).toFixed(2)],
-    ['Winter Solstice (RA=270°)', cardinalData.WS.mean.toFixed(9), cardinalData.WS.iauRef.toFixed(9), ((cardinalData.WS.mean - cardinalData.WS.iauRef) * 86400).toFixed(2)],
+    ['1b) Years'],
+    ['Mean Tropical Year in Days', meansolaryearlengthinDays.toFixed(9)],
+    ['Mean Tropical Year in Seconds', (meansolaryearlengthinDays * meanlengthofday).toFixed(9)],
+    ['Mean Sidereal Year in Days', meansiderealyearlengthinDays.toFixed(9)],
+    ['Mean Sidereal Year in Seconds', meansiderealyearlengthinSeconds.toFixed(9)],
+    ['Mean Anomalistic Year in Days', meanAnomalisticYearinDays.toFixed(9)],
+    ['Mean Anomalistic Year in Seconds', (meanAnomalisticYearinDays * meanlengthofday).toFixed(9)],
     [],
-    ['MEAN TROPICAL YEAR (average of 4 cardinal points)'],
-    ['Measured Mean', meanTropicalYear.toFixed(9)],
-    ['IAU Mean J2000', ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)],
-    ['Difference (seconds)', ((meanTropicalYear - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2)],
-    ['Model Configured', meansolaryearlengthinDays.toFixed(9)],
+    ['1. TROPICAL YEAR', 'Measured (days)'],
+    ['IAU Tropical Year J2000', ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)],
+    ['Measured Tropical Year (Mean in Analysis Period)', meanTropicalYear.toFixed(9)],
     [],
-    ['ANOMALISTIC YEAR', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
-    ['Perihelion to Perihelion', meanPerihelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanPerihelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
-    ['Aphelion to Aphelion', meanAphelion.toFixed(9), ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9), ((meanAphelion - ASTRO_REFERENCE.anomalisticYearJ2000) * 86400).toFixed(2)],
+    ['1a) Tropical Year by Cardinal Point', 'Measured (days)'],
+    ['Vernal Equinox (RA=0°)', cardinalData.VE.mean.toFixed(9)],
+    ['Summer Solstice (RA=90°)', cardinalData.SS.mean.toFixed(9)],
+    ['Autumnal Equinox (RA=180°)', cardinalData.AE.mean.toFixed(9)],
+    ['Winter Solstice (RA=270°)', cardinalData.WS.mean.toFixed(9)],
     [],
-    ['SIDEREAL YEAR BY REFERENCE ANGLE', 'Measured (days)', 'IAU J2000 Ref (days)', 'Diff (seconds)'],
-    ['At 0° ICRF', siderealData.S0.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S0.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
-    ['At 90° ICRF', siderealData.S90.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S90.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
-    ['At 180° ICRF', siderealData.S180.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S180.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
-    ['At 270° ICRF', siderealData.S270.mean.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((siderealData.S270.mean - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
+    ['2. SIDEREAL YEAR', 'Measured (days)'],
+    ['IAU Sidereal Year J2000', ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)],
+    ['Measured Sidereal Year (Mean in Analysis Period)', meanSiderealYear.toFixed(9)],
     [],
-    ['MEAN SIDEREAL YEAR (average of 4 reference angles)'],
-    ['Measured Mean', meanSiderealYear.toFixed(9), ASTRO_REFERENCE.siderealYearJ2000.toFixed(9), ((meanSiderealYear - ASTRO_REFERENCE.siderealYearJ2000) * 86400).toFixed(2)],
-    ['Sidereal - Tropical (model)', '', '', ((meanSiderealYear - meanTropicalYear) * 86400).toFixed(2)],
-    ['Sidereal - Tropical (IAU)', '', '', ((ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2)],
+    ['2a) Sidereal Year by Cardinal Point', 'Measured (days)'],
+    ['Vernal Equinox (RA=0°)', siderealData.S0.mean.toFixed(9)],
+    ['Summer Solstice (RA=90°)', siderealData.S90.mean.toFixed(9)],
+    ['Autumnal Equinox (RA=180°)', siderealData.S180.mean.toFixed(9)],
+    ['Winter Solstice (RA=270°)', siderealData.S270.mean.toFixed(9)],
     [],
-    ['MEASUREMENT OFFSET CORRECTIONS'],
+    ['3. ANOMALISTIC YEAR', 'Measured (days)'],
+    ['IAU Anomalistic Year J2000', ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)],
+    ['Measured Anomalistic Year (Mean in Analysis Period)', meanAnomalisticYear.toFixed(9)],
+    [],
+    ['3a) Anomalistic Year by Aphelion/Perihelion', 'Measured (days)'],
+    ['Perihelion to Perihelion', meanPerihelion.toFixed(9)],
+    ['Aphelion to Aphelion', meanAphelion.toFixed(9)],
+    [],
+    ['4. DERIVED DAY LENGTHS (from measured year lengths)', 'Value (seconds)'],
+    ['Mean Solar Day = siderealYearSeconds / measuredSiderealYear', (meansiderealyearlengthinSeconds / meanSiderealYear).toFixed(6)],
+    ['Mean Sidereal Day = tropicalYearSec / (tropicalYearSec / 86400 + 1)', (() => { const tropSec = meanTropicalYear * (meansiderealyearlengthinSeconds / meanSiderealYear); return (tropSec / (tropSec / 86400 + 1)).toFixed(6); })()],
+    ['Mean Stellar Day = siderealDay × (1 + 1 / (axialPrecession × rotationsPerYear))', (() => { const measuredLOD = meansiderealyearlengthinSeconds / meanSiderealYear; const tropSec = meanTropicalYear * measuredLOD; const sidDay = tropSec / (tropSec / 86400 + 1); const axialPrec = meanSiderealYear / (meanSiderealYear - meanTropicalYear); const rotPerYear = meanTropicalYear + 1; return (sidDay * (1 + 1 / (axialPrec * rotPerYear))).toFixed(6); })()],
+    [],
+    ['COIN ROTATION EFFECTS'],
     [''],
-    ['Solar Day Offset (perihelion precession effect)'],
+    ['Orbital Coin Rotation (1 year)'],
+    ['  1 fewer solar day than sidereal days per year'],
+    ['  Solar days per year', '', '', meansolaryearlengthinDays.toFixed(6)],
+    ['  Sidereal days per year', '', '', (meansolaryearlengthinDays + 1).toFixed(6)],
+    ['  Daily offset (solar − sidereal day)', '', '', ((meanlengthofday - meanSiderealday)).toFixed(4) + ' s (' + ((meanlengthofday - meanSiderealday) * 1000).toFixed(1) + ' ms)'],
+    [''],
+    ['Perihelion Coin Rotation (H/16)'],
+    ['  1 extra solar day over perihelion precession cycle'],
     ['  Formula: (meanLengthOfDay / perihelionCycle) / solarDaysPerYear'],
-    ['  Daily offset', '', '', ASTRO_REFERENCE.solarDayOffsetMs.toFixed(2) + ' ms/day'],
-    ['  Yearly accumulation', '', '', ASTRO_REFERENCE.solarDayOffsetYearlySeconds.toFixed(2) + ' s/year'],
-    ['  Effect: adds 1 extra day over perihelion cycle (H/16)'],
+    ['  Daily offset', '', '', perihelionCoinRotationMs.toFixed(2) + ' ms/day'],
+    ['  Yearly accumulation', '', '', perihelionCoinRotationYearlySeconds.toFixed(2) + ' s/year'],
     [''],
-    ['Wobble Parallax (Earth-wobble measurement effect)'],
-    ['  Formula: ΔT = (r/D) × (T_sid/T_wobble) × T_sid'],
-    ['  Where: r = 0.0014226 AU, D = 1 AU, T_wobble = H/13 = 25,683.69 years'],
-    ['  Wobble parallax (C-D difference)', '', '', ASTRO_REFERENCE.wobbleParallaxSeconds.toFixed(3) + ' s (constant)'],
+    ['Axial Coin Rotation (H/13)'],
+    ['  1 extra sidereal day over axial precession cycle'],
+    ['  Formula: (meanSiderealDay / axialCycle) / siderealDaysPerYear'],
+    ['  Daily offset', '', '', axialCoinRotationMs.toFixed(2) + ' ms/sidereal day'],
+    ['  Yearly accumulation', '', '', axialCoinRotationYearlySeconds.toFixed(2) + ' s/year'],
     [],
     ['PRECESSION CALCULATION'],
-    ['Sidereal Year (4-pt mean)', meanSiderealYear.toFixed(9), '', ''],
-    ['Mean Tropical Year', meanTropicalYear.toFixed(9), '', ''],
+    ['  IAU Axial Precession J2000', ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years'],
+    ['  IAU Δ Sidereal Year - Tropical Year J2000', ((ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2) + ' s'],
+    ['  Measured Δ Sidereal - Tropical Year Analysis Period', ((meanSiderealYear - meanTropicalYear) * 86400).toFixed(2) + ' s'],
     [''],
-    ['Precession = Sidereal / (Sidereal - Tropical)'],
-    ['  Calculated precession', (meanSiderealYear / (meanSiderealYear - meanTropicalYear)).toFixed(2) + ' years', ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2) + ' years (IAU J2000)', '']
+    ['Axial Precession = Sidereal / (Sidereal - Tropical)'],
+    ['  Measured Axial precession (Mean in Analysis Period)', (meanSiderealYear / (meanSiderealYear - meanTropicalYear)).toFixed(2) + ' years'],
+    ['Inclination Precession = Anomalistic / (Anomalistic - Sidereal)'],
+    ['  Measured Inclination precession (Mean in Analysis Period)', (meanAnomalisticYear / (meanAnomalisticYear - meanSiderealYear)).toFixed(2) + ' years'],
+    ['Perihelion Precession = Anomalistic / (Anomalistic - Tropical)'],
+    ['  Measured Perihelion precession (Mean in Analysis Period)', (meanAnomalisticYear / (meanAnomalisticYear - meanTropicalYear)).toFixed(2) + ' years']
   ];
 
   // Helper to get interval by year from a Map
@@ -16436,119 +16453,104 @@ async function runYearAnalysisExport(years) {
   const siderealByYear = new Map(siderealData.S90.crossings.map(e => [e.year, e]));
   const orbParamsByYear = new Map(yearlyOrbitalParams.map(e => [e.year, e]));
 
-  // Sheet 2: Cardinal Points Detail (filter to user-requested years only)
-  const cardinalRows = [
-    ['Year', 'VE JD', 'VE Interval (days)', 'SS JD', 'SS Interval (days)', 'AE JD', 'AE Interval (days)', 'WS JD', 'WS Interval (days)']
+  // Sheet 2: Year Length & Precession (consolidated from Cardinal Points, Anomalistic, Sidereal, Detailed)
+  const detailedRows = [
+    ['JD', 'Date', 'Time', 'Model Year (mean tropical)',
+     'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year',
+     'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval',
+     'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)',
+     'Aphelion JD', 'Aphelion Dist (AU)', 'Aph Interval (days)',
+     'Mean Anomalistic',
+     'Sid 0°', 'Sid 90°', 'Sid 180°', 'Sid 270°', 'Mean Sidereal',
+     'Axial Precession', 'Perihelion Precession', 'Inclination Precession',
+     'Obliquity Cycle Mean', 'Ecliptic Precession']
   ];
-  for (const year of requestedYears) {
-    const veEvent = veEventsByYear.get(year);
-    const ssEvent = ssEventsByYear.get(year);
-    const aeEvent = aeEventsByYear.get(year);
-    const wsEvent = wsEventsByYear.get(year);
-    const row = [
-      year,
-      veEvent?.jd?.toFixed(6) || '',
-      getInterval(cardinalData.VE.intervalsByYear, year),
-      ssEvent?.jd?.toFixed(6) || '',
-      getInterval(cardinalData.SS.intervalsByYear, year),
-      aeEvent?.jd?.toFixed(6) || '',
-      getInterval(cardinalData.AE.intervalsByYear, year),
-      wsEvent?.jd?.toFixed(6) || '',
-      getInterval(cardinalData.WS.intervalsByYear, year)
-    ];
-    cardinalRows.push(row);
-  }
 
-  // Sheet 3: Anomalistic Data (filter to user-requested years only)
-  const anomalisticRows = [
-    ['Year', 'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)', 'Aphelion JD', 'Aphelion Dist (AU)', 'Aph Interval (days)']
-  ];
+  const obliquityCycleMean = holisticyearLength / 8;
+
   for (const year of requestedYears) {
+    const orbParams = orbParamsByYear.get(year) || {};
+    const veEvent = veEventsByYear.get(year);
     const peri = periByYear.get(year);
     const aph = aphByYear.get(year);
-    const row = [
-      year,
+
+    // JD, Date, Time from VE event (or estimate from model year)
+    const refJD = veEvent?.jd || (startmodelJD + (year + 0.21 - startmodelYear) * meansolaryearlengthinDays);
+    const dateInfo = jdToDateString(refJD);
+
+    // Mean tropical year (average of 4 cardinal intervals)
+    const veInt = cardinalData.VE.intervalsByYear.get(year);
+    const ssInt = cardinalData.SS.intervalsByYear.get(year);
+    const aeInt = cardinalData.AE.intervalsByYear.get(year);
+    const wsInt = cardinalData.WS.intervalsByYear.get(year);
+    const meanTrop = (veInt !== undefined && ssInt !== undefined && aeInt !== undefined && wsInt !== undefined)
+      ? (veInt + ssInt + aeInt + wsInt) / 4 : null;
+
+    // Mean anomalistic (average of perihelion + aphelion intervals)
+    const periInt = perihelionIntervalsByYear.get(year);
+    const aphInt = aphelionIntervalsByYear.get(year);
+    const meanAnom = (periInt !== undefined && aphInt !== undefined)
+      ? (periInt + aphInt) / 2 : null;
+
+    // Mean sidereal (4-angle average)
+    const si0   = siderealData.S0.intervalsByYear.get(year);
+    const si90  = siderealData.S90.intervalsByYear.get(year);
+    const si180 = siderealData.S180.intervalsByYear.get(year);
+    const si270 = siderealData.S270.intervalsByYear.get(year);
+    const meanSid = (si0 !== undefined && si90 !== undefined && si180 !== undefined && si270 !== undefined)
+      ? (si0 + si90 + si180 + si270) / 4 : null;
+
+    // Derived precession values
+    let axialPrec = '', periPrec = '', inclPrec = '', eclipticPrec = '';
+    if (meanSid !== null && meanTrop !== null && meanSid !== meanTrop) {
+      axialPrec = meanSid / (meanSid - meanTrop);
+    }
+    if (meanAnom !== null && meanTrop !== null && meanAnom !== meanTrop) {
+      periPrec = meanAnom / (meanAnom - meanTrop);
+    }
+    if (meanAnom !== null && meanSid !== null && meanAnom !== meanSid) {
+      inclPrec = meanAnom / (meanAnom - meanSid);
+    }
+    if (inclPrec !== '' && axialPrec !== '' && (inclPrec / axialPrec) !== 1) {
+      eclipticPrec = inclPrec / ((inclPrec / axialPrec) - 1) * 2;
+    }
+
+    detailedRows.push([
+      String(refJD.toFixed(6)),
+      dateInfo.date,
+      dateInfo.time,
+      jdToModelYear(refJD).toFixed(2),
+      (orbParams.obliquity || 0).toFixed(6),
+      (orbParams.eccentricity || 0).toFixed(8),
+      meanTrop !== null ? meanTrop.toFixed(9) : '',
+      getInterval(cardinalData.VE.intervalsByYear, year),
+      getInterval(cardinalData.SS.intervalsByYear, year),
+      getInterval(cardinalData.AE.intervalsByYear, year),
+      getInterval(cardinalData.WS.intervalsByYear, year),
       peri?.jd?.toFixed(6) || '',
       peri?.distance?.toFixed(8) || '',
       getInterval(perihelionIntervalsByYear, year),
       aph?.jd?.toFixed(6) || '',
       aph?.distance?.toFixed(8) || '',
-      getInterval(aphelionIntervalsByYear, year)
-    ];
-    anomalisticRows.push(row);
-  }
-
-  // Sheet 4: Sidereal Data (filter to user-requested years only, 4-angle breakdown)
-  const siderealRows = [
-    ['Year', 'Interval at 0° (days)', 'Interval at 90° (days)', 'Interval at 180° (days)', 'Interval at 270° (days)', 'Mean Sidereal (days)']
-  ];
-  for (const year of requestedYears) {
-    const i0   = siderealData.S0.intervalsByYear.get(year);
-    const i90  = siderealData.S90.intervalsByYear.get(year);
-    const i180 = siderealData.S180.intervalsByYear.get(year);
-    const i270 = siderealData.S270.intervalsByYear.get(year);
-    const mean = (i0 !== undefined && i90 !== undefined && i180 !== undefined && i270 !== undefined)
-      ? ((i0 + i90 + i180 + i270) / 4).toFixed(9) : '';
-    siderealRows.push([
-      year,
-      i0?.toFixed(9) || '',
-      i90?.toFixed(9) || '',
-      i180?.toFixed(9) || '',
-      i270?.toFixed(9) || '',
-      mean
-    ]);
-  }
-
-  // Sheet 5: Detailed Combined Data (using already-collected orbital params)
-  const detailedRows = [
-    ['Year', 'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year', 'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval', 'Peri Interval', 'Aph Interval', 'Sid 0°', 'Sid 90°', 'Sid 180°', 'Sid 270°', 'Mean Sidereal']
-  ];
-
-  for (const year of requestedYears) {
-    const orbParams = orbParamsByYear.get(year) || {};
-
-    // Calculate mean tropical year for this specific year (average of 4 cardinal intervals)
-    const veInt = cardinalData.VE.intervalsByYear.get(year);
-    const ssInt = cardinalData.SS.intervalsByYear.get(year);
-    const aeInt = cardinalData.AE.intervalsByYear.get(year);
-    const wsInt = cardinalData.WS.intervalsByYear.get(year);
-    const meanTropicalForYear = (veInt !== undefined && ssInt !== undefined && aeInt !== undefined && wsInt !== undefined)
-      ? ((veInt + ssInt + aeInt + wsInt) / 4).toFixed(9)
-      : '';
-
-    const si0   = siderealData.S0.intervalsByYear.get(year);
-    const si90  = siderealData.S90.intervalsByYear.get(year);
-    const si180 = siderealData.S180.intervalsByYear.get(year);
-    const si270 = siderealData.S270.intervalsByYear.get(year);
-    const meanSidForYear = (si0 !== undefined && si90 !== undefined && si180 !== undefined && si270 !== undefined)
-      ? ((si0 + si90 + si180 + si270) / 4).toFixed(9) : '';
-
-    detailedRows.push([
-      year,
-      (orbParams.obliquity || 0).toFixed(6),
-      (orbParams.eccentricity || 0).toFixed(8),
-      meanTropicalForYear,
-      getInterval(cardinalData.VE.intervalsByYear, year),
-      getInterval(cardinalData.SS.intervalsByYear, year),
-      getInterval(cardinalData.AE.intervalsByYear, year),
-      getInterval(cardinalData.WS.intervalsByYear, year),
-      getInterval(perihelionIntervalsByYear, year),
       getInterval(aphelionIntervalsByYear, year),
+      meanAnom !== null ? meanAnom.toFixed(9) : '',
       getInterval(siderealData.S0.intervalsByYear, year),
       getInterval(siderealData.S90.intervalsByYear, year),
       getInterval(siderealData.S180.intervalsByYear, year),
       getInterval(siderealData.S270.intervalsByYear, year),
-      meanSidForYear
+      meanSid !== null ? meanSid.toFixed(9) : '',
+      typeof axialPrec === 'number' ? axialPrec.toFixed(2) : '',
+      typeof periPrec === 'number' ? periPrec.toFixed(2) : '',
+      typeof inclPrec === 'number' ? inclPrec.toFixed(2) : '',
+      obliquityCycleMean.toFixed(2),
+      typeof eclipticPrec === 'number' ? eclipticPrec.toFixed(2) : ''
     ]);
   }
 
   /* E · Create workbook and download */
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cardinalRows), 'Cardinal Points');
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(anomalisticRows), 'Anomalistic');
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(siderealRows), 'Sidereal');
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(detailedRows), 'Detailed');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(detailedRows), 'Year Length & Precession');
 
   const url = URL.createObjectURL(workbookToBlob(wb));
   // Filename: use range format for consecutive years, or list first/last for sparse lists
@@ -18507,7 +18509,8 @@ async function analyzeAnoministicYear(startYear, endYear) {
  * relative to fixed stars (ICRF reference frame), approximately 365.256363 days.
  *
  * Methods A, B, and D should all agree (wobble-free measurements).
- * Method C includes Earth's wobble motion, showing the ~1.76s wobble contribution.
+ * Method C includes Earth's wobble motion. At single angles this shows ~1.75s offset,
+ * but the 4-point average cancels the wobble parallax (same as EoC cancellation).
  */
 async function analyzeSiderealYear(startYear, endYear) {
   startYear = startYear || o.calibrationYearStart;
@@ -18565,7 +18568,7 @@ async function analyzeSiderealYear(startYear, endYear) {
   };
 
   // Method C: Heliocentric Sun→Earth angle (Earth as seen from Sun)
-  // Note: This includes Earth's wobble motion, causing ~1.76s difference from A/B
+  // Note: Includes Earth's wobble motion (~1.75s at single angles, cancels in 4-point mean)
   const getAngleMethodC = (jd) => {
     jumpToJulianDay(jd);
     forceSceneUpdate('minimal');
@@ -20584,15 +20587,17 @@ async function analyzeSiderealDay(startYear) {
  * @param {number} startYear - Start year
  * @param {number} endYear - End year
  */
-async function analyzeSolarDay(startYear, endYear) {
+async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   startYear = startYear || o.calibrationYearStart;
   endYear = endYear || o.calibrationYearEnd;
 
+  if (!methodAOnly) {
   console.log('╔══════════════════════════════════════════════════════════════════════════╗');
   console.log('║           MEAN SOLAR DAY LENGTH ANALYSIS                                 ║');
   console.log('╚══════════════════════════════════════════════════════════════════════════╝');
   console.log(`Analyzing year ${startYear} (one tropical year of daily measurements)...`);
   console.log('');
+  }
 
   const savedJD = o.julianDay;
   const savedRun = o.Run;
@@ -20614,7 +20619,9 @@ async function analyzeSolarDay(startYear, endYear) {
 
   // First, find the first solar noon AFTER the solstice to establish a baseline
   // This ensures we start from an actual solar noon, not an arbitrary time
+  if (!methodAOnly) {
   console.log(`Finding first solar noon after solstice JD ${startSolstice.jd.toFixed(4)}...`);
+  }
 
   // Find first solar noon - we just use the solstice JD as our starting point
   // The solarNoonForJD function will find the next noon from any starting point
@@ -20653,8 +20660,10 @@ async function analyzeSolarDay(startYear, endYear) {
   };
 
   const firstSolarNoon = findFirstSolarNoon(startSolstice.jd);
+  if (!methodAOnly) {
   console.log(`First solar noon at JD ${firstSolarNoon.toFixed(6)}`);
   console.log(`Measuring ${numDays} solar day intervals...`);
+  }
 
   let prevSolarJD = firstSolarNoon;
   let prevSolarJD_B = firstSolarNoon;  // Method C uses same starting point
@@ -20673,6 +20682,7 @@ async function analyzeSolarDay(startYear, endYear) {
       cumulativeState = solarResult.cumulativeState;  // Carry forward cumulative state
     }
 
+    if (!methodAOnly) {
     // Method C: Fixed-frame solar noon detection (sun world angle from origin)
     const solarResultB = solarNoonForJDMethodB(prevSolarJD_B);
     if (solarResultB) {
@@ -20697,9 +20707,10 @@ async function analyzeSolarDay(startYear, endYear) {
       siderealIntervals.push(interval);
       prevSiderealJD = siderealResult.jd;
     }
+    }
 
     // Progress indicator
-    if (i % 50 === 0) {
+    if (i % 50 === 0 && !methodAOnly) {
       console.log(`  Progress: ${i}/${numDays} days...`);
       await new Promise(r => setTimeout(r, 10));
     }
@@ -20709,6 +20720,15 @@ async function analyzeSolarDay(startYear, endYear) {
   const meanSolar = solarIntervals.reduce((a, b) => a + b, 0) / solarIntervals.length;
   const minSolar = Math.min(...solarIntervals);
   const maxSolar = Math.max(...solarIntervals);
+
+  // For methodAOnly, return early with just Method A results
+  if (methodAOnly) {
+    jumpToJulianDay(savedJD);
+    o.Run = savedRun;
+    return {
+      methodA: { count: solarIntervals.length, mean: meanSolar, min: minSolar, max: maxSolar }
+    };
+  }
 
   // Calculate statistics for Method C (fixed-frame)
   const meanSolarB = solarIntervalsB.reduce((a, b) => a + b, 0) / solarIntervalsB.length;
@@ -20873,22 +20893,19 @@ async function analyzeSolarDay(startYear, endYear) {
   console.log('D: Uses sun.ra with cumulative tracking from Earth\'s position.');
   console.log('');
   console.log('-------------------------------------------------------------------------------');
-  console.log('WHY METHODS A/D MEASURE ~11.4ms SHORT OF 86400s');
+  console.log('WHY METHODS A/D MEASURE ~14.2ms SHORT OF meanlengthofday');
   console.log('-------------------------------------------------------------------------------');
-  console.log('The ~11.4ms/day offset is NOT an error - it is a real physical effect of');
-  console.log('perihelion precession on the solar day measurement.');
+  console.log('The ~14.2ms/day offset is confirmed by the Solar day multiepoch test:');
+  console.log('65 measurements evenly distributed across one full holistic year (H),');
+  console.log(`mean offset = -14.194 ms/day (relative to meanlengthofday = ${meanlengthofday.toFixed(6)}s).`);
   console.log('');
-  console.log('Formula: (meanLengthOfDay / perihelionCycle) / solarDaysPerYear');
-  console.log(`       = (86400 / ${(holisticyearLength/16).toFixed(0)}) / 365.242189`);
-  console.log(`       = ${ASTRO_REFERENCE.solarDayOffsetMs.toFixed(2)} ms/day`);
+  console.log('The physical cause is not yet fully explained and requires further investigation.');
+  console.log('Note: perihelion precession shows as sinusoidal modulation (amplitude ~7.1 ms,');
+  console.log('period H/16) and cancels out in the mean — it does NOT explain the 14.2 ms offset.');
   console.log('');
-  console.log('This accumulates to exactly 1 extra day over one perihelion cycle (H/16):');
-  console.log(`  ${ASTRO_REFERENCE.solarDayOffsetMs.toFixed(2)} ms/day × 365.24 days/year = ${ASTRO_REFERENCE.solarDayOffsetYearlySeconds.toFixed(2)} s/year`);
-  console.log(`  ${ASTRO_REFERENCE.solarDayOffsetYearlySeconds.toFixed(2)} s/year × ${(holisticyearLength/16).toFixed(0)} years = ${(ASTRO_REFERENCE.solarDayOffsetYearlySeconds * holisticyearLength/16 / 86400).toFixed(3)} days`);
-  console.log('');
-  console.log('Methods B and C produce exactly 86400s because they use idealized mathematical');
-  console.log('relationships that do not account for this perihelion drift effect.');
-  console.log('Methods A and D capture the real Sun-Earth geometry including perihelion drift.');
+  console.log('Methods B and C produce meanlengthofday because they use idealized mathematical');
+  console.log('relationships that do not capture the RA frame shift.');
+  console.log('Methods A and D capture the real Sun-Earth geometry and expose this offset.');
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -20923,6 +20940,160 @@ async function analyzeSolarDay(startYear, endYear) {
     differenceAD: meanSolar - meanSolarD,
     differenceCB: meanSolarB - derivedSolar
   };
+}
+
+/**
+ * Multi-Epoch Solar Day Analysis
+ *
+ * Measures the solar day offset (Method A) at 65 equally-spaced epochs across
+ * one full holistic year (H = 335,008 tropical years). The epochs are placed
+ * at H/64 intervals (~5,234 years) starting from balancedYear. This covers
+ * 4 full perihelion cycles (H/16) with 4 samples per cycle, revealing the
+ * modulation pattern and enabling derivation of a day-length formula.
+ *
+ * Purpose: verify that the mean offset across all precession phases converges
+ * to the predicted value from axial + obliquity coin rotation (~14.3 ms/day).
+ */
+async function analyzeSolarDayMultiEpoch() {
+  const numSteps = 64;
+  const numPoints = numSteps + 1;  // 65 points: from balanced year back to balanced year
+  const stepYears = holisticyearLength / numSteps;  // H/64 = 5,234.5 years
+  const startEpoch = balancedYear;
+
+  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║     MULTI-EPOCH SOLAR DAY ANALYSIS (64 steps across one holistic year)  ║');
+  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('');
+  console.log(`Holistic year H = ${holisticyearLength} tropical years`);
+  console.log(`Step size: H/32 = ${stepYears.toFixed(2)} years`);
+  console.log(`Start epoch: ${startEpoch.toFixed(0)} (balanced year)`);
+  console.log(`End epoch: ${(startEpoch + (numPoints - 1) * stepYears).toFixed(0)}`);
+  console.log(`Perihelion alignment year: ${perihelionalignmentYear}`);
+  console.log('');
+  console.log('Each epoch measures 365 solar days from the June solstice using Method A');
+  console.log('(wobble-center RA, eliminates wobble parallax).');
+  console.log('');
+
+  const results = [];
+
+  for (let i = 0; i < numPoints; i++) {
+    const epochYear = Math.round(startEpoch + i * stepYears);
+    const periPhase = ((epochYear - perihelionalignmentYear) % (holisticyearLength / 16)) / (holisticyearLength / 16);
+    // Normalize phase to [-0.5, 0.5]
+    const normalizedPhase = periPhase > 0.5 ? periPhase - 1 : (periPhase < -0.5 ? periPhase + 1 : periPhase);
+
+    console.log(`═══════════════════════════════════════════════════════════════════════════`);
+    console.log(`  Epoch ${i + 1}/${numPoints}: year ${epochYear} (perihelion phase: ${(normalizedPhase * 100).toFixed(1)}%)`);
+    console.log(`═══════════════════════════════════════════════════════════════════════════`);
+
+    const result = await analyzeSolarDay(epochYear, null, true);
+
+    if (result) {
+      const offsetA = (result.methodA.mean - meanlengthofday) * 1000;  // ms
+      const obliquity = getObliquityAtYear(epochYear);
+      const inclination = getEarthInclinationAtYear(epochYear);
+      const eclipticInclination = obliquity - inclination;
+      const ecc = computeEccentricityEarth(epochYear, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude);
+      const tropicalYearDays = computeLengthofsolarYear(epochYear);
+      const siderealYearDays = computeLengthofsiderealYear(epochYear);
+      const anomalisticYearDays = evalYearFourier(epochYear, meanAnomalisticYearinDays, ANOMALISTIC_YEAR_HARMONICS);
+      results.push({
+        epoch: epochYear,
+        index: i,
+        perihelionPhase: normalizedPhase,
+        offsetA: offsetA,
+        methodA: result.methodA.mean,
+        obliquity: obliquity,
+        eclipticInclination: eclipticInclination,
+        eccentricity: ecc,
+        tropicalYear: tropicalYearDays,
+        siderealYear: siderealYearDays,
+        anomalisticYear: anomalisticYearDays
+      });
+      console.log(`  → offset: ${offsetA.toFixed(3)} ms  obliq: ${obliquity.toFixed(4)}°  ecl.incl: ${eclipticInclination.toFixed(4)}°  ecc: ${ecc.toFixed(6)}`);
+    }
+  }
+
+  // Summary table
+  console.log('');
+  // Table 1: Offset and orbital parameters
+  console.log('╔═════╤══════════╤═══════════╤═══════════════╤════════════╤═══════════════╤══════════════╗');
+  console.log('║  #  │   Year   │ Peri (%)  │ Offset (ms)   │ Obliq (°)  │ Ecl.Incl (°)  │ Eccentricity ║');
+  console.log('╠═════╪══════════╪═══════════╪═══════════════╪════════════╪═══════════════╪══════════════╣');
+
+  for (const r of results) {
+    const phase = (r.perihelionPhase * 100).toFixed(1).padStart(6);
+    const oA = (r.offsetA >= 0 ? '+' : '') + r.offsetA.toFixed(3).padStart(9);
+    const obl = r.obliquity.toFixed(4).padStart(8);
+    const ecli = r.eclipticInclination.toFixed(4).padStart(8);
+    const ecc = r.eccentricity.toFixed(6).padStart(10);
+    console.log(`║ ${String(r.index + 1).padStart(3)} │ ${String(r.epoch).padStart(8)} │ ${phase}%  │ ${oA} ms  │ ${obl}°  │ ${ecli}°      │ ${ecc}   ║`);
+  }
+
+  console.log('╚═════╧══════════╧═══════════╧═══════════════╧════════════╧═══════════════╧══════════════╝');
+
+  // Table 2: Year lengths
+  console.log('');
+  console.log('╔═════╤══════════╤══════════════════╤══════════════════╤══════════════════╗');
+  console.log('║  #  │   Year   │ Tropical (days)  │ Sidereal (days)  │ Anomalistic (d)  ║');
+  console.log('╠═════╪══════════╪══════════════════╪══════════════════╪══════════════════╣');
+
+  for (const r of results) {
+    const trop = r.tropicalYear.toFixed(6).padStart(14);
+    const sid = r.siderealYear.toFixed(6).padStart(14);
+    const anom = r.anomalisticYear.toFixed(6).padStart(14);
+    console.log(`║ ${String(r.index + 1).padStart(3)} │ ${String(r.epoch).padStart(8)} │ ${trop}   │ ${sid}   │ ${anom}   ║`);
+  }
+
+  console.log('╚═════╧══════════╧══════════════════╧══════════════════╧══════════════════╝');
+
+  // Statistics
+  if (results.length > 0) {
+    const meanOffsetA = results.reduce((s, r) => s + r.offsetA, 0) / results.length;
+    const minA = Math.min(...results.map(r => r.offsetA));
+    const maxA = Math.max(...results.map(r => r.offsetA));
+
+    console.log('');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log('STATISTICS');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log(`  Method A mean offset:  ${meanOffsetA.toFixed(3)} ms/day`);
+    console.log(`  Method A range:        ${minA.toFixed(3)} to ${maxA.toFixed(3)} ms (amplitude: ${((maxA - minA) / 2).toFixed(3)} ms)`);
+    console.log('');
+
+    // Predicted values
+    const predictedAxial = axialCoinRotationMs;
+    const predictedEcliptic = (meanlengthofday / (holisticyearLength / 5)) / meansolaryearlengthinDays * 1000;
+    const predictedTotal = predictedAxial + predictedEcliptic;
+    const predictedPerihelion = perihelionCoinRotationMs;
+
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log('THEORETICAL DECOMPOSITION');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log(`  Axial coin rotation (H/13):      ${predictedAxial.toFixed(3)} ms/day`);
+    console.log(`  Ecliptic coin rotation (H/5):    ${predictedEcliptic.toFixed(3)} ms/day`);
+    console.log(`  Predicted mean (axial+ecliptic): -${predictedTotal.toFixed(3)} ms/day`);
+    console.log(`  Measured mean (Method A):        ${meanOffsetA.toFixed(3)} ms/day`);
+    console.log(`  Difference (measured-predicted):  ${(meanOffsetA + predictedTotal).toFixed(3)} ms/day`);
+    console.log('');
+    console.log(`  Perihelion coin rotation (H/16): ${predictedPerihelion.toFixed(3)} ms/day`);
+    console.log(`  Note: perihelion effect should appear as sinusoidal modulation`);
+    console.log(`  with period H/16 and cancel out in the mean over a full H.`);
+
+    // Accumulation
+    const meanOffsetSecondsPerYear = meanOffsetA * meansolaryearlengthinDays / 1000;
+    console.log('');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log('ACCUMULATION');
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+    console.log(`  Mean offset:    ${meanOffsetA.toFixed(3)} ms/day`);
+    console.log(`  Per year:       ${meanOffsetSecondsPerYear.toFixed(4)} s/year`);
+    console.log(`  Over H years:   ${(meanOffsetSecondsPerYear * holisticyearLength / 86400).toFixed(3)} days`);
+    console.log(`  Over H/13:      ${(meanOffsetSecondsPerYear * (holisticyearLength / 13) / 86400).toFixed(3)} days`);
+    console.log('═══════════════════════════════════════════════════════════════════════════');
+  }
+
+  return results;
 }
 
 /**

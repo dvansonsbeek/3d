@@ -51,6 +51,14 @@ SIDEREAL_YEAR_SECONDS = _SIDEREAL_YEAR_S
 MEAN_DAY_LENGTH = _MEAN_LENGTH_OF_DAY
 MEAN_ANOM_YEAR_DAYS = _MEAN_ANOM_YEAR_DAYS
 
+# --- RA solar day offset (measured, Fourier fit) ---
+# Confirmed by "Solar day multiepoch" test: 65 epochs spanning one full H.
+# Offset is relative to meanlengthofday (= MEAN_DAY_LENGTH).
+# Mean of -14.194 ms has no known physical explanation.
+RA_SOLAR_DAY_OFFSET_MEAN_MS  = -14.194   # ms/day, unknown cause
+RA_SOLAR_DAY_OFFSET_ECC_MS   =  -5.640   # ms/day amplitude at period H/16 (eccentricity)
+RA_SOLAR_DAY_OFFSET_OBLIQ_MS =  -1.684   # ms/day amplitude at period H/8  (obliquity)
+
 # --- Year-length Fourier means (derived, not fitted) ---
 # tropical = round(input × H/16) / (H/16)
 # sidereal = tropical × H / (H - 13)
@@ -326,6 +334,34 @@ def calc_day_length(year: int) -> float:
     """
     sid_days = calc_sidereal_year(year)
     return SIDEREAL_YEAR_SECONDS / sid_days
+
+
+def calc_measured_solar_day(year: int) -> float:
+    """
+    Calculate the RA-measured solar day length in SI seconds.
+
+    RA-based measurements (Methods A and D) consistently show the solar day
+    shorter than meanlengthofday by a Fourier-modulated offset:
+
+      offset(t) = −14.194 − 5.640·cos(2π·t/(H/16)) − 1.684·cos(2π·t/(H/8))  [ms/day]
+
+    where t = year − ANCHOR_YEAR.
+
+    Confirmed by "Solar day multiepoch" test across 65 epochs spanning one H.
+    Regression: R² = 0.994, RMS = 0.324 ms.
+
+    Component summary:
+      Mean (−14.194 ms): constant offset, physical cause unknown.
+      H/16 term (±5.640 ms): modulated by eccentricity (perihelion precession).
+      H/8  term (∓1.684 ms): modulated by obliquity (obliquity cycle).
+    """
+    t = time_offset(year)
+    offset_ms = (
+        RA_SOLAR_DAY_OFFSET_MEAN_MS
+        + RA_SOLAR_DAY_OFFSET_ECC_MS   * math.cos(2 * math.pi * t / EARTH_PERI_PERIOD)
+        + RA_SOLAR_DAY_OFFSET_OBLIQ_MS * math.cos(2 * math.pi * t / OBLIQ_CYCLE)
+    )
+    return calc_day_length(year) + offset_ms / 1000.0
 
 
 def calc_solar_year_seconds(year: int) -> float:
@@ -961,13 +997,15 @@ if __name__ == "__main__":
         print(f"{year:>8} {sy_s:>18.3f} {sid_s:>18.3f} {anom_s:>18.3f}")
 
     print()
-    print(f"{'Year':>8} {'Day Length (s)':>18} {'Sidereal Day (s)':>18} {'Stellar Day (s)':>18}")
-    print("-" * 64)
+    print(f"{'Year':>8} {'Day Length (s)':>18} {'Sidereal Day (s)':>18} {'Stellar Day (s)':>18} {'Measured Solar (s)':>20}")
+    print("-" * 86)
     for year in [2000, 2022, 2100, -10000, 10000]:
         dl = calc_day_length(year)
         sid_d = calc_sidereal_day(year)
         star_d = calc_stellar_day(year)
-        print(f"{year:>8} {dl:>18.6f} {sid_d:>18.6f} {star_d:>18.6f}")
+        msd = calc_measured_solar_day(year)
+        offset_ms = (msd - dl) * 1000   # negative = measured is shorter than meanlengthofday
+        print(f"{year:>8} {dl:>18.6f} {sid_d:>18.6f} {star_d:>18.6f} {msd:>18.6f} ({offset_ms:+.3f} ms)")
 
     # --- Section F: Earth — Precession Periods ---
     print("\n--- Section F: Earth — Precession Periods ---")
