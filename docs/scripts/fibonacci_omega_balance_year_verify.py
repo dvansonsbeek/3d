@@ -201,7 +201,7 @@ except Exception as e:
     HAVE_EXCEL = False
 
 if HAVE_EXCEL:
-    years = df.iloc[:, 3].values
+    years = df['Model Year'].values
     n_rows = len(years)
     bal_idx = np.argmin(np.abs(years - BALANCE_YEAR))
     j2000_idx = np.argmin(np.abs(years - J2000_YEAR))

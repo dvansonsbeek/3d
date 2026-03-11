@@ -21484,8 +21484,8 @@ async function runRATest() {
   }
 
   /* headers */
-  const earthRows  = [['JD', 'Date', 'Time', 'Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
-  const periRows   = [['JD', 'Date', 'Time', 'Year',
+  const earthRows  = [['JD', 'Date', 'Time', 'Model Year', 'Earth Wobble RA', 'Earth Wobble Dec', 'Earth Wobble Dist Earth', 'Earth Wobble Dist Sun', 'Earth Longitude RA', 'Earth Longitude Dec', 'Earth Longitude Dist Earth', 'Earth Longitude Dist Sun', 'Mid-eccentricity RA', 'Mid-eccentricity Dec', 'Mid-eccentricity Dist Earth', 'Mid-eccentricity Dist Sun']];
+  const periRows   = [['JD', 'Date', 'Time', 'Model Year',
     'Mercury Perihelion ICRF', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury Asc Node InvPlane ICRF', 'Mercury Asc Node InvPlane MaxIncl', 'Mercury Inclination Phase Angle', 'Mercury InvPlane Inclination', '* Mercury Perihelion (Ecliptic)', '* Mercury Asc Node InvPlane (Ecliptic)',
     'Venus Perihelion ICRF', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus Asc Node InvPlane ICRF', 'Venus Asc Node InvPlane MaxIncl', 'Venus Inclination Phase Angle', 'Venus InvPlane Inclination', '* Venus Perihelion (Ecliptic)', '* Venus Asc Node InvPlane (Ecliptic)',
     'Earth Perihelion (Ecliptic)', 'Earth Asc Node InvPlane (Ecliptic)', 'Earth Perihelion ICRF', 'Earth Asc Node InvPlane ICRF', 'Earth Asc Node InvPlane MaxIncl', 'Earth InvPlane Inclination',
@@ -21496,7 +21496,7 @@ async function runRATest() {
     'Neptune Perihelion ICRF', 'Neptune Asc Node', 'Neptune Arg Peri', 'Neptune Ecliptic Inclination', 'Neptune Asc Node InvPlane ICRF', 'Neptune Asc Node InvPlane MaxIncl', 'Neptune Inclination Phase Angle', 'Neptune InvPlane Inclination', '* Neptune Perihelion (Ecliptic)', '* Neptune Asc Node InvPlane (Ecliptic)'
   ]];
   //const periRows   = [['JD', 'Date', 'Time', 'Mercury Perihelion', 'Venus Perihelion', 'Earth Perihelion', 'Mars Perihelion', 'Jupiter Perihelion', 'Saturn Perihelion', 'Uranus Perihelion', 'Neptune Perihelion', 'Pluto Perihelion', 'Halleys Perihelion', 'Eros Perihelion']]; 
-  const planetRows = [['JD', 'Date', 'Time', 'Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
+  const planetRows = [['JD', 'Date', 'Time', 'Model Year', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun']]; 
   //const planetRows = [['JD', 'Date', 'Time', 'Sun RA', 'Sun Dec', 'Sun Dist Earth', 'Mercury RA', 'Mercury Dec', 'Mercury Dist Earth', 'Mercury Dist Sun', 'Venus RA', 'Venus Dec', 'Venus Dist Earth', 'Venus Dist Sun','Mars RA', 'Mars Dec', 'Mars Dist Earth', 'Mars Dist Sun','Jupiter RA', 'Jupiter Dec', 'Jupiter Dist Earth', 'Jupiter Dist Sun','Saturn RA', 'Saturn Dec', 'Saturn Dist Earth', 'Saturn Dist Sun','Uranus RA', 'Uranus Dec', 'Uranus Dist Earth', 'Uranus Dist Sun','Neptune RA', 'Neptune Dec', 'Neptune Dist Earth', 'Neptune Dist Sun','Pluto RA', 'Pluto Dec', 'Pluto Dist Earth', 'Pluto Dist Sun','Halleys RA', 'Halleys Dec', 'Halleys Dist Earth', 'Halleys Dist Sun', 'Eros RA', 'Eros Dec', 'Eros Dist Earth', 'Eros Dist Sun']]; 
 
   /* freeze viewer */
@@ -21661,12 +21661,12 @@ async function runRATest() {
     const erosDistE     = eros.distAU;
     const erosDistS     = eros.sunDistAU;
         
-        const year = Math.floor(o.currentYear);
-        earthRows.push([jd, date, time, year, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
+        const modelYear = Math.floor(jdToModelYear(jd));
+        earthRows.push([jd, date, time, modelYear, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8), earthMidRA.toFixed(6), earthMidDec.toFixed(6), earthMidDistE.toFixed(8), earthMidDistS.toFixed(8)]);
     
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
-        periRows.push([jd, date, time, year,
+        periRows.push([jd, date, time, modelYear,
           mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryAscInv.toFixed(6), mercuryAscInvMaxIncl.toFixed(6), mercuryPhaseAngle.toFixed(6), mercuryInvPlaneIncl.toFixed(6), mercuryPerEcl.toFixed(6), mercuryAscInvEcl.toFixed(6),
           venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusAscInv.toFixed(6), venusAscInvMaxIncl.toFixed(6), venusPhaseAngle.toFixed(6), venusInvPlaneIncl.toFixed(6), venusPerEcl.toFixed(6), venusAscInvEcl.toFixed(6),
           earthPerEcl.toFixed(6), earthAscInvEcl.toFixed(6), earthPerRA.toFixed(6), earthAscInv.toFixed(6), earthAscInvMaxIncl.toFixed(6), earthIncl.toFixed(6),
@@ -21679,7 +21679,7 @@ async function runRATest() {
     
 //    planetRows.push([jd, date, time, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6), plutoRA.toFixed(6), plutoDec.toFixed(6), plutoDistE.toFixed(6), plutoDistS.toFixed(6), halleysRA.toFixed(6), halleysDec.toFixed(6), halleysDistE.toFixed(6), halleysDistS.toFixed(6), erosRA.toFixed(6), erosDec.toFixed(6), erosDistE.toFixed(6), erosDistS.toFixed(6)]);
     
-        planetRows.push([jd, date, time, year, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6)]);
+        planetRows.push([jd, date, time, modelYear, sunRA.toFixed(6), sunDec.toFixed(6), sunDistE.toFixed(6), mercuryRA.toFixed(6), mercuryDec.toFixed(6), mercuryDistE.toFixed(6), mercuryDistS.toFixed(6), venusRA.toFixed(6),  venusDec.toFixed(6), venusDistE.toFixed(6), venusDistS.toFixed(6), marsRA.toFixed(6), marsDec.toFixed(6), marsDistE.toFixed(6), marsDistS.toFixed(6), jupiterRA.toFixed(6), jupiterDec.toFixed(6), jupiterDistE.toFixed(6), jupiterDistS.toFixed(6), saturnRA.toFixed(6), saturnDec.toFixed(6),  saturnDistE.toFixed(6), saturnDistS.toFixed(6), uranusRA.toFixed(6), uranusDec.toFixed(6), uranusDistE.toFixed(6), uranusDistS.toFixed(6), neptuneRA.toFixed(6), neptuneDec.toFixed(6), neptuneDistE.toFixed(6), neptuneDistS.toFixed(6)]);
 
     /* yield to browser every YIELD_EVERY rows to prevent timeout */
     if (++done % YIELD_EVERY === 0) {
@@ -21877,6 +21877,13 @@ function jdToDateString(jd) {
 /**
  * Collect position and longitude data for a specific planet at current simulation state
  */
+/**
+ * Convert Julian Day to model year (using mean tropical year, not Julian calendar)
+ */
+function jdToModelYear(jd) {
+  return startmodelYear + (jd - startmodelJD) / meansolaryearlengthinDays;
+}
+
 function collectPlanetDataForDate(planetKey, testDate) {
   const planet = PLANET_OBJECTS[planetKey]();
   const dateInfo = jdToDateString(testDate.jd);
@@ -21948,6 +21955,7 @@ function collectPlanetDataForDate(planetKey, testDate) {
         String(testDate.jd),  // Force as string to avoid comma/dot issues
         dateInfo.date,
         dateInfo.time,
+        jdToModelYear(testDate.jd).toFixed(2),
         testDate.label,
         raToHMSFromRadians(planetRARad),
         decToDMSFromRadians(planetDecRad),
@@ -21968,6 +21976,7 @@ function collectPlanetDataForDate(planetKey, testDate) {
       String(testDate.jd),  // Force as string to avoid comma/dot issues
       dateInfo.date,
       dateInfo.time,
+      jdToModelYear(testDate.jd).toFixed(2),
       testDate.label,
       longPeriCalc.toFixed(6),
       longPeriRef.toFixed(6),
@@ -22414,14 +22423,14 @@ async function generatePlanetReport(planetKey, showAll = false) {
 
   let screenReport = buildReportHeader(planetKey);
   const positionRows = [[
-    'JD', 'Date', 'Time', 'Label',
+    'JD', 'Date', 'Time', 'Model Year (mean tropical)', 'Label',
     'Planet RA', 'Planet Dec',
     'Reference RA', 'Reference Dec', 'Reference Longitude',
     'Compare Planet', 'Companion RA', 'Companion Dec',
     'Planet Dist Earth (AU)', 'Planet Dist Sun (AU)',
     'Sun RA', 'Sun Dec', 'Sun Dist Earth (AU)'
   ]];
-  const longitudeRows = [['JD', 'Date', 'Time', 'Label', 'Long Perihelion Calc (°)', 'Long Perihelion Ref (°)', 'Long Perihelion Diff (°)', 'Asc Node Calc (°)', 'Asc Node Ref (°)', 'Asc Node Diff (°)', 'Arg Periapsis Calc (°)']];
+  const longitudeRows = [['JD', 'Date', 'Time', 'Model Year (mean tropical)', 'Label', 'Long Perihelion Calc (°)', 'Long Perihelion Ref (°)', 'Long Perihelion Diff (°)', 'Asc Node Calc (°)', 'Asc Node Ref (°)', 'Asc Node Diff (°)', 'Arg Periapsis Calc (°)']];
 
   // Process each test date
   for (const testDate of testDates) {

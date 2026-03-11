@@ -38,7 +38,7 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
 
     for _, row in df.iterrows():
         try:
-            year = int(row['Year'])
+            year = int(row['Model Year'])
         except (ValueError, KeyError):
             continue
 

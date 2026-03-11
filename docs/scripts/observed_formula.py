@@ -88,7 +88,7 @@ EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.0153869045
 # ERD (Earth Rate Deviation) is derived as numerical derivative of longitude.
 
 EXCEL_COLS = {
-    'year': 'Year',
+    'year': 'Model Year',
     'earth_longitude': 'Earth Longitude RA',  # from 'Earth Longitude' sheet
     'earth_eccentricity': 'EARTH Eccentricity',
     'earth_obliquity': 'EARTH OBLIQUITY (deg)',
@@ -865,10 +865,10 @@ def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     # Read both sheets
     df_peri = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
     df_long = pd.read_excel(excel_path, sheet_name='Earth Longitude',
-                            usecols=['Year', 'Earth Longitude RA'])
+                            usecols=['Model Year', 'Earth Longitude RA'])
 
     # Compute ERD as numerical derivative of Earth Longitude RA
-    years = df_long['Year'].values
+    years = df_long['Model Year'].values
     longitudes = df_long['Earth Longitude RA'].values
     erd_values = [0.0] * len(years)
     for i in range(1, len(years) - 1):

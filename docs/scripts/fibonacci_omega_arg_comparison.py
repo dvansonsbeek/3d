@@ -29,8 +29,8 @@ from constants_scripts import H, BALANCE_YEAR
 # ─────────────────────────────────────────────────────
 EXCEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '98-holistic-year-objects-data.xlsx')
 df = pd.read_excel(EXCEL_PATH, sheet_name='Perihelion Planets')
-bal_idx = np.argmin(np.abs(df['Year'] - BALANCE_YEAR))
-bal_year = int(df['Year'].iloc[bal_idx])
+bal_idx = np.argmin(np.abs(df['Model Year'] - BALANCE_YEAR))
+bal_year = int(df['Model Year'].iloc[bal_idx])
 row = df.iloc[bal_idx]
 
 planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']
