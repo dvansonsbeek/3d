@@ -1,4 +1,4 @@
-# 35 — Tilt, Inclination, and Eccentricity: Definitive Balance Calculations
+# 36 — Tilt, Inclination, and Eccentricity: Definitive Balance Calculations
 
 This document records the complete relationship between axial tilt, inclination
 to the invariable plane, and orbital eccentricity within the Fibonacci balance

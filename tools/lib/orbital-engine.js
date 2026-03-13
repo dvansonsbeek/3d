@@ -22,11 +22,19 @@ const C = require('./constants');
  * @returns {number} eccentricity at that year
  */
 function computeEccentricityEarth(currentYear) {
-  const root = C.eccentricityDerivedMean;
-  const degrees = ((currentYear - C.balancedYear) / C.perihelionCycleLength) * 360;
+  return computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
+}
+
+/**
+ * Generalized eccentricity formula for any planet.
+ * e(t) = e₀ + (−A − (e₀ − e_base)·cos θ)·cos θ  where e₀ = √(e_base² + A²)
+ */
+function computeEccentricity(currentYear, balancedYear, cycleLength, base, amplitude) {
+  const root = Math.sqrt(base * base + amplitude * amplitude);
+  const degrees = ((currentYear - balancedYear) / cycleLength) * 360;
   const cosTheta = Math.cos(degrees * Math.PI / 180);
-  const h1 = root - C.eccentricityBase;
-  return root + (-C.eccentricityAmplitude - h1 * cosTheta) * cosTheta;
+  const h1 = root - base;
+  return root + (-amplitude - h1 * cosTheta) * cosTheta;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -307,7 +315,8 @@ function computeEarthOrbitalElements(year) {
 }
 
 module.exports = {
-  // Earth orbital elements
+  // Eccentricity
+  computeEccentricity,
   computeEccentricityEarth,
   computeObliquityEarth,
   computeInclinationEarth,

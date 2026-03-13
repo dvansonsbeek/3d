@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
+const OE = require('./orbital-engine');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)
@@ -403,6 +404,8 @@ function buildSceneGraph() {
     startPos: C.correctionSun,
     speed: Math.PI * 2,
     eccentricity: C.eocEccentricity,
+    _eccentricityKey: 'earth',
+    _eocDerived: true,  // Sun EoC = e_dynamic - e_base/2
     perihelionPhaseJ2000: -C.correctionSun * d2r - 2 * Math.PI * (C.startmodelJD - C.perihelionRefJD) / C.meanSolarYearDays + C.perihelionPhaseOffset * d2r,
     perihelionPrecessionRate: Math.PI * 2 / C.perihelionCycleLength, // perihelion advances at H/16 rate
   };
@@ -544,6 +547,8 @@ function buildSceneGraph() {
       const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
       // Type III: per-planet EoC fraction to correct for double-counting with geometric offset
       planetDef.eccentricity = pd.p.orbitalEccentricityJ2000 * (pd.p.eocFraction ?? 0.5);
+      planetDef._eccentricityKey = key;
+      planetDef._eocFraction = pd.p.eocFraction ?? 0.5;
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
         + (pd.planetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
@@ -630,11 +635,28 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function moveModel(graph, pos) {
+  // Compute dynamic eccentricities for all planets (oscillate at H/16)
+  const currentYear = C.balancedYear + (C.startmodelJD + pos * C.meanSolarYearDays - C.balancedJD) / C.meanSolarYearDays;
+  const dynEcc = { earth: OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude) };
+  for (const [key, p] of Object.entries(C.planets)) {
+    if (p.eccentricityPhaseJ2000 !== undefined) {
+      const refYear = 2000 - (p.eccentricityPhaseJ2000 / 360) * C.perihelionCycleLength;
+      dynEcc[key] = OE.computeEccentricity(currentYear, refYear, C.perihelionCycleLength, p.orbitalEccentricityBase, p.orbitalEccentricityAmplitude);
+    }
+  }
+
   // Update each "animated" object: orbit.ry = θ for circular, pivot.position for ellipse
   function animateObject(nodes, def) {
     let θ = def.speed * pos - def.startPos * d2r;
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
-      const e = def.eccentricity;
+      let e;
+      if (def._eccentricityKey && dynEcc[def._eccentricityKey] !== undefined) {
+        e = def._eocDerived
+          ? dynEcc[def._eccentricityKey] - C.eccentricityBase / 2   // Sun: eoc = e_dynamic - e_base/2
+          : dynEcc[def._eccentricityKey] * def._eocFraction;        // Planets: eoc = e_dynamic × fraction
+      } else {
+        e = def.eccentricity;                                        // Moon, Pluto, etc: static
+      }
       const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
@@ -789,11 +811,11 @@ function moveModel(graph, pos) {
       const planetPrecAngle = pm.eclip1.orbit.ry;
       const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const dw = earthPeriEcl - planetPeriEcl;
-      let eo = 2 * C.ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
+      let eo = 2 * dynEcc.earth * 100 * Math.sin(dw);
       if (key === 'saturn') eo = -eo;
       if (pm.sceneData.p.type === 'II') {
-        // Type II: static Mars orbit center offset + half Earth geocentric correction
-        const eccDist = pm.sceneData.p.orbitalEccentricityJ2000 * pm.sceneData.d.orbitDistance * 100;
+        // Type II: Mars orbit center offset + half Earth geocentric correction
+        const eccDist = (dynEcc[key] || pm.sceneData.p.orbitalEccentricityJ2000) * pm.sceneData.d.orbitDistance * 100;
         eo = eccDist / 2 - eo / 2;
       }
       pm.realPeri.pivot.px = eo;

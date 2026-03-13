@@ -16,7 +16,7 @@ import { Pane } from 'tweakpane';
   all planets. The Holistic-Year cycle (H) unifies axial precession
   (H/13), inclination precession (H/3) and perihelion precession (H/16) through
   Fibonacci number ratios. Earth is defined by 26 parameters, the Moon by 9, and
-  each planet by 15.
+  each planet by 16.
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v2
   Website:  https://holisticuniverse.com
@@ -38,7 +38,7 @@ const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthRAAngle = 1.282779;
+const earthRAAngle = 1.25363;
 // Optimized for solstice timing (3708 min/deg) and geometry (sun.dec at solstice, 3.2"/deg). Also depends on temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude.
 const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
 const earthInvPlaneInclinationAmplitude = 0.635970;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.6329789
@@ -58,7 +58,7 @@ const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.5292;
+const correctionSun = 0.493231;
 // Sun's orbital starting angle in degrees. Optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200). Also feeds EoC perihelion phase and planet PerihelionFromEarth startPos. Sensitivity: 1461 min/deg on timing. IMPORTANT: changing this value requires re-tuning earthRAAngle for solstice timing.
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
@@ -1095,22 +1095,22 @@ const ASTRO_REFERENCE = {
   //         s = heliocentric distance (AU), T = centuries from J2000
   // Fitted from JPL reference data via linear least squares (15/18/24/30/36/42 terms per planet).
   decCorrection: {
-    Mercury: { A:-27.2525, B:-145.9324, C: 0.0124, D:-59.7539, E: 113.7188, F: 59.6579, G: 67.0522, H:-38.1228, I: 37.0312, J: 0.4275, K: 0.0352, L: 91.2047, M: 128.1251, N:-39.7702, O:-101.7942, P: 0.0247, Q: 0.2567, R:-0.0911, S:-0.2310, U:-52.4784, V:-18.4280, W:-9.0806, X:-10.3781, Y: 34.6320, Z: 38.8751, AA: 29.2897, AB:-30.1238, AC: 0.0486, AD:-4.2652, AE: 6.2752, AF:-4.1682, AG:-2.1692, AH: 23.4720, AI:-36.3581, AJ: 9.3066, AK:-5.1554, AL:-1.5851, AM:-15.6415, AN: 0.0215, AO:-0.1225, AP:-16.2210, AQ: 14.9281 },
-    Venus:   { A: 51.9923, B:-0.2648, C:-0.0004, D: 7.7020, E: 0.0224, F: 0.0672, G: 2.2244, H:-0.0251, I: 0.0317, J:-0.0049, K: 0.0473, L:-74.0972, M:-5.3111, N: 3.7029, O: 1.5380, P: 0.0018, Q:-0.0103, R:-0.0111, S:-0.0004, U:-0.0219, V: 26.3944, W:-0.1085, X: 2.2845, Y:-1.5185, Z: 0.1374, AA:-5.5921, AB:-1.5382, AC: 0.0010, AD:-0.0057, AE:-2.6761, AF: 1.1263, AG:-1.6720, AH:-1.0446, AI: 3.8586, AJ: 0.0275, AK:-0.0004, AL:-0.0048, AM:-0.0129, AN: 0.0097, AO:-0.0251, AP:-0.0009, AQ:-0.0015 },
-    Mars:    { A:-7.0444, B: 12.2608, C: 0.1169, D: 13.1932, E:-0.1976, F: 0.3850, G:-4.1237, H: 0.1724, I: 0.1798, J: 0.4719, K:-0.1686, L: 20.0096, M:-0.2539, N:-7.9590, O: 0.6092, P:-0.2011, Q:-0.0967, R:-0.7152, S: 0.0737, U: 0.0856, V:-13.0864, W:-1.2679, X:-0.5909, Y:-0.1169, Z:-20.5555, AA:-20.9375, AB: 6.9872, AC: 0.2507, AD:-0.0571, AE: 11.2683 },
-    Jupiter: { A:-68.8543, B:-3.6939, C: 0.0060, D: 39.2352, E:-8.1538, F: 2.8293, G: 0.9880, H: 0.0251, I:-0.3986, J: 1.4267, K: 0.0495, L: 718.4219, M:-273.5972, N:-7.0498, O:-2.2764, P: 0.0014, Q:-0.0888, R:-0.9571, S: 0.0527, U: 42.9855, V:-1876.1536, W:-129.6377, X: 0.0979, Y: 8.9645, Z: 17.1203, AA: 176.5562, AB:-3.8218, AC: 0.0127, AD: 1.2973, AE: 30.3970, AF:-46.8972, AG:-0.1710, AH: 26.0509, AI:-512.6597, AJ: 0.2095, AK:-36.8296, AL: 0.0564, AM: 0.0068, AN:-4.7527, AO: 0.0525, AP: 637.1818, AQ:-74.1388 },
-    Saturn:  { A: 29.6988, B:-71.1983, C:-0.0111, D: 6.2907, E:-1.9522, F: 22.8634, G: 8.9502, H: 0.8847, I: 1.0729, J: 1.9589, K: 0.8763, L:-501.2850, M:-120.0924, N:-27.7394, O: 9.7509, P:-0.2102, Q:-0.3179, R:-0.1599, S: 0.2028, U:-5.3932, V: 2078.8928, W:-16.9710, X:-2.1605, Y:-1.1237, Z: 673.7108, AA:-71.0465, AB:-84.4232, AC:-0.0093, AD:-2.0208, AE: 158.9704, AF: 2.5975, AG: 14.8834, AH:-74.0474, AI: 1329.0012, AJ:-0.0304, AK:-1046.6948 },
-    Uranus:  { A:-12014.6239, B: 6873.6495, C:-0.7184, D:-48488.8423, E:-13468.0076, F: 2866.3330, G: 729.4721, H: 182.3813, I: 374.8878, J:-16.0452, K:-6.1177, L: 477888.9432, M: 495697.5751, N:-2797.4461, O: 9686.7120, P: 3.0726, Q: 0.2925, R: 15.6626, S: 14.7123, U: 77867.0939, V:-4895604.0585, W: 456739.5927, X:-374.1009, Y:-141.3021 },
-    Neptune: { A:-59.6725, B: 0.6590, C:-0.0683, D: 14.1351, E:-91.9172, F: 5.2460, G: 0.1904, H: 1.0200, I: 0.7024, J: 0.2904, K: 5.3726, L: 3790.3287, M:-160.7379, N:-5.2246, O: 43.7001, P: 0.0780, Q:-0.0708, R: 5.4363, S: 2.2203, U: 1391.4686, V:-60044.9027, W:-389.3905, X:-0.5954, Y:-0.9426 },
+    Mercury: { A:-42.1580, B:-136.9111, C: 0.0199, D:-41.4221, E: 114.6048, F: 63.4304, G: 63.2708, H:-37.8461, I: 37.9134, J: 0.3885, K: 0.0423, L: 99.2020, M: 112.6922, N:-43.1383, O:-99.2049, P: 0.0273, Q: 0.2542, R:-0.0850, S:-0.2322, U:-54.2725, V:-19.4364, W:-8.3356, X:-11.5504, Y: 34.6031, Z: 35.7135, AA: 19.4564, AB:-28.8159, AC: 0.0457, AD:-4.2448, AE: 7.1082, AF:-4.1742, AG:-1.8895, AH: 22.7071, AI:-30.2805, AJ: 9.3046, AK:-5.5443, AL:-1.6036, AM:-15.6155, AN: 0.0374, AO:-0.1266, AP:-15.1228, AQ: 15.2468 },
+    Venus:   { A: 60.7626, B:-0.8932, C:-0.0003, D: 8.4858, E: 0.0594, F: 0.0662, G: 2.9776, H:-0.0259, I: 0.0423, J:-0.0061, K: 0.0459, L:-86.6521, M:-5.2145, N: 2.9006, O: 2.1976, P:-0.0007, Q:-0.0102, R:-0.0109, S:-0.0006, U:-0.0394, V: 30.8925, W:-0.0917, X: 1.9233, Y:-1.8681, Z: 0.5894, AA:-6.1880, AB:-2.0806, AC: 0.0027, AD:-0.0097, AE:-2.0921, AF: 1.3795, AG:-1.4091, AH:-1.5356, AI: 3.8044, AJ: 0.0291, AK:-0.0026, AL:-0.0049, AM:-0.0138, AN: 0.0104, AO:-0.0242, AP:-0.0035, AQ: 0.0010 },
+    Mars:    { A:-6.4164, B: 12.1687, C: 0.1155, D: 13.1045, E:-0.1618, F: 0.3845, G:-4.1726, H: 0.1709, I: 0.1733, J: 0.4705, K:-0.1689, L: 18.6399, M:-0.2807, N:-7.9881, O: 0.5755, P:-0.2011, Q:-0.0960, R:-0.7092, S: 0.0746, U: 0.0690, V:-12.4622, W:-1.2951, X:-0.5755, Y:-0.1105, Z:-20.4109, AA:-20.7051, AB: 7.0557, AC: 0.2496, AD:-0.0565, AE: 11.2992 },
+    Jupiter: { A:-73.5513, B:-3.2419, C: 0.0059, D: 43.4228, E:-8.7702, F: 3.0187, G: 0.9644, H: 0.0303, I:-0.4094, J: 1.4245, K: 0.0492, L: 766.7635, M:-279.9261, N:-7.2380, O:-2.6774, P: 0.0018, Q:-0.0890, R:-0.9561, S: 0.0531, U: 46.1692, V:-2000.5352, W:-127.8654, X: 0.0325, Y: 8.7751, Z: 14.6272, AA: 151.9204, AB:-3.5471, AC: 0.0125, AD: 1.3448, AE: 30.9759, AF:-45.9327, AG: 0.1853, AH: 29.3256, AI:-466.0052, AJ: 0.2050, AK:-39.2636, AL: 0.0580, AM: 0.0061, AN:-4.7468, AO: 0.0540, AP: 632.7760, AQ:-79.5971 },
+    Saturn:  { A: 19.3183, B:-71.7532, C:-0.0114, D: 20.9244, E:-2.3648, F: 23.5618, G: 8.8020, H: 0.9145, I: 1.0635, J: 1.9590, K: 0.8763, L:-303.3555, M:-224.4044, N:-28.5406, O: 1.5343, P:-0.2085, Q:-0.3180, R:-0.1599, S: 0.2049, U:-3.6272, V: 1133.8305, W:-16.6243, X:-1.8483, Y:-1.0448, Z: 679.5758, AA:-206.8420, AB:-83.8303, AC:-0.0111, AD:-1.9587, AE: 164.8617, AF: 1.6022, AG: 11.8957, AH: 7.1487, AI: 2306.8003, AJ:-0.0220, AK:-1085.5028 },
+    Uranus:  { A:-12672.2828, B: 6934.6982, C:-0.5393, D:-50603.0840, E:-13789.0068, F: 2963.0081, G: 760.2826, H: 191.4876, I: 390.3497, J:-13.6654, K:-6.5028, L: 503850.8286, M: 517661.5124, N:-2889.1895, O: 9834.4182, P: 3.2428, Q: 0.3031, R: 13.4448, S: 11.3285, U: 81194.8440, V:-5153290.4849, W: 475879.5710, X:-389.4581, Y:-148.8904 },
+    Neptune: { A: 10.1378, B: 0.4644, C:-0.0687, D: 10.3930, E:-78.8758, F: 5.1040, G: 0.1936, H: 0.8112, I: 0.6993, J: 0.5025, K: 5.3711, L:-409.5977, M:-97.4693, N:-5.2228, O: 37.6943, P: 0.0813, Q:-0.0702, R: 5.2277, S: 2.2289, U: 1196.8445, V: 3123.7435, W:-320.1077, X:-0.5926, Y:-0.7388 },
   },
   raCorrection: {
-    Mercury: { A: 26.9619, B:-139.3448, C:-0.3545, D: 240.9854, E:-89.9732, F: 18.8930, G: 130.9174, H:-38.3574, I:-5.8991, J:-0.4392, K:-0.1111, L:-27.7598, M:-47.6916, N:-57.8867, O: 80.0358, P:-0.2833, Q: 0.0035, R: 0.0010, S: 0.3269, U: 43.0186, V:-2.3664, W: 9.9486, X:-23.5736, Y: 20.0624, Z: 64.9564, AA:-96.4733, AB:-47.7634, AC: 0.1379, AD: 4.8227, AE: 14.3596, AF:-0.4951, AG: 6.6242, AH:-18.9598, AI: 10.5280, AJ: 6.3304, AK: 0.2040, AL: 5.6282, AM:-9.4510, AN: 0.3584, AO: 0.1513, AP: 11.4077, AQ:-8.7992 },
-    Venus:   { A:-43.3374, B: 26.2334, C: 0.1009, D:-20.3682, E: 0.1597, F:-0.1089, G: 12.7674, H:-0.0314, I: 0.0933, J: 0.0076, K:-0.0215, L: 49.4747, M: 3.3663, N:-1.9758, O:-8.8199, P:-0.0475, Q:-0.0098, R:-0.0028, S:-0.0898, U:-0.2850, V:-12.8790, W: 0.0650, X: 5.8361, Y:-8.4415, Z:-18.9897, AA: 14.9148, AB:-9.2298, AC: 0.0322, AD:-0.0363, AE: 1.3454, AF: 6.1399, AG:-4.2154, AH: 6.3235, AI:-2.4125, AJ: 0.1021, AK: 0.0500, AL:-0.0045, AM:-0.0573, AN:-0.0050, AO: 0.0015, AP: 0.0109, AQ: 0.0528 },
-    Mars:    { A:-22.1972, B:-19.3845, C:-0.0253, D:-22.8814, E:-0.6000, F: 0.3459, G: 2.3001, H:-0.1659, I: 0.4348, J:-0.4945, K: 0.0522, L: 66.1332, M: 1.6301, N: 9.9363, O: 3.2280, P: 0.0390, Q: 0.0069, R: 0.2095, S:-0.0626, U:-0.6311, V:-54.6154, W: 9.6688, X:-0.0381, Y: 0.3470, Z: 33.2943, AA: 30.1784, AB:-5.1325, AC:-0.1184, AD:-0.1598, AE:-18.4057 },
-    Jupiter: { A: 140.3836, B: 430.3146, C:-0.0006, D:-89.7748, E:-99.5248, F: 3.9313, G:-14.6947, H: 0.7612, I:-0.0426, J: 0.6963, K:-0.1462, L:-1927.5444, M: 407.4097, N: 12.2714, O: 92.9143, P:-0.0194, Q: 0.1166, R:-0.6468, S: 1.2214, U: 525.0291, V: 6240.3539, W: 306.8034, X: 4.2562, Y:-8.7139, Z:-2251.7565, AA:-79.5990, AB: 74.8584, AC: 0.0257, AD: 0.2943, AE:-77.2564, AF: 43.3544, AG:-20.4140, AH:-327.5758, AI:-507.6906, AJ:-0.1896, AK:-51.5832, AL:-0.1349, AM: 0.0131, AN:-2.9503, AO: 0.9489, AP:-324.1987, AQ:-877.3065 },
-    Saturn:  { A:-189.0593, B: 495.6457, C: 0.0143, D: 343.5186, E: 16.7424, F: 30.7582, G: 34.6408, H: 1.4504, I: 3.8380, J:-2.1038, K: 1.6970, L: 3128.4136, M:-1988.3745, N:-28.9460, O:-198.4383, P: 0.4154, Q:-0.1492, R: 0.9111, S:-4.9323, U: 28.6747, V:-12649.8852, W: 851.0975, X:-15.1739, Y:-7.4635, Z:-4712.4469, AA:-4893.2001, AB:-350.1263, AC:-0.0179, AD:-13.3232, AE: 163.5543, AF: 57.2587, AG: 130.0275, AH: 1703.6317, AI: 26325.2675, AJ:-0.3106, AK:-1639.2763 },
-    Uranus:  { A:-35750.6325, B: 5129.6885, C: 5.3603, D:-113637.6142, E: 4680.4764, F: 1192.3829, G: 1949.6947, H:-176.2244, I: 1133.1761, J: 46.1370, K:-0.9884, L: 1343793.9527, M: 863849.9118, N:-1621.2899, O: 947.5969, P: 8.3174, Q:-0.3366, R:-41.4316, S:-104.0760, U:-99376.3414, V:-12764049.9756, W: 1295582.5558, X:-1104.2651, Y: 228.8723 },
-    Neptune: { A: 2355.2216, B: 6.9777, C:-0.4299, D:-881.9059, E:-853.1589, F:-5.3832, G:-1.0066, H:-3.0844, I: 0.8322, J:-4.8617, K:-0.0769, L:-141516.2932, M: 13116.7306, N: 6.6443, O: 423.9811, P: 1.6345, Q:-0.2767, R: 4.2930, S:-5.5389, U: 12874.1003, V: 2125791.9571, W: 13428.0366, X:-0.9840, Y: 3.0822 },
+    Mercury: { A: 29.9373, B:-141.8915, C:-0.3745, D: 223.1667, E:-83.7866, F: 14.8033, G: 129.2616, H:-37.0042, I:-5.8496, J:-0.4423, K:-0.1005, L:-25.8042, M:-34.4669, N:-52.2653, O: 72.4357, P:-0.2917, Q: 0.0087, R: 0.0006, S: 0.3331, U: 41.5670, V:-2.6921, W: 9.2043, X:-21.3527, Y: 18.8295, Z: 64.5204, AA:-90.0162, AB:-47.1134, AC: 0.1430, AD: 4.1645, AE: 13.1357, AF:-0.3135, AG: 6.0261, AH:-17.2620, AI: 7.7483, AJ: 6.0388, AK: 0.2556, AL: 5.5120, AM:-9.0578, AN: 0.3661, AO: 0.1452, AP: 9.1992, AQ:-8.2700 },
+    Venus:   { A:-46.8812, B: 26.1368, C: 0.1013, D:-17.4193, E: 0.3241, F:-0.1500, G: 14.4038, H:-0.0360, I: 0.1438, J: 0.0130, K:-0.0241, L: 54.4618, M: 2.7074, N:-1.4745, O:-8.4060, P:-0.0522, Q:-0.0101, R:-0.0058, S:-0.0901, U:-0.3280, V:-14.6204, W: 0.0765, X: 5.7782, Y:-8.4576, Z:-18.9287, AA: 12.7320, AB:-10.4144, AC: 0.0353, AD:-0.0485, AE: 0.9945, AF: 6.1590, AG:-4.1848, AH: 5.9929, AI:-1.9130, AJ: 0.1064, AK: 0.0568, AL:-0.0055, AM:-0.0579, AN:-0.0061, AO: 0.0029, AP: 0.0073, AQ: 0.0561 },
+    Mars:    { A:-23.7562, B:-19.8881, C:-0.0277, D:-23.4088, E:-0.7352, F: 0.3822, G: 2.3764, H:-0.1699, I: 0.4596, J:-0.4940, K: 0.0549, L: 70.3115, M: 1.7161, N: 10.1081, O: 3.5030, P: 0.0385, Q: 0.0070, R: 0.2084, S:-0.0615, U:-0.6223, V:-57.7872, W: 10.2904, X:-0.0686, Y: 0.3592, Z: 34.2623, AA: 30.6410, AB:-5.2824, AC:-0.1144, AD:-0.1664, AE:-18.8861 },
+    Jupiter: { A: 125.9809, B: 428.3819, C:-0.0007, D:-76.7096, E:-116.3221, F: 4.8486, G:-15.9098, H: 0.8021, I:-0.2000, J: 0.6839, K:-0.1441, L:-1775.0446, M: 384.6944, N: 11.6447, O: 102.0576, P:-0.0186, Q: 0.1164, R:-0.6421, S: 1.2220, U: 608.8541, V: 5836.7557, W: 309.4468, X: 4.7879, Y:-8.2695, Z:-2241.9664, AA:-158.1944, AB: 81.3926, AC: 0.0249, AD: 0.7488, AE:-76.0449, AF: 41.0250, AG:-22.8011, AH:-345.2128, AI:-327.9101, AJ:-0.1747, AK:-63.4810, AL:-0.1419, AM: 0.0123, AN:-2.9146, AO: 0.9375, AP:-345.9905, AQ:-1015.5445 },
+    Saturn:  { A:-174.5075, B: 499.5903, C: 0.0144, D: 328.9628, E: 18.8700, F: 29.6207, G: 33.9681, H: 1.4136, I: 4.0316, J:-2.1042, K: 1.6970, L: 2849.4922, M:-1899.0597, N:-30.4447, O:-187.2824, P: 0.4147, Q:-0.1492, R: 0.9117, S:-4.9336, U: 19.5177, V:-11311.2243, W: 854.4562, X:-15.6528, Y:-7.5300, Z:-4749.8589, AA:-4762.7996, AB:-342.8945, AC:-0.0172, AD:-14.4017, AE: 181.9895, AF: 57.5967, AG: 133.4388, AH: 1587.2838, AI: 25506.7746, AJ:-0.3183, AK:-1585.2187 },
+    Uranus:  { A:-38229.6674, B: 4960.4577, C: 5.9453, D:-120998.1729, E: 6220.2812, F: 1423.4248, G: 2060.5044, H:-136.6603, I: 1184.6611, J: 54.2106, K:-1.6843, L: 1438951.7742, M: 937373.4638, N:-1817.8022, O: 148.2366, P: 8.9478, Q:-0.4125, R:-49.3113, S:-115.2873, U:-113580.5386, V:-13676015.7490, W: 1363125.1654, X:-1155.2345, Y: 193.6668 },
+    Neptune: { A: 2275.4256, B: 7.1156, C:-0.4272, D:-899.7306, E:-842.4176, F:-5.6762, G:-1.1987, H:-3.0633, I: 0.8780, J:-4.8029, K:-0.0684, L:-136744.9132, M: 13377.6808, N: 7.1165, O: 418.9388, P: 1.6366, Q:-0.2725, R: 4.2360, S:-5.6104, U: 12725.0083, V: 2054472.0704, W: 13708.8757, X:-1.0372, Y: 3.0446 },
   },
 };
 
@@ -2644,6 +2644,8 @@ const sun = {
   orbitTilta: 0,
   orbitTiltb: 0,
   eccentricity: eocEccentricity,
+  _eccentricityKey: 'eccentricityEarth',
+  _eocDerived: true,  // Sun EoC = e_dynamic - e_base/2
   perihelionPhaseJ2000: -correctionSun * (Math.PI / 180) - 2 * Math.PI * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays + perihelionPhaseOffset * (Math.PI / 180),
   perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 16), // perihelion advances at H/16 rate
   
@@ -2938,6 +2940,8 @@ const mercury = {
   orbitTilta: Math.cos(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
   eccentricity: mercuryOrbitalEccentricityBase * mercuryEocFraction,
+  _eccentricityKey: 'eccentricityMercury',
+  _eocFraction: mercuryEocFraction,
   perihelionPhaseJ2000: -mercuryStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / mercurySolarYearCount) - Math.PI * 2 / mercuryPerihelionEclipticYears)
     * (mercuryPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3086,6 +3090,8 @@ const venus = {
   orbitTilta: Math.cos(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
   eccentricity: venusOrbitalEccentricityBase * venusEocFraction,
+  _eccentricityKey: 'eccentricityVenus',
+  _eocFraction: venusEocFraction,
   perihelionPhaseJ2000: -venusStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / venusSolarYearCount) - Math.PI * 2 / venusPerihelionEclipticYears)
     * (venusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3239,6 +3245,8 @@ const mars = {
   orbitTilta: Math.cos(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
   eccentricity: marsOrbitalEccentricityBase * marsEocFraction,
+  _eccentricityKey: 'eccentricityMars',
+  _eocFraction: marsEocFraction,
   perihelionPhaseJ2000: -marsStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / marsSolarYearCount) - Math.PI * 2 / marsPerihelionEclipticYears)
     * (marsPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3390,6 +3398,8 @@ const jupiter = {
   orbitTilta: Math.cos(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
   eccentricity: jupiterOrbitalEccentricityBase * jupiterEocFraction,
+  _eccentricityKey: 'eccentricityJupiter',
+  _eocFraction: jupiterEocFraction,
   perihelionPhaseJ2000: -jupiterStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / (holisticyearLength / 5))
     * (jupiterPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3546,6 +3556,8 @@ const saturn = {
   orbitTilta: Math.cos(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
   eccentricity: saturnOrbitalEccentricityBase * saturnEocFraction,
+  _eccentricityKey: 'eccentricitySaturn',
+  _eocFraction: saturnEocFraction,
   perihelionPhaseJ2000: -saturnStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / saturnPerihelionEclipticYears)
     * (saturnPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3702,6 +3714,8 @@ const uranus = {
   orbitTilta: Math.cos(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
   eccentricity: uranusOrbitalEccentricityBase * uranusEocFraction,
+  _eccentricityKey: 'eccentricityUranus',
+  _eocFraction: uranusEocFraction,
   perihelionPhaseJ2000: -uranusStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / uranusPerihelionEclipticYears)
     * (uranusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -3858,6 +3872,8 @@ const neptune = {
   orbitTilta: Math.cos(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
   orbitTiltb: Math.sin(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
   eccentricity: neptuneOrbitalEccentricityBase * neptuneEocFraction,
+  _eccentricityKey: 'eccentricityNeptune',
+  _eocFraction: neptuneEocFraction,
   perihelionPhaseJ2000: -neptuneStartpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / neptunePerihelionEclipticYears)
     * (neptunePerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
@@ -13906,19 +13922,20 @@ function setupGUI() {
 
     // -- Per-planet data (Mercury through Neptune) --
     const allPlanets = [
-      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricityBase, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: mercuryEocFraction, periRefJD: mercuryPerihelionRef_JD },
-      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricityBase,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: venusEocFraction, periRefJD: venusPerihelionRef_JD },
+      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricityBase, eccAmp: mercuryOrbitalEccentricityAmplitude, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: mercuryEocFraction, periRefJD: mercuryPerihelionRef_JD },
+      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricityBase,   eccAmp: venusOrbitalEccentricityAmplitude,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: venusEocFraction, periRefJD: venusPerihelionRef_JD },
 
-      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricityBase,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: marsEocFraction, periRefJD: marsPerihelionRef_JD },
-      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricityBase, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle, eocFrac: jupiterEocFraction, periRefJD: jupiterPerihelionRef_JD },
-      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricityBase,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle, eocFrac: saturnEocFraction, periRefJD: saturnPerihelionRef_JD },
-      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricityBase,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle, eocFrac: uranusEocFraction, periRefJD: uranusPerihelionRef_JD },
-      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricityBase, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle, eocFrac: neptuneEocFraction, periRefJD: neptunePerihelionRef_JD },
+      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricityBase,    eccAmp: marsOrbitalEccentricityAmplitude,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: marsEocFraction, periRefJD: marsPerihelionRef_JD },
+      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricityBase, eccAmp: jupiterOrbitalEccentricityAmplitude, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle, eocFrac: jupiterEocFraction, periRefJD: jupiterPerihelionRef_JD },
+      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricityBase,  eccAmp: saturnOrbitalEccentricityAmplitude,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle, eocFrac: saturnEocFraction, periRefJD: saturnPerihelionRef_JD },
+      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricityBase,  eccAmp: uranusOrbitalEccentricityAmplitude,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle, eocFrac: uranusEocFraction, periRefJD: uranusPerihelionRef_JD },
+      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricityBase, eccAmp: neptuneOrbitalEccentricityAmplitude, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle, eocFrac: neptuneEocFraction, periRefJD: neptunePerihelionRef_JD },
     ];
     allPlanets.forEach(p => {
       const v = {
         period: fmtD(p.period),
         ecc: String(p.ecc),
+        eccAmp: String(p.eccAmp),
         incEcl: p.incEcl != null ? fmtDeg(p.incEcl) : '\u2014',
         incInv: p.incInv != null ? fmtDeg(p.incInv) : '\u2014',
         longPeri: p.longPeri != null ? fmtDeg(p.longPeri) : '\u2014',
@@ -13939,7 +13956,8 @@ function setupGUI() {
       addFolderTooltip(pf, 'With ' + pCount + ' parameters, all orbital behaviours of ' + p.name + ' can be modelled.');
       // J2000 reference values first
       addConst(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
-      addConst(pf, v, 'ecc', 'Eccentricity (J2000)', 'Orbital eccentricity at J2000 (JPL).');
+      addConst(pf, v, 'ecc', 'Eccentricity base', 'Base orbital eccentricity (balance-derived mean).');
+      addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity over H/16 cycle.');
       addConst(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
       addConst(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
       addConst(pf, v, 'longPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 (JPL).');
@@ -30076,7 +30094,14 @@ function moveModel(pos) {
 
     // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
     if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
-      const e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
+      let e;
+      if (obj._eccentricityKey && o[obj._eccentricityKey] !== undefined) {
+        e = obj._eocDerived
+          ? o[obj._eccentricityKey] - eccentricityBase / 2       // Sun: eoc = e_dynamic - e_base/2
+          : o[obj._eccentricityKey] * obj._eocFraction;          // Planets: eoc = e_dynamic × fraction
+      } else {
+        e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
+      }
       const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
@@ -30198,10 +30223,11 @@ function moveModel(pos) {
       const earthPeriEcl = perihelionLongitudeEcliptic(earthPerihelionPrecession1, ASTRO_REFERENCE.perihelionLongitudeJ2000_deg);
       const planetPeriEcl = perihelionLongitudeEcliptic(obj.eclipticPrecLayer, obj.longitudePerihelion);
       const dw = (earthPeriEcl - planetPeriEcl) * Math.PI / 180;
-      let eo = 2 * ASTRO_REFERENCE.eccentricityJ2000 * 100 * Math.sin(dw);
+      let eo = 2 * (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000) * 100 * Math.sin(dw);
       if (obj.planetType === 'II') {
-        // Type II: static Mars orbit center offset + half Earth geocentric correction
-        const eccDist = obj._orbitalEccentricity * obj._orbitDistance * 100;
+        // Type II: Mars orbit center offset + half Earth geocentric correction
+        const dynEcc = obj._eccentricityKey ? (o[obj._eccentricityKey] || obj._orbitalEccentricity) : obj._orbitalEccentricity;
+        const eccDist = dynEcc * obj._orbitDistance * 100;
         eo = eccDist / 2 - eo / 2;
       } else {
         eo = (obj.signFlip || 1) * eo;

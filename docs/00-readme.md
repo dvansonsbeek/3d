@@ -68,6 +68,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 33 | [Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane, plane crossings |
 | 34 | [J2000 Calibration](34-j2000-calibration.md) | J2000-verified ascending nodes methodology |
 | 35 | [Formula Derivation](35-formula-derivation.md) | Planetary precession formula derivation: Fibonacci hierarchy, resonance loops, coefficient breakdowns |
+| 36 | [Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Tilt, inclination, and eccentricity: definitive balance calculations across all epochs |
 
 ### 40–49 Architecture & Code Structure
 

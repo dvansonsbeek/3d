@@ -127,7 +127,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 - **Axial precession**: ~25,770 years (H/13)
 - **Inclination precession**: ~111,669 years (H/3)
 - **Perihelion precession**: ~20,938 years (H/16)
-- **Model parameters**: Earth is defined by 26 parameters, the Moon by 9, and each planet by 15 — with only **6 free parameters** for the entire model
+- **Model parameters**: Earth is defined by 26 parameters, the Moon by 9, and each planet by 16 — with only **6 free parameters** for the entire model
 
 ---
 
