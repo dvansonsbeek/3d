@@ -15,7 +15,7 @@ SECTIONS:
   E. Earth — Time Periods (solar year, sidereal year, day length,
      sidereal day, stellar day)
   F. Earth — Precession Periods (axial, perihelion, inclination)
-  G. Unified Feature Matrix (273-term precession prediction)
+  G. Unified Feature Matrix (429-term precession prediction)
   H. Prediction Functions
 
 Adding new formula categories:
@@ -97,8 +97,67 @@ H_DIV_21 = H / 21               # H/21
 H_DIV_55 = H / 55               # H/55
 H_DIV_77 = H / 77               # H/77
 H_DIV_78 = H / 78               # H/78
+H_DIV_61 = H / 61               # H/61 — Earth perihelion harmonic
 H_DIV_80 = H / 80               # H/80 (5th harmonic of Earth perihelion)
 H_DIV_94 = H / 94               # H/94
+
+# Greedy-selected periods (GROUP 17) — from forward feature selection
+H_DIV_9  = H / 9                # H/9   — Mercury H/9×2δ cross-term
+H_DIV_45 = H / 45               # H/45  — Venus secondary improvement
+H_DIV_60 = H / 60               # H/60  — Venus primary improvement (strongest signal)
+
+# Greedy-selected periods (GROUP 18) — round-2 forward feature selection
+H_DIV_41  = H / 41              # H/41  — Mercury cross-term
+H_DIV_56  = H / 56              # H/56  — Mercury simple
+H_DIV_75  = H / 75              # H/75  — Venus/Jupiter simple
+H_DIV_110 = H / 110             # H/110 — Venus primary round-2 (strongest signal)
+
+# Greedy-selected periods (GROUP 19) — round-3 forward feature selection
+H_DIV_39  = H / 39              # H/39  — Mercury/Venus angle cross-term
+
+# Greedy-selected periods (GROUP 20) — round-4 forward feature selection
+H_DIV_37  = H / 37              # H/37  — Mercury primary round-4
+H_DIV_96  = H / 96              # H/96  — Venus (6th harmonic of Earth perihelion)
+H_DIV_112 = H / 112             # H/112 — Venus (7th harmonic of Earth perihelion)
+
+# Greedy-selected periods (GROUP 21) — round-5 forward feature selection
+H_DIV_7   = H / 7               # H/7   — Jupiter primary round-5
+H_DIV_18  = H / 18              # H/18  — Jupiter secondary round-5
+H_DIV_38  = H / 38              # H/38  — Mercury/Saturn cross-term
+
+# Greedy-selected periods (GROUP 22) — round-6 forward feature selection
+H_DIV_31  = H / 31              # H/31  — Venus dominant round-6 (ΔRMSE -1.55)
+H_DIV_35  = H / 35              # H/35  — Earth perihelion harmonic
+
+# Greedy-selected periods (GROUP 23) — round-7 forward feature selection
+H_DIV_128 = H / 128             # H/128 — Venus primary round-7 (8th harmonic of Earth perihelion)
+H_DIV_42  = H / 42              # H/42  — Venus secondary round-7
+
+# Saturn high-frequency harmonics (GROUP 24) — H/(8×34) harmonic series
+# Fundamental period H/272 = H/(8×34) connects Saturn precession (H/8) with Fibonacci-34
+H_DIV_272  = H / 272            # H/272  — n=1 fundamental (1231.6 yr)
+H_DIV_544  = H / 544            # H/544  — n=2 (615.8 yr)
+H_DIV_816  = H / 816            # H/816  — n=3 (410.5 yr)
+H_DIV_1088 = H / 1088           # H/1088 — n=4 (307.9 yr)
+H_DIV_1360 = H / 1360           # H/1360 — n=5 (246.3 yr)
+H_DIV_1632 = H / 1632           # H/1632 — n=6 (205.3 yr)
+H_DIV_1904 = H / 1904           # H/1904 — n=7 (175.9 yr)
+H_DIV_2176 = H / 2176           # H/2176 — n=8 (154.0 yr)
+H_DIV_2448 = H / 2448           # H/2448 — n=9 (136.8 yr)
+
+# Venus high-frequency triplets (GROUP 25) — carrier ± 16 sideband structure
+# Carriers at H/140,141,142 (~2376 yr) with ±16 sidebands from Earth perihelion
+H_DIV_124  = H / 124            # H/124  — sideband (H/140 - 16)
+H_DIV_125  = H / 125            # H/125  — sideband (H/141 - 16)
+H_DIV_126  = H / 126            # H/126  — sideband (H/142 - 16)
+H_DIV_129  = H / 129            # H/129  — secondary carrier
+H_DIV_139  = H / 139            # H/139  — carrier cluster
+H_DIV_140  = H / 140            # H/140  — carrier
+H_DIV_141  = H / 141            # H/141  — primary carrier (strongest signal)
+H_DIV_142  = H / 142            # H/142  — carrier
+H_DIV_143  = H / 143            # H/143  — carrier cluster
+H_DIV_157  = H / 157            # H/157  — sideband (H/141 + 16)
+H_DIV_158  = H / 158            # H/158  — sideband (H/142 + 16)
 
 # =============================================================================
 # SECTION B: PLANET CONFIGURATIONS
@@ -159,21 +218,32 @@ EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
 EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
 EARTH_ECC_MEAN = _ECCENTRICITY_DERIVED_MEAN
 
-# Earth perihelion harmonics (for perihelion and ERD calculation)
+# Earth perihelion harmonics (21-term Fourier, for perihelion and ERD calculation)
+# Fitted via OLS to 11553 Excel data points — RMSE 0.0035°, J2000 error 0.0003°
 PERI_HARMONICS = [
-    (EARTH_PERI_PERIOD, 4.8906, -0.0223),
-    (EARTH_PERI_2, 2.6637, 0.2477),
-    (EARTH_PERI_3, 0.2217, 0.0202),
-    (EARTH_PERI_4, 0.0708, 0.0123),
-    (INCLIN_CYCLE, -0.1318, 0.0073),
-    (OBLIQ_CYCLE, 0.1200, -0.0078),
-    (H_DIV_29, -0.1309, -0.0060),
-    (H_DIV_24, 0.1303, 0.0060),
-    (H_DIV_40, 0.0163, 0.0007),
-    (H_DIV_13, 0.0118, 0.0005),
-    (H_DIV_80, 0.0105, 0.0019),
+    (EARTH_PERI_PERIOD,  4.890662, -0.022232),
+    (EARTH_PERI_2,       2.663350,  0.252940),
+    (EARTH_PERI_3,       0.221636,  0.020675),
+    (EARTH_PERI_4,       0.070710,  0.012559),
+    (INCLIN_CYCLE,      -0.131799,  0.007423),
+    (H_DIV_29,          -0.130859, -0.006179),
+    (H_DIV_24,           0.130344,  0.006152),
+    (OBLIQ_CYCLE,        0.120049, -0.007974),
+    (H_DIV_40,           0.016290,  0.000666),
+    (H_DIV_13,           0.011751,  0.000554),
+    (H_DIV_45,          -0.010680, -0.000401),
+    (H_DIV_80,           0.010493,  0.001965),
+    (H_DIV_272,          0.006051, -0.005402),
+    (H_DIV_56,           0.006948,  0.000894),
+    (H_DIV_61,          -0.006492, -0.000877),
+    (H_DIV_35,          -0.005619, -0.000266),
+    (H_DIV_544,         -0.005401, -0.000629),
+    (H_DIV_21,          -0.003466,  0.000049),
+    (H_DIV_5,           -0.003215,  0.000012),
+    (H_DIV_96,           0.002785,  0.000683),
+    (H_DIV_816,          0.001235,  0.001767),
 ]
-PERI_OFFSET = -0.2608
+PERI_OFFSET = -0.261258
 
 # =============================================================================
 # SECTION C: EARTH ORBITAL PARAMETERS
@@ -493,12 +563,12 @@ def calc_inclination_precession(year: int) -> float:
 
 
 # =============================================================================
-# SECTION G: UNIFIED FEATURE MATRIX (273 terms)
+# SECTION G: UNIFIED FEATURE MATRIX (429 terms)
 # =============================================================================
 
 def build_features(year: int, planet_period: float, planet_theta0: float) -> List[float]:
     """
-    Build unified 273-term feature matrix for any planet.
+    Build unified 429-term feature matrix for any planet.
 
     This is the SAME structure for all 7 planets. Only the planet_period
     and planet_theta0 parameters vary.
@@ -520,8 +590,15 @@ def build_features(year: int, planet_period: float, planet_theta0: float) -> Lis
     - Venus periodic terms (H/80, H/21, periodic×3δ): 16 terms
     - Time-varying obliq/ecc interactions: 12 terms (critical for Saturn)
     - Venus fine-tuning (H/78, H/94, H/77, H/55): 20 terms
+    - Greedy-selected: H/60 simple, H/24×angle, H/45×angle, H/9×2δ: 14 terms
+    - Greedy round-2: H/110, H/60×angle, H/75, H/41×angle, H/56, H/45 simple: 16 terms
+    - Greedy round-3: H/56×angle, H/41×2δ, ERD×H/110, ERD×6δ, H/39×angle: 16 terms
+    - Greedy round-4: H/60×2δ, H/112×angle, H/39×2δ, H/96×angle, H/37: 18 terms
+    - Greedy round-5: H/96×2δ, H/7+angle, H/18, H/37×2δ, H/38×2δ, ERD×6δ: 22 terms
+    - Greedy round-6: H/31 bundle: 10 terms
+    - Greedy round-7: H/128 bundle, H/42 bundle: 20 terms
 
-    Total: 273 terms
+    Total: 429 terms
     """
     # Time offset for periodic terms
     t = time_offset(year)
@@ -901,6 +978,309 @@ def build_features(year: int, planet_period: float, planet_theta0: float) -> Lis
     features.append(erd * math.sin(phase))
     features.append(erd * math.cos(phase))
 
+    # =========================================================================
+    # GROUP 17: GREEDY-SELECTED TERMS (273-286) - 14 terms
+    # Found by greedy forward feature selection (greedy_features.py).
+    # H/60 is the dominant missing signal for Venus (saves 4.45 "/cy RMSE).
+    # H/24×angle is dominant for Mercury (saves 0.93 "/cy RMSE).
+    # H/45×angle is secondary for Venus.
+    # H/9×2δ is secondary for Mercury.
+    # =========================================================================
+
+    # H/60 simple (2) — primary Venus improvement
+    phase = 2 * math.pi * t / H_DIV_60
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # H/24 × angle (4) — primary Mercury improvement
+    phase = 2 * math.pi * t / H_DIV_24
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/45 × angle (4) — secondary Venus improvement
+    phase = 2 * math.pi * t / H_DIV_45
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/9 × 2δ (4) — secondary Mercury improvement
+    phase = 2 * math.pi * t / H_DIV_9
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # =========================================================================
+    # GROUP 18: GREEDY ROUND-2 TERMS (287-302) - 16 terms
+    # Found by second round of greedy_features.py on updated residuals.
+    # H/110 is the strongest new Venus signal (-1.40 "/cy RMSE each round).
+    # H/60×angle expands the GROUP 17 H/60 to include cross-angle terms.
+    # H/75 helps Venus and Jupiter.
+    # H/41×angle is primary new Mercury term.
+    # H/56 and H/45 simple complete round-2 improvements.
+    # =========================================================================
+
+    # H/110 simple (2) — Venus primary round-2
+    phase = 2 * math.pi * t / H_DIV_110
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # H/60 × angle (4) — Venus secondary (H/60 simple already in GROUP 17)
+    phase = 2 * math.pi * t / H_DIV_60
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/75 simple (2) — Venus/Jupiter
+    phase = 2 * math.pi * t / H_DIV_75
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # H/41 × angle (4) — Mercury primary round-2
+    phase = 2 * math.pi * t / H_DIV_41
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/56 simple (2) — Mercury secondary round-2
+    phase = 2 * math.pi * t / H_DIV_56
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # H/45 simple (2) — Neptune (H/45 was in GROUP 17 only as ×angle)
+    phase = 2 * math.pi * t / H_DIV_45
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # =========================================================================
+    # GROUP 19: GREEDY ROUND-3 TERMS (303-318) - 16 terms
+    # H/56×angle is Mercury's strongest round-3 signal, also Neptune.
+    # H/41×2δ completes Mercury's H/41 (×angle was in GROUP 18).
+    # ERD×H/110 is Venus's strongest new signal (simple was in GROUP 18).
+    # ERD×6δ is Venus's second strongest residual correlator.
+    # H/39×angle helps both Mercury and Venus.
+    # =========================================================================
+
+    # H/56 × angle (4) — Mercury primary round-3, Neptune secondary
+    phase = 2 * math.pi * t / H_DIV_56
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/41 × 2δ (4) — Mercury secondary round-3 (×angle already in G18)
+    phase = 2 * math.pi * t / H_DIV_41
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # ERD × H/110 (2) — Venus primary round-3 (simple already in G18)
+    phase = 2 * math.pi * t / H_DIV_110
+    features.append(erd * math.sin(phase))
+    features.append(erd * math.cos(phase))
+
+    # ERD × 6δ (2) — Venus secondary round-3
+    features.append(erd * math.sin(6 * diff))
+    features.append(erd * math.cos(6 * diff))
+
+    # H/39 × angle (4) — Mercury/Venus tertiary round-3
+    phase = 2 * math.pi * t / H_DIV_39
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # =========================================================================
+    # GROUP 20: GREEDY ROUND-4 TERMS (319-336) - 18 terms
+    # H/60×2δ is Venus's strongest round-4 signal.
+    # H/112×angle is Venus's second (7th harmonic of Earth perihelion).
+    # H/39×2δ completes Venus/Mercury H/39 (×angle was in GROUP 19).
+    # H/96×angle is Venus's fourth (6th harmonic of Earth perihelion).
+    # H/37 simple is Mercury's strongest new period signal.
+    # =========================================================================
+
+    # H/60 × 2δ (4) — Venus primary round-4
+    phase = 2 * math.pi * t / H_DIV_60
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # H/112 × angle (4) — Venus secondary round-4
+    phase = 2 * math.pi * t / H_DIV_112
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/39 × 2δ (4) — Venus/Mercury tertiary round-4
+    phase = 2 * math.pi * t / H_DIV_39
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # H/96 × angle (4) — Venus quaternary round-4
+    phase = 2 * math.pi * t / H_DIV_96
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/37 simple (2) — Mercury primary round-4
+    phase = 2 * math.pi * t / H_DIV_37
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # =========================================================================
+    # GROUP 21: GREEDY ROUND-5 TERMS (337-358) - 22 terms
+    # H/96×2δ is Venus's dominant round-5 signal (ΔRMSE -0.50).
+    # H/7×angle and H/18 simple help Jupiter.
+    # H/37×2δ completes Mercury's H/37 (simple was in GROUP 20).
+    # H/38×2δ helps Mercury and Saturn.
+    # ERD×6δ extends the 6δ pattern for Venus.
+    # =========================================================================
+
+    # H/96 × 2δ (4) — Venus dominant round-5
+    phase = 2 * math.pi * t / H_DIV_96
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # H/7 simple + ×angle (6) — Jupiter primary round-5
+    phase = 2 * math.pi * t / H_DIV_7
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p)
+    features.append(cos_p)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+
+    # H/18 simple (2) — Jupiter secondary round-5
+    phase = 2 * math.pi * t / H_DIV_18
+    features.append(math.sin(phase))
+    features.append(math.cos(phase))
+
+    # H/37 × 2δ (4) — Mercury round-5
+    phase = 2 * math.pi * t / H_DIV_37
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # H/38 × 2δ (4) — Mercury/Saturn round-5
+    phase = 2 * math.pi * t / H_DIV_38
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # ERD × 6δ (2) — Venus round-5
+    features.append(erd * math.cos(6 * diff))
+    features.append(erd * math.sin(6 * diff))
+
+    # =========================================================================
+    # GROUP 22: GREEDY ROUND-6 TERMS (359-368) - 10 terms
+    # H/31 bundle is Venus's dominant round-6 signal (ΔRMSE -1.55).
+    # =========================================================================
+
+    # H/31 simple + ×angle + ×2δ (10) — Venus dominant round-6
+    phase = 2 * math.pi * t / H_DIV_31
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p)
+    features.append(cos_p)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # =========================================================================
+    # GROUP 23: GREEDY ROUND-7 TERMS (369-388) - 20 terms
+    # H/128 is Venus's primary round-7 signal (8th harmonic of perihelion).
+    # H/42 is Venus's secondary round-7 signal.
+    # =========================================================================
+
+    # H/128 simple + ×angle + ×2δ (10) — Venus primary round-7
+    phase = 2 * math.pi * t / H_DIV_128
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p)
+    features.append(cos_p)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # H/42 simple + ×angle + ×2δ (10) — Venus secondary round-7
+    phase = 2 * math.pi * t / H_DIV_42
+    sin_p, cos_p = math.sin(phase), math.cos(phase)
+    features.append(sin_p)
+    features.append(cos_p)
+    features.append(sin_p * math.cos(diff))
+    features.append(sin_p * math.sin(diff))
+    features.append(cos_p * math.cos(diff))
+    features.append(cos_p * math.sin(diff))
+    features.append(sin_p * math.cos(2 * diff))
+    features.append(sin_p * math.sin(2 * diff))
+    features.append(cos_p * math.cos(2 * diff))
+    features.append(cos_p * math.sin(2 * diff))
+
+    # =========================================================================
+    # GROUP 24: SATURN HIGH-FREQUENCY HARMONICS (389-406) - 18 terms
+    # H/(8×34×n) harmonic series for n=1..9
+    # Fundamental H/272 connects Saturn precession (H/8) with Fibonacci-34.
+    # Dominates Saturn/Jupiter residuals; helps all planets except Venus.
+    # =========================================================================
+
+    for p in [H_DIV_272, H_DIV_544, H_DIV_816, H_DIV_1088,
+              H_DIV_1360, H_DIV_1632, H_DIV_1904, H_DIV_2176, H_DIV_2448]:
+        phase = 2 * math.pi * t / p
+        features.append(math.sin(phase))
+        features.append(math.cos(phase))
+
+    # =========================================================================
+    # GROUP 25: VENUS HIGH-FREQUENCY TRIPLETS (429-428) - 22 terms
+    # Carrier signals near H/141 (~2376 yr) with ±16 sidebands from Earth
+    # perihelion modulation. Three triplets: H/{125,141,157}, H/{124,140,156},
+    # H/{126,142,158}, plus cluster members H/129, H/139, H/143.
+    # =========================================================================
+
+    for p in [H_DIV_124, H_DIV_125, H_DIV_126, H_DIV_129, H_DIV_139,
+              H_DIV_140, H_DIV_141, H_DIV_142, H_DIV_143, H_DIV_157, H_DIV_158]:
+        phase = 2 * math.pi * t / p
+        features.append(math.sin(phase))
+        features.append(math.cos(phase))
+
     return features
 
 
@@ -915,7 +1295,7 @@ def predict_fluctuation(year: int, planet_key: str, coefficients: List[float]) -
     Args:
         year: Calendar year
         planet_key: Planet identifier ('mercury', 'venus', etc.)
-        coefficients: Trained coefficient array (273 values)
+        coefficients: Trained coefficient array (429 values)
 
     Returns:
         Precession fluctuation in arcsec/century

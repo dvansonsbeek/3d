@@ -23,7 +23,7 @@ const DEG2RAD = Math.PI / 180;
 // Build lookup tables from per-planet data
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const orbitDistance = { earth: 1.0 };
-const ecc = { earth: C.eccJ2000.earth };
+const ecc = { earth: C.eccentricityBase };  // Base eccentricities for balance
 const inclJ2000 = {};
 const omegaJ2000 = {};
 const period = {};
@@ -34,7 +34,7 @@ for (const p of planets) {
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
-  ecc[p] = C.planets[p].orbitalEccentricity;
+  ecc[p] = C.planets[p].orbitalEccentricityBase;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
   period[p] = C.planets[p].perihelionEclipticYears;

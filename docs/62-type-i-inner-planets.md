@@ -50,13 +50,13 @@ apparent eccentricity of the planet's motion.
 ### The Type I formula
 
 ```
-realOrbitalEccentricity = orbitalEccentricity / (1 + orbitalEccentricity)
+realOrbitalEccentricity = orbitalEccentricityBase / (1 + orbitalEccentricityBase)
 perihelionDistance = orbitDistance * realOrbitalEccentricity * 100
 elipticOrbit = perihelionDistance / 2
 ```
 
 Where:
-- `orbitalEccentricity` = J2000 eccentricity (input constant, unchanged)
+- `orbitalEccentricityBase` = J2000 eccentricity (input constant, unchanged)
 - `realOrbitalEccentricity` = circular-orbit equivalent (derived)
 - `orbitDistance` = semi-major axis in AU (from Kepler's 3rd law)
 - `100` = scale factor (1 AU = 100 scene units)
@@ -65,7 +65,7 @@ Where:
 ### Additional derived values
 
 ```
-eccentricityPerihelion = (perihelionDistance / 2) * orbitalEccentricity
+eccentricityPerihelion = (perihelionDistance / 2) * orbitalEccentricityBase
 lowestPoint = 180 - ascendingNode
 ```
 
@@ -170,7 +170,7 @@ theta += 2 * (e * eocFraction) * sin(M) + 1.25 * (e * eocFraction)^2 * sin(2M)
 ```
 
 Each planet has:
-- `eccentricity`: `orbitalEccentricity * eocFraction` (effective EoC amplitude)
+- `eccentricity`: `orbitalEccentricityBase * eocFraction` (effective EoC amplitude)
 - `perihelionPhaseJ2000`: phase-optimized initial phase (from perihelion ref JD)
 - `perihelionPrecessionRate`: `2pi / perihelionEclipticYears`
 
@@ -246,7 +246,7 @@ phase-optimized reference JD providing the correct initial phase alignment.
 ```
 solarYearInput:            87.9686       (orbital period in days)
 eclipticInclinationJ2000:  7.00497902    (ecliptic inclination, degrees)
-orbitalEccentricity:       0.20563593    (J2000 eccentricity -- INPUT)
+orbitalEccentricityBase:       0.20563593    (J2000 eccentricity -- INPUT)
 realOrbitalEccentricity:   0.17056221    (e/(1+e) -- DERIVED)
 eocFraction:               -0.527        (EoC multiplier, negative = anti-Keplerian)
 longitudePerihelion:        77.4569131    (ecliptic longitude of perihelion, degrees)
@@ -265,7 +265,7 @@ mirrorPair:                'uranus'      (paired planet)
 ```
 solarYearInput:            224.695       (orbital period in days, calibrated)
 eclipticInclinationJ2000:  3.39467605    (ecliptic inclination, degrees)
-orbitalEccentricity:       0.00677672    (J2000 eccentricity -- INPUT)
+orbitalEccentricityBase:       0.00619052    (base eccentricity -- INPUT)
 realOrbitalEccentricity:   0.00673098    (e/(1+e) -- DERIVED)
 eocFraction:               0.436         (EoC multiplier)
 longitudePerihelion:        131.5765919   (ecliptic longitude of perihelion, degrees)

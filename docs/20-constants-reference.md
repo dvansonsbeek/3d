@@ -2,7 +2,7 @@
 
 This document is the **single source of truth** for all constants used in the Holistic Universe Model simulation. Other documents should reference this document rather than duplicating values.
 
-> **Last synchronized with `tools/lib/constants.js` on 2026-03-09.**
+> **Last synchronized with `tools/lib/constants.js` on 2026-03-13.**
 
 ### Code organization
 
@@ -298,7 +298,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Appendix E (84)](84-inc
 |--------|---------|----------------|
 | Mercury | H / (1 + 3/8) | ~243,642 |
 | Venus | H × 2 | ~670,016 |
-| Earth | H / 3 | ~111,669 |
+| Earth | H / 16 | 20,938 |
 | Mars | H / (4 + 1/3) | ~77,310 |
 | Jupiter | H / 5 | 67,002 |
 | Saturn | -H / 8 | -41,876 (retrograde) |
@@ -346,14 +346,14 @@ Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divi
 
 ## Earth Perihelion Harmonics
 
-The `PERI_HARMONICS` array models Earth's perihelion longitude with 12 Fourier terms.
+The `PERI_HARMONICS` array models Earth's perihelion longitude with 21 Fourier terms (RMSE 0.0035°, J2000 error 0.0003°).
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `PERI_HARMONICS` | 12-term array | `[period, sin_coeff, cos_coeff]` per term |
-| `PERI_OFFSET` | -0.3071 deg | Global offset correction |
+| `PERI_HARMONICS` | 21-term array | `[period, sin_coeff, cos_coeff]` per term |
+| `PERI_OFFSET` | -0.261258 deg | Global offset correction |
 
-Periods are Fibonacci fractions of H: H/16, H/32, H/48, H/64, H/3, H/8, H/29, H/24, H, H/2, H/40.
+Periods: H/16, H/32, H/48, H/64, H/3, H/29, H/24, H/8, H/40, H/13, H/45, H/80, H/272, H/56, H/61, H/35, H/544, H/21, H/5, H/96, H/816.
 
 ## Delta-T
 
@@ -418,7 +418,27 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Axial Coin Rotation | `axialCoinRotationMs` | meanSiderealday / (H/13) / (meansolaryearlengthinDays + 1) × 1000 | ~9.12 ms/sidereal day |
 | Yearly accumulation | `axialCoinRotationYearlySeconds` | offset × (meansolaryearlengthinDays + 1) | ~3.34 s/year |
 
-**Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle. Note: RA-based solar day measurements (Method A) show a mean offset of ~14.2 ms shorter than `meanlengthofday`, confirmed across 65 epochs over one full H. The physical cause of this 14.2 ms offset is not yet explained — perihelion precession produces only a sinusoidal modulation (~7.1 ms amplitude) that cancels in the mean.
+**Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle.
+
+## RA Day Offset
+
+RA-based solar day measurements (Methods A/D) show the mean solar day consistently shorter than `meanlengthofday`. Confirmed by the "Solar day multiepoch" test across 65 epochs spanning one full H (R² = 0.994, RMS = 0.324 ms):
+
+```
+offset(t) = −14.194 − 5.640·cos(2π·t/(H/16)) − 1.684·cos(2π·t/(H/8))   [ms/day]
+```
+
+where `t = year − balancedYear`.
+
+| Constant | Variable | Value | Description |
+|----------|----------|-------|-------------|
+| RA Day Offset Mean | `RA_SOLAR_DAY_OFFSET_MEAN_MS` | −14.194 ms/day | Mean offset; physical cause unknown |
+| RA Day Offset Ecc Amp | `RA_SOLAR_DAY_OFFSET_ECC_MS` | −5.640 ms/day | H/16 cosine amplitude (eccentricity/perihelion) |
+| RA Day Offset Obliq Amp | `RA_SOLAR_DAY_OFFSET_OBLIQ_MS` | −1.684 ms/day | H/8 cosine amplitude (obliquity) |
+
+At J2000: offset ≈ −8.3 ms (less negative than mean because eccentricity is near H/16-cycle maximum, contributing +5.5 ms).
+
+The **Measured Solar Day** = `meanlengthofday + offset/1000` (in seconds). At J2000 ≈ 86,399.9913 s; long-term mean ≈ 86,399.9856 s.
 
 **Axial Coin Rotation**: Axial precession (H/13) causes the stellar day to exceed the sidereal day by ~9.1 ms. This accumulates to 1 extra sidereal day over one axial precession cycle.
 
@@ -611,7 +631,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Parameter | Variable | Value | Source |
 |-----------|----------|-------|--------|
 | Orbital Period | `solarYearInput` | 90,465 days | JPL Horizons |
-| Eccentricity | `orbitalEccentricity` | 0.2488273 | JPL Horizons |
+| Eccentricity | `orbitalEccentricityBase` | 0.2488273 | JPL Horizons |
 | Long. Perihelion | `longitudePerihelion` | 224.06891 deg | JPL Horizons |
 | Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | 136,047,200 | DE440 |
 | GM | `GM_PLUTO` | ~975.5 km³/s² | Derived from Charon orbit |
@@ -623,7 +643,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Ecliptic Inclination | `eclipticInclinationJ2000` | 162.26269 deg | JPL (retrograde orbit) |
 | Ascending Node (Ecliptic) | `ascendingNode` | 58.42008 deg | JPL Horizons |
 | Orbital Period | `solarYearInput` | 27,503 days | JPL |
-| Eccentricity | `orbitalEccentricity` | 0.96714291 | JPL |
+| Eccentricity | `orbitalEccentricityBase` | 0.96714291 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 111.33249 deg | JPL Horizons |
 | Mass | `M_HALLEYS` | ~2.2 × 10¹⁴ kg | Estimated (~11×8×8 km, ~0.6 g/cm³) |
 
@@ -634,7 +654,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Ecliptic Inclination | `eclipticInclinationJ2000` | 10.82760 deg | JPL Horizons |
 | Ascending Node (Ecliptic) | `ascendingNode` | 304.30993 deg | JPL Horizons |
 | Orbital Period | `solarYearInput` | 642.93 days | JPL |
-| Eccentricity | `orbitalEccentricity` | 0.2229512 | JPL |
+| Eccentricity | `orbitalEccentricityBase` | 0.2229512 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 178.81322 deg | JPL Horizons |
 | Mass | `M_EROS` | 6.687 × 10¹⁵ kg | NEAR Shoemaker (2000–2001) |
 
@@ -646,7 +666,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Inv. Plane Inclination | `invPlaneInclinationJ2000` | 0.4331698 deg | S&S 2012 |
 | Ascending Node (Ecliptic) | `ascendingNode` | 80.30533 deg | JPL Horizons |
 | Orbital Period | `solarYearInput` | 1,680.5 days | JPL |
-| Eccentricity | `orbitalEccentricity` | 0.0755347 | JPL |
+| Eccentricity | `orbitalEccentricityBase` | 0.0755347 | JPL |
 | Long. Perihelion | `longitudePerihelion` | 73.59769 deg | JPL Horizons |
 | Orbit Distance | `orbitDistanceOverride` | 2.76596 AU | JPL Horizons |
 | GM | `GM_CERES` | 62.6274 km³/s² | Dawn spacecraft (2015–2018) |
@@ -675,19 +695,56 @@ These values result from the optimization campaign (2025-2026) and may change in
 | Uranus | `solarYearInput` | 30586 | 30583 |
 | Neptune | `solarYearInput` | 59980 | 59896 |
 
-## Planet Orbital Eccentricities (Tuned)
+## Planet Orbital Eccentricities (Base)
 
-Outer planets use "dual-balanced" eccentricities optimized for both inclination and eccentricity balance:
+Base eccentricities represent the fixed perihelion distance. They achieve 100% Law 5 eccentricity balance. See [doc 35 §6](35-tilt-and-definitive-balance-calculations.md) for derivation.
 
-| Planet | `orbitalEccentricity` | J2000 Value | Delta | Type |
-|--------|----------------------|-------------|-------|------|
-| Mercury | 0.20563593 | 0.20563593 | 0% | J2000 |
-| Venus | 0.00677672 | 0.00677672 | 0% | J2000 |
-| Mars | 0.09339410 | 0.09339410 | 0% | J2000 |
+| Planet | `orbitalEccentricityBase` | J2000 Value | Delta | Source |
+|--------|--------------------------|-------------|-------|--------|
+| Mercury | 0.20563593 | 0.20563593 | 0% | Tilt ~0, no fluctuation |
+| Venus | 0.00619052 | 0.00677672 | -8.65% | H/16 fit to JPL data |
+| Mars | 0.09297543 | 0.09339410 | -0.45% | H/16 fit to JPL data |
 | Jupiter | 0.04821478 | 0.04838624 | -0.35% | Dual-balanced |
-| Saturn | 0.05374486 | 0.05386179 | -0.22% | Dual-balanced (= Law 5 prediction) |
+| Saturn | 0.05374486 | 0.05386179 | -0.22% | Law 5 prediction |
 | Uranus | 0.04734421 | 0.04725744 | +0.18% | Dual-balanced |
-| Neptune | 0.00867761 | 0.00859048 | +1.01% | Dual-balanced |
+| Neptune | 0.00868571 | 0.00859048 | +1.11% | Solved for 100% balance |
+
+## Planet Eccentricity Amplitudes & Coupling Constant
+
+Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))`. See [doc 35 §4-5](35-tilt-and-definitive-balance-calculations.md).
+
+| Constant | Variable | Value | Description |
+|----------|----------|-------|-------------|
+| Coupling constant K | `eccentricityAmplitudeK` | 3.4505372893e-6 | Universal tilt-eccentricity coupling |
+
+| Planet | `orbitalEccentricityAmplitude` | % of Base | Regime |
+|--------|-------------------------------|-----------|--------|
+| Mercury | 8.436789e-5 | 0.041% | Tilt-driven (tilt ~0, negligible) |
+| Venus | 9.625389e-4 | 15.5% | Tilt-driven |
+| Earth | 1.37032e-3 | 8.9% | Tilt-driven |
+| Mars | 3.073636e-3 | 3.3% | Tilt-driven |
+| Jupiter | 1.149908e-6 | 0.002% | Laplace-Lagrange dominant |
+| Saturn | 5.403008e-6 | 0.010% | Laplace-Lagrange dominant |
+| Uranus | 2.831008e-5 | 0.060% | Laplace-Lagrange dominant |
+| Neptune | 8.098033e-6 | 0.093% | Laplace-Lagrange dominant |
+
+Inner planets (Mercury–Mars): tilt amplitude fully explains the J2000−base difference.
+Outer planets (Jupiter–Neptune): tilt amplitude is negligible; J2000−base differences come from Laplace-Lagrange secular eigenmode exchange.
+
+## Planet Eccentricity Phase Constants (J2000)
+
+Phase angles for the eccentricity oscillation formula. All planets oscillate at H/16 = 20,938 years. Mirror pairs are offset by 180° for tighter Law 5 balance. See [doc 35 §10](35-tilt-and-definitive-balance-calculations.md).
+
+| Planet | `eccentricityPhaseJ2000` (deg) | Mirror Pair | Source |
+|--------|-------------------------------|-------------|--------|
+| Mercury | 89.9882 | Uranus (d=21) | Analytical from J2000 constraint |
+| Venus | 123.7514 | Neptune (d=34) | Analytical from J2000 constraint |
+| Earth | 192.9471 | Saturn (d=3) | ω + 90° = 102.947° + 90° |
+| Mars | 96.8878 | Jupiter (d=5) | Analytical from J2000 constraint |
+| Jupiter | 276.8878 | Mars (d=5) | Mirror-pair rule (96.89° + 180°) |
+| Saturn | 12.9471 | Earth (d=3) | Mirror-pair rule (192.95° + 180°) |
+| Uranus | 269.9882 | Mercury (d=21) | Mirror-pair rule (89.99° + 180°) |
+| Neptune | 303.7514 | Venus (d=34) | Mirror-pair rule (123.75° + 180°) |
 
 ## Per-Planet EoC Fractions
 
@@ -795,7 +852,7 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 ### Predictive Coefficients (`PREDICT_COEFFS`)
 
-7 arrays of 273 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`docs/scripts/*_coeffs_unified.py`). The dot product of the 273-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
+7 arrays of 429 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`docs/scripts/*_coeffs_unified.py`). The dot product of the 429-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
 
 ---
 

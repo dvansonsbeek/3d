@@ -214,7 +214,7 @@ For Mercury through Neptune, the "Perihelion Precession" group includes dynamica
 | **Missing advance of perihelion** | `predictGeocentricPrecession()` − baseline | Fluctuation above/below heliocentric rate at current year |
 | **Perihelion precession (Geocentric)** | `predictGeocentricPrecession()` | Total geocentric rate at current year (baseline + fluctuation) |
 
-These use the 273-term predictive formula system (ported from Python) with trained coefficients per planet.
+These use the 429-term predictive formula system (ported from Python) with trained coefficients per planet.
 
 #### Mercury-Specific Rows
 

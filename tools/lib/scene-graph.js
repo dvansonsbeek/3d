@@ -527,7 +527,7 @@ function buildSceneGraph() {
       tilt: 0,  // tilt only affects axial spin, not position
       startPos: pd.p.startpos,
       speed: pd.planetSpeed,
-      eccentricity: pd.p.orbitalEccentricity,
+      eccentricity: pd.p.orbitalEccentricityJ2000,
     };
     // Add equation of center (variable speed) for planets
     const periRefMap = {
@@ -543,7 +543,7 @@ function buildSceneGraph() {
       const periPrecRate = Math.PI * 2 / pd.perihelionEclipticYears;
       const pos_peri = (periRefMap[key] - C.startmodelJD) / C.meanSolarYearDays;
       // Type III: per-planet EoC fraction to correct for double-counting with geometric offset
-      planetDef.eccentricity = pd.p.orbitalEccentricity * (pd.p.eocFraction ?? 0.5);
+      planetDef.eccentricity = pd.p.orbitalEccentricityJ2000 * (pd.p.eocFraction ?? 0.5);
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
         + (pd.planetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
@@ -793,7 +793,7 @@ function moveModel(graph, pos) {
       if (key === 'saturn') eo = -eo;
       if (pm.sceneData.p.type === 'II') {
         // Type II: static Mars orbit center offset + half Earth geocentric correction
-        const eccDist = pm.sceneData.p.orbitalEccentricity * pm.sceneData.d.orbitDistance * 100;
+        const eccDist = pm.sceneData.p.orbitalEccentricityJ2000 * pm.sceneData.d.orbitDistance * 100;
         eo = eccDist / 2 - eo / 2;
       }
       pm.realPeri.pivot.px = eo;

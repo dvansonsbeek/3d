@@ -209,7 +209,7 @@ def main():
     print("=" * 70)
     print("\nConclusion:")
     print("  - All 7 planets: Excellent fit (R² > 0.998)")
-    print("\nThe unified 273-term feature matrix works well for all planets.")
+    print("\nThe unified 429-term feature matrix works well for all planets.")
 
 
 if __name__ == "__main__":

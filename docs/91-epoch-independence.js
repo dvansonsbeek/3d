@@ -25,11 +25,13 @@ const mass = C.massFraction;
 // Build lookup tables from per-planet data
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const orbitDistance = { earth: 1.0 };
+const eccBase = { earth: C.eccentricityBase };
 const eccJ2000 = { earth: C.eccJ2000.earth };
 for (const p of planets) {
   if (p === 'earth') continue;
   orbitDistance[p] = C.derived[p].orbitDistance;
-  eccJ2000[p] = C.planets[p].orbitalEccentricity;
+  eccBase[p] = C.planets[p].orbitalEccentricityBase;
+  eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
 }
 
 // Config #3: unique mirror-symmetric Fibonacci assignment
@@ -90,8 +92,8 @@ console.log('|--------------------|----|--------------|--------------|----------
 
 const pairAMD = {};
 for (const pair of mirrorPairs) {
-  const aIn = amd(pair.inner, eccJ2000[pair.inner]);
-  const aOut = amd(pair.outer, eccJ2000[pair.outer]);
+  const aIn = amd(pair.inner, eccBase[pair.inner]);
+  const aOut = amd(pair.outer, eccBase[pair.outer]);
   const total = aIn + aOut;
   pairAMD[pair.inner + '-' + pair.outer] = total;
   const outPct = (aOut / total * 100).toFixed(1);
@@ -122,7 +124,7 @@ const saturnEValues = [0.012, 0.020, 0.025, 0.030, 0.035, 0.040, 0.045, 0.050, 0
 
 for (const eSa of saturnEValues) {
   // Scenario 1: only Saturn changes
-  const ecc1 = {...eccJ2000, saturn: eSa};
+  const ecc1 = {...eccBase, saturn: eSa};
   const bal1 = computeBalance(ecc1);
 
   // Scenario 2: Earth-Saturn pair conserve AMD
@@ -132,7 +134,7 @@ for (const eSa of saturnEValues) {
   let eEa2, bal2Str;
   if (amdEa2 > 0) {
     eEa2 = eFromAmd('earth', amdEa2);
-    const ecc2 = {...eccJ2000, saturn: eSa, earth: eEa2};
+    const ecc2 = {...eccBase, saturn: eSa, earth: eEa2};
     bal2Str = computeBalance(ecc2).balance.toFixed(2) + '%';
   } else {
     eEa2 = null;
@@ -142,8 +144,8 @@ for (const eSa of saturnEValues) {
   // Scenario 3: All four pairs exchange AMD proportionally
   // Each outer planet shifts proportionally to Saturn's fractional change
   // Inner planet adjusts to conserve pair AMD
-  const saFrac = eSa / eccJ2000.saturn;
-  const ecc3 = {...eccJ2000, saturn: eSa};
+  const saFrac = eSa / eccBase.saturn;
+  const ecc3 = {...eccBase, saturn: eSa};
 
   // Earth adjusts to conserve Earth-Saturn pair AMD
   if (amdEa2 > 0) {
@@ -154,11 +156,11 @@ for (const eSa of saturnEValues) {
   for (const pair of mirrorPairs) {
     if (pair.outer === 'saturn') continue;
     const key = pair.inner + '-' + pair.outer;
-    const newOuterE = eccJ2000[pair.outer] * saFrac;
+    const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
     const amdOuter = amd(pair.outer, ecc3[pair.outer]);
     const amdInner = pairAMD[key] - amdOuter;
-    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccJ2000[pair.inner];
+    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccBase[pair.inner];
   }
   const bal3 = computeBalance(ecc3);
 
@@ -183,14 +185,14 @@ let eSa_at_min3 = 0, eSa_at_max3 = 0;
 
 for (let eSa = 0.012; eSa <= 0.088; eSa += 0.0001) {
   // Scenario 1
-  const ecc1 = {...eccJ2000, saturn: eSa};
+  const ecc1 = {...eccBase, saturn: eSa};
   const bal1 = computeBalance(ecc1).balance;
   if (bal1 < min1) min1 = bal1;
   if (bal1 > max1) max1 = bal1;
 
   // Scenario 3
-  const saFrac = eSa / eccJ2000.saturn;
-  const ecc3 = {...eccJ2000, saturn: eSa};
+  const saFrac = eSa / eccBase.saturn;
+  const ecc3 = {...eccBase, saturn: eSa};
 
   const totalAMD_ES = pairAMD['earth-saturn'];
   const amdSa = amd('saturn', eSa);
@@ -200,11 +202,11 @@ for (let eSa = 0.012; eSa <= 0.088; eSa += 0.0001) {
   for (const pair of mirrorPairs) {
     if (pair.outer === 'saturn') continue;
     const key = pair.inner + '-' + pair.outer;
-    const newOuterE = eccJ2000[pair.outer] * saFrac;
+    const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
     const amdOuter = amd(pair.outer, ecc3[pair.outer]);
     const amdInner = pairAMD[key] - amdOuter;
-    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccJ2000[pair.inner];
+    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccBase[pair.inner];
   }
   const bal3 = computeBalance(ecc3).balance;
   if (bal3 < min3) { min3 = bal3; eSa_at_min3 = eSa; }
@@ -239,8 +241,8 @@ console.log('|-------------------|----------------------------|-------------|---
 
 for (const eSa of [0.015, 0.020, 0.030, 0.040, 0.050, 0.05386, 0.060, 0.070, 0.080, 0.088]) {
   // Build Scenario 3 eccentricities
-  const saFrac = eSa / eccJ2000.saturn;
-  const ecc3 = {...eccJ2000, saturn: eSa};
+  const saFrac = eSa / eccBase.saturn;
+  const ecc3 = {...eccBase, saturn: eSa};
 
   const totalAMD_ES = pairAMD['earth-saturn'];
   const amdSa = amd('saturn', eSa);
@@ -250,11 +252,11 @@ for (const eSa of [0.015, 0.020, 0.030, 0.040, 0.050, 0.05386, 0.060, 0.070, 0.0
   for (const pair of mirrorPairs) {
     if (pair.outer === 'saturn') continue;
     const key = pair.inner + '-' + pair.outer;
-    const newOuterE = eccJ2000[pair.outer] * saFrac;
+    const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
     const amdOuter = amd(pair.outer, ecc3[pair.outer]);
     const amdInner = pairAMD[key] - amdOuter;
-    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccJ2000[pair.inner];
+    ecc3[pair.inner] = amdInner > 0 ? eFromAmd(pair.inner, amdInner) : eccBase[pair.inner];
   }
 
   // Compute perfect-balance Saturn e from these other-planet eccentricities
@@ -289,7 +291,7 @@ console.log('   The v-weight balance equation is maintained by the same dynamics
 console.log('   that drive the secular oscillation.\n');
 
 console.log('2. SCENARIO 3 DEMONSTRATES STABILITY');
-const j2000Bal = computeBalance(eccJ2000).balance;
+const j2000Bal = computeBalance(eccBase).balance;
 console.log(`   When all four pairs co-evolve with AMD conservation:`);
 console.log(`   - Balance stays ${min3.toFixed(2)}% – ${max3.toFixed(2)}% across Saturn\'s full secular range`);
 console.log(`   - Compare Scenario 1 (Saturn alone): ${min1.toFixed(2)}% – ${max1.toFixed(2)}%`);
@@ -318,7 +320,7 @@ console.log('The question is: how large is the required correction?\n');
 let sum203_fixed = 0;
 for (const p of planets) {
   if (p === 'saturn') continue;
-  sum203_fixed += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * eccJ2000[p] / Math.sqrt(config3[p].d);
+  sum203_fixed += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * eccBase[p] / Math.sqrt(config3[p].d);
 }
 const e_perf = sum203_fixed * sqrtD_sa / (sqrtM_sa * a32_sa);
 

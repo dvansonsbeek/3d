@@ -38,7 +38,7 @@ Commands:
 
 Targets: mercury, venus, mars, jupiter, saturn, uranus, neptune, sun, moon
 Planet params: startpos, solarYearInput, longitudePerihelion,
-               ascendingNode, eclipticInclinationJ2000, orbitalEccentricity,
+               ascendingNode, eclipticInclinationJ2000, orbitalEccentricityBase,
                perihelionEclipticYears, eocFraction, perihelionRef_JD,
                decCorrA, decCorrB, decCorrC, decCorrD, decCorrE, decCorrF
 Sun params:    correctionSun, perihelionRefJD, eccentricityBase,

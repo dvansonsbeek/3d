@@ -165,7 +165,7 @@ function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
 
 This method reads directly from `precessionLayer.orbitObj.rotation.y`, which represents the pure precession angle in the ecliptic plane (rotation around the world Y-axis). This completely bypasses the scene graph hierarchy and Earth's reference frame effects.
 
-### Method 3: Predictive Dynamic (273-term formula)
+### Method 3: Predictive Dynamic (429-term formula)
 
 **What it measures:** The instantaneous geocentric perihelion precession rate at any simulation year, computed analytically from a trained predictive formula.
 
@@ -182,12 +182,12 @@ This method reads directly from `precessionLayer.orbitObj.rotation.y`, which rep
 | Rate at year 1900 | ~574 arcsec/century |
 | Rate at year 2000 | ~570 arcsec/century |
 | Fluctuation range | ±100 arcsec/century (varies by epoch) |
-| Feature count | 273 terms in 16 groups |
+| Feature count | 429 terms in 25 groups |
 
 **How it works:**
 
 ```
-1. Build 273-term feature vector from:
+1. Build 429-term feature vector from:
    - Planet/Earth angle differences and their sin/cos
    - Earth obliquity (normalized), eccentricity (normalized)
    - Earth Rate Deviation (ERD) — derivative of Earth perihelion

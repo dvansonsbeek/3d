@@ -30,7 +30,7 @@ for (const p of planets) {
   solarYearInputs[p] = C.planets[p].solarYearInput;
   solarYearCounts[p] = C.derived[p].solarYearCount;
   orbitDistance[p] = C.derived[p].orbitDistance;
-  eccJPL[p] = C.planets[p].orbitalEccentricity;
+  eccJPL[p] = C.planets[p].orbitalEccentricityBase;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
   period[p] = C.planets[p].perihelionEclipticYears;

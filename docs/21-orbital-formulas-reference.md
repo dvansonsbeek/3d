@@ -2092,18 +2092,18 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Planet | Eccentricity | Inclination (inv) | Semi-major (AU) | Period (days) |
 |--------|--------------|-------------------|-----------------|---------------|
-| Mercury | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Venus | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Mercury | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Venus | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
 | Earth | dynamic | dynamic | 1.000 | `meanSolarYearDays` |
-| Mars | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Jupiter | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Saturn | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Uranus | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Neptune | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
-| Pluto | `orbitalEccentricity` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Mars | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Jupiter | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Saturn | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Uranus | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Neptune | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
+| Pluto | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
 
 **How values are sourced:**
-- **Eccentricity**: Input constant per planet (`planets.{name}.orbitalEccentricity`)
+- **Eccentricity**: Input constant per planet (`planets.{name}.orbitalEccentricityBase`)
 - **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [Fibonacci Laws](10-fibonacci-laws.md))
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = meanSolarYearDays / solarYearInput`
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)

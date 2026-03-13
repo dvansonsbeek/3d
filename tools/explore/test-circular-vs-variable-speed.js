@@ -164,7 +164,7 @@ function buildConfigA() {
 
   if (isTypeIII) {
     const pm = graph.planetNodeMap[targetPlanet];
-    const fullEcc = p.orbitalEccentricity;
+    const fullEcc = p.orbitalEccentricityBase;
     const scaleFactor = 1 / (1 + fullEcc);
 
     // Scale PerihelionFromEarth orbit center: full e → e/(1+e)
@@ -196,7 +196,7 @@ function buildConfigB(eocFraction) {
   const graph = SG.buildSceneGraph();
   const pm = graph.planetNodeMap[targetPlanet];
   const d = C.derived[targetPlanet];
-  const fullEcc = p.orbitalEccentricity;
+  const fullEcc = p.orbitalEccentricityBase;
 
   if (isTypeIII) {
     // PerihelionFromEarth orbit center already at full e (default).
@@ -253,7 +253,7 @@ function buildConfigB(eocFraction) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const entries = getRefEntries();
-const fullEcc = p.orbitalEccentricity;
+const fullEcc = p.orbitalEccentricityBase;
 const reducedEcc = fullEcc / (1 + fullEcc);
 const d = C.derived[targetPlanet];
 

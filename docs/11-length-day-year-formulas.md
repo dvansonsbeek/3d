@@ -150,7 +150,8 @@ RA-based solar day measurements (tracking the Sun's right ascension from Earth's
 
 | Quantity | Model value | IAU reference | Agreement |
 |----------|-------------|---------------|-----------|
-| Mean solar day | 86400.000 s | 86400.002 s | 2 ms (tidal drift not modelled) |
+| Mean solar day (derived) | 86400.000 s | 86400.002 s | 2 ms (tidal drift not modelled) |
+| Mean solar day (measured) | 86399.9913 s | — | RA Day Offset at J2000: −8.3 ms |
 | Sidereal day | 86164.0905 s | 86164.0905 s | 0.003 ms |
 | Stellar day | 86164.0997 s | 86164.0989 s | 0.8 ms |
 | Stellar − sidereal | 9.13 ms | 8.37 ms | — |
@@ -187,7 +188,8 @@ The coin rotation paradox manifests at every timescale — years, days, and seco
 | Tropical year | 365.242191 days | 365.242190 days |
 | Sidereal year | 365.256363 days | 365.256363 days |
 | Anomalistic year | 365.259636 days | 365.259636 days |
-| Mean solar day | 86400.000 s | 86400.002 s |
+| Mean solar day (derived) | 86400.000 s | 86400.002 s |
+| Mean solar day (measured) | 86399.9913 s | — |
 | Sidereal day | 86164.0905 s | 86164.0905 s |
 | Stellar day | 86164.0997 s | 86164.0989 s |
 | Axial precession | 25,772 yr | 25,772 yr |

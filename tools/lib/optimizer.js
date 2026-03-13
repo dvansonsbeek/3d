@@ -89,7 +89,7 @@ function getParamAccessors(target) {
     longitudePerihelion:    { get: () => p.longitudePerihelion,     set: v => { p.longitudePerihelion = v; } },
     ascendingNode:          { get: () => p.ascendingNode,           set: v => { p.ascendingNode = v; } },
     eclipticInclinationJ2000: { get: () => p.eclipticInclinationJ2000, set: v => { p.eclipticInclinationJ2000 = v; } },
-    orbitalEccentricity:    { get: () => p.orbitalEccentricity,    set: v => { p.orbitalEccentricity = v; } },
+    orbitalEccentricityBase:    { get: () => p.orbitalEccentricityBase,    set: v => { p.orbitalEccentricityBase = v; } },
     perihelionEclipticYears:{ get: () => p.perihelionEclipticYears, set: v => { p.perihelionEclipticYears = v; } },
     eocFraction:            { get: () => p.eocFraction,            set: v => { p.eocFraction = v; } },
     perihelionRef_JD:       { get: () => C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'], set: v => { C.ASTRO_REFERENCE[target + 'PerihelionRef_JD'] = v; } },
@@ -124,7 +124,7 @@ function withOverrides(planet, overrides, fn) {
 
   // Rebuild derived values for planets when orbital params change
   const needsRebuild = planet !== 'sun' && planet !== 'moon'
-    && ('solarYearInput' in overrides || 'orbitalEccentricity' in overrides);
+    && ('solarYearInput' in overrides || 'orbitalEccentricityBase' in overrides);
   if (needsRebuild) C.rebuildDerived(planet);
 
   // Force scene graph rebuild
@@ -177,7 +177,7 @@ function scanOrbit(target, jdEpoch, steps = 720) {
     const d = C.derived[target];
     const p = C.planets[target];
     periodDays = (C.H / d.solarYearCount) * C.meanSolarYearDays;
-    inputE = p.orbitalEccentricity;
+    inputE = p.orbitalEccentricityJ2000;
     orbitDist = d.orbitDistance;
     targetType = p.type;
   }

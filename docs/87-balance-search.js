@@ -18,7 +18,8 @@ const DEG2RAD = Math.PI / 180;
 // Build lookup tables from per-planet data
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const orbitDistance = { earth: 1.0 };
-const ecc = { earth: C.eccJ2000.earth };
+const eccBase = { earth: C.eccentricityBase };
+const eccJ2000 = { earth: C.eccJ2000.earth };
 const inclJ2000 = {};
 const omegaJ2000 = {};
 const period = {};
@@ -29,7 +30,8 @@ for (const p of planets) {
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
-  ecc[p] = C.planets[p].orbitalEccentricity;
+  eccBase[p] = C.planets[p].orbitalEccentricityBase;
+  eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
   period[p] = C.planets[p].perihelionEclipticYears;
@@ -115,7 +117,7 @@ function computeBalance(config) {
   for (const key of planets) {
     const cfg_mass = mass[key];
     const cfg_sma = orbitDistance[key];
-    const cfg_ecc = ecc[key];
+    const cfg_ecc = eccBase[key];
     const L = cfg_mass * Math.sqrt(cfg_sma * (1 - cfg_ecc * cfg_ecc));
     const Lamp = L * planetResults[key].amplitude;
     const phaseRad = config[key].phase * DEG2RAD;
@@ -137,9 +139,9 @@ function computeBalance(config) {
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('VERIFICATION: Exact values from script.js computation chain');
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('Planet      SMA (code)       Mass (M/M_SUN)     Ecc');
+console.log('Planet      SMA (code)       Mass (M/M_SUN)     Ecc (Base)   Ecc (J2000)');
 for (const p of planets) {
-  console.log(`${p.padEnd(10)} ${orbitDistance[p].toFixed(8).padStart(14)} ${mass[p].toExponential(8).padStart(18)} ${ecc[p].toFixed(8)}`);
+  console.log(`${p.padEnd(10)} ${orbitDistance[p].toFixed(8).padStart(14)} ${mass[p].toExponential(8).padStart(18)} ${eccBase[p].toFixed(8)} ${eccJ2000[p].toFixed(8)}`);
 }
 
 const currentConfig = {

@@ -175,7 +175,7 @@ function computeAxialPrecessionRealLOD(siderealYearSec, solarYearDays, lengthOfD
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Compute Earth's perihelion longitude using 12-harmonic predictive formula.
+ * Compute Earth's perihelion longitude using 21-harmonic predictive formula.
  *
  * @param {number} year - decimal year
  * @returns {number} longitude in degrees [0, 360)

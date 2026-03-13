@@ -3,12 +3,16 @@
 UNIFIED TRAINING SCRIPT
 ========================
 
-Trains precession coefficients for all 7 planets using the unified 273-term
-feature matrix. All planets use the SAME feature structure.
+Trains precession coefficients for all 7 planets using the unified feature
+matrix. All planets use the SAME feature structure.
 
-Training target: Observed CSV fluctuations
+Training target: Observed Excel fluctuations
 Method: Ridge regression (α=0.01)
 Output: Coefficient files for each planet
+
+Usage:
+    cd docs/scripts
+    python train_precession.py
 
 Author: Holistic Universe Model
 """
@@ -18,6 +22,7 @@ import os
 from pathlib import Path
 from typing import List, Tuple, Dict
 
+import numpy as np
 import pandas as pd
 
 # Import unified feature builder
@@ -44,7 +49,7 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
 
     Returns dict: planet_key -> [(year, fluctuation), ...]
     """
-    df = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
+    df = pd.read_excel(excel_path, sheet_name='Holistic_objects_PerihelionPlan')
 
     data = {key: [] for key in PLANET_FLUCTUATION_COLS}
 
@@ -64,131 +69,27 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
     return data
 
 
-# ============================================================================
-# Pure Python Linear Algebra (no numpy)
-# ============================================================================
-
-def matrix_transpose(A: List[List[float]]) -> List[List[float]]:
-    """Transpose a matrix."""
-    rows = len(A)
-    cols = len(A[0])
-    return [[A[i][j] for i in range(rows)] for j in range(cols)]
-
-
-def matrix_multiply(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:
-    """Multiply two matrices A @ B."""
-    rows_a = len(A)
-    cols_a = len(A[0])
-    cols_b = len(B[0])
-
-    result = [[0.0] * cols_b for _ in range(rows_a)]
-
-    for i in range(rows_a):
-        for j in range(cols_b):
-            for k in range(cols_a):
-                result[i][j] += A[i][k] * B[k][j]
-
-    return result
-
-
-def matrix_vector_multiply(A: List[List[float]], v: List[float]) -> List[float]:
-    """Multiply matrix A by vector v."""
-    rows = len(A)
-    cols = len(A[0])
-    result = [0.0] * rows
-
-    for i in range(rows):
-        for j in range(cols):
-            result[i] += A[i][j] * v[j]
-
-    return result
-
-
-def vector_dot(a: List[float], b: List[float]) -> float:
-    """Dot product of two vectors."""
-    return sum(ai * bi for ai, bi in zip(a, b))
-
-
-def cholesky_decomposition(A: List[List[float]]) -> List[List[float]]:
-    """
-    Cholesky decomposition: A = L @ L.T
-    Returns lower triangular matrix L.
-    A must be symmetric positive definite.
-    """
-    n = len(A)
-    L = [[0.0] * n for _ in range(n)]
-
-    for i in range(n):
-        for j in range(i + 1):
-            s = sum(L[i][k] * L[j][k] for k in range(j))
-
-            if i == j:
-                val = A[i][i] - s
-                if val <= 0:
-                    # Add small regularization if needed
-                    val = 1e-10
-                L[i][j] = math.sqrt(val)
-            else:
-                L[i][j] = (A[i][j] - s) / L[j][j] if L[j][j] != 0 else 0
-
-    return L
-
-
-def forward_substitution(L: List[List[float]], b: List[float]) -> List[float]:
-    """Solve L @ x = b for x, where L is lower triangular."""
-    n = len(b)
-    x = [0.0] * n
-
-    for i in range(n):
-        s = sum(L[i][j] * x[j] for j in range(i))
-        x[i] = (b[i] - s) / L[i][i] if L[i][i] != 0 else 0
-
-    return x
-
-
-def backward_substitution(U: List[List[float]], b: List[float]) -> List[float]:
-    """Solve U @ x = b for x, where U is upper triangular."""
-    n = len(b)
-    x = [0.0] * n
-
-    for i in range(n - 1, -1, -1):
-        s = sum(U[i][j] * x[j] for j in range(i + 1, n))
-        x[i] = (b[i] - s) / U[i][i] if U[i][i] != 0 else 0
-
-    return x
-
-
-def solve_ridge(X: List[List[float]], y: List[float], alpha: float = 0.01) -> List[float]:
+def solve_ridge(X: np.ndarray, y: np.ndarray, alpha: float = 0.01) -> np.ndarray:
     """
     Solve ridge regression: minimize ||Xw - y||² + α||w||²
 
     Solution: w = (X.T @ X + α*I)^-1 @ X.T @ y
 
-    Uses Cholesky decomposition for numerical stability.
+    Uses numpy's Cholesky decomposition for numerical stability.
     """
-    n_samples = len(X)
-    n_features = len(X[0])
+    n_features = X.shape[1]
 
-    # Compute X.T @ X
-    Xt = matrix_transpose(X)
-    XtX = matrix_multiply(Xt, X)
-
-    # Add regularization: XtX + α*I
-    for i in range(n_features):
-        XtX[i][i] += alpha
+    # Compute X.T @ X + α*I
+    XtX = X.T @ X
+    XtX[np.diag_indices_from(XtX)] += alpha
 
     # Compute X.T @ y
-    Xty = [sum(Xt[i][j] * y[j] for j in range(n_samples)) for i in range(n_features)]
+    Xty = X.T @ y
 
     # Solve using Cholesky: (XtX) @ w = Xty
-    # XtX = L @ L.T
-    # L @ z = Xty (forward substitution)
-    # L.T @ w = z (backward substitution)
-    L = cholesky_decomposition(XtX)
-    Lt = matrix_transpose(L)
-
-    z = forward_substitution(L, Xty)
-    w = backward_substitution(Lt, z)
+    L = np.linalg.cholesky(XtX)
+    z = np.linalg.solve(L, Xty)
+    w = np.linalg.solve(L.T, z)
 
     return w
 
@@ -211,28 +112,28 @@ def train_planet(
     n_samples = len(years)
 
     # Build feature matrix
-    X = []
-    y = list(fluctuations)
-
+    X_list = []
     for year in years:
         features = build_features(year, planet_period, planet_theta0)
-        X.append(features)
+        X_list.append(features)
+
+    X = np.array(X_list)
+    y = np.array(fluctuations)
 
     # Solve ridge regression
-    coefficients = solve_ridge(X, y, alpha)
+    w = solve_ridge(X, y, alpha)
 
     # Calculate metrics
-    predictions = [sum(c * f for c, f in zip(coefficients, row)) for row in X]
-    residuals = [yi - pi for yi, pi in zip(y, predictions)]
+    predictions = X @ w
+    residuals = y - predictions
 
-    ss_res = sum(r * r for r in residuals)
-    y_mean = sum(y) / len(y)
-    ss_tot = sum((yi - y_mean) ** 2 for yi in y)
+    ss_res = np.sum(residuals ** 2)
+    ss_tot = np.sum((y - np.mean(y)) ** 2)
 
     rmse = math.sqrt(ss_res / n_samples)
     r2 = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
 
-    return coefficients, rmse, r2
+    return w.tolist(), rmse, float(r2)
 
 
 def write_coefficients(
@@ -244,16 +145,17 @@ def write_coefficients(
 ):
     """Write coefficients to a Python file."""
     planet_name = PLANETS[planet_key]['name'].upper()
+    n_terms = len(coefficients)
 
     filename = output_dir / f"{planet_key}_coeffs_unified.py"
 
     with open(filename, 'w') as f:
         f.write(f'"""\n')
-        f.write(f'{PLANETS[planet_key]["name"]} Coefficients (Unified 273-term system)\n')
+        f.write(f'{PLANETS[planet_key]["name"]} Coefficients (Unified {n_terms}-term system)\n')
         f.write(f'RMSE: {rmse:.4f} arcsec/century\n')
         f.write(f'R²: {r2:.6f}\n')
         f.write(f'"""\n\n')
-        f.write(f'# {planet_name} COEFFICIENTS (273 terms)\n')
+        f.write(f'# {planet_name} COEFFICIENTS ({n_terms} terms)\n')
         f.write(f'{planet_name}_COEFFS = [\n')
 
         for i, coef in enumerate(coefficients):
@@ -269,8 +171,14 @@ def main():
     print("=" * 70)
     print("UNIFIED PRECESSION TRAINING")
     print("=" * 70)
-    print(f"\nFeature matrix: 273 terms (same for all planets)")
+    test_feat = build_features(2000, list(PLANETS.values())[0]['period'], list(PLANETS.values())[0]['theta0'])
+    n_terms = len(test_feat)
+    print(f"\nFeature matrix: {n_terms} terms (same for all planets)")
     print(f"Regularization: Ridge regression (α=0.01)")
+
+    # Verify Earth perihelion at J2000
+    earth_peri_j2000 = calc_earth_perihelion(2000)
+    print(f"Earth perihelion at J2000: {earth_peri_j2000:.6f}°")
     print()
 
     # Paths
@@ -333,10 +241,10 @@ def main():
     print("-" * 70)
     print()
 
-    # Show sample predictions
-    print("Sample predictions vs observed (around year 2000):")
-    print(f"{'Planet':<10} {'Predicted':>12} {'Observed':>12} {'Diff':>12}")
-    print("-" * 50)
+    # Show sample predictions at J2000
+    print("Sample predictions vs observed (year 2000):")
+    print(f"{'Planet':<10} {'Year':>6} {'Predicted':>12} {'Observed':>12} {'Diff':>12}")
+    print("-" * 56)
 
     for planet_key in PLANETS:
         if planet_key not in results:
@@ -362,14 +270,14 @@ def main():
             )
             predicted = sum(c * f for c, f in zip(results[planet_key]['coefficients'], features))
             diff = predicted - closest_fluct
-            print(f"{PLANETS[planet_key]['name']:<10} {predicted:>12.4f} {closest_fluct:>12.4f} {diff:>+12.4f}")
+            print(f"{PLANETS[planet_key]['name']:<10} {closest_year:>6} {predicted:>12.4f} {closest_fluct:>12.4f} {diff:>+12.4f}")
 
     print()
-    print("Training complete. Coefficient files written to docs/ directory.")
+    print("Training complete. Coefficient files written to docs/scripts/ directory.")
     print("\nTo use these coefficients:")
-    print("  from unified_precession import predict_fluctuation")
-    print("  from mercury_coeffs_unified import MERCURY_COEFFS")
-    print("  fluct = predict_fluctuation(2024, 'mercury', MERCURY_COEFFS)")
+    print("  from predict_precession import predict, predict_total")
+    print("  fluct = predict(2024, 'mercury')")
+    print("  total = predict_total(2024, 'mercury')")
 
 
 if __name__ == "__main__":

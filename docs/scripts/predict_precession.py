@@ -295,19 +295,19 @@ def main():
 
     # Model info
     print("Model Information:")
-    print(f"  Feature matrix: 273 terms (unified for all planets)")
+    print(f"  Feature matrix: 429 terms (unified for all planets)")
     print(f"  Reference epoch: J{J2000}")
     print(f"  Holistic Year (H): {H:,} years")
     print()
     print("Training metrics:")
     metrics = {
-        'mercury': ('2.4416', '0.9990'),
-        'venus': ('21.6443', '0.9983'),
-        'mars': ('0.7515', '0.9999'),
-        'jupiter': ('0.5207', '0.9999'),
-        'saturn': ('0.2933', '1.0000'),
-        'uranus': ('0.2826', '0.9999'),
-        'neptune': ('0.1973', '0.9999'),
+        'mercury': ('0.7450', '0.999929'),
+        'venus': ('3.4655', '0.999955'),
+        'mars': ('2.0273', '0.999636'),
+        'jupiter': ('2.3255', '0.999625'),
+        'saturn': ('3.7218', '0.999617'),
+        'uranus': ('1.3956', '0.999618'),
+        'neptune': ('0.2484', '0.999902'),
     }
     print(f"  {'Planet':<10} {'RMSE (\"/cy)':>14} {'R²':>10}")
     for planet, (rmse, r2) in metrics.items():

@@ -867,7 +867,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 - Per-planet data objects (8 planets) with inclination mean/amplitude filled in
 - Additional bodies (Pluto, Halley's, Eros, Ceres)
 - Year-length formula constants (3 amplitude values)
-- Predictive formula constants (PERI_HARMONICS array with 12 terms, PERI_OFFSET)
+- Predictive formula constants (PERI_HARMONICS array with 21 terms, PERI_OFFSET)
 - All derived globals (perihelionCycleLength, balancedYear, balancedJD, meanSolarYearDays, etc.)
 - All Moon derived cycles (synodic, tropical, anomalistic, draconic months + precession periods)
 - Planet derived calculations (orbit distance, speed, eccentricity types I/II/III)
@@ -884,7 +884,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 - `computeLengthOfAnomalisticYearRealLOD(ecc, lod)` — with apsidal correction
 - `computeAxialPrecession(sidYearSec, solYearDays)` — standard
 - `computeAxialPrecessionRealLOD(sidYearSec, solYearDays, lod)` — variable LOD
-- `calcEarthPerihelionPredictive(year)` — 12-harmonic predictive formula
+- `calcEarthPerihelionPredictive(year)` — 21-harmonic predictive formula
 - `calcERD(year)` — Earth Rate of Deviation (derivative of harmonics)
 - `calcPlanetPerihelionLong(theta0, period, year)` — linear precession
 - `computePlanetInvPlaneInclinationDynamic(planet, year, jd)` — ascending-node-based oscillation
@@ -1068,7 +1068,7 @@ Three strategies, in order of complexity:
 **Parameter injection:** Mutate-restore pattern. Overrides are applied to `C.planets[key]`, derived values rebuilt via `rebuildDerived()`, scene graph invalidated. Originals restored in `finally` block. Sun/Moon parameters bypass `rebuildDerived()`.
 
 **Tunable parameters by target:**
-- Planets: startpos, angleCorrection, solarYearInput, longitudePerihelion, ascendingNode, eclipticInclinationJ2000, orbitalEccentricity, perihelionEclipticYears
+- Planets: startpos, angleCorrection, solarYearInput, longitudePerihelion, ascendingNode, eclipticInclinationJ2000, orbitalEccentricityBase, perihelionEclipticYears
 - Sun: correctionSun, eccentricityBase, eccentricityAmplitude, earthRAAngle, earthtiltMean
 - Moon: moonStartposApsidal, moonStartposNodal, moonStartposMoon, moonTilt, moonEclipticInclinationJ2000, moonOrbitalEccentricity
 
@@ -1138,7 +1138,7 @@ All tooling is built and validated. This section documents the execution plan an
 ### 8.2 Parameters — What Can and Cannot Change
 
 **NEVER change (observational/structural):**
-- `eclipticInclinationJ2000`, `orbitalEccentricity`, `ascendingNode`, `longitudePerihelion` (JPL/SPICE data)
+- `eclipticInclinationJ2000`, `orbitalEccentricityBase`, `ascendingNode`, `longitudePerihelion` (JPL/SPICE data)
 - `holisticyearLength` (335,008 — core model constant, tuned to align precession with IAU)
 - `perihelionEclipticYears` (derived from H — Fibonacci structure)
 - `moonEclipticInclinationJ2000`, `moonOrbitalEccentricity`, `moonDistance` (observational)
@@ -1329,7 +1329,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 The remaining steps were executed as a systematic campaign covering:
 
-1. **Per-planet EoC fractions** (Type I/II/III): Derived empirically via `tools/explore/derive-eoc-fractions.js`. Each planet gets `eocFraction × orbitalEccentricity` as its effective EoC eccentricity.
+1. **Per-planet EoC fractions** (Type I/II/III): Derived empirically via `tools/explore/derive-eoc-fractions.js`. Each planet gets `eocFraction × orbitalEccentricityBase` as its effective EoC eccentricity.
 
 2. **Orbital period calibration**: `solarYearInput` values tuned using ISAW ancient observation data (800 BCE–1650 CE) to minimize long-term drift. See `docs/68-orbital-period-calibration.md`.
 

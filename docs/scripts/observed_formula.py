@@ -862,10 +862,18 @@ def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     if excel_path is None:
         excel_path = _get_excel_path()
 
-    # Read both sheets
-    df_peri = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
-    df_long = pd.read_excel(excel_path, sheet_name='Earth Longitude',
-                            usecols=['Model Year', 'Earth Longitude RA'])
+    # Read perihelion sheet (canonical name or first sheet as fallback)
+    xl = pd.ExcelFile(excel_path)
+    peri_sheet = 'Perihelion Planets' if 'Perihelion Planets' in xl.sheet_names else xl.sheet_names[0]
+    df_peri = pd.read_excel(excel_path, sheet_name=peri_sheet)
+
+    # Read Earth Longitude — fall back to Earth Perihelion ICRF from perihelion sheet if separate sheet absent
+    if 'Earth Longitude' in xl.sheet_names:
+        df_long = pd.read_excel(excel_path, sheet_name='Earth Longitude',
+                                usecols=['Model Year', 'Earth Longitude RA'])
+    else:
+        df_long = df_peri[['Model Year', 'Earth Perihelion ICRF']].copy()
+        df_long = df_long.rename(columns={'Earth Perihelion ICRF': 'Earth Longitude RA'})
 
     # Compute ERD as numerical derivative of Earth Longitude RA
     years = df_long['Model Year'].values
@@ -1065,36 +1073,34 @@ if __name__ == '__main__':
 
     print()
 
-    # Example calculations for year 2022
+    # Example calculations for the year closest to 2000
+    data = load_excel_data(excel_path)
+    example_year = min(data.keys(), key=lambda y: abs(y - 2000))
     print("=" * 70)
-    print("EXAMPLE: Year 2022 Calculations")
+    print(f"EXAMPLE: Year {example_year} Calculations")
     print("=" * 70)
     print()
 
-    data = load_excel_data(excel_path)
-    if 2022 in data:
-        row = data[2022]
-        print(f"Earth longitude: {row['theta_E']:.4f}°")
-        print(f"Earth ERD: {row['erd']:.6f}°/year")
-        print(f"Earth obliquity: {row['obliquity']:.4f}°")
-        print(f"Earth eccentricity: {row['eccentricity']:.6f}")
-        print()
+    row = data[example_year]
+    print(f"Earth longitude: {row['theta_E']:.4f}°")
+    print(f"Earth ERD: {row['erd']:.6f}°/year")
+    print(f"Earth obliquity: {row['obliquity']:.4f}°")
+    print(f"Earth eccentricity: {row['eccentricity']:.6f}")
+    print()
 
-        print(f"{'Planet':<10} {'Perihelion':<12} {'Calculated':<15} {'Actual':<15} {'Error'}")
-        print("-" * 70)
+    print(f"{'Planet':<10} {'Perihelion':<12} {'Calculated':<15} {'Actual':<15} {'Error'}")
+    print("-" * 70)
 
-        for planet_key in ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']:
-            peri = row[f"{planet_key}_perihelion"]
-            actual = row[f"{planet_key}_actual"]
-            predicted = calculate_fluctuation(
-                planet_key, 2022,
-                row['theta_E'], row['erd'],
-                peri, row['obliquity'], row['eccentricity']
-            )
-            error = predicted - actual
-            print(f"{PLANETS[planet_key]['name']:<10} {peri:<12.4f} {predicted:<15.4f} {actual:<15.4f} {error:+.4f}")
-    else:
-        print("Year 2022 not found in data")
+    for planet_key in ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']:
+        peri = row[f"{planet_key}_perihelion"]
+        actual = row[f"{planet_key}_actual"]
+        predicted = calculate_fluctuation(
+            planet_key, example_year,
+            row['theta_E'], row['erd'],
+            peri, row['obliquity'], row['eccentricity']
+        )
+        error = predicted - actual
+        print(f"{PLANETS[planet_key]['name']:<10} {peri:<12.4f} {predicted:<15.4f} {actual:<15.4f} {error:+.4f}")
 
     print()
     print("Done!")

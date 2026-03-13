@@ -163,7 +163,7 @@ function scanPlanet(planetKey) {
     if (frac !== 0 && periRefJD) {
       const periPrecRate = Math.PI * 2 / p.perihelionEclipticYears;
       const pos_peri = (periRefJD - C.startmodelJD) / C.meanSolarYearDays;
-      planetDef.eccentricity = p.orbitalEccentricity * frac;
+      planetDef.eccentricity = p.orbitalEccentricityBase * frac;
       planetDef.perihelionPhaseJ2000 = -p.startpos * d2r
         + (planetDef.speed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
@@ -197,7 +197,7 @@ function scanPlanet(planetKey) {
     if (frac !== 0 && periRefJD) {
       const periPrecRate = Math.PI * 2 / p.perihelionEclipticYears;
       const pos_peri = (periRefJD - C.startmodelJD) / C.meanSolarYearDays;
-      planetDef.eccentricity = p.orbitalEccentricity * frac;
+      planetDef.eccentricity = p.orbitalEccentricityBase * frac;
       planetDef.perihelionPhaseJ2000 = -p.startpos * d2r
         + (planetDef.speed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
@@ -221,7 +221,7 @@ function scanPlanet(planetKey) {
   if (periRefJD) {
     const periPrecRate = Math.PI * 2 / p.perihelionEclipticYears;
     const pos_peri = (periRefJD - C.startmodelJD) / C.meanSolarYearDays;
-    pd50.eccentricity = p.orbitalEccentricity * 0.50;
+    pd50.eccentricity = p.orbitalEccentricityBase * 0.50;
     pd50.perihelionPhaseJ2000 = -p.startpos * d2r
       + (pd50.speed - periPrecRate) * pos_peri;
     pd50.perihelionPrecessionRate = periPrecRate;
@@ -231,7 +231,7 @@ function scanPlanet(planetKey) {
   return {
     planetKey,
     name: p.name,
-    eccentricity: p.orbitalEccentricity,
+    eccentricity: p.orbitalEccentricityBase,
     orbitalPeriodDays: p.solarYearInput,
     longitudePerihelion: p.longitudePerihelion,
     deltaOmega: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - p.longitudePerihelion,

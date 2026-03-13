@@ -61,6 +61,9 @@ const earthInvPlaneInclinationMean = 1.481179;
 const earthInvPlaneInclinationAmplitude = 0.635970;
 const eccentricityBase = 0.015372;
 const eccentricityAmplitude = 0.00137032;
+// K = eccentricityAmplitude × √m_Earth × a_Earth^(3/2) / (sin(tiltMean) × √d_Earth)
+// Relates axial tilt to eccentricity amplitude for all planets (doc 35, §4)
+const eccentricityAmplitudeK = 3.4505372893e-6;
 const perihelionRefJD = 2451547.042; // JD of Earth perihelion 2000 (Jan 3.542)
 
 
@@ -86,7 +89,11 @@ const planets = {
   mercury: {
     name: 'Mercury',
     solarYearInput: 87.9686,
-    orbitalEccentricity: 0.20563593,
+    orbitalEccentricityBase: 0.20563593,  // Base eccentricity (tilt ~0, no fluctuation)
+    orbitalEccentricityJ2000: 0.20563593,
+    orbitalEccentricityAmplitude: 8.436789e-5,
+    eccentricityPhaseJ2000: 89.9882,  // Phase angle at J2000 (degrees) — near mean, tilt ~0
+    axialTiltMean: 0.03,
     eocFraction: -0.527,
     startpos: 83.53,
     angleCorrection: 0.971049,
@@ -109,7 +116,11 @@ const planets = {
   venus: {
     name: 'Venus',
     solarYearInput: 224.695,
-    orbitalEccentricity: 0.00677672,
+    orbitalEccentricityBase: 0.00619052,  // Base eccentricity (H/16 fit to JPL data, -8.65% from J2000)
+    orbitalEccentricityJ2000: 0.00677672,
+    orbitalEccentricityAmplitude: 9.625389e-4,
+    eccentricityPhaseJ2000: 123.7514,  // Phase angle at J2000 (degrees) — past mean, decreasing
+    axialTiltMean: 2.6392,
     eocFraction: 0.436,
     startpos: 249.312,
     angleCorrection: -2.784782,
@@ -129,9 +140,13 @@ const planets = {
   mars: {
     name: 'Mars',
     solarYearInput: 686.931,
-    orbitalEccentricity: 0.09339410,
-    eocFraction: -0.066,
-    startpos: 121.47,
+    orbitalEccentricityBase: 0.09297543,  // Base eccentricity (H/16 fit to JPL data, -0.45% from J2000)
+    orbitalEccentricityJ2000: 0.09339410,
+    orbitalEccentricityAmplitude: 3.073636e-3,
+    eccentricityPhaseJ2000: 96.8878,  // Phase angle at J2000 (degrees) — just past mean
+    axialTiltMean: 25.19,
+    eocFraction: -0.066224,
+    startpos: 121.4679,
     angleCorrection: -2.107087,
     perihelionEclipticYears: H / (4 + 1/3),
     type: 'II',
@@ -149,8 +164,11 @@ const planets = {
   jupiter: {
     name: 'Jupiter',
     solarYearInput: 4330.5,
-    orbitalEccentricity: 0.04821478,  // Dual-balanced (-0.35% from J2000)
+    orbitalEccentricityBase: 0.04821478,  // Dual-balanced (-0.35% from J2000)
     orbitalEccentricityJ2000: 0.04838624,
+    orbitalEccentricityAmplitude: 1.149908e-6,
+    eccentricityPhaseJ2000: 276.8878,  // Phase angle at J2000 (degrees) — mirror of Mars (96.89° + 180°)
+    axialTiltMean: 3.13,
     eocFraction: 0.484,
     startpos: 13.85,
     angleCorrection: 0.92974,
@@ -170,8 +188,11 @@ const planets = {
   saturn: {
     name: 'Saturn',
     solarYearInput: 10747.0,
-    orbitalEccentricity: 0.05374486,  // Dual-balanced = Law 5 prediction (-0.22% from J2000)
+    orbitalEccentricityBase: 0.05374486,  // Dual-balanced = Law 5 prediction (-0.22% from J2000)
     orbitalEccentricityJ2000: 0.05386179,
+    orbitalEccentricityAmplitude: 5.403008e-6,
+    eccentricityPhaseJ2000: 12.9471,  // Phase angle at J2000 (degrees) — mirror of Earth (ω+90° + 180°)
+    axialTiltMean: 26.73,
     eocFraction: 0.543,
     startpos: 11.32,
     angleCorrection: -0.17477,
@@ -191,8 +212,11 @@ const planets = {
   uranus: {
     name: 'Uranus',
     solarYearInput: 30586,
-    orbitalEccentricity: 0.04734421,  // Dual-balanced (+0.18% from J2000)
+    orbitalEccentricityBase: 0.04734421,  // Dual-balanced (+0.18% from J2000)
     orbitalEccentricityJ2000: 0.04725744,
+    orbitalEccentricityAmplitude: 2.831008e-5,
+    eccentricityPhaseJ2000: 269.9882,  // Phase angle at J2000 (degrees) — mirror of Mercury (89.99° + 180°)
+    axialTiltMean: 82.23,
     eocFraction: 0.50,
     startpos: 44.88,
     angleCorrection: -0.733732,
@@ -212,8 +236,11 @@ const planets = {
   neptune: {
     name: 'Neptune',
     solarYearInput: 59980,
-    orbitalEccentricity: 0.00867761,  // Dual-balanced (+1.01% from J2000)
+    orbitalEccentricityBase: 0.00868571,  // Base eccentricity, solved for 100% Law 5 balance (+1.11% from J2000)
     orbitalEccentricityJ2000: 0.00859048,
+    orbitalEccentricityAmplitude: 8.098033e-6,
+    eccentricityPhaseJ2000: 303.7514,  // Phase angle at J2000 (degrees) — mirror of Venus (123.75° + 180°)
+    axialTiltMean: 28.32,
     eocFraction: 0.50,
     startpos: 47.96,
     angleCorrection: 2.33091,
@@ -234,10 +261,10 @@ const planets = {
 
 // Additional bodies (not in the 8-planet Fibonacci framework)
 const additionalBodies = {
-  pluto: { name: 'Pluto', solarYearInput: 90465, orbitalEccentricity: 0.2488273, type: 'I' },
-  halleys: { name: "Halley's", solarYearInput: 27503, orbitalEccentricity: 0.96714291, type: 'III' },
-  eros: { name: 'Eros', solarYearInput: 642.93, orbitalEccentricity: 0.2229512, type: 'II' },
-  ceres: { name: 'Ceres', solarYearInput: 1680.5, orbitalEccentricity: 0.0755347, orbitDistanceOverride: 2.76596 },
+  pluto: { name: 'Pluto', solarYearInput: 90465, orbitalEccentricityBase: 0.2488273, type: 'I' },
+  halleys: { name: "Halley's", solarYearInput: 27503, orbitalEccentricityBase: 0.96714291, type: 'III' },
+  eros: { name: 'Eros', solarYearInput: 642.93, orbitalEccentricityBase: 0.2229512, type: 'II' },
+  ceres: { name: 'Ceres', solarYearInput: 1680.5, orbitalEccentricityBase: 0.0755347, orbitDistanceOverride: 2.76596 },
 };
 
 
@@ -332,7 +359,7 @@ const ASTRO_REFERENCE = {
   // --- Planet perihelion passage references (JPL Horizons, phase-optimized) ---
   mercuryPerihelionRef_JD: 2460335.9,
   venusPerihelionRef_JD: 2455464.42,
-  marsPerihelionRef_JD: 2456505.6,
+  marsPerihelionRef_JD: 2456499.441,
   jupiterPerihelionRef_JD: 2464224.5,
   saturnPerihelionRef_JD: 2452875.9,
   uranusPerihelionRef_JD: 2439699.8,
@@ -420,12 +447,12 @@ massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 // PSI constant (inclination formula parameter: ψ = 2205 / (2H))
 const PSI = 2205 / (2 * H);
 
-// J2000 eccentricities for all 8 planets (inner planets unchanged, outer are pre-dual-balance)
+// J2000 eccentricities for all 8 planets (JPL Horizons snapshot at epoch J2000.0)
 const eccJ2000 = {
-  mercury: planets.mercury.orbitalEccentricity,        // 0.20563593 (same)
-  venus:   planets.venus.orbitalEccentricity,           // 0.00677672 (same)
+  mercury: planets.mercury.orbitalEccentricityJ2000,    // 0.20563593
+  venus:   planets.venus.orbitalEccentricityJ2000,      // 0.00677672
   earth:   ASTRO_REFERENCE.earthEccentricityJ2000,      // 0.01671022
-  mars:    planets.mars.orbitalEccentricity,            // 0.09339410 (same)
+  mars:    planets.mars.orbitalEccentricityJ2000,       // 0.09339410
   jupiter: planets.jupiter.orbitalEccentricityJ2000,    // 0.04838624
   saturn:  planets.saturn.orbitalEccentricityJ2000,     // 0.05386179
   uranus:  planets.uranus.orbitalEccentricityJ2000,     // 0.04725744
@@ -447,15 +474,15 @@ function computePlanetDerived(key) {
   let perihelionDistance, elipticOrbit, realOrbitalEccentricity;
 
   if (p.type === 'I') {
-    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
     perihelionDistance = orbitDistance * realOrbitalEccentricity * 100;
     elipticOrbit = perihelionDistance / 2;
   } else if (p.type === 'II') {
-    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
-    elipticOrbit = (realOrbitalEccentricity * orbitDistance * 100) / 2 + (p.orbitalEccentricity - realOrbitalEccentricity) * orbitDistance * 100;
-    perihelionDistance = (orbitDistance * p.orbitalEccentricity * 100) + elipticOrbit;
+    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
+    elipticOrbit = (realOrbitalEccentricity * orbitDistance * 100) / 2 + (p.orbitalEccentricityBase - realOrbitalEccentricity) * orbitDistance * 100;
+    perihelionDistance = (orbitDistance * p.orbitalEccentricityBase * 100) + elipticOrbit;
   } else { // Type III
-    realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+    realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
     const dw = (ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - p.longitudePerihelion) * Math.PI / 180;
     elipticOrbit = 2 * ASTRO_REFERENCE.earthEccentricityJ2000 * 100 * Math.sin(dw);
     perihelionDistance = realOrbitalEccentricity * orbitDistance * 100;
@@ -533,13 +560,19 @@ const knownValues = {
 // ─── 12. PREDICTIVE FORMULA CONSTANTS ────────────────────────────────────
 
 const PERI_HARMONICS = [
-  [H/16, 4.8906, -0.0223], [H/32, 2.6637, 0.2477],
-  [H/48, 0.2217, 0.0202], [H/64, 0.0708, 0.0123],
-  [H/3, -0.1318, 0.0073], [H/8, 0.1200, -0.0078],
-  [H/29, -0.1309, -0.0060], [H/24, 0.1303, 0.0060],
-  [H/40, 0.0163, 0.0007], [H/13, 0.0118, 0.0005], [H/80, 0.0105, 0.0019]
+  [H/16,  4.890662, -0.022232], [H/32,   2.663350,  0.252940],
+  [H/48,  0.221636,  0.020675], [H/64,   0.070710,  0.012559],
+  [H/3,  -0.131799,  0.007423], [H/29,  -0.130859, -0.006179],
+  [H/24,  0.130344,  0.006152], [H/8,    0.120049, -0.007974],
+  [H/40,  0.016290,  0.000666], [H/13,   0.011751,  0.000554],
+  [H/45, -0.010680, -0.000401], [H/80,   0.010493,  0.001965],
+  [H/272,  0.006051, -0.005402], [H/56,   0.006948,  0.000894],
+  [H/61, -0.006492, -0.000877], [H/35,  -0.005619, -0.000266],
+  [H/544, -0.005401, -0.000629], [H/21,  -0.003466,  0.000049],
+  [H/5,  -0.003215,  0.000012], [H/96,   0.002785,  0.000683],
+  [H/816,  0.001235,  0.001767]
 ];
-const PERI_OFFSET = -0.2608;
+const PERI_OFFSET = -0.261258;
 
 
 // ─── 13. UTILITIES ───────────────────────────────────────────────────────
@@ -654,6 +687,7 @@ module.exports = {
   earthInvPlaneInclinationAmplitude,
   eccentricityBase,
   eccentricityAmplitude,
+  eccentricityAmplitudeK,
   perihelionRefJD,
 
   // Moon inputs

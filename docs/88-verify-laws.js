@@ -19,7 +19,8 @@ const DEG2RAD = Math.PI / 180;
 // Build lookup tables from per-planet data
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const orbitDistance = { earth: 1.0 };
-const ecc = { earth: C.eccJ2000.earth };
+const eccBase = { earth: C.eccentricityBase };
+const eccJ2000 = { earth: C.eccJ2000.earth };
 const inclJ2000 = {};
 const omegaJ2000 = {};
 const period = {};
@@ -30,7 +31,8 @@ for (const p of planets) {
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
-  ecc[p] = C.planets[p].orbitalEccentricity;
+  eccBase[p] = C.planets[p].orbitalEccentricityBase;
+  eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
   period[p] = C.planets[p].perihelionEclipticYears;
@@ -40,12 +42,11 @@ inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
     (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
 
-// Mean eccentricities — used for Findings 6, 7 (long-term structural relationships)
-// For Earth, the mean eccentricity (model parameter eccentricityBase) differs from J2000
-const eccMean = {
-  ...ecc,
-  earth: C.eccentricityBase,  // Model mean eccentricity
-};
+// Mean eccentricities = base eccentricities (already includes Earth base)
+const eccMean = eccBase;
+
+// Balance computations use base eccentricities throughout
+const ecc = eccBase;
 
 // LL bounds (Laplace-Lagrange secular theory)
 const llBounds = {
@@ -450,18 +451,18 @@ console.log('\n┌────────────────────�
 console.log('│  FINDING 5: AMD Partition Ratios — n² pair sums are Fibonacci ratios     │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
-console.log('n = e / i_rad  (using J2000 invariable plane inclinations)\n');
+console.log('n = e_base / i_mean_rad  (using base eccentricities and model mean inclinations)\n');
 
-console.log('Planet       e           i_J2000 (°)  i_rad          n = e/i_rad');
+console.log('Planet       e (base)    i_mean (°)   i_rad          n = e/i_rad');
 console.log('─'.repeat(75));
 
 const nValues = {};
 for (const key of planets) {
-  const iRad = inclJ2000[key] * DEG2RAD;
+  const iRad = means[key] * DEG2RAD;
   const n = ecc[key] / iRad;
   nValues[key] = n;
   console.log(
-    `${key.padEnd(12)} ${ecc[key].toFixed(8)}  ${inclJ2000[key].toFixed(7).padStart(10)}  ${iRad.toFixed(10).padStart(13)}  ${n.toFixed(6).padStart(10)}`
+    `${key.padEnd(12)} ${ecc[key].toFixed(8)}  ${means[key].toFixed(7).padStart(10)}  ${iRad.toFixed(10).padStart(13)}  ${n.toFixed(6).padStart(10)}`
   );
 }
 

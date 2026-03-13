@@ -224,7 +224,7 @@ All planet types now use this conversion:
 
 In `constants.js` (Type III derived values):
 ```javascript
-realOrbitalEccentricity = p.orbitalEccentricity / (1 + p.orbitalEccentricity);
+realOrbitalEccentricity = p.orbitalEccentricityBase / (1 + p.orbitalEccentricityBase);
 perihelionDistance = realOrbitalEccentricity * orbitDistance * 100;
 ```
 
@@ -314,7 +314,7 @@ scene-graph tools.
 
 ### Code locations
 
-- Planet data objects in `script.js`: `eccentricity: orbitalEccentricity * eocFraction`
+- Planet data objects in `script.js`: `eccentricity: orbitalEccentricityBase * eocFraction`
 - `moveModel()` EoC block in both `script.js` and `scene-graph.js`: applies to
   any object with `eccentricity` and `perihelionPhaseJ2000`
 

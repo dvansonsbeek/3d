@@ -23,11 +23,13 @@ const mass = C.massFraction;
 // Build lookup tables from per-planet data
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const orbitDistance = { earth: 1.0 };
+const eccBase = { earth: C.eccentricityBase };
 const eccJ2000 = { earth: C.eccJ2000.earth };
 for (const p of planets) {
   if (p === 'earth') continue;
   orbitDistance[p] = C.derived[p].orbitDistance;
-  eccJ2000[p] = C.planets[p].orbitalEccentricity;
+  eccBase[p] = C.planets[p].orbitalEccentricityBase;
+  eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
 }
 
 // Config #3: unique mirror-symmetric Fibonacci assignment
@@ -68,29 +70,53 @@ console.log('APPENDIX N (90) — ECCENTRICITY BALANCE ANALYSIS');
 console.log('═══════════════════════════════════════════════════════════════');
 
 // ══════════════════════════════════════════════════════════════════
-// SECTION 1: Current 8-planet balance (J2000 eccentricities)
+// SECTION 1a: 8-planet balance with BASE eccentricities (mean)
 // ══════════════════════════════════════════════════════════════════
 console.log('\n───────────────────────────────────────────────────────────────');
-console.log('SECTION 1: 8-PLANET ECCENTRICITY BALANCE (J2000)');
+console.log('SECTION 1a: 8-PLANET ECCENTRICITY BALANCE (BASE / MEAN)');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-const j2000 = computeBalance(eccJ2000);
+const base = computeBalance(eccBase);
 
 console.log('v_j = √m_j × a_j^(3/2) × e_j / √d_j\n');
-console.log('| Planet   | Group | d  | √m          | a^(3/2)     | e          | v_j          | % of total |');
+console.log('| Planet   | Group | d  | √m          | a^(3/2)     | e (base)   | v_j          | % of total |');
 console.log('|----------|-------|----|-------------|-------------|------------|--------------|------------|');
 for (const p of planets) {
   const d = config3[p].d;
   const sqrtM = Math.sqrt(mass[p]);
   const a32 = Math.pow(orbitDistance[p], 1.5);
   const group = config3[p].phase > 180 ? '203°' : '23°';
+  const pct = (base.v[p] / base.total * 100).toFixed(2);
+  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccBase[p].toFixed(8)} | ${base.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
+}
+
+console.log(`\n  Σ(203°) = ${base.sum203.toExponential(6)}`);
+console.log(`  Σ(23°)  = ${base.sum23.toExponential(6)}  (Saturn only)`);
+console.log(`  Gap     = ${base.gap.toExponential(6)}`);
+console.log(`  Total   = ${base.total.toExponential(6)}`);
+console.log(`  Balance = ${base.balance.toFixed(4)}%`);
+
+// ══════════════════════════════════════════════════════════════════
+// SECTION 1b: 8-planet balance with J2000 eccentricities
+// ══════════════════════════════════════════════════════════════════
+console.log('\n───────────────────────────────────────────────────────────────');
+console.log('SECTION 1b: 8-PLANET ECCENTRICITY BALANCE (J2000)');
+console.log('───────────────────────────────────────────────────────────────\n');
+
+const j2000 = computeBalance(eccJ2000);
+
+console.log('| Planet   | Group | d  | e (J2000)  | v_j          | % of total |');
+console.log('|----------|-------|----|------------|--------------|------------|');
+for (const p of planets) {
+  const d = config3[p].d;
+  const group = config3[p].phase > 180 ? '203°' : '23°';
   const pct = (j2000.v[p] / j2000.total * 100).toFixed(2);
-  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
+  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
 console.log(`\n  Σ(203°) = ${j2000.sum203.toExponential(6)}`);
 console.log(`  Σ(23°)  = ${j2000.sum23.toExponential(6)}  (Saturn only)`);
-console.log(`  Gap     = ${j2000.gap.toExponential(6)}  (23° side heavier)`);
+console.log(`  Gap     = ${j2000.gap.toExponential(6)}`);
 console.log(`  Total   = ${j2000.total.toExponential(6)}`);
 console.log(`  Balance = ${j2000.balance.toFixed(4)}%`);
 
@@ -317,12 +343,12 @@ console.log('\n─────────────────────�
 console.log('SECTION 7: COMPARISON — INCLINATION vs ECCENTRICITY BALANCE');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-// Inclination balance
+// Inclination balance (using base eccentricities for 1-e² term)
 const PSI = C.PSI;
 let inclSum203 = 0, inclSum23 = 0;
 for (const p of planets) {
   const d = config3[p].d;
-  const w = Math.sqrt(mass[p] * orbitDistance[p] * (1 - eccJ2000[p] * eccJ2000[p])) / d;
+  const w = Math.sqrt(mass[p] * orbitDistance[p] * (1 - eccBase[p] * eccBase[p])) / d;
   if (config3[p].phase > 180) inclSum203 += w; else inclSum23 += w;
 }
 const inclTotal = inclSum203 + inclSum23;
@@ -334,9 +360,9 @@ console.log('|--------------------------|---------------------|-----------------
 console.log(`| Weight formula           | w = √(m·a(1-e²))/d | v = √m·a^(3/2)·e/√d  |`);
 console.log(`| d scaling                | 1/d                 | 1/√d                  |`);
 console.log(`| a scaling                | √a                  | a^(3/2)               |`);
+console.log(`| Balance (base)           | ${inclBalance.toFixed(4)}%          | ${base.balance.toFixed(4)}%            |`);
 console.log(`| Balance (J2000)          | ${inclBalance.toFixed(4)}%          | ${j2000.balance.toFixed(4)}%            |`);
-console.log(`| Balance (Law 4 e_Sa)    | ${inclBalance.toFixed(4)}%          | ${balLaw4.balance.toFixed(4)}%            |`);
-console.log(`| Gap                      | ${inclGap.toExponential(3).padStart(12)}        | ${j2000.gap.toExponential(3).padStart(12)}          |`);
+console.log(`| Gap (base)               | ${inclGap.toExponential(3).padStart(12)}        | ${base.gap.toExponential(3).padStart(12)}          |`);
 console.log(`| TNO correction possible  | Yes (tiny, 0.0002%) | No (a^(3/2) too heavy)|`);
 console.log(`| System type              | Global (all mass)   | Closed (8 planets)    |`);
 
@@ -347,8 +373,8 @@ console.log('\n─────────────────────�
 console.log('SECTION 8: SUMMARY');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-console.log('1. BALANCE: The 8-planet eccentricity balance is 100% with');
-console.log('   dual-balanced eccentricities.');
+console.log(`1. BALANCE: The 8-planet eccentricity balance is ${base.balance.toFixed(4)}% with`);
+console.log(`   base eccentricities, ${j2000.balance.toFixed(4)}% with J2000 eccentricities.`);
 console.log();
 console.log('2. LAW CONVERGENCE: Laws 4 and 5 independently predict Saturn\'s');
 console.log('   eccentricity to within 0.28%, both bracketing J2000:');

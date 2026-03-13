@@ -6,7 +6,7 @@ OBSERVED FORMULA TRAINING SCRIPT
 Trains precession coefficients for all 7 planets using the OBSERVED feature
 matrix (225 terms for most planets, 328 terms for Venus).
 
-Unlike train_precession.py which uses the predictive 273-term feature matrix,
+Unlike train_precession.py which uses the predictive 429-term feature matrix,
 this script uses the observed formula's feature builders that take actual
 Excel-observed values (perihelion, ERD, obliquity, eccentricity) as inputs.
 

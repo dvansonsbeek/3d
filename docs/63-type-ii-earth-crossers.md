@@ -61,7 +61,7 @@ eo = (e_Mars * d * 100) / 2  -  (2 * e_Earth * 100 * sin(delta_omega)) / 2
 ```
 
 Where:
-- `e_Mars` = Mars orbital eccentricity (0.09339410)
+- `e_Mars` = Mars orbital eccentricity (0.09297543)
 - `d` = Mars orbit distance in AU (1.5237, from Kepler's 3rd law)
 - `e_Earth` = Earth's orbital eccentricity (0.01671022)
 - `delta_omega` = angle between Earth's and Mars's ecliptic perihelion
@@ -112,7 +112,7 @@ The legacy formula remains in script.js as a historical artifact.
 
 ## Derived Eccentricity: e/(1+e) Circular-Orbit Equivalent
 
-Mars uses `e/(1+e) = 0.08541762` (from J2000 e = 0.09339410) for the orbit
+Mars uses `e/(1+e) = 0.08506635` (from base e = 0.09297543) for the orbit
 offset calculation. See the
 [Type III doc, "Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)"](64-type-iii-outer-planets.md#perihelion-distance-circular-orbit-eccentricity-e1e)
 section for the full derivation and physical basis.
@@ -173,7 +173,7 @@ the dynamic update in `moveModel()`:
 eclipticPrecLayer: marsPerihelionDurationEcliptic1,  // precession layer reference
 longitudePerihelion: marsLongitudePerihelion,         // J2000 base angle (336.065 deg)
 planetType: 'II',                                    // selects Type II formula branch
-_orbitalEccentricity: marsOrbitalEccentricity,       // for eccDist calculation
+_orbitalEccentricityBase: marsOrbitalEccentricity,       // for eccDist calculation
 _orbitDistance: marsOrbitDistance,                     // for eccDist calculation
 ```
 
@@ -372,14 +372,14 @@ best tradeoff.
 |---------------------------|------------|------------|---------------|-------------|----------|
 | **angleCorrection**       | -2.107     | -4.0       | 0.90 deg      | 0.78 deg    | High     |
 | **longitudePerihelion**   | 336.065    | 330.0      | 0.78 deg      | 0.93 deg    | High     |
-| **orbitalEccentricity**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
+| **orbitalEccentricityBase**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
 | solarYearInput            | 686.931    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
 | ascendingNode             | 49.557     | 55.0       | 1.11 deg      | 0.69 deg    | Low      |
 | inclinationPhaseAngle     | 203.320    | 205.0      | 1.15 deg      | 0.79 deg    | Minimal  |
 | eclipticInclinationJ2000  | 1.850      | (no effect)| 1.20 deg      | 0.78 deg    | None     |
 
 Three parameters have strong leverage on Tycho Dec: `angleCorrection`,
-`longitudePerihelion`, and `orbitalEccentricity`.
+`longitudePerihelion`, and `orbitalEccentricityBase`.
 
 `eclipticInclinationJ2000` has zero effect because it is consumed during
 static initialization into tilt components that don't change with the
@@ -421,7 +421,7 @@ The best combined configuration:
 - Reduces combined metric by **28%** (1.43 deg -> 1.03 deg)
 - Barely changes `longitudePerihelion` (336.065 -> 336)
 - The two effective changes are `angleCorrection` (-2.1 -> -4.5) and
-  `orbitalEccentricity` (0.0934 -> 0.10)
+  `orbitalEccentricityBase` (0.0934 -> 0.10)
 
 ### Top 10 configurations from 3D scan
 
@@ -438,7 +438,7 @@ The best combined configuration:
 | -3.5 | 334 | 0.100  | 0.66    | 0.80    | 1.04     |
 | -4.5 | 335 | 0.100  | 0.66    | 0.80    | 1.04     |
 
-The top configurations all converge on `orbitalEccentricity = 0.10`, with
+The top configurations all converge on `orbitalEccentricityBase = 0.10`, with
 `angleCorrection` and `longitudePerihelion` trading off against each other.
 
 ### Physical interpretation
@@ -563,7 +563,7 @@ involving the planet's eccentricity in the offset calculation.
 ```
 solarYearInput:            686.931       (orbital period in days, calibrated from ISAW drift)
 eclipticInclinationJ2000:  1.84969142    (ecliptic inclination, degrees)
-orbitalEccentricity:       0.09339410    (J2000 eccentricity)
+orbitalEccentricityBase:       0.09297543    (base eccentricity)
 eocFraction:               -0.066        (EoC multiplier, near-zero = mostly geometric)
 longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)

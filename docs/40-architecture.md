@@ -198,7 +198,7 @@ The monolithic script.js is organized into logical sections:
 │  - Earth orbital parameters (tilt, eccentricity, precession)        │
 │  - All planet orbital elements (Mercury through Neptune)            │
 │  - Predictive formula constants (PERI_HARMONICS, PREDICT_PLANETS)   │
-│  - Predictive coefficients (7×273 trained arrays, PREDICT_COEFFS)   │
+│  - Predictive coefficients (7×429 trained arrays, PREDICT_COEFFS)   │
 │  - Moon parameters (sidereal, anomalistic, nodal months)            │
 │  - Physical constants (diameters, masses, distances, GM values)     │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -506,17 +506,17 @@ Features:
 
 ### Predictive Formula System
 
-A 273-term feature matrix system for computing dynamic geocentric perihelion precession rates:
+A 429-term feature matrix system for computing dynamic geocentric perihelion precession rates:
 
 ```
 Architecture:
-├── PERI_HARMONICS (12 terms) → Earth perihelion longitude model
+├── PERI_HARMONICS (21 terms) → Earth perihelion longitude model
 ├── calcEarthPerihelionPredictive(year) → Earth perihelion at any year
 ├── calcERD(year) → Earth Rate Deviation (derivative)
-├── buildPredictiveFeatures(year, period, theta0) → 273-term feature vector
-│   └── 16 groups: angle terms, obliquity, eccentricity, ERD, periodic,
+├── buildPredictiveFeatures(year, period, theta0) → 429-term feature vector
+│   └── 25 groups: angle terms, obliquity, eccentricity, ERD, periodic,
 │       cross-terms, beat frequencies, Venus-specific, higher harmonics
-├── PREDICT_COEFFS (7 × 273 trained arrays) → per-planet coefficients
+├── PREDICT_COEFFS (7 × 429 trained arrays) → per-planet coefficients
 └── predictGeocentricPrecession(year, planetKey) → total rate (″/century)
     └── baseline + dot(features, coefficients)
 ```

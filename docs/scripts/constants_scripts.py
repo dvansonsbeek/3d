@@ -148,7 +148,7 @@ SQRT_M = {p: math.sqrt(MASS[p]) for p in PLANET_NAMES}
 # ECCENTRICITIES
 # ═══════════════════════════════════════════════════════════════════════════
 
-# J2000 snapshot values (used in Holistic model computation chain)
+# J2000 snapshot values (JPL Horizons at epoch J2000.0)
 ECC_J2000 = {
     "Mercury": 0.20563593,
     "Venus":   0.00677672,
@@ -160,48 +160,62 @@ ECC_J2000 = {
     "Neptune": 0.00859048,
 }
 
-# Model-predicted base (midpoint) eccentricities
-# Earth is from 3D simulation; others are model predictions
+# Base eccentricities (fixed perihelion distance, 100% Law 5 balance)
+# From constants.js orbitalEccentricityBase (see docs/35 §6)
 ECC_BASE = {
-    "Mercury": 0.20853,
-    "Venus":   0.00679,
-    "Earth":   0.015372,
-    "Mars":    0.09347,
-    "Jupiter": 0.04839,
-    "Saturn":  0.05386,
-    "Uranus":  0.04726,
-    "Neptune": 0.00870,
-}
-
-# Default eccentricity set: J2000 for most, base for Earth
-# (used in significance tests, eccentricity balance, etc.)
-ECCENTRICITIES = {
-    "Mercury": 0.20563593,
-    "Venus":   0.00677672,
-    "Earth":   0.015372,    # base eccentricity from Holistic model
-    "Mars":    0.09339410,
-    "Jupiter": 0.04838624,
-    "Saturn":  0.05386179,
-    "Uranus":  0.04725744,
-    "Neptune": 0.00859048,
-}
-
-# Dual-balanced eccentricities: inner planets use J2000, outer planets
-# optimized for simultaneous 100% inclination + eccentricity balance.
-# From constants.js orbitalEccentricity (see docs/20-constants-reference.md §675).
-ECC_DUAL_BALANCED = {
-    "Mercury": 0.20563593,  # J2000
-    "Venus":   0.00677672,  # J2000
-    "Earth":   0.01671022,  # J2000 (dual-balanced outer planets were optimized with this value)
-    "Mars":    0.09339410,  # J2000
+    "Mercury": 0.20563593,  # Tilt ~0, no fluctuation (= J2000)
+    "Venus":   0.00619052,  # H/16 fit to JPL data (-8.65% from J2000)
+    "Earth":   0.015372,    # eccentricityBase (tuned parameter)
+    "Mars":    0.09297543,  # H/16 fit to JPL data (-0.45% from J2000)
     "Jupiter": 0.04821478,  # Dual-balanced (-0.35% from J2000)
-    "Saturn":  0.05374486,  # Dual-balanced = Law 5 prediction (-0.22% from J2000)
+    "Saturn":  0.05374486,  # Law 5 prediction (-0.22% from J2000)
     "Uranus":  0.04734421,  # Dual-balanced (+0.18% from J2000)
-    "Neptune": 0.00867761,  # Dual-balanced (+1.01% from J2000)
+    "Neptune": 0.00868571,  # Solved for 100% Law 5 balance (+1.11% from J2000)
 }
 
-# Alias
+# Eccentricity amplitudes from tilt formula: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+# From constants.js orbitalEccentricityAmplitude (see docs/35 §4-5)
+ECC_AMPLITUDE_K = 3.4505372893e-6  # Universal tilt-eccentricity coupling constant
+
+AXIAL_TILT = {
+    "Mercury":  0.03,    "Venus":  2.6392,  "Earth": 23.41357,  "Mars":   25.19,
+    "Jupiter":  3.13,    "Saturn": 26.73,   "Uranus": 82.23,    "Neptune": 28.32,
+}
+
+ECC_AMPLITUDE = {
+    "Mercury": 8.436789e-5,
+    "Venus":   9.625389e-4,
+    "Earth":   EARTH_ECCENTRICITY_AMPLITUDE,  # 0.00137032
+    "Mars":    3.073636e-3,
+    "Jupiter": 1.149908e-6,
+    "Saturn":  5.403008e-6,
+    "Uranus":  2.831008e-5,
+    "Neptune": 8.098033e-6,
+}
+
+# Eccentricity phase angles at J2000 (degrees)
+# Inner planets: solved from J2000 constraint cos(φ) = (e_J2000 - e_base) / e_amplitude
+# Outer planets: mirror-pair rule (inner phase + 180°) for tighter Law 5 balance
+# All planets oscillate at H/16 = 20,938 years (axial-meets-inclination beat)
+# Earth phase = ω + 90° = 192.95° (longitude of perihelion + 90°)
+ECC_PHASE_J2000 = {
+    "Mercury":  89.9882,   # Near mean, tilt ~0
+    "Venus":   123.7514,   # Past mean, decreasing
+    "Earth":   192.9471,   # ω + 90° = 102.947° + 90°
+    "Mars":     96.8878,   # Just past mean
+    "Jupiter": 276.8878,   # Mirror of Mars (96.89° + 180°)
+    "Saturn":   12.9471,   # Mirror of Earth (192.95° + 180°)
+    "Uranus":  269.9882,   # Mirror of Mercury (89.99° + 180°)
+    "Neptune": 303.7514,   # Mirror of Venus (123.75° + 180°)
+}
+
+# Default eccentricity set for balance computations: BASE values
+# (base eccentricities give 100% Law 5 balance by construction)
+ECCENTRICITIES = dict(ECC_BASE)
+
+# Aliases
 ECC = ECCENTRICITIES
+ECC_DUAL_BALANCED = ECC_BASE  # Legacy alias (base eccentricities supersede dual-balanced)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
@@ -395,11 +409,11 @@ def eta(planet):
     return INCL_AMP[planet] * SQRT_M[planet]
 
 
-def xi(planet, use_base=False):
+def xi(planet, use_j2000=False):
     """Mass-weighted eccentricity: ξ = e × √m
-    If use_base=True, uses ECC_BASE values; otherwise uses ECCENTRICITIES (default).
+    If use_j2000=True, uses ECC_J2000 values; otherwise uses ECC_BASE (default).
     """
-    e = ECC_BASE[planet] if use_base else ECCENTRICITIES[planet]
+    e = ECC_J2000[planet] if use_j2000 else ECC_BASE[planet]
     return e * SQRT_M[planet]
 
 

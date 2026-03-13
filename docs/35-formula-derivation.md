@@ -153,7 +153,7 @@ All periods in the formula have physical derivations:
 
 ## 4. Mercury Formula: Coefficient Breakdown (Predictive Formula)
 
-> **Formula Type**: This section documents the **legacy 106-term predictive formula** (year-only input, R² = 0.9986, RMSE = 2.83″/cy). This has been superseded by the **unified 273-term system** (R² = 0.9987, RMSE = 3.21″/cy) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx). The coefficient breakdown below remains valid as a reference for the formula's physical structure. For the **observed formula** (uses Excel data, 225 terms, R² = 0.999994), see [Section 14](#14-observed-angle-formulas-using-observational-data).
+> **Formula Type**: This section documents the **legacy 106-term predictive formula** (year-only input, R² = 0.9986, RMSE = 2.83″/cy). This has been superseded by the **unified 429-term system** (R² = 0.999929, RMSE = 0.75″/cy) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx). The coefficient breakdown below remains valid as a reference for the formula's physical structure. For the **observed formula** (uses Excel data, 225 terms, R² = 0.999994), see [Section 14](#14-observed-angle-formulas-using-observational-data).
 
 The Mercury predictive fluctuation formula achieves R² = 0.9986 using **106 non-zero coefficients** organized into 10 categories. All coefficients are trained regression weights determined by least-squares fitting — they change when H or the training data changes. For current values, see [predictive_formula.py](scripts/predictive_formula.py) and [observed_formula.py](scripts/observed_formula.py) with their associated `*_coeffs.py` files.
 
@@ -184,7 +184,7 @@ Where δ = θ_E − θ_M (relative angle) and σ = θ_E + θ_M (sum angle).
 **Accuracy: R² = 0.9986** (explains 99.86% of variance across full H-year cycle)
 **RMSE: 2.83 arcsec/century**
 
-*Note: The observed formula (Section 14) achieves R² = 0.999994 with 225 terms by using actual perihelion data from Excel. The unified 273-term predictive system achieves R² = 0.9987, RMSE = 3.21″/cy.*
+*Note: The observed formula (Section 14) achieves R² = 0.999994 with 225 terms by using actual perihelion data from Excel. The unified 429-term predictive system achieves R² = 0.999929, RMSE = 0.75″/cy.*
 
 > **Note on ERD Terms**: The ERD² × Periodic terms (10 terms) were the key to reaching 99.8% accuracy. The largest coefficients are the ERD²×cos(t/(H/16)) and ERD²×sin(t/(H/16)) terms, indicating that the squared rate deviation interacting with Earth's effective perihelion cycle is a dominant correction term.
 
@@ -192,7 +192,7 @@ Where δ = θ_E − θ_M (relative angle) and σ = θ_E + θ_M (sum angle).
 
 ## 5. Venus Formula: Coefficient Breakdown (Observed Formula)
 
-> **Formula Type**: This section documents the **observed formula** (uses Excel data, 328 terms, R² = 0.999999, RMSE = 0.46″/cy). Venus also has a **predictive formula** (unified 273-term system, year-only input, R² = 0.9983, RMSE = 21.39″/cy).
+> **Formula Type**: This section documents the **observed formula** (uses Excel data, 328 terms, R² = 0.999999, RMSE = 0.46″/cy). Venus also has a **predictive formula** (unified 429-term system, year-only input, R² = 0.999955, RMSE = 3.47″/cy).
 
 Venus presents a fundamentally different challenge than Mercury. With an eccentricity of only 0.00678 (compared to Mercury's 0.20564), Venus has a nearly circular orbit where geometric modulation effects are minimal. Instead, Venus's fluctuation is dominated by **variations in Earth's axial precession rate**.
 
@@ -367,7 +367,7 @@ This closed loop means Saturn's coefficients include strong coupling to Jupiter 
 
 ### 8.4 Predictive Formula Enhancement
 
-The **predictive formula** for Saturn uses the unified 273-term matrix enhanced with **time-varying obliquity and eccentricity** (GROUP 15 terms):
+The **predictive formula** for Saturn uses the unified 429-term matrix enhanced with **time-varying obliquity and eccentricity** (GROUP 15 terms):
 
 $$
 \varepsilon_{\text{Saturn}}(t) = \texttt{earthtiltMean} + 1.2° \cdot \cos\left(\frac{2\pi t}{H/8}\right)
@@ -377,7 +377,7 @@ $$
 e_{\text{Saturn}}(t) = \texttt{eccentricityDerivedMean} + 0.019 \cdot \cos\left(\frac{2\pi t}{H/8}\right)
 $$
 
-This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 1.0000, RMSE = 0.32″/century**.
+This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (11553 data points, 29-year steps).
 
 For implementation details, see [predictive_formula.py](scripts/predictive_formula.py) (GROUP 15 terms in `build_features`).
 
@@ -385,15 +385,15 @@ For implementation details, see [predictive_formula.py](scripts/predictive_formu
 >
 > Of all seven planets modeled, **Saturn is the only one** that requires time-varying obliquity and eccentricity to achieve accurate predictive results:
 >
-> | Planet | Obliq/Ecc Treatment | R² Achieved (unified 273-term) |
+> | Planet | Obliq/Ecc Treatment | R² Achieved (unified 429-term) |
 > |--------|---------------------|-------------------------------|
-> | Mercury | Constant (standard formulas) | 0.9987 |
-> | Venus | Not used | 0.9983 |
-> | Mars | Zeros (not needed) | 0.9999 |
-> | Jupiter | Zeros (not needed) | 0.9999 |
-> | **Saturn** | **Time-varying (GROUP 15 terms)** | **1.0000** |
-> | Uranus | Zeros (not needed) | 0.9998 |
-> | Neptune | Not used | 0.9997 |
+> | Mercury | Constant (standard formulas) | 0.999929 |
+> | Venus | Not used | 0.999955 |
+> | Mars | Zeros (not needed) | 0.999636 |
+> | Jupiter | Zeros (not needed) | 0.999625 |
+> | **Saturn** | **Time-varying (GROUP 15 terms)** | **0.999617** |
+> | Uranus | Zeros (not needed) | 0.999618 |
+> | Neptune | Not used | 0.999902 |
 >
 > This mathematical requirement provides strong evidence that **Saturn drives Earth's obliquity cycle**. The period synchronization (both = H/8) and the necessity of explicit coupling for accurate modeling suggest a causal relationship: Saturn's gravitational influence modulates Earth's axial tilt oscillation.
 >
@@ -470,13 +470,13 @@ For full implementation details, see [neptune_coeffs.py](scripts/neptune_coeffs.
 
 ### 10.4 Predictive Formula Enhancement
 
-Neptune now uses the **unified 273-term predictive matrix**, the same system used by all other planets. Despite Neptune and Venus sharing the same precession period (H×2), the unified matrix handles this through its ridge regression regularization (α=0.01), which prevents term interference between the two planets.
+Neptune now uses the **unified 429-term predictive matrix**, the same system used by all other planets. Despite Neptune and Venus sharing the same precession period (H×2), the unified matrix handles this through its ridge regression regularization (α=0.01), which prevents term interference between the two planets.
 
 | Property | Observed Formula | Predictive Formula |
 |----------|------------------|-------------------|
-| **R²** | 0.999999 | 0.9997 |
-| **RMSE** | 0.02 arcsec/century | 0.41 arcsec/century |
-| **Features** | 225 terms | 273 terms (unified) |
+| **R²** | 0.999999 | 0.999902 |
+| **RMSE** | 0.02 arcsec/century | 0.25 arcsec/century |
+| **Features** | 225 terms | 429 terms (unified) |
 
 > **Venus period match**: Both Neptune and Venus have precession period H×2. The ridge regression regularization in the unified predictive system handles this shared period without requiring a custom reduced feature set.
 
@@ -536,19 +536,19 @@ The table below shows two sets of formula accuracy values:
 | Uranus | 1.000000 | 0.01 | 225 |
 | Neptune | 0.999999 | 0.02 | 225 |
 
-### Predictive Formula Accuracy (year-only input, unified 273-term system)
+### Predictive Formula Accuracy (year-only input, unified 429-term system)
 
 | Planet | R² | RMSE (″/cy) | Features |
 |--------|-----|-------------|----------|
-| Mercury | 0.9987 | 3.21 | 273 |
-| Venus | 0.9983 | 21.39 | 273 |
-| Mars | 0.9999 | 0.75 | 273 |
-| Jupiter | 0.9999 | 0.93 | 273 |
-| Saturn | 1.0000 | 0.32 | 273 |
-| Uranus | 0.9998 | 0.31 | 273 |
-| Neptune | 0.9997 | 0.41 | 273 |
+| Mercury | 0.999929 | 0.75 | 429 |
+| Venus | 0.999955 | 3.47 | 429 |
+| Mars | 0.999636 | 2.03 | 429 |
+| Jupiter | 0.999625 | 2.33 | 429 |
+| Saturn | 0.999617 | 3.72 | 429 |
+| Uranus | 0.999618 | 1.40 | 429 |
+| Neptune | 0.999902 | 0.25 | 429 |
 
-> **Why the difference?** Observed formulas use actual planetary positions from the Excel data, while predictive formulas must calculate everything from just the year. Venus's near-circular orbit (e = 0.007) makes its perihelion position poorly defined, so the observed formula achieves much better accuracy (0.46 vs 21.39 arcsec).
+> **Why the difference?** Observed formulas use actual planetary positions from the Excel data, while predictive formulas must calculate everything from just the year. Venus's near-circular orbit (e = 0.007) makes its perihelion position poorly defined, so the observed formula achieves much better accuracy (0.46 vs 6.22 arcsec).
 
 ### Key Observations
 
@@ -620,7 +620,7 @@ The formula assumes:
 
 All coefficients are rounded to integers for simplicity. The optimal least-squares values are non-integer (e.g., 42.8 → 43, -89.6 → -90), introducing small systematic errors.
 
-> **Status**: This formula should be considered **provisional** until the base periods (H, Mercury, Mars) are independently verified or derived from first principles. The legacy 106-term predictive formula explains 99.86% of variance with RMSE = 2.83 arcsec/century. The unified 273-term predictive system achieves R² = 0.9987 (RMSE = 3.21) for Mercury. The remaining residual represents the combined effect of these uncertainties.
+> **Status**: This formula should be considered **provisional** until the base periods (H, Mercury, Mars) are independently verified or derived from first principles. The legacy 106-term predictive formula explains 99.86% of variance with RMSE = 2.83 arcsec/century. The unified 429-term predictive system achieves R² = 0.999929 (RMSE = 0.75) for Mercury. The remaining residual represents the combined effect of these uncertainties.
 
 ---
 
@@ -734,7 +734,7 @@ With coefficients $e_1$ (obliquity) and $e_2$ (eccentricity) determined by least
 
 **Result units:** arcseconds per century (″/century)
 
-**Accuracy:** R² = 0.999994, RMSE = 0.22″/cy (225 terms). For the predictive formula (year-only input): R² = 0.9987, RMSE = 3.21″/cy (273 terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx).
+**Accuracy:** R² = 0.999994, RMSE = 0.22″/cy (225 terms). For the predictive formula (year-only input): R² = 0.999929, RMSE = 0.75″/cy (429 terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx).
 
 For predicted fluctuation values over time, see [Section 11](#11-time-varying-fluctuation).
 
