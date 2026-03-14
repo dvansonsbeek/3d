@@ -5481,25 +5481,80 @@ earthPerihelionFromEarth.rotationAxis.add(periLabelObj);
 earthPerihelionFromEarth.labelObj = periLabelObj;
 earthPerihelionFromEarth._labelDiv = periLabelDiv;
 
+/* — Planet Wobble Center orbit circle: center on wobble center, not planet — */
+/* The orbit line is a child of orbitObj at (0,0,0). The pivotObj (wobble center)
+   is always at (a, 0, 0) in orbitObj-local space. Shift the orbit line to (a, 0, 0)
+   so the circle is centered on the wobble center, with the planet on the edge. */
+for (const wc of [mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter,
+                   jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]) {
+  if (wc.orbitLineObj) wc.orbitLineObj.position.set(wc.a, 0, 0);
+}
+
 /* — Planet Wobble Center labels — */
 const _planetWobbleCenters = [
-  { obj: mercuryWobbleCenter, name: "Mercury" },
-  { obj: venusWobbleCenter,   name: "Venus" },
-  { obj: marsWobbleCenter,    name: "Mars" },
-  { obj: jupiterWobbleCenter, name: "Jupiter" },
-  { obj: saturnWobbleCenter,  name: "Saturn" },
-  { obj: uranusWobbleCenter,   name: "Uranus" },
-  { obj: neptuneWobbleCenter, name: "Neptune" },
+  { obj: mercuryWobbleCenter, name: "Mercury", eccAmp: mercuryOrbitalEccentricityAmplitude, tilt: mercuryTilt, inclAmp: mercuryInvPlaneInclinationAmplitude, periEclYr: mercuryPerihelionEclipticYears },
+  { obj: venusWobbleCenter,   name: "Venus",   eccAmp: venusOrbitalEccentricityAmplitude,   tilt: venusTilt,   inclAmp: venusInvPlaneInclinationAmplitude,   periEclYr: venusPerihelionEclipticYears },
+  { obj: marsWobbleCenter,    name: "Mars",    eccAmp: marsOrbitalEccentricityAmplitude,    tilt: marsTilt,    inclAmp: marsInvPlaneInclinationAmplitude,    periEclYr: marsPerihelionEclipticYears },
+  { obj: jupiterWobbleCenter, name: "Jupiter", eccAmp: jupiterOrbitalEccentricityAmplitude, tilt: jupiterTilt, inclAmp: jupiterInvPlaneInclinationAmplitude, periEclYr: jupiterPerihelionEclipticYears },
+  { obj: saturnWobbleCenter,  name: "Saturn",  eccAmp: saturnOrbitalEccentricityAmplitude,  tilt: saturnTilt,  inclAmp: saturnInvPlaneInclinationAmplitude,  periEclYr: saturnPerihelionEclipticYears },
+  { obj: uranusWobbleCenter,   name: "Uranus",  eccAmp: uranusOrbitalEccentricityAmplitude,  tilt: uranusTilt,  inclAmp: uranusInvPlaneInclinationAmplitude,  periEclYr: uranusPerihelionEclipticYears },
+  { obj: neptuneWobbleCenter, name: "Neptune", eccAmp: neptuneOrbitalEccentricityAmplitude, tilt: neptuneTilt, inclAmp: neptuneInvPlaneInclinationAmplitude, periEclYr: neptunePerihelionEclipticYears },
 ];
 for (const wc of _planetWobbleCenters) {
+  // Axial precession: ω_axial = ω_total(H/16) - ω_ecliptic
+  const axialPrecYears = 1 / (16 / holisticyearLength - 1 / wc.periEclYr);
+  const axialDir = axialPrecYears > 0 ? 'prograde' : 'retrograde';
+  const axialYr = Math.abs(Math.round(axialPrecYears)).toLocaleString();
+  // Inclination precession = ecliptic perihelion precession
+  const inclPrecDir = wc.periEclYr > 0 ? 'prograde' : 'retrograde';
+  const inclPrecYr = Math.abs(Math.round(wc.periEclYr)).toLocaleString();
+  // Perihelion precession = H/16
+  const periPrecYr = Math.round(holisticyearLength / 16).toLocaleString();
+
+  const sub = 'font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;';
+  const val = 'font:500 9px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.7);margin-top:3px;font-variant-numeric:tabular-nums;';
+
   const div = document.createElement('div');
-  div.style.cssText = helperLabelStyle;
-  div.innerHTML =
-    '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Wobble Center</div>' +
-    '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of ' + wc.name + '\'s wobble</div>' +
+  div.style.cssText = 'text-align:center;pointer-events:none;transition:opacity .4s ease;opacity:0;';
+  const inner = document.createElement('div');
+  inner.style.cssText = 'transform-origin:center bottom;' +
+    'line-height:1.35;padding:5px 10px 3px;border-radius:8px;' +
+    'background:rgba(8,12,18,.72);' +
+    'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);' +
+    'border:1px solid rgba(255,255,255,.12);' +
+    'box-shadow:0 2px 10px rgba(0,0,0,.4);';
+  // Dynamic eccentricity span — updated each frame
+  const eccSpan = document.createElement('span');
+  eccSpan.style.cssText = 'font-variant-numeric:tabular-nums;';
+  eccSpan.textContent = '—';
+  wc._eccSpan = eccSpan;
+  wc._eccKey = 'eccentricity' + wc.name;  // e.g. 'eccentricityMars'
+
+  const sep = 'margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,.1);';
+  const grp = 'font:600 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:6px;';
+
+  inner.innerHTML =
+    '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">' + wc.name + ' Precession Center</div>' +
+    '<div style="' + sub + '">axis of ' + wc.name + '\'s wobble</div>' +
+    '<div style="' + grp + sep + '">Precession</div>' +
+    '<div style="' + val + '">Inclination: ' + inclPrecYr + ' yr (' + inclPrecDir + ')</div>' +
+    '<div style="' + val + '">Axial: ' + axialYr + ' yr (' + axialDir + ')</div>' +
+    '<div style="' + val + '">Perihelion: ' + periPrecYr + ' yr (prograde)</div>' +
+    '<div style="' + grp + sep + '">Axial</div>' +
+    '<div style="' + val + '">Tilt (J2000): ' + wc.tilt.toFixed(2) + '°</div>' +
+    '<div style="' + val + '">Tilt amplitude: ' + wc.inclAmp.toFixed(6) + '°</div>' +
+    '<div style="' + grp + sep + '">Eccentricity</div>' +
+    '<div style="' + val + '">Current: </div>' +
+    '<div style="' + val + '">Amplitude: ' + wc.eccAmp.toFixed(8) + ' AU</div>' +
     helperPointer;
+  // Insert the dynamic eccentricity span into the "Current: " line
+  const eccLine = inner.querySelector('div:nth-child(11)'); // 11th div = "Current: "
+  eccLine.appendChild(eccSpan);
+
+  div.appendChild(inner);
+  wc._innerDiv = inner;
   const labelObj = new CSS2DObject(div);
-  labelObj.position.set(0, 0.04, 0);
+  labelObj.position.set(0, 0.02, 0);
   wc.obj.rotationAxis.add(labelObj);
   wc.obj.labelObj = labelObj;
   wc.obj._labelDiv = div;
@@ -5512,7 +5567,7 @@ const HELPER_LABEL_FADE_OUT = 20;    /* start fading in below 0.2 AU */
 const _helperLabelObjects = [
   { obj: earthWobbleCenter,        div: wobbleLabelDiv },
   { obj: earthPerihelionFromEarth,  div: periLabelDiv },
-  ..._planetWobbleCenters.map(wc => ({ obj: wc.obj, div: wc._div })),
+  ..._planetWobbleCenters.map(wc => ({ obj: wc.obj, div: wc._div, parentPlanet: wc.name, innerDiv: wc._innerDiv, eccSpan: wc._eccSpan, eccKey: wc._eccKey })),
 ];
 
 //END CREATE AND CONFIGURE PLANETS
@@ -15561,12 +15616,31 @@ function render(now) {
     }
 
     const camDist = camera.position.distanceTo(controls.target);
+    const focusName = o.lookAtObj?.name;
+    // Compensation factor: undo the global CSS2D scale (based on origin distance)
+    // and apply a local scale based on camera-to-target distance instead.
+    const globalRawScale = Math.pow(baseCamDistance / camera.position.length(), 0.5);
+    const globalScale = Math.min(1.5, Math.max(0.2, globalRawScale));
+    const localRawScale = Math.pow(baseCamDistance / Math.max(1, camDist), 0.5);
+    const localScale = Math.min(1.5, Math.max(0.2, localRawScale));
+    const scaleCompensation = localScale / globalScale;
+
     for (const hl of _helperLabelObjects) {
       if (!hl.obj.visible) { hl.div.style.opacity = '0'; continue; }
+      // Planet wobble centers: only show when that planet is focused
+      if (hl.parentPlanet && hl.parentPlanet !== focusName) { hl.div.style.opacity = '0'; continue; }
       const a = camDist <= HELPER_LABEL_FADE_IN  ? 1
               : camDist >= HELPER_LABEL_FADE_OUT ? 0
               : 1 - (camDist - HELPER_LABEL_FADE_IN) / (HELPER_LABEL_FADE_OUT - HELPER_LABEL_FADE_IN);
       hl.div.style.opacity = a.toFixed(3);
+      // Scale compensation for labels far from origin (outer planets)
+      if (hl.innerDiv) {
+        hl.innerDiv.style.transform = 'scale(' + scaleCompensation.toFixed(3) + ')';
+      }
+      // Update dynamic eccentricity value
+      if (hl.eccSpan && hl.eccKey) {
+        hl.eccSpan.textContent = (o[hl.eccKey] ?? 0).toFixed(8);
+      }
     }
   }
 
@@ -29050,7 +29124,7 @@ function updateDomLabel () {
 
     /* ── Helper-object toggle state ── */
     let helpersVisible = true;
-    const helperObjects = [earthWobbleCenter, earthPerihelionFromEarth];
+    const helperObjects = [earthWobbleCenter, earthPerihelionFromEarth, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter];
 
     function toggleHelpers () {
       helpersVisible = !helpersVisible;
