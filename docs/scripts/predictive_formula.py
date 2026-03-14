@@ -12,6 +12,7 @@ SECTIONS:
   C. Earth — Orbital Elements (obliquity, eccentricity, inclination,
      perihelion longitude, ERD)
   D. Planet Perihelion Calculation
+  D2. All Planets — Orbital Elements (ascending node, inclination, eccentricity)
   E. Earth — Time Periods (solar year, sidereal year, day length,
      sidereal day, stellar day)
   F. Earth — Precession Periods (axial, perihelion, inclination)
@@ -36,6 +37,8 @@ from constants_scripts import (
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
+    INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
+    ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
 )
 
 # =============================================================================
@@ -344,6 +347,76 @@ def calc_planet_perihelion(theta0: float, period: float, year: int) -> float:
     Returns: Perihelion longitude in degrees [0, 360)
     """
     return (theta0 + 360.0 * (year - J2000) / period) % 360
+
+
+# =============================================================================
+# SECTION D2: ALL PLANETS — ORBITAL ELEMENTS
+# Ascending node, inclination to invariable plane, eccentricity
+# All oscillate at the planet's precession period (= INCL_PERIOD from constants)
+# =============================================================================
+
+def calc_planet_ascending_node(planet: str, year: int) -> float:
+    """
+    Calculate planet's ascending node longitude on the invariable plane.
+
+    Formula: Ω(t) = Ω_J2000 + 360° × (year - 2000) / T
+
+    Args:
+        planet: Planet name (e.g. 'Mercury')
+        year: Calendar year
+
+    Returns: Ascending node longitude in degrees [0, 360)
+    """
+    omega0 = OMEGA_J2000[planet]
+    period = INCL_PERIOD[planet]
+    return (omega0 + 360.0 * (year - J2000) / period) % 360
+
+
+def calc_planet_inclination(planet: str, year: int) -> float:
+    """
+    Calculate planet's inclination to the invariable plane (degrees).
+
+    Formula: i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
+
+    The inclination oscillates as the ascending node precesses around
+    the invariable plane. Amplitude is derived from ψ/(d×√m).
+
+    Args:
+        planet: Planet name (e.g. 'Mercury')
+        year: Calendar year
+
+    Returns: Inclination in degrees
+    """
+    omega = calc_planet_ascending_node(planet, year)
+    mean = INCL_MEAN[planet]
+    amp = INCL_AMP[planet]
+    phase = INCL_PHASE_ANGLE[planet]
+    return mean + amp * math.cos(math.radians(omega - phase))
+
+
+def calc_planet_eccentricity(planet: str, year: int) -> float:
+    """
+    Calculate planet's orbital eccentricity at given year.
+
+    Formula: e(t) = e_base + e_amp × cos(2π(year - 2000) / (H/16) + φ_J2000)
+
+    All planets oscillate at period H/16 = 20,938 years.
+    Earth uses a different formula (calc_eccentricity) with derived mean.
+
+    Args:
+        planet: Planet name (e.g. 'Mercury')
+        year: Calendar year
+
+    Returns: Eccentricity (dimensionless)
+    """
+    if planet == "Earth":
+        return calc_eccentricity(year)
+    base = ECC_BASE[planet]
+    amp = ECC_AMPLITUDE[planet]
+    phase_j2000 = math.radians(ECC_PHASE_J2000[planet])
+    t = year - J2000
+    period = H / 16
+    return base + amp * math.cos(2 * math.pi * t / period + phase_j2000)
 
 
 # =============================================================================
@@ -1396,5 +1469,27 @@ if __name__ == "__main__":
         peri = calc_perihelion_precession(year)
         incl = calc_inclination_precession(year)
         print(f"{year:>8} {ax:>16.2f} {peri:>16.2f} {incl:>18.2f}")
+
+    # --- Section D2: All Planets — Orbital Elements ---
+    print("\n--- Section D2: All Planets — Orbital Elements (2000) ---")
+    print(f"{'Planet':<10} {'Asc.Node':>10} {'Inclination':>12} {'Incl.Mean':>10} {'Eccentricity':>14} {'Ecc.Base':>12}")
+    print("-" * 72)
+    from constants_scripts import PLANET_NAMES as _PN
+    for planet in _PN:
+        node = calc_planet_ascending_node(planet, 2000)
+        incl_val = calc_planet_inclination(planet, 2000)
+        mean_val = INCL_MEAN[planet]
+        ecc_val = calc_planet_eccentricity(planet, 2000)
+        base_val = ECC_BASE[planet]
+        print(f"  {planet:<10} {node:>8.4f}° {incl_val:>10.6f}° {mean_val:>10.6f}° {ecc_val:>14.8f} {base_val:>12.8f}")
+
+    print(f"\n{'Planet':<10} {'Year':>6} {'Asc.Node':>10} {'Inclination':>12} {'Eccentricity':>14}")
+    print("-" * 56)
+    for planet in ["Mercury", "Earth", "Jupiter", "Saturn"]:
+        for year in [2000, 5000, 10000, -5000]:
+            node = calc_planet_ascending_node(planet, year)
+            incl_val = calc_planet_inclination(planet, year)
+            ecc_val = calc_planet_eccentricity(planet, year)
+            print(f"  {planet:<10} {year:>6} {node:>8.4f}° {incl_val:>10.6f}° {ecc_val:>14.8f}")
 
     print("\nSystem ready.")

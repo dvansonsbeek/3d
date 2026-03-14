@@ -331,6 +331,32 @@ OMEGA_J2000 = {
     "Neptune": 192.04,
 }
 
+# Mean inclinations to invariable plane (center of oscillation, degrees)
+# From script.js InvPlaneInclinationMean constants
+INCL_MEAN = {
+    "Mercury": 6.726620,
+    "Venus":   2.207361,
+    "Earth":   EARTH_INCLINATION_MEAN,  # 1.481179
+    "Mars":    2.649893,
+    "Jupiter": 0.329100,
+    "Saturn":  0.931678,
+    "Uranus":  1.000600,
+    "Neptune": 0.722190,
+}
+
+# Phase angle for inclination oscillation (degrees)
+# Saturn is the sole 23° group member; all others are 203°
+INCL_PHASE_ANGLE = {
+    "Mercury": 203.3195,
+    "Venus":   203.3195,
+    "Earth":   203.3195,
+    "Mars":    203.3195,
+    "Jupiter": 203.3195,
+    "Saturn":   23.3195,
+    "Uranus":  203.3195,
+    "Neptune": 203.3195,
+}
+
 # J2000 orbital inclination to ecliptic (degrees)
 INCL_ECLIPTIC = {
     "Mercury": 7.005,
