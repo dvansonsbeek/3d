@@ -4334,10 +4334,124 @@ const eros = {
   traceOn: false,
 };
 
+// --- Planet Wobble Centers ---
+// Each planet's eccentricity oscillates at H/16. The wobble center orbits the
+// planet at this rate, at a distance equal to the eccentricity amplitude.
+// In reality the planet orbits the wobble center; we parent it under the planet
+// so the camera can track the planet while the center visually orbits.
+// Speed formula is configurable per planet (currently all H/16).
+
+const wobbleCenterSpeed = Math.PI * 2 / (holisticyearLength / 16);
+
+const mercuryWobbleCenter = {
+  name: "MERCURY-WOBBLE-CENTER",
+  startPos: mercuryEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: mercuryOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, mercuryOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const venusWobbleCenter = {
+  name: "VENUS-WOBBLE-CENTER",
+  startPos: venusEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: venusOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, venusOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const marsWobbleCenter = {
+  name: "MARS-WOBBLE-CENTER",
+  startPos: marsEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: marsOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, marsOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const jupiterWobbleCenter = {
+  name: "JUPITER-WOBBLE-CENTER",
+  startPos: jupiterEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: jupiterOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, jupiterOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const saturnWobbleCenter = {
+  name: "SATURN-WOBBLE-CENTER",
+  startPos: saturnEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: saturnOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, saturnOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const uranusWobbleCenter = {
+  name: "URANUS-WOBBLE-CENTER",
+  startPos: uranusEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: uranusOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, uranusOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
+const neptuneWobbleCenter = {
+  name: "NEPTUNE-WOBBLE-CENTER",
+  startPos: neptuneEccentricityPhaseJ2000,
+  speed: wobbleCenterSpeed,
+  tilt: 0, rotationSpeed: 0,
+  orbitRadius: neptuneOrbitalEccentricityAmplitude * 100,
+  orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
+  orbitTilta: 0, orbitTiltb: 0,
+  size: Math.max(0.001, Math.min(0.011, neptuneOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune-wobble-center.png',
+  visible: true,
+  containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
+  traceOn: false, isNotPhysicalObject: true,
+};
+
 //*************************************************************
 // ADD CONSTANTS
 //*************************************************************
-const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun]
+const planetObjects = [startingPoint, earthWobbleCenter, midEccentricityOrbit, earth, earthInclinationPrecession, earthEclipticPrecession, earthObliquityPrecession, earthPerihelionPrecession1, earthPerihelionPrecession2, barycenterEarthAndSun, earthPerihelionFromEarth, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moonApsidalPrecession, moonApsidalNodalPrecession1, moonApsidalNodalPrecession2, moonLunarLevelingCyclePrecession, moonNodalPrecession, moon, mercuryPerihelionDurationEcliptic1, venusPerihelionDurationEcliptic1, marsPerihelionDurationEcliptic1, jupiterPerihelionDurationEcliptic1, saturnPerihelionDurationEcliptic1, uranusPerihelionDurationEcliptic1, neptunePerihelionDurationEcliptic1, plutoPerihelionDurationEcliptic1, halleysPerihelionDurationEcliptic1, erosPerihelionDurationEcliptic1, mercuryPerihelionDurationEcliptic2, mercuryRealPerihelionAtSun, mercury, mercuryFixedPerihelionAtSun, venusPerihelionDurationEcliptic2, venusRealPerihelionAtSun, venus, venusFixedPerihelionAtSun, marsPerihelionDurationEcliptic2, marsRealPerihelionAtSun, mars, marsFixedPerihelionAtSun, jupiterPerihelionDurationEcliptic2, jupiterRealPerihelionAtSun, jupiter, jupiterFixedPerihelionAtSun, saturnPerihelionDurationEcliptic2, saturnRealPerihelionAtSun, saturn, saturnFixedPerihelionAtSun, uranusPerihelionDurationEcliptic2, uranusRealPerihelionAtSun, uranus, uranusFixedPerihelionAtSun, neptunePerihelionDurationEcliptic2, neptuneRealPerihelionAtSun, neptune, neptuneFixedPerihelionAtSun, plutoPerihelionDurationEcliptic2, plutoRealPerihelionAtSun, pluto, plutoFixedPerihelionAtSun, halleysPerihelionDurationEcliptic2, halleysRealPerihelionAtSun, halleys, halleysFixedPerihelionAtSun, erosPerihelionDurationEcliptic2, erosRealPerihelionAtSun, eros, erosFixedPerihelionAtSun, mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter, jupiterWobbleCenter, saturnWobbleCenter, uranusWobbleCenter, neptuneWobbleCenter]
 
 const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, midEccentricityOrbit, mercuryPerihelionFromEarth, venusPerihelionFromEarth, marsPerihelionFromEarth, jupiterPerihelionFromEarth, saturnPerihelionFromEarth, uranusPerihelionFromEarth, neptunePerihelionFromEarth, plutoPerihelionFromEarth, halleysPerihelionFromEarth, erosPerihelionFromEarth, sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, halleys, eros]
 
@@ -5238,6 +5352,7 @@ mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryRealPerihelionAtSun.conta
 mercuryRealPerihelionAtSun.pivotObj.add(mercury.containerObj);
 
 mercuryPerihelionDurationEcliptic2.pivotObj.add(mercuryFixedPerihelionAtSun.containerObj);
+mercury.pivotObj.add(mercuryWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(venusPerihelionDurationEcliptic1.containerObj);
 venusPerihelionDurationEcliptic1.pivotObj.add(venusPerihelionFromEarth.containerObj);
@@ -5246,6 +5361,7 @@ venusPerihelionDurationEcliptic2.pivotObj.add(venusRealPerihelionAtSun.container
 venusRealPerihelionAtSun.pivotObj.add(venus.containerObj);
 
 venusPerihelionDurationEcliptic2.pivotObj.add(venusFixedPerihelionAtSun.containerObj);
+venus.pivotObj.add(venusWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(marsPerihelionDurationEcliptic1.containerObj);
 marsPerihelionDurationEcliptic1.pivotObj.add(marsPerihelionFromEarth.containerObj);
@@ -5254,6 +5370,7 @@ marsPerihelionDurationEcliptic2.pivotObj.add(marsRealPerihelionAtSun.containerOb
 marsRealPerihelionAtSun.pivotObj.add(mars.containerObj);
 
 marsPerihelionDurationEcliptic2.pivotObj.add(marsFixedPerihelionAtSun.containerObj);
+mars.pivotObj.add(marsWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(jupiterPerihelionDurationEcliptic1.containerObj);
 jupiterPerihelionDurationEcliptic1.pivotObj.add(jupiterPerihelionFromEarth.containerObj);
@@ -5262,6 +5379,7 @@ jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterRealPerihelionAtSun.conta
 jupiterRealPerihelionAtSun.pivotObj.add(jupiter.containerObj);
 
 jupiterPerihelionDurationEcliptic2.pivotObj.add(jupiterFixedPerihelionAtSun.containerObj);
+jupiter.pivotObj.add(jupiterWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(saturnPerihelionDurationEcliptic1.containerObj);
 saturnPerihelionDurationEcliptic1.pivotObj.add(saturnPerihelionFromEarth.containerObj);
@@ -5270,6 +5388,7 @@ saturnPerihelionDurationEcliptic2.pivotObj.add(saturnRealPerihelionAtSun.contain
 saturnRealPerihelionAtSun.pivotObj.add(saturn.containerObj);
 
 saturnPerihelionDurationEcliptic2.pivotObj.add(saturnFixedPerihelionAtSun.containerObj);
+saturn.pivotObj.add(saturnWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(uranusPerihelionDurationEcliptic1.containerObj);
 uranusPerihelionDurationEcliptic1.pivotObj.add(uranusPerihelionFromEarth.containerObj);
@@ -5278,6 +5397,7 @@ uranusPerihelionDurationEcliptic2.pivotObj.add(uranusRealPerihelionAtSun.contain
 uranusRealPerihelionAtSun.pivotObj.add(uranus.containerObj);
 
 uranusPerihelionDurationEcliptic2.pivotObj.add(uranusFixedPerihelionAtSun.containerObj);
+uranus.pivotObj.add(uranusWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(neptunePerihelionDurationEcliptic1.containerObj);
 neptunePerihelionDurationEcliptic1.pivotObj.add(neptunePerihelionFromEarth.containerObj);
@@ -5286,6 +5406,7 @@ neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneRealPerihelionAtSun.conta
 neptuneRealPerihelionAtSun.pivotObj.add(neptune.containerObj);
 
 neptunePerihelionDurationEcliptic2.pivotObj.add(neptuneFixedPerihelionAtSun.containerObj);
+neptune.pivotObj.add(neptuneWobbleCenter.containerObj);
 
 barycenterEarthAndSun.pivotObj.add(plutoPerihelionDurationEcliptic1.containerObj);
 plutoPerihelionDurationEcliptic1.pivotObj.add(plutoPerihelionFromEarth.containerObj);
@@ -5360,12 +5481,38 @@ earthPerihelionFromEarth.rotationAxis.add(periLabelObj);
 earthPerihelionFromEarth.labelObj = periLabelObj;
 earthPerihelionFromEarth._labelDiv = periLabelDiv;
 
+/* — Planet Wobble Center labels — */
+const _planetWobbleCenters = [
+  { obj: mercuryWobbleCenter, name: "Mercury" },
+  { obj: venusWobbleCenter,   name: "Venus" },
+  { obj: marsWobbleCenter,    name: "Mars" },
+  { obj: jupiterWobbleCenter, name: "Jupiter" },
+  { obj: saturnWobbleCenter,  name: "Saturn" },
+  { obj: uranusWobbleCenter,   name: "Uranus" },
+  { obj: neptuneWobbleCenter, name: "Neptune" },
+];
+for (const wc of _planetWobbleCenters) {
+  const div = document.createElement('div');
+  div.style.cssText = helperLabelStyle;
+  div.innerHTML =
+    '<div style="font:600 10px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.9);letter-spacing:.03em;">Wobble Center</div>' +
+    '<div style="font:400 8.5px/1.2 Inter,system-ui,sans-serif;color:rgba(255,255,255,.45);margin-top:2px;">axis of ' + wc.name + '\'s wobble</div>' +
+    helperPointer;
+  const labelObj = new CSS2DObject(div);
+  labelObj.position.set(0, 0.04, 0);
+  wc.obj.rotationAxis.add(labelObj);
+  wc.obj.labelObj = labelObj;
+  wc.obj._labelDiv = div;
+  wc._div = div;
+}
+
 /* Distance thresholds for fade-in/out (scene units; 100 = 1 AU) */
 const HELPER_LABEL_FADE_IN  = 5;     /* fully visible below 0.05 AU */
 const HELPER_LABEL_FADE_OUT = 20;    /* start fading in below 0.2 AU */
 const _helperLabelObjects = [
   { obj: earthWobbleCenter,        div: wobbleLabelDiv },
   { obj: earthPerihelionFromEarth,  div: periLabelDiv },
+  ..._planetWobbleCenters.map(wc => ({ obj: wc.obj, div: wc._div })),
 ];
 
 //END CREATE AND CONFIGURE PLANETS
