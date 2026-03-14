@@ -10,7 +10,7 @@ SECTIONS:
   A. Fundamental Constants & Derived Periods
   B. Planet Configurations
   C. Earth — Orbital Elements (obliquity, eccentricity, inclination,
-     perihelion longitude, ERD)
+     ascending node, perihelion longitude, ERD)
   D. Planet Perihelion Calculation
   D2. All Planets — Orbital Elements (ascending node, inclination, eccentricity)
   E. Earth — Time Periods (solar year, sidereal year, day length,
@@ -250,7 +250,7 @@ PERI_OFFSET = -0.261258
 
 # =============================================================================
 # SECTION C: EARTH ORBITAL PARAMETERS
-# Obliquity, eccentricity, inclination, perihelion longitude, ERD
+# Obliquity, eccentricity, inclination, ascending node, perihelion longitude, ERD
 # =============================================================================
 
 def time_offset(year: int) -> float:
@@ -327,6 +327,17 @@ def calc_inclination(year: int) -> float:
     return EARTH_INCLIN_MEAN - EARTH_INCLIN_AMPL * math.cos(
         2 * math.pi * t / INCLIN_CYCLE
     )
+
+
+def calc_ascending_node(year: int) -> float:
+    """
+    Calculate Earth's ascending node longitude on the invariable plane (degrees).
+
+    Formula: Ω(t) = Ω_J2000 + 360° × (year - 2000) / T
+
+    where Ω_J2000 = 284.51° and T = H/3 (inclination precession period).
+    """
+    return (OMEGA_J2000["Earth"] + 360.0 * (year - J2000) / INCL_PERIOD["Earth"]) % 360
 
 
 # =============================================================================
@@ -1413,15 +1424,16 @@ if __name__ == "__main__":
 
     # --- Section C: Earth — Orbital Elements ---
     print("\n--- Section C: Earth — Orbital Elements ---")
-    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Obliquity':>12} {'Eccentricity':>14} {'Inclination':>12}")
-    print("-" * 78)
+    print(f"{'Year':>8} {'Perihelion':>12} {'ERD':>14} {'Obliquity':>12} {'Eccentricity':>14} {'Inclination':>12} {'Asc.Node':>10}")
+    print("-" * 88)
     for year in [2000, 2022, 2100]:
         peri = calc_earth_perihelion(year)
         erd = calc_erd(year)
         obliq = calc_obliquity(year)
         ecc = calc_eccentricity(year)
         inclin = calc_inclination(year)
-        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {obliq:>12.4f}° {ecc:>14.6f} {inclin:>12.4f}°")
+        asc_node = calc_ascending_node(year)
+        print(f"{year:>8} {peri:>12.4f}° {erd:>14.8f} {obliq:>12.4f}° {ecc:>14.6f} {inclin:>12.4f}° {asc_node:>8.4f}°")
 
     # --- Section D: Planet perihelions ---
     print("\n--- Section D: Planet Perihelion Longitudes (2022) ---")
