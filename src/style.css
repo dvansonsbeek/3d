@@ -439,9 +439,22 @@ canvas {
 
 /* ── Gauge bars (shared base) ── */
 #gui .elong-gauge,
-#gui .inv-gauge {
+#gui .inv-gauge,
+#gui .fib-gauge {
   position: relative;
   overflow: hidden;
+}
+/* Fibonacci balance gauge (0–100% left-to-right fill) */
+#gui .fib-gauge::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  right: auto;
+  width: var(--fib-pct, 0%);
+  background: var(--fib-color, hsla(140, 65%, 45%, 0.35));
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+  pointer-events: none;
 }
 /* Left-anchored gauge (elongations, perihelion longitudes) */
 #gui .elong-gauge::before {
@@ -650,7 +663,8 @@ canvas {
     transition: none;
   }
   #gui .elong-gauge::before,
-  #gui .inv-gauge::before {
+  #gui .inv-gauge::before,
+  #gui .fib-gauge::before {
     transition: none;
   }
   .tp-nav-btn:hover {

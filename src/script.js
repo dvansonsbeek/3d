@@ -4848,6 +4848,10 @@ let o = {
   halleysEclipticInclinationSouamiSouchayDynamic: 0,
   erosEclipticInclinationSouamiSouchayDynamic: 0,
 
+  // Fibonacci Balance (dynamic, updated each frame)
+  fibInclinationBalance: 100,       // Law 3: w = √(m·a(1-e²)) / d — % balance between 203° and 23° groups
+  fibEccentricityBalance: 100,      // Law 5: v = √m × a^1.5 × e / √d — % balance between 203° and 23° groups
+
   // Invariable Plane Positions Panel - mass-weighted balance
   massWeightedBalance: 0,           // Mass-weighted height balance (AU)
   planetsAboveInvPlane: 0,          // Count of planets above
@@ -13518,6 +13522,41 @@ const periDetailEls = {};
 const invPlaneGaugeEls = {};
 const invPlaneMaxes = {};
 const invPlaneTooltipEls = {};
+const fibGaugeEls = {};
+
+// Dynamic Fibonacci balance computation (called each frame)
+function computeDynamicFibonacciBalance() {
+  const planets = [
+    { mass: M_MERCURY / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, phase: mercuryInclinationPhaseAngle },
+    { mass: M_VENUS / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, phase: venusInclinationPhaseAngle },
+    { mass: M_EARTH / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  phase: earthInclinationPhaseAngle },
+    { mass: M_MARS / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  phase: marsInclinationPhaseAngle },
+    { mass: M_JUPITER / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  phase: jupiterInclinationPhaseAngle },
+    { mass: M_SATURN / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  phase: saturnInclinationPhaseAngle },
+    { mass: M_URANUS / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, phase: uranusInclinationPhaseAngle },
+    { mass: M_NEPTUNE / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, phase: neptuneInclinationPhaseAngle },
+  ];
+  // Inclination balance: w = √(m·a(1-e²)) / d
+  let inclSum203 = 0, inclSum23 = 0;
+  // Eccentricity balance: v = √m × a^1.5 × e / √d
+  let eccSum203 = 0, eccSum23 = 0;
+  for (const p of planets) {
+    const w = Math.sqrt(p.mass * p.sma * (1 - p.ecc * p.ecc)) / p.d;
+    const v = Math.sqrt(p.mass) * Math.pow(p.sma, 1.5) * p.ecc / Math.sqrt(p.d);
+    if (p.phase > 180) { inclSum203 += w; eccSum203 += v; }
+    else               { inclSum23 += w;  eccSum23 += v; }
+  }
+  const inclTotal = inclSum203 + inclSum23;
+  const eccTotal = eccSum203 + eccSum23;
+  o.fibInclinationBalance = inclTotal > 0 ? 100 - (Math.abs(inclSum203 - inclSum23) / inclTotal) * 100 : 0;
+  o.fibEccentricityBalance = eccTotal > 0 ? 100 - (Math.abs(eccSum203 - eccSum23) / eccTotal) * 100 : 0;
+}
+
+function setFibGaugeProps(el, pct) {
+  el.style.setProperty('--fib-pct', Math.min(pct, 100) + '%');
+  const color = pct >= 99 ? 'hsla(140, 65%, 45%, 0.35)' : pct >= 95 ? 'hsla(40, 80%, 45%, 0.35)' : 'hsla(0, 70%, 45%, 0.35)';
+  el.style.setProperty('--fib-color', color);
+}
 const aboveColor = 'hsla(35, 70%, 50%, 0.30)';
 const belowColor = 'hsla(210, 60%, 45%, 0.30)';
 function setInvGaugeProps(el, value, maxH) {
@@ -14218,7 +14257,47 @@ function setupGUI() {
   createChipGroup('Perihelion', perihelionObjs);
 
   folderT.element.querySelector('.tp-fldv_c').appendChild(chipContainer);
-  
+
+  // ── Fibonacci Balance — live-updating balance indicators ──
+  {
+    const fibFolder = gui.addFolder({ title: 'Fibonacci Balance', expanded: true });
+    fibFolder.element.dataset.category = 'calculated';
+    addFolderTooltip(fibFolder, 'Live Fibonacci balance indicators. All three oscillate over the H/16 perihelion precession cycle and fluctuate around their equilibrium values.');
+
+    const fibPctFmt = v => v.toFixed(4) + '%';
+    const fibAUFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+
+    // Inclination balance (Law 3)
+    const inclB = fibFolder.addBinding(o, 'fibInclinationBalance', {
+      label: 'Inclination (Law 3)', readonly: true, format: fibPctFmt
+    });
+    addTooltip(inclB, 'Fibonacci Law 3: w = \u221A(m\u00B7a(1\u2212e\u00B2)) / d \u2014 structural weight balance between 203\u00B0 and 23\u00B0 phase groups. Uses current dynamic eccentricities. Nearly constant because the weight depends on e only through the (1\u2212e\u00B2) term.');
+    const inclValEl = inclB.element.querySelector('.tp-lblv_v');
+    inclValEl.classList.add('fib-gauge');
+    setFibGaugeProps(inclValEl, o.fibInclinationBalance);
+    fibGaugeEls.inclination = inclValEl;
+
+    // Eccentricity balance (Law 5)
+    const eccB = fibFolder.addBinding(o, 'fibEccentricityBalance', {
+      label: 'Eccentricity (Law 5)', readonly: true, format: fibPctFmt
+    });
+    addTooltip(eccB, 'Fibonacci Law 5: v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad \u2014 eccentricity weight balance between 203\u00B0 and 23\u00B0 phase groups. Uses current dynamic eccentricities (oscillating at H/16). Approaches 100% when planets pass through their base eccentricity.');
+    const eccValEl = eccB.element.querySelector('.tp-lblv_v');
+    eccValEl.classList.add('fib-gauge');
+    setFibGaugeProps(eccValEl, o.fibEccentricityBalance);
+    fibGaugeEls.eccentricity = eccValEl;
+
+    // Mass height balance (invariable plane)
+    const massB = fibFolder.addBinding(o, 'massWeightedBalance', {
+      label: 'Mass height (inv. plane)', readonly: true, format: fibAUFmt
+    });
+    addTooltip(massB, 'Mass-weighted average height of all planets above the invariable plane. Oscillates around zero, validating the invariable plane geometry.');
+    const massValEl = massB.element.querySelector('.tp-lblv_v');
+    massValEl.classList.add('inv-gauge');
+    setInvGaugeProps(massValEl, o.massWeightedBalance, 0.01);
+    fibGaugeEls.massHeight = massValEl;
+  }
+
   // ── Positions (Ecliptic) — top-level, observed category ──
   const posFolder = gui.addFolder({ title: 'Positions (Ecliptic)', expanded: false });
   posFolder.element.dataset.category = 'observed';
@@ -15289,6 +15368,10 @@ function render(now) {
     updatePlanetInvariablePlaneHeights();
     updateDynamicInclinations();
     updateInvariablePlaneBalance();
+    // Update Fibonacci Balance gauge bars
+    if (fibGaugeEls.inclination) setFibGaugeProps(fibGaugeEls.inclination, o.fibInclinationBalance);
+    if (fibGaugeEls.eccentricity) setFibGaugeProps(fibGaugeEls.eccentricity, o.fibEccentricityBalance);
+    if (fibGaugeEls.massHeight) setInvGaugeProps(fibGaugeEls.massHeight, o.massWeightedBalance, 0.01);
     updateBalanceTrendAnalysis();
     updateBalanceMinMax();
     calculateInvariablePlaneFromAngularMomentum();
@@ -24686,7 +24769,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => mercuryTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Nearly zero axial tilt — Mercury's spin axis is almost perpendicular to its orbital plane`],
+       hover : [`Nearly zero axial tilt — Mercury's spin axis is almost perpendicular to its orbital plane. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${mercuryTilt}°) × √21 / (√m × a¹·⁵) = ${mercuryOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${mercuryInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMercury, dec:8, sep:',' },{ small: 'AU' }],
@@ -24699,7 +24782,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.mercuryInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Mercury's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Mercury's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${mercuryInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -25066,7 +25149,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => venusTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Venus rotates retrograde. Small prograde tilt of 2.64° (apparent tilt 177.36° due to retrograde spin)`],
+       hover : [`Venus rotates retrograde. Small prograde tilt of 2.64° (apparent tilt 177.36° due to retrograde spin). Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${venusTilt}°) × √34 / (√m × a¹·⁵) = ${venusOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${venusInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityVenus, dec:8, sep:',' },{ small: 'AU' }],
@@ -25079,7 +25162,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.venusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Venus's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Venus's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${venusInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -25414,7 +25497,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => marsTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Axial tilt similar to Earth's (25.19° vs 23.4°). Mars experiences seasons analogous to Earth's`],
+       hover : [`Axial tilt similar to Earth's (25.19° vs 23.4°). Mars experiences seasons analogous to Earth's. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${marsTilt}°) × √5 / (√m × a¹·⁵) = ${marsOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${marsInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMars, dec:8, sep:',' },{ small: 'AU' }],
@@ -25427,7 +25510,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.marsInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Mars's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Mars's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${marsInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -25762,7 +25845,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => jupiterTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Small axial tilt of 3.13°. Jupiter has minimal seasonal variation due to its nearly upright spin axis`],
+       hover : [`Small axial tilt of 3.13°. Jupiter has minimal seasonal variation due to its nearly upright spin axis. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${jupiterTilt}°) × √5 / (√m × a¹·⁵) = ${jupiterOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${jupiterInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityJupiter, dec:8, sep:',' },{ small: 'AU' }],
@@ -25775,7 +25858,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.jupiterInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Jupiter's orbit and the invariable plane. Jupiter dominates — lowest inclination of all planets`]},
+       hover : [`Angle between Jupiter's orbit and the invariable plane. Jupiter dominates — lowest inclination of all planets. Inclination tilt drives inclination tilt amplitude = ${jupiterInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -26109,7 +26192,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => saturnTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Axial tilt of 26.73°, similar to Earth's. Saturn experiences significant seasons over its 29-year orbit`],
+       hover : [`Axial tilt of 26.73°, similar to Earth's. Saturn experiences significant seasons over its 29-year orbit. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${saturnTilt}°) × √3 / (√m × a¹·⁵) = ${saturnOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${saturnInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricitySaturn, dec:8, sep:',' },{ small: 'AU' }],
@@ -26122,7 +26205,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.saturnInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Saturn's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Saturn's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${saturnInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -26457,7 +26540,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => uranusTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Extreme axial tilt of 82.23° — Uranus rolls on its side. Each pole gets ~42 years of continuous sunlight`],
+       hover : [`Extreme axial tilt of 82.23° — Uranus rolls on its side. Each pole gets ~42 years of continuous sunlight. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${uranusTilt}°) × √21 / (√m × a¹·⁵) = ${uranusOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${uranusInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityUranus, dec:8, sep:',' },{ small: 'AU' }],
@@ -26470,7 +26553,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.uranusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Uranus's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Uranus's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${uranusInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -26805,7 +26888,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => neptuneTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Axial tilt of 28.32°, similar to Earth and Saturn. Neptune experiences seasons over its 165-year orbit`],
+       hover : [`Axial tilt of 28.32°, similar to Earth and Saturn. Neptune experiences seasons over its 165-year orbit. Axial tilt drives both eccentricity and axial tilt amplitude: e_amp = K × sin(${neptuneTilt}°) × √34 / (√m × a¹·⁵) = ${neptuneOrbitalEccentricityAmplitude.toFixed(8)} AU, axial tilt amplitude = ${neptuneInvPlaneInclinationAmplitude.toFixed(4)}°`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityNeptune, dec:8, sep:',' },{ small: 'AU' }],
@@ -26818,7 +26901,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.neptuneInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Neptune's orbit and the invariable plane. Precesses over the Holistic Year cycle`]},
+       hover : [`Angle between Neptune's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${neptuneInvPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -32391,6 +32474,9 @@ function updatePredictions() {
   predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(o.currentYear, 2000 - (saturnEccentricityPhaseJ2000  / 360) * perihelionCycleLength, perihelionCycleLength, saturnOrbitalEccentricityBase,  saturnOrbitalEccentricityAmplitude);
   predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(o.currentYear, 2000 - (uranusEccentricityPhaseJ2000  / 360) * perihelionCycleLength, perihelionCycleLength, uranusOrbitalEccentricityBase,  uranusOrbitalEccentricityAmplitude);
   predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(o.currentYear, 2000 - (neptuneEccentricityPhaseJ2000 / 360) * perihelionCycleLength, perihelionCycleLength, neptuneOrbitalEccentricityBase, neptuneOrbitalEccentricityAmplitude);
+
+  // Dynamic Fibonacci balance (uses eccentricities computed above)
+  computeDynamicFibonacciBalance();
 
   // Year lengths from Fourier harmonics (fitted over ±25,000 years)
   predictions.lengthofsolarYear = o.lengthofsolarYear = computeLengthofsolarYear(o.currentYear);
