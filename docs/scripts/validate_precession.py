@@ -32,7 +32,7 @@ PLANET_FLUCTUATION_COLS = {
 
 def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
     """Load observed fluctuations from Excel file."""
-    df = pd.read_excel(excel_path, sheet_name='Perihelion Planets')
+    df = pd.read_excel(excel_path, sheet_name='Holistic_objects_PerihelionPlan')
 
     data = {key: [] for key in PLANET_FLUCTUATION_COLS}
 

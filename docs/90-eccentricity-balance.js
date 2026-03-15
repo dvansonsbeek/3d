@@ -32,6 +32,54 @@ for (const p of planets) {
   eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
 }
 
+// ── Dynamic eccentricity computation (mirrors computeEccentricityEarth in script.js) ──
+function computeEccentricity(currentYear, balancedYear, cyclePeriod, base, amplitude) {
+  const root = Math.sqrt(base * base + amplitude * amplitude);
+  const degrees = ((currentYear - balancedYear) / cyclePeriod) * 360;
+  const cosθ = Math.cos(degrees * Math.PI / 180);
+  const h1 = root - base;
+  return root + (-amplitude - h1 * cosθ) * cosθ;
+}
+
+// Wobble period calculation (mirrors calcWobblePeriod in script.js)
+function calcWobblePeriod(periEclYr, axialYr) {
+  const H13 = C.H / 13;
+  const inclICRF = (periEclYr * H13) / (H13 - periEclYr);
+  const wobbleRate = Math.abs(1 / axialYr - 1 / inclICRF);
+  return 1 / wobbleRate;
+}
+
+// Axial precession periods (from script.js)
+const axialPrecessionYears = {
+  mercury: -C.planets.mercury.perihelionEclipticYears,  // Cassini state: locked to orbital plane
+  venus:    C.H * 3 / 34,
+  mars:    -C.H / 2,
+  jupiter: -C.H * 3 / 8,
+  saturn:  -C.H * 4 / 3,
+  uranus:   C.H * 610,
+  neptune: -C.H * 68,
+};
+
+// Wobble periods for all planets
+const wobblePeriods = {};
+for (const p of planets) {
+  if (p === 'earth') continue;
+  wobblePeriods[p] = calcWobblePeriod(C.planets[p].perihelionEclipticYears, axialPrecessionYears[p]);
+}
+
+// Dynamic eccentricity at J2000 (year 2000)
+const eccDynamic = {};
+for (const p of planets) {
+  if (p === 'earth') {
+    eccDynamic[p] = computeEccentricity(2000, C.balancedYear, C.H / 16, C.eccentricityBase, C.eccentricityAmplitude);
+  } else {
+    const phase = C.planets[p].eccentricityPhaseJ2000;
+    const wobble = wobblePeriods[p];
+    const refYear = 2000 - (phase / 360) * wobble;
+    eccDynamic[p] = computeEccentricity(2000, refYear, wobble, C.planets[p].orbitalEccentricityBase, C.planets[p].orbitalEccentricityAmplitude);
+  }
+}
+
 // Config #3: unique mirror-symmetric Fibonacci assignment
 const config3 = {
   mercury: { d: 21, phase: 203 }, venus: { d: 34, phase: 203 },
@@ -119,6 +167,35 @@ console.log(`  Σ(23°)  = ${j2000.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${j2000.gap.toExponential(6)}`);
 console.log(`  Total   = ${j2000.total.toExponential(6)}`);
 console.log(`  Balance = ${j2000.balance.toFixed(4)}%`);
+
+// ══════════════════════════════════════════════════════════════════
+// SECTION 1c: 8-planet balance with DYNAMIC eccentricities at J2000
+// ══════════════════════════════════════════════════════════════════
+console.log('\n───────────────────────────────────────────────────────────────');
+console.log('SECTION 1c: 8-PLANET ECCENTRICITY BALANCE (DYNAMIC @ J2000)');
+console.log('───────────────────────────────────────────────────────────────\n');
+
+console.log('Uses computeEccentricityEarth() at year 2000 with per-planet');
+console.log('eccentricity cycles and phase angles (matches simulation display).\n');
+
+const dynamic = computeBalance(eccDynamic);
+
+console.log('| Planet   | Group | d  | e (dynamic)| e (J2000)  | Δe           | v_j          | % of total |');
+console.log('|----------|-------|----|------------|------------|--------------|--------------|------------|');
+for (const p of planets) {
+  const d = config3[p].d;
+  const group = config3[p].phase > 180 ? '203°' : '23°';
+  const pct = (dynamic.v[p] / dynamic.total * 100).toFixed(2);
+  const delta = eccDynamic[p] - eccJ2000[p];
+  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccDynamic[p].toFixed(8)} | ${eccJ2000[p].toFixed(8)} | ${delta.toExponential(3).padStart(12)} | ${dynamic.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
+}
+
+console.log(`\n  Σ(203°) = ${dynamic.sum203.toExponential(6)}`);
+console.log(`  Σ(23°)  = ${dynamic.sum23.toExponential(6)}  (Saturn only)`);
+console.log(`  Gap     = ${dynamic.gap.toExponential(6)}`);
+console.log(`  Total   = ${dynamic.total.toExponential(6)}`);
+console.log(`  Balance = ${dynamic.balance.toFixed(4)}%`);
+console.log(`\n  Compare: Base = ${base.balance.toFixed(4)}%, J2000 = ${j2000.balance.toFixed(4)}%, Dynamic = ${dynamic.balance.toFixed(4)}%`);
 
 // ══════════════════════════════════════════════════════════════════
 // SECTION 2: Mirror pair decomposition

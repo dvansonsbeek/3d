@@ -164,9 +164,9 @@ ECC_J2000 = {
 # From constants.js orbitalEccentricityBase (see docs/35 §6)
 ECC_BASE = {
     "Mercury": 0.20563593,  # Tilt ~0, no fluctuation (= J2000)
-    "Venus":   0.00619052,  # H/16 fit to JPL data (-8.65% from J2000)
+    "Venus":   0.00619052,  # Cosine fit to JPL data (-8.65% from J2000)
     "Earth":   0.015372,    # eccentricityBase (tuned parameter)
-    "Mars":    0.09297543,  # H/16 fit to JPL data (-0.45% from J2000)
+    "Mars":    0.09297543,  # Cosine fit to JPL data (-0.45% from J2000)
     "Jupiter": 0.04821478,  # Dual-balanced (-0.35% from J2000)
     "Saturn":  0.05374486,  # Law 5 prediction (-0.22% from J2000)
     "Uranus":  0.04734421,  # Dual-balanced (+0.18% from J2000)
@@ -195,18 +195,18 @@ ECC_AMPLITUDE = {
 
 # Eccentricity phase angles at J2000 (degrees)
 # Inner planets: solved from J2000 constraint cos(φ) = (e_J2000 - e_base) / e_amplitude
-# Outer planets: mirror-pair rule (inner phase + 180°) for tighter Law 5 balance
-# All planets oscillate at H/16 = 20,938 years (axial-meets-inclination beat)
+# Outer planets: set to maximize proximity to JPL J2000 eccentricity (amplitude negligible)
+# Each planet oscillates at its own eccentricity cycle (axial-meets-inclination beat)
 # Earth phase = ω + 90° = 192.95° (longitude of perihelion + 90°)
 ECC_PHASE_J2000 = {
     "Mercury":  89.9882,   # Near mean, tilt ~0
     "Venus":   123.7514,   # Past mean, decreasing
     "Earth":   192.9471,   # ω + 90° = 102.947° + 90°
     "Mars":     96.8878,   # Just past mean
-    "Jupiter": 276.8878,   # Mirror of Mars (96.89° + 180°)
-    "Saturn":   12.9471,   # Mirror of Earth (192.95° + 180°)
-    "Uranus":  269.9882,   # Mirror of Mercury (89.99° + 180°)
-    "Neptune": 303.7514,   # Mirror of Venus (123.75° + 180°)
+    "Jupiter": 180,        # 180° = max ecc, closest to J2000 (J2000 > base)
+    "Saturn":  180,        # 180° = max ecc, closest to J2000 (J2000 > base)
+    "Uranus":    0,        # 0° = min ecc, closest to J2000 (J2000 < base)
+    "Neptune":   0,        # 0° = min ecc, closest to J2000 (J2000 < base)
 }
 
 # Default eccentricity set for balance computations: BASE values

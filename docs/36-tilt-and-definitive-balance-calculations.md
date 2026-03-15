@@ -150,9 +150,10 @@ i_amplitude = PSI / (d * sqrt(m)). For Earth: amplitude = 0.635970 deg.
 **Step 5 — Eccentricity fluctuation from combined effect.**
 Because the axial tilt oscillation and the inclination oscillation operate at
 DIFFERENT periods, their combined effect produces a real eccentricity fluctuation
-at period H/16 = 20,938 years — the universal beat frequency where axial
-precession meets inclination precession. This period is the same for all planets
-(see Section 10). For Earth it results in an amplitude of 0.00137032 AU.
+at the planet's eccentricity cycle — the meeting frequency where axial precession
+meets inclination precession. Each planet has its own eccentricity cycle (see
+Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
+cycle is H/16 = 20,938 years, resulting in an amplitude of 0.00137032 AU.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve 100% Law 5 balance.
@@ -189,13 +190,13 @@ and therefore the most significant eccentricity oscillations.
 - **Earth**: eccentricityBase = 0.015372 (tuned parameter in the model)
 - **Saturn**: 0.05374486 (Law 5 prediction, locked as sole 23° group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
-- **Venus, Mars**: Derived by fitting a cosine at period H/16 to JPL Horizons
-  eccentricity data. The fitted mean gives the base eccentricity.
-  - Mars: JPL data (1700–2500, 10-year steps) fitted with H/16 cosine gives
-    amplitude 3.059e-3, matching the tilt prediction (3.074e-3) to within 0.5%
+- **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
+  data (originally fitted at H/16 period; to be re-fitted with per-planet eccentricity cycles).
+  - Mars: JPL data (1700–2500, 10-year steps) fitted cosine gives amplitude
+    3.059e-3, matching the tilt prediction (3.074e-3) to within 0.5%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
-  - Venus: JPL data (−9000 to +9000, 100-year steps) fitted with H/16 cosine
-    gives amplitude 1.084e-3 vs tilt prediction 9.625e-4 (ratio 1.13x).
+  - Venus: JPL data (−9000 to +9000, 100-year steps) fitted cosine gives
+    amplitude 1.084e-3 vs tilt prediction 9.625e-4 (ratio 1.13x).
     Fitted mean = 0.00619052.
   - Script: `docs/scripts/planet_eccentricity_jpl.py`
 - **Mercury**: JPL J2000 value (tilt = 0.03°, essentially no fluctuation)
@@ -206,32 +207,32 @@ The following base eccentricities achieve 100.0000000000% Law 5 balance:
 | Planet  | Base Ecc      | J2000 JPL     | Diff from JPL | Note                   |
 |---------|---------------|---------------|---------------|------------------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
-| Venus   | 0.00619052    | 0.00677672    | -8.650%       | H/16 fit to JPL data   |
+| Venus   | 0.00619052    | 0.00677672    | -8.650%       | Cosine fit to JPL data |
 | Earth   | 0.01537200    | 0.01671022    | -8.008%       | eccentricityBase       |
-| Mars    | 0.09297543    | 0.09339410    | -0.448%       | H/16 fit to JPL data   |
+| Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
 | Jupiter | 0.04821478    | 0.04838624    | -0.354%       | Dual-balanced          |
 | Saturn  | 0.05374486    | 0.05386179    | -0.217%       | Law 5 prediction       |
 | Uranus  | 0.04734421    | 0.04725744    | +0.183%       | Dual-balanced          |
 | Neptune | 0.00868571    | 0.00859048    | +1.109%       | Solved for 100% balance |
 
-### H/16 Cosine Fit Validation
+### Cosine Fit Validation
 
-All planet eccentricities oscillate at period H/16 = 20,938 years (the perihelion
-precession period). The Mars result is particularly striking:
+Note: the fits below were originally performed using the universal H/16 period.
+With per-planet eccentricity cycles, the Mars and Venus fits should be re-run using
+their respective periods (Mars: ~50,251 yr, Venus: ~14,056 yr). The
+amplitudes are expected to remain similar since they depend on tilt, not period.
 
-| Planet  | H/16 Fit Amp  | Tilt-Predicted Amp | Ratio | R²    |
+| Planet  | Fit Amp       | Tilt-Predicted Amp | Ratio | R²    |
 |---------|---------------|--------------------|-------|-------|
 | Mars    | 3.059e-3      | 3.074e-3           | 1.00x | 0.867 |
 | Venus   | 1.084e-3      | 9.625e-4           | 1.13x | 0.074 |
 
 Mars matches almost exactly. Venus has lower R² because 300 years of JPL data
-covers only 1.4% of the 20,938-year H/16 cycle, but the amplitude is the right
-order. The outer planets cannot be fitted — their JPL data spans less than 3%
-of one H/16 cycle.
+covers a tiny fraction of the eccentricity cycle.
 
 ### J2000 Eccentricities (Model Prediction at Epoch J2000.0)
 
-At J2000, each planet is at some phase of its H/16 eccentricity oscillation.
+At J2000, each planet is at some phase of its eccentricity oscillation.
 The JPL J2000 values represent the actual eccentricity at that epoch:
 
 | Planet  | J2000 Model   | J2000 JPL     | Diff from JPL |
@@ -358,7 +359,7 @@ only the angle moves.
 
 Note: these periods describe the rotation of the perihelion direction around the
 orbit. The eccentricity **magnitude** oscillation is a separate phenomenon that
-occurs at the universal H/16 period for all planets (see Section 10).
+occurs at each planet's eccentricity cycle (see Section 10).
 
 | Planet  | Period (years)      | Fibonacci Expression | Direction  |
 |---------|---------------------|----------------------|------------|
@@ -375,11 +376,11 @@ occurs at the universal H/16 period for all planets (see Section 10).
 
 ## 10. Predictive Eccentricity Formula
 
-Each planet's eccentricity oscillates around its base value at the universal
-H/16 period (the axial-meets-inclination beat frequency):
+Each planet's eccentricity oscillates around its base value at its own wobble
+period (the meeting frequency of axial precession and perihelion ICRF precession):
 
     e₀ = √(e_base² + e_amp²)           (derived mean)
-    θ  = 360° × (t − t_ref) / (H/16)   (phase angle)
+    θ  = 360° × (t − t_ref) / T_wobble (phase angle)
     e(t) = e₀ + (−e_amp − (e₀ − e_base) × cos θ) × cos θ
 
 At θ = 0°: e = e_base − e_amp (minimum). At θ = 180°: e = e_base + e_amp (maximum).
@@ -389,33 +390,30 @@ slightly asymmetric around the base value due to the geometric derivation.
 Parameters:
 - `e_base` = fixed perihelion-distance eccentricity (Section 6)
 - `e_amp` = K × sin(tilt) × √d / (√m × a^(3/2)) (Section 4)
-- `H/16` = 20,938 years — oscillation period for **all** planets
-- `t_ref` = 2000 − (φ_J2000 / 360) × H/16 — reference year anchored to J2000 phase
+- `T_ecc` = per-planet eccentricity cycle from `calcWobblePeriod()` (see doc 37)
+- `t_ref` = 2000 − (φ_J2000 / 360) × T_ecc — reference year anchored to J2000 phase
 
-In code: `computeEccentricityEarth(t, t_ref, H/16, e_base, e_amp)` in `src/script.js`.
+In code: `computeEccentricityEarth(t, t_ref, T_ecc, e_base, e_amp)` in `src/script.js`.
 
-### Oscillation Period: H/16 for All Planets
+### Oscillation Period: Per-Planet Eccentricity Cycle
 
-All planets oscillate at the same H/16 = 20,938-year period, **not** at their
-individual perihelion precession periods. H/16 is the beat frequency where
-axial precession meets inclination precession — the fundamental timescale for
-the tilt-eccentricity coupling mechanism.
+Each planet oscillates at its own eccentricity cycle — the meeting frequency of its
+axial precession and perihelion ICRF precession. The eccentricity cycle is computed
+by `calcWobblePeriod(perihelionEclipticYears, axialPrecessionYears)` in
+`src/script.js`. For Earth, this gives H/16 = 20,938 years. Other planets have
+different eccentricity cycles (see `docs/37-planets-precession-cycles.md` for the
+full derivation and values).
 
-### Mirror-Pair Phase Rule
+### Phase Angles
 
-Fibonacci mirror pairs share the same d-value and have eccentricity phases
-offset by exactly 180°. When one partner is above its base eccentricity, the
-mirror is below — maintaining tighter Law 5 balance across the full H/16 cycle.
+Since each planet oscillates at its own eccentricity cycle, the mirror-pair 180°
+offset rule no longer applies. The inner planet phases (Mercury, Venus, Mars)
+are derived analytically from JPL J2000 eccentricity data using the per-planet
+eccentricity cycle. The outer planet phases (Jupiter, Saturn, Uranus, Neptune) have
+negligible eccentricity amplitudes (< 0.01% of base), so their phase angles
+have minimal effect on the dynamic balance.
 
-| Mirror Pair       | d  | Inner Phase | Outer Phase | Offset |
-|-------------------|----|-------------|-------------|--------|
-| Mercury ↔ Uranus  | 21 |   89.99°    |  269.99°    |  180°  |
-| Venus ↔ Neptune   | 34 |  123.75°    |  303.75°    |  180°  |
-| Earth ↔ Saturn    |  3 |  192.95°    |   12.95°    |  180°  |
-| Mars ↔ Jupiter    |  5 |   96.89°    |  276.89°    |  180°  |
-
-With mirror-pair phases, the dynamic Law 5 balance oscillates between
-99.988% and 99.9998% over H/16 — a 40% tighter range than arbitrary ~90° phases.
+Phase angles are stored as `<planet>EccentricityPhaseJ2000` in `src/script.js`.
 
 ### Earth Phase: ω + 90°
 
@@ -431,15 +429,15 @@ analytical solution gives 193.0129° ≈ ω + 90.07° (0.002% match).
 The phase offset φ₀ is determined from the J2000 observed eccentricity using
 the `computeEccentricityEarth` function:
 
-| Planet  | φ_J2000  | e_min      | e_max      | Mirror  | Note |
-|---------|----------|------------|------------|---------|------|
-| Mercury |  89.99°  | 0.20555156 | 0.20572030 | Uranus  | Tilt ~0, essentially constant |
-| Venus   | 123.75°  | 0.00522798 | 0.00715306 | Neptune | Past mean, decreasing |
-| Earth   | 192.95°  | 0.01400168 | 0.01674232 | Saturn  | ω + 90°, near maximum at J2000 |
-| Mars    |  96.89°  | 0.08990179 | 0.09604907 | Jupiter | Just past mean |
+| Planet  | φ_J2000  | e_min      | e_max      | Note |
+|---------|----------|------------|------------|------|
+| Mercury |  89.99°  | 0.20555156 | 0.20572030 | Tilt ~0, essentially constant |
+| Venus   | 123.75°  | 0.00522798 | 0.00715306 | Past mean, decreasing |
+| Earth   | 192.95°  | 0.01400168 | 0.01674232 | ω + 90°, near maximum at J2000 |
+| Mars    |  96.89°  | 0.08990179 | 0.09604907 | Just past mean |
 
 The predictive formula works for these planets because the tilt mechanism is
-the dominant source of eccentricity variation over an H/16 cycle.
+the dominant source of eccentricity variation over each planet's eccentricity cycle.
 
 ### Outer Planets: Laplace-Lagrange Regime
 
@@ -461,28 +459,32 @@ giants that redistributes eccentricity among them as a coupled system.
 
 The tilt-derived amplitudes (~10⁻⁶ to 10⁻⁵) are still physically real — they
 represent the tilt-coupled component — but they are negligible compared to the
-secular exchange (~10⁻⁴). The outer planet phases are assigned via the
-mirror-pair rule (inner phase + 180°) for optimal Law 5 balance maintenance.
+secular exchange (~10⁻⁴). The outer planet phases are set to the value that
+places the dynamic eccentricity closest to the JPL J2000 observed value:
+180° when J2000 > base (maximum eccentricity) and 0° when J2000 < base
+(minimum eccentricity). This maximizes the dynamic eccentricity balance at
+J2000 (99.9845%) while the amplitude remains negligible.
 
 ### Phase Constants (J2000)
 
-| Planet  | φ_J2000 (°) | Mirror Pair | Source |
-|---------|-------------|-------------|--------|
-| Mercury |   89.9882   | Uranus      | Analytical from J2000 constraint |
-| Venus   |  123.7514   | Neptune     | Analytical from J2000 constraint |
-| Earth   |  192.9471   | Saturn      | ω + 90° = 102.947° + 90° |
-| Mars    |   96.8878   | Jupiter     | Analytical from J2000 constraint |
-| Jupiter |  276.8878   | Mars        | Mirror-pair rule (96.89° + 180°) |
-| Saturn  |   12.9471   | Earth       | Mirror-pair rule (192.95° + 180°) |
-| Uranus  |  269.9882   | Mercury     | Mirror-pair rule (89.99° + 180°) |
-| Neptune |  303.7514   | Venus       | Mirror-pair rule (123.75° + 180°) |
+| Planet  | φ_J2000 (°) | Source |
+|---------|-------------|--------|
+| Mercury |   89.9882   | Analytical from J2000 constraint |
+| Venus   |  123.7514   | Analytical from J2000 constraint |
+| Earth   |  192.9471   | ω + 90° = 102.947° + 90° |
+| Mars    |   96.8878   | Analytical from J2000 constraint |
+| Jupiter |  180        | 180° = max ecc, closest to J2000 (amp 1.15e-6, negligible) |
+| Saturn  |  180        | 180° = max ecc, closest to J2000 (amp 5.40e-6, negligible) |
+| Uranus  |    0        | 0° = min ecc, closest to J2000 (amp 2.83e-5, negligible) |
+| Neptune |    0        | 0° = min ecc, closest to J2000 (amp 8.10e-6, negligible) |
 
 ### Other Constants
 
 | Symbol | Value | Source |
 |--------|-------|--------|
 | K | 3.4505372893e-6 | `eccentricityAmplitudeK` in constants.js |
-| H/16 | 20,938 years | `perihelionCycleLength` in script.js |
+| T_wobble (Earth) | 20,938 years | `perihelionCycleLength` in script.js |
+| T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
 | axial tilt per planet | See Section 8 table | `axialTiltMean` in constants.js |
 
@@ -533,7 +535,7 @@ their effect on Law 5 weights is negligible for the dominant planets.
 | axialTiltMean (per planet)           | tools/lib/constants.js      |             |
 | Balance search script                 | docs/87-balance-search.js   |             |
 | Eccentricity balance script           | docs/90-eccentricity-balance.js |         |
-| JPL eccentricity H/16 fit            | docs/scripts/planet_eccentricity_jpl.py | |
+| JPL eccentricity cosine fit          | docs/scripts/planet_eccentricity_jpl.py | |
 | JPL eccentricity cache               | docs/scripts/planet_eccentricity_cache.json | |
 
 ---

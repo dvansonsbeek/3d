@@ -733,18 +733,18 @@ Outer planets (Jupiter–Neptune): tilt amplitude is negligible; J2000−base di
 
 ## Planet Eccentricity Phase Constants (J2000)
 
-Phase angles for the eccentricity oscillation formula. All planets oscillate at H/16 = 20,938 years. Mirror pairs are offset by 180° for tighter Law 5 balance. See [doc 35 §10](35-tilt-and-definitive-balance-calculations.md).
+Phase angles for the eccentricity oscillation formula. Each planet oscillates at its own eccentricity cycle (the meeting frequency of axial precession and perihelion ICRF precession). Inner planet phases are derived analytically from JPL J2000 eccentricity constraints. Outer planet phases are set to maximize proximity to the J2000 observed eccentricity (amplitude is negligible). See [doc 36 §Phase Angles](36-tilt-and-definitive-balance-calculations.md).
 
-| Planet | `eccentricityPhaseJ2000` (deg) | Mirror Pair | Source |
-|--------|-------------------------------|-------------|--------|
-| Mercury | 89.9882 | Uranus (d=21) | Analytical from J2000 constraint |
-| Venus | 123.7514 | Neptune (d=34) | Analytical from J2000 constraint |
-| Earth | 192.9471 | Saturn (d=3) | ω + 90° = 102.947° + 90° |
-| Mars | 96.8878 | Jupiter (d=5) | Analytical from J2000 constraint |
-| Jupiter | 276.8878 | Mars (d=5) | Mirror-pair rule (96.89° + 180°) |
-| Saturn | 12.9471 | Earth (d=3) | Mirror-pair rule (192.95° + 180°) |
-| Uranus | 269.9882 | Mercury (d=21) | Mirror-pair rule (89.99° + 180°) |
-| Neptune | 303.7514 | Venus (d=34) | Mirror-pair rule (123.75° + 180°) |
+| Planet | `eccentricityPhaseJ2000` (deg) | Source |
+|--------|-------------------------------|--------|
+| Mercury | 89.9882 | Analytical from J2000 constraint |
+| Venus | 123.7514 | Analytical from J2000 constraint |
+| Earth | 192.9471 | ω + 90° = 102.947° + 90° |
+| Mars | 96.8878 | Analytical from J2000 constraint |
+| Jupiter | 180 | 180° = max ecc, closest to J2000 (amp 1.15e-6, negligible) |
+| Saturn | 180 | 180° = max ecc, closest to J2000 (amp 5.40e-6, negligible) |
+| Uranus | 0 | 0° = min ecc, closest to J2000 (amp 2.83e-5, negligible) |
+| Neptune | 0 | 0° = min ecc, closest to J2000 (amp 8.10e-6, negligible) |
 
 ## Per-Planet EoC Fractions
 

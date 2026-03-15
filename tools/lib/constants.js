@@ -167,7 +167,7 @@ const planets = {
     orbitalEccentricityBase: 0.04821478,  // Dual-balanced (-0.35% from J2000)
     orbitalEccentricityJ2000: 0.04838624,
     orbitalEccentricityAmplitude: 1.149908e-6,
-    eccentricityPhaseJ2000: 276.8878,  // Phase angle at J2000 (degrees) — mirror of Mars (96.89° + 180°)
+    eccentricityPhaseJ2000: 180,  // 180° = max ecc, closest to J2000 (J2000 > base)
     axialTiltMean: 3.13,
     eocFraction: 0.484,
     startpos: 13.85,
@@ -191,7 +191,7 @@ const planets = {
     orbitalEccentricityBase: 0.05374486,  // Dual-balanced = Law 5 prediction (-0.22% from J2000)
     orbitalEccentricityJ2000: 0.05386179,
     orbitalEccentricityAmplitude: 5.403008e-6,
-    eccentricityPhaseJ2000: 12.9471,  // Phase angle at J2000 (degrees) — mirror of Earth (ω+90° + 180°)
+    eccentricityPhaseJ2000: 180,  // 180° = max ecc, closest to J2000 (J2000 > base)
     axialTiltMean: 26.73,
     eocFraction: 0.543,
     startpos: 11.32,
@@ -215,7 +215,7 @@ const planets = {
     orbitalEccentricityBase: 0.04734421,  // Dual-balanced (+0.18% from J2000)
     orbitalEccentricityJ2000: 0.04725744,
     orbitalEccentricityAmplitude: 2.831008e-5,
-    eccentricityPhaseJ2000: 269.9882,  // Phase angle at J2000 (degrees) — mirror of Mercury (89.99° + 180°)
+    eccentricityPhaseJ2000: 0,  // 0° = min ecc, closest to J2000 (J2000 < base)
     axialTiltMean: 82.23,
     eocFraction: 0.50,
     startpos: 44.88,
@@ -239,7 +239,7 @@ const planets = {
     orbitalEccentricityBase: 0.00868571,  // Base eccentricity, solved for 100% Law 5 balance (+1.11% from J2000)
     orbitalEccentricityJ2000: 0.00859048,
     orbitalEccentricityAmplitude: 8.098033e-6,
-    eccentricityPhaseJ2000: 303.7514,  // Phase angle at J2000 (degrees) — mirror of Venus (123.75° + 180°)
+    eccentricityPhaseJ2000: 0,  // 0° = min ecc, closest to J2000 (J2000 < base)
     axialTiltMean: 28.32,
     eocFraction: 0.50,
     startpos: 47.96,
