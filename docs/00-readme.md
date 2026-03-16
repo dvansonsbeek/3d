@@ -69,6 +69,8 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 34 | [J2000 Calibration](34-j2000-calibration.md) | J2000-verified ascending nodes methodology |
 | 35 | [Formula Derivation](35-formula-derivation.md) | Planetary precession formula derivation: Fibonacci hierarchy, resonance loops, coefficient breakdowns |
 | 36 | [Tilt & Balance Calculations](36-tilt-and-definitive-balance-calculations.md) | Tilt, inclination, and eccentricity: definitive balance calculations across all epochs |
+| 38 | [Eccentricity Balance Scale](38-eccentricity-scale.md) | Eccentricity as a balance system: weight formula, per-planet breakdowns, amplitude constant |
+| 39 | [Eccentricity Structure Exploration](39-eccentricity-structure-exploration.md) | Two-component decomposition, mirror pair conservation, statistical significance, exhaustive negative results |
 
 ### 40–49 Architecture & Code Structure
 
@@ -211,6 +213,8 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 | `constants_scripts.py` | Shared constants and planet data for all Python scripts |
 | `fibonacci_significance.py` | Fisher's exact test for statistical significance of Fibonacci structure |
 | `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
+| `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
+| `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
 | `fibonacci_law4_verify.py` | Law 4 (eccentricity constant) verification |
 | `observed_formula.py` | Fit observed orbital element formulas |
 | `predictive_formula.py` | Predictive formula system for orbital elements |

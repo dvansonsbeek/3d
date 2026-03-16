@@ -143,7 +143,17 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 100% balance** (dual-balanced eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment.
+**Result: 100% balance** (dual-balanced eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
+
+#### The Eccentricity Amplitude Constant
+
+While eccentricity base values are determined by the balance system (Laws 4 + 5), the eccentricity **amplitude** — how much each planet's eccentricity oscillates over its eccentricity cycle — has a genuine universal constant, analogous to ψ for inclination:
+
+```
+e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+```
+
+K = 3.4505 × 10⁻⁶ — an empirical constant derived from Earth's mean parameters. The total eccentricity at any time oscillates around the base value with this amplitude over each planet's eccentricity cycle. Two candidate relations K ≈ ψ²/π (0.09%) and K ≈ ψ^(11/5) (0.05%) have been noted but are not proven identities. See [Eccentricity Balance Scale](38-eccentricity-scale.md) for details.
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 

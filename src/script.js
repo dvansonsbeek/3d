@@ -12572,6 +12572,343 @@ function closeBalanceExplorer() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ECCENTRICITY BALANCE SCALE — Interactive visualization
+// Shows how each planet's perihelion offset is built from the contributions
+// of all other planets via the Law 5 balance equation.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BALANCE_PLANETS_SCALE = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
+const PHASE_ANGLE_SCALE = { mercury: 203, venus: 203, earth: 203, mars: 203, jupiter: 203, saturn: 23, uranus: 203, neptune: 203 };
+
+// Use BASE eccentricities for the scale (Law 5 balance is tuned on these)
+const ECC_BASE_SCALE = {
+  mercury: mercuryOrbitalEccentricityBase,
+  venus:   venusOrbitalEccentricityBase,
+  earth:   eccentricityBase,
+  mars:    marsOrbitalEccentricityBase,
+  jupiter: jupiterOrbitalEccentricityBase,
+  saturn:  saturnOrbitalEccentricityBase,
+  uranus:  uranusOrbitalEccentricityBase,
+  neptune: neptuneOrbitalEccentricityBase,
+};
+// Model-derived J2000 eccentricities: e(2000) from computeEccentricityEarth
+const ECC_J2000_SCALE = {
+  mercury: computeEccentricityEarth(2000, 2000 - (mercuryEccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, mercuryOrbitalEccentricityBase, mercuryOrbitalEccentricityAmplitude),
+  venus:   computeEccentricityEarth(2000, 2000 - (venusEccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   venusOrbitalEccentricityBase,   venusOrbitalEccentricityAmplitude),
+  earth:   computeEccentricityEarth(2000, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude),
+  mars:    computeEccentricityEarth(2000, 2000 - (marsEccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    marsOrbitalEccentricityBase,    marsOrbitalEccentricityAmplitude),
+  jupiter: computeEccentricityEarth(2000, 2000 - (jupiterEccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, jupiterOrbitalEccentricityBase, jupiterOrbitalEccentricityAmplitude),
+  saturn:  computeEccentricityEarth(2000, 2000 - (saturnEccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  saturnOrbitalEccentricityBase,  saturnOrbitalEccentricityAmplitude),
+  uranus:  computeEccentricityEarth(2000, 2000 - (uranusEccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  uranusOrbitalEccentricityBase,  uranusOrbitalEccentricityAmplitude),
+  neptune: computeEccentricityEarth(2000, 2000 - (neptuneEccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, neptuneOrbitalEccentricityBase, neptuneOrbitalEccentricityAmplitude),
+};
+const ECC_AMP_SCALE = {
+  mercury: mercuryOrbitalEccentricityAmplitude,
+  venus:   venusOrbitalEccentricityAmplitude,
+  earth:   eccentricityAmplitude,
+  mars:    marsOrbitalEccentricityAmplitude,
+  jupiter: jupiterOrbitalEccentricityAmplitude,
+  saturn:  saturnOrbitalEccentricityAmplitude,
+  uranus:  uranusOrbitalEccentricityAmplitude,
+  neptune: neptuneOrbitalEccentricityAmplitude,
+};
+const ECC_CYCLE_SCALE = {
+  mercury: mercuryWobblePeriod,
+  venus:   venusWobblePeriod,
+  earth:   perihelionCycleLength,
+  mars:    marsWobblePeriod,
+  jupiter: jupiterWobblePeriod,
+  saturn:  saturnWobblePeriod,
+  uranus:  uranusWobblePeriod,
+  neptune: neptuneWobblePeriod,
+};
+
+function computeEccScaleData(targetKey) {
+  const bc = BALANCE_CONFIG;
+  const t = bc[targetKey];
+  const tEcc = ECC_BASE_SCALE[targetKey];
+  const tPhase = PHASE_ANGLE_SCALE[targetKey];
+  const offset_t = tEcc * t.sma;
+  const results = [];
+  for (const key of BALANCE_PLANETS_SCALE) {
+    if (key === targetKey) continue;
+    const p = bc[key];
+    const pPhase = PHASE_ANGLE_SCALE[key];
+    const pEcc = ECC_BASE_SCALE[key];
+    const W = Math.sqrt(p.mass * t.defaultD * p.sma / (t.mass * p.defaultD * t.sma));
+    const sign = pPhase !== tPhase ? +1 : -1;
+    const offset = pEcc * p.sma;
+    const contribution = sign * W * offset;
+    results.push({
+      key, name: p.name, offset, weight: W, sign, contribution,
+      mass: p.mass, d: p.defaultD, sma: p.sma, ecc: pEcc
+    });
+  }
+  results.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
+  let cumulative = 0;
+  for (const r of results) {
+    cumulative += r.contribution;
+    r.cumulative = cumulative;
+    r.pctOfTarget = offset_t > 0 ? (cumulative / offset_t) * 100 : 0;
+  }
+  return { target: targetKey, targetName: t.name, targetOffset: offset_t, targetPhase: tPhase,
+           targetMass: t.mass, targetD: t.defaultD, targetSma: t.sma, targetEcc: tEcc,
+           targetEccJ2000: ECC_J2000_SCALE[targetKey], targetEccAmp: ECC_AMP_SCALE[targetKey],
+           targetEccCycle: ECC_CYCLE_SCALE[targetKey],
+           items: results, total: cumulative };
+}
+
+function hexToCSS(hex) {
+  return '#' + ((hex >> 16) & 0xff).toString(16).padStart(2,'0')
+             + ((hex >> 8) & 0xff).toString(16).padStart(2,'0')
+             + (hex & 0xff).toString(16).padStart(2,'0');
+}
+
+function renderEccWaterfallSVG(data) {
+  const items = data.items;
+  const targetOffset = data.targetOffset;
+  // Compute max cumulative excursion to determine scale
+  let cumTest = 0, maxCum = 0;
+  for (const item of items) { cumTest += item.contribution; maxCum = Math.max(maxCum, Math.abs(cumTest)); }
+  const maxVal = Math.max(maxCum, Math.abs(targetOffset)) * 1.15;
+  const svgW = 900, barH = 28, padTop = 10, padBottom = 30, padLeft = 80, padRight = 140;
+  const chartW = svgW - padLeft - padRight;
+  const svgH = padTop + items.length * barH + padBottom;
+  const scale = chartW / maxVal;
+  const maxAbsC = Math.max(...items.map(i => Math.abs(i.contribution)));
+  const valColX = svgW - padRight + 8; // left edge of value column
+  const valColW = padRight - 16;       // width available for background bars
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<rect width="${svgW}" height="${svgH}" fill="transparent"/>`;
+  // Target marker line
+  const targetX = padLeft + Math.abs(targetOffset) * scale;
+  svg += `<line x1="${targetX}" y1="${padTop - 2}" x2="${targetX}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg += `<text x="${targetX}" y="${svgH - padBottom + 18}" fill="#f0b040" font-size="10" text-anchor="middle" font-family="var(--pl-mono-font)">e=${data.targetEcc.toFixed(6)}</text>`;
+  // Bars — cumulative buildup
+  let cumX = padLeft;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const y = padTop + i * barH;
+    const col = hexToCSS(planetColorHex[item.key] || 0xaaaaaa);
+    const barWidth = Math.abs(item.contribution) * scale;
+    const isPositive = item.sign > 0;
+    // Planet label (left of chart)
+    svg += `<circle cx="${padLeft - 14}" cy="${y + barH/2}" r="4" fill="${col}"/>`;
+    svg += `<text x="${padLeft - 22}" y="${y + barH/2 + 4}" fill="#ccc" font-size="11" text-anchor="end" font-family="var(--pl-body-font)">${item.name}</text>`;
+    // Bar
+    const barX = isPositive ? cumX : cumX - barWidth;
+    const fillColor = isPositive ? 'rgba(80,180,120,0.7)' : 'rgba(200,80,80,0.6)';
+    svg += `<rect x="${Math.max(barX, padLeft)}" y="${y + 4}" width="${Math.min(barWidth, chartW)}" height="${barH - 8}" rx="3" fill="${fillColor}" stroke="${col}" stroke-width="1"/>`;
+    // Update cumulative position
+    cumX += item.contribution * scale;
+    // Value label with background bar on right side (right-aligned to match table)
+    const signStr = item.contribution >= 0 ? '+' : '';
+    const valBarPct = maxAbsC > 0 ? Math.abs(item.contribution) / maxAbsC : 0;
+    const valBarW = Math.max(valBarPct * valColW, 2); // minimum 2px visibility
+    const valBarColor = isPositive ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
+    svg += `<rect x="${svgW - 8 - valBarW}" y="${y + 3}" width="${valBarW}" height="${barH - 6}" rx="2" fill="${valBarColor}"/>`;
+    svg += `<text x="${svgW - 12}" y="${y + barH/2 + 4}" fill="${isPositive ? 'rgba(76,175,80,0.9)' : 'rgba(239,83,80,0.9)'}" font-size="10" text-anchor="end" font-family="var(--pl-mono-font)">${signStr}${item.contribution.toFixed(4)}</text>`;
+    // Cumulative tick
+    if (cumX >= padLeft && cumX <= svgW - padRight) {
+      svg += `<line x1="${cumX}" y1="${y + barH - 2}" x2="${cumX}" y2="${y + barH + 2}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+    }
+  }
+  // Zero line
+  svg += `<line x1="${padLeft}" y1="${padTop - 2}" x2="${padLeft}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
+  // Separator between chart and value column
+  svg += `<line x1="${svgW - padRight}" y1="${padTop - 2}" x2="${svgW - padRight}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  // Total in value column — same row as eccentricity label
+  svg += `<text x="${svgW - 12}" y="${svgH - padBottom + 18}" fill="rgba(143,188,143,.85)" font-size="11" font-weight="600" text-anchor="end" font-family="var(--pl-mono-font)">${data.total.toFixed(6)}</text>`;
+  svg += '</svg>';
+  return svg;
+}
+
+function renderEccBuildupTable(data) {
+  const items = data.items;
+  // Compute total absolute contributions for meaningful percentages
+  const totalAbsContrib = items.reduce((s, i) => s + Math.abs(i.contribution), 0);
+  const maxAbsContrib = Math.max(...items.map(i => Math.abs(i.contribution)));
+  let html = '<table class="ebs-table">';
+  html += '<colgroup><col style="width:12%"><col style="width:13%"><col style="width:5%"><col style="width:13%"><col style="width:13%"><col style="width:9%"><col style="width:15.6%"></colgroup>';
+  html += '<thead><tr>';
+  html += '<th>Planet</th><th title="Planet mass in solar masses (M\u2609). A fixed constant.">Mass (M\u2609)</th><th title="Fibonacci divisor from the balance configuration. A fixed constant that determines each planet\u2019s coupling strength.">d</th><th title="Perihelion offset: eccentricity \u00D7 semi-major axis. The physical distance (AU) between the Sun and the orbit center.">Offset (e\u00D7a)</th><th title="Scale weight: \u221A(m/m_target \u00D7 d_target/d \u00D7 a/a_target). Combines mass ratio, Fibonacci divisor ratio, and distance ratio.">Weight</th><th title="Each planet\u2019s share of the total absolute contributions (always sums to 100%).">Share</th><th class="ebs-col-contrib" title="Weight \u00D7 Offset \u00D7 Sign. Positive (+) if the planet is in the opposite phase group, negative (\u2212) if in the same group.">Contribution</th>';
+  html += '</tr></thead><tbody>';
+  for (const item of items) {
+    const col = hexToCSS(planetColorHex[item.key] || 0xaaaaaa);
+    const signClass = item.sign > 0 ? 'ebs-positive' : 'ebs-negative';
+    // Share = |contribution| / total absolute contributions (always positive, sums to 100%)
+    const sharePct = totalAbsContrib > 0 ? (Math.abs(item.contribution) / totalAbsContrib) * 100 : 0;
+    // Background bar percentages
+    const contribBarPct = maxAbsContrib > 0 ? (Math.abs(item.contribution) / maxAbsContrib) * 100 : 0;
+    const contribBarColor = item.sign > 0 ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
+    const shareBarColor = 'rgba(255,255,255,0.08)';
+    // Format mass: use exponential for very small values, fixed otherwise
+    const massFmt = item.mass < 0.0001 ? item.mass.toExponential(2) : item.mass.toFixed(6);
+    html += `<tr>`;
+    html += `<td><span class="ebs-dot" style="background:${col}"></span>${item.name}</td>`;
+    html += `<td class="ebs-mono ebs-fixed">${massFmt}</td>`;
+    html += `<td class="ebs-mono ebs-fixed">${item.d}</td>`;
+    html += `<td class="ebs-mono ebs-fixed">${item.offset.toFixed(4)}</td>`;
+    html += `<td class="ebs-mono">${item.weight.toFixed(4)}</td>`;
+    html += `<td class="ebs-mono" style="background:linear-gradient(270deg,${shareBarColor} ${sharePct.toFixed(1)}%,transparent ${sharePct.toFixed(1)}%)">${sharePct.toFixed(1)}%</td>`;
+    html += `<td class="ebs-mono ebs-col-contrib ${signClass}" style="background:linear-gradient(270deg,${contribBarColor} ${contribBarPct.toFixed(1)}%,transparent ${contribBarPct.toFixed(1)}%)">${item.contribution >= 0 ? '+' : ''}${item.contribution.toFixed(4)}</td>`;
+    html += '</tr>';
+  }
+  // Summary row
+  html += `<tr class="ebs-summary"><td colspan="5">TOTAL &rarr; e <small>base</small> = <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span></td>`;
+  html += `<td class="ebs-mono">100%</td>`;
+  html += `<td class="ebs-mono ebs-col-contrib ebs-fixed">${data.total.toFixed(6)} AU</td></tr>`;
+  html += '</tbody></table>';
+  return html;
+}
+
+let eccBalanceScalePanel = null;
+
+function createEccBalanceScalePanel() {
+  // Fixed container (same pattern as #fibBalanceExplorer)
+  const panel = document.createElement('div');
+  panel.id = 'eccBalanceScale';
+  // Backdrop overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'ebs-overlay';
+  overlay.addEventListener('click', () => closeEccBalanceScale());
+  panel.appendChild(overlay);
+  // Dialog
+  const dialog = document.createElement('div');
+  dialog.className = 'ebs-dialog';
+  panel.appendChild(dialog);
+  // Header — title and close button
+  const header = document.createElement('div');
+  header.className = 'ebs-header';
+  header.innerHTML = '<h2>\u2696\uFE0F Eccentricity Balance Scale</h2>';
+  const close = document.createElement('div');
+  close.className = 'ebs-close';
+  close.addEventListener('click', closeEccBalanceScale);
+  header.appendChild(close);
+  dialog.appendChild(header);
+  // Planet navigation bar — full width, prominent (like planetStats)
+  const nav = document.createElement('div');
+  nav.className = 'ebs-nav';
+  const navPrev = document.createElement('button');
+  navPrev.className = 'ebs-nav-arrow';
+  navPrev.textContent = '\u2039';
+  navPrev.addEventListener('click', () => {
+    const idx = BALANCE_PLANETS_SCALE.indexOf(panel._currentTarget);
+    if (idx > 0) { panel._currentTarget = BALANCE_PLANETS_SCALE[idx - 1]; updateEccBalanceScale(panel._currentTarget); }
+  });
+  nav.appendChild(navPrev);
+  const navName = document.createElement('button');
+  navName.className = 'ebs-nav-name';
+  nav.appendChild(navName);
+  const navNext = document.createElement('button');
+  navNext.className = 'ebs-nav-arrow';
+  navNext.textContent = '\u203A';
+  navNext.addEventListener('click', () => {
+    const idx = BALANCE_PLANETS_SCALE.indexOf(panel._currentTarget);
+    if (idx < BALANCE_PLANETS_SCALE.length - 1) { panel._currentTarget = BALANCE_PLANETS_SCALE[idx + 1]; updateEccBalanceScale(panel._currentTarget); }
+  });
+  nav.appendChild(navNext);
+  // Planet dropdown (hidden, shown on name click)
+  const dropdown = document.createElement('div');
+  dropdown.className = 'ebs-dropdown';
+  dropdown.style.display = 'none';
+  for (const key of BALANCE_PLANETS_SCALE) {
+    const item = document.createElement('div');
+    item.className = 'ebs-dropdown-item';
+    const dcol = hexToCSS(planetColorHex[key] || 0xaaaaaa);
+    item.innerHTML = `<span class="ebs-dot" style="background:${dcol}"></span>${BALANCE_CONFIG[key].name}`;
+    item.addEventListener('click', () => { panel._currentTarget = key; dropdown.style.display = 'none'; updateEccBalanceScale(key); });
+    dropdown.appendChild(item);
+  }
+  nav.appendChild(dropdown);
+  navName.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none'; });
+  dialog.appendChild(nav);
+  panel._navName = navName;
+  panel._navPrev = navPrev;
+  panel._navNext = navNext;
+  panel._dropdown = dropdown;
+  // Body
+  const body = document.createElement('div');
+  body.className = 'ebs-body';
+  dialog.appendChild(body);
+  document.body.appendChild(panel);
+  panel._body = body;
+  panel._currentTarget = 'saturn';
+  return panel;
+}
+
+function updateEccBalanceScale(targetKey) {
+  if (!eccBalanceScalePanel) return;
+  const body = eccBalanceScalePanel._body;
+  const panel = eccBalanceScalePanel;
+  panel._currentTarget = targetKey;
+  const data = computeEccScaleData(targetKey);
+  // Update nav
+  const col = hexToCSS(planetColorHex[targetKey] || 0xaaaaaa);
+  panel._navName.innerHTML = `<span class="ebs-dot" style="background:${col}"></span>${data.targetName}`;
+  const idx = BALANCE_PLANETS_SCALE.indexOf(targetKey);
+  panel._navPrev.disabled = idx <= 0;
+  panel._navNext.disabled = idx >= BALANCE_PLANETS_SCALE.length - 1;
+  panel._dropdown.style.display = 'none';
+  const phaseLabel = data.targetPhase > 180 ? '203°' : '23°';
+  const hasAllPositive = data.items.every(i => i.sign > 0);
+  let html = '';
+  // Hero card — key numbers at a glance
+  html += `<div class="ebs-hero">`;
+  const eccCycleYrs = data.targetEccCycle;
+  const eccCycleFmt = eccCycleYrs >= 1000 ? fmtNum(eccCycleYrs, 0, ',') : eccCycleYrs.toFixed(1);
+  html += `<div class="ebs-hero-stat" title="The long-term mean eccentricity (how oval the orbit is). 0 = perfect circle, 1 = parabola.\n\nJ2000 value: ${data.targetEccJ2000.toFixed(8)} (measured at epoch 2000)\nAmplitude: \u00B1${data.targetEccAmp.toExponential(4)} (oscillation from universal K constant)\nEccentricity cycle: ${eccCycleFmt} years"><div class="ebs-hero-value ebs-ecc">${data.targetEcc.toFixed(6)}</div><div class="ebs-hero-label">Base Eccentricity (e)</div><div class="ebs-hero-sub">J2000: ${data.targetEccJ2000.toFixed(6)}</div></div>`;
+  html += `<div class="ebs-hero-stat" title="Perihelion offset: the physical distance (in AU) between the Sun and the geometric center of the orbit. Equals eccentricity \u00D7 semi-major axis."><div class="ebs-hero-value ebs-fixed">${data.targetOffset.toFixed(6)}</div><div class="ebs-hero-label">Offset e\u00D7a (AU)</div></div>`;
+  html += `<div class="ebs-hero-stat" title="Semi-major axis: the average distance from the planet to the Sun, in Astronomical Units (1 AU = Earth\u2013Sun distance)."><div class="ebs-hero-value">${data.targetSma.toFixed(4)}</div><div class="ebs-hero-label">Semi-major (AU)</div></div>`;
+  html += `<div class="ebs-hero-stat" title="Phase group from Laplace-Lagrange secular perturbation theory. Saturn is the sole 23\u00B0 member; all other planets are in the 203\u00B0 group. The two groups must balance like a scale."><div class="ebs-hero-value">${phaseLabel}</div><div class="ebs-hero-label">Phase group</div></div>`;
+  html += `</div>`;
+  // Insight callout
+  if (hasAllPositive) {
+    const pushTotal = data.items.reduce((s, i) => s + i.contribution, 0).toFixed(6);
+    const topItem = data.items[0]; // sorted by |contribution| descending
+    const topPct = (Math.abs(topItem.contribution) / Math.abs(data.total) * 100).toFixed(1);
+    html += `<div class="ebs-callout ebs-callout-info">${data.targetName} is the sole member of the ${phaseLabel} group. All 203\u00B0 group planets contribute to its total of <span class="ebs-fixed">${pushTotal}</span> AU. ${topItem.name} provides ${topPct}% \u2014 W \u2248 1 means its offset passes through unchanged, giving a ${data.targetName}/${topItem.name} ratio of <strong>\u2248 1:2</strong>.</div>`;
+  } else {
+    const satContrib = data.items.find(i => i.key === 'saturn');
+    const satPush = satContrib ? Math.abs(satContrib.contribution).toFixed(2) : '?';
+    const pullers = data.items.filter(i => i.sign < 0);
+    const pullTotal = Math.abs(pullers.reduce((s, i) => s + i.contribution, 0)).toFixed(2);
+    html += `<div class="ebs-callout ebs-callout-tug">`;
+    html += `The 23\u00B0 group (Saturn) pulls one way with <span class="ebs-positive">+${satPush}</span> AU `;
+    html += `while the 203\u00B0 group (all other planets) pulls the opposite way with <span class="ebs-negative">\u2212${pullTotal}</span> AU. `;
+    html += `${data.targetName}\u2019s base eccentricity of <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span> is the <strong>residual</strong> after these opposing forces nearly cancel.</div>`;
+  }
+  // SVG chart
+  html += `<div class="ebs-chart">${renderEccWaterfallSVG(data)}</div>`;
+  // Weight formula — compact inline
+  html += `<div class="ebs-formula">`;
+  html += `W<sub>j</sub> = &radic;( m<sub>j</sub>/m<sub>${data.targetName}</sub> &times; d<sub>${data.targetName}</sub>/d<sub>j</sub> &times; a<sub>j</sub>/a<sub>${data.targetName}</sub> )`;
+  html += `<span class="ebs-formula-note">&nbsp;&mdash;&nbsp;<em>mass ratio</em> &times; <em>Fibonacci ratio</em> &times; <em>distance ratio</em></span>`;
+  html += `</div>`;
+  // Buildup table
+  html += `<div class="ebs-section-title">Cumulative buildup of ${data.targetName}</div>`;
+  html += renderEccBuildupTable(data);
+  body.innerHTML = html;
+}
+
+function openEccBalanceScale() {
+  if (!eccBalanceScalePanel) {
+    eccBalanceScalePanel = createEccBalanceScalePanel();
+  }
+  eccBalanceScalePanel.classList.add('visible');
+  // Start with the currently focused planet, or Saturn as fallback
+  const curName = (o.lookAtObj?.name || '').toLowerCase();
+  const startPlanet = BALANCE_PLANETS_SCALE.includes(curName) ? curName : 'saturn';
+  updateEccBalanceScale(startPlanet);
+}
+
+function closeEccBalanceScale() {
+  if (eccBalanceScalePanel) {
+    eccBalanceScalePanel.classList.remove('visible');
+  }
+}
+
 // Update live data in hierarchy inspector (called from render loop)
 let _lastLiveDataJD = null;
 let _lastLiveDataPlanet = null; // Track planet changes to force refresh
@@ -15337,6 +15674,8 @@ function setupGUI() {
     'Open the planet hierarchy inspector. Shows orbital elements, scene graph, and live positional data for each planet.');
   addTooltip(toolsFolder.addButton({ title: 'Invariable Plane Inspector' }).on('click', () => openBalanceExplorer()),
     'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
+  addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
+    'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
 
   /* --- Console Tests (F12) ------------------------------------------------ */
   const calibFolder = toolsFolder.addFolder({ title: 'Console Tests (F12)', expanded: false });
