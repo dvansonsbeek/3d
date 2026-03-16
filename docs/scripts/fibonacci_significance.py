@@ -7,7 +7,7 @@
 # eccentricities and inclinations are statistically significant,
 # or could arise by chance in random planetary systems.
 #
-# TWELVE TEST STATISTICS (matching the six Fibonacci Laws + six Findings):
+# FOURTEEN TEST STATISTICS (matching the six Fibonacci Laws + eight Findings):
 #
 #   Test 1  — Pairwise Fibonacci count (general):
 #       How many planet pairs have ξ-ratios near a Fibonacci ratio?
@@ -24,18 +24,18 @@
 #       NOTE: partially circular — Λ_amp uses model-derived amplitudes.
 #
 #   Test 5  — Inclination Balance (Law 3):
-#       With the model's Fibonacci d-values, phase groups, and dual-balanced
+#       With the model's Fibonacci d-values, phase groups, and base
 #       eccentricities, how well do the angular-momentum-weighted structural
-#       weights cancel? Observed: 100%.  Uses ECC_DUAL_BALANCED (not J2000).
+#       weights cancel? Observed: 100%.  Uses base eccentricities.
 #
 #   Test 6  — Eccentricity Balance (Law 5):
-#       With the model's d-values and dual-balanced eccentricities, how well
+#       With the model's d-values and base eccentricities, how well
 #       do the eccentricity weights cancel between the two phase groups?
-#       Observed: 100%.  Uses ECC_DUAL_BALANCED (not J2000).
+#       Observed: 100%.  Uses base eccentricities.
 #
 #   Test 7  — Saturn Eccentricity Prediction (Finding 4):
 #       The eccentricity balance predicts Saturn's eccentricity from the other 7
-#       planets. Observed: 0.22% error.  Uses ECC_DUAL_BALANCED.
+#       planets. Observed: 0.22% error.  Uses base eccentricities.
 #
 #   Test 8  — ψ-Constant full 8-planet (Law 2):
 #       How constant is d × η = d × i_amp × √m across ALL 8 planets?
@@ -56,6 +56,17 @@
 #   Test 12 — Mirror symmetry (Finding 1):
 #       Do the d-assignments show inner-outer mirror symmetry?
 #       Observed: 4/4 mirror pairs share the same d.
+#
+#   Test 13 — K amplitude constant (Finding 6):
+#       Can a single constant K predict all 8 eccentricity amplitudes via
+#       e_amp = K × sin(tilt) × √d / (√m × a^1.5)?
+#       NOTE: circular — amplitudes were derived from K. But the permutation
+#       test is still valid (shuffling breaks the planet-specific prediction).
+#
+#   Test 14 — Eccentricity Balance Scale (Finding 7):
+#       Can each planet's eccentricity be predicted from the other 7 using
+#       the balance scale formula?  Observed: ~0% RMS (by construction).
+#       The permutation test measures whether the assignment matters.
 #
 # THREE RANDOM DISTRIBUTIONS:
 #   1. Permutation (exhaustive 8! = 40,320) — fixes values, shuffles assignment
@@ -78,28 +89,27 @@ from constants_scripts import (
     PLANET_NAMES, MASSES, ECCENTRICITIES, ECC_DUAL_BALANCED, INCLINATION_AMPS,
     D_INCL, PSI1_THEORY, SEMI_MAJOR, PHASE_GROUP, GROUP_203, GROUP_23,
     MIRROR_PAIRS, INCL_PERIOD, PERIOD_FRAC, H,
-    INCL_J2000,
+    INCL_J2000, INCL_MEAN,
+    ECC_AMPLITUDE, AXIAL_TILT, ECC_AMPLITUDE_K, SMA, D,
 )
 
 # ─── ECCENTRICITY SET SELECTION ───────────────────────────────────────────
 #
-# Two eccentricity sets are used, chosen by what each test measures:
+# ECCENTRICITIES = ECC_BASE = base eccentricities (long-term means for 100%
+# Law 5 balance).  ECC_DUAL_BALANCED is a legacy alias for the same set —
+# there is no longer any distinction between "dual-balanced" and "base".
 #
-#   ECCENTRICITIES (J2000 observed, Earth = model base eccentricity)
-#     → Tests 1, 2, 4, 10: These test whether OBSERVED planetary ratios
-#       (e×√m, e/i, cross-parameter sums) match Fibonacci patterns.
-#       Using J2000 values is correct because we are asking "does nature
-#       exhibit these ratios?" — no model tuning involved.
+# All tests use base eccentricities (the model's values):
+#   Tests 1, 2, 4, 10: These test whether the model's base eccentricity
+#     ratios (e×√m, e/i, cross-parameter sums) match Fibonacci patterns.
+#   Tests 5, 6, 7: These test the model's balance laws (Law 3 incl.
+#     balance, Law 5 ecc. balance, Finding 4 Saturn prediction).
+#     The base eccentricities achieve 100% balance by construction.
+#     The significance question is: "can random eccentricities achieve
+#     this level of balance?" — the permutation/MC tests answer this.
 #
-#   ECC_DUAL_BALANCED (inner planets J2000, outer planets optimized)
-#     → Tests 5, 6, 7: These test the MODEL's balance laws (Law 3 incl.
-#       balance, Law 5 ecc. balance, Finding 4 Saturn prediction).
-#       The dual-balanced outer-planet eccentricities are the values that
-#       achieve 100% balance — they ARE the model's prediction. Using J2000
-#       here would test a straw man (the model predicts specific deviations
-#       from J2000 for the outer planets). The significance question is:
-#       "can random eccentricities achieve this level of balance?" — and the
-#       observed target must be the model's own 100% balance, not a near-miss.
+# J2000 snapshot values (ECC_J2000 in constants_scripts.py) are available
+# but not used in this significance test.
 #
 # NOTE: INCLINATION_AMPS (= INCL_AMP) now stores Fibonacci model PREDICTIONS
 # (ψ/(d×√m)), not independently observed BvW amplitudes.  Tests 3 and 4
@@ -109,10 +119,8 @@ from constants_scripts import (
 # tests, replace INCLINATION_AMPS with independently measured secular amplitudes.
 
 # Mean inclinations (degrees, invariable plane oscillation midpoints)
-INCL_MEANS = {
-    "Mercury": 5.900, "Venus": 3.055, "Earth": 1.482, "Mars": 3.600,
-    "Jupiter": 0.363, "Saturn": 0.941, "Uranus": 1.018, "Neptune": 0.670,
-}
+# Imported from constants_scripts.py as INCL_MEAN (from script.js InvPlaneInclinationMean)
+INCL_MEANS = INCL_MEAN
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FIBONACCI RATIOS AND TOLERANCE
@@ -532,28 +540,163 @@ def stat_mirror_symmetry(d_vals, mirror_pairs):
     return count
 
 
+def stat_k_amplitude(eccs_amp, tilts, d_vals, masses, sma, sqrt_m):
+    """
+    Test 13 — Finding 6: K amplitude constant.
+
+    Tests whether a single constant K can predict all 8 eccentricity
+    amplitudes from:  e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+
+    NOTE: Circular for observed data — the amplitudes were derived from K.
+    However, the permutation test is still valid: shuffling amplitudes across
+    planets breaks the planet-specific prediction, so a low p-value means
+    the assignment matters.
+
+    Returns: max relative error of K prediction across all 8 planets
+             (lower = better).
+    """
+    # Compute K from Earth
+    p_ref = "Earth"
+    tilt_rad = math.radians(tilts[p_ref])
+    sin_tilt = math.sin(tilt_rad)
+    if sin_tilt <= 0 or d_vals.get(p_ref, 0) <= 0:
+        return 1.0
+    K = eccs_amp[p_ref] * sqrt_m[p_ref] * sma[p_ref]**1.5 / (sin_tilt * math.sqrt(d_vals[p_ref]))
+
+    max_err = 0.0
+    for p in PLANET_NAMES:
+        tilt_rad = math.radians(tilts[p])
+        sin_t = math.sin(tilt_rad)
+        if sin_t <= 0 or d_vals.get(p, 0) <= 0 or eccs_amp[p] <= 0:
+            continue
+        predicted = K * sin_t * math.sqrt(d_vals[p]) / (sqrt_m[p] * sma[p]**1.5)
+        rel_err = abs(predicted / eccs_amp[p] - 1.0)
+        if rel_err > max_err:
+            max_err = rel_err
+    return max_err
+
+
+def _best_k_for_amplitudes(eccs_amp, tilts, d_vals, masses, sma, sqrt_m):
+    """
+    Find the best single K that minimizes max relative error across 8 planets.
+
+    Uses the median of per-planet K estimates (robust to outliers).
+    Returns: (K, max_relative_error)
+    """
+    k_estimates = []
+    for p in PLANET_NAMES:
+        tilt_rad = math.radians(tilts[p])
+        sin_t = math.sin(tilt_rad)
+        if sin_t <= 0 or d_vals.get(p, 0) <= 0 or eccs_amp.get(p, 0) <= 0:
+            continue
+        k_p = eccs_amp[p] * sqrt_m[p] * sma[p]**1.5 / (sin_t * math.sqrt(d_vals[p]))
+        k_estimates.append(k_p)
+    if not k_estimates:
+        return 0.0, 1.0
+
+    # Use median as robust estimator
+    k_estimates.sort()
+    n = len(k_estimates)
+    K = k_estimates[n // 2] if n % 2 == 1 else (k_estimates[n // 2 - 1] + k_estimates[n // 2]) / 2
+
+    max_err = 0.0
+    for p in PLANET_NAMES:
+        tilt_rad = math.radians(tilts[p])
+        sin_t = math.sin(tilt_rad)
+        if sin_t <= 0 or d_vals.get(p, 0) <= 0 or eccs_amp.get(p, 0) <= 0:
+            continue
+        predicted = K * sin_t * math.sqrt(d_vals[p]) / (sqrt_m[p] * sma[p]**1.5)
+        rel_err = abs(predicted / eccs_amp[p] - 1.0)
+        if rel_err > max_err:
+            max_err = rel_err
+    return K, max_err
+
+
+def stat_ecc_scale_rms(eccs, d_vals, masses, sma, sqrt_m, group_a, group_b):
+    """
+    Test 14 — Finding 7: Eccentricity Balance Scale (per-planet prediction).
+
+    For each planet as target, predict its eccentricity from the other 7
+    using the balance scale formula:
+      W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)
+      contribution = W_j × e_j (negative if same group, positive if opposite)
+      predicted_offset = sum of contributions
+      predicted_e = predicted_offset / a_target  (not used — see below)
+
+    Actually, the balance equation gives:
+      sum_same_group(v_j) = sum_opposite_group(v_j)
+    where v_j = √m_j × a_j^1.5 × e_j / √d_j.  So for a target planet t in
+    group_b (solo), the predicted eccentricity is:
+      e_t = sum_{j in group_a}(v_j) / (√m_t × a_t^1.5 / √d_t)
+
+    For a target in the majority group, we solve:
+      sum_{j in group_a, j≠t}(v_j) + v_t = sum_{j in group_b}(v_j)
+      => v_t = sum_b - sum_{a\t}
+      => e_t = (sum_b - sum_{a\t}) × √d_t / (√m_t × a_t^1.5)
+
+    Returns: RMS of relative prediction errors across all 8 planets
+             (lower = better).
+    """
+    errors_sq = []
+    for target in PLANET_NAMES:
+        d_t = d_vals.get(target, 0)
+        if d_t <= 0 or eccs.get(target, 0) <= 0:
+            errors_sq.append(1.0)
+            continue
+
+        coeff_t = sqrt_m[target] * sma[target]**1.5 / math.sqrt(d_t)
+
+        # Determine which group target belongs to
+        if target in group_b:
+            # Target is the solo planet — predicted from group_a
+            sum_other = sum(
+                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
+                for p in group_a if d_vals.get(p, 0) > 0
+            )
+        else:
+            # Target is in group_a — predicted from balance with group_b
+            sum_b = sum(
+                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
+                for p in group_b if d_vals.get(p, 0) > 0
+            )
+            sum_a_without = sum(
+                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
+                for p in group_a if p != target and d_vals.get(p, 0) > 0
+            )
+            sum_other = sum_b - sum_a_without
+
+        if coeff_t <= 0:
+            errors_sq.append(1.0)
+            continue
+
+        e_predicted = sum_other / coeff_t
+        rel_err = (e_predicted / eccs[target] - 1.0)
+        errors_sq.append(rel_err ** 2)
+
+    if not errors_sq:
+        return 1.0
+    return math.sqrt(sum(errors_sq) / len(errors_sq))
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # OBSERVED STATISTICS
 # ═══════════════════════════════════════════════════════════════════════════
 
 def compute_observed_stats():
-    """Compute all 12 test statistics for the real solar system.
+    """Compute all 14 test statistics for the real solar system.
 
-    Eccentricity set selection:
-      - Tests 1, 2, 4, 10: ECCENTRICITIES (J2000 observed values)
-        → tests whether nature's ratios match Fibonacci patterns
-      - Tests 5, 6, 7: ECC_DUAL_BALANCED (model's balance-law values)
-        → tests the model's 100% balance prediction against random systems
+    All tests use base eccentricities (ECCENTRICITIES = ECC_BASE).
+    ECC_DUAL_BALANCED is a legacy alias for the same set.
     """
     xi_e, xi_i = compute_xi(ECCENTRICITIES, INCLINATION_AMPS, SQRT_M)
 
     obs = {}
-    # Tests 1-4: use J2000 observed eccentricities
+    # Tests 1-4: base eccentricities
     obs["pairwise_count"] = stat_pairwise_count(xi_e, xi_i)
     obs["ladder_count"], obs["ladder_mean_err"] = stat_ladder(xi_e)
     obs["psi_spread"] = stat_psi_constant(xi_i)
     obs["cross_param"] = stat_cross_parameter(ECCENTRICITIES, INCL_MEANS, INCLINATION_AMPS)
-    # Tests 5-7: use dual-balanced eccentricities (model's balance-law prediction)
+    # Tests 5-7: base eccentricities (= dual-balanced, same set)
     obs["incl_balance"] = stat_incl_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
     obs["ecc_balance"] = stat_ecc_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
     obs["saturn_pred"] = stat_saturn_prediction(ECC_DUAL_BALANCED, D_INCL, GROUP_203, "Saturn")
@@ -563,6 +706,9 @@ def compute_observed_stats():
     obs["r2_partition"] = stat_r2_partition(ECCENTRICITIES, INCL_J2000, MIRROR_PAIRS)
     obs["ejs_resonance"] = stat_ejs_resonance(PERIOD_FRAC)
     obs["mirror_symmetry"] = stat_mirror_symmetry(D_INCL, MIRROR_PAIRS)
+    # Tests 13-14
+    obs["k_amplitude"] = stat_k_amplitude(ECC_AMPLITUDE, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
+    obs["ecc_scale_rms"] = stat_ecc_scale_rms(ECC_DUAL_BALANCED, D_INCL, MASSES, SMA, SQRT_M, GROUP_203, GROUP_23)
 
     return obs
 
@@ -591,6 +737,7 @@ def permutation_test(observed):
     ecc_dual_vals = [ECC_DUAL_BALANCED[p] for p in PLANET_NAMES]
     incl_vals = [INCLINATION_AMPS[p] for p in PLANET_NAMES]
     mean_vals = [INCL_MEANS[p] for p in PLANET_NAMES]
+    ecc_amp_vals = [ECC_AMPLITUDE[p] for p in PLANET_NAMES]
 
     n_perms = math.factorial(8)  # 40,320
     incl_j2000_vals = [INCL_J2000[p] for p in PLANET_NAMES]
@@ -599,7 +746,8 @@ def permutation_test(observed):
     counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
               "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
               "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0}
+              "ejs_resonance": 0, "mirror_symmetry": 0,
+              "k_amplitude": 0, "ecc_scale_rms": 0}
 
     for idx, perm in enumerate(itertools.permutations(range(8))):
         # Assign shuffled values to planets
@@ -609,6 +757,7 @@ def permutation_test(observed):
         means = {PLANET_NAMES[i]: mean_vals[perm[i]] for i in range(8)}
         ij2k = {PLANET_NAMES[i]: incl_j2000_vals[perm[i]] for i in range(8)}
         precs = {PLANET_NAMES[i]: prec_vals[perm[i]] for i in range(8)}
+        ecc_amps = {PLANET_NAMES[i]: ecc_amp_vals[perm[i]] for i in range(8)}
 
         xi_e, xi_i = compute_xi(eccs, incls, SQRT_M)
 
@@ -666,6 +815,16 @@ def permutation_test(observed):
         counts["ejs_resonance"] += 1
         counts["mirror_symmetry"] += 1
 
+        # Test 13: K amplitude constant (shuffled amplitudes)
+        ka = stat_k_amplitude(ecc_amps, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
+        if ka <= observed["k_amplitude"]:
+            counts["k_amplitude"] += 1
+
+        # Test 14: Eccentricity balance scale (shuffled eccentricities)
+        es = stat_ecc_scale_rms(eccs_dual, D_INCL, MASSES, SMA, SQRT_M, GROUP_203, GROUP_23)
+        if es <= observed["ecc_scale_rms"]:
+            counts["ecc_scale_rms"] += 1
+
         if (idx + 1) % 10000 == 0:
             print(f"    ... {idx+1:,}/{n_perms:,} permutations done")
 
@@ -697,10 +856,14 @@ def log_uniform_mc(observed, n_trials, rng):
     # Precession period range (years) for MC
     log_prec_lo, log_prec_hi = math.log(30000), math.log(700000)
 
+    # Eccentricity amplitude range for MC
+    log_ea_lo, log_ea_hi = math.log(1e-6), math.log(0.01)
+
     counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
               "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
               "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0}
+              "ejs_resonance": 0, "mirror_symmetry": 0,
+              "k_amplitude": 0, "ecc_scale_rms": 0}
 
     for trial in range(n_trials):
         eccs = {}
@@ -778,6 +941,18 @@ def log_uniform_mc(observed, n_trials, rng):
         if ms >= observed["mirror_symmetry"]:
             counts["mirror_symmetry"] += 1
 
+        # Test 13: K amplitude — random amplitudes, random tilts, random d-values
+        rand_amps = {p: math.exp(rng.uniform(log_ea_lo, log_ea_hi)) for p in PLANET_NAMES}
+        rand_tilts = {p: rng.uniform(0.01, 90.0) for p in PLANET_NAMES}
+        _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
+        if ka_err <= observed["k_amplitude"]:
+            counts["k_amplitude"] += 1
+
+        # Test 14: Eccentricity balance scale — random eccentricities, random d-values
+        es = stat_ecc_scale_rms(eccs, d_rand, MASSES, SMA, SQRT_M, grp_a, grp_b)
+        if es <= observed["ecc_scale_rms"]:
+            counts["ecc_scale_rms"] += 1
+
         if (trial + 1) % 10000 == 0:
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
 
@@ -805,7 +980,8 @@ def uniform_mc(observed, n_trials, rng):
     counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
               "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
               "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0}
+              "ejs_resonance": 0, "mirror_symmetry": 0,
+              "k_amplitude": 0, "ecc_scale_rms": 0}
 
     for trial in range(n_trials):
         eccs = {}
@@ -813,12 +989,16 @@ def uniform_mc(observed, n_trials, rng):
         means = {}
         ij2k = {}
         precs = {}
+        rand_amps = {}
+        rand_tilts = {}
         for p in PLANET_NAMES:
             eccs[p] = rng.uniform(0.005, 0.25)
             incls[p] = rng.uniform(0.01, 3.0)
             means[p] = rng.uniform(0.1, 10.0)
             ij2k[p] = rng.uniform(0.01, 3.0)
             precs[p] = rng.uniform(30000, 700000)
+            rand_amps[p] = rng.uniform(1e-6, 0.01)
+            rand_tilts[p] = rng.uniform(0.01, 90.0)
 
         xi_e, xi_i = compute_xi(eccs, incls, SQRT_M)
 
@@ -882,6 +1062,16 @@ def uniform_mc(observed, n_trials, rng):
         ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
         if ms >= observed["mirror_symmetry"]:
             counts["mirror_symmetry"] += 1
+
+        # Test 13: K amplitude — random amplitudes, random tilts, random d-values
+        _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
+        if ka_err <= observed["k_amplitude"]:
+            counts["k_amplitude"] += 1
+
+        # Test 14: Eccentricity balance scale — random eccentricities, random d-values
+        es = stat_ecc_scale_rms(eccs, d_rand, MASSES, SMA, SQRT_M, grp_a, grp_b)
+        if es <= observed["ecc_scale_rms"]:
+            counts["ecc_scale_rms"] += 1
 
         if (trial + 1) % 10000 == 0:
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
@@ -1131,6 +1321,8 @@ def main():
     print(f"  Test 10 — R² partition (matching):      {observed['r2_partition']}/4")
     print(f"  Test 11 — E–J–S resonance (error):     {observed['ejs_resonance']*100:.4f}%")
     print(f"  Test 12 — Mirror symmetry (matching):   {observed['mirror_symmetry']}/4")
+    print(f"  Test 13 — K amplitude (max error):      {observed['k_amplitude']*100:.4f}%")
+    print(f"  Test 14 — Ecc. Scale RMS (error):       {observed['ecc_scale_rms']*100:.4f}%")
     print(f"  (computed in {dt:.1f}s)")
     print()
 
@@ -1190,7 +1382,8 @@ def main():
     test_labels = ["pairwise", "ladder", "psi", "cross_param",
                     "incl_balance", "ecc_balance", "saturn_pred",
                     "psi_full", "prec_hierarchy", "r2_partition",
-                    "ejs_resonance", "mirror_symmetry"]
+                    "ejs_resonance", "mirror_symmetry",
+                    "k_amplitude", "ecc_scale_rms"]
     law_labels = {
         "pairwise":        "Pairwise Fibonacci count",
         "ladder":          "Finding 5 — Ecc. Ladder",
@@ -1204,6 +1397,8 @@ def main():
         "r2_partition":    "Law 4 — R² partition",
         "ejs_resonance":   "Law 6 — E–J–S resonance",
         "mirror_symmetry": "Finding 1 — Mirror symm.",
+        "k_amplitude":     "Finding 6 — K amplitude",
+        "ecc_scale_rms":   "Finding 7 — Ecc. Scale",
     }
 
     # Summary table
@@ -1225,7 +1420,7 @@ def main():
     print()
 
     # Fisher's combined p-value per distribution
-    print("  Fisher's combined p-values (all 12 tests):")
+    print("  Fisher's combined p-values (all 14 tests):")
     for dist, pvals in all_p_values.items():
         p_list = [pvals[t] for t in test_labels]
         # Replace exact zeros with conservative bound

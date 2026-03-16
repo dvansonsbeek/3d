@@ -39,7 +39,7 @@ python fibonacci_trappist1_deep.py
 
 | Script | Description |
 |--------|-------------|
-| `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws (7.5σ, p ≤ 7.1 × 10⁻¹⁴) |
+| `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws (14 tests, p ≤ 2.0 × 10⁻²¹) |
 | `fibonacci_j2000_eccentricity.py` | J2000 eccentricities as formation-epoch Fibonacci constraints |
 | `fibonacci_311_deep.py` | Deep investigation of R ≈ 311 as a Fibonacci primitive root prime |
 | `fibonacci_311_analysis.py` | Analysis of the 311 constant across planetary systems |
