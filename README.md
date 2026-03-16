@@ -12,7 +12,7 @@
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 
-This interactive 3D simulation visualizes the **Fibonacci Laws of Planetary Motion** — six laws that connect every planet's orbital tilt, shape, and precession to a single timescale. Built with just **6 free parameters**, it models precession, eccentricity, inclination, obliquity, and perihelion movements from a geo-heliocentric frame of reference.
+This interactive 3D simulation visualizes the **Fibonacci Laws of Planetary Motion** — six laws that connect every planet's orbital tilt, shape, and precession to a single timescale. Built with just **6 free parameters**, the simulation accurately reproduces the geocentric positions of the Sun, Moon, and all seven planets — verified against JPL Horizons ephemeris data (~1800–2200 AD) and over 700 historical astronomical observations (~2000 BC to ~4000 AD). From the same geometric framework, it simultaneously produces obliquity, eccentricity, perihelion precession, and inclination oscillation for all planets.
 
 ---
 
@@ -90,9 +90,11 @@ npm run build
 ## Features
 
 - Interactive 3D solar system with textured planets, rings, shadows, and starfield
+- Equation of center (variable speed) and empirical parallax corrections for all planets
 - Time controls: play, pause, speed adjustment, and date navigation
 - Click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts, and precession analysis
+- [Eccentricity Balance Scale](docs/38-eccentricity-scale.md) for visualizing Law 5 balance per planet
 - [Invariable Plane Balance Explorer](docs/53-balance-explorer-reference.md) for interactive Fibonacci Law testing
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
