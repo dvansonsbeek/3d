@@ -144,19 +144,23 @@ Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
 ## 5. Accuracy
 
-### Current Baselines (JPL, 2000–2200)
+### Current Baselines
 
-| Planet | n pts | Tier | RMS Tot |
-|--------|-------|------|---------|
-| Mercury | 95 | 42p | **0.01°** |
-| Venus | 3812 | 42p | **0.22°** |
-| Mars | 184 | 30p | **0.02°** |
-| Jupiter | 2499 | 42p | **0.06°** |
-| Saturn | 2502 | 36p | **0.10°** |
-| Uranus | 41 | 24p | **0.01°** |
-| Neptune | 69 | 24p | **0.01°** |
+RMS is computed over all weighted reference data (tier 2, weight > 0). The reference data spans well beyond the 2000–2200 enrichment window for most planets:
 
-All 7 planets within 0.22°. Five under 0.06°.
+| Planet | n pts | Tier | RMS Tot | Data range | Primary source |
+|--------|-------|------|---------|------------|----------------|
+| Mercury | 95 | 42p | **0.01°** | 1803–2200 | NASA Mercury Transit Catalog |
+| Venus | 3812 | 42p | **0.22°** | 1875–2200 | JPL Horizons (incl. IC-dense) |
+| Mars | 184 | 30p | **0.02°** | 1899–2200 | Meeus opposition tables |
+| Jupiter | 2499 | 42p | **0.06°** | 1803–2200 | JPL Horizons |
+| Saturn | 2502 | 36p | **0.10°** | 1803–2200 | JPL Horizons |
+| Uranus | 41 | 24p | **0.01°** | 2000–2200 | JPL Horizons |
+| Neptune | 69 | 24p | **0.01°** | 1805–2200 | JPL Horizons / mutual events |
+
+All 7 planets within 0.22°. Five under 0.06°. The accuracy holds over ~200–400 years for most planets (back to ~1800), not just the 2000–2200 window.
+
+Additional ancient observation data (tier 3, back to ~1000 BC, from ISAW/mutual event catalogs) is present in the reference dataset with weight=0. These are available for visual comparison but do not contribute to the RMS.
 
 ### Remaining Error Sources
 
@@ -252,4 +256,7 @@ The empirical approach works because it operates directly in RA/Dec output space
 
 ## 9. Reference Data
 
-JPL Horizons ephemeris data in `config/reference-data.json`. Each planet has 41–3812 data points spanning 2000–2200, with RA/Dec in J2000 frame. The precession module (`tools/lib/precession.js`) converts J2000 to of-date frame before comparison with the model. Venus has been enriched to 3812 points (including IC-dense sampling near 125 inferior conjunctions). Jupiter and Saturn have been enriched to ~2500 points for robust higher-tier fitting.
+Reference data in `config/reference-data.json` contains two tiers per planet:
+
+- **Tier 2 (weight > 0)**: 41–3812 data points per planet, spanning ~1800–2200 for most planets (Uranus: 2000–2200 only). Sources include JPL Horizons API, NASA Mercury Transit Catalog, and Meeus opposition tables. RA/Dec in J2000 frame — the precession module (`tools/lib/precession.js`) converts to of-date frame before comparison with the model. Venus has been enriched to 3812 points (including IC-dense sampling near 125 inferior conjunctions). Jupiter and Saturn have been enriched to ~2500 points for robust higher-tier fitting.
+- **Tier 3 (weight = 0)**: Ancient observation data back to ~1000 BC from ISAW and mutual planetary event catalogs. Available for visual comparison but excluded from RMS calculations and parallax fitting.
