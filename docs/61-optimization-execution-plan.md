@@ -1333,25 +1333,27 @@ The remaining steps were executed as a systematic campaign covering:
 
 2. **Orbital period calibration**: `solarYearInput` values tuned using ISAW ancient observation data (800 BCE–1650 CE) to minimize long-term drift. See `docs/68-orbital-period-calibration.md`.
 
-3. **Empirical parallax correction**: Up to 36-parameter correction per planet (basis functions A–AK), fitted by linear least squares against enriched JPL reference data. Per-planet tier selection via LOOCV/k-fold CV. Venus, Jupiter, Saturn enriched to ~2500 reference points. See `docs/67-planet-parallax-corrections.md`.
+3. **Empirical parallax correction**: Up to 42-parameter correction per planet (basis functions A–AQ), fitted by linear least squares against enriched JPL reference data. Per-planet tier selection via LOOCV/k-fold CV. Venus enriched to ~3800 reference points, Jupiter/Saturn to ~2500. See `docs/67-planet-parallax-corrections.md`.
 
 4. **IAU precession correction**: `tools/lib/precession.js` applies IAU 1976 precession to convert JPL J2000 RA/Dec to of-date frame before comparison, resolving the frame mismatch documented in Section 8.5.
 
-**Final results** (all 9 targets, 2000–2200):
+**Final results** (all 9 targets, ~1800–2200, current as of 2026-03-16):
 
 | Target | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| Sun | 0.714° | 0.065° | 91% |
+| Sun | 0.714° | 0.003° | 99.6% |
 | Moon | 6.267° | 0.01° | 99.8% |
 | Mercury | 4.908° | 0.01° | 99.8% |
-| Venus | 3.709° | 0.24° | 93.5% |
+| Venus | 3.709° | 0.22° | 94.1% |
 | Mars | 3.121° | 0.02° | 99.4% |
 | Jupiter | 1.974° | 0.06° | 97.0% |
 | Saturn | 3.291° | 0.10° | 97.0% |
 | Uranus | 1.372° | 0.01° | 99.3% |
 | Neptune | 1.496° | 0.01° | 99.3% |
 
-All 9 targets within 0.24°. Seven under 0.10°. Average improvement: 97%.
+All 9 targets within 0.22°. Seven under 0.06°. Average improvement: 98%.
+
+> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.493231 and earthRAAngle to 1.25363. Parallax tiers were expanded to 42p for Mercury/Venus/Jupiter, 36p for Saturn, and 24p for Uranus/Neptune. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 

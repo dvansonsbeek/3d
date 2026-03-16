@@ -94,7 +94,7 @@ Equivalently:
 amplitude = ψ / (d × √m)
 ```
 
-This holds for all 8 planets with a single universal ψ = 3.302 × 10⁻³.
+This holds for all 8 planets with a single universal ψ = 3.291 × 10⁻³.
 
 ### Law 3: The Inclination Balance
 
@@ -605,15 +605,15 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
 | √m | | 1.7329 × 10⁻³ |
 | d × √m | 3 × 1.7329 × 10⁻³ | 5.1986 × 10⁻³ |
-| **amplitude** | **3.302005 × 10⁻³ / 5.1986 × 10⁻³** | **0.635185°** |
+| **amplitude** | **3.290966 × 10⁻³ / 5.1992 × 10⁻³** | **0.632976°** |
 
 The mean is computed from the J2000 constraint:
 
 ```
 mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
-     = 1.57867° - 0.635185° × cos(284.51° - 203.3195°)
-     = 1.57867° - 0.635185° × 0.15318
-     = 1.48137°
+     = 1.57867° - 0.632976° × cos(284.51° - 203.3195°)
+     = 1.57867° - 0.632976° × 0.15315
+     = 1.48173°
 ```
 
 #### Fibonacci vs IAU 2006-Optimized Values

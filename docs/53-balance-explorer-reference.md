@@ -208,15 +208,15 @@ Useful experiments to try:
 
 ### Why Earth Is Locked
 
-Earth's inclination amplitude (0.635185°) is derived from the temperature/obliquity model — it is not a free parameter. With d = 3:
+Earth's inclination amplitude (0.632976°) is predicted by the Fibonacci formula. With d = 3:
 
 ```
 amplitude = ψ / (3 × √m_Earth)
-          = 3.302005e-3 / (3 × 1.7328e-3)
-          = 0.635185°
+          = 3.290966e-3 / (3 × 1.7331e-3)
+          = 0.632976°
 ```
 
-This matches the observed oscillation. Changing Earth's d would break this calibration.
+The model's calibrated value (0.635970°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
 
 ---
 

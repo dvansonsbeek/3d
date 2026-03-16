@@ -9,7 +9,7 @@
 - [64-type-iii-outer-planets.md](64-type-iii-outer-planets.md) — Type III eccentricity (Jupiter–Neptune)
 - [65-equation-of-center.md](65-equation-of-center.md) — Variable speed / Kepler's 2nd law
 - [66-moon-meeus-corrections.md](66-moon-meeus-corrections.md) — Meeus Ch. 47 lunar perturbations
-- [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) — Up to 36-parameter parallax correction
+- [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) — Up to 42-parameter parallax correction
 - [68-orbital-period-calibration.md](68-orbital-period-calibration.md) — Ancient observation calibration
 - [69-optimization-baseline.md](69-optimization-baseline.md) — Baseline results
 
