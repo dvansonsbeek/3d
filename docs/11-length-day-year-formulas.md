@@ -279,10 +279,10 @@ The tropical year length depends on *which* cardinal point is used to measure it
 
 | Cardinal point | Year length | Relative to mean | Reason |
 |----------------|-------------|-------------------|--------|
-| Summer Solstice | 365.241926 days | −23 s (shortest) | Aphelion nearby → fast orbital speed |
-| Autumnal Equinox | 365.242129 days | −5 s | Transition |
-| Vernal Equinox | 365.242250 days | +5 s | Transition |
-| Winter Solstice | 365.242449 days | +23 s (longest) | Perihelion nearby → slow orbital speed |
+| Summer Solstice | 365.241660 days | −46 s (shortest) | Aphelion nearby → fast orbital speed |
+| Vernal Equinox | 365.242077 days | −10 s | Transition |
+| Autumnal Equinox | 365.242318 days | +10 s | Transition |
+| Winter Solstice | 365.242709 days | +45 s (longest) | Perihelion nearby → slow orbital speed |
 
 This pattern reverses when perihelion precesses to July (~11,680 AD): WS becomes shortest, SS becomes longest. The *mean* of all four cardinal points cancels this effect and gives the true mean tropical year. The Fourier harmonics model this mean directly.
 
