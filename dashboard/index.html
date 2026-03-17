@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbital Data Explorer — Holistic Universe</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js" charset="utf-8"></script>
+</head>
+<body class="light-mode">
+  <header id="header">
+    <div class="header-left">
+      <h1>Orbital Data Explorer</h1>
+      <span class="header-subtitle">Fibonacci Laws of Planetary Motion</span>
+    </div>
+    <div class="planet-bar" id="planet-bar">
+        <button class="planet-btn active" data-planet="earth" style="--pc:#2e64be">Earth</button>
+        <button class="planet-btn" data-planet="mercury" style="--pc:#9e9e9e">Me</button>
+        <button class="planet-btn" data-planet="venus" style="--pc:#d5ab37">Ve</button>
+        <button class="planet-btn" data-planet="mars" style="--pc:#d04a3e">Ma</button>
+        <button class="planet-btn" data-planet="jupiter" style="--pc:#c97e4f">Ju</button>
+        <button class="planet-btn" data-planet="saturn" style="--pc:#d9b65c">Sa</button>
+        <button class="planet-btn" data-planet="uranus" style="--pc:#37c6d0">Ur</button>
+        <button class="planet-btn" data-planet="neptune" style="--pc:#4a7abf">Ne</button>
+    </div>
+    <div class="header-controls">
+      <div class="range-toggle" id="range-toggle">
+        <button class="range-btn active" data-range="full">Full H</button>
+        <button class="range-btn" data-range="h3">H/3</button>
+        <button class="range-btn" data-range="h5">H/5</button>
+        <button class="range-btn" data-range="h8">H/8</button>
+        <button class="range-btn" data-range="h13">H/13</button>
+        <button class="range-btn" data-range="h16">H/16</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">&#x263E;</button>
+      <a class="header-link" href="https://3d.holisticuniverse.com" target="_blank" rel="noopener">3D Simulation</a>
+    </div>
+  </header>
+
+  <!-- Jump navigation -->
+  <nav class="jump-nav" id="jump-nav">
+    <a href="#panel-obliquity" class="jump-link active" data-panel="panel-obliquity">Obl</a>
+    <a href="#panel-eccentricity" class="jump-link" data-panel="panel-eccentricity">Ecc</a>
+    <a href="#panel-ascending-node" class="jump-link" data-panel="panel-ascending-node">AN</a>
+    <a href="#panel-arg-perihelion" class="jump-link" data-panel="panel-arg-perihelion">AP</a>
+    <a href="#panel-lon-perihelion" class="jump-link" data-panel="panel-lon-perihelion">LP</a>
+    <a href="#panel-year-length" class="jump-link earth-only-link" data-panel="panel-year-length">YL</a>
+    <a href="#panel-precession" class="jump-link earth-only-link" data-panel="panel-precession">Pr</a>
+  </nav>
+
+  <main id="main">
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading orbital data...</span>
+    </div>
+
+    <!-- Common charts (all planets) -->
+    <section class="chart-panel" id="panel-obliquity">
+      <div class="chart-header">
+        <h2 class="chart-title">Obliquity</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-obliquity"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-eccentricity">
+      <div class="chart-header">
+        <h2 class="chart-title">Eccentricity</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-eccentricity"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-ascending-node">
+      <div class="chart-header">
+        <h2 class="chart-title">Ascending Node</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-ascending-node"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-arg-perihelion">
+      <div class="chart-header">
+        <h2 class="chart-title">Argument of Perihelion</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-arg-perihelion"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-lon-perihelion">
+      <div class="chart-header">
+        <h2 class="chart-title">Longitude of Perihelion</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-lon-perihelion"></div>
+    </section>
+
+    <!-- Earth-only charts -->
+    <section class="chart-panel earth-only" id="panel-year-length">
+      <div class="chart-header">
+        <h2 class="chart-title">Year Lengths <span class="earth-badge">Earth</span></h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-year-length"></div>
+    </section>
+
+    <section class="chart-panel earth-only" id="panel-precession">
+      <div class="chart-header">
+        <h2 class="chart-title">Axial Precession Period <span class="earth-badge">Earth</span></h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-precession"></div>
+    </section>
+
+    <section class="info-panel" id="info-panel">
+      <h2 class="chart-title">Planet Constants</h2>
+      <div class="info-grid" id="info-grid"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
