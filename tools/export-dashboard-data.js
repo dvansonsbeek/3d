@@ -51,8 +51,8 @@ function computePlanetBalancedYear(planetName) {
   return 2000 - (phaseJ2000 / 360) * cycleLength;
 }
 
-// Compute ascending node at a given year (linear precession from J2000)
-function computeAscendingNode(ascNodeJ2000, precessionPeriod, year) {
+// Linear ascending node (fallback for Earth which has no orbitTilta/b in constants)
+function computeAscendingNodeLinear(ascNodeJ2000, precessionPeriod, year) {
   const rate = 360 / precessionPeriod;
   return ((ascNodeJ2000 + rate * (year - 2000)) % 360 + 360) % 360;
 }
@@ -97,7 +97,7 @@ function exportEarth(years) {
     lonPerihelion.push(+el.perihelionLong.toFixed(4));
 
     // Ascending node (linear precession for Earth)
-    const ascNode = computeAscendingNode(earthAscNodeJ2000, earthPeriPeriod, year);
+    const ascNode = computeAscendingNodeLinear(earthAscNodeJ2000, earthPeriPeriod, year);
     ascendingNode.push(+ascNode.toFixed(4));
 
     // Argument of perihelion: ω = lon_perihelion - ascending_node
@@ -143,9 +143,6 @@ function exportPlanet(planetName, years) {
   const inclinationTilt = [];
   const lonPerihelion = [], ascendingNode = [], argPerihelion = [];
 
-  // Anchor obliquity to J2000: compute model's inclination at J2000
-  const inclAtJ2000 = OE.computePlanetInvPlaneInclinationDynamic(planetName, 2000);
-
   for (const year of years) {
     // Eccentricity
     const ecc = OE.computeEccentricity(
@@ -159,9 +156,8 @@ function exportPlanet(planetName, years) {
     inclination.push(+incl.toFixed(6));
     inclinationTilt.push(+incl.toFixed(6));
 
-    // Obliquity = axialTilt_J2000 + (inclination(t) - inclination(J2000))
-    // Guarantees obliquity(2000) = axialTiltMean (the known J2000 value)
-    const obliq = p.axialTiltMean + (incl - inclAtJ2000);
+    // Obliquity from simulation formula (anchored to J2000)
+    const obliq = OE.computePlanetObliquity(planetName, year);
     obliquity.push(+obliq.toFixed(6));
 
     // Longitude of perihelion (linear precession)
@@ -170,14 +166,17 @@ function exportPlanet(planetName, years) {
     );
     lonPerihelion.push(+lonPeri.toFixed(4));
 
-    // Ascending node (linear precession)
-    const ascNode = computeAscendingNode(
-      p.ascendingNode, p.perihelionEclipticYears, year
-    );
+    // Ascending node (dynamic rate-based if tilts available, linear fallback)
+    let ascNode;
+    if (p.orbitTilta !== undefined) {
+      ascNode = OE.calculateDynamicAscendingNodeFromTilts(p.orbitTilta, p.orbitTiltb, year);
+    } else {
+      ascNode = computeAscendingNodeLinear(p.ascendingNode, p.perihelionEclipticYears, year);
+    }
     ascendingNode.push(+ascNode.toFixed(4));
 
-    // Argument of perihelion: ω = lon_perihelion - ascending_node
-    const omega = ((lonPeri - ascNode) % 360 + 360) % 360;
+    // Argument of perihelion
+    const omega = OE.computeArgumentOfPerihelion(lonPeri, ascNode);
     argPerihelion.push(+omega.toFixed(4));
   }
 

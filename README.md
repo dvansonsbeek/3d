@@ -79,6 +79,17 @@ npm start
 
 The simulation will open in your browser at `http://localhost:1234`
 
+### Orbital Data Explorer (Dashboard)
+
+An interactive data dashboard for exploring planetary orbital elements across a full Holistic Year:
+
+```bash
+npm run dashboard:export   # generate JSON data from the orbital engine
+npm run dashboard          # start dashboard at http://localhost:5050
+```
+
+Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV export, range presets (Full H, H/3, H/5, H/8, H/13, H/16), and obliquity decomposition for Earth.
+
 ### Build for Production
 
 ```bash

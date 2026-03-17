@@ -112,6 +112,9 @@ const planets = {
     // Fibonacci-derived inclination parameters
     invPlaneInclinationMean: 6.726620,
     invPlaneInclinationAmplitude: 0.384621,
+    obliquityCycle: H * 8 / 3,  // 8H/3 = 893,355 yr (observed ~895 kyr, Bills 2005)
+    orbitTilta: 5.23265097,     // sin(Ω)*i for ascending node dynamics
+    orbitTiltb: 4.65715524,     // cos(Ω)*i for ascending node dynamics
   },
   venus: {
     name: 'Venus',
@@ -136,6 +139,9 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 2.207361,
     invPlaneInclinationAmplitude: 0.061866,
+    obliquityCycle: null,           // N/A — tidally damped at 177°
+    orbitTilta: 3.30333743,
+    orbitTiltb: 0.78216832,
   },
   mars: {
     name: 'Mars',
@@ -160,6 +166,9 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 2.649893,
     invPlaneInclinationAmplitude: 1.158626,
+    obliquityCycle: 3 * H / 8,     // 3H/8 = 125,628 yr (observed ~124,800 yr, Laskar 2004)
+    orbitTilta: 1.40771866,
+    orbitTiltb: 1.19986938,
   },
   jupiter: {
     name: 'Jupiter',
@@ -184,6 +193,9 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 0.329100,
     invPlaneInclinationAmplitude: 0.021301,
+    obliquityCycle: H / 2,          // H/2 = 167,504 yr (prediction)
+    orbitTilta: 1.28260534,
+    orbitTiltb: -0.23743407,
   },
   saturn: {
     name: 'Saturn',
@@ -208,6 +220,9 @@ const planets = {
     inclinationPhaseAngle: 23.3195,   // Saturn: sole 23° planet
     invPlaneInclinationMean: 0.931678,
     invPlaneInclinationAmplitude: 0.064879,
+    obliquityCycle: H / 3,          // H/3 = 111,669 yr (prediction, mirror-pair with Earth)
+    orbitTilta: 2.27728294,
+    orbitTiltb: -0.99706468,
   },
   uranus: {
     name: 'Uranus',
@@ -232,6 +247,9 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 1.000600,
     invPlaneInclinationAmplitude: 0.023716,
+    obliquityCycle: H / 2,          // H/2 = 167,504 yr (prediction, tentative)
+    orbitTilta: 0.74274130,
+    orbitTiltb: 0.21284872,
   },
   neptune: {
     name: 'Neptune',
@@ -256,6 +274,9 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 0.722190,
     invPlaneInclinationAmplitude: 0.013486,
+    obliquityCycle: null,           // N/A — frozen at ~28°
+    orbitTilta: 1.31982602,
+    orbitTiltb: -1.17945460,
   },
 };
 

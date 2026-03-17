@@ -793,3 +793,30 @@ All planetary formulas are implemented in Python for consistency and to handle t
 > - Coefficient files: `mercury_coeffs.py`, `venus_coeffs.py`, `mars_coeffs.py`, `jupiter_coeffs.py`, `saturn_coeffs.py`, `uranus_coeffs.py`, `neptune_coeffs.py`
 >
 > Venus uses a specialized V3_VENUS feature matrix with 328 terms (including ERD³, 4δ harmonics, and obliquity/eccentricity coupling) to achieve 0.46 arcsec accuracy. Other planets use the standard 225-term V2 matrix.
+
+### All Planets: Dynamic Obliquity (Axial Tilt)
+
+Each planet's obliquity oscillates over time as its orbital plane tilts relative to the invariable plane. The obliquity cycle periods are predicted from Fibonacci decomposition of the perihelion ecliptic rate (see [doc 37](37-planets-precession-cycles.md) § Obliquity Cycle Theory).
+
+**Formula:**
+
+```
+obliquity(t) = axialTilt_J2000 + (inclination(t) - inclination(J2000))
+```
+
+where `inclination(t)` is the dynamic invariable-plane inclination from `calc_planet_inclination()`. This anchors the obliquity to the known J2000 axial tilt and ties the oscillation to the inclination dynamics.
+
+**Predicted obliquity cycles:**
+
+| Planet | Period | H-expression | Status |
+|--------|--------|-------------|--------|
+| Mercury | 893,355 yr | 8H/3 | Confirmed (0.2% vs ~895 kyr, Bills 2005) |
+| Venus | N/A | — | Tidally damped at 177° |
+| Earth | 41,876 yr | H/8 | Confirmed (2% vs ~41 kyr) |
+| Mars | 125,628 yr | 3H/8 | Confirmed (0.7% vs ~124,800 yr, Laskar 2004) |
+| Jupiter | 167,504 yr | H/2 | Prediction |
+| Saturn | 111,669 yr | H/3 | Prediction (mirror-pair with Earth) |
+| Uranus | 167,504 yr | H/2 | Prediction (tentative) |
+| Neptune | N/A | — | Frozen at ~28° |
+
+**Implementation:** `calc_planet_obliquity()` in [predictive_formula.py](scripts/predictive_formula.py), `computePlanetObliquity()` in script.js and [orbital-engine.js](../tools/lib/orbital-engine.js).

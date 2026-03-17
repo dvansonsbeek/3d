@@ -109,6 +109,19 @@ print(f"Eccentricity: {earth['eccentricity']:.10f}")
 print(f"ERD: {earth['erd']:.10f} °/yr")
 ```
 
+### Getting Planet Obliquity
+
+```python
+from predictive_formula import calc_planet_obliquity
+
+# Dynamic obliquity anchored to J2000 axial tilt
+for planet in ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']:
+    obliq = calc_planet_obliquity(planet, 2000)
+    print(f"{planet}: {obliq:.4f}°")
+```
+
+Obliquity oscillates with Fibonacci-predicted periods (see [doc 37](../37-planets-precession-cycles.md)). Venus and Neptune return static values (no obliquity cycle).
+
 ## Retraining the Model
 
 If you have updated observed data, you can retrain the coefficients:

@@ -182,6 +182,21 @@ AXIAL_TILT = {
     "Jupiter":  3.13,    "Saturn": 26.73,   "Uranus": 82.23,    "Neptune": 28.32,
 }
 
+# Predicted obliquity cycle periods (years) from Fibonacci decomposition
+# See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory
+# Mercury, Earth, Mars: confirmed (0.2%, 2%, 0.7% error vs observations)
+# Jupiter, Saturn, Uranus: predictions; Venus, Neptune: N/A
+OBLIQUITY_CYCLE = {
+    "Mercury": H * 8 / 3,     # 8H/3 = 893,355 yr (observed ~895 kyr, Bills 2005)
+    "Venus":   None,           # N/A — tidally damped at 177°
+    "Earth":   H / 8,          # H/8 = 41,876 yr (observed ~41,000 yr)
+    "Mars":    3 * H / 8,      # 3H/8 = 125,628 yr (observed ~124,800 yr, Laskar 2004)
+    "Jupiter": H / 2,          # H/2 = 167,504 yr (prediction)
+    "Saturn":  H / 3,          # H/3 = 111,669 yr (prediction, mirror-pair with Earth)
+    "Uranus":  H / 2,          # H/2 = 167,504 yr (prediction, tentative)
+    "Neptune": None,           # N/A — frozen at ~28°
+}
+
 ECC_AMPLITUDE = {
     "Mercury": 8.436789e-5,
     "Venus":   9.625389e-4,

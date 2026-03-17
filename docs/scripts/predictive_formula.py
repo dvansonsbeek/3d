@@ -39,6 +39,7 @@ from constants_scripts import (
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
     INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
+    AXIAL_TILT, OBLIQUITY_CYCLE,
 )
 
 # =============================================================================
@@ -428,6 +429,34 @@ def calc_planet_eccentricity(planet: str, year: int) -> float:
     t = year - J2000
     period = H / 16
     return base + amp * math.cos(2 * math.pi * t / period + phase_j2000)
+
+
+def calc_planet_obliquity(planet: str, year: int) -> float:
+    """
+    Calculate planet's dynamic obliquity (axial tilt) at given year.
+
+    Anchored to J2000: at year 2000, returns the known axial tilt.
+    Oscillation tied to invariable-plane inclination dynamics.
+    Venus and Neptune have no obliquity cycle (returns static value).
+
+    See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory.
+
+    Args:
+        planet: Planet name (e.g. 'Mercury')
+        year: Calendar year
+
+    Returns: Obliquity in degrees
+    """
+    if planet == "Earth":
+        return calc_obliquity(year)
+    cycle = OBLIQUITY_CYCLE.get(planet)
+    tilt_j2000 = AXIAL_TILT[planet]
+    if cycle is None:
+        return tilt_j2000
+    # Anchor to J2000 via inclination oscillation
+    incl_j2000 = calc_planet_inclination(planet, J2000)
+    incl_now = calc_planet_inclination(planet, year)
+    return tilt_j2000 + (incl_now - incl_j2000)
 
 
 # =============================================================================

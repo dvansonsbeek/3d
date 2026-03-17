@@ -4,6 +4,8 @@
   "scripts": {
     "start": "parcel src/index.html",
     "dev": "parcel src/index.html",
+    "dashboard": "npx serve dashboard -l 5050",
+    "dashboard:export": "node tools/export-dashboard-data.js",
     "build": "parcel build src/index.html --dist-dir dist"
   },
   "dependencies": {
