@@ -29,7 +29,7 @@ const perihelionalignmentYear = 1246;
 const startmodelJD = 2451716.5;
 const startmodelYear = 2000.5;
 const correctionDays = -0.23328398168087;
-const correctionSun = 0.493231;
+const correctionSun = 0.494476;
 const temperatureGraphMostLikely = 14.5;
 const startAngleModel = 89.91949879;
 const useVariableSpeed = true; // Toggle equation of center (must match script.js)
@@ -55,10 +55,12 @@ const massRatioDE440 = {
 // ASTRO_REFERENCE (section 8): earthEccentricityJ2000, earthPerihelionLongitudeJ2000,
 // earthAscendingNodeInvPlane, earthInclinationPhaseAngle.
 
-const earthRAAngle = 1.25363;
-const earthtiltMean = 23.41357;
-const earthInvPlaneInclinationMean = 1.481179;
+const earthtiltMean = 23.41349;
 const earthInvPlaneInclinationAmplitude = 0.635970;
+// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
+const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
+const earthInvPlaneInclinationMean = 1.481179;
+const earthAscendingNodeInvPlane = 284.51;  // J2000 ascending node on invariable plane (degrees)
 const eccentricityBase = 0.015372;
 const eccentricityAmplitude = 0.00137032;
 // K = eccentricityAmplitude × √m_Earth × a_Earth^(3/2) / (sin(tiltMean) × √d_Earth)
@@ -372,6 +374,7 @@ const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearIC
 const ASTRO_REFERENCE = {
   // --- Earth orbital parameters (J2000) ---
   juneSolstice2000_JD: 2451716.575,       // June 21, 2000 01:48 UTC
+  obliquityJ2000_deg: 23.439291111,            // IAU 2006 / Meeus
   earthEccentricityJ2000: 0.01671022,
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   earthAscendingNodeInvPlane: 284.51,      // Souami & Souchay (2012)
@@ -715,6 +718,47 @@ const CARDINAL_POINT_HARMONICS = {
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;
 
 
+// ─── 12d. PRECESSION PREDICTION (429-term ML system) ────────────────────
+// Per-planet configs (period, J2000 perihelion angle, baseline rate) and
+// retrained ridge-regression coefficients. See PREDICTIVE_FORMULA_GUIDE.mdx.
+// Built from existing planet data — no duplicated constants
+// Period is always positive (absolute value) for the feature builder.
+// Sign of baseline reflects prograde/retrograde precession.
+const PREDICT_PLANETS = {};
+for (const [key, p] of Object.entries(planets)) {
+  if (!p.perihelionEclipticYears || !p.longitudePerihelion) continue;
+  const absPeriod = Math.abs(p.perihelionEclipticYears);
+  const sign = p.perihelionEclipticYears < 0 ? -1 : 1;
+  PREDICT_PLANETS[key] = {
+    period: absPeriod,
+    theta0: p.longitudePerihelion,
+    baseline: sign * 1296000 / absPeriod * 100,
+  };
+}
+
+// 429 coefficients per planet (trained via ridge regression, α=0.01)
+const PREDICT_COEFFS = (() => {
+  // Load from the retrained coefficient files
+  const coeffs = {};
+  const fs = require('fs');
+  const path = require('path');
+  const dir = path.join(__dirname, '..', '..', 'docs', 'scripts');
+  for (const p of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
+    const file = path.join(dir, `${p}_coeffs_unified.py`);
+    const content = fs.readFileSync(file, 'utf8');
+    // Extract the coefficient array from Python file
+    const match = content.match(/\[([^\]]+)\]/s);
+    if (match) {
+      coeffs[p] = match[1].split('\n')
+        .map(l => l.replace(/#.*$/, '').trim())
+        .filter(l => l)
+        .map(l => parseFloat(l.replace(/,\s*$/, '')))
+        .filter(v => !isNaN(v));
+    }
+  }
+  return coeffs;
+})();
+
 // ─── 13. UTILITIES ───────────────────────────────────────────────────────
 
 // --- Date conversion ---
@@ -825,6 +869,7 @@ module.exports = {
   earthtiltMean,
   earthInvPlaneInclinationMean,
   earthInvPlaneInclinationAmplitude,
+  earthAscendingNodeInvPlane,
   eccentricityBase,
   eccentricityAmplitude,
   eccentricityAmplitudeK,
@@ -915,6 +960,8 @@ module.exports = {
   CARDINAL_POINT_HARMONICS,
   CARDINAL_POINT_ANCHORS,
   PERI_OFFSET,
+  PREDICT_PLANETS,
+  PREDICT_COEFFS,
 
   // Date utilities
   jdToCalendar,

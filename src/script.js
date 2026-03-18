@@ -38,10 +38,11 @@ const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthRAAngle = 1.25363;
-// Optimized for solstice timing (3708 min/deg) and geometry (sun.dec at solstice, 3.2"/deg). Also depends on temperatureGraphMostLikely, earthtiltMean & earthInvPlaneInclinationAmplitude.
-const earthtiltMean = 23.41357;                           // 3D model + formula (optimized for IAU 2006)
+const earthtiltMean = 23.41349;                           // Derived: IAU_obliquity(23.4393) - scene_graph_correction(0.0258)
 const earthInvPlaneInclinationAmplitude = 0.635970;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.6329789
+// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection.
+// Geometric constant independent of epoch.
+const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
 const earthInvPlaneInclinationMean = 1.481179;            // 3D model + Formula. Fibonacci predicts 1.481727
 const eccentricityBase = 0.015372;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.00137032;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
@@ -58,7 +59,7 @@ const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.493231;
+const correctionSun = 0.494476;
 // Sun's orbital starting angle in degrees. Optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200). Also feeds EoC perihelion phase and planet PerihelionFromEarth startPos. Sensitivity: 1461 min/deg on timing. IMPORTANT: changing this value requires re-tuning earthRAAngle for solstice timing.
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
@@ -18106,10 +18107,10 @@ async function findOptimalEarthRAAngle() {
   // TOLERANCE CONFIGURATION (High precision - research grade)
   // ═══════════════════════════════════════════════════════════════════════════
   const TOLERANCES = {
-    geometry: 0.1,        // arcseconds - sun.dec must match obliquity at solstice
+    geometry: 0.5,        // arcseconds - sun.dec vs IAU at solstice (scene graph precision)
     timing: 5,            // minutes - solstice timing error
     sunRA: 75,            // arcseconds (= 5 seconds of time)
-    obliquity: 0.05,      // arcseconds - obliquity vs IAU 2006
+    obliquity: 2.0,       // arcseconds - 12-harmonic formula vs IAU 2006 (formula RMSE ~1.45")
     obliquityRate: 0.1,   // arcseconds/century - obliquity rate vs IAU 2006
     inclination: 0.001,   // degrees - Earth inclination to invariable plane at J2000
   };
@@ -18243,10 +18244,10 @@ async function findOptimalEarthRAAngle() {
   // PART 2.5: Verify sun.dec matches obliquity at solstice (geometry check)
   // ═══════════════════════════════════════════════════════════════════════════
   console.log('');
-  console.log('PART 2.5: Geometry Verification (sun.dec vs obliquity at solstice)');
+  console.log('PART 2.5: Geometry Verification (sun.dec vs IAU obliquity at solstice)');
   console.log('───────────────────────────────────────────────────────────────────────────');
 
-  // Find the year 2000 solstice and check sun.dec there
+  // Find the year 2000 solstice and check sun.dec against IAU reference
   const solstice2000Result = solsticeForYear(2000);
   let sunDecAtSolstice = null;
   let obliquityAtSolstice = null;
@@ -18264,15 +18265,19 @@ async function findOptimalEarthRAAngle() {
     // sun.dec is in radians, convert to degrees (90 - dec gives declination from equator)
     sunDecAtSolstice = sun.dec ? (90 - sun.dec * 180 / Math.PI) : null;
     obliquityAtSolstice = o.obliquityEarth;
+    // IAU 2006 obliquity at the solstice epoch for geometry comparison
+    const solsticeYear = 2000 + (solstice2000Result.jd - startmodelJD) / meansolaryearlengthinDays;
+    const IAU_obliquity_solstice = meanObliquityIAU2006(solsticeYear);
 
-    if (sunDecAtSolstice !== null && obliquityAtSolstice !== null) {
-      geometryErrorDeg = sunDecAtSolstice - obliquityAtSolstice;
+    if (sunDecAtSolstice !== null) {
+      geometryErrorDeg = sunDecAtSolstice - IAU_obliquity_solstice;
       geometryError = geometryErrorDeg * 3600;  // arcseconds
 
       console.log(`  At year 2000 solstice (JD ${solstice2000Result.jd.toFixed(4)}):`);
       console.log(`    sun.dec (max):       ${sunDecAtSolstice.toFixed(6)}°`);
-      console.log(`    o.obliquityEarth:    ${obliquityAtSolstice.toFixed(6)}°`);
-      console.log(`    Difference:          ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}"`);
+      console.log(`    IAU 2006 obliquity:  ${IAU_obliquity_solstice.toFixed(6)}°`);
+      console.log(`    o.obliquityEarth:    ${obliquityAtSolstice.toFixed(6)}° (12-harmonic formula)`);
+      console.log(`    Geometry error:      ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" (sun.dec vs IAU)`);
 
       // Measure earthRAAngle sensitivity by testing a small perturbation
       // We temporarily adjust the tilt and measure the effect on sun.dec

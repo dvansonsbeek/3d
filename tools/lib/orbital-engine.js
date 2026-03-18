@@ -529,6 +529,36 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   return i_mean + amplitude * Math.cos(currentPhaseRad);
 }
 
+/**
+ * Compute a planet's inclination to the ecliptic (Earth's orbital plane).
+ * Derived from spherical geometry: the angle between two planes (planet and Earth)
+ * both tilted relative to the invariable plane.
+ *
+ * Formula: cos(i_ecl) = cos(i_p)·cos(i_e) + sin(i_p)·sin(i_e)·cos(Ω_p - Ω_e)
+ * where i = inv. plane inclination, Ω = ascending node on inv. plane.
+ *
+ * Validated at J2000: matches JPL ecliptic inclinations within 2 arcmin for all planets.
+ *
+ * @param {string} planetName - e.g. 'mercury', 'mars'
+ * @param {number} currentYear - calendar year
+ * @returns {number} ecliptic inclination in degrees
+ */
+function computeEclipticInclination(planetName, currentYear) {
+  const DEG = Math.PI / 180;
+
+  // Planet inclination and ascending node on invariable plane
+  const i_p = computePlanetInvPlaneInclinationDynamic(planetName, currentYear) * DEG;
+  const omega_p = computeAscendingNodeInvPlane(planetName, currentYear) * DEG;
+
+  // Earth inclination and ascending node on invariable plane
+  // Earth's node precesses at H/3 (inclination cycle)
+  const i_e = computeInclinationEarth(currentYear) * DEG;
+  const omega_e = (C.earthAscendingNodeInvPlane + 360 * (currentYear - 2000) / (C.H / 3)) * DEG;
+
+  const cosIncl = Math.cos(i_p) * Math.cos(i_e) + Math.sin(i_p) * Math.sin(i_e) * Math.cos(omega_p - omega_e);
+  return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECESSION
 // ═══════════════════════════════════════════════════════════════════════════
@@ -864,6 +894,311 @@ function computeSolsticeYearLength(year, type) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PRECESSION PREDICTION (429-term ML system)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build the 429-term feature vector for precession prediction.
+ * Ported from script.js buildPredictiveFeatures().
+ * See PREDICTIVE_FORMULA_GUIDE.mdx for feature matrix architecture.
+ *
+ * @param {number} year - calendar year
+ * @param {number} planetPeriod - planet's perihelion precession period (years)
+ * @param {number} planetTheta0 - planet's J2000 perihelion longitude (degrees)
+ * @returns {number[]} 429-element feature array
+ */
+function buildPredictiveFeatures(year, planetPeriod, planetTheta0) {
+  const H = C.H;
+  const t = year - C.balancedYear;
+
+  const thetaE = calcEarthPerihelionPredictive(year);
+  const thetaP = calcPlanetPerihelionLong(planetTheta0, planetPeriod, year);
+  const erd = calcERD(year);
+  const obliq = computeObliquityEarth(year);
+  const ecc = computeEccentricityEarth(year);
+
+  const thetaERad = thetaE * Math.PI / 180;
+  const thetaPRad = thetaP * Math.PI / 180;
+  const diff = thetaERad - thetaPRad;
+  const sumAngle = thetaERad + thetaPRad;
+
+  const obliqNorm = obliq - C.SOLSTICE_OBLIQUITY_MEAN;
+  const eccMean = Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2);
+  const eccNorm = ecc - eccMean;
+  const erd2 = erd * erd;
+  const erd3 = erd2 * erd;
+
+  const f = [];
+
+  // GROUP 1: ANGLE TERMS (0-17) — 18 terms
+  for (const n of [1, 2, 3, 4]) {
+    f.push(Math.cos(n * diff), Math.sin(n * diff));
+  }
+  f.push(Math.cos(sumAngle), Math.sin(sumAngle));
+  for (const n of [1, 2]) f.push(Math.cos(n * thetaERad), Math.sin(n * thetaERad));
+  for (const n of [1, 2]) f.push(Math.cos(n * thetaPRad), Math.sin(n * thetaPRad));
+
+  // GROUP 2: OBLIQUITY & ECCENTRICITY (18-23) — 6 terms
+  f.push(obliqNorm, eccNorm);
+  f.push(obliqNorm * Math.cos(diff), obliqNorm * Math.sin(diff));
+  f.push(eccNorm * Math.cos(diff), eccNorm * Math.sin(diff));
+
+  // GROUP 3: ERD TERMS (24-35) — 12 terms
+  f.push(erd, erd2);
+  f.push(erd * Math.cos(diff), erd * Math.sin(diff));
+  f.push(erd * Math.cos(2 * diff), erd * Math.sin(2 * diff));
+  f.push(erd * Math.cos(sumAngle), erd * Math.sin(sumAngle));
+  f.push(erd2 * Math.cos(diff), erd2 * Math.sin(diff));
+  f.push(erd3, erd2 * Math.cos(2 * diff));
+
+  // GROUP 4: PERIODIC TERMS (36-57) — 22 terms
+  const periods = [planetPeriod, H, H/16, H/32, H/48, H/8, H/3, H/4, H/5, H/12, H/13];
+  for (const p of periods) {
+    const phase = 2 * Math.PI * t / p;
+    f.push(Math.sin(phase), Math.cos(phase));
+  }
+
+  // GROUP 5: ERD × PERIODIC (58-79) — 22 terms
+  for (const p of periods) {
+    const phase = 2 * Math.PI * t / p;
+    f.push(erd * Math.sin(phase), erd * Math.cos(phase));
+  }
+
+  // GROUP 6: ERD² × PERIODIC (80-91) — 12 terms
+  for (const p of [planetPeriod, H, H/16, H/8, H/3, H/5]) {
+    const phase = 2 * Math.PI * t / p;
+    f.push(erd2 * Math.sin(phase), erd2 * Math.cos(phase));
+  }
+
+  // GROUP 7: PERIODIC × ANGLE (92-115) — 24 terms
+  for (const p of [H/16, H/32, H/8, H/3, planetPeriod, H/5]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP * Math.cos(diff), sinP * Math.sin(diff));
+    f.push(cosP * Math.cos(diff), cosP * Math.sin(diff));
+  }
+
+  // GROUP 8: ERD × PERIODIC × ANGLE (116-131) — 16 terms
+  for (const p of [H/16, H/32, planetPeriod, H]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(erd * sinP * Math.cos(diff), erd * sinP * Math.sin(diff));
+    f.push(erd * cosP * Math.cos(diff), erd * cosP * Math.sin(diff));
+  }
+
+  // GROUP 9: PERIODIC × 2δ (132-147) — 16 terms
+  for (const p of [H/16, H/32, planetPeriod, H]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP * Math.cos(2 * diff), sinP * Math.sin(2 * diff));
+    f.push(cosP * Math.cos(2 * diff), cosP * Math.sin(2 * diff));
+  }
+
+  // GROUP 10: PERIODIC × PERIODIC (148-159) — 12 terms
+  for (const [p1, p2] of [[H/16, planetPeriod], [H/16, H/8], [H/8, planetPeriod],
+                           [H/8, H/3], [planetPeriod, H/3], [H/16, H/3]]) {
+    const ph1 = 2 * Math.PI * t / p1, ph2 = 2 * Math.PI * t / p2;
+    f.push(Math.sin(ph1) * Math.sin(ph2), Math.cos(ph1) * Math.cos(ph2));
+  }
+
+  // GROUP 11: CONSTANT (160) — 1 term
+  f.push(1.0);
+
+  // GROUP 12: ERD × SUM-ANGLE (161-164) — 4 terms
+  f.push(erd * Math.cos(2 * sumAngle), erd * Math.sin(2 * sumAngle));
+  f.push(erd2 * Math.cos(sumAngle), erd2 * Math.sin(sumAngle));
+
+  // GROUP 13: EXTENDED HARMONICS (165-224) — 60 terms
+  f.push(Math.cos(3 * diff), Math.sin(3 * diff));
+  f.push(erd * Math.cos(3 * diff), erd * Math.sin(3 * diff));
+
+  // Beat frequencies (12)
+  for (const [p1, p2] of [[H/16, planetPeriod], [H/8, planetPeriod], [H/3, planetPeriod]]) {
+    const beat = p1 !== p2 ? Math.abs(p1 - p2) : H;
+    const sumf = p1 !== p2 ? (p1 * p2) / (p1 + p2) : p1 / 2;
+    for (const bp of [beat, sumf]) {
+      const phase = 2 * Math.PI * t / bp;
+      f.push(Math.sin(phase), Math.cos(phase));
+    }
+  }
+
+  // H/48, H/4, H/13 × angle (12)
+  for (const p of [H/48, H/4, H/13]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP * Math.cos(diff), sinP * Math.sin(diff));
+    f.push(cosP * Math.cos(diff), cosP * Math.sin(diff));
+  }
+
+  // Sum angle combinations (16)
+  for (const p of [H/16, H/8, planetPeriod, H]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP * Math.cos(sumAngle), sinP * Math.sin(sumAngle));
+    f.push(cosP * Math.cos(sumAngle), cosP * Math.sin(sumAngle));
+  }
+
+  // ERD³ × angle (4)
+  f.push(erd3 * Math.cos(diff), erd3 * Math.sin(diff));
+  f.push(erd3 * Math.cos(2 * diff), erd3 * Math.sin(2 * diff));
+
+  // ERD² × periodic × angle (12)
+  for (const p of [H/16, planetPeriod, H/8]) {
+    const phase = 2 * Math.PI * t / p;
+    const sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(erd2 * sinP * Math.cos(diff), erd2 * sinP * Math.sin(diff));
+    f.push(erd2 * cosP * Math.cos(diff), erd2 * cosP * Math.sin(diff));
+  }
+
+  // GROUP 14: VENUS PERIODIC TERMS (225-240) — 16 terms
+  for (const d of [80, 21]) {
+    const phase = 2 * Math.PI * t / (H/d);
+    f.push(Math.sin(phase), Math.cos(phase));
+  }
+  { const phase = 2*Math.PI*t/(H/80), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  for (const p of [planetPeriod, H/16]) {
+    const phase = 2*Math.PI*t/p, sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(3*diff), sinP*Math.sin(3*diff), cosP*Math.cos(3*diff), cosP*Math.sin(3*diff));
+  }
+
+  // GROUP 15: TIME-VARYING OBLIQ/ECC INTERACTIONS (241-252) — 12 terms
+  f.push(obliqNorm*erd*Math.cos(diff), obliqNorm*erd*Math.sin(diff));
+  f.push(obliqNorm*erd*Math.cos(2*diff), obliqNorm*erd*Math.sin(2*diff));
+  f.push(eccNorm*erd*Math.cos(diff), eccNorm*erd*Math.sin(diff));
+  f.push(eccNorm*erd*Math.cos(2*diff), eccNorm*erd*Math.sin(2*diff));
+  { const phase = 2*Math.PI*t/(H/16);
+    f.push(obliqNorm*Math.sin(phase), obliqNorm*Math.cos(phase));
+    f.push(eccNorm*Math.sin(phase), eccNorm*Math.cos(phase)); }
+
+  // GROUP 16: VENUS FINE-TUNING (253-272) — 20 terms
+  for (const d of [78, 94, 77, 55]) {
+    const phase = 2*Math.PI*t/(H/d);
+    f.push(Math.sin(phase), Math.cos(phase));
+  }
+  for (const d of [78, 94]) {
+    const phase = 2*Math.PI*t/(H/d), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff));
+  }
+  for (const d of [78, 94]) {
+    const phase = 2*Math.PI*t/(H/d);
+    f.push(erd*Math.sin(phase), erd*Math.cos(phase));
+  }
+
+  // GROUP 17: GREEDY-SELECTED TERMS (273-286) — 14 terms
+  { const phase = 2*Math.PI*t/(H/60); f.push(Math.sin(phase), Math.cos(phase)); }
+  for (const d of [24, 45]) {
+    const phase = 2*Math.PI*t/(H/d), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff));
+  }
+  { const phase = 2*Math.PI*t/(H/9), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+
+  // GROUP 18: GREEDY ROUND-2 (287-302) — 16 terms
+  { const phase = 2*Math.PI*t/(H/110); f.push(Math.sin(phase), Math.cos(phase)); }
+  { const phase = 2*Math.PI*t/(H/60), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/75); f.push(Math.sin(phase), Math.cos(phase)); }
+  { const phase = 2*Math.PI*t/(H/41), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/56); f.push(Math.sin(phase), Math.cos(phase)); }
+  { const phase = 2*Math.PI*t/(H/45); f.push(Math.sin(phase), Math.cos(phase)); }
+
+  // GROUP 19: GREEDY ROUND-3 (303-318) — 16 terms
+  { const phase = 2*Math.PI*t/(H/56), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/41), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/110); f.push(erd*Math.sin(phase), erd*Math.cos(phase)); }
+  f.push(erd*Math.sin(6*diff), erd*Math.cos(6*diff));
+  { const phase = 2*Math.PI*t/(H/39), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+
+  // GROUP 20: GREEDY ROUND-4 (319-336) — 18 terms
+  { const phase = 2*Math.PI*t/(H/60), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/112), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/39), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/96), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/37); f.push(Math.sin(phase), Math.cos(phase)); }
+
+  // GROUP 21: GREEDY ROUND-5 (337-358) — 22 terms
+  { const phase = 2*Math.PI*t/(H/96), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/7), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP, cosP, sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff)); }
+  { const phase = 2*Math.PI*t/(H/18); f.push(Math.sin(phase), Math.cos(phase)); }
+  { const phase = 2*Math.PI*t/(H/37), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/38), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  f.push(erd*Math.cos(6*diff), erd*Math.sin(6*diff));
+
+  // GROUP 22: GREEDY ROUND-6 (359-368) — 10 terms
+  { const phase = 2*Math.PI*t/(H/31), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP, cosP);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff));
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+
+  // GROUP 23: GREEDY ROUND-7 (369-388) — 20 terms
+  { const phase = 2*Math.PI*t/(H/128), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP, cosP);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff));
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+  { const phase = 2*Math.PI*t/(H/42), sinP = Math.sin(phase), cosP = Math.cos(phase);
+    f.push(sinP, cosP);
+    f.push(sinP*Math.cos(diff), sinP*Math.sin(diff), cosP*Math.cos(diff), cosP*Math.sin(diff));
+    f.push(sinP*Math.cos(2*diff), sinP*Math.sin(2*diff), cosP*Math.cos(2*diff), cosP*Math.sin(2*diff)); }
+
+  // GROUP 24: SATURN HIGH-FREQUENCY (389-406) — 18 terms
+  for (const d of [272, 544, 816, 1088, 1360, 1632, 1904, 2176, 2448]) {
+    const phase = 2*Math.PI*t/(H/d);
+    f.push(Math.sin(phase), Math.cos(phase));
+  }
+
+  // GROUP 25: VENUS HIGH-FREQUENCY TRIPLETS (407-428) — 22 terms
+  for (const d of [124, 125, 126, 129, 139, 140, 141, 142, 143, 157, 158]) {
+    const phase = 2*Math.PI*t/(H/d);
+    f.push(Math.sin(phase), Math.cos(phase));
+  }
+
+  return f;
+}
+
+/**
+ * Predict the total geocentric precession rate for a planet (arcsec/century).
+ * Uses the 429-term feature matrix × trained ridge-regression coefficients.
+ *
+ * @param {number} year - calendar year
+ * @param {string} planetKey - e.g. 'mercury', 'mars'
+ * @returns {number} total precession rate in arcsec/century (baseline + fluctuation)
+ */
+function predictGeocentricPrecession(year, planetKey) {
+  const planet = C.PREDICT_PLANETS[planetKey];
+  const coeffs = C.PREDICT_COEFFS[planetKey];
+  if (!planet || !coeffs) return 0;
+  const features = buildPredictiveFeatures(year, planet.period, planet.theta0);
+  let dot = 0;
+  for (let i = 0; i < coeffs.length; i++) dot += coeffs[i] * features[i];
+  return planet.baseline + dot;
+}
+
+/**
+ * Predict the precession fluctuation (deviation from baseline) for a planet.
+ * @param {number} year - calendar year
+ * @param {string} planetKey - e.g. 'mercury', 'mars'
+ * @returns {number} fluctuation in arcsec/century
+ */
+function predictPrecessionFluctuation(year, planetKey) {
+  const planet = C.PREDICT_PLANETS[planetKey];
+  if (!planet) return 0;
+  return predictGeocentricPrecession(year, planetKey) - planet.baseline;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // COMPOSITE: Compute all orbital elements for a given year
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -944,6 +1279,7 @@ module.exports = {
   // Inclination
   computeInclinationEarth,
   computePlanetInvPlaneInclinationDynamic,
+  computeEclipticInclination,
 
   // Precession
   computeAxialPrecession,
@@ -977,4 +1313,7 @@ module.exports = {
 
   // Composite
   computeEarthOrbitalElements,
+  buildPredictiveFeatures,
+  predictGeocentricPrecession,
+  predictPrecessionFluctuation,
 };

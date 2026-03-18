@@ -596,6 +596,9 @@ function nelderMead(planet, paramNames, options = {}) {
   // Default scale: 1% of current value or 0.1 if near zero
   const scale = initialScale || initial.map(v => Math.abs(v) > 1 ? Math.abs(v) * 0.01 : 0.1);
 
+  // IAU 2006 obliquity at J2000 (for sun geometry constraint)
+  const IAU_OBLIQ_J2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg;
+
   // Objective function
   function objective(x) {
     const overrides = {};
@@ -606,6 +609,16 @@ function nelderMead(planet, paramNames, options = {}) {
     if (startDateWeight > 0) {
       const e0 = bl.entries.find(e => Math.abs(e.year - 2000.5) < 1);
       if (e0) cost += startDateWeight * Math.abs(e0.dRA);
+    }
+    // For Sun: penalize geometry error (sun.dec at J2000 solstice vs IAU obliquity)
+    // Compute sun position directly at the solstice JD (not from baseline entries)
+    if (planet === 'sun') {
+      const solsticePos = sg.computePlanetPosition('sun', 2451716.575);
+      const sunDecAtSolstice = sg.phiToDecDeg(solsticePos.dec);
+      const decError = Math.abs(sunDecAtSolstice - IAU_OBLIQ_J2000);
+      // Weight: geometry error should be comparable to RA RMS (~0.003°)
+      // A 0.00043° dec error (1.5") needs weight ~10 to add ~0.004° to cost
+      cost += decError * 10;
     }
     return cost;
   }
