@@ -72,7 +72,8 @@ URANUS_PERIOD = INCLIN_CYCLE         # H/3
 NEPTUNE_PERIOD = H * 2               # H × 2
 
 # Earth mean values for normalization
-EARTH_OBLIQ_MEAN = 23.414
+# Obliquity mean derived from Pythagorean tilt model (see constants_scripts.py)
+from constants_scripts import SOLSTICE_OBLIQUITY_MEAN as EARTH_OBLIQ_MEAN
 EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
 EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
 EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198

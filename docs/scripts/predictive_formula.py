@@ -42,6 +42,7 @@ from constants_scripts import (
     AXIAL_TILT, OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
     CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
+    SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS,
 )
 
 # =============================================================================
@@ -296,8 +297,7 @@ def calc_erd(year: int) -> float:
 
 def calc_obliquity(year: int) -> float:
     """Calculate Earth's obliquity at given year (degrees).
-    Primary formula: 12-harmonic fit, RMSE 0.20 arcsec over full H."""
-    from constants_scripts import SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS
+    Primary formula: 12-harmonic fit, RMSE 1.45 arcsec over full H."""
     t = time_offset(year)
     obliq = SOLSTICE_OBLIQUITY_MEAN
     for div, sin_c, cos_c in SOLSTICE_OBLIQUITY_HARMONICS:
@@ -836,7 +836,7 @@ def build_features(year: int, planet_period: float, planet_theta0: float) -> Lis
     sum_angle = theta_E_rad + theta_P_rad  # Sum angle
 
     # Normalized Earth parameters
-    obliq_norm = obliq - EARTH_OBLIQ_MEAN
+    obliq_norm = obliq - SOLSTICE_OBLIQUITY_MEAN
     ecc_norm = ecc - EARTH_ECC_MEAN
 
     # ERD powers
