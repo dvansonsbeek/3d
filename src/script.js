@@ -33463,11 +33463,14 @@ function computePlanetObliquity(planetName, currentYear) {
    See docs/14-solstice-prediction.md
 ------------------------------------------------------------------ */
 
-// Solstice JD: anchored at startmodelJD (J2000 solstice), zero fitted constants
+// Solstice JD: anchored at juneSolstice2000_JD (actual solstice, June 21 01:48 UTC)
+// 5 Fibonacci harmonics fitted from 2,889 simulation observations
 const SOLSTICE_JD_HARMONICS = [
-  [3,  -1.4475, -0.0896],       // H/3 inclination, amp = 1.450 days
-  [8,   1.5254,  0.0896],       // H/8 obliquity,   amp = 1.528 days
-  [16,  1.7774,  0.0890],       // H/16 perihelion,  amp = 1.780 days
+  [3,  -1.487917, -0.089684],   // H/3 inclination,   amp = 1.491 days
+  [5,   0.003925,  0.000165],   // H/5 ecliptic,      amp = 0.004 days
+  [8,   1.510931,  0.089545],   // H/8 obliquity,     amp = 1.514 days
+  [13, -0.023038,  0.000208],   // H/13 axial,        amp = 0.023 days
+  [16,  1.770500,  0.088980],   // H/16 perihelion,   amp = 1.773 days
 ];
 // Pre-compute harmonic contribution at J2000
 const _SOLSTICE_T2000 = 2000 - balancedYear;
@@ -33490,12 +33493,12 @@ function computeSolsticeRA(currentYear) {
   return raMean + amp * (-Math.sin(phase3) + Math.sin(phase8));
 }
 
-/** Compute Julian Day when summer solstice occurs. Zero fitted constants.
- *  JD = startmodelJD + meanSolarYear×(year−2000) + harmonics − harmonics_at_J2000
- *  RMSE: 0.054 days (1.3 hours) over full H. */
+/** Compute Julian Day when summer solstice occurs.
+ *  JD = juneSolstice2000_JD + meanSolarYear×(year−2000) + harmonics − harmonics_at_J2000
+ *  Anchored at actual solstice (June 21, 2000 01:48 UTC). RMSE: 1.3 hours over full H. */
 function computeSolsticeJD(currentYear) {
   const t = currentYear - balancedYear;
-  let jd = startmodelJD + meansolaryearlengthinDays * (currentYear - 2000);
+  let jd = ASTRO_REFERENCE.juneSolstice2000_JD + meansolaryearlengthinDays * (currentYear - 2000);
   for (const [div, sinC, cosC] of SOLSTICE_JD_HARMONICS) {
     const phase = 2 * Math.PI * t / (holisticyearLength / div);
     jd += sinC * Math.sin(phase) + cosC * Math.cos(phase);

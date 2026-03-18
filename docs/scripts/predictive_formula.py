@@ -40,7 +40,7 @@ from constants_scripts import (
     INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
     AXIAL_TILT, OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
-    _START_MODEL_JD, SOLSTICE_JD_HARMONICS,
+    _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
 )
 
 # =============================================================================
@@ -676,11 +676,12 @@ def calc_solstice_ra(year: int) -> float:
 def calc_solstice_jd(year: int) -> float:
     """
     Compute Julian Day when the summer solstice occurs.
-    Anchored at J2000 solstice (startmodelJD). Zero fitted constants.
+    Anchored at juneSolstice2000_JD (actual solstice, June 21 01:48 UTC).
 
-    Formula: JD = startmodelJD + meanSolarYear × (year − 2000)
+    Formula: JD = juneSolstice2000_JD + meanSolarYear × (year − 2000)
                 + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
 
+    5 Fibonacci harmonics (H/3, H/5, H/8, H/13, H/16).
     RMSE: 0.054 days (1.3 hours) against 2,889 simulation data points.
 
     Args:
@@ -689,7 +690,7 @@ def calc_solstice_jd(year: int) -> float:
     Returns: Julian Day of the summer solstice
     """
     t = time_offset(year)
-    jd = _START_MODEL_JD + MEAN_SOLAR_YEAR_DAYS * (year - J2000)
+    jd = JUNE_SOLSTICE_2000_JD + MEAN_SOLAR_YEAR_DAYS * (year - J2000)
     for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS:
         phase = 2 * math.pi * t / (H / div)
         jd += sin_c * math.sin(phase) + cos_c * math.cos(phase)

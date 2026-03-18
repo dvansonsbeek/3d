@@ -770,8 +770,8 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // Solstice JD: linear trend + 3 Fibonacci harmonics (H/3, H/8, H/16).
 // The JD harmonics remain fitted (they encode the variable-speed effect
 // which depends on the full equation-of-center interaction).
-// Solstice JD: anchored at startmodelJD (J2000 solstice), harmonics relative to J2000.
-// Harmonic coefficients from C.SOLSTICE_JD_HARMONICS (constants.js).
+// Solstice JD: anchored at juneSolstice2000_JD (actual solstice, June 21 01:48 UTC).
+// 5 Fibonacci harmonics from C.SOLSTICE_JD_HARMONICS (constants.js).
 
 // Pre-compute harmonic contribution at J2000 (subtracted so formula is exact at year 2000)
 const _SOLSTICE_T2000 = 2000 - C.balancedYear;
@@ -811,12 +811,13 @@ function computeSolsticeRA(year) {
 
 /**
  * Compute the Julian Day when the summer solstice occurs.
- * Anchored at startmodelJD (J2000 solstice). Zero fitted constants.
+ * Anchored at juneSolstice2000_JD (actual solstice, June 21, 2000 01:48 UTC).
  *
- * Formula: JD = startmodelJD + meanSolarYear × (year − 2000)
+ * Formula: JD = juneSolstice2000_JD + meanSolarYear × (year − 2000)
  *             + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
  *
- * The harmonic subtraction ensures JD(2000) = startmodelJD exactly.
+ * The harmonic subtraction ensures JD(2000) = juneSolstice2000_JD exactly.
+ * 5 Fibonacci harmonics (H/3, H/5, H/8, H/13, H/16).
  * RMSE: 0.054 days (1.3 hours) against 2,889 simulation data points.
  *
  * @param {number} year - calendar year
@@ -824,7 +825,7 @@ function computeSolsticeRA(year) {
  */
 function computeSolsticeJD(year) {
   const t = year - C.balancedYear;
-  let jd = C.startmodelJD + C.meanSolarYearDays * (year - 2000);
+  let jd = C.ASTRO_REFERENCE.juneSolstice2000_JD + C.meanSolarYearDays * (year - 2000);
   for (const [div, sinC, cosC] of C.SOLSTICE_JD_HARMONICS) {
     const phase = 2 * Math.PI * t / (C.H / div);
     jd += sinC * Math.sin(phase) + cosC * Math.cos(phase);

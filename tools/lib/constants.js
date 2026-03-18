@@ -371,6 +371,7 @@ const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearIC
 
 const ASTRO_REFERENCE = {
   // --- Earth orbital parameters (J2000) ---
+  juneSolstice2000_JD: 2451716.575,       // June 21, 2000 01:48 UTC
   earthEccentricityJ2000: 0.01671022,
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   earthAscendingNodeInvPlane: 284.51,      // Souami & Souchay (2012)
@@ -600,9 +601,13 @@ const PERI_OFFSET = -0.261258;
 // See docs/14-solstice-prediction.md
 const SOLSTICE_JD_HARMONICS = [
   // [H_divisor, sin_coeff, cos_coeff]  — amplitude in days
-  [3,  -1.4475, -0.0896],   // H/3 inclination cycle, amp = 1.450 days
-  [8,   1.5254,  0.0896],   // H/8 obliquity cycle,   amp = 1.528 days
-  [16,  1.7774,  0.0890],   // H/16 perihelion,       amp = 1.780 days
+  // Anchor: ASTRO_REFERENCE.juneSolstice2000_JD (actual solstice June 21, 01:48 UTC)
+  // 5 Fibonacci harmonics fitted from 2,889 simulation observations
+  [3,  -1.487917, -0.089684],   // H/3 inclination cycle,  amp = 1.491 days
+  [5,   0.003925,  0.000165],   // H/5 ecliptic precession, amp = 0.004 days
+  [8,   1.510931,  0.089545],   // H/8 obliquity cycle,    amp = 1.514 days
+  [13, -0.023038,  0.000208],   // H/13 axial precession,  amp = 0.023 days
+  [16,  1.770500,  0.088980],   // H/16 perihelion,        amp = 1.773 days
 ];
 
 

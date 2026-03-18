@@ -37,7 +37,8 @@ J2000_YEAR = 2000
 BALANCE_YEAR = round(1246 - 14.5 * (H / 16))  # balance year: 1246 - 14.5*(H/16)
 
 # Model reference point: summer solstice at J2000 (June 21, 2000)
-_START_MODEL_JD = 2451716.5                     # JD of the model's reference solstice
+_START_MODEL_JD = 2451716.5                     # JD of the model's reference (June 21 00:00 UTC)
+JUNE_SOLSTICE_2000_JD = 2451716.575              # Actual solstice June 21, 2000 01:48 UTC
 _START_MODEL_YEAR = 2000.499361289612            # startModelYearWithCorrection
 _MEAN_SOLAR_YEAR = 365.2421912312542             # meanSolarYearDays (used for JD calc)
 BALANCED_JD = _START_MODEL_JD - _MEAN_SOLAR_YEAR * (_START_MODEL_YEAR - BALANCE_YEAR)
@@ -54,9 +55,13 @@ EARTH_RA_ANGLE = 1.25363                     # earthRAAngle (perihelion tilt in 
 # See docs/14-solstice-prediction.md
 SOLSTICE_JD_HARMONICS = [
     # (H_divisor, sin_coeff, cos_coeff)  — amplitude in days
-    (3,  -1.4475, -0.0896),   # H/3 inclination cycle, amp = 1.450 days
-    (8,   1.5254,  0.0896),   # H/8 obliquity cycle,   amp = 1.528 days
-    (16,  1.7774,  0.0890),   # H/16 perihelion,       amp = 1.780 days
+    # Anchor: juneSolstice2000_JD (actual solstice June 21, 01:48 UTC)
+    # 5 Fibonacci harmonics fitted from 2,889 simulation observations
+    (3,  -1.487917, -0.089684),   # H/3 inclination,   amp = 1.491 days
+    (5,   0.003925,  0.000165),   # H/5 ecliptic,      amp = 0.004 days
+    (8,   1.510931,  0.089545),   # H/8 obliquity,     amp = 1.514 days
+    (13, -0.023038,  0.000208),   # H/13 axial,        amp = 0.023 days
+    (16,  1.770500,  0.088980),   # H/16 perihelion,   amp = 1.773 days
 ]
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
