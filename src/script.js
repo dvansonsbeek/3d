@@ -31735,46 +31735,6 @@ function updatePerihelion() {
 // Planets affected by inclination crossover: Jupiter (1.30°), Mars (1.85°)
 // ================================================================
 
-/**
- * Compute the integrated obliquity change from the mean obliquity point,
- * accounting for direction changes in the obliquity cycle.
- *
- * Obliquity formula: ε = mean - A*cos(phase3) + A*cos(phase8)
- * where phase3 = 2π*t/cycle3, phase8 = 2π*t/cycle8
- *
- * The integral of the RATE of change gives us the accumulated effect,
- * but we need to account for sign changes based on inclination relationship.
- *
- * @param {number} currentYear - Current year
- * @returns {object} { obliquityIntegral3, obliquityIntegral8 } - Integrated components
- */
-function computeObliquityIntegrals(currentYear) {
-  const t = currentYear - balancedYear;
-  const cycle3 = holisticyearLength / 3;
-  const cycle8 = holisticyearLength / 8;
-
-  const phase3 = (t / cycle3) * 2 * Math.PI;
-  const phase8 = (t / cycle8) * 2 * Math.PI;
-
-  // The obliquity is: mean - A*cos(phase3) + A*cos(phase8)
-  // The integral of cos from 0 to phase is sin(phase)
-  // So the "accumulated obliquity change" from balanced year is:
-  //   -A*sin(phase3) + A*sin(phase8)  (but we need the actual deviation)
-  //
-  // Actually, for the ascending node effect, what matters is the
-  // obliquity VALUE relative to the mean, not the integral of rate.
-  // The formula dΩ = (dΩ/dε) * dε integrates to Ω = (dΩ/dε) * (ε - ε_mean)
-  //
-  // So we return the obliquity deviation from mean, split by component
-  // for potential future use in handling direction changes per component.
-
-  return {
-    component3: -earthInvPlaneInclinationAmplitude * Math.cos(phase3),  // Deviation from mean due to cycle3
-    component8: earthInvPlaneInclinationAmplitude * Math.cos(phase8),   // Deviation from mean due to cycle8
-    sin3: Math.sin(phase3),  // For determining direction of cycle3 contribution
-    sin8: Math.sin(phase8)   // For determining direction of cycle8 contribution
-  };
-}
 
 /**
  * Compute Earth's inclination at a specific year.
@@ -33467,7 +33427,7 @@ function updatePredictions() {
     predictions['cp' + cp + 'RA'] = ra;
     predictions['cp' + cp + 'YearLen'] = yr;
   }
-  predictions.cpSolsticeObliquity = computeSolsticeObliquity(cpYear);
+  predictions.cpSolsticeObliquity = computeObliquityEarth(cpYear);
 
   // IAU comparison differences (Model − IAU reference)
   predictions.diffSolarDay = (predictions.lengthofDay - ASTRO_REFERENCE.solarDayJ2000) * 1000;
@@ -33609,37 +33569,6 @@ function computeEccentricityEarth(
 }
 
 
-/**
- * Compute Earth's obliquity (tilt) for a given decimal year.
- *
- * Relies on these values being in scope:
- *   - earthtiltMean                  (mean obliquity, in degrees)
- *   - tilandinclinationAmplitude  (amplitude, in degrees)
- *   - balancedYear                   (reference year for phase = 0)
- *   - holisticyearLength             (full cycle length, in years)
- *
- * @param {number} currentYear  – e.g. the decimal year from your JD→year fn
- * @returns {number}            Earth's tilt (in degrees) at that year
- */
-function computeObliquityEarth(currentYear) {
-  const t = currentYear - balancedYear;
-
-  // two cycle lengths (years) for the cosine terms:
-  const cycle3 = holisticyearLength / 3;
-  const cycle8 = holisticyearLength / 8;
-
-  // Convert each fractional cycle into radians:
-  //    (t / cycle) * 360°  →  in radians = (t / cycle) * 2π
-  const phase3 = (t / cycle3) * 2 * Math.PI;
-  const phase8 = (t / cycle8) * 2 * Math.PI;
-
-  // obliquityEarth
-  //   + [–A * cos(phase3)]
-  //   + [+A * cos(phase8)]
-  return earthtiltMean
-       - earthInvPlaneInclinationAmplitude * Math.cos(phase3)
-       + earthInvPlaneInclinationAmplitude * Math.cos(phase8);
-}
 
 /**
  * Compute dynamic obliquity (axial tilt) for a non-Earth planet.
@@ -33693,23 +33622,43 @@ function computePlanetObliquity(planetName, currentYear) {
    See docs/14-solstice-prediction.md
 ------------------------------------------------------------------ */
 
-// Solstice-observed obliquity: 12-harmonic formula predicting the obliquity as actually
-// measured at the summer solstice (max declination). More accurate than the geometric
-// formula (0.20" vs 187" RMSE) because it includes equation-of-center corrections.
-const SOLSTICE_OBLIQUITY_MEAN = 23.45336360;
-const SOLSTICE_OBLIQUITY_HARMONICS = [
-  [ 2,  -0.00000263,  -0.00006321], [ 3,   0.03209855,  -0.63477438],
-  [ 5,  -0.00007671,  -0.00814478], [ 6,   0.00044850,  -0.00404458],
-  [ 8,  -0.03212886,   0.63478930], [ 9,   0.00000883,  -0.00005598],
-  [11,  -0.00089756,   0.00808658], [13,  -0.00000166,   0.00004102],
-  [14,  -0.00002651,   0.00016237], [16,   0.00044894,  -0.00404490],
-  [19,   0.00002653,  -0.00016529], [24,  -0.00000887,   0.00005342],
+// Primary obliquity formula: derived mean + 12 fitted harmonics.
+// Mean is DERIVED from the physical model (zero fitting):
+//   <sqrt((earthtiltMean + δε)² + (earthRAAngle·cos(H/16))² + (inclMean·sin(H/5))²)>
+// The perpendicular tilts (earthRAAngle in tilta, inclination in ecliptic plane)
+// increase measured obliquity via the Pythagorean effect.
+// RMSE: 1.45 arcsec over full H. For H/3+H/8 decomposition, see orbital-engine.js.
+const OBLIQUITY_MEAN = (() => {
+  const N = 100000;
+  let sum = 0;
+  for (let i = 0; i < N; i++) {
+    const t = i / N;
+    const p3 = 2 * Math.PI * t * 3, p5 = 2 * Math.PI * t * 5;
+    const p8 = 2 * Math.PI * t * 8, p16 = 2 * Math.PI * t * 16;
+    const e = earthtiltMean - earthInvPlaneInclinationAmplitude * Math.cos(p3)
+                             + earthInvPlaneInclinationAmplitude * Math.cos(p8);
+    const pa = earthRAAngle * Math.cos(p16);
+    const pb = earthInvPlaneInclinationMean * Math.sin(p5);
+    sum += Math.sqrt(e * e + pa * pa + pb * pb);
+  }
+  return sum / N;
+})();
+const OBLIQUITY_HARMONICS = [
+  [ 2,  -0.00000263,  -0.00006328], [ 3,   0.03209855,  -0.63477445],
+  [ 5,  -0.00007671,  -0.00814485], [ 6,   0.00044850,  -0.00404465],
+  [ 8,  -0.03212886,   0.63478923], [ 9,   0.00000883,  -0.00005605],
+  [11,  -0.00089756,   0.00808651], [13,  -0.00000166,   0.00004096],
+  [14,  -0.00002651,   0.00016231], [16,   0.00044894,  -0.00404497],
+  [19,   0.00002653,  -0.00016536], [24,  -0.00000887,   0.00005335],
 ];
 
-function computeSolsticeObliquity(currentYear) {
+/** Compute Earth's obliquity (axial tilt) at a given year.
+ *  12-harmonic formula fitted from 11,553 simulation observations. RMSE: 0.20 arcsec.
+ *  For H/3 vs H/8 decomposition, see orbital-engine.js computeObliquityIntegrals(). */
+function computeObliquityEarth(currentYear) {
   const t = currentYear - balancedYear;
-  let obliq = SOLSTICE_OBLIQUITY_MEAN;
-  for (const [div, sinC, cosC] of SOLSTICE_OBLIQUITY_HARMONICS) {
+  let obliq = OBLIQUITY_MEAN;
+  for (const [div, sinC, cosC] of OBLIQUITY_HARMONICS) {
     const phase = 2 * Math.PI * t / (holisticyearLength / div);
     obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
   }

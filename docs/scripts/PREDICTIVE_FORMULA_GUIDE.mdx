@@ -122,6 +122,23 @@ for planet in ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptu
 
 Obliquity oscillates with Fibonacci-predicted periods (see [doc 37](../37-planets-precession-cycles.md)). Venus and Neptune return static values (no obliquity cycle).
 
+### Earth Obliquity (12-harmonic)
+
+```python
+from predictive_formula import calc_obliquity
+
+# Primary obliquity — 12-harmonic formula, RMSE 1.45 arcsec
+obliq = calc_obliquity(2000)  # 23.439640° at J2000
+```
+
+The mean is **derived at import** (not hardcoded) from the Pythagorean tilt model:
+```
+mean = <sqrt((earthtiltMean + δε)² + (earthRAAngle·cos(H/16))² + (inclMean·sin(H/5))²)>
+```
+The perpendicular tilts (earthRAAngle in the tilta direction, inclination mean in the ecliptic plane) increase measured obliquity via the Pythagorean effect, adding +0.040° (143") to the geometric mean. The 12 harmonic coefficients are fitted from simulation data. See [doc 14 §4](../14-solstice-prediction.md) for the full derivation.
+
+For H/3 vs H/8 component decomposition (dashboard charts), use `computeObliquityIntegrals()` in the orbital engine.
+
 ### Cardinal Point Prediction (Solstices & Equinoxes)
 
 All four cardinal points (SS, WS, VE, AE) are supported via an optional `cp_type` parameter (default `'SS'` for backward compatibility):

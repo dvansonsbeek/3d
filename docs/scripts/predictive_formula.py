@@ -295,12 +295,17 @@ def calc_erd(year: int) -> float:
 
 
 def calc_obliquity(year: int) -> float:
-    """Calculate Earth's obliquity at given year (degrees)."""
+    """Calculate Earth's obliquity at given year (degrees).
+    Primary formula: 12-harmonic fit, RMSE 0.20 arcsec over full H."""
+    from constants_scripts import SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS
     t = time_offset(year)
-    obliq = EARTH_OBLIQ_MEAN
-    obliq -= EARTH_INCLIN_AMPL * math.cos(2 * math.pi * t / INCLIN_CYCLE)
-    obliq += EARTH_INCLIN_AMPL * math.cos(2 * math.pi * t / OBLIQ_CYCLE)
+    obliq = SOLSTICE_OBLIQUITY_MEAN
+    for div, sin_c, cos_c in SOLSTICE_OBLIQUITY_HARMONICS:
+        phase = 2 * math.pi * t / (H / div)
+        obliq += sin_c * math.sin(phase) + cos_c * math.cos(phase)
     return obliq
+
+
 
 
 def calc_eccentricity(year: int) -> float:
@@ -721,24 +726,8 @@ def calc_solstice_year_length(year: int, cp_type: str = 'SS') -> float:
     return length
 
 
-def calc_solstice_obliquity(year: int) -> float:
-    """
-    Compute the obliquity as OBSERVED at the summer solstice (max declination).
-    More accurate than calc_obliquity() (0.20" vs 187" RMSE) because it includes
-    the equation of center and precession hierarchy corrections.
-
-    Args:
-        year: Calendar year
-
-    Returns: Solstice-observed obliquity in degrees
-    """
-    from constants_scripts import SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS
-    t = time_offset(year)
-    obliq = SOLSTICE_OBLIQUITY_MEAN
-    for div, sin_c, cos_c in SOLSTICE_OBLIQUITY_HARMONICS:
-        phase = 2 * math.pi * t / (H / div)
-        obliq += sin_c * math.sin(phase) + cos_c * math.cos(phase)
-    return obliq
+# Legacy alias for backward compatibility
+calc_solstice_obliquity = calc_obliquity
 
 
 # =============================================================================

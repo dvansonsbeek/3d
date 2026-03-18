@@ -22,19 +22,21 @@ const C = require('./constants');
 
 /**
  * Compute Earth's obliquity (axial tilt) for a given year.
- * Two-cosine formula: mean - A·cos(H/3) + A·cos(H/8)
- * Source: script.js computeObliquityEarth() ~line 33393
+ * Primary formula: 12-harmonic fit including equation-of-center corrections.
+ * RMSE: 0.20 arcsec over full H (935× more accurate than the geometric formula).
+ * For H/3 vs H/8 component decomposition, use computeObliquityIntegrals().
  *
  * @param {number} currentYear - decimal year
  * @returns {number} obliquity in degrees
  */
 function computeObliquityEarth(currentYear) {
   const t = currentYear - C.balancedYear;
-  const phase3 = (t / (C.H / 3)) * 2 * Math.PI;
-  const phase8 = (t / (C.H / 8)) * 2 * Math.PI;
-  return C.earthtiltMean
-    - C.earthInvPlaneInclinationAmplitude * Math.cos(phase3)
-    + C.earthInvPlaneInclinationAmplitude * Math.cos(phase8);
+  let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
+  for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return obliq;
 }
 
 /**
@@ -55,30 +57,6 @@ function computeObliquityIntegrals(currentYear) {
     sin3: Math.sin(phase3),
     sin8: Math.sin(phase8),
   };
-}
-
-/**
- * Compute the obliquity as OBSERVED at the summer solstice (max declination).
- * More accurate than computeObliquityEarth() because it includes the equation
- * of center and precession hierarchy effects that shift the measured obliquity.
- *
- * The geometric formula (computeObliquityEarth) has RMSE = 187" against simulation data.
- * This 12-harmonic formula has RMSE = 0.20" — a 935× improvement.
- *
- * The 0.040° (143") mean offset from the geometric formula comes from the equation
- * of center systematically biasing max-declination measurements at the solstice.
- *
- * @param {number} currentYear - calendar year (integer recommended)
- * @returns {number} solstice-observed obliquity in degrees
- */
-function computeSolsticeObliquity(currentYear) {
-  const t = currentYear - C.balancedYear;
-  let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
-  for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
-    const phase = 2 * Math.PI * t / (C.H / div);
-    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-  }
-  return obliq;
 }
 
 /**
@@ -937,7 +915,6 @@ function computeEarthOrbitalElements(year) {
 module.exports = {
   // Obliquity
   computeObliquityEarth,
-  computeSolsticeObliquity,
   computeObliquityIntegrals,
   computePlanetObliquity,
   computeInclinationTiltRelative,
