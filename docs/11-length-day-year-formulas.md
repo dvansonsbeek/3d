@@ -286,7 +286,7 @@ The tropical year length depends on *which* cardinal point is used to measure it
 
 This pattern reverses when perihelion precesses to July (~11,680 AD): WS becomes shortest, SS becomes longest. The *mean* of all four cardinal points cancels this effect and gives the true mean tropical year. The Fourier harmonics model this mean directly.
 
-For long-term prediction of individual solstice dates (including the variable-speed effect), see [Solstice Prediction from Fibonacci Harmonics](14-solstice-prediction.md) — a 3-harmonic formula valid across the full 335,008-year Holistic Year.
+For long-term prediction of individual solstice dates (including the variable-speed effect), see [Solstice Prediction from Fibonacci Harmonics](14-solstice-prediction.md) — a 5-harmonic Fibonacci formula valid across the full 335,008-year Holistic Year.
 
 
 ## Implementation
