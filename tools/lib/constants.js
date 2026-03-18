@@ -596,19 +596,86 @@ const PERI_HARMONICS = [
 ];
 const PERI_OFFSET = -0.261258;
 
-// ─── 12b. SOLSTICE JD HARMONICS ─────────────────────────────────────────
-// Fitted from 2,889 simulation solstice observations spanning full H.
+// ─── 12b. CARDINAL POINT JD HARMONICS ───────────────────────────────────
+// 12-harmonic fits from 11,553 simulation observations (29-year steps) spanning full H.
+// 5 Fibonacci fundamentals + 7 overtones (all sums of Fibonacci: 6=3+3, 11=3+8, etc.)
 // See docs/14-solstice-prediction.md
-const SOLSTICE_JD_HARMONICS = [
-  // [H_divisor, sin_coeff, cos_coeff]  — amplitude in days
-  // Anchor: ASTRO_REFERENCE.juneSolstice2000_JD (actual solstice June 21, 01:48 UTC)
-  // 5 Fibonacci harmonics fitted from 2,889 simulation observations
-  [3,  -1.487917, -0.089684],   // H/3 inclination cycle,  amp = 1.491 days
-  [5,   0.003925,  0.000165],   // H/5 ecliptic precession, amp = 0.004 days
-  [8,   1.510931,  0.089545],   // H/8 obliquity cycle,    amp = 1.514 days
-  [13, -0.023038,  0.000208],   // H/13 axial precession,  amp = 0.023 days
-  [16,  1.770500,  0.088980],   // H/16 perihelion,        amp = 1.773 days
-];
+//
+// Each cardinal point is anchored at its observed J2000 value:
+//   SS: ASTRO_REFERENCE.juneSolstice2000_JD = 2451716.575
+//   WS: 2451900.067346   (Dec 21, 2000 ~01:37 UTC)
+//   VE: 2451623.737525   (Mar 20, 2000 ~05:42 UTC)
+//   AE: 2451810.304175   (Sep 22, 2000 ~19:18 UTC)
+
+const CARDINAL_POINT_ANCHORS = {
+  SS: 2451716.575,       // juneSolstice2000_JD
+  WS: 2451900.067346,
+  VE: 2451623.737525,
+  AE: 2451810.304175,
+};
+
+// [H_divisor, sin_coeff, cos_coeff]  — amplitude in days
+const CARDINAL_POINT_HARMONICS = {
+  SS: [  // RMSE = 2.7 min over full H
+    [ 3,  -1.489856, -0.089878],  // H/3  amp=1.493d [Fib] inclination
+    [ 5,   0.003928, -0.000258],  // H/5  amp=0.004d [Fib] ecliptic
+    [ 6,  -0.020769, -0.002618],  // H/6  amp=0.021d  2×(H/3) inclination overtone
+    [ 8,   1.512826,  0.088901],  // H/8  amp=1.515d [Fib] obliquity
+    [11,   0.041889,  0.003991],  // H/11 amp=0.042d  H/3+H/8 coupling
+    [13,  -0.022995, -0.000219],  // H/13 amp=0.023d [Fib] axial precession
+    [16,   1.769641,  0.088047],  // H/16 amp=1.772d [Fib] perihelion
+    [19,   0.021683,  0.001938],  // H/19 amp=0.022d  H/3+H/16 coupling
+    [24,  -0.023684, -0.002899],  // H/24 amp=0.024d  H/8+H/16 coupling
+    [29,   0.001261, -0.000420],  // H/29 amp=0.001d  H/13+H/16
+    [32,  -0.088527, -0.005357],  // H/32 amp=0.089d  2×(H/16) perihelion overtone
+    [40,   0.001251, -0.000270],  // H/40 amp=0.001d  H/8+H/32
+  ],
+  WS: [  // RMSE = 5.3 min over full H
+    [ 3,  -1.481731, -0.089611],  // H/3  amp=1.484d [Fib]
+    [ 5,   0.003214, -0.000402],  // H/5  amp=0.003d [Fib]
+    [ 6,  -0.020656, -0.002783],  // H/6  amp=0.021d
+    [ 8,   1.458880,  0.088769],  // H/8  amp=1.462d [Fib]
+    [11,   0.040965,  0.003759],  // H/11 amp=0.041d
+    [13,   0.022819, -0.000817],  // H/13 amp=0.023d [Fib]
+    [14,   0.001088, -0.000425],  // H/14 amp=0.001d
+    [16,  -1.808930, -0.093384],  // H/16 amp=1.811d [Fib] anti-phase to SS
+    [19,  -0.023794, -0.003299],  // H/19 amp=0.024d
+    [24,   0.023840,  0.001968],  // H/24 amp=0.024d
+    [32,   0.069576,  0.002420],  // H/32 amp=0.070d
+    [48,   0.002811, -0.000403],  // H/48 amp=0.003d  3×(H/16)
+  ],
+  VE: [  // RMSE = 3.0 min over full H
+    [ 3,  -1.485598, -0.089089],  // H/3  amp=1.488d [Fib]
+    [ 5,   0.003585,  0.000574],  // H/5  amp=0.004d [Fib]
+    [ 6,  -0.020707, -0.002118],  // H/6  amp=0.021d
+    [ 8,   1.485817,  0.112270],  // H/8  amp=1.490d [Fib]
+    [11,   0.041399,  0.004878],  // H/11 amp=0.042d
+    [13,  -0.000220, -0.022860],  // H/13 amp=0.023d [Fib]
+    [16,  -0.113545,  1.783526],  // H/16 amp=1.787d [Fib] 90° shifted from SS
+    [19,  -0.003667,  0.022702],  // H/19 amp=0.023d
+    [24,   0.003172, -0.023635],  // H/24 amp=0.024d
+    [27,   0.000188, -0.000833],  // H/27 amp=0.001d
+    [32,   0.013522, -0.077970],  // H/32 amp=0.079d
+    [35,   0.000347, -0.000845],  // H/35 amp=0.001d
+  ],
+  AE: [  // RMSE = 5.0 min over full H
+    [ 3,  -1.486008, -0.090361],  // H/3  amp=1.489d [Fib]
+    [ 5,   0.003556, -0.001238],  // H/5  amp=0.004d [Fib]
+    [ 6,  -0.020719, -0.003286],  // H/6  amp=0.021d
+    [ 8,   1.485786,  0.065283],  // H/8  amp=1.487d [Fib]
+    [11,   0.041453,  0.002865],  // H/11 amp=0.042d
+    [13,   0.000213,  0.021826],  // H/13 amp=0.022d [Fib]
+    [14,   0.001099, -0.000954],  // H/14 amp=0.002d
+    [16,   0.067795, -1.789261],  // H/16 amp=1.791d [Fib] 90° shifted from WS
+    [19,   0.001390, -0.024089],  // H/19 amp=0.024d
+    [22,   0.000030, -0.001591],  // H/22 amp=0.002d
+    [24,  -0.001869,  0.022763],  // H/24 amp=0.023d
+    [32,   0.005593,  0.078878],  // H/32 amp=0.079d
+  ],
+};
+
+// Legacy alias for backward compatibility
+const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;
 
 
 // ─── 13. UTILITIES ───────────────────────────────────────────────────────
@@ -806,6 +873,8 @@ module.exports = {
   // Predictive formula
   PERI_HARMONICS,
   SOLSTICE_JD_HARMONICS,
+  CARDINAL_POINT_HARMONICS,
+  CARDINAL_POINT_ANCHORS,
   PERI_OFFSET,
 
   // Date utilities

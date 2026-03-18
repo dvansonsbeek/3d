@@ -767,42 +767,41 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // The earthRAAngle sets the mean offset; the inclination amplitude sets the oscillation.
 // Validated: RMSE = 0.089° (0.36 min RA) against 2,889 simulation data points.
 
-// Solstice JD: linear trend + 3 Fibonacci harmonics (H/3, H/8, H/16).
-// The JD harmonics remain fitted (they encode the variable-speed effect
-// which depends on the full equation-of-center interaction).
-// Solstice JD: anchored at juneSolstice2000_JD (actual solstice, June 21 01:48 UTC).
-// 5 Fibonacci harmonics from C.SOLSTICE_JD_HARMONICS (constants.js).
+// Cardinal Point JD: linear trend + 12 harmonics (5 Fibonacci + 7 overtones).
+// 12-harmonic fits from 11,553 observations (29-year steps) per cardinal point.
+// Anchored at observed J2000 values. Self-correcting: exact at year 2000.
+// See docs/14-solstice-prediction.md
 
-// Pre-compute harmonic contribution at J2000 (subtracted so formula is exact at year 2000)
-const _SOLSTICE_T2000 = 2000 - C.balancedYear;
-let _SOLSTICE_HARMONICS_AT_J2000 = 0;
-for (const [div, sinC, cosC] of C.SOLSTICE_JD_HARMONICS) {
-  const phase = 2 * Math.PI * _SOLSTICE_T2000 / (C.H / div);
-  _SOLSTICE_HARMONICS_AT_J2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+// Pre-compute harmonic contributions at J2000 for each cardinal point
+const _CP_T2000 = 2000 - C.balancedYear;
+const _CP_HARMONICS_AT_J2000 = {};
+for (const type of ['SS', 'WS', 'VE', 'AE']) {
+  let h2000 = 0;
+  for (const [div, sinC, cosC] of C.CARDINAL_POINT_HARMONICS[type]) {
+    const phase = 2 * Math.PI * _CP_T2000 / (C.H / div);
+    h2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  _CP_HARMONICS_AT_J2000[type] = h2000;
 }
 
 /**
- * Compute the RA (in degrees) where the summer solstice occurs.
+ * Compute the RA (in degrees) where a cardinal point occurs.
  * Fully derived — zero fitted constants.
  *
- * Formula: RA(t) = (90° − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
+ * Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
+ *   where baseRA = 90° (SS), 270° (WS), 0° (VE), 180° (AE)
  *
- * Physical basis:
- *   - earthRAAngle: perihelion tilt in the scene graph → mean RA offset
- *   - A: inclination amplitude → oscillation amplitude
- *   - 1/sin(ε): ecliptic-to-equatorial projection (same factor for both)
- *   - −sin(H/3) + sin(H/8): 90°-shifted obliquity structure (RA tracks rate of obliquity change)
- *
- * RMSE: 0.089° (0.36 min RA) against 2,889 simulation data points.
- * At J2000: ~90° (6h 00m). Mean over full H: ~86.85° (5h 47m 22s).
+ * RMSE: 0.089° (0.36 min RA) against 11,553 simulation data points.
  *
  * @param {number} year - calendar year
- * @returns {number} solstice RA in degrees
+ * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
+ * @returns {number} RA in degrees
  */
-function computeSolsticeRA(year) {
+function computeSolsticeRA(year, type) {
   const t = year - C.balancedYear;
   const sinE = Math.sin(C.earthtiltMean * Math.PI / 180);
-  const raMean = 90 - C.earthRAAngle / sinE;
+  const baseRA = { SS: 90, WS: 270, VE: 0, AE: 180 }[type || 'SS'];
+  const raMean = baseRA - C.earthRAAngle / sinE;
   const amp = C.earthInvPlaneInclinationAmplitude / sinE;
   const phase3 = 2 * Math.PI * t / (C.H / 3);
   const phase8 = 2 * Math.PI * t / (C.H / 8);
@@ -810,50 +809,53 @@ function computeSolsticeRA(year) {
 }
 
 /**
- * Compute the Julian Day when the summer solstice occurs.
- * Anchored at juneSolstice2000_JD (actual solstice, June 21, 2000 01:48 UTC).
+ * Compute the Julian Day when a cardinal point occurs.
+ * Anchored at observed J2000 value for each cardinal point.
  *
- * Formula: JD = juneSolstice2000_JD + meanSolarYear × (year − 2000)
+ * Formula: JD = anchor + meanSolarYear × (year − 2000)
  *             + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
  *
- * The harmonic subtraction ensures JD(2000) = juneSolstice2000_JD exactly.
- * 5 Fibonacci harmonics (H/3, H/5, H/8, H/13, H/16).
- * RMSE: 0.054 days (1.3 hours) against 2,889 simulation data points.
+ * 12 harmonics: 5 Fibonacci fundamentals + 7 overtones.
+ * RMSE: SS 2.7min, WS 5.3min, VE 3.0min, AE 5.0min over full H.
  *
  * @param {number} year - calendar year
- * @returns {number} Julian Day of the summer solstice
+ * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
+ * @returns {number} Julian Day of the cardinal point
  */
-function computeSolsticeJD(year) {
+function computeSolsticeJD(year, type) {
+  const cp = type || 'SS';
   const t = year - C.balancedYear;
-  let jd = C.ASTRO_REFERENCE.juneSolstice2000_JD + C.meanSolarYearDays * (year - 2000);
-  for (const [div, sinC, cosC] of C.SOLSTICE_JD_HARMONICS) {
+  const anchor = C.CARDINAL_POINT_ANCHORS[cp];
+  const harmonics = C.CARDINAL_POINT_HARMONICS[cp];
+  let jd = anchor + C.meanSolarYearDays * (year - 2000);
+  for (const [div, sinC, cosC] of harmonics) {
     const phase = 2 * Math.PI * t / (C.H / div);
     jd += sinC * Math.sin(phase) + cosC * Math.cos(phase);
   }
-  jd -= _SOLSTICE_HARMONICS_AT_J2000;
+  jd -= _CP_HARMONICS_AT_J2000[cp];
   return jd;
 }
 
 /**
- * Compute the "solstice year" — time between consecutive summer solstices.
- * This is the cardinal-point tropical year for the summer solstice.
- * Derivative of computeSolsticeJD(year) with respect to year.
+ * Compute the cardinal-point tropical year length (time between consecutive events).
+ * Derivative of computeSolsticeJD() with respect to year.
  *
- * Differs from the mean tropical year by up to ±46 seconds due to
- * perihelion precession (H/16). When perihelion aligns with the solstice,
- * the Sun moves faster there, shortening the solstice year.
+ * At J2000: SS=365.2417d (shortest, −46s), WS=365.2427d (longest, +45s).
+ * The ±46s variation comes from perihelion precession (H/16).
  *
  * @param {number} year - calendar year
- * @returns {number} solstice year length in days
+ * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
+ * @returns {number} year length in days
  */
-function computeSolsticeYearLength(year) {
+function computeSolsticeYearLength(year, type) {
+  const cp = type || 'SS';
   const t = year - C.balancedYear;
+  const harmonics = C.CARDINAL_POINT_HARMONICS[cp];
   let length = C.meanSolarYearDays;
-  for (const [div, sinC, cosC] of C.SOLSTICE_JD_HARMONICS) {
+  for (const [div, sinC, cosC] of harmonics) {
     const period = C.H / div;
     const omega = 2 * Math.PI / period;
     const phase = omega * t;
-    // Derivative: d/dt [sinC·sin(ωt) + cosC·cos(ωt)] = sinC·ω·cos(ωt) - cosC·ω·sin(ωt)
     length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
   }
   return length;
