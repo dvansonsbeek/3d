@@ -51,18 +51,43 @@ EARTH_INCLINATION_MEAN = 1.481179            # earthInvPlaneInclinationMean
 EARTH_INCLINATION_AMPLITUDE = 0.635970       # earthInvPlaneInclinationAmplitude
 EARTH_RA_ANGLE = 1.25363                     # earthRAAngle (perihelion tilt in scene graph)
 
-# Solstice JD harmonics — fitted from 2,889 simulation solstice observations
+# Cardinal Point JD harmonics — 12-harmonic fits from 11,553 observations (29-yr steps)
+# 5 Fibonacci fundamentals + 7 overtones (sums of Fibonacci: 6=3+3, 11=3+8, etc.)
 # See docs/14-solstice-prediction.md
-SOLSTICE_JD_HARMONICS = [
-    # (H_divisor, sin_coeff, cos_coeff)  — amplitude in days
-    # Anchor: juneSolstice2000_JD (actual solstice June 21, 01:48 UTC)
-    # 5 Fibonacci harmonics fitted from 2,889 simulation observations
-    (3,  -1.487917, -0.089684),   # H/3 inclination,   amp = 1.491 days
-    (5,   0.003925,  0.000165),   # H/5 ecliptic,      amp = 0.004 days
-    (8,   1.510931,  0.089545),   # H/8 obliquity,     amp = 1.514 days
-    (13, -0.023038,  0.000208),   # H/13 axial,        amp = 0.023 days
-    (16,  1.770500,  0.088980),   # H/16 perihelion,   amp = 1.773 days
-]
+CARDINAL_POINT_ANCHORS = {
+    'SS': 2451716.575,       # juneSolstice2000_JD
+    'WS': 2451900.067346,
+    'VE': 2451623.737525,
+    'AE': 2451810.304175,
+}
+CARDINAL_POINT_HARMONICS = {
+    'SS': [  # RMSE = 2.7 min
+        ( 3, -1.489856, -0.089878), ( 5,  0.003928, -0.000258), ( 6, -0.020769, -0.002618),
+        ( 8,  1.512826,  0.088901), (11,  0.041889,  0.003991), (13, -0.022995, -0.000219),
+        (16,  1.769641,  0.088047), (19,  0.021683,  0.001938), (24, -0.023684, -0.002899),
+        (29,  0.001261, -0.000420), (32, -0.088527, -0.005357), (40,  0.001251, -0.000270),
+    ],
+    'WS': [  # RMSE = 5.3 min
+        ( 3, -1.481731, -0.089611), ( 5,  0.003214, -0.000402), ( 6, -0.020656, -0.002783),
+        ( 8,  1.458880,  0.088769), (11,  0.040965,  0.003759), (13,  0.022819, -0.000817),
+        (14,  0.001088, -0.000425), (16, -1.808930, -0.093384), (19, -0.023794, -0.003299),
+        (24,  0.023840,  0.001968), (32,  0.069576,  0.002420), (48,  0.002811, -0.000403),
+    ],
+    'VE': [  # RMSE = 3.0 min
+        ( 3, -1.485598, -0.089089), ( 5,  0.003585,  0.000574), ( 6, -0.020707, -0.002118),
+        ( 8,  1.485817,  0.112270), (11,  0.041399,  0.004878), (13, -0.000220, -0.022860),
+        (16, -0.113545,  1.783526), (19, -0.003667,  0.022702), (24,  0.003172, -0.023635),
+        (27,  0.000188, -0.000833), (32,  0.013522, -0.077970), (35,  0.000347, -0.000845),
+    ],
+    'AE': [  # RMSE = 5.0 min
+        ( 3, -1.486008, -0.090361), ( 5,  0.003556, -0.001238), ( 6, -0.020719, -0.003286),
+        ( 8,  1.485786,  0.065283), (11,  0.041453,  0.002865), (13,  0.000213,  0.021826),
+        (14,  0.001099, -0.000954), (16,  0.067795, -1.789261), (19,  0.001390, -0.024089),
+        (22,  0.000030, -0.001591), (24, -0.001869,  0.022763), (32,  0.005593,  0.078878),
+    ],
+}
+# Legacy alias
+SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees

@@ -41,6 +41,7 @@ from constants_scripts import (
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
     AXIAL_TILT, OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
+    CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
 )
 
 # =============================================================================
@@ -634,86 +635,85 @@ def calc_stellar_day(year: int) -> float:
 # See docs/14-solstice-prediction.md
 # =============================================================================
 
-# Pre-compute harmonic contribution at J2000 (subtracted so formula is exact at year 2000)
-_SOLSTICE_T2000 = J2000 - ANCHOR_YEAR
-_SOLSTICE_HARMONICS_AT_J2000 = sum(
-    sin_c * math.sin(2 * math.pi * _SOLSTICE_T2000 / (H / div))
-    + cos_c * math.cos(2 * math.pi * _SOLSTICE_T2000 / (H / div))
-    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS
-)
+# Pre-compute harmonic contributions at J2000 for each cardinal point
+_CP_T2000 = J2000 - ANCHOR_YEAR
+_CP_HARMONICS_AT_J2000 = {}
+for _cp_type in ('SS', 'WS', 'VE', 'AE'):
+    _CP_HARMONICS_AT_J2000[_cp_type] = sum(
+        sin_c * math.sin(2 * math.pi * _CP_T2000 / (H / div))
+        + cos_c * math.cos(2 * math.pi * _CP_T2000 / (H / div))
+        for div, sin_c, cos_c in CARDINAL_POINT_HARMONICS[_cp_type]
+    )
+# Legacy alias
+_SOLSTICE_HARMONICS_AT_J2000 = _CP_HARMONICS_AT_J2000['SS']
 
 
-def calc_solstice_ra(year: int) -> float:
+def calc_solstice_ra(year: int, cp_type: str = 'SS') -> float:
     """
-    Compute RA (degrees) where the summer solstice occurs.
+    Compute RA (degrees) where a cardinal point occurs.
     Fully derived — zero fitted constants.
 
-    Formula: RA(t) = (90° − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
+    Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
 
-    Physical basis:
-      - earthRAAngle: perihelion tilt in scene graph → mean RA offset
-      - A: inclination amplitude → oscillation amplitude
-      - 1/sin(ε): ecliptic-to-equatorial projection (same factor for both)
-      - −sin(H/3) + sin(H/8): RA tracks the RATE of obliquity change (90° phase shift)
-
-    RMSE: 0.089° (0.36 min RA) against 2,889 simulation data points.
-    At J2000: ~90° (6h 00m). Mean over full H: ~86.85° (5h 47m 22s).
+    RMSE: 0.089° (0.36 min RA) over full H, same for all 4 cardinal points.
 
     Args:
         year: Calendar year
+        cp_type: 'SS', 'WS', 'VE', or 'AE' (default 'SS')
 
-    Returns: Solstice RA in degrees
+    Returns: Cardinal point RA in degrees
     """
     t = time_offset(year)
     sin_e = math.sin(math.radians(EARTH_OBLIQ_MEAN))
-    ra_mean = 90 - EARTH_RA_ANGLE / sin_e
+    base_ra = {'SS': 90, 'WS': 270, 'VE': 0, 'AE': 180}[cp_type]
+    ra_mean = base_ra - EARTH_RA_ANGLE / sin_e
     amp = EARTH_INCLIN_AMPL / sin_e
     phase3 = 2 * math.pi * t / (H / 3)
     phase8 = 2 * math.pi * t / (H / 8)
     return ra_mean + amp * (-math.sin(phase3) + math.sin(phase8))
 
 
-def calc_solstice_jd(year: int) -> float:
+def calc_solstice_jd(year: int, cp_type: str = 'SS') -> float:
     """
-    Compute Julian Day when the summer solstice occurs.
-    Anchored at juneSolstice2000_JD (actual solstice, June 21 01:48 UTC).
+    Compute Julian Day when a cardinal point occurs.
+    Anchored at the observed J2000 value for each cardinal point.
 
-    Formula: JD = juneSolstice2000_JD + meanSolarYear × (year − 2000)
-                + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
-
-    5 Fibonacci harmonics (H/3, H/5, H/8, H/13, H/16).
-    RMSE: 0.054 days (1.3 hours) against 2,889 simulation data points.
+    12 harmonics (5 Fibonacci + 7 overtones) per cardinal point.
+    RMSE: SS 2.7min, WS 5.3min, VE 3.0min, AE 5.0min.
 
     Args:
         year: Calendar year
+        cp_type: 'SS', 'WS', 'VE', or 'AE' (default 'SS')
 
-    Returns: Julian Day of the summer solstice
+    Returns: Julian Day of the cardinal point
     """
     t = time_offset(year)
-    jd = JUNE_SOLSTICE_2000_JD + MEAN_SOLAR_YEAR_DAYS * (year - J2000)
-    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS:
+    anchor = CARDINAL_POINT_ANCHORS[cp_type]
+    harmonics = CARDINAL_POINT_HARMONICS[cp_type]
+    jd = anchor + MEAN_SOLAR_YEAR_DAYS * (year - J2000)
+    for div, sin_c, cos_c in harmonics:
         phase = 2 * math.pi * t / (H / div)
         jd += sin_c * math.sin(phase) + cos_c * math.cos(phase)
-    jd -= _SOLSTICE_HARMONICS_AT_J2000
+    jd -= _CP_HARMONICS_AT_J2000[cp_type]
     return jd
 
 
-def calc_solstice_year_length(year: int) -> float:
+def calc_solstice_year_length(year: int, cp_type: str = 'SS') -> float:
     """
-    Compute the "solstice year" — time between consecutive summer solstices.
+    Compute the cardinal-point year length — time between consecutive events.
 
-    This is the cardinal-point tropical year for the summer solstice.
-    Differs from the mean tropical year by up to ±46 seconds due to
-    perihelion precession (H/16).
+    At J2000: SS=365.2416d (shortest), WS=365.2427d (longest), spread ~98s.
 
     Args:
         year: Calendar year
+        cp_type: 'SS', 'WS', 'VE', or 'AE' (default 'SS')
 
-    Returns: Solstice year length in days
+    Returns: Cardinal point year length in days
     """
     t = time_offset(year)
+    harmonics = CARDINAL_POINT_HARMONICS[cp_type]
     length = MEAN_SOLAR_YEAR_DAYS
-    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS:
+    for div, sin_c, cos_c in harmonics:
         period = H / div
         omega = 2 * math.pi / period
         phase = omega * t
