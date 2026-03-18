@@ -36,12 +36,28 @@ PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = round(1246 - 14.5 * (H / 16))  # balance year: 1246 - 14.5*(H/16)
 
+# Model reference point: summer solstice at J2000 (June 21, 2000)
+_START_MODEL_JD = 2451716.5                     # JD of the model's reference solstice
+_START_MODEL_YEAR = 2000.499361289612            # startModelYearWithCorrection
+_MEAN_SOLAR_YEAR = 365.2421912312542             # meanSolarYearDays (used for JD calc)
+BALANCED_JD = _START_MODEL_JD - _MEAN_SOLAR_YEAR * (_START_MODEL_YEAR - BALANCE_YEAR)
+
 # Earth parameters (constants.js section 3)
 EARTH_BASE_ECCENTRICITY = 0.015372           # eccentricityBase: (max + min) / 2
 EARTH_ECCENTRICITY_AMPLITUDE = 0.00137032    # eccentricityAmplitude: (max - min) / 2
 EARTH_OBLIQUITY_MEAN = 23.41357              # earthtiltMean
 EARTH_INCLINATION_MEAN = 1.481179            # earthInvPlaneInclinationMean
 EARTH_INCLINATION_AMPLITUDE = 0.635970       # earthInvPlaneInclinationAmplitude
+EARTH_RA_ANGLE = 1.25363                     # earthRAAngle (perihelion tilt in scene graph)
+
+# Solstice JD harmonics — fitted from 2,889 simulation solstice observations
+# See docs/14-solstice-prediction.md
+SOLSTICE_JD_HARMONICS = [
+    # (H_divisor, sin_coeff, cos_coeff)  — amplitude in days
+    (3,  -1.4475, -0.0896),   # H/3 inclination cycle, amp = 1.450 days
+    (8,   1.5254,  0.0896),   # H/8 obliquity cycle,   amp = 1.528 days
+    (16,  1.7774,  0.0890),   # H/16 perihelion,       amp = 1.780 days
+]
 
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees

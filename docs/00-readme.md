@@ -48,6 +48,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, proposed formulas |
 | 12 | [Perihelion Precession](12-perihelion-precession.md) | Perihelion longitude and precession rate calculations |
 | 13 | [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) | Mercury's perihelion precession by contributing planet |
+| 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from Fibonacci harmonics (H/3, H/8, H/16) |
 
 ### 20–29 Technical Reference
 

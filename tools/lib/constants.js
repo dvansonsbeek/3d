@@ -595,6 +595,16 @@ const PERI_HARMONICS = [
 ];
 const PERI_OFFSET = -0.261258;
 
+// ─── 12b. SOLSTICE JD HARMONICS ─────────────────────────────────────────
+// Fitted from 2,889 simulation solstice observations spanning full H.
+// See docs/14-solstice-prediction.md
+const SOLSTICE_JD_HARMONICS = [
+  // [H_divisor, sin_coeff, cos_coeff]  — amplitude in days
+  [3,  -1.4475, -0.0896],   // H/3 inclination cycle, amp = 1.450 days
+  [8,   1.5254,  0.0896],   // H/8 obliquity cycle,   amp = 1.528 days
+  [16,  1.7774,  0.0890],   // H/16 perihelion,       amp = 1.780 days
+];
+
 
 // ─── 13. UTILITIES ───────────────────────────────────────────────────────
 
@@ -790,6 +800,7 @@ module.exports = {
 
   // Predictive formula
   PERI_HARMONICS,
+  SOLSTICE_JD_HARMONICS,
   PERI_OFFSET,
 
   // Date utilities

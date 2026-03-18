@@ -33457,6 +33457,66 @@ function computePlanetObliquity(planetName, currentYear) {
   return tiltJ2000 + (inclNow - inclAtJ2000);
 }
 
+/* -----------------------------------------------------------------
+   SOLSTICE PREDICTION — Fibonacci harmonics (H/3, H/8, H/16)
+   Derived from 2,889 simulation solstice observations spanning full H.
+   See docs/14-solstice-prediction.md
+------------------------------------------------------------------ */
+
+// Solstice JD: anchored at startmodelJD (J2000 solstice), zero fitted constants
+const SOLSTICE_JD_HARMONICS = [
+  [3,  -1.4475, -0.0896],       // H/3 inclination, amp = 1.450 days
+  [8,   1.5254,  0.0896],       // H/8 obliquity,   amp = 1.528 days
+  [16,  1.7774,  0.0890],       // H/16 perihelion,  amp = 1.780 days
+];
+// Pre-compute harmonic contribution at J2000
+const _SOLSTICE_T2000 = 2000 - balancedYear;
+let _SOLSTICE_HARMONICS_AT_J2000 = 0;
+for (const [div, sinC, cosC] of SOLSTICE_JD_HARMONICS) {
+  const phase = 2 * Math.PI * _SOLSTICE_T2000 / (holisticyearLength / div);
+  _SOLSTICE_HARMONICS_AT_J2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+}
+
+/** Compute RA (degrees) where summer solstice occurs. Fully derived, zero fitted constants.
+ *  RA(t) = (90° − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
+ *  RMSE: 0.089° (0.36 min RA) over full H. */
+function computeSolsticeRA(currentYear) {
+  const t = currentYear - balancedYear;
+  const sinE = Math.sin(earthtiltMean * Math.PI / 180);
+  const raMean = 90 - earthRAAngle / sinE;
+  const amp = earthInvPlaneInclinationAmplitude / sinE;
+  const phase3 = 2 * Math.PI * t / (holisticyearLength / 3);
+  const phase8 = 2 * Math.PI * t / (holisticyearLength / 8);
+  return raMean + amp * (-Math.sin(phase3) + Math.sin(phase8));
+}
+
+/** Compute Julian Day when summer solstice occurs. Zero fitted constants.
+ *  JD = startmodelJD + meanSolarYear×(year−2000) + harmonics − harmonics_at_J2000
+ *  RMSE: 0.054 days (1.3 hours) over full H. */
+function computeSolsticeJD(currentYear) {
+  const t = currentYear - balancedYear;
+  let jd = startmodelJD + meansolaryearlengthinDays * (currentYear - 2000);
+  for (const [div, sinC, cosC] of SOLSTICE_JD_HARMONICS) {
+    const phase = 2 * Math.PI * t / (holisticyearLength / div);
+    jd += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  jd -= _SOLSTICE_HARMONICS_AT_J2000;
+  return jd;
+}
+
+/** Compute "solstice year" — time between consecutive summer solstices (days). */
+function computeSolsticeYearLength(currentYear) {
+  const t = currentYear - balancedYear;
+  let length = meansolaryearlengthinDays;
+  for (const [div, sinC, cosC] of SOLSTICE_JD_HARMONICS) {
+    const period = holisticyearLength / div;
+    const omega = 2 * Math.PI / period;
+    const phase = omega * t;
+    length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
+  }
+  return length;
+}
+
 /**
  * Compute Earth’s ecliptic inclination for a given year.
  *

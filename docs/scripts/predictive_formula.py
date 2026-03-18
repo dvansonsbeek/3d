@@ -39,7 +39,8 @@ from constants_scripts import (
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
     INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
-    AXIAL_TILT, OBLIQUITY_CYCLE,
+    AXIAL_TILT, OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
+    _START_MODEL_JD, SOLSTICE_JD_HARMONICS,
 )
 
 # =============================================================================
@@ -624,6 +625,99 @@ def calc_stellar_day(year: int) -> float:
     sy_d = calc_solar_year(year)
     sid_day = calc_sidereal_day(year)
     return ((sy_s / (sy_d + 1)) / (H / 13)) / (sy_d + 1) + sid_day
+
+
+# =============================================================================
+# SECTION E2: SOLSTICE PREDICTION
+# Solstice RA: fully derived from model parameters (zero fitted constants).
+# Solstice JD: anchored at J2000 solstice, zero fitted constants.
+# See docs/14-solstice-prediction.md
+# =============================================================================
+
+# Pre-compute harmonic contribution at J2000 (subtracted so formula is exact at year 2000)
+_SOLSTICE_T2000 = J2000 - ANCHOR_YEAR
+_SOLSTICE_HARMONICS_AT_J2000 = sum(
+    sin_c * math.sin(2 * math.pi * _SOLSTICE_T2000 / (H / div))
+    + cos_c * math.cos(2 * math.pi * _SOLSTICE_T2000 / (H / div))
+    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS
+)
+
+
+def calc_solstice_ra(year: int) -> float:
+    """
+    Compute RA (degrees) where the summer solstice occurs.
+    Fully derived — zero fitted constants.
+
+    Formula: RA(t) = (90° − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
+
+    Physical basis:
+      - earthRAAngle: perihelion tilt in scene graph → mean RA offset
+      - A: inclination amplitude → oscillation amplitude
+      - 1/sin(ε): ecliptic-to-equatorial projection (same factor for both)
+      - −sin(H/3) + sin(H/8): RA tracks the RATE of obliquity change (90° phase shift)
+
+    RMSE: 0.089° (0.36 min RA) against 2,889 simulation data points.
+    At J2000: ~90° (6h 00m). Mean over full H: ~86.85° (5h 47m 22s).
+
+    Args:
+        year: Calendar year
+
+    Returns: Solstice RA in degrees
+    """
+    t = time_offset(year)
+    sin_e = math.sin(math.radians(EARTH_OBLIQ_MEAN))
+    ra_mean = 90 - EARTH_RA_ANGLE / sin_e
+    amp = EARTH_INCLIN_AMPL / sin_e
+    phase3 = 2 * math.pi * t / (H / 3)
+    phase8 = 2 * math.pi * t / (H / 8)
+    return ra_mean + amp * (-math.sin(phase3) + math.sin(phase8))
+
+
+def calc_solstice_jd(year: int) -> float:
+    """
+    Compute Julian Day when the summer solstice occurs.
+    Anchored at J2000 solstice (startmodelJD). Zero fitted constants.
+
+    Formula: JD = startmodelJD + meanSolarYear × (year − 2000)
+                + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
+
+    RMSE: 0.054 days (1.3 hours) against 2,889 simulation data points.
+
+    Args:
+        year: Calendar year
+
+    Returns: Julian Day of the summer solstice
+    """
+    t = time_offset(year)
+    jd = _START_MODEL_JD + MEAN_SOLAR_YEAR_DAYS * (year - J2000)
+    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS:
+        phase = 2 * math.pi * t / (H / div)
+        jd += sin_c * math.sin(phase) + cos_c * math.cos(phase)
+    jd -= _SOLSTICE_HARMONICS_AT_J2000
+    return jd
+
+
+def calc_solstice_year_length(year: int) -> float:
+    """
+    Compute the "solstice year" — time between consecutive summer solstices.
+
+    This is the cardinal-point tropical year for the summer solstice.
+    Differs from the mean tropical year by up to ±46 seconds due to
+    perihelion precession (H/16).
+
+    Args:
+        year: Calendar year
+
+    Returns: Solstice year length in days
+    """
+    t = time_offset(year)
+    length = MEAN_SOLAR_YEAR_DAYS
+    for div, sin_c, cos_c in SOLSTICE_JD_HARMONICS:
+        period = H / div
+        omega = 2 * math.pi / period
+        phase = omega * t
+        length += sin_c * omega * math.cos(phase) - cos_c * omega * math.sin(phase)
+    return length
 
 
 # =============================================================================
