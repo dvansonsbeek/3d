@@ -5114,6 +5114,14 @@ let predictions = {
   longitudePerihelionDatePer: 0,
   longitudePerihelionDateAp: 0,
   lengthofAU: currentAUDistance,
+
+  // Cardinal point predictions (solstices & equinoxes)
+  cpSSDate: '', cpSSJD: 0, cpSSRA: 0, cpSSYearLen: 0,
+  cpWSDate: '', cpWSJD: 0, cpWSRA: 0, cpWSYearLen: 0,
+  cpVEDate: '', cpVEJD: 0, cpVERA: 0, cpVEYearLen: 0,
+  cpAEDate: '', cpAEJD: 0, cpAERA: 0, cpAEYearLen: 0,
+  cpSolsticeObliquity: 0,
+
   anomalisticMercury: 0,
 
   // IAU / J2000 reference values (for side-by-side comparison in GUI)
@@ -15246,6 +15254,27 @@ function setupGUI() {
   addTooltip(anomalisticFolder.addBinding(predictions, 'lengthofanomalisticDaysRealLOD', {
     label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
   }), 'Anomalistic year in days. Perihelion to perihelion.');
+
+  const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points' });
+  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 12-harmonic Fibonacci formula. Valid across the full 335,008-year Holistic Year. See doc 14.');
+  for (const [cp, label] of [['SS', 'Summer Solstice'], ['WS', 'Winter Solstice'], ['VE', 'Vernal Equinox'], ['AE', 'Autumnal Equinox']]) {
+    const sub = cpFolder.addFolder({ title: label });
+    addTooltip(sub.addBinding(predictions, 'cp' + cp + 'Date', {
+      label: 'Date', readonly: true
+    }), 'Predicted date and time (UTC) from the cardinal point formula.');
+    addTooltip(sub.addBinding(predictions, 'cp' + cp + 'JD', {
+      label: 'Julian Day', readonly: true, format: v => v.toFixed(6)
+    }), 'Julian Day number. Can be copied for use in other tools.');
+    addTooltip(sub.addBinding(predictions, 'cp' + cp + 'RA', {
+      label: 'RA (\u00B0)', readonly: true, format: v => v.toFixed(6)
+    }), 'Right Ascension where the cardinal point occurs. Fully derived (zero fitted constants).');
+    addTooltip(sub.addBinding(predictions, 'cp' + cp + 'YearLen', {
+      label: 'Year Length (d)', readonly: true, format: v => v.toFixed(8)
+    }), 'Time between consecutive events of this type. SS is shortest (~\u221251s), WS is longest (~+47s).');
+  }
+  addTooltip(cpFolder.addBinding(predictions, 'cpSolsticeObliquity', {
+    label: 'Observed Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
+  }), 'Obliquity as measured at the summer solstice (max declination). 12-harmonic formula, RMSE 0.20\". More accurate than the geometric obliquity by 935\u00d7 because it includes equation-of-center corrections.');
 
   const precessionFolder = astroFolder.addFolder({ title: 'Precession Periods' });
   addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecessionRealLOD', {
@@ -33425,6 +33454,21 @@ function updatePredictions() {
   
   predictions.lengthofAU = o.lengthofAU = (o.lengthofsiderealYearInSeconds/60/60 * speedofSuninKM) / (2 * Math.PI);
 
+  // Cardinal point predictions (solstices & equinoxes)
+  // Use integer year so values stay fixed for the entire calendar year
+  const cpYear = Math.floor(o.currentYear);
+  for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+    const jd = computeSolsticeJD(cpYear, cp);
+    const dt = jdToDateString(jd);
+    const ra = computeSolsticeRA(cpYear, cp);
+    const yr = computeSolsticeYearLength(cpYear, cp);
+    predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
+    predictions['cp' + cp + 'JD'] = jd;
+    predictions['cp' + cp + 'RA'] = ra;
+    predictions['cp' + cp + 'YearLen'] = yr;
+  }
+  predictions.cpSolsticeObliquity = computeSolsticeObliquity(cpYear);
+
   // IAU comparison differences (Model − IAU reference)
   predictions.diffSolarDay = (predictions.lengthofDay - ASTRO_REFERENCE.solarDayJ2000) * 1000;
   predictions.diffSiderealDay = (predictions.lengthofsiderealDayRealLOD - ASTRO_REFERENCE.siderealDayJ2000) * 1000;
@@ -33648,6 +33692,29 @@ function computePlanetObliquity(planetName, currentYear) {
    Derived from 2,889 simulation solstice observations spanning full H.
    See docs/14-solstice-prediction.md
 ------------------------------------------------------------------ */
+
+// Solstice-observed obliquity: 12-harmonic formula predicting the obliquity as actually
+// measured at the summer solstice (max declination). More accurate than the geometric
+// formula (0.20" vs 187" RMSE) because it includes equation-of-center corrections.
+const SOLSTICE_OBLIQUITY_MEAN = 23.45336360;
+const SOLSTICE_OBLIQUITY_HARMONICS = [
+  [ 2,  -0.00000263,  -0.00006321], [ 3,   0.03209855,  -0.63477438],
+  [ 5,  -0.00007671,  -0.00814478], [ 6,   0.00044850,  -0.00404458],
+  [ 8,  -0.03212886,   0.63478930], [ 9,   0.00000883,  -0.00005598],
+  [11,  -0.00089756,   0.00808658], [13,  -0.00000166,   0.00004102],
+  [14,  -0.00002651,   0.00016237], [16,   0.00044894,  -0.00404490],
+  [19,   0.00002653,  -0.00016529], [24,  -0.00000887,   0.00005342],
+];
+
+function computeSolsticeObliquity(currentYear) {
+  const t = currentYear - balancedYear;
+  let obliq = SOLSTICE_OBLIQUITY_MEAN;
+  for (const [div, sinC, cosC] of SOLSTICE_OBLIQUITY_HARMONICS) {
+    const phase = 2 * Math.PI * t / (holisticyearLength / div);
+    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return obliq;
+}
 
 // Cardinal Point JD: 12-harmonic fits (5 Fibonacci + 7 overtones) per cardinal point.
 // Fitted from 11,553 simulation observations (29-year steps) per type.

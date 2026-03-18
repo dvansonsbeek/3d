@@ -721,6 +721,26 @@ def calc_solstice_year_length(year: int, cp_type: str = 'SS') -> float:
     return length
 
 
+def calc_solstice_obliquity(year: int) -> float:
+    """
+    Compute the obliquity as OBSERVED at the summer solstice (max declination).
+    More accurate than calc_obliquity() (0.20" vs 187" RMSE) because it includes
+    the equation of center and precession hierarchy corrections.
+
+    Args:
+        year: Calendar year
+
+    Returns: Solstice-observed obliquity in degrees
+    """
+    from constants_scripts import SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS
+    t = time_offset(year)
+    obliq = SOLSTICE_OBLIQUITY_MEAN
+    for div, sin_c, cos_c in SOLSTICE_OBLIQUITY_HARMONICS:
+        phase = 2 * math.pi * t / (H / div)
+        obliq += sin_c * math.sin(phase) + cos_c * math.cos(phase)
+    return obliq
+
+
 # =============================================================================
 # SECTION F: PRECESSION DURATIONS
 # Axial, perihelion, and inclination precession periods — all derived

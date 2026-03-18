@@ -58,6 +58,30 @@ function computeObliquityIntegrals(currentYear) {
 }
 
 /**
+ * Compute the obliquity as OBSERVED at the summer solstice (max declination).
+ * More accurate than computeObliquityEarth() because it includes the equation
+ * of center and precession hierarchy effects that shift the measured obliquity.
+ *
+ * The geometric formula (computeObliquityEarth) has RMSE = 187" against simulation data.
+ * This 12-harmonic formula has RMSE = 0.20" — a 935× improvement.
+ *
+ * The 0.040° (143") mean offset from the geometric formula comes from the equation
+ * of center systematically biasing max-declination measurements at the solstice.
+ *
+ * @param {number} currentYear - calendar year (integer recommended)
+ * @returns {number} solstice-observed obliquity in degrees
+ */
+function computeSolsticeObliquity(currentYear) {
+  const t = currentYear - C.balancedYear;
+  let obliq = C.SOLSTICE_OBLIQUITY_MEAN;
+  for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return obliq;
+}
+
+/**
  * Compute dynamic obliquity (axial tilt) for a non-Earth planet.
  * Anchored to J2000: at year 2000, returns the known axial tilt.
  * Venus and Neptune have no obliquity cycle (returns static value).
@@ -913,6 +937,7 @@ function computeEarthOrbitalElements(year) {
 module.exports = {
   // Obliquity
   computeObliquityEarth,
+  computeSolsticeObliquity,
   computeObliquityIntegrals,
   computePlanetObliquity,
   computeInclinationTiltRelative,

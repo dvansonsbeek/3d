@@ -208,7 +208,35 @@ with perihelion precession. At SS it's sin-dominated, at VE it's cos-dominated,
 at AE it's −cos, at WS it's −sin. This is the perihelion precession "sweeping"
 through the cardinal points over the 20,938-year H/16 cycle.
 
-### 4. Long-term calendar implications
+### 4. Solstice-observed obliquity differs from geometric obliquity
+
+The geometric obliquity formula (`computeObliquityEarth`) uses:
+```
+obliquity = earthtiltMean − A·cos(H/3) + A·cos(H/8)
+```
+
+The obliquity **actually measured at the summer solstice** (max declination) differs
+systematically by +0.040° (143 arcsec). This offset arises because the equation of center
+shifts exactly WHEN the maximum declination occurs, creating a measurement bias.
+
+A separate 12-harmonic formula (`computeSolsticeObliquity`) achieves **0.20 arcsec** RMSE —
+a **935× improvement** over the geometric formula's 187 arcsec RMSE against simulation data.
+
+| Formula | Mean | RMSE | Use case |
+|---------|------|------|----------|
+| Geometric (`computeObliquityEarth`) | 23.41357° | 187" | Structural: ascending nodes, precession dynamics |
+| Solstice-observed (`computeSolsticeObliquity`) | 23.45336° | 0.20" | Observational: what you'd measure at the solstice |
+
+The 0.040° mean offset is approximately `inclinationMean × A / obliquityMean` =
+1.481 × 0.636 / 23.414 = 0.040° (1.1% accuracy) — the second-order coupling between
+the orbital plane's mean tilt, its oscillation depth, and the axial tilt. This is a
+numerical observation; a full derivation from first principles remains open.
+
+The same 12 overtone harmonics appear as in the cardinal point JD fits (H/5, H/6, H/11,
+H/13, H/16, H/19, H/24), confirming these are universal second-order interaction terms
+of the Fibonacci precession hierarchy.
+
+### 5. Long-term calendar implications
 
 Over the full Holistic Year, the solstice RA drifts by 6.3° (25 minutes of RA).
 The "summer solstice at 6h RA" is a temporary coincidence of our epoch.
@@ -238,9 +266,9 @@ All three codebases support all 4 cardinal points with an optional `type` parame
 
 | File | Functions | Constants |
 |------|-----------|-----------|
-| `tools/lib/orbital-engine.js` | `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)` | `C.CARDINAL_POINT_HARMONICS`, `C.CARDINAL_POINT_ANCHORS` |
-| `src/script.js` | `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)` | `CARDINAL_POINT_HARMONICS`, `CARDINAL_POINT_ANCHORS` |
-| `docs/scripts/predictive_formula.py` | `calc_solstice_ra(year, type)`, `calc_solstice_jd(year, type)`, `calc_solstice_year_length(year, type)` | `_CARDINAL_POINT_HARMONICS`, `_CARDINAL_POINT_ANCHORS` |
+| `tools/lib/orbital-engine.js` | `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)`, `computeSolsticeObliquity(year)` | `C.CARDINAL_POINT_HARMONICS`, `C.CARDINAL_POINT_ANCHORS`, `C.SOLSTICE_OBLIQUITY_*` |
+| `src/script.js` | `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)`, `computeSolsticeObliquity(year)` | `CARDINAL_POINT_HARMONICS`, `CARDINAL_POINT_ANCHORS`, `SOLSTICE_OBLIQUITY_*` |
+| `docs/scripts/predictive_formula.py` | `calc_solstice_ra(year, type)`, `calc_solstice_jd(year, type)`, `calc_solstice_year_length(year, type)`, `calc_solstice_obliquity(year)` | `CARDINAL_POINT_*`, `SOLSTICE_OBLIQUITY_*` |
 
 All implementations return exact J2000 anchor values by construction. Legacy `SOLSTICE_JD_HARMONICS` alias preserved for backward compatibility.
 
@@ -250,6 +278,8 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 |----------|-------|--------|
 | `CARDINAL_POINT_ANCHORS` | 4 × JD values | Astronomical observation (J2000 cardinal points) |
 | `CARDINAL_POINT_HARMONICS` | 4 × 12 × [div, sin, cos] | Fitted from 11,553 simulation observations per type |
+| `SOLSTICE_OBLIQUITY_MEAN` | 23.45336° | Fitted mean (= earthtiltMean + inclMean×A/ε ≈ +0.040°) |
+| `SOLSTICE_OBLIQUITY_HARMONICS` | 12 × [div, sin, cos] | Fitted from 11,553 SS observations |
 | `earthRAAngle` | 1.25363° | Scene graph parameter (perihelion precession tilt) |
 | `earthInvPlaneInclinationAmplitude` | 0.63597° | Model parameter (inclination oscillation) |
 | `earthtiltMean` | 23.41357° | Model parameter (mean obliquity) |

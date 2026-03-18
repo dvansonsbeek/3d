@@ -89,6 +89,24 @@ CARDINAL_POINT_HARMONICS = {
 # Legacy alias
 SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
 
+# Solstice-observed obliquity: predicts obliquity as measured at summer solstice
+# More accurate than geometric formula (0.20" vs 187" RMSE) due to EoC corrections
+SOLSTICE_OBLIQUITY_MEAN = 23.45336360
+SOLSTICE_OBLIQUITY_HARMONICS = [
+    ( 2,  -0.00000263,  -0.00006321),  # H/2  amp=0.2"
+    ( 3,   0.03209855,  -0.63477438),  # H/3  amp=2288"  inclination
+    ( 5,  -0.00007671,  -0.00814478),  # H/5  amp=29"    ecliptic
+    ( 6,   0.00044850,  -0.00404458),  # H/6  amp=15"    2×(H/3) overtone
+    ( 8,  -0.03212886,   0.63478930),  # H/8  amp=2288"  obliquity
+    ( 9,   0.00000883,  -0.00005598),  # H/9  amp=0.2"
+    (11,  -0.00089756,   0.00808658),  # H/11 amp=29"    H/3+H/8 coupling
+    (13,  -0.00000166,   0.00004102),  # H/13 amp=0.1"   axial
+    (14,  -0.00002651,   0.00016237),  # H/14 amp=0.6"
+    (16,   0.00044894,  -0.00404490),  # H/16 amp=15"    perihelion
+    (19,   0.00002653,  -0.00016529),  # H/19 amp=0.6"   H/3+H/16 coupling
+    (24,  -0.00000887,   0.00005342),  # H/24 amp=0.2"   H/8+H/16 coupling
+]
+
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees
 

@@ -596,7 +596,29 @@ const PERI_HARMONICS = [
 ];
 const PERI_OFFSET = -0.261258;
 
-// ─── 12b. CARDINAL POINT JD HARMONICS ───────────────────────────────────
+// ─── 12b. SOLSTICE-OBSERVED OBLIQUITY ────────────────────────────────────
+// The geometric obliquity formula (computeObliquityEarth) uses mean - A·cos(H/3) + A·cos(H/8).
+// The OBSERVED obliquity at the solstice (max declination) differs by ~0.04° (143")
+// due to the equation of center and precession hierarchy. This 12-harmonic formula
+// predicts the obliquity as actually observed at the summer solstice.
+// RMSE: 0.20 arcsec over full H. Fitted from 11,553 SS observations.
+const SOLSTICE_OBLIQUITY_MEAN = 23.45336360;
+const SOLSTICE_OBLIQUITY_HARMONICS = [
+  [ 2,  -0.00000263,  -0.00006321],  // H/2  amp=0.2"  [Fib]
+  [ 3,   0.03209855,  -0.63477438],  // H/3  amp=2288" [Fib] inclination
+  [ 5,  -0.00007671,  -0.00814478],  // H/5  amp=29"   [Fib] ecliptic
+  [ 6,   0.00044850,  -0.00404458],  // H/6  amp=15"   2×(H/3) overtone
+  [ 8,  -0.03212886,   0.63478930],  // H/8  amp=2288" [Fib] obliquity
+  [ 9,   0.00000883,  -0.00005598],  // H/9  amp=0.2"
+  [11,  -0.00089756,   0.00808658],  // H/11 amp=29"   H/3+H/8 coupling
+  [13,  -0.00000166,   0.00004102],  // H/13 amp=0.1"  [Fib] axial
+  [14,  -0.00002651,   0.00016237],  // H/14 amp=0.6"
+  [16,   0.00044894,  -0.00404490],  // H/16 amp=15"   [Fib] perihelion
+  [19,   0.00002653,  -0.00016529],  // H/19 amp=0.6"  H/3+H/16 coupling
+  [24,  -0.00000887,   0.00005342],  // H/24 amp=0.2"  H/8+H/16 coupling
+];
+
+// ─── 12c. CARDINAL POINT JD HARMONICS ───────────────────────────────────
 // 12-harmonic fits from 11,553 simulation observations (29-year steps) spanning full H.
 // 5 Fibonacci fundamentals + 7 overtones (all sums of Fibonacci: 6=3+3, 11=3+8, etc.)
 // See docs/14-solstice-prediction.md
@@ -873,6 +895,8 @@ module.exports = {
   // Predictive formula
   PERI_HARMONICS,
   SOLSTICE_JD_HARMONICS,
+  SOLSTICE_OBLIQUITY_MEAN,
+  SOLSTICE_OBLIQUITY_HARMONICS,
   CARDINAL_POINT_HARMONICS,
   CARDINAL_POINT_ANCHORS,
   PERI_OFFSET,
