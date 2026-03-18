@@ -5036,6 +5036,7 @@ let o = {
   runRATestToggle : false,
   _raTestBusy     : false,
   
+  solType        : 'SS',             // 'SS' | 'WS' | 'SS+WS' | 'ALL'
   solMode        : 'Range',          // 'Range' | 'List'
   solYearsText   : '2000, 2005, etc.',
   solRangeStart  : 2000,
@@ -15614,6 +15615,12 @@ function setupGUI() {
   /* --- Create Solstice File ------------------------------------------- */
   const solFolder = reportsFolder.addFolder({ title: 'Solstices & Equinoxes', expanded: false });
   addFolderTooltip(solFolder, 'Export solstice and equinox dates with RA and obliquity for selected years.');
+  solFolder.addBinding(o, 'solType', {
+    label: 'Type', options: {
+      'Summer Solstice': 'SS', 'Winter Solstice': 'WS',
+      'Both Solstices': 'SS+WS', 'All 4 Cardinal Points': 'ALL'
+    }
+  });
   const modeCtrl2 = solFolder.addBinding(o, 'solMode', {
     label: 'Mode', options: { 'Range': 'Range', 'List': 'List' }
   });
@@ -16147,6 +16154,145 @@ function solsticeForYear(year, prevSolsticeJD = null) {
     jd      : refinedJD,  // Use refinedJD directly for precision
     raDeg   : (sun.ra * 180 / Math.PI + 360) % 360,
     obliqDeg: refinedObliq
+  };
+}
+
+/**
+ * Find the WINTER solstice for a given year by detecting MINIMUM sun declination.
+ * Mirror of solsticeForYear() but searches for the minimum instead of maximum.
+ * @param {number} year - The year to find the winter solstice for
+ * @param {number} prevWinterSolsticeJD - Previous winter solstice JD for chaining
+ * @returns {object|null} - { jd, raDeg, obliqDeg } or null
+ */
+function winterSolsticeForYear(year, prevWinterSolsticeJD = null) {
+  let approxJD;
+  let searchRange;
+
+  if (prevWinterSolsticeJD !== null) {
+    approxJD = prevWinterSolsticeJD + meansolaryearlengthinDays;
+    searchRange = 288;  // ±6 days when chained
+  } else {
+    // Winter solstice is ~December, so year + 0.97
+    approxJD = startmodelJD +
+          ((year + 0.97) - startmodelYear) * meansolaryearlengthinDays;
+    searchRange = 960;  // ±20 days for first search (estimate can be off by >10 days)
+  }
+
+  const step    = 0.5 / 24;         // 0.5 h in days
+  let bestK     = 0;
+  let bestObliq = Infinity;          // Start high — looking for MINIMUM
+
+  const samples = [];
+  for (let k = -searchRange; k <= searchRange; ++k) {
+    const jd = approxJD + k * step;
+    jumpToJulianDay(jd);
+    forceSceneUpdate('light');
+    if (!Number.isFinite(sun?.dec)) continue;
+
+    const obDeg = 90 - sun.dec * 180 / Math.PI;
+    samples[k + searchRange] = { k, jd, obDeg };
+    if (obDeg < bestObliq) { bestObliq = obDeg; bestK = k; }  // MINIMUM
+  }
+
+  const bestIdx = bestK + searchRange;
+  if (!samples[bestIdx]) return null;
+
+  /* Parabolic interpolation for sub-sample precision (same as solsticeForYear) */
+  let refinedJD = samples[bestIdx].jd;
+  let refinedObliq = bestObliq;
+
+  if (samples[bestIdx - 1] && samples[bestIdx + 1]) {
+    const y_m1 = samples[bestIdx - 1].obDeg;
+    const y_0  = samples[bestIdx].obDeg;
+    const y_p1 = samples[bestIdx + 1].obDeg;
+
+    const denom = y_m1 - 2 * y_0 + y_p1;
+    if (Math.abs(denom) > 1e-12) {
+      const offset = (step / 2) * (y_m1 - y_p1) / denom;
+      refinedJD = samples[bestIdx].jd + offset;
+      const t = offset / step;
+      refinedObliq = y_0 + 0.5 * t * (y_p1 - y_m1) + 0.5 * t * t * (y_p1 - 2 * y_0 + y_m1);
+    }
+  }
+
+  jumpToJulianDay(refinedJD);
+  forceSceneUpdate('light');
+
+  return {
+    jd      : refinedJD,
+    raDeg   : (sun.ra * 180 / Math.PI + 360) % 360,
+    obliqDeg: refinedObliq
+  };
+}
+
+/**
+ * Find an equinox for a given year by detecting when sun declination crosses zero.
+ * @param {number} year - The year to find the equinox for
+ * @param {'VE'|'AE'} which - 'VE' = Vernal (ascending, March), 'AE' = Autumnal (descending, Sept)
+ * @param {number} prevEquinoxJD - Previous equinox JD for chaining
+ * @returns {object|null} - { jd, raDeg, obliqDeg } or null
+ */
+function equinoxForYearByDec(year, which, prevEquinoxJD = null) {
+  let approxJD;
+  let searchRange;
+
+  if (prevEquinoxJD !== null) {
+    approxJD = prevEquinoxJD + meansolaryearlengthinDays;
+    searchRange = 288;
+  } else {
+    const yearFraction = which === 'VE' ? 0.22 : 0.73;  // March or September
+    approxJD = startmodelJD +
+          ((year + yearFraction) - startmodelYear) * meansolaryearlengthinDays;
+    searchRange = 960;  // ±20 days for first search (VE estimate can be off by ~13 days)
+  }
+
+  const step = 0.5 / 24;  // 0.5 h in days
+
+  /* Phase 1: Coarse search */
+  const samples = [];
+  for (let k = -searchRange; k <= searchRange; ++k) {
+    const jd = approxJD + k * step;
+    jumpToJulianDay(jd);
+    forceSceneUpdate('light');
+    if (!Number.isFinite(sun?.dec)) continue;
+
+    const decDeg = 90 - sun.dec * 180 / Math.PI;  // Signed declination (sun.dec is co-declination)
+    samples[k + searchRange] = { k, jd, decDeg };
+  }
+
+  /* Phase 2: Find zero crossing with correct direction */
+  let refinedJD = null;
+
+  for (let i = 1; i < samples.length; i++) {
+    if (!samples[i] || !samples[i-1]) continue;
+
+    const dec1 = samples[i-1].decDeg;
+    const dec2 = samples[i].decDeg;
+
+    const isAscending  = dec1 < 0 && dec2 >= 0;   // VE: negative → positive
+    const isDescending = dec1 >= 0 && dec2 < 0;    // AE: positive → negative
+
+    if ((which === 'VE' && isAscending) || (which === 'AE' && isDescending)) {
+      // Linear interpolation at zero crossing
+      const t = -dec1 / (dec2 - dec1);
+      refinedJD = samples[i-1].jd + t * step;
+      break;
+    }
+  }
+
+  if (refinedJD === null) return null;
+
+  jumpToJulianDay(refinedJD);
+  forceSceneUpdate('light');
+
+  // Obliquity derived from declination (consistent with solstice functions):
+  // At equinox, this gives ~0° (the Sun is on the equator).
+  const obliq = 90 - sun.dec * 180 / Math.PI;
+
+  return {
+    jd      : refinedJD,
+    raDeg   : (sun.ra * 180 / Math.PI + 360) % 360,
+    obliqDeg: obliq
   };
 }
 
@@ -16956,8 +17102,13 @@ function aphelionForYear(year, debug = false, prevAphelionJD = null) {
 }
 
 async function runSolsticeExport(years) {
+  const solType = o.solType || 'SS';
+  const wantSS  = solType === 'SS'  || solType === 'SS+WS' || solType === 'ALL';
+  const wantWS  = solType === 'WS'  || solType === 'SS+WS' || solType === 'ALL';
+  const wantVE  = solType === 'ALL';
+  const wantAE  = solType === 'ALL';
 
-  console.log('Solstice export for years:', years);
+  console.log('Solstice export for years:', years, '| type:', solType);
 
   /* A · freeze viewer */
   const oldRun  = o.Run;
@@ -16965,24 +17116,58 @@ async function runSolsticeExport(years) {
   const oldTime = o.Time;
   o.Run = false;
 
-  /* B · rows */
-  const rows = [['Date', 'Time', 'Year', 'JD', 'RA (°)', 'Obliquity (°)']];
+  /* B · build header based on selected types */
+  const types = [];
+  if (wantVE) types.push('VE');
+  if (wantSS) types.push('SS');
+  if (wantAE) types.push('AE');
+  if (wantWS) types.push('WS');
+
+  // Pivoted header: Model Year | VE Date | VE Time | VE JD | VE RA | VE Obliquity | SS Date | ...
+  const header = ['Model Year'];
+  for (const t of types) {
+    header.push(`${t} Date`, `${t} Time`, `${t} JD`, `${t} RA (°)`, `${t} Obliquity (°)`);
+  }
+  const rows = [header];
   const YIELD_EVERY = 25;
   let done = 0;
 
-  for (const y of years) {
-    const r = solsticeForYear(y);
-    if (!r) continue;
+  let prevJD_SS = null, prevJD_WS = null, prevJD_VE = null, prevJD_AE = null;
 
-    rows.push([
-      o.Date,
-      o.Time,
-      y,
-      r.jd.toFixed(6),
-      r.raDeg.toFixed(6),
-      r.obliqDeg.toFixed(6)
-    ]);
-    if (++done % YIELD_EVERY === 0) {
+  for (const y of years) {
+    const row = [y];
+    const results = {};
+
+    if (wantVE) {
+      const r = equinoxForYearByDec(y, 'VE', prevJD_VE);
+      if (r) { prevJD_VE = r.jd; results.VE = { date: o.Date, time: o.Time, ...r }; }
+    }
+    if (wantSS) {
+      const r = solsticeForYear(y, prevJD_SS);
+      if (r) { prevJD_SS = r.jd; results.SS = { date: o.Date, time: o.Time, ...r }; }
+    }
+    if (wantAE) {
+      const r = equinoxForYearByDec(y, 'AE', prevJD_AE);
+      if (r) { prevJD_AE = r.jd; results.AE = { date: o.Date, time: o.Time, ...r }; }
+    }
+    if (wantWS) {
+      const r = winterSolsticeForYear(y, prevJD_WS);
+      if (r) { prevJD_WS = r.jd; results.WS = { date: o.Date, time: o.Time, ...r }; }
+    }
+
+    for (const t of types) {
+      const r = results[t];
+      if (r) {
+        row.push(r.date, r.time, r.jd.toFixed(6), r.raDeg.toFixed(6), r.obliqDeg.toFixed(6));
+      } else {
+        row.push('', '', '', '', '');
+      }
+    }
+
+    rows.push(row);
+    done++;
+
+    if (done % YIELD_EVERY === 0) {
       await new Promise(requestAnimationFrame);
     }
   }
@@ -16995,16 +17180,17 @@ async function runSolsticeExport(years) {
   /* D · write file */
   if (done) {
     await ensureSheetJs();
+    const sheetName = solType === 'ALL' ? 'Cardinal Point Dates' : 'Solstice Dates';
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,
-        XLSX.utils.aoa_to_sheet(rows), 'Solstice Dates');
+        XLSX.utils.aoa_to_sheet(rows), sheetName);
     const url = URL.createObjectURL(workbookToBlob(wb));
     Object.assign(document.createElement('a'), {
       href: url,
       download: 'Holistic_solstice_results.xlsx'
     }).click();
     URL.revokeObjectURL(url);
-    console.log(`Export finished – ${done} rows`);
+    console.log(`Export finished – ${done} rows (${solType})`);
   } else {
     console.error('No valid years – nothing written');
   }

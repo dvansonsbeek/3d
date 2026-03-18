@@ -157,7 +157,7 @@ Position data for Sun and all planets.
 
 ### Purpose
 
-Exports solstice and equinox timing data with RA and obliquity for a range of years to an Excel file.
+Exports solstice and equinox timing data with RA and obliquity for a range of years to an Excel file. All four cardinal points are detected by their **physical definition** — not by RA coordinate crossings.
 
 ### Location
 
@@ -167,30 +167,66 @@ Exports solstice and equinox timing data with RA and obliquity for a range of ye
 
 | Control | Description |
 |---------|-------------|
+| **Type** | Cardinal point selection (see below) |
 | **Mode** | `Range` or `List` — determines how years are specified |
 | **Year list (CSV)** | Comma-separated list of specific years (List mode only) |
 | **Start year** | First year in range (Range mode only) |
 | **End year** | Last year in range (Range mode only) |
 | **Create file (be patient)** | Button to trigger export |
 
+#### Type options
+
+| Option | Description |
+|--------|-------------|
+| **Summer Solstice** | June solstice only (maximum declination) — default |
+| **Winter Solstice** | December solstice only (minimum declination) |
+| **Both Solstices** | Summer and winter solstice per year |
+| **All 4 Cardinal Points** | VE, SS, AE, WS per year |
+
+### Detection methods
+
+Each cardinal point is found by its physical observable:
+
+| Point | Method | Interpolation |
+|-------|--------|---------------|
+| **Summer Solstice (SS)** | Maximum sun declination | Parabolic (sub-sample precision) |
+| **Winter Solstice (WS)** | Minimum sun declination | Parabolic (sub-sample precision) |
+| **Vernal Equinox (VE)** | Declination crosses zero ascending (neg → pos) | Linear at zero crossing |
+| **Autumnal Equinox (AE)** | Declination crosses zero descending (pos → neg) | Linear at zero crossing |
+
+This differs from the Year Length Analysis report (Part 3), which detects cardinal points via RA crossings at 0°/90°/180°/270°. Both methods are valid but measure subtly different moments (~1 second difference at J2000 due to the obliquity rate of change).
+
 ### Output
 
-Excel file (`Holistic_solstice_results.xlsx`) with columns:
+Excel file (`Holistic_solstice_results.xlsx`) with pivoted layout — one row per year, columns grouped by cardinal point:
 
 | Column | Description |
 |--------|-------------|
-| Date | Solstice date |
-| Time | Solstice time (UTC) |
-| Year | Calendar year |
-| JD | Julian Day number |
-| RA | Sun's Right Ascension (deg) |
-| Obliquity | Earth's axial tilt (deg) |
+| Model Year | Calendar year |
+| {Type} Date | Date of the cardinal point event |
+| {Type} Time | Time (UTC) |
+| {Type} JD | Julian Day number |
+| {Type} RA (°) | Sun's Right Ascension at the event |
+| {Type} Obliquity (°) | Declination-derived obliquity: ~23.4° at solstices, ~0° at equinoxes |
+
+Where `{Type}` = SS, WS, VE, AE depending on the selected type. When "All 4 Cardinal Points" is selected, the sheet is named "Cardinal Point Dates".
 
 ### Technical Implementation
 
-**Source**: `script.js` line ~14435
+**Source**: `script.js`
 
-**Function**: `runSolsticeExport(years)`
+| Function | Description |
+|----------|-------------|
+| `runSolsticeExport(years)` | Main export — reads `o.solType`, dispatches to detection functions |
+| `solsticeForYear(year, prevJD)` | Summer solstice: finds max declination with parabolic interpolation |
+| `winterSolsticeForYear(year, prevJD)` | Winter solstice: finds min declination with parabolic interpolation |
+| `equinoxForYearByDec(year, which, prevJD)` | Equinoxes: finds declination zero crossing (VE ascending, AE descending) |
+
+All functions support JD chaining (`prevJD`) for efficient sequential-year searches. Initial search uses ±20 days window (960 half-hour samples); chained search uses ±6 days.
+
+### Related
+
+For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across 335,008 years), see [14 — Solstice Prediction](14-solstice-prediction.md).
 
 ---
 
@@ -464,18 +500,37 @@ SUMMARY:
 
 ## Key Functions Reference
 
+### solsticeForYear(year, prevSolsticeJD)
+
+Finds the summer solstice (maximum sun declination) for a given year using parabolic interpolation.
+
+**Returns**: `{ jd, raDeg, obliqDeg }` — RA ≈ 90° at summer solstice
+
+### winterSolsticeForYear(year, prevWinterSolsticeJD)
+
+Finds the winter solstice (minimum sun declination) for a given year using parabolic interpolation.
+
+**Returns**: `{ jd, raDeg, obliqDeg }` — RA ≈ 270° at winter solstice, obliquity is negative
+
+### equinoxForYearByDec(year, which, prevEquinoxJD)
+
+Finds an equinox by detecting when sun declination crosses zero.
+
+**Parameters**:
+- `which` - `'VE'` (ascending, March) or `'AE'` (descending, September)
+
+**Returns**: `{ jd, raDeg, obliqDeg }` — obliquity ≈ 0° at equinox
+
 ### sunRACrossingForYear(year, targetRA, prevJD)
 
-Finds the Julian Day when the Sun crosses a specific Right Ascension value.
-
-**Location**: line ~13644
+Finds the Julian Day when the Sun crosses a specific Right Ascension value. Used by the Year Length Analysis report (Part 3) for RA-based cardinal point detection.
 
 **Parameters**:
 - `year` - Calendar year
 - `targetRA` - Target RA in degrees (0=VE, 90=SS, 180=AE, 270=WS)
 - `prevJD` - Optional previous crossing JD for optimization
 
-**Returns**: Object with `jd` property containing the crossing Julian Day
+**Returns**: `{ jd, raDeg, decDeg }`
 
 ### perihelionForYearMethodB(year, verbose, prevJD)
 
