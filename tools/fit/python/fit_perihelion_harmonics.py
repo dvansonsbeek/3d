@@ -227,22 +227,17 @@ def main():
     print(f'Current ({len(current_divisors)} terms): RMSE = {rmse:.6f}°, offset = {offset:.6f}')
     print(f'Greedy  ({len(greedy_divs)} terms):  RMSE = {greedy_rmse:.6f}°, offset = {greedy_offset:.6f}')
 
-    # ─── Auto-update fitted-coefficients.js ───────────────────────────
-    # Use the current 21-term fit (stable structure, well-validated)
-    from update_fitted import update_section
-
-    lines = []
-    lines.append(f'// {len(current_divisors)}-term fit, RMSE = {rmse:.4f}°, from data/01-holistic-year-objects-data.xlsx')
-    lines.append(f'// Periods computed from H in buildFittedCoefficients().')
-    lines.append(f'const PERI_HARMONICS_RAW = [')
-    for div, sc, cc in harmonics:
-        amp = math.sqrt(sc**2 + cc**2)
-        lines.append(f'  [{div:>4},  {sc:>10.6f},  {cc:>10.6f}],  // H/{div}  amp={amp:.4f}°')
-    lines.append(f'];')
-    lines.append(f'const PERI_OFFSET = {offset:.6f};')
-
-    update_section('PERI_HARMONICS', '\n'.join(lines))
-    print(f'\n✓ Updated PERI_HARMONICS in fitted-coefficients.js')
+    # ─── Write to fitted-coefficients.json if --write flag is present ───
+    import json
+    if '--write' in sys.argv:
+        json_path = Path(__file__).resolve().parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
+        fc = json.loads(json_path.read_text())
+        fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in harmonics]
+        fc['PERI_OFFSET'] = offset
+        json_path.write_text(json.dumps(fc, indent=2) + '\n')
+        print(f'\n✓ Written PERI_HARMONICS to fitted-coefficients.json')
+    else:
+        print(f'\n  (dry run — add --write to update fitted-coefficients.json)')
 
 
 if __name__ == '__main__':

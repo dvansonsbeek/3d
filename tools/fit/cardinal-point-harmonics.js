@@ -230,21 +230,19 @@ function main() {
     console.log(`  ${type} | ${current.rmse.toFixed(2)} min     | ${greedy.rmse.toFixed(2)} min  | [${greedy.divisors.join(',')}]`);
   }
 
-  // ─── Auto-update fitted-coefficients.js ──────────────────────────────
-  const fittedPath = path.join(__dirname, '..', 'lib', 'constants', 'fitted-coefficients.js');
-  const fittedSrc = fs.readFileSync(fittedPath, 'utf8');
-  const startMarker = '// @AUTO:CARDINAL_POINTS:START';
-  const endMarker = '// @AUTO:CARDINAL_POINTS:END';
-  const startIdx = fittedSrc.indexOf(startMarker);
-  const endIdx = fittedSrc.indexOf(endMarker);
-  if (startIdx === -1 || endIdx === -1) {
-    console.error('\n  ✗ Could not find @AUTO:CARDINAL_POINTS markers in fitted-coefficients.js');
+  // ─── Write to fitted-coefficients.json if --write flag is present ────
+  if (process.argv.includes('--write')) {
+    const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+    const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    const harmonicsObj = {};
+    for (const type of types) {
+      harmonicsObj[type] = results[type].greedy.harmonics;
+    }
+    fc.CARDINAL_POINT_HARMONICS = harmonicsObj;
+    fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
+    console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS to fitted-coefficients.json');
   } else {
-    const startLineEnd = fittedSrc.indexOf('\n', startIdx) + 1;
-    const newContent = jsLines.join('\n') + '\n\n// Legacy alias\nconst SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;\n';
-    const newSrc = fittedSrc.slice(0, startLineEnd) + newContent + fittedSrc.slice(endIdx);
-    fs.writeFileSync(fittedPath, newSrc);
-    console.log('\n  ✓ Updated CARDINAL_POINT_HARMONICS in fitted-coefficients.js');
+    console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }
 }
 

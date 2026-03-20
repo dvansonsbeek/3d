@@ -1,259 +1,158 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // SHARED CONSTANTS MODULE — Single source of truth for all tool scripts.
 //
-// Structure:
-//   constants.js          — Input constants + derived values (this file)
-//   constants/astro-reference.js    — External reference data (IAU, JPL, Meeus)
-//   constants/fitted-coefficients.js — Fitted harmonics and ML coefficients
-//   constants/utils.js              — Date conversion and formatting helpers
+// All input data loaded from JSON files in public/input/:
+//   model-parameters.json       — Model theory parameters
+//   astro-reference.json        — IAU/JPL/Meeus reference data
+//   fitted-coefficients.json    — Fitting pipeline output (via fitted-coefficients.js)
+//
+// Sub-modules:
+//   constants/fitted-coefficients.js — Loads fitted data + buildFittedCoefficients()
+//   constants/utils.js              — Date conversion, formatting, derivation helpers
 //
 // All consumers: const C = require('./lib/constants');
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ─── Sub-modules ─────────────────────────────────────────────────────────
-const { ASTRO_REFERENCE, yearLengthRef, knownValues } = require('./constants/astro-reference');
+// ─── Sub-modules & JSON data ─────────────────────────────────────────────
 const fitted = require('./constants/fitted-coefficients');
 const utils = require('./constants/utils');
+const path = require('path');
+const fs = require('fs');
+const modelParams = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json'), 'utf8'));
+const astroRef = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
+
+// Build ASTRO_REFERENCE object (consumed by scene-graph.js, optimizer.js, etc.)
+const ASTRO_REFERENCE = {
+  // Earth orbital (J2000)
+  juneSolstice2000_JD: astroRef.earthOrbital.juneSolstice2000_JD,
+  obliquityJ2000_deg: astroRef.earthOrbital.obliquityJ2000_deg,
+  obliquityRate_arcsecPerCentury: astroRef.earthOrbital.obliquityRate_arcsecPerCentury,
+  earthEccentricityJ2000: astroRef.earthOrbital.earthEccentricityJ2000,
+  earthPerihelionLongitudeJ2000: astroRef.earthOrbital.earthPerihelionLongitudeJ2000,
+  earthAscendingNodeInvPlane: astroRef.earthOrbital.earthAscendingNodeInvPlane,
+  earthInclinationPhaseAngle: astroRef.earthOrbital.earthInclinationPhaseAngle,
+  perihelionPassageJ2000_JD: astroRef.earthOrbital.perihelionPassageJ2000_JD,
+  earthInclinationJ2000_deg: astroRef.earthOrbital.earthInclinationJ2000_deg,
+  // Lunar Meeus coefficients
+  ...astroRef.moonMeeus,
+  // Cardinal point anchors
+  cardinalPointAnchors: astroRef.cardinalPointAnchors,
+  // Additional fields attached below after planets are defined:
+  //   ascNodeTiltCorrection, decCorrection, raCorrection,
+  //   earthInvPlanePrecessionYears, <planet>PerihelionRef_JD
+};
+
+const yearLengthRef = astroRef.yearLengthRef;
+const knownValues = astroRef.knownValues;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. FOUNDATIONAL MODEL CONSTANTS
+// 1. FOUNDATIONAL MODEL CONSTANTS (from model-parameters.json)
 // These define the model itself. Changing any = different theory.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const H = 335008; // holisticyearLength
-const inputMeanSolarYear = 365.2421897;
-const perihelionalignmentYear = 1246;
-const startmodelJD = 2451716.5;
-const startmodelYear = 2000.5;
-const correctionDays = -0.23328398168087;
-const correctionSun = 0.495997;
-const temperatureGraphMostLikely = 14.5;
-const startAngleModel = 89.91949879;
-const useVariableSpeed = true; // Toggle equation of center (must match script.js)
+const H = modelParams.foundational.H;
+const inputMeanSolarYear = modelParams.foundational.inputMeanSolarYear;
+const startmodelJD = modelParams.foundational.startmodelJD;
+const startmodelYear = modelParams.foundational.startmodelYear;
+const correctionDays = modelParams.foundational.correctionDays;
+const correctionSun = modelParams.foundational.correctionSun;
+const temperatureGraphMostLikely = modelParams.foundational.temperatureGraphMostLikely;
+const startAngleModel = modelParams.foundational.startAngleModel;
+const useVariableSpeed = modelParams.foundational.useVariableSpeed;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. PHYSICAL & ASTRONOMICAL CONSTANTS
+// 2. PHYSICAL & ASTRONOMICAL CONSTANTS (from astro-reference.json)
 // External reference values from IAU, JPL DE440, etc.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const currentAUDistance = 149597870.698828; // km
-const meanSiderealYearSeconds = 31558149.8;
-const G_CONSTANT = 6.6743e-20; // km³/(kg·s²)
-const MASS_RATIO_EARTH_MOON = 81.3007;
-
-// DE440 Sun/planet mass ratios (Sun mass / planet mass)
-const massRatioDE440 = {
-  mercury: 6023625.5, venus: 408523.72, mars: 3098703.59,
-  jupiter: 1047.348625, saturn: 3497.9018, uranus: 22902.944, neptune: 19412.237,
-};
+const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
+const meanSiderealYearSeconds = astroRef.physicalConstants.meanSiderealYearSeconds;
+const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
+const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
+const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
+const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 3. EARTH PARAMETERS
+// 3. EARTH PARAMETERS (from model-parameters.json + derived)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const earthtiltMean = 23.41365930;           // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
-const earthInvPlaneInclinationAmplitude = 0.63541988; // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
+const earthtiltMean = modelParams.earth.earthtiltMean;
+const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclinationAmplitude;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
 // Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle) — refs from ASTRO_REFERENCE
-const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;  // 284.51° Souami & Souchay (2012)
+const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
   ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,
   earthAscendingNodeInvPlane, ASTRO_REFERENCE.earthInclinationPhaseAngle);
-const eccentricityBase = 0.01537159;
-const eccentricityAmplitude = 0.00137074; // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
-// K = eccentricityAmplitude × √m_Earth × a_Earth^(3/2) / (sin(tiltMean) × √d_Earth)
-const eccentricityAmplitudeK = 3.4505372893e-6;
-const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD; // JD of Earth perihelion 2000 (Jan 3.542)
+const eccentricityBase = modelParams.earth.eccentricityBase;
+const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
+const eccentricityAmplitudeK = modelParams.earth.eccentricityAmplitudeK;
+const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. MOON INPUT CONSTANTS
+// 4. MOON INPUT CONSTANTS (astro refs + model startpos)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const moonSiderealMonthInput = 27.32166156;
-const moonAnomalisticMonthInput = 27.55454988;
-const moonNodalMonthInput = 27.21222082;
-const moonDistance = 384399.07; // km
-const moonEclipticInclinationJ2000 = 5.1453964;
-const moonOrbitalEccentricity = 0.054900489;
-const moonTilt = 6.687;
-const moonStartposApsidal = 347.622;
-const moonStartposNodal = -83.630;
-const moonStartposMoon = 131.930;
+const moonSiderealMonthInput = astroRef.moonReference.moonSiderealMonthInput;
+const moonAnomalisticMonthInput = astroRef.moonReference.moonAnomalisticMonthInput;
+const moonNodalMonthInput = astroRef.moonReference.moonNodalMonthInput;
+const moonDistance = astroRef.moonReference.moonDistance;
+const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinationJ2000;
+const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricity;
+const moonTilt = astroRef.moonReference.moonTilt;
+const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
+const moonStartposNodal = modelParams.moon.moonStartposNodal;
+const moonStartposMoon = modelParams.moon.moonStartposMoon;
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5. PLANET INPUT DATA
+// 5. PLANET INPUT DATA (merged from model-parameters.json + astro-reference.json)
 // Per-planet constants for the 7 non-Earth planets.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const planets = {
-  mercury: {
-    name: 'Mercury',
-    solarYearInput: 87.9686,
-    orbitalEccentricityBase: 0.20563593,
-    orbitalEccentricityJ2000: 0.20563593,
-    orbitalEccentricityAmplitude: 8.436789e-5,
-    eccentricityPhaseJ2000: 89.9882,
-    axialTiltMean: 0.03,
-    eocFraction: -0.527,
-    startpos: 83.5293,
-    angleCorrection: 0.97090778,
-    perihelionEclipticYears: H / (1 + 3/8),
-    type: 'I',
-    mirrorPair: 'uranus',
-    fibonacciD: 21,
-    eclipticInclinationJ2000: 7.00497902,
-    longitudePerihelion: 77.4569131,
-    ascendingNode: 48.33033155,
-    invPlaneInclinationJ2000: 6.3472858,
-    ascendingNodeInvPlane: 32.83,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: H * 8 / 3,
-  },
-  venus: {
-    name: 'Venus',
-    solarYearInput: 224.695,
-    orbitalEccentricityBase: 0.00619052,
-    orbitalEccentricityJ2000: 0.00677672,
-    orbitalEccentricityAmplitude: 9.625389e-4,
-    eccentricityPhaseJ2000: 123.7514,
-    axialTiltMean: 2.6392,
-    eocFraction: 0.436,
-    startpos: 249.3141,
-    angleCorrection: -2.80286830,
-    perihelionEclipticYears: H * 2,
-    type: 'I',
-    mirrorPair: 'neptune',
-    fibonacciD: 34,
-    eclipticInclinationJ2000: 3.39467605,
-    longitudePerihelion: 131.5765919,
-    ascendingNode: 76.67877109,
-    invPlaneInclinationJ2000: 2.1545441,
-    ascendingNodeInvPlane: 54.70,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: null,
-  },
-  mars: {
-    name: 'Mars',
-    solarYearInput: 686.931,
-    orbitalEccentricityBase: 0.09297543,
-    orbitalEccentricityJ2000: 0.09339410,
-    orbitalEccentricityAmplitude: 3.073636e-3,
-    eccentricityPhaseJ2000: 96.8878,
-    axialTiltMean: 25.19,
-    eocFraction: -0.066224,
-    startpos: 121.4679,
-    angleCorrection: -2.10936153,
-    perihelionEclipticYears: H / (4 + 1/3),
-    type: 'II',
-    mirrorPair: 'jupiter',
-    fibonacciD: 5,
-    eclipticInclinationJ2000: 1.84969142,
-    longitudePerihelion: 336.0650681,
-    ascendingNode: 49.55737662,
-    invPlaneInclinationJ2000: 1.6311858,
-    ascendingNodeInvPlane: 354.87,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: 3 * H / 8,
-  },
-  jupiter: {
-    name: 'Jupiter',
-    solarYearInput: 4330.5,
-    orbitalEccentricityBase: 0.04821478,
-    orbitalEccentricityJ2000: 0.04838624,
-    orbitalEccentricityAmplitude: 1.149908e-6,
-    eccentricityPhaseJ2000: 180,
-    axialTiltMean: 3.13,
-    eocFraction: 0.495,
-    startpos: 13.85,
-    angleCorrection: 0.92703626,
-    perihelionEclipticYears: H / 5,
-    type: 'III',
-    mirrorPair: 'mars',
-    fibonacciD: 5,
-    eclipticInclinationJ2000: 1.30439695,
-    longitudePerihelion: 14.70659401,
-    ascendingNode: 100.4877868,
-    invPlaneInclinationJ2000: 0.3219652,
-    ascendingNodeInvPlane: 312.89,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: H / 2,
-  },
-  saturn: {
-    name: 'Saturn',
-    solarYearInput: 10747.0,
-    orbitalEccentricityBase: 0.05374486,
-    orbitalEccentricityJ2000: 0.05386179,
-    orbitalEccentricityAmplitude: 5.403008e-6,
-    eccentricityPhaseJ2000: 180,
-    axialTiltMean: 26.73,
-    eocFraction: 0.540,
-    startpos: 11.3199,
-    angleCorrection: -0.17477212,
-    perihelionEclipticYears: -H / 8,
-    type: 'III',
-    mirrorPair: 'earth',
-    fibonacciD: 3,
-    eclipticInclinationJ2000: 2.48599187,
-    longitudePerihelion: 92.12794343,
-    ascendingNode: 113.6452856,
-    invPlaneInclinationJ2000: 0.9254704,
-    ascendingNodeInvPlane: 118.81,
-    inclinationPhaseAngle: 23.3195,
-    obliquityCycle: H / 3,
-  },
-  uranus: {
-    name: 'Uranus',
-    solarYearInput: 30586,
-    orbitalEccentricityBase: 0.04734421,
-    orbitalEccentricityJ2000: 0.04725744,
-    orbitalEccentricityAmplitude: 2.831008e-5,
-    eccentricityPhaseJ2000: 0,
-    axialTiltMean: 82.23,
-    eocFraction: 0.530,
-    startpos: 44.8801,
-    angleCorrection: -0.73459551,
-    perihelionEclipticYears: H / 3,
-    type: 'III',
-    mirrorPair: 'mercury',
-    fibonacciD: 21,
-    eclipticInclinationJ2000: 0.77263783,
-    longitudePerihelion: 170.7308251,
-    ascendingNode: 74.00919023,
-    invPlaneInclinationJ2000: 0.9946692,
-    ascendingNodeInvPlane: 307.80,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: H / 2,
-  },
-  neptune: {
-    name: 'Neptune',
-    solarYearInput: 59980,
-    orbitalEccentricityBase: 0.00868571,
-    orbitalEccentricityJ2000: 0.00859048,
-    orbitalEccentricityAmplitude: 8.098033e-6,
-    eccentricityPhaseJ2000: 0,
-    axialTiltMean: 28.32,
-    eocFraction: 0.585,
-    startpos: 47.9551,
-    angleCorrection: 2.33381876,
-    perihelionEclipticYears: H * 2,
-    type: 'III',
-    mirrorPair: 'venus',
-    fibonacciD: 34,
-    eclipticInclinationJ2000: 1.77004347,
-    longitudePerihelion: 45.80124471,
-    ascendingNode: 131.7853754,
-    invPlaneInclinationJ2000: 0.7354155,
-    ascendingNodeInvPlane: 192.04,
-    inclinationPhaseAngle: 203.3195,
-    obliquityCycle: null,
-  },
-};
+// Helper: convert fraction [num, den] to H * num / den
+function fractionToYears(frac) {
+  if (frac === null) return null;
+  return H * frac[0] / frac[1];
+}
+
+const planetAstro = astroRef.planetOrbitalElements;
+const planets = {};
+for (const [key, mp] of Object.entries(modelParams.planets)) {
+  const ar = planetAstro[key];
+  planets[key] = {
+    // Model parameters (from model-parameters.json)
+    name: mp.name,
+    orbitalEccentricityBase: mp.orbitalEccentricityBase,
+    orbitalEccentricityAmplitude: mp.orbitalEccentricityAmplitude,
+    eccentricityPhaseJ2000: mp.eccentricityPhaseJ2000,
+    eocFraction: mp.eocFraction,
+    startpos: mp.startpos,
+    angleCorrection: mp.angleCorrection,
+    perihelionEclipticYears: fractionToYears(mp.perihelionEclipticFraction),
+    type: mp.type,
+    mirrorPair: mp.mirrorPair,
+    fibonacciD: mp.fibonacciD,
+    ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
+    inclinationPhaseAngle: mp.inclinationPhaseAngle,
+    obliquityCycle: fractionToYears(mp.obliquityCycleFraction),
+    // Astro references (from astro-reference.json)
+    solarYearInput: ar.solarYearInput,
+    orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
+    axialTiltMean: ar.axialTiltMean,
+    eclipticInclinationJ2000: ar.eclipticInclinationJ2000,
+    longitudePerihelion: ar.longitudePerihelion,
+    ascendingNode: ar.ascendingNode,
+    invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
+  };
+}
 
 // Derive orbitTilta/b from ascendingNode + eclipticInclinationJ2000
 for (const p of Object.values(planets)) {
@@ -265,12 +164,17 @@ for (const p of Object.values(planets)) {
 }
 
 // Additional bodies (not in the 8-planet Fibonacci framework)
-const additionalBodies = {
-  pluto: { name: 'Pluto', solarYearInput: 90465, orbitalEccentricityBase: 0.2488273, type: 'I' },
-  halleys: { name: "Halley's", solarYearInput: 27503, orbitalEccentricityBase: 0.96714291, type: 'III' },
-  eros: { name: 'Eros', solarYearInput: 642.93, orbitalEccentricityBase: 0.2229512, type: 'II' },
-  ceres: { name: 'Ceres', solarYearInput: 1680.5, orbitalEccentricityBase: 0.0755347, orbitDistanceOverride: 2.76596 },
-};
+const additionalBodies = {};
+for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
+  const ar = astroRef.additionalBodiesReference[key] || {};
+  additionalBodies[key] = {
+    name: body.name,
+    solarYearInput: ar.solarYearInput || body.solarYearInput,
+    orbitalEccentricityBase: body.orbitalEccentricityBase,
+    type: body.type,
+    ...(body.orbitDistanceOverride ? { orbitDistanceOverride: body.orbitDistanceOverride } : {}),
+  };
+}
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -295,7 +199,7 @@ const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + 
 const totalDaysInH = H * meanSolarYearDays;
 
 // J2000.0 epoch and Julian century derived from model constants
-const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meanSolarYearDays;
+const j2000JD = startmodelJD - (startmodelYear - astroRef.earthOrbital.j2000EpochYear) * meanSolarYearDays;
 const julianCenturyDays = 100 * meanSolarYearDays;
 
 // Equation of center eccentricity — derived, not a free parameter.
@@ -344,6 +248,11 @@ ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
 ASTRO_REFERENCE.decCorrection = fitted.PARALLAX_DEC_CORRECTION;
 ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
 
+// Planet perihelion passage references (model-tuned, from model-parameters.json)
+for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
+  if (typeof jd === 'number') ASTRO_REFERENCE[key + 'PerihelionRef_JD'] = jd;
+}
+
 // Ascending node corrections (derived from planet data)
 ASTRO_REFERENCE.ascNodeTiltCorrection = {
   mercury: 180 - planets.mercury.ascendingNode,
@@ -376,7 +285,7 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
   SOLAR_SIDEREAL_DAY_RATIO;
 massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
-const PSI = 2205 / (2 * H);
+const PSI = modelParams.foundational.psiNumerator / (2 * H);
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,

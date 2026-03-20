@@ -10,7 +10,8 @@
 
 const C = require('./constants');
 const OE = require('./orbital-engine');
-const MEEUS_LUNAR = require('./constants/meeus-lunar-tables.json');
+const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
+  require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)

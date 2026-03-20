@@ -298,26 +298,17 @@ function main() {
   }
   console.log('];');
 
-  // ─── Auto-update fitted-coefficients.js ──────────────────────────────
-  const fittedPath = path.join(__dirname, '..', 'lib', 'constants', 'fitted-coefficients.js');
-  const fittedSrc = fs.readFileSync(fittedPath, 'utf8');
-  const startMarker = '// @AUTO:OBLIQUITY:START';
-  const endMarker = '// @AUTO:OBLIQUITY:END';
-  const startIdx = fittedSrc.indexOf(startMarker);
-  const endIdx = fittedSrc.indexOf(endMarker);
-  if (startIdx === -1 || endIdx === -1) {
-    console.error('  ✗ Could not find @AUTO:OBLIQUITY markers in fitted-coefficients.js');
+  // ─── Write to fitted-coefficients.json if --write flag is present ────
+  if (process.argv.includes('--write')) {
+    const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+    const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = obliqMean;
+    fc.SOLSTICE_OBLIQUITY_HARMONICS = greedy.harmonics;
+    fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
+    console.log(`\n  ✓ Written SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)}° to fitted-coefficients.json`);
+    console.log('  ✓ Written SOLSTICE_OBLIQUITY_HARMONICS to fitted-coefficients.json');
   } else {
-    const startLineEnd = fittedSrc.indexOf('\n', startIdx) + 1;
-    const newContent =
-      `// Data-derived solstice mean (more accurate than Pythagorean time-average)\n` +
-      `const SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)};\n` +
-      `const SOLSTICE_OBLIQUITY_HARMONICS = [\n` +
-      lines.join('\n') + '\n];\n';
-    const newSrc = fittedSrc.slice(0, startLineEnd) + newContent + fittedSrc.slice(endIdx);
-    fs.writeFileSync(fittedPath, newSrc);
-    console.log(`\n  ✓ Updated SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)}° in fitted-coefficients.js`);
-    console.log('  ✓ Updated SOLSTICE_OBLIQUITY_HARMONICS in fitted-coefficients.js');
+    console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }
 }
 

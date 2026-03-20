@@ -1,7 +1,7 @@
 # Fitting & Derivation Scripts
 
 All scripts that produce fitted coefficients or derived constants live here.
-Output values are stored in `tools/lib/constants/fitted-coefficients.js`.
+Output values are stored in `public/input/fitted-coefficients.json`.
 
 ## Scripts
 
@@ -52,19 +52,19 @@ When model parameters change, refit in this order. The logic:
 Step 1:  node tools/optimize.js optimize sun correctionSun
          → correctionSun, eccentricityBase, eccentricityAmplitude,
            earthtiltMean, earthInvPlaneInclinationAmplitude (all derived)
-         Updates: constants.js + script.js (5 Earth orbital constants)
+         Updates: model-parameters.json + script.js (5 Earth orbital constants)
          Verify: RMS < 0.004°, solstice timing < 1 sec error at J2000
 
 Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
          → angleCorrection (derived from longitudePerihelion, not a free param)
-         Updates: constants.js + script.js (angleCorrection per planet)
+         Updates: model-parameters.json + script.js (angleCorrection per planet)
          Verify: Scene perihelion RA = longitudePerihelion exactly (diff < 0.000001°)
          Planets: mercury, venus, mars, jupiter, saturn, uranus, neptune
 
 Step 2b: node tools/fit/moon-eclipse-optimizer.js
          Optimizes Moon's 3 startpos values against 66 solar eclipses (2000–2025)
          Measures Moon-Sun angular separation at each eclipse — should be ~0°
-         Updates: constants.js + script.js (moonStartposNodal, moonStartposApsidal, moonStartposMoon, manual)
+         Updates: model-parameters.json + script.js (moonStartposNodal, moonStartposApsidal, moonStartposMoon, manual)
          Verify: RMS separation < 0.5°, individual eclipses < 1°
 
          Moon position architecture (two layers):
@@ -86,7 +86,7 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
 
 Step 4:  python/fit_perihelion_harmonics.py   → PERI_HARMONICS_RAW, PERI_OFFSET
          (Earth perihelion longitude & ERD from file 01)
-         Updates: fitted-coefficients.js (auto-updated by script)
+         Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
          (RMSE, max error, J2000 accuracy, ERD analytical vs numerical)
@@ -109,16 +109,16 @@ Step 6:  python/train_observed.py             → tools/lib/python/coefficients/
 
 Step 7:  eoc-fractions.js                     → per-planet eocFraction
          Scans EoC fraction 0→1 for Type III planets (Jupiter, Saturn, Uranus, Neptune)
-         Updates: constants.js + script.js (eocFraction per Type III planet, manual)
+         Updates: model-parameters.json + script.js (eocFraction per Type III planet, manual)
 
 Step 8:  ascnode-correction.js                → startpos per planet
          Scans ascNodeTiltCorrection (derived from startpos), re-optimizes startpos
-         Updates: constants.js + script.js (startpos per planet, manual)
+         Updates: model-parameters.json + script.js (startpos per planet, manual)
          Note: ascNodeTiltCorrection is derived (2*startpos or 180-ascendingNode)
 
 Step 9:  parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Fits up to 42-parameter RA/Dec correction per planet via cross-validation
-         Updates: fitted-coefficients.js (auto-updated by script)
+         Updates: fitted-coefficients.json (auto-updated by script)
 
 ── Phase 5: Cardinal point data & harmonics ─────────────────────────
 
@@ -126,13 +126,13 @@ Step 10: export-cardinal-points.js            → data/02-cardinal-points.csv
          (runs full scene-graph simulation — depends on all above)
 
 Step 11: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
-         Updates: fitted-coefficients.js (auto-updated by script)
+         Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 12: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
-         Updates: fitted-coefficients.js (auto-updated by script)
+         Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 13: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
-         Updates: fitted-coefficients.js (auto-updated by script)
+         Updates: fitted-coefficients.json (auto-updated by script)
 ```
 
 Note: `data/03-year-length-analysis.xlsx` (491 pts, 100-yr steps) is also exported
@@ -202,28 +202,46 @@ node tools/fit/year-length-harmonics.js
 
 | Output type | Location |
 |-------------|----------|
-| Fitted JS coefficients | `tools/lib/constants/fitted-coefficients.js` |
-| Parallax corrections | `tools/lib/constants/fitted-coefficients.js` (attached to ASTRO_REFERENCE) |
+| Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Training data (CSV/JSON) | `data/02-cardinal-points.csv`, `data/cardinal-points-training.json` |
-| Meeus lunar tables | `tools/lib/constants/meeus-lunar-tables.json` (reference data, not fitted) |
+
+## Single source of truth — JSON files
+
+All input data lives in 4 JSON files in `public/input/`:
+
+| File | Contents | Who writes |
+|------|----------|-----------|
+| `model-parameters.json` | Model theory parameters (H, corrections, planet configs) | Manual / optimizer |
+| `astro-reference.json` | IAU/JPL/Meeus reference data | Manual (external sources) |
+| `fitted-coefficients.json` | All fitting pipeline output (harmonics, parallax, obliquity) | Fitting scripts (auto) |
+| `meeus-lunar-tables.json` | Moon perturbation tables (Meeus Ch. 47) | Manual (reference data) |
 
 ## Constants flow
 
 ```
-tools/lib/constants.js          ← Single source of truth (JS)
-    ↓ require()
+public/input/
+    ├── model-parameters.json     ← Model parameters (H, corrections, planet configs)
+    ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus)
+    ├── fitted-coefficients.json  ← Fitting pipeline output (harmonics, parallax)
+    └── meeus-lunar-tables.json   ← Moon Meeus Ch. 47 tables
+         ↓ JSON.parse (loaded at require-time)
+tools/lib/constants.js            ← Builds all constants from JSON + derived values
 tools/lib/constants/
-    ├── fitted-coefficients.js  ← All fitted output
-    ├── astro-reference.js      ← External reference data
-    └── utils.js                ← Date/formatting helpers
-    ↓ Node.js JSON dump
+    ├── fitted-coefficients.js    ← Loads fitted JSON + buildFittedCoefficients()
+    └── utils.js                  ← Date/formatting/derivation helpers
+         ↓ Node.js JSON dump (_dump_constants.js)
 tools/fit/python/load_constants.py  ← Python bridge (auto-sync)
     ↓ import
-tools/lib/python/constants_scripts.py    ← Python physics library (zero hardcoded values)
+tools/lib/python/constants_scripts.py    ← Python physics library
     ↓ import
 tools/lib/python/predictive_formula.py   ← Predictive formulas
 tools/lib/python/observed_formula.py     ← Observed formulas
+
+Fitting scripts write directly to fitted-coefficients.json:
+    obliquity-harmonics.js       → SOLSTICE_OBLIQUITY_HARMONICS, SOLSTICE_OBLIQUITY_MEAN_FITTED
+    cardinal-point-harmonics.js  → CARDINAL_POINT_HARMONICS
+    fit_perihelion_harmonics.py  → PERI_HARMONICS_RAW, PERI_OFFSET
 ```
 
 ## Related documentation

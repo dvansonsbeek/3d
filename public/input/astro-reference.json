@@ -19,6 +19,7 @@
   },
 
   "earthOrbital": {
+    "j2000EpochYear": 2000.0,
     "perihelionalignmentYear": 1246,
     "juneSolstice2000_JD": 2451716.575,
     "obliquityJ2000_deg": 23.439291111,

@@ -34,6 +34,7 @@ Commands:
   optimize <planet> [params]  Nelder-Mead optimization
                               params: comma-separated (default: startpos)
                               --max-iter=N  (default: 500)
+                              --write       Write results to model-parameters.json
   eccentricity             Compare model vs Keplerian eccentricity for all planets
 
 Targets: mercury, venus, mars, jupiter, saturn, uranus, neptune, sun, moon
@@ -412,6 +413,53 @@ if (command === 'diagnose') {
       console.log('  IAU rate   :', r.iauArcsecCy.toFixed(4), '"/century');
       console.log('  Difference :', (r.diffArcsecCy >= 0 ? '+' : '') + r.diffArcsecCy.toFixed(4), '"  ' + ok + '  (tolerance: 0.1"/cy)');
     }
+  }
+
+  // ─── Write to JSON if --write flag is present ──────────────────────
+  const doWrite = process.argv.includes('--write');
+  if (doWrite) {
+    const fs = require('fs');
+    const path = require('path');
+    const mpPath = path.resolve(__dirname, '..', 'public', 'input', 'model-parameters.json');
+    const mp = JSON.parse(fs.readFileSync(mpPath, 'utf8'));
+
+    if (planet === 'sun') {
+      // Update Sun model parameters
+      if (result.optimizedValues.correctionSun !== undefined)
+        mp.foundational.correctionSun = result.optimizedValues.correctionSun;
+      if (result.sunDerived) {
+        const d = result.sunDerived;
+        if (d.obliquity) {
+          mp.earth.earthtiltMean = d.obliquity.earthtiltMean;
+          mp.earth.earthInvPlaneInclinationAmplitude = d.obliquity.earthInvPlaneInclinationAmplitude;
+        }
+        mp.earth.eccentricityBase = d.eccentricityBase;
+        if (d.eccentricityAmplitude !== null)
+          mp.earth.eccentricityAmplitude = d.eccentricityAmplitude;
+      }
+    } else if (planet !== 'moon') {
+      // Update planet model parameters
+      const p = mp.planets[planet];
+      if (p) {
+        if (result.optimizedValues.startpos !== undefined)
+          p.startpos = result.optimizedValues.startpos;
+        if (result.planetDerived)
+          p.angleCorrection = result.planetDerived.angleCorrection;
+      }
+    } else {
+      // Moon parameters
+      if (result.optimizedValues.moonStartposApsidal !== undefined)
+        mp.moon.moonStartposApsidal = result.optimizedValues.moonStartposApsidal;
+      if (result.optimizedValues.moonStartposNodal !== undefined)
+        mp.moon.moonStartposNodal = result.optimizedValues.moonStartposNodal;
+      if (result.optimizedValues.moonStartposMoon !== undefined)
+        mp.moon.moonStartposMoon = result.optimizedValues.moonStartposMoon;
+    }
+
+    fs.writeFileSync(mpPath, JSON.stringify(mp, null, 2) + '\n');
+    console.log(`\n  ✓ Written to model-parameters.json`);
+  } else {
+    console.log(`\n  (dry run — add --write to update model-parameters.json)`);
   }
 
 } else {
