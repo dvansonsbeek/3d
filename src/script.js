@@ -163,7 +163,6 @@ planets.mercury = {
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Venus
@@ -190,7 +189,6 @@ planets.venus = {
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Mars
@@ -217,7 +215,6 @@ planets.mars = {
   perihelionRef_JD: 2456505.6,
   ascendingNodeInvPlane: 354.87,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Jupiter
@@ -244,7 +241,6 @@ planets.jupiter = {
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Saturn
@@ -271,7 +267,6 @@ planets.saturn = {
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
   inclinationPhaseAngle: 23.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Uranus
@@ -298,7 +293,6 @@ planets.uranus = {
   perihelionRef_JD: 2439699.8,
   ascendingNodeInvPlane: 307.80,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // Neptune
@@ -325,7 +319,6 @@ planets.neptune = {
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
   inclinationPhaseAngle: 203.3195,
-  // invPlaneInclinationAmplitude and invPlaneInclinationMean: derived after mass ratios (section 10b)
 };
 
 // --- 4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -333,45 +326,83 @@ planets.neptune = {
 // Pluto
 planets.pluto = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 90465, eclipticInclinationJ2000: 17.14001,
-  invPlaneInclinationJ2000: 15.5639473, axialTiltMean: 57.47, longitudePerihelion: 224.06891,
-  ascendingNode: 110.30393, meanAnomaly: 15.55009, trueAnomaly: 26.31965048,
+  solarYearInput: 90465, 
+  eclipticInclinationJ2000: 17.14001,
+  invPlaneInclinationJ2000: 15.5639473, 
+  axialTiltMean: 57.47, 
+  longitudePerihelion: 224.06891,
+  ascendingNode: 110.30393, 
+  meanAnomaly: 15.55009, 
+  trueAnomaly: 26.31965048,
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.2488273,
-  angleCorrection: 2.469281, perihelionEclipticYears: holisticyearLength, startpos: 71.555,
+  angleCorrection: 2.469281, 
+  perihelionEclipticYears: holisticyearLength, 
+  startpos: 71.555,
+  ascendingNodeInvPlane: 101.06, 
+  inclinationPhaseAngle: 203.3195,
+  invPlaneInclinationMean: 15.716200, invPlaneInclinationAmplitude: 0.717024,
 };
 
 // Halley's
 planets.halleys = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 27503, eclipticInclinationJ2000: 162.26269,
-  invPlaneInclinationJ2000: 150, axialTiltMean: 0, longitudePerihelion: 111.33249,
-  ascendingNode: 58.42008, meanAnomaly: 38.77481, trueAnomaly: 166.26774708,
+  solarYearInput: 27503, 
+  eclipticInclinationJ2000: 162.26269,
+  invPlaneInclinationJ2000: 150, 
+  axialTiltMean: 0, 
+  longitudePerihelion: 111.33249,
+  ascendingNode: 58.42008, 
+  meanAnomaly: 38.77481, 
+  trueAnomaly: 166.26774708,
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.96714291,
-  angleCorrection: -1.619816, perihelionEclipticYears: holisticyearLength, startpos: 80,
+  angleCorrection: -1.619816, 
+  perihelionEclipticYears: holisticyearLength, 
+  startpos: 80,
+  ascendingNodeInvPlane: 59.56,
+  inclinationPhaseAngle: 23.3195,
+  invPlaneInclinationMean: 150, invPlaneInclinationAmplitude: 0.1,
 };
 
 // Eros
 planets.eros = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 642.93, eclipticInclinationJ2000: 10.82760,
-  invPlaneInclinationJ2000: 9.25, axialTiltMean: 0, longitudePerihelion: 178.81322,
-  ascendingNode: 304.30993, meanAnomaly: 320.21552, trueAnomaly: 299.91713740,
+  solarYearInput: 642.93, 
+  eclipticInclinationJ2000: 10.82760,
+  invPlaneInclinationJ2000: 9.25, 
+  axialTiltMean: 0, 
+  longitudePerihelion: 178.81322,
+  ascendingNode: 304.30993, 
+  meanAnomaly: 320.21552, 
+  trueAnomaly: 299.91713740,
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.2229512,
-  angleCorrection: 0.047888, perihelionEclipticYears: holisticyearLength, startpos: 57.402,
+  angleCorrection: 0.047888, 
+  perihelionEclipticYears: holisticyearLength, 
+  startpos: 57.402,
+  ascendingNodeInvPlane: 10.36,
+  inclinationPhaseAngle: 203.3195,
+  invPlaneInclinationMean: 9.25, invPlaneInclinationAmplitude: 0.5,
 };
 
 // Ceres
 planets.ceres = {
   // Astro references (from astro-reference.json)
-  solarYearInput: 1680.5, eclipticInclinationJ2000: 10.59407,
-  invPlaneInclinationJ2000: 0.4331698, axialTiltMean: 4, longitudePerihelion: 73.59769,
-  ascendingNode: 80.30533, meanAnomaly: 95.98772, trueAnomaly: 104.48097667,
+  solarYearInput: 1680.5, 
+  eclipticInclinationJ2000: 10.59407,
+  invPlaneInclinationJ2000: 0.4331698, 
+  axialTiltMean: 4, longitudePerihelion: 73.59769,
+  ascendingNode: 80.30533, meanAnomaly: 95.98772, 
+  trueAnomaly: 104.48097667,
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.0755347,
-  angleCorrection: 0, perihelionEclipticYears: holisticyearLength, orbitDistance: 2.76596,
+  angleCorrection: 0, 
+  perihelionEclipticYears: holisticyearLength, 
+  orbitDistance: 2.76596,
+  ascendingNodeInvPlane: 10.36,
+  inclinationPhaseAngle: 203.3195,
+  invPlaneInclinationMean: 0.43, invPlaneInclinationAmplitude: 0.05,
 };
 
 // --- 4c. Ascending nodes on invariable plane ---
@@ -32710,6 +32741,7 @@ function updateDynamicInclinations() {
   o.plutoInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('pluto', o.currentYear);
   o.halleysInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('halleys', o.currentYear);
   o.erosInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('eros', o.currentYear);
+  o.ceresInvPlaneInclinationDynamic = computePlanetInvPlaneInclinationDynamic('ceres', o.currentYear);
 
   // Dynamic obliquity (axial tilt) for all planets — anchored to J2000 observed values
   o.mercuryObliquity = computePlanetObliquity('mercury', o.currentYear);
@@ -34174,7 +34206,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.invPlaneInclinationJ2000,
     pluto: planets.pluto.invPlaneInclinationJ2000,
     halleys: planets.halleys.invPlaneInclinationJ2000,
-    eros: planets.eros.invPlaneInclinationJ2000
+    eros: planets.eros.invPlaneInclinationJ2000,
+    ceres: planets.ceres.invPlaneInclinationJ2000,
   };
 
   // Mean inclinations (midpoint of Laplace-Lagrange bounds)
@@ -34189,7 +34222,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.invPlaneInclinationMean,
     pluto: planets.pluto.invPlaneInclinationMean,
     halleys: planets.halleys.invPlaneInclinationMean,
-    eros: planets.eros.invPlaneInclinationMean
+    eros: planets.eros.invPlaneInclinationMean,
+    ceres: planets.ceres.invPlaneInclinationMean
   };
 
   // Planet inclination oscillation amplitudes (from Laplace-Lagrange secular theory)
@@ -34203,7 +34237,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.invPlaneInclinationAmplitude,
     pluto: planets.pluto.invPlaneInclinationAmplitude,
     halleys: planets.halleys.invPlaneInclinationAmplitude,
-    eros: planets.eros.invPlaneInclinationAmplitude
+    eros: planets.eros.invPlaneInclinationAmplitude,
+    ceres: planets.ceres.invPlaneInclinationAmplitude
   };
 
   // Planet precession periods (same period governs nodal precession and inclination oscillation)
@@ -34217,7 +34252,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.perihelionEclipticYears,  // Negative = retrograde
     pluto: planets.pluto.perihelionEclipticYears,
     halleys: planets.halleys.perihelionEclipticYears,
-    eros: planets.eros.perihelionEclipticYears
+    eros: planets.eros.perihelionEclipticYears,
+    ceres: planets.ceres.perihelionEclipticYears
   };
 
   // J2000 ascending nodes on invariable plane
@@ -34231,7 +34267,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.ascendingNodeInvPlane,
     pluto: planets.pluto.ascendingNodeInvPlane,
     halleys: planets.halleys.ascendingNodeInvPlane,
-    eros: planets.eros.ascendingNodeInvPlane
+    eros: planets.eros.ascendingNodeInvPlane,
+    ceres: planets.ceres.ascendingNodeInvPlane
   };
 
   // Phase offsets: the geometric relationship between Ω and the inclination phase
@@ -34246,7 +34283,8 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     neptune: planets.neptune.inclinationPhaseAngle,
     pluto: planets.pluto.inclinationPhaseAngle,
     halleys: planets.halleys.inclinationPhaseAngle,
-    eros: planets.eros.inclinationPhaseAngle
+    eros: planets.eros.inclinationPhaseAngle,
+    ceres: planets.ceres.inclinationPhaseAngle
   };
 
   const i_J2000 = j2000Inclinations[planet];
