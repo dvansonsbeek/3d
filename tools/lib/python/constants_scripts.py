@@ -178,6 +178,9 @@ ECC_AMPLITUDE_K = _C['eccentricityAmplitudeK']
 AXIAL_TILT = {p['name']: p['axialTiltMean'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN
 
+LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets'].values()}
+PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
+
 # Predicted obliquity cycle periods (years) from Fibonacci decomposition
 # See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory
 # Mercury, Earth, Mars: confirmed (0.2%, 2%, 0.7% error vs observations)

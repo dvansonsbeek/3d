@@ -39,7 +39,8 @@ from constants_scripts import (
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
     INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
-    AXIAL_TILT, OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
+    AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
+    OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
     CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
     SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS,
@@ -176,47 +177,47 @@ H_DIV_158  = H / 158            # H/158  — sideband (H/142 + 16)
 PLANETS = {
     'mercury': {
         'name': 'Mercury',
-        'period': H * 8 / 11,       # H × 8/11
-        'theta0': 77.4569131,       # J2000 perihelion longitude
-        'baseline': 1296000 / (H * 8 / 11) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Mercury'],
+        'theta0': LONGITUDE_PERIHELION['Mercury'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Mercury'] * 100,
     },
     'venus': {
         'name': 'Venus',
-        'period': H * 2,            # H × 2
-        'theta0': 131.5765919,
-        'baseline': 1296000 / (H * 2) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Venus'],
+        'theta0': LONGITUDE_PERIHELION['Venus'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Venus'] * 100,
     },
     'mars': {
         'name': 'Mars',
-        'period': H * 3 / 13,       # H × 3/13
-        'theta0': 336.0650681,
-        'baseline': 1296000 / (H * 3 / 13) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Mars'],
+        'theta0': LONGITUDE_PERIHELION['Mars'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Mars'] * 100,
     },
     'jupiter': {
         'name': 'Jupiter',
-        'period': H / 5,            # H/5
-        'theta0': 14.70659401,
-        'baseline': 1296000 / (H / 5) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Jupiter'],
+        'theta0': LONGITUDE_PERIHELION['Jupiter'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Jupiter'] * 100,
     },
     'saturn': {
         'name': 'Saturn',
-        'period': H / 8,            # H/8 (retrograde, = obliquity cycle)
-        'theta0': 92.12794343,
-        'baseline': -1296000 / (H / 8) * 100,
+        'period': abs(PERIHELION_ECLIPTIC_YEARS['Saturn']),  # retrograde (negative in constants)
+        'theta0': LONGITUDE_PERIHELION['Saturn'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Saturn'] * 100,
         # Note: Saturn's period equals the obliquity cycle, creating strong
         # coupling with Earth's obliquity/eccentricity variations (GROUP 15)
     },
     'uranus': {
         'name': 'Uranus',
-        'period': H / 3,            # H/3
-        'theta0': 170.7308251,
-        'baseline': 1296000 / (H / 3) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Uranus'],
+        'theta0': LONGITUDE_PERIHELION['Uranus'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Uranus'] * 100,
     },
     'neptune': {
         'name': 'Neptune',
-        'period': H * 2,            # H × 2
-        'theta0': 45.80124471,
-        'baseline': 1296000 / (H * 2) * 100,
+        'period': PERIHELION_ECLIPTIC_YEARS['Neptune'],
+        'theta0': LONGITUDE_PERIHELION['Neptune'],
+        'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Neptune'] * 100,
     },
 }
 

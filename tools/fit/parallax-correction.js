@@ -87,6 +87,9 @@ const tiers = [
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
 
+const allDecCorrections = {};
+const allRaCorrections = {};
+
 for (const target of targets) {
   const allPoints = refData.planets[target] || [];
   const points = allPoints.filter(p => p.ra != null && p.dec != null && (p.weight || 0) > 0);
@@ -149,10 +152,29 @@ for (const target of targets) {
   console.log(`  dec: { ${fmtCoeffs(bestTier.decBeta)} },`);
   console.log(`  ra:  { ${fmtCoeffs(bestTier.raBeta)} },`);
   console.log('');
+
+  // Collect for JSON output
+  const decObj = {}, raObj = {};
+  usedLabels.forEach((l, i) => { decObj[l] = parseFloat(bestTier.decBeta[i].toFixed(4)); });
+  usedLabels.forEach((l, i) => { raObj[l] = parseFloat(bestTier.raBeta[i].toFixed(4)); });
+  allDecCorrections[target] = decObj;
+  allRaCorrections[target] = raObj;
 }
 
 C.ASTRO_REFERENCE.decCorrection = savedDec;
 C.ASTRO_REFERENCE.raCorrection = savedRA;
+
+// ─── Write to fitted-coefficients.json if --write flag is present ────
+if (process.argv.includes('--write')) {
+  const jsonPath = require('path').resolve(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+  const fc = JSON.parse(require('fs').readFileSync(jsonPath, 'utf8'));
+  fc.PARALLAX_DEC_CORRECTION = allDecCorrections;
+  fc.PARALLAX_RA_CORRECTION = allRaCorrections;
+  require('fs').writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
+  console.log('✓ Written PARALLAX_DEC_CORRECTION and PARALLAX_RA_CORRECTION to fitted-coefficients.json');
+} else {
+  console.log('  (dry run — add --write to update fitted-coefficients.json)');
+}
 
 function kfoldCV(data, basisFn, decFn, raFn) {
   const n = data.length;

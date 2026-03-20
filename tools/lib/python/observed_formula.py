@@ -74,9 +74,10 @@ NEPTUNE_PERIOD = H * 2               # H × 2
 # Earth mean values for normalization
 # Obliquity mean derived from Pythagorean tilt model (see constants_scripts.py)
 from constants_scripts import SOLSTICE_OBLIQUITY_MEAN as EARTH_OBLIQ_MEAN
-EARTH_ECC_BASE = 0.015372                                      # (max + min) / 2
-EARTH_ECC_AMP  = 0.00137032                                    # (max - min) / 2
-EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)  # 0.015386904554198
+from constants_scripts import EARTH_BASE_ECCENTRICITY, EARTH_ECCENTRICITY_AMPLITUDE
+EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
+EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
+EARTH_ECC_MEAN = math.sqrt(EARTH_ECC_BASE**2 + EARTH_ECC_AMP**2)
 
 # =============================================================================
 # EXCEL COLUMN MAPPINGS
