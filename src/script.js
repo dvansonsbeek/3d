@@ -22,55 +22,35 @@ import { Pane } from 'tweakpane';
   Website:  https://holisticuniverse.com
 */
 
-// ─── 1. FOUNDATIONAL MODEL CONSTANTS ────────────────────────────────────
-// The six free parameters and related Earth constants that define the model.
-// Changing any of these changes the theory itself.
-// ─────────────────────────────────────────────────────────────────────────
-const holisticyearLength = 335008;
-// Input Length of Holistic-Year in Years
-const perihelionalignmentYear = 1246;
-// Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
-const inputmeanlengthsolaryearindays = 365.2421897;
-// Reference length of solar year in days. THIS IS USED AS INPUT. The actual mean lenght is calculated based upon this input and the lenght of the holistic year
-const meansiderealyearlengthinSeconds = 31558149.8;
-// The length of sidereal year in seconds is fixed
-const temperatureGraphMostLikely = 14.5;
-// 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthtiltMean = 23.41365930;                        // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
-const earthInvPlaneInclinationAmplitude = 0.63541988;     // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
-const eccentricityBase = 0.01537159;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.00137074;                 // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
-const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+// ═══════════════════════════════════════════════════════════════════════════
+// A. MODEL PARAMETERS (source: public/input/model-parameters.json)
+// ═══════════════════════════════════════════════════════════════════════════
 
-// ─── 2. MODEL START & PHYSICAL CONSTANTS ────────────────────────────────
-// Model epoch, calibration corrections, toggles, and physical constants.
-// ─────────────────────────────────────────────────────────────────────────
-const startmodelJD = 2451716.5;
-// By default the model is pointing to the June Solstice in year 2000. Value in Juliandate and dates need to start at 00:00 (so only julianday with values of 0.5). IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
-const startmodelYear = 2000.5;
-// By default the model is pointing to the June Solstice in year 2000. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
-const whichSolsticeOrEquinox = 1;
-// By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
-const correctionDays = -0.23328398168087;
-// Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.495997;
-// Sun's orbital starting angle in degrees. Optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200). Also feeds EoC perihelion phase and planet PerihelionFromEarth startPos. Sensitivity: 1461 min/deg on timing. IMPORTANT: changing this value requires re-tuning earthRAAngle for solstice timing.
-const useVariableSpeed = true;
-// Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
-// When useVariableSpeed = false, correctionSun should be increased (0.913280 or so)
-// eocEccentricity and perihelionPhaseOffset are derived constants — see derived section after eccentricityDerivedMean
-const startAngleModel = 89.91949879;                      // The startdate of the model is set to 21 june 2000 00:00 UTC which is just before it reaches 90 degrees which is at 01:47 UTC (89.91949879)
-const currentAUDistance = 149597870.698828;               // 3D model + formula
-const speedOfLight = 299792.458;                          // Speed of light in km/s (fundamental constant)
-const debugOn = false;                                     // Debug button flag (set to true when needed)
+// ─── A1. Foundational ────────────────────────────────────────────────────
+const holisticyearLength = 335008;                        // H — full precession cycle length in years
+const inputmeanlengthsolaryearindays = 365.2421897;       // Mean tropical year (IAU input)
+const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
+const startmodelYear = 2000.5;                            // Fractional year of model start
+const correctionDays = -0.23328398168087;                 // Fine timing correction (optimizer-derived)
+const correctionSun = 0.495997;                           // Sun position correction angle (optimizer Step 1)
+const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
+const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
+const useVariableSpeed = true;                            // Toggle equation of center
 
-// Formula-only amplitude parameters
+// ─── A2. Earth parameters ────────────────────────────────────────────────
+const earthtiltMean = 23.41365930;                        // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.63541988;     // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.01537159;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.00137074;                 // Solved: e(J2000) = 0.01671022
+const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
 
-// Fourier harmonic coefficients for year-length formulas (fitted from 491 data points, ±25000 yr)
-// Means are DERIVED (not fitted): tropical = meansolaryearlengthinDays,
-// sidereal = meansiderealyearlengthinDays, anomalistic = meanAnomalisticYearinDays.
-// Only these coefficients need refitting if H changes.
-// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = holisticyearLength / divisor
+
+// ═══════════════════════════════════════════════════════════════════════════
+// B. FITTED COEFFICIENTS (source: public/input/fitted-coefficients.json)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── B1. Year-length harmonics ───────────────────────────────────────────
+// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
 const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.001 s
   [ 3,  +6.332548792685e-07, +8.075245235817e-06],        // H/3:  0.700s amp
   [ 8,  -1.356696988329e-06, -2.088113114600e-05],        // H/8:  1.808s amp
@@ -92,9 +72,24 @@ const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.000 s
   [22,  +1.062301999920e-07, -6.676606979168e-08],        // H/22: 0.011s amp
   [23,  -4.273912533399e-07, +2.329348175831e-07],        // H/23: 0.042s amp
 ];
-const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 
-// Early derived constants (computed from inputs above)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// C. ASTRO REFERENCES (source: public/input/astro-reference.json)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── C1. Physical constants ──────────────────────────────────────────────
+const currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 2012)
+const meansiderealyearlengthinSeconds = 31558149.8;       // Mean sidereal year in seconds (IAU)
+const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
+const perihelionalignmentYear = 1246;                     // Year when perihelion longitude = 90° (Meeus)
+const deltaTStart = 63.63;                                // Delta-T at model epoch (seconds)
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// E. DERIVED VALUES (computed from above, not stored in JSON)
+// ═══════════════════════════════════════════════════════════════════════════
+
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meansolaryearlengthinDays;
@@ -103,6 +98,14 @@ const julianCenturyDays = 100 * meansolaryearlengthinDays;
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
 // Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
 const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((284.51 - 203.3195) * Math.PI / 180);
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// F. DISPLAY-ONLY (not in JSON files)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3=WS
+const debugOn = false;                                     // Debug button flag
 
 // ─── 3. SUN & MOON INPUT CONSTANTS ─────────────────────────────────────
 // Reference lengths used as INPUT for the Sun
