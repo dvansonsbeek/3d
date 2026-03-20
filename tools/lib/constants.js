@@ -53,8 +53,8 @@ const knownValues = astroRef.knownValues;
 // These define the model itself. Changing any = different theory.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const H = modelParams.foundational.H;
-const inputMeanSolarYear = modelParams.foundational.inputMeanSolarYear;
+const H = modelParams.foundational.holisticyearLength;
+const inputMeanSolarYear = modelParams.foundational.inputmeanlengthsolaryearindays;
 const startmodelJD = modelParams.foundational.startmodelJD;
 const startmodelYear = modelParams.foundational.startmodelYear;
 const correctionDays = modelParams.foundational.correctionDays;
@@ -70,7 +70,7 @@ const useVariableSpeed = modelParams.foundational.useVariableSpeed;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
-const meanSiderealYearSeconds = astroRef.physicalConstants.meanSiderealYearSeconds;
+const meanSiderealYearSeconds = astroRef.physicalConstants.meansiderealyearlengthinSeconds;
 const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
 const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
@@ -105,7 +105,7 @@ const moonAnomalisticMonthInput = astroRef.moonReference.moonAnomalisticMonthInp
 const moonNodalMonthInput = astroRef.moonReference.moonNodalMonthInput;
 const moonDistance = astroRef.moonReference.moonDistance;
 const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinationJ2000;
-const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricity;
+const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
 const moonTilt = astroRef.moonReference.moonTilt;
 const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
 const moonStartposNodal = modelParams.moon.moonStartposNodal;

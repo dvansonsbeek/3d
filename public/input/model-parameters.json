@@ -1,8 +1,8 @@
 {
   "_description": "Model parameters — values that define the Holistic Universe Model theory. Changing any value = different model. Source of truth for both tools/lib/constants.js and src/script.js.",
   "foundational": {
-    "H": 335008,
-    "inputMeanSolarYear": 365.2421897,
+    "holisticyearLength": 335008,
+    "inputmeanlengthsolaryearindays": 365.2421897,
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": -0.23328398168087,

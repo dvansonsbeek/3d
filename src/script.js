@@ -132,208 +132,380 @@ const moonStartposMoon = 131.930;                         // Optimized against J
 // ─── 4. PLANET INPUT CONSTANTS ──────────────────────────────────────────
 // Per-planet J2000 orbital elements, tuned parameters (startpos, angleCorrection,
 // eocFraction, perihelionRef_JD), and perihelion precession periods.
+// Source: public/input/model-parameters.json + astro-reference.json
 // ─────────────────────────────────────────────────────────────────────────
 
 // --- 4a. Major planets (Mercury–Neptune) ---
+// Planet data stored in structured objects. Flat const aliases provided for
+// backward compatibility with the rest of script.js.
 
-// Reference lengths used as INPUT for Mercury
-const mercurySolarYearInput = 87.9686;
-const mercuryEclipticInclinationJ2000 = 7.00497902;       // JPL J2000
-const mercuryOrbitalEccentricityJ2000 = 0.20563593;       // JPL J2000
-const mercuryOrbitalEccentricityBase = 0.20563593;        // Base eccentricity (tilt ~0, no fluctuation)
-const mercuryOrbitalEccentricityAmplitude = 8.436789e-5;  // K × sin(0.03°) × √21 / (√m × a^1.5)
-const mercuryEccentricityPhaseJ2000 = 89.9882;           // Phase angle at J2000 (degrees) — near mean, tilt ~0
-const mercuryInvPlaneInclinationJ2000 = 6.3472858;
-const mercuryTilt = 0.03;
-const mercuryLongitudePerihelion = 77.4569131;
-const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
-const mercuryMeanAnomaly = 156.6364301;                   // Reference only
-const mercuryTrueAnomaly = 164.1669319;                   // Reference only
-const mercuryAngleCorrection = 0.97090778;                 // To align the perihelion exactly
-const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
-const mercuryAxialPrecessionYears = -mercuryPerihelionEclipticYears; // Retrograde. Cassini state: locked to orbital plane precession (~235–326 kyr, Peale 2006, Yseboodt & Margot 2006)
-const mercuryStartpos = 83.53;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
-const mercuryEocFraction = -0.527;                          // Derived: -e/2 for Type I with large eccentricity (geometric offset over-compensates)
-const mercuryPerihelionRef_JD = 2460335.9;                  // EoC phase reference — phase-optimized
+const planets = {};
 
-// Reference lengths used as INPUT for Venus
-const venusSolarYearInput = 224.695;
-const venusEclipticInclinationJ2000 = 3.39467605;         // JPL J2000
-const venusOrbitalEccentricityJ2000 = 0.00677672;         // JPL J2000
-const venusOrbitalEccentricityBase = 0.00619052;          // Base eccentricity (cosine fit to JPL data, -8.65% from J2000)
-const venusOrbitalEccentricityAmplitude = 9.625389e-4;    // K × sin(2.6392°) × √34 / (√m × a^1.5)
-const venusEccentricityPhaseJ2000 = 123.7514;            // Phase angle at J2000 (degrees) — past mean, decreasing
-const venusInvPlaneInclinationJ2000 = 2.1545441;
-const venusTilt = 2.6392;
-const venusLongitudePerihelion = 131.5765919;
-const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
-const venusMeanAnomaly = 324.9668371;                     // Reference only
-const venusTrueAnomaly = 324.5198504;                     // Reference only
-const venusAngleCorrection = -2.80286830;                  // To align the perihelion exactly
-const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
-const venusAxialPrecessionYears = holisticyearLength*3/34;    // Prograde (obliquity 177°). H×3/34 (F4/F9) ≈ 29,560 yr (~29 kyr observed, Cottereau & Souchay 2009, NASA 2022)
-const venusStartpos = 249.312;                             // Re-optimized with 36p correction
-const venusEocFraction = 0.436;                             // Re-optimized with 36p correction
-const venusPerihelionRef_JD = 2455464.42;                   // Re-optimized with 36p correction
+// Mercury
+planets.mercury = {
+  // Astro references (from astro-reference.json)
+  solarYearInput: 87.9686,
+  eclipticInclinationJ2000: 7.00497902,
+  orbitalEccentricityJ2000: 0.20563593,
+  invPlaneInclinationJ2000: 6.3472858,
+  axialTiltMean: 0.03,
+  longitudePerihelion: 77.4569131,
+  ascendingNode: 48.33033155,
+  meanAnomaly: 156.6364301,
+  trueAnomaly: 164.1669319,
+  // Model parameters (from model-parameters.json)
+  orbitalEccentricityBase: 0.20563593,
+  orbitalEccentricityAmplitude: 8.436789e-5,
+  eccentricityPhaseJ2000: 89.9882,
+  angleCorrection: 0.97090778,
+  perihelionEclipticYears: holisticyearLength/(1+(3/8)),
+  axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
+  startpos: 83.53,
+  eocFraction: -0.527,
+  perihelionRef_JD: 2460335.9,
+};
 
-// Reference lengths used as INPUT for Mars
-const marsSolarYearInput = 686.931;
-const marsEclipticInclinationJ2000 = 1.84969142;          // JPL J2000
-const marsOrbitalEccentricityJ2000 = 0.09339410;          // JPL J2000
-const marsOrbitalEccentricityBase = 0.09297543;           // Base eccentricity (cosine fit to JPL data, -0.45% from J2000)
-const marsOrbitalEccentricityAmplitude = 3.073636e-3;     // K × sin(25.19°) × √5 / (√m × a^1.5)
-const marsEccentricityPhaseJ2000 = 96.8878;              // Phase angle at J2000 (degrees) — just past mean
-const marsInvPlaneInclinationJ2000 = 1.6311858;
-const marsTilt = 25.19;  
-const marsLongitudePerihelion = 336.0650681;
-const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
-const marsMeanAnomaly = 109.2630844;                      // Reference only
-const marsTrueAnomaly = 118.9501056;                      // Reference only
-const marsAngleCorrection = -2.10936153;                  // To align the perihelion exactly
-const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
-const marsAxialPrecessionYears = -holisticyearLength/2;      // Retrograde. H/2 ≈ 167,504 yr (~167–175 kyr observed, 7605±3 mas/yr, Konopliv et al. 2020 InSight)
-const marsStartpos = 121.47;                              // Tuned for start-date RA match (enriched JPL, 184 pts)
-const marsEocFraction = -0.066;                             // Per-planet EoC fraction (geocentric parallax interaction)
-const marsPerihelionRef_JD = 2456505.6;                     // EoC phase reference — re-optimized with Dec correction
+// Flat aliases (backward compatibility — used throughout script.js)
+const mercurySolarYearInput = planets.mercury.solarYearInput;
+const mercuryEclipticInclinationJ2000 = planets.mercury.eclipticInclinationJ2000;
+const mercuryOrbitalEccentricityJ2000 = planets.mercury.orbitalEccentricityJ2000;
+const mercuryOrbitalEccentricityBase = planets.mercury.orbitalEccentricityBase;
+const mercuryOrbitalEccentricityAmplitude = planets.mercury.orbitalEccentricityAmplitude;
+const mercuryEccentricityPhaseJ2000 = planets.mercury.eccentricityPhaseJ2000;
+const mercuryInvPlaneInclinationJ2000 = planets.mercury.invPlaneInclinationJ2000;
+const mercuryTilt = planets.mercury.axialTiltMean;
+const mercuryLongitudePerihelion = planets.mercury.longitudePerihelion;
+const mercuryAscendingNode = planets.mercury.ascendingNode;
+const mercuryMeanAnomaly = planets.mercury.meanAnomaly;
+const mercuryTrueAnomaly = planets.mercury.trueAnomaly;
+const mercuryAngleCorrection = planets.mercury.angleCorrection;
+const mercuryPerihelionEclipticYears = planets.mercury.perihelionEclipticYears;
+const mercuryAxialPrecessionYears = planets.mercury.axialPrecessionYears;
+const mercuryStartpos = planets.mercury.startpos;
+const mercuryEocFraction = planets.mercury.eocFraction;
+const mercuryPerihelionRef_JD = planets.mercury.perihelionRef_JD;
 
-// Reference lengths used as INPUT for Jupiter
-const jupiterSolarYearInput = 4330.5;
-const jupiterEclipticInclinationJ2000 = 1.30439695;       // JPL J2000
-const jupiterOrbitalEccentricityJ2000 = 0.04838624;       // JPL J2000
-const jupiterOrbitalEccentricityBase = 0.04821478;        // Dual-balanced (-0.35% from J2000)
-const jupiterOrbitalEccentricityAmplitude = 1.149908e-6;  // K × sin(3.13°) × √5 / (√m × a^1.5)
-const jupiterEccentricityPhaseJ2000 = 180;                 // Phase angle at J2000 (degrees) — amplitude negligible (1.15e-6); 180° = max ecc, closest to J2000
-const jupiterInvPlaneInclinationJ2000 = 0.3219652;
-const jupiterTilt = 3.13;
-const jupiterLongitudePerihelion = 14.70659401;
-const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
-const jupiterMeanAnomaly = 32.47179744;                   // Reference only
-const jupiterTrueAnomaly = 35.69428061;                   // Reference only
-const jupiterAngleCorrection = 0.92703626;                // To align the perihelion exactly
-const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
-const jupiterAxialPrecessionYears = -holisticyearLength*3/8;  // Retrograde. H×3/8 (F4/F6) ≈ 125,628 yr (~113–136 kyr observed, α=2.64–3.17″/yr, Saillenfest et al. 2020 A&A)
-const jupiterStartpos = 13.85;                            // Tuned for start-date RA match (enriched JPL, 70 pts)
-const jupiterEocFraction = 0.484;                         // Optimized EoC fraction
-const jupiterPerihelionRef_JD = 2464224.5;                 // EoC phase reference — phase-optimized (-6° from 2023-Jan-21)
+// Venus
+planets.venus = {
+  solarYearInput: 224.695,
+  eclipticInclinationJ2000: 3.39467605,
+  orbitalEccentricityJ2000: 0.00677672,
+  invPlaneInclinationJ2000: 2.1545441,
+  axialTiltMean: 2.6392,
+  longitudePerihelion: 131.5765919,
+  ascendingNode: 76.67877109,
+  meanAnomaly: 324.9668371,
+  trueAnomaly: 324.5198504,
+  orbitalEccentricityBase: 0.00619052,
+  orbitalEccentricityAmplitude: 9.625389e-4,
+  eccentricityPhaseJ2000: 123.7514,
+  angleCorrection: -2.80286830,
+  perihelionEclipticYears: holisticyearLength*2,
+  axialPrecessionYears: holisticyearLength*3/34,
+  startpos: 249.312,
+  eocFraction: 0.436,
+  perihelionRef_JD: 2455464.42,
+};
+const venusSolarYearInput = planets.venus.solarYearInput;
+const venusEclipticInclinationJ2000 = planets.venus.eclipticInclinationJ2000;
+const venusOrbitalEccentricityJ2000 = planets.venus.orbitalEccentricityJ2000;
+const venusOrbitalEccentricityBase = planets.venus.orbitalEccentricityBase;
+const venusOrbitalEccentricityAmplitude = planets.venus.orbitalEccentricityAmplitude;
+const venusEccentricityPhaseJ2000 = planets.venus.eccentricityPhaseJ2000;
+const venusInvPlaneInclinationJ2000 = planets.venus.invPlaneInclinationJ2000;
+const venusTilt = planets.venus.axialTiltMean;
+const venusLongitudePerihelion = planets.venus.longitudePerihelion;
+const venusAscendingNode = planets.venus.ascendingNode;
+const venusMeanAnomaly = planets.venus.meanAnomaly;
+const venusTrueAnomaly = planets.venus.trueAnomaly;
+const venusAngleCorrection = planets.venus.angleCorrection;
+const venusPerihelionEclipticYears = planets.venus.perihelionEclipticYears;
+const venusAxialPrecessionYears = planets.venus.axialPrecessionYears;
+const venusStartpos = planets.venus.startpos;
+const venusEocFraction = planets.venus.eocFraction;
+const venusPerihelionRef_JD = planets.venus.perihelionRef_JD;
 
-// Reference lengths used as INPUT for Saturn
-const saturnSolarYearInput = 10747.0;
-const saturnEclipticInclinationJ2000 = 2.48599187;        // JPL J2000
-const saturnOrbitalEccentricityJ2000 = 0.05386179;        // JPL J2000
-const saturnOrbitalEccentricityBase = 0.05374486;         // Dual-balanced = Law 5 prediction (-0.22% from J2000)
-const saturnOrbitalEccentricityAmplitude = 5.403008e-6;   // K × sin(26.73°) × √3 / (√m × a^1.5)
-const saturnEccentricityPhaseJ2000 = 180;                  // Phase angle at J2000 (degrees) — amplitude negligible (5.40e-6); 180° = max ecc, closest to J2000
-const saturnInvPlaneInclinationJ2000 = 0.9254704;
-const saturnTilt = 26.73;
-const saturnLongitudePerihelion = 92.12794343;
-const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
-const saturnMeanAnomaly = 325.663876;                     // Reference only
-const saturnTrueAnomaly = 321.7910116;                    // Reference only
-const saturnAngleCorrection = -0.17477212;                // To align the perihelion exactly
-const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
-const saturnAxialPrecessionYears = -holisticyearLength*4/3;   // Retrograde. H×4/3 ≈ 446,677 yr (~400–480 kyr observed, α=0.75–0.89″/yr, Saillenfest et al. 2021 A&A)
-const saturnStartpos = 11.32;                             // Tuned for start-date RA match (enriched JPL, 67 pts)
-const saturnEocFraction = 0.543;                          // Optimized EoC fraction
-const saturnPerihelionRef_JD = 2452875.9;                  // EoC phase reference — phase-optimized (+1° from 2003-Jul-26)
+// Mars
+planets.mars = {
+  solarYearInput: 686.931,
+  eclipticInclinationJ2000: 1.84969142,
+  orbitalEccentricityJ2000: 0.09339410,
+  invPlaneInclinationJ2000: 1.6311858,
+  axialTiltMean: 25.19,
+  longitudePerihelion: 336.0650681,
+  ascendingNode: 49.55737662,
+  meanAnomaly: 109.2630844,
+  trueAnomaly: 118.9501056,
+  orbitalEccentricityBase: 0.09297543,
+  orbitalEccentricityAmplitude: 3.073636e-3,
+  eccentricityPhaseJ2000: 96.8878,
+  angleCorrection: -2.10936153,
+  perihelionEclipticYears: holisticyearLength/(4+(1/3)),
+  axialPrecessionYears: -holisticyearLength/2,
+  startpos: 121.47,
+  eocFraction: -0.066,
+  perihelionRef_JD: 2456505.6,
+};
+const marsSolarYearInput = planets.mars.solarYearInput;
+const marsEclipticInclinationJ2000 = planets.mars.eclipticInclinationJ2000;
+const marsOrbitalEccentricityJ2000 = planets.mars.orbitalEccentricityJ2000;
+const marsOrbitalEccentricityBase = planets.mars.orbitalEccentricityBase;
+const marsOrbitalEccentricityAmplitude = planets.mars.orbitalEccentricityAmplitude;
+const marsEccentricityPhaseJ2000 = planets.mars.eccentricityPhaseJ2000;
+const marsInvPlaneInclinationJ2000 = planets.mars.invPlaneInclinationJ2000;
+const marsTilt = planets.mars.axialTiltMean;
+const marsLongitudePerihelion = planets.mars.longitudePerihelion;
+const marsAscendingNode = planets.mars.ascendingNode;
+const marsMeanAnomaly = planets.mars.meanAnomaly;
+const marsTrueAnomaly = planets.mars.trueAnomaly;
+const marsAngleCorrection = planets.mars.angleCorrection;
+const marsPerihelionEclipticYears = planets.mars.perihelionEclipticYears;
+const marsAxialPrecessionYears = planets.mars.axialPrecessionYears;
+const marsStartpos = planets.mars.startpos;
+const marsEocFraction = planets.mars.eocFraction;
+const marsPerihelionRef_JD = planets.mars.perihelionRef_JD;
 
-// Reference lengths used as INPUT for Uranus
-const uranusSolarYearInput = 30586;
-const uranusEclipticInclinationJ2000 = 0.77263783;        // JPL J2000
-const uranusOrbitalEccentricityJ2000 = 0.04725744;        // JPL J2000
-const uranusOrbitalEccentricityBase = 0.04734421;         // Dual-balanced (+0.18% from J2000)
-const uranusOrbitalEccentricityAmplitude = 2.831008e-5;   // K × sin(82.23°) × √21 / (√m × a^1.5)
-const uranusEccentricityPhaseJ2000 = 0;                    // Phase angle at J2000 (degrees) — amplitude negligible (2.83e-5); 0° = min ecc, closest to J2000
-const uranusInvPlaneInclinationJ2000 = 0.9946692;
-const uranusTilt = 82.23;
-const uranusLongitudePerihelion = 170.7308251;
-const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
-const uranusMeanAnomaly = 145.7292678;                    // Reference only
-const uranusTrueAnomaly = 148.5142459;                    // Reference only
-const uranusAngleCorrection = -0.73459551;                // To align the perihelion exactly
-const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
-const uranusAxialPrecessionYears = holisticyearLength*610;    // Prograde (obliquity 98°). H×610 (F15) ≈ 204 Myr (~210 Myr observed, α≈0.008″/yr, Saillenfest et al. 2022 A&A)
-const uranusStartpos = 44.88;                              // Retuned after removing correctionSun from PeriFromEarth
-const uranusEocFraction = 0.50;                            // Derived: e/2 for Type III (geocentric parallax interaction)
-const uranusPerihelionRef_JD = 2439699.8;                  // EoC phase reference — phase-optimized (+5° from 1966-May-20)
+// Jupiter
+planets.jupiter = {
+  solarYearInput: 4330.5,
+  eclipticInclinationJ2000: 1.30439695,
+  orbitalEccentricityJ2000: 0.04838624,
+  invPlaneInclinationJ2000: 0.3219652,
+  axialTiltMean: 3.13,
+  longitudePerihelion: 14.70659401,
+  ascendingNode: 100.4877868,
+  meanAnomaly: 32.47179744,
+  trueAnomaly: 35.69428061,
+  orbitalEccentricityBase: 0.04821478,
+  orbitalEccentricityAmplitude: 1.149908e-6,
+  eccentricityPhaseJ2000: 180,
+  angleCorrection: 0.92703626,
+  perihelionEclipticYears: holisticyearLength/5,
+  axialPrecessionYears: -holisticyearLength*3/8,
+  startpos: 13.85,
+  eocFraction: 0.484,
+  perihelionRef_JD: 2464224.5,
+};
+const jupiterSolarYearInput = planets.jupiter.solarYearInput;
+const jupiterEclipticInclinationJ2000 = planets.jupiter.eclipticInclinationJ2000;
+const jupiterOrbitalEccentricityJ2000 = planets.jupiter.orbitalEccentricityJ2000;
+const jupiterOrbitalEccentricityBase = planets.jupiter.orbitalEccentricityBase;
+const jupiterOrbitalEccentricityAmplitude = planets.jupiter.orbitalEccentricityAmplitude;
+const jupiterEccentricityPhaseJ2000 = planets.jupiter.eccentricityPhaseJ2000;
+const jupiterInvPlaneInclinationJ2000 = planets.jupiter.invPlaneInclinationJ2000;
+const jupiterTilt = planets.jupiter.axialTiltMean;
+const jupiterLongitudePerihelion = planets.jupiter.longitudePerihelion;
+const jupiterAscendingNode = planets.jupiter.ascendingNode;
+const jupiterMeanAnomaly = planets.jupiter.meanAnomaly;
+const jupiterTrueAnomaly = planets.jupiter.trueAnomaly;
+const jupiterAngleCorrection = planets.jupiter.angleCorrection;
+const jupiterPerihelionEclipticYears = planets.jupiter.perihelionEclipticYears;
+const jupiterAxialPrecessionYears = planets.jupiter.axialPrecessionYears;
+const jupiterStartpos = planets.jupiter.startpos;
+const jupiterEocFraction = planets.jupiter.eocFraction;
+const jupiterPerihelionRef_JD = planets.jupiter.perihelionRef_JD;
 
-// Reference lengths used as INPUT for Neptune
-const neptuneSolarYearInput = 59980;
-const neptuneEclipticInclinationJ2000 = 1.77004347;       // JPL J2000
-const neptuneOrbitalEccentricityJ2000 = 0.00859048;       // JPL J2000
-const neptuneOrbitalEccentricityBase = 0.00868571;        // Base eccentricity, solved for 100% Law 5 balance (+1.11% from J2000)
-const neptuneOrbitalEccentricityAmplitude = 8.098033e-6;  // K × sin(28.32°) × √34 / (√m × a^1.5)
-const neptuneEccentricityPhaseJ2000 = 0;                   // Phase angle at J2000 (degrees) — amplitude negligible (8.10e-6); 0° = min ecc, closest to J2000
-const neptuneInvPlaneInclinationJ2000 = 0.7354155;
-const neptuneTilt = 28.32;
-const neptuneLongitudePerihelion = 45.80124471;
-const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
-const neptuneMeanAnomaly = 262.5003424;                   // Reference only
-const neptuneTrueAnomaly = 261.2242728;                   // Reference only
-const neptuneAngleCorrection = 2.33381876;                // To align the perihelion exactly
-const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
-const neptuneAxialPrecessionYears = -holisticyearLength*68;   // Retrograde. H×68 (2×F9) ≈ 22.8 Myr (~23 Myr observed, Neptune Wikipedia/NASA)
-const neptuneStartpos = 47.96;                             // Tuned for start-date RA match (enriched JPL, 69 pts)
-const neptuneEocFraction = 0.50;                           // Derived: e/2 for Type III (geocentric parallax interaction)
-const neptunePerihelionRef_JD = 2409432.4;                 // EoC phase reference — phase-optimized (+17° from 1876-Aug-27)
+// Saturn
+planets.saturn = {
+  solarYearInput: 10747.0,
+  eclipticInclinationJ2000: 2.48599187,
+  orbitalEccentricityJ2000: 0.05386179,
+  invPlaneInclinationJ2000: 0.9254704,
+  axialTiltMean: 26.73,
+  longitudePerihelion: 92.12794343,
+  ascendingNode: 113.6452856,
+  meanAnomaly: 325.663876,
+  trueAnomaly: 321.7910116,
+  orbitalEccentricityBase: 0.05374486,
+  orbitalEccentricityAmplitude: 5.403008e-6,
+  eccentricityPhaseJ2000: 180,
+  angleCorrection: -0.17477212,
+  perihelionEclipticYears: -holisticyearLength/8,
+  axialPrecessionYears: -holisticyearLength*4/3,
+  startpos: 11.32,
+  eocFraction: 0.543,
+  perihelionRef_JD: 2452875.9,
+};
+const saturnSolarYearInput = planets.saturn.solarYearInput;
+const saturnEclipticInclinationJ2000 = planets.saturn.eclipticInclinationJ2000;
+const saturnOrbitalEccentricityJ2000 = planets.saturn.orbitalEccentricityJ2000;
+const saturnOrbitalEccentricityBase = planets.saturn.orbitalEccentricityBase;
+const saturnOrbitalEccentricityAmplitude = planets.saturn.orbitalEccentricityAmplitude;
+const saturnEccentricityPhaseJ2000 = planets.saturn.eccentricityPhaseJ2000;
+const saturnInvPlaneInclinationJ2000 = planets.saturn.invPlaneInclinationJ2000;
+const saturnTilt = planets.saturn.axialTiltMean;
+const saturnLongitudePerihelion = planets.saturn.longitudePerihelion;
+const saturnAscendingNode = planets.saturn.ascendingNode;
+const saturnMeanAnomaly = planets.saturn.meanAnomaly;
+const saturnTrueAnomaly = planets.saturn.trueAnomaly;
+const saturnAngleCorrection = planets.saturn.angleCorrection;
+const saturnPerihelionEclipticYears = planets.saturn.perihelionEclipticYears;
+const saturnAxialPrecessionYears = planets.saturn.axialPrecessionYears;
+const saturnStartpos = planets.saturn.startpos;
+const saturnEocFraction = planets.saturn.eocFraction;
+const saturnPerihelionRef_JD = planets.saturn.perihelionRef_JD;
+
+// Uranus
+planets.uranus = {
+  solarYearInput: 30586,
+  eclipticInclinationJ2000: 0.77263783,
+  orbitalEccentricityJ2000: 0.04725744,
+  invPlaneInclinationJ2000: 0.9946692,
+  axialTiltMean: 82.23,
+  longitudePerihelion: 170.7308251,
+  ascendingNode: 74.00919023,
+  meanAnomaly: 145.7292678,
+  trueAnomaly: 148.5142459,
+  orbitalEccentricityBase: 0.04734421,
+  orbitalEccentricityAmplitude: 2.831008e-5,
+  eccentricityPhaseJ2000: 0,
+  angleCorrection: -0.73459551,
+  perihelionEclipticYears: holisticyearLength/3,
+  axialPrecessionYears: holisticyearLength*610,
+  startpos: 44.88,
+  eocFraction: 0.50,
+  perihelionRef_JD: 2439699.8,
+};
+const uranusSolarYearInput = planets.uranus.solarYearInput;
+const uranusEclipticInclinationJ2000 = planets.uranus.eclipticInclinationJ2000;
+const uranusOrbitalEccentricityJ2000 = planets.uranus.orbitalEccentricityJ2000;
+const uranusOrbitalEccentricityBase = planets.uranus.orbitalEccentricityBase;
+const uranusOrbitalEccentricityAmplitude = planets.uranus.orbitalEccentricityAmplitude;
+const uranusEccentricityPhaseJ2000 = planets.uranus.eccentricityPhaseJ2000;
+const uranusInvPlaneInclinationJ2000 = planets.uranus.invPlaneInclinationJ2000;
+const uranusTilt = planets.uranus.axialTiltMean;
+const uranusLongitudePerihelion = planets.uranus.longitudePerihelion;
+const uranusAscendingNode = planets.uranus.ascendingNode;
+const uranusMeanAnomaly = planets.uranus.meanAnomaly;
+const uranusTrueAnomaly = planets.uranus.trueAnomaly;
+const uranusAngleCorrection = planets.uranus.angleCorrection;
+const uranusPerihelionEclipticYears = planets.uranus.perihelionEclipticYears;
+const uranusAxialPrecessionYears = planets.uranus.axialPrecessionYears;
+const uranusStartpos = planets.uranus.startpos;
+const uranusEocFraction = planets.uranus.eocFraction;
+const uranusPerihelionRef_JD = planets.uranus.perihelionRef_JD;
+
+// Neptune
+planets.neptune = {
+  solarYearInput: 59980,
+  eclipticInclinationJ2000: 1.77004347,
+  orbitalEccentricityJ2000: 0.00859048,
+  invPlaneInclinationJ2000: 0.7354155,
+  axialTiltMean: 28.32,
+  longitudePerihelion: 45.80124471,
+  ascendingNode: 131.7853754,
+  meanAnomaly: 262.5003424,
+  trueAnomaly: 261.2242728,
+  orbitalEccentricityBase: 0.00868571,
+  orbitalEccentricityAmplitude: 8.098033e-6,
+  eccentricityPhaseJ2000: 0,
+  angleCorrection: 2.33381876,
+  perihelionEclipticYears: holisticyearLength*2,
+  axialPrecessionYears: -holisticyearLength*68,
+  startpos: 47.96,
+  eocFraction: 0.50,
+  perihelionRef_JD: 2409432.4,
+};
+const neptuneSolarYearInput = planets.neptune.solarYearInput;
+const neptuneEclipticInclinationJ2000 = planets.neptune.eclipticInclinationJ2000;
+const neptuneOrbitalEccentricityJ2000 = planets.neptune.orbitalEccentricityJ2000;
+const neptuneOrbitalEccentricityBase = planets.neptune.orbitalEccentricityBase;
+const neptuneOrbitalEccentricityAmplitude = planets.neptune.orbitalEccentricityAmplitude;
+const neptuneEccentricityPhaseJ2000 = planets.neptune.eccentricityPhaseJ2000;
+const neptuneInvPlaneInclinationJ2000 = planets.neptune.invPlaneInclinationJ2000;
+const neptuneTilt = planets.neptune.axialTiltMean;
+const neptuneLongitudePerihelion = planets.neptune.longitudePerihelion;
+const neptuneAscendingNode = planets.neptune.ascendingNode;
+const neptuneMeanAnomaly = planets.neptune.meanAnomaly;
+const neptuneTrueAnomaly = planets.neptune.trueAnomaly;
+const neptuneAngleCorrection = planets.neptune.angleCorrection;
+const neptunePerihelionEclipticYears = planets.neptune.perihelionEclipticYears;
+const neptuneAxialPrecessionYears = planets.neptune.axialPrecessionYears;
+const neptuneStartpos = planets.neptune.startpos;
+const neptuneEocFraction = planets.neptune.eocFraction;
+const neptunePerihelionRef_JD = planets.neptune.perihelionRef_JD;
 
 // --- 4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
-// Approximate orbits — switched off via visibility flag. Can be refined later.
 
-// Reference lengths used as INPUT for Pluto
-const plutoSolarYearInput = 90465;               // JPL Horizons J2000 (was 89760)
-const plutoEclipticInclinationJ2000 = 17.14001;  // JPL Horizons J2000 (was 17.14175)
-const plutoOrbitalEccentricityBase = 0.2488273;      // JPL Horizons J2000 (was 0.24880766)
-const plutoInvPlaneInclinationJ2000 = 15.5639473;// From Souami & Souchay (2012) - KEEP UNCHANGED
-const plutoTilt = 57.47;
-const plutoLongitudePerihelion = 224.06891;      // JPL Horizons J2000 (was 224.06676)
-const plutoAscendingNode = 110.30393;            // JPL Horizons J2000 (was 110.30347)
-const plutoMeanAnomaly = 15.55009;               // JPL Horizons J2000 (was 15.83341625)
-const plutoTrueAnomaly = 26.31965048;            // Calculated from M=15.55009°, e=0.2488273 (was 26.51719941)
-const plutoAngleCorrection = 2.469281;           // To align the perihelion exactly
-const plutoPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const plutoStartpos = 71.555;                    // Needs to be at ~16h44m12.72 if start model is 2451716.5
+// Pluto
+planets.pluto = {
+  solarYearInput: 90465, eclipticInclinationJ2000: 17.14001, orbitalEccentricityBase: 0.2488273,
+  invPlaneInclinationJ2000: 15.5639473, axialTiltMean: 57.47, longitudePerihelion: 224.06891,
+  ascendingNode: 110.30393, meanAnomaly: 15.55009, trueAnomaly: 26.31965048,
+  angleCorrection: 2.469281, perihelionEclipticYears: holisticyearLength, startpos: 71.555,
+};
+const plutoSolarYearInput = planets.pluto.solarYearInput;
+const plutoEclipticInclinationJ2000 = planets.pluto.eclipticInclinationJ2000;
+const plutoOrbitalEccentricityBase = planets.pluto.orbitalEccentricityBase;
+const plutoInvPlaneInclinationJ2000 = planets.pluto.invPlaneInclinationJ2000;
+const plutoTilt = planets.pluto.axialTiltMean;
+const plutoLongitudePerihelion = planets.pluto.longitudePerihelion;
+const plutoAscendingNode = planets.pluto.ascendingNode;
+const plutoMeanAnomaly = planets.pluto.meanAnomaly;
+const plutoTrueAnomaly = planets.pluto.trueAnomaly;
+const plutoAngleCorrection = planets.pluto.angleCorrection;
+const plutoPerihelionEclipticYears = planets.pluto.perihelionEclipticYears;
+const plutoStartpos = planets.pluto.startpos;
 
-// Reference lengths used as INPUT for Halleys
-const halleysSolarYearInput = 27503;             // JPL Horizons J2000 (was 27618)
-const halleysEclipticInclinationJ2000 = 162.26269; // JPL Horizons J2000 (was 162.192203847561)
-const halleysOrbitalEccentricityBase = 0.96714291;   // JPL Horizons J2000 (was 0.9679427911271)
-const halleysInvPlaneInclinationJ2000 = 150;     // ⚠ PLACEHOLDER: Needs research for retrograde orbit
-const halleysTilt = 0;
-const halleysLongitudePerihelion = 111.33249;    // JPL Horizons J2000 (was 172.033036745069, CRITICAL: ~60° correction)
-const halleysAscendingNode = 58.42008;           // JPL Horizons J2000 (was 59.5607834844014)
-const halleysMeanAnomaly = 38.77481;             // JPL Horizons J2000 (was 13, TODO placeholder)
-const halleysTrueAnomaly = 166.26774708;         // Calculated from M=38.77481°, e=0.96714291 (was 13 placeholder)
-const halleysAngleCorrection = -1.619816;        // To align the perihelion exactly
-const halleysPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const halleysStartpos = 80;                      // Needs to be at ~08h43m12.79 if start model is 2451716.5
+// Halley's
+planets.halleys = {
+  solarYearInput: 27503, eclipticInclinationJ2000: 162.26269, orbitalEccentricityBase: 0.96714291,
+  invPlaneInclinationJ2000: 150, axialTiltMean: 0, longitudePerihelion: 111.33249,
+  ascendingNode: 58.42008, meanAnomaly: 38.77481, trueAnomaly: 166.26774708,
+  angleCorrection: -1.619816, perihelionEclipticYears: holisticyearLength, startpos: 80,
+};
+const halleysSolarYearInput = planets.halleys.solarYearInput;
+const halleysEclipticInclinationJ2000 = planets.halleys.eclipticInclinationJ2000;
+const halleysOrbitalEccentricityBase = planets.halleys.orbitalEccentricityBase;
+const halleysInvPlaneInclinationJ2000 = planets.halleys.invPlaneInclinationJ2000;
+const halleysTilt = planets.halleys.axialTiltMean;
+const halleysLongitudePerihelion = planets.halleys.longitudePerihelion;
+const halleysAscendingNode = planets.halleys.ascendingNode;
+const halleysMeanAnomaly = planets.halleys.meanAnomaly;
+const halleysTrueAnomaly = planets.halleys.trueAnomaly;
+const halleysAngleCorrection = planets.halleys.angleCorrection;
+const halleysPerihelionEclipticYears = planets.halleys.perihelionEclipticYears;
+const halleysStartpos = planets.halleys.startpos;
 
-// Reference lengths used as INPUT for Eros
-const erosSolarYearInput = 642.93;               // JPL Horizons J2000 (was 643.22295)
-const erosEclipticInclinationJ2000 = 10.82760;   // JPL Horizons J2000 (was 10.8290328658513)
-const erosOrbitalEccentricityBase = 0.2229512;       // JPL Horizons J2000 (was 0.222807894458402)
-const erosInvPlaneInclinationJ2000 = 9.25;       // Estimated (ecliptic - Earth offset) - Keep unchanged
-const erosTilt = 0;
-const erosLongitudePerihelion = 178.81322;       // JPL Horizons J2000 (was 123.054362100533, CRITICAL: ~56° correction)
-const erosAscendingNode = 304.30993;             // JPL Horizons J2000 (was 304.411578580454)
-const erosMeanAnomaly = 320.21552;               // JPL Horizons J2000 (was 153.67797646)
-const erosTrueAnomaly = 299.91713740;            // Calculated from M=320.21552°, e=0.2229512 (was 162.69081884)
-const erosAngleCorrection = 0.047888;            // To align the perihelion exactly
-const erosPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession to explain TODO arcseconds per century
-const erosStartpos = 57.402;                     // Needs to be at ~20h38m24.47 if start model is 2451716.5
+// Eros
+planets.eros = {
+  solarYearInput: 642.93, eclipticInclinationJ2000: 10.82760, orbitalEccentricityBase: 0.2229512,
+  invPlaneInclinationJ2000: 9.25, axialTiltMean: 0, longitudePerihelion: 178.81322,
+  ascendingNode: 304.30993, meanAnomaly: 320.21552, trueAnomaly: 299.91713740,
+  angleCorrection: 0.047888, perihelionEclipticYears: holisticyearLength, startpos: 57.402,
+};
+const erosSolarYearInput = planets.eros.solarYearInput;
+const erosEclipticInclinationJ2000 = planets.eros.eclipticInclinationJ2000;
+const erosOrbitalEccentricityBase = planets.eros.orbitalEccentricityBase;
+const erosInvPlaneInclinationJ2000 = planets.eros.invPlaneInclinationJ2000;
+const erosTilt = planets.eros.axialTiltMean;
+const erosLongitudePerihelion = planets.eros.longitudePerihelion;
+const erosAscendingNode = planets.eros.ascendingNode;
+const erosMeanAnomaly = planets.eros.meanAnomaly;
+const erosTrueAnomaly = planets.eros.trueAnomaly;
+const erosAngleCorrection = planets.eros.angleCorrection;
+const erosPerihelionEclipticYears = planets.eros.perihelionEclipticYears;
+const erosStartpos = planets.eros.startpos;
 
-// Reference lengths used as INPUT for Ceres
-const ceresSolarYearInput = 1680.5;              // JPL Horizons J2000
-const ceresEclipticInclinationJ2000 = 10.59407;  // JPL Horizons J2000 (was 10.58682)
-const ceresOrbitalEccentricityBase = 0.0755347;      // JPL Horizons J2000 (was 0.07913825)
-const ceresInvPlaneInclinationJ2000 = 0.4331698; // Souami & Souchay (2012) Table 2 - Real data!
-const ceresTilt = 4;                             // Dawn spacecraft measurement (~4°)
-const ceresLongitudePerihelion = 73.59769;       // JPL Horizons J2000
-const ceresAscendingNode = 80.30533;             // JPL Horizons J2000
-const ceresMeanAnomaly = 95.98772;               // JPL Horizons J2000
-const ceresTrueAnomaly = 104.48097667;           // Calculated from M=95.98772°, e=0.0755347
-const ceresAngleCorrection = 0;                  // To align the perihelion exactly
-const ceresPerihelionEclipticYears = holisticyearLength; // Duration of perihelion precession
-const ceresOrbitDistance = 2.76596;              // JPL Horizons J2000
+// Ceres
+planets.ceres = {
+  solarYearInput: 1680.5, eclipticInclinationJ2000: 10.59407, orbitalEccentricityBase: 0.0755347,
+  invPlaneInclinationJ2000: 0.4331698, axialTiltMean: 4, longitudePerihelion: 73.59769,
+  ascendingNode: 80.30533, meanAnomaly: 95.98772, trueAnomaly: 104.48097667,
+  angleCorrection: 0, perihelionEclipticYears: holisticyearLength, orbitDistance: 2.76596,
+};
+const ceresSolarYearInput = planets.ceres.solarYearInput;
+const ceresEclipticInclinationJ2000 = planets.ceres.eclipticInclinationJ2000;
+const ceresOrbitalEccentricityBase = planets.ceres.orbitalEccentricityBase;
+const ceresInvPlaneInclinationJ2000 = planets.ceres.invPlaneInclinationJ2000;
+const ceresTilt = planets.ceres.axialTiltMean;
+const ceresLongitudePerihelion = planets.ceres.longitudePerihelion;
+const ceresAscendingNode = planets.ceres.ascendingNode;
+const ceresMeanAnomaly = planets.ceres.meanAnomaly;
+const ceresTrueAnomaly = planets.ceres.trueAnomaly;
+const ceresAngleCorrection = planets.ceres.angleCorrection;
+const ceresPerihelionEclipticYears = planets.ceres.perihelionEclipticYears;
+const ceresOrbitDistance = planets.ceres.orbitDistance;
 
 // --- 4c. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)

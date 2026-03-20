@@ -3,7 +3,7 @@
 
   "physicalConstants": {
     "currentAUDistance": 149597870.698828,
-    "meanSiderealYearSeconds": 31558149.8,
+    "meansiderealyearlengthinSeconds": 31558149.8,
     "G_CONSTANT": 6.6743e-20,
     "MASS_RATIO_EARTH_MOON": 81.3007,
     "speedOfLight": 299792.458,
@@ -47,7 +47,7 @@
     "moonNodalMonthInput": 27.21222082,
     "moonDistance": 384399.07,
     "moonEclipticInclinationJ2000": 5.1453964,
-    "moonOrbitalEccentricity": 0.054900489,
+    "moonOrbitalEccentricityBase": 0.054900489,
     "moonTilt": 6.687
   },
 
