@@ -11,17 +11,21 @@ Output values are stored in `tools/lib/constants/fitted-coefficients.js`.
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (12 terms) | `data/02-cardinal-points.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×12 terms) | `data/02-cardinal-points.csv` |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/03-year-length-analysis.xlsx` |
-| `eoc-constants.js` | `eocEccentricity`, `perihelionPhaseOffset` | Scene-graph simulation |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
-| `perihelion-offset.js` | `perihelionPhaseOffset` (analytical) | Constants only |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 42p/planet) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
+| `moon-eclipse-optimizer.js` | `moonStartposNodal/Apsidal/Moon` | 66 solar eclipses (2000–2025) |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
+| `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/train_precession.py` | `PREDICT_COEFFS` (429 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
+
+Note: `eoc-constants.js` and `perihelion-offset.js` are **informational/exploratory** only —
+`eocEccentricity` and `perihelionPhaseOffset` are already derived analytically in `constants.js`
+and require no pipeline step.
 
 ## Dependency chain
 
@@ -35,6 +39,12 @@ When model parameters change, refit in this order. The logic:
 7. Parallax corrections are a final layer on top of scene-graph positions
 8. Cardinal point data comes from the scene-graph (depends on everything above)
 9. Obliquity/year-length harmonics are fitted from the cardinal point data
+10. `SOLSTICE_OBLIQUITY_MEAN_FITTED` (Step 11) feeds back into the scene graph,
+    creating a circular dependency. For full self-consistency after parameter
+    changes, run the pipeline twice. The first pass establishes the correct
+    obliquity mean; the second pass ensures all downstream steps (ML training,
+    cardinal point export) use the corrected value. In practice the effect is
+    small (~1.5" obliquity shift), but a second pass guarantees convergence.
 
 ```
 ── Phase 0: Sun optimizer & planet alignment (optimizer tool) ───────
@@ -42,12 +52,29 @@ When model parameters change, refit in this order. The logic:
 Step 1:  node tools/optimize.js optimize sun correctionSun
          → correctionSun, eccentricityBase, eccentricityAmplitude,
            earthtiltMean, earthInvPlaneInclinationAmplitude (all derived)
+         Updates: constants.js + script.js (5 Earth orbital constants)
          Verify: RMS < 0.004°, solstice timing < 1 sec error at J2000
 
 Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
          → angleCorrection (derived from longitudePerihelion, not a free param)
+         Updates: constants.js + script.js (angleCorrection per planet)
          Verify: Scene perihelion RA = longitudePerihelion exactly (diff < 0.000001°)
          Planets: mercury, venus, mars, jupiter, saturn, uranus, neptune
+
+Step 2b: node tools/fit/moon-eclipse-optimizer.js
+         Optimizes Moon's 3 startpos values against 66 solar eclipses (2000–2025)
+         Measures Moon-Sun angular separation at each eclipse — should be ~0°
+         Updates: constants.js + script.js (moonStartposNodal, moonStartposApsidal, moonStartposMoon, manual)
+         Verify: RMS separation < 0.5°, individual eclipses < 1°
+
+         Moon position architecture (two layers):
+         1. Geometric orbit: 5 precession layers from 3 month inputs + 3 startpos
+            → constants.js (moonSiderealMonthInput, moonAnomalisticMonthInput, moonNodalMonthInput,
+              moonStartposApsidal, moonStartposNodal, moonStartposMoon)
+         2. Meeus perturbation overlay: 120 terms from published tables (not fitted)
+            → tools/lib/constants/meeus-lunar-tables.json (centralized, loaded by scene-graph.js)
+            Source: Meeus "Astronomical Algorithms", Chapter 47, Tables 47.A & 47.B
+            Note: script.js still has its own copy (browser cannot load JSON at runtime)
 
 ── Phase 1: Generate input data (manual) ───────────────────────────
 
@@ -59,55 +86,78 @@ Step 3:  Export from browser GUI              → data/01-holistic-year-objects-
 
 Step 4:  python/fit_perihelion_harmonics.py   → PERI_HARMONICS_RAW, PERI_OFFSET
          (Earth perihelion longitude & ERD from file 01)
+         Updates: fitted-coefficients.js (auto-updated by script)
 
-Step 5:  eoc-constants.js                     → eocEccentricity, perihelionPhaseOffset
-         (Equation of center derived from scene-graph geometry)
+Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
+         (RMSE, max error, J2000 accuracy, ERD analytical vs numerical)
+         Must pass before proceeding — ERD errors propagate into all planet ML predictions.
+
+Note: eocEccentricity and perihelionPhaseOffset are derived analytically in constants.js
+      from correctionSun and the eccentricity constants — no pipeline step needed.
 
 ── Phase 3: Planet precession predictions ───────────────────────────
 
-Step 6:  python/train_precession.py           → tools/lib/python/coefficients/*_coeffs_unified.py
+Step 5:  python/train_precession.py           → tools/lib/python/coefficients/*_coeffs_unified.py
          (429-term ML coefficients, uses perihelion/ERD as features)
+         Updates: coefficients/*_coeffs_unified.py (auto-written by script)
 
-Step 7:  python/train_observed.py             → tools/lib/python/coefficients/*_coeffs.py
+Step 6:  python/train_observed.py             → tools/lib/python/coefficients/*_coeffs.py
          (225-term observed coefficients)
+         Updates: coefficients/*_coeffs.py (auto-written by script)
 
 ── Phase 4: Planet positions & corrections ──────────────────────────
 
-Step 8:  eoc-fractions.js                     → per-planet eocFraction
-Step 9:  ascnode-correction.js                → ascNodeTiltCorrection, startpos
-Step 10: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
+Step 7:  eoc-fractions.js                     → per-planet eocFraction
+         Scans EoC fraction 0→1 for Type III planets (Jupiter, Saturn, Uranus, Neptune)
+         Updates: constants.js + script.js (eocFraction per Type III planet, manual)
+
+Step 8:  ascnode-correction.js                → startpos per planet
+         Scans ascNodeTiltCorrection (derived from startpos), re-optimizes startpos
+         Updates: constants.js + script.js (startpos per planet, manual)
+         Note: ascNodeTiltCorrection is derived (2*startpos or 180-ascendingNode)
+
+Step 9:  parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
+         Fits up to 42-parameter RA/Dec correction per planet via cross-validation
+         Updates: fitted-coefficients.js (auto-updated by script)
 
 ── Phase 5: Cardinal point data & harmonics ─────────────────────────
 
-Step 11: export-cardinal-points.js            → data/02-cardinal-points.csv
+Step 10: export-cardinal-points.js            → data/02-cardinal-points.csv
          (runs full scene-graph simulation — depends on all above)
 
-Step 12: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
-Step 13: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
-Step 14: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
+Step 11: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
+         Updates: fitted-coefficients.js (auto-updated by script)
+
+Step 12: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
+         Updates: fitted-coefficients.js (auto-updated by script)
+
+Step 13: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
+         Updates: fitted-coefficients.js (auto-updated by script)
 ```
 
 Note: `data/03-year-length-analysis.xlsx` (491 pts, 100-yr steps) is also exported
-from the browser GUI (Menu: Analysis → Year Length Report) and used by step 11.
+from the browser GUI (Menu: Analysis → Year Length Report) and used by step 10.
 Only needs regenerating if H or year-length-affecting parameters change.
 
 ## What triggers a refit?
 
 | Parameter changed | Steps to rerun |
 |-------------------|----------------|
-| `H` (holisticyearLength) | ALL (1→14) |
+| `H` (holisticyearLength) | ALL (1→13) |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
-| `earthtiltMean` | 1, 3→7, 11→14 |
-| `earthInvPlaneInclinationAmplitude` | 1, 3→7, 11→14 |
-| `earthInvPlaneInclinationMean` | 3, 11→14 |
-| `correctionSun` | 1, 5, 11→14 |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→5, 11→14 |
-| `correctionDays` | 3, 11→14 |
-| `useVariableSpeed` | ALL (1→14) |
-| Planet `startpos` | 2 (re-solve angleCorrection), 10 |
-| Planet `eocFraction` | 3, 10 |
-| Planet `solarYearInput` | 2, 6→7, 10 |
-| Planet `orbitalEccentricityBase` | 2, 8, 10 |
+| `earthtiltMean` | 1, 3→6, 10→13 |
+| `earthInvPlaneInclinationAmplitude` | 1, 3→6, 10→13 |
+| `earthInvPlaneInclinationMean` | 3, 10→13 |
+| `correctionSun` | 1, 10→13 |
+| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4, 10→13 |
+| `correctionDays` | 3, 10→13 |
+| `useVariableSpeed` | ALL (1→13) |
+| Planet `startpos` | 2 (re-solve angleCorrection), 9 |
+| Planet `eocFraction` | 3, 9 |
+| Planet `solarYearInput` | 2, 5→6, 9 |
+| Planet `orbitalEccentricityBase` | 2, 7, 9 |
+| Moon months (sidereal/anomalistic/nodal) | 2b |
+| `moonStartposNodal/Apsidal/Moon` | 2b |
 
 ## How to run
 
@@ -122,13 +172,15 @@ node tools/optimize.js optimize jupiter startpos
 node tools/optimize.js optimize saturn startpos
 node tools/optimize.js optimize uranus startpos
 node tools/optimize.js optimize neptune startpos
+# Moon
+node tools/fit/moon-eclipse-optimizer.js
 
 # Phase 1: Generate input data (manual)
 # Export from browser: Analysis → Export Objects Report → save as data/01-holistic-year-objects-data.xlsx
 
 # Phase 2: Earth orbital geometry
 python3 tools/fit/python/fit_perihelion_harmonics.py
-node tools/fit/eoc-constants.js
+python3 tools/fit/python/verify_perihelion_erd.py   # must pass before continuing
 
 # Phase 3: Planet precession predictions
 python3 tools/fit/python/train_precession.py
@@ -154,6 +206,7 @@ node tools/fit/year-length-harmonics.js
 | Parallax corrections | `tools/lib/constants/fitted-coefficients.js` (attached to ASTRO_REFERENCE) |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Training data (CSV/JSON) | `data/02-cardinal-points.csv`, `data/cardinal-points-training.json` |
+| Meeus lunar tables | `tools/lib/constants/meeus-lunar-tables.json` (reference data, not fitted) |
 
 ## Constants flow
 

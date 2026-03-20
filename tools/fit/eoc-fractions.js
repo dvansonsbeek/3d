@@ -163,12 +163,14 @@ function scanPlanet(planetKey) {
     if (frac !== 0 && periRefJD) {
       const periPrecRate = Math.PI * 2 / p.perihelionEclipticYears;
       const pos_peri = (periRefJD - C.startmodelJD) / C.meanSolarYearDays;
-      planetDef.eccentricity = p.orbitalEccentricityBase * frac;
+      planetDef.eccentricity = p.orbitalEccentricityJ2000 * frac;
+      planetDef._eocFraction = frac;
       planetDef.perihelionPhaseJ2000 = -p.startpos * d2r
         + (planetDef.speed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
     } else {
       delete planetDef.eccentricity;
+      delete planetDef._eocFraction;
       delete planetDef.perihelionPhaseJ2000;
       delete planetDef.perihelionPrecessionRate;
     }
@@ -197,12 +199,14 @@ function scanPlanet(planetKey) {
     if (frac !== 0 && periRefJD) {
       const periPrecRate = Math.PI * 2 / p.perihelionEclipticYears;
       const pos_peri = (periRefJD - C.startmodelJD) / C.meanSolarYearDays;
-      planetDef.eccentricity = p.orbitalEccentricityBase * frac;
+      planetDef.eccentricity = p.orbitalEccentricityJ2000 * frac;
+      planetDef._eocFraction = frac;
       planetDef.perihelionPhaseJ2000 = -p.startpos * d2r
         + (planetDef.speed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
     } else {
       delete planetDef.eccentricity;
+      delete planetDef._eocFraction;
       delete planetDef.perihelionPhaseJ2000;
       delete planetDef.perihelionPrecessionRate;
     }

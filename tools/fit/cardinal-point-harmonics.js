@@ -187,7 +187,7 @@ function main() {
 
     // Greedy selection
     console.log('  Greedy selection:');
-    const greedy = greedySelect(data, fibDivisors, 12, 55);
+    const greedy = greedySelect(data, fibDivisors, 24, 120);
     console.log(`  Final: RMSE = ${greedy.rmse.toFixed(2)} min [${greedy.divisors.join(',')}]`);
 
     results[type] = { current, greedy, anchor };
@@ -198,21 +198,29 @@ function main() {
   console.log('  COPY-PASTE OUTPUT');
   console.log('═══════════════════════════════════════════════════════════════');
 
+  const jsLines = [];
+  jsLines.push('const CARDINAL_POINT_HARMONICS = {');
   console.log('\nconst CARDINAL_POINT_HARMONICS = {');
   for (const type of types) {
     const { greedy } = results[type];
-    console.log(`  ${type}: [  // RMSE = ${greedy.rmse.toFixed(1)} min over full H`);
+    const hdr = `  ${type}: [  // RMSE = ${greedy.rmse.toFixed(1)} min over full H`;
+    console.log(hdr);
+    jsLines.push(hdr);
     for (const [div, sinC, cosC] of greedy.harmonics) {
       const amp = Math.sqrt(sinC * sinC + cosC * cosC);
       const label = [3,5,8,13,16].includes(div) ? ' [Fib]' :
         (div === 6 ? ' 2×(H/3)' : div === 11 ? ' H/3+H/8' :
          div === 19 ? ' H/3+H/16' : div === 24 ? ' H/8+H/16' :
          div === 32 ? ' 2×(H/16)' : '');
-      console.log(`    [${String(div).padStart(2)},  ${sinC >= 0 ? ' ' : ''}${sinC.toFixed(6)},  ${cosC >= 0 ? ' ' : ''}${cosC.toFixed(6)}],  // H/${div}  amp=${amp.toFixed(3)}d${label}`);
+      const line = `    [${String(div).padStart(2)},  ${sinC >= 0 ? ' ' : ''}${sinC.toFixed(6)},  ${cosC >= 0 ? ' ' : ''}${cosC.toFixed(6)}],  // H/${div}  amp=${amp.toFixed(3)}d${label}`;
+      console.log(line);
+      jsLines.push(line);
     }
     console.log('  ],');
+    jsLines.push('  ],');
   }
   console.log('};');
+  jsLines.push('};');
 
   // Summary table
   console.log('\n── Summary ──');
@@ -220,6 +228,23 @@ function main() {
   for (const type of types) {
     const { current, greedy } = results[type];
     console.log(`  ${type} | ${current.rmse.toFixed(2)} min     | ${greedy.rmse.toFixed(2)} min  | [${greedy.divisors.join(',')}]`);
+  }
+
+  // ─── Auto-update fitted-coefficients.js ──────────────────────────────
+  const fittedPath = path.join(__dirname, '..', 'lib', 'constants', 'fitted-coefficients.js');
+  const fittedSrc = fs.readFileSync(fittedPath, 'utf8');
+  const startMarker = '// @AUTO:CARDINAL_POINTS:START';
+  const endMarker = '// @AUTO:CARDINAL_POINTS:END';
+  const startIdx = fittedSrc.indexOf(startMarker);
+  const endIdx = fittedSrc.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1) {
+    console.error('\n  ✗ Could not find @AUTO:CARDINAL_POINTS markers in fitted-coefficients.js');
+  } else {
+    const startLineEnd = fittedSrc.indexOf('\n', startIdx) + 1;
+    const newContent = jsLines.join('\n') + '\n\n// Legacy alias\nconst SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;\n';
+    const newSrc = fittedSrc.slice(0, startLineEnd) + newContent + fittedSrc.slice(endIdx);
+    fs.writeFileSync(fittedPath, newSrc);
+    console.log('\n  ✓ Updated CARDINAL_POINT_HARMONICS in fitted-coefficients.js');
   }
 }
 

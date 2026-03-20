@@ -73,6 +73,12 @@ SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS['SS']
 SOLSTICE_OBLIQUITY_MEAN = _C['SOLSTICE_OBLIQUITY_MEAN']
 SOLSTICE_OBLIQUITY_HARMONICS = [tuple(h) for h in _C['SOLSTICE_OBLIQUITY_HARMONICS']]
 
+# Earth perihelion harmonics (fitted, from fitted-coefficients.js via constants.js)
+# PERI_HARMONICS: list of (period_years, sin_coeff, cos_coeff)
+# PERI_OFFSET: DC offset in degrees
+PERI_HARMONICS = [tuple(h) for h in _C['PERI_HARMONICS']]
+PERI_OFFSET = _C['PERI_OFFSET']
+
 # Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
 PHASE_ANGLE = 203.3195  # degrees
 

@@ -203,19 +203,22 @@ function main() {
   console.log(`  H                                = ${C.H}`);
   console.log(`  balancedYear                     = ${C.balancedYear}`);
 
-  const obliqMean = computePythagoreanMean();
-  console.log(`\nPythagorean obliquity mean (recomputed): ${obliqMean.toFixed(6)}°`);
-  console.log(`SOLSTICE_OBLIQUITY_MEAN (constants.js):  ${C.SOLSTICE_OBLIQUITY_MEAN.toFixed(6)}°`);
-  if (Math.abs(obliqMean - C.SOLSTICE_OBLIQUITY_MEAN) > 1e-6) {
-    console.log(`  ⚠️  MISMATCH: ${((obliqMean - C.SOLSTICE_OBLIQUITY_MEAN) * 3600).toFixed(3)}" difference`);
-  } else {
-    console.log('  ✓  Match confirmed');
-  }
+  const pythagoreanMean = computePythagoreanMean();
+  console.log(`\nPythagorean obliquity mean (time-average): ${pythagoreanMean.toFixed(8)}°`);
 
   const data = readSSData();
-  console.log(`\nSS data points: ${data.length}`);
+  console.log(`SS data points: ${data.length}`);
   console.log(`Year range: ${data[0].year} to ${data[data.length - 1].year}`);
   console.log(`Obliquity range: ${Math.min(...data.map(d => d.obliq)).toFixed(6)}° to ${Math.max(...data.map(d => d.obliq)).toFixed(6)}°`);
+
+  // Compute mean obliquity from data (more accurate than Pythagorean for solstice fitting)
+  let obliqSum = 0;
+  for (const d of data) obliqSum += d.obliq;
+  const obliqMean = obliqSum / data.length;
+  console.log(`\nData-derived solstice mean:               ${obliqMean.toFixed(8)}°`);
+  console.log(`Pythagorean mean:                          ${pythagoreanMean.toFixed(8)}°`);
+  console.log(`Difference (Pythagorean − data):           ${((pythagoreanMean - obliqMean) * 3600).toFixed(3)}"`);
+  console.log(`SOLSTICE_OBLIQUITY_MEAN (constants.js):     ${C.SOLSTICE_OBLIQUITY_MEAN.toFixed(8)}°`);
 
   // Compute raw residual stats
   let rawSSE = 0;
@@ -282,15 +285,40 @@ function main() {
   console.log('═══════════════════════════════════════════════════════════════');
   console.log(`\n// Pythagorean obliquity mean: ${obliqMean.toFixed(6)}°`);
   console.log('const OBLIQUITY_HARMONICS = [');
+  const lines = [];
   for (const [div, sinC, cosC] of greedy.harmonics) {
     const amp = Math.sqrt(sinC * sinC + cosC * cosC) * 3600;
     const label = [3,5,8,13,16].includes(div) ? ' [Fib]' :
       (div === 6 ? ' 2×(H/3)' : div === 11 ? ' H/3+H/8' :
        div === 19 ? ' H/3+H/16' : div === 24 ? ' H/8+H/16' :
        div === 32 ? ' 2×(H/16)' : '');
-    console.log(`  [${String(div).padStart(2)},  ${sinC >= 0 ? ' ' : ''}${sinC.toFixed(8)},  ${cosC >= 0 ? ' ' : ''}${cosC.toFixed(8)}],  // H/${div}  amp=${amp.toFixed(1)}"${label}`);
+    const line = `  [${String(div).padStart(2)},  ${sinC >= 0 ? ' ' : ''}${sinC.toFixed(8)},  ${cosC >= 0 ? ' ' : ''}${cosC.toFixed(8)}],  // H/${div}  amp=${amp.toFixed(1)}"${label}`;
+    console.log(line);
+    lines.push(line);
   }
   console.log('];');
+
+  // ─── Auto-update fitted-coefficients.js ──────────────────────────────
+  const fittedPath = path.join(__dirname, '..', 'lib', 'constants', 'fitted-coefficients.js');
+  const fittedSrc = fs.readFileSync(fittedPath, 'utf8');
+  const startMarker = '// @AUTO:OBLIQUITY:START';
+  const endMarker = '// @AUTO:OBLIQUITY:END';
+  const startIdx = fittedSrc.indexOf(startMarker);
+  const endIdx = fittedSrc.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1) {
+    console.error('  ✗ Could not find @AUTO:OBLIQUITY markers in fitted-coefficients.js');
+  } else {
+    const startLineEnd = fittedSrc.indexOf('\n', startIdx) + 1;
+    const newContent =
+      `// Data-derived solstice mean (more accurate than Pythagorean time-average)\n` +
+      `const SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)};\n` +
+      `const SOLSTICE_OBLIQUITY_HARMONICS = [\n` +
+      lines.join('\n') + '\n];\n';
+    const newSrc = fittedSrc.slice(0, startLineEnd) + newContent + fittedSrc.slice(endIdx);
+    fs.writeFileSync(fittedPath, newSrc);
+    console.log(`\n  ✓ Updated SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)}° in fitted-coefficients.js`);
+    console.log('  ✓ Updated SOLSTICE_OBLIQUITY_HARMONICS in fitted-coefficients.js');
+  }
 }
 
 main();

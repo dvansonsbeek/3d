@@ -1,0 +1,761 @@
+{
+  "_description": "Classification of all model parameters and astro references. Each entry shows the current value, source file, and proposed category (model_param or astro_ref). Use this to review and decide the final placement before creating the 3 JSON files.",
+
+  "foundational": {
+    "_section": "Section 1: Foundational constants (constants.js lines 24-33)",
+    "H": {
+      "value": 335008,
+      "source": "constants.js:24",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Holistic year length — defines the full precession cycle",
+      "note": "Core theory parameter"
+    },
+    "inputMeanSolarYear": {
+      "value": 365.2421897,
+      "source": "constants.js:25",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Mean tropical year length in days",
+      "note": "IAU observed value, not a model choice"
+    },
+    "perihelionalignmentYear": {
+      "value": 1246,
+      "source": "constants.js:26",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Year when Earth perihelion longitude was 90 degrees",
+      "note": "Determined from Meeus formula, not a model parameter"
+    },
+    "startmodelJD": {
+      "value": 2451716.5,
+      "source": "constants.js:27",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Julian day of model start (June 21, 2000 00:00 UTC)",
+      "note": "Same as juneSolstice2000_JD rounded — astronomical reference date"
+    },
+    "startmodelYear": {
+      "value": 2000.5,
+      "source": "constants.js:28",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Fractional year of model start",
+      "note": "Model choice: mid-2000"
+    },
+    "correctionDays": {
+      "value": -0.23328398168087,
+      "source": "constants.js:29",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Fine correction to model start timing",
+      "note": "Optimizer-derived"
+    },
+    "correctionSun": {
+      "value": 0.495997,
+      "source": "constants.js:30",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Sun position correction angle",
+      "note": "Optimizer-derived (Step 1)"
+    },
+    "temperatureGraphMostLikely": {
+      "value": 14.5,
+      "source": "constants.js:31",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Temperature graph baseline",
+      "note": "Display parameter"
+    },
+    "startAngleModel": {
+      "value": 89.91949879,
+      "source": "constants.js:32",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Starting angle of model in degrees",
+      "note": "Derived from geometry"
+    },
+    "useVariableSpeed": {
+      "value": true,
+      "source": "constants.js:33",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Toggle equation of center",
+      "note": "Model feature flag"
+    }
+  },
+
+  "physical_constants": {
+    "_section": "Section 2: Physical & astronomical constants (constants.js lines 41-50)",
+    "currentAUDistance": {
+      "value": 149597870.698828,
+      "unit": "km",
+      "source": "constants.js:41",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "1 AU in km",
+      "note": "IAU 2012 definition"
+    },
+    "meanSiderealYearSeconds": {
+      "value": 31558149.8,
+      "unit": "seconds",
+      "source": "constants.js:42",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Mean sidereal year in seconds",
+      "note": "IAU observed value"
+    },
+    "G_CONSTANT": {
+      "value": 6.6743e-20,
+      "unit": "km³/(kg·s²)",
+      "source": "constants.js:43",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Gravitational constant",
+      "note": "CODATA 2018"
+    },
+    "MASS_RATIO_EARTH_MOON": {
+      "value": 81.3007,
+      "source": "constants.js:44",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Earth/Moon mass ratio",
+      "note": "DE440"
+    },
+    "massRatioDE440": {
+      "value": {
+        "mercury": 6023625.5,
+        "venus": 408523.72,
+        "mars": 3098703.59,
+        "jupiter": 1047.348625,
+        "saturn": 3497.9018,
+        "uranus": 22902.944,
+        "neptune": 19412.237
+      },
+      "source": "constants.js:47-50",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Sun/planet mass ratios from DE440",
+      "note": "JPL DE440 ephemeris"
+    }
+  },
+
+  "earth_parameters": {
+    "_section": "Section 3: Earth parameters (constants.js lines 57-69)",
+    "earthtiltMean": {
+      "value": 23.4136593,
+      "unit": "degrees",
+      "source": "constants.js:57",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Earth mean axial tilt (scene-geometry base)",
+      "note": "Optimizer-solved to match IAU obliquity at J2000"
+    },
+    "earthInvPlaneInclinationAmplitude": {
+      "value": 0.63541988,
+      "unit": "degrees",
+      "source": "constants.js:58",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Amplitude of Earth's invariable plane inclination oscillation",
+      "note": "Optimizer-solved to match IAU obliquity rate"
+    },
+    "earthRAAngle": {
+      "value": "DERIVED: 2*A - A²/ε",
+      "source": "constants.js:60",
+      "current_category": "derived",
+      "proposed_category": "derived",
+      "description": "Right ascension angle component from inclination",
+      "note": "Computed from earthInvPlaneInclinationAmplitude and earthtiltMean — stays in JS"
+    },
+    "earthInvPlaneInclinationMean": {
+      "value": "DERIVED from J2000 inclination - amplitude × cos(phase)",
+      "source": "constants.js:63-64",
+      "current_category": "derived",
+      "proposed_category": "derived",
+      "description": "Mean invariable plane inclination",
+      "note": "Computed from ASTRO_REFERENCE values + amplitude — stays in JS"
+    },
+    "eccentricityBase": {
+      "value": 0.01537159,
+      "source": "constants.js:65",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Base eccentricity (balance-locked)",
+      "note": "Determined by Law 5 balance constraint"
+    },
+    "eccentricityAmplitude": {
+      "value": 0.00137074,
+      "source": "constants.js:66",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Eccentricity oscillation amplitude",
+      "note": "Optimizer-solved to give e(J2000) = 0.01671022"
+    },
+    "eccentricityAmplitudeK": {
+      "value": 3.4505372893e-6,
+      "source": "constants.js:68",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Eccentricity amplitude scaling constant (K)",
+      "note": "Derived from physical relationship"
+    }
+  },
+
+  "moon_parameters": {
+    "_section": "Section 4: Moon input constants (constants.js lines 76-85)",
+    "moonSiderealMonthInput": {
+      "value": 27.32166156,
+      "unit": "days",
+      "source": "constants.js:76",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon sidereal month",
+      "note": "IAU observed value"
+    },
+    "moonAnomalisticMonthInput": {
+      "value": 27.55454988,
+      "unit": "days",
+      "source": "constants.js:77",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon anomalistic month",
+      "note": "IAU observed value"
+    },
+    "moonNodalMonthInput": {
+      "value": 27.21222082,
+      "unit": "days",
+      "source": "constants.js:78",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon nodal (draconic) month",
+      "note": "IAU observed value"
+    },
+    "moonDistance": {
+      "value": 384399.07,
+      "unit": "km",
+      "source": "constants.js:79",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Mean Earth-Moon distance",
+      "note": "IAU/JPL observed value"
+    },
+    "moonEclipticInclinationJ2000": {
+      "value": 5.1453964,
+      "unit": "degrees",
+      "source": "constants.js:80",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon orbital inclination to ecliptic at J2000",
+      "note": "JPL observed value"
+    },
+    "moonOrbitalEccentricity": {
+      "value": 0.054900489,
+      "source": "constants.js:81",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon orbital eccentricity",
+      "note": "JPL observed value"
+    },
+    "moonTilt": {
+      "value": 6.687,
+      "unit": "degrees",
+      "source": "constants.js:82",
+      "current_category": "model_param",
+      "proposed_category": "astro_ref",
+      "description": "Moon axial tilt to ecliptic",
+      "note": "Observed value"
+    },
+    "moonStartposApsidal": {
+      "value": 347.622,
+      "unit": "degrees",
+      "source": "constants.js:83",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Moon apsidal precession start position",
+      "note": "Eclipse-optimizer tuned (Step 2b)"
+    },
+    "moonStartposNodal": {
+      "value": -83.63,
+      "unit": "degrees",
+      "source": "constants.js:84",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Moon nodal precession start position",
+      "note": "Eclipse-optimizer tuned (Step 2b)"
+    },
+    "moonStartposMoon": {
+      "value": 131.93,
+      "unit": "degrees",
+      "source": "constants.js:85",
+      "current_category": "model_param",
+      "proposed_category": "model_param",
+      "description": "Moon orbital start position",
+      "note": "Eclipse-optimizer tuned (Step 2b)"
+    }
+  },
+
+  "planet_fields": {
+    "_section": "Section 5: Per-planet fields (constants.js lines 93-283). Classification of each field that appears in every planet object.",
+    "name": {
+      "example": "Mercury",
+      "proposed_category": "model_param",
+      "description": "Display name"
+    },
+    "solarYearInput": {
+      "example": 87.9686,
+      "unit": "days",
+      "proposed_category": "model_param",
+      "description": "Orbital period in days",
+      "note": "IAU/JPL observed value"
+    },
+    "orbitalEccentricityBase": {
+      "example": 0.20563593,
+      "proposed_category": "model_param",
+      "description": "Balance-derived mean eccentricity",
+      "note": "Determines Law 5 balance — LOCKED"
+    },
+    "orbitalEccentricityJ2000": {
+      "example": 0.20563593,
+      "proposed_category": "astro_ref",
+      "description": "Actual eccentricity at J2000",
+      "note": "JPL observed value"
+    },
+    "orbitalEccentricityAmplitude": {
+      "example": 8.436789e-5,
+      "proposed_category": "model_param",
+      "description": "Eccentricity oscillation amplitude",
+      "note": "Fitted from model"
+    },
+    "eccentricityPhaseJ2000": {
+      "example": 89.9882,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Eccentricity oscillation phase at J2000",
+      "note": "Fitted"
+    },
+    "axialTiltMean": {
+      "example": 0.03,
+      "unit": "degrees",
+      "proposed_category": "astro_ref",
+      "description": "Mean axial tilt of planet",
+      "note": "Observed value"
+    },
+    "eocFraction": {
+      "example": -0.527,
+      "proposed_category": "model_param",
+      "description": "Equation of center fraction",
+      "note": "Fitted (Step 7)"
+    },
+    "startpos": {
+      "example": 83.5293,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Planet orbital start position",
+      "note": "Optimizer-tuned (Step 8)"
+    },
+    "angleCorrection": {
+      "example": 0.97090778,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Perihelion direction correction angle",
+      "note": "Derived from longitudePerihelion (Step 2)"
+    },
+    "perihelionEclipticYears": {
+      "example": "H / (1 + 3/8) = H * 8/11",
+      "proposed_category": "model_param",
+      "description": "Perihelion precession period in years",
+      "note": "H-dependent theory parameter. Store as fraction [num, den] in JSON."
+    },
+    "type": {
+      "example": "I",
+      "proposed_category": "model_param",
+      "description": "Planet type classification (I, II, III)",
+      "note": "Theory structure"
+    },
+    "mirrorPair": {
+      "example": "uranus",
+      "proposed_category": "model_param",
+      "description": "Mirror-symmetric partner planet",
+      "note": "Theory structure"
+    },
+    "fibonacciD": {
+      "example": 21,
+      "proposed_category": "model_param",
+      "description": "Fibonacci divisor in balance framework",
+      "note": "Theory structure"
+    },
+    "eclipticInclinationJ2000": {
+      "example": 7.00497902,
+      "unit": "degrees",
+      "proposed_category": "astro_ref",
+      "description": "Orbital inclination to ecliptic at J2000",
+      "note": "JPL observed value"
+    },
+    "longitudePerihelion": {
+      "example": 77.4569131,
+      "unit": "degrees",
+      "proposed_category": "astro_ref",
+      "description": "Longitude of perihelion at J2000",
+      "note": "JPL observed value"
+    },
+    "ascendingNode": {
+      "example": 48.33033155,
+      "unit": "degrees",
+      "proposed_category": "astro_ref",
+      "description": "Longitude of ascending node at J2000",
+      "note": "JPL observed value"
+    },
+    "invPlaneInclinationJ2000": {
+      "example": 6.3472858,
+      "unit": "degrees",
+      "proposed_category": "astro_ref",
+      "description": "Inclination to invariable plane at J2000",
+      "note": "Souami & Souchay (2012)"
+    },
+    "ascendingNodeInvPlane": {
+      "example": 32.83,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Ascending node on invariable plane",
+      "note": "Improved from Souami & Souchay (2012)"
+    },
+    "inclinationPhaseAngle": {
+      "example": 203.3195,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Phase angle for inclination oscillation",
+      "note": "Model-derived from balance structure"
+    },
+    "invPlaneInclinationMean": {
+      "example": 6.72662,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Mean invariable plane inclination",
+      "note": "Derived from J2000 value and amplitude"
+    },
+    "invPlaneInclinationAmplitude": {
+      "example": 0.384621,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Invariable plane inclination oscillation amplitude",
+      "note": "Fitted from model"
+    },
+    "obliquityCycle": {
+      "example": "H * 8 / 3",
+      "proposed_category": "model_param",
+      "description": "Planet obliquity cycle period in years",
+      "note": "H-dependent theory parameter. Store as fraction [num, den] in JSON. null for Venus/Neptune."
+    },
+    "orbitTilta": {
+      "example": 5.23265097,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Scene-graph orbit tilt component a",
+      "note": "Derived from ecliptic geometry"
+    },
+    "orbitTiltb": {
+      "example": 4.65715524,
+      "unit": "degrees",
+      "proposed_category": "model_param",
+      "description": "Scene-graph orbit tilt component b",
+      "note": "Derived from ecliptic geometry"
+    }
+  },
+
+  "astro_reference_earth": {
+    "_section": "ASTRO_REFERENCE: Earth orbital (astro-reference.js lines 9-24)",
+    "juneSolstice2000_JD": {
+      "value": 2451716.575,
+      "source": "astro-reference.js:9",
+      "proposed_category": "astro_ref",
+      "description": "June solstice 2000 Julian Day",
+      "note": "USNO observed: June 21, 2000 01:48 UTC"
+    },
+    "obliquityJ2000_deg": {
+      "value": 23.439291111,
+      "unit": "degrees",
+      "source": "astro-reference.js:10",
+      "proposed_category": "astro_ref",
+      "description": "Earth obliquity at J2000",
+      "note": "IAU 2006 / Capitaine et al. 2003"
+    },
+    "obliquityRate_arcsecPerCentury": {
+      "value": -46.836769,
+      "unit": "arcsec/century",
+      "source": "astro-reference.js:11",
+      "proposed_category": "astro_ref",
+      "description": "Linear rate of obliquity change",
+      "note": "IAU 2006"
+    },
+    "obliquityRate_degPerCentury": {
+      "value": -0.013010213611,
+      "unit": "degrees/century",
+      "source": "astro-reference.js:12",
+      "proposed_category": "derived",
+      "description": "Same rate in degrees",
+      "note": "= obliquityRate_arcsecPerCentury / 3600 — derive at load time, don't store"
+    },
+    "earthEccentricityJ2000": {
+      "value": 0.01671022,
+      "source": "astro-reference.js:13",
+      "proposed_category": "astro_ref",
+      "description": "Earth orbital eccentricity at J2000",
+      "note": "JPL/IAU"
+    },
+    "earthPerihelionLongitudeJ2000": {
+      "value": 102.947,
+      "unit": "degrees",
+      "source": "astro-reference.js:14",
+      "proposed_category": "astro_ref",
+      "description": "Earth perihelion longitude at J2000",
+      "note": "JPL"
+    },
+    "earthAscendingNodeInvPlane": {
+      "value": 284.51,
+      "unit": "degrees",
+      "source": "astro-reference.js:15",
+      "proposed_category": "astro_ref",
+      "description": "Earth ascending node on invariable plane",
+      "note": "Souami & Souchay (2012)"
+    },
+    "earthInclinationPhaseAngle": {
+      "value": 203.3195,
+      "unit": "degrees",
+      "source": "astro-reference.js:16",
+      "proposed_category": "model_param",
+      "description": "Phase angle for Earth inclination oscillation",
+      "note": "Currently in astro_ref but this is model-derived (same for all planets)"
+    },
+    "perihelionPassageJ2000_JD": {
+      "value": 2451547.042,
+      "source": "astro-reference.js:19",
+      "proposed_category": "astro_ref",
+      "description": "Earth perihelion passage 2000 (Jan 3.542)",
+      "note": "USNO observed"
+    },
+    "earthInclinationJ2000_deg": {
+      "value": 1.57869,
+      "unit": "degrees",
+      "source": "astro-reference.js:23",
+      "proposed_category": "astro_ref",
+      "description": "Earth inclination to invariable plane at J2000",
+      "note": "Souami & Souchay (2012)"
+    },
+    "earthInclinationModelEpoch_deg": {
+      "value": 1.57866,
+      "unit": "degrees",
+      "source": "astro-reference.js:24",
+      "proposed_category": "astro_ref",
+      "description": "Earth inclination adjusted to model epoch (June 2000)",
+      "note": "Precession-adjusted from J2000"
+    }
+  },
+
+  "astro_reference_planets": {
+    "_section": "ASTRO_REFERENCE: Planet perihelion passages (astro-reference.js lines 27-33)",
+    "mercuryPerihelionRef_JD": {
+      "value": 2460335.9,
+      "source": "astro-reference.js:27",
+      "proposed_category": "model_param",
+      "description": "Mercury perihelion passage reference JD",
+      "note": "JPL Horizons, phase-optimized"
+    },
+    "venusPerihelionRef_JD": {
+      "value": 2455464.42,
+      "source": "astro-reference.js:28",
+      "proposed_category": "model_param"
+    },
+    "marsPerihelionRef_JD": {
+      "value": 2456499.441,
+      "source": "astro-reference.js:29",
+      "proposed_category": "model_param"
+    },
+    "jupiterPerihelionRef_JD": {
+      "value": 2464224.5,
+      "source": "astro-reference.js:30",
+      "proposed_category": "model_param"
+    },
+    "saturnPerihelionRef_JD": {
+      "value": 2452875.9,
+      "source": "astro-reference.js:31",
+      "proposed_category": "model_param"
+    },
+    "uranusPerihelionRef_JD": {
+      "value": 2439699.8,
+      "source": "astro-reference.js:32",
+      "proposed_category": "model_param"
+    },
+    "neptunePerihelionRef_JD": {
+      "value": 2409432.4,
+      "source": "astro-reference.js:33",
+      "proposed_category": "model_param"
+    }
+  },
+
+  "astro_reference_moon_meeus": {
+    "_section": "ASTRO_REFERENCE: Lunar Meeus coefficients (astro-reference.js lines 36-45)",
+    "moonMeanAnomalyJ2000_deg": {
+      "value": 134.9634,
+      "source": "astro-reference.js:36",
+      "proposed_category": "astro_ref",
+      "note": "Meeus Ch. 47"
+    },
+    "moonMeanAnomalyRate_degPerDay": {
+      "value": 13.06499295,
+      "source": "astro-reference.js:37",
+      "proposed_category": "astro_ref",
+      "note": "Meeus Ch. 47"
+    },
+    "moonMeanElongationJ2000_deg": {
+      "value": 297.8502,
+      "source": "astro-reference.js:38",
+      "proposed_category": "astro_ref"
+    },
+    "moonMeanElongationRate_degPerDay": {
+      "value": 12.19074912,
+      "source": "astro-reference.js:39",
+      "proposed_category": "astro_ref"
+    },
+    "sunMeanAnomalyJ2000_deg": {
+      "value": 357.5291,
+      "source": "astro-reference.js:40",
+      "proposed_category": "astro_ref"
+    },
+    "sunMeanAnomalyRate_degPerDay": {
+      "value": 0.98560028,
+      "source": "astro-reference.js:41",
+      "proposed_category": "astro_ref"
+    },
+    "moonArgLatJ2000_deg": {
+      "value": 93.2720993,
+      "source": "astro-reference.js:42",
+      "proposed_category": "astro_ref"
+    },
+    "moonArgLatRate_degPerCentury": {
+      "value": 483202.0175273,
+      "source": "astro-reference.js:43",
+      "proposed_category": "astro_ref"
+    },
+    "moonMeanElongationJ2000Full_deg": {
+      "value": 297.8502042,
+      "source": "astro-reference.js:44",
+      "proposed_category": "astro_ref"
+    },
+    "moonMeanElongationRate_degPerCentury": {
+      "value": 445267.1115168,
+      "source": "astro-reference.js:45",
+      "proposed_category": "astro_ref"
+    }
+  },
+
+  "astro_reference_cardinal_anchors": {
+    "_section": "ASTRO_REFERENCE: Cardinal point anchors (astro-reference.js lines 49-54)",
+    "SS": {
+      "value": 2451716.575,
+      "source": "astro-reference.js:50",
+      "proposed_category": "astro_ref",
+      "note": "June 21, 2000 01:48 UTC — observed"
+    },
+    "WS": {
+      "value": 2451900.067346,
+      "source": "astro-reference.js:51",
+      "proposed_category": "astro_ref",
+      "note": "Dec 21, 2000 01:37 UTC — observed"
+    },
+    "VE": {
+      "value": 2451623.737525,
+      "source": "astro-reference.js:52",
+      "proposed_category": "astro_ref",
+      "note": "Mar 20, 2000 05:42 UTC — observed"
+    },
+    "AE": {
+      "value": 2451810.304175,
+      "source": "astro-reference.js:53",
+      "proposed_category": "astro_ref",
+      "note": "Sep 22, 2000 19:18 UTC — observed"
+    }
+  },
+
+  "year_length_references": {
+    "_section": "yearLengthRef: External reference values (astro-reference.js lines 66-79)",
+    "tropicalYearVE": { "value": 365.242374, "proposed_category": "astro_ref" },
+    "tropicalYearSS": { "value": 365.241626, "proposed_category": "astro_ref" },
+    "tropicalYearAE": { "value": 365.242018, "proposed_category": "astro_ref" },
+    "tropicalYearWS": { "value": 365.242740, "proposed_category": "astro_ref" },
+    "tropicalYearMean": { "value": 365.2421897, "proposed_category": "astro_ref" },
+    "anomalisticYear": { "value": 365.259636, "proposed_category": "astro_ref" },
+    "siderealYear": { "value": 365.256363, "proposed_category": "astro_ref" },
+    "iauPrecessionJ2000": { "value": 25771.57634, "unit": "years", "proposed_category": "astro_ref" },
+    "tropicalYearRateSecPerCentury": { "value": -0.53, "unit": "sec/century", "proposed_category": "astro_ref" },
+    "solarDay": { "value": 86400.0, "unit": "seconds", "proposed_category": "astro_ref" },
+    "siderealDay": { "value": 86164.09053083288, "unit": "seconds", "proposed_category": "astro_ref" },
+    "stellarDay": { "value": 86164.0989036905, "unit": "seconds", "proposed_category": "astro_ref" }
+  },
+
+  "known_values": {
+    "_section": "knownValues: Validation reference values (astro-reference.js lines 81-92)",
+    "jupiterSaturnConjunctionPeriod": { "value": 19.859, "unit": "years", "proposed_category": "astro_ref" },
+    "moonSynodicMonth": { "value": 29.530589, "unit": "days", "proposed_category": "astro_ref" },
+    "moonTropicalMonth": { "value": 27.321582, "unit": "days", "proposed_category": "astro_ref" },
+    "moonAnomalisticMonth": { "value": 27.55455, "unit": "days", "proposed_category": "astro_ref" },
+    "moonDraconicMonth": { "value": 27.212221, "unit": "days", "proposed_category": "astro_ref" },
+    "moonNodalPrecessionYears": { "value": 18.613, "unit": "years", "proposed_category": "astro_ref" },
+    "moonApsidalPrecessionYears": { "value": 8.849, "unit": "years", "proposed_category": "astro_ref" },
+    "moonDraconicYear": { "value": 346.62, "unit": "days", "proposed_category": "astro_ref" },
+    "sarosDays": { "value": 6585.32, "unit": "days", "proposed_category": "astro_ref" },
+    "exeligmosDays": { "value": 19755.96, "unit": "days", "proposed_category": "astro_ref" }
+  },
+
+  "additional_bodies": {
+    "_section": "Additional bodies (constants.js lines 286-289)",
+    "pluto": {
+      "solarYearInput": { "value": 90465, "proposed_category": "model_param" },
+      "orbitalEccentricityBase": { "value": 0.2488273, "proposed_category": "astro_ref" },
+      "type": { "value": "I", "proposed_category": "model_param" }
+    },
+    "halleys": {
+      "solarYearInput": { "value": 27503, "proposed_category": "model_param" },
+      "orbitalEccentricityBase": { "value": 0.96714291, "proposed_category": "astro_ref" },
+      "type": { "value": "III", "proposed_category": "model_param" }
+    },
+    "eros": {
+      "solarYearInput": { "value": 642.93, "proposed_category": "model_param" },
+      "orbitalEccentricityBase": { "value": 0.2229512, "proposed_category": "astro_ref" },
+      "type": { "value": "II", "proposed_category": "model_param" }
+    }
+  },
+
+  "_summary": {
+    "total_items": "~120 distinct values",
+    "proposed_model_param": "~45 values (H, corrections, Earth params, Moon startpos, per-planet fitted values, scene geometry)",
+    "proposed_astro_ref": "~65 values (IAU/JPL observed, Meeus, Souami & Souchay, orbital elements, year lengths)",
+    "derived": "~5 values (earthRAAngle, earthInvPlaneInclinationMean, obliquityRate_degPerCentury — computed at load time)",
+    "items_changing_category": [
+      "inputMeanSolarYear: model_param → astro_ref",
+      "perihelionalignmentYear: model_param → astro_ref",
+      "startmodelJD: model_param → astro_ref",
+      "currentAUDistance: model_param → astro_ref",
+      "meanSiderealYearSeconds: model_param → astro_ref",
+      "G_CONSTANT: model_param → astro_ref",
+      "MASS_RATIO_EARTH_MOON: model_param → astro_ref",
+      "massRatioDE440: model_param → astro_ref",
+      "moonSiderealMonthInput: model_param → astro_ref",
+      "moonAnomalisticMonthInput: model_param → astro_ref",
+      "moonNodalMonthInput: model_param → astro_ref",
+      "moonDistance: model_param → astro_ref",
+      "moonEclipticInclinationJ2000: model_param → astro_ref",
+      "moonOrbitalEccentricity: model_param → astro_ref",
+      "moonTilt: model_param → astro_ref",
+      "per-planet solarYearInput: model_param → astro_ref",
+      "per-planet orbitalEccentricityJ2000: model_param → astro_ref",
+      "per-planet axialTiltMean: model_param → astro_ref",
+      "per-planet eclipticInclinationJ2000: model_param → astro_ref",
+      "per-planet longitudePerihelion: model_param → astro_ref",
+      "per-planet ascendingNode: model_param → astro_ref",
+      "per-planet invPlaneInclinationJ2000: model_param → astro_ref",
+      "per-planet ascendingNodeInvPlane: model_param → astro_ref",
+      "earthInclinationPhaseAngle: astro_ref → model_param"
+    ]
+  }
+}

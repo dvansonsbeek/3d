@@ -43,6 +43,7 @@ from constants_scripts import (
     _START_MODEL_JD, JUNE_SOLSTICE_2000_JD, SOLSTICE_JD_HARMONICS,
     CARDINAL_POINT_ANCHORS, CARDINAL_POINT_HARMONICS,
     SOLSTICE_OBLIQUITY_MEAN, SOLSTICE_OBLIQUITY_HARMONICS,
+    PERI_HARMONICS, PERI_OFFSET,
 )
 
 # =============================================================================
@@ -225,32 +226,10 @@ EARTH_ECC_BASE = EARTH_BASE_ECCENTRICITY
 EARTH_ECC_AMP  = EARTH_ECCENTRICITY_AMPLITUDE
 EARTH_ECC_MEAN = _ECCENTRICITY_DERIVED_MEAN
 
-# Earth perihelion harmonics (21-term Fourier, for perihelion and ERD calculation)
-# Fitted via OLS to 11553 Excel data points — RMSE 0.0035°, J2000 error 0.0003°
-PERI_HARMONICS = [
-    (EARTH_PERI_PERIOD,  4.890662, -0.022232),
-    (EARTH_PERI_2,       2.663350,  0.252940),
-    (EARTH_PERI_3,       0.221636,  0.020675),
-    (EARTH_PERI_4,       0.070710,  0.012559),
-    (INCLIN_CYCLE,      -0.131799,  0.007423),
-    (H_DIV_29,          -0.130859, -0.006179),
-    (H_DIV_24,           0.130344,  0.006152),
-    (OBLIQ_CYCLE,        0.120049, -0.007974),
-    (H_DIV_40,           0.016290,  0.000666),
-    (H_DIV_13,           0.011751,  0.000554),
-    (H_DIV_45,          -0.010680, -0.000401),
-    (H_DIV_80,           0.010493,  0.001965),
-    (H_DIV_272,          0.006051, -0.005402),
-    (H_DIV_56,           0.006948,  0.000894),
-    (H_DIV_61,          -0.006492, -0.000877),
-    (H_DIV_35,          -0.005619, -0.000266),
-    (H_DIV_544,         -0.005401, -0.000629),
-    (H_DIV_21,          -0.003466,  0.000049),
-    (H_DIV_5,           -0.003215,  0.000012),
-    (H_DIV_96,           0.002785,  0.000683),
-    (H_DIV_816,          0.001235,  0.001767),
-]
-PERI_OFFSET = -0.261258
+# Earth perihelion harmonics — loaded from fitted-coefficients.js via constants chain.
+# Updated automatically when fit_perihelion_harmonics.py reruns.
+# PERI_HARMONICS: list of (period_years, sin_coeff, cos_coeff)
+# PERI_OFFSET: DC offset in degrees
 
 # =============================================================================
 # SECTION C: EARTH ORBITAL PARAMETERS
