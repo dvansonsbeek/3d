@@ -1,6 +1,6 @@
 # Formula Derivation and Analysis
 
-This document explains **how the planetary precession formulas were derived** — the physical reasoning, mathematical relationships, and coefficient breakdowns. For the practical "cookbook" formulas, see the [formulas reference](https://holisticuniverse.com/reference/formulas). For the technical training guide, see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx).
+This document explains **how the planetary precession formulas were derived** — the physical reasoning, mathematical relationships, and coefficient breakdowns. For the practical "cookbook" formulas, see the [formulas reference](https://holisticuniverse.com/reference/formulas). For the technical training guide, see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).
 
 > **Purpose of this document**: Understanding *why* the formulas work, not just *how* to use them. This is valuable for researchers who want to verify, extend, or critique the model.
 
@@ -153,9 +153,9 @@ All periods in the formula have physical derivations:
 
 ## 4. Mercury Formula: Coefficient Breakdown (Predictive Formula)
 
-> **Formula Type**: This section documents the **legacy 106-term predictive formula** (year-only input, R² = 0.9986, RMSE = 2.83″/cy). This has been superseded by the **unified 429-term system** (R² = 0.999929, RMSE = 0.75″/cy) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx). The coefficient breakdown below remains valid as a reference for the formula's physical structure. For the **observed formula** (uses Excel data, 225 terms, R² = 0.999994), see [Section 14](#14-observed-angle-formulas-using-observational-data).
+> **Formula Type**: This section documents the **legacy 106-term predictive formula** (year-only input, R² = 0.9986, RMSE = 2.83″/cy). This has been superseded by the **unified 429-term system** (R² = 0.999929, RMSE = 0.75″/cy) — see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx). The coefficient breakdown below remains valid as a reference for the formula's physical structure. For the **observed formula** (uses Excel data, 225 terms, R² = 0.999994), see [Section 14](#14-observed-angle-formulas-using-observational-data).
 
-The Mercury predictive fluctuation formula achieves R² = 0.9986 using **106 non-zero coefficients** organized into 10 categories. All coefficients are trained regression weights determined by least-squares fitting — they change when H or the training data changes. For current values, see [predictive_formula.py](scripts/predictive_formula.py) and [observed_formula.py](scripts/observed_formula.py) with their associated `*_coeffs.py` files.
+The Mercury predictive fluctuation formula achieves R² = 0.9986 using **106 non-zero coefficients** organized into 10 categories. All coefficients are trained regression weights determined by least-squares fitting — they change when H or the training data changes. For current values, see [predictive_formula.py](../tools/lib/python/predictive_formula.py) and [observed_formula.py](../tools/lib/python/observed_formula.py) with their associated `*_coeffs.py` files.
 
 ### Term Categories
 
@@ -219,7 +219,7 @@ The Venus formula is based on the physical principle that:
    - Earth's instantaneous axial precession rate variation (ERD)
    - Interactions between these two factors
 
-All 328 coefficients are trained regression weights determined by least-squares fitting. They change when H or the training data changes. For current values, see [observed_formula.py](scripts/observed_formula.py) and [venus_coeffs.py](scripts/venus_coeffs.py).
+All 328 coefficients are trained regression weights determined by least-squares fitting. They change when H or the training data changes. For current values, see [observed_formula.py](../tools/lib/python/observed_formula.py) and [venus_coeffs.py](../tools/lib/python/coefficients/venus_coeffs.py).
 
 ### 5.2 Term Categories
 
@@ -284,7 +284,7 @@ The 225 terms include:
 - **Cross-products**: ERD × periodic, periodic × angle, ERD × periodic × angle
 - **Beat frequency terms** between Mars and Earth periods
 
-For full implementation details, see [mars_coeffs.py](scripts/mars_coeffs.py).
+For full implementation details, see [mars_coeffs.py](../tools/lib/python/coefficients/mars_coeffs.py).
 
 ---
 
@@ -323,7 +323,7 @@ Jupiter's precession fluctuation is driven by:
 | H/3 | Inclination cycle |
 | H/16 | Earth effective perihelion |
 
-For full implementation details, see [jupiter_coeffs.py](scripts/jupiter_coeffs.py).
+For full implementation details, see [jupiter_coeffs.py](../tools/lib/python/coefficients/jupiter_coeffs.py).
 
 ---
 
@@ -379,7 +379,7 @@ $$
 
 This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (11553 data points, 29-year steps).
 
-For implementation details, see [predictive_formula.py](scripts/predictive_formula.py) (GROUP 15 terms in `build_features`).
+For implementation details, see [predictive_formula.py](../tools/lib/python/predictive_formula.py) (GROUP 15 terms in `build_features`).
 
 > **Critical Finding: Saturn is Unique**
 >
@@ -433,7 +433,7 @@ Uranus's period (H/3) exactly matches Earth's inclination precession cycle. This
 - Strong resonance terms in the formula
 - Excellent predictability over historical timescales
 
-For full implementation details, see [uranus_coeffs.py](scripts/uranus_coeffs.py).
+For full implementation details, see [uranus_coeffs.py](../tools/lib/python/coefficients/uranus_coeffs.py).
 
 ---
 
@@ -466,7 +466,7 @@ Neptune's precession fluctuation is driven by:
 
 Neptune's precession period (H×2) exactly matches Venus's precession period. Both planets have nearly circular orbits, which may explain why they share this ultra-long timescale in the Fibonacci hierarchy.
 
-For full implementation details, see [neptune_coeffs.py](scripts/neptune_coeffs.py).
+For full implementation details, see [neptune_coeffs.py](../tools/lib/python/coefficients/neptune_coeffs.py).
 
 ### 10.4 Predictive Formula Enhancement
 
@@ -626,7 +626,7 @@ All coefficients are rounded to integers for simplicity. The optimal least-squar
 
 ## 14. Observed-Angle Formulas (Using Observational Data)
 
-The formulas in this section require **observed orbital parameters** as inputs — Earth perihelion position, planetary perihelion position, obliquity, eccentricity, and Earth Rate Deviation (ERD). These formulas were used during model development to fit against ice-core chronological data. For **predictive formulas** (year-only input), see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx).
+The formulas in this section require **observed orbital parameters** as inputs — Earth perihelion position, planetary perihelion position, obliquity, eccentricity, and Earth Rate Deviation (ERD). These formulas were used during model development to fit against ice-core chronological data. For **predictive formulas** (year-only input), see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).
 
 > **Relationship to Earlier Sections**:
 > - [Section 4](#4-mercury-formula-coefficient-breakdown-predictive-formula) documents Mercury's **predictive formula** (106 terms, year-only input)
@@ -683,7 +683,7 @@ $$
 
 Where $\delta = \theta_E - \theta_M$ (relative angle) and $\sigma = \theta_E + \theta_M$ (sum angle).
 
-With coefficients $a_1$ through $a_6$ determined by least-squares fitting (see [observed_formula.py](scripts/observed_formula.py) for current values).
+With coefficients $a_1$ through $a_6$ determined by least-squares fitting (see [observed_formula.py](../tools/lib/python/observed_formula.py) for current values).
 
 **Phase (Periodic) Terms:**
 
@@ -702,7 +702,7 @@ $$
 + d_4 \cdot \text{ERD} \cos(2\delta) + d_5 \cdot \text{ERD} \sin(2\delta) + d_6 \cdot \text{ERD}^2 + d_7 \cdot (\varepsilon - \varepsilon_0) \cdot \text{ERD}
 $$
 
-With coefficients $d_1$ through $d_7$ determined by least-squares fitting (see [observed_formula.py](scripts/observed_formula.py) for current values).
+With coefficients $d_1$ through $d_7$ determined by least-squares fitting (see [observed_formula.py](../tools/lib/python/observed_formula.py) for current values).
 
 **ERD × Periodic, ERD² × Periodic, and Triple Interactions:**
 
@@ -716,7 +716,7 @@ $$
 + \text{Triple interactions: } \text{ERD} \times \text{periodic} \times \cos/\sin(n\delta) \text{ for } n = 1, 2
 $$
 
-Key ERD² × Periodic terms: ERD² cos(t/(H/16)), ERD² sin(t/(H/16)), ERD² sin(t/(H×4/11)), ERD² cos(t/(H/3)) — these carry the largest coefficients (see [observed_formula.py](scripts/observed_formula.py) for current values).
+Key ERD² × Periodic terms: ERD² cos(t/(H/16)), ERD² sin(t/(H/16)), ERD² sin(t/(H×4/11)), ERD² cos(t/(H/3)) — these carry the largest coefficients (see [observed_formula.py](../tools/lib/python/observed_formula.py) for current values).
 
 **Higher Harmonics:**
 
@@ -730,11 +730,11 @@ $$
 F_{\text{aux}} = e_1 \cdot (\varepsilon - \varepsilon_0) + e_2 \cdot (e - e_0)
 $$
 
-With coefficients $e_1$ (obliquity) and $e_2$ (eccentricity) determined by least-squares fitting; $\varepsilon_0$ = `earthtiltMean`, $e_0$ = `eccentricityDerivedMean`. See [observed_formula.py](scripts/observed_formula.py) for current values.
+With coefficients $e_1$ (obliquity) and $e_2$ (eccentricity) determined by least-squares fitting; $\varepsilon_0$ = `earthtiltMean`, $e_0$ = `eccentricityDerivedMean`. See [observed_formula.py](../tools/lib/python/observed_formula.py) for current values.
 
 **Result units:** arcseconds per century (″/century)
 
-**Accuracy:** R² = 0.999994, RMSE = 0.22″/cy (225 terms). For the predictive formula (year-only input): R² = 0.999929, RMSE = 0.75″/cy (429 terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](scripts/PREDICTIVE_FORMULA_GUIDE.mdx).
+**Accuracy:** R² = 0.999994, RMSE = 0.22″/cy (225 terms). For the predictive formula (year-only input): R² = 0.999929, RMSE = 0.75″/cy (429 terms) — see [PREDICTIVE_FORMULA_GUIDE.mdx](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx).
 
 For predicted fluctuation values over time, see [Section 11](#11-time-varying-fluctuation).
 
@@ -748,7 +748,7 @@ $$
 
 Where δ = θ_E − θ_V and periods are H×2, H, H/3, H/8, H/16, H/48. Key drivers are ERD² × periodic terms and triple interactions (ERD × periodic × angle). Uses the shared ERD helper from column **DR**.
 
-**R² = 0.999999, RMSE = 0.46″/cy.** For coefficients and physical explanation, see [Section 5](#5-venus-formula-coefficient-breakdown-observed-formula) and [observed_formula.py](scripts/observed_formula.py).
+**R² = 0.999999, RMSE = 0.46″/cy.** For coefficients and physical explanation, see [Section 5](#5-venus-formula-coefficient-breakdown-observed-formula) and [observed_formula.py](../tools/lib/python/observed_formula.py).
 
 ### All Planets: Python Implementation Reference
 
@@ -785,11 +785,11 @@ All planetary formulas are implemented in Python for consistency and to handle t
 
 > **Python Implementation**: A unified Python script provides all implementations:
 >
-> **Main script**: [observed_formula.py](scripts/observed_formula.py) — Calculates precession fluctuation for **all 7 planets** (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune) using observed perihelion data from the Excel file.
+> **Main script**: [observed_formula.py](../tools/lib/python/observed_formula.py) — Calculates precession fluctuation for **all 7 planets** (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune) using observed perihelion data from the Excel file.
 >
 > Supporting files:
-> - [train_observed.py](scripts/train_observed.py) — Training script for observed formula coefficients (SVD-based least-squares)
-> - [train_precession.py](scripts/train_precession.py) — Training script for predictive formula coefficients (ridge regression)
+> - [train_observed.py](../tools/fit/python/train_observed.py) — Training script for observed formula coefficients (SVD-based least-squares)
+> - [train_precession.py](../tools/fit/python/train_precession.py) — Training script for predictive formula coefficients (ridge regression)
 > - Coefficient files: `mercury_coeffs.py`, `venus_coeffs.py`, `mars_coeffs.py`, `jupiter_coeffs.py`, `saturn_coeffs.py`, `uranus_coeffs.py`, `neptune_coeffs.py`
 >
 > Venus uses a specialized V3_VENUS feature matrix with 328 terms (including ERD³, 4δ harmonics, and obliquity/eccentricity coupling) to achieve 0.46 arcsec accuracy. Other planets use the standard 225-term V2 matrix.
@@ -819,4 +819,4 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 | Uranus | 167,504 yr | H/2 | Prediction (tentative) |
 | Neptune | N/A | — | Frozen at ~28° |
 
-**Implementation:** `calc_planet_obliquity()` in [predictive_formula.py](scripts/predictive_formula.py), `computePlanetObliquity()` in script.js and [orbital-engine.js](../tools/lib/orbital-engine.js).
+**Implementation:** `calc_planet_obliquity()` in [predictive_formula.py](../tools/lib/python/predictive_formula.py), `computePlanetObliquity()` in script.js and [orbital-engine.js](../tools/lib/orbital-engine.js).

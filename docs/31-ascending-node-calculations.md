@@ -473,10 +473,10 @@ Both use the static `<planet>EclipticInclinationJ2000` as their base, but apply 
 - [Dynamic Elements Overview](04-dynamic-elements-overview.md) - Master overview of all dynamic systems
 - [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation using Ω-based approach
 - [Constants Reference](20-constants-reference.md) - All constants and source values
-- [Appendix A (80) — Ascending Node Optimization](80-ascending-node-optimization.js) - Numerical optimization to calculate ascending nodes
-- [Appendix C (82) — Ascending Node Verification](82-ascending-node-verification.js) - Verifies J2000-verified ascending nodes
-- [Appendix D (83) — Ascending Node Comparison](83-ascending-node-souami-souchay.js) - Compares S&S vs Verified accuracy
-- [Appendix B (81) — Analytical Ascending Nodes](81-analytical-ascending-nodes.js) - Analytical (closed-form) calculation
+- [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js) - Numerical optimization to calculate ascending nodes
+- [Ascending Node Verification](../tools/verify/ascending-node-verification.js) - Verifies J2000-verified ascending nodes
+- [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) - Compares S&S vs Verified accuracy
+- [Analytical Ascending Nodes](../tools/verify/analytical-ascending-nodes.js) - Analytical (closed-form) calculation
 
 ## Testing
 

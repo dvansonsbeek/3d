@@ -1,27 +1,25 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // SHARED CONSTANTS MODULE — Single source of truth for all tool scripts.
-// All values and formulas replicate the exact calculations in src/script.js.
 //
 // Structure:
-//   1. Foundational model constants
-//   2. Physical & astronomical constants
-//   3. Earth parameters
-//   4. Moon input constants
-//   5. Planet input data (7 non-Earth planets + additional bodies)
-//   6. Derived model values (year lengths, eccentricity, EoC, epochs)
-//   7. Moon derived cycles
-//   8. Astronomical reference data (ASTRO_REFERENCE)
-//   9. Mass computation, PSI, J2000 eccentricities
-//  10. Planet derived calculations
-//  11. External reference values
-//  12. Predictive formula constants
-//  13. Utilities (date conversion, formatting)
-//  14. Exports
+//   constants.js          — Input constants + derived values (this file)
+//   constants/astro-reference.js    — External reference data (IAU, JPL, Meeus)
+//   constants/fitted-coefficients.js — Fitted harmonics and ML coefficients
+//   constants/utils.js              — Date conversion and formatting helpers
+//
+// All consumers: const C = require('./lib/constants');
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ─── Sub-modules ─────────────────────────────────────────────────────────
+const { ASTRO_REFERENCE, yearLengthRef, knownValues } = require('./constants/astro-reference');
+const fitted = require('./constants/fitted-coefficients');
+const utils = require('./constants/utils');
 
-// ─── 1. FOUNDATIONAL MODEL CONSTANTS ─────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. FOUNDATIONAL MODEL CONSTANTS
 // These define the model itself. Changing any = different theory.
+// ═══════════════════════════════════════════════════════════════════════════
 
 const H = 335008; // holisticyearLength
 const inputMeanSolarYear = 365.2421897;
@@ -29,14 +27,16 @@ const perihelionalignmentYear = 1246;
 const startmodelJD = 2451716.5;
 const startmodelYear = 2000.5;
 const correctionDays = -0.23328398168087;
-const correctionSun = 0.494476;
+const correctionSun = 0.495997;
 const temperatureGraphMostLikely = 14.5;
 const startAngleModel = 89.91949879;
 const useVariableSpeed = true; // Toggle equation of center (must match script.js)
 
 
-// ─── 2. PHYSICAL & ASTRONOMICAL CONSTANTS ────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. PHYSICAL & ASTRONOMICAL CONSTANTS
 // External reference values from IAU, JPL DE440, etc.
+// ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = 149597870.698828; // km
 const meanSiderealYearSeconds = 31558149.8;
@@ -50,26 +50,28 @@ const massRatioDE440 = {
 };
 
 
-// ─── 3. EARTH PARAMETERS ─────────────────────────────────────────────────
-// Earth-specific model constants. Additional Earth J2000 values are in
-// ASTRO_REFERENCE (section 8): earthEccentricityJ2000, earthPerihelionLongitudeJ2000,
-// earthAscendingNodeInvPlane, earthInclinationPhaseAngle.
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. EARTH PARAMETERS
+// ═══════════════════════════════════════════════════════════════════════════
 
-const earthtiltMean = 23.41349;
-const earthInvPlaneInclinationAmplitude = 0.635970;
+const earthtiltMean = 23.41365930;           // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
+const earthInvPlaneInclinationAmplitude = 0.63541988; // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-const earthInvPlaneInclinationMean = 1.481179;
-const earthAscendingNodeInvPlane = 284.51;  // J2000 ascending node on invariable plane (degrees)
-const eccentricityBase = 0.015372;
-const eccentricityAmplitude = 0.00137032;
+// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle) — refs from ASTRO_REFERENCE
+const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;  // 284.51° Souami & Souchay (2012)
+const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg
+  - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlane - ASTRO_REFERENCE.earthInclinationPhaseAngle) * Math.PI / 180);
+const eccentricityBase = 0.01537159;
+const eccentricityAmplitude = 0.00137074; // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
 // K = eccentricityAmplitude × √m_Earth × a_Earth^(3/2) / (sin(tiltMean) × √d_Earth)
-// Relates axial tilt to eccentricity amplitude for all planets (doc 35, §4)
 const eccentricityAmplitudeK = 3.4505372893e-6;
-const perihelionRefJD = 2451547.042; // JD of Earth perihelion 2000 (Jan 3.542)
+const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD; // JD of Earth perihelion 2000 (Jan 3.542)
 
 
-// ─── 4. MOON INPUT CONSTANTS ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. MOON INPUT CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
 
 const moonSiderealMonthInput = 27.32166156;
 const moonAnomalisticMonthInput = 27.55454988;
@@ -83,52 +85,50 @@ const moonStartposNodal = -83.630;
 const moonStartposMoon = 131.930;
 
 
-// ─── 5. PLANET INPUT DATA ────────────────────────────────────────────────
-// Per-planet constants for the 7 non-Earth planets in the Fibonacci framework.
-// Earth is not included here (it's the observer/reference frame).
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. PLANET INPUT DATA
+// Per-planet constants for the 7 non-Earth planets.
+// ═══════════════════════════════════════════════════════════════════════════
 
 const planets = {
   mercury: {
     name: 'Mercury',
     solarYearInput: 87.9686,
-    orbitalEccentricityBase: 0.20563593,  // Base eccentricity (tilt ~0, no fluctuation)
+    orbitalEccentricityBase: 0.20563593,
     orbitalEccentricityJ2000: 0.20563593,
     orbitalEccentricityAmplitude: 8.436789e-5,
-    eccentricityPhaseJ2000: 89.9882,  // Phase angle at J2000 (degrees) — near mean, tilt ~0
+    eccentricityPhaseJ2000: 89.9882,
     axialTiltMean: 0.03,
     eocFraction: -0.527,
     startpos: 83.53,
-    angleCorrection: 0.971049,
+    angleCorrection: 0.97090778,
     perihelionEclipticYears: H / (1 + 3/8),
     type: 'I',
     mirrorPair: 'uranus',
     fibonacciD: 21,
-    // J2000 orbital elements (JPL Horizons)
     eclipticInclinationJ2000: 7.00497902,
     longitudePerihelion: 77.4569131,
     ascendingNode: 48.33033155,
-    // Invariable plane (Souami & Souchay 2012)
     invPlaneInclinationJ2000: 6.3472858,
     ascendingNodeInvPlane: 32.83,
     inclinationPhaseAngle: 203.3195,
-    // Fibonacci-derived inclination parameters
     invPlaneInclinationMean: 6.726620,
     invPlaneInclinationAmplitude: 0.384621,
-    obliquityCycle: H * 8 / 3,  // 8H/3 = 893,355 yr (observed ~895 kyr, Bills 2005)
-    orbitTilta: 5.23265097,     // sin(Ω)*i for ascending node dynamics
-    orbitTiltb: 4.65715524,     // cos(Ω)*i for ascending node dynamics
+    obliquityCycle: H * 8 / 3,
+    orbitTilta: 5.23265097,
+    orbitTiltb: 4.65715524,
   },
   venus: {
     name: 'Venus',
     solarYearInput: 224.695,
-    orbitalEccentricityBase: 0.00619052,  // Base eccentricity (H/16 fit to JPL data, -8.65% from J2000)
+    orbitalEccentricityBase: 0.00619052,
     orbitalEccentricityJ2000: 0.00677672,
     orbitalEccentricityAmplitude: 9.625389e-4,
-    eccentricityPhaseJ2000: 123.7514,  // Phase angle at J2000 (degrees) — past mean, decreasing
+    eccentricityPhaseJ2000: 123.7514,
     axialTiltMean: 2.6392,
     eocFraction: 0.436,
     startpos: 249.312,
-    angleCorrection: -2.784782,
+    angleCorrection: -2.80286830,
     perihelionEclipticYears: H * 2,
     type: 'I',
     mirrorPair: 'neptune',
@@ -141,21 +141,21 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 2.207361,
     invPlaneInclinationAmplitude: 0.061866,
-    obliquityCycle: null,           // N/A — tidally damped at 177°
+    obliquityCycle: null,
     orbitTilta: 3.30333743,
     orbitTiltb: 0.78216832,
   },
   mars: {
     name: 'Mars',
     solarYearInput: 686.931,
-    orbitalEccentricityBase: 0.09297543,  // Base eccentricity (H/16 fit to JPL data, -0.45% from J2000)
+    orbitalEccentricityBase: 0.09297543,
     orbitalEccentricityJ2000: 0.09339410,
     orbitalEccentricityAmplitude: 3.073636e-3,
-    eccentricityPhaseJ2000: 96.8878,  // Phase angle at J2000 (degrees) — just past mean
+    eccentricityPhaseJ2000: 96.8878,
     axialTiltMean: 25.19,
     eocFraction: -0.066224,
     startpos: 121.4679,
-    angleCorrection: -2.107087,
+    angleCorrection: -2.10936153,
     perihelionEclipticYears: H / (4 + 1/3),
     type: 'II',
     mirrorPair: 'jupiter',
@@ -168,21 +168,21 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 2.649893,
     invPlaneInclinationAmplitude: 1.158626,
-    obliquityCycle: 3 * H / 8,     // 3H/8 = 125,628 yr (observed ~124,800 yr, Laskar 2004)
+    obliquityCycle: 3 * H / 8,
     orbitTilta: 1.40771866,
     orbitTiltb: 1.19986938,
   },
   jupiter: {
     name: 'Jupiter',
     solarYearInput: 4330.5,
-    orbitalEccentricityBase: 0.04821478,  // Dual-balanced (-0.35% from J2000)
+    orbitalEccentricityBase: 0.04821478,
     orbitalEccentricityJ2000: 0.04838624,
     orbitalEccentricityAmplitude: 1.149908e-6,
-    eccentricityPhaseJ2000: 180,  // 180° = max ecc, closest to J2000 (J2000 > base)
+    eccentricityPhaseJ2000: 180,
     axialTiltMean: 3.13,
     eocFraction: 0.484,
     startpos: 13.85,
-    angleCorrection: 0.92974,
+    angleCorrection: 0.92703626,
     perihelionEclipticYears: H / 5,
     type: 'III',
     mirrorPair: 'mars',
@@ -195,21 +195,21 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 0.329100,
     invPlaneInclinationAmplitude: 0.021301,
-    obliquityCycle: H / 2,          // H/2 = 167,504 yr (prediction)
+    obliquityCycle: H / 2,
     orbitTilta: 1.28260534,
     orbitTiltb: -0.23743407,
   },
   saturn: {
     name: 'Saturn',
     solarYearInput: 10747.0,
-    orbitalEccentricityBase: 0.05374486,  // Dual-balanced = Law 5 prediction (-0.22% from J2000)
+    orbitalEccentricityBase: 0.05374486,
     orbitalEccentricityJ2000: 0.05386179,
     orbitalEccentricityAmplitude: 5.403008e-6,
-    eccentricityPhaseJ2000: 180,  // 180° = max ecc, closest to J2000 (J2000 > base)
+    eccentricityPhaseJ2000: 180,
     axialTiltMean: 26.73,
     eocFraction: 0.543,
     startpos: 11.32,
-    angleCorrection: -0.17477,
+    angleCorrection: -0.17477212,
     perihelionEclipticYears: -H / 8,
     type: 'III',
     mirrorPair: 'earth',
@@ -219,24 +219,24 @@ const planets = {
     ascendingNode: 113.6452856,
     invPlaneInclinationJ2000: 0.9254704,
     ascendingNodeInvPlane: 118.81,
-    inclinationPhaseAngle: 23.3195,   // Saturn: sole 23° planet
+    inclinationPhaseAngle: 23.3195,
     invPlaneInclinationMean: 0.931678,
     invPlaneInclinationAmplitude: 0.064879,
-    obliquityCycle: H / 3,          // H/3 = 111,669 yr (prediction, mirror-pair with Earth)
+    obliquityCycle: H / 3,
     orbitTilta: 2.27728294,
     orbitTiltb: -0.99706468,
   },
   uranus: {
     name: 'Uranus',
     solarYearInput: 30586,
-    orbitalEccentricityBase: 0.04734421,  // Dual-balanced (+0.18% from J2000)
+    orbitalEccentricityBase: 0.04734421,
     orbitalEccentricityJ2000: 0.04725744,
     orbitalEccentricityAmplitude: 2.831008e-5,
-    eccentricityPhaseJ2000: 0,  // 0° = min ecc, closest to J2000 (J2000 < base)
+    eccentricityPhaseJ2000: 0,
     axialTiltMean: 82.23,
     eocFraction: 0.50,
     startpos: 44.88,
-    angleCorrection: -0.733732,
+    angleCorrection: -0.73459551,
     perihelionEclipticYears: H / 3,
     type: 'III',
     mirrorPair: 'mercury',
@@ -249,21 +249,21 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 1.000600,
     invPlaneInclinationAmplitude: 0.023716,
-    obliquityCycle: H / 2,          // H/2 = 167,504 yr (prediction, tentative)
+    obliquityCycle: H / 2,
     orbitTilta: 0.74274130,
     orbitTiltb: 0.21284872,
   },
   neptune: {
     name: 'Neptune',
     solarYearInput: 59980,
-    orbitalEccentricityBase: 0.00868571,  // Base eccentricity, solved for 100% Law 5 balance (+1.11% from J2000)
+    orbitalEccentricityBase: 0.00868571,
     orbitalEccentricityJ2000: 0.00859048,
     orbitalEccentricityAmplitude: 8.098033e-6,
-    eccentricityPhaseJ2000: 0,  // 0° = min ecc, closest to J2000 (J2000 < base)
+    eccentricityPhaseJ2000: 0,
     axialTiltMean: 28.32,
     eocFraction: 0.50,
     startpos: 47.96,
-    angleCorrection: 2.33091,
+    angleCorrection: 2.33381876,
     perihelionEclipticYears: H * 2,
     type: 'III',
     mirrorPair: 'venus',
@@ -276,7 +276,7 @@ const planets = {
     inclinationPhaseAngle: 203.3195,
     invPlaneInclinationMean: 0.722190,
     invPlaneInclinationAmplitude: 0.013486,
-    obliquityCycle: null,           // N/A — frozen at ~28°
+    obliquityCycle: null,
     orbitTilta: 1.31982602,
     orbitTiltb: -1.17945460,
   },
@@ -291,8 +291,10 @@ const additionalBodies = {
 };
 
 
-// ─── 6. DERIVED MODEL VALUES ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. DERIVED MODEL VALUES
 // Computed from foundational constants. Order matters (dependency chain).
+// ═══════════════════════════════════════════════════════════════════════════
 
 const perihelionCycleLength = H / 16;
 const meanSolarYearDays = Math.round(inputMeanSolarYear * (H / 16)) / (H / 16);
@@ -315,36 +317,16 @@ const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meanSolarYearDays;
 const julianCenturyDays = 100 * meanSolarYearDays;
 
 // Equation of center eccentricity — derived, not a free parameter.
-// Off-center geometry provides amplitude e_geom (first order); EoC adds 2·eoc.
-// Total must equal Keplerian 2·e_real → eoc = e_real - e_geom/2.
 const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
 
 // Perihelion phase offset — derived from geometric perihelion direction vs reference perihelion date.
 const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / (H / 16) * 360
   + correctionSun + 360 * (startmodelJD - perihelionRefJD) / meanSolarYearDays) % 360 + 360) % 360;
 
-// Fourier harmonic coefficients for year-length formulas (fitted from 491 data points, ±25000 yr)
-// Means are DERIVED: tropical = meanSolarYearDays, sidereal = meanSiderealYearDays,
-// anomalistic = meanAnomalisticYearDays. Only coefficients need refitting if H changes.
-// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
-const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.006 s
-  [8,  -1.315685778131e-06, -2.101615481220e-05],         // H/8:  1.819s amp
-  [3,  +6.745126392744e-07, +7.955457410219e-06],         // H/3:  0.690s amp
-  [16, -6.145697256116e-09, -3.622604401125e-07],          // H/16: 0.031s amp
-];
-const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.003 s
-  [8, -1.255070074367e-06, -1.783278998075e-08],           // H/8:  0.108s amp
-  [3, +5.794170454941e-07, +1.019398849945e-07],           // H/3:  0.051s amp
-];
-const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.011 s
-  [8,  -2.111981801448e-07, +2.544662242077e-08],          // H/8:  0.018s amp
-  [3,  -6.755570533516e-08, -5.963699950444e-10],          // H/3:  0.006s amp
-  [16, -5.074517345509e-08, +8.665832935489e-08],          // H/16: 0.009s amp
-  [24, -4.432336424626e-07, +1.845872180598e-08],          // H/24: 0.038s amp
-];
 
-
-// ─── 7. MOON DERIVED CYCLES ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. MOON DERIVED CYCLES
+// ═══════════════════════════════════════════════════════════════════════════
 
 const moonSiderealMonth = totalDaysInH / Math.ceil(totalDaysInH / moonSiderealMonthInput);
 const moonAnomalisticMonth = totalDaysInH / Math.ceil(totalDaysInH / moonAnomalisticMonthInput);
@@ -368,100 +350,43 @@ const moonDraconicYearICRF = 1 / ((1 / meanSolarYearDays) + (1 / moonNodalPreces
 const moonDraconicYearEarth = totalDaysInH / ((totalDaysInH / moonDraconicYearICRF) - 13);
 
 
-// ─── 8. ASTRONOMICAL REFERENCE DATA (ASTRO_REFERENCE) ────────────────────
-// External reference values and derived correction coefficients.
+// ═══════════════════════════════════════════════════════════════════════════
+// 8. ASTRO_REFERENCE WIRING
+// Attach planet-dependent fields to the imported ASTRO_REFERENCE object.
+// ═══════════════════════════════════════════════════════════════════════════
 
-const ASTRO_REFERENCE = {
-  // --- Earth orbital parameters (J2000) ---
-  juneSolstice2000_JD: 2451716.575,       // June 21, 2000 01:48 UTC
-  obliquityJ2000_deg: 23.439291111,            // IAU 2006 / Meeus
-  earthEccentricityJ2000: 0.01671022,
-  earthPerihelionLongitudeJ2000: 102.947,  // degrees
-  earthAscendingNodeInvPlane: 284.51,      // Souami & Souchay (2012)
-  earthInclinationPhaseAngle: 203.3195,
-  earthInvPlanePrecessionYears: H / 3,
+// Model-derived value (not an astronomical reference, but consumed via ASTRO_REFERENCE)
+ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
 
-  // --- Planet perihelion passage references (JPL Horizons, phase-optimized) ---
-  mercuryPerihelionRef_JD: 2460335.9,
-  venusPerihelionRef_JD: 2455464.42,
-  marsPerihelionRef_JD: 2456499.441,
-  jupiterPerihelionRef_JD: 2464224.5,
-  saturnPerihelionRef_JD: 2452875.9,
-  uranusPerihelionRef_JD: 2439699.8,
-  neptunePerihelionRef_JD: 2409432.4,
+// Parallax corrections (fitted, from fitted-coefficients.js)
+ASTRO_REFERENCE.decCorrection = fitted.PARALLAX_DEC_CORRECTION;
+ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
 
-  // --- Lunar mean longitude coefficients (Meeus, Ch. 47) ---
-  moonMeanAnomalyJ2000_deg: 134.9634,
-  moonMeanAnomalyRate_degPerDay: 13.06499295,
-  moonMeanElongationJ2000_deg: 297.8502,
-  moonMeanElongationRate_degPerDay: 12.19074912,
-  sunMeanAnomalyJ2000_deg: 357.5291,
-  sunMeanAnomalyRate_degPerDay: 0.98560028,
-  moonArgLatJ2000_deg: 93.2720993,
-  moonArgLatRate_degPerCentury: 483202.0175273,
-  moonMeanElongationJ2000Full_deg: 297.8502042,
-  moonMeanElongationRate_degPerCentury: 445267.1115168,
-
-  // --- Ascending node frame corrections (DERIVED, not tuned) ---
-  //   Type I/II (inner): 180 - ascendingNode (anti-node direction)
-  //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
-  ascNodeTiltCorrection: {
-    mercury: 180 - planets.mercury.ascendingNode,
-    venus:   180 - planets.venus.ascendingNode,
-    mars:    180 - planets.mars.ascendingNode,
-    jupiter: 2 * planets.jupiter.startpos,
-    saturn:  2 * planets.saturn.startpos,
-    uranus:  2 * planets.uranus.startpos,
-    neptune: 2 * planets.neptune.startpos,
-  },
-
-  // --- Parallax correction coefficients (fitted from JPL reference data) ---
-  // Post-hoc RA/Dec correction for geocentric parallax effect.
-  // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u) + H*sin(3u) + I*cos(3u))/d
-  //              + T*(J*sin(u) + K*cos(u))/d
-  //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
-  //         s = heliocentric distance (AU), T = centuries from J2000
-  // Fitted via linear least squares (15/18/24/30/36/42 terms per planet).
-  // L = 1/s, M = sin(u)/d², N = sin(2u)/s, O = cos(u)/s
-  // P = T*sin(2u)/d, Q = T*cos(2u)/d, R = T*sin(u)/s
-  // S = T/d, U = cos(u)/d², V = 1/s², W = sin(u)/s², X = cos(3u)/s, Y = sin(3u)/s
-  // Z = 1/(d*s), AA = sin(u)/(d*s), AB = cos(2u)/(d*s), AC = T*sin(2u)/s, AD = cos(3u)/d², AE = sin(2u)/s²
-  // AF = sin(3u)/s², AG = cos(3u)/s², AH = cos(u)/s², AI = sin(u)/(d²*s), AJ = cos(4u)/s, AK = sin(2u)/(d²*s)
-  // AL = sin(4u)/d, AM = cos(4u)/d, AN = T*sin(u)/d², AO = T*cos(u)/d², AP = sin(u)/d³, AQ = cos(u)/d³
-  decCorrection: {
-    mercury: { A:-42.1580, B:-136.9111, C: 0.0199, D:-41.4221, E: 114.6048, F: 63.4304, G: 63.2708, H:-37.8461, I: 37.9134, J: 0.3885, K: 0.0423, L: 99.2020, M: 112.6922, N:-43.1383, O:-99.2049, P: 0.0273, Q: 0.2542, R:-0.0850, S:-0.2322, U:-54.2725, V:-19.4364, W:-8.3356, X:-11.5504, Y: 34.6031, Z: 35.7135, AA: 19.4564, AB:-28.8159, AC: 0.0457, AD:-4.2448, AE: 7.1082, AF:-4.1742, AG:-1.8895, AH: 22.7071, AI:-30.2805, AJ: 9.3046, AK:-5.5443, AL:-1.6036, AM:-15.6155, AN: 0.0374, AO:-0.1266, AP:-15.1228, AQ: 15.2468 },
-    venus:   { A: 60.7626, B:-0.8932, C:-0.0003, D: 8.4858, E: 0.0594, F: 0.0662, G: 2.9776, H:-0.0259, I: 0.0423, J:-0.0061, K: 0.0459, L:-86.6521, M:-5.2145, N: 2.9006, O: 2.1976, P:-0.0007, Q:-0.0102, R:-0.0109, S:-0.0006, U:-0.0394, V: 30.8925, W:-0.0917, X: 1.9233, Y:-1.8681, Z: 0.5894, AA:-6.1880, AB:-2.0806, AC: 0.0027, AD:-0.0097, AE:-2.0921, AF: 1.3795, AG:-1.4091, AH:-1.5356, AI: 3.8044, AJ: 0.0291, AK:-0.0026, AL:-0.0049, AM:-0.0138, AN: 0.0104, AO:-0.0242, AP:-0.0035, AQ: 0.0010 },
-    mars:    { A:-6.4164, B: 12.1687, C: 0.1155, D: 13.1045, E:-0.1618, F: 0.3845, G:-4.1726, H: 0.1709, I: 0.1733, J: 0.4705, K:-0.1689, L: 18.6399, M:-0.2807, N:-7.9881, O: 0.5755, P:-0.2011, Q:-0.0960, R:-0.7092, S: 0.0746, U: 0.0690, V:-12.4622, W:-1.2951, X:-0.5755, Y:-0.1105, Z:-20.4109, AA:-20.7051, AB: 7.0557, AC: 0.2496, AD:-0.0565, AE: 11.2992 },
-    jupiter: { A:-73.5513, B:-3.2419, C: 0.0059, D: 43.4228, E:-8.7702, F: 3.0187, G: 0.9644, H: 0.0303, I:-0.4094, J: 1.4245, K: 0.0492, L: 766.7635, M:-279.9261, N:-7.2380, O:-2.6774, P: 0.0018, Q:-0.0890, R:-0.9561, S: 0.0531, U: 46.1692, V:-2000.5352, W:-127.8654, X: 0.0325, Y: 8.7751, Z: 14.6272, AA: 151.9204, AB:-3.5471, AC: 0.0125, AD: 1.3448, AE: 30.9759, AF:-45.9327, AG: 0.1853, AH: 29.3256, AI:-466.0052, AJ: 0.2050, AK:-39.2636, AL: 0.0580, AM: 0.0061, AN:-4.7468, AO: 0.0540, AP: 632.7760, AQ:-79.5971 },
-    saturn:  { A: 19.3183, B:-71.7532, C:-0.0114, D: 20.9244, E:-2.3648, F: 23.5618, G: 8.8020, H: 0.9145, I: 1.0635, J: 1.9590, K: 0.8763, L:-303.3555, M:-224.4044, N:-28.5406, O: 1.5343, P:-0.2085, Q:-0.3180, R:-0.1599, S: 0.2049, U:-3.6272, V: 1133.8305, W:-16.6243, X:-1.8483, Y:-1.0448, Z: 679.5758, AA:-206.8420, AB:-83.8303, AC:-0.0111, AD:-1.9587, AE: 164.8617, AF: 1.6022, AG: 11.8957, AH: 7.1487, AI: 2306.8003, AJ:-0.0220, AK:-1085.5028 },
-    uranus:  { A:-12672.2828, B: 6934.6982, C:-0.5393, D:-50603.0840, E:-13789.0068, F: 2963.0081, G: 760.2826, H: 191.4876, I: 390.3497, J:-13.6654, K:-6.5028, L: 503850.8286, M: 517661.5124, N:-2889.1895, O: 9834.4182, P: 3.2428, Q: 0.3031, R: 13.4448, S: 11.3285, U: 81194.8440, V:-5153290.4849, W: 475879.5710, X:-389.4581, Y:-148.8904 },
-    neptune: { A: 10.1378, B: 0.4644, C:-0.0687, D: 10.3930, E:-78.8758, F: 5.1040, G: 0.1936, H: 0.8112, I: 0.6993, J: 0.5025, K: 5.3711, L:-409.5977, M:-97.4693, N:-5.2228, O: 37.6943, P: 0.0813, Q:-0.0702, R: 5.2277, S: 2.2289, U: 1196.8445, V: 3123.7435, W:-320.1077, X:-0.5926, Y:-0.7388 },
-  },
-  raCorrection: {
-    mercury: { A: 29.9373, B:-141.8915, C:-0.3745, D: 223.1667, E:-83.7866, F: 14.8033, G: 129.2616, H:-37.0042, I:-5.8496, J:-0.4423, K:-0.1005, L:-25.8042, M:-34.4669, N:-52.2653, O: 72.4357, P:-0.2917, Q: 0.0087, R: 0.0006, S: 0.3331, U: 41.5670, V:-2.6921, W: 9.2043, X:-21.3527, Y: 18.8295, Z: 64.5204, AA:-90.0162, AB:-47.1134, AC: 0.1430, AD: 4.1645, AE: 13.1357, AF:-0.3135, AG: 6.0261, AH:-17.2620, AI: 7.7483, AJ: 6.0388, AK: 0.2556, AL: 5.5120, AM:-9.0578, AN: 0.3661, AO: 0.1452, AP: 9.1992, AQ:-8.2700 },
-    venus:   { A:-46.8812, B: 26.1368, C: 0.1013, D:-17.4193, E: 0.3241, F:-0.1500, G: 14.4038, H:-0.0360, I: 0.1438, J: 0.0130, K:-0.0241, L: 54.4618, M: 2.7074, N:-1.4745, O:-8.4060, P:-0.0522, Q:-0.0101, R:-0.0058, S:-0.0901, U:-0.3280, V:-14.6204, W: 0.0765, X: 5.7782, Y:-8.4576, Z:-18.9287, AA: 12.7320, AB:-10.4144, AC: 0.0353, AD:-0.0485, AE: 0.9945, AF: 6.1590, AG:-4.1848, AH: 5.9929, AI:-1.9130, AJ: 0.1064, AK: 0.0568, AL:-0.0055, AM:-0.0579, AN:-0.0061, AO: 0.0029, AP: 0.0073, AQ: 0.0561 },
-    mars:    { A:-23.7562, B:-19.8881, C:-0.0277, D:-23.4088, E:-0.7352, F: 0.3822, G: 2.3764, H:-0.1699, I: 0.4596, J:-0.4940, K: 0.0549, L: 70.3115, M: 1.7161, N: 10.1081, O: 3.5030, P: 0.0385, Q: 0.0070, R: 0.2084, S:-0.0615, U:-0.6223, V:-57.7872, W: 10.2904, X:-0.0686, Y: 0.3592, Z: 34.2623, AA: 30.6410, AB:-5.2824, AC:-0.1144, AD:-0.1664, AE:-18.8861 },
-    jupiter: { A: 125.9809, B: 428.3819, C:-0.0007, D:-76.7096, E:-116.3221, F: 4.8486, G:-15.9098, H: 0.8021, I:-0.2000, J: 0.6839, K:-0.1441, L:-1775.0446, M: 384.6944, N: 11.6447, O: 102.0576, P:-0.0186, Q: 0.1164, R:-0.6421, S: 1.2220, U: 608.8541, V: 5836.7557, W: 309.4468, X: 4.7879, Y:-8.2695, Z:-2241.9664, AA:-158.1944, AB: 81.3926, AC: 0.0249, AD: 0.7488, AE:-76.0449, AF: 41.0250, AG:-22.8011, AH:-345.2128, AI:-327.9101, AJ:-0.1747, AK:-63.4810, AL:-0.1419, AM: 0.0123, AN:-2.9146, AO: 0.9375, AP:-345.9905, AQ:-1015.5445 },
-    saturn:  { A:-174.5075, B: 499.5903, C: 0.0144, D: 328.9628, E: 18.8700, F: 29.6207, G: 33.9681, H: 1.4136, I: 4.0316, J:-2.1042, K: 1.6970, L: 2849.4922, M:-1899.0597, N:-30.4447, O:-187.2824, P: 0.4147, Q:-0.1492, R: 0.9117, S:-4.9336, U: 19.5177, V:-11311.2243, W: 854.4562, X:-15.6528, Y:-7.5300, Z:-4749.8589, AA:-4762.7996, AB:-342.8945, AC:-0.0172, AD:-14.4017, AE: 181.9895, AF: 57.5967, AG: 133.4388, AH: 1587.2838, AI: 25506.7746, AJ:-0.3183, AK:-1585.2187 },
-    uranus:  { A:-38229.6674, B: 4960.4577, C: 5.9453, D:-120998.1729, E: 6220.2812, F: 1423.4248, G: 2060.5044, H:-136.6603, I: 1184.6611, J: 54.2106, K:-1.6843, L: 1438951.7742, M: 937373.4638, N:-1817.8022, O: 148.2366, P: 8.9478, Q:-0.4125, R:-49.3113, S:-115.2873, U:-113580.5386, V:-13676015.7490, W: 1363125.1654, X:-1155.2345, Y: 193.6668 },
-    neptune: { A: 2275.4256, B: 7.1156, C:-0.4272, D:-899.7306, E:-842.4176, F:-5.6762, G:-1.1987, H:-3.0633, I: 0.8780, J:-4.8029, K:-0.0684, L:-136744.9132, M: 13377.6808, N: 7.1165, O: 418.9388, P: 1.6366, Q:-0.2725, R: 4.2360, S:-5.6104, U: 12725.0083, V: 2054472.0704, W: 13708.8757, X:-1.0372, Y: 3.0446 },
-  },
+// Ascending node corrections (derived from planet data)
+ASTRO_REFERENCE.ascNodeTiltCorrection = {
+  mercury: 180 - planets.mercury.ascendingNode,
+  venus:   180 - planets.venus.ascendingNode,
+  mars:    180 - planets.mars.ascendingNode,
+  jupiter: 2 * planets.jupiter.startpos,
+  saturn:  2 * planets.saturn.startpos,
+  uranus:  2 * planets.uranus.startpos,
+  neptune: 2 * planets.neptune.startpos,
 };
 
 
-// ─── 9. MASS COMPUTATION, PSI, J2000 ECCENTRICITIES ─────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 9. MASS COMPUTATION, PSI, J2000 ECCENTRICITIES
+// ═══════════════════════════════════════════════════════════════════════════
 
-// GM_SUN from Kepler's 3rd law
 const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
 const M_SUN = GM_SUN / G_CONSTANT;
 
-// Non-Earth planets: M_planet/M_SUN = 1/ratio (GM chain cancels)
 const massFraction = {};
 for (const [k, ratio] of Object.entries(massRatioDE440)) {
   massFraction[k] = 1 / ratio;
 }
 
-// Earth mass via Moon orbital mechanics (same chain as script.js)
+// Earth mass via Moon orbital mechanics
 const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) /
   Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
 const SOLAR_SIDEREAL_DAY_RATIO = meanLengthOfDay / meanSiderealDay;
@@ -469,32 +394,31 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
   SOLAR_SIDEREAL_DAY_RATIO;
 massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
-// PSI constant (inclination formula parameter: ψ = 2205 / (2H))
 const PSI = 2205 / (2 * H);
 
-// J2000 eccentricities for all 8 planets (JPL Horizons snapshot at epoch J2000.0)
 const eccJ2000 = {
-  mercury: planets.mercury.orbitalEccentricityJ2000,    // 0.20563593
-  venus:   planets.venus.orbitalEccentricityJ2000,      // 0.00677672
-  earth:   ASTRO_REFERENCE.earthEccentricityJ2000,      // 0.01671022
-  mars:    planets.mars.orbitalEccentricityJ2000,       // 0.09339410
-  jupiter: planets.jupiter.orbitalEccentricityJ2000,    // 0.04838624
-  saturn:  planets.saturn.orbitalEccentricityJ2000,     // 0.05386179
-  uranus:  planets.uranus.orbitalEccentricityJ2000,     // 0.04725744
-  neptune: planets.neptune.orbitalEccentricityJ2000,    // 0.00859048
+  mercury: planets.mercury.orbitalEccentricityJ2000,
+  venus:   planets.venus.orbitalEccentricityJ2000,
+  earth:   ASTRO_REFERENCE.earthEccentricityJ2000,
+  mars:    planets.mars.orbitalEccentricityJ2000,
+  jupiter: planets.jupiter.orbitalEccentricityJ2000,
+  saturn:  planets.saturn.orbitalEccentricityJ2000,
+  uranus:  planets.uranus.orbitalEccentricityJ2000,
+  neptune: planets.neptune.orbitalEccentricityJ2000,
 };
 
-// Fibonacci sequence
 const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 
 
-// ─── 10. PLANET DERIVED CALCULATIONS ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 10. PLANET DERIVED CALCULATIONS
+// ═══════════════════════════════════════════════════════════════════════════
 
 function computePlanetDerived(key) {
   const p = planets[key];
   const solarYearCount = Math.round(totalDaysInH / p.solarYearInput);
   const orbitDistance = ((H / solarYearCount) ** 2) ** (1/3);
-  const period = H / solarYearCount; // in solar years
+  const period = H / solarYearCount;
 
   let perihelionDistance, elipticOrbit, realOrbitalEccentricity;
 
@@ -524,18 +448,15 @@ function computePlanetDerived(key) {
   };
 }
 
-// Pre-compute derived values for all planets
 const derived = {};
 for (const key of Object.keys(planets)) {
   derived[key] = computePlanetDerived(key);
 }
 
-/** Rebuild derived values for a planet after parameter changes. */
 function rebuildDerived(key) {
   derived[key] = computePlanetDerived(key);
 }
 
-// Additional bodies
 function computeAdditionalDerived(key) {
   const b = additionalBodies[key];
   const solarYearCount = Math.round(totalDaysInH / b.solarYearInput);
@@ -550,298 +471,23 @@ for (const key of Object.keys(additionalBodies)) {
 }
 
 
-// ─── 11. EXTERNAL REFERENCE VALUES ───────────────────────────────────────
-// Observed/published values for comparison and validation.
+// ═══════════════════════════════════════════════════════════════════════════
+// 11. BUILD DYNAMIC VALUES
+// ═══════════════════════════════════════════════════════════════════════════
 
-const yearLengthRef = {
-  tropicalYearVE: 365.242374,
-  tropicalYearSS: 365.241626,
-  tropicalYearAE: 365.242018,
-  tropicalYearWS: 365.242740,
-  tropicalYearMean: 365.2421897,
-  anomalisticYear: 365.259636,
-  siderealYear: 365.256363,
-  iauPrecessionJ2000: 25771.57634,
-  tropicalYearRateSecPerCentury: -0.53,
-  solarDay: 86400.0,
-  siderealDay: 86164.09053083288,
-  stellarDay: 86164.0989036905,
-};
+// Date utilities (jdToYear/yearToJD need model constants)
+const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmodelJD, meanSolarYearDays });
 
-const knownValues = {
-  jupiterSaturnConjunctionPeriod: 19.859, // years (great conjunction)
-  moonSynodicMonth: 29.530589, // days
-  moonTropicalMonth: 27.321582, // days (approx)
-  moonAnomalisticMonth: 27.554550, // days
-  moonDraconicMonth: 27.212221, // days
-  moonNodalPrecessionYears: 18.613, // years
-  moonApsidalPrecessionYears: 8.849, // years
-  moonDraconicYear: 346.620, // days
-  sarosDays: 6585.32, // days (223 synodic months)
-  exeligmosDays: 19755.96, // days (3x Saros)
-};
+// Fitted coefficients that depend on model parameters
+const { SOLSTICE_OBLIQUITY_MEAN, PREDICT_PLANETS, PREDICT_COEFFS, PERI_HARMONICS } = fitted.buildFittedCoefficients({
+  earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
+  earthInvPlaneInclinationMean, planets, H,
+});
 
 
-// ─── 12. PREDICTIVE FORMULA CONSTANTS ────────────────────────────────────
-
-const PERI_HARMONICS = [
-  [H/16,  4.890662, -0.022232], [H/32,   2.663350,  0.252940],
-  [H/48,  0.221636,  0.020675], [H/64,   0.070710,  0.012559],
-  [H/3,  -0.131799,  0.007423], [H/29,  -0.130859, -0.006179],
-  [H/24,  0.130344,  0.006152], [H/8,    0.120049, -0.007974],
-  [H/40,  0.016290,  0.000666], [H/13,   0.011751,  0.000554],
-  [H/45, -0.010680, -0.000401], [H/80,   0.010493,  0.001965],
-  [H/272,  0.006051, -0.005402], [H/56,   0.006948,  0.000894],
-  [H/61, -0.006492, -0.000877], [H/35,  -0.005619, -0.000266],
-  [H/544, -0.005401, -0.000629], [H/21,  -0.003466,  0.000049],
-  [H/5,  -0.003215,  0.000012], [H/96,   0.002785,  0.000683],
-  [H/816,  0.001235,  0.001767]
-];
-const PERI_OFFSET = -0.261258;
-
-// ─── 12b. OBLIQUITY FORMULA ──────────────────────────────────────────────
-// Mean is DERIVED from the physical model (zero fitting):
-//   <sqrt((earthtiltMean + δε)² + (earthRAAngle·cos(H/16))² + (inclMean·sin(H/5))²)>
-// where δε = -A·cos(H/3) + A·cos(H/8). The perpendicular tilts (earthRAAngle
-// in tilta, inclination in ecliptic plane) increase measured obliquity via
-// the Pythagorean effect. 12 harmonic coefficients fitted from 11,553 SS observations.
-// RMSE: 1.45 arcsec over full H.
-const SOLSTICE_OBLIQUITY_MEAN = (() => {
-  const N = 100000;
-  let sum = 0;
-  for (let i = 0; i < N; i++) {
-    const t = i / N;
-    const p3 = 2 * Math.PI * t * 3, p5 = 2 * Math.PI * t * 5;
-    const p8 = 2 * Math.PI * t * 8, p16 = 2 * Math.PI * t * 16;
-    const e = earthtiltMean - earthInvPlaneInclinationAmplitude * Math.cos(p3)
-                             + earthInvPlaneInclinationAmplitude * Math.cos(p8);
-    const pa = earthRAAngle * Math.cos(p16);
-    const pb = earthInvPlaneInclinationMean * Math.sin(p5);
-    sum += Math.sqrt(e * e + pa * pa + pb * pb);
-  }
-  return sum / N;
-})();
-const SOLSTICE_OBLIQUITY_HARMONICS = [
-  [ 2,  -0.00000263,  -0.00006328],  // H/2  amp=0.2"  [Fib]
-  [ 3,   0.03209855,  -0.63477445],  // H/3  amp=2288" [Fib] inclination
-  [ 5,  -0.00007671,  -0.00814485],  // H/5  amp=29"   [Fib] ecliptic
-  [ 6,   0.00044850,  -0.00404465],  // H/6  amp=15"   2×(H/3) overtone
-  [ 8,  -0.03212886,   0.63478923],  // H/8  amp=2288" [Fib] obliquity
-  [ 9,   0.00000883,  -0.00005605],  // H/9  amp=0.2"
-  [11,  -0.00089756,   0.00808651],  // H/11 amp=29"   H/3+H/8 coupling
-  [13,  -0.00000166,   0.00004096],  // H/13 amp=0.1"  [Fib] axial
-  [14,  -0.00002651,   0.00016231],  // H/14 amp=0.6"
-  [16,   0.00044894,  -0.00404497],  // H/16 amp=15"   [Fib] perihelion
-  [19,   0.00002653,  -0.00016536],  // H/19 amp=0.6"  H/3+H/16 coupling
-  [24,  -0.00000887,   0.00005335],  // H/24 amp=0.2"  H/8+H/16 coupling
-];
-
-// ─── 12c. CARDINAL POINT JD HARMONICS ───────────────────────────────────
-// 12-harmonic fits from 11,553 simulation observations (29-year steps) spanning full H.
-// 5 Fibonacci fundamentals + 7 overtones (all sums of Fibonacci: 6=3+3, 11=3+8, etc.)
-// See docs/14-solstice-prediction.md
-//
-// Each cardinal point is anchored at its observed J2000 value:
-//   SS: ASTRO_REFERENCE.juneSolstice2000_JD = 2451716.575
-//   WS: 2451900.067346   (Dec 21, 2000 ~01:37 UTC)
-//   VE: 2451623.737525   (Mar 20, 2000 ~05:42 UTC)
-//   AE: 2451810.304175   (Sep 22, 2000 ~19:18 UTC)
-
-const CARDINAL_POINT_ANCHORS = {
-  SS: 2451716.575,       // juneSolstice2000_JD
-  WS: 2451900.067346,
-  VE: 2451623.737525,
-  AE: 2451810.304175,
-};
-
-// [H_divisor, sin_coeff, cos_coeff]  — amplitude in days
-const CARDINAL_POINT_HARMONICS = {
-  SS: [  // RMSE = 2.7 min over full H
-    [ 3,  -1.489856, -0.089878],  // H/3  amp=1.493d [Fib] inclination
-    [ 5,   0.003928, -0.000258],  // H/5  amp=0.004d [Fib] ecliptic
-    [ 6,  -0.020769, -0.002618],  // H/6  amp=0.021d  2×(H/3) inclination overtone
-    [ 8,   1.512826,  0.088901],  // H/8  amp=1.515d [Fib] obliquity
-    [11,   0.041889,  0.003991],  // H/11 amp=0.042d  H/3+H/8 coupling
-    [13,  -0.022995, -0.000219],  // H/13 amp=0.023d [Fib] axial precession
-    [16,   1.769641,  0.088047],  // H/16 amp=1.772d [Fib] perihelion
-    [19,   0.021683,  0.001938],  // H/19 amp=0.022d  H/3+H/16 coupling
-    [24,  -0.023684, -0.002899],  // H/24 amp=0.024d  H/8+H/16 coupling
-    [29,   0.001261, -0.000420],  // H/29 amp=0.001d  H/13+H/16
-    [32,  -0.088527, -0.005357],  // H/32 amp=0.089d  2×(H/16) perihelion overtone
-    [40,   0.001251, -0.000270],  // H/40 amp=0.001d  H/8+H/32
-  ],
-  WS: [  // RMSE = 5.3 min over full H
-    [ 3,  -1.481731, -0.089611],  // H/3  amp=1.484d [Fib]
-    [ 5,   0.003214, -0.000402],  // H/5  amp=0.003d [Fib]
-    [ 6,  -0.020656, -0.002783],  // H/6  amp=0.021d
-    [ 8,   1.458880,  0.088769],  // H/8  amp=1.462d [Fib]
-    [11,   0.040965,  0.003759],  // H/11 amp=0.041d
-    [13,   0.022819, -0.000817],  // H/13 amp=0.023d [Fib]
-    [14,   0.001088, -0.000425],  // H/14 amp=0.001d
-    [16,  -1.808930, -0.093384],  // H/16 amp=1.811d [Fib] anti-phase to SS
-    [19,  -0.023794, -0.003299],  // H/19 amp=0.024d
-    [24,   0.023840,  0.001968],  // H/24 amp=0.024d
-    [32,   0.069576,  0.002420],  // H/32 amp=0.070d
-    [48,   0.002811, -0.000403],  // H/48 amp=0.003d  3×(H/16)
-  ],
-  VE: [  // RMSE = 3.0 min over full H
-    [ 3,  -1.485598, -0.089089],  // H/3  amp=1.488d [Fib]
-    [ 5,   0.003585,  0.000574],  // H/5  amp=0.004d [Fib]
-    [ 6,  -0.020707, -0.002118],  // H/6  amp=0.021d
-    [ 8,   1.485817,  0.112270],  // H/8  amp=1.490d [Fib]
-    [11,   0.041399,  0.004878],  // H/11 amp=0.042d
-    [13,  -0.000220, -0.022860],  // H/13 amp=0.023d [Fib]
-    [16,  -0.113545,  1.783526],  // H/16 amp=1.787d [Fib] 90° shifted from SS
-    [19,  -0.003667,  0.022702],  // H/19 amp=0.023d
-    [24,   0.003172, -0.023635],  // H/24 amp=0.024d
-    [27,   0.000188, -0.000833],  // H/27 amp=0.001d
-    [32,   0.013522, -0.077970],  // H/32 amp=0.079d
-    [35,   0.000347, -0.000845],  // H/35 amp=0.001d
-  ],
-  AE: [  // RMSE = 5.0 min over full H
-    [ 3,  -1.486008, -0.090361],  // H/3  amp=1.489d [Fib]
-    [ 5,   0.003556, -0.001238],  // H/5  amp=0.004d [Fib]
-    [ 6,  -0.020719, -0.003286],  // H/6  amp=0.021d
-    [ 8,   1.485786,  0.065283],  // H/8  amp=1.487d [Fib]
-    [11,   0.041453,  0.002865],  // H/11 amp=0.042d
-    [13,   0.000213,  0.021826],  // H/13 amp=0.022d [Fib]
-    [14,   0.001099, -0.000954],  // H/14 amp=0.002d
-    [16,   0.067795, -1.789261],  // H/16 amp=1.791d [Fib] 90° shifted from WS
-    [19,   0.001390, -0.024089],  // H/19 amp=0.024d
-    [22,   0.000030, -0.001591],  // H/22 amp=0.002d
-    [24,  -0.001869,  0.022763],  // H/24 amp=0.023d
-    [32,   0.005593,  0.078878],  // H/32 amp=0.079d
-  ],
-};
-
-// Legacy alias for backward compatibility
-const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;
-
-
-// ─── 12d. PRECESSION PREDICTION (429-term ML system) ────────────────────
-// Per-planet configs (period, J2000 perihelion angle, baseline rate) and
-// retrained ridge-regression coefficients. See PREDICTIVE_FORMULA_GUIDE.mdx.
-// Built from existing planet data — no duplicated constants
-// Period is always positive (absolute value) for the feature builder.
-// Sign of baseline reflects prograde/retrograde precession.
-const PREDICT_PLANETS = {};
-for (const [key, p] of Object.entries(planets)) {
-  if (!p.perihelionEclipticYears || !p.longitudePerihelion) continue;
-  const absPeriod = Math.abs(p.perihelionEclipticYears);
-  const sign = p.perihelionEclipticYears < 0 ? -1 : 1;
-  PREDICT_PLANETS[key] = {
-    period: absPeriod,
-    theta0: p.longitudePerihelion,
-    baseline: sign * 1296000 / absPeriod * 100,
-  };
-}
-
-// 429 coefficients per planet (trained via ridge regression, α=0.01)
-const PREDICT_COEFFS = (() => {
-  // Load from the retrained coefficient files
-  const coeffs = {};
-  const fs = require('fs');
-  const path = require('path');
-  const dir = path.join(__dirname, '..', '..', 'docs', 'scripts');
-  for (const p of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
-    const file = path.join(dir, `${p}_coeffs_unified.py`);
-    const content = fs.readFileSync(file, 'utf8');
-    // Extract the coefficient array from Python file
-    const match = content.match(/\[([^\]]+)\]/s);
-    if (match) {
-      coeffs[p] = match[1].split('\n')
-        .map(l => l.replace(/#.*$/, '').trim())
-        .filter(l => l)
-        .map(l => parseFloat(l.replace(/,\s*$/, '')))
-        .filter(v => !isNaN(v));
-    }
-  }
-  return coeffs;
-})();
-
-// ─── 13. UTILITIES ───────────────────────────────────────────────────────
-
-// --- Date conversion ---
-
-function jdToCalendar(jd) {
-  // Algorithm from Meeus, Astronomical Algorithms (2nd ed.)
-  const z = Math.floor(jd + 0.5);
-  const f = (jd + 0.5) - z;
-  let a;
-  if (z < 2299161) {
-    a = z; // Julian calendar
-  } else {
-    const alpha = Math.floor((z - 1867216.25) / 36524.25);
-    a = z + 1 + alpha - Math.floor(alpha / 4);
-  }
-  const b = a + 1524;
-  const c = Math.floor((b - 122.1) / 365.25);
-  const d = Math.floor(365.25 * c);
-  const e = Math.floor((b - d) / 30.6001);
-
-  const day = b - d - Math.floor(30.6001 * e) + f;
-  const month = (e < 14) ? e - 1 : e - 13;
-  const year = (month > 2) ? c - 4716 : c - 4715;
-
-  return { year, month, day: Math.floor(day), dayFrac: day - Math.floor(day) };
-}
-
-function calendarToJD(year, month, day) {
-  let y = year, m = month;
-  if (m <= 2) { y -= 1; m += 12; }
-  const a = Math.floor(y / 100);
-  const b = 2 - a + Math.floor(a / 4);
-  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
-}
-
-function jdToYear(jd) {
-  return startmodelYear + (jd - startmodelJD) / meanSolarYearDays;
-}
-
-function yearToJD(year) {
-  return startmodelJD + (year - startmodelYear) * meanSolarYearDays;
-}
-
-function jdToDateString(jd) {
-  const cal = jdToCalendar(jd);
-  const h = cal.dayFrac * 24;
-  const hour = Math.floor(h);
-  const min = Math.floor((h - hour) * 60);
-  return `${cal.year}-${String(cal.month).padStart(2, '0')}-${String(cal.day).padStart(2, '0')} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-}
-
-// --- Formatting helpers ---
-
-function pad(str, len) {
-  str = String(str);
-  return str.length >= len ? str : str + ' '.repeat(len - str.length);
-}
-
-function padLeft(str, len) {
-  str = String(str);
-  return str.length >= len ? str : ' '.repeat(len - str.length) + str;
-}
-
-function fmt(n, dec = 6) {
-  return typeof n === 'number' ? n.toFixed(dec) : String(n);
-}
-
-function fmtInt(n) {
-  return n.toLocaleString('en-US');
-}
-
-function printTable(headers, rows, colWidths) {
-  const sep = colWidths.map(w => '-'.repeat(w)).join('-+-');
-  const headerLine = headers.map((h, i) => pad(h, colWidths[i])).join(' | ');
-  console.log(headerLine);
-  console.log(sep);
-  for (const row of rows) {
-    console.log(row.map((c, i) => pad(String(c), colWidths[i])).join(' | '));
-  }
-}
-
-
-// ─── 14. EXPORTS ─────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// EXPORTS — All ~115 items, backward compatible
+// ═══════════════════════════════════════════════════════════════════════════
 
 module.exports = {
   // Foundational model constants
@@ -910,9 +556,9 @@ module.exports = {
   julianCenturyDays,
   eocEccentricity,
   perihelionPhaseOffset,
-  TROPICAL_YEAR_HARMONICS,
-  SIDEREAL_YEAR_HARMONICS,
-  ANOMALISTIC_YEAR_HARMONICS,
+  TROPICAL_YEAR_HARMONICS: fitted.TROPICAL_YEAR_HARMONICS,
+  SIDEREAL_YEAR_HARMONICS: fitted.SIDEREAL_YEAR_HARMONICS,
+  ANOMALISTIC_YEAR_HARMONICS: fitted.ANOMALISTIC_YEAR_HARMONICS,
 
   // Moon derived
   moonSiderealMonth,
@@ -952,24 +598,28 @@ module.exports = {
   yearLengthRef,
   knownValues,
 
-  // Predictive formula
+  // Predictive formula (from fitted-coefficients.js)
   PERI_HARMONICS,
-  SOLSTICE_JD_HARMONICS,
+  SOLSTICE_JD_HARMONICS: fitted.SOLSTICE_JD_HARMONICS,
   SOLSTICE_OBLIQUITY_MEAN,
-  SOLSTICE_OBLIQUITY_HARMONICS,
-  CARDINAL_POINT_HARMONICS,
-  CARDINAL_POINT_ANCHORS,
-  PERI_OFFSET,
+  SOLSTICE_OBLIQUITY_HARMONICS: fitted.SOLSTICE_OBLIQUITY_HARMONICS,
+  CARDINAL_POINT_HARMONICS: fitted.CARDINAL_POINT_HARMONICS,
+  CARDINAL_POINT_ANCHORS: ASTRO_REFERENCE.cardinalPointAnchors,
+  PERI_OFFSET: fitted.PERI_OFFSET,
   PREDICT_PLANETS,
   PREDICT_COEFFS,
 
   // Date utilities
-  jdToCalendar,
-  calendarToJD,
+  jdToCalendar: utils.jdToCalendar,
+  calendarToJD: utils.calendarToJD,
   jdToYear,
   yearToJD,
-  jdToDateString,
+  jdToDateString: utils.jdToDateString,
 
   // Formatting helpers
-  pad, padLeft, fmt, fmtInt, printTable,
+  pad: utils.pad,
+  padLeft: utils.padLeft,
+  fmt: utils.fmt,
+  fmtInt: utils.fmtInt,
+  printTable: utils.printTable,
 };

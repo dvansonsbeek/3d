@@ -251,16 +251,14 @@ be at 5h 35m RA (the minimum).
 ## Data Source
 
 Cardinal point observations generated from the headless scene-graph (no browser needed):
-- Script: `tools/export-cardinal-points.js` (reusable, configurable step size)
-- File: [97-Holistic_cardinal_points.csv](97-Holistic_cardinal_points.csv)
+- Script: `tools/fit/export-cardinal-points.js` (reusable, configurable step size)
+- File: [../data/02-cardinal-points.csv](../data/02-cardinal-points.csv)
 - 46,212 data points (11,553 per cardinal point) spanning one full Holistic Year
 - Step: 29 years (year 2000 included in every type)
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination
   zero crossing (linear interpolation)
 
-Previous SS-only data: [97-Holistic_solstice_results.xlsx](97-Holistic_solstice_results.xlsx)
-(2,889 points at 116-year steps, superseded by the CSV above).
 
 ## Implementation
 
@@ -271,7 +269,7 @@ All three codebases support all 4 cardinal points with an optional `type` parame
 |------|-----------|-----------|
 | `tools/lib/orbital-engine.js` | `computeObliquityEarth(year)`, `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)` | `C.SOLSTICE_OBLIQUITY_MEAN` (derived at startup), `C.SOLSTICE_OBLIQUITY_HARMONICS`, `C.CARDINAL_POINT_*` |
 | `src/script.js` | `computeObliquityEarth(year)`, `computeSolsticeRA(year, type)`, `computeSolsticeJD(year, type)`, `computeSolsticeYearLength(year, type)` | `OBLIQUITY_MEAN` (derived at startup), `OBLIQUITY_HARMONICS`, `CARDINAL_POINT_*` |
-| `docs/scripts/predictive_formula.py` | `calc_obliquity(year)`, `calc_solstice_ra(year, type)`, `calc_solstice_jd(year, type)`, `calc_solstice_year_length(year, type)` | `SOLSTICE_OBLIQUITY_MEAN` (derived at import), `SOLSTICE_OBLIQUITY_HARMONICS`, `CARDINAL_POINT_*` |
+| `tools/lib/python/predictive_formula.py` | `calc_obliquity(year)`, `calc_solstice_ra(year, type)`, `calc_solstice_jd(year, type)`, `calc_solstice_year_length(year, type)` | `SOLSTICE_OBLIQUITY_MEAN` (derived at import), `SOLSTICE_OBLIQUITY_HARMONICS`, `CARDINAL_POINT_*` |
 
 All implementations return exact J2000 anchor values by construction. Legacy `SOLSTICE_JD_HARMONICS` alias preserved for backward compatibility.
 

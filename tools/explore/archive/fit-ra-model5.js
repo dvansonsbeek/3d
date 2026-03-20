@@ -6,7 +6,7 @@ const { computePlanetPosition } = require('../lib/scene-graph.js');
 const sg = require('../lib/scene-graph.js');
 const C = require('../lib/constants.js');
 const { j2000ToOfDate } = require('../lib/precession.js');
-const refData = require('../../config/reference-data.json');
+const refData = require('../../data/reference-data.json');
 const d2r = Math.PI / 180;
 
 // Disable existing RA correction to fit from raw errors

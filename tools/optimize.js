@@ -41,8 +41,7 @@ Planet params: startpos, solarYearInput, longitudePerihelion,
                ascendingNode, eclipticInclinationJ2000, orbitalEccentricityBase,
                perihelionEclipticYears, eocFraction, perihelionRef_JD,
                decCorrA, decCorrB, decCorrC, decCorrD, decCorrE, decCorrF
-Sun params:    correctionSun, perihelionRefJD, eccentricityBase,
-               eccentricityAmplitude, earthRAAngle, earthtiltMean
+Sun params:    correctionSun, eccentricityBase, eccentricityAmplitude, earthtiltMean
 Moon params:   moonStartposApsidal, moonStartposNodal, moonStartposMoon,
                moonTilt, moonEclipticInclinationJ2000, moonOrbitalEccentricity
 `);
@@ -103,7 +102,7 @@ if (command === 'diagnose') {
   // 2. Layer decomposition
   console.log('\n─── Layer Decomposition (model start) ───\n');
   const refLabel = planet === 'moon' ? 'dist_earth' : 'dist_sun';
-  const layers = opt.decomposeLayerPositions(planet, 2451716.5);
+  const layers = opt.decomposeLayerPositions(planet, C.startmodelJD);
   for (const l of layers) {
     console.log('  ' + l.name.padEnd(28), refLabel + ':', l.distFromRef.toFixed(6).padStart(10));
   }
@@ -322,8 +321,11 @@ if (command === 'diagnose') {
   }
 
 } else if (command === 'optimize') {
-  const paramStr = args[1] || 'startpos';
-  const paramNames = paramStr.split(',');
+  // Collect all non-flag args after planet as parameter names (space- or comma-separated)
+  const nonFlagArgs = args.slice(1).filter(a => !a.startsWith('--'));
+  const paramNames = nonFlagArgs.length > 0
+    ? nonFlagArgs.flatMap(a => a.split(','))
+    : ['startpos'];
   const maxIter = parseInt(parseFlag(args, 'max-iter', '500'));
 
   console.log('═══════════════════════════════════════════════════════════════');
@@ -334,7 +336,7 @@ if (command === 'diagnose') {
   const result = opt.nelderMead(planet, paramNames, { maxIter });
 
   console.log('Parameter'.padEnd(28), 'Initial'.padStart(14), 'Optimized'.padStart(14), 'Change'.padStart(14));
-  for (const p of paramNames) {
+  for (const p of result.params) {
     const init = result.initialValues[p];
     const opt2 = result.optimizedValues[p];
     console.log(
@@ -349,6 +351,68 @@ if (command === 'diagnose') {
   console.log('Final error:  ', result.finalError.toFixed(4) + '°');
   console.log('Improvement:  ', result.improvement);
   console.log('Iterations:   ', result.iterations);
+
+  // For planets: show solved angleCorrection and perihelion RA match
+  if (result.planetDerived) {
+    const pd = result.planetDerived;
+    const ok = Math.abs(pd.perihelionRA.diff) < 0.001 ? '✓ OK' : '⚠ CHECK';
+    console.log();
+    console.log('── Derived angleCorrection (perihelion direction) ──');
+    console.log('  angleCorrection  :', pd.angleCorrection.toFixed(8));
+    console.log('  Scene RA at J2000:', pd.perihelionRA.achieved.toFixed(6) + '°',
+      '  target:', pd.perihelionRA.target.toFixed(6) + '°',
+      '  diff:', (pd.perihelionRA.diff >= 0 ? '+' : '') + pd.perihelionRA.diff.toFixed(6) + '°',
+      ' ' + ok);
+  }
+
+  // For Sun: show derived eccentricity values and perihelion longitude check
+  if (result.sunDerived) {
+    const d = result.sunDerived;
+    console.log();
+    console.log('── Derived eccentricity (e(J2000) constraint) ──');
+    console.log('  eccentricityBase     :', d.eccentricityBase.toFixed(8), '  (Law 5 locked)');
+    if (d.eccentricityAmplitude !== null) {
+      const residual = Math.abs(d.eJ2000Achieved - d.eJ2000Target);
+      console.log('  eccentricityAmplitude:', d.eccentricityAmplitude.toFixed(8), '  (derived from base + perihelionalignmentYear)');
+      console.log('  e(J2000) achieved    :', d.eJ2000Achieved.toFixed(10), ' target:', d.eJ2000Target, ' residual:', residual.toExponential(2));
+    } else {
+      console.log('  eccentricityAmplitude: n/a — base ≥ e(J2000), constraint infeasible');
+    }
+
+    if (d.perihelionRA) {
+      const p = d.perihelionRA;
+      const diff = p.raAchieved !== null ? (p.raAchieved - p.raTarget).toFixed(6) : 'n/a';
+      console.log();
+      console.log('── Perihelion longitude (barycenter.RA at J2000) ──');
+      console.log('  eccentricityBase     :', p.base.toFixed(8), '  (derived from RA = 102.947° constraint)');
+      console.log('  eccentricityAmplitude:', p.amplitude !== null ? p.amplitude.toFixed(8) : 'n/a', '  (derived)');
+      console.log('  barycenter.RA at J2000:', p.raAchieved !== null ? p.raAchieved.toFixed(6) : 'n/a',
+        '  target:', p.raTarget, '  diff:', diff + '°');
+    }
+
+    if (d.obliquity) {
+      const o = d.obliquity;
+      const okV = Math.abs(o.diffArcsec) < 0.01 ? '✓ OK' : '⚠ NEEDS FIX';
+      console.log();
+      console.log('── Obliquity at J2000 (IAU: 23.439291°) ──');
+      console.log('  earthtiltMean               :', o.earthtiltMean.toFixed(8));
+      console.log('  earthInvPlaneInclinationAmpl:', o.earthInvPlaneInclinationAmplitude.toFixed(8));
+      console.log('  earthInvPlaneInclinationMean:', o.earthInvPlaneInclinationMean.toFixed(8));
+      console.log('  Model obliquity :', o.modelDeg.toFixed(8), '°');
+      console.log('  IAU obliquity   :', o.iauDeg.toFixed(8), '°');
+      console.log('  Difference      :', (o.diffArcsec >= 0 ? '+' : '') + o.diffArcsec.toFixed(4), '"  ' + okV);
+    }
+
+    if (d.obliquityRate) {
+      const r = d.obliquityRate;
+      const ok = Math.abs(r.diffArcsecCy) < 0.1 ? '✓ OK' : '⚠ NEEDS FIX';
+      console.log();
+      console.log('── Obliquity rate (IAU 2006: -46.836769"/cy) ──');
+      console.log('  Model rate :', r.modelArcsecCy.toFixed(4), '"/century');
+      console.log('  IAU rate   :', r.iauArcsecCy.toFixed(4), '"/century');
+      console.log('  Difference :', (r.diffArcsecCy >= 0 ? '+' : '') + r.diffArcsecCy.toFixed(4), '"  ' + ok + '  (tolerance: 0.1"/cy)');
+    }
+  }
 
 } else {
   console.error(`Unknown command: ${command}`);

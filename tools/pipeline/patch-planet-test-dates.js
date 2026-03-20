@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SCRIPT_PATH = path.join(__dirname, '..', '..', 'src', 'script.js');
-const DATA_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const DATA_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. LOAD REFERENCE DATA

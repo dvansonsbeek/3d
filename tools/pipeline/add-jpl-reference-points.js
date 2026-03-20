@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 const jpl = require('../lib/horizons-client');
 
-const DATA_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const DATA_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 
 // Model epoch constants (from constants.js)
 const startmodelJD = 2451716.5;        // JD of 21 Jun 2000

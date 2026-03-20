@@ -17,8 +17,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const CSV_PATH = path.join(__dirname, '..', '..', 'config', 'tycho-mars-raw.csv');
-const DATA_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const CSV_PATH = path.join(__dirname, '..', '..', 'data', 'tycho-mars-raw.csv');
+const DATA_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. PARSE CSV
@@ -170,7 +170,7 @@ referenceData._meta.weightDefinitions = {
 referenceData._meta.tychoImport = {
   importedAt: new Date().toISOString(),
   totalEntries: entries.length,
-  source: 'config/tycho-mars-raw.csv (from pafko.com/tycho/)',
+  source: 'data/tycho-mars-raw.csv (from pafko.com/tycho/)',
   originalSource: 'Tychonis Brahe Dani Opera Omnia, vols. 10 & 13',
 };
 

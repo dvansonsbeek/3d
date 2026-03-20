@@ -12,7 +12,7 @@ const C = require('../lib/constants');
 const fs = require('fs');
 const path = require('path');
 
-const REF_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const REF_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 
 async function generate() {
   // Generate JD list: every 3 days from 2000.0 to 2050.0

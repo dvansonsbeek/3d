@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════════════════
 // EXPORT REFERENCE DATA — Parse PLANET_TEST_DATES from script.js and
-//                          output config/reference-data.json with metadata
+//                          output data/reference-data.json with metadata
 // ═══════════════════════════════════════════════════════════════════════════
 
 const fs = require('fs');
 const path = require('path');
 
 const SCRIPT_PATH = path.join(__dirname, '..', '..', 'src', 'script.js');
-const OUTPUT_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const OUTPUT_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. PARSE PLANET_TEST_DATES FROM script.js

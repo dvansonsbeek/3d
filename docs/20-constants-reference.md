@@ -264,7 +264,7 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 ## Planet Inclination Parameters (from ψ formula)
 
 Amplitudes derived from Fibonacci Laws: `amp = ψ / (d × √m)`. Means from J2000 constraint.
-See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Appendix E (84)](84-inclination-optimization.js) and [Appendix F (85)](85-inclination-verification.js).
+See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js).
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle |
 |--------|----------|---------------|-----------|-------------|
@@ -514,7 +514,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: Saturn and Neptune show **increasing** inclinations, which requires retrograde phase (Saturn) or special phase alignment (Neptune). Model errors verified by [Appendix F (85)](85-inclination-verification.js).
+**Note**: Saturn and Neptune show **increasing** inclinations, which requires retrograde phase (Saturn) or special phase alignment (Neptune). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
 
 ### Mean & True Anomaly at J2000
 
@@ -774,7 +774,7 @@ The Equation of Center fraction determines how much of a planet's Keplerian vari
 
 ## J2000-Verified Ascending Nodes (Optimized)
 
-Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Appendix A (80)](80-ascending-node-optimization.js)):
+Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js)):
 
 | Planet | `ascendingNodeInvPlane` | Delta from S&S |
 |--------|------------------------|--------------|
@@ -789,7 +789,7 @@ Calibrated to reproduce exact J2000 ecliptic inclinations (optimized by [Appendi
 | Pluto | 101.06 | -6.00 deg |
 
 See [34-j2000-calibration.md](34-j2000-calibration.md) for the methodology.
-**Verification**: [Appendix C (82)](82-ascending-node-verification.js) verifies correct J2000 ecliptic inclinations. [Appendix D (83)](83-ascending-node-souami-souchay.js) compares S&S vs Verified values.
+**Verification**: [Ascending Node Verification](../tools/verify/ascending-node-verification.js) verifies correct J2000 ecliptic inclinations. [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) compares S&S vs Verified values.
 
 ## Planet Perihelion Reference Dates (Phase-Optimized)
 
@@ -852,7 +852,7 @@ Per-planet configuration for the predictive perihelion precession formula:
 
 ### Predictive Coefficients (`PREDICT_COEFFS`)
 
-7 arrays of 429 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`docs/scripts/*_coeffs_unified.py`). The dot product of the 429-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
+7 arrays of 429 trained coefficients each, one per planet. These are the regression weights from the Python training pipeline (`tools/lib/python/coefficients/*_coeffs_unified.py`). The dot product of the 429-term feature vector with the coefficient array gives the geocentric precession fluctuation above/below the heliocentric baseline.
 
 ---
 

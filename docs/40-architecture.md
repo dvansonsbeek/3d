@@ -521,7 +521,7 @@ Architecture:
     └── baseline + dot(features, coefficients)
 ```
 
-Ported from Python (`docs/scripts/predictive_formula.py`). Reuses existing `computeObliquityEarth()` and `computeEccentricityEarth()`.
+Ported from Python (`tools/lib/python/predictive_formula.py`). Reuses existing `computeObliquityEarth()` and `computeEccentricityEarth()`.
 
 ### Celestial Bodies
 

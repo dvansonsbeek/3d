@@ -338,8 +338,8 @@ def calc_solar_year(year):
 | `src/script.js` | Runtime formulas, harmonic coefficients at line ~75 |
 | `tools/lib/constants.js` | Optimization tool constants |
 | `tools/lib/orbital-engine.js` | Optimization tool year-length functions |
-| `docs/scripts/constants_scripts.py` | Single source of truth for Python |
-| `docs/scripts/predictive_formula.py` | Python implementation |
+| `tools/lib/python/constants_scripts.py` | Single source of truth for Python |
+| `tools/lib/python/predictive_formula.py` | Python implementation |
 
 
 ## Updating Coefficients
@@ -353,4 +353,4 @@ If `H` or `inputmeanlengthsolaryearindays` changes:
    - Fit sin/cos coefficients with means fixed to derived values
    - Update `TROPICAL_YEAR_HARMONICS`, `SIDEREAL_YEAR_HARMONICS`, `ANOMALISTIC_YEAR_HARMONICS` in all source files
 
-Training data: `docs/96_Holistic_year_analysis_491_years.xlsx` (sheet "Detailed")
+Training data: `data/03-year-length-analysis.xlsx` (sheet "Detailed")

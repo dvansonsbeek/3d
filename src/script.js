@@ -38,14 +38,15 @@ const meansiderealyearlengthinSeconds = 31558149.8;
 // The length of sidereal year in seconds is fixed
 const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
-const earthtiltMean = 23.41349;                           // Derived: IAU_obliquity(23.4393) - scene_graph_correction(0.0258)
-const earthInvPlaneInclinationAmplitude = 0.635970;       // 3D model + formula (optimized for IAU 2006 rate). Fibonacci predicts 0.6329789
+const earthtiltMean = 23.41365930;                        // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
+const earthInvPlaneInclinationAmplitude = 0.63541988;     // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection.
 // Geometric constant independent of epoch.
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-const earthInvPlaneInclinationMean = 1.481179;            // 3D model + Formula. Fibonacci predicts 1.481727
-const eccentricityBase = 0.015372;                        // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
-const eccentricityAmplitude = 0.00137032;                 // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
+const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((284.51 - 203.3195) * Math.PI / 180);
+const eccentricityBase = 0.01537159;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
+const eccentricityAmplitude = 0.00137074;                 // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 
 // ─── 2. MODEL START & PHYSICAL CONSTANTS ────────────────────────────────
@@ -59,7 +60,7 @@ const whichSolsticeOrEquinox = 1;
 // By default the model is pointing to the June Solstice (=1). Possible values: 0 = March Equinox, 1 = June Solstice, 2 = September Equinox, 3= December Solstice. IF YOU CHANGE THIS VALUE, ALSO OTHER VALUES NEED TO CHANGE.
 const correctionDays = -0.23328398168087;
 // Small correction in days because the startmodel on 21 june 00:00 UTC is not exactly aligned with Solstice + to make sure the juliandate is with exact rounded numbers in the Balanced year
-const correctionSun = 0.494476;
+const correctionSun = 0.495997;
 // Sun's orbital starting angle in degrees. Optimized vs 26 JPL reference points (RMS 0.003°, validated 1600-2200). Also feeds EoC perihelion phase and planet PerihelionFromEarth startPos. Sensitivity: 1461 min/deg on timing. IMPORTANT: changing this value requires re-tuning earthRAAngle for solstice timing.
 const useVariableSpeed = true;
 // Toggle equation of center (Kepler's 2nd Law variable speed). When true, objects with eccentricity move faster at perihelion and slower at aphelion. When false, all orbits use constant angular velocity.
@@ -79,20 +80,26 @@ const helionpointAmplitude = 5.05;                        // Formula only
 // sidereal = meansiderealyearlengthinDays, anomalistic = meanAnomalisticYearinDays.
 // Only these coefficients need refitting if H changes.
 // Each entry: [period_divisor, sin_coeff, cos_coeff] — period = holisticyearLength / divisor
-const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.006 s
-  [8,  -1.315685778131e-06, -2.101615481220e-05],         // H/8:  1.819s amp
-  [3,  +6.745126392744e-07, +7.955457410219e-06],         // H/3:  0.690s amp
-  [16, -6.145697256116e-09, -3.622604401125e-07],          // H/16: 0.031s amp
+const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.001 s
+  [ 3,  +6.332548792685e-07, +8.075245235817e-06],        // H/3:  0.700s amp
+  [ 8,  -1.356696988329e-06, -2.088113114600e-05],        // H/8:  1.808s amp
+  [14,  -1.545140139305e-07, +3.637423948615e-07],        // H/14: 0.034s amp
+  [15,  +8.449709609471e-08, -4.860696254744e-07],        // H/15: 0.043s amp
+  [31,  +2.067861760831e-08, -1.502149356245e-08],        // H/31: 0.002s amp
+  [41,  -6.303689078519e-09, +1.914969191424e-08],        // H/41: 0.002s amp
 ];
-const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.003 s
-  [8, -1.255070074367e-06, -1.783278998075e-08],           // H/8:  0.108s amp
-  [3, +5.794170454941e-07, +1.019398849945e-07],           // H/3:  0.051s amp
+const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.000 s
+  [ 2,  -6.446591502042e-07, -1.036571636840e-07],        // H/2:  0.056s amp
+  [ 3,  +1.162133281368e-06, +4.849859858606e-07],        // H/3:  0.109s amp
+  [ 8,  -1.134779565378e-06, -2.847253755636e-09],        // H/8:  0.098s amp
 ];
-const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.011 s
-  [8,  -2.111981801448e-07, +2.544662242077e-08],          // H/8:  0.018s amp
-  [3,  -6.755570533516e-08, -5.963699950444e-10],          // H/3:  0.006s amp
-  [16, -5.074517345509e-08, +8.665832935489e-08],          // H/16: 0.009s amp
-  [24, -4.432336424626e-07, +1.845872180598e-08],          // H/24: 0.038s amp
+const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.000 s
+  [ 2,  -3.331807798338e-06, -1.199082237907e-05],        // H/2:  1.075s amp
+  [ 3,  -3.739072613520e-06, +9.617812262260e-06],        // H/3:  0.892s amp
+  [ 8,  -3.175712482370e-07, +2.623030026153e-06],        // H/8:  0.228s amp
+  [ 9,  +8.022402310244e-07, -1.542541871698e-06],        // H/9:  0.150s amp
+  [22,  +1.062301999920e-07, -6.676606979168e-08],        // H/22: 0.011s amp
+  [23,  -4.273912533399e-07, +2.329348175831e-07],        // H/23: 0.042s amp
 ];
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 
@@ -142,7 +149,7 @@ const mercuryLongitudePerihelion = 77.4569131;
 const mercuryAscendingNode = 48.33033155;                 // SPICE 48.33033155 (JPL J2000 48.33076593)
 const mercuryMeanAnomaly = 156.6364301;                   // Reference only
 const mercuryTrueAnomaly = 164.1669319;                   // Reference only
-const mercuryAngleCorrection = 0.971049;                  // To align the perihelion exactly
+const mercuryAngleCorrection = 0.97090778;                 // To align the perihelion exactly
 const mercuryPerihelionEclipticYears = holisticyearLength/(1+(3/8)); // Duration of perihelion precession to explain ~575 arcseconds per century
 const mercuryAxialPrecessionYears = -mercuryPerihelionEclipticYears; // Retrograde. Cassini state: locked to orbital plane precession (~235–326 kyr, Peale 2006, Yseboodt & Margot 2006)
 const mercuryStartpos = 83.53;                              // Tuned for start-date RA match (enriched JPL, 95 pts)
@@ -162,7 +169,7 @@ const venusLongitudePerihelion = 131.5765919;
 const venusAscendingNode = 76.67877109;                   // SPICE 76.67877109 (JPL J2000 76.67984255)
 const venusMeanAnomaly = 324.9668371;                     // Reference only
 const venusTrueAnomaly = 324.5198504;                     // Reference only
-const venusAngleCorrection = -2.784782;                    // To align the perihelion exactly
+const venusAngleCorrection = -2.80286830;                  // To align the perihelion exactly
 const venusPerihelionEclipticYears = holisticyearLength*2;    // Duration of perihelion precession to explain ~400 arcseconds per century
 const venusAxialPrecessionYears = holisticyearLength*3/34;    // Prograde (obliquity 177°). H×3/34 (F4/F9) ≈ 29,560 yr (~29 kyr observed, Cottereau & Souchay 2009, NASA 2022)
 const venusStartpos = 249.312;                             // Re-optimized with 36p correction
@@ -182,7 +189,7 @@ const marsLongitudePerihelion = 336.0650681;
 const marsAscendingNode = 49.55737662;                    // SPICE 49.55737662 (JPL J2000 49.55953891)
 const marsMeanAnomaly = 109.2630844;                      // Reference only
 const marsTrueAnomaly = 118.9501056;                      // Reference only
-const marsAngleCorrection = -2.107087;                    // To align the perihelion exactly
+const marsAngleCorrection = -2.10936153;                  // To align the perihelion exactly
 const marsPerihelionEclipticYears = holisticyearLength/(4+(1/3)); // Duration of perihelion precession to explain ~1600 arcseconds per century
 const marsAxialPrecessionYears = -holisticyearLength/2;      // Retrograde. H/2 ≈ 167,504 yr (~167–175 kyr observed, 7605±3 mas/yr, Konopliv et al. 2020 InSight)
 const marsStartpos = 121.47;                              // Tuned for start-date RA match (enriched JPL, 184 pts)
@@ -202,7 +209,7 @@ const jupiterLongitudePerihelion = 14.70659401;
 const jupiterAscendingNode = 100.4877868;                 // SPICE = 100.4877868 (JPL J2000 100.47390909)
 const jupiterMeanAnomaly = 32.47179744;                   // Reference only
 const jupiterTrueAnomaly = 35.69428061;                   // Reference only
-const jupiterAngleCorrection = 0.92974;                  // To align the perihelion exactly
+const jupiterAngleCorrection = 0.92703626;                // To align the perihelion exactly
 const jupiterPerihelionEclipticYears = holisticyearLength/5;  // Duration of perihelion precession to explain ~1800 arcseconds per century
 const jupiterAxialPrecessionYears = -holisticyearLength*3/8;  // Retrograde. H×3/8 (F4/F6) ≈ 125,628 yr (~113–136 kyr observed, α=2.64–3.17″/yr, Saillenfest et al. 2020 A&A)
 const jupiterStartpos = 13.85;                            // Tuned for start-date RA match (enriched JPL, 70 pts)
@@ -222,7 +229,7 @@ const saturnLongitudePerihelion = 92.12794343;
 const saturnAscendingNode = 113.6452856;                  // SPICE = 113.6452856 (JPL J2000 113.66242448)
 const saturnMeanAnomaly = 325.663876;                     // Reference only
 const saturnTrueAnomaly = 321.7910116;                    // Reference only
-const saturnAngleCorrection = -0.17477;                  // To align the perihelion exactly
+const saturnAngleCorrection = -0.17477212;                // To align the perihelion exactly
 const saturnPerihelionEclipticYears = -holisticyearLength/8;  // Duration of perihelion precession to explain ~-3400 arcseconds per century
 const saturnAxialPrecessionYears = -holisticyearLength*4/3;   // Retrograde. H×4/3 ≈ 446,677 yr (~400–480 kyr observed, α=0.75–0.89″/yr, Saillenfest et al. 2021 A&A)
 const saturnStartpos = 11.32;                             // Tuned for start-date RA match (enriched JPL, 67 pts)
@@ -242,7 +249,7 @@ const uranusLongitudePerihelion = 170.7308251;
 const uranusAscendingNode = 74.00919023;                  // SPICE 74.00919023 (JPL J2000 74.01692503)
 const uranusMeanAnomaly = 145.7292678;                    // Reference only
 const uranusTrueAnomaly = 148.5142459;                    // Reference only
-const uranusAngleCorrection = -0.733732;                  // To align the perihelion exactly
+const uranusAngleCorrection = -0.73459551;                // To align the perihelion exactly
 const uranusPerihelionEclipticYears = holisticyearLength/3;   // Duration of perihelion precession to explain ~1100 arcseconds per century
 const uranusAxialPrecessionYears = holisticyearLength*610;    // Prograde (obliquity 98°). H×610 (F15) ≈ 204 Myr (~210 Myr observed, α≈0.008″/yr, Saillenfest et al. 2022 A&A)
 const uranusStartpos = 44.88;                              // Retuned after removing correctionSun from PeriFromEarth
@@ -262,7 +269,7 @@ const neptuneLongitudePerihelion = 45.80124471;
 const neptuneAscendingNode = 131.7853754;                 // SPICE 131.7853754 (JPL J2000 131.78422574)
 const neptuneMeanAnomaly = 262.5003424;                   // Reference only
 const neptuneTrueAnomaly = 261.2242728;                   // Reference only
-const neptuneAngleCorrection = 2.33091;                  // To align the perihelion exactly
+const neptuneAngleCorrection = 2.33381876;                // To align the perihelion exactly
 const neptunePerihelionEclipticYears = holisticyearLength*2;  // Duration of perihelion precession to explain ~-400 arcseconds per century
 const neptuneAxialPrecessionYears = -holisticyearLength*68;   // Retrograde. H×68 (2×F9) ≈ 22.8 Myr (~23 Myr observed, Neptune Wikipedia/NASA)
 const neptuneStartpos = 47.96;                             // Tuned for start-date RA match (enriched JPL, 69 pts)
@@ -504,7 +511,7 @@ const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNo
 // ─── 6. PREDICTIVE FORMULA SYSTEM ───────────────────────────────────────
 // PERI_HARMONICS (perihelion longitude Fourier terms), PREDICT_PLANETS
 // (precession periods), and PREDICT_COEFFS (per-planet correction arrays).
-// Ported from docs/scripts/predictive_formula.py
+// Ported from tools/lib/python/predictive_formula.py
 // ─────────────────────────────────────────────────────────────────────────
 const H = holisticyearLength;
 const PERI_HARMONICS = [
@@ -11129,7 +11136,7 @@ const BALANCE_PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn
 
 // 742 preset configurations with >= 99.994% vector balance (TNO margin)
 // Generated by exhaustive search over Fibonacci d-values {1,2,3,5,8,13,21,34,55}
-// and two phase groups (203.3195° and 23.3195°) — see docs/87-balance-search.js
+// and two phase groups (203.3195° and 23.3195°) — see tools/verify/balance-search.js
 // Format: [scenario, balance%, me_d, me_phase, ve_d, ve_phase, ma_d, ma_phase, ju_d, ju_phase, sa_d, sa_phase, ur_d, ur_phase, ne_d, ne_phase]
 // Phase: 0 = 203.3195°, 1 = 23.3195°
 // Scenarios: A = Ju5/Sa3, B = Ju8/Sa5, C = Ju13/Sa8, D = Ju21/Sa13
@@ -12066,7 +12073,7 @@ const BALANCE_CONFIG = {
 };
 
 // Ecliptic trend calculation: apparent inclination at a given year
-// Ported from docs/84-inclination-optimization.js
+// Ported from tools/verify/inclination-optimization.js
 function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
@@ -15763,7 +15770,7 @@ function setupGUI() {
     'Verify the rate of perihelion precession against reference data.');
   addTestButton('Investigate Parameters', investigateParameterEffects,
     'Explore how changing orbital parameters affects year length and precession.');
-  addTestButton('Find Optimal earthRAAngle', findOptimalEarthRAAngle,
+  addTestButton('Verify Earth Parameters', verifyEarthParameters,
     'Search for the earthRAAngle value that best matches IAU tropical year references.');
 
   // Insert group labels before the first button of each group
@@ -18040,21 +18047,22 @@ async function runObliquityCalibrationTest() {
   const rateResults = [];
 
   console.log('╔══════╤══════════════╤══════════════╤══════════╗');
-  console.log('║ Year │ Model (°)    │ IAU 2006 (°) │ Diff (") ║');
+  console.log('║ Year │ Sun Dec (°)  │ IAU 2006 (°) │ Diff (") ║');
   console.log('╠══════╪══════════════╪══════════════╪══════════╣');
 
   for (const year of rateYears) {
-    const jd = dateToJulianDay(year, 1, 1) + 0.5;
-    jumpToJulianDay(jd);
-    forceSceneUpdate();
-    await new Promise(r => setTimeout(r, 50));
-
-    const modelObliquity = o.obliquityEarth;
-    const centuriesFromJ2000 = (jd - JD_J2000) / julianCenturyDays;
+    // Use June solstice JD so we measure actual sun.dec at maximum declination
+    const solstice = solsticeForYear(year);
+    if (!solstice) {
+      console.log(`║ ${year} │ FAILED       │              │          ║`);
+      continue;
+    }
+    const modelObliquity = solstice.obliqDeg;  // 90 - sun.dec * 180/π at solstice
+    const centuriesFromJ2000 = (solstice.jd - JD_J2000) / julianCenturyDays;
     const iauObliquity = IAU_OBLIQUITY_J2000 + IAU_RATE_DEG * centuriesFromJ2000;
     const diffArcsec = (modelObliquity - iauObliquity) * 3600;
 
-    rateResults.push({ year, model: modelObliquity, iau: iauObliquity, diff: diffArcsec, jd });
+    rateResults.push({ year, model: modelObliquity, iau: iauObliquity, diff: diffArcsec, jd: solstice.jd });
     console.log(`║ ${year} │ ${modelObliquity.toFixed(6)}°  │ ${iauObliquity.toFixed(6)}° │ ${diffArcsec >= 0 ? '+' : ''}${diffArcsec.toFixed(2).padStart(5)}" ║`);
   }
   console.log('╚══════╧══════════════╧══════════════╧══════════╝');
@@ -18088,18 +18096,15 @@ async function runObliquityCalibrationTest() {
   return { solsticeResults, netTilt, rateResults, modelRate, iauRate: IAU_RATE };
 }
 
-/** Find optimal parameter values for earthRAAngle, earthtiltMean, and earthInvPlaneInclinationAmplitude
+/** Verify Earth parameters against astronomical references.
  *
- * This function analyzes:
- * 1. Solstice timing errors across multiple years
- * 2. Obliquity accuracy vs IAU 2006
- * 3. Drift rate (change in error over time)
- *
- * And suggests optimal values for all three parameters.
+ * earthRAAngle is derived (2A − A²/ε), not adjustable.
+ * This function checks geometry, timing, obliquity, rate, inclination, and Sun RA,
+ * and suggests adjustments for correctionSun, earthtiltMean, and amplitude.
  */
-async function findOptimalEarthRAAngle() {
+async function verifyEarthParameters() {
   console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║           FIND OPTIMAL PARAMETERS                                        ║');
+  console.log('║           VERIFY EARTH PARAMETERS                                         ║');
   console.log('╚══════════════════════════════════════════════════════════════════════════╝');
   console.log('');
 
@@ -18307,64 +18312,21 @@ async function findOptimalEarthRAAngle() {
         console.log('  Geometry sensitivity analysis:');
         console.log(`    earthRAAngle sensitivity: ${earthRAAngle_geometrySensitivity.toFixed(4)}° sun.dec per 1° earthRAAngle`);
 
-        // If geometry error is significant, do an iterative search to find optimal earthRAAngle
-        // The linear approximation can be very inaccurate due to non-linear sensitivity
+        // earthRAAngle is derived (2A - A²/ε), not adjustable directly.
+        // If geometry error is significant, it means earthtiltMean or amplitude need adjustment.
+        if (Math.abs(earthRAAngle_geometrySensitivity) > 0.001) {
+          earthRAAngle_geometryAdjustment = -geometryErrorDeg / earthRAAngle_geometrySensitivity;
+        }
         if (Math.abs(geometryError) > TOLERANCES.geometry) {
           console.log('');
-          console.log('  Iterative search for optimal earthRAAngle:');
-
-          // Search range: try values from current-0.2 to current+0.3 in steps of 0.01
-          let bestRAAngle = earthRAAngle;
-          let bestGeometryError = Math.abs(geometryError);
-          const searchStart = earthRAAngle - 0.2;
-          const searchEnd = earthRAAngle + 0.3;
-          const searchStep = 0.02;
-
-          for (let testRA = searchStart; testRA <= searchEnd; testRA += searchStep) {
-            // Apply test value
-            earthPerihelionPrecession1.orbitTilta = -testRA;
-            earthPerihelionPrecession1.containerObj.rotation.x = earthPerihelionPrecession1.orbitTilta * Math.PI / 180;
-            forceSceneUpdate();
-            await new Promise(r => setTimeout(r, 30));
-
-            // Find solstice with this value
-            const testSolstice = solsticeForYear(2000);
-            if (testSolstice) {
-              jumpToJulianDay(testSolstice.jd);
-              forceSceneUpdate();
-              await new Promise(r => setTimeout(r, 30));
-
-              const testSunDec = sun.dec ? (90 - sun.dec * 180 / Math.PI) : null;
-              const testObliquity = o.obliquityEarth;
-
-              if (testSunDec !== null && testObliquity !== null) {
-                const testError = Math.abs(testSunDec - testObliquity) * 3600;
-                if (testError < bestGeometryError) {
-                  bestGeometryError = testError;
-                  bestRAAngle = testRA;
-                }
-              }
-            }
-          }
-
-          // Restore original
-          earthPerihelionPrecession1.orbitTilta = -earthRAAngle;
-          earthPerihelionPrecession1.containerObj.rotation.x = earthPerihelionPrecession1.orbitTilta * Math.PI / 180;
-          forceSceneUpdate();
-          await new Promise(r => setTimeout(r, 50));
-
-          earthRAAngle_geometryAdjustment = bestRAAngle - earthRAAngle;
-          console.log(`    Best earthRAAngle found: ${bestRAAngle.toFixed(6)}° (geometry error: ${bestGeometryError.toFixed(2)}")`);
-          console.log(`    Adjustment needed: ${earthRAAngle_geometryAdjustment >= 0 ? '+' : ''}${earthRAAngle_geometryAdjustment.toFixed(6)}°`);
-        } else {
-          // Geometry is OK, use linear approximation for small adjustments
-          if (Math.abs(earthRAAngle_geometrySensitivity) > 0.001) {
-            earthRAAngle_geometryAdjustment = -geometryErrorDeg / earthRAAngle_geometrySensitivity;
-          }
+          console.log(`  ⚠️  Geometry error exceeds tolerance.`);
+          console.log(`      earthRAAngle is derived (2A − A²/ε = ${earthRAAngle.toFixed(6)}°), not directly adjustable.`);
+          console.log(`      To fix: adjust earthtiltMean or earthInvPlaneInclinationAmplitude.`);
           if (earthRAAngle_geometryAdjustment !== null) {
-            console.log(`    To fix geometry error: adjust earthRAAngle by ${earthRAAngle_geometryAdjustment >= 0 ? '+' : ''}${earthRAAngle_geometryAdjustment.toFixed(6)}°`);
-            console.log(`    Suggested earthRAAngle for geometry: ${(earthRAAngle + earthRAAngle_geometryAdjustment).toFixed(6)}°`);
+            console.log(`      (Equivalent earthRAAngle shift needed: ${earthRAAngle_geometryAdjustment >= 0 ? '+' : ''}${earthRAAngle_geometryAdjustment.toFixed(6)}°)`);
           }
+        } else {
+          console.log(`    earthRAAngle = ${earthRAAngle.toFixed(6)}° (derived: 2A − A²/ε)`);
         }
       }
 
@@ -18490,7 +18452,6 @@ async function findOptimalEarthRAAngle() {
   // Sensitivity constants (empirically derived)
   // earthRAAngle affects BOTH geometry (sun.dec) AND timing
   // correctionSun affects ONLY timing (Sun's orbital starting position)
-  const earthRAAngle_minPerDeg = 3708;  // 1° earthRAAngle ≈ 3708 min shift in solstice
   const correctionSun_minPerDeg = 365.25 * 24 * 60 / 360;  // ~1461 min/degree (Sun moves 360° in one year)
 
   // For obliquity parameters, we use analytical relationships from the model formula:
@@ -18552,130 +18513,30 @@ async function findOptimalEarthRAAngle() {
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Parameter roles:
-  // - earthRAAngle: affects BOTH geometry (sun.dec) AND timing
-  // - correctionSun: affects Sun RA position AND timing (optimized vs 26 JPL points, validated 1600-2200)
-  //
-  // Strategy: First fix geometry with earthRAAngle, then fix timing with correctionSun
+  // - earthRAAngle: DERIVED (2A − A²/ε) — not directly adjustable
+  // - correctionSun: Sun RA position + timing (optimized vs 26 JPL points, validated 1600-2200)
+  // - earthtiltMean / amplitude: affect obliquity, rate, AND geometry (via earthRAAngle derivation)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  const geometryAdjustment = earthRAAngle_geometryAdjustment || 0;
-
-  // Calculate suggested earthRAAngle for geometry (this is the primary constraint)
-  const suggestedRAAngle_forGeometry = earthRAAngle + geometryAdjustment;
-
-  // Geometry tolerance in degrees
-  const geometryTolerance = TOLERANCES.geometry / 3600;  // convert arcsec to degrees
-  let geometryRangeMin = null;
-  let geometryRangeMax = null;
-  if (earthRAAngle_geometrySensitivity && Math.abs(earthRAAngle_geometrySensitivity) > 0.001) {
-    geometryRangeMin = earthRAAngle + (geometryErrorDeg - geometryTolerance) / (-earthRAAngle_geometrySensitivity);
-    geometryRangeMax = earthRAAngle + (geometryErrorDeg + geometryTolerance) / (-earthRAAngle_geometrySensitivity);
-    if (geometryRangeMin > geometryRangeMax) {
-      [geometryRangeMin, geometryRangeMax] = [geometryRangeMax, geometryRangeMin];
-    }
-  }
-
-  // Check if geometry needs fixing (used in calculations below)
-  const geometryNeedsFix = Math.abs(geometryError) > TOLERANCES.geometry;
-
-  // Calculate suggested earthRAAngle considering BOTH geometry AND timing
-  // Strategy:
-  // - earthRAAngle must fix geometry (sun.dec = obliquity)
-  // - But we also want timing to be reasonable so correctionSun doesn't need huge adjustment
-  // - correctionSun has sensitivity ~1461 min/degree, max reasonable adjustment is ~0.5°
-  // - So timing error after earthRAAngle fix should be within ±730 min (correctable by correctionSun ±0.5°)
-
-  let suggestedRAAngle = suggestedRAAngle_forGeometry;
-  let optimalRAAngleAdj = geometryAdjustment;
-
-  // If geometry is already OK, keep current earthRAAngle
-  if (!geometryNeedsFix) {
-    suggestedRAAngle = earthRAAngle;
-    optimalRAAngleAdj = 0;
-  }
-
-  // Calculate timing error AFTER applying suggested earthRAAngle
-  let timingAfterGeometryFix = error2000 - (optimalRAAngleAdj * earthRAAngle_minPerDeg);
-
-  // If timing after geometry fix is way off, we need to find a better balance
-  // The geometry-based suggestion might not be accurate due to sensitivity measurement at wrong point
-  // Try to find earthRAAngle that gives both good geometry AND reasonable timing
-  const maxCorrectionSunAdjustment = 0.5;  // degrees
-  const maxTimingCorrectable = maxCorrectionSunAdjustment * correctionSun_minPerDeg;  // ~730 min
-
-  if (Math.abs(timingAfterGeometryFix) > maxTimingCorrectable && geometryNeedsFix) {
-    // The geometry-only fix leads to timing that can't be corrected by correctionSun
-    // This suggests the sensitivity measurement is inaccurate at this earthRAAngle value
-    // Fall back to calculating earthRAAngle from timing, then verify geometry
-    const timingBasedAdjustment = -error2000 / earthRAAngle_minPerDeg;
-    const timingBasedRAAngle = earthRAAngle + timingBasedAdjustment;
-
-    // Check if timing-based earthRAAngle is within geometry valid range
-    if (geometryRangeMin !== null && geometryRangeMax !== null) {
-      if (timingBasedRAAngle >= geometryRangeMin && timingBasedRAAngle <= geometryRangeMax) {
-        // Timing-based value is within geometry tolerance - use it
-        suggestedRAAngle = timingBasedRAAngle;
-        optimalRAAngleAdj = timingBasedAdjustment;
-        timingAfterGeometryFix = 0;
-      } else {
-        // Need a compromise - use edge of geometry range closest to timing-based value
-        if (timingBasedRAAngle < geometryRangeMin) {
-          suggestedRAAngle = geometryRangeMin;
-        } else {
-          suggestedRAAngle = geometryRangeMax;
-        }
-        optimalRAAngleAdj = suggestedRAAngle - earthRAAngle;
-        timingAfterGeometryFix = error2000 - (optimalRAAngleAdj * earthRAAngle_minPerDeg);
-      }
-    }
-  }
-
-  // Determine what else needs to be fixed
-  const timingNeedsFix = Math.abs(timingAfterGeometryFix) > TOLERANCES.timing;
+  const geometryNeedsFix = geometryError !== null && Math.abs(geometryError) > TOLERANCES.geometry;
+  const timingNeedsFix = Math.abs(error2000) > TOLERANCES.timing;
   const raNeedsFix = Math.abs(raErrorArcsec) > TOLERANCES.sunRA;
 
-  // Calculate correctionSun adjustment
-  // Strategy:
-  // - If earthRAAngle is being changed significantly, use TIMING-based correction
-  //   (because RA error measured with wrong earthRAAngle is meaningless)
-  // - Only use RA-based correction when geometry is already correct
-  let correctionSunAdjustment;
-  let correctionSunBasis;  // Track which method was used
+  // correctionSun adjustment: based on timing error
+  let correctionSunAdjustment = 0;
+  let correctionSunBasis = 'none';
 
-  // If we're making a significant earthRAAngle adjustment, RA measurement is unreliable
-  // Use timing-based correction instead
-  const significantGeometryAdjustment = Math.abs(optimalRAAngleAdj) > 0.01;  // More than 0.01° change
-
-  if (significantGeometryAdjustment) {
-    // earthRAAngle is being adjusted significantly - use timing-based correctionSun
-    // RA error is unreliable when orbital geometry is wrong
-    if (Math.abs(timingAfterGeometryFix) > TOLERANCES.timing) {
-      correctionSunAdjustment = -timingAfterGeometryFix / correctionSun_minPerDeg;
-      correctionSunBasis = 'timing (geometry adjustment)';
-    } else {
-      correctionSunAdjustment = 0;
-      correctionSunBasis = 'none (timing OK after geometry fix)';
-    }
-  } else if (timingNeedsFix) {
-    // Geometry is OK, but timing needs fixing
-    correctionSunAdjustment = -timingAfterGeometryFix / correctionSun_minPerDeg;
+  if (timingNeedsFix) {
+    correctionSunAdjustment = -error2000 / correctionSun_minPerDeg;
     correctionSunBasis = 'timing';
   } else if (raNeedsFix) {
-    // Both geometry and timing are OK, but RA is off
-    // Check if RA fix would break timing
     const timingImpactOfRAfix = Math.abs(correctionSunForRA * correctionSun_minPerDeg);
     if (timingImpactOfRAfix <= TOLERANCES.timing) {
       correctionSunAdjustment = correctionSunForRA;
       correctionSunBasis = 'RA';
     } else {
-      // RA fix would break timing - skip it
-      correctionSunAdjustment = 0;
       correctionSunBasis = 'none (RA fix would break timing)';
     }
-  } else {
-    // All are acceptable - no change needed
-    correctionSunAdjustment = 0;
-    correctionSunBasis = 'none';
   }
   const suggestedCorrectionSun = correctionSun + correctionSunAdjustment;
 
@@ -18684,27 +18545,20 @@ async function findOptimalEarthRAAngle() {
   const suggestedMean = earthtiltMean + optimalMeanAdjustment;
 
   console.log('');
-  console.log('  Parameter sensitivities:');
-  console.log(`    earthRAAngle: ${earthRAAngle_minPerDeg.toFixed(0)} min/degree (affects timing AND geometry)`);
+  console.log('  Sensitivities:');
   console.log(`    correctionSun: ${correctionSun_minPerDeg.toFixed(0)} min/degree (affects Sun RA AND timing)`);
   if (earthRAAngle_geometrySensitivity) {
-    console.log(`    earthRAAngle geometry: ${(earthRAAngle_geometrySensitivity * 3600).toFixed(2)}"/degree sun.dec`);
+    console.log(`    earthRAAngle geometry: ${(earthRAAngle_geometrySensitivity * 3600).toFixed(2)}"/degree sun.dec (derived, not adjustable)`);
   }
 
   console.log('');
   console.log('  Current status:');
-  console.log(`    Geometry error:     ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" ${geometryNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.geometry}")`);
-  console.log(`    Timing error:       ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min ${Math.abs(error2000) > TOLERANCES.timing ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.timing} min)`);
+  console.log(`    Geometry error:     ${geometryError !== null ? (geometryError >= 0 ? '+' : '') + geometryError.toFixed(2) + '"' : 'N/A'} ${geometryNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.geometry}")`);
+  console.log(`    Timing error:       ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min ${timingNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.timing} min)`);
   console.log(`    Sun RA error:       ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" (${raErrorTimeSec >= 0 ? '+' : ''}${raErrorTimeSec.toFixed(1)}s) ${raNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.sunRA}" = ${sunRA_timeSec.toFixed(0)}s)`);
   console.log(`    Obliquity error:    ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" ${obliquityNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquity}")`);
   console.log(`    Obliquity rate:     ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century ${obliquityRateNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.obliquityRate}"/century)`);
   console.log(`    Inclination error:  ${inclinationErrorDeg >= 0 ? '+' : ''}${inclinationErrorDeg.toFixed(5)}° ${inclinationNeedsFix ? '⚠️ NEEDS FIX' : '✓ OK'} (tolerance: ${TOLERANCES.inclination}°)`);
-
-  if (geometryRangeMin !== null) {
-    console.log('');
-    console.log(`  Valid earthRAAngle range for geometry (±${TOLERANCES.geometry}"):`);
-    console.log(`    ${geometryRangeMin.toFixed(6)}° to ${geometryRangeMax.toFixed(6)}°`);
-  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // PART 4: Suggested values
@@ -18715,9 +18569,7 @@ async function findOptimalEarthRAAngle() {
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   // Show what needs to be fixed
-  // Note: timingNeedsFix refers to timing AFTER geometry fix, not current timing
-  const currentTimingNeedsFix = Math.abs(error2000) > TOLERANCES.timing;
-  const allOK = !geometryNeedsFix && !currentTimingNeedsFix && !raNeedsFix && !obliquityNeedsFix && !obliquityRateNeedsFix && !inclinationNeedsFix;
+  const allOK = !geometryNeedsFix && !timingNeedsFix && !raNeedsFix && !obliquityNeedsFix && !obliquityRateNeedsFix && !inclinationNeedsFix;
 
   if (allOK) {
     console.log('');
@@ -18726,15 +18578,15 @@ async function findOptimalEarthRAAngle() {
     console.log('');
     if (geometryNeedsFix) {
       console.log(`⚠️  GEOMETRY needs correction (error > ${TOLERANCES.geometry}")`);
-      if (timingNeedsFix) {
-        console.log('    → This will also require TIMING correction via correctionSun');
-      }
+      console.log('    → Adjust earthtiltMean or amplitude (earthRAAngle is derived)');
     }
-    if (currentTimingNeedsFix && !geometryNeedsFix) {
+    if (timingNeedsFix) {
       console.log(`⚠️  TIMING needs correction (error > ${TOLERANCES.timing} min)`);
+      console.log('    → Adjust correctionSun (use optimizer tool)');
     }
-    if (raNeedsFix && !geometryNeedsFix) {
+    if (raNeedsFix && !timingNeedsFix) {
       console.log(`⚠️  SUN RA needs correction (error > ${TOLERANCES.sunRA}" = ${sunRA_timeSec.toFixed(0)}s)`);
+      console.log('    → Adjust correctionSun (use optimizer tool)');
     }
     if (obliquityNeedsFix) {
       console.log(`⚠️  OBLIQUITY needs correction (error > ${TOLERANCES.obliquity}")`);
@@ -18758,7 +18610,7 @@ async function findOptimalEarthRAAngle() {
   console.log('┌─────────────────────────────────────┬─────────────┬─────────────┬───────────┐');
   console.log('│ Parameter                           │ Current     │ Suggested   │ Change    │');
   console.log('├─────────────────────────────────────┼─────────────┼─────────────┼───────────┤');
-  console.log(`│ earthRAAngle (geometry+timing)      │ ${earthRAAngle.toFixed(6)}°   │ ${suggestedRAAngle.toFixed(6)}°   │ ${optimalRAAngleAdj >= 0 ? '+' : ''}${optimalRAAngleAdj.toFixed(6)}° │`);
+  console.log(`│ earthRAAngle (derived: 2A−A²/ε)    │ ${earthRAAngle.toFixed(6)}°   │  (derived)  │     —     │`);
   console.log(`│ correctionSun (RA+timing)           │ ${correctionSun >= 0 ? '+' : ''}${correctionSun.toFixed(6)}° │ ${suggestedCorrectionSun >= 0 ? '+' : ''}${suggestedCorrectionSun.toFixed(6)}° │ ${correctionSunAdjustment >= 0 ? '+' : ''}${correctionSunAdjustment.toFixed(6)}° │`);
   console.log('├─────────────────────────────────────┼─────────────┼─────────────┼───────────┤');
   console.log(`│ earthInvPlaneInclinationAmplitude   │ ${earthInvPlaneInclinationAmplitude.toFixed(6)}°   │ ${suggestedAmplitude.toFixed(6)}°   │ ${optimalAmpAdjustment >= 0 ? '+' : ''}${optimalAmpAdjustment.toFixed(6)}° │`);
@@ -18772,32 +18624,25 @@ async function findOptimalEarthRAAngle() {
   } else {
     console.log('Expected results after applying suggested values:');
     console.log(`  Correction basis: ${correctionSunBasis}`);
-    console.log(`  • Geometry error: ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" → ~0" (sun.dec = obliquity)`);
-    if (correctionSunBasis === 'RA') {
-      console.log(`  • Sun RA error:   ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" → ~0"`);
-    } else {
-      console.log(`  • Sun RA error:   ${raErrorArcsec >= 0 ? '+' : ''}${raErrorArcsec.toFixed(1)}" (will improve with correct geometry)`);
+    if (geometryNeedsFix) {
+      console.log(`  • Geometry error: ${geometryError >= 0 ? '+' : ''}${geometryError.toFixed(2)}" → adjust earthtiltMean/amplitude`);
     }
-    // Expected timing after BOTH earthRAAngle change and correctionSun adjustment:
-    // - earthRAAngle change: shifts timing by (optimalRAAngleAdj * earthRAAngle_minPerDeg)
-    // - correctionSun change: shifts timing by (correctionSunAdjustment * correctionSun_minPerDeg)
-    const timingShiftFromRAAngle = optimalRAAngleAdj * earthRAAngle_minPerDeg;
     const timingShiftFromCorrectionSun = correctionSunAdjustment * correctionSun_minPerDeg;
-    const expectedTiming = error2000 - timingShiftFromRAAngle + timingShiftFromCorrectionSun;
-    console.log(`  • Timing error:   ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min → ~${expectedTiming.toFixed(1)} min`);
-    console.log(`      (earthRAAngle: ${timingShiftFromRAAngle >= 0 ? '+' : ''}${timingShiftFromRAAngle.toFixed(1)} min, correctionSun: ${timingShiftFromCorrectionSun >= 0 ? '+' : ''}${timingShiftFromCorrectionSun.toFixed(1)} min)`);
-    console.log(`  • Obliquity:      ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" → ~0"`);
-    console.log(`  • Obliquity rate: ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century → ~0"/century`);
+    const expectedTiming = error2000 + timingShiftFromCorrectionSun;
+    console.log(`  • Timing error:   ${error2000 >= 0 ? '+' : ''}${error2000.toFixed(1)} min → ~${expectedTiming.toFixed(1)} min (correctionSun: ${timingShiftFromCorrectionSun >= 0 ? '+' : ''}${timingShiftFromCorrectionSun.toFixed(1)} min)`);
+    if (obliquityNeedsFix) console.log(`  • Obliquity:      ${obliquityErrorArcsec >= 0 ? '+' : ''}${obliquityErrorArcsec.toFixed(2)}" → ~0" (adjust earthtiltMean)`);
+    if (obliquityRateNeedsFix) console.log(`  • Obliquity rate: ${rateErrorArcsec >= 0 ? '+' : ''}${rateErrorArcsec.toFixed(2)}"/century → ~0"/century (adjust amplitude)`);
   }
 
   console.log('');
   console.log('HOW THE PARAMETERS WORK:');
-  console.log('  • earthRAAngle: Controls geometry (sun.dec at solstice) and timing (3708 min/deg).');
+  console.log('  • earthRAAngle = 2A − A²/ε (DERIVED, not directly adjustable)');
+  console.log('    Controls geometry (sun.dec at solstice). Changes via amplitude/mean.');
   console.log('  • correctionSun: Sun orbital starting angle. Controls Sun RA (optimized vs 26 JPL points,');
   console.log('    RMS 0.003°, validated 1600-2200). Also affects timing (1461 min/deg).');
-  console.log('  • Strategy: First set earthRAAngle for correct geometry + timing,');
-  console.log('              then fine-tune correctionSun with optimizer tool for best Sun RA.');
-  console.log('  • IMPORTANT: Changing correctionSun shifts timing, so earthRAAngle must be re-tuned afterwards.');
+  console.log('  • earthtiltMean: Obliquity mean value. 1:1 effect on obliquity at epoch.');
+  console.log('  • amplitude: Obliquity oscillation amplitude. Affects obliquity rate AND geometry.');
+  console.log('  • Strategy: Adjust mean/amplitude for obliquity+geometry, then optimize correctionSun.');
 
   console.log('');
   console.log('NOTE: Drift of ~' + driftPerYear.toFixed(1) + ' min/year is inherent to model year length');
@@ -18821,8 +18666,10 @@ async function findOptimalEarthRAAngle() {
       earthInvPlaneInclinationAmplitude: suggestedAmplitude,
       earthInvPlaneInclinationMean: suggestedInclinationMean,
       earthtiltMean: suggestedMean,
-      earthRAAngle: suggestedRAAngle,
       correctionSun: suggestedCorrectionSun
+    },
+    derived: {
+      earthRAAngle,  // 2A − A²/ε (not adjustable)
     },
     errors: {
       solstice2000: error2000,
@@ -18838,12 +18685,8 @@ async function findOptimalEarthRAAngle() {
       inclinationNeedsFix: inclinationNeedsFix
     },
     sensitivities: {
-      earthRAAngle_timing: earthRAAngle_minPerDeg,
       earthRAAngle_geometry: earthRAAngle_geometrySensitivity,
       correctionSun_timing: correctionSun_minPerDeg
-    },
-    ranges: {
-      geometryRange: { min: geometryRangeMin, max: geometryRangeMax }
     },
     reference: {
       earthInclinationJ2000: ASTRO_REFERENCE.earthInclinationJ2000_deg
@@ -33794,7 +33637,7 @@ function computeInclinationEarth(
 }
 
 // =============================================================================
-// PREDICTIVE FORMULA SYSTEM — Ported from docs/scripts/predictive_formula.py
+// PREDICTIVE FORMULA SYSTEM — Ported from scripts/predictive_formula.py
 // Calculates geocentric precession rate for any planet at any year
 // =============================================================================
 

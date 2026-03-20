@@ -123,7 +123,7 @@ across all precession phases.
 
 **Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
 by 310 arcsec. The correction was discovered through numerical analysis using
-the scene-graph tools (`tools/explore/derive-eoc-constants.js`).
+the scene-graph tools (`tools/fit/eoc-constants.js`).
 
 ### perihelionPhaseOffset
 
@@ -295,7 +295,7 @@ re-optimized to absorb this offset.
   - moveModel: ~line 29200 (equation of center gate and formula)
 - `tools/lib/constants.js`: lines 208-216 (derived constants)
 - `tools/lib/scene-graph.js`: line 399 (Sun eccentricity), line 547 (moveModel)
-- `tools/explore/derive-eoc-constants.js`: numerical verification script
+- `tools/fit/eoc-constants.js`: numerical verification script
 
 ---
 

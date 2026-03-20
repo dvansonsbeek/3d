@@ -213,14 +213,14 @@ Planet visual positions in the 3D scene are NOT corrected — the corrections ar
 
 | Tool | Purpose |
 |------|---------|
-| `tools/explore/fit-extended-correction.js` | Fit 15p/18p/24p/30p/36p/42p tiers, LOOCV/k-fold selection, output coefficients |
-| `tools/explore/archive/search-next-params.js` | Test 30 candidates as next parameter, ranked by LOOCV (superseded by greedy-forward-select) |
-| `tools/explore/greedy-forward-select.js` | Sequential best-3 selection per planet |
+| `tools/fit/parallax-correction.js` | Fit 15p/18p/24p/30p/36p/42p tiers, LOOCV/k-fold selection, output coefficients |
+| `tools/explore/archive/search-next-params.js` | Test 30 candidates as next parameter, ranked by LOOCV (superseded by parallax-greedy-select) |
+| `tools/fit/parallax-greedy-select.js` | Sequential best-3 selection per planet |
 
 After any change to the geometric model (startpos, EoC, dynamic tilt, holisticyearLength):
 
 ```bash
-node tools/explore/fit-extended-correction.js   # refit coefficients
+node tools/fit/parallax-correction.js   # refit coefficients
 # Copy output into constants.js and script.js
 node tools/optimize.js baseline all             # verify
 
@@ -256,7 +256,7 @@ The empirical approach works because it operates directly in RA/Dec output space
 
 ## 9. Reference Data
 
-Reference data in `config/reference-data.json` contains two tiers per planet:
+Reference data in `data/reference-data.json` contains two tiers per planet:
 
 - **Tier 2 (weight > 0)**: 41–3812 data points per planet, spanning ~1800–2200 for most planets (Uranus: 2000–2200 only). Sources include JPL Horizons API, NASA Mercury Transit Catalog, and Meeus opposition tables. RA/Dec in J2000 frame — the precession module (`tools/lib/precession.js`) converts to of-date frame before comparison with the model. Venus has been enriched to 3812 points (including IC-dense sampling near 125 inferior conjunctions). Jupiter and Saturn have been enriched to ~2500 points for robust higher-tier fitting.
 - **Tier 3 (weight = 0)**: Ancient observation data back to ~1000 BC from ISAW and mutual planetary event catalogs. Available for visual comparison but excluded from RMS calculations and parallax fitting.

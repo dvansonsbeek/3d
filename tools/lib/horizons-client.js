@@ -13,7 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const CACHE_PATH = path.join(__dirname, '..', '..', 'config', 'jpl-cache.json');
+const CACHE_PATH = path.join(__dirname, '..', '..', 'data', 'jpl-cache.json');
 
 // JPL Horizons target body codes (geocentric observer)
 const TARGET_CODES = {

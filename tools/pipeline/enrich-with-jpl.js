@@ -8,8 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const DATA_PATH = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
-const CACHE_PATH = path.join(__dirname, '..', '..', 'config', 'jpl-cache.json');
+const DATA_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
+const CACHE_PATH = path.join(__dirname, '..', '..', 'data', 'jpl-cache.json');
 
 // JPL Horizons command codes for geocentric queries
 const PLANET_CODES = {

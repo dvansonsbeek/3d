@@ -236,7 +236,7 @@ The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search
 - **Saturn-solo** — Saturn is the only planet at the 23° phase angle (all others at 203°)
 - **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
 
-These are overlapping, not nested, constraints (full analysis: [Appendix M (89)](89-configuration-analysis.js)):
+These are overlapping, not nested, constraints (full analysis: [Appendix M (89)](../tools/verify/configuration-analysis.js)):
 
 | Filter | Count | % of total |
 |--------|------:|------------|
@@ -280,7 +280,7 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 - The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 100%
 - Random eccentricity values in the same weight formula give 50–85% balance
 
-The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [Appendix N (90) — Eccentricity Balance](90-eccentricity-balance.js) for the quantitative analysis.
+The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [Appendix N (90) — Eccentricity Balance](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
 
 ### Finding 4: Saturn Eccentricity Prediction and Law Convergence
 
@@ -300,7 +300,7 @@ e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Why this is significant:** Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09 (a factor-of-9 dynamic range). Two structurally different Fibonacci constraints — one using only the Earth–Saturn pair, the other using all eight planets — independently predict a value within 0.3% of each other and within 0.25% of J2000 across this range. The Fibonacci divisors were originally chosen to match precession periods (Law 1) and inclination balance (Law 3); the eccentricity predictions were never optimized for. That two independent equations, drawing on different subsets of planetary data, converge on the same value confirms that the eccentricity balance is not an independent free parameter but an emergent consequence of the Fibonacci pair structure.
 
-**Epoch independence:** The convergence is not a coincidence of the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, the balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillates alone. At any epoch where all pairs have co-evolved, computing the "perfect-balance Saturn e" from the other seven planets' actual eccentricities yields a value within 0.2–0.4% of Saturn's actual eccentricity — the convergence is maintained structurally, not by chance of timing. Only configurations already near 100% balance produce corrections small enough for Law 4 to confirm independently; an 80% configuration would require a 33% correction that no independent law predicts. See [Appendix O (91) — Epoch Independence](91-epoch-independence.js) for the full analysis.
+**Epoch independence:** The convergence is not a coincidence of the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, the balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillates alone. At any epoch where all pairs have co-evolved, computing the "perfect-balance Saturn e" from the other seven planets' actual eccentricities yields a value within 0.2–0.4% of Saturn's actual eccentricity — the convergence is maintained structurally, not by chance of timing. Only configurations already near 100% balance produce corrections small enough for Law 4 to confirm independently; an 80% configuration would require a 33% correction that no independent law predicts. See [Appendix O (91) — Epoch Independence](../tools/verify/epoch-independence.js) for the full analysis.
 
 With dual-balanced eccentricities, the eccentricity balance reaches 100%. The model's eccentricities are optimized to satisfy both the inclination balance (Law 3) and eccentricity balance (Law 5) simultaneously. See [Appendix N (90) — Eccentricity Balance](90-eccentricity-balance.js) for the static analysis.
 
@@ -743,7 +743,7 @@ Verify that the 8 pair constraints (Law 4) plus Law 5 form an overconstrained sy
 
 ## Exhaustive Search and Preset Generation
 
-The Fibonacci divisor assignments are not hand-picked — they emerge from an exhaustive search over all possible configurations. The search script ([87-balance-search.js](87-balance-search.js)) reproduces the exact computation chain from `script.js` and evaluates every combination.
+The Fibonacci divisor assignments are not hand-picked — they emerge from an exhaustive search over all possible configurations. The search script ([balance-search.js](../tools/verify/balance-search.js)) reproduces the exact computation chain from `script.js` and evaluates every combination.
 
 ### Search Space
 
@@ -767,29 +767,29 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `public/input/balance-presets.json` containing all qualifying configurations sorted by balance (best first). The current run yields 755 presets across all four scenarios.
+The search writes `data/balance-presets.json` containing all qualifying configurations sorted by balance (best first). The current run yields 755 presets across all four scenarios.
 
 ### Important: Separate Input Values
 
-The search script (`87-balance-search.js`) and the application (`script.js`) each maintain their own copy of the planetary parameters (orbital periods, mass ratios, eccentricities, LL bounds, etc.). These are **not shared** — changing a value in one does not automatically update the other.
+The search script (`tools/verify/balance-search.js`) and the application (`script.js`) each maintain their own copy of the planetary parameters (orbital periods, mass ratios, eccentricities, LL bounds, etc.). These are **not shared** — changing a value in one does not automatically update the other.
 
-If any input value changes in `script.js` (e.g. a refined eccentricity or mass ratio), the same change must be manually applied in `87-balance-search.js` before regenerating presets. If the two files use different values, the presets will not match the Balance Explorer's live computation.
+If any input value changes in `script.js` (e.g. a refined eccentricity or mass ratio), the same change must be manually applied in `tools/verify/balance-search.js` before regenerating presets. If the two files use different values, the presets will not match the Balance Explorer's live computation.
 
 ### Regenerating Presets
 
 The presets are hardcoded into `script.js` as the `BALANCE_PRESETS` array, which populates the Balance Explorer dropdown. If planetary parameters change, follow these steps:
 
 ```bash
-# 1. Verify the input values in 87-balance-search.js match script.js
+# 1. Verify the input values in tools/verify/balance-search.js match script.js
 #    (orbital periods, mass ratios, eccentricities, LL bounds, etc.)
 
 # 2. Run the exhaustive search
-node docs/87-balance-search.js
+node tools/verify/balance-search.js
 
 # 3. Replace the BALANCE_PRESETS array in script.js with the new data
 node -e "
   const fs = require('fs');
-  const data = JSON.parse(fs.readFileSync('public/input/balance-presets.json'));
+  const data = JSON.parse(fs.readFileSync('data/balance-presets.json'));
   const src = fs.readFileSync('src/script.js', 'utf8');
   const re = /const BALANCE_PRESETS = \[[\s\S]*?\n\];/;
   const lines = data.presets.map(r => JSON.stringify(r));
@@ -856,12 +856,12 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [15 - Inclination Calculations](32-inclination-calculations.md) | Inclination oscillation implementation |
 | [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
-| [Appendix E (84) — Inclination Optimization](84-inclination-optimization.js) | Optimization script |
-| [Appendix K (87) — Balance Search](87-balance-search.js) | Exhaustive Fibonacci divisor search |
-| [Appendix L (88) — Verify Laws](88-verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
-| [Appendix M (89) — Configuration Analysis](89-configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
-| [Appendix N (90) — Eccentricity Balance](90-eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity, TNO closed-system argument |
-| [Appendix O (91) — Epoch Independence](91-epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
+| [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
+| [Balance Search](../tools/verify/balance-search.js) | Exhaustive Fibonacci divisor search |
+| [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
+| [Configuration Analysis](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
+| [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity, TNO closed-system argument |
+| [Epoch Independence](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 
 ---
 

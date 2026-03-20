@@ -2,7 +2,7 @@
 // Balance search TEST copy — for experimentation
 // Based on 87-balance-search.js but does NOT write output files
 //
-// Usage: node docs/87-balance-search.js
+// Usage: node tools/verify/balance-search.js
 // ═══════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

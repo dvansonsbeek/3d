@@ -303,7 +303,7 @@ volumes 10 and 13. These are Tier 1C data -- the most precise pre-telescope
 planetary measurements ever made (accuracy: 1-2 arcminutes).
 
 Imported via `tools/pipeline/import-tycho-mars.js`, stored in
-`config/reference-data.json` under `tier1_observations.tycho_mars`.
+`data/reference-data.json` under `tier1_observations.tycho_mars`.
 
 ### Results with current parameters
 

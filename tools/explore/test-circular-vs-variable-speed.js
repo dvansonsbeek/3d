@@ -46,7 +46,7 @@ const SG = require(path.join(__dirname, '..', 'lib', 'scene-graph.js'));
 
 const targetPlanet = (process.argv[2] || 'mercury').toLowerCase();
 
-const refDataPath = path.join(__dirname, '..', '..', 'config', 'reference-data.json');
+const refDataPath = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 const refData = JSON.parse(fs.readFileSync(refDataPath, 'utf-8'));
 
 const planetRef = refData.planets[targetPlanet];

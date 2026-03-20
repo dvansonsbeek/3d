@@ -186,7 +186,7 @@ Two numerical coincidences have been found relating K to the inclination constan
 - **ψ²/π** would imply eccentricity oscillations are a second-order effect of inclination coupling (ψ²), divided by π. However, π has no clear physical derivation in this context — why π and not 2π (full orbit) or 4π² (Kepler)?
 - **ψ^(11/5)** uses L₅/F₅ = 11/5, connecting the 5th Lucas number to the 5th Fibonacci number. This keeps everything in the Fibonacci/Lucas framework without transcendental constants, but 11 is not a Fibonacci number.
 
-Both are **noted as numerical coincidences**, not claimed as identities. Further investigation is needed. See [predict_tilt_from_eccentricity.py](scripts/predict_tilt_from_eccentricity.py) for full analysis.
+Both are **noted as numerical coincidences**, not claimed as identities. Further investigation is needed. See [predict_tilt_from_eccentricity.py](../scripts/predict_tilt_from_eccentricity.py) for full analysis.
 
 ### Tilt prediction from eccentricity
 
@@ -240,8 +240,8 @@ These 9 equations for 8 unknowns fully determine all planetary eccentricities wi
 
 - [Fibonacci Laws](10-fibonacci-laws.md) — Laws 4 and 5 (eccentricity constant and balance)
 - [Tilt and Balance Calculations](36-tilt-and-definitive-balance-calculations.md) — Detailed derivations
-- [Eccentricity Balance](90-eccentricity-balance.js) — Static analysis (Appendix N)
-- [fibonacci_eccentricity_scale.py](scripts/fibonacci_eccentricity_scale.py) — Full numerical exploration
-- [fibonacci_eccentricity_structure.py](scripts/fibonacci_eccentricity_structure.py) — Exhaustive search (10 directions)
-- [predict_tilt_from_eccentricity.py](scripts/predict_tilt_from_eccentricity.py) — K constant investigation and tilt prediction
+- [Eccentricity Balance](../tools/verify/eccentricity-balance.js) — Static analysis
+- [fibonacci_eccentricity_scale.py](../scripts/fibonacci_eccentricity_scale.py) — Full numerical exploration
+- [fibonacci_eccentricity_structure.py](../scripts/fibonacci_eccentricity_structure.py) — Exhaustive search (10 directions)
+- [predict_tilt_from_eccentricity.py](../scripts/predict_tilt_from_eccentricity.py) — K constant investigation and tilt prediction
 - **Interactive visualization**: Tools → "Eccentricity Balance Scale" in the 3D simulation

@@ -513,7 +513,7 @@ For our 200-year range, the simpler IAU 1976 model is adequate.
 
 ### Diagnostic Tools
 
-- `tools/explore/derive-eoc-fractions.js` -- derives optimal per-planet EoC fractions
+- `tools/fit/eoc-fractions.js` -- derives optimal per-planet EoC fractions
 - `tools/explore/test-circular-vs-variable-speed.js` -- confirms Type I/II are
   true circular, Type III needs EoC
 - `tools/explore/saturn-drift-analysis.js <planet>` -- validates RA/Dec against

@@ -90,7 +90,7 @@ All planets use one of two **universal phase angles** derived from the s₈ eige
 
 ### Inclination Constants
 
-All values derived from **Fibonacci Laws** (amplitude = ψ / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Appendix E (84)](84-inclination-optimization.js) and [Appendix F (85)](85-inclination-verification.js)):
+All values derived from **Fibonacci Laws** (amplitude = ψ / (d × √m)) with means computed for **exact J2000 invariable plane inclination match** (verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js)):
 
 For current values, see [Constants Reference](20-constants-reference.md).
 
@@ -418,12 +418,12 @@ The planet information panels display four invariable plane values:
 | [10 - Constants Reference](20-constants-reference.md) | All inclination and ascending node constants |
 | [14 - Ascending Node Calculations](31-ascending-node-calculations.md) | Ascending node precession |
 | [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
-| [Appendix A (80) — Ascending Node Optimization](80-ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
-| [Appendix C (82) — Ascending Node Verification](82-ascending-node-verification.js) | Verification that J2000-verified ascending nodes produce correct ecliptic inclinations |
-| [Appendix D (83) — Ascending Node Comparison](83-ascending-node-souami-souchay.js) | Comparison of S&S vs Verified ascending node accuracy |
-| [Appendix E (84) — Inclination Optimization](84-inclination-optimization.js) | Optimization script to calculate mean/amplitude values |
-| [Appendix F (85) — Inclination Verification](85-inclination-verification.js) | Verification script for mean/amplitude values |
-| [Appendix B (81) — Analytical Ascending Nodes](81-analytical-ascending-nodes.js) | Analytical (closed-form) calculation of ascending nodes |
+| [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
+| [Ascending Node Verification](../tools/verify/ascending-node-verification.js) | Verification that J2000-verified ascending nodes produce correct ecliptic inclinations |
+| [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) | Comparison of S&S vs Verified ascending node accuracy |
+| [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script to calculate mean/amplitude values |
+| [Inclination Verification](../tools/verify/inclination-verification.js) | Verification script for mean/amplitude values |
+| [Analytical Ascending Nodes](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation of ascending nodes |
 
 ---
 

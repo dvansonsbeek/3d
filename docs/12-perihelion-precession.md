@@ -175,7 +175,7 @@ This method reads directly from `precessionLayer.orbitObj.rotation.y`, which rep
 - Dynamic — updates with the current simulation year
 - Analytical — no need to sample the simulation over centuries
 - Covers all 7 planets (Mercury through Neptune)
-- Ported from Python (`docs/scripts/predictive_formula.py`)
+- Ported from Python (`tools/lib/python/predictive_formula.py`)
 
 | Metric | Mercury Example |
 |--------|-----------------|
@@ -322,7 +322,7 @@ Both values are shown in the "Perihelion Planets" folder for each planet:
 - [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) - Mercury precession analysis
 - [21-orbital-formulas-reference.md](21-orbital-formulas-reference.md) - Orbital mechanics calculations
 - [04-dynamic-elements-overview.md](04-dynamic-elements-overview.md) - Earth precession layer documentation
-- [Appendix G (86) — Mercury Precession Centuries](86-mercury-precession-centuries.js) - Precession rates by century (1800-2100)
+- [Mercury Precession Centuries](../tools/verify/mercury-precession-centuries.js) - Precession rates by century (1800-2100)
 
 ---
 

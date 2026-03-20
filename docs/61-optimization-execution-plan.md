@@ -672,10 +672,10 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 #### Phase 3 Checkpoint (completed)
 
 ##### What was built:
-1. **`tools/export-reference-data.js`** — Parses PLANET_TEST_DATES from script.js (regex, not eval), assigns tier/weight/source/reliability metadata per entry, outputs `config/reference-data.json`
-2. **`tools/enrich-with-jpl.js`** — Queries JPL Horizons REST API for missing RA/Dec values on all Tier 2 entries, with response caching (`config/jpl-cache.json`) and 1 req/sec rate limiting
-3. **`config/reference-data.json`** — The compiled reference dataset with 678 entries fully annotated
-4. **`config/jpl-cache.json`** — Cached JPL Horizons responses (288 entries) for reproducibility
+1. **`tools/export-reference-data.js`** — Parses PLANET_TEST_DATES from script.js (regex, not eval), assigns tier/weight/source/reliability metadata per entry, outputs `data/reference-data.json`
+2. **`tools/enrich-with-jpl.js`** — Queries JPL Horizons REST API for missing RA/Dec values on all Tier 2 entries, with response caching (`data/jpl-cache.json`) and 1 req/sec rate limiting
+3. **`data/reference-data.json`** — The compiled reference dataset with 678 entries fully annotated
+4. **`data/jpl-cache.json`** — Cached JPL Horizons responses (288 entries) for reproducibility
 
 ##### Key results:
 - 678 entries parsed from PLANET_TEST_DATES across 10 bodies (mercury through eros)
@@ -703,7 +703,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Accuracy: 1-2 arcminutes (0.017-0.033°) — the most precise pre-telescope planetary measurements
 - Data type: declination only (no RA); 322 negative (south), 601 positive (north)
 - Dec range: -27.98° to +27.30°; JD range: 2299198.5 to 2305532.88
-- Files: `config/tycho-mars-raw.csv` (raw CSV), `tools/import-tycho-mars.js` (parser)
+- Files: `data/tycho-mars-raw.csv` (raw CSV), `tools/import-tycho-mars.js` (parser)
 - Densest coverage: 1595 (294 obs), 1593 (135 obs), 1591 (104 obs)
 - These are **positionReliable: true** — actual measurements, not computed from ephemeris
 
@@ -719,7 +719,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 **Phase 3 is COMPLETE.** Reference data compiled with tiered observation system. Proceed to Phase 4 (Update PLANET_TEST_DATES with Tier System).
 
 ### Phase 3: Compile Reference Data (`reference-data.json`)
-**Files:** `config/reference-data.json`
+**Files:** `data/reference-data.json`
 **Effort:** Medium
 **Risk:** Low
 **Prerequisite:** Must be done before any optimization
@@ -994,7 +994,7 @@ The growing errors at historical dates are the **model's own prediction error** 
 
 - Implement REST client with `fetch` (Node.js 18+)
 - Response parser for RA/Dec extraction
-- Result caching to `config/reference-cache.json`
+- Result caching to `data/reference-cache.json`
 - Rate limiting (avoid hammering NASA's servers)
 
 #### Phase 7 Checkpoint (completed)
@@ -1008,7 +1008,7 @@ The growing errors at historical dates are the **model's own prediction error** 
 
 **Features:**
 - Uses Node.js built-in `fetch` (no dependencies)
-- Disk cache at `config/jpl-cache.json` (shared with pipeline scripts, 288+ pre-existing entries)
+- Disk cache at `data/jpl-cache.json` (shared with pipeline scripts, 288+ pre-existing entries)
 - 200ms rate limiting between API calls
 - Batch grouping: uncached dates grouped into batches of 50, cached dates returned instantly
 - Parses `$$SOE`..`$$EOE` block from JPL JSON response
@@ -1181,7 +1181,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 - Fetches geocentric astrometric RA/Dec from JPL Horizons at 26 yearly dates (2000-2025)
 - Consistent date coverage across all targets — enables apples-to-apples comparison
 - Dates are June 21 each year (aligned with model start epoch)
-- Results cached in `config/jpl-cache.json` for reproducibility
+- Results cached in `data/jpl-cache.json` for reproducibility
 
 **Metrics computed per target:**
 - **RMS RA** — root-mean-square RA error in degrees (weighted by entry weight)
@@ -1322,14 +1322,14 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 - Two free parameters eliminated: eocEccentricity and perihelionPhaseOffset are now pure physics derivations
 - Sun RMS: **0.003°** — 20× improvement from 0.065° (with IAU precession frame correction)
 - Validated across 600 years (1600-2200) with only ~0.23 arcsec/century drift from slight precession rate mismatch
-- Full derivation analysis: `tools/explore/derive-eoc-constants.js`
+- Full derivation analysis: `tools/fit/eoc-constants.js`
 - Documentation: `docs/65-equation-of-center.md`
 
 **Steps 3-7 results — Planet optimization campaign:**
 
 The remaining steps were executed as a systematic campaign covering:
 
-1. **Per-planet EoC fractions** (Type I/II/III): Derived empirically via `tools/explore/derive-eoc-fractions.js`. Each planet gets `eocFraction × orbitalEccentricityBase` as its effective EoC eccentricity.
+1. **Per-planet EoC fractions** (Type I/II/III): Derived empirically via `tools/fit/eoc-fractions.js`. Each planet gets `eocFraction × orbitalEccentricityBase` as its effective EoC eccentricity.
 
 2. **Orbital period calibration**: `solarYearInput` values tuned using ISAW ancient observation data (800 BCE–1650 CE) to minimize long-term drift. See `docs/68-orbital-period-calibration.md`.
 

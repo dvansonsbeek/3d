@@ -44,7 +44,7 @@ The model implements six laws connecting planetary orbital parameters through pu
 
 The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 755 candidate configurations, only one satisfies all six laws simultaneously.
 
-See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [Appendix L (88)](docs/88-verify-laws.js) for comprehensive verification (49/49 checks pass).
+See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/49 checks pass).
 
 ---
 
@@ -66,7 +66,8 @@ For more details see [holisticuniverse.com](https://holisticuniverse.com).
 ## Quick Start
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Node.js](https://nodejs.org/) (v16 or higher) — for the simulation and optimization tools
+- [Python 3](https://www.python.org/) (optional) — only needed for the statistical analysis scripts in `scripts/`
 
 ### Installation
 
@@ -89,6 +90,15 @@ npm run dashboard          # start dashboard at http://localhost:5050
 ```
 
 Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV export, range presets (Full H, H/3, H/5, H/8, H/13, H/16), and obliquity decomposition for Earth.
+
+### Python Analysis Scripts (Optional)
+
+The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis). To use them:
+
+```bash
+pip install -r requirements.txt   # numpy, pandas, openpyxl
+python3 scripts/fibonacci_significance.py
+```
 
 ### Build for Production
 
@@ -130,7 +140,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 80–99 | Appendices | Code scripts and data spreadsheets |
 
 **Investigation & Verification:**
-- [Python Scripts](docs/scripts/) — Statistical significance tests, perihelion precession analysis, exoplanet Fibonacci tests, and predictive formula system
+- [Python Scripts](scripts/) — Statistical significance tests, perihelion precession analysis, exoplanet Fibonacci tests, and predictive formula system
 
 ---
 

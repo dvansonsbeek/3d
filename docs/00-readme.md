@@ -112,22 +112,22 @@ Documents are organized in numbered ranges by category, with gaps for future add
 
 ### 80–99 Appendices
 
-**Code scripts (80–97)** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node docs/<filename>`.
+**Verification scripts** — standalone Node.js scripts that verify, compute, or analyze model parameters. Run with `node tools/verify/<filename>`.
 
-| # | Script | Description |
-|---|--------|-------------|
-| 80 | [Ascending Node Optimization](80-ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
-| 81 | [Analytical Ascending Nodes](81-analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
-| 82 | [Ascending Node Verification](82-ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
-| 83 | [Ascending Node Comparison](83-ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
-| 84 | [Inclination Computation](84-inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
-| 85 | [Inclination Verification](85-inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
-| 86 | [Mercury Precession](86-mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| 87 | [Balance Search](87-balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; generates balance-presets.json |
-| 88 | [Verify Laws](88-verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions (49 checks) |
-| 89 | [Configuration Analysis](89-configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
-| 90 | [Eccentricity Balance](90-eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity analysis |
-| 91 | [Epoch Independence](91-epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
+| Script | Description |
+|--------|-------------|
+| [ascending-node-optimization.js](../tools/verify/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
+| [analytical-ascending-nodes.js](../tools/verify/analytical-ascending-nodes.js) | Analytical (closed-form) calculation using spherical trigonometry |
+| [ascending-node-verification.js](../tools/verify/ascending-node-verification.js) | Verifies J2000-verified values produce correct ecliptic inclinations |
+| [ascending-node-souami-souchay.js](../tools/verify/ascending-node-souami-souchay.js) | Compares Souami & Souchay original vs verified ascending node accuracy |
+| [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
+| [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
+| [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
+| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; generates data/balance-presets.json |
+| [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions (49 checks) |
+| [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
+| [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity analysis |
+| [epoch-independence.js](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 
 > **Note:** Scripts 80 and 81 calculate the same ascending node values using different methods (numerical vs analytical). Both produce identical results, proving the geometric validity of the approach.
 
@@ -135,8 +135,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 
 | # | File | Description |
 |---|------|-------------|
-| 98 | [Holistic Year Objects Data](98-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning one complete Holistic Year |
-| 99 | [Holistic Year Analysis Data](99-holistic-year-analysis.xlsx) | 64 time-points for year-length analysis spanning one complete Holistic Year |
+| 98 | [Holistic Year Objects Data](../data/01-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning one complete Holistic Year |
 
 ---
 
@@ -183,21 +182,34 @@ Scripts that fetch, enrich, and export reference data from JPL Horizons:
 
 ### `tools/explore/` — Investigation Scripts
 
-Ad-hoc analysis and exploration scripts used during development. These are not part of the core tool but document the investigative process:
+Ad-hoc analysis and exploration scripts used during development:
 
 | File | Description |
 |------|-------------|
-| `derive-eoc-constants.js` | Derive Equation of Center constants from first principles |
-| `derive-eoc-fractions.js` | Derive per-planet EoC fractions from reference data |
 | `conjunction-finder.js` | Find planetary conjunctions and validate against observations |
 | `resonance-loop.js` | Saturn–Jupiter–Earth resonance loop analysis (Law 6) |
 | `year-lengths.js` | Measure tropical/sidereal/anomalistic year lengths |
-| `fit-extended-correction.js` | Fit extended parallax correction coefficients |
-| `greedy-forward-select.js` | Greedy forward selection for parallax model terms |
 | `moon-cycles.js` | Moon cycle analysis (synodic, anomalistic, nodal) |
-| ... | And ~15 more investigation scripts |
+| ... | And ~10 more investigation scripts |
 
-### `config/` — Runtime Data
+### `tools/fit/` — Fitting & Derivation Scripts
+
+Centralized scripts for fitting harmonics, deriving constants, and generating training data.
+Run in dependency order when model parameters change (see `tools/fit/README.md`).
+
+| File | Description |
+|------|-------------|
+| `export-cardinal-points.js` | Generate cardinal point training data (CSV) from scene-graph |
+| `obliquity-harmonics.js` | Fit 12-harmonic obliquity formula |
+| `cardinal-point-harmonics.js` | Fit 12-harmonic JD formula per cardinal point |
+| `eoc-constants.js` | Derive Equation of Center constants from first principles |
+| `eoc-fractions.js` | Derive per-planet EoC fractions from reference data |
+| `perihelion-offset.js` | Derive perihelion phase offset analytically |
+| `parallax-correction.js` | Fit extended parallax correction coefficients (up to 42p) |
+| `parallax-greedy-select.js` | Greedy forward selection for parallax model terms |
+| `ascnode-correction.js` | Optimize ascending node tilt corrections |
+
+### `data/` — Runtime Data
 
 | File | Description |
 |------|-------------|
@@ -205,23 +217,21 @@ Ad-hoc analysis and exploration scripts used during development. These are not p
 | `jpl-cache.json` | Cached JPL Horizons API responses |
 | `tycho-mars-raw.csv` | Tycho Brahe's Mars opposition observations (1580–1600) |
 
-### `docs/scripts/` — Python Analysis
+### `scripts/` — Python Analysis
 
-Statistical analysis and verification scripts. Install dependencies with `pip install -r docs/scripts/requirements.txt`.
+Statistical analysis and verification scripts. Install dependencies with `pip install -r requirements.txt`.
 
 | File | Description |
 |------|-------------|
-| `constants_scripts.py` | Shared constants and planet data for all Python scripts |
 | `fibonacci_significance.py` | Fisher's exact test for statistical significance of Fibonacci structure |
 | `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
 | `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
 | `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
 | `fibonacci_law4_verify.py` | Law 4 (eccentricity constant) verification |
-| `observed_formula.py` | Fit observed orbital element formulas |
-| `predictive_formula.py` | Predictive formula system for orbital elements |
-| `*_coeffs.py` | Per-planet Fourier coefficient fitting (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune) |
 
-See the [Python Scripts README](scripts/README.md) and [Predictive Formula Guide](scripts/PREDICTIVE_FORMULA_GUIDE.mdx) for details.
+> The shared Python library (`constants_scripts.py`, `predictive_formula.py`, `observed_formula.py`, `coefficients/`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
+
+See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Guide](../tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) for details.
 
 ---
 

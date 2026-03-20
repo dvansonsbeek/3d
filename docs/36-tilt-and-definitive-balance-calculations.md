@@ -198,7 +198,7 @@ and therefore the most significant eccentricity oscillations.
   - Venus: JPL data (−9000 to +9000, 100-year steps) fitted cosine gives
     amplitude 1.084e-3 vs tilt prediction 9.625e-4 (ratio 1.13x).
     Fitted mean = 0.00619052.
-  - Script: `docs/scripts/planet_eccentricity_jpl.py`
+  - Script: `tools/fit/python/planet_eccentricity_jpl.py`
 - **Mercury**: JPL J2000 value (tilt = 0.03°, essentially no fluctuation)
 - **Neptune**: Solved algebraically for exact 100% Law 5 balance
 
@@ -533,17 +533,17 @@ their effect on Law 5 weights is negligible for the dominant planets.
 | eccentricityAmplitudeK (K)           | tools/lib/constants.js      | 66          |
 | orbitalEccentricityAmplitude (per planet) | tools/lib/constants.js  |             |
 | axialTiltMean (per planet)           | tools/lib/constants.js      |             |
-| Balance search script                 | docs/87-balance-search.js   |             |
-| Eccentricity balance script           | docs/90-eccentricity-balance.js |         |
-| JPL eccentricity cosine fit          | docs/scripts/planet_eccentricity_jpl.py | |
-| JPL eccentricity cache               | docs/scripts/planet_eccentricity_cache.json | |
+| Balance search script                 | tools/verify/balance-search.js |          |
+| Eccentricity balance script           | tools/verify/eccentricity-balance.js |    |
+| JPL eccentricity cosine fit          | tools/fit/python/planet_eccentricity_jpl.py | |
+| JPL eccentricity cache               | data/planet_eccentricity_cache.json | |
 
 ---
 
 ## 13. Verification Scripts
 
-Run `node docs/90-eccentricity-balance.js` to verify Law 5 balance with current
+Run `node tools/verify/eccentricity-balance.js` to verify Law 5 balance with current
 dual-balanced eccentricities.
 
-Run `node docs/87-balance-search.js` to perform exhaustive balance search across
+Run `node tools/verify/balance-search.js` to perform exhaustive balance search across
 all Fibonacci d-value combinations.

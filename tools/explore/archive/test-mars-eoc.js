@@ -15,7 +15,7 @@ const origConst = fs.readFileSync(constPath, 'utf8');
 // Write eval script
 fs.writeFileSync(evalPath, `
 const sg = require('${sgPath}');
-const refData = JSON.parse(require('fs').readFileSync('${path.join(ROOT, 'config/reference-data.json')}', 'utf8'));
+const refData = JSON.parse(require('fs').readFileSync('${path.join(ROOT, 'data/reference-data.json')}', 'utf8'));
 const marsRefs = refData.planets.mars;
 let sumSqRA = 0, sumSqDec = 0, n = 0;
 for (const ref of marsRefs) {

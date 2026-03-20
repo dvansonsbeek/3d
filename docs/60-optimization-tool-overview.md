@@ -471,7 +471,7 @@ tools/
     reference-data.js      -- Tiered reference data loader with reliability scores
     optimizer.js           -- Sensitivity scan, Nelder-Mead, residual analysis
     reporter.js            -- Formatted output (tables, JSON, error statistics)
-  config/
+  data/
     parameters.json        -- Current parameter set (read/write by optimizer)
     reference-cache.json   -- Cached JPL Horizons API results
     reference-data.json    -- Compiled reference data with tier/weight per entry

@@ -202,6 +202,6 @@ This fundamental difference explains why no single eccentricity constant exists.
 - [Fibonacci Laws](10-fibonacci-laws.md) — Laws 4 and 5 (eccentricity constant and balance)
 - [Eccentricity Balance Scale](38-eccentricity-scale.md) — The balance scale visualization and interpretation
 - [Tilt and Balance Calculations](36-tilt-and-definitive-balance-calculations.md) — Detailed derivations
-- [fibonacci_eccentricity_structure.py](scripts/fibonacci_eccentricity_structure.py) — Exhaustive 10-direction exploration with statistical significance tests
-- [fibonacci_eccentricity_scale.py](scripts/fibonacci_eccentricity_scale.py) — Balance scale numerical exploration
+- [fibonacci_eccentricity_structure.py](../scripts/fibonacci_eccentricity_structure.py) — Exhaustive 10-direction exploration with statistical significance tests
+- [fibonacci_eccentricity_scale.py](../scripts/fibonacci_eccentricity_scale.py) — Balance scale numerical exploration
 - **Interactive visualization**: Tools → "Eccentricity Balance Scale" in the 3D simulation
