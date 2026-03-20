@@ -136,15 +136,11 @@ Obliquity oscillates with Fibonacci-predicted periods (see [doc 37](../../../doc
 ```python
 from predictive_formula import calc_obliquity
 
-# Primary obliquity — 12-harmonic formula, RMSE 1.45 arcsec
+# Primary obliquity — 12-harmonic formula, RMSE ~0.005 arcsec
 obliq = calc_obliquity(2000)  # 23.439640° at J2000
 ```
 
-The mean is **derived at import** (not hardcoded) from the Pythagorean tilt model:
-```
-mean = <sqrt((earthtiltMean + δε)² + (earthRAAngle·cos(H/16))² + (inclMean·sin(H/5))²)>
-```
-The perpendicular tilts (earthRAAngle in the tilta direction, inclination mean in the ecliptic plane) increase measured obliquity via the Pythagorean effect, adding +0.040° (143") to the geometric mean. The 12 harmonic coefficients are fitted from simulation data. See [doc 14 §4](../../../docs/14-solstice-prediction.md) for the full derivation.
+The mean (`SOLSTICE_OBLIQUITY_MEAN_FITTED` = 23.4534°) is a data-derived constant stored in `fitted-coefficients.json`. It represents the solstice-instant mean obliquity, which differs from the Pythagorean time-average by ~1.5" due to the instantaneous measurement geometry at solstice. The 12 harmonic coefficients are fitted from simulation data. See [doc 14 §4](../../../docs/14-solstice-prediction.md) for the full derivation.
 
 For H/3 vs H/8 component decomposition (dashboard charts), use `computeObliquityIntegrals()` in the orbital engine.
 
@@ -214,8 +210,11 @@ This will:
 
 ### 4. Update JavaScript
 
-No manual step needed — `tools/lib/constants/fitted-coefficients.js` automatically reads
+The tooling side is automatic — `tools/lib/constants/fitted-coefficients.js` reads
 the coefficient files from `tools/lib/python/coefficients/` at require-time.
+
+For the browser (`src/script.js`), the PREDICT_COEFFS arrays are currently embedded
+directly in the script and not yet synced by `export-to-script.js`.
 
 ### 5. Validate Results
 
@@ -295,15 +294,7 @@ To add features to the model:
 
 ### Adding a New Planet
 
-1. Add planet configuration to `PLANETS` dict in `predictive_formula.py`:
-   ```python
-   'newplanet': {
-       'name': 'NewPlanet',
-       'period': H * fraction,  # Derived from H
-       'theta0': xxx.xxxxx,     # J2000 perihelion longitude
-       'baseline': 1296000 / period * 100,  # or negative for retrograde
-   }
-   ```
+1. Add planet to `model-parameters.json` (with `perihelionEclipticFraction`) and `astro-reference.json` (with `longitudePerihelion`). The `PLANETS` dict in `predictive_formula.py` reads `period`, `theta0`, and `baseline` from `constants_scripts.py` (via `PERIHELION_ECLIPTIC_YEARS` and `LONGITUDE_PERIHELION` dicts), so no hardcoded values are needed.
 
 2. Add column to `data/01-holistic-year-objects-data.xlsx`: `NewPlanet Precession Fluctuation`
 

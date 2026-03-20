@@ -3,6 +3,12 @@
 All scripts that produce fitted coefficients or derived constants live here.
 Output values are stored in `public/input/fitted-coefficients.json`.
 
+## `--write` flag convention
+
+All fitting scripts support **dry run** by default (print results only).
+Add `--write` to actually update the JSON source-of-truth files.
+After writing, run `export-to-script.js --write` to sync values to `src/script.js`.
+
 ## Scripts
 
 | Script | Produces | Data source |
@@ -22,6 +28,8 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 | `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
+| `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
+| `verify-pipeline.js` | Pass/fail verification of all 9 targets | Scene-graph simulation |
 
 Note: `eoc-constants.js` and `perihelion-offset.js` are **informational/exploratory** only —
 `eocEccentricity` and `perihelionPhaseOffset` are already derived analytically in `constants.js`
@@ -133,7 +141,23 @@ Step 12: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
 
 Step 13: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
          Updates: fitted-coefficients.json (auto-updated by script)
+
+── Phase 6: Sync & verify ─────────────────────────────────────────
+
+Step 14: export-to-script.js --write          → src/script.js
+         Reads all 4 JSON files and patches corresponding values in script.js.
+         Handles: scalar consts, planet properties, arrays (harmonics, Moon tables),
+         objects (parallax corrections, cardinal point harmonics).
+         Dry run (no --write) shows diffs without changing script.js.
+
+Step 15: verify-pipeline.js                   → pass/fail
+         Runs scene-graph simulation for all 9 targets (Sun, Moon, 7 planets)
+         and verifies RMS errors are within tolerance.
 ```
+
+Note: `export-to-script.js --write` should be run after any `--write` step that
+updates a JSON file. The browser simulation (`src/script.js`) cannot load JSON
+at runtime, so all values must be patched into the script.
 
 Note: `data/03-year-length-analysis.xlsx` (491 pts, 100-yr steps) is also exported
 from the browser GUI (Menu: Analysis → Year Length Report) and used by step 10.
@@ -161,49 +185,62 @@ Only needs regenerating if H or year-length-affecting parameters change.
 
 ## How to run
 
+All scripts default to **dry run** (print only). Add `--write` to update JSON files.
+After each `--write` step, run `export-to-script.js --write` to sync to `src/script.js`.
+
 ```bash
 # Phase 0: Sun optimizer & planet alignment
-node tools/optimize.js optimize sun correctionSun
+node tools/optimize.js optimize sun correctionSun --write
 # For each planet (mercury, venus, mars, jupiter, saturn, uranus, neptune):
-node tools/optimize.js optimize mercury startpos
-node tools/optimize.js optimize venus startpos
-node tools/optimize.js optimize mars startpos
-node tools/optimize.js optimize jupiter startpos
-node tools/optimize.js optimize saturn startpos
-node tools/optimize.js optimize uranus startpos
-node tools/optimize.js optimize neptune startpos
+node tools/optimize.js optimize mercury startpos --write
+node tools/optimize.js optimize venus startpos --write
+node tools/optimize.js optimize mars startpos --write
+node tools/optimize.js optimize jupiter startpos --write
+node tools/optimize.js optimize saturn startpos --write
+node tools/optimize.js optimize uranus startpos --write
+node tools/optimize.js optimize neptune startpos --write
 # Moon
-node tools/fit/moon-eclipse-optimizer.js
+node tools/fit/moon-eclipse-optimizer.js --write
+# Sync to script.js
+node tools/fit/export-to-script.js --write
 
 # Phase 1: Generate input data (manual)
 # Export from browser: Analysis → Export Objects Report → save as data/01-holistic-year-objects-data.xlsx
 
 # Phase 2: Earth orbital geometry
-python3 tools/fit/python/fit_perihelion_harmonics.py
-python3 tools/fit/python/verify_perihelion_erd.py   # must pass before continuing
+cd tools/fit/python && python3 fit_perihelion_harmonics.py --write && cd ../../..
+cd tools/fit/python && python3 verify_perihelion_erd.py && cd ../../..   # must pass before continuing
+node tools/fit/export-to-script.js --write
 
 # Phase 3: Planet precession predictions
-python3 tools/fit/python/train_precession.py
-python3 tools/fit/python/train_observed.py
+cd tools/fit/python && python3 train_precession.py --write && cd ../../..
+cd tools/fit/python && python3 train_observed.py --write && cd ../../..
 
 # Phase 4: Planet positions & corrections
 node tools/fit/eoc-fractions.js
 node tools/fit/ascnode-correction.js
-node tools/fit/parallax-correction.js
+node tools/fit/parallax-correction.js --write
+node tools/fit/export-to-script.js --write
 
 # Phase 5: Cardinal point data & harmonics
 node tools/fit/export-cardinal-points.js
-node tools/fit/obliquity-harmonics.js
-node tools/fit/cardinal-point-harmonics.js
-node tools/fit/year-length-harmonics.js
+node tools/fit/obliquity-harmonics.js --write
+node tools/fit/cardinal-point-harmonics.js --write
+node tools/fit/year-length-harmonics.js --write
+
+# Phase 6: Sync & verify
+node tools/fit/export-to-script.js --write
+node tools/fit/verify-pipeline.js
 ```
 
 ## Where outputs are stored
 
 | Output type | Location |
 |-------------|----------|
+| Model parameters (JSON) | `public/input/model-parameters.json` ← single source of truth |
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
+| Browser simulation | `src/script.js` ← patched by `export-to-script.js` |
 | Training data (CSV/JSON) | `data/02-cardinal-points.csv`, `data/cardinal-points-training.json` |
 
 ## Single source of truth — JSON files
@@ -220,29 +257,45 @@ All input data lives in 4 JSON files in `public/input/`:
 ## Constants flow
 
 ```
-public/input/
+public/input/ (single source of truth)
     ├── model-parameters.json     ← Model parameters (H, corrections, planet configs)
     ├── astro-reference.json      ← External reference data (IAU, JPL, Meeus)
     ├── fitted-coefficients.json  ← Fitting pipeline output (harmonics, parallax)
     └── meeus-lunar-tables.json   ← Moon Meeus Ch. 47 tables
-         ↓ JSON.parse (loaded at require-time)
-tools/lib/constants.js            ← Builds all constants from JSON + derived values
-tools/lib/constants/
-    ├── fitted-coefficients.js    ← Loads fitted JSON + buildFittedCoefficients()
-    └── utils.js                  ← Date/formatting/derivation helpers
-         ↓ Node.js JSON dump (_dump_constants.js)
-tools/fit/python/load_constants.py  ← Python bridge (auto-sync)
-    ↓ import
-tools/lib/python/constants_scripts.py    ← Python physics library
-    ↓ import
-tools/lib/python/predictive_formula.py   ← Predictive formulas
-tools/lib/python/observed_formula.py     ← Observed formulas
+         │
+         ├──→ JSON.parse (loaded at require-time)
+         │    tools/lib/constants.js            ← Builds all constants + derived values
+         │    tools/lib/constants/
+         │        ├── fitted-coefficients.js    ← Loads fitted JSON + buildFittedCoefficients()
+         │        └── utils.js                  ← Derivation helpers (orbitTilt, inclination, etc.)
+         │         ↓ Node.js JSON dump
+         │    tools/fit/python/_dump_constants.js  ← Exports constants as JSON to stdout
+         │         ↓ subprocess (Node.js invoked by Python)
+         │    tools/fit/python/load_constants.py   ← Python bridge: calls _dump_constants.js
+         │         ↓ import
+         │    tools/lib/python/constants_scripts.py    ← Python constants (dicts, derived values)
+         │         ↓ import
+         │    tools/lib/python/predictive_formula.py   ← 429-term ML feature matrix
+         │    tools/lib/python/observed_formula.py     ← 225-term observed feature matrix
+         │
+         └──→ export-to-script.js --write
+              src/script.js   ← Browser simulation (cannot load JSON at runtime)
 
-Fitting scripts write directly to fitted-coefficients.json:
-    obliquity-harmonics.js       → SOLSTICE_OBLIQUITY_HARMONICS, SOLSTICE_OBLIQUITY_MEAN_FITTED
-    cardinal-point-harmonics.js  → CARDINAL_POINT_HARMONICS
-    fit_perihelion_harmonics.py  → PERI_HARMONICS_RAW, PERI_OFFSET
+Fitting scripts write to JSON, then export-to-script.js syncs to script.js:
+    fit_perihelion_harmonics.py  → fitted-coefficients.json → export-to-script.js → script.js
+    obliquity-harmonics.js       → fitted-coefficients.json → export-to-script.js → script.js
+    cardinal-point-harmonics.js  → fitted-coefficients.json → export-to-script.js → script.js
+    year-length-harmonics.js     → fitted-coefficients.json → export-to-script.js → script.js
+    parallax-correction.js       → fitted-coefficients.json → export-to-script.js → script.js
+    optimize.js                  → model-parameters.json    → export-to-script.js → script.js
 ```
+
+### Python-Node.js bridge
+
+Python scripts cannot parse JavaScript directly. Instead, `load_constants.py` calls
+`_dump_constants.js` via `subprocess`, which runs Node.js to load `constants.js` and
+outputs all constants as JSON to stdout. Python reads this JSON, so all Python scripts
+automatically use the same values as the Node.js tooling — no manual sync needed.
 
 ## Related documentation
 

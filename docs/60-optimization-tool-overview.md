@@ -119,7 +119,7 @@ Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
 | `perihelionalignmentYear` | Perihelion-solstice alignment epoch |
 | `startmodelJD` | Model start: 21 June 2000 |
 | `earthtiltMean` | Mean obliquity |
-| `earthRAAngle` | Equatorial frame orientation |
+| `earthRAAngle` | Equatorial frame orientation (**derived**: 2A − A²/ε) |
 | `earthInvPlaneInclinationAmplitude` | Obliquity oscillation range |
 | `earthInvPlaneInclinationMean` | Mean Earth inclination to inv. plane |
 | `eccentricityBase` | Orbital radius of PERIHELION-OF-EARTH around Sun |
@@ -552,7 +552,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Parameter | What it controls | Why dangerous |
 |-----------|------------------|---------------|
 | `earthtiltMean` | Earth object `tilt` property -> obliquity of equatorial frame | **Affects ALL planets' RA/Dec** -- this defines the equatorial coordinate frame |
-| `earthRAAngle` | `orbitTilta` of `earthPerihelionPrecession1` | **Affects ALL planets' RA** -- rotates the entire equatorial reference frame |
+| `earthRAAngle` | `orbitTilta` of `earthPerihelionPrecession1` | **Derived** (2A − A²/ε). Affects ALL planets' RA -- rotates the entire equatorial reference frame |
 | `earthInvPlaneInclinationAmplitude` | `orbitTiltb` of both `earthEclipticPrecession` (negative) and `earthObliquityPrecession` (positive) | **Affects ALL planets' Dec** -- controls Earth's inclination oscillation amplitude |
 | `earthInvPlaneInclinationMean` | Used in inclination computation formulas | Less dangerous -- affects Earth inclination calculation |
 | `eccentricityBase` | `orbitCentera` of `earthPerihelionPrecession2` = `-eccentricityBase*100` | Orbital radius of PERIHELION-OF-EARTH around Sun |
@@ -688,6 +688,6 @@ Given the above, optimization should proceed in this order:
 
 1. **First: Per-planet isolated parameters** (`Startpos`, `AngleCorrection`) -- low risk, no cascade
 2. **Then: Per-planet cascading parameters** (`SolarYearInput`, `InvPlaneInclinationMean/Amplitude`) -- medium risk, changes orbit geometry
-3. **Then: Earth global parameters** (`earthRAAngle`, `earthtiltMean`) -- high risk, affects all planets
+3. **Then: Earth global parameters** (`earthtiltMean`, `eccentricityBase`, `eccentricityAmplitude`) -- high risk, affects all planets (earthRAAngle is derived)
 4. **Then: Calculation formulas** (TYPE I/II/III) -- only if systematic patterns suggest the formula itself is wrong
 5. **Last: New movements** -- only if residual analysis reveals periodic patterns that no parameter change can explain

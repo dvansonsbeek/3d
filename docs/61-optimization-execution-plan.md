@@ -1069,7 +1069,7 @@ Three strategies, in order of complexity:
 
 **Tunable parameters by target:**
 - Planets: startpos, angleCorrection, solarYearInput, longitudePerihelion, ascendingNode, eclipticInclinationJ2000, orbitalEccentricityBase, perihelionEclipticYears
-- Sun: correctionSun, eccentricityBase, eccentricityAmplitude, earthRAAngle, earthtiltMean
+- Sun: correctionSun, eccentricityBase, eccentricityAmplitude, earthtiltMean (earthRAAngle is derived: 2A − A²/ε)
 - Moon: moonStartposApsidal, moonStartposNodal, moonStartposMoon, moonTilt, moonEclipticInclinationJ2000, moonOrbitalEccentricity
 
 **CLI commands:**
@@ -1353,7 +1353,7 @@ The remaining steps were executed as a systematic campaign covering:
 
 All 9 targets within 0.22°. Seven under 0.06°. Average improvement: 98%.
 
-> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.493231 and earthRAAngle to 1.25363. Parallax tiers were expanded to 42p for Mercury/Venus/Jupiter, 36p for Saturn, and 24p for Uranus/Neptune. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
+> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.495997 (earthRAAngle is now derived: 2A − A²/ε ≈ 1.25365). Parallax tiers were expanded to 42p for Mercury/Venus/Jupiter, 36p for Saturn, and 24p for Uranus/Neptune. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 

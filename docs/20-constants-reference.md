@@ -96,7 +96,7 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 | Base Eccentricity | `eccentricityBase` | 0.015372 | Base orbital eccentricity |
 | Eccentricity Amplitude | `eccentricityAmplitude` | 0.00137032 | Oscillation amplitude |
 | Mean Obliquity | `earthtiltMean` | 23.41357 deg | Mean axial tilt |
-| RA Angle | `earthRAAngle` | 1.25363 | Derived from obliquity cycle position, tuned for solstice timing |
+| RA Angle | `earthRAAngle` | 1.25365 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481179 deg | Mean orbital inclination to invariable plane |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970 deg | Oscillation amplitude |
 | Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195 deg | Phase offset for inclination oscillation |
@@ -681,7 +681,7 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Correction Sun | `correctionSun` | 0.493231 deg | Degree correction for Sun position (dynamic EoC); optimized vs 26 JPL points, validated 1600-2200 |
+| Correction Sun | `correctionSun` | 0.495997 deg | Degree correction for Sun position (dynamic EoC); optimized vs 26 JPL points, validated 1600-2200 |
 
 ## Planet Orbital Periods (Tuned)
 

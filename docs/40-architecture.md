@@ -556,8 +556,8 @@ Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 ├─▼ About                          (collapsed)
 │  ├─▼ The Six Laws               (custom DOM, full-width)
 │  ├─▼ Free Parameters (6 DOF)    (0 DOF items dimmed)
-│  ├─▼ Calibration Inputs (20)    (from ASTRO_REFERENCE)
-│  ├─▼ Model Parameters (125)     (Earth 25, Moon 9, 7 planets × 13)
+│  ├─▼ Calibration Inputs (75)    (from astro-reference.json: Earth & Time 26, Moon 14, Planets 5×7)
+│  ├─▼ Model Parameters (70)      (from model-parameters.json: Earth 11, Moon 3, Planets 8×7)
 │  └─ Website link                (holisticuniverse.com)
 │
 ├─ Date                          [binding: text input]

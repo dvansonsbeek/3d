@@ -15,8 +15,8 @@ import { Pane } from 'tweakpane';
   precession, eccentricity, inclination, obliquity and perihelion movements of
   all planets. The Holistic-Year cycle (H) unifies axial precession
   (H/13), inclination precession (H/3) and perihelion precession (H/16) through
-  Fibonacci number ratios. Earth is defined by 26 parameters, the Moon by 9, and
-  each planet by 16.
+  Fibonacci number ratios. 70 model parameters (Earth 11, Moon 3, 7 planets x 8)
+  and 75 calibration inputs from astronomical observations (astro-reference.json).
 
   Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v2
   Website:  https://holisticuniverse.com
@@ -14443,17 +14443,30 @@ function setupGUI() {
     configBlade.element.style.opacity = '0.65';
   }
 
-  // --- Calibration Inputs (from ASTRO_REFERENCE + website) ---
+  // --- Calibration Inputs (from astro-reference.json — external observations) ---
   {
     const R = ASTRO_REFERENCE;
-    const calibInputs = {
-      ciAlignment: '1246 AD',
+    const fmtDeg = (v) => v + '\u00B0';
+    const fmtD = (v) => v + ' days';
+    let totalCalib = 0;
+    const calibInputFolder = aboutFolder.addFolder({ title: 'Calibration Inputs', expanded: false });
+    addFolderTooltip(calibInputFolder, 'Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor the model. Source: astro-reference.json.');
+    const addCalib = (folder, obj, key, label, tip) => {
+      addTooltip(folder.addBinding(obj, key, { label, readonly: true }), tip);
+    };
+
+    // -- Earth orbital & time references --
+    const earthCalib = {
+      ciAlignment: perihelionalignmentYear + ' AD',
       ciLongPeri: R.perihelionLongitudeJ2000_deg + '\u00B0',
       ciObliquity: (R.obliquityJ2000_arcsec / 3600).toFixed(6) + '\u00B0',
       ciObliquityRate: R.obliquityRate_arcsecPerCentury + '"/cy',
       ciObliquityRange: '~22.1\u00B0 to ~24.5\u00B0',
       ciEarthIncl: R.earthInclinationJ2000_deg + '\u00B0',
       ciEccentricity: String(R.eccentricityJ2000),
+      ciAscNode: fmtDeg(earthAscendingNodeInvPlaneVerified),
+      ciPhaseAngle: fmtDeg(earthInclinationPhaseAngle),
+      ciSiderealYearSec: meansiderealyearlengthinSeconds + ' s',
       ciSiderealYear: R.siderealYearJ2000 + ' days',
       ciTropicalYear: R.tropicalYearMeanJ2000 + ' days',
       ciTropicalVE: R.tropicalYearVEJ2000 + ' days',
@@ -14468,6 +14481,49 @@ function setupGUI() {
       ciSiderealDay: R.siderealDayJ2000.toFixed(6) + ' s',
       ciStellarDay: R.stellarDayJ2000.toFixed(6) + ' s',
       ciPeriPassage: String(R.perihelionPassageJ2000_JD),
+      ciAuDist: currentAUDistance.toLocaleString('en-US') + ' km',
+      ciDeltaT: deltaTStart + ' s',
+    };
+    const earthCalibCount = Object.keys(earthCalib).length;
+    totalCalib += earthCalibCount;
+    const earthCalibFolder = calibInputFolder.addFolder({ title: 'Earth & Time (' + earthCalibCount + ')', expanded: false });
+    addCalib(earthCalibFolder, earthCalib, 'ciAlignment', 'Perihelion-solstice', 'Year when perihelion aligned with the December solstice (Meeus).');
+    addCalib(earthCalibFolder, earthCalib, 'ciLongPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 epoch.');
+    addCalib(earthCalibFolder, earthCalib, 'ciObliquity', 'Obliquity (J2000)', 'Obliquity of the ecliptic at J2000 (IAU 2006, Capitaine et al. 2003).');
+    addCalib(earthCalibFolder, earthCalib, 'ciObliquityRate', 'Obliquity rate (J2000)', 'Rate of change of obliquity in arcseconds per century (IAU 2006).');
+    addCalib(earthCalibFolder, earthCalib, 'ciObliquityRange', 'Obliquity range', 'Observed range of obliquity oscillation over the precession cycle (Laskar 1993).');
+    addCalib(earthCalibFolder, earthCalib, 'ciEarthIncl', 'Earth incl. (J2000)', 'Earth orbital inclination to the invariable plane at J2000 (Astronomical Almanac).');
+    addCalib(earthCalibFolder, earthCalib, 'ciEccentricity', 'Eccentricity (J2000)', 'Earth orbital eccentricity at J2000 (JPL Horizons).');
+    addCalib(earthCalibFolder, earthCalib, 'ciAscNode', 'Asc. node inv. plane', 'Ascending node on the invariable plane at J2000 (Souami & Souchay 2012).');
+    addCalib(earthCalibFolder, earthCalib, 'ciPhaseAngle', 'Incl. phase angle', 'Inclination phase group angle from s8 eigenmode (Laplace-Lagrange).');
+    earthCalibFolder.addBlade({ view: 'separator' });
+    addCalib(earthCalibFolder, earthCalib, 'ciSiderealYearSec', 'Sidereal year (s)', 'Mean sidereal year length in seconds (IAU).');
+    addCalib(earthCalibFolder, earthCalib, 'ciSiderealYear', 'Sidereal year (days)', 'Sidereal year length in days (JPL Horizons).');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalYear', 'Tropical year (J2000)', 'Mean tropical year length in days (Meeus & Savoie 1992).');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalVE', 'Trop. yr VE (J2000)', 'Tropical year measured from Vernal Equinox to Vernal Equinox.');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalSS', 'Trop. yr SS (J2000)', 'Tropical year measured from Summer Solstice to Summer Solstice.');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalAE', 'Trop. yr AE (J2000)', 'Tropical year measured from Autumnal Equinox to Autumnal Equinox.');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalWS', 'Trop. yr WS (J2000)', 'Tropical year measured from Winter Solstice to Winter Solstice.');
+    addCalib(earthCalibFolder, earthCalib, 'ciAnomalYear', 'Anomalistic yr (J2000)', 'Anomalistic year: perihelion to perihelion in days.');
+    addCalib(earthCalibFolder, earthCalib, 'ciTropicalRate', 'Tropical yr rate', 'Secular change in tropical year length (seconds per century).');
+    addCalib(earthCalibFolder, earthCalib, 'ciPrecession', 'Axial prec. (J2000)', 'IAU J2000 axial precession period in years.');
+    addCalib(earthCalibFolder, earthCalib, 'ciSolsticeJD', 'June Solstice 2000 JD', 'Julian Day of the June 2000 solstice (USNO).');
+    addCalib(earthCalibFolder, earthCalib, 'ciSolarDay', 'Solar day (J2000)', 'Mean solar day in SI seconds (exact by definition at epoch).');
+    addCalib(earthCalibFolder, earthCalib, 'ciSiderealDay', 'Sidereal day (J2000)', 'Rotation period relative to the vernal equinox (~23h 56m 4.0905s).');
+    addCalib(earthCalibFolder, earthCalib, 'ciStellarDay', 'Stellar day (J2000)', 'Rotation period relative to fixed stars (~23h 56m 4.0989s).');
+    addCalib(earthCalibFolder, earthCalib, 'ciPeriPassage', 'Perihelion passage JD', 'Julian Day of Earth perihelion passage at J2000 (2000 Jan 3 13:00 UTC).');
+    addCalib(earthCalibFolder, earthCalib, 'ciAuDist', 'AU distance', '1 AU in km (IAU 2012).');
+    addCalib(earthCalibFolder, earthCalib, 'ciDeltaT', 'Delta-T start', 'Initial Delta-T value in seconds.');
+
+    // -- Moon orbital references --
+    const moonCalib = {
+      ciSidereal: fmtD(moonSiderealMonthInput),
+      ciAnomalistic: fmtD(moonAnomalisticMonthInput),
+      ciNodal: fmtD(moonNodalMonthInput),
+      ciDistance: moonDistance.toLocaleString('en-US') + ' km',
+      ciEclInc: fmtDeg(moonEclipticInclinationJ2000),
+      ciEcc: String(moonOrbitalEccentricityBase),
+      ciTilt: fmtDeg(moonTilt),
       ciMoonMeanAnom: R.moonMeanAnomalyJ2000_deg + '\u00B0',
       ciMoonMeanAnomRate: R.moonMeanAnomalyRate_degPerDay + '\u00B0/day',
       ciMoonElongation: R.moonMeanElongationJ2000_deg + '\u00B0',
@@ -14476,66 +14532,52 @@ function setupGUI() {
       ciSunMeanAnomRate: R.sunMeanAnomalyRate_degPerDay + '\u00B0/day',
       ciMoonArgLat: R.moonArgLatJ2000_deg + '\u00B0',
     };
-    const calibCount = Object.keys(calibInputs).length;
-    const calibInputFolder = aboutFolder.addFolder({ title: 'Calibration Inputs (' + calibCount + ')', expanded: false });
-    addFolderTooltip(calibInputFolder, 'Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor the model.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciAlignment', { label: 'Perihelion-solstice', readonly: true }),
-      'Year when perihelion aligned with the December solstice (Meeus).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciLongPeri', { label: 'Long. perihelion (J2000)', readonly: true }),
-      'Longitude of perihelion at J2000 epoch.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquity', { label: 'Obliquity (J2000)', readonly: true }),
-      'Obliquity of the ecliptic at J2000 (IAU 2006, Capitaine et al. 2003).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquityRate', { label: 'Obliquity rate (J2000)', readonly: true }),
-      'Rate of change of obliquity in arcseconds per century (IAU 2006).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciObliquityRange', { label: 'Obliquity range', readonly: true }),
-      'Observed range of obliquity oscillation over the precession cycle (Laskar 1993).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciEarthIncl', { label: 'Earth incl. (J2000)', readonly: true }),
-      'Earth orbital inclination to the invariable plane at J2000 (Astronomical Almanac).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciEccentricity', { label: 'Eccentricity (J2000)', readonly: true }),
-      'Earth orbital eccentricity at J2000 (JPL Horizons).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSiderealYear', { label: 'Sidereal year (J2000)', readonly: true }),
-      'Sidereal year length in days (JPL Horizons).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalYear', { label: 'Tropical year (J2000)', readonly: true }),
-      'Mean tropical year length in days (Meeus & Savoie 1992).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalVE', { label: 'Trop. yr VE (J2000)', readonly: true }),
-      'Tropical year measured from Vernal Equinox to Vernal Equinox.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalSS', { label: 'Trop. yr SS (J2000)', readonly: true }),
-      'Tropical year measured from Summer Solstice to Summer Solstice.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalAE', { label: 'Trop. yr AE (J2000)', readonly: true }),
-      'Tropical year measured from Autumnal Equinox to Autumnal Equinox.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalWS', { label: 'Trop. yr WS (J2000)', readonly: true }),
-      'Tropical year measured from Winter Solstice to Winter Solstice.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciAnomalYear', { label: 'Anomalistic yr (J2000)', readonly: true }),
-      'Anomalistic year: perihelion to perihelion in days.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciTropicalRate', { label: 'Tropical yr rate', readonly: true }),
-      'Secular change in tropical year length (seconds per century).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciPrecession', { label: 'Axial prec. (J2000)', readonly: true }),
-      'IAU J2000 axial precession period in years.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSolsticeJD', { label: 'June Solstice 2000 JD', readonly: true }),
-      'Julian Day of the June 2000 solstice (USNO).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSolarDay', { label: 'Solar day (J2000)', readonly: true }),
-      'Mean solar day in SI seconds (exact by definition at epoch).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSiderealDay', { label: 'Sidereal day (J2000)', readonly: true }),
-      'Rotation period relative to the vernal equinox (~23h 56m 4.0905s).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciStellarDay', { label: 'Stellar day (J2000)', readonly: true }),
-      'Rotation period relative to fixed stars (~23h 56m 4.0989s).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciPeriPassage', { label: 'Perihelion passage JD', readonly: true }),
-      'Julian Day of Earth perihelion passage at J2000 (2000 Jan 3 13:00 UTC).');
-    calibInputFolder.addBlade({ view: 'separator' });
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonMeanAnom', { label: 'Moon mean anom. (J2000)', readonly: true }),
-      'Moon mean anomaly at J2000.0 (Meeus Ch. 47).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonMeanAnomRate', { label: 'Moon mean anom. rate', readonly: true }),
-      'Moon mean anomaly rate in degrees per day.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonElongation', { label: 'Moon elongation (J2000)', readonly: true }),
-      'Mean elongation Moon\u2013Sun at J2000.0 (Meeus Ch. 47).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonElongRate', { label: 'Moon elongation rate', readonly: true }),
-      'Mean elongation rate in degrees per day.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSunMeanAnom', { label: 'Sun mean anom. (J2000)', readonly: true }),
-      'Sun mean anomaly at J2000.0 (Meeus Ch. 47).');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciSunMeanAnomRate', { label: 'Sun mean anom. rate', readonly: true }),
-      'Sun mean anomaly rate in degrees per day.');
-    addTooltip(calibInputFolder.addBinding(calibInputs, 'ciMoonArgLat', { label: 'Moon arg. lat. (J2000)', readonly: true }),
-      'Moon argument of latitude F at J2000.0 (Meeus Ch. 47).');
+    const moonCalibCount = Object.keys(moonCalib).length;
+    totalCalib += moonCalibCount;
+    const moonCalibFolder = calibInputFolder.addFolder({ title: 'Moon (' + moonCalibCount + ')', expanded: false });
+    addCalib(moonCalibFolder, moonCalib, 'ciSidereal', 'Sidereal month', 'Sidereal orbital period of the Moon.');
+    addCalib(moonCalibFolder, moonCalib, 'ciAnomalistic', 'Anomalistic month', 'Anomalistic orbital period (perigee to perigee).');
+    addCalib(moonCalibFolder, moonCalib, 'ciNodal', 'Nodal month', 'Nodal orbital period (node to node).');
+    addCalib(moonCalibFolder, moonCalib, 'ciDistance', 'Mean distance', 'Mean Earth\u2013Moon distance.');
+    addCalib(moonCalibFolder, moonCalib, 'ciEclInc', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000.');
+    addCalib(moonCalibFolder, moonCalib, 'ciEcc', 'Eccentricity', 'Orbital eccentricity.');
+    addCalib(moonCalibFolder, moonCalib, 'ciTilt', 'Axial tilt', 'Moon axial tilt.');
+    moonCalibFolder.addBlade({ view: 'separator' });
+    addCalib(moonCalibFolder, moonCalib, 'ciMoonMeanAnom', 'Mean anom. (J2000)', 'Moon mean anomaly at J2000.0 (Meeus Ch. 47).');
+    addCalib(moonCalibFolder, moonCalib, 'ciMoonMeanAnomRate', 'Mean anom. rate', 'Moon mean anomaly rate in degrees per day.');
+    addCalib(moonCalibFolder, moonCalib, 'ciMoonElongation', 'Elongation (J2000)', 'Mean elongation Moon\u2013Sun at J2000.0 (Meeus Ch. 47).');
+    addCalib(moonCalibFolder, moonCalib, 'ciMoonElongRate', 'Elongation rate', 'Mean elongation rate in degrees per day.');
+    addCalib(moonCalibFolder, moonCalib, 'ciSunMeanAnom', 'Sun mean anom. (J2000)', 'Sun mean anomaly at J2000.0 (Meeus Ch. 47).');
+    addCalib(moonCalibFolder, moonCalib, 'ciSunMeanAnomRate', 'Sun mean anom. rate', 'Sun mean anomaly rate in degrees per day.');
+    addCalib(moonCalibFolder, moonCalib, 'ciMoonArgLat', 'Arg. latitude (J2000)', 'Moon argument of latitude F at J2000.0 (Meeus Ch. 47).');
+
+    // -- Per-planet J2000 orbital elements --
+    const planetCalibNames = [
+      { key: 'mercury', name: 'Mercury' }, { key: 'venus', name: 'Venus' },
+      { key: 'mars', name: 'Mars' }, { key: 'jupiter', name: 'Jupiter' },
+      { key: 'saturn', name: 'Saturn' }, { key: 'uranus', name: 'Uranus' },
+      { key: 'neptune', name: 'Neptune' },
+    ];
+    planetCalibNames.forEach(({ key, name }) => {
+      const p = planets[key];
+      const v = {
+        period: fmtD(p.solarYearInput),
+        incEcl: fmtDeg(p.eclipticInclinationJ2000),
+        incInv: fmtDeg(p.invPlaneInclinationJ2000),
+        longPeri: fmtDeg(p.longitudePerihelion),
+        ascNode: fmtDeg(p.ascendingNode),
+      };
+      const cnt = Object.keys(v).length;
+      totalCalib += cnt;
+      const pf = calibInputFolder.addFolder({ title: name + ' (' + cnt + ')', expanded: false });
+      addCalib(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
+      addCalib(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
+      addCalib(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
+      addCalib(pf, v, 'longPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 (JPL).');
+      addCalib(pf, v, 'ascNode', 'Asc. node ecliptic (J2000)', 'Longitude of ascending node on the ecliptic at J2000 (SPICE).');
+    });
+
+    calibInputFolder.title = 'Calibration Inputs (' + totalCalib + ')';
   }
 
   // --- Model Parameters (all parameters from the top of script.js) ---
@@ -14550,77 +14592,50 @@ function setupGUI() {
     // Helper: format a number with unit
     const fmtD = (v) => v + ' days';
     const fmtDeg = (v) => v + '\u00B0';
-    const fmtKm = (v) => v.toLocaleString('en-US') + ' km';
     const fmtYr = (v) => v.toLocaleString('en-US') + ' yr';
 
-    // -- Earth (includes fundamental parameters — model is geocentrically defined) --
+    // -- Earth (model-parameters.json values only) --
     const fundVals = {
       holisticYear: fmtYr(holisticyearLength),
-      perihelionAlignYear: perihelionalignmentYear + ' AD',
-      perihelionAlignJD: String(perihelionalignmentJD),
       tropicalYear: fmtD(inputmeanlengthsolaryearindays),
-      siderealYearSec: meansiderealyearlengthinSeconds + ' s',
       startJD: String(startmodelJD),
-      startYear: String(startmodelYear),
       correctionDays: String(correctionDays),
       correctionSun: fmtDeg(correctionSun),
       tempGraphPos: String(temperatureGraphMostLikely),
       startAngle: fmtDeg(startAngleModel),
-      earthRAAngle: String(earthRAAngle),
       earthTiltMean: fmtDeg(earthtiltMean),
       inclAmp: fmtDeg(earthInvPlaneInclinationAmplitude),
-      inclMean: fmtDeg(earthInvPlaneInclinationMean),
-      phaseAngle: fmtDeg(earthInclinationPhaseAngle),
-      ascNodeVerified: fmtDeg(earthAscendingNodeInvPlaneVerified),
       eccBase: String(eccentricityBase),
       eccAmp: String(eccentricityAmplitude),
-      periHarmonics: String(PERI_HARMONICS.length) + ' terms',
-      periRMSE: '0.003°',
-      siderealYearRMS: '0.0002 s (Fourier)',
-      solarYearRMS: '0.003 s (Fourier)',
-      anomYearRMS: '0.002 s (Fourier)',
-      auDist: fmtKm(currentAUDistance),
-      deltaT: String(deltaTStart),
     };
     const fundCount = Object.keys(fundVals).length;
     totalModelParams += fundCount;
+    // Derived values shown but not counted
+    const fundDerived = {
+      earthRAAngle: earthRAAngle.toFixed(7) + '\u00B0 (derived)',
+      inclMean: earthInvPlaneInclinationMean.toFixed(6) + '\u00B0 (derived)',
+    };
     const fundFolder = constFolder.addFolder({ title: 'Earth (' + fundCount + ')', expanded: false });
-    addFolderTooltip(fundFolder, 'With ' + fundCount + ' parameters, all orbital behaviours of the Earth can be modelled.');
+    addFolderTooltip(fundFolder, fundCount + ' model parameters define all Earth orbital behaviours. Source: model-parameters.json.');
     addConst(fundFolder, fundVals, 'holisticYear', 'Holistic-Year', 'The fundamental cycle unifying all precession movements.');
-    addConst(fundFolder, fundVals, 'perihelionAlignYear', 'Perihelion align.', 'Last year perihelion aligned with December solstice (Meeus).');
-    addConst(fundFolder, fundVals, 'perihelionAlignJD', 'Perihelion align. JD', 'Same alignment in Julian Day number.');
-    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. May differ from the actual mean tropical year, which is calculated from this input and the Holistic-Year length.');
-    addConst(fundFolder, fundVals, 'siderealYearSec', 'Sidereal year', 'Sidereal year length in seconds (fixed).');
+    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. The actual mean tropical year is calculated from this and the Holistic-Year length.');
     addConst(fundFolder, fundVals, 'startJD', 'Start model JD', 'Julian Day of the model start date (June Solstice 2000).');
-    addConst(fundFolder, fundVals, 'startYear', 'Start model year', 'Decimal year of the model start date.');
     addConst(fundFolder, fundVals, 'correctionDays', 'Correction days', 'Small correction because 21 June 00:00 UTC is not exactly at solstice.');
     addConst(fundFolder, fundVals, 'correctionSun', 'Correction Sun', 'Degree correction for solstice alignment at ~01:47 UTC.');
     addConst(fundFolder, fundVals, 'tempGraphPos', 'Obliquity cycle pos.', 'Position (0\u201316) in the obliquity cycle for temperature graph.');
     addConst(fundFolder, fundVals, 'startAngle', 'Start angle', 'Sun ecliptic longitude at model start (just before 90\u00B0).');
-    addConst(fundFolder, fundVals, 'earthRAAngle', 'RA angle', 'Right-ascension angle; determined by obliquity cycle position, mean tilt, and inclination amplitude.');
     addConst(fundFolder, fundVals, 'earthTiltMean', 'Mean obliquity', 'Mean obliquity of the ecliptic (optimized for IAU 2006).');
-    addConst(fundFolder, fundVals, 'inclAmp', 'Incl. amplitude', 'Earth inclination oscillation amplitude on invariable plane. Fibonacci predicts 0.6329789\u00B0.');
-    addConst(fundFolder, fundVals, 'inclMean', 'Incl. mean', 'Mean inclination to the invariable plane. Fibonacci predicts 1.481727\u00B0.');
-    addConst(fundFolder, fundVals, 'phaseAngle', 'Incl. phase angle', 'Phase group angle for the Fibonacci balance (203\u00B0 group).');
-    addConst(fundFolder, fundVals, 'ascNodeVerified', 'Asc. node inv. plane (J2000)', 'J2000-verified ascending node on the invariable plane (Souami & Souchay 2012).');
+    addConst(fundFolder, fundVals, 'inclAmp', 'Incl. amplitude', 'Earth inclination oscillation amplitude on invariable plane.');
     addConst(fundFolder, fundVals, 'eccBase', 'Eccentricity base', 'Base eccentricity for the long-term oscillation.');
     addConst(fundFolder, fundVals, 'eccAmp', 'Eccentricity ampl.', 'Amplitude of the eccentricity oscillation.');
-    addConst(fundFolder, fundVals, 'periHarmonics', 'Perihelion harmonics', 'Number of Fourier terms in the Earth perihelion longitude formula (fitted from simulation data).');
-    addConst(fundFolder, fundVals, 'periRMSE', 'Perihelion RMSE', 'Root mean square error of the perihelion harmonic fit over full H.');
-    addConst(fundFolder, fundVals, 'siderealYearRMS', 'Sidereal year RMS', 'Sidereal year Fourier fit RMS residual.');
-    addConst(fundFolder, fundVals, 'solarYearRMS', 'Solar year RMS', 'Tropical year Fourier fit RMS residual.');
-    addConst(fundFolder, fundVals, 'anomYearRMS', 'Anomalistic yr RMS', 'Anomalistic year Fourier fit RMS residual.');
-    addConst(fundFolder, fundVals, 'auDist', 'AU distance', 'Current Earth\u2013Sun distance in km.');
-    addConst(fundFolder, fundVals, 'deltaT', 'Delta-T start', 'Initial Delta-T value in seconds (formula only).');
+    fundFolder.addBlade({ view: 'separator' });
+    const raB = addConst(fundFolder, fundDerived, 'earthRAAngle', 'RA angle', 'Derived: 2A \u2212 A\u00B2/\u03B5 where A = inclination amplitude.');
+    const imB = addConst(fundFolder, fundDerived, 'inclMean', 'Incl. mean', 'Derived from J2000 inclination, amplitude, and phase angle.');
+    if (raB && raB.element) raB.element.style.opacity = '0.65';
+    if (imB && imB.element) imB.element.style.opacity = '0.65';
 
-    // -- Moon --
+    // -- Moon (model-parameters.json values only: 3 startpos) --
     const moonVals = {
-      sidereal: fmtD(moonSiderealMonthInput),
-      anomalistic: fmtD(moonAnomalisticMonthInput),
-      nodal: fmtD(moonNodalMonthInput),
-      distance: fmtKm(moonDistance),
-      eclInc: fmtDeg(moonEclipticInclinationJ2000),
-      ecc: String(moonOrbitalEccentricityBase),
       startApsidal: fmtDeg(moonStartposApsidal),
       startNodal: fmtDeg(moonStartposNodal),
       startMoon: fmtDeg(moonStartposMoon),
@@ -14628,70 +14643,60 @@ function setupGUI() {
     const moonCount = Object.keys(moonVals).length;
     totalModelParams += moonCount;
     const moonFolder = constFolder.addFolder({ title: 'Moon (' + moonCount + ')', expanded: false });
-    addFolderTooltip(moonFolder, 'With ' + moonCount + ' parameters, all orbital behaviours of the Moon can be modelled.');
-    addConst(moonFolder, moonVals, 'sidereal', 'Sidereal month', 'Sidereal orbital period of the Moon.');
-    addConst(moonFolder, moonVals, 'anomalistic', 'Anomalistic month', 'Anomalistic orbital period (perigee to perigee).');
-    addConst(moonFolder, moonVals, 'nodal', 'Nodal month', 'Nodal orbital period (node to node).');
-    addConst(moonFolder, moonVals, 'distance', 'Mean distance', 'Mean Earth\u2013Moon distance.');
-    addConst(moonFolder, moonVals, 'eclInc', 'Incl. ecliptic', 'Inclination to the ecliptic at J2000.');
-    addConst(moonFolder, moonVals, 'ecc', 'Eccentricity', 'Orbital eccentricity.');
+    addFolderTooltip(moonFolder, moonCount + ' model parameters define the Moon start positions. Orbital periods and references are in Calibration Inputs.');
     addConst(moonFolder, moonVals, 'startApsidal', 'Start pos. apsidal', 'Initial apsidal precession angle.');
     addConst(moonFolder, moonVals, 'startNodal', 'Start pos. nodal', 'Initial nodal precession angle.');
     addConst(moonFolder, moonVals, 'startMoon', 'Start pos. Moon', 'Initial Moon position angle.');
 
-    // -- Per-planet data (Mercury through Neptune) --
-    const allPlanets = [
-      { name: 'Mercury', period: planets.mercury.solarYearInput, ecc: planets.mercury.orbitalEccentricityBase, eccAmp: planets.mercury.orbitalEccentricityAmplitude, incEcl: planets.mercury.eclipticInclinationJ2000, incInv: planets.mercury.invPlaneInclinationJ2000, longPeri: planets.mercury.longitudePerihelion, ascNode: planets.mercury.ascendingNode, angleCorr: planets.mercury.angleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: planets.mercury.startpos, ascNodeVerified: planets.mercury.ascendingNodeInvPlane, inclMean: planets.mercury.invPlaneInclinationMean, inclAmp: planets.mercury.invPlaneInclinationAmplitude, phaseAngle: planets.mercury.inclinationPhaseAngle, eocFrac: planets.mercury.eocFraction, periRefJD: planets.mercury.perihelionRef_JD },
-      { name: 'Venus',   period: planets.venus.solarYearInput,   ecc: planets.venus.orbitalEccentricityBase,   eccAmp: planets.venus.orbitalEccentricityAmplitude,   incEcl: planets.venus.eclipticInclinationJ2000,   incInv: planets.venus.invPlaneInclinationJ2000,   longPeri: planets.venus.longitudePerihelion,   ascNode: planets.venus.ascendingNode,   angleCorr: planets.venus.angleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: planets.venus.startpos, ascNodeVerified: planets.venus.ascendingNodeInvPlane, inclMean: planets.venus.invPlaneInclinationMean, inclAmp: planets.venus.invPlaneInclinationAmplitude, phaseAngle: planets.venus.inclinationPhaseAngle, eocFrac: planets.venus.eocFraction, periRefJD: planets.venus.perihelionRef_JD },
-
-      { name: 'Mars',    period: planets.mars.solarYearInput,     ecc: planets.mars.orbitalEccentricityBase,    eccAmp: planets.mars.orbitalEccentricityAmplitude,    incEcl: planets.mars.eclipticInclinationJ2000,    incInv: planets.mars.invPlaneInclinationJ2000,    longPeri: planets.mars.longitudePerihelion,    ascNode: planets.mars.ascendingNode,    angleCorr: planets.mars.angleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: planets.mars.startpos, ascNodeVerified: planets.mars.ascendingNodeInvPlane, inclMean: planets.mars.invPlaneInclinationMean, inclAmp: planets.mars.invPlaneInclinationAmplitude, phaseAngle: planets.mars.inclinationPhaseAngle, eocFrac: planets.mars.eocFraction, periRefJD: planets.mars.perihelionRef_JD },
-      { name: 'Jupiter', period: planets.jupiter.solarYearInput,  ecc: planets.jupiter.orbitalEccentricityBase, eccAmp: planets.jupiter.orbitalEccentricityAmplitude, incEcl: planets.jupiter.eclipticInclinationJ2000, incInv: planets.jupiter.invPlaneInclinationJ2000, longPeri: planets.jupiter.longitudePerihelion, ascNode: planets.jupiter.ascendingNode, angleCorr: planets.jupiter.angleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: planets.jupiter.startpos, ascNodeVerified: planets.jupiter.ascendingNodeInvPlane, inclMean: planets.jupiter.invPlaneInclinationMean, inclAmp: planets.jupiter.invPlaneInclinationAmplitude, phaseAngle: planets.jupiter.inclinationPhaseAngle, eocFrac: planets.jupiter.eocFraction, periRefJD: planets.jupiter.perihelionRef_JD },
-      { name: 'Saturn',  period: planets.saturn.solarYearInput,   ecc: planets.saturn.orbitalEccentricityBase,  eccAmp: planets.saturn.orbitalEccentricityAmplitude,  incEcl: planets.saturn.eclipticInclinationJ2000,  incInv: planets.saturn.invPlaneInclinationJ2000,  longPeri: planets.saturn.longitudePerihelion,  ascNode: planets.saturn.ascendingNode,  angleCorr: planets.saturn.angleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: planets.saturn.startpos, ascNodeVerified: planets.saturn.ascendingNodeInvPlane, inclMean: planets.saturn.invPlaneInclinationMean, inclAmp: planets.saturn.invPlaneInclinationAmplitude, phaseAngle: planets.saturn.inclinationPhaseAngle, eocFrac: planets.saturn.eocFraction, periRefJD: planets.saturn.perihelionRef_JD },
-      { name: 'Uranus',  period: planets.uranus.solarYearInput,   ecc: planets.uranus.orbitalEccentricityBase,  eccAmp: planets.uranus.orbitalEccentricityAmplitude,  incEcl: planets.uranus.eclipticInclinationJ2000,  incInv: planets.uranus.invPlaneInclinationJ2000,  longPeri: planets.uranus.longitudePerihelion,  ascNode: planets.uranus.ascendingNode,  angleCorr: planets.uranus.angleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: planets.uranus.startpos, ascNodeVerified: planets.uranus.ascendingNodeInvPlane, inclMean: planets.uranus.invPlaneInclinationMean, inclAmp: planets.uranus.invPlaneInclinationAmplitude, phaseAngle: planets.uranus.inclinationPhaseAngle, eocFrac: planets.uranus.eocFraction, periRefJD: planets.uranus.perihelionRef_JD },
-      { name: 'Neptune', period: planets.neptune.solarYearInput,  ecc: planets.neptune.orbitalEccentricityBase, eccAmp: planets.neptune.orbitalEccentricityAmplitude, incEcl: planets.neptune.eclipticInclinationJ2000, incInv: planets.neptune.invPlaneInclinationJ2000, longPeri: planets.neptune.longitudePerihelion, ascNode: planets.neptune.ascendingNode, angleCorr: planets.neptune.angleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: planets.neptune.startpos, ascNodeVerified: planets.neptune.ascendingNodeInvPlane, inclMean: planets.neptune.invPlaneInclinationMean, inclAmp: planets.neptune.invPlaneInclinationAmplitude, phaseAngle: planets.neptune.inclinationPhaseAngle, eocFrac: planets.neptune.eocFraction, periRefJD: planets.neptune.perihelionRef_JD },
-    ];
-    allPlanets.forEach(p => {
+    // -- Per-planet data (Mercury through Neptune) — model-parameters.json only --
+    const planetPeriLabels = {
+      mercury: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
+      venus: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr',
+      mars: 'H/(4+1/3) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
+      jupiter: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr',
+      saturn: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr',
+      uranus: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr',
+      neptune: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr',
+    };
+    const planetModelKeys = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const planetModelNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
+    planetModelKeys.forEach(key => {
+      const p = planets[key];
       const v = {
-        period: fmtD(p.period),
-        ecc: String(p.ecc),
-        eccAmp: String(p.eccAmp),
-        incEcl: p.incEcl != null ? fmtDeg(p.incEcl) : '\u2014',
-        incInv: p.incInv != null ? fmtDeg(p.incInv) : '\u2014',
-        longPeri: p.longPeri != null ? fmtDeg(p.longPeri) : '\u2014',
-        ascNode: p.ascNode != null ? fmtDeg(p.ascNode) : '\u2014',
-        ascNodeVerified: fmtDeg(p.ascNodeVerified),
-        inclMean: fmtDeg(p.inclMean),
-        inclAmp: fmtDeg(p.inclAmp),
-        phaseAngle: fmtDeg(p.phaseAngle),
-        angleCorr: p.angleCorr != null ? fmtDeg(p.angleCorr) : '\u2014',
-        periYears: p.periYears,
-        startpos: p.startpos != null ? fmtDeg(p.startpos) : '\u2014',
-        eocFrac: String(p.eocFrac),
-        periRefJD: String(p.periRefJD),
+        ecc: String(p.orbitalEccentricityBase),
+        eccAmp: String(p.orbitalEccentricityAmplitude),
+        ascNodeInv: fmtDeg(p.ascendingNodeInvPlane),
+        phaseAngle: fmtDeg(p.inclinationPhaseAngle),
+        periYears: planetPeriLabels[key],
+        startpos: fmtDeg(p.startpos),
+        eocFrac: String(p.eocFraction),
+        periRefJD: String(p.perihelionRef_JD),
       };
       const pCount = Object.keys(v).length;
       totalModelParams += pCount;
-      const pf = constFolder.addFolder({ title: p.name + ' (' + pCount + ')', expanded: false });
-      addFolderTooltip(pf, 'With ' + pCount + ' parameters, all orbital behaviours of ' + p.name + ' can be modelled.');
-      // J2000 reference values first
-      addConst(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
+      // Derived values (not counted)
+      const vDerived = {
+        angleCorr: fmtDeg(p.angleCorrection) + ' (derived)',
+        inclMean: (p.invPlaneInclinationMean != null ? p.invPlaneInclinationMean.toFixed(6) : '\u2014') + '\u00B0 (derived)',
+        inclAmp: (p.invPlaneInclinationAmplitude != null ? p.invPlaneInclinationAmplitude.toFixed(6) : '\u2014') + '\u00B0 (derived)',
+      };
+      const pf = constFolder.addFolder({ title: planetModelNames[key] + ' (' + pCount + ')', expanded: false });
+      addFolderTooltip(pf, pCount + ' model parameters for ' + planetModelNames[key] + '. J2000 references are in Calibration Inputs.');
       addConst(pf, v, 'ecc', 'Eccentricity base', 'Base orbital eccentricity (balance-derived mean).');
-      addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity over the eccentricity cycle.');
-      addConst(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
-      addConst(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
-      addConst(pf, v, 'longPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 (JPL).');
-      addConst(pf, v, 'ascNode', 'Asc. node ecliptic (J2000)', 'Longitude of ascending node on the ecliptic at J2000 (SPICE).');
-      addConst(pf, v, 'ascNodeVerified', 'Asc. node inv. plane (J2000)', 'J2000-verified ascending node on the invariable plane.');
-      addConst(pf, v, 'angleCorr', 'Angle correction (J2000)', 'Small correction to align perihelion exactly at J2000.');
-      // Model-derived values — visual separator
-      pf.addBlade({ view: 'separator' });
-      addConst(pf, v, 'inclMean', 'Incl. inv. mean', 'Mean inclination to the invariable plane over the precession cycle.');
-      addConst(pf, v, 'inclAmp', 'Incl. inv. amplitude', 'Oscillation amplitude of inclination on the invariable plane.');
+      addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity.');
+      addConst(pf, v, 'ascNodeInv', 'Asc. node inv. plane', 'Ascending node on the invariable plane (model-adjusted).');
       addConst(pf, v, 'phaseAngle', 'Incl. phase angle', 'Phase group angle for the Fibonacci balance (203\u00B0 or 23\u00B0).');
-      addConst(pf, v, 'periYears', 'Perihelion prec.', 'Duration of perihelion precession cycle.');
+      addConst(pf, v, 'periYears', 'Perihelion prec.', 'Duration of perihelion precession cycle (from H-fraction).');
       addConst(pf, v, 'startpos', 'Start position', 'Initial angular position at model start.');
-      addConst(pf, v, 'eocFrac', 'EoC fraction', 'Equation of Center fraction: how much variable-speed is EoC vs geometric offset.');
+      addConst(pf, v, 'eocFrac', 'EoC fraction', 'Equation of Center fraction: variable-speed vs geometric offset.');
       addConst(pf, v, 'periRefJD', 'Perihelion ref. JD', 'Julian Day reference for EoC phase alignment.');
+      pf.addBlade({ view: 'separator' });
+      const acB = addConst(pf, vDerived, 'angleCorr', 'Angle correction', 'Derived by optimizer bisection to align perihelion at J2000.');
+      const imB = addConst(pf, vDerived, 'inclMean', 'Incl. inv. mean', 'Derived from J2000 inclination + Fibonacci amplitude + phase.');
+      const iaB = addConst(pf, vDerived, 'inclAmp', 'Incl. inv. amplitude', 'Derived from Fibonacci law: \u03C8/(d\u00D7\u221Am).');
+      if (acB && acB.element) acB.element.style.opacity = '0.65';
+      if (imB && imB.element) imB.element.style.opacity = '0.65';
+      if (iaB && iaB.element) iaB.element.style.opacity = '0.65';
     });
     constFolder.title = 'Model Parameters (' + totalModelParams + ')';
     addFolderTooltip(constFolder, 'All ' + totalModelParams + ' input constants used by the 3D model, grouped by body.');
