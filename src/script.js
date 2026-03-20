@@ -59,19 +59,11 @@ const perihelionalignmentYear = 1246;                     // Year when perihelio
 const deltaTStart = 63.63;                                // Delta-T at model epoch (seconds)
 
 
-// ═══════════════════════════════════════════════════════════════════════════
-// E. DERIVED VALUES (computed from above, not stored in JSON)
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meansolaryearlengthinDays;
 const julianCenturyDays = 100 * meansolaryearlengthinDays;
-// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
-const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
-const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // F. DISPLAY-ONLY (not in JSON files)
@@ -974,7 +966,45 @@ const CARDINAL_POINT_HARMONICS = {
   ],
 };
 
-// ─── 7. BODY DIAMETERS ──────────────────────────────────────────────────
+// ─── D. MOON MEEUS TABLES (source: public/input/meeus-lunar-tables.json) ─
+// Meeus Ch. 47, Tables 47.A (longitude, 60 terms) and 47.B (latitude, 60 terms)
+// Each row: [D, M, M', F, coefficient (×10⁻⁶ degrees)]
+const MOON_L = [
+  [0,0,1,0, 6288774],[2,0,-1,0, 1274027],[2,0,0,0, 658314],[0,0,2,0, 213618],
+  [0,1,0,0, -185116],[0,0,0,2, -114332],[2,0,-2,0, 58793],[2,-1,-1,0, 57066],
+  [2,0,1,0, 53322],[2,-1,0,0, 45758],[0,1,-1,0, -40923],[1,0,0,0, -34720],
+  [0,1,1,0, -30383],[2,0,0,-2, 15327],[0,0,1,2, -12528],[0,0,1,-2, 10980],
+  [4,0,-1,0, 10675],[0,0,3,0, 10034],[4,0,-2,0, 8548],[2,1,-1,0, -7888],
+  [2,1,0,0, -6766],[1,0,-1,0, -5163],[1,1,0,0, 4987],[2,-1,1,0, 4036],
+  [2,0,2,0, 3994],[4,0,0,0, 3861],[2,0,-3,0, 3665],[0,1,-2,0, -2689],
+  [2,0,-1,2, -2602],[2,-1,-2,0, 2390],[1,0,1,0, -2348],[2,-2,0,0, 2236],
+  [0,1,2,0, -2120],[0,2,0,0, -2069],[2,-2,-1,0, 2048],[2,0,1,-2, -1773],
+  [2,0,0,2, -1595],[4,-1,-1,0, 1215],[0,0,2,2, -1110],[3,0,-1,0, -892],
+  [2,1,1,0, -810],[4,-1,-2,0, 759],[0,2,-1,0, -713],[2,2,-1,0, -700],
+  [2,1,-2,0, 691],[2,-1,0,-2, 596],[4,0,1,0, 549],[0,0,4,0, 537],
+  [4,-1,0,0, 520],[1,0,-2,0, -487],[2,1,0,-2, -399],[0,0,2,-2, -381],
+  [1,1,1,0, 351],[3,0,-2,0, -340],[4,0,-3,0, 330],[2,-1,2,0, 327],
+  [0,2,1,0, -323],[1,1,-1,0, 299],[2,0,3,0, 294],
+];
+const MOON_B = [
+  [0,0,0,1, 5128122],[0,0,1,1, 280602],[0,0,1,-1, 277693],[2,0,0,-1, 173237],
+  [2,0,-1,1, 55413],[2,0,-1,-1, 46271],[2,0,0,1, 32573],[0,0,2,1, 17198],
+  [2,0,1,-1, 9266],[0,0,2,-1, 8822],[2,-1,0,-1, 8216],[2,0,-2,-1, 4324],
+  [2,0,1,1, 4200],[2,1,0,-1, -3359],[2,-1,-1,1, 2463],[2,-1,0,1, 2211],
+  [2,-1,-1,-1, 2065],[0,1,-1,-1, -1870],[4,0,-1,-1, 1828],[0,1,0,1, -1794],
+  [0,0,0,3, -1749],[0,1,-1,1, -1565],[1,0,0,1, -1491],[0,1,1,1, -1475],
+  [0,1,1,-1, -1410],[0,1,0,-1, -1344],[1,0,0,-1, -1335],[0,0,3,1, 1107],
+  [4,0,0,-1, 1021],[4,0,-1,1, 833],[0,0,1,-3, 777],[4,0,-2,1, 671],
+  [2,0,0,-3, 607],[2,0,2,-1, 596],[2,-1,1,-1, 491],[2,0,-2,1, -451],
+  [0,0,3,-1, 439],[2,0,2,1, 422],[2,0,-3,-1, 421],[2,1,-1,1, -366],
+  [2,1,0,1, -351],[4,0,0,1, 331],[2,-1,1,1, 315],[2,-2,0,-1, 302],
+  [0,0,1,3, -283],[2,1,1,-1, -229],[1,1,0,-1, 223],[1,1,0,1, 223],
+  [0,1,-2,-1, -220],[2,1,-1,-1, -220],[1,0,1,1, -185],[2,-1,-2,-1, 181],
+  [0,1,2,1, -177],[4,0,-2,-1, 176],[4,-1,-1,-1, 166],[1,0,1,-1, -164],
+  [4,0,1,-1, 132],[1,0,-1,-1, -119],[4,-1,0,-1, 115],[2,-2,0,1, 107],
+];
+
+// ─── C3. Body diameters (astro reference) ──────────────────────────────────────────────────
 const diameters = {
   sunDiameter      : 1392684.00,
   moonDiameter     : 3474.8,
@@ -991,7 +1021,7 @@ const diameters = {
   erosDiameter     : 16.84,
 };
 
-// --- C3. Ascending nodes on invariable plane ---
+// --- C4. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
@@ -1009,12 +1039,12 @@ const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from e
 const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
 
 
-// ─── C4. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
+// ─── C5. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
 // Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
 // JPL ecliptic inclination trend rates, and eigenmode phase angles.
 // ─────────────────────────────────────────────────────────────────────────
 
-// --- C4a. Laplace-Lagrange bounds & eigenmode phases ---
+// --- C5a. Laplace-Lagrange bounds & eigenmode phases ---
 // Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
 // Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
 const mercuryLLBoundsMin = 4.57;
@@ -1053,7 +1083,7 @@ const EIGENMODE_PHASES = [
   { value: 'custom', label: 'Custom...' }
 ];
 
-// --- C4b. JPL ecliptic inclination trend rates (°/century) ---
+// --- C5b. JPL ecliptic inclination trend rates (°/century) ---
 // Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
 // Target rates for model verification.
 const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
@@ -1065,7 +1095,7 @@ const uranusEclipticInclinationTrendJPL = -0.00243;   // degrees/century (DECREA
 const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREASING)
 const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
 
-// ─── 8. ASTRONOMICAL REFERENCE VALUES (ASTRO_REFERENCE) ─────────────────
+// ─── C6. Astronomical reference object (ASTRO_REFERENCE) ─────────────────
 // J2000 epoch values, year/day lengths, perihelion reference, Meeus
 // coefficients, perihelion precession rates, and measurement offsets.
 // ─────────────────────────────────────────────────────────────────────────
@@ -1153,10 +1183,14 @@ const ASTRO_REFERENCE = {
 
 };
 
-// ─── 9. DERIVED CONSTANTS ───────────────────────────────────────────────
+// ─── E. DERIVED CONSTANTS ───────────────────────────────────────────────
 // Computed from foundational constants. Time units, EoC parameters,
 // Moon cycles, speeds, and orbital distances.
 // ─────────────────────────────────────────────────────────────────────────
+// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
+const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
+// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
+const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
 
 // --- 9a. Time units & year lengths ---
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
@@ -1252,12 +1286,12 @@ const moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSuninKM) / (2 * Math.PI);
 // Result: 149,597,870.345632 km
 
-// ─── 10. MASS CALCULATIONS ──────────────────────────────────────────────
+// ─── E2. Mass calculations ──────────────────────────────────────────────
 // GM and mass for Sun, Earth, Moon, and all planets. Derived from
 // Kepler's 3rd Law, DE440 mass ratios, and Moon orbital mechanics.
 // ─────────────────────────────────────────────────────────────────────────
 
-// --- 10a. Sun, Earth, Moon masses (Kepler's 3rd Law) ---
+// --- E2a. Sun, Earth, Moon masses (Kepler's 3rd Law) ---
 
 // Gravitational parameter of the Sun (derived from Kepler's 3rd Law)
 // GM = (2π)² × a³ / P² where a = mean AU in km, P = mean sidereal year in seconds
@@ -1313,7 +1347,7 @@ const M_MOON = GM_MOON / G_CONSTANT;
 // Mass ratio Sun/Earth ≈ 332,946
 const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
 
-// --- 10b. Planetary mass ratios (Sun/Planet) — IAU/JPL DE440 ---
+// --- E2b. Planetary mass ratios (Sun/Planet) — IAU/JPL DE440 ---
 // GM_planet = GM_SUN / ratio, then M_planet = GM_planet / G
 
 // Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
@@ -1369,7 +1403,7 @@ const GM_HALLEYS = M_HALLEYS * G_CONSTANT;           // ~1.47 × 10⁻⁵ km³/s
 const M_EROS = 6.687e15;                             // 6.687 × 10¹⁵ kg (measured)
 const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s²
 
-// ─── 10b. Derived planet inclination parameters (Fibonacci Laws) ────────
+// ─── E2c. Derived planet inclination parameters (Fibonacci Laws) ────────
 // Amplitude = ψ / (d × √m), Mean from J2000 constraint: mean = inclJ2000 - amp × cos(Ω - φ)
 // fibonacciD values: Mercury=21, Venus=34, Earth=3, Mars=5, Jupiter=5, Saturn=3, Uranus=21, Neptune=34
 const _fibD = { mercury: 21, venus: 34, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
@@ -1386,7 +1420,7 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
   }
 }
 
-// ─── 11. ORBITAL FORMULAS ───────────────────────────────────────────────
+// ─── E3. Orbital formulas ───────────────────────────────────────────────
 // Pure helper functions for orbital mechanics. No model-specific state.
 // Used by the About panel and orbital element displays.
 // ─────────────────────────────────────────────────────────────────────────
@@ -1945,7 +1979,7 @@ const OrbitalFormulas = {
   }
 };
 
-// ─── END OF CONSTANTS SECTION ───────────────────────────────────────────
+// ─── END OF CONSTANTS & FORMULAS SECTION ───────────────────────────────────────────
 // Everything below this line uses the constants defined above.
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -31018,24 +31052,6 @@ function moveModel(pos) {
       const A3 = (313.45 + 481266.484*T) * _d2r;
 
       // ── Sigma_l: longitude series (Table 47.A, 60 terms) ──
-      // Table-driven to avoid sign errors: [D, M, M', F, coeff_l (×10⁻⁶ deg)]
-      const MOON_L = [
-        [0,0,1,0, 6288774],[2,0,-1,0, 1274027],[2,0,0,0, 658314],[0,0,2,0, 213618],
-        [0,1,0,0, -185116],[0,0,0,2, -114332],[2,0,-2,0, 58793],[2,-1,-1,0, 57066],
-        [2,0,1,0, 53322],[2,-1,0,0, 45758],[0,1,-1,0, -40923],[1,0,0,0, -34720],
-        [0,1,1,0, -30383],[2,0,0,-2, 15327],[0,0,1,2, -12528],[0,0,1,-2, 10980],
-        [4,0,-1,0, 10675],[0,0,3,0, 10034],[4,0,-2,0, 8548],[2,1,-1,0, -7888],
-        [2,1,0,0, -6766],[1,0,-1,0, -5163],[1,1,0,0, 4987],[2,-1,1,0, 4036],
-        [2,0,2,0, 3994],[4,0,0,0, 3861],[2,0,-3,0, 3665],[0,1,-2,0, -2689],
-        [2,0,-1,2, -2602],[2,-1,-2,0, 2390],[1,0,1,0, -2348],[2,-2,0,0, 2236],
-        [0,1,2,0, -2120],[0,2,0,0, -2069],[2,-2,-1,0, 2048],[2,0,1,-2, -1773],
-        [2,0,0,2, -1595],[4,-1,-1,0, 1215],[0,0,2,2, -1110],[3,0,-1,0, -892],
-        [2,1,1,0, -810],[4,-1,-2,0, 759],[0,2,-1,0, -713],[2,2,-1,0, -700],
-        [2,1,-2,0, 691],[2,-1,0,-2, 596],[4,0,1,0, 549],[0,0,4,0, 537],
-        [4,-1,0,0, 520],[1,0,-2,0, -487],[2,1,0,-2, -399],[0,0,2,-2, -381],
-        [1,1,1,0, 351],[3,0,-2,0, -340],[4,0,-3,0, 330],[2,-1,2,0, 327],
-        [0,2,1,0, -323],[1,1,-1,0, 299],[2,0,3,0, 294],
-      ];
       let Sl = 0;
       for (let i = 0; i < MOON_L.length; i++) {
         const r = MOON_L[i];
@@ -31058,24 +31074,6 @@ function moveModel(pos) {
       θ += Sl * 1e-6 * _d2r;
 
       // ── Sigma_b: latitude series (Table 47.B, 60 terms) ──
-      // [D, M, M', F, coeff_b (×10⁻⁶ deg)]
-      const MOON_B = [
-        [0,0,0,1, 5128122],[0,0,1,1, 280602],[0,0,1,-1, 277693],[2,0,0,-1, 173237],
-        [2,0,-1,1, 55413],[2,0,-1,-1, 46271],[2,0,0,1, 32573],[0,0,2,1, 17198],
-        [2,0,1,-1, 9266],[0,0,2,-1, 8822],[2,-1,0,-1, 8216],[2,0,-2,-1, 4324],
-        [2,0,1,1, 4200],[2,1,0,-1, -3359],[2,-1,-1,1, 2463],[2,-1,0,1, 2211],
-        [2,-1,-1,-1, 2065],[0,1,-1,-1, -1870],[4,0,-1,-1, 1828],[0,1,0,1, -1794],
-        [0,0,0,3, -1749],[0,1,-1,1, -1565],[1,0,0,1, -1491],[0,1,1,1, -1475],
-        [0,1,1,-1, -1410],[0,1,0,-1, -1344],[1,0,0,-1, -1335],[0,0,3,1, 1107],
-        [4,0,0,-1, 1021],[4,0,-1,1, 833],[0,0,1,-3, 777],[4,0,-2,1, 671],
-        [2,0,0,-3, 607],[2,0,2,-1, 596],[2,-1,1,-1, 491],[2,0,-2,1, -451],
-        [0,0,3,-1, 439],[2,0,2,1, 422],[2,0,-3,-1, 421],[2,1,-1,1, -366],
-        [2,1,0,1, -351],[4,0,0,1, 331],[2,-1,1,1, 315],[2,-2,0,-1, 302],
-        [0,0,1,3, -283],[2,1,1,-1, -229],[1,1,0,-1, 223],[1,1,0,1, 223],
-        [0,1,-2,-1, -220],[2,1,-1,-1, -220],[1,0,1,1, -185],[2,-1,-2,-1, 181],
-        [0,1,2,1, -177],[4,0,-2,-1, 176],[4,-1,-1,-1, 166],[1,0,1,-1, -164],
-        [4,0,1,-1, 132],[1,0,-1,-1, -119],[4,-1,0,-1, 115],[2,-2,0,1, 107],
-      ];
       let Sb = 0;
       for (let i = 0; i < MOON_B.length; i++) {
         const r = MOON_B[i];
