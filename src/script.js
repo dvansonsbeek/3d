@@ -188,24 +188,6 @@ planets.venus = {
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
 };
-const venusSolarYearInput = planets.venus.solarYearInput;
-const venusEclipticInclinationJ2000 = planets.venus.eclipticInclinationJ2000;
-const venusOrbitalEccentricityJ2000 = planets.venus.orbitalEccentricityJ2000;
-const venusOrbitalEccentricityBase = planets.venus.orbitalEccentricityBase;
-const venusOrbitalEccentricityAmplitude = planets.venus.orbitalEccentricityAmplitude;
-const venusEccentricityPhaseJ2000 = planets.venus.eccentricityPhaseJ2000;
-const venusInvPlaneInclinationJ2000 = planets.venus.invPlaneInclinationJ2000;
-const venusTilt = planets.venus.axialTiltMean;
-const venusLongitudePerihelion = planets.venus.longitudePerihelion;
-const venusAscendingNode = planets.venus.ascendingNode;
-const venusMeanAnomaly = planets.venus.meanAnomaly;
-const venusTrueAnomaly = planets.venus.trueAnomaly;
-const venusAngleCorrection = planets.venus.angleCorrection;
-const venusPerihelionEclipticYears = planets.venus.perihelionEclipticYears;
-const venusAxialPrecessionYears = planets.venus.axialPrecessionYears;
-const venusStartpos = planets.venus.startpos;
-const venusEocFraction = planets.venus.eocFraction;
-const venusPerihelionRef_JD = planets.venus.perihelionRef_JD;
 
 // Mars
 planets.mars = {
@@ -228,24 +210,6 @@ planets.mars = {
   eocFraction: -0.066,
   perihelionRef_JD: 2456505.6,
 };
-const marsSolarYearInput = planets.mars.solarYearInput;
-const marsEclipticInclinationJ2000 = planets.mars.eclipticInclinationJ2000;
-const marsOrbitalEccentricityJ2000 = planets.mars.orbitalEccentricityJ2000;
-const marsOrbitalEccentricityBase = planets.mars.orbitalEccentricityBase;
-const marsOrbitalEccentricityAmplitude = planets.mars.orbitalEccentricityAmplitude;
-const marsEccentricityPhaseJ2000 = planets.mars.eccentricityPhaseJ2000;
-const marsInvPlaneInclinationJ2000 = planets.mars.invPlaneInclinationJ2000;
-const marsTilt = planets.mars.axialTiltMean;
-const marsLongitudePerihelion = planets.mars.longitudePerihelion;
-const marsAscendingNode = planets.mars.ascendingNode;
-const marsMeanAnomaly = planets.mars.meanAnomaly;
-const marsTrueAnomaly = planets.mars.trueAnomaly;
-const marsAngleCorrection = planets.mars.angleCorrection;
-const marsPerihelionEclipticYears = planets.mars.perihelionEclipticYears;
-const marsAxialPrecessionYears = planets.mars.axialPrecessionYears;
-const marsStartpos = planets.mars.startpos;
-const marsEocFraction = planets.mars.eocFraction;
-const marsPerihelionRef_JD = planets.mars.perihelionRef_JD;
 
 // Jupiter
 planets.jupiter = {
@@ -268,24 +232,6 @@ planets.jupiter = {
   eocFraction: 0.484,
   perihelionRef_JD: 2464224.5,
 };
-const jupiterSolarYearInput = planets.jupiter.solarYearInput;
-const jupiterEclipticInclinationJ2000 = planets.jupiter.eclipticInclinationJ2000;
-const jupiterOrbitalEccentricityJ2000 = planets.jupiter.orbitalEccentricityJ2000;
-const jupiterOrbitalEccentricityBase = planets.jupiter.orbitalEccentricityBase;
-const jupiterOrbitalEccentricityAmplitude = planets.jupiter.orbitalEccentricityAmplitude;
-const jupiterEccentricityPhaseJ2000 = planets.jupiter.eccentricityPhaseJ2000;
-const jupiterInvPlaneInclinationJ2000 = planets.jupiter.invPlaneInclinationJ2000;
-const jupiterTilt = planets.jupiter.axialTiltMean;
-const jupiterLongitudePerihelion = planets.jupiter.longitudePerihelion;
-const jupiterAscendingNode = planets.jupiter.ascendingNode;
-const jupiterMeanAnomaly = planets.jupiter.meanAnomaly;
-const jupiterTrueAnomaly = planets.jupiter.trueAnomaly;
-const jupiterAngleCorrection = planets.jupiter.angleCorrection;
-const jupiterPerihelionEclipticYears = planets.jupiter.perihelionEclipticYears;
-const jupiterAxialPrecessionYears = planets.jupiter.axialPrecessionYears;
-const jupiterStartpos = planets.jupiter.startpos;
-const jupiterEocFraction = planets.jupiter.eocFraction;
-const jupiterPerihelionRef_JD = planets.jupiter.perihelionRef_JD;
 
 // Saturn
 planets.saturn = {
@@ -308,24 +254,6 @@ planets.saturn = {
   eocFraction: 0.543,
   perihelionRef_JD: 2452875.9,
 };
-const saturnSolarYearInput = planets.saturn.solarYearInput;
-const saturnEclipticInclinationJ2000 = planets.saturn.eclipticInclinationJ2000;
-const saturnOrbitalEccentricityJ2000 = planets.saturn.orbitalEccentricityJ2000;
-const saturnOrbitalEccentricityBase = planets.saturn.orbitalEccentricityBase;
-const saturnOrbitalEccentricityAmplitude = planets.saturn.orbitalEccentricityAmplitude;
-const saturnEccentricityPhaseJ2000 = planets.saturn.eccentricityPhaseJ2000;
-const saturnInvPlaneInclinationJ2000 = planets.saturn.invPlaneInclinationJ2000;
-const saturnTilt = planets.saturn.axialTiltMean;
-const saturnLongitudePerihelion = planets.saturn.longitudePerihelion;
-const saturnAscendingNode = planets.saturn.ascendingNode;
-const saturnMeanAnomaly = planets.saturn.meanAnomaly;
-const saturnTrueAnomaly = planets.saturn.trueAnomaly;
-const saturnAngleCorrection = planets.saturn.angleCorrection;
-const saturnPerihelionEclipticYears = planets.saturn.perihelionEclipticYears;
-const saturnAxialPrecessionYears = planets.saturn.axialPrecessionYears;
-const saturnStartpos = planets.saturn.startpos;
-const saturnEocFraction = planets.saturn.eocFraction;
-const saturnPerihelionRef_JD = planets.saturn.perihelionRef_JD;
 
 // Uranus
 planets.uranus = {
@@ -348,24 +276,6 @@ planets.uranus = {
   eocFraction: 0.50,
   perihelionRef_JD: 2439699.8,
 };
-const uranusSolarYearInput = planets.uranus.solarYearInput;
-const uranusEclipticInclinationJ2000 = planets.uranus.eclipticInclinationJ2000;
-const uranusOrbitalEccentricityJ2000 = planets.uranus.orbitalEccentricityJ2000;
-const uranusOrbitalEccentricityBase = planets.uranus.orbitalEccentricityBase;
-const uranusOrbitalEccentricityAmplitude = planets.uranus.orbitalEccentricityAmplitude;
-const uranusEccentricityPhaseJ2000 = planets.uranus.eccentricityPhaseJ2000;
-const uranusInvPlaneInclinationJ2000 = planets.uranus.invPlaneInclinationJ2000;
-const uranusTilt = planets.uranus.axialTiltMean;
-const uranusLongitudePerihelion = planets.uranus.longitudePerihelion;
-const uranusAscendingNode = planets.uranus.ascendingNode;
-const uranusMeanAnomaly = planets.uranus.meanAnomaly;
-const uranusTrueAnomaly = planets.uranus.trueAnomaly;
-const uranusAngleCorrection = planets.uranus.angleCorrection;
-const uranusPerihelionEclipticYears = planets.uranus.perihelionEclipticYears;
-const uranusAxialPrecessionYears = planets.uranus.axialPrecessionYears;
-const uranusStartpos = planets.uranus.startpos;
-const uranusEocFraction = planets.uranus.eocFraction;
-const uranusPerihelionRef_JD = planets.uranus.perihelionRef_JD;
 
 // Neptune
 planets.neptune = {
@@ -388,24 +298,6 @@ planets.neptune = {
   eocFraction: 0.50,
   perihelionRef_JD: 2409432.4,
 };
-const neptuneSolarYearInput = planets.neptune.solarYearInput;
-const neptuneEclipticInclinationJ2000 = planets.neptune.eclipticInclinationJ2000;
-const neptuneOrbitalEccentricityJ2000 = planets.neptune.orbitalEccentricityJ2000;
-const neptuneOrbitalEccentricityBase = planets.neptune.orbitalEccentricityBase;
-const neptuneOrbitalEccentricityAmplitude = planets.neptune.orbitalEccentricityAmplitude;
-const neptuneEccentricityPhaseJ2000 = planets.neptune.eccentricityPhaseJ2000;
-const neptuneInvPlaneInclinationJ2000 = planets.neptune.invPlaneInclinationJ2000;
-const neptuneTilt = planets.neptune.axialTiltMean;
-const neptuneLongitudePerihelion = planets.neptune.longitudePerihelion;
-const neptuneAscendingNode = planets.neptune.ascendingNode;
-const neptuneMeanAnomaly = planets.neptune.meanAnomaly;
-const neptuneTrueAnomaly = planets.neptune.trueAnomaly;
-const neptuneAngleCorrection = planets.neptune.angleCorrection;
-const neptunePerihelionEclipticYears = planets.neptune.perihelionEclipticYears;
-const neptuneAxialPrecessionYears = planets.neptune.axialPrecessionYears;
-const neptuneStartpos = planets.neptune.startpos;
-const neptuneEocFraction = planets.neptune.eocFraction;
-const neptunePerihelionRef_JD = planets.neptune.perihelionRef_JD;
 
 // --- 4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
 
@@ -416,18 +308,6 @@ planets.pluto = {
   ascendingNode: 110.30393, meanAnomaly: 15.55009, trueAnomaly: 26.31965048,
   angleCorrection: 2.469281, perihelionEclipticYears: holisticyearLength, startpos: 71.555,
 };
-const plutoSolarYearInput = planets.pluto.solarYearInput;
-const plutoEclipticInclinationJ2000 = planets.pluto.eclipticInclinationJ2000;
-const plutoOrbitalEccentricityBase = planets.pluto.orbitalEccentricityBase;
-const plutoInvPlaneInclinationJ2000 = planets.pluto.invPlaneInclinationJ2000;
-const plutoTilt = planets.pluto.axialTiltMean;
-const plutoLongitudePerihelion = planets.pluto.longitudePerihelion;
-const plutoAscendingNode = planets.pluto.ascendingNode;
-const plutoMeanAnomaly = planets.pluto.meanAnomaly;
-const plutoTrueAnomaly = planets.pluto.trueAnomaly;
-const plutoAngleCorrection = planets.pluto.angleCorrection;
-const plutoPerihelionEclipticYears = planets.pluto.perihelionEclipticYears;
-const plutoStartpos = planets.pluto.startpos;
 
 // Halley's
 planets.halleys = {
@@ -436,18 +316,6 @@ planets.halleys = {
   ascendingNode: 58.42008, meanAnomaly: 38.77481, trueAnomaly: 166.26774708,
   angleCorrection: -1.619816, perihelionEclipticYears: holisticyearLength, startpos: 80,
 };
-const halleysSolarYearInput = planets.halleys.solarYearInput;
-const halleysEclipticInclinationJ2000 = planets.halleys.eclipticInclinationJ2000;
-const halleysOrbitalEccentricityBase = planets.halleys.orbitalEccentricityBase;
-const halleysInvPlaneInclinationJ2000 = planets.halleys.invPlaneInclinationJ2000;
-const halleysTilt = planets.halleys.axialTiltMean;
-const halleysLongitudePerihelion = planets.halleys.longitudePerihelion;
-const halleysAscendingNode = planets.halleys.ascendingNode;
-const halleysMeanAnomaly = planets.halleys.meanAnomaly;
-const halleysTrueAnomaly = planets.halleys.trueAnomaly;
-const halleysAngleCorrection = planets.halleys.angleCorrection;
-const halleysPerihelionEclipticYears = planets.halleys.perihelionEclipticYears;
-const halleysStartpos = planets.halleys.startpos;
 
 // Eros
 planets.eros = {
@@ -456,18 +324,6 @@ planets.eros = {
   ascendingNode: 304.30993, meanAnomaly: 320.21552, trueAnomaly: 299.91713740,
   angleCorrection: 0.047888, perihelionEclipticYears: holisticyearLength, startpos: 57.402,
 };
-const erosSolarYearInput = planets.eros.solarYearInput;
-const erosEclipticInclinationJ2000 = planets.eros.eclipticInclinationJ2000;
-const erosOrbitalEccentricityBase = planets.eros.orbitalEccentricityBase;
-const erosInvPlaneInclinationJ2000 = planets.eros.invPlaneInclinationJ2000;
-const erosTilt = planets.eros.axialTiltMean;
-const erosLongitudePerihelion = planets.eros.longitudePerihelion;
-const erosAscendingNode = planets.eros.ascendingNode;
-const erosMeanAnomaly = planets.eros.meanAnomaly;
-const erosTrueAnomaly = planets.eros.trueAnomaly;
-const erosAngleCorrection = planets.eros.angleCorrection;
-const erosPerihelionEclipticYears = planets.eros.perihelionEclipticYears;
-const erosStartpos = planets.eros.startpos;
 
 // Ceres
 planets.ceres = {
@@ -476,18 +332,6 @@ planets.ceres = {
   ascendingNode: 80.30533, meanAnomaly: 95.98772, trueAnomaly: 104.48097667,
   angleCorrection: 0, perihelionEclipticYears: holisticyearLength, orbitDistance: 2.76596,
 };
-const ceresSolarYearInput = planets.ceres.solarYearInput;
-const ceresEclipticInclinationJ2000 = planets.ceres.eclipticInclinationJ2000;
-const ceresOrbitalEccentricityBase = planets.ceres.orbitalEccentricityBase;
-const ceresInvPlaneInclinationJ2000 = planets.ceres.invPlaneInclinationJ2000;
-const ceresTilt = planets.ceres.axialTiltMean;
-const ceresLongitudePerihelion = planets.ceres.longitudePerihelion;
-const ceresAscendingNode = planets.ceres.ascendingNode;
-const ceresMeanAnomaly = planets.ceres.meanAnomaly;
-const ceresTrueAnomaly = planets.ceres.trueAnomaly;
-const ceresAngleCorrection = planets.ceres.angleCorrection;
-const ceresPerihelionEclipticYears = planets.ceres.perihelionEclipticYears;
-const ceresOrbitDistance = planets.ceres.orbitDistance;
 
 // --- 4c. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
@@ -1330,12 +1174,12 @@ const perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / 
 //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
 const ascNodeTiltCorrection = {
   mercury: 180 - planets.mercury.ascendingNode,
-  venus:   180 - venusAscendingNode,
-  mars:    180 - marsAscendingNode,
-  jupiter: 2 * jupiterStartpos,
-  saturn:  2 * saturnStartpos,
-  uranus:  2 * uranusStartpos,
-  neptune: 2 * neptuneStartpos,
+  venus:   180 - planets.venus.ascendingNode,
+  mars:    180 - planets.mars.ascendingNode,
+  jupiter: 2 * planets.jupiter.startpos,
+  saturn:  2 * planets.saturn.startpos,
+  uranus:  2 * planets.uranus.startpos,
+  neptune: 2 * planets.neptune.startpos,
 };
 
 // --- 9c. Speeds & distances ---
@@ -2073,30 +1917,30 @@ const mercuryRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/
 const mercuryEccentricityPerihelion = (mercuryPerihelionDistance/2)*planets.mercury.orbitalEccentricityBase;
 const mercuryLowestPoint = 180-planets.mercury.ascendingNode;
 
-const venusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/venusSolarYearInput));
+const venusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.venus.solarYearInput));
 const venusOrbitDistance = (((holisticyearLength/venusSolarYearCount)**2)**(1/3));
-const venusRealOrbitalEccentricity = venusOrbitalEccentricityBase/(1+venusOrbitalEccentricityBase);
+const venusRealOrbitalEccentricity = planets.venus.orbitalEccentricityBase/(1+planets.venus.orbitalEccentricityBase);
 const venusPerihelionDistance = (venusOrbitDistance*venusRealOrbitalEccentricity*100);
 const venusElipticOrbit = venusPerihelionDistance/2;
 const venusSpeed = (venusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/venusSolarYearCount))/24;
 const venusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/243.022699230302));
-const venusEccentricityPerihelion = (venusPerihelionDistance/2)*venusOrbitalEccentricityBase;
-const venusLowestPoint = 180-venusAscendingNode;
+const venusEccentricityPerihelion = (venusPerihelionDistance/2)*planets.venus.orbitalEccentricityBase;
+const venusLowestPoint = 180-planets.venus.ascendingNode;
 
 // Planet calculations TYPE II
-const marsSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/marsSolarYearInput));
+const marsSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.mars.solarYearInput));
 const marsOrbitDistance = (((holisticyearLength/marsSolarYearCount)**2)**(1/3));
-const marsRealOrbitalEccentricity = marsOrbitalEccentricityBase/(1+marsOrbitalEccentricityBase);
-const marsElipticOrbit = (((marsRealOrbitalEccentricity*marsOrbitDistance)/2))*100+((marsOrbitalEccentricityBase*marsOrbitDistance)-(marsRealOrbitalEccentricity*marsOrbitDistance))*100;
-const marsPerihelionDistance = (marsOrbitDistance*marsOrbitalEccentricityBase*100)+marsElipticOrbit;
+const marsRealOrbitalEccentricity = planets.mars.orbitalEccentricityBase/(1+planets.mars.orbitalEccentricityBase);
+const marsElipticOrbit = (((marsRealOrbitalEccentricity*marsOrbitDistance)/2))*100+((planets.mars.orbitalEccentricityBase*marsOrbitDistance)-(marsRealOrbitalEccentricity*marsOrbitDistance))*100;
+const marsPerihelionDistance = (marsOrbitDistance*planets.mars.orbitalEccentricityBase*100)+marsElipticOrbit;
 const marsSpeed = (marsOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/marsSolarYearCount))/24;
 const marsRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/1.02595659586635));
 
-const erosSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/erosSolarYearInput));
+const erosSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.eros.solarYearInput));
 const erosOrbitDistance = (((holisticyearLength/erosSolarYearCount)**2)**(1/3));
-const erosRealOrbitalEccentricity = erosOrbitalEccentricityBase/(1+erosOrbitalEccentricityBase);
-const erosElipticOrbit = (((erosRealOrbitalEccentricity*erosOrbitDistance)/2))*100+((erosOrbitalEccentricityBase*erosOrbitDistance)-(erosRealOrbitalEccentricity*erosOrbitDistance))*100;
-const erosPerihelionDistance = (erosOrbitDistance*erosOrbitalEccentricityBase*100)+erosElipticOrbit;
+const erosRealOrbitalEccentricity = planets.eros.orbitalEccentricityBase/(1+planets.eros.orbitalEccentricityBase);
+const erosElipticOrbit = (((erosRealOrbitalEccentricity*erosOrbitDistance)/2))*100+((planets.eros.orbitalEccentricityBase*erosOrbitDistance)-(erosRealOrbitalEccentricity*erosOrbitDistance))*100;
+const erosPerihelionDistance = (erosOrbitDistance*planets.eros.orbitalEccentricityBase*100)+erosElipticOrbit;
 const erosSpeed = (erosOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/erosSolarYearCount))/24;
 const erosRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.21958333344885));
 
@@ -2108,49 +1952,49 @@ function geocentricElipticOrbit(planetLongPeri) {
   return 2 * ASTRO_REFERENCE.eccentricityJ2000 * 100 * Math.sin(dw);
 }
 
-const jupiterSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/jupiterSolarYearInput));
+const jupiterSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.jupiter.solarYearInput));
 const jupiterOrbitDistance = (((holisticyearLength/jupiterSolarYearCount)**2)**(1/3));
-const jupiterRealOrbitalEccentricity = jupiterOrbitalEccentricityBase/(1+jupiterOrbitalEccentricityBase);
-const jupiterElipticOrbit = geocentricElipticOrbit(jupiterLongitudePerihelion);
+const jupiterRealOrbitalEccentricity = planets.jupiter.orbitalEccentricityBase/(1+planets.jupiter.orbitalEccentricityBase);
+const jupiterElipticOrbit = geocentricElipticOrbit(planets.jupiter.longitudePerihelion);
 const jupiterPerihelionDistance = jupiterRealOrbitalEccentricity*jupiterOrbitDistance*100;
 const jupiterSpeed = (jupiterOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/jupiterSolarYearCount))/24;
 const jupiterRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.413541666975253));
 
-const saturnSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/saturnSolarYearInput));
+const saturnSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.saturn.solarYearInput));
 const saturnOrbitDistance = (((holisticyearLength/saturnSolarYearCount)**2)**(1/3));
-const saturnRealOrbitalEccentricity = saturnOrbitalEccentricityBase/(1+saturnOrbitalEccentricityBase);
-const saturnElipticOrbit = geocentricElipticOrbit(saturnLongitudePerihelion);
+const saturnRealOrbitalEccentricity = planets.saturn.orbitalEccentricityBase/(1+planets.saturn.orbitalEccentricityBase);
+const saturnElipticOrbit = geocentricElipticOrbit(planets.saturn.longitudePerihelion);
 const saturnPerihelionDistance = saturnRealOrbitalEccentricity*saturnOrbitDistance*100;
 const saturnSpeed = (saturnOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/saturnSolarYearCount))/24;
 const saturnRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.440023148755863));
 
-const uranusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/uranusSolarYearInput));
+const uranusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.uranus.solarYearInput));
 const uranusOrbitDistance = (((holisticyearLength/uranusSolarYearCount)**2)**(1/3));
-const uranusRealOrbitalEccentricity = uranusOrbitalEccentricityBase/(1+uranusOrbitalEccentricityBase);
-const uranusElipticOrbit = geocentricElipticOrbit(uranusLongitudePerihelion);
+const uranusRealOrbitalEccentricity = planets.uranus.orbitalEccentricityBase/(1+planets.uranus.orbitalEccentricityBase);
+const uranusElipticOrbit = geocentricElipticOrbit(planets.uranus.longitudePerihelion);
 const uranusPerihelionDistance = uranusRealOrbitalEccentricity*uranusOrbitDistance*100;
 const uranusSpeed = (uranusOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/uranusSolarYearCount))/24;
 const uranusRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.718329998141018));
 
-const neptuneSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/neptuneSolarYearInput));
+const neptuneSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.neptune.solarYearInput));
 const neptuneOrbitDistance = (((holisticyearLength/neptuneSolarYearCount)**2)**(1/3));
-const neptuneRealOrbitalEccentricity = neptuneOrbitalEccentricityBase/(1+neptuneOrbitalEccentricityBase);
-const neptuneElipticOrbit = geocentricElipticOrbit(neptuneLongitudePerihelion);
+const neptuneRealOrbitalEccentricity = planets.neptune.orbitalEccentricityBase/(1+planets.neptune.orbitalEccentricityBase);
+const neptuneElipticOrbit = geocentricElipticOrbit(planets.neptune.longitudePerihelion);
 const neptunePerihelionDistance = neptuneRealOrbitalEccentricity*neptuneOrbitDistance*100;
 const neptuneSpeed = (neptuneOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/neptuneSolarYearCount))/24;
 const neptuneRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/0.671300001591743));
 
-const plutoSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/plutoSolarYearInput));
+const plutoSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.pluto.solarYearInput));
 const plutoOrbitDistance = (((holisticyearLength/plutoSolarYearCount)**2)**(1/3));
-const plutoPerihelionDistance = plutoOrbitalEccentricityBase*plutoOrbitDistance*100;
+const plutoPerihelionDistance = planets.pluto.orbitalEccentricityBase*plutoOrbitDistance*100;
 const plutoElipticOrbit = plutoPerihelionDistance/2;
 const plutoSpeed = (plutoOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/plutoSolarYearCount))/24;
 const plutoRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/6.38720012152536));
 
-const halleysSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/halleysSolarYearInput));
+const halleysSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.halleys.solarYearInput));
 const halleysOrbitDistance = (((holisticyearLength/halleysSolarYearCount)**2)**(1/3));
-const halleysRealOrbitalEccentricity = halleysOrbitalEccentricityBase/(1+halleysOrbitalEccentricityBase);
-const halleysElipticOrbit = ((halleysOrbitalEccentricityBase*halleysOrbitDistance)-(halleysRealOrbitalEccentricity*halleysOrbitDistance))*100; 
+const halleysRealOrbitalEccentricity = planets.halleys.orbitalEccentricityBase/(1+planets.halleys.orbitalEccentricityBase);
+const halleysElipticOrbit = ((planets.halleys.orbitalEccentricityBase*halleysOrbitDistance)-(halleysRealOrbitalEccentricity*halleysOrbitDistance))*100; 
 const halleysPerihelionDistance = halleysRealOrbitalEccentricity*halleysOrbitDistance*2*100;
 const halleysSpeed = (halleysOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/halleysSolarYearCount))/24;
 const halleysRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(Math.round((meansolaryearlengthinDays*holisticyearLength)/2.2));
@@ -2209,12 +2053,12 @@ function getPlanetPerturbationData(oRef) {
     {
       name: 'Venus',
       a_km: venusOrbitDistance * oRef.lengthofAU,
-      e: venusOrbitalEccentricityBase,
-      i_deg: venusEclipticInclinationJ2000,          // Fixed ecliptic inclination (3.39°)
-      omega_deg: venusAscendingNode,                 // Fixed J2000 ascending node
+      e: planets.venus.orbitalEccentricityBase,
+      i_deg: planets.venus.eclipticInclinationJ2000,          // Fixed ecliptic inclination (3.39°)
+      omega_deg: planets.venus.ascendingNode,                 // Fixed J2000 ascending node
       mass: M_VENUS,
       period_days: (holisticyearLength / venusSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears)
     },
     {
       name: 'Earth',
@@ -2229,82 +2073,82 @@ function getPlanetPerturbationData(oRef) {
     {
       name: 'Mars',
       a_km: marsOrbitDistance * oRef.lengthofAU,
-      e: marsOrbitalEccentricityBase,
-      i_deg: marsEclipticInclinationJ2000,          // Fixed ecliptic inclination (1.85°)
-      omega_deg: marsAscendingNode,                 // Fixed J2000 ascending node
+      e: planets.mars.orbitalEccentricityBase,
+      i_deg: planets.mars.eclipticInclinationJ2000,          // Fixed ecliptic inclination (1.85°)
+      omega_deg: planets.mars.ascendingNode,                 // Fixed J2000 ascending node
       mass: M_MARS,
       period_days: (holisticyearLength / marsSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears)
     },
     {
       name: 'Jupiter',
       a_km: jupiterOrbitDistance * oRef.lengthofAU,
-      e: jupiterOrbitalEccentricityBase,
-      i_deg: jupiterEclipticInclinationJ2000,       // Fixed ecliptic inclination (1.30°)
-      omega_deg: jupiterAscendingNode,              // Fixed J2000 ascending node
+      e: planets.jupiter.orbitalEccentricityBase,
+      i_deg: planets.jupiter.eclipticInclinationJ2000,       // Fixed ecliptic inclination (1.30°)
+      omega_deg: planets.jupiter.ascendingNode,              // Fixed J2000 ascending node
       mass: M_JUPITER,
       period_days: (holisticyearLength / jupiterSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears)
     },
     {
       name: 'Saturn',
       a_km: saturnOrbitDistance * oRef.lengthofAU,
-      e: saturnOrbitalEccentricityBase,
-      i_deg: saturnEclipticInclinationJ2000,        // Fixed ecliptic inclination (2.49°)
-      omega_deg: saturnAscendingNode,               // Fixed J2000 ascending node
+      e: planets.saturn.orbitalEccentricityBase,
+      i_deg: planets.saturn.eclipticInclinationJ2000,        // Fixed ecliptic inclination (2.49°)
+      omega_deg: planets.saturn.ascendingNode,               // Fixed J2000 ascending node
       mass: M_SATURN,
       period_days: (holisticyearLength / saturnSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears)
     },
     {
       name: 'Uranus',
       a_km: uranusOrbitDistance * oRef.lengthofAU,
-      e: uranusOrbitalEccentricityBase,
-      i_deg: uranusEclipticInclinationJ2000,        // Fixed ecliptic inclination (0.77°)
-      omega_deg: uranusAscendingNode,               // Fixed J2000 ascending node
+      e: planets.uranus.orbitalEccentricityBase,
+      i_deg: planets.uranus.eclipticInclinationJ2000,        // Fixed ecliptic inclination (0.77°)
+      omega_deg: planets.uranus.ascendingNode,               // Fixed J2000 ascending node
       mass: M_URANUS,
       period_days: (holisticyearLength / uranusSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears)
     },
     {
       name: 'Neptune',
       a_km: neptuneOrbitDistance * oRef.lengthofAU,
-      e: neptuneOrbitalEccentricityBase,
-      i_deg: neptuneEclipticInclinationJ2000,       // Fixed ecliptic inclination (1.77°)
-      omega_deg: neptuneAscendingNode,              // Fixed J2000 ascending node
+      e: planets.neptune.orbitalEccentricityBase,
+      i_deg: planets.neptune.eclipticInclinationJ2000,       // Fixed ecliptic inclination (1.77°)
+      omega_deg: planets.neptune.ascendingNode,              // Fixed J2000 ascending node
       mass: M_NEPTUNE,
       period_days: (holisticyearLength / neptuneSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears)
     },
     {
       name: 'Pluto',
       a_km: plutoOrbitDistance * oRef.lengthofAU,
-      e: plutoOrbitalEccentricityBase,
-      i_deg: plutoEclipticInclinationJ2000,         // Fixed ecliptic inclination (17.14°)
-      omega_deg: plutoAscendingNode,                // Fixed J2000 ascending node
+      e: planets.pluto.orbitalEccentricityBase,
+      i_deg: planets.pluto.eclipticInclinationJ2000,         // Fixed ecliptic inclination (17.14°)
+      omega_deg: planets.pluto.ascendingNode,                // Fixed J2000 ascending node
       mass: M_PLUTO,
       period_days: (holisticyearLength / plutoSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears)
     },
     {
       name: 'Halleys',
       a_km: halleysOrbitDistance * oRef.lengthofAU,
-      e: halleysOrbitalEccentricityBase,
-      i_deg: halleysEclipticInclinationJ2000,       // Fixed ecliptic inclination (162.19° - retrograde)
-      omega_deg: halleysAscendingNode,              // Fixed J2000 ascending node
+      e: planets.halleys.orbitalEccentricityBase,
+      i_deg: planets.halleys.eclipticInclinationJ2000,       // Fixed ecliptic inclination (162.19° - retrograde)
+      omega_deg: planets.halleys.ascendingNode,              // Fixed J2000 ascending node
       mass: M_HALLEYS,
       period_days: (holisticyearLength / halleysSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears)
     },
     {
       name: 'Eros',
       a_km: erosOrbitDistance * oRef.lengthofAU,
-      e: erosOrbitalEccentricityBase,
-      i_deg: erosEclipticInclinationJ2000,          // Fixed ecliptic inclination (10.83°)
-      omega_deg: erosAscendingNode,                 // Fixed J2000 ascending node
+      e: planets.eros.orbitalEccentricityBase,
+      i_deg: planets.eros.eclipticInclinationJ2000,          // Fixed ecliptic inclination (10.83°)
+      omega_deg: planets.eros.ascendingNode,                 // Fixed J2000 ascending node
       mass: M_EROS,
       period_days: (holisticyearLength / erosSolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears)
     }
   ];
 }
@@ -3046,9 +2890,9 @@ const ascNodeToolCorrection = ascNodeTiltCorrection;
 
 // Ascending node lookup by planet name (for post-hoc RA/Dec correction)
 const _planetAscNodeLookup = {
-  Mercury: planets.mercury.ascendingNode, Venus: venusAscendingNode, Mars: marsAscendingNode,
-  Jupiter: jupiterAscendingNode, Saturn: saturnAscendingNode,
-  Uranus: uranusAscendingNode, Neptune: neptuneAscendingNode,
+  Mercury: planets.mercury.ascendingNode, Venus: planets.venus.ascendingNode, Mars: planets.mars.ascendingNode,
+  Jupiter: planets.jupiter.ascendingNode, Saturn: planets.saturn.ascendingNode,
+  Uranus: planets.uranus.ascendingNode, Neptune: planets.neptune.ascendingNode,
 };
 
 const mercuryRealPerihelionAtSun = {
@@ -3133,7 +2977,7 @@ const mercury = {
 const venusPerihelionDurationEcliptic1 = {
   name: "Venus Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/venusPerihelionEclipticYears,
+  speed: Math.PI*2/planets.venus.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3159,8 +3003,8 @@ const venusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((venusLongitudePerihelion+venusAngleCorrection+90))*Math.PI/180)*venusPerihelionDistance,
-  orbitCenterb: Math.cos((90-(venusLongitudePerihelion+venusAngleCorrection-90))*Math.PI/180)*venusPerihelionDistance,
+  orbitCentera: Math.cos(((planets.venus.longitudePerihelion+planets.venus.angleCorrection+90))*Math.PI/180)*venusPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.venus.longitudePerihelion+planets.venus.angleCorrection-90))*Math.PI/180)*venusPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3182,7 +3026,7 @@ const venusPerihelionFromEarth = {
 const venusPerihelionDurationEcliptic2 = {
   name: "Venus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/venusPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.venus.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3211,8 +3055,8 @@ const venusRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
 
   size: 0.1,
   color: 0xA57C1B,
@@ -3234,8 +3078,8 @@ const venusFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-venusAscendingNode)*Math.PI)/180)*-venusEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.venus.ascendingNode)*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
 
   size: 0.1,
   color: 0xA57C1B,
@@ -3249,23 +3093,23 @@ const venusFixedPerihelionAtSun = {
 
 const venus = {
   name: "Venus",
-  startPos: venusStartpos,
+  startPos: planets.venus.startpos,
   speed: Math.PI*2/(holisticyearLength/venusSolarYearCount),
   rotationSpeed: -Math.PI*2*((venusRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -venusTilt,
+  tilt: -planets.venus.axialTiltMean,
   orbitRadius: (((holisticyearLength/venusSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(venusAscendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-venusEclipticInclinationJ2000,
-  eccentricity: venusOrbitalEccentricityBase * venusEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.venus.ascendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.venus.ascendingNode+ascNodeToolCorrection.venus))*Math.PI)/180)*-planets.venus.eclipticInclinationJ2000,
+  eccentricity: planets.venus.orbitalEccentricityBase * planets.venus.eocFraction,
   _eccentricityKey: 'eccentricityVenus',
-  _eocFraction: venusEocFraction,
-  perihelionPhaseJ2000: -venusStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / venusSolarYearCount) - Math.PI * 2 / venusPerihelionEclipticYears)
-    * (venusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / venusPerihelionEclipticYears,
+  _eocFraction: planets.venus.eocFraction,
+  perihelionPhaseJ2000: -planets.venus.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / venusSolarYearCount) - Math.PI * 2 / planets.venus.perihelionEclipticYears)
+    * (planets.venus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.venus.perihelionEclipticYears,
 
   size: (diameters.venusDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
@@ -3283,7 +3127,7 @@ const venus = {
 const marsPerihelionDurationEcliptic1 = {
   name: "Mars Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/marsPerihelionEclipticYears,
+  speed: Math.PI*2/planets.mars.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3309,8 +3153,8 @@ const marsPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((marsLongitudePerihelion+marsAngleCorrection+90))*Math.PI/180)*marsPerihelionDistance,
-  orbitCenterb: Math.cos((90-(marsLongitudePerihelion+marsAngleCorrection-90))*Math.PI/180)*marsPerihelionDistance,
+  orbitCentera: Math.cos(((planets.mars.longitudePerihelion+planets.mars.angleCorrection+90))*Math.PI/180)*marsPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.mars.longitudePerihelion+planets.mars.angleCorrection-90))*Math.PI/180)*marsPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3332,7 +3176,7 @@ const marsPerihelionFromEarth = {
 const marsPerihelionDurationEcliptic2 = {
   name: "Mars Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/marsPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.mars.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3353,7 +3197,7 @@ const marsPerihelionDurationEcliptic2 = {
 
 const marsRealPerihelionAtSun = {
   name: "Mars Real Perihelion At Sun",
-  startPos: marsStartpos*2,
+  startPos: planets.mars.startpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
   rotationSpeed: 0,
   tilt: 0,
@@ -3361,12 +3205,12 @@ const marsRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
   eclipticPrecLayer: marsPerihelionDurationEcliptic1,
-  longitudePerihelion: marsLongitudePerihelion,
+  longitudePerihelion: planets.mars.longitudePerihelion,
   planetType: 'II',
-  _orbitalEccentricity: marsOrbitalEccentricityBase,
+  _orbitalEccentricity: planets.mars.orbitalEccentricityBase,
   _orbitDistance: marsOrbitDistance,
 
   size: 0.1,
@@ -3381,7 +3225,7 @@ const marsRealPerihelionAtSun = {
 
 const marsFixedPerihelionAtSun = {
   name: "Mars Fixed Perihelion At Sun",
-  startPos: marsStartpos*2,
+  startPos: planets.mars.startpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/marsSolarYearCount)),
   rotationSpeed: 0,
   tilt: 0,
@@ -3389,8 +3233,8 @@ const marsFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-marsAscendingNode)*Math.PI)/180)*-marsEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.mars.ascendingNode)*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
 
   size: 0.1,
   color: 0xFEAA0D,
@@ -3404,23 +3248,23 @@ const marsFixedPerihelionAtSun = {
 
 const mars = {
   name: "Mars",
-  startPos: marsStartpos,
+  startPos: planets.mars.startpos,
   speed: -Math.PI*2/(holisticyearLength/marsSolarYearCount),
   rotationSpeed: Math.PI*2*((marsRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -marsTilt,
+  tilt: -planets.mars.axialTiltMean,
   orbitRadius: (((holisticyearLength/marsSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(marsAscendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-marsEclipticInclinationJ2000,
-  eccentricity: marsOrbitalEccentricityBase * marsEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.mars.ascendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.mars.ascendingNode+ascNodeToolCorrection.mars))*Math.PI)/180)*-planets.mars.eclipticInclinationJ2000,
+  eccentricity: planets.mars.orbitalEccentricityBase * planets.mars.eocFraction,
   _eccentricityKey: 'eccentricityMars',
-  _eocFraction: marsEocFraction,
-  perihelionPhaseJ2000: -marsStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / marsSolarYearCount) - Math.PI * 2 / marsPerihelionEclipticYears)
-    * (marsPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / marsPerihelionEclipticYears,
+  _eocFraction: planets.mars.eocFraction,
+  perihelionPhaseJ2000: -planets.mars.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / marsSolarYearCount) - Math.PI * 2 / planets.mars.perihelionEclipticYears)
+    * (planets.mars.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.mars.perihelionEclipticYears,
 
   size: (diameters.marsDiameter/ currentAUDistance)*100,
   color: 0xFF0000,
@@ -3438,7 +3282,7 @@ const mars = {
 const jupiterPerihelionDurationEcliptic1 = {
   name: "Jupiter Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/jupiterPerihelionEclipticYears,
+  speed: Math.PI*2/planets.jupiter.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3464,8 +3308,8 @@ const jupiterPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((jupiterLongitudePerihelion+jupiterAngleCorrection+90))*Math.PI/180)*jupiterPerihelionDistance,
-  orbitCenterb: Math.cos((90-(jupiterLongitudePerihelion+jupiterAngleCorrection-90))*Math.PI/180)*jupiterPerihelionDistance,
+  orbitCentera: Math.cos(((planets.jupiter.longitudePerihelion+planets.jupiter.angleCorrection+90))*Math.PI/180)*jupiterPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.jupiter.longitudePerihelion+planets.jupiter.angleCorrection-90))*Math.PI/180)*jupiterPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3487,7 +3331,7 @@ const jupiterPerihelionFromEarth = {
 const jupiterPerihelionDurationEcliptic2 = {
   name: "Jupiter Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/jupiterPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.jupiter.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3508,7 +3352,7 @@ const jupiterPerihelionDurationEcliptic2 = {
 
 const jupiterRealPerihelionAtSun = {
   name: "Jupiter Real Perihelion At Sun",
-  startPos: jupiterStartpos*2,
+  startPos: planets.jupiter.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3516,10 +3360,10 @@ const jupiterRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
   eclipticPrecLayer: jupiterPerihelionDurationEcliptic1,
-  longitudePerihelion: jupiterLongitudePerihelion,
+  longitudePerihelion: planets.jupiter.longitudePerihelion,
   signFlip: 1,
 
   size: 1.0,
@@ -3534,7 +3378,7 @@ const jupiterRealPerihelionAtSun = {
 
 const jupiterFixedPerihelionAtSun = {
   name: "Jupiter Fixed Perihelion At Sun",
-  startPos: jupiterStartpos*2,
+  startPos: planets.jupiter.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3542,8 +3386,8 @@ const jupiterFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-jupiterAscendingNode)*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.jupiter.ascendingNode)*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
   
   size: 1.0,
   color: 0xCDC2B2,
@@ -3557,22 +3401,22 @@ const jupiterFixedPerihelionAtSun = {
 
 const jupiter = {
   name: "Jupiter",
-  startPos: jupiterStartpos,
+  startPos: planets.jupiter.startpos,
   speed: Math.PI*2/(holisticyearLength/jupiterSolarYearCount),
   rotationSpeed: Math.PI*2*((jupiterRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -jupiterTilt,
+  tilt: -planets.jupiter.axialTiltMean,
   orbitRadius: (((holisticyearLength/jupiterSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(jupiterAscendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-jupiterEclipticInclinationJ2000,
-  eccentricity: jupiterOrbitalEccentricityBase * jupiterEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.jupiter.ascendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.jupiter.ascendingNode+ascNodeToolCorrection.jupiter))*Math.PI)/180)*-planets.jupiter.eclipticInclinationJ2000,
+  eccentricity: planets.jupiter.orbitalEccentricityBase * planets.jupiter.eocFraction,
   _eccentricityKey: 'eccentricityJupiter',
-  _eocFraction: jupiterEocFraction,
-  perihelionPhaseJ2000: -jupiterStartpos * (Math.PI / 180)
+  _eocFraction: planets.jupiter.eocFraction,
+  perihelionPhaseJ2000: -planets.jupiter.startpos * (Math.PI / 180)
     + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / (holisticyearLength / 5))
-    * (jupiterPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+    * (planets.jupiter.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
   perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 5),
 
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
@@ -3596,7 +3440,7 @@ const jupiter = {
 const saturnPerihelionDurationEcliptic1 = {
   name: "Saturn Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/saturnPerihelionEclipticYears,
+  speed: Math.PI*2/planets.saturn.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3622,8 +3466,8 @@ const saturnPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((saturnLongitudePerihelion+saturnAngleCorrection+90))*Math.PI/180)*saturnPerihelionDistance,
-  orbitCenterb: Math.cos((90-(saturnLongitudePerihelion+saturnAngleCorrection-90))*Math.PI/180)*saturnPerihelionDistance,
+  orbitCentera: Math.cos(((planets.saturn.longitudePerihelion+planets.saturn.angleCorrection+90))*Math.PI/180)*saturnPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.saturn.longitudePerihelion+planets.saturn.angleCorrection-90))*Math.PI/180)*saturnPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3645,7 +3489,7 @@ const saturnPerihelionFromEarth = {
 const saturnPerihelionDurationEcliptic2 = {
   name: "Saturn Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/saturnPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.saturn.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3666,7 +3510,7 @@ const saturnPerihelionDurationEcliptic2 = {
 
 const saturnRealPerihelionAtSun = {
   name: "Saturn Real Perihelion At Sun",
-  startPos: saturnStartpos*2,
+  startPos: planets.saturn.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3674,10 +3518,10 @@ const saturnRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
   eclipticPrecLayer: saturnPerihelionDurationEcliptic1,
-  longitudePerihelion: saturnLongitudePerihelion,
+  longitudePerihelion: planets.saturn.longitudePerihelion,
   signFlip: -1,
 
   size: 0.1,
@@ -3692,7 +3536,7 @@ const saturnRealPerihelionAtSun = {
 
 const saturnFixedPerihelionAtSun = {
   name: "Saturn Fixed Perihelion At Sun",
-  startPos: saturnStartpos*2,
+  startPos: planets.saturn.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3700,8 +3544,8 @@ const saturnFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-saturnAscendingNode)*Math.PI)/180)*-saturnEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.saturn.ascendingNode)*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
 
   size: 0.1,   
   color: 0xA79662,
@@ -3715,23 +3559,23 @@ const saturnFixedPerihelionAtSun = {
 
 const saturn = {
   name: "Saturn",
-  startPos: saturnStartpos,
+  startPos: planets.saturn.startpos,
   speed: Math.PI*2/(holisticyearLength/saturnSolarYearCount),
   rotationSpeed: Math.PI*2*((saturnRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -saturnTilt,
+  tilt: -planets.saturn.axialTiltMean,
   orbitRadius: (((holisticyearLength/saturnSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(saturnAscendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-saturnEclipticInclinationJ2000,
-  eccentricity: saturnOrbitalEccentricityBase * saturnEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.saturn.ascendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.saturn.ascendingNode+ascNodeToolCorrection.saturn))*Math.PI)/180)*-planets.saturn.eclipticInclinationJ2000,
+  eccentricity: planets.saturn.orbitalEccentricityBase * planets.saturn.eocFraction,
   _eccentricityKey: 'eccentricitySaturn',
-  _eocFraction: saturnEocFraction,
-  perihelionPhaseJ2000: -saturnStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / saturnPerihelionEclipticYears)
-    * (saturnPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / saturnPerihelionEclipticYears,
+  _eocFraction: planets.saturn.eocFraction,
+  perihelionPhaseJ2000: -planets.saturn.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / saturnSolarYearCount) - Math.PI * 2 / planets.saturn.perihelionEclipticYears)
+    * (planets.saturn.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.saturn.perihelionEclipticYears,
 
   size: (diameters.saturnDiameter/ currentAUDistance)*100,
   color: 0xA79662,
@@ -3754,7 +3598,7 @@ const saturn = {
 const uranusPerihelionDurationEcliptic1 = {
   name: "Uranus Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/uranusPerihelionEclipticYears,
+  speed: Math.PI*2/planets.uranus.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3780,8 +3624,8 @@ const uranusPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((uranusLongitudePerihelion+uranusAngleCorrection+90))*Math.PI/180)*uranusPerihelionDistance,
-  orbitCenterb: Math.cos((90-(uranusLongitudePerihelion+uranusAngleCorrection-90))*Math.PI/180)*uranusPerihelionDistance,
+  orbitCentera: Math.cos(((planets.uranus.longitudePerihelion+planets.uranus.angleCorrection+90))*Math.PI/180)*uranusPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.uranus.longitudePerihelion+planets.uranus.angleCorrection-90))*Math.PI/180)*uranusPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3803,7 +3647,7 @@ const uranusPerihelionFromEarth = {
 const uranusPerihelionDurationEcliptic2 = {
   name: "Uranus Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/uranusPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.uranus.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3824,7 +3668,7 @@ const uranusPerihelionDurationEcliptic2 = {
 
 const uranusRealPerihelionAtSun = {
   name: "Uranus Real Perihelion At Sun",
-  startPos: uranusStartpos*2,
+  startPos: planets.uranus.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3832,10 +3676,10 @@ const uranusRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
   eclipticPrecLayer: uranusPerihelionDurationEcliptic1,
-  longitudePerihelion: uranusLongitudePerihelion,
+  longitudePerihelion: planets.uranus.longitudePerihelion,
   signFlip: 1,
 
   size: 0.1,
@@ -3850,7 +3694,7 @@ const uranusRealPerihelionAtSun = {
 
 const uranusFixedPerihelionAtSun = {
   name: "Uranus Fixed Perihelion At Sun",
-  startPos: uranusStartpos*2,
+  startPos: planets.uranus.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3858,8 +3702,8 @@ const uranusFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-uranusAscendingNode)*Math.PI)/180)*-uranusEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.uranus.ascendingNode)*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
 
   size: 0.1,   
   color: 0xD2F9FA,
@@ -3873,23 +3717,23 @@ const uranusFixedPerihelionAtSun = {
 
 const uranus = {
   name: "Uranus",
-  startPos: uranusStartpos,
+  startPos: planets.uranus.startpos,
   speed: Math.PI*2/(holisticyearLength/uranusSolarYearCount),
   rotationSpeed: -Math.PI*2*((uranusRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -uranusTilt,
+  tilt: -planets.uranus.axialTiltMean,
   orbitRadius: (((holisticyearLength/uranusSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(uranusAscendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-uranusEclipticInclinationJ2000,
-  eccentricity: uranusOrbitalEccentricityBase * uranusEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.uranus.ascendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.uranus.ascendingNode+ascNodeToolCorrection.uranus))*Math.PI)/180)*-planets.uranus.eclipticInclinationJ2000,
+  eccentricity: planets.uranus.orbitalEccentricityBase * planets.uranus.eocFraction,
   _eccentricityKey: 'eccentricityUranus',
-  _eocFraction: uranusEocFraction,
-  perihelionPhaseJ2000: -uranusStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / uranusPerihelionEclipticYears)
-    * (uranusPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / uranusPerihelionEclipticYears,
+  _eocFraction: planets.uranus.eocFraction,
+  perihelionPhaseJ2000: -planets.uranus.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / uranusSolarYearCount) - Math.PI * 2 / planets.uranus.perihelionEclipticYears)
+    * (planets.uranus.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.uranus.perihelionEclipticYears,
 
   size: (diameters.uranusDiameter/ currentAUDistance)*100,
   color: 0xD2F9FA,
@@ -3912,7 +3756,7 @@ const uranus = {
 const neptunePerihelionDurationEcliptic1 = {
   name: "Neptune Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/neptunePerihelionEclipticYears,
+  speed: Math.PI*2/planets.neptune.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3938,8 +3782,8 @@ const neptunePerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((neptuneLongitudePerihelion+neptuneAngleCorrection+90))*Math.PI/180)*neptunePerihelionDistance,
-  orbitCenterb: Math.cos((90-(neptuneLongitudePerihelion+neptuneAngleCorrection-90))*Math.PI/180)*neptunePerihelionDistance,
+  orbitCentera: Math.cos(((planets.neptune.longitudePerihelion+planets.neptune.angleCorrection+90))*Math.PI/180)*neptunePerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.neptune.longitudePerihelion+planets.neptune.angleCorrection-90))*Math.PI/180)*neptunePerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3961,7 +3805,7 @@ const neptunePerihelionFromEarth = {
 const neptunePerihelionDurationEcliptic2 = {
   name: "Neptune Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/neptunePerihelionEclipticYears,
+  speed: -Math.PI*2/planets.neptune.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3982,7 +3826,7 @@ const neptunePerihelionDurationEcliptic2 = {
 
 const neptuneRealPerihelionAtSun = {
   name: "Neptune Real Perihelion At Sun",
-  startPos: neptuneStartpos*2,
+  startPos: planets.neptune.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -3990,10 +3834,10 @@ const neptuneRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
   eclipticPrecLayer: neptunePerihelionDurationEcliptic1,
-  longitudePerihelion: neptuneLongitudePerihelion,
+  longitudePerihelion: planets.neptune.longitudePerihelion,
   signFlip: 1,
 
   size: 0.1,
@@ -4008,7 +3852,7 @@ const neptuneRealPerihelionAtSun = {
 
 const neptuneFixedPerihelionAtSun = {
   name: "Neptune Fixed Perihelion At Sun",
-  startPos: neptuneStartpos*2,
+  startPos: planets.neptune.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4016,8 +3860,8 @@ const neptuneFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-neptuneAscendingNode)*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.neptune.ascendingNode)*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
 
   size: 0.1,   
   color: 0x5E93F1,
@@ -4031,23 +3875,23 @@ const neptuneFixedPerihelionAtSun = {
 
 const neptune = {
   name: "Neptune",
-  startPos: neptuneStartpos,
+  startPos: planets.neptune.startpos,
   speed: Math.PI*2/(holisticyearLength/neptuneSolarYearCount),
   rotationSpeed: Math.PI*2*((neptuneRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -neptuneTilt,
+  tilt: -planets.neptune.axialTiltMean,
   orbitRadius: (((holisticyearLength/neptuneSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(neptuneAscendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-neptuneEclipticInclinationJ2000,
-  eccentricity: neptuneOrbitalEccentricityBase * neptuneEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.neptune.ascendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.neptune.ascendingNode+ascNodeToolCorrection.neptune))*Math.PI)/180)*-planets.neptune.eclipticInclinationJ2000,
+  eccentricity: planets.neptune.orbitalEccentricityBase * planets.neptune.eocFraction,
   _eccentricityKey: 'eccentricityNeptune',
-  _eocFraction: neptuneEocFraction,
-  perihelionPhaseJ2000: -neptuneStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / neptunePerihelionEclipticYears)
-    * (neptunePerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / neptunePerihelionEclipticYears,
+  _eocFraction: planets.neptune.eocFraction,
+  perihelionPhaseJ2000: -planets.neptune.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / neptuneSolarYearCount) - Math.PI * 2 / planets.neptune.perihelionEclipticYears)
+    * (planets.neptune.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.neptune.perihelionEclipticYears,
 
   size: (diameters.neptuneDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
@@ -4075,7 +3919,7 @@ const neptune = {
 const plutoPerihelionDurationEcliptic1 = {
   name: "Pluto Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/plutoPerihelionEclipticYears,
+  speed: Math.PI*2/planets.pluto.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4101,8 +3945,8 @@ const plutoPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((plutoLongitudePerihelion+plutoAngleCorrection+90))*Math.PI/180)*plutoPerihelionDistance,
-  orbitCenterb: Math.cos((90-(plutoLongitudePerihelion+plutoAngleCorrection-90))*Math.PI/180)*plutoPerihelionDistance,
+  orbitCentera: Math.cos(((planets.pluto.longitudePerihelion+planets.pluto.angleCorrection+90))*Math.PI/180)*plutoPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.pluto.longitudePerihelion+planets.pluto.angleCorrection-90))*Math.PI/180)*plutoPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -4124,7 +3968,7 @@ const plutoPerihelionFromEarth = {
 const plutoPerihelionDurationEcliptic2 = {
   name: "Pluto Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/plutoPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.pluto.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4145,7 +3989,7 @@ const plutoPerihelionDurationEcliptic2 = {
 
 const plutoRealPerihelionAtSun = {
   name: "Pluto Real Perihelion At Sun",
-  startPos: plutoStartpos*2,
+  startPos: planets.pluto.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4153,8 +3997,8 @@ const plutoRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.pluto.ascendingNode)*Math.PI)/180)*-planets.pluto.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.pluto.ascendingNode)*Math.PI)/180)*-planets.pluto.eclipticInclinationJ2000,
 
   size: 0.1,   
   color: 0x5E93F1,
@@ -4168,7 +4012,7 @@ const plutoRealPerihelionAtSun = {
 
 const plutoFixedPerihelionAtSun = {
   name: "Pluto Fixed Perihelion At Sun",
-  startPos: plutoStartpos*2,
+  startPos: planets.pluto.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4176,8 +4020,8 @@ const plutoFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-plutoAscendingNode)*Math.PI)/180)*-plutoEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.pluto.ascendingNode)*Math.PI)/180)*-planets.pluto.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.pluto.ascendingNode)*Math.PI)/180)*-planets.pluto.eclipticInclinationJ2000,
 
   size: 0.1,   
   color: 0x5E93F1,
@@ -4191,17 +4035,17 @@ const plutoFixedPerihelionAtSun = {
 
 const pluto = {
   name: "Pluto",
-  startPos: plutoStartpos,
+  startPos: planets.pluto.startpos,
   speed: Math.PI*2/(holisticyearLength/plutoSolarYearCount),
   rotationSpeed: Math.PI*2*((plutoRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -plutoTilt,
+  tilt: -planets.pluto.axialTiltMean,
   orbitRadius: (((holisticyearLength/plutoSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  eccentricity: plutoOrbitalEccentricityBase,
+  eccentricity: planets.pluto.orbitalEccentricityBase,
 
   size: (diameters.plutoDiameter/ currentAUDistance)*100,
   color: 0x5E93F1,
@@ -4219,7 +4063,7 @@ const pluto = {
 const halleysPerihelionDurationEcliptic1 = {
   name: "Halleys Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/halleysPerihelionEclipticYears,
+  speed: Math.PI*2/planets.halleys.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4245,8 +4089,8 @@ const halleysPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((halleysLongitudePerihelion+halleysAngleCorrection+90))*Math.PI/180)*halleysPerihelionDistance,
-  orbitCenterb: Math.cos((90-(halleysLongitudePerihelion+halleysAngleCorrection-90))*Math.PI/180)*halleysPerihelionDistance,
+  orbitCentera: Math.cos(((planets.halleys.longitudePerihelion+planets.halleys.angleCorrection+90))*Math.PI/180)*halleysPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.halleys.longitudePerihelion+planets.halleys.angleCorrection-90))*Math.PI/180)*halleysPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -4268,7 +4112,7 @@ const halleysPerihelionFromEarth = {
 const halleysPerihelionDurationEcliptic2 = {
   name: "Halleys Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/halleysPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.halleys.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4289,7 +4133,7 @@ const halleysPerihelionDurationEcliptic2 = {
 
 const halleysRealPerihelionAtSun = {
   name: "Halleys Real Perihelion At Sun",
-  startPos: halleysStartpos*2,
+  startPos: planets.halleys.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4297,8 +4141,8 @@ const halleysRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysEclipticInclinationJ2000),
-  orbitTiltb: Math.sin(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysEclipticInclinationJ2000),
+  orbitTilta: Math.cos(((-90-planets.halleys.ascendingNode)*Math.PI)/180)*(-planets.halleys.eclipticInclinationJ2000),
+  orbitTiltb: Math.sin(((-90-planets.halleys.ascendingNode)*Math.PI)/180)*(-planets.halleys.eclipticInclinationJ2000),
 
   size: 0.1,
   color: 0xA57C1B,
@@ -4312,7 +4156,7 @@ const halleysRealPerihelionAtSun = {
 
 const halleysFixedPerihelionAtSun = {
   name: "Halleys Fixed Perihelion At Sun",
-  startPos: halleysStartpos*2,
+  startPos: planets.halleys.startpos*2,
   speed: -Math.PI*2,
   rotationSpeed: 0,
   tilt: 0,
@@ -4320,8 +4164,8 @@ const halleysFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysEclipticInclinationJ2000),
-  orbitTiltb: Math.sin(((-90-halleysAscendingNode)*Math.PI)/180)*(-halleysEclipticInclinationJ2000),
+  orbitTilta: Math.cos(((-90-planets.halleys.ascendingNode)*Math.PI)/180)*(-planets.halleys.eclipticInclinationJ2000),
+  orbitTiltb: Math.sin(((-90-planets.halleys.ascendingNode)*Math.PI)/180)*(-planets.halleys.eclipticInclinationJ2000),
 
   size: 0.1,
   color: 0xA57C1B,
@@ -4335,10 +4179,10 @@ const halleysFixedPerihelionAtSun = {
 
 const halleys = {
   name: "Halleys",
-  startPos: halleysStartpos,
+  startPos: planets.halleys.startpos,
   speed: Math.PI*2/(holisticyearLength/halleysSolarYearCount),
   rotationSpeed: Math.PI*2*((halleysRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: halleysTilt,
+  tilt: planets.halleys.axialTiltMean,
   orbitRadius: (((holisticyearLength/halleysSolarYearCount) ** 2) **(1/3)) *100,
   orbitSemiMajor: 0,
   orbitSemiMinor: 0,
@@ -4347,7 +4191,7 @@ const halleys = {
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  eccentricity: halleysOrbitalEccentricityBase,
+  eccentricity: planets.halleys.orbitalEccentricityBase,
 
   size: (diameters.halleysDiameter/ currentAUDistance)*100,
   color: 0x00FF00,
@@ -4365,7 +4209,7 @@ const halleys = {
 const erosPerihelionDurationEcliptic1 = {
   name: "Eros Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/erosPerihelionEclipticYears,
+  speed: Math.PI*2/planets.eros.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4391,8 +4235,8 @@ const erosPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((erosLongitudePerihelion+erosAngleCorrection+90))*Math.PI/180)*erosPerihelionDistance,
-  orbitCenterb: Math.cos((90-(erosLongitudePerihelion+erosAngleCorrection-90))*Math.PI/180)*erosPerihelionDistance,
+  orbitCentera: Math.cos(((planets.eros.longitudePerihelion+planets.eros.angleCorrection+90))*Math.PI/180)*erosPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.eros.longitudePerihelion+planets.eros.angleCorrection-90))*Math.PI/180)*erosPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -4414,7 +4258,7 @@ const erosPerihelionFromEarth = {
 const erosPerihelionDurationEcliptic2 = {
   name: "Eros Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/erosPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.eros.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -4435,15 +4279,15 @@ const erosPerihelionDurationEcliptic2 = {
 
 const erosRealPerihelionAtSun = {
   name: "Eros Real Perihelion At Sun",
-  startPos: erosStartpos*2,
+  startPos: planets.eros.startpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/erosSolarYearCount)),
   tilt: 0,
   orbitRadius: erosElipticOrbit,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-erosAscendingNode)*Math.PI)/180)*-erosEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-erosAscendingNode)*Math.PI)/180)*-erosEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.eros.ascendingNode)*Math.PI)/180)*-planets.eros.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.eros.ascendingNode)*Math.PI)/180)*-planets.eros.eclipticInclinationJ2000,
 
   size: 0.1,
   color: 0xA57C1B,
@@ -4457,15 +4301,15 @@ const erosRealPerihelionAtSun = {
 
 const erosFixedPerihelionAtSun = {
   name: "Eros Fixed Perihelion At Sun",
-  startPos: erosStartpos*2,
+  startPos: planets.eros.startpos*2,
   speed: -Math.PI*2+(2*Math.PI*2/(holisticyearLength/erosSolarYearCount)),
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-erosAscendingNode)*Math.PI)/180)*-erosEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-erosAscendingNode)*Math.PI)/180)*-erosEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.eros.ascendingNode)*Math.PI)/180)*-planets.eros.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.eros.ascendingNode)*Math.PI)/180)*-planets.eros.eclipticInclinationJ2000,
 
   size: 0.1,
   color: 0xA57C1B,
@@ -4479,17 +4323,17 @@ const erosFixedPerihelionAtSun = {
 
 const eros = {
   name: "Eros",
-  startPos: erosStartpos,
+  startPos: planets.eros.startpos,
   speed: -Math.PI*2/(holisticyearLength/erosSolarYearCount),
   rotationSpeed: Math.PI*2*((erosRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: erosTilt,
+  tilt: planets.eros.axialTiltMean,
   orbitRadius: (((holisticyearLength/erosSolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
-  eccentricity: erosOrbitalEccentricityBase,
+  eccentricity: planets.eros.orbitalEccentricityBase,
 
   size: (diameters.erosDiameter/ currentAUDistance)*100,
   color: 0xA57C1B,
@@ -4522,12 +4366,12 @@ function calcWobblePeriod(periEclYr, axialYr) {
   return 1 / wobbleRate;
 }
 const mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);
-const venusWobblePeriod    = calcWobblePeriod(venusPerihelionEclipticYears,   venusAxialPrecessionYears);
-const marsWobblePeriod     = calcWobblePeriod(marsPerihelionEclipticYears,    marsAxialPrecessionYears);
-const jupiterWobblePeriod  = calcWobblePeriod(jupiterPerihelionEclipticYears, jupiterAxialPrecessionYears);
-const saturnWobblePeriod   = calcWobblePeriod(saturnPerihelionEclipticYears,  saturnAxialPrecessionYears);
-const uranusWobblePeriod   = calcWobblePeriod(uranusPerihelionEclipticYears,  uranusAxialPrecessionYears);
-const neptuneWobblePeriod  = calcWobblePeriod(neptunePerihelionEclipticYears, neptuneAxialPrecessionYears);
+const venusWobblePeriod    = calcWobblePeriod(planets.venus.perihelionEclipticYears,   planets.venus.axialPrecessionYears);
+const marsWobblePeriod     = calcWobblePeriod(planets.mars.perihelionEclipticYears,    planets.mars.axialPrecessionYears);
+const jupiterWobblePeriod  = calcWobblePeriod(planets.jupiter.perihelionEclipticYears, planets.jupiter.axialPrecessionYears);
+const saturnWobblePeriod   = calcWobblePeriod(planets.saturn.perihelionEclipticYears,  planets.saturn.axialPrecessionYears);
+const uranusWobblePeriod   = calcWobblePeriod(planets.uranus.perihelionEclipticYears,  planets.uranus.axialPrecessionYears);
+const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEclipticYears, planets.neptune.axialPrecessionYears);
 
 // --- Obliquity Cycle (predicted) ---
 // Theory: perihelion ecliptic rate = obliquity rate + ecliptic rate (Fibonacci decomposition).
@@ -4560,13 +4404,13 @@ const mercuryWobbleCenter = {
 
 const venusWobbleCenter = {
   name: "VENUS-WOBBLE-CENTER",
-  startPos: venusEccentricityPhaseJ2000,
+  startPos: planets.venus.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / venusWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: venusOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.venus.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, venusOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.venus.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -4575,13 +4419,13 @@ const venusWobbleCenter = {
 
 const marsWobbleCenter = {
   name: "MARS-WOBBLE-CENTER",
-  startPos: marsEccentricityPhaseJ2000,
+  startPos: planets.mars.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / marsWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: marsOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.mars.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, marsOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.mars.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -4590,13 +4434,13 @@ const marsWobbleCenter = {
 
 const jupiterWobbleCenter = {
   name: "JUPITER-WOBBLE-CENTER",
-  startPos: jupiterEccentricityPhaseJ2000,
+  startPos: planets.jupiter.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / jupiterWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: jupiterOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.jupiter.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, jupiterOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.jupiter.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -4605,13 +4449,13 @@ const jupiterWobbleCenter = {
 
 const saturnWobbleCenter = {
   name: "SATURN-WOBBLE-CENTER",
-  startPos: saturnEccentricityPhaseJ2000,
+  startPos: planets.saturn.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / saturnWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: saturnOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.saturn.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, saturnOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.saturn.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -4620,13 +4464,13 @@ const saturnWobbleCenter = {
 
 const uranusWobbleCenter = {
   name: "URANUS-WOBBLE-CENTER",
-  startPos: uranusEccentricityPhaseJ2000,
+  startPos: planets.uranus.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / uranusWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: uranusOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.uranus.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, uranusOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.uranus.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -4635,13 +4479,13 @@ const uranusWobbleCenter = {
 
 const neptuneWobbleCenter = {
   name: "NEPTUNE-WOBBLE-CENTER",
-  startPos: neptuneEccentricityPhaseJ2000,
+  startPos: planets.neptune.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / neptuneWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: neptuneOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.neptune.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, neptuneOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.neptune.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -5702,12 +5546,12 @@ for (const wc of [mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter,
 /* — Planet Wobble Center labels — */
 const _planetWobbleCenters = [
   { obj: mercuryWobbleCenter, name: "Mercury", eccAmp: planets.mercury.orbitalEccentricityAmplitude, tilt: planets.mercury.axialTiltMean, inclAmp: mercuryInvPlaneInclinationAmplitude, periEclYr: planets.mercury.perihelionEclipticYears, axialYr: planets.mercury.axialPrecessionYears, obliqCycle: mercuryObliquityCycle },
-  { obj: venusWobbleCenter,   name: "Venus",   eccAmp: venusOrbitalEccentricityAmplitude,   tilt: venusTilt,   inclAmp: venusInvPlaneInclinationAmplitude,   periEclYr: venusPerihelionEclipticYears,   axialYr: venusAxialPrecessionYears,   obliqCycle: venusObliquityCycle },
-  { obj: marsWobbleCenter,    name: "Mars",    eccAmp: marsOrbitalEccentricityAmplitude,    tilt: marsTilt,    inclAmp: marsInvPlaneInclinationAmplitude,    periEclYr: marsPerihelionEclipticYears,    axialYr: marsAxialPrecessionYears,    obliqCycle: marsObliquityCycle },
-  { obj: jupiterWobbleCenter, name: "Jupiter", eccAmp: jupiterOrbitalEccentricityAmplitude, tilt: jupiterTilt, inclAmp: jupiterInvPlaneInclinationAmplitude, periEclYr: jupiterPerihelionEclipticYears, axialYr: jupiterAxialPrecessionYears, obliqCycle: jupiterObliquityCycle },
-  { obj: saturnWobbleCenter,  name: "Saturn",  eccAmp: saturnOrbitalEccentricityAmplitude,  tilt: saturnTilt,  inclAmp: saturnInvPlaneInclinationAmplitude,  periEclYr: saturnPerihelionEclipticYears,  axialYr: saturnAxialPrecessionYears,  obliqCycle: saturnObliquityCycle },
-  { obj: uranusWobbleCenter,   name: "Uranus",  eccAmp: uranusOrbitalEccentricityAmplitude,  tilt: uranusTilt,  inclAmp: uranusInvPlaneInclinationAmplitude,  periEclYr: uranusPerihelionEclipticYears,  axialYr: uranusAxialPrecessionYears,   obliqCycle: uranusObliquityCycle },
-  { obj: neptuneWobbleCenter, name: "Neptune", eccAmp: neptuneOrbitalEccentricityAmplitude, tilt: neptuneTilt, inclAmp: neptuneInvPlaneInclinationAmplitude, periEclYr: neptunePerihelionEclipticYears, axialYr: neptuneAxialPrecessionYears, obliqCycle: neptuneObliquityCycle },
+  { obj: venusWobbleCenter,   name: "Venus",   eccAmp: planets.venus.orbitalEccentricityAmplitude,   tilt: planets.venus.axialTiltMean,   inclAmp: venusInvPlaneInclinationAmplitude,   periEclYr: planets.venus.perihelionEclipticYears,   axialYr: planets.venus.axialPrecessionYears,   obliqCycle: venusObliquityCycle },
+  { obj: marsWobbleCenter,    name: "Mars",    eccAmp: planets.mars.orbitalEccentricityAmplitude,    tilt: planets.mars.axialTiltMean,    inclAmp: marsInvPlaneInclinationAmplitude,    periEclYr: planets.mars.perihelionEclipticYears,    axialYr: planets.mars.axialPrecessionYears,    obliqCycle: marsObliquityCycle },
+  { obj: jupiterWobbleCenter, name: "Jupiter", eccAmp: planets.jupiter.orbitalEccentricityAmplitude, tilt: planets.jupiter.axialTiltMean, inclAmp: jupiterInvPlaneInclinationAmplitude, periEclYr: planets.jupiter.perihelionEclipticYears, axialYr: planets.jupiter.axialPrecessionYears, obliqCycle: jupiterObliquityCycle },
+  { obj: saturnWobbleCenter,  name: "Saturn",  eccAmp: planets.saturn.orbitalEccentricityAmplitude,  tilt: planets.saturn.axialTiltMean,  inclAmp: saturnInvPlaneInclinationAmplitude,  periEclYr: planets.saturn.perihelionEclipticYears,  axialYr: planets.saturn.axialPrecessionYears,  obliqCycle: saturnObliquityCycle },
+  { obj: uranusWobbleCenter,   name: "Uranus",  eccAmp: planets.uranus.orbitalEccentricityAmplitude,  tilt: planets.uranus.axialTiltMean,  inclAmp: uranusInvPlaneInclinationAmplitude,  periEclYr: planets.uranus.perihelionEclipticYears,  axialYr: planets.uranus.axialPrecessionYears,   obliqCycle: uranusObliquityCycle },
+  { obj: neptuneWobbleCenter, name: "Neptune", eccAmp: planets.neptune.orbitalEccentricityAmplitude, tilt: planets.neptune.axialTiltMean, inclAmp: neptuneInvPlaneInclinationAmplitude, periEclYr: planets.neptune.perihelionEclipticYears, axialYr: planets.neptune.axialPrecessionYears, obliqCycle: neptuneObliquityCycle },
 ];
 for (const wc of _planetWobbleCenters) {
   // Axial precession from per-planet constants
@@ -9228,28 +9072,28 @@ const PLANET_TEST_DATES = {
 // Reference constants for longitude validation
 const LONGITUDE_PERIHELION_REFS = {
   mercury: planets.mercury.longitudePerihelion,
-  venus: venusLongitudePerihelion,
-  mars: marsLongitudePerihelion,
-  jupiter: jupiterLongitudePerihelion,
-  saturn: saturnLongitudePerihelion,
-  uranus: uranusLongitudePerihelion,
-  neptune: neptuneLongitudePerihelion,
-  pluto: plutoLongitudePerihelion,
-  halleys: halleysLongitudePerihelion,
-  eros: erosLongitudePerihelion
+  venus: planets.venus.longitudePerihelion,
+  mars: planets.mars.longitudePerihelion,
+  jupiter: planets.jupiter.longitudePerihelion,
+  saturn: planets.saturn.longitudePerihelion,
+  uranus: planets.uranus.longitudePerihelion,
+  neptune: planets.neptune.longitudePerihelion,
+  pluto: planets.pluto.longitudePerihelion,
+  halleys: planets.halleys.longitudePerihelion,
+  eros: planets.eros.longitudePerihelion
 };
 
 const ASCENDING_NODE_REFS = {
   mercury: planets.mercury.ascendingNode,
-  venus: venusAscendingNode,
-  mars: marsAscendingNode,
-  jupiter: jupiterAscendingNode,
-  saturn: saturnAscendingNode,
-  uranus: uranusAscendingNode,
-  neptune: neptuneAscendingNode,
-  pluto: plutoAscendingNode,
-  halleys: halleysAscendingNode,
-  eros: erosAscendingNode
+  venus: planets.venus.ascendingNode,
+  mars: planets.mars.ascendingNode,
+  jupiter: planets.jupiter.ascendingNode,
+  saturn: planets.saturn.ascendingNode,
+  uranus: planets.uranus.ascendingNode,
+  neptune: planets.neptune.ascendingNode,
+  pluto: planets.pluto.ascendingNode,
+  halleys: planets.halleys.ascendingNode,
+  eros: planets.eros.ascendingNode
 };
 
 // Planet object references for report generation
@@ -9446,15 +9290,15 @@ function validateStep(stepData, stepIndex, steps) {
       // Reference longitude of perihelion values (expected on model start date)
       const referenceLongitudes = {
         mercury: planets.mercury.longitudePerihelion,
-        venus: venusLongitudePerihelion,
-        mars: marsLongitudePerihelion,
-        jupiter: jupiterLongitudePerihelion,
-        saturn: saturnLongitudePerihelion,
-        uranus: uranusLongitudePerihelion,
-        neptune: neptuneLongitudePerihelion,
-        pluto: plutoLongitudePerihelion,
-        halleys: halleysLongitudePerihelion,
-        eros: erosLongitudePerihelion
+        venus: planets.venus.longitudePerihelion,
+        mars: planets.mars.longitudePerihelion,
+        jupiter: planets.jupiter.longitudePerihelion,
+        saturn: planets.saturn.longitudePerihelion,
+        uranus: planets.uranus.longitudePerihelion,
+        neptune: planets.neptune.longitudePerihelion,
+        pluto: planets.pluto.longitudePerihelion,
+        halleys: planets.halleys.longitudePerihelion,
+        eros: planets.eros.longitudePerihelion
       };
 
       const currentPlanet = hierarchyInspector.currentPlanet;
@@ -12130,11 +11974,11 @@ const BALANCE_CONFIG = {
     name: 'Venus',
     mass: M_VENUS / M_SUN,
     sma: venusOrbitDistance,
-    ecc: venusOrbitalEccentricityBase,
+    ecc: planets.venus.orbitalEccentricityBase,
     defaultD: 34,
-    inclJ2000: venusInvPlaneInclinationJ2000,
+    inclJ2000: planets.venus.invPlaneInclinationJ2000,
     omegaJ2000: venusAscendingNodeInvPlaneVerified,
-    period: venusPerihelionEclipticYears,
+    period: planets.venus.perihelionEclipticYears,
     trendJPL: venusEclipticInclinationTrendJPL,
     llBounds: { min: venusLLBoundsMin, max: venusLLBoundsMax },
     defaultPhaseAngle: venusInclinationPhaseAngle,
@@ -12158,11 +12002,11 @@ const BALANCE_CONFIG = {
     name: 'Mars',
     mass: M_MARS / M_SUN,
     sma: marsOrbitDistance,
-    ecc: marsOrbitalEccentricityBase,
+    ecc: planets.mars.orbitalEccentricityBase,
     defaultD: 5,
-    inclJ2000: marsInvPlaneInclinationJ2000,
+    inclJ2000: planets.mars.invPlaneInclinationJ2000,
     omegaJ2000: marsAscendingNodeInvPlaneVerified,
-    period: marsPerihelionEclipticYears,
+    period: planets.mars.perihelionEclipticYears,
     trendJPL: marsEclipticInclinationTrendJPL,
     llBounds: { min: marsLLBoundsMin, max: marsLLBoundsMax },
     defaultPhaseAngle: marsInclinationPhaseAngle,
@@ -12172,11 +12016,11 @@ const BALANCE_CONFIG = {
     name: 'Jupiter',
     mass: M_JUPITER / M_SUN,
     sma: jupiterOrbitDistance,
-    ecc: jupiterOrbitalEccentricityBase,
+    ecc: planets.jupiter.orbitalEccentricityBase,
     defaultD: 5,
-    inclJ2000: jupiterInvPlaneInclinationJ2000,
+    inclJ2000: planets.jupiter.invPlaneInclinationJ2000,
     omegaJ2000: jupiterAscendingNodeInvPlaneVerified,
-    period: jupiterPerihelionEclipticYears,
+    period: planets.jupiter.perihelionEclipticYears,
     trendJPL: jupiterEclipticInclinationTrendJPL,
     llBounds: { min: jupiterLLBoundsMin, max: jupiterLLBoundsMax },
     defaultPhaseAngle: jupiterInclinationPhaseAngle,
@@ -12186,11 +12030,11 @@ const BALANCE_CONFIG = {
     name: 'Saturn',
     mass: M_SATURN / M_SUN,
     sma: saturnOrbitDistance,
-    ecc: saturnOrbitalEccentricityBase,
+    ecc: planets.saturn.orbitalEccentricityBase,
     defaultD: 3,
-    inclJ2000: saturnInvPlaneInclinationJ2000,
+    inclJ2000: planets.saturn.invPlaneInclinationJ2000,
     omegaJ2000: saturnAscendingNodeInvPlaneVerified,
-    period: saturnPerihelionEclipticYears,
+    period: planets.saturn.perihelionEclipticYears,
     trendJPL: saturnEclipticInclinationTrendJPL,
     llBounds: { min: saturnLLBoundsMin, max: saturnLLBoundsMax },
     defaultPhaseAngle: saturnInclinationPhaseAngle,
@@ -12200,11 +12044,11 @@ const BALANCE_CONFIG = {
     name: 'Uranus',
     mass: M_URANUS / M_SUN,
     sma: uranusOrbitDistance,
-    ecc: uranusOrbitalEccentricityBase,
+    ecc: planets.uranus.orbitalEccentricityBase,
     defaultD: 21,
-    inclJ2000: uranusInvPlaneInclinationJ2000,
+    inclJ2000: planets.uranus.invPlaneInclinationJ2000,
     omegaJ2000: uranusAscendingNodeInvPlaneVerified,
-    period: uranusPerihelionEclipticYears,
+    period: planets.uranus.perihelionEclipticYears,
     trendJPL: uranusEclipticInclinationTrendJPL,
     llBounds: { min: uranusLLBoundsMin, max: uranusLLBoundsMax },
     defaultPhaseAngle: uranusInclinationPhaseAngle,
@@ -12214,11 +12058,11 @@ const BALANCE_CONFIG = {
     name: 'Neptune',
     mass: M_NEPTUNE / M_SUN,
     sma: neptuneOrbitDistance,
-    ecc: neptuneOrbitalEccentricityBase,
+    ecc: planets.neptune.orbitalEccentricityBase,
     defaultD: 34,
-    inclJ2000: neptuneInvPlaneInclinationJ2000,
+    inclJ2000: planets.neptune.invPlaneInclinationJ2000,
     omegaJ2000: neptuneAscendingNodeInvPlaneVerified,
-    period: neptunePerihelionEclipticYears,
+    period: planets.neptune.perihelionEclipticYears,
     trendJPL: neptuneEclipticInclinationTrendJPL,
     llBounds: { min: neptuneLLBoundsMin, max: neptuneLLBoundsMax },
     defaultPhaseAngle: neptuneInclinationPhaseAngle,
@@ -12756,34 +12600,34 @@ const PHASE_ANGLE_SCALE = { mercury: 203, venus: 203, earth: 203, mars: 203, jup
 // Use BASE eccentricities for the scale (Law 5 balance is tuned on these)
 const ECC_BASE_SCALE = {
   mercury: planets.mercury.orbitalEccentricityBase,
-  venus:   venusOrbitalEccentricityBase,
+  venus:   planets.venus.orbitalEccentricityBase,
   earth:   eccentricityBase,
-  mars:    marsOrbitalEccentricityBase,
-  jupiter: jupiterOrbitalEccentricityBase,
-  saturn:  saturnOrbitalEccentricityBase,
-  uranus:  uranusOrbitalEccentricityBase,
-  neptune: neptuneOrbitalEccentricityBase,
+  mars:    planets.mars.orbitalEccentricityBase,
+  jupiter: planets.jupiter.orbitalEccentricityBase,
+  saturn:  planets.saturn.orbitalEccentricityBase,
+  uranus:  planets.uranus.orbitalEccentricityBase,
+  neptune: planets.neptune.orbitalEccentricityBase,
 };
 // Model-derived J2000 eccentricities: e(2000) from computeEccentricityEarth
 const ECC_J2000_SCALE = {
   mercury: computeEccentricityEarth(2000, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude),
-  venus:   computeEccentricityEarth(2000, 2000 - (venusEccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   venusOrbitalEccentricityBase,   venusOrbitalEccentricityAmplitude),
+  venus:   computeEccentricityEarth(2000, 2000 - (planets.venus.eccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude),
   earth:   computeEccentricityEarth(2000, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude),
-  mars:    computeEccentricityEarth(2000, 2000 - (marsEccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    marsOrbitalEccentricityBase,    marsOrbitalEccentricityAmplitude),
-  jupiter: computeEccentricityEarth(2000, 2000 - (jupiterEccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, jupiterOrbitalEccentricityBase, jupiterOrbitalEccentricityAmplitude),
-  saturn:  computeEccentricityEarth(2000, 2000 - (saturnEccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  saturnOrbitalEccentricityBase,  saturnOrbitalEccentricityAmplitude),
-  uranus:  computeEccentricityEarth(2000, 2000 - (uranusEccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  uranusOrbitalEccentricityBase,  uranusOrbitalEccentricityAmplitude),
-  neptune: computeEccentricityEarth(2000, 2000 - (neptuneEccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, neptuneOrbitalEccentricityBase, neptuneOrbitalEccentricityAmplitude),
+  mars:    computeEccentricityEarth(2000, 2000 - (planets.mars.eccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude),
+  jupiter: computeEccentricityEarth(2000, 2000 - (planets.jupiter.eccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude),
+  saturn:  computeEccentricityEarth(2000, 2000 - (planets.saturn.eccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude),
+  uranus:  computeEccentricityEarth(2000, 2000 - (planets.uranus.eccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude),
+  neptune: computeEccentricityEarth(2000, 2000 - (planets.neptune.eccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude),
 };
 const ECC_AMP_SCALE = {
   mercury: planets.mercury.orbitalEccentricityAmplitude,
-  venus:   venusOrbitalEccentricityAmplitude,
+  venus:   planets.venus.orbitalEccentricityAmplitude,
   earth:   eccentricityAmplitude,
-  mars:    marsOrbitalEccentricityAmplitude,
-  jupiter: jupiterOrbitalEccentricityAmplitude,
-  saturn:  saturnOrbitalEccentricityAmplitude,
-  uranus:  uranusOrbitalEccentricityAmplitude,
-  neptune: neptuneOrbitalEccentricityAmplitude,
+  mars:    planets.mars.orbitalEccentricityAmplitude,
+  jupiter: planets.jupiter.orbitalEccentricityAmplitude,
+  saturn:  planets.saturn.orbitalEccentricityAmplitude,
+  uranus:  planets.uranus.orbitalEccentricityAmplitude,
+  neptune: planets.neptune.orbitalEccentricityAmplitude,
 };
 const ECC_CYCLE_SCALE = {
   mercury: mercuryWobblePeriod,
@@ -13556,15 +13400,15 @@ function updateHierarchyLiveData() {
     // Get reference anomaly values for current planet (21 Jun 2000 00:00 UTC)
     const refAnomalies = {
       mercury: { mean: planets.mercury.meanAnomaly, true: planets.mercury.trueAnomaly },
-      venus: { mean: venusMeanAnomaly, true: venusTrueAnomaly },
-      mars: { mean: marsMeanAnomaly, true: marsTrueAnomaly },
-      jupiter: { mean: jupiterMeanAnomaly, true: jupiterTrueAnomaly },
-      saturn: { mean: saturnMeanAnomaly, true: saturnTrueAnomaly },
-      uranus: { mean: uranusMeanAnomaly, true: uranusTrueAnomaly },
-      neptune: { mean: neptuneMeanAnomaly, true: neptuneTrueAnomaly },
-      pluto: { mean: plutoMeanAnomaly, true: plutoTrueAnomaly },
-      halleys: { mean: halleysMeanAnomaly, true: halleysTrueAnomaly },
-      eros: { mean: erosMeanAnomaly, true: erosTrueAnomaly }
+      venus: { mean: planets.venus.meanAnomaly, true: planets.venus.trueAnomaly },
+      mars: { mean: planets.mars.meanAnomaly, true: planets.mars.trueAnomaly },
+      jupiter: { mean: planets.jupiter.meanAnomaly, true: planets.jupiter.trueAnomaly },
+      saturn: { mean: planets.saturn.meanAnomaly, true: planets.saturn.trueAnomaly },
+      uranus: { mean: planets.uranus.meanAnomaly, true: planets.uranus.trueAnomaly },
+      neptune: { mean: planets.neptune.meanAnomaly, true: planets.neptune.trueAnomaly },
+      pluto: { mean: planets.pluto.meanAnomaly, true: planets.pluto.trueAnomaly },
+      halleys: { mean: planets.halleys.meanAnomaly, true: planets.halleys.trueAnomaly },
+      eros: { mean: planets.eros.meanAnomaly, true: planets.eros.trueAnomaly }
     };
     const refAnomaly = refAnomalies[hierarchyInspector.currentPlanet];
     if (refAnomaly) {
@@ -14714,13 +14558,13 @@ function setupGUI() {
     // -- Per-planet data (Mercury through Neptune) --
     const allPlanets = [
       { name: 'Mercury', period: planets.mercury.solarYearInput, ecc: planets.mercury.orbitalEccentricityBase, eccAmp: planets.mercury.orbitalEccentricityAmplitude, incEcl: planets.mercury.eclipticInclinationJ2000, incInv: planets.mercury.invPlaneInclinationJ2000, longPeri: planets.mercury.longitudePerihelion, ascNode: planets.mercury.ascendingNode, angleCorr: planets.mercury.angleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: planets.mercury.startpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: planets.mercury.eocFraction, periRefJD: planets.mercury.perihelionRef_JD },
-      { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricityBase,   eccAmp: venusOrbitalEccentricityAmplitude,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: venusEocFraction, periRefJD: venusPerihelionRef_JD },
+      { name: 'Venus',   period: planets.venus.solarYearInput,   ecc: planets.venus.orbitalEccentricityBase,   eccAmp: planets.venus.orbitalEccentricityAmplitude,   incEcl: planets.venus.eclipticInclinationJ2000,   incInv: planets.venus.invPlaneInclinationJ2000,   longPeri: planets.venus.longitudePerihelion,   ascNode: planets.venus.ascendingNode,   angleCorr: planets.venus.angleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: planets.venus.startpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: planets.venus.eocFraction, periRefJD: planets.venus.perihelionRef_JD },
 
-      { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricityBase,    eccAmp: marsOrbitalEccentricityAmplitude,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: marsEocFraction, periRefJD: marsPerihelionRef_JD },
-      { name: 'Jupiter', period: jupiterSolarYearInput,  ecc: jupiterOrbitalEccentricityBase, eccAmp: jupiterOrbitalEccentricityAmplitude, incEcl: jupiterEclipticInclinationJ2000, incInv: jupiterInvPlaneInclinationJ2000, longPeri: jupiterLongitudePerihelion, ascNode: jupiterAscendingNode, angleCorr: jupiterAngleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: jupiterStartpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle, eocFrac: jupiterEocFraction, periRefJD: jupiterPerihelionRef_JD },
-      { name: 'Saturn',  period: saturnSolarYearInput,   ecc: saturnOrbitalEccentricityBase,  eccAmp: saturnOrbitalEccentricityAmplitude,  incEcl: saturnEclipticInclinationJ2000,  incInv: saturnInvPlaneInclinationJ2000,  longPeri: saturnLongitudePerihelion,  ascNode: saturnAscendingNode,  angleCorr: saturnAngleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: saturnStartpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle, eocFrac: saturnEocFraction, periRefJD: saturnPerihelionRef_JD },
-      { name: 'Uranus',  period: uranusSolarYearInput,   ecc: uranusOrbitalEccentricityBase,  eccAmp: uranusOrbitalEccentricityAmplitude,  incEcl: uranusEclipticInclinationJ2000,  incInv: uranusInvPlaneInclinationJ2000,  longPeri: uranusLongitudePerihelion,  ascNode: uranusAscendingNode,  angleCorr: uranusAngleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: uranusStartpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle, eocFrac: uranusEocFraction, periRefJD: uranusPerihelionRef_JD },
-      { name: 'Neptune', period: neptuneSolarYearInput,  ecc: neptuneOrbitalEccentricityBase, eccAmp: neptuneOrbitalEccentricityAmplitude, incEcl: neptuneEclipticInclinationJ2000, incInv: neptuneInvPlaneInclinationJ2000, longPeri: neptuneLongitudePerihelion, ascNode: neptuneAscendingNode, angleCorr: neptuneAngleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: neptuneStartpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle, eocFrac: neptuneEocFraction, periRefJD: neptunePerihelionRef_JD },
+      { name: 'Mars',    period: planets.mars.solarYearInput,     ecc: planets.mars.orbitalEccentricityBase,    eccAmp: planets.mars.orbitalEccentricityAmplitude,    incEcl: planets.mars.eclipticInclinationJ2000,    incInv: planets.mars.invPlaneInclinationJ2000,    longPeri: planets.mars.longitudePerihelion,    ascNode: planets.mars.ascendingNode,    angleCorr: planets.mars.angleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: planets.mars.startpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: planets.mars.eocFraction, periRefJD: planets.mars.perihelionRef_JD },
+      { name: 'Jupiter', period: planets.jupiter.solarYearInput,  ecc: planets.jupiter.orbitalEccentricityBase, eccAmp: planets.jupiter.orbitalEccentricityAmplitude, incEcl: planets.jupiter.eclipticInclinationJ2000, incInv: planets.jupiter.invPlaneInclinationJ2000, longPeri: planets.jupiter.longitudePerihelion, ascNode: planets.jupiter.ascendingNode, angleCorr: planets.jupiter.angleCorrection, periYears: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr', startpos: planets.jupiter.startpos, ascNodeVerified: jupiterAscendingNodeInvPlaneVerified, inclMean: jupiterInvPlaneInclinationMean, inclAmp: jupiterInvPlaneInclinationAmplitude, phaseAngle: jupiterInclinationPhaseAngle, eocFrac: planets.jupiter.eocFraction, periRefJD: planets.jupiter.perihelionRef_JD },
+      { name: 'Saturn',  period: planets.saturn.solarYearInput,   ecc: planets.saturn.orbitalEccentricityBase,  eccAmp: planets.saturn.orbitalEccentricityAmplitude,  incEcl: planets.saturn.eclipticInclinationJ2000,  incInv: planets.saturn.invPlaneInclinationJ2000,  longPeri: planets.saturn.longitudePerihelion,  ascNode: planets.saturn.ascendingNode,  angleCorr: planets.saturn.angleCorrection,  periYears: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr', startpos: planets.saturn.startpos, ascNodeVerified: saturnAscendingNodeInvPlaneVerified, inclMean: saturnInvPlaneInclinationMean, inclAmp: saturnInvPlaneInclinationAmplitude, phaseAngle: saturnInclinationPhaseAngle, eocFrac: planets.saturn.eocFraction, periRefJD: planets.saturn.perihelionRef_JD },
+      { name: 'Uranus',  period: planets.uranus.solarYearInput,   ecc: planets.uranus.orbitalEccentricityBase,  eccAmp: planets.uranus.orbitalEccentricityAmplitude,  incEcl: planets.uranus.eclipticInclinationJ2000,  incInv: planets.uranus.invPlaneInclinationJ2000,  longPeri: planets.uranus.longitudePerihelion,  ascNode: planets.uranus.ascendingNode,  angleCorr: planets.uranus.angleCorrection,  periYears: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr', startpos: planets.uranus.startpos, ascNodeVerified: uranusAscendingNodeInvPlaneVerified, inclMean: uranusInvPlaneInclinationMean, inclAmp: uranusInvPlaneInclinationAmplitude, phaseAngle: uranusInclinationPhaseAngle, eocFrac: planets.uranus.eocFraction, periRefJD: planets.uranus.perihelionRef_JD },
+      { name: 'Neptune', period: planets.neptune.solarYearInput,  ecc: planets.neptune.orbitalEccentricityBase, eccAmp: planets.neptune.orbitalEccentricityAmplitude, incEcl: planets.neptune.eclipticInclinationJ2000, incInv: planets.neptune.invPlaneInclinationJ2000, longPeri: planets.neptune.longitudePerihelion, ascNode: planets.neptune.ascendingNode, angleCorr: planets.neptune.angleCorrection, periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: planets.neptune.startpos, ascNodeVerified: neptuneAscendingNodeInvPlaneVerified, inclMean: neptuneInvPlaneInclinationMean, inclAmp: neptuneInvPlaneInclinationAmplitude, phaseAngle: neptuneInclinationPhaseAngle, eocFrac: planets.neptune.eocFraction, periRefJD: planets.neptune.perihelionRef_JD },
     ];
     allPlanets.forEach(p => {
       const v = {
@@ -15130,13 +14974,13 @@ function setupGUI() {
   // [planetKey, geoKey, label, precessionYears] — Earth has no detail row
   const periPlanets = [
     ['mercury', 'mercuryPerihelion', 'Mercury', planets.mercury.perihelionEclipticYears],
-    ['venus', 'venusPerihelion', 'Venus', venusPerihelionEclipticYears],
+    ['venus', 'venusPerihelion', 'Venus', planets.venus.perihelionEclipticYears],
     ['earth', 'earthPerihelion', 'Earth', earthPerihelionICRFYears],
-    ['mars', 'marsPerihelion', 'Mars', marsPerihelionEclipticYears],
-    ['jupiter', 'jupiterPerihelion', 'Jupiter', jupiterPerihelionEclipticYears],
-    ['saturn', 'saturnPerihelion', 'Saturn', saturnPerihelionEclipticYears],
-    ['uranus', 'uranusPerihelion', 'Uranus', uranusPerihelionEclipticYears],
-    ['neptune', 'neptunePerihelion', 'Neptune', neptunePerihelionEclipticYears]
+    ['mars', 'marsPerihelion', 'Mars', planets.mars.perihelionEclipticYears],
+    ['jupiter', 'jupiterPerihelion', 'Jupiter', planets.jupiter.perihelionEclipticYears],
+    ['saturn', 'saturnPerihelion', 'Saturn', planets.saturn.perihelionEclipticYears],
+    ['uranus', 'uranusPerihelion', 'Uranus', planets.uranus.perihelionEclipticYears],
+    ['neptune', 'neptunePerihelion', 'Neptune', planets.neptune.perihelionEclipticYears]
   ];
   periPlanets.forEach(([planetKey, geoKey, name, precYears]) => {
     // Geocentric row with gauge bar (always visible)
@@ -15202,14 +15046,14 @@ function setupGUI() {
   const invPlaneFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
   const invPlanePlanets = [
     ['mercury', 'Mercury (AU)', 6.35, 0.467, planets.mercury.perihelionEclipticYears],
-    ['venus', 'Venus (AU)', 2.15, 0.728, venusPerihelionEclipticYears],
+    ['venus', 'Venus (AU)', 2.15, 0.728, planets.venus.perihelionEclipticYears],
     ['earth', 'Earth (AU)', 1.57, 1.017, earthPerihelionICRFYears],
-    ['mars', 'Mars (AU)', 1.63, 1.666, marsPerihelionEclipticYears],
+    ['mars', 'Mars (AU)', 1.63, 1.666, planets.mars.perihelionEclipticYears],
     'separator',
-    ['jupiter', 'Jupiter (AU)', 0.32, 5.455, jupiterPerihelionEclipticYears],
-    ['saturn', 'Saturn (AU)', 0.93, 10.054, saturnPerihelionEclipticYears],
-    ['uranus', 'Uranus (AU)', 0.99, 20.083, uranusPerihelionEclipticYears],
-    ['neptune', 'Neptune (AU)', 0.74, 30.33, neptunePerihelionEclipticYears]
+    ['jupiter', 'Jupiter (AU)', 0.32, 5.455, planets.jupiter.perihelionEclipticYears],
+    ['saturn', 'Saturn (AU)', 0.93, 10.054, planets.saturn.perihelionEclipticYears],
+    ['uranus', 'Uranus (AU)', 0.99, 20.083, planets.uranus.perihelionEclipticYears],
+    ['neptune', 'Neptune (AU)', 0.74, 30.33, planets.neptune.perihelionEclipticYears]
   ];
   const fldContent = invPlaneFolder.element.querySelector('.tp-fldv_c');
   invPlanePlanets.forEach(item => {
@@ -25997,10 +25841,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.venusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Venus is tidally damped — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${venusTilt}°. Apparent tilt 177.36° due to retrograde spin`]},
+       hover : [`Venus is tidally damped — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${planets.venus.axialTiltMean}°. Apparent tilt 177.36° due to retrograde spin`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityVenus, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${venusOrbitalEccentricityBase}. Phase: ${venusEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(venusWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.venus.orbitalEccentricityBase}. Phase: ${planets.venus.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(venusWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.venusEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Venus's orbital inclination to the ecliptic (J2000 ≈ 3.39°)`]},
@@ -26088,16 +25932,16 @@ const planetStats = {
        hover : [`Venus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(venusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(venusOrbitDistance, venusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(venusOrbitDistance, venusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(venusOrbitDistance, venusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -26106,11 +25950,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(venusOrbitDistance, venusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(venusOrbitDistance, venusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(venusOrbitDistance, planets.venus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -26125,25 +25969,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(venus.sunDistAU * o.lengthofAU, venusOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(venusOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.venus.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -26163,11 +26007,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -26260,7 +26104,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(venusOrbitalEccentricityBase, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -26272,40 +26116,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), venusOrbitalEccentricityBase, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), venusOrbitalEccentricityBase, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(venusSolarYearCount-13))*meansolaryearlengthinDays), planets.venus.orbitalEccentricityBase, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * o.lengthofAU, venusOrbitalEccentricityBase, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * o.lengthofAU, planets.venus.orbitalEccentricityBase, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(venusSolarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.venus.solarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(venusSolarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.venus.solarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => venusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.venus.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(venusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.venus.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => venusAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Venus's spin axis to complete one full precession cycle. Prograde (obliquity 177°). H×3/34 ≈ ${fmtNum(venusAxialPrecessionYears, 0, ',')} years.`],
+       value : [ { v: () => planets.venus.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Venus's spin axis to complete one full precession cycle. Prograde (obliquity 177°). H×3/34 ≈ ${fmtNum(planets.venus.axialPrecessionYears, 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => venusWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -26321,8 +26165,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(venusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.venus.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'venus') - PREDICT_PLANETS.venus.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -26356,10 +26200,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.marsObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(marsObliquityCycle, 0, ',')} years (3H/8, confirmed 0.7% vs observed ~124,800 yr). Amplitude: ±${marsInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${marsTilt}°. Similar to Earth's tilt (25.19° vs 23.4°)`]},
+       hover : [`Dynamic obliquity oscillating with period ${fmtNum(marsObliquityCycle, 0, ',')} years (3H/8, confirmed 0.7% vs observed ~124,800 yr). Amplitude: ±${marsInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.mars.axialTiltMean}°. Similar to Earth's tilt (25.19° vs 23.4°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMars, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${marsOrbitalEccentricityBase}. Phase: ${marsEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(marsWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.mars.orbitalEccentricityBase}. Phase: ${planets.mars.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(marsWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.marsEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Mars's orbital inclination to the ecliptic (J2000 ≈ 1.85°)`]},
@@ -26447,16 +26291,16 @@ const planetStats = {
        hover : [`Mars distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(marsSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(marsOrbitDistance, marsOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(marsOrbitDistance, marsOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(marsOrbitDistance, marsOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -26465,11 +26309,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(marsOrbitDistance, marsOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(marsOrbitDistance, marsOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(marsOrbitDistance, planets.mars.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -26484,25 +26328,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(mars.sunDistAU * o.lengthofAU, marsOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(marsOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.mars.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -26522,11 +26366,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -26619,7 +26463,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(marsOrbitalEccentricityBase, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -26631,40 +26475,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), marsOrbitalEccentricityBase, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), marsOrbitalEccentricityBase, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(marsSolarYearCount+13))*meansolaryearlengthinDays), planets.mars.orbitalEccentricityBase, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * o.lengthofAU, marsOrbitalEccentricityBase, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * o.lengthofAU, planets.mars.orbitalEccentricityBase, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(marsSolarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.mars.solarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(marsSolarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.mars.solarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => marsPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.mars.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(marsPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.mars.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => marsAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Mars's spin axis to complete one full precession cycle. Negative = retrograde. H/2 ≈ ${fmtNum(Math.abs(marsAxialPrecessionYears), 0, ',')} years.`],
+       value : [ { v: () => planets.mars.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Mars's spin axis to complete one full precession cycle. Negative = retrograde. H/2 ≈ ${fmtNum(Math.abs(planets.mars.axialPrecessionYears), 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => marsWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -26680,8 +26524,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(marsPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.mars.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mars') - PREDICT_PLANETS.mars.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -26715,10 +26559,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.jupiterObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(jupiterObliquityCycle, 0, ',')} years (H/2). Amplitude: ±${jupiterInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${jupiterTilt}°. Cross-planet link: equals Mars axial precession period`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(jupiterObliquityCycle, 0, ',')} years (H/2). Amplitude: ±${jupiterInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.jupiter.axialTiltMean}°. Cross-planet link: equals Mars axial precession period`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityJupiter, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${jupiterOrbitalEccentricityBase}. Phase: ${jupiterEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(jupiterWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.jupiter.orbitalEccentricityBase}. Phase: ${planets.jupiter.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(jupiterWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.jupiterEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Jupiter's orbital inclination to the ecliptic (J2000 ≈ 1.30°)`]},
@@ -26806,16 +26650,16 @@ const planetStats = {
        hover : [`Jupiter distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(jupiterSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(jupiterOrbitDistance, jupiterOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(jupiterOrbitDistance, jupiterOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(jupiterOrbitDistance, jupiterOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -26824,11 +26668,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(jupiterOrbitDistance, jupiterOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(jupiterOrbitDistance, jupiterOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(jupiterOrbitDistance, planets.jupiter.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -26843,25 +26687,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * o.lengthofAU, jupiterOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(jupiterOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.jupiter.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -26881,11 +26725,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -26977,7 +26821,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(jupiterOrbitalEccentricityBase, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -26989,40 +26833,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), jupiterOrbitalEccentricityBase, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), jupiterOrbitalEccentricityBase, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(jupiterSolarYearCount+13))*meansolaryearlengthinDays), planets.jupiter.orbitalEccentricityBase, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * o.lengthofAU, jupiterOrbitalEccentricityBase, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * o.lengthofAU, planets.jupiter.orbitalEccentricityBase, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(jupiterSolarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.jupiter.solarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(jupiterSolarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.jupiter.solarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => jupiterPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.jupiter.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(jupiterPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.jupiter.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => jupiterAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Jupiter's spin axis to complete one full precession cycle. Negative = retrograde. H×3/8 ≈ ${fmtNum(Math.abs(jupiterAxialPrecessionYears), 0, ',')} years.`],
+       value : [ { v: () => planets.jupiter.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Jupiter's spin axis to complete one full precession cycle. Negative = retrograde. H×3/8 ≈ ${fmtNum(Math.abs(planets.jupiter.axialPrecessionYears), 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => jupiterWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -27038,8 +26882,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(jupiterPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.jupiter.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'jupiter') - PREDICT_PLANETS.jupiter.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -27073,10 +26917,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.saturnObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(saturnObliquityCycle, 0, ',')} years (H/3, mirror-pair with Earth). Amplitude: ±${saturnInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${saturnTilt}°. Saturn is the sole 23° phase group member`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(saturnObliquityCycle, 0, ',')} years (H/3, mirror-pair with Earth). Amplitude: ±${saturnInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.saturn.axialTiltMean}°. Saturn is the sole 23° phase group member`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricitySaturn, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${saturnOrbitalEccentricityBase}. Phase: ${saturnEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(saturnWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.saturn.orbitalEccentricityBase}. Phase: ${planets.saturn.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(saturnWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.saturnEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Saturn's orbital inclination to the ecliptic (J2000 ≈ 2.49°)`]},
@@ -27164,16 +27008,16 @@ const planetStats = {
        hover : [`Saturn distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(saturnSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(saturnOrbitDistance, saturnOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(saturnOrbitDistance, saturnOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(saturnOrbitDistance, saturnOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -27182,11 +27026,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(saturnOrbitDistance, saturnOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(saturnOrbitDistance, saturnOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(saturnOrbitDistance, planets.saturn.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -27201,25 +27045,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * o.lengthofAU, saturnOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(saturnOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.saturn.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -27239,11 +27083,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -27336,7 +27180,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(saturnOrbitalEccentricityBase, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -27348,40 +27192,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), saturnOrbitalEccentricityBase, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), saturnOrbitalEccentricityBase, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(saturnSolarYearCount+13))*meansolaryearlengthinDays), planets.saturn.orbitalEccentricityBase, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * o.lengthofAU, saturnOrbitalEccentricityBase, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * o.lengthofAU, planets.saturn.orbitalEccentricityBase, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(saturnSolarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.saturn.solarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(saturnSolarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.saturn.solarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => saturnPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.saturn.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(saturnPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.saturn.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => saturnAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Saturn's spin axis to complete one full precession cycle. Negative = retrograde. H×4/3 ≈ ${fmtNum(Math.abs(saturnAxialPrecessionYears), 0, ',')} years.`],
+       value : [ { v: () => planets.saturn.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Saturn's spin axis to complete one full precession cycle. Negative = retrograde. H×4/3 ≈ ${fmtNum(Math.abs(planets.saturn.axialPrecessionYears), 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => saturnWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -27397,8 +27241,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(saturnPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.saturn.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'saturn') - PREDICT_PLANETS.saturn.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -27432,10 +27276,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.uranusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(uranusObliquityCycle, 0, ',')} years (H/2, tentative). Amplitude: ±${uranusInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${uranusTilt}°. Uranus rolls on its side (82.23°)`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(uranusObliquityCycle, 0, ',')} years (H/2, tentative). Amplitude: ±${uranusInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.uranus.axialTiltMean}°. Uranus rolls on its side (82.23°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityUranus, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${uranusOrbitalEccentricityBase}. Phase: ${uranusEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(uranusWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.uranus.orbitalEccentricityBase}. Phase: ${planets.uranus.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(uranusWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.uranusEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Uranus's orbital inclination to the ecliptic (J2000 ≈ 0.77°). Lowest of the outer planets`]},
@@ -27523,16 +27367,16 @@ const planetStats = {
        hover : [`Uranus distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(uranusSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(uranusOrbitDistance, uranusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(uranusOrbitDistance, uranusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(uranusOrbitDistance, uranusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -27541,11 +27385,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(uranusOrbitDistance, uranusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(uranusOrbitDistance, uranusOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(uranusOrbitDistance, planets.uranus.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -27560,25 +27404,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * o.lengthofAU, uranusOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(uranusOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.uranus.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -27598,11 +27442,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -27695,7 +27539,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(uranusOrbitalEccentricityBase, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -27707,40 +27551,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), uranusOrbitalEccentricityBase, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), uranusOrbitalEccentricityBase, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(uranusSolarYearCount+13))*meansolaryearlengthinDays), planets.uranus.orbitalEccentricityBase, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * o.lengthofAU, uranusOrbitalEccentricityBase, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * o.lengthofAU, planets.uranus.orbitalEccentricityBase, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(uranusSolarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.uranus.solarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(uranusSolarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.uranus.solarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => uranusPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.uranus.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(uranusPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.uranus.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => uranusAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Uranus's spin axis to complete one full precession cycle. Prograde (obliquity 98°). H×610 ≈ ${fmtNum(uranusAxialPrecessionYears, 0, ',')} years.`],
+       value : [ { v: () => planets.uranus.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Uranus's spin axis to complete one full precession cycle. Prograde (obliquity 98°). H×610 ≈ ${fmtNum(planets.uranus.axialPrecessionYears, 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => uranusWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -27756,8 +27600,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(uranusPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.uranus.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'uranus') - PREDICT_PLANETS.uranus.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -27791,10 +27635,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.neptuneObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Neptune's obliquity is frozen — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${neptuneTilt}°. Similar to Earth and Saturn`]},
+       hover : [`Neptune's obliquity is frozen — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${planets.neptune.axialTiltMean}°. Similar to Earth and Saturn`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityNeptune, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${neptuneOrbitalEccentricityBase}. Phase: ${neptuneEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(neptuneWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.neptune.orbitalEccentricityBase}. Phase: ${planets.neptune.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(neptuneWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.neptuneEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Neptune's orbital inclination to the ecliptic (J2000 ≈ 1.77°)`]},
@@ -27882,16 +27726,16 @@ const planetStats = {
        hover : [`Neptune distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(neptuneSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(neptuneOrbitDistance, neptuneOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(neptuneOrbitDistance, neptuneOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(neptuneOrbitDistance, neptuneOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -27900,11 +27744,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(neptuneOrbitDistance, neptuneOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(neptuneOrbitDistance, neptuneOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(neptuneOrbitDistance, planets.neptune.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -27919,25 +27763,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * o.lengthofAU, neptuneOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(neptuneOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.neptune.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -27957,11 +27801,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -28054,7 +27898,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(neptuneOrbitalEccentricityBase, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -28066,40 +27910,40 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), neptuneOrbitalEccentricityBase, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), neptuneOrbitalEccentricityBase, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(neptuneSolarYearCount+13))*meansolaryearlengthinDays), planets.neptune.orbitalEccentricityBase, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * o.lengthofAU, neptuneOrbitalEccentricityBase, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * o.lengthofAU, planets.neptune.orbitalEccentricityBase, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(neptuneSolarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.neptune.solarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(neptuneSolarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.neptune.solarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => neptunePerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.neptune.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(neptunePerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.neptune.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => neptuneAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Neptune's spin axis to complete one full precession cycle. Negative = retrograde. H×68 ≈ ${fmtNum(Math.abs(neptuneAxialPrecessionYears), 0, ',')} years.`],
+       value : [ { v: () => planets.neptune.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : [`Period for Neptune's spin axis to complete one full precession cycle. Negative = retrograde. H×68 ≈ ${fmtNum(Math.abs(planets.neptune.axialPrecessionYears), 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => neptuneWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -28115,8 +27959,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(neptunePerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.neptune.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'neptune') - PREDICT_PLANETS.neptune.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -28148,11 +27992,11 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => plutoTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => planets.pluto.axialTiltMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Large axial tilt of 57.47° (retrograde = 122.53°). Poles receive more solar energy than equator`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => plutoOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
+       value : [ { v: () => planets.pluto.orbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`High eccentricity (e ≈ 0.249) brings Pluto inside Neptune's orbit at perihelion (29.7 vs 30.1 AU)`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
@@ -28242,16 +28086,16 @@ const planetStats = {
        hover : [`Pluto distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(plutoSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(plutoOrbitDistance, plutoOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(plutoOrbitDistance, plutoOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(plutoOrbitDistance, plutoOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -28260,11 +28104,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(plutoOrbitDistance, plutoOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(plutoOrbitDistance, plutoOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(plutoOrbitDistance, planets.pluto.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -28279,25 +28123,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(pluto.sunDistAU * o.lengthofAU, plutoOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase, o.plutoTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase, o.plutoTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(plutoOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.pluto.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -28317,11 +28161,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -28414,7 +28258,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(plutoOrbitalEccentricityBase, o.plutoTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -28426,41 +28270,41 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(plutoSolarYearCount+13))*meansolaryearlengthinDays), plutoOrbitalEccentricityBase, o.plutoTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(plutoSolarYearCount+13))*meansolaryearlengthinDays), planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(plutoSolarYearCount+13))*meansolaryearlengthinDays), plutoOrbitalEccentricityBase, o.plutoEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(plutoSolarYearCount+13))*meansolaryearlengthinDays), planets.pluto.orbitalEccentricityBase, o.plutoEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(plutoOrbitDistance * o.lengthofAU, plutoOrbitalEccentricityBase, o.plutoTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(plutoOrbitDistance * o.lengthofAU, planets.pluto.orbitalEccentricityBase, o.plutoTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(plutoSolarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.pluto.solarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(plutoSolarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.pluto.solarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => plutoPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.pluto.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(plutoPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.pluto.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(plutoPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(plutoPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.pluto.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('pluto'), dec:2, sep:',' },{ small: '″/100yr' }],
@@ -28490,11 +28334,11 @@ const planetStats = {
       'null_row',
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => halleysTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => planets.halleys.axialTiltMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Axial tilt of Halley's Comet nucleus. Orientation determines which hemisphere faces the Sun at perihelion`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => halleysOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
+       value : [ { v: () => planets.halleys.orbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`Highly eccentric orbit (e ≈ 0.967). Ranges from 0.59 AU (inside Venus) to 35.1 AU (beyond Neptune)`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
@@ -28584,16 +28428,16 @@ const planetStats = {
        hover : [`Halleys distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(halleysSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(halleysOrbitDistance, halleysOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(halleysOrbitDistance, halleysOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(halleysOrbitDistance, halleysOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -28602,11 +28446,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(halleysOrbitDistance, halleysOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(halleysOrbitDistance, halleysOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(halleysOrbitDistance, planets.halleys.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -28621,25 +28465,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(halleys.sunDistAU * o.lengthofAU, halleysOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase, o.halleysTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase, o.halleysTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(halleysOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.halleys.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -28659,11 +28503,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -28742,7 +28586,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(halleysOrbitalEccentricityBase, o.halleysTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -28754,41 +28598,41 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(halleysSolarYearCount+13))*meansolaryearlengthinDays), halleysOrbitalEccentricityBase, o.halleysTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(halleysSolarYearCount+13))*meansolaryearlengthinDays), planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(halleysSolarYearCount+13))*meansolaryearlengthinDays), halleysOrbitalEccentricityBase, o.halleysEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(halleysSolarYearCount+13))*meansolaryearlengthinDays), planets.halleys.orbitalEccentricityBase, o.halleysEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(halleysOrbitDistance * o.lengthofAU, halleysOrbitalEccentricityBase, o.halleysTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(halleysOrbitDistance * o.lengthofAU, planets.halleys.orbitalEccentricityBase, o.halleysTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(halleysSolarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.halleys.solarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(halleysSolarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.halleys.solarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => halleysPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.halleys.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(halleysPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.halleys.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(halleysPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(halleysPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.halleys.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('halleys'), dec:2, sep:',' },{ small: '″/100yr' }],
@@ -28818,11 +28662,11 @@ const planetStats = {
       'null_row',
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => erosTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => planets.eros.axialTiltMean, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Axial tilt of 433 Eros relative to its orbital plane`],
        constant: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => erosOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
+       value : [ { v: () => planets.eros.orbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`Eros's orbital eccentricity (e ≈ 0.223). Near-Earth asteroid that crosses Mars's orbit`],
        constant: true},
       {label : () => `Ecliptic Inclination (i)`,
@@ -28912,16 +28756,16 @@ const planetStats = {
        hover : [`Eros distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(erosSolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(erosOrbitDistance, erosOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(erosOrbitDistance, erosOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(erosOrbitDistance, erosOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -28930,11 +28774,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(erosOrbitDistance, erosOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(erosOrbitDistance, erosOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(erosOrbitDistance, planets.eros.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -28949,25 +28793,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(eros.sunDistAU * o.lengthofAU, erosOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase, o.erosTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase, o.erosTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(erosOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.eros.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -28987,11 +28831,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -29070,7 +28914,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(erosOrbitalEccentricityBase, o.erosTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -29082,41 +28926,41 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays), erosOrbitalEccentricityBase, o.erosTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays), planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays), erosOrbitalEccentricityBase, o.erosEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(erosSolarYearCount-13))*meansolaryearlengthinDays), planets.eros.orbitalEccentricityBase, o.erosEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(erosOrbitDistance * o.lengthofAU, erosOrbitalEccentricityBase, o.erosTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(erosOrbitDistance * o.lengthofAU, planets.eros.orbitalEccentricityBase, o.erosTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(erosSolarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.eros.solarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(erosSolarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.eros.solarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => erosPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.eros.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(erosPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.eros.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(erosPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(erosPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.eros.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => calculateMissingPerihelionAdvance('eros'), dec:2, sep:',' },{ small: '″/100yr' }],
@@ -29488,12 +29332,12 @@ function buildPerihelionChart(planetKey, currentYear) {
   // Planet lookup tables
   const cfg = {
     mercury: { period: planets.mercury.perihelionEclipticYears, mean: mercuryInvPlaneInclinationMean, amp: mercuryInvPlaneInclinationAmplitude, ascJ2000: mercuryAscendingNodeInvPlaneVerified, phase: mercuryInclinationPhaseAngle },
-    venus:   { period: venusPerihelionEclipticYears,   mean: venusInvPlaneInclinationMean,   amp: venusInvPlaneInclinationAmplitude,   ascJ2000: venusAscendingNodeInvPlaneVerified,   phase: venusInclinationPhaseAngle },
-    mars:    { period: marsPerihelionEclipticYears,     mean: marsInvPlaneInclinationMean,    amp: marsInvPlaneInclinationAmplitude,    ascJ2000: marsAscendingNodeInvPlaneVerified,    phase: marsInclinationPhaseAngle },
-    jupiter: { period: jupiterPerihelionEclipticYears,  mean: jupiterInvPlaneInclinationMean, amp: jupiterInvPlaneInclinationAmplitude, ascJ2000: jupiterAscendingNodeInvPlaneVerified, phase: jupiterInclinationPhaseAngle },
-    saturn:  { period: saturnPerihelionEclipticYears,   mean: saturnInvPlaneInclinationMean,  amp: saturnInvPlaneInclinationAmplitude,  ascJ2000: saturnAscendingNodeInvPlaneVerified,  phase: saturnInclinationPhaseAngle },
-    uranus:  { period: uranusPerihelionEclipticYears,   mean: uranusInvPlaneInclinationMean,  amp: uranusInvPlaneInclinationAmplitude,  ascJ2000: uranusAscendingNodeInvPlaneVerified,  phase: uranusInclinationPhaseAngle },
-    neptune: { period: neptunePerihelionEclipticYears,  mean: neptuneInvPlaneInclinationMean, amp: neptuneInvPlaneInclinationAmplitude, ascJ2000: neptuneAscendingNodeInvPlaneVerified, phase: neptuneInclinationPhaseAngle },
+    venus:   { period: planets.venus.perihelionEclipticYears,   mean: venusInvPlaneInclinationMean,   amp: venusInvPlaneInclinationAmplitude,   ascJ2000: venusAscendingNodeInvPlaneVerified,   phase: venusInclinationPhaseAngle },
+    mars:    { period: planets.mars.perihelionEclipticYears,     mean: marsInvPlaneInclinationMean,    amp: marsInvPlaneInclinationAmplitude,    ascJ2000: marsAscendingNodeInvPlaneVerified,    phase: marsInclinationPhaseAngle },
+    jupiter: { period: planets.jupiter.perihelionEclipticYears,  mean: jupiterInvPlaneInclinationMean, amp: jupiterInvPlaneInclinationAmplitude, ascJ2000: jupiterAscendingNodeInvPlaneVerified, phase: jupiterInclinationPhaseAngle },
+    saturn:  { period: planets.saturn.perihelionEclipticYears,   mean: saturnInvPlaneInclinationMean,  amp: saturnInvPlaneInclinationAmplitude,  ascJ2000: saturnAscendingNodeInvPlaneVerified,  phase: saturnInclinationPhaseAngle },
+    uranus:  { period: planets.uranus.perihelionEclipticYears,   mean: uranusInvPlaneInclinationMean,  amp: uranusInvPlaneInclinationAmplitude,  ascJ2000: uranusAscendingNodeInvPlaneVerified,  phase: uranusInclinationPhaseAngle },
+    neptune: { period: planets.neptune.perihelionEclipticYears,  mean: neptuneInvPlaneInclinationMean, amp: neptuneInvPlaneInclinationAmplitude, ascJ2000: neptuneAscendingNodeInvPlaneVerified, phase: neptuneInclinationPhaseAngle },
   };
   const p = cfg[planetKey];
   if (!p) return '';
@@ -31705,15 +31549,15 @@ function updatePerihelion() {
   // Stable precession rate, unaffected by Earth's reference frame
   // ═══════════════════════════════════════════════════════════════════════════
   o["mercuryPerihelionEcliptic"] = perihelionLongitudeEcliptic(mercuryPerihelionDurationEcliptic1, planets.mercury.longitudePerihelion);
-  o["venusPerihelionEcliptic"] = perihelionLongitudeEcliptic(venusPerihelionDurationEcliptic1, venusLongitudePerihelion);
-  o["marsPerihelionEcliptic"] = perihelionLongitudeEcliptic(marsPerihelionDurationEcliptic1, marsLongitudePerihelion);
-  o["jupiterPerihelionEcliptic"] = perihelionLongitudeEcliptic(jupiterPerihelionDurationEcliptic1, jupiterLongitudePerihelion);
-  o["saturnPerihelionEcliptic"] = perihelionLongitudeEcliptic(saturnPerihelionDurationEcliptic1, saturnLongitudePerihelion);
-  o["uranusPerihelionEcliptic"] = perihelionLongitudeEcliptic(uranusPerihelionDurationEcliptic1, uranusLongitudePerihelion);
-  o["neptunePerihelionEcliptic"] = perihelionLongitudeEcliptic(neptunePerihelionDurationEcliptic1, neptuneLongitudePerihelion);
-  o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, plutoLongitudePerihelion);
-  o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, halleysLongitudePerihelion);
-  o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, erosLongitudePerihelion);
+  o["venusPerihelionEcliptic"] = perihelionLongitudeEcliptic(venusPerihelionDurationEcliptic1, planets.venus.longitudePerihelion);
+  o["marsPerihelionEcliptic"] = perihelionLongitudeEcliptic(marsPerihelionDurationEcliptic1, planets.mars.longitudePerihelion);
+  o["jupiterPerihelionEcliptic"] = perihelionLongitudeEcliptic(jupiterPerihelionDurationEcliptic1, planets.jupiter.longitudePerihelion);
+  o["saturnPerihelionEcliptic"] = perihelionLongitudeEcliptic(saturnPerihelionDurationEcliptic1, planets.saturn.longitudePerihelion);
+  o["uranusPerihelionEcliptic"] = perihelionLongitudeEcliptic(uranusPerihelionDurationEcliptic1, planets.uranus.longitudePerihelion);
+  o["neptunePerihelionEcliptic"] = perihelionLongitudeEcliptic(neptunePerihelionDurationEcliptic1, planets.neptune.longitudePerihelion);
+  o["plutoPerihelionEcliptic"] = perihelionLongitudeEcliptic(plutoPerihelionDurationEcliptic1, planets.pluto.longitudePerihelion);
+  o["halleysPerihelionEcliptic"] = perihelionLongitudeEcliptic(halleysPerihelionDurationEcliptic1, planets.halleys.longitudePerihelion);
+  o["erosPerihelionEcliptic"] = perihelionLongitudeEcliptic(erosPerihelionDurationEcliptic1, planets.eros.longitudePerihelion);
   // Update perihelion gauge bars
   for (const key in periGaugeEls) {
     if (periGaugeEls[key]) periGaugeEls[key].style.setProperty('--elong-pct', ((o[key] / 360) * 100) + '%');
@@ -32237,15 +32081,15 @@ function updatePlanetAnomalies() {
   // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix, eccentricity]
   const planetConfigs = [
     { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityBase },
-    { planet: venus, fixedPerihelion: venusFixedPerihelionAtSun, key: 'venus', e: venusOrbitalEccentricityBase },
-    { planet: mars, fixedPerihelion: marsFixedPerihelionAtSun, key: 'mars', e: marsOrbitalEccentricityBase },
-    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: jupiterOrbitalEccentricityBase },
-    { planet: saturn, fixedPerihelion: saturnFixedPerihelionAtSun, key: 'saturn', e: saturnOrbitalEccentricityBase },
-    { planet: uranus, fixedPerihelion: uranusFixedPerihelionAtSun, key: 'uranus', e: uranusOrbitalEccentricityBase },
-    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: neptuneOrbitalEccentricityBase },
-    { planet: pluto, fixedPerihelion: plutoFixedPerihelionAtSun, key: 'pluto', e: plutoOrbitalEccentricityBase },
-    { planet: halleys, fixedPerihelion: halleysFixedPerihelionAtSun, key: 'halleys', e: halleysOrbitalEccentricityBase },
-    { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros', e: erosOrbitalEccentricityBase }
+    { planet: venus, fixedPerihelion: venusFixedPerihelionAtSun, key: 'venus', e: planets.venus.orbitalEccentricityBase },
+    { planet: mars, fixedPerihelion: marsFixedPerihelionAtSun, key: 'mars', e: planets.mars.orbitalEccentricityBase },
+    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityBase },
+    { planet: saturn, fixedPerihelion: saturnFixedPerihelionAtSun, key: 'saturn', e: planets.saturn.orbitalEccentricityBase },
+    { planet: uranus, fixedPerihelion: uranusFixedPerihelionAtSun, key: 'uranus', e: planets.uranus.orbitalEccentricityBase },
+    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityBase },
+    { planet: pluto, fixedPerihelion: plutoFixedPerihelionAtSun, key: 'pluto', e: planets.pluto.orbitalEccentricityBase },
+    { planet: halleys, fixedPerihelion: halleysFixedPerihelionAtSun, key: 'halleys', e: planets.halleys.orbitalEccentricityBase },
+    { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros', e: planets.eros.orbitalEccentricityBase }
   ];
 
   for (const { planet, fixedPerihelion, key, e } of planetConfigs) {
@@ -32481,16 +32325,16 @@ function updatePlanetInvariablePlaneHeights() {
   // Precession uses <planet>PerihelionEclipticYears constants (earthPerihelionICRFYears for Earth)
   const planetConfigs = [
     { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || planets.mercury.invPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: planets.mercury.perihelionEclipticYears },
-    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
+    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || planets.venus.invPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: planets.venus.perihelionEclipticYears },
     { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionICRFYears },
-    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
-    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || jupiterInvPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: jupiterPerihelionEclipticYears },
-    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || saturnInvPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: saturnPerihelionEclipticYears },
-    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || uranusInvPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: uranusPerihelionEclipticYears },
-    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || neptuneInvPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: neptunePerihelionEclipticYears },
-    { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || plutoInvPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: plutoPerihelionEclipticYears },
-    { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || halleysInvPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: halleysPerihelionEclipticYears },
-    { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
+    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || planets.mars.invPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: planets.mars.perihelionEclipticYears },
+    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || planets.jupiter.invPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: jupiterAscendingNodeInvPlaneVerified, precessionYears: planets.jupiter.perihelionEclipticYears },
+    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || planets.saturn.invPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: saturnAscendingNodeInvPlaneVerified,  precessionYears: planets.saturn.perihelionEclipticYears },
+    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || planets.uranus.invPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: uranusAscendingNodeInvPlaneVerified,  precessionYears: planets.uranus.perihelionEclipticYears },
+    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || planets.neptune.invPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: neptuneAscendingNodeInvPlaneVerified, precessionYears: planets.neptune.perihelionEclipticYears },
+    { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || planets.pluto.invPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: plutoAscendingNodeInvPlaneVerified,   precessionYears: planets.pluto.perihelionEclipticYears },
+    { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || planets.halleys.invPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: halleysAscendingNodeInvPlaneVerified, precessionYears: planets.halleys.perihelionEclipticYears },
+    { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || planets.eros.invPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: planets.eros.perihelionEclipticYears }
   ];
 
   for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planetConfigs) {
@@ -32777,16 +32621,16 @@ function calculateInvariablePlaneFromAngularMomentum() {
   // Including Pluto as per Souami & Souchay (2012) who used N=10 body system
   const planetConfigs = [
     { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: planets.mercury.orbitalEccentricityBase, i: planets.mercury.eclipticInclinationJ2000, node: planets.mercury.ascendingNode },
-    { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: venusOrbitalEccentricityBase,   i: venusEclipticInclinationJ2000,   node: venusAscendingNode },
+    { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: planets.venus.orbitalEccentricityBase,   i: planets.venus.eclipticInclinationJ2000,   node: planets.venus.ascendingNode },
     { key: 'earth',   mass: M_EARTH,   a: 1.0,                  e: o.eccentricityEarth,        i: 0,                         node: 0 },
-    { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: marsOrbitalEccentricityBase,    i: marsEclipticInclinationJ2000,    node: marsAscendingNode },
-    { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: jupiterOrbitalEccentricityBase, i: jupiterEclipticInclinationJ2000, node: jupiterAscendingNode },
-    { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: saturnOrbitalEccentricityBase,  i: saturnEclipticInclinationJ2000,  node: saturnAscendingNode },
-    { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: uranusOrbitalEccentricityBase,  i: uranusEclipticInclinationJ2000,  node: uranusAscendingNode },
-    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: neptuneOrbitalEccentricityBase, i: neptuneEclipticInclinationJ2000, node: neptuneAscendingNode },
-    { key: 'pluto',   mass: M_PLUTO,   a: plutoOrbitDistance,   e: plutoOrbitalEccentricityBase,   i: plutoEclipticInclinationJ2000,   node: plutoAscendingNode },
+    { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: planets.mars.orbitalEccentricityBase,    i: planets.mars.eclipticInclinationJ2000,    node: planets.mars.ascendingNode },
+    { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: planets.jupiter.orbitalEccentricityBase, i: planets.jupiter.eclipticInclinationJ2000, node: planets.jupiter.ascendingNode },
+    { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: planets.saturn.orbitalEccentricityBase,  i: planets.saturn.eclipticInclinationJ2000,  node: planets.saturn.ascendingNode },
+    { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: planets.uranus.orbitalEccentricityBase,  i: planets.uranus.eclipticInclinationJ2000,  node: planets.uranus.ascendingNode },
+    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: planets.neptune.orbitalEccentricityBase, i: planets.neptune.eclipticInclinationJ2000, node: planets.neptune.ascendingNode },
+    { key: 'pluto',   mass: M_PLUTO,   a: plutoOrbitDistance,   e: planets.pluto.orbitalEccentricityBase,   i: planets.pluto.eclipticInclinationJ2000,   node: planets.pluto.ascendingNode },
     // Including Ceres as per Souami & Souchay (2012) who used N=10 body system
-    { key: 'ceres',   mass: M_CERES,   a: ceresOrbitDistance,   e: ceresOrbitalEccentricityBase,   i: ceresEclipticInclinationJ2000,   node: ceresAscendingNode }
+    { key: 'ceres',   mass: M_CERES,   a: planets.ceres.orbitDistance,   e: planets.ceres.orbitalEccentricityBase,   i: planets.ceres.eclipticInclinationJ2000,   node: planets.ceres.ascendingNode }
   ];
 
   let L_total_x = 0;
@@ -33350,12 +33194,12 @@ function updatePredictions() {
   // Each planet oscillates at its own wobble period (meeting frequency of axial + perihelion ICRF)
   // Each planet's reference year = 2000 - (phaseJ2000 / 360) × wobblePeriod, so e(2000) = e_J2000
   predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(o.currentYear, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude);
-  predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(o.currentYear, 2000 - (venusEccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   venusOrbitalEccentricityBase,   venusOrbitalEccentricityAmplitude);
-  predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(o.currentYear, 2000 - (marsEccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    marsOrbitalEccentricityBase,    marsOrbitalEccentricityAmplitude);
-  predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(o.currentYear, 2000 - (jupiterEccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, jupiterOrbitalEccentricityBase, jupiterOrbitalEccentricityAmplitude);
-  predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(o.currentYear, 2000 - (saturnEccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  saturnOrbitalEccentricityBase,  saturnOrbitalEccentricityAmplitude);
-  predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(o.currentYear, 2000 - (uranusEccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  uranusOrbitalEccentricityBase,  uranusOrbitalEccentricityAmplitude);
-  predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(o.currentYear, 2000 - (neptuneEccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, neptuneOrbitalEccentricityBase, neptuneOrbitalEccentricityAmplitude);
+  predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(o.currentYear, 2000 - (planets.venus.eccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   planets.venus.orbitalEccentricityBase,   planets.venus.orbitalEccentricityAmplitude);
+  predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(o.currentYear, 2000 - (planets.mars.eccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    planets.mars.orbitalEccentricityBase,    planets.mars.orbitalEccentricityAmplitude);
+  predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(o.currentYear, 2000 - (planets.jupiter.eccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, planets.jupiter.orbitalEccentricityBase, planets.jupiter.orbitalEccentricityAmplitude);
+  predictions.eccentricitySaturn  = o.eccentricitySaturn  = computeEccentricityEarth(o.currentYear, 2000 - (planets.saturn.eccentricityPhaseJ2000  / 360) * saturnWobblePeriod,  saturnWobblePeriod,  planets.saturn.orbitalEccentricityBase,  planets.saturn.orbitalEccentricityAmplitude);
+  predictions.eccentricityUranus  = o.eccentricityUranus  = computeEccentricityEarth(o.currentYear, 2000 - (planets.uranus.eccentricityPhaseJ2000  / 360) * uranusWobblePeriod,  uranusWobblePeriod,  planets.uranus.orbitalEccentricityBase,  planets.uranus.orbitalEccentricityAmplitude);
+  predictions.eccentricityNeptune = o.eccentricityNeptune = computeEccentricityEarth(o.currentYear, 2000 - (planets.neptune.eccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, planets.neptune.orbitalEccentricityBase, planets.neptune.orbitalEccentricityAmplitude);
 
   // Dynamic Fibonacci balance (uses eccentricities computed above)
   computeDynamicFibonacciBalance();
@@ -33598,12 +33442,12 @@ function computePlanetObliquity(planetName, currentYear) {
   };
   const axialTilts = {
     mercury: planets.mercury.axialTiltMean,
-    venus:   venusTilt,
-    mars:    marsTilt,
-    jupiter: jupiterTilt,
-    saturn:  saturnTilt,
-    uranus:  uranusTilt,
-    neptune: neptuneTilt,
+    venus:   planets.venus.axialTiltMean,
+    mars:    planets.mars.axialTiltMean,
+    jupiter: planets.jupiter.axialTiltMean,
+    saturn:  planets.saturn.axialTiltMean,
+    uranus:  planets.uranus.axialTiltMean,
+    neptune: planets.neptune.axialTiltMean,
   };
 
   const cycle = obliqCycles[planetName];
@@ -34344,15 +34188,15 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Planet J2000 inclinations (Souami & Souchay 2012) - calibration targets
   const j2000Inclinations = {
     mercury: planets.mercury.invPlaneInclinationJ2000,
-    venus: venusInvPlaneInclinationJ2000,
-    mars: marsInvPlaneInclinationJ2000,
-    jupiter: jupiterInvPlaneInclinationJ2000,
-    saturn: saturnInvPlaneInclinationJ2000,
-    uranus: uranusInvPlaneInclinationJ2000,
-    neptune: neptuneInvPlaneInclinationJ2000,
-    pluto: plutoInvPlaneInclinationJ2000,
-    halleys: halleysInvPlaneInclinationJ2000,
-    eros: erosInvPlaneInclinationJ2000
+    venus: planets.venus.invPlaneInclinationJ2000,
+    mars: planets.mars.invPlaneInclinationJ2000,
+    jupiter: planets.jupiter.invPlaneInclinationJ2000,
+    saturn: planets.saturn.invPlaneInclinationJ2000,
+    uranus: planets.uranus.invPlaneInclinationJ2000,
+    neptune: planets.neptune.invPlaneInclinationJ2000,
+    pluto: planets.pluto.invPlaneInclinationJ2000,
+    halleys: planets.halleys.invPlaneInclinationJ2000,
+    eros: planets.eros.invPlaneInclinationJ2000
   };
 
   // Mean inclinations (midpoint of Laplace-Lagrange bounds)
@@ -34387,15 +34231,15 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Planet precession periods (same period governs nodal precession and inclination oscillation)
   const periods = {
     mercury: planets.mercury.perihelionEclipticYears,
-    venus: venusPerihelionEclipticYears,
-    mars: marsPerihelionEclipticYears,
-    jupiter: jupiterPerihelionEclipticYears,
-    saturn: saturnPerihelionEclipticYears,  // Negative = retrograde
-    uranus: uranusPerihelionEclipticYears,
-    neptune: neptunePerihelionEclipticYears,  // Negative = retrograde
-    pluto: plutoPerihelionEclipticYears,
-    halleys: halleysPerihelionEclipticYears,
-    eros: erosPerihelionEclipticYears
+    venus: planets.venus.perihelionEclipticYears,
+    mars: planets.mars.perihelionEclipticYears,
+    jupiter: planets.jupiter.perihelionEclipticYears,
+    saturn: planets.saturn.perihelionEclipticYears,  // Negative = retrograde
+    uranus: planets.uranus.perihelionEclipticYears,
+    neptune: planets.neptune.perihelionEclipticYears,  // Negative = retrograde
+    pluto: planets.pluto.perihelionEclipticYears,
+    halleys: planets.halleys.perihelionEclipticYears,
+    eros: planets.eros.perihelionEclipticYears
   };
 
   // J2000 ascending nodes on invariable plane
