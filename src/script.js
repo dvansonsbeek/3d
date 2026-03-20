@@ -166,24 +166,6 @@ planets.mercury = {
 };
 
 // Flat aliases (backward compatibility — used throughout script.js)
-const mercurySolarYearInput = planets.mercury.solarYearInput;
-const mercuryEclipticInclinationJ2000 = planets.mercury.eclipticInclinationJ2000;
-const mercuryOrbitalEccentricityJ2000 = planets.mercury.orbitalEccentricityJ2000;
-const mercuryOrbitalEccentricityBase = planets.mercury.orbitalEccentricityBase;
-const mercuryOrbitalEccentricityAmplitude = planets.mercury.orbitalEccentricityAmplitude;
-const mercuryEccentricityPhaseJ2000 = planets.mercury.eccentricityPhaseJ2000;
-const mercuryInvPlaneInclinationJ2000 = planets.mercury.invPlaneInclinationJ2000;
-const mercuryTilt = planets.mercury.axialTiltMean;
-const mercuryLongitudePerihelion = planets.mercury.longitudePerihelion;
-const mercuryAscendingNode = planets.mercury.ascendingNode;
-const mercuryMeanAnomaly = planets.mercury.meanAnomaly;
-const mercuryTrueAnomaly = planets.mercury.trueAnomaly;
-const mercuryAngleCorrection = planets.mercury.angleCorrection;
-const mercuryPerihelionEclipticYears = planets.mercury.perihelionEclipticYears;
-const mercuryAxialPrecessionYears = planets.mercury.axialPrecessionYears;
-const mercuryStartpos = planets.mercury.startpos;
-const mercuryEocFraction = planets.mercury.eocFraction;
-const mercuryPerihelionRef_JD = planets.mercury.perihelionRef_JD;
 
 // Venus
 planets.venus = {
@@ -1347,7 +1329,7 @@ const perihelionPhaseOffset = (((startmodelyearwithCorrection - balancedYear) / 
 //   Type I/II (inner): 180 - ascendingNode (anti-node direction)
 //   Type III (outer):  2 × startpos (compensates orbital phase in tilt frame)
 const ascNodeTiltCorrection = {
-  mercury: 180 - mercuryAscendingNode,
+  mercury: 180 - planets.mercury.ascendingNode,
   venus:   180 - venusAscendingNode,
   mars:    180 - marsAscendingNode,
   jupiter: 2 * jupiterStartpos,
@@ -2081,15 +2063,15 @@ const OrbitalFormulas = {
 // ─────────────────────────────────────────────────────────────────────────
 
 // Planet calculations TYPE I
-const mercurySolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/mercurySolarYearInput));
+const mercurySolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/planets.mercury.solarYearInput));
 const mercuryOrbitDistance = (((holisticyearLength/mercurySolarYearCount)**2)**(1/3));
-const mercuryRealOrbitalEccentricity = mercuryOrbitalEccentricityBase/(1+mercuryOrbitalEccentricityBase);
+const mercuryRealOrbitalEccentricity = planets.mercury.orbitalEccentricityBase/(1+planets.mercury.orbitalEccentricityBase);
 const mercuryPerihelionDistance = mercuryOrbitDistance*mercuryRealOrbitalEccentricity*100;
 const mercuryElipticOrbit = mercuryPerihelionDistance/2;
 const mercurySpeed = (mercuryOrbitDistance*currentAUDistance*Math.PI*2)/(meansolaryearlengthinDays*(holisticyearLength/mercurySolarYearCount))/24;
 const mercuryRotationPeriod = 24*(meansolaryearlengthinDays*holisticyearLength)/(mercurySolarYearCount*3/2);
-const mercuryEccentricityPerihelion = (mercuryPerihelionDistance/2)*mercuryOrbitalEccentricityBase;
-const mercuryLowestPoint = 180-mercuryAscendingNode;
+const mercuryEccentricityPerihelion = (mercuryPerihelionDistance/2)*planets.mercury.orbitalEccentricityBase;
+const mercuryLowestPoint = 180-planets.mercury.ascendingNode;
 
 const venusSolarYearCount = (Math.round((holisticyearLength*meansolaryearlengthinDays)/venusSolarYearInput));
 const venusOrbitDistance = (((holisticyearLength/venusSolarYearCount)**2)**(1/3));
@@ -2210,19 +2192,19 @@ const precessionBreakdownCache = {
 // Get orbital data for all 8 major planets (used for precession breakdown calculations)
 // Uses FIXED J2000 ecliptic orbital elements for consistency with reference calculations
 // NOTE: period_days uses the CALCULATED period from the model (holisticyearLength/count * meansolaryearlengthinDays)
-//       i_deg uses the FIXED ecliptic inclination (e.g., mercuryEclipticInclinationJ2000 = 7.005°)
-//       omega_deg uses the FIXED J2000 ascending node (e.g., mercuryAscendingNode = 48.33°)
+//       i_deg uses the FIXED ecliptic inclination (e.g., planets.mercury.eclipticInclinationJ2000 = 7.005°)
+//       omega_deg uses the FIXED J2000 ascending node (e.g., planets.mercury.ascendingNode = 48.33°)
 function getPlanetPerturbationData(oRef) {
   return [
     {
       name: 'Mercury',
       a_km: mercuryOrbitDistance * oRef.lengthofAU,
-      e: mercuryOrbitalEccentricityBase,
-      i_deg: mercuryEclipticInclinationJ2000,        // Fixed ecliptic inclination (7.005°)
-      omega_deg: mercuryAscendingNode,               // Fixed J2000 ascending node
+      e: planets.mercury.orbitalEccentricityBase,
+      i_deg: planets.mercury.eclipticInclinationJ2000,        // Fixed ecliptic inclination (7.005°)
+      omega_deg: planets.mercury.ascendingNode,               // Fixed J2000 ascending node
       mass: M_MERCURY,
       period_days: (holisticyearLength / mercurySolarYearCount) * meansolaryearlengthinDays,
-      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)
+      observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears)
     },
     {
       name: 'Venus',
@@ -2991,7 +2973,7 @@ const moon = {
 const mercuryPerihelionDurationEcliptic1 = {
   name: "Mercury Perihelion Duration Ecliptic1",
   startPos: 0,
-  speed: Math.PI*2/mercuryPerihelionEclipticYears,
+  speed: Math.PI*2/planets.mercury.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3017,8 +2999,8 @@ const mercuryPerihelionFromEarth = {
   rotationSpeed: 0,
   tilt: 0,
   orbitRadius: 0,
-  orbitCentera: Math.cos(((mercuryLongitudePerihelion+mercuryAngleCorrection+90))*Math.PI/180)*mercuryPerihelionDistance,
-  orbitCenterb: Math.cos((90-(mercuryLongitudePerihelion+mercuryAngleCorrection-90))*Math.PI/180)*mercuryPerihelionDistance,
+  orbitCentera: Math.cos(((planets.mercury.longitudePerihelion+planets.mercury.angleCorrection+90))*Math.PI/180)*mercuryPerihelionDistance,
+  orbitCenterb: Math.cos((90-(planets.mercury.longitudePerihelion+planets.mercury.angleCorrection-90))*Math.PI/180)*mercuryPerihelionDistance,
   orbitCenterc: 0,
   orbitTilta: 0,
   orbitTiltb: 0,
@@ -3040,7 +3022,7 @@ const mercuryPerihelionFromEarth = {
 const mercuryPerihelionDurationEcliptic2 = {
   name: "Mercury Perihelion Duration Ecliptic2",
   startPos: 0,
-  speed: -Math.PI*2/mercuryPerihelionEclipticYears,
+  speed: -Math.PI*2/planets.mercury.perihelionEclipticYears,
   tilt: 0,
   orbitRadius: 0,
   orbitCentera: 0,
@@ -3064,7 +3046,7 @@ const ascNodeToolCorrection = ascNodeTiltCorrection;
 
 // Ascending node lookup by planet name (for post-hoc RA/Dec correction)
 const _planetAscNodeLookup = {
-  Mercury: mercuryAscendingNode, Venus: venusAscendingNode, Mars: marsAscendingNode,
+  Mercury: planets.mercury.ascendingNode, Venus: venusAscendingNode, Mars: marsAscendingNode,
   Jupiter: jupiterAscendingNode, Saturn: saturnAscendingNode,
   Uranus: uranusAscendingNode, Neptune: neptuneAscendingNode,
 };
@@ -3079,8 +3061,8 @@ const mercuryRealPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
 
   size: 1.0,
   color: 0x868485,
@@ -3102,8 +3084,8 @@ const mercuryFixedPerihelionAtSun = {
   orbitCentera: 100,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-mercuryAscendingNode)*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
+  orbitTilta: Math.cos(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-planets.mercury.ascendingNode)*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
 
   size: 1.0,
   color: 0x868485,
@@ -3117,23 +3099,23 @@ const mercuryFixedPerihelionAtSun = {
 
 const mercury = {
   name: "Mercury",
-  startPos: mercuryStartpos,
+  startPos: planets.mercury.startpos,
   speed: Math.PI*2/(holisticyearLength/mercurySolarYearCount),
   rotationSpeed: Math.PI*2*((mercuryRotationPeriod/24)/meansolaryearlengthinDays),
-  tilt: -mercuryTilt,
+  tilt: -planets.mercury.axialTiltMean,
   orbitRadius: (((holisticyearLength/mercurySolarYearCount) ** 2) **(1/3)) *100,
   orbitCentera: 0,
   orbitCenterb: 0,
   orbitCenterc: 0,
-  orbitTilta: Math.cos(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
-  orbitTiltb: Math.sin(((-90-(mercuryAscendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-mercuryEclipticInclinationJ2000,
-  eccentricity: mercuryOrbitalEccentricityBase * mercuryEocFraction,
+  orbitTilta: Math.cos(((-90-(planets.mercury.ascendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
+  orbitTiltb: Math.sin(((-90-(planets.mercury.ascendingNode+ascNodeToolCorrection.mercury))*Math.PI)/180)*-planets.mercury.eclipticInclinationJ2000,
+  eccentricity: planets.mercury.orbitalEccentricityBase * planets.mercury.eocFraction,
   _eccentricityKey: 'eccentricityMercury',
-  _eocFraction: mercuryEocFraction,
-  perihelionPhaseJ2000: -mercuryStartpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / mercurySolarYearCount) - Math.PI * 2 / mercuryPerihelionEclipticYears)
-    * (mercuryPerihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / mercuryPerihelionEclipticYears,
+  _eocFraction: planets.mercury.eocFraction,
+  perihelionPhaseJ2000: -planets.mercury.startpos * (Math.PI / 180)
+    + (Math.PI * 2 / (holisticyearLength / mercurySolarYearCount) - Math.PI * 2 / planets.mercury.perihelionEclipticYears)
+    * (planets.mercury.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
+  perihelionPrecessionRate: Math.PI * 2 / planets.mercury.perihelionEclipticYears,
 
   size: (diameters.mercuryDiameter/ currentAUDistance)*100,
   color: 0x868485,
@@ -4539,7 +4521,7 @@ function calcWobblePeriod(periEclYr, axialYr) {
   const wobbleRate = Math.abs(1 / axialYr - 1 / inclICRF);
   return 1 / wobbleRate;
 }
-const mercuryWobblePeriod  = calcWobblePeriod(mercuryPerihelionEclipticYears, mercuryAxialPrecessionYears);
+const mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);
 const venusWobblePeriod    = calcWobblePeriod(venusPerihelionEclipticYears,   venusAxialPrecessionYears);
 const marsWobblePeriod     = calcWobblePeriod(marsPerihelionEclipticYears,    marsAxialPrecessionYears);
 const jupiterWobblePeriod  = calcWobblePeriod(jupiterPerihelionEclipticYears, jupiterAxialPrecessionYears);
@@ -4563,13 +4545,13 @@ const neptuneObliquityCycle = null;                          // N/A — frozen a
 
 const mercuryWobbleCenter = {
   name: "MERCURY-WOBBLE-CENTER",
-  startPos: mercuryEccentricityPhaseJ2000,
+  startPos: planets.mercury.eccentricityPhaseJ2000,
   speed: Math.PI * 2 / mercuryWobblePeriod,
   tilt: 0, rotationSpeed: 0,
-  orbitRadius: mercuryOrbitalEccentricityAmplitude * 100,
+  orbitRadius: planets.mercury.orbitalEccentricityAmplitude * 100,
   orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
   orbitTilta: 0, orbitTiltb: 0,
-  size: Math.max(0.001, Math.min(0.011, mercuryOrbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
+  size: Math.max(0.001, Math.min(0.011, planets.mercury.orbitalEccentricityAmplitude * 100 * 0.25)), color: 0x333333,
   textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury-wobble-center.png',
   visible: true,
   containerObj: "", orbitObj: "", planetObj: "", pivotObj: "",
@@ -5719,7 +5701,7 @@ for (const wc of [mercuryWobbleCenter, venusWobbleCenter, marsWobbleCenter,
 
 /* — Planet Wobble Center labels — */
 const _planetWobbleCenters = [
-  { obj: mercuryWobbleCenter, name: "Mercury", eccAmp: mercuryOrbitalEccentricityAmplitude, tilt: mercuryTilt, inclAmp: mercuryInvPlaneInclinationAmplitude, periEclYr: mercuryPerihelionEclipticYears, axialYr: mercuryAxialPrecessionYears, obliqCycle: mercuryObliquityCycle },
+  { obj: mercuryWobbleCenter, name: "Mercury", eccAmp: planets.mercury.orbitalEccentricityAmplitude, tilt: planets.mercury.axialTiltMean, inclAmp: mercuryInvPlaneInclinationAmplitude, periEclYr: planets.mercury.perihelionEclipticYears, axialYr: planets.mercury.axialPrecessionYears, obliqCycle: mercuryObliquityCycle },
   { obj: venusWobbleCenter,   name: "Venus",   eccAmp: venusOrbitalEccentricityAmplitude,   tilt: venusTilt,   inclAmp: venusInvPlaneInclinationAmplitude,   periEclYr: venusPerihelionEclipticYears,   axialYr: venusAxialPrecessionYears,   obliqCycle: venusObliquityCycle },
   { obj: marsWobbleCenter,    name: "Mars",    eccAmp: marsOrbitalEccentricityAmplitude,    tilt: marsTilt,    inclAmp: marsInvPlaneInclinationAmplitude,    periEclYr: marsPerihelionEclipticYears,    axialYr: marsAxialPrecessionYears,    obliqCycle: marsObliquityCycle },
   { obj: jupiterWobbleCenter, name: "Jupiter", eccAmp: jupiterOrbitalEccentricityAmplitude, tilt: jupiterTilt, inclAmp: jupiterInvPlaneInclinationAmplitude, periEclYr: jupiterPerihelionEclipticYears, axialYr: jupiterAxialPrecessionYears, obliqCycle: jupiterObliquityCycle },
@@ -9245,7 +9227,7 @@ const PLANET_TEST_DATES = {
 
 // Reference constants for longitude validation
 const LONGITUDE_PERIHELION_REFS = {
-  mercury: mercuryLongitudePerihelion,
+  mercury: planets.mercury.longitudePerihelion,
   venus: venusLongitudePerihelion,
   mars: marsLongitudePerihelion,
   jupiter: jupiterLongitudePerihelion,
@@ -9258,7 +9240,7 @@ const LONGITUDE_PERIHELION_REFS = {
 };
 
 const ASCENDING_NODE_REFS = {
-  mercury: mercuryAscendingNode,
+  mercury: planets.mercury.ascendingNode,
   venus: venusAscendingNode,
   mars: marsAscendingNode,
   jupiter: jupiterAscendingNode,
@@ -9463,7 +9445,7 @@ function validateStep(stepData, stepIndex, steps) {
     if (earthPerihelionFromEarth && obj) {
       // Reference longitude of perihelion values (expected on model start date)
       const referenceLongitudes = {
-        mercury: mercuryLongitudePerihelion,
+        mercury: planets.mercury.longitudePerihelion,
         venus: venusLongitudePerihelion,
         mars: marsLongitudePerihelion,
         jupiter: jupiterLongitudePerihelion,
@@ -12078,9 +12060,9 @@ function fbeDecodePreset(row) {
 function fbePresetLabel(row, index) {
   const PHASES = [earthInclinationPhaseAngle, saturnInclinationPhaseAngle];
   const pLabel = (ph) => Math.abs(ph - earthInclinationPhaseAngle) < 1 ? '203' : '23';
-  const planets = ['Me','Ve','Ma','Ju','Sa','Ur','Ne'];
+  const planetConfigs = ['Me','Ve','Ma','Ju','Sa','Ur','Ne'];
   const indices = [2,4,6,8,10,12,14]; // d positions in row
-  const parts = planets.map((p, i) => `${p}${row[indices[i]]}@${pLabel(PHASES[row[indices[i]+1]])}`);
+  const parts = planetConfigs.map((p, i) => `${p}${row[indices[i]]}@${pLabel(PHASES[row[indices[i]+1]])}`);
   return `#${index+1} ${row[1].toFixed(4)}% ${parts.join(' ')} [${row[0]}]`;
 }
 
@@ -12134,11 +12116,11 @@ const BALANCE_CONFIG = {
     name: 'Mercury',
     mass: M_MERCURY / M_SUN,
     sma: mercuryOrbitDistance,
-    ecc: mercuryOrbitalEccentricityBase,
+    ecc: planets.mercury.orbitalEccentricityBase,
     defaultD: 21,
-    inclJ2000: mercuryInvPlaneInclinationJ2000,
+    inclJ2000: planets.mercury.invPlaneInclinationJ2000,
     omegaJ2000: mercuryAscendingNodeInvPlaneVerified,
-    period: mercuryPerihelionEclipticYears,
+    period: planets.mercury.perihelionEclipticYears,
     trendJPL: mercuryEclipticInclinationTrendJPL,
     llBounds: { min: mercuryLLBoundsMin, max: mercuryLLBoundsMax },
     defaultPhaseAngle: mercuryInclinationPhaseAngle,
@@ -12773,7 +12755,7 @@ const PHASE_ANGLE_SCALE = { mercury: 203, venus: 203, earth: 203, mars: 203, jup
 
 // Use BASE eccentricities for the scale (Law 5 balance is tuned on these)
 const ECC_BASE_SCALE = {
-  mercury: mercuryOrbitalEccentricityBase,
+  mercury: planets.mercury.orbitalEccentricityBase,
   venus:   venusOrbitalEccentricityBase,
   earth:   eccentricityBase,
   mars:    marsOrbitalEccentricityBase,
@@ -12784,7 +12766,7 @@ const ECC_BASE_SCALE = {
 };
 // Model-derived J2000 eccentricities: e(2000) from computeEccentricityEarth
 const ECC_J2000_SCALE = {
-  mercury: computeEccentricityEarth(2000, 2000 - (mercuryEccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, mercuryOrbitalEccentricityBase, mercuryOrbitalEccentricityAmplitude),
+  mercury: computeEccentricityEarth(2000, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude),
   venus:   computeEccentricityEarth(2000, 2000 - (venusEccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   venusOrbitalEccentricityBase,   venusOrbitalEccentricityAmplitude),
   earth:   computeEccentricityEarth(2000, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude),
   mars:    computeEccentricityEarth(2000, 2000 - (marsEccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    marsOrbitalEccentricityBase,    marsOrbitalEccentricityAmplitude),
@@ -12794,7 +12776,7 @@ const ECC_J2000_SCALE = {
   neptune: computeEccentricityEarth(2000, 2000 - (neptuneEccentricityPhaseJ2000 / 360) * neptuneWobblePeriod, neptuneWobblePeriod, neptuneOrbitalEccentricityBase, neptuneOrbitalEccentricityAmplitude),
 };
 const ECC_AMP_SCALE = {
-  mercury: mercuryOrbitalEccentricityAmplitude,
+  mercury: planets.mercury.orbitalEccentricityAmplitude,
   venus:   venusOrbitalEccentricityAmplitude,
   earth:   eccentricityAmplitude,
   mars:    marsOrbitalEccentricityAmplitude,
@@ -13390,7 +13372,7 @@ function updateHierarchyLiveData() {
     }
 
     // Calculate initial angle based on child planet's startPos
-    // The RealPerihelionAtSun.startPos = 2 * childStartPos (e.g., mercuryStartpos * 2 = 588)
+    // The RealPerihelionAtSun.startPos = 2 * childStartPos (e.g., planets.mercury.startpos * 2 = 588)
     //
     // Rules for initial angle (counting DOWN from this value to 0):
     // - If 2 * childStartPos >= 360: initialAngle = childStartPos (e.g., Mercury: 294°)
@@ -13573,7 +13555,7 @@ function updateHierarchyLiveData() {
 
     // Get reference anomaly values for current planet (21 Jun 2000 00:00 UTC)
     const refAnomalies = {
-      mercury: { mean: mercuryMeanAnomaly, true: mercuryTrueAnomaly },
+      mercury: { mean: planets.mercury.meanAnomaly, true: planets.mercury.trueAnomaly },
       venus: { mean: venusMeanAnomaly, true: venusTrueAnomaly },
       mars: { mean: marsMeanAnomaly, true: marsTrueAnomaly },
       jupiter: { mean: jupiterMeanAnomaly, true: jupiterTrueAnomaly },
@@ -14296,7 +14278,7 @@ const fibGaugeEls = {};
 
 // Dynamic Fibonacci balance computation (called each frame)
 function computeDynamicFibonacciBalance() {
-  const planets = [
+  const planetConfigs = [
     { mass: M_MERCURY / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, phase: mercuryInclinationPhaseAngle },
     { mass: M_VENUS / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, phase: venusInclinationPhaseAngle },
     { mass: M_EARTH / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  phase: earthInclinationPhaseAngle },
@@ -14310,7 +14292,7 @@ function computeDynamicFibonacciBalance() {
   let inclSum203 = 0, inclSum23 = 0;
   // Eccentricity balance: v = √m × a^1.5 × e / √d
   let eccSum203 = 0, eccSum23 = 0;
-  for (const p of planets) {
+  for (const p of planetConfigs) {
     const w = Math.sqrt(p.mass * p.sma * (1 - p.ecc * p.ecc)) / p.d;
     const v = Math.sqrt(p.mass) * Math.pow(p.sma, 1.5) * p.ecc / Math.sqrt(p.d);
     if (p.phase > 180) { inclSum203 += w; eccSum203 += v; }
@@ -14731,7 +14713,7 @@ function setupGUI() {
 
     // -- Per-planet data (Mercury through Neptune) --
     const allPlanets = [
-      { name: 'Mercury', period: mercurySolarYearInput, ecc: mercuryOrbitalEccentricityBase, eccAmp: mercuryOrbitalEccentricityAmplitude, incEcl: mercuryEclipticInclinationJ2000, incInv: mercuryInvPlaneInclinationJ2000, longPeri: mercuryLongitudePerihelion, ascNode: mercuryAscendingNode, angleCorr: mercuryAngleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(mercuryPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: mercuryStartpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: mercuryEocFraction, periRefJD: mercuryPerihelionRef_JD },
+      { name: 'Mercury', period: planets.mercury.solarYearInput, ecc: planets.mercury.orbitalEccentricityBase, eccAmp: planets.mercury.orbitalEccentricityAmplitude, incEcl: planets.mercury.eclipticInclinationJ2000, incInv: planets.mercury.invPlaneInclinationJ2000, longPeri: planets.mercury.longitudePerihelion, ascNode: planets.mercury.ascendingNode, angleCorr: planets.mercury.angleCorrection, periYears: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: planets.mercury.startpos, ascNodeVerified: mercuryAscendingNodeInvPlaneVerified, inclMean: mercuryInvPlaneInclinationMean, inclAmp: mercuryInvPlaneInclinationAmplitude, phaseAngle: mercuryInclinationPhaseAngle, eocFrac: planets.mercury.eocFraction, periRefJD: planets.mercury.perihelionRef_JD },
       { name: 'Venus',   period: venusSolarYearInput,   ecc: venusOrbitalEccentricityBase,   eccAmp: venusOrbitalEccentricityAmplitude,   incEcl: venusEclipticInclinationJ2000,   incInv: venusInvPlaneInclinationJ2000,   longPeri: venusLongitudePerihelion,   ascNode: venusAscendingNode,   angleCorr: venusAngleCorrection,   periYears: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr', startpos: venusStartpos, ascNodeVerified: venusAscendingNodeInvPlaneVerified, inclMean: venusInvPlaneInclinationMean, inclAmp: venusInvPlaneInclinationAmplitude, phaseAngle: venusInclinationPhaseAngle, eocFrac: venusEocFraction, periRefJD: venusPerihelionRef_JD },
 
       { name: 'Mars',    period: marsSolarYearInput,     ecc: marsOrbitalEccentricityBase,    eccAmp: marsOrbitalEccentricityAmplitude,    incEcl: marsEclipticInclinationJ2000,    incInv: marsInvPlaneInclinationJ2000,    longPeri: marsLongitudePerihelion,    ascNode: marsAscendingNode,    angleCorr: marsAngleCorrection,    periYears: 'H/(4+1/3) \u2248 ' + Math.round(marsPerihelionEclipticYears).toLocaleString('en-US') + ' yr', startpos: marsStartpos, ascNodeVerified: marsAscendingNodeInvPlaneVerified, inclMean: marsInvPlaneInclinationMean, inclAmp: marsInvPlaneInclinationAmplitude, phaseAngle: marsInclinationPhaseAngle, eocFrac: marsEocFraction, periRefJD: marsPerihelionRef_JD },
@@ -15147,7 +15129,7 @@ function setupGUI() {
   const periFmt = v => v.toFixed(6);
   // [planetKey, geoKey, label, precessionYears] — Earth has no detail row
   const periPlanets = [
-    ['mercury', 'mercuryPerihelion', 'Mercury', mercuryPerihelionEclipticYears],
+    ['mercury', 'mercuryPerihelion', 'Mercury', planets.mercury.perihelionEclipticYears],
     ['venus', 'venusPerihelion', 'Venus', venusPerihelionEclipticYears],
     ['earth', 'earthPerihelion', 'Earth', earthPerihelionICRFYears],
     ['mars', 'marsPerihelion', 'Mars', marsPerihelionEclipticYears],
@@ -15219,7 +15201,7 @@ function setupGUI() {
   // Invariable plane heights with centered gauge bars + expandable detail rows
   const invPlaneFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
   const invPlanePlanets = [
-    ['mercury', 'Mercury (AU)', 6.35, 0.467, mercuryPerihelionEclipticYears],
+    ['mercury', 'Mercury (AU)', 6.35, 0.467, planets.mercury.perihelionEclipticYears],
     ['venus', 'Venus (AU)', 2.15, 0.728, venusPerihelionEclipticYears],
     ['earth', 'Earth (AU)', 1.57, 1.017, earthPerihelionICRFYears],
     ['mars', 'Mars (AU)', 1.63, 1.666, marsPerihelionEclipticYears],
@@ -25624,10 +25606,10 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.mercuryObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(mercuryObliquityCycle, 0, ',')} years (8H/3, confirmed 0.2% vs observed ~895 kyr). Amplitude: ±${mercuryInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${mercuryTilt}°`]},
+       hover : [`Dynamic obliquity oscillating with period ${fmtNum(mercuryObliquityCycle, 0, ',')} years (8H/3, confirmed 0.2% vs observed ~895 kyr). Amplitude: ±${mercuryInvPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.mercury.axialTiltMean}°`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMercury, dec:8, sep:',' },{ small: 'AU' }],
-       hover : [`Dynamic eccentricity from tilt formula. Base: ${mercuryOrbitalEccentricityBase}. Phase: ${mercuryEccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(mercuryWobblePeriod, 0, ',')} years`]},
+       hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.mercury.orbitalEccentricityBase}. Phase: ${planets.mercury.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(mercuryWobblePeriod, 0, ',')} years`]},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => o.mercuryEclipticInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Mercury's orbital inclination to the ecliptic (J2000 ≈ 7.00°). Highest of the eight planets`]},
@@ -25715,16 +25697,16 @@ const planetStats = {
        hover : [`Mercury distance to Sun in km is calculated as (((${fmtNum(holisticyearLength,0,',')}/${fmtNum(mercurySolarYearCount,0,',')})^2)^(1/3))*${fmtNum(o.lengthofAU,6,',')}`],
        static: true},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(mercuryOrbitDistance, mercuryOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`],
        static: true},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(mercuryOrbitDistance, mercuryOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`],
        static: true},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(mercuryOrbitDistance, mercuryOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`],
        static: true},
       {label : () => `Current distance from Sun (r)`,
@@ -25733,11 +25715,11 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(mercuryOrbitDistance, mercuryOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`],
        static: true},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(mercuryOrbitDistance, mercuryOrbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(mercuryOrbitDistance, planets.mercury.orbitalEccentricityBase), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`],
        static: true},
       {label : () => `Eccentricity distance (ae)`,
@@ -25752,25 +25734,25 @@ const planetStats = {
        static: true},
       {label : () => `Current orbital velocity`,
        value : [ { v: () => OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * o.lengthofAU, mercuryOrbitDistance * o.lengthofAU) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase) * 3600, 0, ',')} km/h at aphelion`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(mercuryOrbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(planets.mercury.orbitalEccentricityBase), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -25790,11 +25772,11 @@ const planetStats = {
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -25887,7 +25869,7 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(mercuryOrbitalEccentricityBase, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
@@ -25899,39 +25881,39 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), mercuryOrbitalEccentricityBase, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), mercuryOrbitalEccentricityBase, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((holisticyearLength/(mercurySolarYearCount-13))*meansolaryearlengthinDays), planets.mercury.orbitalEccentricityBase, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * o.lengthofAU, mercuryOrbitalEccentricityBase, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * o.lengthofAU, planets.mercury.orbitalEccentricityBase, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(mercurySolarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.mercury.solarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(mercurySolarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.mercury.solarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => mercuryPerihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.mercury.perihelionEclipticYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for perihelion to complete one full revolution relative to the ecliptic plane`],
        constant: true, highlight: true},
     null,
       {label : () => `Perihelion Precession Duration against ICRF`,
-       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(mercuryPerihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
+       value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.mercury.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
        static: true},
       {label : () => `Precession Angular Velocity`,
-       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
+       value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
        static: true},
       {label : () => `Axial Precession Period`,
-       value : [ { v: () => mercuryAxialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => planets.mercury.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`Period for Mercury's spin axis to complete one full precession cycle. Negative = retrograde. Mercury is in a Cassini state: axial precession locked to orbital plane precession.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
@@ -25948,8 +25930,8 @@ const planetStats = {
     null,
     null,
       {label : () => `┌ Perihelion precession (Heliocentric)`,
-       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
-       hover : [`1,296,000 / ${fmtNum(mercuryPerihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears),2,',')} arcsec/century`],
+       value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears), dec:2, sep:',' },{ small: '″/100yr' }],
+       hover : [`1,296,000 / ${fmtNum(planets.mercury.perihelionEclipticYears,2,',')} = ${fmtNum(OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears),2,',')} arcsec/century`],
        constant: true},
       {label : () => `├ Missing advance of perihelion`,
        value : [ { v: () => predictGeocentricPrecession(o.currentYear, 'mercury') - PREDICT_PLANETS.mercury.baseline, dec:2, sep:',' },{ small: '″/100yr' }],
@@ -29505,7 +29487,7 @@ function buildPerihelionChart(planetKey, currentYear) {
 
   // Planet lookup tables
   const cfg = {
-    mercury: { period: mercuryPerihelionEclipticYears, mean: mercuryInvPlaneInclinationMean, amp: mercuryInvPlaneInclinationAmplitude, ascJ2000: mercuryAscendingNodeInvPlaneVerified, phase: mercuryInclinationPhaseAngle },
+    mercury: { period: planets.mercury.perihelionEclipticYears, mean: mercuryInvPlaneInclinationMean, amp: mercuryInvPlaneInclinationAmplitude, ascJ2000: mercuryAscendingNodeInvPlaneVerified, phase: mercuryInclinationPhaseAngle },
     venus:   { period: venusPerihelionEclipticYears,   mean: venusInvPlaneInclinationMean,   amp: venusInvPlaneInclinationAmplitude,   ascJ2000: venusAscendingNodeInvPlaneVerified,   phase: venusInclinationPhaseAngle },
     mars:    { period: marsPerihelionEclipticYears,     mean: marsInvPlaneInclinationMean,    amp: marsInvPlaneInclinationAmplitude,    ascJ2000: marsAscendingNodeInvPlaneVerified,    phase: marsInclinationPhaseAngle },
     jupiter: { period: jupiterPerihelionEclipticYears,  mean: jupiterInvPlaneInclinationMean, amp: jupiterInvPlaneInclinationAmplitude, ascJ2000: jupiterAscendingNodeInvPlaneVerified, phase: jupiterInclinationPhaseAngle },
@@ -31722,7 +31704,7 @@ function updatePerihelion() {
   // Reads directly from precession layer rotation - the "true" heliocentric value
   // Stable precession rate, unaffected by Earth's reference frame
   // ═══════════════════════════════════════════════════════════════════════════
-  o["mercuryPerihelionEcliptic"] = perihelionLongitudeEcliptic(mercuryPerihelionDurationEcliptic1, mercuryLongitudePerihelion);
+  o["mercuryPerihelionEcliptic"] = perihelionLongitudeEcliptic(mercuryPerihelionDurationEcliptic1, planets.mercury.longitudePerihelion);
   o["venusPerihelionEcliptic"] = perihelionLongitudeEcliptic(venusPerihelionDurationEcliptic1, venusLongitudePerihelion);
   o["marsPerihelionEcliptic"] = perihelionLongitudeEcliptic(marsPerihelionDurationEcliptic1, marsLongitudePerihelion);
   o["jupiterPerihelionEcliptic"] = perihelionLongitudeEcliptic(jupiterPerihelionDurationEcliptic1, jupiterLongitudePerihelion);
@@ -32106,7 +32088,7 @@ function updateAscendingNodes() {
   const now = Date.now();
   if (_debugAscendingNodeLogEnabled && (now - _debugAscendingNodeLastLog > _debugAscendingNodeInterval)) {
     _debugAscendingNodeLastLog = now;
-    console.log(`🔍 Ascending Node: Year ${currentYear.toFixed(2)}, Mercury Ω = ${o.mercuryAscendingNode.toFixed(2)}° (static: ${mercuryAscendingNode}°, diff: ${(o.mercuryAscendingNode - mercuryAscendingNode).toFixed(2)}°)`);
+    console.log(`🔍 Ascending Node: Year ${currentYear.toFixed(2)}, Mercury Ω = ${o.mercuryAscendingNode.toFixed(2)}° (static: ${planets.mercury.ascendingNode}°, diff: ${(o.mercuryAscendingNode - planets.mercury.ascendingNode).toFixed(2)}°)`);
     console.log(`🌍 DEBUG TEST v2 - code updated check`);
 
     // Earth Invariable Plane debug
@@ -32253,8 +32235,8 @@ function updatePlanetAnomalies() {
   sun.pivotObj.getWorldPosition(_anomalySunPos);
 
   // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix, eccentricity]
-  const planets = [
-    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: mercuryOrbitalEccentricityBase },
+  const planetConfigs = [
+    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityBase },
     { planet: venus, fixedPerihelion: venusFixedPerihelionAtSun, key: 'venus', e: venusOrbitalEccentricityBase },
     { planet: mars, fixedPerihelion: marsFixedPerihelionAtSun, key: 'mars', e: marsOrbitalEccentricityBase },
     { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: jupiterOrbitalEccentricityBase },
@@ -32266,7 +32248,7 @@ function updatePlanetAnomalies() {
     { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros', e: erosOrbitalEccentricityBase }
   ];
 
-  for (const { planet, fixedPerihelion, key, e } of planets) {
+  for (const { planet, fixedPerihelion, key, e } of planetConfigs) {
     // Skip if objects don't exist
     if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
       continue;
@@ -32497,8 +32479,8 @@ function updatePlanetInvariablePlaneHeights() {
   // Planet configuration for invariable plane calculations
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
   // Precession uses <planet>PerihelionEclipticYears constants (earthPerihelionICRFYears for Earth)
-  const planets = [
-    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || mercuryInvPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: mercuryPerihelionEclipticYears },
+  const planetConfigs = [
+    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || planets.mercury.invPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: mercuryAscendingNodeInvPlaneVerified, precessionYears: planets.mercury.perihelionEclipticYears },
     { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || venusInvPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: venusAscendingNodeInvPlaneVerified,   precessionYears: venusPerihelionEclipticYears },
     { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionICRFYears },
     { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || marsInvPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: marsAscendingNodeInvPlaneVerified,    precessionYears: marsPerihelionEclipticYears },
@@ -32511,7 +32493,7 @@ function updatePlanetInvariablePlaneHeights() {
     { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || erosInvPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: erosAscendingNodeInvPlaneVerified,    precessionYears: erosPerihelionEclipticYears }
   ];
 
-  for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planets) {
+  for (const { key, obj, getIncl, ascNodeJ2000, ascNodeJ2000Verified, precessionYears } of planetConfigs) {
     let eclipticLongitude;
     let distanceAU;
     let inclToInvPlane;
@@ -32649,7 +32631,7 @@ function updateInvariablePlaneBalance() {
   let aboveCount = 0;
   let belowCount = 0;
 
-  const planets = [
+  const planetConfigs = [
     { key: 'mercury', mass: M_MERCURY },
     { key: 'venus',   mass: M_VENUS },
     { key: 'earth',   mass: M_EARTH },
@@ -32660,7 +32642,7 @@ function updateInvariablePlaneBalance() {
     { key: 'neptune', mass: M_NEPTUNE }
   ];
 
-  for (const { key, mass } of planets) {
+  for (const { key, mass } of planetConfigs) {
     const height = o[key + 'HeightAboveInvPlane'] || 0;
     const isAbove = o[key + 'AboveInvPlane'];
 
@@ -32793,8 +32775,8 @@ function calculateInvariablePlaneFromAngularMomentum() {
 
   // GM_SUN is in km³/s², lengthofAU is in km
   // Including Pluto as per Souami & Souchay (2012) who used N=10 body system
-  const planets = [
-    { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: mercuryOrbitalEccentricityBase, i: mercuryEclipticInclinationJ2000, node: mercuryAscendingNode },
+  const planetConfigs = [
+    { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: planets.mercury.orbitalEccentricityBase, i: planets.mercury.eclipticInclinationJ2000, node: planets.mercury.ascendingNode },
     { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: venusOrbitalEccentricityBase,   i: venusEclipticInclinationJ2000,   node: venusAscendingNode },
     { key: 'earth',   mass: M_EARTH,   a: 1.0,                  e: o.eccentricityEarth,        i: 0,                         node: 0 },
     { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: marsOrbitalEccentricityBase,    i: marsEclipticInclinationJ2000,    node: marsAscendingNode },
@@ -32814,7 +32796,7 @@ function calculateInvariablePlaneFromAngularMomentum() {
   let jupiterL = 0;
   let saturnL = 0;
 
-  for (const planet of planets) {
+  for (const planet of planetConfigs) {
     // Specific angular momentum magnitude: h = sqrt(GM * a * (1 - e²))
     // a is in AU, convert to km for consistency with GM_SUN (km³/s²)
     const a_km = planet.a * o.lengthofAU;
@@ -32941,7 +32923,7 @@ function updateDynamicInclinations() {
   // incl = DYNAMIC inclinations to invariable plane (now oscillating like Earth's)
   // ascNodeSS = Souami & Souchay (2012) ascending nodes (dynamic, precessing)
   // ascNodeVerified = J2000-verified ascending nodes (dynamic, precessing) - now the primary value
-  const planets = [
+  const planetConfigs = [
     { key: 'mercury', incl: o.mercuryInvPlaneInclinationDynamic, ascNodeSS: o.mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeVerified: o.mercuryAscendingNodeInvPlane },
     { key: 'venus',   incl: o.venusInvPlaneInclinationDynamic,   ascNodeSS: o.venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeVerified: o.venusAscendingNodeInvPlane },
     { key: 'mars',    incl: o.marsInvPlaneInclinationDynamic,    ascNodeSS: o.marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.marsAscendingNodeInvPlane },
@@ -32954,7 +32936,7 @@ function updateDynamicInclinations() {
     { key: 'eros',    incl: o.erosInvPlaneInclinationDynamic,    ascNodeSS: o.erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeVerified: o.erosAscendingNodeInvPlane }
   ];
 
-  for (const { key, incl, ascNodeSS, ascNodeVerified } of planets) {
+  for (const { key, incl, ascNodeSS, ascNodeVerified } of planetConfigs) {
     const pI = incl * DEG2RAD;
 
     // Calculate using Souami & Souchay ascending node AND S&S ecliptic normal
@@ -33027,7 +33009,7 @@ function orbitalAnglesFromTilts(pd, peri) {
 }
 
 function updateOrbitOrientations() {
-  const planets = [
+  const planetConfigs = [
     ["mercury",  mercuryRealPerihelionAtSun,  o.mercuryPerihelion],
     ["venus",    venusRealPerihelionAtSun,    o.venusPerihelion],
 //    ["mercury2",    mercuryRealPerihelionAtSun,    o.mercuryPerihelion2],    
@@ -33041,7 +33023,7 @@ function updateOrbitOrientations() {
     ["eros",     erosRealPerihelionAtSun,     o.erosPerihelion]
   ];
 
-  for (const [name, pd, peri] of planets) {
+  for (const [name, pd, peri] of planetConfigs) {
     const r = orbitalAnglesFromTilts(pd, peri);
 
     o[`${name}Inclination`]        = r.inclination;      // (optional)
@@ -33367,7 +33349,7 @@ function updatePredictions() {
   // Planet eccentricities: e(t) = f(base, amplitude, wobblePeriod)
   // Each planet oscillates at its own wobble period (meeting frequency of axial + perihelion ICRF)
   // Each planet's reference year = 2000 - (phaseJ2000 / 360) × wobblePeriod, so e(2000) = e_J2000
-  predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(o.currentYear, 2000 - (mercuryEccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, mercuryOrbitalEccentricityBase, mercuryOrbitalEccentricityAmplitude);
+  predictions.eccentricityMercury = o.eccentricityMercury = computeEccentricityEarth(o.currentYear, 2000 - (planets.mercury.eccentricityPhaseJ2000 / 360) * mercuryWobblePeriod, mercuryWobblePeriod, planets.mercury.orbitalEccentricityBase, planets.mercury.orbitalEccentricityAmplitude);
   predictions.eccentricityVenus   = o.eccentricityVenus   = computeEccentricityEarth(o.currentYear, 2000 - (venusEccentricityPhaseJ2000   / 360) * venusWobblePeriod,   venusWobblePeriod,   venusOrbitalEccentricityBase,   venusOrbitalEccentricityAmplitude);
   predictions.eccentricityMars    = o.eccentricityMars    = computeEccentricityEarth(o.currentYear, 2000 - (marsEccentricityPhaseJ2000    / 360) * marsWobblePeriod,    marsWobblePeriod,    marsOrbitalEccentricityBase,    marsOrbitalEccentricityAmplitude);
   predictions.eccentricityJupiter = o.eccentricityJupiter = computeEccentricityEarth(o.currentYear, 2000 - (jupiterEccentricityPhaseJ2000 / 360) * jupiterWobblePeriod, jupiterWobblePeriod, jupiterOrbitalEccentricityBase, jupiterOrbitalEccentricityAmplitude);
@@ -33615,7 +33597,7 @@ function computePlanetObliquity(planetName, currentYear) {
     neptune: neptuneObliquityCycle,
   };
   const axialTilts = {
-    mercury: mercuryTilt,
+    mercury: planets.mercury.axialTiltMean,
     venus:   venusTilt,
     mars:    marsTilt,
     jupiter: jupiterTilt,
@@ -34361,7 +34343,7 @@ function predictGeocentricPrecession(year, planetKey) {
 function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Planet J2000 inclinations (Souami & Souchay 2012) - calibration targets
   const j2000Inclinations = {
-    mercury: mercuryInvPlaneInclinationJ2000,
+    mercury: planets.mercury.invPlaneInclinationJ2000,
     venus: venusInvPlaneInclinationJ2000,
     mars: marsInvPlaneInclinationJ2000,
     jupiter: jupiterInvPlaneInclinationJ2000,
@@ -34404,7 +34386,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
   // Planet precession periods (same period governs nodal precession and inclination oscillation)
   const periods = {
-    mercury: mercuryPerihelionEclipticYears,
+    mercury: planets.mercury.perihelionEclipticYears,
     venus: venusPerihelionEclipticYears,
     mars: marsPerihelionEclipticYears,
     jupiter: jupiterPerihelionEclipticYears,
