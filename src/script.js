@@ -30,8 +30,6 @@ const holisticyearLength = 335008;
 // Input Length of Holistic-Year in Years
 const perihelionalignmentYear = 1246;
 // Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD)
-const perihelionalignmentJD = 2176142;
-// Last YEAR longitude of perihelion aligned with solstice (according to J. Meeus around 1246 AD) in Juliandate
 const inputmeanlengthsolaryearindays = 365.2421897;
 // Reference length of solar year in days. THIS IS USED AS INPUT. The actual mean lenght is calculated based upon this input and the lenght of the holistic year
 const meansiderealyearlengthinSeconds = 31558149.8;
@@ -40,11 +38,6 @@ const temperatureGraphMostLikely = 14.5;
 // 3D model = Choose from 0 to 16, with steps of 0.5 where we are in our obliquity cycle (so 32 options). If you change this value, also the earthRAAngle value will change and depending if you make it an whole or a half value you need to make earthInvPlaneInclinationAmplitude negative/positive. Value 14.5 means in 1246 we were 14.5/16 * holistic year length on our journey calculated from the balanced year so - relatively - almost nearing a new balanced year.
 const earthtiltMean = 23.41365930;                        // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
 const earthInvPlaneInclinationAmplitude = 0.63541988;     // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
-// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection.
-// Geometric constant independent of epoch.
-const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
-const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((284.51 - 203.3195) * Math.PI / 180);
 const eccentricityBase = 0.01537159;                      // 3D model + formula = aligned needs to be 102.9553 on startdate 2000-06-21 in order 2000-01-01 was ~102.947
 const eccentricityAmplitude = 0.00137074;                 // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
@@ -72,8 +65,6 @@ const speedOfLight = 299792.458;                          // Speed of light in k
 const debugOn = false;                                     // Debug button flag (set to true when needed)
 
 // Formula-only amplitude parameters
-const mideccentricitypointAmplitude = 2.4587;             // Formula only
-const helionpointAmplitude = 5.05;                        // Formula only
 
 // Fourier harmonic coefficients for year-length formulas (fitted from 491 data points, ±25000 yr)
 // Means are DERIVED (not fitted): tropical = meansolaryearlengthinDays,
@@ -103,11 +94,15 @@ const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.000 s
 ];
 const deltaTStart = 63.63;                                // Formula only ; usage in delta-T is commented out by default (see render loop)
 
-// Early derived constants (needed before ASTRO_REFERENCE)
+// Early derived constants (computed from inputs above)
 const perihelionCycleLength = holisticyearLength / 16;
 const meansolaryearlengthinDays = Math.round(inputmeanlengthsolaryearindays * (holisticyearLength / 16)) / (holisticyearLength / 16);
 const j2000JD = startmodelJD - (startmodelYear - 2000.0) * meansolaryearlengthinDays;
 const julianCenturyDays = 100 * meansolaryearlengthinDays;
+// Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
+const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
+// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
+const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((284.51 - 203.3195) * Math.PI / 180);
 
 // ─── 3. SUN & MOON INPUT CONSTANTS ─────────────────────────────────────
 // Reference lengths used as INPUT for the Sun
@@ -165,10 +160,9 @@ planets.mercury = {
   perihelionRef_JD: 2460335.9,
 };
 
-// Flat aliases (backward compatibility — used throughout script.js)
-
 // Venus
 planets.venus = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 224.695,
   eclipticInclinationJ2000: 3.39467605,
   orbitalEccentricityJ2000: 0.00677672,
@@ -178,6 +172,7 @@ planets.venus = {
   ascendingNode: 76.67877109,
   meanAnomaly: 324.9668371,
   trueAnomaly: 324.5198504,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.00619052,
   orbitalEccentricityAmplitude: 9.625389e-4,
   eccentricityPhaseJ2000: 123.7514,
@@ -191,6 +186,7 @@ planets.venus = {
 
 // Mars
 planets.mars = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 686.931,
   eclipticInclinationJ2000: 1.84969142,
   orbitalEccentricityJ2000: 0.09339410,
@@ -200,6 +196,7 @@ planets.mars = {
   ascendingNode: 49.55737662,
   meanAnomaly: 109.2630844,
   trueAnomaly: 118.9501056,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.09297543,
   orbitalEccentricityAmplitude: 3.073636e-3,
   eccentricityPhaseJ2000: 96.8878,
@@ -213,6 +210,7 @@ planets.mars = {
 
 // Jupiter
 planets.jupiter = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 4330.5,
   eclipticInclinationJ2000: 1.30439695,
   orbitalEccentricityJ2000: 0.04838624,
@@ -222,6 +220,7 @@ planets.jupiter = {
   ascendingNode: 100.4877868,
   meanAnomaly: 32.47179744,
   trueAnomaly: 35.69428061,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.04821478,
   orbitalEccentricityAmplitude: 1.149908e-6,
   eccentricityPhaseJ2000: 180,
@@ -235,6 +234,7 @@ planets.jupiter = {
 
 // Saturn
 planets.saturn = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 10747.0,
   eclipticInclinationJ2000: 2.48599187,
   orbitalEccentricityJ2000: 0.05386179,
@@ -244,6 +244,7 @@ planets.saturn = {
   ascendingNode: 113.6452856,
   meanAnomaly: 325.663876,
   trueAnomaly: 321.7910116,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.05374486,
   orbitalEccentricityAmplitude: 5.403008e-6,
   eccentricityPhaseJ2000: 180,
@@ -257,6 +258,7 @@ planets.saturn = {
 
 // Uranus
 planets.uranus = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 30586,
   eclipticInclinationJ2000: 0.77263783,
   orbitalEccentricityJ2000: 0.04725744,
@@ -266,6 +268,7 @@ planets.uranus = {
   ascendingNode: 74.00919023,
   meanAnomaly: 145.7292678,
   trueAnomaly: 148.5142459,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.04734421,
   orbitalEccentricityAmplitude: 2.831008e-5,
   eccentricityPhaseJ2000: 0,
@@ -279,6 +282,7 @@ planets.uranus = {
 
 // Neptune
 planets.neptune = {
+  // Astro references (from astro-reference.json)
   solarYearInput: 59980,
   eclipticInclinationJ2000: 1.77004347,
   orbitalEccentricityJ2000: 0.00859048,
@@ -288,6 +292,7 @@ planets.neptune = {
   ascendingNode: 131.7853754,
   meanAnomaly: 262.5003424,
   trueAnomaly: 261.2242728,
+  // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.00868571,
   orbitalEccentricityAmplitude: 8.098033e-6,
   eccentricityPhaseJ2000: 0,
@@ -303,33 +308,45 @@ planets.neptune = {
 
 // Pluto
 planets.pluto = {
-  solarYearInput: 90465, eclipticInclinationJ2000: 17.14001, orbitalEccentricityBase: 0.2488273,
+  // Astro references (from astro-reference.json)
+  solarYearInput: 90465, eclipticInclinationJ2000: 17.14001,
   invPlaneInclinationJ2000: 15.5639473, axialTiltMean: 57.47, longitudePerihelion: 224.06891,
   ascendingNode: 110.30393, meanAnomaly: 15.55009, trueAnomaly: 26.31965048,
+  // Model parameters (from model-parameters.json)
+  orbitalEccentricityBase: 0.2488273,
   angleCorrection: 2.469281, perihelionEclipticYears: holisticyearLength, startpos: 71.555,
 };
 
 // Halley's
 planets.halleys = {
-  solarYearInput: 27503, eclipticInclinationJ2000: 162.26269, orbitalEccentricityBase: 0.96714291,
+  // Astro references (from astro-reference.json)
+  solarYearInput: 27503, eclipticInclinationJ2000: 162.26269,
   invPlaneInclinationJ2000: 150, axialTiltMean: 0, longitudePerihelion: 111.33249,
   ascendingNode: 58.42008, meanAnomaly: 38.77481, trueAnomaly: 166.26774708,
+  // Model parameters (from model-parameters.json)
+  orbitalEccentricityBase: 0.96714291,
   angleCorrection: -1.619816, perihelionEclipticYears: holisticyearLength, startpos: 80,
 };
 
 // Eros
 planets.eros = {
-  solarYearInput: 642.93, eclipticInclinationJ2000: 10.82760, orbitalEccentricityBase: 0.2229512,
+  // Astro references (from astro-reference.json)
+  solarYearInput: 642.93, eclipticInclinationJ2000: 10.82760,
   invPlaneInclinationJ2000: 9.25, axialTiltMean: 0, longitudePerihelion: 178.81322,
   ascendingNode: 304.30993, meanAnomaly: 320.21552, trueAnomaly: 299.91713740,
+  // Model parameters (from model-parameters.json)
+  orbitalEccentricityBase: 0.2229512,
   angleCorrection: 0.047888, perihelionEclipticYears: holisticyearLength, startpos: 57.402,
 };
 
 // Ceres
 planets.ceres = {
-  solarYearInput: 1680.5, eclipticInclinationJ2000: 10.59407, orbitalEccentricityBase: 0.0755347,
+  // Astro references (from astro-reference.json)
+  solarYearInput: 1680.5, eclipticInclinationJ2000: 10.59407,
   invPlaneInclinationJ2000: 0.4331698, axialTiltMean: 4, longitudePerihelion: 73.59769,
   ascendingNode: 80.30533, meanAnomaly: 95.98772, trueAnomaly: 104.48097667,
+  // Model parameters (from model-parameters.json)
+  orbitalEccentricityBase: 0.0755347,
   angleCorrection: 0, perihelionEclipticYears: holisticyearLength, orbitDistance: 2.76596,
 };
 
@@ -1138,6 +1155,7 @@ const meanearthRotationsinDays = meansolaryearlengthinDays+1;
 const startmodelyearwithCorrection = startmodelYear+(correctionDays/meansolaryearlengthinDays);
 const balancedYear = perihelionalignmentYear-(temperatureGraphMostLikely*(holisticyearLength/16));
 const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelyearwithCorrection-balancedYear));
+const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelyearwithCorrection - perihelionalignmentYear)));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 const meanlengthofday = meansiderealyearlengthinSeconds/meansiderealyearlengthinDays;
@@ -14490,8 +14508,8 @@ function setupGUI() {
       ascNodeVerified: fmtDeg(earthAscendingNodeInvPlaneVerified),
       eccBase: String(eccentricityBase),
       eccAmp: String(eccentricityAmplitude),
-      midEccAmp: fmtDeg(mideccentricitypointAmplitude),
-      helionAmp: fmtDeg(helionpointAmplitude),
+      periHarmonics: String(PERI_HARMONICS.length) + ' terms',
+      periRMSE: '0.003°',
       siderealYearRMS: '0.0002 s (Fourier)',
       solarYearRMS: '0.003 s (Fourier)',
       anomYearRMS: '0.002 s (Fourier)',
@@ -14521,8 +14539,8 @@ function setupGUI() {
     addConst(fundFolder, fundVals, 'ascNodeVerified', 'Asc. node inv. plane (J2000)', 'J2000-verified ascending node on the invariable plane (Souami & Souchay 2012).');
     addConst(fundFolder, fundVals, 'eccBase', 'Eccentricity base', 'Base eccentricity for the long-term oscillation.');
     addConst(fundFolder, fundVals, 'eccAmp', 'Eccentricity ampl.', 'Amplitude of the eccentricity oscillation.');
-    addConst(fundFolder, fundVals, 'midEccAmp', 'Mid-ecc. amplitude', 'Mid-eccentricity point amplitude (formula only).');
-    addConst(fundFolder, fundVals, 'helionAmp', 'Helion point ampl.', 'Helion point amplitude (formula only).');
+    addConst(fundFolder, fundVals, 'periHarmonics', 'Perihelion harmonics', 'Number of Fourier terms in the Earth perihelion longitude formula (fitted from simulation data).');
+    addConst(fundFolder, fundVals, 'periRMSE', 'Perihelion RMSE', 'Root mean square error of the perihelion harmonic fit over full H.');
     addConst(fundFolder, fundVals, 'siderealYearRMS', 'Sidereal year RMS', 'Sidereal year Fourier fit RMS residual.');
     addConst(fundFolder, fundVals, 'solarYearRMS', 'Solar year RMS', 'Tropical year Fourier fit RMS residual.');
     addConst(fundFolder, fundVals, 'anomYearRMS', 'Anomalistic yr RMS', 'Anomalistic year Fourier fit RMS residual.');
@@ -34327,51 +34345,6 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
 
   // Dynamic inclination centered on the mean
   return i_mean + amplitude * Math.cos(currentPhaseRad);
-}
-
-/**
- * Compute the longitude of perihelion for a given year.
- *
- * @param {number} currentYear                        – the year you want to compute for
- * @param {number} balancedYear                       – the reference (“balanced”) year
- * @param {number} perihelionCycleLength              – length of the perihelion cycle (in years)
- * @param {number} perihelionprecessioncycleYear      – the precession cycle year threshold
- * @param {number} helionpointAmplitude               – amplitude of the perihelion-point variation (in degrees)
- * @param {number} mideccentricitypointAmplitude      – amplitude of the mid-eccentricity-point variation (in degrees)
- * @returns {number} longitudePerihelion (in degrees)
- */
-function computeLongitudePerihelion(
-  currentYear,
-  balancedYear,
-  perihelionCycleLength,
-  perihelionprecessioncycleYear,
-  helionpointAmplitude,
-  mideccentricitypointAmplitude
-  ) {
-  // 1. Determine which cycle value to use
-  const delta = currentYear - balancedYear;
-  const cycleValue = (delta / perihelionCycleLength) > 1
-    ? delta
-    : perihelionprecessioncycleYear;
-
-  // 2. First sinusoidal term:
-  //    helionpointAmplitude * sin( (cycleValue / perihelionCycleLength) * 360° )
-  const angle1 = (cycleValue / perihelionCycleLength) * 360;
-  const term1 = helionpointAmplitude * Math.sin(angle1 * Math.PI / 180);
-
-  // 3. Linear drift term normalized into [0, 360):
-  //    270 + delta * (360 / perihelionCycleLength)
-  //    then subtract floor(.../360)*360
-  const raw = 270 + delta * (360 / perihelionCycleLength);
-  const term2 = raw - Math.floor(raw / 360) * 360;
-
-  // 4. Second sinusoidal term:
-  //    mideccentricitypointAmplitude * sin( (cycleValue / (perihelionCycleLength/2)) * 360° )
-  const angle3 = (cycleValue / (perihelionCycleLength / 2)) * 360;
-  const term3 = mideccentricitypointAmplitude * Math.sin(angle3 * Math.PI / 180);
-
-  // 5. Sum all contributions
-  return term1 + term2 + term3;
 }
 
 /**
