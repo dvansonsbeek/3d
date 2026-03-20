@@ -93,6 +93,111 @@ for (const [key, jd] of Object.entries(mp.perihelionPassageRef)) {
   if (typeof jd === 'number') replacePlanetProp(key, 'perihelionRef_JD', jd);
 }
 
+// ─── Helper: replace a const array block ─────────────────────────────────
+// Matches from "const NAME = [" to the closing "];" and replaces the content.
+function replaceArray(name, newData, formatter) {
+  const re = new RegExp('(const\\s+' + name + '\\s*=\\s*\\[)[\\s\\S]*?(\\];)');
+  const m = src.match(re);
+  if (!m) return;
+  const oldBlock = m[0];
+  const newBlock = m[1] + '\n' + formatter(newData) + '\n' + m[2];
+  if (oldBlock === newBlock) return;
+  // Count entries in old block to verify
+  const oldCount = (oldBlock.match(/\[[\d,.\-\s+eE]+\]/g) || []).length;
+  console.log('  ' + name + ': ' + oldCount + ' → ' + newData.length + ' entries');
+  src = src.replace(re, newBlock);
+  changes++;
+}
+
+// ─── Helper: replace a const object block ────────────────────────────────
+// Matches from "const NAME = {" to the closing "};" and replaces entirely.
+function replaceObject(name, newContent) {
+  const re = new RegExp('const\\s+' + name + '\\s*=\\s*\\{[\\s\\S]*?\\};');
+  const m = src.match(re);
+  if (!m) return;
+  const newBlock = 'const ' + name + ' = ' + newContent + ';';
+  if (m[0] === newBlock) return;
+  console.log('  ' + name + ': updated');
+  src = src.replace(re, newBlock);
+  changes++;
+}
+
+// ─── Formatters ──────────────────────────────────────────────────────────
+function fmtHarmonics3(data) {
+  // Format: [div, sin, cos] pairs, 2 per line
+  const lines = [];
+  for (let i = 0; i < data.length; i += 2) {
+    const a = data[i];
+    const parts = ['  [' + String(a[0]).padStart(2) + ', ' + fmtNum(a[1]) + ', ' + fmtNum(a[2]) + ']'];
+    if (i + 1 < data.length) {
+      const b = data[i + 1];
+      parts.push('[' + String(b[0]).padStart(2) + ', ' + fmtNum(b[1]) + ', ' + fmtNum(b[2]) + ']');
+    }
+    lines.push(parts.join(', ') + ',');
+  }
+  return lines.join('\n');
+}
+
+function fmtYearHarmonics(data) {
+  return data.map(([div, s, c]) =>
+    '  [' + String(div).padStart(2) + ',  ' + fmtSci(s) + ', ' + fmtSci(c) + '],'
+  ).join('\n');
+}
+
+function fmtPeriHarmonics(data) {
+  // PERI_HARMONICS uses H/div format in script.js
+  const lines = [];
+  for (let i = 0; i < data.length; i += 2) {
+    const a = data[i];
+    const parts = ['  [H/' + a[0] + ', ' + fmtNum(a[1], 6) + ', ' + fmtNum(a[2], 6) + ']'];
+    if (i + 1 < data.length) {
+      const b = data[i + 1];
+      parts.push('[H/' + b[0] + ', ' + fmtNum(b[1], 6) + ', ' + fmtNum(b[2], 6) + ']');
+    }
+    lines.push(parts.join(', ') + ',');
+  }
+  return lines.join('\n');
+}
+
+function fmtMoonTable(data) {
+  // Format: [D,M,M',F, coeff] groups, 4 per line
+  const lines = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const parts = [];
+    for (let j = i; j < Math.min(i + 4, data.length); j++) {
+      const r = data[j];
+      parts.push('[' + r.join(',') + ']');
+    }
+    lines.push('  ' + parts.join(',') + ',');
+  }
+  return lines.join('\n');
+}
+
+function fmtParallax(data) {
+  // Format: { Mercury: { A:x, B:y, ... }, Venus: { ... }, ... }
+  const planetNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
+  const lines = ['{'];
+  for (const [key, coeffs] of Object.entries(data)) {
+    const name = planetNames[key] || key;
+    const pairs = Object.entries(coeffs).map(([k, v]) => k + ':' + fmtNum(v, 4));
+    lines.push('  ' + name + ': { ' + pairs.join(', ') + ' },');
+  }
+  lines.push('}');
+  return lines.join('\n');
+}
+
+function fmtNum(n, dec) {
+  dec = dec || 6;
+  if (n === 0) return '0';
+  const s = n.toFixed(dec);
+  return n >= 0 ? ' ' + s : s;
+}
+
+function fmtSci(n) {
+  const s = n.toExponential(12);
+  return n >= 0 ? '+' + s : s;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // B. FITTED COEFFICIENTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -101,9 +206,39 @@ console.log('\n=== B. Fitted Coefficients ===');
 replaceConst('PERI_OFFSET', fc.PERI_OFFSET);
 replaceConst('OBLIQUITY_MEAN', fc.SOLSTICE_OBLIQUITY_MEAN_FITTED);
 
-// TODO: PERI_HARMONICS, OBLIQUITY_HARMONICS, CARDINAL_POINT_HARMONICS,
-//       PARALLAX corrections, PREDICT_COEFFS — these are arrays/objects
-//       that need block replacement, not simple value replacement.
+// B1. Year-length harmonics
+replaceArray('TROPICAL_YEAR_HARMONICS', fc.TROPICAL_YEAR_HARMONICS, fmtYearHarmonics);
+replaceArray('SIDEREAL_YEAR_HARMONICS', fc.SIDEREAL_YEAR_HARMONICS, fmtYearHarmonics);
+replaceArray('ANOMALISTIC_YEAR_HARMONICS', fc.ANOMALISTIC_YEAR_HARMONICS, fmtYearHarmonics);
+
+// B2. Perihelion harmonics (uses H/div format)
+replaceArray('PERI_HARMONICS', fc.PERI_HARMONICS_RAW, fmtPeriHarmonics);
+
+// B4. Obliquity harmonics
+replaceArray('OBLIQUITY_HARMONICS', fc.SOLSTICE_OBLIQUITY_HARMONICS, fmtHarmonics3);
+
+// B5. Cardinal point harmonics
+if (fc.CARDINAL_POINT_HARMONICS) {
+  const cpLines = ['{\n'];
+  for (const [type, terms] of Object.entries(fc.CARDINAL_POINT_HARMONICS)) {
+    cpLines.push('  ' + type + ': [\n');
+    cpLines.push(fmtHarmonics3(terms));
+    cpLines.push('\n  ],\n');
+  }
+  cpLines.push('}');
+  replaceObject('CARDINAL_POINT_HARMONICS', cpLines.join(''));
+}
+
+// B3. Parallax corrections
+if (fc.PARALLAX_DEC_CORRECTION) {
+  replaceObject('PARALLAX_DEC_CORRECTION', fmtParallax(fc.PARALLAX_DEC_CORRECTION));
+  replaceObject('PARALLAX_RA_CORRECTION', fmtParallax(fc.PARALLAX_RA_CORRECTION));
+}
+
+// D. Moon Meeus tables
+const meeus = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
+replaceArray('MOON_L', meeus.longitudeTerms.terms, fmtMoonTable);
+replaceArray('MOON_B', meeus.latitudeTerms.terms, fmtMoonTable);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C. ASTRO REFERENCES
