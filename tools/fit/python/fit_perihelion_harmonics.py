@@ -230,7 +230,7 @@ def main():
     # ─── Write to fitted-coefficients.json if --write flag is present ───
     import json
     if '--write' in sys.argv:
-        json_path = Path(__file__).resolve().parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
+        json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
         fc = json.loads(json_path.read_text())
         fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in harmonics]
         fc['PERI_OFFSET'] = offset

@@ -182,6 +182,7 @@ def main():
 
     # Train each planet
     planet_order = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
+    results = {}
 
     for planet_key in planet_order:
         coefficients, rmse, r2, n_terms = train_planet(planet_key, rows)
@@ -190,11 +191,26 @@ def main():
             planet_key, coefficients, rmse, r2, n_terms, output_dir
         )
 
+        results[planet_key] = {'coefficients': coefficients, 'rmse': rmse, 'r2': r2}
         print(f"{PLANETS[planet_key]['name']:<10} {n_terms:>6} {rmse:>12.4f} {r2:>12.6f} {output_file.name}")
 
     print("-" * 70)
     print()
     print("Training complete. Coefficient files written to tools/lib/python/coefficients/ directory.")
+
+    # ─── Write to fitted-coefficients.json if --write flag is present ───
+    if '--write' in sys.argv:
+        import json
+        json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
+        fc = json.loads(json_path.read_text())
+        coeffs_dict = {}
+        for planet_key, res in results.items():
+            coeffs_dict[planet_key] = [float(c) for c in res['coefficients']]
+        fc['PREDICT_COEFFS_OBSERVED'] = coeffs_dict
+        json_path.write_text(json.dumps(fc, indent=2) + '\n')
+        print(f'\n✓ Written PREDICT_COEFFS_OBSERVED to fitted-coefficients.json')
+    else:
+        print('\n  (dry run — add --write to update fitted-coefficients.json)')
 
 
 if __name__ == "__main__":

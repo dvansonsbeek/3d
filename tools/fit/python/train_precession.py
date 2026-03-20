@@ -279,10 +279,20 @@ def main():
 
     print()
     print("Training complete. Coefficient files written to tools/lib/python/coefficients/ directory.")
-    print("\nTo use these coefficients:")
-    print("  from predict_precession import predict, predict_total")
-    print("  fluct = predict(2024, 'mercury')")
-    print("  total = predict_total(2024, 'mercury')")
+
+    # ─── Write to fitted-coefficients.json if --write flag is present ───
+    if '--write' in sys.argv:
+        import json
+        json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
+        fc = json.loads(json_path.read_text())
+        coeffs_dict = {}
+        for planet_key, res in results.items():
+            coeffs_dict[planet_key] = [float(c) for c in res['coefficients']]
+        fc['PREDICT_COEFFS_UNIFIED'] = coeffs_dict
+        json_path.write_text(json.dumps(fc, indent=2) + '\n')
+        print(f'\n✓ Written PREDICT_COEFFS_UNIFIED to fitted-coefficients.json')
+    else:
+        print('\n  (dry run — add --write to update fitted-coefficients.json)')
 
 
 if __name__ == "__main__":

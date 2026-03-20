@@ -70,25 +70,8 @@ function buildFittedCoefficients(params) {
     };
   }
 
-  // 429 coefficients per planet (loaded from Python training output)
-  const PREDICT_COEFFS = {};
-  const dir = path.join(__dirname, '..', 'python', 'coefficients');
-  for (const p of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
-    const file = path.join(dir, `${p}_coeffs_unified.py`);
-    try {
-      const content = fs.readFileSync(file, 'utf8');
-      const match = content.match(/\[([^\]]+)\]/s);
-      if (match) {
-        PREDICT_COEFFS[p] = match[1].split('\n')
-          .map(l => l.replace(/#.*$/, '').trim())
-          .filter(l => l)
-          .map(l => parseFloat(l.replace(/,\s*$/, '')))
-          .filter(v => !isNaN(v));
-      }
-    } catch (e) {
-      // Coefficient files may not exist in all environments
-    }
-  }
+  // 429 coefficients per planet (from fitted-coefficients.json)
+  const PREDICT_COEFFS = data.PREDICT_COEFFS_UNIFIED || {};
 
   // Perihelion harmonics — expand divisors to actual periods using H
   const PERI_HARMONICS = PERI_HARMONICS_RAW.map(([div, s, c]) => [params.H / div, s, c]);
