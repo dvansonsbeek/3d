@@ -377,80 +377,6 @@ planets.ceres = {
   invPlaneInclinationMean: 0.43, invPlaneInclinationAmplitude: 0.05,
 };
 
-// --- C3. Ascending nodes on invariable plane ---
-// Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
-// These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
-// Units: degrees at J2000.0 epoch
-const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
-const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
-const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
-const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
-const jupiterAscendingNodeInvPlaneSouamiSouchay = 306.92;
-const saturnAscendingNodeInvPlaneSouamiSouchay = 122.27;
-const uranusAscendingNodeInvPlaneSouamiSouchay = 308.44;
-const neptuneAscendingNodeInvPlaneSouamiSouchay = 189.28;
-const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
-const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56; // Approximation from ecliptic value
-const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from ecliptic value
-const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
-
-
-// ─── C4. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
-// Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
-// JPL ecliptic inclination trend rates, and eigenmode phase angles.
-// ─────────────────────────────────────────────────────────────────────────
-
-// --- C4a. Laplace-Lagrange bounds & eigenmode phases ---
-// Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
-// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-const mercuryLLBoundsMin = 4.57;
-const mercuryLLBoundsMax = 9.86;
-const venusLLBoundsMin = 0.00;
-const venusLLBoundsMax = 3.38;
-const earthLLBoundsMin = 0.00;
-const earthLLBoundsMax = 2.95;
-const marsLLBoundsMin = 0.00;
-const marsLLBoundsMax = 5.84;
-const jupiterLLBoundsMin = 0.241;
-const jupiterLLBoundsMax = 0.489;
-const saturnLLBoundsMin = 0.797;
-const saturnLLBoundsMax = 1.02;
-const uranusLLBoundsMin = 0.902;
-const uranusLLBoundsMax = 1.11;
-const neptuneLLBoundsMin = 0.554;
-const neptuneLLBoundsMax = 0.800;
-
-// Laplace-Lagrange inclination eigenmode phase angles (degrees)
-// Source: Farside Table 10.1 (Brouwer & van Woerkom refinement)
-// https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-// f₅ = 0 (invariable plane, no evolution) is excluded — 7 active modes remain
-const EIGENMODE_PHASES = [
-  // Fibonacci balance group phase angles (model-defined)
-  { value: 203.3195, label: 'φ₁ = 203.32°', group: 'model' },
-  { value: 23.3195,  label: 'φ₂ = 23.32°',  group: 'model' },
-  // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1)
-  { value: 202.8,  label: 'γ₈ = 202.8°' },
-  { value: 20.23,  label: 'γ₁ = 20.23°' },
-  { value: 255.6,  label: 'γ₃ = 255.6°' },
-  { value: 296.9,  label: 'γ₄ = 296.9°' },
-  { value: 127.3,  label: 'γ₆ = 127.3°' },
-  { value: 315.6,  label: 'γ₇ = 315.6°' },
-  { value: 318.3,  label: 'γ₂ = 318.3°' },
-  { value: 'custom', label: 'Custom...' }
-];
-
-// --- C4b. JPL ecliptic inclination trend rates (°/century) ---
-// Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
-// Target rates for model verification.
-const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
-const venusEclipticInclinationTrendJPL = -0.00079;    // degrees/century (DECREASING)
-const marsEclipticInclinationTrendJPL = -0.00813;     // degrees/century (DECREASING)
-const jupiterEclipticInclinationTrendJPL = -0.00184;  // degrees/century (DECREASING)
-const saturnEclipticInclinationTrendJPL = +0.00194;   // degrees/century (INCREASING)
-const uranusEclipticInclinationTrendJPL = -0.00243;   // degrees/century (DECREASING)
-const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREASING)
-const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
-
 // Derived phase offset for inclination path alignment with zodiac
 // The earthInvPlaneInclinationMean correction accounts for the projection offset when measuring
 // angles across two planes (ecliptic vs invariable plane) - the compound angle geometry
@@ -972,8 +898,81 @@ const PREDICT_COEFFS = {
   ]
 };
 
+// ─── B3. Parallax correction coefficients (fitted) ───────────────────────
+// Post-hoc RA/Dec correction for geocentric parallax effect.
+// Source: public/input/fitted-coefficients.json
+const PARALLAX_DEC_CORRECTION = {
+  Mercury: { A:-42.1580, B:-136.9111, C: 0.0199, D:-41.4221, E: 114.6048, F: 63.4304, G: 63.2708, H:-37.8461, I: 37.9134, J: 0.3885, K: 0.0423, L: 99.2020, M: 112.6922, N:-43.1383, O:-99.2049, P: 0.0273, Q: 0.2542, R:-0.0850, S:-0.2322, U:-54.2725, V:-19.4364, W:-8.3356, X:-11.5504, Y: 34.6031, Z: 35.7135, AA: 19.4564, AB:-28.8159, AC: 0.0457, AD:-4.2448, AE: 7.1082, AF:-4.1742, AG:-1.8895, AH: 22.7071, AI:-30.2805, AJ: 9.3046, AK:-5.5443, AL:-1.6036, AM:-15.6155, AN: 0.0374, AO:-0.1266, AP:-15.1228, AQ: 15.2468 },
+  Venus:   { A: 60.7626, B:-0.8932, C:-0.0003, D: 8.4858, E: 0.0594, F: 0.0662, G: 2.9776, H:-0.0259, I: 0.0423, J:-0.0061, K: 0.0459, L:-86.6521, M:-5.2145, N: 2.9006, O: 2.1976, P:-0.0007, Q:-0.0102, R:-0.0109, S:-0.0006, U:-0.0394, V: 30.8925, W:-0.0917, X: 1.9233, Y:-1.8681, Z: 0.5894, AA:-6.1880, AB:-2.0806, AC: 0.0027, AD:-0.0097, AE:-2.0921, AF: 1.3795, AG:-1.4091, AH:-1.5356, AI: 3.8044, AJ: 0.0291, AK:-0.0026, AL:-0.0049, AM:-0.0138, AN: 0.0104, AO:-0.0242, AP:-0.0035, AQ: 0.0010 },
+  Mars:    { A:-6.4164, B: 12.1687, C: 0.1155, D: 13.1045, E:-0.1618, F: 0.3845, G:-4.1726, H: 0.1709, I: 0.1733, J: 0.4705, K:-0.1689, L: 18.6399, M:-0.2807, N:-7.9881, O: 0.5755, P:-0.2011, Q:-0.0960, R:-0.7092, S: 0.0746, U: 0.0690, V:-12.4622, W:-1.2951, X:-0.5755, Y:-0.1105, Z:-20.4109, AA:-20.7051, AB: 7.0557, AC: 0.2496, AD:-0.0565, AE: 11.2992 },
+  Jupiter: { A:-73.5513, B:-3.2419, C: 0.0059, D: 43.4228, E:-8.7702, F: 3.0187, G: 0.9644, H: 0.0303, I:-0.4094, J: 1.4245, K: 0.0492, L: 766.7635, M:-279.9261, N:-7.2380, O:-2.6774, P: 0.0018, Q:-0.0890, R:-0.9561, S: 0.0531, U: 46.1692, V:-2000.5352, W:-127.8654, X: 0.0325, Y: 8.7751, Z: 14.6272, AA: 151.9204, AB:-3.5471, AC: 0.0125, AD: 1.3448, AE: 30.9759, AF:-45.9327, AG: 0.1853, AH: 29.3256, AI:-466.0052, AJ: 0.2050, AK:-39.2636, AL: 0.0580, AM: 0.0061, AN:-4.7468, AO: 0.0540, AP: 632.7760, AQ:-79.5971 },
+  Saturn:  { A: 19.3183, B:-71.7532, C:-0.0114, D: 20.9244, E:-2.3648, F: 23.5618, G: 8.8020, H: 0.9145, I: 1.0635, J: 1.9590, K: 0.8763, L:-303.3555, M:-224.4044, N:-28.5406, O: 1.5343, P:-0.2085, Q:-0.3180, R:-0.1599, S: 0.2049, U:-3.6272, V: 1133.8305, W:-16.6243, X:-1.8483, Y:-1.0448, Z: 679.5758, AA:-206.8420, AB:-83.8303, AC:-0.0111, AD:-1.9587, AE: 164.8617, AF: 1.6022, AG: 11.8957, AH: 7.1487, AI: 2306.8003, AJ:-0.0220, AK:-1085.5028 },
+  Uranus:  { A:-12672.2828, B: 6934.6982, C:-0.5393, D:-50603.0840, E:-13789.0068, F: 2963.0081, G: 760.2826, H: 191.4876, I: 390.3497, J:-13.6654, K:-6.5028, L: 503850.8286, M: 517661.5124, N:-2889.1895, O: 9834.4182, P: 3.2428, Q: 0.3031, R: 13.4448, S: 11.3285, U: 81194.8440, V:-5153290.4849, W: 475879.5710, X:-389.4581, Y:-148.8904 },
+  Neptune: { A: 10.1378, B: 0.4644, C:-0.0687, D: 10.3930, E:-78.8758, F: 5.1040, G: 0.1936, H: 0.8112, I: 0.6993, J: 0.5025, K: 5.3711, L:-409.5977, M:-97.4693, N:-5.2228, O: 37.6943, P: 0.0813, Q:-0.0702, R: 5.2277, S: 2.2289, U: 1196.8445, V: 3123.7435, W:-320.1077, X:-0.5926, Y:-0.7388 },
+};
+const PARALLAX_RA_CORRECTION = {
+  Mercury: { A: 29.9373, B:-141.8915, C:-0.3745, D: 223.1667, E:-83.7866, F: 14.8033, G: 129.2616, H:-37.0042, I:-5.8496, J:-0.4423, K:-0.1005, L:-25.8042, M:-34.4669, N:-52.2653, O: 72.4357, P:-0.2917, Q: 0.0087, R: 0.0006, S: 0.3331, U: 41.5670, V:-2.6921, W: 9.2043, X:-21.3527, Y: 18.8295, Z: 64.5204, AA:-90.0162, AB:-47.1134, AC: 0.1430, AD: 4.1645, AE: 13.1357, AF:-0.3135, AG: 6.0261, AH:-17.2620, AI: 7.7483, AJ: 6.0388, AK: 0.2556, AL: 5.5120, AM:-9.0578, AN: 0.3661, AO: 0.1452, AP: 9.1992, AQ:-8.2700 },
+  Venus:   { A:-46.8812, B: 26.1368, C: 0.1013, D:-17.4193, E: 0.3241, F:-0.1500, G: 14.4038, H:-0.0360, I: 0.1438, J: 0.0130, K:-0.0241, L: 54.4618, M: 2.7074, N:-1.4745, O:-8.4060, P:-0.0522, Q:-0.0101, R:-0.0058, S:-0.0901, U:-0.3280, V:-14.6204, W: 0.0765, X: 5.7782, Y:-8.4576, Z:-18.9287, AA: 12.7320, AB:-10.4144, AC: 0.0353, AD:-0.0485, AE: 0.9945, AF: 6.1590, AG:-4.1848, AH: 5.9929, AI:-1.9130, AJ: 0.1064, AK: 0.0568, AL:-0.0055, AM:-0.0579, AN:-0.0061, AO: 0.0029, AP: 0.0073, AQ: 0.0561 },
+  Mars:    { A:-23.7562, B:-19.8881, C:-0.0277, D:-23.4088, E:-0.7352, F: 0.3822, G: 2.3764, H:-0.1699, I: 0.4596, J:-0.4940, K: 0.0549, L: 70.3115, M: 1.7161, N: 10.1081, O: 3.5030, P: 0.0385, Q: 0.0070, R: 0.2084, S:-0.0615, U:-0.6223, V:-57.7872, W: 10.2904, X:-0.0686, Y: 0.3592, Z: 34.2623, AA: 30.6410, AB:-5.2824, AC:-0.1144, AD:-0.1664, AE:-18.8861 },
+  Jupiter: { A: 125.9809, B: 428.3819, C:-0.0007, D:-76.7096, E:-116.3221, F: 4.8486, G:-15.9098, H: 0.8021, I:-0.2000, J: 0.6839, K:-0.1441, L:-1775.0446, M: 384.6944, N: 11.6447, O: 102.0576, P:-0.0186, Q: 0.1164, R:-0.6421, S: 1.2220, U: 608.8541, V: 5836.7557, W: 309.4468, X: 4.7879, Y:-8.2695, Z:-2241.9664, AA:-158.1944, AB: 81.3926, AC: 0.0249, AD: 0.7488, AE:-76.0449, AF: 41.0250, AG:-22.8011, AH:-345.2128, AI:-327.9101, AJ:-0.1747, AK:-63.4810, AL:-0.1419, AM: 0.0123, AN:-2.9146, AO: 0.9375, AP:-345.9905, AQ:-1015.5445 },
+  Saturn:  { A:-174.5075, B: 499.5903, C: 0.0144, D: 328.9628, E: 18.8700, F: 29.6207, G: 33.9681, H: 1.4136, I: 4.0316, J:-2.1042, K: 1.6970, L: 2849.4922, M:-1899.0597, N:-30.4447, O:-187.2824, P: 0.4147, Q:-0.1492, R: 0.9117, S:-4.9336, U: 19.5177, V:-11311.2243, W: 854.4562, X:-15.6528, Y:-7.5300, Z:-4749.8589, AA:-4762.7996, AB:-342.8945, AC:-0.0172, AD:-14.4017, AE: 181.9895, AF: 57.5967, AG: 133.4388, AH: 1587.2838, AI: 25506.7746, AJ:-0.3183, AK:-1585.2187 },
+  Uranus:  { A:-38229.6674, B: 4960.4577, C: 5.9453, D:-120998.1729, E: 6220.2812, F: 1423.4248, G: 2060.5044, H:-136.6603, I: 1184.6611, J: 54.2106, K:-1.6843, L: 1438951.7742, M: 937373.4638, N:-1817.8022, O: 148.2366, P: 8.9478, Q:-0.4125, R:-49.3113, S:-115.2873, U:-113580.5386, V:-13676015.7490, W: 1363125.1654, X:-1155.2345, Y: 193.6668 },
+  Neptune: { A: 2275.4256, B: 7.1156, C:-0.4272, D:-899.7306, E:-842.4176, F:-5.6762, G:-1.1987, H:-3.0633, I: 0.8780, J:-4.8029, K:-0.0684, L:-136744.9132, M: 13377.6808, N: 7.1165, O: 418.9388, P: 1.6366, Q:-0.2725, R: 4.2360, S:-5.6104, U: 12725.0083, V: 2054472.0704, W: 13708.8757, X:-1.0372, Y: 3.0446 },
+};
 
+// ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
+// Source: public/input/fitted-coefficients.json
+// Data-derived solstice mean (more accurate than Pythagorean time-average)
+const OBLIQUITY_MEAN = 23.45343689;
+const OBLIQUITY_HARMONICS = [
+  [ 2,  -0.00000263,  -0.00006165], [ 3,   0.03207255,  -0.63427917],
+  [ 5,  -0.00007659,  -0.00812995], [ 6,   0.00044775,  -0.00403652],
+  [ 8,  -0.03210284,   0.63429685], [ 9,   0.00000880,  -0.00005443],
+  [11,  -0.00089606,   0.00807468], [13,  -0.00000165,   0.00004233],
+  [14,  -0.00002645,   0.00016338], [16,   0.00044819,  -0.00403683],
+  [17,  -0.00000078,   0.00000361], [19,   0.00002646,  -0.00016347],
+  [22,   0.00000117,  -0.00000542], [24,  -0.00000884,   0.00005469],
+  [27,  -0.00000078,   0.00000362], [32,   0.00000019,  -0.00000091],
+];
 
+// ─── B5. Cardinal point harmonics (fitted) ───────────────────────────────
+// Source: public/input/fitted-coefficients.json
+const CARDINAL_POINT_ANCHORS = {
+  SS: 2451716.575,  WS: 2451900.067346,  VE: 2451623.737525,  AE: 2451810.304175,
+};
+const CARDINAL_POINT_HARMONICS = {
+  SS: [ // RMSE = 2.7 min
+    [ 3, -1.488691, -0.089818], [ 5,  0.003921, -0.000272], [ 6, -0.020735, -0.002628],
+    [ 8,  1.511643,  0.088815], [11,  0.041820,  0.003970], [13, -0.022977, -0.000232],
+    [16,  1.769787,  0.088040], [19,  0.021668,  0.001923], [24, -0.023666, -0.002911],
+    [29,  0.001260, -0.000434], [32, -0.088559, -0.005372], [35, -0.001224, -0.000580],
+  ],
+  WS: [ // RMSE = 2.7 min
+    [ 3, -1.480570, -0.089521], [ 5,  0.003209, -0.000385], [ 6, -0.020622, -0.002762],
+    [ 8,  1.457738,  0.088714], [ 9, -0.000364, -0.000639], [11,  0.040898,  0.003769],
+    [13,  0.022801, -0.000799], [14,  0.001085, -0.000408], [16, -1.809007, -0.093365],
+    [19, -0.023773, -0.003279], [21, -0.000221, -0.000591], [22, -0.000502, -0.000665],
+    [24,  0.023820,  0.001983], [27,  0.000956, -0.000426], [29, -0.000770, -0.000562],
+    [32,  0.069608,  0.002440], [33,  0.000001, -0.000581], [35,  0.000740, -0.000515],
+    [40, -0.000712, -0.000652], [48,  0.002812, -0.000385],
+  ],
+  VE: [ // RMSE = 2.6 min
+    [ 3, -1.484435, -0.089312], [ 5,  0.003579,  0.000278], [ 6, -0.020673, -0.002409],
+    [ 8,  1.484654,  0.111885], [11,  0.041331,  0.004575], [13, -0.000220, -0.023136],
+    [16, -0.113515,  1.783344], [19, -0.003662,  0.022389], [21, -0.000009,  0.000026],
+    [22, -0.000119,  0.000254], [24,  0.003168, -0.023911], [27,  0.000188, -0.001126],
+    [29, -0.000235,  0.000807], [32,  0.013524, -0.078297], [35,  0.000346, -0.001139],
+    [40, -0.000379,  0.000740],
+  ],
+  AE: [ // RMSE = 3.7 min
+    [ 3, -1.484845, -0.089991], [ 5,  0.003551, -0.000940], [ 6, -0.020685, -0.002985],
+    [ 8,  1.484623,  0.065526], [11,  0.041384,  0.003156], [13,  0.000213,  0.022105],
+    [14,  0.001096, -0.000657], [16,  0.067831, -1.789069], [19,  0.001390, -0.023772],
+    [21,  0.000011, -0.001045], [22,  0.000030, -0.001293], [24, -0.001868,  0.023041],
+    [27, -0.000112,  0.000121], [32,  0.005592,  0.079207], [35,  0.000135,  0.000197],
+    [48, -0.001157,  0.000899],
+  ],
+};
 
 // ─── 7. BODY DIAMETERS ──────────────────────────────────────────────────
 const diameters = {
@@ -991,6 +990,80 @@ const diameters = {
   halleysDiameter  : 11,
   erosDiameter     : 16.84,
 };
+
+// --- C3. Ascending nodes on invariable plane ---
+// Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
+// These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
+// Units: degrees at J2000.0 epoch
+const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
+const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
+const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
+const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
+const jupiterAscendingNodeInvPlaneSouamiSouchay = 306.92;
+const saturnAscendingNodeInvPlaneSouamiSouchay = 122.27;
+const uranusAscendingNodeInvPlaneSouamiSouchay = 308.44;
+const neptuneAscendingNodeInvPlaneSouamiSouchay = 189.28;
+const plutoAscendingNodeInvPlaneSouamiSouchay = 107.06;
+const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56; // Approximation from ecliptic value
+const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from ecliptic value
+const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
+
+
+// ─── C4. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
+// Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
+// JPL ecliptic inclination trend rates, and eigenmode phase angles.
+// ─────────────────────────────────────────────────────────────────────────
+
+// --- C4a. Laplace-Lagrange bounds & eigenmode phases ---
+// Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
+// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+const mercuryLLBoundsMin = 4.57;
+const mercuryLLBoundsMax = 9.86;
+const venusLLBoundsMin = 0.00;
+const venusLLBoundsMax = 3.38;
+const earthLLBoundsMin = 0.00;
+const earthLLBoundsMax = 2.95;
+const marsLLBoundsMin = 0.00;
+const marsLLBoundsMax = 5.84;
+const jupiterLLBoundsMin = 0.241;
+const jupiterLLBoundsMax = 0.489;
+const saturnLLBoundsMin = 0.797;
+const saturnLLBoundsMax = 1.02;
+const uranusLLBoundsMin = 0.902;
+const uranusLLBoundsMax = 1.11;
+const neptuneLLBoundsMin = 0.554;
+const neptuneLLBoundsMax = 0.800;
+
+// Laplace-Lagrange inclination eigenmode phase angles (degrees)
+// Source: Farside Table 10.1 (Brouwer & van Woerkom refinement)
+// https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+// f₅ = 0 (invariable plane, no evolution) is excluded — 7 active modes remain
+const EIGENMODE_PHASES = [
+  // Fibonacci balance group phase angles (model-defined)
+  { value: 203.3195, label: 'φ₁ = 203.32°', group: 'model' },
+  { value: 23.3195,  label: 'φ₂ = 23.32°',  group: 'model' },
+  // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1)
+  { value: 202.8,  label: 'γ₈ = 202.8°' },
+  { value: 20.23,  label: 'γ₁ = 20.23°' },
+  { value: 255.6,  label: 'γ₃ = 255.6°' },
+  { value: 296.9,  label: 'γ₄ = 296.9°' },
+  { value: 127.3,  label: 'γ₆ = 127.3°' },
+  { value: 315.6,  label: 'γ₇ = 315.6°' },
+  { value: 318.3,  label: 'γ₂ = 318.3°' },
+  { value: 'custom', label: 'Custom...' }
+];
+
+// --- C4b. JPL ecliptic inclination trend rates (°/century) ---
+// Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
+// Target rates for model verification.
+const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
+const venusEclipticInclinationTrendJPL = -0.00079;    // degrees/century (DECREASING)
+const marsEclipticInclinationTrendJPL = -0.00813;     // degrees/century (DECREASING)
+const jupiterEclipticInclinationTrendJPL = -0.00184;  // degrees/century (DECREASING)
+const saturnEclipticInclinationTrendJPL = +0.00194;   // degrees/century (INCREASING)
+const uranusEclipticInclinationTrendJPL = -0.00243;   // degrees/century (DECREASING)
+const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREASING)
+const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
 
 // ─── 8. ASTRONOMICAL REFERENCE VALUES (ASTRO_REFERENCE) ─────────────────
 // J2000 epoch values, year/day lengths, perihelion reference, Meeus
@@ -1078,34 +1151,6 @@ const ASTRO_REFERENCE = {
   // These offsets arise from measuring from Earth's precessing position rather
   // than from fixed reference points.
 
-  // --- 8g. Parallax correction coefficients ---
-  // Post-hoc RA/Dec correction for geocentric parallax effect (15-param model).
-  // Formula: dX = A + B/d + C*T + (D*sin(u) + E*cos(u) + F*sin(2u) + G*cos(2u)
-  //              + H*sin(3u) + I*cos(3u))/d + T*(J*sin(u) + K*cos(u))/d
-  //              + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
-  //              + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
-  //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
-  //   where u = RA - ascendingNode (radians), d = geocentric distance (AU),
-  //         s = heliocentric distance (AU), T = centuries from J2000
-  // Fitted from JPL reference data via linear least squares (15/18/24/30/36/42 terms per planet).
-  decCorrection: {
-    Mercury: { A:-42.1580, B:-136.9111, C: 0.0199, D:-41.4221, E: 114.6048, F: 63.4304, G: 63.2708, H:-37.8461, I: 37.9134, J: 0.3885, K: 0.0423, L: 99.2020, M: 112.6922, N:-43.1383, O:-99.2049, P: 0.0273, Q: 0.2542, R:-0.0850, S:-0.2322, U:-54.2725, V:-19.4364, W:-8.3356, X:-11.5504, Y: 34.6031, Z: 35.7135, AA: 19.4564, AB:-28.8159, AC: 0.0457, AD:-4.2448, AE: 7.1082, AF:-4.1742, AG:-1.8895, AH: 22.7071, AI:-30.2805, AJ: 9.3046, AK:-5.5443, AL:-1.6036, AM:-15.6155, AN: 0.0374, AO:-0.1266, AP:-15.1228, AQ: 15.2468 },
-    Venus:   { A: 60.7626, B:-0.8932, C:-0.0003, D: 8.4858, E: 0.0594, F: 0.0662, G: 2.9776, H:-0.0259, I: 0.0423, J:-0.0061, K: 0.0459, L:-86.6521, M:-5.2145, N: 2.9006, O: 2.1976, P:-0.0007, Q:-0.0102, R:-0.0109, S:-0.0006, U:-0.0394, V: 30.8925, W:-0.0917, X: 1.9233, Y:-1.8681, Z: 0.5894, AA:-6.1880, AB:-2.0806, AC: 0.0027, AD:-0.0097, AE:-2.0921, AF: 1.3795, AG:-1.4091, AH:-1.5356, AI: 3.8044, AJ: 0.0291, AK:-0.0026, AL:-0.0049, AM:-0.0138, AN: 0.0104, AO:-0.0242, AP:-0.0035, AQ: 0.0010 },
-    Mars:    { A:-6.4164, B: 12.1687, C: 0.1155, D: 13.1045, E:-0.1618, F: 0.3845, G:-4.1726, H: 0.1709, I: 0.1733, J: 0.4705, K:-0.1689, L: 18.6399, M:-0.2807, N:-7.9881, O: 0.5755, P:-0.2011, Q:-0.0960, R:-0.7092, S: 0.0746, U: 0.0690, V:-12.4622, W:-1.2951, X:-0.5755, Y:-0.1105, Z:-20.4109, AA:-20.7051, AB: 7.0557, AC: 0.2496, AD:-0.0565, AE: 11.2992 },
-    Jupiter: { A:-73.5513, B:-3.2419, C: 0.0059, D: 43.4228, E:-8.7702, F: 3.0187, G: 0.9644, H: 0.0303, I:-0.4094, J: 1.4245, K: 0.0492, L: 766.7635, M:-279.9261, N:-7.2380, O:-2.6774, P: 0.0018, Q:-0.0890, R:-0.9561, S: 0.0531, U: 46.1692, V:-2000.5352, W:-127.8654, X: 0.0325, Y: 8.7751, Z: 14.6272, AA: 151.9204, AB:-3.5471, AC: 0.0125, AD: 1.3448, AE: 30.9759, AF:-45.9327, AG: 0.1853, AH: 29.3256, AI:-466.0052, AJ: 0.2050, AK:-39.2636, AL: 0.0580, AM: 0.0061, AN:-4.7468, AO: 0.0540, AP: 632.7760, AQ:-79.5971 },
-    Saturn:  { A: 19.3183, B:-71.7532, C:-0.0114, D: 20.9244, E:-2.3648, F: 23.5618, G: 8.8020, H: 0.9145, I: 1.0635, J: 1.9590, K: 0.8763, L:-303.3555, M:-224.4044, N:-28.5406, O: 1.5343, P:-0.2085, Q:-0.3180, R:-0.1599, S: 0.2049, U:-3.6272, V: 1133.8305, W:-16.6243, X:-1.8483, Y:-1.0448, Z: 679.5758, AA:-206.8420, AB:-83.8303, AC:-0.0111, AD:-1.9587, AE: 164.8617, AF: 1.6022, AG: 11.8957, AH: 7.1487, AI: 2306.8003, AJ:-0.0220, AK:-1085.5028 },
-    Uranus:  { A:-12672.2828, B: 6934.6982, C:-0.5393, D:-50603.0840, E:-13789.0068, F: 2963.0081, G: 760.2826, H: 191.4876, I: 390.3497, J:-13.6654, K:-6.5028, L: 503850.8286, M: 517661.5124, N:-2889.1895, O: 9834.4182, P: 3.2428, Q: 0.3031, R: 13.4448, S: 11.3285, U: 81194.8440, V:-5153290.4849, W: 475879.5710, X:-389.4581, Y:-148.8904 },
-    Neptune: { A: 10.1378, B: 0.4644, C:-0.0687, D: 10.3930, E:-78.8758, F: 5.1040, G: 0.1936, H: 0.8112, I: 0.6993, J: 0.5025, K: 5.3711, L:-409.5977, M:-97.4693, N:-5.2228, O: 37.6943, P: 0.0813, Q:-0.0702, R: 5.2277, S: 2.2289, U: 1196.8445, V: 3123.7435, W:-320.1077, X:-0.5926, Y:-0.7388 },
-  },
-  raCorrection: {
-    Mercury: { A: 29.9373, B:-141.8915, C:-0.3745, D: 223.1667, E:-83.7866, F: 14.8033, G: 129.2616, H:-37.0042, I:-5.8496, J:-0.4423, K:-0.1005, L:-25.8042, M:-34.4669, N:-52.2653, O: 72.4357, P:-0.2917, Q: 0.0087, R: 0.0006, S: 0.3331, U: 41.5670, V:-2.6921, W: 9.2043, X:-21.3527, Y: 18.8295, Z: 64.5204, AA:-90.0162, AB:-47.1134, AC: 0.1430, AD: 4.1645, AE: 13.1357, AF:-0.3135, AG: 6.0261, AH:-17.2620, AI: 7.7483, AJ: 6.0388, AK: 0.2556, AL: 5.5120, AM:-9.0578, AN: 0.3661, AO: 0.1452, AP: 9.1992, AQ:-8.2700 },
-    Venus:   { A:-46.8812, B: 26.1368, C: 0.1013, D:-17.4193, E: 0.3241, F:-0.1500, G: 14.4038, H:-0.0360, I: 0.1438, J: 0.0130, K:-0.0241, L: 54.4618, M: 2.7074, N:-1.4745, O:-8.4060, P:-0.0522, Q:-0.0101, R:-0.0058, S:-0.0901, U:-0.3280, V:-14.6204, W: 0.0765, X: 5.7782, Y:-8.4576, Z:-18.9287, AA: 12.7320, AB:-10.4144, AC: 0.0353, AD:-0.0485, AE: 0.9945, AF: 6.1590, AG:-4.1848, AH: 5.9929, AI:-1.9130, AJ: 0.1064, AK: 0.0568, AL:-0.0055, AM:-0.0579, AN:-0.0061, AO: 0.0029, AP: 0.0073, AQ: 0.0561 },
-    Mars:    { A:-23.7562, B:-19.8881, C:-0.0277, D:-23.4088, E:-0.7352, F: 0.3822, G: 2.3764, H:-0.1699, I: 0.4596, J:-0.4940, K: 0.0549, L: 70.3115, M: 1.7161, N: 10.1081, O: 3.5030, P: 0.0385, Q: 0.0070, R: 0.2084, S:-0.0615, U:-0.6223, V:-57.7872, W: 10.2904, X:-0.0686, Y: 0.3592, Z: 34.2623, AA: 30.6410, AB:-5.2824, AC:-0.1144, AD:-0.1664, AE:-18.8861 },
-    Jupiter: { A: 125.9809, B: 428.3819, C:-0.0007, D:-76.7096, E:-116.3221, F: 4.8486, G:-15.9098, H: 0.8021, I:-0.2000, J: 0.6839, K:-0.1441, L:-1775.0446, M: 384.6944, N: 11.6447, O: 102.0576, P:-0.0186, Q: 0.1164, R:-0.6421, S: 1.2220, U: 608.8541, V: 5836.7557, W: 309.4468, X: 4.7879, Y:-8.2695, Z:-2241.9664, AA:-158.1944, AB: 81.3926, AC: 0.0249, AD: 0.7488, AE:-76.0449, AF: 41.0250, AG:-22.8011, AH:-345.2128, AI:-327.9101, AJ:-0.1747, AK:-63.4810, AL:-0.1419, AM: 0.0123, AN:-2.9146, AO: 0.9375, AP:-345.9905, AQ:-1015.5445 },
-    Saturn:  { A:-174.5075, B: 499.5903, C: 0.0144, D: 328.9628, E: 18.8700, F: 29.6207, G: 33.9681, H: 1.4136, I: 4.0316, J:-2.1042, K: 1.6970, L: 2849.4922, M:-1899.0597, N:-30.4447, O:-187.2824, P: 0.4147, Q:-0.1492, R: 0.9117, S:-4.9336, U: 19.5177, V:-11311.2243, W: 854.4562, X:-15.6528, Y:-7.5300, Z:-4749.8589, AA:-4762.7996, AB:-342.8945, AC:-0.0172, AD:-14.4017, AE: 181.9895, AF: 57.5967, AG: 133.4388, AH: 1587.2838, AI: 25506.7746, AJ:-0.3183, AK:-1585.2187 },
-    Uranus:  { A:-38229.6674, B: 4960.4577, C: 5.9453, D:-120998.1729, E: 6220.2812, F: 1423.4248, G: 2060.5044, H:-136.6603, I: 1184.6611, J: 54.2106, K:-1.6843, L: 1438951.7742, M: 937373.4638, N:-1817.8022, O: 148.2366, P: 8.9478, Q:-0.4125, R:-49.3113, S:-115.2873, U:-113580.5386, V:-13676015.7490, W: 1363125.1654, X:-1155.2345, Y: 193.6668 },
-    Neptune: { A: 2275.4256, B: 7.1156, C:-0.4272, D:-899.7306, E:-842.4176, F:-5.6762, G:-1.1987, H:-3.0633, I: 0.8780, J:-4.8029, K:-0.0684, L:-136744.9132, M: 13377.6808, N: 7.1165, O: 418.9388, P: 1.6366, Q:-0.2725, R: 4.2360, S:-5.6104, U: 12725.0083, V: 2054472.0704, W: 13708.8757, X:-1.0372, Y: 3.0446 },
-  },
 };
 
 // ─── 9. DERIVED CONSTANTS ───────────────────────────────────────────────
@@ -30610,8 +30655,8 @@ function updatePositions() {
     //            + T*(J*sin + K*cos)/d + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
     //            + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
     //            + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
-    const _dc = ASTRO_REFERENCE.decCorrection[obj.name];
-    const _rc = ASTRO_REFERENCE.raCorrection && ASTRO_REFERENCE.raCorrection[obj.name];
+    const _dc = PARALLAX_DEC_CORRECTION[obj.name];
+    const _rc = PARALLAX_RA_CORRECTION && PARALLAX_RA_CORRECTION[obj.name];
     if (_dc || _rc) {
       const _ascNode = _planetAscNodeLookup[obj.name];
       const _u = (obj.ra * (180 / Math.PI) - _ascNode) * (Math.PI / 180);
@@ -33468,39 +33513,9 @@ function computePlanetObliquity(planetName, currentYear) {
    See docs/14-solstice-prediction.md
 ------------------------------------------------------------------ */
 
-// Primary obliquity formula: derived mean + 12 fitted harmonics.
-// Mean is DERIVED from the physical model (zero fitting):
-//   <sqrt((earthtiltMean + δε)² + (earthRAAngle·cos(H/16))² + (inclMean·sin(H/5))²)>
-// The perpendicular tilts (earthRAAngle in tilta, inclination in ecliptic plane)
-// increase measured obliquity via the Pythagorean effect.
-// RMSE: 1.45 arcsec over full H. For H/3+H/8 decomposition, see orbital-engine.js.
-const OBLIQUITY_MEAN = (() => {
-  const N = 100000;
-  let sum = 0;
-  for (let i = 0; i < N; i++) {
-    const t = i / N;
-    const p3 = 2 * Math.PI * t * 3, p5 = 2 * Math.PI * t * 5;
-    const p8 = 2 * Math.PI * t * 8, p16 = 2 * Math.PI * t * 16;
-    const e = earthtiltMean - earthInvPlaneInclinationAmplitude * Math.cos(p3)
-                             + earthInvPlaneInclinationAmplitude * Math.cos(p8);
-    const pa = earthRAAngle * Math.cos(p16);
-    const pb = earthInvPlaneInclinationMean * Math.sin(p5);
-    sum += Math.sqrt(e * e + pa * pa + pb * pb);
-  }
-  return sum / N;
-})();
-const OBLIQUITY_HARMONICS = [
-  [ 2,  -0.00000263,  -0.00006328], [ 3,   0.03209855,  -0.63477445],
-  [ 5,  -0.00007671,  -0.00814485], [ 6,   0.00044850,  -0.00404465],
-  [ 8,  -0.03212886,   0.63478923], [ 9,   0.00000883,  -0.00005605],
-  [11,  -0.00089756,   0.00808651], [13,  -0.00000166,   0.00004096],
-  [14,  -0.00002651,   0.00016231], [16,   0.00044894,  -0.00404497],
-  [19,   0.00002653,  -0.00016536], [24,  -0.00000887,   0.00005335],
-];
-
+// Obliquity and cardinal point functions (data now in section B4/B5)
 /** Compute Earth's obliquity (axial tilt) at a given year.
- *  12-harmonic formula fitted from 11,553 simulation observations. RMSE: 0.20 arcsec.
- *  For H/3 vs H/8 decomposition, see orbital-engine.js computeObliquityIntegrals(). */
+ *  16-harmonic formula, RMSE: 0.005 arcsec. */
 function computeObliquityEarth(currentYear) {
   const t = currentYear - balancedYear;
   let obliq = OBLIQUITY_MEAN;
@@ -33511,46 +33526,6 @@ function computeObliquityEarth(currentYear) {
   return obliq;
 }
 
-// Cardinal Point JD: 12-harmonic fits (5 Fibonacci + 7 overtones) per cardinal point.
-// Fitted from 11,553 simulation observations (29-year steps) per type.
-// See docs/14-solstice-prediction.md
-const CARDINAL_POINT_ANCHORS = {
-  SS: ASTRO_REFERENCE.juneSolstice2000_JD,  // 2451716.575
-  WS: 2451900.067346,  VE: 2451623.737525,  AE: 2451810.304175,
-};
-const CARDINAL_POINT_HARMONICS = {
-  SS: [ // RMSE = 2.7 min
-    [ 3, -1.488691, -0.089818], [ 5,  0.003921, -0.000272], [ 6, -0.020735, -0.002628],
-    [ 8,  1.511643,  0.088815], [11,  0.041820,  0.003970], [13, -0.022977, -0.000232],
-    [16,  1.769787,  0.088040], [19,  0.021668,  0.001923], [24, -0.023666, -0.002911],
-    [29,  0.001260, -0.000434], [32, -0.088559, -0.005372], [35, -0.001224, -0.000580],
-  ],
-  WS: [ // RMSE = 2.7 min
-    [ 3, -1.480570, -0.089521], [ 5,  0.003209, -0.000385], [ 6, -0.020622, -0.002762],
-    [ 8,  1.457738,  0.088714], [ 9, -0.000364, -0.000639], [11,  0.040898,  0.003769],
-    [13,  0.022801, -0.000799], [14,  0.001085, -0.000408], [16, -1.809007, -0.093365],
-    [19, -0.023773, -0.003279], [21, -0.000221, -0.000591], [22, -0.000502, -0.000665],
-    [24,  0.023820,  0.001983], [27,  0.000956, -0.000426], [29, -0.000770, -0.000562],
-    [32,  0.069608,  0.002440], [33,  0.000001, -0.000581], [35,  0.000740, -0.000515],
-    [40, -0.000712, -0.000652], [48,  0.002812, -0.000385],
-  ],
-  VE: [ // RMSE = 2.6 min
-    [ 3, -1.484435, -0.089312], [ 5,  0.003579,  0.000278], [ 6, -0.020673, -0.002409],
-    [ 8,  1.484654,  0.111885], [11,  0.041331,  0.004575], [13, -0.000220, -0.023136],
-    [16, -0.113515,  1.783344], [19, -0.003662,  0.022389], [21, -0.000009,  0.000026],
-    [22, -0.000119,  0.000254], [24,  0.003168, -0.023911], [27,  0.000188, -0.001126],
-    [29, -0.000235,  0.000807], [32,  0.013524, -0.078297], [35,  0.000346, -0.001139],
-    [40, -0.000379,  0.000740],
-  ],
-  AE: [ // RMSE = 3.7 min
-    [ 3, -1.484845, -0.089991], [ 5,  0.003551, -0.000940], [ 6, -0.020685, -0.002985],
-    [ 8,  1.484623,  0.065526], [11,  0.041384,  0.003156], [13,  0.000213,  0.022105],
-    [14,  0.001096, -0.000657], [16,  0.067831, -1.789069], [19,  0.001390, -0.023772],
-    [21,  0.000011, -0.001045], [22,  0.000030, -0.001293], [24, -0.001868,  0.023041],
-    [27, -0.000112,  0.000121], [32,  0.005592,  0.079207], [35,  0.000135,  0.000197],
-    [48, -0.001157,  0.000899],
-  ],
-};
 // Pre-compute harmonic contribution at J2000 for each cardinal point
 const _CP_T2000 = 2000 - balancedYear;
 const _CP_HARMONICS_AT_J2000 = {};
