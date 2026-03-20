@@ -1,0 +1,256 @@
+{
+  "_description": "Astronomical reference data — external values from IAU, JPL, Meeus, Souami & Souchay. Nothing model-specific. Source of truth for both tools/lib/constants/astro-reference.js and src/script.js.",
+
+  "physicalConstants": {
+    "currentAUDistance": 149597870.698828,
+    "meanSiderealYearSeconds": 31558149.8,
+    "G_CONSTANT": 6.6743e-20,
+    "MASS_RATIO_EARTH_MOON": 81.3007,
+    "speedOfLight": 299792.458,
+    "massRatioDE440": {
+      "mercury": 6023625.5,
+      "venus": 408523.72,
+      "mars": 3098703.59,
+      "jupiter": 1047.348625,
+      "saturn": 3497.9018,
+      "uranus": 22902.944,
+      "neptune": 19412.237
+    }
+  },
+
+  "earthOrbital": {
+    "perihelionalignmentYear": 1246,
+    "juneSolstice2000_JD": 2451716.575,
+    "obliquityJ2000_deg": 23.439291111,
+    "obliquityRate_arcsecPerCentury": -46.836769,
+    "earthEccentricityJ2000": 0.01671022,
+    "earthPerihelionLongitudeJ2000": 102.947,
+    "earthAscendingNodeInvPlane": 284.51,
+    "earthInclinationPhaseAngle": 203.3195,
+    "perihelionPassageJ2000_JD": 2451547.042,
+    "earthInclinationJ2000_deg": 1.57869,
+    "deltaTStart": 63.63,
+    "sunTilt": 7.155
+  },
+
+  "cardinalPointAnchors": {
+    "SS": 2451716.575,
+    "WS": 2451900.067346,
+    "VE": 2451623.737525,
+    "AE": 2451810.304175
+  },
+
+  "moonReference": {
+    "moonSiderealMonthInput": 27.32166156,
+    "moonAnomalisticMonthInput": 27.55454988,
+    "moonNodalMonthInput": 27.21222082,
+    "moonDistance": 384399.07,
+    "moonEclipticInclinationJ2000": 5.1453964,
+    "moonOrbitalEccentricity": 0.054900489,
+    "moonTilt": 6.687
+  },
+
+  "moonMeeus": {
+    "_description": "Lunar mean longitude coefficients (Meeus Ch. 47). Full perturbation tables in tools/lib/constants/meeus-lunar-tables.json.",
+    "moonMeanAnomalyJ2000_deg": 134.9634,
+    "moonMeanAnomalyRate_degPerDay": 13.06499295,
+    "moonMeanElongationJ2000_deg": 297.8502,
+    "moonMeanElongationRate_degPerDay": 12.19074912,
+    "sunMeanAnomalyJ2000_deg": 357.5291,
+    "sunMeanAnomalyRate_degPerDay": 0.98560028,
+    "moonArgLatJ2000_deg": 93.2720993,
+    "moonArgLatRate_degPerCentury": 483202.0175273,
+    "moonMeanElongationJ2000Full_deg": 297.8502042,
+    "moonMeanElongationRate_degPerCentury": 445267.1115168
+  },
+
+  "planetOrbitalElements": {
+    "_description": "JPL/SPICE J2000 orbital elements per planet",
+    "mercury": {
+      "solarYearInput": 87.9686,
+      "orbitalEccentricityJ2000": 0.20563593,
+      "axialTiltMean": 0.03,
+      "eclipticInclinationJ2000": 7.00497902,
+      "longitudePerihelion": 77.4569131,
+      "ascendingNode": 48.33033155,
+      "invPlaneInclinationJ2000": 6.3472858,
+      "meanAnomaly": 156.6364301,
+      "trueAnomaly": 164.1669319
+    },
+    "venus": {
+      "solarYearInput": 224.695,
+      "orbitalEccentricityJ2000": 0.00677672,
+      "axialTiltMean": 2.6392,
+      "eclipticInclinationJ2000": 3.39467605,
+      "longitudePerihelion": 131.5765919,
+      "ascendingNode": 76.67877109,
+      "invPlaneInclinationJ2000": 2.1545441,
+      "meanAnomaly": 324.9668371,
+      "trueAnomaly": 324.5198504
+    },
+    "mars": {
+      "solarYearInput": 686.931,
+      "orbitalEccentricityJ2000": 0.09339410,
+      "axialTiltMean": 25.19,
+      "eclipticInclinationJ2000": 1.84969142,
+      "longitudePerihelion": 336.0650681,
+      "ascendingNode": 49.55737662,
+      "invPlaneInclinationJ2000": 1.6311858,
+      "meanAnomaly": 109.2630844,
+      "trueAnomaly": 118.9501056
+    },
+    "jupiter": {
+      "solarYearInput": 4330.5,
+      "orbitalEccentricityJ2000": 0.04838624,
+      "axialTiltMean": 3.13,
+      "eclipticInclinationJ2000": 1.30439695,
+      "longitudePerihelion": 14.70659401,
+      "ascendingNode": 100.4877868,
+      "invPlaneInclinationJ2000": 0.3219652,
+      "meanAnomaly": 32.47179744,
+      "trueAnomaly": 35.69428061
+    },
+    "saturn": {
+      "solarYearInput": 10747.0,
+      "orbitalEccentricityJ2000": 0.05386179,
+      "axialTiltMean": 26.73,
+      "eclipticInclinationJ2000": 2.48599187,
+      "longitudePerihelion": 92.12794343,
+      "ascendingNode": 113.6452856,
+      "invPlaneInclinationJ2000": 0.9254704,
+      "meanAnomaly": 325.663876,
+      "trueAnomaly": 321.7910116
+    },
+    "uranus": {
+      "solarYearInput": 30586,
+      "orbitalEccentricityJ2000": 0.04725744,
+      "axialTiltMean": 82.23,
+      "eclipticInclinationJ2000": 0.77263783,
+      "longitudePerihelion": 170.7308251,
+      "ascendingNode": 74.00919023,
+      "invPlaneInclinationJ2000": 0.9946692,
+      "meanAnomaly": 145.7292678,
+      "trueAnomaly": 148.5142459
+    },
+    "neptune": {
+      "solarYearInput": 59980,
+      "orbitalEccentricityJ2000": 0.00859048,
+      "axialTiltMean": 28.32,
+      "eclipticInclinationJ2000": 1.77004347,
+      "longitudePerihelion": 45.80124471,
+      "ascendingNode": 131.7853754,
+      "invPlaneInclinationJ2000": 0.7354155,
+      "meanAnomaly": 262.5003424,
+      "trueAnomaly": 261.2242728
+    }
+  },
+
+  "additionalBodiesReference": {
+    "pluto": {
+      "solarYearInput": 90465,
+      "orbitalEccentricityJ2000": 0.2488273,
+      "invPlaneInclinationJ2000": 15.5639473
+    },
+    "halleys": {
+      "solarYearInput": 27503,
+      "orbitalEccentricityJ2000": 0.96714291
+    },
+    "eros": {
+      "solarYearInput": 642.93,
+      "orbitalEccentricityJ2000": 0.2229512
+    },
+    "ceres": {
+      "solarYearInput": 1680.5,
+      "orbitalEccentricityJ2000": 0.0755347,
+      "invPlaneInclinationJ2000": 0.4331698
+    }
+  },
+
+  "ascendingNodesSouamiSouchay": {
+    "_description": "Raw ascending nodes on invariable plane from Souami & Souchay (2012) Table 2",
+    "earth": 284.51,
+    "mercury": 32.22,
+    "venus": 52.31,
+    "mars": 352.95,
+    "jupiter": 306.92,
+    "saturn": 122.27,
+    "uranus": 308.44,
+    "neptune": 189.28,
+    "pluto": 107.06,
+    "halleys": 59.56,
+    "eros": 10.36,
+    "ceres": 80.89
+  },
+
+  "laplaceLagrangeBounds": {
+    "_description": "Inclination bounds from Farside Table 10.4 (Brouwer & van Woerkom). Units: degrees.",
+    "mercury": [4.57, 9.86],
+    "venus": [0.00, 3.38],
+    "earth": [0.00, 2.95],
+    "mars": [0.00, 5.84],
+    "jupiter": [0.241, 0.489],
+    "saturn": [0.797, 1.02],
+    "uranus": [0.902, 1.11],
+    "neptune": [0.554, 0.800]
+  },
+
+  "jplEclipticInclinationTrends": {
+    "_description": "JPL ecliptic inclination trend rates (degrees/century). Source: https://ssd.jpl.nasa.gov/planets/approx_pos.html",
+    "mercury": -0.00595,
+    "venus": -0.00079,
+    "mars": -0.00813,
+    "jupiter": -0.00184,
+    "saturn": 0.00194,
+    "uranus": -0.00243,
+    "neptune": 0.00035,
+    "pluto": -0.00100
+  },
+
+  "eigenmodePhasesLaplaceLagrange": {
+    "_description": "Laplace-Lagrange inclination eigenmode phase angles (degrees). Source: Farside Table 10.1.",
+    "gamma1": 20.23,
+    "gamma2": 318.3,
+    "gamma3": 255.6,
+    "gamma4": 296.9,
+    "gamma6": 127.3,
+    "gamma7": 315.6,
+    "gamma8": 202.8
+  },
+
+  "yearLengthRef": {
+    "tropicalYearVE": 365.242374,
+    "tropicalYearSS": 365.241626,
+    "tropicalYearAE": 365.242018,
+    "tropicalYearWS": 365.242740,
+    "tropicalYearMean": 365.2421897,
+    "anomalisticYear": 365.259636,
+    "siderealYear": 365.256363,
+    "iauPrecessionJ2000": 25771.57634,
+    "tropicalYearRateSecPerCentury": -0.53,
+    "solarDay": 86400.0,
+    "siderealDay": 86164.09053083288,
+    "stellarDay": 86164.0989036905
+  },
+
+  "knownValues": {
+    "_description": "Validation reference values for comparison",
+    "jupiterSaturnConjunctionPeriod": 19.859,
+    "moonSynodicMonth": 29.530589,
+    "moonTropicalMonth": 27.321582,
+    "moonAnomalisticMonth": 27.554550,
+    "moonDraconicMonth": 27.212221,
+    "moonNodalPrecessionYears": 18.613,
+    "moonApsidalPrecessionYears": 8.849,
+    "moonDraconicYear": 346.620,
+    "sarosDays": 6585.32,
+    "exeligmosDays": 19755.96
+  },
+
+  "galaxyMotion": {
+    "_description": "Sun and galaxy motion parameters (visualization only)",
+    "milkywayDistance": 27500,
+    "sunSpeed": 828000,
+    "greatattractorDistance": 200000000,
+    "milkywaySpeed": 2160000
+  }
+}

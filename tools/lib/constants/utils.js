@@ -90,10 +90,71 @@ function printTable(headers, rows, colWidths) {
   }
 }
 
+// --- Derived constant helpers ---
+// Pure functions that compute derived values from input parameters.
+// Used by constants.js at load time to avoid hardcoding derived values.
+
+/**
+ * Compute orbit tilt components from ascending node and ecliptic inclination.
+ * Formula: orbitTilta = cos((-90 - Ω) × π/180) × (-inclination)
+ *          orbitTiltb = sin((-90 - Ω) × π/180) × (-inclination)
+ * @param {number} ascendingNode - Longitude of ascending node (degrees)
+ * @param {number} eclipticInclinationJ2000 - Ecliptic inclination at J2000 (degrees)
+ * @returns {{ orbitTilta: number, orbitTiltb: number }}
+ */
+function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
+  const angle = (-90 - ascendingNode) * Math.PI / 180;
+  return {
+    orbitTilta: Math.cos(angle) * (-eclipticInclinationJ2000),
+    orbitTiltb: Math.sin(angle) * (-eclipticInclinationJ2000),
+  };
+}
+
+/**
+ * Compute invariable plane inclination amplitude from Fibonacci law.
+ * Formula: amplitude = PSI / (fibonacciD × √massFraction)
+ * @param {number} PSI - Universal Fibonacci constant (= 2205 / (2 × H))
+ * @param {number} fibonacciD - Fibonacci quantum number for the planet
+ * @param {number} massFraction - Planet mass as fraction of Sun mass
+ * @returns {number} Amplitude in degrees
+ */
+function computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction) {
+  return PSI / (fibonacciD * Math.sqrt(massFraction));
+}
+
+/**
+ * Compute invariable plane inclination mean from J2000 constraint.
+ * Formula: mean = inclJ2000 - amplitude × cos((Ω_J2000 - phaseAngle) × π/180)
+ * @param {number} inclJ2000 - Invariable plane inclination at J2000 (degrees)
+ * @param {number} amplitude - Inclination oscillation amplitude (degrees)
+ * @param {number} ascendingNodeInvPlane - Ascending node on invariable plane at J2000 (degrees)
+ * @param {number} inclinationPhaseAngle - Phase angle for inclination oscillation (degrees)
+ * @returns {number} Mean inclination in degrees
+ */
+function computeInvPlaneInclinationMean(inclJ2000, amplitude, ascendingNodeInvPlane, inclinationPhaseAngle) {
+  return inclJ2000 - amplitude * Math.cos((ascendingNodeInvPlane - inclinationPhaseAngle) * Math.PI / 180);
+}
+
+/**
+ * Compute Earth RA angle from inclination amplitude and tilt mean.
+ * Formula: earthRAAngle = 2A - A²/ε
+ * Two tilt layers (H/3 + H/5) minus second-order equatorial projection.
+ * @param {number} amplitude - earthInvPlaneInclinationAmplitude (degrees)
+ * @param {number} tiltMean - earthtiltMean (degrees)
+ * @returns {number} earthRAAngle in degrees
+ */
+function computeEarthRAAngle(amplitude, tiltMean) {
+  return 2 * amplitude - amplitude * amplitude / tiltMean;
+}
+
 module.exports = {
   jdToCalendar,
   calendarToJD,
   jdToDateString,
   createDateUtils,
   pad, padLeft, fmt, fmtInt, printTable,
+  computeOrbitTilt,
+  computeInvPlaneInclinationAmplitude,
+  computeInvPlaneInclinationMean,
+  computeEarthRAAngle,
 };

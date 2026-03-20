@@ -57,11 +57,12 @@ const massRatioDE440 = {
 const earthtiltMean = 23.41365930;           // scene-geometry solved: obliquity at J2000 = IAU 23.439291° exactly
 const earthInvPlaneInclinationAmplitude = 0.63541988; // scene-geometry solved: obliquity rate = IAU -46.836769"/cy exactly
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
-const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
+const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
 // Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle) — refs from ASTRO_REFERENCE
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;  // 284.51° Souami & Souchay (2012)
-const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg
-  - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlane - ASTRO_REFERENCE.earthInclinationPhaseAngle) * Math.PI / 180);
+const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
+  ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,
+  earthAscendingNodeInvPlane, ASTRO_REFERENCE.earthInclinationPhaseAngle);
 const eccentricityBase = 0.01537159;
 const eccentricityAmplitude = 0.00137074; // scene-geometry solved: gives earthEccentricityJ2000 = 0.01671022 exactly
 // K = eccentricityAmplitude × √m_Earth × a_Earth^(3/2) / (sin(tiltMean) × √d_Earth)
@@ -112,11 +113,7 @@ const planets = {
     invPlaneInclinationJ2000: 6.3472858,
     ascendingNodeInvPlane: 32.83,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 6.726620,
-    invPlaneInclinationAmplitude: 0.384621,
     obliquityCycle: H * 8 / 3,
-    orbitTilta: 5.23265097,
-    orbitTiltb: 4.65715524,
   },
   venus: {
     name: 'Venus',
@@ -139,11 +136,7 @@ const planets = {
     invPlaneInclinationJ2000: 2.1545441,
     ascendingNodeInvPlane: 54.70,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 2.207361,
-    invPlaneInclinationAmplitude: 0.061866,
     obliquityCycle: null,
-    orbitTilta: 3.30333743,
-    orbitTiltb: 0.78216832,
   },
   mars: {
     name: 'Mars',
@@ -166,11 +159,7 @@ const planets = {
     invPlaneInclinationJ2000: 1.6311858,
     ascendingNodeInvPlane: 354.87,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 2.649893,
-    invPlaneInclinationAmplitude: 1.158626,
     obliquityCycle: 3 * H / 8,
-    orbitTilta: 1.40771866,
-    orbitTiltb: 1.19986938,
   },
   jupiter: {
     name: 'Jupiter',
@@ -193,11 +182,7 @@ const planets = {
     invPlaneInclinationJ2000: 0.3219652,
     ascendingNodeInvPlane: 312.89,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 0.329100,
-    invPlaneInclinationAmplitude: 0.021301,
     obliquityCycle: H / 2,
-    orbitTilta: 1.28260534,
-    orbitTiltb: -0.23743407,
   },
   saturn: {
     name: 'Saturn',
@@ -220,11 +205,7 @@ const planets = {
     invPlaneInclinationJ2000: 0.9254704,
     ascendingNodeInvPlane: 118.81,
     inclinationPhaseAngle: 23.3195,
-    invPlaneInclinationMean: 0.931678,
-    invPlaneInclinationAmplitude: 0.064879,
     obliquityCycle: H / 3,
-    orbitTilta: 2.27728294,
-    orbitTiltb: -0.99706468,
   },
   uranus: {
     name: 'Uranus',
@@ -247,11 +228,7 @@ const planets = {
     invPlaneInclinationJ2000: 0.9946692,
     ascendingNodeInvPlane: 307.80,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 1.000600,
-    invPlaneInclinationAmplitude: 0.023716,
     obliquityCycle: H / 2,
-    orbitTilta: 0.74274130,
-    orbitTiltb: 0.21284872,
   },
   neptune: {
     name: 'Neptune',
@@ -274,13 +251,18 @@ const planets = {
     invPlaneInclinationJ2000: 0.7354155,
     ascendingNodeInvPlane: 192.04,
     inclinationPhaseAngle: 203.3195,
-    invPlaneInclinationMean: 0.722190,
-    invPlaneInclinationAmplitude: 0.013486,
     obliquityCycle: null,
-    orbitTilta: 1.31982602,
-    orbitTiltb: -1.17945460,
   },
 };
+
+// Derive orbitTilta/b from ascendingNode + eclipticInclinationJ2000
+for (const p of Object.values(planets)) {
+  if (p.ascendingNode !== undefined && p.eclipticInclinationJ2000 !== undefined) {
+    const tilt = utils.computeOrbitTilt(p.ascendingNode, p.eclipticInclinationJ2000);
+    p.orbitTilta = tilt.orbitTilta;
+    p.orbitTiltb = tilt.orbitTiltb;
+  }
+}
 
 // Additional bodies (not in the 8-planet Fibonacci framework)
 const additionalBodies = {
@@ -408,6 +390,17 @@ const eccJ2000 = {
 };
 
 const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
+
+// Derive invPlaneInclinationAmplitude and invPlaneInclinationMean for each planet
+// Amplitude = PSI / (d × √m), Mean = inclJ2000 - amplitude × cos(Ω - φ)
+for (const [key, p] of Object.entries(planets)) {
+  if (p.fibonacciD && massFraction[key] && p.invPlaneInclinationJ2000 !== undefined) {
+    p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
+    p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
+      p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
+      p.ascendingNodeInvPlane, p.inclinationPhaseAngle);
+  }
+}
 
 
 // ═══════════════════════════════════════════════════════════════════════════

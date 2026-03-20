@@ -9,7 +9,6 @@ const ASTRO_REFERENCE = {
   juneSolstice2000_JD: 2451716.575,       // June 21, 2000 01:48 UTC
   obliquityJ2000_deg: 23.439291111,            // IAU 2006 / Meeus (Capitaine et al. 2003)
   obliquityRate_arcsecPerCentury: -46.836769,  // IAU 2006 linear term ε₀ = 84381.406"
-  obliquityRate_degPerCentury: -46.836769 / 3600, // = -0.013010°/century
   earthEccentricityJ2000: 0.01671022,
   earthPerihelionLongitudeJ2000: 102.947,  // degrees
   earthAscendingNodeInvPlane: 284.51,      // Souami & Souchay (2012)
@@ -18,10 +17,8 @@ const ASTRO_REFERENCE = {
 
   perihelionPassageJ2000_JD: 2451547.042,  // Earth perihelion 2000 (Jan 3.542) — same as perihelionRefJD in constants.js
 
-  // --- Earth inclination at model epoch (June 21, 2000) ---
-  // Adjusted from J2000 (Jan 1.5) to model epoch (June 21) using precession rate
+  // --- Earth inclination to invariable plane ---
   earthInclinationJ2000_deg: 1.57869,
-  earthInclinationModelEpoch_deg: 1.57866,
 
   // --- Planet perihelion passage references (JPL Horizons, phase-optimized) ---
   mercuryPerihelionRef_JD: 2460335.9,

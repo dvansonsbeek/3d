@@ -430,16 +430,16 @@
     "invPlaneInclinationMean": {
       "example": 6.72662,
       "unit": "degrees",
-      "proposed_category": "model_param",
+      "proposed_category": "derived",
       "description": "Mean invariable plane inclination",
-      "note": "Derived from J2000 value and amplitude"
+      "note": "RESOLVED: Now derived at load time via computeInvPlaneInclinationMean(inclJ2000, amplitude, Ω, φ). Removed from planet objects."
     },
     "invPlaneInclinationAmplitude": {
       "example": 0.384621,
       "unit": "degrees",
-      "proposed_category": "model_param",
+      "proposed_category": "derived",
       "description": "Invariable plane inclination oscillation amplitude",
-      "note": "Fitted from model"
+      "note": "RESOLVED: Now derived at load time via computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction). Removed from planet objects."
     },
     "obliquityCycle": {
       "example": "H * 8 / 3",
@@ -450,16 +450,16 @@
     "orbitTilta": {
       "example": 5.23265097,
       "unit": "degrees",
-      "proposed_category": "model_param",
+      "proposed_category": "derived",
       "description": "Scene-graph orbit tilt component a",
-      "note": "Derived from ecliptic geometry"
+      "note": "RESOLVED: Now derived at load time via computeOrbitTilt(ascendingNode, eclipticInclinationJ2000). Removed from planet objects."
     },
     "orbitTiltb": {
       "example": 4.65715524,
       "unit": "degrees",
-      "proposed_category": "model_param",
+      "proposed_category": "derived",
       "description": "Scene-graph orbit tilt component b",
-      "note": "Derived from ecliptic geometry"
+      "note": "RESOLVED: Now derived at load time via computeOrbitTilt(ascendingNode, eclipticInclinationJ2000). Removed from planet objects."
     }
   },
 
@@ -494,7 +494,7 @@
       "source": "astro-reference.js:12",
       "proposed_category": "derived",
       "description": "Same rate in degrees",
-      "note": "= obliquityRate_arcsecPerCentury / 3600 — derive at load time, don't store"
+      "note": "RESOLVED: Removed from astro-reference.js. Derive as arcsec/3600 when needed."
     },
     "earthEccentricityJ2000": {
       "value": 0.01671022,
@@ -542,14 +542,7 @@
       "description": "Earth inclination to invariable plane at J2000",
       "note": "Souami & Souchay (2012)"
     },
-    "earthInclinationModelEpoch_deg": {
-      "value": 1.57866,
-      "unit": "degrees",
-      "source": "astro-reference.js:24",
-      "proposed_category": "astro_ref",
-      "description": "Earth inclination adjusted to model epoch (June 2000)",
-      "note": "Precession-adjusted from J2000"
-    }
+    "_earthInclinationModelEpoch_deg": "REMOVED — duplicate of earthInclinationJ2000_deg. Use earthInclinationJ2000_deg and derive model-epoch value when needed."
   },
 
   "astro_reference_planets": {
@@ -730,11 +723,18 @@
     "total_items": "~120 distinct values",
     "proposed_model_param": "~45 values (H, corrections, Earth params, Moon startpos, per-planet fitted values, scene geometry)",
     "proposed_astro_ref": "~65 values (IAU/JPL observed, Meeus, Souami & Souchay, orbital elements, year lengths)",
-    "derived": "~5 values (earthRAAngle, earthInvPlaneInclinationMean, obliquityRate_degPerCentury — computed at load time)",
+    "derived": "~9 values — computed at load time via utils.js functions, not stored in JSON",
+    "resolved_derivations": [
+      "orbitTilta/b: REMOVED from planet objects → computeOrbitTilt(ascendingNode, eclipticInclinationJ2000)",
+      "invPlaneInclinationAmplitude: REMOVED from planet objects → computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction)",
+      "invPlaneInclinationMean: REMOVED from planet objects → computeInvPlaneInclinationMean(inclJ2000, amplitude, Ω, φ)",
+      "earthRAAngle: now uses computeEarthRAAngle(amplitude, tiltMean) from utils.js",
+      "earthInvPlaneInclinationMean: now uses computeInvPlaneInclinationMean() from utils.js",
+      "obliquityRate_degPerCentury: REMOVED from astro-reference → derive as arcsec/3600",
+      "earthInclinationModelEpoch_deg: REMOVED from astro-reference → use earthInclinationJ2000_deg"
+    ],
     "items_changing_category": [
-      "inputMeanSolarYear: model_param → astro_ref",
       "perihelionalignmentYear: model_param → astro_ref",
-      "startmodelJD: model_param → astro_ref",
       "currentAUDistance: model_param → astro_ref",
       "meanSiderealYearSeconds: model_param → astro_ref",
       "G_CONSTANT: model_param → astro_ref",
@@ -747,14 +747,12 @@
       "moonEclipticInclinationJ2000: model_param → astro_ref",
       "moonOrbitalEccentricity: model_param → astro_ref",
       "moonTilt: model_param → astro_ref",
-      "per-planet solarYearInput: model_param → astro_ref",
       "per-planet orbitalEccentricityJ2000: model_param → astro_ref",
       "per-planet axialTiltMean: model_param → astro_ref",
       "per-planet eclipticInclinationJ2000: model_param → astro_ref",
       "per-planet longitudePerihelion: model_param → astro_ref",
       "per-planet ascendingNode: model_param → astro_ref",
       "per-planet invPlaneInclinationJ2000: model_param → astro_ref",
-      "per-planet ascendingNodeInvPlane: model_param → astro_ref",
       "earthInclinationPhaseAngle: astro_ref → model_param"
     ]
   }

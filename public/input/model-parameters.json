@@ -1,0 +1,202 @@
+{
+  "_description": "Model parameters — values that define the Holistic Universe Model theory. Changing any value = different model. Source of truth for both tools/lib/constants.js and src/script.js.",
+
+  "foundational": {
+    "H": 335008,
+    "inputMeanSolarYear": 365.2421897,
+    "startmodelJD": 2451716.5,
+    "startmodelYear": 2000.5,
+    "correctionDays": -0.23328398168087,
+    "correctionSun": 0.495997,
+    "temperatureGraphMostLikely": 14.5,
+    "startAngleModel": 89.91949879,
+    "useVariableSpeed": true,
+    "psiNumerator": 2205
+  },
+
+  "earth": {
+    "earthtiltMean": 23.41365930,
+    "earthInvPlaneInclinationAmplitude": 0.63541988,
+    "eccentricityBase": 0.01537159,
+    "eccentricityAmplitude": 0.00137074,
+    "eccentricityAmplitudeK": 3.4505372893e-6
+  },
+
+  "moon": {
+    "moonStartposApsidal": 347.622,
+    "moonStartposNodal": -83.630,
+    "moonStartposMoon": 131.930
+  },
+
+  "planets": {
+    "mercury": {
+      "name": "Mercury",
+      "orbitalEccentricityBase": 0.20563593,
+      "orbitalEccentricityAmplitude": 8.436789e-5,
+      "eccentricityPhaseJ2000": 89.9882,
+      "eocFraction": -0.527,
+      "startpos": 83.5293,
+      "angleCorrection": 0.97090778,
+      "perihelionEclipticFraction": [8, 11],
+      "type": "I",
+      "mirrorPair": "uranus",
+      "fibonacciD": 21,
+      "ascendingNodeInvPlane": 32.83,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": [8, 3],
+      "axialPrecessionFraction": [-8, 11]
+    },
+    "venus": {
+      "name": "Venus",
+      "orbitalEccentricityBase": 0.00619052,
+      "orbitalEccentricityAmplitude": 9.625389e-4,
+      "eccentricityPhaseJ2000": 123.7514,
+      "eocFraction": 0.436,
+      "startpos": 249.3141,
+      "angleCorrection": -2.80286830,
+      "perihelionEclipticFraction": [2, 1],
+      "type": "I",
+      "mirrorPair": "neptune",
+      "fibonacciD": 34,
+      "ascendingNodeInvPlane": 54.70,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": null,
+      "axialPrecessionFraction": [3, 34]
+    },
+    "mars": {
+      "name": "Mars",
+      "orbitalEccentricityBase": 0.09297543,
+      "orbitalEccentricityAmplitude": 3.073636e-3,
+      "eccentricityPhaseJ2000": 96.8878,
+      "eocFraction": -0.066224,
+      "startpos": 121.4679,
+      "angleCorrection": -2.10936153,
+      "perihelionEclipticFraction": [3, 13],
+      "type": "II",
+      "mirrorPair": "jupiter",
+      "fibonacciD": 5,
+      "ascendingNodeInvPlane": 354.87,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": [3, 8],
+      "axialPrecessionFraction": [-1, 2]
+    },
+    "jupiter": {
+      "name": "Jupiter",
+      "orbitalEccentricityBase": 0.04821478,
+      "orbitalEccentricityAmplitude": 1.149908e-6,
+      "eccentricityPhaseJ2000": 180,
+      "eocFraction": 0.495,
+      "startpos": 13.85,
+      "angleCorrection": 0.92703626,
+      "perihelionEclipticFraction": [1, 5],
+      "type": "III",
+      "mirrorPair": "mars",
+      "fibonacciD": 5,
+      "ascendingNodeInvPlane": 312.89,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": [1, 2],
+      "axialPrecessionFraction": [-3, 8]
+    },
+    "saturn": {
+      "name": "Saturn",
+      "orbitalEccentricityBase": 0.05374486,
+      "orbitalEccentricityAmplitude": 5.403008e-6,
+      "eccentricityPhaseJ2000": 180,
+      "eocFraction": 0.540,
+      "startpos": 11.3199,
+      "angleCorrection": -0.17477212,
+      "perihelionEclipticFraction": [-1, 8],
+      "type": "III",
+      "mirrorPair": "earth",
+      "fibonacciD": 3,
+      "ascendingNodeInvPlane": 118.81,
+      "inclinationPhaseAngle": 23.3195,
+      "obliquityCycleFraction": [1, 3],
+      "axialPrecessionFraction": [-4, 3]
+    },
+    "uranus": {
+      "name": "Uranus",
+      "orbitalEccentricityBase": 0.04734421,
+      "orbitalEccentricityAmplitude": 2.831008e-5,
+      "eccentricityPhaseJ2000": 0,
+      "eocFraction": 0.530,
+      "startpos": 44.8801,
+      "angleCorrection": -0.73459551,
+      "perihelionEclipticFraction": [1, 3],
+      "type": "III",
+      "mirrorPair": "mercury",
+      "fibonacciD": 21,
+      "ascendingNodeInvPlane": 307.80,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": [1, 2],
+      "axialPrecessionFraction": [610, 1]
+    },
+    "neptune": {
+      "name": "Neptune",
+      "orbitalEccentricityBase": 0.00868571,
+      "orbitalEccentricityAmplitude": 8.098033e-6,
+      "eccentricityPhaseJ2000": 0,
+      "eocFraction": 0.585,
+      "startpos": 47.9551,
+      "angleCorrection": 2.33381876,
+      "perihelionEclipticFraction": [2, 1],
+      "type": "III",
+      "mirrorPair": "venus",
+      "fibonacciD": 34,
+      "ascendingNodeInvPlane": 192.04,
+      "inclinationPhaseAngle": 203.3195,
+      "obliquityCycleFraction": null,
+      "axialPrecessionFraction": [-68, 1]
+    }
+  },
+
+  "additionalBodies": {
+    "pluto": {
+      "name": "Pluto",
+      "orbitalEccentricityBase": 0.2488273,
+      "type": "I",
+      "ascendingNodeInvPlane": 101.06,
+      "inclinationPhaseAngle": 203.3195,
+      "invPlaneInclinationMean": 15.716200,
+      "invPlaneInclinationAmplitude": 0.717024
+    },
+    "halleys": {
+      "name": "Halley's",
+      "orbitalEccentricityBase": 0.96714291,
+      "type": "III",
+      "ascendingNodeInvPlane": 59.56,
+      "inclinationPhaseAngle": 23.3195,
+      "invPlaneInclinationMean": 150,
+      "invPlaneInclinationAmplitude": 0.1
+    },
+    "eros": {
+      "name": "Eros",
+      "orbitalEccentricityBase": 0.2229512,
+      "type": "II",
+      "ascendingNodeInvPlane": 10.36,
+      "inclinationPhaseAngle": 203.3195,
+      "invPlaneInclinationMean": 9.25,
+      "invPlaneInclinationAmplitude": 0.5
+    },
+    "ceres": {
+      "name": "Ceres",
+      "orbitalEccentricityBase": 0.0755347,
+      "orbitDistanceOverride": 2.76596,
+      "ascendingNodeInvPlane": 80.89,
+      "inclinationPhaseAngle": 203.3195,
+      "invPlaneInclinationMean": 0.43,
+      "invPlaneInclinationAmplitude": 0.05
+    }
+  },
+
+  "perihelionPassageRef": {
+    "_description": "Planet perihelion passage reference JDs — phase-optimized for EoC alignment",
+    "mercury": 2460335.9,
+    "venus": 2455464.42,
+    "mars": 2456499.441,
+    "jupiter": 2464224.5,
+    "saturn": 2452875.9,
+    "uranus": 2439699.8,
+    "neptune": 2409432.4
+  }
+}
