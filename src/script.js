@@ -43,36 +43,9 @@ const earthInvPlaneInclinationAmplitude = 0.63541988;     // Scene-geometry solv
 const eccentricityBase = 0.01537159;                      // Law 5 balance-locked
 const eccentricityAmplitude = 0.00137074;                 // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
-
-
-// ═══════════════════════════════════════════════════════════════════════════
-// B. FITTED COEFFICIENTS (source: public/input/fitted-coefficients.json)
-// ═══════════════════════════════════════════════════════════════════════════
-
-// ─── B1. Year-length harmonics ───────────────────────────────────────────
-// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
-const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.001 s
-  [ 3,  +6.332548792685e-07, +8.075245235817e-06],        // H/3:  0.700s amp
-  [ 8,  -1.356696988329e-06, -2.088113114600e-05],        // H/8:  1.808s amp
-  [14,  -1.545140139305e-07, +3.637423948615e-07],        // H/14: 0.034s amp
-  [15,  +8.449709609471e-08, -4.860696254744e-07],        // H/15: 0.043s amp
-  [31,  +2.067861760831e-08, -1.502149356245e-08],        // H/31: 0.002s amp
-  [41,  -6.303689078519e-09, +1.914969191424e-08],        // H/41: 0.002s amp
-];
-const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.000 s
-  [ 2,  -6.446591502042e-07, -1.036571636840e-07],        // H/2:  0.056s amp
-  [ 3,  +1.162133281368e-06, +4.849859858606e-07],        // H/3:  0.109s amp
-  [ 8,  -1.134779565378e-06, -2.847253755636e-09],        // H/8:  0.098s amp
-];
-const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.000 s
-  [ 2,  -3.331807798338e-06, -1.199082237907e-05],        // H/2:  1.075s amp
-  [ 3,  -3.739072613520e-06, +9.617812262260e-06],        // H/3:  0.892s amp
-  [ 8,  -3.175712482370e-07, +2.623030026153e-06],        // H/8:  0.228s amp
-  [ 9,  +8.022402310244e-07, -1.542541871698e-06],        // H/9:  0.150s amp
-  [22,  +1.062301999920e-07, -6.676606979168e-08],        // H/22: 0.011s amp
-  [23,  -4.273912533399e-07, +2.329348175831e-07],        // H/23: 0.042s amp
-];
-
+const psiNumerator = 2205;                               // Fibonacci constant: 5 × 21²
+const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
+const earthInclinationPhaseAngle = 203.3195;              // 203° balance group (reference)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C. ASTRO REFERENCES (source: public/input/astro-reference.json)
@@ -97,7 +70,7 @@ const julianCenturyDays = 100 * meansolaryearlengthinDays;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
 // Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
-const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((284.51 - 203.3195) * Math.PI / 180);
+const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -107,33 +80,32 @@ const earthInvPlaneInclinationMean = 1.57869 - earthInvPlaneInclinationAmplitude
 const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3=WS
 const debugOn = false;                                     // Debug button flag
 
-// ─── 3. SUN & MOON INPUT CONSTANTS ─────────────────────────────────────
-// Reference lengths used as INPUT for the Sun
-const sunTilt = 7.155;
-const milkywayDistance = 27500;
-const sunSpeed = 828000;
-const greatattractorDistance = 200000000;
-const milkywaySpeed = 2160000;
+// ─── A3. Moon model parameters ───────────────────────────────────────────
+const moonStartposApsidal = 347.622;                      // Eclipse-optimizer tuned (Step 2b)
+const moonStartposNodal = -83.630;                        // Eclipse-optimizer tuned (Step 2b)
+const moonStartposMoon = 131.930;                         // Eclipse-optimizer tuned (Step 2b)
 
-// Reference lengths used as INPUT for the Moon
-const moonSiderealMonthInput = 27.32166156;
-const moonAnomalisticMonthInput = 27.55454988;
-const moonNodalMonthInput = 27.21222082;
-const moonDistance = 384399.07;
-const moonEclipticInclinationJ2000 = 5.1453964;
-const moonOrbitalEccentricityBase = 0.054900489;
-const moonTilt = 6.687;
-const moonStartposApsidal = 347.622;                      // Optimized against JPL Horizons 2000-2025 (7-day sampling)
-const moonStartposNodal = -83.630;                        // Optimized against JPL Horizons 2000-2025 (7-day sampling)
-const moonStartposMoon = 131.930;                         // Optimized against JPL Horizons 2000-2025 (7-day sampling)
+// ─── C2. Sun & Moon astro references ─────────────────────────────────────
+const sunTilt = 7.155;                                    // Solar obliquity to ecliptic
+const milkywayDistance = 27500;                           // Distance to galactic center (light-years)
+const sunSpeed = 828000;                                  // Sun orbital speed (km/h)
+const greatattractorDistance = 200000000;                  // Distance to Great Attractor (light-years)
+const milkywaySpeed = 2160000;                            // Milky Way speed toward GA (km/h)
+const moonSiderealMonthInput = 27.32166156;               // IAU sidereal month (days)
+const moonAnomalisticMonthInput = 27.55454988;            // IAU anomalistic month (days)
+const moonNodalMonthInput = 27.21222082;                  // IAU nodal month (days)
+const moonDistance = 384399.07;                           // Mean Earth-Moon distance (km)
+const moonEclipticInclinationJ2000 = 5.1453964;           // Moon orbital inclination at J2000
+const moonOrbitalEccentricityBase = 0.054900489;          // Moon orbital eccentricity
+const moonTilt = 6.687;                                   // Moon axial tilt
 
-// ─── 4. PLANET INPUT CONSTANTS ──────────────────────────────────────────
+// ─── A4. Planet input constants ──────────────────────────────────────────
 // Per-planet J2000 orbital elements, tuned parameters (startpos, angleCorrection,
 // eocFraction, perihelionRef_JD), and perihelion precession periods.
 // Source: public/input/model-parameters.json + astro-reference.json
 // ─────────────────────────────────────────────────────────────────────────
 
-// --- 4a. Major planets (Mercury–Neptune) ---
+// --- A4a. Major planets (Mercury–Neptune) ---
 // Planet data stored in structured objects. Flat const aliases provided for
 // backward compatibility with the rest of script.js.
 
@@ -321,7 +293,7 @@ planets.neptune = {
   inclinationPhaseAngle: 203.3195,
 };
 
-// --- 4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
+// --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
 
 // Pluto
 planets.pluto = {
@@ -405,7 +377,7 @@ planets.ceres = {
   invPlaneInclinationMean: 0.43, invPlaneInclinationAmplitude: 0.05,
 };
 
-// --- 4c. Ascending nodes on invariable plane ---
+// --- C3. Ascending nodes on invariable plane ---
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
@@ -422,18 +394,13 @@ const halleysAscendingNodeInvPlaneSouamiSouchay = 59.56; // Approximation from e
 const erosAscendingNodeInvPlaneSouamiSouchay = 10.36;    // Approximation from ecliptic value
 const ceresAscendingNodeInvPlaneSouamiSouchay = 80.89;   // From Souami & Souchay (2012) Table 2
 
-// J2000-verified ascending nodes - optimized to reproduce exact J2000 ecliptic inclinations
-// These use the existing <planet>Inclination values (Souami & Souchay 2012) and only adjust ascending nodes
-// Earth's ascending node is set the same as Souami & Souchay value
-// Result: All planets match J2000 EclipticInclinationJ2000 values with error < 0.0001°
-const earthAscendingNodeInvPlaneVerified = 284.51;       // Souami & Souchay (2012)
 
-// ─── 5. INCLINATION SYSTEM ──────────────────────────────────────────────
+// ─── C4. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
 // Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
 // JPL ecliptic inclination trend rates, and eigenmode phase angles.
 // ─────────────────────────────────────────────────────────────────────────
 
-// --- 5a. Laplace-Lagrange bounds & eigenmode phases ---
+// --- C4a. Laplace-Lagrange bounds & eigenmode phases ---
 // Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
 // Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
 const mercuryLLBoundsMin = 4.57;
@@ -472,13 +439,7 @@ const EIGENMODE_PHASES = [
   { value: 'custom', label: 'Custom...' }
 ];
 
-// --- 5b. Fibonacci constant & Earth inclination phase ---
-// Planet inclination means/amplitudes are derived in section 10b from Fibonacci Laws.
-// Universal ψ = psiNumerator/(2×H), balance: Σ(203°) w = Σ(23°) w
-const psiNumerator = 2205;                               // Fibonacci-derived: 5 × 441 = 5 × 21²
-const earthInclinationPhaseAngle = 203.3195;    // 203° balance group (reference)
-
-// --- 5d. JPL ecliptic inclination trend rates (°/century) ---
+// --- C4b. JPL ecliptic inclination trend rates (°/century) ---
 // Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
 // Target rates for model verification.
 const mercuryEclipticInclinationTrendJPL = -0.00595;  // degrees/century (DECREASING)
@@ -497,7 +458,35 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 // Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - <number 1.5 - 2 >
 const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - 2;
 
-// ─── 6. PREDICTIVE FORMULA SYSTEM ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// B. FITTED COEFFICIENTS (source: public/input/fitted-coefficients.json)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── B1. Year-length harmonics ───────────────────────────────────────────
+// Each entry: [period_divisor, sin_coeff, cos_coeff] — period = H / divisor
+const TROPICAL_YEAR_HARMONICS = [                          // RMS = 0.001 s
+  [ 3,  +6.332548792685e-07, +8.075245235817e-06],        // H/3:  0.700s amp
+  [ 8,  -1.356696988329e-06, -2.088113114600e-05],        // H/8:  1.808s amp
+  [14,  -1.545140139305e-07, +3.637423948615e-07],        // H/14: 0.034s amp
+  [15,  +8.449709609471e-08, -4.860696254744e-07],        // H/15: 0.043s amp
+  [31,  +2.067861760831e-08, -1.502149356245e-08],        // H/31: 0.002s amp
+  [41,  -6.303689078519e-09, +1.914969191424e-08],        // H/41: 0.002s amp
+];
+const SIDEREAL_YEAR_HARMONICS = [                          // RMS = 0.000 s
+  [ 2,  -6.446591502042e-07, -1.036571636840e-07],        // H/2:  0.056s amp
+  [ 3,  +1.162133281368e-06, +4.849859858606e-07],        // H/3:  0.109s amp
+  [ 8,  -1.134779565378e-06, -2.847253755636e-09],        // H/8:  0.098s amp
+];
+const ANOMALISTIC_YEAR_HARMONICS = [                       // RMS = 0.000 s
+  [ 2,  -3.331807798338e-06, -1.199082237907e-05],        // H/2:  1.075s amp
+  [ 3,  -3.739072613520e-06, +9.617812262260e-06],        // H/3:  0.892s amp
+  [ 8,  -3.175712482370e-07, +2.623030026153e-06],        // H/8:  0.228s amp
+  [ 9,  +8.022402310244e-07, -1.542541871698e-06],        // H/9:  0.150s amp
+  [22,  +1.062301999920e-07, -6.676606979168e-08],        // H/22: 0.011s amp
+  [23,  -4.273912533399e-07, +2.329348175831e-07],        // H/23: 0.042s amp
+];
+
+// ─── B2. Predictive formula system ───────────────────────────────────────
 // PERI_HARMONICS (perihelion longitude Fourier terms), PREDICT_PLANETS
 // (precession periods), and PREDICT_COEFFS (per-planet correction arrays).
 // Ported from tools/lib/python/predictive_formula.py
