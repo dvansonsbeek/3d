@@ -35,7 +35,7 @@ for _, r in df.iterrows():
         'year': float(r['Year']),
         'tropical': float(r['Mean Tropical Year']),
         'sidereal': float(r['Mean Sidereal']),
-        'anomalistic': float(r['Peri Interval']),
+        'anomalistic': float(r['Mean Anomalistic']),
     })
 json.dump(rows, sys.stdout)
 `;

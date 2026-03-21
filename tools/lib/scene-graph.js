@@ -1010,8 +1010,37 @@ function thetaToRaHours(theta) {
   return theta * 12 / Math.PI;
 }
 
+/**
+ * Get Sun's world-space angle (for sidereal year measurement).
+ * Returns atan2(z, x) in degrees [0, 360).
+ */
+function getSunWorldAngle(jd) {
+  const graph = getGraph();
+  const pos = sDay * (jd - C.startmodelJD);
+  moveModel(graph, pos);
+  const sunWP = graph.sunNodes.pivot.getWorldPosition();
+  let angle = Math.atan2(sunWP[2], sunWP[0]) * 180 / Math.PI;
+  return ((angle % 360) + 360) % 360;
+}
+
+/**
+ * Get WobbleCenter-Sun distance in AU (for perihelion/aphelion detection).
+ * Uses the fixed wobble center (scene origin) → Sun, NOT Earth → Sun.
+ * This measures the true anomalistic orbit without axial-precession noise.
+ */
+function getWobbleSunDistAU(jd) {
+  const graph = getGraph();
+  const pos = sDay * (jd - C.startmodelJD);
+  moveModel(graph, pos);
+  // WobbleCenter is at the scene origin (0,0,0)
+  const sunWP = graph.sunNodes.pivot.getWorldPosition();
+  return Math.sqrt(sunWP[0]*sunWP[0] + sunWP[1]*sunWP[1] + sunWP[2]*sunWP[2]) / 100;
+}
+
 module.exports = {
   computePlanetPosition,
+  getSunWorldAngle,
+  getWobbleSunDistAU,
   phiToDecDeg,
   thetaToRaDeg,
   thetaToRaHours,

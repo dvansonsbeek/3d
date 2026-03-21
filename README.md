@@ -67,7 +67,7 @@ For more details see [holisticuniverse.com](https://holisticuniverse.com).
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16 or higher) — for the simulation and optimization tools
-- [Python 3](https://www.python.org/) (optional) — only needed for the statistical analysis scripts in `scripts/`
+- [Python 3](https://www.python.org/) (optional) — needed for ML training (`tools/fit/python/`) and statistical analysis (`scripts/`)
 
 ### Installation
 
@@ -135,12 +135,14 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 30–39 | Calculations | [Anomaly](docs/30-anomaly-calculations.md), [Ascending Nodes](docs/31-ascending-node-calculations.md), [Inclination](docs/32-inclination-calculations.md) |
 | 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |
 | 50–59 | UI & Tools | [UI Panels](docs/50-ui-panels-reference.md), [Balance Explorer](docs/53-balance-explorer-reference.md) |
-| 60–69 | Optimization Tool | [Overview](docs/60-optimization-tool-overview.md) |
+| 60–69 | Optimization & Fitting | [Overview](docs/60-optimization-tool-overview.md), [Fitting Pipeline](tools/fit/README.md) |
 | 70–79 | Verification | [Ascending Node Limitations](docs/70-ascending-node-limitations.md) |
 | 80–99 | Appendices | Code scripts and data spreadsheets |
 
 **Investigation & Verification:**
-- [Python Scripts](scripts/) — Statistical significance tests, perihelion precession analysis, exoplanet Fibonacci tests, and predictive formula system
+- [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis
+- [Fitting Pipeline](tools/fit/README.md) — 15-step pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, obliquity/year-length harmonics
+- [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — 429-term ML system for planetary precession prediction
 
 ---
 
@@ -150,7 +152,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 - **Axial precession**: ~25,770 years (H/13)
 - **Inclination precession**: ~111,669 years (H/3)
 - **Perihelion precession**: ~20,938 years (H/16)
-- **Model parameters**: Earth is defined by 26 parameters, the Moon by 9, and each planet by 16 — with only **6 free parameters** for the entire model
+- **Model parameters**: 70 model parameters (Earth 11, Moon 3, 7 planets x 8) and 75 calibration inputs from astronomical observations — with only **6 free parameters** for the entire model
 
 ---
 
