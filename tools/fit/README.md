@@ -7,7 +7,8 @@ Output values are stored in `public/input/fitted-coefficients.json`.
 
 All fitting scripts support **dry run** by default (print results only).
 Add `--write` to actually update the JSON source-of-truth files.
-After all steps complete, run `export-to-script.js --write` (Step 8) to sync values to `src/script.js`.
+After all steps complete, run `verify-pipeline.js` (Step 8) to check for regressions,
+then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 ## Scripts
 
