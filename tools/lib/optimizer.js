@@ -861,7 +861,7 @@ function baseline(target, overrides, refDates) {
 
       results.push({
         jd: ref.jd,
-        year: ref.calendarYear,
+        year: ref.calendarYear || ref.year || C.startmodelYear + (ref.jd - C.startmodelJD) / C.meanSolarYearDays,
         label: ref.label,
         tier: ref.tier,
         weight: w,

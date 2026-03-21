@@ -982,9 +982,11 @@ function computePlanetPosition(target, jd) {
     }
   }
 
-  // Venus offset correction (elongation × Earth perihelion geometry)
-  if (target === 'venus' && C.VENUS_CORRECTION) {
-    const vc = C.VENUS_CORRECTION;
+  // Elongation offset correction (elongation × Earth perihelion geometry)
+  // Applied to inner planets: Mercury, Venus, Mars
+  const _elCorr = (C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target]) || (target === 'venus' && C.VENUS_CORRECTION);
+  if (_elCorr) {
+    const vc = _elCorr;
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
     // Compute Sun RA for elongation
     const _sunSph = computePlanetPosition('sun', jd, graph);
@@ -994,9 +996,9 @@ function computePlanetPosition(target, jd) {
     // Earth perihelion angle
     const _wE = (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 360 / (C.H / 16) * (_yr - 2000)) * d2r;
     const _vFromWE = _venusRA - _wE;
-    // Venus-Earth synodic phase (exact from integer orbit count)
-    const _vCount = Math.round(C.totalDaysInH / C.planets.venus.solarYearInput);
-    const _synVE = 1 / Math.abs(1 - _vCount / C.H);
+    // Planet-Earth synodic phase (exact from integer orbit count)
+    const _plCount = Math.round(C.totalDaysInH / C.planets[target].solarYearInput);
+    const _synVE = 1 / Math.abs(1 - _plCount / C.H);
     const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
     // 15 basis functions (1st-4th harmonics of V-ωE × sin(elongation) + synodic + d²-weighted)
     const sinEl = Math.sin(_elong), cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);

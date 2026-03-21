@@ -135,7 +135,7 @@ for (const target of targets) {
     const dd = result.distAU;
     const u = (modelRA - ascNode) * d2r;
     const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
-    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase });
+    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, weight: pt.weight || 1 });
   }
 
   const n = data.length;
@@ -250,26 +250,30 @@ function fmt(v) { return (v >= 0 ? ' ' : '') + v.toFixed(4); }
 function linearFit(data, basisFn, valueFn) {
   const n = data.length;
   const m = basisFn(data[0]).length;
-  const X = [], y = [];
-  for (const pt of data) { X.push(basisFn(pt)); y.push(valueFn(pt)); }
+  const X = [], y = [], w = [];
+  for (const pt of data) { X.push(basisFn(pt)); y.push(valueFn(pt)); w.push(pt.weight || 1); }
+  // Weighted least squares: minimize Σ w_i (y_i - X_i·β)²
   const XtX = Array.from({length: m}, () => new Float64Array(m));
   const Xty = new Float64Array(m);
+  let totalWeight = 0;
   for (let i = 0; i < n; i++) {
+    const wi = w[i];
+    totalWeight += wi;
     for (let j = 0; j < m; j++) {
-      Xty[j] += X[i][j] * y[i];
-      for (let k = j; k < m; k++) XtX[j][k] += X[i][j] * X[i][k];
+      Xty[j] += wi * X[i][j] * y[i];
+      for (let k = j; k < m; k++) XtX[j][k] += wi * X[i][j] * X[i][k];
     }
   }
   for (let j = 0; j < m; j++)
     for (let k = 0; k < j; k++) XtX[j][k] = XtX[k][j];
   const beta = solveLinear(XtX, Xty, m);
-  let rms = 0;
+  let wss = 0;
   for (let i = 0; i < n; i++) {
     let pred = 0;
     for (let j = 0; j < m; j++) pred += beta[j] * X[i][j];
-    rms += (y[i] - pred) ** 2;
+    wss += w[i] * (y[i] - pred) ** 2;
   }
-  return { rms: Math.sqrt(rms / n), beta };
+  return { rms: Math.sqrt(wss / totalWeight), beta };
 }
 
 function solveLinear(A, b, n) {

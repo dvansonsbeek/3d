@@ -28,6 +28,7 @@ const PARALLAX_RA_CORRECTION = data.PARALLAX_RA_CORRECTION;
 const MOON_CORRECTION = data.MOON_CORRECTION || null;
 const CONJUNCTION_CORRECTION = data.CONJUNCTION_CORRECTION || null;
 const VENUS_CORRECTION = data.VENUS_CORRECTION || null;
+const ELONGATION_CORRECTION = data.ELONGATION_CORRECTION || null;
 
 
 // ─── Dynamic fitted values ───────────────────────────────────────────────
@@ -90,6 +91,7 @@ module.exports = {
   MOON_CORRECTION,
   CONJUNCTION_CORRECTION,
   VENUS_CORRECTION,
+  ELONGATION_CORRECTION,
 
   // Static fitted arrays
   TROPICAL_YEAR_HARMONICS,
