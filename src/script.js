@@ -914,6 +914,12 @@ const PARALLAX_RA_CORRECTION = {
   Neptune: { A: 2003.6316, B: 8.2896, C:-0.4284, D:-880.7456, E:-809.1314, F:-7.1162, G:-1.4653, H:-2.8004, I: 0.1151, J:-5.9754, K:-0.0632, L:-120473.9734, M: 13062.6789, N: 8.3853, O: 403.1442, P: 1.6266, Q:-0.2693, R: 5.4061, S:-5.5699, U: 12276.0169, V: 1810944.9893, W: 13472.1024, X:-0.2807, Y: 2.7242 },
 };
 
+// ─── B3b. Moon post-Meeus correction (fitted to JPL DE440 residuals) ─────
+// 3-term correction: D (mean elongation), M' (Moon mean anomaly), M (Sun mean anomaly)
+// Source: public/input/fitted-coefficients.json
+// @AUTO:MOON_CORRECTION
+const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.000027, raCosMp: -0.001423, raSinMs: -0.000027, raCosMs: 0.000005, decSinD: 0.000005, decCosD: -0.000009, decSinMp: 0.000017, decCosMp: -0.000026, decSinMs: -0.001093, decCosMs: -0.000257 };
+
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
@@ -30786,7 +30792,22 @@ function updatePositions() {
       // Ecliptic → equatorial (Meeus eq. 13.3, 13.4)
       let newRA = Math.atan2(sinLam * cosE - Math.tan(betR) * sinE, cosLam);
       if (newRA < 0) newRA += 2 * Math.PI;
-      const newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+      let newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+
+      // Post-Meeus RA/Dec correction (fitted to JPL DE440 residuals, 3 terms: D, M', M_sun)
+      if (MOON_CORRECTION) {
+        const _d2r = Math.PI / 180;
+        const _dJD = (obj._meeusT || 0) * 36525;
+        const _Dc  = (297.850 + 12.19074912 * _dJD) * _d2r;
+        const _Mpc = (134.963 + 13.06499295 * _dJD) * _d2r;
+        const _Msc = (357.529 + 0.98560028 * _dJD) * _d2r;
+        newRA  -= (MOON_CORRECTION.raSinD  * Math.sin(_Dc) + MOON_CORRECTION.raCosD  * Math.cos(_Dc)
+                 + MOON_CORRECTION.raSinMp * Math.sin(_Mpc) + MOON_CORRECTION.raCosMp * Math.cos(_Mpc)
+                 + MOON_CORRECTION.raSinMs * Math.sin(_Msc) + MOON_CORRECTION.raCosMs * Math.cos(_Msc)) * _d2r;
+        newDec -= (MOON_CORRECTION.decSinD  * Math.sin(_Dc) + MOON_CORRECTION.decCosD  * Math.cos(_Dc)
+                 + MOON_CORRECTION.decSinMp * Math.sin(_Mpc) + MOON_CORRECTION.decCosMp * Math.cos(_Mpc)
+                 + MOON_CORRECTION.decSinMs * Math.sin(_Msc) + MOON_CORRECTION.decCosMs * Math.cos(_Msc)) * _d2r;
+      }
 
       obj.ra  = newRA;                     // override RA
       obj.dec = Math.PI / 2 - newDec;      // override Dec (phi convention)

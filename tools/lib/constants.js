@@ -252,6 +252,9 @@ ASTRO_REFERENCE.earthInvPlanePrecessionYears = H / 3;
 ASTRO_REFERENCE.decCorrection = fitted.PARALLAX_DEC_CORRECTION;
 ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
 
+// Moon post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
+const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
+
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
 for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
   if (typeof jd === 'number') ASTRO_REFERENCE[key + 'PerihelionRef_JD'] = jd;
@@ -434,6 +437,7 @@ module.exports = {
   moonDistance,
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
+  MOON_CORRECTION,
   moonOrbitalEccentricity,
   moonTilt,
   moonStartposApsidal,

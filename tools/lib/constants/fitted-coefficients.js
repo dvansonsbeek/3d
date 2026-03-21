@@ -25,6 +25,7 @@ const CARDINAL_POINT_HARMONICS = data.CARDINAL_POINT_HARMONICS;
 const SOLSTICE_JD_HARMONICS = CARDINAL_POINT_HARMONICS.SS;  // Legacy alias
 const PARALLAX_DEC_CORRECTION = data.PARALLAX_DEC_CORRECTION;
 const PARALLAX_RA_CORRECTION = data.PARALLAX_RA_CORRECTION;
+const MOON_CORRECTION = data.MOON_CORRECTION || null;
 
 
 // ─── Dynamic fitted values ───────────────────────────────────────────────
@@ -84,6 +85,7 @@ module.exports = {
   // Parallax corrections (attached to ASTRO_REFERENCE by constants.js)
   PARALLAX_DEC_CORRECTION,
   PARALLAX_RA_CORRECTION,
+  MOON_CORRECTION,
 
   // Static fitted arrays
   TROPICAL_YEAR_HARMONICS,

@@ -14,7 +14,7 @@
   },
   "targets": {
     "sun":     { "rmsRA": 0.0033, "rmsDec": 0.0001, "rmsTotal": 0.0033, "maxRA": -0.0077, "maxDec": 0.0003, "entries": 52 },
-    "moon":    { "rmsRA": 0.0042, "rmsDec": 0.0014, "rmsTotal": 0.0045, "maxRA": -0.0106, "maxDec": -0.0047, "entries": 6088 },
+    "moon":    { "rmsRA": 0.0010, "rmsDec": 0.0012, "rmsTotal": 0.0015, "maxRA": -0.0039, "maxDec": 0.0038, "entries": 6088 },
     "mercury": { "rmsRA": 0.0038, "rmsDec": 0.0052, "rmsTotal": 0.0065, "maxRA": -0.0116, "maxDec": -0.0222, "entries": 95 },
     "venus":   { "rmsRA": 0.2041, "rmsDec": 0.0875, "rmsTotal": 0.2221, "maxRA": 0.9347, "maxDec": -0.4520, "entries": 3812 },
     "mars":    { "rmsRA": 0.0196, "rmsDec": 0.0140, "rmsTotal": 0.0241, "maxRA": -0.0626, "maxDec": 0.0454, "entries": 184 },

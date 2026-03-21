@@ -186,25 +186,101 @@ const bestLpCorrection = -rawBias;
 console.log(`Raw RA bias (no Lp correction): ${rawBias.toFixed(6)}° (${rawBaseline.entries.length} JPL points)`);
 console.log(`Optimal Lp correction: ${bestLpCorrection.toFixed(6)}° (was ${origLpCorr})`);
 
-// Apply correction and verify
+// Apply Lp correction
 C.moonMeeusLpCorrection = bestLpCorrection;
 _invalidateGraph();
 
-const correctedBaseline = computeJPLBaseline('moon');
-console.log(`Moon RMS after Lp correction: ${correctedBaseline.rmsTotal.toFixed(4)}° (was ${rawBaseline.rmsTotal.toFixed(4)}°)`);
+const lpBaseline = computeJPLBaseline('moon');
+console.log(`Moon RMS after Lp correction: ${lpBaseline.rmsTotal.toFixed(4)}° (was ${rawBaseline.rmsTotal.toFixed(4)}°)`);
 
-// ─── Write to model-parameters.json if --write flag ─────────────────────────
+// ─── 3-term RA/Dec correction: fit D, M', M_sun residuals ──────────────────
+console.log('\n═══ MOON 3-TERM CORRECTION (D, M\', M_sun) ═══\n');
+
+// Also zero out existing correction to get clean residuals for fitting
+C.MOON_CORRECTION = null;
+_invalidateGraph();
+
+const preCorr = computeJPLBaseline('moon');
+const entries = preCorr.entries;
+const d2r = Math.PI / 180;
+
+// Compute lunar arguments
+for (const e of entries) {
+  const dJD = e.jd - 2451545.0;
+  e.Dc  = (297.850 + 12.19074912 * dJD) * d2r;
+  e.Mpc = (134.963 + 13.06499295 * dJD) * d2r;
+  e.Msc = (357.529 + 0.98560028 * dJD) * d2r;
+}
+
+// Fit RA and Dec separately
+function fitComponent(getError) {
+  const m = 6;
+  const ATA = Array.from({length: m}, () => new Float64Array(m));
+  const ATb = new Float64Array(m);
+  for (const e of entries) {
+    const row = [Math.sin(e.Dc), Math.cos(e.Dc), Math.sin(e.Mpc), Math.cos(e.Mpc), Math.sin(e.Msc), Math.cos(e.Msc)];
+    const err = getError(e);
+    for (let j = 0; j < m; j++) {
+      ATb[j] += row[j] * err;
+      for (let k = j; k < m; k++) ATA[j][k] += row[j] * row[k];
+    }
+  }
+  for (let j = 0; j < m; j++) for (let k = 0; k < j; k++) ATA[j][k] = ATA[k][j];
+  const L = Array.from({length: m}, () => new Float64Array(m));
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j <= i; j++) {
+      let s = ATA[i][j]; for (let k = 0; k < j; k++) s -= L[i][k] * L[j][k];
+      L[i][j] = i === j ? Math.sqrt(s) : s / L[j][j];
+    }
+  }
+  const y = new Float64Array(m);
+  for (let i = 0; i < m; i++) { let s = ATb[i]; for (let k = 0; k < i; k++) s -= L[i][k]*y[k]; y[i] = s/L[i][i]; }
+  const x = new Float64Array(m);
+  for (let i = m-1; i >= 0; i--) { let s = y[i]; for (let k = i+1; k < m; k++) s -= L[k][i]*x[k]; x[i] = s/L[i][i]; }
+  return x;
+}
+
+const raC = fitComponent(e => e.dRA);
+const decC = fitComponent(e => e.dDec);
+const round6 = v => Math.round(v * 1000000) / 1000000;
+const bestMoonCorrection = {
+  raSinD: round6(raC[0]), raCosD: round6(raC[1]),
+  raSinMp: round6(raC[2]), raCosMp: round6(raC[3]),
+  raSinMs: round6(raC[4]), raCosMs: round6(raC[5]),
+  decSinD: round6(decC[0]), decCosD: round6(decC[1]),
+  decSinMp: round6(decC[2]), decCosMp: round6(decC[3]),
+  decSinMs: round6(decC[4]), decCosMs: round6(decC[5]),
+};
+
+console.log('Fitted coefficients:');
+console.log(`  D:   RA sin=${raC[0].toFixed(6)} cos=${raC[1].toFixed(6)}  Dec sin=${decC[0].toFixed(6)} cos=${decC[1].toFixed(6)}`);
+console.log(`  Mp:  RA sin=${raC[2].toFixed(6)} cos=${raC[3].toFixed(6)}  Dec sin=${decC[2].toFixed(6)} cos=${decC[3].toFixed(6)}`);
+console.log(`  Ms:  RA sin=${raC[4].toFixed(6)} cos=${raC[5].toFixed(6)}  Dec sin=${decC[4].toFixed(6)} cos=${decC[5].toFixed(6)}`);
+
+// Apply and verify
+C.MOON_CORRECTION = bestMoonCorrection;
+_invalidateGraph();
+const finalBaseline = computeJPLBaseline('moon');
+console.log(`\nMoon RMS after 3-term correction: ${finalBaseline.rmsTotal.toFixed(4)}° (was ${preCorr.rmsTotal.toFixed(4)}°)`);
+
+// ─── Write if --write flag ──────────────────────────────────────────────────
 if (process.argv.includes('--write')) {
-  const jsonPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
-  const mp = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const mpPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
+  const mp = JSON.parse(fs.readFileSync(mpPath, 'utf8'));
   mp.moon.moonStartposNodal = bestNodal;
   mp.moon.moonStartposApsidal = bestApsidal;
   mp.moon.moonStartposMoon = bestMoon;
   mp.moon.moonMeeusLpCorrection = Math.round(bestLpCorrection * 1000000) / 1000000;
-  fs.writeFileSync(jsonPath, JSON.stringify(mp, null, 2) + '\n');
-  console.log('\n✓ Written moonStartposNodal/Apsidal/Moon + moonMeeusLpCorrection to model-parameters.json');
+  fs.writeFileSync(mpPath, JSON.stringify(mp, null, 2) + '\n');
+
+  const fcPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+  const fc = JSON.parse(fs.readFileSync(fcPath, 'utf8'));
+  fc.MOON_CORRECTION = bestMoonCorrection;
+  fs.writeFileSync(fcPath, JSON.stringify(fc, null, 2) + '\n');
+
+  console.log('\n✓ Written to model-parameters.json (startpos + Lp) and fitted-coefficients.json (MOON_CORRECTION)');
 } else {
-  console.log('\n  (dry run — add --write to update model-parameters.json)');
+  console.log('\n  (dry run — add --write to update JSON files)');
 }
 
 // Restore original values in memory

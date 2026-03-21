@@ -971,7 +971,22 @@ function computePlanetPosition(target, jd) {
 
     let newRA = Math.atan2(sinLam * cosE - Math.tan(betR) * sinE, cosLam);
     if (newRA < 0) newRA += 2 * Math.PI;
-    const newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+    let newDec = Math.asin(sinBet * cosE + cosBet * sinE * sinLam);
+
+    // Post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
+    const mc = C.MOON_CORRECTION;
+    if (mc) {
+      const dJD = (graph.moonNodes._meeusT || 0) * 36525;  // days from J2000
+      const Dc  = (297.850 + 12.19074912 * dJD) * d2r;
+      const Mpc = (134.963 + 13.06499295 * dJD) * d2r;
+      const Msc = (357.529 + 0.98560028 * dJD) * d2r;
+      newRA  -= (mc.raSinD  * Math.sin(Dc) + mc.raCosD  * Math.cos(Dc)
+               + mc.raSinMp * Math.sin(Mpc) + mc.raCosMp * Math.cos(Mpc)
+               + mc.raSinMs * Math.sin(Msc) + mc.raCosMs * Math.cos(Msc)) * d2r;
+      newDec -= (mc.decSinD  * Math.sin(Dc) + mc.decCosD  * Math.cos(Dc)
+               + mc.decSinMp * Math.sin(Mpc) + mc.decCosMp * Math.cos(Mpc)
+               + mc.decSinMs * Math.sin(Msc) + mc.decCosMs * Math.cos(Msc)) * d2r;
+    }
 
     sph.theta = newRA;
     sph.phi = Math.PI / 2 - newDec;

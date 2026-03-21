@@ -5867,5 +5867,19 @@
       -29972.93659784634,
       -11026.508226509768
     ]
+  },
+  "MOON_CORRECTION": {
+    "raSinD": 0.000002,
+    "raCosD": -0.005654,
+    "raSinMp": -0.000027,
+    "raCosMp": -0.001423,
+    "raSinMs": -0.000027,
+    "raCosMs": 0.000005,
+    "decSinD": 0.000005,
+    "decCosD": -0.000009,
+    "decSinMp": 0.000017,
+    "decCosMp": -0.000026,
+    "decSinMs": -0.001093,
+    "decCosMs": -0.000257
   }
 }
