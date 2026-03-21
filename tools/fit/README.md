@@ -108,6 +108,14 @@ Step 5b: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
          Updates: model-parameters.json (auto-updated by script)
          Verify: RMS separation < 0.85°, individual eclipses < 2°
 
+Step 5c: conjunction-correction.js            → CONJUNCTION_CORRECTION
+         Two-stage post-parallax correction: fits sin/cos at per-planet synodic
+         periods to the residuals. Captures conjunction signals that the parallax
+         tier system cannot select (too few parameters vs data ratio).
+         Periods: Mars (Jup 2.2yr, Ven 2.7yr), Jupiter (Nep 12.8yr),
+         Saturn (Jup 19.9yr, Ura 136yr), Uranus (Nep 171yr), Neptune (Jup 12.8yr, Sat 35.8yr)
+         Updates: fitted-coefficients.json (auto-updated by script)
+
          Optional diagnostics (skip in standard refit):
          • eoc-fractions.js — scans EoC fraction for Type III planets. No --write.
            Only re-run if planet orbital elements or EoC architecture changes.
@@ -255,6 +263,7 @@ python3 tools/fit/python/train_observed.py --write                           # S
 # Phase 4: Planet positions & corrections
 node tools/fit/parallax-correction.js --write                                # Step 5a
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5b
+node tools/fit/conjunction-correction.js --write                             # Step 5c
 # node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 
@@ -327,6 +336,7 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     train_observed.py            → fitted-coefficients.json  (Step 4d)
     parallax-correction.js       → fitted-coefficients.json  (Step 5a)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5b)
+    conjunction-correction.js    → fitted-coefficients.json  (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 7b)

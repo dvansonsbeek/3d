@@ -65,6 +65,8 @@ const STEPS = [
     cmd: 'node tools/fit/parallax-correction.js --write' },
   { id: '5b', phase: 2, name: 'Moon eclipse optimizer',
     cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
+  { id: '5c', phase: 2, name: 'Conjunction correction',
+    cmd: 'node tools/fit/conjunction-correction.js --write' },
 
   // Phase 5: Cardinal point harmonics
   { id: '6a', phase: 2, name: 'Export cardinal points (~35 min)',
