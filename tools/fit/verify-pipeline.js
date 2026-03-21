@@ -193,9 +193,174 @@ for (const [key, p] of Object.entries(C.planets)) {
 console.log(`  ✓ All derived planet values verified\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 9. Baseline regression check — compare RMS against stored baselines
+// 9. Earth geometry validation
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 9: Baseline regression check ═══');
+console.log('═══ Step 9: Earth geometry validation ═══');
+
+const sg = require('../lib/scene-graph');
+
+// Obliquity at J2000 (from scene-graph at June solstice 2000)
+const solsticeJ2000JD = C.ASTRO_REFERENCE.juneSolstice2000_JD;
+const obliqScene = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD).dec);
+const obliqError = Math.abs(obliqScene - C.ASTRO_REFERENCE.obliquityJ2000_deg) * 3600;
+check('Obliquity at J2000 (scene)', obliqError, 0, 0.01); // within 0.01"
+console.log(`  Obliquity at J2000: ${obliqScene.toFixed(6)}° (IAU: ${C.ASTRO_REFERENCE.obliquityJ2000_deg}°, error: ${obliqError.toFixed(4)}")`);
+
+// Obliquity rate (scene-graph: solstice 2000 vs 2000 + tropicalCentury)
+const obliq2100 = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD + C.tropicalCenturyDays).dec);
+const rateModel = (obliq2100 - obliqScene) * 3600;
+const rateError = Math.abs(rateModel - C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury);
+check('Obliquity rate', rateError, 0, 0.1); // within 0.1"/cy
+console.log(`  Obliquity rate: ${rateModel.toFixed(4)}"/cy (IAU: ${C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury}"/cy, error: ${rateError.toFixed(4)}")`);
+
+// June solstice 2000 timing (find RA=90° crossing near expected JD)
+const ssTargetJD = C.ASTRO_REFERENCE.juneSolstice2000_JD;
+const STEP = 0.5 / 24; // 0.5 hours
+let ssFoundJD = null;
+for (let k = -480; k <= 480; k++) { // ±10 days search
+  const jd1 = ssTargetJD + (k - 1) * STEP;
+  const jd2 = ssTargetJD + k * STEP;
+  const ra1 = ((sg.thetaToRaDeg(sg.computePlanetPosition('sun', jd1).ra) % 360) + 360) % 360;
+  const ra2 = ((sg.thetaToRaDeg(sg.computePlanetPosition('sun', jd2).ra) % 360) + 360) % 360;
+  if (ra1 < 90 && ra2 >= 90) {
+    const t = (90 - ra1) / (ra2 - ra1);
+    ssFoundJD = jd1 + t * STEP;
+    break;
+  }
+}
+if (ssFoundJD) {
+  const ssDiffMin = (ssFoundJD - ssTargetJD) * 24 * 60;
+  check('June solstice 2000 timing', Math.abs(ssDiffMin), 0, 30.0); // within 30 minutes
+  console.log(`  June solstice 2000: JD ${ssFoundJD.toFixed(6)} (ref: ${ssTargetJD}, diff: ${ssDiffMin >= 0 ? '+' : ''}${ssDiffMin.toFixed(2)} min)`);
+}
+
+// Eccentricity at J2000 (from analytical formula, same as script.js)
+const ePhase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / 16);
+const eMean = Math.sqrt(C.eccentricityBase ** 2 + C.eccentricityAmplitude ** 2);
+const h1 = eMean - C.eccentricityBase;
+const eJ2000 = eMean + (-C.eccentricityAmplitude - h1 * Math.cos(ePhase)) * Math.cos(ePhase);
+const eTarget = C.ASTRO_REFERENCE.earthEccentricityJ2000;
+const eError = Math.abs(eJ2000 - eTarget);
+check('e(J2000) vs IAU', eError, 0, 1e-4); // note: analytical formula differs from scene-graph bisection
+console.log(`  e(J2000): ${eJ2000.toFixed(10)} (IAU: ${eTarget}, diff: ${eError.toExponential(2)})`);
+
+// Perihelion longitude at J2000 (from raw harmonic formula)
+const PERI_PERIOD = C.H / 16;
+const t2000 = 2000 - C.balancedYear;
+let periLonJ2000 = 270.0 + (360.0 / PERI_PERIOD) * t2000 + fitted.PERI_OFFSET;
+for (const [div, sinC, cosC] of fitted.PERI_HARMONICS_RAW) {
+  const phase = 2 * Math.PI * t2000 / (C.H / div);
+  periLonJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+}
+periLonJ2000 = ((periLonJ2000 % 360) + 360) % 360;
+const periLonTarget = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
+const periLonError = Math.abs(periLonJ2000 - periLonTarget);
+check('Perihelion longitude at J2000', periLonError, 0, 0.01); // within 0.01°
+console.log(`  Perihelion longitude at J2000: ${periLonJ2000.toFixed(4)}° (ref: ${periLonTarget}°, error: ${periLonError.toFixed(4)}°)`);
+
+// ERD at J2000 (analytical derivative of perihelion harmonics)
+// Coefficients are in degrees, derivative gives °/yr directly
+const meanRate = 360.0 / PERI_PERIOD; // °/yr
+let erdJ2000DegPerYr = 0; // deviation from mean rate
+for (const [div, sinC, cosC] of fitted.PERI_HARMONICS_RAW) {
+  const omega = 2 * Math.PI / (C.H / div); // 1/yr
+  const phase = omega * t2000;
+  erdJ2000DegPerYr += omega * (sinC * Math.cos(phase) - cosC * Math.sin(phase));
+}
+console.log(`  Mean precession rate: ${meanRate.toFixed(6)}°/yr`);
+console.log(`  ERD at J2000: ${(erdJ2000DegPerYr >= 0 ? '+' : '')}${erdJ2000DegPerYr.toFixed(6)}°/yr (deviation from mean)`);
+
+// Year lengths at J2000 vs IAU references
+const astroRef = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
+const ylRef = astroRef.yearLengthRef;
+
+// Tropical year at J2000 (from harmonics)
+let tropJ2000 = C.meanSolarYearDays;
+for (const [div, sinC, cosC] of (fitted.TROPICAL_YEAR_HARMONICS || [])) {
+  const phase = 2 * Math.PI * t2000 / (C.H / div);
+  tropJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+}
+const tropDiffSec = (tropJ2000 - ylRef.tropicalYearMean) * 86400;
+check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 1.0); // within 1 second
+console.log(`  Tropical year at J2000: ${tropJ2000.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s)`);
+
+// Sidereal year at J2000 (from harmonics)
+let sidJ2000 = C.meanSiderealYearDays;
+for (const [div, sinC, cosC] of (fitted.SIDEREAL_YEAR_HARMONICS || [])) {
+  const phase = 2 * Math.PI * t2000 / (C.H / div);
+  sidJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+}
+const sidDiffSec = (sidJ2000 - ylRef.siderealYear) * 86400;
+check('Sidereal year at J2000', Math.abs(sidDiffSec), 0, 1.0); // within 1 second
+console.log(`  Sidereal year at J2000: ${sidJ2000.toFixed(9)} d (IAU: ${ylRef.siderealYear} d, diff: ${sidDiffSec >= 0 ? '+' : ''}${sidDiffSec.toFixed(3)}s)`);
+
+// Anomalistic year at J2000 (from harmonics)
+let anomJ2000 = C.meanAnomalisticYearDays;
+for (const [div, sinC, cosC] of (fitted.ANOMALISTIC_YEAR_HARMONICS || [])) {
+  const phase = 2 * Math.PI * t2000 / (C.H / div);
+  anomJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+}
+const anomDiffSec = (anomJ2000 - ylRef.anomalisticYear) * 86400;
+check('Anomalistic year at J2000', Math.abs(anomDiffSec), 0, 1.0); // within 1 second
+console.log(`  Anomalistic year at J2000: ${anomJ2000.toFixed(9)} d (IAU: ${ylRef.anomalisticYear} d, diff: ${anomDiffSec >= 0 ? '+' : ''}${anomDiffSec.toFixed(3)}s)`);
+
+// Harmonic term counts
+console.log(`  Perihelion harmonics: ${C.PERI_HARMONICS.length} terms`);
+console.log(`  Obliquity harmonics: ${C.SOLSTICE_OBLIQUITY_HARMONICS.length} terms`);
+console.log(`  Cardinal points: SS=${C.CARDINAL_POINT_HARMONICS.SS.length}, WS=${C.CARDINAL_POINT_HARMONICS.WS.length}, VE=${C.CARDINAL_POINT_HARMONICS.VE.length}, AE=${C.CARDINAL_POINT_HARMONICS.AE.length} terms`);
+
+const tropTerms = fitted.TROPICAL_YEAR_HARMONICS?.length || 0;
+const sidTerms = fitted.SIDEREAL_YEAR_HARMONICS?.length || 0;
+const anomTerms = fitted.ANOMALISTIC_YEAR_HARMONICS?.length || 0;
+console.log(`  Year-length harmonics: tropical=${tropTerms}, sidereal=${sidTerms}, anomalistic=${anomTerms} terms`);
+
+// Compare against stored Earth baselines
+const storedBaselinesEarly = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, '..', 'results', 'baselines.json'), 'utf8'));
+const prevEarth = storedBaselinesEarly.earth;
+if (prevEarth) {
+  if (obliqError > prevEarth.obliquityJ2000_error_arcsec + 0.01) {
+    console.log(`  WARNING: Obliquity J2000 error regressed: ${prevEarth.obliquityJ2000_error_arcsec.toFixed(4)}" → ${obliqError.toFixed(4)}"`);
+    totalErrors++;
+  }
+  if (rateError > prevEarth.obliquityRate_error_arcsec + 0.01) {
+    console.log(`  WARNING: Obliquity rate error regressed: ${prevEarth.obliquityRate_error_arcsec.toFixed(4)}" → ${rateError.toFixed(4)}"`);
+    totalErrors++;
+  }
+  if (prevEarth.perihelionLonJ2000_error_deg !== undefined &&
+      periLonError > prevEarth.perihelionLonJ2000_error_deg + 0.005) {
+    console.log(`  WARNING: Perihelion longitude error regressed: ${prevEarth.perihelionLonJ2000_error_deg.toFixed(4)}° → ${periLonError.toFixed(4)}°`);
+    totalErrors++;
+  }
+}
+console.log(`  ✓ Earth geometry verified\n`);
+
+// Store new Earth metrics for --write
+const newEarth = {
+  obliquityJ2000_error_arcsec: Math.round(obliqError * 10000) / 10000,
+  obliquityRate_error_arcsec: Math.round(rateError * 10000) / 10000,
+  perihelionLonJ2000_error_deg: Math.round(periLonError * 10000) / 10000,
+  erdJ2000_degPerYr: Math.round(erdJ2000DegPerYr * 1000000) / 1000000,
+  meanPrecessionRate_degPerYr: Math.round(meanRate * 1000000) / 1000000,
+  tropicalYearJ2000_diff_sec: Math.round(tropDiffSec * 1000) / 1000,
+  siderealYearJ2000_diff_sec: Math.round(sidDiffSec * 1000) / 1000,
+  anomalisticYearJ2000_diff_sec: Math.round(anomDiffSec * 1000) / 1000,
+  perihelionHarmonics_terms: C.PERI_HARMONICS.length,
+  obliquityHarmonics_terms: C.SOLSTICE_OBLIQUITY_HARMONICS.length,
+  cardinalPoints_terms: {
+    SS: C.CARDINAL_POINT_HARMONICS.SS.length,
+    WS: C.CARDINAL_POINT_HARMONICS.WS.length,
+    VE: C.CARDINAL_POINT_HARMONICS.VE.length,
+    AE: C.CARDINAL_POINT_HARMONICS.AE.length,
+  },
+  yearLengthHarmonics_terms: { tropical: tropTerms, sidereal: sidTerms, anomalistic: anomTerms },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 10. Baseline regression check — compare RMS against stored baselines
+// ═══════════════════════════════════════════════════════════════════════════
+console.log('═══ Step 10: Baseline regression check ═══');
 
 const BASELINES_PATH = path.resolve(__dirname, '..', 'results', 'baselines.json');
 const { baseline: computeBaseline } = require('../lib/optimizer');
@@ -226,19 +391,31 @@ for (const target of planetTargets) {
     console.log(`  ${target.padEnd(10)}│ no stored baseline`);
     continue;
   }
+  const round4 = v => Math.round(v * 10000) / 10000;
   const curr = {
-    rmsRA: Math.round(result.rmsRA * 10000) / 10000,
-    rmsDec: Math.round(result.rmsDec * 10000) / 10000,
-    rmsTotal: Math.round(result.rmsTotal * 10000) / 10000,
+    rmsRA: round4(result.rmsRA),
+    rmsDec: round4(result.rmsDec),
+    rmsTotal: round4(result.rmsTotal),
+    maxRA: round4(result.maxRA),
+    maxDec: round4(result.maxDec),
+    entries: result.entries.length,
   };
   newBaselines[target] = curr;
 
   const diff = curr.rmsTotal - prev.rmsTotal;
+  const maxDiff = Math.max(
+    Math.abs(curr.maxRA) - Math.abs(prev.maxRA),
+    Math.abs(curr.maxDec) - Math.abs(prev.maxDec)
+  );
   const pad = (s, n) => String(s).padStart(n);
 
   let status;
   if (diff > 0.001) {
-    status = 'REGRESSION';
+    status = 'REGRESSION (RMS)';
+    regressions++;
+    totalErrors++;
+  } else if (maxDiff > 0.01) {
+    status = 'REGRESSION (max)';
     regressions++;
     totalErrors++;
   } else if (diff < -0.001) {
@@ -249,6 +426,9 @@ for (const target of planetTargets) {
   }
 
   console.log(`  ${target.padEnd(10)}│ ${pad(prev.rmsTotal.toFixed(4), 7)}°│ ${pad(curr.rmsTotal.toFixed(4), 7)}°│ ${pad((diff >= 0 ? '+' : '') + diff.toFixed(4), 7)}°│ ${status}`);
+  if (status.startsWith('REGRESSION')) {
+    console.log(`  ${''.padEnd(10)}│ maxRA: ${pad(Math.abs(prev.maxRA).toFixed(4), 7)}→${pad(Math.abs(curr.maxRA).toFixed(4), 7)}  maxDec: ${pad(Math.abs(prev.maxDec).toFixed(4), 7)}→${pad(Math.abs(curr.maxDec).toFixed(4), 7)}`);
+  }
 }
 
 // Copy Sun/Moon from stored (not re-measured here — use `optimize.js baseline all` for those)
@@ -270,8 +450,9 @@ if (regressions > 0) {
 // Update stored baselines if --write flag
 if (process.argv.includes('--write')) {
   const output = {
-    _description: 'Stored baseline RMS values for regression checking. Updated by verify-pipeline.js --write.',
+    _description: 'Stored baseline values for regression checking. Updated by verify-pipeline.js --write.',
     _updated: new Date().toISOString().slice(0, 10),
+    earth: newEarth,
     targets: newBaselines,
   };
   fs.writeFileSync(BASELINES_PATH, JSON.stringify(output, null, 2) + '\n');

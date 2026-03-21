@@ -1,15 +1,26 @@
 {
-  "_description": "Stored baseline RMS values for regression checking. Updated by verify-pipeline.js --write.",
+  "_description": "Stored baseline values for regression checking. Updated by verify-pipeline.js --write.",
   "_updated": "2026-03-21",
+  "earth": {
+    "obliquityJ2000_error_arcsec": 0.0000,
+    "obliquityRate_error_arcsec": 0.0006,
+    "perihelionLonJ2000_error_deg": 0.0005,
+    "erdJ2000_degPerYr": -0.000097,
+    "meanPrecessionRate_degPerYr": 0.017194,
+    "perihelionHarmonics_terms": 21,
+    "obliquityHarmonics_terms": 16,
+    "cardinalPoints_terms": { "SS": 15, "WS": 21, "VE": 16, "AE": 17 },
+    "yearLengthHarmonics_terms": { "tropical": 6, "sidereal": 3, "anomalistic": 8 }
+  },
   "targets": {
-    "sun":     { "rmsRA": 0.0033, "rmsDec": 0.0001, "rmsTotal": 0.0033 },
-    "moon":    { "rmsRA": 0.0118, "rmsDec": 0.0035, "rmsTotal": 0.0123 },
-    "mercury": { "rmsRA": 0.0040, "rmsDec": 0.0052, "rmsTotal": 0.0066 },
-    "venus":   { "rmsRA": 0.2042, "rmsDec": 0.0876, "rmsTotal": 0.2221 },
-    "mars":    { "rmsRA": 0.0196, "rmsDec": 0.0141, "rmsTotal": 0.0241 },
-    "jupiter": { "rmsRA": 0.0583, "rmsDec": 0.0190, "rmsTotal": 0.0612 },
-    "saturn":  { "rmsRA": 0.0912, "rmsDec": 0.0263, "rmsTotal": 0.0949 },
-    "uranus":  { "rmsRA": 0.0074, "rmsDec": 0.0017, "rmsTotal": 0.0076 },
-    "neptune": { "rmsRA": 0.0072, "rmsDec": 0.0018, "rmsTotal": 0.0075 }
+    "sun":     { "rmsRA": 0.0033, "rmsDec": 0.0001, "rmsTotal": 0.0033, "maxRA": -0.0077, "maxDec": 0.0003, "entries": 52 },
+    "moon":    { "rmsRA": 0.0118, "rmsDec": 0.0035, "rmsTotal": 0.0123, "maxRA": -0.0228, "maxDec": -0.0090, "entries": 6088 },
+    "mercury": { "rmsRA": 0.0038, "rmsDec": 0.0052, "rmsTotal": 0.0065, "maxRA": -0.0116, "maxDec": -0.0222, "entries": 95 },
+    "venus":   { "rmsRA": 0.2041, "rmsDec": 0.0875, "rmsTotal": 0.2221, "maxRA": 0.9347, "maxDec": -0.4520, "entries": 3812 },
+    "mars":    { "rmsRA": 0.0196, "rmsDec": 0.0140, "rmsTotal": 0.0241, "maxRA": -0.0626, "maxDec": 0.0454, "entries": 184 },
+    "jupiter": { "rmsRA": 0.0572, "rmsDec": 0.0218, "rmsTotal": 0.0612, "maxRA": 0.1635, "maxDec": 0.0713, "entries": 2499 },
+    "saturn":  { "rmsRA": 0.0913, "rmsDec": 0.0259, "rmsTotal": 0.0949, "maxRA": -0.4331, "maxDec": 0.1188, "entries": 2502 },
+    "uranus":  { "rmsRA": 0.0072, "rmsDec": 0.0022, "rmsTotal": 0.0076, "maxRA": -0.0200, "maxDec": 0.0058, "entries": 41 },
+    "neptune": { "rmsRA": 0.0070, "rmsDec": 0.0025, "rmsTotal": 0.0075, "maxRA": -0.0250, "maxDec": 0.0068, "entries": 69 }
   }
 }
