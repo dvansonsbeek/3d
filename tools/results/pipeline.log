@@ -1,0 +1,187 @@
+[13:17:32] Pipeline started: 2026-03-21T13:17:32.835Z
+[13:17:32] Steps: 1, 2
+[13:17:32] Log: /home/dennis/code/3d/tools/results/pipeline.log
+[13:17:32] 
+[13:17:32] ── Step 1: Sun optimizer ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: SUN — correctionSun
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   correctionSun                      0.496423       0.496423       0.000000
+   
+   Initial error: 0.0033°
+   Final error:   0.0033°
+   Improvement:   0.00%
+   Iterations:    10
+   
+   ── Derived eccentricity (e(J2000) constraint) ──
+     eccentricityBase     : 0.01537159   (Law 5 locked)
+     eccentricityAmplitude: 0.00137074   (derived from base + perihelionalignmentYear)
+     e(J2000) achieved    : 0.0167102200  target: 0.01671022  residual: 4.50e-14
+   
+   ── Perihelion longitude (barycenter.RA at J2000) ──
+     eccentricityBase     : 0.00885461   (derived from RA = 102.947° constraint)
+     eccentricityAmplitude: 0.00796282   (derived)
+     barycenter.RA at J2000: 97.435671   target: 102.947   diff: -5.511329°
+   
+   ── Obliquity at J2000 (IAU: 23.439291°) ──
+     earthtiltMean               : 23.41365771
+     earthInvPlaneInclinationAmpl: 0.63545912
+     earthInvPlaneInclinationMean: 1.48136963
+     Model obliquity : 23.43929111 °
+     IAU obliquity   : 23.43929111 °
+     Difference      : +0.0000 "  ✓ OK
+   
+   ── Obliquity rate (IAU 2006: -46.836769"/cy) ──
+     Model rate : -46.8368 "/century
+     IAU rate   : -46.8368 "/century
+     Difference : -0.0000 "  ✓ OK  (tolerance: 0.1"/cy)
+   
+     ✓ Written to model-parameters.json
+[13:17:33]    ✓ Step 1: Sun optimizer (0.5s)
+[13:17:33] ── Step 2: Planet startpos: mercury ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: MERCURY — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                          83.528739      83.528739       0.000000
+   
+   Initial error: 0.0065°
+   Final error:   0.0065°
+   Improvement:   0.00%
+   Iterations:    15
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : 0.97090764
+     Scene RA at J2000: 77.456913°   target: 77.456913°   diff: +0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:34]    ✓ Step 2: Planet startpos: mercury (1.0s)
+[13:17:34] ── Step 2: Planet startpos: venus ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: VENUS — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                         249.319046     249.319046       0.000000
+   
+   Initial error: 0.2221°
+   Final error:   0.2221°
+   Improvement:   0.00%
+   Iterations:    18
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : -2.80286845
+     Scene RA at J2000: 131.576592°   target: 131.576592°   diff: -0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:38]    ✓ Step 2: Planet startpos: venus (4.3s)
+[13:17:38] ── Step 2: Planet startpos: mars ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: MARS — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                         121.467951     121.467951       0.000000
+   
+   Initial error: 0.0241°
+   Final error:   0.0241°
+   Improvement:   0.00%
+   Iterations:    19
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : -2.10936211
+     Scene RA at J2000: 336.065068°   target: 336.065068°   diff: -0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:39]    ✓ Step 2: Planet startpos: mars (1.3s)
+[13:17:39] ── Step 2: Planet startpos: jupiter ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: JUPITER — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                          13.850211      13.850211       0.000000
+   
+   Initial error: 0.0612°
+   Final error:   0.0612°
+   Improvement:   0.00%
+   Iterations:    13
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : 0.92703556
+     Scene RA at J2000: 14.706594°   target: 14.706594°   diff: +0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:42]    ✓ Step 2: Planet startpos: jupiter (2.6s)
+[13:17:42] ── Step 2: Planet startpos: saturn ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: SATURN — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                          11.319914      11.319900      -0.000014
+   
+   Initial error: 0.0949°
+   Final error:   0.0949°
+   Improvement:   0.00%
+   Iterations:    15
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : -0.17477220
+     Scene RA at J2000: 92.127943°   target: 92.127943°   diff: -0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:45]    ✓ Step 2: Planet startpos: saturn (2.9s)
+[13:17:45] ── Step 2: Planet startpos: uranus ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: URANUS — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                          44.880689      44.880686      -0.000003
+   
+   Initial error: 0.0076°
+   Final error:   0.0076°
+   Improvement:   0.00%
+   Iterations:    19
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : -0.73459618
+     Scene RA at J2000: 170.730825°   target: 170.730825°   diff: -0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:46]    ✓ Step 2: Planet startpos: uranus (1.2s)
+[13:17:46] ── Step 2: Planet startpos: neptune ──
+   ═══════════════════════════════════════════════════════════════
+     OPTIMIZE: NEPTUNE — startpos
+     Max iterations: 500
+   ═══════════════════════════════════════════════════════════════
+   
+   Parameter                           Initial      Optimized         Change
+   startpos                          47.955085      47.955078      -0.000007
+   
+   Initial error: 0.0075°
+   Final error:   0.0075°
+   Improvement:   0.00%
+   Iterations:    19
+   
+   ── Derived angleCorrection (perihelion direction) ──
+     angleCorrection  : 2.33381837
+     Scene RA at J2000: 45.801245°   target: 45.801245°   diff: -0.000000°  ✓ OK
+   
+     ✓ Written to model-parameters.json
+[13:17:47]    ✓ Step 2: Planet startpos: neptune (1.2s)
+[13:17:47] 
+[13:17:47] ═══════════════════════════════════════════════════════════════
+[13:17:47]   Pipeline COMPLETE: 8 steps passed in 0.3 min
+[13:17:47] ═══════════════════════════════════════════════════════════════
