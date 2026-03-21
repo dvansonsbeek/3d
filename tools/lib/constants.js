@@ -107,6 +107,7 @@ const moonDistance = astroRef.moonReference.moonDistance;
 const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinationJ2000;
 const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
 const moonTilt = astroRef.moonReference.moonTilt;
+const moonMeeusLpCorrection = modelParams.moon.moonMeeusLpCorrection || 0;
 const moonStartposApsidal = modelParams.moon.moonStartposApsidal;
 const moonStartposNodal = modelParams.moon.moonStartposNodal;
 const moonStartposMoon = modelParams.moon.moonStartposMoon;
@@ -432,6 +433,7 @@ module.exports = {
   moonNodalMonthInput,
   moonDistance,
   moonEclipticInclinationJ2000,
+  moonMeeusLpCorrection,
   moonOrbitalEccentricity,
   moonTilt,
   moonStartposApsidal,

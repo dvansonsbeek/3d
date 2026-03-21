@@ -371,9 +371,9 @@ const newBaselines = {};
 
 const storedBaselines = JSON.parse(fs.readFileSync(BASELINES_PATH, 'utf8'));
 
-// Planets use reference-data.json (synchronous). Sun and Moon need JPL fetch (async),
-// so we only check planets here. Sun/Moon baselines are checked via `optimize.js baseline all`.
-const planetTargets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+// Planets and Moon use reference-data.json (synchronous).
+// Sun needs JPL fetch (async) — checked via `optimize.js baseline all`.
+const planetTargets = ['moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
 console.log('  Target    │ Stored  │ Current │ Change  │ Status');
 console.log('  ──────────┼─────────┼─────────┼─────────┼───────');
@@ -431,12 +431,10 @@ for (const target of planetTargets) {
   }
 }
 
-// Copy Sun/Moon from stored (not re-measured here — use `optimize.js baseline all` for those)
-for (const t of ['sun', 'moon']) {
-  if (storedBaselines.targets[t]) {
-    newBaselines[t] = storedBaselines.targets[t];
-    console.log(`  ${t.padEnd(10)}│ ${storedBaselines.targets[t].rmsTotal.toFixed(4).padStart(7)}°│ (skip)  │         │ needs JPL fetch`);
-  }
+// Copy Sun from stored (not re-measured here — needs JPL fetch via `optimize.js baseline all`)
+if (storedBaselines.targets.sun) {
+  newBaselines.sun = storedBaselines.targets.sun;
+  console.log(`  sun       │ ${storedBaselines.targets.sun.rmsTotal.toFixed(4).padStart(7)}°│ (skip)  │         │ needs JPL fetch`);
 }
 
 if (regressions > 0) {

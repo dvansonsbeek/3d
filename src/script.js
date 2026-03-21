@@ -74,9 +74,10 @@ const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3
 const debugOn = false;                                     // Debug button flag
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
-const moonStartposApsidal = 347.622;                      // Eclipse-optimizer tuned (Step 2b)
-const moonStartposNodal = -83.630;                        // Eclipse-optimizer tuned (Step 2b)
-const moonStartposMoon = 131.930;                         // Eclipse-optimizer tuned (Step 2b)
+const moonStartposApsidal = 347.622;                      // Eclipse-optimizer tuned (Step 5b)
+const moonStartposNodal = -83.630;                        // Eclipse-optimizer tuned (Step 5b)
+const moonStartposMoon = 131.930;                         // Eclipse-optimizer tuned (Step 5b)
+const moonMeeusLpCorrection = 0.010525;                   // Meeus Lp longitude correction (DE200→DE440 offset)
 
 // ─── C2. Sun & Moon astro references ─────────────────────────────────────
 const sunTilt = 7.155;                                    // Solar obliquity to ecliptic
@@ -31114,7 +31115,7 @@ function moveModel(pos) {
       // Re-add the EoC half that was subtracted from Sl for the hierarchy θ correction.
       const fullSl = Sl + (2 * eocHalf / _d2r * 1e6) * Math.sin(Mpr)
                        + (1.25 * eocHalf * eocHalf / _d2r * 1e6) * Math.sin(2*Mpr);
-      obj._meeusLonDeg = Lp / _d2r + fullSl * 1e-6;  // ecliptic longitude in degrees
+      obj._meeusLonDeg = Lp / _d2r + fullSl * 1e-6 + moonMeeusLpCorrection;  // ecliptic longitude in degrees
       obj._meeusT = T;  // store T for obliquity computation
     }
 

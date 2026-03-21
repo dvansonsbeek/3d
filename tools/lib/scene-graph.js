@@ -727,7 +727,7 @@ function moveModel(graph, pos) {
       // Full Meeus ecliptic longitude for post-hoc RA override
       const fullSl = Sl + (2 * eocHalf / d2r * 1e6) * Math.sin(Mpr)
                        + (1.25 * eocHalf * eocHalf / d2r * 1e6) * Math.sin(2*Mpr);
-      nodes._meeusLonDeg = Lp / d2r + fullSl * 1e-6;
+      nodes._meeusLonDeg = Lp / d2r + fullSl * 1e-6 + C.moonMeeusLpCorrection;
       nodes._meeusT = T;
     }
     if (nodes.isEllipse) {

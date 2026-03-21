@@ -162,20 +162,51 @@ for (const d of final.details) {
   console.log(`${d.label.padEnd(25)} ${d.sep.toFixed(2).padStart(5)}  ${d.dRA.toFixed(2).padStart(7)}  ${d.dDec.toFixed(2).padStart(7)}`);
 }
 
+// ─── Meeus Lp correction: measure mean RA bias against JPL reference ────────
+console.log('\n═══ MEEUS Lp CORRECTION (JPL baseline) ═══\n');
+
+const fs = require('fs');
+const path = require('path');
+const { baseline: computeJPLBaseline } = require('../lib/optimizer');
+
+// Apply the optimized startpos for the Lp measurement
+setParams(bestNodal, bestApsidal, bestMoon);
+
+// Save current Lp correction, then zero it out to measure raw bias
+const origLpCorr = C.moonMeeusLpCorrection;
+C.moonMeeusLpCorrection = 0;
+_invalidateGraph();
+
+const rawBaseline = computeJPLBaseline('moon');
+let sumRA = 0;
+for (const e of rawBaseline.entries) sumRA += e.dRA;
+const rawBias = sumRA / rawBaseline.entries.length;
+const bestLpCorrection = -rawBias;
+
+console.log(`Raw RA bias (no Lp correction): ${rawBias.toFixed(6)}° (${rawBaseline.entries.length} JPL points)`);
+console.log(`Optimal Lp correction: ${bestLpCorrection.toFixed(6)}° (was ${origLpCorr})`);
+
+// Apply correction and verify
+C.moonMeeusLpCorrection = bestLpCorrection;
+_invalidateGraph();
+
+const correctedBaseline = computeJPLBaseline('moon');
+console.log(`Moon RMS after Lp correction: ${correctedBaseline.rmsTotal.toFixed(4)}° (was ${rawBaseline.rmsTotal.toFixed(4)}°)`);
+
 // ─── Write to model-parameters.json if --write flag ─────────────────────────
 if (process.argv.includes('--write')) {
-  const fs = require('fs');
-  const path = require('path');
   const jsonPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
   const mp = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   mp.moon.moonStartposNodal = bestNodal;
   mp.moon.moonStartposApsidal = bestApsidal;
   mp.moon.moonStartposMoon = bestMoon;
+  mp.moon.moonMeeusLpCorrection = Math.round(bestLpCorrection * 1000000) / 1000000;
   fs.writeFileSync(jsonPath, JSON.stringify(mp, null, 2) + '\n');
-  console.log('\n✓ Written moonStartposNodal/Apsidal/Moon to model-parameters.json');
+  console.log('\n✓ Written moonStartposNodal/Apsidal/Moon + moonMeeusLpCorrection to model-parameters.json');
 } else {
   console.log('\n  (dry run — add --write to update model-parameters.json)');
 }
 
 // Restore original values in memory
+C.moonMeeusLpCorrection = origLpCorr;
 setParams(origNodal, origApsidal, origMoon);
