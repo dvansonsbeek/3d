@@ -11,7 +11,9 @@
  * 2. Compares pure Meeus Moon position against JPL Horizons for independent verification
  */
 
+const C = require('../lib/constants');
 const d2r = Math.PI / 180;
+const obliquityJ2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg;
 
 // Full Meeus Ch. 47 tables (same as moon-full-meeus-test.js)
 const TABLE_47A = [
@@ -321,7 +323,7 @@ for (const e of ECLIPSES) {
   if (dLam < -180) dLam += 360;
 
   // Convert to equatorial for proper separation
-  const eps = (23.4393 - 0.01300 * moon.T) * d2r;
+  const eps = (obliquityJ2000 - 0.01300 * moon.T) * d2r;
   const cosE = Math.cos(eps), sinE = Math.sin(eps);
 
   const moonLamR = moon.lambda_deg * d2r, moonBetR = moon.beta_deg * d2r;
@@ -364,7 +366,7 @@ const gammas = ECLIPSES.map(e => Math.abs(e.gamma));
 const seps = ECLIPSES.map(e => {
   const moon = meeusFullMoon(e.jd);
   const sun = meeusSun(e.jd);
-  const eps = (23.4393 - 0.01300 * moon.T) * d2r;
+  const eps = (obliquityJ2000 - 0.01300 * moon.T) * d2r;
   const cosE = Math.cos(eps), sinE = Math.sin(eps);
   const moonLamR = moon.lambda_deg * d2r, moonBetR = moon.beta_deg * d2r;
   const moonRA = Math.atan2(Math.sin(moonLamR) * cosE - Math.tan(moonBetR) * sinE, Math.cos(moonLamR));

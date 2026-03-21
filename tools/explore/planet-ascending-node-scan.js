@@ -36,7 +36,7 @@ const dates = {
   ],
 };
 
-const obliquity = 23.4393;
+const obliquity = C.ASTRO_REFERENCE.obliquityJ2000_deg;
 
 async function main() {
   const jds = dates[target];

@@ -198,9 +198,12 @@ const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 const totalDaysInH = H * meanSolarYearDays;
 
-// J2000.0 epoch and Julian century derived from model constants
-const j2000JD = startmodelJD - (startmodelYear - astroRef.earthOrbital.j2000EpochYear) * meanSolarYearDays;
-const julianCenturyDays = 100 * meanSolarYearDays;
+// J2000.0 epoch (standard astronomical convention: Jan 1.5, 2000 TT = JD 2451545.0)
+// Julian century = exactly 36525 days by IAU definition (used in Meeus, IAU precession, parallax)
+// Tropical century = 100 model tropical years (used in obliquity rate solver for phase-clean measurement)
+const j2000JD = 2451545.0;
+const julianCenturyDays = 36525;
+const tropicalCenturyDays = 100 * meanSolarYearDays;
 
 // Equation of center eccentricity — derived, not a free parameter.
 const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
@@ -456,6 +459,7 @@ module.exports = {
   totalDaysInH,
   j2000JD,
   julianCenturyDays,
+  tropicalCenturyDays,
   eocEccentricity,
   perihelionPhaseOffset,
   TROPICAL_YEAR_HARMONICS: fitted.TROPICAL_YEAR_HARMONICS,

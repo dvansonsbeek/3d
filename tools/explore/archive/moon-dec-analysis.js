@@ -20,7 +20,7 @@ const jpl = require('../lib/horizons-client');
 
 const d2r = Math.PI / 180;
 const r2d = 180 / Math.PI;
-const obliquity = 23.4393 * d2r; // mean obliquity
+const obliquity = C.ASTRO_REFERENCE.obliquityJ2000_deg * d2r; // mean obliquity
 
 // ─── Equatorial to Ecliptic conversion ───────────────────────────────────
 function equatorialToEcliptic(raDeg, decDeg) {

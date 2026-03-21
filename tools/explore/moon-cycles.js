@@ -50,12 +50,13 @@ console.log();
 console.log('─── 2. Derived Months — Model vs Known ──────────────────────');
 console.log();
 
+const kv = C.knownValues;
 const monthComparisons = [
-  { name: 'Sidereal month', model: C.moonSiderealMonth, known: 27.321662, unit: 'd' },
-  { name: 'Anomalistic month', model: C.moonAnomalisticMonth, known: 27.554550, unit: 'd' },
-  { name: 'Nodal (draconic) month', model: C.moonNodalMonth, known: 27.212221, unit: 'd' },
-  { name: 'Synodic month', model: C.moonSynodicMonth, known: 29.530589, unit: 'd' },
-  { name: 'Tropical month', model: C.moonTropicalMonth, known: 27.321582, unit: 'd' },
+  { name: 'Sidereal month', model: C.moonSiderealMonth, known: C.moonSiderealMonthInput, unit: 'd' },
+  { name: 'Anomalistic month', model: C.moonAnomalisticMonth, known: C.moonAnomalisticMonthInput, unit: 'd' },
+  { name: 'Nodal (draconic) month', model: C.moonNodalMonth, known: C.moonNodalMonthInput, unit: 'd' },
+  { name: 'Synodic month', model: C.moonSynodicMonth, known: kv.moonSynodicMonth, unit: 'd' },
+  { name: 'Tropical month', model: C.moonTropicalMonth, known: kv.moonTropicalMonth, unit: 'd' },
 ];
 
 const mcHeader = ['Month type', 'Model (d)', 'Known (d)', 'Diff (s)', 'Diff (ppm)'];
@@ -87,8 +88,8 @@ const precComparisons = [
   {
     name: 'Apsidal precession (Earth frame)',
     modelDays: C.moonApsidalPrecessionDaysEarth,
-    knownYears: 8.849,
-    knownDays: 8.849 * 365.25,
+    knownYears: kv.moonApsidalPrecessionYears,
+    knownDays: kv.moonApsidalPrecessionYears * C.meanSolarYearDays,
   },
   {
     name: 'Apsidal precession (ICRF)',
@@ -99,8 +100,8 @@ const precComparisons = [
   {
     name: 'Nodal precession (Earth frame)',
     modelDays: C.moonNodalPrecessionDaysEarth,
-    knownYears: 18.613,
-    knownDays: 18.613 * 365.25,
+    knownYears: kv.moonNodalPrecessionYears,
+    knownDays: kv.moonNodalPrecessionYears * C.meanSolarYearDays,
   },
   {
     name: 'Nodal precession (ICRF)',
@@ -163,7 +164,7 @@ for (const [key, s] of Object.entries(saros)) {
   }
 }
 
-const knownSaros = 6585.32;
+const knownSaros = kv.sarosDays;
 console.log();
 console.log(`    Known Saros:           ~${knownSaros} days`);
 console.log(`    Model vs known:        ${(sarosBase - knownSaros).toFixed(4)} days = ${((sarosBase - knownSaros) * 24).toFixed(2)} hours`);
@@ -239,7 +240,7 @@ console.log();
 console.log('─── 6. Full Moon Cycle ───────────────────────────────────────');
 console.log();
 
-const knownFMC = 411.78; // days (approximately)
+const knownFMC = kv.fullMoonCycleDays;
 console.log(`  Full Moon Cycle (Earth): ${C.moonFullMoonCycleEarth.toFixed(6)} days = ${(C.moonFullMoonCycleEarth / C.meanSolarYearDays).toFixed(6)} years`);
 console.log(`  Full Moon Cycle (ICRF):  ${C.moonFullMoonCycleICRF.toFixed(6)} days`);
 console.log(`  Known:                   ~${knownFMC} days`);

@@ -22,7 +22,7 @@ const dates = [
   { label: 'Opp 2024', jd: 2460561.5 },
 ];
 
-const obliquity = 23.4393;
+const obliquity = C.ASTRO_REFERENCE.obliquityJ2000_deg;
 
 function equatorialToEcliptic(raDeg, decDeg, obliquityDeg) {
   const eps = obliquityDeg * d2r;

@@ -1,6 +1,6 @@
 # Sun Baseline — RMS vs JPL Horizons
 
-**Last updated:** 2026-03-20
+**Last updated:** 2026-03-21
 **Reference:** JPL Horizons, yearly winter + summer dates
 **Precession:** IAU 1976 (Meeus) J2000 → of-date applied to JPL reference frame
 
@@ -37,13 +37,16 @@ Max ΔRA: 0.0130°  Max ΔDec: 0.0004°
 
 | Parameter                          | Value         | Method                                      |
 |------------------------------------|---------------|---------------------------------------------|
-| `correctionSun`                    | 0.495997      | NM optimizer, 52 ref dates (winter+summer)  |
+| `correctionSun`                    | 0.496423      | NM optimizer, 52 ref dates (winter+summer)  |
 | `perihelionalignmentYear`          | 1246          | Scan confirmed optimal                      |
 | `eccentricityBase`                 | 0.01537159    | Law 5 locked                                |
 | `eccentricityAmplitude`            | 0.00137074    | Bisection → scene e(J2000) = 0.01671022     |
-| `earthtiltMean`                    | 23.41365930   | Bisection → IAU obliquity at J2000 exactly  |
-| `earthInvPlaneInclinationAmplitude`| 0.63541988    | Bisection → IAU rate −46.837″/cy exactly    |
-| `earthInvPlaneInclinationMean`     | 1.48137564    | Derived from amplitude                      |
+| `earthtiltMean`                    | 23.41365805   | Bisection → IAU obliquity at J2000 exactly  |
+| `earthInvPlaneInclinationAmplitude`| 0.63545059    | Bisection → IAU rate −46.836″/cy exactly    |
+| `earthInvPlaneInclinationMean`     | 1.48137094    | Derived from amplitude                      |
+| `j2000JD`                          | 2451545.0     | Standard J2000.0 epoch (was model-derived)  |
+| `julianCenturyDays`                | 36525         | IAU Julian century (was tropical century)   |
+| `tropicalCenturyDays`              | 36524.22      | 100 × meanSolarYearDays (obliquity solver)  |
 
 ---
 
@@ -53,7 +56,7 @@ Max ΔRA: 0.0130°  Max ΔDec: 0.0004°
 |-------------------------------|----------------|----------------|------------|
 | Eccentricity at J2000         | 0.0167102200   | 0.0167102200   | 2.6e-13    |
 | Obliquity at J2000            | 23.43929111°   | 23.43929111°   | −0.0000″   |
-| Obliquity rate                | −46.8345″/cy   | −46.8368″/cy   | +0.0023″ ✓ |
+| Obliquity rate                | −46.8361″/cy   | −46.8368″/cy   | +0.0006″ ✓ |
 | June solstice 2000 (JD)       | 2451716.575000 | 2451716.575000 | 0.00 min   |
 | Perihelion longitude at J2000 | 97.435°        | 102.947°       | −5.51°     |
 

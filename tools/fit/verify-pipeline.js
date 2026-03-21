@@ -106,7 +106,7 @@ for (const [div, sinC, cosC] of C.SOLSTICE_OBLIQUITY_HARMONICS) {
   const phase = 2 * Math.PI * (2000 - C.balancedYear) / (C.H / div);
   obliq += sinC * Math.sin(phase) + cosC * Math.cos(phase);
 }
-check('J2000 obliquity vs IAU', Math.abs(obliq - 23.439291111) * 3600, 0, 0.1); // within 0.1"
+check('J2000 obliquity vs IAU', Math.abs(obliq - C.ASTRO_REFERENCE.obliquityJ2000_deg) * 3600, 0, 0.1); // within 0.1"
 console.log(`  ✓ OBLIQUITY: ${stored.SOLSTICE_OBLIQUITY_HARMONICS.length} terms match, J2000=${obliq.toFixed(6)}°\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════

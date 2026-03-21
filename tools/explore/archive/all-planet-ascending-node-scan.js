@@ -20,7 +20,7 @@ function equatorialToEcliptic(raDeg, decDeg, obliquityDeg) {
   return { lon: lam, lat: Math.asin(sinBet) * r2d };
 }
 
-const obliquity = 23.4393;
+const obliquity = C.ASTRO_REFERENCE.obliquityJ2000_deg;
 
 // Opposition/conjunction dates for each planet
 const dates = {

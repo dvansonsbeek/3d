@@ -162,7 +162,7 @@ function recomputePerihelionDerived() {
 function solveAmplitudeForObliquityRate() {
   const target = C.ASTRO_REFERENCE.obliquityRate_arcsecPerCentury;  // negative
   const solsticeJ2000 = C.ASTRO_REFERENCE.juneSolstice2000_JD;
-  const solsticeJ2100 = solsticeJ2000 + C.julianCenturyDays;
+  const solsticeJ2100 = solsticeJ2000 + C.tropicalCenturyDays;  // 100 tropical years for phase-clean measurement
 
   function measureRate(A) {
     const saved = C.earthInvPlaneInclinationAmplitude;
@@ -1150,7 +1150,7 @@ function nelderMead(planet, paramNames, options = {}) {
     // earthInvPlaneInclinationAmplitude and earthtiltMean were solved analytically before NM
     // and persist in C; result contains only the NM-free params (e.g. correctionSun).
     const solsticeJ2000 = C.ASTRO_REFERENCE.juneSolstice2000_JD;
-    const solsticeJ2100 = solsticeJ2000 + C.julianCenturyDays;
+    const solsticeJ2100 = solsticeJ2000 + C.tropicalCenturyDays;  // 100 tropical years for phase-clean measurement
     const [modelObliqDeg, modelObliqRateArcsecCy] = withOverrides(planet, result, () => {
       sg._invalidateGraph();
       const d0 = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000).dec);

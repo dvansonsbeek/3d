@@ -962,7 +962,7 @@ function computePlanetPosition(target, jd) {
   if (target === 'moon' && C.useVariableSpeed &&
       graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {
     const T = graph.moonNodes._meeusT || 0;
-    const eps = (23.4393 - 0.01300 * T) * d2r;
+    const eps = (C.ASTRO_REFERENCE.obliquityJ2000_deg - 0.01300 * T) * d2r;
     const cosE = Math.cos(eps), sinE = Math.sin(eps);
     const lamR = graph.moonNodes._meeusLonDeg * d2r;
     const betR = graph.moonNodes._meeusLatDeg * d2r;

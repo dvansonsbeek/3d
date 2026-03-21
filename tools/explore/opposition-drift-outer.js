@@ -243,7 +243,7 @@ function scanPeriods(planet, knownOpps, startYear, endYear, stepDays, baseInput,
       const lateMean = lateMatches.length > 0 ? lateMatches.reduce((a, m) => a + m.diffDays, 0) / lateMatches.length : NaN;
       const drift = earlyMean - lateMean;
 
-      const count = Math.round(335008 * 365.2421897 / testInput);
+      const count = Math.round(C.H * C.meanSolarYearDays / testInput);
       const marker = testInput === origInput ? ' *' : '';
       console.log('  ' + C.pad(testInput.toFixed(1) + marker, 16) + ' | ' +
         C.padLeft(count.toString(), 8) + ' | ' +

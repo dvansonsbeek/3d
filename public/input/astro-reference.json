@@ -234,15 +234,14 @@
   },
 
   "knownValues": {
-    "_description": "Validation reference values for comparison",
+    "_description": "Validation reference values for comparison (used by moon-cycles.js). Moon month inputs are in moonReference — not duplicated here.",
     "jupiterSaturnConjunctionPeriod": 19.859,
     "moonSynodicMonth": 29.530589,
     "moonTropicalMonth": 27.321582,
-    "moonAnomalisticMonth": 27.554550,
-    "moonDraconicMonth": 27.212221,
     "moonNodalPrecessionYears": 18.613,
     "moonApsidalPrecessionYears": 8.849,
     "moonDraconicYear": 346.620,
+    "fullMoonCycleDays": 411.78,
     "sarosDays": 6585.32,
     "exeligmosDays": 19755.96
   },

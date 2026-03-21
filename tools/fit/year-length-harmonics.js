@@ -40,7 +40,7 @@ for _, r in df.iterrows():
 json.dump(rows, sys.stdout)
 `;
   const result = execSync(`python3 -c "${script.replace(/"/g, '\\"')}"`, {
-    encoding: 'utf8', timeout: 15000,
+    encoding: 'utf8', timeout: 30000, maxBuffer: 100 * 1024 * 1024,
   });
   return JSON.parse(result);
 }
@@ -218,6 +218,19 @@ function main() {
   console.log(`Tropical     | ${tropical.rmse.toFixed(4)}s     | ${tropicalGreedy.rmse.toFixed(4)}s  | [${tropicalGreedy.divisors.join(',')}]`);
   console.log(`Sidereal     | ${sidereal.rmse.toFixed(4)}s     | ${siderealGreedy.rmse.toFixed(4)}s  | [${siderealGreedy.divisors.join(',')}]`);
   console.log(`Anomalistic  | ${anom.rmse.toFixed(4)}s     | ${anomGreedy.rmse.toFixed(4)}s  | [${anomGreedy.divisors.join(',')}]`);
+
+  // ─── Write to fitted-coefficients.json if --write flag ──────────────
+  if (process.argv.includes('--write')) {
+    const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
+    const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    fc.TROPICAL_YEAR_HARMONICS = tropicalGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
+    fc.SIDEREAL_YEAR_HARMONICS = siderealGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
+    fc.ANOMALISTIC_YEAR_HARMONICS = anomGreedy.harmonics.map(([div, s, c]) => [div, s, c]);
+    fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
+    console.log('\n✓ Written TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS to fitted-coefficients.json');
+  } else {
+    console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
+  }
 }
 
 main();

@@ -16,6 +16,7 @@ After writing, run `export-to-script.js --write` to sync values to `src/script.j
 | `export-cardinal-points.js` | `data/02-cardinal-points.csv` | Scene-graph simulation |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (12 terms) | `data/02-cardinal-points.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×12 terms) | `data/02-cardinal-points.csv` |
+| `export-year-lengths.js` | `data/03-year-length-analysis.xlsx` | Scene-graph simulation (headless) |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/03-year-length-analysis.xlsx` |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 42p/planet) | `data/reference-data.json` |
@@ -115,14 +116,15 @@ Step 6:  python/train_observed.py             → tools/lib/python/coefficients/
 
 ── Phase 4: Planet positions & corrections ──────────────────────────
 
-Step 7:  eoc-fractions.js                     → per-planet eocFraction
+Step 7:  eoc-fractions.js                     → per-planet eocFraction  (DIAGNOSTIC, skip in standard refit)
          Scans EoC fraction 0→1 for Type III planets (Jupiter, Saturn, Uranus, Neptune)
-         Updates: model-parameters.json + script.js (eocFraction per Type III planet, manual)
+         Informational only — no --write flag. Values rarely change (<0.01° impact).
+         Only re-run if planet orbital elements or EoC architecture changes.
 
-Step 8:  ascnode-correction.js                → startpos per planet
+Step 8:  ascnode-correction.js                → startpos per planet  (DIAGNOSTIC, skip in standard refit)
          Scans ascNodeTiltCorrection (derived from startpos), re-optimizes startpos
-         Updates: model-parameters.json + script.js (startpos per planet, manual)
-         Note: ascNodeTiltCorrection is derived (2*startpos or 180-ascendingNode)
+         Informational only — no --write flag. Step 2 already optimizes startpos/angleCorrection.
+         Only re-run if ascending node reference values or inclination model changes.
 
 Step 9:  parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Fits up to 42-parameter RA/Dec correction per planet via cross-validation
@@ -139,8 +141,50 @@ Step 11: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
 Step 12: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 13: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
-         Updates: fitted-coefficients.json (auto-updated by script)
+Step 13a: export-year-lengths.js               → data/03-year-length-analysis.xlsx
+          Measures tropical (RA crossings), sidereal (world-angle crossings),
+          and anomalistic (WobbleCenter→Sun peri+aph mean) year lengths.
+          Uses headless scene-graph — no browser needed.
+          Default: full H at 29-year steps (11,553 points, ~90 min).
+          Custom range: --start -23200 --end 25800 --step 100
+
+          Year-length measurement method (same 3 types as browser report):
+
+          1. TROPICAL YEAR — Sun RA crossing intervals
+             Finds when Sun RA crosses 4 cardinal angles (0°, 90°, 180°, 270°).
+             For each angle, measures the interval between crossing at year Y
+             and crossing at year Y−N (where N = step size in years).
+             Mean tropical year = average of all 4 intervals, divided by N.
+             This is the same RA-crossing method as sunRACrossingForYear()
+             in the browser.
+
+          2. SIDEREAL YEAR — Sun world-angle crossing intervals
+             Finds when the Sun's world-space angle (atan2(z, x) in the
+             Three.js scene) crosses 4 reference angles (0°, 90°, 180°, 270°).
+             Mean sidereal year = average of 4 intervals / N.
+             Same method as the browser's getSunWorldAngle() sidereal
+             measurement.
+
+          3. ANOMALISTIC YEAR — perihelion + aphelion mean interval
+             Finds perihelion (minimum WobbleCenter→Sun distance) and
+             aphelion (maximum distance) for each target year.
+             Mean anomalistic year = (perihelion interval + aphelion interval)
+             / (2 × N). Averaging peri + aph cancels EoC variable-speed bias.
+             Same method as browser's perihelionForYearMethodB() and
+             aphelionForYearMethodB().
+
+          Key difference from browser "Days, Years & Precession" report:
+          The browser report uses 1-year steps (interval = crossing(Y) −
+          crossing(Y−1)), giving exact year-to-year values including
+          short-term fluctuations. The headless tool uses N-year steps
+          (default 29), dividing by N to get a smoothed average. This
+          smoothing is intentional for Step 13b harmonic fitting — it
+          suppresses noise and lets the Fourier fit focus on long-period
+          signals (H/2, H/3, H/8 etc.).
+
+Step 13b: year-length-harmonics.js            → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
+          Reads data/03-year-length-analysis.xlsx, fits Fourier harmonics.
+          Updates: fitted-coefficients.json (auto-updated by script)
 
 ── Phase 6: Sync & verify ─────────────────────────────────────────
 
@@ -217,8 +261,8 @@ cd tools/fit/python && python3 train_precession.py --write && cd ../../..
 cd tools/fit/python && python3 train_observed.py --write && cd ../../..
 
 # Phase 4: Planet positions & corrections
-node tools/fit/eoc-fractions.js
-node tools/fit/ascnode-correction.js
+# node tools/fit/eoc-fractions.js           # DIAGNOSTIC — skip in standard refit
+# node tools/fit/ascnode-correction.js       # DIAGNOSTIC — skip in standard refit
 node tools/fit/parallax-correction.js --write
 node tools/fit/export-to-script.js --write
 
@@ -226,6 +270,7 @@ node tools/fit/export-to-script.js --write
 node tools/fit/export-cardinal-points.js
 node tools/fit/obliquity-harmonics.js --write
 node tools/fit/cardinal-point-harmonics.js --write
+node tools/fit/export-year-lengths.js          # generates data/03-year-length-analysis.xlsx (~90 min)
 node tools/fit/year-length-harmonics.js --write
 
 # Phase 6: Sync & verify
