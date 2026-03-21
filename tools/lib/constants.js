@@ -268,6 +268,9 @@ const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
 // Two-stage conjunction correction (per-planet synodic periods, post-parallax)
 const CONJUNCTION_CORRECTION = fitted.CONJUNCTION_CORRECTION || null;
 
+// Venus offset correction (elongation × Earth perihelion geometry)
+const VENUS_CORRECTION = fitted.VENUS_CORRECTION || null;
+
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
 for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
   if (typeof jd === 'number') ASTRO_REFERENCE[key + 'PerihelionRef_JD'] = jd;
@@ -452,6 +455,7 @@ module.exports = {
   moonMeeusLpCorrection,
   MOON_CORRECTION,
   CONJUNCTION_CORRECTION,
+  VENUS_CORRECTION,
   moonOrbitalEccentricity,
   moonTilt,
   moonStartposApsidal,

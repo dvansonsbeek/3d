@@ -982,6 +982,34 @@ function computePlanetPosition(target, jd) {
     }
   }
 
+  // Venus offset correction (elongation × Earth perihelion geometry)
+  if (target === 'venus' && C.VENUS_CORRECTION) {
+    const vc = C.VENUS_CORRECTION;
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    // Compute Sun RA for elongation
+    const _sunSph = computePlanetPosition('sun', jd, graph);
+    const _sunRA = _sunSph.ra;  // radians
+    const _venusRA = sph.theta; // radians (already corrected by parallax + conjunction)
+    const _elong = _venusRA - _sunRA;
+    // Earth perihelion angle
+    const _wE = (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 360 / (C.H / 16) * (_yr - 2000)) * d2r;
+    const _vFromWE = _venusRA - _wE;
+    // 5 basis functions
+    const sinEl = Math.sin(_elong), cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);
+    const sin2VwE = Math.sin(2 * _vFromWE), cos2VwE = Math.cos(2 * _vFromWE);
+    const invD = 1 / distAU;
+    sph.theta -= ((vc.cosVwE_sinEl_ra || 0) * cosVwE * sinEl
+                + (vc.sinEl_d_ra || 0) * sinEl * invD
+                + (vc.sinVwE_sinEl_ra || 0) * sinVwE * sinEl
+                + (vc.sin2VwE_sinEl_ra || 0) * sin2VwE * sinEl
+                + (vc.cos2VwE_sinEl_ra || 0) * cos2VwE * sinEl) * d2r;
+    sph.phi += ((vc.cosVwE_sinEl_dec || 0) * cosVwE * sinEl
+              + (vc.sinEl_d_dec || 0) * sinEl * invD
+              + (vc.sinVwE_sinEl_dec || 0) * sinVwE * sinEl
+              + (vc.sin2VwE_sinEl_dec || 0) * sin2VwE * sinEl
+              + (vc.cos2VwE_sinEl_dec || 0) * cos2VwE * sinEl) * d2r;
+  }
+
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&
       graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {

@@ -5985,5 +5985,17 @@
         "decCos": -0.000765
       }
     ]
+  },
+  "VENUS_CORRECTION": {
+    "cosVwE_sinEl_ra": -0.361937,
+    "cosVwE_sinEl_dec": -0.064501,
+    "sinEl_d_ra": -0.060017,
+    "sinEl_d_dec": 0.047165,
+    "sinVwE_sinEl_ra": -0.089602,
+    "sinVwE_sinEl_dec": -0.071581,
+    "sin2VwE_sinEl_ra": 0.215718,
+    "sin2VwE_sinEl_dec": 0.135863,
+    "cos2VwE_sinEl_ra": -0.202735,
+    "cos2VwE_sinEl_dec": 0.023076
   }
 }

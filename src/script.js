@@ -947,6 +947,13 @@ const CONJUNCTION_CORRECTION = {
   ],
 };
 
+// ─── B3d. Venus offset correction (elongation × Earth perihelion geometry) ─
+// Captures the interaction between Venus position, Sun elongation, and Earth's
+// eccentricity offset direction. 5 terms fitted to JPL residuals.
+// Source: public/input/fitted-coefficients.json
+// @AUTO:VENUS_CORRECTION
+const VENUS_CORRECTION = { cosVwE_sinEl_ra: -0.361937, cosVwE_sinEl_dec: -0.064501, sinEl_d_ra: -0.060017, sinEl_d_dec: 0.047165, sinVwE_sinEl_ra: -0.089602, sinVwE_sinEl_dec: -0.071581, sin2VwE_sinEl_ra: 0.215718, sin2VwE_sinEl_dec: 0.135863, cos2VwE_sinEl_ra: -0.202735, cos2VwE_sinEl_dec: 0.023076 };
+
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
@@ -30836,6 +30843,33 @@ function updatePositions() {
         obj.ra -= (_ct.raSin * _sp + _ct.raCos * _cp) * (Math.PI / 180);
         obj.dec += (_ct.decSin * _sp + _ct.decCos * _cp) * (Math.PI / 180);
       }
+    }
+
+    // Venus offset correction (elongation × Earth perihelion geometry)
+    if (obj.name === 'venus' && VENUS_CORRECTION) {
+      const _vc = VENUS_CORRECTION;
+      const _vyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
+      // Sun RA for elongation (use stored sun position from this frame)
+      const _sunRAv = sun.ra || 0;
+      const _venusRAv = obj.ra;
+      const _elong = _venusRAv - _sunRAv;
+      // Earth perihelion angle
+      const _wEv = (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + 360 / (holisticyearLength / 16) * (_vyr - 2000)) * (Math.PI / 180);
+      const _vFromWE = _venusRAv - _wEv;
+      const _sinEl = Math.sin(_elong), _cosVwE = Math.cos(_vFromWE), _sinVwE = Math.sin(_vFromWE);
+      const _sin2VwE = Math.sin(2 * _vFromWE), _cos2VwE = Math.cos(2 * _vFromWE);
+      const _invDv = 1 / obj.distAU;
+      const _d2r = Math.PI / 180;
+      obj.ra -= ((_vc.cosVwE_sinEl_ra || 0) * _cosVwE * _sinEl
+               + (_vc.sinEl_d_ra || 0) * _sinEl * _invDv
+               + (_vc.sinVwE_sinEl_ra || 0) * _sinVwE * _sinEl
+               + (_vc.sin2VwE_sinEl_ra || 0) * _sin2VwE * _sinEl
+               + (_vc.cos2VwE_sinEl_ra || 0) * _cos2VwE * _sinEl) * _d2r;
+      obj.dec += ((_vc.cosVwE_sinEl_dec || 0) * _cosVwE * _sinEl
+               + (_vc.sinEl_d_dec || 0) * _sinEl * _invDv
+               + (_vc.sinVwE_sinEl_dec || 0) * _sinVwE * _sinEl
+               + (_vc.sin2VwE_sinEl_dec || 0) * _sin2VwE * _sinEl
+               + (_vc.cos2VwE_sinEl_dec || 0) * _cos2VwE * _sinEl) * _d2r;
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.

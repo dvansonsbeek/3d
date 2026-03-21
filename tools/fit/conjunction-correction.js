@@ -16,8 +16,14 @@ const fs = require('fs');
 const path = require('path');
 const { baseline } = require('../lib/optimizer');
 const C = require('../lib/constants');
+const sg = require('../lib/scene-graph');
 
 const d2r = Math.PI / 180;
+
+// Disable existing conjunction + Venus corrections so we fit from raw parallax residuals
+C.CONJUNCTION_CORRECTION = null;
+C.VENUS_CORRECTION = null;
+sg._invalidateGraph();
 
 // ─── Per-planet conjunction periods ─────────────────────────────────────
 // Each entry: array of synodic periods (in years) to fit.
@@ -145,6 +151,95 @@ for (const [planet, periods] of Object.entries(conjConfig)) {
   console.log('');
 }
 
+// ─── Venus offset correction ────────────────────────────────────────────
+// Venus's errors correlate with the angle between Venus, the Sun, and
+// Earth's perihelion direction. These offset-aware basis functions capture
+// the interaction between Venus's elongation and Earth's eccentricity offset.
+
+console.log('VENUS offset correction (elongation × Earth perihelion geometry):');
+
+const venusResult = baseline('venus');
+const venusEntries = venusResult.entries;
+const nv = venusEntries.length;
+
+// Earth perihelion precession
+const wE0 = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
+const wERate = 360 / (C.H / 16);
+
+// Compute geometric quantities for each Venus data point
+for (const e of venusEntries) {
+  const sunPos = sg.computePlanetPosition('sun', e.jd);
+  const sunRA = sg.thetaToRaDeg(sunPos.ra);
+  let elong = e.modelRA - sunRA;
+  if (elong > 180) elong -= 360;
+  if (elong < -180) elong += 360;
+  e.elong = elong * (Math.PI / 180);
+  const dt = e.year - 2000;
+  e.vFromWE = e.modelRA * (Math.PI / 180) - (wE0 + wERate * dt) * (Math.PI / 180);
+}
+
+// 5 offset-aware basis functions
+const venusBasis = [
+  { name: 'cosVwE_sinEl',    fn: e => Math.cos(e.vFromWE) * Math.sin(e.elong) },
+  { name: 'sinEl_d',         fn: e => Math.sin(e.elong) / e.distAU },
+  { name: 'sinVwE_sinEl',    fn: e => Math.sin(e.vFromWE) * Math.sin(e.elong) },
+  { name: 'sin2VwE_sinEl',   fn: e => Math.sin(2 * e.vFromWE) * Math.sin(e.elong) },
+  { name: 'cos2VwE_sinEl',   fn: e => Math.cos(2 * e.vFromWE) * Math.sin(e.elong) },
+];
+
+const mv = venusBasis.length;
+const vATA = Array.from({ length: mv }, () => new Float64Array(mv));
+const vATbRA = new Float64Array(mv);
+const vATbDec = new Float64Array(mv);
+
+for (const e of venusEntries) {
+  const row = venusBasis.map(b => b.fn(e));
+  for (let j = 0; j < mv; j++) {
+    vATbRA[j] += row[j] * e.dRA;
+    vATbDec[j] += row[j] * e.dDec;
+    for (let k = j; k < mv; k++) vATA[j][k] += row[j] * row[k];
+  }
+}
+for (let j = 0; j < mv; j++) for (let k = 0; k < j; k++) vATA[j][k] = vATA[k][j];
+
+const vL = Array.from({ length: mv }, () => new Float64Array(mv));
+for (let i = 0; i < mv; i++) for (let j = 0; j <= i; j++) {
+  let s = vATA[i][j]; for (let k = 0; k < j; k++) s -= vL[i][k] * vL[j][k];
+  vL[i][j] = i === j ? Math.sqrt(Math.max(s, 1e-15)) : s / vL[j][j];
+}
+function vSolve(b) {
+  const y = new Float64Array(mv);
+  for (let i = 0; i < mv; i++) { let s = b[i]; for (let k = 0; k < i; k++) s -= vL[i][k] * y[k]; y[i] = s / vL[i][i]; }
+  const x = new Float64Array(mv);
+  for (let i = mv - 1; i >= 0; i--) { let s = y[i]; for (let k = i + 1; k < mv; k++) s -= vL[k][i] * x[k]; x[i] = s / vL[i][i]; }
+  return x;
+}
+const vxRA = vSolve(vATbRA);
+const vxDec = vSolve(vATbDec);
+
+let vssRA = 0, vssDec = 0;
+for (const e of venusEntries) {
+  let cRA = 0, cDec = 0;
+  const row = venusBasis.map(b => b.fn(e));
+  for (let j = 0; j < mv; j++) { cRA += vxRA[j] * row[j]; cDec += vxDec[j] * row[j]; }
+  vssRA += (e.dRA - cRA) ** 2;
+  vssDec += (e.dDec - cDec) ** 2;
+}
+const venusNewRMS = Math.sqrt((vssRA + vssDec) / nv);
+const round6 = v => Math.round(v * 1000000) / 1000000;
+
+const venusCorrection = {};
+for (let k = 0; k < mv; k++) {
+  venusCorrection[venusBasis[k].name + '_ra'] = round6(vxRA[k]);
+  venusCorrection[venusBasis[k].name + '_dec'] = round6(vxDec[k]);
+}
+
+console.log(`  Venus RMS: ${venusResult.rmsTotal.toFixed(4)}° → ${venusNewRMS.toFixed(4)}° (-${((venusResult.rmsTotal - venusNewRMS) / venusResult.rmsTotal * 100).toFixed(1)}%)`);
+for (let k = 0; k < mv; k++) {
+  console.log(`  ${venusBasis[k].name.padEnd(20)} RA=${vxRA[k].toFixed(6)}  Dec=${vxDec[k].toFixed(6)}`);
+}
+console.log('');
+
 // ─── Summary ────────────────────────────────────────────────────────────
 
 console.log('═══════════════════════════════════════════════════════════════');
@@ -153,11 +248,14 @@ console.log('══════════════════════�
 
 const planetCount = Object.keys(corrections).length;
 const termCount = Object.values(corrections).reduce((s, v) => s + v.length, 0);
-console.log(`${planetCount} planets with conjunction corrections, ${termCount} total terms\n`);
+console.log(`${planetCount} planets with synodic corrections, ${termCount} synodic terms`);
+console.log(`Venus: 5 offset-aware terms`);
+console.log('');
 
 for (const [planet, terms] of Object.entries(corrections)) {
   console.log(`  ${planet}: ${terms.length} term(s) at ${terms.map(t => t.period.toFixed(2) + 'yr').join(', ')}`);
 }
+console.log(`  venus: 5 offset-aware terms (elongation × Earth perihelion)`);
 
 // ─── Write ──────────────────────────────────────────────────────────────
 
@@ -165,8 +263,9 @@ if (process.argv.includes('--write')) {
   const jsonPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
   const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   fc.CONJUNCTION_CORRECTION = corrections;
+  fc.VENUS_CORRECTION = venusCorrection;
   fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
-  console.log('\n✓ Written CONJUNCTION_CORRECTION to fitted-coefficients.json');
+  console.log('\n✓ Written CONJUNCTION_CORRECTION + VENUS_CORRECTION to fitted-coefficients.json');
 } else {
   console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
 }
