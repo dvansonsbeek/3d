@@ -141,8 +141,25 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis
-- [Fitting Pipeline](tools/fit/README.md) — 15-step pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, obliquity/year-length harmonics
+- [Fitting Pipeline](tools/fit/README.md) — 9-step pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, obliquity/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — 429-term ML system for planetary precession prediction
+
+---
+
+## Fitting Pipeline
+
+The model's constants are stored in 4 JSON files in `public/input/`. When you change any model parameter (e.g., H, eccentricityBase, planet orbital elements), the fitting pipeline recalibrates all derived coefficients so the simulation matches JPL Horizons observations.
+
+```bash
+node tools/fit/run-pipeline.js --all           # full pipeline (~2.5 hrs)
+node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
+node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs)
+node tools/fit/run-pipeline.js --from 5        # resume from Step 5
+```
+
+The pipeline runs 9 steps across 7 phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → cardinal point harmonics → year-length harmonics → verify → sync to script.js. Step 3 (browser data export) is always manual. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+
+**Safety**: Step 8 (`verify-pipeline.js`) validates all results against IAU reference values before syncing to `script.js`. If any parameter change produces unrealistic values — e.g., year lengths that differ from IAU by more than 1 second, obliquity that doesn't match J2000 within 0.01", or planet baselines that regress — the pipeline stops and reports which checks failed. This prevents invalid parameter changes from propagating into the simulation.
 
 ---
 

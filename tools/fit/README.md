@@ -209,6 +209,22 @@ All scripts default to **dry run** (print only). Add `--write` to update JSON fi
 Run `export-to-script.js --write` to sync JSON values to `src/script.js`.
 This can be done after each `--write` step, or once at the end — it patches all diffs in one pass.
 
+### Automated pipeline runner
+
+Instead of running each step manually, use `run-pipeline.js`:
+
+```bash
+node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
+node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
+node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
+node tools/fit/run-pipeline.js --from 5        # Resume from Step 5 onwards
+```
+
+Output is logged to `tools/fit/pipeline.log`. Stops on any step failure.
+Step 3 (browser export) is always manual — the runner checks the data file exists.
+
+### Manual step-by-step
+
 ```bash
 # Phase 1: Sun optimizer & planet alignment
 node tools/optimize.js optimize sun correctionSun --write                    # Step 1
