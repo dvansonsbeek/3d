@@ -970,6 +970,18 @@ function computePlanetPosition(target, jd) {
     }
   }
 
+  // Two-stage conjunction correction (post-parallax, per-planet synodic periods)
+  const conjCorr = C.CONJUNCTION_CORRECTION && C.CONJUNCTION_CORRECTION[target];
+  if (conjCorr) {
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    for (const term of conjCorr) {
+      const phase = 2 * Math.PI * (_yr - 2000) / term.period;
+      const sp = Math.sin(phase), cp = Math.cos(phase);
+      sph.theta -= (term.raSin * sp + term.raCos * cp) * d2r;
+      sph.phi += (term.decSin * sp + term.decCos * cp) * d2r;
+    }
+  }
+
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&
       graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {

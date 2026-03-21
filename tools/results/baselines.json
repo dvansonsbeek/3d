@@ -50,43 +50,43 @@
       "entries": 3812
     },
     "mars": {
-      "rmsRA": 0.0196,
-      "rmsDec": 0.014,
-      "rmsTotal": 0.0241,
-      "maxRA": -0.0624,
-      "maxDec": 0.0455,
+      "rmsRA": 0.0164,
+      "rmsDec": 0.0138,
+      "rmsTotal": 0.0214,
+      "maxRA": 0.0547,
+      "maxDec": 0.0422,
       "entries": 184
     },
     "jupiter": {
-      "rmsRA": 0.0507,
-      "rmsDec": 0.0203,
-      "rmsTotal": 0.0546,
-      "maxRA": -0.1663,
-      "maxDec": 0.0635,
+      "rmsRA": 0.0504,
+      "rmsDec": 0.0202,
+      "rmsTotal": 0.0543,
+      "maxRA": -0.1735,
+      "maxDec": 0.0609,
       "entries": 2499
     },
     "saturn": {
-      "rmsRA": 0.0428,
-      "rmsDec": 0.0209,
-      "rmsTotal": 0.0476,
-      "maxRA": -0.3141,
-      "maxDec": 0.1286,
+      "rmsRA": 0.038,
+      "rmsDec": 0.015,
+      "rmsTotal": 0.0409,
+      "maxRA": -0.2937,
+      "maxDec": 0.1323,
       "entries": 2502
     },
     "uranus": {
-      "rmsRA": 0.0072,
-      "rmsDec": 0.0022,
-      "rmsTotal": 0.0076,
-      "maxRA": -0.0199,
-      "maxDec": 0.0059,
+      "rmsRA": 0.0062,
+      "rmsDec": 0.0021,
+      "rmsTotal": 0.0066,
+      "maxRA": -0.0149,
+      "maxDec": 0.0051,
       "entries": 41
     },
     "neptune": {
-      "rmsRA": 0.007,
-      "rmsDec": 0.0025,
-      "rmsTotal": 0.0075,
-      "maxRA": -0.025,
-      "maxDec": 0.0067,
+      "rmsRA": 0.0036,
+      "rmsDec": 0.0024,
+      "rmsTotal": 0.0044,
+      "maxRA": -0.0119,
+      "maxDec": 0.0064,
       "entries": 69
     },
     "sun": {

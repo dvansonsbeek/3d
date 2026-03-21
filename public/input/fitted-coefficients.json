@@ -5917,5 +5917,73 @@
     "decCosMp": -0.000026,
     "decSinMs": -0.001093,
     "decCosMs": -0.000257
+  },
+  "CONJUNCTION_CORRECTION": {
+    "mars": [
+      {
+        "period": 2.235339,
+        "raSin": 0.010419,
+        "raCos": -0.003516,
+        "decSin": -0.002693,
+        "decCos": 0.001754
+      },
+      {
+        "period": 2.74273,
+        "raSin": 0.006732,
+        "raCos": 0.008207,
+        "decSin": -0.001049,
+        "decCos": 0.00098
+      }
+    ],
+    "jupiter": [
+      {
+        "period": 12.779249,
+        "raSin": -0.001739,
+        "raCos": -0.007319,
+        "decSin": 0.002678,
+        "decCos": -0.001375
+      }
+    ],
+    "saturn": [
+      {
+        "period": 19.85821,
+        "raSin": -0.003867,
+        "raCos": -0.002097,
+        "decSin": 0.017055,
+        "decCos": -0.011506
+      },
+      {
+        "period": 136.089912,
+        "raSin": 0.026834,
+        "raCos": 0.005093,
+        "decSin": 0.001155,
+        "decCos": -0.001385
+      }
+    ],
+    "uranus": [
+      {
+        "period": 170.922449,
+        "raSin": 0.004836,
+        "raCos": 0.00157,
+        "decSin": 0.000919,
+        "decCos": 0.000625
+      }
+    ],
+    "neptune": [
+      {
+        "period": 12.779249,
+        "raSin": -0.000263,
+        "raCos": -0.009566,
+        "decSin": -0.000159,
+        "decCos": -0.000831
+      },
+      {
+        "period": 35.848903,
+        "raSin": 0.00053,
+        "raCos": -0.003906,
+        "decSin": 0.000168,
+        "decCos": -0.000765
+      }
+    ]
   }
 }

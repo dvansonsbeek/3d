@@ -922,6 +922,31 @@ const PARALLAX_RA_CORRECTION = {
 // @AUTO:MOON_CORRECTION
 const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.000027, raCosMp: -0.001423, raSinMs: -0.000027, raCosMs: 0.000005, decSinD: 0.000005, decCosD: -0.000009, decSinMp: 0.000017, decCosMp: -0.000026, decSinMs: -0.001093, decCosMs: -0.000257 };
 
+// ─── B3c. Two-stage conjunction correction (post-parallax, per-planet synodic periods) ─
+// Each planet has 1-2 terms at its dominant perturber's synodic period.
+// Source: public/input/fitted-coefficients.json
+// @AUTO:CONJUNCTION_CORRECTION
+const CONJUNCTION_CORRECTION = {
+  mars: [
+    { period: 2.2353, raSin: 0.010419, raCos: -0.003516, decSin: -0.002693, decCos: 0.001754 },
+    { period: 2.7427, raSin: 0.006732, raCos: 0.008207, decSin: -0.001049, decCos: 0.00098 },
+  ],
+  jupiter: [
+    { period: 12.7792, raSin: -0.001739, raCos: -0.007319, decSin: 0.002678, decCos: -0.001375 },
+  ],
+  saturn: [
+    { period: 19.8582, raSin: -0.003867, raCos: -0.002097, decSin: 0.017055, decCos: -0.011506 },
+    { period: 136.0899, raSin: 0.026834, raCos: 0.005093, decSin: 0.001155, decCos: -0.001385 },
+  ],
+  uranus: [
+    { period: 170.9224, raSin: 0.004836, raCos: 0.00157, decSin: 0.000919, decCos: 0.000625 },
+  ],
+  neptune: [
+    { period: 12.7792, raSin: -0.000263, raCos: -0.009566, decSin: -0.000159, decCos: -0.000831 },
+    { period: 35.8489, raSin: 0.00053, raCos: -0.003906, decSin: 0.000168, decCos: -0.000765 },
+  ],
+};
+
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
@@ -30798,6 +30823,18 @@ function updatePositions() {
           + (_rc.AT || 0) * _sin2CP + (_rc.AU_ || 0) * _cos2CP
           + (_rc.AV || 0) * _sinCP * _invD + (_rc.AW || 0) * _cosCP * _invD;
         obj.ra -= _corrRA * (Math.PI / 180);
+      }
+    }
+
+    // Two-stage conjunction correction (post-parallax, per-planet synodic periods)
+    const _conjTerms = CONJUNCTION_CORRECTION[obj.name];
+    if (_conjTerms) {
+      const _cyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
+      for (const _ct of _conjTerms) {
+        const _cph = 2 * Math.PI * (_cyr - 2000) / _ct.period;
+        const _sp = Math.sin(_cph), _cp = Math.cos(_cph);
+        obj.ra -= (_ct.raSin * _sp + _ct.raCos * _cp) * (Math.PI / 180);
+        obj.dec += (_ct.decSin * _sp + _ct.decCos * _cp) * (Math.PI / 180);
       }
     }
 
