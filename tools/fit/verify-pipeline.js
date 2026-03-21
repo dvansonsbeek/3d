@@ -193,6 +193,92 @@ for (const [key, p] of Object.entries(C.planets)) {
 console.log(`  ✓ All derived planet values verified\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 9. Baseline regression check — compare RMS against stored baselines
+// ═══════════════════════════════════════════════════════════════════════════
+console.log('═══ Step 9: Baseline regression check ═══');
+
+const BASELINES_PATH = path.resolve(__dirname, '..', 'results', 'baselines.json');
+const { baseline: computeBaseline } = require('../lib/optimizer');
+
+let regressions = 0;
+let improvements = 0;
+const newBaselines = {};
+
+const storedBaselines = JSON.parse(fs.readFileSync(BASELINES_PATH, 'utf8'));
+
+// Planets use reference-data.json (synchronous). Sun and Moon need JPL fetch (async),
+// so we only check planets here. Sun/Moon baselines are checked via `optimize.js baseline all`.
+const planetTargets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+
+console.log('  Target    │ Stored  │ Current │ Change  │ Status');
+console.log('  ──────────┼─────────┼─────────┼─────────┼───────');
+
+for (const target of planetTargets) {
+  let result;
+  try {
+    result = computeBaseline(target);
+  } catch (e) {
+    console.log(`  ${target.padEnd(10)}│ skipped (${e.message})`);
+    continue;
+  }
+  const prev = storedBaselines.targets[target];
+  if (!prev) {
+    console.log(`  ${target.padEnd(10)}│ no stored baseline`);
+    continue;
+  }
+  const curr = {
+    rmsRA: Math.round(result.rmsRA * 10000) / 10000,
+    rmsDec: Math.round(result.rmsDec * 10000) / 10000,
+    rmsTotal: Math.round(result.rmsTotal * 10000) / 10000,
+  };
+  newBaselines[target] = curr;
+
+  const diff = curr.rmsTotal - prev.rmsTotal;
+  const pad = (s, n) => String(s).padStart(n);
+
+  let status;
+  if (diff > 0.001) {
+    status = 'REGRESSION';
+    regressions++;
+    totalErrors++;
+  } else if (diff < -0.001) {
+    status = 'improved';
+    improvements++;
+  } else {
+    status = 'ok';
+  }
+
+  console.log(`  ${target.padEnd(10)}│ ${pad(prev.rmsTotal.toFixed(4), 7)}°│ ${pad(curr.rmsTotal.toFixed(4), 7)}°│ ${pad((diff >= 0 ? '+' : '') + diff.toFixed(4), 7)}°│ ${status}`);
+}
+
+// Copy Sun/Moon from stored (not re-measured here — use `optimize.js baseline all` for those)
+for (const t of ['sun', 'moon']) {
+  if (storedBaselines.targets[t]) {
+    newBaselines[t] = storedBaselines.targets[t];
+    console.log(`  ${t.padEnd(10)}│ ${storedBaselines.targets[t].rmsTotal.toFixed(4).padStart(7)}°│ (skip)  │         │ needs JPL fetch`);
+  }
+}
+
+if (regressions > 0) {
+  console.log(`\n  WARNING: ${regressions} target(s) regressed! Review before accepting.\n`);
+} else if (improvements > 0) {
+  console.log(`\n  ✓ No regressions. ${improvements} target(s) improved.\n`);
+} else {
+  console.log(`\n  ✓ All planet baselines match stored values.\n`);
+}
+
+// Update stored baselines if --write flag
+if (process.argv.includes('--write')) {
+  const output = {
+    _description: 'Stored baseline RMS values for regression checking. Updated by verify-pipeline.js --write.',
+    _updated: new Date().toISOString().slice(0, 10),
+    targets: newBaselines,
+  };
+  fs.writeFileSync(BASELINES_PATH, JSON.stringify(output, null, 2) + '\n');
+  console.log('  ✓ Updated baselines.json\n');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('═══════════════════════════════════════════════════════════════');
@@ -200,6 +286,10 @@ console.log(`  ${totalChecks} checks, ${totalErrors} errors`);
 if (totalErrors === 0) {
   console.log('  ✓ ALL PIPELINE VERIFICATION PASSED');
   console.log('  The JSON files are consistent with the computation engine.');
+  if (regressions === 0) console.log('  No baseline regressions detected.');
+} else if (regressions > 0) {
+  console.log(`  ✗ ${regressions} BASELINE REGRESSION(S) — review results before proceeding`);
+  process.exit(1);
 } else {
   console.log('  ✗ VERIFICATION FAILED — fix errors before proceeding');
   process.exit(1);

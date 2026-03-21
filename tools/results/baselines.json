@@ -1,0 +1,15 @@
+{
+  "_description": "Stored baseline RMS values for regression checking. Updated by verify-pipeline.js --write.",
+  "_updated": "2026-03-21",
+  "targets": {
+    "sun":     { "rmsRA": 0.0033, "rmsDec": 0.0001, "rmsTotal": 0.0033 },
+    "moon":    { "rmsRA": 0.0118, "rmsDec": 0.0035, "rmsTotal": 0.0123 },
+    "mercury": { "rmsRA": 0.0040, "rmsDec": 0.0052, "rmsTotal": 0.0066 },
+    "venus":   { "rmsRA": 0.2042, "rmsDec": 0.0876, "rmsTotal": 0.2221 },
+    "mars":    { "rmsRA": 0.0196, "rmsDec": 0.0141, "rmsTotal": 0.0241 },
+    "jupiter": { "rmsRA": 0.0583, "rmsDec": 0.0190, "rmsTotal": 0.0612 },
+    "saturn":  { "rmsRA": 0.0912, "rmsDec": 0.0263, "rmsTotal": 0.0949 },
+    "uranus":  { "rmsRA": 0.0074, "rmsDec": 0.0017, "rmsTotal": 0.0076 },
+    "neptune": { "rmsRA": 0.0072, "rmsDec": 0.0018, "rmsTotal": 0.0075 }
+  }
+}
