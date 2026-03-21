@@ -1224,9 +1224,10 @@ const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDa
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
 const meansiderealyearlengthinDays = meansolaryearlengthinDays *(holisticyearLength/13)/((holisticyearLength/13)-1);
 // Triple synodic period (Jupiter-Saturn conjunction + perihelion precession H/5, -H/8)
+// Uses exact orbital periods from integer orbit counts: H / round(H*meanSolarYear/solarYearInput)
 const tripleSynodicYears = (() => {
-  const _Tj = planets.jupiter.solarYearInput / meansolaryearlengthinDays;
-  const _Ts = planets.saturn.solarYearInput / meansolaryearlengthinDays;
+  const _Tj = holisticyearLength / Math.round(holisticyearLength * meansolaryearlengthinDays / planets.jupiter.solarYearInput);
+  const _Ts = holisticyearLength / Math.round(holisticyearLength * meansolaryearlengthinDays / planets.saturn.solarYearInput);
   const _nJe = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
   const _nSe = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
   return 3 * 360 / (_nJe - _nSe);

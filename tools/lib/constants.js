@@ -207,9 +207,11 @@ const julianCenturyDays = 36525;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 
 // Triple synodic period (Jupiter-Saturn conjunction cycle with perihelion precession)
-// Derived from orbital periods + H/5 (Jupiter) and -H/8 (Saturn) perihelion rates
-const _Tj = planets.jupiter.solarYearInput / meanSolarYearDays;
-const _Ts = planets.saturn.solarYearInput / meanSolarYearDays;
+// Uses exact orbital periods from integer orbit counts: H / round(totalDaysInH / solarYearInput)
+const _jupCount = Math.round(totalDaysInH / planets.jupiter.solarYearInput);
+const _satCount = Math.round(totalDaysInH / planets.saturn.solarYearInput);
+const _Tj = H / _jupCount;  // exact Jupiter period in tropical years
+const _Ts = H / _satCount;  // exact Saturn period in tropical years
 const _nJeff = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
 const _nSeff = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
 const tripleSynodicYears = 3 * 360 / (_nJeff - _nSeff);

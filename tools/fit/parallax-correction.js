@@ -102,9 +102,9 @@ const allDecCorrections = {};
 const allRaCorrections = {};
 
 // Triple-synodic period for conjunction-phase basis functions
-// Derived from model orbital periods + perihelion precession (H/5, -H/8)
-const _Tj = C.planets.jupiter.solarYearInput / C.meanSolarYearDays;
-const _Ts = C.planets.saturn.solarYearInput / C.meanSolarYearDays;
+// Uses exact orbital periods from integer orbit counts: H / round(totalDays/solarYearInput)
+const _Tj = C.H / Math.round(C.totalDaysInH / C.planets.jupiter.solarYearInput);
+const _Ts = C.H / Math.round(C.totalDaysInH / C.planets.saturn.solarYearInput);
 const _nJ_eff = 360.0 / _Tj + 360.0 / C.planets.jupiter.perihelionEclipticYears;
 const _nS_eff = 360.0 / _Ts + 360.0 / C.planets.saturn.perihelionEclipticYears;
 const tripleSynodicYears = 3 * 360.0 / (_nJ_eff - _nS_eff);
