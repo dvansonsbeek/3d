@@ -994,20 +994,32 @@ function computePlanetPosition(target, jd) {
     // Earth perihelion angle
     const _wE = (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 + 360 / (C.H / 16) * (_yr - 2000)) * d2r;
     const _vFromWE = _venusRA - _wE;
-    // 5 basis functions
+    // 10 basis functions (1st-4th harmonics of V-ωE × sin(elongation))
     const sinEl = Math.sin(_elong), cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);
     const sin2VwE = Math.sin(2 * _vFromWE), cos2VwE = Math.cos(2 * _vFromWE);
+    const sin3VwE = Math.sin(3 * _vFromWE), cos3VwE = Math.cos(3 * _vFromWE);
+    const sin4VwE = Math.sin(4 * _vFromWE), cos4VwE = Math.cos(4 * _vFromWE);
     const invD = 1 / distAU;
     sph.theta -= ((vc.cosVwE_sinEl_ra || 0) * cosVwE * sinEl
                 + (vc.sinEl_d_ra || 0) * sinEl * invD
                 + (vc.sinVwE_sinEl_ra || 0) * sinVwE * sinEl
                 + (vc.sin2VwE_sinEl_ra || 0) * sin2VwE * sinEl
-                + (vc.cos2VwE_sinEl_ra || 0) * cos2VwE * sinEl) * d2r;
+                + (vc.cos2VwE_sinEl_ra || 0) * cos2VwE * sinEl
+                + (vc.cos4VwE_sinEl_ra || 0) * cos4VwE * sinEl
+                + (vc.sin4VwE_sinEl_ra || 0) * sin4VwE * sinEl
+                + (vc.sinVwE_sinEl_d2_ra || 0) * sinVwE * sinEl * invD * invD
+                + (vc.cos3VwE_sinEl_ra || 0) * cos3VwE * sinEl
+                + (vc.sin3VwE_sinEl_ra || 0) * sin3VwE * sinEl) * d2r;
     sph.phi += ((vc.cosVwE_sinEl_dec || 0) * cosVwE * sinEl
               + (vc.sinEl_d_dec || 0) * sinEl * invD
               + (vc.sinVwE_sinEl_dec || 0) * sinVwE * sinEl
               + (vc.sin2VwE_sinEl_dec || 0) * sin2VwE * sinEl
-              + (vc.cos2VwE_sinEl_dec || 0) * cos2VwE * sinEl) * d2r;
+              + (vc.cos2VwE_sinEl_dec || 0) * cos2VwE * sinEl
+              + (vc.cos4VwE_sinEl_dec || 0) * cos4VwE * sinEl
+              + (vc.sin4VwE_sinEl_dec || 0) * sin4VwE * sinEl
+              + (vc.sinVwE_sinEl_d2_dec || 0) * sinVwE * sinEl * invD * invD
+              + (vc.cos3VwE_sinEl_dec || 0) * cos3VwE * sinEl
+              + (vc.sin3VwE_sinEl_dec || 0) * sin3VwE * sinEl) * d2r;
   }
 
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec

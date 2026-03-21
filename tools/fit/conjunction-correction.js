@@ -178,13 +178,20 @@ for (const e of venusEntries) {
   e.vFromWE = e.modelRA * (Math.PI / 180) - (wE0 + wERate * dt) * (Math.PI / 180);
 }
 
-// 5 offset-aware basis functions
+// 10 offset-aware basis functions (elongation × Earth perihelion harmonics)
 const venusBasis = [
+  // Original 5: 1st and 2nd harmonics of V-ωE × sin(elongation)
   { name: 'cosVwE_sinEl',    fn: e => Math.cos(e.vFromWE) * Math.sin(e.elong) },
   { name: 'sinEl_d',         fn: e => Math.sin(e.elong) / e.distAU },
   { name: 'sinVwE_sinEl',    fn: e => Math.sin(e.vFromWE) * Math.sin(e.elong) },
   { name: 'sin2VwE_sinEl',   fn: e => Math.sin(2 * e.vFromWE) * Math.sin(e.elong) },
   { name: 'cos2VwE_sinEl',   fn: e => Math.cos(2 * e.vFromWE) * Math.sin(e.elong) },
+  // Extended 5: 3rd/4th harmonics + distance-weighted
+  { name: 'cos4VwE_sinEl',   fn: e => Math.cos(4 * e.vFromWE) * Math.sin(e.elong) },
+  { name: 'sin4VwE_sinEl',   fn: e => Math.sin(4 * e.vFromWE) * Math.sin(e.elong) },
+  { name: 'sinVwE_sinEl_d2', fn: e => Math.sin(e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
+  { name: 'cos3VwE_sinEl',   fn: e => Math.cos(3 * e.vFromWE) * Math.sin(e.elong) },
+  { name: 'sin3VwE_sinEl',   fn: e => Math.sin(3 * e.vFromWE) * Math.sin(e.elong) },
 ];
 
 const mv = venusBasis.length;

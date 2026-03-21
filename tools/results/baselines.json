@@ -42,11 +42,11 @@
       "entries": 95
     },
     "venus": {
-      "rmsRA": 0.1305,
-      "rmsDec": 0.0593,
-      "rmsTotal": 0.1433,
-      "maxRA": 0.4799,
-      "maxDec": -0.4507,
+      "rmsRA": 0.1019,
+      "rmsDec": 0.0476,
+      "rmsTotal": 0.1125,
+      "maxRA": -0.436,
+      "maxDec": -0.451,
       "entries": 3812
     },
     "mars": {

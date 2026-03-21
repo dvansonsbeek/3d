@@ -5987,15 +5987,25 @@
     ]
   },
   "VENUS_CORRECTION": {
-    "cosVwE_sinEl_ra": -0.361937,
-    "cosVwE_sinEl_dec": -0.064501,
-    "sinEl_d_ra": -0.060017,
-    "sinEl_d_dec": 0.047165,
-    "sinVwE_sinEl_ra": -0.089602,
-    "sinVwE_sinEl_dec": -0.071581,
-    "sin2VwE_sinEl_ra": 0.215718,
-    "sin2VwE_sinEl_dec": 0.135863,
-    "cos2VwE_sinEl_ra": -0.202735,
-    "cos2VwE_sinEl_dec": 0.023076
+    "cosVwE_sinEl_ra": -0.369134,
+    "cosVwE_sinEl_dec": -0.06593,
+    "sinEl_d_ra": -0.061607,
+    "sinEl_d_dec": 0.047657,
+    "sinVwE_sinEl_ra": -0.189265,
+    "sinVwE_sinEl_dec": -0.034008,
+    "sin2VwE_sinEl_ra": 0.219972,
+    "sin2VwE_sinEl_dec": 0.132295,
+    "cos2VwE_sinEl_ra": -0.19736,
+    "cos2VwE_sinEl_dec": 0.025026,
+    "cos4VwE_sinEl_ra": -0.176251,
+    "cos4VwE_sinEl_dec": -0.06727,
+    "sin4VwE_sinEl_ra": 0.135533,
+    "sin4VwE_sinEl_dec": 0.033318,
+    "sinVwE_sinEl_d2_ra": 0.035286,
+    "sinVwE_sinEl_d2_dec": -0.010658,
+    "cos3VwE_sinEl_ra": -0.070102,
+    "cos3VwE_sinEl_dec": 0.056622,
+    "sin3VwE_sinEl_ra": -0.045855,
+    "sin3VwE_sinEl_dec": -0.04971
   }
 }

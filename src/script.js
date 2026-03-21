@@ -952,7 +952,7 @@ const CONJUNCTION_CORRECTION = {
 // eccentricity offset direction. 5 terms fitted to JPL residuals.
 // Source: public/input/fitted-coefficients.json
 // @AUTO:VENUS_CORRECTION
-const VENUS_CORRECTION = { cosVwE_sinEl_ra: -0.361937, cosVwE_sinEl_dec: -0.064501, sinEl_d_ra: -0.060017, sinEl_d_dec: 0.047165, sinVwE_sinEl_ra: -0.089602, sinVwE_sinEl_dec: -0.071581, sin2VwE_sinEl_ra: 0.215718, sin2VwE_sinEl_dec: 0.135863, cos2VwE_sinEl_ra: -0.202735, cos2VwE_sinEl_dec: 0.023076 };
+const VENUS_CORRECTION = { cosVwE_sinEl_ra: -0.369134, cosVwE_sinEl_dec: -0.06593, sinEl_d_ra: -0.061607, sinEl_d_dec: 0.047657, sinVwE_sinEl_ra: -0.189265, sinVwE_sinEl_dec: -0.034008, sin2VwE_sinEl_ra: 0.219972, sin2VwE_sinEl_dec: 0.132295, cos2VwE_sinEl_ra: -0.19736, cos2VwE_sinEl_dec: 0.025026, cos4VwE_sinEl_ra: -0.176251, cos4VwE_sinEl_dec: -0.06727, sin4VwE_sinEl_ra: 0.135533, sin4VwE_sinEl_dec: 0.033318, sinVwE_sinEl_d2_ra: 0.035286, sinVwE_sinEl_d2_dec: -0.010658, cos3VwE_sinEl_ra: -0.070102, cos3VwE_sinEl_dec: 0.056622, sin3VwE_sinEl_ra: -0.045855, sin3VwE_sinEl_dec: -0.04971 };
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -30858,18 +30858,30 @@ function updatePositions() {
       const _vFromWE = _venusRAv - _wEv;
       const _sinEl = Math.sin(_elong), _cosVwE = Math.cos(_vFromWE), _sinVwE = Math.sin(_vFromWE);
       const _sin2VwE = Math.sin(2 * _vFromWE), _cos2VwE = Math.cos(2 * _vFromWE);
+      const _sin3VwE = Math.sin(3 * _vFromWE), _cos3VwE = Math.cos(3 * _vFromWE);
+      const _sin4VwE = Math.sin(4 * _vFromWE), _cos4VwE = Math.cos(4 * _vFromWE);
       const _invDv = 1 / obj.distAU;
       const _d2r = Math.PI / 180;
       obj.ra -= ((_vc.cosVwE_sinEl_ra || 0) * _cosVwE * _sinEl
                + (_vc.sinEl_d_ra || 0) * _sinEl * _invDv
                + (_vc.sinVwE_sinEl_ra || 0) * _sinVwE * _sinEl
                + (_vc.sin2VwE_sinEl_ra || 0) * _sin2VwE * _sinEl
-               + (_vc.cos2VwE_sinEl_ra || 0) * _cos2VwE * _sinEl) * _d2r;
+               + (_vc.cos2VwE_sinEl_ra || 0) * _cos2VwE * _sinEl
+               + (_vc.cos4VwE_sinEl_ra || 0) * _cos4VwE * _sinEl
+               + (_vc.sin4VwE_sinEl_ra || 0) * _sin4VwE * _sinEl
+               + (_vc.sinVwE_sinEl_d2_ra || 0) * _sinVwE * _sinEl * _invDv * _invDv
+               + (_vc.cos3VwE_sinEl_ra || 0) * _cos3VwE * _sinEl
+               + (_vc.sin3VwE_sinEl_ra || 0) * _sin3VwE * _sinEl) * _d2r;
       obj.dec += ((_vc.cosVwE_sinEl_dec || 0) * _cosVwE * _sinEl
                + (_vc.sinEl_d_dec || 0) * _sinEl * _invDv
                + (_vc.sinVwE_sinEl_dec || 0) * _sinVwE * _sinEl
                + (_vc.sin2VwE_sinEl_dec || 0) * _sin2VwE * _sinEl
-               + (_vc.cos2VwE_sinEl_dec || 0) * _cos2VwE * _sinEl) * _d2r;
+               + (_vc.cos2VwE_sinEl_dec || 0) * _cos2VwE * _sinEl
+               + (_vc.cos4VwE_sinEl_dec || 0) * _cos4VwE * _sinEl
+               + (_vc.sin4VwE_sinEl_dec || 0) * _sin4VwE * _sinEl
+               + (_vc.sinVwE_sinEl_d2_dec || 0) * _sinVwE * _sinEl * _invDv * _invDv
+               + (_vc.cos3VwE_sinEl_dec || 0) * _cos3VwE * _sinEl
+               + (_vc.sin3VwE_sinEl_dec || 0) * _sin3VwE * _sinEl) * _d2r;
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
