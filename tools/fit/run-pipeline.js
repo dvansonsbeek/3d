@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const LOG_PATH = path.join(__dirname, 'pipeline.log');
+const LOG_PATH = path.join(ROOT, 'tools', 'results', 'pipeline.log');
 const DATA_01 = path.join(ROOT, 'data', '01-holistic-year-objects-data.xlsx');
 
 // ─── Parse arguments ────────────────────────────────────────────────────────
