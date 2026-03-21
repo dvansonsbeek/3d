@@ -166,6 +166,11 @@ const nv = venusEntries.length;
 const wE0 = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
 const wERate = 360 / (C.H / 16);
 
+// Venus-Earth synodic period
+const _venusCount = Math.round(C.totalDaysInH / C.planets.venus.solarYearInput);
+const _Tv = C.H / _venusCount;
+const synodicVE = 1 / Math.abs(1 - 1 / _Tv);
+
 // Compute geometric quantities for each Venus data point
 for (const e of venusEntries) {
   const sunPos = sg.computePlanetPosition('sun', e.jd);
@@ -176,6 +181,7 @@ for (const e of venusEntries) {
   e.elong = elong * (Math.PI / 180);
   const dt = e.year - 2000;
   e.vFromWE = e.modelRA * (Math.PI / 180) - (wE0 + wERate * dt) * (Math.PI / 180);
+  e.synPhase = 2 * Math.PI * dt / synodicVE;
 }
 
 // 10 offset-aware basis functions (elongation × Earth perihelion harmonics)
@@ -192,6 +198,12 @@ const venusBasis = [
   { name: 'sinVwE_sinEl_d2', fn: e => Math.sin(e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
   { name: 'cos3VwE_sinEl',   fn: e => Math.cos(3 * e.vFromWE) * Math.sin(e.elong) },
   { name: 'sin3VwE_sinEl',   fn: e => Math.sin(3 * e.vFromWE) * Math.sin(e.elong) },
+  // Extended 5 more: synodic phase + distance-weighted higher harmonics
+  { name: 'sin2syn',         fn: e => Math.sin(2 * e.synPhase) },
+  { name: 'cos1syn',         fn: e => Math.cos(e.synPhase) },
+  { name: 'sin3VwE_sinEl_d2',fn: e => Math.sin(3 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
+  { name: 'sin2VwE_sinEl_d2',fn: e => Math.sin(2 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
+  { name: 'cos2VwE_sinEl_d2',fn: e => Math.cos(2 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
 ];
 
 const mv = venusBasis.length;
