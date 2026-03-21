@@ -231,11 +231,18 @@ Instead of running each step manually, use `run-pipeline.js`:
 node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
 node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
 node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
-node tools/fit/run-pipeline.js --from 5        # Resume from Step 5 onwards
+node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
+node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5c 20 times
+node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5c until improvement < 0.001°
 ```
 
-Output is logged to `tools/fit/pipeline.log`. Stops on any step failure.
+Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 Step 3 (browser export) is always manual — the runner checks the data file exists.
+
+The `--iterate` / `--converge` flags repeat the correction fitting steps (parallax →
+conjunction → Venus offset) iteratively. Each pass, the parallax sees cleaner residuals
+and reallocates its terms, allowing the Venus offset to capture more signal.
+Typically converges in 15-20 passes. Venus improves from ~0.10° to ~0.05°.
 
 ### Manual step-by-step
 
