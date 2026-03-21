@@ -61,8 +61,10 @@ const STEPS = [
     cmd: 'python3 tools/fit/python/train_observed.py --write' },
 
   // Phase 4: Planet positions & corrections
-  { id: '5',  phase: 2, name: 'Parallax corrections',
+  { id: '5a', phase: 2, name: 'Parallax corrections',
     cmd: 'node tools/fit/parallax-correction.js --write' },
+  { id: '5b', phase: 2, name: 'Moon eclipse optimizer',
+    cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
   // Phase 5: Cardinal point harmonics
   { id: '6a', phase: 2, name: 'Export cardinal points (~35 min)',

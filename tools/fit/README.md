@@ -98,9 +98,15 @@ Step 4d: python/train_observed.py             → tools/lib/python/coefficients/
 
 ── Phase 4: Planet positions & corrections ────────────────────────
 
-Step 5:  parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
+Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Fits up to 42-parameter RA/Dec correction per planet via cross-validation
          Updates: fitted-coefficients.json (auto-updated by script)
+
+Step 5b: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
+         Optimizes Moon's 3 startpos values against 66 solar eclipses (2000–2025)
+         Measures Moon-Sun angular separation at each eclipse — should be ~0°
+         Updates: model-parameters.json (auto-updated by script)
+         Verify: RMS separation < 0.85°, individual eclipses < 2°
 
          Optional diagnostics (skip in standard refit):
          • eoc-fractions.js — scans EoC fraction for Type III planets. No --write.
@@ -247,7 +253,8 @@ python3 tools/fit/python/train_precession.py --write                         # S
 python3 tools/fit/python/train_observed.py --write                           # Step 4d
 
 # Phase 4: Planet positions & corrections
-node tools/fit/parallax-correction.js --write                                # Step 5
+node tools/fit/parallax-correction.js --write                                # Step 5a
+node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5b
 # node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 
@@ -318,7 +325,8 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
     train_precession.py          → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
-    parallax-correction.js       → fitted-coefficients.json  (Step 5)
+    parallax-correction.js       → fitted-coefficients.json  (Step 5a)
+    moon-eclipse-optimizer.js    → model-parameters.json     (Step 5b)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 7b)

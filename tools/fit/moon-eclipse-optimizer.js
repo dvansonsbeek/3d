@@ -162,9 +162,20 @@ for (const d of final.details) {
   console.log(`${d.label.padEnd(25)} ${d.sep.toFixed(2).padStart(5)}  ${d.dRA.toFixed(2).padStart(7)}  ${d.dDec.toFixed(2).padStart(7)}`);
 }
 
-// Check specific eclipse
-const sep2025 = computeSeparation(2460940.321574);
-console.log(`\n2025-Sep-21 eclipse: sep=${sep2025.sep.toFixed(3)}° dRA=${sep2025.dRA.toFixed(3)}° dDec=${sep2025.dDec.toFixed(3)}°`);
+// ─── Write to model-parameters.json if --write flag ─────────────────────────
+if (process.argv.includes('--write')) {
+  const fs = require('fs');
+  const path = require('path');
+  const jsonPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
+  const mp = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  mp.moon.moonStartposNodal = bestNodal;
+  mp.moon.moonStartposApsidal = bestApsidal;
+  mp.moon.moonStartposMoon = bestMoon;
+  fs.writeFileSync(jsonPath, JSON.stringify(mp, null, 2) + '\n');
+  console.log('\n✓ Written moonStartposNodal/Apsidal/Moon to model-parameters.json');
+} else {
+  console.log('\n  (dry run — add --write to update model-parameters.json)');
+}
 
-// Restore
+// Restore original values in memory
 setParams(origNodal, origApsidal, origMoon);
