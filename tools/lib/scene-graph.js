@@ -905,6 +905,12 @@ function computePlanetPosition(target, jd) {
     const sin2U = Math.sin(2*u), cos2U = Math.cos(2*u);
     const sin3U = Math.sin(3*u), cos3U = Math.cos(3*u);
 
+    // Conjunction phase for Jupiter-Saturn interaction terms (AR-AW)
+    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const conjPhase = 2 * Math.PI * (_yr - 2000) / C.tripleSynodicYears;
+    const sinCP = Math.sin(conjPhase), cosCP = Math.cos(conjPhase);
+    const sin2CP = Math.sin(2 * conjPhase), cos2CP = Math.cos(2 * conjPhase);
+
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
       const invDS = invD * invS;
@@ -927,7 +933,10 @@ function computePlanetPosition(target, jd) {
         + (dc.AJ || 0) * Math.cos(4*u) * invS + (dc.AK || 0) * sin2U * invD2 * invS
         + (dc.AL || 0) * Math.sin(4*u) * invD + (dc.AM || 0) * Math.cos(4*u) * invD
         + (dc.AN || 0) * T * sinU * invD2 + (dc.AO || 0) * T * cosU * invD2
-        + (dc.AP || 0) * sinU * invD2 * invD + (dc.AQ || 0) * cosU * invD2 * invD;
+        + (dc.AP || 0) * sinU * invD2 * invD + (dc.AQ || 0) * cosU * invD2 * invD
+        + (dc.AR || 0) * sinCP + (dc.AS || 0) * cosCP
+        + (dc.AT || 0) * sin2CP + (dc.AU_ || 0) * cos2CP
+        + (dc.AV || 0) * sinCP * invD + (dc.AW || 0) * cosCP * invD;
       sph.phi += corrDec * d2r;
     }
 
@@ -953,7 +962,10 @@ function computePlanetPosition(target, jd) {
         + (rc.AJ || 0) * Math.cos(4*u) * invS + (rc.AK || 0) * sin2U * invD2 * invS
         + (rc.AL || 0) * Math.sin(4*u) * invD + (rc.AM || 0) * Math.cos(4*u) * invD
         + (rc.AN || 0) * T * sinU * invD2 + (rc.AO || 0) * T * cosU * invD2
-        + (rc.AP || 0) * sinU * invD2 * invD + (rc.AQ || 0) * cosU * invD2 * invD;
+        + (rc.AP || 0) * sinU * invD2 * invD + (rc.AQ || 0) * cosU * invD2 * invD
+        + (rc.AR || 0) * sinCP + (rc.AS || 0) * cosCP
+        + (rc.AT || 0) * sin2CP + (rc.AU_ || 0) * cos2CP
+        + (rc.AV || 0) * sinCP * invD + (rc.AW || 0) * cosCP * invD;
       sph.theta -= corrRA * d2r;
     }
   }

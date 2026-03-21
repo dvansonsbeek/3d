@@ -206,6 +206,14 @@ const j2000JD = 2451545.0;
 const julianCenturyDays = 36525;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 
+// Triple synodic period (Jupiter-Saturn conjunction cycle with perihelion precession)
+// Derived from orbital periods + H/5 (Jupiter) and -H/8 (Saturn) perihelion rates
+const _Tj = planets.jupiter.solarYearInput / meanSolarYearDays;
+const _Ts = planets.saturn.solarYearInput / meanSolarYearDays;
+const _nJeff = 360 / _Tj + 360 / planets.jupiter.perihelionEclipticYears;
+const _nSeff = 360 / _Ts + 360 / planets.saturn.perihelionEclipticYears;
+const tripleSynodicYears = 3 * 360 / (_nJeff - _nSeff);
+
 // Equation of center eccentricity — derived, not a free parameter.
 const eocEccentricity = eccentricityDerivedMean - eccentricityBase / 2;
 
@@ -466,6 +474,7 @@ module.exports = {
   j2000JD,
   julianCenturyDays,
   tropicalCenturyDays,
+  tripleSynodicYears,
   eocEccentricity,
   perihelionPhaseOffset,
   TROPICAL_YEAR_HARMONICS: fitted.TROPICAL_YEAR_HARMONICS,

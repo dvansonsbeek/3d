@@ -70,12 +70,22 @@ const basisFn = (pt) => {
     T*Math.cos(pt.u)/(pt.d*pt.d),              // AO: T*cos(u)/d² — time-modulated close approach
     Math.sin(pt.u)/(pt.d*pt.d*pt.d),           // AP: sin(u)/d³ — cubic close approach
     Math.cos(pt.u)/(pt.d*pt.d*pt.d),           // AQ: cos(u)/d³ — cubic close approach
+    // Extended terms (43-48) — conjunction-period terms for Jupiter-Saturn interaction
+    // Triple synodic period ~59.53yr captures the geocentric parallax modulation
+    // from Earth viewing Jupiter-Saturn conjunctions at different orbital phases.
+    // Uses effective synodic period (includes perihelion precession at H/5 and -H/8).
+    Math.sin(pt.conjPhase),                     // AR: sin(conjunction phase)
+    Math.cos(pt.conjPhase),                     // AS: cos(conjunction phase)
+    Math.sin(2*pt.conjPhase),                   // AT: sin(2× conjunction phase)
+    Math.cos(2*pt.conjPhase),                   // AU_: cos(2× conjunction phase)
+    Math.sin(pt.conjPhase)/pt.d,                // AV: sin(conj phase)/d
+    Math.cos(pt.conjPhase)/pt.d,                // AW: cos(conj phase)/d
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW'];
 
-// Tier sizes: 15, 18, 24, 30, 36, 42
+// Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
   { name: '15p', count: 15 },
   { name: '18p', count: 18 },
@@ -83,12 +93,22 @@ const tiers = [
   { name: '30p', count: 30 },
   { name: '36p', count: 36 },
   { name: '42p', count: 42 },
+  { name: '48p', count: 48 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
 
 const allDecCorrections = {};
 const allRaCorrections = {};
+
+// Triple-synodic period for conjunction-phase basis functions
+// Derived from model orbital periods + perihelion precession (H/5, -H/8)
+const _Tj = C.planets.jupiter.solarYearInput / C.meanSolarYearDays;
+const _Ts = C.planets.saturn.solarYearInput / C.meanSolarYearDays;
+const _nJ_eff = 360.0 / _Tj + 360.0 / C.planets.jupiter.perihelionEclipticYears;
+const _nS_eff = 360.0 / _Ts + 360.0 / C.planets.saturn.perihelionEclipticYears;
+const tripleSynodicYears = 3 * 360.0 / (_nJ_eff - _nS_eff);
+console.log(`Conjunction basis: triple synodic = ${tripleSynodicYears.toFixed(4)} yr\n`);
 
 for (const target of targets) {
   const allPoints = refData.planets[target] || [];
@@ -114,7 +134,8 @@ for (const target of targets) {
     const year = C.jdToYear(pt.jd);
     const dd = result.distAU;
     const u = (modelRA - ascNode) * d2r;
-    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU });
+    const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
+    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase });
   }
 
   const n = data.length;
