@@ -123,7 +123,7 @@ planets.mercury = {
   orbitalEccentricityBase: 0.20563593,
   orbitalEccentricityAmplitude: 8.436789e-5,
   eccentricityPhaseJ2000: 89.9882,
-  angleCorrection: 0.9709076360262152,
+  angleCorrection: 0.9709076360988149,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
   startpos: 83.5311863165714,
@@ -149,10 +149,10 @@ planets.venus = {
   orbitalEccentricityBase: 0.00619052,
   orbitalEccentricityAmplitude: 9.625389e-4,
   eccentricityPhaseJ2000: 123.7514,
-  angleCorrection: -2.8028684488442366,
+  angleCorrection: -2.8028684487716475,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: holisticyearLength*3/34,
-  startpos: 249.31904552785377,
+  startpos: 249.31752380516377,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
@@ -175,10 +175,10 @@ planets.mars = {
   orbitalEccentricityBase: 0.09297543,
   orbitalEccentricityAmplitude: 3.073636e-3,
   eccentricityPhaseJ2000: 96.8878,
-  angleCorrection: -2.109362111899337,
+  angleCorrection: -2.109362111826645,
   perihelionEclipticYears: holisticyearLength/(4+(1/3)),
   axialPrecessionYears: -holisticyearLength/2,
-  startpos: 121.46795096995999,
+  startpos: 121.46800657357522,
   eocFraction: -0.066224,
   perihelionRef_JD: 2456499.441,
   ascendingNodeInvPlane: 354.87,
@@ -201,10 +201,10 @@ planets.jupiter = {
   orbitalEccentricityBase: 0.04821478,
   orbitalEccentricityAmplitude: 1.149908e-6,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: 0.9270355609987391,
+  angleCorrection: 0.9270355609260399,
   perihelionEclipticYears: holisticyearLength/5,
   axialPrecessionYears: -holisticyearLength*3/8,
-  startpos: 13.850211334548405,
+  startpos: 13.850278962533437,
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
@@ -227,10 +227,10 @@ planets.saturn = {
   orbitalEccentricityBase: 0.05374486,
   orbitalEccentricityAmplitude: 5.403008e-6,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: -0.17477220015242523,
+  angleCorrection: -0.1747722001523968,
   perihelionEclipticYears: -holisticyearLength/8,
   axialPrecessionYears: -holisticyearLength*4/3,
-  startpos: 11.319899999240945,
+  startpos: 11.31984472629173,
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
@@ -253,10 +253,10 @@ planets.uranus = {
   orbitalEccentricityBase: 0.04734421,
   orbitalEccentricityAmplitude: 2.831008e-5,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: -0.73459617845376,
+  angleCorrection: -0.7345961784537103,
   perihelionEclipticYears: holisticyearLength/3,
   axialPrecessionYears: holisticyearLength*610,
-  startpos: 44.880685519272305,
+  startpos: 44.88065127802664,
   eocFraction: 0.53,
   perihelionRef_JD: 2439699.8,
   ascendingNodeInvPlane: 307.80,
@@ -279,10 +279,10 @@ planets.neptune = {
   orbitalEccentricityBase: 0.00868571,
   orbitalEccentricityAmplitude: 8.098033e-6,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: 2.333818371922451,
+  angleCorrection: 2.3338183719950543,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
-  startpos: 47.95507804781808,
+  startpos: 47.95502682626865,
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
@@ -928,22 +928,22 @@ const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.00002
 // @AUTO:CONJUNCTION_CORRECTION
 const CONJUNCTION_CORRECTION = {
   Mars: [
-    { period: 2.235339, raSin: 0.005277, raCos: -0.003231, decSin: -0.000879, decCos: 0.002340 },
-    { period: 2.742730, raSin: 0.000677, raCos: 0.004308, decSin: 0.000859, decCos: 0.000305 }
+    { period: 2.235339, raSin: 0.005281, raCos: -0.003230, decSin: -0.000879, decCos: 0.002340 },
+    { period: 2.742730, raSin: 0.000675, raCos: 0.004308, decSin: 0.000859, decCos: 0.000305 }
   ],
   Jupiter: [
-    { period: 12.779249, raSin: 0.000383, raCos: -0.004376, decSin: 0.001363, decCos: 0.000715 }
+    { period: 12.779249, raSin: 0.000382, raCos: -0.004373, decSin: 0.001371, decCos: 0.000707 }
   ],
   Saturn: [
-    { period: 19.858210, raSin: -0.011195, raCos: -0.002820, decSin: 0.018903, decCos: -0.012977 },
-    { period: 136.089912, raSin: 0.027336, raCos: 0.006599, decSin: -0.000023, decCos: -0.002140 }
+    { period: 19.858210, raSin: -0.011194, raCos: -0.002816, decSin: 0.018901, decCos: -0.012975 },
+    { period: 136.089912, raSin: 0.027359, raCos: 0.006606, decSin: -0.000024, decCos: -0.002139 }
   ],
   Uranus: [
-    { period: 170.922449, raSin: 0.015843, raCos: -0.008797, decSin: -0.004765, decCos: 0.001786 }
+    { period: 170.922449, raSin: 0.015842, raCos: -0.008774, decSin: -0.004760, decCos: 0.001790 }
   ],
   Neptune: [
-    { period: 12.779249, raSin: -0.000222, raCos: -0.009586, decSin: 0.000055, decCos: -0.000290 },
-    { period: 35.848903, raSin: 0.001344, raCos: -0.005348, decSin: 0.000220, decCos: -0.000198 }
+    { period: 12.779249, raSin: -0.000224, raCos: -0.009588, decSin: 0.000056, decCos: -0.000290 },
+    { period: 35.848903, raSin: 0.001344, raCos: -0.005352, decSin: 0.000222, decCos: -0.000198 }
   ],
 };
 
@@ -953,9 +953,9 @@ const CONJUNCTION_CORRECTION = {
 // Source: public/input/fitted-coefficients.json
 // @AUTO:ELONGATION_CORRECTION
 const ELONGATION_CORRECTION = {
-  Mercury: { cosVwE_sinEl_ra: -1.155486, cosVwE_sinEl_dec: -0.705895, sinEl_d_ra: -0.862128, sinEl_d_dec: -0.851340, sinVwE_sinEl_ra: -0.015004, sinVwE_sinEl_dec: -0.096541, sin2VwE_sinEl_ra: 0.771327, sin2VwE_sinEl_dec: -0.200826, cos2VwE_sinEl_ra: -0.105710, cos2VwE_sinEl_dec: -1.584602, cos4VwE_sinEl_ra: -0.329587, cos4VwE_sinEl_dec: -0.077225, sin4VwE_sinEl_ra: -0.132700, sin4VwE_sinEl_dec: -0.056338, sinVwE_sinEl_d2_ra: -0.029610, sinVwE_sinEl_d2_dec: 0.026366, cos3VwE_sinEl_ra: 0.180504, cos3VwE_sinEl_dec: 0.518347, sin3VwE_sinEl_ra: -0.402486, sin3VwE_sinEl_dec: 0.446267, sin2syn_ra: 0.100318, sin2syn_dec: 0.056948, cos1syn_ra: -0.715872, cos1syn_dec: -0.392839, sin3VwE_sinEl_d2_ra: 0.275074, sin3VwE_sinEl_d2_dec: 0.203498, sin2VwE_sinEl_d2_ra: -0.478564, sin2VwE_sinEl_d2_dec: 0.389791, cos2VwE_sinEl_d2_ra: 0.794413, cos2VwE_sinEl_d2_dec: 1.693138 },
-  Venus: { cosVwE_sinEl_ra: -0.648942, cosVwE_sinEl_dec: -0.017637, sinEl_d_ra: -0.033056, sinEl_d_dec: 0.046897, sinVwE_sinEl_ra: -0.634142, sinVwE_sinEl_dec: 0.007614, sin2VwE_sinEl_ra: 0.178425, sin2VwE_sinEl_dec: 0.104159, cos2VwE_sinEl_ra: -0.034447, cos2VwE_sinEl_dec: -0.036408, cos4VwE_sinEl_ra: 0.018023, cos4VwE_sinEl_dec: -0.024864, sin4VwE_sinEl_ra: -0.001607, sin4VwE_sinEl_dec: 0.029259, sinVwE_sinEl_d2_ra: 0.106228, sinVwE_sinEl_d2_dec: -0.025180, cos3VwE_sinEl_ra: -0.162322, cos3VwE_sinEl_dec: 0.064956, sin3VwE_sinEl_ra: -0.066331, sin3VwE_sinEl_dec: 0.017087, sin2syn_ra: -0.032247, sin2syn_dec: 0.006243, cos1syn_ra: 0.104233, cos1syn_dec: -0.035307, sin3VwE_sinEl_d2_ra: -0.013753, sin3VwE_sinEl_d2_dec: 0.003248, sin2VwE_sinEl_d2_ra: 0.006465, sin2VwE_sinEl_d2_dec: 0.021005, cos2VwE_sinEl_d2_ra: -0.018653, cos2VwE_sinEl_d2_dec: -0.001379 },
-  Mars: { cosVwE_sinEl_ra: 0.011881, cosVwE_sinEl_dec: 0.060605, sinEl_d_ra: 0.111452, sinEl_d_dec: 0.019925, sinVwE_sinEl_ra: -0.351413, sinVwE_sinEl_dec: -0.048738, sin2VwE_sinEl_ra: 0.112125, sin2VwE_sinEl_dec: 0.057848, cos2VwE_sinEl_ra: -0.012941, cos2VwE_sinEl_dec: -0.036956, cos4VwE_sinEl_ra: 0.023523, cos4VwE_sinEl_dec: -0.006615, sin4VwE_sinEl_ra: 0.003999, sin4VwE_sinEl_dec: 0.052588, sinVwE_sinEl_d2_ra: 0.068942, sinVwE_sinEl_d2_dec: 0.097411, cos3VwE_sinEl_ra: 0.028269, cos3VwE_sinEl_dec: 0.009177, sin3VwE_sinEl_ra: -0.166404, sin3VwE_sinEl_dec: 0.012511, sin2syn_ra: 0.020644, sin2syn_dec: -0.036710, cos1syn_ra: -0.019253, cos1syn_dec: 0.042691, sin3VwE_sinEl_d2_ra: -0.135334, sin3VwE_sinEl_d2_dec: 0.004911, sin2VwE_sinEl_d2_ra: -0.100987, sin2VwE_sinEl_d2_dec: -0.006718, cos2VwE_sinEl_d2_ra: 0.007131, cos2VwE_sinEl_d2_dec: 0.054425 },
+  Mercury: { cosVwE_sinEl_ra: -1.155388, cosVwE_sinEl_dec: -0.705691, sinEl_d_ra: -0.864733, sinEl_d_dec: -0.851607, sinVwE_sinEl_ra: -0.015674, sinVwE_sinEl_dec: -0.096485, sin2VwE_sinEl_ra: 0.771101, sin2VwE_sinEl_dec: -0.200465, cos2VwE_sinEl_ra: -0.105756, cos2VwE_sinEl_dec: -1.585162, cos4VwE_sinEl_ra: -0.329594, cos4VwE_sinEl_dec: -0.077228, sin4VwE_sinEl_ra: -0.132719, sin4VwE_sinEl_dec: -0.056339, sinVwE_sinEl_d2_ra: -0.029305, sinVwE_sinEl_d2_dec: 0.026474, cos3VwE_sinEl_ra: 0.180469, cos3VwE_sinEl_dec: 0.518293, sin3VwE_sinEl_ra: -0.402627, sin3VwE_sinEl_dec: 0.446283, sin2syn_ra: 0.100806, sin2syn_dec: 0.056987, cos1syn_ra: -0.717192, cos1syn_dec: -0.392958, sin3VwE_sinEl_d2_ra: 0.275216, sin3VwE_sinEl_d2_dec: 0.203507, sin2VwE_sinEl_d2_ra: -0.478237, sin2VwE_sinEl_d2_dec: 0.389497, cos2VwE_sinEl_d2_ra: 0.794608, cos2VwE_sinEl_d2_dec: 1.693614 },
+  Venus: { cosVwE_sinEl_ra: -0.648992, cosVwE_sinEl_dec: -0.017725, sinEl_d_ra: -0.034377, sinEl_d_dec: 0.046829, sinVwE_sinEl_ra: -0.634316, sinVwE_sinEl_dec: 0.007725, sin2VwE_sinEl_ra: 0.178316, sin2VwE_sinEl_dec: 0.104187, cos2VwE_sinEl_ra: -0.034254, cos2VwE_sinEl_dec: -0.036446, cos4VwE_sinEl_ra: 0.017999, cos4VwE_sinEl_dec: -0.024861, sin4VwE_sinEl_ra: -0.001626, sin4VwE_sinEl_dec: 0.029273, sinVwE_sinEl_d2_ra: 0.106308, sinVwE_sinEl_d2_dec: -0.025307, cos3VwE_sinEl_ra: -0.162304, cos3VwE_sinEl_dec: 0.064970, sin3VwE_sinEl_ra: -0.066338, sin3VwE_sinEl_dec: 0.017056, sin2syn_ra: -0.030794, sin2syn_dec: 0.006289, cos1syn_ra: 0.102785, cos1syn_dec: -0.035364, sin3VwE_sinEl_d2_ra: -0.013749, sin3VwE_sinEl_d2_dec: 0.003268, sin2VwE_sinEl_d2_ra: 0.006502, sin2VwE_sinEl_d2_dec: 0.020987, cos2VwE_sinEl_d2_ra: -0.018692, cos2VwE_sinEl_d2_dec: -0.001357 },
+  Mars: { cosVwE_sinEl_ra: 0.011851, cosVwE_sinEl_dec: 0.060602, sinEl_d_ra: 0.111315, sinEl_d_dec: 0.019957, sinVwE_sinEl_ra: -0.351360, sinVwE_sinEl_dec: -0.048732, sin2VwE_sinEl_ra: 0.112119, sin2VwE_sinEl_dec: 0.057856, cos2VwE_sinEl_ra: -0.012926, cos2VwE_sinEl_dec: -0.036943, cos4VwE_sinEl_ra: 0.023523, cos4VwE_sinEl_dec: -0.006615, sin4VwE_sinEl_ra: 0.004000, sin4VwE_sinEl_dec: 0.052588, sinVwE_sinEl_d2_ra: 0.068868, sinVwE_sinEl_d2_dec: 0.097399, cos3VwE_sinEl_ra: 0.028268, cos3VwE_sinEl_dec: 0.009177, sin3VwE_sinEl_ra: -0.166403, sin3VwE_sinEl_dec: 0.012510, sin2syn_ra: 0.020563, sin2syn_dec: -0.036692, cos1syn_ra: -0.019145, cos1syn_dec: 0.042667, sin3VwE_sinEl_d2_ra: -0.135338, sin3VwE_sinEl_d2_dec: 0.004910, sin2VwE_sinEl_d2_ra: -0.100991, sin2VwE_sinEl_d2_dec: -0.006726, cos2VwE_sinEl_d2_ra: 0.007118, cos2VwE_sinEl_d2_dec: 0.054410 },
 };
 const VENUS_CORRECTION = ELONGATION_CORRECTION.Venus; // legacy alias
 
