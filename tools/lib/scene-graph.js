@@ -1055,16 +1055,24 @@ function computePlanetPosition(target, jd) {
     const _phaseRate = -(2 * 2 * Math.PI / (C.H / 13) + 2 * Math.PI / _pInfo.perihelionEclipticYears);
     const _decPhi = _offCorr.decPhi0 * d2r + _phaseRate * _dyrs;
     const _raPhi  = _offCorr.raPhi0  * d2r + _phaseRate * _dyrs;
-    // Amplitude = relative inclination (planet vs Earth) at current epoch
-    // incl(t) = mean + ampl × cos(ascendingNode(t) - phaseAngle)
-    // Planet ascending node precesses at 360°/perihelionEclipticYears
+    // Amplitude = e × a × sin(|relativeInclination|)
+    // The eccentricity displaces the orbit center from the focus by e×a AU.
+    // Through the relative inclination, this creates an out-of-plane offset
+    // that projects as a declination error.
+    // Both inclinations oscillate: planet at perihelionEclipticYears, Earth at H/3.
     const _pNodePhase = (_pInfo.ascendingNodeInvPlane - _pInfo.inclinationPhaseAngle) * d2r + 2 * Math.PI / _pInfo.perihelionEclipticYears * _dyrs;
     const _pIncl = _pInfo.invPlaneInclinationMean + _pInfo.invPlaneInclinationAmplitude * Math.cos(_pNodePhase);
-    // Earth ascending node precesses at 360°/(H/3)
     const _eNodePhase = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * d2r + 2 * Math.PI / (C.H / 3) * _dyrs;
     const _eIncl = C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(_eNodePhase);
     const _relIncl = Math.abs(_pIncl - _eIncl);
-    const _amp = _relIncl * _offCorr.projectionFactor;
+    // Dynamic eccentricity: e(t) = base + amplitude × cos(eccentricityPhase(t))
+    const _eccPhase = _pInfo.eccentricityPhaseJ2000 * d2r + 2 * Math.PI / _pInfo.perihelionEclipticYears * _dyrs;
+    const _ecc = _pInfo.orbitalEccentricityBase + _pInfo.orbitalEccentricityAmplitude * Math.cos(_eccPhase);
+    // Actual orbital period and semi-major axis (Kepler: a³ = P²)
+    const _orbCount = Math.round(C.totalDaysInH / _pInfo.solarYearInput);
+    const _Pyrs = C.totalDaysInH / _orbCount / 365.25;
+    const _sma = Math.pow(_Pyrs * _Pyrs, 1 / 3);
+    const _amp = _ecc * _sma * Math.sin(_relIncl * d2r) * (180 / Math.PI); // degrees
     sph.theta -= (_offCorr.raConst + _amp * Math.cos(_Lsun - _raPhi)) * d2r;
     sph.phi   += (_offCorr.decConst + _amp * Math.cos(_Lsun - _decPhi)) * d2r;
   }

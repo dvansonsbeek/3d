@@ -2,52 +2,56 @@
 
 ## Overview
 
-The planet offset correction is a post-hoc correction layer that captures the systematic error introduced when the geocentric model projects a planet's orbital inclination through its rotation hierarchy. It is time-dependent: the phase drifts with Earth's axial precession and the amplitude scales with the planet's oscillating inclination.
+The planet offset correction is a post-hoc correction layer that captures a systematic declination error caused by the eccentricity-induced orbit center offset projected through the relative orbital inclination between a planet and Earth.
 
-Currently implemented for Mercury only. The same approach applies to any planet where the Tier 1 (observed) RMS reveals a Sun-longitude-dependent pattern.
+The amplitude is fully derived from orbital mechanics — no fitted amplitude parameter. Only the phase and bias constants (4 per planet) are fitted from Tier 1 observed data.
+
+Currently implemented for Mercury only. Mercury is uniquely affected because it has both the highest eccentricity (0.206) and the largest relative inclination to Earth (4.87°) of any planet.
 
 ## Physical Origin
 
-### The Problem
+### The Eccentricity Offset
 
-The geocentric model represents each planet's orbital inclination through scene-graph rotation nodes (`orbitTilta`, `orbitTiltb`). These are computed once from the J2000 epoch values of:
+In an eccentric orbit, the geometric center of the ellipse is displaced from the focus (Sun) by `e × a`, where `e` is the eccentricity and `a` is the semi-major axis. This displacement is directed toward the aphelion.
 
-- Invariable plane inclination (`invPlaneInclinationJ2000`)
-- Ascending node on the invariable plane (`ascendingNodeInvPlane`)
+For Mercury: `e × a = 0.206 × 0.387 AU = 0.080 AU`
 
-The decomposition `(inclination, ascendingNode) → (orbitTilta, orbitTiltb)` introduces a systematic error because:
+In the geocentric model, this means Mercury's orbit center is offset from the Sun by 0.08 AU. The model's scene-graph decomposes the orbital inclination into two fixed tilt angles (`orbitTilta`, `orbitTiltb`) computed at J2000. These tilts correctly orient the orbital plane but do not account for the displacement of the orbit center from the focus. The eccentricity offset, viewed through the tilted plane, produces a systematic out-of-plane error.
 
-1. The two tilt angles don't perfectly reconstruct the original 3D rotation at all ecliptic longitudes
-2. The projection through Earth's obliquity (23.4°) to get equatorial declination amplifies the mismatch
-3. The tilt values are fixed at J2000 — they don't track the precessing ascending node or oscillating inclination
+### Projection Through Relative Inclination
 
-### What the Error Looks Like
+Mercury's orbit is tilted by 4.87° relative to Earth's orbit on the invariable plane. This means Mercury's orbit center offset (0.08 AU) is not in the same plane as Earth's orbit — it has an out-of-plane component:
 
-For Mercury (7° ecliptic inclination, 4.87° relative to Earth):
+```
+out-of-plane displacement = e × a × sin(relative inclination)
+                          = 0.206 × 0.387 × sin(4.87°)
+                          = 0.0066 AU
+```
 
-| Component | Value | Meaning |
-|-----------|-------|---------|
-| Constant bias | +0.14° | Mean orbital plane sits ~0.14° too far north |
-| Sinusoidal amplitude | 0.35° | 7.4% × relative inclination (4.77°) |
-| Phase | Drifts at -2.94°/century | Tracks precessing equatorial frame |
+Viewed from Earth at ~1 AU distance, this subtends:
 
-The error is entirely in **declination** — RA errors are ~10× smaller. This is because the inclination affects latitude (→ declination), not longitude (→ RA).
+```
+angular error = 0.0066 AU / 1 AU × (180°/π) ≈ 0.38°
+```
 
-### Why Relative Inclination
+This matches the observed offset amplitude of **0.36°** at J2000. The small difference arises because the Earth's own eccentricity offset (0.017 AU toward 283°) partially cancels Mercury's offset depending on the relative perihelion angles (Mercury perihelion at 77°, Earth at 103°).
 
-The amplitude is proportional to the **difference** between the planet's and Earth's invariable plane inclinations, not the planet's absolute inclination:
+### Why Mercury Is Unique
 
-| Planet | Incl. (inv.plane) | Δ to Earth (1.48°) | Raw Dec signal | Offset needed? |
-|--------|-------------------|-------------------|----------------|----------------|
-| **Mercury** | 6.35° | **4.87°** | 0.208° | **Yes** — too large for parallax |
-| Venus | 2.15° | 0.67° | 0.137° | No — parallax absorbs 99% |
-| **Mars** | 1.63° | **0.15°** | 0.140° | No — nearly co-planar with Earth |
-| Jupiter | 0.32° | 1.16° | 0.020° | No — parallax absorbs 97% |
-| Saturn | 0.93° | 0.56° | 0.011° | No — parallax absorbs it |
+The formula `e × a × sin(Δincl)` explains why only Mercury needs this correction:
 
-Mars and Earth are nearly co-planar on the invariable plane (Δ = 0.15°), so the geocentric model barely needs to tilt Mars's orbit relative to Earth's — the rotation decomposition error is negligible. Mercury's 4.87° relative inclination creates a 0.21° signal that the 48-parameter parallax correction can only absorb ~55% of, leaving a 0.09° structured residual.
+| Planet | e | a (AU) | e×a (AU) | Δincl | Predicted | Parallax absorbs |
+|--------|------|--------|----------|-------|-----------|-----------------|
+| **Mercury** | **0.206** | 0.387 | **0.080** | **4.87°** | **0.38°** | 55% → 0.09° residual |
+| Venus | 0.007 | 0.723 | 0.005 | 0.58° | 0.003° | 99% |
+| Mars | 0.093 | 1.524 | 0.142 | 0.05° | 0.007° | ~100% (co-planar) |
+| Jupiter | 0.048 | 5.203 | 0.252 | 1.26° | 0.061° | 97% |
+| Saturn | 0.054 | 9.537 | 0.516 | 0.65° | 0.034° | ~95% |
 
-The **projection factor** (~7.4%) converts relative inclination to declination offset. It represents the geometric efficiency of the rotation hierarchy error projected through Earth's obliquity (23.4°).
+Mercury dominates because of the **product** `e × sin(Δincl)`:
+- Mercury: `0.206 × sin(4.87°) = 0.017` — an order of magnitude larger than any other planet
+- Mars has decent eccentricity (0.093) but is nearly co-planar with Earth (Δincl = 0.05°)
+- Jupiter has moderate Δincl (1.26°) but small eccentricity and the parallax easily absorbs it
 
 ### The Mercury Discovery
 
@@ -57,35 +61,44 @@ Analysis of 23 Mercury transit observations (1632-1799, Tier 1B) revealed:
 - **November transits** (RA ~225°, near descending node): Dec error **+0.07°**
 - Strong correlation with Sun longitude: r = 0.95
 
+The sinusoidal pattern peaks near Mercury's ascending node on the invariable plane (32.8°), where the out-of-plane component of the orbit center offset is largest.
+
 ## Time Dependence
 
-### Phase Drift
+All three components of the amplitude formula evolve over time:
 
-The correction phase drifts at **-2.94°/century**, completing a full cycle in ~12,250 years. This matches **2 × Earth's axial precession rate** (H/13) plus Mercury's node precession rate:
+### 1. Dynamic Eccentricity
+
+The eccentricity oscillates over the perihelion ecliptic precession period:
+
+```
+e(t) = orbitalEccentricityBase + orbitalEccentricityAmplitude × cos(eccentricityPhase(t))
+```
+
+For Mercury the variation is ±0.04% (negligible), but for Venus it's ±15% — significant if the correction is ever applied to other planets.
+
+### 2. Relative Inclination
+
+Both planet and Earth inclinations oscillate as their ascending nodes precess:
+
+```
+incl(t) = invPlaneInclinationMean + invPlaneInclinationAmplitude × cos(ascNode(t) - phaseAngle)
+```
+
+The planet's ascending node precesses at `360°/perihelionEclipticYears`. Earth's precesses at `360°/(H/3)`. The relative inclination `|planetIncl(t) - earthIncl(t)|` therefore oscillates with a complex beat pattern.
+
+### 3. Phase Drift
+
+The correction phase drifts at **-2.94°/century**, completing a full cycle in ~12,250 years:
 
 ```
 driftRate = -(2 × 2π/(H/13) + 2π/perihelionEclipticYears)
          = -(2 × 1.397 + 0.148) °/century
-         = -2.94 °/century
 ```
 
-**Why 2× Earth's axial precession?** The offset is in equatorial coordinates (Dec), but the inclination pattern is in the invariable plane frame. Earth's precessing equator (H/13 = 25,770 years) rotates the equatorial reference. The sin/cos product in the ecliptic-to-equatorial coordinate transformation creates a geometric frequency doubling, giving 2×(H/13) ≈ H/26 ≈ 12,885 years.
+This arises because the offset is measured in equatorial coordinates (Dec), but the inclination geometry is in the invariable plane frame. Earth's axial precession (H/13) rotates the equatorial reference frame, creating a geometric frequency doubling (2×H/13 ≈ H/26 ≈ 12,885 years).
 
 The drift rate is **fully derived** from existing model constants — no free parameter.
-
-### Amplitude Scaling
-
-The amplitude equals the **relative inclination** (planet minus Earth) times a projection factor. Both inclinations oscillate over time:
-
-```
-planetIncl(t) = invPlaneInclinationMean + invPlaneInclinationAmplitude × cos(inclPhase(t))
-earthIncl(t)  = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude × cos(earthInclPhase(t))
-
-relativeIncl(t) = |planetIncl(t) - earthIncl(t)|
-amplitude(t) = relativeIncl(t) × projectionFactor
-```
-
-The planet inclination oscillates at its `perihelionEclipticYears` period. Earth's inclination oscillates at `H/3` (111,669 years). For Mercury at J2000: `|6.35° - 1.58°| × 0.074 = 0.353°`.
 
 ## Formula
 
@@ -93,79 +106,86 @@ Applied in `scene-graph.js` after all other corrections:
 
 ```
 Lsun = (280.460 + 0.9856474 × (JD - 2451545)) × π/180
-
-year = startmodelYear + (JD - startmodelJD) / meanSolarYearDays
 Δyears = year - 2000
 
-phaseRate = -(2 × 2π/(H/13) + 2π/perihelionEclipticYears)    [derived]
-
+── Phase (drifts with precession) ──
+phaseRate = -(2 × 2π/(H/13) + 2π/perihelionEclipticYears)         [derived]
 decPhi = decPhi0 × π/180 + phaseRate × Δyears
 raPhi  = raPhi0  × π/180 + phaseRate × Δyears
 
-planetIncl = invPlaneInclinationMean + invPlaneInclinationAmplitude × cos(...)   [planet]
-earthIncl  = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude × cos(...)   [Earth, H/3]
+── Dynamic eccentricity ──
+eccPhase = eccentricityPhaseJ2000 + 2π/perihelionEclipticYears × Δyears
+e(t) = orbitalEccentricityBase + orbitalEccentricityAmplitude × cos(eccPhase)
 
-amp = |planetIncl - earthIncl| × projectionFactor              [derived from relative inclination]
+── Semi-major axis (from actual orbital period via Kepler) ──
+orbitCount = round(totalDaysInH / solarYearInput)
+P_years = totalDaysInH / orbitCount / 365.25
+a = (P_years²)^(1/3)                                               [Kepler: a³ = P²]
 
+── Relative inclination (both oscillate) ──
+planetIncl = planetMean + planetAmpl × cos(planetAscNode(t) - phaseAngle)    [node precesses at perihelionEclipticYears]
+earthIncl  = earthMean  + earthAmpl  × cos(earthAscNode(t)  - phaseAngle)    [node precesses at H/3]
+
+── Amplitude (fully derived from orbital mechanics) ──
+amp = e(t) × a × sin(|planetIncl(t) - earthIncl(t)|) × 180/π      [degrees]
+
+── Apply ──
 sph.theta -= (raConst + amp × cos(Lsun - raPhi)) × π/180
 sph.phi   += (decConst + amp × cos(Lsun - decPhi)) × π/180
 ```
 
-The amplitude is the planet's own `invPlaneInclinationAmplitude` — the same value that drives the inclination oscillation over the perihelion ecliptic precession cycle. It is not fitted; it follows directly from the model geometry.
-
 ## Parameters
 
-### Derived from model constants (not stored in JSON)
+### Fully derived (not stored — computed from orbital mechanics)
 
-| Parameter | Formula | Meaning |
-|-----------|---------|---------|
-| `amplitude` | `\|planetIncl(t) - earthIncl(t)\| × projectionFactor` | Relative inclination × projection efficiency |
-| `phaseRate` | `-(2 × 2π/(H/13) + 2π/perihelionEclipticYears)` | Phase drift: 2× Earth axial precession + node rate |
-| `planetIncl(t)` | `mean + ampl × cos(inclPhase)` | Planet inclination oscillation |
-| `earthIncl(t)` | `mean + ampl × cos(earthInclPhase)` | Earth inclination oscillation (period H/3) |
+| Parameter | Source | Meaning |
+|-----------|--------|---------|
+| `e(t)` | `base + ampl × cos(eccPhase(t))` | Dynamic eccentricity |
+| `a` | Kepler's third law from actual period | Semi-major axis (AU) |
+| `Δincl(t)` | `\|planetIncl(t) - earthIncl(t)\|` | Relative inclination (both oscillate) |
+| `amplitude` | `e(t) × a × sin(Δincl(t))` | Orbit center out-of-plane offset (AU → degrees) |
+| `phaseRate` | `-(2 × 2π/(H/13) + 2π/perihelionEclipticYears)` | Phase drift from precessing equatorial frame |
 
 ### Fitted per planet (stored in `fitted-coefficients.json`)
 
 | Parameter | Mercury | Meaning |
 |-----------|---------|---------|
-| `projectionFactor` | 0.074 | Geometric projection efficiency (~7.4%) |
 | `decConst` | 0.14° | Mean Dec bias from rotation chain |
 | `decPhi0` | -40.5° | Dec pattern phase at J2000 |
 | `raConst` | 0.018° | Mean RA bias |
 | `raPhi0` | 122° | RA pattern phase at J2000 |
 
-**Total free parameters: 5** per planet (projectionFactor, decConst, decPhi0, raConst, raPhi0).
-**Derived parameters: 4** (phaseRate, planetIncl, earthIncl, amplitude) — from existing model constants.
+**Total free parameters: 4** per planet.
+**Derived parameters: 5** — from orbital mechanics and model constants.
 
-The `projectionFactor` (7.4%) represents the geometric efficiency of the rotation hierarchy error projected through Earth's obliquity. The 4 const/phi parameters capture the specific phase and bias of the error at J2000. All 5 would change if the model architecture changes significantly, but are stable across normal parameter refitting.
+The 4 fitted parameters capture how the scene-graph rotation chain maps the eccentricity offset error into equatorial coordinates:
+
+- **`decConst`** — The mean northward Dec bias. This arises because the orbit center offset has a net out-of-plane component that doesn't average to zero over all Sun longitudes (the projection through obliquity is asymmetric).
+- **`decPhi0`** — The Sun longitude where the Dec error is maximum. Related to the ascending node geometry but shifted by the obliquity transformation.
+- **`raConst`** / **`raPhi0`** — Same for RA (much smaller, ~10× less than Dec, because the offset primarily affects latitude/declination, not longitude/RA).
+
+These are stable across normal pipeline refitting (post-hoc layer, never refitted).
 
 ### Performance
 
-| Metric | Without offset | Fixed offset | Time-dependent (relative incl) |
-|--------|---------------|-------------|-------------------------------|
-| Mercury T1 RMS | 0.147° | 0.039° | **0.029°** |
-| Mercury All RMS | 0.310° | 0.410° | 0.480° |
+| Metric | Without offset | Fixed offset | Time-dependent |
+|--------|---------------|-------------|----------------|
+| Mercury T1 RMS | 0.147° | 0.039° | **0.030°** |
+| Mercury All RMS | 0.310° | 0.410° | 0.497° |
 | Valid timespan | — | ~1600-2200 | **Full H** |
 
 The All RMS increase is expected and acceptable: the correction prioritizes matching the 23 observed transit positions over the ~5000 JPL numerical positions. The JPL data (Tier 2) is computed, not observed — Tier 1 accuracy is the true measure of model quality.
 
-## Why Only Mercury Needs This
+## Extending to Other Planets
 
-The same inclination-projection error exists for all planets, but it's only significant for Mercury because:
-
-1. Mercury has the largest relative inclination to Earth (4.87°) — 8× larger than Jupiter (1.16°), 32× larger than Mars (0.15°)
-2. The raw model error (0.21°) is too large and structured for the 48-parameter parallax correction to fully absorb — parallax only captures 55% of it
-3. Mars has Δincl = 0.15° (nearly co-planar with Earth) → raw signal only 0.002°, fully absorbed by parallax
-4. Jupiter has Δincl = 1.16° → raw signal 0.020°, parallax absorbs 97%
-
-If a future planet shows a Sun-longitude-correlated Dec residual after parallax fitting, the same correction can be added:
+The formula works for any planet. To add the correction:
 
 1. Collect Tier 1 residuals from `baseline(planet).entries`
 2. Check correlation of dDec with sin(L)/cos(L). If r > 0.8, proceed.
-3. Fit `projectionFactor`, `decConst`, `decPhi0` using the relative inclination formula
-4. Fit `raConst`, `raPhi0`
-5. Add 5 parameters to `PLANET_OFFSET_CORRECTION` in `fitted-coefficients.json`
-   (amplitude, phase rate, and inclination scaling are derived automatically)
+3. Fit only `decConst`, `decPhi0`, `raConst`, `raPhi0` — the amplitude is derived automatically from `e × a × sin(Δincl)`
+4. Add 4 parameters to `PLANET_OFFSET_CORRECTION` in `fitted-coefficients.json`
+
+In practice, only Mercury needs it — the formula predicts <0.06° for all other planets, which the parallax correction fully absorbs.
 
 The phase rate uses the same formula for all planets:
 ```
@@ -176,8 +196,8 @@ phaseRate = -(2 × 2π/(H/13) + 2π/planet.perihelionEclipticYears)
 
 | File | What |
 |------|------|
-| `tools/lib/scene-graph.js` (lines 1041-1060) | Applies the correction |
-| `public/input/fitted-coefficients.json` | Stores `PLANET_OFFSET_CORRECTION` |
+| `tools/lib/scene-graph.js` (lines 1047-1073) | Applies the correction |
+| `public/input/fitted-coefficients.json` | Stores 4 fitted parameters per planet |
 | `tools/lib/correction-stack.js` | Defines as `type: 'post-hoc'` — always disabled during fitting |
 | `src/script.js` (line ~963, ~36490) | Browser implementation (synced by export-to-script.js) |
 

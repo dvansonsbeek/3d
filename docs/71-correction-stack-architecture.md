@@ -24,8 +24,9 @@ Raw Model Position (from scene-graph rotation hierarchy)
   │                         Elongation × Earth perihelion geometry
   │                         Source: ELONGATION_CORRECTION
   │
-  ├─ 4. PLANET OFFSET       Time-dependent inclination projection correction
-  │                         Phase drifts with precession, amplitude scales with inclination
+  ├─ 4. PLANET OFFSET       Eccentricity offset through relative inclination
+  │                         Amplitude: e × a × sin(Δincl), fully derived
+  │                         Phase drifts with precession; 4 fitted bias/phase params
   │                         Source: PLANET_OFFSET_CORRECTION
   │                         Type: POST-HOC (never refitted in pipeline)
   │
@@ -46,9 +47,9 @@ Raw Model Position (from scene-graph rotation hierarchy)
 
 The parallax correction has 48 free parameters per planet — enough to model almost any smooth pattern. If a post-hoc correction is active during parallax fitting, the parallax will try to compensate for it, creating a feedback loop:
 
-1. Post-hoc shifts Mercury Dec by +0.13°
-2. Parallax sees this and allocates parameters to cancel it
-3. Next iteration, post-hoc still adds +0.13°, but parallax now overcorrects
+1. Post-hoc shifts Mercury Dec by up to ±0.38° (from eccentricity offset × relative inclination)
+2. Parallax sees this and allocates its 48 parameters to cancel it
+3. Next iteration, post-hoc still applies ±0.38°, but parallax now overcorrects
 4. Coefficients diverge with each refit cycle
 
 The `prepareForFitting()` function prevents this by automatically disabling all post-hoc layers during any fitting pass:
