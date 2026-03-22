@@ -77,10 +77,17 @@ const basisFn = (pt) => {
     Math.cos(2*pt.conjPhase),                   // AU_: cos(2× conjunction phase)
     Math.sin(pt.conjPhase)/pt.d,                // AV: sin(conj phase)/d
     Math.cos(pt.conjPhase)/pt.d,                // AW: cos(conj phase)/d
+    // Extended terms (49-52) — eccentricity offset through relative inclination
+    // The orbit center offset (e×a) projects through the relative inclination
+    // as a Sun-longitude-dependent declination error that scales with 1/distance.
+    Math.sin(pt.Lsun)/pt.d,                     // AX: sin(Lsun)/d — eccentricity offset RA
+    Math.cos(pt.Lsun)/pt.d,                     // AY: cos(Lsun)/d — eccentricity offset Dec
+    Math.sin(pt.Lsun),                           // AZ: sin(Lsun) — eccentricity offset (distance-independent)
+    Math.cos(pt.Lsun),                           // BA: cos(Lsun) — eccentricity offset (distance-independent)
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA'];
 
 // Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
@@ -91,6 +98,7 @@ const tiers = [
   { name: '36p', count: 36 },
   { name: '42p', count: 42 },
   { name: '48p', count: 48 },
+  { name: '52p', count: 52 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
@@ -132,7 +140,9 @@ for (const target of targets) {
     const dd = result.distAU;
     const u = (modelRA - ascNode) * d2r;
     const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
-    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, weight: pt.weight || 1 });
+    const dt = pt.jd - 2451545.0;
+    const Lsun = (280.460 + 0.9856474 * dt) * d2r; // Sun mean longitude
+    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, Lsun, weight: pt.weight || 1 });
   }
 
   const n = data.length;
@@ -179,8 +189,7 @@ for (const target of targets) {
   allRaCorrections[target] = raObj;
 }
 
-C.ASTRO_REFERENCE.decCorrection = savedDec;
-C.ASTRO_REFERENCE.raCorrection = savedRA;
+restore(); // re-enable parallax + post-hoc corrections
 
 // ─── Write to fitted-coefficients.json if --write flag is present ────
 if (process.argv.includes('--write')) {

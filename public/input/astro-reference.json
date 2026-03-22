@@ -1,6 +1,5 @@
 {
   "_description": "Astronomical reference data — external values from IAU, JPL, Meeus, Souami & Souchay. Nothing model-specific. Source of truth for both tools/lib/constants/astro-reference.js and src/script.js.",
-
   "physicalConstants": {
     "currentAUDistance": 149597870.698828,
     "meansiderealyearlengthinSeconds": 31558149.8,
@@ -17,9 +16,8 @@
       "neptune": 19412.237
     }
   },
-
   "earthOrbital": {
-    "j2000EpochYear": 2000.0,
+    "j2000EpochYear": 2000,
     "perihelionalignmentYear": 1246,
     "juneSolstice2000_JD": 2451716.575,
     "obliquityJ2000_deg": 23.439291111,
@@ -33,14 +31,12 @@
     "deltaTStart": 63.63,
     "sunTilt": 7.155
   },
-
   "cardinalPointAnchors": {
     "SS": 2451716.575,
     "WS": 2451900.067346,
     "VE": 2451623.737525,
     "AE": 2451810.304175
   },
-
   "moonReference": {
     "moonSiderealMonthInput": 27.32166156,
     "moonAnomalisticMonthInput": 27.55454988,
@@ -50,7 +46,6 @@
     "moonOrbitalEccentricityBase": 0.054900489,
     "moonTilt": 6.687
   },
-
   "moonMeeus": {
     "_description": "Lunar mean longitude coefficients (Meeus Ch. 47). Full perturbation tables in tools/lib/constants/meeus-lunar-tables.json.",
     "moonMeanAnomalyJ2000_deg": 134.9634,
@@ -64,11 +59,10 @@
     "moonMeanElongationJ2000Full_deg": 297.8502042,
     "moonMeanElongationRate_degPerCentury": 445267.1115168
   },
-
   "planetOrbitalElements": {
     "_description": "JPL/SPICE J2000 orbital elements per planet",
     "mercury": {
-      "solarYearInput": 87.9686,
+      "solarYearInput": 87.9681,
       "orbitalEccentricityJ2000": 0.20563593,
       "axialTiltMean": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
@@ -91,7 +85,7 @@
     },
     "mars": {
       "solarYearInput": 686.931,
-      "orbitalEccentricityJ2000": 0.09339410,
+      "orbitalEccentricityJ2000": 0.0933941,
       "axialTiltMean": 25.19,
       "eclipticInclinationJ2000": 1.84969142,
       "longitudePerihelion": 336.0650681,
@@ -112,7 +106,7 @@
       "trueAnomaly": 35.69428061
     },
     "saturn": {
-      "solarYearInput": 10747.0,
+      "solarYearInput": 10747,
       "orbitalEccentricityJ2000": 0.05386179,
       "axialTiltMean": 26.73,
       "eclipticInclinationJ2000": 2.48599187,
@@ -145,7 +139,6 @@
       "trueAnomaly": 261.2242728
     }
   },
-
   "additionalBodiesReference": {
     "pluto": {
       "solarYearInput": 90465,
@@ -166,7 +159,6 @@
       "invPlaneInclinationJ2000": 0.4331698
     }
   },
-
   "ascendingNodesSouamiSouchay": {
     "_description": "Raw ascending nodes on invariable plane from Souami & Souchay (2012) Table 2",
     "earth": 284.51,
@@ -182,19 +174,41 @@
     "eros": 10.36,
     "ceres": 80.89
   },
-
   "laplaceLagrangeBounds": {
     "_description": "Inclination bounds from Farside Table 10.4 (Brouwer & van Woerkom). Units: degrees.",
-    "mercury": [4.57, 9.86],
-    "venus": [0.00, 3.38],
-    "earth": [0.00, 2.95],
-    "mars": [0.00, 5.84],
-    "jupiter": [0.241, 0.489],
-    "saturn": [0.797, 1.02],
-    "uranus": [0.902, 1.11],
-    "neptune": [0.554, 0.800]
+    "mercury": [
+      4.57,
+      9.86
+    ],
+    "venus": [
+      0,
+      3.38
+    ],
+    "earth": [
+      0,
+      2.95
+    ],
+    "mars": [
+      0,
+      5.84
+    ],
+    "jupiter": [
+      0.241,
+      0.489
+    ],
+    "saturn": [
+      0.797,
+      1.02
+    ],
+    "uranus": [
+      0.902,
+      1.11
+    ],
+    "neptune": [
+      0.554,
+      0.8
+    ]
   },
-
   "jplEclipticInclinationTrends": {
     "_description": "JPL ecliptic inclination trend rates (degrees/century). Source: https://ssd.jpl.nasa.gov/planets/approx_pos.html",
     "mercury": -0.00595,
@@ -204,9 +218,8 @@
     "saturn": 0.00194,
     "uranus": -0.00243,
     "neptune": 0.00035,
-    "pluto": -0.00100
+    "pluto": -0.001
   },
-
   "eigenmodePhasesLaplaceLagrange": {
     "_description": "Laplace-Lagrange inclination eigenmode phase angles (degrees). Source: Farside Table 10.1.",
     "gamma1": 20.23,
@@ -217,22 +230,20 @@
     "gamma7": 315.6,
     "gamma8": 202.8
   },
-
   "yearLengthRef": {
     "tropicalYearVE": 365.242374,
     "tropicalYearSS": 365.241626,
     "tropicalYearAE": 365.242018,
-    "tropicalYearWS": 365.242740,
+    "tropicalYearWS": 365.24274,
     "tropicalYearMean": 365.2421897,
     "anomalisticYear": 365.259636,
     "siderealYear": 365.256363,
     "iauPrecessionJ2000": 25771.57634,
     "tropicalYearRateSecPerCentury": -0.53,
-    "solarDay": 86400.0,
+    "solarDay": 86400,
     "siderealDay": 86164.09053083288,
     "stellarDay": 86164.0989036905
   },
-
   "knownValues": {
     "_description": "Validation reference values for comparison (used by moon-cycles.js). Moon month inputs are in moonReference — not duplicated here.",
     "jupiterSaturnConjunctionPeriod": 19.859,
@@ -240,12 +251,11 @@
     "moonTropicalMonth": 27.321582,
     "moonNodalPrecessionYears": 18.613,
     "moonApsidalPrecessionYears": 8.849,
-    "moonDraconicYear": 346.620,
+    "moonDraconicYear": 346.62,
     "fullMoonCycleDays": 411.78,
     "sarosDays": 6585.32,
     "exeligmosDays": 19755.96
   },
-
   "galaxyMotion": {
     "_description": "Sun and galaxy motion parameters (visualization only)",
     "milkywayDistance": 27500,

@@ -911,6 +911,10 @@ function computePlanetPosition(target, jd) {
     const sinCP = Math.sin(conjPhase), cosCP = Math.cos(conjPhase);
     const sin2CP = Math.sin(2 * conjPhase), cos2CP = Math.cos(2 * conjPhase);
 
+    // Sun mean longitude for eccentricity-offset terms (AX-BA)
+    const _Lsun = (280.460 + 0.9856474 * (jd - 2451545.0)) * d2r;
+    const sinLsun = Math.sin(_Lsun), cosLsun = Math.cos(_Lsun);
+
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
       const invDS = invD * invS;
@@ -936,7 +940,9 @@ function computePlanetPosition(target, jd) {
         + (dc.AP || 0) * sinU * invD2 * invD + (dc.AQ || 0) * cosU * invD2 * invD
         + (dc.AR || 0) * sinCP + (dc.AS || 0) * cosCP
         + (dc.AT || 0) * sin2CP + (dc.AU_ || 0) * cos2CP
-        + (dc.AV || 0) * sinCP * invD + (dc.AW || 0) * cosCP * invD;
+        + (dc.AV || 0) * sinCP * invD + (dc.AW || 0) * cosCP * invD
+        + (dc.AX || 0) * sinLsun * invD + (dc.AY || 0) * cosLsun * invD
+        + (dc.AZ || 0) * sinLsun + (dc.BA || 0) * cosLsun;
       sph.phi += corrDec * d2r;
     }
 
@@ -965,7 +971,9 @@ function computePlanetPosition(target, jd) {
         + (rc.AP || 0) * sinU * invD2 * invD + (rc.AQ || 0) * cosU * invD2 * invD
         + (rc.AR || 0) * sinCP + (rc.AS || 0) * cosCP
         + (rc.AT || 0) * sin2CP + (rc.AU_ || 0) * cos2CP
-        + (rc.AV || 0) * sinCP * invD + (rc.AW || 0) * cosCP * invD;
+        + (rc.AV || 0) * sinCP * invD + (rc.AW || 0) * cosCP * invD
+        + (rc.AX || 0) * sinLsun * invD + (rc.AY || 0) * cosLsun * invD
+        + (rc.AZ || 0) * sinLsun + (rc.BA || 0) * cosLsun;
       sph.theta -= corrRA * d2r;
     }
   }
