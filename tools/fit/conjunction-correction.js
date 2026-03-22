@@ -194,7 +194,9 @@ for (const elPlanet of elongationPlanets) {
     e.synPhase = 2 * Math.PI * dt / synodicPl;
   }
 
-  // 15 offset-aware basis functions (same for all inner planets)
+  // 21 offset-aware basis functions (same for all inner planets)
+  // Original 15 use sin(elong) — active at max elongation, zero at conjunction/opposition.
+  // New 6 use cos(elong) — active at conjunction/opposition (the blind spot), zero at max elong.
   const elBasis = [
     { name: 'cosVwE_sinEl',    fn: e => Math.cos(e.vFromWE) * Math.sin(e.elong) },
     { name: 'sinEl_d',         fn: e => Math.sin(e.elong) / e.distAU },
@@ -211,6 +213,13 @@ for (const elPlanet of elongationPlanets) {
     { name: 'sin3VwE_sinEl_d2',fn: e => Math.sin(3 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
     { name: 'sin2VwE_sinEl_d2',fn: e => Math.sin(2 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
     { name: 'cos2VwE_sinEl_d2',fn: e => Math.cos(2 * e.vFromWE) * Math.sin(e.elong) / (e.distAU * e.distAU) },
+    // cos(elong) terms — active at conjunction (elong=0°) and opposition (elong=180°)
+    { name: 'cosEl_d',         fn: e => Math.cos(e.elong) / e.distAU },
+    { name: 'cosVwE_cosEl_d',  fn: e => Math.cos(e.vFromWE) * Math.cos(e.elong) / e.distAU },
+    { name: 'sinVwE_cosEl_d',  fn: e => Math.sin(e.vFromWE) * Math.cos(e.elong) / e.distAU },
+    { name: 'cosEl_d2',        fn: e => Math.cos(e.elong) / (e.distAU * e.distAU) },
+    { name: 'cosVwE_cosEl_d2', fn: e => Math.cos(e.vFromWE) * Math.cos(e.elong) / (e.distAU * e.distAU) },
+    { name: 'sinVwE_cosEl_d2', fn: e => Math.sin(e.vFromWE) * Math.cos(e.elong) / (e.distAU * e.distAU) },
   ];
 
   // Fit using least squares

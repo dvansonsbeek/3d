@@ -1027,7 +1027,8 @@ function computePlanetPosition(target, jd) {
     const _synVE = 1 / Math.abs(1 - _plCount / C.H);
     const _synPhase = 2 * Math.PI * (_yr - 2000) / _synVE;
     // 15 basis functions (1st-4th harmonics of V-ωE × sin(elongation) + synodic + d²-weighted)
-    const sinEl = Math.sin(_elong), cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);
+    const sinEl = Math.sin(_elong), cosEl = Math.cos(_elong);
+    const cosVwE = Math.cos(_vFromWE), sinVwE = Math.sin(_vFromWE);
     const sin2VwE = Math.sin(2 * _vFromWE), cos2VwE = Math.cos(2 * _vFromWE);
     const sin3VwE = Math.sin(3 * _vFromWE), cos3VwE = Math.cos(3 * _vFromWE);
     const sin4VwE = Math.sin(4 * _vFromWE), cos4VwE = Math.cos(4 * _vFromWE);
@@ -1046,7 +1047,13 @@ function computePlanetPosition(target, jd) {
                 + (vc.cos1syn_ra || 0) * Math.cos(_synPhase)
                 + (vc.sin3VwE_sinEl_d2_ra || 0) * sin3VwE * sinEl * invD * invD
                 + (vc.sin2VwE_sinEl_d2_ra || 0) * sin2VwE * sinEl * invD * invD
-                + (vc.cos2VwE_sinEl_d2_ra || 0) * cos2VwE * sinEl * invD * invD) * d2r;
+                + (vc.cos2VwE_sinEl_d2_ra || 0) * cos2VwE * sinEl * invD * invD
+                + (vc.cosEl_d_ra || 0) * cosEl * invD
+                + (vc.cosVwE_cosEl_d_ra || 0) * cosVwE * cosEl * invD
+                + (vc.sinVwE_cosEl_d_ra || 0) * sinVwE * cosEl * invD
+                + (vc.cosEl_d2_ra || 0) * cosEl * invD * invD
+                + (vc.cosVwE_cosEl_d2_ra || 0) * cosVwE * cosEl * invD * invD
+                + (vc.sinVwE_cosEl_d2_ra || 0) * sinVwE * cosEl * invD * invD) * d2r;
     sph.phi += ((vc.cosVwE_sinEl_dec || 0) * cosVwE * sinEl
               + (vc.sinEl_d_dec || 0) * sinEl * invD
               + (vc.sinVwE_sinEl_dec || 0) * sinVwE * sinEl
@@ -1061,7 +1068,13 @@ function computePlanetPosition(target, jd) {
               + (vc.cos1syn_dec || 0) * Math.cos(_synPhase)
               + (vc.sin3VwE_sinEl_d2_dec || 0) * sin3VwE * sinEl * invD * invD
               + (vc.sin2VwE_sinEl_d2_dec || 0) * sin2VwE * sinEl * invD * invD
-              + (vc.cos2VwE_sinEl_d2_dec || 0) * cos2VwE * sinEl * invD * invD) * d2r;
+              + (vc.cos2VwE_sinEl_d2_dec || 0) * cos2VwE * sinEl * invD * invD
+              + (vc.cosEl_d_dec || 0) * cosEl * invD
+              + (vc.cosVwE_cosEl_d_dec || 0) * cosVwE * cosEl * invD
+              + (vc.sinVwE_cosEl_d_dec || 0) * sinVwE * cosEl * invD
+              + (vc.cosEl_d2_dec || 0) * cosEl * invD * invD
+              + (vc.cosVwE_cosEl_d2_dec || 0) * cosVwE * cosEl * invD * invD
+              + (vc.sinVwE_cosEl_d2_dec || 0) * sinVwE * cosEl * invD * invD) * d2r;
   }
 
   // Planet offset correction (time-dependent, fitted from Tier 1 observed data)
