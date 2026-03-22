@@ -123,10 +123,10 @@ planets.mercury = {
   orbitalEccentricityBase: 0.20563593,
   orbitalEccentricityAmplitude: 8.436789e-5,
   eccentricityPhaseJ2000: 89.9882,
-  angleCorrection: 0.9709076360988149,
+  angleCorrection: 0.9709076360262152,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
-  startpos: 83.52873918554057,
+  startpos: 83.5311863165714,
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
@@ -36507,7 +36507,7 @@ function updatePositions() {
         const _opNodePh = (_opInfo.ascendingNodeInvPlane - _opInfo.inclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / _opInfo.perihelionEclipticYears * _odyrs;
         const _opIncl = _opInfo.invPlaneInclinationMean + _opInfo.invPlaneInclinationAmplitude * Math.cos(_opNodePh);
         // Earth ascending node precesses at 360°/(H/3)
-        const _oeNodePh = (ASTRO_REFERENCE.earthAscendingNodeInvPlane - ASTRO_REFERENCE.earthInclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / (holisticyearLength / 3) * _odyrs;
+        const _oeNodePh = (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / (holisticyearLength / 3) * _odyrs;
         const _oeIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(_oeNodePh);
         const _oamp = Math.abs(_opIncl - _oeIncl) * _offCorr.projectionFactor;
         obj.ra -= (_offCorr.raConst + _oamp * Math.cos(_Lsun - _oraPhi)) * (Math.PI / 180);
