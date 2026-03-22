@@ -163,9 +163,12 @@ const wERate = 360 / (C.H / 16);
 
 // ─── Elongation correction for inner planets ────────────────────────────
 // Fits offset × elongation basis functions to capture the geocentric
-// viewing geometry error. Applied to Mercury, Venus, and Mars.
+// viewing geometry error. Applied to Venus and Mars.
+// Mercury excluded: its 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²) handle
+// the synodic close-approach geometry directly — overlaps with elongation basis
+// functions (r=0.74 at close approach), causing instability when both are active.
 
-const elongationPlanets = ['mercury', 'venus', 'mars'];
+const elongationPlanets = ['venus', 'mars'];
 const elongationCorrections = {};
 
 for (const elPlanet of elongationPlanets) {

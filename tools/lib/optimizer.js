@@ -1036,8 +1036,23 @@ function nelderMead(planet, paramNames, options = {}) {
   const scale = initialScale || initial.map(v => Math.max(Math.abs(v) * 0.02, 0.001));
 
 
+  // Parameter bounds: restrict startpos search to ±10° of initial value.
+  // Inner planets (Mercury, Venus) have two local minima for startpos
+  // separated by ~10° — the near and far side of the orbit as seen from Earth.
+  // We want the near-side solution (closest approach).
+  const bounds = {};
+  for (let i = 0; i < n; i++) {
+    if (paramNames[i] === 'startpos') {
+      bounds[i] = { min: initial[i] - 10, max: initial[i] + 10 };
+    }
+  }
+
   // Objective function
   function objective(x) {
+    // Apply bounds penalty — large cost for out-of-bounds parameters
+    for (const [idx, b] of Object.entries(bounds)) {
+      if (x[idx] < b.min || x[idx] > b.max) return 1e6;
+    }
     const overrides = {};
     for (let i = 0; i < n; i++) overrides[paramNames[i]] = x[i];
     const bl = baseline(planet, overrides, refDates);
