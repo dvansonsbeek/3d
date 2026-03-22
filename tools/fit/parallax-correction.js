@@ -90,10 +90,19 @@ const basisFn = (pt) => {
     T*Math.cos(pt.Lsun)/pt.d,                    // BC: T*cos(Lsun)/d — secular drift at close approach
     T*Math.sin(pt.Lsun),                          // BD: T*sin(Lsun) — secular drift (distance-independent)
     T*Math.cos(pt.Lsun),                          // BE: T*cos(Lsun) — secular drift (distance-independent)
+    // Extended terms (57-62) — nonlinear close-approach interactions
+    // Captures the interaction between orbital geometry (u) and Sun longitude (Lsun)
+    // at close approach distances, where the geocentric tilt decomposition breaks down.
+    Math.cos(pt.u)*Math.sin(pt.Lsun)/(pt.d*pt.d), // BF: cos(u)×sin(Lsun)/d² — inclination×Lsun at close approach
+    Math.cos(pt.u)*Math.cos(pt.Lsun)/(pt.d*pt.d), // BG: cos(u)×cos(Lsun)/d² — inclination×Lsun at close approach
+    Math.sin(pt.Lsun)/(pt.d*pt.d*pt.d),            // BH: sin(Lsun)/d³ — cubic close approach eccentricity offset
+    Math.cos(pt.Lsun)/(pt.d*pt.d*pt.d),            // BI: cos(Lsun)/d³ — cubic close approach eccentricity offset
+    Math.sin(pt.u-pt.Lsun)/(pt.d*pt.d),            // BJ: sin(u-Lsun)/d² — synodic phase at close approach
+    Math.cos(pt.u-pt.Lsun)/(pt.d*pt.d),            // BK: cos(u-Lsun)/d² — synodic phase at close approach
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK'];
 
 // Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
@@ -106,6 +115,7 @@ const tiers = [
   { name: '48p', count: 48 },
   { name: '52p', count: 52 },
   { name: '56p', count: 56 },
+  { name: '62p', count: 62 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
