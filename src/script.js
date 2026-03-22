@@ -958,10 +958,6 @@ const ELONGATION_CORRECTION = {
 };
 const VENUS_CORRECTION = ELONGATION_CORRECTION.Venus; // legacy alias
 
-// PLANET_OFFSET_CORRECTION removed — Mercury's inclination geometry is now handled
-// entirely by the 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²).
-// See docs/72-planet-offset-correction.md for the physics derivation.
-
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
@@ -37413,10 +37409,6 @@ function updatePositions() {
                + (_vc.sin2VwE_sinEl_d2_dec || 0) * _sin2VwE * _sinEl * _invDv2
                + (_vc.cos2VwE_sinEl_d2_dec || 0) * _cos2VwE * _sinEl * _invDv2) * _d2r;
     }
-
-    // PLANET_OFFSET_CORRECTION removed — Mercury's inclination geometry is now
-    // handled by the 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²).
-    // See docs/72-planet-offset-correction.md for the physics derivation.
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.
