@@ -84,10 +84,16 @@ const basisFn = (pt) => {
     Math.cos(pt.Lsun)/pt.d,                     // AY: cos(Lsun)/d — eccentricity offset Dec
     Math.sin(pt.Lsun),                           // AZ: sin(Lsun) — eccentricity offset (distance-independent)
     Math.cos(pt.Lsun),                           // BA: cos(Lsun) — eccentricity offset (distance-independent)
+    // Extended terms (53-56) — time-dependent eccentricity offset (secular drift)
+    // Captures the accumulating drift at Sun-longitude geometry over centuries.
+    T*Math.sin(pt.Lsun)/pt.d,                    // BB: T*sin(Lsun)/d — secular drift at close approach
+    T*Math.cos(pt.Lsun)/pt.d,                    // BC: T*cos(Lsun)/d — secular drift at close approach
+    T*Math.sin(pt.Lsun),                          // BD: T*sin(Lsun) — secular drift (distance-independent)
+    T*Math.cos(pt.Lsun),                          // BE: T*cos(Lsun) — secular drift (distance-independent)
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE'];
 
 // Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
@@ -99,6 +105,7 @@ const tiers = [
   { name: '42p', count: 42 },
   { name: '48p', count: 48 },
   { name: '52p', count: 52 },
+  { name: '56p', count: 56 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
