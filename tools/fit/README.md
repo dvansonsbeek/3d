@@ -104,13 +104,7 @@ Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Uses prepareForFitting() to disable parallax + all post-hoc layers.
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 5b: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
-         Optimizes Moon's 3 startpos values against 66 solar eclipses (2000–2025)
-         Measures Moon-Sun angular separation at each eclipse — should be ~0°
-         Updates: model-parameters.json (auto-updated by script)
-         Verify: RMS separation < 0.85°, individual eclipses < 2°
-
-Step 5c: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONGATION_CORRECTION
+Step 5b: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONGATION_CORRECTION
          Two-stage post-parallax correction:
          1. Synodic conjunction terms (sin/cos at per-planet periods)
          2. Elongation offset correction (15 basis functions for Mercury/Venus/Mars)
@@ -122,6 +116,13 @@ Step 5c: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONG
            Only re-run if planet orbital elements or EoC architecture changes.
          • ascnode-correction.js — scans ascNodeTiltCorrection. No --write.
            Step 2 already optimizes startpos/angleCorrection.
+
+Step 5c: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
+         Optimizes Moon's 3 startpos values against 66 solar eclipses (2000–2025)
+         Measures Moon-Sun angular separation at each eclipse — should be ~0°
+         Independent of the planet correction stack (Steps 5a/5b).
+         Updates: model-parameters.json (auto-updated by script)
+         Verify: RMS separation < 0.85°, individual eclipses < 2°
 
 ── Phase 5: Cardinal point harmonics ──────────────────────────────
 
@@ -233,17 +234,18 @@ node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
 node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
 node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
 node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
-node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5c 20 times
-node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5c until improvement < 0.001°
+node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5b 20 times
+node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5b until improvement < 0.001°
 ```
 
 Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 Step 3 (browser export) is always manual — the runner checks the data file exists.
 
-The `--iterate` / `--converge` flags repeat the correction fitting steps (parallax →
-conjunction + elongation) iteratively. Each pass, the parallax sees cleaner residuals
+The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →
+5b conjunction + elongation) iteratively. Each pass, the parallax sees cleaner residuals
 and reallocates its terms, allowing the elongation correction to capture more signal.
 Typically converges in 15-20 passes. Venus improves from ~0.10° to ~0.05°.
+The Moon step (5c) runs once after the iteration completes.
 
 ### Manual step-by-step
 
@@ -270,10 +272,10 @@ python3 tools/fit/python/train_observed.py --write                           # S
 
 # Phase 4: Planet positions & corrections
 node tools/fit/parallax-correction.js --write                                # Step 5a
-node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5b
-node tools/fit/conjunction-correction.js --write                             # Step 5c
+node tools/fit/conjunction-correction.js --write                             # Step 5b
 # node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
+node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
 # Phase 5: Cardinal point harmonics
 node tools/fit/export-cardinal-points.js                                     # Step 6a (~35 min)

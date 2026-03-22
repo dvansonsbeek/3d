@@ -7,8 +7,8 @@
  *   node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
  *   node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
  *   node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
- *   node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5c 20 times (iterative convergence)
- *   node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5c until improvement < 0.001°
+ *   node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5b 20 times (iterative convergence)
+ *   node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5b until improvement < 0.001°
  *
  * Logs all output to tools/results/pipeline.log (overwritten each run).
  * Stops on any step failure. Step 8 (verify) must pass before Step 9 (sync).
@@ -72,10 +72,10 @@ const STEPS = [
   // Phase 4: Planet positions & corrections
   { id: '5a', phase: 2, name: 'Parallax corrections',
     cmd: 'node tools/fit/parallax-correction.js --write' },
-  { id: '5b', phase: 2, name: 'Moon eclipse optimizer',
-    cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
-  { id: '5c', phase: 2, name: 'Conjunction correction',
+  { id: '5b', phase: 2, name: 'Conjunction correction',
     cmd: 'node tools/fit/conjunction-correction.js --write' },
+  { id: '5c', phase: 2, name: 'Moon eclipse optimizer',
+    cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
   // Phase 5: Cardinal point harmonics
   { id: '6a', phase: 2, name: 'Export cardinal points (~35 min)',
@@ -195,15 +195,16 @@ for (let i = 0; i < steps.length; i++) {
 }
 
 // ─── Iterative correction refinement ─────────────────────────────────────
-// Repeats Steps 5a-5c to allow parallax and Venus offset corrections
-// to iteratively improve by each seeing the other's residuals.
+// Repeats Steps 5a-5b (parallax + conjunction/elongation) to allow
+// corrections to iteratively improve by each seeing the other's residuals.
+// Moon step (5c) runs once after iteration completes.
 
 if (iterateCount > 0 || convergeMode) {
-  const iterSteps = STEPS.filter(s => s.id === '5a' || s.id === '5c');
+  const iterSteps = STEPS.filter(s => s.id === '5a' || s.id === '5b');
   const CONVERGE_THRESHOLD = 0.001; // degrees
 
   log('');
-  log('═══ Iterative correction refinement (Steps 5a-5c) ═══');
+  log('═══ Iterative correction refinement (Steps 5a-5b) ═══');
   log(convergeMode ? `  Mode: converge (threshold ${CONVERGE_THRESHOLD}°, max ${iterateCount} passes)` : `  Mode: ${iterateCount} passes`);
   log('');
 
