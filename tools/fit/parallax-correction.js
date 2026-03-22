@@ -99,10 +99,19 @@ const basisFn = (pt) => {
     Math.cos(pt.Lsun)/(pt.d*pt.d*pt.d),            // BI: cos(Lsun)/d³ — cubic close approach eccentricity offset
     Math.sin(pt.u-pt.Lsun)/(pt.d*pt.d),            // BJ: sin(u-Lsun)/d² — synodic phase at close approach
     Math.cos(pt.u-pt.Lsun)/(pt.d*pt.d),            // BK: cos(u-Lsun)/d² — synodic phase at close approach
+    // Extended terms (63-68) — quadratic time drift + Venus close approach
+    // T² terms capture quadratic (non-linear) time drift for Saturn (r=0.45) and Jupiter (r=0.18).
+    // Higher-order 1/d terms help Venus at 0.26 AU closest approach.
+    T*T/pt.d,                                        // BL: T²/d — quadratic time drift at distance
+    T*T*Math.sin(pt.u)/pt.d,                         // BM: T²×sin(u)/d — quadratic drift × orbital phase
+    T*T*Math.cos(pt.u)/pt.d,                         // BN: T²×cos(u)/d — quadratic drift × orbital phase
+    Math.sin(2*pt.u)/(pt.d*pt.d*pt.d),              // BO: sin(2u)/d³ — 2nd harmonic at close approach
+    Math.cos(2*pt.u)/(pt.d*pt.d*pt.d),              // BP: cos(2u)/d³ — 2nd harmonic at close approach
+    Math.sin(pt.u)/(pt.d*pt.d*pt.d*pt.d),           // BQ: sin(u)/d⁴ — quartic close approach (Venus 0.26 AU)
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ'];
 
 // Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
@@ -116,6 +125,7 @@ const tiers = [
   { name: '52p', count: 52 },
   { name: '56p', count: 56 },
   { name: '62p', count: 62 },
+  { name: '68p', count: 68 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');

@@ -949,7 +949,10 @@ function computePlanetPosition(target, jd) {
         + (dc.BD || 0) * T * sinLsun + (dc.BE || 0) * T * cosLsun
         + (dc.BF || 0) * cosU * sinLsun * invD2 + (dc.BG || 0) * cosU * cosLsun * invD2
         + (dc.BH || 0) * sinLsun * invD2 * invD + (dc.BI || 0) * cosLsun * invD2 * invD
-        + (dc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (dc.BK || 0) * Math.cos(u - _Lsun) * invD2;
+        + (dc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (dc.BK || 0) * Math.cos(u - _Lsun) * invD2
+        + (dc.BL || 0) * T * T * invD + (dc.BM || 0) * T * T * sinU * invD + (dc.BN || 0) * T * T * cosU * invD
+        + (dc.BO || 0) * sin2U * invD2 * invD + (dc.BP || 0) * cos2U * invD2 * invD
+        + (dc.BQ || 0) * sinU * invD2 * invD * invD;
       sph.phi += corrDec * d2r;
     }
 
@@ -985,7 +988,10 @@ function computePlanetPosition(target, jd) {
         + (rc.BD || 0) * T * sinLsun + (rc.BE || 0) * T * cosLsun
         + (rc.BF || 0) * cosU * sinLsun * invD2 + (rc.BG || 0) * cosU * cosLsun * invD2
         + (rc.BH || 0) * sinLsun * invD2 * invD + (rc.BI || 0) * cosLsun * invD2 * invD
-        + (rc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (rc.BK || 0) * Math.cos(u - _Lsun) * invD2;
+        + (rc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (rc.BK || 0) * Math.cos(u - _Lsun) * invD2
+        + (rc.BL || 0) * T * T * invD + (rc.BM || 0) * T * T * sinU * invD + (rc.BN || 0) * T * T * cosU * invD
+        + (rc.BO || 0) * sin2U * invD2 * invD + (rc.BP || 0) * cos2U * invD2 * invD
+        + (rc.BQ || 0) * sinU * invD2 * invD * invD;
       sph.theta -= corrRA * d2r;
     }
   }
