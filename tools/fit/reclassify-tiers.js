@@ -379,6 +379,33 @@ async function enrichTier1WithJPL() {
   console.log(`  Total Tier 1 entries enriched from JPL: ${changes.transitRA}\n`);
 }
 
+// ─── Task 8: Reclassify radar/spacecraft era as Tier 2R ─────────────
+
+console.log('─── 8. Radar/Spacecraft Era (1960-2025) → Tier 2R ───\n');
+
+// JPL ephemeris is constrained by radar ranging (1960s+) and spacecraft tracking.
+// Data in this window is more reliable than backward-integrated (pre-1960)
+// or forward-predicted (post-2025) positions.
+const RADAR_START = 1960;
+const RADAR_END = 2025;
+const TIER_2R_WEIGHT = 2;
+changes.radarTier = 0;
+
+for (const planet of Object.keys(refData.planets)) {
+  for (const e of refData.planets[planet]) {
+    if (!(e.tier || '').startsWith('2')) continue; // only reclassify Tier 2
+    const yr = getYear(e);
+    if (yr >= RADAR_START && yr < RADAR_END) {
+      if (e.tier !== '2R') {
+        e.tier = '2R';
+        e.weight = TIER_2R_WEIGHT;
+        changes.radarTier++;
+      }
+    }
+  }
+}
+console.log(`  Reclassified to Tier 2R (w=${TIER_2R_WEIGHT}): ${changes.radarTier} entries\n`);
+
 // Wrap remaining tasks in async main (JPL fetch is async)
 async function main() {
 await enrichTier1WithJPL();
@@ -424,6 +451,7 @@ console.log(`  Tycho Brahe Mars added: ${changes.tycho}`);
 console.log(`  Venus legacy fixed: ${changes.venusLegacy}`);
 console.log(`  Jupiter-Saturn 2020: ${changes.jupSat2020}`);
 console.log(`  Mars future oppositions: ${changes.marsOppositions}`);
+console.log(`  Radar/spacecraft era (2R): ${changes.radarTier}`);
 
 // ─── Write ──────────────────────────────────────────────────────────────
 

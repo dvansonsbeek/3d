@@ -38,9 +38,9 @@
       "tier2Count": 6088
     },
     "mercury": {
-      "rmsRA": 0.3726,
-      "rmsDec": 0.3287,
-      "rmsTotal": 0.4969,
+      "rmsRA": 0.3743,
+      "rmsDec": 0.3293,
+      "rmsTotal": 0.4985,
       "maxRA": -1.3185,
       "maxDec": 0.9506,
       "entries": 5119,
@@ -50,9 +50,9 @@
       "tier2Count": 5096
     },
     "venus": {
-      "rmsRA": 0.0357,
-      "rmsDec": 0.0385,
-      "rmsTotal": 0.0525,
+      "rmsRA": 0.0345,
+      "rmsDec": 0.0367,
+      "rmsTotal": 0.0504,
       "maxRA": 0.2029,
       "maxDec": 0.3539,
       "entries": 8816,
@@ -62,9 +62,9 @@
       "tier2Count": 8808
     },
     "mars": {
-      "rmsRA": 0.1088,
-      "rmsDec": 0.0744,
-      "rmsTotal": 0.1318,
+      "rmsRA": 0.1037,
+      "rmsDec": 0.0693,
+      "rmsTotal": 0.1247,
       "maxRA": 0.6267,
       "maxDec": 0.8659,
       "entries": 5190,
@@ -74,9 +74,9 @@
       "tier2Count": 5183
     },
     "jupiter": {
-      "rmsRA": 0.0622,
-      "rmsDec": 0.0226,
-      "rmsTotal": 0.0662,
+      "rmsRA": 0.0607,
+      "rmsDec": 0.0224,
+      "rmsTotal": 0.0648,
       "maxRA": 0.3921,
       "maxDec": -0.1229,
       "entries": 7504,
@@ -86,9 +86,9 @@
       "tier2Count": 7476
     },
     "saturn": {
-      "rmsRA": 0.057,
-      "rmsDec": 0.0209,
-      "rmsTotal": 0.0607,
+      "rmsRA": 0.0563,
+      "rmsDec": 0.0201,
+      "rmsTotal": 0.0598,
       "maxRA": -0.4007,
       "maxDec": 0.1334,
       "entries": 7500,
@@ -98,9 +98,9 @@
       "tier2Count": 7482
     },
     "uranus": {
-      "rmsRA": 0.0292,
-      "rmsDec": 0.009,
-      "rmsTotal": 0.0306,
+      "rmsRA": 0.0323,
+      "rmsDec": 0.01,
+      "rmsTotal": 0.0338,
       "maxRA": -0.1278,
       "maxDec": 0.0361,
       "entries": 5046,
@@ -110,9 +110,9 @@
       "tier2Count": 5042
     },
     "neptune": {
-      "rmsRA": 0.0113,
-      "rmsDec": 0.0043,
-      "rmsTotal": 0.0121,
+      "rmsRA": 0.0122,
+      "rmsDec": 0.0044,
+      "rmsTotal": 0.013,
       "maxRA": 0.0529,
       "maxDec": -0.0209,
       "entries": 5072,
