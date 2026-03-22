@@ -29296,7 +29296,7 @@ function buildJdArray () {
     return [];
   }
   const step = (e - s) / (n - 1);
-  return Array.from({ length: n }, (_, i) => Math.round(s + i * step));
+  return Array.from({ length: n }, (_, i) => s + i * step);
 }
 
 /* ────────────────────────────────────────────────────────── */
