@@ -6238,12 +6238,11 @@
   },
   "PLANET_OFFSET_CORRECTION": {
     "mercury": {
-      "raConst": 0.000698,
-      "raSinL": 0.034226,
-      "raCosL": 0.017472,
-      "decConst": 0.131571,
-      "decSinL": -0.191562,
-      "decCosL": 0.309106
+      "projectionFactor": 0.074,
+      "decConst": 0.14,
+      "decPhi0": -40.5,
+      "raConst": 0.018,
+      "raPhi0": 122
     }
   }
 }

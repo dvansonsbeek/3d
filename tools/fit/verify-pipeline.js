@@ -358,6 +358,23 @@ const newEarth = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 9b. Correction stack validation — ensure all corrections are loaded
+// ═══════════════════════════════════════════════════════════════════════════
+console.log('═══ Step 9b: Correction stack validation ═══');
+const { validateCorrectionState } = require('../lib/correction-stack');
+const corrState = validateCorrectionState(C);
+if (corrState.ok) {
+  console.log('  ✓ All correction layers loaded\n');
+  totalChecks++;
+} else {
+  for (const w of corrState.warnings) {
+    console.log(`  WARNING: ${w}`);
+  }
+  console.log('');
+  totalErrors += corrState.warnings.length;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 10. Baseline regression check — compare RMS against stored baselines
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('═══ Step 10: Baseline regression check ═══');

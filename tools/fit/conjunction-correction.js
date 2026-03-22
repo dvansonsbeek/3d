@@ -20,11 +20,9 @@ const sg = require('../lib/scene-graph');
 
 const d2r = Math.PI / 180;
 
-// Disable existing corrections so we fit from raw parallax residuals
-C.CONJUNCTION_CORRECTION = null;
-C.VENUS_CORRECTION = null;
-C.ELONGATION_CORRECTION = null;
-sg._invalidateGraph();
+// Disable conjunction + elongation (+ all post-hoc layers) to fit from parallax residuals
+const { prepareForFitting } = require('../lib/correction-stack');
+const restore = prepareForFitting(C, sg, ['conjunction', 'elongation']);
 
 // ─── Per-planet conjunction periods ─────────────────────────────────────
 // Each entry: array of synodic periods (in years) to fit.

@@ -173,12 +173,13 @@ function fmtMoonTable(data) {
   return lines.join('\n');
 }
 
+const { toDisplayName } = require('../lib/correction-stack');
+
 function fmtParallax(data) {
   // Format: { Mercury: { A:x, B:y, ... }, Venus: { ... }, ... }
-  const planetNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
   const lines = ['{'];
   for (const [key, coeffs] of Object.entries(data)) {
-    const name = planetNames[key] || key;
+    const name = toDisplayName(key);
     const pairs = Object.entries(coeffs).map(([k, v]) => k + ':' + fmtNum(v, 4));
     lines.push('  ' + name + ': { ' + pairs.join(', ') + ' },');
   }
@@ -233,6 +234,44 @@ if (fc.CARDINAL_POINT_HARMONICS) {
 if (fc.PARALLAX_DEC_CORRECTION) {
   replaceObject('PARALLAX_DEC_CORRECTION', fmtParallax(fc.PARALLAX_DEC_CORRECTION));
   replaceObject('PARALLAX_RA_CORRECTION', fmtParallax(fc.PARALLAX_RA_CORRECTION));
+}
+
+// B3b. Conjunction correction (synodic period terms, capitalized keys)
+if (fc.CONJUNCTION_CORRECTION) {
+  const lines = ['{'];
+  for (const [planet, terms] of Object.entries(fc.CONJUNCTION_CORRECTION)) {
+    const arr = terms.map(t => {
+      const pairs = Object.entries(t).map(([k, v]) => k + ': ' + fmtNum(v, 6).trim());
+      return '    { ' + pairs.join(', ') + ' }';
+    });
+    lines.push('  ' + toDisplayName(planet) + ': [');
+    lines.push(arr.join(',\n'));
+    lines.push('  ],');
+  }
+  lines.push('}');
+  replaceObject('CONJUNCTION_CORRECTION', lines.join('\n'));
+}
+
+// B3c. Elongation correction (inner planets, capitalized keys)
+if (fc.ELONGATION_CORRECTION) {
+  const lines = ['{'];
+  for (const [planet, coeffs] of Object.entries(fc.ELONGATION_CORRECTION)) {
+    const pairs = Object.entries(coeffs).map(([k, v]) => k + ': ' + fmtNum(v, 6).trim());
+    lines.push('  ' + toDisplayName(planet) + ': { ' + pairs.join(', ') + ' },');
+  }
+  lines.push('}');
+  replaceObject('ELONGATION_CORRECTION', lines.join('\n'));
+}
+
+// B3d. Planet offset correction (Sun-longitude basis, capitalized keys)
+if (fc.PLANET_OFFSET_CORRECTION) {
+  const lines = ['{'];
+  for (const [planet, coeffs] of Object.entries(fc.PLANET_OFFSET_CORRECTION)) {
+    const pairs = Object.entries(coeffs).map(([k, v]) => k + ': ' + fmtNum(v, 6).trim());
+    lines.push('  ' + toDisplayName(planet) + ': { ' + pairs.join(', ') + ' },');
+  }
+  lines.push('}');
+  replaceObject('PLANET_OFFSET_CORRECTION', lines.join('\n'));
 }
 
 // D. Moon Meeus tables

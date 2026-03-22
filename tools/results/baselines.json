@@ -38,15 +38,15 @@
       "tier2Count": 6088
     },
     "mercury": {
-      "rmsRA": 0.2616,
-      "rmsDec": 0.3159,
-      "rmsTotal": 0.4102,
-      "maxRA": -0.9772,
-      "maxDec": 1.0502,
+      "rmsRA": 0.3602,
+      "rmsDec": 0.3152,
+      "rmsTotal": 0.4786,
+      "maxRA": -1.2966,
+      "maxDec": 0.9572,
       "entries": 5119,
-      "tier1RMS": 0.0387,
+      "tier1RMS": 0.029,
       "tier1Count": 23,
-      "tier2RMS": 0.4192,
+      "tier2RMS": 0.4893,
       "tier2Count": 5096
     },
     "venus": {

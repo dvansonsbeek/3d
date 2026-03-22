@@ -13,12 +13,9 @@ const { j2000ToOfDate } = require('../lib/precession.js');
 const refData = require('../../data/reference-data.json');
 const d2r = Math.PI / 180;
 
-// Disable existing corrections to fit from raw errors
-const savedDec = { ...C.ASTRO_REFERENCE.decCorrection };
-const savedRA = C.ASTRO_REFERENCE.raCorrection ? { ...C.ASTRO_REFERENCE.raCorrection } : {};
-C.ASTRO_REFERENCE.decCorrection = {};
-C.ASTRO_REFERENCE.raCorrection = {};
-sg._invalidateGraph();
+// Disable parallax (+ all post-hoc layers) to fit from raw errors
+const { prepareForFitting } = require('../lib/correction-stack');
+const restore = prepareForFitting(C, sg, 'parallax');
 
 const targets = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
 

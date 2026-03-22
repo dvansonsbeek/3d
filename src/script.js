@@ -928,22 +928,22 @@ const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.00002
 // @AUTO:CONJUNCTION_CORRECTION
 const CONJUNCTION_CORRECTION = {
   Mars: [
-    { period: 2.2353, raSin: 0.010419, raCos: -0.003516, decSin: -0.002693, decCos: 0.001754 },
-    { period: 2.7427, raSin: 0.006732, raCos: 0.008207, decSin: -0.001049, decCos: 0.00098 },
+    { period: 2.235339, raSin: 0.005277, raCos: -0.003231, decSin: -0.000879, decCos: 0.002340 },
+    { period: 2.742730, raSin: 0.000677, raCos: 0.004308, decSin: 0.000859, decCos: 0.000305 }
   ],
   Jupiter: [
-    { period: 12.7792, raSin: -0.001739, raCos: -0.007319, decSin: 0.002678, decCos: -0.001375 },
+    { period: 12.779249, raSin: 0.000383, raCos: -0.004376, decSin: 0.001363, decCos: 0.000715 }
   ],
   Saturn: [
-    { period: 19.8582, raSin: -0.003867, raCos: -0.002097, decSin: 0.017055, decCos: -0.011506 },
-    { period: 136.0899, raSin: 0.026834, raCos: 0.005093, decSin: 0.001155, decCos: -0.001385 },
+    { period: 19.858210, raSin: -0.011195, raCos: -0.002820, decSin: 0.018903, decCos: -0.012977 },
+    { period: 136.089912, raSin: 0.027336, raCos: 0.006599, decSin: -0.000023, decCos: -0.002140 }
   ],
   Uranus: [
-    { period: 170.9224, raSin: 0.004836, raCos: 0.00157, decSin: 0.000919, decCos: 0.000625 },
+    { period: 170.922449, raSin: 0.015843, raCos: -0.008797, decSin: -0.004765, decCos: 0.001786 }
   ],
   Neptune: [
-    { period: 12.7792, raSin: -0.000263, raCos: -0.009566, decSin: -0.000159, decCos: -0.000831 },
-    { period: 35.8489, raSin: 0.00053, raCos: -0.003906, decSin: 0.000168, decCos: -0.000765 },
+    { period: 12.779249, raSin: -0.000222, raCos: -0.009586, decSin: 0.000055, decCos: -0.000290 },
+    { period: 35.848903, raSin: 0.001344, raCos: -0.005348, decSin: 0.000220, decCos: -0.000198 }
   ],
 };
 
@@ -953,15 +953,15 @@ const CONJUNCTION_CORRECTION = {
 // Source: public/input/fitted-coefficients.json
 // @AUTO:ELONGATION_CORRECTION
 const ELONGATION_CORRECTION = {
-  Mercury: { cosVwE_sinEl_ra: -1.127234, cosVwE_sinEl_dec: -0.682096, sinEl_d_ra: -0.756693, sinEl_d_dec: -0.782477, sinVwE_sinEl_ra: -0.122949, sinVwE_sinEl_dec: -0.190431, sin2VwE_sinEl_ra: 0.746675, sin2VwE_sinEl_dec: -0.167013, cos2VwE_sinEl_ra: -0.04842, cos2VwE_sinEl_dec: -1.525146, cos4VwE_sinEl_ra: -0.330962, cos4VwE_sinEl_dec: -0.075872, sin4VwE_sinEl_ra: -0.123593, sin4VwE_sinEl_dec: -0.060354, sinVwE_sinEl_d2_ra: 0.071813, sinVwE_sinEl_d2_dec: 0.123103, cos3VwE_sinEl_ra: 0.154998, cos3VwE_sinEl_dec: 0.496432, sin3VwE_sinEl_ra: -0.404038, sin3VwE_sinEl_dec: 0.415444, sin2syn_ra: 0.094126, sin2syn_dec: 0.061746, cos1syn_ra: -0.666857, cos1syn_dec: -0.364469, sin3VwE_sinEl_d2_ra: 0.276876, sin3VwE_sinEl_d2_dec: 0.209325, sin2VwE_sinEl_d2_ra: -0.483224, sin2VwE_sinEl_d2_dec: 0.344647, cos2VwE_sinEl_d2_ra: 0.737198, cos2VwE_sinEl_d2_dec: 1.623718 },
-  Venus: { cosVwE_sinEl_ra: -0.372017, cosVwE_sinEl_dec: -0.066425, sinEl_d_ra: -0.065645, sinEl_d_dec: 0.048137, sinVwE_sinEl_ra: -0.192733, sinVwE_sinEl_dec: -0.037102, sin2VwE_sinEl_ra: 0.214703, sin2VwE_sinEl_dec: 0.051639, cos2VwE_sinEl_ra: -0.12921, cos2VwE_sinEl_dec: -0.002721, cos4VwE_sinEl_ra: -0.176055, cos4VwE_sinEl_dec: -0.068314, sin4VwE_sinEl_ra: 0.135353, sin4VwE_sinEl_dec: 0.032736, sinVwE_sinEl_d2_ra: 0.036797, sinVwE_sinEl_d2_dec: -0.009164, cos3VwE_sinEl_ra: -0.069499, cos3VwE_sinEl_dec: 0.052568, sin3VwE_sinEl_ra: 0.039053, sin3VwE_sinEl_dec: -0.038047, sin2syn_ra: -0.041858, sin2syn_dec: 0.002443, cos1syn_ra: -0.046607, cos1syn_dec: 0.005815, sin3VwE_sinEl_d2_ra: -0.02601, sin3VwE_sinEl_d2_dec: -0.003552, sin2VwE_sinEl_d2_ra: 0.000693, sin2VwE_sinEl_d2_dec: 0.026075, cos2VwE_sinEl_d2_ra: -0.020013, cos2VwE_sinEl_d2_dec: 0.009726 },
-  Mars: { cosVwE_sinEl_ra: 0.003114, cosVwE_sinEl_dec: 0.05823, sinEl_d_ra: 0.111801, sinEl_d_dec: 0.0179, sinVwE_sinEl_ra: -0.342734, sinVwE_sinEl_dec: -0.046981, sin2VwE_sinEl_ra: 0.115945, sin2VwE_sinEl_dec: 0.059803, cos2VwE_sinEl_ra: -0.012391, cos2VwE_sinEl_dec: -0.036302, cos4VwE_sinEl_ra: 0.022164, cos4VwE_sinEl_dec: -0.007566, sin4VwE_sinEl_ra: 0.002384, sin4VwE_sinEl_dec: 0.052009, sinVwE_sinEl_d2_ra: 0.07, sinVwE_sinEl_d2_dec: 0.095627, cos3VwE_sinEl_ra: 0.031972, cos3VwE_sinEl_dec: 0.008363, sin3VwE_sinEl_ra: -0.157302, sin3VwE_sinEl_dec: 0.014329, sin2syn_ra: 0.021661, sin2syn_dec: -0.037002, cos1syn_ra: -0.021671, cos1syn_dec: 0.042404, sin3VwE_sinEl_d2_ra: -0.131979, sin3VwE_sinEl_d2_dec: 0.004307, sin2VwE_sinEl_d2_ra: -0.101713, sin2VwE_sinEl_d2_dec: -0.008149, cos2VwE_sinEl_d2_ra: 0.007918, cos2VwE_sinEl_d2_dec: 0.053507 },
+  Mercury: { cosVwE_sinEl_ra: -1.155486, cosVwE_sinEl_dec: -0.705895, sinEl_d_ra: -0.862128, sinEl_d_dec: -0.851340, sinVwE_sinEl_ra: -0.015004, sinVwE_sinEl_dec: -0.096541, sin2VwE_sinEl_ra: 0.771327, sin2VwE_sinEl_dec: -0.200826, cos2VwE_sinEl_ra: -0.105710, cos2VwE_sinEl_dec: -1.584602, cos4VwE_sinEl_ra: -0.329587, cos4VwE_sinEl_dec: -0.077225, sin4VwE_sinEl_ra: -0.132700, sin4VwE_sinEl_dec: -0.056338, sinVwE_sinEl_d2_ra: -0.029610, sinVwE_sinEl_d2_dec: 0.026366, cos3VwE_sinEl_ra: 0.180504, cos3VwE_sinEl_dec: 0.518347, sin3VwE_sinEl_ra: -0.402486, sin3VwE_sinEl_dec: 0.446267, sin2syn_ra: 0.100318, sin2syn_dec: 0.056948, cos1syn_ra: -0.715872, cos1syn_dec: -0.392839, sin3VwE_sinEl_d2_ra: 0.275074, sin3VwE_sinEl_d2_dec: 0.203498, sin2VwE_sinEl_d2_ra: -0.478564, sin2VwE_sinEl_d2_dec: 0.389791, cos2VwE_sinEl_d2_ra: 0.794413, cos2VwE_sinEl_d2_dec: 1.693138 },
+  Venus: { cosVwE_sinEl_ra: -0.648942, cosVwE_sinEl_dec: -0.017637, sinEl_d_ra: -0.033056, sinEl_d_dec: 0.046897, sinVwE_sinEl_ra: -0.634142, sinVwE_sinEl_dec: 0.007614, sin2VwE_sinEl_ra: 0.178425, sin2VwE_sinEl_dec: 0.104159, cos2VwE_sinEl_ra: -0.034447, cos2VwE_sinEl_dec: -0.036408, cos4VwE_sinEl_ra: 0.018023, cos4VwE_sinEl_dec: -0.024864, sin4VwE_sinEl_ra: -0.001607, sin4VwE_sinEl_dec: 0.029259, sinVwE_sinEl_d2_ra: 0.106228, sinVwE_sinEl_d2_dec: -0.025180, cos3VwE_sinEl_ra: -0.162322, cos3VwE_sinEl_dec: 0.064956, sin3VwE_sinEl_ra: -0.066331, sin3VwE_sinEl_dec: 0.017087, sin2syn_ra: -0.032247, sin2syn_dec: 0.006243, cos1syn_ra: 0.104233, cos1syn_dec: -0.035307, sin3VwE_sinEl_d2_ra: -0.013753, sin3VwE_sinEl_d2_dec: 0.003248, sin2VwE_sinEl_d2_ra: 0.006465, sin2VwE_sinEl_d2_dec: 0.021005, cos2VwE_sinEl_d2_ra: -0.018653, cos2VwE_sinEl_d2_dec: -0.001379 },
+  Mars: { cosVwE_sinEl_ra: 0.011881, cosVwE_sinEl_dec: 0.060605, sinEl_d_ra: 0.111452, sinEl_d_dec: 0.019925, sinVwE_sinEl_ra: -0.351413, sinVwE_sinEl_dec: -0.048738, sin2VwE_sinEl_ra: 0.112125, sin2VwE_sinEl_dec: 0.057848, cos2VwE_sinEl_ra: -0.012941, cos2VwE_sinEl_dec: -0.036956, cos4VwE_sinEl_ra: 0.023523, cos4VwE_sinEl_dec: -0.006615, sin4VwE_sinEl_ra: 0.003999, sin4VwE_sinEl_dec: 0.052588, sinVwE_sinEl_d2_ra: 0.068942, sinVwE_sinEl_d2_dec: 0.097411, cos3VwE_sinEl_ra: 0.028269, cos3VwE_sinEl_dec: 0.009177, sin3VwE_sinEl_ra: -0.166404, sin3VwE_sinEl_dec: 0.012511, sin2syn_ra: 0.020644, sin2syn_dec: -0.036710, cos1syn_ra: -0.019253, cos1syn_dec: 0.042691, sin3VwE_sinEl_d2_ra: -0.135334, sin3VwE_sinEl_d2_dec: 0.004911, sin2VwE_sinEl_d2_ra: -0.100987, sin2VwE_sinEl_d2_dec: -0.006718, cos2VwE_sinEl_d2_ra: 0.007131, cos2VwE_sinEl_d2_dec: 0.054425 },
 };
 const VENUS_CORRECTION = ELONGATION_CORRECTION.Venus; // legacy alias
 
 // @AUTO:PLANET_OFFSET_CORRECTION
 const PLANET_OFFSET_CORRECTION = {
-  Mercury: { raConst: 0.000698, raSinL: 0.034226, raCosL: 0.017472, decConst: 0.131571, decSinL: -0.191562, decCosL: 0.309106 },
+  Mercury: { projectionFactor: 0.074000, decConst: 0.140000, decPhi0: -40.500000, raConst: 0.018000, raPhi0: 122.000000 },
 };
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
@@ -36487,13 +36487,32 @@ function updatePositions() {
                + (_vc.cos2VwE_sinEl_d2_dec || 0) * _cos2VwE * _sinEl * _invDv2) * _d2r;
     }
 
-    // Planet offset correction (Sun-longitude-based, fitted from Tier 1 observed data)
+    // Planet offset correction (time-dependent, fitted from Tier 1 observed data)
+    // Amplitude = relative inclination (planet vs Earth) × projectionFactor.
+    // Phase drifts at -(2×Earth axial precession + planet node rate).
     const _offCorr = PLANET_OFFSET_CORRECTION && PLANET_OFFSET_CORRECTION[obj.name];
     if (_offCorr) {
-      const _dt = o.julianDay - 2451545.0; // days from J2000
+      const _dt = o.julianDay - 2451545.0;
       const _Lsun = (280.460 + 0.9856474 * _dt) * (Math.PI / 180);
-      obj.ra -= (_offCorr.raConst + _offCorr.raSinL * Math.sin(_Lsun) + _offCorr.raCosL * Math.cos(_Lsun)) * (Math.PI / 180);
-      obj.dec += (_offCorr.decConst + _offCorr.decSinL * Math.sin(_Lsun) + _offCorr.decCosL * Math.cos(_Lsun)) * (Math.PI / 180);
+      const _oyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
+      const _odyrs = _oyr - 2000;
+      const _plName = obj.name.toLowerCase();
+      const _opInfo = planets[_plName];
+      if (_opInfo) {
+        const _ophaseRate = -(2 * 2 * Math.PI / (holisticyearLength / 13) + 2 * Math.PI / _opInfo.perihelionEclipticYears);
+        const _odecPhi = _offCorr.decPhi0 * (Math.PI / 180) + _ophaseRate * _odyrs;
+        const _oraPhi  = _offCorr.raPhi0  * (Math.PI / 180) + _ophaseRate * _odyrs;
+        // incl(t) = mean + ampl × cos(ascendingNode(t) - phaseAngle)
+        // Planet ascending node precesses at 360°/perihelionEclipticYears
+        const _opNodePh = (_opInfo.ascendingNodeInvPlane - _opInfo.inclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / _opInfo.perihelionEclipticYears * _odyrs;
+        const _opIncl = _opInfo.invPlaneInclinationMean + _opInfo.invPlaneInclinationAmplitude * Math.cos(_opNodePh);
+        // Earth ascending node precesses at 360°/(H/3)
+        const _oeNodePh = (ASTRO_REFERENCE.earthAscendingNodeInvPlane - ASTRO_REFERENCE.earthInclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / (holisticyearLength / 3) * _odyrs;
+        const _oeIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(_oeNodePh);
+        const _oamp = Math.abs(_opIncl - _oeIncl) * _offCorr.projectionFactor;
+        obj.ra -= (_offCorr.raConst + _oamp * Math.cos(_Lsun - _oraPhi)) * (Math.PI / 180);
+        obj.dec += (_offCorr.decConst + _oamp * Math.cos(_Lsun - _odecPhi)) * (Math.PI / 180);
+      }
     }
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.

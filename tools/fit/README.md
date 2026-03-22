@@ -31,7 +31,8 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
-| `verify-pipeline.js` | Pass/fail verification of all 9 targets | Scene-graph simulation |
+| `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
+| `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
 Note: `eoc-constants.js` and `perihelion-offset.js` are **informational/exploratory** only —
 `eocEccentricity` and `perihelionPhaseOffset` are already derived analytically in `constants.js`
@@ -99,7 +100,8 @@ Step 4d: python/train_observed.py             → tools/lib/python/coefficients/
 ── Phase 4: Planet positions & corrections ────────────────────────
 
 Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
-         Fits up to 42-parameter RA/Dec correction per planet via cross-validation
+         Fits up to 48-parameter RA/Dec correction per planet via cross-validation.
+         Uses prepareForFitting() to disable parallax + all post-hoc layers.
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 5b: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
@@ -108,12 +110,11 @@ Step 5b: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
          Updates: model-parameters.json (auto-updated by script)
          Verify: RMS separation < 0.85°, individual eclipses < 2°
 
-Step 5c: conjunction-correction.js            → CONJUNCTION_CORRECTION
-         Two-stage post-parallax correction: fits sin/cos at per-planet synodic
-         periods to the residuals. Captures conjunction signals that the parallax
-         tier system cannot select (too few parameters vs data ratio).
-         Periods: Mars (Jup 2.2yr, Ven 2.7yr), Jupiter (Nep 12.8yr),
-         Saturn (Jup 19.9yr, Ura 136yr), Uranus (Nep 171yr), Neptune (Jup 12.8yr, Sat 35.8yr)
+Step 5c: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONGATION_CORRECTION
+         Two-stage post-parallax correction:
+         1. Synodic conjunction terms (sin/cos at per-planet periods)
+         2. Elongation offset correction (15 basis functions for Mercury/Venus/Mars)
+         Uses prepareForFitting() to disable conjunction + elongation + all post-hoc layers.
          Updates: fitted-coefficients.json (auto-updated by script)
 
          Optional diagnostics (skip in standard refit):
@@ -349,6 +350,95 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     year-length-harmonics.js     → fitted-coefficients.json  (Step 7b)
     optimize.js                  → model-parameters.json     (Steps 1, 2)
 ```
+
+## Correction Stack
+
+Planet positions go through multiple correction layers after the raw scene-graph computation.
+The correction stack is defined in `tools/lib/correction-stack.js` — the single source of truth
+for what layers exist, their order, and how they behave during fitting.
+
+### Layers (applied in order)
+
+```
+Raw Model Position
+  │
+  ├─ 1. PARALLAX          42 basis functions per planet (distance, geometry, time)
+  │                        Fits from: raw model residuals (all other corrections active)
+  │                        Script: parallax-correction.js (Step 5a)
+  │
+  ├─ 2. CONJUNCTION        Sin/cos terms at planet-specific synodic periods
+  │                        Fits from: post-parallax residuals
+  │                        Script: conjunction-correction.js (Step 5c)
+  │
+  ├─ 3. ELONGATION         15 basis functions for inner planets (Mercury, Venus, Mars)
+  │                        Fits from: post-parallax residuals (same pass as conjunction)
+  │                        Script: conjunction-correction.js (Step 5c)
+  │
+  ├─ 4. PLANET OFFSET      3 terms per planet (const + sin/cos of Sun longitude)     ◄ POST-HOC
+  │                        Fitted once from Tier 1 observed data, never refitted
+  │                        Not part of the iterative pipeline
+  │
+  └─ 5. MOON MEEUS         6 terms (Moon only, independent)
+                           Fitted once from JPL baseline bias
+```
+
+### Layer types
+
+| Type | Meaning | During fitting |
+|------|---------|----------------|
+| **fittable** | Part of the iterative pipeline (Steps 5a/5c) | Disabled when being fitted, active otherwise |
+| **post-hoc** | Fitted once on special data (e.g., Tier 1 transits), never refitted | **Always disabled** during any fitting pass |
+| **independent** | Doesn't interact with other layers | Left as-is |
+
+### Why post-hoc matters
+
+Post-hoc corrections (like PLANET_OFFSET) capture patterns that the main pipeline can't fit
+because they'd be overwhelmed by the ~5000 Tier 2 (JPL numerical) data points. They are fitted
+from small, high-quality datasets (e.g., 23 Mercury transit observations) and applied as a final
+layer.
+
+**Critical rule:** post-hoc corrections must NEVER be active during parallax or conjunction fitting.
+If they are, the parallax (with 42 free parameters) will try to compensate for the post-hoc correction,
+creating a feedback loop where each refit makes things worse.
+
+The `prepareForFitting()` function enforces this automatically:
+
+```js
+const { prepareForFitting } = require('../lib/correction-stack');
+
+// In parallax-correction.js:
+prepareForFitting(C, sg, 'parallax');
+// → Disables: parallax + planet-offset (post-hoc)
+// → Leaves active: conjunction, elongation, moon-meeus
+
+// In conjunction-correction.js:
+prepareForFitting(C, sg, ['conjunction', 'elongation']);
+// → Disables: conjunction + elongation + planet-offset (post-hoc)
+// → Leaves active: parallax, moon-meeus
+```
+
+### Adding a new correction layer
+
+1. Add an entry to `CORRECTION_LAYERS` in `tools/lib/correction-stack.js`:
+   ```js
+   { id: 'my-correction', keys: ['MY_CORRECTION'], type: 'post-hoc', emptyVal: null }
+   ```
+2. Add `MY_CORRECTION` to `fitted-coefficients.js` and `constants.js` (load + export)
+3. Add the application code in `scene-graph.js` (after existing corrections)
+4. Add an `@AUTO:MY_CORRECTION` block in `src/script.js`
+5. Add an export block in `export-to-script.js` (using `toDisplayName` for key casing)
+
+If the type is `post-hoc`, it will automatically be disabled during all fitting passes.
+If `fittable`, write a fitting script that calls `prepareForFitting(C, sg, 'my-correction')`.
+
+### Planet name casing
+
+Tools use lowercase (`mercury`), `src/script.js` uses capitalized (`Mercury`).
+The conversion happens in one place: `toDisplayName()` / `toLowerName()` in `correction-stack.js`.
+
+- JSON files (`fitted-coefficients.json`): **lowercase** keys — this is canonical
+- `src/script.js` correction objects: **Capitalized** keys (matching `obj.name`)
+- `export-to-script.js` converts automatically using `toDisplayName()`
 
 ### Python-Node.js bridge
 
