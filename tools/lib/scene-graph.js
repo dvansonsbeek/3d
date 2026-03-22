@@ -1038,6 +1038,15 @@ function computePlanetPosition(target, jd) {
               + (vc.cos2VwE_sinEl_d2_dec || 0) * cos2VwE * sinEl * invD * invD) * d2r;
   }
 
+  // Planet offset correction (Sun-longitude-based, fitted from Tier 1 observed data)
+  const _offCorr = C.PLANET_OFFSET_CORRECTION && C.PLANET_OFFSET_CORRECTION[target];
+  if (_offCorr) {
+    const _dt = jd - 2451545.0; // days from J2000
+    const _Lsun = (280.460 + 0.9856474 * _dt) * d2r; // Sun mean longitude
+    sph.theta -= (_offCorr.raConst + _offCorr.raSinL * Math.sin(_Lsun) + _offCorr.raCosL * Math.cos(_Lsun)) * d2r;
+    sph.phi   += (_offCorr.decConst + _offCorr.decSinL * Math.sin(_Lsun) + _offCorr.decCosL * Math.cos(_Lsun)) * d2r;
+  }
+
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&
       graph.moonNodes._meeusLonDeg !== undefined && graph.moonNodes._meeusLatDeg !== undefined) {

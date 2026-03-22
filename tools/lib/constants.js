@@ -274,6 +274,9 @@ const VENUS_CORRECTION = fitted.VENUS_CORRECTION || null;
 // Elongation correction for inner planets (Mercury, Venus, Mars)
 const ELONGATION_CORRECTION = fitted.ELONGATION_CORRECTION || null;
 
+// Planet offset correction (Sun-longitude-based, fitted from Tier 1 observed data)
+const PLANET_OFFSET_CORRECTION = fitted.PLANET_OFFSET_CORRECTION || null;
+
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
 for (const [key, jd] of Object.entries(modelParams.perihelionPassageRef)) {
   if (typeof jd === 'number') ASTRO_REFERENCE[key + 'PerihelionRef_JD'] = jd;
@@ -460,6 +463,7 @@ module.exports = {
   CONJUNCTION_CORRECTION,
   VENUS_CORRECTION,
   ELONGATION_CORRECTION,
+  PLANET_OFFSET_CORRECTION,
   moonOrbitalEccentricity,
   moonTilt,
   moonStartposApsidal,

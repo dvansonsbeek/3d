@@ -368,6 +368,7 @@ const { baseline: computeBaseline } = require('../lib/optimizer');
 let regressions = 0;
 let improvements = 0;
 const newBaselines = {};
+const baselineResults = {};
 
 const storedBaselines = JSON.parse(fs.readFileSync(BASELINES_PATH, 'utf8'));
 
@@ -386,6 +387,7 @@ for (const target of planetTargets) {
     console.log(`  ${target.padEnd(10)}│ skipped (${e.message})`);
     continue;
   }
+  baselineResults[target] = result;
   const prev = storedBaselines.targets[target];
   if (!prev) {
     console.log(`  ${target.padEnd(10)}│ no stored baseline`);
@@ -444,6 +446,57 @@ if (regressions > 0) {
 } else {
   console.log(`\n  ✓ All planet baselines match stored values.\n`);
 }
+
+// ─── Tier 1 (observed) RMS breakdown ────────────────────────────────────
+console.log('═══ Step 10b: Tier 1 (observed data) RMS ═══');
+console.log('  Target    │   All   │ Tier 1  │  n(T1) │ Tier 2  │  n(T2) │ Tiers present');
+console.log('  ──────────┼─────────┼─────────┼────────┼─────────┼────────┼──────────────');
+
+for (const target of planetTargets) {
+  const result = baselineResults[target];
+  if (!result) continue;
+
+  // Split entries by tier category
+  const tier1 = result.entries.filter(e => (e.tier || '').startsWith('1'));
+  const tier2 = result.entries.filter(e => (e.tier || '').startsWith('2'));
+
+  // Compute RMS for a subset
+  function subsetRMS(entries) {
+    if (entries.length === 0) return null;
+    let sumRA2 = 0, sumDec2 = 0, n = 0;
+    for (const e of entries) {
+      sumRA2 += e.dRA * e.dRA;
+      sumDec2 += e.dDec * e.dDec;
+      n++;
+    }
+    return Math.sqrt((sumRA2 + sumDec2) / n);
+  }
+
+  const rmsAll = newBaselines[target] ? newBaselines[target].rmsTotal : null;
+  const rms1 = subsetRMS(tier1);
+  const rms2 = subsetRMS(tier2);
+
+  // Collect which tier subtypes are present
+  const tierCounts = {};
+  for (const e of result.entries) {
+    const t = e.tier || '?';
+    tierCounts[t] = (tierCounts[t] || 0) + 1;
+  }
+  const tierList = Object.entries(tierCounts).sort().map(([t, c]) => `${t}:${c}`).join(' ');
+
+  const fmt = (v, w) => v !== null ? (v.toFixed(4) + '°').padStart(w) : '-'.padStart(w);
+
+  console.log(`  ${target.padEnd(10)}│ ${fmt(rmsAll, 7)} │ ${fmt(rms1, 7)} │ ${String(tier1.length).padStart(6)} │ ${fmt(rms2, 7)} │ ${String(tier2.length).padStart(6)} │ ${tierList}`);
+
+  // Store tier 1 RMS in baselines
+  if (newBaselines[target]) {
+    newBaselines[target].tier1RMS = rms1 !== null ? Math.round(rms1 * 10000) / 10000 : null;
+    newBaselines[target].tier1Count = tier1.length;
+    newBaselines[target].tier2RMS = rms2 !== null ? Math.round(rms2 * 10000) / 10000 : null;
+    newBaselines[target].tier2Count = tier2.length;
+  }
+}
+console.log('');
 
 // Update stored baselines if --write flag
 if (process.argv.includes('--write')) {
