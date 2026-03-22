@@ -958,10 +958,9 @@ const ELONGATION_CORRECTION = {
 };
 const VENUS_CORRECTION = ELONGATION_CORRECTION.Venus; // legacy alias
 
-// @AUTO:PLANET_OFFSET_CORRECTION
-const PLANET_OFFSET_CORRECTION = {
-  Mercury: { decConst: 0.140000, decPhi0: -40.500000, raConst: 0.018000, raPhi0: 122.000000 },
-};
+// PLANET_OFFSET_CORRECTION removed — Mercury's inclination geometry is now handled
+// entirely by the 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²).
+// See docs/72-planet-offset-correction.md for the physics derivation.
 
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -37415,41 +37414,9 @@ function updatePositions() {
                + (_vc.cos2VwE_sinEl_d2_dec || 0) * _cos2VwE * _sinEl * _invDv2) * _d2r;
     }
 
-    // Planet offset correction (time-dependent, fitted from Tier 1 observed data)
-    // Amplitude = relative inclination (planet vs Earth) × projectionFactor.
-    // Phase drifts at -(2×Earth axial precession + planet node rate).
-    const _offCorr = PLANET_OFFSET_CORRECTION && PLANET_OFFSET_CORRECTION[obj.name];
-    if (_offCorr) {
-      const _dt = o.julianDay - 2451545.0;
-      const _Lsun = (280.460 + 0.9856474 * _dt) * (Math.PI / 180);
-      const _oyr = startmodelYear + (o.julianDay - startmodelJD) / meansolaryearlengthinDays;
-      const _odyrs = _oyr - 2000;
-      const _plName = obj.name.toLowerCase();
-      const _opInfo = planets[_plName];
-      if (_opInfo) {
-        const _ophaseRate = -(2 * 2 * Math.PI / (holisticyearLength / 13) + 2 * Math.PI / _opInfo.perihelionEclipticYears);
-        const _odecPhi = _offCorr.decPhi0 * (Math.PI / 180) + _ophaseRate * _odyrs;
-        const _oraPhi  = _offCorr.raPhi0  * (Math.PI / 180) + _ophaseRate * _odyrs;
-        // Amplitude = e × a × sin(|relativeInclination|)
-        // Eccentricity displaces orbit center from focus by e×a; through the
-        // relative inclination this creates an out-of-plane declination error.
-        const _opNodePh = (_opInfo.ascendingNodeInvPlane - _opInfo.inclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / _opInfo.perihelionEclipticYears * _odyrs;
-        const _opIncl = _opInfo.invPlaneInclinationMean + _opInfo.invPlaneInclinationAmplitude * Math.cos(_opNodePh);
-        const _oeNodePh = (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * (Math.PI / 180) + 2 * Math.PI / (holisticyearLength / 3) * _odyrs;
-        const _oeIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(_oeNodePh);
-        const _oRelIncl = Math.abs(_opIncl - _oeIncl);
-        // Dynamic eccentricity: e(t) = base + amplitude × cos(eccentricityPhase(t))
-        const _oeccPhase = _opInfo.eccentricityPhaseJ2000 * (Math.PI / 180) + 2 * Math.PI / _opInfo.perihelionEclipticYears * _odyrs;
-        const _oecc = _opInfo.orbitalEccentricityBase + _opInfo.orbitalEccentricityAmplitude * Math.cos(_oeccPhase);
-        // Actual orbital period and semi-major axis (Kepler: a³ = P²)
-        const _oOrbCount = Math.round(holisticyearLength * meansolaryearlengthinDays / _opInfo.solarYearInput);
-        const _oPyrs = holisticyearLength * meansolaryearlengthinDays / _oOrbCount / 365.25;
-        const _osma = Math.pow(_oPyrs * _oPyrs, 1 / 3);
-        const _oamp = _oecc * _osma * Math.sin(_oRelIncl * (Math.PI / 180)) * (180 / Math.PI);
-        obj.ra -= (_offCorr.raConst + _oamp * Math.cos(_Lsun - _oraPhi)) * (Math.PI / 180);
-        obj.dec += (_offCorr.decConst + _oamp * Math.cos(_Lsun - _odecPhi)) * (Math.PI / 180);
-      }
-    }
+    // PLANET_OFFSET_CORRECTION removed — Mercury's inclination geometry is now
+    // handled by the 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²).
+    // See docs/72-planet-offset-correction.md for the physics derivation.
 
     // Meeus Ch. 47 post-hoc correction: override both RA and Dec with full Meeus position.
     // The hierarchy provides the orbit ring visual; this puts the Moon mesh at the correct position.

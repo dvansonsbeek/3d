@@ -263,17 +263,6 @@ if (fc.ELONGATION_CORRECTION) {
   replaceObject('ELONGATION_CORRECTION', lines.join('\n'));
 }
 
-// B3d. Planet offset correction (Sun-longitude basis, capitalized keys)
-if (fc.PLANET_OFFSET_CORRECTION) {
-  const lines = ['{'];
-  for (const [planet, coeffs] of Object.entries(fc.PLANET_OFFSET_CORRECTION)) {
-    const pairs = Object.entries(coeffs).map(([k, v]) => k + ': ' + fmtNum(v, 6).trim());
-    lines.push('  ' + toDisplayName(planet) + ': { ' + pairs.join(', ') + ' },');
-  }
-  lines.push('}');
-  replaceObject('PLANET_OFFSET_CORRECTION', lines.join('\n'));
-}
-
 // D. Moon Meeus tables
 const meeus = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
 replaceArray('MOON_L', meeus.longitudeTerms.terms, fmtMoonTable);

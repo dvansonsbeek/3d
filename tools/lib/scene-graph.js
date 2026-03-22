@@ -1057,43 +1057,9 @@ function computePlanetPosition(target, jd) {
   }
 
   // Planet offset correction (time-dependent, fitted from Tier 1 observed data)
-  // Captures the geometric residual from the geocentric rotation hierarchy's
-  // decomposition of the planet's orbital tilt. The error is proportional to
-  // the relative inclination between the planet and Earth on the invariable plane.
-  // Phase drifts at 2×Earth axial precession + node rate.
-  // Amplitude scales with the time-varying relative inclination.
-  const _offCorr = C.PLANET_OFFSET_CORRECTION && C.PLANET_OFFSET_CORRECTION[target];
-  if (_offCorr) {
-    const _dt = jd - 2451545.0; // days from J2000
-    const _Lsun = (280.460 + 0.9856474 * _dt) * d2r;
-    const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
-    const _dyrs = _yr - 2000;
-    // Time-dependent phase: drifts at -(2×(H/13) + planet node rate)
-    const _pInfo = C.planets[target];
-    const _phaseRate = -(2 * 2 * Math.PI / (C.H / 13) + 2 * Math.PI / _pInfo.perihelionEclipticYears);
-    const _decPhi = _offCorr.decPhi0 * d2r + _phaseRate * _dyrs;
-    const _raPhi  = _offCorr.raPhi0  * d2r + _phaseRate * _dyrs;
-    // Amplitude = e × a × sin(|relativeInclination|)
-    // The eccentricity displaces the orbit center from the focus by e×a AU.
-    // Through the relative inclination, this creates an out-of-plane offset
-    // that projects as a declination error.
-    // Both inclinations oscillate: planet at perihelionEclipticYears, Earth at H/3.
-    const _pNodePhase = (_pInfo.ascendingNodeInvPlane - _pInfo.inclinationPhaseAngle) * d2r + 2 * Math.PI / _pInfo.perihelionEclipticYears * _dyrs;
-    const _pIncl = _pInfo.invPlaneInclinationMean + _pInfo.invPlaneInclinationAmplitude * Math.cos(_pNodePhase);
-    const _eNodePhase = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * d2r + 2 * Math.PI / (C.H / 3) * _dyrs;
-    const _eIncl = C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(_eNodePhase);
-    const _relIncl = Math.abs(_pIncl - _eIncl);
-    // Dynamic eccentricity: e(t) = base + amplitude × cos(eccentricityPhase(t))
-    const _eccPhase = _pInfo.eccentricityPhaseJ2000 * d2r + 2 * Math.PI / _pInfo.perihelionEclipticYears * _dyrs;
-    const _ecc = _pInfo.orbitalEccentricityBase + _pInfo.orbitalEccentricityAmplitude * Math.cos(_eccPhase);
-    // Actual orbital period and semi-major axis (Kepler: a³ = P²)
-    const _orbCount = Math.round(C.totalDaysInH / _pInfo.solarYearInput);
-    const _Pyrs = C.totalDaysInH / _orbCount / 365.25;
-    const _sma = Math.pow(_Pyrs * _Pyrs, 1 / 3);
-    const _amp = _ecc * _sma * Math.sin(_relIncl * d2r) * (180 / Math.PI); // degrees
-    sph.theta -= (_offCorr.raConst + _amp * Math.cos(_Lsun - _raPhi)) * d2r;
-    sph.phi   += (_offCorr.decConst + _amp * Math.cos(_Lsun - _decPhi)) * d2r;
-  }
+  // PLANET_OFFSET_CORRECTION removed — the inclination geometry residual for Mercury
+  // is now handled by the 62p parallax BJ/BK terms (sin/cos(u-Lsun)/d²).
+  // See docs/72-planet-offset-correction.md for the physics derivation.
 
   // Full Meeus Ch. 47 post-hoc correction: override both RA and Dec
   if (target === 'moon' && C.useVariableSpeed &&
