@@ -551,8 +551,10 @@ function buildSceneGraph() {
       planetDef.eccentricity = pd.p.orbitalEccentricityJ2000 * (pd.p.eocFraction ?? 0.5);
       planetDef._eccentricityKey = key;
       planetDef._eocFraction = pd.p.eocFraction ?? 0.5;
+      // Use absolute planet speed for perihelion phase (script.js uses positive speed)
+      const absPlanetSpeed = Math.PI * 2 / (H / pd.d.solarYearCount);
       planetDef.perihelionPhaseJ2000 = -pd.p.startpos * d2r
-        + (pd.planetSpeed - periPrecRate) * pos_peri;
+        + (absPlanetSpeed - periPrecRate) * pos_peri;
       planetDef.perihelionPrecessionRate = periPrecRate;
     }
     const planetNodes = makeObjectNodes(key, planetDef);
