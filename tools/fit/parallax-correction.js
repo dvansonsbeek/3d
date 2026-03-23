@@ -108,10 +108,25 @@ const basisFn = (pt) => {
     Math.sin(2*pt.u)/(pt.d*pt.d*pt.d),              // BO: sin(2u)/d³ — 2nd harmonic at close approach
     Math.cos(2*pt.u)/(pt.d*pt.d*pt.d),              // BP: cos(2u)/d³ — 2nd harmonic at close approach
     Math.sin(pt.u)/(pt.d*pt.d*pt.d*pt.d),           // BQ: sin(u)/d⁴ — quartic close approach (Venus 0.26 AU)
+    // Extended terms (69-78) — planet mean anomaly (heliocentric orbital phase)
+    // Each planet's unmodeled EoC residual (from partial eocFraction) projects through
+    // its ecliptic inclination into Dec/RA errors. Mean anomaly M tracks the planet's
+    // heliocentric phase (vs u which is geocentric). Most impactful for high-eccentricity
+    // planets: Mercury (e=0.206, 47% unmodeled), Mars (e=0.093, 93% unmodeled).
+    Math.sin(pt.Mplanet)/pt.d,                         // BR: sin(M)/d — 1st harmonic EoC at distance
+    Math.cos(pt.Mplanet)/pt.d,                         // BS: cos(M)/d — 1st harmonic EoC at distance
+    Math.sin(2*pt.Mplanet)/pt.d,                       // BT: sin(2M)/d — 2nd harmonic EoC at distance
+    Math.cos(2*pt.Mplanet)/pt.d,                       // BU: cos(2M)/d — 2nd harmonic EoC at distance
+    Math.sin(pt.Mplanet),                               // BV: sin(M) — distance-independent 1st harmonic
+    Math.cos(pt.Mplanet),                               // BW: cos(M) — distance-independent 1st harmonic
+    Math.sin(2*pt.Mplanet),                             // BX: sin(2M) — distance-independent 2nd harmonic
+    Math.cos(2*pt.Mplanet),                             // BY: cos(2M) — distance-independent 2nd harmonic
+    Math.sin(pt.Mplanet)/(pt.d*pt.d),                  // BZ: sin(M)/d² — 1st harmonic at close approach
+    Math.cos(pt.Mplanet)/(pt.d*pt.d),                  // CA: cos(M)/d² — 1st harmonic at close approach
   ];
 };
 
-const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ'];
+const allLabels = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU_','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ','CA'];
 
 // Tier sizes: 15, 18, 24, 30, 36, 42, 48
 const tiers = [
@@ -126,6 +141,8 @@ const tiers = [
   { name: '56p', count: 56 },
   { name: '62p', count: 62 },
   { name: '68p', count: 68 },
+  { name: '72p', count: 72 },
+  { name: '78p', count: 78 },
 ];
 
 console.log('Extended correction coefficients with multi-tier CV selection\n');
@@ -169,7 +186,16 @@ for (const target of targets) {
     const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
     const dt = pt.jd - 2451545.0;
     const Lsun = (280.460 + 0.9856474 * dt) * d2r; // Sun mean longitude
-    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, Lsun, weight: pt.weight || 1 });
+    // Planet mean anomaly (heliocentric orbital phase) — for eccentricity correction terms
+    // Only for inner planets (Mercury, Venus, Mars) where orbital period is short enough
+    // to avoid collinearity with existing slow-varying basis functions.
+    // Outer planets (Jupiter–Neptune) have too few M cycles in 400yr → overfitting.
+    const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
+    const _astroEl = require('../../public/input/astro-reference.json').planetOrbitalElements[target];
+    const _MA0 = (_useM && _astroEl) ? _astroEl.meanAnomaly : 0;
+    const _MArate = (_useM && _astroEl) ? 360 / _astroEl.solarYearInput : 0;
+    const Mplanet = (_MA0 + _MArate * dt) * d2r;
+    data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, Lsun, Mplanet, weight: pt.weight || 1 });
   }
 
   const n = data.length;

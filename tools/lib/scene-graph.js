@@ -12,6 +12,8 @@ const C = require('./constants');
 const OE = require('./orbital-engine');
 const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
   require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
+const _astroRefJSON = JSON.parse(require('fs').readFileSync(
+  require('path').resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)
@@ -802,9 +804,13 @@ function moveModel(graph, pos) {
     }
 
     // Dynamic orbital plane: update planet container tilt from dynamic ecliptic inclination
+    // Uses dynamic ascending node (matching script.js updateOrbitalPlaneRotations)
     if (pm.sceneData && pm.sceneData.p.ascendingNodeInvPlane !== undefined) {
       const dynamicIncl = computeDynamicEclipticInclination(key, yearsSinceBalanced);
-      const correctedAscNode = pm.sceneData.p.ascendingNode + (ascNodeToolCorrection[key] || 0);
+      const currentYear = C.startmodelYear + (currentJD - C.startmodelJD) / C.meanSolarYearDays;
+      const dynamicAscNode = OE.calculateDynamicAscendingNodeFromTilts(
+        pm.sceneData.p.orbitTilta, pm.sceneData.p.orbitTiltb, currentYear);
+      const correctedAscNode = dynamicAscNode + (ascNodeToolCorrection[key] || 0);
       const angle = (-90 - correctedAscNode) * d2r;
       pm.planet.container.rx = Math.cos(angle) * -dynamicIncl * d2r;
       pm.planet.container.rz = Math.sin(angle) * -dynamicIncl * d2r;
@@ -919,6 +925,17 @@ function computePlanetPosition(target, jd) {
     const _Lsun = (280.460 + 0.9856474 * (jd - 2451545.0)) * d2r;
     const sinLsun = Math.sin(_Lsun), cosLsun = Math.cos(_Lsun);
 
+    // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
+    // Only for inner planets (Mercury, Venus, Mars) — outer planets have too few M cycles
+    const _plElRef = _astroRefJSON.planetOrbitalElements[target];
+    const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
+    let sinMplanet = 0, cosMplanet = 0, sin2Mplanet = 0, cos2Mplanet = 0;
+    if (_useM && _plElRef) {
+      const _Mplanet = (_plElRef.meanAnomaly + (360 / _plElRef.solarYearInput) * (jd - 2451545.0)) * d2r;
+      sinMplanet = Math.sin(_Mplanet); cosMplanet = Math.cos(_Mplanet);
+      sin2Mplanet = Math.sin(2 * _Mplanet); cos2Mplanet = Math.cos(2 * _Mplanet);
+    }
+
     const dc = C.ASTRO_REFERENCE.decCorrection[target];
     if (dc) {
       const invDS = invD * invS;
@@ -954,7 +971,12 @@ function computePlanetPosition(target, jd) {
         + (dc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (dc.BK || 0) * Math.cos(u - _Lsun) * invD2
         + (dc.BL || 0) * T * T * invD + (dc.BM || 0) * T * T * sinU * invD + (dc.BN || 0) * T * T * cosU * invD
         + (dc.BO || 0) * sin2U * invD2 * invD + (dc.BP || 0) * cos2U * invD2 * invD
-        + (dc.BQ || 0) * sinU * invD2 * invD * invD;
+        + (dc.BQ || 0) * sinU * invD2 * invD * invD
+        + (dc.BR || 0) * sinMplanet * invD + (dc.BS || 0) * cosMplanet * invD
+        + (dc.BT || 0) * sin2Mplanet * invD + (dc.BU || 0) * cos2Mplanet * invD
+        + (dc.BV || 0) * sinMplanet + (dc.BW || 0) * cosMplanet
+        + (dc.BX || 0) * sin2Mplanet + (dc.BY || 0) * cos2Mplanet
+        + (dc.BZ || 0) * sinMplanet * invD2 + (dc.CA || 0) * cosMplanet * invD2;
       sph.phi += corrDec * d2r;
     }
 
@@ -993,7 +1015,12 @@ function computePlanetPosition(target, jd) {
         + (rc.BJ || 0) * Math.sin(u - _Lsun) * invD2 + (rc.BK || 0) * Math.cos(u - _Lsun) * invD2
         + (rc.BL || 0) * T * T * invD + (rc.BM || 0) * T * T * sinU * invD + (rc.BN || 0) * T * T * cosU * invD
         + (rc.BO || 0) * sin2U * invD2 * invD + (rc.BP || 0) * cos2U * invD2 * invD
-        + (rc.BQ || 0) * sinU * invD2 * invD * invD;
+        + (rc.BQ || 0) * sinU * invD2 * invD * invD
+        + (rc.BR || 0) * sinMplanet * invD + (rc.BS || 0) * cosMplanet * invD
+        + (rc.BT || 0) * sin2Mplanet * invD + (rc.BU || 0) * cos2Mplanet * invD
+        + (rc.BV || 0) * sinMplanet + (rc.BW || 0) * cosMplanet
+        + (rc.BX || 0) * sin2Mplanet + (rc.BY || 0) * cos2Mplanet
+        + (rc.BZ || 0) * sinMplanet * invD2 + (rc.CA || 0) * cosMplanet * invD2;
       sph.theta -= corrRA * d2r;
     }
   }
