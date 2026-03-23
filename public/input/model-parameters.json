@@ -23,7 +23,7 @@
     "moonStartposApsidal": 347.622,
     "moonStartposNodal": -83.63,
     "moonStartposMoon": 131.93,
-    "moonMeeusLpCorrection": 0.010525
+    "moonMeeusLpCorrection": 0.010524
   },
   "planets": {
     "mercury": {

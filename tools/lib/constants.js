@@ -265,13 +265,10 @@ ASTRO_REFERENCE.raCorrection = fitted.PARALLAX_RA_CORRECTION;
 // Moon post-Meeus RA/Dec correction (fitted to JPL DE440 residuals)
 const MOON_CORRECTION = fitted.MOON_CORRECTION || null;
 
-// Two-stage conjunction correction (per-planet synodic periods, post-parallax)
-const CONJUNCTION_CORRECTION = fitted.CONJUNCTION_CORRECTION || null;
+// Gravitation correction (per-planet synodic periods, planet-planet perturbations)
+const GRAVITATION_CORRECTION = fitted.GRAVITATION_CORRECTION || null;
 
-// Venus offset correction (elongation × Earth perihelion geometry)
-const VENUS_CORRECTION = fitted.VENUS_CORRECTION || null;
-
-// Elongation correction for inner planets (Mercury, Venus, Mars)
+// Elongation correction for inner planets (Venus, Mars)
 const ELONGATION_CORRECTION = fitted.ELONGATION_CORRECTION || null;
 
 // Planet perihelion passage references (model-tuned, from model-parameters.json)
@@ -457,8 +454,7 @@ module.exports = {
   moonEclipticInclinationJ2000,
   moonMeeusLpCorrection,
   MOON_CORRECTION,
-  CONJUNCTION_CORRECTION,
-  VENUS_CORRECTION,
+  GRAVITATION_CORRECTION,
   ELONGATION_CORRECTION,
   moonOrbitalEccentricity,
   moonTilt,

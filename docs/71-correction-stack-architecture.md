@@ -13,15 +13,16 @@ Applied in this order to the spherical coordinates `(sph.theta, sph.phi)`:
 ```
 Raw Model Position (from scene-graph rotation hierarchy)
   │
-  ├─ 1. PARALLAX           Up to 48 basis functions per planet
-  │                         Geometric: distance, time, orbital harmonics
+  ├─ 1. PARALLAX           Up to 68 basis functions per planet
+  │                         Geocentric viewing geometry: distance, time, orbital harmonics
   │                         Source: PARALLAX_DEC_CORRECTION, PARALLAX_RA_CORRECTION
   │
-  ├─ 2. CONJUNCTION         Sin/cos at planet-specific synodic periods
-  │                         Source: CONJUNCTION_CORRECTION
+  ├─ 2. GRAVITATION         Sin/cos at planet-specific synodic periods
+  │                         Planet-planet gravitational perturbations
+  │                         Source: GRAVITATION_CORRECTION
   │
   ├─ 3. ELONGATION          21 basis functions (inner planets only)
-  │                         Elongation × Earth perihelion geometry
+  │                         Viewing angle × Earth perihelion geometry
   │                         Source: ELONGATION_CORRECTION
   │
   └─ 4. MOON MEEUS          6 sin/cos terms (Moon only)
@@ -33,7 +34,7 @@ Raw Model Position (from scene-graph rotation hierarchy)
 
 | Type | Behavior during fitting | Examples |
 |------|------------------------|----------|
-| **fittable** | Disabled when being fitted; active otherwise. Part of the iterative pipeline (Steps 5a/5b). | Parallax, Conjunction, Elongation |
+| **fittable** | Disabled when being fitted; active otherwise. Part of the iterative pipeline (Steps 5a/5b). | Parallax, Gravitation, Elongation |
 | **independent** | Left as-is during all fitting. Does not interact with other layers. | Moon Meeus |
 
 ## Fitting Behavior
@@ -46,11 +47,11 @@ const { prepareForFitting } = require('../lib/correction-stack');
 // parallax-correction.js:
 prepareForFitting(C, sg, 'parallax');
 // Disables: parallax
-// Active: conjunction, elongation, moon-meeus
+// Active: gravitation, elongation, moon-meeus
 
-// conjunction-correction.js:
-prepareForFitting(C, sg, ['conjunction', 'elongation']);
-// Disables: conjunction + elongation
+// gravitation-correction.js:
+prepareForFitting(C, sg, ['gravitation', 'elongation']);
+// Disables: gravitation + elongation
 // Active: parallax, moon-meeus
 ```
 
@@ -58,8 +59,8 @@ prepareForFitting(C, sg, ['conjunction', 'elongation']);
 
 The fitting pipeline (Steps 5a → 5b) can iterate multiple times via `--iterate N` or `--converge`. During each cycle:
 
-1. **Step 5a** (parallax): `prepareForFitting('parallax')` → disables parallax → fits from residuals (with conjunction+elongation still active)
-2. **Step 5b** (conjunction+elongation): `prepareForFitting(['conjunction', 'elongation'])` → disables conjunction + elongation → fits from post-parallax residuals
+1. **Step 5a** (parallax): `prepareForFitting('parallax')` → disables parallax → fits from residuals (with gravitation+elongation still active)
+2. **Step 5b** (gravitation+elongation): `prepareForFitting(['gravitation', 'elongation'])` → disables gravitation + elongation → fits from post-parallax residuals
 
 ## RA/Dec vs 3D Position
 
@@ -77,7 +78,7 @@ If pixel-perfect planet positioning were ever needed, the same Stage 2 transform
 fitted-coefficients.json (lowercase planet keys)
     │
     ├─→ tools/lib/constants/fitted-coefficients.js (loads JSON)
-    │       └─→ tools/lib/constants.js (exports as C.PARALLAX_*, C.CONJUNCTION_*, etc.)
+    │       └─→ tools/lib/constants.js (exports as C.PARALLAX_*, C.GRAVITATION_*, etc.)
     │               └─→ tools/lib/scene-graph.js (applies corrections)
     │
     └─→ tools/fit/export-to-script.js (converts lowercase → Capitalized keys)
@@ -123,10 +124,10 @@ The `export-to-script.js` uses `toDisplayName()` to convert all correction objec
 | File | Role |
 |------|------|
 | `tools/lib/correction-stack.js` | Layer definitions, `prepareForFitting()`, name conversion |
-| `tools/lib/scene-graph.js` (lines 889-1060) | Applies all corrections in order |
-| `tools/lib/constants.js` (lines 262-280) | Loads and exports correction data |
+| `tools/lib/scene-graph.js` | Applies all corrections in order |
+| `tools/lib/constants.js` | Loads and exports correction data |
 | `tools/fit/parallax-correction.js` | Fits Layer 1 (parallax) |
-| `tools/fit/conjunction-correction.js` | Fits Layers 2+3 (conjunction + elongation) |
+| `tools/fit/gravitation-correction.js` | Fits Layers 2+3 (gravitation + elongation) |
 | `public/input/fitted-coefficients.json` | Single source of truth for all coefficients |
 | `tools/fit/export-to-script.js` | Syncs JSON → script.js with key conversion |
 

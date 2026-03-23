@@ -996,11 +996,11 @@ function computePlanetPosition(target, jd) {
     }
   }
 
-  // Two-stage conjunction correction (post-parallax, per-planet synodic periods)
-  const conjCorr = C.CONJUNCTION_CORRECTION && C.CONJUNCTION_CORRECTION[target];
-  if (conjCorr) {
+  // Gravitation correction (per-planet synodic periods, planet-planet perturbations)
+  const gravCorr = C.GRAVITATION_CORRECTION && C.GRAVITATION_CORRECTION[target];
+  if (gravCorr) {
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
-    for (const term of conjCorr) {
+    for (const term of gravCorr) {
       const phase = 2 * Math.PI * (_yr - 2000) / term.period;
       const sp = Math.sin(phase), cp = Math.cos(phase);
       sph.theta -= (term.raSin * sp + term.raCos * cp) * d2r;
@@ -1009,8 +1009,8 @@ function computePlanetPosition(target, jd) {
   }
 
   // Elongation offset correction (elongation × Earth perihelion geometry)
-  // Applied to inner planets: Mercury, Venus, Mars
-  const _elCorr = (C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target]) || (target === 'venus' && C.VENUS_CORRECTION);
+  // Applied to inner planets: Venus, Mars
+  const _elCorr = C.ELONGATION_CORRECTION && C.ELONGATION_CORRECTION[target];
   if (_elCorr) {
     const vc = _elCorr;
     const _yr = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;

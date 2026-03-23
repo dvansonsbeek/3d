@@ -236,10 +236,10 @@ if (fc.PARALLAX_DEC_CORRECTION) {
   replaceObject('PARALLAX_RA_CORRECTION', fmtParallax(fc.PARALLAX_RA_CORRECTION));
 }
 
-// B3b. Conjunction correction (synodic period terms, capitalized keys)
-if (fc.CONJUNCTION_CORRECTION) {
+// B3b. Gravitation correction (synodic period terms, planet-planet perturbations, capitalized keys)
+if (fc.GRAVITATION_CORRECTION) {
   const lines = ['{'];
-  for (const [planet, terms] of Object.entries(fc.CONJUNCTION_CORRECTION)) {
+  for (const [planet, terms] of Object.entries(fc.GRAVITATION_CORRECTION)) {
     const arr = terms.map(t => {
       const pairs = Object.entries(t).map(([k, v]) => k + ': ' + fmtNum(v, 6).trim());
       return '    { ' + pairs.join(', ') + ' }';
@@ -249,7 +249,7 @@ if (fc.CONJUNCTION_CORRECTION) {
     lines.push('  ],');
   }
   lines.push('}');
-  replaceObject('CONJUNCTION_CORRECTION', lines.join('\n'));
+  replaceObject('GRAVITATION_CORRECTION', lines.join('\n'));
 }
 
 // B3c. Elongation correction (inner planets, capitalized keys)

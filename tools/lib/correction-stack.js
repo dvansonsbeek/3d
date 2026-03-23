@@ -8,9 +8,9 @@
 
 const CORRECTION_LAYERS = [
   { id: 'parallax',      keys: ['ASTRO_REFERENCE.decCorrection', 'ASTRO_REFERENCE.raCorrection'], type: 'fittable', emptyVal: {} },
-  { id: 'conjunction',    keys: ['CONJUNCTION_CORRECTION'],           type: 'fittable', emptyVal: null },
-  { id: 'elongation',     keys: ['ELONGATION_CORRECTION', 'VENUS_CORRECTION'], type: 'fittable', emptyVal: null },
-  { id: 'moon-meeus',     keys: ['MOON_CORRECTION'],                 type: 'independent', emptyVal: null },
+  { id: 'gravitation',   keys: ['GRAVITATION_CORRECTION'],           type: 'fittable', emptyVal: null },
+  { id: 'elongation',    keys: ['ELONGATION_CORRECTION'],            type: 'fittable', emptyVal: null },
+  { id: 'moon-meeus',    keys: ['MOON_CORRECTION'],                  type: 'independent', emptyVal: null },
 ];
 
 // ─── Deep property access helpers ────────────────────────────────────────

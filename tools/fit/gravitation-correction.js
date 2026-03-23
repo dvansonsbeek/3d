@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 /**
- * Two-stage conjunction correction — fits sin/cos terms at planet-specific
- * synodic periods to the residuals AFTER the main parallax correction.
- *
- * This bypasses the parallax tier system (which bundles conjunction terms
- * with unneeded parameters) by fitting only 2-4 coefficients per planet
- * directly to the remaining residuals.
+ * Gravitation + elongation correction — fits sin/cos terms at planet-specific
+ * synodic periods (gravitational perturbations) and elongation basis functions
+ * to the residuals AFTER the main parallax correction.
  *
  * Usage:
  *   node tools/fit/conjunction-correction.js           # dry run
@@ -20,11 +17,11 @@ const sg = require('../lib/scene-graph');
 
 const d2r = Math.PI / 180;
 
-// Disable conjunction + elongation (+ all post-hoc layers) to fit from parallax residuals
+// Disable gravitation + elongation to fit from parallax residuals
 const { prepareForFitting } = require('../lib/correction-stack');
-const restore = prepareForFitting(C, sg, ['conjunction', 'elongation']);
+const restore = prepareForFitting(C, sg, ['gravitation', 'elongation']);
 
-// ─── Per-planet conjunction periods ─────────────────────────────────────
+// ─── Per-planet gravitation periods ─────────────────────────────────────
 // Each entry: array of synodic periods (in years) to fit.
 // Derived from dominant signals in residual Fourier analysis.
 
@@ -36,11 +33,17 @@ function computeSynodic(target1, target2) {
   return Math.abs(360 / (n1 - n2));
 }
 
+// Jupiter orbital period (used for Mercury's 4× Jupiter perturbation)
+const jupCount = Math.round(C.totalDaysInH / C.planets.jupiter.solarYearInput);
+const jupPeriodYr = C.H / jupCount;
+
 const conjConfig = {
+  mercury: [4 * jupPeriodYr, 2 * jupPeriodYr],  // ~47yr + ~24yr: Jupiter perturbation harmonics
   mars:    [computeSynodic('mars', 'jupiter'), 3 * computeSynodic('mars', 'venus')],
-  jupiter: [computeSynodic('jupiter', 'neptune')],
-  saturn:  [computeSynodic('saturn', 'jupiter'), 3 * computeSynodic('saturn', 'uranus')],
-  uranus:  [computeSynodic('uranus', 'neptune')],
+  jupiter: [computeSynodic('jupiter', 'neptune'), computeSynodic('jupiter', 'saturn')],
+  saturn:  [computeSynodic('saturn', 'jupiter'), 3 * computeSynodic('saturn', 'uranus'),
+            2 * computeSynodic('saturn', 'neptune'), computeSynodic('saturn', 'uranus')],
+  uranus:  [computeSynodic('uranus', 'neptune'), computeSynodic('uranus', 'jupiter')],
   neptune: [computeSynodic('neptune', 'jupiter'), computeSynodic('neptune', 'saturn')],
 };
 
@@ -48,16 +51,16 @@ const conjConfig = {
 const MIN_AMPLITUDE = 0.0005;
 
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('  CONJUNCTION CORRECTION (two-stage, post-parallax)');
+console.log('  GRAVITATION CORRECTION (planet-planet perturbations, post-parallax)');
 console.log('═══════════════════════════════════════════════════════════════\n');
 
-console.log('Per-planet conjunction periods:');
+console.log('Per-planet gravitation periods:');
 for (const [planet, periods] of Object.entries(conjConfig)) {
   console.log(`  ${planet.padEnd(10)} ${periods.map(p => p.toFixed(4) + 'yr').join(', ')}`);
 }
 console.log('');
 
-// ─── Fit conjunction correction per planet ───────────────────────────────
+// ─── Fit gravitation correction per planet ───────────────────────────────
 
 const corrections = {};
 
@@ -301,12 +304,12 @@ for (const planet of Object.keys(elongationCorrections)) {
 if (process.argv.includes('--write')) {
   const jsonPath = path.resolve(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
   const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-  fc.CONJUNCTION_CORRECTION = corrections;
+  fc.GRAVITATION_CORRECTION = corrections;
   fc.ELONGATION_CORRECTION = elongationCorrections;
-  // Legacy alias
-  fc.VENUS_CORRECTION = elongationCorrections.venus || null;
+  // Remove legacy VENUS_CORRECTION if present
+  delete fc.VENUS_CORRECTION;
   fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
-  console.log('\n✓ Written CONJUNCTION_CORRECTION + ELONGATION_CORRECTION to fitted-coefficients.json');
+  console.log('\n✓ Written GRAVITATION_CORRECTION + ELONGATION_CORRECTION to fitted-coefficients.json');
 } else {
   console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
 }

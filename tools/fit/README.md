@@ -104,11 +104,11 @@ Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Uses prepareForFitting() to disable parallax layer.
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 5b: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONGATION_CORRECTION
+Step 5b: gravitation-correction.js            → GRAVITATION_CORRECTION + ELONGATION_CORRECTION
          Two-stage post-parallax correction:
-         1. Synodic conjunction terms (sin/cos at per-planet periods)
+         1. Synodic gravitation terms (sin/cos at per-planet periods)
          2. Elongation offset correction (21 basis functions for Mercury/Venus/Mars)
-         Uses prepareForFitting() to disable conjunction + elongation layers.
+         Uses prepareForFitting() to disable gravitation + elongation layers.
          Updates: fitted-coefficients.json (auto-updated by script)
 
          Optional diagnostics (skip in standard refit):
@@ -242,7 +242,7 @@ Output is logged to `tools/results/pipeline.log`. Stops on any step failure.
 Step 3 (browser export) is always manual — the runner checks the data file exists.
 
 The `--iterate` / `--converge` flags repeat the planet correction fitting steps (5a parallax →
-5b conjunction + elongation) iteratively. Each pass, the parallax sees cleaner residuals
+5b gravitation + elongation) iteratively. Each pass, the parallax sees cleaner residuals
 and reallocates its terms, allowing the elongation correction to capture more signal.
 Typically converges in 15-20 passes. Venus improves from ~0.10° to ~0.05°.
 The Moon step (5c) runs once after the iteration completes.
@@ -272,7 +272,7 @@ python3 tools/fit/python/train_observed.py --write                           # S
 
 # Phase 4: Planet positions & corrections
 node tools/fit/parallax-correction.js --write                                # Step 5a
-node tools/fit/conjunction-correction.js --write                             # Step 5b
+node tools/fit/gravitation-correction.js --write                             # Step 5b
 # node tools/fit/eoc-fractions.js              # optional diagnostic
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
@@ -345,7 +345,7 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     train_precession.py          → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
     parallax-correction.js       → fitted-coefficients.json  (Step 5a)
-    conjunction-correction.js    → fitted-coefficients.json  (Step 5b)
+    gravitation-correction.js    → fitted-coefficients.json  (Step 5b)
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
@@ -359,7 +359,7 @@ Planet positions go through 4 correction layers after the raw scene-graph comput
 The architecture is managed by `tools/lib/correction-stack.js` with `prepareForFitting()`
 to safely disable layers during fitting.
 
-**Layers:** Parallax (48p) → Conjunction → Elongation (21p) → Moon Meeus
+**Layers:** Parallax (68p) → Gravitation → Elongation (21p) → Moon Meeus
 
 Steps 5a and 5b use `prepareForFitting()` which disables the target layer(s) so the
 fitter sees residuals without its own layer's contribution.

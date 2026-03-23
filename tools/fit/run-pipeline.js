@@ -72,8 +72,8 @@ const STEPS = [
   // Phase 4: Planet positions & corrections
   { id: '5a', phase: 2, name: 'Parallax corrections',
     cmd: 'node tools/fit/parallax-correction.js --write' },
-  { id: '5b', phase: 2, name: 'Conjunction correction',
-    cmd: 'node tools/fit/conjunction-correction.js --write' },
+  { id: '5b', phase: 2, name: 'Gravitation correction',
+    cmd: 'node tools/fit/gravitation-correction.js --write' },
   { id: '5c', phase: 2, name: 'Moon eclipse optimizer',
     cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
@@ -195,7 +195,7 @@ for (let i = 0; i < steps.length; i++) {
 }
 
 // ─── Iterative correction refinement ─────────────────────────────────────
-// Repeats Steps 5a-5b (parallax + conjunction/elongation) to allow
+// Repeats Steps 5a-5b (parallax + gravitation/elongation) to allow
 // corrections to iteratively improve by each seeing the other's residuals.
 // Moon step (5c) runs once after iteration completes.
 
