@@ -1,16 +1,16 @@
-[16:15:04] Pipeline started: 2026-03-23T16:15:04.024Z
-[16:15:04] Steps: 
-[16:15:04] Log: /home/dennis/code/3d/tools/results/pipeline.log
-[16:15:04] 
-[16:15:04] 
-[16:15:04] ═══ Iterative correction refinement (Steps 5a-5b) ═══
-[16:15:04]   Mode: converge (threshold 0.001°, max 50 passes)
-[16:15:04] 
-[16:15:27]   Pass  1: Venus=0.0285° (23s)
-[16:15:49]   Pass  2: Venus=0.0286° (Δ=+0.0001°) (23s)
-[16:15:49]   Converged at pass 2 (Δ < 0.001°)
-[16:15:49] 
-[16:15:49] 
-[16:15:49] ═══════════════════════════════════════════════════════════════
-[16:15:49]   Pipeline COMPLETE: 4 steps passed in 0.8 min
-[16:15:49] ═══════════════════════════════════════════════════════════════
+[17:18:03] Pipeline started: 2026-03-23T17:18:03.015Z
+[17:18:03] Steps: 
+[17:18:03] Log: /home/dennis/code/3d/tools/results/pipeline.log
+[17:18:03] 
+[17:18:03] 
+[17:18:03] ═══ Iterative correction refinement (Steps 5a-5b) ═══
+[17:18:03]   Mode: converge (threshold 0.001°, max 50 passes)
+[17:18:03] 
+[17:18:32]   Pass  1: Venus=0.0289° (30s)
+[17:19:02]   Pass  2: Venus=0.0292° (Δ=+0.0003°) (30s)
+[17:19:02]   Converged at pass 2 (Δ < 0.001°)
+[17:19:02] 
+[17:19:02] 
+[17:19:02] ═══════════════════════════════════════════════════════════════
+[17:19:02]   Pipeline COMPLETE: 4 steps passed in 1.0 min
+[17:19:02] ═══════════════════════════════════════════════════════════════

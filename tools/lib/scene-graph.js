@@ -894,9 +894,11 @@ function computePlanetPosition(target, jd) {
   //              + L/s + M*sin(u)/d² + N*sin(2u)/s + O*cos(u)/s
   //              + P*T*sin(2u)/d + Q*T*cos(2u)/d + R*T*sin(u)/s
   //              + S*T/d + U*cos(u)/d² + V/s² + W*sin(u)/s² + X*cos(3u)/s + Y*sin(3u)/s
-  //   where u = RA - ascendingNode, d = geocentric dist, s = sunDist, T = centuries from J2000
+  //   where u = RA - ascendingNode(t), d = geocentric dist, s = sunDist, T = centuries from J2000
   if (target !== 'moon' && target !== 'sun') {
-    const ascNode = C.planets[target].ascendingNode;
+    const _p = C.planets[target];
+    const _currentYear = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
+    const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear);
     const u = (sph.theta / d2r - ascNode) * d2r;
     const invD = 1 / distAU;
     const invD2 = invD * invD;
