@@ -62,7 +62,7 @@
   "planetOrbitalElements": {
     "_description": "JPL/SPICE J2000 orbital elements per planet",
     "mercury": {
-      "solarYearInput": 87.9681,
+      "solarYearInput": 87.9685,
       "orbitalEccentricityJ2000": 0.20563593,
       "axialTiltMean": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
