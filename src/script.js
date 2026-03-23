@@ -32401,10 +32401,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.mercury.solarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / mercurySolarYearCount, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.mercury.solarYearInput, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / mercurySolarYearCount, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -32792,10 +32792,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.venus.solarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / venusSolarYearCount, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.venus.solarYearInput, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / venusSolarYearCount, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -33151,10 +33151,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.mars.solarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / marsSolarYearCount, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.mars.solarYearInput, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / marsSolarYearCount, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -33509,10 +33509,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.jupiter.solarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / jupiterSolarYearCount, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.jupiter.solarYearInput, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / jupiterSolarYearCount, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -33868,10 +33868,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.saturn.solarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / saturnSolarYearCount, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.saturn.solarYearInput, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / saturnSolarYearCount, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -34227,10 +34227,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.uranus.solarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / uranusSolarYearCount, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.uranus.solarYearInput, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / uranusSolarYearCount, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -34586,10 +34586,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.neptune.solarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / neptuneSolarYearCount, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.neptune.solarYearInput, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / neptuneSolarYearCount, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -34946,10 +34946,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.pluto.solarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / plutoSolarYearCount, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.pluto.solarYearInput, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / plutoSolarYearCount, o.plutoMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -35274,10 +35274,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.halleys.solarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / halleysSolarYearCount, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.halleys.solarYearInput, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / halleysSolarYearCount, o.halleysMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
@@ -35602,10 +35602,10 @@ const planetStats = {
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(planets.eros.solarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion(holisticyearLength * meansolaryearlengthinDays / erosSolarYearCount, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(planets.eros.solarYearInput, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion(holisticyearLength * meansolaryearlengthinDays / erosSolarYearCount, o.erosMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession —' },
