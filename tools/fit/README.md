@@ -101,14 +101,14 @@ Step 4d: python/train_observed.py             → tools/lib/python/coefficients/
 
 Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
          Fits up to 48-parameter RA/Dec correction per planet via cross-validation.
-         Uses prepareForFitting() to disable parallax + all post-hoc layers.
+         Uses prepareForFitting() to disable parallax layer.
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 5b: conjunction-correction.js            → CONJUNCTION_CORRECTION + ELONGATION_CORRECTION
          Two-stage post-parallax correction:
          1. Synodic conjunction terms (sin/cos at per-planet periods)
-         2. Elongation offset correction (15 basis functions for Mercury/Venus/Mars)
-         Uses prepareForFitting() to disable conjunction + elongation + all post-hoc layers.
+         2. Elongation offset correction (21 basis functions for Mercury/Venus/Mars)
+         Uses prepareForFitting() to disable conjunction + elongation layers.
          Updates: fitted-coefficients.json (auto-updated by script)
 
          Optional diagnostics (skip in standard refit):
@@ -345,8 +345,8 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     train_precession.py          → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
     parallax-correction.js       → fitted-coefficients.json  (Step 5a)
-    moon-eclipse-optimizer.js    → model-parameters.json     (Step 5b)
-    conjunction-correction.js    → fitted-coefficients.json  (Step 5c)
+    conjunction-correction.js    → fitted-coefficients.json  (Step 5b)
+    moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 7b)
@@ -355,18 +355,16 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
 
 ## Correction Stack
 
-Planet positions go through 5 correction layers after the raw scene-graph computation.
+Planet positions go through 4 correction layers after the raw scene-graph computation.
 The architecture is managed by `tools/lib/correction-stack.js` with `prepareForFitting()`
 to safely disable layers during fitting.
 
-**Layers:** Parallax (48p) → Conjunction → Elongation → Planet Offset (post-hoc) → Moon Meeus
+**Layers:** Parallax (48p) → Conjunction → Elongation (21p) → Moon Meeus
 
-Steps 5a and 5c use `prepareForFitting()` which automatically disables the target layer
-plus all post-hoc layers, preventing the feedback divergence that occurs when post-hoc
-corrections are active during fitting.
+Steps 5a and 5b use `prepareForFitting()` which disables the target layer(s) so the
+fitter sees residuals without its own layer's contribution.
 
 For full details see [docs/71 — Correction Stack Architecture](../../docs/71-correction-stack-architecture.md).
-For the planet offset correction physics see [docs/72 — Planet Offset Correction](../../docs/72-planet-offset-correction.md).
 
 ## Python-Node.js bridge
 
@@ -381,5 +379,4 @@ automatically use the same values as the Node.js tooling — no manual sync need
 - [Solstice Prediction](../../docs/14-solstice-prediction.md) — Cardinal point harmonics, obliquity formula derivation
 - [Equation of Center](../../docs/65-equation-of-center.md) — EoC derivation and constants
 - [Parallax Corrections](../../docs/67-planet-parallax-corrections.md) — Parallax correction formula and tiers
-- [Correction Stack Architecture](../../docs/71-correction-stack-architecture.md) — Layer ordering, post-hoc concept, prepareForFitting()
-- [Planet Offset Correction](../../docs/72-planet-offset-correction.md) — Eccentricity offset × relative inclination physics
+- [Correction Stack Architecture](../../docs/71-correction-stack-architecture.md) — Layer ordering, prepareForFitting()
