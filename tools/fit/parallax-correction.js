@@ -186,15 +186,11 @@ for (const target of targets) {
     const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
     const dt = pt.jd - 2451545.0;
     const Lsun = (280.460 + 0.9856474 * dt) * d2r; // Sun mean longitude
-    // Planet mean anomaly (heliocentric orbital phase) — for eccentricity correction terms
+    // Planet mean anomaly (heliocentric orbital phase) — dynamic from scene graph EoC
     // Only for inner planets (Mercury, Venus, Mars) where orbital period is short enough
     // to avoid collinearity with existing slow-varying basis functions.
-    // Outer planets (Jupiter–Neptune) have too few M cycles in 400yr → overfitting.
     const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
-    const _astroEl = require('../../public/input/astro-reference.json').planetOrbitalElements[target];
-    const _MA0 = (_useM && _astroEl) ? _astroEl.meanAnomaly : 0;
-    const _MArate = (_useM && _astroEl) ? 360 / _astroEl.solarYearInput : 0;
-    const Mplanet = (_MA0 + _MArate * dt) * d2r;
+    const Mplanet = _useM ? result.meanAnomaly : 0;
     data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, Lsun, Mplanet, weight: pt.weight || 1 });
   }
 

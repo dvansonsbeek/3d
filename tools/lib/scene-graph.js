@@ -12,8 +12,6 @@ const C = require('./constants');
 const OE = require('./orbital-engine');
 const MEEUS_LUNAR = JSON.parse(require('fs').readFileSync(
   require('path').resolve(__dirname, '..', '..', 'public', 'input', 'meeus-lunar-tables.json'), 'utf8'));
-const _astroRefJSON = JSON.parse(require('fs').readFileSync(
-  require('path').resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MINIMAL MATRIX4 (column-major, matches Three.js convention)
@@ -666,6 +664,7 @@ function moveModel(graph, pos) {
       const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+      nodes._meanAnomaly = M; // Store for parallax correction use
     }
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
@@ -926,12 +925,13 @@ function computePlanetPosition(target, jd) {
     const sinLsun = Math.sin(_Lsun), cosLsun = Math.cos(_Lsun);
 
     // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
+    // Uses dynamic M from EoC computation in animateObject (stored on planet node)
     // Only for inner planets (Mercury, Venus, Mars) — outer planets have too few M cycles
-    const _plElRef = _astroRefJSON.planetOrbitalElements[target];
     const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
     let sinMplanet = 0, cosMplanet = 0, sin2Mplanet = 0, cos2Mplanet = 0;
-    if (_useM && _plElRef) {
-      const _Mplanet = (_plElRef.meanAnomaly + (360 / _plElRef.solarYearInput) * (jd - 2451545.0)) * d2r;
+    if (_useM) {
+      const _pm = graph.planetNodeMap[target];
+      const _Mplanet = _pm && _pm.planet._meanAnomaly != null ? _pm.planet._meanAnomaly : 0;
       sinMplanet = Math.sin(_Mplanet); cosMplanet = Math.cos(_Mplanet);
       sin2Mplanet = Math.sin(2 * _Mplanet); cos2Mplanet = Math.cos(2 * _Mplanet);
     }
@@ -1145,11 +1145,21 @@ function computePlanetPosition(target, jd) {
     sph.phi = Math.PI / 2 - newDec;
   }
 
+  // Extract dynamic mean anomaly for inner planets (from EoC computation)
+  let meanAnomaly = 0;
+  if (target !== 'moon' && target !== 'sun') {
+    const _pm = graph.planetNodeMap[target];
+    if (_pm && _pm.planet._meanAnomaly != null) {
+      meanAnomaly = _pm.planet._meanAnomaly;
+    }
+  }
+
   return {
     ra: sph.theta,   // radians
     dec: sph.phi,    // radians (Three.js phi convention)
     distAU,
     sunDistAU,
+    meanAnomaly,     // radians (from EoC computation, heliocentric orbital phase)
   };
 }
 
