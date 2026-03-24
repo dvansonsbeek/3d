@@ -808,7 +808,7 @@ function moveModel(graph, pos) {
       const dynamicIncl = computeDynamicEclipticInclination(key, yearsSinceBalanced);
       const currentYear = C.startmodelYear + (currentJD - C.startmodelJD) / C.meanSolarYearDays;
       const dynamicAscNode = OE.calculateDynamicAscendingNodeFromTilts(
-        pm.sceneData.p.orbitTilta, pm.sceneData.p.orbitTiltb, currentYear);
+        pm.sceneData.p.orbitTilta, pm.sceneData.p.orbitTiltb, currentYear, key);
       const correctedAscNode = dynamicAscNode + (ascNodeToolCorrection[key] || 0);
       const angle = (-90 - correctedAscNode) * d2r;
       pm.planet.container.rx = Math.cos(angle) * -dynamicIncl * d2r;
@@ -903,7 +903,7 @@ function computePlanetPosition(target, jd) {
   if (target !== 'moon' && target !== 'sun') {
     const _p = C.planets[target];
     const _currentYear = C.startmodelYear + (jd - C.startmodelJD) / C.meanSolarYearDays;
-    const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear);
+    const ascNode = OE.calculateDynamicAscendingNodeFromTilts(_p.orbitTilta, _p.orbitTiltb, _currentYear, target);
     const u = (sph.theta / d2r - ascNode) * d2r;
     const invD = 1 / distAU;
     const invD2 = invD * invD;

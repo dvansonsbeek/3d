@@ -69,21 +69,40 @@ For current values, see [Constants Reference](20-constants-reference.md).
 The base perturbation rate for the ascending node is:
 
 ```
-dΩ/dε = -sin(Ω) / tan(i)
+dΩ/dε = -sin(Ω) / tan(i(t))
 ```
 
 Where:
-- `Ω` = current ascending node longitude
-- `ε` = Earth's obliquity
-- `i` = planet's orbital inclination
+- `Ω` = current ascending node longitude (static at J2000)
+- `ε` = Earth's obliquity (dynamic — changes with obliquity cycle)
+- `i(t)` = planet's **dynamic** ecliptic inclination (changes over time)
+
+### Dynamic Inputs
+
+The formula depends on three dynamic quantities:
+
+| Input | Source | Period | What changes |
+|-------|--------|--------|-------------|
+| Earth's obliquity (dε) | `computeObliquityEarth()` | H/3 + H/8 | How much the ecliptic tilts |
+| Earth's inclination | `computeInclinationEarth()` | H/3 | Direction of effect (+1 or -1) |
+| Planet's ecliptic inclination | `computeEclipticInclination()` | perihelionEclipticYears | Rate factor `1/tan(i)` |
+
+The **planet's ecliptic inclination** is computed via the dot product of the planet's and Earth's orbital plane normal vectors on the invariable plane. Both planes oscillate independently:
+- The planet's invariable plane inclination oscillates: `i_planet(t) = mean + amplitude × cos(Ω_inv(t) - offset)`
+- Earth's invariable plane inclination oscillates at period H/3
+- Their ascending nodes on the invariable plane precess linearly
+
+This creates a time-varying ecliptic inclination that modifies the `1/tan(i)` rate factor in the perturbation formula. There is **no circular dependency** — the ecliptic inclination depends on invariable plane quantities (linear precession), not on the ecliptic ascending node being computed.
 
 ### Rate-Based Integration
 
 The implementation uses a **rate-based integration approach** that properly handles:
 
-1. **Obliquity direction changes** - When Earth's obliquity reverses from decreasing to increasing (or vice versa), the effect on the ascending node also reverses.
+1. **Obliquity direction changes** — When Earth's obliquity reverses from decreasing to increasing (or vice versa), the effect on the ascending node also reverses.
 
-2. **Inclination crossovers** - When Earth's orbital inclination crosses a planet's inclination, the direction of the effect reverses for that planet.
+2. **Inclination crossovers** — When Earth's orbital inclination crosses a planet's ecliptic inclination, the direction of the effect reverses for that planet.
+
+3. **Planet inclination oscillation** — The rate `1/tan(i)` varies as the planet's ecliptic inclination changes over its perihelion precession period. This is evaluated at the midpoint of each integration segment.
 
 ### Integration Method
 
@@ -105,12 +124,29 @@ For each segment between critical points:
 // Get obliquity change over segment
 const deltaObl = (obliquityEnd - obliquityStart);
 
+// Compute dynamic ecliptic inclination at segment midpoint
+const dynIncl = computeEclipticInclination(planetName, midYear);
+
 // Determine direction based on Earth vs planet inclination at midpoint
-const inclDirection = (earthInclAtMid > planetInclination) ? +1 : -1;
+const inclDirection = (earthInclAtMid > dynIncl) ? +1 : -1;
+
+// Compute perturbation rate using dynamic inclination
+const segRate = -sin(Ω) / tan(dynIncl);
 
 // Calculate effect for this segment
-const segmentEffect = baseDOmegaDeps * inclDirection * deltaObl;
+const segmentEffect = segRate * inclDirection * deltaObl;
 ```
+
+### Impact of Dynamic Planet Inclination
+
+Over the 200-year fitting window (1800–2200), the effect of dynamic planet inclination is small because the perihelion precession periods are very long (67,000–670,000 years). Over longer timescales, Mars is the most affected:
+
+| Timescale | Mars i range | Rate change |
+|-----------|-------------|-------------|
+| 200 yr | 1.83°–1.87° | ±1% |
+| 5,000 yr | 1.39°–2.31° | ±25% |
+| 10,000 yr | 1.01°–2.69° | ±85% |
+| 38,000 yr | 0.69°–3.01° | Full cycle |
 
 ## Implementation Details
 
@@ -118,23 +154,40 @@ const segmentEffect = baseDOmegaDeps * inclDirection * deltaObl;
 
 #### `calculateDynamicAscendingNodeFromTilts()`
 
-Main calculation function. Location: [script.js:9198](../src/script.js#L9198)
+Main calculation function. Exists in both `script.js` and `tools/lib/orbital-engine.js`.
 
 ```javascript
+// script.js version:
 function calculateDynamicAscendingNodeFromTilts(
   orbitTilta,        // Encodes sin(Ω) * inclination
   orbitTiltb,        // Encodes cos(Ω) * inclination
   currentObliquity,  // Current Earth obliquity (degrees)
   earthInclination,  // Current Earth inclination (degrees)
-  currentYear        // Current year for integration
+  currentYear,       // Current year for integration
+  planetName         // Optional: enables dynamic ecliptic inclination
+)
+
+// orbital-engine.js version:
+function calculateDynamicAscendingNodeFromTilts(
+  orbitTilta,        // Encodes sin(Ω) * inclination
+  orbitTiltb,        // Encodes cos(Ω) * inclination
+  currentYear,       // Current year for integration
+  planetName         // Optional: enables dynamic ecliptic inclination
 )
 ```
+
+#### `getEclipticInclinationAtYear(planetName, year)` (script.js only)
+
+Computes the dynamic ecliptic inclination at any year using the dot product of planet and Earth normal vectors on the invariable plane. Used by the integration loop when `planetName` is provided.
+
+The tools-side equivalent is `computeEclipticInclination()` in `orbital-engine.js`.
 
 #### `integrateEffect(fromYear, toYear)`
 
 Inner helper that performs the segment-based integration, handling:
 - Finding obliquity extrema via sampling
 - Finding inclination crossovers
+- Computing dynamic ecliptic inclination at each segment midpoint (when `planetName` provided)
 - Summing effects across all segments
 
 #### `getObliquityAtYear(year)`

@@ -38488,6 +38488,34 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
 }
 
 /**
+ * Compute the dynamic ecliptic inclination for a planet at a given year.
+ * Uses dot product of planet and Earth normal vectors on the invariable plane.
+ *
+ * @param {string} planetName - lowercase planet key (e.g., 'mercury')
+ * @param {number} year - decimal year
+ * @returns {number} ecliptic inclination in degrees
+ */
+function getEclipticInclinationAtYear(planetName, year) {
+  const DEG2RAD = Math.PI / 180;
+  const p = planets[planetName];
+  if (!p || !p.invPlaneInclinationMean || !p.perihelionEclipticYears) return null;
+
+  // Planet inclination and ascending node on invariable plane
+  const planetI = computePlanetInvPlaneInclinationDynamic(planetName, year) * DEG2RAD;
+  const planetRate = 360 / p.perihelionEclipticYears;
+  const planetOmega = (p.ascendingNodeInvPlane + planetRate * (year - startmodelyearwithCorrection)) * DEG2RAD;
+
+  // Earth inclination and ascending node on invariable plane
+  const earthI = getEarthInclinationAtYear(year) * DEG2RAD;
+  const earthRate = 360 / earthPerihelionICRFYears;
+  const earthOmega = (earthAscendingNodeInvPlaneVerified + earthRate * (year - startmodelyearwithCorrection)) * DEG2RAD;
+
+  const cosIncl = Math.cos(planetI) * Math.cos(earthI)
+    + Math.sin(planetI) * Math.sin(earthI) * Math.cos(planetOmega - earthOmega);
+  return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG2RAD;
+}
+
+/**
  * Calculate the dynamic ascending node longitude using a RATE-BASED approach.
  *
  * This properly handles:
@@ -38504,9 +38532,10 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
  * @param {number} currentObliquity - Current Earth obliquity (degrees)
  * @param {number} earthInclination - Current Earth ecliptic inclination (degrees)
  * @param {number} currentYear - Current year (needed for rate-based calculation)
+ * @param {string} [planetName] - Optional planet key for dynamic inclination
  * @returns {number} Dynamic ascending node longitude (degrees, 0-360)
  */
-function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear) {
+function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentObliquity, earthInclination, currentYear, planetName) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
@@ -38614,8 +38643,12 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentO
     const minEarthIncl = earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude;
     const maxEarthIncl = earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude;
 
-    if (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl) {
-      const allCrossings = findAllInclinationCrossings(planetInclination, yearMin, yearMax);
+    // When planetName is provided, dynamic inclination could enter Earth's range
+    if (planetName || (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl)) {
+      const crossIncl = planetName
+        ? (getEclipticInclinationAtYear(planetName, (yearMin + yearMax) / 2) || planetInclination)
+        : planetInclination;
+      const allCrossings = findAllInclinationCrossings(crossIncl, yearMin, yearMax);
       criticalYears.push(...allCrossings);
     }
 
@@ -38634,9 +38667,17 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentO
 
       const midYear = (segStart + segEnd) / 2;
       const earthInclAtMid = getEarthInclinationAtYear(midYear);
-      const inclDirection = earthInclAtMid > planetInclination ? 1 : -1;
 
-      effect += baseDOmegaDeps * inclDirection * deltaObl * RAD2DEG;
+      // Use dynamic ecliptic inclination when planetName is provided
+      const dynIncl = planetName
+        ? (getEclipticInclinationAtYear(planetName, midYear) || planetInclination)
+        : planetInclination;
+      const inclDirection = earthInclAtMid > dynIncl ? 1 : -1;
+      const dynTanI = Math.tan(dynIncl * DEG2RAD);
+      if (Math.abs(dynTanI) < 1e-10) continue;
+      const segRate = -sinOmega / dynTanI;
+
+      effect += segRate * inclDirection * deltaObl * RAD2DEG;
     }
 
     return effect * dir;
@@ -38709,7 +38750,7 @@ function updateAscendingNodes() {
 
   // Mercury - use actual tilt values from planet data
   o.mercuryAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    mercuryRealPerihelionAtSun.orbitTilta, mercuryRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    mercuryRealPerihelionAtSun.orbitTilta, mercuryRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'mercury'
   );
   o.mercuryArgumentOfPeriapsis = ((o.mercuryPerihelion - o.mercuryAscendingNode) % 360 + 360) % 360;
 
@@ -38738,55 +38779,55 @@ function updateAscendingNodes() {
 
   // Venus
   o.venusAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    venusRealPerihelionAtSun.orbitTilta, venusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    venusRealPerihelionAtSun.orbitTilta, venusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'venus'
   );
   o.venusArgumentOfPeriapsis = ((o.venusPerihelion - o.venusAscendingNode) % 360 + 360) % 360;
 
   // Mars - NOTE: Mars (1.85°) is within Earth's inclination range and will experience crossover
   o.marsAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    marsRealPerihelionAtSun.orbitTilta, marsRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    marsRealPerihelionAtSun.orbitTilta, marsRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'mars'
   );
   o.marsArgumentOfPeriapsis = ((o.marsPerihelion - o.marsAscendingNode) % 360 + 360) % 360;
 
   // Jupiter - NOTE: Jupiter (1.30°) is within Earth's inclination range and will experience crossover
   o.jupiterAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    jupiterRealPerihelionAtSun.orbitTilta, jupiterRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    jupiterRealPerihelionAtSun.orbitTilta, jupiterRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'jupiter'
   );
   o.jupiterArgumentOfPeriapsis = ((o.jupiterPerihelion - o.jupiterAscendingNode) % 360 + 360) % 360;
 
   // Saturn
   o.saturnAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    saturnRealPerihelionAtSun.orbitTilta, saturnRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    saturnRealPerihelionAtSun.orbitTilta, saturnRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'saturn'
   );
   o.saturnArgumentOfPeriapsis = ((o.saturnPerihelion - o.saturnAscendingNode) % 360 + 360) % 360;
 
   // Uranus
   o.uranusAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    uranusRealPerihelionAtSun.orbitTilta, uranusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    uranusRealPerihelionAtSun.orbitTilta, uranusRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'uranus'
   );
   o.uranusArgumentOfPeriapsis = ((o.uranusPerihelion - o.uranusAscendingNode) % 360 + 360) % 360;
 
   // Neptune
   o.neptuneAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    neptuneRealPerihelionAtSun.orbitTilta, neptuneRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    neptuneRealPerihelionAtSun.orbitTilta, neptuneRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'neptune'
   );
   o.neptuneArgumentOfPeriapsis = ((o.neptunePerihelion - o.neptuneAscendingNode) % 360 + 360) % 360;
 
   // Pluto
   o.plutoAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    plutoRealPerihelionAtSun.orbitTilta, plutoRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    plutoRealPerihelionAtSun.orbitTilta, plutoRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'pluto'
   );
   o.plutoArgumentOfPeriapsis = ((o.plutoPerihelion - o.plutoAscendingNode) % 360 + 360) % 360;
 
   // Halley's Comet
   o.halleysAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    halleysRealPerihelionAtSun.orbitTilta, halleysRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    halleysRealPerihelionAtSun.orbitTilta, halleysRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'halleys'
   );
   o.halleysArgumentOfPeriapsis = ((o.halleysPerihelion - o.halleysAscendingNode) % 360 + 360) % 360;
 
   // Eros
   o.erosAscendingNode = calculateDynamicAscendingNodeFromTilts(
-    erosRealPerihelionAtSun.orbitTilta, erosRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear
+    erosRealPerihelionAtSun.orbitTilta, erosRealPerihelionAtSun.orbitTiltb, currentObliquity, earthInclination, currentYear, 'eros'
   );
   o.erosArgumentOfPeriapsis = ((o.erosPerihelion - o.erosAscendingNode) % 360 + 360) % 360;
 

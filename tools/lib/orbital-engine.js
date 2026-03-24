@@ -264,7 +264,7 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
  * @param {number} currentYear - Current year
  * @returns {number} Dynamic ascending node longitude (0-360°)
  */
-function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentYear) {
+function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentYear, planetName) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
@@ -336,8 +336,13 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
     const minEarthIncl = C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude;
     const maxEarthIncl = C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude;
 
-    if (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl) {
-      const allCrossings = findAllInclinationCrossings(planetInclination, yearMin, yearMax);
+    // When planetName is provided, the ecliptic inclination is dynamic and could enter
+    // Earth's range even if the J2000 value is outside — always search for crossovers
+    if (planetName || (planetInclination >= minEarthIncl && planetInclination <= maxEarthIncl)) {
+      const crossIncl = planetName
+        ? computeEclipticInclination(planetName, (yearMin + yearMax) / 2)
+        : planetInclination;
+      const allCrossings = findAllInclinationCrossings(crossIncl, yearMin, yearMax);
       criticalYears.push(...allCrossings);
     }
 
@@ -356,9 +361,17 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
 
       const midYear = (segStart + segEnd) / 2;
       const earthInclAtMid = computeInclinationEarth(midYear);
-      const inclDirection = earthInclAtMid > planetInclination ? 1 : -1;
 
-      effect += baseDOmegaDeps * inclDirection * deltaObl * RAD2DEG;
+      // Use dynamic ecliptic inclination when planetName is provided
+      const dynIncl = planetName
+        ? computeEclipticInclination(planetName, midYear)
+        : planetInclination;
+      const inclDirection = earthInclAtMid > dynIncl ? 1 : -1;
+      const dynTanI = Math.tan(dynIncl * DEG2RAD);
+      if (Math.abs(dynTanI) < 1e-10) continue; // skip near-zero inclination
+      const segRate = -sinOmega / dynTanI;
+
+      effect += segRate * inclDirection * deltaObl * RAD2DEG;
     }
 
     return effect * dir;
