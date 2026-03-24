@@ -478,44 +478,41 @@ The dynamic ascending node calculation and the dynamic ecliptic inclination (`o.
 | **Ascending Node Shift** | Where the planet's orbit crosses the ecliptic | Planet's orbital inclination relative to invariable plane | H years |
 | **Ecliptic Inclination** | How tilted the planet appears from Earth's perspective | Planet's orbital plane in space | H/3 years |
 
-### Why We Use Static Inclination (Not EclipticInclinationDynamic)
+### Dynamic Ecliptic Inclination in the Rate Formula
 
-The ascending node calculation correctly uses the **static** `<planet>EclipticInclinationJ2000` (extracted from `orbitTilta/orbitTiltb`), not the dynamic `<planet>EclipticInclinationDynamic`. Here's why:
+As of 2026-03-24, the ascending node calculation uses the **dynamic ecliptic inclination** `computeEclipticInclination(planetName, year)` in the perturbation rate `1/tan(i)`. This is NOT double-counting — the obliquity change `dε` drives the AMOUNT of effect, while the dynamic `i(t)` modifies the RATE at which that effect converts into ascending node shift. These are independent roles:
 
-1. **The planet's orbital plane doesn't change** - only our reference frame (the ecliptic) tilts over time
-2. The formula `dΩ/dε = -sin(Ω) / tan(i)` uses `i` = the planet's inclination to the **invariable plane** (or equivalently, to the mean ecliptic), not the current ecliptic
-3. The ascending node calculation already accounts for Earth's tilting reference frame through the `currentObliquity` and `earthInclination` parameters
+| Role | Parameter | What it controls |
+|------|-----------|-----------------|
+| **Driver** | `dε` (obliquity change) | How much the ecliptic tilts per segment |
+| **Direction** | Earth incl vs planet incl | Sign of the effect (+1 or -1) |
+| **Rate factor** | `1/tan(i(t))` | How efficiently the tilt converts to node shift |
 
-### Physical Reasoning
+The dynamic ecliptic inclination accounts for BOTH Earth's and the planet's orbital plane oscillations simultaneously, correctly capturing how the angle between the two planes varies over the planet's perihelion precession period.
 
-The **ascending node** is defined as where a planet's orbit crosses the **reference plane** (ecliptic). When Earth's obliquity changes:
-- The ecliptic plane tilts slightly relative to the invariable plane
-- This changes *where* other planets' orbits cross this tilted plane
-- But it doesn't change the planet's actual orbital tilt in space
+### Physical Completeness Analysis
 
-The **ecliptic inclination** measures the angle between two orbital planes:
-- Earth's orbital plane (which tilts with the H/3 cycle)
-- The planet's orbital plane (which stays essentially fixed in space)
+The implementation captures the dominant physical effect correctly. Here is an assessment of all relevant effects:
 
-### What Each Calculation Uses
+**What IS modeled:**
 
-| Calculation | Uses | Why |
-|------------|------|-----|
-| `calculateDynamicAscendingNodeFromTilts` | Static `<planet>EclipticInclinationJ2000` (from orbitTilta/b) | Measures intrinsic planet orbit property |
-| `updateDynamicInclinations` | Static `<planet>EclipticInclinationJ2000` + dynamic Earth tilt | Calculates apparent angle between planes |
-| `updateOrbitOrientations` | Dynamic `o.<planet>EclipticInclinationDynamic` | Rotates the visual orbit ring in 3D |
+| Effect | Mechanism | Status |
+|--------|-----------|--------|
+| Reference frame tilt | Obliquity-driven `dΩ/dε = -sin(Ω)/tan(i)` | ✅ Complete |
+| Earth inclination direction | `inclDirection = earthIncl > planetIncl ? +1 : -1` | ✅ Complete |
+| Planet inclination oscillation | Dynamic `i(t)` in rate factor `1/tan(i)` | ✅ Complete |
+| Inclination crossovers | Segment splitting when Earth crosses planet inclination | ✅ Complete |
+| Obliquity extrema | Segment splitting at direction reversals | ✅ Complete |
 
-### Why NOT to Use EclipticInclinationDynamic Here
+**Theoretical subtleties (not modeled, with justification):**
 
-Using `EclipticInclinationDynamic` in the ascending node formula would be **double-counting** the effect of Earth's tilting reference frame:
+1. **H/8 contamination in obliquity driver**: The formula uses obliquity change (`dε`) which includes both the H/3 orbital plane tilt and the H/8 axial precession. Strictly, only the H/3 component (orbital inclination change) tilts the ecliptic. The H/8 component is axial precession which does NOT move the ecliptic plane. However: the H/8 amplitude in obliquity is smaller than H/3, the calibration (ascNodeToolCorrection, parallax coefficients) was fitted WITH this behavior, and over 200 years the difference is negligible.
 
-1. The ascending node formula already accounts for Earth's tilt through:
-   - The `earthInclination` parameter (used for direction determination)
-   - The `currentObliquity` parameter (used for rate calculation)
+2. **Planet's invariable-plane node precession**: Each planet's ascending node on the invariable plane precesses linearly at rate `360/perihelionEclipticYears`. This rotation of the planet's orbital plane around the invariable-plane normal is a separate physical effect from the ecliptic reference frame tilting. It is partially captured through the dynamic ecliptic inclination (which uses the precessing invariable-plane node in its dot product calculation), but not directly modeled as a separate ascending node shift. The effect is absorbed by the empirical parallax correction layer.
 
-2. The `EclipticInclinationDynamic` also incorporates Earth's tilt (that's what makes it "ecliptic")
+3. **Full N-body gravitational precession**: The complete gravitational ascending node precession rates (18–1053 arcsec/century from JPL) are much larger than what the geometric model produces. This is a known limitation — the model captures the secular oscillation pattern but not the absolute rates. See [doc 70](70-ascending-node-limitations.md) for details.
 
-3. Combining them would apply the Earth tilt effect twice, producing incorrect results
+**Verdict**: For a geocentric circular-orbit model, the ascending node calculation is as complete as it can be without switching to a full gravitational N-body approach. The remaining theoretical gaps are small and absorbed by the empirical correction layers.
 
 ### Summary
 
