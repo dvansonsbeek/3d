@@ -17,6 +17,74 @@
 const C = require('./constants');
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PRECOMPUTED OBLIQUITY EXTREMA
+// Obliquity is a sum of 16 harmonics (shortest period ~10,469 yr).
+// Extrema occur only ~5 times per 25,000 years. Precompute once at module
+// load so calculateDynamicAscendingNodeFromTilts() can look them up via
+// binary search instead of scanning + binary searching each call.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const _OBLIQUITY_EXTREMA_RANGE = [-50000, 50000]; // year range to precompute
+let _obliquityExtrema = null; // lazily computed on first use
+
+function _precomputeObliquityExtrema() {
+  if (_obliquityExtrema) return _obliquityExtrema;
+  const [rangeStart, rangeEnd] = _OBLIQUITY_EXTREMA_RANGE;
+  const sampleStep = 500; // years — well below half the shortest period (~5235 yr)
+  const extrema = [];
+
+  let prevObl = computeObliquityEarth(rangeStart);
+  let prevDir = 0;
+
+  for (let y = rangeStart + sampleStep; y <= rangeEnd; y += sampleStep) {
+    const obl = computeObliquityEarth(y);
+    const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
+
+    if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
+      // Binary search for exact extremum
+      let lo = y - sampleStep, hi = y;
+      for (let iter = 0; iter < 30; iter++) {
+        const mid = (lo + hi) / 2;
+        const oblLo = computeObliquityEarth(lo);
+        const oblMid = computeObliquityEarth(mid);
+        const oblHi = computeObliquityEarth(hi);
+        if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
+          extrema.push(mid);
+          break;
+        } else if ((oblMid - oblLo) * prevDir > 0) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+    }
+    if (curDir !== 0) prevDir = curDir;
+    prevObl = obl;
+  }
+
+  _obliquityExtrema = extrema.sort((a, b) => a - b);
+  return _obliquityExtrema;
+}
+
+/**
+ * Get obliquity extrema within a year range via binary search on precomputed array.
+ */
+function _getObliquityExtremaInRange(yearMin, yearMax) {
+  const all = _precomputeObliquityExtrema();
+  // Binary search for first extremum >= yearMin
+  let lo = 0, hi = all.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (all[mid] < yearMin) lo = mid + 1; else hi = mid;
+  }
+  const result = [];
+  for (let i = lo; i < all.length && all[i] <= yearMax; i++) {
+    result.push(all[i]);
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // OBLIQUITY
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -230,28 +298,34 @@ function findAllInclinationCrossings(targetInclination, startYear, endYear) {
     return [];
   }
 
-  const yearSpan = Math.abs(endYear - startYear);
-  const cycleLength = C.H / 3;
-  const expectedCrossings = Math.ceil(yearSpan / cycleLength) * 2 + 4;
-  const steps = Math.max(1000, expectedCrossings * 50);
-  const stepSize = (endYear - startYear) / steps;
+  // Analytical solution: Earth inclination is a simple cosine
+  //   I(t) = mean - amp * cos(2π * (t - balancedYear) / (H/3))
+  //   target = mean - amp * cos(θ)  →  cos(θ) = (mean - target) / amp
+  const cosTheta = (C.earthInvPlaneInclinationMean - targetInclination) / C.earthInvPlaneInclinationAmplitude;
+  if (Math.abs(cosTheta) > 1) return [];
 
-  let prevIncl = computeInclinationEarth(startYear);
+  const period = C.H / 3;
+  const baseTheta = Math.acos(cosTheta); // 0..π
   const crossings = [];
+  const yMin = Math.min(startYear, endYear);
+  const yMax = Math.max(startYear, endYear);
 
-  for (let i = 1; i <= steps; i++) {
-    const year = startYear + i * stepSize;
-    const incl = computeInclinationEarth(year);
+  // Two crossings per cycle at θ = ±baseTheta + 2πn
+  // θ = 2π * (year - balancedYear) / period  →  year = balancedYear + θ * period / (2π)
+  const thetaToYear = (theta) => C.balancedYear + theta * period / (2 * Math.PI);
 
-    if ((prevIncl < targetInclination && incl >= targetInclination) ||
-        (prevIncl > targetInclination && incl <= targetInclination)) {
-      const fraction = (targetInclination - prevIncl) / (incl - prevIncl);
-      crossings.push(year - stepSize + fraction * stepSize);
-    }
-    prevIncl = incl;
+  // Find the range of n values we need
+  const nMin = Math.floor((yMin - C.balancedYear) / period - 1);
+  const nMax = Math.ceil((yMax - C.balancedYear) / period + 1);
+
+  for (let n = nMin; n <= nMax; n++) {
+    const y1 = thetaToYear(baseTheta + 2 * Math.PI * n);
+    const y2 = thetaToYear(-baseTheta + 2 * Math.PI * n);
+    if (y1 >= yMin && y1 <= yMax) crossings.push(y1);
+    if (y2 >= yMin && y2 <= yMax && Math.abs(y2 - y1) > 0.1) crossings.push(y2);
   }
 
-  return crossings;
+  return crossings.sort((a, b) => a - b);
 }
 
 /**
@@ -296,41 +370,8 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
 
     let criticalYears = [yearMin, yearMax];
 
-    // Sample to find obliquity direction changes (extrema)
-    const sampleStep = Math.min(1000, (yearMax - yearMin) / 100);
-    if (sampleStep > 0) {
-      let prevObl = computeObliquityEarth(yearMin);
-      let prevDir = 0;
-
-      for (let y = yearMin + sampleStep; y <= yearMax; y += sampleStep) {
-        const obl = computeObliquityEarth(y);
-        const curDir = obl > prevObl ? 1 : (obl < prevObl ? -1 : 0);
-
-        if (prevDir !== 0 && curDir !== 0 && prevDir !== curDir) {
-          // Direction changed — binary search for extremum
-          let lo = y - sampleStep;
-          let hi = y;
-          for (let iter = 0; iter < 20; iter++) {
-            const mid = (lo + hi) / 2;
-            const oblLo = computeObliquityEarth(lo);
-            const oblMid = computeObliquityEarth(mid);
-            const oblHi = computeObliquityEarth(hi);
-
-            if ((oblMid > oblLo && oblMid > oblHi) || (oblMid < oblLo && oblMid < oblHi)) {
-              criticalYears.push(mid);
-              break;
-            } else if ((oblMid - oblLo) * prevDir > 0) {
-              lo = mid;
-            } else {
-              hi = mid;
-            }
-          }
-        }
-
-        if (curDir !== 0) prevDir = curDir;
-        prevObl = obl;
-      }
-    }
+    // Look up precomputed obliquity extrema (O(log n) binary search)
+    criticalYears.push(..._getObliquityExtremaInRange(yearMin, yearMax));
 
     // Find ALL inclination crossings
     const minEarthIncl = C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude;

@@ -15,7 +15,7 @@ const d2r = Math.PI / 180;
 
 // Disable parallax (+ all post-hoc layers) to fit from raw errors
 const { prepareForFitting } = require('../lib/correction-stack');
-const restore = prepareForFitting(C, sg, 'parallax');
+const restore = prepareForFitting(C, sg, ['parallax', 'elongation']);
 
 const targets = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
 
