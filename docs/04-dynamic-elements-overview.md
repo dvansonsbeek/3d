@@ -83,7 +83,7 @@ For current values of mean, amplitude, min, and max, see [Constants Reference](2
 
 ### System 1: Dynamic Ascending Node (on Ecliptic)
 
-**Purpose**: Calculate where each planet's orbit crosses Earth's orbital plane
+**Purpose**: Calculate where each planet's orbit crosses Earth's orbital plane. Also drives the **tilt direction** of the planet's container (orbital plane orientation in the 3D scene).
 
 **Documentation**: [31-ascending-node-calculations.md](31-ascending-node-calculations.md)
 
@@ -98,6 +98,11 @@ dΩ/dε = -sin(Ω) / tan(i)
 - Planet's static `orbitTilta` and `orbitTiltb` values (encode Ω and i)
 
 **Output**: `o.<planet>AscendingNode` (degrees, 0-360°)
+
+**Used by**:
+- UI display values
+- Parallax correction `u` angle: `u = RA − Ω(t)`
+- Planet container tilt direction in `moveModel()` / `updateOrbitalPlaneRotations()`
 
 **Direction Rule**:
 - If **Earth's inclination > Planet's inclination**: Ω INCREASES when obliquity decreases
@@ -176,10 +181,17 @@ Ecliptic Inclination:
 The systems must be called in this order in each frame:
 
 ```javascript
+// script.js (browser):
 1. updatePlanetInvariablePlaneHeights()  // Calculates dynamic Ω on invariable plane
 2. updateDynamicInclinations()            // Uses Ω values to calculate ecliptic inclinations
 3. updateAscendingNodes()                 // Calculates Ω on ecliptic
-4. updateOrbitalPlaneRotations()          // Applies both values to 3D visualizations
+4. updateOrbitalPlaneRotations()          // Applies both values to 3D visualizations + tilt direction
+
+// tools/lib/scene-graph.js (tools):
+// moveModel() handles steps 2-4 internally:
+//   - computeDynamicEclipticInclination() for tilt magnitude
+//   - calculateDynamicAscendingNodeFromTilts() for tilt direction
+//   - Dynamic ascending node also used in parallax u computation
 ```
 
 ## Planet Behavior Table

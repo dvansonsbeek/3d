@@ -13,8 +13,9 @@ Applied in this order to the spherical coordinates `(sph.theta, sph.phi)`:
 ```
 Raw Model Position (from scene-graph rotation hierarchy)
   │
-  ├─ 1. PARALLAX           Up to 68 basis functions per planet
-  │                         Geocentric viewing geometry: distance, time, orbital harmonics
+  ├─ 1. PARALLAX           Up to 78 basis functions (inner planets) / 68 (outer)
+  │                         Geocentric viewing geometry: distance, time, orbital harmonics,
+  │                         mean anomaly (inner planets only)
   │                         Source: PARALLAX_DEC_CORRECTION, PARALLAX_RA_CORRECTION
   │
   ├─ 2. GRAVITATION         Sin/cos at planet-specific synodic periods

@@ -6,7 +6,11 @@ This document describes the dynamic calculation of the longitude of ascending no
 
 ## Implementation Status
 
-**Implemented** - The dynamic ascending node calculation is fully implemented in `script.js`.
+**Implemented** — The dynamic ascending node calculation is fully implemented in both `script.js` and `tools/lib/scene-graph.js`. It is used for:
+
+1. **Display values**: `o.<planet>AscendingNode` — shown in the UI
+2. **Parallax correction**: The `u = RA − Ω(t)` angle uses the dynamic ascending node
+3. **Tilt direction**: The planet container orientation in `moveModel()` / `updateOrbitalPlaneRotations()` uses the dynamic ascending node to set the tilt direction, eliminating systematic Dec drift at Mercury transits (was -0.30°/century, now ~0°)
 
 ## Physical Background
 
@@ -402,11 +406,13 @@ These are the ascending node values encoded in the `orbitTilta`/`orbitTiltb` par
 
 | Component | Location |
 |-----------|----------|
-| Main calculation function | [script.js:9198-9350](../src/script.js#L9198-L9350) |
-| Helper functions | [script.js:9113-9177](../src/script.js#L9113-L9177) |
-| Update function | [script.js:9379-9444](../src/script.js#L9379-L9444) |
-| Planet tilt definitions | [script.js:84-228](../src/script.js#L84-L228) |
-| Earth cycle parameters | [script.js:42-44](../src/script.js#L42-L44) |
+| Main calculation (script.js) | `calculateDynamicAscendingNodeFromTilts()` in `script.js` |
+| Main calculation (tools) | `calculateDynamicAscendingNodeFromTilts()` in `tools/lib/orbital-engine.js` |
+| Update ascending nodes | `updateAscendingNodes()` in `script.js` |
+| Tilt direction (script.js) | `updateOrbitalPlaneRotations()` in `script.js` |
+| Tilt direction (tools) | `moveModel()` in `tools/lib/scene-graph.js` |
+| Parallax u computation | `computePlanetPosition()` in `tools/lib/scene-graph.js` |
+| Planet tilt definitions | `planets.*` at top of `script.js` |
 
 ## Relationship to Ecliptic Inclination
 

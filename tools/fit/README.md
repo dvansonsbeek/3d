@@ -20,7 +20,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `export-year-lengths.js` | `data/03-year-length-analysis.xlsx` | Scene-graph simulation (headless) |
 | `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/03-year-length-analysis.xlsx` |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
-| `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 48p/planet) | `data/reference-data.json` |
+| `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
 | `ascnode-correction.js` | `ascNodeTiltCorrection`, `startpos` | `data/reference-data.json` |
 | `moon-eclipse-optimizer.js` | `moonStartposNodal/Apsidal/Moon` | 66 solar eclipses (2000–2025) — run separately, not part of standard pipeline |
