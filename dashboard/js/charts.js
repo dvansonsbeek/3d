@@ -64,8 +64,9 @@ export function stdAnnotations() {
 // ── Chart IDs ──────────────────────────────────────────────────────────────
 
 const ALL_CHART_IDS = [
-  'chart-eccentricity', 'chart-obliquity', 'chart-ascending-node',
-  'chart-arg-perihelion', 'chart-lon-perihelion',
+  'chart-eccentricity', 'chart-obliquity', 'chart-inclination',
+  'chart-ascending-node', 'chart-arg-perihelion', 'chart-lon-perihelion',
+  'chart-distance',
 ];
 
 // ── Render all active planets onto shared charts ───────────────────────────
@@ -76,10 +77,15 @@ export function renderAllCharts(planetDataMap) {
   });
 
   renderObliquityChart(planetDataMap);
+  renderInclinationChart(planetDataMap);
 
-  renderAngleChart('chart-ascending-node', planetDataMap, 'ascendingNode', 'Ascending Node (°)');
-  renderAngleChart('chart-arg-perihelion', planetDataMap, 'argPerihelion', 'Argument of Perihelion (°)');
+  renderAngleChart('chart-ascending-node', planetDataMap, 'ascendingNode', 'Ascending Node (°)',
+    { secondary: 'ascNodeInvPlane', secondaryLabel: 'Inv. Plane' });
+  renderAngleChart('chart-arg-perihelion', planetDataMap, 'argPerihelion', 'Argument of Perihelion (°)',
+    { secondary: 'argPeriInvPlane', secondaryLabel: 'Inv. Plane' });
   renderAngleChart('chart-lon-perihelion', planetDataMap, 'lonPerihelion', 'Longitude of Perihelion (°)');
+
+  renderDistanceChart(planetDataMap);
 
   setupSyncZoom();
 }
@@ -208,7 +214,7 @@ function renderObliquityChart(planetDataMap) {
 
 // ── Angle chart (0-360 range, handles wrapping) ────────────────────────────
 
-function renderAngleChart(divId, planetDataMap, field, yTitle) {
+function renderAngleChart(divId, planetDataMap, field, yTitle, opts = {}) {
   const div = document.getElementById(divId);
   const traces = [];
 
@@ -224,6 +230,18 @@ function renderAngleChart(divId, planetDataMap, field, yTitle) {
       name: PLANET_NAMES[name],
       hovertemplate: `${PLANET_NAMES[name]}: %{y:.2f}°<extra></extra>`,
     });
+
+    // Optional secondary trace (e.g. invariable plane variant)
+    if (opts.secondary && fc[opts.secondary]) {
+      traces.push({
+        x: fc.years, y: fc[opts.secondary],
+        type: 'scattergl', mode: 'lines',
+        line: { color: PLANET_COLORS[name], width: 1.5, dash: 'dash' },
+        name: PLANET_NAMES[name] + ' ' + (opts.secondaryLabel || ''),
+        visible: 'legendonly',
+        hovertemplate: `${PLANET_NAMES[name]} ${opts.secondaryLabel || ''}: %{y:.2f}°<extra></extra>`,
+      });
+    }
   }
 
   const layout = makePlotlyLayout({
@@ -236,7 +254,86 @@ function renderAngleChart(divId, planetDataMap, field, yTitle) {
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);
 }
 
-// ── Earth-only: Year Lengths ───────────────────────────────────────────────
+// ── Inclination (invariable plane + ecliptic) ─────────────────────────────
+
+function renderInclinationChart(planetDataMap) {
+  const div = document.getElementById('chart-inclination');
+  if (!div) return;
+  const traces = [];
+
+  for (const [name, data] of Object.entries(planetDataMap)) {
+    const fc = data.fullCycle;
+    if (!fc.inclination) continue;
+
+    // Invariable plane inclination (primary)
+    traces.push({
+      x: fc.years, y: fc.inclination,
+      type: 'scattergl', mode: 'lines',
+      line: { color: PLANET_COLORS[name], width: 1.5 },
+      name: PLANET_NAMES[name] + ' (inv)',
+      hovertemplate: `${PLANET_NAMES[name]} inv: %{y:.4f}°<extra></extra>`,
+    });
+
+    // Ecliptic inclination (secondary, shown by default with dashed line)
+    if (fc.eclipticInclination) {
+      traces.push({
+        x: fc.years, y: fc.eclipticInclination,
+        type: 'scattergl', mode: 'lines',
+        line: { color: PLANET_COLORS[name], width: 1, dash: 'dash' },
+        name: PLANET_NAMES[name] + ' (ecl)',
+        hovertemplate: `${PLANET_NAMES[name]} ecl: %{y:.4f}°<extra></extra>`,
+      });
+    }
+  }
+
+  const layout = makePlotlyLayout({
+    yaxis: { title: { text: 'Inclination (°)' }, ticksuffix: '°', autorange: true, rangemode: 'tozero' },
+    shapes: stdShapes(),
+    annotations: stdAnnotations(),
+    legend: { orientation: 'h', y: 1.08 },
+  });
+
+  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Perihelion / Aphelion Distance ────────────────────────────────────────
+
+function renderDistanceChart(planetDataMap) {
+  const div = document.getElementById('chart-distance');
+  if (!div) return;
+  const traces = [];
+
+  for (const [name, data] of Object.entries(planetDataMap)) {
+    const fc = data.fullCycle;
+    if (!fc.perihelionDist) continue;
+
+    traces.push({
+      x: fc.years, y: fc.perihelionDist,
+      type: 'scattergl', mode: 'lines',
+      line: { color: PLANET_COLORS[name], width: 1.5 },
+      name: PLANET_NAMES[name] + ' perihelion',
+      hovertemplate: `${PLANET_NAMES[name]} peri: %{y:.6f} AU<extra></extra>`,
+    });
+
+    traces.push({
+      x: fc.years, y: fc.aphelionDist,
+      type: 'scattergl', mode: 'lines',
+      line: { color: PLANET_COLORS[name], width: 1, dash: 'dot' },
+      name: PLANET_NAMES[name] + ' aphelion',
+      visible: 'legendonly',
+      hovertemplate: `${PLANET_NAMES[name]} aph: %{y:.6f} AU<extra></extra>`,
+    });
+  }
+
+  const layout = makePlotlyLayout({
+    yaxis: { title: { text: 'Distance (AU)' }, autorange: true },
+    shapes: stdShapes(),
+    annotations: stdAnnotations(),
+    legend: { orientation: 'h', y: 1.08 },
+  });
+
+  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
+}
 
 // ── Synchronized zoom ──────────────────────────────────────────────────────
 

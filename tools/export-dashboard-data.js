@@ -78,6 +78,7 @@ function exportEarth(years) {
   const veJD = [], veRA = [], veYearLength = [];
   const aeJD = [], aeRA = [], aeYearLength = [];
   const solsticeObliquity = [];
+  const perihelionDist = [], aphelionDist = [];
 
   // Earth's perihelion precession period and ascending node
   const earthPeriPeriod = C.perihelionCycleLength;
@@ -135,6 +136,11 @@ function exportEarth(years) {
     aeYearLength.push(+OE.computeSolsticeYearLength(year, 'AE').toFixed(8));
     solsticeObliquity.push(+OE.computeObliquityEarth(year).toFixed(6));
 
+    // Perihelion/aphelion distance (Earth semi-major axis = 1 AU)
+    const earthDist = OE.computePerihelionAphelionDistance(el.eccentricity, 1.0);
+    perihelionDist.push(+earthDist.perihelion.toFixed(8));
+    aphelionDist.push(+earthDist.aphelion.toFixed(8));
+
     // Perihelion longitude (from predictive 21-harmonic formula)
     lonPerihelion.push(+el.perihelionLong.toFixed(4));
 
@@ -164,6 +170,7 @@ function exportEarth(years) {
       veJD, veRA, veYearLength,
       aeJD, aeRA, aeYearLength,
       solsticeObliquity,
+      perihelionDist, aphelionDist,
     },
     constants: {
       eccentricityBase: C.eccentricityBase,
@@ -193,6 +200,9 @@ function exportPlanet(planetName, years) {
   const eccentricity = [], inclination = [], obliquity = [];
   const inclinationTilt = [];
   const lonPerihelion = [], ascendingNode = [], argPerihelion = [];
+  const eclipticInclination = [];
+  const ascNodeInvPlane = [], argPeriInvPlane = [];
+  const perihelionDist = [], aphelionDist = [];
 
   for (const year of years) {
     // Eccentricity
@@ -220,7 +230,7 @@ function exportPlanet(planetName, years) {
     // Ascending node (dynamic rate-based if tilts available, linear fallback)
     let ascNode;
     if (p.orbitTilta !== undefined) {
-      ascNode = OE.calculateDynamicAscendingNodeFromTilts(p.orbitTilta, p.orbitTiltb, year);
+      ascNode = OE.calculateDynamicAscendingNodeFromTilts(p.orbitTilta, p.orbitTiltb, year, planetName);
     } else {
       ascNode = computeAscendingNodeLinear(p.ascendingNode, p.perihelionEclipticYears, year);
     }
@@ -229,6 +239,24 @@ function exportPlanet(planetName, years) {
     // Argument of perihelion
     const omega = OE.computeArgumentOfPerihelion(lonPeri, ascNode);
     argPerihelion.push(+omega.toFixed(4));
+
+    // Ecliptic inclination (dynamic, accounts for Earth's plane changes)
+    const eclIncl = OE.computeEclipticInclination(planetName, year);
+    eclipticInclination.push(+eclIncl.toFixed(6));
+
+    // Invariable plane ascending node
+    const ascInv = OE.computeAscendingNodeInvPlane(planetName, year);
+    ascNodeInvPlane.push(+ascInv.toFixed(4));
+
+    // Invariable plane argument of perihelion
+    const omegaInv = OE.computeArgumentOfPerihelionInvPlane(lonPeri, ascInv);
+    argPeriInvPlane.push(+omegaInv.toFixed(4));
+
+    // Perihelion/aphelion distance
+    const sma = OE.computeSemiMajorAxis(planetName);
+    const dist = OE.computePerihelionAphelionDistance(ecc, sma);
+    perihelionDist.push(+dist.perihelion.toFixed(8));
+    aphelionDist.push(+dist.aphelion.toFixed(8));
   }
 
   return {
@@ -236,7 +264,10 @@ function exportPlanet(planetName, years) {
     generated: new Date().toISOString(),
     fullCycle: {
       years, eccentricity, obliquity, inclination, inclinationTilt,
+      eclipticInclination,
       lonPerihelion, ascendingNode, argPerihelion,
+      ascNodeInvPlane, argPeriInvPlane,
+      perihelionDist, aphelionDist,
     },
     constants: {
       eccentricityBase: p.orbitalEccentricityBase,

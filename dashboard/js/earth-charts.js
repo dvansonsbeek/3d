@@ -7,7 +7,8 @@ import { stdShapes, stdAnnotations } from './charts.js';
 
 export const EARTH_CHART_IDS = [
   'chart-day-lengths', 'chart-year-lengths', 'chart-cardinal',
-  'chart-precession', 'chart-erd',
+  'chart-precession', 'chart-cardinal-ra', 'chart-solstice-obliquity',
+  'chart-erd',
 ];
 
 export function renderAllEarthCharts(data) {
@@ -16,6 +17,8 @@ export function renderAllEarthCharts(data) {
   renderYearLengthsChart(fc);
   renderCardinalPointsChart(fc);
   renderPrecessionChart(fc);
+  renderCardinalRAChart(fc);
+  renderSolsticeObliquityChart(fc);
   renderERDChart(fc);
   setupEarthSyncZoom();
 }
@@ -137,6 +140,14 @@ function renderCardinalPointsChart(fc) {
       name: 'Autumnal Equinox',
       hovertemplate: 'AE: %{y:.6f} days<extra></extra>',
     },
+    {
+      x: fc.years, y: fc.tropicalYearDays,
+      type: 'scattergl', mode: 'lines',
+      line: { color: '#9b59b6', width: 1, dash: 'dot' },
+      name: 'Tropical Year',
+      visible: 'legendonly',
+      hovertemplate: 'Tropical: %{y:.6f} days<extra></extra>',
+    },
   ];
 
   const layout = makePlotlyLayout({
@@ -185,6 +196,71 @@ function renderPrecessionChart(fc) {
 
   const layout = makePlotlyLayout({
     yaxis: { ...AXIS_COMMON, title: 'Period (years)' },
+    shapes: stdShapes(), annotations: stdAnnotations(),
+  });
+  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Cardinal Points RA ────────────────────────────────────────────────────
+
+function renderCardinalRAChart(fc) {
+  const div = document.getElementById('chart-cardinal-ra');
+  if (!div) return;
+
+  const traces = [
+    {
+      x: fc.years, y: fc.ssRA,
+      type: 'scattergl', mode: 'lines',
+      line: { color: '#f56c6c', width: 1.5 },
+      name: 'Summer Solstice RA',
+      hovertemplate: 'SS RA: %{y:.4f}°<extra></extra>',
+    },
+    {
+      x: fc.years, y: fc.wsRA,
+      type: 'scattergl', mode: 'lines',
+      line: { color: '#409eff', width: 1.5 },
+      name: 'Winter Solstice RA',
+      hovertemplate: 'WS RA: %{y:.4f}°<extra></extra>',
+    },
+    {
+      x: fc.years, y: fc.veRA,
+      type: 'scattergl', mode: 'lines',
+      line: { color: '#67c23a', width: 1.5 },
+      name: 'Vernal Equinox RA',
+      hovertemplate: 'VE RA: %{y:.4f}°<extra></extra>',
+    },
+    {
+      x: fc.years, y: fc.aeRA,
+      type: 'scattergl', mode: 'lines',
+      line: { color: '#e6a23c', width: 1.5 },
+      name: 'Autumnal Equinox RA',
+      hovertemplate: 'AE RA: %{y:.4f}°<extra></extra>',
+    },
+  ];
+
+  const layout = makePlotlyLayout({
+    yaxis: { ...AXIS_COMMON, title: 'RA (degrees)' },
+    shapes: stdShapes(), annotations: stdAnnotations(),
+  });
+  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Solstice Obliquity ────────────────────────────────────────────────────
+
+function renderSolsticeObliquityChart(fc) {
+  const div = document.getElementById('chart-solstice-obliquity');
+  if (!div) return;
+
+  const traces = [{
+    x: fc.years, y: fc.solsticeObliquity,
+    type: 'scattergl', mode: 'lines',
+    line: { color: '#9b59b6', width: 1.5 },
+    name: 'Obliquity at Solstice',
+    hovertemplate: 'Obliquity: %{y:.4f}°<extra></extra>',
+  }];
+
+  const layout = makePlotlyLayout({
+    yaxis: { ...AXIS_COMMON, title: 'Obliquity (degrees)' },
     shapes: stdShapes(), annotations: stdAnnotations(),
   });
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);

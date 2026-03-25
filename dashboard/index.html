@@ -46,9 +46,11 @@
   <nav class="jump-nav" id="jump-nav">
     <a href="#panel-obliquity" class="jump-link active" data-panel="panel-obliquity">Obl</a>
     <a href="#panel-eccentricity" class="jump-link" data-panel="panel-eccentricity">Ecc</a>
+    <a href="#panel-inclination" class="jump-link" data-panel="panel-inclination">Inc</a>
     <a href="#panel-ascending-node" class="jump-link" data-panel="panel-ascending-node">AN</a>
     <a href="#panel-arg-perihelion" class="jump-link" data-panel="panel-arg-perihelion">AP</a>
     <a href="#panel-lon-perihelion" class="jump-link" data-panel="panel-lon-perihelion">LP</a>
+    <a href="#panel-distance" class="jump-link" data-panel="panel-distance">Dist</a>
   </nav>
 
   <main id="main">
@@ -74,6 +76,14 @@
       <div class="chart-container" id="chart-eccentricity"></div>
     </section>
 
+    <section class="chart-panel" id="panel-inclination">
+      <div class="chart-header">
+        <h2 class="chart-title">Inclination</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-inclination"></div>
+    </section>
+
     <section class="chart-panel" id="panel-ascending-node">
       <div class="chart-header">
         <h2 class="chart-title">Ascending Node</h2>
@@ -96,6 +106,14 @@
         <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
       </div>
       <div class="chart-container" id="chart-lon-perihelion"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-distance">
+      <div class="chart-header">
+        <h2 class="chart-title">Perihelion / Aphelion Distance</h2>
+        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
+      </div>
+      <div class="chart-container" id="chart-distance"></div>
     </section>
 
     <section class="info-panel" id="info-panel">

@@ -71,7 +71,7 @@ const activePlanets = new Set(['mars']);
     const halfSpan = RANGE_PRESETS[rangeKey] || 200;
     const xRange = [centerYear - halfSpan, centerYear + halfSpan];
 
-    const timeChartIds = ['chart-ra', 'chart-dec', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
+    const timeChartIds = ['chart-ra', 'chart-dec', 'chart-distance', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
     for (const id of timeChartIds) {
       const div = document.getElementById(id);
       if (div) Plotly.relayout(div, { 'xaxis.range': xRange });

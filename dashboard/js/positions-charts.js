@@ -4,7 +4,7 @@
 
 import { PLANET_COLORS, PLANET_NAMES, AXIS_COMMON, makePlotlyLayout, PLOTLY_CONFIG } from './theme.js';
 
-export const POS_CHART_IDS = ['chart-ra', 'chart-dec', 'chart-sky', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
+export const POS_CHART_IDS = ['chart-ra', 'chart-dec', 'chart-sky', 'chart-distance', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
 
 // Show "No data" annotation when chart has no meaningful traces
 function renderNoData(divId) {
@@ -33,6 +33,7 @@ export function renderAllPositionCharts(planetDataMap, sunData) {
   renderRAChart(planetDataMap);
   renderDecChart(planetDataMap);
   // Sky Path is rendered by applyRange() which is called after this
+  renderDistanceChart(planetDataMap);
   renderSeparationsChart(planetDataMap, sunData);
   renderErrorRAChart(planetDataMap);
   renderErrorDecChart(planetDataMap);
@@ -183,6 +184,52 @@ export function renderSkyPathChart(planetDataMap, timeRange) {
   const layout = makePlotlyLayout({
     xaxis: { ...AXIS_COMMON, title: 'RA (degrees)', autorange: true },
     yaxis: { ...AXIS_COMMON, title: 'Dec (degrees)', autorange: true },
+  });
+
+  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Distance (to Earth + to Sun) ──────────────────────────────────────────
+
+function renderDistanceChart(planetDataMap) {
+  const div = document.getElementById('chart-distance');
+  if (!div) return;
+
+  const traces = [];
+  for (const [name, data] of planetDataMap) {
+    if (name === 'sun' || name === 'moon') continue;
+
+    // Distance to Earth (geocentric)
+    traces.push({
+      x: data.years,
+      y: data.dist_au,
+      type: 'scattergl',
+      mode: 'lines',
+      line: { color: PLANET_COLORS[name], width: 1.5 },
+      name: (PLANET_NAMES[name] || name) + ' ↔ Earth',
+      hovertemplate: `${(PLANET_NAMES[name] || name)} ↔ Earth: %{y:.4f} AU<extra></extra>`,
+    });
+
+    // Distance to Sun (heliocentric)
+    if (data.sun_dist_au) {
+      traces.push({
+        x: data.years,
+        y: data.sun_dist_au,
+        type: 'scattergl',
+        mode: 'lines',
+        line: { color: PLANET_COLORS[name], width: 1, dash: 'dot' },
+        name: (PLANET_NAMES[name] || name) + ' ↔ Sun',
+        visible: 'legendonly',
+        hovertemplate: `${(PLANET_NAMES[name] || name)} ↔ Sun: %{y:.4f} AU<extra></extra>`,
+      });
+    }
+  }
+
+  if (traces.length === 0) { renderNoData('chart-distance'); return; }
+
+  const layout = makePlotlyLayout({
+    yaxis: { ...AXIS_COMMON, title: 'Distance (AU)', autorange: true },
+    xaxis: { ...AXIS_COMMON, title: 'Year' },
   });
 
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);
@@ -367,7 +414,7 @@ function renderErrorDecChart(planetDataMap) {
 let _posSyncTimeout = null;
 
 function setupPositionsSyncZoom() {
-  const timeChartIds = ['chart-ra', 'chart-dec', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
+  const timeChartIds = ['chart-ra', 'chart-dec', 'chart-distance', 'chart-separations', 'chart-err-ra', 'chart-err-dec'];
 
   for (const id of timeChartIds) {
     const div = document.getElementById(id);

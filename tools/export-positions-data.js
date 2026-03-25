@@ -106,6 +106,7 @@ function exportTarget(target) {
   const ra_deg = [];
   const dec_deg = [];
   const dist_au = [];
+  const sun_dist_au = [];
 
   let count = 0;
   for (let jd = startJD; jd <= endJD; jd += STEP_DAYS) {
@@ -119,6 +120,7 @@ function exportTarget(target) {
     ra_deg.push(Math.round(ra * 10000) / 10000);
     dec_deg.push(Math.round(dec * 10000) / 10000);
     dist_au.push(Math.round(pos.distAU * 100000) / 100000);
+    sun_dist_au.push(Math.round((pos.sunDistAU || 0) * 100000) / 100000);
     count++;
   }
 
@@ -142,6 +144,7 @@ function exportTarget(target) {
     ra_deg,
     dec_deg,
     dist_au,
+    sun_dist_au,
     ref_years: ref.refYears,
     ref_ra: ref.refRA,
     ref_dec: ref.refDec,
