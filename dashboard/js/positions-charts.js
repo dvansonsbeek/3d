@@ -197,21 +197,20 @@ function renderDistanceChart(planetDataMap) {
 
   const traces = [];
   for (const [name, data] of planetDataMap) {
-    if (name === 'sun' || name === 'moon') continue;
-
-    // Distance to Earth (geocentric)
+    // Distance to Earth (geocentric) — for Sun this is the Earth-Sun distance
+    const distLabel = name === 'sun' ? 'Sun ↔ Earth' : (PLANET_NAMES[name] || name) + ' ↔ Earth';
     traces.push({
       x: data.years,
       y: data.dist_au,
       type: 'scattergl',
       mode: 'lines',
       line: { color: PLANET_COLORS[name], width: 1.5 },
-      name: (PLANET_NAMES[name] || name) + ' ↔ Earth',
-      hovertemplate: `${(PLANET_NAMES[name] || name)} ↔ Earth: %{y:.4f} AU<extra></extra>`,
+      name: distLabel,
+      hovertemplate: `${distLabel}: %{y:.4f} AU<extra></extra>`,
     });
 
-    // Distance to Sun (heliocentric)
-    if (data.sun_dist_au) {
+    // Distance to Sun (heliocentric) — skip for Sun itself
+    if (data.sun_dist_au && name !== 'sun') {
       traces.push({
         x: data.years,
         y: data.sun_dist_au,

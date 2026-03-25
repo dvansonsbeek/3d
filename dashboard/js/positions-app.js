@@ -7,7 +7,7 @@ import { applyPlotlyTheme } from './theme.js';
 
 // ── State ──────────────────────────────────────────────────────────────────
 
-const activePlanets = new Set(['mars']);
+const activePlanets = new Set(['sun']);
   const posDataCache = new Map();
   let sunData = null;
   let currentPlanetDataMap = null;
