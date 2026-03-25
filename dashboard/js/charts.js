@@ -16,7 +16,7 @@ function hLine(y, color = 'rgba(255,255,255,0.2)', dash = 'dash') {
 const BALANCED_YEAR = -302355;
 const H = 335008;
 
-function stdShapes() {
+export function stdShapes() {
   const l = isLight();
   return [
     // J2000 — prominent marker
@@ -39,7 +39,7 @@ function stdShapes() {
   ];
 }
 
-function stdAnnotations() {
+export function stdAnnotations() {
   const l = isLight();
   return [
     // Now
@@ -66,15 +66,11 @@ function stdAnnotations() {
 const ALL_CHART_IDS = [
   'chart-eccentricity', 'chart-obliquity', 'chart-ascending-node',
   'chart-arg-perihelion', 'chart-lon-perihelion',
-  'chart-year-length', 'chart-precession',
 ];
 
 // ── Render all active planets onto shared charts ───────────────────────────
 
 export function renderAllCharts(planetDataMap) {
-  const activePlanets = Object.keys(planetDataMap);
-  const hasEarth = activePlanets.includes('earth');
-
   renderOverlayChart('chart-eccentricity', planetDataMap, 'eccentricity', {
     yaxis: { title: { text: 'Eccentricity' }, tickformat: '.6f', autorange: true, rangemode: 'normal' },
   });
@@ -84,20 +80,6 @@ export function renderAllCharts(planetDataMap) {
   renderAngleChart('chart-ascending-node', planetDataMap, 'ascendingNode', 'Ascending Node (°)');
   renderAngleChart('chart-arg-perihelion', planetDataMap, 'argPerihelion', 'Argument of Perihelion (°)');
   renderAngleChart('chart-lon-perihelion', planetDataMap, 'lonPerihelion', 'Longitude of Perihelion (°)');
-
-  // Earth-only panels
-  const yearPanel = document.getElementById('panel-year-length');
-  const precPanel = document.getElementById('panel-precession');
-
-  if (hasEarth) {
-    yearPanel.style.display = '';
-    precPanel.style.display = '';
-    renderEarthYearLengths(planetDataMap.earth);
-    renderEarthPrecession(planetDataMap.earth);
-  } else {
-    yearPanel.style.display = 'none';
-    precPanel.style.display = 'none';
-  }
 
   setupSyncZoom();
 }
@@ -255,60 +237,6 @@ function renderAngleChart(divId, planetDataMap, field, yTitle) {
 }
 
 // ── Earth-only: Year Lengths ───────────────────────────────────────────────
-
-function renderEarthYearLengths(data) {
-  const { years, tropicalYearDays, siderealYearDays } = data.fullCycle;
-  const div = document.getElementById('chart-year-length');
-
-  const traces = [
-    {
-      x: years, y: tropicalYearDays,
-      type: 'scattergl', mode: 'lines',
-      line: { color: '#5cb85c', width: 1.5 },
-      name: 'Tropical year',
-      hovertemplate: 'Year: %{x:,.0f}<br>Tropical = %{y:.6f} days<extra></extra>',
-    },
-    {
-      x: years, y: siderealYearDays,
-      type: 'scattergl', mode: 'lines',
-      line: { color: '#37c6d0', width: 1.5 },
-      name: 'Sidereal year',
-      hovertemplate: 'Year: %{x:,.0f}<br>Sidereal = %{y:.6f} days<extra></extra>',
-    },
-  ];
-
-  const layout = makePlotlyLayout({
-    yaxis: { title: { text: 'Days' }, tickformat: '.6f', autorange: true, rangemode: 'normal' },
-    legend: { orientation: 'h', y: 1.08 },
-    shapes: stdShapes(),
-    annotations: stdAnnotations(),
-  });
-
-  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
-}
-
-// ── Earth-only: Axial Precession Period ────────────────────────────────────
-
-function renderEarthPrecession(data) {
-  const { years, precessionPeriod } = data.fullCycle;
-  const div = document.getElementById('chart-precession');
-
-  const traces = [{
-    x: years, y: precessionPeriod,
-    type: 'scattergl', mode: 'lines',
-    line: { color: '#9b59b6', width: 1.5 },
-    name: 'Axial precession period',
-    hovertemplate: 'Year: %{x:,.0f}<br>Period = %{y:,.0f} years<extra></extra>',
-  }];
-
-  const layout = makePlotlyLayout({
-    yaxis: { title: { text: 'Precession Period (years)' }, tickformat: ',d', exponentformat: 'none', autorange: true, rangemode: 'normal' },
-    shapes: stdShapes(),
-    annotations: stdAnnotations(),
-  });
-
-  Plotly.react(div, traces, layout, PLOTLY_CONFIG);
-}
 
 // ── Synchronized zoom ──────────────────────────────────────────────────────
 

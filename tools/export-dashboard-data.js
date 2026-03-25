@@ -68,6 +68,16 @@ function exportEarth(years) {
   const lonPerihelion = [], ascendingNode = [], argPerihelion = [];
   const tropicalYearDays = [], siderealYearDays = [];
   const precessionPeriod = [], erd = [];
+  // Earth predictions (day lengths, cardinal points, precession)
+  const solarDaySeconds = [], siderealDaySeconds = [], stellarDaySeconds = [];
+  const measuredSolarDaySeconds = [], raDayOffsetMs = [];
+  const anomalisticYearDays = [];
+  const perihelionPrecession = [], inclinationPrecession = [], eclipticPrecession = [];
+  const ssJD = [], ssRA = [], ssYearLength = [];
+  const wsJD = [], wsRA = [], wsYearLength = [];
+  const veJD = [], veRA = [], veYearLength = [];
+  const aeJD = [], aeRA = [], aeYearLength = [];
+  const solsticeObliquity = [];
 
   // Earth's perihelion precession period and ascending node
   const earthPeriPeriod = C.perihelionCycleLength;
@@ -93,6 +103,38 @@ function exportEarth(years) {
     precessionPeriod.push(+el.precession.toFixed(2));
     erd.push(+el.erd.toFixed(8));
 
+    // Day lengths (from computeEarthOrbitalElements)
+    solarDaySeconds.push(+el.lengthOfDay.toFixed(6));
+    siderealDaySeconds.push(+el.siderealDay.toFixed(6));
+    stellarDaySeconds.push(+el.stellarDay.toFixed(6));
+    measuredSolarDaySeconds.push(+el.measuredSolarDay.toFixed(6));
+    raDayOffsetMs.push(+el.raDayOffsetMs.toFixed(4));
+
+    // Anomalistic year
+    anomalisticYearDays.push(+OE.computeLengthOfAnomalisticYearDays(year).toFixed(10));
+
+    // Precession variants (derived from axial precession)
+    const solarYearSec = el.solarYearDays * el.lengthOfDay;
+    const anomYearSec = OE.computeLengthOfAnomalisticYearDays(year) * el.lengthOfDay;
+    perihelionPrecession.push(+OE.computePerihelionPrecession(anomYearSec, solarYearSec).toFixed(2));
+    inclinationPrecession.push(+(el.precession * 13 / 3).toFixed(2));
+    eclipticPrecession.push(+(el.precession * 13 / 5).toFixed(2));
+
+    // Cardinal points (SS, WS, VE, AE)
+    ssJD.push(+OE.computeSolsticeJD(year, 'SS').toFixed(4));
+    ssRA.push(+OE.computeSolsticeRA(year, 'SS').toFixed(4));
+    ssYearLength.push(+OE.computeSolsticeYearLength(year, 'SS').toFixed(8));
+    wsJD.push(+OE.computeSolsticeJD(year, 'WS').toFixed(4));
+    wsRA.push(+OE.computeSolsticeRA(year, 'WS').toFixed(4));
+    wsYearLength.push(+OE.computeSolsticeYearLength(year, 'WS').toFixed(8));
+    veJD.push(+OE.computeSolsticeJD(year, 'VE').toFixed(4));
+    veRA.push(+OE.computeSolsticeRA(year, 'VE').toFixed(4));
+    veYearLength.push(+OE.computeSolsticeYearLength(year, 'VE').toFixed(8));
+    aeJD.push(+OE.computeSolsticeJD(year, 'AE').toFixed(4));
+    aeRA.push(+OE.computeSolsticeRA(year, 'AE').toFixed(4));
+    aeYearLength.push(+OE.computeSolsticeYearLength(year, 'AE').toFixed(8));
+    solsticeObliquity.push(+OE.computeObliquityEarth(year).toFixed(6));
+
     // Perihelion longitude (from predictive 21-harmonic formula)
     lonPerihelion.push(+el.perihelionLong.toFixed(4));
 
@@ -112,7 +154,16 @@ function exportEarth(years) {
       years, eccentricity, obliquity, inclination,
       inclinationTilt, axialTilt, inclinationTiltRel, axialTiltRel,
       lonPerihelion, ascendingNode, argPerihelion,
-      tropicalYearDays, siderealYearDays, precessionPeriod, erd,
+      tropicalYearDays, siderealYearDays, anomalisticYearDays,
+      precessionPeriod, perihelionPrecession, inclinationPrecession, eclipticPrecession,
+      erd,
+      solarDaySeconds, siderealDaySeconds, stellarDaySeconds,
+      measuredSolarDaySeconds, raDayOffsetMs,
+      ssJD, ssRA, ssYearLength,
+      wsJD, wsRA, wsYearLength,
+      veJD, veRA, veYearLength,
+      aeJD, aeRA, aeYearLength,
+      solsticeObliquity,
     },
     constants: {
       eccentricityBase: C.eccentricityBase,

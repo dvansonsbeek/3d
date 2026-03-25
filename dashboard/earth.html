@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earth Predictions — Holistic Universe</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js" charset="utf-8"></script>
+</head>
+<body class="light-mode">
+  <header id="header">
+    <div class="header-left">
+      <h1>Earth Predictions</h1>
+      <span class="header-subtitle">Day Lengths, Year Lengths, Precession, Cardinal Points</span>
+    </div>
+    <nav class="dashboard-tabs">
+      <a href="index.html" class="tab-link">Orbital Elements</a>
+      <a href="positions.html" class="tab-link">Sky Positions</a>
+      <a href="earth.html" class="tab-link active">Earth Predictions</a>
+    </nav>
+    <div class="header-controls">
+      <div class="range-toggle" id="range-toggle">
+        <button class="range-btn active" data-range="full">Full H</button>
+        <button class="range-btn" data-range="h3">H/3</button>
+        <button class="range-btn" data-range="h5">H/5</button>
+        <button class="range-btn" data-range="h8">H/8</button>
+        <button class="range-btn" data-range="h13">H/13</button>
+        <button class="range-btn" data-range="h16">H/16</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">&#x263E;</button>
+      <a class="header-link" href="https://3d.holisticuniverse.com" target="_blank" rel="noopener">3D Simulation</a>
+    </div>
+  </header>
+
+  <nav class="jump-nav" id="jump-nav">
+    <a href="#panel-day-lengths" class="jump-link active" data-panel="panel-day-lengths">Day</a>
+    <a href="#panel-year-lengths" class="jump-link" data-panel="panel-year-lengths">Year</a>
+    <a href="#panel-cardinal" class="jump-link" data-panel="panel-cardinal">CP</a>
+    <a href="#panel-precession" class="jump-link" data-panel="panel-precession">Prec</a>
+    <a href="#panel-erd" class="jump-link" data-panel="panel-erd">ERD</a>
+  </nav>
+
+  <main id="main">
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading Earth prediction data...</span>
+    </div>
+
+    <section class="chart-panel" id="panel-day-lengths">
+      <div class="chart-header">
+        <h2 class="chart-title">Day Lengths</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-day-lengths"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-year-lengths">
+      <div class="chart-header">
+        <h2 class="chart-title">Year Lengths</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-year-lengths"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-cardinal">
+      <div class="chart-header">
+        <h2 class="chart-title">Cardinal Points — Year Lengths</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-cardinal"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-precession">
+      <div class="chart-header">
+        <h2 class="chart-title">Precession Periods</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-precession"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-erd">
+      <div class="chart-header">
+        <h2 class="chart-title">Earth Rate of Deviation (ERD)</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-erd"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/earth-app.js"></script>
+</body>
+</html>

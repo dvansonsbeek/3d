@@ -10,9 +10,14 @@
 <body class="light-mode">
   <header id="header">
     <div class="header-left">
-      <h1>Planet Positions Explorer</h1>
+      <h1>Sky Positions</h1>
       <span class="header-subtitle">Geocentric RA / Dec — 1800–2200</span>
     </div>
+    <nav class="dashboard-tabs">
+      <a href="index.html" class="tab-link">Orbital Elements</a>
+      <a href="positions.html" class="tab-link active">Sky Positions</a>
+      <a href="earth.html" class="tab-link">Earth Predictions</a>
+    </nav>
     <div class="planet-bar" id="planet-bar">
         <button class="planet-btn" data-planet="sun" style="--pc:#ffd700">Sun</button>
         <button class="planet-btn" data-planet="moon" style="--pc:#c0c0c0">Moon</button>
@@ -36,7 +41,6 @@
         <input type="number" id="center-year" value="2000" min="1800" max="2200" step="1" class="center-year-input">
       </label>
       <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">&#x263E;</button>
-      <a class="header-link" href="index.html">Orbital Elements</a>
       <a class="header-link" href="https://3d.holisticuniverse.com" target="_blank" rel="noopener">3D Simulation</a>
     </div>
   </header>

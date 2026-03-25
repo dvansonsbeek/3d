@@ -10,9 +10,14 @@
 <body class="light-mode">
   <header id="header">
     <div class="header-left">
-      <h1>Orbital Data Explorer</h1>
+      <h1>Orbital Elements</h1>
       <span class="header-subtitle">Fibonacci Laws of Planetary Motion</span>
     </div>
+    <nav class="dashboard-tabs">
+      <a href="index.html" class="tab-link active">Orbital Elements</a>
+      <a href="positions.html" class="tab-link">Sky Positions</a>
+      <a href="earth.html" class="tab-link">Earth Predictions</a>
+    </nav>
     <div class="planet-bar" id="planet-bar">
         <button class="planet-btn active" data-planet="earth" style="--pc:#2e64be">Earth</button>
         <button class="planet-btn" data-planet="mercury" style="--pc:#9e9e9e">Me</button>
@@ -33,7 +38,6 @@
         <button class="range-btn" data-range="h16">H/16</button>
       </div>
       <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">&#x263E;</button>
-      <a class="header-link" href="positions.html">Planet Positions</a>
       <a class="header-link" href="https://3d.holisticuniverse.com" target="_blank" rel="noopener">3D Simulation</a>
     </div>
   </header>
@@ -45,8 +49,6 @@
     <a href="#panel-ascending-node" class="jump-link" data-panel="panel-ascending-node">AN</a>
     <a href="#panel-arg-perihelion" class="jump-link" data-panel="panel-arg-perihelion">AP</a>
     <a href="#panel-lon-perihelion" class="jump-link" data-panel="panel-lon-perihelion">LP</a>
-    <a href="#panel-year-length" class="jump-link earth-only-link" data-panel="panel-year-length">YL</a>
-    <a href="#panel-precession" class="jump-link earth-only-link" data-panel="panel-precession">Pr</a>
   </nav>
 
   <main id="main">
@@ -94,23 +96,6 @@
         <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
       </div>
       <div class="chart-container" id="chart-lon-perihelion"></div>
-    </section>
-
-    <!-- Earth-only charts -->
-    <section class="chart-panel earth-only" id="panel-year-length">
-      <div class="chart-header">
-        <h2 class="chart-title">Year Lengths <span class="earth-badge">Earth</span></h2>
-        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
-      </div>
-      <div class="chart-container" id="chart-year-length"></div>
-    </section>
-
-    <section class="chart-panel earth-only" id="panel-precession">
-      <div class="chart-header">
-        <h2 class="chart-title">Axial Precession Period <span class="earth-badge">Earth</span></h2>
-        <div class="chart-actions"><button class="csv-btn" title="Export CSV">CSV</button><button class="expand-btn" title="Expand chart">&#x2922;</button></div>
-      </div>
-      <div class="chart-container" id="chart-precession"></div>
     </section>
 
     <section class="info-panel" id="info-panel">

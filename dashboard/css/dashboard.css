@@ -698,6 +698,47 @@ body.light-mode .info-item {
   opacity: 0.8;
 }
 
+/* ── Dashboard tab navigation ────────────────────────────────────────── */
+
+.dashboard-tabs {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.tab-link {
+  padding: 6px 14px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary, rgba(255,255,255,0.45));
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.tab-link:hover {
+  color: var(--text, rgba(255,255,255,0.85));
+}
+
+.tab-link.active {
+  border-bottom-color: #4a9eff;
+  color: var(--text, rgba(255,255,255,0.85));
+}
+
+.light-mode .tab-link {
+  color: rgba(0,0,0,0.4);
+}
+
+.light-mode .tab-link:hover {
+  color: rgba(0,0,0,0.8);
+}
+
+.light-mode .tab-link.active {
+  color: rgba(0,0,0,0.85);
+  border-bottom-color: #2e64be;
+}
+
 /* ── Positions dashboard extras ──────────────────────────────────────── */
 
 .center-year-label {
