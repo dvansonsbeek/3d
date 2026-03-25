@@ -1,25 +1,46 @@
 # All Baselines Summary — RMS vs JPL Horizons
 
-**Last updated:** 2026-03-21
-**Reference:** JPL Horizons RA/Dec, IAU 1976 precession correction applied
+**Last updated:** 2026-03-25
+**Reference:** JPL Horizons RA/Dec + IMCCE INPOP19, IAU 1976 precession correction applied
+**Training window:** 1800–2200 (primary) + observed pre-1800 anchors
 
 ---
 
 ## All 9 Targets
 
-| Target   | RMS Total | RMS RA   | RMS Dec  | Max ΔRA   | Max ΔDec  | Entries |
-|----------|-----------|----------|----------|-----------|-----------|---------|
-| Sun      | 0.0033°   | 0.0033°  | 0.0001°  | −0.0077°  | +0.0003°  | 52      |
-| Moon     | 0.0123°   | 0.0118°  | 0.0035°  | −0.0228°  | −0.0090°  | 6088    |
-| Mercury  | 0.0066°   | 0.0040°  | 0.0052°  | −0.0123°  | −0.0204°  | 95      |
-| Venus    | 0.2221°   | 0.2042°  | 0.0876°  | +0.9372°  | +0.4569°  | 3812    |
-| Mars     | 0.0241°   | 0.0196°  | 0.0141°  | −0.0621°  | +0.0442°  | 184     |
-| Jupiter  | 0.0612°   | 0.0583°  | 0.0190°  | +0.2291°  | +0.0803°  | 2499    |
-| Saturn   | 0.0949°   | 0.0912°  | 0.0263°  | −0.4435°  | +0.1228°  | 2502    |
-| Uranus   | 0.0076°   | 0.0074°  | 0.0017°  | +0.0138°  | −0.0032°  | 41      |
-| Neptune  | 0.0075°   | 0.0072°  | 0.0018°  | +0.0121°  | −0.0036°  | 69      |
+| Target   | RMS Total | Notes |
+|----------|-----------|-------|
+| Sun      | 0.0033°   | Earth geometry only |
+| Moon     | 0.0015°   | Meeus correction layer |
+| Mercury  | 0.0712°   | 78p parallax + mean anomaly terms |
+| Venus    | 0.0309°   | 78p parallax |
+| Mars     | 0.0914°   | 78p parallax, circular orbit limit |
+| Jupiter  | 0.0515°   | 68p parallax + gravitation |
+| Saturn   | 0.0672°   | 68p parallax + gravitation + 1682 anchor |
+| Uranus   | 0.0159°   | 68p parallax |
+| Neptune  | 0.0042°   | 68p parallax |
 
-All 9 targets within 0.23°. Seven under 0.10°.
+Five targets under 0.05°. All within 0.10° except Mars (circular orbit limit).
+
+---
+
+## Historical Conjunction Validation
+
+| Event | Year | Separation | Status |
+|-------|------|-----------|--------|
+| Jupiter-Saturn triple #1 | 1682.8 | 0.91° | First telescopic observation |
+| Jupiter-Saturn triple #2 | 1683.1 | 0.89° | First telescopic observation |
+| Jupiter-Saturn triple #3 | 1683.4 | 0.79° | First telescopic observation |
+| Jupiter-Saturn | 2020.0 | 0.61° | Modern observation |
+
+---
+
+## Data Sources
+
+- **JPL Horizons DE441** (NASA/JPL): 1600–2400
+- **IMCCE Miriade INPOP19** (OBSPM/CNRS): 1200–2800 (independent, cross-checked to 0.04")
+- **Total reference data:** ~175,000 data points, 1200–2800 CE
+- **Training data:** ~44,000 pts (1800–2200) + 41 observed pre-1800 anchors
 
 ---
 

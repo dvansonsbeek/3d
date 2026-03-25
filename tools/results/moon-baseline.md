@@ -1,6 +1,6 @@
 # Moon Baseline — RMS vs JPL Horizons
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-25
 **Reference:** JPL Horizons, 3-day sampling 2000–2025
 **Precession:** IAU 1976 (Meeus) J2000 -> of-date applied to JPL reference frame
 **Position method:** Meeus Ch. 47 perturbation overlay on 5-layer geometric orbit

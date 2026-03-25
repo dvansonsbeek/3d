@@ -1,21 +1,26 @@
 # Planet Positions — RMS vs JPL Horizons
 
-**Last updated:** 2026-03-21
-**Reference:** JPL Horizons RA/Dec, precession-corrected (IAU 1976 J2000 -> of-date)
+**Last updated:** 2026-03-25
+**Reference:** JPL Horizons DE441 + IMCCE INPOP19, precession-corrected (IAU 1976 J2000 -> of-date)
+**Training:** 1800–2200 primary (44k pts) + 41 observed pre-1800 anchors (weight 3–5)
 
 ---
 
 ## Summary (all planets, post-parallax-correction)
 
-| Planet   | Ref pts | Parallax tier | Pre-correction RMS | Post-correction RMS |
-|----------|---------|---------------|-------------------|-------------------|
-| Mercury  | 95      | 42p           | 1.182°            | 0.014°            |
-| Venus    | 3812    | 42p           | 1.207°            | 0.224°            |
-| Mars     | 184     | 30p           | 1.058°            | 0.034°            |
-| Jupiter  | 2499    | 42p           | 0.218°            | 0.063°            |
-| Saturn   | 2502    | 36p           | 0.418°            | 0.097°            |
-| Uranus   | 41      | 24p           | 0.121°            | 0.008°            |
-| Neptune  | 69      | 24p           | 0.688°            | 0.008°            |
+| Planet   | Training pts | Parallax tier | Post-correction RMS |
+|----------|-------------|---------------|-------------------|
+| Mercury  | ~5,100      | 78p (A–CA)    | **0.071°**        |
+| Venus    | ~8,800      | 78p (A–CA)    | **0.031°**        |
+| Mars     | ~5,200      | 78p (A–CA)    | **0.091°**        |
+| Jupiter  | ~7,500      | 68p (A–BQ)    | **0.052°**        |
+| Saturn   | ~7,500      | 68p (A–BQ)    | **0.067°**        |
+| Uranus   | ~5,000      | 68p (A–BQ)    | **0.016°**        |
+| Neptune  | ~5,100      | 68p (A–BQ)    | **0.004°**        |
+
+Data sources: JPL Horizons DE441 (1600–2400) + IMCCE INPOP19 (1200–2800, independent).
+Cross-checked to 0.04" agreement in overlapping periods.
+Total reference: ~175k pts; validation (weight 0): ~130k pts spanning 1200–2800.
 
 ---
 
