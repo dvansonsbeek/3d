@@ -187,9 +187,11 @@ for (const target of targets) {
     const dt = pt.jd - 2451545.0;
     const Lsun = (280.460 + 0.9856474 * dt) * d2r; // Sun mean longitude
     // Planet mean anomaly (heliocentric orbital phase) — dynamic from scene graph EoC
-    // Only for inner planets (Mercury, Venus, Mars) where orbital period is short enough
+    // Only for Mercury and Venus where orbital period is short enough
     // to avoid collinearity with existing slow-varying basis functions.
-    const _useM = (target === 'mercury' || target === 'venus' || target === 'mars');
+    // Mars excluded: low inclination (1.85°) makes M-term Dec signal tiny,
+    // and the 10 extra parameters cause overfitting (0.091° at 78p vs 0.078° at 68p).
+    const _useM = (target === 'mercury' || target === 'venus');
     const Mplanet = _useM ? result.meanAnomaly : 0;
     data.push({ dRA, dDec, d: dd, u, year, sunDist: result.sunDistAU, conjPhase, Lsun, Mplanet, weight: pt.weight || 1 });
   }
