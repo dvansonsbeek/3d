@@ -32,7 +32,7 @@
       "orbitalEccentricityAmplitude": 0.00008436789,
       "eccentricityPhaseJ2000": 89.9882,
       "eocFraction": -0.527,
-      "startpos": 83.69176950616905,
+      "startpos": 83.69268896492527,
       "angleCorrection": 0.970907549119584,
       "perihelionEclipticFraction": [
         8,
@@ -58,8 +58,8 @@
       "orbitalEccentricityAmplitude": 0.0009625389,
       "eccentricityPhaseJ2000": 123.7514,
       "eocFraction": 0.436,
-      "startpos": 249.3081844308657,
-      "angleCorrection": -2.8028684487716653,
+      "startpos": 249.30943979458556,
+      "angleCorrection": -2.8028684488443147,
       "perihelionEclipticFraction": [
         2,
         1
@@ -81,7 +81,7 @@
       "orbitalEccentricityAmplitude": 0.003073636,
       "eccentricityPhaseJ2000": 96.8878,
       "eocFraction": -0.066224,
-      "startpos": 121.47833056081932,
+      "startpos": 121.47855299438493,
       "angleCorrection": -2.109362111899337,
       "perihelionEclipticFraction": [
         3,
@@ -107,7 +107,7 @@
       "orbitalEccentricityAmplitude": 0.000001149908,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.495,
-      "startpos": 13.87621445290917,
+      "startpos": 13.877569561157502,
       "angleCorrection": 0.9270355609260399,
       "perihelionEclipticFraction": [
         1,
@@ -133,8 +133,8 @@
       "orbitalEccentricityAmplitude": 0.000005403008,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.54,
-      "startpos": 11.28587615563766,
-      "angleCorrection": -0.17477220015242523,
+      "startpos": 11.270284061118005,
+      "angleCorrection": -0.17477220007971184,
       "perihelionEclipticFraction": [
         -1,
         8
@@ -159,8 +159,8 @@
       "orbitalEccentricityAmplitude": 0.00002831008,
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.53,
-      "startpos": 44.89768286839711,
-      "angleCorrection": -0.7345961784536534,
+      "startpos": 44.90049171476649,
+      "angleCorrection": -0.7345961784536748,
       "perihelionEclipticFraction": [
         1,
         3
@@ -185,7 +185,7 @@
       "orbitalEccentricityAmplitude": 0.000008098033,
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.585,
-      "startpos": 47.95499389691912,
+      "startpos": 47.95482193930442,
       "angleCorrection": 2.3338183719950543,
       "perihelionEclipticFraction": [
         2,
