@@ -172,7 +172,7 @@ function exportChartCSV(chartDiv) {
 
 // ── Theme toggle ───────────────────────────────────────────────────────────
 
-let isLightMode = true;
+let isLightMode = localStorage.getItem('dashboard-theme') !== 'dark';
 
 function applyPlotlyTheme() {
   const light = isLightMode;
@@ -210,6 +210,7 @@ function setupThemeToggle() {
   const btn = document.getElementById('theme-toggle');
   btn.addEventListener('click', async () => {
     isLightMode = !isLightMode;
+    localStorage.setItem('dashboard-theme', isLightMode ? 'light' : 'dark');
     document.body.classList.toggle('light-mode', isLightMode);
     btn.innerHTML = isLightMode ? '&#x263E;' : '&#x263C;'; // moon / sun
     // Re-render charts to pick up theme-aware annotation/shape colors
@@ -287,6 +288,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       exportChartCSV(chartDiv);
     });
   });
+
+  // Apply saved theme
+  document.body.classList.toggle('light-mode', isLightMode);
+  const themeBtn = document.getElementById('theme-toggle');
+  if (themeBtn) themeBtn.innerHTML = isLightMode ? '&#x263E;' : '&#x263C;';
 
   // Load default planet and apply initial theme
   await refreshCharts();

@@ -4,6 +4,8 @@
 
 // Brightened for WCAG 3:1 contrast on dark background
 export const PLANET_COLORS = {
+  sun:     '#ffd700',
+  moon:    '#c0c0c0',
   earth:   '#2e64be',
   mercury: '#9e9e9e',   // was #6e6e6e — too dark
   venus:   '#d5ab37',
@@ -15,6 +17,8 @@ export const PLANET_COLORS = {
 };
 
 export const PLANET_NAMES = {
+  sun:     'Sun',
+  moon:    'Moon',
   earth:   'Earth',
   mercury: 'Mercury',
   venus:   'Venus',
@@ -25,7 +29,7 @@ export const PLANET_NAMES = {
   neptune: 'Neptune',
 };
 
-const AXIS_COMMON = {
+export const AXIS_COMMON = {
   gridcolor: 'rgba(255, 255, 255, 0.08)',   // was 0.06 — too subtle
   zerolinecolor: 'rgba(255, 255, 255, 0.15)',
   linecolor: 'rgba(255, 255, 255, 0.15)',
@@ -106,4 +110,37 @@ export function yearLine(year, color = 'rgba(255,255,255,0.15)') {
     yref: 'paper',
     line: { color, width: 1, dash: 'dot' },
   };
+}
+
+// ── Light/Dark theme application for Plotly charts ────────────────────────
+// Call after rendering charts to apply the correct theme colors.
+// chartIds: array of DOM IDs of chart containers to update.
+export function applyPlotlyTheme(chartIds, light = true) {
+  const layoutUpdate = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: light ? 'rgba(248,249,252,0.5)' : 'rgba(10,14,20,0.6)',
+    'font.color': light ? '#333' : 'rgba(255,255,255,0.85)',
+    'xaxis.gridcolor': light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)',
+    'yaxis.gridcolor': light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)',
+    'xaxis.zerolinecolor': light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.15)',
+    'yaxis.zerolinecolor': light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.15)',
+    'xaxis.linecolor': light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)',
+    'yaxis.linecolor': light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)',
+    'xaxis.tickfont.color': light ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.7)',
+    'yaxis.tickfont.color': light ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.7)',
+    'xaxis.title.font.color': light ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.4)',
+    'yaxis.title.font.color': light ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.4)',
+    'xaxis.spikecolor': light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.15)',
+    'legend.font.color': light ? '#444' : 'rgba(255,255,255,0.8)',
+    'hoverlabel.bgcolor': light ? '#fff' : 'rgba(20,25,35,0.95)',
+    'hoverlabel.bordercolor': light ? 'rgba(0,0,0,0.15)' : 'rgba(100,140,200,0.4)',
+    'hoverlabel.font.color': light ? '#222' : '#fff',
+  };
+
+  for (const id of chartIds) {
+    const div = document.getElementById(id);
+    if (div && div.data && div.data.length) {
+      Plotly.relayout(div, layoutUpdate);
+    }
+  }
 }

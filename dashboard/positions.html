@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planet Positions Explorer — Holistic Universe</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js" charset="utf-8"></script>
+</head>
+<body class="light-mode">
+  <header id="header">
+    <div class="header-left">
+      <h1>Planet Positions Explorer</h1>
+      <span class="header-subtitle">Geocentric RA / Dec — 1800–2200</span>
+    </div>
+    <div class="planet-bar" id="planet-bar">
+        <button class="planet-btn" data-planet="sun" style="--pc:#ffd700">Sun</button>
+        <button class="planet-btn" data-planet="moon" style="--pc:#c0c0c0">Moon</button>
+        <button class="planet-btn" data-planet="mercury" style="--pc:#9e9e9e">Me</button>
+        <button class="planet-btn" data-planet="venus" style="--pc:#d5ab37">Ve</button>
+        <button class="planet-btn active" data-planet="mars" style="--pc:#d04a3e">Ma</button>
+        <button class="planet-btn" data-planet="jupiter" style="--pc:#c97e4f">Ju</button>
+        <button class="planet-btn" data-planet="saturn" style="--pc:#d9b65c">Sa</button>
+        <button class="planet-btn" data-planet="uranus" style="--pc:#37c6d0">Ur</button>
+        <button class="planet-btn" data-planet="neptune" style="--pc:#4a7abf">Ne</button>
+    </div>
+    <div class="header-controls">
+      <div class="range-toggle" id="range-toggle">
+        <button class="range-btn" data-range="1yr">1yr</button>
+        <button class="range-btn" data-range="5yr">5yr</button>
+        <button class="range-btn active" data-range="20yr">20yr</button>
+        <button class="range-btn" data-range="100yr">100yr</button>
+        <button class="range-btn" data-range="full">Full</button>
+      </div>
+      <label class="center-year-label">Center:
+        <input type="number" id="center-year" value="2000" min="1800" max="2200" step="1" class="center-year-input">
+      </label>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">&#x263E;</button>
+      <a class="header-link" href="index.html">Orbital Elements</a>
+      <a class="header-link" href="https://3d.holisticuniverse.com" target="_blank" rel="noopener">3D Simulation</a>
+    </div>
+  </header>
+
+  <!-- Jump navigation -->
+  <nav class="jump-nav" id="jump-nav">
+    <a href="#panel-ra" class="jump-link active" data-panel="panel-ra">RA</a>
+    <a href="#panel-dec" class="jump-link" data-panel="panel-dec">Dec</a>
+    <a href="#panel-sky" class="jump-link" data-panel="panel-sky">Sky</a>
+    <a href="#panel-separations" class="jump-link" data-panel="panel-separations">Sep</a>
+    <a href="#panel-err-ra" class="jump-link" data-panel="panel-err-ra">ΔRA</a>
+    <a href="#panel-err-dec" class="jump-link" data-panel="panel-err-dec">ΔDec</a>
+  </nav>
+
+  <main id="main">
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading position data...</span>
+    </div>
+
+    <section class="chart-panel" id="panel-ra">
+      <div class="chart-header">
+        <h2 class="chart-title">Right Ascension</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-ra"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-dec">
+      <div class="chart-header">
+        <h2 class="chart-title">Declination</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-dec"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-sky">
+      <div class="chart-header">
+        <h2 class="chart-title">Sky Path (RA vs Dec)</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-sky"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-separations">
+      <div class="chart-header">
+        <h2 class="chart-title">Elongation from Sun</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-separations"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-err-ra">
+      <div class="chart-header">
+        <h2 class="chart-title">RA Error (Model − JPL)</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-err-ra"></div>
+    </section>
+
+    <section class="chart-panel" id="panel-err-dec">
+      <div class="chart-header">
+        <h2 class="chart-title">Dec Error (Model − JPL)</h2>
+        <div class="chart-actions">
+          <button class="csv-btn" title="Export CSV">CSV</button>
+          <button class="expand-btn" title="Expand">&#x2922;</button>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-err-dec"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/positions-app.js"></script>
+</body>
+</html>

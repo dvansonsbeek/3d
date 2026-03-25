@@ -697,3 +697,29 @@ body.light-mode .info-item {
 .js-plotly-plot .plotly .modebar-btn:hover {
   opacity: 0.8;
 }
+
+/* ── Positions dashboard extras ──────────────────────────────────────── */
+
+.center-year-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+}
+
+.center-year-input {
+  width: 65px;
+  padding: 4px 6px;
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: 'IBM Plex Mono', monospace;
+  text-align: center;
+}
+
+.center-year-input:focus {
+  outline: 1px solid var(--accent, #4a9eff);
+}
