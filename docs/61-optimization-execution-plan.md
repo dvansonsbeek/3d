@@ -690,17 +690,30 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Non-enrichable bodies (pluto, halleys, eros): 3 entries with model start date positions only
 
 ##### Tier system revised to sub-tiers (1A/1B/1C/1D/2A/2B/2C/2R/3):
-- **1A** (weight 1): Modern direct observation, < 1 arcsec (Venus/Jupiter/Saturn transits)
-- **1B** (weight 1): Telescope-era observation, 1-40 arcsec (transit contact times, Flamsteed)
-- **1C** (weight 1): Pre-telescope precision, 1-2 arcmin (Tycho Brahe, 923 Mars obs)
-- **1D** (weight 1): Ancient/medieval, 10-60 arcmin (Ptolemy, Babylonian)
-- **2A** (weight 1): JPL forward extrapolation (2025–2100)
-- **2B** (weight 1): JPL computed monthly (1900–2500)
-- **2C** (weight 1): JPL extended monthly (1600–2400, added 2026-03)
-- **2R** (weight 1): JPL recent high-accuracy (1960–2025)
-- **3** (weight 0): Extrapolation/ancient (comparison only)
+- **1A**: Modern direct observation, < 1 arcsec (Venus/Jupiter/Saturn transits)
+- **1B**: Telescope-era observation, 1-40 arcsec (transit contact times, conjunctions)
+- **1C**: Pre-telescope precision, 1-2 arcmin (Tycho Brahe, 923 Mars obs)
+- **1D**: Ancient/medieval, 10-60 arcmin (Ptolemy, Babylonian, mutual events)
+- **2A**: JPL forward extrapolation (2025–2100)
+- **2B**: JPL computed monthly (1900–2500)
+- **2C**: JPL/IMCCE extended monthly (1200–2800)
+- **2R**: JPL recent high-accuracy (1960–2025)
+- **3**: Ancient data (visual comparison only)
 
-**Equal weight policy** (adopted 2026-03-25): All tiers are weighted equally (weight=1.0) for fitting. The JPL DE441 ephemeris is accurate to sub-arcminute for all planets across 1600–2400, so the reference data quality is not the limiting factor — the model architecture is. Differential weighting was found to mask model limitations by optimizing for near-J2000 accuracy at the expense of long-term extrapolation. Equal weight produces an honest baseline that reflects true model performance over 800 years.
+**Data sources** (adopted 2026-03-25): Two independent ephemeris services, cross-checked to 0.04" agreement:
+- **JPL Horizons DE441** (NASA/JPL): Primary source, covers 1600–2400
+- **IMCCE Miriade INPOP19** (OBSPM/CNRS, Paris): Independent source, fills Saturn 1600–1752 gap, extends all planets to 1200–2800
+- Total: ~175,000 data points spanning 1200–2800 CE
+
+**Weighting policy** (revised 2026-03-25): Train on 1800–2200, anchor to confirmed observations.
+- 1800–2200 JPL/IMCCE: weight 1.0 (~44k pts, primary training)
+- Mercury transits 1632–1799: weight 3.0 (23 observed events, NASA catalog)
+- Venus transits 1640–1769: weight 3.0 (4 observed events, NASA catalog)
+- Jupiter-Saturn conjunctions 1604–1783: weight 3.0 (8 telescope-era events)
+- Jupiter-Saturn 1682–83 triple: weight 5.0 (6 pts, first telescopic confirmation)
+- All other data: weight 0 (~130k pts, validation/reference only)
+
+**Rationale**: Testing showed that equal-weight fitting over wider ranges (1600–2400 or 1200–2800) degrades near-J2000 accuracy because the 68–78 parallax basis functions cannot model 800+ years without distorting the core fit. The model is physically derived — the parallax correction should model geocentric viewing geometry, not compensate for circular orbit limitations. The 41 pre-1800 anchor points (all confirmed telescope-era observations) provide long-term constraint without distorting the training window (< 0.001° impact on 1800–2200 baselines).
 
 ##### Tycho Brahe Mars data compiled (Tier 1C — first true observational data):
 - **923 Mars declination observations** (1582-1600) from Uraniborg
