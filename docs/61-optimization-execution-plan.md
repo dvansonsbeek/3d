@@ -689,13 +689,18 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - JPL query: geocentric (CENTER=500@399), astrometric RA/Dec in decimal degrees (ANG_FORMAT=DEG)
 - Non-enrichable bodies (pluto, halleys, eros): 3 entries with model start date positions only
 
-##### Tier system revised to sub-tiers (1A/1B/1C/1D/2/3):
-- **1A** (weight 10): Modern direct observation, < 1 arcsec (LLR, modern eclipses, radar)
-- **1B** (weight 7-9): Telescope-era observation, 1-40 arcsec (transit contact times, Flamsteed)
-- **1C** (weight 5-6): Pre-telescope precision, 1-2 arcmin (Tycho Brahe)
-- **1D** (weight 2-4): Ancient/medieval, 10-60 arcmin (Ptolemy, Babylonian)
-- **2** (weight 1): Modern fitted ephemeris (JPL DE441, computed)
-- **3** (weight 0): Extrapolation (comparison only)
+##### Tier system revised to sub-tiers (1A/1B/1C/1D/2A/2B/2C/2R/3):
+- **1A** (weight 1): Modern direct observation, < 1 arcsec (Venus/Jupiter/Saturn transits)
+- **1B** (weight 1): Telescope-era observation, 1-40 arcsec (transit contact times, Flamsteed)
+- **1C** (weight 1): Pre-telescope precision, 1-2 arcmin (Tycho Brahe, 923 Mars obs)
+- **1D** (weight 1): Ancient/medieval, 10-60 arcmin (Ptolemy, Babylonian)
+- **2A** (weight 1): JPL forward extrapolation (2025–2100)
+- **2B** (weight 1): JPL computed monthly (1900–2500)
+- **2C** (weight 1): JPL extended monthly (1600–2400, added 2026-03)
+- **2R** (weight 1): JPL recent high-accuracy (1960–2025)
+- **3** (weight 0): Extrapolation/ancient (comparison only)
+
+**Equal weight policy** (adopted 2026-03-25): All tiers are weighted equally (weight=1.0) for fitting. The JPL DE441 ephemeris is accurate to sub-arcminute for all planets across 1600–2400, so the reference data quality is not the limiting factor — the model architecture is. Differential weighting was found to mask model limitations by optimizing for near-J2000 accuracy at the expense of long-term extrapolation. Equal weight produces an honest baseline that reflects true model performance over 800 years.
 
 ##### Tycho Brahe Mars data compiled (Tier 1C — first true observational data):
 - **923 Mars declination observations** (1582-1600) from Uraniborg

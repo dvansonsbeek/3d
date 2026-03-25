@@ -149,13 +149,13 @@ Not all planets benefit from all terms. Each planet uses the tier with the lowes
 
 | Planet | n pts | Tier | RMS Tot | Notes |
 |--------|-------|------|---------|-------|
-| Mercury | 5119 | 78p (A–CA) | 0.07° | Mean anomaly terms give 45% improvement |
-| Venus | 8816 | 78p (A–CA) | 0.04° | Enriched to 8816 pts incl. IC-dense sampling |
-| Mars | 5190 | 78p (A–CA) | 0.08° | Mean anomaly terms included |
-| Jupiter | 7504 | 68p (A–BQ) | 0.05° | No M terms (too few cycles) |
-| Saturn | 7500 | 68p (A–BQ) | 0.06° | No M terms (too few cycles) |
-| Uranus | 5046 | 68p (A–BQ) | 0.02° | No M terms (too few cycles) |
-| Neptune | 5072 | 68p (A–BQ) | 0.004° | No M terms (too few cycles) |
+| Mercury | ~15k | 78p (A–CA) | 0.106° | Mean anomaly terms, 1600–2400 |
+| Venus | ~19k | 78p (A–CA) | 0.058° | 1600–2400 |
+| Mars | ~16k | 78p (A–CA) | 0.217° | Mean anomaly terms, 1600–2400 |
+| Jupiter | ~13k | 68p (A–BQ) | 0.068° | No M terms (too few cycles) |
+| Saturn | ~10k | 68p (A–BQ) | 0.090° | No M terms (too few cycles) |
+| Uranus | ~15k | 68p (A–BQ) | 0.052° | No M terms (too few cycles) |
+| Neptune | ~15k | 68p (A–BQ) | 0.010° | No M terms (too few cycles) |
 
 Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
@@ -175,29 +175,59 @@ Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
 ### Current Baselines
 
-RMS is computed over all weighted reference data (tier 2, weight > 0). The reference data spans well beyond the 2000–2200 enrichment window for most planets:
+RMS is computed over all reference data with **equal weight** (weight=1.0). The model is fitted honestly against the full 1600–2400 JPL dataset without privileging any era. This ensures the baselines reflect true model performance over 800 years.
 
 | Planet | n pts | Tier | RMS Tot | Data range | Primary source |
 |--------|-------|------|---------|------------|----------------|
-| Mercury | 5119 | 78p | **0.07°** | 1631–2200 | NASA Mercury Transit Catalog + JPL |
-| Venus | 8816 | 78p | **0.04°** | 1800–2200 | JPL Horizons (incl. IC-dense) |
-| Mars | 5190 | 78p | **0.08°** | 1800–2200 | JPL Horizons + Meeus opposition tables |
-| Jupiter | 7504 | 68p | **0.05°** | 1800–2200 | JPL Horizons |
-| Saturn | 7500 | 68p | **0.06°** | 1800–2200 | JPL Horizons |
-| Uranus | 5046 | 68p | **0.02°** | 1800–2200 | JPL Horizons |
-| Neptune | 5072 | 68p | **0.004°** | 1800–2200 | JPL Horizons / mutual events |
+| Mercury | ~15k | 78p | **0.106°** | 1600–2400 | JPL Horizons DE441 |
+| Venus | ~19k | 78p | **0.058°** | 1600–2400 | JPL Horizons DE441 |
+| Mars | ~16k | 78p | **0.217°** | 1600–2400 | JPL Horizons DE441 |
+| Jupiter | ~13k | 68p | **0.068°** | 1600–2400 | JPL Horizons DE441 |
+| Saturn | ~10k | 68p | **0.090°** | 1750–2500 | JPL Horizons DE441 |
+| Uranus | ~15k | 68p | **0.052°** | 1600–2400 | JPL Horizons DE441 |
+| Neptune | ~15k | 68p | **0.010°** | 1600–2400 | JPL Horizons DE441 |
 
-All 7 planets within 0.08°. Five under 0.06°. The accuracy holds over ~400 years (1800–2200).
+For comparison, fitting on the narrower 1800–2200 window only yields better near-J2000 accuracy but poor extrapolation:
 
-Additional ancient observation data (tier 3, back to ~1000 BC, from ISAW/mutual event catalogs) is present in the reference dataset with weight=0. These are available for visual comparison but do not contribute to the RMS.
+| Planet | 1800–2200 only | 1600–2400 (current) | Note |
+|--------|---------------|---------------------|------|
+| Mercury | 0.062° | 0.106° | Close approach at high eccentricity |
+| Venus | 0.030° | 0.058° | |
+| Mars | 0.078° | 0.217° | Circular orbit limit (e=0.093) |
+| Jupiter | 0.050° | 0.068° | |
+| Saturn | 0.051° | 0.090° | |
+| Uranus | 0.016° | 0.052° | |
+| Neptune | 0.004° | 0.010° | |
+
+The 1800–2200 baselines are achievable but not honest — the model extrapolates poorly to 1600–1800 and 2200–2400 with those coefficients. The current equal-weight approach ensures the fit is balanced across the full range.
+
+### Data Tier Structure
+
+The reference data is organized in tiers reflecting its provenance, but **all tiers are weighted equally** (weight=1.0) for fitting:
+
+| Tier | Description | Weight | Example |
+|------|-------------|--------|---------|
+| 1A | Venus/Jupiter/Saturn transits (observed) | 1.0 | Venus transits 2004, 2012 |
+| 1B | Historical transit/conjunction observations | 1.0 | Mercury transits 1631–1799 |
+| 1C | Tycho Brahe Mars observations | 1.0 | Mars 1583–1600 (923 points) |
+| 1D | Ancient observations (Babylonian, etc.) | 1.0 | Jupiter back to -890 |
+| 2A | JPL forward extrapolation (2025–2100) | 1.0 | All planets |
+| 2B | JPL computed (1900–2500, monthly) | 1.0 | All planets |
+| 2C | JPL extended (1600–2400, monthly) | 1.0 | All planets |
+| 2R | JPL recent high-accuracy (1960–2025) | 1.0 | All planets |
+| 3 | Ancient data (visual only) | 0.0 | Not used in fitting |
+
+The equal-weight policy treats JPL DE441 data as equally reliable across its valid range (1600–2400). The DE441 ephemeris is accurate to sub-arcminute for all planets over this period — the dominant uncertainty is in our model, not the reference data.
 
 ### Remaining Error Sources
 
-1. **Orbital eccentricity residual**: The mean anomaly terms (BR–CA) capture most of the unmodeled EoC for inner planets. Mercury's residual dropped from 0.13° to 0.07° with these terms. The remaining error is concentrated at close-approach geometry (0.55–0.67 AU) where the circular orbit approximation is most strained.
+1. **Circular orbit approximation**: The dominant error source for Mars (e=0.093) and Mercury (e=0.206). At close approach (<1 AU), the circular orbit places the planet at the wrong ecliptic longitude. The mean anomaly terms (BR–CA) capture much of this for Mercury, but Mars is near the physical limit of what a circular model can achieve.
 
-2. **Mutual perturbations**: Jupiter–Saturn gravitational interaction causes ~1° longitude perturbations over their ~20-year conjunction cycle. Captured by conjunction phase terms (AR–AW) and the gravitation correction layer.
+2. **Long-term extrapolation**: Errors grow symmetrically from the 1900–2100 core window. The 68 parallax basis functions are smooth (sin/cos × polynomial in T), limiting their ability to model 800 years of orbital evolution.
 
-3. **Elliptical orbit limitation**: At Mercury transits (inferior conjunction), the circular orbit produces ~0.2° Dec errors at specific dates. This is the dominant remaining error source and would require elliptical orbit paths to resolve.
+3. **Mutual perturbations**: Jupiter–Saturn gravitational interaction causes ~1° longitude perturbations over their ~20-year conjunction cycle. Captured by the gravitation correction layer. The 1226 conjunction (774 years from J2000) still shows 2.8° separation.
+
+4. **Elliptical orbit limitation**: At Mercury transits (inferior conjunction), the circular orbit produces ~0.2° Dec errors at specific dates. This would require elliptical orbit paths to resolve.
 
 ---
 
