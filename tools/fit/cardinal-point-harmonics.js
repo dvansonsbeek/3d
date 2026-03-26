@@ -46,24 +46,31 @@ function readData() {
 }
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
+// Fits self-corrected harmonics (matching runtime formula) plus a constant
+// term that absorbs the offset between IAU anchor + linear and actual data.
+// The constant becomes the anchor adjustment (anchorShift).
+//
+// Runtime formula: JD = (anchor + shift) + mean × (year - 2000) + h(year) - h(2000)
 function fitHarmonics(data, divisors) {
   const n = data.length;
-  const m = divisors.length * 2;
+  const nHarm = divisors.length * 2;
+  const m = nHarm + 1; // +1 for constant (anchor shift)
+  const anchor = data[0].anchor; // IAU J2000 anchor
+  const t2000 = 2000 - C.balancedYear;
 
-  // Linear trend: JD = anchor + meanSolarYear * (year - 2000)
-  // Residual = JD - linear
   const A = new Array(n);
   const b = new Float64Array(n);
 
   for (let i = 0; i < n; i++) {
-    const linearJD = C.meanSolarYearDays * (data[i].year - GRID_YEAR); // grid year anchor
-    b[i] = data[i].jd - (data[i].anchor + linearJD);
+    b[i] = data[i].jd - (anchor + C.meanSolarYearDays * (data[i].year - 2000));
     A[i] = new Float64Array(m);
+    A[i][0] = 1; // constant term (anchor shift)
     const t = data[i].year - C.balancedYear;
     for (let k = 0; k < divisors.length; k++) {
       const phase = 2 * Math.PI * t / (C.H / divisors[k]);
-      A[i][2 * k] = Math.sin(phase);
-      A[i][2 * k + 1] = Math.cos(phase);
+      const phase0 = 2 * Math.PI * t2000 / (C.H / divisors[k]);
+      A[i][1 + 2 * k] = Math.sin(phase) - Math.sin(phase0);
+      A[i][1 + 2 * k + 1] = Math.cos(phase) - Math.cos(phase0);
     }
   }
 
@@ -84,30 +91,18 @@ function fitHarmonics(data, divisors) {
 
   const x = solveCholesky(ATA, ATb, m);
 
+  const anchorShift = x[0]; // constant term = anchor adjustment
   const harmonics = [];
   for (let k = 0; k < divisors.length; k++) {
-    harmonics.push([divisors[k], x[2 * k], x[2 * k + 1]]);
+    harmonics.push([divisors[k], x[1 + 2 * k], x[1 + 2 * k + 1]]);
   }
 
-  // Compute RMSE using self-corrected runtime formula:
-  //   JD = adjustedAnchor + mean × (year - 2000) + h(year) - h(2000)
-  // where adjustedAnchor is derived so the formula is exact at gridYear.
-  const t2000 = 2000 - C.balancedYear;
-  const tGrid = GRID_YEAR - C.balancedYear;
-  let hGrid = 0, h2000 = 0;
-  for (const [div, sinC, cosC] of harmonics) {
-    hGrid += sinC * Math.sin(2 * Math.PI * tGrid / (C.H / div))
-           + cosC * Math.cos(2 * Math.PI * tGrid / (C.H / div));
-    h2000 += sinC * Math.sin(2 * Math.PI * t2000 / (C.H / div))
-           + cosC * Math.cos(2 * Math.PI * t2000 / (C.H / div));
-  }
-  // adjustedAnchor = dataAnchor - mean × delta - (hGrid - h2000)
-  const adjustedAnchor = data[0].anchor - C.meanSolarYearDays * DELTA_FROM_J2000 - (hGrid - h2000);
-
+  // Compute RMSE using the runtime formula:
+  //   JD = (anchor + shift) + mean × (year - 2000) + h(year) - h(2000)
   let sse = 0;
   for (let i = 0; i < n; i++) {
     const t = data[i].year - C.balancedYear;
-    let pred = adjustedAnchor + C.meanSolarYearDays * (data[i].year - 2000);
+    let pred = (anchor + anchorShift) + C.meanSolarYearDays * (data[i].year - 2000);
     for (const [div, sinC, cosC] of harmonics) {
       const phase = 2 * Math.PI * t / (C.H / div);
       const phase0 = 2 * Math.PI * t2000 / (C.H / div);
@@ -119,7 +114,7 @@ function fitHarmonics(data, divisors) {
   }
   const rmse = Math.sqrt(sse / n);
 
-  return { harmonics, rmse };
+  return { harmonics, rmse, anchorShift };
 }
 
 function solveCholesky(A, b, n) {
@@ -199,12 +194,11 @@ function main() {
   const results = {};
 
   for (const type of types) {
-    // Use the actual JD from the data at grid year as the fitting anchor.
-    // This avoids the ~182-day offset between model year epoch and actual cardinal point date.
-    const gridRow = byType[type].find(d => d.year === GRID_YEAR);
-    const anchor = gridRow ? gridRow.jd : C.CARDINAL_POINT_ANCHORS[type];
+    // Use IAU J2000 anchor directly — event years derived from JD eliminate the
+    // ~182-day offset between model year epoch and actual cardinal point date.
+    const anchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
     const data = byType[type].map(d => ({ ...d, anchor }));
-    console.log(`\n── ${type} (${data.length} points, anchor=${anchor.toFixed(3)} at year ${GRID_YEAR}) ──`);
+    console.log(`\n── ${type} (${data.length} points, J2000 anchor=${anchor.toFixed(3)}) ──`);
 
     // Fit with current divisors from constants.js
     const currentDivisors = C.CARDINAL_POINT_HARMONICS[type].map(h => h[0]);
@@ -256,39 +250,21 @@ function main() {
     console.log(`  ${type} | ${current.rmse.toFixed(2)} min     | ${greedy.rmse.toFixed(2)} min  | [${greedy.divisors.join(',')}]`);
   }
 
-  // ─── Derive J2000 anchors for the runtime formula ──────────────────────
-  // Fitting: JD = dataAnchor + mean × (year - gridYear) + h(year)
-  // Runtime: JD = anchor_J2000 + mean × (year - 2000) + h(year) - h(2000)
-  // Setting equal (h(year) cancels):
-  //   anchor_J2000 = dataAnchor + mean × (2000 - gridYear) + h(2000)
+  // ─── Adjusted J2000 anchors ─────────────────────────────────────────────
+  // The fitted constant (anchorShift) absorbs the offset between IAU anchor
+  // and the actual data. adjusted = IAU + shift. At year 2000, the self-corrected
+  // harmonics cancel, so JD = adjusted anchor exactly.
 
-  console.log(`\n── J2000 anchors (derived from data anchor at grid year ${GRID_YEAR}) ──`);
+  console.log(`\n── Adjusted J2000 anchors ──`);
   const adjustedAnchors = {};
   for (const type of types) {
-    const harmonics = results[type].greedy.harmonics;
-    const dataAnchor = results[type].anchor;
-    const t2000 = 2000 - C.balancedYear;
-    const tGrid = GRID_YEAR - C.balancedYear;
-    let harm2000 = 0, harmGrid = 0;
-    for (const [div, sinC, cosC] of harmonics) {
-      harm2000 += sinC * Math.sin(2 * Math.PI * t2000 / (C.H / div))
-                + cosC * Math.cos(2 * Math.PI * t2000 / (C.H / div));
-      harmGrid += sinC * Math.sin(2 * Math.PI * tGrid / (C.H / div))
-                + cosC * Math.cos(2 * Math.PI * tGrid / (C.H / div));
-    }
-    const j2000Anchor = dataAnchor + C.meanSolarYearDays * (2000 - GRID_YEAR) + harm2000;
-    adjustedAnchors[type] = j2000Anchor;
+    const iauAnchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
+    const shift = results[type].greedy.anchorShift;
+    const adjusted = iauAnchor + shift;
+    adjustedAnchors[type] = adjusted;
 
-    // Verify: runtime at gridYear should reproduce fitting at gridYear
-    // Runtime: j2000Anchor + mean × (gridYear - 2000) + harmGrid - harm2000
-    // Fitting: dataAnchor + 0 + harmGrid
-    const runtimeAtGrid = j2000Anchor + C.meanSolarYearDays * (GRID_YEAR - 2000) + harmGrid - harm2000;
-    const fittingAtGrid = dataAnchor + harmGrid;
-    const gridErr = (runtimeAtGrid - fittingAtGrid) * 24 * 60;
-    const iauJ2000 = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
-    const j2000Err = (j2000Anchor - iauJ2000) * 24 * 60;
-
-    console.log(`  ${type}: J2000=${j2000Anchor.toFixed(6)} (IAU: ${iauJ2000.toFixed(3)}, diff: ${j2000Err.toFixed(2)} min), grid verify err: ${gridErr.toFixed(4)} min`);
+    const shiftMin = shift * 24 * 60;
+    console.log(`  ${type}: IAU=${iauAnchor.toFixed(6)} + shift=${shiftMin.toFixed(2)} min → adjusted=${adjusted.toFixed(6)}`);
   }
 
   // ─── Write to fitted-coefficients.json if --write flag is present ────
