@@ -184,7 +184,7 @@ for (const target of targets) {
     const dd = result.distAU;
     const u = (modelRA - ascNode) * d2r;
     const conjPhase = 2 * Math.PI * (year - 2000) / tripleSynodicYears;
-    const dt = pt.jd - 2451545.0;
+    const dt = pt.jd - C.j2000JD;
     const Lsun = (280.460 + 0.9856474 * dt) * d2r; // Sun mean longitude
     // Planet mean anomaly (heliocentric orbital phase) — dynamic from scene graph EoC
     // Only for Mercury and Venus where orbital period is short enough

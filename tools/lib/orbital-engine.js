@@ -716,9 +716,18 @@ function evalYearFourier(year, mean, harmonics) {
   return result;
 }
 
-/** Compute tropical year length in days. */
-function computeLengthOfSolarYear(year) {
+/** Compute simplified tropical year length in days (Fourier harmonics around mean). */
+function computeLengthOfSimplifiedSolarYear(year) {
   return evalYearFourier(year, C.meanSolarYearDays, C.TROPICAL_YEAR_HARMONICS);
+}
+
+/** Compute tropical year length in days as mean of 4 cardinal point year lengths.
+ *  This is the physically correct definition: the mean return time to solstices/equinoxes. */
+function computeLengthOfSolarYear(year) {
+  return (computeSolsticeYearLength(year, 'SS') +
+          computeSolsticeYearLength(year, 'WS') +
+          computeSolsticeYearLength(year, 'VE') +
+          computeSolsticeYearLength(year, 'AE')) / 4;
 }
 
 /** Compute sidereal year length in days. */
@@ -1346,6 +1355,7 @@ module.exports = {
   // Year Length
   evalYearFourier,
   computeLengthOfSolarYear,
+  computeLengthOfSimplifiedSolarYear,
   computeLengthOfSiderealYear,
   computeLengthOfAnomalisticYearRealLOD,
   computeLengthOfAnomalisticYearDays,

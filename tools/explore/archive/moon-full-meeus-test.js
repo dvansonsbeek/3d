@@ -216,7 +216,7 @@ const TABLE_47B = [
  * Returns { lambda_deg, beta_deg } — geocentric ecliptic coordinates.
  */
 function meeusFullMoon(jd) {
-  const T = (jd - 2451545.0) / 36525;
+  const T = (jd - C.j2000JD) / C.julianCenturyDays;
   const T2 = T * T;
   const T3 = T2 * T;
   const T4 = T3 * T;
@@ -315,7 +315,7 @@ function eclipticToEquatorial(lambda_deg, beta_deg, T) {
  * Full Meeus Sun position (Meeus Ch. 25 — low accuracy method).
  */
 function meeusSun(jd) {
-  const T = (jd - 2451545.0) / 36525;
+  const T = (jd - C.j2000JD) / C.julianCenturyDays;
   const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
   const Mr = M * d2r;

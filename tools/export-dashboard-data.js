@@ -17,8 +17,8 @@ const OUTPUT_DIR = path.join(__dirname, '..', 'dashboard', 'data');
 
 // ── Configuration ──────────────────────────────────────────────────────────
 
-const STEP = 29;                          // years between data points
-const H = C.H;                            // 335,008 — one full Holistic Year
+const STEP = C.stepYears;                 // years between data points (from model-parameters.json)
+const H = C.H;                            // one full Holistic Year
 const startYear = C.balancedYear;         // start of the cycle
 const endYear = startYear + 2 * H;        // 2 full Holistic Years
 const PLANET_NAMES = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];

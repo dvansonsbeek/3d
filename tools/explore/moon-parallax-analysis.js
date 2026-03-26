@@ -143,7 +143,7 @@ const TABLE_47B = [
 ];
 
 function meeusFullMoon(jd) {
-  const T = (jd - 2451545.0) / 36525;
+  const T = (jd - C.j2000JD) / C.julianCenturyDays;
   const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
   let Lp = 218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000;
@@ -214,7 +214,7 @@ function meeusFullMoon(jd) {
 }
 
 function meeusSun(jd) {
-  const T = (jd - 2451545.0) / 36525;
+  const T = (jd - C.j2000JD) / C.julianCenturyDays;
   const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
   const Mr = M * d2r;

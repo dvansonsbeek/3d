@@ -27,7 +27,7 @@ function getArg(name, defaultVal) {
   return idx >= 0 && args[idx + 1] ? args[idx + 1] : defaultVal;
 }
 
-const STEP_YEARS = parseInt(getArg('step', '29'), 10);
+const STEP_YEARS = parseInt(getArg('step', String(C.stepYears)), 10);
 const START_YEAR = parseInt(getArg('start', String(C.balancedYear)), 10);
 const END_YEAR = parseInt(getArg('end', String(C.balancedYear + C.H)), 10);
 const OUTPUT_PATH = path.join(__dirname, '..', '..', 'data', '03-year-length-analysis.xlsx');
@@ -231,10 +231,12 @@ function findSiderealCrossing(year, targetAngle, prevJD) {
 const startYear = START_YEAR;
 const endYear = END_YEAR;
 
-// Verify year 2000 is on the grid
-const yearSpan = 2000 - startYear;
-if (yearSpan % STEP_YEARS !== 0) {
-  console.error(`WARNING: step ${STEP_YEARS} does not land on year 2000.`);
+// Verify grid year is on the step grid
+const gridCheck = (C.gridYear - startYear) % STEP_YEARS;
+if (Math.abs(gridCheck) > 0.001) {
+  console.error(`WARNING: step ${STEP_YEARS} does not land on grid year ${C.gridYear}.`);
+} else {
+  console.error(`Grid year ${C.gridYear} is on the step grid (step=${STEP_YEARS}).`);
 }
 
 console.log(`Exporting year-length analysis: ${startYear} to ${endYear}, step ${STEP_YEARS}`);

@@ -261,7 +261,7 @@ function main() {
   // ─── Greedy search for better harmonics ────────────────────────────
   console.log('\n── Greedy harmonic selection (start from 5 Fibonacci) ──');
   const fibDivisors = [3, 5, 8, 13, 16];
-  const greedy = greedySelect(data, obliqMean, fibDivisors, 16, 55);
+  const greedy = greedySelect(data, obliqMean, fibDivisors, 16, 120);
 
   console.log(`\nFinal (${greedy.divisors.length} harmonics): RMSE = ${(greedy.rmse * 3600).toFixed(3)}"`);
   console.log('\nCoefficients:');
@@ -298,14 +298,39 @@ function main() {
   }
   console.log('];');
 
+  // ─── Smart anchor: adjust mean so formula gives IAU obliquity at nearest grid year ──
+  const gridYear = C.gridYear;
+  const iauAtGrid = C.iauObliquityAtGrid;
+
+  // Evaluate harmonics at grid year
+  let harmonicsAtGrid = 0;
+  const tGrid = gridYear - C.balancedYear;
+  for (const [div, sinC, cosC] of greedy.harmonics) {
+    const phase = 2 * Math.PI * tGrid / (C.H / div);
+    harmonicsAtGrid += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+
+  // Adjusted mean: MEAN = IAU_at_grid - harmonics(grid)
+  const adjustedMean = iauAtGrid - harmonicsAtGrid;
+  console.log(`\n── Smart anchor (grid year ${gridYear}, delta=${C.gridYearDeltaFromJ2000}yr) ──`);
+  console.log(`  IAU obliquity at grid:  ${iauAtGrid.toFixed(6)}°`);
+  console.log(`  Harmonics at grid:      ${(harmonicsAtGrid * 3600).toFixed(2)}"`);
+  console.log(`  Data-derived mean:      ${obliqMean.toFixed(6)}°`);
+  console.log(`  Adjusted mean:          ${adjustedMean.toFixed(6)}°`);
+  console.log(`  Shift:                  ${((adjustedMean - obliqMean) * 3600).toFixed(2)}"`);
+
+  // Verify: formula at grid year should now give IAU
+  const verifyObliq = adjustedMean + harmonicsAtGrid;
+  console.log(`  Verify at grid:         ${verifyObliq.toFixed(6)}° (IAU: ${iauAtGrid.toFixed(6)}°, diff: ${((verifyObliq - iauAtGrid) * 3600).toFixed(4)}")`);
+
   // ─── Write to fitted-coefficients.json if --write flag is present ────
   if (process.argv.includes('--write')) {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = obliqMean;
+    fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = adjustedMean;  // Smart anchor: IAU at grid - harmonics(grid)
     fc.SOLSTICE_OBLIQUITY_HARMONICS = greedy.harmonics;
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
-    console.log(`\n  ✓ Written SOLSTICE_OBLIQUITY_MEAN_FITTED = ${obliqMean.toFixed(8)}° to fitted-coefficients.json`);
+    console.log(`\n  ✓ Written SOLSTICE_OBLIQUITY_MEAN_FITTED = ${adjustedMean.toFixed(8)}° to fitted-coefficients.json`);
     console.log('  ✓ Written SOLSTICE_OBLIQUITY_HARMONICS to fitted-coefficients.json');
   } else {
     console.log('\n  (dry run — add --write to update fitted-coefficients.json)');

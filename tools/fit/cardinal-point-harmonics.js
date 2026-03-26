@@ -6,7 +6,9 @@
  * fits 12 Fourier harmonics per type to the JD residuals (after removing
  * the linear trend), and outputs copy-paste coefficients.
  *
- * The harmonics are self-corrected to return the exact J2000 anchor value.
+ * The harmonics are self-corrected to return the exact anchor value at the
+ * nearest grid year to J2000. When steps don't land on year 2000 exactly,
+ * the anchors are shifted using IAU rates.
  *
  * Usage: node tools/fit/cardinal-point-harmonics.js
  */
@@ -16,6 +18,11 @@ const path = require('path');
 const C = require('../lib/constants');
 
 const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-cardinal-points.csv');
+
+// ─── Grid year and shifted anchors (from constants.js) ───────────────────
+const GRID_YEAR = C.gridYear;
+const DELTA_FROM_J2000 = C.gridYearDeltaFromJ2000;
+const GRID_ANCHORS = C.cardinalPointAnchorsAtGrid;
 
 // ─── Read CSV data by type ───────────────────────────────────────────────
 function readData() {
@@ -49,7 +56,7 @@ function fitHarmonics(data, divisors) {
   const b = new Float64Array(n);
 
   for (let i = 0; i < n; i++) {
-    const linearJD = C.meanSolarYearDays * (data[i].year - 2000); // anchor cancels in residual
+    const linearJD = C.meanSolarYearDays * (data[i].year - GRID_YEAR); // anchor cancels in residual
     b[i] = data[i].jd - (data[i].anchor + linearJD);
     A[i] = new Float64Array(m);
     const t = data[i].year - C.balancedYear;
@@ -86,9 +93,9 @@ function fitHarmonics(data, divisors) {
   let sse = 0;
   for (let i = 0; i < n; i++) {
     const t = data[i].year - C.balancedYear;
-    let pred = data[i].anchor + C.meanSolarYearDays * (data[i].year - 2000);
+    let pred = data[i].anchor + C.meanSolarYearDays * (data[i].year - GRID_YEAR);
     // Self-correction: harmonics(year) - harmonics(2000)
-    const t2000 = 2000 - C.balancedYear;
+    const t2000 = GRID_YEAR - C.balancedYear;
     for (const [div, sinC, cosC] of harmonics) {
       const phase = 2 * Math.PI * t / (C.H / div);
       const phase0 = 2 * Math.PI * t2000 / (C.H / div);
@@ -169,6 +176,10 @@ function main() {
   console.log('═══════════════════════════════════════════════════════════════');
   console.log(`\nUsing constants.js: H=${C.H}, balancedYear=${C.balancedYear}`);
   console.log(`meanSolarYearDays=${C.meanSolarYearDays}`);
+  console.log(`Grid year (nearest to J2000): ${GRID_YEAR} (delta=${DELTA_FROM_J2000}yr)`);
+  for (const [type, jd] of Object.entries(GRID_ANCHORS)) {
+    console.log(`  ${type} anchor: J2000=${C.CARDINAL_POINT_ANCHORS[type].toFixed(3)} → grid=${jd.toFixed(3)}`);
+  }
 
   const byType = readData();
   const types = ['SS', 'WS', 'VE', 'AE'];
@@ -176,7 +187,7 @@ function main() {
   const results = {};
 
   for (const type of types) {
-    const anchor = C.CARDINAL_POINT_ANCHORS[type];
+    const anchor = GRID_ANCHORS[type];
     const data = byType[type].map(d => ({ ...d, anchor }));
     console.log(`\n── ${type} (${data.length} points, anchor=${anchor}) ──`);
 
@@ -230,6 +241,41 @@ function main() {
     console.log(`  ${type} | ${current.rmse.toFixed(2)} min     | ${greedy.rmse.toFixed(2)} min  | [${greedy.divisors.join(',')}]`);
   }
 
+  // ─── Smart anchor: adjust J2000 anchors so runtime formula is correct ────
+  // The runtime formula (computeSolsticeJD) uses:
+  //   JD = anchor_J2000 + mean × (year - 2000) + harmonics(year) - harmonics(2000)
+  // Our harmonics were fitted relative to GRID_YEAR. We need to compute what
+  // anchor_J2000 makes the formula give the correct JD at the grid year.
+  //
+  // At GRID_YEAR: JD_true = GRID_ANCHOR
+  //   GRID_ANCHOR = anchor_J2000 + mean × (GRID_YEAR - 2000) + harm(GRID) - harm(2000)
+  //   anchor_J2000 = GRID_ANCHOR - mean × (GRID_YEAR - 2000) - harm(GRID) + harm(2000)
+  //                = GRID_ANCHOR - mean × delta - (harm(GRID) - harm(2000))
+
+  console.log(`\n── Smart J2000 anchors (grid year ${GRID_YEAR}) ──`);
+  const adjustedAnchors = {};
+  for (const type of types) {
+    const harmonics = results[type].greedy.harmonics;
+    const tGrid = GRID_YEAR - C.balancedYear;
+    const t2000 = 2000 - C.balancedYear;
+    let harmGrid = 0, harm2000 = 0;
+    for (const [div, sinC, cosC] of harmonics) {
+      const phaseGrid = 2 * Math.PI * tGrid / (C.H / div);
+      const phase2000 = 2 * Math.PI * t2000 / (C.H / div);
+      harmGrid += sinC * Math.sin(phaseGrid) + cosC * Math.cos(phaseGrid);
+      harm2000 += sinC * Math.sin(phase2000) + cosC * Math.cos(phase2000);
+    }
+    const gridAnchor = GRID_ANCHORS[type];
+    const j2000Anchor = gridAnchor - C.meanSolarYearDays * DELTA_FROM_J2000 - (harmGrid - harm2000);
+
+    // Verify: runtime formula at GRID_YEAR should give GRID_ANCHOR
+    const verify = j2000Anchor + C.meanSolarYearDays * DELTA_FROM_J2000 + harmGrid - harm2000;
+    const verifyErr = (verify - gridAnchor) * 24 * 60; // minutes
+
+    adjustedAnchors[type] = j2000Anchor;
+    console.log(`  ${type}: grid=${gridAnchor.toFixed(3)} → J2000=${j2000Anchor.toFixed(6)} (verify err: ${verifyErr.toFixed(4)} min)`);
+  }
+
   // ─── Write to fitted-coefficients.json if --write flag is present ────
   if (process.argv.includes('--write')) {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
@@ -239,8 +285,10 @@ function main() {
       harmonicsObj[type] = results[type].greedy.harmonics;
     }
     fc.CARDINAL_POINT_HARMONICS = harmonicsObj;
+    fc.CARDINAL_POINT_ANCHORS_ADJUSTED = adjustedAnchors;
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS to fitted-coefficients.json');
+    console.log('  ✓ Written CARDINAL_POINT_ANCHORS_ADJUSTED to fitted-coefficients.json');
   } else {
     console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }

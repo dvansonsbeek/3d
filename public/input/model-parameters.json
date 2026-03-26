@@ -1,22 +1,23 @@
 {
   "_description": "Model parameters — values that define the Holistic Universe Model theory. Changing any value = different model. Source of truth for both tools/lib/constants.js and src/script.js.",
   "foundational": {
-    "holisticyearLength": 335008,
-    "inputmeanlengthsolaryearindays": 365.2421897,
+    "holisticyearLength": 334992,
+    "stepYears": 21,
+    "inputmeanlengthsolaryearindays": 365.2422,
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
-    "correctionDays": -0.23328398168087,
-    "correctionSun": 0.49642324742187505,
+    "correctionDays": -0.242011755704879,
+    "correctionSun": 0.4962681151570557,
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
     "psiNumerator": 2205
   },
   "earth": {
-    "earthtiltMean": 23.4136577082204,
-    "earthInvPlaneInclinationAmplitude": 0.6354591196810362,
+    "earthtiltMean": 23.41366362719282,
+    "earthInvPlaneInclinationAmplitude": 0.6354285125795287,
     "eccentricityBase": 0.01537159,
-    "eccentricityAmplitude": 0.0013707412825169742,
+    "eccentricityAmplitude": 0.0013707444053579821,
     "eccentricityAmplitudeK": 0.0000034505372893
   },
   "moon": {
@@ -32,8 +33,8 @@
       "orbitalEccentricityAmplitude": 0.00008436789,
       "eccentricityPhaseJ2000": 89.9882,
       "eocFraction": -0.527,
-      "startpos": 83.69268896492527,
-      "angleCorrection": 0.970907549119584,
+      "startpos": 83.70004476766631,
+      "angleCorrection": 0.9709080901966658,
       "perihelionEclipticFraction": [
         8,
         11
@@ -58,8 +59,8 @@
       "orbitalEccentricityAmplitude": 0.0009625389,
       "eccentricityPhaseJ2000": 123.7514,
       "eocFraction": 0.436,
-      "startpos": 249.30943979458556,
-      "angleCorrection": -2.8028684488443147,
+      "startpos": 249.3096870649955,
+      "angleCorrection": -2.8028858234795173,
       "perihelionEclipticFraction": [
         2,
         1
@@ -81,8 +82,8 @@
       "orbitalEccentricityAmplitude": 0.003073636,
       "eccentricityPhaseJ2000": 96.8878,
       "eocFraction": -0.066224,
-      "startpos": 121.47855299438493,
-      "angleCorrection": -2.109362111899337,
+      "startpos": 121.48011003150216,
+      "angleCorrection": -2.109359104675395,
       "perihelionEclipticFraction": [
         3,
         13
@@ -107,8 +108,8 @@
       "orbitalEccentricityAmplitude": 0.000001149908,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.495,
-      "startpos": 13.877569561157502,
-      "angleCorrection": 0.9270355609260399,
+      "startpos": 13.881381149476912,
+      "angleCorrection": 0.9270346937948375,
       "perihelionEclipticFraction": [
         1,
         5
@@ -133,8 +134,8 @@
       "orbitalEccentricityAmplitude": 0.000005403008,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.54,
-      "startpos": 11.270284061118005,
-      "angleCorrection": -0.17477220007971184,
+      "startpos": 11.277520596049827,
+      "angleCorrection": -0.17477195458654293,
       "perihelionEclipticFraction": [
         -1,
         8
@@ -160,7 +161,7 @@
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.53,
       "startpos": 44.90049171476649,
-      "angleCorrection": -0.7345961784536748,
+      "angleCorrection": -0.7345936479166468,
       "perihelionEclipticFraction": [
         1,
         3
@@ -185,8 +186,8 @@
       "orbitalEccentricityAmplitude": 0.000008098033,
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.585,
-      "startpos": 47.95482193930442,
-      "angleCorrection": 2.3338183719950543,
+      "startpos": 47.95490974720592,
+      "angleCorrection": 2.3338143264418996,
       "perihelionEclipticFraction": [
         2,
         1

@@ -669,8 +669,8 @@ function moveModel(graph, pos) {
     // Full Meeus Ch. 47 lunar perturbations (longitude + latitude, 60+60 terms)
     // Meeus formulas require T from standard J2000.0 (JD 2451545.0) in Julian centuries (36525 days)
     if (C.useVariableSpeed && def.lunarPerturbations) {
-      const d = (C.startmodelJD - 2451545.0) + pos * C.meanSolarYearDays;
-      const T = d / 36525;
+      const d = (C.startmodelJD - C.j2000JD) + pos * C.meanSolarYearDays;
+      const T = d / C.julianCenturyDays;
       const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
 
       // Fundamental arguments from centralized Meeus tables
@@ -921,7 +921,7 @@ function computePlanetPosition(target, jd) {
     const sin2CP = Math.sin(2 * conjPhase), cos2CP = Math.cos(2 * conjPhase);
 
     // Sun mean longitude for eccentricity-offset terms (AX-BA)
-    const _Lsun = (280.460 + 0.9856474 * (jd - 2451545.0)) * d2r;
+    const _Lsun = (280.460 + 0.9856474 * (jd - C.j2000JD)) * d2r;
     const sinLsun = Math.sin(_Lsun), cosLsun = Math.cos(_Lsun);
 
     // Planet mean anomaly for heliocentric orbital phase terms (BR-CA)
@@ -1215,8 +1215,69 @@ function getWobbleSunDistAU(jd) {
   return Math.sqrt(sunWP[0]*sunWP[0] + sunWP[1]*sunWP[1] + sunWP[2]*sunWP[2]) / 100;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FAST SUN POSITION — Only animates Earth precession + Sun node.
+// Skips all planets, Moon, and dynamic ascending node computations.
+// ~5-10x faster than computePlanetPosition('sun', jd).
+// Use for cardinal point / year-length exports that scan Sun RA at high frequency.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function computeSunPositionFast(jd) {
+  const graph = getGraph();
+  const pos = sDay * (jd - C.startmodelJD);
+
+  // Compute Earth eccentricity for EoC
+  const currentYear = C.balancedYear + (C.startmodelJD + pos * C.meanSolarYearDays - C.balancedJD) / C.meanSolarYearDays;
+  const earthEcc = OE.computeEccentricity(currentYear, C.balancedYear, C.perihelionCycleLength, C.eccentricityBase, C.eccentricityAmplitude);
+
+  // Animate a single node: orbit.ry = θ (with EoC if applicable)
+  function animateFast(nodes, def) {
+    let θ = def.speed * pos - def.startPos * d2r;
+    if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
+      const e = def._eocDerived
+        ? earthEcc - C.eccentricityBase / 2
+        : def.eccentricity;
+      const perihelionPhase = def.perihelionPhaseJ2000 + (def.perihelionPrecessionRate || 0) * pos;
+      const M = θ - perihelionPhase;
+      θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
+    }
+    nodes.orbit.ry = θ;
+  }
+
+  // Animate Earth + precession chain + Sun only
+  animateFast(graph.earthNodes, graph.earthNodes.def);
+  const precLayers = [
+    [graph.earthInclPrec, graph.earthInclPrec.def],
+    [graph.earthEclipPrec, graph.earthEclipPrec.def],
+    [graph.earthObliqPrec, graph.earthObliqPrec.def],
+    [graph.earthPeriPrec1, graph.earthPeriPrec1.def],
+    [graph.earthPeriPrec2, graph.earthPeriPrec2.def],
+    [graph.barycenter, graph.barycenter.def],
+  ];
+  for (const [nodes, def] of precLayers) animateFast(nodes, def);
+  animateFast(graph.sunNodes, graph.sunNodes.def);
+
+  // Update world matrices from root
+  graph.root.updateWorldMatrix();
+
+  // Extract Sun position in Earth's equatorial frame
+  const earthRotAxisWP = graph.earthNodes.rotAxis.getWorldPosition();
+  const sunWP = graph.sunNodes.pivot.getWorldPosition();
+
+  const dx = sunWP[0] - earthRotAxisWP[0];
+  const dy = sunWP[1] - earthRotAxisWP[1];
+  const dz = sunWP[2] - earthRotAxisWP[2];
+  const distAU = Math.sqrt(dx*dx + dy*dy + dz*dz) / 100;
+
+  const local = graph.earthNodes.rotAxis.worldToLocal(sunWP[0], sunWP[1], sunWP[2]);
+  const sph = cartesianToSpherical(local[0], local[1], local[2]);
+
+  return { ra: sph.theta, dec: sph.phi, distAU, sunDistAU: distAU };
+}
+
 module.exports = {
   computePlanetPosition,
+  computeSunPositionFast,
   getSunWorldAngle,
   getWobbleSunDistAU,
   phiToDecDeg,

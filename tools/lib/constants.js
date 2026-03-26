@@ -199,6 +199,29 @@ const meanAnomalisticYearDays = (meanSolarYearDays / (perihelionCycleLength - 1)
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
 const totalDaysInH = H * meanSolarYearDays;
 
+// ── Step size and grid year (derived from H and startmodelYear) ──────────
+const stepYears = modelParams.foundational.stepYears || 21;
+const gridYear = balancedYear + Math.round((2000 - balancedYear) / stepYears) * stepYears;
+const gridYearDeltaFromJ2000 = gridYear - 2000;
+
+// Cardinal point year fractions for initial search (derived from startmodelYear offset)
+// Maps calendar event to approximate year fraction from the model epoch
+const _epochOffset = startmodelYear % 1;  // 0.5 for mid-year epoch
+const cardinalPointYearFractions = {
+  SS: 0.47 - _epochOffset,                   // June solstice
+  WS: 0.97 - _epochOffset,                   // December solstice
+  VE: ((0.22 - _epochOffset) % 1 + 1) % 1,  // March equinox (wrap if negative)
+  AE: 0.73 - _epochOffset,                   // September equinox
+};
+
+// Shifted IAU values at grid year (for harmonic fitting when grid ≠ J2000)
+const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg
+  + (ASTRO_REFERENCE.obliquityRate_arcsecPerCentury / 3600 / 100) * gridYearDeltaFromJ2000;
+const cardinalPointAnchorsAtGrid = {};
+for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors)) {
+  cardinalPointAnchorsAtGrid[type] = jd2000 + meanSolarYearDays * gridYearDeltaFromJ2000;
+}
+
 // J2000.0 epoch (standard astronomical convention: Jan 1.5, 2000 TT = JD 2451545.0)
 // Julian century = exactly 36525 days by IAU definition (used in Meeus, IAU precession, parallax)
 // Tropical century = 100 model tropical years (used in obliquity rate solver for phase-clean measurement)
@@ -473,6 +496,12 @@ module.exports = {
   startModelYearWithCorrection,
   balancedYear,
   balancedJD,
+  stepYears,
+  gridYear,
+  gridYearDeltaFromJ2000,
+  cardinalPointYearFractions,
+  iauObliquityAtGrid,
+  cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
   meanSiderealYearDays,
   meanLengthOfDay,

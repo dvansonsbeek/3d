@@ -134,7 +134,7 @@ async function main() {
 
   // Drift trend
   console.log('\n  Ecl.Lon drift (Δλ vs time from J2000):');
-  const jd_j2000 = 2451545.0;
+  const jd_j2000 = C.j2000JD;
   for (const e of errors) {
     const dt = (e.jd - jd_j2000) / 365.25;
     const bar = e.dLon > 0 ? '+'.repeat(Math.min(40, Math.round(Math.abs(e.dLon) * 20)))

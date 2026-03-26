@@ -55,7 +55,7 @@ try {
 console.log('═══ Step 2: Scene graph positions ═══');
 try {
   const SG = require('../lib/scene-graph');
-  const jd = 2451545.0; // J2000
+  const jd = C.j2000JD; // J2000
   for (const target of ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
     const pos = SG.computePlanetPosition(target, jd);
     const ok = pos && typeof pos.ra === 'number' && typeof pos.dec === 'number';

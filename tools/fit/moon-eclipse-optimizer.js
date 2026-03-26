@@ -206,7 +206,7 @@ const d2r = Math.PI / 180;
 
 // Compute lunar arguments
 for (const e of entries) {
-  const dJD = e.jd - 2451545.0;
+  const dJD = e.jd - C.j2000JD;
   e.Dc  = (297.850 + 12.19074912 * dJD) * d2r;
   e.Mpc = (134.963 + 13.06499295 * dJD) * d2r;
   e.Msc = (357.529 + 0.98560028 * dJD) * d2r;
