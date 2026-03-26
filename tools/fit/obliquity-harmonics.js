@@ -298,36 +298,48 @@ function main() {
   }
   console.log('];');
 
-  // ─── Smart anchor: adjust mean so formula gives IAU obliquity at nearest grid year ──
+  // ─── Smart anchor: adjust mean so formula gives exact IAU obliquity at J2000 ──
+  const IAU_J2000 = C.ASTRO_REFERENCE.obliquityJ2000_deg;
+
+  // Evaluate harmonics at J2000
+  let harmonicsAt2000 = 0;
+  const t2000 = 2000 - C.balancedYear;
+  for (const [div, sinC, cosC] of greedy.harmonics) {
+    const phase = 2 * Math.PI * t2000 / (C.H / div);
+    harmonicsAt2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+
+  // Adjusted mean: MEAN = IAU_J2000 - harmonics(2000)
+  // This guarantees: MEAN + harmonics(2000) = IAU_J2000 exactly
+  const adjustedMean = IAU_J2000 - harmonicsAt2000;
+  console.log(`\n── Smart anchor (J2000) ──`);
+  console.log(`  IAU obliquity at J2000: ${IAU_J2000.toFixed(6)}°`);
+  console.log(`  Harmonics at J2000:     ${(harmonicsAt2000 * 3600).toFixed(2)}"`);
+  console.log(`  Data-derived mean:      ${obliqMean.toFixed(6)}°`);
+  console.log(`  Adjusted mean:          ${adjustedMean.toFixed(6)}°`);
+  console.log(`  Shift:                  ${((adjustedMean - obliqMean) * 3600).toFixed(2)}"`);
+
+  // Verify: formula at J2000 should give exact IAU value
+  const verifyJ2000 = adjustedMean + harmonicsAt2000;
+  console.log(`  Verify at J2000:        ${verifyJ2000.toFixed(6)}° (IAU: ${IAU_J2000.toFixed(6)}°, diff: ${((verifyJ2000 - IAU_J2000) * 3600).toFixed(4)}")`);
+
+  // Also check at grid year
   const gridYear = C.gridYear;
   const iauAtGrid = C.iauObliquityAtGrid;
-
-  // Evaluate harmonics at grid year
   let harmonicsAtGrid = 0;
   const tGrid = gridYear - C.balancedYear;
   for (const [div, sinC, cosC] of greedy.harmonics) {
     const phase = 2 * Math.PI * tGrid / (C.H / div);
     harmonicsAtGrid += sinC * Math.sin(phase) + cosC * Math.cos(phase);
   }
-
-  // Adjusted mean: MEAN = IAU_at_grid - harmonics(grid)
-  const adjustedMean = iauAtGrid - harmonicsAtGrid;
-  console.log(`\n── Smart anchor (grid year ${gridYear}, delta=${C.gridYearDeltaFromJ2000}yr) ──`);
-  console.log(`  IAU obliquity at grid:  ${iauAtGrid.toFixed(6)}°`);
-  console.log(`  Harmonics at grid:      ${(harmonicsAtGrid * 3600).toFixed(2)}"`);
-  console.log(`  Data-derived mean:      ${obliqMean.toFixed(6)}°`);
-  console.log(`  Adjusted mean:          ${adjustedMean.toFixed(6)}°`);
-  console.log(`  Shift:                  ${((adjustedMean - obliqMean) * 3600).toFixed(2)}"`);
-
-  // Verify: formula at grid year should now give IAU
-  const verifyObliq = adjustedMean + harmonicsAtGrid;
-  console.log(`  Verify at grid:         ${verifyObliq.toFixed(6)}° (IAU: ${iauAtGrid.toFixed(6)}°, diff: ${((verifyObliq - iauAtGrid) * 3600).toFixed(4)}")`);
+  const verifyGrid = adjustedMean + harmonicsAtGrid;
+  console.log(`  Verify at grid ${gridYear}: ${verifyGrid.toFixed(6)}° (IAU: ${iauAtGrid.toFixed(6)}°, diff: ${((verifyGrid - iauAtGrid) * 3600).toFixed(4)}")`);
 
   // ─── Write to fitted-coefficients.json if --write flag is present ────
   if (process.argv.includes('--write')) {
     const jsonPath = path.join(__dirname, '..', '..', 'public', 'input', 'fitted-coefficients.json');
     const fc = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = adjustedMean;  // Smart anchor: IAU at grid - harmonics(grid)
+    fc.SOLSTICE_OBLIQUITY_MEAN_FITTED = adjustedMean;  // Smart anchor: IAU_J2000 - harmonics(2000)
     fc.SOLSTICE_OBLIQUITY_HARMONICS = greedy.harmonics;
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log(`\n  ✓ Written SOLSTICE_OBLIQUITY_MEAN_FITTED = ${adjustedMean.toFixed(8)}° to fitted-coefficients.json`);
