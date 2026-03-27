@@ -46,15 +46,16 @@ function readData() {
 }
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
-// Fits self-corrected harmonics (matching runtime formula) plus a constant
-// term that absorbs the offset between IAU anchor + linear and actual data.
-// The constant becomes the anchor adjustment (anchorShift).
+// Uses IAU J2000 anchors directly. Self-corrected harmonics matching runtime.
+// CSV data uses model years (integer + 0.5); we convert to calendar years
+// to match the runtime's computeSolsticeJD(year) which takes calendar years.
+// SS/WS/AE: calYear = modelYear - 0.5 (event in same calendar year)
+// VE: calYear = modelYear + 0.5 (March wraps to next calendar year)
 //
-// Runtime formula: JD = (anchor + shift) + mean × (year - 2000) + h(year) - h(2000)
-function fitHarmonics(data, divisors) {
+// Runtime formula: JD = anchor + mean × (year - 2000) + h(year) - h(2000)
+function fitHarmonics(data, divisors, yearOffset) {
   const n = data.length;
-  const nHarm = divisors.length * 2;
-  const m = nHarm + 1; // +1 for constant (anchor shift)
+  const m = divisors.length * 2;
   const anchor = data[0].anchor; // IAU J2000 anchor
   const t2000 = 2000 - C.balancedYear;
 
@@ -62,15 +63,15 @@ function fitHarmonics(data, divisors) {
   const b = new Float64Array(n);
 
   for (let i = 0; i < n; i++) {
-    b[i] = data[i].jd - (anchor + C.meanSolarYearDays * (data[i].year - 2000));
+    const calYear = data[i].year + yearOffset; // model year → calendar year
+    b[i] = data[i].jd - (anchor + C.meanSolarYearDays * (calYear - 2000));
     A[i] = new Float64Array(m);
-    A[i][0] = 1; // constant term (anchor shift)
-    const t = data[i].year - C.balancedYear;
+    const t = calYear - C.balancedYear;
     for (let k = 0; k < divisors.length; k++) {
       const phase = 2 * Math.PI * t / (C.H / divisors[k]);
       const phase0 = 2 * Math.PI * t2000 / (C.H / divisors[k]);
-      A[i][1 + 2 * k] = Math.sin(phase) - Math.sin(phase0);
-      A[i][1 + 2 * k + 1] = Math.cos(phase) - Math.cos(phase0);
+      A[i][2 * k] = Math.sin(phase) - Math.sin(phase0);
+      A[i][2 * k + 1] = Math.cos(phase) - Math.cos(phase0);
     }
   }
 
@@ -91,18 +92,18 @@ function fitHarmonics(data, divisors) {
 
   const x = solveCholesky(ATA, ATb, m);
 
-  const anchorShift = x[0]; // constant term = anchor adjustment
   const harmonics = [];
   for (let k = 0; k < divisors.length; k++) {
-    harmonics.push([divisors[k], x[1 + 2 * k], x[1 + 2 * k + 1]]);
+    harmonics.push([divisors[k], x[2 * k], x[2 * k + 1]]);
   }
 
-  // Compute RMSE using the runtime formula:
-  //   JD = (anchor + shift) + mean × (year - 2000) + h(year) - h(2000)
+  // Compute RMSE using the runtime formula with calendar years:
+  //   JD = anchor + mean × (calYear - 2000) + h(calYear) - h(2000)
   let sse = 0;
   for (let i = 0; i < n; i++) {
-    const t = data[i].year - C.balancedYear;
-    let pred = (anchor + anchorShift) + C.meanSolarYearDays * (data[i].year - 2000);
+    const calYear = data[i].year + yearOffset;
+    const t = calYear - C.balancedYear;
+    let pred = anchor + C.meanSolarYearDays * (calYear - 2000);
     for (const [div, sinC, cosC] of harmonics) {
       const phase = 2 * Math.PI * t / (C.H / div);
       const phase0 = 2 * Math.PI * t2000 / (C.H / div);
@@ -114,7 +115,7 @@ function fitHarmonics(data, divisors) {
   }
   const rmse = Math.sqrt(sse / n);
 
-  return { harmonics, rmse, anchorShift };
+  return { harmonics, rmse };
 }
 
 function solveCholesky(A, b, n) {
@@ -144,9 +145,9 @@ function solveCholesky(A, b, n) {
 }
 
 // ─── Greedy harmonic selection ───────────────────────────────────────────
-function greedySelect(data, baseDivisors, maxHarmonics, candidateRange) {
+function greedySelect(data, baseDivisors, maxHarmonics, candidateRange, yearOffset) {
   let currentDivisors = [...baseDivisors];
-  let best = fitHarmonics(data, currentDivisors);
+  let best = fitHarmonics(data, currentDivisors, yearOffset);
 
   console.log(`    Base (${currentDivisors.length}): RMSE = ${best.rmse.toFixed(2)} min`);
 
@@ -156,7 +157,7 @@ function greedySelect(data, baseDivisors, maxHarmonics, candidateRange) {
 
     for (let d = 2; d <= candidateRange; d++) {
       if (currentDivisors.includes(d)) continue;
-      const test = fitHarmonics(data, [...currentDivisors, d]);
+      const test = fitHarmonics(data, [...currentDivisors, d], yearOffset);
       if (test.rmse < bestRmse) {
         bestRmse = test.rmse;
         bestDiv = d;
@@ -166,7 +167,7 @@ function greedySelect(data, baseDivisors, maxHarmonics, candidateRange) {
     if (bestDiv === null) break;
     currentDivisors.push(bestDiv);
     currentDivisors.sort((a, b) => a - b);
-    best = fitHarmonics(data, currentDivisors);
+    best = fitHarmonics(data, currentDivisors, yearOffset);
 
     const h = best.harmonics.find(h => h[0] === bestDiv);
     const amp = Math.sqrt(h[1] ** 2 + h[2] ** 2);
@@ -194,23 +195,23 @@ function main() {
   const results = {};
 
   for (const type of types) {
-    // Use IAU J2000 anchor directly — event years derived from JD eliminate the
-    // ~182-day offset between model year epoch and actual cardinal point date.
     const anchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
+    // Model year → calendar year: VE wraps to next year (+0.5), others stay (-0.5)
+    const yearOffset = type === 'VE' ? 0.5 : -0.5;
     const data = byType[type].map(d => ({ ...d, anchor }));
-    console.log(`\n── ${type} (${data.length} points, J2000 anchor=${anchor.toFixed(3)}) ──`);
+    console.log(`\n── ${type} (${data.length} points, J2000 anchor=${anchor.toFixed(3)}, yearOffset=${yearOffset}) ──`);
 
     // Fit with current divisors from constants.js
     const currentDivisors = C.CARDINAL_POINT_HARMONICS[type].map(h => h[0]);
-    const current = fitHarmonics(data, currentDivisors);
+    const current = fitHarmonics(data, currentDivisors, yearOffset);
     console.log(`  Current ${currentDivisors.length} harmonics [${currentDivisors.join(',')}]: RMSE = ${current.rmse.toFixed(2)} min`);
 
     // Greedy selection
     console.log('  Greedy selection:');
-    const greedy = greedySelect(data, fibDivisors, 24, 120);
+    const greedy = greedySelect(data, fibDivisors, 24, 120, yearOffset);
     console.log(`  Final: RMSE = ${greedy.rmse.toFixed(2)} min [${greedy.divisors.join(',')}]`);
 
-    results[type] = { current, greedy, anchor };
+    results[type] = { current, greedy, anchor, yearOffset };
   }
 
   // ─── Output ──────────────────────────────────────────────────────────
@@ -252,19 +253,26 @@ function main() {
 
   // ─── Adjusted J2000 anchors ─────────────────────────────────────────────
   // The fitted constant (anchorShift) absorbs the offset between IAU anchor
-  // and the actual data. adjusted = IAU + shift. At year 2000, the self-corrected
-  // harmonics cancel, so JD = adjusted anchor exactly.
-
-  console.log(`\n── Adjusted J2000 anchors ──`);
-  const adjustedAnchors = {};
+  // ─── J2000 anchors (IAU values, exact by construction) ──────────────────
+  // At year 2000: h(2000) - h(2000) = 0, so JD = anchor. No adjustment needed.
+  console.log(`\n── J2000 anchors (IAU, exact at year 2000) ──`);
   for (const type of types) {
-    const iauAnchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
-    const shift = results[type].greedy.anchorShift;
-    const adjusted = iauAnchor + shift;
-    adjustedAnchors[type] = adjusted;
-
-    const shiftMin = shift * 24 * 60;
-    console.log(`  ${type}: IAU=${iauAnchor.toFixed(6)} + shift=${shiftMin.toFixed(2)} min → adjusted=${adjusted.toFixed(6)}`);
+    const anchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
+    const yearOffset = results[type].yearOffset;
+    const calGrid = GRID_YEAR + yearOffset; // model year → calendar year
+    const harmonics = results[type].greedy.harmonics;
+    const gridRow = byType[type].find(d => d.year === GRID_YEAR);
+    if (gridRow) {
+      const t = calGrid - C.balancedYear;
+      const t2000 = 2000 - C.balancedYear;
+      let pred = anchor + C.meanSolarYearDays * (calGrid - 2000);
+      for (const [div, sinC, cosC] of harmonics) {
+        pred += sinC * (Math.sin(2 * Math.PI * t / (C.H / div)) - Math.sin(2 * Math.PI * t2000 / (C.H / div)))
+              + cosC * (Math.cos(2 * Math.PI * t / (C.H / div)) - Math.cos(2 * Math.PI * t2000 / (C.H / div)));
+      }
+      const gridErr = (pred - gridRow.jd) * 24 * 60;
+      console.log(`  ${type}: anchor=${anchor.toFixed(6)}, grid ${GRID_YEAR} err: ${gridErr.toFixed(2)} min`);
+    }
   }
 
   // ─── Write to fitted-coefficients.json if --write flag is present ────
@@ -276,10 +284,9 @@ function main() {
       harmonicsObj[type] = results[type].greedy.harmonics;
     }
     fc.CARDINAL_POINT_HARMONICS = harmonicsObj;
-    fc.CARDINAL_POINT_ANCHORS_ADJUSTED = adjustedAnchors;
+    delete fc.CARDINAL_POINT_ANCHORS_ADJUSTED; // No longer needed — use IAU values directly
     fs.writeFileSync(jsonPath, JSON.stringify(fc, null, 2) + '\n');
     console.log('\n  ✓ Written CARDINAL_POINT_HARMONICS to fitted-coefficients.json');
-    console.log('  ✓ Written CARDINAL_POINT_ANCHORS_ADJUSTED to fitted-coefficients.json');
   } else {
     console.log('\n  (dry run — add --write to update fitted-coefficients.json)');
   }
