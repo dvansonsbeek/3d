@@ -347,7 +347,27 @@ For each planet, six parameters fully describe the orbital dynamics:
 
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
-Earth is the exception (~0.5% tuning offset from the formula prediction).
+
+**Earth's amplitude: mean vs instantaneous.**
+The ψ formula gives the **mean amplitude over the full H cycle**: 0.632469°.
+This is the structural value that achieves 100% Law 3 inclination balance.
+However, the IAU obliquity rate at J2000 (-46.836769"/cy) constrains the
+**instantaneous amplitude** to 0.636055° — a 0.57% difference (12.9 arcsec).
+
+This is not an exception but a predictable phase effect. The instantaneous
+amplitude depends on where J2000 falls in the H/3 and H/8 cycles:
+
+```
+A(J2000) = IAU_rate / [360000 × (2π·sin(φ₃)/(H/3) − 2π·sin(φ₈)/(H/8))]
+```
+
+where φ₃ = 2π × (J2000 − balancedYear) / (H/3) and
+      φ₈ = 2π × (J2000 − balancedYear) / (H/8).
+
+At J2000, the phases are φ₃ = 261.2° and φ₈ = 96.5°, both near their
+maximum rate positions (sin ≈ ±1), making the instantaneous amplitude
+slightly larger than the mean. At other epochs the instantaneous amplitude
+varies, but averages to the ψ-predicted value over the full cycle.
 
 ---
 
