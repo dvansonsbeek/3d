@@ -184,7 +184,7 @@ for (const [key, body] of Object.entries(modelParams.additionalBodies)) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const perihelionCycleLength = H / 16;
-const meanSolarYearDays = Math.round(inputMeanSolarYear * (H / 16)) / (H / 16);
+const meanSolarYearDays = Math.round(inputMeanSolarYear * (H / 8)) / (H / 8);
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
 const startModelYearWithCorrection = startmodelYear + (correctionDays / meanSolarYearDays);
 const balancedYear = perihelionalignmentYear - (temperatureGraphMostLikely * (H / 16));

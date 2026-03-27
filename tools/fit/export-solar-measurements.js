@@ -2,7 +2,7 @@
 /**
  * Export Solar Measurements across the full Holistic Year.
  *
- * Single-pass simulation that measures all solar events:
+ * Single-pass simulation (1-year steps) measuring all solar events:
  *   - Cardinal points: SS (max dec), WS (min dec), VE (dec=0 asc), AE (dec=0 desc)
  *   - Perihelion (min wobble-center distance), Aphelion (max distance)
  *   - World-angle (sidereal position) at each event
@@ -10,16 +10,19 @@
  * Output: data/02-solar-measurements.csv
  *   Type, Model Year, JD, RA (deg), Obliquity (deg), World Angle (deg), Distance (AU)
  *
+ * 1-year steps allow a narrow search window (±2 days) and simple forward chaining.
+ * No two-pass needed — each event is close to prevJD + meanYear.
+ *
  * Downstream consumers:
  *   - obliquity-harmonics.js (step 6b) — reads SS obliquity
  *   - cardinal-point-harmonics.js (step 6c) — reads cardinal point JDs
- *   - sidereal-year-harmonics.js (step 6d) — reads world-angles at cardinal points
- *   - anomalistic-year-harmonics.js (step 6e) — reads PERI/APH JDs
+ *   - year-length-harmonics.js --type sidereal (step 6d) — reads world-angles
+ *   - year-length-harmonics.js --type anomalistic (step 6e) — reads PERI/APH JDs
  *   - Tropical year: derived from cardinal point harmonics (no separate step)
  *
  * Usage:
- *   node tools/fit/export-solar-measurements.js
- *   node tools/fit/export-solar-measurements.js --step 21
+ *   node tools/fit/export-solar-measurements.js                    # full H (~50 min)
+ *   node tools/fit/export-solar-measurements.js --start -25000 --end 25000  # test range
  */
 
 const SG = require('../lib/scene-graph');
@@ -34,32 +37,22 @@ function getArg(name, defaultVal) {
   return idx >= 0 && args[idx + 1] ? args[idx + 1] : defaultVal;
 }
 
-const STEP_YEARS = parseInt(getArg('step', String(C.stepYears)), 10);
+const START_YEAR = parseFloat(getArg('start', String(C.balancedYear)));
+const END_YEAR = parseFloat(getArg('end', String(C.balancedYear + C.H)));
 const OUTPUT_CSV = getArg('output', path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv'));
-
-// ─── Verify grid year is on the step grid ────────────────────────────────────
-const gridCheck = (C.gridYear - C.balancedYear) % STEP_YEARS;
-if (Math.abs(gridCheck) > 0.001) {
-  console.error(`WARNING: step ${STEP_YEARS} does not land on grid year ${C.gridYear}.`);
-} else {
-  console.error(`Grid year ${C.gridYear} is on the step grid (step=${STEP_YEARS}).`);
-}
 
 // ─── Search parameters ───────────────────────────────────────────────────────
 const SAMPLE_STEP = 0.5 / 24;   // 0.5 hours in days
-const SEARCH_RANGE = 960;       // ±20 days (960 × 0.5h)
+const SEARCH_RANGE = 96;        // ±2 days (96 × 0.5h) — narrow window for 1-year chaining
 
 // ─── Cardinal point detection ────────────────────────────────────────────────
 
 /**
- * Find a solstice (max or min declination) for a given year.
- * Returns JD, RA, obliquity, world-angle, and wobble-distance.
+ * Find a solstice (max or min declination).
+ * prevJD must be provided (except for the very first year).
  */
-function findSolstice(year, type, prevJD) {
-  const approxJD = prevJD
-    ? prevJD + STEP_YEARS * C.meanSolarYearDays
-    : C.startmodelJD + ((year + C.cardinalPointYearFractions[type]) - C.startModelYearWithCorrection) * C.meanSolarYearDays;
-
+function findSolstice(type, prevJD) {
+  const approxJD = prevJD + C.meanSolarYearDays;
   const isMax = type === 'SS';
   let bestJD = approxJD;
   let bestDec = isMax ? -Infinity : Infinity;
@@ -99,13 +92,10 @@ function findSolstice(year, type, prevJD) {
 }
 
 /**
- * Find an equinox (declination zero crossing) for a given year.
- * Returns JD, RA, obliquity, world-angle, and wobble-distance.
+ * Find an equinox (declination zero crossing).
  */
-function findEquinox(year, type, prevJD) {
-  const approxJD = prevJD
-    ? prevJD + STEP_YEARS * C.meanSolarYearDays
-    : C.startmodelJD + ((year + C.cardinalPointYearFractions[type]) - C.startModelYearWithCorrection) * C.meanSolarYearDays;
+function findEquinox(type, prevJD) {
+  const approxJD = prevJD + C.meanSolarYearDays;
 
   for (let k = -SEARCH_RANGE + 1; k <= SEARCH_RANGE; k++) {
     const jd1 = approxJD + (k - 1) * SAMPLE_STEP;
@@ -134,26 +124,12 @@ function findEquinox(year, type, prevJD) {
   return null;
 }
 
-// ─── Perihelion/Aphelion detection (min/max wobble-center distance) ──────────
-
 /**
- * Find perihelion (minimum distance) or aphelion (maximum distance).
- * Uses computeSunPositionFast for ~5x speedup over full moveModel.
+ * Find perihelion (min distance) or aphelion (max distance).
  */
-function findDistanceExtremum(year, type, prevJD) {
+function findDistanceExtremum(type, prevJD) {
   const isPeri = type === 'PERI';
-
-  let approxJD;
-  if (prevJD) {
-    approxJD = prevJD + STEP_YEARS * C.meanAnomalisticYearDays;
-  } else {
-    const perihelionCycle = C.H / 16;
-    const refFrac = isPeri ? 0.03 : 0.53;  // perihelion ~January, aphelion ~July
-    const yearsSinceRef = year - C.perihelionalignmentYear;
-    let frac = (refFrac + (yearsSinceRef / perihelionCycle) % 1) % 1;
-    if (frac < 0) frac += 1;
-    approxJD = C.startmodelJD + ((year + frac) - C.startModelYearWithCorrection) * C.meanSolarYearDays;
-  }
+  const approxJD = prevJD + C.meanAnomalisticYearDays;
 
   let bestJD = approxJD;
   let bestDist = isPeri ? Infinity : -Infinity;
@@ -192,76 +168,185 @@ function findDistanceExtremum(year, type, prevJD) {
   };
 }
 
+// ─── Seed: find initial events near J2000 using wide search ──────────────────
+
+function seedEvent(type) {
+  const WIDE_RANGE = 960; // ±20 days for the initial search only
+  // Approximate JD for this event type near J2000
+  const frac = C.cardinalPointYearFractions[type] || 0;
+  const approxJD = C.startmodelJD + frac * C.meanSolarYearDays;
+
+  if (type === 'SS' || type === 'WS') {
+    const isMax = type === 'SS';
+    let bestJD = approxJD;
+    let bestDec = isMax ? -Infinity : Infinity;
+    const samples = [];
+    for (let k = -WIDE_RANGE; k <= WIDE_RANGE; k++) {
+      const jd = approxJD + k * SAMPLE_STEP;
+      const pos = SG.computeSunPositionFast(jd);
+      const decDeg = 90 - pos.dec * 180 / Math.PI;
+      samples.push({ jd, decDeg });
+      if (isMax ? decDeg > bestDec : decDeg < bestDec) {
+        bestDec = decDeg;
+        bestJD = jd;
+      }
+    }
+    const bestIdx = samples.findIndex(s => s.jd === bestJD);
+    if (bestIdx > 0 && bestIdx < samples.length - 1) {
+      const y_m1 = samples[bestIdx - 1].decDeg;
+      const y_0 = samples[bestIdx].decDeg;
+      const y_p1 = samples[bestIdx + 1].decDeg;
+      const denom = y_m1 - 2 * y_0 + y_p1;
+      if (Math.abs(denom) > 1e-12)
+        bestJD = samples[bestIdx].jd + (SAMPLE_STEP / 2) * (y_m1 - y_p1) / denom;
+    }
+    return bestJD;
+  }
+
+  if (type === 'VE' || type === 'AE') {
+    for (let k = -WIDE_RANGE + 1; k <= WIDE_RANGE; k++) {
+      const jd1 = approxJD + (k - 1) * SAMPLE_STEP;
+      const jd2 = approxJD + k * SAMPLE_STEP;
+      const dec1 = 90 - SG.computeSunPositionFast(jd1).dec * 180 / Math.PI;
+      const dec2 = 90 - SG.computeSunPositionFast(jd2).dec * 180 / Math.PI;
+      const isAsc = dec1 < 0 && dec2 >= 0;
+      const isDesc = dec1 >= 0 && dec2 < 0;
+      if ((type === 'VE' && isAsc) || (type === 'AE' && isDesc)) {
+        const t = -dec1 / (dec2 - dec1);
+        return jd1 + t * SAMPLE_STEP;
+      }
+    }
+    return null;
+  }
+
+  // PERI / APH
+  const isPeri = type === 'PERI';
+  const periFrac = isPeri ? 0.03 : 0.53;
+  const periApprox = C.startmodelJD + (periFrac - 0.5) * C.meanSolarYearDays;
+  let bestJD = periApprox;
+  let bestDist = isPeri ? Infinity : -Infinity;
+  const samples = [];
+  for (let k = -WIDE_RANGE; k <= WIDE_RANGE; k++) {
+    const jd = periApprox + k * SAMPLE_STEP;
+    const pos = SG.computeSunPositionFast(jd);
+    const dist = pos.wobbleDistAU;
+    samples.push({ jd, dist });
+    if (isPeri ? dist < bestDist : dist > bestDist) {
+      bestDist = dist;
+      bestJD = jd;
+    }
+  }
+  const bestIdx = samples.findIndex(s => s.jd === bestJD);
+  if (bestIdx > 0 && bestIdx < samples.length - 1) {
+    const y_m1 = samples[bestIdx - 1].dist;
+    const y_0 = samples[bestIdx].dist;
+    const y_p1 = samples[bestIdx + 1].dist;
+    const denom = y_m1 - 2 * y_0 + y_p1;
+    if (Math.abs(denom) > 1e-12)
+      bestJD = samples[bestIdx].jd + (SAMPLE_STEP / 2) * (y_m1 - y_p1) / denom;
+  }
+  return bestJD;
+}
+
 // ─── Main export loop ────────────────────────────────────────────────────────
-// Two-pass approach: forward from J2000, then backward (for reliable chaining).
+// Seed from J2000, chain forward to end, then chain backward to start.
 
-const startYear = C.balancedYear;
-const endYear = startYear + C.H;
-const j2000Year = startYear + Math.round((2000 - startYear) / STEP_YEARS) * STEP_YEARS;
-const totalSteps = Math.ceil(C.H / STEP_YEARS);
+const startYear = START_YEAR;
+const endYear = END_YEAR;
+const totalYears = Math.round(endYear - startYear);
 
-console.error(`Solar measurements export: ${STEP_YEARS}-year steps, ${startYear} to ${endYear}`);
-console.error(`Expected: ~${totalSteps} points per type, ~${totalSteps * 6} total rows`);
-console.error(`Two-pass: forward from ${j2000Year}, then backward`);
+const allTypes = ['SS', 'WS', 'VE', 'AE', 'PERI', 'APH'];
+
+console.error(`Solar measurements export: 1-year steps, ${startYear} to ${endYear}`);
+console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`);
 console.error(`Output: ${OUTPUT_CSV}`);
 console.error('');
 
+// Seed near J2000 (model epoch)
+console.error('Seeding initial events near J2000...');
+const seedJDs = {};
+for (const type of allTypes) {
+  seedJDs[type] = seedEvent(type);
+  if (seedJDs[type]) {
+    console.error(`  ${type}: JD=${seedJDs[type].toFixed(3)}`);
+  } else {
+    console.error(`  ${type}: SEED FAILED`);
+    process.exit(1);
+  }
+}
+
 const allRows = [];
-let count = 0;
 const t0 = Date.now();
 
-// All 6 event types
-const cardinalTypes = ['VE', 'SS', 'AE', 'WS'];
-const distTypes = ['PERI', 'APH'];
+// We'll store the seed year's model year (startmodelYear rounded)
+const seedModelYear = Math.round(C.startmodelYear);
 
-function findEvent(type, year, prevJD) {
-  if (type === 'SS' || type === 'WS') return findSolstice(year, type, prevJD);
-  if (type === 'VE' || type === 'AE') return findEquinox(year, type, prevJD);
-  return findDistanceExtremum(year, type, prevJD);
-}
+// ─── Forward pass: seedModelYear → endYear ──────────────────────────────────
+console.error('\nForward pass...');
+const fwdPrev = { ...seedJDs };
 
-// Pass 1: Forward from J2000
-const fwdPrev = {};
-for (let y = j2000Year; y <= endYear; y += STEP_YEARS) {
-  for (const type of [...cardinalTypes, ...distTypes]) {
-    const r = findEvent(type, y, fwdPrev[type] || null);
-    if (r) {
-      fwdPrev[type] = r.jd;
-      allRows.push({ type, year: y, ...r });
+for (let year = seedModelYear; year <= endYear; year++) {
+  if (year !== seedModelYear) {
+    // Find each event by chaining from previous year
+    for (const type of allTypes) {
+      const finder = (type === 'SS' || type === 'WS') ? findSolstice
+        : (type === 'VE' || type === 'AE') ? findEquinox
+        : findDistanceExtremum;
+      const r = finder(type, fwdPrev[type]);
+      if (r) {
+        fwdPrev[type] = r.jd;
+        allRows.push({ type, year, ...r });
+      }
+    }
+  } else {
+    // Seed year: compute full position at seed JDs
+    for (const type of allTypes) {
+      const fp = SG.computeSunPositionFast(seedJDs[type]);
+      const isCardinal = ['SS', 'WS', 'VE', 'AE'].includes(type);
+      allRows.push({
+        type, year,
+        jd: seedJDs[type],
+        raDeg: isCardinal ? (fp.ra * 180 / Math.PI + 360) % 360 : null,
+        obliqDeg: isCardinal ? 90 - fp.dec * 180 / Math.PI : null,
+        worldAngle: fp.worldAngle,
+        distAU: fp.wobbleDistAU,
+      });
     }
   }
-  count++;
-  if (count % 500 === 0) {
+
+  const done = year - seedModelYear + 1;
+  if (done % 10000 === 0) {
     const elapsed = ((Date.now() - t0) / 1000).toFixed(0);
-    const pct = (count / totalSteps * 100).toFixed(1);
-    console.error(`  ${count}/${totalSteps} (${pct}%) — ${elapsed}s elapsed`);
+    const pct = (done / totalYears * 50).toFixed(1); // forward = first 50%
+    console.error(`  ${done}/${totalYears} fwd (${pct}%) — ${elapsed}s`);
   }
 }
 
-// Pass 2: Backward from J2000
-const bwdPrev = {};
-for (const type of [...cardinalTypes, ...distTypes]) {
-  const firstFwd = allRows.find(r => r.type === type && r.year === j2000Year);
-  if (firstFwd) bwdPrev[type] = firstFwd.jd;
-}
+// ─── Backward pass: seedModelYear-1 → startYear ─────────────────────────────
+console.error('Backward pass...');
+const bwdPrev = { ...seedJDs };
 
-for (let y = j2000Year - STEP_YEARS; y >= startYear; y -= STEP_YEARS) {
-  for (const type of [...cardinalTypes, ...distTypes]) {
-    // Shift prevJD back by 2×step for backward chaining
-    const shiftedPrev = bwdPrev[type]
-      ? bwdPrev[type] - 2 * STEP_YEARS * (distTypes.includes(type) ? C.meanAnomalisticYearDays : C.meanSolarYearDays)
-      : null;
-    const r = findEvent(type, y, shiftedPrev);
+for (let year = seedModelYear - 1; year >= startYear; year--) {
+  for (const type of allTypes) {
+    // Chain backward: prevJD - meanYear
+    const meanYear = ['PERI', 'APH'].includes(type) ? C.meanAnomalisticYearDays : C.meanSolarYearDays;
+    const backPrevJD = bwdPrev[type] - 2 * meanYear; // shift back so finder's +meanYear lands on target
+
+    const finder = (type === 'SS' || type === 'WS') ? findSolstice
+      : (type === 'VE' || type === 'AE') ? findEquinox
+      : findDistanceExtremum;
+    const r = finder(type, backPrevJD);
     if (r) {
       bwdPrev[type] = r.jd;
-      allRows.push({ type, year: y, ...r });
+      allRows.push({ type, year, ...r });
     }
   }
-  count++;
-  if (count % 500 === 0) {
+
+  const done = seedModelYear - year;
+  if (done % 10000 === 0) {
     const elapsed = ((Date.now() - t0) / 1000).toFixed(0);
-    const pct = (count / totalSteps * 100).toFixed(1);
-    console.error(`  ${count}/${totalSteps} (${pct}%) — ${elapsed}s elapsed`);
+    const pct = (50 + done / totalYears * 50).toFixed(1); // backward = last 50%
+    console.error(`  ${done}/${totalYears} bwd (${pct}%) — ${elapsed}s`);
   }
 }
 
@@ -274,16 +359,15 @@ allRows.sort((a, b) => {
 const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 
 // ─── Sanity checks ───────────────────────────────────────────────────────────
-const GY = C.gridYear;
 console.error('');
-console.error(`Sanity checks (grid year ${GY}):`);
-for (const type of [...cardinalTypes, ...distTypes]) {
-  const row = allRows.find(r => r.type === type && r.year === GY);
+console.error(`Sanity checks (year ${seedModelYear}):`);
+for (const type of allTypes) {
+  const row = allRows.find(r => r.type === type && r.year === seedModelYear);
   if (row) {
     const extra = row.raDeg !== null ? ` RA=${row.raDeg.toFixed(4)}°` : '';
     console.error(`  ${type.padEnd(4)}: JD=${row.jd.toFixed(6)}${extra} WA=${row.worldAngle.toFixed(4)}° dist=${row.distAU.toFixed(6)} AU`);
   } else {
-    console.error(`  ${type.padEnd(4)}: NOT FOUND at grid year ${GY}!`);
+    console.error(`  ${type.padEnd(4)}: NOT FOUND!`);
   }
 }
 
@@ -310,7 +394,7 @@ for (const r of allRows) typeCounts[r.type] = (typeCounts[r.type] || 0) + 1;
 console.error('');
 console.error(`Done in ${elapsed}s.`);
 console.error(`Total rows: ${allRows.length}`);
-for (const [type, count] of Object.entries(typeCounts)) {
-  console.error(`  ${type}: ${count} rows`);
+for (const [type, cnt] of Object.entries(typeCounts)) {
+  console.error(`  ${type}: ${cnt} rows`);
 }
 console.error(`CSV: ${OUTPUT_CSV}`);

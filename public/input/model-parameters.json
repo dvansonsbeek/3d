@@ -1,23 +1,23 @@
 {
   "_description": "Model parameters — values that define the Holistic Universe Model theory. Changing any value = different model. Source of truth for both tools/lib/constants.js and src/script.js.",
   "foundational": {
-    "holisticyearLength": 334992,
+    "holisticyearLength": 335320,
     "stepYears": 21,
     "inputmeanlengthsolaryearindays": 365.2422,
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
-    "correctionDays": -0.742011755704879,
-    "correctionSun": 0.4962681151570557,
+    "correctionDays": 0.0852797329425812,
+    "correctionSun": 0.49628681158496546,
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
     "psiNumerator": 2205
   },
   "earth": {
-    "earthtiltMean": 23.41366362719282,
-    "earthInvPlaneInclinationAmplitude": 0.6354285125795287,
+    "earthtiltMean": 23.413509889044235,
+    "earthInvPlaneInclinationAmplitude": 0.6360544161114376,
     "eccentricityBase": 0.01537159,
-    "eccentricityAmplitude": 0.0013707444053579821,
+    "eccentricityAmplitude": 0.0013706588764762274,
     "eccentricityAmplitudeK": 0.0000034505372893
   },
   "moon": {
