@@ -18,7 +18,7 @@
   },
   "earthOrbital": {
     "j2000EpochYear": 2000,
-    "perihelionalignmentYear": 1246,
+    "perihelionalignmentYear": 1246.25,
     "juneSolstice2000_JD": 2451716.575,
     "obliquityJ2000_deg": 23.439291111,
     "obliquityRate_arcsecPerCentury": -46.836769,
@@ -62,7 +62,7 @@
   "planetOrbitalElements": {
     "_description": "JPL/SPICE J2000 orbital elements per planet",
     "mercury": {
-      "solarYearInput": 87.9685,
+      "solarYearInput": 87.9683,
       "orbitalEccentricityJ2000": 0.20563593,
       "axialTiltMean": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
