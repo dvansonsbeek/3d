@@ -7,17 +7,17 @@
     "startmodelJD": 2451716.5,
     "startmodelYear": 2000.5,
     "correctionDays": 0.0852797329425812,
-    "correctionSun": 0.49628681158496546,
+    "correctionSun": 0.49630135104833023,
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
     "psiNumerator": 2205
   },
   "earth": {
-    "earthtiltMean": 23.413509889044235,
-    "earthInvPlaneInclinationAmplitude": 0.6360544161114376,
-    "eccentricityBase": 0.01537159,
-    "eccentricityAmplitude": 0.0013706588764762274,
+    "earthtiltMean": 23.4135098740403,
+    "earthInvPlaneInclinationAmplitude": 0.636054789746413,
+    "eccentricityBase": 0.015390144598093028,
+    "eccentricityAmplitude": 0.0013516997594706483,
     "eccentricityAmplitudeK": 0.0000034505372893
   },
   "moon": {

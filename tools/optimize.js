@@ -371,24 +371,19 @@ if (command === 'diagnose') {
     const d = result.sunDerived;
     console.log();
     console.log('── Derived eccentricity (e(J2000) constraint) ──');
-    console.log('  eccentricityBase     :', d.eccentricityBase.toFixed(8), '  (Law 5 locked)');
-    if (d.eccentricityAmplitude !== null) {
-      const residual = Math.abs(d.eJ2000Achieved - d.eJ2000Target);
-      console.log('  eccentricityAmplitude:', d.eccentricityAmplitude.toFixed(8), '  (derived from base + perihelionalignmentYear)');
-      console.log('  e(J2000) achieved    :', d.eJ2000Achieved.toFixed(10), ' target:', d.eJ2000Target, ' residual:', residual.toExponential(2));
-    } else {
-      console.log('  eccentricityAmplitude: n/a — base ≥ e(J2000), constraint infeasible');
-    }
+    const residual = Math.abs(d.eJ2000Achieved - d.eJ2000Target);
+    console.log('  eccentricityBase     :', d.eccentricityBase.toFixed(8), '  (derived from perihelion longitude)');
+    console.log('  eccentricityAmplitude:', d.eccentricityAmplitude.toFixed(10), '  (derived from base + e(J2000))');
+    console.log('  e(J2000) achieved    :', d.eJ2000Achieved.toFixed(10), ' target:', d.eJ2000Target, ' residual:', residual.toExponential(2));
 
     if (d.perihelionRA) {
       const p = d.perihelionRA;
-      const diff = p.raAchieved !== null ? (p.raAchieved - p.raTarget).toFixed(6) : 'n/a';
+      const okP = Math.abs(p.diffArcsec) < 1 ? '✓ OK' : '⚠ NEEDS FIX';
       console.log();
-      console.log('── Perihelion longitude (barycenter.RA at J2000) ──');
-      console.log('  eccentricityBase     :', p.base.toFixed(8), '  (derived from RA = 102.947° constraint)');
-      console.log('  eccentricityAmplitude:', p.amplitude !== null ? p.amplitude.toFixed(8) : 'n/a', '  (derived)');
-      console.log('  barycenter.RA at J2000:', p.raAchieved !== null ? p.raAchieved.toFixed(6) : 'n/a',
-        '  target:', p.raTarget, '  diff:', diff + '°');
+      console.log('── Perihelion longitude at J2000 (IAU: ' + p.raTarget + '°) ──');
+      console.log('  Model longitude      :', p.raAchieved.toFixed(6) + '°');
+      console.log('  Difference           :', (p.diffArcsec >= 0 ? '+' : '') + p.diffArcsec.toFixed(2) + '"',
+        ' ' + okP);
     }
 
     if (d.obliquity) {

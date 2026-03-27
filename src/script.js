@@ -32,16 +32,16 @@ const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year 
 const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = 2000.5;                            // Fractional year of model start
 const correctionDays = 0.0852797329425812;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.49628681158496546;                 // Sun position correction angle (optimizer Step 1)
+const correctionSun = 0.49630135104833023;                 // Sun position correction angle (optimizer Step 1)
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.413509889044235;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360544161114376; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.01537159;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013706588764762274;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = 23.4135098740403;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.636054789746413; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.015390144598093028;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.0013516997594706483;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
