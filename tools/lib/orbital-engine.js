@@ -90,8 +90,8 @@ function _getObliquityExtremaInRange(yearMin, yearMax) {
 
 /**
  * Compute Earth's obliquity (axial tilt) for a given year.
- * Primary formula: 12-harmonic fit including equation-of-center corrections.
- * RMSE: 0.20 arcsec over full H (935× more accurate than the geometric formula).
+ * 16-harmonic fit with J2000 smart anchor (exact IAU obliquity at year 2000).
+ * RMSE: 0.004 arcsec over full H.
  * For H/3 vs H/8 component decomposition, use computeObliquityIntegrals().
  *
  * @param {number} currentYear - decimal year
@@ -860,11 +860,11 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // Solstice RA: derived from earthRAAngle, inclination amplitude, and obliquity.
 // All three project through the same 1/sin(ε) ecliptic-to-equatorial factor.
 // The earthRAAngle sets the mean offset; the inclination amplitude sets the oscillation.
-// Validated: RMSE = 0.089° (0.36 min RA) against 2,889 simulation data points.
+// Validated: RMSE = 0.089° (0.36 min RA) against 15,953 simulation data points.
 
-// Cardinal Point JD: linear trend + 12 harmonics (5 Fibonacci + 7 overtones).
-// 12-harmonic fits from 11,553 observations (29-year steps) per cardinal point.
-// Anchored at observed J2000 values. Self-correcting: exact at year 2000.
+// Cardinal Point JD: linear trend + 24 self-corrected harmonics (Fibonacci + combinations).
+// Fitted from 15,953 observations (21-year steps) per cardinal point.
+// Anchored at IAU J2000 values. Self-correcting: exact at year 2000.
 // See docs/14-solstice-prediction.md
 
 // Pre-compute harmonic contributions at J2000 for each cardinal point
@@ -886,7 +886,7 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
  * Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
  *   where baseRA = 90° (SS), 270° (WS), 0° (VE), 180° (AE)
  *
- * RMSE: 0.089° (0.36 min RA) against 11,553 simulation data points.
+ * RMSE: 0.089° (0.36 min RA) against 15,953 simulation data points.
  *
  * @param {number} year - calendar year
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
@@ -910,8 +910,8 @@ function computeSolsticeRA(year, type) {
  * Formula: JD = anchor + meanSolarYear × (year − 2000)
  *             + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
  *
- * 12 harmonics: 5 Fibonacci fundamentals + 7 overtones.
- * RMSE: SS 2.7min, WS 5.3min, VE 3.0min, AE 5.0min over full H.
+ * 24 harmonics: 5 Fibonacci fundamentals + 19 combination/overtones.
+ * RMSE: SS 0.10min, WS 0.06min, VE 0.05min, AE 0.05min over full H.
  *
  * @param {number} year - calendar year
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
