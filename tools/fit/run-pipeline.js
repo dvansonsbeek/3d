@@ -77,19 +77,17 @@ const STEPS = [
   { id: '5c', phase: 2, name: 'Moon eclipse optimizer',
     cmd: 'node tools/fit/moon-eclipse-optimizer.js --write' },
 
-  // Phase 5: Cardinal point harmonics
-  { id: '6a', phase: 2, name: 'Export cardinal points (~35 min)',
-    cmd: 'node tools/fit/export-cardinal-points.js', timeout: 60 * 60 * 1000 },
+  // Phase 5: Solar measurements & harmonic fits
+  { id: '6a', phase: 2, name: 'Export solar measurements (~50 min)',
+    cmd: 'node tools/fit/export-solar-measurements.js', timeout: 2 * 60 * 60 * 1000 },
   { id: '6b', phase: 2, name: 'Obliquity harmonics',
     cmd: 'node tools/fit/obliquity-harmonics.js --write' },
   { id: '6c', phase: 2, name: 'Cardinal point harmonics',
     cmd: 'node tools/fit/cardinal-point-harmonics.js --write' },
-
-  // Phase 6: Year-length harmonics
-  { id: '7a', phase: 2, name: 'Export year lengths (~90 min)',
-    cmd: 'node tools/fit/export-year-lengths.js', timeout: 2 * 60 * 60 * 1000 },
-  { id: '7b', phase: 2, name: 'Year-length harmonics',
-    cmd: 'node tools/fit/year-length-harmonics.js --write' },
+  { id: '6d', phase: 2, name: 'Sidereal year harmonics',
+    cmd: 'node tools/fit/year-length-harmonics.js --write --type sidereal' },
+  { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
+    cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
 
   // Phase 7: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',

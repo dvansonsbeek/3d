@@ -2,7 +2,7 @@
 /**
  * Fit obliquity harmonics from cardinal point CSV data.
  *
- * Reads SS observations from data/02-cardinal-points.csv,
+ * Reads SS observations from data/02-solar-measurements.csv,
  * computes the Pythagorean obliquity mean from current parameters,
  * and fits 12 Fourier harmonics to the residuals via least squares.
  *
@@ -34,7 +34,7 @@ function computePythagoreanMean() {
 
 // ─── Read CSV data ───────────────────────────────────────────────────────
 function readSSData() {
-  const csvPath = path.join(__dirname, '..', '..', 'data', '02-cardinal-points.csv');
+  const csvPath = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
   const raw = fs.readFileSync(csvPath, 'utf8');
   const lines = raw.trim().split('\n');
   const header = lines[0];

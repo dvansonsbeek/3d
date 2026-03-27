@@ -1272,7 +1272,12 @@ function computeSunPositionFast(jd) {
   const local = graph.earthNodes.rotAxis.worldToLocal(sunWP[0], sunWP[1], sunWP[2]);
   const sph = cartesianToSpherical(local[0], local[1], local[2]);
 
-  return { ra: sph.theta, dec: sph.phi, distAU, sunDistAU: distAU };
+  // World-angle (sidereal position) and wobble-center distance
+  let worldAngle = Math.atan2(sunWP[2], sunWP[0]) * 180 / Math.PI;
+  worldAngle = ((worldAngle % 360) + 360) % 360;
+  const wobbleDistAU = Math.sqrt(sunWP[0]*sunWP[0] + sunWP[1]*sunWP[1] + sunWP[2]*sunWP[2]) / 100;
+
+  return { ra: sph.theta, dec: sph.phi, distAU, sunDistAU: distAU, worldAngle, wobbleDistAU };
 }
 
 module.exports = {

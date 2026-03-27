@@ -2,7 +2,7 @@
   "_description": "Astronomical reference data — external values from IAU, JPL, Meeus, Souami & Souchay. Nothing model-specific. Source of truth for both tools/lib/constants/astro-reference.js and src/script.js.",
   "physicalConstants": {
     "currentAUDistance": 149597870.698828,
-    "meansiderealyearlengthinSeconds": 31558149.8,
+    "meansiderealyearlengthinSeconds": 31558149.7632023,
     "G_CONSTANT": 6.6743e-20,
     "MASS_RATIO_EARTH_MOON": 81.3007,
     "speedOfLight": 299792.458,

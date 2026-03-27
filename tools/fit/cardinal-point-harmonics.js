@@ -2,7 +2,7 @@
 /**
  * Fit cardinal point JD harmonics from simulation data.
  *
- * Reads all 4 cardinal point types from data/02-cardinal-points.csv,
+ * Reads all 4 cardinal point types from data/02-solar-measurements.csv,
  * fits 12 Fourier harmonics per type to the JD residuals (after removing
  * the linear trend), and outputs copy-paste coefficients.
  *
@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const C = require('../lib/constants');
 
-const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-cardinal-points.csv');
+const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
 
 // ─── Grid year and shifted anchors (from constants.js) ───────────────────
 const GRID_YEAR = C.gridYear;

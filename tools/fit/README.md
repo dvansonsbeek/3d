@@ -14,11 +14,10 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
-| `export-cardinal-points.js` | `data/02-cardinal-points.csv` | Scene-graph simulation |
-| `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-cardinal-points.csv` |
-| `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×15-21 terms) | `data/02-cardinal-points.csv` |
-| `export-year-lengths.js` | `data/03-year-length-analysis.xlsx` | Scene-graph simulation (headless) |
-| `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/03-year-length-analysis.xlsx` |
+| `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (single pass) |
+| `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
+| `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) | `data/02-solar-measurements.csv` |
+| `year-length-harmonics.js` | `SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -46,8 +45,9 @@ When model parameters change, refit in this order. The logic:
 3. Only after Steps 1–2 is the simulation state correct enough to export input data
 4. Earth's perihelion/ERD must be correct before planet ML predictions (4a→4d)
 5. Parallax corrections are a final layer on top of scene-graph positions
-6. Cardinal point data comes from the scene-graph (depends on everything above)
-7. Year-length harmonics are fitted from the year-length analysis data
+6. Solar measurements (cardinal points, perihelion/aphelion, world-angles) come
+   from a single scene-graph pass (depends on everything above)
+7. Tropical year is derived from cardinal point harmonics (no separate step)
 8. `SOLSTICE_OBLIQUITY_MEAN_FITTED` (Step 6b) feeds back into the scene graph,
    creating a circular dependency. For full self-consistency after parameter
    changes, run the pipeline twice. The first pass establishes the correct
@@ -124,65 +124,42 @@ Step 5c: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
          Updates: model-parameters.json (auto-updated by script)
          Verify: RMS separation < 0.85°, individual eclipses < 2°
 
-── Phase 5: Cardinal point harmonics ──────────────────────────────
+── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
-Step 6a: export-cardinal-points.js            → data/02-cardinal-points.csv
-         (runs full scene-graph simulation — depends on all above, ~35 min)
+Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
+         Single-pass scene-graph simulation (~50 min) measuring:
+         - Cardinal points: SS (max dec), WS (min dec), VE (dec=0↑), AE (dec=0↓)
+         - Perihelion (min wobble-center distance), Aphelion (max distance)
+         - World-angle (sidereal position) at each event
+         All 6 event types use computeSunPositionFast() for ~5x speedup.
+         Output columns: Type, Model Year, JD, RA, Obliquity, World Angle, Distance
+         Default: full H at stepYears-year steps.
 
 Step 6b: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
+         Reads SS obliquity from 02-solar-measurements.csv.
+         16 harmonics, RMSE 0.004", J2000-anchored (exact IAU obliquity).
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
+         Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv.
+         24 self-corrected harmonics per type, RMSE 0.05-0.10 min.
+         IAU J2000 anchors (exact at year 2000).
+         Tropical year = mean of 4 cardinal point derivatives (no separate step).
          Updates: fitted-coefficients.json (auto-updated by script)
 
-── Phase 6: Year-length harmonics ─────────────────────────────────
-
-Step 7a: export-year-lengths.js               → data/03-year-length-analysis.xlsx
-         Measures tropical (RA crossings), sidereal (world-angle crossings),
-         and anomalistic (WobbleCenter→Sun peri+aph mean) year lengths.
-         Uses headless scene-graph — no browser needed.
-         Default: full H at stepYears-year steps (~90 min).
-         Custom range: --start -23200 --end 25800 --step 100
-
-         Year-length measurement method (same 3 types as browser report):
-
-         1. TROPICAL YEAR — Sun RA crossing intervals
-            Finds when Sun RA crosses 4 cardinal angles (0°, 90°, 180°, 270°).
-            For each angle, measures the interval between crossing at year Y
-            and crossing at year Y−N (where N = step size in years).
-            Mean tropical year = average of all 4 intervals, divided by N.
-            This is the same RA-crossing method as sunRACrossingForYear()
-            in the browser.
-
-         2. SIDEREAL YEAR — Sun world-angle crossing intervals
-            Finds when the Sun's world-space angle (atan2(z, x) in the
-            Three.js scene) crosses 4 reference angles (0°, 90°, 180°, 270°).
-            Mean sidereal year = average of 4 intervals / N.
-            Same method as the browser's getSunWorldAngle() sidereal
-            measurement.
-
-         3. ANOMALISTIC YEAR — perihelion + aphelion mean interval
-            Finds perihelion (minimum WobbleCenter→Sun distance) and
-            aphelion (maximum distance) for each target year.
-            Mean anomalistic year = (perihelion interval + aphelion interval)
-            / (2 × N). Averaging peri + aph cancels EoC variable-speed bias.
-            Same method as browser's perihelionForYearMethodB() and
-            aphelionForYearMethodB().
-
-         Key difference from browser "Days, Years & Precession" report:
-         The browser report uses 1-year steps (interval = crossing(Y) −
-         crossing(Y−1)), giving exact year-to-year values including
-         short-term fluctuations. The headless tool uses N-year steps
-         (default 29), dividing by N to get a smoothed average. This
-         smoothing is intentional for Step 7b harmonic fitting — it
-         suppresses noise and lets the Fourier fit focus on long-period
-         signals (H/2, H/3, H/8 etc.).
-
-Step 7b: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
-         Reads data/03-year-length-analysis.xlsx, fits Fourier harmonics.
+Step 6d: year-length-harmonics.js --type sidereal    → SIDEREAL_YEAR_HARMONICS
+         Reads world-angles at cardinal point JDs from 02-solar-measurements.csv.
+         Sidereal year = days × 360° / Δ(world-angle), measured at the same
+         physical events as the tropical year for consistency.
          Updates: fitted-coefficients.json (auto-updated by script)
 
-── Phase 7: Verify & sync ─────────────────────────────────────────
+Step 6e: year-length-harmonics.js --type anomalistic → ANOMALISTIC_YEAR_HARMONICS
+         Reads PERI/APH JDs from 02-solar-measurements.csv.
+         Anomalistic year = (peri interval + aph interval) / 2 / step.
+         Averaging peri + aph cancels EoC variable-speed bias.
+         Updates: fitted-coefficients.json (auto-updated by script)
+
+── Phase 6: Verify & sync ─────────────────────────────────────────
 
 Step 8:  verify-pipeline.js                   → pass/fail
          Verifies JSON consistency and checks planet baselines against stored
@@ -196,24 +173,24 @@ Step 9:  export-to-script.js --write          → src/script.js
          Only run after Step 8 passes.
 ```
 
-Note: `data/03-year-length-analysis.xlsx` is generated by Step 7a (headless, ~90 min
-for full H at stepYears-year steps). Only needs regenerating if H or year-length-affecting
-parameters change. Can also be exported from browser (Menu: Analysis → Year Length Report)
-but the headless tool is preferred for full H coverage.
+Note: `data/02-solar-measurements.csv` is generated by Step 6a (~50 min for full H).
+It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
+All downstream fitting steps (6b-6e) read from this single CSV — no separate exports needed.
+Tropical year harmonics are derived from cardinal point harmonics (Step 6c), not fitted separately.
 
 ## What triggers a refit?
 
 | Parameter changed | Steps to rerun |
 |-------------------|----------------|
-| `H` (holisticyearLength) | ALL (1→7b) + update `stepYears` in model-parameters.json |
+| `H` (holisticyearLength) | ALL (1→6e) + update `stepYears` in model-parameters.json |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
-| `earthtiltMean` | 1, 3→4d, 6a→7b |
-| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→7b |
-| `earthInvPlaneInclinationMean` | 3, 6a→7b |
-| `correctionSun` | 1, 6a→7b |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→7b |
-| `correctionDays` | 3, 6a→7b |
-| `useVariableSpeed` | ALL (1→7b) |
+| `earthtiltMean` | 1, 3→4d, 6a→6e |
+| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6e |
+| `earthInvPlaneInclinationMean` | 3, 6a→6e |
+| `correctionSun` | 1, 6a→6e |
+| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6e |
+| `correctionDays` | 3, 6a→6e |
+| `useVariableSpeed` | ALL (1→6e) |
 | Planet `startpos` | 2 (re-solve angleCorrection), 5 |
 | Planet `eocFraction` | 3, 5 |
 | Planet `solarYearInput` | 2, 4c→4d, 5 |
@@ -292,16 +269,14 @@ node tools/fit/gravitation-correction.js --write                             # S
 # node tools/fit/ascnode-correction.js          # optional diagnostic
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
-# Phase 5: Cardinal point harmonics
-node tools/fit/export-cardinal-points.js                                     # Step 6a (~35 min)
+# Phase 5: Solar measurements & harmonic fits
+node tools/fit/export-solar-measurements.js                                  # Step 6a (~50 min)
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
 node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
+node tools/fit/year-length-harmonics.js --write --type sidereal              # Step 6d
+node tools/fit/year-length-harmonics.js --write --type anomalistic           # Step 6e
 
-# Phase 6: Year-length harmonics
-node tools/fit/export-year-lengths.js                                        # Step 7a (~90 min)
-node tools/fit/year-length-harmonics.js --write                              # Step 7b
-
-# Phase 7: Verify & sync
+# Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
 node tools/fit/verify-pipeline.js --write                                    # update baselines.json
 node tools/fit/export-to-script.js --write                                   # Step 9 (only after Step 8 passes)
@@ -315,7 +290,7 @@ node tools/fit/export-to-script.js --write                                   # S
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Browser simulation | `src/script.js` ← patched by `export-to-script.js` |
-| Training data (CSV/JSON) | `data/02-cardinal-points.csv`, `data/cardinal-points-training.json` |
+| Training data (CSV) | `data/02-solar-measurements.csv` |
 
 ## Single source of truth — JSON files
 
@@ -364,7 +339,7 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
-    year-length-harmonics.js     → fitted-coefficients.json  (Step 7b)
+    year-length-harmonics.js     → fitted-coefficients.json  (Steps 6d, 6e)
     optimize.js                  → model-parameters.json     (Steps 1, 2)
 ```
 
