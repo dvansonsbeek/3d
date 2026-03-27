@@ -32,16 +32,16 @@ const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year 
 const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = 2000.5;                            // Fractional year of model start
 const correctionDays = 0.0852797329425812;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.49630135104833023;                 // Sun position correction angle (optimizer Step 1)
+const correctionSun = 0.4962915327096994;                 // Sun position correction angle (optimizer Step 1)
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.4135098740403;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.636054789746413; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015390144598093028;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013516997594706483;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = 23.413542446040537;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.6360533393744845; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.015385242982656361;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.0013567297883128049;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
@@ -55,7 +55,7 @@ const earthInclinationPhaseAngle = 203.3195;              // 203° balance group
 const currentAUDistance = 149597870.698828;               // 1 AU in km (IAU 2012)
 const meansiderealyearlengthinSeconds = 31558149.7632023; // Mean sidereal year in seconds (IAU)
 const speedOfLight = 299792.458;                          // Speed of light in km/s (CODATA)
-const perihelionalignmentYear = 1246.25;                     // Year when perihelion longitude = 90° (Meeus)
+const perihelionalignmentYear = 1246;                     // Year when perihelion longitude = 90° (Meeus)
 const deltaTStart = 63.63;                                // Delta-T at model epoch (seconds)
 
 

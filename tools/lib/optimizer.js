@@ -95,6 +95,11 @@ function solveAmplitudeForJ2000(base) {
   // can assign a penalty cost rather than crash.
   if (base >= target) return null;
 
+  // Temporarily set C.eccentricityBase so the scene graph uses the correct
+  // orbit center offset when measuring eccentricity at J2000.
+  const savedBase = C.eccentricityBase;
+  C.eccentricityBase = base;
+
   // f(A) = scene_eccentricity(A) - target; monotonically increasing in A.
   function f(A) {
     return computeEccentricityJ2000Scene(A) - target;
@@ -112,6 +117,8 @@ function solveAmplitudeForJ2000(base) {
     if (f(mid) <= 0) lo = mid; else hi = mid;
     if (hi - lo < 1e-12) break;
   }
+
+  C.eccentricityBase = savedBase;
   return (lo + hi) / 2;
 }
 
@@ -988,51 +995,31 @@ function nelderMead(planet, paramNames, options = {}) {
       paramNames = paramNames.filter(p => !derived.includes(p));
     }
 
-    // Iterative solver: eccentricityBase, obliquity, and perihelion longitude are coupled.
-    // Changing base shifts the geometry → obliquity measurement shifts → re-solve obliquity.
-    // Iterate until all constraints converge simultaneously.
+    // Three-step solver: obliquity and eccentricityBase are weakly coupled.
+    // Step A: Solve obliquity exactly (rate + value) with current base.
+    // Step B: Bisect eccentricityBase for perihelion longitude (fixed obliquity → monotonic RA).
+    // Step C: Re-solve obliquity for the new base (small correction).
+    // Repeat A-B-C if needed (typically 2 passes suffice).
     const targetRA = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
-    const MAX_ITER = 10;
     const RA_TOL = 0.0001; // degrees (~0.36 arcsec)
+    const MAX_PASSES = 5;
 
-    for (let iter = 1; iter <= MAX_ITER; iter++) {
-      // 1. Solve obliquity rate → earthInvPlaneInclinationAmplitude
+    for (let pass = 1; pass <= MAX_PASSES; pass++) {
+      // Step A: Solve obliquity with current eccentricityBase
       const solvedAmpl = solveAmplitudeForObliquityRate();
       C.earthInvPlaneInclinationAmplitude = solvedAmpl;
       recomputeInclinationDerived();
-
-      // 2. Solve obliquity at J2000 → earthtiltMean
       const solvedTilt = solveEarthtiltMeanForObliquity();
       C.earthtiltMean = solvedTilt;
       recomputeInclinationDerived();
       sg._invalidateGraph();
 
-      // 3. Derive eccentricityAmplitude from current base + e(J2000) constraint
-      const solvedAmp = solveAmplitudeForJ2000(C.eccentricityBase);
-      if (solvedAmp !== null) {
-        C.eccentricityAmplitude = solvedAmp;
-        recomputeEccentricityDerived();
-        sg._invalidateGraph();
-      }
-
-      // 4. Measure perihelion longitude
-      const currentRA = computePerihelionRA();
-      const raErr = currentRA - targetRA;
-
-      console.warn(`[optimizer] Sun iter ${iter}: base=${C.eccentricityBase.toFixed(8)} amp=${C.eccentricityAmplitude.toFixed(10)} RA=${currentRA.toFixed(6)}° (target=${targetRA}°, err=${(raErr*3600).toFixed(1)}" ) tilt=${solvedTilt.toFixed(8)} inclAmpl=${solvedAmpl.toFixed(8)}`);
-
-      if (Math.abs(raErr) < RA_TOL) {
-        console.warn(`[optimizer] Sun: converged at iter ${iter} — perihelion RA within ${(raErr*3600).toFixed(1)}" of target`);
-        break;
-      }
-
-      // 5. Adjust eccentricityBase to close the gap
-      // RA increases monotonically with base — bisect around current value
-      const step = 0.0005; // search range around current base
+      // Step B: Bisect base for perihelion longitude (obliquity held fixed)
+      const step = 0.002;
       let lo = Math.max(0.001, C.eccentricityBase - step);
       let hi = Math.min(C.ASTRO_REFERENCE.earthEccentricityJ2000 - 1e-6, C.eccentricityBase + step);
 
-      for (let bi = 0; bi < 40; bi++) {
+      for (let bi = 0; bi < 50; bi++) {
         const mid = (lo + hi) / 2;
         const amp = solveAmplitudeForJ2000(mid);
         if (amp === null) { lo = mid; continue; }
@@ -1044,13 +1031,22 @@ function nelderMead(planet, paramNames, options = {}) {
         if (midRA < targetRA) lo = mid; else hi = mid;
         if (hi - lo < 1e-10) break;
       }
-      // Apply the converged base
       const newBase = (lo + hi) / 2;
       const newAmp = solveAmplitudeForJ2000(newBase);
       C.eccentricityBase = newBase;
       C.eccentricityAmplitude = newAmp;
       recomputeEccentricityDerived();
       sg._invalidateGraph();
+
+      // Measure final RA for this pass
+      const passRA = computePerihelionRA();
+      const raErr = passRA - targetRA;
+      console.warn(`[optimizer] Sun pass ${pass}: base=${newBase.toFixed(8)} RA=${passRA.toFixed(6)}° err=${(raErr*3600).toFixed(1)}" tilt=${solvedTilt.toFixed(8)} inclAmpl=${solvedAmpl.toFixed(8)}`);
+
+      if (Math.abs(raErr) < RA_TOL) {
+        console.warn(`[optimizer] Sun: converged at pass ${pass} — perihelion RA within ${(raErr*3600).toFixed(1)}" of target`);
+        break;
+      }
     }
 
     console.warn(`[optimizer] Sun: final eccentricityBase = ${C.eccentricityBase.toFixed(8)}`);
