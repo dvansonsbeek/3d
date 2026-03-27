@@ -251,11 +251,11 @@ be at 5h 35m RA (the minimum).
 ## Data Source
 
 Cardinal point observations generated from the headless scene-graph (no browser needed):
-- Script: `tools/fit/export-cardinal-points.js` (reusable, configurable step size)
-- File: [../data/02-cardinal-points.csv](../data/02-cardinal-points.csv)
-- 46,212 data points (11,553 per cardinal point) spanning one full Holistic Year
-- Step: 29 years (year 2000 included in every type)
-- Columns: Type, Model Year, JD, RA (°), Obliquity (°)
+- Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
+- File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
+- ~96,000 data points (6 types × ~16,000 steps) spanning one full Holistic Year
+- Step: stepYears (from model-parameters.json), grid-aligned
+- Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination
   zero crossing (linear interpolation)
 

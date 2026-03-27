@@ -141,7 +141,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis
-- [Fitting Pipeline](tools/fit/README.md) — 9-step pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, obliquity/year-length harmonics
+- [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — 429-term ML system for planetary precession prediction
 
 ---
@@ -157,7 +157,7 @@ node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs)
 node tools/fit/run-pipeline.js --from 5        # resume from Step 5
 ```
 
-The pipeline runs 9 steps across 7 phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → cardinal point harmonics → year-length harmonics → verify → sync to script.js. Step 3 (browser data export) is always manual. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+The pipeline runs across 6 phases: Sun geometry → planet alignment → perihelion harmonics → ML training → parallax corrections → solar measurements & harmonic fits → verify → sync to script.js. Step 3 (browser data export) is always manual. Step 6a (solar measurements) exports all cardinal points, perihelion/aphelion, and world-angles in a single scene-graph pass; steps 6b-6e fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
 
 **Safety**: Step 8 (`verify-pipeline.js`) validates all results against IAU reference values before syncing to `script.js`. If any parameter change produces unrealistic values — e.g., year lengths that differ from IAU by more than 1 second, obliquity that doesn't match J2000 within 0.01", or planet baselines that regress — the pipeline stops and reports which checks failed. This prevents invalid parameter changes from propagating into the simulation.
 

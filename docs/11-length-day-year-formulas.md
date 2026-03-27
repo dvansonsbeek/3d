@@ -347,10 +347,10 @@ def calc_solar_year(year):
 If `H` or `inputmeanlengthsolaryearindays` changes:
 
 1. **Means update automatically** — they are derived formulas, not constants
-2. **Harmonic coefficients must be refitted** from model measurement data:
-   - Run the model's year-length analysis over ±25,000 years at 100-year steps
-   - Export to Excel (491 data points)
-   - Fit sin/cos coefficients with means fixed to derived values
-   - Update `TROPICAL_YEAR_HARMONICS`, `SIDEREAL_YEAR_HARMONICS`, `ANOMALISTIC_YEAR_HARMONICS` in all source files
+2. **Harmonic coefficients must be refitted** from solar measurement data:
+   - Run `export-solar-measurements.js` (step 6a) — full H at stepYears-year steps
+   - Tropical year: derived from cardinal point harmonics (step 6c), no separate fit
+   - Sidereal/anomalistic: run `year-length-harmonics.js` (steps 6d/6e)
+   - Updates `SIDEREAL_YEAR_HARMONICS`, `ANOMALISTIC_YEAR_HARMONICS` in fitted-coefficients.json
 
-Training data: `data/03-year-length-analysis.xlsx` (sheet "Detailed")
+Training data: `data/02-solar-measurements.csv`

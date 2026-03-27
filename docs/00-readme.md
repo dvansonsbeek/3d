@@ -199,9 +199,10 @@ Run in dependency order when model parameters change (see `tools/fit/README.md`)
 
 | File | Description |
 |------|-------------|
-| `export-cardinal-points.js` | Generate cardinal point training data (CSV) from scene-graph |
-| `obliquity-harmonics.js` | Fit 12-harmonic obliquity formula |
-| `cardinal-point-harmonics.js` | Fit 12-harmonic JD formula per cardinal point |
+| `export-solar-measurements.js` | Single-pass export: cardinal points, perihelion/aphelion, world-angles |
+| `obliquity-harmonics.js` | Fit 16-harmonic obliquity formula (J2000-anchored) |
+| `cardinal-point-harmonics.js` | Fit 24-harmonic JD formula per cardinal point (IAU-anchored) |
+| `year-length-harmonics.js` | Fit sidereal + anomalistic year harmonics from solar measurements |
 | `eoc-constants.js` | Derive Equation of Center constants from first principles |
 | `eoc-fractions.js` | Derive per-planet EoC fractions from reference data |
 | `perihelion-offset.js` | Derive perihelion phase offset analytically |
