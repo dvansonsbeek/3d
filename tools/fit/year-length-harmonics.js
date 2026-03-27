@@ -3,7 +3,7 @@
  * Fit year-length harmonics from simulation data.
  *
  * Reads tropical, sidereal, and anomalistic year lengths from
- * data/03-year-length-analysis.xlsx (491 data points, 100-year steps)
+ * data/02-solar-measurements.csv (stepYears-year steps over full H)
  * and fits Fourier harmonics to the residuals around the derived means.
  *
  * Produced constants:
@@ -18,31 +18,30 @@ const fs = require('fs');
 const path = require('path');
 const C = require('../lib/constants');
 
-// We need xlsx parsing — use a simple approach: Python extracts CSV, or we parse directly.
-// Since the project already has Python with pandas, let's shell out for the extraction.
-const { execSync } = require('child_process');
+const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
 
-const EXCEL_PATH = path.join(__dirname, '..', '..', 'data', '03-year-length-analysis.xlsx');
-
-// ─── Extract data from Excel via Python ──────────────────────────────────
+// ─── Read data from CSV ─────────────────────────────────────────────────
 function loadData() {
-  const script = `
-import pandas as pd, json, sys
-df = pd.read_excel('${EXCEL_PATH}', sheet_name='Detailed')
-rows = []
-for _, r in df.iterrows():
-    rows.append({
-        'year': float(r['Year']),
-        'tropical': float(r['Mean Tropical Year']),
-        'sidereal': float(r['Mean Sidereal']),
-        'anomalistic': float(r['Mean Anomalistic']),
-    })
-json.dump(rows, sys.stdout)
-`;
-  const result = execSync(`python3 -c "${script.replace(/"/g, '\\"')}"`, {
-    encoding: 'utf8', timeout: 30000, maxBuffer: 100 * 1024 * 1024,
-  });
-  return JSON.parse(result);
+  const raw = fs.readFileSync(CSV_PATH, 'utf8');
+  const lines = raw.trim().split('\n');
+  const header = lines[0].split(',');
+  const yearIdx = header.indexOf('Year');
+  const tropIdx = header.indexOf('Mean Tropical Year');
+  const sidIdx = header.indexOf('Mean Sidereal');
+  const anomIdx = header.indexOf('Mean Anomalistic');
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',');
+    const year = parseFloat(parts[yearIdx]);
+    const tropical = parseFloat(parts[tropIdx]);
+    const sidereal = parseFloat(parts[sidIdx]);
+    const anomalistic = parseFloat(parts[anomIdx]);
+    if (!isNaN(year) && !isNaN(tropical) && !isNaN(sidereal) && !isNaN(anomalistic)) {
+      rows.push({ year, tropical, sidereal, anomalistic });
+    }
+  }
+  return rows;
 }
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
@@ -166,7 +165,7 @@ function main() {
   console.log(`\nUsing constants.js: H=${C.H}, balancedYear=${C.balancedYear}`);
   console.log(`Means: tropical=${C.meanSolarYearDays}, sidereal=${C.meanSiderealYearDays}, anomalistic=${C.meanAnomalisticYearDays}`);
 
-  console.log('\nLoading Excel data...');
+  console.log('\nLoading CSV data...');
   const data = loadData();
   console.log(`${data.length} data points, years ${data[0].year} to ${data[data.length-1].year}`);
 
