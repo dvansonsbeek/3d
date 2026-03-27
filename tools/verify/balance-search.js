@@ -113,6 +113,7 @@ function computeBalance(config) {
   }
 
   // Vector balance (identical to computeBalanceResults in script.js)
+  // Both use eccentricityBase — structural balance is time-independent
   let balanceCos = 0, balanceSin = 0, totalLamp = 0;
   for (const key of planets) {
     const cfg_mass = mass[key];
@@ -214,7 +215,7 @@ for (const scenario of scenarios) {
                           ).length,
                           row: [
                             scenario.name,
-                            parseFloat(result.balance.toFixed(6)),
+                            parseFloat(result.balance.toFixed(8)),
                             config.mercury.d, p(config.mercury.phase),
                             config.venus.d, p(config.venus.phase),
                             config.mars.d, p(config.mars.phase),
