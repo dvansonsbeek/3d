@@ -20,27 +20,82 @@ const C = require('../lib/constants');
 
 const CSV_PATH = path.join(__dirname, '..', '..', 'data', '02-solar-measurements.csv');
 
-// ─── Read data from CSV ─────────────────────────────────────────────────
+// ─── Read and compute year lengths from raw solar measurements CSV ────────
+// The CSV has 1-year step events: SS, WS, VE, AE, PERI, APH with JD and World Angle.
+// We compute:
+//   - Sidereal year: days × 360° / Δ(world-angle) at cardinal points
+//   - Anomalistic year: mean of perihelion + aphelion intervals
+// Tropical year is derived from cardinal point harmonics (step 6c), not fitted here.
 function loadData() {
   const raw = fs.readFileSync(CSV_PATH, 'utf8');
   const lines = raw.trim().split('\n');
-  const header = lines[0].split(',');
-  const yearIdx = header.indexOf('Year');
-  const tropIdx = header.indexOf('Mean Tropical Year');
-  const sidIdx = header.indexOf('Mean Sidereal');
-  const anomIdx = header.indexOf('Mean Anomalistic');
+  console.log(`CSV: ${lines.length - 1} rows`);
 
-  const rows = [];
+  // Parse raw events by type
+  const byType = {};
   for (let i = 1; i < lines.length; i++) {
     const parts = lines[i].split(',');
-    const year = parseFloat(parts[yearIdx]);
-    const tropical = parseFloat(parts[tropIdx]);
-    const sidereal = parseFloat(parts[sidIdx]);
-    const anomalistic = parseFloat(parts[anomIdx]);
-    if (!isNaN(year) && !isNaN(tropical) && !isNaN(sidereal) && !isNaN(anomalistic)) {
+    const type = parts[0];
+    const year = parseFloat(parts[1]);
+    const jd = parseFloat(parts[2]);
+    const wa = parseFloat(parts[5]);  // World Angle (deg)
+    if (!byType[type]) byType[type] = [];
+    byType[type].push({ year, jd, wa });
+  }
+
+  // Downsample by stepYears
+  const step = C.stepYears || 20;
+  const sampled = {};
+  for (const type of Object.keys(byType)) {
+    sampled[type] = [];
+    for (let i = 0; i < byType[type].length; i += step) sampled[type].push(byType[type][i]);
+  }
+  console.log(`Downsampled by ${step}: ${sampled.SS.length} points per type`);
+
+  // Compute year lengths from consecutive events
+  const cardinals = ['SS', 'WS', 'VE', 'AE'];
+  const rows = [];
+
+  for (let i = 1; i < sampled.SS.length; i++) {
+    const year = sampled.SS[i].year;
+
+    // Sidereal year: mean of 4 cardinal point world-angle advancements
+    let sidValues = [];
+    for (const type of cardinals) {
+      const curr = sampled[type][i];
+      const prev = sampled[type][i - 1];
+      if (!curr || !prev) continue;
+      const djd = curr.jd - prev.jd;
+      let dwa = curr.wa - prev.wa;
+      while (dwa < 0) dwa += 360;
+      // Sun moves clockwise: in step tropical years, sidereal motion < step×360°
+      sidValues.push(djd * 360 / (step * 360 - dwa));
+    }
+    const sidereal = sidValues.length === 4 ? sidValues.reduce((a, b) => a + b) / 4 : NaN;
+
+    // Anomalistic year: mean of perihelion + aphelion intervals
+    const periCurr = sampled.PERI[i];
+    const periPrev = sampled.PERI[i - 1];
+    const aphCurr = sampled.APH[i];
+    const aphPrev = sampled.APH[i - 1];
+    const periInt = (periCurr && periPrev) ? periCurr.jd - periPrev.jd : NaN;
+    const aphInt = (aphCurr && aphPrev) ? aphCurr.jd - aphPrev.jd : NaN;
+    const anomalistic = (!isNaN(periInt) && !isNaN(aphInt)) ? (periInt + aphInt) / (2 * step) : NaN;
+
+    // Tropical year: mean of 4 cardinal point JD intervals
+    let tropValues = [];
+    for (const type of cardinals) {
+      const curr = sampled[type][i];
+      const prev = sampled[type][i - 1];
+      if (curr && prev) tropValues.push((curr.jd - prev.jd) / step);
+    }
+    const tropical = tropValues.length === 4 ? tropValues.reduce((a, b) => a + b) / 4 : NaN;
+
+    if (!isNaN(sidereal) && !isNaN(anomalistic) && !isNaN(tropical)) {
       rows.push({ year, tropical, sidereal, anomalistic });
     }
   }
+
   return rows;
 }
 
@@ -175,7 +230,7 @@ function main() {
   const tropical = fitHarmonics(data, 'tropical', C.meanSolarYearDays, tropicalDivisors);
   console.log(`  Current [${tropicalDivisors.join(',')}]: RMSE = ${tropical.rmse.toFixed(4)}s`);
   console.log('  Greedy:');
-  const tropicalGreedy = greedySelect(data, 'tropical', C.meanSolarYearDays, [3, 8], 6);
+  const tropicalGreedy = greedySelect(data, 'tropical', C.meanSolarYearDays, [3, 8], 12);
 
   // ─── Sidereal year ─────────────────────────────────────────────────
   console.log('\n── SIDEREAL YEAR ──');
