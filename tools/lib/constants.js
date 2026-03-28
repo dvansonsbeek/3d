@@ -251,12 +251,12 @@ const perihelionPhaseOffset = (((startModelYearWithCorrection - balancedYear) / 
 // 7. MOON DERIVED CYCLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const moonSiderealMonth = totalDaysInH / Math.ceil(totalDaysInH / moonSiderealMonthInput);
-const moonAnomalisticMonth = totalDaysInH / Math.ceil(totalDaysInH / moonAnomalisticMonthInput);
-const moonNodalMonth = totalDaysInH / Math.ceil(totalDaysInH / moonNodalMonthInput);
+const moonSiderealMonth = totalDaysInH / Math.round(totalDaysInH / moonSiderealMonthInput);
+const moonAnomalisticMonth = totalDaysInH / (Math.round(totalDaysInH / moonAnomalisticMonthInput) - 1);
+const moonNodalMonth = totalDaysInH / Math.round(totalDaysInH / moonNodalMonthInput);
 
-const moonSynodicMonth = totalDaysInH / (Math.ceil(totalDaysInH / moonSiderealMonthInput - 1) + 13 - H);
-const moonTropicalMonth = totalDaysInH / (Math.ceil(totalDaysInH / moonSiderealMonthInput - 1) + 13);
+const moonSynodicMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13 - H);
+const moonTropicalMonth = totalDaysInH / (Math.round(totalDaysInH / moonSiderealMonthInput - 1) + 13);
 
 const moonFullMoonCycleEarth = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
 const moonFullMoonCycleICRF = totalDaysInH / ((totalDaysInH / moonFullMoonCycleEarth) + 13);
