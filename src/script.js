@@ -32,16 +32,16 @@ const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year 
 const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = 2000.5;                            // Fractional year of model start
 const correctionDays = 1.31728498637676;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.49630121359875384;                 // Sun position correction angle (optimizer Step 1)
+const correctionSun = 0.4953906573457113;                 // Sun position correction angle (optimizer Step 1)
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.41351031737804;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360546741925646; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015390191257511131;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013516523697035157;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = 23.41351062214244;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.6360471101419536; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.01539019127456141;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.0013516523522412176;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
@@ -24761,7 +24761,7 @@ async function runObliquityCalibrationTest() {
   console.log(`  Model rate:      ${modelRate.toFixed(2)}"/century`);
   console.log(`  IAU 2006 rate:   ${IAU_RATE.toFixed(2)}"/century`);
   console.log(`  Rate error:      ${(modelRate - IAU_RATE).toFixed(2)}"/century`);
-  console.log(`  Avg offset:      ${avgDiff.toFixed(2)}"`);
+  console.log(`  Avg offset:      ${avgDiff.toFixed(2)}" (expected ~0.22": IAU declines between J2000 and solstice date)`);
   console.log(`  Rate match:      ${Math.abs(modelRate - IAU_RATE) < 1 ? 'GOOD' : 'POOR'}`);
   console.log('');
 

@@ -1113,8 +1113,21 @@ function nelderMead(planet, paramNames, options = {}) {
       const e0 = bl.entries.find(e => Math.abs(e.year - 2000.5) < 1);
       if (e0) cost += startDateWeight * Math.abs(e0.dRA);
     }
-    // earthInvPlaneInclinationAmplitude and earthtiltMean are solved analytically before NM
-    // (exact bisection for IAU rate and obliquity). No penalty needed here.
+    // For Sun: penalize solstice timing error at J2000.
+    // The June solstice should occur at juneSolstice2000_JD.
+    // Measure the Sun's declination at the target JD — at exact solstice, dec is maximum.
+    // Penalty = |dec_rate| at target JD (zero at perfect alignment).
+    if (planet === 'sun') {
+      const ssJD = C.ASTRO_REFERENCE.juneSolstice2000_JD;
+      const step = 0.25 / 24; // 15 min
+      withOverrides(planet, overrides, () => {
+        sg._invalidateGraph();
+        const d0 = sg.phiToDecDeg(sg.computeSunPositionFast(ssJD - step).dec);
+        const d1 = sg.phiToDecDeg(sg.computeSunPositionFast(ssJD + step).dec);
+        const decRate = Math.abs(d1 - d0); // should be ~0 at solstice
+        cost += decRate * 10000; // weight: 10000× dec-rate in degrees
+      });
+    }
     return cost;
   }
 
