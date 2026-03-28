@@ -89,11 +89,15 @@ const STEPS = [
   { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
     cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
 
-  // Phase 7: Verify & sync
+  // Phase 6: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
     cmd: 'node tools/fit/verify-pipeline.js --write' },
   { id: '9',  phase: 2, name: 'Export to script.js',
     cmd: 'node tools/fit/export-to-script.js --write' },
+
+  // Phase 7: Dashboard data
+  { id: '10', phase: 2, name: 'Export dashboard data',
+    cmd: 'node tools/export-dashboard-data.js' },
 ];
 
 // ─── Filter steps ───────────────────────────────────────────────────────────

@@ -14,10 +14,10 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
-| `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (single pass) |
+| `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
-| `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) | `data/02-solar-measurements.csv` |
-| `year-length-harmonics.js` | `SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
+| `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
+| `year-length-harmonics.js` | `TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS` | `data/02-solar-measurements.csv` |
 | `eoc-fractions.js` | Per-planet `eocFraction` | `data/reference-data.json` |
 | `parallax-correction.js` | `PARALLAX_DEC/RA_CORRECTION` (up to 78p inner / 68p outer) | `data/reference-data.json` |
 | `parallax-greedy-select.js` | Candidate basis terms for parallax | `data/reference-data.json` |
@@ -41,12 +41,14 @@ and require no pipeline step.
 
 When model parameters change, refit in this order. The logic:
 1. Sun optimizer must run first — it derives the exact Earth geometry constants
+   (eccentricityBase, eccentricityAmplitude, obliquity, perihelion longitude)
 2. Planet angleCorrection must be solved next — it aligns each planet's perihelion
 3. Only after Steps 1–2 is the simulation state correct enough to export input data
 4. Earth's perihelion/ERD must be correct before planet ML predictions (4a→4d)
 5. Parallax corrections are a final layer on top of scene-graph positions
 6. Solar measurements (cardinal points, perihelion/aphelion, world-angles) come
-   from a single scene-graph pass (depends on everything above)
+   from a single scene-graph pass at 1-year steps (depends on everything above).
+   Fitting scripts downsample by `stepYears` (default 20) for efficiency.
 7. Tropical year is derived from cardinal point harmonics (no separate step)
 8. `SOLSTICE_OBLIQUITY_MEAN_FITTED` (Step 6b) feeds back into the scene graph,
    creating a circular dependency. For full self-consistency after parameter
@@ -61,8 +63,10 @@ When model parameters change, refit in this order. The logic:
 Step 1:  node tools/optimize.js optimize sun correctionSun
          → correctionSun, eccentricityBase, eccentricityAmplitude,
            earthtiltMean, earthInvPlaneInclinationAmplitude (all derived)
+         Iterative solver: obliquity + perihelion longitude constraints
+         converge simultaneously (typically 1 pass).
          Updates: model-parameters.json (5 Earth orbital constants)
-         Verify: RMS < 0.004°, solstice timing < 1 sec error at J2000
+         Verify: RMS < 0.004°, perihelion longitude < 0.01" from IAU
 
 Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
          → angleCorrection (derived from longitudePerihelion, not a free param)
@@ -73,13 +77,14 @@ Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
 ── Phase 2: Generate input data (manual) ──────────────────────────
 
 Step 3:  Export from browser GUI              → data/01-holistic-year-objects-data.xlsx
-         (Perihelion/precession data for all planets, stepYears-year steps over full H)
+         (Perihelion/precession data for all planets, 1-year steps over full H)
          Menu: Analysis → Export Objects Report
 
 ── Phase 3: Earth perihelion & ML training ────────────────────────
 
 Step 4a: python/fit_perihelion_harmonics.py   → PERI_HARMONICS_RAW, PERI_OFFSET
          (Earth perihelion longitude & ERD from file 01)
+         Downsampled by stepYears for efficiency.
          Updates: fitted-coefficients.json (auto-updated by script)
 
 Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
@@ -91,6 +96,7 @@ Note: eocEccentricity and perihelionPhaseOffset are derived analytically in cons
 
 Step 4c: python/train_precession.py           → tools/lib/python/coefficients/*_coeffs_unified.py
          (429-term ML coefficients, uses perihelion/ERD as features)
+         Downsampled by stepYears for efficiency.
          Updates: coefficients/*_coeffs_unified.py + fitted-coefficients.json (auto-written by script)
 
 Step 4d: python/train_observed.py             → tools/lib/python/coefficients/*_coeffs.py
@@ -100,7 +106,7 @@ Step 4d: python/train_observed.py             → tools/lib/python/coefficients/
 ── Phase 4: Planet positions & corrections ────────────────────────
 
 Step 5a: parallax-correction.js               → PARALLAX_DEC/RA_CORRECTION
-         Fits up to 48-parameter RA/Dec correction per planet via cross-validation.
+         Fits up to 78-parameter RA/Dec correction per planet via cross-validation.
          Uses prepareForFitting() to disable parallax layer.
          Updates: fitted-coefficients.json (auto-updated by script)
 
@@ -127,36 +133,33 @@ Step 5c: moon-eclipse-optimizer.js            → moonStartposNodal/Apsidal/Moon
 ── Phase 5: Solar measurements & harmonic fits ─────────────────────
 
 Step 6a: export-solar-measurements.js         → data/02-solar-measurements.csv
-         Single-pass scene-graph simulation (~50 min) measuring:
+         Single-pass scene-graph simulation (~80 min) measuring:
          - Cardinal points: SS (max dec), WS (min dec), VE (dec=0↑), AE (dec=0↓)
          - Perihelion (min wobble-center distance), Aphelion (max distance)
          - World-angle (sidereal position) at each event
-         All 6 event types use computeSunPositionFast() for ~5x speedup.
+         1-year steps over full H. All 6 event types use computeSunPositionFast().
          Output columns: Type, Model Year, JD, RA, Obliquity, World Angle, Distance
-         Default: full H at stepYears-year steps.
+         Test range: --start -25000 --end 25000
 
 Step 6b: obliquity-harmonics.js               → SOLSTICE_OBLIQUITY_HARMONICS
-         Reads SS obliquity from 02-solar-measurements.csv.
+         Reads SS obliquity from 02-solar-measurements.csv (downsampled by stepYears).
          16 harmonics, RMSE 0.004", J2000-anchored (exact IAU obliquity).
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS
-         Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv.
-         24 self-corrected harmonics per type, RMSE 0.05-0.10 min.
-         IAU J2000 anchors (exact at year 2000).
+Step 6c: cardinal-point-harmonics.js          → CARDINAL_POINT_HARMONICS + ANCHORS
+         Reads SS/WS/VE/AE JDs from 02-solar-measurements.csv (downsampled by stepYears).
+         24 self-corrected harmonics per type, RMSE 0.03-0.05 min.
+         Data-anchored at closest JD to IAU J2000 value, then derived to J2000.
          Tropical year = mean of 4 cardinal point derivatives (no separate step).
          Updates: fitted-coefficients.json (auto-updated by script)
 
-Step 6d: year-length-harmonics.js --type sidereal    → SIDEREAL_YEAR_HARMONICS
-         Reads world-angles at cardinal point JDs from 02-solar-measurements.csv.
-         Sidereal year = days × 360° / Δ(world-angle), measured at the same
-         physical events as the tropical year for consistency.
-         Updates: fitted-coefficients.json (auto-updated by script)
-
-Step 6e: year-length-harmonics.js --type anomalistic → ANOMALISTIC_YEAR_HARMONICS
-         Reads PERI/APH JDs from 02-solar-measurements.csv.
-         Anomalistic year = (peri interval + aph interval) / 2 / step.
-         Averaging peri + aph cancels EoC variable-speed bias.
+Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS
+         Computes year lengths from raw events in 02-solar-measurements.csv:
+         - Tropical: mean of 4 cardinal point JD intervals
+         - Sidereal: world-angle advancement at cardinal points
+         - Anomalistic: mean of perihelion + aphelion intervals
+         All downsampled by stepYears. RMSE: tropical 0.002s, sidereal 0.001s,
+         anomalistic 0.002s over full H.
          Updates: fitted-coefficients.json (auto-updated by script)
 
 ── Phase 6: Verify & sync ─────────────────────────────────────────
@@ -171,45 +174,45 @@ Step 9:  export-to-script.js --write          → src/script.js
          Handles: scalar consts, planet properties, arrays (harmonics, Moon tables),
          objects (parallax corrections, cardinal point harmonics).
          Only run after Step 8 passes.
+
+── Phase 7: Dashboard ─────────────────────────────────────────────
+
+Step 10: node tools/export-dashboard-data.js  → dashboard/data/*.json
+         Exports orbital elements, sky positions, and Earth predictions
+         for the dashboard visualizations. Uses stepYears intervals.
 ```
 
-Note: `data/02-solar-measurements.csv` is generated by Step 6a (~50 min for full H).
+Note: `data/02-solar-measurements.csv` is generated by Step 6a (~80 min for full H at 1-year steps).
 It contains all solar events (cardinal points + perihelion/aphelion) with world-angles.
-All downstream fitting steps (6b-6e) read from this single CSV — no separate exports needed.
-Tropical year harmonics are derived from cardinal point harmonics (Step 6c), not fitted separately.
+All downstream fitting steps (6b-6d) read from this single CSV and downsample by `stepYears`
+(default 20) — no separate exports needed.
+Tropical year harmonics are fitted alongside sidereal and anomalistic (Step 6d).
+The cardinal-point-derived tropical year (Step 6c) is the authoritative runtime version.
 
 ## What triggers a refit?
 
 | Parameter changed | Steps to rerun |
 |-------------------|----------------|
-| `H` (holisticyearLength) | ALL (1→6e) + update `stepYears` in model-parameters.json |
+| `H` (holisticyearLength) | ALL (1→10) |
 | `longitudePerihelion` (any planet) | 2 (that planet only) |
-| `earthtiltMean` | 1, 3→4d, 6a→6e |
-| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6e |
-| `earthInvPlaneInclinationMean` | 3, 6a→6e |
-| `correctionSun` | 1, 6a→6e |
-| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6e |
-| `correctionDays` | 3, 6a→6e |
-| `useVariableSpeed` | ALL (1→6e) |
+| `earthtiltMean` | 1, 3→4d, 6a→6d |
+| `earthInvPlaneInclinationAmplitude` | 1, 3→4d, 6a→6d |
+| `earthInvPlaneInclinationMean` | 3, 6a→6d |
+| `correctionSun` | 1, 6a→6d |
+| `eccentricityBase` / `eccentricityAmplitude` | 1, 3→4a, 6a→6d |
+| `correctionDays` | 3, 6a→6d |
+| `useVariableSpeed` | ALL (1→10) |
 | Planet `startpos` | 2 (re-solve angleCorrection), 5 |
 | Planet `eocFraction` | 3, 5 |
 | Planet `solarYearInput` | 2, 4c→4d, 5 |
 | Planet `orbitalEccentricityBase` | 2, 5 |
 
-**When H changes:** The step size must divide H/16 evenly. Update `stepYears` in
-`public/input/model-parameters.json` (foundational section). All export scripts read
-this value automatically via `constants.js` — no per-script updates needed.
+**When H changes:** Update `holisticyearLength` in `model-parameters.json`.
+The `stepYears` parameter controls downsampling for fitting scripts (default 20).
+All derived values (balancedYear, meanSolarYearDays, cycle periods, etc.) are
+computed automatically in `constants.js` — no per-script updates needed.
 
-The following derived values are also computed automatically in `constants.js`:
-- `gridYear` — nearest step-aligned year to J2000 (= `balancedYear + round((2000 - balancedYear) / stepYears) × stepYears`)
-- `gridYearDeltaFromJ2000` — offset from J2000 (may be non-zero if steps don't land on 2000)
-- `cardinalPointYearFractions` — SS/WS/VE/AE year fractions adjusted for `startmodelYear` epoch offset
-- `iauObliquityAtGrid` — IAU obliquity shifted from J2000 to grid year
-- `cardinalPointAnchorsAtGrid` — cardinal point JD anchors shifted from J2000 to grid year
-
-Step 3 (browser export) must also use a matching step size.
-
-Current: H=334,992, stepYears=21 (H/16=20,937, gridYear=1991.5).
+Current: H=335,320 (= 2³ × 5 × 83 × 101), stepYears=20.
 
 ## How to run
 
@@ -223,8 +226,8 @@ Instead of running each step manually, use `run-pipeline.js`:
 
 ```bash
 node tools/fit/run-pipeline.js --phase1        # Steps 1-2 only (~15 sec)
-node tools/fit/run-pipeline.js --phase2        # Steps 4a-9 (~2.5 hrs, requires Step 3 data)
-node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-9
+node tools/fit/run-pipeline.js --phase2        # Steps 4a-10 (~2.5 hrs, requires Step 3 data)
+node tools/fit/run-pipeline.js --all           # Steps 1-2, then 4a-10
 node tools/fit/run-pipeline.js --from 5a       # Resume from Step 5a onwards
 node tools/fit/run-pipeline.js --iterate 20    # Repeat Steps 5a-5b 20 times
 node tools/fit/run-pipeline.js --converge      # Repeat Steps 5a-5b until improvement < 0.001°
@@ -270,16 +273,18 @@ node tools/fit/gravitation-correction.js --write                             # S
 node tools/fit/moon-eclipse-optimizer.js --write                             # Step 5c
 
 # Phase 5: Solar measurements & harmonic fits
-node tools/fit/export-solar-measurements.js                                  # Step 6a (~50 min)
+node tools/fit/export-solar-measurements.js                                  # Step 6a (~80 min)
 node tools/fit/obliquity-harmonics.js --write                                # Step 6b
 node tools/fit/cardinal-point-harmonics.js --write                           # Step 6c
-node tools/fit/year-length-harmonics.js --write --type sidereal              # Step 6d
-node tools/fit/year-length-harmonics.js --write --type anomalistic           # Step 6e
+node tools/fit/year-length-harmonics.js --write                              # Step 6d
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
 node tools/fit/verify-pipeline.js --write                                    # update baselines.json
 node tools/fit/export-to-script.js --write                                   # Step 9 (only after Step 8 passes)
+
+# Phase 7: Dashboard
+node tools/export-dashboard-data.js                                          # Step 10
 ```
 
 ## Where outputs are stored
@@ -290,7 +295,12 @@ node tools/fit/export-to-script.js --write                                   # S
 | Fitted coefficients (JSON) | `public/input/fitted-coefficients.json` ← single source of truth |
 | ML coefficients (Python) | `tools/lib/python/coefficients/*_coeffs*.py` |
 | Browser simulation | `src/script.js` ← patched by `export-to-script.js` |
-| Training data (CSV) | `data/02-solar-measurements.csv` |
+| Solar measurements (CSV) | `data/02-solar-measurements.csv` (1-year steps, ~120 MB) |
+| Browser export (Excel) | `data/01-holistic-year-objects-data.xlsx` (1-year steps, ~300 MB) |
+| Dashboard data | `dashboard/data/*.json` |
+
+Note: Large data files (>100 MB) are excluded from git via `.gitignore`.
+They are generated locally by steps 3 and 6a.
 
 ## Single source of truth — JSON files
 
@@ -339,7 +349,7 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     moon-eclipse-optimizer.js    → model-parameters.json     (Step 5c)
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
-    year-length-harmonics.js     → fitted-coefficients.json  (Steps 6d, 6e)
+    year-length-harmonics.js     → fitted-coefficients.json  (Step 6d)
     optimize.js                  → model-parameters.json     (Steps 1, 2)
 ```
 
@@ -349,7 +359,7 @@ Planet positions go through 4 correction layers after the raw scene-graph comput
 The architecture is managed by `tools/lib/correction-stack.js` with `prepareForFitting()`
 to safely disable layers during fitting.
 
-**Layers:** Parallax (68p) → Gravitation → Elongation (21p) → Moon Meeus
+**Layers:** Parallax (78p) → Gravitation → Elongation (21p) → Moon Meeus
 
 Steps 5a and 5b use `prepareForFitting()` which disables the target layer(s) so the
 fitter sees residuals without its own layer's contribution.
@@ -362,6 +372,9 @@ Python scripts cannot parse JavaScript directly. Instead, `load_constants.py` ca
 `_dump_constants.js` via `subprocess`, which runs Node.js to load `constants.js` and
 outputs all constants as JSON to stdout. Python reads this JSON, so all Python scripts
 automatically use the same values as the Node.js tooling — no manual sync needed.
+
+All Python scripts that read the Excel data downsample by `stepYears` (default 20)
+for fitting efficiency. This gives the same RMSE as the full dataset but runs 20× faster.
 
 ## Related documentation
 
