@@ -212,6 +212,17 @@ def main():
         phase = 2 * math.pi * t_2000 / (H / div)
         pred_2000g += sc * math.sin(phase) + cc * math.cos(phase)
 
+    # ─── Smart anchor: adjust offset so formula gives IAU value at J2000 ──
+    iau_j2000 = C.get('earthPerihelionLongitudeJ2000', 102.947)
+    anchor_shift = iau_j2000 - (pred_2000g % 360)
+    greedy_offset += anchor_shift
+    print(f'\n── Smart anchor (J2000) ──')
+    print(f'  IAU perihelion at J2000: {iau_j2000}°')
+    print(f'  Formula before anchor:   {pred_2000g % 360:.6f}°')
+    print(f'  Shift:                   {anchor_shift * 3600:.1f}"')
+    print(f'  Adjusted PERI_OFFSET:    {greedy_offset:.12f}')
+    print(f'  Formula after anchor:    {iau_j2000}° (exact)')
+
     # ─── Output ───────────────────────────────────────────────────────
     print(f'\n═══════════════════════════════════════════════════════════════')
     print(f'  COPY-PASTE OUTPUT')
@@ -238,8 +249,8 @@ def main():
     if '--write' in sys.argv:
         json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
         fc = json.loads(json_path.read_text())
-        fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in harmonics]
-        fc['PERI_OFFSET'] = offset
+        fc['PERI_HARMONICS_RAW'] = [[int(d), s, c] for d, s, c in greedy_harm]
+        fc['PERI_OFFSET'] = greedy_offset
         json_path.write_text(json.dumps(fc, indent=2) + '\n')
         print(f'\n✓ Written PERI_HARMONICS to fitted-coefficients.json')
     else:
