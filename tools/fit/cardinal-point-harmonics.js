@@ -51,7 +51,7 @@ function readData() {
     for (let i = 0; i < allByType[type].length; i += step) byType[type].push(allByType[type][i]);
   }
   console.log(`Downsampled: ${allByType.SS.length} → ${byType.SS.length} per type (step=${step})`);
-  return byType;
+  return { byType, allByType };
 }
 
 // ─── Least squares harmonic fit ──────────────────────────────────────────
@@ -195,7 +195,7 @@ function main() {
     console.log(`  ${type} anchor: J2000=${C.CARDINAL_POINT_ANCHORS[type].toFixed(3)} → grid=${jd.toFixed(3)}`);
   }
 
-  const byType = readData();
+  const { byType, allByType } = readData();
   const types = ['SS', 'WS', 'VE', 'AE'];
   const fibDivisors = [3, 5, 8, 13, 16];
   const results = {};
@@ -265,17 +265,49 @@ function main() {
     console.log(`  ${type} | ${current.rmse.toFixed(2)} min     | ${greedy.rmse.toFixed(2)} min  | [${greedy.divisors.join(',')}]`);
   }
 
-  // ─── J2000 anchors ──────────────────────────────────────────────────────
-  // The data anchor (actual JD at year 2000) becomes the runtime anchor.
-  // At year 2000: h(2000) - h(2000) = 0, so JD = anchor exactly.
-  console.log(`\n── J2000 anchors (from data at year 2000) ──`);
+  // ─── Derive J2000 anchors ────────────────────────────────────────────────
+  // The fitting used the data anchor at anchorYear (≈2003). The runtime uses a
+  // J2000 reference year. Due to the export's seed at 2000.5, the year label
+  // for the J2000 event differs per type: year 2001 for SS/WS/AE, year 2000 for VE.
+  // We find the correct J2000 year from the data (closest JD to IAU anchor).
+  console.log(`\n── J2000 anchors (derived from data anchors) ──`);
   const adjustedAnchors = {};
   for (const type of types) {
     const dataAnchor = results[type].anchor;
+    const anchorYear = results[type].greedy.anchorYear;
+    const harmonics = results[type].greedy.harmonics;
+
+    // Find which year label corresponds to J2000 for this type (search full data)
     const iauAnchor = C.ASTRO_REFERENCE.cardinalPointAnchors[type];
-    const diffMin = (dataAnchor - iauAnchor) * 24 * 60;
-    adjustedAnchors[type] = dataAnchor;
-    console.log(`  ${type}: data=${dataAnchor.toFixed(6)}, IAU=${iauAnchor.toFixed(3)}, diff=${diffMin.toFixed(2)} min`);
+    let j2000Year = 2000;
+    let bestDiff = Infinity;
+    for (const d of allByType[type]) {
+      if (d.year >= 1999 && d.year <= 2002) {
+        const diff = Math.abs(d.jd - iauAnchor);
+        if (diff < bestDiff) { bestDiff = diff; j2000Year = d.year; }
+      }
+    }
+
+    const t2000 = j2000Year - C.balancedYear;
+    const tAnchor = anchorYear - C.balancedYear;
+
+    let hAnchor = 0, h2000 = 0;
+    for (const [div, sinC, cosC] of harmonics) {
+      const pA = 2 * Math.PI * tAnchor / (C.H / div);
+      const p0 = 2 * Math.PI * t2000 / (C.H / div);
+      hAnchor += sinC * Math.sin(pA) + cosC * Math.cos(pA);
+      h2000   += sinC * Math.sin(p0) + cosC * Math.cos(p0);
+    }
+
+    const j2000Anchor = dataAnchor - C.meanSolarYearDays * (anchorYear - j2000Year) - (hAnchor - h2000);
+    adjustedAnchors[type] = j2000Anchor;
+
+    // Verify: runtime at anchorYear should give dataAnchor
+    const verify = j2000Anchor + C.meanSolarYearDays * (anchorYear - j2000Year) + hAnchor - h2000;
+    const verifyErr = (verify - dataAnchor) * 24 * 60;
+
+    const iauDiff = (j2000Anchor - iauAnchor) * 24 * 60;
+    console.log(`  ${type}: J2000=${j2000Anchor.toFixed(6)} (IAU=${iauAnchor.toFixed(3)}, diff=${iauDiff.toFixed(2)} min, j2000yr=${j2000Year}, verify err=${verifyErr.toFixed(4)} min)`);
   }
 
   // ─── Write to fitted-coefficients.json if --write flag is present ────
