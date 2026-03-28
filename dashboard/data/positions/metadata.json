@@ -1,0 +1,44 @@
+{
+  "generated": "2026-03-25T20:19:01.154Z",
+  "startYear": 1800,
+  "endYear": 2200,
+  "stepDays": 5,
+  "targets": {
+    "sun": {
+      "color": "#ffd700",
+      "displayName": "Sun"
+    },
+    "moon": {
+      "color": "#c0c0c0",
+      "displayName": "Moon"
+    },
+    "mercury": {
+      "color": "#9e9e9e",
+      "displayName": "Mercury"
+    },
+    "venus": {
+      "color": "#d5ab37",
+      "displayName": "Venus"
+    },
+    "mars": {
+      "color": "#d04a3e",
+      "displayName": "Mars"
+    },
+    "jupiter": {
+      "color": "#c97e4f",
+      "displayName": "Jupiter"
+    },
+    "saturn": {
+      "color": "#d9b65c",
+      "displayName": "Saturn"
+    },
+    "uranus": {
+      "color": "#37c6d0",
+      "displayName": "Uranus"
+    },
+    "neptune": {
+      "color": "#4a7abf",
+      "displayName": "Neptune"
+    }
+  }
+}
