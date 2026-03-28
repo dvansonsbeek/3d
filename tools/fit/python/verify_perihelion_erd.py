@@ -49,15 +49,21 @@ J2000_FAIL      = 0.010   # degrees — J2000 accuracy fail
 ERD_RMSE_WARN   = 0.0010  # degrees/year — ERD comparison warning
 ERD_RMSE_FAIL   = 0.0050  # degrees/year — ERD comparison fail
 
-ERD_STEP_YEARS  = 29      # data step size (years), used for numerical derivative
+ERD_STEP_YEARS  = int(C.get('stepYears', 20))  # data step size (years), used for numerical derivative
 
 
 def load_truth():
     """Load Earth Perihelion ICRF from the Excel simulation data and unwrap."""
     df = pd.read_excel(str(EXCEL_PATH), sheet_name=SHEET_NAME)
+
+    # Downsample by stepYears for consistency with fitting scripts
+    step = int(C.get('stepYears', 20))
+    df = df.iloc[::step].reset_index(drop=True)
+
     years = df['Model Year'].values.astype(float)
     peri_raw = df['Earth Perihelion ICRF'].values.astype(float)
     peri_unwrapped = np.rad2deg(np.unwrap(np.deg2rad(peri_raw)))
+    print(f'  Downsampled by {step}: {len(years)} points')
     return years, peri_unwrapped
 
 

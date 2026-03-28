@@ -56,6 +56,11 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
     """
     df = pd.read_excel(excel_path, sheet_name='Holistic_objects_PerihelionPlan')
 
+    # Downsample by stepYears for fitting efficiency
+    step = 20  # matches stepYears in model-parameters.json
+    df = df.iloc[::step].reset_index(drop=True)
+    print(f'  Downsampled by {step}: {len(df)} rows')
+
     data = {key: [] for key in PLANET_FLUCTUATION_COLS}
 
     for _, row in df.iterrows():

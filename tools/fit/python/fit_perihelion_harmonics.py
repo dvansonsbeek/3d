@@ -34,6 +34,11 @@ EXCEL_PATH = Path(__file__).resolve().parent.parent.parent.parent / 'data' / '01
 def load_data():
     """Load Earth perihelion ecliptic longitude and unwrap."""
     df = pd.read_excel(str(EXCEL_PATH), sheet_name='Holistic_objects_PerihelionPlan')
+
+    # Downsample by stepYears for fitting efficiency (same RMSE, much faster)
+    step = int(C.get('stepYears', 20))
+    df = df.iloc[::step].reset_index(drop=True)
+
     years = df['Model Year'].values.astype(float)
     peri_raw = df['Earth Perihelion ICRF'].values.astype(float)
 
@@ -41,6 +46,7 @@ def load_data():
     # np.unwrap works in radians, so convert, unwrap, convert back.
     peri_unwrapped = np.rad2deg(np.unwrap(np.deg2rad(peri_raw)))
 
+    print(f'  Downsampled by {step}: {len(years)} points')
     return years, peri_unwrapped
 
 

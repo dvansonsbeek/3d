@@ -855,10 +855,15 @@ def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     peri_sheet = 'Perihelion Planets' if 'Perihelion Planets' in xl.sheet_names else xl.sheet_names[0]
     df_peri = pd.read_excel(excel_path, sheet_name=peri_sheet)
 
+    # Downsample by stepYears for fitting efficiency
+    _step = 20  # matches stepYears in model-parameters.json
+    df_peri = df_peri.iloc[::_step].reset_index(drop=True)
+
     # Read Earth Longitude — fall back to Earth Perihelion ICRF from perihelion sheet if separate sheet absent
     if 'Earth Longitude' in xl.sheet_names:
         df_long = pd.read_excel(excel_path, sheet_name='Earth Longitude',
                                 usecols=['Model Year', 'Earth Longitude RA'])
+        df_long = df_long.iloc[::_step].reset_index(drop=True)
     else:
         df_long = df_peri[['Model Year', 'Earth Perihelion ICRF']].copy()
         df_long = df_long.rename(columns={'Earth Perihelion ICRF': 'Earth Longitude RA'})
