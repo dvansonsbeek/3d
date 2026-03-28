@@ -38,10 +38,10 @@ const startAngleModel = 89.91949879;                      // Start angle at 2000
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.413510317653618;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360546671843621; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015390191231399513;                      // Law 5 balance-locked
-const eccentricityAmplitude = 0.0013516523966245588;      // Solved: e(J2000) = 0.01671022
+const earthtiltMean = 23.41351031737804;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.6360546741925646; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.015390191257511131;                      // Law 5 balance-locked
+const eccentricityAmplitude = 0.0013516523697035157;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 3.4505372893e-6;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
@@ -123,10 +123,10 @@ planets.mercury = {
   orbitalEccentricityBase: 0.20563593,
   orbitalEccentricityAmplitude: 8.436789e-5,
   eccentricityPhaseJ2000: 89.9882,
-  angleCorrection: 0.9709080901966658,
+  angleCorrection: 0.9709065634927079,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
-  startpos: 83.70004476766631,
+  startpos: 83.6591756051821,
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
@@ -149,10 +149,10 @@ planets.venus = {
   orbitalEccentricityBase: 0.00619052,
   orbitalEccentricityAmplitude: 9.625389e-4,
   eccentricityPhaseJ2000: 123.7514,
-  angleCorrection: -2.8028858234795173,
+  angleCorrection: -2.802859951964365,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: holisticyearLength*3/34,
-  startpos: 249.3096870649955,
+  startpos: 249.29675290764655,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
@@ -175,10 +175,10 @@ planets.mars = {
   orbitalEccentricityBase: 0.09297543,
   orbitalEccentricityAmplitude: 3.073636e-3,
   eccentricityPhaseJ2000: 96.8878,
-  angleCorrection: -2.109359104675395,
+  angleCorrection: -2.109372539691609,
   perihelionEclipticYears: holisticyearLength/(4+(1/3)),
   axialPrecessionYears: -holisticyearLength/2,
-  startpos: 121.48011003150216,
+  startpos: 121.4790349206651,
   eocFraction: -0.066224,
   perihelionRef_JD: 2456499.441,
   ascendingNodeInvPlane: 354.87,
@@ -201,10 +201,10 @@ planets.jupiter = {
   orbitalEccentricityBase: 0.04821478,
   orbitalEccentricityAmplitude: 1.149908e-6,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: 0.9270346937948375,
+  angleCorrection: 0.9270187499569893,
   perihelionEclipticYears: holisticyearLength/5,
   axialPrecessionYears: -holisticyearLength*3/8,
-  startpos: 13.881381149476912,
+  startpos: 13.885024334226834,
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
@@ -227,10 +227,10 @@ planets.saturn = {
   orbitalEccentricityBase: 0.05374486,
   orbitalEccentricityAmplitude: 5.403008e-6,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: -0.17477195458654293,
+  angleCorrection: -0.17477186053051952,
   perihelionEclipticYears: -holisticyearLength/8,
   axialPrecessionYears: -holisticyearLength*4/3,
-  startpos: 11.277520596049827,
+  startpos: 11.275868615493765,
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
@@ -253,7 +253,7 @@ planets.uranus = {
   orbitalEccentricityBase: 0.04734421,
   orbitalEccentricityAmplitude: 2.831008e-5,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: -0.7345936479166468,
+  angleCorrection: -0.7346025478625542,
   perihelionEclipticYears: holisticyearLength/3,
   axialPrecessionYears: holisticyearLength*610,
   startpos: 44.90049171476649,
@@ -279,10 +279,10 @@ planets.neptune = {
   orbitalEccentricityBase: 0.00868571,
   orbitalEccentricityAmplitude: 8.098033e-6,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: 2.3338143264418996,
+  angleCorrection: 2.333808574598244,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
-  startpos: 47.95490974720592,
+  startpos: 47.95485852583625,
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
@@ -967,14 +967,14 @@ const ELONGATION_CORRECTION = {
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
 // Data-derived solstice mean (more accurate than Pythagorean time-average)
-const OBLIQUITY_MEAN = 23.453376336164574;
+const OBLIQUITY_MEAN = 23.45323579006333;
 const OBLIQUITY_HARMONICS = [
-  [ 2, -0.000003, -0.000062], [ 3,  0.032056, -0.634289],
-  [ 5, -0.000077, -0.008130], [ 6,  0.000448, -0.004037],
-  [ 8, -0.032056,  0.634308], [ 9,  0.000009, -0.000054],
-  [11, -0.000895,  0.008075], [13, -0.000002,  0.000042],
-  [14, -0.000026,  0.000163], [16,  0.000448, -0.004037],
-  [17, -0.000001,  0.000004], [19,  0.000026, -0.000163],
+  [ 2, -0.000003, -0.000062], [ 3,  0.032101, -0.634912],
+  [ 5, -0.000078, -0.008146], [ 6,  0.000449, -0.004045],
+  [ 8, -0.032072,  0.634933], [ 9,  0.000009, -0.000055],
+  [11, -0.000897,  0.008091], [13, -0.000002,  0.000042],
+  [14, -0.000027,  0.000164], [16,  0.000448, -0.004045],
+  [17, -0.000001,  0.000004], [19,  0.000027, -0.000164],
   [22,  0.000001, -0.000005], [24, -0.000009,  0.000055],
   [27, -0.000001,  0.000004], [32,  0.000000, -0.000001],
 ];
@@ -22503,7 +22503,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v6.01</span>';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v6.1</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */
@@ -26044,7 +26044,7 @@ async function analyzeEquinoxIntervals(startYear, endYear) {
   console.log('  At solstices, Earth is perpendicular to the perihelion-aphelion axis, maximizing');
   console.log('  the parallax angle. At equinoxes, Earth is closer to that axis, reducing parallax.');
   console.log('  Method C "washes out" the eccentricity effect, converging all cardinal points to');
-  console.log('  nearly the same value (~365.2421887 days) - very close to IAU mean tropical year.');
+  console.log('  nearly the same value (~365.2422 days) - very close to IAU mean tropical year.');
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════════════════════════════════════');
   console.log('MODEL VS IAU AT SOLSTICES:');
@@ -31233,11 +31233,11 @@ const planetStats = {
        constant: true},
       {label : () => `Orbital period (P)`,
        value : [ { v: () => o.lengthofsolarYear/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
-       hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of 365.24219 days`],
+       hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`],
        constant: true},
       {label : () => `Orbital period (solar)`,
        value : [ { v: () => o.lengthofsolarYear, dec:8, sep:',' },{ small : 'days' }],
-       hover : [`Tropical year: equinox-to-equinox interval. Varies ±minutes due to gravitational perturbations. Mean ≈ 365.24219 days`],
+       hover : [`Tropical year: equinox-to-equinox interval. Varies ±minutes due to gravitational perturbations. Mean ≈ ~365.2422 days`],
        tpLink: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => o.lengthofsiderealYear, dec:8, sep:',' },{ small : 'days' }],
@@ -31486,7 +31486,7 @@ const planetStats = {
        hover : [`Left = mean solar year in SI seconds. Right = current tropical year adjusted for length-of-day drift`]},
       {label : () => `Solar year (days)`,
        value : [ { small: meansolaryearlengthinDays },{ v: () => o.lengthofsolarYear, dec:11, sep:',' }],
-       hover : [`Left = mean tropical year ≈ 365.24219 days. Right = current. Basis for the calendar year and leap year cycle`]},
+       hover : [`Left = mean tropical year ≈ ~365.2422 days. Right = current. Basis for the calendar year and leap year cycle`]},
      null,
       {label : () => `Sidereal year (SI seconds)`,
        value : [ { small: meansiderealyearlengthinSeconds },{ v: () => o.lengthofsiderealYearInSeconds, dec:6, sep:',' }],

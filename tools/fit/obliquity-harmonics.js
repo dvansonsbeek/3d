@@ -40,16 +40,23 @@ function readSSData() {
   const header = lines[0];
   console.log(`CSV header: ${header}`);
 
-  const data = [];
+  // Collect all SS rows, then downsample by stepYears for fitting efficiency
+  const allSS = [];
   for (let i = 1; i < lines.length; i++) {
     const parts = lines[i].split(',');
     if (parts[0] !== 'SS') continue;
     const year = parseFloat(parts[1]);
     const obliq = parseFloat(parts[4]);
     if (!isNaN(year) && !isNaN(obliq) && obliq > 0) {
-      data.push({ year, obliq });
+      allSS.push({ year, obliq });
     }
   }
+
+  // Downsample: every stepYears-th point (same RMSE, much faster fitting)
+  const step = C.stepYears || 20;
+  const data = [];
+  for (let i = 0; i < allSS.length; i += step) data.push(allSS[i]);
+  console.log(`Downsampled: ${allSS.length} → ${data.length} points (step=${step})`);
   return data;
 }
 
@@ -209,7 +216,9 @@ function main() {
   const data = readSSData();
   console.log(`SS data points: ${data.length}`);
   console.log(`Year range: ${data[0].year} to ${data[data.length - 1].year}`);
-  console.log(`Obliquity range: ${Math.min(...data.map(d => d.obliq)).toFixed(6)}° to ${Math.max(...data.map(d => d.obliq)).toFixed(6)}°`);
+  let obliqMin = Infinity, obliqMax = -Infinity;
+  for (const d of data) { if (d.obliq < obliqMin) obliqMin = d.obliq; if (d.obliq > obliqMax) obliqMax = d.obliq; }
+  console.log(`Obliquity range: ${obliqMin.toFixed(6)}° to ${obliqMax.toFixed(6)}°`);
 
   // Compute mean obliquity from data (more accurate than Pythagorean for solstice fitting)
   let obliqSum = 0;
