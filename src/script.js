@@ -29295,9 +29295,14 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
     }
   }
 
-  // Replace canvases with a single <img> at logical (not HiDPI) size
+  // Replace canvases with a single <img> using blob URL (short URL, not base64)
   const img = document.createElement('img');
-  img.src = mergedCanvas.toDataURL('image/png');
+  mergedCanvas.toBlob((blob) => {
+    const imgBlobUrl = URL.createObjectURL(blob);
+    img.src = imgBlobUrl;
+    // Store for cleanup when modal closes
+    img._blobUrl = imgBlobUrl;
+  }, 'image/png');
   img.style.width = totalW + 'px';
   img.style.height = (totalH + 60) + 'px';
   img.style.borderRadius = '4px';
@@ -29340,11 +29345,11 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
 
   container.appendChild(footer);
 
-  // Clean up blob URL when modal closes
-  const origOnClick = modal.onclick;
+  // Clean up blob URLs when modal closes
   modal.onclick = (e) => {
     if (e.target === modal) {
       URL.revokeObjectURL(xlsxBlobUrl);
+      if (img._blobUrl) URL.revokeObjectURL(img._blobUrl);
       modal.remove();
     }
   };
