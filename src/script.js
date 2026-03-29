@@ -1231,7 +1231,7 @@ const ASTRO_REFERENCE = {
   tropicalYearRateSecPerCentury: -0.53,              // Secular change in tropical year length
   // Source: JPL Horizons
   anomalisticYearJ2000: 365.259636,                  // Perihelion to perihelion
-  siderealYearJ2000: 365.256363,                     // Fixed star reference (one complete orbit)
+  siderealYearJ2000: 365.25636301,                    // Fixed star reference (one complete orbit)
   // Source: IERS Conventions / IAU definitions
   solarDayJ2000: 86400.0,                            // Mean solar day (SI definition)
   siderealDayJ2000: 86164.09053083288,               // ~23h 56m 4.0905s
