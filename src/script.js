@@ -5256,7 +5256,9 @@ let o = {
   runRADiagnostics      : false,
   calibrationYearStart  : 1990,
   calibrationYearEnd    : 2010,
-  _calibrationBusy      : false
+  _calibrationBusy      : false,
+  solarDayReportYear    : 2000,
+  _solarDayBusy         : false
 };
 
 const params = { sizeBoost: 0 }; 
@@ -22391,6 +22393,27 @@ function setupGUI() {
   syncYearAnalysisVis();
   modeCtrl3.on('change', syncYearAnalysisVis);
 
+  /* ── Solar Day Report ────────────────────────────────────────────────── */
+  const solarDayFolder = reportsFolder.addFolder({ title: 'Solar Day', expanded: false });
+  addFolderTooltip(solarDayFolder, 'Measure 365 solar-noon-to-noon intervals starting from 6 points (4 RA crossings + perihelion + aphelion). Shows how starting angle affects mean solar day length via equation-of-time sampling bias.');
+  solarDayFolder.addBinding(o, 'solarDayReportYear', { label: 'Year', step: 1 });
+  o._solarDayProgress = '';
+  const solarDayProgressCtrl = solarDayFolder.addBinding(o, '_solarDayProgress', { label: 'Progress', readonly: true });
+  solarDayFolder.addButton({ title: 'Create file' }).on('click', async () => {
+    if (o._solarDayBusy) return;
+    o._solarDayBusy = true;
+    try {
+      await runSolarDayReport(o.solarDayReportYear, (msg) => {
+        o._solarDayProgress = msg;
+        solarDayProgressCtrl.refresh();
+      });
+    } finally {
+      o._solarDayBusy = false;
+      o._solarDayProgress = '';
+      solarDayProgressCtrl.refresh();
+    }
+  });
+
   // ── Tools ──
   const toolsFolder = gui.addFolder({ title: 'Tools', expanded: false });
   toolsFolder.element.dataset.category = 'tools';
@@ -24239,7 +24262,7 @@ async function runYearAnalysisExport(years) {
 
   // Sheet 1: Summary
   const summaryRows = [
-    ['DAYS & YEARS & PRECESSION REPORT'],
+    ['DAYS & YEARS REPORT'],
     ['GENERATED', new Date().toISOString()],
     ['ANALYSIS PERIOD', `${startYear} to ${endYear} (${endYear - startYear} years)`],
     [],
@@ -24257,25 +24280,25 @@ async function runYearAnalysisExport(years) {
     ['Mean Anomalistic Year in Days', meanAnomalisticYearinDays.toFixed(9)],
     ['Mean Anomalistic Year in Seconds', (meanAnomalisticYearinDays * meanlengthofday).toFixed(9)],
     [],
-    ['1. TROPICAL YEAR', 'Measured (days)'],
+    ['1. RA TROPICAL YEAR (mean of 4 RA crossings)', 'Measured (days)'],
     ['IAU Tropical Year J2000', ASTRO_REFERENCE.tropicalYearMeanJ2000.toFixed(9)],
-    ['Measured Tropical Year (Mean in Analysis Period)', meanTropicalYear.toFixed(9)],
+    ['Mean RA Tropical Year (Analysis Period)', meanTropicalYear.toFixed(9)],
     [],
-    ['1a) Tropical Year by Cardinal Point', 'Measured (days)'],
-    ['Vernal Equinox (RA=0°)', cardinalData.VE.mean.toFixed(9)],
-    ['Summer Solstice (RA=90°)', cardinalData.SS.mean.toFixed(9)],
-    ['Autumnal Equinox (RA=180°)', cardinalData.AE.mean.toFixed(9)],
-    ['Winter Solstice (RA=270°)', cardinalData.WS.mean.toFixed(9)],
+    ['1a) RA Tropical Year by Crossing', 'Measured (days)'],
+    ['RA=0° crossing', cardinalData.VE.mean.toFixed(9)],
+    ['RA=90° crossing', cardinalData.SS.mean.toFixed(9)],
+    ['RA=180° crossing', cardinalData.AE.mean.toFixed(9)],
+    ['RA=270° crossing', cardinalData.WS.mean.toFixed(9)],
     [],
     ['2. SIDEREAL YEAR', 'Measured (days)'],
     ['IAU Sidereal Year J2000', ASTRO_REFERENCE.siderealYearJ2000.toFixed(9)],
     ['Measured Sidereal Year (Mean in Analysis Period)', meanSiderealYear.toFixed(9)],
     [],
     ['2a) Sidereal Year by Cardinal Point', 'Measured (days)'],
-    ['Vernal Equinox (RA=0°)', siderealData.S0.mean.toFixed(9)],
-    ['Summer Solstice (RA=90°)', siderealData.S90.mean.toFixed(9)],
-    ['Autumnal Equinox (RA=180°)', siderealData.S180.mean.toFixed(9)],
-    ['Winter Solstice (RA=270°)', siderealData.S270.mean.toFixed(9)],
+    ['RA=0° crossing', siderealData.S0.mean.toFixed(9)],
+    ['RA=90° crossing', siderealData.S90.mean.toFixed(9)],
+    ['RA=180° crossing', siderealData.S180.mean.toFixed(9)],
+    ['RA=270° crossing', siderealData.S270.mean.toFixed(9)],
     [],
     ['3. ANOMALISTIC YEAR', 'Measured (days)'],
     ['IAU Anomalistic Year J2000', ASTRO_REFERENCE.anomalisticYearJ2000.toFixed(9)],
@@ -24325,18 +24348,6 @@ async function runYearAnalysisExport(years) {
     ['  RA Day Offset (ms)', (() => { const t = midYear - balancedYear; return (-14.194 - 5.640 * Math.cos(2 * Math.PI * t / (holisticyearLength / 16)) - 1.684 * Math.cos(2 * Math.PI * t / (holisticyearLength / 8))).toFixed(4); })(), 'ms/day'],
     ['  Derived Day Length (s)', (meansiderealyearlengthinSeconds / computeLengthofsiderealYear(midYear)).toFixed(6)],
     ['  Measured Solar Day (s)', (() => { const t = midYear - balancedYear; const offset = -14.194 - 5.640 * Math.cos(2 * Math.PI * t / (holisticyearLength / 16)) - 1.684 * Math.cos(2 * Math.PI * t / (holisticyearLength / 8)); return (meansiderealyearlengthinSeconds / computeLengthofsiderealYear(midYear) + offset / 1000).toFixed(6); })()],
-    [],
-    ['PRECESSION CALCULATION'],
-    ['  IAU Axial Precession J2000', ASTRO_REFERENCE.iauPrecessionJ2000.toFixed(2), 'years'],
-    ['  IAU Δ Sidereal Year - Tropical Year J2000', ((ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) * 86400).toFixed(2), 's'],
-    ['  Measured Δ Sidereal - Tropical Year Analysis Period', ((meanSiderealYear - meanTropicalYear) * 86400).toFixed(2), 's'],
-    [''],
-    ['Axial Precession = Sidereal / (Sidereal - Tropical)'],
-    ['  Measured Axial precession (Mean in Analysis Period)', (meanSiderealYear / (meanSiderealYear - meanTropicalYear)).toFixed(2), 'years'],
-    ['Inclination Precession = Anomalistic / (Anomalistic - Sidereal)'],
-    ['  Measured Inclination precession (Mean in Analysis Period)', (meanAnomalisticYear / (meanAnomalisticYear - meanSiderealYear)).toFixed(2), 'years'],
-    ['Perihelion Precession = Anomalistic / (Anomalistic - Tropical)'],
-    ['  Measured Perihelion precession (Mean in Analysis Period)', (meanAnomalisticYear / (meanAnomalisticYear - meanTropicalYear)).toFixed(2), 'years']
   ];
 
   // Helper to get interval by year from a Map
@@ -24358,18 +24369,14 @@ async function runYearAnalysisExport(years) {
   // Sheet 2: Year Length & Precession (consolidated from Cardinal Points, Anomalistic, Sidereal, Detailed)
   const detailedRows = [
     ['JD', 'Date', 'Time', 'Model Year (mean tropical)',
-     'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year',
-     'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval',
+     'Obliquity (°)', 'Eccentricity', 'Mean RA Tropical Year',
+     'RA=0° Interval', 'RA=90° Interval', 'RA=180° Interval', 'RA=270° Interval',
      'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)',
      'Aphelion JD', 'Aphelion Dist (AU)', 'Aph Interval (days)',
      'Mean Anomalistic',
      'Sid 0°', 'Sid 90°', 'Sid 180°', 'Sid 270°', 'Mean Sidereal',
-     'Axial Precession', 'Perihelion Precession', 'Inclination Precession',
-     'Obliquity Cycle Mean', 'Ecliptic Precession',
      'Derived Day Length (s)', 'Sidereal Day (s)', 'Stellar Day (s)', 'RA Day Offset (ms)', 'Measured Solar Day (s)']
   ];
-
-  const obliquityCycleMean = holisticyearLength / 8;
 
   for (const year of requestedYears) {
     const orbParams = orbParamsByYear.get(year) || {};
@@ -24415,21 +24422,6 @@ async function runYearAnalysisExport(years) {
       - 1.684 * Math.cos(2 * Math.PI * _raDayT / (holisticyearLength / 8));
     const measuredSolarDayRow = derivedDayLength + raDayOffsetMsRow / 1000;
 
-    // Derived precession values
-    let axialPrec = '', periPrec = '', inclPrec = '', eclipticPrec = '';
-    if (meanSid !== null && meanTrop !== null && meanSid !== meanTrop) {
-      axialPrec = meanSid / (meanSid - meanTrop);
-    }
-    if (meanAnom !== null && meanTrop !== null && meanAnom !== meanTrop) {
-      periPrec = meanAnom / (meanAnom - meanTrop);
-    }
-    if (meanAnom !== null && meanSid !== null && meanAnom !== meanSid) {
-      inclPrec = meanAnom / (meanAnom - meanSid);
-    }
-    if (inclPrec !== '' && axialPrec !== '' && (inclPrec / axialPrec) !== 1) {
-      eclipticPrec = inclPrec / ((inclPrec / axialPrec) - 1) * 2;
-    }
-
     detailedRows.push([
       String(refJD.toFixed(6)),
       dateInfo.date,
@@ -24454,11 +24446,6 @@ async function runYearAnalysisExport(years) {
       getInterval(siderealData.S180.intervalsByYear, year),
       getInterval(siderealData.S270.intervalsByYear, year),
       meanSid !== null ? meanSid.toFixed(9) : '',
-      typeof axialPrec === 'number' ? axialPrec.toFixed(2) : '',
-      typeof periPrec === 'number' ? periPrec.toFixed(2) : '',
-      typeof inclPrec === 'number' ? inclPrec.toFixed(2) : '',
-      obliquityCycleMean.toFixed(2),
-      typeof eclipticPrec === 'number' ? eclipticPrec.toFixed(2) : '',
       derivedDayLength.toFixed(6),
       siderealDayRow.toFixed(6),
       stellarDayRow.toFixed(6),
@@ -28355,7 +28342,8 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   console.log('╔══════════════════════════════════════════════════════════════════════════╗');
   console.log('║           MEAN SOLAR DAY LENGTH ANALYSIS                                 ║');
   console.log('╚══════════════════════════════════════════════════════════════════════════╝');
-  console.log(`Analyzing year ${startYear} (one tropical year of daily measurements)...`);
+  console.log(`Analyzing year ${startYear} (365 daily measurements starting from June solstice / RA≈90°)`);
+  console.log('Note: starting angle affects the measured mean. Use Reports > Solar Day for comparison.');
   console.log('');
   }
 
@@ -28653,19 +28641,29 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   console.log('D: Uses sun.ra with cumulative tracking from Earth\'s position.');
   console.log('');
   console.log('-------------------------------------------------------------------------------');
-  console.log('WHY METHODS A/D MEASURE ~14.2ms SHORT OF meanlengthofday');
+  console.log('WHY METHODS A/D DIFFER FROM meanlengthofday');
   console.log('-------------------------------------------------------------------------------');
-  console.log('The ~14.2ms/day offset is confirmed by the Solar day multiepoch test:');
-  console.log('65 measurements evenly distributed across one full holistic year (H),');
-  console.log(`mean offset = -14.194 ms/day (relative to meanlengthofday = ${meanlengthofday.toFixed(6)}s).`);
+  console.log('The measured offset has two components:');
   console.log('');
-  console.log('The physical cause is not yet fully explained and requires further investigation.');
-  console.log('Note: perihelion precession shows as sinusoidal modulation (amplitude ~7.1 ms,');
-  console.log('period H/16) and cancels out in the mean — it does NOT explain the 14.2 ms offset.');
+  console.log('1) STARTING-ANGLE BIAS (varies by ±15 ms depending on starting RA)');
+  console.log('   This test starts from the June solstice (RA≈90°). We measure exactly');
+  console.log('   365 noon-to-noon intervals, but a tropical year is 365.242... days.');
+  console.log('   The unmeasured 0.242-day residual falls at a specific phase of the');
+  console.log('   equation-of-time cycle, biasing the mean. Starting at RA=180° gives');
+  console.log('   a higher mean; RA=270° gives a lower mean. Use Reports > Solar Day');
+  console.log('   to compare all starting angles side by side.');
   console.log('');
-  console.log('Methods B and C produce meanlengthofday because they use idealized mathematical');
-  console.log('relationships that do not capture the RA frame shift.');
-  console.log('Methods A and D capture the real Sun-Earth geometry and expose this offset.');
+  console.log('2) STRUCTURAL RA OFFSET (~14 ms mean over one full holistic year)');
+  console.log('   Confirmed by the Solar Day Multi-Epoch test: 65 measurements across');
+  console.log(`   one full H cycle give mean offset = -14.194 ms/day (all from RA≈90°).`);
+  console.log('   This reflects the coin rotation effect of axial precession: the RA');
+  console.log('   reference frame itself precesses, shortening every RA-measured day.');
+  console.log('   Perihelion precession adds a sinusoidal modulation (±7 ms, period H/16)');
+  console.log('   that cancels in the H-cycle mean.');
+  console.log('');
+  console.log('Methods B and C produce meanlengthofday because they use idealized');
+  console.log('mathematical relationships that do not capture the RA frame shift.');
+  console.log('Methods A and D capture the real Sun-Earth geometry and expose both effects.');
   console.log('═══════════════════════════════════════════════════════════════════════════');
 
   jumpToJulianDay(savedJD);
@@ -28703,6 +28701,656 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
 }
 
 /**
+ * measureSolarDayIntervals(startJD, numDays)
+ *
+ * Measures numDays solar-noon-to-noon intervals using Method A
+ * (wobble-center RA via calculateRAFromWobbleCenter), starting from
+ * the solar noon nearest to startJD.
+ *
+ * @param {number} startJD - JD near the desired starting point
+ * @param {number} numDays - Number of intervals to measure (default 365)
+ * @returns {{ intervals: number[], declinations: number[], noonJDs: number[], firstNoonJD: number }}
+ */
+async function measureSolarDayIntervals(startJD, numDays = 365) {
+  // Find nearest solar noon to startJD (adapted from analyzeSolarDay)
+  const findNearestNoon = (jd) => {
+    jumpToJulianDay(jd);
+    forceSceneUpdate();
+    const startHA = earth.planetObj.rotation.y - calculateRAFromWobbleCenter(sun);
+    const nearestNoonHA = Math.round(startHA / (2 * Math.PI)) * (2 * Math.PI);
+    const step = 1 / (24 * 60); // 1 minute
+    let bestJD = jd;
+    let bestDiff = Infinity;
+    for (let k = -12 * 60; k <= 12 * 60; k++) {
+      const testJD = jd + k * step;
+      jumpToJulianDay(testJD);
+      forceSceneUpdate();
+      const ha = earth.planetObj.rotation.y - calculateRAFromWobbleCenter(sun);
+      const diff = Math.abs(ha - nearestNoonHA);
+      if (diff < bestDiff) { bestDiff = diff; bestJD = testJD; }
+    }
+    return bestJD;
+  };
+
+  const firstNoonJD = findNearestNoon(startJD);
+  // Capture declination at the first noon
+  jumpToJulianDay(firstNoonJD);
+  forceSceneUpdate();
+  const firstDec = sun.dec * 180 / Math.PI; // degrees
+
+  const intervals = [];
+  const declinations = [firstDec];
+  const noonJDs = [firstNoonJD];
+  let prevJD = firstNoonJD;
+  let cumulativeState = null;
+
+  for (let i = 0; i < numDays; i++) {
+    const result = solarNoonForJD(prevJD, false, cumulativeState);
+    if (result) {
+      intervals.push((result.jd - prevJD) * 86400);
+      prevJD = result.jd;
+      cumulativeState = result.cumulativeState;
+      // Capture declination at this noon
+      jumpToJulianDay(result.jd);
+      forceSceneUpdate();
+      declinations.push(sun.dec * 180 / Math.PI);
+      noonJDs.push(result.jd);
+    }
+    // Yield to UI every 50 days to prevent freezing
+    if (i % 50 === 49) await new Promise(r => setTimeout(r, 0));
+  }
+
+  return { intervals, declinations, noonJDs, firstNoonJD };
+}
+
+/**
+ * runSolarDayReport(year)
+ *
+ * Generates an XLSX report measuring 365 solar-noon-to-noon intervals
+ * from 6 starting points (RA=0°, 90°, 180°, 270° + perihelion + aphelion).
+ * Shows how starting angle affects the measured mean solar day.
+ */
+async function runSolarDayReport(year, onProgress) {
+  await ensureSheetJs();
+
+  const savedJD = o.julianDay;
+  const savedRun = o.Run;
+  o.Run = false;
+
+  const numDays = Math.floor(meansolaryearlengthinDays); // 365
+
+  // Build starting points: 4 RA crossings + perihelion + aphelion
+  const startPoints = [
+    { label: 'RA=0°',      type: 'ra', ra: 0,   cardinal: true },
+    { label: 'RA=90°',     type: 'ra', ra: 90,  cardinal: true },
+    { label: 'RA=180°',    type: 'ra', ra: 180, cardinal: true },
+    { label: 'RA=270°',    type: 'ra', ra: 270, cardinal: true },
+    { label: 'Perihelion',  type: 'perihelion',  cardinal: false },
+    { label: 'Aphelion',    type: 'aphelion',    cardinal: false },
+  ];
+
+  const results = [];
+
+  for (let spIdx = 0; spIdx < startPoints.length; spIdx++) {
+    const sp = startPoints[spIdx];
+    if (onProgress) onProgress(`${spIdx + 1}/${startPoints.length}: ${sp.label}...`);
+    console.log(`Solar Day Report: measuring ${numDays} days from ${sp.label}...`);
+    let startJD;
+    if (sp.type === 'ra') {
+      const crossing = sunRACrossingForYear(year, sp.ra);
+      if (!crossing) { console.error(`Could not find ${sp.label} for year ${year}`); continue; }
+      startJD = crossing.jd;
+    } else if (sp.type === 'perihelion') {
+      const peri = perihelionForYear(year);
+      if (!peri) { console.error(`Could not find perihelion for year ${year}`); continue; }
+      startJD = peri.jd;
+    } else {
+      const aph = aphelionForYear(year);
+      if (!aph) { console.error(`Could not find aphelion for year ${year}`); continue; }
+      startJD = aph.jd;
+    }
+
+    const data = await measureSolarDayIntervals(startJD, numDays);
+
+    const intervals = data.intervals;
+    const sorted = [...intervals].sort((a, b) => a - b);
+    const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const min = sorted[0];
+    const max = sorted[sorted.length - 1];
+
+    results.push({
+      ...sp,
+      intervals,
+      declinations: data.declinations,
+      noonJDs: data.noonJDs,
+      firstNoonJD: data.firstNoonJD,
+      startJD,
+      stats: {
+        count: intervals.length,
+        mean,
+        median: sorted[Math.floor(sorted.length / 2)],
+        min,
+        max,
+        range: max - min,
+        diffFrom86400: mean - 86400,
+      }
+    });
+    console.log(`  ${sp.label}: mean = ${mean.toFixed(6)}s, diff = ${((mean - 86400) * 1000).toFixed(3)} ms`);
+  }
+
+  // ── Sheet 1: Summary ──────────────────────────────────────────────────
+  const tropicalYearAtEpoch = computeLengthofsolarYear(year);
+  const residual = tropicalYearAtEpoch - numDays;
+
+  if (onProgress) onProgress('Building report...');
+
+  const summaryRows = [
+    ['SOLAR DAY REPORT'],
+    ['GENERATED', new Date().toISOString()],
+    [],
+    [`YEAR: ${year}`],
+    [`Tropical year length at year ${year}:`, tropicalYearAtEpoch.toFixed(9), 'days'],
+    [`Mean tropical year (H-cycle average):`, meansolaryearlengthinDays.toFixed(9), 'days'],
+    [`Measured intervals per starting point:`, numDays],
+    [],
+    ['WHY STARTING ANGLE MATTERS'],
+    [`The solar day is measured as the interval between successive solar noons.`],
+    [`In year ${year} the tropical year is ${tropicalYearAtEpoch.toFixed(6)} days — not an integer.`],
+    [`We measure exactly ${numDays} noon-to-noon intervals, leaving a ${residual.toFixed(6)}-day`],
+    ['residual that is not measured. Which part of the annual equation-of-time cycle'],
+    ['falls in that unmeasured residual depends on the starting point, biasing the'],
+    ['measured mean solar day by several milliseconds.'],
+    ['This report measures from 6 starting points to expose this bias.'],
+    ['Results are specific to year ' + year + ' and will differ for other years.'],
+    [],
+    ['MEASUREMENT METHOD'],
+    ['Solar noon is detected by tracking the Sun\'s Right Ascension (RA) as seen from'],
+    ['a wobble-corrected Earth center (eliminates precession wobble parallax).'],
+    ['Each noon is the moment when the hour angle (Earth rotation minus Sun RA)'],
+    ['advances by exactly 360 degrees from the previous noon.'],
+    [],
+    ['RESULTS'],
+    ['Starting Point', 'Start JD', 'Count', 'Mean (s)', 'Median (s)', 'Min (s)', 'Max (s)', 'Range (s)', 'Diff from 86400 (ms)'],
+  ];
+  for (const r of results) {
+    summaryRows.push([
+      r.label,
+      r.startJD.toFixed(6),
+      r.stats.count,
+      r.stats.mean.toFixed(6),
+      r.stats.median.toFixed(6),
+      r.stats.min.toFixed(6),
+      r.stats.max.toFixed(6),
+      r.stats.range.toFixed(6),
+      (r.stats.diffFrom86400 * 1000).toFixed(4)
+    ]);
+  }
+
+  // Add comparison section
+  if (results.length >= 2) {
+    const cardinalResults = results.filter(r => r.cardinal);
+    const cardinalMean = cardinalResults.length > 0
+      ? cardinalResults.reduce((s, r) => s + r.stats.mean, 0) / cardinalResults.length : 0;
+    const allMean = results.reduce((s, r) => s + r.stats.mean, 0) / results.length;
+
+    summaryRows.push([]);
+    summaryRows.push(['COMPARISON']);
+    summaryRows.push(['Shortest mean', results.reduce((a, b) => a.stats.mean < b.stats.mean ? a : b).label,
+      results.reduce((a, b) => a.stats.mean < b.stats.mean ? a : b).stats.mean.toFixed(6)]);
+    summaryRows.push(['Longest mean', results.reduce((a, b) => a.stats.mean > b.stats.mean ? a : b).label,
+      results.reduce((a, b) => a.stats.mean > b.stats.mean ? a : b).stats.mean.toFixed(6)]);
+    const spread = Math.max(...results.map(r => r.stats.mean)) - Math.min(...results.map(r => r.stats.mean));
+    summaryRows.push(['Spread (max - min)', '', (spread * 1000).toFixed(4) + ' ms']);
+    summaryRows.push([]);
+    if (cardinalResults.length === 4) {
+      summaryRows.push(['Mean of 4 cardinal points (RA 0/90/180/270)', '', cardinalMean.toFixed(6), 's',
+        '', ((cardinalMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+    }
+    summaryRows.push([`Mean of all ${results.length} starting points`, '', allMean.toFixed(6), 's',
+      '', ((allMean - 86400) * 1000).toFixed(4), 'ms from 86400']);
+  }
+
+  // ── Sheet 2: Daily Data ───────────────────────────────────────────────
+  const headerRow = ['Day#'];
+  for (const r of results) {
+    headerRow.push(`${r.label} Length (s)`, `${r.label} Diff (s)`, `${r.label} Cumul (s)`);
+  }
+  const dailyRows = [headerRow];
+
+  // Pre-compute cumulative drifts
+  const cumulDrifts = results.map(r => {
+    const drifts = [];
+    let cum = 0;
+    for (const interval of r.intervals) {
+      cum += (interval - 86400);
+      drifts.push(cum);
+    }
+    return drifts;
+  });
+
+  for (let i = 0; i < numDays; i++) {
+    const row = [i + 1];
+    for (let rIdx = 0; rIdx < results.length; rIdx++) {
+      const len = results[rIdx].intervals[i];
+      if (len !== undefined) {
+        row.push(len.toFixed(6), (len - 86400).toFixed(6), cumulDrifts[rIdx][i].toFixed(6));
+      } else {
+        row.push('', '', '');
+      }
+    }
+    dailyRows.push(row);
+  }
+
+  // ── Build workbook and download ───────────────────────────────────────
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dailyRows), 'Daily Data');
+
+  const xlsxBlobUrl = URL.createObjectURL(workbookToBlob(wb));
+  const xlsxFilename = `Holistic_solar_day_${year}.xlsx`;
+
+  // Restore state
+  jumpToJulianDay(savedJD);
+  o.Run = savedRun;
+  console.log(`Solar Day Report for year ${year} complete.`);
+
+  // ── Analemma-style visualization modal ────────────────────────────────
+  showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xlsxFilename);
+}
+
+/**
+ * Show a modal with equation-of-time chart for all starting points.
+ * Draws daily deviation from 86400s and cumulative drift on a canvas.
+ */
+function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xlsxFilename) {
+  const prev = document.getElementById('solar-day-modal');
+  if (prev) prev.remove();
+
+  const colors = ['#e6194b', '#3cb44b', '#4363d8', '#f58231', '#911eb4', '#42d4f4'];
+
+  // Use first result (RA=0°) for analemma — all starting points trace the same physical path
+  const analemmaResult = results[0];
+  const analemmaEoTRaw = []; // equation of time in minutes (raw cumulative)
+  let cumSec = 0;
+  for (let i = 0; i < numDays; i++) {
+    cumSec += (analemmaResult.intervals[i] - 86400);
+    analemmaEoTRaw.push(-cumSec / 60); // EoT convention: sun fast = positive
+  }
+  // Center the EoT so the figure-8 is symmetric around the zero line
+  const eotMean = analemmaEoTRaw.reduce((a, b) => a + b, 0) / analemmaEoTRaw.length;
+  const analemmaEoT = analemmaEoTRaw.map(v => v - eotMean);
+
+  const analemmaDec = analemmaResult.declinations.slice(1, numDays + 1); // dec at each noon after interval
+  const analemmaNoonJDs = analemmaResult.noonJDs.slice(1, numDays + 1); // JDs at each noon
+
+  // Find longest/shortest solar day (max/min noon-to-noon interval, NOT declination extremes)
+  let longestDayIdx = 0, shortestDayIdx = 0;
+  for (let i = 1; i < numDays; i++) {
+    if (analemmaResult.intervals[i] > analemmaResult.intervals[longestDayIdx]) longestDayIdx = i;
+    if (analemmaResult.intervals[i] < analemmaResult.intervals[shortestDayIdx]) shortestDayIdx = i;
+  }
+  const longestDate = jdToDateString(analemmaNoonJDs[longestDayIdx]).date;
+  const shortestDate = jdToDateString(analemmaNoonJDs[shortestDayIdx]).date;
+  const longestLen = analemmaResult.intervals[longestDayIdx];
+  const shortestLen = analemmaResult.intervals[shortestDayIdx];
+
+  // HiDPI scaling for crisp rendering
+  const DPR = window.devicePixelRatio || 1;
+  const createHiDPICanvas = (w, h) => {
+    const c = document.createElement('canvas');
+    c.width = w * DPR; c.height = h * DPR;
+    c.style.width = w + 'px'; c.style.height = h + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(DPR, DPR);
+    return c;
+  };
+
+  // Modal
+  const modal = document.createElement('div');
+  modal.id = 'solar-day-modal';
+  Object.assign(modal.style, {
+    position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+    background: 'rgba(0,0,0,0.75)', zIndex: '100000', display: 'flex',
+    alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+  });
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+  const container = document.createElement('div');
+  Object.assign(container.style, {
+    background: '#12122a', borderRadius: '10px', padding: '20px',
+    border: '1px solid #444', boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
+    cursor: 'default', maxWidth: '95vw'
+  });
+
+  const titleEl = document.createElement('div');
+  titleEl.textContent = `Analemma & Solar Day \u2014 Year ${year}`;
+  Object.assign(titleEl.style, { color: '#eee', fontSize: '15px', marginBottom: '10px', textAlign: 'center', fontFamily: 'monospace' });
+  container.appendChild(titleEl);
+
+  // Layout: analemma (left) + two time charts (right)
+  const row = document.createElement('div');
+  Object.assign(row.style, { display: 'flex', gap: '12px' });
+
+  // ── Analemma canvas (left) ──
+  const AW = 360, AH = 480;
+  const analemmaCanvas = createHiDPICanvas(AW, AH);
+  row.appendChild(analemmaCanvas);
+
+  // ── Time-series canvas (right) ──
+  const TW = 620, TH = 480, TPAD = 55, TCH = 190;
+  const timeCanvas = createHiDPICanvas(TW, TH);
+  row.appendChild(timeCanvas);
+
+  container.appendChild(row);
+
+  // Legend
+  const legend = document.createElement('div');
+  Object.assign(legend.style, { display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '8px', justifyContent: 'center' });
+  for (let i = 0; i < results.length; i++) {
+    const item = document.createElement('span');
+    item.innerHTML = `<span style="display:inline-block;width:12px;height:12px;background:${colors[i]};margin-right:4px;vertical-align:middle;border-radius:2px;"></span>` +
+      `<span style="color:#ccc;font-size:12px;">${results[i].label}: ${(results[i].stats.diffFrom86400 * 1000).toFixed(2)} ms</span>`;
+    legend.appendChild(item);
+  }
+  container.appendChild(legend);
+  modal.appendChild(container);
+  document.body.appendChild(modal);
+
+  // ════════════════════════════════════════════════════════════════════
+  // DRAW ANALEMMA (figure-8)
+  // ════════════════════════════════════════════════════════════════════
+  const actx = analemmaCanvas.getContext('2d');
+  actx.fillStyle = '#12122a';
+  actx.fillRect(0, 0, AW, AH);
+
+  const APAD_L = 55, APAD_R = 20, APAD_T = 30, APAD_B = 35;
+  const plotW = AW - APAD_L - APAD_R;
+  const plotH = AH - APAD_T - APAD_B;
+
+  // Data ranges
+  let eotMin = Infinity, eotMax = -Infinity, decMin = Infinity, decMax = -Infinity;
+  for (let i = 0; i < numDays; i++) {
+    if (analemmaEoT[i] < eotMin) eotMin = analemmaEoT[i];
+    if (analemmaEoT[i] > eotMax) eotMax = analemmaEoT[i];
+    if (analemmaDec[i] < decMin) decMin = analemmaDec[i];
+    if (analemmaDec[i] > decMax) decMax = analemmaDec[i];
+  }
+  // Symmetric EoT range
+  const eotAbs = Math.max(Math.abs(eotMin), Math.abs(eotMax)) * 1.1;
+  eotMin = -eotAbs; eotMax = eotAbs;
+  const decMargin = (decMax - decMin) * 0.05;
+  decMin -= decMargin; decMax += decMargin;
+
+  const eotToX = (eot) => APAD_L + ((eot - eotMin) / (eotMax - eotMin)) * plotW;
+  const decToY = (dec) => APAD_T + ((decMax - dec) / (decMax - decMin)) * plotH;
+
+  // Title
+  actx.fillStyle = '#ccc';
+  actx.font = '13px monospace';
+  actx.textAlign = 'center';
+  actx.fillText('Analemma ' + year, AW / 2, 16);
+
+  // Grid
+  actx.strokeStyle = '#2a2a4a';
+  actx.lineWidth = 0.5;
+  // Horizontal: dec lines every 5°
+  for (let d = Math.ceil(decMin / 5) * 5; d <= decMax; d += 5) {
+    const y = decToY(d);
+    actx.beginPath(); actx.moveTo(APAD_L, y); actx.lineTo(AW - APAD_R, y); actx.stroke();
+    actx.fillStyle = '#999'; actx.font = '11px monospace'; actx.textAlign = 'right';
+    actx.fillText(d.toFixed(0) + '\u00B0', APAD_L - 4, y + 4);
+  }
+  // Vertical: EoT lines every 5 min
+  for (let m = Math.ceil(eotMin / 5) * 5; m <= eotMax; m += 5) {
+    const x = eotToX(m);
+    actx.beginPath(); actx.moveTo(x, APAD_T); actx.lineTo(x, AH - APAD_B); actx.stroke();
+    actx.fillStyle = '#999'; actx.font = '11px monospace'; actx.textAlign = 'center';
+    actx.fillText(m.toFixed(0), x, AH - APAD_B + 14);
+  }
+  // Zero lines
+  actx.strokeStyle = '#666'; actx.lineWidth = 1;
+  actx.setLineDash([4, 4]);
+  const zeroX = eotToX(0);
+  actx.beginPath(); actx.moveTo(zeroX, APAD_T); actx.lineTo(zeroX, AH - APAD_B); actx.stroke();
+  const zeroY = decToY(0);
+  if (zeroY > APAD_T && zeroY < AH - APAD_B) {
+    actx.beginPath(); actx.moveTo(APAD_L, zeroY); actx.lineTo(AW - APAD_R, zeroY); actx.stroke();
+  }
+  actx.setLineDash([]);
+
+  // Axis labels
+  actx.fillStyle = '#bbb'; actx.font = '11px monospace'; actx.textAlign = 'center';
+  actx.fillText('Equation of Time (min)', AW / 2, AH - 4);
+  actx.save();
+  actx.translate(14, AH / 2);
+  actx.rotate(-Math.PI / 2);
+  actx.fillText('Declination (\u00B0)', 0, 0);
+  actx.restore();
+
+  // Draw analemma curve with dotted line
+  actx.strokeStyle = '#f0c040';
+  actx.lineWidth = 2;
+  actx.beginPath();
+  for (let i = 0; i < numDays; i++) {
+    const x = eotToX(analemmaEoT[i]);
+    const y = decToY(analemmaDec[i]);
+    if (i === 0) actx.moveTo(x, y); else actx.lineTo(x, y);
+  }
+  actx.stroke();
+
+  // Monthly dots with labels
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // First noon is at the RA=0° crossing (~Mar 20). Calculate approximate day-of-year offsets for month starts
+  const firstNoonJD = analemmaResult.noonJDs[0];
+  for (let i = 0; i < numDays; i += 10) {
+    const x = eotToX(analemmaEoT[i]);
+    const y = decToY(analemmaDec[i]);
+    actx.fillStyle = 'rgba(240,192,64,0.5)';
+    actx.beginPath(); actx.arc(x, y, 2, 0, 2 * Math.PI); actx.fill();
+  }
+  // Label first-of-month positions
+  for (let m = 0; m < 12; m++) {
+    // Find the noon closest to the 1st of each month
+    // Data starts ~Mar 20, so Jan+Feb fall in the next calendar year
+    const monthYear = m < 3 ? year + 1 : year;
+    const monthJD = 2451544.5 + (monthYear - 2000) * 365.25 + m * 30.4375; // approximate
+    let bestI = 0, bestDist = Infinity;
+    for (let i = 0; i < numDays && i < analemmaResult.noonJDs.length - 1; i++) {
+      const d = Math.abs(analemmaResult.noonJDs[i + 1] - monthJD);
+      if (d < bestDist) { bestDist = d; bestI = i; }
+    }
+    if (bestDist < 20) {
+      const x = eotToX(analemmaEoT[bestI]);
+      const y = decToY(analemmaDec[bestI]);
+      actx.fillStyle = '#f0c040';
+      actx.beginPath(); actx.arc(x, y, 4, 0, 2 * Math.PI); actx.fill();
+      actx.fillStyle = '#eee'; actx.font = '10px monospace'; actx.textAlign = 'left';
+      actx.fillText(monthNames[m], x + 6, y + 4);
+    }
+  }
+
+  // Mark longest solar day (max noon-to-noon interval)
+  const lx = eotToX(analemmaEoT[longestDayIdx]);
+  const ly = decToY(analemmaDec[longestDayIdx]);
+  actx.fillStyle = '#ff4444';
+  actx.beginPath(); actx.arc(lx, ly, 5, 0, 2 * Math.PI); actx.fill();
+  actx.fillStyle = '#ff8888'; actx.font = '10px monospace';
+  const lLabel1 = `Longest: ${longestDate}`;
+  const lLabel2 = `+${(longestLen - 86400).toFixed(1)}s`;
+  actx.textAlign = 'left';
+  actx.fillText(lLabel1, Math.max(APAD_L, lx + 8), ly + 4);
+  actx.fillText(lLabel2, Math.max(APAD_L, lx + 8), ly + 14);
+
+  // Mark shortest solar day (min noon-to-noon interval)
+  const sx = eotToX(analemmaEoT[shortestDayIdx]);
+  const sy = decToY(analemmaDec[shortestDayIdx]);
+  actx.fillStyle = '#4488ff';
+  actx.beginPath(); actx.arc(sx, sy, 5, 0, 2 * Math.PI); actx.fill();
+  actx.fillStyle = '#88bbff'; actx.font = '10px monospace';
+  const sLabel1 = `Shortest: ${shortestDate}`;
+  const sLabel2 = `${(shortestLen - 86400).toFixed(1)}s`;
+  actx.textAlign = 'left';
+  actx.fillText(sLabel1, Math.max(APAD_L, sx + 8), sy + 4);
+  actx.fillText(sLabel2, Math.max(APAD_L, sx + 8), sy + 14);
+
+  // ════════════════════════════════════════════════════════════════════
+  // DRAW TIME-SERIES CHARTS (right side)
+  // ════════════════════════════════════════════════════════════════════
+  const tctx = timeCanvas.getContext('2d');
+  tctx.fillStyle = '#12122a';
+  tctx.fillRect(0, 0, TW, TH);
+
+  const drawTimeChart = (yOffset, chartHeight, getData, ylabel, chartTitle) => {
+    let minVal = Infinity, maxVal = -Infinity;
+    for (const r of results) {
+      for (let i = 0; i < numDays; i++) {
+        const v = getData(r, i);
+        if (v < minVal) minVal = v;
+        if (v > maxVal) maxVal = v;
+      }
+    }
+    const margin = (maxVal - minVal) * 0.05 || 1;
+    minVal -= margin; maxVal += margin;
+
+    tctx.fillStyle = '#ccc'; tctx.font = '12px monospace'; tctx.textAlign = 'center';
+    tctx.fillText(chartTitle, TW / 2, yOffset + 12);
+
+    tctx.strokeStyle = '#333'; tctx.lineWidth = 1;
+    tctx.beginPath();
+    tctx.moveTo(TPAD, yOffset + 16); tctx.lineTo(TPAD, yOffset + chartHeight);
+    tctx.lineTo(TW - 10, yOffset + chartHeight); tctx.stroke();
+
+    const zy = yOffset + 16 + (maxVal / (maxVal - minVal)) * (chartHeight - 16);
+    if (zy > yOffset + 16 && zy < yOffset + chartHeight) {
+      tctx.strokeStyle = '#666'; tctx.setLineDash([4, 4]);
+      tctx.beginPath(); tctx.moveTo(TPAD, zy); tctx.lineTo(TW - 10, zy); tctx.stroke();
+      tctx.setLineDash([]);
+    }
+
+    tctx.fillStyle = '#aaa'; tctx.font = '11px monospace'; tctx.textAlign = 'right';
+    tctx.fillText(maxVal.toFixed(1) + 's', TPAD - 4, yOffset + 24);
+    tctx.fillText(minVal.toFixed(1) + 's', TPAD - 4, yOffset + chartHeight - 2);
+    if (zy > yOffset + 30 && zy < yOffset + chartHeight - 10) tctx.fillText('0', TPAD - 4, zy + 4);
+
+    tctx.textAlign = 'center';
+    for (let d = 0; d <= 360; d += 30) {
+      tctx.fillText(String(d), TPAD + (d / numDays) * (TW - TPAD - 10), yOffset + chartHeight + 12);
+    }
+    tctx.fillText(ylabel, TW / 2, yOffset + chartHeight + 24);
+
+    const xScale = (TW - TPAD - 10) / numDays;
+    const yScale = (chartHeight - 16) / (maxVal - minVal);
+    for (let rIdx = 0; rIdx < results.length; rIdx++) {
+      tctx.strokeStyle = colors[rIdx]; tctx.lineWidth = 1.2;
+      tctx.beginPath();
+      for (let i = 0; i < numDays; i++) {
+        const x = TPAD + i * xScale;
+        const y = yOffset + 16 + (maxVal - getData(results[rIdx], i)) * yScale;
+        if (i === 0) tctx.moveTo(x, y); else tctx.lineTo(x, y);
+      }
+      tctx.stroke();
+    }
+  };
+
+  drawTimeChart(0, TCH, (r, i) => r.intervals[i] - 86400, 'Day #', 'Daily Deviation from 86400s');
+  drawTimeChart(TCH + 50, TCH, (r, i) => cumulDrifts[results.indexOf(r)][i], 'Day #', 'Cumulative Drift (s)');
+
+  // ── Merge canvases into a single image for right-click "Open in new tab" ──
+  const mergedCanvas = document.createElement('canvas');
+  const GAP = 16;
+  const MPAD = 20;
+  const totalW = MPAD + AW + GAP + TW + MPAD;
+  const totalH = Math.max(AH, TH);
+  // Use DPR for crisp merged image
+  mergedCanvas.width = totalW * DPR;
+  mergedCanvas.height = (totalH + 60) * DPR;
+  const mctx = mergedCanvas.getContext('2d');
+  mctx.scale(DPR, DPR);
+  mctx.fillStyle = '#12122a';
+  mctx.fillRect(0, 0, totalW, totalH + 60);
+  // Draw both canvases at logical size (they are already DPR-scaled internally)
+  mctx.drawImage(analemmaCanvas, MPAD, 0, AW, AH);
+  mctx.drawImage(timeCanvas, MPAD + AW + GAP, 0, TW, TH);
+  // Legend at bottom — centered, wrapping to 2 rows if needed
+  mctx.font = '12px monospace';
+  const legendItems = results.map((r, i) => ({
+    color: colors[i],
+    text: `${r.label}: ${(r.stats.diffFrom86400 * 1000).toFixed(2)} ms`
+  }));
+  const itemWidths = legendItems.map(it => mctx.measureText(it.text).width + 24);
+  const totalLegendW = itemWidths.reduce((a, b) => a + b, 0);
+  const useRows = totalLegendW > totalW - 40 ? 2 : 1;
+  const perRow = Math.ceil(legendItems.length / useRows);
+  for (let row = 0; row < useRows; row++) {
+    const rowItems = legendItems.slice(row * perRow, (row + 1) * perRow);
+    const rowW = rowItems.reduce((s, it) => s + mctx.measureText(it.text).width + 24, 0);
+    let lx = (totalW - rowW) / 2;
+    const ly = totalH + 16 + row * 18;
+    for (const it of rowItems) {
+      mctx.fillStyle = it.color;
+      mctx.fillRect(lx, ly - 8, 10, 10);
+      mctx.fillStyle = '#ccc'; mctx.textAlign = 'left';
+      mctx.fillText(it.text, lx + 14, ly);
+      lx += mctx.measureText(it.text).width + 24;
+    }
+  }
+
+  // Replace canvases with a single <img> at logical (not HiDPI) size
+  const img = document.createElement('img');
+  img.src = mergedCanvas.toDataURL('image/png');
+  img.style.width = totalW + 'px';
+  img.style.height = (totalH + 60) + 'px';
+  img.style.borderRadius = '4px';
+  row.replaceChildren(img);
+  // Remove the separate legend since it's now in the image
+  legend.remove();
+
+  // Footer: download button + hints
+  const footer = document.createElement('div');
+  Object.assign(footer.style, {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    marginTop: '12px', gap: '16px'
+  });
+
+  // Download XLSX button
+  const dlBtn = document.createElement('button');
+  dlBtn.textContent = 'Download Excel data (.xlsx)';
+  Object.assign(dlBtn.style, {
+    background: '#2a4a6a', color: '#eee', border: '1px solid #4a6a8a',
+    borderRadius: '5px', padding: '8px 16px', cursor: 'pointer',
+    fontSize: '13px', fontFamily: 'monospace'
+  });
+  dlBtn.onmouseenter = () => { dlBtn.style.background = '#3a5a7a'; };
+  dlBtn.onmouseleave = () => { dlBtn.style.background = '#2a4a6a'; };
+  dlBtn.onclick = () => {
+    Object.assign(document.createElement('a'), {
+      href: xlsxBlobUrl, download: xlsxFilename
+    }).click();
+    dlBtn.textContent = 'Downloaded!';
+    dlBtn.style.background = '#2a6a3a';
+    setTimeout(() => { dlBtn.textContent = 'Download Excel data (.xlsx)'; dlBtn.style.background = '#2a4a6a'; }, 2000);
+  };
+  footer.appendChild(dlBtn);
+
+  // Hints
+  const hints = document.createElement('div');
+  Object.assign(hints.style, { color: '#888', fontSize: '12px', fontFamily: 'monospace', textAlign: 'right' });
+  hints.innerHTML = 'Right-click image to save as PNG &bull; Click outside to close';
+  footer.appendChild(hints);
+
+  container.appendChild(footer);
+
+  // Clean up blob URL when modal closes
+  const origOnClick = modal.onclick;
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      URL.revokeObjectURL(xlsxBlobUrl);
+      modal.remove();
+    }
+  };
+}
+
+/**
  * Multi-Epoch Solar Day Analysis
  *
  * Measures the solar day offset (Method A) at 65 equally-spaced epochs across
@@ -28730,8 +29378,8 @@ async function analyzeSolarDayMultiEpoch() {
   console.log(`End epoch: ${(startEpoch + (numPoints - 1) * stepYears).toFixed(0)}`);
   console.log(`Perihelion alignment year: ${perihelionalignmentYear}`);
   console.log('');
-  console.log('Each epoch measures 365 solar days from the June solstice using Method A');
-  console.log('(wobble-center RA, eliminates wobble parallax).');
+  console.log('Each epoch measures 365 solar days from the June solstice (RA≈90°) using Method A');
+  console.log('(wobble-center RA). All epochs share the same starting-angle bias.');
   console.log('');
 
   const results = [];
