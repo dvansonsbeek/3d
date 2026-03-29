@@ -22427,6 +22427,8 @@ function setupGUI() {
     'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
   addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
     'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
+  addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
+    'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across the full Holistic Year.');
 
   /* --- Console Tests (F12) ------------------------------------------------ */
   const calibFolder = toolsFolder.addFolder({ title: 'Console Tests (F12)', expanded: false });
