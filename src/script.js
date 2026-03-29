@@ -147,7 +147,7 @@ planets.venus = {
   // Model parameters (from model-parameters.json)
   orbitalEccentricityBase: 0.00619052,
   orbitalEccentricityAmplitude: 9.625389e-4,
-  eccentricityPhaseJ2000: 123.7514,
+  eccentricityPhaseJ2000: 124.0631,
   angleCorrection: -2.8028602960696354,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: holisticyearLength*3/34,

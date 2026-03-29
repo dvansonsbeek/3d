@@ -33,6 +33,35 @@ where:
 
 The gas giants have negligible amplitudes (tiny axial tilts → tiny sin(tilt)), so their base and structural values are nearly identical. The inner planets, especially Venus and Earth, have significant amplitude contributions.
 
+### Eccentricity Time-Variation Formula
+
+The observed eccentricity at any time is the geometric distance between two circular orbits — the law of cosines:
+
+```
+e(t) = sqrt(base² + amp² - 2·base·amp·cos(θ))
+```
+
+where `θ = 2π·(year - refYear) / (H/16)` and `refYear` is derived from the J2000 phase angle.
+
+This formula arises from the model's geocentric geometry: Earth orbits the wobble-center at radius `amplitude`, while the wobble-center (perihelion point) orbits the Sun at radius `base`. The distance between Earth and Sun varies as the two orbits precess relative to each other with period H/16.
+
+**Phase at J2000** (`eccentricityPhaseJ2000`): derived analytically from the law of cosines inverted at J2000:
+
+```
+cos(θ_J2000) = (base² + amp² - e_J2000²) / (2·base·amp)
+phase = acos(cos(θ_J2000)) × 180/π
+```
+
+| Planet | Phase (°) | base | amplitude | e(J2000) | Derivable? |
+|--------|----------|------|-----------|----------|------------|
+| Mercury | 89.99 | 0.205636 | 8.437e-5 | 0.205636 | Yes |
+| Venus | 124.06 | 0.006191 | 9.625e-4 | 0.006777 | Yes |
+| Earth | (from balancedYear) | 0.015386 | 0.001356 | 0.016710 | Yes |
+| Mars | 96.89 | 0.092975 | 3.074e-3 | 0.093394 | Yes |
+| Jupiter–Neptune | — | — | — | — | No (cos(θ) out of range) |
+
+The outer planets (Jupiter–Neptune) have `cos(θ) > 1` or `< -1` from the law of cosines, meaning their J2000 eccentricity falls outside the `[base-amp, base+amp]` range. This is because their eccentricity oscillation amplitude (K constant) is negligibly small — their eccentricity is essentially constant at `base`, and any J2000 deviation is from other perturbations not captured by the single H/16 cosine.
+
 ### Balance with structural eccentricities
 
 - **Base eccentricities**: 100% Law 5 balance (by construction — these are the tuned values)
