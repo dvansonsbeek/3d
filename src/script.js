@@ -24279,6 +24279,7 @@ async function runYearAnalysisExport(years) {
   const detailedRows = [
     ['JD', 'Date', 'Time', 'Model Year (mean tropical)',
      'Obliquity (°)', 'Eccentricity', 'Mean Tropical Year',
+     'VE JD', 'VE RA (°)', 'SS JD', 'SS RA (°)', 'AE JD', 'AE RA (°)', 'WS JD', 'WS RA (°)',
      'VE Interval', 'SS Interval', 'AE Interval', 'WS Interval',
      'Perihelion JD', 'Perihelion Dist (AU)', 'Peri Interval (days)',
      'Aphelion JD', 'Aphelion Dist (AU)', 'Aph Interval (days)',
@@ -24290,6 +24291,9 @@ async function runYearAnalysisExport(years) {
   for (const year of requestedYears) {
     const orbParams = orbParamsByYear.get(year) || {};
     const veEvent = veEventsByYear.get(year);
+    const ssEvent = ssEventsByYear.get(year);
+    const aeEvent = aeEventsByYear.get(year);
+    const wsEvent = wsEventsByYear.get(year);
     const peri = periByYear.get(year);
     const aph = aphByYear.get(year);
 
@@ -24333,6 +24337,10 @@ async function runYearAnalysisExport(years) {
       (orbParams.obliquity || 0).toFixed(6),
       (orbParams.eccentricity || 0).toFixed(8),
       meanTrop !== null ? meanTrop.toFixed(9) : '',
+      veEvent?.jd?.toFixed(6) || '', veEvent?.raDeg?.toFixed(4) || '',
+      ssEvent?.jd?.toFixed(6) || '', ssEvent?.raDeg?.toFixed(4) || '',
+      aeEvent?.jd?.toFixed(6) || '', aeEvent?.raDeg?.toFixed(4) || '',
+      wsEvent?.jd?.toFixed(6) || '', wsEvent?.raDeg?.toFixed(4) || '',
       getInterval(cardinalData.VE.intervalsByYear, year),
       getInterval(cardinalData.SS.intervalsByYear, year),
       getInterval(cardinalData.AE.intervalsByYear, year),
