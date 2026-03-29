@@ -34,7 +34,7 @@ angles (203.3195 deg or 23.3195 deg) should cancel.
 **Scalar balance**: the sum of v for the 203 deg group must equal the sum of v for
 the 23 deg group.
 
-**Group assignment** (Config #3: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
+**Group assignment** (Config #15: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
 
 | Group    | Planets                                               |
 |----------|-------------------------------------------------------|
@@ -58,7 +58,7 @@ K is derived in Section 4 below.
 
 ---
 
-## 3. Fibonacci D-Values and Phase Groups (Config #3)
+## 3. Fibonacci D-Values and Phase Groups (Config #15)
 
 | Planet  | d  | Phase (deg) | Mirror Pair |
 |---------|----|-------------|-------------|
