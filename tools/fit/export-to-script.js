@@ -218,7 +218,14 @@ replaceArray('PERI_HARMONICS', fc.PERI_HARMONICS_RAW, fmtPeriHarmonics);
 // B4. Obliquity harmonics
 replaceArray('OBLIQUITY_HARMONICS', fc.SOLSTICE_OBLIQUITY_HARMONICS, fmtHarmonics3);
 
-// B5. Cardinal point harmonics
+// B5a. Cardinal point anchors
+if (fc.CARDINAL_POINT_ANCHORS_ADJUSTED) {
+  const a = fc.CARDINAL_POINT_ANCHORS_ADJUSTED;
+  const anchorStr = `{\n  SS: ${a.SS},  WS: ${a.WS},  VE: ${a.VE},  AE: ${a.AE},\n}`;
+  replaceObject('CARDINAL_POINT_ANCHORS', anchorStr);
+}
+
+// B5b. Cardinal point harmonics
 if (fc.CARDINAL_POINT_HARMONICS) {
   const cpLines = ['{\n'];
   for (const [type, terms] of Object.entries(fc.CARDINAL_POINT_HARMONICS)) {
@@ -274,7 +281,7 @@ replaceArray('MOON_B', meeus.latitudeTerms.terms, fmtMoonTable);
 
 console.log('\n=== C. Astro References ===');
 replaceConst('currentAUDistance', ar.physicalConstants.currentAUDistance);
-replaceConst('meansiderealyearlengthinSeconds', ar.physicalConstants.meansiderealyearlengthinSeconds);
+// meansiderealyearlengthinSeconds is now derived: ASTRO_REFERENCE.siderealYearJ2000 * 86400
 replaceConst('speedOfLight', ar.physicalConstants.speedOfLight);
 replaceConst('perihelionalignmentYear', ar.earthOrbital.perihelionalignmentYear);
 replaceConst('deltaTStart', ar.earthOrbital.deltaTStart);
@@ -293,6 +300,33 @@ for (const [key, a] of Object.entries(ar.planetOrbitalElements)) {
   ]) {
     if (a[prop] !== undefined) replacePlanetProp(key, prop, a[prop]);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// E. BALANCE PRESETS
+// ═══════════════════════════════════════════════════════════════════════════
+
+console.log('\n=== E. Balance Presets ===');
+const balancePresetsPath = path.resolve(__dirname, '..', '..', 'data', 'balance-presets.json');
+if (fs.existsSync(balancePresetsPath)) {
+  const bpData = JSON.parse(fs.readFileSync(balancePresetsPath, 'utf8'));
+  if (bpData.presets && bpData.presets.length > 0) {
+    const presetsStr = bpData.presets.map(p => JSON.stringify(p)).join(',\n');
+    const newBlock = 'const BALANCE_PRESETS = [\n' + presetsStr + '\n];';
+    // Greedy match to capture the entire array including nested arrays, up to ];
+    const re = /const BALANCE_PRESETS = \[[\s\S]*?\n\];/;
+    const m = src.match(re);
+    if (m) {
+      const oldCount = (m[0].match(/\["/g) || []).length;
+      if (oldCount !== bpData.presets.length) {
+        src = src.replace(re, newBlock);
+        changes++;
+        console.log(`  BALANCE_PRESETS: ${oldCount} → ${bpData.presets.length} presets`);
+      }
+    }
+  }
+} else {
+  console.log('  (no balance-presets.json found, skipping)');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

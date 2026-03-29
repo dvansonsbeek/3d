@@ -2,7 +2,6 @@
   "_description": "Astronomical reference data — external values from IAU, JPL, Meeus, Souami & Souchay. Nothing model-specific. Source of truth for both tools/lib/constants/astro-reference.js and src/script.js.",
   "physicalConstants": {
     "currentAUDistance": 149597870.698828,
-    "meansiderealyearlengthinSeconds": 31558149.8,
     "G_CONSTANT": 6.6743e-20,
     "MASS_RATIO_EARTH_MOON": 81.3007,
     "speedOfLight": 299792.458,
@@ -18,7 +17,7 @@
   },
   "earthOrbital": {
     "j2000EpochYear": 2000,
-    "perihelionalignmentYear": 1246.25,
+    "perihelionalignmentYear": 1246.03125,
     "juneSolstice2000_JD": 2451716.575,
     "obliquityJ2000_deg": 23.439291111,
     "obliquityRate_arcsecPerCentury": -46.836769,
@@ -84,7 +83,7 @@
       "trueAnomaly": 324.5198504
     },
     "mars": {
-      "solarYearInput": 686.931,
+      "solarYearInput": 686.935,
       "orbitalEccentricityJ2000": 0.0933941,
       "axialTiltMean": 25.19,
       "eclipticInclinationJ2000": 1.84969142,

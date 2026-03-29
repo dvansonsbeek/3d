@@ -35,6 +35,7 @@ from predictive_formula import (
     build_features, PLANETS, H, J2000,
     calc_earth_perihelion, calc_erd
 )
+from load_constants import C
 
 
 PLANET_FLUCTUATION_COLS = {
@@ -57,7 +58,7 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
     df = pd.read_excel(excel_path, sheet_name='Holistic_objects_PerihelionPlan')
 
     # Downsample by stepYears for fitting efficiency
-    step = 20  # matches stepYears in model-parameters.json
+    step = int(C.get('stepYears', 23))
     df = df.iloc[::step].reset_index(drop=True)
     print(f'  Downsampled by {step}: {len(df)} rows')
 

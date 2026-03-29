@@ -70,7 +70,7 @@ const useVariableSpeed = modelParams.foundational.useVariableSpeed;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const currentAUDistance = astroRef.physicalConstants.currentAUDistance;
-const meanSiderealYearSeconds = astroRef.physicalConstants.meansiderealyearlengthinSeconds;
+const meanSiderealYearSeconds = astroRef.yearLengthRef.siderealYear * 86400;
 const G_CONSTANT = astroRef.physicalConstants.G_CONSTANT;
 const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;

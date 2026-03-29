@@ -1,6 +1,7 @@
 # All Baselines Summary — RMS vs JPL Horizons
 
-**Last updated:** 2026-03-25
+**Last updated:** 2026-03-29
+**H:** 335,317 (= 23 × 61 × 239), stepYears=23
 **Reference:** JPL Horizons RA/Dec + IMCCE INPOP19, IAU 1976 precession correction applied
 **Training window:** 1800–2200 (primary) + observed pre-1800 anchors
 
@@ -10,17 +11,17 @@
 
 | Target   | RMS Total | Notes |
 |----------|-----------|-------|
-| Sun      | 0.0033°   | Earth geometry only |
+| Sun      | 0.0032°   | Earth geometry only |
 | Moon     | 0.0015°   | Meeus correction layer |
-| Mercury  | 0.0712°   | 78p parallax + mean anomaly terms |
-| Venus    | 0.0309°   | 78p parallax |
-| Mars     | 0.0914°   | 78p parallax, circular orbit limit |
-| Jupiter  | 0.0515°   | 68p parallax + gravitation |
-| Saturn   | 0.0672°   | 68p parallax + gravitation + 1682 anchor |
-| Uranus   | 0.0159°   | 68p parallax |
-| Neptune  | 0.0042°   | 68p parallax |
+| Mercury  | 0.0793°   | 78p parallax + mean anomaly terms |
+| Venus    | 0.0406°   | 78p parallax |
+| Mars     | 0.0904°   | 78p parallax, circular orbit limit |
+| Jupiter  | 0.0517°   | 68p parallax + gravitation |
+| Saturn   | 0.0715°   | 68p parallax + gravitation + 1682 anchor |
+| Uranus   | 0.0163°   | 68p parallax |
+| Neptune  | 0.0039°   | 68p parallax |
 
-Five targets under 0.05°. All within 0.10° except Mars (circular orbit limit).
+Four targets under 0.05°. All within 0.10° except Mars (circular orbit limit).
 
 ---
 

@@ -35,10 +35,11 @@ function check(label, actual, expected, tolerance = 1e-10) {
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. Verify constants load correctly
 // ═══════════════════════════════════════════════════════════════════════════
+let C;
 console.log('═══ Step 1: Constants load ═══');
 try {
-  const C = require('../lib/constants');
-  check('H', C.H, 335008);
+  C = require('../lib/constants');
+  check('H', C.H, 335317);
   check('planets count', Object.keys(C.planets).length, 7);
   check('PERI_HARMONICS terms', C.PERI_HARMONICS.length, stored.PERI_HARMONICS_RAW.length);
   check('OBLIQUITY terms', C.SOLSTICE_OBLIQUITY_HARMONICS.length, stored.SOLSTICE_OBLIQUITY_HARMONICS.length);
@@ -74,7 +75,7 @@ try {
 // 3. Verify PERI_HARMONICS (compare stored JSON values with what's loaded)
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('═══ Step 3: PERI_HARMONICS consistency ═══');
-const C = require('../lib/constants');
+if (!C) C = require('../lib/constants');
 const fitted = require('../lib/constants/fitted-coefficients');
 
 check('PERI_OFFSET', fitted.PERI_OFFSET, stored.PERI_OFFSET);
@@ -275,35 +276,92 @@ const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 const ylRef = astroRef.yearLengthRef;
 
-// Tropical year at J2000 (from harmonics)
-let tropJ2000 = C.meanSolarYearDays;
-for (const [div, sinC, cosC] of (fitted.TROPICAL_YEAR_HARMONICS || [])) {
-  const phase = 2 * Math.PI * t2000 / (C.H / div);
-  tropJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+// Helper: evaluate Fourier series (same as script.js evalYearFourier)
+function evalFourier(year, mean, harmonics) {
+  const t = year - C.balancedYear;
+  let result = mean;
+  for (const [div, sinC, cosC] of harmonics) {
+    const phase = 2 * Math.PI * t / (C.H / div);
+    result += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+  }
+  return result;
 }
-const tropDiffSec = (tropJ2000 - ylRef.tropicalYearMean) * 86400;
-check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 1.0); // within 1 second
-console.log(`  Tropical year at J2000: ${tropJ2000.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s)`);
 
-// Sidereal year at J2000 (from harmonics)
-let sidJ2000 = C.meanSiderealYearDays;
-for (const [div, sinC, cosC] of (fitted.SIDEREAL_YEAR_HARMONICS || [])) {
-  const phase = 2 * Math.PI * t2000 / (C.H / div);
-  sidJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
+// Helper: cardinal point year length (derivative of JD harmonics, same as script.js)
+function cardinalYearLength(year, type) {
+  const t = year - C.balancedYear;
+  const harmonics = C.CARDINAL_POINT_HARMONICS[type];
+  let length = C.meanSolarYearDays;
+  for (const [div, sinC, cosC] of harmonics) {
+    const omega = 2 * Math.PI / (C.H / div);
+    const phase = omega * t;
+    length += sinC * omega * Math.cos(phase) - cosC * omega * Math.sin(phase);
+  }
+  return length;
 }
+
+// Helper: cardinal point JD (same as script.js computeSolsticeJD)
+function cardinalJD(year, type) {
+  const t = year - C.balancedYear;
+  const anchor = C.CARDINAL_POINT_ANCHORS[type];
+  const harmonics = C.CARDINAL_POINT_HARMONICS[type];
+  const t2k = 2000 - C.balancedYear;
+  let h2000 = 0;
+  for (const [div, sinC, cosC] of harmonics) {
+    h2000 += sinC * Math.sin(2 * Math.PI * t2k / (C.H / div)) + cosC * Math.cos(2 * Math.PI * t2k / (C.H / div));
+  }
+  let jd = anchor + C.meanSolarYearDays * (year - 2000);
+  for (const [div, sinC, cosC] of harmonics) {
+    jd += sinC * Math.sin(2 * Math.PI * t / (C.H / div)) + cosC * Math.cos(2 * Math.PI * t / (C.H / div));
+  }
+  return jd - h2000;
+}
+
+// Helper: JD to date string
+function jdToDate(jd) {
+  const z = Math.floor(jd + 0.5), f = jd + 0.5 - z;
+  let a = z;
+  if (z >= 2299161) { const al = Math.floor((z - 1867216.25) / 36524.25); a = z + 1 + al - Math.floor(al / 4); }
+  const b = a + 1524, c = Math.floor((b - 122.1) / 365.25), d = Math.floor(365.25 * c), e = Math.floor((b - d) / 30.6001);
+  const day = b - d - Math.floor(30.6001 * e), month = e < 14 ? e - 1 : e - 13, yr = month > 2 ? c - 4716 : c - 4715;
+  const hrs = f * 24, h = Math.floor(hrs), m = Math.floor((hrs - h) * 60), s = Math.round(((hrs - h) * 60 - m) * 60);
+  return `${yr}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ── Tropical year at J2000 (from cardinal point derivatives, same as browser) ──
+const tropSS = cardinalYearLength(2000, 'SS');
+const tropWS = cardinalYearLength(2000, 'WS');
+const tropVE = cardinalYearLength(2000, 'VE');
+const tropAE = cardinalYearLength(2000, 'AE');
+const tropJ2000 = (tropSS + tropWS + tropVE + tropAE) / 4;
+const tropDiffSec = (tropJ2000 - ylRef.tropicalYearMean) * 86400;
+check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 1.0);
+console.log(`  Tropical year at J2000: ${tropJ2000.toFixed(9)} d (IAU: ${ylRef.tropicalYearMean} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s)`);
+console.log(`    RA=0°  (VE): ${tropVE.toFixed(9)} d (IAU: ${ylRef.tropicalYearVE} d, diff: ${((tropVE - ylRef.tropicalYearVE)*86400).toFixed(2)}s)`);
+console.log(`    RA=90° (SS): ${tropSS.toFixed(9)} d (IAU: ${ylRef.tropicalYearSS} d, diff: ${((tropSS - ylRef.tropicalYearSS)*86400).toFixed(2)}s)`);
+console.log(`    RA=180°(AE): ${tropAE.toFixed(9)} d (IAU: ${ylRef.tropicalYearAE} d, diff: ${((tropAE - ylRef.tropicalYearAE)*86400).toFixed(2)}s)`);
+console.log(`    RA=270°(WS): ${tropWS.toFixed(9)} d (IAU: ${ylRef.tropicalYearWS} d, diff: ${((tropWS - ylRef.tropicalYearWS)*86400).toFixed(2)}s)`);
+
+// ── Sidereal year at J2000 (from Fourier harmonics) ──
+const sidJ2000 = evalFourier(2000, C.meanSiderealYearDays, fitted.SIDEREAL_YEAR_HARMONICS || []);
 const sidDiffSec = (sidJ2000 - ylRef.siderealYear) * 86400;
-check('Sidereal year at J2000', Math.abs(sidDiffSec), 0, 1.0); // within 1 second
+check('Sidereal year at J2000', Math.abs(sidDiffSec), 0, 1.0);
 console.log(`  Sidereal year at J2000: ${sidJ2000.toFixed(9)} d (IAU: ${ylRef.siderealYear} d, diff: ${sidDiffSec >= 0 ? '+' : ''}${sidDiffSec.toFixed(3)}s)`);
 
-// Anomalistic year at J2000 (from harmonics)
-let anomJ2000 = C.meanAnomalisticYearDays;
-for (const [div, sinC, cosC] of (fitted.ANOMALISTIC_YEAR_HARMONICS || [])) {
-  const phase = 2 * Math.PI * t2000 / (C.H / div);
-  anomJ2000 += sinC * Math.sin(phase) + cosC * Math.cos(phase);
-}
+// ── Anomalistic year at J2000 (from Fourier harmonics) ──
+const anomJ2000 = evalFourier(2000, C.meanAnomalisticYearDays, fitted.ANOMALISTIC_YEAR_HARMONICS || []);
 const anomDiffSec = (anomJ2000 - ylRef.anomalisticYear) * 86400;
-check('Anomalistic year at J2000', Math.abs(anomDiffSec), 0, 1.0); // within 1 second
+check('Anomalistic year at J2000', Math.abs(anomDiffSec), 0, 1.0);
 console.log(`  Anomalistic year at J2000: ${anomJ2000.toFixed(9)} d (IAU: ${ylRef.anomalisticYear} d, diff: ${anomDiffSec >= 0 ? '+' : ''}${anomDiffSec.toFixed(3)}s)`);
+
+// ── Cardinal point JDs at J2000 (from formula, same as browser) ──
+const iauCP = { SS: 2451716.575, WS: 2451900.068, VE: 2451623.738, AE: 2451810.305 };
+console.log('  Cardinal point JDs at J2000:');
+for (const type of ['SS', 'WS', 'VE', 'AE']) {
+  const jd = cardinalJD(2000, type);
+  const diffMin = (jd - iauCP[type]) * 1440;
+  console.log(`    ${type}: JD ${jd.toFixed(6)} (${jdToDate(jd)})  IAU: ${iauCP[type].toFixed(3)}  diff: ${diffMin >= 0 ? '+' : ''}${diffMin.toFixed(2)} min`);
+}
 
 // Harmonic term counts
 console.log(`  Perihelion harmonics: ${C.PERI_HARMONICS.length} terms`);
