@@ -40806,19 +40806,16 @@ function computeEccentricityEarth(
   eccentricityBase,
   eccentricityAmplitude
 ) {
-  // 1. root = √(eₘ² + a²) — derived mean eccentricity
-  const root = Math.sqrt(
+  // Law of cosines: distance between two circular orbits
+  // Earth orbits wobble-center at radius `amplitude` (H/13 clockwise)
+  // Wobble-center orbits Sun at radius `base`
+  // e(t) = sqrt(base² + amp² - 2·base·amp·cos(θ))
+  const θ = ((currentYear - balancedYear) / perihelionCycleLength) * 2 * Math.PI;
+  return Math.sqrt(
     eccentricityBase * eccentricityBase +
-    eccentricityAmplitude * eccentricityAmplitude
+    eccentricityAmplitude * eccentricityAmplitude -
+    2 * eccentricityBase * eccentricityAmplitude * Math.cos(θ)
   );
-
-  // 2. θ in radians
-  const degrees = ((currentYear - balancedYear) / perihelionCycleLength) * 360;
-  const cosθ = Math.cos(degrees * Math.PI / 180);
-
-  // 3. e(t) = e₀ + (-A - (e₀ - e_base)·cos(θ))·cos(θ)
-  const h1 = root - eccentricityBase;
-  return root + (-eccentricityAmplitude - h1 * cosθ) * cosθ;
 }
 
 

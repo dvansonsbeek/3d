@@ -233,11 +233,9 @@ function computeEccentricityEarth(currentYear) {
  * Source: script.js computeEccentricityEarth() ~line 33358
  */
 function computeEccentricity(currentYear, balancedYear, cycleLength, base, amplitude) {
-  const root = Math.sqrt(base * base + amplitude * amplitude);
-  const degrees = ((currentYear - balancedYear) / cycleLength) * 360;
-  const cosTheta = Math.cos(degrees * Math.PI / 180);
-  const h1 = root - base;
-  return root + (-amplitude - h1 * cosTheta) * cosTheta;
+  // Law of cosines: distance between two circular orbits
+  const θ = ((currentYear - balancedYear) / cycleLength) * 2 * Math.PI;
+  return Math.sqrt(base * base + amplitude * amplitude - 2 * base * amplitude * Math.cos(θ));
 }
 
 /**
