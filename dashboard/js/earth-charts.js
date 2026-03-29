@@ -51,14 +51,6 @@ function renderDayLengthsChart(fc) {
       name: 'Stellar Day',
       hovertemplate: 'Stellar: %{y:.4f}s<extra></extra>',
     },
-    {
-      x: fc.years, y: fc.measuredSolarDaySeconds,
-      type: 'scattergl', mode: 'lines',
-      line: { color: '#f56c6c', width: 1, dash: 'dot' },
-      name: 'Measured Solar Day',
-      visible: 'legendonly',
-      hovertemplate: 'Measured: %{y:.4f}s<extra></extra>',
-    },
   ];
 
   const layout = makePlotlyLayout({

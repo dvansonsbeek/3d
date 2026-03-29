@@ -70,7 +70,6 @@ function exportEarth(years) {
   const precessionPeriod = [], erd = [];
   // Earth predictions (day lengths, cardinal points, precession)
   const solarDaySeconds = [], siderealDaySeconds = [], stellarDaySeconds = [];
-  const measuredSolarDaySeconds = [], raDayOffsetMs = [];
   const anomalisticYearDays = [];
   const perihelionPrecession = [], inclinationPrecession = [], eclipticPrecession = [];
   const ssJD = [], ssRA = [], ssYearLength = [];
@@ -108,8 +107,6 @@ function exportEarth(years) {
     solarDaySeconds.push(+el.lengthOfDay.toFixed(6));
     siderealDaySeconds.push(+el.siderealDay.toFixed(6));
     stellarDaySeconds.push(+el.stellarDay.toFixed(6));
-    measuredSolarDaySeconds.push(+el.measuredSolarDay.toFixed(6));
-    raDayOffsetMs.push(+el.raDayOffsetMs.toFixed(4));
 
     // Anomalistic year
     anomalisticYearDays.push(+OE.computeLengthOfAnomalisticYearDays(year).toFixed(10));
@@ -164,7 +161,6 @@ function exportEarth(years) {
       precessionPeriod, perihelionPrecession, inclinationPrecession, eclipticPrecession,
       erd,
       solarDaySeconds, siderealDaySeconds, stellarDaySeconds,
-      measuredSolarDaySeconds, raDayOffsetMs,
       ssJD, ssRA, ssYearLength,
       wsJD, wsRA, wsYearLength,
       veJD, veRA, veYearLength,
