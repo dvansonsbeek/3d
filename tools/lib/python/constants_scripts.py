@@ -259,7 +259,7 @@ GROUP_23 = [p for p in PLANET_NAMES if PHASE_GROUP[p] == 23]
 FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
 
 # Theoretical ψ from H and Fibonacci numbers (exact, zero free parameters)
-# ψ = F_5 × F_8² / (2H) = 5 × 21² / (2 × 335008) = 2205/670016
+# ψ = F_5 × F_8² / (2H) = 5 × 21² / (2 × H) = 2205 / (2H)
 PSI = FIB[5] * FIB[8]**2 / (2 * H)
 
 # Backwards compatibility aliases

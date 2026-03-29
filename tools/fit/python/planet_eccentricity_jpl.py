@@ -9,10 +9,11 @@ import numpy as np
 import json
 import os
 from astroquery.jplhorizons import Horizons
+from load_constants import C
 
-# ─── Model constants ───────────────────────────────────────────────────────
-H = 335008
-ANCHOR_YEAR = 1246 - 14.5 * (H / 16)  # -302355
+# ─── Model constants (from JSON via bridge) ───────────────────────────────
+H = int(C['H'])
+ANCHOR_YEAR = C['balancedYear']
 
 PLANETS = {
     'Mercury': {'id': '199', 'period': H * 8 / 11, 'e_model': 0.20563593, 'e_j2000': 0.20563593, 'range': (-9000, 9000)},

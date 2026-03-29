@@ -45,8 +45,8 @@ import pandas as pd
 # FUNDAMENTAL CONSTANTS
 # =============================================================================
 
-H = 335008  # Master Holistic-Year cycle
-ANCHOR = 302355  # Reference year offset: balancedYear = 1246 - 14.5*(H/16)
+from constants_scripts import H, BALANCE_YEAR  # Read from JSON via bridge
+ANCHOR = -BALANCE_YEAR  # Reference year offset (positive value)
 
 # Earth precession cycles
 EARTH_PERI_PERIOD = H // 16     # H/16 (effective perihelion)

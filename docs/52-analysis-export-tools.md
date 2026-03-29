@@ -153,7 +153,9 @@ Position data for Sun and all planets.
 
 ---
 
-## Part 2: Solstices & Equinoxes
+## Part 2: Solstices & Equinoxes (Hidden — merged into Days & Years)
+
+> **Note:** This report is now hidden in the UI. Its functionality (declination-based cardinal point detection) has been merged into the Days & Years report (Part 3). The code and function `runSolsticeExport()` remain for reference.
 
 ### Purpose
 
@@ -161,7 +163,7 @@ Exports solstice and equinox timing data with RA and obliquity for a range of ye
 
 ### Location
 
-`Reports > Solstices & Equinoxes`
+`Reports > Solstices & Equinoxes` *(hidden since 2026-03-29)*
 
 ### Controls
 
@@ -194,7 +196,7 @@ Each cardinal point is found by its physical observable:
 | **Vernal Equinox (VE)** | Declination crosses zero ascending (neg → pos) | Linear at zero crossing |
 | **Autumnal Equinox (AE)** | Declination crosses zero descending (pos → neg) | Linear at zero crossing |
 
-This differs from the Year Length Analysis report (Part 3), which detects cardinal points via RA crossings at 0°/90°/180°/270°. Both methods are valid but measure subtly different moments (~1 second difference at J2000 due to the obliquity rate of change).
+Since 2026-03-29, the Year Length Analysis report (Part 3) also uses declination-based detection, making this report redundant.
 
 ### Output
 
@@ -226,7 +228,7 @@ All functions support JD chaining (`prevJD`) for efficient sequential-year searc
 
 ### Related
 
-For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across 335,008 years), see [14 — Solstice Prediction](14-solstice-prediction.md).
+For the solstice RA and JD prediction formulas (Fibonacci harmonics, valid across 335,317 years), see [14 — Solstice Prediction](14-solstice-prediction.md).
 
 ---
 
@@ -257,20 +259,20 @@ Downloads an Excel file (`Holistic_year_analysis_YYYY_YYYY.xlsx`) containing 5 s
 #### Sheet 1: Summary
 
 - **Orbital Parameters**: Obliquity and eccentricity at mid-point year
-- **Tropical Year by Cardinal Point**: Measured vs IAU J2000 reference for all 4 cardinal points (VE, SS, AE, WS)
+- **Tropical Year by Cardinal Point**: Measured at solstices (max/min dec) and equinoxes (dec=0 crossing) vs IAU J2000 reference
 - **Mean Tropical Year**: Average of 4 cardinal points with IAU comparison
+- **Sidereal Year**: World-angle advancement at cardinal points, averaged over 4 crossings
 - **Anomalistic Year**: Perihelion-to-perihelion and aphelion-to-aphelion intervals
-- **Sidereal Year**: Measured sidereal year with IAU comparison
-- **Coin Rotation Effects**: Orbital, perihelion, and axial coin rotation offsets
-- **Precession Calculation**: Derived precession period from sidereal/tropical difference
+- **Derived Day Lengths**: Solar, sidereal, stellar day from measured year lengths
+- **Coin Rotation Effects**: Orbital and axial coin rotation offsets
 
 #### Sheet 2: Cardinal Points
 
 Year-by-year Julian Day and interval data for each cardinal point:
-- Vernal Equinox (RA=0 deg)
-- Summer Solstice (RA=90 deg)
-- Autumnal Equinox (RA=180 deg)
-- Winter Solstice (RA=270 deg)
+- Vernal Equinox (dec=0 ascending)
+- Summer Solstice (max declination)
+- Autumnal Equinox (dec=0 descending)
+- Winter Solstice (min declination)
 
 #### Sheet 3: Anomalistic
 
@@ -303,10 +305,11 @@ Combined view of all measurements per year:
 **Algorithm**:
 1. Collects all measurements in a single pass through the year range
 2. For each year, finds:
-   - All 4 cardinal point crossings using `sunRACrossingForYear()`
+   - SS/WS by declination extrema (`solsticeForYear()`, `winterSolsticeForYear()`)
+   - VE/AE by declination zero-crossing (`equinoxForYearByDec()`)
+   - World angle captured at each cardinal event for sidereal year
    - Perihelion using `perihelionForYearMethodB()`
    - Aphelion using `aphelionForYearMethodB()`
-   - Sidereal crossing using world angle tracking
 3. Calculates intervals between consecutive years
 4. Generates Excel workbook using SheetJS library
 

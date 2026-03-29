@@ -342,7 +342,7 @@ console.log('  PERIOD SCAN');
 console.log('═══════════════════════════════════════════════════════════════');
 
 // Uranus: current = 30583, try ±steps
-// Step size: 335008 * 365.2421897 / 30583 ≈ 4002, so each count step ≈ 30583/4002 ≈ 7.6 days
+// Step size: H * meanSolarYear / 30583 ≈ 4004, so each count step ≈ 30583/4004 ≈ 7.6 days
 const uranusTests = [];
 for (let v = 30570; v <= 30596; v += 2) uranusTests.push(v);
 scanPeriods('uranus', knownUranusOpp, 1780, 2025, 3, 30583, uranusTests);
@@ -350,7 +350,7 @@ scanPeriods('uranus', knownUranusOpp, 1780, 2025, 3, 30583, uranusTests);
 console.log();
 
 // Neptune: current = 59980, try ±steps
-// Step size: 335008 * 365.2421897 / 59980 ≈ 2040, so each count step ≈ 59980/2040 ≈ 29.4 days
+// Step size: H * meanSolarYear / 59980 ≈ 2042, so each count step ≈ 59980/2042 ≈ 29.4 days
 const neptuneTests = [];
 for (let v = 59940; v <= 60020; v += 5) neptuneTests.push(v);
 scanPeriods('neptune', knownNeptuneOpp, 1846, 2025, 3, 59980, neptuneTests);

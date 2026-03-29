@@ -9,7 +9,7 @@ This document explains **how the planetary precession formulas were derived** �
 | Term | Value | Meaning |
 |------|-------|---------|
 | **Holistic-Year (H)** | See [Constants Reference](20-constants-reference.md) | Master cycle from which all periods derive via Fibonacci fractions |
-| **Anchor Year** | `balancedYear` = 1246 − 14.5×(H/16) | Year zero of the current Holistic cycle; formulas use `Year − balancedYear` |
+| **Anchor Year** | `balancedYear` = perihelionalignmentYear − 14.5×(H/16) | Year zero of the current Holistic cycle; formulas use `Year − balancedYear` |
 | **ERD** | Earth Rate Deviation | Difference between instantaneous and mean Earth perihelion rate (°/year); see [Section 14](#14-observed-angle-formulas-using-observational-data) |
 
 ### Formula Types
@@ -206,7 +206,7 @@ The Venus formula is based on the physical principle that:
 
 2. **Earth's reference frame rotates** due to axial precession
    - Mean period: H/13 years
-   - Current period: ~25,772 years (varying with obliquity)
+   - Current period: ~25,771 years (varying with obliquity)
 
 3. **Earth Rate Deviation (ERD)** captures this variation:
    ```

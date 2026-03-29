@@ -630,8 +630,8 @@ Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 │
 ├─▼ Reports                       [observed category]
 │  ├─▼ Planet Positions & Orbits
-│  ├─▼ Solstices & Equinoxes
-│  └─▼ Year Length Analysis
+│  ├─▼ Days & Years (combined solstice/equinox + year lengths)
+│  └─▼ Solar Day (analemma + day length by starting angle)
 │
 └─▼ Tools
    ├─ Planet Inspector           [button]

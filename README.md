@@ -1,7 +1,7 @@
 # Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-6-green.svg)](https://github.com/dvansonsbeek/3d)
+[![Version](https://img.shields.io/badge/version-7-green.svg)](https://github.com/dvansonsbeek/3d)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
@@ -22,12 +22,12 @@ The model starts from a single observation: two of Earth's precession motions ro
 
 | Motion | Direction | Cycle |
 |--------|-----------|-------|
-| Axial Precession | Clockwise | ~25,770 years |
-| Inclination Precession | Counter-clockwise | ~111,669 years |
+| Axial Precession | Clockwise | ~25,794 years |
+| Inclination Precession | Counter-clockwise | ~111,772 years |
 
 These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and climate patterns including ice ages.
 
-Everything comes together in the **Holistic-Year (H)**: a 335,008-year megacycle that unifies all precession periods through Fibonacci number ratios (H/3, H/13, H/16) — and this simulation visualizes it all in one interactive view.
+Everything comes together in the **Holistic-Year (H)**: a 335,317-year megacycle that unifies all precession periods through Fibonacci number ratios (H/3, H/13, H/16) — and this simulation visualizes it all in one interactive view.
 
 ---
 
@@ -42,7 +42,7 @@ The model implements six laws connecting planetary orbital parameters through pu
 5. **The Eccentricity Balance** — The same two planet groups balance independently in eccentricity to 100%
 6. **Saturn-Jupiter-Earth Resonance** — A closed beat-frequency loop connects inner and outer solar system dynamics
 
-The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 755 candidate configurations, only one satisfies all six laws simultaneously.
+The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 737 candidate configurations, only one satisfies all six laws simultaneously.
 
 See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/49 checks pass).
 
@@ -52,9 +52,9 @@ See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full d
 
 The Sun is still the center of our solar system. The model uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
-- **Earth wobbles** clockwise around a reference point (the EARTH-WOBBLE-CENTER) in ~25,770 years — this is axial precession
-- **Earth's perihelion point** wobbles counter-clockwise around the Sun in ~111,669 years — this is inclination precession
-- These two motions **meet every ~20,938 years** — producing perihelion precession
+- **Earth wobbles** clockwise around a reference point (the EARTH-WOBBLE-CENTER) in ~25,794 years — this is axial precession
+- **Earth's perihelion point** wobbles counter-clockwise around the Sun in ~111,772 years — this is inclination precession
+- These two motions **meet every ~20,957 years** — producing perihelion precession
 - Earth orbits its perihelion point (close to the Sun) in 1 solar year, and all planets orbit their own perihelion points following Kepler's 3rd law
 
 The result: obliquity, eccentricity, inclination, and all precession movements emerge from just two opposing forces in a 3:13 ratio.
@@ -165,10 +165,10 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ## Quick Facts
 
-- **Master cycle**: 335,008 years (the Holistic-Year, H)
-- **Axial precession**: ~25,770 years (H/13)
-- **Inclination precession**: ~111,669 years (H/3)
-- **Perihelion precession**: ~20,938 years (H/16)
+- **Master cycle**: 335,317 years (the Holistic-Year, H)
+- **Axial precession**: ~25,794 years (H/13)
+- **Inclination precession**: ~111,772 years (H/3)
+- **Perihelion precession**: ~20,957 years (H/16)
 - **Model parameters**: 70 model parameters (Earth 11, Moon 3, 7 planets x 8) and 75 calibration inputs from astronomical observations — with only **6 free parameters** for the entire model
 
 ---

@@ -42,7 +42,7 @@ The model is fundamentally built on **Fibonacci number relationships between pla
 
 ### 2.1 How Orbit Counts Work
 
-Each planet has an integer orbit count in the Holistic Year (H = 335,008 solar years):
+Each planet has an integer orbit count in the Holistic Year (H = 335,317 solar years):
 
 ```
 SolarYearCount = round(H x meanSolarYear / SolarYearInput)
@@ -638,8 +638,8 @@ Additionally, there are less well-known cycles that may need modeling:
 | `InvPlaneInclinationJ2000` | Souami & Souchay (2012) research paper |
 | `LongitudePerihelion` | JPL J2000 reference -- defines perihelion direction |
 | `PerihelionEclipticYears` | Derived from H/n -- the Fibonacci/Holistic-Year structure is fundamental |
-| `holisticyearLength` | Core model constant (335,008) -- the entire model is built on this |
-| `perihelionalignmentYear` | Historical reference (1246 AD) |
+| `holisticyearLength` | Core model constant (335,317) -- the entire model is built on this |
+| `perihelionalignmentYear` | Historical reference (1246.03125 AD) |
 | `AscendingNodeInvPlaneVerified` | Optimized from Souami & Souchay to match J2000 ecliptic inclinations |
 | `moonEclipticInclinationJ2000` | 5.1453964 deg -- observational data |
 | `moonOrbitalEccentricity` | 0.054900489 -- observational data |

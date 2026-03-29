@@ -25,8 +25,8 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Variable | Description |
 |----------|-------------|
 | `holisticyearLength` | Length of Holistic-Year (H) in Earth solar years |
-| `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/16 precision) |
-| `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds |
+| `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/8 precision) |
+| `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds (derived: `siderealYearJ2000 × 86400`) |
 | `meanlengthofday` | Mean solar day in SI seconds |
 | `meanSiderealday` | Mean sidereal day in SI seconds (derived) |
 | `meanStellarday` | Mean stellar day in SI seconds (derived) |

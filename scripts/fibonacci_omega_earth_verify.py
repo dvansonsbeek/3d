@@ -4,7 +4,7 @@ Earth's ω Identity — Consolidated Verification Script
 =======================================================
 Consolidates 2 scripts into one comprehensive analysis:
 
-  1. Earth's ecliptic-frame geometry over 335,008 years
+  1. Earth's ecliptic-frame geometry over 335,317 years
   2. Deep investigation: Is ω_ecl + i = 180° a geometric identity?
 
 Key finding: For Earth, ω_ecl + i = 180.0000° at ALL data points
@@ -70,7 +70,7 @@ arg_peri_all = np.array([norm360(peri_ecl[j] - omega_ecl[j]) for j in range(n)])
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
 print("=" * 100)
-print("§1 — EARTH'S ECLIPTIC-FRAME GEOMETRY OVER 335,008 YEARS")
+print("§1 — EARTH'S ECLIPTIC-FRAME GEOMETRY OVER 335,317 YEARS")
 print("=" * 100)
 
 print(f"\n  Data: {n} points, step ~{(years[-1]-years[0])/(n-1):.0f} yr, years {years[0]:,.0f} to {years[-1]:,.0f}")
@@ -381,7 +381,7 @@ print("=" * 100)
 print(f"""
   CORE FINDING:
     ω_ecl + i = 180° is EXACT to machine precision (< {np.max(np.abs(residuals)):.1e}°)
-    for ALL {n_valid} data points across the full 335,008-year Holistic cycle.
+    for ALL {n_valid} data points across the full 335,317-year Holistic cycle.
 
   PROPERTIES:
     1. Earth-specific — does NOT hold for any other planet

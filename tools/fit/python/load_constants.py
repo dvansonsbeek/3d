@@ -7,7 +7,7 @@ Python scripts import from here instead of duplicating values in constants_scrip
 
 Usage:
     from load_constants import C
-    print(C['H'])                    # 335008
+    print(C['H'])                    # 335317
     print(C['earthtiltMean'])        # 23.41349
     print(C['planets']['mercury'])   # { name: 'Mercury', ... }
 """

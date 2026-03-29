@@ -65,11 +65,11 @@ precession hierarchy.
 |--------|----------------|-------------|---------|-------------------|-------|
 | Mercury | +531.9 | 243,642 | H × 8/11 | 243,642 yr | — |
 | Venus | +193.4 | 670,016 | H × 2 | 670,016 yr | — |
-| Earth | +1,160.6 | 111,669 | H/3 | 111,669 yr | — |
-| Mars | +1,676.4 | 77,310 | H × 3/13 | 77,310 yr | — |
-| Jupiter | +1,934.3 | 67,002 | H/5 | 67,002 yr | — |
-| Saturn | −3,094.9 | 41,876 (r) | H/8 | 41,876 yr | — |
-| Uranus | +1,160.6 | 111,669 | H/3 | 111,669 yr | — |
+| Earth | +1,160.6 | 111,772 | H/3 | 111,772 yr | — |
+| Mars | +1,676.4 | 77,381 | H × 3/13 | 77,381 yr | — |
+| Jupiter | +1,934.3 | 67,063 | H/5 | 67,063 yr | — |
+| Saturn | −3,094.9 | 41,915 (r) | H/8 | 41,915 yr | — |
+| Uranus | +1,160.6 | 111,772 | H/3 | 111,772 yr | — |
 | Neptune | +193.4 | 670,016 | H × 2 | 670,016 yr | — |
 
 Source: WebGeoCalc analysis of long-term perihelion longitude evolution.
@@ -89,7 +89,7 @@ Source: WebGeoCalc analysis of long-term perihelion longitude evolution.
 |--------|------|--------|-----------|--------|
 | Mercury | Cassini state (locked) | ~300 kyr | Retrograde | Peale 2006; Margot+ 2012 |
 | Venus | ~44"/yr (cone period ~29 kyr) | ~29 kyr | Prograde (obliquity 177°) | Cottereau & Souchay 2009 (A&A) |
-| Earth | 50.29"/yr | 25,772 yr | Retrograde | IAU 2006 |
+| Earth | 50.29"/yr | 25,771 yr | Retrograde | IAU 2006 |
 | Mars | 7604 ± 6 mas/yr | 170,400 yr | Retrograde | Konopliv+ 2020 (InSight/RISE) |
 | Jupiter | 2.64–3.17 "/yr | 113–136 kyr | Retrograde | Saillenfest+ 2020 (A&A) |
 | Saturn | 0.747–0.894 "/yr | 400–480 kyr | Retrograde | Saillenfest+ 2021 (Nature Astron.) |
@@ -130,10 +130,10 @@ allows obliquity to wander 0°–60°+.
 
 | Phenomenon | Observed value | H expression | H rate | Error |
 |-----------|---------------|-------------|--------|-------|
-| Inclination (inv. plane) | ≈ perihelion ecliptic (g₄ ≈ \|s₄\|) | **3H/13** = 77,310 yr | 13/(3H) | — |
-| Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **3H/8** = 125,628 yr | 8/(3H) | 0.7% |
-| Perihelion ecliptic (ϖ) | 77,310 yr (WebGeoCalc) | **3H/13** = 77,310 yr | 13/(3H) | 0.0% |
-| Axial precession | 170,400 yr (InSight) | **H/2** = 167,504 yr | 2/H | 1.7% |
+| Inclination (inv. plane) | ≈ perihelion ecliptic (g₄ ≈ \|s₄\|) | **3H/13** = 77,381 yr | 13/(3H) | — |
+| Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **3H/8** = 125,744 yr | 8/(3H) | 0.7% |
+| Perihelion ecliptic (ϖ) | 77,381 yr (WebGeoCalc) | **3H/13** = 77,381 yr | 13/(3H) | 0.0% |
+| Axial precession | 170,400 yr (InSight) | **H/2** = 167,659 yr | 2/H | 1.7% |
 
 Note: Mars's apsidal eigenfrequency g₄ = 17.916"/yr and nodal eigenfrequency
 |s₄| = 17.755"/yr differ by only 0.9%. The model treats inclination and
@@ -144,12 +144,12 @@ with the eigenfrequency data.
 
 | Precession type | Earth rate | Earth period | Mars rate | Mars period |
 |----------------|-----------|-------------|----------|-------------|
-| Inclination (inv. plane) | 3/H | H/3 = 111,669 yr | 13/(3H) | 3H/13 = 77,310 yr |
-| Ecliptic precession | 5/H | H/5 = 67,002 yr | **?** | **?** (predicted 3H/5) |
-| Obliquity cycle | 8/H | H/8 = 41,876 yr | 8/(3H) | 3H/8 = 125,628 yr |
-| Axial precession | 13/H | H/13 = 25,770 yr | 2/H | H/2 = 167,504 yr |
-| Perihelion (ecliptic) | 16/H | H/16 = 20,938 yr | 13/(3H) | 3H/13 = 77,310 yr |
-| Perihelion (ICRF) | 3/H | H/3 = 111,669 yr | 26/(3H) | 3H/26 = 38,655 yr |
+| Inclination (inv. plane) | 3/H | H/3 = 111,772 yr | 13/(3H) | 3H/13 = 77,381 yr |
+| Ecliptic precession | 5/H | H/5 = 67,063 yr | **?** | **?** (predicted 3H/5) |
+| Obliquity cycle | 8/H | H/8 = 41,915 yr | 8/(3H) | 3H/8 = 125,744 yr |
+| Axial precession | 13/H | H/13 = 25,794 yr | 2/H | H/2 = 167,659 yr |
+| Perihelion (ecliptic) | 16/H | H/16 = 20,957 yr | 13/(3H) | 3H/13 = 77,381 yr |
+| Perihelion (ICRF) | 3/H | H/3 = 111,772 yr | 26/(3H) | 3H/26 = 38,690 yr |
 
 ### Fibonacci analysis
 
@@ -166,8 +166,8 @@ All are Fibonacci numbers or sums thereof. Identities:
 **Mars** — rates for obliquity and perihelion ecliptic share a 1/(3H) base:
 
 ```
-obliquity:        8/(3H)  →  3H/8  = 125,628 yr
-perihelion ecl:  13/(3H)  →  3H/13 =  77,310 yr
+obliquity:        8/(3H)  →  3H/8  = 125,744 yr
+perihelion ecl:  13/(3H)  →  3H/13 =  77,381 yr
 ```
 
 The Fibonacci identity **13 = 8 + 5** predicts:
@@ -177,9 +177,9 @@ perihelion ecl = obliquity + ecliptic
 13/(3H) = 8/(3H) + 5/(3H)
 ```
 
-This gives a **predicted Mars ecliptic precession = 3H/5 = 201,005 yr**.
+This gives a **predicted Mars ecliptic precession = 3H/5 = 201,190 yr**.
 
-**Mars axial precession**: H/2 = 167,504 yr (rate = 2/H = 6/(3H)). The value 6
+**Mars axial precession**: H/2 = 167,659 yr (rate = 2/H = 6/(3H)). The value 6
 is not a Fibonacci number, suggesting either:
 
 - (a) H/2 is approximate and the true value follows a different Fibonacci ratio
@@ -192,7 +192,7 @@ is not a Fibonacci number, suggesting either:
   of Mars From Orbiting Spacecraft", *Geophysical Research Letters* — rate
   7604 ± 6 mas/yr from InSight + 3 landers spanning 1976–2019.
 - **Perihelion longitude**: WebGeoCalc long-term analysis — dϖ/dt ≈ +1676.4"/cy
-  → 77,310 yr = 3H/13 (exact match).
+  → 77,381 yr = 3H/13 (exact match).
 - **Eigenfrequencies**: g₄ = 17.916"/yr (apsidal), s₄ = -17.755"/yr (nodal) —
   differ by only 0.9%, supporting the model's single-rate assumption.
   Source: Laskar et al. 2004, Table 3.
@@ -207,12 +207,12 @@ is not a Fibonacci number, suggesting either:
 
 | Phenomenon | Period | H expression | Rate (1/H units) |
 |-----------|--------|-------------|------------------|
-| Inclination (inv. plane) | 111,669 yr | H/3 | 3 |
-| Ecliptic precession | 67,002 yr | H/5 | 5 |
-| Obliquity cycle | 41,876 yr | H/8 | 8 |
-| Axial precession | 25,770 yr | H/13 | 13 |
-| Perihelion (ecliptic) | 20,938 yr | H/16 | 16 |
-| Perihelion (ICRF) | 111,669 yr | H/3 | 3 |
+| Inclination (inv. plane) | 111,772 yr | H/3 | 3 |
+| Ecliptic precession | 67,063 yr | H/5 | 5 |
+| Obliquity cycle | 41,915 yr | H/8 | 8 |
+| Axial precession | 25,794 yr | H/13 | 13 |
+| Perihelion (ecliptic) | 20,957 yr | H/16 | 16 |
+| Perihelion (ICRF) | 111,772 yr | H/3 | 3 |
 
 Earth's perihelion ICRF = H/3 comes from converting the ecliptic value:
 
@@ -238,8 +238,8 @@ Current H-based fits used in the simulation:
 |--------|----------|---------|--------|-----------|----------|--------|
 | Mercury | `mercuryAxialPrecessionYears` | `-mercuryPerihelionEclipticYears` | 243,642 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006 |
 | Venus | `venusAxialPrecessionYears` | `H×3/34` (F4/F9) | 29,560 yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
-| Mars | `marsAxialPrecessionYears` | `-H/2` | 167,504 yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
-| Jupiter | `jupiterAxialPrecessionYears` | `-H×3/8` (F4/F6) | 125,628 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
+| Mars | `marsAxialPrecessionYears` | `-H/2` | 167,659 yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
+| Jupiter | `jupiterAxialPrecessionYears` | `-H×3/8` (F4/F6) | 125,744 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
 | Saturn | `saturnAxialPrecessionYears` | `-H×4/3` | 446,677 yr | Retrograde | 400–480 kyr | Saillenfest+ 2021 |
 | Uranus | `uranusAxialPrecessionYears` | `H×610` (F15) | 204 Myr | Prograde | ~40–50 Myr (bare) | Saillenfest+ 2022 |
 | Neptune | `neptuneAxialPrecessionYears` | `-H×68` (2×F9) | 22.8 Myr | Retrograde | ~70 Myr (est.) | Ward & Hamilton 2004 |
@@ -275,11 +275,11 @@ The wobble is the **meeting frequency** of these two motions:
 |--------|--------------------|---------|--------------------|--------|-----|
 | Mercury | 243,642 yr | H×8/11 | −28,818 yr | −8H/93 | retro |
 | Venus | 670,016 yr | H×2 | −26,801 yr | −2H/25 | retro |
-| Earth | 20,938 yr | H/16 | +111,669 yr | +H/3 | **pro** |
-| Mars | 77,310 yr | 3H/13 | −38,655 yr | −3H/26 | retro |
-| Jupiter | 67,002 yr | H/5 | −41,876 yr | −H/8 | retro |
-| Saturn | −41,876 yr (r) | −H/8 | −15,953 yr | −H/21 | retro |
-| Uranus | 111,669 yr | H/3 | −33,501 yr | −H/10 | retro |
+| Earth | 20,957 yr | H/16 | +111,772 yr | +H/3 | **pro** |
+| Mars | 77,381 yr | 3H/13 | −38,690 yr | −3H/26 | retro |
+| Jupiter | 67,063 yr | H/5 | −41,915 yr | −H/8 | retro |
+| Saturn | −41,915 yr (r) | −H/8 | −15,967 yr | −H/21 | retro |
+| Uranus | 111,772 yr | H/3 | −33,532 yr | −H/10 | retro |
 | Neptune | 670,016 yr | H×2 | −26,801 yr | −2H/25 | retro |
 
 Notable ICRF patterns: Jupiter = **H/8** (F6), Saturn = **H/21** (F8).
@@ -291,9 +291,9 @@ Earth is the only planet with prograde perihelion ICRF.
 |--------|--------|-------------|-----------|
 | Mercury | 243,642 yr | −H×8/11 | Retrograde (Cassini) |
 | Venus | 29,560 yr | +H×3/34 | Prograde (obliq 177°) |
-| Earth | 25,770 yr | −H/13 | Retrograde |
-| Mars | 167,504 yr | −H/2 | Retrograde |
-| Jupiter | 125,628 yr | −H×3/8 | Retrograde |
+| Earth | 25,794 yr | −H/13 | Retrograde |
+| Mars | 167,659 yr | −H/2 | Retrograde |
+| Jupiter | 125,744 yr | −H×3/8 | Retrograde |
 | Saturn | 446,677 yr | −H×4/3 | Retrograde |
 | Uranus | 204 Myr | +H×610 | Prograde (obliq 98°) |
 | Neptune | 22.8 Myr | −H×68 | Retrograde |
@@ -304,11 +304,11 @@ Earth is the only planet with prograde perihelion ICRF.
 |--------|-----------|---------------|---------|-------------|--------|--------|
 | Mercury | retro | retro | same: \|diff\| | 82/(8H) | 32,684 yr | 4H/41 |
 | Venus | pro | retro | opp: sum | 143/(6H) | 14,056 yr | 6H/143 |
-| Earth | retro | pro | opp: sum | 16/H | 20,938 yr | **H/16** |
+| Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
 | Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,251 yr | 3H/20 |
 | Jupiter | retro | retro | same: \|diff\| | 16/(3H) | 62,814 yr | **3H/16** |
 | Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,544 yr | 4H/81 |
-| Uranus | pro | retro | opp: sum | ≈10/H | 33,501 yr | ≈H/10 |
+| Uranus | pro | retro | opp: sum | ≈10/H | 33,532 yr | ≈H/10 |
 | Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,801 yr | ≈2H/25 |
 
 Calculation detail:
@@ -354,9 +354,9 @@ both the obliquity and ecliptic precession rates.
 
 | Planet | Peri ecl rate | Base | N | Decomp | Obliquity | Period | Observed | Error |
 |--------|-------------|------|---|--------|-----------|--------|----------|-------|
-| Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = 893,355 yr | ~895 kyr | 0.2% |
-| Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = 41,876 yr | ~41,000 yr | 2% |
-| Mars | 13/(3H) | 1/(3H) | 13 | 8 + 5 | 8/(3H) | 3H/8 = 125,628 yr | ~124,800 yr | 0.7% |
+| Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = 894,179 yr | ~895 kyr | 0.2% |
+| Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = 41,915 yr | ~41,000 yr | 2% |
+| Mars | 13/(3H) | 1/(3H) | 13 | 8 + 5 | 8/(3H) | 3H/8 = 125,744 yr | ~124,800 yr | 0.7% |
 
 All three confirmed obliquity cycles involve the Fibonacci number **8** in the period
 expression: 8H/3, H/8, 3H/8.
@@ -367,9 +367,9 @@ Three cross-planet period matches link obliquity cycles to other planets' preces
 
 | Connection | Period | Significance |
 |-----------|--------|-------------|
-| Mars obliquity = Jupiter axial | 3H/8 = 125,628 yr | Exact match, mirror pair (d=5) |
-| Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | 893,355 ≈ 893,354 yr |
-| Earth obliquity = Saturn peri ecl = Jupiter peri ICRF | H/8 = 41,876 yr | Same Fibonacci rate (8/H) |
+| Mars obliquity = Jupiter axial | 3H/8 = 125,744 yr | Exact match, mirror pair (d=5) |
+| Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | 894,179 ≈ 894,178 yr |
+| Earth obliquity = Saturn peri ecl = Jupiter peri ICRF | H/8 = 41,915 yr | Same Fibonacci rate (8/H) |
 
 The Mars-Jupiter connection is the strongest: both are mirror pairs (d=5) and the
 match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = H/2**.
@@ -378,30 +378,30 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 
 | Planet | Peri ecl | N | Decomp | Obliquity prediction | Ecliptic prediction | Status |
 |--------|---------|---|--------|---------------------|---------------------|--------|
-| Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = 893,355 yr** | H = 335,008 yr | ✓ Confirmed |
+| Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Confirmed |
 | Venus | H×2 | 1 | — | N/A | N/A | ✓ Consistent (tidally damped) |
-| Earth | H/16 | 8 | 5 + 3 | **H/8 = 41,876 yr** | H/5 = 67,002 yr | ✓ Confirmed |
-| Mars | 3H/13 | 13 | 8 + 5 | **3H/8 = 125,628 yr** | 3H/5 = 201,005 yr | ✓ Confirmed |
-| Jupiter | H/5 | 5 | 2 + 3 | **H/2 = 167,504 yr** | H/3 = 111,669 yr | Prediction |
-| Saturn | H/8 (r) | 8 | 5 + 3 | **H/5 = 67,002 yr** or **H/3 = 111,669 yr** | H/3 or H/5 | Ambiguous |
-| Uranus | H/3 | 3 | 2 + 1 | **H/2 = 167,504 yr** or **H = 335,008 yr** | H or H/2 | Ambiguous |
+| Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
+| Mars | 3H/13 | 13 | 8 + 5 | **3H/8 = ~125,744 yr** | 3H/5 = ~201,190 yr | ✓ Confirmed |
+| Jupiter | H/5 | 5 | 2 + 3 | **H/2 = ~167,659 yr** | H/3 = ~111,772 yr | Prediction |
+| Saturn | H/8 (r) | 8 | 5 + 3 | **H/5 = ~67,063 yr** or **H/3 = ~111,772 yr** | H/3 or H/5 | Ambiguous |
+| Uranus | H/3 | 3 | 2 + 1 | **H/2 = ~167,659 yr** or **H = 335,317 yr** | H or H/2 | Ambiguous |
 | Neptune | H×2 | 1 | — | N/A | N/A | ✓ Consistent (frozen) |
 
 ### Resolving ambiguities
 
 **Jupiter** (5 = 2 + 3): The Mars-Jupiter mirror-pair reciprocity resolves this
 uniquely. Mars obliquity = Jupiter axial (confirmed), therefore Jupiter obliquity =
-Mars axial = **H/2 = 167,504 yr**. This selects obliquity = 2/H and ecliptic = 3/H.
+Mars axial = **H/2 = ~167,659 yr**. This selects obliquity = 2/H and ecliptic = 3/H.
 
 **Saturn** (8 = 5 + 3): Earth and Saturn are mirror pairs (d=3). Earth's Fibonacci
 triple is {inclination=3, ecliptic=5, obliquity=8}. If the mirror swaps inclination
 and obliquity, Saturn's triple would be {inclination=8, ecliptic=5, obliquity=3},
-giving Saturn obliquity = **H/3 = 111,669 yr**. The alternative is H/5 = 67,002 yr.
+giving Saturn obliquity = **H/3 = ~111,772 yr**. The alternative is H/5 = ~67,063 yr.
 Both are testable predictions.
 
 **Uranus** (3 = 2 + 1): Mercury and Uranus are mirror pairs (d=21). No clear
-reciprocity resolves the ambiguity. The two options are **H/2 = 167,504 yr** and
-**H = 335,008 yr** (one full Holistic cycle). Uranus's obliquity is currently
+reciprocity resolves the ambiguity. The two options are **H/2 = ~167,659 yr** and
+**H = 335,317 yr** (one full Holistic cycle). Uranus's obliquity is currently
 frozen at ~98° (set by an ancient impact/satellite migration), so any underlying
 Fibonacci obliquity cycle may be suppressed.
 
@@ -449,12 +449,12 @@ solar system through the Fibonacci mirror-pair framework.
 
 | # | Prediction | Value | Current status | How to test |
 |---|-----------|-------|----------------|-------------|
-| 1 | Jupiter obliquity cycle | H/2 = 167,504 yr | "No regular cycle" (Saillenfest+ 2020) | Long-term numerical integration of spin-axis evolution |
-| 2 | Saturn obliquity cycle | H/3 = 111,669 yr or H/5 = 67,002 yr | "No regular cycle" (Saillenfest+ 2021) | Long-term numerical integration |
-| 3 | Uranus obliquity cycle | H/2 = 167,504 yr or H = 335,008 yr | "Frozen at 98°" (Saillenfest+ 2022) | Extremely long timescale simulation |
-| 4 | Mars ecliptic precession | 3H/5 = 201,005 yr | Not measured | Secular perturbation analysis |
-| 5 | Jupiter ecliptic precession | H/3 = 111,669 yr | Not measured | Secular perturbation analysis |
-| 6 | Mercury ecliptic precession | H = 335,008 yr | Not measured | Secular perturbation analysis |
+| 1 | Jupiter obliquity cycle | H/2 = ~167,659 yr | "No regular cycle" (Saillenfest+ 2020) | Long-term numerical integration of spin-axis evolution |
+| 2 | Saturn obliquity cycle | H/3 = ~111,772 yr or H/5 = ~67,063 yr | "No regular cycle" (Saillenfest+ 2021) | Long-term numerical integration |
+| 3 | Uranus obliquity cycle | H/2 = ~167,659 yr or H = 335,317 yr | "Frozen at 98°" (Saillenfest+ 2022) | Extremely long timescale simulation |
+| 4 | Mars ecliptic precession | 3H/5 = ~201,190 yr | Not measured | Secular perturbation analysis |
+| 5 | Jupiter ecliptic precession | H/3 = ~111,772 yr | Not measured | Secular perturbation analysis |
+| 6 | Mercury ecliptic precession | H = 335,317 yr | Not measured | Secular perturbation analysis |
 | 7 | Mars-Jupiter reciprocity | Mars obliq = Ju axial, Ju obliq = Mars axial | Mars confirmed, Jupiter untested | Jupiter spin-axis modeling |
 
 Note: Current literature describes Jupiter and Saturn as having no regular obliquity
@@ -469,11 +469,11 @@ oscillations superimposed on the trend — would constitute a confirmation.
 ## Open Questions
 
 1. **Mars axial at H/2**: rate 6/(3H) is not Fibonacci. Could the true value be
-   closer to 3H/5 = 201,005 yr (rate 5/(3H))? The InSight measurement is quite
+   closer to 3H/5 = 201,190 yr (rate 5/(3H))? The InSight measurement is quite
    precise at 170,400 yr, ruling out 201 kyr. Perhaps axial precession follows a
    different rule.
 
-2. **Mars ecliptic precession**: predicted at 3H/5 = 201,005 yr from the
+2. **Mars ecliptic precession**: predicted at 3H/5 = 201,190 yr from the
    identity 13 = 8 + 5. Not yet verified against any observation. See the
    obliquity cycle theory section above for the full set of ecliptic precession
    predictions.
@@ -501,7 +501,7 @@ oscillations superimposed on the trend — would constitute a confirmation.
    the model's single-rate assumption.
 
 7. **Jupiter obliquity verification**: The Mars-Jupiter reciprocity predicts
-   Jupiter obliquity = H/2 = 167,504 yr. Current literature (Saillenfest+ 2020)
+   Jupiter obliquity = H/2 = 167,659 yr. Current literature (Saillenfest+ 2020)
    describes Jupiter's obliquity as trending upward rather than oscillating
    regularly. Identifying a ~167 kyr oscillation superimposed on the secular
    trend would confirm the prediction.

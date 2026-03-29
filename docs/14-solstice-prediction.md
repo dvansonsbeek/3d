@@ -8,7 +8,7 @@ points (VE, SS, AE, WS) using **12 Fibonacci-based harmonics** per cardinal poin
 Fibonacci fundamentals** (H/6=3+3, H/11=3+8, H/19=3+16, H/24=8+16, H/32=16+16, etc.).
 
 These harmonics replace the conventional Meeus polynomial approach, extending
-the valid prediction range from ±2,000 years to the full **335,008-year** Holistic Year.
+the valid prediction range from ±2,000 years to the full **335,317-year** Holistic Year.
 
 Three formulas are provided for each cardinal point:
 
@@ -18,7 +18,7 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-335,008-year Holistic Year can be predicted to **2.7–5.3 minutes** accuracy.
+335,317-year Holistic Year can be predicted to **2.7–5.3 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |

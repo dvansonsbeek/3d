@@ -2,7 +2,7 @@
 
 This document is the **single source of truth** for all constants used in the Holistic Universe Model simulation. Other documents should reference this document rather than duplicating values.
 
-> **Last synchronized with `tools/lib/constants.js` on 2026-03-13.**
+> **Last synchronized with `tools/lib/constants.js` on 2026-03-29.**
 
 ### Code organization
 
@@ -16,7 +16,7 @@ The shared tools module `tools/lib/constants.js` mirrors these with its own 14-s
 
 - **Rule A — Formulas stay, computed numbers go.** Write "H/13" not a specific year count.
 - **Rule B — Theory-intrinsic integers stay inline.** Fibonacci numbers, cycle counts (13, 3, 16), and ratios are part of the theory.
-- **Rule C — Approximate values for readability.** Use "H/13 (~25,770 years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
+- **Rule C — Approximate values for readability.** Use "H/13 (~25,794 years; see [Constants Reference](20-constants-reference.md))" when a number aids understanding.
 - **Rule D — Tables reference this document.** If a doc repeats planet parameters, add: "For current values see [Constants Reference](20-constants-reference.md)."
 
 ---
@@ -29,11 +29,11 @@ The six true degrees of freedom that define the model. Everything else is derive
 
 | # | Parameter | Variable | Value | DOF | Section |
 |---|-----------|----------|-------|-----|---------|
-| 1 | Holistic-Year | `holisticyearLength` | 335,008 years | 1 | [Part 1 — Holistic-Year](#the-holistic-year-h) |
-| 2 | Balanced year | `balancedYear` | −302,355 (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
+| 1 | Holistic-Year | `holisticyearLength` | 335,317 years | 1 | [Part 1 — Holistic-Year](#the-holistic-year-h) |
+| 2 | Balanced year | `balancedYear` | −302,635 (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
-| 4 | Mean obliquity | `earthtiltMean` | 23.41357° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 4 | Mean obliquity | `earthtiltMean` | 23.41354° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
+| 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 6 | Planet config | Config #3 | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
@@ -44,14 +44,14 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 
 | Parameter | Variable | Value |
 |-----------|----------|-------|
-| Perihelion-solstice alignment | `perihelionalignmentYear` | 1246 AD |
+| Perihelion-solstice alignment | `perihelionalignmentYear` | 1246.03125 AD |
 | Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | 102.947° |
 | Obliquity (J2000) | `obliquityJ2000_arcsec` | 84381.406" (23.439279°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
 | Obliquity range | — | ~22.1° to ~24.5° |
 | Earth incl. (J2000) | `earthInclinationJ2000_deg` | 1.57869° |
 | Eccentricity (J2000) | `eccentricityJ2000` | 0.01671022 |
-| Sidereal year (J2000) | `siderealYearJ2000` | 365.256363 days |
+| Sidereal year (J2000) | `siderealYearJ2000` | 365.25636301 days |
 | Tropical year mean (J2000) | `tropicalYearMeanJ2000` | 365.2421897 days |
 | Tropical year VE (J2000) | `tropicalYearVEJ2000` | 365.242374 days |
 | Tropical year SS (J2000) | `tropicalYearSSJ2000` | 365.241626 days |
@@ -83,8 +83,8 @@ These constants define the model. Changing any of them changes the theory.
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| Holistic-Year | `holisticyearLength` (H) | **335,008** years |
-| Perihelion alignment year | `perihelionalignmentYear` | 1246 AD |
+| Holistic-Year | `holisticyearLength` (H) | **335,317** years |
+| Perihelion alignment year | `perihelionalignmentYear` | 1246.03125 AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
 The Holistic-Year is divided by Fibonacci-related integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)).
@@ -93,12 +93,12 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Base Eccentricity | `eccentricityBase` | 0.015372 | Base orbital eccentricity |
-| Eccentricity Amplitude | `eccentricityAmplitude` | 0.00137032 | Oscillation amplitude |
-| Mean Obliquity | `earthtiltMean` | 23.41357 deg | Mean axial tilt |
-| RA Angle | `earthRAAngle` | 1.25365 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
-| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481179 deg | Mean orbital inclination to invariable plane |
-| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.635970 deg | Oscillation amplitude |
+| Base Eccentricity | `eccentricityBase` | 0.015386 | Base orbital eccentricity (derived from perihelion longitude) |
+| Eccentricity Amplitude | `eccentricityAmplitude` | 0.001356 | Oscillation amplitude (derived from base + e(J2000) constraint) |
+| Mean Obliquity | `earthtiltMean` | 23.41354 deg | Mean axial tilt (derived from obliquity at J2000) |
+| RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
+| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.48128 deg | Mean orbital inclination to invariable plane (derived) |
+| Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603 deg | Oscillation amplitude (derived from obliquity rate) |
 | Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195 deg | Phase offset for inclination oscillation |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
 
@@ -122,7 +122,7 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 | Start Model JD | `startmodelJD` | 2451716.5 | June Solstice 2000 00:00 UTC |
 | Start Model Year | `startmodelYear` | 2000.5 | Decimal year of model start |
 | Start Angle | `startAngleModel` | 89.91949879 deg | Sun ecliptic longitude at model start |
-| Correction Days | `correctionDays` | -0.23328398168087 | Correction for solstice alignment offset |
+| Correction Days | `correctionDays` | -0.8288 | Correction for solstice alignment offset |
 | Variable Speed | `useVariableSpeed` | true | Enables equation of center (Kepler's 2nd law) |
 
 ## Physical Constants
@@ -131,7 +131,7 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 |----------|----------|-------|
 | Speed of Light | `speedOfLight` | 299,792.458 km/s |
 | Astronomical Unit | `currentAUDistance` | 149,597,870.698828 km |
-| Mean Sidereal Year | `meanSiderealYearSeconds` | 31,558,149.8 s |
+| Mean Sidereal Year | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 (derived) |
 | Gravitational Constant | `G_CONSTANT` | 6.6743 × 10⁻²⁰ km³/(kg·s²) |
 | Earth/Moon Mass Ratio | `MASS_RATIO_EARTH_MOON` | 81.3007 |
 
@@ -157,46 +157,46 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Inclination Precession | H / 3 | ~111,669 | Counter-clockwise |
-| Ecliptic Precession | H / 5 | 67,002 | Counter-clockwise |
-| Obliquity Cycle | H / 8 | 41,876 | Clockwise (negative) |
-| Axial Precession | H / 13 | ~25,770 | Clockwise (negative) |
-| Perihelion Precession | H / 16 | 20,938 | Both directions |
+| Inclination Precession | H / 3 | ~111,772 | Counter-clockwise |
+| Ecliptic Precession | H / 5 | ~67,063 | Counter-clockwise |
+| Obliquity Cycle | H / 8 | ~41,915 | Clockwise (negative) |
+| Axial Precession | H / 13 | ~25,794 | Clockwise (negative) |
+| Perihelion Precession | H / 16 | ~20,957 | Both directions |
 
 ## Time Constants
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/16) / (H/16) | 365.2421912312542 days |
-| Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | 365.2563650204 days |
-| Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | 365.2596360510 days |
+| Mean Solar Year | `meanSolarYearDays` | round(inputMeanSolarYear × H/8) / (H/8) | 365.242203646 days |
+| Mean Sidereal Year | `meanSiderealYearDays` | meanSolarYearDays × (H/13) / ((H/13) - 1) | 365.256364374 days |
+| Mean Anomalistic Year | `meanAnomalisticYearDays` | meanSolarYearDays / (H/16 - 1) + meanSolarYearDays | 365.259632390 days |
 | Mean Length of Day | `meanLengthOfDay` | meanSiderealYearSeconds / meanSiderealYearDays | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | 86,164.0902 s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/(H/13)) / (meanSolarYearDays+1) + meanSiderealDay | 86,164.0993 s |
-| Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | -302,355 |
-| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - 1246) | 2,176,142 |
-| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | 20,938 years |
-| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~122,334,851 days |
+| Balanced Year | `balancedYear` | perihelionalignmentYear - (14.5 × H/16) | -302,635 |
+| Perihelion Alignment JD | `perihelionalignmentJD` | startmodelJD - meanSolarYearDays × (startModelYearWithCorrection - perihelionalignmentYear) | ~2,176,153 |
+| Perihelion Cycle Length | `perihelionCycleLength` | H / 16 | ~20,957 years |
+| Total Days in H | `totalDaysInH` | H × meanSolarYearDays | ~122,471,920 days |
 | J2000.0 epoch JD | `j2000JD` | startmodelJD - (startmodelYear - 2000) × meanSolarYearDays | ~2451545.0 |
-| Julian century | `julianCenturyDays` | 100 × meanSolarYearDays | ~36,524.22 days |
+| Julian century | `julianCenturyDays` | 36525 (100 × 365.25) | 36,525 days (IAU Julian century) |
 | Earth rotations/year | `meanEarthRotationsPerYear` | meanSolarYearDays + 1 | 366.2422 |
-| Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4994 |
-| Years balanced→J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ~302,355 |
+| Start year corrected | `startModelYearWithCorrection` | startmodelYear + correctionDays / meanSolarYearDays | ~2000.4977 |
+| Years balanced→J2000 | `yearsFromBalancedToJ2000` | (startmodelJD - balancedJD) / meanSolarYearDays | ~302,635 |
 
 Input constants used in the formulas above:
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Input Solar Year | `inputMeanSolarYear` | 365.2421897 days | Input mean solar year (Meeus) |
-| Sidereal Year (seconds) | `meanSiderealYearSeconds` | 31,558,149.8 s | Mean sidereal year in seconds |
+| Input Solar Year | `inputMeanSolarYear` | 365.2422 days | Input mean solar year |
+| Sidereal Year (seconds) | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 | Derived from IAU sidereal year reference |
 
 ## Eccentricity Derived Values
 
 | Constant | Variable | Formula | Value |
 |----------|----------|---------|-------|
-| Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | 0.015434 |
-| EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | 0.007747 |
-| Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~0.470 deg |
+| Derived Mean Eccentricity | `eccentricityDerivedMean` | sqrt(base² + amplitude²) | ~0.01545 |
+| EoC Eccentricity | `eocEccentricity` | derivedMean - base/2 | ~0.00776 |
+| Perihelion Phase Offset | `perihelionPhaseOffset` | (see constants.js derivation) | ~0.481 deg |
 
 ## Ascending Node Frame Corrections
 
@@ -270,7 +270,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 |--------|----------|---------------|-----------|-------------|
 | Mercury | 6.726620 | 0.384621 | 6.34 - 7.11 | 203.3195 deg |
 | Venus | 2.207361 | 0.061866 | 2.15 - 2.27 | 203.3195 deg |
-| Earth | 1.481179 | 0.635970 | 0.85 - 2.12 | 203.3195 deg |
+| Earth | 1.48128 | 0.63603 | 0.85 - 2.12 | 203.3195 deg |
 | Mars | 2.649893 | 1.158626 | 1.49 - 3.81 | 203.3195 deg |
 | Jupiter | 0.329100 | 0.021301 | 0.31 - 0.35 | 203.3195 deg |
 | Saturn | 0.931678 | 0.064879 | 0.87 - 1.00 | 23.3195 deg (retrograde) |
@@ -284,26 +284,26 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Orbit Count in H | Distance (AU) | Period (years) | Speed (km/h) |
 |--------|-----------------|---------------|----------------|---------------|
-| Mercury | 1,390,940 | 0.3871 | 0.2409 | 172,341 |
-| Venus | 544,556 | 0.7233 | 0.6151 | 126,081 |
-| Mars | 178,124 | 1.5237 | 1.8811 | 86,870 |
-| Jupiter | 28,255 | 5.1996 | 11.8596 | 47,002 |
-| Saturn | 11,385 | 9.5312 | 29.4296 | 34,702 |
-| Uranus | 4,000 | 19.1424 | 83.7520 | 24,518 |
-| Neptune | 2,040 | 29.9882 | 164.2196 | 19,585 |
+| Mercury | 1,392,228 | 0.3871 | 0.2409 | 172,341 |
+| Venus | 545,059 | 0.7233 | 0.6151 | 126,081 |
+| Mars | 178,287 | 1.5237 | 1.8811 | 86,870 |
+| Jupiter | 28,282 | 5.1996 | 11.8596 | 47,002 |
+| Saturn | 11,396 | 9.5312 | 29.4296 | 34,702 |
+| Uranus | 4,004 | 19.1424 | 83.7520 | 24,518 |
+| Neptune | 2,042 | 29.9882 | 164.2196 | 19,585 |
 
 ## Perihelion Precession Periods (Ecliptic)
 
 | Planet | Formula | Period (years) |
 |--------|---------|----------------|
-| Mercury | H / (1 + 3/8) | ~243,642 |
-| Venus | H × 2 | ~670,016 |
-| Earth | H / 16 | 20,938 |
-| Mars | H / (4 + 1/3) | ~77,310 |
-| Jupiter | H / 5 | 67,002 |
-| Saturn | -H / 8 | -41,876 (retrograde) |
-| Uranus | H / 3 | ~111,669 |
-| Neptune | H × 2 | ~670,016 |
+| Mercury | H / (1 + 3/8) | ~243,867 |
+| Venus | H × 2 | ~670,634 |
+| Earth | H / 16 | ~20,957 |
+| Mars | H / (4 + 1/3) | ~77,381 |
+| Jupiter | H / 5 | ~67,063 |
+| Saturn | -H / 8 | ~-41,915 (retrograde) |
+| Uranus | H / 3 | ~111,772 |
+| Neptune | H × 2 | ~670,634 |
 
 ## Moon Derived Cycles
 
@@ -334,26 +334,26 @@ Eclipse cycles (from derived months): Saros = 223 synodic ≈ 6585.32 days, Exel
 
 ## Year-Length Fourier Harmonics
 
-Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/16) / (H/16)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from 491 data points spanning ±25,000 years).
+Year-length variations are modelled with Fourier harmonics. The **means are derived** from `inputmeanlengthsolaryearindays` via `round(input × H/8) / (H/8)` and the standard sidereal/anomalistic ratios. Only the harmonic coefficients are fitted (from data spanning full H at stepYears=23 steps).
 
 Each array entry: `[period_divisor, sin_coeff, cos_coeff]` — period = H / divisor.
 
-| Array | Harmonics | RMS | Dominant term |
-|-------|-----------|-----|---------------|
-| `TROPICAL_YEAR_HARMONICS` | H/8, H/3, H/16 | 0.006 s | H/8: 1.819s amp |
-| `SIDEREAL_YEAR_HARMONICS` | H/8, H/3 | 0.003 s | H/8: 0.108s amp |
-| `ANOMALISTIC_YEAR_HARMONICS` | H/8, H/3, H/16, H/24 | 0.011 s | H/24: 0.038s amp |
+| Array | Terms | RMS | Dominant term |
+|-------|-------|-----|---------------|
+| `TROPICAL_YEAR_HARMONICS` | 12 | 0.002 s | H/8 (obliquity) |
+| `SIDEREAL_YEAR_HARMONICS` | 5 | 0.001 s | H/8 + H/3 |
+| `ANOMALISTIC_YEAR_HARMONICS` | 8 | 0.002 s | H/24 (beat) |
+
+Note: The tropical year at runtime uses `CARDINAL_POINT_HARMONICS` (24 terms per type, derivative-based), not `TROPICAL_YEAR_HARMONICS`. The latter is used by pipeline tools only.
 
 ## Earth Perihelion Harmonics
 
-The `PERI_HARMONICS` array models Earth's perihelion longitude with 21 Fourier terms (RMSE 0.0035°, J2000 error 0.0003°).
+The `PERI_HARMONICS` array models Earth's perihelion longitude with 25 Fourier terms (RMSE 0.0006°, J2000 exact).
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `PERI_HARMONICS` | 21-term array | `[period, sin_coeff, cos_coeff]` per term |
-| `PERI_OFFSET` | -0.261258 deg | Global offset correction |
-
-Periods: H/16, H/32, H/48, H/64, H/3, H/29, H/24, H/8, H/40, H/13, H/45, H/80, H/272, H/56, H/61, H/35, H/544, H/21, H/5, H/96, H/816.
+| `PERI_HARMONICS` | 25-term array | `[period, sin_coeff, cos_coeff]` per term |
+| `PERI_OFFSET` | ~-0.260 deg | Global offset correction (J2000-anchored) |
 
 ## Delta-T
 
@@ -402,7 +402,7 @@ These come from external astronomical sources and do not change with the model.
 | Tropical year (WS) | `tropicalYearWSJ2000` | 365.242740 days | Meeus & Savoie 1992 |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | -0.53 s/cy | Meeus & Savoie 1992 |
 | Anomalistic year | `anomalisticYearJ2000` | 365.259636 days | JPL Horizons |
-| Sidereal year | `siderealYearJ2000` | 365.256363 days | JPL Horizons |
+| Sidereal year | `siderealYearJ2000` | 365.25636301 days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
 | Sidereal day | `siderealDayJ2000` | 86164.09053083288 s (~23h 56m 4.0905s) | IERS |
 | Stellar day | `stellarDayJ2000` | 86164.0989036905 s (~23h 56m 4.0989s) | IERS |
@@ -420,27 +420,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 
 **Perihelion Coin Rotation**: Theoretical value derived from 1 extra solar day per H/16 cycle.
 
-## RA Day Offset
-
-RA-based solar day measurements (Methods A/D) show the mean solar day consistently shorter than `meanlengthofday`. Confirmed by the "Solar day multiepoch" test across 65 epochs spanning one full H (R² = 0.994, RMS = 0.324 ms):
-
-```
-offset(t) = −14.194 − 5.640·cos(2π·t/(H/16)) − 1.684·cos(2π·t/(H/8))   [ms/day]
-```
-
-where `t = year − balancedYear`.
-
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| RA Day Offset Mean | `RA_SOLAR_DAY_OFFSET_MEAN_MS` | −14.194 ms/day | Mean offset; physical cause unknown |
-| RA Day Offset Ecc Amp | `RA_SOLAR_DAY_OFFSET_ECC_MS` | −5.640 ms/day | H/16 cosine amplitude (eccentricity/perihelion) |
-| RA Day Offset Obliq Amp | `RA_SOLAR_DAY_OFFSET_OBLIQ_MS` | −1.684 ms/day | H/8 cosine amplitude (obliquity) |
-
-At J2000: offset ≈ −8.3 ms (less negative than mean because eccentricity is near H/16-cycle maximum, contributing +5.5 ms).
-
-The **Measured Solar Day** = `meanlengthofday + offset/1000` (in seconds). At J2000 ≈ 86,399.9913 s; long-term mean ≈ 86,399.9856 s.
-
-**Axial Coin Rotation**: Axial precession (H/13) causes the stellar day to exceed the sidereal day by ~9.1 ms. This accumulates to 1 extra sidereal day over one axial precession cycle.
+**Axial Coin Rotation**: Axial precession (H/13) causes the stellar day to exceed the sidereal day by ~9.1 ms. This accumulates to 1 extra sidereal day over one axial precession cycle. See [Year and Day Length Formulas](11-length-day-year-formulas.md) for details.
 
 ## Moon Constants (External)
 
@@ -681,7 +661,7 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Correction Sun | `correctionSun` | 0.495997 deg | Degree correction for Sun position (dynamic EoC); optimized vs 26 JPL points, validated 1600-2200 |
+| Correction Sun | `correctionSun` | 0.49552 deg | Degree correction for Sun position (dynamic EoC); optimizer step 1 |
 
 ## Planet Orbital Periods (Tuned)
 

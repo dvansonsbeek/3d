@@ -7,7 +7,7 @@ Merged investigation combining two analyses:
 
 Part 1 — CAN ψ BE DERIVED FROM H?
   Investigates whether the inclination ψ-constant can be expressed in terms of
-  H = 335,008, φ, π, Fibonacci numbers, and/or Earth's base eccentricity.
+  H = 335,317, φ, π, Fibonacci numbers, and/or Earth's base eccentricity.
   Also investigates the master ratio R = ψ/ξ_V connecting inclination to
   eccentricity constants.
   (10 sections, originally fibonacci_psi_from_H.py)

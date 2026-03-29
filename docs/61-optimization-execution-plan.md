@@ -55,13 +55,13 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - **Earth** orbits EARTH-WOBBLE-CENTER clockwise at H/13 (mean axial precession)
 - **PERIHELION-OF-EARTH** orbits the Sun counter-clockwise at H/3 (inclination precession)
 - Because they rotate in **opposite directions**, their meeting frequency is additive: 1/(H/13) + 1/(H/3) = 16/H (perihelion precession cycle, H/16)
-- The **observed/experienced** precession period (~25,772 yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
+- The **observed/experienced** precession period (~25,771 yr currently) differs from the mean (H/13) because the instantaneous rate varies through the cycle. The model's H/13 mean is correct.
 
 **Fibonacci precession periods:**
 
 | Node | Period | Fibonacci | Known comparison | Notes |
 |------|--------|-----------|-----------------|-------|
-| `earth` | H/13 | 13 | ~25,772 yr (current obs.) | Mean is correct; current obs. rate varies |
+| `earth` | H/13 | 13 | ~25,771 yr (current obs.) | Mean is correct; current obs. rate varies |
 | `earthInclinationPrecession` | H/3 | 3 | Inclination precession | Counter-clockwise, drives perihelion-of-earth |
 | `earthEclipticPrecession` | H/5 | 5 | ~68,000-70,000 yr | Ecliptic pole precession |
 | `earthObliquityPrecession` | H/8 | 8 | ~41,000 yr (Milankovitch) | Retrograde; matches climate records |
@@ -626,7 +626,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 **2. Resonance loop (resonance-loop.js):**
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
-- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.291 × 10⁻³ (H=335,008)
+- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.291 × 10⁻³ (H=335,317)
 - Clean Fibonacci perihelion precession: Jupiter (H/5), Saturn (-H/8), Uranus (H/3). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**
@@ -912,7 +912,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 - Eccentricity: 0.01671044 (expected ~0.01671)
 - Obliquity: 23.4393° (expected ~23.44°)
 - Perihelion longitude: 102.95° (expected ~102.9°)
-- Precession: 25,859 years (expected ~25,772 — known model vs IAU difference)
+- Precession: 25,859 years (expected ~25,771 — known model vs IAU difference)
 - All 6 explore scripts pass with re-exported constants
 
 **Key finding:** Planet inclination mean/amplitude values were stored as individual globals in script.js (lines 345-398), not in the per-planet objects. These have now been populated in the constants module's `planets` object for tool use.
@@ -1157,7 +1157,7 @@ All tooling is built and validated. This section documents the execution plan an
 
 **NEVER change (observational/structural):**
 - `eclipticInclinationJ2000`, `orbitalEccentricityBase`, `ascendingNode`, `longitudePerihelion` (JPL/SPICE data)
-- `holisticyearLength` (335,008 — core model constant, tuned to align precession with IAU)
+- `holisticyearLength` (335,317 — core model constant, tuned to align precession with IAU)
 - `perihelionEclipticYears` (derived from H — Fibonacci structure)
 - `moonEclipticInclinationJ2000`, `moonOrbitalEccentricity`, `moonDistance` (observational)
 
@@ -1316,7 +1316,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 | Step | Target | Status | Before RMS | After RMS | Params Changed |
 |------|--------|--------|-----------|-----------|----------------|
-| 1 | All | DONE | See below | — | H=335008, useVariableSpeed: true, dynamic perihelion phase |
+| 1 | All | DONE | See below | — | H=335317, useVariableSpeed: true, dynamic perihelion phase |
 | 2 | Sun | DONE | 0.714° | 0.003° | eocEccentricity & perihelionPhaseOffset derived; correctionSun: 0.5292; earthRAAngle: 1.282779; validated 1600-2200 (600yr) |
 | 3 | Moon | DONE | 6.267° | 0.01° | Full Meeus Ch. 47 (60L+60B), RA+Dec override; see `docs/66-moon-meeus-corrections.md` |
 | 4a | Jupiter | DONE | 1.974° | 0.06° | solarYearInput: 4330.5, eocFraction: 0.484, startpos: 13.85, 36p parallax |
@@ -1330,7 +1330,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 **Step 1 results** (JPL Horizons 2000-2025, 26 yearly dates): Full report at `tools/results/baseline-before.md` and `docs/69-optimization-baseline.md`
 
-**Step 2 results — Sun optimization (updated for H=335,008, derived EoC constants):**
+**Step 2 results — Sun optimization (updated for H=335,317, derived EoC constants):**
 - Constants changed:
   - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°

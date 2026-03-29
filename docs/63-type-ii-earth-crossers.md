@@ -142,7 +142,7 @@ Key differences from Type III:
 ### Perihelion precession
 
 Mars's perihelion precesses with period `H / (4 + 1/3)` years, where
-`H = 335008` solar years. This corresponds to the 4+1/3 Fibonacci-derived
+`H = 335317` solar years. This corresponds to the 4+1/3 Fibonacci-derived
 divisor. The precession is split into two counter-rotating ecliptic layers
 that bracket the PerihelionFromEarth annual wobble, ensuring the perihelion
 direction tracks correctly in the ecliptic frame.

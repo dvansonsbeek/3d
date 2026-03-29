@@ -49,7 +49,7 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 
 | Symbol | Value                | Source                                      |
 |--------|----------------------|---------------------------------------------|
-| H      | 335008               | Holistic Year Length                         |
+| H      | 335317               | Holistic Year Length                         |
 | PSI    | 2205 / (2H) = 0.003290966 | Inclination formula constant            |
 | K      | 3.450537e-6          | Tilt-eccentricity constant (derived from Earth) |
 

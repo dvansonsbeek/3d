@@ -5,7 +5,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Pane } from 'tweakpane';
 
 /*
-  Fibonacci Laws of Planetary Motion — Holistic Universe Model v6
+  Fibonacci Laws of Planetary Motion — Holistic Universe Model v7
 
   This software is licensed under the GNU General Public License (GPL-3.0).
   For more information, visit <https://www.gnu.org/licenses/>.
@@ -20886,7 +20886,7 @@ function setupGUI() {
   if (titleEl) {
     const versionEl = document.createElement('div');
     versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px;';
-    versionEl.textContent = 'Holistic Universe Model v6';
+    versionEl.textContent = 'Holistic Universe Model v7';
     titleEl.appendChild(versionEl);
   }
 
@@ -22538,7 +22538,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v6.1</span>';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v7</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */

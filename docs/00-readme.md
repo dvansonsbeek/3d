@@ -240,10 +240,10 @@ See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Gu
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Holistic-Year (H) | 335,008 years | Complete cycle unifying all precession movements |
-| Axial Precession | H/13 (~25,770 yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
-| Inclination Precession | H/3 (~111,669 yr) | PERIHELION-OF-EARTH orbit period |
-| Perihelion Precession | H/16 (~20,938 yr) | Combined cycle where axial meets inclination |
-| Obliquity Range | ~22.2° – ~24.7° | Earth's axial tilt oscillation |
+| Holistic-Year (H) | 335,317 years | Complete cycle unifying all precession movements |
+| Axial Precession | H/13 (~25,794 yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
+| Inclination Precession | H/3 (~111,772 yr) | PERIHELION-OF-EARTH orbit period |
+| Perihelion Precession | H/16 (~20,957 yr) | Combined cycle where axial meets inclination |
+| Obliquity Range | ~22.1° – ~24.5° | Earth's axial tilt oscillation |
 
 For all constants and their sources, see the [Constants Reference](20-constants-reference.md).

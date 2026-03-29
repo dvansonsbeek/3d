@@ -319,7 +319,7 @@ After any future changes to this system:
 
 1. Run year analysis report in browser -- check cardinal point timing
 2. Verify season lengths: VE-SS ~92.7d, SS-AE ~93.7d, AE-WS ~89.9d
-3. Check precession period is still ~25,772 years
+3. Check precession period is still ~25,771 years
 4. Check year lengths match IAU to within a few seconds
 5. Verify Sun visually speeds up in January and slows down in July
 6. Check equation of center display in UI shows correct values

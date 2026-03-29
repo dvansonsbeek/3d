@@ -643,7 +643,7 @@ The Fibonacci prediction (0.635185°) represents the theoretical long-term value
 
 ```javascript
 // Fundamental constants
-const H = 335008; // See Constants Reference for current value
+const H = 335317; // See Constants Reference for current value
 const PSI = 2205 / (2 * H);  // = 3.291 × 10⁻³
 
 // Fibonacci divisors
