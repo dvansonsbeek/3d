@@ -32,6 +32,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
+| `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline) | `fitted-coefficients.json` + `model-parameters.json` |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
@@ -222,6 +223,13 @@ Step 9:  export-to-script.js --write          → src/script.js
          objects (parallax corrections, cardinal point harmonics + anchors),
          balance presets (from data/balance-presets.json).
          Only run after Step 8 passes.
+
+Manual:  export-to-holistic.js --write        → Holistic website repo
+         (NOT in automated pipeline — run manually after Step 9)
+         Syncs all fitted values to the Holistic website TypeScript files:
+         - constants.ts: harmonics, Earth scalars, eccentricity + inclination records
+         - coefficients.ts: 429-term prediction coefficients (7 planets)
+         - model-values.ts: display strings, PLANET_INCL object
 
 ── Phase 7: Dashboard ─────────────────────────────────────────────
 
