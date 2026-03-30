@@ -130,7 +130,7 @@
     },
     "saturn": {
       "name": "Saturn",
-      "orbitalEccentricityBase": 0.05373662626292262,
+      "orbitalEccentricityBase": 0.05373662626292838,
       "orbitalEccentricityAmplitude": 0.000005347432417577137,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.54,
@@ -182,7 +182,7 @@
     },
     "neptune": {
       "name": "Neptune",
-      "orbitalEccentricityBase": 0.00860930797301989,
+      "orbitalEccentricityBase": 0.008609307973025893,
       "orbitalEccentricityAmplitude": 0.000008014434394494452,
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.585,
