@@ -63,7 +63,9 @@ function replaceArray(content, name, newArr) {
 
   let newBlock = startMatch[0].replace(/\[$/, '[\n');
   for (const [div, sin, cos] of newArr) {
-    newBlock += `  [${div}, ${sin}, ${cos}],\n`;
+    // Website expects periods (H/div), fitted JSON stores divisors
+    const period = C.H / div;
+    newBlock += `  [${period}, ${sin}, ${cos}],\n`;
   }
   newBlock += ']';
 
@@ -104,6 +106,28 @@ constantsTs = replaceArray(constantsTs, 'TROPICAL_YEAR_HARMONICS', fitted.TROPIC
 constantsTs = replaceArray(constantsTs, 'SIDEREAL_YEAR_HARMONICS', fitted.SIDEREAL_YEAR_HARMONICS);
 constantsTs = replaceArray(constantsTs, 'ANOMALISTIC_YEAR_HARMONICS', fitted.ANOMALISTIC_YEAR_HARMONICS);
 constantsTs = replaceArray(constantsTs, 'OBLIQUITY_HARMONICS', fitted.SOLSTICE_OBLIQUITY_HARMONICS);
+
+// Replace the Pythagorean OBLIQUITY_MEAN computation with the pipeline-fitted value.
+// The Pythagorean computation (100k-sample numerical integration) gives ~1.8" error
+// compared to the pipeline-fitted value from actual simulation data.
+const obliqMeanFitted = fitted.SOLSTICE_OBLIQUITY_MEAN_FITTED;
+if (obliqMeanFitted) {
+  const obliqRe = /export const OBLIQUITY_MEAN: number = \(\(\) => \{[\s\S]*?\}\)\(\)/;
+  const obliqMatch = constantsTs.match(obliqRe);
+  if (obliqMatch) {
+    const newObliq = `export const OBLIQUITY_MEAN: number = ${obliqMeanFitted} // Pipeline-fitted (SOLSTICE_OBLIQUITY_MEAN_FITTED)`;
+    if (obliqMatch[0] !== newObliq) {
+      constantsTs = constantsTs.replace(obliqMatch[0], newObliq);
+      console.log(`  ↻ OBLIQUITY_MEAN: Pythagorean → pipeline-fitted (${obliqMeanFitted.toFixed(5)}°)`);
+      changeCount++;
+    } else {
+      console.log(`  ✓ OBLIQUITY_MEAN: unchanged (${obliqMeanFitted.toFixed(5)}°)`);
+    }
+  } else {
+    // Already replaced in a previous run — check scalar
+    constantsTs = replaceScalar(constantsTs, 'OBLIQUITY_MEAN', obliqMeanFitted);
+  }
+}
 constantsTs = replaceArray(constantsTs, 'PERI_HARMONICS', fitted.PERI_HARMONICS_RAW);
 constantsTs = replaceScalar(constantsTs, 'PERI_OFFSET', fitted.PERI_OFFSET);
 
@@ -229,8 +253,8 @@ for (let i = 0; i < planetNames.length; i++) {
 }
 
 coefOut += 'export const COEFFICIENTS: Record<string, number[]> = {\n';
-for (const n of Names) {
-  coefOut += `  ${n}: ${n.toUpperCase()}_COEFFS,\n`;
+for (let i = 0; i < planetNames.length; i++) {
+  coefOut += `  ${planetNames[i]}: ${Names[i].toUpperCase()}_COEFFS,\n`;
 }
 coefOut += '}\n';
 
