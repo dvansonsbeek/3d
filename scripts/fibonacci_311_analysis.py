@@ -12,7 +12,7 @@ Part 1 — CAN ψ BE DERIVED FROM H?
   eccentricity constants.
   (10 sections, originally fibonacci_psi_from_H.py)
 
-Part 2 — FRESH INVESTIGATION: R ≈ 311 AND THE LAST FREE PARAMETER
+Part 2 — FRESH INVESTIGATION: R ≈ 308 (nearest FPR prime = 311) AND THE LAST FREE PARAMETER
   Deep analysis of R from multiple angles: factor structure of 2205/11025,
   number-theoretic properties of 311 (Pisano period, Zeckendorf representation),
   √m weighting / AMD connection, and the inner eccentricity quartet.

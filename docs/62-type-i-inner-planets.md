@@ -265,8 +265,8 @@ mirrorPair:                'uranus'      (paired planet)
 ```
 solarYearInput:            224.695       (orbital period in days, calibrated)
 eclipticInclinationJ2000:  3.39467605    (ecliptic inclination, degrees)
-orbitalEccentricityBase:       0.00619052    (base eccentricity -- INPUT)
-realOrbitalEccentricity:   0.00615243    (e/(1+e) -- DERIVED)
+orbitalEccentricityBase:       0.00675727    (base eccentricity -- from R=311 constraint)
+realOrbitalEccentricity:   0.00671192    (e/(1+e) -- DERIVED)
 eocFraction:               0.436         (EoC multiplier)
 longitudePerihelion:        131.5765919   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             76.67877109   (ecliptic ascending node, degrees)
@@ -285,9 +285,9 @@ mirrorPair:                'neptune'     (paired planet)
 |------------------------|-----------|-----------|
 | solarYearCount         | 1392228   | 545059    |
 | orbitDistance (AU)      | 0.3871    | 0.7233    |
-| realOrbitalEccentricity| 0.17056   | 0.00615   |
-| perihelionDistance      | 6.603     | 0.445     |
-| elipticOrbit           | 3.301     | 0.223     |
+| realOrbitalEccentricity| 0.17056   | 0.00671   |
+| perihelionDistance      | 6.603     | 0.485     |
+| elipticOrbit           | 3.301     | 0.243     |
 | eccentricityPerihelion | 0.679     | 0.001     |
 | lowestPoint            | 131.67    | 103.32    |
 

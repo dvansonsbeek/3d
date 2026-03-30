@@ -23,7 +23,7 @@ where:
 | Planet | e_base | e_amplitude | e_structural | structural % |
 |--------|--------|-------------|-------------|-------------|
 | Mercury | 0.205636 | 8.350e-5 | 0.205552 | 99.96% |
-| Venus | 0.006191 | 9.526e-4 | 0.005238 | 84.61% |
+| Venus | 0.006757 | 9.526e-4 | 0.005805 | 85.90% |
 | Earth | 0.015386 | 1.356e-3 | 0.014030 | 91.19% |
 | Mars | 0.092975 | 3.042e-3 | 0.089934 | 96.73% |
 | Jupiter | 0.048215 | 1.138e-6 | 0.048214 | 100.00% |
@@ -55,7 +55,7 @@ phase = acos(cos(θ_J2000)) × 180/π
 | Planet | Phase (°) | base | amplitude | e(J2000) | Derivable? |
 |--------|----------|------|-----------|----------|------------|
 | Mercury | 89.99 | 0.205636 | 8.350e-5 | 0.205636 | Yes |
-| Venus | 124.58 | 0.006191 | 9.526e-4 | 0.006777 | Yes |
+| Venus | 87.13 | 0.006757 | 9.526e-4 | 0.006777 | Yes |
 | Earth | (from balancedYear) | 0.015386 | 0.001356 | 0.016710 | Yes |
 | Mars | 96.98 | 0.092975 | 3.042e-3 | 0.093394 | Yes |
 | Jupiter–Neptune | — | — | — | — | No (cos(θ) out of range) |
@@ -64,7 +64,7 @@ The outer planets (Jupiter–Neptune) have `cos(θ) > 1` or `< -1` from the law 
 
 ### Balance with structural eccentricities
 
-- **Base eccentricities**: 99.9996% Law 5 balance (by construction — these are the tuned values)
+- **Base eccentricities**: 100% Law 5 balance (by construction — Venus from R=311 constraint, Neptune solved for balance)
 - **Structural eccentricities**: ~99.98% balance (removing amplitudes adds ~0.02% imbalance)
 - **J2000 eccentricities**: 99.89% balance (a snapshot with current oscillation phases)
 

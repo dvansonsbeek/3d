@@ -195,9 +195,10 @@ and therefore the most significant eccentricity oscillations.
   - Mars: JPL data (1700–2500, 10-year steps) fitted cosine gives amplitude
     3.059e-3, matching the tilt prediction (3.042e-3) to within 0.6%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
-  - Venus: JPL data (−9000 to +9000, 100-year steps) fitted cosine gives
-    amplitude 1.084e-3 vs tilt prediction 9.526e-4 (ratio 1.14x).
-    Fitted mean = 0.00619052.
+  - Venus: Base eccentricity derived from R = 311 constraint (ψ/ξ_V = 311),
+    giving e_V_base = 0.006757 — within 0.3% of J2000 (0.006777). Venus's
+    eccentricity variation is dominated by Laplace-Lagrange secular perturbations,
+    not the K-driven tilt mechanism (JPL cosine fit R² = 0.074).
   - Script: `tools/fit/python/planet_eccentricity_jpl.py`
 - **Mercury**: JPL J2000 value (tilt = 0.03°, essentially no fluctuation)
 - **Neptune**: Solved algebraically for exact 100% Law 5 balance
@@ -207,13 +208,13 @@ The following base eccentricities achieve 99.9996% Law 5 balance:
 | Planet  | Base Ecc      | J2000 JPL     | Diff from JPL | Note                   |
 |---------|---------------|---------------|---------------|------------------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
-| Venus   | 0.00619052    | 0.00677672    | -8.650%       | Cosine fit to JPL data |
+| Venus   | 0.00675727    | 0.00677672    | -0.287%       | R = 311 constraint |
 | Earth   | 0.01538600    | 0.01671022    | -8.008%       | eccentricityBase       |
 | Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
 | Jupiter | 0.04821478    | 0.04838624    | -0.354%       | Dual-balanced          |
 | Saturn  | 0.05374486    | 0.05386179    | -0.217%       | Law 5 prediction       |
 | Uranus  | 0.04734421    | 0.04725744    | +0.183%       | Dual-balanced          |
-| Neptune | 0.00868571    | 0.00859048    | +1.109%       | Solved for 100% balance |
+| Neptune | 0.00868583    | 0.00859048    | +1.109%       | Solved for 100% balance |
 
 ### Cosine Fit Validation
 
@@ -244,7 +245,7 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 | Jupiter | 0.04821478    | 0.04838624    | -0.354%       |
 | Saturn  | 0.05374486    | 0.05386179    | -0.217%       |
 | Uranus  | 0.04734421    | 0.04725744    | +0.183%       |
-| Neptune | 0.00868571    | 0.00859048    | +1.109%       |
+| Neptune | 0.00868583    | 0.00859048    | +1.109%       |
 
 At J2000, Venus and Mars are above their base eccentricities (JPL trend shows
 Venus decreasing and Mars increasing toward their respective bases). The outer
@@ -337,13 +338,13 @@ For each planet, six parameters fully describe the orbital dynamics:
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
 | Mercury |   0.03     | 0.384267    | 0.20563593    | 8.350e-5      |  6.726271    | 0.384267    |
-| Venus   |   2.6392   | 0.061809    | 0.00619052    | 9.526e-4      |  2.207312    | 0.061809    |
+| Venus   |   2.6392   | 0.061809    | 0.00675727    | 9.526e-4      |  2.207312    | 0.061809    |
 | Earth   |  23.41354  | 0.63603    | 0.01538600    | 1.356e-3      |  1.48128    | 0.63603    |
 | Mars    |  25.19     | 1.157559    | 0.09297543    | 3.042e-3      |  2.648955    | 1.157559    |
 | Jupiter |   3.13     | 0.021281    | 0.04821478    | 1.138e-6      |  0.329094    | 0.021281    |
 | Saturn  |  26.73     | 0.064819    | 0.05374486    | 5.347e-6      |  0.931672    | 0.064819    |
 | Uranus  |  82.23     | 0.023695    | 0.04734421    | 2.802e-5      |  1.000594    | 0.023695    |
-| Neptune |  28.32     | 0.013474    | 0.00868571    | 8.014e-6      |  0.722202    | 0.013474    |
+| Neptune |  28.32     | 0.013474    | 0.00868583    | 8.014e-6      |  0.722202    | 0.013474    |
 
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
@@ -514,11 +515,11 @@ J2000 (99.9845%) while the amplitude remains negligible.
 
 | Balance Check                    | Result              |
 |----------------------------------|---------------------|
-| Law 5 base eccentricities        | 99.9996%            |
+| Law 5 base eccentricities        | 100.0000%           |
 | Law 5 J2000 eccentricities       | 99.8909%            |
 | Law 3 inclination balance         | 99.9998%            |
 
-The Law 5 eccentricity balance is near-exact by construction (Neptune solved for balance).
+The Law 5 eccentricity balance is exact by construction (Venus from R=311 constraint, Neptune solved for balance).
 The Law 3 inclination balance emerges naturally from the Fibonacci framework at 99.9998%.
 
 ### Why the Balance Holds at All Epochs

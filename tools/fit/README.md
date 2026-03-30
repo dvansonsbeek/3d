@@ -165,16 +165,32 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
 
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
-Step 7a: derive-eccentricity-amplitudes.js    → orbitalEccentricityAmplitude, eccentricityPhaseJ2000
-         Derives K from Earth's parameters (eccentricityAmplitude, massFraction,
-         earthtiltMean, d=3), then computes per-planet eccentricity amplitudes
-         and J2000 phase angles. Must run after Step 1 (which sets Earth's
-         eccentricityAmplitude) and before Step 7b (balance verification).
-         Updates: model-parameters.json (K + 7 planet amplitudes + phases)
+Step 7a: derive-eccentricity-amplitudes.js    → K, Venus base, Mercury/Mars amp+phase
+         Three derivations from the eccentricity chain:
+         1. K from Earth: K = e_amp × √m / (sin(tilt) × √d)
+         2. Venus base from R=311: e_V = ψ / (311 × √m_V)
+            Venus ecc variation is Laplace-Lagrange dominated (R²=7.4%),
+            not K-driven. Base set by R=311 constraint (within 0.3% of J2000).
+         3. Mercury/Mars amplitude from K + phase from law of cosines
+            These are K-driven (high tilt, good JPL cosine fit R²).
+         Outer planets (Jupiter–Neptune): amplitudes kept as-is (negligible).
+         All eccentricities must remain consistent with J2000 observed values
+         via the law of cosines: e(J2000) = sqrt(base² + amp² - 2·base·amp·cos(θ)).
+         Updates: model-parameters.json (K, Venus base+phase, Mercury/Mars amp+phase)
+
+         Dependency chain (no circular dependencies):
+         - Steps 1-3 depend only on H, Earth params, and planet masses (fixed)
+         - Outer planet solarYearInput/eccBase changes do NOT require re-running 7a
+         - Only H changes or Sun optimizer re-runs (Step 1) require re-running 7a
 
 Step 7b: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
+         Key targets:
+         - Inclination balance ≥ 99.999% (Law 3)
+         - Eccentricity balance = 100% (Law 5, Venus from R=311 + Neptune for balance)
+         - All 8 planet inclination amplitudes match ψ/(d×√m) (Law 2)
+         - All eccentricities consistent with J2000 observed values
          eccentricity-balance.js              → convergence report
          Laws 4 and 5 independently predict Saturn's eccentricity.
          balance-search.js                    → balance-presets.json
