@@ -204,7 +204,7 @@ Useful experiments to try:
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 743 valid configurations |
-| Look for Config #15 (Scenario A) | The unique mirror-symmetric solution |
+| Look for Config #1 (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
 
@@ -241,7 +241,7 @@ Expected results:
 - LL bounds: **8/8 pass**
 - Trend directions: **7/7 match**
 
-This is Config #15 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is Config #1 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 

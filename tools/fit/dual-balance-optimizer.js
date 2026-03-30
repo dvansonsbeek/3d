@@ -11,7 +11,7 @@
 //   - Venus base: from R=311 constraint
 //   - Earth base + amplitude: from Sun optimizer
 //   - Mars base: from JPL cosine fit
-//   - All masses, d-values, phase groups (Config #15)
+//   - All masses, d-values, phase groups (Config #1)
 //   - All solarYearInput (default) — optionally scans ±1 orbit count
 //
 // Free:

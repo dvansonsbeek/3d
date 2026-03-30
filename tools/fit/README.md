@@ -195,7 +195,12 @@ Step 7b: dual-balance-optimizer.js             → Jupiter/Saturn/Uranus/Neptune
          Optional --scan-orbits tests ±1 orbit count per outer planet.
          Updates: model-parameters.json (4 outer planet base eccentricities)
 
-Step 7c: verify-laws.js                       → pass/fail
+Step 7c: balance-search.js                    → balance-presets.json
+         Exhaustive search for configs with ≥99.994% inclination balance.
+         Writes data/balance-presets.json (synced to script.js by Step 9).
+         Count changes when eccentricity values change (affects w = √(m·a(1-e²))/d).
+
+Step 7d: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
          Key targets:
@@ -205,8 +210,6 @@ Step 7c: verify-laws.js                       → pass/fail
          - All eccentricities consistent with J2000 observed values
          eccentricity-balance.js              → convergence report
          Laws 4 and 5 independently predict Saturn's eccentricity.
-         balance-search.js                    → balance-presets.json
-         Exhaustive search for configs with ≥99.994% balance.
 
 ── Phase 6: Verify & sync ─────────────────────────────────────────
 

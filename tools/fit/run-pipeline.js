@@ -94,6 +94,8 @@ const STEPS = [
     cmd: 'node tools/fit/derive-eccentricity-amplitudes.js --write' },
   { id: '7b', phase: 2, name: 'Dual-balance optimizer',
     cmd: 'node tools/fit/dual-balance-optimizer.js --write' },
+  { id: '7c', phase: 2, name: 'Balance search (presets)',
+    cmd: 'node tools/verify/balance-search.js' },
 
   // Phase 6: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',

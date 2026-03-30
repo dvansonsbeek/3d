@@ -261,13 +261,13 @@ These are overlapping, not nested, constraints (full analysis: [configuration-an
 | **All four filters** | | |
 | Mirror ∩ Saturn-solo ∩ LL bounds ∩ Balance ≥ 99.994% | **1** | 0.0000132% |
 
-That single configuration is **Config #15** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
+That single configuration is **Config #1** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
 
 **Key structural constraints:**
 
 - **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric configurations.
 - **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune). Of the 81 mirror + Saturn-solo configs, 36 pass LL bounds — exactly the 6 × 6 grid where both pair d-values are ≥ 5.
-- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #15 achieves balance ≥ 99.994% (at 100%).
+- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #1 achieves balance ≥ 99.994% (at 100%).
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -834,7 +834,7 @@ npx parcel build src/index.html --no-cache
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
-4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #15 is the only one that is also mirror-symmetric.
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #1 is the only one that is also mirror-symmetric.
 
 5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to RMS 2.19% error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations. The Saturn eccentricity predicted by Law 4 (0.05389) and the value predicted by Law 5 eccentricity balance (0.05374) agree to within 0.28%, both bracketing the J2000 observed value (0.05386) — two entirely different Fibonacci constraints converge on the same physical value.
 
@@ -844,7 +844,7 @@ The balance conditions (Laws 3 and 5) combine known conservation principles with
 
 Law 2 (Inclination Amplitude quantization) is the most genuinely novel claim — no existing theory predicts that `d × amplitude × √m` should be constant across all planets when `d` is a Fibonacci number.
 
-The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #15 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #1 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
 
 ---
 
