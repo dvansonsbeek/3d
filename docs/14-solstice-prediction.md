@@ -3,9 +3,9 @@
 ## Overview
 
 The Holistic Universe Model predicts the timing and position of all four cardinal
-points (VE, SS, AE, WS) using **12 Fibonacci-based harmonics** per cardinal point:
-5 fundamentals (H/3, H/5, H/8, H/13, H/16) plus 7 overtones that are **sums of
-Fibonacci fundamentals** (H/6=3+3, H/11=3+8, H/19=3+16, H/24=8+16, H/32=16+16, etc.).
+points (VE, SS, AE, WS) using **24 harmonics** per cardinal point:
+5 Fibonacci fundamentals (H/3, H/5, H/8, H/13, H/16) plus 19 overtones from
+nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
 the valid prediction range from ±2,000 years to the full **335,317-year** Holistic Year.
@@ -18,15 +18,15 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-335,317-year Holistic Year can be predicted to **2.7–5.3 minutes** accuracy.
+335,317-year Holistic Year can be predicted to **0.05–1.0 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
 |----------------|-----------|-----------|--------------|
-| **SS** (Summer Solstice) | Max declination | **2.7 min** | 2451716.575 (Jun 21, 01:48 UTC) |
-| **VE** (Vernal Equinox) | Dec crosses 0° ascending | **3.0 min** | 2451623.738 (Mar 20, 05:42 UTC) |
-| **AE** (Autumnal Equinox) | Dec crosses 0° descending | **5.0 min** | 2451810.304 (Sep 22, 19:18 UTC) |
-| **WS** (Winter Solstice) | Min declination | **5.3 min** | 2451900.067 (Dec 21, 01:37 UTC) |
+| **SS** (Summer Solstice) | Max declination | **1.0 min** | 2451716.575 (Jun 21, 01:48 UTC) |
+| **VE** (Vernal Equinox) | Dec crosses 0° ascending | **0.05 min** | 2451623.738 (Mar 20, 05:42 UTC) |
+| **AE** (Autumnal Equinox) | Dec crosses 0° descending | **0.6 min** | 2451810.304 (Sep 22, 19:18 UTC) |
+| **WS** (Winter Solstice) | Min declination | **1.0 min** | 2451900.067 (Dec 21, 01:37 UTC) |
 
 ---
 
@@ -54,7 +54,7 @@ and `baseRA` = 90° (SS), 270° (WS), 0° (VE), 180° (AE).
 - **Mean SS RA ≈ 86.85° = 5h 47m 22s** (at balanced year when all precession phases = 0)
 - **At J2000: SS ≈ 90°, WS ≈ 270°, VE ≈ 0°, AE ≈ 180°** (near current obliquity maximum)
 - **Range: 6.32°** (25.3 minutes of RA) oscillation over the full Holistic Year
-- **RMSE: 0.089°** (0.36 minutes of RA) — validated against 11,553 simulation data points
+- **RMSE: 0.089°** (0.36 minutes of RA) — validated against 14,579 simulation data points
 - **Zero fitted constants** — everything derived from earthRAAngle, A, and ε
 
 ### Physical structure
@@ -75,7 +75,7 @@ exactly mirroring the obliquity formula where both components use the same ampli
 
 ## Formula 2: Cardinal Point Timing (Julian Day)
 
-Each cardinal point has its own 12-harmonic Fourier fit, anchored at the observed J2000
+Each cardinal point has its own 24-harmonic Fourier fit, anchored at the observed J2000
 value. Harmonics are self-corrected to return the exact anchor at year 2000:
 
 ```
@@ -83,17 +83,16 @@ JD(year) = anchor + meanSolarYear × (year − 2000)
          + Σ harmonics(year − balanced) − Σ harmonics(2000 − balanced)
 ```
 
-The 12 harmonics per cardinal point consist of:
+The 24 harmonics per cardinal point consist of:
 
 | Category | Harmonics | Physical origin |
 |----------|-----------|-----------------|
 | **Fibonacci fundamentals** | H/3, H/5, H/8, H/13, H/16 | Direct precession chain |
-| **Second harmonics** | H/6 (=3+3), H/32 (=16+16) | Overtones of inclination and perihelion |
-| **Cross-couplings** | H/11 (=3+8), H/19 (=3+16), H/24 (=8+16) | Interaction between precession cycles |
-| **Cardinal-specific** | 2 additional (vary per type) | Higher-order or tertiary couplings |
+| **Second harmonics** | H/6, H/10, H/32 | Overtones of fundamentals |
+| **Cross-couplings** | H/9, H/11, H/14, H/17, H/19, H/22, H/24, H/27 | Interaction between precession cycles |
+| **Higher-order** | H/29, H/30, H/35, H/38, H/40, H/43, H/48 | Third-order and finer corrections |
 
-All overtones are **sums of Fibonacci fundamentals** — they arise from second-order
-nonlinear interactions between the precession cycles.
+The overtones arise from nonlinear interactions between the precession cycles.
 
 ### Amplitude structure across cardinal points
 
@@ -113,12 +112,12 @@ When perihelion is near a cardinal point, the Sun moves fastest there, shifting 
 
 ### RMSE by cardinal point
 
-| Type | 5 Fibonacci | 12 Harmonics | Improvement |
+| Type | 5 Fibonacci | 24 Harmonics | Improvement |
 |------|-------------|-------------|-------------|
-| SS | 107 min | **2.7 min** | 40× |
-| VE | 154 min | **3.0 min** | 51× |
-| AE | 154 min | **5.0 min** | 31× |
-| WS | 96 min | **5.3 min** | 18× |
+| SS | 107 min | **1.0 min** | 107× |
+| VE | 154 min | **0.05 min** | 3,080× |
+| AE | 154 min | **0.6 min** | 257× |
+| WS | 96 min | **1.0 min** | 96× |
 
 ### Cardinal point year length (derivative)
 
@@ -142,12 +141,12 @@ Mean of 4: 365.24218 days (≈ meanSolarYearDays = 365.24219).
 
 ### Derivation path
 
-The JD coefficients were extracted from 11,553 simulation data points (29-year steps) by:
+The JD coefficients were extracted from 14,579 simulation data points (23-year steps) by:
 1. Fitting a linear trend: slope = `meanSolarYearDays` (fixed, not fitted)
 2. Computing residuals: δJD = JD_actual − JD_linear
 3. Greedy forward selection: starting with 5 Fibonacci fundamentals, then adding overtones
-4. Each round: test all H/div (div=1..55), select the one that reduces RMSE most
-5. The 7 overtones are all sums of Fibonacci fundamentals (physically motivated)
+4. Each round: test all H/div candidates, select the one that reduces RMSE most
+5. The 19 overtones capture increasingly fine corrections beyond the 5 fundamentals
 6. Adding obliquity/eccentricity cross-terms was tested but provides no additional
    information beyond what the overtone harmonics already capture (the overtones
    ARE the mathematical expansion of the physical cross-terms)
@@ -172,12 +171,12 @@ The ~98-second spread between cardinal point year lengths documented in
 | Property | Meeus `solarLongitudeDeg()` | Fibonacci harmonics |
 |----------|---------------------------|---------------------|
 | Valid range | ±2,000 years (safely) | ±167,500 years (full H) |
-| Method | Polynomial (T, T², T³) | Fourier (12 Fibonacci harmonics) |
+| Method | Polynomial (T, T², T³) | Fourier (24 harmonics) |
 | Cardinal points | SS only (separate formulas for others) | All 4 with same structure |
-| Parameters | 6 polynomial coefficients | RA: 0 fitted; JD: 24 fitted + 1 anchor per type |
+| Parameters | 6 polynomial coefficients | RA: 0 fitted; JD: 48 fitted + 1 anchor per type |
 | Physical basis | Empirical fit to modern data | Derived from precession hierarchy |
 | Accuracy at J2000 | ±1 second | JD: exact (anchored at observed value) |
-| Accuracy over full H | Diverges beyond ±5,000 yr | RA: 0.089° RMSE; JD: 2.7–5.3 min RMSE |
+| Accuracy over full H | Diverges beyond ±5,000 yr | RA: 0.089° RMSE; JD: 0.05–1.0 min RMSE |
 | Extrapolation | Diverges (polynomial) | Periodic — never diverges |
 
 **The two approaches are complementary**: Meeus for precision calendrics within ±2,000 years,
@@ -194,12 +193,11 @@ geometric projection of three model parameters through `1/sin(ε)`. The 0.089° 
 against simulation output is a measure of the approximation quality (from ignoring the
 small H/16 and higher-order terms in RA), not of free-parameter tuning.
 
-### 2. Only Fibonacci periods and their sums appear
+### 2. Fibonacci fundamentals dominate
 
-The 5 fundamental periods are pure Fibonacci. The 7 overtones are all sums of two
-fundamentals: 6=3+3, 11=3+8, 19=3+16, 24=8+16, 32=16+16. No harmonics outside
-this Fibonacci sum structure are needed. This suggests the timing variations arise from
-second-order nonlinear coupling between the precession cycles.
+The 5 Fibonacci fundamental periods (H/3, H/5, H/8, H/13, H/16) carry the largest
+amplitudes. The 19 additional overtones provide progressively finer corrections,
+with many being sums or multiples of the fundamentals (e.g., 6=3+3, 11=3+8, 24=8+16).
 
 ### 3. H/16 phase rotates 90° between consecutive cardinal points
 
@@ -232,11 +230,10 @@ where `<...>` denotes the time-average over one full H. This formula uses only e
 model parameters and produces 23.45326° — matching the simulation data to **1.4 arcsec**.
 
 The `computeObliquityEarth()` function computes this derived mean at startup (no hardcoded
-value), then adds 12 fitted harmonics for the oscillation. Total RMSE: **1.45 arcsec** over
-the full Holistic Year.
+value), then adds 16 fitted harmonics for the oscillation.
 
-The same 12 overtone harmonics appear as in the cardinal point JD fits (H/5, H/6, H/11,
-H/13, H/16, H/19, H/24), confirming these are universal second-order interaction terms
+Many of the same overtone harmonics appear as in the cardinal point JD fits (H/5, H/6, H/11,
+H/13, H/16, H/19, H/24), confirming these are universal interaction terms
 of the Fibonacci precession hierarchy.
 
 ### 5. Long-term calendar implications
@@ -253,7 +250,7 @@ be at 5h 35m RA (the minimum).
 Cardinal point observations generated from the headless scene-graph (no browser needed):
 - Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
 - File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
-- ~96,000 data points (6 types × ~16,000 steps) spanning one full Holistic Year
+- ~87,000 data points (6 types × ~14,579 steps) spanning one full Holistic Year
 - Step: stepYears (from model-parameters.json), grid-aligned
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination
@@ -278,14 +275,14 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 | Constant | Value | Origin |
 |----------|-------|--------|
 | `CARDINAL_POINT_ANCHORS` | 4 × JD values | Astronomical observation (J2000 cardinal points) |
-| `CARDINAL_POINT_HARMONICS` | 4 × 12 × [div, sin, cos] | Fitted from 11,553 simulation observations per type |
+| `CARDINAL_POINT_HARMONICS` | 4 × 24 × [div, sin, cos] | Fitted from 14,579 simulation observations per type |
 | `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
-| `SOLSTICE_OBLIQUITY_HARMONICS` | 12 × [div, sin, cos] | Fitted from 11,553 SS observations |
-| `earthInvPlaneInclinationMean` | 1.48118° | Model parameter (mean orbital plane tilt to invariable plane) |
+| `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 14,579 SS observations |
+| `earthInvPlaneInclinationMean` | 1.48128° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
 | `earthInvPlaneInclinationAmplitude` | 0.63603° | Model parameter (inclination oscillation) |
 | `earthtiltMean` | 23.41354° | Model parameter (mean obliquity) |
-| `meanSolarYearDays` | 365.242203646 | Derived from H/13 and H |
+| `meanSolarYearDays` | 365.242203646 | Derived from H/8 quantization |
 
 ## Related Documents
 
