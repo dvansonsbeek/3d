@@ -79,7 +79,6 @@ You can jump to any date using:
 The display shows:
 - Current UTC date and time
 - Julian Day number (continuous day count since 4713 BC)
-- Perihelion date (when Earth is closest to the Sun)
 - Simulation speed
 
 **Date range**: The simulation supports dates from ancient history to far future, enabling observation of long-term precession cycles.
@@ -258,8 +257,8 @@ When the Hierarchy Inspector panel is open:
 
 ### Track Perihelion-Solstice Alignment
 
-1. Go to date **December 14, 1245**
-2. Note perihelion aligns with December solstice
+1. Go to date **December 26, 1245** (perihelion alignment epoch)
+2. Note perihelion is near the December solstice direction
 3. Advance to year **2000**
 4. Perihelion now occurs around January 3 (~12.95° shift)
 

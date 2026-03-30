@@ -361,9 +361,9 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 
 ## References
 
-1. [14 - Ascending Node Calculations](31-ascending-node-calculations.md) - Detailed ascending node algorithm
-2. [15 - Inclination Calculations](32-inclination-calculations.md) - Detailed inclination algorithm and oscillation approach
-3. [10 - Constants Reference](20-constants-reference.md) - All planetary constants
+1. [31 - Ascending Node Calculations](31-ascending-node-calculations.md) - Detailed ascending node algorithm
+2. [32 - Inclination Calculations](32-inclination-calculations.md) - Detailed inclination algorithm and oscillation approach
+3. [20 - Constants Reference](20-constants-reference.md) - All planetary constants
 4. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
 5. [Farside Physics Textbook - Secular Evolution](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html) - Laplace-Lagrange secular theory, Table 10.4
 6. [Inclination Verification](../tools/verify/inclination-verification.js) - Verification script for mean/amplitude values

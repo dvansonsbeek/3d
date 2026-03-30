@@ -294,7 +294,7 @@ Inclination amplitudes are derived from the PSI formula:
 |---------|-----|----------------|----------------------|------------------|-------|
 | Mercury |  21 | 4.0744e-4      | 0.384621             | 0.384621         | Yes   |
 | Venus   |  34 | 1.5646e-3      | 0.061866             | 0.061866         | Yes   |
-| Earth   |   3 | 1.7331e-3      | 0.632976             | 0.63603         | ~0.5% |
+| Earth   |   3 | 1.7331e-3      | 0.632              | 0.63603         | ~0.6% |
 | Mars    |   5 | 5.6808e-4      | 1.158626             | 1.158626         | Yes   |
 | Jupiter |   5 | 3.0900e-2      | 0.021301             | 0.021301         | Yes   |
 | Saturn  |   3 | 1.6908e-2      | 0.064879             | 0.064879         | Yes   |
@@ -302,8 +302,8 @@ Inclination amplitudes are derived from the PSI formula:
 | Neptune |  34 | 7.1772e-3      | 0.013486             | 0.013486         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
-precession rate (0.63603), while the Fibonacci formula predicts 0.632976 (= 0.6329789
-in the code comment). All other planets match exactly.
+precession rate (0.63603), while the Fibonacci formula predicts 0.632 (ψ/(d×√m)).
+All other planets match exactly.
 
 ### Inclination Balance Result
 

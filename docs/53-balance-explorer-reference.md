@@ -64,7 +64,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  Incl: Σ203°=X  Σ23°=Y  →  100%       ✓                           │
 │  Ecc:  Σ203°=X  Σ23°=Y  →  100%       ✓                           │
 │  LL: 8/8 pass | Dir: 7/7 match                                   │
-│  ψ = 2205 / (2 × H) = 3.291e-3                                  │
+│  ψ = 2205 / (2 × H) = 3.288e-3                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -208,12 +208,12 @@ Useful experiments to try:
 
 ### Why Earth Is Locked
 
-Earth's inclination amplitude (0.632976°) is predicted by the Fibonacci formula. With d = 3:
+Earth's inclination amplitude (~0.632°) is predicted by the Fibonacci formula. With d = 3:
 
 ```
 amplitude = ψ / (3 × √m_Earth)
-          = 3.290966e-3 / (3 × 1.7331e-3)
-          = 0.632976°
+          = 3.288e-3 / (3 × 1.7331e-3)
+          = 0.632°
 ```
 
 The model's calibrated value (0.63603°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.

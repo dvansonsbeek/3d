@@ -242,7 +242,7 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 
 | Constant | Formula | Value |
 |----------|---------|-------|
-| ψ (psi) | 2205 / (2 × H) = F(5) × F(8)² / (2 × H) | 3.291 × 10⁻³ |
+| ψ (psi) | 2205 / (2 × H) = F(5) × F(8)² / (2 × H) | 3.288 × 10⁻³ |
 
 Where F(n) are Fibonacci numbers: F(5) = 5, F(8) = 21.
 

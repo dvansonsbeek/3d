@@ -71,15 +71,15 @@ The ratio between axial and inclination precession cycles follows a Fibonacci pa
 The Holistic-Year duration is uniquely determined by six constraints:
 
 1. **Planetary Alignment**: All major planetary orbits must realign within one cycle
-2. **1246 AD Calibration**: Historical alignment of December solstice with perihelion
+2. **1246 AD Calibration**: Perihelion alignment epoch (perihelion near the December solstice)
 3. **Climate Cycle Correlation**: Matches observed ~300,000-year patterns in ice core data
 4. **Earth-Wobble-Center Dynamics**: Required by the ratio between sidereal and solar year differences
 5. **Eccentricity Compliance**: Maintains eccentricity within observed ranges
 6. **Mercury's Perihelion Precession**: Aligns with observed planetary precession rates
 
-### Reference Point: December 14, 1245 AD
+### Reference Point: JD 2176153.5 (1245-12-26) / early 1246 AD
 
-This date marks when the PERIHELION-OF-EARTH aligned with the December solstice. It serves as the reference point for:
+This date marks the perihelion alignment epoch — when the perihelion longitude was closest to the winter solstice direction. It serves as the reference point for:
 - Mean solar year length
 - Mean sidereal year length
 - Baseline calculations for all precession cycles

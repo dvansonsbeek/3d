@@ -46,7 +46,7 @@ The definitive modern reference is [Souami & Souchay (2012)](https://www.aanda.o
 
 | Parameter | Value |
 |-----------|-------|
-| Inclination to ecliptic | 1°34'43.3" ≈ **1.578°** |
+| Inclination to ecliptic (J2000) | 1°34'43.3" ≈ **1.578°** |
 | Ascending node on ecliptic | 107°34'56" ≈ **107.58°** |
 
 ### The Ecliptic-Invariable Relationship
@@ -68,7 +68,7 @@ Each planet's orbit is tilted relative to the invariable plane. These values are
 
 For current values, see [Constants Reference](20-constants-reference.md).
 
-| Planet | Inclination to Inv. Plane | Inclination to Ecliptic | Notes |
+| Planet | Inclination to Inv. Plane | Inclination to Ecliptic (J2000) | Notes |
 |--------|---------------------------|------------------------|-------|
 | Mercury | `mercuryInvPlaneInclinationMean` | 7.01° | Highest inclination |
 | Venus | `venusInvPlaneInclinationMean` | 3.39° | |
@@ -257,7 +257,7 @@ L_z = L × (-sin(i) × cos(Ω))
 
 | Parameter | Value |
 |-----------|-------|
-| Inclination to ecliptic | 1°34'43.3" = **1.5787°** |
+| Inclination to ecliptic (J2000) | 1°34'43.3" = **1.5787°** |
 | Ascending node on ecliptic | 107°34'56" = **107.582°** |
 
 ### Important: Two Different Reference Frames
@@ -348,11 +348,11 @@ The angular momentum validation (Option A vs B) and mass-weighted balance tracki
 ## Further Reading
 
 For technical implementation details:
-- [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculation formulas and code
-- [15 - Inclination Calculations](32-inclination-calculations.md) - Dynamic inclination oscillations
+- [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculation formulas and code
+- [32 - Inclination Calculations](32-inclination-calculations.md) - Dynamic inclination oscillations
 
 For constants and data:
-- [10 - Constants Reference](20-constants-reference.md) - All invariable plane constants
+- [20 - Constants Reference](20-constants-reference.md) - All invariable plane constants
 
 ---
 

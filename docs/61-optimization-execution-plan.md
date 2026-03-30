@@ -626,7 +626,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 **2. Resonance loop (resonance-loop.js):**
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
-- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.291 × 10⁻³ (H=335,317)
+- Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.288 × 10⁻³ (H=335,317)
 - Clean Fibonacci perihelion precession: Jupiter (H/5), Saturn (-H/8), Uranus (H/3). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**

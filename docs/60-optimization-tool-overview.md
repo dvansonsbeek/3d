@@ -31,7 +31,7 @@ A tool that Claude can run **without user intervention** to:
 
 ### Why now
 - We verified that **JPL Horizons API** can provide RA/Dec data for any planet at any date (tested successfully for all 8 planets)
-- The **Excel comparison** (Appendix H (98)) showed the model's positions diverge from JPL: ~0.9° RA/century for the Sun, 1-7° for planets
+- The **Excel comparison** ([01-holistic-year-objects-data.xlsx](../data/01-holistic-year-objects-data.xlsx)) showed the model's positions diverge from JPL: ~0.9° RA/century for the Sun, 1-7° for planets
 - The existing ~80 standalone test scripts in `docs/hidden/testscripts/` prove the pattern works: pure math Node.js scripts that replicate model formulas and run with `node`
 
 ---
@@ -384,7 +384,7 @@ The [kaidadragongirl/planetarycalendar](https://github.com/kaidadragongirl/plane
 |--------|-----------------|---------------|------------|
 | `PLANET_TEST_DATES` | ~700 entries: NASA transit/opposition/conjunction dates with Dec, some with RA | In-code constant | -2000 to +4000 |
 | JPL Horizons API | Authoritative RA/Dec for any planet at any date | REST API with caching | Planet-dependent (see below) |
-| Excel (Appendix H (98)) | Simulation output at 111-year intervals for all planets | Local file | -301,334 to +32,547 |
+| [01-holistic-year-objects-data.xlsx](../data/01-holistic-year-objects-data.xlsx) | Simulation output at 1-year intervals for all planets | Local file | Full H |
 
 **JPL Horizons date limits:**
 | Planet | Max future date |

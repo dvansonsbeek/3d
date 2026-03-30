@@ -94,7 +94,7 @@ Equivalently:
 amplitude = ψ / (d × √m)
 ```
 
-This holds for all 8 planets with a single universal ψ = 3.291 × 10⁻³.
+This holds for all 8 planets with a single universal ψ = 3.288 × 10⁻³.
 
 ### Law 3: The Inclination Balance
 
@@ -236,25 +236,25 @@ The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search
 - **Saturn-solo** — Saturn is the only planet at the 23° phase angle (all others at 203°)
 - **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
 
-These are overlapping, not nested, constraints (full analysis: [Appendix M (89)](../tools/verify/configuration-analysis.js)):
+These are overlapping, not nested, constraints (full analysis: [configuration-analysis.js](../tools/verify/configuration-analysis.js)):
 
 | Filter | Count | % of total |
 |--------|------:|------------|
 | Total search space | 7,558,272 | 100% |
 | **Single filters** | | |
-| Balance ≥ 99.994% | 737 | 0.0100% |
+| Balance ≥ 99.994% | 737 | 0.00975% |
 | Mirror-symmetric | 2,592 | 0.0343% |
 | Saturn-solo | 236,196 | 3.125% |
 | LL bounds | 739,200 | 9.780% |
 | **Two-filter intersections** | | |
 | Mirror ∩ Balance | 1 | 0.0000132% |
-| Saturn-solo ∩ Balance | 17 | 0.000225% |
+| Saturn-solo ∩ Balance | 15 | 0.000199% |
 | Saturn-solo ∩ LL bounds | 36,288 | 0.480% |
 | Mirror ∩ Saturn-solo | 81 | 0.00107% |
 | Mirror ∩ LL bounds | 380 | 0.00503% |
-| Balance ∩ LL bounds | 177 | 0.00234% |
+| Balance ∩ LL bounds | 180 | 0.00238% |
 | **Three-filter intersections** | | |
-| Saturn-solo ∩ Balance ∩ LL bounds | 7 | 0.0000926% |
+| Saturn-solo ∩ Balance ∩ LL bounds | 5 | 0.0000662% |
 | Mirror ∩ Saturn-solo ∩ LL bounds | 36 | 0.000476% |
 | Mirror ∩ Saturn-solo ∩ Balance | 1 | 0.0000132% |
 | Mirror ∩ Balance ∩ LL bounds | 1 | 0.0000132% |
@@ -280,7 +280,7 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 - The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 100%
 - Random eccentricity values in the same weight formula give 50–85% balance
 
-The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [Appendix N (90) — Eccentricity Balance](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
+The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
 
 ### Finding 4: Saturn Eccentricity Prediction and Law Convergence
 
@@ -300,9 +300,9 @@ e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Why this is significant:** Saturn's eccentricity oscillates secularly between ~0.01 and ~0.09 (a factor-of-9 dynamic range). Two structurally different Fibonacci constraints — one using only the Earth–Saturn pair, the other using all eight planets — independently predict a value within 0.3% of each other and within 0.25% of J2000 across this range. The Fibonacci divisors were originally chosen to match precession periods (Law 1) and inclination balance (Law 3); the eccentricity predictions were never optimized for. That two independent equations, drawing on different subsets of planetary data, converge on the same value confirms that the eccentricity balance is not an independent free parameter but an emergent consequence of the Fibonacci pair structure.
 
-**Epoch independence:** The convergence is not a coincidence of the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, the balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillates alone. At any epoch where all pairs have co-evolved, computing the "perfect-balance Saturn e" from the other seven planets' actual eccentricities yields a value within 0.2–0.4% of Saturn's actual eccentricity — the convergence is maintained structurally, not by chance of timing. Only configurations already near 100% balance produce corrections small enough for Law 4 to confirm independently; an 80% configuration would require a 33% correction that no independent law predicts. See [Appendix O (91) — Epoch Independence](../tools/verify/epoch-independence.js) for the full analysis.
+**Epoch independence:** The convergence is not a coincidence of the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, the balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillates alone. At any epoch where all pairs have co-evolved, computing the "perfect-balance Saturn e" from the other seven planets' actual eccentricities yields a value within 0.2–0.4% of Saturn's actual eccentricity — the convergence is maintained structurally, not by chance of timing. Only configurations already near 100% balance produce corrections small enough for Law 4 to confirm independently; an 80% configuration would require a 33% correction that no independent law predicts. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
-With dual-balanced eccentricities, the eccentricity balance reaches 100%. The model's eccentricities are optimized to satisfy both the inclination balance (Law 3) and eccentricity balance (Law 5) simultaneously. See [Appendix N (90) — Eccentricity Balance](90-eccentricity-balance.js) for the static analysis.
+With dual-balanced eccentricities, the eccentricity balance reaches 100%. The model's eccentricities are optimized to satisfy both the inclination balance (Law 3) and eccentricity balance (Law 5) simultaneously. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
 
 ### Finding 5: Inner Planet Eccentricity Ladder
 
@@ -605,15 +605,15 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
 | √m | | 1.7329 × 10⁻³ |
 | d × √m | 3 × 1.7329 × 10⁻³ | 5.1986 × 10⁻³ |
-| **amplitude** | **3.290966 × 10⁻³ / 5.1992 × 10⁻³** | **0.632976°** |
+| **amplitude** | **3.288 × 10⁻³ / 5.1986 × 10⁻³** | **0.632 °** |
 
 The mean is computed from the J2000 constraint:
 
 ```
 mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
-     = 1.57867° - 0.632976° × cos(284.51° - 203.3195°)
-     = 1.57867° - 0.632976° × 0.15315
-     = 1.48173°
+     = 1.57867° - 0.632° × cos(284.51° - 203.3195°)
+     = 1.57867° - 0.632° × 0.15315
+     = 1.48188°
 ```
 
 #### Fibonacci vs IAU 2006-Optimized Values
@@ -644,7 +644,7 @@ The Fibonacci prediction (0.635185°) represents the theoretical long-term value
 ```javascript
 // Fundamental constants
 const H = 335317; // See Constants Reference for current value
-const PSI = 2205 / (2 * H);  // = 3.291 × 10⁻³
+const PSI = 2205 / (2 * H);  // = 3.288 × 10⁻³
 
 // Fibonacci divisors
 const FIBONACCI_D = {
