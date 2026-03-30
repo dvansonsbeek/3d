@@ -187,7 +187,7 @@ Expected: ~102.94° (within ~0.01° of the Excel `Earth Perihelion ICRF` value a
 
 ### 2. Prepare Training Data
 
-The training data is in `data/01-holistic-year-objects-data.xlsx` (Excel format). The step size should divide H (335008) evenly — currently 29-year steps (11553 points). Data comes from:
+The training data is in `data/01-holistic-year-objects-data.xlsx` (Excel format). The step size should divide H (335,317) evenly — currently 23-year steps (14,579 points). Data comes from:
 
 **Sheet 'Holistic_objects_PerihelionPlan':**
 - `Model Year` — Calendar year (must include year 2000)
@@ -270,7 +270,7 @@ Groups 17–23 were added via greedy forward feature selection (`greedy_features
 
 ## Training Metrics
 
-Current model performance (429 terms, 11553 data points, 29-year steps):
+Current model performance (429 terms, 14,579 data points, 23-year steps):
 
 | Planet | RMSE ("/cy) | R² |
 |--------|-------------|-----|
@@ -327,4 +327,4 @@ The model captures how these parameters interact across multiple timescales to p
 
 - Holistic Universe Model documentation
 - J2000 perihelion values from NASA JPL Horizons
-- Training data spans one full Holistic Year (H years) of calculated values (11,553 data points, 29-year steps)
+- Training data spans one full Holistic Year (H years) of calculated values (14,579 data points, 23-year steps)

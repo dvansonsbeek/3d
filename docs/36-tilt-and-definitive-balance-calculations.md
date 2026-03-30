@@ -50,8 +50,8 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 | Symbol | Value                | Source                                      |
 |--------|----------------------|---------------------------------------------|
 | H      | 335317               | Holistic Year Length                         |
-| PSI    | 2205 / (2H) = 0.003290966 | Inclination formula constant            |
-| K      | 3.450537e-6          | Tilt-eccentricity constant (derived from Earth) |
+| PSI    | 2205 / (2H) = 0.003287934 | Inclination formula constant            |
+| K      | 3.414920e-6          | Tilt-eccentricity constant (derived from Earth) |
 
 PSI is defined in `tools/lib/constants.js` line 421.
 K is derived in Section 4 below.
@@ -91,11 +91,11 @@ amplitude of this fluctuation is:
 
     e_amplitude = K * sin(tilt_mean) * sqrt(d) / (sqrt(m) * a^(3/2))
 
-where K = 3.450537e-6, derived from Earth:
+where K = 3.414483e-6, derived from Earth:
 
     K = e_amp_Earth * sqrt(m_Earth) * a_Earth^(3/2) / (sin(tilt_Earth) * sqrt(d_Earth))
     K = 0.001356 * sqrt(3.00352e-6) * 1.0 / (sin(23.41354 deg) * sqrt(3))
-    K = 3.450537e-6
+    K = 3.414483e-6
 
 ### Key Property: Law 5 Weight Change
 
@@ -502,7 +502,7 @@ J2000 (99.9845%) while the amplitude remains negligible.
 
 | Symbol | Value | Source |
 |--------|-------|--------|
-| K | 3.4505372893e-6 | `eccentricityAmplitudeK` in constants.js |
+| K | 3.4149201316e-6 | `eccentricityAmplitudeK` in constants.js |
 | T_wobble (Earth) | 20,957 years | `perihelionCycleLength` in script.js |
 | T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
@@ -555,6 +555,7 @@ their effect on Law 5 weights is negligible for the dominant planets.
 | axialTiltMean (per planet)           | tools/lib/constants.js      |             |
 | Balance search script                 | tools/verify/balance-search.js |          |
 | Eccentricity balance script           | tools/verify/eccentricity-balance.js |    |
+| Derive K + planet amplitudes/phases  | tools/fit/derive-eccentricity-amplitudes.js | Pipeline Step 7a |
 | JPL eccentricity cosine fit          | tools/fit/python/planet_eccentricity_jpl.py | |
 | JPL eccentricity cache               | data/planet_eccentricity_cache.json | |
 

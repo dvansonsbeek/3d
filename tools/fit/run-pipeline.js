@@ -89,6 +89,10 @@ const STEPS = [
   { id: '6e', phase: 2, name: 'Anomalistic year harmonics',
     cmd: 'node tools/fit/year-length-harmonics.js --write --type anomalistic' },
 
+  // Phase 5b: Eccentricity amplitudes & balance law verification
+  { id: '7a', phase: 2, name: 'Derive eccentricity amplitudes',
+    cmd: 'node tools/fit/derive-eccentricity-amplitudes.js --write' },
+
   // Phase 6: Verify & sync
   { id: '8',  phase: 2, name: 'Verify pipeline',
     cmd: 'node tools/fit/verify-pipeline.js --write' },

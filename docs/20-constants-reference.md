@@ -695,7 +695,7 @@ Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(til
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Coupling constant K | `eccentricityAmplitudeK` | 3.4505372893e-6 | Universal tilt-eccentricity coupling |
+| Coupling constant K | `eccentricityAmplitudeK` | 3.4149201316e-6 | Universal tilt-eccentricity coupling |
 
 | Planet | `orbitalEccentricityAmplitude` | % of Base | Regime |
 |--------|-------------------------------|-----------|--------|

@@ -153,7 +153,7 @@ While eccentricity base values are determined by the balance system (Laws 4 + 5)
 e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 ```
 
-K = 3.4505 × 10⁻⁶ — an empirical constant derived from Earth's mean parameters. The total eccentricity at any time oscillates around the base value with this amplitude over each planet's eccentricity cycle. Two candidate relations K ≈ ψ²/π (0.09%) and K ≈ ψ^(11/5) (0.05%) have been noted but are not proven identities. See [Eccentricity Balance Scale](38-eccentricity-scale.md) for details.
+K = 3.4149 × 10⁻⁶ — a constant derived from Earth's mean parameters. The total eccentricity at any time oscillates around the base value with this amplitude over each planet's eccentricity cycle. Two candidate relations K ≈ ψ²/π (0.77%) and K ≈ ψ^(11/5) (0.89%) have been noted but are not proven identities. See [Eccentricity Balance Scale](38-eccentricity-scale.md) for details.
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 

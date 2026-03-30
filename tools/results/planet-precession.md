@@ -1,7 +1,7 @@
 # Planet Precession — ML Training Results
 
 **Last updated:** 2026-03-25
-**Data source:** `data/01-holistic-year-objects-data.xlsx` (11553 points, 29-year steps, full H)
+**Data source:** `data/01-holistic-year-objects-data.xlsx` (14,579 points, 23-year steps, full H)
 **Earth perihelion:** PERI_HARMONICS (21 terms, RMSE 0.003468°), PERI_OFFSET = −0.255223
 
 ---

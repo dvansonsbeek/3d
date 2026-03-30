@@ -377,7 +377,7 @@ $$
 e_{\text{Saturn}}(t) = \texttt{eccentricityDerivedMean} + 0.019 \cdot \cos\left(\frac{2\pi t}{H/8}\right)
 $$
 
-This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (11553 data points, 29-year steps).
+This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (14,579 data points, 23-year steps).
 
 For implementation details, see [predictive_formula.py](../tools/lib/python/predictive_formula.py) (GROUP 15 terms in `build_features`).
 

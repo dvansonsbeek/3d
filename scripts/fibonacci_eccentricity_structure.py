@@ -614,7 +614,7 @@ print("""
 
   1. TWO-COMPONENT DECOMPOSITION: e_base = e_structural + e_amplitude
      - e_amplitude = K × sin(tilt) × √d / (√m × a^1.5)
-       Universal constant K = 3.4505e-6, 0% error across all 8 planets
+       Universal constant K = 3.4149e-6, 0% error across all 8 planets
      - e_structural is the tilt-independent foundation (>84% of e_base)
 
   2. LAW 5 BALANCE:

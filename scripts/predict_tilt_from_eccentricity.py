@@ -7,7 +7,7 @@ The eccentricity amplitude formula:
 
     e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 
-uses a universal constant K = 3.4505 × 10⁻⁶, derived from Earth's parameters.
+uses a universal constant K = 3.4149 × 10⁻⁶, derived from Earth's parameters.
 This constant predicts all 8 planetary eccentricity amplitudes.
 
 This script investigates:

@@ -17,7 +17,7 @@
  *   - JSON training file: tools/cardinal-points-training.json (per-type arrays)
  *
  * The step size must divide evenly into (2000 - balancedYear) so that year 2000
- * is always included in the output. Default step = 29 years (~11,553 points per type).
+ * is always included in the output. Default step = 23 years (~14,579 points per type).
  */
 
 const SG = require('../lib/scene-graph');

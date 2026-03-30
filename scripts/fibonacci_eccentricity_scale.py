@@ -627,6 +627,6 @@ print("""
 
   8. THE UNIVERSAL CONSTANT:
      Eccentricity amplitude: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
-     K = 3.4505e-6 (0% error, all 8 planets)
+     K = 3.4149e-6 (0% error, all 8 planets)
      This is the eccentricity analog of the ψ-constant.
 """)

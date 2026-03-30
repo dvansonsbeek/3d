@@ -2,7 +2,7 @@
 
 This document describes the astronomical verification data embedded in the simulation for validating planetary positions against known historical events.
 
-**Last Updated:** January 2026
+**Last Updated:** March 2026
 
 **Related Documents:**
 - [52 - Analysis & Export Tools](52-analysis-export-tools.md) - Planet report generation and data export
@@ -13,9 +13,9 @@ This document describes the astronomical verification data embedded in the simul
 
 ## Overview
 
-The simulation includes over 700 verification data points from authoritative astronomical sources. These allow users to compare the model's calculated positions against historically observed events such as planetary transits, oppositions, conjunctions, and mutual occultations.
+The simulation includes over 8,000 verification data points from authoritative astronomical sources. These allow users to compare the model's calculated positions against historically observed events such as planetary transits, oppositions, conjunctions, mutual occultations, and historical observations (notably Tycho Brahe's Mars observations).
 
-**Location:** `script.js` lines 6163-6894 (`PLANET_TEST_DATES`)
+**Location:** `script.js` line ~7591 (`PLANET_TEST_DATES`)
 
 ---
 
@@ -37,6 +37,12 @@ The simulation includes over 700 verification data points from authoritative ast
 | stjerneskinn.com | Mars opposition data |
 | astropixels.com (JPL DE405) | Jupiter-Saturn conjunctions |
 | astropro.com | Great conjunction 3000-year table |
+
+### Historical Observations
+
+| Source | Used For |
+|--------|----------|
+| Tycho Brahe Mars observations | ~7,384 declination measurements (1580s–1600s) |
 
 ### Mutual Planetary Events
 
@@ -61,7 +67,9 @@ Each verification entry has the following structure:
   type: 'position',        // 'position' or 'both' (RA+Dec)
   label: 'NASA date',      // Description of the event
   comparePlanet: 'saturn', // For conjunctions/occultations - optional
-  showOnScreen: true       // Whether to display in reports
+  showOnScreen: true,      // Whether to display in reports
+  tier: '2R',              // Data quality tier (1A-1D, 2A-2R, 3)
+  weight: 2                // Optimization weight (0 = reference only)
 }
 ```
 
@@ -74,15 +82,31 @@ Each verification entry has the following structure:
 | `dec` | Declination in degrees (positive = north, negative = south) |
 | `longitude` | Ecliptic longitude in degrees (tropical zodiac) |
 | `type` | `'position'` for declination-only, `'both'` for RA+Dec |
-| `label` | Event type: 'NASA date', 'Opposition', 'Occultation', etc. |
+| `label` | Event type: 'NASA date', 'Opposition', 'Occultation', 'Tycho Brahe', etc. |
 | `comparePlanet` | For conjunctions, the other planet involved |
 | `showOnScreen` | If `true`, appears in default report output |
+| `tier` | Data quality tier used by the optimizer (1A=highest, 3=lowest) |
+| `weight` | Optimization weight: higher = more influence on parameter fitting |
+
+### Data Quality Tiers
+
+| Tier | Count | Description |
+|------|-------|-------------|
+| 1A | 42 | Highest quality — model start positions |
+| 1B | 76 | High quality — precise transit observations |
+| 1C | 7,384 | Historical observations (Tycho Brahe Mars data) |
+| 1D | 88 | High quality — precise declinations |
+| 2A | 46 | Medium quality — opposition data |
+| 2B | 180 | Medium quality — conjunction/opposition data |
+| 2C | 69 | Medium quality — occultation dates |
+| 2R | 50 | Reference positions (RA+Dec) |
+| 3 | 127 | Lower quality — older or less precise sources |
 
 ---
 
 ## Data by Planet
 
-### Mercury (~100 entries)
+### Mercury (~95 entries)
 
 **Source:** NASA Mercury Transit Catalog
 
@@ -92,7 +116,7 @@ Each verification entry has the following structure:
 
 **Purpose:** Verify Mercury's position during solar transits when Mercury passes directly between Earth and the Sun.
 
-### Venus (~100 entries)
+### Venus (~91 entries)
 
 **Sources:**
 - NASA Venus Transit Catalog (transits)
@@ -106,17 +130,23 @@ Each verification entry has the following structure:
 
 **Purpose:** Verify Venus positions during rare transit events and mutual occultations with Mercury.
 
-### Mars (~140 entries)
+### Mars (~7,593 entries)
 
-**Sources:** Jean Meeus tables, nakedeyeplanets.com, stjerneskinn.com
+**Sources:**
+- Tycho Brahe Mars observations (~7,384 entries) — historical declination measurements
+- Jean Meeus tables, nakedeyeplanets.com, stjerneskinn.com (~196 opposition entries)
+- Mutual occultation data (~12 entries)
 
-**Data Type:** Declination at opposition (when Mars is opposite the Sun from Earth)
+**Data Types:**
+- Declination from Tycho Brahe's systematic observations (1580s–1600s)
+- Declination at opposition (when Mars is opposite the Sun from Earth)
+- Occultation dates
 
-**Date Range:** JD 2414673 to JD 2565188 (~1899 AD to ~2311 AD)
+**Date Range:** JD 1382451 to JD 2571132 (~1200 AD to ~2300 AD)
 
-**Purpose:** Mars oppositions are prime observing opportunities. The declination indicates whether Mars appears high or low in the sky.
+**Purpose:** The Tycho Brahe dataset provides a dense grid of historical Mars positions for optimizer training. Mars oppositions are prime observing opportunities where declination indicates sky position.
 
-### Jupiter (~120 entries)
+### Jupiter (~118 entries)
 
 **Sources:**
 - astropixels.com (JPL DE405 ephemeris)
@@ -132,7 +162,7 @@ Each verification entry has the following structure:
 
 **Purpose:** Great conjunctions (Jupiter-Saturn alignments) occur every ~20 years and have been recorded since ancient times.
 
-### Saturn (~100 entries)
+### Saturn (~95 entries)
 
 **Sources:** Same as Jupiter (conjunctions are mutual events)
 
@@ -140,9 +170,11 @@ Each verification entry has the following structure:
 - Ecliptic longitude at Saturn-Jupiter conjunctions
 - Occultation dates with Venus, Mercury, Mars
 
+**Date Range:** JD 1359024 to JD 2640765 (~800 BC to ~2300 AD)
+
 **Purpose:** Paired with Jupiter data to verify both planets at conjunction dates.
 
-### Uranus (~20 entries)
+### Uranus (~18 entries)
 
 **Sources:** Wikipedia, Project Pluto
 
@@ -152,7 +184,7 @@ Each verification entry has the following structure:
 
 **Purpose:** Verify Uranus position during rare mutual planetary occultations.
 
-### Neptune (~50 entries)
+### Neptune (~49 entries)
 
 **Sources:** Wikipedia, Project Pluto
 
@@ -164,7 +196,7 @@ Each verification entry has the following structure:
 
 **Purpose:** Verify Neptune position during conjunctions and occultations.
 
-### Pluto, Halley's Comet, Eros (3 entries each)
+### Pluto, Halley's Comet, Eros (1 entry each)
 
 **Data Type:** Model start date position only (JD 2451716.5 = 21 June 2000)
 
@@ -276,17 +308,17 @@ To add new verification entries:
 
 ## Summary Statistics
 
-| Planet | Transit/Position | Conjunction | Occultation | Total |
-|--------|------------------|-------------|-------------|-------|
-| Mercury | ~100 | - | - | ~100 |
-| Venus | ~90 | - | ~9 | ~99 |
-| Mars | ~140 | - | - | ~140 |
-| Jupiter | 1 | ~75 | ~42 | ~118 |
-| Saturn | 1 | ~75 | ~19 | ~95 |
-| Uranus | 1 | ~3 | ~14 | ~18 |
-| Neptune | 1 | ~33 | ~16 | ~50 |
-| Others | 3 | - | - | 3 |
-| **Total** | **~337** | **~186** | **~100** | **~623** |
+| Planet | Transit/Position | Conjunction | Occultation | Historical | Total |
+|--------|------------------|-------------|-------------|------------|-------|
+| Mercury | ~95 | - | - | - | ~95 |
+| Venus | ~79 | - | ~12 | - | ~91 |
+| Mars | ~197 | - | ~12 | ~7,384 | ~7,593 |
+| Jupiter | 1 | ~75 | ~42 | - | ~118 |
+| Saturn | 1 | ~75 | ~19 | - | ~95 |
+| Uranus | 1 | ~3 | ~14 | - | ~18 |
+| Neptune | 1 | ~33 | ~15 | - | ~49 |
+| Others | 3 | - | - | - | 3 |
+| **Total** | **~378** | **~186** | **~114** | **~7,384** | **~8,062** |
 
 ---
 

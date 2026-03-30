@@ -3,7 +3,7 @@
 Fit Earth perihelion longitude harmonics from simulation data.
 
 Reads 'Earth Perihelion (Ecliptic)' from data/01-holistic-year-objects-data.xlsx
-(11,553 data points, 29-year steps) and fits a 21-term Fourier series to the
+(14,579 data points, 23-year steps) and fits a 21-term Fourier series to the
 residuals after removing the linear precession trend.
 
 Produced constants:

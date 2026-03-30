@@ -14,6 +14,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
+| `derive-eccentricity-amplitudes.js` | `eccentricityAmplitudeK`, per-planet `orbitalEccentricityAmplitude` + `eccentricityPhaseJ2000` | Derived from Earth's K constant |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
@@ -162,9 +163,16 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
          anomalistic 0.002s over full H.
          Updates: fitted-coefficients.json (auto-updated by script)
 
-── Phase 5b: Balance law verification ─────────────────────────────
+── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
-Step 7:  verify-laws.js                       → pass/fail
+Step 7a: derive-eccentricity-amplitudes.js    → orbitalEccentricityAmplitude, eccentricityPhaseJ2000
+         Derives K from Earth's parameters (eccentricityAmplitude, massFraction,
+         earthtiltMean, d=3), then computes per-planet eccentricity amplitudes
+         and J2000 phase angles. Must run after Step 1 (which sets Earth's
+         eccentricityAmplitude) and before Step 7b (balance verification).
+         Updates: model-parameters.json (K + 7 planet amplitudes + phases)
+
+Step 7b: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
          eccentricity-balance.js              → convergence report
