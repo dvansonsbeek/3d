@@ -431,11 +431,11 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 
 | Document | Purpose |
 |----------|---------|
-| [26 - Fibonacci Laws](10-fibonacci-laws.md) | The six laws, derivations, and findings |
-| [22 - UI Panels Reference](50-ui-panels-reference.md) | Overview of all UI panels |
-| [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
-| [10 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
+| [10 - Fibonacci Laws](10-fibonacci-laws.md) | The six laws, derivations, and findings |
+| [50 - UI Panels Reference](50-ui-panels-reference.md) | Overview of all UI panels |
+| [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
+| [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
 
 ---
 
-**Previous**: [26 - Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md)
+**Previous**: [10 - Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md)

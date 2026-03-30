@@ -411,7 +411,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 ### Full Reference
 
-See [27 - Balance Explorer Reference](53-balance-explorer-reference.md) for complete documentation including calculation details, all controls, and interpretation guide.
+See [53 - Balance Explorer Reference](53-balance-explorer-reference.md) for complete documentation including calculation details, all controls, and interpretation guide.
 
 ---
 
@@ -458,11 +458,11 @@ This 99.994% accuracy validates that our orbital elements are consistent with pu
 
 | Document | Purpose |
 |----------|---------|
-| [21 - Planet Inspector Reference](51-planet-inspector-reference.md) | Planet inspector calculations |
-| [27 - Balance Explorer Reference](53-balance-explorer-reference.md) | Balance explorer calculations and controls |
-| [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
-| [10 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
+| [51 - Planet Inspector Reference](51-planet-inspector-reference.md) | Planet inspector calculations |
+| [53 - Balance Explorer Reference](53-balance-explorer-reference.md) | Balance explorer calculations and controls |
+| [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
+| [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
 
 ---
 
-**Previous**: [21 - Planet Inspector Reference](51-planet-inspector-reference.md)
+**Previous**: [51 - Planet Inspector Reference](51-planet-inspector-reference.md)

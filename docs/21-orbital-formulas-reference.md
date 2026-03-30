@@ -1810,9 +1810,9 @@ precessionEclipticToICRF: (ecliptic_years, reference_years) => {
 ```
 
 **Example for Mercury:**
-- ICRF period: ~243,642 years
+- ICRF period: ~243,867 years
 - Reference (H/13): ~25,794 years
-- Ecliptic period: ~28,818 years
+- Ecliptic period: ~28,844 years
 
 #### 10.2.2 ICRF to Ecliptic Transformation
 

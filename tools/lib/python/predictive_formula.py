@@ -399,7 +399,7 @@ def calc_planet_eccentricity(planet: str, year: int) -> float:
 
     Formula: e(t) = e_base + e_amp × cos(2π(year - 2000) / (H/16) + φ_J2000)
 
-    All planets oscillate at period H/16 = 20,938 years.
+    All planets oscillate at period H/16 = 20,957 years.
     Earth uses a different formula (calc_eccentricity) with derived mean.
 
     Args:

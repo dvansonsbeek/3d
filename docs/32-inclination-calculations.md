@@ -414,10 +414,10 @@ The planet information panels display four invariable plane values:
 
 | Document | Purpose |
 |----------|---------|
-| [26 - Fibonacci Laws](10-fibonacci-laws.md) | Fibonacci Laws derivation with balance condition |
-| [10 - Constants Reference](20-constants-reference.md) | All inclination and ascending node constants |
-| [14 - Ascending Node Calculations](31-ascending-node-calculations.md) | Ascending node precession |
-| [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
+| [10 - Fibonacci Laws](10-fibonacci-laws.md) | Fibonacci Laws derivation with balance condition |
+| [20 - Constants Reference](20-constants-reference.md) | All inclination and ascending node constants |
+| [31 - Ascending Node Calculations](31-ascending-node-calculations.md) | Ascending node precession |
+| [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [Ascending Node Optimization](../tools/verify/ascending-node-optimization.js) | Numerical optimization to calculate ascending node values |
 | [Ascending Node Verification](../tools/verify/ascending-node-verification.js) | Verification that J2000-verified ascending nodes produce correct ecliptic inclinations |
 | [Ascending Node Souami-Souchay](../tools/verify/ascending-node-souami-souchay.js) | Comparison of S&S vs Verified ascending node accuracy |
@@ -427,5 +427,5 @@ The planet information panels display four invariable plane values:
 
 ---
 
-**Previous**: [14 - Ascending Node Calculations](31-ascending-node-calculations.md)
-**Next**: [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md)
+**Previous**: [31 - Ascending Node Calculations](31-ascending-node-calculations.md)
+**Next**: [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md)

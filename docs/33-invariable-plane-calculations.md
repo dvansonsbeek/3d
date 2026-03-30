@@ -391,10 +391,10 @@ All invariable plane values in the planet stats panels show **ecliptic coordinat
 | Document | Purpose |
 |----------|---------|
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
-| [10 - Constants Reference](20-constants-reference.md) | All constants and values |
-| [15 - Inclination Calculations](32-inclination-calculations.md) | Dynamic inclination oscillations |
+| [20 - Constants Reference](20-constants-reference.md) | All constants and values |
+| [32 - Inclination Calculations](32-inclination-calculations.md) | Dynamic inclination oscillations |
 
 ---
 
-**Previous**: [15 - Inclination Calculations](32-inclination-calculations.md)
-**Next**: [17 - Mercury Precession Breakdown](13-mercury-precession-breakdown.md)
+**Previous**: [32 - Inclination Calculations](32-inclination-calculations.md)
+**Next**: [13 - Mercury Precession Breakdown](13-mercury-precession-breakdown.md)

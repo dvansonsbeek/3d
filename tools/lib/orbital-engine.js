@@ -655,7 +655,7 @@ function computePerihelionPrecession(anomalisticYearSec, solarYearSec) {
 
 /**
  * Compute inclination precession period (in years).
- * For Earth: H/3 = 111,669 yr. For planets: perihelionEclipticYears.
+ * For Earth: H/3 = 111,772 yr. For planets: perihelionEclipticYears.
  * Source: constants — this is a fixed period per planet.
  *
  * @param {string} planetName - planet key or 'earth'

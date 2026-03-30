@@ -5,8 +5,8 @@ This document describes the Three.js scene graph hierarchy used in the Holistic 
 **Last Updated:** January 2026
 
 **Related Documents:**
-- [13 - Perihelion Precession](12-perihelion-precession.md) - How precession affects apparent measurements
-- [20 - Architecture](40-architecture.md) - Overall code structure
+- [12 - Perihelion Precession](12-perihelion-precession.md) - How precession affects apparent measurements
+- [40 - Architecture](40-architecture.md) - Overall code structure
 - [04 - Dynamic Elements Overview](04-dynamic-elements-overview.md) - What orbital elements change over time
 
 **Source:** [Technical Guide](https://www.holisticuniverse.com/en/simulation/technical-guide) on the Holistic Universe website
@@ -317,7 +317,7 @@ WorldMatrix = M_earth × M_inclinationPrecession × M_eclipticPrecession
 
 **When measuring from ecliptic frame:** Bypass Earth's precession layers by reading directly from the planet's `precessionLayer.orbitObj.rotation.y`.
 
-This is why Mercury's perihelion precession appears to fluctuate when measured from Earth but is constant in the ecliptic frame (see [13 - Perihelion Precession](12-perihelion-precession.md)).
+This is why Mercury's perihelion precession appears to fluctuate when measured from Earth but is constant in the ecliptic frame (see [12 - Perihelion Precession](12-perihelion-precession.md)).
 
 ---
 
@@ -403,4 +403,4 @@ This applies throughout the model:
 ---
 
 **Previous**: [05 - Invariable Plane Overview](05-invariable-plane-overview.md)
-**Next**: [10 - Constants Reference](20-constants-reference.md)
+**Next**: [20 - Constants Reference](20-constants-reference.md)

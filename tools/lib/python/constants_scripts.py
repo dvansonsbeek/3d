@@ -186,13 +186,13 @@ PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C
 # Mercury, Earth, Mars: confirmed (0.2%, 2%, 0.7% error vs observations)
 # Jupiter, Saturn, Uranus: predictions; Venus, Neptune: N/A
 OBLIQUITY_CYCLE = {
-    "Mercury": H * 8 / 3,     # 8H/3 = 893,355 yr (observed ~895 kyr, Bills 2005)
+    "Mercury": H * 8 / 3,     # 8H/3 = 894,179 yr (observed ~895 kyr, Bills 2005)
     "Venus":   None,           # N/A — tidally damped at 177°
-    "Earth":   H / 8,          # H/8 = 41,876 yr (observed ~41,000 yr)
-    "Mars":    3 * H / 8,      # 3H/8 = 125,628 yr (observed ~124,800 yr, Laskar 2004)
-    "Jupiter": H / 2,          # H/2 = 167,504 yr (prediction)
-    "Saturn":  H / 3,          # H/3 = 111,669 yr (prediction, mirror-pair with Earth)
-    "Uranus":  H / 2,          # H/2 = 167,504 yr (prediction, tentative)
+    "Earth":   H / 8,          # H/8 = 41,915 yr (observed ~41,000 yr)
+    "Mars":    3 * H / 8,      # 3H/8 = 125,744 yr (observed ~124,800 yr, Laskar 2004)
+    "Jupiter": H / 2,          # H/2 = 167,659 yr (prediction)
+    "Saturn":  H / 3,          # H/3 = 111,772 yr (prediction, mirror-pair with Earth)
+    "Uranus":  H / 2,          # H/2 = 167,659 yr (prediction, tentative)
     "Neptune": None,           # N/A — frozen at ~28°
 }
 

@@ -5,9 +5,9 @@ This document describes all data export, report generation, and validation syste
 **Last Updated:** March 2026
 
 **Related Documents:**
-- [21 - Planet Inspector Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
-- [22 - UI Panels Reference](50-ui-panels-reference.md) - Panel system overview
-- [11 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculations used in exports
+- [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Planet inspector panel and where planet reports are displayed
+- [50 - UI Panels Reference](50-ui-panels-reference.md) - Panel system overview
+- [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculations used in exports
 
 ---
 
@@ -679,5 +679,5 @@ Reports compare against these reference sources:
 
 ---
 
-**Previous**: [22 - UI Panels Reference](50-ui-panels-reference.md)
-**Next**: [26 - Fibonacci Laws](10-fibonacci-laws.md)
+**Previous**: [50 - UI Panels Reference](50-ui-panels-reference.md)
+**Next**: [10 - Fibonacci Laws](10-fibonacci-laws.md)

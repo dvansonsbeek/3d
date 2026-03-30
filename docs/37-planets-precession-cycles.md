@@ -63,14 +63,14 @@ precession hierarchy.
 
 | Planet | Baseline ("/cy) | Period (yr) | H Ratio | H-predicted period | Error |
 |--------|----------------|-------------|---------|-------------------|-------|
-| Mercury | +531.9 | 243,642 | H × 8/11 | 243,642 yr | — |
-| Venus | +193.4 | 670,016 | H × 2 | 670,016 yr | — |
-| Earth | +1,160.6 | 111,772 | H/3 | 111,772 yr | — |
-| Mars | +1,676.4 | 77,381 | H × 3/13 | 77,381 yr | — |
-| Jupiter | +1,934.3 | 67,063 | H/5 | 67,063 yr | — |
-| Saturn | −3,094.9 | 41,915 (r) | H/8 | 41,915 yr | — |
-| Uranus | +1,160.6 | 111,772 | H/3 | 111,772 yr | — |
-| Neptune | +193.4 | 670,016 | H × 2 | 670,016 yr | — |
+| Mercury | +531.4 | 243,867 | H × 8/11 | 243,867 yr | — |
+| Venus | +193.3 | 670,634 | H × 2 | 670,634 yr | — |
+| Earth | +1,159.5 | 111,772 | H/3 | 111,772 yr | — |
+| Mars | +1,674.8 | 77,381 | H × 3/13 | 77,381 yr | — |
+| Jupiter | +1,932.5 | 67,063 | H/5 | 67,063 yr | — |
+| Saturn | −3,092.0 | 41,915 (r) | H/8 | 41,915 yr | — |
+| Uranus | +1,159.5 | 111,772 | H/3 | 111,772 yr | — |
+| Neptune | +193.3 | 670,634 | H × 2 | 670,634 yr | — |
 
 Source: WebGeoCalc analysis of long-term perihelion longitude evolution.
 
@@ -191,7 +191,7 @@ is not a Fibonacci number, suggesting either:
 - **Axial precession**: Konopliv et al. 2020, "Detection of the Chandler Wobble
   of Mars From Orbiting Spacecraft", *Geophysical Research Letters* — rate
   7604 ± 6 mas/yr from InSight + 3 landers spanning 1976–2019.
-- **Perihelion longitude**: WebGeoCalc long-term analysis — dϖ/dt ≈ +1676.4"/cy
+- **Perihelion longitude**: WebGeoCalc long-term analysis — dϖ/dt ≈ +1674.8"/cy
   → 77,381 yr = 3H/13 (exact match).
 - **Eigenfrequencies**: g₄ = 17.916"/yr (apsidal), s₄ = -17.755"/yr (nodal) —
   differ by only 0.9%, supporting the model's single-rate assumption.
@@ -236,7 +236,7 @@ Current H-based fits used in the simulation:
 
 | Planet | Constant | Formula | Period | Direction | Observed | Source |
 |--------|----------|---------|--------|-----------|----------|--------|
-| Mercury | `mercuryAxialPrecessionYears` | `-mercuryPerihelionEclipticYears` | 243,642 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006 |
+| Mercury | `mercuryAxialPrecessionYears` | `-mercuryPerihelionEclipticYears` | 243,867 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006 |
 | Venus | `venusAxialPrecessionYears` | `H×3/34` (F4/F9) | 29,560 yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
 | Mars | `marsAxialPrecessionYears` | `-H/2` | 167,659 yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
 | Jupiter | `jupiterAxialPrecessionYears` | `-H×3/8` (F4/F6) | 125,744 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
@@ -273,14 +273,14 @@ The wobble is the **meeting frequency** of these two motions:
 
 | Planet | Perihelion Ecliptic | H expr | → Perihelion (ICRF) | H expr | Dir |
 |--------|--------------------|---------|--------------------|--------|-----|
-| Mercury | 243,642 yr | H×8/11 | −28,818 yr | −8H/93 | retro |
-| Venus | 670,016 yr | H×2 | −26,801 yr | −2H/25 | retro |
+| Mercury | 243,867 yr | H×8/11 | −28,844 yr | −8H/93 | retro |
+| Venus | 670,634 yr | H×2 | −26,825 yr | −2H/25 | retro |
 | Earth | 20,957 yr | H/16 | +111,772 yr | +H/3 | **pro** |
 | Mars | 77,381 yr | 3H/13 | −38,690 yr | −3H/26 | retro |
 | Jupiter | 67,063 yr | H/5 | −41,915 yr | −H/8 | retro |
 | Saturn | −41,915 yr (r) | −H/8 | −15,967 yr | −H/21 | retro |
 | Uranus | 111,772 yr | H/3 | −33,532 yr | −H/10 | retro |
-| Neptune | 670,016 yr | H×2 | −26,801 yr | −2H/25 | retro |
+| Neptune | 670,634 yr | H×2 | −26,825 yr | −2H/25 | retro |
 
 Notable ICRF patterns: Jupiter = **H/8** (F6), Saturn = **H/21** (F8).
 Earth is the only planet with prograde perihelion ICRF.
@@ -289,7 +289,7 @@ Earth is the only planet with prograde perihelion ICRF.
 
 | Planet | Period | H expression | Direction |
 |--------|--------|-------------|-----------|
-| Mercury | 243,642 yr | −H×8/11 | Retrograde (Cassini) |
+| Mercury | 243,867 yr | −H×8/11 | Retrograde (Cassini) |
 | Venus | 29,560 yr | +H×3/34 | Prograde (obliq 177°) |
 | Earth | 25,794 yr | −H/13 | Retrograde |
 | Mars | 167,659 yr | −H/2 | Retrograde |
@@ -309,7 +309,7 @@ Earth is the only planet with prograde perihelion ICRF.
 | Jupiter | retro | retro | same: \|diff\| | 16/(3H) | 62,814 yr | **3H/16** |
 | Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,544 yr | 4H/81 |
 | Uranus | pro | retro | opp: sum | ≈10/H | 33,532 yr | ≈H/10 |
-| Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,801 yr | ≈2H/25 |
+| Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
 
 Calculation detail:
 - **Mercury**: |11/(8H) − 93/(8H)| = 82/(8H) = 41/(4H)

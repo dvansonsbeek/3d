@@ -5,9 +5,9 @@ This document describes the astronomical verification data embedded in the simul
 **Last Updated:** January 2026
 
 **Related Documents:**
-- [24 - Analysis & Export Tools](52-analysis-export-tools.md) - Planet report generation and data export
-- [21 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
-- [10 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
+- [52 - Analysis & Export Tools](52-analysis-export-tools.md) - Planet report generation and data export
+- [51 - Planet Inspector Reference](51-planet-inspector-reference.md) - Where reports are displayed
+- [20 - Constants Reference](20-constants-reference.md) - Orbital constants and sources
 
 ---
 
@@ -300,5 +300,5 @@ To add new verification entries:
 
 ---
 
-**Previous**: [06 - Scene Graph Hierarchy](41-scene-graph-hierarchy.md)
-**Next**: [10 - Constants Reference](20-constants-reference.md)
+**Previous**: [41 - Scene Graph Hierarchy](41-scene-graph-hierarchy.md)
+**Next**: [20 - Constants Reference](20-constants-reference.md)

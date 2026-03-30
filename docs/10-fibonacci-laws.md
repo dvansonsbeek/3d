@@ -635,7 +635,7 @@ obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
 
 where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is the H/13 axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude.
 
-The Fibonacci prediction (0.635185°) represents the theoretical long-term value from the balance condition, while the model value is calibrated to the currently observed obliquity rate. The difference is within the model's tolerance.
+The Fibonacci prediction (~0.632°) represents the theoretical long-term value from the balance condition, while the model value is calibrated to the currently observed obliquity rate. The difference is within the model's tolerance.
 
 ---
 
@@ -852,9 +852,9 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 
 | Document | Purpose |
 |----------|---------|
-| [10 - Constants Reference](20-constants-reference.md) | All constants and values |
-| [15 - Inclination Calculations](32-inclination-calculations.md) | Inclination oscillation implementation |
-| [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
+| [20 - Constants Reference](20-constants-reference.md) | All constants and values |
+| [32 - Inclination Calculations](32-inclination-calculations.md) | Inclination oscillation implementation |
+| [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
 | [Balance Search](../tools/verify/balance-search.js) | Exhaustive Fibonacci divisor search |
@@ -865,4 +865,4 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 
 ---
 
-**Previous**: [25 - Ascending Node Calculations Limitations](70-ascending-node-limitations.md)
+**Previous**: [70 - Ascending Node Calculations Limitations](70-ascending-node-limitations.md)

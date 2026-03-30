@@ -4558,12 +4558,12 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Obliquity = |inclination − ecliptic| where inclination ≈ perihelion ecliptic.
 // Confirmed for Mercury (0.2%), Earth (2%), Mars (0.7%). See docs/37 §Obliquity Cycle Theory.
 // Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle (consistent with observations).
-const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 893,355 yr (observed ~895 kyr, Bills 2005)
+const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (observed ~895 kyr, Bills 2005)
 const venusObliquityCycle   = null;                          // N/A — tidally damped at 177°
-const marsObliquityCycle    = 3 * holisticyearLength / 8;    // 3H/8 = 125,628 yr (observed ~124,800 yr)
-const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,504 yr (prediction, = Mars axial)
-const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,669 yr (prediction, mirror-pair with Earth)
-const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,504 yr (prediction, tentative)
+const marsObliquityCycle    = 3 * holisticyearLength / 8;    // 3H/8 = 125,744 yr (observed ~124,800 yr)
+const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,659 yr (prediction, = Mars axial)
+const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
+const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,659 yr (prediction, tentative)
 const neptuneObliquityCycle = null;                          // N/A — frozen at ~28°
 
 const mercuryWobbleCenter = {
@@ -40720,7 +40720,7 @@ function evalYearFourier(currentYear, mean, harmonics) {
  * Compute the length of the tropical (solar) year (in days) using Fourier harmonics.
  *
  * Fitted from 491 data points spanning ±25,000 years. Dominant periods: H/8 (obliquity
- * cycle, 41,876 yr) and H/3 (inclination cycle, 111,669 yr). RMS residual: 0.003 s.
+ * cycle, 41,915 yr) and H/3 (inclination cycle, 111,772 yr). RMS residual: 0.003 s.
  *
  * @param {number} currentYear – the calendar year
  * @returns {number} lengthofsolarYear (in days)

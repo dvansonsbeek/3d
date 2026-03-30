@@ -266,7 +266,7 @@ Mars's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×3/13 (~77,310 years) |
+| **Perihelion period** | H×3/13 (~77,381 years) |
 | **Eccentricity** | 0.09339 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.03 arcsec/century |
@@ -454,7 +454,7 @@ Neptune's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×2 (~670,016 years) |
+| **Perihelion period** | H×2 (~670,634 years) |
 | **Eccentricity** | 0.00859 (nearly circular) |
 | **Formula R²** | **0.999999** |
 | **RMSE** | 0.02 arcsec/century |
@@ -502,11 +502,11 @@ At year 2000, these terms combine to give approximately **+38.8 arcsec/century**
 The geometric coefficients scale with Mercury's orbital properties:
 
 ```
-A = Baseline × e_Mercury = 531.9 × 0.20564 ≈ 110 arcsec/century
+A = Baseline × e_Mercury = 531.4 × 0.20564 ≈ 109 arcsec/century
 ```
 
 Where:
-- **Baseline** = 531.9 arcsec/century (Mercury's Newtonian precession rate = 1,296,000″ ÷ (H×8/11) × 100)
+- **Baseline** = 531.4 arcsec/century (Mercury's Newtonian precession rate = 1,296,000″ ÷ (H×8/11) × 100)
 - **e_Mercury** = 0.20564 (Mercury's orbital eccentricity)
 
 The actual coefficients in the formula are optimized jointly with ERD terms, resulting in values that differ from simple geometric predictions. The dominant cos(2θM) and eccentricity coupling terms reflect the complex interplay between geometric effects and Earth Rate Deviation.
@@ -810,13 +810,13 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 
 | Planet | Period | H-expression | Status |
 |--------|--------|-------------|--------|
-| Mercury | 893,355 yr | 8H/3 | Confirmed (0.2% vs ~895 kyr, Bills 2005) |
+| Mercury | 894,179 yr | 8H/3 | Confirmed (0.1% vs ~895 kyr, Bills 2005) |
 | Venus | N/A | — | Tidally damped at 177° |
 | Earth | 41,915 yr | H/8 | Confirmed (2% vs ~41 kyr) |
-| Mars | 125,628 yr | 3H/8 | Confirmed (0.7% vs ~124,800 yr, Laskar 2004) |
-| Jupiter | 167,504 yr | H/2 | Prediction |
+| Mars | 125,744 yr | 3H/8 | Confirmed (0.8% vs ~124,800 yr, Laskar 2004) |
+| Jupiter | 167,659 yr | H/2 | Prediction |
 | Saturn | 111,772 yr | H/3 | Prediction (mirror-pair with Earth) |
-| Uranus | 167,504 yr | H/2 | Prediction (tentative) |
+| Uranus | 167,659 yr | H/2 | Prediction (tentative) |
 | Neptune | N/A | — | Frozen at ~28° |
 
 **Implementation:** `calc_planet_obliquity()` in [predictive_formula.py](../tools/lib/python/predictive_formula.py), `computePlanetObliquity()` in script.js and [orbital-engine.js](../tools/lib/orbital-engine.js).

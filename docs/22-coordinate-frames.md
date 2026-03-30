@@ -5,9 +5,9 @@ This document describes the coordinate reference frames and transformations used
 **Last Updated:** January 2026
 
 **Related Documents:**
-- [11 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculation functions
-- [16 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculations
-- [14 - Ascending Node Calculations](31-ascending-node-calculations.md) - Node precession
+- [21 - Orbital Formulas Reference](21-orbital-formulas-reference.md) - Calculation functions
+- [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height calculations
+- [31 - Ascending Node Calculations](31-ascending-node-calculations.md) - Node precession
 
 ---
 
@@ -389,5 +389,5 @@ const _liveDataTiltMatrix = new THREE.Matrix4();
 
 ---
 
-**Previous**: [18 - J2000 Calibration](34-j2000-calibration.md)
-**Next**: [20 - Architecture](40-architecture.md)
+**Previous**: [34 - J2000 Calibration](34-j2000-calibration.md)
+**Next**: [40 - Architecture](40-architecture.md)

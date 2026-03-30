@@ -22,9 +22,9 @@ This document describes the three methods used to calculate perihelion longitude
 | Metric | Mercury Example |
 |--------|-----------------|
 | Current rate (year 2000) | ~570 arcsec/century |
-| Long-term average | ~532 arcsec/century |
+| Long-term average | ~531 arcsec/century |
 | Fluctuation range | ±100 arcsec/century |
-| Fluctuation period | ~6,500 years |
+| Fluctuation period | ~7,450 years |
 
 ### Method 2: Ecliptic-Frame (J2000 Ecliptic)
 
@@ -39,7 +39,7 @@ This document describes the three methods used to calculate perihelion longitude
 
 | Metric | Mercury Example |
 |--------|-----------------|
-| Rate | Exactly 531.9 arcsec/century |
+| Rate | Exactly 531.4 arcsec/century |
 | Fluctuation | None |
 | Starting longitude (J2000) | 77.46° |
 
@@ -213,16 +213,16 @@ Analysis of Mercury's perihelion precession over ~49,000 years revealed:
 
 | Metric | Value |
 |--------|-------|
-| Mean rate | 531.9 arcsec/century |
+| Mean rate | 531.4 arcsec/century |
 | Minimum rate | 427 arcsec/century |
 | Maximum rate | 710 arcsec/century |
 | Range | 283 arcsec/century |
 | Fluctuation | ±50% of mean |
-| Dominant period | ~6,500 years |
+| Dominant period | ~7,450 years |
 
 ### Root Cause
 
-The ~6,500 year period corresponds to `H / 45`, which is a harmonic interaction between:
+The ~7,450 year period corresponds to `H / 45`, which is a harmonic interaction between:
 
 1. **Earth's Inclination Precession**: Period = H/3
 2. **Earth's Ecliptic Precession**: Period = H/5
@@ -232,9 +232,9 @@ The beat frequency between these two precession cycles:
 ```
 1/(1/3 - 1/5) = 1/(2/15) = 15/2 = 7.5
 
-H / 7.5 (fundamental beat)
+H / 7.5 = ~44,709 years (fundamental beat)
 
-Further harmonics divide this, producing the ~6,500 year observed period.
+The 6th harmonic of this: H / 45 = ~7,451 years — the dominant observed period.
 ```
 
 ### Scene Hierarchy Effect
@@ -283,7 +283,7 @@ General Relativity explained the additional 43 arcsec/century as a consequence o
 
 | Effect | Rate | Nature |
 |--------|------|--------|
-| This model's configured precession | 532 arcsec/century | Newtonian mechanics |
+| This model's configured precession | 531.4 arcsec/century | Newtonian mechanics |
 | Earth-frame fluctuation | ±100 arcsec/century | Reference frame artifact (averages to zero) |
 | Relativistic correction | +43 arcsec/century | Real physical effect (not in this model) |
 
@@ -291,7 +291,7 @@ General Relativity explained the additional 43 arcsec/century as a consequence o
 - The Earth-frame fluctuations shown in this model are **coordinate artifacts** that average out over time
 - The relativistic 43 arcsec/century is a **real physical effect** that accumulates continuously and never averages out
 
-The Earth-frame showing ~575 arcsec/century currently might be coincidental - we happen to be at a high point in the ~6,500 year fluctuation cycle. This is NOT the same as the relativistic anomaly.
+The Earth-frame showing ~575 arcsec/century currently might be coincidental - we happen to be at a high point in the ~7,450 year fluctuation cycle. This is NOT the same as the relativistic anomaly.
 
 ---
 

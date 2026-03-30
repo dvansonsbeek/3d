@@ -14,11 +14,17 @@ inputmeanlengthsolaryearindays = 365.2422
   │ meanAnomalisticYear = meanSolarYear × H / (H − 16) │  Anomalistic year mean
   └─────────────────────────────────────────────────────┘
         │
-        ▼  + Fourier harmonics (fitted coefficients)
-  ┌─────────────────────────────────────────────────────┐
-  │ Y(t) = mean + Σ [sᵢ·sin(2πt/Tᵢ) + cᵢ·cos(2πt/Tᵢ)]│
-  │ where t = year − balancedYear                       │
-  └─────────────────────────────────────────────────────┘
+        ├──► Tropical year (runtime):
+        │    Mean of 4 cardinal point derivatives
+        │    (CARDINAL_POINT_HARMONICS, 24 terms per type)
+        │    Measured at solstices (max/min dec) and
+        │    equinoxes (dec=0 crossing)
+        │
+        ├──► Sidereal year: Fourier harmonics (5 terms)
+        │    Y(t) = mean + Σ [sᵢ·sin(2πt/Tᵢ) + cᵢ·cos(2πt/Tᵢ)]
+        │
+        └──► Anomalistic year: Fourier harmonics (8 terms)
+             where t = year − balancedYear
         │
         ▼  Derived quantities
   ┌─────────────────────────────────────────────────────┐
@@ -137,7 +143,7 @@ siderealDay = solarYearSec / (solarYearSec / 86400 + 1)
 | Quantity | Model value | IAU reference |
 |----------|-------------|---------------|
 | Mean solar day | 86400.000 s | 86400.000 s |
-| Sidereal day | 86164.090 s | 86164.091 s |
+| Sidereal day | 86164.091 s | 86164.091 s |
 | Stellar day | 86164.099 s | 86164.099 s |
 
 
@@ -147,7 +153,7 @@ All precession periods emerge from ratios of year lengths:
 
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
-| Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ 25,793 yr |
+| Axial | `Y_sid / (Y_sid − Y_trop)` | H/13 ≈ 25,794 yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | H/16 ≈ 20,957 yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | H/3 ≈ 111,772 yr |
 | Obliquity | axial × 13/8 | H/8 ≈ 41,915 yr |
@@ -173,9 +179,9 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal year | 365.256363 days | 365.256363 days |
 | Anomalistic year | 365.259633 days | 365.259636 days |
 | Mean solar day | 86400.000 s | 86400.000 s |
-| Sidereal day | 86164.090 s | 86164.091 s |
+| Sidereal day | 86164.091 s | 86164.091 s |
 | Stellar day | 86164.099 s | 86164.099 s |
-| Axial precession | H/13 = 25,794 yr | 25,771 yr (instantaneous J2000 rate) |
+| Axial precession | 25,771 yr | 25,771 yr (instantaneous J2000 rate) |
 
 
 ## Physical Insights
@@ -188,16 +194,16 @@ The coin rotation paradox manifests at every timescale:
 | Sidereal | H/8 + H/3 (tiny) | Measures full orbit — nearly constant, with only tiny perturbations from planetary gravitational interactions |
 | Anomalistic | H/24 (beat freq) | Measures perihelion-to-perihelion — sensitive to the interplay between inclination and obliquity cycles |
 
-### Cardinal Point Tropical Year Variation
+### Cardinal Point Tropical Year Variation (J2000)
 
-The tropical year length depends on *which* cardinal point is used to measure it. At the current epoch (perihelion in early January):
+The tropical year length depends on *which* cardinal point is used to measure it. At J2000 (perihelion in early January):
 
 | Cardinal point | Year length | Relative to mean | Reason |
 |----------------|-------------|-------------------|--------|
-| Summer Solstice | 365.241617 days | −49 s (shortest) | Aphelion nearby → fast orbital speed |
-| Vernal Equinox | 365.242336 days | +13 s | Transition |
-| Autumnal Equinox | 365.242056 days | −12 s | Transition |
-| Winter Solstice | 365.242750 days | +48 s (longest) | Perihelion nearby → slow orbital speed |
+| Summer Solstice | 365.241617 days | −51 s (shortest) | Aphelion nearby → fast orbital speed |
+| Vernal Equinox | 365.242336 days | +12 s | Transition |
+| Autumnal Equinox | 365.242056 days | −13 s | Transition |
+| Winter Solstice | 365.242749 days | +47 s (longest) | Perihelion nearby → slow orbital speed |
 
 This pattern reverses when perihelion precesses to July. The *mean* of all four cardinal points cancels this effect and gives the true mean tropical year.
 
