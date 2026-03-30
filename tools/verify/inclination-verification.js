@@ -67,8 +67,8 @@ const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estima
 
 const currentCodeValues = {
   mercury: {
-    mean: 6.726620,
-    amplitude: 0.384621,
+    mean: 6.726271,
+    amplitude: 0.384267,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 32.83,
     period: holisticyearLength / (1 + 3/8),  // ~243,867 years
@@ -76,8 +76,8 @@ const currentCodeValues = {
     jplTrend: mercuryEclipticInclinationTrendJPL
   },
   venus: {
-    mean: 2.207361,
-    amplitude: 0.061866,
+    mean: 2.207312,
+    amplitude: 0.061809,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 54.70,
     period: holisticyearLength * 2,  // 670,634 years
@@ -85,8 +85,8 @@ const currentCodeValues = {
     jplTrend: venusEclipticInclinationTrendJPL
   },
   mars: {
-    mean: 2.649893,
-    amplitude: 1.158626,
+    mean: 2.648955,
+    amplitude: 1.157559,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 354.87,
     period: holisticyearLength / (4 + 1/3),  // ~77,381 years
@@ -94,8 +94,8 @@ const currentCodeValues = {
     jplTrend: marsEclipticInclinationTrendJPL
   },
   jupiter: {
-    mean: 0.329100,
-    amplitude: 0.021301,
+    mean: 0.329094,
+    amplitude: 0.021281,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 312.89,
     period: holisticyearLength / 5,  // 67,063 years
@@ -103,8 +103,8 @@ const currentCodeValues = {
     jplTrend: jupiterEclipticInclinationTrendJPL
   },
   saturn: {
-    mean: 0.931678,
-    amplitude: 0.064879,
+    mean: 0.931672,
+    amplitude: 0.064819,
     phaseAngle: 23.3195,       // 23° balance group (retrograde)
     omegaJ2000: 118.81,
     period: -holisticyearLength / 8,  // -41,915 years (retrograde)
@@ -112,8 +112,8 @@ const currentCodeValues = {
     jplTrend: saturnEclipticInclinationTrendJPL
   },
   uranus: {
-    mean: 1.000600,
-    amplitude: 0.023716,
+    mean: 1.000594,
+    amplitude: 0.023695,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 307.80,
     period: holisticyearLength / 3,  // 111,772 years
@@ -121,8 +121,8 @@ const currentCodeValues = {
     jplTrend: uranusEclipticInclinationTrendJPL
   },
   neptune: {
-    mean: 0.722190,
-    amplitude: 0.013486,
+    mean: 0.722202,
+    amplitude: 0.013474,
     phaseAngle: 203.3195,      // 203° balance group
     omegaJ2000: 192.04,
     period: holisticyearLength * 2,  // 670,634 years
