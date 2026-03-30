@@ -4,7 +4,7 @@
 
 The planetary eccentricities are determined by a balance scale — not by individual per-planet formulas, but by a system of simultaneous relationships that constrains all 8 eccentricities at once, analogous to how Kepler's T² = a³ relates all periods to distances through a single principle.
 
-The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = 0.015372 vs J2000 = 0.016710).
+The eccentricities used in this balance are the **base eccentricities** — the long-term mean values around which each planet's eccentricity oscillates over its eccentricity cycle. These differ slightly from the J2000 measured values (e.g., Earth's base = 0.015386 vs J2000 = 0.016710).
 
 The balance equation (Law 5) can be expressed as a physical scale:
 
@@ -164,9 +164,9 @@ While eccentricity base values are determined by the balance system (no single f
 e_amp = K × sin(tilt) × √d / (√m × a^1.5)
 ```
 
-K = 3.4505 × 10⁻⁶ — derived from Earth's mean parameters (obliquity = 23.41357°, eccentricity amplitude = 0.00137032). This is the eccentricity analog of the ψ-constant for inclination amplitudes.
+K = 3.4505 × 10⁻⁶ — derived from Earth's mean parameters (obliquity = 23.41354°, eccentricity amplitude = 0.001356). This is the eccentricity analog of the ψ-constant for inclination amplitudes.
 
-Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). For Earth this cycle is ~20,938 years; other planets have their own cycle periods. At any given time:
+Each planet's eccentricity oscillates around its base value over an **eccentricity cycle** (the meeting frequency of axial and perihelion precession in ICRF). For Earth this cycle is ~20,957 years; other planets have their own cycle periods. At any given time:
 
 ```
 e(t) = √(e_base² + e_amp²) + (-e_amp - h₁·cos θ)·cos θ

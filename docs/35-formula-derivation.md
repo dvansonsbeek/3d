@@ -46,10 +46,10 @@ This section documents the timescale hierarchy that forms Law 1 of the Fibonacci
 
 | Fibonacci | H/F | Period (years) | Astronomical Meaning |
 |-----------|-----|----------------|---------------------|
-| 3 | H/3 | **111,669** | Earth true perihelion precession |
-| 5 | H/5 | **67,002** | Jupiter perihelion precession |
-| 8 | H/8 | **41,876** | Saturn perihelion precession |
-| 13 | H/13 | **25,770** | Axial precession |
+| 3 | H/3 | **111,772** | Earth true perihelion precession |
+| 5 | H/5 | **67,063** | Jupiter perihelion precession |
+| 8 | H/8 | **41,915** | Saturn perihelion precession |
+| 13 | H/13 | **25,794** | Axial precession |
 | 21 | H/21 | **15,953** | Saturn + Axial beat frequency |
 | 34 | H/34 | **9,853** | Earth + Saturn beat frequency |
 | 55 | H/55 | **6,091** | Higher-order resonance |
@@ -305,7 +305,7 @@ Jupiter's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/5 (~67,002 years) |
+| **Perihelion period** | H/5 (~67,063 years) |
 | **Eccentricity** | 0.04839 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.06 arcsec/century |
@@ -344,7 +344,7 @@ Saturn's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/8 (~41,876 years) — **ECLIPTIC-RETROGRADE** |
+| **Perihelion period** | H/8 (~41,915 years) — **ECLIPTIC-RETROGRADE** |
 | **Eccentricity** | 0.05386 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.05 arcsec/century |
@@ -418,7 +418,7 @@ Uranus's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/3 (~111,669 years) |
+| **Perihelion period** | H/3 (~111,772 years) |
 | **Eccentricity** | 0.04726 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.01 arcsec/century |
@@ -812,10 +812,10 @@ where `inclination(t)` is the dynamic invariable-plane inclination from `calc_pl
 |--------|--------|-------------|--------|
 | Mercury | 893,355 yr | 8H/3 | Confirmed (0.2% vs ~895 kyr, Bills 2005) |
 | Venus | N/A | — | Tidally damped at 177° |
-| Earth | 41,876 yr | H/8 | Confirmed (2% vs ~41 kyr) |
+| Earth | 41,915 yr | H/8 | Confirmed (2% vs ~41 kyr) |
 | Mars | 125,628 yr | 3H/8 | Confirmed (0.7% vs ~124,800 yr, Laskar 2004) |
 | Jupiter | 167,504 yr | H/2 | Prediction |
-| Saturn | 111,669 yr | H/3 | Prediction (mirror-pair with Earth) |
+| Saturn | 111,772 yr | H/3 | Prediction (mirror-pair with Earth) |
 | Uranus | 167,504 yr | H/2 | Prediction (tentative) |
 | Neptune | N/A | — | Frozen at ~28° |
 

@@ -1332,7 +1332,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 **Step 2 results — Sun optimization (updated for H=335,317, derived EoC constants):**
 - Constants changed:
-  - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007747
+  - `eocEccentricity`: now **derived** as `eccentricityDerivedMean - eccentricityBase/2` = 0.007753
   - `perihelionPhaseOffset`: was hardcoded 2°, now **derived** from EP1 precession phase + correctionSun + perihelion date = ~0.51°
   - `correctionSun`: 0.5292 (optimized for Sun RA across 26 JPL reference points 2000-2025, validated across 1600-2200)
   - `earthRAAngle`: 1.282779 (re-tuned for solstice timing alignment after correctionSun change)
@@ -1371,7 +1371,7 @@ The remaining steps were executed as a systematic campaign covering:
 
 All 9 targets within 0.22°. Seven under 0.06°. Average improvement: 98%.
 
-> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.495997 (earthRAAngle is now derived: 2A − A²/ε ≈ 1.25365). Parallax tiers were expanded to 42p for Mercury/Venus/Jupiter, 36p for Saturn, and 24p for Uranus/Neptune. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
+> **Note**: The Sun improved from 0.065° to 0.003° after the IAU precession frame correction was applied (see §8.5). correctionSun was subsequently retuned to 0.49552 (earthRAAngle is now derived: 2A − A²/ε ≈ 1.25478). Parallax tiers were expanded to 42p for Mercury/Venus/Jupiter, 36p for Saturn, and 24p for Uranus/Neptune. Reference data spans ~1800–2200 for most planets. See `docs/67-planet-parallax-corrections.md` for current details.
 
 ### 8.5 JPL Reference Frame Limitation — Critical Finding
 

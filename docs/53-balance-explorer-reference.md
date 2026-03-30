@@ -216,7 +216,7 @@ amplitude = ψ / (3 × √m_Earth)
           = 0.632976°
 ```
 
-The model's calibrated value (0.635970°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
+The model's calibrated value (0.63603°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
 
 ---
 

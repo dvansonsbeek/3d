@@ -94,7 +94,7 @@ amplitude of this fluctuation is:
 where K = 3.450537e-6, derived from Earth:
 
     K = e_amp_Earth * sqrt(m_Earth) * a_Earth^(3/2) / (sin(tilt_Earth) * sqrt(d_Earth))
-    K = 0.00137032 * sqrt(3.00352e-6) * 1.0 / (sin(23.41357 deg) * sqrt(3))
+    K = 0.001356 * sqrt(3.00352e-6) * 1.0 / (sin(23.41354 deg) * sqrt(3))
     K = 3.450537e-6
 
 ### Key Property: Law 5 Weight Change
@@ -117,7 +117,7 @@ mass or position.
 |---------|------------|---------------|-----------------|-------------------|
 | Mercury |   0.03     | 8.437e-5      | 0.041%          | Negligible        |
 | Venus   |   2.6392   | 9.625e-4      | 14.204%         | Negligible (tiny v) |
-| Earth   |  23.41357  | 1.370e-3      | 8.200%          | 0.05% of total    |
+| Earth   |  23.41354  | 1.370e-3      | 8.200%          | 0.05% of total    |
 | Mars    |  25.19     | 3.074e-3      | 3.291%          | 0.14% of total    |
 | Jupiter |   3.13     | 1.150e-6      | 0.002%          | Negligible        |
 | Saturn  |  26.73     | 5.403e-6      | 0.010%          | Negligible        |
@@ -130,22 +130,22 @@ The following chain describes what happens for each planet:
 
 **Step 1 — Fixed orbital eccentricity (base value).**
 Each planet's orbit has a fixed offset between its geometric center and the Sun.
-For Earth this offset is eccentricityBase = 0.015372 AU. This base eccentricity
+For Earth this offset is eccentricityBase = 0.015386 AU. This base eccentricity
 does not change over time. Only the direction of the perihelion precesses — the
 perihelion point rotates around the Sun, but its distance remains the same.
 
 **Step 2 — Mean axial tilt.**
-Each planet has a mean axial obliquity. For Earth this is 23.41357 deg.
+Each planet has a mean axial obliquity. For Earth this is 23.41354 deg.
 
 **Step 3 — Axial tilt oscillation.**
 The axial tilt fluctuates over time with a period equal to the obliquity cycle.
 The amplitude of this oscillation equals the inclination amplitude (see Step 4).
-For Earth: amplitude = 0.635970 deg.
+For Earth: amplitude = 0.63603 deg.
 
 **Step 4 — Inclination oscillation.**
 The inclination to the invariable plane fluctuates with a period equal to the
 inclination precession cycle. The amplitude equals the axial tilt amplitude:
-i_amplitude = PSI / (d * sqrt(m)). For Earth: amplitude = 0.635970 deg.
+i_amplitude = PSI / (d * sqrt(m)). For Earth: amplitude = 0.63603 deg.
 
 **Step 5 — Eccentricity fluctuation from combined effect.**
 Because the axial tilt oscillation and the inclination oscillation operate at
@@ -153,7 +153,7 @@ DIFFERENT periods, their combined effect produces a real eccentricity fluctuatio
 at the planet's eccentricity cycle — the meeting frequency where axial precession
 meets inclination precession. Each planet has its own eccentricity cycle (see
 Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentricity
-cycle is H/16 = 20,938 years, resulting in an amplitude of 0.00137032 AU.
+cycle is H/16 = 20,957 years, resulting in an amplitude of 0.001356 AU.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
 The mean perihelion distances (base eccentricities) achieve 100% Law 5 balance.
@@ -187,7 +187,7 @@ and therefore the most significant eccentricity oscillations.
 
 **Derivation of base eccentricities:**
 
-- **Earth**: eccentricityBase = 0.015372 (tuned parameter in the model)
+- **Earth**: eccentricityBase = 0.015386 (tuned parameter in the model)
 - **Saturn**: 0.05374486 (Law 5 prediction, locked as sole 23° group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
 - **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
@@ -208,7 +208,7 @@ The following base eccentricities achieve 100.0000000000% Law 5 balance:
 |---------|---------------|---------------|---------------|------------------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
 | Venus   | 0.00619052    | 0.00677672    | -8.650%       | Cosine fit to JPL data |
-| Earth   | 0.01537200    | 0.01671022    | -8.008%       | eccentricityBase       |
+| Earth   | 0.01538600    | 0.01671022    | -8.008%       | eccentricityBase       |
 | Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
 | Jupiter | 0.04821478    | 0.04838624    | -0.354%       | Dual-balanced          |
 | Saturn  | 0.05374486    | 0.05386179    | -0.217%       | Law 5 prediction       |
@@ -277,7 +277,7 @@ Laplace-Lagrange secular exchange, not the tilt mechanism (see Section 10).
 |---------|-----------------|------------------|-------------------|------------------|
 | Mercury |  6.726620       | 0.384621         | 6.3472858         | 6.34 to 7.11    |
 | Venus   |  2.207361       | 0.061866         | 2.1545441         | 2.15 to 2.27    |
-| Earth   |  1.481179       | 0.635970         | (computed)        | 0.85 to 2.12    |
+| Earth   |  1.48128       | 0.63603         | (computed)        | 0.85 to 2.12    |
 | Mars    |  2.649893       | 1.158626         | 1.6311858         | 1.49 to 3.81    |
 | Jupiter |  0.329100       | 0.021301         | 0.3219652         | 0.31 to 0.35    |
 | Saturn  |  0.931678       | 0.064879         | 0.9254704         | 0.87 to 1.00    |
@@ -294,7 +294,7 @@ Inclination amplitudes are derived from the PSI formula:
 |---------|-----|----------------|----------------------|------------------|-------|
 | Mercury |  21 | 4.0744e-4      | 0.384621             | 0.384621         | Yes   |
 | Venus   |  34 | 1.5646e-3      | 0.061866             | 0.061866         | Yes   |
-| Earth   |   3 | 1.7331e-3      | 0.632976             | 0.635970         | ~0.5% |
+| Earth   |   3 | 1.7331e-3      | 0.632976             | 0.63603         | ~0.5% |
 | Mars    |   5 | 5.6808e-4      | 1.158626             | 1.158626         | Yes   |
 | Jupiter |   5 | 3.0900e-2      | 0.021301             | 0.021301         | Yes   |
 | Saturn  |   3 | 1.6908e-2      | 0.064879             | 0.064879         | Yes   |
@@ -302,7 +302,7 @@ Inclination amplitudes are derived from the PSI formula:
 | Neptune |  34 | 7.1772e-3      | 0.013486             | 0.013486         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
-precession rate (0.635970), while the Fibonacci formula predicts 0.632976 (= 0.6329789
+precession rate (0.63603), while the Fibonacci formula predicts 0.632976 (= 0.6329789
 in the code comment). All other planets match exactly.
 
 ### Inclination Balance Result
@@ -338,7 +338,7 @@ For each planet, six parameters fully describe the orbital dynamics:
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
 | Mercury |   0.03     | 0.384621    | 0.20563593    | 8.437e-5      |  6.726620    | 0.384621    |
 | Venus   |   2.6392   | 0.061866    | 0.00619052    | 9.625e-4      |  2.207361    | 0.061866    |
-| Earth   |  23.41357  | 0.635970    | 0.01537200    | 1.370e-3      |  1.481179    | 0.635970    |
+| Earth   |  23.41354  | 0.63603    | 0.01538600    | 1.370e-3      |  1.48128    | 0.63603    |
 | Mars    |  25.19     | 1.158626    | 0.09297543    | 3.074e-3      |  2.649893    | 1.158626    |
 | Jupiter |   3.13     | 0.021301    | 0.04821478    | 1.150e-6      |  0.329100    | 0.021301    |
 | Saturn  |  26.73     | 0.064879    | 0.05374486    | 5.403e-6      |  0.931678    | 0.064879    |
@@ -385,11 +385,11 @@ occurs at each planet's eccentricity cycle (see Section 10).
 |---------|---------------------|----------------------|------------|
 | Mercury | 242,915             | H / (1 + 3/8)       | Prograde   |
 | Venus   | 670,016             | H * 2                | Prograde   |
-| Earth   |  20,938             | H / 16               | Prograde   |
+| Earth   |  20,957             | H / 16               | Prograde   |
 | Mars    |  77,310             | H / (4 + 1/3)       | Prograde   |
-| Jupiter |  67,002             | H / 5                | Prograde   |
-| Saturn  | -41,876             | -H / 8               | Retrograde |
-| Uranus  | 111,669             | H / 3                | Prograde   |
+| Jupiter |  67,063             | H / 5                | Prograde   |
+| Saturn  | -41,915             | -H / 8               | Retrograde |
+| Uranus  | 111,772             | H / 3                | Prograde   |
 | Neptune | 670,016             | H * 2                | Prograde   |
 
 ---
@@ -420,7 +420,7 @@ In code: `computeEccentricityEarth(t, t_ref, T_ecc, e_base, e_amp)` in `src/scri
 Each planet oscillates at its own eccentricity cycle — the meeting frequency of its
 axial precession and perihelion ICRF precession. The eccentricity cycle is computed
 by `calcWobblePeriod(perihelionEclipticYears, axialPrecessionYears)` in
-`src/script.js`. For Earth, this gives H/16 = 20,938 years. Other planets have
+`src/script.js`. For Earth, this gives H/16 = 20,957 years. Other planets have
 different eccentricity cycles (see `docs/37-planets-precession-cycles.md` for the
 full derivation and values).
 
@@ -503,7 +503,7 @@ J2000 (99.9845%) while the amplitude remains negligible.
 | Symbol | Value | Source |
 |--------|-------|--------|
 | K | 3.4505372893e-6 | `eccentricityAmplitudeK` in constants.js |
-| T_wobble (Earth) | 20,938 years | `perihelionCycleLength` in script.js |
+| T_wobble (Earth) | 20,957 years | `perihelionCycleLength` in script.js |
 | T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
 | axial tilt per planet | See Section 8 table | `axialTiltMean` in constants.js |

@@ -44,7 +44,7 @@ and `baseRA` = 90° (SS), 270° (WS), 0° (VE), 180° (AE).
 
 | Component | Value | Source |
 |-----------|-------|--------|
-| Mean RA offset | 1.25363°/sin(23.414°) = 3.155° | earthRAAngle / sin(ε) |
+| Mean RA offset | 1.25478°/sin(23.414°) = 3.155° | earthRAAngle / sin(ε) |
 | Amplitude | 0.636°/sin(23.414°) = 1.600° | A / sin(ε) |
 | Periods | H/3 and H/8 | Fibonacci precession hierarchy |
 
@@ -163,7 +163,7 @@ cardinal point**, which includes the full equation-of-center modulation.
 
 The ~98-second spread between cardinal point year lengths documented in
 [doc 11](11-length-day-year-formulas.md) manifests here as the H/16 amplitude of
-±1.77–1.81 days accumulated over the 20,938-year perihelion precession cycle.
+±1.77–1.81 days accumulated over the 20,957-year perihelion precession cycle.
 
 ---
 
@@ -206,13 +206,13 @@ second-order nonlinear coupling between the precession cycles.
 The variable-speed effect (equation of center) creates a timing shift that rotates
 with perihelion precession. At SS it's sin-dominated, at VE it's cos-dominated,
 at AE it's −cos, at WS it's −sin. This is the perihelion precession "sweeping"
-through the cardinal points over the 20,938-year H/16 cycle.
+through the cardinal points over the 20,957-year H/16 cycle.
 
 ### 4. Obliquity mean is derived from the Pythagorean tilt model
 
 The simple geometric obliquity formula `earthtiltMean − A·cos(H/3) + A·cos(H/8)` has a
-mean of 23.41357° (the time-average of cosines is zero). But the obliquity **actually
-measured at the summer solstice** (max declination) averages 23.45376° — a systematic
+mean of 23.41354° (the time-average of cosines is zero). But the obliquity **actually
+measured at the summer solstice** (max declination) averages 23.45326° — a systematic
 +0.040° (143") offset.
 
 This offset is **physically derived** from the scene graph's 3D geometry. The precession
@@ -229,7 +229,7 @@ obliquityMean = <sqrt((ε + δε)² + (earthRAAngle·cos(φ₁₆))² + (inclMea
 ```
 
 where `<...>` denotes the time-average over one full H. This formula uses only existing
-model parameters and produces 23.45376° — matching the simulation data to **1.4 arcsec**.
+model parameters and produces 23.45326° — matching the simulation data to **1.4 arcsec**.
 
 The `computeObliquityEarth()` function computes this derived mean at startup (no hardcoded
 value), then adds 12 fitted harmonics for the oscillation. Total RMSE: **1.45 arcsec** over
@@ -279,13 +279,13 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 |----------|-------|--------|
 | `CARDINAL_POINT_ANCHORS` | 4 × JD values | Astronomical observation (J2000 cardinal points) |
 | `CARDINAL_POINT_HARMONICS` | 4 × 12 × [div, sin, cos] | Fitted from 11,553 simulation observations per type |
-| `SOLSTICE_OBLIQUITY_MEAN` | 23.45376° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
+| `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
 | `SOLSTICE_OBLIQUITY_HARMONICS` | 12 × [div, sin, cos] | Fitted from 11,553 SS observations |
 | `earthInvPlaneInclinationMean` | 1.48118° | Model parameter (mean orbital plane tilt to invariable plane) |
-| `earthRAAngle` | 1.25363° | Scene graph parameter (perihelion precession tilt) |
-| `earthInvPlaneInclinationAmplitude` | 0.63597° | Model parameter (inclination oscillation) |
-| `earthtiltMean` | 23.41357° | Model parameter (mean obliquity) |
-| `meanSolarYearDays` | 365.24219123 | Derived from H/13 and H |
+| `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
+| `earthInvPlaneInclinationAmplitude` | 0.63603° | Model parameter (inclination oscillation) |
+| `earthtiltMean` | 23.41354° | Model parameter (mean obliquity) |
+| `meanSolarYearDays` | 365.242203646 | Derived from H/13 and H |
 
 ## Related Documents
 

@@ -119,7 +119,7 @@ mathematical identity for the mean of a vector sum where one component is fixed
 and the other rotates. Using the mean ensures the EoC is correct on average
 across all precession phases.
 
-**Numerical value:** `sqrt(0.015372^2 + 0.00137032^2) - 0.015372/2 = 0.007748`
+**Numerical value:** `sqrt(0.015386^2 + 0.001356^2) - 0.015386/2 = 0.007753`
 
 **Previous hardcoded value was 0.0085** -- this overshot the total EoC effect
 by 310 arcsec. The correction was discovered through numerical analysis using
@@ -160,14 +160,14 @@ on its orbit to align cardinal points (solstices/equinoxes) with observed dates.
 
 | Parameter | Value | How determined |
 |-----------|-------|----------------|
-| `eocEccentricity` | 0.007747 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
+| `eocEccentricity` | 0.007753 | **Derived**: `eccentricityDerivedMean - eccentricityBase / 2` |
 | `perihelionPhaseOffset` | ~0.51 deg | **Derived**: from EP1 precession phase + correctionSun + perihelion date |
-| `correctionSun` | 0.495997 | **Tuned**: aligns summer solstice timing + Sun RA |
+| `correctionSun` | 0.49552 | **Tuned**: aligns summer solstice timing + Sun RA |
 | `useVariableSpeed` | true | Toggle |
 
 The geometric orbit offset parameters are **unchanged**:
-- `eccentricityBase` = 0.015372 (offset of circle center from Earth)
-- `eccentricityAmplitude` = 0.00137032 (oscillation amplitude over H/16 cycle)
+- `eccentricityBase` = 0.015386 (offset of circle center from Earth)
+- `eccentricityAmplitude` = 0.001356 (oscillation amplitude over H/16 cycle)
 
 ### Results
 
@@ -177,7 +177,7 @@ Sun baseline vs JPL Horizons (2000-2025, 26 yearly dates):
 - Entries: 26
 
 Year lengths:
-- Mean Tropical Year: 365.242190835 days (IAU: 365.242189700, diff +0.10s)
+- Mean Tropical Year: 365.242190835 days (IAU: 365.242200, diff +0.10s)
 - Mean Sidereal Year: 365.256363246 days (IAU: 365.256363000, diff +0.02s)
 - Anomalistic Year: 365.259636199 days (IAU: 365.259636000, diff +0.02s)
 
