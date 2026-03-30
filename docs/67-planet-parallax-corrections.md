@@ -149,13 +149,13 @@ Not all planets benefit from all terms. Each planet uses the tier with the lowes
 
 | Planet | n pts | Tier | RMS Tot | Notes |
 |--------|-------|------|---------|-------|
-| Mercury | ~15k | 78p (A–CA) | 0.106° | Mean anomaly terms, 1600–2400 |
-| Venus | ~19k | 78p (A–CA) | 0.058° | 1600–2400 |
-| Mars | ~16k | 78p (A–CA) | 0.217° | Mean anomaly terms, 1600–2400 |
-| Jupiter | ~13k | 68p (A–BQ) | 0.068° | No M terms (too few cycles) |
-| Saturn | ~10k | 68p (A–BQ) | 0.090° | No M terms (too few cycles) |
-| Uranus | ~15k | 68p (A–BQ) | 0.052° | No M terms (too few cycles) |
-| Neptune | ~15k | 68p (A–BQ) | 0.010° | No M terms (too few cycles) |
+| Mercury | ~5k | 78p (A–CA) | 0.079° | Mean anomaly terms, 1600–2400 |
+| Venus | ~9k | 78p (A–CA) | 0.041° | 1600–2400 |
+| Mars | ~5k | 78p (A–CA) | 0.090° | Mean anomaly terms, 1600–2400 |
+| Jupiter | ~7k | 68p (A–BQ) | 0.052° | No M terms (too few cycles) |
+| Saturn | ~7k | 68p (A–BQ) | 0.072° | No M terms (too few cycles) |
+| Uranus | ~5k | 68p (A–BQ) | 0.016° | No M terms (too few cycles) |
+| Neptune | ~5k | 68p (A–BQ) | 0.004° | No M terms (too few cycles) |
 
 Absent coefficients evaluate to zero via `(dc.X || 0)` fallback in the formula.
 
@@ -179,11 +179,11 @@ RMS is computed over all training data (1800–2200 primary window + observed pr
 
 | Planet | Tier | RMS Tot | Notes |
 |--------|------|---------|-------|
-| Mercury | 78p | **0.071°** | Mean anomaly terms give 45% improvement |
-| Venus | 78p | **0.031°** | |
-| Mars | 78p | **0.091°** | Close approach limit (e=0.093) |
-| Jupiter | 68p | **0.050°** | |
-| Saturn | 68p | **0.063°** | |
+| Mercury | 78p | **0.079°** | Mean anomaly terms give 45% improvement |
+| Venus | 78p | **0.041°** | |
+| Mars | 78p | **0.090°** | Close approach limit (e=0.093) |
+| Jupiter | 68p | **0.052°** | |
+| Saturn | 68p | **0.072°** | |
 | Uranus | 68p | **0.016°** | |
 | Neptune | 68p | **0.004°** | |
 

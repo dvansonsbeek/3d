@@ -244,15 +244,15 @@ phase-optimized reference JD providing the correct initial phase alignment.
 ### Mercury (tools/lib/constants.js lines 41-59, src/script.js lines 93-105)
 
 ```
-solarYearInput:            87.9686       (orbital period in days)
+solarYearInput:            87.9683       (orbital period in days)
 eclipticInclinationJ2000:  7.00497902    (ecliptic inclination, degrees)
 orbitalEccentricityBase:       0.20563593    (J2000 eccentricity -- INPUT)
 realOrbitalEccentricity:   0.17056221    (e/(1+e) -- DERIVED)
 eocFraction:               -0.527        (EoC multiplier, negative = anti-Keplerian)
 longitudePerihelion:        77.4569131    (ecliptic longitude of perihelion, degrees)
 ascendingNode:             48.33033155   (ecliptic ascending node, degrees)
-angleCorrection:           0.971049      (perihelion alignment offset, degrees)
-startpos:                  83.53         (orbital phase at model start, degrees)
+angleCorrection:           0.9709        (perihelion alignment offset, degrees)
+startpos:                  83.653        (orbital phase at model start, degrees)
 perihelionEclipticYears:   H / (1+3/8)  (perihelion precession period)
 perihelionRef_JD:          2460335.9     (phase-optimized)
 inclinationPhaseAngle:     203.3195      (inclination variation phase)
@@ -266,12 +266,12 @@ mirrorPair:                'uranus'      (paired planet)
 solarYearInput:            224.695       (orbital period in days, calibrated)
 eclipticInclinationJ2000:  3.39467605    (ecliptic inclination, degrees)
 orbitalEccentricityBase:       0.00619052    (base eccentricity -- INPUT)
-realOrbitalEccentricity:   0.00673098    (e/(1+e) -- DERIVED)
+realOrbitalEccentricity:   0.00615243    (e/(1+e) -- DERIVED)
 eocFraction:               0.436         (EoC multiplier)
 longitudePerihelion:        131.5765919   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             76.67877109   (ecliptic ascending node, degrees)
-angleCorrection:           -2.784782     (perihelion alignment offset, degrees)
-startpos:                  249.312       (orbital phase at model start, degrees)
+angleCorrection:           -2.8029       (perihelion alignment offset, degrees)
+startpos:                  249.364       (orbital phase at model start, degrees)
 perihelionEclipticYears:   H * 2         (perihelion precession period)
 perihelionRef_JD:          2455464.42    (phase-optimized)
 inclinationPhaseAngle:     203.3195      (inclination variation phase)
@@ -283,12 +283,12 @@ mirrorPair:                'neptune'     (paired planet)
 
 | Value                  | Mercury   | Venus     |
 |------------------------|-----------|-----------|
-| solarYearCount         | 1390940   | 544556    |
+| solarYearCount         | 1392228   | 545059    |
 | orbitDistance (AU)      | 0.3871    | 0.7233    |
-| realOrbitalEccentricity| 0.17056   | 0.00673   |
-| perihelionDistance      | 6.605     | 0.487     |
-| elipticOrbit           | 3.302     | 0.243     |
-| eccentricityPerihelion | 0.679     | 0.002     |
+| realOrbitalEccentricity| 0.17056   | 0.00615   |
+| perihelionDistance      | 6.603     | 0.445     |
+| elipticOrbit           | 3.301     | 0.223     |
+| eccentricityPerihelion | 0.679     | 0.001     |
 | lowestPoint            | 131.67    | 103.32    |
 
 ---

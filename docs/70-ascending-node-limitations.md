@@ -125,14 +125,14 @@ From JPL's documentation:
 For perihelion precession, the model includes a translation from geocentric to heliocentric rates via the "extra fluctuation" factor. A similar translation may be needed for ascending nodes but has not been implemented.
 
 **Perihelion example (Mercury at J2000):**
-- Geocentric base rate: 533.7 arcsec/cy
-- Heliocentric experienced rate: 572.54 arcsec/cy
-- Extra fluctuation: +39 arcsec/cy
+- Heliocentric baseline rate: 531.4 arcsec/cy
+- Geocentric rate (predictive formula): 569.2 arcsec/cy
+- Extra fluctuation: +37.7 arcsec/cy
 
 If applied to ascending nodes:
 - Geocentric rate: -285 arcsec/cy
-- Plus extra fluctuation: +39 arcsec/cy
-- Result: -246 arcsec/cy
+- Plus extra fluctuation: +37.7 arcsec/cy
+- Result: -247 arcsec/cy
 
 This still does not match JPL's -451 arcsec/cy, suggesting the translation is more complex for ascending nodes than for perihelion.
 

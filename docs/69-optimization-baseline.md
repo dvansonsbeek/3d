@@ -107,14 +107,16 @@ Notes:
 
 ## Baseline Summary for Progress Tracking
 
-| Target   | RMS Total (JPL 2000-2025) |
-|----------|---------------------------|
-| Sun      | 0.714°                    |
-| Moon     | 6.267°                    |
-| Mercury  | 4.908°                    |
-| Venus    | 3.709°                    |
-| Mars     | 3.121°                    |
-| Jupiter  | 1.974°                    |
-| Saturn   | 3.291°                    |
-| Uranus   | 1.372°                    |
-| Neptune  | 1.496°                    |
+| Target   | RMS Total (before) | RMS Total (current) | Improvement |
+|----------|-------------------|--------------------|----|
+| Sun      | 0.714°            | 0.003°             | 238× |
+| Moon     | 6.267°            | 0.002°             | 3,134× |
+| Mercury  | 4.908°            | 0.079°             | 62× |
+| Venus    | 3.709°            | 0.041°             | 90× |
+| Mars     | 3.121°            | 0.090°             | 35× |
+| Jupiter  | 1.974°            | 0.052°             | 38× |
+| Saturn   | 3.291°            | 0.072°             | 46× |
+| Uranus   | 1.372°            | 0.016°             | 86× |
+| Neptune  | 1.496°            | 0.004°             | 374× |
+
+Current baselines from `tools/results/baselines.json` (2026-03-29). Training window: 1800–2200 + observed pre-1800 anchors. The improvement factors range from 35× (Mars) to 3,134× (Moon).

@@ -130,7 +130,7 @@ WebGL Render (60 FPS target)
 /home/dennis/code/3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~32,000 lines)
+│   ├── script.js               # Main application (~43,000 lines)
 │   └── style.css               # GUI and label styling
 │
 ├── public/
@@ -142,19 +142,27 @@ WebGL Render (60 FPS target)
 │   │   └── skybox/             # Background starfield
 │   │
 │   └── input/
-│       ├── constellations.json # 88 IAU constellation line patterns
-│       └── stars.json          # Yale Bright Star Catalog (~9,000 stars)
+│       ├── model-parameters.json      # Model constants (H, Earth params, planet configs)
+│       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods)
+│       ├── fitted-coefficients.json   # Pipeline output (harmonics, parallax, corrections)
+│       ├── meeus-lunar-tables.json    # Meeus Ch.47 lunar correction tables
+│       ├── constellations.json        # 88 IAU constellation line patterns
+│       └── stars.json                 # Yale Bright Star Catalog (~9,000 stars)
 │
-├── dist/                       # Parcel production build output
+├── data/
+│   ├── 01-holistic-year-objects-data.xlsx  # Full H export (perihelion, precession)
+│   ├── 02-solar-measurements.csv          # Cardinal points, year lengths (full H)
+│   ├── reference-data.json                # JPL-enriched verification data
+│   └── balance-presets.json               # 737 balance configurations
 │
-├── docs/
-│   ├── architecture.md         # This document
-│   ├── orbital-formulas.md     # Mathematical reference
-│   ├── invariable-plane-positions-panel.md
-│   ├── invariable-plane-dynamic-calculation.md
-│   └── hidden/                 # Development documentation
-│       ├── todo/               # Feature specifications
-│       └── ...
+├── tools/
+│   ├── fit/                    # Pipeline fitting scripts (Steps 1-9)
+│   ├── verify/                 # Law verification and balance analysis
+│   ├── explore/                # Exploratory analysis scripts
+│   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine)
+│   └── results/                # Baseline values and pipeline logs
+│
+├── docs/                       # Documentation (docs 00-71)
 │
 ├── package.json                # Dependencies and scripts
 ├── .gitignore

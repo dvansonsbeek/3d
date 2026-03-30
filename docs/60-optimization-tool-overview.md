@@ -130,17 +130,17 @@ Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
 **Per-planet constants (13 each, Mercury-Neptune + Pluto, Halley's, Eros, Ceres):**
 | Constant | Example (Mercury) | Purpose |
 |----------|-------------------|---------|
-| `SolarYearInput` | 87.96845 days | Orbital period |
+| `SolarYearInput` | 87.9683 days | Orbital period |
 | `EclipticInclinationJ2000` | 7.00497902 deg | Inclination to ecliptic (JPL) |
 | `OrbitalEccentricity` | 0.20563593 | Orbital eccentricity (JPL) |
 | `InvPlaneInclinationJ2000` | 6.3472858 deg | Incl. to invariable plane |
 | `LongitudePerihelion` | 77.4569131 deg | Perihelion longitude (JPL J2000) |
 | `AscendingNode` | 48.33033155 deg | Ecliptic ascending node (SPICE) |
-| `AngleCorrection` | 0.984366 deg | Perihelion alignment fine-tune |
+| `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
-| `Startpos` | 84.205 deg | Starting orbital position |
-| `InvPlaneInclinationMean` | 6.727893 deg | Inclination oscillation center |
-| `InvPlaneInclinationAmplitude` | 0.385911 deg | Inclination oscillation range |
+| `Startpos` | 83.653 deg | Starting orbital position |
+| `InvPlaneInclinationMean` | 6.726271 deg | Inclination oscillation center |
+| `InvPlaneInclinationAmplitude` | 0.384267 deg | Inclination oscillation range |
 | `InclinationPhaseAngle` | 203.3195 deg | Phase group (203 deg or 23 deg) |
 
 ### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
@@ -397,7 +397,7 @@ The [kaidadragongirl/planetarycalendar](https://github.com/kaidadragongirl/plane
 
 **Excel vs JPL comparison results (from investigation, years 1800-2910):**
 
-| Body | Avg |dRA| | Max |dRA| | Avg |dDec| | Max |dDec| | Notes |
+| Body | Avg \|dRA\| | Max \|dRA\| | Avg \|dDec\| | Max \|dDec\| | Notes |
 |---------|---------|---------|----------|---------|-------|
 | Sun | 6.65 deg | 14.58 deg | 0.24 deg | 0.80 deg | ~1.4 deg/century RA drift (precession) |
 | Mercury | 7.22 deg | 15.75 deg | 4.02 deg | 6.56 deg | Inner planet, fast orbit |
@@ -538,11 +538,11 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 
 | Parameter | Example (Mercury) | What it controls | Propagation effects |
 |-----------|-------------------|------------------|-------------------|
-| `SolarYearInput` | 87.96845 days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
-| `Startpos` | 84.205 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD 2451716.5 |
-| `AngleCorrection` | 0.984366 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
-| `InvPlaneInclinationMean` | 6.727893 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
-| `InvPlaneInclinationAmplitude` | 0.385911 deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
+| `SolarYearInput` | 87.9683 days | Orbital period -> feeds into `SolarYearCount` -> `OrbitDistance` (Kepler's 3rd) -> `PerihelionDistance` -> orbit speed, orbit radius | **High cascade**: changing this changes orbit size, speed, and all derived geometry |
+| `Startpos` | 83.653 deg | Starting orbital angle at model epoch | **Isolated**: only affects where the planet is at JD 2451716.5 |
+| `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
+| `InvPlaneInclinationMean` | 6.726271 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
+| `InvPlaneInclinationAmplitude` | 0.384267 deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
 | `InclinationPhaseAngle` | 203.3195 deg | Phase of inclination oscillation | **Constrained**: must be 203.3195 deg or 23.3195 deg (model philosophy) |
 
 **Earth input constants -- HIGH IMPACT, change with extreme care:**

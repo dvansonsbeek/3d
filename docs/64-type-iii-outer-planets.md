@@ -328,10 +328,10 @@ achieve start-date RA within 0.02° for all Type III planets.
 
 | Planet  | startpos | Start ΔRA |
 |---------|----------|-----------|
-| Jupiter | 13.85    | -0.013°   |
-| Saturn  | 11.32    | +0.010°   |
-| Uranus  | 44.88    | +0.005°   |
-| Neptune | 47.96    | +0.047°   |
+| Jupiter | 13.89    | -0.013°   |
+| Saturn  | 11.28    | +0.010°   |
+| Uranus  | 44.90    | +0.005°   |
+| Neptune | 47.95    | +0.047°   |
 
 The conjunction-finder (`tools/explore/conjunction-finder.js`) validates
 against known great conjunctions (7 BCE - 2120 CE) and opposition dates.
@@ -470,10 +470,10 @@ alignment with Earth).
 
 | Planet  | eocFraction | startpos | RMS     | Entries | Notes |
 |---------|-------------|----------|---------|---------|-------|
-| Jupiter | 0.484       | 13.85    | 0.062°  | 2499    | Dual-balanced eccentricity |
-| Saturn  | 0.543       | 11.32    | 0.098°  | 2502    | Dual-balanced eccentricity |
-| Uranus  | 0.50        | 44.88    | 0.014°  | 41      | With e/(1+e) + precession  |
-| Neptune | 0.50        | 47.96    | 0.009°  | 69      | Phase-optimized perihelionRef |
+| Jupiter | 0.495       | 13.89    | 0.052°  | 2499    | Dual-balanced eccentricity |
+| Saturn  | 0.54        | 11.28    | 0.072°  | 2502    | Dual-balanced eccentricity |
+| Uranus  | 0.53        | 44.90    | 0.016°  | 41      | With e/(1+e) + precession  |
+| Neptune | 0.585       | 47.95    | 0.004°  | 69      | Phase-optimized perihelionRef |
 
 These were co-optimized to simultaneously achieve:
 - Start-date RA within 0.02° of JPL for all four planets
