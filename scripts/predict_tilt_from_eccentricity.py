@@ -12,7 +12,7 @@ This constant predicts all 8 planetary eccentricity amplitudes.
 
 This script investigates:
   1. Whether K can be derived from ψ (the inclination constant)
-  2. Two candidate relations: K ≈ ψ²/π (0.09%) and K ≈ ψ^(11/5) (0.05%)
+  2. Two candidate relations: K ≈ ψ²/π (0.77%) and K ≈ ψ^(11/5) (0.89%)
   3. Whether the tilt can be predicted from eccentricity data
   4. The inner/outer planet distinction for tilt prediction
 
@@ -275,8 +275,8 @@ for i, (abs_err, label, val, err_pct) in enumerate(candidates[:10]):
     print(f"  {i+1:>4} {label:>16} {val:>14.6e} {err_pct:>+9.4f}%{marker}")
 
 print("""
-  The two best candidates (ψ²/π at 0.09% and ψ^(11/5) at 0.05%) are
-  significantly closer than all others. The next best is ψ²/(2φ) at 3.1%.
+  The two best candidates (ψ²/π at 0.77% and ψ^(11/5) at 0.89%) are
+  closer than most others. The next best is ψ²/(2φ) at 3.1%.
 """)
 
 

@@ -563,7 +563,7 @@ Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 ├─ Date                          [binding: text input]
 ├─ Time                          [binding: text input]
 ├─ JD                            [binding: numeric]
-├─ Perihelion Date               [binding: read-only display]
+├─ Perihelion Date               [hidden]
 │
 ├─▼ Simulation Controls
 │  ├─ Run                        [binding: toggle]
@@ -629,13 +629,15 @@ Tweakpane Root ("Fibonacci Laws of Planetary Motion")
 │  └─▼ Show / Hide              (chip-grid toggles by planet)
 │
 ├─▼ Reports                       [observed category]
-│  ├─▼ Planet Positions & Orbits
+│  ├─▼ Planet Positions, Perihelion & Inclination
 │  ├─▼ Days & Years (combined solstice/equinox + year lengths)
 │  └─▼ Solar Day (analemma + day length by starting angle)
 │
 └─▼ Tools
    ├─ Planet Inspector           [button]
    ├─ Invariable Plane Inspector [button]
+   ├─ Eccentricity Balance Scale [button]
+   ├─ Data Explorer              [button → holisticuniverse.com]
    ├─▼ Console Tests (F12)       (buttons, not toggles)
    ├─▼ Camera
    └─▼ Debug

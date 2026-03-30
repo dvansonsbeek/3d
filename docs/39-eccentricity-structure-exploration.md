@@ -22,14 +22,14 @@ where:
 
 | Planet | e_base | e_amplitude | e_structural | structural % |
 |--------|--------|-------------|-------------|-------------|
-| Mercury | 0.205636 | 8.437e-5 | 0.205552 | 99.96% |
-| Venus | 0.006777 | 9.625e-4 | 0.005814 | 85.80% |
-| Earth | 0.015386 | 1.370e-3 | 0.014002 | 91.09% |
-| Mars | 0.093394 | 3.074e-3 | 0.090320 | 96.71% |
-| Jupiter | 0.048386 | 1.150e-6 | 0.048385 | 100.00% |
-| Saturn | 0.053862 | 5.403e-6 | 0.053856 | 100.00% |
-| Uranus | 0.047257 | 2.831e-5 | 0.047229 | 99.94% |
-| Neptune | 0.008590 | 8.098e-6 | 0.008582 | 99.91% |
+| Mercury | 0.205636 | 8.350e-5 | 0.205552 | 99.96% |
+| Venus | 0.006191 | 9.526e-4 | 0.005238 | 84.61% |
+| Earth | 0.015386 | 1.356e-3 | 0.014030 | 91.19% |
+| Mars | 0.092975 | 3.042e-3 | 0.089934 | 96.73% |
+| Jupiter | 0.048215 | 1.138e-6 | 0.048214 | 100.00% |
+| Saturn | 0.053745 | 5.347e-6 | 0.053740 | 99.99% |
+| Uranus | 0.047344 | 2.802e-5 | 0.047316 | 99.94% |
+| Neptune | 0.008686 | 8.014e-6 | 0.008678 | 99.91% |
 
 The gas giants have negligible amplitudes (tiny axial tilts → tiny sin(tilt)), so their base and structural values are nearly identical. The inner planets, especially Venus and Earth, have significant amplitude contributions.
 
@@ -54,18 +54,18 @@ phase = acos(cos(θ_J2000)) × 180/π
 
 | Planet | Phase (°) | base | amplitude | e(J2000) | Derivable? |
 |--------|----------|------|-----------|----------|------------|
-| Mercury | 89.99 | 0.205636 | 8.437e-5 | 0.205636 | Yes |
-| Venus | 124.06 | 0.006191 | 9.625e-4 | 0.006777 | Yes |
+| Mercury | 89.99 | 0.205636 | 8.350e-5 | 0.205636 | Yes |
+| Venus | 124.58 | 0.006191 | 9.526e-4 | 0.006777 | Yes |
 | Earth | (from balancedYear) | 0.015386 | 0.001356 | 0.016710 | Yes |
-| Mars | 96.89 | 0.092975 | 3.074e-3 | 0.093394 | Yes |
+| Mars | 96.98 | 0.092975 | 3.042e-3 | 0.093394 | Yes |
 | Jupiter–Neptune | — | — | — | — | No (cos(θ) out of range) |
 
 The outer planets (Jupiter–Neptune) have `cos(θ) > 1` or `< -1` from the law of cosines, meaning their J2000 eccentricity falls outside the `[base-amp, base+amp]` range. This is because their eccentricity oscillation amplitude (K constant) is negligibly small — their eccentricity is essentially constant at `base`, and any J2000 deviation is from other perturbations not captured by the single H/16 cosine.
 
 ### Balance with structural eccentricities
 
-- **Base eccentricities**: 100% Law 5 balance (by construction — these are the tuned values)
-- **Structural eccentricities**: 99.978% balance (removing amplitudes adds ~0.02% imbalance)
+- **Base eccentricities**: 99.9996% Law 5 balance (by construction — these are the tuned values)
+- **Structural eccentricities**: ~99.98% balance (removing amplitudes adds ~0.02% imbalance)
 - **J2000 eccentricities**: 99.89% balance (a snapshot with current oscillation phases)
 
 This confirms that the structural component carries the balance, and the amplitude is a perturbation on top.

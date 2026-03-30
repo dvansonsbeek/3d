@@ -180,8 +180,8 @@ Two numerical coincidences have been found relating K to the inclination constan
 
 | Relation | Value | Error vs K |
 |----------|-------|-----------|
-| K ≈ ψ²/π | 3.4474 × 10⁻⁶ | 0.09% |
-| K ≈ ψ^(11/5) | 3.4523 × 10⁻⁶ | 0.05% |
+| K ≈ ψ²/π | 3.4411 × 10⁻⁶ | 0.77% |
+| K ≈ ψ^(11/5) | 3.4453 × 10⁻⁶ | 0.89% |
 
 - **ψ²/π** would imply eccentricity oscillations are a second-order effect of inclination coupling (ψ²), divided by π. However, π has no clear physical derivation in this context — why π and not 2π (full orbit) or 4π² (Kepler)?
 - **ψ^(11/5)** uses L₅/F₅ = 11/5, connecting the 5th Lucas number to the 5th Fibonacci number. This keeps everything in the Fibonacci/Lucas framework without transcendental constants, but 11 is not a Fibonacci number.
@@ -230,7 +230,7 @@ These 9 equations for 8 unknowns fully determine all planetary eccentricities wi
 
 3. **Time evolution**: As eccentricities oscillate (with the amplitude formula), does the balance stay perfect at every moment? Or does it only balance at specific epochs?
 
-4. **Can K be derived from first principles?** K ≈ ψ²/π (0.09%) and K ≈ ψ^(L₅/F₅) (0.05%) are suggestive but not exact. Is K truly fundamental, or just an empirical fit from Earth? Independent eccentricity amplitude measurements from long-term orbital integrations could test this.
+4. **Can K be derived from first principles?** K ≈ ψ²/π (0.77%) and K ≈ ψ^(L₅/F₅) (0.89%) are suggestive but not exact. Is K truly fundamental, or just an empirical fit from Earth? Independent eccentricity amplitude measurements from long-term orbital integrations could test this.
 
 5. **Exoplanet extension**: Can this balance framework predict eccentricities in exoplanet systems? This would be the ultimate test.
 

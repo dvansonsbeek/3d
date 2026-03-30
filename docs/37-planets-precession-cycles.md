@@ -43,7 +43,7 @@ supersede the earlier Brouwer & van Woerkom (1950) analytical solution.
 | 7 | 3.088 | 419,689 yr | 2.993 | 433,010 yr | 3.1% | Uranus |
 | 8 | 0.673 | 1,925,705 yr | 0.692 | 1,872,832 yr | 2.7% | Neptune |
 
-Source: Laskar, J. et al. (2004), *Icarus* 170, Table 3.
+Frequencies from Laskar, J. et al. (2004), *A&A* 428, 261–285, Table 3. Periods computed as 1,296,000″ / rate. These are **external reference values** from numerical integration, not model outputs. The Holistic Universe Model assigns a single H-based period per planet (see the next table), which corresponds to the *dominant* eigenmode for each planet.
 
 ### Are apsidal and nodal precession the same?
 
@@ -302,12 +302,12 @@ Earth is the only planet with prograde perihelion ICRF.
 
 | Planet | Axial dir | Peri ICRF dir | Formula | Ecc. cycle rate | Period | H expr |
 |--------|-----------|---------------|---------|-------------|--------|--------|
-| Mercury | retro | retro | same: \|diff\| | 82/(8H) | 32,684 yr | 4H/41 |
-| Venus | pro | retro | opp: sum | 143/(6H) | 14,056 yr | 6H/143 |
+| Mercury | retro | retro | same: \|diff\| | 82/(8H) | 32,714 yr | 4H/41 |
+| Venus | pro | retro | opp: sum | 143/(6H) | 14,069 yr | 6H/143 |
 | Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
-| Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,251 yr | 3H/20 |
-| Jupiter | retro | retro | same: \|diff\| | 16/(3H) | 62,814 yr | **3H/16** |
-| Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,544 yr | 4H/81 |
+| Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
+| Jupiter | retro | retro | same: \|diff\| | 16/(3H) | 62,872 yr | **3H/16** |
+| Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,559 yr | 4H/81 |
 | Uranus | pro | retro | opp: sum | ≈10/H | 33,532 yr | ≈H/10 |
 | Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
 
