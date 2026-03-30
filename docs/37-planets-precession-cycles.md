@@ -32,7 +32,7 @@ planet's actual precession is a superposition of all 8 modes. The table below
 uses Laskar 2004 values (Table 3, 20–50 Myr numerical integration), which
 supersede the earlier Brouwer & van Woerkom (1950) analytical solution.
 
-| Mode | g_i ("/yr) | Apsidal period | |s_i| ("/yr) | Nodal period | |g_i|≈|s_i|? | Planet |
+| Mode | g_i ("/yr) | Apsidal period | \|s_i\| ("/yr) | Nodal period | \|g_i\|≈\|s_i\|? | Planet |
 |------|-----------|----------------|-------------|--------------|--------------|--------|
 | 1 | 5.59 | 231,842 yr | 5.59 | 231,842 yr | **0.0%** | Mercury |
 | 2 | 7.452 | 173,913 yr | 7.05 | 183,830 yr | 5.4% | Venus |

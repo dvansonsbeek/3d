@@ -451,10 +451,10 @@ the `computeEccentricityEarth` function:
 
 | Planet  | φ_J2000  | e_min      | e_max      | Note |
 |---------|----------|------------|------------|------|
-| Mercury |  89.99°  | 0.20555156 | 0.20572030 | Tilt ~0, essentially constant |
-| Venus   | 123.75°  | 0.00522798 | 0.00715306 | Past mean, decreasing |
-| Earth   | 192.95°  | 0.01400168 | 0.01674232 | ω + 90°, near maximum at J2000 |
-| Mars    |  96.89°  | 0.08990179 | 0.09604907 | Just past mean |
+| Mercury |  89.99°  | 0.20555243 | 0.20571943 | Tilt ~0, essentially constant |
+| Venus   | 124.58°  | 0.00523792 | 0.00714312 | Past mean, decreasing |
+| Earth   | 192.95°  | 0.01402961 | 0.01674196 | ω + 90°, near maximum at J2000 |
+| Mars    |  96.98°  | 0.08993353 | 0.09601733 | Just past mean |
 
 The predictive formula works for these planets because the tilt mechanism is
 the dominant source of eccentricity variation over each planet's eccentricity cycle.
@@ -489,14 +489,14 @@ J2000 (99.9845%) while the amplitude remains negligible.
 
 | Planet  | φ_J2000 (°) | Source |
 |---------|-------------|--------|
-| Mercury |   89.9882   | Analytical from J2000 constraint |
-| Venus   |  123.7514   | Analytical from J2000 constraint |
+| Mercury |   89.9884   | Analytical from J2000 constraint |
+| Venus   |  124.5803   | Analytical from J2000 constraint |
 | Earth   |  192.9471   | ω + 90° = 102.947° + 90° |
-| Mars    |   96.8878   | Analytical from J2000 constraint |
-| Jupiter |  180        | 180° = max ecc, closest to J2000 (amp 1.15e-6, negligible) |
-| Saturn  |  180        | 180° = max ecc, closest to J2000 (amp 5.40e-6, negligible) |
-| Uranus  |    0        | 0° = min ecc, closest to J2000 (amp 2.83e-5, negligible) |
-| Neptune |    0        | 0° = min ecc, closest to J2000 (amp 8.10e-6, negligible) |
+| Mars    |   96.9836   | Analytical from J2000 constraint |
+| Jupiter |  180        | 180° = max ecc, closest to J2000 (amp 1.14e-6, negligible) |
+| Saturn  |  180        | 180° = max ecc, closest to J2000 (amp 5.35e-6, negligible) |
+| Uranus  |    0        | 0° = min ecc, closest to J2000 (amp 2.80e-5, negligible) |
+| Neptune |    0        | 0° = min ecc, closest to J2000 (amp 8.01e-6, negligible) |
 
 ### Other Constants
 

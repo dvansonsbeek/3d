@@ -717,14 +717,14 @@ Phase angles for the eccentricity oscillation formula. Each planet oscillates at
 
 | Planet | `eccentricityPhaseJ2000` (deg) | Source |
 |--------|-------------------------------|--------|
-| Mercury | 89.9882 | Analytical from J2000 constraint |
-| Venus | 123.7514 | Analytical from J2000 constraint |
+| Mercury | 89.9884 | Analytical from J2000 constraint |
+| Venus | 124.5803 | Analytical from J2000 constraint |
 | Earth | 192.9471 | ω + 90° = 102.947° + 90° |
-| Mars | 96.8878 | Analytical from J2000 constraint |
-| Jupiter | 180 | 180° = max ecc, closest to J2000 (amp 1.15e-6, negligible) |
-| Saturn | 180 | 180° = max ecc, closest to J2000 (amp 5.40e-6, negligible) |
-| Uranus | 0 | 0° = min ecc, closest to J2000 (amp 2.83e-5, negligible) |
-| Neptune | 0 | 0° = min ecc, closest to J2000 (amp 8.10e-6, negligible) |
+| Mars | 96.9836 | Analytical from J2000 constraint |
+| Jupiter | 180 | 180° = max ecc, closest to J2000 (amp 1.14e-6, negligible) |
+| Saturn | 180 | 180° = max ecc, closest to J2000 (amp 5.35e-6, negligible) |
+| Uranus | 0 | 0° = min ecc, closest to J2000 (amp 2.80e-5, negligible) |
+| Neptune | 0 | 0° = min ecc, closest to J2000 (amp 8.01e-6, negligible) |
 
 ## Per-Planet EoC Fractions
 
