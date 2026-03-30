@@ -219,7 +219,7 @@ ECC_DUAL_BALANCED = ECC_BASE  # Legacy alias (base eccentricities supersede dual
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Pure Fibonacci divisor assignments — Config #3, the unique mirror-symmetric
+# Pure Fibonacci divisor assignments — Config #15, the unique mirror-symmetric
 # configuration from exhaustive search of 7,558,272 candidates (755 achieve
 # balance above 99.994%; this is the only one with exact mirror symmetry).
 D = {p['name']: p['fibonacciD'] for p in _C['planets'].values()}

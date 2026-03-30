@@ -407,7 +407,7 @@ def stat_saturn_prediction(eccs, d_vals, group_a, solo_planet):
     Since the solo retrograde planet carries the entire 23° contribution,
     the eccentricity balance directly predicts its eccentricity from the
     other seven planets. Uses ECC_DUAL_BALANCED: Saturn's dual-balanced
-    value (0.05374486) IS the model's prediction from the balance law.
+    value (0.05373663) IS the model's prediction from the dual-balance optimizer.
 
     e_solo = sum_A(v_j) / (sqrt(m_solo) × a_solo^(3/2) / sqrt(d_solo))
 

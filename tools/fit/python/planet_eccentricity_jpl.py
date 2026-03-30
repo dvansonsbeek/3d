@@ -17,12 +17,12 @@ ANCHOR_YEAR = C['balancedYear']
 
 PLANETS = {
     'Mercury': {'id': '199', 'period': H * 8 / 11, 'e_model': 0.20563593, 'e_j2000': 0.20563593, 'range': (-9000, 9000)},
-    'Venus':   {'id': '299', 'period': H * 2,      'e_model': 0.00619052, 'e_j2000': 0.00677672, 'range': (-9000, 9000)},
+    'Venus':   {'id': '299', 'period': H * 2,      'e_model': 0.00675727, 'e_j2000': 0.00677672, 'range': (-9000, 9000)},
     'Mars':    {'id': '499', 'period': H * 3 / 13,  'e_model': 0.09297543, 'e_j2000': 0.09339410, 'range': (1700, 2500)},
-    'Jupiter': {'id': '599', 'period': H / 5,       'e_model': 0.04821478, 'e_j2000': 0.04838624, 'range': (1700, 2100)},
-    'Saturn':  {'id': '699', 'period': H / 8,       'e_model': 0.05374486, 'e_j2000': 0.05386179, 'range': (1800, 2200)},
-    'Uranus':  {'id': '799', 'period': H / 3,       'e_model': 0.04734421, 'e_j2000': 0.04725744, 'range': (1700, 2300)},
-    'Neptune': {'id': '899', 'period': H * 2,       'e_model': 0.00868571, 'e_j2000': 0.00859048, 'range': (1700, 2300)},
+    'Jupiter': {'id': '599', 'period': H / 5,       'e_model': 0.04828624, 'e_j2000': 0.04838624, 'range': (1700, 2100)},
+    'Saturn':  {'id': '699', 'period': H / 8,       'e_model': 0.05373663, 'e_j2000': 0.05386179, 'range': (1800, 2200)},
+    'Uranus':  {'id': '799', 'period': H / 3,       'e_model': 0.04735744, 'e_j2000': 0.04725744, 'range': (1700, 2300)},
+    'Neptune': {'id': '899', 'period': H * 2,       'e_model': 0.00860931, 'e_j2000': 0.00859048, 'range': (1700, 2300)},
 }
 
 # ─── Step 1: Fetch data from JPL Horizons ──────────────────────────────────

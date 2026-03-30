@@ -14,7 +14,8 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
-| `derive-eccentricity-amplitudes.js` | `eccentricityAmplitudeK`, per-planet `orbitalEccentricityAmplitude` + `eccentricityPhaseJ2000` | Derived from Earth's K constant |
+| `derive-eccentricity-amplitudes.js` | `eccentricityAmplitudeK`, Venus base, Mercury/Mars amp+phase | Derived from Earth's K constant + R=311 |
+| `dual-balance-optimizer.js` | Jupiter/Saturn/Uranus/Neptune `orbitalEccentricityBase` | Dual-balance optimization (100% incl + 100% ecc) |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
@@ -183,12 +184,22 @@ Step 7a: derive-eccentricity-amplitudes.js    → K, Venus base, Mercury/Mars am
          - Outer planet solarYearInput/eccBase changes do NOT require re-running 7a
          - Only H changes or Sun optimizer re-runs (Step 1) require re-running 7a
 
-Step 7b: verify-laws.js                       → pass/fail
+Step 7b: dual-balance-optimizer.js             → Jupiter/Saturn/Uranus/Neptune orbitalEccentricityBase
+         Finds outer planet base eccentricities that achieve 100% inclination
+         balance AND 100% eccentricity balance simultaneously, while minimizing
+         deviation from J2000 observed eccentricities.
+         Fixed: Mercury (=J2000), Venus (R=311), Earth (Sun optimizer), Mars (JPL fit).
+         Free: Jupiter, Saturn, Uranus, Neptune base eccentricities.
+         4 unknowns, 2 balance equations → 2 DOF used to minimize J2000 error.
+         Optional --scan-orbits tests ±1 orbit count per outer planet.
+         Updates: model-parameters.json (4 outer planet base eccentricities)
+
+Step 7c: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
          Key targets:
-         - Inclination balance ≥ 99.999% (Law 3)
-         - Eccentricity balance = 100% (Law 5, Venus from R=311 + Neptune for balance)
+         - Inclination balance = 100% (Law 3, from dual-balance optimizer)
+         - Eccentricity balance = 100% (Law 5, from dual-balance optimizer)
          - All 8 planet inclination amplitudes match ψ/(d×√m) (Law 2)
          - All eccentricities consistent with J2000 observed values
          eccentricity-balance.js              → convergence report

@@ -32,15 +32,15 @@ const inputmeanlengthsolaryearindays = 365.2422;          // Mean tropical year 
 const startmodelJD = 2451716.5;                           // June 21, 2000 00:00 UTC (Julian Day)
 const startmodelYear = 2000.5;                            // Fractional year of model start
 const correctionDays = -0.828832119703292;                // Fine timing correction (optimizer-derived)
-const correctionSun = 0.495513787763078;                 // Sun position correction angle (optimizer Step 1)
+const correctionSun = 0.4955138066654289;                 // Sun position correction angle (optimizer Step 1)
 const temperatureGraphMostLikely = 14.5;                  // Position in obliquity cycle (0–16)
 const startAngleModel = 89.91949879;                      // Start angle at 2000-06-21 00:00 UTC
 const useVariableSpeed = true;                            // Toggle equation of center
 
 // ─── A2. Earth parameters ────────────────────────────────────────────────
-const earthtiltMean = 23.413539776570815;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
-const earthInvPlaneInclinationAmplitude = 0.6360324924986345; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
-const eccentricityBase = 0.015385784721339644;                      // Law 5 balance-locked
+const earthtiltMean = 23.41353978156394;                  // Scene-geometry solved: obliquity at J2000 = IAU 23.439291°
+const earthInvPlaneInclinationAmplitude = 0.6360323692031671; // Scene-geometry solved: obliquity rate = IAU -46.836769"/cy
+const eccentricityBase = 0.015385784721782658;                      // Law 5 balance-locked
 const eccentricityAmplitude = 0.0013561739066062727;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 0.0000034149201315866186;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
@@ -122,7 +122,7 @@ planets.mercury = {
   orbitalEccentricityBase: 0.20563593,
   orbitalEccentricityAmplitude: 0.00008349732021736901,
   eccentricityPhaseJ2000: 89.98836768437955,
-  angleCorrection: 0.9709062820133347,
+  angleCorrection: 0.9709062825108177,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
   startpos: 83.65263977646751,
@@ -148,10 +148,10 @@ planets.venus = {
   orbitalEccentricityBase: 0.006757270058130583,
   orbitalEccentricityAmplitude: 0.0009526037225820447,
   eccentricityPhaseJ2000: 87.13170566776543,
-  angleCorrection: -2.802860296792783,
+  angleCorrection: -2.785608570061882,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: holisticyearLength*3/34,
-  startpos: 249.3641210418676,
+  startpos: 249.354151956218,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
@@ -174,7 +174,7 @@ planets.mars = {
   orbitalEccentricityBase: 0.09297543,
   orbitalEccentricityAmplitude: 0.003041895556616812,
   eccentricityPhaseJ2000: 96.98363594881995,
-  angleCorrection: -2.1093711062942297,
+  angleCorrection: -2.1093711045845396,
   perihelionEclipticYears: holisticyearLength/(4+(1/3)),
   axialPrecessionYears: -holisticyearLength/2,
   startpos: 121.47516084503593,
@@ -197,13 +197,13 @@ planets.jupiter = {
   meanAnomaly: 32.47179744,
   trueAnomaly: 35.69428061,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.04821478,
+  orbitalEccentricityBase: 0.048286239999999994,
   orbitalEccentricityAmplitude: 0.0000011380669025163578,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: 0.9270172110553538,
+  angleCorrection: 0.9274947313225503,
   perihelionEclipticYears: holisticyearLength/5,
   axialPrecessionYears: -holisticyearLength*3/8,
-  startpos: 13.88765148236467,
+  startpos: 13.887643006014889,
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
@@ -223,13 +223,13 @@ planets.saturn = {
   meanAnomaly: 325.663876,
   trueAnomaly: 321.7910116,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.05374486,
+  orbitalEccentricityBase: 0.05373662626292262,
   orbitalEccentricityAmplitude: 0.000005347432417577137,
   eccentricityPhaseJ2000: 180,
-  angleCorrection: -0.17477219062502414,
+  angleCorrection: -0.17477199532426013,
   perihelionEclipticYears: -holisticyearLength/8,
   axialPrecessionYears: -holisticyearLength*4/3,
-  startpos: 11.278002196734622,
+  startpos: 11.277960895457046,
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
@@ -249,13 +249,13 @@ planets.uranus = {
   meanAnomaly: 145.7292678,
   trueAnomaly: 148.5142459,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.04734421,
+  orbitalEccentricityBase: 0.04735744,
   orbitalEccentricityAmplitude: 0.000028021304344320577,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: -0.7346015381723632,
+  angleCorrection: -0.7346245309503843,
   perihelionEclipticYears: holisticyearLength/3,
   axialPrecessionYears: holisticyearLength*610,
-  startpos: 44.9004300533518,
+  startpos: 44.900443755875614,
   eocFraction: 0.53,
   perihelionRef_JD: 2439699.8,
   ascendingNodeInvPlane: 307.80,
@@ -275,13 +275,13 @@ planets.neptune = {
   meanAnomaly: 262.5003424,
   trueAnomaly: 261.2242728,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.00868582569694518,
+  orbitalEccentricityBase: 0.00860930797301989,
   orbitalEccentricityAmplitude: 0.000008014434394494452,
   eccentricityPhaseJ2000: 0,
-  angleCorrection: 2.3338078118737506,
+  angleCorrection: 2.3325710611708423,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
-  startpos: 47.95471583802366,
+  startpos: 47.955275612157195,
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,

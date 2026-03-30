@@ -684,10 +684,10 @@ Base eccentricities represent the fixed perihelion distance. They achieve 100% L
 | Mercury | 0.20563593 | 0.20563593 | 0% | Tilt ~0, no fluctuation |
 | Venus | 0.00675727 | 0.00677672 | -0.29% | R = 311 constraint |
 | Mars | 0.09297543 | 0.09339410 | -0.45% | H/16 fit to JPL data |
-| Jupiter | 0.04821478 | 0.04838624 | -0.35% | Dual-balanced |
-| Saturn | 0.05374486 | 0.05386179 | -0.22% | Law 5 prediction |
-| Uranus | 0.04734421 | 0.04725744 | +0.18% | Dual-balanced |
-| Neptune | 0.00868583 | 0.00859048 | +1.11% | Solved for 100% balance |
+| Jupiter | 0.04828624 | 0.04838624 | -0.21% | Dual-balance optimized |
+| Saturn | 0.05373663 | 0.05386179 | -0.23% | Dual-balance optimized |
+| Uranus | 0.04735744 | 0.04725744 | +0.21% | Dual-balance optimized |
+| Neptune | 0.00860931 | 0.00859048 | +0.22% | Dual-balance optimized |
 
 ## Planet Eccentricity Amplitudes & Coupling Constant
 
