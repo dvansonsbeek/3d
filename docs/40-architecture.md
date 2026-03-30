@@ -197,66 +197,66 @@ WebGL Render (60 FPS target)
 
 ### script.js Organization
 
-The monolithic script.js is organized into logical sections:
+The monolithic script.js (~43,000 lines) is organized into logical sections. Constants are grouped by source file (A = model-parameters.json, B = fitted-coefficients.json, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  SECTION 1: INPUT CONSTANTS (Lines 17-782)                          │
-│  - Holistic Year parameters (H-year cycle)                          │
-│  - Earth orbital parameters (tilt, eccentricity, precession)        │
-│  - All planet orbital elements (Mercury through Neptune)            │
-│  - Predictive formula constants (PERI_HARMONICS, PREDICT_PLANETS)   │
-│  - Predictive coefficients (7×429 trained arrays, PREDICT_COEFFS)   │
-│  - Moon parameters (sidereal, anomalistic, nodal months)            │
-│  - Physical constants (diameters, masses, distances, GM values)     │
+│  CONSTANTS & FORMULAS (Lines 17-2078)                               │
+│  A. Model parameters: H, Earth params, Moon, planet configs         │
+│  B. Fitted coefficients: year harmonics, predictive formula (429    │
+│     terms × 7 planets), parallax/gravitation/elongation corrections,│
+│     obliquity & cardinal point harmonics, balance presets           │
+│  C. Astro references: J2000 elements, body diameters, inclination  │
+│     reference data, ASTRO_REFERENCE object                          │
+│  D. Moon Meeus tables (Ch.47 lunar corrections)                     │
+│  E. Derived constants: year lengths, precession periods, mass       │
+│     fractions, planet inclinations (Fibonacci Laws)                 │
+│  E3. OrbitalFormulas library (50+ methods: Kepler solver, anomaly   │
+│     conversions, frame transforms, Laplace coefficients)            │
+│  F. Display-only constants                                          │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 2: ORBITAL FORMULAS LIBRARY (Lines 1130-1685)              │
-│  - OrbitalFormulas object with 50+ methods                          │
-│  - Kepler equation solver                                           │
-│  - Anomaly conversions (mean, eccentric, true)                      │
-│  - Velocity calculations, Laplace coefficients                      │
-│  - Frame conversion (Ecliptic ↔ ICRF)                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 3: DERIVED VALUES (Lines 1687-2155)                        │
-│  - Derived orbital parameters (Kepler's 3rd Law)                    │
-│  - Mean motion calculations                                         │
-│  - Precession period derivations                                    │
-│  - Julian Day conversions, calendar systems                         │
-│  - Coordinate transforms (Equatorial ↔ Ecliptic)                    │
-│  - Solstice/Equinox detection, RA/Dec calculations                  │
-├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 4: OBJECT DEFINITIONS (Lines 2160-4034)                    │
-│  - Data objects for every celestial body and helper                  │
-│  - Planet hierarchical precession layers                             │
+│  OBJECT DEFINITIONS (Lines ~2082-4550)                              │
+│  - Data objects for every celestial body (Type I/II/III)            │
+│  - Planet hierarchical precession layers                            │
 │  - Moon precession layers                                           │
+│  - Obliquity cycles, planet parallax corrections                    │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 5: MASTER ARRAYS & SCENE SETUP (Lines 4039-4999)           │
-│  - planetObjects / tracePlanets arrays                               │
-│  - Global state object 'o' definition (~line 4226)                  │
-│  - Renderer initialization (WebGL, shadows, tone mapping)           │
-│  - Camera setup (perspective, orbit controls)                       │
+│  MASTER ARRAYS & SCENE SETUP (Lines ~4550-7590)                     │
+│  - planetObjects / tracePlanets arrays                              │
+│  - Global state object 'o' (~line 5003)                             │
+│  - Renderer, camera, orbit controls                                 │
 │  - createPlanet calls and hierarchy wiring (.add() calls)           │
+│  - Invariable plane system, node markers                            │
+│  - PLANET_TEST_DATES verification data (~8,000 entries)             │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 6: PLANET SYSTEMS & VISUAL EFFECTS (Lines 5000-12245)      │
+│  VISUAL SYSTEMS (Lines ~7590-17800)                                 │
 │  - Orbit visualization, starfield, constellations                   │
-│  - Invariable plane system and hierarchy inspector                  │
+│  - Planet inspector and hierarchy display                           │
 │  - Trace path rendering, visual effects                             │
-│  - Export functions (solstice, year analysis, bulk, planet reports)  │
+│  - Export functions (planet reports, year analysis, solar day)       │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 7: GUI SETUP (Lines 12246-13683)                           │
-│  - Tweakpane folder structure (addFolder/addBinding/addButton)      │
+│  BALANCE EXPLORER & SCALE (Lines ~17800-20850)                      │
+│  - Fibonacci Balance Explorer (interactive config testing)          │
+│  - Eccentricity Balance Scale visualization                         │
+├─────────────────────────────────────────────────────────────────────┤
+│  GUI SETUP (Lines ~20855-22575)                                     │
+│  - Tweakpane folder structure (About, Controls, Celestial, Reports, │
+│    Tools)                                                           │
 │  - Control bindings and event handlers                              │
-│  - Prediction displays                                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 8: RENDER LOOP (Lines 13703-13906)                         │
+│  RENDER LOOP (Lines ~22576-22900)                                   │
 │  - Main animation frame callback                                    │
 │  - Throttled update cycles (20/10/5/30 Hz)                          │
 │  - Performance monitoring                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  SECTION 9: UPDATE & CALCULATION FUNCTIONS (Lines 13907-32676)      │
+│  UPDATE & CALCULATION FUNCTIONS (Lines ~22900-43600)                │
+│  - Cardinal point detection (solstice/equinox by declination)       │
+│  - Days & Years report, Solar Day report                            │
 │  - Position update functions (moveModel, updatePositions)           │
 │  - Precession calculations (obliquity, inclination, dynamic)        │
 │  - Invariable plane updates and balance trend analysis              │
+│  - Year-length formulas (tropical, sidereal, anomalistic)           │
+│  - Perihelion longitude and predictive formula evaluation           │
 │  - createPlanet function                                            │
 └─────────────────────────────────────────────────────────────────────┘
 ```
