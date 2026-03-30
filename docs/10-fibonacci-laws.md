@@ -242,7 +242,7 @@ These are overlapping, not nested, constraints (full analysis: [configuration-an
 |--------|------:|------------|
 | Total search space | 7,558,272 | 100% |
 | **Single filters** | | |
-| Balance ≥ 99.994% | 737 | 0.00975% |
+| Balance ≥ 99.994% | 743 | 0.00975% |
 | Mirror-symmetric | 2,592 | 0.0343% |
 | Saturn-solo | 236,196 | 3.125% |
 | LL bounds | 739,200 | 9.780% |
@@ -767,7 +767,7 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `data/balance-presets.json` containing all qualifying configurations sorted by balance (best first). The current run yields 737 presets across all four scenarios.
+The search writes `data/balance-presets.json` containing all qualifying configurations sorted by balance (best first). The current run yields 743 presets across all four scenarios.
 
 ### Important: Separate Input Values
 
@@ -834,7 +834,7 @@ npx parcel build src/index.html --no-cache
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
-4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 737 valid configurations, Config #15 is the only one that is also mirror-symmetric.
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #15 is the only one that is also mirror-symmetric.
 
 5. **Eccentricity prediction from Fibonacci pair constraints** — The AMD partition ratio R = e/i within each mirror pair satisfies two independent Fibonacci constraints (Law 4), predicting all 8 eccentricities to RMS 2.19% error. The resulting overconstrained system (9 equations for 8 unknowns) reproduces the eccentricity balance without imposing it. No existing theory predicts that eccentricity-to-inclination ratios within mirror pairs should satisfy Fibonacci relations. The Saturn eccentricity predicted by Law 4 (0.05389) and the value predicted by Law 5 eccentricity balance (0.05374) agree to within 0.28%, both bracketing the J2000 observed value (0.05386) — two entirely different Fibonacci constraints converge on the same physical value.
 

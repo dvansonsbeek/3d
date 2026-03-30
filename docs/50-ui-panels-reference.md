@@ -397,7 +397,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **Phase angle selection** | Choose between model phases (203°/23°), Laplace-Lagrange eigenmodes, or custom angles |
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
-| **737 presets** | Pre-computed configurations with ≥99.994% inclination balance |
+| **743 presets** | Pre-computed configurations with ≥99.994% inclination balance |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
 | **Earth locked** | Earth's parameters (d=3, 203°) are derived from the temperature model and cannot be changed |

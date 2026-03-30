@@ -153,7 +153,7 @@ WebGL Render (60 FPS target)
 │   ├── 01-holistic-year-objects-data.xlsx  # Full H export (perihelion, precession)
 │   ├── 02-solar-measurements.csv          # Cardinal points, year lengths (full H)
 │   ├── reference-data.json                # JPL-enriched verification data
-│   └── balance-presets.json               # 737 balance configurations
+│   └── balance-presets.json               # 743 balance configurations
 │
 ├── tools/
 │   ├── fit/                    # Pipeline fitting scripts (Steps 1-9)

@@ -74,7 +74,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **737 pre-computed configurations** that achieve ≥99.994% inclination vector balance (the TNO margin). These are grouped by Jupiter/Saturn d-value scenario:
+A dropdown in the header offers **743 pre-computed configurations** that achieve ≥99.994% inclination vector balance (the TNO margin). These are grouped by Jupiter/Saturn d-value scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -203,7 +203,7 @@ Useful experiments to try:
 | Change Saturn to 203° phase | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
-| Use Preset dropdown | See all 737 valid configurations |
+| Use Preset dropdown | See all 743 valid configurations |
 | Look for Config #15 (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
@@ -241,7 +241,7 @@ Expected results:
 - LL bounds: **8/8 pass**
 - Trend directions: **7/7 match**
 
-This is Config #15 out of 737 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is Config #15 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 
@@ -415,7 +415,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | Component | Location |
 |-----------|----------|
 | `BALANCE_PLANETS` array | [script.js:9207](../src/script.js#L9207) |
-| `BALANCE_PRESETS` (737 configs) | [script.js:9216](../src/script.js#L9216) |
+| `BALANCE_PRESETS` (743 configs) | [script.js:9216](../src/script.js#L9216) |
 | `D_VALUE_OPTIONS` | [script.js:9330](../src/script.js#L9330) |
 | `BALANCE_CONFIG` | [script.js:9348](../src/script.js#L9348) |
 | `computeBalanceResults()` | [script.js:9497](../src/script.js#L9497) |
