@@ -303,6 +303,44 @@ for (const [key, a] of Object.entries(ar.planetOrbitalElements)) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// D. PREDICT_COEFFS (429-term prediction coefficients per planet)
+// ═══════════════════════════════════════════════════════════════════════════
+
+console.log('\n=== D. Prediction Coefficients ===');
+if (fc.PREDICT_COEFFS_UNIFIED) {
+  const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+
+  // Build the new PREDICT_COEFFS block
+  let newCoeffs = 'const PREDICT_COEFFS = {\n';
+  for (const p of planets7) {
+    const coeffs = fc.PREDICT_COEFFS_UNIFIED[p];
+    if (!coeffs) continue;
+    newCoeffs += '  ' + p + ': [\n';
+    // Format 7 coefficients per line
+    for (let i = 0; i < coeffs.length; i += 7) {
+      const chunk = coeffs.slice(i, i + 7);
+      newCoeffs += '                                ' +
+        chunk.map(v => fmtSci(v)).join(', ') + ',\n';
+    }
+    newCoeffs += '  ],\n';
+  }
+  newCoeffs += '};';
+
+  // Replace the old block
+  const re = /const PREDICT_COEFFS = \{[\s\S]*?\n\};/;
+  const m = src.match(re);
+  if (m) {
+    if (m[0] === newCoeffs) {
+      console.log('  PREDICT_COEFFS: unchanged (' + planets7.length + ' × ' + fc.PREDICT_COEFFS_UNIFIED.mercury.length + ' terms)');
+    } else {
+      console.log('  PREDICT_COEFFS: ' + planets7.length + ' × ' + fc.PREDICT_COEFFS_UNIFIED.mercury.length + ' terms updated');
+      src = src.replace(re, newCoeffs);
+      changes++;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // E. BALANCE PRESETS
 // ═══════════════════════════════════════════════════════════════════════════
 
