@@ -170,13 +170,13 @@ const earthScalars = {
   EARTH_INCLIN_MEAN: { val: C.earthInvPlaneInclinationMean, prec: 5 },
   EARTH_INCLIN_AMPL: { val: C.earthInvPlaneInclinationAmplitude, prec: 5 },
   EARTH_OBLIQ_MEAN: { val: C.earthtiltMean, prec: 6 },
-  EARTH_ECC_BASE: { val: C.eccentricityBase, prec: 6 },
-  EARTH_ECC_AMP: { val: C.eccentricityAmplitude, prec: 6 },
+  EARTH_ECC_BASE: { val: C.eccentricityBase, prec: -1 },
+  EARTH_ECC_AMP: { val: C.eccentricityAmplitude, prec: -1 },
 };
 
 for (const [name, { val, prec }] of Object.entries(earthScalars)) {
-  const rounded = parseFloat(val.toFixed(prec));
-  constantsTs = replaceScalar(constantsTs, name, rounded);
+  const output = prec < 0 ? val : parseFloat(val.toFixed(prec));
+  constantsTs = replaceScalar(constantsTs, name, output);
 }
 
 // ── 3. Planet eccentricity records ────────────────────────────

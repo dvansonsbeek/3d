@@ -21954,9 +21954,9 @@ function setupGUI() {
     label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
   }), 'Anomalistic year in days. Perihelion to perihelion.');
 
-  const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points' });
+  const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
   addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Holistic Year. See doc 14.');
-  for (const [cp, label] of [['SS', 'Summer Solstice'], ['WS', 'Winter Solstice'], ['VE', 'Vernal Equinox'], ['AE', 'Autumnal Equinox']]) {
+  for (const [cp, label] of [['VE', 'Vernal Equinox'], ['SS', 'Summer Solstice'], ['AE', 'Autumnal Equinox'], ['WS', 'Winter Solstice']]) {
     const sub = cpFolder.addFolder({ title: label });
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'Date', {
       label: 'Date', readonly: true
