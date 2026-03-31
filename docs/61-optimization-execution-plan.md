@@ -912,7 +912,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 - Eccentricity: 0.01671044 (expected ~0.01671)
 - Obliquity: 23.4393° (expected ~23.44°)
 - Perihelion longitude: 102.95° (expected ~102.9°)
-- Precession: 25,859 years (expected ~25,771 — known model vs IAU difference)
+- Precession: 25,794 years (H/13 mean; IAU J2000 instantaneous rate is ~25,772)
 - All 6 explore scripts pass with re-exported constants
 
 **Key finding:** Planet inclination mean/amplitude values were stored as individual globals in script.js (lines 345-398), not in the per-planet objects. These have now been populated in the constants module's `planets` object for tool use.
