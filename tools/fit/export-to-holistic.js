@@ -321,6 +321,25 @@ if (oldCoef === coefOut) {
   console.log(`  ✓ Written coefficients.ts (${planetNames.length} × ${coeffs.mercury.length} terms)`);
 }
 
+// ── Feature builder verification ──────────────────────────────
+
+const PLANETS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'planets.ts');
+if (fs.existsSync(PLANETS_PATH)) {
+  const planetsTs = fs.readFileSync(PLANETS_PATH, 'utf8');
+  const OE = require('../lib/orbital-engine');
+  const expectedCount = OE.buildPredictiveFeatures(2000, 243866.91, 77.4569).length;
+
+  // Count features by checking the comment at the top of buildFeatures
+  const commentMatch = planetsTs.match(/Build unified (\d+)-term feature matrix/);
+  const declaredCount = commentMatch ? parseInt(commentMatch[1]) : 0;
+
+  if (declaredCount !== expectedCount) {
+    console.log(`  ⚠ planets.ts buildFeatures declares ${declaredCount} terms but pipeline expects ${expectedCount} — MANUAL UPDATE NEEDED`);
+  } else {
+    console.log(`  ✓ planets.ts buildFeatures: ${expectedCount} terms (matches pipeline)`);
+  }
+}
+
 // ── 6. model-values.ts ────────────────────────────────────────
 
 const MV_PATH = path.join(HOLISTIC_ROOT, 'src', 'data', 'model-values.ts');
