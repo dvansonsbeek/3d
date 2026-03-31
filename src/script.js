@@ -21932,30 +21932,30 @@ function setupGUI() {
 
   const yearsFolder = astroFolder.addFolder({ title: 'Solar Year' });
   addTooltip(yearsFolder.addBinding(predictions, 'lengthofsolarYearSecRealLOD', {
-    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(2)
   }), 'Tropical year in seconds. Equinox to equinox.');
   addTooltip(yearsFolder.addBinding(predictions, 'lengthofsolarYear', {
-    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(8)
   }), 'Tropical year in days. Equinox to equinox.');
 
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'lengthofsiderealYearInSeconds', {
-    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(2)
   }), 'Sidereal year in seconds. One orbit relative to the fixed stars.');
   addTooltip(siderealYrFolder.addBinding(predictions, 'lengthofsiderealYearDaysRealLOD', {
-    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(8)
   }), 'Sidereal year in days. One orbit relative to the fixed stars.');
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'lengthofanomalisticYearSecRealLOD', {
-    label: 'Model (sec)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (sec)', readonly: true, format: v => v.toFixed(2)
   }), 'Anomalistic year in seconds. Perihelion to perihelion.');
   addTooltip(anomalisticFolder.addBinding(predictions, 'lengthofanomalisticDaysRealLOD', {
-    label: 'Model (days)', readonly: true, format: v => v.toFixed(6)
+    label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
   }), 'Anomalistic year in days. Perihelion to perihelion.');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points' });
-  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 12-harmonic Fibonacci formula. Valid across the full 335,008-year Holistic Year. See doc 14.');
+  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Holistic Year. See doc 14.');
   for (const [cp, label] of [['SS', 'Summer Solstice'], ['WS', 'Winter Solstice'], ['VE', 'Vernal Equinox'], ['AE', 'Autumnal Equinox']]) {
     const sub = cpFolder.addFolder({ title: label });
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'Date', {
@@ -21977,21 +21977,21 @@ function setupGUI() {
 
   const precessionFolder = astroFolder.addFolder({ title: 'Precession Periods' });
   addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecessionRealLOD', {
-    label: 'Perihelion (yrs)', readonly: true, format: v => v.toFixed(6)
+    label: 'Perihelion (yrs)', readonly: true, format: v => v.toFixed(2)
   }), 'Time for the perihelion direction to complete one full revolution.');
   addTooltip(precessionFolder.addBinding(predictions, 'axialPrecessionRealLOD', {
-    label: 'Axial (yrs)', readonly: true, format: v => v.toFixed(6)
+    label: 'Axial (yrs)', readonly: true, format: v => v.toFixed(2)
   }), 'Time for Earth\u2019s rotation axis to trace one full cone (H/8).');
   addTooltip(precessionFolder.addBinding(predictions, 'inclinationPrecessionRealLOD', {
-    label: 'Inclination (yrs)', readonly: true, format: v => v.toFixed(6)
+    label: 'Inclination (yrs)', readonly: true, format: v => v.toFixed(2)
   }), 'Time for Earth\u2019s orbital plane to precess around the invariable plane (H/3).');
   addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecessionRealLOD', {
-    label: 'Ecliptic Cycle (yrs)', readonly: true, format: v => v.toFixed(6)
+    label: 'Ecliptic Cycle (yrs)', readonly: true, format: v => v.toFixed(2)
   }), 'Combined cycle of axial and orbital plane precession.');
 
   const orbitalFolder = astroFolder.addFolder({ title: 'Orbital Elements' });
   addTooltip(orbitalFolder.addBinding(predictions, 'eccentricityEarth', {
-    label: 'Eccentricity', readonly: true, format: v => v.toFixed(6)
+    label: 'Eccentricity', readonly: true, format: v => v.toFixed(8)
   }), 'Shape of Earth\u2019s orbit. 0 = circle, 1 = parabola.');
   addTooltip(orbitalFolder.addBinding(predictions, 'obliquityEarth', {
     label: 'Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
@@ -22003,7 +22003,7 @@ function setupGUI() {
     label: 'Long. Perihelion (\u00B0)', readonly: true, format: v => v.toFixed(6)
   }), 'Ecliptic longitude where Earth is closest to the Sun.');
   addTooltip(orbitalFolder.addBinding(predictions, 'lengthofAU', {
-    label: 'Length of AU (km)', readonly: true, format: v => v.toFixed(6)
+    label: 'Length of AU (km)', readonly: true, format: v => v.toFixed(3)
   }), 'Mean Sun\u2013Earth distance derived from the model.');
 
   // ── Visualization ──
@@ -31733,7 +31733,7 @@ const planetStats = {
        constant: true},
     null,
       {label : () => `Axial tilt`,
-       value : [ { v: () => o.obliquityEarth, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over a Holistic Year. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
@@ -31741,10 +31741,10 @@ const planetStats = {
        hover : [`Observed eccentricity from 3D scene. Base: ${eccentricityBase}. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:8, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => o.obliquityEarth-radiansToDecDecimal(earthWobbleCenter.dec), dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Difference between axial tilt amplitude and inclination tilt amplitude. Currently decreasing toward 0° in ~2194 AD, when obliquity reaches its mean value`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => o.earthInvPlaneInclinationDynamic, dec:8, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => o.earthInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between orbit and the invariable plane (solar system's angular momentum plane). Oscillates ~${(earthInvPlaneInclinationMean - earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude).toFixed(2)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
