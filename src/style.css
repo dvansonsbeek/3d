@@ -3372,6 +3372,15 @@ a:link {
 .vfp-j2000 td:nth-child(2),
 .vfp-j2000 td:nth-child(3) { text-align: right; }
 
+.vfp-source-link {
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+  font-size: 10px;
+  margin-left: 4px;
+  transition: color 0.15s;
+}
+.vfp-source-link:hover { color: #4fc3f7; }
+
 .vfp-max-diff {
   padding: 6px 10px;
   margin: 6px 0;

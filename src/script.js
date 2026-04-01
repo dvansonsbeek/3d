@@ -19621,17 +19621,17 @@ function yearToJDApprox(year) { return j2000JD + (year - 2000) * 365.25; }
 // ── Reference formula implementations ────────────────────────────
 
 function eccHarkness(year) {
-  // Excel: =0.016771049-(0.0000004245*(A5-1850))-((0.000000001367*(A5-1850))^2)
-  // Note: the ^2 applies to the ENTIRE product (coeff × dy), not just dy
+  // Harkness (1891), "The Solar Parallax and Its Related Constants"
+  // Standard polynomial: e = 0.016771049 - 0.0000004245*(t-1850) - 0.000000001367*(t-1850)^2
   const dy = year - 1850;
-  return 0.016771049 - 0.0000004245 * dy - Math.pow(0.000000001367 * dy, 2);
+  return 0.016771049 - 0.0000004245 * dy - 0.000000001367 * dy * dy;
 }
 
 function eccMeeus(year) {
-  // Excel: =0.016708634-(0.000042037*T)-((0.0000001267*T)^2)
-  // Note: the ^2 applies to the ENTIRE product (coeff × T), not just T
+  // Meeus (1991), "Astronomical Algorithms", Eq. 25.4
+  // Standard polynomial: e = 0.016708634 - 0.000042037*T - 0.0000001267*T^2
   const T = (yearToJDApprox(year) - j2000JD) / 36525;
-  return 0.016708634 - 0.000042037 * T - Math.pow(0.0000001267 * T, 2);
+  return 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
 }
 
 function obliquityChapront2002(year) {
@@ -19648,15 +19648,17 @@ function perihelionMeeus(year) {
 }
 
 function perihelionMeeusEarth(year) {
+  // Meeus (1991), Table 31.A, based on Simon et al. (1994)
+  // Standard polynomial with T in millennia, coefficients in arcseconds
   const T = (yearToJDApprox(year) - j2000JD) / 365250;  // millennia
   const arcsecToDeg = 360 / 1296000;
   return ((102.93734808
     + 61900.5529 * arcsecToDeg * T
-    + Math.pow(164.47797 * arcsecToDeg * T, 2)
-    - Math.pow(0.06365 * arcsecToDeg * T, 3)
-    - Math.pow(0.12909 * arcsecToDeg * T, 4)
-    + Math.pow(0.00298 * arcsecToDeg * T, 5)
-    + Math.pow(0.0002 * arcsecToDeg * T, 6)) % 360 + 360) % 360;
+    + 164.47797 * arcsecToDeg * Math.pow(T, 2)
+    - 0.06365 * arcsecToDeg * Math.pow(T, 3)
+    - 0.12909 * arcsecToDeg * Math.pow(T, 4)
+    + 0.00298 * arcsecToDeg * Math.pow(T, 5)
+    + 0.0002 * arcsecToDeg * Math.pow(T, 6)) % 360 + 360) % 360;
 }
 
 function tropicalYearLaskar(year) {
@@ -19686,6 +19688,119 @@ function axialPrecessionCapitaine2009(year) {
   return 129600000 / rateArcsecPerCy;
 }
 
+// ── Berger (1978) trigonometric series ────────────────────────────
+// Source: Berger, A.L. (1978), J. Atmos. Sci., 35(12), 2362-2367
+// Epoch: 1950.0 CE. Coefficients from palinsol R package (Crucifix).
+
+const _BER78_ARCSEC2RAD = Math.PI / (180 * 3600);
+const _BER78_DEG2RAD = Math.PI / 180;
+
+// Table 4: Eccentricity (19 terms) — e·sin(ω̃) and e·cos(ω̃) projections
+const _BER78_ECC = [
+  [0.01860798, 4.207205, 28.620089], [0.01627522, 7.346091, 193.788772],
+  [-0.01300660, 17.857263, 308.307024], [0.00988829, 17.220546, 320.199637],
+  [-0.00336700, 16.846733, 279.376984], [0.00333077, 5.199079, 87.195000],
+  [-0.00235400, 18.231076, 349.129677], [0.00140015, 26.216758, 128.443387],
+  [0.00100700, 6.359169, 154.143880], [0.00085700, 16.210016, 291.269597],
+  [0.00064990, 3.065181, 114.860583], [0.00059900, 16.583829, 332.092251],
+  [0.00037800, 18.493980, 296.414411], [-0.00033700, 6.190953, 145.769910],
+  [0.00027600, 18.867793, 337.237063], [0.00018200, 17.425567, 152.092288],
+  [-0.00017400, 6.186001, 126.839891], [-0.00012400, 18.417441, 210.667199],
+  [0.00001250, 0.667863, 72.108838],
+];
+
+function eccBerger1978(year) {
+  const t = year - 1950; // years from 1950.0
+  let esinP = 0, ecosP = 0;
+  for (const [M, rate, phase] of _BER78_ECC) {
+    const arg = rate * _BER78_ARCSEC2RAD * t + phase * _BER78_DEG2RAD;
+    esinP += M * Math.sin(arg);
+    ecosP += M * Math.cos(arg);
+  }
+  return Math.sqrt(esinP * esinP + ecosP * ecosP);
+}
+
+// Table 1: Obliquity (47 terms) — amplitudes in arcseconds
+const _BER78_OBL_MEAN = 23.320556; // degrees
+const _BER78_OBL = [
+  [-2462.2214466, 31.609974, 251.9025], [-857.3232075, 32.620504, 280.8325],
+  [-629.3231835, 24.172203, 128.3057], [-414.2804924, 31.983787, 292.7252],
+  [-311.7632587, 44.828336, 15.3747], [308.9408604, 30.973257, 263.7951],
+  [-162.5533601, 43.668246, 308.4258], [-116.1077911, 32.246691, 240.0099],
+  [101.1189923, 30.599444, 222.9725], [-67.6856209, 42.681324, 268.7809],
+  [24.9079067, 43.836462, 316.7998], [22.5811241, 47.439436, 319.6024],
+  [-21.1648355, 63.219948, 143.8050], [-15.6549876, 64.230478, 172.7351],
+  [15.3936813, 1.010530, 28.9300], [14.6660938, 7.437771, 123.5968],
+  [-11.7273029, 55.782177, 20.2082], [10.2742696, 0.373813, 40.8226],
+  [6.4914588, 13.218362, 123.4722], [5.8539148, 62.583231, 155.6977],
+  [-5.4872205, 63.593761, 184.6277], [-5.4290191, 76.438310, 267.2772],
+  [5.1609570, 45.815258, 55.0196], [5.0786314, 8.448301, 152.5268],
+  [-4.0735782, 56.792707, 49.1382], [3.7227167, 49.747842, 204.6609],
+  [3.3971932, 12.058272, 56.5233], [-2.8347004, 75.278220, 200.3284],
+  [-2.6550721, 65.241008, 201.6651], [-2.5717867, 64.604291, 213.5577],
+  [-2.4712188, 1.647247, 17.0374], [2.4625410, 7.811584, 164.4194],
+  [2.2464112, 12.207832, 94.5422], [-2.0755511, 63.856665, 131.9124],
+  [-1.9713669, 56.155990, 61.0309], [-1.8813061, 77.448840, 296.2073],
+  [-1.8468785, 6.801054, 135.4894], [1.8186742, 62.209418, 114.8750],
+  [1.7601888, 20.656133, 247.0691], [-1.5428851, 48.344406, 256.6114],
+  [1.4738838, 55.145460, 32.1008], [-1.4593669, 69.000539, 143.6804],
+  [1.4192259, 11.071350, 16.8784], [-1.1818980, 74.291298, 160.6835],
+  [1.1756474, 11.047742, 27.5932], [-1.1316126, 0.636717, 348.1074],
+  [1.0896928, 12.844549, 82.6496],
+];
+
+function obliquityBerger1978(year) {
+  const t = year - 1950;
+  let eps = _BER78_OBL_MEAN;
+  for (const [A, rate, phase] of _BER78_OBL) {
+    eps += (A / 3600) * Math.cos(rate * _BER78_ARCSEC2RAD * t + phase * _BER78_DEG2RAD);
+  }
+  return eps;
+}
+
+// ── Vondrák et al. (2011) long-term precession ──────────────────
+// Source: Vondrák, Capitaine & Wallace (2011), A&A 534, A22
+// Table 3: general precession p_A + obliquity epsilon_A
+// T in Julian centuries from J2000.0
+
+const _VONDRAK_PA = [
+  // [period_cy, Cp, Sp]
+  [409.90, -6908.287473, -2845.175469],
+  [396.15, -3198.706291, 449.844989],
+  [537.22, 1453.674527, -1255.915323],
+  [402.90, -857.748557, 886.736783],
+  [417.15, 1173.231614, 418.887514],
+  [288.92, -156.981465, 997.912441],
+  [4043.00, 371.836550, -240.979710],
+  [306.00, -216.619040, 76.541307],
+  [277.00, 193.691479, -36.788069],
+  [203.00, 11.891524, -170.964086],
+];
+
+function axialPrecessionVondrak2011(year) {
+  const T = (year - 2000) / 100; // Julian centuries from J2000
+  // Polynomial part of p_A (accumulated general precession, arcsec)
+  let pA = 8134.017132 + 5043.0520035 * T - 0.00710733 * T * T + 271e-9 * Math.pow(T, 3);
+  // Periodic terms
+  for (const [P, Cp, Sp] of _VONDRAK_PA) {
+    const arg = 2 * Math.PI * T / P;
+    pA += Cp * Math.cos(arg) + Sp * Math.sin(arg);
+  }
+  // p_A is accumulated precession in arcsec; rate = dp_A/dT in arcsec/cy
+  // Numerical derivative: rate ≈ (p_A(T+h) - p_A(T-h)) / (2h) with h = 0.01 cy = 1 yr
+  const h = 0.01;
+  const T1 = T + h, T2 = T - h;
+  let pA1 = 8134.017132 + 5043.0520035 * T1 - 0.00710733 * T1 * T1 + 271e-9 * Math.pow(T1, 3);
+  let pA2 = 8134.017132 + 5043.0520035 * T2 - 0.00710733 * T2 * T2 + 271e-9 * Math.pow(T2, 3);
+  for (const [P, Cp, Sp] of _VONDRAK_PA) {
+    pA1 += Cp * Math.cos(2 * Math.PI * T1 / P) + Sp * Math.sin(2 * Math.PI * T1 / P);
+    pA2 += Cp * Math.cos(2 * Math.PI * T2 / P) + Sp * Math.sin(2 * Math.PI * T2 / P);
+  }
+  const rateArcsecPerCy = (pA1 - pA2) / (2 * h);
+  if (Math.abs(rateArcsecPerCy) < 1) return NaN;
+  return 129600000 / rateArcsecPerCy; // period in years
+}
+
 // ── Category definitions ─────────────────────────────────────────
 
 const VFP_CATEGORIES = [
@@ -19698,8 +19813,9 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeEccentricityEarth(year, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude) },
     references: [
-      { name: 'Harkness (1891)', color: '#4fc3f7', fn: eccHarkness },
-      { name: 'Meeus (1991)', color: '#81c784', fn: eccMeeus },
+      { name: 'Harkness (1891)', color: '#4fc3f7', fn: eccHarkness, sourceUrl: 'https://archive.org/details/solarparallaxits00hark' },
+      { name: 'Meeus (1991)', color: '#81c784', fn: eccMeeus, sourceUrl: 'https://en.wikipedia.org/wiki/Orbital_eccentricity' },
+      { name: 'Berger (1978)', color: '#ce93d8', fn: eccBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -19717,9 +19833,10 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeObliquityEarth(year) },
     references: [
-      { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986 },
-      { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006 },
-      { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002 },
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986, sourceUrl: 'https://en.wikipedia.org/wiki/Axial_tilt' },
+      { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Berger (1978)', color: '#ff8a65', fn: obliquityBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19737,7 +19854,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => calcEarthPerihelionPredictive(year) },
     references: [
-      { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth },
+      { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -19753,7 +19870,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeLengthofsolarYear(year) },
     references: [
-      { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar },
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar, sourceUrl: 'https://en.wikipedia.org/wiki/Tropical_year' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19768,7 +19885,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year) },
     references: [
-      { name: 'Peters (2010)', color: '#4fc3f7', fn: solarDayPeters },
+      { name: 'Peters (2010)', color: '#4fc3f7', fn: solarDayPeters, sourceUrl: 'https://en.wikipedia.org/wiki/Day_length_fluctuations' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19784,7 +19901,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeLengthofsiderealYear(year) },
     references: [
-      { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront },
+      { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -19806,7 +19923,8 @@ const VFP_CATEGORIES = [
         return computeAxialPrecessionRealLOD(meansiderealyearlengthinSeconds, solYear, lod);
       }},
     references: [
-      { name: 'Capitaine (2009)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009 },
+      { name: 'Capitaine (2003)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
+      { name: 'Vondr\u00e1k (2011)', color: '#81c784', fn: axialPrecessionVondrak2011, sourceUrl: 'https://doi.org/10.1051/0004-6361/201117274' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -20046,7 +20164,8 @@ function renderVFPChart(category, currentYear) {
       diff = (d >= 0 ? '+' : '') + d.toExponential(3);
     }
     const fmtV = category.fmtValue || (v => Number.isFinite(v) ? v.toFixed(category.precision) : 'N/A');
-    j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${curve.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${curve.name}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
+    const srcLink = curve.sourceUrl ? ` <a href="${curve.sourceUrl}" target="_blank" class="vfp-source-link" title="Source">\u2197</a>` : '';
+    j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${curve.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${curve.name}${srcLink}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
   }
   // Extra J2000 reference values (observed, not plotted as curves)
   if (category.j2000extras) {
@@ -20064,7 +20183,7 @@ function renderVFPChart(category, currentYear) {
   }
   // Pad to fixed row count so table height is consistent across categories
   const totalRows = allCurves.length + (category.j2000extras?.length || 0);
-  const maxRows = 5;
+  const maxRows = 6;
   for (let i = totalRows; i < maxRows; i++) {
     j2000Table += '<tr><td>&nbsp;</td><td></td><td></td></tr>';
   }
