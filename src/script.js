@@ -19610,6 +19610,776 @@ function closeEccBalanceScale() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// FORMULA VERIFICATION PANEL (.vfp-)
+// Compare model predictions vs published scientific formulas
+// ═══════════════════════════════════════════════════════════════════
+
+/** Convert calendar year to approximate JD (standard polynomial convention) */
+function yearToJDApprox(year) { return j2000JD + (year - 2000) * 365.25; }
+
+// ── Reference formula implementations ────────────────────────────
+
+function eccHarkness(year) {
+  // Excel: =0.016771049-(0.0000004245*(A5-1850))-((0.000000001367*(A5-1850))^2)
+  // Note: the ^2 applies to the ENTIRE product (coeff × dy), not just dy
+  const dy = year - 1850;
+  return 0.016771049 - 0.0000004245 * dy - Math.pow(0.000000001367 * dy, 2);
+}
+
+function eccMeeus(year) {
+  // Excel: =0.016708634-(0.000042037*T)-((0.0000001267*T)^2)
+  // Note: the ^2 applies to the ENTIRE product (coeff × T), not just T
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return 0.016708634 - 0.000042037 * T - Math.pow(0.0000001267 * T, 2);
+}
+
+function obliquityChapront2002(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return (84381.406 - 46.836769 * T - 0.0001831 * T * T
+    + 0.0020034 * Math.pow(T, 3) - 0.000000576 * Math.pow(T, 4)
+    - 0.0000000434 * Math.pow(T, 5)) / 3600;
+}
+
+function perihelionMeeus(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return ((102.937348 + 1.7195366 * T + 0.00045688 * T * T
+    - 0.000000018 * Math.pow(T, 3)) % 360 + 360) % 360;
+}
+
+function perihelionMeeusEarth(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 365250;  // millennia
+  const arcsecToDeg = 360 / 1296000;
+  return ((102.93734808
+    + 61900.5529 * arcsecToDeg * T
+    + Math.pow(164.47797 * arcsecToDeg * T, 2)
+    - Math.pow(0.06365 * arcsecToDeg * T, 3)
+    - Math.pow(0.12909 * arcsecToDeg * T, 4)
+    + Math.pow(0.00298 * arcsecToDeg * T, 5)
+    + Math.pow(0.0002 * arcsecToDeg * T, 6)) % 360 + 360) % 360;
+}
+
+function tropicalYearLaskar(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return 365.2421896698 - 0.00000615359 * T
+    - 0.000000000729 * T * T + 0.000000000264 * Math.pow(T, 3);
+}
+
+function solarDayPeters(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return 86400 + (T + 1.8) * 0.0017;
+}
+
+function siderealYearChapront(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  return 365.256362953 + 0.0000001139 * T
+    - 0.000000000076 * T * T - 0.00000000000169 * Math.pow(T, 3);
+}
+
+function axialPrecessionCapitaine2009(year) {
+  const T = (yearToJDApprox(year) - j2000JD) / 36525;
+  const rateArcsecPerCy = 5028.796195 + 2.2108696 * T
+    + 0.00023892 * T * T - 0.000095428 * Math.pow(T, 3)
+    - 0.0000001915 * Math.pow(T, 4);
+  if (Math.abs(rateArcsecPerCy) < 1) return NaN;
+  // rate is arcsec/century; full circle = 1,296,000 arcsec; period in years = 1296000/rate * 100
+  return 129600000 / rateArcsecPerCy;
+}
+
+// ── Category definitions ─────────────────────────────────────────
+
+const VFP_CATEGORIES = [
+  {
+    id: 'eccentricity', label: 'Eccentricity', unit: '', precision: 8,
+    yLabel: 'eccentricity',
+    residualLabel: 'AU', residualScale: 1,
+    primaryRef: 1, // Meeus
+    paperRange: [-23000, 23000], paperTitle: 'Eccentricity Comparison',
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => computeEccentricityEarth(year, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude) },
+    references: [
+      { name: 'Harkness (1891)', color: '#4fc3f7', fn: eccHarkness },
+      { name: 'Meeus (1991)', color: '#81c784', fn: eccMeeus },
+    ],
+    j2000extras: [
+      { name: 'NASA/JPL (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.eccentricityJ2000 },
+    ],
+  },
+  {
+    id: 'obliquity', label: 'Obliquity', unit: '°', precision: 6,
+    yLabel: 'degrees',
+    residualLabel: 'arcseconds', residualScale: 3600,
+    primaryRef: 2, // Chapront+ 2002
+    paperRange: [-23000, 23000], paperTitle: 'Obliquity Comparison',
+    paperYRange: [20, 28], paperYTicks: [20, 21, 22, 23, 24, 25, 26, 27, 28],
+    fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => computeObliquityEarth(year) },
+    references: [
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: meanObliquityLaskar1986 },
+      { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006 },
+      { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002 },
+    ],
+    j2000extras: [
+      { name: 'IAU (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.obliquityJ2000_deg },
+    ],
+  },
+  {
+    id: 'perihelion', label: 'Longitude of Perihelion', unit: '°', precision: 3,
+    yLabel: 'degrees',
+    residualLabel: 'degrees', residualScale: 1,
+    wrap360: true,
+    paperTitle: 'Longitude Perihelion Comparison',
+    paperRange: [-23000, 23000], paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
+    fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => calcEarthPerihelionPredictive(year) },
+    references: [
+      { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth },
+    ],
+    j2000extras: [
+      { name: 'NASA/JPL (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.perihelionLongitudeJ2000_deg },
+    ],
+  },
+  {
+    id: 'tropical-year', label: 'Tropical Year', unit: ' days', precision: 8,
+    yLabel: 'days',
+    residualLabel: 'seconds', residualScale: 86400,
+    paperTitle: 'Tropical Year Comparison',
+    fixedYRange: [365.2418, 365.2426], fixedYTicks: [365.2418, 365.2420, 365.2422, 365.2424, 365.2426],
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => computeLengthofsolarYear(year) },
+    references: [
+      { name: 'Laskar (1986)', color: '#4fc3f7', fn: tropicalYearLaskar },
+    ],
+    j2000extras: [
+      { name: 'IAU (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.tropicalYearMeanJ2000 },
+    ],
+  },
+  {
+    id: 'solar-day', label: 'Solar Day Length', unit: ' s', precision: 6,
+    yLabel: 'seconds',
+    residualLabel: 'milliseconds', residualScale: 1000,
+    paperTitle: 'Solar Day Length Comparison',
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => meansiderealyearlengthinSeconds / computeLengthofsiderealYear(year) },
+    references: [
+      { name: 'Peters (2010)', color: '#4fc3f7', fn: solarDayPeters },
+    ],
+    j2000extras: [
+      { name: 'IAU (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.solarDayJ2000 },
+    ],
+  },
+  {
+    id: 'sidereal-year', label: 'Sidereal Year', unit: ' days', precision: 9,
+    yLabel: 'days',
+    residualLabel: 'seconds', residualScale: 86400,
+    paperTitle: 'Sidereal Year Comparison',
+    fixedYRange: [365.25635, 365.256375], fixedYTicks: [365.25635, 365.256355, 365.25636, 365.256365, 365.25637, 365.256375],
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => computeLengthofsiderealYear(year) },
+    references: [
+      { name: 'Chapront (2002)', color: '#4fc3f7', fn: siderealYearChapront },
+    ],
+    j2000extras: [
+      { name: 'NASA/JPL (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.siderealYearJ2000 },
+    ],
+  },
+  {
+    id: 'axial-precession', label: 'Axial Precession Period', unit: ' yr', precision: 2,
+    yLabel: 'years',
+    residualLabel: 'years', residualScale: 1,
+    paperRange: [-23000, 23000], paperTitle: 'Axial Precession Period Comparison',
+    fixedYRange: [25000, 26600], fixedYTicks: [25000, 25400, 25800, 26200, 26600],
+    fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A',
+    model: { name: 'This model', color: '#f0b040',
+      fn: year => {
+        const sidDays = computeLengthofsiderealYear(year);
+        const lod = meansiderealyearlengthinSeconds / sidDays;
+        const solYear = computeLengthofsolarYear(year);
+        return computeAxialPrecessionRealLOD(meansiderealyearlengthinSeconds, solYear, lod);
+      }},
+    references: [
+      { name: 'Capitaine (2009)', color: '#4fc3f7', fn: axialPrecessionCapitaine2009 },
+    ],
+    j2000extras: [
+      { name: 'IAU (observed)', color: '#ef5350',
+        value: () => ASTRO_REFERENCE.siderealYearJ2000 / (ASTRO_REFERENCE.siderealYearJ2000 - ASTRO_REFERENCE.tropicalYearMeanJ2000) },
+    ],
+  },
+];
+
+// ── SVG Chart Renderer ───────────────────────────────────────────
+
+function renderVFPChart(category, currentYear) {
+  const W = 800, H_MAIN = 300, H_RES = 140, PAD = { l: 72, r: 20, t: 22, b: 30 };
+  const plotW = W - PAD.l - PAD.r;
+  const plotH_main = H_MAIN - PAD.t - PAD.b;
+  const plotH_res = H_RES - PAD.t - PAD.b;
+  const yearMin = -12000, yearMax = 12000;
+  const nSamples = 200;
+  const step = (yearMax - yearMin) / nSamples;
+
+  // Sample all curves
+  const allCurves = [category.model, ...category.references];
+  const samples = allCurves.map(() => []);
+  for (let i = 0; i <= nSamples; i++) {
+    const yr = yearMin + i * step;
+    allCurves.forEach((curve, ci) => {
+      const v = curve.fn(yr);
+      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
+    });
+  }
+
+  // Residuals (reference - model), with wrap360 normalization
+  const residuals = category.references.map((_, ri) =>
+    samples[0].map((m, i) => {
+      const rv = samples[ri + 1][i].v, mv = m.v;
+      if (!Number.isFinite(rv) || !Number.isFinite(mv)) return { yr: m.yr, v: NaN };
+      let diff = rv - mv;
+      if (category.wrap360) {
+        // Normalize difference to [-180, +180]
+        diff = ((diff + 180) % 360 + 360) % 360 - 180;
+      }
+      return { yr: m.yr, v: diff };
+    })
+  );
+
+  // Y range for main chart
+  let yMin, yMax;
+  if (category.fixedYRange) {
+    [yMin, yMax] = category.fixedYRange;
+  } else {
+    yMin = Infinity; yMax = -Infinity;
+    for (const s of samples) for (const { v } of s) {
+      if (Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
+    }
+    if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
+    const yMargin = (yMax - yMin) * 0.08 || 0.001;
+    yMin -= yMargin; yMax += yMargin;
+  }
+
+  // Scale residuals to display unit
+  const rScale_ = category.residualScale || 1;
+  const rLabel = category.residualLabel || category.yLabel;
+  const scaledResiduals = residuals.map(r => r.map(({ yr, v }) => ({ yr, v: Number.isFinite(v) ? v * rScale_ : NaN })));
+
+  // Y range for residuals (in display units)
+  let rMin = Infinity, rMax = -Infinity;
+  for (const r of scaledResiduals) for (const { v } of r) {
+    if (Number.isFinite(v)) { rMin = Math.min(rMin, v); rMax = Math.max(rMax, v); }
+  }
+  if (!Number.isFinite(rMin)) { rMin = -1; rMax = 1; }
+  const rMargin = (rMax - rMin) * 0.12 || 0.0001;
+  rMin -= rMargin; rMax += rMargin;
+
+  // Compute endpoint differences (at -12000 and +12000) for the primary reference
+  const primaryIdx = category.primaryRef || 0;
+  const primaryName = category.references[primaryIdx]?.name || '';
+  const primaryModelFn = category.model.fn;
+  const primaryRefFn = category.references[primaryIdx]?.fn;
+  let diffAtStart = NaN, diffAtEnd = NaN;
+  let modelValStart = NaN, refValStart = NaN, modelValEnd = NaN, refValEnd = NaN;
+  if (primaryRefFn) {
+    modelValStart = primaryModelFn(-12000); refValStart = primaryRefFn(-12000);
+    modelValEnd = primaryModelFn(12000); refValEnd = primaryRefFn(12000);
+    if (Number.isFinite(modelValStart) && Number.isFinite(refValStart)) {
+      let d = refValStart - modelValStart;
+      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
+      diffAtStart = d * rScale_;
+    }
+    if (Number.isFinite(modelValEnd) && Number.isFinite(refValEnd)) {
+      let d = refValEnd - modelValEnd;
+      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
+      diffAtEnd = d * rScale_;
+    }
+  }
+
+  // Coordinate transforms
+  const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
+  const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH_main;
+  const rScaleFn = v => PAD.t + (1 - (v - rMin) / (rMax - rMin)) * plotH_res;
+
+  // Build SVG path for a data series (handles NaN gaps and optional 360 wrapping)
+  function buildPath(data, scaleY, wrap360) {
+    let d = '', inPath = false;
+    for (let i = 0; i < data.length; i++) {
+      const { yr, v } = data[i];
+      if (!Number.isFinite(v)) { inPath = false; continue; }
+      // Break path at 360/0 discontinuity
+      if (wrap360 && i > 0 && Number.isFinite(data[i - 1].v) &&
+          Math.abs(v - data[i - 1].v) > 180) {
+        inPath = false;
+      }
+      const x = xScale(yr).toFixed(1);
+      const y = scaleY(v).toFixed(1);
+      d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
+      inPath = true;
+    }
+    return d;
+  }
+
+  // Y-axis tick formatting — auto-detect needed decimals from data range
+  function fmtY(v) {
+    if (category.fmtValue) return category.fmtValue(v);
+    const range = yMax - yMin;
+    if (range === 0) return v.toFixed(category.precision);
+    // Determine decimals needed to show meaningful variation
+    const rangeDecimals = Math.max(0, -Math.floor(Math.log10(range)) + 2);
+    const decimals = Math.min(Math.max(rangeDecimals, 1), category.precision);
+    return v.toFixed(decimals);
+  }
+
+  // Plot area background
+  let mainGrid = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH_main}" fill="rgba(255,255,255,0.015)" rx="2"/>`;
+  // Grid + axes for main chart
+  const yTickValues = category.fixedYTicks || Array.from({ length: 6 }, (_, i) => yMin + i * (yMax - yMin) / 5);
+  for (const v of yTickValues) {
+    const y = yScale(v).toFixed(1);
+    mainGrid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
+    mainGrid += `<text x="${PAD.l - 5}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="rgba(255,255,255,0.45)" font-size="9">${fmtY(v)}</text>`;
+  }
+  // X-axis ticks with BC/AD labels
+  const xTicks = [-10000, -5000, 0, 5000, 10000];
+  function fmtXYear(yr) { return yr === 0 ? '0' : yr < 0 ? Math.abs(yr).toLocaleString() + ' BC' : yr.toLocaleString() + ' AD'; }
+  for (const yr of xTicks) {
+    const x = xScale(yr).toFixed(1);
+    mainGrid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H_MAIN - PAD.b}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>`;
+    mainGrid += `<text x="${x}" y="${H_MAIN - PAD.b + 13}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
+  }
+
+  // Current year marker with label
+  let marker = '';
+  if (Number.isFinite(currentYear) && currentYear >= yearMin && currentYear <= yearMax) {
+    const mx = xScale(currentYear).toFixed(1);
+    const yrLabel = currentYear === 2000 ? 'J2000' : Math.round(currentYear).toLocaleString();
+    marker = `<line x1="${mx}" y1="${PAD.t}" x2="${mx}" y2="${H_MAIN - PAD.b}" stroke="rgba(235,100,100,0.7)" stroke-width="1" stroke-dasharray="4,3"/>`;
+    marker += `<text x="${mx}" y="${PAD.t - 4}" text-anchor="middle" fill="rgba(235,100,100,0.8)" font-size="8" font-family="Inter,system-ui,sans-serif">${yrLabel}</text>`;
+  }
+
+  // Draw curves
+  let curvePaths = '';
+  allCurves.forEach((curve, ci) => {
+    const d = buildPath(samples[ci], yScale, category.wrap360);
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.5}" stroke-opacity="${ci === 0 ? 1 : 0.85}"/>`;
+  });
+
+  // Y-axis label
+  const yAxisLabel = `<text x="12" y="${PAD.t + plotH_main / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_main / 2})" fill="rgba(255,255,255,0.45)" font-size="9" font-family="Inter,system-ui,sans-serif">${category.yLabel}</text>`;
+
+  // Main SVG
+  const mainSVG = `<svg viewBox="0 0 ${W} ${H_MAIN}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+    ${mainGrid}${yAxisLabel}${marker}${curvePaths}
+  </svg>`;
+
+  // Residual chart
+  let resGrid = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH_res}" fill="rgba(255,255,255,0.01)" rx="2"/>`;
+  const rTicks = 3;
+  const rTickStep = (rMax - rMin) / rTicks;
+  // Format residual ticks with appropriate precision for the display unit
+  function fmtR(v) {
+    const range = rMax - rMin;
+    if (range === 0) return v.toFixed(2);
+    const decimals = Math.max(0, -Math.floor(Math.log10(range)) + 2);
+    return v.toFixed(Math.min(decimals, 6));
+  }
+  for (let i = 0; i <= rTicks; i++) {
+    const v = rMin + i * rTickStep;
+    const y = rScaleFn(v).toFixed(1);
+    resGrid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+    resGrid += `<text x="${PAD.l - 4}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="rgba(255,255,255,0.4)" font-size="8">${fmtR(v)}</text>`;
+  }
+  // Zero line
+  if (rMin <= 0 && rMax >= 0) {
+    const zy = rScaleFn(0).toFixed(1);
+    resGrid += `<line x1="${PAD.l}" y1="${zy}" x2="${W - PAD.r}" y2="${zy}" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" stroke-dasharray="3,3"/>`;
+  }
+  // X ticks for residual
+  for (const yr of xTicks) {
+    const x = xScale(yr).toFixed(1);
+    resGrid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H_RES - PAD.b}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+    resGrid += `<text x="${x}" y="${H_RES - PAD.b + 12}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8">${fmtXYear(yr)}</text>`;
+  }
+
+  // Current year marker on residual
+  let resMarker = '';
+  if (Number.isFinite(currentYear) && currentYear >= yearMin && currentYear <= yearMax) {
+    const mx = xScale(currentYear).toFixed(1);
+    resMarker = `<line x1="${mx}" y1="${PAD.t}" x2="${mx}" y2="${H_RES - PAD.b}" stroke="rgba(235,100,100,0.5)" stroke-width="1" stroke-dasharray="4,3"/>`;
+  }
+
+  let resPaths = '';
+  scaledResiduals.forEach((r, ri) => {
+    const d = buildPath(r, rScaleFn, category.wrap360);
+    resPaths += `<path d="${d}" fill="none" stroke="${category.references[ri].color}" stroke-width="1.2" stroke-opacity="0.8"/>`;
+  });
+
+  // Residual Y-axis label
+  const resYLabel = `<text x="12" y="${PAD.t + plotH_res / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,12,${PAD.t + plotH_res / 2})" fill="rgba(255,255,255,0.45)" font-size="8" font-family="Inter,system-ui,sans-serif">${rLabel}</text>`;
+
+  const resSVG = `<svg viewBox="0 0 ${W} ${H_RES}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+    ${resGrid}${resYLabel}${resMarker}${resPaths}
+    <text x="${W / 2}" y="12" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9" font-family="Inter,system-ui,sans-serif">Residual (Reference \u2212 Model) in ${rLabel}</text>
+  </svg>`;
+
+  // Legend
+  let legend = '';
+  for (const curve of allCurves) {
+    legend += `<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="background:${curve.color}"></span>${curve.name}</div>`;
+  }
+
+  // J2000 values table
+  let j2000Table = '<div class="vfp-j2000"><table><colgroup><col><col><col></colgroup><tr><th>Formula</th><th>Value at J2000</th><th>\u0394 vs Model</th></tr>';
+  const modelJ2000 = category.model.fn(2000);
+  for (const curve of allCurves) {
+    const v = curve.fn(2000);
+    let diff = '';
+    if (curve !== category.model && Number.isFinite(v) && Number.isFinite(modelJ2000)) {
+      let d = v - modelJ2000;
+      if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
+      diff = (d >= 0 ? '+' : '') + d.toExponential(3);
+    }
+    const fmtV = category.fmtValue || (v => Number.isFinite(v) ? v.toFixed(category.precision) : 'N/A');
+    j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${curve.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${curve.name}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
+  }
+  // Extra J2000 reference values (observed, not plotted as curves)
+  if (category.j2000extras) {
+    const fmtV = category.fmtValue || (v => Number.isFinite(v) ? v.toFixed(category.precision) : 'N/A');
+    for (const extra of category.j2000extras) {
+      const v = typeof extra.value === 'function' ? extra.value() : extra.value;
+      let diff = '';
+      if (Number.isFinite(v) && Number.isFinite(modelJ2000)) {
+        let d = v - modelJ2000;
+        if (category.wrap360) d = ((d + 180) % 360 + 360) % 360 - 180;
+        diff = (d >= 0 ? '+' : '') + d.toExponential(3);
+      }
+      j2000Table += `<tr><td><span class="vfp-legend-swatch" style="background:${extra.color};display:inline-block;vertical-align:middle;margin-right:6px"></span>${extra.name}</td><td>${fmtV(v)}${category.unit}</td><td>${diff}</td></tr>`;
+    }
+  }
+  // Pad to fixed row count so table height is consistent across categories
+  const totalRows = allCurves.length + (category.j2000extras?.length || 0);
+  const maxRows = 5;
+  for (let i = totalRows; i < maxRows; i++) {
+    j2000Table += '<tr><td>&nbsp;</td><td></td><td></td></tr>';
+  }
+  j2000Table += '</table></div>';
+
+  // Endpoint difference summary
+  let maxDiffHTML = '';
+  function fmtDiff(v) {
+    const absVal = Math.abs(v);
+    const sign = v >= 0 ? '+' : '\u2212';
+    const num = absVal >= 1000 ? absVal.toFixed(0) : absVal >= 1 ? absVal.toFixed(2) : absVal >= 0.001 ? absVal.toFixed(6) : absVal >= 0.0000001 ? absVal.toFixed(9) : absVal.toExponential(2);
+    return sign + num;
+  }
+  // Format base values in the original unit for context
+  function fmtBase(v) {
+    if (!Number.isFinite(v)) return 'N/A';
+    return (category.fmtValue || (x => Number.isFinite(x) ? x.toFixed(category.precision) : 'N/A'))(v) + (category.unit || '');
+  }
+  if (primaryRefFn && (Number.isFinite(diffAtStart) || Number.isFinite(diffAtEnd))) {
+    maxDiffHTML = `<div class="vfp-max-diff"><div class="vfp-max-diff-title">Difference vs ${primaryName} (in ${rLabel}):</div><div class="vfp-max-diff-row">`;
+    if (Number.isFinite(diffAtStart)) {
+      maxDiffHTML += `<span>At 12,000 BC: <strong>${fmtDiff(diffAtStart)} ${rLabel}</strong> <span class="vfp-max-diff-sep">\u00b7</span> <span class="vfp-max-diff-context">${fmtBase(modelValStart)} vs ${fmtBase(refValStart)}</span></span>`;
+    }
+    if (Number.isFinite(diffAtEnd)) {
+      maxDiffHTML += `<span>At 12,000 AD: <strong>${fmtDiff(diffAtEnd)} ${rLabel}</strong> <span class="vfp-max-diff-sep">\u00b7</span> <span class="vfp-max-diff-context">${fmtBase(modelValEnd)} vs ${fmtBase(refValEnd)}</span></span>`;
+    }
+    maxDiffHTML += '</div></div>';
+  }
+
+  // Year range note
+  const rangeNote = '<div class="vfp-range-note">Range: 12,000 BC \u2013 12,000 AD &middot; Reference formulas become unreliable outside their stated validity window</div>';
+
+  return `<div class="vfp-legend">${legend}</div>
+    <div class="vfp-chart-container">${mainSVG}</div>
+    ${j2000Table}
+    ${maxDiffHTML}
+    <div class="vfp-chart-container vfp-residual">${resSVG}</div>
+    ${rangeNote}`;
+}
+
+// ── Paper Export ─────────────────────────────────────────────────
+
+function renderVFPPaperChart(category) {
+  const W = 1000, H = 500, PAD = { l: 80, r: 30, t: 50, b: 45 };
+  const plotW = W - PAD.l - PAD.r;
+  const plotH = H - PAD.t - PAD.b;
+  const [yearMin, yearMax] = category.paperRange || [-12000, 12000];
+  const nSamples = 300;
+  const step = (yearMax - yearMin) / nSamples;
+
+  // Paper colors
+  const modelColor = '#2563eb'; // blue
+  const refColors = ['#b91c1c', '#15803d', '#7e22ce', '#b45309']; // dark red, dark green, purple, amber
+  const textColor = '#333';
+  const gridColor = '#ddd';
+  const axisColor = '#999';
+
+  // Sample all curves
+  const allCurves = [
+    { ...category.model, color: modelColor },
+    ...category.references.map((r, i) => ({ ...r, color: refColors[i % refColors.length] }))
+  ];
+  const samples = allCurves.map(() => []);
+  for (let i = 0; i <= nSamples; i++) {
+    const yr = yearMin + i * step;
+    allCurves.forEach((curve, ci) => {
+      const v = curve.fn(yr);
+      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
+    });
+  }
+
+  // Y range — paper overrides take priority, then UI fixedYRange, then auto
+  let yMin, yMax;
+  if (category.paperYRange) {
+    [yMin, yMax] = category.paperYRange;
+  } else if (category.fixedYRange) {
+    [yMin, yMax] = category.fixedYRange;
+  } else {
+    yMin = Infinity; yMax = -Infinity;
+    for (const s of samples) for (const { v } of s) {
+      if (Number.isFinite(v)) { yMin = Math.min(yMin, v); yMax = Math.max(yMax, v); }
+    }
+    if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
+    const yMargin = (yMax - yMin) * 0.08 || 0.001;
+    yMin -= yMargin; yMax += yMargin;
+  }
+
+  const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
+  const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
+
+  // Y-axis formatting
+  function fmtY(v) {
+    if (category.fmtValue) return category.fmtValue(v);
+    const range = yMax - yMin;
+    if (range === 0) return v.toFixed(category.precision);
+    const rangeDecimals = Math.max(0, -Math.floor(Math.log10(range)) + 2);
+    return v.toFixed(Math.min(Math.max(rangeDecimals, 1), category.precision));
+  }
+
+  // Build path
+  function buildPath(data) {
+    let d = '', inPath = false;
+    for (let i = 0; i < data.length; i++) {
+      const { yr, v } = data[i];
+      if (!Number.isFinite(v)) { inPath = false; continue; }
+      if (category.wrap360 && i > 0 && Number.isFinite(data[i - 1].v) &&
+          Math.abs(v - data[i - 1].v) > 180) { inPath = false; }
+      const x = xScale(yr).toFixed(1);
+      const y = yScale(v).toFixed(1);
+      d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
+      inPath = true;
+    }
+    return d;
+  }
+
+  // Grid
+  let grid = '';
+  const yTickValues = category.paperYTicks || category.fixedYTicks || Array.from({ length: 6 }, (_, i) => yMin + i * (yMax - yMin) / 5);
+  for (const v of yTickValues) {
+    const y = yScale(v).toFixed(1);
+    grid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${gridColor}" stroke-width="0.5"/>`;
+    grid += `<text x="${PAD.l - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#555" font-size="11" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtY(v)}</text>`;
+  }
+
+  // X-axis ticks
+  const xRange = yearMax - yearMin;
+  const xTickStep = xRange > 30000 ? 5000 : 5000;
+  const xTicksArr = [];
+  for (let yr = yearMin; yr <= yearMax; yr += xTickStep) xTicksArr.push(yr);
+  function fmtXYear(yr) { return yr.toLocaleString(); }
+  for (const yr of xTicksArr) {
+    const x = xScale(yr).toFixed(1);
+    grid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H - PAD.b}" stroke="#e8e8e8" stroke-width="0.5"/>`;
+    grid += `<text x="${x}" y="${H - PAD.b + 16}" text-anchor="middle" fill="#555" font-size="10" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtXYear(yr)}</text>`;
+  }
+
+  // Plot border
+  grid += `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="none" stroke="#ccc" stroke-width="0.5"/>`;
+
+  // Clip path to keep curves within plot area
+  const clipDef = `<defs><clipPath id="vfp-paper-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
+
+  // Curves — model thicker, clipped to plot area
+  let curvePaths = '';
+  allCurves.forEach((curve, ci) => {
+    const d = buildPath(samples[ci]);
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}" clip-path="url(#vfp-paper-clip)"/>`;
+  });
+
+  // J2000 marker
+  const j2000x = xScale(2000).toFixed(1);
+  const j2000val = category.model.fn(2000);
+  let j2000marker = '';
+  if (Number.isFinite(j2000val)) {
+    const j2000y = yScale(j2000val).toFixed(1);
+    j2000marker = `<circle cx="${j2000x}" cy="${j2000y}" r="3.5" fill="${modelColor}" stroke="white" stroke-width="1.5"/>`;
+    const j2000text = `J2000; ${(category.fmtValue || (v => v.toFixed(category.precision)))(j2000val)}`;
+    const j2000tw = j2000text.length * 5.8 + 12;
+    const j2000tx = Number(j2000x) + 8;
+    const j2000ty = Number(j2000y) - 12;
+    j2000marker += `<rect x="${j2000tx - 4}" y="${j2000ty - 10}" width="${j2000tw}" height="16" rx="3" fill="white" stroke="#ccc" stroke-width="0.7"/>`;
+    j2000marker += `<text x="${j2000tx + 2}" y="${j2000ty + 2}" fill="${textColor}" font-size="9.5" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${j2000text}</text>`;
+  }
+
+  // Legend — centered, evenly spaced
+  const legendY = 32;
+  const legendItemWidths = allCurves.map(c => 28 + c.name.length * 6.2 + 24);
+  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
+  let legendX = (W - legendTotalW) / 2;
+  let legendItems = '';
+  allCurves.forEach((curve, ci) => {
+    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"/>`;
+    legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${curve.name}</text>`;
+    legendX += legendItemWidths[ci];
+  });
+
+  // Title
+  const title = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${category.paperTitle || category.label + ' Comparison'}</text>`;
+
+  // Y-axis label
+  const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${category.yLabel}</text>`;
+
+  // X-axis label
+  const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${W}" height="${H}" fill="white"/>
+  ${clipDef}${grid}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}
+</svg>`;
+}
+
+function exportVFPPaper() {
+  if (!verificationPanel) return;
+  const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
+  if (idx < 0) return;
+  const cat = VFP_CATEGORIES[idx];
+  const svg = renderVFPPaperChart(cat);
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) win.document.title = cat.paperTitle || cat.label;
+}
+
+// ── Panel DOM ────────────────────────────────────────────────────
+
+let verificationPanel = null;
+
+function createVerificationPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'verificationPanel';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'vfp-overlay';
+  overlay.addEventListener('click', closeVerificationPanel);
+  panel.appendChild(overlay);
+
+  const dialog = document.createElement('div');
+  dialog.className = 'vfp-dialog';
+  panel.appendChild(dialog);
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'vfp-header';
+  header.innerHTML = '<h2>Formula Verification <span class="vfp-subtitle">\u2014 Model vs Published Formulas</span></h2>';
+  const exportBtn = document.createElement('button');
+  exportBtn.className = 'vfp-export-btn';
+  exportBtn.textContent = 'Export for Paper';
+  exportBtn.addEventListener('click', exportVFPPaper);
+  header.appendChild(exportBtn);
+  const close = document.createElement('div');
+  close.className = 'vfp-close';
+  close.addEventListener('click', closeVerificationPanel);
+  header.appendChild(close);
+  dialog.appendChild(header);
+
+  // Navigation
+  const nav = document.createElement('div');
+  nav.className = 'vfp-nav';
+  const navPrev = document.createElement('button');
+  navPrev.className = 'vfp-nav-arrow';
+  navPrev.textContent = '\u2039';
+  navPrev.addEventListener('click', () => {
+    const idx = VFP_CATEGORIES.findIndex(c => c.id === panel._currentCategory);
+    if (idx > 0) updateVerificationPanel(VFP_CATEGORIES[idx - 1].id);
+  });
+  nav.appendChild(navPrev);
+
+  const navName = document.createElement('button');
+  navName.className = 'vfp-nav-name';
+  nav.appendChild(navName);
+
+  const navNext = document.createElement('button');
+  navNext.className = 'vfp-nav-arrow';
+  navNext.textContent = '\u203A';
+  navNext.addEventListener('click', () => {
+    const idx = VFP_CATEGORIES.findIndex(c => c.id === panel._currentCategory);
+    if (idx < VFP_CATEGORIES.length - 1) updateVerificationPanel(VFP_CATEGORIES[idx + 1].id);
+  });
+  nav.appendChild(navNext);
+
+  // Dropdown
+  const dropdown = document.createElement('div');
+  dropdown.className = 'vfp-dropdown';
+  dropdown.style.display = 'none';
+  for (const cat of VFP_CATEGORIES) {
+    const item = document.createElement('div');
+    item.className = 'vfp-dropdown-item';
+    item.textContent = cat.label;
+    item.addEventListener('click', () => { dropdown.style.display = 'none'; updateVerificationPanel(cat.id); });
+    dropdown.appendChild(item);
+  }
+  nav.appendChild(dropdown);
+  navName.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none'; });
+  dialog.appendChild(nav);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'vfp-body';
+  dialog.appendChild(body);
+
+  panel._body = body;
+  panel._navName = navName;
+  panel._navPrev = navPrev;
+  panel._navNext = navNext;
+  panel._dropdown = dropdown;
+  panel._currentCategory = VFP_CATEGORIES[0].id;
+
+  document.body.appendChild(panel);
+  return panel;
+}
+
+function updateVerificationPanel(categoryId) {
+  if (!verificationPanel) return;
+  const idx = VFP_CATEGORIES.findIndex(c => c.id === categoryId);
+  if (idx < 0) return;
+  const cat = VFP_CATEGORIES[idx];
+  verificationPanel._currentCategory = categoryId;
+  verificationPanel._navName.textContent = cat.label;
+  verificationPanel._navPrev.disabled = idx === 0;
+  verificationPanel._navNext.disabled = idx === VFP_CATEGORIES.length - 1;
+  verificationPanel._dropdown.style.display = 'none';
+  verificationPanel._body.innerHTML = renderVFPChart(cat, o.currentYear || 2000);
+}
+
+function openVerificationPanel() {
+  if (!verificationPanel) verificationPanel = createVerificationPanel();
+  verificationPanel.classList.add('visible');
+  updateVerificationPanel(verificationPanel._currentCategory);
+}
+
+function closeVerificationPanel() {
+  if (verificationPanel) verificationPanel.classList.remove('visible');
+}
+
 // Update live data in hierarchy inspector (called from render loop)
 let _lastLiveDataJD = null;
 let _lastLiveDataPlanet = null; // Track planet changes to force refresh
@@ -22433,6 +23203,8 @@ function setupGUI() {
     'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
   addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
     'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
+  addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
+    'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
     'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across the full Holistic Year.');
 
