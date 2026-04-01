@@ -1111,7 +1111,7 @@ const diameters = {
 // Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
 // These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
 // Units: degrees at J2000.0 epoch
-const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Precesses with period holisticyearLength/3 against ICRF which is holisticyearLength/5 against ecliptic
+const earthAscendingNodeInvPlaneSouamiSouchay = 284.51;  // Regresses with period holisticyearLength/5 in the invariant frame (ecliptic precession rate)
 const mercuryAscendingNodeInvPlaneSouamiSouchay = 32.22;
 const venusAscendingNodeInvPlaneSouamiSouchay = 52.31;
 const marsAscendingNodeInvPlaneSouamiSouchay = 352.95;
@@ -19842,7 +19842,7 @@ function _la2010Interp(yearFromJ2000, col) {
 function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
 function ascNodeLa2010(year) { return _la2010Interp(year - 2000, 4); }
 
-/** Model ascending node on invariable plane — linear precession at H/3 */
+/** Model ascending node on invariable plane — prograde at H/3 (current model implementation) */
 function ascNodeModel(year) {
   return ((earthAscendingNodeInvPlaneVerified + (360 / (holisticyearLength / 3)) * (year - 2000)) % 360 + 360) % 360;
 }
