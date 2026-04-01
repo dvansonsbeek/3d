@@ -19820,6 +19820,7 @@ function _la2004Interp(year, col) {
 
 function eccLa2004(year) { return _la2004Interp(year - 2000, 1); }
 function obliquityLa2004(year) { return _la2004Interp(year - 2000, 2); }
+function perihelionLa2004(year) { return _la2004Interp(year - 2000, 3); }
 
 // ── Laskar La2010a orbital elements (invariable plane) ───────────
 // Source: Laskar et al. (2011), A&A 532, A89
@@ -19839,6 +19840,12 @@ function _la2010Interp(yearFromJ2000, col) {
 }
 
 function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
+function ascNodeLa2010(year) { return _la2010Interp(year - 2000, 4); }
+
+/** Model ascending node on invariable plane — linear precession at H/3 */
+function ascNodeModel(year) {
+  return ((earthAscendingNodeInvPlaneVerified + (360 / (holisticyearLength / 3)) * (year - 2000)) % 360 + 360) % 360;
+}
 
 // ── Category definitions ─────────────────────────────────────────
 
@@ -19849,6 +19856,15 @@ const VFP_CATEGORIES = [
     residualLabel: 'AU', residualScale: 1,
     primaryRef: 1, // Meeus
     paperRange: [-23000, 23000], paperTitle: 'Eccentricity Comparison',
+    paperAlt: {
+      range: [-248000, 102000], title: 'Eccentricity Cycles',
+      yRange: [0, 0.06], yTicks: [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06],
+      excludeRefs: ['Meeus (1991)'], // polynomial diverges beyond ±10k years
+      noJ2000: true,
+      refLines: [
+        { value: () => Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude), label: 'mean (0.01545)', color: '#888', dash: true, yOffset: 0 },
+      ],
+    },
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeEccentricityEarth(year, balancedYear, perihelionCycleLength, eccentricityBase, eccentricityAmplitude) },
     references: [
@@ -19868,6 +19884,14 @@ const VFP_CATEGORIES = [
     primaryRef: 2, // Chapront+ 2002
     paperRange: [-23000, 23000], paperTitle: 'Obliquity Comparison',
     paperYRange: [20, 28], paperYTicks: [20, 21, 22, 23, 24, 25, 26, 27, 28],
+    paperAlt: {
+      range: [-248000, 102000], title: 'Obliquity Cycles',
+      yRange: [22, 25], yTicks: [22, 22.5, 23, 23.5, 24, 24.5, 25],
+      excludeRefs: ['Laskar (1986)', 'Capitaine (2006)', 'Chapront (2002)'],
+      refLines: [
+        { value: () => earthtiltMean, label: 'mean (' + earthtiltMean.toFixed(2) + '\u00b0)', color: '#888', dash: true, yOffset: 0 },
+      ],
+    },
     fixedYRange: [22, 25], fixedYTicks: [22, 23, 24, 25],
     model: { name: 'This model', color: '#f0b040',
       fn: year => computeObliquityEarth(year) },
@@ -19876,7 +19900,7 @@ const VFP_CATEGORIES = [
       { name: 'Capitaine (2006)', color: '#81c784', fn: meanObliquityIAU2006, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
       { name: 'Chapront (2002)', color: '#ce93d8', fn: obliquityChapront2002, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/2003A%26A...412..567C' },
       { name: 'Berger (1978)', color: '#ff8a65', fn: obliquityBerger1978, sourceUrl: 'https://doi.org/10.1175/1520-0469(1978)035%3C2362:LTVODI%3E2.0.CO;2' },
-      { name: 'La2004 (Laskar)', color: '#42a5f5', fn: obliquityLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
+      { name: 'La2004 (Laskar)', color: '#e53935', fn: obliquityLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
       { name: 'IAU (observed)', color: '#ef5350',
@@ -19901,6 +19925,24 @@ const VFP_CATEGORIES = [
     ],
   },
   {
+    id: 'ascending-node', label: 'Ascending Node on Invariable Plane', unit: '°', precision: 2,
+    yLabel: 'degrees',
+    residualLabel: 'degrees', residualScale: 1,
+    wrap360: true,
+    fixedYRange: [0, 360], fixedYTicks: [0, 60, 120, 180, 240, 300, 360],
+    paperRange: [-500000, 2000], paperTitle: 'Ascending Node on Invariable Plane',
+    paperYRange: [0, 400], paperYTicks: [0, 50, 100, 150, 200, 250, 300, 350, 400],
+    model: { name: 'This model', color: '#f0b040',
+      fn: ascNodeModel },
+    references: [
+      { name: 'La2010 (Laskar)', color: '#4fc3f7', fn: ascNodeLa2010, sourceUrl: 'https://doi.org/10.1051/0004-6361/201116836' },
+    ],
+    j2000extras: [
+      { name: 'Souami & Souchay (2012)', color: '#ef5350',
+        value: () => earthAscendingNodeInvPlaneVerified },
+    ],
+  },
+  {
     id: 'perihelion', label: 'Longitude of Perihelion', unit: '°', precision: 3,
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
@@ -19912,6 +19954,7 @@ const VFP_CATEGORIES = [
       fn: year => calcEarthPerihelionPredictive(year) },
     references: [
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
+      { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
       { name: 'NASA/JPL (observed)', color: '#ef5350',
@@ -20379,7 +20422,7 @@ function renderVFPPaperChart(category) {
 
   // X-axis ticks
   const xRange = yearMax - yearMin;
-  const xTickStep = xRange > 30000 ? 5000 : 5000;
+  const xTickStep = xRange > 200000 ? 50000 : xRange > 80000 ? 10000 : 5000;
   const xTicksArr = [];
   for (let yr = yearMin; yr <= yearMax; yr += xTickStep) xTicksArr.push(yr);
   function fmtXYear(yr) { return yr.toLocaleString(); }
@@ -20411,7 +20454,9 @@ function renderVFPPaperChart(category) {
     j2000marker = `<circle cx="${j2000x}" cy="${j2000y}" r="3.5" fill="${modelColor}" stroke="white" stroke-width="1.5"/>`;
     const j2000text = `J2000; ${(category.fmtValue || (v => v.toFixed(category.precision)))(j2000val)}`;
     const j2000tw = j2000text.length * 5.8 + 12;
-    const j2000tx = Number(j2000x) + 8;
+    // Position label to the left if J2000 is near the right edge
+    const j2000AtRightEdge = Number(j2000x) + j2000tw + 12 > W - PAD.r;
+    const j2000tx = j2000AtRightEdge ? Number(j2000x) - j2000tw - 4 : Number(j2000x) + 8;
     const j2000ty = Number(j2000y) - 12;
     j2000marker += `<rect x="${j2000tx - 4}" y="${j2000ty - 10}" width="${j2000tw}" height="16" rx="3" fill="white" stroke="#ccc" stroke-width="0.7"/>`;
     j2000marker += `<text x="${j2000tx + 2}" y="${j2000ty + 2}" fill="${textColor}" font-size="9.5" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${j2000text}</text>`;
@@ -20445,6 +20490,138 @@ function renderVFPPaperChart(category) {
 </svg>`;
 }
 
+function renderVFPPaperChartAlt(category) {
+  const alt = category.paperAlt;
+  const W = 1000, H = 500, PAD = { l: 80, r: 120, t: 50, b: 45 };
+  const plotW = W - PAD.l - PAD.r;
+  const plotH = H - PAD.t - PAD.b;
+  const [yearMin, yearMax] = alt.range;
+  const nSamples = 400;
+  const step = (yearMax - yearMin) / nSamples;
+
+  const modelColor = '#2563eb';
+  const refColors = ['#b91c1c', '#15803d', '#7e22ce', '#b45309'];
+  const textColor = '#333';
+  const gridColor = '#ddd';
+
+  // Sample all curves (exclude specified refs for long-term view)
+  const excludeSet = new Set(alt.excludeRefs || []);
+  const allCurves = [
+    { ...category.model, color: modelColor },
+    ...category.references
+      .filter(r => !excludeSet.has(r.name))
+      .map((r, i) => ({ ...r, color: refColors[i % refColors.length] }))
+  ];
+  const samples = allCurves.map(() => []);
+  for (let i = 0; i <= nSamples; i++) {
+    const yr = yearMin + i * step;
+    allCurves.forEach((curve, ci) => {
+      const v = curve.fn(yr);
+      samples[ci].push({ yr, v: Number.isFinite(v) ? v : NaN });
+    });
+  }
+
+  const [yMin, yMax] = alt.yRange;
+  const xScale = yr => PAD.l + (yr - yearMin) / (yearMax - yearMin) * plotW;
+  const yScale = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
+
+  function fmtY(v) { return v.toFixed(2); }
+
+  // Build path
+  function buildPath(data) {
+    let d = '', inPath = false;
+    for (const { yr, v } of data) {
+      if (!Number.isFinite(v)) { inPath = false; continue; }
+      const x = xScale(yr).toFixed(1), y = yScale(v).toFixed(1);
+      d += inPath ? ` L${x},${y}` : ` M${x},${y}`;
+      inPath = true;
+    }
+    return d;
+  }
+
+  // Plot border + grid
+  let grid = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="none" stroke="#ccc" stroke-width="0.5"/>`;
+
+  for (const v of alt.yTicks) {
+    const y = yScale(v).toFixed(1);
+    grid += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${gridColor}" stroke-width="0.5"/>`;
+    grid += `<text x="${PAD.l - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#555" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${fmtY(v)}</text>`;
+  }
+
+  // X-axis
+  const xRange = yearMax - yearMin;
+  const xTickStep = xRange > 200000 ? 50000 : xRange > 80000 ? 10000 : 5000;
+  function fmtXYear(yr) { return yr.toLocaleString(); }
+  for (let yr = yearMin; yr <= yearMax; yr += xTickStep) {
+    const x = xScale(yr).toFixed(1);
+    grid += `<line x1="${x}" y1="${PAD.t}" x2="${x}" y2="${H - PAD.b}" stroke="#e8e8e8" stroke-width="0.5"/>`;
+    grid += `<text x="${x}" y="${H - PAD.b + 16}" text-anchor="middle" fill="#555" font-size="10" font-weight="400" font-family="Inter,Helvetica,Arial,sans-serif">${fmtXYear(yr)}</text>`;
+  }
+
+  // Clip path
+  const clipDef = `<defs><clipPath id="vfp-paper-alt-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
+
+  // Horizontal reference lines with labels on the right
+  let refLinesSVG = '';
+  if (alt.refLines) {
+    for (const rl of alt.refLines) {
+      const val = typeof rl.value === 'function' ? rl.value() : rl.value;
+      if (!Number.isFinite(val) || val < yMin || val > yMax) continue;
+      const y = yScale(val).toFixed(1);
+      const dashAttr = rl.dash ? ' stroke-dasharray="6,4"' : '';
+      const labelY = Number(y) + (rl.yOffset || 0);
+      refLinesSVG += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${rl.color}" stroke-width="1"${dashAttr}/>`;
+      refLinesSVG += `<text x="${W - PAD.r - 4}" y="${labelY - 4}" text-anchor="end" fill="${rl.color}" font-size="9" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${rl.label}</text>`;
+    }
+  }
+
+  // Curves
+  let curvePaths = '';
+  allCurves.forEach((curve, ci) => {
+    const d = buildPath(samples[ci]);
+    curvePaths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${ci === 0 ? 2 : 1.5}" clip-path="url(#vfp-paper-alt-clip)"/>`;
+  });
+
+  // Legend
+  const legendY = 32;
+  const legendItemWidths = allCurves.map(c => 28 + c.name.length * 6.2 + 24);
+  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
+  let legendX = (W - legendTotalW) / 2;
+  let legendItems = '';
+  allCurves.forEach((curve, ci) => {
+    legendItems += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${curve.color}" stroke-width="${ci === 0 ? 2.5 : 1.8}"/>`;
+    legendItems += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${textColor}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${curve.name}</text>`;
+    legendX += legendItemWidths[ci];
+  });
+
+  // J2000 marker
+  const j2000x = xScale(2000).toFixed(1);
+  const j2000val = category.model.fn(2000);
+  let j2000marker = '';
+  if (Number.isFinite(j2000val) && j2000val >= yMin && j2000val <= yMax) {
+    const j2000y = yScale(j2000val).toFixed(1);
+    j2000marker = `<circle cx="${j2000x}" cy="${j2000y}" r="3.5" fill="${modelColor}" stroke="white" stroke-width="1.5"/>`;
+    const j2000text = `J2000; ${(category.fmtValue || (v => v.toFixed(category.precision)))(j2000val)}`;
+    const j2000tw = j2000text.length * 5.8 + 12;
+    const j2000AtRightEdge = Number(j2000x) + j2000tw + 12 > W - PAD.r;
+    const j2000tx = j2000AtRightEdge ? Number(j2000x) - j2000tw - 4 : Number(j2000x) + 8;
+    const j2000ty = Number(j2000y) - 12;
+    j2000marker += `<rect x="${j2000tx - 4}" y="${j2000ty - 10}" width="${j2000tw}" height="16" rx="3" fill="white" stroke="#ccc" stroke-width="0.7"/>`;
+    j2000marker += `<text x="${j2000tx + 2}" y="${j2000ty + 2}" fill="${textColor}" font-size="9.5" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${j2000text}</text>`;
+  }
+
+  // Title + axis labels
+  const title = `<text x="${W / 2}" y="18" text-anchor="middle" fill="#222" font-size="16" font-weight="600" font-family="Inter,Helvetica,Arial,sans-serif">${alt.title}</text>`;
+  const yAxisLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${category.yLabel}</text>`;
+  const xAxisLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 5}" text-anchor="middle" fill="#444" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">Years (BC / AD)</text>`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${W}" height="${H}" fill="white"/>
+  ${clipDef}${grid}${refLinesSVG}${yAxisLabel}${xAxisLabel}${title}${legendItems}${curvePaths}${j2000marker}
+</svg>`;
+}
+
 function exportVFPPaper() {
   if (!verificationPanel) return;
   const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
@@ -20455,6 +20632,19 @@ function exportVFPPaper() {
   const url = URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
   if (win) win.document.title = cat.paperTitle || cat.label;
+}
+
+function exportVFPPaperAlt() {
+  if (!verificationPanel) return;
+  const idx = VFP_CATEGORIES.findIndex(c => c.id === verificationPanel._currentCategory);
+  if (idx < 0) return;
+  const cat = VFP_CATEGORIES[idx];
+  if (!cat.paperAlt) return;
+  const svg = renderVFPPaperChartAlt(cat);
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) win.document.title = cat.paperAlt.title;
 }
 
 // ── Panel DOM ────────────────────────────────────────────────────
@@ -20478,6 +20668,12 @@ function createVerificationPanel() {
   const header = document.createElement('div');
   header.className = 'vfp-header';
   header.innerHTML = '<h2>Formula Verification <span class="vfp-subtitle">\u2014 Model vs Published Formulas</span></h2>';
+  const exportAltBtn = document.createElement('button');
+  exportAltBtn.className = 'vfp-export-btn';
+  exportAltBtn.textContent = 'Export Cycles';
+  exportAltBtn.addEventListener('click', exportVFPPaperAlt);
+  exportAltBtn.style.display = 'none';
+  header.appendChild(exportAltBtn);
   const exportBtn = document.createElement('button');
   exportBtn.className = 'vfp-export-btn';
   exportBtn.textContent = 'Export for Paper';
@@ -20539,6 +20735,7 @@ function createVerificationPanel() {
   panel._navPrev = navPrev;
   panel._navNext = navNext;
   panel._dropdown = dropdown;
+  panel._exportAltBtn = exportAltBtn;
   panel._currentCategory = VFP_CATEGORIES[0].id;
 
   document.body.appendChild(panel);
@@ -20555,6 +20752,7 @@ function updateVerificationPanel(categoryId) {
   verificationPanel._navPrev.disabled = idx === 0;
   verificationPanel._navNext.disabled = idx === VFP_CATEGORIES.length - 1;
   verificationPanel._dropdown.style.display = 'none';
+  verificationPanel._exportAltBtn.style.display = cat.paperAlt ? '' : 'none';
   verificationPanel._body.innerHTML = renderVFPChart(cat, o.currentYear || 2000);
 }
 
