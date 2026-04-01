@@ -1,20 +1,91 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// INCLINATION PHASE ANALYSIS — Perihelion-based (ICRF)
+// ASCENDING NODE & PERIHELION INVESTIGATION
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Investigation started: 2026-04-01
+// Status: OPEN — findings documented, model not yet changed
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// BACKGROUND
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// The current model uses the ascending node (Ω) on the invariable plane
+// as the reference angle for the inclination oscillation formula:
+//
+//   i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
+//
+// where Ω precesses prograde at +H/3 and phaseAngle = 203.3195° (s₈ eigenmode).
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// FINDINGS (2026-04-01)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// 1. ASCENDING NODE DIRECTION
+//    - La2010 N-body solution shows Ω DECREASING at ~-4.15°/kyr (retrograde)
+//    - The La2010 period matches H/5 = 67,063 years (ecliptic precession)
+//    - This is confirmed by secular perturbation theory:
+//      * All s-eigenfrequencies are negative (retrograde nodal precession)
+//      * All g-eigenfrequencies are positive (prograde apsidal precession)
+//    - Analogous to the Moon: node regresses (18.6yr), apsides advance (8.85yr)
+//    - Sources: Laskar (1990), Murray & Dermott (1999), Brouwer & Clemence (1961)
+//
+// 2. PERIHELION vs ASCENDING NODE
+//    - Perihelion longitude advances prograde: +H/3 in ICRF, +H/16 in ecliptic
+//    - Ascending node regresses retrograde: -H/5 in invariant frame
+//    - At J2000: ω̃ = 102.947° and Ω = 284.51° (differ by ~181.6°, near 180°)
+//    - This ~180° relationship is coincidental at this epoch, not structural
+//    - La2010 shows the argument of perihelion (ω = ω̃ - Ω) changes at ~7.2°/kyr
+//
+// 3. INCLINATION FORMULA REQUIREMENTS
+//    - The formula cos(angle(t) - phaseAngle) requires the reference angle
+//      to precess at the SAME rate as the inclination oscillation (H/3)
+//    - The ascending node at +H/3 satisfies this (current model)
+//    - The perihelion longitude in ICRF also moves at H/3 — a valid alternative
+//    - The ascending node at -H/5 does NOT work (different period, wrong phase)
+//
+// 4. PERIHELION-BASED PHASE ANGLE
+//    - If we use ω̃ (ICRF perihelion longitude) instead of Ω:
+//      * New phase angle: 21.77° (was 203.3195°)
+//      * Saturn phase angle: 201.77° (was 23.3195°)
+//      * Mean inclination changes by only -0.5 arcseconds for Earth
+//      * Balance (Law 3) is UNAFFECTED (depends on group membership, not angle)
+//    - PROBLEM: Mars fails Laplace-Lagrange bounds with 21.77° phase angle
+//      * Mars new mean = 0.823°, min = -0.33° (impossible negative inclination)
+//      * All other planets fit within bounds
+//
+// 5. CURRENT MODEL STATUS
+//    - The simulation uses Ω at +H/3 for everything (inclination, visuals, markers)
+//    - The VFP ascending node chart shows model's +H/3 alongside La2010's -H/5
+//    - The discrepancy is visible but the model's RA/Dec accuracy is unaffected
+//    - The ascending node visual (invariable plane markers) moves at +H/3
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// OPEN QUESTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// 1. Can Mars be handled with a different phase group (201.77° instead of 21.77°)?
+//    This would break the "Saturn sole retrograde" finding.
+//
+// 2. Is the 203.3195° phase angle (s₈ eigenmode) fundamentally tied to Ω,
+//    or is it a coincidence that it works with the +H/3 ascending node?
+//
+// 3. Should we separate the "inclination oscillation reference angle" from
+//    the "ascending node display value"? The oscillation needs H/3 rate,
+//    but the displayed ascending node should show the physical -H/5 rate.
+//
+// 4. What would happen if we changed the ascending node markers to -H/5
+//    while keeping the inclination formula at +H/3 with Ω?
+//    The markers would diverge from the inclination phase — is that correct?
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// WHAT THIS SCRIPT DOES
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // Recomputes all planetary inclination parameters using the perihelion
 // longitude (J2000/ICRF) as the reference angle instead of the ascending node.
+// Shows the impact on mean inclination and Laplace-Lagrange bounds.
 //
-// Key insight: The inclination oscillation is driven by the ICRF perihelion
-// longitude which precesses at H/3 (prograde). The ascending node precesses
-// independently at -H/5 (retrograde, ecliptic precession rate).
-//
-// The phase angle is derived from the balanced year:
-//   - At balanced year: minimum inclination → cos = -1
-//   - ω̃_ICRF at balanced year = 270° (perpendicular to solstice)
-//   - Phase angle = 270° - 180° = 90° → use 21.77° after J2000 constraint
-//
-// Usage: node tools/explore/inclination-phase-analysis.js
+// Usage: node tools/explore/ascending-node-perihelion-investigation.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');
