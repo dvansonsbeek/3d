@@ -19820,7 +19820,20 @@ function _la2004Interp(year, col) {
 
 function eccLa2004(year) { return _la2004Interp(year - 2000, 1); }
 function obliquityLa2004(year) { return _la2004Interp(year - 2000, 2); }
-function perihelionLa2004(year) { return _la2004Interp(year - 2000, 3); }
+function perihelionLa2004(year) {
+  // Perihelion longitude wraps at 360°/0° — need wrap-aware interpolation
+  const yearFromJ2000 = year - 2000;
+  if (yearFromJ2000 < _LA2004[0][0] || yearFromJ2000 > _LA2004[_LA2004.length - 1][0]) return NaN;
+  const idx = (yearFromJ2000 - _LA2004[0][0]) / 1000;
+  const i = Math.floor(idx);
+  if (i >= _LA2004.length - 1) return _LA2004[_LA2004.length - 1][3];
+  const frac = idx - i;
+  let v0 = _LA2004[i][3], v1 = _LA2004[i + 1][3];
+  // Unwrap: if values jump by more than 180°, adjust
+  if (v1 - v0 > 180) v1 -= 360;
+  else if (v0 - v1 > 180) v1 += 360;
+  return ((v0 * (1 - frac) + v1 * frac) % 360 + 360) % 360;
+}
 
 // ── Laskar La2010a orbital elements (invariable plane) ───────────
 // Source: Laskar et al. (2011), A&A 532, A89
