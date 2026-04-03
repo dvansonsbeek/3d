@@ -182,12 +182,12 @@ for (const [key, p] of Object.entries(C.planets)) {
 
   // Verify invPlaneInclinationMean derived correctly
   const amp = utils.computeInvPlaneInclinationAmplitude(C.PSI, mpP.fibonacciD, C.massFraction[key]);
-  const mean = utils.computeInvPlaneInclinationMean(arP.invPlaneInclinationJ2000, amp, mpP.ascendingNodeInvPlane, mpP.inclinationPhaseAngle);
+  const mean = utils.computeInvPlaneInclinationMean(arP.invPlaneInclinationJ2000, amp, mpP.longitudePerihelion, mpP.inclinationPhaseAngle);
   check(`${key}.invPlaneInclinationAmplitude`, p.invPlaneInclinationAmplitude, amp, 1e-7);
   check(`${key}.invPlaneInclinationMean`, p.invPlaneInclinationMean, mean, 1e-7);
 
-  // Verify J2000 reconstruction
-  const cosPhase = Math.cos((mpP.ascendingNodeInvPlane - mpP.inclinationPhaseAngle) * Math.PI / 180);
+  // Verify J2000 reconstruction (using perihelion longitude, ICRF reference)
+  const cosPhase = Math.cos((mpP.longitudePerihelion - mpP.inclinationPhaseAngle) * Math.PI / 180);
   const reconstructed = mean + amp * cosPhase;
   check(`${key}.inclJ2000 reconstructed`, reconstructed, arP.invPlaneInclinationJ2000, 1e-6);
 }

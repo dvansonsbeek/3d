@@ -27,8 +27,8 @@
     "ne_phase"
   ],
   "phaseAngles": [
-    203.3195,
-    23.3195
+    "prograde",
+    "anti-phase"
   ],
   "presets": [
     [

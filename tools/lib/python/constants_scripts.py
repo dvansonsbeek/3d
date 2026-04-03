@@ -79,8 +79,8 @@ SOLSTICE_OBLIQUITY_HARMONICS = [tuple(h) for h in _C['SOLSTICE_OBLIQUITY_HARMONI
 PERI_HARMONICS = [tuple(h) for h in _C['PERI_HARMONICS']]
 PERI_OFFSET = _C['PERI_OFFSET']
 
-# Phase angle from s₈ eigenmode of Laplace-Lagrange secular perturbation theory
-PHASE_ANGLE = 203.3195  # degrees
+# Earth phase angle: ω̃_ICRF at max inclination (from balanced year)
+PHASE_ANGLE = 21.77  # degrees (was 203.3195 in ascending-node-based model)
 
 # Physical & astronomical constants (from constants.js)
 _AU_KM = _C['currentAUDistance']

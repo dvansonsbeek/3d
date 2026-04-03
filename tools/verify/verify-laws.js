@@ -233,12 +233,12 @@ for (const key of planets) {
   const Lamp = L * amplitudes[key];
   const w = Math.sqrt(mass[key] * orbitDistance[key] * (1 - ecc[key] * ecc[key])) / config[key].d;
 
-  if (config[key].phase > 180) inclSum203 += w;
+  if (key !== 'saturn') inclSum203 += w;
   else inclSum23 += w;
 
-  const group = config[key].phase > 180 ? '203°' : ' 23°';
+  const group = key === 'saturn' ? 'anti' : 'rest';
   console.log(
-    `${key.padEnd(12)} ${group}  ${String(config[key].d).padStart(3)}  ${L.toExponential(6).padStart(16)}  ${amplitudes[key].toFixed(6).padStart(10)}  ${Lamp.toExponential(6).padStart(14)}  ${w.toExponential(6).padStart(16)}`
+    `${key.padEnd(12)} ${group.padEnd(4)}  ${String(config[key].d).padStart(3)}  ${L.toExponential(6).padStart(16)}  ${amplitudes[key].toFixed(6).padStart(10)}  ${Lamp.toExponential(6).padStart(14)}  ${w.toExponential(6).padStart(16)}`
   );
 }
 
@@ -267,12 +267,12 @@ for (const key of planets) {
   const coeff = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) / Math.sqrt(config[key].d);
   const v = coeff * ecc[key];
 
-  if (config[key].phase > 180) eccSum203 += v;
+  if (key !== 'saturn') eccSum203 += v;
   else eccSum23 += v;
 
-  const group = config[key].phase > 180 ? '203°' : ' 23°';
+  const group = key === 'saturn' ? 'anti' : 'rest';
   console.log(
-    `${key.padEnd(12)} ${group}  ${String(config[key].d).padStart(3)}  ${coeff.toExponential(6).padStart(16)}  ${ecc[key].toFixed(8)}  ${v.toExponential(6).padStart(14)}`
+    `${key.padEnd(12)} ${group.padEnd(4)}  ${String(config[key].d).padStart(3)}  ${coeff.toExponential(6).padStart(16)}  ${ecc[key].toFixed(8)}  ${v.toExponential(6).padStart(14)}`
   );
 }
 
@@ -392,7 +392,7 @@ check('Weight ratios not proportional', ratioRange > 100, `factor = ${ratioRange
 let coeffSum203 = 0, coeffSum23 = 0;
 for (const key of planets) {
   const c = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) / Math.sqrt(config[key].d);
-  if (config[key].phase > 180) coeffSum203 += c;
+  if (key !== 'saturn') coeffSum203 += c;
   else coeffSum23 += c;
 }
 const coeffBalance = (1 - Math.abs(coeffSum203 - coeffSum23) / (coeffSum203 + coeffSum23)) * 100;
@@ -411,7 +411,7 @@ for (let trial = 0; trial < nTrials; trial++) {
     const c = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) / Math.sqrt(config[key].d);
     const randE = 0.001 + Math.random() * 0.3;
     const v = c * randE;
-    if (config[key].phase > 180) rSum203 += v;
+    if (key !== 'saturn') rSum203 += v;
     else rSum23 += v;
   }
   const rBal = (1 - Math.abs(rSum203 - rSum23) / (rSum203 + rSum23)) * 100;
@@ -547,7 +547,7 @@ for (let gamma = 0.5; gamma <= 2.0; gamma += 0.1) {
   for (const key of planets) {
     const c = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) / Math.sqrt(config[key].d);
     const v = c * Math.pow(ecc[key], gamma);
-    if (config[key].phase > 180) pSum203 += v;
+    if (key !== 'saturn') pSum203 += v;
     else pSum23 += v;
   }
   const bal = (1 - Math.abs(pSum203 - pSum23) / (pSum203 + pSum23)) * 100;

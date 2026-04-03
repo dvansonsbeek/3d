@@ -542,8 +542,8 @@ function computeInclinationEarth(currentYear) {
 
 /**
  * Compute dynamic invariable-plane inclination for a planet.
- * Uses ascending-node-based oscillation with mean-centered cosine.
- * Source: script.js computePlanetInvPlaneInclinationDynamic() ~line 33987
+ * Uses ICRF perihelion-based oscillation with mean-centered cosine.
+ * Source: script.js computePlanetInvPlaneInclinationDynamic()
  *
  * @param {string} planetName - e.g. 'mercury', 'mars'
  * @param {number} currentYear - decimal year
@@ -557,25 +557,29 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   const i_J2000 = p.invPlaneInclinationJ2000;
   const i_mean = p.invPlaneInclinationMean;
   const amplitude = p.invPlaneInclinationAmplitude;
-  const period = p.perihelionEclipticYears;
   const phaseOffset = p.inclinationPhaseAngle;
 
-  if (i_J2000 === undefined || amplitude === undefined || period === undefined) {
+  if (i_J2000 === undefined || amplitude === undefined) {
     return i_J2000 || 0;
   }
 
   if (amplitude === 0) return i_J2000;
 
+  // ICRF perihelion period: Earth = H/3 directly, others = 1/(1/eclP - 1/(H/13))
+  const genPrecRate = 1 / (C.H / 13);
+  const icrfPeriod = (planetName === 'earth')
+    ? C.H / 3
+    : 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  const icrfRate = 360 / icrfPeriod;
+
   const jd = julianDay || C.yearToJD(currentYear);
   const yearsSinceBalanced = (jd - C.balancedJD) / C.meanSolarYearDays;
 
-  const precessionRate = 360 / period;
+  const periLongJ2000 = p.longitudePerihelion;
+  const periAtBalanced = periLongJ2000 - icrfRate * C.yearsFromBalancedToJ2000;
+  const periCurrent = periAtBalanced + icrfRate * yearsSinceBalanced;
 
-  const ascNodeJ2000 = p.ascendingNode;
-  const ascNodeAtBalanced = ascNodeJ2000 - precessionRate * C.yearsFromBalancedToJ2000;
-  const ascNodeCurrent = ascNodeAtBalanced + precessionRate * yearsSinceBalanced;
-
-  const currentPhaseDeg = ascNodeCurrent - phaseOffset;
+  const currentPhaseDeg = periCurrent - phaseOffset;
   const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
 
   return i_mean + amplitude * Math.cos(currentPhaseRad);

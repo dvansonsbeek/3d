@@ -36,8 +36,8 @@ const genPrec = H / 13;
 const planetData = {
   mercury: { name: 'Mercury', eclP: C.planets.mercury.perihelionEclipticYears, periLong: C.planets.mercury.longitudePerihelion, inclJ2000: C.planets.mercury.invPlaneInclinationJ2000, omega: C.planets.mercury.ascendingNodeInvPlane, d: C.planets.mercury.fibonacciD, mass: C.massFraction.mercury, sma: C.derived.mercury.orbitDistance, ecc: C.eccJ2000.mercury, antiPhase: false },
   venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   periLong: C.planets.venus.longitudePerihelion,   inclJ2000: C.planets.venus.invPlaneInclinationJ2000,   omega: C.planets.venus.ascendingNodeInvPlane,   d: C.planets.venus.fibonacciD,   mass: C.massFraction.venus,   sma: C.derived.venus.orbitDistance,   ecc: C.eccJ2000.venus,   antiPhase: false },
-  earth:   { name: 'Earth',   eclP: H/16,                                      periLong: 102.947,                               inclJ2000: 1.57869,                                     omega: 284.51,                                  d: 3,                           mass: C.massFraction.earth,   sma: 1.0,                            ecc: C.eccJ2000.earth,   antiPhase: false },
-  mars:    { name: 'Mars',    eclP: H/(35/8),                                  periLong: C.planets.mars.longitudePerihelion,    inclJ2000: C.planets.mars.invPlaneInclinationJ2000,    omega: C.planets.mars.ascendingNodeInvPlane,    d: C.planets.mars.fibonacciD,    mass: C.massFraction.mars,    sma: C.derived.mars.orbitDistance,    ecc: C.eccJ2000.mars,    antiPhase: false },
+  earth:   { name: 'Earth',   eclP: H/16,                                      periLong: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, inclJ2000: C.ASTRO_REFERENCE.earthInclinationJ2000_deg, omega: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane, d: 3, mass: C.massFraction.earth, sma: 1.0, ecc: C.eccJ2000.earth, antiPhase: false },
+  mars:    { name: 'Mars',    eclP: C.planets.mars.perihelionEclipticYears,    periLong: C.planets.mars.longitudePerihelion,    inclJ2000: C.planets.mars.invPlaneInclinationJ2000,    omega: C.planets.mars.ascendingNodeInvPlane,    d: C.planets.mars.fibonacciD,    mass: C.massFraction.mars,    sma: C.derived.mars.orbitDistance,    ecc: C.eccJ2000.mars,    antiPhase: false },
   jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, periLong: C.planets.jupiter.longitudePerihelion, inclJ2000: C.planets.jupiter.invPlaneInclinationJ2000, omega: C.planets.jupiter.ascendingNodeInvPlane, d: C.planets.jupiter.fibonacciD, mass: C.massFraction.jupiter, sma: C.derived.jupiter.orbitDistance, ecc: C.eccJ2000.jupiter, antiPhase: false },
   saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  periLong: C.planets.saturn.longitudePerihelion,  inclJ2000: C.planets.saturn.invPlaneInclinationJ2000,  omega: C.planets.saturn.ascendingNodeInvPlane,  d: C.planets.saturn.fibonacciD,  mass: C.massFraction.saturn,  sma: C.derived.saturn.orbitDistance,  ecc: C.eccJ2000.saturn,  antiPhase: true },
   uranus:  { name: 'Uranus',  eclP: C.planets.uranus.perihelionEclipticYears,  periLong: C.planets.uranus.longitudePerihelion,  inclJ2000: C.planets.uranus.invPlaneInclinationJ2000,  omega: C.planets.uranus.ascendingNodeInvPlane,  d: C.planets.uranus.fibonacciD,  mass: C.massFraction.uranus,  sma: C.derived.uranus.orbitDistance,  ecc: C.eccJ2000.uranus,  antiPhase: false },
@@ -85,7 +85,7 @@ function evaluateBalancedYear(testBY) {
   }
 
   function getEarthOmega(year) {
-    return 284.51 + (360 / (H / 3)) * (year - 2000);
+    return C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / (H / 3)) * (year - 2000);
   }
 
   for (const [key, p] of Object.entries(planetData)) {

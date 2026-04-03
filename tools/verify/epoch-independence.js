@@ -57,7 +57,7 @@ function computeBalance(ecc) {
   for (const p of planets) {
     const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
-    if (config3[p].phase > 180) sum203 += v; else sum23 += v;
+    if (p !== 'saturn') sum203 += v; else sum23 += v;  // Saturn anti-phase
   }
   const total = sum203 + sum23;
   const balance = (1 - Math.abs(sum203 - sum23) / total) * 100;

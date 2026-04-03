@@ -50,7 +50,7 @@ from constants_scripts import (
 
 DT = J2000_YEAR - BALANCE_YEAR
 
-PHASE_ANGLE = 203.3195  # s₈ eigenmode phase (degrees)
+PHASE_ANGLE = 21.77  # Earth phase angle: ω̃_ICRF at max inclination (from balanced year)
 
 # Balance year positions (from 3D model)
 BAL_POSITIONS = {

@@ -104,7 +104,7 @@ function computeBalance(ecc) {
     const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
     vPerPlanet[p] = v;
-    if (config3[p].phase > 180) sum203 += v; else sum23 += v;
+    if (p !== 'saturn') sum203 += v; else sum23 += v;  // Saturn anti-phase
   }
   const gap = sum23 - sum203;
   const total = sum203 + sum23;
@@ -133,9 +133,9 @@ for (const p of planets) {
   const d = config3[p].d;
   const sqrtM = Math.sqrt(mass[p]);
   const a32 = Math.pow(orbitDistance[p], 1.5);
-  const group = config3[p].phase > 180 ? '203°' : '23°';
+  const group = p === 'saturn' ? 'anti' : 'rest';
   const pct = (base.v[p] / base.total * 100).toFixed(2);
-  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccBase[p].toFixed(8)} | ${base.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
+  console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccBase[p].toFixed(8)} | ${base.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
 console.log(`\n  Σ(203°) = ${base.sum203.toExponential(6)}`);
@@ -157,9 +157,9 @@ console.log('| Planet   | Group | d  | e (J2000)  | v_j          | % of total |'
 console.log('|----------|-------|----|------------|--------------|------------|');
 for (const p of planets) {
   const d = config3[p].d;
-  const group = config3[p].phase > 180 ? '203°' : '23°';
+  const group = p === 'saturn' ? 'anti' : 'rest';
   const pct = (j2000.v[p] / j2000.total * 100).toFixed(2);
-  console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
+  console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
 console.log(`\n  Σ(203°) = ${j2000.sum203.toExponential(6)}`);
@@ -184,7 +184,7 @@ console.log('| Planet   | Group | d  | e (dynamic)| e (J2000)  | Δe           |
 console.log('|----------|-------|----|------------|------------|--------------|--------------|------------|');
 for (const p of planets) {
   const d = config3[p].d;
-  const group = config3[p].phase > 180 ? '203°' : '23°';
+  const group = p === 'saturn' ? 'anti' : 'rest';
   const pct = (dynamic.v[p] / dynamic.total * 100).toFixed(2);
   const delta = eccDynamic[p] - eccJ2000[p];
   console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccDynamic[p].toFixed(8)} | ${eccJ2000[p].toFixed(8)} | ${delta.toExponential(3).padStart(12)} | ${dynamic.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
@@ -218,7 +218,7 @@ for (const pair of mirrorPairs) {
   // Gap contribution: how much this pair adds to (23° - 203°)
   let pair203 = 0, pair23 = 0;
   for (const p of [pair.inner, pair.outer]) {
-    if (config3[p].phase > 180) pair203 += j2000.v[p]; else pair23 += j2000.v[p];
+    if (p !== 'saturn') pair203 += j2000.v[p]; else pair23 += j2000.v[p];
   }
   const pairContrib = pair23 - pair203;
   gapCheck += pairContrib;
@@ -323,7 +323,7 @@ console.log('| Planet   | Current a (AU) | Δa needed (AU) | Δa/a (%)   |');
 console.log('|----------|----------------|----------------|------------|');
 for (const p of planets) {
   const a = orbitDistance[p];
-  const sign = config3[p].phase > 180 ? 1 : -1;
+  const sign = p !== 'saturn' ? 1 : -1;  // Saturn anti-phase
   const deltaA = (j2000.gap / j2000.v[p]) * a * (2/3) * sign;
   console.log(`| ${p.padEnd(8)} | ${a.toFixed(4).padStart(14)} | ${(deltaA > 0 ? '+' : '') + deltaA.toFixed(4).padStart(13)} | ${(Math.abs(deltaA/a)*100).toFixed(4).padStart(9)}% |`);
 }
@@ -332,7 +332,7 @@ console.log('\nEccentricity (e):');
 console.log('| Planet   | Current e      | Δe needed      | Δe/e (%)   |');
 console.log('|----------|----------------|----------------|------------|');
 for (const p of planets) {
-  const sign = config3[p].phase > 180 ? 1 : -1;
+  const sign = p !== 'saturn' ? 1 : -1;  // Saturn anti-phase
   const deltaE = (j2000.gap / j2000.v[p]) * eccJ2000[p] * sign;
   console.log(`| ${p.padEnd(8)} | ${eccJ2000[p].toFixed(8)} | ${deltaE.toExponential(4).padStart(14)} | ${(Math.abs(deltaE/eccJ2000[p])*100).toFixed(4).padStart(9)}% |`);
 }
@@ -426,7 +426,7 @@ let inclSum203 = 0, inclSum23 = 0;
 for (const p of planets) {
   const d = config3[p].d;
   const w = Math.sqrt(mass[p] * orbitDistance[p] * (1 - eccBase[p] * eccBase[p])) / d;
-  if (config3[p].phase > 180) inclSum203 += w; else inclSum23 += w;
+  if (p !== 'saturn') inclSum203 += w; else inclSum23 += w;  // Saturn anti-phase
 }
 const inclTotal = inclSum203 + inclSum23;
 const inclGap = Math.abs(inclSum203 - inclSum23);
