@@ -20,7 +20,22 @@
 //    This is required by BOTH the balance AND the LL bounds
 // 8. Mars period changed to H/(35/8) for 8H super-period compatibility
 // 9. All 8 planets meet every 8H = 2,682,536 years (super-holistic year)
-// 10. Phase angles cluster near LL eigenmode phases (γ₁–γ₈)
+// 10. Phase angles cluster near LL eigenmode phases (γ₁–γ₈):
+//     Earth 21.77° → γ₈ MIN (22.8°, Δ=1.0°)
+//     Uranus 21.33° → γ₁ MAX (20.2°, Δ=1.1°)
+//     Jupiter 291.18° → γ₁ mean↑ (290.2°, Δ=1.0°)
+//     Saturn 120.38° → γ₄ MIN (116.9°, Δ=3.5°)
+//     Venus 79.82° → γ₃ MIN (75.6°, Δ=4.2°)
+//     Neptune 354.04° → γ₅ MAX (0°, Δ=6.0°)
+//     Mars 96.95° → γ₅ mean↓ (90°, Δ=7.0°)
+//     Mercury 99.52° → γ₅ mean↓ (90°, Δ=9.5°)
+// 11. Eigenmode-locking is NOT possible: it breaks the balanced year
+//     alignment (planets would not be exactly at MIN/MAX at balanced year).
+//     The balanced year is the structural anchor; eigenmode proximity is a
+//     consequence, not a constraint.
+// 12. Saturn and Neptune ecliptic trends have wrong direction vs JPL.
+//     Not fixable by phase adjustment — fundamental to ICRF approach.
+//     Difference is small: Saturn 7.7"/cy, Neptune 1.3"/cy.
 //
 // ═══════════════════════════════════════════════════════════════════════════
 // KEY INSIGHT: Saturn anti-phase
