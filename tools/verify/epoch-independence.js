@@ -312,7 +312,7 @@ console.log('──────────────────────�
 console.log('SECTION 6: WHY HIGH BALANCE IS THE ONLY TESTABLE REGIME');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-console.log('For any configuration where Saturn is sole 23° member, you can');
+console.log('For any configuration where Saturn is sole anti-phase member, you can');
 console.log('mathematically solve for a Saturn e that gives 100% balance.');
 console.log('The question is: how large is the required correction?\n');
 

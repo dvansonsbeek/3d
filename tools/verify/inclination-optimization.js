@@ -15,7 +15,7 @@
 // It then verifies that:
 // 1. All values match the exact J2000 invariable plane inclination
 // 2. All ranges stay within Laplace-Lagrange secular bounds
-// 3. The invariable plane balance holds (Σ(203°) w = Σ(23°) w)
+// 3. The invariable plane balance holds (Σ(prograde) w = Σ(anti-phase) w)
 // 4. Ecliptic inclination trends are consistent with JPL observations
 //
 // Depends on: Appendix A (80) (provides ascending node values used here)
@@ -69,31 +69,22 @@ function getFibonacciAmplitude(key) {
 // EARTH REFERENCE (computed from Fibonacci theory)
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// PHASE ANGLE DERIVATION (203.3195°)
-// -----------------------------------
-// The universal phase angle is derived from Earth's Fibonacci parameters:
+// PHASE ANGLE DERIVATION
+// ----------------------
+// Each planet has a per-planet phase angle: the ICRF perihelion longitude
+// at the balanced year (~302,635 BC). The mean is derived from:
 //
-//   phaseAngle = Ω_J2000 - arccos((i_J2000 - mean) / amplitude)
+//   mean = i_J2000 - amplitude × cos(ω̃_J2000 - phaseAngle)
 //
 // where:
-//   Ω_J2000   = 284.51°       (Earth ascending node, Souami & Souchay 2012)
-//   i_J2000   = 1.57866663°   (Earth inclination to invariable plane at J2000)
-//   amplitude = ψ / (d × √m)  (Fibonacci amplitude, depends on H via ψ)
-//   mean      = derived from J2000 constraint using amplitude and phaseAngle
+//   ω̃_J2000   = ICRF perihelion longitude at J2000
+//   i_J2000   = inclination to invariable plane at J2000
+//   amplitude = ψ / (d × √m)  (Fibonacci amplitude)
+//   phaseAngle = per-planet ICRF perihelion at balanced year
 //
-// This is NOT circular: the Fibonacci amplitude uniquely determines the
-// ratio (i_J2000 - mean) / amplitude = cos(Ω - φ), and this ratio is
-// H-INDEPENDENT. When H changes, both amplitude and mean shift
-// proportionally, preserving the arccos argument. Verified numerically
-// for different H values: phaseAngle = 203.3195° in all cases.
-//
-// The value 203.3195° corresponds to the s₈ eigenmode of Laplace-Lagrange
-// secular perturbation theory (Farside Table 10.1 gives γ₈ = 202.8°).
-// Saturn uses 23.3195° (= 203.3195° - 180°) due to retrograde precession.
-//
-// Note: script.js uses IAU 2006-optimized Earth values (see constants.js for
-// current values) which give phaseAngle ≈ 203.33° — a small
-// offset from the Fibonacci-derived value. This is negligible.
+// Earth's phase angle (21.77°) clusters near the γ₁ eigenmode (20.23°).
+// Saturn is anti-phase: MAX inclination at balanced year (others at MIN).
+// All ICRF periods divide 8H = 2,682,536 years (Grand Holistic Octave).
 // ═══════════════════════════════════════════════════════════════════════════
 
 const earthFibAmp = getFibonacciAmplitude('earth');
@@ -205,7 +196,7 @@ planetInputs.pluto = {
   inclJ2000: 15.5639473,
   eclPeriod: holisticyearLength,
   icrfPeriod: 1 / (1 / holisticyearLength - genPrecRate),
-  phaseAngle: 203.3195,
+  phaseAngle: 203.32,
   antiPhase: false,
 };
 

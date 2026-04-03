@@ -101,13 +101,13 @@ This holds for all 8 planets with a single universal ψ = 3.288 × 10⁻³.
 The angular-momentum-weighted inclination amplitudes cancel between the two phase groups, conserving the orientation of the invariable plane:
 
 ```
-Σ(203° group) L_j × amp_j = Σ(23° group) L_j × amp_j
+Σ(prograde group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
 ```
 
 Substituting Law 2 and simplifying:
 
 ```
-Σ(203°) w_j = Σ(23°) w_j
+Σ(prograde) w_j = Σ(anti-phase) w_j
 
 where w_j = √(m_j × a_j(1-e_j²)) / d_j
 ```
@@ -132,7 +132,7 @@ This determines all 8 eccentricities from Law 2 inclinations with 0 free paramet
 The eccentricities satisfy an independent balance condition using the same Fibonacci divisors and phase groups:
 
 ```
-Σ(203° group) v_j = Σ(23° group) v_j
+Σ(prograde group) v_j = Σ(anti-phase group) v_j
 
 where v_j = √m_j × a_j^(3/2) × e_j / √d_j
 ```
@@ -175,38 +175,46 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 | Planet | d | Fibonacci | Phase group |
 |--------|---|-----------|-------------|
-| Mercury | 21 | F₈ | 203° |
-| Venus | 34 | F₉ | 203° |
-| Earth | 3 | F₄ | 203° |
-| Mars | 5 | F₅ | 203° |
-| Jupiter | 5 | F₅ | 203° |
-| Saturn | 3 | F₄ | 23° |
-| Uranus | 21 | F₈ | 203° |
-| Neptune | 34 | F₉ | 203° |
+| Mercury | 21 | F₈ | Prograde |
+| Venus | 34 | F₉ | Prograde |
+| Earth | 3 | F₄ | Prograde |
+| Mars | 5 | F₅ | Prograde |
+| Jupiter | 5 | F₅ | Prograde |
+| Saturn | 3 | F₄ | Anti-phase |
+| Uranus | 21 | F₈ | Prograde |
+| Neptune | 34 | F₉ | Prograde |
 
 ### Phase Groups
 
-The model uses two phase angles, 180° apart, derived from the s₈ eigenmode of Laplace-Lagrange secular perturbation theory (γ₈ ≈ 203.3195°):
+Each planet has a per-planet phase angle — the ICRF perihelion longitude at the balanced year (~302,635 BC). At the balanced year, all prograde planets reach minimum inclination while Saturn (anti-phase) reaches maximum:
 
-| Phase angle | Planets |
-|-------------|---------|
-| **203.3195°** | Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune |
-| **23.3195°** | Saturn (retrograde, solo) |
+| Planet | Phase Angle | Group |
+|--------|-------------|-------|
+| Mercury | 99.52° | Prograde |
+| Venus | 79.82° | Prograde |
+| Earth | 21.77° | Prograde |
+| Mars | 96.95° | Prograde |
+| Jupiter | 291.18° | Prograde |
+| **Saturn** | **120.38°** | **Anti-phase** |
+| Uranus | 21.33° | Prograde |
+| Neptune | 354.04° | Prograde |
 
-The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5).
+The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5). Phase angles cluster near LL eigenmodes (γ₁-γ₈) within 1-10°.
 
-### Precession Periods
+### Ecliptic Perihelion Periods
 
 | Planet | Expression |
 |--------|------------|
-| Mercury | H / (1+3/8) |
+| Mercury | H × 8/11 |
 | Venus | 2H |
 | Earth | H/3 |
-| Mars | H / (4+1/3) |
+| Mars | H × 8/35 |
 | Jupiter | H/5 |
-| Saturn | −H/8 (retrograde) |
+| Saturn | H/8 |
 | Uranus | H/3 |
 | Neptune | 2H |
+
+The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years (the Grand Holistic Octave).
 
 ---
 
@@ -225,7 +233,7 @@ Each inner planet shares its Fibonacci divisor with its outer counterpart across
 | Far | Venus (d=34) | Neptune (d=34) | 34 | F₉ |
 | Outermost | Mercury (d=21) | Uranus (d=21) | 21 | F₈ |
 
-Earth–Saturn is the only pair with opposite phase groups (203° vs 23°). The divisors form two consecutive Fibonacci pairs: (3, 5) for the belt-adjacent planets and (21, 34) for the outer planets.
+Earth–Saturn is the only pair with opposite balance groups (prograde vs anti-phase). The divisors form two consecutive Fibonacci pairs: (3, 5) for the belt-adjacent planets and (21, 34) for the outer planets.
 
 ### Finding 2: Configuration Uniqueness
 
@@ -233,7 +241,7 @@ The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search
 
 - **Balance ≥ 99.994%** — the inclination balance exceeds the TNO margin
 - **Mirror symmetry** — inner/outer d-values match across the asteroid belt (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju)
-- **Saturn-solo** — Saturn is the only planet at the 23° phase angle (all others at 203°)
+- **Saturn-solo** — Saturn is the only anti-phase planet (all others prograde)
 - **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
 
 These are overlapping, not nested, constraints (full analysis: [configuration-analysis.js](../tools/verify/configuration-analysis.js)):
@@ -287,7 +295,7 @@ The two balances also differ structurally. The inclination balance is a **global
 Since Saturn is the sole retrograde planet, the eccentricity balance directly predicts its eccentricity from the other seven:
 
 ```
-e_Saturn = Σ(203° group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
+e_Saturn = Σ(prograde group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 ```
 
 | Source | e_Saturn | vs J2000 |
@@ -335,7 +343,7 @@ The Z-component of angular momentum is `Lz_j ∝ L_j × cos(i_j)`. For small inc
 In the two-group model, planets in each group oscillate together (with 180° phase offset). The balance condition is:
 
 ```
-Σ(203° group) L_j × amp_j = Σ(23° group) L_j × amp_j
+Σ(prograde group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
 ```
 
 ### Substituting the Fibonacci Formula
@@ -351,7 +359,7 @@ L_j × amp_j = ψ × m_j × √(a_j(1-e_j²)) / (d_j × √m_j)
 Since ψ is a single universal constant, it cancels from both sides:
 
 ```
-Σ(203°) w_j = Σ(23°) w_j
+Σ(prograde) w_j = Σ(anti-phase) w_j
 ```
 
 Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each planet.
@@ -360,24 +368,24 @@ Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each p
 
 | Planet | Group | d | w_j |
 |--------|-------|---|-----|
-| Mercury | 203° | 21 | 1.181 × 10⁻⁵ |
-| Venus | 203° | 34 | 3.914 × 10⁻⁵ |
-| Earth | 203° | 3 | 5.776 × 10⁻⁴ |
-| Mars | 203° | 5 | 1.396 × 10⁻⁴ |
-| Jupiter | 203° | 5 | 1.408 × 10⁻² |
-| Uranus | 203° | 21 | 1.375 × 10⁻³ |
-| Neptune | 203° | 34 | 1.155 × 10⁻³ |
-| Saturn | 23° | 3 | 1.737 × 10⁻² |
+| Mercury | Prograde | 21 | 1.181 × 10⁻⁵ |
+| Venus | Prograde | 34 | 3.914 × 10⁻⁵ |
+| Earth | Prograde | 3 | 5.776 × 10⁻⁴ |
+| Mars | Prograde | 5 | 1.396 × 10⁻⁴ |
+| Jupiter | Prograde | 5 | 1.408 × 10⁻² |
+| Uranus | Prograde | 21 | 1.375 × 10⁻³ |
+| Neptune | Prograde | 34 | 1.155 × 10⁻³ |
+| Saturn | Anti-phase | 3 | 1.737 × 10⁻² |
 
 ```
-Σ(203°) w = 1.7374 × 10⁻²
-Σ(23°)  w = 1.7374 × 10⁻²
+Σ(prograde) w = 1.7374 × 10⁻²
+Σ(anti-phase)  w = 1.7374 × 10⁻²
 
 Difference: 5.4 × 10⁻⁸
 Balance: 100%
 ```
 
-Jupiter (d=5) contributes the dominant 203° weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
+Jupiter (d=5) contributes the dominant prograde weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
 
 ### TNO Contribution
 
@@ -392,7 +400,7 @@ The balance considers only the 8 major planets, which carry 99.994% of the solar
 The eccentricity balance states that orbital-period-weighted eccentricities, scaled by √(mass / Fibonacci divisor), cancel between the two phase groups:
 
 ```
-Σ(203°) v_j = Σ(23°) v_j
+Σ(prograde) v_j = Σ(anti-phase) v_j
 
 where v_j = √m_j × a_j^(3/2) × e_j / √d_j
 ```
@@ -424,23 +432,23 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 
 | Planet | Group | d | v_j = √m × a^(3/2) × e / √d |
 |--------|-------|---|------|
-| Mercury | 203° | 21 | 4.404 × 10⁻⁶ |
-| Venus | 203° | 34 | 1.119 × 10⁻⁶ |
-| Earth | 203° | 3 | 1.672 × 10⁻⁵ |
-| Mars | 203° | 5 | 4.463 × 10⁻⁵ |
-| Jupiter | 203° | 5 | 7.928 × 10⁻³ |
-| Uranus | 203° | 21 | 5.705 × 10⁻³ |
-| Neptune | 203° | 34 | 1.734 × 10⁻³ |
-| Saturn | 23° | 3 | 1.547 × 10⁻² |
+| Mercury | Prograde | 21 | 4.404 × 10⁻⁶ |
+| Venus | Prograde | 34 | 1.119 × 10⁻⁶ |
+| Earth | Prograde | 3 | 1.672 × 10⁻⁵ |
+| Mars | Prograde | 5 | 4.463 × 10⁻⁵ |
+| Jupiter | Prograde | 5 | 7.928 × 10⁻³ |
+| Uranus | Prograde | 21 | 5.705 × 10⁻³ |
+| Neptune | Prograde | 34 | 1.734 × 10⁻³ |
+| Saturn | Anti-phase | 3 | 1.547 × 10⁻² |
 
 ```
-Σ(203°) v = 1.543 × 10⁻²
-Σ(23°)  v = 1.547 × 10⁻²
+Σ(prograde) v = 1.543 × 10⁻²
+Σ(anti-phase)  v = 1.547 × 10⁻²
 
 Balance: 100%
 ```
 
-Saturn alone carries the entire 23° contribution. The 203° group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
+Saturn alone carries the entire anti-phase contribution. The prograde group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
 
 ### Mirror Pair Decomposition
 
@@ -454,7 +462,7 @@ The gap decomposes by mirror pair into four contributions that nearly cancel:
 | Venus ↔ Neptune | 34 | −1.735 × 10⁻³ | −4,773% |
 | **Sum** | | **3.636 × 10⁻⁵** | **100%** |
 
-Four numbers spanning ±42,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (23° group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three 203°-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
+Four numbers spanning ±42,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (anti-phase group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three prograde-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
 
 ### Non-Triviality
 
@@ -581,14 +589,14 @@ The R²_sum × d pattern breaks for d=21 (6.79% error vs F₁₃=233) because Me
 
 | Planet | d | Phase | Amplitude (°) | Mean (°) | Range (°) | LL bounds (°) | Margin (°) |
 |--------|---|-------|---------------|----------|-----------|---------------|-----------|
-| Mercury | 21 | 203° | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
-| Venus | 34 | 203° | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
-| Earth | 3 | 203° | 0.635 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
-| Mars | 5 | 203° | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
-| Jupiter | 5 | 203° | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
-| Saturn | 3 | 23° | 0.065 | 0.932 | 0.87 – 1.00 | 0.797 – 1.02 | +0.023 |
-| Uranus | 21 | 203° | 0.024 | 1.001 | 0.98 – 1.02 | 0.90 – 1.11 | +0.075 |
-| Neptune | 34 | 203° | 0.014 | 0.722 | 0.71 – 0.74 | 0.55 – 0.80 | +0.064 |
+| Mercury | 21 | Prograde | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
+| Venus | 34 | Prograde | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
+| Earth | 3 | Prograde | 0.635 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
+| Mars | 5 | Prograde | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
+| Jupiter | 5 | Prograde | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
+| Saturn | 3 | Anti-phase | 0.065 | 0.932 | 0.87 – 1.00 | 0.797 – 1.02 | +0.023 |
+| Uranus | 21 | Prograde | 0.024 | 1.001 | 0.98 – 1.02 | 0.90 – 1.11 | +0.075 |
+| Neptune | 34 | Prograde | 0.014 | 0.722 | 0.71 – 0.74 | 0.55 – 0.80 | +0.064 |
 
 **Balance: 100%** — All 8 planets fit within Laplace-Lagrange bounds.
 
@@ -610,8 +618,9 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 The mean is computed from the J2000 constraint:
 
 ```
-mean = inclJ2000 - amplitude × cos(Ω_J2000 - phaseAngle)
-     = 1.57867° - 0.632° × cos(284.51° - 203.3195°)
+mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle)
+     = 1.57867° - 0.632° × cos(102.947° - 21.77°)
+     = 1.57867° - 0.632° × cos(81.177°)
      = 1.57867° - 0.632° × 0.15315
      = 1.48188°
 ```
@@ -658,11 +667,12 @@ const FIBONACCI_D = {
   neptune: 34    // F₉
 };
 
-// Phase group assignments (Saturn sole retrograde)
-const PHASE_GROUP = {
-  mercury: 203.3195, venus: 203.3195, earth: 203.3195, mars: 203.3195,
-  jupiter: 203.3195, saturn: 23.3195, uranus: 203.3195, neptune: 203.3195
+// Per-planet phase angles (ICRF perihelion at balanced year)
+const PHASE_ANGLE = {
+  mercury: 99.52, venus: 79.82, earth: 21.77, mars: 96.95,
+  jupiter: 291.18, saturn: 120.38, uranus: 21.33, neptune: 354.04
 };
+// Saturn is anti-phase (MAX at balanced year, others at MIN)
 
 // Compute amplitude for a planet (Law 2)
 function getFibonacciAmplitude(planet, mass) {
@@ -673,31 +683,31 @@ function getFibonacciAmplitude(planet, mass) {
 
 // Verify the inclination balance condition (Law 3)
 function computeInclinationBalance(planets) {
-  let sum203 = 0, sum23 = 0;
+  let sumPro = 0, sumAnti = 0;
 
   for (const [name, p] of Object.entries(planets)) {
     const w = Math.sqrt(p.mass * p.a * (1 - p.e * p.e)) / FIBONACCI_D[name];
-    if (PHASE_GROUP[name] > 180) sum203 += w; else sum23 += w;
+    if (name !== 'saturn') sumPro += w; else sumAnti += w;
   }
 
-  const residual = Math.abs(sum203 - sum23);
-  const balance = 1 - residual / (sum203 + sum23);
-  return { sum203, sum23, balance };  // balance ≈ 0.999998
+  const residual = Math.abs(sumPro - sumAnti);
+  const balance = 1 - residual / (sumPro + sumAnti);
+  return { sumPro, sumAnti, balance };  // balance ≈ 0.999998
 }
 
 // Verify the eccentricity balance condition (Law 5)
 function computeEccentricityBalance(planets) {
-  let sum203 = 0, sum23 = 0;
+  let sumPro = 0, sumAnti = 0;
 
   for (const [name, p] of Object.entries(planets)) {
     const d = FIBONACCI_D[name];
     const v = Math.sqrt(p.mass) * Math.pow(p.a, 1.5) * p.e / Math.sqrt(d);
-    if (PHASE_GROUP[name] > 180) sum203 += v; else sum23 += v;
+    if (name !== 'saturn') sumPro += v; else sumAnti += v;
   }
 
-  const residual = Math.abs(sum203 - sum23);
-  const balance = 1 - residual / (sum203 + sum23);
-  return { sum203, sum23, balance };  // balance ≈ 0.9988
+  const residual = Math.abs(sumPro - sumAnti);
+  const balance = 1 - residual / (sumPro + sumAnti);
+  return { sumPro, sumAnti, balance };  // balance ≈ 0.9988
 }
 ```
 
@@ -715,11 +725,11 @@ Compute `mean ± amplitude` for each planet and verify the range falls within th
 
 ### Test 3: Inclination Balance
 
-Verify `Σ(203°) w_j = Σ(23°) w_j` to 100% balance.
+Verify `Σ(prograde) w_j = Σ(anti-phase) w_j` to 100% balance.
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(203°) v_j = Σ(23°) v_j` to 100% balance.
+Verify `Σ(prograde) v_j = Σ(anti-phase) v_j` to 100% balance.
 
 ### Test 5: Saturn Eccentricity Prediction and Law Convergence
 
@@ -727,7 +737,7 @@ Compute Saturn's eccentricity from the eccentricity balance equation (Law 5) and
 
 ### Test 6: J2000 Inclination Match
 
-At J2000 epoch, `i(2000) = mean + amplitude × cos(Ω_J2000 - φ_group)` should match observed invariable plane inclinations.
+At J2000 epoch, `i(2000) = mean + amplitude × cos(ω̃_J2000 - phaseAngle)` should match observed invariable plane inclinations.
 
 ### Test 7: Eccentricity Prediction from AMD Partition
 
@@ -749,10 +759,10 @@ The Fibonacci divisor assignments are not hand-picked — they emerge from an ex
 
 The search iterates over:
 - **Fibonacci divisors**: d ∈ {1, 2, 3, 5, 8, 13, 21, 34, 55} for Mercury, Venus, Mars, Uranus, Neptune
-- **Phase angles**: 203.3195° or 23.3195° for each of the above
+- **Balance group**: prograde or anti-phase for each of the above
 - **4 scenarios** for Jupiter and Saturn (fixed per scenario):
   - A: Ju=5, Sa=3 — B: Ju=8, Sa=5 — C: Ju=13, Sa=8 — D: Ju=21, Sa=13
-- **Earth**: locked at d=3, phase=203.3195°
+- **Earth**: locked at d=3, prograde group
 
 This produces 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 4 = 7,558,272 configurations per run.
 
@@ -822,7 +832,7 @@ npx parcel build src/index.html --no-cache
 
 **Law 3 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 100%.
 
-**Phase angles** (203.3195° and 23.3195°) originate from the **s₈ eigenmode of Laplace-Lagrange secular perturbation theory**, a framework established in classical celestial mechanics (18th–19th century). Saturn's retrograde ascending node precession is also a known result from secular theory.
+**Phase angles** are per-planet values (ICRF perihelion longitude at the balanced year) that cluster near the **eigenmodes of Laplace-Lagrange secular perturbation theory** (γ₁-γ₈) within 1-10°. Saturn's anti-phase behavior (MAX inclination at balanced year, opposite to all other planets) is consistent with its known retrograde precession in secular theory.
 
 **Law 5 (Eccentricity Balance)** connects to **Angular Momentum Deficit (AMD) conservation**, a known conserved quantity in secular theory. The weight `√m × a^(3/2) × e / √d` contains factors related to how AMD is partitioned among planets. However, the linear dependence on eccentricity (rather than quadratic, as in the AMD itself) and the `1/√d` scaling distinguish it from the standard AMD formulation. The balance operates as a **closed 8-planet system** — the mirror pairs exchange AMD as communicating vessels, while TNOs and other small bodies cannot participate (the a^(3/2) weighting makes them disproportionately heavy, and they lack paired counterparts). This contrasts with the inclination balance (Law 3), which is a global property where all solar system mass contributes.
 

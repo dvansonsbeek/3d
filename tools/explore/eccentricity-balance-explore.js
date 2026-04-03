@@ -3,8 +3,8 @@
 // Goal: Find what tweaks can bring Law 5 balance from 99.89% to 100%
 //
 // The eccentricity balance formula: v_j = √m_j × a_j^(3/2) × e_j / √d_j
-// Two phase groups must sum to equal: Σ(203°) v_j = Σ(23°) v_j
-// Saturn is the only 23° planet, so: v_Saturn = Σ(other 7 planets)
+// Two phase groups must sum to equal: Σ(prograde) v_j = Σ(anti-phase) v_j
+// Saturn is the only anti-phase planet, so: v_Saturn = Σ(other 7 planets)
 //
 // Usage: node tools/explore/eccentricity-balance-explore.js
 // ═══════════════════════════════════════════════════════════════
@@ -40,7 +40,7 @@ for (const [k, e] of Object.entries(eccJ2000)) {
 
 // Config #3 d-values and phases
 const d = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
-const isSaturn23 = true; // Saturn is the only 23° planet
+const isSaturn23 = true; // Saturn is the only anti-phase planet
 
 const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
@@ -71,10 +71,10 @@ console.log('══════════════════════�
 
 const base = computeEccBalance();
 console.log(`\nCurrent balance: ${base.balance.toFixed(6)}%`);
-console.log(`  Σ(203°) = ${base.sum203.toExponential(10)}`);
-console.log(`  Σ(23°)  = ${base.sum23.toExponential(10)}  (Saturn only)`);
+console.log(`  Σ(prograde) = ${base.sum203.toExponential(10)}`);
+console.log(`  Σ(anti-phase)  = ${base.sum23.toExponential(10)}  (Saturn only)`);
 console.log(`  Gap     = ${base.gap.toExponential(6)}`);
-console.log(`  Gap is on the ${base.sum23 > base.sum203 ? '23° (Saturn)' : '203°'} side`);
+console.log(`  Gap is on the ${base.sum23 > base.sum203 ? 'anti-phase (Saturn)' : 'prograde'} side`);
 
 console.log('\nPer-planet v-weights:');
 console.log('Planet      √m          a^(3/2)      e            1/√d        v_j              % of total');
@@ -108,9 +108,9 @@ Parameters in the formula:
        Eccentricities oscillate secularly, so using a mean value
        (averaged over a secular cycle) is physically justified.
 
-Since Saturn is heavier (23° side > 203° side), we need to either:
+Since Saturn is heavier (anti-phase side > prograde side), we need to either:
   (a) REDUCE Saturn's v-weight, or
-  (b) INCREASE one or more 203° planet v-weights
+  (b) INCREASE one or more prograde planet v-weights
 `);
 
 // ═══════════════════════════════════════════════════════════════
@@ -136,8 +136,8 @@ const secularRange = {
 };
 
 for (const p of planets) {
-  // For a 203° planet: increasing e moves 203° sum up → closes gap (since 23° is heavier)
-  // For Saturn (23°): decreasing e moves 23° sum down → closes gap
+  // For a prograde planet: increasing e moves prograde sum up → closes gap (since anti-phase is heavier)
+  // For Saturn (anti-phase): decreasing e moves anti-phase sum down → closes gap
   // Perfect e: solve v_perfect such that sum203_new = sum23_new
 
   const m = getMass(p);
@@ -145,7 +145,7 @@ for (const p of planets) {
   const coeff = Math.sqrt(m) * Math.pow(a, 1.5) / Math.sqrt(d[p]);
 
   if (p === 'saturn') {
-    // Saturn is 23° side. sum203 = base.sum203, new sum23 = coeff * e_new
+    // Saturn is anti-phase side. sum203 = base.sum203, new sum23 = coeff * e_new
     // Balance when: base.sum203 = coeff * e_new → e_new = base.sum203 / coeff
     const ePerfect = base.sum203 / coeff;
     const delta = ePerfect - eccJ2000[p];
@@ -154,7 +154,7 @@ for (const p of planets) {
     const inRange = ePerfect >= range.min && ePerfect <= range.max ? 'YES' : 'NO';
     console.log(`${p.padEnd(10)}  ${eccJ2000[p].toFixed(8)}  ${ePerfect.toFixed(8)}  ${(delta >= 0 ? '+' : '') + delta.toExponential(4)}  ${pctChange.toFixed(4).padStart(9)}%  [${range.min}, ${range.max}] ${inRange}`);
   } else {
-    // 203° planet. new sum203 = base.sum203 - base.weights[p] + coeff * e_new
+    // prograde planet. new sum203 = base.sum203 - base.weights[p] + coeff * e_new
     // Balance when: base.sum203 - base.weights[p] + coeff * e_new = base.sum23
     // e_new = (base.sum23 - base.sum203 + base.weights[p]) / coeff
     const ePerfect = (base.sum23 - base.sum203 + base.weights[p]) / coeff;
@@ -228,7 +228,7 @@ console.log('══════════════════════�
   const coeff = Math.sqrt(m) * Math.pow(a, 1.5) / Math.sqrt(d.jupiter);
   // Need to increase Jupiter's v by the gap amount
   const ePerfect = (base.weights.jupiter + base.gap) / coeff;
-  // But only if 23° side was heavier
+  // But only if anti-phase side was heavier
   if (base.sum23 > base.sum203) {
     const delta = ePerfect - eccJ2000.jupiter;
     console.log(`\nApproach B: Adjust Jupiter eccentricity alone`);
@@ -261,7 +261,7 @@ console.log(`  Using Lagrange multiplier approach...`);
   //
   // Lagrangian: L = Σ((e_j - e_j0)/e_j0)² - λ(Σ_{j≠sat} c_j*e_j - c_sat*e_sat)
   // ∂L/∂e_j = 2(e_j - e_j0)/e_j0² + sign_j*λ*c_j = 0
-  // where sign_j = -1 for 203°, +1 for saturn
+  // where sign_j = -1 for prograde, +1 for saturn
   // e_j = e_j0 - sign_j * λ * c_j * e_j0² / 2
 
   const c = {};
@@ -272,7 +272,7 @@ console.log(`  Using Lagrange multiplier approach...`);
   }
 
   // Current gap: sum23 - sum203 = c_sat*e_sat - Σ_{j≠sat} c_j*e_j
-  const currentGap = base.sum23 - base.sum203; // positive means 23° too heavy
+  const currentGap = base.sum23 - base.sum203; // positive means anti-phase too heavy
 
   // The perturbation Δe_j = -sign_j * λ * c_j * e_j0² / 2
   // Sum of perturbation effects on gap:
@@ -324,8 +324,8 @@ const circResult = computeEccBalance(eccCircular);
 console.log(`\nBalance with e/(1+e): ${circResult.balance.toFixed(6)}%`);
 console.log(`Balance with e_JPL:   ${base.balance.toFixed(6)}%`);
 console.log(`Change: ${(circResult.balance - base.balance) > 0 ? '+' : ''}${(circResult.balance - base.balance).toFixed(6)}%`);
-console.log(`\n  Σ(203°) = ${circResult.sum203.toExponential(10)}`);
-console.log(`  Σ(23°)  = ${circResult.sum23.toExponential(10)}`);
+console.log(`\n  Σ(prograde) = ${circResult.sum203.toExponential(10)}`);
+console.log(`  Σ(anti-phase)  = ${circResult.sum23.toExponential(10)}`);
 console.log(`  Gap     = ${circResult.gap.toExponential(6)}`);
 
 // ═══════════════════════════════════════════════════════════════

@@ -25,12 +25,13 @@ const RAD2DEG = 180 / Math.PI;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const earthConfig = {
-  omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane,
-  period: holisticyearLength / 3,
+  periLongJ2000: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
+  period: holisticyearLength / 3,  // Earth ICRF period = H/3
   mean: C.earthInvPlaneInclinationMean,
   amplitude: C.earthInvPlaneInclinationAmplitude,
   inclJ2000: 1.57866663,
-  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle
+  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+  omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane  // for ecliptic plane normal
 };
 
 // Calculate Earth's initial phase from J2000 constraint
@@ -62,82 +63,43 @@ const neptuneEclipticInclinationTrendJPL = +0.00035;  // degrees/century (INCREA
 const plutoEclipticInclinationTrendJPL = -0.00100;    // degrees/century (estimated)
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CURRENT CODE VALUES (from script.js)
+// CURRENT CODE VALUES (from constants module)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const currentCodeValues = {
-  mercury: {
-    mean: 6.726271,
-    amplitude: 0.384267,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 32.83,
-    period: holisticyearLength / (1 + 3/8),  // ~243,867 years
-    inclJ2000: 6.3472858,
-    jplTrend: mercuryEclipticInclinationTrendJPL
-  },
-  venus: {
-    mean: 2.207312,
-    amplitude: 0.061809,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 54.70,
-    period: holisticyearLength * 2,  // 670,634 years
-    inclJ2000: 2.1545441,
-    jplTrend: venusEclipticInclinationTrendJPL
-  },
-  mars: {
-    mean: 2.648955,
-    amplitude: 1.157559,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 354.87,
-    period: holisticyearLength / (4 + 1/3),  // ~77,381 years
-    inclJ2000: 1.6311858,
-    jplTrend: marsEclipticInclinationTrendJPL
-  },
-  jupiter: {
-    mean: 0.329094,
-    amplitude: 0.021281,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 312.89,
-    period: holisticyearLength / 5,  // 67,063 years
-    inclJ2000: 0.3219652,
-    jplTrend: jupiterEclipticInclinationTrendJPL
-  },
-  saturn: {
-    mean: 0.931672,
-    amplitude: 0.064819,
-    phaseAngle: 23.3195,       // 23° balance group (retrograde)
-    omegaJ2000: 118.81,
-    period: -holisticyearLength / 8,  // -41,915 years (retrograde)
-    inclJ2000: 0.9254704,
-    jplTrend: saturnEclipticInclinationTrendJPL
-  },
-  uranus: {
-    mean: 1.000594,
-    amplitude: 0.023695,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 307.80,
-    period: holisticyearLength / 3,  // 111,772 years
-    inclJ2000: 0.9946692,
-    jplTrend: uranusEclipticInclinationTrendJPL
-  },
-  neptune: {
-    mean: 0.722202,
-    amplitude: 0.013474,
-    phaseAngle: 203.3195,      // 203° balance group
-    omegaJ2000: 192.04,
-    period: holisticyearLength * 2,  // 670,634 years
-    inclJ2000: 0.7354155,
-    jplTrend: neptuneEclipticInclinationTrendJPL
-  },
-  pluto: {
-    mean: 15.716200,
-    amplitude: 0.717024,
-    phaseAngle: 203.3195,      // not in balance theory
-    omegaJ2000: 101.06,
-    period: holisticyearLength,  // H years
-    inclJ2000: 15.5639473,
-    jplTrend: plutoEclipticInclinationTrendJPL
-  }
+const genPrec = holisticyearLength / 13;
+const jplTrends = {
+  mercury: mercuryEclipticInclinationTrendJPL, venus: venusEclipticInclinationTrendJPL,
+  mars: marsEclipticInclinationTrendJPL, jupiter: jupiterEclipticInclinationTrendJPL,
+  saturn: saturnEclipticInclinationTrendJPL, uranus: uranusEclipticInclinationTrendJPL,
+  neptune: neptuneEclipticInclinationTrendJPL, pluto: plutoEclipticInclinationTrendJPL
+};
+
+const currentCodeValues = {};
+const planetNames = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+for (const p of planetNames) {
+  const pd = C.planets[p];
+  const eclP = pd.perihelionEclipticYears;
+  const icrfP = Math.abs(1 / (1/eclP - 1/genPrec));
+  currentCodeValues[p] = {
+    mean: pd.invPlaneInclinationMean,
+    amplitude: pd.invPlaneInclinationAmplitude,
+    phaseAngle: pd.inclinationPhaseAngle,
+    periLongJ2000: pd.longitudePerihelion,
+    omegaJ2000: pd.ascendingNodeInvPlane,  // for ecliptic plane normal
+    icrfPeriod: icrfP,
+    period: eclP,  // kept for ecliptic ascending node rate
+    inclJ2000: pd.invPlaneInclinationJ2000,
+    jplTrend: jplTrends[p],
+    antiPhase: p === 'saturn'
+  };
+}
+// Pluto (not in C.planets)
+currentCodeValues.pluto = {
+  mean: 15.716200, amplitude: 0.717024, phaseAngle: 203.32,
+  periLongJ2000: 224.06, omegaJ2000: 101.06,
+  icrfPeriod: Math.abs(1 / (1/holisticyearLength - 1/genPrec)),
+  period: holisticyearLength, inclJ2000: 15.5639473,
+  jplTrend: plutoEclipticInclinationTrendJPL, antiPhase: false
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -160,13 +122,15 @@ const laplaceLagrangeBounds = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function getPlanetInclination(planet, year) {
-  const { mean, amplitude, phaseAngle, omegaJ2000, period } = planet;
-  const omega = omegaJ2000 + (360 / period) * (year - 2000);
-  const phase = (omega - phaseAngle) * DEG2RAD;
-  return mean + amplitude * Math.cos(phase);
+  const { mean, amplitude, phaseAngle, periLongJ2000, icrfPeriod, antiPhase } = planet;
+  const periLong = periLongJ2000 + (360 / icrfPeriod) * (year - 2000);
+  const phase = (periLong - phaseAngle) * DEG2RAD;
+  const sign = antiPhase ? -1 : 1;
+  return mean + sign * amplitude * Math.cos(phase);
 }
 
 function getPlanetOmega(planet, year) {
+  // Ecliptic ascending node — used for plane normal direction, NOT for inclination oscillation
   return planet.omegaJ2000 + (360 / planet.period) * (year - 2000);
 }
 
@@ -269,8 +233,8 @@ console.log('');
 console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
 console.log('│ EARTH REFERENCE (fixed values)                                              │');
 console.log('├─────────────────────────────────────────────────────────────────────────────┤');
-console.log(`│ Ascending Node (Ω) at J2000:  ${earthConfig.omegaJ2000}°`);
-console.log(`│ Inclination Period:           ${earthConfig.period.toLocaleString()} years (holisticyearLength/3)`);
+console.log(`│ ICRF Perihelion (ω̃) at J2000: ${earthConfig.periLongJ2000}°`);
+console.log(`│ ICRF Period:                  ${earthConfig.period.toLocaleString()} years (H/3, sole prograde)`);
 console.log(`│ Mean Inclination:             ${earthConfig.mean}°`);
 console.log(`│ Amplitude:                    ${earthConfig.amplitude}°`);
 console.log(`│ Phase Angle:                  ${earthConfig.phaseAngle}°`);
@@ -286,16 +250,14 @@ for (const [name, planet] of Object.entries(currentCodeValues)) {
   const result = verifyPlanet(name, planet, bounds);
   results.push(result);
 
-  const periodStr = Math.abs(planet.period).toLocaleString();
-  const retro = planet.period < 0 ? ' (RETROGRADE)' : '';
 
   console.log('┌─────────────────────────────────────────────────────────────────────────────┐');
   console.log(`│ ${name.toUpperCase().padEnd(75)}│`);
   console.log('├─────────────────────────────────────────────────────────────────────────────┤');
   console.log(`│ CODE VALUES:                                                                │`);
   console.log(`│   Mean:            ${planet.mean.toFixed(6).padEnd(20)}Amplitude:        ${planet.amplitude.toFixed(6)}   │`);
-  console.log(`│   Phase Angle:     ${String(planet.phaseAngle + '°').padEnd(20)}Period:           ${periodStr} yrs${retro.padEnd(11)}│`);
-  console.log(`│   Ω at J2000:      ${String(planet.omegaJ2000 + '°').padEnd(20)}                                       │`);
+  console.log(`│   Phase Angle:     ${String(planet.phaseAngle.toFixed(2) + '°').padEnd(20)}ICRF Period:      ${Math.round(planet.icrfPeriod).toLocaleString()} yrs${(planet.antiPhase ? ' (anti)' : '').padEnd(11)}│`);
+  console.log(`│   ω̃ at J2000:      ${String(planet.periLongJ2000 + '°').padEnd(20)}                                       │`);
   console.log('├─────────────────────────────────────────────────────────────────────────────┤');
   console.log(`│ VERIFICATION:                                                               │`);
 

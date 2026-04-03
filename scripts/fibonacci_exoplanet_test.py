@@ -8,8 +8,8 @@ the Solar System) apply to exoplanet systems.
 
 Solar System Laws (reference):
   Law 2: d × amplitude × √m = ψ (inclination amplitude, single ψ constant)
-  Law 3: Σ(203°) w_j = Σ(23°) w_j (inclination balance, 100%)
-  Law 5: Σ(203°) v_j = Σ(23°) v_j (eccentricity balance, 100%)
+  Law 3: Σ(prograde) w_j = Σ(anti-phase) w_j (inclination balance, 100%)
+  Law 5: Σ(prograde) v_j = Σ(anti-phase) v_j (eccentricity balance, 100%)
   Additional: ξ = e × √m forms Fibonacci-ratio ladders (inner planets)
 
 Key variables:

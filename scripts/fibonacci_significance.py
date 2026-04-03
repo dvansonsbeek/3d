@@ -324,8 +324,8 @@ def compute_incl_balance(eccs, d_vals, group_a, group_b):
     Parameters:
         eccs: dict of eccentricities per planet
         d_vals: dict of Fibonacci d-values per planet
-        group_a: list of planets in group A (203°)
-        group_b: list of planets in group B (23°)
+        group_a: list of planets in group A (prograde)
+        group_b: list of planets in group B (anti-phase)
 
     Returns: balance percentage (100% = perfect)
     """
@@ -404,7 +404,7 @@ def stat_saturn_prediction(eccs, d_vals, group_a, solo_planet):
     """
     Test 7 — Saturn Eccentricity Prediction (Finding 4).
 
-    Since the solo retrograde planet carries the entire 23° contribution,
+    Since the solo anti-phase planet carries the entire anti-phase contribution,
     the eccentricity balance directly predicts its eccentricity from the
     other seven planets. Uses ECC_DUAL_BALANCED: Saturn's dual-balanced
     value (0.05373663) IS the model's prediction from the dual-balance optimizer.

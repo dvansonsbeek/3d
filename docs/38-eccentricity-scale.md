@@ -16,14 +16,14 @@ where each planet has:
 - A **weight**: W_j = √(m_j/m_target × d_target/d_j × a_j/a_target) — combining mass, Fibonacci divisor, and distance ratios relative to the target planet
 - A **position**: offset_j = e_base_j × a_j — the perihelion offset in AU
 
-Saturn (the sole 23° group member) sits alone on one side. The other 7 planets must collectively balance it. The equation can also be solved for any other planet as the target.
+Saturn (the sole anti-phase group member) sits alone on one side. The other 7 planets must collectively balance it. The equation can also be solved for any other planet as the target.
 
 ---
 
 ## The Scale Diagram
 
 ```
-LEFT side (203° group):                RIGHT side (23° group):
+LEFT side (prograde group):                RIGHT side (anti-phase group):
 ┌─────────────────────┐                ┌─────────────────────┐
 │ Jupiter  51.2%      │                │ Saturn  100%        │
 │ Uranus   37.0%      │       ⚖        │                     │
@@ -55,13 +55,13 @@ This weight has three competing factors:
 
 **Product for Jupiter: 3.34 × 0.60 × 0.55 = 1.09 → W = √1.09 = 1.046 ≈ 1**
 
-Jupiter's mass advantage is almost exactly cancelled by its Fibonacci disadvantage (d=5 vs Saturn's d=3) and its distance disadvantage (closer to the Sun than Saturn, so less leverage). This three-way cancellation makes Jupiter the natural balance center of the 203° group.
+Jupiter's mass advantage is almost exactly cancelled by its Fibonacci disadvantage (d=5 vs Saturn's d=3) and its distance disadvantage (closer to the Sun than Saturn, so less leverage). This three-way cancellation makes Jupiter the natural balance center of the prograde group.
 
 ---
 
 ## Building Saturn's Offset (0.512254 AU)
 
-Saturn's perihelion offset is the weighted sum of the 203° group:
+Saturn's perihelion offset is the weighted sum of the prograde group:
 
 | Planet | Offset (e×a) | × Weight | = Contribution | Cumulative | % of Saturn |
 |--------|-------------|----------|---------------|------------|-------------|
@@ -80,13 +80,13 @@ The scale formulation is a rewriting of the Law 5 balance equation in physical t
 
 ## Every Planet as the Balance Target
 
-The balance equation can be solved for ANY planet — given 7 eccentricities, the 8th is determined. For 203° planets, Saturn pushes (+) while other 203° planets pull back (-). The eccentricity is the residual of a tug-of-war.
+The balance equation can be solved for ANY planet — given 7 eccentricities, the 8th is determined. For prograde planets, Saturn pushes (+) while other prograde planets pull back (-). The eccentricity is the residual of a tug-of-war.
 
-### Saturn (23° — all contributions positive)
+### Saturn (anti-phase — all contributions positive)
 
-Simply the sum of all 203° planets' weighted offsets. Jupiter provides the foundation (51%), Uranus and Neptune add the rest.
+Simply the sum of all prograde planets' weighted offsets. Jupiter provides the foundation (51%), Uranus and Neptune add the rest.
 
-### Jupiter (203° — Saturn pushes, giants pull back)
+### Jupiter (prograde — Saturn pushes, giants pull back)
 
 | Planet | Contribution |
 |--------|-------------|
@@ -96,9 +96,9 @@ Simply the sum of all 203° planets' weighted offsets. Jupiter provides the foun
 | Inner planets | -0.002 AU |
 | **Residual** | **= 0.251 AU** |
 
-Jupiter is the **balance center** of the 203° group. Its offset is what remains after Uranus and Neptune partially cancel Saturn's push. If only Jupiter and Saturn existed, their offsets would be nearly equal (W ≈ 1). The additional contributions of Uranus and Neptune on the 203° side are what push Saturn's total offset to ≈ 2× Jupiter's.
+Jupiter is the **balance center** of the prograde group. Its offset is what remains after Uranus and Neptune partially cancel Saturn's push. If only Jupiter and Saturn existed, their offsets would be nearly equal (W ≈ 1). The additional contributions of Uranus and Neptune on the prograde side are what push Saturn's total offset to ≈ 2× Jupiter's.
 
-### Earth (203° — tiny residual of a massive tug-of-war)
+### Earth (prograde — tiny residual of a massive tug-of-war)
 
 | Planet | Contribution |
 |--------|-------------|
@@ -147,12 +147,12 @@ If Uranus and Neptune contributed exactly as much as Jupiter, the ratio would be
 The product e × a × m summed over each group shows a near-2:1 ratio:
 
 ```
-Σ(203°) e×a×m = 2.925 × 10⁻⁴
+Σ(prograde) e×a×m = 2.925 × 10⁻⁴
 Saturn   e×a×m = 1.464 × 10⁻⁴
 Ratio = 1.997 ≈ 2
 ```
 
-The actual balance law uses e × a^1.5 × √m / √d (balanced at 1:1). The 2:1 ratio in e×a×m arises because Jupiter dominates 81.8% of the 203° sum, and the Jupiter/Saturn e×a×m ratio of 1.63 is amplified by the other planets to ≈ 2.
+The actual balance law uses e × a^1.5 × √m / √d (balanced at 1:1). The 2:1 ratio in e×a×m arises because Jupiter dominates 81.8% of the prograde sum, and the Jupiter/Saturn e×a×m ratio of 1.63 is amplified by the other planets to ≈ 2.
 
 ---
 
@@ -214,7 +214,7 @@ Both laws share the same character: they relate ALL planets through a single pri
 The system of equations:
 - **Law 4**: R²_in + R²_out = Fibonacci fraction (4 pairs)
 - **Law 4**: R_in × R_out or R_in/R_out = Fibonacci fraction (4 pairs)
-- **Law 5**: Σ(203°) √m × a^1.5 × e / √d = Σ(23°) same
+- **Law 5**: Σ(prograde) √m × a^1.5 × e / √d = Σ(anti-phase) same
 
 where R = e / i_mean_rad and i_mean is derived from the ψ-constant.
 

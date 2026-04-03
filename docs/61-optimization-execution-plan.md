@@ -404,7 +404,7 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 |--------|----------------------|-----------|----------------|
 | Mercury | H/(1+3/8) | — | ~575 |
 | Venus | H×2 | — | ~400 |
-| Mars | H/(4+1/3) | — | ~1,600 |
+| Mars | H/(4+3/8) | — | ~1,600 |
 | Jupiter | H/5 | 5 | ~1,800 |
 | Saturn | −H/8 | 8 (retrograde) | ~−3,400 |
 | Uranus | H/3 | 3 | ~1,100 |

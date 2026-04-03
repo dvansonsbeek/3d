@@ -20,7 +20,7 @@ Data sources:
 Framework (2025):
   - Single ψ-constant for all 8 planets
   - Pure Fibonacci divisors d ∈ {3, 5, 21, 34}
-  - Saturn sole retrograde planet (23° phase group)
+  - Saturn sole anti-phase planet (MAX inclination at balanced year)
   - Six laws: Inclination Amplitude, Inclination Balance, Eccentricity Balance,
     Perihelion Argument, Eccentricity Formation, and Precession Rate
 """
@@ -179,6 +179,7 @@ AXIAL_TILT = {p['name']: p['axialTiltMean'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN
 
 LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets'].values()}
+LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
 PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
 
 # Predicted obliquity cycle periods (years) from Fibonacci decomposition
@@ -240,16 +241,19 @@ MIRROR_PAIRS = [
 # PHASE GROUPS
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Phase groups from s₈ eigenmode (γ₈ ≈ 203.3195°)
-# Saturn is the sole retrograde planet
+# Balance groups: Saturn is the sole anti-phase planet
+# Per-planet phase angles are in INCL_PHASE_ANGLE (ICRF perihelion at balanced year)
 PHASE_GROUP = {
-    "Mercury": 203, "Venus": 203, "Earth": 203, "Mars": 203,
-    "Jupiter": 203, "Saturn": 23, "Uranus": 203, "Neptune": 203,
+    "Mercury": "prograde", "Venus": "prograde", "Earth": "prograde", "Mars": "prograde",
+    "Jupiter": "prograde", "Saturn": "anti-phase", "Uranus": "prograde", "Neptune": "prograde",
 }
 
-# Planet lists by phase group
-GROUP_203 = [p for p in PLANET_NAMES if PHASE_GROUP[p] == 203]
-GROUP_23 = [p for p in PLANET_NAMES if PHASE_GROUP[p] == 23]
+# Planet lists by balance group
+GROUP_PROGRADE = [p for p in PLANET_NAMES if p != "Saturn"]
+GROUP_ANTI = ["Saturn"]
+# Backwards compatibility aliases
+GROUP_203 = GROUP_PROGRADE
+GROUP_23 = GROUP_ANTI
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ψ-CONSTANT (single, universal)
@@ -311,7 +315,7 @@ INCL_MEAN["Earth"] = EARTH_INCLINATION_MEAN
 
 # Phase angle for inclination oscillation (from constants.js inclinationPhaseAngle)
 INCL_PHASE_ANGLE = {p['name']: p['inclinationPhaseAngle'] for p in _C['planets'].values()}
-INCL_PHASE_ANGLE["Earth"] = PHASE_ANGLE  # 203.3195
+INCL_PHASE_ANGLE["Earth"] = PHASE_ANGLE  # 21.77
 
 # J2000 orbital inclination to ecliptic (from constants.js eclipticInclinationJ2000)
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
@@ -485,43 +489,43 @@ def eccentricity_weight(planet):
 
 
 def verify_law2():
-    """Verify Law 3: inclination balance between phase groups.
-    Returns (sum_203, sum_23, balance_pct).
+    """Verify Law 3: inclination balance between prograde and anti-phase groups.
+    Returns (sum_pro, sum_anti, balance_pct).
     """
-    sum_203 = sum(inclination_weight(p) for p in GROUP_203)
-    sum_23 = sum(inclination_weight(p) for p in GROUP_23)
-    balance = 1 - abs(sum_203 - sum_23) / (sum_203 + sum_23)
-    return sum_203, sum_23, balance * 100
+    sum_pro = sum(inclination_weight(p) for p in GROUP_PROGRADE)
+    sum_anti = sum(inclination_weight(p) for p in GROUP_ANTI)
+    balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
+    return sum_pro, sum_anti, balance * 100
 
 
 def verify_law3():
-    """Verify Law 5: eccentricity balance between phase groups.
-    Returns (sum_203, sum_23, balance_pct).
+    """Verify Law 5: eccentricity balance between prograde and anti-phase groups.
+    Returns (sum_pro, sum_anti, balance_pct).
     """
-    sum_203 = sum(eccentricity_weight(p) for p in GROUP_203)
-    sum_23 = sum(eccentricity_weight(p) for p in GROUP_23)
-    balance = 1 - abs(sum_203 - sum_23) / (sum_203 + sum_23)
-    return sum_203, sum_23, balance * 100
+    sum_pro = sum(eccentricity_weight(p) for p in GROUP_PROGRADE)
+    sum_anti = sum(eccentricity_weight(p) for p in GROUP_ANTI)
+    balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
+    return sum_pro, sum_anti, balance * 100
 
 
 def predict_saturn_eccentricity():
     """Finding 4: predict Saturn's eccentricity from eccentricity balance.
     Returns (predicted_e, actual_e, error_pct).
     """
-    sum_203 = sum(eccentricity_weight(p) for p in GROUP_203)
+    sum_pro = sum(eccentricity_weight(p) for p in GROUP_PROGRADE)
     coeff = math.sqrt(MASS["Saturn"]) * SMA["Saturn"]**1.5 / math.sqrt(D["Saturn"])
-    predicted = sum_203 / coeff
+    predicted = sum_pro / coeff
     actual = ECC["Saturn"]
     return predicted, actual, pct_err(predicted, actual)
 
 
 def compute_mean_inclination(planet):
     """Compute mean inclination from J2000 constraint.
-    mean = i_J2000 - amp × cos(Ω_J2000 - φ_group)
+    mean = i_J2000 - amp × cos(ω̃_J2000 - phaseAngle)
     """
     amp = INCL_AMP[planet]
     i_j2000 = INCL_J2000[planet]
-    omega = OMEGA_J2000[planet]
-    phi = PHASE_ANGLE if PHASE_GROUP[planet] == 203 else PHASE_ANGLE - 180
-    mean = i_j2000 - amp * math.cos(math.radians(omega - phi))
+    peri_long = LONGITUDE_PERIHELION[planet]
+    phase = INCL_PHASE_ANGLE[planet]
+    mean = i_j2000 - amp * math.cos(math.radians(peri_long - phase))
     return mean

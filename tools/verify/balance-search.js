@@ -21,25 +21,35 @@ const orbitDistance = { earth: 1.0 };
 const eccBase = { earth: C.eccentricityBase };
 const eccJ2000 = { earth: C.eccJ2000.earth };
 const inclJ2000 = {};
+const periLongJ2000 = {};
 const omegaJ2000 = {};
-const period = {};
+const eclPeriod = {};
+const icrfPeriod = {};
+const perPlanetPhase = {};
+const genPrec = C.H / 13;
 for (const p of planets) {
   if (p === 'earth') {
+    periLongJ2000[p] = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
     omegaJ2000[p] = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
-    period[p] = C.H / 3;
+    icrfPeriod[p] = C.H / 3;
+    eclPeriod[p] = C.H / 16;
+    perPlanetPhase[p] = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
   eccBase[p] = C.planets[p].orbitalEccentricityBase;
   eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
+  periLongJ2000[p] = C.planets[p].longitudePerihelion;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
-  period[p] = C.planets[p].perihelionEclipticYears;
+  eclPeriod[p] = C.planets[p].perihelionEclipticYears;
+  icrfPeriod[p] = Math.abs(1 / (1/eclPeriod[p] - 1/genPrec));
+  perPlanetPhase[p] = C.planets[p].inclinationPhaseAngle;
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
-    (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
 
 // LL bounds (Laplace-Lagrange secular theory)
 const llBounds = {
@@ -60,11 +70,12 @@ const trendJPL = {
 };
 
 // ── Reproduce fbeCalcApparentIncl from script.js ──
-function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
-  const planetOmega = planetOmegaJ2000 + (360 / planetPeriod) * (year - 2000);
-  const planetPhase = (planetOmega - planetPhaseAngle) * DEG2RAD;
-  const planetI = (planetMean + planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-  const planetOmegaRad = planetOmega * DEG2RAD;
+function fbeCalcApparentIncl(year, planetKey, planetMean, planetAmplitude, planetIcrfPeriod, planetPeriLongJ2000, planetPhaseAngle, isAntiPhase) {
+  const periLong = planetPeriLongJ2000 + (360 / planetIcrfPeriod) * (year - 2000);
+  const planetPhase = (periLong - planetPhaseAngle) * DEG2RAD;
+  const sign = isAntiPhase ? -1 : 1;
+  const planetI = (planetMean + sign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
+  const planetOmegaRad = (omegaJ2000[planetKey] + (360 / eclPeriod[planetKey]) * (year - 2000)) * DEG2RAD;
 
   const earthPeriod = C.H / 3;
   const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
@@ -91,19 +102,20 @@ function computeBalance(config) {
 
   for (const key of planets) {
     const d = config[key].d;
-    const phaseAngle = config[key].phase;
+    const isAntiPhase = config[key].group === 'anti-phase';
+    const phaseAngle = perPlanetPhase[key];
     const sqrtM = Math.sqrt(mass[key]);
     const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
-    const cosPhaseJ2000 = Math.cos((omegaJ2000[key] - phaseAngle) * DEG2RAD);
-    const mean = inclJ2000[key] - amplitude * cosPhaseJ2000;
+    const cosPhaseJ2000 = Math.cos((periLongJ2000[key] - phaseAngle) * DEG2RAD);
+    const mean = inclJ2000[key] - (isAntiPhase ? -1 : 1) * amplitude * cosPhaseJ2000;
     const rangeMin = mean - amplitude;
     const rangeMax = mean + amplitude;
     const fitsLL = rangeMin >= llBounds[key].min - 0.01 && rangeMax <= llBounds[key].max + 0.01;
 
     let directionMatch = true;
     if (key !== 'earth') {
-      const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, period[key], omegaJ2000[key], phaseAngle);
-      const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, period[key], omegaJ2000[key], phaseAngle);
+      const i1900 = fbeCalcApparentIncl(1900, key, mean, amplitude, icrfPeriod[key], periLongJ2000[key], phaseAngle, isAntiPhase);
+      const i2100 = fbeCalcApparentIncl(2100, key, mean, amplitude, icrfPeriod[key], periLongJ2000[key], phaseAngle, isAntiPhase);
       const trend = (i2100 - i1900) / 2;
       directionMatch = (trendJPL[key] >= 0) === (trend >= 0);
     }
@@ -112,21 +124,19 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
   }
 
-  // Vector balance (identical to computeBalanceResults in script.js)
-  // Both use eccentricityBase — structural balance is time-independent
-  let balanceCos = 0, balanceSin = 0, totalLamp = 0;
+  // Scalar balance (prograde vs anti-phase)
+  let sumPro = 0, sumAnti = 0;
   for (const key of planets) {
     const cfg_mass = mass[key];
     const cfg_sma = orbitDistance[key];
     const cfg_ecc = eccBase[key];
     const L = cfg_mass * Math.sqrt(cfg_sma * (1 - cfg_ecc * cfg_ecc));
-    const Lamp = L * planetResults[key].amplitude;
-    const phaseRad = config[key].phase * DEG2RAD;
-    balanceCos += Lamp * Math.cos(phaseRad);
-    balanceSin += Lamp * Math.sin(phaseRad);
-    totalLamp += Lamp;
+    const w = L * planetResults[key].amplitude;
+    if (config[key].group !== 'anti-phase') sumPro += w;
+    else sumAnti += w;
   }
-  const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
+  const totalLamp = sumPro + sumAnti;
+  const balanceResidual = Math.abs(sumPro - sumAnti);
   const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
   const balance = 100 - imbalance;
 
@@ -146,10 +156,10 @@ for (const p of planets) {
 }
 
 const currentConfig = {
-  mercury: { d: 21, phase: 203.3195 }, venus: { d: 34, phase: 203.3195 },
-  earth: { d: 3, phase: 203.3195 }, mars: { d: 5, phase: 203.3195 },
-  jupiter: { d: 5, phase: 203.3195 }, saturn: { d: 3, phase: 23.3195 },
-  uranus: { d: 21, phase: 203.3195 }, neptune: { d: 34, phase: 203.3195 },
+  mercury: { d: 21, group: 'prograde' }, venus: { d: 34, group: 'prograde' },
+  earth: { d: 3, group: 'prograde' }, mars: { d: 5, group: 'prograde' },
+  jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' },
+  uranus: { d: 21, group: 'prograde' }, neptune: { d: 34, group: 'prograde' },
 };
 
 const curResult = computeBalance(currentConfig);
@@ -165,13 +175,13 @@ console.log('EXHAUSTIVE SEARCH');
 console.log('═══════════════════════════════════════════════════════════════');
 
 const fibNumbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-const phases = [203.3195, 23.3195];
+const groups = ['prograde', 'anti-phase'];
 
 const scenarios = [
-  { name: 'A', jupiter: { d: 5, phase: 203.3195 }, saturn: { d: 3, phase: 23.3195 } },
-  { name: 'B', jupiter: { d: 8, phase: 203.3195 }, saturn: { d: 5, phase: 23.3195 } },
-  { name: 'C', jupiter: { d: 13, phase: 203.3195 }, saturn: { d: 8, phase: 23.3195 } },
-  { name: 'D', jupiter: { d: 21, phase: 203.3195 }, saturn: { d: 13, phase: 23.3195 } },
+  { name: 'A', jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' } },
+  { name: 'B', jupiter: { d: 8, group: 'prograde' }, saturn: { d: 5, group: 'anti-phase' } },
+  { name: 'C', jupiter: { d: 13, group: 'prograde' }, saturn: { d: 8, group: 'anti-phase' } },
+  { name: 'D', jupiter: { d: 21, group: 'prograde' }, saturn: { d: 13, group: 'anti-phase' } },
 ];
 
 const THRESHOLD = 99.994;
@@ -191,21 +201,21 @@ for (const scenario of scenarios) {
                   for (let ni = 0; ni < fibNumbers.length; ni++) {
                     for (let np = 0; np < 2; np++) {
                       const config = {
-                        mercury: { d: fibNumbers[mi], phase: phases[mp] },
-                        venus: { d: fibNumbers[vi], phase: phases[vp] },
-                        earth: { d: 3, phase: 203.3195 },
-                        mars: { d: fibNumbers[mai], phase: phases[map] },
+                        mercury: { d: fibNumbers[mi], group: groups[mp] },
+                        venus: { d: fibNumbers[vi], group: groups[vp] },
+                        earth: { d: 3, group: 'prograde' },
+                        mars: { d: fibNumbers[mai], group: groups[map] },
                         jupiter: scenario.jupiter,
                         saturn: scenario.saturn,
-                        uranus: { d: fibNumbers[ui], phase: phases[up] },
-                        neptune: { d: fibNumbers[ni], phase: phases[np] },
+                        uranus: { d: fibNumbers[ui], group: groups[up] },
+                        neptune: { d: fibNumbers[ni], group: groups[np] },
                       };
 
                       const result = computeBalance(config);
 
                       if (result.balance >= THRESHOLD) {
                         count++;
-                        const p = (phase) => Math.abs(phase - 203.3195) < 1 ? 0 : 1;
+                        const g = (grp) => grp === 'prograde' ? 0 : 1;
                         allConfigs.push({
                           scenario: scenario.name,
                           balance: result.balance,
@@ -216,13 +226,13 @@ for (const scenario of scenarios) {
                           row: [
                             scenario.name,
                             parseFloat(result.balance.toFixed(8)),
-                            config.mercury.d, p(config.mercury.phase),
-                            config.venus.d, p(config.venus.phase),
-                            config.mars.d, p(config.mars.phase),
-                            config.jupiter.d, p(config.jupiter.phase),
-                            config.saturn.d, p(config.saturn.phase),
-                            config.uranus.d, p(config.uranus.phase),
-                            config.neptune.d, p(config.neptune.phase),
+                            config.mercury.d, g(config.mercury.group),
+                            config.venus.d, g(config.venus.group),
+                            config.mars.d, g(config.mars.group),
+                            config.jupiter.d, g(config.jupiter.group),
+                            config.saturn.d, g(config.saturn.group),
+                            config.uranus.d, g(config.uranus.group),
+                            config.neptune.d, g(config.neptune.group),
                           ],
                         });
                       }
@@ -264,7 +274,7 @@ const output = {
     D: 'Ju=21, Sa=13',
   },
   format: ['scenario','balance','me_d','me_phase','ve_d','ve_phase','ma_d','ma_phase','ju_d','ju_phase','sa_d','sa_phase','ur_d','ur_phase','ne_d','ne_phase'],
-  phaseAngles: [203.3195, 23.3195],
+  phaseAngles: ['prograde', 'anti-phase'],
   presets: allConfigs.map(c => c.row),
 };
 

@@ -439,16 +439,16 @@ for p in PLANET_NAMES:
     C_coeff[p] = (math.sqrt(MASS[p]) * SMA[p]**1.5
                   * INCL_MEAN_RAD[p] / math.sqrt(D[p]))
 
-print("  Law 5 balance in R-variables: Σ(203°) R_j × C_j = R_Saturn × C_Saturn")
+print("  Law 5 balance in R-variables: Σ(prograde) R_j × C_j = R_Saturn × C_Saturn")
 print(f"  where C_j = √m × a^(3/2) × i_mean_rad / √d\n")
 
 sum_203_C_coeff = sum(C_coeff[p] for p in GROUP_203)
-print(f"    Σ C_j (203°) = {sum_203_C_coeff:.6e}")
+print(f"    Σ C_j (prograde) = {sum_203_C_coeff:.6e}")
 print(f"    C_Saturn      = {C_coeff['Saturn']:.6e}")
 
 total_C = sum(abs(C_coeff[p]) for p in PLANET_NAMES)
 inner_C = sum(C_coeff[p] for p in ["Mercury", "Venus", "Earth", "Mars"])
-print(f"\n    Inner planet C sum = {inner_C/sum_203_C_coeff*100:.2f}% of 203° sum")
+print(f"\n    Inner planet C sum = {inner_C/sum_203_C_coeff*100:.2f}% of prograde sum")
 print(f"    → inner eccentricities are WEAKLY constrained by Law 5")
 
 # Monte Carlo: random e satisfying Law 5

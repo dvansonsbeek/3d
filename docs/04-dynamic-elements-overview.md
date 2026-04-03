@@ -30,7 +30,7 @@ All systems are driven by orbital plane precession: both Earth's and the other p
 ┌───────────────────────────────────────────────────────┐
 │                                                       │
 │   computePlanetInvPlaneInclinationDynamic()               │
-│   → Uses Ω-based formula: i = mean + A·cos(Ω - φ)   │
+│   → Uses ICRF perihelion: i = mean + A·cos(ω̃ - φ)   │
 │   → Output: o.<planet>InvPlaneInclinationDynamic         │
 │                                                       │
 └───────────────────────────────────────────────────────┘
@@ -125,15 +125,15 @@ Where:
 - `Ω_p` = Planet's ascending node on invariable plane (DYNAMIC, precesses)
 - `Ω_e` = Earth's ascending node on invariable plane (DYNAMIC, precesses)
 
-**Planet Inclination Oscillation** (Ω-based approach):
+**Planet Inclination Oscillation** (ICRF perihelion approach):
 ```
-i_p(t) = mean + amplitude × cos(Ω_p(t) - offset)
+i_p(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)
 
 Where:
-  mean     = Laplace-Lagrange midpoint (center of oscillation range)
-  amplitude = half of oscillation range
-  Ω_p(t)   = planet's ascending node (precesses with time)
-  offset   = phase offset = Ω_J2000 - φ₀ (geometric relationship)
+  mean       = Laplace-Lagrange midpoint (center of oscillation range)
+  amplitude  = half of oscillation range
+  ω̃_ICRF(t) = planet's ICRF perihelion longitude (precesses with time)
+  phaseAngle = per-planet phase (ICRF perihelion at balanced year)
 ```
 
 **Inputs**:
@@ -284,7 +284,7 @@ Key behavioral notes:
 
 The three systems are **geometrically linked** through orbital plane precession:
 
-1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is **geometrically linked** to the ascending node position via: `i(t) = mean + A × cos(Ω(t) - offset)`
+1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is driven by the ICRF perihelion longitude: `i(t) = mean + A × cos(ω̃_ICRF(t) - phaseAngle)`
 
 2. **Ecliptic inclination**: Depends on BOTH Earth's and the planet's dynamic inclinations to the invariable plane, plus their ascending node difference.
 
@@ -320,7 +320,7 @@ The Moon's dynamic elements are computed separately from the planets by `updateM
 | **What drives Ω** | Earth's obliquity + inclination changes | 3D nodal precession chain (~18.6 yr retrograde) |
 | **What drives ω/ϖ** | Perihelion precession from `apparentRaFromPdA()` | 3D apsidal precession chain (~8.85 yr prograde) |
 | **Anomaly focus** | Sun | Earth |
-| **Inclination oscillation** | Ω-based: `i = mean + A·cos(Ω − φ)` | Not applicable (fixed 5.14° to ecliptic) |
+| **Inclination oscillation** | ICRF perihelion: `i = mean + A·cos(ω̃ − φ)` | Not applicable (fixed 5.14° to ecliptic) |
 
 ### Moon Dynamic Variables
 
@@ -345,13 +345,13 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 |----------|----------|---------|
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Updates Ω on invariable plane |
 | `updateDynamicInclinations()` | [script.js](../src/script.js) | Calculates dynamic planet inclinations and ecliptic inclinations |
-| `computePlanetInvPlaneInclinationDynamic()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using Ω-based formula |
+| `computePlanetInvPlaneInclinationDynamic()` | [script.js:19515-19585](../src/script.js#L19515-L19585) | Computes oscillating planet inclination using ICRF perihelion |
 | `calculateDynamicAscendingNodeFromTilts()` | [script.js](../src/script.js) | Calculates Ω on ecliptic |
 | `updateAscendingNodes()` | [script.js](../src/script.js) | Updates all ascending nodes |
 | `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Applies to 3D visualizations |
 | `updateMoonOrbitalElements()` | [script.js](../src/script.js) | Moon Ω, ϖ, anomalies, phase (Earth as focus) |
 
-### Inclination Oscillation Constants (Ω-based approach)
+### Inclination Oscillation Constants (ICRF perihelion approach)
 
 | Constant Type | Location | Purpose |
 |---------------|----------|---------|
@@ -371,6 +371,7 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 ---
 
 *Document created: 2024-12-21*
-*Updated: 2024-12-31 - Added Ω-based planet inclination oscillation approach*
+*Updated: 2024-12-31 - Added planet inclination oscillation approach*
+*Updated: 2026-04-03 - Migrated from Ω-based to ICRF perihelion approach with per-planet phase angles*
 *Updated: 2025-01-01 - Saturn anomaly resolved (phase offset 37.8°), fixed document references*
 *Part of the Holistic Universe Model documentation*

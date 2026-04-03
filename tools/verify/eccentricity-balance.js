@@ -138,8 +138,8 @@ for (const p of planets) {
   console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccBase[p].toFixed(8)} | ${base.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(203°) = ${base.sum203.toExponential(6)}`);
-console.log(`  Σ(23°)  = ${base.sum23.toExponential(6)}  (Saturn only)`);
+console.log(`\n  Σ(prograde) = ${base.sum203.toExponential(6)}`);
+console.log(`  Σ(anti-phase)  = ${base.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${base.gap.toExponential(6)}`);
 console.log(`  Total   = ${base.total.toExponential(6)}`);
 console.log(`  Balance = ${base.balance.toFixed(4)}%`);
@@ -162,8 +162,8 @@ for (const p of planets) {
   console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(203°) = ${j2000.sum203.toExponential(6)}`);
-console.log(`  Σ(23°)  = ${j2000.sum23.toExponential(6)}  (Saturn only)`);
+console.log(`\n  Σ(prograde) = ${j2000.sum203.toExponential(6)}`);
+console.log(`  Σ(anti-phase)  = ${j2000.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${j2000.gap.toExponential(6)}`);
 console.log(`  Total   = ${j2000.total.toExponential(6)}`);
 console.log(`  Balance = ${j2000.balance.toFixed(4)}%`);
@@ -190,8 +190,8 @@ for (const p of planets) {
   console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccDynamic[p].toFixed(8)} | ${eccJ2000[p].toFixed(8)} | ${delta.toExponential(3).padStart(12)} | ${dynamic.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(203°) = ${dynamic.sum203.toExponential(6)}`);
-console.log(`  Σ(23°)  = ${dynamic.sum23.toExponential(6)}  (Saturn only)`);
+console.log(`\n  Σ(prograde) = ${dynamic.sum203.toExponential(6)}`);
+console.log(`  Σ(anti-phase)  = ${dynamic.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${dynamic.gap.toExponential(6)}`);
 console.log(`  Total   = ${dynamic.total.toExponential(6)}`);
 console.log(`  Balance = ${dynamic.balance.toFixed(4)}%`);
@@ -215,7 +215,7 @@ console.log('|---------------------|----|--------------|--------------|---------
 for (const pair of mirrorPairs) {
   const vI = j2000.v[pair.inner];
   const vO = j2000.v[pair.outer];
-  // Gap contribution: how much this pair adds to (23° - 203°)
+  // Gap contribution: how much this pair adds to (anti-phase - prograde)
   let pair203 = 0, pair23 = 0;
   for (const p of [pair.inner, pair.outer]) {
     if (p !== 'saturn') pair203 += j2000.v[p]; else pair23 += j2000.v[p];

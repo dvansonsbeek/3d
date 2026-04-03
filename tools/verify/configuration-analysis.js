@@ -5,7 +5,7 @@
 // Computes the intersection counts for four independent filters:
 //   1. Balance ≥ 99.994% (TNO margin)
 //   2. Mirror symmetry (inner/outer d-values match across asteroid belt)
-//   3. Saturn-solo (Saturn is the only planet at 23° phase angle)
+//   3. Saturn-solo (Saturn is the only anti-phase planet)
 //   4. LL bounds (all planets within Laplace-Lagrange secular theory bounds)
 //
 // Reproduces the exact computation chain from script.js / Appendix K (87).
@@ -25,24 +25,34 @@ const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uran
 const orbitDistance = { earth: 1.0 };
 const ecc = { earth: C.eccentricityBase };  // Base eccentricities for balance
 const inclJ2000 = {};
-const omegaJ2000 = {};
-const period = {};
+const periLongJ2000 = {};  // ICRF perihelion longitude
+const omegaJ2000 = {};     // ascending node (for ecliptic plane normal)
+const eclPeriod = {};      // ecliptic perihelion period
+const icrfPeriod = {};     // |ICRF perihelion period|
+const perPlanetPhase = {}; // per-planet phase angles
+const genPrec = C.H / 13;
 for (const p of planets) {
   if (p === 'earth') {
+    periLongJ2000[p] = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
     omegaJ2000[p] = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
-    period[p] = C.H / 3;
+    icrfPeriod[p] = C.H / 3;
+    eclPeriod[p] = C.H / 16;
+    perPlanetPhase[p] = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
   ecc[p] = C.planets[p].orbitalEccentricityBase;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
+  periLongJ2000[p] = C.planets[p].longitudePerihelion;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
-  period[p] = C.planets[p].perihelionEclipticYears;
+  eclPeriod[p] = C.planets[p].perihelionEclipticYears;
+  icrfPeriod[p] = Math.abs(1 / (1/eclPeriod[p] - 1/genPrec));
+  perPlanetPhase[p] = C.planets[p].inclinationPhaseAngle;
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
-    (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
 
 // Laplace-Lagrange bounds
 const llBounds = {
@@ -63,11 +73,12 @@ const trendJPL = {
 };
 
 // ── Reproduce fbeCalcApparentIncl from script.js ──
-function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
-  const planetOmega = planetOmegaJ2000 + (360 / planetPeriod) * (year - 2000);
-  const planetPhase = (planetOmega - planetPhaseAngle) * DEG2RAD;
-  const planetI = (planetMean + planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-  const planetOmegaRad = planetOmega * DEG2RAD;
+function fbeCalcApparentIncl(year, planetKey, planetMean, planetAmplitude, planetIcrfPeriod, planetPeriLongJ2000, planetPhaseAngle, isAntiPhase) {
+  const periLong = planetPeriLongJ2000 + (360 / planetIcrfPeriod) * (year - 2000);
+  const planetPhase = (periLong - planetPhaseAngle) * DEG2RAD;
+  const sign = isAntiPhase ? -1 : 1;
+  const planetI = (planetMean + sign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
+  const planetOmegaRad = (omegaJ2000[planetKey] + (360 / eclPeriod[planetKey]) * (year - 2000)) * DEG2RAD;
 
   const earthPeriod = C.H / 3;
   const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
@@ -93,19 +104,20 @@ function computeBalance(config) {
 
   for (const key of planets) {
     const d = config[key].d;
-    const phaseAngle = config[key].phase;
+    const isAntiPhase = config[key].group === 'anti-phase';
+    const phaseAngle = perPlanetPhase[key];
     const sqrtM = Math.sqrt(mass[key]);
     const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
-    const cosPhaseJ2000 = Math.cos((omegaJ2000[key] - phaseAngle) * DEG2RAD);
-    const mean = inclJ2000[key] - amplitude * cosPhaseJ2000;
+    const cosPhaseJ2000 = Math.cos((periLongJ2000[key] - phaseAngle) * DEG2RAD);
+    const mean = inclJ2000[key] - (isAntiPhase ? -1 : 1) * amplitude * cosPhaseJ2000;
     const rangeMin = mean - amplitude;
     const rangeMax = mean + amplitude;
     const fitsLL = rangeMin >= llBounds[key].min - 0.01 && rangeMax <= llBounds[key].max + 0.01;
 
     let directionMatch = true;
     if (key !== 'earth') {
-      const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, period[key], omegaJ2000[key], phaseAngle);
-      const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, period[key], omegaJ2000[key], phaseAngle);
+      const i1900 = fbeCalcApparentIncl(1900, key, mean, amplitude, icrfPeriod[key], periLongJ2000[key], phaseAngle, isAntiPhase);
+      const i2100 = fbeCalcApparentIncl(2100, key, mean, amplitude, icrfPeriod[key], periLongJ2000[key], phaseAngle, isAntiPhase);
       const trend = (i2100 - i1900) / 2;
       directionMatch = (trendJPL[key] >= 0) === (trend >= 0);
     }
@@ -113,17 +125,16 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
   }
 
-  // Vector balance
-  let balanceCos = 0, balanceSin = 0, totalLamp = 0;
+  // Scalar balance (prograde vs anti-phase)
+  let sumPro = 0, sumAnti = 0;
   for (const key of planets) {
     const L = mass[key] * Math.sqrt(orbitDistance[key] * (1 - ecc[key] * ecc[key]));
-    const Lamp = L * planetResults[key].amplitude;
-    const phaseRad = config[key].phase * DEG2RAD;
-    balanceCos += Lamp * Math.cos(phaseRad);
-    balanceSin += Lamp * Math.sin(phaseRad);
-    totalLamp += Lamp;
+    const w = L * planetResults[key].amplitude;
+    if (config[key].group !== 'anti-phase') sumPro += w;
+    else sumAnti += w;
   }
-  const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
+  const totalLamp = sumPro + sumAnti;
+  const balanceResidual = Math.abs(sumPro - sumAnti);
   const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
   const balance = 100 - imbalance;
 
@@ -139,13 +150,13 @@ function computeBalance(config) {
 // ══════════════════════════════════════════════════════════════════
 
 const fibNumbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-const phases = [203.3195, 23.3195];
+const groups = ['prograde', 'anti-phase'];
 
 const scenarios = [
-  { name: 'A', jupiter: { d: 5, phase: 203.3195 }, saturn: { d: 3, phase: 23.3195 } },
-  { name: 'B', jupiter: { d: 8, phase: 203.3195 }, saturn: { d: 5, phase: 23.3195 } },
-  { name: 'C', jupiter: { d: 13, phase: 203.3195 }, saturn: { d: 8, phase: 23.3195 } },
-  { name: 'D', jupiter: { d: 21, phase: 203.3195 }, saturn: { d: 13, phase: 23.3195 } },
+  { name: 'A', jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' } },
+  { name: 'B', jupiter: { d: 8, group: 'prograde' }, saturn: { d: 5, group: 'anti-phase' } },
+  { name: 'C', jupiter: { d: 13, group: 'prograde' }, saturn: { d: 8, group: 'anti-phase' } },
+  { name: 'D', jupiter: { d: 21, group: 'prograde' }, saturn: { d: 13, group: 'anti-phase' } },
 ];
 
 const THRESHOLD = 99.994;
@@ -210,14 +221,14 @@ for (const scenario of scenarios) {
                   for (let ni = 0; ni < fibNumbers.length; ni++) {
                     for (let np = 0; np < 2; np++) {
                       const config = {
-                        mercury: { d: fibNumbers[mi], phase: phases[mp] },
-                        venus: { d: fibNumbers[vi], phase: phases[vp] },
-                        earth: { d: 3, phase: 203.3195 },
-                        mars: { d: fibNumbers[mai], phase: phases[map] },
+                        mercury: { d: fibNumbers[mi], group: groups[mp] },
+                        venus: { d: fibNumbers[vi], group: groups[vp] },
+                        earth: { d: 3, group: 'prograde' },
+                        mars: { d: fibNumbers[mai], group: groups[map] },
                         jupiter: scenario.jupiter,
                         saturn: scenario.saturn,
-                        uranus: { d: fibNumbers[ui], phase: phases[up] },
-                        neptune: { d: fibNumbers[ni], phase: phases[np] },
+                        uranus: { d: fibNumbers[ui], group: groups[up] },
+                        neptune: { d: fibNumbers[ni], group: groups[np] },
                       };
 
                       total++;
@@ -358,7 +369,7 @@ for (let i = 0; i < saturnSoloBalanceConfigs.length; i++) {
 console.log('\n═══════════════════════════════════════════════════════════════');
 console.log('SECTION 4: MIRROR + SATURN-SOLO + LL BOUNDS (36 configs)');
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('\nAll use Scenario A (Ju=5, Sa=3), Earth d=3, Mars d=5, all phases 203° except Saturn 23°.');
+console.log('\nAll use Scenario A (Ju=5, Sa=3), Earth d=3, Mars d=5, all prograde except Saturn anti-phase.');
 console.log('LL bounds require d ≥ 5 for both Mercury↔Uranus and Venus↔Neptune.\n');
 
 mirrorSaturnSoloLLConfigs.sort((a, b) => b.balance - a.balance);
@@ -379,7 +390,7 @@ console.log('SECTION 5: ANALYTICAL VERIFICATION');
 console.log('═══════════════════════════════════════════════════════════════\n');
 
 console.log('Search space: 9 fibs × 2 phases × 5 planets × 4 scenarios = 18⁵ × 4 =', 18**5 * 4);
-console.log('Saturn-solo: all 5 variable planets at 203° = 9⁵ × 4 =', 9**5 * 4);
-console.log('Mirror (Scenario A only): Earth↔Sa locked, Mars↔Ju locked, 2 Mars phases × 9 Me/Ur d × 4 Me/Ur phases × 9 Ve/Ne d × 4 Ve/Ne phases =', 2 * 9 * 4 * 9 * 4);
-console.log('Mirror ∩ Saturn-solo: Mars phase=203°, Me/Ur both 203°, Ve/Ne both 203° = 9 × 9 =', 9 * 9);
+console.log('Saturn-solo: all 5 variable planets prograde = 9⁵ × 4 =', 9**5 * 4);
+console.log('Mirror (Scenario A only): Earth↔Sa locked, Mars↔Ju locked, 2 Mars groups × 9 Me/Ur d × 4 Me/Ur groups × 9 Ve/Ne d × 4 Ve/Ne groups =', 2 * 9 * 4 * 9 * 4);
+console.log('Mirror ∩ Saturn-solo: Mars prograde, Me/Ur both prograde, Ve/Ne both prograde = 9 × 9 =', 9 * 9);
 console.log('Mirror ∩ Saturn-solo ∩ LL (d≥5): 6 × 6 =', 6 * 6);

@@ -442,7 +442,7 @@ bal_j2000, sum_a_j, sum_b_j = incl_balance(ECC_J2000, D, GROUP_203, GROUP_23)
 bal_base, sum_a_b, sum_b_b = incl_balance(ECC_BASE, D, GROUP_203, GROUP_23)
 bal_dual, sum_a_dual, sum_b_dual = incl_balance(ECC_DUAL_BALANCED, D, GROUP_203, GROUP_23)
 
-print(f"  Eccentricity set      Balance (%)    Σ_203°         Σ_23°")
+print(f"  Eccentricity set      Balance (%)    Σ_prograde         Σ_anti-phase")
 print(f"  {'─'*20}  {'─'*13}  {'─'*14}  {'─'*14}")
 print(f"  {'J2000 (snapshot)':20s}  {bal_j2000:13.6f}  {sum_a_j:14.10f}  {sum_b_j:14.10f}")
 print(f"  {'Base (balanced yr)':20s}  {bal_base:13.6f}  {sum_a_b:14.10f}  {sum_b_b:14.10f}")
@@ -467,7 +467,7 @@ ebal_j2000, ea_j, eb_j = ecc_balance(ECC_J2000, D, GROUP_203, GROUP_23)
 ebal_base, ea_b, eb_b = ecc_balance(ECC_BASE, D, GROUP_203, GROUP_23)
 ebal_dual, ea_dual, eb_dual = ecc_balance(ECC_DUAL_BALANCED, D, GROUP_203, GROUP_23)
 
-print(f"  Eccentricity set      Balance (%)    Σ_203°         Σ_23°")
+print(f"  Eccentricity set      Balance (%)    Σ_prograde         Σ_anti-phase")
 print(f"  {'─'*20}  {'─'*13}  {'─'*14}  {'─'*14}")
 print(f"  {'J2000 (snapshot)':20s}  {ebal_j2000:13.6f}  {ea_j:14.10f}  {eb_j:14.10f}")
 print(f"  {'Base (balanced yr)':20s}  {ebal_base:13.6f}  {ea_b:14.10f}  {eb_b:14.10f}")
@@ -678,8 +678,8 @@ for label, eccs in [("J2000", ECC_J2000), ("Base", ECC_BASE)]:
     ratio = L_203 / L_23
 
     print(f"  {label} eccentricities:")
-    print(f"    L(203° group): {L_203:.10e}")
-    print(f"    L(23° group):  {L_23:.10e}  (Saturn only)")
+    print(f"    L(prograde group): {L_203:.10e}")
+    print(f"    L(anti-phase group):  {L_23:.10e}  (Saturn only)")
     print(f"    Ratio L_203/L_23: {ratio:.6f}")
     print()
 
@@ -699,10 +699,10 @@ print(f"  {'─'*10}  {'─'*8}  {'─'*8}  {'─'*8}  {'─'*12}  {'─'*8}")
 
 for p in PLANET_NAMES:
     amp = INCL_AMP[p]
-    phi_group = PHASE_ANGLE if PHASE_GROUP[p] == 203 else PHASE_ANGLE - 180
-    phase_j2000 = OMEGA_J2000[p] - phi_group
-    cos_phase = math.cos(math.radians(phase_j2000))
-    i_mean = INCL_J2000[p] - amp * cos_phase
+    phase = INCL_PHASE_ANGLE[p]
+    sign = -1 if p == 'Saturn' else 1
+    cos_phase = math.cos(math.radians(LONGITUDE_PERIHELION[p] - phase))
+    i_mean = INCL_J2000[p] - sign * amp * cos_phase
     print(f"  {p:10s}  {INCL_J2000[p]:8.4f}°  {amp:8.4f}°  {i_mean:8.4f}°  "
           f"{phase_j2000:+12.2f}°  {cos_phase:+8.4f}")
 

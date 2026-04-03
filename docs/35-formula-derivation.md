@@ -143,7 +143,7 @@ All periods in the formula have physical derivations:
 | **H×3/80** | Saturn×0.30 fraction | (H/8) × 0.30 |
 | **H/34** | Fibonacci hierarchy | H ÷ 34 |
 | **H×8/561** | Mercury/51 harmonic | (H×8/11) ÷ 51 |
-| **H/91** | Mars/21 Fibonacci harmonic | (H×3/13) ÷ 21 = H/(13×7) |
+| **H/91** | Mars/21 Fibonacci harmonic | (H×8/35) ÷ (91/35) = H/91 |
 
 **Note**: The periods are all physically derived from Mercury, Jupiter, Saturn, or Fibonacci harmonics.
 
@@ -259,14 +259,14 @@ Mars's precession fluctuation is driven by:
 
 1. **Relative geometry**: The angle between Mars's perihelion and Earth's perihelion (δ = θE - θMars)
 2. **Earth Rate Deviation (ERD)**: Variations in Earth's axial precession rate
-3. **Mars's own perihelion precession**: Period of H×3/13
+3. **Mars's own perihelion precession**: Period of H×8/35
 4. **Jupiter-Mars resonance**: Mars is strongly influenced by Jupiter's gravitational perturbations
 
 ### 6.2 Formula Summary
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×3/13 (~77,381 years) |
+| **Perihelion period** | H×8/35 (~76,644 years) |
 | **Eccentricity** | 0.09339 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.03 arcsec/century |
@@ -522,7 +522,7 @@ The table below shows two sets of formula accuracy values:
 | Property | Mercury | Venus | Mars | Jupiter | Saturn | Uranus | Neptune |
 |----------|---------|-------|------|---------|--------|--------|---------|
 | Eccentricity | 0.20564 | 0.00678 | 0.09339 | 0.04839 | 0.05386 | 0.04726 | 0.00859 |
-| Period | H×8/11 | H×2 | H×3/13 | H/5 | H/8 | H/3 | H×2 |
+| Period | H×8/11 | H×2 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
 
 ### Observed Formula Accuracy (using Excel data)
 
@@ -568,7 +568,7 @@ The table below shows two sets of formula accuracy values:
 - **Saturn** is unique with ecliptic-retrograde precession, creating the resonance loop
 - **Neptune** and **Venus** share the same period (H×2) despite being at opposite ends of the solar system
 
-> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to simple fractions of H: Jupiter (H/5), Saturn (H/8), Mars (H×3/13), Uranus (H/3), and both Venus and Neptune share H×2. The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
+> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to simple fractions of H: Jupiter (H/5), Saturn (H/8), Mars (H×8/35), Uranus (H/3), and both Venus and Neptune share H×2. The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
 
 ---
 
@@ -591,7 +591,7 @@ The fundamental periods are model parameters, not independently derived values:
 | **Planetary perihelion periods** | | | |
 | Mercury | H×8/11 | Fibonacci | Mercury fluctuation formula |
 | Venus | H×2 | Fibonacci | Venus fluctuation formula |
-| Mars | H×3/13 | Fibonacci | Mars fluctuation formula |
+| Mars | H×8/35 | Fibonacci | Mars fluctuation formula |
 | Jupiter | H/5 | Fibonacci | Jupiter fluctuation, beat frequencies |
 | Saturn | H/8 (ecliptic-retrograde) | Fibonacci | Saturn fluctuation, resonance loop |
 | Uranus | H/3 | Fibonacci | Uranus fluctuation formula |
@@ -777,7 +777,7 @@ All planetary formulas are implemented in Python for consistency and to handle t
 |--------|-----|-------------|----------|----------------|
 | Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
 | Venus | **0.999999** | **0.46** | **328** | H×2 |
-| Mars | 1.000000 | 0.03 | 225 | H×3/13 |
+| Mars | 1.000000 | 0.03 | 225 | H×8/35 |
 | Jupiter | 1.000000 | 0.06 | 225 | H/5 |
 | Saturn | 1.000000 | 0.05 | 225 | H/8 |
 | Uranus | 1.000000 | 0.01 | 225 | H/3 |

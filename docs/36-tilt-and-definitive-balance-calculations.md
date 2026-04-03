@@ -25,21 +25,21 @@ where m = planet mass / Sun mass, a = semi-major axis (AU), e = eccentricity,
 d = Fibonacci d-value, and i_amplitude = PSI / (d * sqrt(m)).
 
 **Vector balance**: the sum of L * i_amplitude vectors at their respective phase
-angles (203.3195 deg or 23.3195 deg) should cancel.
+angles (per-planet phase angles from balanced year) should cancel. Prograde planets (7) vs anti-phase Saturn.
 
 ### Law 5 — Eccentricity Balance (Scalar)
 
     v = sqrt(m) * a^(3/2) * e / sqrt(d)
 
-**Scalar balance**: the sum of v for the 203 deg group must equal the sum of v for
-the 23 deg group.
+**Scalar balance**: the sum of v for the prograde group must equal the sum of v for
+the anti-phase group.
 
 **Group assignment** (Config #1: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
 
-| Group    | Planets                                               |
-|----------|-------------------------------------------------------|
-| 203 deg  | Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune |
-| 23 deg   | Saturn (sole member)                                  |
+| Group       | Planets                                               |
+|-------------|-------------------------------------------------------|
+| Prograde    | Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune |
+| Anti-phase  | Saturn (sole member)                                  |
 
 Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 
@@ -60,16 +60,16 @@ K is derived in Section 4 below.
 
 ## 3. Fibonacci D-Values and Phase Groups (Config #1)
 
-| Planet  | d  | Phase (deg) | Mirror Pair |
-|---------|----|-------------|-------------|
-| Mercury | 21 | 203.3195    | Uranus      |
-| Venus   | 34 | 203.3195    | Neptune     |
-| Earth   |  3 | 203.3195    | Saturn      |
-| Mars    |  5 | 203.3195    | Jupiter     |
-| Jupiter |  5 | 203.3195    | Mars        |
-| Saturn  |  3 |  23.3195    | Earth       |
-| Uranus  | 21 | 203.3195    | Mercury     |
-| Neptune | 34 | 203.3195    | Venus       |
+| Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
+|---------|----|--------------|------------|-------------|
+| Mercury | 21 |  99.52       | Prograde   | Uranus      |
+| Venus   | 34 |  79.82       | Prograde   | Neptune     |
+| Earth   |  3 |  21.77       | Prograde   | Saturn      |
+| Mars    |  5 |  96.95       | Prograde   | Jupiter     |
+| Jupiter |  5 | 291.18       | Prograde   | Mars        |
+| Saturn  |  3 | 120.38       | Anti-phase | Earth       |
+| Uranus  | 21 |  21.33       | Prograde   | Mercury     |
+| Neptune | 34 | 354.04       | Prograde   | Venus       |
 
 Mirror symmetry: Me-Ur (21), Ve-Ne (34), Ea-Sa (3), Ma-Ju (5).
 
@@ -188,7 +188,7 @@ and therefore the most significant eccentricity oscillations.
 **Derivation of base eccentricities:**
 
 - **Earth**: eccentricityBase = 0.015386 (tuned parameter in the model)
-- **Saturn**: 0.05373663 (dual-balance optimized, sole 23° group member)
+- **Saturn**: 0.05373663 (dual-balance optimized, sole anti-phase group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
 - **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
   data (originally fitted at H/16 period; to be re-fitted with per-planet eccentricity cycles).
@@ -387,7 +387,7 @@ occurs at each planet's eccentricity cycle (see Section 10).
 | Mercury | 243,867             | H / (1 + 3/8)       | Prograde   |
 | Venus   | 670,634             | H * 2                | Prograde   |
 | Earth   |  20,957             | H / 16               | Prograde   |
-| Mars    |  77,381             | H / (4 + 1/3)       | Prograde   |
+| Mars    |  76,644             | H / (4 + 3/8)       | Prograde   |
 | Jupiter |  67,063             | H / 5                | Prograde   |
 | Saturn  | -41,915             | -H / 8               | Retrograde |
 | Uranus  | 111,772             | H / 3                | Prograde   |

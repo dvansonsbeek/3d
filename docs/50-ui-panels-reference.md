@@ -203,7 +203,7 @@ Shows one full obliquity cycle (H/8) with:
 - **Curve**: obliquity variation over the cycle
 - **Markers**: current year and reference positions
 - **Same cycle windowing** logic as perihelion chart
-- **Phase group peaks**: Hover text on 203.3° phase group peak markers includes Glacial Maximum information (no separate LGM marker)
+- **Phase group peaks**: Hover text on phase angle peak markers includes Glacial Maximum information (no separate LGM marker)
 
 ### Predictive Formula Rows
 
@@ -394,13 +394,13 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 | Feature | Description |
 |---------|-------------|
-| **Phase angle selection** | Choose between model phases (203°/23°), Laplace-Lagrange eigenmodes, or custom angles |
+| **Phase angle selection** | Choose between per-planet model phases, Laplace-Lagrange eigenmodes, or custom angles |
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
 | **743 presets** | Pre-computed configurations with ≥99.994% inclination balance |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
-| **Earth locked** | Earth's parameters (d=3, 203°) are derived from the temperature model and cannot be changed |
+| **Earth locked** | Earth's parameters (d=3, prograde, 21.77°) are derived from the temperature model and cannot be changed |
 
 ### Default Configuration Result
 

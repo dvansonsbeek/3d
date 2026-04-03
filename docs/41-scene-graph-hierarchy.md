@@ -289,7 +289,7 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 |--------|-----------|-----------|
 | Mercury | H / (1+3/8) | Prograde |
 | Venus | H × 2 | Prograde |
-| Mars | H / (4+1/3) | Prograde |
+| Mars | H / (4+3/8) | Prograde |
 | Jupiter | H / 5 | Prograde |
 | Saturn | H / 8 | **Retrograde** |
 | Uranus | H / 3 | Prograde |

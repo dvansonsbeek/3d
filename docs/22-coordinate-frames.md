@@ -217,18 +217,18 @@ heliocentricLatitude(i_deg, omega_deg, nu_deg)
 
 ### 3.1 Dynamic Inclination to Invariable Plane
 
-Planetary inclinations oscillate as the ascending node precesses (Laplace-Lagrange secular theory).
+Planetary inclinations oscillate as the ICRF perihelion longitude precesses (Laplace-Lagrange secular theory).
 
 **Formula:**
 ```
-i(t) = i_mean + A × cos(Ω(t) - offset)
+i(t) = i_mean + A × cos(ω̃_ICRF(t) - phaseAngle)
 ```
 
 Where:
 - i_mean = Laplace-Lagrange mean inclination
 - A = oscillation amplitude
-- Ω(t) = current ascending node
-- offset = geometric phase offset (calibrated to J2000)
+- ω̃_ICRF(t) = current ICRF perihelion longitude
+- phaseAngle = per-planet phase angle (ICRF perihelion at balanced year)
 
 **Implementation (lines 19905-20026):**
 - Function: `computePlanetInvPlaneInclinationDynamic(planet, currentYear)`

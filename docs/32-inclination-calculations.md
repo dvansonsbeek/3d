@@ -15,12 +15,12 @@ The **invariable plane** is the fundamental reference plane of the solar system�
 
 ### Why Inclinations Change
 
-Each planet's orbital plane precesses around the invariable plane due to gravitational torques from other planets. This precession has two coupled effects:
+Each planet's orbital plane precesses around the invariable plane due to gravitational torques from other planets. This precession has two effects:
 
 1. **Ascending node (Ω) rotates** - The line where the orbital plane crosses the invariable plane precesses over time
-2. **Inclination oscillates** - As the plane precesses, it tilts toward and away from the invariable plane
+2. **Inclination oscillates** - The plane tilts toward and away from the invariable plane
 
-These effects are geometrically linked—they're two aspects of the same physical precession motion.
+The inclination oscillation is driven by the ICRF perihelion longitude (ω̃), not the ascending node. The ICRF perihelion rate equals the ecliptic perihelion rate minus the general precession rate (H/13).
 
 ### Reference Frames
 
@@ -45,48 +45,51 @@ The **ecliptic inclination** (what we traditionally measure) depends on both:
 
 ## Part 1: Inclination Oscillations to the Invariable Plane
 
-### The Ω-Based Approach
+### The ICRF Perihelion Approach
 
-The model calculates dynamic inclination using the planet's ascending node position:
+The model calculates dynamic inclination using the planet's ICRF perihelion longitude:
 
 ```
-i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
+i(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)
 ```
 
 Where:
-- `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(Ω - phaseAngle))
+- `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle))
 - `amplitude` = Fibonacci-derived: ψ / (d × √m), see [Fibonacci Laws](10-fibonacci-laws.md)
-- `Ω(t)` = Current ascending node on invariable plane
-- `phaseAngle` = Balance group phase angle (203.3195° or 23.3195°, see [Fibonacci Laws](10-fibonacci-laws.md))
+- `ω̃_ICRF(t)` = Current ICRF perihelion longitude (ecliptic perihelion minus general precession)
+- `phaseAngle` = Per-planet phase angle from balanced year (see table below)
 
 ### Why This Works
 
-When an orbital plane precesses around the invariable plane:
-- At `Ω(t) = phaseAngle`: `cos(0°) = +1` → **Maximum inclination** (mean + amplitude)
-- At `Ω(t) = phaseAngle + 90°`: `cos(90°) = 0` → Mean inclination
-- At `Ω(t) = phaseAngle + 180°`: `cos(180°) = -1` → **Minimum inclination** (mean - amplitude)
+The ICRF perihelion longitude tracks each planet's apsidal precession in an inertial frame. As the perihelion sweeps through its cycle:
+- At `ω̃_ICRF(t) = phaseAngle`: `cos(0°) = +1` → **Maximum inclination** (mean + amplitude)
+- At `ω̃_ICRF(t) = phaseAngle + 90°`: `cos(90°) = 0` → Mean inclination
+- At `ω̃_ICRF(t) = phaseAngle + 180°`: `cos(180°) = -1` → **Minimum inclination** (mean - amplitude)
 
-### Universal Phase Angles (Balance Groups)
+For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others are at MIN).
 
-All planets use one of two **universal phase angles** derived from the s₈ eigenmode of Laplace-Lagrange secular theory (γ₈ ≈ 203.3195°), assigned to balance groups by the invariable plane angular momentum balance condition (see [Fibonacci Laws](10-fibonacci-laws.md)):
+### Per-Planet Phase Angles
 
-| Planet | Phase Angle | Balance Group | Precession Direction | Incl. Trend at J2000 |
-|--------|-------------|---------------|---------------------|---------------------------|
-| Mercury | 203.3195° | 203° | Prograde | Decreasing |
-| Venus | 203.3195° | 203° | Prograde | Decreasing |
-| Earth | 203.3195° | 203° | Prograde | Decreasing |
-| Mars | 203.3195° | 203° | Prograde | Decreasing |
-| Jupiter | 203.3195° | 203° | Prograde | Decreasing |
-| **Saturn** | **23.3195°** | **23°** | **Retrograde** | **Increasing** |
-| Uranus | 203.3195° | 203° | Prograde | Decreasing |
-| Neptune | 203.3195° | 203° | Prograde | Decreasing |
-| Pluto | 203.3195° | — | Prograde | Decreasing |
+Each planet has its own phase angle, derived from the ICRF perihelion longitude at the balanced year (n=0, ~302,635 BC). At the balanced year, all prograde planets reach minimum inclination and Saturn reaches maximum:
+
+| Planet | Phase Angle | Balance Group | ICRF Direction | Incl. Trend at J2000 |
+|--------|-------------|---------------|----------------|---------------------------|
+| Mercury | 99.52° | Prograde | Retrograde | Decreasing |
+| Venus | 79.82° | Prograde | Retrograde | Decreasing |
+| Earth | 21.77° | Prograde | Prograde | Decreasing |
+| Mars | 96.95° | Prograde | Retrograde | Decreasing |
+| Jupiter | 291.18° | Prograde | Retrograde | Decreasing |
+| **Saturn** | **120.38°** | **Anti-phase** | **Retrograde** | **Increasing** |
+| Uranus | 21.33° | Prograde | Retrograde | Decreasing |
+| Neptune | 354.04° | Prograde | Retrograde | Decreasing |
+| Pluto | 203.32° | — | Retrograde | Decreasing |
 
 **Key insights**:
-- The two phase angles (203.3195° and 23.3195°) are 180° apart, representing opposite sides of the invariable plane oscillation
-- Group assignments are determined by the **invariable plane balance condition**: Σ(203°) w = Σ(23°) w
-- Saturn uses 23.3195° because its ascending node precesses in the **opposite direction** (retrograde)
-- Saturn is the **sole planet** in the 23° group; all other planets use 203.3195°
+- Phase angles are the ICRF perihelion longitude at the balanced year (when inclination is at extremum)
+- Balance groups are determined by the **invariable plane balance condition**: Σ(prograde) w = Σ(anti-phase) w
+- Saturn is **anti-phase**: its inclination is at MAX when all other planets are at MIN
+- Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde
+- Phase angles cluster near Laplace-Lagrange eigenmodes (γ₁-γ₈) within 1-10°
 
 ### Inclination Constants
 
@@ -113,40 +116,46 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   // Get planet-specific constants
   const mean = mercuryInvPlaneInclinationMean;
   const amplitude = mercuryInvPlaneInclinationAmplitude;
-  const period = mercuryPerihelionEclipticYears;
-  const ascNodeJ2000 = mercuryAscendingNodeInvPlaneVerified;
-  const phaseAngle = mercuryInclinationPhaseAngle;  // 203.3195°
+  const icrfPeriod = mercuryPerihelionICRFYears;     // |ICRF period|
+  const periLongJ2000 = mercuryLongitudePerihelion;   // ICRF perihelion at J2000
+  const phaseAngle = mercuryInclinationPhaseAngle;    // 99.52°
 
-  // Calculate current ascending node
+  // Calculate current ICRF perihelion longitude
   const yearsSinceJ2000 = currentYear - 2000;
-  const precessionRate = 360 / period;
-  const ascNodeCurrent = ascNodeJ2000 + precessionRate * yearsSinceJ2000;
+  const icrfRate = 360 / icrfPeriod;  // negative for retrograde planets
+  const periLongCurrent = periLongJ2000 + icrfRate * yearsSinceJ2000;
 
-  // Calculate inclination from ascending node position
-  const phaseDeg = ascNodeCurrent - phaseAngle;
+  // Calculate inclination from ICRF perihelion position
+  const phaseDeg = periLongCurrent - phaseAngle;
   const phaseRad = phaseDeg * Math.PI / 180;
 
-  return mean + amplitude * Math.cos(phaseRad);
+  // Saturn is anti-phase: flip the cosine sign
+  const sign = (planet === 'saturn') ? -1 : 1;
+  return mean + sign * amplitude * Math.cos(phaseRad);
 }
 ```
 
-### Oscillation Period = Nodal Precession Period
+### ICRF Perihelion Periods
 
-The inclination oscillation period equals the ascending node precession period for each planet. This is because both effects arise from the same physical mechanism:
+The inclination oscillation period equals the absolute ICRF perihelion period for each planet. The ICRF rate = ecliptic rate − general precession (H/13):
 
-| Planet | Period Formula |
-|--------|---------------|
-| Mercury | `H / (1 + 3/8)` |
-| Venus | `H × 2` |
-| Earth | `H / 3` |
-| Mars | `H / (4 + 1/3)` |
-| Jupiter | `H / 5` |
-| Saturn | `-H / 8` (retrograde) |
-| Uranus | `H / 3` |
-| Neptune | `H × 2` |
-| Pluto | `H` |
+| Planet | Ecliptic Period | ICRF Period | ICRF Direction |
+|--------|----------------|-------------|----------------|
+| Mercury | `H × 8/11` | `8H/93` ≈ 28,844 yr | Retrograde |
+| Venus | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
+| Earth | `H / 3` | `H/3` ≈ 111,772 yr | Prograde (sole) |
+| Mars | `H × 8/35` | `8H/69` ≈ 38,877 yr | Retrograde |
+| Jupiter | `H / 5` | `H/8` ≈ 41,915 yr | Retrograde |
+| Saturn | `H / 8` | `H/5` ≈ 67,063 yr | Retrograde |
+| Uranus | `H / 3` | `H/16` ≈ 20,957 yr | Retrograde |
+| Neptune | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
+| Pluto | `H` | `H/14` ≈ 23,951 yr | Retrograde |
 
 For computed period values, see [Constants Reference](20-constants-reference.md).
+
+### Grand Holistic Octave (8H)
+
+All ICRF perihelion periods divide evenly into 8H = 2,682,536 years (the "Grand Holistic Octave"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
 
 ---
 
@@ -392,10 +401,10 @@ The planet information panels display four invariable plane values:
 |----------|-------------|
 | **Ascending Node on Inv. Plane (Ω)** | Current ascending node in ecliptic coordinates |
 | **Descending Node on Inv. Plane** | Ascending node + 180° |
-| **Ω at Max Inclination** | Where inclination reaches maximum (precesses) |
+| **ω̃ at Max Inclination** | ICRF perihelion longitude where inclination reaches maximum (= phase angle) |
 | **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
 
-**Note**: The first three values use ecliptic coordinates (precession period H/16), while the oscillation phase uses ICRF coordinates (precession period H/3).
+**Note**: The ascending node values use ecliptic coordinates (precession period H/16), while the oscillation phase uses ICRF perihelion coordinates (per-planet ICRF period).
 
 ---
 

@@ -306,8 +306,8 @@ planets.pluto = {
   angleCorrection: 2.469281, 
   perihelionEclipticYears: holisticyearLength, 
   startpos: 71.555,
-  ascendingNodeInvPlane: 101.06, 
-  inclinationPhaseAngle: 203.3195,
+  ascendingNodeInvPlane: 101.06,
+  inclinationPhaseAngle: 203.32,
   invPlaneInclinationMean: 15.716200, invPlaneInclinationAmplitude: 0.717024,
 };
 
@@ -5994,7 +5994,7 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
   group.add(ring);
 
   // ===== FIXED MARKERS GROUP =====
-  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationPhaseAngle (203.3195°)
+  // HIGH/LOW/MEAN markers are FIXED in ICRF coordinates based on earthInclinationPhaseAngle (21.77°)
   // They do NOT precess with the ascending node
   // These are added to a SEPARATE group that doesn't rotate with the plane
   // Position is calculated by applying the plane's quaternion manually (like Sun-centered max incl marker)
@@ -6999,7 +6999,7 @@ function updateSunCenteredInvPlane() {
     uranus: planets.uranus.inclinationPhaseAngle,
     neptune: planets.neptune.inclinationPhaseAngle,
     pluto: planets.pluto.inclinationPhaseAngle,
-    earth: earthInclinationPhaseAngle  // Ω=284.51°, φ₀=81.5° → 203.3195.0°
+    earth: earthInclinationPhaseAngle  // ω̃=102.947°, ICRF perihelion at balanced year → 21.77°
   };
   const phaseOffset = phaseOffsetLookup[planetData.key] ?? 0;
 
@@ -22423,7 +22423,7 @@ function setupGUI() {
     const planetPeriLabels = {
       mercury: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
       venus: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr',
-      mars: 'H/(4+1/3) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
+      mars: 'H/(4+3/8) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
       jupiter: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr',
       saturn: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr',
       uranus: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr',
@@ -37608,7 +37608,7 @@ function buildObliquityChart(currentYear) {
   const endYear   = Math.round(balancedYear + ysbStart + H);
   const curYear   = Math.round(currentYear || startmodelYear);
 
-  // Phase group 203° markers at inclination tilt peaks (3 per Holistic Year)
+  // Phase angle markers at inclination tilt peaks (3 per Holistic Year)
   const phaseLabel = earthInclinationPhaseAngle.toFixed(1) + '°';
   const peakAxialVal = mid + A;  // inclination tilt curve value at peak
   const peakTs = [c3 / 2, 3 * c3 / 2, 5 * c3 / 2];

@@ -141,8 +141,8 @@ Key differences from Type III:
 
 ### Perihelion precession
 
-Mars's perihelion precesses with period `H / (4 + 1/3)` years, where
-`H = 335317` solar years. This corresponds to the 4+1/3 Fibonacci-derived
+Mars's perihelion precesses with period `H / (4 + 3/8)` years, where
+`H = 335317` solar years. This corresponds to the 4+3/8 Fibonacci-derived
 divisor. The precession is split into two counter-rotating ecliptic layers
 that bracket the PerihelionFromEarth annual wobble, ensuring the perihelion
 direction tracks correctly in the ecliptic frame.
@@ -375,7 +375,7 @@ best tradeoff.
 | **orbitalEccentricityBase**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
 | solarYearInput            | 686.931    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
 | ascendingNode             | 49.557     | 55.0       | 1.11 deg      | 0.69 deg    | Low      |
-| inclinationPhaseAngle     | 203.320    | 205.0      | 1.15 deg      | 0.79 deg    | Minimal  |
+| inclinationPhaseAngle     | 96.95      | 100.0      | 1.15 deg      | 0.79 deg    | Minimal  |
 | eclipticInclinationJ2000  | 1.850      | (no effect)| 1.20 deg      | 0.78 deg    | None     |
 
 Three parameters have strong leverage on Tycho Dec: `angleCorrection`,
@@ -569,9 +569,9 @@ longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degr
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)
 angleCorrection:           -2.1094       (perihelion alignment offset, degrees)
 startpos:                  121.475       (orbital phase at model start, degrees)
-perihelionEclipticYears:   H / (4+1/3)  (perihelion precession period)
+perihelionEclipticYears:   H / (4+3/8)  (perihelion precession period, = H×8/35)
 perihelionRef_JD:          2456505.6     (phase-optimized)
-inclinationPhaseAngle:     203.3195      (inclination variation phase)
+inclinationPhaseAngle:     96.95         (ICRF perihelion at balanced year, degrees)
 ascNodeToolCorrection:     130.44        (180 - ascendingNode, tilt placement frame correction)
 type:                      'II'          (formula selector)
 mirrorPair:                'jupiter'     (paired planet)

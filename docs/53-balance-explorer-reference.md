@@ -33,16 +33,16 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │                                                                  │
 │  PLANET ASSIGNMENTS                                              │
 │  ┌────────┬──────────┬────────┬────┬────────────┬─────┬───────┐  │
-│  │ Planet │ Phase(γ) │ Ω J2000│ d  │ Period(yr) │ Dir │ Trend │  │
-│  ├────────┼──────────┼────────┼────┼────────────┼─────┼───────┤  │
-│  │ Mercury│ [▼ 203°] │ 32.83  │[▼] │ H×8/11     │ PRO │ +0.53 │  │
-│  │ Venus  │ [▼ 203°] │ 54.70  │[▼] │ H×2        │ PRO │ +0.19 │  │
-│  │ Earth🔒│  203°    │ 284.51 │ 3  │ H/3        │ PRO │ +1.16 │  │
-│  │ Mars   │ [▼ 203°] │ 354.87 │[▼] │ H×3/13     │ PRO │ +1.68 │  │
-│  │ Jupiter│ [▼ 203°] │ 312.89 │[▼] │ H/5        │ PRO │ +1.94 │  │
-│  │ Saturn │ [▼  23°] │ 118.81 │[▼] │ -H/8       │ RET │ -3.11 │  │
-│  │ Uranus │ [▼ 203°] │ 307.80 │[▼] │ H/3        │ PRO │ +1.16 │  │
-│  │ Neptune│ [▼ 203°] │ 192.04 │[▼] │ H×2        │ PRO │ +0.19 │  │
+│  │ Planet │ Phase(γ)  │ ω̃ J2000│ d  │ Period(yr) │ Grp │ Trend │  │
+│  ├────────┼───────────┼────────┼────┼────────────┼─────┼───────┤  │
+│  │ Mercury│ [▼ 99.5°] │ 77.46  │[▼] │ 8H/93      │ PRO │ +0.53 │  │
+│  │ Venus  │ [▼ 79.8°] │131.58  │[▼] │ 2H/25      │ PRO │ +0.19 │  │
+│  │ Earth🔒│  21.8°    │102.95  │ 3  │ H/3        │ PRO │ +1.16 │  │
+│  │ Mars   │ [▼ 97.0°] │336.07  │[▼] │ 8H/69      │ PRO │ +1.68 │  │
+│  │ Jupiter│ [▼291.2°] │ 14.71  │[▼] │ H/8        │ PRO │ +1.94 │  │
+│  │ Saturn │ [▼120.4°] │ 92.13  │[▼] │ H/5        │ ANT │ -3.11 │  │
+│  │ Uranus │ [▼ 21.3°] │170.73  │[▼] │ H/16       │ PRO │ +1.16 │  │
+│  │ Neptune│ [▼354.0°] │ 45.80  │[▼] │ 2H/25      │ PRO │ +0.19 │  │
 │  └────────┴──────────┴────────┴────┴────────────┴─────┴───────┘  │
 │                                                                  │
 │  BALANCE RESULTS                                                 │
@@ -61,8 +61,8 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  └──────┴──────┴──────┴──────────┴──┴───────┴──────┴────┴───┘    │
 │                                                                  │
 │  BALANCE VERIFICATION                                            │
-│  Incl: Σ203°=X  Σ23°=Y  →  100%       ✓                           │
-│  Ecc:  Σ203°=X  Σ23°=Y  →  100%       ✓                           │
+│  Incl: Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
+│  Ecc:  Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
 │  LL: 8/8 pass | Dir: 7/7 match                                   │
 │  ψ = 2205 / (2 × H) = 3.288e-3                                  │
 └──────────────────────────────────────────────────────────────────┘
@@ -83,24 +83,23 @@ A dropdown in the header offers **743 pre-computed configurations** that achieve
 | C | 13 | 8 |
 | D | 21 | 13 |
 
-Selecting a preset applies its d-values and phase angles to all planets (except Earth, which is locked).
+Selecting a preset applies its d-values and balance group assignments to all planets (except Earth, which is locked).
 
 ### Phase Angle (γ)
 
-A dropdown per planet to select the oscillation phase angle. Available options:
+A dropdown per planet to select the oscillation phase angle. Each planet has a per-planet phase angle (ICRF perihelion longitude at the balanced year). Available options:
 
 | Option | Value | Description |
 |--------|-------|-------------|
-| 203.3195° | 203.3195° | Model phase group (majority of planets) |
-| 23.3195° | 23.3195° | Opposite phase group (180° apart) |
+| Per-planet default | Various | ICRF perihelion at balanced year (model default) |
 | γ₁–γ₈ | Various | Laplace-Lagrange eigenmode angles |
 | Custom | User input | Any angle 0°–360° |
 
-The two model phases (203.3195° and 23.3195°) are derived from the s₈ eigenmode of secular perturbation theory. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
+Phase angles are per-planet values derived from the balanced year (~302,635 BC). They cluster near LL eigenmodes. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
 
-### Ω J2000 (Read-Only)
+### ω̃ J2000 (Read-Only)
 
-Displays each planet's longitude of ascending node on the invariable plane at the J2000 epoch (Souami & Souchay 2012). This value is not editable — it is a fixed observational quantity.
+Displays each planet's ICRF perihelion longitude at the J2000 epoch. This value is not editable — it is derived from observational data.
 
 ### Fibonacci Divisor (d)
 
@@ -123,11 +122,11 @@ Selecting "Custom" reveals a numeric input field.
 
 ### Period (years)
 
-The precession period of each planet's ascending node, editable for exploration. Negative values indicate retrograde precession. The period determines the base trend displayed in the last column.
+The ICRF perihelion period for each planet, editable for exploration. The period determines the base trend displayed in the last column.
 
 ### Earth Row (Locked)
 
-Earth's controls are locked (grayed out): phase = 203.3195°, d = 3. Earth's amplitude is independently calibrated from the temperature/obliquity model (0.635185°), so its parameters cannot be freely varied.
+Earth's controls are locked (grayed out): phase = 21.77°, d = 3, prograde group. Earth's amplitude is independently calibrated from the temperature/obliquity model (0.635185°), so its parameters cannot be freely varied.
 
 ### Instant Recalculation
 
@@ -145,13 +144,13 @@ Two summary lines show the balance percentage for each law:
 ```
 w = √(m · a(1-e²)) / d
 ```
-The structural weights of the 203° group must equal those of the 23° group. Displayed as a percentage (100% = perfect balance). Turns red if below 90%.
+The structural weights of the prograde group must equal those of the anti-phase group. Displayed as a percentage (100% = perfect balance). Turns red if below 90%.
 
 **Eccentricity Balance (Law 5):**
 ```
 v = √m × a^(3/2) × e / √d
 ```
-The eccentricity weights of the 203° group must equal those of the 23° group. Displayed as a percentage. Turns red if below 90%.
+The eccentricity weights of the prograde group must equal those of the anti-phase group. Displayed as a percentage. Turns red if below 90%.
 
 ### Per-Planet Results Table
 
@@ -173,7 +172,7 @@ The eccentricity weights of the 203° group must equal those of the 23° group. 
 
 Below the results table:
 
-- **Inclination verification**: Sum of 203° group weights, sum of 23° group weights, balance percentage, pass/fail indicator
+- **Inclination verification**: Sum of prograde group weights, sum of anti-phase group weights, balance percentage, pass/fail indicator
 - **Eccentricity verification**: Same format for eccentricity weights
 - **Status line**: Count of LL bounds passes (out of 8) and direction matches (out of 7, Earth excluded)
 - **ψ formula**: `ψ = 2205 / (2 × H)` (see [Constants Reference](20-constants-reference.md) for current value)
@@ -200,7 +199,7 @@ Useful experiments to try:
 
 | Experiment | Expected Result |
 |------------|----------------|
-| Change Saturn to 203° phase | Balance collapses (all planets on one side) |
+| Change Saturn to prograde group | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 743 valid configurations |
@@ -226,14 +225,14 @@ The model's default (and uniquely determined) configuration:
 
 | Planet | Phase | d | Fibonacci | Mirror partner |
 |--------|-------|---|-----------|----------------|
-| Mercury | 203° | 21 | F₈ | Uranus |
-| Venus | 203° | 34 | F₉ | Neptune |
-| Earth | 203° | 3 | F₄ | Saturn |
-| Mars | 203° | 5 | F₅ | Jupiter |
-| Jupiter | 203° | 5 | F₅ | Mars |
-| Saturn | 23° | 3 | F₄ | Earth |
-| Uranus | 203° | 21 | F₈ | Mercury |
-| Neptune | 203° | 34 | F₉ | Venus |
+| Mercury | Prograde (99.52°) | 21 | F₈ | Uranus |
+| Venus | Prograde (79.82°) | 34 | F₉ | Neptune |
+| Earth | Prograde (21.77°) | 3 | F₄ | Saturn |
+| Mars | Prograde (96.95°) | 5 | F₅ | Jupiter |
+| Jupiter | Prograde (291.18°) | 5 | F₅ | Mars |
+| Saturn | Anti-phase (120.38°) | 3 | F₄ | Earth |
+| Uranus | Prograde (21.33°) | 21 | F₈ | Mercury |
+| Neptune | Prograde (354.04°) | 34 | F₉ | Venus |
 
 Expected results:
 - Inclination balance: **100%**
@@ -259,7 +258,7 @@ These are read from the model's orbital element constants and cannot be changed 
 | Semi-major axis | a | Orbital semi-major axis in AU | JPL orbital elements |
 | Eccentricity | e | Orbital eccentricity at J2000 epoch | JPL J2000 orbital elements |
 | J2000 inclination | i_J2000 | Inclination to invariable plane at J2000 | Souami & Souchay (2012) |
-| Ascending node | Ω_J2000 | Longitude of ascending node on invariable plane at J2000 | Souami & Souchay (2012), verified |
+| Perihelion longitude | ω̃_J2000 | ICRF perihelion longitude at J2000 | JPL orbital elements |
 | JPL trend | trend_JPL | Observed ecliptic inclination trend (°/century) | JPL ephemerides |
 | LL bounds | LL_min, LL_max | Laplace-Lagrange secular theory inclination bounds | Secular perturbation theory |
 | Holistic Year | H | See [Constants Reference](20-constants-reference.md) — used to derive ψ | Model calibration |
@@ -271,8 +270,8 @@ These can be changed via the UI controls (except for Earth, which is locked):
 | Variable | Symbol | Description | Default |
 |----------|--------|-------------|---------|
 | Fibonacci divisor | d | Fibonacci number dividing the amplitude | See [Default Configuration](#default-configuration) |
-| Phase angle | γ | Oscillation phase group angle | 203.3195° or 23.3195° |
-| Precession period | T | Ascending node precession period in years | From model constants |
+| Phase angle | γ | Per-planet phase angle (ICRF perihelion at balanced year) | Per-planet values |
+| ICRF period | T | ICRF perihelion period in years | From model constants |
 
 ### Variables Used Per Calculation
 
@@ -294,7 +293,7 @@ Derives the center and bounds of inclination oscillation from the amplitude.
 |----------|------|------|
 | amplitude | Computed | From Law 2 above |
 | i_J2000 | Fixed | J2000 inclination snapshot |
-| Ω_J2000 | Fixed | Ascending node at J2000 |
+| ω̃_J2000 | Fixed | ICRF perihelion longitude at J2000 |
 | γ | **User-adjustable** | Phase angle (determines cos_phase) |
 
 #### Inclination Balance (Law 3)
@@ -307,7 +306,7 @@ Tests whether the structural weights cancel between the two phase groups.
 | a | Fixed | Semi-major axis |
 | e | Fixed | Eccentricity (via 1−e²) |
 | d | **User-adjustable** | Fibonacci divisor (denominator) |
-| γ | **User-adjustable** | Phase angle (determines group membership: >180° → 203° group, ≤180° → 23° group) |
+| γ | **User-adjustable** | Phase angle (group membership: Saturn = anti-phase, all others = prograde) |
 
 #### Eccentricity Balance (Law 5)
 
@@ -341,10 +340,10 @@ Computes the apparent change in ecliptic inclination over 1900–2100 by compari
 |----------|------|------|
 | mean | Computed | From Mean calculation above |
 | amplitude | Computed | From Law 2 above |
-| Ω_J2000 | Fixed | Planet ascending node at J2000 |
+| ω̃_J2000 | Fixed | Planet ICRF perihelion longitude at J2000 |
 | γ | **User-adjustable** | Phase angle |
-| T | **User-adjustable** | Precession period (determines Ω drift rate) |
-| Earth constants | Fixed | Earth's mean, amplitude, Ω, and period (H/3) for the reference frame |
+| T | **User-adjustable** | ICRF period (determines ω̃ drift rate) |
+| Earth constants | Fixed | Earth's mean, amplitude, ω̃, and period (H/3) for the reference frame |
 
 ---
 
@@ -371,7 +370,7 @@ w = √(m × a × (1-e²)) / d
 
 Balance condition:
 ```
-Σ(203° group) w = Σ(23° group) w
+Σ(prograde group) w = Σ(anti-phase group) w
 ```
 
 ### Eccentricity Balance (Law 5)
@@ -383,7 +382,7 @@ v = √m × a^(3/2) × e / √d
 
 Balance condition:
 ```
-Σ(203° group) v = Σ(23° group) v
+Σ(prograde group) v = Σ(anti-phase group) v
 ```
 
 ### Ecliptic Trend Calculation
@@ -396,8 +395,8 @@ To verify that a configuration produces correct observed inclination trends, the
 
 The planet's invariable plane inclination at year Y:
 ```
-Ω(Y) = Ω_J2000 + (360/period) × (Y − 2000)
-i(Y) = mean + amplitude × cos(Ω(Y) − γ)
+ω̃(Y) = ω̃_J2000 + (360/icrfPeriod) × (Y − 2000)
+i(Y) = mean + amplitude × cos(ω̃(Y) − γ)
 ```
 
 ### Laplace-Lagrange Bounds Check

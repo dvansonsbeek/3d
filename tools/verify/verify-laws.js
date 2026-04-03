@@ -22,25 +22,27 @@ const orbitDistance = { earth: 1.0 };
 const eccBase = { earth: C.eccentricityBase };
 const eccJ2000 = { earth: C.eccJ2000.earth };
 const inclJ2000 = {};
-const omegaJ2000 = {};
-const period = {};
+const periLongJ2000 = {};  // ICRF perihelion longitude at J2000
+const icrfPeriod = {};     // |ICRF perihelion period| per planet
+const genPrec = C.H / 13;
 for (const p of planets) {
   if (p === 'earth') {
-    omegaJ2000[p] = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
-    period[p] = C.H / 3;
+    periLongJ2000[p] = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
+    icrfPeriod[p] = C.H / 3;  // Earth sole prograde ICRF
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
   eccBase[p] = C.planets[p].orbitalEccentricityBase;
   eccJ2000[p] = C.planets[p].orbitalEccentricityJ2000;
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
-  omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
-  period[p] = C.planets[p].perihelionEclipticYears;
+  periLongJ2000[p] = C.planets[p].longitudePerihelion;
+  const eclP = C.planets[p].perihelionEclipticYears;
+  icrfPeriod[p] = Math.abs(1 / (1/eclP - 1/genPrec));
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
-    (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
 
 // Mean eccentricities = base eccentricities (already includes Earth base)
 const eccMean = eccBase;
@@ -66,13 +68,16 @@ const trendJPL = {
   jupiter: -0.00184, saturn: +0.00194, uranus: -0.00243, neptune: +0.00035,
 };
 
-// Config #3 — the unique mirror-symmetric configuration
-const config = {
-  mercury: { d: 21, phase: 203.3195 }, venus: { d: 34, phase: 203.3195 },
-  earth: { d: 3, phase: 203.3195 }, mars: { d: 5, phase: 203.3195 },
-  jupiter: { d: 5, phase: 203.3195 }, saturn: { d: 3, phase: 23.3195 },
-  uranus: { d: 21, phase: 203.3195 }, neptune: { d: 34, phase: 203.3195 },
-};
+// Config #1 — the unique mirror-symmetric configuration
+// Per-planet phase angles (ICRF perihelion at balanced year)
+const config = {};
+for (const p of planets) {
+  if (p === 'earth') {
+    config[p] = { d: 3, phase: C.ASTRO_REFERENCE.earthInclinationPhaseAngle };
+  } else {
+    config[p] = { d: C.planets[p].fibonacciD, phase: C.planets[p].inclinationPhaseAngle };
+  }
+}
 
 // Fibonacci numbers
 const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765];
@@ -159,7 +164,7 @@ for (const key of planets) {
   const amplitude = PSI / (d * sqrtM);
   amplitudes[key] = amplitude;
 
-  const cosPhaseJ2000 = Math.cos((omegaJ2000[key] - config[key].phase) * DEG2RAD);
+  const cosPhaseJ2000 = Math.cos((periLongJ2000[key] - config[key].phase) * DEG2RAD);
   const mean = inclJ2000[key] - amplitude * cosPhaseJ2000;
   means[key] = mean;
 
@@ -169,8 +174,8 @@ for (const key of planets) {
 
   let directionMatch = true;
   if (key !== 'earth') {
-    const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, period[key], omegaJ2000[key], config[key].phase);
-    const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, period[key], omegaJ2000[key], config[key].phase);
+    const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, icrfPeriod[key], periLongJ2000[key], config[key].phase);
+    const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, icrfPeriod[key], periLongJ2000[key], config[key].phase);
     const trend = (i2100 - i1900) / 2;
     directionMatch = (trendJPL[key] >= 0) === (trend >= 0);
   }
@@ -203,8 +208,8 @@ for (const key of planets) {
 console.log('');
 for (const key of planets) {
   if (key === 'earth') continue;
-  const i1900 = fbeCalcApparentIncl(1900, means[key], amplitudes[key], period[key], omegaJ2000[key], config[key].phase);
-  const i2100 = fbeCalcApparentIncl(2100, means[key], amplitudes[key], period[key], omegaJ2000[key], config[key].phase);
+  const i1900 = fbeCalcApparentIncl(1900, means[key], amplitudes[key], icrfPeriod[key], periLongJ2000[key], config[key].phase);
+  const i2100 = fbeCalcApparentIncl(2100, means[key], amplitudes[key], icrfPeriod[key], periLongJ2000[key], config[key].phase);
   const trend = (i2100 - i1900) / 2;
   const match = (trendJPL[key] >= 0) === (trend >= 0);
   // Neptune's JPL trend is +0.00035°/century (barely positive), so direction mismatch is marginal
@@ -221,7 +226,7 @@ for (const key of planets) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  LAW 2: Σ(203°) w_j = Σ(23°) w_j  where w_j = √(m×a(1-e²)) / d        │');
+console.log('│  LAW 2: Σ(prograde) w_j = Σ(anti-phase) w_j  where w_j = √(m×a(1-e²)) / d        │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 let inclSum203 = 0, inclSum23 = 0;
@@ -244,8 +249,8 @@ for (const key of planets) {
 
 const inclResidual = Math.abs(inclSum203 - inclSum23);
 const inclBalance = (1 - inclResidual / (inclSum203 + inclSum23)) * 100;
-console.log(`\nΣ(203°) = ${inclSum203.toExponential(10)}`);
-console.log(`Σ(23°)  = ${inclSum23.toExponential(10)}`);
+console.log(`\nΣ(prograde) = ${inclSum203.toExponential(10)}`);
+console.log(`Σ(anti-phase)  = ${inclSum23.toExponential(10)}`);
 console.log(`Residual = ${inclResidual.toExponential(4)}`);
 console.log(`Balance  = ${inclBalance.toFixed(4)}%`);
 
@@ -256,7 +261,7 @@ check('Inclination balance > 99.999%', inclBalance > 99.999, `${inclBalance.toFi
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  LAW 3: Σ(203°) v_j = Σ(23°) v_j  where v_j = √m × a^(3/2) × e / √d   │');
+console.log('│  LAW 3: Σ(prograde) v_j = Σ(anti-phase) v_j  where v_j = √m × a^(3/2) × e / √d   │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 let eccSum203 = 0, eccSum23 = 0;
@@ -278,8 +283,8 @@ for (const key of planets) {
 
 const eccResidual = Math.abs(eccSum203 - eccSum23);
 const eccBalance = (1 - eccResidual / (eccSum203 + eccSum23)) * 100;
-console.log(`\nΣ(203°) = ${eccSum203.toExponential(10)}`);
-console.log(`Σ(23°)  = ${eccSum23.toExponential(10)}`);
+console.log(`\nΣ(prograde) = ${eccSum203.toExponential(10)}`);
+console.log(`Σ(anti-phase)  = ${eccSum23.toExponential(10)}`);
 console.log(`Residual = ${eccResidual.toExponential(4)}`);
 console.log(`Balance  = ${eccBalance.toFixed(4)}%`);
 
@@ -328,7 +333,7 @@ try {
 }
 
 if (presetData) {
-  const phaseAngles = [203.3195, 23.3195];
+  const phaseGroups = ['prograde', 'anti-phase'];
   const planetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
   let mirrorCount = 0;
@@ -338,10 +343,10 @@ if (presetData) {
     const cfg = {};
     let idx = 2;
     for (const p of planetOrder) {
-      cfg[p] = { d: preset[idx], phase: phaseAngles[preset[idx + 1]] };
+      cfg[p] = { d: preset[idx], group: phaseGroups[preset[idx + 1]] };
       idx += 2;
     }
-    cfg.earth = { d: 3, phase: 203.3195 };
+    cfg.earth = { d: 3, group: 'prograde' };
 
     const isMirror =
       cfg.mercury.d === cfg.uranus.d &&
@@ -674,7 +679,7 @@ console.log('Planet       Model i(J2000)  Observed i_J2000  Difference (")');
 console.log('─'.repeat(60));
 
 for (const key of planets) {
-  const cosPhase = Math.cos((omegaJ2000[key] - config[key].phase) * DEG2RAD);
+  const cosPhase = Math.cos((periLongJ2000[key] - config[key].phase) * DEG2RAD);
   const modelI = means[key] + amplitudes[key] * cosPhase;
   const diff = (modelI - inclJ2000[key]) * 3600; // arcsec
   console.log(

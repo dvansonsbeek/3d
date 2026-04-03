@@ -384,7 +384,7 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 ## Related Documents
 
 - [Dynamic Elements Overview](04-dynamic-elements-overview.md) - Master overview of all dynamic systems
-- [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (Ω-based approach)
+- [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (ICRF perihelion approach)
 - [Invariable Plane Calculations](33-invariable-plane-calculations.md) - Height above/below invariable plane
 
 ## Note on Dynamic Inclinations
@@ -392,10 +392,10 @@ The differences between Souami & Souchay (2012) ascending nodes and our verified
 Since January 2026, the ecliptic inclination calculation uses **dynamic planet inclinations** (`o.<planet>InvPlaneInclinationDynamic`) rather than fixed Souami & Souchay values. Each planet's inclination to the invariable plane now oscillates using the formula:
 
 ```
-i(t) = mean + A × cos(Ω(t) - offset)
+i(t) = mean + A × cos(ω̃_ICRF(t) - phaseAngle)
 ```
 
-This means the verified ascending nodes work together with the dynamic inclination system to produce accurate ecliptic inclinations over long timescales.
+This means the verified ascending nodes (for ecliptic plane normals) work together with the ICRF perihelion-based inclination oscillation to produce accurate ecliptic inclinations over long timescales.
 
 ## Change Log
 

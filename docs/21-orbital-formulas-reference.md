@@ -8,7 +8,7 @@ This document provides a complete reference for all orbital calculation function
 
 **Related Documents:**
 - [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
-- [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (Ω-based approach)
+- [Inclination Calculations](32-inclination-calculations.md) - Planet inclination oscillation (ICRF perihelion approach)
 - [Ascending Node Calculations](31-ascending-node-calculations.md) - Ascending node shifts with obliquity
 - [Formula Derivation](35-formula-derivation.md) - Theoretical derivation of precession formulas from Fibonacci periods
 
@@ -93,7 +93,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `{planet}OrbitalEccentricity` | Eccentricity (e) |
 | `{planet}InvPlaneInclinationMean` | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
 | `{planet}InvPlaneInclinationAmplitude` | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationPhaseAngle` | Phase offset linking inclination to ascending node |
+| `{planet}InclinationPhaseAngle` | Phase angle for inclination oscillation (ICRF perihelion at balanced year) |
 | `{planet}EclipticInclinationJ2000` | J2000 orbital inclination to ecliptic |
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
@@ -1843,7 +1843,7 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 | Mercury | 1.375 | holisticyearLength / (1+3/8) |
 | Venus | ~0.5 | holisticyearLength * 2 |
 | Earth | 3 | holisticyearLength / 3 |
-| Mars | 4.333 | holisticyearLength / (4+1/3) |
+| Mars | 4.375 | holisticyearLength / (4+3/8) |
 | Jupiter | 5 | holisticyearLength / 5 |
 | Saturn | -8 | -holisticyearLength / 8 (retrograde) |
 | Uranus | 3 | holisticyearLength / 3 |
@@ -1985,7 +1985,7 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 | **Mercury** | `mercuryPerihelionEcliptic` | derived | H / (1+3/8) |
 | **Venus** | `venusPerihelionEcliptic` | derived | H × 2 |
 | **Earth** | H/3 | derived | 3 |
-| **Mars** | `marsPerihelionEcliptic` | derived | H / (4+1/3) |
+| **Mars** | `marsPerihelionEcliptic` | derived | H / (4+3/8) |
 | **Jupiter** | `jupiterPerihelionEcliptic` | derived | H / 5 |
 | **Saturn** | `saturnPerihelionEcliptic` | derived | H / 8 (retrograde) |
 | **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
@@ -2064,22 +2064,21 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 β = arcsin(sin(i_inv)·sin(u)) Heliocentric latitude
 ```
 
-### Inclination Oscillation (Ω-based approach)
+### Inclination Oscillation (ICRF perihelion approach)
 ```
-i(t) = mean + A·cos(Ω(t) - offset)   Dynamic inclination to invariable plane
+i(t) = mean + A·cos(ω̃_ICRF(t) - phaseAngle)   Dynamic inclination to invariable plane
 
 Where:
-  mean   = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
-  A      = <planet>InclinationAmplitude Half of oscillation range
-  Ω(t)   = Current ascending node on invariable plane (precesses)
-  offset = <planet>InclinationPhaseAngle = Ω_J2000 - φ₀
+  mean       = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
+  A          = <planet>InclinationAmplitude          Half of oscillation range
+  ω̃_ICRF(t) = Current ICRF perihelion longitude (ecliptic rate - general precession H/13)
+  phaseAngle = <planet>InclinationPhaseAngle         Per-planet ICRF perihelion at balanced year
 
-Phase offset derivation:
-  i_J2000 = mean + A·cos(φ₀)           Solve for φ₀ from known J2000 value
-  offset = Ω_J2000 - φ₀                Geometric relationship
+Mean derivation:
+  mean = i_J2000 - A·cos(ω̃_J2000 - phaseAngle)    From known J2000 constraint
 
-Note: Two valid solutions exist for φ₀ (±acos). Choose the one that
-      produces the correct inclination change direction (increasing/decreasing).
+Note: Saturn is anti-phase (cos sign flipped): MAX inclination at balanced year,
+      while all other planets are at MIN.
 ```
 
 ---

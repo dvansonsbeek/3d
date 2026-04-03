@@ -99,21 +99,21 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.48128 deg | Mean orbital inclination to invariable plane (derived) |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603 deg | Oscillation amplitude (derived from obliquity rate) |
-| Inclination Phase Angle | `earthInclinationPhaseAngle` | 203.3195 deg | Phase offset for inclination oscillation |
+| Inclination Phase Angle | `earthInclinationPhaseAngle` | 21.77 deg | ICRF perihelion at balanced year (phase offset for inclination oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
 
 ## Fibonacci Divisor Assignments
 
 | Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
-| Mercury | 21 | 203 deg | Uranus | I |
-| Venus | 34 | 203 deg | Neptune | I |
-| Earth | 3 | 203 deg | Saturn | — |
-| Mars | 5 | 203 deg | Jupiter | II |
-| Jupiter | 5 | 203 deg | Mars | III |
-| Saturn | 3 | 23 deg (retrograde) | Earth | III |
-| Uranus | 21 | 203 deg | Mercury | III |
-| Neptune | 34 | 203 deg | Venus | III |
+| Mercury | 21 | Prograde (99.52°) | Uranus | I |
+| Venus | 34 | Prograde (79.82°) | Neptune | I |
+| Earth | 3 | Prograde (21.77°) | Saturn | — |
+| Mars | 5 | Prograde (96.95°) | Jupiter | II |
+| Jupiter | 5 | Prograde (291.18°) | Mars | III |
+| Saturn | 3 | Anti-phase (120.38°) | Earth | III |
+| Uranus | 21 | Prograde (21.33°) | Mercury | III |
+| Neptune | 34 | Prograde (354.04°) | Venus | III |
 
 ## Model Start & Alignment
 
@@ -266,19 +266,19 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 Amplitudes derived from Fibonacci Laws: `amp = ψ / (d × √m)`. Means from J2000 constraint.
 See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimization](../tools/verify/inclination-optimization.js) and [Inclination Verification](../tools/verify/inclination-verification.js).
 
-| Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle |
-|--------|----------|---------------|-----------|-------------|
-| Mercury | 6.726271 | 0.384267 | 6.34 - 7.11 | 203.3195 deg |
-| Venus | 2.207312 | 0.061809 | 2.15 - 2.27 | 203.3195 deg |
-| Earth | 1.48128 | 0.63603 | 0.85 - 2.12 | 203.3195 deg |
-| Mars | 2.648955 | 1.157559 | 1.49 - 3.81 | 203.3195 deg |
-| Jupiter | 0.329094 | 0.021281 | 0.31 - 0.35 | 203.3195 deg |
-| Saturn | 0.931672 | 0.064819 | 0.87 - 1.00 | 23.3195 deg (retrograde) |
-| Uranus | 1.000594 | 0.023695 | 0.98 - 1.02 | 203.3195 deg |
-| Neptune | 0.722202 | 0.013474 | 0.71 - 0.74 | 203.3195 deg |
-| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.3195 deg |
+| Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
+|--------|----------|---------------|-----------|-------------|-------------|
+| Mercury | 6.726271 | 0.384267 | 6.34 - 7.11 | 99.52° | 8H/93 ≈ 28,844 yr |
+| Venus | 2.207312 | 0.061809 | 2.15 - 2.27 | 79.82° | 2H/25 ≈ 26,825 yr |
+| Earth | 1.48128 | 0.63603 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
+| Mars | 2.648955 | 1.157559 | 1.49 - 3.81 | 96.95° | 8H/69 ≈ 38,877 yr |
+| Jupiter | 0.329094 | 0.021281 | 0.31 - 0.35 | 291.18° | H/8 ≈ 41,915 yr |
+| Saturn | 0.931672 | 0.064819 | 0.87 - 1.00 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
+| Uranus | 1.000594 | 0.023695 | 0.98 - 1.02 | 21.33° | H/16 ≈ 20,957 yr |
+| Neptune | 0.722202 | 0.013474 | 0.71 - 0.74 | 354.04° | 2H/25 ≈ 26,825 yr |
+| Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
 
-**Formula**: `i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)`
+**Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)` (Saturn: sign flipped, anti-phase)
 
 ## Planet Orbital Distances & Periods
 
@@ -299,7 +299,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Mercury | H / (1 + 3/8) | ~243,867 |
 | Venus | H × 2 | ~670,634 |
 | Earth | H / 16 | ~20,957 |
-| Mars | H / (4 + 1/3) | ~77,381 |
+| Mars | H / (4 + 3/8) | ~76,644 |
 | Jupiter | H / 5 | ~67,063 |
 | Saturn | -H / 8 | ~-41,915 (retrograde) |
 | Uranus | H / 3 | ~111,772 |
@@ -494,7 +494,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: Saturn and Neptune show **increasing** inclinations, which requires retrograde phase (Saturn) or special phase alignment (Neptune). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
+**Note**: Saturn shows **increasing** inclination because it is anti-phase (MAX at balanced year). Neptune also shows increasing, which is a known consequence of its balance-driven group assignment (prograde). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
 
 ### Mean & True Anomaly at J2000
 
@@ -586,14 +586,26 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
-### Inclination Eigenmode Phase Angles (`EIGENMODE_PHASES`)
+### Inclination Phase Angles & Eigenmode Connection
 
-The model uses two universal phase angles derived from the s₈ eigenmode (γ₈ = 202.8°). The `EIGENMODE_PHASES` array in `script.js` provides a dropdown for the UI:
+Each planet has a per-planet phase angle (ICRF perihelion longitude at the balanced year, ~302,635 BC). These cluster near the Laplace-Lagrange eigenmodes (γ₁-γ₈) within 1-10°:
+
+| Planet | Phase Angle | Nearest Eigenmode | Δ |
+|--------|-------------|-------------------|---|
+| Mercury | 99.52° | — | — |
+| Venus | 79.82° | — | — |
+| Earth | 21.77° | γ₁ (20.23°) | +1.5° |
+| Mars | 96.95° | — | — |
+| Jupiter | 291.18° | γ₄ (296.9°) | -5.7° |
+| Saturn | 120.38° | γ₆ (127.3°) | -6.9° |
+| Uranus | 21.33° | γ₁ (20.23°) | +1.1° |
+| Neptune | 354.04° | — | — |
+| Pluto | 203.32° | γ₈ (202.8°) | +0.5° |
+
+The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 
 | Value | Label | Source |
 |-------|-------|--------|
-| **203.3195°** | φ₁ (prograde group) | Model-defined |
-| **23.3195°** | φ₂ (retrograde group) | Model-defined (= φ₁ − 180°) |
 | 202.8° | γ₈ | Farside Table 10.1 |
 | 20.23° | γ₁ | Farside Table 10.1 |
 | 255.6° | γ₃ | Farside Table 10.1 |
@@ -815,7 +827,7 @@ Per-planet configuration for the predictive perihelion precession formula:
 |--------|---------------|---------------|---------------------|
 | Mercury | H × 8/11 | 77.4569131 | 1296000/period×100 |
 | Venus | H × 2 | 131.5765919 | 1296000/period×100 |
-| Mars | H × 3/13 | 336.0650681 | 1296000/period×100 |
+| Mars | H × 8/35 | 336.0650681 | 1296000/period×100 |
 | Jupiter | H / 5 | 14.70659401 | 1296000/period×100 |
 | Saturn | H / 8 | 92.12794343 | -1296000/period×100 (retrograde) |
 | Uranus | H / 3 | 170.7308251 | 1296000/period×100 |

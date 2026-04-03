@@ -71,7 +71,7 @@ Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between two phase groups (203 deg and 23 deg) to **100% balance**.
+**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between the prograde group (7 planets) and anti-phase group (Saturn) to **100% balance**.
 
 **Laws 4-5 -- Eccentricity Constant & Balance**: All 8 eccentricities are determined by Fibonacci pair constraints. Saturn's eccentricity is independently predicted to within 0.3% by two different laws.
 
@@ -96,7 +96,7 @@ Each inner planet shares its Fibonacci divisor with its outer counterpart across
 | Far | Venus (d=34) | Neptune (d=34) | 34 | F9 |
 | Outermost | Mercury (d=21) | Uranus (d=21) | 21 | F8 |
 
-Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
+Earth-Saturn is the only pair with opposite balance groups (prograde vs anti-phase).
 
 ### 2.4 Implications for the Optimization Tool
 
@@ -141,14 +141,14 @@ Earth-Saturn is the only pair with opposite phase groups (203 deg vs 23 deg).
 | `Startpos` | 83.653 deg | Starting orbital position |
 | `InvPlaneInclinationMean` | 6.726271 deg | Inclination oscillation center |
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Inclination oscillation range |
-| `InclinationPhaseAngle` | 203.3195 deg | Phase group (203 deg or 23 deg) |
+| `InclinationPhaseAngle` | Per-planet | ICRF perihelion at balanced year (e.g. Mercury: 99.52°) |
 
 ### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
 | Planet | Formula | Direction |
 |--------|---------|-----------|
 | Mercury | H/(1+3/8) | Prograde |
 | Venus | Hx2 | Prograde |
-| Mars | H/(4+1/3) | Prograde |
+| Mars | H/(4+3/8) | Prograde |
 | Jupiter | H/5 | Prograde |
 | Saturn | -H/8 | **Retrograde** |
 | Uranus | H/3 | Prograde |
@@ -543,7 +543,7 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 | `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
 | `InvPlaneInclinationMean` | 6.726271 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
-| `InclinationPhaseAngle` | 203.3195 deg | Phase of inclination oscillation | **Constrained**: must be 203.3195 deg or 23.3195 deg (model philosophy) |
+| `InclinationPhaseAngle` | Per-planet | Phase of inclination oscillation (ICRF perihelion at balanced year) | **Constrained**: per-planet value derived from balanced year |
 
 **Earth input constants -- HIGH IMPACT, change with extreme care:**
 
