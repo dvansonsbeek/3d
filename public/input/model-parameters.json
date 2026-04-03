@@ -44,6 +44,7 @@
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 32.83,
       "inclinationPhaseAngle": 99.52,
+      "ascendingNodeCyclesIn8H": 12,
       "obliquityCycleFraction": [
         8,
         3
@@ -70,6 +71,7 @@
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 54.7,
       "inclinationPhaseAngle": 79.82,
+      "ascendingNodeCyclesIn8H": 15,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         3,
@@ -93,6 +95,7 @@
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
       "inclinationPhaseAngle": 96.95,
+      "ascendingNodeCyclesIn8H": 37,
       "obliquityCycleFraction": [
         3,
         8
@@ -119,6 +122,7 @@
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 312.89,
       "inclinationPhaseAngle": 291.18,
+      "ascendingNodeCyclesIn8H": 55,
       "obliquityCycleFraction": [
         1,
         2
@@ -145,6 +149,7 @@
       "fibonacciD": 3,
       "ascendingNodeInvPlane": 118.81,
       "inclinationPhaseAngle": 120.38,
+      "ascendingNodeCyclesIn8H": 55,
       "obliquityCycleFraction": [
         1,
         3
@@ -171,6 +176,7 @@
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 307.8,
       "inclinationPhaseAngle": 21.33,
+      "ascendingNodeCyclesIn8H": 6,
       "obliquityCycleFraction": [
         1,
         2
@@ -197,6 +203,7 @@
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 192.04,
       "inclinationPhaseAngle": 354.04,
+      "ascendingNodeCyclesIn8H": 1,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         -68,

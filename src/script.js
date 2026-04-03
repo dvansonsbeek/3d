@@ -130,6 +130,7 @@ planets.mercury = {
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
   inclinationPhaseAngle: 99.52,
+  ascendingNodeCyclesIn8H: 12,
 };
 
 // Venus
@@ -156,6 +157,7 @@ planets.venus = {
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
   inclinationPhaseAngle: 79.82,
+  ascendingNodeCyclesIn8H: 15,
 };
 
 // Mars
@@ -182,6 +184,7 @@ planets.mars = {
   perihelionRef_JD: 2456499.441,
   ascendingNodeInvPlane: 354.87,
   inclinationPhaseAngle: 96.95,
+  ascendingNodeCyclesIn8H: 37,
 };
 
 // Jupiter
@@ -208,6 +211,7 @@ planets.jupiter = {
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
   inclinationPhaseAngle: 291.18,
+  ascendingNodeCyclesIn8H: 55,
 };
 
 // Saturn
@@ -234,6 +238,7 @@ planets.saturn = {
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
   inclinationPhaseAngle: 120.38,
+  ascendingNodeCyclesIn8H: 55,
 };
 
 // Uranus
@@ -260,6 +265,7 @@ planets.uranus = {
   perihelionRef_JD: 2439699.8,
   ascendingNodeInvPlane: 307.80,
   inclinationPhaseAngle: 21.33,
+  ascendingNodeCyclesIn8H: 6,
 };
 
 // Neptune
@@ -286,6 +292,7 @@ planets.neptune = {
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
   inclinationPhaseAngle: 354.04,
+  ascendingNodeCyclesIn8H: 1,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -1153,9 +1160,15 @@ const neptuneLLBoundsMax = 0.800;
 // https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
 // f₅ = 0 (invariable plane, no evolution) is excluded — 7 active modes remain
 const EIGENMODE_PHASES = [
-  // Fibonacci balance group phase angles (model-defined)
-  { value: 21.77,    label: 'Earth = 21.77°', group: 'model' },
-  { value: 120.38,   label: 'Saturn = 120.38°', group: 'model' },
+  // Per-planet phase angles (ICRF perihelion at balanced year)
+  { value: 99.52,    label: '99.52° (Me)', group: 'model' },
+  { value: 79.82,    label: '79.82° (Ve)', group: 'model' },
+  { value: 21.77,    label: '21.77° (Ea)', group: 'model' },
+  { value: 96.95,    label: '96.95° (Ma)', group: 'model' },
+  { value: 291.18,   label: '291.18° (Ju)', group: 'model' },
+  { value: 120.38,   label: '120.38° (Sa)', group: 'model' },
+  { value: 21.33,    label: '21.33° (Ur)', group: 'model' },
+  { value: 354.04,   label: '354.04° (Ne)', group: 'model' },
   // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1)
   { value: 202.8,  label: 'γ₈ = 202.8°' },
   { value: 20.23,  label: 'γ₁ = 20.23°' },
@@ -1277,7 +1290,7 @@ const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclin
 const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationPhaseAngle) * Math.PI / 180);
 
 // Inclination path zodiac offset — uses perihelion longitude from ASTRO_REFERENCE
-const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationPhaseAngle) - 2;
+const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationPhaseAngle);
 
 // --- 9a. Time units & year lengths ---
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
@@ -6227,7 +6240,7 @@ function createInclinationPath(radius = 250, numPoints = 120, yScale = 50) {
   // Phase offset to align the path with the zodiac
   // The path is now a child of zodiac, so it's in zodiac's local coordinate system.
   // Uses global inclinationPathZodiacOffsetDeg constant
-  const PHASE_OFFSET = Math.PI + inclinationPathZodiacOffsetDeg * Math.PI / 180;
+  const PHASE_OFFSET = inclinationPathZodiacOffsetDeg * Math.PI / 180;
 
   for (let i = 0; i <= numPoints; i++) {
     const t = i / numPoints;
@@ -18574,26 +18587,28 @@ const BALANCE_PRESETS = [
 
 // Decode a preset row into a state object
 function fbeDecodePreset(row) {
-  const PHASES = [earthInclinationPhaseAngle, planets.saturn.inclinationPhaseAngle];
+  // Group index 0 = prograde (use planet's own phase angle), 1 = anti-phase
+  const phaseFor = (key, groupIdx) => {
+    return BALANCE_CONFIG[key].defaultPhaseAngle;  // per-planet phase angle (always the planet's own)
+  };
   return {
-    mercury:  { d: row[2],  phase: PHASES[row[3]] },
-    venus:    { d: row[4],  phase: PHASES[row[5]] },
-    earth:    { d: 3,       phase: earthInclinationPhaseAngle },
-    mars:     { d: row[6],  phase: PHASES[row[7]] },
-    jupiter:  { d: row[8],  phase: PHASES[row[9]] },
-    saturn:   { d: row[10], phase: PHASES[row[11]] },
-    uranus:   { d: row[12], phase: PHASES[row[13]] },
-    neptune:  { d: row[14], phase: PHASES[row[15]] },
+    mercury:  { d: row[2],  phase: phaseFor('mercury', row[3]),  group: row[3] },
+    venus:    { d: row[4],  phase: phaseFor('venus', row[5]),    group: row[5] },
+    earth:    { d: 3,       phase: earthInclinationPhaseAngle,   group: 0 },
+    mars:     { d: row[6],  phase: phaseFor('mars', row[7]),     group: row[7] },
+    jupiter:  { d: row[8],  phase: phaseFor('jupiter', row[9]),  group: row[9] },
+    saturn:   { d: row[10], phase: phaseFor('saturn', row[11]),  group: row[11] },
+    uranus:   { d: row[12], phase: phaseFor('uranus', row[13]),  group: row[13] },
+    neptune:  { d: row[14], phase: phaseFor('neptune', row[15]), group: row[15] },
   };
 }
 
 // Build dropdown label for a preset
 function fbePresetLabel(row, index) {
-  const PHASES = [earthInclinationPhaseAngle, planets.saturn.inclinationPhaseAngle];
-  const pLabel = (ph) => Math.abs(ph - earthInclinationPhaseAngle) < 1 ? '203' : '23';
+  const gLabel = (g) => g === 0 ? 'pro' : 'anti';
   const planetConfigs = ['Me','Ve','Ma','Ju','Sa','Ur','Ne'];
   const indices = [2,4,6,8,10,12,14]; // d positions in row
-  const parts = planetConfigs.map((p, i) => `${p}${row[indices[i]]}@${pLabel(PHASES[row[indices[i]+1]])}`);
+  const parts = planetConfigs.map((p, i) => `${p}${row[indices[i]]}@${gLabel(row[indices[i]+1])}`);
   return `#${index+1} ${row[1].toFixed(4)}% ${parts.join(' ')} [${row[0]}]`;
 }
 
@@ -18602,16 +18617,17 @@ function fbeMatchDefaultPreset() {
   const SCENARIOS = { '5,3': 'A', '8,5': 'B', '13,8': 'C', '21,13': 'D' };
   const scenario = SCENARIOS[BALANCE_CONFIG.jupiter.defaultD + ',' + BALANCE_CONFIG.saturn.defaultD];
   if (!scenario) return null;
-  const phaseIdx = (ph) => Math.abs(ph - earthInclinationPhaseAngle) < 1 ? 0 : 1;
+  // Group index: 0 = prograde, 1 = anti-phase (Saturn only in default config)
+  const groupIdx = (key) => key === 'saturn' ? 1 : 0;
   const defaults = [
     scenario, 0,
-    BALANCE_CONFIG.mercury.defaultD, phaseIdx(BALANCE_CONFIG.mercury.defaultPhaseAngle),
-    BALANCE_CONFIG.venus.defaultD,   phaseIdx(BALANCE_CONFIG.venus.defaultPhaseAngle),
-    BALANCE_CONFIG.mars.defaultD,    phaseIdx(BALANCE_CONFIG.mars.defaultPhaseAngle),
-    BALANCE_CONFIG.jupiter.defaultD, phaseIdx(BALANCE_CONFIG.jupiter.defaultPhaseAngle),
-    BALANCE_CONFIG.saturn.defaultD,  phaseIdx(BALANCE_CONFIG.saturn.defaultPhaseAngle),
-    BALANCE_CONFIG.uranus.defaultD,  phaseIdx(BALANCE_CONFIG.uranus.defaultPhaseAngle),
-    BALANCE_CONFIG.neptune.defaultD, phaseIdx(BALANCE_CONFIG.neptune.defaultPhaseAngle),
+    BALANCE_CONFIG.mercury.defaultD, groupIdx('mercury'),
+    BALANCE_CONFIG.venus.defaultD,   groupIdx('venus'),
+    BALANCE_CONFIG.mars.defaultD,    groupIdx('mars'),
+    BALANCE_CONFIG.jupiter.defaultD, groupIdx('jupiter'),
+    BALANCE_CONFIG.saturn.defaultD,  groupIdx('saturn'),
+    BALANCE_CONFIG.uranus.defaultD,  groupIdx('uranus'),
+    BALANCE_CONFIG.neptune.defaultD, groupIdx('neptune'),
   ];
   for (let i = 0; i < BALANCE_PRESETS.length; i++) {
     const row = BALANCE_PRESETS[i];
@@ -18642,6 +18658,9 @@ const earthInvPlaneInclJ2000 = earthInvPlaneInclinationMean +
   earthInvPlaneInclinationAmplitude *
   Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
 
+// ICRF perihelion periods for balance explorer (inclination oscillation uses ICRF, not ecliptic)
+const _balGP = 1 / (holisticyearLength / 13);
+const _balICRF = (k) => 1 / (1 / planets[k].perihelionEclipticYears - _balGP);
 const BALANCE_CONFIG = {
   mercury: {
     name: 'Mercury',
@@ -18651,7 +18670,8 @@ const BALANCE_CONFIG = {
     defaultD: 21,
     inclJ2000: planets.mercury.invPlaneInclinationJ2000,
     omegaJ2000: planets.mercury.ascendingNodeInvPlane,
-    period: planets.mercury.perihelionEclipticYears,
+    periLongJ2000: planets.mercury.longitudePerihelion,
+    period: _balICRF('mercury'),
     trendJPL: mercuryEclipticInclinationTrendJPL,
     llBounds: { min: mercuryLLBoundsMin, max: mercuryLLBoundsMax },
     defaultPhaseAngle: planets.mercury.inclinationPhaseAngle,
@@ -18665,7 +18685,8 @@ const BALANCE_CONFIG = {
     defaultD: 34,
     inclJ2000: planets.venus.invPlaneInclinationJ2000,
     omegaJ2000: planets.venus.ascendingNodeInvPlane,
-    period: planets.venus.perihelionEclipticYears,
+    periLongJ2000: planets.venus.longitudePerihelion,
+    period: _balICRF('venus'),
     trendJPL: venusEclipticInclinationTrendJPL,
     llBounds: { min: venusLLBoundsMin, max: venusLLBoundsMax },
     defaultPhaseAngle: planets.venus.inclinationPhaseAngle,
@@ -18679,6 +18700,7 @@ const BALANCE_CONFIG = {
     defaultD: 3,
     inclJ2000: earthInvPlaneInclJ2000,
     omegaJ2000: earthAscendingNodeInvPlaneVerified,
+    periLongJ2000: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg,
     period: earthPerihelionICRFYears,
     trendJPL: 0,  // Earth defines the ecliptic — no self-trend
     llBounds: { min: earthLLBoundsMin, max: earthLLBoundsMax },
@@ -18693,7 +18715,8 @@ const BALANCE_CONFIG = {
     defaultD: 5,
     inclJ2000: planets.mars.invPlaneInclinationJ2000,
     omegaJ2000: planets.mars.ascendingNodeInvPlane,
-    period: planets.mars.perihelionEclipticYears,
+    periLongJ2000: planets.mars.longitudePerihelion,
+    period: _balICRF('mars'),
     trendJPL: marsEclipticInclinationTrendJPL,
     llBounds: { min: marsLLBoundsMin, max: marsLLBoundsMax },
     defaultPhaseAngle: planets.mars.inclinationPhaseAngle,
@@ -18707,7 +18730,8 @@ const BALANCE_CONFIG = {
     defaultD: 5,
     inclJ2000: planets.jupiter.invPlaneInclinationJ2000,
     omegaJ2000: planets.jupiter.ascendingNodeInvPlane,
-    period: planets.jupiter.perihelionEclipticYears,
+    periLongJ2000: planets.jupiter.longitudePerihelion,
+    period: _balICRF('jupiter'),
     trendJPL: jupiterEclipticInclinationTrendJPL,
     llBounds: { min: jupiterLLBoundsMin, max: jupiterLLBoundsMax },
     defaultPhaseAngle: planets.jupiter.inclinationPhaseAngle,
@@ -18721,7 +18745,8 @@ const BALANCE_CONFIG = {
     defaultD: 3,
     inclJ2000: planets.saturn.invPlaneInclinationJ2000,
     omegaJ2000: planets.saturn.ascendingNodeInvPlane,
-    period: planets.saturn.perihelionEclipticYears,
+    periLongJ2000: planets.saturn.longitudePerihelion,
+    period: _balICRF('saturn'),
     trendJPL: saturnEclipticInclinationTrendJPL,
     llBounds: { min: saturnLLBoundsMin, max: saturnLLBoundsMax },
     defaultPhaseAngle: planets.saturn.inclinationPhaseAngle,
@@ -18735,7 +18760,8 @@ const BALANCE_CONFIG = {
     defaultD: 21,
     inclJ2000: planets.uranus.invPlaneInclinationJ2000,
     omegaJ2000: planets.uranus.ascendingNodeInvPlane,
-    period: planets.uranus.perihelionEclipticYears,
+    periLongJ2000: planets.uranus.longitudePerihelion,
+    period: _balICRF('uranus'),
     trendJPL: uranusEclipticInclinationTrendJPL,
     llBounds: { min: uranusLLBoundsMin, max: uranusLLBoundsMax },
     defaultPhaseAngle: planets.uranus.inclinationPhaseAngle,
@@ -18749,7 +18775,8 @@ const BALANCE_CONFIG = {
     defaultD: 34,
     inclJ2000: planets.neptune.invPlaneInclinationJ2000,
     omegaJ2000: planets.neptune.ascendingNodeInvPlane,
-    period: planets.neptune.perihelionEclipticYears,
+    periLongJ2000: planets.neptune.longitudePerihelion,
+    period: _balICRF('neptune'),
     trendJPL: neptuneEclipticInclinationTrendJPL,
     llBounds: { min: neptuneLLBoundsMin, max: neptuneLLBoundsMax },
     defaultPhaseAngle: planets.neptune.inclinationPhaseAngle,
@@ -18770,12 +18797,13 @@ function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, pl
   const planetOmegaRad = planetOmega * DEG2RAD;
 
   // Earth at given year
-  const earthPeriod = holisticyearLength / 3;
+  const earthICRFPeriod = holisticyearLength / 3;   // ICRF perihelion period (for inclination oscillation)
+  const earthAscPeriod = -holisticyearLength / 5;    // ascending node regression period (for plane normal Ω)
   const earthCosPhase0 = (earthInvPlaneInclJ2000 - earthInvPlaneInclinationMean) / earthInvPlaneInclinationAmplitude;
   const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthPeriod;
+  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
   const earthI = (earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthPeriod) * (year - 2000)) * DEG2RAD;
+  const earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
 
   // Normal vectors
   const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
@@ -18810,8 +18838,10 @@ function computeBalanceResults(state) {
     const d = state[key].d;
     const sqrtM = Math.sqrt(cfg.mass);
     const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
-    const cosPhaseJ2000 = Math.cos((cfg.omegaJ2000 - state[key].phaseAngle) * DEG2RAD);
-    const mean = cfg.inclJ2000 - amplitude * cosPhaseJ2000;
+    const cosPhaseJ2000 = Math.cos((cfg.periLongJ2000 - state[key].phaseAngle) * DEG2RAD);
+    const isAntiPhase = state[key].group === 1;
+    const antiPhaseSign = isAntiPhase ? -1 : 1;
+    const mean = cfg.inclJ2000 - antiPhaseSign * amplitude * cosPhaseJ2000;
     const rangeMin = mean - amplitude;
     const rangeMax = mean + amplitude;
     const fitsLL = rangeMin >= cfg.llBounds.min - 0.01 && rangeMax <= cfg.llBounds.max + 0.01;
@@ -18838,7 +18868,7 @@ function computeBalanceResults(state) {
     const d = state[key].d;
     if (d <= 0) continue;
     const wVal = Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
-    if (key !== 'saturn') inclSum203 += wVal; else inclSum23 += wVal;  // Saturn anti-phase (sole balance opponent)
+    if (state[key].group !== 1) inclSum203 += wVal; else inclSum23 += wVal;  // group 0=prograde, 1=anti-phase
     // Vector balance verification
     const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
     const Lamp = L * planetResults[key].amplitude;
@@ -18847,8 +18877,12 @@ function computeBalanceResults(state) {
     balanceSin += Lamp * Math.sin(phaseRad);
     totalLamp += Lamp;
   }
+  // Scalar balance: prograde sum vs anti-phase sum (Saturn)
+  const inclTotal = inclSum203 + inclSum23;
+  const inclResidual = Math.abs(inclSum203 - inclSum23);
+  const imbalance = inclTotal > 0 ? (inclResidual / inclTotal) * 100 : 0;
+  // Vector balance kept for reference
   const balanceResidual = Math.sqrt(balanceCos * balanceCos + balanceSin * balanceSin);
-  const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
 
   // Eccentricity balance (Law 5): v = √m × a^(3/2) × e / √d
   let eccSum203 = 0, eccSum23 = 0;
@@ -18858,7 +18892,7 @@ function computeBalanceResults(state) {
     if (d <= 0) continue;
     const v = Math.sqrt(cfg.mass) * Math.pow(cfg.sma, 1.5) * cfg.ecc / Math.sqrt(d);
     planetResults[key].eccWeight = v;
-    if (key !== 'saturn') eccSum203 += v; else eccSum23 += v;  // Saturn anti-phase
+    if (state[key].group !== 1) eccSum203 += v; else eccSum23 += v;  // group 0=prograde, 1=anti-phase
   }
   const eccResidual = Math.abs(eccSum203 - eccSum23);
   const eccTotal = eccSum203 + eccSum23;
@@ -18905,7 +18939,7 @@ function fbeBuildPhaseSelect(planet, defaultPhase) {
     options = `<option value="${defaultPhase}" selected>${defaultPhase}\u00B0</option>` + options;
   }
 
-  const retroClass = Math.abs(defaultPhase - planets.saturn.inclinationPhaseAngle) < 0.01 ? ' fbe-phase-retrograde' : '';
+  const retroClass = (planet === 'saturn') ? ' fbe-phase-retrograde' : '';
   return `<select class="fbe-phase-select${retroClass}" data-planet="${planet}" ${disabled}>${options}</select>` +
     `<input type="number" class="fbe-phase-custom" data-planet="${planet}" step="0.1" min="0" max="360" placeholder="\u03B3\u00B0" ${disabled}>`;
 }
@@ -18924,7 +18958,8 @@ function createBalanceExplorerPanel() {
     state[key] = {
       phaseAngle: cfg.defaultPhaseAngle,
       period: cfg.period,
-      d: cfg.defaultD
+      d: cfg.defaultD,
+      group: (key === 'saturn') ? 1 : 0  // 0=prograde, 1=anti-phase
     };
   }
   balanceExplorerState = state;
@@ -18951,12 +18986,12 @@ function createBalanceExplorerPanel() {
           <div class="fbe-section-title">Planet Assignments</div>
           <div class="fbe-grid-header">
             <span>Planet</span>
-            <span class="fbe-header-tip">Phase angle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The phase angle \u03B3 determines the direction of each planet\u2019s inclination oscillation. By default, all planets are assigned to two groups exactly 180\u00B0 apart (23\u00B0 and 203\u00B0). This guarantees that the vector balance reduces to a simple equality between two opposing groups, enabling near-100% balance of the invariable plane.<br><br>You can also select individual eigenmode phases (\u03B3\u2081\u2013\u03B3\u2088) from Laplace-Lagrange secular theory, or enter any custom angle.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Secular Perturbation Theory \u2192</a></span></span>
-            <span class="fbe-header-tip">\u03A9 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The longitude of ascending node relative to the invariable plane at J2000 epoch.<br><br>When the ascending node \u03A9 aligns with the phase angle \u03B3, the planet reaches its maximum inclination to the invariable plane. This column is read-only for reference.</span></span>
+            <span class="fbe-header-tip">Phase angle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet phase angle: the ICRF perihelion longitude at the balanced year (~302,635 BC). These cluster near Laplace-Lagrange eigenmodes (\u03B3\u2081\u2013\u03B3\u2088) within 1\u201310\u00B0. Saturn is anti-phase (MAX inclination at balanced year, others at MIN).<br><br>You can also select individual eigenmode phases from secular theory, or enter any custom angle.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Secular Perturbation Theory \u2192</a></span></span>
+            <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch.<br><br>When the ICRF perihelion \u03D6 aligns with the phase angle \u03B3, the planet reaches its maximum inclination to the invariable plane. This column is read-only for reference.</span></span>
             <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
-            <span class="fbe-header-tip">Period (yr) <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The perihelion precession period determines how fast the ascending node to the invariable plane rotates. This affects the inclination trend (rate of change) and direction.<br><br>Default values are from the 3D model\u2019s orbital mechanics. Edit to explore how different precession rates affect the predicted trends.</span></span>
+            <span class="fbe-header-tip">Period (yr) <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion period determines the inclination oscillation rate. This is the ecliptic perihelion rate minus general precession (H/13).<br><br>Default values are from the 3D model. Edit to explore how different periods affect the predicted trends.</span></span>
             <span></span>
-            <span class="fbe-header-tip">Base trend <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The base precession rate in arcseconds per century, calculated as 360\u00B0\u00D7100\u00D73600 / period.<br><br>This represents the Newtonian gravitational contribution to the perihelion precession \u2014 the rate at which the ascending node to the invariable plane rotates due to gravitational perturbations from other planets.</span></span>
+            <span class="fbe-header-tip">Base trend <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion precession rate in arcseconds per century, calculated as 360\u00B0\u00D7100\u00D73600 / period.<br><br>This represents the rate at which the ICRF perihelion longitude rotates, driving the inclination oscillation.</span></span>
           </div>
           <div class="fbe-planet-grid">
             ${BALANCE_PLANETS.map(key => {
@@ -18969,7 +19004,7 @@ function createBalanceExplorerPanel() {
                   ${fbeBuildPhaseSelect(key, cfg.defaultPhaseAngle)}
                 </div>
                 <div class="fbe-omega-cell">
-                  <span class="fbe-omega-display">${cfg.omegaJ2000.toFixed(2)}\u00B0</span>
+                  <span class="fbe-omega-display">${cfg.periLongJ2000.toFixed(2)}\u00B0</span>
                 </div>
                 <div class="fbe-d-cell">
                   ${fbeBuildDSelect(key, cfg.defaultD)}
@@ -19054,6 +19089,7 @@ function createBalanceExplorerPanel() {
       if (cfg.locked) continue;
       state[key].phaseAngle = preset[key].phase;
       state[key].d = preset[key].d;
+      state[key].group = preset[key].group;
       // Update phase select UI
       const phaseSel = panel.querySelector(`.fbe-phase-select[data-planet="${key}"]`);
       const phaseCustom = panel.querySelector(`.fbe-phase-custom[data-planet="${key}"]`);
@@ -19066,7 +19102,7 @@ function createBalanceExplorerPanel() {
         phaseCustom.classList.add('visible');
         phaseCustom.value = preset[key].phase;
       }
-      phaseSel.classList.toggle('fbe-phase-retrograde', Math.abs(preset[key].phase - planets.saturn.inclinationPhaseAngle) < 0.01);
+      phaseSel.classList.toggle('fbe-phase-retrograde', preset[key].group === 1);
       // Update d select UI
       const dSel = panel.querySelector(`.fbe-d-select[data-planet="${key}"]`);
       const dCustom = panel.querySelector(`.fbe-d-custom[data-planet="${key}"]`);
@@ -19095,7 +19131,7 @@ function createBalanceExplorerPanel() {
         customInput.classList.remove('visible');
         const val = parseFloat(e.target.value);
         state[planet].phaseAngle = val;
-        e.target.classList.toggle('fbe-phase-retrograde', Math.abs(val - planets.saturn.inclinationPhaseAngle) < 0.01);
+        e.target.classList.toggle('fbe-phase-retrograde', e.target.dataset.planet === 'saturn');
         updateBalanceExplorerResults(panel, state);
       }
     });
@@ -19857,9 +19893,9 @@ function _la2010Interp(yearFromJ2000, col) {
 function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
 function ascNodeLa2010(year) { return _la2010Interp(year - 2000, 4); }
 
-/** Model ascending node on invariable plane — prograde at H/3 (current model implementation) */
+/** Model ascending node on invariable plane — retrograde at -H/5 (confirmed by La2010 N-body solution) */
 function ascNodeModel(year) {
-  return ((earthAscendingNodeInvPlaneVerified + (360 / (holisticyearLength / 3)) * (year - 2000)) % 360 + 360) % 360;
+  return ((earthAscendingNodeInvPlaneVerified + (360 / (-holisticyearLength / 5)) * (year - 2000)) % 360 + 360) % 360;
 }
 
 // ── Category definitions ─────────────────────────────────────────
@@ -34175,7 +34211,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.mercury.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -34566,7 +34602,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.venus.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -34925,7 +34961,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.mars.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -35283,7 +35319,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.jupiter.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -35642,7 +35678,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.saturn.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -36001,7 +36037,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.uranus.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -36360,7 +36396,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.neptune.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -36720,7 +36756,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.pluto.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -37048,7 +37084,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.halleys.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.halleys.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -37376,7 +37412,7 @@ const planetStats = {
       {label : () => `Perihelion Precession Duration against ICRF`,
        value : [ { v: () => OrbitalFormulas.precessionEclipticToICRF(planets.eros.perihelionEclipticYears, holisticyearLength/13), dec:2, sep:',' },{ small: 'years' }],
        hover : [`Period relative to the inertial ICRF frame: T_ICRF = (T_ecl × T_ref) / (T_ecl - T_ref)`],
-       static: true},
+       constant: true, highlight: true},
       {label : () => `Precession Angular Velocity`,
        value : [ { v: () => OrbitalFormulas.precessionAngularVelocity(OrbitalFormulas.precessionRateFromPeriod(planets.eros.perihelionEclipticYears)) * 1e9, dec:6, sep:',' },{ small: '10⁻⁹ rad/yr' }],
        hover : [`Angular velocity: ω = (arcsec/century / 100) × (π / 648000) rad/yr`],
@@ -37588,6 +37624,7 @@ function buildObliquityChart(currentYear) {
   const cx = toX(tNow).toFixed(1);
   const cy = toY(oblNow).toFixed(1);
   const ascNodeNow = ((o.earthAscendingNodeInvPlane || 0) % 360 + 360) % 360;
+  const periLongNowEarth = ((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + (360 / earthPerihelionICRFYears) * ((currentYear || startmodelYear) - 2000)) % 360 + 360) % 360;
 
   const gridClr  = 'rgba(255,255,255,0.08)';
   const textClr  = 'rgba(255,255,255,0.45)';
@@ -37666,14 +37703,17 @@ function buildObliquityChart(currentYear) {
   const oblFixed = mid + axFixed + inFixed;
   const fxX      = toX(tFixed).toFixed(1);
   const fxY      = toY(oblFixed).toFixed(1);
-  const earthRate = 360 / earthPerihelionICRFYears;
-  const ascNodeFixed = ((earthAscendingNodeInvPlaneVerified - earthRate * yearsFromBalancedToJ2000 + earthRate * tFixedAbs) % 360 + 360) % 360;
+  const earthAscRate = 360 / (-holisticyearLength / 5);  // ascending node regression rate
+  const earthPeriRate = 360 / earthPerihelionICRFYears;   // ICRF perihelion rate
+  const ascNodeFixed = ((earthAscendingNodeInvPlaneVerified + earthAscRate * (startmodelYear - 2000)) % 360 + 360) % 360;
+  const periLongFixed = ((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + earthPeriRate * (startmodelYear - 2000)) % 360 + 360) % 360;
   const fixedTip =
     `Reference year: ${fmtYr(Math.round(startmodelYear))}\n` +
     `Obliquity: ${oblFixed.toFixed(4)}°\n` +
     `Inclination component: ${axFixed >= 0 ? '+' : ''}${axFixed.toFixed(3)}°\n` +
     `Axial component: ${inFixed >= 0 ? '+' : ''}${inFixed.toFixed(3)}°\n` +
-    `Ascending node (Ω): ${ascNodeFixed.toFixed(2)}°`;
+    `Ascending node (Ω): ${ascNodeFixed.toFixed(2)}°\n` +
+    `ICRF perihelion (ω̃): ${periLongFixed.toFixed(2)}°`;
 
   // Simulation position hover (moves with play)
   const simTip =
@@ -37681,7 +37721,8 @@ function buildObliquityChart(currentYear) {
     `Obliquity: ${oblNow.toFixed(4)}°\n` +
     `Inclination component: ${axNow >= 0 ? '+' : ''}${axNow.toFixed(3)}°\n` +
     `Axial component: ${inNow >= 0 ? '+' : ''}${inNow.toFixed(3)}°\n` +
-    `Ascending node (Ω): ${ascNodeNow.toFixed(2)}°`;
+    `Ascending node (Ω): ${ascNodeNow.toFixed(2)}°\n` +
+    `ICRF perihelion (ω̃): ${periLongNowEarth.toFixed(2)}°`;
 
   // Hover zone dimensions
   const hzW = 20;  // hover zone width in SVG units
@@ -37726,7 +37767,6 @@ function buildObliquityChart(currentYear) {
         <circle cx="${cx}" cy="${cy}" r="3" fill="rgba(235,100,100,0.9)" stroke="${dotClr}" stroke-width="0.8"/>
         <circle cx="${cx}" cy="${cy}" r="8" fill="transparent"/>
       </g>
-      <text x="${(+cx + 5).toFixed(1)}" y="${(+cy - 5).toFixed(1)}" fill="rgba(235,100,100,0.85)" font-size="5.5" text-anchor="start">Ω=${ascNodeNow.toFixed(1)}°</text>
       <!-- start balanced year marker + trough label -->
       <line x1="${toX(0).toFixed(1)}" y1="${pad.top}" x2="${toX(0).toFixed(1)}" y2="${Ht-pad.bot}" stroke="${textClr}" stroke-width="0.3" stroke-dasharray="2,3" opacity="0.5"/>
       <text x="${toX(0).toFixed(1)}" y="${pad.top - 5.5}" fill="${textClr}" font-size="5.5" text-anchor="middle" opacity="0.5">${troughLabel}</text>
@@ -37745,6 +37785,7 @@ function buildObliquityChart(currentYear) {
       <text x="${pad.left}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(startYear)}</text>
       <text x="${toX(H/2).toFixed(1)}" y="${Ht-2}" fill="#8FBC8F" font-size="7" text-anchor="middle">${fmtNum(H,0,',')} years</text>
       <text x="${W-pad.right}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(endYear)}</text>
+      <text x="${(+cx + (+cx > W * 0.7 ? -5 : 5)).toFixed(1)}" y="${(+cy - 5).toFixed(1)}" fill="rgba(235,100,100,0.85)" font-size="5.5" text-anchor="${+cx > W * 0.7 ? 'end' : 'start'}">Ω=${ascNodeNow.toFixed(1)}° ω̃=${periLongNowEarth.toFixed(1)}°</text>
     </svg>
   </div>`;
 }
@@ -37756,20 +37797,24 @@ function buildPerihelionChart(planetKey, currentYear) {
   // Planet lookup tables — uses ICRF perihelion periods for inclination oscillation
   const _gpr = 1 / (holisticyearLength / 13);
   const _icrfP = (k) => k === 'earth' ? holisticyearLength / 3 : 1 / (1 / planets[k].perihelionEclipticYears - _gpr);
+  // Ascending node periods from model-parameters.json (ascendingNodeCyclesIn8H), all retrograde
+  const _8Hs = 8 * holisticyearLength;
+  const _ascPeriod = (k) => planets[k].ascendingNodeCyclesIn8H ? -_8Hs / planets[k].ascendingNodeCyclesIn8H : planets[k].perihelionEclipticYears;
   const cfg = {
-    mercury: { period: _icrfP('mercury'), mean: planets.mercury.invPlaneInclinationMean, amp: planets.mercury.invPlaneInclinationAmplitude, periJ2000: planets.mercury.longitudePerihelion, phase: planets.mercury.inclinationPhaseAngle },
-    venus:   { period: _icrfP('venus'),   mean: planets.venus.invPlaneInclinationMean,   amp: planets.venus.invPlaneInclinationAmplitude,   periJ2000: planets.venus.longitudePerihelion,   phase: planets.venus.inclinationPhaseAngle },
-    mars:    { period: _icrfP('mars'),    mean: planets.mars.invPlaneInclinationMean,    amp: planets.mars.invPlaneInclinationAmplitude,    periJ2000: planets.mars.longitudePerihelion,    phase: planets.mars.inclinationPhaseAngle },
-    jupiter: { period: _icrfP('jupiter'), mean: planets.jupiter.invPlaneInclinationMean, amp: planets.jupiter.invPlaneInclinationAmplitude, periJ2000: planets.jupiter.longitudePerihelion, phase: planets.jupiter.inclinationPhaseAngle },
-    saturn:  { period: _icrfP('saturn'),  mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  periJ2000: planets.saturn.longitudePerihelion,  phase: planets.saturn.inclinationPhaseAngle, antiPhase: true },
-    uranus:  { period: _icrfP('uranus'),  mean: planets.uranus.invPlaneInclinationMean,  amp: planets.uranus.invPlaneInclinationAmplitude,  periJ2000: planets.uranus.longitudePerihelion,  phase: planets.uranus.inclinationPhaseAngle },
-    neptune: { period: _icrfP('neptune'), mean: planets.neptune.invPlaneInclinationMean, amp: planets.neptune.invPlaneInclinationAmplitude, periJ2000: planets.neptune.longitudePerihelion, phase: planets.neptune.inclinationPhaseAngle },
+    mercury: { period: _icrfP('mercury'), mean: planets.mercury.invPlaneInclinationMean, amp: planets.mercury.invPlaneInclinationAmplitude, periJ2000: planets.mercury.longitudePerihelion, phase: planets.mercury.inclinationPhaseAngle, omegaJ2000: planets.mercury.ascendingNodeInvPlane, ascPeriod: _ascPeriod('mercury') },
+    venus:   { period: _icrfP('venus'),   mean: planets.venus.invPlaneInclinationMean,   amp: planets.venus.invPlaneInclinationAmplitude,   periJ2000: planets.venus.longitudePerihelion,   phase: planets.venus.inclinationPhaseAngle,   omegaJ2000: planets.venus.ascendingNodeInvPlane,   ascPeriod: _ascPeriod('venus') },
+    mars:    { period: _icrfP('mars'),    mean: planets.mars.invPlaneInclinationMean,    amp: planets.mars.invPlaneInclinationAmplitude,    periJ2000: planets.mars.longitudePerihelion,    phase: planets.mars.inclinationPhaseAngle,    omegaJ2000: planets.mars.ascendingNodeInvPlane,    ascPeriod: _ascPeriod('mars') },
+    jupiter: { period: _icrfP('jupiter'), mean: planets.jupiter.invPlaneInclinationMean, amp: planets.jupiter.invPlaneInclinationAmplitude, periJ2000: planets.jupiter.longitudePerihelion, phase: planets.jupiter.inclinationPhaseAngle, omegaJ2000: planets.jupiter.ascendingNodeInvPlane, ascPeriod: _ascPeriod('jupiter') },
+    saturn:  { period: _icrfP('saturn'),  mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  periJ2000: planets.saturn.longitudePerihelion,  phase: planets.saturn.inclinationPhaseAngle,  omegaJ2000: planets.saturn.ascendingNodeInvPlane,  ascPeriod: _ascPeriod('saturn'), antiPhase: true },
+    uranus:  { period: _icrfP('uranus'),  mean: planets.uranus.invPlaneInclinationMean,  amp: planets.uranus.invPlaneInclinationAmplitude,  periJ2000: planets.uranus.longitudePerihelion,  phase: planets.uranus.inclinationPhaseAngle,  omegaJ2000: planets.uranus.ascendingNodeInvPlane,  ascPeriod: _ascPeriod('uranus') },
+    neptune: { period: _icrfP('neptune'), mean: planets.neptune.invPlaneInclinationMean, amp: planets.neptune.invPlaneInclinationAmplitude, periJ2000: planets.neptune.longitudePerihelion, phase: planets.neptune.inclinationPhaseAngle, omegaJ2000: planets.neptune.ascendingNodeInvPlane, ascPeriod: _ascPeriod('neptune') },
   };
   const p = cfg[planetKey];
   if (!p) return '';
 
   // Earth constants for ecliptic normal computation
-  const earthPeriod   = earthPerihelionICRFYears;  // H/3
+  const earthPeriod   = earthPerihelionICRFYears;  // H/3 (ICRF, for inclination)
+  const earthAscPeriod = -holisticyearLength / 5;  // ascending node regression
   const earthAscJ2000 = earthAscendingNodeInvPlaneVerified;
   const earthPhase    = earthInclinationPhaseAngle;
   const earthMean     = earthInvPlaneInclinationMean;
@@ -37796,20 +37841,24 @@ function buildPerihelionChart(planetKey, currentYear) {
     const sign = antiPhase ? -1 : 1;
     return mean + sign * amp * Math.cos((peri - phaseOff) * DEG2RAD);
   };
-  // Backward compat alias
-  const ascNodeAtYear = periAtYear;
+  // Ascending node uses ecliptic period (different from ICRF perihelion period)
+  // Earth: -H/5 (retrograde regression), others: ecliptic perihelion period
+  const ascNodeAtYear = (omegaJ2000, ascPeriod, ysb) => {
+    const rate = 360 / ascPeriod;
+    return omegaJ2000 - rate * yearsFromBalancedToJ2000 + rate * ysb;
+  };
 
   // Helper: compute ecliptic inclination (angle between planet and Earth orbital planes)
   const eclipticInclAtYear = (ysb) => {
     // Earth orbital plane normal
     const eIncl = inclAtYear(earthMean, earthAmp, earthAscJ2000, earthPeriod, earthPhase, ysb) * DEG2RAD;
-    const eOmega = ascNodeAtYear(earthAscJ2000, earthPeriod, ysb) * DEG2RAD;
+    const eOmega = ascNodeAtYear(earthAscJ2000, earthAscPeriod, ysb) * DEG2RAD;
     const enx = Math.sin(eIncl) * Math.sin(eOmega);
     const eny = Math.sin(eIncl) * Math.cos(eOmega);
     const enz = Math.cos(eIncl);
     // Planet orbital plane normal
     const pIncl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb, p.antiPhase) * DEG2RAD;
-    const pOmega = ascNodeAtYear(p.periJ2000, p.period, ysb) * DEG2RAD;
+    const pOmega = ascNodeAtYear(p.omegaJ2000, p.ascPeriod, ysb) * DEG2RAD;
     const pnx = Math.sin(pIncl) * Math.sin(pOmega);
     const pny = Math.sin(pIncl) * Math.cos(pOmega);
     const pnz = Math.cos(pIncl);
@@ -37875,6 +37924,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   const cx = toX(tNow).toFixed(1);
   const cy = toY(inclNow).toFixed(1);
   const ascNodeNow = ((o[planetKey + 'AscendingNodeInvPlane'] || 0) % 360 + 360) % 360;
+  const periLongNow = ((periAtYear(p.periJ2000, p.period, ysbNow) % 360) + 360) % 360;
 
   // Fixed reference marker at startmodelYear
   const tFixedRef = startmodelYear - balancedYear;
@@ -37883,7 +37933,8 @@ function buildPerihelionChart(planetKey, currentYear) {
   const ysbFixed = ysbStart + (fixedInWindow ? tFixed : 0);
   const inclFixed = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbFixed, p.antiPhase);
   const eclFixed  = eclipticInclAtYear(ysbFixed);
-  const ascNodeFixed = ((ascNodeAtYear(p.periJ2000, p.period, ysbFixed) % 360) + 360) % 360;
+  const ascNodeFixed = ((ascNodeAtYear(p.omegaJ2000, p.ascPeriod, ysbFixed) % 360) + 360) % 360;
+  const periLongFixed = ((periAtYear(p.periJ2000, p.period, ysbFixed) % 360) + 360) % 360;
   const fxX = toX(tFixed).toFixed(1);
   const fxY = toY(inclFixed).toFixed(1);
 
@@ -37924,17 +37975,19 @@ function buildPerihelionChart(planetKey, currentYear) {
     `Simulation year: ${fmtYr(curYear)}\n` +
     `Incl. to Inv. Plane: ${inclNow.toFixed(4)}°\n` +
     `Ecliptic Inclination: ${eclNow.toFixed(4)}°\n` +
-    `Ascending node (Ω): ${ascNodeNow.toFixed(2)}°`;
+    `Ascending node (Ω): ${ascNodeNow.toFixed(2)}°\n` +
+    `ICRF perihelion (ω̃): ${periLongNow.toFixed(2)}°`;
   const fixedTip =
     `Reference year: ${fmtYr(Math.round(startmodelYear))}\n` +
     `Incl. to Inv. Plane: ${inclFixed.toFixed(4)}°\n` +
     `Ecliptic Inclination: ${eclFixed.toFixed(4)}°\n` +
-    `Ascending node (Ω): ${ascNodeFixed.toFixed(2)}°`;
+    `Ascending node (Ω): ${ascNodeFixed.toFixed(2)}°\n` +
+    `ICRF perihelion (ω̃): ${periLongFixed.toFixed(2)}°`;
 
   return `<div class="pl-prec-viz" style="grid-column:1/-1; padding:4px 2px 2px;">
     <svg viewBox="0 0 ${W} ${Ht}" width="100%" style="display:block;overflow:visible;">
       <!-- title -->
-      <g style="cursor:help"><title>The orbital plane precesses around the invariable plane.\nThe ascending node (Ω) completes a full rotation over this cycle period.\nInclination oscillates as: i(t) = mean + amp × cos(Ω(t) − phase offset)</title>
+      <g style="cursor:help"><title>Inclination oscillates with the ICRF perihelion longitude.\nFormula: i(t) = mean + amp × cos(ω̃_ICRF(t) − phaseAngle)\nAscending node (Ω) regresses independently (Earth: −H/5).</title>
         <text x="${W/2}" y="8" fill="#8FBC8F" font-size="7.5" font-weight="600" text-anchor="middle">Orbital Plane Precession Cycle</text>
       </g>
       <!-- legend -->
@@ -37988,12 +38041,12 @@ function buildPerihelionChart(planetKey, currentYear) {
       <g style="cursor:pointer"><title>${simTip}</title>
         <circle cx="${cx}" cy="${cy}" r="3" fill="rgba(235,100,100,0.9)" stroke="${dotClr}" stroke-width="0.8"/>
         <circle cx="${cx}" cy="${cy}" r="8" fill="transparent"/>
-      </g>
-      <text x="${(+cx + 5).toFixed(1)}" y="${(+cy - 5).toFixed(1)}" fill="rgba(235,100,100,0.85)" font-size="5.5" text-anchor="start">Ω=${ascNodeNow.toFixed(1)}°</text>` : ''}
+      </g>` : ''}
       <!-- X labels -->
       <text x="${pad.left}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(Math.round(balancedYear + ysbStart))}</text>
       <text x="${toX(absPeriod/2).toFixed(1)}" y="${Ht-2}" fill="#8FBC8F" font-size="7" text-anchor="middle">${fmtNum(absPeriod,0,',')} years</text>
       <text x="${W-pad.right}" y="${Ht-2}" fill="${textClr}" font-size="6" text-anchor="middle">${fmtYr(Math.round(balancedYear + ysbStart + absPeriod))}</text>
+      ${simInWindow ? `<text x="${(+cx + (+cx > W * 0.7 ? -5 : 5)).toFixed(1)}" y="${(+cy - 5).toFixed(1)}" fill="rgba(235,100,100,0.85)" font-size="5.5" text-anchor="${+cx > W * 0.7 ? 'end' : 'start'}">Ω=${ascNodeNow.toFixed(1)}° ω̃=${periLongNow.toFixed(1)}°</text>` : ''}
     </svg>
   </div>`;
 }
@@ -40912,16 +40965,19 @@ function updatePlanetInvariablePlaneHeights() {
 
   // Planet configuration for invariable plane calculations
   // Each entry includes: key, planetObj, inclToInvPlane, ascNodeAtJ2000 (Souami & Souchay), ascNodeJ2000Verified, precessionPeriodYears
-  // Precession uses <planet>PerihelionEclipticYears constants (earthPerihelionICRFYears for Earth)
+  // Ascending node periods: from ascendingNodeCyclesIn8H in model-parameters.json (all retrograde)
+  // Earth: -H/5 (La2010). Minor bodies: use ecliptic perihelion period as fallback.
+  const _8H = 8 * holisticyearLength;
+  const _ascP = (k) => planets[k].ascendingNodeCyclesIn8H ? -_8H / planets[k].ascendingNodeCyclesIn8H : planets[k].perihelionEclipticYears;
   const planetConfigs = [
-    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || planets.mercury.invPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.mercury.ascendingNodeInvPlane, precessionYears: planets.mercury.perihelionEclipticYears },
-    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || planets.venus.invPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: planets.venus.ascendingNodeInvPlane,   precessionYears: planets.venus.perihelionEclipticYears },
-    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,   ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: earthPerihelionICRFYears },
-    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || planets.mars.invPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: planets.mars.ascendingNodeInvPlane,    precessionYears: planets.mars.perihelionEclipticYears },
-    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || planets.jupiter.invPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.jupiter.ascendingNodeInvPlane, precessionYears: planets.jupiter.perihelionEclipticYears },
-    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || planets.saturn.invPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.saturn.ascendingNodeInvPlane,  precessionYears: planets.saturn.perihelionEclipticYears },
-    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || planets.uranus.invPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.uranus.ascendingNodeInvPlane,  precessionYears: planets.uranus.perihelionEclipticYears },
-    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || planets.neptune.invPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.neptune.ascendingNodeInvPlane, precessionYears: planets.neptune.perihelionEclipticYears },
+    { key: 'mercury', obj: mercury, getIncl: () => o.mercuryInvPlaneInclinationDynamic || planets.mercury.invPlaneInclinationJ2000, ascNodeJ2000: mercuryAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.mercury.ascendingNodeInvPlane, precessionYears: _ascP('mercury') },
+    { key: 'venus',   obj: venus,   getIncl: () => o.venusInvPlaneInclinationDynamic   || planets.venus.invPlaneInclinationJ2000,   ascNodeJ2000: venusAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: planets.venus.ascendingNodeInvPlane,   precessionYears: _ascP('venus') },
+    { key: 'earth',   obj: null,    getIncl: () => o.earthInvPlaneInclinationDynamic   || earthInvPlaneInclinationJ2000,             ascNodeJ2000: earthAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: earthAscendingNodeInvPlaneVerified,   precessionYears: -holisticyearLength / 5 },  // -H/5 (La2010)
+    { key: 'mars',    obj: mars,    getIncl: () => o.marsInvPlaneInclinationDynamic    || planets.mars.invPlaneInclinationJ2000,    ascNodeJ2000: marsAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: planets.mars.ascendingNodeInvPlane,    precessionYears: _ascP('mars') },
+    { key: 'jupiter', obj: jupiter, getIncl: () => o.jupiterInvPlaneInclinationDynamic || planets.jupiter.invPlaneInclinationJ2000, ascNodeJ2000: jupiterAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.jupiter.ascendingNodeInvPlane, precessionYears: _ascP('jupiter') },
+    { key: 'saturn',  obj: saturn,  getIncl: () => o.saturnInvPlaneInclinationDynamic  || planets.saturn.invPlaneInclinationJ2000,  ascNodeJ2000: saturnAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.saturn.ascendingNodeInvPlane,  precessionYears: _ascP('saturn') },
+    { key: 'uranus',  obj: uranus,  getIncl: () => o.uranusInvPlaneInclinationDynamic  || planets.uranus.invPlaneInclinationJ2000,  ascNodeJ2000: uranusAscendingNodeInvPlaneSouamiSouchay,  ascNodeJ2000Verified: planets.uranus.ascendingNodeInvPlane,  precessionYears: _ascP('uranus') },
+    { key: 'neptune', obj: neptune, getIncl: () => o.neptuneInvPlaneInclinationDynamic || planets.neptune.invPlaneInclinationJ2000, ascNodeJ2000: neptuneAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.neptune.ascendingNodeInvPlane, precessionYears: _ascP('neptune') },
     { key: 'pluto',   obj: pluto,   getIncl: () => o.plutoInvPlaneInclinationDynamic   || planets.pluto.invPlaneInclinationJ2000,   ascNodeJ2000: plutoAscendingNodeInvPlaneSouamiSouchay,   ascNodeJ2000Verified: planets.pluto.ascendingNodeInvPlane,   precessionYears: planets.pluto.perihelionEclipticYears },
     { key: 'halleys', obj: halleys, getIncl: () => o.halleysInvPlaneInclinationDynamic || planets.halleys.invPlaneInclinationJ2000, ascNodeJ2000: halleysAscendingNodeInvPlaneSouamiSouchay, ascNodeJ2000Verified: planets.halleys.ascendingNodeInvPlane, precessionYears: planets.halleys.perihelionEclipticYears },
     { key: 'eros',    obj: eros,    getIncl: () => o.erosInvPlaneInclinationDynamic    || planets.eros.invPlaneInclinationJ2000,    ascNodeJ2000: erosAscendingNodeInvPlaneSouamiSouchay,    ascNodeJ2000Verified: planets.eros.ascendingNodeInvPlane,    precessionYears: planets.eros.perihelionEclipticYears }

@@ -143,6 +143,8 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     fibonacciD: mp.fibonacciD,
     ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
     inclinationPhaseAngle: mp.inclinationPhaseAngle,
+    ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
+    ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
     obliquityCycle: fractionToYears(mp.obliquityCycleFraction),
     // Astro references (from astro-reference.json)
     solarYearInput: ar.solarYearInput,

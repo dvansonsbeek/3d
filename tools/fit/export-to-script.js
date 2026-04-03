@@ -83,6 +83,8 @@ for (const [key, p] of Object.entries(mp.planets)) {
   for (const prop of [
     'orbitalEccentricityBase', 'orbitalEccentricityAmplitude',
     'eccentricityPhaseJ2000', 'eocFraction', 'startpos', 'angleCorrection',
+    'ascendingNodeInvPlane', 'inclinationPhaseAngle',
+    'ascendingNodeCyclesIn8H',
   ]) {
     if (p[prop] !== undefined) replacePlanetProp(key, prop, p[prop]);
   }
