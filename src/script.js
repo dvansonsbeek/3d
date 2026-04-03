@@ -1512,8 +1512,9 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
   const p = planets[key];
   if (p && _fibD[key] && _massFrac[key]) {
     p.invPlaneInclinationAmplitude = psiConstant / (_fibD[key] * Math.sqrt(_massFrac[key]));
+    const _antiPhase = (key === 'saturn') ? -1 : 1;
     p.invPlaneInclinationMean = p.invPlaneInclinationJ2000
-      - p.invPlaneInclinationAmplitude * Math.cos((p.longitudePerihelion - p.inclinationPhaseAngle) * Math.PI / 180);
+      - _antiPhase * p.invPlaneInclinationAmplitude * Math.cos((p.longitudePerihelion - p.inclinationPhaseAngle) * Math.PI / 180);
   }
 }
 
@@ -37760,7 +37761,7 @@ function buildPerihelionChart(planetKey, currentYear) {
     venus:   { period: _icrfP('venus'),   mean: planets.venus.invPlaneInclinationMean,   amp: planets.venus.invPlaneInclinationAmplitude,   periJ2000: planets.venus.longitudePerihelion,   phase: planets.venus.inclinationPhaseAngle },
     mars:    { period: _icrfP('mars'),    mean: planets.mars.invPlaneInclinationMean,    amp: planets.mars.invPlaneInclinationAmplitude,    periJ2000: planets.mars.longitudePerihelion,    phase: planets.mars.inclinationPhaseAngle },
     jupiter: { period: _icrfP('jupiter'), mean: planets.jupiter.invPlaneInclinationMean, amp: planets.jupiter.invPlaneInclinationAmplitude, periJ2000: planets.jupiter.longitudePerihelion, phase: planets.jupiter.inclinationPhaseAngle },
-    saturn:  { period: _icrfP('saturn'),  mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  periJ2000: planets.saturn.longitudePerihelion,  phase: planets.saturn.inclinationPhaseAngle },
+    saturn:  { period: _icrfP('saturn'),  mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  periJ2000: planets.saturn.longitudePerihelion,  phase: planets.saturn.inclinationPhaseAngle, antiPhase: true },
     uranus:  { period: _icrfP('uranus'),  mean: planets.uranus.invPlaneInclinationMean,  amp: planets.uranus.invPlaneInclinationAmplitude,  periJ2000: planets.uranus.longitudePerihelion,  phase: planets.uranus.inclinationPhaseAngle },
     neptune: { period: _icrfP('neptune'), mean: planets.neptune.invPlaneInclinationMean, amp: planets.neptune.invPlaneInclinationAmplitude, periJ2000: planets.neptune.longitudePerihelion, phase: planets.neptune.inclinationPhaseAngle },
   };
@@ -37790,9 +37791,10 @@ function buildPerihelionChart(planetKey, currentYear) {
   };
 
   // Helper: compute inclination to inv. plane at arbitrary yearsSinceBalanced
-  const inclAtYear = (mean, amp, periJ2000, period, phaseOff, ysb) => {
+  const inclAtYear = (mean, amp, periJ2000, period, phaseOff, ysb, antiPhase = false) => {
     const peri = periAtYear(periJ2000, period, ysb);
-    return mean + amp * Math.cos((peri - phaseOff) * DEG2RAD);
+    const sign = antiPhase ? -1 : 1;
+    return mean + sign * amp * Math.cos((peri - phaseOff) * DEG2RAD);
   };
   // Backward compat alias
   const ascNodeAtYear = periAtYear;
@@ -37806,7 +37808,7 @@ function buildPerihelionChart(planetKey, currentYear) {
     const eny = Math.sin(eIncl) * Math.cos(eOmega);
     const enz = Math.cos(eIncl);
     // Planet orbital plane normal
-    const pIncl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb) * DEG2RAD;
+    const pIncl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb, p.antiPhase) * DEG2RAD;
     const pOmega = ascNodeAtYear(p.periJ2000, p.period, ysb) * DEG2RAD;
     const pnx = Math.sin(pIncl) * Math.sin(pOmega);
     const pny = Math.sin(pIncl) * Math.cos(pOmega);
@@ -37836,7 +37838,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   // Pre-scan for Y range
   for (let i = 0; i <= steps; i++) {
     const ysb = ysbStart + (i / steps) * absPeriod;
-    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb);
+    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb, p.antiPhase);
     const ecl  = eclipticInclAtYear(ysb);
     const lo = Math.min(incl, ecl), hi = Math.max(incl, ecl);
     if (lo < yMin) yMin = lo;
@@ -37856,7 +37858,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   for (let i = 0; i <= steps; i++) {
     const t = (i / steps) * absPeriod;
     const ysb = ysbStart + t;
-    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb);
+    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb, p.antiPhase);
     const ecl  = eclipticInclAtYear(ysb);
     const cmd = i === 0 ? 'M' : 'L';
     const x = toX(t).toFixed(1);
@@ -37868,7 +37870,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   const tNow = tRef - ysbStart;
   const simInWindow = tNow >= 0 && tNow <= absPeriod;
   const ysbNow = ysbStart + (simInWindow ? tNow : 0);
-  const inclNow = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbNow);
+  const inclNow = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbNow, p.antiPhase);
   const eclNow  = eclipticInclAtYear(ysbNow);
   const cx = toX(tNow).toFixed(1);
   const cy = toY(inclNow).toFixed(1);
@@ -37879,7 +37881,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   const tFixed = tFixedRef - ysbStart;
   const fixedInWindow = tFixed >= 0 && tFixed <= absPeriod;
   const ysbFixed = ysbStart + (fixedInWindow ? tFixed : 0);
-  const inclFixed = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbFixed);
+  const inclFixed = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbFixed, p.antiPhase);
   const eclFixed  = eclipticInclAtYear(ysbFixed);
   const ascNodeFixed = ((ascNodeAtYear(p.periJ2000, p.period, ysbFixed) % 360) + 360) % 360;
   const fxX = toX(tFixed).toFixed(1);
@@ -42836,7 +42838,9 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
 
   // Dynamic inclination centered on the mean
-  return i_mean + amplitude * Math.cos(currentPhaseRad);
+  // Saturn is anti-phase: cos sign flipped (MAX at balanced year, others at MIN)
+  const antiPhaseSign = (planet === 'saturn') ? -1 : 1;
+  return i_mean + antiPhaseSign * amplitude * Math.cos(currentPhaseRad);
 }
 
 /**

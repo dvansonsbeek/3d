@@ -582,7 +582,8 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   const currentPhaseDeg = periCurrent - phaseOffset;
   const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
 
-  return i_mean + amplitude * Math.cos(currentPhaseRad);
+  const antiPhaseSign = (planetName === 'saturn') ? -1 : 1;
+  return i_mean + antiPhaseSign * amplitude * Math.cos(currentPhaseRad);
 }
 
 /**

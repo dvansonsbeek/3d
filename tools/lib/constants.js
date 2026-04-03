@@ -354,7 +354,7 @@ for (const [key, p] of Object.entries(planets)) {
     p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
     p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
       p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
-      p.longitudePerihelion, p.inclinationPhaseAngle);
+      p.longitudePerihelion, p.inclinationPhaseAngle, key === 'saturn');
   }
 }
 

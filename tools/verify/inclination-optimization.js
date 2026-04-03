@@ -222,7 +222,8 @@ function computePlanet(key) {
   if (fibAmplitude !== null) {
     // Fibonacci-derived: amplitude is known, compute mean from J2000 constraint
     amplitude = fibAmplitude;
-    mean = inclJ2000 - amplitude * cosPhaseJ2000;
+    const antiPhaseSign = input.antiPhase ? -1 : 1;
+    mean = inclJ2000 - antiPhaseSign * amplitude * cosPhaseJ2000;
     source = 'Fibonacci';
   } else {
     // Pluto: no Fibonacci theory, optimize for maximum amplitude within LL bounds
@@ -244,7 +245,8 @@ function computePlanet(key) {
   }
 
   // Verify J2000 match
-  const i2000_check = mean + amplitude * cosPhaseJ2000;
+  const antiSign2 = input.antiPhase ? -1 : 1;
+  const i2000_check = mean + antiSign2 * amplitude * cosPhaseJ2000;
 
   // Check LL bounds
   const rangeMin = mean - amplitude;

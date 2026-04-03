@@ -371,14 +371,24 @@ def calc_planet_ascending_node(planet: str, year: int) -> float:
     return (omega0 + 360.0 * (year - J2000) / period) % 360
 
 
+def calc_planet_perihelion_icrf(planet: str, year: int) -> float:
+    """
+    Calculate planet's ICRF perihelion longitude at given year (degrees).
+    Used as reference angle for inclination oscillation.
+    """
+    peri0 = LONGITUDE_PERIHELION[planet]
+    period = INCL_PERIOD[planet]
+    return (peri0 + 360.0 * (year - J2000) / period) % 360
+
+
 def calc_planet_inclination(planet: str, year: int) -> float:
     """
     Calculate planet's inclination to the invariable plane (degrees).
 
-    Formula: i(t) = mean + amplitude × cos(Ω(t) - phaseAngle)
+    Formula: i(t) = mean + sign × amplitude × cos(ω̃_ICRF(t) - phaseAngle)
 
-    The inclination oscillates as the ascending node precesses around
-    the invariable plane. Amplitude is derived from ψ/(d×√m).
+    The inclination oscillates with the ICRF perihelion longitude.
+    Saturn is anti-phase (sign = -1). Amplitude is derived from ψ/(d×√m).
 
     Args:
         planet: Planet name (e.g. 'Mercury')
@@ -386,11 +396,12 @@ def calc_planet_inclination(planet: str, year: int) -> float:
 
     Returns: Inclination in degrees
     """
-    omega = calc_planet_ascending_node(planet, year)
+    peri = calc_planet_perihelion_icrf(planet, year)
     mean = INCL_MEAN[planet]
     amp = INCL_AMP[planet]
     phase = INCL_PHASE_ANGLE[planet]
-    return mean + amp * math.cos(math.radians(omega - phase))
+    sign = -1 if planet == 'Saturn' else 1
+    return mean + sign * amp * math.cos(math.radians(peri - phase))
 
 
 def calc_planet_eccentricity(planet: str, year: int) -> float:

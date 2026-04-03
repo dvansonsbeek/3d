@@ -37,10 +37,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from constants_scripts import (
     PLANET_NAMES, MASS, SQRT_M, SEMI_MAJOR, D, H, FIB,
     ECC_J2000, ECC_BASE, ECC_DUAL_BALANCED, ECCENTRICITIES,
-    INCL_J2000, OMEGA_J2000, INCL_AMP, INCL_PERIOD,
+    INCL_J2000, OMEGA_J2000, INCL_AMP, INCL_PERIOD, INCL_PHASE_ANGLE,
+    LONGITUDE_PERIHELION,
     PHASE_GROUP, GROUP_203, GROUP_23,
     PSI, MIRROR_PAIRS,
     BALANCE_YEAR, J2000_YEAR,
+    compute_mean_inclination,
 )
 
 
@@ -701,62 +703,61 @@ for p in PLANET_NAMES:
     amp = INCL_AMP[p]
     phase = INCL_PHASE_ANGLE[p]
     sign = -1 if p == 'Saturn' else 1
-    cos_phase = math.cos(math.radians(LONGITUDE_PERIHELION[p] - phase))
+    peri_j2000 = LONGITUDE_PERIHELION[p]
+    cos_phase = math.cos(math.radians(peri_j2000 - phase))
     i_mean = INCL_J2000[p] - sign * amp * cos_phase
     print(f"  {p:10s}  {INCL_J2000[p]:8.4f}°  {amp:8.4f}°  {i_mean:8.4f}°  "
-          f"{phase_j2000:+12.2f}°  {cos_phase:+8.4f}")
+          f"{peri_j2000 - phase:+12.2f}°  {cos_phase:+8.4f}")
 
 print()
-print("  Known balance year positions (from 3D model):")
-print("    Earth:   perihelion = 270°, ascending node = 90°")
-print("    Jupiter: perihelion = 180°, ascending node = 117.5°")
-print("    Saturn:  perihelion = 187.3°, ascending node = 215.3°")
+print("  At the balanced year (~302,635 BC), prograde planets are at MIN inclination")
+print("  and Saturn (anti-phase) is at MAX inclination.")
+print("  The ICRF perihelion at balanced year = phaseAngle + 180° (for prograde)")
+print("  because cos(180°) = -1 → i = mean + amp×(-1) = mean - amp = MIN")
 print()
 
 # Earth at balanced year
-earth_phi_group = PHASE_ANGLE
-earth_phase_bal = 90.0 - earth_phi_group
-earth_cos_bal = math.cos(math.radians(earth_phase_bal))
+earth_phase = INCL_PHASE_ANGLE["Earth"]
+earth_peri_bal = earth_phase + 180  # at MIN, ω̃ is 180° from phase
+earth_cos_bal = math.cos(math.radians(earth_peri_bal - earth_phase))  # = cos(180°) = -1
 earth_amp = INCL_AMP["Earth"]
-earth_i_mean = INCL_J2000["Earth"] - earth_amp * math.cos(math.radians(OMEGA_J2000["Earth"] - earth_phi_group))
-earth_i_bal = earth_i_mean + earth_amp * earth_cos_bal
+earth_i_mean = compute_mean_inclination("Earth")
+earth_i_bal = earth_i_mean + earth_amp * earth_cos_bal  # = mean - amp = MIN
 
 print(f"  Earth at balanced year:")
-print(f"    Ω_bal = 90°, φ_group = {earth_phi_group:.2f}°")
-print(f"    Phase = Ω_bal - φ = {earth_phase_bal:.2f}°")
-print(f"    cos(phase) = {earth_cos_bal:.4f}")
+print(f"    Phase angle = {earth_phase:.2f}°, ω̃_bal = {earth_peri_bal:.2f}°")
+print(f"    cos(ω̃_bal - phase) = {earth_cos_bal:.4f}")
 print(f"    i_mean = {earth_i_mean:.4f}°, amp = {earth_amp:.4f}°")
-print(f"    i_bal = i_mean + amp×cos = {earth_i_bal:.4f}° (vs J2000: {INCL_J2000['Earth']:.4f}°)")
+print(f"    i_bal = mean + amp×cos = {earth_i_bal:.4f}° = MIN = mean - amp")
 print()
 
 # Jupiter at balanced year
-jup_phi_group = PHASE_ANGLE
-jup_phase_bal = 117.5 - jup_phi_group
-jup_cos_bal = math.cos(math.radians(jup_phase_bal))
+jup_phase = INCL_PHASE_ANGLE["Jupiter"]
+jup_peri_bal = jup_phase + 180
+jup_cos_bal = math.cos(math.radians(jup_peri_bal - jup_phase))
 jup_amp = INCL_AMP["Jupiter"]
-jup_i_mean = INCL_J2000["Jupiter"] - jup_amp * math.cos(math.radians(OMEGA_J2000["Jupiter"] - jup_phi_group))
+jup_i_mean = compute_mean_inclination("Jupiter")
 jup_i_bal = jup_i_mean + jup_amp * jup_cos_bal
 
 print(f"  Jupiter at balanced year:")
-print(f"    Ω_bal = 117.5°, φ_group = {jup_phi_group:.2f}°")
-print(f"    Phase = Ω_bal - φ = {jup_phase_bal:.2f}°")
-print(f"    cos(phase) = {jup_cos_bal:.4f}")
-print(f"    i_bal = {jup_i_bal:.4f}° (vs J2000: {INCL_J2000['Jupiter']:.4f}°)")
+print(f"    Phase angle = {jup_phase:.2f}°, ω̃_bal = {jup_peri_bal:.2f}°")
+print(f"    cos(ω̃_bal - phase) = {jup_cos_bal:.4f}")
+print(f"    i_bal = {jup_i_bal:.4f}° = MIN = mean - amp")
 print()
 
-# Saturn at balanced year
-sat_phi_group = PHASE_ANGLE - 180
-sat_phase_bal = 215.3 - sat_phi_group
-sat_cos_bal = math.cos(math.radians(sat_phase_bal))
+# Saturn at balanced year (anti-phase: MAX at balanced year)
+sat_phase = INCL_PHASE_ANGLE["Saturn"]
+sat_peri_bal = sat_phase + 180  # same geometry, but sign flipped → MAX
+sat_cos_bal = math.cos(math.radians(sat_peri_bal - sat_phase))
 sat_amp = INCL_AMP["Saturn"]
-sat_i_mean = INCL_J2000["Saturn"] - sat_amp * math.cos(math.radians(OMEGA_J2000["Saturn"] - sat_phi_group))
-sat_i_bal = sat_i_mean + sat_amp * sat_cos_bal
+sat_i_mean = compute_mean_inclination("Saturn")
+sat_sign = -1
+sat_i_bal = sat_i_mean + sat_sign * sat_amp * sat_cos_bal  # = mean - (-1)*amp*(-1) = mean + amp = MAX
 
-print(f"  Saturn at balanced year:")
-print(f"    Ω_bal = 215.3°, φ_group = {sat_phi_group:.2f}°")
-print(f"    Phase = Ω_bal - φ = {sat_phase_bal:.2f}°")
-print(f"    cos(phase) = {sat_cos_bal:.4f}")
-print(f"    i_bal = {sat_i_bal:.4f}° (vs J2000: {INCL_J2000['Saturn']:.4f}°)")
+print(f"  Saturn at balanced year (anti-phase):")
+print(f"    Phase angle = {sat_phase:.2f}°, ω̃_bal = {sat_peri_bal:.2f}°")
+print(f"    cos(ω̃_bal - phase) = {sat_cos_bal:.4f}")
+print(f"    i_bal = {sat_i_bal:.4f}° = MAX = mean + amp")
 
 # ψ-constant at balanced year
 print()

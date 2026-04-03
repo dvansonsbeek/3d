@@ -131,8 +131,9 @@ function computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction) {
  * @param {number} inclinationPhaseAngle - Phase angle for inclination oscillation (degrees)
  * @returns {number} Mean inclination in degrees
  */
-function computeInvPlaneInclinationMean(inclJ2000, amplitude, longitudePerihelion, inclinationPhaseAngle) {
-  return inclJ2000 - amplitude * Math.cos((longitudePerihelion - inclinationPhaseAngle) * Math.PI / 180);
+function computeInvPlaneInclinationMean(inclJ2000, amplitude, longitudePerihelion, inclinationPhaseAngle, antiPhase = false) {
+  const sign = antiPhase ? -1 : 1;
+  return inclJ2000 - sign * amplitude * Math.cos((longitudePerihelion - inclinationPhaseAngle) * Math.PI / 180);
 }
 
 /**

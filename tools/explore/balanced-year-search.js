@@ -95,7 +95,8 @@ function evaluateBalancedYear(testBY) {
     const phaseAngle = p.antiPhase ? periAtBY : ((periAtBY - 180 + 360) % 360);
 
     const cosJ2000 = Math.cos((p.periLong - phaseAngle) * DEG2RAD);
-    const mean = p.inclJ2000 - p.amp * cosJ2000;
+    const antiSign = p.antiPhase ? -1 : 1;
+    const mean = p.inclJ2000 - antiSign * p.amp * cosJ2000;
     const minIncl = mean - p.amp;
     const maxIncl = mean + p.amp;
     const ll = llBounds[key];
@@ -107,7 +108,8 @@ function evaluateBalancedYear(testBY) {
     if (key !== 'earth') {
       function getPlanetIncl(year) {
         const peri = p.periLong + p.icrfRate * (year - 2000);
-        return mean + p.amp * Math.cos((peri - phaseAngle) * DEG2RAD);
+        const sign = p.antiPhase ? -1 : 1;
+        return mean + sign * p.amp * Math.cos((peri - phaseAngle) * DEG2RAD);
       }
 
       function calcEclipticIncl(year) {

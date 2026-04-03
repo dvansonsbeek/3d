@@ -361,7 +361,8 @@ for (const [key, p] of Object.entries(planets)) {
   const phase = antiPhase ? periAtBY : ((periAtBY - 180 + 360) % 360);
   const periLong = key === 'earth' ? 102.947 : C.planets[key].longitudePerihelion;
   const cosJ2000 = Math.cos((periLong - phase) * DEG2RAD);
-  const mean = inclJ2000 - amp * cosJ2000;
+  const antiSign = antiPhase ? -1 : 1;
+  const mean = inclJ2000 - antiSign * amp * cosJ2000;
   const state = antiPhase ? 'MAX ↑' : 'MIN ↓';
 
   console.log('   ' + p.name.padEnd(10) + ' │ ' +

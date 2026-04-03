@@ -165,7 +165,8 @@ for (const key of planets) {
   amplitudes[key] = amplitude;
 
   const cosPhaseJ2000 = Math.cos((periLongJ2000[key] - config[key].phase) * DEG2RAD);
-  const mean = inclJ2000[key] - amplitude * cosPhaseJ2000;
+  const antiPhaseSign = (key === 'saturn') ? -1 : 1;
+  const mean = inclJ2000[key] - antiPhaseSign * amplitude * cosPhaseJ2000;
   means[key] = mean;
 
   const rangeMin = mean - amplitude;
@@ -680,7 +681,8 @@ console.log('─'.repeat(60));
 
 for (const key of planets) {
   const cosPhase = Math.cos((periLongJ2000[key] - config[key].phase) * DEG2RAD);
-  const modelI = means[key] + amplitudes[key] * cosPhase;
+  const antiSign = (key === 'saturn') ? -1 : 1;
+  const modelI = means[key] + antiSign * amplitudes[key] * cosPhase;
   const diff = (modelI - inclJ2000[key]) * 3600; // arcsec
   console.log(
     `${key.padEnd(12)} ${modelI.toFixed(7).padStart(12)}°  ${inclJ2000[key].toFixed(7).padStart(12)}°  ${diff.toFixed(4).padStart(12)}"`

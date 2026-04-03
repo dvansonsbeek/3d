@@ -620,8 +620,9 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
     + icrfRate * yearsSinceBalanced;
 
   const planetPhaseDeg = periICRFDeg - p.inclinationPhaseAngle;
+  const antiPhaseSign = (key === 'saturn') ? -1 : 1;
   const planetI = (p.invPlaneInclinationMean
-    + p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+    + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
   // Ω direction for plane normal (ecliptic ascending node rate, geometric)
   const planetOmegaRate = 360 / p.perihelionEclipticYears;

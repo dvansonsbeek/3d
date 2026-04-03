@@ -19,7 +19,8 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const planetOmegaDeg = p.ascendingNodeInvPlane - planetOmegaRate * C.yearsFromBalancedToJ2000 + planetOmegaRate * yearsSinceBalanced;
   const planetOmega = planetOmegaDeg * d2r;
   const planetPhaseDeg = planetOmegaDeg - p.inclinationPhaseAngle;
-  const planetI = (p.invPlaneInclinationMean + p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+  const antiSign = (key === 'saturn') ? -1 : 1;
+  const planetI = (p.invPlaneInclinationMean + antiSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
   const eNx = Math.sin(earthI) * Math.sin(earthOmega);
   const eNy = Math.sin(earthI) * Math.cos(earthOmega);

@@ -122,7 +122,8 @@ function computeResults(testBY) {
       : ((periAtBY - 180 + 360) % 360);
 
     const cosJ2000 = Math.cos((p.periLong - phaseAngle) * DEG2RAD);
-    const mean = p.inclJ2000 - p.amp * cosJ2000;
+    const antiSign = p.antiPhase ? -1 : 1;
+    const mean = p.inclJ2000 - antiSign * p.amp * cosJ2000;
     const minIncl = mean - p.amp;
     const maxIncl = mean + p.amp;
     const ll = llBounds[key];
@@ -219,9 +220,10 @@ console.log('──────────────────────�
 console.log('');
 for (const [key, p] of Object.entries(planetData)) {
   const r = results[key];
-  const j2000check = r.mean + p.amp * r.cosJ2000;
+  const antiSign = p.antiPhase ? -1 : 1;
+  const j2000check = r.mean + antiSign * p.amp * r.cosJ2000;
   const cosAtBY = Math.cos((r.periAtBY - r.phaseAngle) * DEG2RAD);
-  const iAtBY = r.mean + p.amp * cosAtBY;
+  const iAtBY = r.mean + antiSign * p.amp * cosAtBY;
   const expectedBY = p.antiPhase ? r.maxIncl : r.minIncl;
   const labelBY = p.antiPhase ? 'MAX' : 'MIN';
   console.log('   ' + p.name + ':');

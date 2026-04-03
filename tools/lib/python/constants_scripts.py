@@ -527,5 +527,6 @@ def compute_mean_inclination(planet):
     i_j2000 = INCL_J2000[planet]
     peri_long = LONGITUDE_PERIHELION[planet]
     phase = INCL_PHASE_ANGLE[planet]
-    mean = i_j2000 - amp * math.cos(math.radians(peri_long - phase))
+    sign = -1 if planet == 'Saturn' else 1
+    mean = i_j2000 - sign * amp * math.cos(math.radians(peri_long - phase))
     return mean
