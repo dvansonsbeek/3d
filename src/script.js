@@ -45,7 +45,7 @@ const eccentricityAmplitude = 0.0013561739066062727;      // Solved: e(J2000) = 
 const eccentricityAmplitudeK = 0.0000034149201315866186;           // Universal tilt-eccentricity coupling
 const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
-const earthInclinationPhaseAngle = 203.3195;              // 203° balance group (reference)
+const earthInclinationPhaseAngle = 21.77;                  // Phase angle: ω̃_ICRF at max inclination (from balanced year)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C. ASTRO REFERENCES (source: public/input/astro-reference.json)
@@ -129,7 +129,7 @@ planets.mercury = {
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 99.52,
 };
 
 // Venus
@@ -155,7 +155,7 @@ planets.venus = {
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 79.82,
 };
 
 // Mars
@@ -175,13 +175,13 @@ planets.mars = {
   orbitalEccentricityAmplitude: 0.003041895556616812,
   eccentricityPhaseJ2000: 96.98363594881995,
   angleCorrection: -2.1093711045845396,
-  perihelionEclipticYears: holisticyearLength/(4+(1/3)),
+  perihelionEclipticYears: holisticyearLength/(4+(3/8)),
   axialPrecessionYears: -holisticyearLength/2,
   startpos: 121.47516084503593,
   eocFraction: -0.066224,
   perihelionRef_JD: 2456499.441,
   ascendingNodeInvPlane: 354.87,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 96.95,
 };
 
 // Jupiter
@@ -207,7 +207,7 @@ planets.jupiter = {
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 291.18,
 };
 
 // Saturn
@@ -233,7 +233,7 @@ planets.saturn = {
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
-  inclinationPhaseAngle: 23.3195,
+  inclinationPhaseAngle: 120.38,
 };
 
 // Uranus
@@ -259,7 +259,7 @@ planets.uranus = {
   eocFraction: 0.53,
   perihelionRef_JD: 2439699.8,
   ascendingNodeInvPlane: 307.80,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 21.33,
 };
 
 // Neptune
@@ -285,7 +285,7 @@ planets.neptune = {
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
-  inclinationPhaseAngle: 203.3195,
+  inclinationPhaseAngle: 354.04,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -375,9 +375,7 @@ planets.ceres = {
 // Derived phase offset for inclination path alignment with zodiac
 // The earthInvPlaneInclinationMean correction accounts for the projection offset when measuring
 // angles across two planes (ecliptic vs invariable plane) - the compound angle geometry
-// causes a systematic offset approximately equal to the current inclination.
-// Formula: 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - <number 1.5 - 2 >
-const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) - 2;
+// inclinationPathZodiacOffsetDeg: moved after ASTRO_REFERENCE definition (see ~line 1282)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // B. FITTED COEFFICIENTS (source: public/input/fitted-coefficients.json)
@@ -1275,8 +1273,11 @@ const ASTRO_REFERENCE = {
 // ─────────────────────────────────────────────────────────────────────────
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = 2 * earthInvPlaneInclinationAmplitude - earthInvPlaneInclinationAmplitude * earthInvPlaneInclinationAmplitude / earthtiltMean;
-// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle), where Ω=284.51° (Souami & Souchay), phaseAngle=203.3195°
-const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((earthAscendingNodeInvPlaneVerified - earthInclinationPhaseAngle) * Math.PI / 180);
+// Derived: inclJ2000 − amplitude × cos(ω̃_J2000 − phaseAngle), using perihelion longitude (ICRF)
+const earthInvPlaneInclinationMean = ASTRO_REFERENCE.earthInclinationJ2000_deg - earthInvPlaneInclinationAmplitude * Math.cos((ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationPhaseAngle) * Math.PI / 180);
+
+// Inclination path zodiac offset — uses perihelion longitude from ASTRO_REFERENCE
+const inclinationPathZodiacOffsetDeg = 360 - startAngleModel - (ASTRO_REFERENCE.perihelionLongitudeJ2000_deg - earthInclinationPhaseAngle) - 2;
 
 // --- 9a. Time units & year lengths ---
 const meanearthRotationsinDays = meansolaryearlengthinDays+1;
@@ -1512,7 +1513,7 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
   if (p && _fibD[key] && _massFrac[key]) {
     p.invPlaneInclinationAmplitude = psiConstant / (_fibD[key] * Math.sqrt(_massFrac[key]));
     p.invPlaneInclinationMean = p.invPlaneInclinationJ2000
-      - p.invPlaneInclinationAmplitude * Math.cos((p.ascendingNodeInvPlane - p.inclinationPhaseAngle) * Math.PI / 180);
+      - p.invPlaneInclinationAmplitude * Math.cos((p.longitudePerihelion - p.inclinationPhaseAngle) * Math.PI / 180);
   }
 }
 
@@ -37751,15 +37752,17 @@ function buildPerihelionChart(planetKey, currentYear) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
-  // Planet lookup tables
+  // Planet lookup tables — uses ICRF perihelion periods for inclination oscillation
+  const _gpr = 1 / (holisticyearLength / 13);
+  const _icrfP = (k) => k === 'earth' ? holisticyearLength / 3 : 1 / (1 / planets[k].perihelionEclipticYears - _gpr);
   const cfg = {
-    mercury: { period: planets.mercury.perihelionEclipticYears, mean: planets.mercury.invPlaneInclinationMean, amp: planets.mercury.invPlaneInclinationAmplitude, ascJ2000: planets.mercury.ascendingNodeInvPlane, phase: planets.mercury.inclinationPhaseAngle },
-    venus:   { period: planets.venus.perihelionEclipticYears,   mean: planets.venus.invPlaneInclinationMean,   amp: planets.venus.invPlaneInclinationAmplitude,   ascJ2000: planets.venus.ascendingNodeInvPlane,   phase: planets.venus.inclinationPhaseAngle },
-    mars:    { period: planets.mars.perihelionEclipticYears,     mean: planets.mars.invPlaneInclinationMean,    amp: planets.mars.invPlaneInclinationAmplitude,    ascJ2000: planets.mars.ascendingNodeInvPlane,    phase: planets.mars.inclinationPhaseAngle },
-    jupiter: { period: planets.jupiter.perihelionEclipticYears,  mean: planets.jupiter.invPlaneInclinationMean, amp: planets.jupiter.invPlaneInclinationAmplitude, ascJ2000: planets.jupiter.ascendingNodeInvPlane, phase: planets.jupiter.inclinationPhaseAngle },
-    saturn:  { period: planets.saturn.perihelionEclipticYears,   mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  ascJ2000: planets.saturn.ascendingNodeInvPlane,  phase: planets.saturn.inclinationPhaseAngle },
-    uranus:  { period: planets.uranus.perihelionEclipticYears,   mean: planets.uranus.invPlaneInclinationMean,  amp: planets.uranus.invPlaneInclinationAmplitude,  ascJ2000: planets.uranus.ascendingNodeInvPlane,  phase: planets.uranus.inclinationPhaseAngle },
-    neptune: { period: planets.neptune.perihelionEclipticYears,  mean: planets.neptune.invPlaneInclinationMean, amp: planets.neptune.invPlaneInclinationAmplitude, ascJ2000: planets.neptune.ascendingNodeInvPlane, phase: planets.neptune.inclinationPhaseAngle },
+    mercury: { period: _icrfP('mercury'), mean: planets.mercury.invPlaneInclinationMean, amp: planets.mercury.invPlaneInclinationAmplitude, periJ2000: planets.mercury.longitudePerihelion, phase: planets.mercury.inclinationPhaseAngle },
+    venus:   { period: _icrfP('venus'),   mean: planets.venus.invPlaneInclinationMean,   amp: planets.venus.invPlaneInclinationAmplitude,   periJ2000: planets.venus.longitudePerihelion,   phase: planets.venus.inclinationPhaseAngle },
+    mars:    { period: _icrfP('mars'),    mean: planets.mars.invPlaneInclinationMean,    amp: planets.mars.invPlaneInclinationAmplitude,    periJ2000: planets.mars.longitudePerihelion,    phase: planets.mars.inclinationPhaseAngle },
+    jupiter: { period: _icrfP('jupiter'), mean: planets.jupiter.invPlaneInclinationMean, amp: planets.jupiter.invPlaneInclinationAmplitude, periJ2000: planets.jupiter.longitudePerihelion, phase: planets.jupiter.inclinationPhaseAngle },
+    saturn:  { period: _icrfP('saturn'),  mean: planets.saturn.invPlaneInclinationMean,  amp: planets.saturn.invPlaneInclinationAmplitude,  periJ2000: planets.saturn.longitudePerihelion,  phase: planets.saturn.inclinationPhaseAngle },
+    uranus:  { period: _icrfP('uranus'),  mean: planets.uranus.invPlaneInclinationMean,  amp: planets.uranus.invPlaneInclinationAmplitude,  periJ2000: planets.uranus.longitudePerihelion,  phase: planets.uranus.inclinationPhaseAngle },
+    neptune: { period: _icrfP('neptune'), mean: planets.neptune.invPlaneInclinationMean, amp: planets.neptune.invPlaneInclinationAmplitude, periJ2000: planets.neptune.longitudePerihelion, phase: planets.neptune.inclinationPhaseAngle },
   };
   const p = cfg[planetKey];
   if (!p) return '';
@@ -37780,17 +37783,19 @@ function buildPerihelionChart(planetKey, currentYear) {
   const pw = W - pad.left - pad.right;
   const ph = Ht - pad.top - pad.bot;
 
-  // Helper: compute ascending node at arbitrary yearsSinceBalanced
-  const ascNodeAtYear = (ascJ2000, period, ysb) => {
+  // Helper: compute ICRF perihelion longitude at arbitrary yearsSinceBalanced
+  const periAtYear = (periJ2000, period, ysb) => {
     const rate = 360 / period;
-    return ascJ2000 - rate * yearsFromBalancedToJ2000 + rate * ysb;
+    return periJ2000 - rate * yearsFromBalancedToJ2000 + rate * ysb;
   };
 
   // Helper: compute inclination to inv. plane at arbitrary yearsSinceBalanced
-  const inclAtYear = (mean, amp, ascJ2000, period, phaseOff, ysb) => {
-    const ascNode = ascNodeAtYear(ascJ2000, period, ysb);
-    return mean + amp * Math.cos((ascNode - phaseOff) * DEG2RAD);
+  const inclAtYear = (mean, amp, periJ2000, period, phaseOff, ysb) => {
+    const peri = periAtYear(periJ2000, period, ysb);
+    return mean + amp * Math.cos((peri - phaseOff) * DEG2RAD);
   };
+  // Backward compat alias
+  const ascNodeAtYear = periAtYear;
 
   // Helper: compute ecliptic inclination (angle between planet and Earth orbital planes)
   const eclipticInclAtYear = (ysb) => {
@@ -37801,8 +37806,8 @@ function buildPerihelionChart(planetKey, currentYear) {
     const eny = Math.sin(eIncl) * Math.cos(eOmega);
     const enz = Math.cos(eIncl);
     // Planet orbital plane normal
-    const pIncl = inclAtYear(p.mean, p.amp, p.ascJ2000, p.period, p.phase, ysb) * DEG2RAD;
-    const pOmega = ascNodeAtYear(p.ascJ2000, p.period, ysb) * DEG2RAD;
+    const pIncl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb) * DEG2RAD;
+    const pOmega = ascNodeAtYear(p.periJ2000, p.period, ysb) * DEG2RAD;
     const pnx = Math.sin(pIncl) * Math.sin(pOmega);
     const pny = Math.sin(pIncl) * Math.cos(pOmega);
     const pnz = Math.cos(pIncl);
@@ -37815,7 +37820,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   // Max occurs when ascNode(t) = phaseOffset, i.e. ysbMax = (phase - ascNodeAtBalanced) / rate
   const tRef = (currentYear || startmodelYear) - balancedYear;
   const rateForMax = 360 / p.period;
-  const ascNodeAtBalancedForMax = p.ascJ2000 - rateForMax * yearsFromBalancedToJ2000;
+  const ascNodeAtBalancedForMax = p.periJ2000 - rateForMax * yearsFromBalancedToJ2000;
   const ysbMaxBase = (p.phase - ascNodeAtBalancedForMax) / rateForMax;
   // Find the nearest max to tRef
   const cyclesFromMax = Math.round((tRef - ysbMaxBase) / absPeriod);
@@ -37831,7 +37836,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   // Pre-scan for Y range
   for (let i = 0; i <= steps; i++) {
     const ysb = ysbStart + (i / steps) * absPeriod;
-    const incl = inclAtYear(p.mean, p.amp, p.ascJ2000, p.period, p.phase, ysb);
+    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb);
     const ecl  = eclipticInclAtYear(ysb);
     const lo = Math.min(incl, ecl), hi = Math.max(incl, ecl);
     if (lo < yMin) yMin = lo;
@@ -37851,7 +37856,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   for (let i = 0; i <= steps; i++) {
     const t = (i / steps) * absPeriod;
     const ysb = ysbStart + t;
-    const incl = inclAtYear(p.mean, p.amp, p.ascJ2000, p.period, p.phase, ysb);
+    const incl = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysb);
     const ecl  = eclipticInclAtYear(ysb);
     const cmd = i === 0 ? 'M' : 'L';
     const x = toX(t).toFixed(1);
@@ -37863,7 +37868,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   const tNow = tRef - ysbStart;
   const simInWindow = tNow >= 0 && tNow <= absPeriod;
   const ysbNow = ysbStart + (simInWindow ? tNow : 0);
-  const inclNow = inclAtYear(p.mean, p.amp, p.ascJ2000, p.period, p.phase, ysbNow);
+  const inclNow = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbNow);
   const eclNow  = eclipticInclAtYear(ysbNow);
   const cx = toX(tNow).toFixed(1);
   const cy = toY(inclNow).toFixed(1);
@@ -37874,9 +37879,9 @@ function buildPerihelionChart(planetKey, currentYear) {
   const tFixed = tFixedRef - ysbStart;
   const fixedInWindow = tFixed >= 0 && tFixed <= absPeriod;
   const ysbFixed = ysbStart + (fixedInWindow ? tFixed : 0);
-  const inclFixed = inclAtYear(p.mean, p.amp, p.ascJ2000, p.period, p.phase, ysbFixed);
+  const inclFixed = inclAtYear(p.mean, p.amp, p.periJ2000, p.period, p.phase, ysbFixed);
   const eclFixed  = eclipticInclAtYear(ysbFixed);
-  const ascNodeFixed = ((ascNodeAtYear(p.ascJ2000, p.period, ysbFixed) % 360) + 360) % 360;
+  const ascNodeFixed = ((ascNodeAtYear(p.periJ2000, p.period, ysbFixed) % 360) + 360) % 360;
   const fxX = toX(tFixed).toFixed(1);
   const fxY = toY(inclFixed).toFixed(1);
 
@@ -42749,38 +42754,24 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     ceres: planets.ceres.invPlaneInclinationAmplitude
   };
 
-  // Planet precession periods (same period governs nodal precession and inclination oscillation)
-  const periods = {
-    mercury: planets.mercury.perihelionEclipticYears,
-    venus: planets.venus.perihelionEclipticYears,
-    mars: planets.mars.perihelionEclipticYears,
-    jupiter: planets.jupiter.perihelionEclipticYears,
-    saturn: planets.saturn.perihelionEclipticYears,  // Negative = retrograde
-    uranus: planets.uranus.perihelionEclipticYears,
-    neptune: planets.neptune.perihelionEclipticYears,  // Negative = retrograde
-    pluto: planets.pluto.perihelionEclipticYears,
-    halleys: planets.halleys.perihelionEclipticYears,
-    eros: planets.eros.perihelionEclipticYears,
-    ceres: planets.ceres.perihelionEclipticYears
-  };
+  // Inclination oscillation periods: |ICRF perihelion period| per planet
+  // ICRF rate = ecliptic rate - general precession (H/13)
+  // Earth is special: ICRF period = H/3 directly (eclP in script.js is already earthPerihelionICRFYears)
+  const _genPrecRate = 1 / (holisticyearLength / 13);
+  const icrfPeriods = {};
+  for (const k of ['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','halleys','eros','ceres']) {
+    icrfPeriods[k] = 1 / (1 / planets[k].perihelionEclipticYears - _genPrecRate);
+  }
+  icrfPeriods.earth = holisticyearLength / 3; // Earth: ICRF = H/3 directly
 
-  // J2000 ascending nodes on invariable plane
-  const ascNodesJ2000 = {
-    mercury: planets.mercury.ascendingNodeInvPlane,
-    venus: planets.venus.ascendingNodeInvPlane,
-    mars: planets.mars.ascendingNodeInvPlane,
-    jupiter: planets.jupiter.ascendingNodeInvPlane,
-    saturn: planets.saturn.ascendingNodeInvPlane,
-    uranus: planets.uranus.ascendingNodeInvPlane,
-    neptune: planets.neptune.ascendingNodeInvPlane,
-    pluto: planets.pluto.ascendingNodeInvPlane,
-    halleys: planets.halleys.ascendingNodeInvPlane,
-    eros: planets.eros.ascendingNodeInvPlane,
-    ceres: planets.ceres.ascendingNodeInvPlane
-  };
+  // J2000 perihelion longitudes (ICRF reference for inclination oscillation)
+  const periLongsJ2000 = {};
+  for (const k of ['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','halleys','eros','ceres']) {
+    periLongsJ2000[k] = planets[k].longitudePerihelion;
+  }
+  periLongsJ2000.earth = ASTRO_REFERENCE.perihelionLongitudeJ2000_deg;
 
-  // Phase offsets: the geometric relationship between Ω and the inclination phase
-  // φ₀ = Ω_J2000 - offset  (where φ₀ is the inclination phase at J2000)
+  // Phase offsets: ω̃_ICRF at max inclination (from balanced year derivation)
   const phaseOffsets = {
     mercury: planets.mercury.inclinationPhaseAngle,
     venus: planets.venus.inclinationPhaseAngle,
@@ -42798,11 +42789,11 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const i_J2000 = j2000Inclinations[planet];
   const i_mean = meanInclinations[planet];
   const amplitude = amplitudes[planet];
-  const period = periods[planet];
-  const ascNodeJ2000 = ascNodesJ2000[planet];
+  const icrfPeriod = icrfPeriods[planet];
+  const periLongJ2000 = periLongsJ2000[planet];
   const phaseOffset = phaseOffsets[planet];
 
-  if (i_J2000 === undefined || amplitude === undefined || period === undefined) {
+  if (i_J2000 === undefined || amplitude === undefined || icrfPeriod === undefined) {
     console.warn(`computePlanetInvPlaneInclinationDynamic: Unknown planet '${planet}'`);
     return i_J2000 || 0;
   }
@@ -42812,41 +42803,36 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
     return i_J2000;
   }
 
-  // Ω-based approach: Mean-centered oscillation linked to ascending node
+  // ICRF perihelion-based approach: inclination oscillation linked to perihelion longitude
   //
-  // Formula: i(t) = mean + A × cos(Ω(t) - offset)
+  // Formula: i(t) = mean + A × cos(ω̃_ICRF(t) - phaseAngle)
   //
   // where:
-  //   mean = Laplace-Lagrange mean (center of oscillation)
-  //   A = amplitude (half of min-max range)
-  //   Ω(t) = current ascending node on invariable plane
-  //   offset = geometric phase offset (Ω_J2000 - φ₀)
+  //   mean = center of oscillation (derived from J2000 constraint)
+  //   A = amplitude (from ψ / (d × √m))
+  //   ω̃_ICRF(t) = perihelion longitude in ICRF at time t
+  //   phaseAngle = ω̃_ICRF at max inclination (from balanced year)
   //
-  // The ascending node precesses with time, using balancedYear as epoch:
-  //   Ω_balanced = Ω_J2000 - rate × (J2000 - balancedYear)
-  //   Ω(t) = Ω_balanced + rate × (t - balancedYear)
+  // The ICRF perihelion precesses with time, using balancedYear as epoch:
+  //   ω̃_balanced = ω̃_J2000 - rate × (J2000 - balancedYear)
+  //   ω̃(t) = ω̃_balanced + rate × (t - balancedYear)
   //
-  // This ensures perfect cycle synchronization over complete Holistic Years
-  // while still producing correct J2000 values for verification
+  // Earth is sole prograde (+H/3); all others retrograde in ICRF.
+  // All ICRF periods divide the Grand Holistic Octave (8H) evenly.
 
-  // Use balancedYear as epoch for perfect Holistic Year cycle synchronization
-  // This ensures inclination values return to exactly the same values after one complete cycle
-  // Calculate from JD directly using mean solar year length to avoid calendar-based drift
   const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
 
-  // yearsFromBalancedToJ2000 is a pre-computed constant (defined near line 434)
+  // ICRF perihelion precession rate
+  const icrfRate = 360 / icrfPeriod;  // deg/yr (positive=prograde, negative=retrograde)
 
-  // Calculate precession rate
-  const precessionRate = 360 / period;  // degrees per year (negative for retrograde)
+  // Back-calculate perihelion longitude at balancedYear from J2000 values
+  const periAtBalanced = periLongJ2000 - icrfRate * yearsFromBalancedToJ2000;
 
-  // Back-calculate ascending node at balancedYear from J2000 values
-  const ascNodeAtBalanced = ascNodeJ2000 - precessionRate * yearsFromBalancedToJ2000;
+  // Calculate current perihelion longitude from balancedYear reference
+  const periCurrent = periAtBalanced + icrfRate * yearsSinceBalanced;
 
-  // Calculate current ascending node from balancedYear reference
-  const ascNodeCurrent = ascNodeAtBalanced + precessionRate * yearsSinceBalanced;
-
-  // Calculate current phase from ascending node
-  const currentPhaseDeg = ascNodeCurrent - phaseOffset;
+  // Calculate current phase from ICRF perihelion longitude
+  const currentPhaseDeg = periCurrent - phaseOffset;
   const currentPhaseRad = currentPhaseDeg * Math.PI / 180;
 
   // Dynamic inclination centered on the mean

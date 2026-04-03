@@ -595,31 +595,40 @@ function buildSceneGraph() {
  */
 function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const p = C.planets[key];
+  const genPrecRate = 1 / (C.H / 13);
 
-  // --- Earth's orbital plane normal in invariable plane coords ---
-  // Earth: i = mean - amplitude × cos(2π × years / (H/3))
+  // --- Earth's orbital plane ---
+  // Inclination oscillation: ICRF perihelion rate (H/3 for Earth)
   const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
   const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
   const earthI = (C.earthInvPlaneInclinationMean
     - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
 
-  // Earth Ω on invariable plane (precesses at 360/period per year)
+  // Earth Ω direction for plane normal (ascending node, separate from oscillation)
   const earthOmegaRate = 360 / earthPrecYears;
   const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
     - earthOmegaRate * C.yearsFromBalancedToJ2000
     + earthOmegaRate * yearsSinceBalanced) * d2r;
 
-  // --- Planet's orbital plane normal ---
-  // Planet: i = mean + amplitude × cos(Ω - phaseAngle)
+  // --- Planet's orbital plane ---
+  // Inclination oscillation: uses ICRF perihelion rate
+  // ICRF rate = ecliptic rate - general precession
+  const eclRate = 1 / p.perihelionEclipticYears;
+  const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
+  const periICRFDeg = p.longitudePerihelion
+    - icrfRate * C.yearsFromBalancedToJ2000
+    + icrfRate * yearsSinceBalanced;
+
+  const planetPhaseDeg = periICRFDeg - p.inclinationPhaseAngle;
+  const planetI = (p.invPlaneInclinationMean
+    + p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+
+  // Ω direction for plane normal (ecliptic ascending node rate, geometric)
   const planetOmegaRate = 360 / p.perihelionEclipticYears;
   const planetOmegaDeg = p.ascendingNodeInvPlane
     - planetOmegaRate * C.yearsFromBalancedToJ2000
     + planetOmegaRate * yearsSinceBalanced;
   const planetOmega = planetOmegaDeg * d2r;
-
-  const planetPhaseDeg = planetOmegaDeg - p.inclinationPhaseAngle;
-  const planetI = (p.invPlaneInclinationMean
-    + p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
   // --- Dot product of normal vectors → angle between orbital planes ---
   const eNx = Math.sin(earthI) * Math.sin(earthOmega);
