@@ -18836,7 +18836,7 @@ function computeBalanceResults(state) {
     const d = state[key].d;
     if (d <= 0) continue;
     const wVal = Math.sqrt(cfg.mass * cfg.sma * (1 - cfg.ecc * cfg.ecc)) / d;
-    if (state[key].phaseAngle > 180) inclSum203 += wVal; else inclSum23 += wVal;
+    if (key !== 'saturn') inclSum203 += wVal; else inclSum23 += wVal;  // Saturn anti-phase (sole balance opponent)
     // Vector balance verification
     const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
     const Lamp = L * planetResults[key].amplitude;
@@ -18856,7 +18856,7 @@ function computeBalanceResults(state) {
     if (d <= 0) continue;
     const v = Math.sqrt(cfg.mass) * Math.pow(cfg.sma, 1.5) * cfg.ecc / Math.sqrt(d);
     planetResults[key].eccWeight = v;
-    if (state[key].phaseAngle > 180) eccSum203 += v; else eccSum23 += v;
+    if (key !== 'saturn') eccSum203 += v; else eccSum23 += v;  // Saturn anti-phase
   }
   const eccResidual = Math.abs(eccSum203 - eccSum23);
   const eccTotal = eccSum203 + eccSum23;
@@ -19552,7 +19552,7 @@ function updateEccBalanceScale(targetKey) {
   panel._navPrev.disabled = idx <= 0;
   panel._navNext.disabled = idx >= BALANCE_PLANETS_SCALE.length - 1;
   panel._dropdown.style.display = 'none';
-  const phaseLabel = data.targetPhase > 180 ? '203°' : '23°';
+  const phaseLabel = data.target === 'saturn' ? 'anti-phase' : 'prograde';
   const hasAllPositive = data.items.every(i => i.sign > 0);
   let html = '';
   // Hero card — key numbers at a glance
@@ -21977,14 +21977,14 @@ const fibGaugeEls = {};
 // Dynamic Fibonacci balance computation (called each frame)
 function computeDynamicFibonacciBalance() {
   const planetConfigs = [
-    { mass: M_MERCURY / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, phase: planets.mercury.inclinationPhaseAngle },
-    { mass: M_VENUS / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, phase: planets.venus.inclinationPhaseAngle },
-    { mass: M_EARTH / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  phase: earthInclinationPhaseAngle },
-    { mass: M_MARS / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  phase: planets.mars.inclinationPhaseAngle },
-    { mass: M_JUPITER / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  phase: planets.jupiter.inclinationPhaseAngle },
-    { mass: M_SATURN / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  phase: planets.saturn.inclinationPhaseAngle },
-    { mass: M_URANUS / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, phase: planets.uranus.inclinationPhaseAngle },
-    { mass: M_NEPTUNE / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, phase: planets.neptune.inclinationPhaseAngle },
+    { key: 'mercury', mass: M_MERCURY / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, phase: planets.mercury.inclinationPhaseAngle },
+    { key: 'venus',   mass: M_VENUS / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, phase: planets.venus.inclinationPhaseAngle },
+    { key: 'earth',   mass: M_EARTH / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  phase: earthInclinationPhaseAngle },
+    { key: 'mars',    mass: M_MARS / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  phase: planets.mars.inclinationPhaseAngle },
+    { key: 'jupiter', mass: M_JUPITER / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  phase: planets.jupiter.inclinationPhaseAngle },
+    { key: 'saturn',  mass: M_SATURN / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  phase: planets.saturn.inclinationPhaseAngle },
+    { key: 'uranus',  mass: M_URANUS / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, phase: planets.uranus.inclinationPhaseAngle },
+    { key: 'neptune', mass: M_NEPTUNE / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, phase: planets.neptune.inclinationPhaseAngle },
   ];
   // Inclination balance: w = √(m·a(1-e²)) / d
   let inclSum203 = 0, inclSum23 = 0;
@@ -21993,8 +21993,8 @@ function computeDynamicFibonacciBalance() {
   for (const p of planetConfigs) {
     const w = Math.sqrt(p.mass * p.sma * (1 - p.ecc * p.ecc)) / p.d;
     const v = Math.sqrt(p.mass) * Math.pow(p.sma, 1.5) * p.ecc / Math.sqrt(p.d);
-    if (p.phase > 180) { inclSum203 += w; eccSum203 += v; }
-    else               { inclSum23 += w;  eccSum23 += v; }
+    if (p.key !== 'saturn') { inclSum203 += w; eccSum203 += v; }  // Saturn anti-phase (sole balance opponent)
+    else                    { inclSum23 += w;  eccSum23 += v; }
   }
   const inclTotal = inclSum203 + inclSum23;
   const eccTotal = eccSum203 + eccSum23;
