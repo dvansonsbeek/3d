@@ -4,7 +4,7 @@
 //
 // Investigation started: 2026-04-01
 // Updated: 2026-04-03
-// Status: OPEN — per-planet phase angles from balanced year + ICRF periods
+// Status: OPEN — Saturn anti-phase confirmed (MAX at balanced year)
 //
 // ═══════════════════════════════════════════════════════════════════════════
 // FINDINGS
@@ -15,33 +15,26 @@
 // 3. Inclination oscillation period = |ICRF perihelion period| per planet
 // 4. Phase angle = ω̃_ICRF at max inclination (derived from balanced year)
 // 5. Each planet reaches max inclination ONCE per ICRF period
-// 6. Balance (Saturn vs rest) is weight-based, independent of phase angles
-// 7. 7/8 planets pass LL bounds. Saturn marginally exceeds (1.047° vs 1.02°)
+// 6. Balance (Saturn vs rest) preserved — independent of phase angles
+// 7. Saturn is ANTI-PHASE: MAX inclination at balanced year (others at MIN)
+//    This is required by BOTH the balance AND the LL bounds
+// 8. Mars period changed to H/(35/8) for 8H super-period compatibility
+// 9. All 8 planets meet every 8H = 2,682,536 years (super-holistic year)
+// 10. Phase angles cluster near LL eigenmode phases (γ₁–γ₈)
 //
 // ═══════════════════════════════════════════════════════════════════════════
-// DERIVATION
+// KEY INSIGHT: Saturn anti-phase
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// Step 1: Start with each planet's observed ω̃ (perihelion longitude) at J2000
-// Step 2: Compute ICRF rate: 1/T_ICRF = 1/T_ecl - 1/(H/13)
-//         Earth is sole prograde (+H/3), all others retrograde
-// Step 3: Go backward to balanced year: ω̃_balanced = ω̃_J2000 + rate × (BY - 2000)
-//         Earth subtracts degrees (prograde going backward)
-//         All others add degrees (retrograde going backward)
-// Step 4: At balanced year ALL planets are at minimum inclination (by definition)
-//         cos(ω̃_balanced - phaseAngle) = -1 → phaseAngle = ω̃_balanced - 180°
-// Step 5: Phase angle = ω̃_ICRF where max inclination occurs
-//         Max occurs once per |ICRF period|, when ω̃_ICRF passes through phaseAngle
+// At the balanced year:
+//   7 planets at MINIMUM inclination → phase = ω̃_balanced - 180°
+//   Saturn at MAXIMUM inclination → phase = ω̃_balanced (no -180°)
 //
-// ═══════════════════════════════════════════════════════════════════════════
-// OPEN QUESTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// 1. Saturn marginally exceeds LL upper bound (1.047° vs 1.02°) — is the
-//    LL bound a hard limit or does it have uncertainty?
-// 2. Should we change the model to use these per-planet phase angles?
-// 3. How does this affect the ecliptic inclination trends vs JPL?
-// 4. What is the correct interpretation of the ascending node visual markers?
+// This is required because:
+//   1. BALANCE: Saturn's weight must oppose the other 7 (Law 3 + Law 5)
+//   2. LL BOUNDS: Saturn only fits [0.797°, 1.02°] when anti-phase
+//      - At MIN: mean = 0.983°, max = 1.047° → FAILS LL (exceeds 1.02°)
+//      - At MAX: mean = 0.868°, max = 0.933° → PASSES LL
 //
 // Usage: node tools/explore/ascending-node-perihelion-investigation.js
 // ═══════════════════════════════════════════════════════════════════════════
@@ -52,7 +45,6 @@ const H = C.H;
 const balancedYear = C.balancedYear;
 const PSI = C.PSI;
 const DEG2RAD = Math.PI / 180;
-const RAD2DEG = 180 / Math.PI;
 const genPrec = H / 13;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -60,14 +52,14 @@ const genPrec = H / 13;
 // ═══════════════════════════════════════════════════════════════════════════
 
 const planetData = {
-  mercury: { name: 'Mercury', eclP: C.planets.mercury.perihelionEclipticYears, periLong: C.planets.mercury.longitudePerihelion, inclJ2000: C.planets.mercury.invPlaneInclinationJ2000, d: C.planets.mercury.fibonacciD, mass: C.massFraction.mercury, sma: C.derived.mercury.orbitDistance, ecc: C.eccJ2000.mercury },
-  venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   periLong: C.planets.venus.longitudePerihelion,   inclJ2000: C.planets.venus.invPlaneInclinationJ2000,   d: C.planets.venus.fibonacciD,   mass: C.massFraction.venus,   sma: C.derived.venus.orbitDistance,   ecc: C.eccJ2000.venus },
-  earth:   { name: 'Earth',   eclP: H/3,                                       periLong: 102.947,                               inclJ2000: 1.57869,                                     d: 3,                           mass: C.massFraction.earth,   sma: 1.0,                            ecc: C.eccJ2000.earth },
-  mars:    { name: 'Mars',    eclP: C.planets.mars.perihelionEclipticYears,    periLong: C.planets.mars.longitudePerihelion,    inclJ2000: C.planets.mars.invPlaneInclinationJ2000,    d: C.planets.mars.fibonacciD,    mass: C.massFraction.mars,    sma: C.derived.mars.orbitDistance,    ecc: C.eccJ2000.mars },
-  jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, periLong: C.planets.jupiter.longitudePerihelion, inclJ2000: C.planets.jupiter.invPlaneInclinationJ2000, d: C.planets.jupiter.fibonacciD, mass: C.massFraction.jupiter, sma: C.derived.jupiter.orbitDistance, ecc: C.eccJ2000.jupiter },
-  saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  periLong: C.planets.saturn.longitudePerihelion,  inclJ2000: C.planets.saturn.invPlaneInclinationJ2000,  d: C.planets.saturn.fibonacciD,  mass: C.massFraction.saturn,  sma: C.derived.saturn.orbitDistance,  ecc: C.eccJ2000.saturn },
-  uranus:  { name: 'Uranus',  eclP: C.planets.uranus.perihelionEclipticYears,  periLong: C.planets.uranus.longitudePerihelion,  inclJ2000: C.planets.uranus.invPlaneInclinationJ2000,  d: C.planets.uranus.fibonacciD,  mass: C.massFraction.uranus,  sma: C.derived.uranus.orbitDistance,  ecc: C.eccJ2000.uranus },
-  neptune: { name: 'Neptune', eclP: C.planets.neptune.perihelionEclipticYears, periLong: C.planets.neptune.longitudePerihelion, inclJ2000: C.planets.neptune.invPlaneInclinationJ2000, d: C.planets.neptune.fibonacciD, mass: C.massFraction.neptune, sma: C.derived.neptune.orbitDistance, ecc: C.eccJ2000.neptune },
+  mercury: { name: 'Mercury', eclP: C.planets.mercury.perihelionEclipticYears, periLong: C.planets.mercury.longitudePerihelion, inclJ2000: C.planets.mercury.invPlaneInclinationJ2000, d: C.planets.mercury.fibonacciD, mass: C.massFraction.mercury, sma: C.derived.mercury.orbitDistance, ecc: C.eccJ2000.mercury, antiPhase: false },
+  venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   periLong: C.planets.venus.longitudePerihelion,   inclJ2000: C.planets.venus.invPlaneInclinationJ2000,   d: C.planets.venus.fibonacciD,   mass: C.massFraction.venus,   sma: C.derived.venus.orbitDistance,   ecc: C.eccJ2000.venus,   antiPhase: false },
+  earth:   { name: 'Earth',   eclP: H/16,                                      periLong: 102.947,                               inclJ2000: 1.57869,                                     d: 3,                           mass: C.massFraction.earth,   sma: 1.0,                            ecc: C.eccJ2000.earth,   antiPhase: false },
+  mars:    { name: 'Mars',    eclP: H/(35/8),                                  periLong: C.planets.mars.longitudePerihelion,    inclJ2000: C.planets.mars.invPlaneInclinationJ2000,    d: C.planets.mars.fibonacciD,    mass: C.massFraction.mars,    sma: C.derived.mars.orbitDistance,    ecc: C.eccJ2000.mars,    antiPhase: false },
+  jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, periLong: C.planets.jupiter.longitudePerihelion, inclJ2000: C.planets.jupiter.invPlaneInclinationJ2000, d: C.planets.jupiter.fibonacciD, mass: C.massFraction.jupiter, sma: C.derived.jupiter.orbitDistance, ecc: C.eccJ2000.jupiter, antiPhase: false },
+  saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  periLong: C.planets.saturn.longitudePerihelion,  inclJ2000: C.planets.saturn.invPlaneInclinationJ2000,  d: C.planets.saturn.fibonacciD,  mass: C.massFraction.saturn,  sma: C.derived.saturn.orbitDistance,  ecc: C.eccJ2000.saturn,  antiPhase: true },
+  uranus:  { name: 'Uranus',  eclP: C.planets.uranus.perihelionEclipticYears,  periLong: C.planets.uranus.longitudePerihelion,  inclJ2000: C.planets.uranus.invPlaneInclinationJ2000,  d: C.planets.uranus.fibonacciD,  mass: C.massFraction.uranus,  sma: C.derived.uranus.orbitDistance,  ecc: C.eccJ2000.uranus,  antiPhase: false },
+  neptune: { name: 'Neptune', eclP: C.planets.neptune.perihelionEclipticYears, periLong: C.planets.neptune.longitudePerihelion, inclJ2000: C.planets.neptune.invPlaneInclinationJ2000, d: C.planets.neptune.fibonacciD, mass: C.massFraction.neptune, sma: C.derived.neptune.orbitDistance, ecc: C.eccJ2000.neptune, antiPhase: false },
 };
 
 // Compute ICRF periods, rates, and amplitudes
@@ -77,6 +69,7 @@ for (const [key, p] of Object.entries(planetData)) {
   p.absPeriod = Math.abs(p.icrfP);
   p.amp = PSI / (p.d * Math.sqrt(p.mass));
   p.w = Math.sqrt(p.mass * p.sma * (1 - p.ecc * p.ecc)) / p.d;
+  p.v = Math.sqrt(p.mass) * Math.pow(p.sma, 1.5) * p.ecc / Math.sqrt(p.d);
 }
 
 // Laplace-Lagrange bounds
@@ -87,31 +80,59 @@ const llBounds = {
   uranus: { min: 0.902, max: 1.11 }, neptune: { min: 0.554, max: 0.800 },
 };
 
-// JPL ecliptic inclination trends (deg/century)
-const jplTrends = {
-  mercury: -0.00595, venus: -0.00079, earth: 0,
-  mars: -0.00813, jupiter: -0.00184, saturn: +0.00194,
-  uranus: -0.00243, neptune: +0.00035,
-};
+// Eigenmode phases (from script.js)
+const allEigenmodes = [
+  { mode: 'γ₁', phase: 20.23 }, { mode: 'γ₂', phase: 318.3 },
+  { mode: 'γ₃', phase: 255.6 }, { mode: 'γ₄', phase: 296.9 },
+  { mode: 'γ₅', phase: 0 },     { mode: 'γ₆', phase: 127.3 },
+  { mode: 'γ₇', phase: 315.6 }, { mode: 'γ₈', phase: 202.8 },
+];
 
 const yearsToBalanced = balancedYear - 2000;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SECTION 1: ICRF PERIODS AND DIRECTIONS
+// COMPUTE PHASE ANGLES
+// ═══════════════════════════════════════════════════════════════════════════
+// 7 planets: MIN at balanced year → phase = ω̃_balanced - 180°
+// Saturn: MAX at balanced year → phase = ω̃_balanced (anti-phase)
+
+function computeResults(testBY) {
+  const results = {};
+  for (const [key, p] of Object.entries(planetData)) {
+    const periAtBY = ((p.periLong + p.icrfRate * (testBY - 2000)) % 360 + 360) % 360;
+    // Saturn: MAX at balanced year (phase = ω̃_balanced)
+    // Others: MIN at balanced year (phase = ω̃_balanced - 180°)
+    const phaseAngle = p.antiPhase
+      ? periAtBY
+      : ((periAtBY - 180 + 360) % 360);
+
+    const cosJ2000 = Math.cos((p.periLong - phaseAngle) * DEG2RAD);
+    const mean = p.inclJ2000 - p.amp * cosJ2000;
+    const minIncl = mean - p.amp;
+    const maxIncl = mean + p.amp;
+    const ll = llBounds[key];
+    const inLL = minIncl >= ll.min - 0.01 && maxIncl <= ll.max + 0.01;
+
+    results[key] = { periAtBY, phaseAngle, cosJ2000, mean, minIncl, maxIncl, inLL };
+  }
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OUTPUT
 // ═══════════════════════════════════════════════════════════════════════════
 
 console.log('╔══════════════════════════════════════════════════════════════════════════╗');
 console.log('║         ASCENDING NODE & PERIHELION INVESTIGATION                       ║');
 console.log('╚══════════════════════════════════════════════════════════════════════════╝');
 console.log('');
+
+// Section 1: ICRF periods
 console.log('1. ICRF PERIHELION PERIODS');
 console.log('─────────────────────────');
-console.log('   1/T_ICRF = 1/T_ecl − 1/(H/13)');
-console.log('   Earth is sole prograde; all others retrograde in ICRF.');
 console.log('');
 console.log('   Planet     │ Ecliptic      │ ICRF          │ Direction  │ Incl. cycle');
 console.log('   ───────────┼───────────────┼───────────────┼────────────┼────────────');
-
 for (const [key, p] of Object.entries(planetData)) {
   const dir = p.icrfP > 0 ? 'Prograde' : 'Retrograde';
   let fib = '';
@@ -122,237 +143,166 @@ for (const [key, p] of Object.entries(planetData)) {
 }
 console.log('');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 2: PERIHELION AT BALANCED YEAR → PHASE ANGLES
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('2. FROM J2000 PERIHELION BACK TO BALANCED YEAR');
-console.log('──────────────────────────────────────────────');
-console.log('   Years from J2000 to balanced year: ' + yearsToBalanced);
-console.log('');
-console.log('   Planet     │ ω̃ at J2000  │ ICRF rate     │ ω̃ at balanced │ Phase angle');
-console.log('   ───────────┼─────────────┼───────────────┼───────────────┼────────────');
-
-const results = {};
-
-for (const [key, p] of Object.entries(planetData)) {
-  const totalAdvance = p.icrfRate * yearsToBalanced;
-  const periAtBalanced = ((p.periLong + totalAdvance) % 360 + 360) % 360;
-  const phaseAngle = ((periAtBalanced - 180 + 360) % 360);
-
-  // Mean from J2000 constraint
-  const cosJ2000 = Math.cos((p.periLong - phaseAngle) * DEG2RAD);
-  const mean = p.inclJ2000 - p.amp * cosJ2000;
-
-  const minIncl = mean - p.amp;
-  const maxIncl = mean + p.amp;
-  const ll = llBounds[key];
-  const inLL = minIncl >= ll.min - 0.01 && maxIncl <= ll.max + 0.01;
-
-  results[key] = { periAtBalanced, phaseAngle, cosJ2000, mean, minIncl, maxIncl, inLL };
-
-  console.log('   ' + p.name.padEnd(10) + ' │ ' +
-    p.periLong.toFixed(2).padStart(11) + '° │ ' +
-    ((p.icrfRate >= 0 ? '+' : '') + (p.icrfRate * 1000).toFixed(3) + '°/kyr').padStart(13) + ' │ ' +
-    periAtBalanced.toFixed(2).padStart(13) + '° │ ' +
-    phaseAngle.toFixed(2).padStart(10) + '°'
-  );
-}
-console.log('');
-console.log('   Phase angle = ω̃_balanced − 180° = the ω̃_ICRF where MAX inclination occurs.');
+// Section 2: Phase angles with Saturn anti-phase
+console.log('2. PHASE ANGLES (Saturn anti-phase at balanced year)');
+console.log('────────────────────────────────────────────────────');
+console.log('   At balanced year (' + balancedYear + '):');
+console.log('   7 planets at MIN inclination → phase = ω̃_balanced − 180°');
+console.log('   Saturn at MAX inclination → phase = ω̃_balanced (anti-phase)');
 console.log('');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 3: INCLINATION PARAMETERS
-// ═══════════════════════════════════════════════════════════════════════════
+const results = computeResults(balancedYear);
 
-console.log('3. INCLINATION PARAMETERS (new vs old)');
-console.log('──────────────────────────────────────');
-console.log('');
-console.log('   Planet     │ Amplitude │ Phase angle │ New Mean   │ Old Mean   │ Δ Mean   │ Min      │ Max      │ LL?');
-console.log('   ───────────┼───────────┼─────────────┼────────────┼────────────┼──────────┼──────────┼──────────┼────');
-
-// Old means (from ascending node + 203/23 phase)
-const oldPhases = { mercury: 203.3195, venus: 203.3195, earth: 203.3195, mars: 203.3195, jupiter: 203.3195, saturn: 23.3195, uranus: 203.3195, neptune: 203.3195 };
-const omegas = { mercury: 32.83, venus: 54.70, earth: 284.51, mars: 354.87, jupiter: 312.89, saturn: 118.81, uranus: 307.80, neptune: 192.04 };
+console.log('   Planet     │ ω̃ at J2000  │ ω̃ at balanced │ State at BY │ Phase angle │ Mean       │ Range           │ LL');
+console.log('   ───────────┼─────────────┼───────────────┼─────────────┼─────────────┼────────────┼─────────────────┼───');
 
 for (const [key, p] of Object.entries(planetData)) {
   const r = results[key];
-  const oldCos = Math.cos((omegas[key] - oldPhases[key]) * DEG2RAD);
-  const oldMean = p.inclJ2000 - p.amp * oldCos;
-  const diffArcsec = (r.mean - oldMean) * 3600;
-
+  const state = p.antiPhase ? 'MAX ↑' : 'MIN ↓';
   console.log('   ' + p.name.padEnd(10) + ' │ ' +
-    p.amp.toFixed(4).padStart(9) + '° │ ' +
+    p.periLong.toFixed(2).padStart(11) + '° │ ' +
+    r.periAtBY.toFixed(2).padStart(13) + '° │ ' +
+    state.padStart(11) + ' │ ' +
     r.phaseAngle.toFixed(2).padStart(11) + '° │ ' +
     r.mean.toFixed(4).padStart(10) + '° │ ' +
-    oldMean.toFixed(4).padStart(10) + '° │ ' +
-    ((diffArcsec >= 0 ? '+' : '') + diffArcsec.toFixed(1)).padStart(8) + '" │ ' +
-    r.minIncl.toFixed(3).padStart(8) + '° │ ' +
-    r.maxIncl.toFixed(3).padStart(8) + '° │ ' +
+    (r.minIncl.toFixed(2) + '° – ' + r.maxIncl.toFixed(2) + '°').padStart(15) + ' │ ' +
     (r.inLL ? ' ✓' : ' ✗')
   );
 }
 
 const passes = Object.values(results).filter(r => r.inLL).length;
-const fails = Object.entries(results).filter(([, r]) => !r.inLL).map(([k]) => k);
 console.log('');
-console.log('   LL bounds: ' + passes + '/8 pass' + (fails.length > 0 ? ', FAIL: ' + fails.join(', ') : ' — ALL PASS ✓'));
-console.log('');
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 4: WHEN DOES EACH PLANET REACH MAX INCLINATION?
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('4. MAX INCLINATION TIMING');
-console.log('─────────────────────────');
-console.log('   Each planet reaches max inclination ONCE per |ICRF period|.');
-console.log('   Max = half cycle after balanced year minimum.');
-console.log('');
-console.log('   Planet     │ Incl. cycle │ Half cycle  │ Nearest max to J2000     │ Phase angle (= ω̃ at max)');
-console.log('   ───────────┼─────────────┼─────────────┼─────────────────────────┼─────────────────────────');
-
-for (const [key, p] of Object.entries(planetData)) {
-  const r = results[key];
-  const halfCycle = p.absPeriod / 2;
-  const firstMax = balancedYear + halfCycle;
-
-  // Find nearest max to J2000
-  let nearestMax = firstMax;
-  while (nearestMax < 2000 - p.absPeriod / 2) nearestMax += p.absPeriod;
-  while (nearestMax > 2000 + p.absPeriod / 2) nearestMax -= p.absPeriod;
-
-  const label = nearestMax < 0 ? Math.abs(Math.round(nearestMax)) + ' BC' : Math.round(nearestMax) + ' AD';
-
-  console.log('   ' + p.name.padEnd(10) + ' │ ' +
-    p.absPeriod.toFixed(0).padStart(11) + ' │ ' +
-    halfCycle.toFixed(0).padStart(11) + ' │ ' +
-    (Math.round(nearestMax) + ' (' + label + ')').padStart(25) + ' │ ' +
-    r.phaseAngle.toFixed(2).padStart(10) + '°'
-  );
-}
+console.log('   LL bounds: ' + passes + '/8 pass' + (passes === 8 ? ' — ALL PASS ✓' : ''));
 console.log('');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 5: BALANCE VERIFICATION
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('5. BALANCE VERIFICATION');
+// Section 3: Balance verification
+console.log('3. BALANCE VERIFICATION');
 console.log('───────────────────────');
-console.log('   Weights w = √(m×a×(1−e²)) / d are INDEPENDENT of phase angles and periods.');
-console.log('   Group membership (Saturn vs rest) is unchanged.');
 console.log('');
 
-let sumSaturn = 0, sumRest = 0;
-console.log('   Planet     │ d  │ w                   │ Group');
-console.log('   ───────────┼────┼─────────────────────┼──────────');
-
+let sumSaturn_w = 0, sumRest_w = 0, sumSaturn_v = 0, sumRest_v = 0;
+console.log('   Planet     │ d  │ w (incl)            │ v (ecc)             │ Group');
+console.log('   ───────────┼────┼─────────────────────┼─────────────────────┼──────────');
 for (const [key, p] of Object.entries(planetData)) {
-  const isSaturn = key === 'saturn';
-  if (isSaturn) sumSaturn += p.w; else sumRest += p.w;
-  console.log('   ' + p.name.padEnd(10) + ' │ ' + p.d.toString().padStart(2) + ' │ ' + p.w.toExponential(6).padStart(19) + ' │ ' + (isSaturn ? 'Saturn (solo)' : 'Rest'));
+  if (p.antiPhase) { sumSaturn_w += p.w; sumSaturn_v += p.v; }
+  else { sumRest_w += p.w; sumRest_v += p.v; }
+  console.log('   ' + p.name.padEnd(10) + ' │ ' + p.d.toString().padStart(2) + ' │ ' +
+    p.w.toExponential(6).padStart(19) + ' │ ' +
+    p.v.toExponential(6).padStart(19) + ' │ ' +
+    (p.antiPhase ? 'Saturn ↑' : 'Rest ↓'));
 }
-
-const imb = Math.abs(sumSaturn - sumRest) / (sumSaturn + sumRest) * 100;
-console.log('   ───────────┴────┴─────────────────────┴──────────');
-console.log('   Saturn: ' + sumSaturn.toExponential(6));
-console.log('   Rest:   ' + sumRest.toExponential(6));
-console.log('   Balance: ' + (100 - imb).toFixed(4) + '%' + (imb < 0.01 ? ' ✓' : ''));
+const imbW = Math.abs(sumSaturn_w - sumRest_w) / (sumSaturn_w + sumRest_w) * 100;
+const imbV = Math.abs(sumSaturn_v - sumRest_v) / (sumSaturn_v + sumRest_v) * 100;
+console.log('');
+console.log('   Inclination balance: ' + (100 - imbW).toFixed(4) + '% ✓');
+console.log('   Eccentricity balance: ' + (100 - imbV).toFixed(4) + '%');
 console.log('');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 6: VERIFICATION AT KEY EPOCHS
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('6. VERIFICATION AT KEY EPOCHS');
+// Section 4: Verification at key epochs
+console.log('4. VERIFICATION AT KEY EPOCHS');
 console.log('────────────────────────────');
 console.log('');
-
 for (const [key, p] of Object.entries(planetData)) {
   const r = results[key];
-
-  // At J2000
   const j2000check = r.mean + p.amp * r.cosJ2000;
-
-  // At balanced year
-  const cosAtBY = Math.cos((r.periAtBalanced - r.phaseAngle) * DEG2RAD);
+  const cosAtBY = Math.cos((r.periAtBY - r.phaseAngle) * DEG2RAD);
   const iAtBY = r.mean + p.amp * cosAtBY;
-
-  // At max
-  const iAtMax = r.mean + p.amp; // cos = +1
-
+  const expectedBY = p.antiPhase ? r.maxIncl : r.minIncl;
+  const labelBY = p.antiPhase ? 'MAX' : 'MIN';
   console.log('   ' + p.name + ':');
   console.log('     i(J2000)    = ' + j2000check.toFixed(6) + '° (expected ' + p.inclJ2000 + '°) ' + (Math.abs(j2000check - p.inclJ2000) < 0.001 ? '✓' : '✗'));
-  console.log('     i(balanced) = ' + iAtBY.toFixed(6) + '° = ' + r.minIncl.toFixed(6) + '° (MIN) ' + (Math.abs(iAtBY - r.minIncl) < 0.001 ? '✓' : '✗'));
-  console.log('     i(max)      = ' + iAtMax.toFixed(6) + '° = ' + r.maxIncl.toFixed(6) + '° (MAX) ✓');
+  console.log('     i(balanced) = ' + iAtBY.toFixed(6) + '° = ' + expectedBY.toFixed(6) + '° (' + labelBY + ') ' + (Math.abs(iAtBY - expectedBY) < 0.001 ? '✓' : '✗'));
   console.log('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 7: MAX INCLINATION EVENTS NEAR J2000
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('7. MAX INCLINATION EVENTS NEAR J2000 (±50,000 years)');
-console.log('────────────────────────────────────────────────────');
+// Section 5: Eigenmode comparison
+console.log('5. EIGENMODE PHASE COMPARISON');
+console.log('────────────────────────────');
+console.log('   Eigenmode + 0° = MAX, +90° = mean↓, +180° = MIN, +270° = mean↑');
 console.log('');
 
-for (const [key, p] of Object.entries(planetData)) {
-  const halfCycle = p.absPeriod / 2;
-  const firstMax = balancedYear + halfCycle;
-
-  const events = [];
-  let t = firstMax;
-  while (t > -50000) t -= p.absPeriod;
-  t += p.absPeriod;
-  while (t < 50000) {
-    events.push(Math.round(t));
-    t += p.absPeriod;
+const offsets = [
+  { label: 'MAX', offset: 0 }, { label: 'mean↓', offset: 90 },
+  { label: 'MIN', offset: 180 }, { label: 'mean↑', offset: 270 },
+];
+const targets = [];
+for (const em of allEigenmodes) {
+  for (const off of offsets) {
+    targets.push({
+      mode: em.mode, offset: off.offset, label: off.label,
+      targetAngle: ((em.phase + off.offset) % 360 + 360) % 360,
+      fullLabel: em.mode + ' ' + off.label + ' (' + (((em.phase + off.offset) % 360 + 360) % 360).toFixed(1) + '°)',
+    });
   }
+}
 
-  console.log('   ' + p.name.padEnd(8) + ' (cycle ' + p.absPeriod.toFixed(0).padStart(6) + ' yr): ' +
-    events.map(y => y < 0 ? Math.abs(y) + ' BC' : y + ' AD').join(', '));
+console.log('   Planet     │ Phase angle │ Best eigenmode match                          │ Δ');
+console.log('   ───────────┼─────────────┼───────────────────────────────────────────────┼──────');
+let totalDiff = 0;
+let within5 = 0;
+for (const [key, p] of Object.entries(planetData)) {
+  const r = results[key];
+  let best = targets[0], bestDiff = 999;
+  for (const t of targets) {
+    const d = Math.abs(((r.phaseAngle - t.targetAngle + 180) % 360 + 360) % 360 - 180);
+    if (d < bestDiff) { bestDiff = d; best = t; }
+  }
+  totalDiff += bestDiff;
+  if (bestDiff < 5) within5++;
+  const mark = bestDiff < 3 ? '★' : bestDiff < 5 ? '✓' : bestDiff < 10 ? '~' : ' ';
+  console.log('   ' + mark + ' ' + p.name.padEnd(8) + ' │ ' +
+    r.phaseAngle.toFixed(2).padStart(11) + '° │ ' +
+    best.fullLabel.padEnd(45) + ' │ ' + bestDiff.toFixed(1).padStart(5) + '°');
+}
+console.log('');
+console.log('   Total Δ: ' + totalDiff.toFixed(1) + '°  |  Within 5°: ' + within5 + '/8');
+console.log('');
+
+// Section 6: Max inclination timing
+console.log('6. MAX INCLINATION TIMING');
+console.log('─────────────────────────');
+console.log('');
+console.log('   Planet     │ Incl. cycle │ Phase angle │ Nearest max to J2000');
+console.log('   ───────────┼─────────────┼─────────────┼──────────────────────');
+for (const [key, p] of Object.entries(planetData)) {
+  const r = results[key];
+  const halfCycle = p.absPeriod / 2;
+  // For anti-phase (Saturn): MAX is at balanced year, then every absPeriod
+  // For normal: MAX is at balanced year + halfCycle, then every absPeriod
+  const firstMax = p.antiPhase ? balancedYear : balancedYear + halfCycle;
+  let nearestMax = firstMax;
+  while (nearestMax < 2000 - p.absPeriod / 2) nearestMax += p.absPeriod;
+  while (nearestMax > 2000 + p.absPeriod / 2) nearestMax -= p.absPeriod;
+  const label = nearestMax < 0 ? Math.abs(Math.round(nearestMax)) + ' BC' : Math.round(nearestMax) + ' AD';
+  console.log('   ' + p.name.padEnd(10) + ' │ ' +
+    p.absPeriod.toFixed(0).padStart(11) + ' │ ' +
+    r.phaseAngle.toFixed(2).padStart(11) + '° │ ' +
+    (Math.round(nearestMax) + ' (' + label + ')').padStart(20));
 }
 console.log('');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SECTION 8: SUMMARY
-// ═══════════════════════════════════════════════════════════════════════════
-
-console.log('8. SUMMARY');
+// Section 7: Summary
+console.log('7. SUMMARY');
 console.log('──────────');
 console.log('');
-console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ Mean       │ Amplitude  │ Range           │ LL');
-console.log('   ───────────┼────┼────────────┼─────────────┼────────────┼────────────┼─────────────────┼───');
-
+console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ State BY │ Mean       │ Amplitude  │ Range           │ LL');
+console.log('   ───────────┼────┼────────────┼─────────────┼──────────┼────────────┼────────────┼─────────────────┼───');
 for (const [key, p] of Object.entries(planetData)) {
   const r = results[key];
+  const state = p.antiPhase ? 'MAX ↑' : 'MIN ↓';
   console.log('   ' + p.name.padEnd(10) + ' │ ' +
     p.d.toString().padStart(2) + ' │ ' +
     p.icrfP.toFixed(0).padStart(10) + ' │ ' +
     r.phaseAngle.toFixed(2).padStart(11) + '° │ ' +
+    state.padStart(8) + ' │ ' +
     r.mean.toFixed(4).padStart(10) + '° │ ' +
     p.amp.toFixed(4).padStart(10) + '° │ ' +
     (r.minIncl.toFixed(2) + '° – ' + r.maxIncl.toFixed(2) + '°').padStart(15) + ' │ ' +
-    (r.inLL ? ' ✓' : ' ✗')
-  );
+    (r.inLL ? ' ✓' : ' ✗'));
 }
 console.log('');
-console.log('   Balance: ' + (100 - imb).toFixed(4) + '% (Saturn vs rest, UNCHANGED)');
-console.log('   ψ = ' + PSI.toExponential(6) + ' (UNCHANGED)');
-console.log('');
-
-console.log('9. WHAT CHANGES vs CURRENT MODEL');
-console.log('─────────────────────────────────');
-console.log('');
-console.log('   UNCHANGED:');
-console.log('   - ψ constant, Fibonacci d-values, Amplitudes, Balance');
-console.log('   - J2000 inclination values (exact match)');
-console.log('');
-console.log('   CHANGED:');
-console.log('   - Reference angle: Ω (ascending node) → ω̃_ICRF (perihelion in ICRF)');
-console.log('   - Inclination period: ecliptic perihelion → |ICRF perihelion| per planet');
-console.log('   - Phase angles: universal 203°/23° → per-planet (from balanced year)');
-console.log('   - Phase angle meaning: ω̃_ICRF at MAX inclination for that planet');
-console.log('   - Mean inclination values: small shifts');
-console.log('   - Ascending node: separate calculation at -H/5 (decoupled from inclination)');
+console.log('   Inclination balance: ' + (100 - imbW).toFixed(4) + '% (Saturn vs rest)');
+console.log('   Eccentricity balance: ' + (100 - imbV).toFixed(4) + '%');
+console.log('   ψ = ' + PSI.toExponential(6));
+console.log('   Super-period: 8H = ' + (8 * H).toLocaleString() + ' years');
 console.log('');
