@@ -43,7 +43,7 @@
       "mirrorPair": "uranus",
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 32.83,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 99.52,
       "obliquityCycleFraction": [
         8,
         3
@@ -69,7 +69,7 @@
       "mirrorPair": "neptune",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 54.7,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 79.82,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         3,
@@ -85,14 +85,14 @@
       "startpos": 121.47516084503593,
       "angleCorrection": -2.1093711045845396,
       "perihelionEclipticFraction": [
-        3,
-        13
+        8,
+        35
       ],
       "type": "II",
       "mirrorPair": "jupiter",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 96.95,
       "obliquityCycleFraction": [
         3,
         8
@@ -118,7 +118,7 @@
       "mirrorPair": "mars",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 312.89,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 291.18,
       "obliquityCycleFraction": [
         1,
         2
@@ -144,7 +144,7 @@
       "mirrorPair": "earth",
       "fibonacciD": 3,
       "ascendingNodeInvPlane": 118.81,
-      "inclinationPhaseAngle": 23.3195,
+      "inclinationPhaseAngle": 120.38,
       "obliquityCycleFraction": [
         1,
         3
@@ -170,7 +170,7 @@
       "mirrorPair": "mercury",
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 307.8,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 21.33,
       "obliquityCycleFraction": [
         1,
         2
@@ -196,7 +196,7 @@
       "mirrorPair": "venus",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 192.04,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationPhaseAngle": 354.04,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         -68,

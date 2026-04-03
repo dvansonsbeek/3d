@@ -127,12 +127,12 @@ function computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction) {
  * Formula: mean = inclJ2000 - amplitude × cos((Ω_J2000 - phaseAngle) × π/180)
  * @param {number} inclJ2000 - Invariable plane inclination at J2000 (degrees)
  * @param {number} amplitude - Inclination oscillation amplitude (degrees)
- * @param {number} ascendingNodeInvPlane - Ascending node on invariable plane at J2000 (degrees)
+ * @param {number} longitudePerihelion - Longitude of perihelion at J2000 (degrees)
  * @param {number} inclinationPhaseAngle - Phase angle for inclination oscillation (degrees)
  * @returns {number} Mean inclination in degrees
  */
-function computeInvPlaneInclinationMean(inclJ2000, amplitude, ascendingNodeInvPlane, inclinationPhaseAngle) {
-  return inclJ2000 - amplitude * Math.cos((ascendingNodeInvPlane - inclinationPhaseAngle) * Math.PI / 180);
+function computeInvPlaneInclinationMean(inclJ2000, amplitude, longitudePerihelion, inclinationPhaseAngle) {
+  return inclJ2000 - amplitude * Math.cos((longitudePerihelion - inclinationPhaseAngle) * Math.PI / 180);
 }
 
 /**

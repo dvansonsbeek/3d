@@ -85,11 +85,11 @@ const earthtiltMean = modelParams.earth.earthtiltMean;
 const earthInvPlaneInclinationAmplitude = modelParams.earth.earthInvPlaneInclinationAmplitude;
 // Derived: 2A − A²/ε — two tilt layers (H/3 + H/5) minus second-order equatorial projection
 const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude, earthtiltMean);
-// Derived: inclJ2000 − amplitude × cos(Ω_J2000 − phaseAngle) — refs from ASTRO_REFERENCE
+// Derived: inclJ2000 − amplitude × cos(ω̃_J2000 − phaseAngle) — using perihelion longitude (ICRF)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
   ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,
-  earthAscendingNodeInvPlane, ASTRO_REFERENCE.earthInclinationPhaseAngle);
+  ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationPhaseAngle);
 const eccentricityBase = modelParams.earth.eccentricityBase;
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
 const eccentricityAmplitudeK = modelParams.earth.eccentricityAmplitudeK;
@@ -347,13 +347,14 @@ const eccJ2000 = {
 const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 
 // Derive invPlaneInclinationAmplitude and invPlaneInclinationMean for each planet
-// Amplitude = PSI / (d × √m), Mean = inclJ2000 - amplitude × cos(Ω - φ)
+// Amplitude = PSI / (d × √m), Mean = inclJ2000 - amplitude × cos(ω̃ - φ)
+// Uses perihelion longitude (ICRF reference) instead of ascending node
 for (const [key, p] of Object.entries(planets)) {
   if (p.fibonacciD && massFraction[key] && p.invPlaneInclinationJ2000 !== undefined) {
     p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
     p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
       p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
-      p.ascendingNodeInvPlane, p.inclinationPhaseAngle);
+      p.longitudePerihelion, p.inclinationPhaseAngle);
   }
 }
 
