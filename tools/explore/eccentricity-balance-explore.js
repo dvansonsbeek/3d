@@ -3,7 +3,7 @@
 // Goal: Find what tweaks can bring Law 5 balance from 99.89% to 100%
 //
 // The eccentricity balance formula: v_j = √m_j × a_j^(3/2) × e_j / √d_j
-// Two phase groups must sum to equal: Σ(prograde) v_j = Σ(anti-phase) v_j
+// Two phase groups must sum to equal: Σ(in-phase) v_j = Σ(anti-phase) v_j
 // Saturn is the only anti-phase planet, so: v_Saturn = Σ(other 7 planets)
 //
 // Usage: node tools/explore/eccentricity-balance-explore.js
@@ -53,7 +53,7 @@ function computeEccBalance(eccOverrides, syiOverrides) {
     const e = eccOverrides?.[p] ?? eccJ2000[p];
     const v = Math.sqrt(m) * Math.pow(a, 1.5) * e / Math.sqrt(d[p]);
     weights[p] = v;
-    if (p === 'saturn') sum23 += v;
+    if (C.planets[p] && C.planets[p].antiPhase) sum23 += v;
     else sum203 += v;
   }
   const total = sum203 + sum23;
@@ -71,10 +71,10 @@ console.log('══════════════════════�
 
 const base = computeEccBalance();
 console.log(`\nCurrent balance: ${base.balance.toFixed(6)}%`);
-console.log(`  Σ(prograde) = ${base.sum203.toExponential(10)}`);
+console.log(`  Σ(in-phase) = ${base.sum203.toExponential(10)}`);
 console.log(`  Σ(anti-phase)  = ${base.sum23.toExponential(10)}  (Saturn only)`);
 console.log(`  Gap     = ${base.gap.toExponential(6)}`);
-console.log(`  Gap is on the ${base.sum23 > base.sum203 ? 'anti-phase (Saturn)' : 'prograde'} side`);
+console.log(`  Gap is on the ${base.sum23 > base.sum203 ? 'anti-phase (Saturn)' : 'in-phase'} side`);
 
 console.log('\nPer-planet v-weights:');
 console.log('Planet      √m          a^(3/2)      e            1/√d        v_j              % of total');
@@ -108,9 +108,9 @@ Parameters in the formula:
        Eccentricities oscillate secularly, so using a mean value
        (averaged over a secular cycle) is physically justified.
 
-Since Saturn is heavier (anti-phase side > prograde side), we need to either:
+Since Saturn is heavier (anti-phase side > in-phase side), we need to either:
   (a) REDUCE Saturn's v-weight, or
-  (b) INCREASE one or more prograde planet v-weights
+  (b) INCREASE one or more in-phase planet v-weights
 `);
 
 // ═══════════════════════════════════════════════════════════════
@@ -136,7 +136,7 @@ const secularRange = {
 };
 
 for (const p of planets) {
-  // For a prograde planet: increasing e moves prograde sum up → closes gap (since anti-phase is heavier)
+  // For an in-phase planet: increasing e moves in-phase sum up → closes gap (since anti-phase is heavier)
   // For Saturn (anti-phase): decreasing e moves anti-phase sum down → closes gap
   // Perfect e: solve v_perfect such that sum203_new = sum23_new
 
@@ -144,7 +144,7 @@ for (const p of planets) {
   const a = getSMA(p);
   const coeff = Math.sqrt(m) * Math.pow(a, 1.5) / Math.sqrt(d[p]);
 
-  if (p === 'saturn') {
+  if (C.planets[p] && C.planets[p].antiPhase) {
     // Saturn is anti-phase side. sum203 = base.sum203, new sum23 = coeff * e_new
     // Balance when: base.sum203 = coeff * e_new → e_new = base.sum203 / coeff
     const ePerfect = base.sum203 / coeff;
@@ -154,7 +154,7 @@ for (const p of planets) {
     const inRange = ePerfect >= range.min && ePerfect <= range.max ? 'YES' : 'NO';
     console.log(`${p.padEnd(10)}  ${eccJ2000[p].toFixed(8)}  ${ePerfect.toFixed(8)}  ${(delta >= 0 ? '+' : '') + delta.toExponential(4)}  ${pctChange.toFixed(4).padStart(9)}%  [${range.min}, ${range.max}] ${inRange}`);
   } else {
-    // prograde planet. new sum203 = base.sum203 - base.weights[p] + coeff * e_new
+    // in-phase planet. new sum203 = base.sum203 - base.weights[p] + coeff * e_new
     // Balance when: base.sum203 - base.weights[p] + coeff * e_new = base.sum23
     // e_new = (base.sum23 - base.sum203 + base.weights[p]) / coeff
     const ePerfect = (base.sum23 - base.sum203 + base.weights[p]) / coeff;
@@ -261,7 +261,7 @@ console.log(`  Using Lagrange multiplier approach...`);
   //
   // Lagrangian: L = Σ((e_j - e_j0)/e_j0)² - λ(Σ_{j≠sat} c_j*e_j - c_sat*e_sat)
   // ∂L/∂e_j = 2(e_j - e_j0)/e_j0² + sign_j*λ*c_j = 0
-  // where sign_j = -1 for prograde, +1 for saturn
+  // where sign_j = -1 for in-phase, +1 for anti-phase
   // e_j = e_j0 - sign_j * λ * c_j * e_j0² / 2
 
   const c = {};
@@ -290,7 +290,7 @@ console.log(`  Using Lagrange multiplier approach...`);
   let totalRelChange2 = 0;
   const eccOptimal = {};
   for (const p of planets) {
-    const sign = p === 'saturn' ? +1 : -1;
+    const sign = (C.planets[p] && C.planets[p].antiPhase) ? +1 : -1;
     const deltaE = -sign * lambda * c[p] * eccJ2000[p] * eccJ2000[p] / 2;
     const eOpt = eccJ2000[p] + deltaE;
     eccOptimal[p] = eOpt;
@@ -324,7 +324,7 @@ const circResult = computeEccBalance(eccCircular);
 console.log(`\nBalance with e/(1+e): ${circResult.balance.toFixed(6)}%`);
 console.log(`Balance with e_JPL:   ${base.balance.toFixed(6)}%`);
 console.log(`Change: ${(circResult.balance - base.balance) > 0 ? '+' : ''}${(circResult.balance - base.balance).toFixed(6)}%`);
-console.log(`\n  Σ(prograde) = ${circResult.sum203.toExponential(10)}`);
+console.log(`\n  Σ(in-phase) = ${circResult.sum203.toExponential(10)}`);
 console.log(`  Σ(anti-phase)  = ${circResult.sum23.toExponential(10)}`);
 console.log(`  Gap     = ${circResult.gap.toExponential(6)}`);
 
@@ -369,7 +369,7 @@ console.log(`\nApproach D (circular): Minimum perturbation spread across all pla
   console.log('\n  Planet      e_circ        e_optimal     Δe           Δe/e (%)      Back to JPL e');
   const eccOpt = {};
   for (const p of planets) {
-    const sign = p === 'saturn' ? +1 : -1;
+    const sign = (C.planets[p] && C.planets[p].antiPhase) ? +1 : -1;
     const deltaE = -sign * lambda * c[p] * eccCircular[p] * eccCircular[p] / 2;
     eccOpt[p] = eccCircular[p] + deltaE;
     const relChange = deltaE / eccCircular[p] * 100;

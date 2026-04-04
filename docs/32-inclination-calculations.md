@@ -70,23 +70,23 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Phase Angles
 
-Each planet has its own phase angle, derived from the ICRF perihelion longitude at the balanced year (n=0, ~302,635 BC). At the balanced year, all prograde planets reach minimum inclination and Saturn reaches maximum:
+Each planet has its own phase angle, derived from the ICRF perihelion longitude at the balanced year (n=0, ~302,635 BC). At the balanced year, all in-phase planets reach minimum inclination and Saturn (anti-phase) reaches maximum:
 
 | Planet | Phase Angle | Balance Group | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------------|---------------------------|
-| Mercury | 99.52° | Prograde | Retrograde | Decreasing |
-| Venus | 79.82° | Prograde | Retrograde | Decreasing |
-| Earth | 21.77° | Prograde | Prograde | Decreasing |
-| Mars | 96.95° | Prograde | Retrograde | Decreasing |
-| Jupiter | 291.18° | Prograde | Retrograde | Decreasing |
+| Mercury | 99.52° | In-phase | Retrograde | Decreasing |
+| Venus | 79.82° | In-phase | Retrograde | Decreasing |
+| Earth | 21.77° | In-phase | Prograde | Decreasing |
+| Mars | 96.95° | In-phase | Retrograde | Decreasing |
+| Jupiter | 291.18° | In-phase | Retrograde | Decreasing |
 | **Saturn** | **120.38°** | **Anti-phase** | **Retrograde** | **Increasing** |
-| Uranus | 21.33° | Prograde | Retrograde | Decreasing |
-| Neptune | 354.04° | Prograde | Retrograde | Decreasing |
+| Uranus | 21.33° | In-phase | Retrograde | Decreasing |
+| Neptune | 354.04° | In-phase | Retrograde | Decreasing |
 | Pluto | 203.32° | — | Retrograde | Decreasing |
 
 **Key insights**:
 - Phase angles are the ICRF perihelion longitude at the balanced year (when inclination is at extremum)
-- Balance groups are determined by the **invariable plane balance condition**: Σ(prograde) w = Σ(anti-phase) w
+- Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w
 - Saturn is **anti-phase**: its inclination is at MAX when all other planets are at MIN
 - Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde
 - Phase angles cluster near Laplace-Lagrange eigenmodes (γ₁-γ₈) within 1-10°

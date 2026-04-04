@@ -125,7 +125,7 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
   }
 
-  // Scalar balance (prograde vs anti-phase)
+  // Scalar balance (in-phase vs anti-phase)
   let sumPro = 0, sumAnti = 0;
   for (const key of planets) {
     const L = mass[key] * Math.sqrt(orbitDistance[key] * (1 - ecc[key] * ecc[key]));
@@ -150,13 +150,13 @@ function computeBalance(config) {
 // ══════════════════════════════════════════════════════════════════
 
 const fibNumbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-const groups = ['prograde', 'anti-phase'];
+const groups = ['in-phase', 'anti-phase'];
 
 const scenarios = [
-  { name: 'A', jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' } },
-  { name: 'B', jupiter: { d: 8, group: 'prograde' }, saturn: { d: 5, group: 'anti-phase' } },
-  { name: 'C', jupiter: { d: 13, group: 'prograde' }, saturn: { d: 8, group: 'anti-phase' } },
-  { name: 'D', jupiter: { d: 21, group: 'prograde' }, saturn: { d: 13, group: 'anti-phase' } },
+  { name: 'A', jupiter: { d: 5, group: 'in-phase' }, saturn: { d: 3, group: 'anti-phase' } },
+  { name: 'B', jupiter: { d: 8, group: 'in-phase' }, saturn: { d: 5, group: 'anti-phase' } },
+  { name: 'C', jupiter: { d: 13, group: 'in-phase' }, saturn: { d: 8, group: 'anti-phase' } },
+  { name: 'D', jupiter: { d: 21, group: 'in-phase' }, saturn: { d: 13, group: 'anti-phase' } },
 ];
 
 const THRESHOLD = 99.994;
@@ -223,7 +223,7 @@ for (const scenario of scenarios) {
                       const config = {
                         mercury: { d: fibNumbers[mi], group: groups[mp] },
                         venus: { d: fibNumbers[vi], group: groups[vp] },
-                        earth: { d: 3, group: 'prograde' },
+                        earth: { d: 3, group: 'in-phase' },
                         mars: { d: fibNumbers[mai], group: groups[map] },
                         jupiter: scenario.jupiter,
                         saturn: scenario.saturn,
@@ -369,7 +369,7 @@ for (let i = 0; i < saturnSoloBalanceConfigs.length; i++) {
 console.log('\n═══════════════════════════════════════════════════════════════');
 console.log('SECTION 4: MIRROR + SATURN-SOLO + LL BOUNDS (36 configs)');
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('\nAll use Scenario A (Ju=5, Sa=3), Earth d=3, Mars d=5, all prograde except Saturn anti-phase.');
+console.log('\nAll use Scenario A (Ju=5, Sa=3), Earth d=3, Mars d=5, all in-phase except Saturn anti-phase.');
 console.log('LL bounds require d ≥ 5 for both Mercury↔Uranus and Venus↔Neptune.\n');
 
 mirrorSaturnSoloLLConfigs.sort((a, b) => b.balance - a.balance);
@@ -390,7 +390,7 @@ console.log('SECTION 5: ANALYTICAL VERIFICATION');
 console.log('═══════════════════════════════════════════════════════════════\n');
 
 console.log('Search space: 9 fibs × 2 phases × 5 planets × 4 scenarios = 18⁵ × 4 =', 18**5 * 4);
-console.log('Saturn-solo: all 5 variable planets prograde = 9⁵ × 4 =', 9**5 * 4);
+console.log('Saturn-solo: all 5 variable planets in-phase = 9⁵ × 4 =', 9**5 * 4);
 console.log('Mirror (Scenario A only): Earth↔Sa locked, Mars↔Ju locked, 2 Mars groups × 9 Me/Ur d × 4 Me/Ur groups × 9 Ve/Ne d × 4 Ve/Ne groups =', 2 * 9 * 4 * 9 * 4);
-console.log('Mirror ∩ Saturn-solo: Mars prograde, Me/Ur both prograde, Ve/Ne both prograde = 9 × 9 =', 9 * 9);
+console.log('Mirror ∩ Saturn-solo: Mars in-phase, Me/Ur both in-phase, Ve/Ne both in-phase = 9 × 9 =', 9 * 9);
 console.log('Mirror ∩ Saturn-solo ∩ LL (d≥5): 6 × 6 =', 6 * 6);

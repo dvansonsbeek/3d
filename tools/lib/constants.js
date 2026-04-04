@@ -143,6 +143,7 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     fibonacciD: mp.fibonacciD,
     ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
     inclinationPhaseAngle: mp.inclinationPhaseAngle,
+    antiPhase: mp.antiPhase || false,
     ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
     ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
     obliquityCycle: fractionToYears(mp.obliquityCycleFraction),
@@ -356,7 +357,7 @@ for (const [key, p] of Object.entries(planets)) {
     p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
     p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
       p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
-      p.longitudePerihelion, p.inclinationPhaseAngle, key === 'saturn');
+      p.longitudePerihelion, p.inclinationPhaseAngle, p.antiPhase);
   }
 }
 

@@ -71,7 +71,7 @@ Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between the prograde group (7 planets) and anti-phase group (Saturn) to **100% balance**.
+**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between the in-phase group (7 planets) and anti-phase group (Saturn) to **100% balance**.
 
 **Laws 4-5 -- Eccentricity Constant & Balance**: All 8 eccentricities are determined by Fibonacci pair constraints. Saturn's eccentricity is independently predicted to within 0.3% by two different laws.
 
@@ -96,7 +96,7 @@ Each inner planet shares its Fibonacci divisor with its outer counterpart across
 | Far | Venus (d=34) | Neptune (d=34) | 34 | F9 |
 | Outermost | Mercury (d=21) | Uranus (d=21) | 21 | F8 |
 
-Earth-Saturn is the only pair with opposite balance groups (prograde vs anti-phase).
+Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-phase).
 
 ### 2.4 Implications for the Optimization Tool
 

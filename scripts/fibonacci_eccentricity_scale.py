@@ -9,7 +9,7 @@ planets, but a SYSTEM of relationships that determines all 8 eccentricities
 simultaneously.
 
 The balance equation (Law 5):
-    Σ(prograde) √m_j × a_j^1.5 × e_j / √d_j = √m_S × a_S^1.5 × e_S / √d_S
+    Σ(in-phase) √m_j × a_j^1.5 × e_j / √d_j = √m_S × a_S^1.5 × e_S / √d_S
 
 Rewritten as a scale:
     Saturn's offset = Σ W_j × offset_j
@@ -20,7 +20,7 @@ where:
 
 Key discoveries:
   1. Jupiter's weight W ≈ 1 (mass, Fibonacci, distance cancel)
-  2. Saturn's offset is a weighted sum of prograde group offsets
+  2. Saturn's offset is a weighted sum of in-phase group offsets
   3. The Jupiter/Saturn e×a ≈ 1:2 ratio is derived from balance
   4. All 8 eccentricities are determined by 9 equations (0 free params)
   5. The e×a×m ratio between groups ≈ 2:1
@@ -72,7 +72,7 @@ print("=" * 90)
 print("""
   Imagine a balance scale (like Lady Justice):
 
-  LEFT side (prograde group):                RIGHT side (anti-phase group):
+  LEFT side (in-phase group):                RIGHT side (anti-phase group):
   ┌─────────────────────┐                ┌─────────────────────┐
   │ Jupiter  51.2%      │                │ Saturn  100%        │
   │ Uranus   37.0%      │       ⚖        │                     │
@@ -101,7 +101,7 @@ print("=" * 90)
 print(f"""
   Saturn's perihelion offset is determined by the balance equation:
 
-    offset_Saturn = Σ W_j × offset_j   (sum over all prograde planets)
+    offset_Saturn = Σ W_j × offset_j   (sum over all in-phase planets)
 
   where the WEIGHT of each planet relative to Saturn is:
 
@@ -203,7 +203,7 @@ print(f"\n  Perihelion offsets (e × a) — the 'positions' on the scale:\n")
 
 # Sort by offset
 sorted_203 = sorted(GROUP_203, key=lambda p: EA[p], reverse=True)
-print(f"  LEFT (prograde) — sorted by offset:")
+print(f"  LEFT (in-phase) — sorted by offset:")
 for p in sorted_203:
     bar = "█" * int(EA[p] / EA['Uranus'] * 40)
     W = scale_weight(p)
@@ -243,13 +243,13 @@ for p in PLANET_NAMES:
     pct = eam[p] / grp_total * 100
     print(f"  {p:>10} {eam[p]:14.6e} {pct:9.2f}% {g:>6}")
 
-print(f"\n  Σ(prograde) e×a×m = {eam_203:.6e}")
+print(f"\n  Σ(in-phase) e×a×m = {eam_203:.6e}")
 print(f"  Saturn   e×a×m = {eam_23:.6e}")
-print(f"  Ratio prograde/anti-phase = {eam_203 / eam_23:.4f}")
-print(f"\n  The prograde group has almost exactly 2× Saturn's e×a×m.")
+print(f"  Ratio in-phase/anti-phase = {eam_203 / eam_23:.4f}")
+print(f"\n  The in-phase group has almost exactly 2× Saturn's e×a×m.")
 print(f"  This 2:1 ratio is NOT the balance law (which is 1:1 for")
 print(f"  e×a^1.5×√m/√d), but arises because Jupiter dominates the")
-print(f"  prograde sum at 81.8% and Jup/Sat e×a×m = {eam['Jupiter']/eam_23:.4f}.")
+print(f"  in-phase sum at 81.8% and Jup/Sat e×a×m = {eam['Jupiter']/eam_23:.4f}.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -272,7 +272,7 @@ print(f"""
     sign_j = -1 if j is in the SAME phase group (pulls away from target)
 
   For Saturn (sole anti-phase member), all signs are +1 (simple sum).
-  For prograde planets, Saturn pushes (+) while other prograde planets pull (-).
+  For in-phase planets, Saturn pushes (+) while other in-phase planets pull (-).
   The eccentricity is the RESIDUAL of a massive tug-of-war.
 """)
 
@@ -318,16 +318,16 @@ print(f"  KEY INSIGHTS FROM THE FULL BREAKDOWN")
 print(f"  ═══════════════════════════════════════════════════════")
 print(f"""
   SATURN (anti-phase — all contributions positive):
-    Simply the sum of all prograde planets' weighted offsets.
+    Simply the sum of all in-phase planets' weighted offsets.
     Jupiter provides the foundation (51%), Uranus and Neptune add the rest.
 
-  JUPITER (prograde — Saturn pushes, others pull back):
+  JUPITER (in-phase — Saturn pushes, others pull back):
     Saturn pushes +0.490 AU, but Uranus (-0.181) and Neptune (-0.056)
     pull back, leaving Jupiter at 0.251 AU. Jupiter is the BALANCE
-    CENTER of the prograde group — its offset is what remains after
+    CENTER of the in-phase group — its offset is what remains after
     the other gas giants partially cancel Saturn's push.
 
-  INNER PLANETS (prograde — caught in the giant tug-of-war):
+  INNER PLANETS (in-phase — caught in the giant tug-of-war):
     For Earth: Saturn pushes +15.4 AU, but Jupiter pulls -7.9 AU,
     Uranus pulls -5.7 AU, Neptune pulls -1.8 AU → residual = 0.015 AU.
     The inner planets' small eccentricities are NOT because they are
@@ -430,7 +430,7 @@ v203_pred = sum(SQRT_M[p] * SMA[p] ** 1.5 * e_pred[p] / math.sqrt(D[p])
 v23_pred = SQRT_M['Saturn'] * SMA['Saturn'] ** 1.5 * e_pred['Saturn'] / math.sqrt(D['Saturn'])
 bal_pred = (1 - abs(v203_pred - v23_pred) / (v203_pred + v23_pred)) * 100
 
-print(f"  Σ(prograde) = {v203_pred:.10e}")
+print(f"  Σ(in-phase) = {v203_pred:.10e}")
 print(f"  Σ(anti-phase)  = {v23_pred:.10e}")
 print(f"  Balance = {bal_pred:.4f}%")
 
@@ -462,7 +462,7 @@ print(f"""
   │  Eccentricity Balance System:                                │
   │    R²_in + R²_out = Fibonacci fraction (×4 pairs)           │
   │    R_in × R_out or R_in/R_out = Fibonacci fraction (×4)     │
-  │    Σ(prograde) √m × a^1.5 × e / √d = Σ(anti-phase) same (×1)        │
+  │    Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same (×1)        │
   │    Nine equations, determines ALL 8 eccentricities           │
   │    Zero free parameters                                      │
   │    Physical basis: secular perturbation balance (?)           │
@@ -479,7 +479,7 @@ print(f"""
   - Fibonacci divisors d (from the ψ-constant framework)
   - ψ-constant (determines inclination amplitudes → i_mean)
   - 8 Fibonacci fractions (the R² and C2 targets)
-  - Phase group assignment (prograde vs anti-phase)
+  - Phase group assignment (in-phase vs anti-phase)
 """)
 
 
@@ -597,7 +597,7 @@ print("""
   ════════════════════════════════════
 
   1. WHAT IT IS:
-     A balance scale where 7 planets (prograde group) on one side
+     A balance scale where 7 planets (in-phase group) on one side
      must balance Saturn (anti-phase group, sole member) on the other.
 
   2. THE WEIGHT of each planet on the scale:

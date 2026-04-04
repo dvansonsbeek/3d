@@ -244,15 +244,15 @@ MIRROR_PAIRS = [
 # Balance groups: Saturn is the sole anti-phase planet
 # Per-planet phase angles are in INCL_PHASE_ANGLE (ICRF perihelion at balanced year)
 PHASE_GROUP = {
-    "Mercury": "prograde", "Venus": "prograde", "Earth": "prograde", "Mars": "prograde",
-    "Jupiter": "prograde", "Saturn": "anti-phase", "Uranus": "prograde", "Neptune": "prograde",
+    "Mercury": "in-phase", "Venus": "in-phase", "Earth": "in-phase", "Mars": "in-phase",
+    "Jupiter": "in-phase", "Saturn": "anti-phase", "Uranus": "in-phase", "Neptune": "in-phase",
 }
 
 # Planet lists by balance group
-GROUP_PROGRADE = [p for p in PLANET_NAMES if p != "Saturn"]
+GROUP_IN_PHASE = [p for p in PLANET_NAMES if p != "Saturn"]
 GROUP_ANTI = ["Saturn"]
 # Backwards compatibility aliases
-GROUP_203 = GROUP_PROGRADE
+GROUP_203 = GROUP_IN_PHASE  # legacy alias
 GROUP_23 = GROUP_ANTI
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -489,20 +489,20 @@ def eccentricity_weight(planet):
 
 
 def verify_law2():
-    """Verify Law 3: inclination balance between prograde and anti-phase groups.
+    """Verify Law 3: inclination balance between in-phase and anti-phase groups.
     Returns (sum_pro, sum_anti, balance_pct).
     """
-    sum_pro = sum(inclination_weight(p) for p in GROUP_PROGRADE)
+    sum_pro = sum(inclination_weight(p) for p in GROUP_IN_PHASE)
     sum_anti = sum(inclination_weight(p) for p in GROUP_ANTI)
     balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
     return sum_pro, sum_anti, balance * 100
 
 
 def verify_law3():
-    """Verify Law 5: eccentricity balance between prograde and anti-phase groups.
+    """Verify Law 5: eccentricity balance between in-phase and anti-phase groups.
     Returns (sum_pro, sum_anti, balance_pct).
     """
-    sum_pro = sum(eccentricity_weight(p) for p in GROUP_PROGRADE)
+    sum_pro = sum(eccentricity_weight(p) for p in GROUP_IN_PHASE)
     sum_anti = sum(eccentricity_weight(p) for p in GROUP_ANTI)
     balance = 1 - abs(sum_pro - sum_anti) / (sum_pro + sum_anti)
     return sum_pro, sum_anti, balance * 100
@@ -512,7 +512,7 @@ def predict_saturn_eccentricity():
     """Finding 4: predict Saturn's eccentricity from eccentricity balance.
     Returns (predicted_e, actual_e, error_pct).
     """
-    sum_pro = sum(eccentricity_weight(p) for p in GROUP_PROGRADE)
+    sum_pro = sum(eccentricity_weight(p) for p in GROUP_IN_PHASE)
     coeff = math.sqrt(MASS["Saturn"]) * SMA["Saturn"]**1.5 / math.sqrt(D["Saturn"])
     predicted = sum_pro / coeff
     actual = ECC["Saturn"]

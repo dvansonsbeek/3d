@@ -355,7 +355,7 @@ for (const [key, p] of Object.entries(planets)) {
   const mass = C.massFraction[key];
   const amp = PSI / (d * Math.sqrt(mass));
   const inclJ2000 = key === 'earth' ? 1.57869 : C.planets[key].invPlaneInclinationJ2000;
-  const antiPhase = key === 'saturn';
+  const antiPhase = key === 'earth' ? false : C.planets[key].antiPhase;
 
   const periAtBY = ((p.icrfRate * (balancedYear - 2000) + (key === 'earth' ? 102.947 : C.planets[key].longitudePerihelion)) % 360 + 360) % 360;
   const phase = antiPhase ? periAtBY : ((periAtBY - 180 + 360) % 360);

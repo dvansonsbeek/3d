@@ -35,12 +35,14 @@ for (const p of planets) {
 }
 
 // Config #3: unique mirror-symmetric Fibonacci assignment
-const config3 = {
-  mercury: { d: 21, phase: 203 }, venus: { d: 34, phase: 203 },
-  earth: { d: 3, phase: 203 }, mars: { d: 5, phase: 203 },
-  jupiter: { d: 5, phase: 203 }, saturn: { d: 3, phase: 23 },
-  uranus: { d: 21, phase: 203 }, neptune: { d: 34, phase: 203 },
-};
+const config3 = {};
+for (const p of planets) {
+  if (p === 'earth') {
+    config3[p] = { d: 3, antiPhase: false };
+  } else {
+    config3[p] = { d: C.planets[p].fibonacciD, antiPhase: C.planets[p].antiPhase };
+  }
+}
 
 // Mirror pairs (inner ↔ outer across asteroid belt)
 const mirrorPairs = [
@@ -57,7 +59,7 @@ function computeBalance(ecc) {
   for (const p of planets) {
     const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
-    if (p !== 'saturn') sum203 += v; else sum23 += v;  // Saturn anti-phase
+    if (!config3[p].antiPhase) sum203 += v; else sum23 += v;
   }
   const total = sum203 + sum23;
   const balance = (1 - Math.abs(sum203 - sum23) / total) * 100;
@@ -154,7 +156,7 @@ for (const eSa of saturnEValues) {
 
   // Other pairs: outer shifts proportionally, inner adjusts
   for (const pair of mirrorPairs) {
-    if (pair.outer === 'saturn') continue;
+    if (config3[pair.outer].antiPhase) continue;
     const key = pair.inner + '-' + pair.outer;
     const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
@@ -200,7 +202,7 @@ for (let eSa = 0.012; eSa <= 0.088; eSa += 0.0001) {
   if (amdEa > 0) ecc3.earth = eFromAmd('earth', amdEa);
 
   for (const pair of mirrorPairs) {
-    if (pair.outer === 'saturn') continue;
+    if (config3[pair.outer].antiPhase) continue;
     const key = pair.inner + '-' + pair.outer;
     const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
@@ -250,7 +252,7 @@ for (const eSa of [0.015, 0.020, 0.030, 0.040, 0.050, 0.05386, 0.060, 0.070, 0.0
   if (amdEa > 0) ecc3.earth = eFromAmd('earth', amdEa);
 
   for (const pair of mirrorPairs) {
-    if (pair.outer === 'saturn') continue;
+    if (config3[pair.outer].antiPhase) continue;
     const key = pair.inner + '-' + pair.outer;
     const newOuterE = eccBase[pair.outer] * saFrac;
     ecc3[pair.outer] = Math.max(newOuterE, 1e-6);
@@ -262,7 +264,7 @@ for (const eSa of [0.015, 0.020, 0.030, 0.040, 0.050, 0.05386, 0.060, 0.070, 0.0
   // Compute perfect-balance Saturn e from these other-planet eccentricities
   let sum203 = 0;
   for (const p of planets) {
-    if (p === 'saturn') continue;
+    if (config3[p].antiPhase) continue;
     const d = config3[p].d;
     sum203 += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc3[p] / Math.sqrt(d);
   }
@@ -319,7 +321,7 @@ console.log('The question is: how large is the required correction?\n');
 // Compute sum_203 at J2000 (all non-Saturn planets)
 let sum203_fixed = 0;
 for (const p of planets) {
-  if (p === 'saturn') continue;
+  if (config3[p].antiPhase) continue;
   sum203_fixed += Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * eccBase[p] / Math.sqrt(config3[p].d);
 }
 const e_perf = sum203_fixed * sqrtD_sa / (sqrtM_sa * a32_sa);

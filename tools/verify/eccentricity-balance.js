@@ -81,12 +81,14 @@ for (const p of planets) {
 }
 
 // Config #3: unique mirror-symmetric Fibonacci assignment
-const config3 = {
-  mercury: { d: 21, phase: 203 }, venus: { d: 34, phase: 203 },
-  earth: { d: 3, phase: 203 }, mars: { d: 5, phase: 203 },
-  jupiter: { d: 5, phase: 203 }, saturn: { d: 3, phase: 23 },
-  uranus: { d: 21, phase: 203 }, neptune: { d: 34, phase: 203 },
-};
+const config3 = {};
+for (const p of planets) {
+  if (p === 'earth') {
+    config3[p] = { d: 3, antiPhase: false };
+  } else {
+    config3[p] = { d: C.planets[p].fibonacciD, antiPhase: C.planets[p].antiPhase };
+  }
+}
 
 // Mirror pairs (inner ↔ outer across asteroid belt)
 const mirrorPairs = [
@@ -104,7 +106,7 @@ function computeBalance(ecc) {
     const d = config3[p].d;
     const v = Math.sqrt(mass[p]) * Math.pow(orbitDistance[p], 1.5) * ecc[p] / Math.sqrt(d);
     vPerPlanet[p] = v;
-    if (p !== 'saturn') sum203 += v; else sum23 += v;  // Saturn anti-phase
+    if (!config3[p].antiPhase) sum203 += v; else sum23 += v;
   }
   const gap = sum23 - sum203;
   const total = sum203 + sum23;
@@ -133,12 +135,12 @@ for (const p of planets) {
   const d = config3[p].d;
   const sqrtM = Math.sqrt(mass[p]);
   const a32 = Math.pow(orbitDistance[p], 1.5);
-  const group = p === 'saturn' ? 'anti' : 'rest';
+  const group = config3[p].antiPhase ? 'anti' : 'rest';
   const pct = (base.v[p] / base.total * 100).toFixed(2);
   console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${sqrtM.toExponential(3).padStart(11)} | ${a32.toFixed(4).padStart(11)} | ${eccBase[p].toFixed(8)} | ${base.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(prograde) = ${base.sum203.toExponential(6)}`);
+console.log(`\n  Σ(in-phase) = ${base.sum203.toExponential(6)}`);
 console.log(`  Σ(anti-phase)  = ${base.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${base.gap.toExponential(6)}`);
 console.log(`  Total   = ${base.total.toExponential(6)}`);
@@ -157,12 +159,12 @@ console.log('| Planet   | Group | d  | e (J2000)  | v_j          | % of total |'
 console.log('|----------|-------|----|------------|--------------|------------|');
 for (const p of planets) {
   const d = config3[p].d;
-  const group = p === 'saturn' ? 'anti' : 'rest';
+  const group = config3[p].antiPhase ? 'anti' : 'rest';
   const pct = (j2000.v[p] / j2000.total * 100).toFixed(2);
   console.log(`| ${p.padEnd(8)} | ${group.padEnd(4)}  | ${d.toString().padStart(2)} | ${eccJ2000[p].toFixed(8)} | ${j2000.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(prograde) = ${j2000.sum203.toExponential(6)}`);
+console.log(`\n  Σ(in-phase) = ${j2000.sum203.toExponential(6)}`);
 console.log(`  Σ(anti-phase)  = ${j2000.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${j2000.gap.toExponential(6)}`);
 console.log(`  Total   = ${j2000.total.toExponential(6)}`);
@@ -184,13 +186,13 @@ console.log('| Planet   | Group | d  | e (dynamic)| e (J2000)  | Δe           |
 console.log('|----------|-------|----|------------|------------|--------------|--------------|------------|');
 for (const p of planets) {
   const d = config3[p].d;
-  const group = p === 'saturn' ? 'anti' : 'rest';
+  const group = config3[p].antiPhase ? 'anti' : 'rest';
   const pct = (dynamic.v[p] / dynamic.total * 100).toFixed(2);
   const delta = eccDynamic[p] - eccJ2000[p];
   console.log(`| ${p.padEnd(8)} | ${group}  | ${d.toString().padStart(2)} | ${eccDynamic[p].toFixed(8)} | ${eccJ2000[p].toFixed(8)} | ${delta.toExponential(3).padStart(12)} | ${dynamic.v[p].toExponential(4).padStart(12)} | ${pct.padStart(9)}% |`);
 }
 
-console.log(`\n  Σ(prograde) = ${dynamic.sum203.toExponential(6)}`);
+console.log(`\n  Σ(in-phase) = ${dynamic.sum203.toExponential(6)}`);
 console.log(`  Σ(anti-phase)  = ${dynamic.sum23.toExponential(6)}  (Saturn only)`);
 console.log(`  Gap     = ${dynamic.gap.toExponential(6)}`);
 console.log(`  Total   = ${dynamic.total.toExponential(6)}`);
@@ -215,7 +217,7 @@ console.log('|---------------------|----|--------------|--------------|---------
 for (const pair of mirrorPairs) {
   const vI = j2000.v[pair.inner];
   const vO = j2000.v[pair.outer];
-  // Gap contribution: how much this pair adds to (anti-phase - prograde)
+  // Gap contribution: how much this pair adds to (anti-phase - in-phase)
   let pair203 = 0, pair23 = 0;
   for (const p of [pair.inner, pair.outer]) {
     if (p !== 'saturn') pair203 += j2000.v[p]; else pair23 += j2000.v[p];

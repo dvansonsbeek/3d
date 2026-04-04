@@ -119,7 +119,7 @@ for label, ecc_set in [("Base (tuned for 100%)", ECC_BASE),
             v23.append(v)
     bal = balance_pct(v203, v23)
     print(f"\n  {label}:")
-    print(f"    Sum prograde: {sum(v203):.10e}")
+    print(f"    Sum in-phase: {sum(v203):.10e}")
     print(f"    Sum  anti-phase: {sum(v23):.10e}")
     print(f"    Balance:  {bal:.6f}%")
 
@@ -626,7 +626,7 @@ print("""
      - Subtracting amplitudes changes R² sums by <0.3
 
   4. SATURN'S ECCENTRICITY is determined by Law 5 balance:
-     - Saturn is the sole anti-phase planet, must balance all prograde planets
+     - Saturn is the sole anti-phase planet, must balance all in-phase planets
      - Jupiter contributes 51.2%, Uranus 37.0%, Neptune 11.4%
      - Inner planets contribute only 0.4% of the balance sum
      - The Jupiter/Saturn e×a ≈ 1:2 ratio is a CONSEQUENCE of balance

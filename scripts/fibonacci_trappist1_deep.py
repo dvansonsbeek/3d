@@ -757,7 +757,7 @@ def main():
     # ═══════════════════════════════════════════════════════════════════════
     section("13. ECCENTRICITY BALANCE TEST")
 
-    print("  Solar System Law 3: Σ(prograde) v_j = Σ(anti-phase) v_j")
+    print("  Solar System Law 3: Σ(in-phase) v_j = Σ(anti-phase) v_j")
     print("  where v = √m × a^(3/2) × e / √d")
     print()
     print("  For TRAPPIST-1, test each planet as sole 'retrograde' group:")

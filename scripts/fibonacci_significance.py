@@ -324,7 +324,7 @@ def compute_incl_balance(eccs, d_vals, group_a, group_b):
     Parameters:
         eccs: dict of eccentricities per planet
         d_vals: dict of Fibonacci d-values per planet
-        group_a: list of planets in group A (prograde)
+        group_a: list of planets in group A (in-phase)
         group_b: list of planets in group B (anti-phase)
 
     Returns: balance percentage (100% = perfect)

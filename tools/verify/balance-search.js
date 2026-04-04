@@ -124,7 +124,7 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
   }
 
-  // Scalar balance (prograde vs anti-phase)
+  // Scalar balance (in-phase vs anti-phase)
   let sumPro = 0, sumAnti = 0;
   for (const key of planets) {
     const cfg_mass = mass[key];
@@ -156,10 +156,10 @@ for (const p of planets) {
 }
 
 const currentConfig = {
-  mercury: { d: 21, group: 'prograde' }, venus: { d: 34, group: 'prograde' },
-  earth: { d: 3, group: 'prograde' }, mars: { d: 5, group: 'prograde' },
-  jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' },
-  uranus: { d: 21, group: 'prograde' }, neptune: { d: 34, group: 'prograde' },
+  mercury: { d: 21, group: 'in-phase' }, venus: { d: 34, group: 'in-phase' },
+  earth: { d: 3, group: 'in-phase' }, mars: { d: 5, group: 'in-phase' },
+  jupiter: { d: 5, group: 'in-phase' }, saturn: { d: 3, group: 'anti-phase' },
+  uranus: { d: 21, group: 'in-phase' }, neptune: { d: 34, group: 'in-phase' },
 };
 
 const curResult = computeBalance(currentConfig);
@@ -175,13 +175,13 @@ console.log('EXHAUSTIVE SEARCH');
 console.log('═══════════════════════════════════════════════════════════════');
 
 const fibNumbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
-const groups = ['prograde', 'anti-phase'];
+const groups = ['in-phase', 'anti-phase'];
 
 const scenarios = [
-  { name: 'A', jupiter: { d: 5, group: 'prograde' }, saturn: { d: 3, group: 'anti-phase' } },
-  { name: 'B', jupiter: { d: 8, group: 'prograde' }, saturn: { d: 5, group: 'anti-phase' } },
-  { name: 'C', jupiter: { d: 13, group: 'prograde' }, saturn: { d: 8, group: 'anti-phase' } },
-  { name: 'D', jupiter: { d: 21, group: 'prograde' }, saturn: { d: 13, group: 'anti-phase' } },
+  { name: 'A', jupiter: { d: 5, group: 'in-phase' }, saturn: { d: 3, group: 'anti-phase' } },
+  { name: 'B', jupiter: { d: 8, group: 'in-phase' }, saturn: { d: 5, group: 'anti-phase' } },
+  { name: 'C', jupiter: { d: 13, group: 'in-phase' }, saturn: { d: 8, group: 'anti-phase' } },
+  { name: 'D', jupiter: { d: 21, group: 'in-phase' }, saturn: { d: 13, group: 'anti-phase' } },
 ];
 
 const THRESHOLD = 99.994;
@@ -203,7 +203,7 @@ for (const scenario of scenarios) {
                       const config = {
                         mercury: { d: fibNumbers[mi], group: groups[mp] },
                         venus: { d: fibNumbers[vi], group: groups[vp] },
-                        earth: { d: 3, group: 'prograde' },
+                        earth: { d: 3, group: 'in-phase' },
                         mars: { d: fibNumbers[mai], group: groups[map] },
                         jupiter: scenario.jupiter,
                         saturn: scenario.saturn,
@@ -215,7 +215,7 @@ for (const scenario of scenarios) {
 
                       if (result.balance >= THRESHOLD) {
                         count++;
-                        const g = (grp) => grp === 'prograde' ? 0 : 1;
+                        const g = (grp) => grp === 'in-phase' ? 0 : 1;
                         allConfigs.push({
                           scenario: scenario.name,
                           balance: result.balance,
@@ -274,7 +274,7 @@ const output = {
     D: 'Ju=21, Sa=13',
   },
   format: ['scenario','balance','me_d','me_phase','ve_d','ve_phase','ma_d','ma_phase','ju_d','ju_phase','sa_d','sa_phase','ur_d','ur_phase','ne_d','ne_phase'],
-  phaseAngles: ['prograde', 'anti-phase'],
+  phaseAngles: ['in-phase', 'anti-phase'],
   presets: allConfigs.map(c => c.row),
 };
 

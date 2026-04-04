@@ -42,7 +42,7 @@ The model implements six laws connecting planetary orbital parameters through pu
 5. **The Eccentricity Balance** — The same two planet groups balance independently in eccentricity to 100%
 6. **Saturn-Jupiter-Earth Resonance** — A closed beat-frequency loop connects inner and outer solar system dynamics
 
-The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 737 candidate configurations, only one satisfies all six laws simultaneously.
+The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 743 candidate configurations, only one satisfies all six laws simultaneously.
 
 See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (49/49 checks pass).
 

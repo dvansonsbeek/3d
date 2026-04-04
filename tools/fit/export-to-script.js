@@ -85,6 +85,8 @@ for (const [key, p] of Object.entries(mp.planets)) {
     'eccentricityPhaseJ2000', 'eocFraction', 'startpos', 'angleCorrection',
     'ascendingNodeInvPlane', 'inclinationPhaseAngle',
     'ascendingNodeCyclesIn8H',
+    // Note: 'antiPhase' is a boolean — cannot be synced by replacePlanetProp (numeric regex).
+    // Values are set manually in script.js planet definitions.
   ]) {
     if (p[prop] !== undefined) replacePlanetProp(key, prop, p[prop]);
   }

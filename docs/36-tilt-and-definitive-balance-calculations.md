@@ -31,7 +31,7 @@ angles (per-planet phase angles from balanced year) should cancel. Prograde plan
 
     v = sqrt(m) * a^(3/2) * e / sqrt(d)
 
-**Scalar balance**: the sum of v for the prograde group must equal the sum of v for
+**Scalar balance**: the sum of v for the in-phase group must equal the sum of v for
 the anti-phase group.
 
 **Group assignment** (Config #1: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):

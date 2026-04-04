@@ -126,7 +126,7 @@ The ICRF perihelion period for each planet, editable for exploration. The period
 
 ### Earth Row (Locked)
 
-Earth's controls are locked (grayed out): phase = 21.77°, d = 3, prograde group. Earth's amplitude is independently calibrated from the temperature/obliquity model (0.635185°), so its parameters cannot be freely varied.
+Earth's controls are locked (grayed out): phase = 21.77°, d = 3, in-phase group. Earth's amplitude is independently calibrated from the temperature/obliquity model (0.635185°), so its parameters cannot be freely varied.
 
 ### Instant Recalculation
 
@@ -144,13 +144,13 @@ Two summary lines show the balance percentage for each law:
 ```
 w = √(m · a(1-e²)) / d
 ```
-The structural weights of the prograde group must equal those of the anti-phase group. Displayed as a percentage (100% = perfect balance). Turns red if below 90%.
+The structural weights of the in-phase group must equal those of the anti-phase group. Displayed as a percentage (100% = perfect balance). Turns red if below 90%.
 
 **Eccentricity Balance (Law 5):**
 ```
 v = √m × a^(3/2) × e / √d
 ```
-The eccentricity weights of the prograde group must equal those of the anti-phase group. Displayed as a percentage. Turns red if below 90%.
+The eccentricity weights of the in-phase group must equal those of the anti-phase group. Displayed as a percentage. Turns red if below 90%.
 
 ### Per-Planet Results Table
 
@@ -172,7 +172,7 @@ The eccentricity weights of the prograde group must equal those of the anti-phas
 
 Below the results table:
 
-- **Inclination verification**: Sum of prograde group weights, sum of anti-phase group weights, balance percentage, pass/fail indicator
+- **Inclination verification**: Sum of in-phase group weights, sum of anti-phase group weights, balance percentage, pass/fail indicator
 - **Eccentricity verification**: Same format for eccentricity weights
 - **Status line**: Count of LL bounds passes (out of 8) and direction matches (out of 7, Earth excluded)
 - **ψ formula**: `ψ = 2205 / (2 × H)` (see [Constants Reference](20-constants-reference.md) for current value)
@@ -199,7 +199,7 @@ Useful experiments to try:
 
 | Experiment | Expected Result |
 |------------|----------------|
-| Change Saturn to prograde group | Balance collapses (all planets on one side) |
+| Change Saturn to in-phase group | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 743 valid configurations |
@@ -306,7 +306,7 @@ Tests whether the structural weights cancel between the two phase groups.
 | a | Fixed | Semi-major axis |
 | e | Fixed | Eccentricity (via 1−e²) |
 | d | **User-adjustable** | Fibonacci divisor (denominator) |
-| γ | **User-adjustable** | Phase angle (group membership: Saturn = anti-phase, all others = prograde) |
+| γ | **User-adjustable** | Phase angle (group membership: Saturn = anti-phase, all others = in-phase) |
 
 #### Eccentricity Balance (Law 5)
 
@@ -370,7 +370,7 @@ w = √(m × a × (1-e²)) / d
 
 Balance condition:
 ```
-Σ(prograde group) w = Σ(anti-phase group) w
+Σ(in-phase group) w = Σ(anti-phase group) w
 ```
 
 ### Eccentricity Balance (Law 5)
@@ -382,7 +382,7 @@ v = √m × a^(3/2) × e / √d
 
 Balance condition:
 ```
-Σ(prograde group) v = Σ(anti-phase group) v
+Σ(in-phase group) v = Σ(anti-phase group) v
 ```
 
 ### Ecliptic Trend Calculation

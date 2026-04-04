@@ -90,7 +90,7 @@ for (const p of planetNames) {
     period: eclP,  // kept for ecliptic ascending node rate
     inclJ2000: pd.invPlaneInclinationJ2000,
     jplTrend: jplTrends[p],
-    antiPhase: p === 'saturn'
+    antiPhase: pd.antiPhase || false
   };
 }
 // Pluto (not in C.planets)

@@ -246,6 +246,21 @@ constantsTs = replaceRecordBlock(constantsTs, 'INCL_MEAN',
   `  Mercury: ${C.planets.mercury.invPlaneInclinationMean}, Venus: ${C.planets.venus.invPlaneInclinationMean}, Earth: ${C.earthInvPlaneInclinationMean}, Mars: ${C.planets.mars.invPlaneInclinationMean},`,
   `  Jupiter: ${C.planets.jupiter.invPlaneInclinationMean}, Saturn: ${C.planets.saturn.invPlaneInclinationMean}, Uranus: ${C.planets.uranus.invPlaneInclinationMean}, Neptune: ${C.planets.neptune.invPlaneInclinationMean},`);
 
+// ── 4b. Anti-phase flag ──────────────────────────────────────
+
+console.log('');
+console.log('  ── Anti-phase ──');
+
+{
+  const cap = p => p.charAt(0).toUpperCase() + p.slice(1);
+  const ap = p => p === 'earth' ? false : (mp.planets[p].antiPhase || false);
+  const inner = ['mercury', 'venus', 'earth', 'mars'].map(p => `${cap(p)}: ${ap(p)}`).join(', ');
+  const outer = ['jupiter', 'saturn', 'uranus', 'neptune'].map(p => `${cap(p)}: ${ap(p)}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'ANTI_PHASE',
+    `  ${inner},`,
+    `  ${outer},`);
+}
+
 // ── 4. Write constants.ts ─────────────────────────────────────
 
 console.log('');

@@ -400,7 +400,7 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **743 presets** | Pre-computed configurations with ≥99.994% inclination balance |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
-| **Earth locked** | Earth's parameters (d=3, prograde, 21.77°) are derived from the temperature model and cannot be changed |
+| **Earth locked** | Earth's parameters (d=3, in-phase, 21.77°) are derived from the temperature model and cannot be changed |
 
 ### Default Configuration Result
 

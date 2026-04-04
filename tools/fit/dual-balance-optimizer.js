@@ -55,7 +55,7 @@ function getOrbitalParams(solarYearOverrides) {
       mass: C.massFraction[p],
       sma: a,
       d: p === 'earth' ? 3 : C.planets[p].fibonacciD,
-      phase: p === 'earth' ? 203 : (p === 'saturn' ? 23 : 203),
+      antiPhase: p === 'earth' ? false : (C.planets[p].antiPhase || false),
     };
   }
   return params;
@@ -64,11 +64,11 @@ function getOrbitalParams(solarYearOverrides) {
 function computeBalances(ecc, params) {
   let w203 = 0, w23 = 0, v203 = 0, v23 = 0;
   for (const p of planets) {
-    const { mass, sma, d, phase } = params[p];
+    const { mass, sma, d, antiPhase } = params[p];
     const e = ecc[p];
     const w = Math.sqrt(mass * sma * (1 - e * e)) / d;
     const v = Math.sqrt(mass) * Math.pow(sma, 1.5) * e / Math.sqrt(d);
-    if (phase === 203) { w203 += w; v203 += v; }
+    if (!antiPhase) { w203 += w; v203 += v; }
     else { w23 += w; v23 += v; }
   }
   const wTotal = w203 + w23;

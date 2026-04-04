@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-03T22:29:45.894Z",
+  "generated": "2026-04-04T18:50:35.522Z",
   "threshold": 99.994,
   "count": 743,
   "scenarios": {
@@ -27,7 +27,7 @@
     "ne_phase"
   ],
   "phaseAngles": [
-    "prograde",
+    "in-phase",
     "anti-phase"
   ],
   "presets": [

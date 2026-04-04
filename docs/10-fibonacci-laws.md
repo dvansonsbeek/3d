@@ -101,13 +101,13 @@ This holds for all 8 planets with a single universal ψ = 3.288 × 10⁻³.
 The angular-momentum-weighted inclination amplitudes cancel between the two phase groups, conserving the orientation of the invariable plane:
 
 ```
-Σ(prograde group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
+Σ(in-phase group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
 ```
 
 Substituting Law 2 and simplifying:
 
 ```
-Σ(prograde) w_j = Σ(anti-phase) w_j
+Σ(in-phase) w_j = Σ(anti-phase) w_j
 
 where w_j = √(m_j × a_j(1-e_j²)) / d_j
 ```
@@ -132,7 +132,7 @@ This determines all 8 eccentricities from Law 2 inclinations with 0 free paramet
 The eccentricities satisfy an independent balance condition using the same Fibonacci divisors and phase groups:
 
 ```
-Σ(prograde group) v_j = Σ(anti-phase group) v_j
+Σ(in-phase group) v_j = Σ(anti-phase group) v_j
 
 where v_j = √m_j × a_j^(3/2) × e_j / √d_j
 ```
@@ -186,7 +186,7 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 ### Phase Groups
 
-Each planet has a per-planet phase angle — the ICRF perihelion longitude at the balanced year (~302,635 BC). At the balanced year, all prograde planets reach minimum inclination while Saturn (anti-phase) reaches maximum:
+Each planet has a per-planet phase angle — the ICRF perihelion longitude at the balanced year (~302,635 BC). At the balanced year, all in-phase planets reach minimum inclination while Saturn (anti-phase) reaches maximum:
 
 | Planet | Phase Angle | Group |
 |--------|-------------|-------|
@@ -233,7 +233,7 @@ Each inner planet shares its Fibonacci divisor with its outer counterpart across
 | Far | Venus (d=34) | Neptune (d=34) | 34 | F₉ |
 | Outermost | Mercury (d=21) | Uranus (d=21) | 21 | F₈ |
 
-Earth–Saturn is the only pair with opposite balance groups (prograde vs anti-phase). The divisors form two consecutive Fibonacci pairs: (3, 5) for the belt-adjacent planets and (21, 34) for the outer planets.
+Earth–Saturn is the only pair with opposite balance groups (in-phase vs anti-phase). The divisors form two consecutive Fibonacci pairs: (3, 5) for the belt-adjacent planets and (21, 34) for the outer planets.
 
 ### Finding 2: Configuration Uniqueness
 
@@ -241,7 +241,7 @@ The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search
 
 - **Balance ≥ 99.994%** — the inclination balance exceeds the TNO margin
 - **Mirror symmetry** — inner/outer d-values match across the asteroid belt (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju)
-- **Saturn-solo** — Saturn is the only anti-phase planet (all others prograde)
+- **Saturn-solo** — Saturn is the only anti-phase planet (all others in-phase)
 - **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
 
 These are overlapping, not nested, constraints (full analysis: [configuration-analysis.js](../tools/verify/configuration-analysis.js)):
@@ -295,7 +295,7 @@ The two balances also differ structurally. The inclination balance is a **global
 Since Saturn is the sole retrograde planet, the eccentricity balance directly predicts its eccentricity from the other seven:
 
 ```
-e_Saturn = Σ(prograde group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
+e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 ```
 
 | Source | e_Saturn | vs J2000 |
@@ -343,7 +343,7 @@ The Z-component of angular momentum is `Lz_j ∝ L_j × cos(i_j)`. For small inc
 In the two-group model, planets in each group oscillate together (with 180° phase offset). The balance condition is:
 
 ```
-Σ(prograde group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
+Σ(in-phase group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
 ```
 
 ### Substituting the Fibonacci Formula
@@ -359,7 +359,7 @@ L_j × amp_j = ψ × m_j × √(a_j(1-e_j²)) / (d_j × √m_j)
 Since ψ is a single universal constant, it cancels from both sides:
 
 ```
-Σ(prograde) w_j = Σ(anti-phase) w_j
+Σ(in-phase) w_j = Σ(anti-phase) w_j
 ```
 
 Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each planet.
@@ -378,14 +378,14 @@ Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each p
 | Saturn | Anti-phase | 3 | 1.737 × 10⁻² |
 
 ```
-Σ(prograde) w = 1.7374 × 10⁻²
+Σ(in-phase) w = 1.7374 × 10⁻²
 Σ(anti-phase)  w = 1.7374 × 10⁻²
 
 Difference: 5.4 × 10⁻⁸
 Balance: 100%
 ```
 
-Jupiter (d=5) contributes the dominant prograde weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
+Jupiter (d=5) contributes the dominant in-phase weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
 
 ### TNO Contribution
 
@@ -400,7 +400,7 @@ The balance considers only the 8 major planets, which carry 99.994% of the solar
 The eccentricity balance states that orbital-period-weighted eccentricities, scaled by √(mass / Fibonacci divisor), cancel between the two phase groups:
 
 ```
-Σ(prograde) v_j = Σ(anti-phase) v_j
+Σ(in-phase) v_j = Σ(anti-phase) v_j
 
 where v_j = √m_j × a_j^(3/2) × e_j / √d_j
 ```
@@ -442,13 +442,13 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 | Saturn | Anti-phase | 3 | 1.547 × 10⁻² |
 
 ```
-Σ(prograde) v = 1.543 × 10⁻²
+Σ(in-phase) v = 1.543 × 10⁻²
 Σ(anti-phase)  v = 1.547 × 10⁻²
 
 Balance: 100%
 ```
 
-Saturn alone carries the entire anti-phase contribution. The prograde group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
+Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
 
 ### Mirror Pair Decomposition
 
@@ -462,7 +462,7 @@ The gap decomposes by mirror pair into four contributions that nearly cancel:
 | Venus ↔ Neptune | 34 | −1.735 × 10⁻³ | −4,773% |
 | **Sum** | | **3.636 × 10⁻⁵** | **100%** |
 
-Four numbers spanning ±42,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (anti-phase group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three prograde-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
+Four numbers spanning ±42,000% cancel to leave a negligible residual. The Earth–Saturn pair dominates because Saturn (anti-phase group) is 925× heavier than Earth in eccentricity weight, creating a large surplus. The three in-phase-only pairs (Mars–Jupiter, Mercury–Uranus, Venus–Neptune) collectively compensate, with Jupiter and Uranus providing the bulk of the compensation. The balance emerges from the "communicating vessel" structure of AMD exchange between paired planets.
 
 ### Non-Triviality
 
@@ -725,11 +725,11 @@ Compute `mean ± amplitude` for each planet and verify the range falls within th
 
 ### Test 3: Inclination Balance
 
-Verify `Σ(prograde) w_j = Σ(anti-phase) w_j` to 100% balance.
+Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 100% balance.
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(prograde) v_j = Σ(anti-phase) v_j` to 100% balance.
+Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 100% balance.
 
 ### Test 5: Saturn Eccentricity Prediction and Law Convergence
 
@@ -759,10 +759,10 @@ The Fibonacci divisor assignments are not hand-picked — they emerge from an ex
 
 The search iterates over:
 - **Fibonacci divisors**: d ∈ {1, 2, 3, 5, 8, 13, 21, 34, 55} for Mercury, Venus, Mars, Uranus, Neptune
-- **Balance group**: prograde or anti-phase for each of the above
+- **Balance group**: in-phase or anti-phase for each of the above
 - **4 scenarios** for Jupiter and Saturn (fixed per scenario):
   - A: Ju=5, Sa=3 — B: Ju=8, Sa=5 — C: Ju=13, Sa=8 — D: Ju=21, Sa=13
-- **Earth**: locked at d=3, prograde group
+- **Earth**: locked at d=3, in-phase group
 
 This produces 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 9 × 2 × 4 = 7,558,272 configurations per run.
 

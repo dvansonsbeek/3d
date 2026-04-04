@@ -15,7 +15,7 @@
 // It then verifies that:
 // 1. All values match the exact J2000 invariable plane inclination
 // 2. All ranges stay within Laplace-Lagrange secular bounds
-// 3. The invariable plane balance holds (Σ(prograde) w = Σ(anti-phase) w)
+// 3. The invariable plane balance holds (Σ(in-phase) w = Σ(anti-phase) w)
 // 4. Ecliptic inclination trends are consistent with JPL observations
 //
 // Depends on: Appendix A (80) (provides ascending node values used here)
@@ -158,7 +158,7 @@ const laplaceLagrangeBounds = {
 // Amplitudes are COMPUTED from Fibonacci theory, means from J2000 constraint
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// Balance groups: Saturn anti-phase (MAX at balanced year), all others prograde (MIN at balanced year)
+// Balance groups: Saturn anti-phase (MAX at balanced year), all others in-phase (MIN at balanced year)
 // Phase angles are per-planet, derived from balanced year + ICRF perihelion longitude
 //
 const genPrecRate = 1 / (holisticyearLength / 13);
@@ -174,7 +174,7 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
     eclPeriod: p.perihelionEclipticYears,
     icrfPeriod: icrfPeriod,
     phaseAngle: p.inclinationPhaseAngle,
-    antiPhase: key === 'saturn',
+    antiPhase: p.antiPhase || false,
   };
 }
 // Earth — special: ICRF period = H/3 directly
@@ -393,7 +393,7 @@ console.log('╚═════════════════════�
 console.log('');
 
 // Structural weight balance: Σ(rest) w = Σ(saturn) w where w = √(m×a×(1-e²)) / d
-// Saturn is anti-phase (sole balance opponent); all others are prograde
+// Saturn is anti-phase (sole balance opponent); all others are in-phase
 let sumRest = 0, sumSaturn = 0;
 const balancePlanets = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
 
@@ -408,10 +408,10 @@ for (const key of balancePlanets) {
   const e = PLANET_ECC[key];
   const d = FIBONACCI_D[key];
   const w = Math.sqrt(m * a * (1 - e * e)) / d;
-  const isSaturn = key === 'saturn';
-  if (isSaturn) sumSaturn += w; else sumRest += w;
+  const isAntiPhase = planetInputs[key].antiPhase;
+  if (isAntiPhase) sumSaturn += w; else sumRest += w;
 
-  const side = isSaturn ? 'Anti-phase' : 'Rest';
+  const side = isAntiPhase ? 'Anti-phase' : 'Rest';
   console.log(`  ${planetInputs[key].name.padEnd(10)} │ ${side.padEnd(10)} │ ${w.toExponential(6).padStart(20)} │ ${side}`);
 }
 

@@ -296,9 +296,9 @@ function getPlanetSceneData(key) {
     realPeriStartPos = p.startpos * 2;
   }
 
-  // Elliptic orbit radius — sign differs for Saturn (negative in script.js)
+  // Elliptic orbit radius — sign differs for anti-phase planets (negative in script.js)
   let elipticOrbitRadius = d.elipticOrbit;
-  if (key === 'saturn') elipticOrbitRadius = -elipticOrbitRadius;
+  if (p.antiPhase) elipticOrbitRadius = -elipticOrbitRadius;
 
   // Planet orbital speed (Mars is negative, all others positive)
   const planetSpeed = (key === 'mars')
@@ -620,7 +620,7 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
     + icrfRate * yearsSinceBalanced;
 
   const planetPhaseDeg = periICRFDeg - p.inclinationPhaseAngle;
-  const antiPhaseSign = (key === 'saturn') ? -1 : 1;
+  const antiPhaseSign = p.antiPhase ? -1 : 1;
   const planetI = (p.invPlaneInclinationMean
     + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
@@ -802,7 +802,7 @@ function moveModel(graph, pos) {
       const planetPeriEcl = ((planetPrecAngle + pm.sceneData.p.longitudePerihelion * d2r) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const dw = earthPeriEcl - planetPeriEcl;
       let eo = 2 * dynEcc.earth * 100 * Math.sin(dw);
-      if (key === 'saturn') eo = -eo;
+      if (pm.sceneData.p.antiPhase) eo = -eo;
       if (pm.sceneData.p.type === 'II') {
         // Type II: Mars orbit center offset + half Earth geocentric correction
         const eccDist = (dynEcc[key] || pm.sceneData.p.orbitalEccentricityJ2000) * pm.sceneData.d.orbitDistance * 100;

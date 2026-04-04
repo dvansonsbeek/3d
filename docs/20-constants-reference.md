@@ -494,7 +494,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: Saturn shows **increasing** inclination because it is anti-phase (MAX at balanced year). Neptune also shows increasing, which is a known consequence of its balance-driven group assignment (prograde). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
+**Note**: Saturn shows **increasing** inclination because it is anti-phase (MAX at balanced year). Neptune also shows increasing, which is a known consequence of its balance-driven group assignment (in-phase). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
 
 ### Mean & True Anomaly at J2000
 
