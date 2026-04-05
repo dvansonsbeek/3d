@@ -6,9 +6,9 @@ The **Grand Holistic Octave** (8H = 2,682,536 years) is the fundamental super-pe
 
 This document describes the "Grand Holistic Octave Period Table" modal panel, which visualizes all planetary periods as **8H/N** fractions.
 
-## The Seven Cycle Types
+## The Six Cycle Types
 
-Each planet has up to seven distinct long-period cycles. All are driven by the same underlying Fibonacci/H structure:
+Each planet has up to six distinct long-period cycles shown in the modal:
 
 ### 1. Axial Precession
 The rate at which the planet's spin axis precesses (wobbles). For Earth this is the well-known ~25,794-year cycle (H/13). Every planet has its own axial precession rate, though Uranus and Neptune's are extremely long (effectively frozen).
@@ -23,23 +23,20 @@ The ecliptic rate minus general precession (H/13). This is the rate that drives 
 The rate at which the ascending node on the invariable plane regresses. These rates correspond to the Laplace-Lagrange secular eigenfrequencies (s₁...s₈) — a third level of Fibonacci structure.
 
 ### 5. Obliquity Oscillation
-The period of the planet's axial tilt oscillation. This is a beat frequency between the axial precession and the ICRF perihelion precession. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have no obliquity cycle (tidally damped / frozen).
+The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have no obliquity cycle (tidally damped / frozen).
 
-### 6. Eccentricity Cycle (Perihelion Precession Beat)
-The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 (the perihelion precession period). For planets, it varies based on their axial and ICRF rates.
-
-### 7. Solar Year (Orbital Period)
-The planet's orbital period around the Sun, from Kepler's third law. While short compared to the other cycles, the solar year count within H determines the semi-major axis and connects to the eccentricity balance.
+### 6. Eccentricity Cycle (Wobble Period)
+The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = 20,957 yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
 
 ## Complete Period Table
 
 All periods expressed as 8H/N where 8H = 2,682,536 years:
 
-| Planet | Axial | Peri. ecl. | Peri. ICRF | Asc. node | Obliquity | Ecc. cycle |
+| Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
 | Mercury | 8H/11 | 8H/11 | 8H/93 | 8H/12 | 8H/3 | 8H/82 |
 | Venus | 8H/91 | 8H/4 | 8H/100 | 8H/15 | — | 8H/191 |
-| **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/80** |
+| **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
 | Mars | 8H/16 | 8H/35 | 8H/69 | 8H/37 | 8H/21 | 8H/53 |
 | Jupiter | 8H/21 | 8H/40 | 8H/64 | 8H/55 | 8H/16 | 8H/43 |
 | Saturn | 8H/6 | 8H/64 | 8H/168 | 8H/55 | 8H/24 | 8H/162 |
@@ -51,21 +48,22 @@ Notes:
 - Venus and Neptune obliquity is tidally damped / frozen — no oscillation
 - Mercury's axial precession period = ecliptic perihelion period (spin-orbit resonance)
 - ICRF perihelion = inclination cycle (same physical driver)
+- Earth's eccentricity cycle = perihelion precession period (H/16)
 
 ## Periods in Years
 
-| Planet | Axial prec. | Peri. ecl. | Peri. ICRF | Asc. node | Obliquity | Ecc. cycle |
+| Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | −243,867 | 243,867 | −28,844 | −223,545 | 894,179 | 32,714 |
 | Venus | +29,587 | 670,634 | −26,825 | −178,836 | — | 14,069 |
-| **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **33,532** |
+| **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
 | Mars | −167,659 | 76,644 | −38,877 | −72,501 | 125,744 | 50,614 |
 | Jupiter | −125,744 | 67,063 | −41,915 | −48,773 | 167,659 | 62,872 |
 | Saturn | −447,089 | −41,915 | −15,967 | −48,773 | 111,772 | 16,559 |
-| Uranus | +204,543,370 | 111,772 | −33,532 | −447,089 | 167,659 | 33,526 |
-| Neptune | −22,801,556 | 670,634 | −26,825 | −2,682,536 | — | 26,857 |
+| Uranus | ~∞ | 111,772 | −33,532 | −447,089 | 167,659 | 33,526 |
+| Neptune | ~∞ | 670,634 | −26,825 | −2,682,536 | — | 26,857 |
 
-(+ = prograde, − = retrograde)
+(+ = prograde, − = retrograde, ~∞ = frozen)
 
 ## Notable Patterns
 
@@ -77,9 +75,7 @@ Notes:
 - **Mercury axial = Mercury ecliptic**: both 8H/11 (spin-orbit resonance)
 
 ### Fibonacci Connections in 8H/N Divisors
-Direct Fibonacci numbers: 1, 3, 4, 6, 16, 21, 24, 40, 55, 64, 80, 100, 104, 128
-
-Many are products of small Fibonacci numbers:
+Many divisors are products of small Fibonacci numbers:
 - 24 = 3 × 8, 40 = 5 × 8, 64 = 8 × 8, 80 = 5 × 16
 - 104 = 8 × 13, 128 = 8 × 16, 168 = 8 × 21
 
@@ -93,7 +89,7 @@ Many are products of small Fibonacci numbers:
 Each planet's cycles are connected through beat frequencies:
 
 ```
-Axial precession ←─── beat ───→ ICRF perihelion = Eccentricity cycle
+Axial precession ←─── beat ───→ ICRF perihelion = Eccentricity cycle (wobble)
                                        │
                                   (= Inclination cycle)
                                        │
@@ -113,14 +109,12 @@ Inclination precession (H/3 = 8H/24)
 Perihelion precession (H/16 = 8H/128)
     ↓ beat with ecliptic (H/5 = 8H/40)
 Obliquity oscillation (H/8 = 8H/64)
-    ↕ same period
-Eccentricity oscillation (H/8 = 8H/64)
 ```
 
 ### The Grand Holistic Octave as Synchronization Point
 Every 8H years, ALL planetary cycles return to their starting configuration:
 - All ecliptic perihelions complete integer revolutions
-- All ICRF perihelions complete integer revolutions  
+- All ICRF perihelions complete integer revolutions
 - All ascending nodes complete integer regressions
 - All axial precessions complete integer cycles
 - All inclination, obliquity, and eccentricity oscillations complete integer cycles
@@ -129,43 +123,23 @@ This is what makes 8H the fundamental super-period of the solar system.
 
 ## UI Panel Design
 
-### Approach: Two-Tab Modal
+### Implementation
+A single modal panel with a **Years / 8H/N toggle** button:
+- **Years mode** (default): shows periods in years with thousand separators
+- **8H/N mode**: shows the integer divisor N
 
-The data has two natural views:
+### Color Coding
+- **Green**: prograde precession (positive period)
+- **Red**: retrograde precession (negative period)
+- **White/neutral**: oscillation periods (obliquity, eccentricity — no direction)
+- **∞**: frozen (axial precession > 10 Myr)
+- **—**: N/A (Venus/Neptune obliquity)
 
-**Tab 1: "8H/N Table"** — The compact overview
-- Rows: 8 planets
-- Columns: 7 cycle types
-- Cell content: **8H/N** as the primary display
-- Hover: shows period in years and H-fraction
-- Color coding by cycle type
-- Mirror pairs highlighted
-
-**Tab 2: "Cycle Connections"** — How cycles relate  
-- Per-planet expandable cards
-- Shows the beat-frequency chain for each planet
-- Fibonacci decomposition of each N value
-- Connection lines between related cycles
-
-### Header
-- Title: "Grand Holistic Octave"
-- Subtitle: "8H = 2,682,536 years"
-- "All planetary periods divide 8H evenly"
-
-### Color Scheme
-| Cycle Type | Color | Reason |
-|-----------|-------|--------|
-| Axial precession | Blue | Spin axis |
-| Perihelion ecliptic | Orange | Orbit shape |
-| ICRF / Inclination | Green | Invariable plane tilt |
-| Ascending node | Purple | Plane intersection |
-| Obliquity | Cyan | Axial tilt oscillation |
-| Eccentricity | Yellow | Orbit shape oscillation |
-
-### Footer
-- Total unique 8H/N divisors count
-- Link to Fibonacci Laws documentation
-- "Verified: node tools/explore/grand-holistic-octave-periods.js"
+### Layout
+- Header with title, subtitle ("8H = 2,682,536 years"), and toggle button
+- 8 rows × 6 columns grid with planet color dots
+- Earth row highlighted
+- Footer with planet/cycle count and H value
 
 ## Related Documentation
 
@@ -184,9 +158,11 @@ Run `node tools/explore/grand-holistic-octave-periods.js` to verify all periods 
 
 | Component | Location |
 |-----------|----------|
-| Period table modal | `src/script.js` (TBD) |
-| Period computation | `tools/explore/grand-holistic-octave-periods.js` |
+| Period table modal | `createGHOPanel()` / `openGHOPanel()` in `src/script.js` |
+| Period computation | `ghoComputeData()` in `src/script.js` |
+| Wobble period formula | `calcWobblePeriod()` in `src/script.js` |
 | Axial precession values | `axialPrecessionYears` in planet objects, `src/script.js` |
 | Obliquity cycles | `mercuryObliquityCycle` etc. in `src/script.js` |
-| Eccentricity cycles | `calcWobblePeriod()` in `src/script.js` |
 | Ascending node cycles | `ascendingNodeCyclesIn8H` in planet objects |
+| Button | Tools folder in Tweakpane: "Grand Holistic Octave" |
+| CSS | `.gho-*` classes in `src/style.css` |
