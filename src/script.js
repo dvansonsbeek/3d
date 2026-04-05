@@ -18937,26 +18937,28 @@ function fbeBuildDSelect(planet, defaultD) {
     `<input type="number" class="fbe-d-custom" data-planet="${planet}" step="0.001" min="0.001" placeholder="d" ${disabled}>`;
 }
 
-// Build phase angle select HTML
-function fbeBuildPhaseSelect(planet, defaultPhase) {
-  const disabled = BALANCE_CONFIG[planet].locked ? 'disabled' : '';
-  let options = EIGENMODE_PHASES.map(opt => {
-    if (opt.value === 'custom') {
-      return `<option value="custom">${opt.label}</option>`;
-    }
-    const selected = Math.abs(opt.value - defaultPhase) < 0.01 ? 'selected' : '';
-    return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
-  }).join('');
+// Build phase angle read-only display
+function fbeBuildPhaseDisplay(planet, defaultPhase) {
+  return `<span class="fbe-phase-display" data-planet="${planet}">${defaultPhase.toFixed(2)}\u00B0</span>`;
+}
 
-  // If default is not in presets, add it as first option
-  const isPreset = EIGENMODE_PHASES.some(o => o.value !== 'custom' && Math.abs(o.value - defaultPhase) < 0.01);
-  if (!isPreset) {
-    options = `<option value="${defaultPhase}" selected>${defaultPhase}\u00B0</option>` + options;
+// Build group toggle (in-phase / anti-phase)
+function fbeBuildGroupToggle(planet, isAntiPhase) {
+  const locked = BALANCE_CONFIG[planet].locked;
+  const cls = isAntiPhase ? 'fbe-group-anti' : 'fbe-group-in';
+  const label = isAntiPhase ? 'anti-phase' : 'in-phase';
+  if (locked) {
+    return `<span class="fbe-group-toggle ${cls} fbe-group-locked" data-planet="${planet}">${label}</span>`;
   }
+  return `<button class="fbe-group-toggle ${cls}" data-planet="${planet}" title="Click to toggle between in-phase and anti-phase">${label}</button>`;
+}
 
-  const retroClass = BALANCE_CONFIG[planet].defaultAntiPhase ? ' fbe-phase-retrograde' : '';
-  return `<select class="fbe-phase-select${retroClass}" data-planet="${planet}" ${disabled}>${options}</select>` +
-    `<input type="number" class="fbe-phase-custom" data-planet="${planet}" step="0.1" min="0" max="360" placeholder="\u03B3\u00B0" ${disabled}>`;
+// Derive phase angle from balanced year, period, and group
+function fbeComputePhaseAngle(planet, period, isAntiPhase) {
+  const cfg = BALANCE_CONFIG[planet];
+  const icrfRate = 360 / period;
+  const periAtBY = ((cfg.periLongJ2000 + icrfRate * (balancedYear - 2000)) % 360 + 360) % 360;
+  return isAntiPhase ? periAtBY : ((periAtBY - 180 + 360) % 360);
 }
 
 let balanceExplorerPanel = null;
@@ -19001,22 +19003,26 @@ function createBalanceExplorerPanel() {
           <div class="fbe-section-title">Planet Assignments</div>
           <div class="fbe-grid-header">
             <span>Planet</span>
-            <span class="fbe-header-tip">Phase angle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet phase angle: the ICRF perihelion longitude at the balanced year (~302,635 BC). These cluster near Laplace-Lagrange eigenmodes (\u03B3\u2081\u2013\u03B3\u2088) within 1\u201310\u00B0. Saturn is anti-phase (MAX inclination at balanced year, others at MIN).<br><br>You can also select individual eigenmode phases from secular theory, or enter any custom angle.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Secular Perturbation Theory \u2192</a></span></span>
-            <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch.<br><br>When the ICRF perihelion \u03D6 aligns with the phase angle \u03B3, the planet reaches its maximum inclination to the invariable plane. This column is read-only for reference.</span></span>
+            <span class="fbe-header-tip">Group <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Balance group: <b>in-phase</b> planets reach minimum inclination at the balanced year (~302,635 BC). <b>Anti-phase</b> planets reach maximum. The two groups must have equal structural weights for the invariable plane to remain stable.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
+            <span class="fbe-header-tip">Phase \u03C6 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet phase angle: the ICRF perihelion longitude at the <b>balanced year</b> (~302,635 BC). This is the moment within the Grand Holistic Octave (8H = 2,682,536 yr) when all planets simultaneously reach their inclination extremes.<br><br>In-phase planets: \u03C6 = \u03D6(balanced year) \u2212 180\u00B0 (MIN inclination)<br>Anti-phase planets: \u03C6 = \u03D6(balanced year) (MAX inclination)<br><br>These cluster near Laplace-Lagrange eigenmodes (\u03B3\u2081\u2013\u03B3\u2088) within 1\u201310\u00B0.</span></span>
+            <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch. Read-only reference.</span></span>
             <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
-            <span class="fbe-header-tip">Period (yr) <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion period determines the inclination oscillation rate. This is the ecliptic perihelion rate minus general precession (H/13).<br><br>Default values are from the 3D model. Edit to explore how different periods affect the predicted trends.</span></span>
-            <span></span>
-            <span class="fbe-header-tip">Base trend <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion precession rate in arcseconds per century, calculated as 360\u00B0\u00D7100\u00D73600 / period.<br><br>This represents the rate at which the ICRF perihelion longitude rotates, driving the inclination oscillation.</span></span>
+            <span class="fbe-header-tip">Incl. cycle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The inclination oscillation period (years): how long for the planet\u2019s invariable-plane inclination to complete one full cycle (min \u2192 max \u2192 min).<br><br>This equals the ICRF perihelion period (ecliptic rate minus general precession H/13). Negative = retrograde ICRF precession. All ICRF periods divide the Grand Holistic Octave (8H) evenly.</span></span>
+            <span class="fbe-header-tip">Ecl. period <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ecliptic perihelion precession period (years) \u2014 the period visible in the simulation. All ecliptic periods are H/Fibonacci fractions.</span></span>
           </div>
           <div class="fbe-planet-grid">
             ${BALANCE_PLANETS.map(key => {
               const cfg = BALANCE_CONFIG[key];
               const locked = cfg.locked ? 'locked' : '';
               const disabled = cfg.locked ? 'disabled' : '';
+              const eclPeriod = key === 'earth' ? holisticyearLength / 16 : planets[key].perihelionEclipticYears;
               return `<div class="fbe-planet-row ${locked}" data-planet="${key}">
                 <span class="fbe-planet-name">${cfg.name}${cfg.locked ? ' <span class="fbe-lock-tip">\uD83D\uDD12<span class="fbe-lock-tip-content">Earth is locked because the formula <b>amp = \u03C8 / (d \u00D7 \u221Am)</b> was derived from Earth\u2019s observed inclination amplitude (0.6329789\u00B0) with Fibonacci divisor d\u2009=\u20093.<br><br>All other planet amplitudes follow from this calibration.<br><br><a href="https://github.com/dvansonsbeek/3d/blob/main/docs/10-fibonacci-laws.md" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>' : ''}</span>
+                <div class="fbe-group-cell">
+                  ${fbeBuildGroupToggle(key, cfg.defaultAntiPhase)}
+                </div>
                 <div class="fbe-phase-cell">
-                  ${fbeBuildPhaseSelect(key, cfg.defaultPhaseAngle)}
+                  ${fbeBuildPhaseDisplay(key, cfg.defaultPhaseAngle)}
                 </div>
                 <div class="fbe-omega-cell">
                   <span class="fbe-omega-display">${cfg.periLongJ2000.toFixed(2)}\u00B0</span>
@@ -19025,13 +19031,10 @@ function createBalanceExplorerPanel() {
                   ${fbeBuildDSelect(key, cfg.defaultD)}
                 </div>
                 <div class="fbe-period-cell">
-                  <input type="number" class="fbe-period-input" data-planet="${key}" value="${Math.round(cfg.period)}" step="1" ${disabled}>
+                  <span class="fbe-period-display ${cfg.period > 0 ? 'fbe-prograde' : 'fbe-retrograde'}" data-planet="${key}">${cfg.period > 0 ? '' : '\u2212'}${Math.round(Math.abs(cfg.period)).toLocaleString()}</span>
                 </div>
-                <div class="fbe-dir-cell">
-                  <span class="fbe-period-dir ${cfg.period < 0 ? 'retrograde' : 'prograde'}" data-planet="${key}">${cfg.period < 0 ? 'RETROGRADE' : 'PROGRADE'}</span>
-                </div>
-                <div class="fbe-trend-cell">
-                  <span class="fbe-period-trend" data-planet="${key}">${(129600000 / cfg.period).toFixed(2)}"/cy</span>
+                <div class="fbe-ecl-period-cell">
+                  <span class="fbe-ecl-period-display ${eclPeriod < 0 ? 'fbe-retrograde' : ''}" data-planet="${key}">${eclPeriod < 0 ? '\u2212' : ''}${Math.round(Math.abs(eclPeriod)).toLocaleString()}</span>
                 </div>
               </div>`;
             }).join('')}
@@ -19102,22 +19105,18 @@ function createBalanceExplorerPanel() {
     for (const key of BALANCE_PLANETS) {
       const cfg = BALANCE_CONFIG[key];
       if (cfg.locked) continue;
-      state[key].phaseAngle = preset[key].phase;
       state[key].d = preset[key].d;
       state[key].group = preset[key].group;
-      // Update phase select UI
-      const phaseSel = panel.querySelector(`.fbe-phase-select[data-planet="${key}"]`);
-      const phaseCustom = panel.querySelector(`.fbe-phase-custom[data-planet="${key}"]`);
-      const phaseMatch = Array.from(phaseSel.options).find(o => o.value !== 'custom' && Math.abs(parseFloat(o.value) - preset[key].phase) < 0.01);
-      if (phaseMatch) {
-        phaseSel.value = phaseMatch.value;
-        phaseCustom.classList.remove('visible');
-      } else {
-        phaseSel.value = 'custom';
-        phaseCustom.classList.add('visible');
-        phaseCustom.value = preset[key].phase;
+      state[key].phaseAngle = fbeComputePhaseAngle(key, state[key].period, preset[key].group === 1);
+      // Update group toggle UI
+      const groupBtn = panel.querySelector(`.fbe-group-toggle[data-planet="${key}"]`);
+      if (groupBtn) {
+        groupBtn.className = 'fbe-group-toggle ' + (preset[key].group === 1 ? 'fbe-group-anti' : 'fbe-group-in');
+        groupBtn.textContent = preset[key].group === 1 ? 'anti-phase' : 'in-phase';
       }
-      phaseSel.classList.toggle('fbe-phase-retrograde', preset[key].group === 1);
+      // Update phase display
+      const phaseDisplay = panel.querySelector(`.fbe-phase-display[data-planet="${key}"]`);
+      if (phaseDisplay) phaseDisplay.textContent = state[key].phaseAngle.toFixed(2) + '\u00B0';
       // Update d select UI
       const dSel = panel.querySelector(`.fbe-d-select[data-planet="${key}"]`);
       const dCustom = panel.querySelector(`.fbe-d-custom[data-planet="${key}"]`);
@@ -19134,50 +19133,21 @@ function createBalanceExplorerPanel() {
     updateBalanceExplorerResults(panel, state);
   });
 
-  // Phase select handlers
-  panel.querySelectorAll('.fbe-phase-select:not([disabled])').forEach(sel => {
-    sel.addEventListener('change', (e) => {
+  // Group toggle handlers (in-phase ↔ anti-phase)
+  panel.querySelectorAll('.fbe-group-toggle:not(.fbe-group-locked)').forEach(btn => {
+    btn.addEventListener('click', (e) => {
       const planet = e.target.dataset.planet;
-      const customInput = panel.querySelector(`.fbe-phase-custom[data-planet="${planet}"]`);
-      if (e.target.value === 'custom') {
-        customInput.classList.add('visible');
-        customInput.focus();
-      } else {
-        customInput.classList.remove('visible');
-        const val = parseFloat(e.target.value);
-        state[planet].phaseAngle = val;
-        e.target.classList.toggle('fbe-phase-retrograde', BALANCE_CONFIG[e.target.dataset.planet].defaultAntiPhase);
-        updateBalanceExplorerResults(panel, state);
-      }
-    });
-  });
-
-  // Phase custom input handlers
-  panel.querySelectorAll('.fbe-phase-custom:not([disabled])').forEach(inp => {
-    inp.addEventListener('input', (e) => {
-      const planet = e.target.dataset.planet;
-      const val = parseFloat(e.target.value);
-      if (isFinite(val) && val >= 0 && val <= 360) {
-        state[planet].phaseAngle = val;
-        updateBalanceExplorerResults(panel, state);
-      }
-    });
-  });
-
-  // Period input handlers
-  panel.querySelectorAll('.fbe-period-input:not([disabled])').forEach(inp => {
-    inp.addEventListener('input', (e) => {
-      const planet = e.target.dataset.planet;
-      const val = parseFloat(e.target.value);
-      if (isFinite(val) && val !== 0) {
-        state[planet].period = val;
-        const dirLabel = panel.querySelector(`.fbe-period-dir[data-planet="${planet}"]`);
-        dirLabel.textContent = val < 0 ? 'RETROGRADE' : 'PROGRADE';
-        dirLabel.className = 'fbe-period-dir ' + (val < 0 ? 'retrograde' : 'prograde');
-        const trendLabel = panel.querySelector(`.fbe-period-trend[data-planet="${planet}"]`);
-        trendLabel.textContent = (129600000 / val).toFixed(2) + '"/cy';
-        updateBalanceExplorerResults(panel, state);
-      }
+      const newGroup = state[planet].group === 1 ? 0 : 1;
+      state[planet].group = newGroup;
+      // Update button appearance
+      e.target.className = 'fbe-group-toggle ' + (newGroup === 1 ? 'fbe-group-anti' : 'fbe-group-in');
+      e.target.textContent = newGroup === 1 ? 'anti-phase' : 'in-phase';
+      // Recompute phase angle from balanced year
+      state[planet].phaseAngle = fbeComputePhaseAngle(planet, state[planet].period, newGroup === 1);
+      // Update phase display
+      const phaseDisplay = panel.querySelector(`.fbe-phase-display[data-planet="${planet}"]`);
+      if (phaseDisplay) phaseDisplay.textContent = state[planet].phaseAngle.toFixed(2) + '\u00B0';
+      updateBalanceExplorerResults(panel, state);
     });
   });
 
