@@ -19634,6 +19634,158 @@ function closeEccBalanceScale() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// GRAND HOLISTIC OCTAVE PERIOD TABLE — Modal panel
+// Shows all planetary periods as 8H/N fractions
+// ═══════════════════════════════════════════════════════════════════
+
+let ghoPanel = null;
+let ghoShowAs8H = false; // false = years, true = 8H/N
+
+function ghoComputeData() {
+  const H = holisticyearLength;
+  const S = 8 * H;
+  const gp = H / 13;
+  const keys = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+  const names = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+  const colors = [planetColorHex.mercury, planetColorHex.venus, 0x3399ff, planetColorHex.mars,
+                  planetColorHex.jupiter, planetColorHex.saturn, planetColorHex.uranus, planetColorHex.neptune];
+
+  const obliqCycles = [mercuryObliquityCycle, venusObliquityCycle, H / 8,
+    marsObliquityCycle, jupiterObliquityCycle, saturnObliquityCycle, uranusObliquityCycle, neptuneObliquityCycle];
+  const wobblePeriods = [mercuryWobblePeriod, venusWobblePeriod, H / 16,
+    marsWobblePeriod, jupiterWobblePeriod, saturnWobblePeriod, uranusWobblePeriod, neptuneWobblePeriod];
+
+  const rows = [];
+  for (let i = 0; i < 8; i++) {
+    const key = keys[i];
+    const p = key === 'earth' ? null : planets[key];
+
+    const axialP = key === 'earth' ? -H / 13 : p.axialPrecessionYears;  // Earth axial precession is retrograde (clockwise)
+    const eclP = key === 'earth' ? H / 16 : p.perihelionEclipticYears;
+    const icrfP = key === 'earth' ? H / 3 : (eclP * (H / 13)) / ((H / 13) - eclP);
+    const ascP = S / (key === 'earth' ? 40 : p.ascendingNodeCyclesIn8H);
+    const obliqP = obliqCycles[i];
+    const eccP = wobblePeriods[i];
+
+    rows.push({
+      key, name: names[i], color: colors[i],
+      cycles: [
+        { label: 'Axial', period: axialP, n: Math.round(S / Math.abs(axialP)), frozen: Math.abs(axialP) > 1e7 },
+        { label: 'Peri. ecl.', period: eclP, n: Math.round(S / Math.abs(eclP)) },
+        { label: 'ICRF / Incl.', period: icrfP, n: Math.round(S / Math.abs(icrfP)) },
+        { label: 'Asc. node', period: -Math.abs(ascP), n: Math.round(S / Math.abs(ascP)) },
+        { label: 'Obliquity', period: obliqP, n: obliqP ? Math.round(S / obliqP) : null, oscillation: true },
+        { label: 'Ecc. cycle', period: eccP, n: isFinite(eccP) ? Math.round(S / eccP) : null, oscillation: true },
+      ]
+    });
+  }
+  return { rows, S, H };
+}
+
+function ghoCellContent(cycle, showAs8H) {
+  if (cycle.n === null || cycle.frozen) {
+    // Return object with content and a flag to center the cell
+    return { html: cycle.frozen ? '\u221E' : '\u2014', center: true };
+  }
+  const isRetro = cycle.period < 0;
+  // Oscillation periods (obliquity, eccentricity) have no direction — show neutral color
+  const isOsc = cycle.oscillation;
+  const cls = isOsc ? 'gho-osc' : (isRetro ? 'gho-retro' : 'gho-pro');
+  const sign = isOsc ? '' : (isRetro ? '\u2212' : '');
+  if (showAs8H) {
+    return { html: '<span class="gho-n ' + cls + '">' + sign + '8H/' + cycle.n + '</span>', center: false };
+  }
+  const yr = Math.round(Math.abs(cycle.period));
+  return { html: '<span class="gho-yr ' + cls + '">' + sign + yr.toLocaleString('en-US') + '</span>', center: false };
+}
+
+function createGHOPanel() {
+  const data = ghoComputeData();
+  const panel = document.createElement('div');
+  panel.id = 'ghoPanel';
+  panel.className = 'gho-modal';
+
+  const cycleLabels = ['Axial', 'Peri. ecl.', 'ICRF / Incl.', 'Asc. node', 'Obliquity', 'Ecc. cycle'];
+  const cycleTips = [
+    'Axial precession: the wobble of the planet\u2019s spin axis.',
+    'Ecliptic perihelion precession: orbital shape rotation in the ecliptic frame.',
+    'ICRF perihelion precession = inclination oscillation cycle. Ecliptic rate minus general precession (H/13).',
+    'Ascending node regression on the invariable plane. Matches secular eigenfrequencies s\u2081\u2013s\u2088.',
+    'Obliquity oscillation: axial tilt variation period. Beat of axial precession and ICRF perihelion.',
+    'Eccentricity cycle: orbital eccentricity oscillation period. Beat of axial precession and ICRF perihelion (wobble period).',
+  ];
+
+  panel.innerHTML = `
+    <div class="gho-overlay"></div>
+    <div class="gho-container">
+      <div class="gho-header">
+        <div class="gho-title">Grand Holistic Octave</div>
+        <div class="gho-subtitle">\u2014 8H = ${data.S.toLocaleString('en-US')} years \u2014 all planetary periods divide evenly</div>
+        <div class="gho-controls">
+          <button class="gho-toggle" title="Toggle between years and 8H/N notation">
+            <span class="gho-toggle-yr">Years</span>
+            <span class="gho-toggle-8h">8H/N</span>
+          </button>
+        </div>
+        <div class="gho-close" title="Close"></div>
+      </div>
+      <div class="gho-body">
+        <div class="gho-table">
+          <div class="gho-table-header">
+            <span class="gho-th-planet">Planet</span>
+            ${cycleLabels.map((label, i) => `<span class="gho-th gho-th-${i}" title="${cycleTips[i]}">${label}</span>`).join('')}
+          </div>
+          ${data.rows.map(row => {
+            const colorHex = '#' + (row.color || 0xaaaaaa).toString(16).padStart(6, '0');
+            return `<div class="gho-row${row.key === 'earth' ? ' gho-row-earth' : ''}" data-planet="${row.key}">
+              <span class="gho-planet"><span class="gho-dot" style="background:${colorHex}"></span>${row.name}</span>
+              ${row.cycles.map((c, ci) => { const r = ghoCellContent(c, ghoShowAs8H); return `<span class="gho-cell gho-col-${ci}${r.center ? ' gho-cell-center' : ''}">${r.html}</span>`; }).join('')}
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="gho-footer">All ${data.rows.length} planets \u00D7 6 cycle types = integer divisors of 8H \u2002\u2022\u2002 H = ${data.H.toLocaleString('en-US')} years (Holistic Year)</div>
+      </div>
+    </div>
+  `;
+
+  // Event: close
+  panel.querySelector('.gho-close').addEventListener('click', closeGHOPanel);
+  panel.querySelector('.gho-overlay').addEventListener('click', closeGHOPanel);
+
+  // Event: toggle
+  panel.querySelector('.gho-toggle').addEventListener('click', () => {
+    ghoShowAs8H = !ghoShowAs8H;
+    panel.querySelector('.gho-toggle').classList.toggle('gho-toggle-active', ghoShowAs8H);
+    // Update all cells
+    const rows = data.rows;
+    for (const row of rows) {
+      const rowEl = panel.querySelector(`.gho-row[data-planet="${row.key}"]`);
+      if (!rowEl) continue;
+      const cells = rowEl.querySelectorAll('.gho-cell');
+      cells.forEach((cell, ci) => {
+        const r = ghoCellContent(row.cycles[ci], ghoShowAs8H);
+        cell.innerHTML = r.html;
+        cell.classList.toggle('gho-cell-center', r.center);
+      });
+    }
+  });
+
+  document.body.appendChild(panel);
+  return panel;
+}
+
+function openGHOPanel() {
+  // Recreate panel each time to pick up any changes
+  if (ghoPanel) { ghoPanel.remove(); ghoPanel = null; }
+  ghoPanel = createGHOPanel();
+  ghoPanel.classList.add('visible');
+}
+
+function closeGHOPanel() {
+  if (ghoPanel) ghoPanel.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FORMULA VERIFICATION PANEL (.vfp-)
 // Compare model predictions vs published scientific formulas
 // ═══════════════════════════════════════════════════════════════════
@@ -19872,7 +20024,13 @@ function _la2010Interp(yearFromJ2000, col) {
   const i = Math.floor(idx);
   if (i >= _LA2010.length - 1) return _LA2010[_LA2010.length - 1][col];
   const frac = idx - i;
-  return _LA2010[i][col] * (1 - frac) + _LA2010[i + 1][col] * frac;
+  let a = _LA2010[i][col], b = _LA2010[i + 1][col];
+  // Handle 360° wrapping for angular columns (ascending node, perihelion longitude)
+  if (col >= 3 && Math.abs(b - a) > 180) {
+    if (b > a) a += 360; else b += 360;
+    return ((a * (1 - frac) + b * frac) % 360 + 360) % 360;
+  }
+  return a * (1 - frac) + b * frac;
 }
 
 function inclinationLa2010(year) { return _la2010Interp(year - 2000, 2); }
@@ -23625,6 +23783,8 @@ function setupGUI() {
     'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
   addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
     'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
+  addTooltip(toolsFolder.addButton({ title: 'Grand Holistic Octave' }).on('click', () => openGHOPanel()),
+    'All planetary periods as integer divisors of 8H = 2,682,536 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
   addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
@@ -33322,11 +33482,11 @@ const planetStats = {
       {label : () => ``,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(o.perihelionPrecessionRealLOD), dec:2, sep:',' },{ small: '″/100yr' }]},
     null,
-      {label : () => `<span class="pl-dir pl-dir-pro">→</span> Ecliptic precession`,
-       value : [ { v: () => o.eclipticPrecessionRealLOD, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Mean: ${fmtNum(holisticyearLength,0,',')}/5`],
+      {label : () => `<span class="pl-dir pl-dir-retro">←</span> Ecliptic precession`,
+       value : [ { v: () => -o.eclipticPrecessionRealLOD, dec:2, sep:',' },{ small: 'years' }],
+       hover : [`Mean: -${fmtNum(holisticyearLength,0,',')}/5 (retrograde). Earth's orbital plane precesses clockwise around the invariable plane.`],
        info  : 'https://en.wikipedia.org/wiki/Milankovitch_cycles#Orbital_inclination',
-       fraction: `${fmtNum(holisticyearLength,0,',')}/5`, barPct: () => o.eclipticPrecessionRealLOD / (o.inclinationPrecessionRealLOD || 1) * 100, barDir: 'right', derived: true},
+       fraction: `${fmtNum(holisticyearLength,0,',')}/5`, barPct: () => Math.abs(o.eclipticPrecessionRealLOD) / (o.inclinationPrecessionRealLOD || 1) * 100, barDir: 'left', derived: true},
       {label : () => ``,
        value : [ { v: () => OrbitalFormulas.precessionRateFromPeriod(o.eclipticPrecessionRealLOD), dec:2, sep:',' },{ small: '″/100yr' }]},
     null,
@@ -38068,7 +38228,7 @@ function buildPrecessionViz() {
     <div style="text-align:left; flex:0 0 auto;">
       <div style="color:${derivClr}">→ Perihelion <span style="${dimOp}">${hVal}/16</span></div>
       <div style="color:${resultClr}; margin-top:1px;">⇌ Obliquity <span style="${dimOp}">${hVal}/8</span></div>
-      <div style="color:${derivClr}; margin-top:1px;">→ Ecliptic <span style="${dimOp}">${hVal}/5</span></div>
+      <div style="color:${retroClr}; margin-top:1px;">← Ecliptic <span style="${dimOp}">${hVal}/5</span></div>
     </div>
   </div>`;
 }

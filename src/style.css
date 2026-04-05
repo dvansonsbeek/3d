@@ -3112,6 +3112,108 @@ a:link {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   GRAND HOLISTIC OCTAVE PERIOD TABLE (.gho-)
+   ══════════════════════════════════════════════════════════════════ */
+
+.gho-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:10000; }
+.gho-modal.visible { display:flex; align-items:center; justify-content:center; }
+.gho-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.65); backdrop-filter:blur(3px); }
+.gho-container {
+  position:relative; z-index:1;
+  background:#12151a; border:1px solid rgba(255,255,255,.12); border-radius:12px;
+  width:min(960px, 95vw); max-height:90vh; overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+}
+
+/* Header */
+.gho-header {
+  display:flex; align-items:center; gap:16px; padding:18px 24px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
+}
+.gho-title {
+  font:800 15px/1.2 Inter,system-ui,sans-serif; color:#fff;
+  text-transform:uppercase; letter-spacing:.06em;
+}
+.gho-subtitle {
+  font:400 11px/1.3 Inter,system-ui,sans-serif; color:rgba(255,255,255,.5);
+  flex:1; padding-left:4px;
+}
+.gho-controls { display:flex; gap:8px; }
+.gho-close {
+  width:32px; height:32px; cursor:pointer; opacity:.4; transition:opacity .15s;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E") center/18px no-repeat;
+}
+.gho-close:hover { opacity:1; }
+.gho-body { padding:16px 24px 24px; }
+
+/* Toggle button */
+.gho-toggle {
+  display:flex; border:1px solid rgba(255,255,255,.2); border-radius:5px;
+  overflow:hidden; cursor:pointer; background:transparent;
+}
+.gho-toggle-yr, .gho-toggle-8h {
+  padding:5px 14px; font:700 11px/1.3 var(--pl-mono-font); letter-spacing:.03em;
+  transition:all .15s;
+}
+.gho-toggle-yr { background:rgba(100,150,255,.15); color:#8cb4ff; }
+.gho-toggle-8h { background:transparent; color:rgba(255,255,255,.3); }
+.gho-toggle.gho-toggle-active .gho-toggle-yr { background:transparent; color:rgba(255,255,255,.3); }
+.gho-toggle.gho-toggle-active .gho-toggle-8h { background:rgba(100,150,255,.15); color:#8cb4ff; }
+
+/* Table */
+.gho-table { width:100%; }
+.gho-table-header {
+  display:grid; grid-template-columns:100px repeat(6, 1fr);
+  padding:10px 0 8px; border-bottom:2px solid rgba(255,255,255,.12);
+  font:700 9px/1.3 Inter,system-ui,sans-serif; color:rgba(255,255,255,.55);
+  text-transform:uppercase; letter-spacing:.06em;
+}
+.gho-th { text-align:right; padding-right:12px; cursor:help; }
+.gho-th-planet { text-align:left; padding-left:4px; }
+.gho-row {
+  display:grid; grid-template-columns:100px repeat(6, 1fr);
+  padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .1s;
+  align-items:center;
+}
+.gho-row:hover { background:rgba(255,255,255,.025); }
+.gho-row-earth {
+  background:rgba(100,150,255,.06);
+  border-bottom:1px solid rgba(100,150,255,.12);
+  border-top:1px solid rgba(100,150,255,.08);
+}
+.gho-row-earth:hover { background:rgba(100,150,255,.1); }
+
+.gho-planet {
+  display:flex; align-items:center; gap:8px; padding-left:4px;
+  font:600 12px/1.3 Inter,system-ui,sans-serif; color:rgba(255,255,255,.85);
+}
+.gho-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; box-shadow:0 0 4px rgba(255,255,255,.15); }
+
+.gho-cell {
+  text-align:right; padding-right:12px;
+  font:400 12px/1.3 var(--pl-mono-font); color:rgba(255,255,255,.7);
+}
+.gho-cell.gho-cell-center {
+  color:rgba(255,255,255,.2); font-size:15px;
+}
+
+/* Values */
+.gho-n { font-weight:500; font-size:12px; }
+.gho-yr { font-weight:400; }
+.gho-retro { color:rgba(255,110,110,.85); }
+.gho-pro { color:rgba(110,220,110,.8); }
+.gho-osc { color:rgba(255,255,255,.6); }
+
+/* Footer */
+.gho-footer {
+  margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06);
+  font:400 10px/1.5 Inter,system-ui,sans-serif; color:rgba(255,255,255,.35);
+  text-align:center;
+}
+
+/* ══════════════════════════════════════════════════════════════════
    FORMULA VERIFICATION PANEL (.vfp-)
    ══════════════════════════════════════════════════════════════════ */
 
