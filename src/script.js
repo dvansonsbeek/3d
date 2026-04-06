@@ -5175,6 +5175,16 @@ let o = {
   halleysAscendingNodeInvPlane: 0,
   erosAscendingNodeInvPlane: 0,
 
+  // ICRF perihelion longitude (J2000 epoch coordinates, linear precession at ICRF rate)
+  mercuryPerihelionLongICRF: 0,
+  venusPerihelionLongICRF: 0,
+  earthPerihelionLongICRF: 0,
+  marsPerihelionLongICRF: 0,
+  jupiterPerihelionLongICRF: 0,
+  saturnPerihelionLongICRF: 0,
+  uranusPerihelionLongICRF: 0,
+  neptunePerihelionLongICRF: 0,
+
   // Dynamic ascending nodes on invariable plane - Souami & Souchay (2012) values (for comparison, precess over time)
   mercuryAscendingNodeInvPlaneSouamiSouchay: 0,
   venusAscendingNodeInvPlaneSouamiSouchay: 0,
@@ -23183,16 +23193,17 @@ function setupGUI() {
 
   // Invariable plane heights with centered gauge bars + expandable detail rows
   const invPlaneFmt = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+  const _invIcrfP = (k) => 1 / (1 / planets[k].perihelionEclipticYears - 1 / (holisticyearLength / 13));
   const invPlanePlanets = [
-    ['mercury', 'Mercury (AU)', 6.35, 0.467, planets.mercury.perihelionEclipticYears],
-    ['venus', 'Venus (AU)', 2.15, 0.728, planets.venus.perihelionEclipticYears],
+    ['mercury', 'Mercury (AU)', 6.35, 0.467, _invIcrfP('mercury')],
+    ['venus', 'Venus (AU)', 2.15, 0.728, _invIcrfP('venus')],
     ['earth', 'Earth (AU)', 1.57, 1.017, earthPerihelionICRFYears],
-    ['mars', 'Mars (AU)', 1.63, 1.666, planets.mars.perihelionEclipticYears],
+    ['mars', 'Mars (AU)', 1.63, 1.666, _invIcrfP('mars')],
     'separator',
-    ['jupiter', 'Jupiter (AU)', 0.32, 5.455, planets.jupiter.perihelionEclipticYears],
-    ['saturn', 'Saturn (AU)', 0.93, 10.054, planets.saturn.perihelionEclipticYears],
-    ['uranus', 'Uranus (AU)', 0.99, 20.083, planets.uranus.perihelionEclipticYears],
-    ['neptune', 'Neptune (AU)', 0.74, 30.33, planets.neptune.perihelionEclipticYears]
+    ['jupiter', 'Jupiter (AU)', 0.32, 5.455, _invIcrfP('jupiter')],
+    ['saturn', 'Saturn (AU)', 0.93, 10.054, _invIcrfP('saturn')],
+    ['uranus', 'Uranus (AU)', 0.99, 20.083, _invIcrfP('uranus')],
+    ['neptune', 'Neptune (AU)', 0.74, 30.33, _invIcrfP('neptune')]
   ];
   const fldContent = invPlaneFolder.element.querySelector('.tp-fldv_c');
   invPlanePlanets.forEach(item => {
@@ -23204,13 +23215,13 @@ function setupGUI() {
     }
     const [planetKey, label, inclDeg, aphelionAU, precYears] = item;
     const heightKey = planetKey + 'HeightAboveInvPlane';
-    const ascNodeKey = planetKey + 'AscendingNodeInvPlane';
+    const periICRFKey = planetKey + 'PerihelionLongICRF';
     const inclKey = planetKey + 'InvPlaneInclinationDynamic';
     const maxH = Math.sin(inclDeg * Math.PI / 180) * aphelionAU;
     invPlaneMaxes[heightKey] = maxH;
 
     // Ensure o properties exist for binding
-    if (o[ascNodeKey] === undefined) o[ascNodeKey] = 0;
+    if (o[periICRFKey] === undefined) o[periICRFKey] = 0;
     if (o[inclKey] === undefined) o[inclKey] = inclDeg;
 
     // Height binding with gauge bar (always visible)
@@ -23228,15 +23239,15 @@ function setupGUI() {
     const precSign = precYears >= 0 ? '+' : '\u2212';
     detail.innerHTML =
       '<span class="inv-detail-item">' +
-        '<span class="inv-detail-label">Asc.Node</span>' +
-        '<span class="inv-detail-val" data-key="' + ascNodeKey + '">' + o[ascNodeKey].toFixed(2) + '\u00B0</span>' +
+        '<span class="inv-detail-label">Peri\u00A0(ICRF)</span>' +
+        '<span class="inv-detail-val" data-key="' + periICRFKey + '">' + o[periICRFKey].toFixed(2) + '\u00B0</span>' +
       '</span>' +
       '<span class="inv-detail-item">' +
         '<span class="inv-detail-label">Incl.</span>' +
         '<span class="inv-detail-val" data-key="' + inclKey + '">' + (o[inclKey] || inclDeg).toFixed(4) + '\u00B0</span>' +
       '</span>' +
       '<span class="inv-detail-item">' +
-        '<span class="inv-detail-label">Prec.</span>' +
+        '<span class="inv-detail-label">Prec.\u00A0(ICRF)</span>' +
         '<span class="inv-detail-val" style="color:' + precColor + '">' + precSign + Math.abs(precYears).toFixed(0) + ' yr</span>' +
       '</span>';
     // Store binding+detail pair for deferred DOM insertion
@@ -23246,9 +23257,9 @@ function setupGUI() {
     invPlaneTooltipEls[heightKey] = {
       row: detail,
       bladeEl: b.element,
-      ascEl: detail.querySelector('[data-key="' + ascNodeKey + '"]'),
+      periICRFEl: detail.querySelector('[data-key="' + periICRFKey + '"]'),
       inclEl: detail.querySelector('[data-key="' + inclKey + '"]'),
-      ascKey: ascNodeKey,
+      periICRFKey: periICRFKey,
       inclKey: inclKey,
       phaseAngle: {
         mercury: planets.mercury.inclinationPhaseAngle,
@@ -41332,11 +41343,11 @@ function updatePlanetInvariablePlaneHeights() {
     // Update expandable detail values (always update so values are correct when revealed)
     const dt = invPlaneTooltipEls[gaugeKey];
     if (dt) {
-      dt.ascEl.textContent = o[dt.ascKey].toFixed(2) + '\u00B0';
+      dt.periICRFEl.textContent = o[dt.periICRFKey].toFixed(2) + '\u00B0';
       dt.inclEl.textContent = o[dt.inclKey].toFixed(4) + '\u00B0';
-      // Color inclination based on InclinationPhaseAngle
-      // Phase = (Ω - φ₀ + 360) % 360: 180°–360° = increasing, 0°–180° = decreasing
-      const phase = ((o[dt.ascKey] - dt.phaseAngle) % 360 + 360) % 360;
+      // Color inclination based on ICRF perihelion phase relative to inclinationPhaseAngle
+      // Phase = (ω̃_ICRF - φ₀ + 360) % 360: 180°–360° = increasing, 0°–180° = decreasing
+      const phase = ((o[dt.periICRFKey] - dt.phaseAngle) % 360 + 360) % 360;
       const increasing = phase >= 180;
       dt.inclEl.style.color = increasing
         ? 'hsla(140, 65%, 55%, 1)'  // green = increasing
@@ -41631,6 +41642,26 @@ function updateDynamicInclinations() {
   o.saturnObliquity = computePlanetObliquity('saturn', o.currentYear);
   o.uranusObliquity = computePlanetObliquity('uranus', o.currentYear);
   o.neptuneObliquity = computePlanetObliquity('neptune', o.currentYear);
+
+  // ICRF perihelion longitude: J2000 epoch coordinates, linear precession
+  // Earth: harmonic formula minus general precession
+  const _gprRate = 360 / (holisticyearLength / 13);  // general precession rate (°/yr)
+  const earthEclPeri = calcEarthPerihelionPredictive(o.currentYear);
+  o.earthPerihelionLongICRF = ((earthEclPeri - _gprRate * (o.currentYear - 2000)) % 360 + 360) % 360;
+  // Planets: linear at ICRF rate from J2000 longitudePerihelion
+  const _calcPeriICRF = (key) => {
+    const p = planets[key];
+    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - 1 / (holisticyearLength / 13));
+    const icrfRate = 360 / icrfPeriod;
+    return ((p.longitudePerihelion + icrfRate * (o.currentYear - 2000)) % 360 + 360) % 360;
+  };
+  o.mercuryPerihelionLongICRF = _calcPeriICRF('mercury');
+  o.venusPerihelionLongICRF   = _calcPeriICRF('venus');
+  o.marsPerihelionLongICRF    = _calcPeriICRF('mars');
+  o.jupiterPerihelionLongICRF = _calcPeriICRF('jupiter');
+  o.saturnPerihelionLongICRF  = _calcPeriICRF('saturn');
+  o.uranusPerihelionLongICRF  = _calcPeriICRF('uranus');
+  o.neptunePerihelionLongICRF = _calcPeriICRF('neptune');
 
   // Get Earth's current orbital plane normals (ecliptic normals)
   // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
