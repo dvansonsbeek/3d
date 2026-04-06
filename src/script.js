@@ -19344,7 +19344,9 @@ function updateBalanceExplorerResults(panel, state) {
   fbeRenderVectorDiagram(panel, state);
 }
 
-// ── Multi-mode eigenmode solver (Laskar 2004 secular frequencies) ──
+// ── Multi-mode eigenmode solver (model's own 8H/N frequencies) ──
+// Uses the model's ascending node periods (ascendingNodeCyclesIn8H) as eigenfrequencies.
+// These are integer divisors of 8H — the model's Fibonacci-level prediction.
 // Computes eigenvector amplitudes once, then reconstruct(year) gives
 // the p,q state for all 8 planets at any year with guaranteed 100% balance.
 let _eigenX = null, _eigenY = null, _eigenPlanets = null;
@@ -19355,10 +19357,13 @@ function fbeInitEigenmodes() {
   const DEG = Math.PI / 180;
   const KEYS = BALANCE_PLANETS;
   const NP = 8;
+  const _8H = 8 * holisticyearLength;
 
-  // Laskar 2004 eigenfrequencies (s₁,s₂,s₃,s₄,s₆,s₇,s₈ — s₅=0 excluded)
-  const S_ARCSEC = [-5.610, -7.060, -18.851, -17.635, -26.350, -2.993, -0.692];
-  const S_RAD = S_ARCSEC.map(s => s / 3600 * DEG);
+  // Model's own eigenfrequencies from ascendingNodeCyclesIn8H (8H/N periods)
+  // Inner: s₁(Me)=8H/12, s₂(Ve)=8H/15, s₃(Ea)=8H/40, s₄(Ma)=8H/37
+  // Outer: s₆(Sa)=8H/55, s₇(Ur)=8H/6, s₈(Ne)=8H/1
+  const ascCycles = [12, 15, 40, 37, 55, 6, 1];  // [s₁,s₂,s₃,s₄,s₆,s₇,s₈]
+  const S_RAD = ascCycles.map(n => -2 * Math.PI / (_8H / n));  // retrograde
 
   // Planet angular momenta and J2000 states
   const pls = KEYS.map(key => {
