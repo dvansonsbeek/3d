@@ -19675,6 +19675,76 @@ function ghoComputeData() {
   const wobblePeriods = [mercuryWobblePeriod, venusWobblePeriod, H / 16,
     marsWobblePeriod, jupiterWobblePeriod, saturnWobblePeriod, uranusWobblePeriod, neptuneWobblePeriod];
 
+  // Scientific reference values: { observed, source, predicted } per cycle per planet
+  // observed = published value, source = citation, predicted = true if no observation exists
+  const sci = {
+    mercury: {
+      axial:  { observed: '~300 kyr', source: 'Peale 2006; Margot+ 2012 (Cassini state)' },
+      ecl:    { observed: '~227 kyr (~570\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '231,842 yr (s\u2081)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: '~895 kyr', source: 'Bills 2005; Yseboodt & Margot 2006', error: '0.2%' },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    venus: {
+      axial:  { observed: '~29 kyr', source: 'Cottereau & Souchay 2009' },
+      ecl:    { observed: '~324 kyr (~400\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '183,830 yr (s\u2082)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: 'None (tidally damped)', source: 'Correia & Laskar 2003' },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    earth: {
+      axial:  { observed: '25,771 yr', source: 'IAU 2006 (50.29\u2033/yr)', error: '0.1%' },
+      ecl:    { observed: '~20,957 yr (~6,186\u2033/cy)', source: 'Derived (axial + inclination rates)' },
+      icrf:   { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: '~41,000 yr', source: 'Laskar+ 1993 (Milankovitch)', error: '2%' },
+      ecc:    { observed: '~100 kyr / ~413 kyr', source: 'Berger 1978 (Milankovitch eccentricity)' },
+    },
+    mars: {
+      axial:  { observed: '170,400 yr', source: 'Konopliv+ 2020 (InSight/RISE, 7604\u00B16 mas/yr)', error: '1.7%' },
+      ecl:    { observed: '~81 kyr (~1,600\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '72,991 yr (s\u2084)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: '~124,800 yr', source: 'Ward 1973; Laskar+ 2004 (modes s\u2083+s\u2084)', error: '0.7%' },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    jupiter: {
+      axial:  { observed: '113\u2013136 kyr', source: 'Saillenfest+ 2020 (A&A)' },
+      ecl:    { observed: '~72 kyr (~1,800\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '\u221E (s\u2085=0, inv. plane)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2020', predicted: true },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    saturn: {
+      axial:  { observed: '400\u2013480 kyr', source: 'Saillenfest+ 2021 (Nature Astron.)' },
+      ecl:    { observed: '~38 kyr (~3,400\u2033/cy, retro)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '49,187 yr (s\u2086)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2021', predicted: true },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    uranus: {
+      axial:  { observed: '~40\u201350 Myr', source: 'Saillenfest+ 2022 (A&A)' },
+      ecl:    { observed: '~118 kyr (~1,100\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '433,010 yr (s\u2087)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: 'Frozen at ~98\u00B0', source: 'Saillenfest+ 2022', predicted: true },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+    neptune: {
+      axial:  { observed: '~70 Myr (est.)', source: 'Ward & Hamilton 2004' },
+      ecl:    { observed: '~648 kyr (~200\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      icrf:   { predicted: true, source: 'Model prediction' },
+      asc:    { observed: '1,872,832 yr (s\u2088)', source: 'Laskar 2004 Table 3' },
+      obliq:  { observed: 'Frozen at ~28\u00B0', source: 'Rogoszinski & Hamilton 2020' },
+      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+    },
+  };
+  const sciKeys = ['axial', 'ecl', 'icrf', 'asc', 'obliq', 'ecc'];
+
   const rows = [];
   for (let i = 0; i < 8; i++) {
     const key = keys[i];
@@ -19687,15 +19757,23 @@ function ghoComputeData() {
     const obliqP = obliqCycles[i];
     const eccP = wobblePeriods[i];
 
+    const s = sci[key];
+    const mkHover = (sk, period) => {
+      const ref = s[sk];
+      const yr = Math.round(Math.abs(period)).toLocaleString('en-US');
+      const status = ref.predicted ? '\u26AB Prediction' : (ref.error ? `\u2705 Confirmed (${ref.error})` : '\u2705 Observed');
+      return `Model: ${yr} yr\nObserved: ${ref.observed}\nSource: ${ref.source}\n${status}`;
+    };
+
     rows.push({
       key, name: names[i], color: colors[i],
       cycles: [
-        { label: 'Axial', period: axialP, n: Math.round(S / Math.abs(axialP)), frozen: Math.abs(axialP) > 1e7 },
-        { label: 'Peri. ecl.', period: eclP, n: Math.round(S / Math.abs(eclP)) },
-        { label: 'ICRF / Incl.', period: icrfP, n: Math.round(S / Math.abs(icrfP)) },
-        { label: 'Asc. node', period: -Math.abs(ascP), n: Math.round(S / Math.abs(ascP)) },
-        { label: 'Obliquity', period: obliqP, n: obliqP ? Math.round(S / obliqP) : null, oscillation: true },
-        { label: 'Ecc. cycle', period: eccP, n: isFinite(eccP) ? Math.round(S / eccP) : null, oscillation: true },
+        { label: 'Axial', period: axialP, n: Math.round(S / Math.abs(axialP)), frozen: Math.abs(axialP) > 1e7, hover: mkHover('axial', axialP) },
+        { label: 'Peri. ecl.', period: eclP, n: Math.round(S / Math.abs(eclP)), hover: mkHover('ecl', eclP) },
+        { label: 'ICRF / Incl.', period: icrfP, n: Math.round(S / Math.abs(icrfP)), hover: mkHover('icrf', icrfP) },
+        { label: 'Asc. node', period: -Math.abs(ascP), n: Math.round(S / Math.abs(ascP)), hover: mkHover('asc', ascP) },
+        { label: 'Obliquity', period: obliqP, n: obliqP ? Math.round(S / obliqP) : null, oscillation: true, hover: mkHover('obliq', obliqP || 0) },
+        { label: 'Ecc. cycle', period: eccP, n: isFinite(eccP) ? Math.round(S / eccP) : null, oscillation: true, hover: mkHover('ecc', eccP) },
       ]
     });
   }
@@ -19759,7 +19837,7 @@ function createGHOPanel() {
             const colorHex = '#' + (row.color || 0xaaaaaa).toString(16).padStart(6, '0');
             return `<div class="gho-row${row.key === 'earth' ? ' gho-row-earth' : ''}" data-planet="${row.key}">
               <span class="gho-planet"><span class="gho-dot" style="background:${colorHex}"></span>${row.name}</span>
-              ${row.cycles.map((c, ci) => { const r = ghoCellContent(c, ghoShowAs8H); return `<span class="gho-cell gho-col-${ci}${r.center ? ' gho-cell-center' : ''}">${r.html}</span>`; }).join('')}
+              ${row.cycles.map((c, ci) => { const r = ghoCellContent(c, ghoShowAs8H); return `<span class="gho-cell gho-col-${ci}${r.center ? ' gho-cell-center' : ''}" title="${(c.hover || '').replace(/"/g, '&quot;')}">${r.html}</span>`; }).join('')}
             </div>`;
           }).join('')}
         </div>
