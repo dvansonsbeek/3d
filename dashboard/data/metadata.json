@@ -1,0 +1,65 @@
+{
+  "generated": "2026-04-06T09:22:28.533Z",
+  "holisticYear": 335317,
+  "balancedYear": -302635,
+  "step": 23,
+  "dataPoints": 14579,
+  "planets": {
+    "earth": {
+      "color": "#2e64be",
+      "displayName": "Earth",
+      "fibonacciD": 3,
+      "type": "II",
+      "semiMajorAxis": 1
+    },
+    "mercury": {
+      "color": "#6e6e6e",
+      "displayName": "Mercury",
+      "fibonacciD": 21,
+      "type": "I",
+      "mirrorPair": "uranus"
+    },
+    "venus": {
+      "color": "#d5ab37",
+      "displayName": "Venus",
+      "fibonacciD": 34,
+      "type": "I",
+      "mirrorPair": "neptune"
+    },
+    "mars": {
+      "color": "#b03a2e",
+      "displayName": "Mars",
+      "fibonacciD": 5,
+      "type": "II",
+      "mirrorPair": "jupiter"
+    },
+    "jupiter": {
+      "color": "#c97e4f",
+      "displayName": "Jupiter",
+      "fibonacciD": 5,
+      "type": "III",
+      "mirrorPair": "mars"
+    },
+    "saturn": {
+      "color": "#d9b65c",
+      "displayName": "Saturn",
+      "fibonacciD": 3,
+      "type": "III",
+      "mirrorPair": "earth"
+    },
+    "uranus": {
+      "color": "#37c6d0",
+      "displayName": "Uranus",
+      "fibonacciD": 21,
+      "type": "III",
+      "mirrorPair": "mercury"
+    },
+    "neptune": {
+      "color": "#2c539e",
+      "displayName": "Neptune",
+      "fibonacciD": 34,
+      "type": "III",
+      "mirrorPair": "venus"
+    }
+  }
+}

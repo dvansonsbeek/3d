@@ -14,7 +14,6 @@ __pycache__/
 docs/hidden/
 docs/scripts/archive/
 web-bundles/
-dashboard/data/
 tools/cardinal-points-training.json
 data/01-holistic-year-objects-data.xlsx
 data/02-solar-measurements.csv
