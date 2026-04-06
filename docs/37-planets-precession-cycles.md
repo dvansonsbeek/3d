@@ -445,6 +445,51 @@ The cross-planet connections (Mars obliquity = Jupiter axial, etc.) suggest that
 the precession structure is not independent per planet but coupled across the
 solar system through the Fibonacci mirror-pair framework.
 
+### Two-component obliquity formula
+
+The obliquity oscillation for each planet uses two cosine components, matching
+Earth's decomposition into H/3 (inclination) and H/8 (obliquity precession):
+
+```
+obliquity(t) = mean − A·cos(ωᵢ·t) + A·cos(ωₒ·t)
+```
+
+where:
+- A = `invPlaneInclinationAmplitude` (same amplitude for both components)
+- ωᵢ = 2π / ICRF perihelion period (inclination component, **negative** sign)
+- ωₒ = 2π / obliquity cycle period (obliquity component, **positive** sign)
+- t = years from balanced year
+
+Anchored to J2000: `obliquity(2000) = axialTiltMean` (the known J2000 tilt).
+
+The **mean obliquity** (time-averaged over the Grand Holistic Octave = 8H) is:
+
+```
+mean = tiltJ2000 + A·cos(ωᵢ·t₂₀₀₀) − A·cos(ωₒ·t₂₀₀₀)
+```
+
+Since all ICRF and obliquity cycle periods divide 8H evenly, the cosine terms
+average to zero over 8H, leaving only the constant anchoring offsets.
+
+| Planet | J2000 tilt | Mean obliquity (8H) | Shift | Amplitude |
+|--------|-----------|---------------------|-------|-----------|
+| Mercury | 0.0300° | −0.1188° | −0.1488° | ±0.3843° |
+| Venus | 2.6392° | 2.6392° | — | (no cycle) |
+| Earth | 23.4393° | 23.4533° | +0.0140° | ±0.6360° |
+| Mars | 25.1900° | 26.8078° | +1.6178° | ±1.1576° |
+| Jupiter | 3.1300° | 3.1189° | −0.0111° | ±0.0213° |
+| Saturn | 26.7300° | 26.7970° | +0.0670° | ±0.0648° |
+| Uranus | 82.2300° | 82.2407° | +0.0107° | ±0.0237° |
+| Neptune | 28.3200° | 28.3200° | — | (no cycle) |
+
+**Notable result**: Mars and Saturn have nearly identical mean obliquities
+(26.81° vs 26.80°), differing by only 0.01°. These are the two planets with
+the largest obliquities after Uranus. Mars (d=5) and Saturn (d=3, anti-phase)
+are deeply connected in the balance framework — Saturn is the sole anti-phase
+planet opposing all others. Whether this convergence follows from the balance
+laws or is a numerical coincidence of the current parameters remains an open
+question.
+
 ### Summary of testable predictions
 
 | # | Prediction | Value | Current status | How to test |
