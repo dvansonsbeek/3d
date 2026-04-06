@@ -19485,6 +19485,10 @@ function fbeRenderVectorDiagram(panel, state) {
   const year = o.currentYear || 2000;
   const genPrecRate = 1 / (holisticyearLength / 13);
 
+  // Detect if current config matches Config #1
+  const CONFIG1 = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
+  const isConfig1 = BALANCE_PLANETS.every(k => state[k].d === CONFIG1[k]);
+
   const planetColors = {
     mercury: '#a0a0a0', venus: '#e8c46a', earth: '#3399ff', mars: '#b03a2e',
     jupiter: '#c97e4f', saturn: '#d9b65c', uranus: '#37c6d0', neptune: '#2c539e'
@@ -19683,6 +19687,13 @@ function fbeRenderVectorDiagram(panel, state) {
   html += `<text x="70" y="${LY2}" fill="#5cb85c" font-size="10" font-weight="700" dominant-baseline="central">${inPhasePct.toFixed(1)}%</text>`;
   html += `<text x="195" y="${LY2}" fill="#d9534f" font-size="10" font-weight="700" dominant-baseline="central">${antiPhasePct.toFixed(1)}%</text>`;
   html += `<text x="326" y="${LY2}" fill="#ffd700" font-size="10" font-weight="700" dominant-baseline="central">${imbalancePct.toFixed(2)}%</text>`;
+
+  // Note when non-Config-1 is selected
+  if (!isConfig1) {
+    const NY = LY2 + 18;
+    html += `<text x="${CX}" y="${NY}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">Note: Vector balance is independent of d-value configuration \u2014 it works for any integer divisors of 8H.</text>`;
+    html += `<text x="${CX}" y="${NY + 12}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">The real constraints are the scalar Inclination Balance (Law 3) and Eccentricity Balance (Law 5) above.</text>`;
+  }
 
   svg.innerHTML = html;
 }
