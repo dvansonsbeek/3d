@@ -148,7 +148,7 @@ A single modal panel with a **Years / 8H/N toggle** button:
 - [Balance Explorer Reference](53-balance-explorer-reference.md) — Interactive balance testing
 - [Ascending Node Calculations](31-ascending-node-calculations.md) — Dynamic ascending node model
 - [Inclination Calculations](32-inclination-calculations.md) — ICRF perihelion inclination model
-- [Planets Precession Cycles](37-planets-precession-cycles.md) — Per-planet precession analysis
+- [Planets Precession Cycles](37-planets-precession-cycles.md) — Per-planet precession analysis, observed rates (WebGeoCalc, Laskar 2004, InSight), obliquity cycle theory, and two-component obliquity formula
 
 ## Verification
 

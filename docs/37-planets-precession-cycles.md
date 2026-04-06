@@ -61,18 +61,22 @@ precession hierarchy.
 
 ### Perihelion longitude advance (dϖ/dt)
 
-| Planet | Baseline ("/cy) | Period (yr) | H Ratio | H-predicted period | Error |
-|--------|----------------|-------------|---------|-------------------|-------|
-| Mercury | +531.4 | 243,867 | H × 8/11 | 243,867 yr | — |
-| Venus | +193.3 | 670,634 | H × 2 | 670,634 yr | — |
-| Earth | +1,159.5 | 111,772 | H/3 | 111,772 yr | — |
-| Mars | +1,691.0 | 76,644 | H × 8/35 | 76,644 yr | — |
-| Jupiter | +1,932.5 | 67,063 | H/5 | 67,063 yr | — |
-| Saturn | −3,092.0 | 41,915 (r) | H/8 | 41,915 yr | — |
-| Uranus | +1,159.5 | 111,772 | H/3 | 111,772 yr | — |
-| Neptune | +193.3 | 670,634 | H × 2 | 670,634 yr | — |
+| Planet | Observed ("/cy) | Observed period | H Ratio | H-predicted ("/cy) | H-predicted period |
+|--------|----------------|-----------------|---------|-------------------|-------------------|
+| Mercury | ~570 | ~227 kyr | H × 8/11 | 531.4 | 243,867 yr |
+| Venus | ~400 | ~324 kyr | H × 2 | 193.3 | 670,634 yr |
+| Earth | ~6,186 | ~20,957 yr | H/16 | 6,186.5 | 20,957 yr |
+| Mars | ~1,600 | ~81 kyr | H × 8/35 | 1,691.0 | 76,644 yr |
+| Jupiter | ~1,800 | ~72 kyr | H/5 | 1,932.5 | 67,063 yr |
+| Saturn | ~−3,400 | ~38 kyr (r) | H/8 | −3,092.0 | 41,915 yr |
+| Uranus | ~1,100 | ~118 kyr | H/3 | 1,159.5 | 111,772 yr |
+| Neptune | ~200 | ~648 kyr | H × 2 | 193.3 | 670,634 yr |
 
-Source: WebGeoCalc analysis of long-term perihelion longitude evolution.
+Observed: WebGeoCalc (JPL/NAIF, 1900–2100 observation window). The observed rates
+are approximate total advance rates measured over a short baseline. The H-predicted
+rates are long-term mean rates derived from the Fibonacci framework. Short-term
+observations include contributions from planetary perturbations that average out
+over longer timescales.
 
 **Notable patterns:**
 - **Venus = Neptune** (both H×2) — inner/outer mirror symmetry
