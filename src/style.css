@@ -2266,7 +2266,7 @@ a:link {
 
 .fbe-planet-row {
   display: grid;
-  grid-template-columns: 90px 80px 70px 70px 1fr 90px 90px;
+  grid-template-columns: 90px 80px 75px 75px 1fr 90px 90px;
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
@@ -2448,7 +2448,7 @@ a:link {
 /* Grid header row */
 .fbe-grid-header {
   display: grid;
-  grid-template-columns: 90px 80px 70px 70px 1fr 90px 90px;
+  grid-template-columns: 90px 80px 75px 75px 1fr 90px 90px;
   gap: 8px;
   padding: 4px 10px;
   font-size: 11px;
@@ -2456,6 +2456,10 @@ a:link {
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.fbe-grid-header > span {
+  white-space: nowrap;
 }
 
 /* Header tooltip */
