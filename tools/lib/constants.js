@@ -147,6 +147,7 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
     ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
     obliquityCycle: fractionToYears(mp.obliquityCycleFraction),
+    axialPrecessionYears: fractionToYears(mp.axialPrecessionFraction),
     // Astro references (from astro-reference.json)
     solarYearInput: ar.solarYearInput,
     orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
@@ -358,6 +359,17 @@ for (const [key, p] of Object.entries(planets)) {
     p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
       p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
       p.longitudePerihelion, p.inclinationPhaseAngle, p.antiPhase);
+  }
+}
+
+// Derive wobblePeriod for each planet (beat of axial precession and ICRF inclination)
+// Matches script.js calcWobblePeriod()
+const H13 = H / 13;
+for (const [key, p] of Object.entries(planets)) {
+  if (p.perihelionEclipticYears && p.axialPrecessionYears) {
+    const inclICRF = (p.perihelionEclipticYears * H13) / (H13 - p.perihelionEclipticYears);
+    const wobbleRate = Math.abs(1 / p.axialPrecessionYears - 1 / inclICRF);
+    p.wobblePeriod = 1 / wobbleRate;
   }
 }
 

@@ -44,12 +44,7 @@ function generateYears(from, to, step) {
   return years;
 }
 
-function computePlanetBalancedYear(planetName) {
-  const p = C.planets[planetName];
-  const phaseJ2000 = p.eccentricityPhaseJ2000;
-  const cycleLength = C.perihelionCycleLength;
-  return 2000 - (phaseJ2000 / 360) * cycleLength;
-}
+
 
 // Linear ascending node (fallback for Earth which has no orbitTilta/b in constants)
 function computeAscendingNodeLinear(ascNodeJ2000, precessionPeriod, year) {
@@ -65,7 +60,7 @@ function exportEarth(years) {
   const eccentricity = [], obliquity = [], inclination = [];
   const inclinationTilt = [], axialTilt = [];
   const inclinationTiltRel = [], axialTiltRel = [];
-  const lonPerihelion = [], ascendingNode = [], argPerihelion = [];
+  const lonPerihelion = [], lonPerihelionICRF = [], ascendingNode = [], argPerihelion = [];
   const tropicalYearDays = [], siderealYearDays = [];
   const precessionPeriod = [], erd = [];
   // Earth predictions (day lengths, cardinal points, precession)
@@ -79,8 +74,8 @@ function exportEarth(years) {
   const solsticeObliquity = [];
   const perihelionDist = [], aphelionDist = [];
 
-  // Earth's perihelion precession period and ascending node
-  const earthPeriPeriod = C.perihelionCycleLength;
+  // Earth's ascending node precesses at -H/5 (retrograde, ecliptic precession rate)
+  const earthAscNodePeriod = -C.H / 5;
   const earthAscNodeJ2000 = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane || 284.51;
 
   for (const year of years) {
@@ -140,9 +135,10 @@ function exportEarth(years) {
 
     // Perihelion longitude (from predictive 21-harmonic formula)
     lonPerihelion.push(+el.perihelionLong.toFixed(4));
+    lonPerihelionICRF.push(+OE.calcPerihelionLongICRF('earth', year).toFixed(4));
 
     // Ascending node (linear precession for Earth)
-    const ascNode = computeAscendingNodeLinear(earthAscNodeJ2000, earthPeriPeriod, year);
+    const ascNode = computeAscendingNodeLinear(earthAscNodeJ2000, earthAscNodePeriod, year);
     ascendingNode.push(+ascNode.toFixed(4));
 
     // Argument of perihelion: ω = lon_perihelion - ascending_node
@@ -156,7 +152,7 @@ function exportEarth(years) {
     fullCycle: {
       years, eccentricity, obliquity, inclination,
       inclinationTilt, axialTilt, inclinationTiltRel, axialTiltRel,
-      lonPerihelion, ascendingNode, argPerihelion,
+      lonPerihelion, lonPerihelionICRF, ascendingNode, argPerihelion,
       tropicalYearDays, siderealYearDays, anomalisticYearDays,
       precessionPeriod, perihelionPrecession, inclinationPrecession, eclipticPrecession,
       erd,
@@ -190,12 +186,13 @@ function exportPlanet(planetName, years) {
   const p = C.planets[planetName];
   console.log(`  ${planetName}: computing ${years.length} data points...`);
 
-  const planetBalancedYear = computePlanetBalancedYear(planetName);
-  const cycleLength = C.perihelionCycleLength;
+  const cycleLength = p.wobblePeriod;
+  const planetBalancedYear = 2000 - (p.eccentricityPhaseJ2000 / 360) * cycleLength;
 
   const eccentricity = [], inclination = [], obliquity = [];
-  const inclinationTilt = [];
-  const lonPerihelion = [], ascendingNode = [], argPerihelion = [];
+  const inclinationTilt = [], axialTilt = [];
+  const inclinationTiltRel = [], axialTiltRel = [];
+  const lonPerihelion = [], lonPerihelionICRF = [], ascendingNode = [], argPerihelion = [];
   const eclipticInclination = [];
   const ascNodeInvPlane = [], argPeriInvPlane = [];
   const perihelionDist = [], aphelionDist = [];
@@ -211,17 +208,31 @@ function exportPlanet(planetName, years) {
     // Invariable-plane inclination (dynamic oscillation)
     const incl = OE.computePlanetInvPlaneInclinationDynamic(planetName, year);
     inclination.push(+incl.toFixed(6));
-    inclinationTilt.push(+incl.toFixed(6));
 
-    // Obliquity from simulation formula (anchored to J2000)
+    // Obliquity from two-component formula (inclination + axial)
     const obliq = OE.computePlanetObliquity(planetName, year);
     obliquity.push(+obliq.toFixed(6));
+
+    // Obliquity components: pure cosines (no anchoring offset), matching Earth's component3/component8
+    // inclRel = -amp × cos(ωᵢ·t)  (range ±amp, like Earth's -amp×cos(H/3))
+    // obliqRel = +amp × cos(ωₒ·t)  (range ±amp, like Earth's +amp×cos(H/8))
+    const amp = p.invPlaneInclinationAmplitude;
+    const t = year - C.balancedYear;
+    const genPrecRate = 1 / (C.H / 13);
+    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+    const inclRel = p.obliquityCycle ? -amp * Math.cos(2 * Math.PI * t / icrfPeriod) : 0;
+    const obliqRel = p.obliquityCycle ? amp * Math.cos(2 * Math.PI * t / p.obliquityCycle) : 0;
+    inclinationTiltRel.push(+inclRel.toFixed(6));
+    axialTiltRel.push(+obliqRel.toFixed(6));
+    inclinationTilt.push(+(p.axialTiltMean + inclRel).toFixed(6));
+    axialTilt.push(+(p.axialTiltMean + obliqRel).toFixed(6));
 
     // Longitude of perihelion (linear precession)
     const lonPeri = OE.calcPlanetPerihelionLong(
       p.longitudePerihelion, p.perihelionEclipticYears, year
     );
     lonPerihelion.push(+lonPeri.toFixed(4));
+    lonPerihelionICRF.push(+OE.calcPerihelionLongICRF(planetName, year).toFixed(4));
 
     // Ascending node (dynamic rate-based if tilts available, linear fallback)
     let ascNode;
@@ -259,9 +270,9 @@ function exportPlanet(planetName, years) {
     planet: planetName,
     generated: new Date().toISOString(),
     fullCycle: {
-      years, eccentricity, obliquity, inclination, inclinationTilt,
+      years, eccentricity, obliquity, inclination, inclinationTilt, axialTilt, inclinationTiltRel, axialTiltRel,
       eclipticInclination,
-      lonPerihelion, ascendingNode, argPerihelion,
+      lonPerihelion, lonPerihelionICRF, ascendingNode, argPerihelion,
       ascNodeInvPlane, argPeriInvPlane,
       perihelionDist, aphelionDist,
     },

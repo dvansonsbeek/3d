@@ -142,17 +142,30 @@ function computePlanetObliquity(planetName, currentYear) {
   const p = C.planets[planetName];
   if (!p) return 0;
 
-  const cycle = p.obliquityCycle;
   const tiltJ2000 = p.axialTiltMean;
 
   // Venus, Neptune: no obliquity cycle — return static tilt
-  if (!cycle) return tiltJ2000;
+  if (!p.obliquityCycle) return tiltJ2000;
 
-  // Anchor to J2000 via inclination oscillation
-  const inclAtJ2000 = computePlanetInvPlaneInclinationDynamic(planetName, 2000);
-  const inclNow = computePlanetInvPlaneInclinationDynamic(planetName, currentYear);
+  // Two-component obliquity (same structure as Earth's -cos(H/3) + cos(H/8)):
+  //   1. Inclination component at ICRF perihelion period (NEGATIVE sign)
+  //   2. Obliquity precession component at obliquityCycle period (POSITIVE sign)
+  // Both with same amplitude, anchored to axialTiltMean at J2000
+  const amp = p.invPlaneInclinationAmplitude;
+  const t = currentYear - C.balancedYear;
+  const t2000 = 2000 - C.balancedYear;
 
-  return tiltJ2000 + (inclNow - inclAtJ2000);
+  // Inclination component (ICRF perihelion period, NEGATIVE — like Earth's -cos(H/3))
+  const genPrecRate = 1 / (C.H / 13);
+  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  const phaseIncl = 2 * Math.PI / icrfPeriod;
+  const inclComponent = -amp * (Math.cos(phaseIncl * t) - Math.cos(phaseIncl * t2000));
+
+  // Obliquity precession component (obliquityCycle, POSITIVE — like Earth's +cos(H/8))
+  const phaseObliq = 2 * Math.PI / p.obliquityCycle;
+  const obliqComponent = amp * (Math.cos(phaseObliq * t) - Math.cos(phaseObliq * t2000));
+
+  return tiltJ2000 + inclComponent + obliqComponent;
 }
 
 /**
@@ -433,8 +446,9 @@ function calculateDynamicAscendingNodeFromTilts(orbitTilta, orbitTiltb, currentY
  */
 function computeAscendingNodeInvPlane(planetName, year) {
   const p = C.planets[planetName];
-  if (!p || !p.ascendingNodeInvPlane || !p.perihelionEclipticYears) return 0;
-  const rate = 360 / p.perihelionEclipticYears;
+  if (!p || !p.ascendingNodeInvPlane) return 0;
+  const period = p.ascendingNodePeriod || p.perihelionEclipticYears;
+  const rate = 360 / period;
   return ((p.ascendingNodeInvPlane + rate * (year - 2000)) % 360 + 360) % 360;
 }
 
@@ -519,6 +533,30 @@ function calcERD(year) {
  */
 function calcPlanetPerihelionLong(theta0, period, year) {
   return ((theta0 + 360.0 * (year - 2000) / period) % 360 + 360) % 360;
+}
+
+/**
+ * Compute ICRF perihelion longitude for a planet.
+ * ICRF = ecliptic minus general precession (H/13).
+ * For Earth: uses H/3 period directly.
+ * For planets: icrfPeriod = 1 / (1/perihelionEclipticYears - 1/(H/13))
+ *
+ * @param {string} planetName - planet key
+ * @param {number} year - decimal year
+ * @returns {number} ICRF longitude in degrees [0, 360)
+ */
+function calcPerihelionLongICRF(planetName, year) {
+  const genPrecRate = 1 / (C.H / 13);
+  if (planetName === 'earth') {
+    const eclipticLong = calcEarthPerihelionPredictive(year);
+    const generalPrecession = 360 * (year - 2000) * genPrecRate;
+    return ((eclipticLong - generalPrecession) % 360 + 360) % 360;
+  }
+  const p = C.planets[planetName];
+  if (!p) return 0;
+  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  const icrfRate = 360 / icrfPeriod;
+  return ((p.longitudePerihelion + icrfRate * (year - 2000)) % 360 + 360) % 360;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1341,6 +1379,7 @@ module.exports = {
   calcEarthPerihelionPredictive,
   calcERD,
   calcPlanetPerihelionLong,
+  calcPerihelionLongICRF,
 
   // Inclination
   computeInclinationEarth,

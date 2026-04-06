@@ -83,7 +83,8 @@ export function renderAllCharts(planetDataMap) {
     { secondary: 'ascNodeInvPlane', secondaryLabel: 'Inv. Plane' });
   renderAngleChart('chart-arg-perihelion', planetDataMap, 'argPerihelion', 'Argument of Perihelion (°)',
     { secondary: 'argPeriInvPlane', secondaryLabel: 'Inv. Plane' });
-  renderAngleChart('chart-lon-perihelion', planetDataMap, 'lonPerihelion', 'Longitude of Perihelion (°)');
+  renderAngleChart('chart-lon-perihelion', planetDataMap, 'lonPerihelion', 'Longitude of Perihelion (°)',
+    { secondary: 'lonPerihelionICRF', secondaryLabel: 'ICRF' });
 
   renderDistanceChart(planetDataMap);
 
@@ -167,38 +168,38 @@ function renderObliquityChart(planetDataMap) {
       });
     }
 
-    // Earth only: Axial tilt absolute + relative traces for comparison
-    if (name === 'earth') {
-      if (fc.axialTilt) {
-        traces.push({
-          x: fc.years, y: fc.axialTilt,
-          type: 'scattergl', mode: 'lines',
-          line: { color, width: 1, dash: 'dot' },
-          name: `${pName} Axial tilt`,
-          visible: 'legendonly',
-          hovertemplate: `${pName} Axial tilt: %{y:.4f}°<extra></extra>`,
-        });
-      }
-      if (fc.inclinationTiltRel) {
-        traces.push({
-          x: fc.years, y: fc.inclinationTiltRel,
-          type: 'scattergl', mode: 'lines',
-          line: { color: '#5cb85c', width: 1, dash: 'dash' },
-          name: `${pName} Incl. tilt (rel)`,
-          visible: 'legendonly',
-          hovertemplate: `${pName} Incl. tilt rel: %{y:+.4f}°<extra></extra>`,
-        });
-      }
-      if (fc.axialTiltRel) {
-        traces.push({
-          x: fc.years, y: fc.axialTiltRel,
-          type: 'scattergl', mode: 'lines',
-          line: { color: '#e8a838', width: 1, dash: 'dot' },
-          name: `${pName} Axial tilt (rel)`,
-          visible: 'legendonly',
-          hovertemplate: `${pName} Axial tilt rel: %{y:+.4f}°<extra></extra>`,
-        });
-      }
+    // Axial tilt component (all planets with obliquity cycle + Earth)
+    if (fc.axialTilt) {
+      traces.push({
+        x: fc.years, y: fc.axialTilt,
+        type: 'scattergl', mode: 'lines',
+        line: { color, width: 1, dash: 'dot' },
+        name: `${pName} Axial tilt`,
+        visible: 'legendonly',
+        hovertemplate: `${pName} Axial tilt: %{y:.4f}°<extra></extra>`,
+      });
+    }
+
+    // Relative deviation traces (all planets)
+    if (fc.inclinationTiltRel) {
+      traces.push({
+        x: fc.years, y: fc.inclinationTiltRel,
+        type: 'scattergl', mode: 'lines',
+        line: { color: '#5cb85c', width: 1, dash: 'dash' },
+        name: `${pName} Incl. tilt (rel)`,
+        visible: 'legendonly',
+        hovertemplate: `${pName} Incl. tilt rel: %{y:+.4f}°<extra></extra>`,
+      });
+    }
+    if (fc.axialTiltRel) {
+      traces.push({
+        x: fc.years, y: fc.axialTiltRel,
+        type: 'scattergl', mode: 'lines',
+        line: { color: '#e8a838', width: 1, dash: 'dot' },
+        name: `${pName} Axial tilt (rel)`,
+        visible: 'legendonly',
+        hovertemplate: `${pName} Axial tilt rel: %{y:+.4f}°<extra></extra>`,
+      });
     }
   }
 

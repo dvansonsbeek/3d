@@ -42236,27 +42236,33 @@ function computePlanetObliquity(planetName, currentYear) {
     uranus:  uranusObliquityCycle,
     neptune: neptuneObliquityCycle,
   };
-  const axialTilts = {
-    mercury: planets.mercury.axialTiltMean,
-    venus:   planets.venus.axialTiltMean,
-    mars:    planets.mars.axialTiltMean,
-    jupiter: planets.jupiter.axialTiltMean,
-    saturn:  planets.saturn.axialTiltMean,
-    uranus:  planets.uranus.axialTiltMean,
-    neptune: planets.neptune.axialTiltMean,
-  };
 
-  const cycle = obliqCycles[planetName];
-  const tiltJ2000 = axialTilts[planetName];
+  const p = planets[planetName];
+  const tiltJ2000 = p.axialTiltMean;
 
   // Venus, Neptune: no obliquity cycle — return static tilt
-  if (!cycle) return tiltJ2000;
+  if (!obliqCycles[planetName]) return tiltJ2000;
 
-  // Anchor to J2000: obliquity(2000) = axialTiltMean exactly
-  const inclAtJ2000 = computePlanetInvPlaneInclinationDynamic(planetName, 2000);
-  const inclNow = computePlanetInvPlaneInclinationDynamic(planetName, currentYear);
+  // Two-component obliquity (same structure as Earth's -cos(H/3) + cos(H/8)):
+  //   1. Inclination component at ICRF perihelion period (NEGATIVE sign)
+  //   2. Obliquity precession component at obliquityCycle period (POSITIVE sign)
+  // Both with same amplitude, anchored to axialTiltMean at J2000
+  const cycle = obliqCycles[planetName];
+  const amp = p.invPlaneInclinationAmplitude;
+  const t = currentYear - balancedYear;
+  const t2000 = 2000 - balancedYear;
 
-  return tiltJ2000 + (inclNow - inclAtJ2000);
+  // Inclination component (ICRF perihelion period, NEGATIVE — like Earth's -cos(H/3))
+  const genPrecRate = 1 / (holisticyearLength / 13);
+  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  const phaseIncl = 2 * Math.PI / icrfPeriod;
+  const inclComponent = -amp * (Math.cos(phaseIncl * t) - Math.cos(phaseIncl * t2000));
+
+  // Obliquity precession component (obliquityCycle, POSITIVE — like Earth's +cos(H/8))
+  const phaseObliq = 2 * Math.PI / cycle;
+  const obliqComponent = amp * (Math.cos(phaseObliq * t) - Math.cos(phaseObliq * t2000));
+
+  return tiltJ2000 + inclComponent + obliqComponent;
 }
 
 /* -----------------------------------------------------------------
