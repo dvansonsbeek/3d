@@ -19088,7 +19088,7 @@ function createBalanceExplorerPanel() {
         <div class="fbe-section">
           <div class="fbe-section-title" style="display:flex;align-items:center;justify-content:space-between">
             <span>Vector Balance Diagram</span>
-            <button class="fbe-mode-toggle" title="Toggle between single-mode (one \u03A9 rate per planet) and multi-mode (7 Laskar eigenfrequencies, 100% balance guaranteed)">
+            <button class="fbe-mode-toggle" title="Toggle between single-mode (one \u03A9 rate per planet) and multi-mode (7 eigenfrequencies from 8H). Multi-mode gives 100% vector balance for ANY set of integer divisors of 8H.">
               <span class="fbe-mode-single">Single-mode</span>
               <span class="fbe-mode-multi">Multi-mode</span>
             </button>
@@ -19130,6 +19130,8 @@ function createBalanceExplorerPanel() {
           <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 3): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two balance groups must cancel: \u03A3(in-phase) w = \u03A3(anti-phase) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
           <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 5): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two balance groups balance: \u03A3(in-phase) v = \u03A3(anti-phase) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
+          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Grand Holistic Octave). These values (8H/12, 8H/15, 8H/40, etc.) match Laskar\u2019s (2004) N-body eigenfrequencies within 1\u20133% for 6 of 7 modes. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
+          <div class="fbe-balance-explain" style="margin-top:6px">The <b>genuine constraints</b> are the scalar inclination balance (Law 3) and eccentricity balance (Law 5) shown above \u2014 these select the Fibonacci d-values and cannot be achieved by arbitrary configurations. The ascending node periods describe motion over 50,000\u20132,000,000 year timescales. With only ~4,000 years of recorded astronomy, humanity cannot observationally distinguish between competing period values. Both our 8H/N predictions and Laskar\u2019s measurements produce indistinguishable motion over observable timescales.</div>
         </div>
       </div>
     </div>`;
@@ -19233,8 +19235,8 @@ function createBalanceExplorerPanel() {
       fbeMultiMode = !fbeMultiMode;
       modeToggle.classList.toggle('fbe-mode-active', fbeMultiMode);
       modeExplain.textContent = fbeMultiMode
-        ? 'Multi-mode: 7 Laskar eigenfrequencies (s\u2081\u2013s\u2088). Each mode independently balances to zero \u2014 total balance is always 100%. Ascending nodes wobble in complex patterns (sum of 7 frequencies).'
-        : 'Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed phase angles (\u03C6).';
+        ? 'Multi-mode: 7 eigenfrequencies from 8H/N. Each mode independently balances to zero \u2014 total balance is always 100%. Note: this works for ANY set of 7 frequencies (the solver has 33 spare degrees of freedom). The real constraints are the scalar balance Laws 3 + 5 above.'
+        : 'Single-mode: each \u03A9 precesses at one rate (8H/N). Balance degrades over time because different planets precess at different speeds. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show ICRF perihelion (\u03D6).';
       if (fbeMultiMode) fbeInitEigenmodes();
       fbeRenderVectorDiagram(panel, state);
     });
