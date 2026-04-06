@@ -19689,7 +19689,7 @@ function fbeRenderVectorDiagram(panel, state) {
   html += `<text x="326" y="${LY2}" fill="#ffd700" font-size="10" font-weight="700" dominant-baseline="central">${imbalancePct.toFixed(2)}%</text>`;
 
   // Note when non-Config-1 is selected
-  if (!isConfig1) {
+  if (!isConfig1 && fbeMultiMode) {
     const NY = LY2 + 18;
     html += `<text x="${CX}" y="${NY}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">Note: Vector balance is independent of d-value configuration \u2014 it works for any integer divisors of 8H.</text>`;
     html += `<text x="${CX}" y="${NY + 12}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">The real constraints are the scalar Inclination Balance (Law 3) and Eccentricity Balance (Law 5) above.</text>`;
