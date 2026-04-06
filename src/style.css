@@ -2115,6 +2115,7 @@ a:link {
   display: none;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 #fibBalanceExplorer.visible {
@@ -2125,12 +2126,14 @@ a:link {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
+  right: 320px;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
 }
 
 .fbe-dialog {
+  pointer-events: auto;
   position: relative;
   width: min(1080px, 94vw);
   max-height: 92vh;
@@ -2583,6 +2586,54 @@ a:link {
   color: rgba(255, 255, 255, 0.35);
   max-width: 640px;
   margin: 6px auto 10px;
+}
+
+/* Vector balance mode toggle */
+.fbe-mode-toggle {
+  display: inline-flex;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  overflow: hidden;
+}
+
+.fbe-mode-toggle span {
+  padding: 3px 10px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: background 0.2s, color 0.2s;
+}
+
+.fbe-mode-single {
+  background: rgba(90, 180, 90, 0.25);
+  color: #5cb85c !important;
+}
+
+.fbe-mode-active .fbe-mode-single {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.fbe-mode-active .fbe-mode-multi {
+  background: rgba(79, 195, 247, 0.25);
+  color: #4fc3f7 !important;
+}
+
+/* Vector balance diagram */
+.fbe-vector-diagram {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.fbe-polar-svg {
+  width: 440px;
+  height: 440px;
+  max-width: 100%;
 }
 
 .fbe-status {

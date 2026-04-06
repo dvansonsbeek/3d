@@ -19086,10 +19086,16 @@ function createBalanceExplorerPanel() {
           </div>
         </div>
         <div class="fbe-section">
-          <div class="fbe-section-title">Vector Balance Diagram</div>
-          <div class="fbe-balance-explain" style="margin-bottom:4px">Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed phase angles (\u03C6).</div>
+          <div class="fbe-section-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Vector Balance Diagram</span>
+            <button class="fbe-mode-toggle" title="Toggle between single-mode (one \u03A9 rate per planet) and multi-mode (7 Laskar eigenfrequencies, 100% balance guaranteed)">
+              <span class="fbe-mode-single">Single-mode</span>
+              <span class="fbe-mode-multi">Multi-mode</span>
+            </button>
+          </div>
+          <div class="fbe-balance-explain fbe-mode-explain" style="margin-bottom:4px">Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed phase angles (\u03C6).</div>
           <div class="fbe-vector-diagram">
-            <svg class="fbe-polar-svg" viewBox="0 0 440 400" xmlns="http://www.w3.org/2000/svg"></svg>
+            <svg class="fbe-polar-svg" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg"></svg>
           </div>
         </div>
         <div class="fbe-section">
@@ -19219,6 +19225,21 @@ function createBalanceExplorerPanel() {
   // Initial calculation
   updateBalanceExplorerResults(panel, state);
 
+  // Vector balance mode toggle
+  const modeToggle = panel.querySelector('.fbe-mode-toggle');
+  const modeExplain = panel.querySelector('.fbe-mode-explain');
+  if (modeToggle) {
+    modeToggle.addEventListener('click', () => {
+      fbeMultiMode = !fbeMultiMode;
+      modeToggle.classList.toggle('fbe-mode-active', fbeMultiMode);
+      modeExplain.textContent = fbeMultiMode
+        ? 'Multi-mode: 7 Laskar eigenfrequencies (s\u2081\u2013s\u2088). Each mode independently balances to zero \u2014 total balance is always 100%. Ascending nodes wobble in complex patterns (sum of 7 frequencies).'
+        : 'Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed phase angles (\u03C6).';
+      if (fbeMultiMode) fbeInitEigenmodes();
+      fbeRenderVectorDiagram(panel, state);
+    });
+  }
+
   return panel;
 }
 
@@ -19323,11 +19344,136 @@ function updateBalanceExplorerResults(panel, state) {
   fbeRenderVectorDiagram(panel, state);
 }
 
+// ── Multi-mode eigenmode solver (Laskar 2004 secular frequencies) ──
+// Computes eigenvector amplitudes once, then reconstruct(year) gives
+// the p,q state for all 8 planets at any year with guaranteed 100% balance.
+let _eigenX = null, _eigenY = null, _eigenPlanets = null;
+let fbeMultiMode = false;
+
+function fbeInitEigenmodes() {
+  if (_eigenX) return; // already initialized
+  const DEG = Math.PI / 180;
+  const KEYS = BALANCE_PLANETS;
+  const NP = 8;
+
+  // Laskar 2004 eigenfrequencies (s₁,s₂,s₃,s₄,s₆,s₇,s₈ — s₅=0 excluded)
+  const S_ARCSEC = [-5.610, -7.060, -18.851, -17.635, -26.350, -2.993, -0.692];
+  const S_RAD = S_ARCSEC.map(s => s / 3600 * DEG);
+
+  // Planet angular momenta and J2000 states
+  const pls = KEYS.map(key => {
+    const cfg = BALANCE_CONFIG[key];
+    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
+    return { key, L, inclJ2000: cfg.inclJ2000, omegaJ2000: cfg.omegaJ2000 };
+  });
+  _eigenPlanets = pls;
+
+  const p0 = pls.map(pl => Math.sin(pl.inclJ2000 * DEG) * Math.sin(pl.omegaJ2000 * DEG));
+  const q0 = pls.map(pl => Math.sin(pl.inclJ2000 * DEG) * Math.cos(pl.omegaJ2000 * DEG));
+
+  // JPL rates (arcsec/yr for nodes, arcsec/cy for inclinations)
+  const nodeRates = { mercury: -6.592, venus: -7.902, earth: -18.851, mars: -17.635, jupiter: -25.934, saturn: -26.578, uranus: -3.087, neptune: -0.673 };
+  const inclRates = { mercury: -23.89, venus: -2.86, earth: -46.94, mars: -18.72, jupiter: -2.48, saturn: +6.68, uranus: -3.64, neptune: +0.68 };
+
+  const dp0 = [], dq0 = [];
+  for (let j = 0; j < NP; j++) {
+    const key = KEYS[j];
+    const dO = nodeRates[key] / 3600 * DEG;
+    const dI = inclRates[key] / 100 / 3600 * DEG;
+    const I = pls[j].inclJ2000 * DEG, O = pls[j].omegaJ2000 * DEG;
+    dp0.push(Math.cos(I) * Math.sin(O) * dI + Math.sin(I) * Math.cos(O) * dO);
+    dq0.push(Math.cos(I) * Math.cos(O) * dI - Math.sin(I) * Math.sin(O) * dO);
+  }
+
+  // Least-squares solver
+  function solveLSQ(rows, rhs, n) {
+    const m = rows.length;
+    const ATA = Array.from({ length: n }, () => Array(n).fill(0));
+    const ATb = Array(n).fill(0);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) for (let k = 0; k < m; k++) ATA[i][j] += rows[k][i] * rows[k][j];
+      for (let k = 0; k < m; k++) ATb[i] += rows[k][i] * rhs[k];
+    }
+    const M = ATA.map((r, i) => [...r, ATb[i]]);
+    for (let col = 0; col < n; col++) {
+      let mx = 0, mr = col;
+      for (let r = col; r < n; r++) if (Math.abs(M[r][col]) > mx) { mx = Math.abs(M[r][col]); mr = r; }
+      [M[col], M[mr]] = [M[mr], M[col]];
+      if (Math.abs(M[col][col]) < 1e-30) continue;
+      for (let r = col + 1; r < n; r++) { const f = M[r][col] / M[col][col]; for (let j = col; j <= n; j++) M[r][j] -= f * M[col][j]; }
+    }
+    const x = Array(n).fill(0);
+    for (let i = n - 1; i >= 0; i--) { x[i] = M[i][n]; for (let j = i + 1; j < n; j++) x[i] -= M[i][j] * x[j]; if (Math.abs(M[i][i]) > 1e-30) x[i] /= M[i][i]; }
+    return x;
+  }
+
+  function solveSubsystem(planetIdxs, modeIdxs) {
+    const np = planetIdxs.length, nm = modeIdxs.length;
+    function build(sv, rv) {
+      const rows = [], rhs = [];
+      for (let jj = 0; jj < np; jj++) {
+        const j = planetIdxs[jj];
+        const rP = Array(np * nm).fill(0), rR = Array(np * nm).fill(0);
+        for (let ii = 0; ii < nm; ii++) { rP[jj * nm + ii] = 1; rR[jj * nm + ii] = S_RAD[modeIdxs[ii]]; }
+        rows.push(rP); rhs.push(sv[j]); rows.push(rR); rhs.push(rv[j]);
+      }
+      for (let ii = 0; ii < nm; ii++) {
+        const row = Array(np * nm).fill(0);
+        for (let jj = 0; jj < np; jj++) row[jj * nm + ii] = pls[planetIdxs[jj]].L;
+        rows.push(row); rhs.push(0);
+      }
+      return solveLSQ(rows, rhs, np * nm);
+    }
+    const a_flat = build(p0, dq0.map(v => -v));
+    const b_flat = build(q0, dp0);
+    const a = [], b = [];
+    for (let jj = 0; jj < np; jj++) { a.push(a_flat.slice(jj * nm, (jj + 1) * nm)); b.push(b_flat.slice(jj * nm, (jj + 1) * nm)); }
+    return { a, b };
+  }
+
+  const inner = solveSubsystem([0, 1, 2, 3], [0, 1, 2, 3]);
+  const outer = solveSubsystem([4, 5, 6, 7], [4, 5, 6]);
+
+  const X = Array.from({ length: 7 }, () => Array(8).fill(0));
+  const Y = Array.from({ length: 7 }, () => Array(8).fill(0));
+  for (let ii = 0; ii < 4; ii++) for (let jj = 0; jj < 4; jj++) { X[ii][jj] = inner.a[jj][ii]; Y[ii][jj] = inner.b[jj][ii]; }
+  for (let ii = 0; ii < 3; ii++) for (let jj = 0; jj < 4; jj++) { X[4 + ii][4 + jj] = outer.a[jj][ii]; Y[4 + ii][4 + jj] = outer.b[jj][ii]; }
+
+  // Enforce angular momentum constraint
+  for (let i = 0; i < 7; i++) {
+    let sLX = 0, sLY = 0, sLL = 0;
+    for (let j = 0; j < NP; j++) { sLX += pls[j].L * X[i][j]; sLY += pls[j].L * Y[i][j]; sLL += pls[j].L * pls[j].L; }
+    for (let j = 0; j < NP; j++) { X[i][j] -= (sLX / sLL) * pls[j].L; Y[i][j] -= (sLY / sLL) * pls[j].L; }
+  }
+
+  _eigenX = X; _eigenY = Y;
+  _eigenX._S_RAD = S_RAD;
+}
+
+function fbeReconstructMultiMode(year) {
+  if (!_eigenX) fbeInitEigenmodes();
+  const t = year - 2000;
+  const RAD2DEG = 180 / Math.PI;
+  const S_RAD = _eigenX._S_RAD;
+  return _eigenPlanets.map((pl, j) => {
+    let p = 0, q = 0;
+    for (let i = 0; i < 7; i++) {
+      const c = Math.cos(S_RAD[i] * t), s = Math.sin(S_RAD[i] * t);
+      p += c * _eigenX[i][j] + s * _eigenY[i][j];
+      q += c * _eigenY[i][j] - s * _eigenX[i][j];
+    }
+    const sinI = Math.sqrt(p * p + q * q);
+    const incl = Math.asin(Math.min(1, sinI)) * RAD2DEG;
+    const omega = ((Math.atan2(p, q) * RAD2DEG) % 360 + 360) % 360;
+    return { key: pl.key, L: pl.L, incl, omega, p, q };
+  });
+}
+
 function fbeRenderVectorDiagram(panel, state) {
   const svg = panel.querySelector('.fbe-polar-svg');
   if (!svg) return;
 
-  const CX = 220, CY = 190, R = 145;
+  const CX = 220, CY = 180, R = 130;
   const DEG = Math.PI / 180;
   const year = o.currentYear || 2000;
   const genPrecRate = 1 / (holisticyearLength / 13);
@@ -19337,21 +19483,31 @@ function fbeRenderVectorDiagram(panel, state) {
     jupiter: '#c97e4f', saturn: '#d9b65c', uranus: '#37c6d0', neptune: '#2c539e'
   };
 
-  // Compute per-planet data
+  // Compute per-planet data (single-mode from simulation, or multi-mode from eigenmodes)
+  const multiData = fbeMultiMode ? fbeReconstructMultiMode(year) : null;
   const data = [];
   let totalMag = 0;
-  for (const key of BALANCE_PLANETS) {
+  for (let idx = 0; idx < BALANCE_PLANETS.length; idx++) {
+    const key = BALANCE_PLANETS[idx];
     const cfg = BALANCE_CONFIG[key];
-    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
-    const incl = key === 'earth' ? o.earthInvPlaneInclinationDynamic : (o[key + 'InvPlaneInclinationDynamic'] || 0);
-    const omega = key === 'earth' ? o.earthAscendingNodeInvPlane : (o[key + 'AscendingNodeInvPlane'] || 0);
     const periICRF = key === 'earth' ? o.earthPerihelionLongICRF : (o[key + 'PerihelionLongICRF'] || 0);
     const phaseAngle = state[key].phaseAngle;
     const isAnti = state[key].group === 1;
 
-    // Vector balance components
-    const Lp = L * Math.sin(incl * DEG) * Math.sin(omega * DEG);
-    const Lq = L * Math.sin(incl * DEG) * Math.cos(omega * DEG);
+    let L, incl, omega, Lp, Lq;
+    if (multiData) {
+      // Multi-mode: use eigenmode reconstruction (100% balance guaranteed)
+      const m = multiData[idx];
+      L = m.L; incl = m.incl; omega = m.omega;
+      Lp = m.L * m.p; Lq = m.L * m.q;
+    } else {
+      // Single-mode: use simulation ascending nodes
+      L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
+      incl = key === 'earth' ? o.earthInvPlaneInclinationDynamic : (o[key + 'InvPlaneInclinationDynamic'] || 0);
+      omega = key === 'earth' ? o.earthAscendingNodeInvPlane : (o[key + 'AscendingNodeInvPlane'] || 0);
+      Lp = L * Math.sin(incl * DEG) * Math.sin(omega * DEG);
+      Lq = L * Math.sin(incl * DEG) * Math.cos(omega * DEG);
+    }
     const mag = Math.sqrt(Lp * Lp + Lq * Lq);
     totalMag += mag;
 
@@ -19482,40 +19638,44 @@ function fbeRenderVectorDiagram(panel, state) {
     html += `</g>`;
   }
 
-  // Residual: show as a small circle at center (not an arrow — direction is noise at this precision)
+  // Residual: small dashed circle at center (imbalance shown in side panel)
   if (totalMag > 0) {
     const imbalancePct = (residual / totalMag) * 100;
-    const resRadius = Math.max(3, Math.min(imbalancePct * 8, 20));  // 3-20px based on imbalance
+    const resRadius = Math.max(4, Math.min(imbalancePct * 8, 20));
     html += `<g><title>Net imbalance: ${imbalancePct.toFixed(4)}%\nResidual magnitude: ${residual.toExponential(3)}\n\nAt 99.6% balance, the residual direction\nis dominated by numerical precision.\nJupiter + Saturn nearly perfectly cancel.</title>`;
-    html += `<circle cx="${CX}" cy="${CY}" r="${resRadius}" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.7" stroke-dasharray="3,2"/>`;
-    html += `<text x="${CX}" y="${CY}" fill="#ffd700" font-size="8" font-weight="600" text-anchor="middle" dominant-baseline="central">${imbalancePct.toFixed(1)}%</text>`;
+    html += `<circle cx="${CX}" cy="${CY}" r="${resRadius}" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.6" stroke-dasharray="3,2"/>`;
     html += `</g>`;
   }
 
-  // Group sums (top-right corner)
+  // Group sums computed for legend row
   let inPhasePct = 0, antiPhasePct = 0;
   for (const d of data) {
     const pct = totalMag > 0 ? (d.mag / totalMag * 100) : 0;
     if (d.isAnti) antiPhasePct += pct; else inPhasePct += pct;
   }
-  const SX = 410, SY = 15;
-  html += `<text x="${SX}" y="${SY}" fill="rgba(255,255,255,0.5)" font-size="9" font-weight="600" text-anchor="end">Force share</text>`;
-  html += `<text x="${SX}" y="${SY + 16}" fill="#5cb85c" font-size="10" font-weight="700" text-anchor="end">In-phase: ${inPhasePct.toFixed(1)}%</text>`;
-  html += `<text x="${SX}" y="${SY + 30}" fill="#d9534f" font-size="10" font-weight="700" text-anchor="end">Anti-phase: ${antiPhasePct.toFixed(1)}%</text>`;
+  const imbalancePct = totalMag > 0 ? (residual / totalMag) * 100 : 0;
 
   // Balance readout below diagram
-  const BY = R + CY + 28;
+  const BY = R + CY + 58;
+  const modeLabel = fbeMultiMode ? ' (multi-mode)' : ' (single-mode)';
   html += `<text x="${CX}" y="${BY}" fill="rgba(255,255,255,0.85)" font-size="14" font-weight="700" text-anchor="middle">Vector Balance: `;
-  html += `<tspan fill="${balance > 99 ? '#5cb85c' : '#ffd700'}">${balance.toFixed(2)}%</tspan></text>`;
+  html += `<tspan fill="${balance > 99 ? '#5cb85c' : '#ffd700'}">${balance.toFixed(2)}%</tspan>`;
+  html += `<tspan fill="rgba(255,255,255,0.35)" font-size="9">${modeLabel}</tspan></text>`;
 
-  // Legend: simple color key
-  const LY = BY + 22;
+  // Legend: two rows — labels on top, percentages below
+  const LY = BY + 20;
+  // Row 1: legend symbols + labels
   html += `<line x1="50" y1="${LY}" x2="65" y2="${LY}" stroke="#5cb85c" stroke-width="2.5"/>`;
   html += `<text x="70" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">In-phase (\u03A9)</text>`;
-  html += `<line x1="165" y1="${LY}" x2="180" y2="${LY}" stroke="#d9534f" stroke-width="2.5"/>`;
-  html += `<text x="185" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Anti-phase (\u03A9)</text>`;
-  html += `<circle cx="297" cy="${LY}" r="5" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="2,2"/>`;
-  html += `<text x="308" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Net imbalance</text>`;
+  html += `<line x1="175" y1="${LY}" x2="190" y2="${LY}" stroke="#d9534f" stroke-width="2.5"/>`;
+  html += `<text x="195" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Anti-phase (\u03A9)</text>`;
+  html += `<circle cx="315" cy="${LY}" r="5" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+  html += `<text x="326" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Net imbalance</text>`;
+  // Row 2: percentages aligned under each legend item
+  const LY2 = LY + 14;
+  html += `<text x="70" y="${LY2}" fill="#5cb85c" font-size="10" font-weight="700" dominant-baseline="central">${inPhasePct.toFixed(1)}%</text>`;
+  html += `<text x="195" y="${LY2}" fill="#d9534f" font-size="10" font-weight="700" dominant-baseline="central">${antiPhasePct.toFixed(1)}%</text>`;
+  html += `<text x="326" y="${LY2}" fill="#ffd700" font-size="10" font-weight="700" dominant-baseline="central">${imbalancePct.toFixed(2)}%</text>`;
 
   svg.innerHTML = html;
 }
@@ -41869,6 +42029,11 @@ function updateDynamicInclinations() {
   o.saturnPerihelionLongICRF  = _calcPeriICRF('saturn');
   o.uranusPerihelionLongICRF  = _calcPeriICRF('uranus');
   o.neptunePerihelionLongICRF = _calcPeriICRF('neptune');
+
+  // Live-update vector balance diagram if Balance Explorer is open
+  if (balanceExplorerPanel && balanceExplorerPanel.classList.contains('visible') && balanceExplorerState) {
+    fbeRenderVectorDiagram(balanceExplorerPanel, balanceExplorerState);
+  }
 
   // Get Earth's current orbital plane normals (ecliptic normals)
   // We need TWO ecliptic normals: one for S&S calculations, one for Verified calculations
