@@ -4588,6 +4588,26 @@ const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,772 yr
 const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,659 yr (prediction, tentative)
 const neptuneObliquityCycle = null;                          // N/A — frozen at ~28°
 
+// Mean obliquity (analytical, averaged over 8H = Grand Holistic Octave)
+// mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
+function calcObliquityMean(planetKey, obliqCycle) {
+  if (!obliqCycle) return planets[planetKey].axialTiltMean;
+  const p = planets[planetKey];
+  const amp = p.invPlaneInclinationAmplitude;
+  const t2000 = 2000 - balancedYear;
+  const genPrecRate = 1 / (holisticyearLength / 13);
+  const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  return p.axialTiltMean + amp * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
+                         - amp * Math.cos(2 * Math.PI * t2000 / obliqCycle);
+}
+const mercuryObliquityMean = calcObliquityMean('mercury', mercuryObliquityCycle);
+const venusObliquityMean   = calcObliquityMean('venus',   venusObliquityCycle);
+const marsObliquityMean    = calcObliquityMean('mars',    marsObliquityCycle);
+const jupiterObliquityMean = calcObliquityMean('jupiter', jupiterObliquityCycle);
+const saturnObliquityMean  = calcObliquityMean('saturn',  saturnObliquityCycle);
+const uranusObliquityMean  = calcObliquityMean('uranus',  uranusObliquityCycle);
+const neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle);
+
 const mercuryWobbleCenter = {
   name: "MERCURY-WOBBLE-CENTER",
   startPos: planets.mercury.eccentricityPhaseJ2000,
@@ -34055,7 +34075,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.mercuryObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(mercuryObliquityCycle, 0, ',')} years (8H/3, confirmed 0.2% vs observed ~895 kyr). Amplitude: ±${planets.mercury.invPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.mercury.axialTiltMean}°`]},
+       hover : [`Dynamic obliquity oscillating with period ${fmtNum(mercuryObliquityCycle, 0, ',')} years (8H/3, confirmed 0.2% vs observed ~895 kyr). Amplitude: ±${planets.mercury.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${mercuryObliquityMean.toFixed(4)}°. J2000 value: ${planets.mercury.axialTiltMean}°`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMercury, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.mercury.orbitalEccentricityBase}. Phase: ${planets.mercury.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(mercuryWobblePeriod, 0, ',')} years`]},
@@ -34446,7 +34466,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.venusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Venus is tidally damped — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${planets.venus.axialTiltMean}°. Apparent tilt 177.36° due to retrograde spin`]},
+       hover : [`Venus is tidally damped — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Mean: ${venusObliquityMean.toFixed(4)}°. Apparent tilt 177.36° due to retrograde spin`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityVenus, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.venus.orbitalEccentricityBase}. Phase: ${planets.venus.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(venusWobblePeriod, 0, ',')} years`]},
@@ -34805,7 +34825,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.marsObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with period ${fmtNum(marsObliquityCycle, 0, ',')} years (3H/8, confirmed 0.7% vs observed ~124,800 yr). Amplitude: ±${planets.mars.invPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.mars.axialTiltMean}°. Similar to Earth's tilt (25.19° vs 23.4°)`]},
+       hover : [`Dynamic obliquity oscillating with period ${fmtNum(marsObliquityCycle, 0, ',')} years (3H/8, confirmed 0.7% vs observed ~124,800 yr). Amplitude: ±${planets.mars.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${marsObliquityMean.toFixed(4)}°. J2000 value: ${planets.mars.axialTiltMean}°. Similar to Earth's tilt (25.19° vs 23.4°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityMars, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.mars.orbitalEccentricityBase}. Phase: ${planets.mars.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(marsWobblePeriod, 0, ',')} years`]},
@@ -35164,7 +35184,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.jupiterObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(jupiterObliquityCycle, 0, ',')} years (H/2). Amplitude: ±${planets.jupiter.invPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.jupiter.axialTiltMean}°. Cross-planet link: equals Mars axial precession period`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(jupiterObliquityCycle, 0, ',')} years (H/2). Amplitude: ±${planets.jupiter.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${jupiterObliquityMean.toFixed(4)}°. J2000 value: ${planets.jupiter.axialTiltMean}°. Cross-planet link: equals Mars axial precession period`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityJupiter, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.jupiter.orbitalEccentricityBase}. Phase: ${planets.jupiter.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(jupiterWobblePeriod, 0, ',')} years`]},
@@ -35522,7 +35542,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.saturnObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(saturnObliquityCycle, 0, ',')} years (H/3, mirror-pair with Earth). Amplitude: ±${planets.saturn.invPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.saturn.axialTiltMean}°. Saturn is anti-phase (MAX at balanced year, sole balance opponent)`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(saturnObliquityCycle, 0, ',')} years (H/3, mirror-pair with Earth). Amplitude: ±${planets.saturn.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${saturnObliquityMean.toFixed(4)}°. J2000 value: ${planets.saturn.axialTiltMean}°. Saturn is anti-phase (MAX at balanced year, sole balance opponent)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricitySaturn, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.saturn.orbitalEccentricityBase}. Phase: ${planets.saturn.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(saturnWobblePeriod, 0, ',')} years`]},
@@ -35881,7 +35901,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.uranusObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(uranusObliquityCycle, 0, ',')} years (H/2, tentative). Amplitude: ±${planets.uranus.invPlaneInclinationAmplitude.toFixed(4)}°. J2000 value: ${planets.uranus.axialTiltMean}°. Uranus rolls on its side (82.23°)`]},
+       hover : [`Dynamic obliquity oscillating with predicted period ${fmtNum(uranusObliquityCycle, 0, ',')} years (H/2, tentative). Amplitude: ±${planets.uranus.invPlaneInclinationAmplitude.toFixed(4)}°. Mean: ${uranusObliquityMean.toFixed(4)}°. J2000 value: ${planets.uranus.axialTiltMean}°. Uranus rolls on its side (82.23°)`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityUranus, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.uranus.orbitalEccentricityBase}. Phase: ${planets.uranus.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(uranusWobblePeriod, 0, ',')} years`]},
@@ -36240,7 +36260,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt (dynamic obliquity)`,
        value : [ { v: () => o.neptuneObliquity, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Neptune's obliquity is frozen — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Static value: ${planets.neptune.axialTiltMean}°. Similar to Earth and Saturn`]},
+       hover : [`Neptune's obliquity is frozen — no obliquity cycle predicted (rate numerator = 1 cannot decompose into Fibonacci sum). Mean: ${neptuneObliquityMean.toFixed(4)}°. Similar to Earth and Saturn`]},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => o.eccentricityNeptune, dec:8, sep:',' },{ small: 'AU' }],
        hover : [`Dynamic eccentricity from tilt formula. Base: ${planets.neptune.orbitalEccentricityBase}. Phase: ${planets.neptune.eccentricityPhaseJ2000.toFixed(2)}°. Eccentricity cycle: ${fmtNum(neptuneWobblePeriod, 0, ',')} years`]},

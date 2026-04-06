@@ -283,7 +283,18 @@ function exportPlanet(planetName, years) {
       eccentricityPhaseJ2000: p.eccentricityPhaseJ2000,
       invPlaneInclinationMean: p.invPlaneInclinationMean,
       invPlaneInclinationAmplitude: p.invPlaneInclinationAmplitude,
-      obliquityMean: p.axialTiltMean,
+      obliquityMean: (() => {
+        // Analytical mean over 8H: cos terms average to 0, leaving the anchoring offsets
+        // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
+        if (!p.obliquityCycle) return p.axialTiltMean;
+        const amp = p.invPlaneInclinationAmplitude;
+        const t2000 = 2000 - C.balancedYear;
+        const genPrecRate = 1 / (C.H / 13);
+        const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+        return p.axialTiltMean + amp * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
+                               - amp * Math.cos(2 * Math.PI * t2000 / p.obliquityCycle);
+      })(),
+      obliquityJ2000: p.axialTiltMean,
       semiMajorAxis: p.orbitDistance,
       orbitalPeriodDays: p.solarYearInput,
       perihelionEclipticYears: p.perihelionEclipticYears,
