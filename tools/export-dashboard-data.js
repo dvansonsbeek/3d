@@ -169,6 +169,7 @@ function exportEarth(years) {
       eccentricityAmplitude: C.eccentricityAmplitude,
       eccentricityJ2000: C.ASTRO_REFERENCE.earthEccentricityJ2000,
       obliquityMean: C.earthtiltMean,
+      obliquityJ2000: C.ASTRO_REFERENCE.obliquityJ2000_deg,
       inclinationMean: C.earthInvPlaneInclinationMean,
       inclinationAmplitude: C.earthInvPlaneInclinationAmplitude,
       perihelionCycleLength: C.perihelionCycleLength,

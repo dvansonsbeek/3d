@@ -127,7 +127,7 @@ function renderOverlayChart(divId, planetDataMap, field, layoutOverrides) {
   const layout = makePlotlyLayout({
     shapes: stdShapes(),
     annotations: stdAnnotations(),
-    legend: { orientation: 'h', y: 1.08 },
+    legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', font: { size: 10 }, tracegroupgap: 2, itemwidth: 20 },
     ...layoutOverrides,
   });
 
@@ -207,7 +207,7 @@ function renderObliquityChart(planetDataMap) {
     yaxis: { title: { text: 'Degrees (°)' }, ticksuffix: '°', tickformat: '.2f', autorange: true, rangemode: 'normal' },
     shapes: stdShapes(),
     annotations: stdAnnotations(),
-    legend: { orientation: 'h', y: 1.08 },
+    legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', font: { size: 10 }, tracegroupgap: 2, itemwidth: 20 },
   });
 
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);
@@ -249,7 +249,7 @@ function renderAngleChart(divId, planetDataMap, field, yTitle, opts = {}) {
     yaxis: { title: { text: yTitle }, ticksuffix: '°', range: [0, 360] },
     shapes: stdShapes(),
     annotations: stdAnnotations(),
-    legend: { orientation: 'h', y: 1.08 },
+    legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', font: { size: 10 }, tracegroupgap: 2, itemwidth: 20 },
   });
 
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);
@@ -291,7 +291,7 @@ function renderInclinationChart(planetDataMap) {
     yaxis: { title: { text: 'Inclination (°)' }, ticksuffix: '°', autorange: true, rangemode: 'tozero' },
     shapes: stdShapes(),
     annotations: stdAnnotations(),
-    legend: { orientation: 'h', y: 1.08 },
+    legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', font: { size: 10 }, tracegroupgap: 2, itemwidth: 20 },
   });
 
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);
@@ -330,7 +330,7 @@ function renderDistanceChart(planetDataMap) {
     yaxis: { title: { text: 'Distance (AU)' }, autorange: true },
     shapes: stdShapes(),
     annotations: stdAnnotations(),
-    legend: { orientation: 'h', y: 1.08 },
+    legend: { orientation: 'h', y: 1.02, yanchor: 'bottom', font: { size: 10 }, tracegroupgap: 2, itemwidth: 20 },
   });
 
   Plotly.react(div, traces, layout, PLOTLY_CONFIG);

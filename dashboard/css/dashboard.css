@@ -335,6 +335,14 @@ main {
   color: var(--text);
 }
 
+.info-j2000 .info-value {
+  color: #4fc3f7;
+}
+
+.info-j2000 .info-label {
+  color: rgba(79, 195, 247, 0.6);
+}
+
 /* ── Loading overlay ────────────────────────────────────────────────────── */
 
 .loading {
@@ -580,6 +588,14 @@ body.light-mode .info-label {
 
 body.light-mode .info-value {
   color: rgba(0, 0, 0, 0.85);
+}
+
+body.light-mode .info-j2000 .info-value {
+  color: #0277bd;
+}
+
+body.light-mode .info-j2000 .info-label {
+  color: rgba(2, 119, 189, 0.6);
 }
 
 body.light-mode .theme-toggle {

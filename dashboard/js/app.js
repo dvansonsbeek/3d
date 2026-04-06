@@ -16,8 +16,8 @@ const planetDataCache = {};
 function renderInfoPanel() {
   const grid = document.getElementById('info-grid');
   const items = [];
-  const addItem = (label, value) => items.push(
-    `<div class="info-item"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`
+  const addItem = (label, value, cls) => items.push(
+    `<div class="info-item${cls ? ' ' + cls : ''}"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`
   );
 
   for (const name of activePlanets) {
@@ -26,14 +26,10 @@ function renderInfoPanel() {
     const c = data.constants;
 
     addItem(`${capitalize(name)} — Eccentricity (base)`, fmtSci(c.eccentricityBase, 8));
-    addItem(`${capitalize(name)} — Eccentricity (J2000)`, fmtSci(c.eccentricityJ2000, 8));
-    if (name === 'earth') {
-      addItem(`${capitalize(name)} — Obliquity (mean)`, fmtDeg(c.obliquityMean, 5));
-    } else {
-      addItem(`${capitalize(name)} — Obliquity (mean)`, fmtDeg(c.obliquityMean, 2));
-    }
+    addItem(`${capitalize(name)} — Eccentricity (J2000)`, fmtSci(c.eccentricityJ2000, 8), 'info-j2000');
+    addItem(`${capitalize(name)} — Obliquity (mean)`, fmtDeg(c.obliquityMean, 5));
+    addItem(`${capitalize(name)} — Obliquity (J2000)`, fmtDeg(c.obliquityJ2000, 5), 'info-j2000');
     addItem(`${capitalize(name)} — Fibonacci d`, c.fibonacciD);
-    addItem(`${capitalize(name)} — Type`, c.type);
   }
 
   grid.innerHTML = items.join('');
