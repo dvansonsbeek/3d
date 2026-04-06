@@ -19086,6 +19086,13 @@ function createBalanceExplorerPanel() {
           </div>
         </div>
         <div class="fbe-section">
+          <div class="fbe-section-title">Vector Balance Diagram</div>
+          <div class="fbe-balance-explain" style="margin-bottom:4px">Each planet\u2019s orbital tilt creates a force on the invariable plane. Arrows show force direction (\u03A9) and strength (L\u00D7sin\u2009i). Dots show current ICRF perihelion (\u03D6). Dashed lines show fixed phase angles (\u03C6).</div>
+          <div class="fbe-vector-diagram">
+            <svg class="fbe-polar-svg" viewBox="0 0 440 400" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+        <div class="fbe-section">
           <div class="fbe-section-title">Per-Planet Results</div>
           <div class="fbe-table-wrapper">
             <table class="fbe-results-table">
@@ -19311,6 +19318,206 @@ function updateBalanceExplorerResults(panel, state) {
     (results.eccImbalance < 1
       ? '<span class="pass">\u2713</span>'
       : '<span class="fail">\u26A0</span>');
+
+  // ── Vector Balance Diagram ──
+  fbeRenderVectorDiagram(panel, state);
+}
+
+function fbeRenderVectorDiagram(panel, state) {
+  const svg = panel.querySelector('.fbe-polar-svg');
+  if (!svg) return;
+
+  const CX = 220, CY = 190, R = 145;
+  const DEG = Math.PI / 180;
+  const year = o.currentYear || 2000;
+  const genPrecRate = 1 / (holisticyearLength / 13);
+
+  const planetColors = {
+    mercury: '#a0a0a0', venus: '#e8c46a', earth: '#3399ff', mars: '#b03a2e',
+    jupiter: '#c97e4f', saturn: '#d9b65c', uranus: '#37c6d0', neptune: '#2c539e'
+  };
+
+  // Compute per-planet data
+  const data = [];
+  let totalMag = 0;
+  for (const key of BALANCE_PLANETS) {
+    const cfg = BALANCE_CONFIG[key];
+    const L = cfg.mass * Math.sqrt(cfg.sma * (1 - cfg.ecc * cfg.ecc));
+    const incl = key === 'earth' ? o.earthInvPlaneInclinationDynamic : (o[key + 'InvPlaneInclinationDynamic'] || 0);
+    const omega = key === 'earth' ? o.earthAscendingNodeInvPlane : (o[key + 'AscendingNodeInvPlane'] || 0);
+    const periICRF = key === 'earth' ? o.earthPerihelionLongICRF : (o[key + 'PerihelionLongICRF'] || 0);
+    const phaseAngle = state[key].phaseAngle;
+    const isAnti = state[key].group === 1;
+
+    // Vector balance components
+    const Lp = L * Math.sin(incl * DEG) * Math.sin(omega * DEG);
+    const Lq = L * Math.sin(incl * DEG) * Math.cos(omega * DEG);
+    const mag = Math.sqrt(Lp * Lp + Lq * Lq);
+    totalMag += mag;
+
+    data.push({ key, Lp, Lq, mag, omega, incl, periICRF, phaseAngle, isAnti, color: planetColors[key] });
+  }
+
+  // Residual
+  let sumP = 0, sumQ = 0;
+  data.forEach(d => { sumP += d.Lp; sumQ += d.Lq; });
+  const residual = Math.sqrt(sumP * sumP + sumQ * sumQ);
+  const balance = totalMag > 0 ? (1 - residual / totalMag) * 100 : 100;
+
+
+
+  const planetNames = {
+    mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars',
+    jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune'
+  };
+  const planetFull = {
+    mercury: 'Mercury', venus: 'Venus', earth: 'Earth', mars: 'Mars',
+    jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune'
+  };
+
+  // Counter-clockwise angle → SVG coords (0° = right = Aries, CCW positive)
+  const px = (angle, r) => CX + r * Math.cos(angle * DEG);
+  const py = (angle, r) => CY - r * Math.sin(angle * DEG);
+
+  let html = '';
+  html += '<defs><style>';
+  html += '.fbe-vd-group { cursor: pointer; } ';
+  html += '.fbe-vd-group:hover .fbe-vd-arrow { opacity: 1; stroke-width: 3; } ';
+  html += '.fbe-vd-group:hover .fbe-vd-head { opacity: 1; } ';
+  html += '.fbe-vd-group:hover .fbe-vd-dot { r: 7; } ';
+  html += '</style></defs>';
+
+  // Background circles
+  html += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  html += `<circle cx="${CX}" cy="${CY}" r="${R * 0.5}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
+
+  // Axis lines and degree labels (every 30°)
+  for (let deg = 0; deg < 360; deg += 30) {
+    html += `<line x1="${CX}" y1="${CY}" x2="${px(deg, R)}" y2="${py(deg, R)}" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>`;
+    html += `<text x="${px(deg, R + 14)}" y="${py(deg, R + 14)}" fill="rgba(255,255,255,0.2)" font-size="8" text-anchor="middle" dominant-baseline="central">${deg}\u00B0</text>`;
+  }
+
+  // Phase angle markers (fixed reference — thin dashed lines from center)
+  for (const d of data) {
+    const x = px(d.phaseAngle, R * 0.85), y = py(d.phaseAngle, R * 0.85);
+    html += `<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="${d.color}" stroke-width="0.5" stroke-dasharray="2,4" opacity="0.25"/>`;
+    html += `<circle cx="${x}" cy="${y}" r="2" fill="${d.color}" opacity="0.25"/>`;
+  }
+
+  // Vector balance arrows (direction = Ω ascending node, length ∝ L×sin(i))
+  const maxArrow = R * 0.75;
+  const maxMag = Math.max(...data.map(d => d.mag));
+  for (const d of data) {
+    if (d.mag < 1e-15) continue;
+    const arrowColor = d.isAnti ? '#d9534f' : '#5cb85c';
+    const pct = totalMag > 0 ? (d.mag / totalMag * 100) : 0;
+    const arrowLen = (d.mag / maxMag) * maxArrow;
+    const ex = px(d.omega, arrowLen), ey = py(d.omega, arrowLen);
+
+    // Build tooltip
+    const tip = `${planetFull[d.key]}${d.isAnti ? ' (anti-phase)' : ''}\n` +
+      `\u03A9 = ${d.omega.toFixed(1)}\u00B0  (ascending node direction)\n` +
+      `i = ${d.incl.toFixed(4)}\u00B0  (inclination)\n` +
+      `\u03D6 ICRF = ${d.periICRF.toFixed(2)}\u00B0  (perihelion)\n` +
+      `Phase \u03C6 = ${d.phaseAngle.toFixed(2)}\u00B0  (fixed)\n` +
+      `Force: ${pct.toFixed(1)}% of total`;
+
+    html += `<g class="fbe-vd-group"><title>${tip}</title>`;
+
+    // Arrow line
+    html += `<line class="fbe-vd-arrow" x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="${arrowColor}" stroke-width="1.5" opacity="0.6"/>`;
+    // Arrowhead
+    const hl = 5;
+    const a = Math.atan2(CY - ey, ex - CX);
+    html += `<polygon class="fbe-vd-head" points="${ex},${ey} ${ex - hl * Math.cos(a - 0.4)},${ey + hl * Math.sin(a - 0.4)} ${ex - hl * Math.cos(a + 0.4)},${ey + hl * Math.sin(a + 0.4)}" fill="${arrowColor}" opacity="0.6"/>`;
+
+    html += `</g>`;
+  }
+
+  // ICRF perihelion dots — anti-collision label placement
+  const labelSlots = data.map(d => ({
+    ...d,
+    pct: totalMag > 0 ? (d.mag / totalMag * 100) : 0,
+    labelAngle: d.periICRF
+  }));
+  // Push labels apart when too close
+  const slotsSorted = [...labelSlots].sort((a, b) => a.labelAngle - b.labelAngle);
+  const minGap = 18;
+  for (let pass = 0; pass < 8; pass++) {
+    for (let i = 0; i < slotsSorted.length; i++) {
+      const cur = slotsSorted[i], nxt = slotsSorted[(i + 1) % slotsSorted.length];
+      let gap = nxt.labelAngle - cur.labelAngle;
+      if (gap < 0) gap += 360;
+      if (gap < minGap) {
+        const push = (minGap - gap) / 2 + 0.5;
+        cur.labelAngle = (cur.labelAngle - push + 360) % 360;
+        nxt.labelAngle = (nxt.labelAngle + push) % 360;
+      }
+    }
+  }
+
+  for (const d of labelSlots) {
+    const dotX = px(d.periICRF, R), dotY = py(d.periICRF, R);
+    const tip = `${planetFull[d.key]}${d.isAnti ? ' (anti-phase)' : ''}\n\n` +
+      `\u03A9 = ${d.omega.toFixed(1)}\u00B0  (ascending node \u2192 force direction)\n` +
+      `i = ${d.incl.toFixed(4)}\u00B0  (inclination to inv. plane)\n` +
+      `\u03D6 ICRF = ${d.periICRF.toFixed(2)}\u00B0  (perihelion in J2000)\n` +
+      `Phase \u03C6 = ${d.phaseAngle.toFixed(2)}\u00B0  (fixed reference)\n` +
+      `Force: ${d.pct.toFixed(1)}% of total`;
+
+    html += `<g class="fbe-vd-group"><title>${tip}</title>`;
+    // Dot at true ICRF position
+    html += `<circle class="fbe-vd-dot" cx="${dotX}" cy="${dotY}" r="6" fill="${d.color}" stroke="${d.isAnti ? '#d9534f' : 'rgba(255,255,255,0.5)'}" stroke-width="${d.isAnti ? 2 : 0.7}"/>`;
+    // Connecting line from dot to label when label was pushed away
+    const lR = R + 30;
+    const lx = px(d.labelAngle, lR), ly = py(d.labelAngle, lR);
+    if (Math.abs(d.labelAngle - d.periICRF) > 5) {
+      html += `<line x1="${dotX}" y1="${dotY}" x2="${px(d.labelAngle, R + 10)}" y2="${py(d.labelAngle, R + 10)}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>`;
+    }
+    // Label at adjusted angle — name + force %
+    const a = d.labelAngle;
+    const anchor = (a > 110 && a < 250) ? 'end' : (a >= 70 && a <= 110) || (a >= 250 && a <= 290) ? 'middle' : 'start';
+    html += `<text x="${lx}" y="${ly - 4}" fill="${d.color}" font-size="11" font-weight="700" text-anchor="${anchor}" dominant-baseline="central">${planetNames[d.key]}</text>`;
+    html += `<text x="${lx}" y="${ly + 9}" fill="rgba(255,255,255,0.55)" font-size="9" text-anchor="${anchor}" dominant-baseline="central">${d.pct.toFixed(1)}%</text>`;
+    html += `</g>`;
+  }
+
+  // Residual: show as a small circle at center (not an arrow — direction is noise at this precision)
+  if (totalMag > 0) {
+    const imbalancePct = (residual / totalMag) * 100;
+    const resRadius = Math.max(3, Math.min(imbalancePct * 8, 20));  // 3-20px based on imbalance
+    html += `<g><title>Net imbalance: ${imbalancePct.toFixed(4)}%\nResidual magnitude: ${residual.toExponential(3)}\n\nAt 99.6% balance, the residual direction\nis dominated by numerical precision.\nJupiter + Saturn nearly perfectly cancel.</title>`;
+    html += `<circle cx="${CX}" cy="${CY}" r="${resRadius}" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.7" stroke-dasharray="3,2"/>`;
+    html += `<text x="${CX}" y="${CY}" fill="#ffd700" font-size="8" font-weight="600" text-anchor="middle" dominant-baseline="central">${imbalancePct.toFixed(1)}%</text>`;
+    html += `</g>`;
+  }
+
+  // Group sums (top-right corner)
+  let inPhasePct = 0, antiPhasePct = 0;
+  for (const d of data) {
+    const pct = totalMag > 0 ? (d.mag / totalMag * 100) : 0;
+    if (d.isAnti) antiPhasePct += pct; else inPhasePct += pct;
+  }
+  const SX = 410, SY = 15;
+  html += `<text x="${SX}" y="${SY}" fill="rgba(255,255,255,0.5)" font-size="9" font-weight="600" text-anchor="end">Force share</text>`;
+  html += `<text x="${SX}" y="${SY + 16}" fill="#5cb85c" font-size="10" font-weight="700" text-anchor="end">In-phase: ${inPhasePct.toFixed(1)}%</text>`;
+  html += `<text x="${SX}" y="${SY + 30}" fill="#d9534f" font-size="10" font-weight="700" text-anchor="end">Anti-phase: ${antiPhasePct.toFixed(1)}%</text>`;
+
+  // Balance readout below diagram
+  const BY = R + CY + 28;
+  html += `<text x="${CX}" y="${BY}" fill="rgba(255,255,255,0.85)" font-size="14" font-weight="700" text-anchor="middle">Vector Balance: `;
+  html += `<tspan fill="${balance > 99 ? '#5cb85c' : '#ffd700'}">${balance.toFixed(2)}%</tspan></text>`;
+
+  // Legend: simple color key
+  const LY = BY + 22;
+  html += `<line x1="50" y1="${LY}" x2="65" y2="${LY}" stroke="#5cb85c" stroke-width="2.5"/>`;
+  html += `<text x="70" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">In-phase (\u03A9)</text>`;
+  html += `<line x1="165" y1="${LY}" x2="180" y2="${LY}" stroke="#d9534f" stroke-width="2.5"/>`;
+  html += `<text x="185" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Anti-phase (\u03A9)</text>`;
+  html += `<circle cx="297" cy="${LY}" r="5" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+  html += `<text x="308" y="${LY}" fill="rgba(255,255,255,0.5)" font-size="9" dominant-baseline="central">Net imbalance</text>`;
+
+  svg.innerHTML = html;
 }
 
 function openBalanceExplorer() {
