@@ -437,4 +437,72 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 
 ---
 
+---
+
+## Vector Balance Diagram
+
+The Balance Explorer includes an interactive polar SVG diagram showing the 2D vector balance of planetary angular momentum perturbations at the current simulation year.
+
+### What it shows
+
+- **Outer ring**: Colored dots at each planet's current ICRF perihelion longitude (ϖ)
+- **Arrows from center**: Force vectors pointing at each planet's ascending node direction (Ω), with length proportional to L × sin(i) — the angular momentum perturbation magnitude
+- **Green arrows**: In-phase planets (7 planets)
+- **Red arrow**: Anti-phase planet (Saturn)
+- **Gold dashed circle**: Net imbalance at center
+- **Dashed lines**: Fixed phase angles (φ) — where each planet reaches its inclination extreme
+- **Force share**: In-phase total %, anti-phase total %, and imbalance %
+
+The diagram updates live as the simulation year changes.
+
+### Single-mode vs Multi-mode toggle
+
+A toggle button switches between two ascending node models:
+
+**Single-mode** (default): Each planet's ascending node precesses at ONE constant rate (the model's 8H/N period from `ascendingNodeCyclesIn8H`). Different planets have different rates, so the vector cancellation geometry breaks over time. Balance can drop to ~72% at some epochs.
+
+**Multi-mode**: Each planet's ascending node position is computed as the sum of 7 eigenmodes, all oscillating simultaneously. The eigenvector amplitudes are solved to enforce angular momentum cancellation per mode. Balance is guaranteed 100% at all times.
+
+### The vector balance constraint and its limitations
+
+The vector balance diagram demonstrates an important subtlety: the multi-mode solver gives 100% balance for ANY set of 7 frequencies — not just the model's 8H/N values or Laskar's measured eigenfrequencies. This is because the solver has 56 free parameters (8 planets × 7 modes) but only 23 constraints (16 data + 7 angular momentum), leaving 33 degrees of freedom to always find a solution.
+
+**What this means:** The 100% vector balance is a mathematical property of the solver's over-determined system, not a unique property of any specific frequency set. The invariable plane is stable by DEFINITION — it is the plane where Σ L×sin(i)×exp(iΩ) = 0 — so any eigenmode decomposition that reproduces the J2000 state will automatically maintain this.
+
+**What IS genuinely constraining (and unique to this model):**
+
+| Constraint | Status | Laskar equivalent |
+|-----------|--------|-------------------|
+| Scalar inclination balance (Law 3) = 100% | ✓ Real constraint, selects d-values | None |
+| Scalar eccentricity balance (Law 5) = 100% | ✓ Independent constraint, same d-values | None |
+| Fibonacci d-values with mirror symmetry | ✓ Structural prediction | None |
+| 8H/N ascending node periods match Laskar within 1–3% | ✓ 6/7 modes | N/A (Laskar measures, doesn't predict) |
+| J2000 positions and short-term rates | ✓ Match observations | ✓ Match observations |
+
+**What CANNOT be observationally verified:**
+
+The ascending node periods (whether 8H/N or Laskar's values) describe motion over 50,000–2,000,000 year timescales. Humanity has at most ~4,000 years of recorded astronomical observations — far too short to distinguish between:
+
+- A constant rate (single-mode at 8H/N)
+- A wobbling rate (multi-mode sum of 7 eigenfrequencies)
+- A fundamentally different period that produces the same J2000 snapshot
+
+The model's 8H/N predictions and Laskar's N-body measurements both produce indistinguishable motion over observable timescales. The difference is philosophical: Laskar extracts 8 independent numbers from a simulation; our model derives all 7 from a single constant (H = 335,317) with a Fibonacci structure that also explains the scalar balance, the d-values, and the mirror symmetry.
+
+### Frequency comparison
+
+| Mode | Our 8H/N | Our rate | Laskar rate | Diff |
+|------|---------|----------|-------------|------|
+| s₁ (Mercury) | 8H/12 | −5.80"/yr | −5.61"/yr | +3.3% |
+| s₂ (Venus) | 8H/15 | −7.25"/yr | −7.06"/yr | +2.6% |
+| s₃ (Earth) | 8H/40 | −19.33"/yr | −18.85"/yr | +2.5% |
+| s₄ (Mars) | 8H/37 | −17.88"/yr | −17.64"/yr | +1.4% |
+| s₆ (Saturn) | 8H/55 | −26.57"/yr | −26.35"/yr | +0.8% |
+| s₇ (Uranus) | 8H/6 | −2.90"/yr | −2.99"/yr | −3.1% |
+| s₈ (Neptune) | 8H/1 | −0.48"/yr | −0.69"/yr | −30% |
+
+The Neptune outlier (8H/1 = 2.68M yr vs Laskar's 1.87M yr) is the largest discrepancy. Neptune's eigenfrequency is so slow that even Laskar's 50 Myr integration captures only ~27 complete cycles, limiting measurement precision.
+
+---
+
 **Previous**: [10 - Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md)
