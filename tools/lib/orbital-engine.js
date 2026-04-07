@@ -646,9 +646,9 @@ function computeEclipticInclination(planetName, currentYear) {
   const omega_p = computeAscendingNodeInvPlane(planetName, currentYear) * DEG;
 
   // Earth inclination and ascending node on invariable plane
-  // Earth's node precesses at H/3 (inclination cycle)
+  // Earth's node regresses at -H/5 (ecliptic precession rate), inclination oscillates with ICRF perihelion
   const i_e = computeInclinationEarth(currentYear) * DEG;
-  const omega_e = (C.earthAscendingNodeInvPlane + 360 * (currentYear - 2000) / (C.H / 3)) * DEG;
+  const omega_e = (C.earthAscendingNodeInvPlane + 360 * (currentYear - 2000) / (-C.H / 5)) * DEG;
 
   const cosIncl = Math.cos(i_p) * Math.cos(i_e) + Math.sin(i_p) * Math.sin(i_e) * Math.cos(omega_p - omega_e);
   return Math.acos(Math.max(-1, Math.min(1, cosIncl))) / DEG;
