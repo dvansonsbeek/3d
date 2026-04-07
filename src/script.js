@@ -38455,6 +38455,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   const earthPeriod   = earthPerihelionICRFYears;  // H/3 (ICRF, for inclination)
   const earthAscPeriod = -holisticyearLength / 5;  // ascending node regression
   const earthAscJ2000 = earthAscendingNodeInvPlaneVerified;
+  const earthPeriJ2000 = ASTRO_REFERENCE.perihelionLongitudeJ2000_deg;  // Earth ICRF perihelion at J2000 (drives inclination oscillation)
   const earthPhase    = earthInclinationPhaseAngle;
   const earthMean     = earthInvPlaneInclinationMean;
   const earthAmp      = earthInvPlaneInclinationAmplitude;
@@ -38489,8 +38490,8 @@ function buildPerihelionChart(planetKey, currentYear) {
 
   // Helper: compute ecliptic inclination (angle between planet and Earth orbital planes)
   const eclipticInclAtYear = (ysb) => {
-    // Earth orbital plane normal
-    const eIncl = inclAtYear(earthMean, earthAmp, earthAscJ2000, earthPeriod, earthPhase, ysb) * DEG2RAD;
+    // Earth orbital plane normal — inclination oscillates with ICRF perihelion, asc node regresses independently
+    const eIncl = inclAtYear(earthMean, earthAmp, earthPeriJ2000, earthPeriod, earthPhase, ysb) * DEG2RAD;
     const eOmega = ascNodeAtYear(earthAscJ2000, earthAscPeriod, ysb) * DEG2RAD;
     const enx = Math.sin(eIncl) * Math.sin(eOmega);
     const eny = Math.sin(eIncl) * Math.cos(eOmega);
