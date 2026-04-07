@@ -472,26 +472,46 @@ for (const key of planets) {
   );
 }
 
-const pairDefs = [
-  ['mercury', 'uranus'],
-  ['earth', 'saturn'],
-  ['venus', 'neptune'],
-  ['mars', 'jupiter'],
+// Law 4 pair definitions: per-pair Fibonacci/Lucas constraint on R = e_base / i_mean,rad
+//   form 'sq_ratio'  → R_outer² / R_inner² = target
+//   form 'lin_ratio' → R_outer  / R_inner  = target
+//   form 'sq_sum'    → R_inner² + R_outer² = target
+const law4Pairs = [
+  // [inner, outer, form, target, label]
+  ['mars',    'jupiter', 'sq_ratio',  144 / 11, '144/11 (F₁₂/L₅)'],
+  ['earth',   'saturn',  'lin_ratio', 21 / 4,   '21/4  (F₈/L₃)'],
+  ['venus',   'neptune', 'sq_ratio',  55 / 4,   '55/4  (F₁₀/L₃)'],
+  ['mercury', 'uranus',  'sq_sum',    55 / 5,   '55/5  (F₁₀/F₅) = 11'],
 ];
 
-console.log('\nPair n² sums:');
+// pairDefs is kept for the existing structure (just inner+outer order)
+const pairDefs = law4Pairs.map(([a, b]) => [a, b]);
+
+function law4Observed(rIn, rOut, form) {
+  if (form === 'sq_ratio')  return (rOut * rOut) / (rIn * rIn);
+  if (form === 'lin_ratio') return rOut / rIn;
+  return rIn * rIn + rOut * rOut; // sq_sum
+}
+
+function law4PredictOuterR(rIn, form, target) {
+  if (form === 'sq_ratio')  return rIn * Math.sqrt(target);
+  if (form === 'lin_ratio') return rIn * target;
+  return Math.sqrt(Math.max(0, target - rIn * rIn)); // sq_sum
+}
+
+console.log('\nLaw 4 pair constraints (R = e / i_mean,rad):');
 console.log('─'.repeat(90));
 
-for (const [a, b] of pairDefs) {
-  const n2a = nValues[a] * nValues[a];
-  const n2b = nValues[b] * nValues[b];
-  const n2sum = n2a + n2b;
-  const bestFib = findBestFibRatio(n2sum);
-
-  console.log(`${a}/${b} (d=${config[a].d}):`);
-  console.log(`  n²_A = ${n2a.toFixed(6)},  n²_B = ${n2b.toFixed(6)}`);
-  console.log(`  n²_A + n²_B = ${n2sum.toFixed(6)} ≈ ${bestFib.num}/${bestFib.den} = ${bestFib.ratio.toFixed(6)} (${bestFib.err.toFixed(4)}%)`);
-  check(`${a}/${b} n² sum < 5% Fibonacci error`, bestFib.err < 5, `${bestFib.num}/${bestFib.den} (${bestFib.err.toFixed(3)}%)`);
+for (const [a, b, form, target, label] of law4Pairs) {
+  const rA = nValues[a];
+  const rB = nValues[b];
+  const obs = law4Observed(rA, rB, form);
+  const err = (obs / target - 1) * 100;
+  const formStr = form === 'sq_ratio' ? `R²_${b[0]}/R²_${a[0]}` :
+                  form === 'lin_ratio' ? `R_${b[0]}/R_${a[0]}` :
+                  `R²_${a[0]}+R²_${b[0]}`;
+  console.log(`${a}/${b}: ${formStr} = ${obs.toFixed(6)}  vs  ${label}  (err ${err >= 0 ? '+' : ''}${err.toFixed(4)}%)`);
+  check(`${a}/${b} Law 4 constraint < 1% err`, Math.abs(err) < 1, `${err >= 0 ? '+' : ''}${err.toFixed(3)}%`);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -594,64 +614,59 @@ for (const key of planets) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  PREDICTIONS: Eccentricities from Law 4 (pair n² constraints)            │');
+console.log('│  PREDICTIONS: Outer eccentricities from Law 4 (4 inner → 4 outer)        │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
-// For each mirror pair, use the best Fibonacci S (n² sum) and R (n² ratio)
-// to predict both eccentricities directly from pair constraints.
-// Uses MEAN eccentricities and inclinations for long-term structural relationships.
+// New Law 4 statement: each pair has ONE constraint (3 ratios + 1 sum-of-squares).
+// The four constraints together predict the four outer-planet base eccentricities
+// from the four inner-planet base eccentricities. R = e_base / i_mean,rad.
 const nValuesMean = {};
 for (const key of planets) {
   const iRad = means[key] * DEG2RAD;
   nValuesMean[key] = eccMean[key] / iRad;
 }
 
-const pairSR = {};
-for (const [a, b] of pairDefs) {
-  const n2a = nValuesMean[a] * nValuesMean[a];
-  const n2b = nValuesMean[b] * nValuesMean[b];
-  const n2sum = n2a + n2b;
-  const n2ratio = n2a / n2b;
-  const bestS = findBestFibRatio(n2sum);
-  const bestR = findBestFibRatio(n2ratio);
-  pairSR[`${a}/${b}`] = { S: bestS.ratio, R: bestR.ratio, Sstr: `${bestS.num}/${bestS.den}`, Rstr: `${bestR.num}/${bestR.den}` };
-}
-
 const eccPredicted = {};
-for (const [a, b] of pairDefs) {
-  const key = `${a}/${b}`;
-  const { S, R } = pairSR[key];
-  const iA = means[a] * DEG2RAD;
-  const iB = means[b] * DEG2RAD;
-  const n2b = S / (R + 1);
-  const n2a = S * R / (R + 1);
-  eccPredicted[a] = Math.sqrt(n2a) * iA;
-  eccPredicted[b] = Math.sqrt(n2b) * iB;
+// Inner planets are reference (predicted = observed base)
+for (const key of planets) eccPredicted[key] = eccMean[key];
+
+// Solve each pair for the outer planet's R, then convert via e = R × i_mean,rad
+for (const [a, b, form, target] of law4Pairs) {
+  const rIn = nValuesMean[a];
+  const rOut = law4PredictOuterR(rIn, form, target);
+  eccPredicted[b] = rOut * (means[b] * DEG2RAD);
 }
 
-console.log('Planet       S (n²sum)    R (n²ratio)   e_predicted   e_actual (mean)  Error');
-console.log('─'.repeat(95));
+console.log('Planet       Role        e_predicted   e_actual (base)  Error');
+console.log('─'.repeat(75));
 
-let rmsErr = 0;
-for (const key of planets) {
+const planetOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+const innerSet = new Set(law4Pairs.map(([a]) => a));
+const outerToInner = {};
+for (const [a, b] of law4Pairs) outerToInner[b] = a;
+
+let outerErrSqSum = 0;
+let maxOuterErr = 0;
+for (const key of planetOrder) {
   const ePred = eccPredicted[key];
-  const err = (ePred - eccMean[key]) / eccMean[key] * 100;
-  rmsErr += err * err;
-
-  // Find which pair this planet belongs to
-  let pairKey = '';
-  for (const [a, b] of pairDefs) {
-    if (a === key || b === key) { pairKey = `${a}/${b}`; break; }
+  const eObs = eccMean[key];
+  const err = (ePred - eObs) / eObs * 100;
+  let role;
+  if (innerSet.has(key)) {
+    role = 'reference';
+  } else {
+    role = `← ${outerToInner[key].slice(0, 3)}`;
+    outerErrSqSum += err * err;
+    maxOuterErr = Math.max(maxOuterErr, Math.abs(err));
   }
-  const sr = pairSR[pairKey];
-  const source = `S=${sr.Sstr}, R=${sr.Rstr}`;
-
   console.log(
-    `${key.padEnd(12)} ${source.padEnd(24)} ${ePred.toFixed(8).padStart(12)}  ${eccMean[key].toFixed(8)}  ${err >= 0 ? '+' : ''}${err.toFixed(3)}%`
+    `${key.padEnd(12)} ${role.padEnd(11)} ${ePred.toFixed(8).padStart(12)}  ${eObs.toFixed(8)}  ${err >= 0 ? '+' : ''}${err.toFixed(4)}%`
   );
 }
-rmsErr = Math.sqrt(rmsErr / 8);
-console.log(`\nRMS error: ${rmsErr.toFixed(2)}%`);
+const rmsErr = Math.sqrt(outerErrSqSum / 4);
+console.log(`\nRMS error (4 outer planets): ${rmsErr.toFixed(3)}%`);
+console.log(`Max  error (4 outer planets): ${maxOuterErr.toFixed(3)}%`);
+check(`Law 4 outer prediction RMS < 0.3%`, rmsErr < 0.3, `${rmsErr.toFixed(3)}%`);
 
 // Cross-check: Law 4 vs Law 5 Saturn prediction
 // Law 4 = direct pair constraint (from table above)
@@ -661,7 +676,7 @@ const satLaw5 = satPredicted; // computed in Finding 4 from J2000 observed eccen
 const satConvergence = Math.abs(satLaw4 - satLaw5) / ecc.saturn * 100;
 
 console.log('\nSaturn cross-check — Law 4 vs Law 5:');
-console.log(`  Law 4 (R² pair constraint):    ${satLaw4.toFixed(8)}  (${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(2)}% from J2000)`);
+console.log(`  Law 4 (R_Sa/R_E = 21/4):       ${satLaw4.toFixed(8)}  (${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(2)}% from J2000)`);
 console.log(`  Law 5 (eccentricity balance):  ${satLaw5.toFixed(8)}  (${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(2)}% from J2000)`);
 console.log(`  J2000 observed:                ${ecc.saturn.toFixed(8)}`);
 console.log(`  Convergence: ${satConvergence.toFixed(2)}% — two independent constraints bracket J2000`);
@@ -707,7 +722,7 @@ console.log('╠═════════════════════�
 console.log(`║  Saturn Law 4 (pair): ${satLaw4.toFixed(8)} (err: ${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
 console.log(`║  Saturn Law 5 (bal):  ${satLaw5.toFixed(8)} (err: ${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
 console.log(`║  Convergence:         ${satConvergence.toFixed(2)}%`.padEnd(76) + '║');
-console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(2)}% (8-planet Law 4 pair constraints)`.padEnd(76) + '║');
+console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(3)}% (4 outer planets, Law 4 pair constraints)`.padEnd(76) + '║');
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 
 if (failCount > 0) {
