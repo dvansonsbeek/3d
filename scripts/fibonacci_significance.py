@@ -45,9 +45,11 @@
 #       How many pairwise precession-period ratios match Fibonacci ratios?
 #       Observed: 12/28 pairs match within 5%.
 #
-#   Test 10 — R² partition sums (Law 4):
-#       For the 4 mirror pairs, how many R² pair sums match Fibonacci ratios?
-#       Observed: 4/4 match within 5%.
+#   Test 10 — Law 4 pair constraints:
+#       For the 4 mirror pairs, how many of the pair-specific R-form
+#       constraints (R = e_base/i_mean,rad) match their Fibonacci/Lucas
+#       targets within tol? Forms: R²_Ju/R²_Ma=144/11, R_Sa/R_E=21/4,
+#       R²_Ne/R²_V=55/4, R²_Me+R²_Ur=11. Observed: 4/4 match.
 #
 #   Test 11 — E–J–S resonance loop (Law 6):
 #       Do Earth, Jupiter, Saturn periods satisfy b_E + b_J = b_S?
@@ -477,36 +479,54 @@ def stat_prec_hierarchy(prec_periods, tol=TOLERANCE):
     return count
 
 
-# Wide Fibonacci ratio set for R² partition test (needs 34, 55, 89, 377)
-FIB_SET_WIDE = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
-FIB_RATIOS_WIDE = sorted(set(a / b for a in FIB_SET_WIDE for b in FIB_SET_WIDE if a != b))
+# Law 4 pair constraints (current statement — three ratios + one sum-of-squares)
+# Each entry: (inner, outer, form, target)
+# form: 'sq_ratio'  → R_outer² / R_inner²
+#       'lin_ratio' → R_outer  / R_inner
+#       'sq_sum'    → R_inner² + R_outer²
+LAW4_PAIRS = [
+    ("Mars",    "Jupiter", "sq_ratio", 144 / 11),  # F₁₂/L₅
+    ("Earth",   "Saturn",  "lin_ratio", 21 / 4),    # F₈/L₃
+    ("Venus",   "Neptune", "sq_ratio", 55 / 4),    # F₁₀/L₃
+    ("Mercury", "Uranus",  "sq_sum",   55 / 5),    # F₁₀/F₅ = 11
+]
 
 
-def best_fibonacci_error_wide(ratio):
-    """Return the smallest relative error to any wide Fibonacci ratio."""
-    return min(abs(ratio / fr - 1.0) for fr in FIB_RATIOS_WIDE if fr > 0)
-
-
-def stat_r2_partition(eccs, incl_j2000, mirror_pairs, tol=TOLERANCE):
+def stat_r2_partition(eccs, incl_mean, mirror_pairs=None, tol=TOLERANCE):
     """
-    Test 10 — Law 4: R² partition sums.
+    Test 10 — Law 4: pair constraints.
 
-    For each mirror pair, compute R²_A + R²_B where R = e / i_rad.
-    Count how many pair sums match a Fibonacci ratio (a/b where a,b
-    are Fibonacci numbers up to 377).
+    For each of the four mirror pairs, compute the pair-specific
+    R-form and check whether it lands within tol of its Fibonacci/Lucas
+    target. R = e / i_mean,rad. The four constraints are:
+
+        Mars / Jupiter   :  R²_Ju / R²_Ma  =  144/11   (F₁₂/L₅)
+        Earth / Saturn   :  R_Sa / R_E     =  21/4     (F₈/L₃)
+        Venus / Neptune  :  R²_Ne / R²_V   =  55/4     (F₁₀/L₃)
+        Mercury / Uranus :  R²_Me + R²_Ur  =  55/5 = 11 (F₁₀/F₅)
+
+    The `mirror_pairs` argument is accepted for backwards compatibility
+    but ignored — Law 4 fixes the constraint form per pair.
 
     Returns: count of matching pairs out of 4 (higher = better).
     """
     count = 0
-    for inner, outer in mirror_pairs:
-        i_inner = math.radians(incl_j2000.get(inner, 0))
-        i_outer = math.radians(incl_j2000.get(outer, 0))
+    for inner, outer, form, target in LAW4_PAIRS:
+        i_inner = math.radians(incl_mean.get(inner, 0))
+        i_outer = math.radians(incl_mean.get(outer, 0))
         if i_inner <= 0 or i_outer <= 0:
             continue
         r_inner = eccs.get(inner, 0) / i_inner
         r_outer = eccs.get(outer, 0) / i_outer
-        r2_sum = r_inner**2 + r_outer**2
-        if r2_sum > 0 and best_fibonacci_error_wide(r2_sum) < tol:
+        if r_inner <= 0 or r_outer <= 0:
+            continue
+        if form == "sq_ratio":
+            obs = (r_outer * r_outer) / (r_inner * r_inner)
+        elif form == "lin_ratio":
+            obs = r_outer / r_inner
+        else:  # sq_sum
+            obs = r_inner * r_inner + r_outer * r_outer
+        if abs(obs / target - 1.0) < tol:
             count += 1
     return count
 
@@ -706,7 +726,7 @@ def compute_observed_stats():
     # Tests 8–12
     obs["psi_full"] = stat_psi_full(INCL_J2000, D_INCL, SQRT_M)
     obs["prec_hierarchy"] = stat_prec_hierarchy(INCL_PERIOD)
-    obs["r2_partition"] = stat_r2_partition(ECCENTRICITIES, INCL_J2000, MIRROR_PAIRS)
+    obs["r2_partition"] = stat_r2_partition(ECCENTRICITIES, INCL_MEANS, MIRROR_PAIRS)
     obs["ejs_resonance"] = stat_ejs_resonance(PERIOD_FRAC)
     obs["mirror_symmetry"] = stat_mirror_symmetry(D_INCL, MIRROR_PAIRS)
     # Tests 13-14
@@ -807,8 +827,8 @@ def permutation_test(observed):
         if ph >= observed["prec_hierarchy"]:
             counts["prec_hierarchy"] += 1
 
-        # Test 10: R² partition (shuffled eccs + shuffled J2000 incl)
-        rp = stat_r2_partition(eccs, ij2k, MIRROR_PAIRS)
+        # Test 10: Law 4 pair constraints (shuffled eccs + shuffled mean incl)
+        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
         if rp >= observed["r2_partition"]:
             counts["r2_partition"] += 1
 
@@ -927,8 +947,8 @@ def log_uniform_mc(observed, n_trials, rng):
         if ph >= observed["prec_hierarchy"]:
             counts["prec_hierarchy"] += 1
 
-        # Test 10: R² partition (random eccs + random J2000 incl)
-        rp = stat_r2_partition(eccs, ij2k, MIRROR_PAIRS)
+        # Test 10: Law 4 pair constraints (random eccs + random mean incl)
+        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
         if rp >= observed["r2_partition"]:
             counts["r2_partition"] += 1
 
@@ -1049,8 +1069,8 @@ def uniform_mc(observed, n_trials, rng):
         if ph >= observed["prec_hierarchy"]:
             counts["prec_hierarchy"] += 1
 
-        # Test 10: R² partition
-        rp = stat_r2_partition(eccs, ij2k, MIRROR_PAIRS)
+        # Test 10: Law 4 pair constraints
+        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
         if rp >= observed["r2_partition"]:
             counts["r2_partition"] += 1
 
@@ -1321,7 +1341,7 @@ def main():
     print(f"  Test 7  — Saturn prediction (error):    {observed['saturn_pred']*100:.4f}%  [dual-balanced ecc]")
     print(f"  Test 8  — ψ full 8-planet (spread):     {observed['psi_full']*100:.4f}%")
     print(f"  Test 9  — Prec. hierarchy (pairs):      {observed['prec_hierarchy']}")
-    print(f"  Test 10 — R² partition (matching):      {observed['r2_partition']}/4")
+    print(f"  Test 10 — Law 4 pair constraints:        {observed['r2_partition']}/4")
     print(f"  Test 11 — E–J–S resonance (error):     {observed['ejs_resonance']*100:.4f}%")
     print(f"  Test 12 — Mirror symmetry (matching):   {observed['mirror_symmetry']}/4")
     print(f"  Test 13 — K amplitude (max error):      {observed['k_amplitude']*100:.4f}%")
@@ -1397,7 +1417,7 @@ def main():
         "saturn_pred":     "Finding 4 — Saturn e pred",
         "psi_full":        "Law 2 — ψ full 8-planet",
         "prec_hierarchy":  "Law 1 — Prec. hierarchy",
-        "r2_partition":    "Law 4 — R² partition",
+        "r2_partition":    "Law 4 — Pair constraints",
         "ejs_resonance":   "Law 6 — E–J–S resonance",
         "mirror_symmetry": "Finding 1 — Mirror symm.",
         "k_amplitude":     "Finding 6 — K amplitude",

@@ -18,7 +18,7 @@ Sections:
    8. ξ-ladder search: d × ξ = constant?
    9. Period chain: cumulative ratios
   10. Eccentricity structure: comparative
-  11. R² pair structure test (mirror pairs)
+  11. AMD partition ratio test (mirror pairs, exploratory)
   12. Fibonacci divisor d × ξ = const (brute-force search)
   13. Eccentricity balance test
 
@@ -665,10 +665,12 @@ def main():
     # ═══════════════════════════════════════════════════════════════════════
     # 11. R² PAIR STRUCTURE TEST (mirror pairs)
     # ═══════════════════════════════════════════════════════════════════════
-    section("11. R² PAIR STRUCTURE TEST (mirror pairs)")
+    section("11. AMD PARTITION RATIO TEST (mirror pairs)")
 
     print("  Apply the AMD partition ratio framework (R = e/i) to TRAPPIST-1.")
-    print("  Test whether mirror-pair R² sums follow Fibonacci patterns.")
+    print("  Solar-system Law 4 uses pair-specific Fibonacci/Lucas constraints")
+    print("  (3 ratios + 1 sum-of-squares); here we report R² sum, R product,")
+    print("  and R ratio for each candidate mirror pair as exploratory data.")
     print()
 
     # Mutual inclinations relative to approximate invariable plane
@@ -819,7 +821,7 @@ def main():
     print("     The 3ξ_b + 5ξ_g = 8ξ_e triad remains the strongest Fibonacci")
     print("     eccentricity signal in TRAPPIST-1.")
     print()
-    print("  5. R² PAIR STRUCTURE:")
+    print("  5. AMD PARTITION RATIO PAIR STRUCTURE:")
     print("     NOT YET FEASIBLE — mutual inclinations from transit data are")
     print("     too noisy (errors comparable to signal). Needs JWST astrometry.")
     print()
