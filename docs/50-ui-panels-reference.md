@@ -406,8 +406,9 @@ An interactive modal for testing different planetary group assignments and Fibon
 
 - Inclination balance: **100%**
 - Eccentricity balance: **100%**
-- LL bounds: **8/8 pass**
-- Trend directions: **7/7 match**
+- LL bounds: **7/8 pass** (Saturn: +0.027° excess, within Brouwer & van Woerkom source precision)
+- Trend directions: **7/7 fitted planets match JPL** (J2000-fixed frame)
+- Total trend error: **~4.3″/century** across the 7 fitted planets
 
 ### Full Reference
 

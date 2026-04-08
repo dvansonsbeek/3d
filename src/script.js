@@ -129,9 +129,9 @@ planets.mercury = {
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
   ascendingNodeInvPlane: 32.83,
-  inclinationPhaseAngle: 99.52,
+  inclinationPhaseAngle: 234.52,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 12,
+  ascendingNodeCyclesIn8H: 9,
 };
 
 // Venus
@@ -157,9 +157,9 @@ planets.venus = {
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
-  inclinationPhaseAngle: 79.82,
+  inclinationPhaseAngle: 259.82,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 15,
+  ascendingNodeCyclesIn8H: 1,
 };
 
 // Mars
@@ -185,9 +185,9 @@ planets.mars = {
   eocFraction: -0.066224,
   perihelionRef_JD: 2456499.441,
   ascendingNodeInvPlane: 354.87,
-  inclinationPhaseAngle: 96.95,
+  inclinationPhaseAngle: 231.95,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 37,
+  ascendingNodeCyclesIn8H: 62,
 };
 
 // Jupiter
@@ -215,7 +215,7 @@ planets.jupiter = {
   ascendingNodeInvPlane: 312.89,
   inclinationPhaseAngle: 291.18,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 55,
+  ascendingNodeCyclesIn8H: 36,
 };
 
 // Saturn
@@ -243,7 +243,7 @@ planets.saturn = {
   ascendingNodeInvPlane: 118.81,
   inclinationPhaseAngle: 120.38,
   antiPhase: true,
-  ascendingNodeCyclesIn8H: 55,
+  ascendingNodeCyclesIn8H: 36,
 };
 
 // Uranus
@@ -271,7 +271,7 @@ planets.uranus = {
   ascendingNodeInvPlane: 307.80,
   inclinationPhaseAngle: 21.33,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 6,
+  ascendingNodeCyclesIn8H: 12,
 };
 
 // Neptune
@@ -297,9 +297,9 @@ planets.neptune = {
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
   ascendingNodeInvPlane: 192.04,
-  inclinationPhaseAngle: 354.04,
+  inclinationPhaseAngle: 174.04,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 1,
+  ascendingNodeCyclesIn8H: 3,
 };
 
 // --- A4b. Minor bodies (Pluto, Halleys, Eros, Ceres) ---
@@ -18841,7 +18841,8 @@ function fbeCalcApparentIncl(
   year, planetMean, planetAmplitude,
   planetPeriICRFPeriod, planetPeriICRFJ2000, planetPhaseAngle,
   planetAscNodeJ2000, planetAscNodePeriod,
-  antiPhaseSign
+  antiPhaseSign,
+  fixedEarth
 ) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
@@ -18856,14 +18857,25 @@ function fbeCalcApparentIncl(
   // Planet ascending node Ω — advances at the asc-node period (NOT the ICRF perihelion rate)
   const planetAscNode = (planetAscNodeJ2000 + (360 / planetAscNodePeriod) * (year - 2000)) * DEG2RAD;
 
-  // Earth at given year
-  const earthICRFPeriod = holisticyearLength / 3;   // ICRF perihelion period (for inclination oscillation)
-  const earthAscPeriod = -holisticyearLength / 5;    // ascending node regression period (for plane normal Ω)
-  const earthCosPhase0 = (earthInvPlaneInclJ2000 - earthInvPlaneInclinationMean) / earthInvPlaneInclinationAmplitude;
-  const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
-  const earthI = (earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
+  // Earth plane:
+  //   - moving:    real dynamic plane at year `year` (the model's actual ecliptic-of-date).
+  //                This is what an Earth-bound observer at year t would measure.
+  //   - fixedEarth=true: Earth's plane FROZEN at J2000. This matches JPL's published
+  //                "mean ecliptic and equinox of J2000" frame so that the resulting
+  //                trend can be compared directly to JPL's catalog dI/dt.
+  let earthI, earthOmega;
+  if (fixedEarth) {
+    earthI = earthInvPlaneInclJ2000 * DEG2RAD;
+    earthOmega = earthAscendingNodeInvPlaneVerified * DEG2RAD;
+  } else {
+    const earthICRFPeriod = holisticyearLength / 3;   // ICRF perihelion period (for inclination oscillation)
+    const earthAscPeriod = -holisticyearLength / 5;    // ascending node regression period (for plane normal Ω)
+    const earthCosPhase0 = (earthInvPlaneInclJ2000 - earthInvPlaneInclinationMean) / earthInvPlaneInclinationAmplitude;
+    const earthPhase0 = Math.acos(earthCosPhase0);
+    const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
+    earthI = (earthInvPlaneInclinationMean + earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
+    earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
+  }
 
   // Normal vectors
   const pnx = Math.sin(planetI) * Math.sin(planetAscNode);
@@ -18908,13 +18920,37 @@ function computeBalanceResults(state) {
     const dxixsqrtm = d * amplitude * sqrtM;
 
     // Ecliptic trend (skip for Earth — it defines the ecliptic)
-    let trend = NaN, trendError = NaN, directionMatch = false;
+    //
+    // We compute TWO trends per planet:
+    //
+    //   trend (moving Earth):  the real angle a year-t observer would
+    //     measure between the planet's plane and Earth's *current* plane.
+    //     This is the model's actual physical observable.
+    //
+    //   trendFixed (J2000-frozen Earth): the same angle but with Earth's
+    //     plane locked to its J2000 orientation. This matches JPL's
+    //     catalog frame ("mean ecliptic and equinox of J2000") and so
+    //     equals what JPL would measure with their conventions.
+    //
+    // JPL's published dI/dt is in the J2000-frozen frame, so it cannot
+    // be compared directly to our moving-Earth `trend`. We re-express
+    // JPL's value into our moving frame via:
+    //
+    //   frameCorrection  = trend − trendFixed
+    //   jplTrendMoving   = cfg.trendJPL + frameCorrection
+    //
+    // The displayed JPL value (jplTrendMoving) is then directly
+    // comparable to the model's apparent trend, and the trendError /
+    // directionMatch indicators become meaningful.
+    let trend = NaN, trendFixed = NaN, jplTrendMoving = NaN;
+    let trendError = NaN, directionMatch = false;
     if (key !== 'earth') {
       // Asc-node period: model uses 8H / ascendingNodeCyclesIn8H (retrograde, negative).
       const ascNodePeriod = planets[key].ascendingNodeCyclesIn8H
         ? -(8 * holisticyearLength) / planets[key].ascendingNodeCyclesIn8H
         : planets[key].perihelionEclipticYears;
       const fbeAntiPhaseSign = isAntiPhase ? -1 : 1;
+      // Moving-Earth trend (the model's actual ecliptic-of-date observable)
       const i1900 = fbeCalcApparentIncl(
         1900, mean, amplitude,
         state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
@@ -18925,12 +18961,30 @@ function computeBalanceResults(state) {
         state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
         cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign
       );
-      trend = (i2100 - i1900) / 2;  // degrees/century
-      trendError = Math.abs(trend - cfg.trendJPL);
-      directionMatch = (cfg.trendJPL >= 0) === (trend >= 0);
+      trend = (i2100 - i1900) / 2;
+      // J2000-frozen Earth trend (matches JPL's frame)
+      const i1900f = fbeCalcApparentIncl(
+        1900, mean, amplitude,
+        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
+        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign, true
+      );
+      const i2100f = fbeCalcApparentIncl(
+        2100, mean, amplitude,
+        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
+        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign, true
+      );
+      trendFixed = (i2100f - i1900f) / 2;
+      // Re-express JPL's catalog value into our moving frame
+      const frameCorrection = trend - trendFixed;
+      jplTrendMoving = cfg.trendJPL + frameCorrection;
+      trendError = Math.abs(trend - jplTrendMoving);
+      directionMatch = (jplTrendMoving >= 0) === (trend >= 0);
     }
 
-    planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, dxixsqrtm, trend, trendError, directionMatch };
+    planetResults[key] = {
+      amplitude, mean, rangeMin, rangeMax, fitsLL, dxixsqrtm,
+      trend, trendFixed, jplTrendMoving, trendError, directionMatch,
+    };
   }
 
   // Inclination balance (Law 3): w = √(m·a(1-e²)) / d — group sums
@@ -19137,8 +19191,9 @@ function createBalanceExplorerPanel() {
                   <th>Mean</th>
                   <th>Range</th>
                   <th>LL</th>
-                  <th>Trend (\u00B0/cy)</th>
-                  <th>JPL (\u00B0/cy)</th>
+                  <th><span class="fbe-ll-tip">Trend (\u00B0/cy)<span class="fbe-ll-tip-content">Model's apparent ecliptic-inclination trend over 1900–2100, measured against Earth's orbital plane <b>at each year</b> (the real moving plane). This is what an Earth-bound observer would actually measure.</span></span></th>
+                  <th><span class="fbe-ll-tip">JPL (\u00B0/cy)<span class="fbe-ll-tip-content">JPL's catalog dI/dt is published in the <b>J2000-frozen</b> ecliptic frame. To compare with the model's moving-frame trend (left column), the catalog value is re-expressed into the moving frame by adding the frame correction: <i>JPL_displayed = JPL_catalog + (trend_moving \u2212 trend_J2000)</i>. The result is directly comparable to the model column.</span></span></th>
+                  <th>Frame corr</th>
                   <th>Err</th>
                   <th>Dir</th>
                   <th>d\u00D7i\u00D7\u221Am</th>
@@ -19317,15 +19372,18 @@ function updateBalanceExplorerResults(panel, state) {
     const meanStr = r.mean.toFixed(4) + '\u00B0';
     const rangeStr = `[${r.rangeMin.toFixed(2)}, ${r.rangeMax.toFixed(2)}]`;
 
-    let trendStr, jplStr, errStr, dirStr;
+    let trendStr, jplStr, frameStr, errStr, dirStr;
     if (key === 'earth') {
       trendStr = '\u2014';
       jplStr = '\u2014';
+      frameStr = '\u2014';
       errStr = '\u2014';
       dirStr = '\u2014';
     } else {
       trendStr = (r.trend >= 0 ? '+' : '') + r.trend.toFixed(5);
-      jplStr = (cfg.trendJPL >= 0 ? '+' : '') + cfg.trendJPL.toFixed(5);
+      jplStr = (r.jplTrendMoving >= 0 ? '+' : '') + r.jplTrendMoving.toFixed(5);
+      const frameCorr = r.trend - r.trendFixed;
+      frameStr = (frameCorr >= 0 ? '+' : '') + frameCorr.toFixed(5);
       errStr = (r.trendError * 3600).toFixed(1) + '"';
       dirStr = r.directionMatch ? '\u2713' : '\u2717';
     }
@@ -19341,6 +19399,7 @@ function updateBalanceExplorerResults(panel, state) {
       <td class="${r.fitsLL ? 'pass' : 'fail'} fbe-ll-cell"><span class="fbe-ll-tip">${r.fitsLL ? '\u2713' : '\u2717'}<span class="fbe-ll-tip-content">Laplace-Lagrange bounds for ${cfg.name}:<br><b>${cfg.llBounds.min.toFixed(3)}\u00B0 \u2013 ${cfg.llBounds.max.toFixed(3)}\u00B0</b><br>3D model predicted range: ${r.rangeMin.toFixed(3)}\u00B0 \u2013 ${r.rangeMax.toFixed(3)}\u00B0<br><br><a href="https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html" target="_blank" rel="noopener">Farside: Table 10.4 \u2192</a></span></span></td>
       <td>${trendStr}</td>
       <td>${jplStr}</td>
+      <td>${frameStr}</td>
       <td>${errStr}</td>
       <td class="${key === 'earth' ? '' : (r.directionMatch ? 'pass' : 'fail')}">${dirStr}</td>
       <td>${dxiStr}</td>

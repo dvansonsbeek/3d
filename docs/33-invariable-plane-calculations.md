@@ -181,12 +181,18 @@ function updatePlanetInvariablePlaneHeights() {
 
 Each body's ascending node Ω on the invariable plane precesses linearly at a body-specific rate. These rates are **distinct from** the inclination-oscillation cycle (which is driven by the ICRF perihelion ϖ_ICRF) — Ω and the inclination are independent angles evolving at independent rates.
 
-| Body | Ω Period | Source |
-|------|----------|--------|
-| **Earth** | −H/5 ≈ −67,063 yr | Ecliptic precession rate |
-| Other planets | −(8H)/N | Integer divisor of the Grand Holistic Octave 8H ≈ 2,682,536 yr, with N matching the Laplace-Lagrange secular eigenfrequencies s₁–s₈ |
+| Body | N | Ω Period | Notes |
+|------|---|----------|-------|
+| **Earth** | 40 | −H/5 ≈ −67,063 yr | = −(8H)/40, the ecliptic precession rate |
+| Mercury | 9 | −298,060 yr | |
+| Venus | 1 | −2,682,536 yr | = −8H, full Grand Holistic Octave |
+| Mars | 62 | −43,267 yr | |
+| Jupiter | 36 | −74,515 yr | Shared with Saturn (lockstep) |
+| Saturn | 36 | −74,515 yr | Shared with Jupiter (lockstep) |
+| Uranus | 12 | −223,545 yr | |
+| Neptune | 3 | −894,179 yr | |
 
-The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`.
+The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`. The integers were chosen by a 2026-04-09 audit to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame; see [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) for the full derivation.
 
 ### Implementation
 

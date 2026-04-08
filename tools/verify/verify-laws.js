@@ -82,11 +82,12 @@ for (const p of planets) {
 // Fibonacci numbers
 const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765];
 
-// Reproduce fbeCalcApparentIncl from script.js — fixed version.
-// Two angles per planet evolve at different rates and must be tracked separately:
-//   - ICRF perihelion ϖ_ICRF: drives the inclination cosine, advances at ICRF period
-//   - Ascending node Ω: defines the orbital plane normal, advances at the asc-node period
-// Earth's Ω regresses at -H/5; Earth's inclination oscillates at H/3.
+// Reproduce fbeCalcApparentIncl from script.js — JPL J2000-fixed frame.
+// JPL publishes dI/dt against the "mean ecliptic and equinox of J2000" — i.e.
+// Earth's orbital plane FROZEN at J2000, not the moving plane of date. To
+// compare model trends to JPL trends apples-to-apples, we measure the angle
+// between the planet's plane at year t and Earth's J2000-fixed plane.
+// (See docs/32-inclination-calculations.md "Two Frames" section.)
 function fbeCalcApparentIncl(
   year, planetMean, planetAmplitude,
   planetPeriICRFPeriod, planetPeriICRFJ2000, planetPhaseAngle,
@@ -103,14 +104,9 @@ function fbeCalcApparentIncl(
   // Planet ascending node Ω — advances at the asc-node period, NOT the ICRF rate
   const planetAscNode = (planetAscNodeJ2000 + (360 / planetAscNodePeriod) * (year - 2000)) * DEG2RAD;
 
-  // Earth at given year
-  const earthICRFPeriod = C.H / 3;          // ICRF period for inclination oscillation
-  const earthAscPeriod = -C.H / 5;          // ascending node regression period
-  const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
-  const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
-  const earthI = (C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
+  // Earth plane FROZEN at J2000 (matches JPL's "mean ecliptic and equinox of J2000").
+  const earthI = inclJ2000.earth * DEG2RAD;
+  const earthOmega = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane * DEG2RAD;
 
   const pnx = Math.sin(planetI) * Math.sin(planetAscNode);
   const pny = Math.sin(planetI) * Math.cos(planetAscNode);
@@ -510,10 +506,24 @@ for (const key of planets) {
   );
 }
 
-// Law 4 pair definitions: per-pair Fibonacci/Lucas constraint on R = e_base / i_mean,rad
-//   form 'sq_ratio'  → R_outer² / R_inner² = target
-//   form 'lin_ratio' → R_outer  / R_inner  = target
-//   form 'sq_sum'    → R_inner² + R_outer² = target
+// LAW 4 (DEMOTED to OBSERVATION 4 — see docs/10-fibonacci-laws.md):
+//
+// The four mirror-pair quantities R = e_base / i_mean,rad cluster near small
+// Fibonacci/Lucas ratios at the noise level of the dense Fibonacci/Lucas
+// candidate space. Three independent searches confirmed the clustering is
+// not a derivable physical law:
+//
+//   1. scripts/archive/fibonacci_law4_search.py found no universal constant
+//      ξ × f(params) = const exists across the 8 planets.
+//   2. scripts/fibonacci_law4_reformulation_search.py tried 7 R-definitions
+//      and 5 pair forms — all give errors at noise level.
+//   3. scripts/fibonacci_law4_balance_search.py confirmed exactly ONE
+//      physical balance equation exists in (m, a, d) space: Law 5 itself.
+//      No second balance equation exists to determine the other 3 outer
+//      eccentricities.
+//
+// The four ratio targets below are kept for reference and reporting only —
+// they are NOT pass/fail tested.
 const law4Pairs = [
   // [inner, outer, form, target, label]
   ['mars',    'jupiter', 'sq_ratio',  144 / 11, '144/11 (F₁₂/L₅)'],
@@ -537,8 +547,11 @@ function law4PredictOuterR(rIn, form, target) {
   return Math.sqrt(Math.max(0, target - rIn * rIn)); // sq_sum
 }
 
-console.log('\nLaw 4 pair constraints (R = e / i_mean,rad):');
+console.log('\nObservation 4 — pair clustering (R = e / i_mean,rad), DEMOTED — REPORT ONLY:');
 console.log('─'.repeat(90));
+console.log('  Note: these clusters are at noise level for the dense Fibonacci/Lucas');
+console.log('  candidate space. Reported for reference, not pass/fail tested.');
+console.log('');
 
 for (const [a, b, form, target, label] of law4Pairs) {
   const rA = nValues[a];
@@ -548,8 +561,7 @@ for (const [a, b, form, target, label] of law4Pairs) {
   const formStr = form === 'sq_ratio' ? `R²_${b[0]}/R²_${a[0]}` :
                   form === 'lin_ratio' ? `R_${b[0]}/R_${a[0]}` :
                   `R²_${a[0]}+R²_${b[0]}`;
-  console.log(`${a}/${b}: ${formStr} = ${obs.toFixed(6)}  vs  ${label}  (err ${err >= 0 ? '+' : ''}${err.toFixed(4)}%)`);
-  check(`${a}/${b} Law 4 constraint < 1% err`, Math.abs(err) < 1, `${err >= 0 ? '+' : ''}${err.toFixed(3)}%`);
+  console.log(`  ${a}/${b}: ${formStr} = ${obs.toFixed(6)}  vs  ${label}  (Δ ${err >= 0 ? '+' : ''}${err.toFixed(4)}%)`);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -652,12 +664,16 @@ for (const key of planets) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  PREDICTIONS: Outer eccentricities from Law 4 (4 inner → 4 outer)        │');
+console.log('│  REPORT ONLY: Outer eccentricities from Observation 4 cluster targets    │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
+console.log('  Observation 4 was demoted; the values below are reported for reference,');
+console.log('  not used as pass/fail criteria. See top of file for the search history.');
+console.log('');
 
-// New Law 4 statement: each pair has ONE constraint (3 ratios + 1 sum-of-squares).
-// The four constraints together predict the four outer-planet base eccentricities
-// from the four inner-planet base eccentricities. R = e_base / i_mean,rad.
+// Original Law 4 prediction logic kept for reference. Each "pair" target predicts
+// the outer-planet base eccentricity from the inner-planet base eccentricity, but
+// these targets are now known to be at noise level — see the Observation 4 note
+// near the top of this file.
 const nValuesMean = {};
 for (const key of planets) {
   const iRad = means[key] * DEG2RAD;
@@ -702,9 +718,8 @@ for (const key of planetOrder) {
   );
 }
 const rmsErr = Math.sqrt(outerErrSqSum / 4);
-console.log(`\nRMS error (4 outer planets): ${rmsErr.toFixed(3)}%`);
+console.log(`\nRMS error (4 outer planets): ${rmsErr.toFixed(3)}%   (report only — not pass/fail)`);
 console.log(`Max  error (4 outer planets): ${maxOuterErr.toFixed(3)}%`);
-check(`Law 4 outer prediction RMS < 0.3%`, rmsErr < 0.3, `${rmsErr.toFixed(3)}%`);
 
 // Cross-check: Law 4 vs Law 5 Saturn prediction
 // Law 4 = direct pair constraint (from table above)
@@ -755,12 +770,12 @@ console.log(`║  Checks failed: ${String(failCount).padStart(3)} / ${String(pas
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
 console.log(`║  Law 2 — Inclination amplitude: d×amp×√m = ψ for all 8 planets`.padEnd(76) + '║');
 console.log(`║  Law 3 — Inclination balance:   ${inclBalance.toFixed(4)}%`.padEnd(76) + '║');
+console.log(`║  Law 4 — Eccentricity constant: OPEN PLACEHOLDER (see docs/10-fibonacci-laws.md)`.padEnd(76) + '║');
 console.log(`║  Law 5 — Eccentricity balance:  ${eccBalance.toFixed(4)}%`.padEnd(76) + '║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log(`║  Saturn Law 4 (pair): ${satLaw4.toFixed(8)} (err: ${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
+console.log(`║  Saturn Obs 4 (pair): ${satLaw4.toFixed(8)} (Δ from J2000: ${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%, REPORT)`.padEnd(76) + '║');
 console.log(`║  Saturn Law 5 (bal):  ${satLaw5.toFixed(8)} (err: ${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
-console.log(`║  Convergence:         ${satConvergence.toFixed(2)}%`.padEnd(76) + '║');
-console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(3)}% (4 outer planets, Law 4 pair constraints)`.padEnd(76) + '║');
+console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(3)}% (4 outer planets, Obs 4 pair targets, REPORT only)`.padEnd(76) + '║');
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');
 
 if (failCount > 0) {

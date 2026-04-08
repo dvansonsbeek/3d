@@ -34,19 +34,8 @@ const earthConfig = {
   omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane  // for ecliptic plane normal
 };
 
-// Calculate Earth's initial phase from J2000 constraint
-const earthCosPhase0 = (earthConfig.inclJ2000 - earthConfig.mean) / earthConfig.amplitude;
-const earthPhase0 = Math.acos(earthCosPhase0);
-
-function getEarthInclination(year) {
-  const phase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthConfig.period;
-  return earthConfig.mean + earthConfig.amplitude * Math.cos(phase);
-}
-
-const earthAscNodePeriod = -holisticyearLength / 5;  // Earth Ω regresses at -H/5
-function getEarthOmega(year) {
-  return earthConfig.omegaJ2000 + (360 / earthAscNodePeriod) * (year - 2000);
-}
+// Earth-frame helpers removed: this script compares to JPL trends, which use
+// the J2000-fixed ecliptic frame. See calculateEclipticInclination() below.
 
 // ═══════════════════════════════════════════════════════════════════════════
 // JPL ECLIPTIC INCLINATION TREND RATES (degrees/century)
@@ -141,11 +130,15 @@ function getPlanetOmega(planet, year) {
   return planet.omegaJ2000 + (360 / planet.ascNodePeriod) * (year - 2000);
 }
 
+// Earth FROZEN at J2000 — JPL's "mean ecliptic and equinox of J2000" frame.
+// (See docs/32-inclination-calculations.md "Two Frames" section.)
+const _EARTH_I_J2000 = earthConfig.inclJ2000;
+const _EARTH_OM_J2000 = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 function calculateEclipticInclination(planet, year) {
   const planetI = getPlanetInclination(planet, year) * DEG2RAD;
   const planetOmega = getPlanetOmega(planet, year) * DEG2RAD;
-  const earthI = getEarthInclination(year) * DEG2RAD;
-  const earthOmega = getEarthOmega(year) * DEG2RAD;
+  const earthI = _EARTH_I_J2000 * DEG2RAD;
+  const earthOmega = _EARTH_OM_J2000 * DEG2RAD;
 
   // Calculate orbital plane normals
   const pnx = Math.sin(planetI) * Math.sin(planetOmega);

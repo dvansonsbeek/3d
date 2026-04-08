@@ -62,14 +62,16 @@ K is derived in Section 4 below.
 
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|
-| Mercury | 21 |  99.52       | Prograde   | Uranus      |
-| Venus   | 34 |  79.82       | Prograde   | Neptune     |
+| Mercury | 21 | 234.52       | Prograde   | Uranus      |
+| Venus   | 34 | 259.82       | Prograde   | Neptune     |
 | Earth   |  3 |  21.77       | Prograde   | Saturn      |
-| Mars    |  5 |  96.95       | Prograde   | Jupiter     |
+| Mars    |  5 | 231.95       | Prograde   | Jupiter     |
 | Jupiter |  5 | 291.18       | Prograde   | Mars        |
 | Saturn  |  3 | 120.38       | Anti-phase | Earth       |
 | Uranus  | 21 |  21.33       | Prograde   | Mercury     |
-| Neptune | 34 | 354.04       | Prograde   | Venus       |
+| Neptune | 34 | 174.04       | Prograde   | Venus       |
+
+Phase angles re-anchored 2026-04-09 to balanced year n=7. d-values, antiPhase, mirror pairs unchanged.
 
 Mirror symmetry: Me-Ur (21), Ve-Ne (34), Ea-Sa (3), Ma-Ju (5).
 

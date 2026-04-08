@@ -106,14 +106,16 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 
 | Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
-| Mercury | 21 | Prograde (99.52°) | Uranus | I |
-| Venus | 34 | Prograde (79.82°) | Neptune | I |
+| Mercury | 21 | Prograde (234.52°) | Uranus | I |
+| Venus | 34 | Prograde (259.82°) | Neptune | I |
 | Earth | 3 | Prograde (21.77°) | Saturn | — |
-| Mars | 5 | Prograde (96.95°) | Jupiter | II |
+| Mars | 5 | Prograde (231.95°) | Jupiter | II |
 | Jupiter | 5 | Prograde (291.18°) | Mars | III |
 | Saturn | 3 | Anti-phase (120.38°) | Earth | III |
 | Uranus | 21 | Prograde (21.33°) | Mercury | III |
-| Neptune | 34 | Prograde (354.04°) | Venus | III |
+| Neptune | 34 | Prograde (174.04°) | Venus | III |
+
+Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -2,649,854 BC). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [32-inclination-calculations.md § Per-Planet Phase Angles](32-inclination-calculations.md#per-planet-phase-angles).
 
 ## Model Start & Alignment
 
@@ -268,14 +270,14 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.726271 | 0.384267 | 6.34 - 7.11 | 99.52° | 8H/93 ≈ 28,844 yr |
-| Venus | 2.207312 | 0.061809 | 2.15 - 2.27 | 79.82° | 2H/25 ≈ 26,825 yr |
-| Earth | 1.48128 | 0.63603 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
-| Mars | 2.648955 | 1.157559 | 1.49 - 3.81 | 96.95° | 8H/69 ≈ 38,877 yr |
-| Jupiter | 0.329094 | 0.021281 | 0.31 - 0.35 | 291.18° | H/8 ≈ 41,915 yr |
-| Saturn | 0.931672 | 0.064819 | 0.87 - 1.00 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
-| Uranus | 1.000594 | 0.023695 | 0.98 - 1.02 | 21.33° | H/16 ≈ 20,957 yr |
-| Neptune | 0.722202 | 0.013474 | 0.71 - 0.74 | 354.04° | 2H/25 ≈ 26,825 yr |
+| Mercury | 6.701170 | 0.384267 | 6.32 - 7.09 | 234.52° | 8H/93 ≈ 28,844 yr |
+| Venus | 2.192804 | 0.061809 | 2.13 - 2.25 | 259.82° | 2H/25 ≈ 26,825 yr |
+| Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
+| Mars | 1.913480 | 1.157559 | 0.76 - 3.07 | 231.95° | 8H/69 ≈ 38,877 yr |
+| Jupiter | 0.319566 | 0.021281 | 0.30 - 0.34 | 291.18° | H/8 ≈ 41,915 yr |
+| Saturn | 0.982568 | 0.064819 | 0.92 - 1.05 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
+| Uranus | 1.015064 | 0.023695 | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
+| Neptune | 0.743755 | 0.013474 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
 | Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)` (Saturn: sign flipped, anti-phase)
@@ -481,20 +483,22 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 ### Ecliptic Inclination Trend Rates
 
+JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). The model error column below is the difference between the model's J2000-fixed-frame trend and JPL's catalog value, after the 2026-04-09 audit re-fit `ascendingNodeCyclesIn8H` and the n=7 phase anchor.
+
 | Planet | Rate (deg/century) | Direction | Model Error |
 |--------|------------------|-----------|-------------|
-| Mercury | -0.00595 | Decreasing | 0.5"/cy |
-| Venus | -0.00079 | Decreasing | 21.2"/cy |
-| Mars | -0.00813 | Decreasing | 13.1"/cy |
-| Jupiter | -0.00184 | Decreasing | 0.0"/cy |
-| Saturn | **+0.00194** | **Increasing** | 0.0"/cy |
-| Uranus | -0.00243 | Decreasing | 1.0"/cy |
-| Neptune | **+0.00035** | **Increasing** | 0.2"/cy |
-| Pluto | -0.00100 | Decreasing | 3.9"/cy |
+| Mercury | -0.00595 | Decreasing | ~0.4"/cy |
+| Venus | -0.00079 | Decreasing | ~1.7"/cy |
+| Mars | -0.00813 | Decreasing | ~0.4"/cy |
+| Jupiter | -0.00184 | Decreasing | ~0.0"/cy |
+| Saturn | **+0.00194** | **Increasing** | ~1.7"/cy |
+| Uranus | -0.00243 | Decreasing | ~0.1"/cy |
+| Neptune | **+0.00035** | **Increasing** | ~0.0"/cy |
+| Pluto | -0.00100 | Decreasing | (not fitted) |
 
 **Source**: [JPL Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html)
 
-**Note**: Saturn shows **increasing** inclination because it is anti-phase (MAX at balanced year). Neptune also shows increasing, which is a known consequence of its balance-driven group assignment (in-phase). Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
+**Note**: All 7 fitted planets now match JPL trend direction in the J2000-fixed frame. Total trend error is ~4.3″/century across the 7 planets. See [32-inclination-calculations.md § Two Frames](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean) for the frame distinction. Model errors verified by [Inclination Verification](../tools/verify/inclination-verification.js).
 
 ### Mean & True Anomaly at J2000
 
@@ -586,21 +590,25 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
-### Inclination Phase Angles & Eigenmode Connection
+### Inclination Phase Angles
 
-Each planet has a per-planet phase angle (ICRF perihelion longitude at the balanced year, ~302,635 BC). These cluster near the Laplace-Lagrange eigenmodes (γ₁-γ₈) within 1-10°:
+Each planet has a per-planet phase angle (ICRF perihelion longitude at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Grand Holistic Octave); Earth is locked to its IAU-derived n=0 reference.
 
-| Planet | Phase Angle | Nearest Eigenmode | Δ |
-|--------|-------------|-------------------|---|
-| Mercury | 99.52° | — | — |
-| Venus | 79.82° | — | — |
-| Earth | 21.77° | γ₁ (20.23°) | +1.5° |
-| Mars | 96.95° | — | — |
-| Jupiter | 291.18° | γ₄ (296.9°) | -5.7° |
-| Saturn | 120.38° | γ₆ (127.3°) | -6.9° |
-| Uranus | 21.33° | γ₁ (20.23°) | +1.1° |
-| Neptune | 354.04° | — | — |
-| Pluto | 203.32° | γ₈ (202.8°) | +0.5° |
+| Planet | Phase Angle | Anchor | Notes |
+|--------|-------------|--------|-------|
+| Mercury | 234.52° | n=7 | |
+| Venus | 259.82° | n=7 | |
+| Earth | 21.77° | n=0 | locked, IAU reference |
+| Mars | 231.95° | n=7 | |
+| Jupiter | 291.18° | n=7* | |
+| Saturn | 120.38° | n=7* | anti-phase |
+| Uranus | 21.33° | n=7* | |
+| Neptune | 174.04° | n=7 | |
+| Pluto | 203.32° | — | not fitted |
+
+\* Jupiter, Saturn, and Uranus have ICRF periods that divide H exactly; their phase at n=7 numerically coincides with their phase at n=0 (and any other anchor).
+
+The eigenmode-cluster claim from earlier model versions (phase angles ≈ Laplace-Lagrange γ₁–γ₈) no longer holds in detail under the n=7 anchor — the alignment was specific to the n=0 phase set. See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups).
 
 The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 

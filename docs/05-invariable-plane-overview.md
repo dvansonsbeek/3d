@@ -154,18 +154,12 @@ The crossing dates shift as Earth's ascending node circulates through 360°. Ear
 
 ## Orbital Plane Precession
 
-All planetary orbital planes **precess around the invariable plane** like spinning tops:
+All planetary orbital planes **precess around the invariable plane** like spinning tops. Each planet's plane has **two distinct angles** evolving at different rates:
 
-| Body | Precession Period | Notes |
-|------|-------------------|-------|
-| Earth | H/3 years | One-third of holistic year |
-| Jupiter-Saturn | ~50,000-60,000 years | Coupled motion |
-| Invariable plane | Essentially fixed | Varies < 0.1 mas over 100 years |
+- **Inclination** `i(t)` — oscillates with the planet's *ICRF perihelion period* (e.g., Earth: H/3, Jupiter: H/8). This is the "nodding" of the orbital plane.
+- **Ascending node** `Ω(t)` — regresses linearly at `−(8H)/N` years for some planet-specific integer N (Earth: N=40, period −H/5 ≈ −67,063 years). This is the "spinning" of the line of nodes.
 
-As orbital planes precess:
-1. The ascending node circulates through 360°
-2. The inclination oscillates (the plane "nods")
-3. These are coupled motions—two aspects of the same precession
+Per-planet integer assignments are listed in [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md). The invariable plane itself varies < 0.1 mas over 100 years and is treated as fixed for all model purposes.
 
 ---
 

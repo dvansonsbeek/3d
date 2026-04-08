@@ -261,6 +261,59 @@ console.log('  ── Anti-phase ──');
     `  ${outer},`);
 }
 
+// ── 4c. Inclination phase angles ─────────────────────────────
+
+console.log('');
+console.log('  ── Inclination phase angles ──');
+
+{
+  const cap = p => p.charAt(0).toUpperCase() + p.slice(1);
+  const phase = p => p === 'earth'
+    ? C.ASTRO_REFERENCE.earthInclinationPhaseAngle
+    : mp.planets[p].inclinationPhaseAngle;
+  const inner = ['mercury', 'venus', 'earth', 'mars'].map(p => `${cap(p)}: ${phase(p)}`).join(', ');
+  const outer = ['jupiter', 'saturn', 'uranus', 'neptune'].map(p => `${cap(p)}: ${phase(p)}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'INCL_PHASE_ANGLE',
+    `  ${inner},`,
+    `  ${outer},`);
+}
+
+// ── 4d. Ascending node periods (asc-node integers re-fit 2026-04-09) ──
+
+console.log('');
+console.log('  ── Ascending node integers ──');
+
+{
+  // The website constants.ts stores ASC_NODE_PERIOD as expressions like
+  // `-_8H / 12`. We replace the whole record block with the new integers,
+  // preserving the Earth special case (-H/5 = -8H/40).
+  const cyc = p => p === 'earth' ? null : mp.planets[p].ascendingNodeCyclesIn8H;
+  // Match the existing layout: 8 lines, planets in declaration order
+  const re = /(export const ASC_NODE_PERIOD: Record<string, number> = \{)([\s\S]*?)(\})/;
+  const match = constantsTs.match(re);
+  if (!match) {
+    console.log('  ⚠ ASC_NODE_PERIOD: not found');
+  } else {
+    const newBody = '\n' +
+      `  Mercury: -_8H / ${cyc('mercury')},\n` +
+      `  Venus:   -_8H / ${cyc('venus')},\n` +
+      `  Earth:   -H / 5,\n` +
+      `  Mars:    -_8H / ${cyc('mars')},\n` +
+      `  Jupiter: -_8H / ${cyc('jupiter')},\n` +
+      `  Saturn:  -_8H / ${cyc('saturn')},\n` +
+      `  Uranus:  -_8H / ${cyc('uranus')},\n` +
+      `  Neptune: -_8H / ${cyc('neptune')},\n`;
+    const newBlock = match[1] + newBody + match[3];
+    if (match[0] === newBlock) {
+      console.log('  ✓ ASC_NODE_PERIOD: unchanged');
+    } else {
+      constantsTs = constantsTs.replace(match[0], newBlock);
+      console.log('  ↻ ASC_NODE_PERIOD: updated');
+      changeCount++;
+    }
+  }
+}
+
 // ── 4. Write constants.ts ─────────────────────────────────────
 
 console.log('');
@@ -398,8 +451,10 @@ if (fs.existsSync(MV_PATH)) {
   for (const p of inclPlanets) {
     const mean = C.planets[p].invPlaneInclinationMean;
     const amp = C.planets[p].invPlaneInclinationAmplitude;
+    const phase = C.planets[p].inclinationPhaseAngle;
     replaceMV(p + 'InclMean', mean.toFixed(6));
     replaceMV(p + 'InclAmp', amp.toFixed(6));
+    replaceMV(p + 'InclPhase', phase.toFixed(2));
   }
 
   // PLANET_INCL numeric object

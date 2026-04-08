@@ -70,26 +70,29 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Phase Angles
 
-Each planet has its own phase angle, derived from the ICRF perihelion longitude at the balanced year (n=0, ~302,635 BC). At the balanced year, all in-phase planets reach minimum inclination and Saturn (anti-phase) reaches maximum:
+Each planet's phase angle is the ICRF perihelion longitude at the balanced-year anchor where the planet is at its inclination extremum. After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Grand Holistic Octave).
 
-| Planet | Phase Angle | Balance Group | ICRF Direction | Incl. Trend at J2000 |
-|--------|-------------|---------------|----------------|---------------------------|
-| Mercury | 99.52° | In-phase | Retrograde | Decreasing |
-| Venus | 79.82° | In-phase | Retrograde | Decreasing |
-| Earth | 21.77° | In-phase | Prograde | Decreasing |
-| Mars | 96.95° | In-phase | Retrograde | Decreasing |
-| Jupiter | 291.18° | In-phase | Retrograde | Decreasing |
-| **Saturn** | **120.38°** | **Anti-phase** | **Retrograde** | **Increasing** |
-| Uranus | 21.33° | In-phase | Retrograde | Decreasing |
-| Neptune | 354.04° | In-phase | Retrograde | Decreasing |
-| Pluto | 203.32° | — | Retrograde | Decreasing |
+| Planet | Phase Angle | Balance Group | Anchor n | Anchor year | ICRF Direction | Incl. Trend at J2000 |
+|--------|-------------|---------------|----------|-------------|----------------|----------------------|
+| Mercury | 234.52° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Venus | 259.82° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Earth | 21.77° | In-phase | n=0 (locked) | -302,635 | Prograde | Decreasing |
+| Mars | 231.95° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Jupiter | 291.18° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
+| **Saturn** | **120.38°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
+| Uranus | 21.33° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
+| Neptune | 174.04° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Pluto | 203.32° | — | — | — | Retrograde | — |
+
+\* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase at n=7 coincides numerically with their phase at n=0. The conceptual anchor is still n=7 — the oldest balanced year of the current 8H octave.
 
 **Key insights**:
-- Phase angles are the ICRF perihelion longitude at the balanced year (when inclination is at extremum)
-- Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w
-- Saturn is **anti-phase**: its inclination is at MAX when all other planets are at MIN
-- Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde
-- Phase angles cluster near Laplace-Lagrange eigenmodes (γ₁-γ₈) within 1-10°
+- All seven fitted planets share the same balanced-year anchor (n=7, ≈ -2,649,854 BC = the **start of the current Grand Holistic Octave**).
+- Earth's phase angle is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
+- Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
+- Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
+- Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde.
+- The phase angles produce a total JPL ecliptic-inclination trend error of ~4.3″/century across all 7 fitted planets in the [J2000-fixed frame](#two-frames--be-careful-which-one-you-mean), with all 7 directions matching JPL.
 
 ### Inclination Constants
 
@@ -118,7 +121,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const icrfPeriod = mercuryPerihelionICRFYears;     // |ICRF period|
   const periLongJ2000 = mercuryLongitudePerihelion;   // ICRF perihelion at J2000
-  const phaseAngle = mercuryInclinationPhaseAngle;    // 99.52°
+  const phaseAngle = mercuryInclinationPhaseAngle;    // 234.52° (n=7 anchor)
 
   // Calculate current ICRF perihelion longitude
   const yearsSinceJ2000 = currentYear - 2000;
@@ -161,9 +164,38 @@ All ICRF perihelion periods divide evenly into 8H = 2,682,536 years (the "Grand 
 
 ## Part 2: Ecliptic Inclination Calculation
 
-### The Problem
+### Two Frames — Be Careful Which One You Mean
 
-The **ecliptic** (Earth's orbital plane) tilts over time as Earth's inclination to the invariable plane changes. This means a planet's inclination measured relative to the ecliptic also changes—even if the planet's orbit relative to the invariable plane were perfectly fixed.
+When we talk about a planet's "ecliptic inclination", there are **two distinct quantities** that look almost identical at J2000 but have very different time derivatives:
+
+1. **Inclination to the J2000 ecliptic** (fixed in inertial space)
+   The angle between the planet's orbital plane at time *t* and Earth's orbital plane *frozen at J2000*. The reference plane never moves.
+   This is the quantity JPL publishes in [Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html), with the header
+   *"Keplerian elements and their rates, with respect to the mean ecliptic and equinox of J2000"*.
+
+2. **Inclination to the ecliptic of date** (instantaneous)
+   The angle between the planet's orbital plane at time *t* and Earth's orbital plane *also at time t*. The reference plane is moving — Earth's orbital plane oscillates at the H/3 ICRF cycle and its node regresses at −H/5.
+
+The two definitions agree exactly **only at the J2000 instant**. A century away from J2000, Earth's plane has drifted by ~0.015°, and a planet's "ecliptic inclination" looks different in the two frames by a comparable amount. For Saturn (JPL `dI/dt` = +0.00194°/cy ≈ 7″/cy) and Neptune (+0.00035°/cy ≈ 1.27″/cy), this Earth-plane drift is **larger than the trend itself** and changes its sign.
+
+**Always compare the model against the J2000-fixed frame when comparing to JPL `dI/dt` values.** All trend-search and verification scripts in `tools/` use the J2000-fixed frame for JPL comparison, even though the visual scene-graph and the dynamic balance simulator use the moving Earth plane internally (since that's what physically rotates with the rest of the system).
+
+### Why the Distinction Matters
+
+A planet's invariable-plane inclination oscillates slowly (period ~30–100 kyr depending on the planet's ICRF rate). Earth's invariable-plane inclination oscillates at H/3 ≈ 112 kyr with amplitude 0.636°. When you compute the angle between two oscillating planes, the time derivatives **partially cancel**:
+
+```
+d/dt angle(planet, Earth-of-date) = d_planet/dt − d_earth/dt + cross-terms
+d/dt angle(planet, Earth-J2000)   = d_planet/dt only (from a fixed reference)
+```
+
+For inner planets, the cancellation is fortuitous — `d_planet/dt` and `d_earth/dt` are similar in magnitude, so the moving-frame derivative looks small (matching JPL coincidentally). For the outer giants the cancellation is destructive — the moving-frame derivative gets the *wrong sign* relative to JPL.
+
+This was the root cause of an extended search across rate-based hypotheses (single-rate, two-rate partition, eigenmode wobble) that all looked broken for Saturn/Neptune. The model was right; the comparison frame was wrong. See `tools/explore/jpl-frame-reconciliation.js` for the diagnostic that surfaced this.
+
+### The Problem (model side)
+
+The **ecliptic** (Earth's orbital plane) tilts over time as Earth's inclination to the invariable plane changes. This means a planet's inclination measured relative to the *moving* ecliptic also changes — even if the planet's orbit relative to the invariable plane were perfectly fixed. The scene-graph computes the moving-frame quantity for visualization. JPL trend comparisons use the fixed-J2000 frame.
 
 ### The Geometry
 
@@ -179,12 +211,20 @@ Where:
 
 ### Time Evolution of Ω
 
-Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**:
+Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**. Each planet's Ω regression period is `−(8H)/N` for an integer N stored as `ascendingNodeCyclesIn8H` in `data/planets.json`. After the 2026-04-09 audit:
 
-| Body | Ω period | Notes |
-|------|----------|-------|
-| Earth | −H/5 ≈ −67,063 yr | Ecliptic precession rate |
-| Other planets | −(8H)/N | N matches Laplace-Lagrange secular eigenfrequencies s₁–s₈; signed integer divisor of 8H ≈ 2,682,536 yr stored as `ascendingNodeCyclesIn8H` |
+| Body | N | Ω period (yr) | Notes |
+|------|---|---------------|-------|
+| Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
+| Mercury | 9 | −298,060 | |
+| Venus | 1 | −2,682,536 (= −8H) | Full Grand Octave |
+| Mars | 62 | −43,267 | |
+| Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
+| Saturn | 36 | −74,515 | Shared with Jupiter |
+| Uranus | 12 | −223,545 | |
+| Neptune | 3 | −894,179 | |
+
+The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame. Jupiter and Saturn share N=36 because the gas-giant pair's invariable-plane balance requires their nodes to regress in lockstep. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) for the full derivation.
 
 ```javascript
 // Earth: Ω regresses at -H/5

@@ -225,13 +225,11 @@ for (const key of PLANET_KEYS) {
     const pPhase = (pPeriICRF - pl.phaseAngle) * DEG2RAD;
     const pI = (mean + antiSign * amp * Math.cos(pPhase)) * DEG2RAD;
     const pO = (pl.omegaJ2000 + pl.ascNodeRate * (year - 2000)) * DEG2RAD;
-    const e = planets[2]; // Earth
-    const eAmp = C.earthInvPlaneInclinationAmplitude;
-    const eMean = C.earthInvPlaneInclinationMean;
-    const ePhase0 = Math.acos((e.inclJ2000 - eMean) / eAmp);
-    const ePhase = ePhase0 + 2 * Math.PI * (year - 2000) / (H / 3);
-    const eI = (eMean + eAmp * Math.cos(ePhase)) * DEG2RAD;
-    const eO = (e.omegaJ2000 + (360 / (-H / 5)) * (year - 2000)) * DEG2RAD;
+    // Earth FROZEN at J2000 — JPL "mean ecliptic and equinox of J2000" frame.
+    // (See docs/32-inclination-calculations.md "Two Frames" section.)
+    const e = planets[2];
+    const eI = e.inclJ2000 * DEG2RAD;
+    const eO = e.omegaJ2000 * DEG2RAD;
     const dot = Math.sin(pI) * Math.sin(eI) * (Math.sin(pO) * Math.sin(eO) + Math.cos(pO) * Math.cos(eO)) + Math.cos(pI) * Math.cos(eI);
     return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
   }

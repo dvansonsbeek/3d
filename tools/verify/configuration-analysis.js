@@ -87,13 +87,10 @@ function fbeCalcApparentIncl(year, planetKey, planetMean, planetAmplitude, plane
   const planetI = (planetMean + sign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
   const planetOmegaRad = (omegaJ2000[planetKey] + (360 / ascNodePeriod[planetKey]) * (year - 2000)) * DEG2RAD;
 
-  const earthICRFPeriod = C.H / 3;
-  const earthAscPeriod = -C.H / 5;
-  const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
-  const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
-  const earthI = (C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
+  // Earth FROZEN at J2000 — JPL "mean ecliptic and equinox of J2000" frame.
+  // (See docs/32-inclination-calculations.md "Two Frames" section.)
+  const earthI = inclJ2000.earth * DEG2RAD;
+  const earthOmega = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane * DEG2RAD;
 
   const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
   const pny = Math.sin(planetI) * Math.cos(planetOmegaRad);

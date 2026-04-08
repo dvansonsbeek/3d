@@ -230,18 +230,15 @@ Based on the geometric relationship between Earth's and each planet's orbital pl
 
 *Expected based on observed astronomical data trends
 
-### The Saturn Anomaly (RESOLVED)
+### The Saturn Trend Resolution
 
-Saturn's ecliptic inclination trend was previously incorrect. This has been **resolved** by implementing dynamic planetary inclination oscillations.
+Saturn's published JPL ecliptic-inclination trend (`+0.00194°/century`, increasing) initially appeared to disagree with the model. The disagreement turned out to have **two independent causes**, both since resolved:
 
-| Metric | Observed | Old Model | New Model |
-|--------|----------|-----------|-----------|
-| Trend (1900-2036) | +0.0025°/century ↑ | -0.0026°/century ↓ | Should now match ✓ |
-| Direction | UP | DOWN | UP (after fix) |
+1. **Frame mismatch**: JPL's `dI/dt` is published against the **J2000-fixed** ecliptic ("mean ecliptic and equinox of J2000"), not the moving ecliptic of date. The model's `fbeCalcApparentIncl()` originally compared the moving-frame trend against the J2000-frame catalog value, which was meaningless. After the [frame correction](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean), Saturn's direction matches JPL.
 
-**Solution**: Each planet's inclination to the invariable plane now oscillates dynamically, similar to Earth's. This is based on Laplace-Lagrange secular theory. See [32-inclination-calculations.md](32-inclination-calculations.md) for full details.
+2. **Asc-node integer assignment**: Saturn (and the other six fitted planets) now use `ascendingNodeCyclesIn8H` integers chosen to match the J2000-frame JPL trends to <2″/century. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) for the full integer assignment.
 
-**Implementation**: Added `computePlanetInvPlaneInclinationDynamic()` function with amplitude values from Table 10.4 of the [Farside physics textbook](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html).
+The total trend error across all 7 fitted planets in the J2000-fixed frame is now ~4.3″/century, all directions match JPL, and Saturn's residual is the second-largest (1.7″) after a small structural Saturn LL-bound excess (~0.025°) that is being tracked separately.
 
 ## Detailed Planet Behavior
 
@@ -267,18 +264,20 @@ Key behavioral notes:
 | Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | H years |
 | Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | H/3 years |
 
-**Planet Inclination Oscillation Periods** (same as nodal precession). For current computed values see [Constants Reference](20-constants-reference.md):
+**Planet Inclination-Oscillation Periods** (the planet's *ICRF perihelion* period, which drives the cosine in `i(t) = mean + amp · cos(ω̃_ICRF(t) − φ)`). The ascending node Ω evolves on a *separate* `−(8H)/N` schedule listed in [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md). For current computed values see [Constants Reference](20-constants-reference.md):
 
-| Planet | Formula | Direction |
-|--------|---------|-----------|
-| Mercury | H / (1 + 3/8) | Prograde |
-| Venus | H × 2 | Prograde |
-| Mars | H / (4 + 1/3) | Prograde |
-| Jupiter | H / 5 | Prograde |
-| Saturn | H / 8 | **Retrograde** |
-| Uranus | H / 3 | Prograde |
-| Neptune | H × 2 | Prograde |
-| Pluto | H | Prograde |
+| Planet | Ecliptic perihelion period | Direction |
+|--------|----------------------------|-----------|
+| Mercury | H × 8/11 | Retrograde (in ICRF) |
+| Venus | H × 2 | Retrograde (in ICRF) |
+| Earth | H / 3 | **Prograde (sole)** |
+| Mars | H × 8/35 | Retrograde (in ICRF) |
+| Jupiter | H / 5 | Retrograde (in ICRF) |
+| Saturn | H / 8 | Retrograde (in ICRF) |
+| Uranus | H / 3 | Retrograde (in ICRF) |
+| Neptune | H × 2 | Retrograde (in ICRF) |
+
+The "direction" column is the sign of the planet's ICRF perihelion advance after subtracting general precession (H/13). Earth is the only fitted planet with a prograde ICRF perihelion. The ICRF periods all divide 8H = 2,682,536 years exactly (the Grand Holistic Octave).
 
 ### The Key Insight
 

@@ -4,7 +4,13 @@
 
 This document presents the analysis of the **dynamic vector balance** — whether the angular momentum perturbations of all 8 planets cancel at every moment in time — and the verification that **Config #1** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34, Saturn-only anti-phase) is the most likely correct Fibonacci d-value configuration.
 
-The analysis was conducted in April 2026 and involved:
+Config #1's *d-values and phase groups* are unchanged. What was refined later (2026-04-09 audit) are two non-d-value parameters:
+- The **asc-node integer assignments** `ascendingNodeCyclesIn8H` (Mercury 9, Venus 1, Mars 62, Jupiter/Saturn 36, Uranus 12, Neptune 3) — re-fit so all 7 fitted planets match JPL ecliptic-inclination trend directions in the J2000-fixed frame, with Jupiter+Saturn locked to share N=36.
+- Four **phase angles** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -2,649,854 BC).
+
+The d-values, the antiPhase grouping, and Saturn's role as the sole anti-phase planet are exactly as analyzed below.
+
+The original April 2026 analysis below was conducted in two passes:
 - Testing 173 million (d-value, group) combinations against 9 constraints
 - Computing the Laplace-Lagrange B-matrix from first principles
 - Fitting a 7-eigenmode model to J2000 observations
@@ -16,7 +22,7 @@ The analysis was conducted in April 2026 and involved:
 1. **All d-values are Fibonacci numbers** — {1, 2, 3, 5, 8, 13, 21, 34, 55}
 2. **LL bounds**: all 8 planets within Laplace-Lagrange secular theory ranges
 3. **Scalar inclination balance** (Law 3): Σ(in-phase) w = Σ(anti-phase) w ≥ 99.9%
-4. **Trend directions**: ecliptic inclination change 1900-2100 matches JPL ≥ 6/8
+4. **Trend directions**: ecliptic inclination change 1900-2100 matches JPL for all 7 fitted planets, computed in the J2000-fixed frame (Earth's plane frozen at J2000, matching JPL's "mean ecliptic and equinox of J2000" convention — see [32-inclination-calculations.md § Two Frames](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean))
 
 **Strong constraints (should satisfy):**
 5. **Scalar eccentricity balance** (Law 5): ≥ 99% (with ≤5% ecc adjustments allowed)
@@ -39,7 +45,7 @@ An exhaustive LL-constrained search tested 127 million (d-value, group) combinat
 - 4/4 mirror symmetry (Me=Ur=21, Ve=Ne=34, Ma=Ju=5, Ea=Sa=3)
 - 7/8 LL bounds pass (Saturn marginal: 1.047° vs 1.02° limit)
 
-No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition.
+No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition. **The d-values, antiPhase grouping, and the Saturn-only anti-phase assignment from this finding are all unchanged in the current model.** The 2026-04-09 audit only refit `ascendingNodeCyclesIn8H` and four phase angles, not the d-values themselves.
 
 ### 1B. Vector balance varies by configuration — NOT guaranteed by d-values alone
 
@@ -52,24 +58,27 @@ Preset #346 achieves better vector balance by using larger d-values for Jupiter 
 
 The full eigenmode computation (B-matrix) confirmed that 100% vector balance is guaranteed in the multi-mode framework — but the single-mode approximation quality depends on the d-values chosen.
 
-### 1C. Eigenfrequencies are Fibonacci-structured (Third Level)
+### 1C. Asc-node integers (third Fibonacci level) — re-fit 2026-04-09
 
-The 7 Laplace-Lagrange eigenfrequencies match our ascending node cycle counts:
+The original April 2026 finding noted that the model's asc-node cycle counts approximately matched Laplace-Lagrange's secular eigenfrequencies s₁–s₈. The 2026-04-09 JPL-frame audit then re-fit `ascendingNodeCyclesIn8H` to bring all 7 fitted-planet trends into JPL agreement, which produced a *different* integer set:
 
-| Eigenmode | Rate (″/yr) | Period | Our 8H/N | Match |
-|-----------|:-----------:|:------:|:--------:|:-----:|
-| s₁ (Mercury) | -5.610 | 231,016 yr | 8H/12 = 223,545 | 96.7% |
-| s₂ (Venus) | -7.060 | 183,569 yr | 8H/15 = 178,836 | 97.4% |
-| s₃ (Earth) | -18.851 | 68,750 yr | 8H/40 = 67,063 | 97.5% |
-| s₄ (Mars) | -17.635 | 73,490 yr | 8H/37 = 72,501 | 98.6% |
-| s₆ (Saturn) | -26.350 | 49,184 yr | 8H/55 = 48,773 | 99.2% |
-| s₇ (Uranus) | -2.993 | 433,010 yr | 8H/6 = 447,089 | 96.9% |
-| s₈ (Neptune) | -0.692 | 1,872,832 yr | 8H/1 = 2,682,536 | 69.8% |
+| Planet | Original 8H/N | Eigenfreq match | **Re-fit 8H/N (2026-04-09)** | JPL trend match |
+|--------|:-------------:|:---------------:|:-------------------------:|:----------------:|
+| Mercury | 8H/12 (s₁) | 96.7% | **8H/9** | tightens trend |
+| Venus | 8H/15 (s₂) | 97.4% | **8H/1** (= 8H, full Grand Octave) | tightens trend |
+| Earth | 8H/40 (s₃) | 97.5% | 8H/40 (unchanged — = −H/5) | locked |
+| Mars | 8H/37 (s₄) | 98.6% | **8H/62** | tightens trend |
+| Jupiter | 8H/55 (s₆) | 99.2% | **8H/36** | tightens trend; J+S lockstep |
+| Saturn | 8H/55 (s₆) | 99.2% | **8H/36** | tightens trend; J+S lockstep |
+| Uranus | 8H/6 (s₇) | 96.9% | **8H/12** | tightens trend |
+| Neptune | 8H/1 (s₈) | 69.8% | **8H/3** | tightens trend |
 
-This reveals three levels of Fibonacci structure:
-- Level 1: d-values are Fibonacci numbers (Law 2)
-- Level 2: ICRF perihelion periods are H/Fibonacci (Law 1)
-- Level 3: Eigenfrequencies ≈ 8H/N where N = ascending node cycles
+The new integers were chosen by `tools/explore/anchor-and-ascnode-audit.js` to bring the J2000-fixed-frame JPL trend errors below ~2″/century per planet (total ~4.3″/century across all 7), with Jupiter+Saturn locked to share N=36 to preserve the gas-giant vector pair lockstep.
+
+The "third Fibonacci level" framing therefore needs reformulation:
+- **Level 1**: d-values are Fibonacci numbers (Law 2) — *unchanged*
+- **Level 2**: ICRF perihelion periods are H/Fibonacci (Law 1) — *unchanged*
+- **Level 3**: Asc-node periods are 8H/N for an integer set selected to fit JPL trends — *the integers no longer match s₁–s₈, but they remain small integers and several factor as products of small Fibonacci numbers* (Mercury 9 = 3², J/S 36 = 4×9, Uranus 12 = 4×3, Neptune 3 = F₄). Whether the new integers themselves form a Fibonacci-style structure is an open question for further work.
 
 ### 1D. JPL inclination rates cannot determine d-values
 
@@ -101,22 +110,26 @@ Three models were tested for the I-Ω coupling:
 
 Result: all three models give **identical trend directions** (3/8 with default rates, 6/8 with locked rates). The I-Ω coupling is too weak over 200 years to change the ecliptic trend sign.
 
-### 1H. Trend direction depends on ascending node RATE MODE, not coupling
+### 1H. Trend direction was a frame-bug artifact (superseded)
 
-| Node rate mode | Direction matches |
+> **Update 2026-04-09**: The "trend direction depends on node rate mode" finding turned out to be an artifact of comparing the model's *moving-Earth* trend against JPL's *J2000-fixed* catalog values — two different observables. After the [frame correction](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean), the 3/8 vs 6/8 vs 8/8 distinction collapses: in the J2000-fixed frame *all 7 fitted planets match JPL trend direction* once `ascendingNodeCyclesIn8H` is re-fit (see 1C above). The "locked common mode" workaround is no longer needed.
+
+The original 2026-04-05 measurements are preserved here for historical reference:
+
+| Node rate mode | Direction matches (moving-Earth frame, wrong observable) |
 |:-:|:-:|
-| Locked (all at 55 cycles/8H) | **6/8** |
-| Default (per-planet rates) | **3/8** |
+| Locked (all at 55 cycles/8H) | 6/8 |
+| Default (per-planet rates) | 3/8 |
 
-The trend direction match drops from 6/8 to 3/8 when using per-planet ascending node rates. This is because:
+These numbers are not directly comparable to JPL because the model trend was computed in the wrong reference frame. The correct comparison (J2000-fixed Earth) gives 7/7 fitted planets matching JPL after the 2026-04-09 asc-node re-fit.
+
+The historical reasoning below is preserved as context for how the frame issue was originally misdiagnosed:
+
 - The ecliptic conversion depends on the relative node direction between planet and Earth
-- Per-planet node rates create differential rotation that introduces spurious ecliptic trends
-- The **common-mode** regression (all nodes at same rate, = dominant s₆ eigenmode) preserves the correct trend geometry
-- Saturn and Neptune specifically fail because their individual node rates deviate most from the common mode
+- Per-planet node rates create differential rotation that introduces an *apparent* ecliptic trend in the moving frame, which made several planets look broken
+- The "locked common-mode" workaround appeared to fix this in the moving frame because it cancelled the spurious differential, hiding the actual frame error
 
-**Conclusion**: The 6/8 match (locked nodes) is the correct comparison for evaluating d-values. The 3/8 match (default rates) reflects a limitation of the single-rate-per-planet ascending node model, not a flaw in the d-values.
-
-**Physical picture**: Planets DO move at different ascending node rates (observed). But the dominant eigenmode (s₆ ≈ 8H/55) has all nodes precessing approximately together. The per-planet deviations come from other eigenmodes (s₁-s₄, s₇, s₈). The ecliptic trend calculation is sensitive to these deviations because it involves the difference between two nearly-parallel plane normals.
+The lesson: when a model and a published catalog appear to disagree, **first check the reference frame** before tuning rates.
 
 ### 1I. Coupling strength analysis
 
@@ -135,27 +148,34 @@ The ratio Ω_rate / I_rate reveals which planets have significant I-Ω coupling:
 
 For Earth, Jupiter, Mars, and Saturn, the ascending node regresses fast enough relative to the inclination oscillation that the coupling could matter on longer timescales. For Neptune, the coupling is negligible.
 
-### 1J. Config #1 achieves 8/8 trend direction matches
+### 1J. Config #1 trend matches — corrected 2026-04-09
 
-A critical finding: the actual simulation logic (`fbeCalcApparentIncl`) uses the **ICRF perihelion period** for the planet's ascending node Ω in the ecliptic conversion — not the per-planet ascending node rate. This is physically correct: the planet's ascending node on the invariable plane precesses as part of the same orbital plane precession that drives the perihelion.
+> **The original 2026-04-05 conclusion** ("Config #1 achieves 8/8 trend direction matches with Saturn +4.01″ and Neptune +20.59″ in the moving-Earth frame") was based on using the planet's **ICRF perihelion period** for Ω instead of the per-planet asc-node rate. This temporarily masked a deeper issue: the model trend was being computed in the moving-Earth frame and compared against JPL's J2000-fixed catalog values. The numbers happened to align for *most* planets but not Saturn or Neptune at the precision level the model claims to reach.
 
-With this correct logic, Config #1 achieves **8/8 trend direction matches**, including Saturn (+4.01″ vs JPL +6.98″) and Neptune (+20.59″ vs JPL +1.26″).
+**Current state (2026-04-09)**:
+1. `fbeCalcApparentIncl` was updated to compute trends in **both** frames (moving for visualization, J2000-fixed for JPL comparison) and re-express JPL's catalog values into the moving frame for the Balance Explorer display (Fix B). See [Balance Explorer Reference](53-balance-explorer-reference.md).
+2. Each planet's `ascendingNodeCyclesIn8H` was independently re-fit so that the J2000-fixed-frame trend matches JPL to <2″/century.
+3. Phase angles for Mercury, Venus, Mars, and Neptune were re-anchored to balanced year n=7.
+4. Total trend error (J2000-fixed frame) is now **~4.3″/century across all 7 fitted planets**, with all 7 directions matching JPL — a clean result that does not depend on which Ω rate is used for the planet's ascending node.
 
-The earlier 3/8 and 6/8 scores in exploration scripts were artifacts of incorrectly using per-planet `ascendingNodeCyclesIn8H` rates for the ecliptic conversion.
+The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened to mostly cancel; the 2026-04-09 audit fixes both errors directly.
 
 ### Step 1 Final Score for Config #1
 
+(After the 2026-04-09 audit + JPL-frame correction)
+
 | Constraint | Result | Status |
 |:--|:--|:--|
-| Fibonacci d-values | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 | ✓ |
+| Fibonacci d-values | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 (unchanged) | ✓ |
 | LL bounds | 7/8 (Saturn +0.027° — within source precision) | ✓ |
 | Scalar inclination balance | 99.9999% | ✓ |
 | Scalar eccentricity balance | 99.9993% | ✓ |
-| Trend directions | 8/8 | ✓ |
+| Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |
+| Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |
-| Eigenfrequency consistency | 7/7 match 8H/N within 3.3% | ✓ |
-| Vector balance (locked) | 92% min, 7.4 pp variation | ⚠ |
-| Vector balance (ICRF Ω) | needs verification | ? |
+| Asc-node integers (re-fit 2026-04-09) | Me9 Ve1 Ma62 Ju36 Sa36 Ur12 Ne3, J+S lockstep | ✓ |
+| Phase angles (re-anchored to n=7) | All 7 fitted planets at -2,649,854 BC | ✓ |
+| Vector balance (multi-mode) | 100% (B-matrix eigenmode representation) | ✓ |
 
 ## Step 2 FINDINGS (2026-04-05)
 
@@ -182,44 +202,51 @@ This proves that:
 3. **Vector balance is determined by eigenmode physics**, not by d-value choice
 4. The 92% single-mode vector balance measures the dominant eigenmode's share of the dynamics, not a configuration quality
 
-### 2C. The Ω mode tradeoff is resolved
+### 2C. The Ω mode question — resolved by frame correction (2026-04-09)
 
-Four Ω modes were compared:
+The original April 2026 analysis treated "which Ω rate for trend computation" as a free design choice and tabulated four candidate modes. After the JPL frame correction, **the question collapsed**: there is exactly one physically right answer (per-planet `ascendingNodeCyclesIn8H` integers in the J2000-fixed frame), and the 2026-04-09 audit re-fit those integers so the answer matches JPL.
 
-| Ω Mode | Vec Balance | Trend Match | Purpose |
-|:-------|:---:|:---:|:---|
-| ICRF period | 1.9-99% | 8/8 | Ecliptic conversion (correct for trends) |
-| Per-planet rates | 64-99% | 3/8 | Individual eigenfrequencies |
-| Locked (55) | 92-99% | 6/8 | Dominant eigenmode (s₆) |
-| Multi-mode (7 modes) | **100%** | — | Full physics (correct for balance) |
+| Ω Mode | Vector balance (single-mode) | Frame | Status |
+|:-------|:----------------------------:|:-----:|:-------|
+| Per-planet 8H/N (re-fit 2026-04-09) | partial | J2000-fixed | **Current — all 7 fitted planets match JPL, total ~4.3″/cy** |
+| Per-planet original eigenfrequency 8H/N | partial | moving Earth | Historical (frame bug) |
+| Locked common mode (all 8H/55) | 92-99% | moving Earth | Historical workaround |
+| ICRF period for Ω | 1.9-99% | moving Earth | Historical workaround that masked frame bug |
+| Multi-mode (7 eigenmodes) | **100%** | invariable plane | Physically rigorous; used for vector-balance verification, not for trend reporting |
 
-These are not competing choices — they serve different purposes:
-- **Ecliptic trends** use the ICRF perihelion rate for Ω (gives 8/8 match)
-- **Vector balance** uses all 7 eigenmode frequencies (gives 100%)
-- **Single-mode approximation** uses locked common mode (gives 92%, best single-mode)
+**Resolution**: trends are computed with each planet at its own re-fit `ascendingNodeCyclesIn8H` integer, in the J2000-fixed frame, against JPL's catalog values directly. Vector balance over time is verified separately via the multi-mode B-matrix model — that calculation is independent of the trend-fitting machinery and continues to give 100%.
 
-## FINAL CONCLUSION (2026-04-05)
+## FINAL CONCLUSION (2026-04-09 update)
 
-**Config #1 (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34, Saturn-only anti-phase) is confirmed as the most likely correct configuration.**
+**Config #1 (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34, Saturn-only anti-phase) is confirmed as the most likely correct d-value configuration.**
+
+The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase planet are unchanged from the April 2026 analysis. The 2026-04-09 audit added two complementary results:
+
+1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 62, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 phase angles (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -2,649,854 BC).
+
+2. **Law 4 has been demoted to an open placeholder** — see [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-constant-open--placeholder). Three independent searches confirmed the four mirror-pair Fibonacci/Lucas R² ratios were always at the noise level of the dense candidate space; only Law 5's eccentricity balance is a genuinely predictive eccentricity constraint at present.
 
 | Constraint | Result | Status |
 |:--|:--|:--:|
-| Fibonacci d-values | All Fibonacci | ✓ |
+| Fibonacci d-values (unchanged) | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 | ✓ |
 | LL bounds | 7/8 (Saturn within source precision) | ✓ |
-| Scalar inclination balance | 99.9999% | ✓ |
-| Scalar eccentricity balance | 99.9993% | ✓ |
-| Trend directions | 8/8 | ✓ |
+| Scalar inclination balance (Law 3) | 99.9999% | ✓ |
+| Scalar eccentricity balance (Law 5) | 99.9993% | ✓ |
+| Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |
+| Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |
-| Eigenfrequency consistency | 7/7 within 3.3% | ✓ |
-| Vector balance (multi-mode) | 100.0000% | ✓ |
-| Ranked #1 out of 4.3M valid configs | By combined score | ✓ |
+| Asc-node integers (re-fit 2026-04-09, J+S lockstep) | Me9 Ve1 Ma62 Ju36 Sa36 Ur12 Ne3 | ✓ |
+| Phase anchor (n=7, balanced year ≈ -2,649,854) | All 7 fitted planets | ✓ |
+| Vector balance (multi-mode B-matrix) | 100.0000% | ✓ |
+| Eccentricity prediction beyond Law 5 (Law 4) | Open — see Law 4 placeholder | open |
+| Ranked #1 out of 4.3M valid configs (by scalar balance) | Unchanged | ✓ |
 
-The d-values are uniquely determined by the scalar balance conditions (Laws 3 and 5). The vector balance is independently guaranteed by the eigenmode structure of the solar system. These are complementary, not competing constraints.
+The d-values are uniquely determined by the scalar balance conditions (Laws 3 and 5). The vector balance is independently guaranteed by the eigenmode structure of the solar system. The asc-node integers and phase anchors are determined by JPL trend fitting — a third, independent constraint that was added 2026-04-09.
 
-Three levels of Fibonacci structure are confirmed:
-1. **d-values** are Fibonacci numbers (3, 5, 21, 34)
-2. **ICRF perihelion periods** are H/Fibonacci fractions
-3. **Eigenfrequencies** match 8H/N where N = ascending node cycle counts
+Three levels of Fibonacci structure remain in the model, with the Level-3 framing updated:
+1. **d-values** are Fibonacci numbers (3, 5, 21, 34) — *unchanged*
+2. **ICRF perihelion periods** are H/Fibonacci fractions — *unchanged*
+3. **Asc-node periods** are 8H/N for the integer set above — *re-fit 2026-04-09 to match JPL trends*. Whether the new integers themselves form a Fibonacci-style structure (e.g., factor as products of small Fibonacci numbers) is an open question alongside Law 4.
 
 ---
 
@@ -259,12 +286,16 @@ The correct approach was the **exhaustive LL-constrained search** — testing al
 ### Kept in tools/explore/ (active reference)
 | Script | Purpose | Key Finding |
 |--------|---------|-------------|
-| `eigenmode-decomposition.js` | Eigenmode theory and Fibonacci connection | s₁-s₈ match 8H/N; third Fibonacci level |
+| `eigenmode-decomposition.js` | Eigenmode theory and Fibonacci connection | Original "s₁–s₈ ≈ 8H/N" claim — superseded by 2026-04-09 re-fit, see [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) |
 | `laplace-lagrange-eigenmodes.js` | B-matrix from first principles | 100% vector balance with B-matrix eigenvectors |
 | `eigenmode-subsystem-fit.js` | Direct inner/outer subsystem fit (no B-matrix) | 98.7% min with inner/outer split; feeds into proof |
 | `config-exhaustive-search.js` | LL-bounds-constrained exhaustive search | **Config #1 ranks #1 out of 4.3M valid configs** |
-| `single-mode-observational-constraints.js` | All observational constraints per (d,group) | Rates 2-130× slower than single-mode prediction |
-| `ascending-node-inclination-coupling.js` | I-Ω coupling + node rate mode analysis | Coupling doesn't help; node RATE mode determines trends |
+| `single-mode-observational-constraints.js` | All observational constraints per (d,group) | Rates 2-130× slower than single-mode prediction (frame-corrected 2026-04-09) |
+| `ascending-node-inclination-coupling.js` | I-Ω coupling + node rate mode analysis | Coupling doesn't change trend signs over 200 yr (legacy framing — node-rate analysis predates the J2000-fixed-frame correction) |
+| `vector-balance-j2000.js` | J2000 instant residual diagnostic (Phase A) | Static \|V\| ≈ 0.42% — invariable plane is real |
+| `vector-balance-simulator.js` | Time-domain \|V(t)\| under specified phase scenarios | Reusable building block |
+| `jpl-frame-reconciliation.js` | Diagnostic that surfaced the moving-Earth vs J2000-fixed frame bug | The script that triggered the 2026-04-09 audit |
+| `anchor-and-ascnode-audit.js` | Joint sweep of (n, N) for each planet under shared J+S N | The audit that produced the new asc-node integers and n=7 phase anchors (4.3″/cy total) |
 
 ### Kept in tools/verify/ (deliverable)
 | Script | Purpose |

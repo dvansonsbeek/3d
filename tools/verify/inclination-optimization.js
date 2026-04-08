@@ -106,20 +106,10 @@ const earthConfig = {
 earthConfig.mean = earthConfig.inclJ2000 - earthConfig.amplitude *
   Math.cos((earthConfig.periLongJ2000 - earthConfig.phaseAngle) * DEG2RAD);
 
-// Calculate Earth's initial phase from J2000 constraint
-const earthPhase0 = (earthConfig.periLongJ2000 - earthConfig.phaseAngle) * DEG2RAD;
-
-function getEarthInclination(year) {
-  const phase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthConfig.period;
-  return earthConfig.mean + earthConfig.amplitude * Math.cos(phase);
-}
-
-function getEarthOmega(year) {
-  // Ascending node Ω regresses at -H/5 (the ecliptic precession rate),
-  // NOT the H/3 ICRF perihelion period that drives the inclination oscillation.
-  const earthAscPeriod = -holisticyearLength / 5;
-  return earthConfig.omegaJ2000 + (360 / earthAscPeriod) * (year - 2000);
-}
+// Earth FROZEN at J2000 — JPL "mean ecliptic and equinox of J2000" frame.
+// (See docs/32-inclination-calculations.md "Two Frames" section.)
+function getEarthInclination(_year) { return earthConfig.inclJ2000; }
+function getEarthOmega(_year)       { return earthConfig.omegaJ2000; }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // JPL ECLIPTIC INCLINATION TREND RATES (degrees/century)

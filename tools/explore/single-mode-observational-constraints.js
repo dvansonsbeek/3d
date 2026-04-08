@@ -121,10 +121,12 @@ function earthInclAtYear(year) {
 }
 
 function computeEclipticIncl(pl, mean, amp, phaseAngle, antiPhase, year) {
+  // Earth FROZEN at J2000 — JPL "mean ecliptic and equinox of J2000" frame.
+  // (See docs/32-inclination-calculations.md "Two Frames" section.)
   const pI = computeInclAtYear(pl, mean, amp, phaseAngle, antiPhase, year) * DEG2RAD;
-  const eI = earthInclAtYear(year) * DEG2RAD;
   const pOmega = (pl.omegaJ2000 + pl.ascNodeRate * (year - 2000)) * DEG2RAD;
-  const eOmega = (planets[2].omegaJ2000 + planets[2].ascNodeRate * (year - 2000)) * DEG2RAD;
+  const eI = planets[2].inclJ2000 * DEG2RAD;
+  const eOmega = planets[2].omegaJ2000 * DEG2RAD;
   const dot = Math.sin(pI) * Math.sin(eI) * (Math.sin(pOmega) * Math.sin(eOmega) + Math.cos(pOmega) * Math.cos(eOmega)) + Math.cos(pI) * Math.cos(eI);
   return Math.acos(Math.max(-1, Math.min(1, dot))) * RAD2DEG;
 }

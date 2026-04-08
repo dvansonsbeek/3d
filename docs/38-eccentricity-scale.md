@@ -201,38 +201,35 @@ This inner/outer distinction arises because the amplitude formula produces tiny 
 
 ## The Kepler Analogy
 
-| Kepler's 3rd Law (1619) | Eccentricity Balance System |
-|-------------------------|---------------------------|
-| T² = a³ | 9 balance equations (Laws 4 + 5) |
-| One equation, all planets | 9 equations, 8 unknowns |
-| No free parameters per planet | 0 free parameters |
+| Kepler's 3rd Law (1619) | Eccentricity Balance (Law 5) |
+|-------------------------|------------------------------|
+| T² = a³ | One balance equation in 8 unknowns |
+| One equation, all planets | One equation, all planets |
+| No free parameters per planet | Saturn determined; the other 7 are inputs |
 | Physical basis: gravity | Physical basis: secular perturbation balance |
-| Individual T follows from a | Individual e follows from balance |
+| Individual T follows from a | Saturn's e follows from the other seven |
 
-Both laws share the same character: they relate ALL planets through a single principle. Individual values are not predicted by per-planet formulas — the law IS the relationship itself.
+Law 5 relates all eight planets through a single principle. Individual values are not predicted by per-planet formulas — the law IS the relationship itself. Given seven of the eight eccentricities, the eighth is uniquely determined.
 
-The system of equations:
-- **Law 4**: R²_in + R²_out = Fibonacci fraction (4 pairs)
-- **Law 4**: R_in × R_out or R_in/R_out = Fibonacci fraction (4 pairs)
-- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same
+The current system:
+- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same — one equation, predicts Saturn from the other seven to ~0.001%
+- **Law 4**: open placeholder — see [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-constant-open--placeholder). The four mirror-pair Fibonacci R² targets earlier framed as Law 4 were shown by three independent searches in 2026 to be at the noise level of the dense Fibonacci/Lucas combination space, and have been retracted as a derivation. Reformulating Law 4 to predict the remaining seven eccentricities (or finding a single physical constant tying eccentricity to a quantity outside `(m, a, d)` space) is an open research question.
 
-where R = e / i_mean_rad and i_mean is derived from the ψ-constant.
-
-These 9 equations for 8 unknowns fully determine all planetary eccentricities with zero free parameters. Current prediction accuracy is 0.1–6.7%, with the gap arising from the R² sums deviating 0.1–1.5% from their ideal Fibonacci targets.
+Where R = e / i_mean_rad and i_mean is derived from the ψ-constant. The R values still cluster near small Fibonacci ratios as a *descriptive observation*, but not significantly tighter than chance for the candidate space.
 
 ---
 
 ## Open Questions
 
-1. **What determines the Fibonacci fractions?** The R² targets (377/5, 34/3, 1/2, 21/2) and product/ratio targets are the fundamental inputs. What physical mechanism selects these specific Fibonacci numbers?
+1. **What completes Law 4?** Law 5 alone is one equation in eight unknowns; predicting the remaining seven eccentricities requires either three more independent balance equations (none exist in the (m, a, d) parameter space — see [`scripts/fibonacci_law4_balance_search.py`](../scripts/fibonacci_law4_balance_search.py)) or a physical constant tying eccentricity to a quantity outside (m, a, d). Neither has been found.
 
-2. **The R² gap**: The actual R² sums deviate 0.1–1.5% from the Fibonacci targets. Is this because i_mean is epoch-dependent, or because the Fibonacci targets are approximate?
+2. **The R-value clustering**: The R = e/i_mean ratios cluster near small Fibonacci/Lucas combinations descriptively. Is there a physical mechanism behind the clustering that we have not yet uncovered, or is it noise from the dense candidate space (75% of random targets find a Fibonacci/Lucas match within 1%)?
 
-3. **Time evolution**: As eccentricities oscillate (with the amplitude formula), does the balance stay perfect at every moment? Or does it only balance at specific epochs?
+3. **Time evolution**: As eccentricities oscillate (with the amplitude formula), does Law 5's balance stay perfect at every moment? Or does it only balance at specific epochs? See [epoch-independence.js](../tools/verify/epoch-independence.js) for the analysis.
 
 4. **Can K be derived from first principles?** K ≈ ψ²/π (0.77%) and K ≈ ψ^(L₅/F₅) (0.89%) are suggestive but not exact. Is K truly fundamental, or just an empirical fit from Earth? Independent eccentricity amplitude measurements from long-term orbital integrations could test this.
 
-5. **Exoplanet extension**: Can this balance framework predict eccentricities in exoplanet systems? This would be the ultimate test.
+5. **Exoplanet extension**: Can the balance framework (Law 5 alone, until Law 4 is found) predict eccentricities in exoplanet systems? This would be the ultimate test.
 
 ---
 

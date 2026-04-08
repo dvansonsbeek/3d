@@ -63,7 +63,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  BALANCE VERIFICATION                                            │
 │  Incl: Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
 │  Ecc:  Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
-│  LL: 8/8 pass | Dir: 7/7 match                                   │
+│  LL: 7/8 pass (Saturn margin) | Dir: 7/7 fitted planets match    │
 │  ψ = 2205 / (2 × H) = 3.288e-3                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -161,10 +161,11 @@ The eccentricity weights of the in-phase group must equal those of the anti-phas
 | **Mean** | Center of oscillation: `i_J2000 − amplitude × cos(Ω − γ)` |
 | **Range** | `[mean − amplitude, mean + amplitude]` in degrees |
 | **LL** | ✓ if range fits within Laplace-Lagrange bounds, ✗ if not |
-| **Trend (°/cy)** | Calculated ecliptic inclination trend from precession period |
-| **JPL (°/cy)** | Reference trend from JPL ephemerides |
-| **Err** | Difference between calculated and JPL trend (arcseconds) |
-| **Dir** | ✓ if trend direction matches JPL, ✗ if not (Earth shows —) |
+| **Trend (°/cy)** | Model's apparent ecliptic-inclination trend over 1900–2100, measured against Earth's orbital plane *at each year* (the moving plane of date — what an Earth-bound observer would actually measure) |
+| **JPL (°/cy)** | JPL's catalog `dI/dt` re-expressed in the moving-Earth frame. JPL's [Approximate Positions](https://ssd.jpl.nasa.gov/planets/approx_pos.html) reports trends in the *J2000-frozen* ecliptic, so they are not directly comparable to the moving-frame model trend. The displayed value is `JPL_catalog + (trend_moving − trend_J2000_fixed)`. See [32-inclination-calculations.md § Two Frames](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean). |
+| **Frame corr** | The frame correction `trend_moving − trend_J2000_fixed`. Tells you how much of the displayed JPL value comes from Earth's plane motion between 1900 and 2100. |
+| **Err** | `\|Trend − JPL\|` × 3600 — both columns now share the same frame so the subtraction is meaningful (arcseconds/century) |
+| **Dir** | ✓ if `Trend` and `JPL` have the same sign, ✗ if not (Earth shows —) |
 | **d×i×√m** | Structural weight for inclination balance (scientific notation) |
 | **v (ecc)** | Eccentricity weight (scientific notation) |
 
@@ -190,8 +191,8 @@ A configuration is valid when:
 |-------|-----------|
 | **Inclination balance** | ≥99.994% (TNO margin) |
 | **Eccentricity balance** | High percentage (100% for the model configuration) |
-| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (8/8 ✓) |
-| **Trend directions** | All 7 planets match JPL direction (7/7 ✓) |
+| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #1 has Saturn at +0.027° excess — within source precision, see [54 § 2A](54-vector-balance-analysis.md#2a-saturn-ll-bound-excess-is-within-source-precision)) |
+| **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
 
 ### Exploring Configurations
 
@@ -225,22 +226,23 @@ The model's default (and uniquely determined) configuration:
 
 | Planet | Phase | d | Fibonacci | Mirror partner |
 |--------|-------|---|-----------|----------------|
-| Mercury | Prograde (99.52°) | 21 | F₈ | Uranus |
-| Venus | Prograde (79.82°) | 34 | F₉ | Neptune |
+| Mercury | Prograde (234.52°) | 21 | F₈ | Uranus |
+| Venus | Prograde (259.82°) | 34 | F₉ | Neptune |
 | Earth | Prograde (21.77°) | 3 | F₄ | Saturn |
-| Mars | Prograde (96.95°) | 5 | F₅ | Jupiter |
+| Mars | Prograde (231.95°) | 5 | F₅ | Jupiter |
 | Jupiter | Prograde (291.18°) | 5 | F₅ | Mars |
 | Saturn | Anti-phase (120.38°) | 3 | F₄ | Earth |
 | Uranus | Prograde (21.33°) | 21 | F₈ | Mercury |
-| Neptune | Prograde (354.04°) | 34 | F₉ | Venus |
+| Neptune | Prograde (174.04°) | 34 | F₉ | Venus |
 
 Expected results:
 - Inclination balance: **100%**
 - Eccentricity balance: **100%**
-- LL bounds: **8/8 pass**
-- Trend directions: **7/7 match**
+- LL bounds: **7/8 pass** (Saturn: +0.027° excess, within Brouwer & van Woerkom source precision)
+- Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
+- Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is Config #1 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is Config #1 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)). The d-values, antiPhase grouping, and mirror pairs are unchanged from the original April 2026 analysis; the asc-node integers and 4 phase angles were re-fit 2026-04-09 to bring JPL trends into agreement.
 
 ---
 
@@ -476,7 +478,7 @@ The vector balance diagram demonstrates an important subtlety: the multi-mode so
 | Scalar inclination balance (Law 3) = 100% | ✓ Real constraint, selects d-values | None |
 | Scalar eccentricity balance (Law 5) = 100% | ✓ Independent constraint, same d-values | None |
 | Fibonacci d-values with mirror symmetry | ✓ Structural prediction | None |
-| 8H/N ascending node periods match Laskar within 1–3% | ✓ 6/7 modes | N/A (Laskar measures, doesn't predict) |
+| 8H/N ascending node periods (re-fit 2026-04-09 to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-grand-holistic-octave-periods.md#notable-patterns) |
 | J2000 positions and short-term rates | ✓ Match observations | ✓ Match observations |
 
 **What CANNOT be observationally verified:**

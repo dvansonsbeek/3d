@@ -139,9 +139,9 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
 | `Startpos` | 83.653 deg | Starting orbital position |
-| `InvPlaneInclinationMean` | 6.726271 deg | Inclination oscillation center |
+| `InvPlaneInclinationMean` | 6.701170 deg | Inclination oscillation center (Mercury, after 2026-04-09 phase re-anchor) |
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Inclination oscillation range |
-| `InclinationPhaseAngle` | Per-planet | ICRF perihelion at balanced year (e.g. Mercury: 99.52°) |
+| `InclinationPhaseAngle` | Per-planet | ICRF perihelion at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
 
 ### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
 | Planet | Formula | Direction |

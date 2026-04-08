@@ -43,9 +43,9 @@
       "mirrorPair": "uranus",
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 32.83,
-      "inclinationPhaseAngle": 99.52,
+      "inclinationPhaseAngle": 234.52,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 12,
+      "ascendingNodeCyclesIn8H": 9,
       "obliquityCycleFraction": [
         8,
         3
@@ -71,9 +71,9 @@
       "mirrorPair": "neptune",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 54.7,
-      "inclinationPhaseAngle": 79.82,
+      "inclinationPhaseAngle": 259.82,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 15,
+      "ascendingNodeCyclesIn8H": 1,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         3,
@@ -96,9 +96,9 @@
       "mirrorPair": "jupiter",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
-      "inclinationPhaseAngle": 96.95,
+      "inclinationPhaseAngle": 231.95,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 37,
+      "ascendingNodeCyclesIn8H": 62,
       "obliquityCycleFraction": [
         3,
         8
@@ -126,7 +126,7 @@
       "ascendingNodeInvPlane": 312.89,
       "inclinationPhaseAngle": 291.18,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 55,
+      "ascendingNodeCyclesIn8H": 36,
       "obliquityCycleFraction": [
         1,
         2
@@ -154,7 +154,7 @@
       "ascendingNodeInvPlane": 118.81,
       "inclinationPhaseAngle": 120.38,
       "antiPhase": true,
-      "ascendingNodeCyclesIn8H": 55,
+      "ascendingNodeCyclesIn8H": 36,
       "obliquityCycleFraction": [
         1,
         3
@@ -182,7 +182,7 @@
       "ascendingNodeInvPlane": 307.8,
       "inclinationPhaseAngle": 21.33,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 6,
+      "ascendingNodeCyclesIn8H": 12,
       "obliquityCycleFraction": [
         1,
         2
@@ -208,9 +208,9 @@
       "mirrorPair": "venus",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 192.04,
-      "inclinationPhaseAngle": 354.04,
+      "inclinationPhaseAngle": 174.04,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 1,
+      "ascendingNodeCyclesIn8H": 3,
       "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         -68,
