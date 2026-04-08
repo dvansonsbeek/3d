@@ -18829,17 +18829,32 @@ const BALANCE_CONFIG = {
   }
 };
 
-// Ecliptic trend calculation: apparent inclination at a given year
-// Ported from tools/verify/inclination-optimization.js
-function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
+// Ecliptic trend calculation: apparent inclination at a given year.
+// Two angles per planet evolve at different rates and must be tracked separately:
+//   - ICRF perihelion ϖ_ICRF: drives the inclination oscillation cosine,
+//     advances at the ICRF perihelion period.
+//   - Ascending node Ω: defines the orientation of the orbital plane normal,
+//     advances at the asc-node period (asc-node-specific or ecliptic perihelion).
+// Earth's ascending node Ω regresses at -H/5 (ecliptic precession rate);
+// Earth's inclination oscillates at H/3 (the ICRF perihelion period).
+function fbeCalcApparentIncl(
+  year, planetMean, planetAmplitude,
+  planetPeriICRFPeriod, planetPeriICRFJ2000, planetPhaseAngle,
+  planetAscNodeJ2000, planetAscNodePeriod,
+  antiPhaseSign
+) {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
+  if (antiPhaseSign === undefined) antiPhaseSign = 1;
 
-  // Planet at given year
-  const planetOmega = planetOmegaJ2000 + (360 / planetPeriod) * (year - 2000);
-  const planetPhase = (planetOmega - planetPhaseAngle) * DEG2RAD;
-  const planetI = (planetMean + planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-  const planetOmegaRad = planetOmega * DEG2RAD;
+  // Planet inclination — driven by ICRF perihelion advancing at the ICRF rate.
+  // antiPhaseSign = +1 for in-phase planets, -1 for the anti-phase planet (Saturn).
+  const planetPeriICRF = planetPeriICRFJ2000 + (360 / planetPeriICRFPeriod) * (year - 2000);
+  const planetPhase = (planetPeriICRF - planetPhaseAngle) * DEG2RAD;
+  const planetI = (planetMean + antiPhaseSign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
+
+  // Planet ascending node Ω — advances at the asc-node period (NOT the ICRF perihelion rate)
+  const planetAscNode = (planetAscNodeJ2000 + (360 / planetAscNodePeriod) * (year - 2000)) * DEG2RAD;
 
   // Earth at given year
   const earthICRFPeriod = holisticyearLength / 3;   // ICRF perihelion period (for inclination oscillation)
@@ -18851,8 +18866,8 @@ function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, pl
   const earthOmega = (earthAscendingNodeInvPlaneVerified + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
 
   // Normal vectors
-  const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
-  const pny = Math.sin(planetI) * Math.cos(planetOmegaRad);
+  const pnx = Math.sin(planetI) * Math.sin(planetAscNode);
+  const pny = Math.sin(planetI) * Math.cos(planetAscNode);
   const pnz = Math.cos(planetI);
 
   const enx = Math.sin(earthI) * Math.sin(earthOmega);
@@ -18895,8 +18910,21 @@ function computeBalanceResults(state) {
     // Ecliptic trend (skip for Earth — it defines the ecliptic)
     let trend = NaN, trendError = NaN, directionMatch = false;
     if (key !== 'earth') {
-      const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, state[key].period, cfg.omegaJ2000, state[key].phaseAngle);
-      const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, state[key].period, cfg.omegaJ2000, state[key].phaseAngle);
+      // Asc-node period: model uses 8H / ascendingNodeCyclesIn8H (retrograde, negative).
+      const ascNodePeriod = planets[key].ascendingNodeCyclesIn8H
+        ? -(8 * holisticyearLength) / planets[key].ascendingNodeCyclesIn8H
+        : planets[key].perihelionEclipticYears;
+      const fbeAntiPhaseSign = isAntiPhase ? -1 : 1;
+      const i1900 = fbeCalcApparentIncl(
+        1900, mean, amplitude,
+        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
+        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign
+      );
+      const i2100 = fbeCalcApparentIncl(
+        2100, mean, amplitude,
+        state[key].period, cfg.periLongJ2000, state[key].phaseAngle,
+        cfg.omegaJ2000, ascNodePeriod, fbeAntiPhaseSign
+      );
       trend = (i2100 - i1900) / 2;  // degrees/century
       trendError = Math.abs(trend - cfg.trendJPL);
       directionMatch = (cfg.trendJPL >= 0) === (trend >= 0);

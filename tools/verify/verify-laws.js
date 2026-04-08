@@ -23,7 +23,7 @@ const eccBase = { earth: C.eccentricityBase };
 const eccJ2000 = { earth: C.eccJ2000.earth };
 const inclJ2000 = {};
 const periLongJ2000 = {};  // ICRF perihelion longitude at J2000
-const icrfPeriod = {};     // |ICRF perihelion period| per planet
+const icrfPeriod = {};     // SIGNED ICRF perihelion period per planet (negative = retrograde)
 const genPrec = C.H / 13;
 for (const p of planets) {
   if (p === 'earth') {
@@ -37,7 +37,7 @@ for (const p of planets) {
   inclJ2000[p] = C.planets[p].invPlaneInclinationJ2000;
   periLongJ2000[p] = C.planets[p].longitudePerihelion;
   const eclP = C.planets[p].perihelionEclipticYears;
-  icrfPeriod[p] = Math.abs(1 / (1/eclP - 1/genPrec));
+  icrfPeriod[p] = 1 / (1/eclP - 1/genPrec);  // signed
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
@@ -82,22 +82,38 @@ for (const p of planets) {
 // Fibonacci numbers
 const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765];
 
-// Reproduce fbeCalcApparentIncl from script.js
-function fbeCalcApparentIncl(year, planetMean, planetAmplitude, planetPeriod, planetOmegaJ2000, planetPhaseAngle) {
-  const planetOmega = planetOmegaJ2000 + (360 / planetPeriod) * (year - 2000);
-  const planetPhase = (planetOmega - planetPhaseAngle) * DEG2RAD;
-  const planetI = (planetMean + planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-  const planetOmegaRad = planetOmega * DEG2RAD;
+// Reproduce fbeCalcApparentIncl from script.js — fixed version.
+// Two angles per planet evolve at different rates and must be tracked separately:
+//   - ICRF perihelion ϖ_ICRF: drives the inclination cosine, advances at ICRF period
+//   - Ascending node Ω: defines the orbital plane normal, advances at the asc-node period
+// Earth's Ω regresses at -H/5; Earth's inclination oscillates at H/3.
+function fbeCalcApparentIncl(
+  year, planetMean, planetAmplitude,
+  planetPeriICRFPeriod, planetPeriICRFJ2000, planetPhaseAngle,
+  planetAscNodeJ2000, planetAscNodePeriod,
+  antiPhaseSign
+) {
+  if (antiPhaseSign === undefined) antiPhaseSign = 1;
+  // Planet inclination — driven by ICRF perihelion advancing at the ICRF rate.
+  // antiPhaseSign = +1 for in-phase planets, -1 for the anti-phase planet (Saturn).
+  const planetPeriICRF = planetPeriICRFJ2000 + (360 / planetPeriICRFPeriod) * (year - 2000);
+  const planetPhase = (planetPeriICRF - planetPhaseAngle) * DEG2RAD;
+  const planetI = (planetMean + antiPhaseSign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
 
-  const earthPeriod = C.H / 3;
+  // Planet ascending node Ω — advances at the asc-node period, NOT the ICRF rate
+  const planetAscNode = (planetAscNodeJ2000 + (360 / planetAscNodePeriod) * (year - 2000)) * DEG2RAD;
+
+  // Earth at given year
+  const earthICRFPeriod = C.H / 3;          // ICRF period for inclination oscillation
+  const earthAscPeriod = -C.H / 5;          // ascending node regression period
   const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
   const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthPeriod;
+  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
   const earthI = (C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthPeriod) * (year - 2000)) * DEG2RAD;
+  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
 
-  const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
-  const pny = Math.sin(planetI) * Math.cos(planetOmegaRad);
+  const pnx = Math.sin(planetI) * Math.sin(planetAscNode);
+  const pny = Math.sin(planetI) * Math.cos(planetAscNode);
   const pnz = Math.cos(planetI);
   const enx = Math.sin(earthI) * Math.sin(earthOmega);
   const eny = Math.sin(earthI) * Math.cos(earthOmega);
@@ -175,8 +191,19 @@ for (const key of planets) {
 
   let directionMatch = true;
   if (key !== 'earth') {
-    const i1900 = fbeCalcApparentIncl(1900, mean, amplitude, icrfPeriod[key], periLongJ2000[key], config[key].phase);
-    const i2100 = fbeCalcApparentIncl(2100, mean, amplitude, icrfPeriod[key], periLongJ2000[key], config[key].phase);
+    const ascNodeJ2000 = C.planets[key].ascendingNodeInvPlane;
+    const ascNodePeriod = C.planets[key].ascendingNodePeriod || C.planets[key].perihelionEclipticYears;
+    const sign = config[key].antiPhase ? -1 : 1;
+    const i1900 = fbeCalcApparentIncl(
+      1900, mean, amplitude,
+      icrfPeriod[key], periLongJ2000[key], config[key].phase,
+      ascNodeJ2000, ascNodePeriod, sign
+    );
+    const i2100 = fbeCalcApparentIncl(
+      2100, mean, amplitude,
+      icrfPeriod[key], periLongJ2000[key], config[key].phase,
+      ascNodeJ2000, ascNodePeriod, sign
+    );
     const trend = (i2100 - i1900) / 2;
     directionMatch = (trendJPL[key] >= 0) === (trend >= 0);
   }
@@ -209,8 +236,19 @@ for (const key of planets) {
 console.log('');
 for (const key of planets) {
   if (key === 'earth') continue;
-  const i1900 = fbeCalcApparentIncl(1900, means[key], amplitudes[key], icrfPeriod[key], periLongJ2000[key], config[key].phase);
-  const i2100 = fbeCalcApparentIncl(2100, means[key], amplitudes[key], icrfPeriod[key], periLongJ2000[key], config[key].phase);
+  const ascNodeJ2000 = C.planets[key].ascendingNodeInvPlane;
+  const ascNodePeriod = C.planets[key].ascendingNodePeriod || C.planets[key].perihelionEclipticYears;
+  const sign = config[key].antiPhase ? -1 : 1;
+  const i1900 = fbeCalcApparentIncl(
+    1900, means[key], amplitudes[key],
+    icrfPeriod[key], periLongJ2000[key], config[key].phase,
+    ascNodeJ2000, ascNodePeriod, sign
+  );
+  const i2100 = fbeCalcApparentIncl(
+    2100, means[key], amplitudes[key],
+    icrfPeriod[key], periLongJ2000[key], config[key].phase,
+    ascNodeJ2000, ascNodePeriod, sign
+  );
   const trend = (i2100 - i1900) / 2;
   const match = (trendJPL[key] >= 0) === (trend >= 0);
   // Neptune's JPL trend is +0.00035°/century (barely positive), so direction mismatch is marginal
