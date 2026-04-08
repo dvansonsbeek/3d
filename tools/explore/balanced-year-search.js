@@ -45,8 +45,15 @@ const planetData = {
 };
 
 for (const [key, p] of Object.entries(planetData)) {
-  if (key === 'earth') { p.icrfP = H / 3; p.icrfRate = 360 / (H/3); }
-  else { p.icrfRate = (1/p.eclP - 1/genPrec) * 360; p.icrfP = 360 / p.icrfRate; }
+  if (key === 'earth') {
+    p.icrfP = H / 3; p.icrfRate = 360 / (H/3);
+    p.ascNodePeriod = -H / 5;
+  } else {
+    p.icrfRate = (1/p.eclP - 1/genPrec) * 360; p.icrfP = 360 / p.icrfRate;
+    p.ascNodePeriod = C.planets[key].ascendingNodeCyclesIn8H
+      ? -(8 * H) / C.planets[key].ascendingNodeCyclesIn8H
+      : p.eclP;
+  }
   p.amp = PSI / (p.d * Math.sqrt(p.mass));
 }
 
@@ -85,7 +92,7 @@ function evaluateBalancedYear(testBY) {
   }
 
   function getEarthOmega(year) {
-    return C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / (H / 3)) * (year - 2000);
+    return C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / (-H / 5)) * (year - 2000);
   }
 
   for (const [key, p] of Object.entries(planetData)) {
@@ -114,7 +121,7 @@ function evaluateBalancedYear(testBY) {
 
       function calcEclipticIncl(year) {
         const planetI = getPlanetIncl(year) * DEG2RAD;
-        const planetOmega = (p.omega + (360 / p.eclP) * (year - 2000)) * DEG2RAD;
+        const planetOmega = (p.omega + (360 / p.ascNodePeriod) * (year - 2000)) * DEG2RAD;
         const earthI = getEarthIncl(year) * DEG2RAD;
         const earthOmega = getEarthOmega(year) * DEG2RAD;
         const pnx = Math.sin(planetI) * Math.sin(planetOmega);

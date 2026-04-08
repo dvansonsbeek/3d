@@ -148,7 +148,7 @@ Year 50000 (minimum tilt):
 - Maximum height: sin(0.85°) × 1 AU ≈ 0.015 AU ≈ 2.2 million km (min ~0.848°)
 ```
 
-The crossing dates shift over the H/3-year precession cycle as the ascending node circulates through 360°.
+The crossing dates shift as Earth's ascending node circulates through 360°. Earth's Ω regresses at the ecliptic precession rate of −H/5 ≈ 67,063 years (Earth's *inclination* itself oscillates on the H/3 ≈ 111,772-year ICRF perihelion cycle — these are two distinct angles evolving at different rates).
 
 ---
 

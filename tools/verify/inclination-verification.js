@@ -43,8 +43,9 @@ function getEarthInclination(year) {
   return earthConfig.mean + earthConfig.amplitude * Math.cos(phase);
 }
 
+const earthAscNodePeriod = -holisticyearLength / 5;  // Earth Ω regresses at -H/5
 function getEarthOmega(year) {
-  return earthConfig.omegaJ2000 + (360 / earthConfig.period) * (year - 2000);
+  return earthConfig.omegaJ2000 + (360 / earthAscNodePeriod) * (year - 2000);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -79,7 +80,10 @@ const planetNames = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 
 for (const p of planetNames) {
   const pd = C.planets[p];
   const eclP = pd.perihelionEclipticYears;
-  const icrfP = Math.abs(1 / (1/eclP - 1/genPrec));
+  const icrfP = 1 / (1/eclP - 1/genPrec);  // signed
+  const ascNodeP = pd.ascendingNodeCyclesIn8H
+    ? -(8 * holisticyearLength) / pd.ascendingNodeCyclesIn8H
+    : eclP;
   currentCodeValues[p] = {
     mean: pd.invPlaneInclinationMean,
     amplitude: pd.invPlaneInclinationAmplitude,
@@ -87,6 +91,7 @@ for (const p of planetNames) {
     periLongJ2000: pd.longitudePerihelion,
     omegaJ2000: pd.ascendingNodeInvPlane,  // for ecliptic plane normal
     icrfPeriod: icrfP,
+    ascNodePeriod: ascNodeP,
     period: eclP,  // kept for ecliptic ascending node rate
     inclJ2000: pd.invPlaneInclinationJ2000,
     jplTrend: jplTrends[p],
@@ -97,7 +102,8 @@ for (const p of planetNames) {
 currentCodeValues.pluto = {
   mean: 15.716200, amplitude: 0.717024, phaseAngle: 203.32,
   periLongJ2000: 224.06, omegaJ2000: 101.06,
-  icrfPeriod: Math.abs(1 / (1/holisticyearLength - 1/genPrec)),
+  icrfPeriod: 1 / (1/holisticyearLength - 1/genPrec),
+  ascNodePeriod: holisticyearLength,
   period: holisticyearLength, inclJ2000: 15.5639473,
   jplTrend: plutoEclipticInclinationTrendJPL, antiPhase: false
 };
@@ -130,8 +136,9 @@ function getPlanetInclination(planet, year) {
 }
 
 function getPlanetOmega(planet, year) {
-  // Ecliptic ascending node — used for plane normal direction, NOT for inclination oscillation
-  return planet.omegaJ2000 + (360 / planet.period) * (year - 2000);
+  // Ascending node Ω advances at the asc-node period (-8H/N), distinct from
+  // ϖ_ICRF (perihelion) and the ecliptic perihelion period.
+  return planet.omegaJ2000 + (360 / planet.ascNodePeriod) * (year - 2000);
 }
 
 function calculateEclipticInclination(planet, year) {

@@ -59,7 +59,10 @@ const planets = PLANET_KEYS.map(key => {
   const phaseAngle = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationPhaseAngle : p.inclinationPhaseAngle;
   const eccBase = key === 'earth' ? C.eccentricityBase : p.orbitalEccentricityBase;
   const ascCycles = key === 'earth' ? 40 : p.ascendingNodeCyclesIn8H;
-  return { key, mass, sqrtM, sma, ecc, eccBase, L, inclJ2000, omegaJ2000, periLong, eclP, icrfP, icrfRate, phaseAngle, ascCycles };
+  // Asc-node Ω advances at this rate (-8H/N, retrograde for the planets and Earth at -H/5)
+  const ascNodeP = key === 'earth' ? -H / 5 : -(8 * H) / ascCycles;
+  const ascNodeRate = 360 / ascNodeP;
+  return { key, mass, sqrtM, sma, ecc, eccBase, L, inclJ2000, omegaJ2000, periLong, eclP, icrfP, icrfRate, phaseAngle, ascCycles, ascNodeP, ascNodeRate };
 });
 
 console.log('╔══════════════════════════════════════════════════════════════════════════╗');
@@ -213,12 +216,15 @@ for (const key of PLANET_KEYS) {
   const cosJ2000 = Math.cos((pl.periLong - pl.phaseAngle) * DEG2RAD);
   const mean = pl.inclJ2000 - antiSign * amp * cosJ2000;
 
-  // fbeCalcApparentIncl uses ICRF period for planet Ω
+  // Ecliptic inclination from dot product of orbital plane normals.
+  // Planet inclination cosine is driven by ICRF perihelion ϖ_ICRF advancing
+  // at the ICRF rate; planet ascending node Ω advances at the asc-node rate
+  // (-8H/N) — these are different angles evolving at different rates.
   function eclIncl(year) {
-    const pOmega = pl.omegaJ2000 + pl.icrfRate * (year - 2000);
-    const pPhase = (pOmega - pl.phaseAngle) * DEG2RAD;
-    const pI = (mean + amp * Math.cos(pPhase)) * DEG2RAD;
-    const pO = pOmega * DEG2RAD;
+    const pPeriICRF = pl.periLong + pl.icrfRate * (year - 2000);
+    const pPhase = (pPeriICRF - pl.phaseAngle) * DEG2RAD;
+    const pI = (mean + antiSign * amp * Math.cos(pPhase)) * DEG2RAD;
+    const pO = (pl.omegaJ2000 + pl.ascNodeRate * (year - 2000)) * DEG2RAD;
     const e = planets[2]; // Earth
     const eAmp = C.earthInvPlaneInclinationAmplitude;
     const eMean = C.earthInvPlaneInclinationMean;

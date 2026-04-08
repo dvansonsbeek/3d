@@ -177,6 +177,25 @@ Where:
 - `i` = Inclination to invariable plane
 - `Ω` = Ascending node on invariable plane
 
+### Time Evolution of Ω
+
+Both Earth's and each planet's ascending node on the invariable plane evolve linearly over time. They are **distinct angles from the ICRF perihelion** that drives the inclination oscillation, and they evolve at **different rates**:
+
+| Body | Ω period | Notes |
+|------|----------|-------|
+| Earth | −H/5 ≈ −67,063 yr | Ecliptic precession rate |
+| Other planets | −(8H)/N | N matches Laplace-Lagrange secular eigenfrequencies s₁–s₈; signed integer divisor of 8H ≈ 2,682,536 yr stored as `ascendingNodeCyclesIn8H` |
+
+```javascript
+// Earth: Ω regresses at -H/5
+const earthOmega = earthAscJ2000 + (360 / (-H / 5)) * (year - 2000);
+
+// Planet: Ω regresses at -(8H)/N
+const planetOmega = planetAscJ2000 + (360 / (-(8 * H) / N)) * (year - 2000);
+```
+
+The canonical implementations are `computeAscendingNodeInvPlane()` and the inline Earth Ω in `computeEclipticInclination()`, both in [tools/lib/orbital-engine.js](../tools/lib/orbital-engine.js). See [Invariable Plane Calculations](33-invariable-plane-calculations.md#ascending-node-precession) for details.
+
 ### The Algorithm
 
 The angle between two planes equals the angle between their normal vectors:
@@ -213,9 +232,11 @@ function updateDynamicInclinations() {
   const DEG2RAD = Math.PI / 180;
   const RAD2DEG = 180 / Math.PI;
 
-  // Earth's DYNAMIC inclination to invariable plane
+  // Earth's DYNAMIC inclination and ascending node on the invariable plane.
+  // - Inclination oscillates at H/3 (driven by Earth's ICRF perihelion).
+  // - Ω regresses linearly at -H/5 (the ecliptic precession rate) — NOT H/3.
   const earthIncl = o.earthInvPlaneInclinationDynamic;
-  const earthAscNode = o.earthAscendingNodeInvPlane;
+  const earthAscNode = earthAscJ2000 + (360 / (-H / 5)) * (currentYear - 2000);
 
   // Calculate current ecliptic normal
   const earthI = earthIncl * DEG2RAD;
@@ -226,11 +247,16 @@ function updateDynamicInclinations() {
     Math.sin(earthI) * Math.cos(earthOmega)
   );
 
-  // Planet configuration with DYNAMIC inclinations
+  // Planet configuration with DYNAMIC inclinations and asc-node values.
+  // Each planet's Ω regresses linearly at -(8H)/N where N is the planet's
+  // ascendingNodeCyclesIn8H integer (NOT at the perihelionEclipticYears period).
+  const ascNodeOf = (key, j2000) =>
+    j2000 + (360 / (-(8 * H) / planetData[key].ascendingNodeCyclesIn8H)) * (currentYear - 2000);
+
   const planets = [
-    { key: 'mercury', incl: o.mercuryInvPlaneInclinationDynamic, ascNode: o.mercuryAscendingNodeInvPlane },
-    { key: 'venus',   incl: o.venusInvPlaneInclinationDynamic,   ascNode: o.venusAscendingNodeInvPlane },
-    { key: 'mars',    incl: o.marsInvPlaneInclinationDynamic,    ascNode: o.marsAscendingNodeInvPlane },
+    { key: 'mercury', incl: o.mercuryInvPlaneInclinationDynamic, ascNode: ascNodeOf('mercury', mercuryAscJ2000) },
+    { key: 'venus',   incl: o.venusInvPlaneInclinationDynamic,   ascNode: ascNodeOf('venus',   venusAscJ2000)   },
+    { key: 'mars',    incl: o.marsInvPlaneInclinationDynamic,    ascNode: ascNodeOf('mars',    marsAscJ2000)    },
     // ... etc for all planets
   ];
 
@@ -313,7 +339,9 @@ Where:
   R = sqrt(ex² + ey²)
 ```
 
-### Verified Ascending Node Values
+### Verified Ascending Node Values (J2000 starting points)
+
+The values in the table below are the **J2000 starting points** for each planet's ascending node on the invariable plane. They were originally calibrated to reproduce the JPL J2000 ecliptic inclination given Earth's reference Ω of 284.51°. In the current model these starting values are paired with the linear precession rate `−(8H)/N` from the table above (and `−H/5` for Earth) — so Ω(t) = Ω_J2000 + (360 / period) · (t − 2000), and the J2000 ecliptic inclinations remain matched to within ~10⁻⁵°.
 
 Values calibrated with `earthAscendingNodeInvPlaneVerified = 284.51°` (Souami & Souchay 2012):
 

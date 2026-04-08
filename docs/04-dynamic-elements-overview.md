@@ -211,7 +211,7 @@ Based on the relationship between Earth's inclination (~1.58° at J2000, decreas
 | Neptune | 1.768° | ABOVE | ABOVE | **DECREASING** ↓ |
 | Pluto | 17.142° | ABOVE | ABOVE | **DECREASING** ↓ |
 
-**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets will experience Ω direction reversals during the H/3-year cycle when Earth's inclination crosses theirs.
+**Note**: Mars (1.850°), Jupiter (1.305°), and Neptune (1.768°) have **ecliptic inclinations** within Earth's **invariable plane inclination** range (0.85°-2.12°). The ascending node algorithm compares these values, so these planets experience Ω direction reversals whenever Earth's inclination crosses theirs over the H/3 ≈ 111,772-year inclination-oscillation cycle (driven by Earth's ICRF perihelion). Note that Earth's ascending node Ω itself regresses on a separate −H/5 ≈ 67,063-year cycle.
 
 ### Ecliptic Inclination Direction
 

@@ -115,8 +115,10 @@ function getEarthInclination(year) {
 }
 
 function getEarthOmega(year) {
-  // Ascending node for ecliptic trend dot-product (geometric, separate from inclination oscillation)
-  return earthConfig.omegaJ2000 + (360 / earthConfig.period) * (year - 2000);
+  // Ascending node Ω regresses at -H/5 (the ecliptic precession rate),
+  // NOT the H/3 ICRF perihelion period that drives the inclination oscillation.
+  const earthAscPeriod = -holisticyearLength / 5;
+  return earthConfig.omegaJ2000 + (360 / earthAscPeriod) * (year - 2000);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -166,6 +168,10 @@ const planetInputs = {};
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = C.planets[key];
   const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+  // Ascending node Ω period: -8H/N from the model's Fibonacci eigenfrequency assignment.
+  const ascNodePeriod = p.ascendingNodeCyclesIn8H
+    ? -(8 * holisticyearLength) / p.ascendingNodeCyclesIn8H
+    : p.perihelionEclipticYears;
   planetInputs[key] = {
     name: p.name || key.charAt(0).toUpperCase() + key.slice(1),
     periLongJ2000: p.longitudePerihelion,
@@ -173,11 +179,12 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
     inclJ2000: p.invPlaneInclinationJ2000,
     eclPeriod: p.perihelionEclipticYears,
     icrfPeriod: icrfPeriod,
+    ascNodePeriod: ascNodePeriod,
     phaseAngle: p.inclinationPhaseAngle,
     antiPhase: p.antiPhase || false,
   };
 }
-// Earth — special: ICRF period = H/3 directly
+// Earth — special: ICRF period = H/3 directly; Ω regresses at -H/5
 planetInputs.earth = {
   name: 'Earth',
   periLongJ2000: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
@@ -185,6 +192,7 @@ planetInputs.earth = {
   inclJ2000: C.ASTRO_REFERENCE.earthInclinationJ2000_deg,
   eclPeriod: holisticyearLength / 16,
   icrfPeriod: holisticyearLength / 3,
+  ascNodePeriod: -holisticyearLength / 5,
   phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
   antiPhase: false,
 };
@@ -196,6 +204,7 @@ planetInputs.pluto = {
   inclJ2000: 15.5639473,
   eclPeriod: holisticyearLength,
   icrfPeriod: 1 / (1 / holisticyearLength - genPrecRate),
+  ascNodePeriod: holisticyearLength,
   phaseAngle: 203.32,
   antiPhase: false,
 };
@@ -209,7 +218,7 @@ function computePlanet(key) {
   const bounds = laplaceLagrangeBounds[key];
   const targetTrend = jplTrends[key];
 
-  const { periLongJ2000, omegaJ2000, inclJ2000, eclPeriod, icrfPeriod, phaseAngle } = input;
+  const { periLongJ2000, omegaJ2000, inclJ2000, icrfPeriod, phaseAngle } = input;
 
   // Calculate phase at J2000 using perihelion longitude (ICRF reference)
   const cosPhaseJ2000 = Math.cos((periLongJ2000 - phaseAngle) * DEG2RAD);
@@ -253,17 +262,22 @@ function computePlanet(key) {
   const rangeMax = mean + amplitude;
   const fitsLL = rangeMin >= bounds.min - 0.01 && rangeMax <= bounds.max + 0.01;
 
+  const antiPhaseSign = input.antiPhase ? -1 : 1;
+  const ascNodePeriod = input.ascNodePeriod;
+
   // Helper: Calculate planet inclination at a given year (ICRF perihelion-based)
   function getPlanetInclination(year, m, a) {
     const peri = periLongJ2000 + (360 / icrfPeriod) * (year - 2000);
     const phase = (peri - phaseAngle) * DEG2RAD;
-    return m + a * Math.cos(phase);
+    return m + antiPhaseSign * a * Math.cos(phase);
   }
 
-  // Helper: Calculate ecliptic inclination (angle between planet and Earth orbital planes)
+  // Helper: Calculate ecliptic inclination (angle between planet and Earth orbital planes).
+  // Planet Ω advances at the asc-node period (NOT the ICRF perihelion period or
+  // the ecliptic perihelion period — these are different angles evolving at different rates).
   function calcEclipticIncl(year, m, a) {
     const planetI = getPlanetInclination(year, m, a) * DEG2RAD;
-    const planetOmega = (omegaJ2000 + (360 / eclPeriod) * (year - 2000)) * DEG2RAD;
+    const planetOmega = (omegaJ2000 + (360 / ascNodePeriod) * (year - 2000)) * DEG2RAD;
     const earthI = getEarthInclination(year) * DEG2RAD;
     const earthOmega = getEarthOmega(year) * DEG2RAD;
 

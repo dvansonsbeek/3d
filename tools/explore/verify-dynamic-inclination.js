@@ -9,18 +9,33 @@ const ysb = C.yearsFromBalancedToJ2000;
 
 function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const p = C.planets[key];
+  const genPrecRate = 1 / (C.H / 13);
+
+  // Earth's orbital plane: inclination oscillates with H/3 (ICRF perihelion period);
+  // ascending node Ω regresses at -H/5 (the ecliptic precession rate).
   const earthPrecYears = C.ASTRO_REFERENCE.earthInvPlanePrecessionYears;
   const earthPhaseRad = (yearsSinceBalanced / earthPrecYears) * 2 * Math.PI;
   const earthI = (C.earthInvPlaneInclinationMean - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
-  const earthOmegaRate = 360 / earthPrecYears;
+  const earthAscNodePeriod = -C.H / 5;
+  const earthOmegaRate = 360 / earthAscNodePeriod;
   const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane - earthOmegaRate * C.yearsFromBalancedToJ2000 + earthOmegaRate * yearsSinceBalanced) * d2r;
 
-  const planetOmegaRate = 360 / p.perihelionEclipticYears;
-  const planetOmegaDeg = p.ascendingNodeInvPlane - planetOmegaRate * C.yearsFromBalancedToJ2000 + planetOmegaRate * yearsSinceBalanced;
-  const planetOmega = planetOmegaDeg * d2r;
-  const planetPhaseDeg = planetOmegaDeg - p.inclinationPhaseAngle;
+  // Planet inclination: driven by ICRF perihelion ϖ_ICRF advancing at the ICRF rate
+  const eclRate = 1 / p.perihelionEclipticYears;
+  const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
+  const periICRFDeg = p.longitudePerihelion - icrfRate * C.yearsFromBalancedToJ2000 + icrfRate * yearsSinceBalanced;
+  const planetPhaseDeg = periICRFDeg - p.inclinationPhaseAngle;
   const antiSign = p.antiPhase ? -1 : 1;
   const planetI = (p.invPlaneInclinationMean + antiSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
+
+  // Planet ascending node Ω: advances at the asc-node period (-8H/N), NOT the ICRF
+  // perihelion or ecliptic perihelion period — these are different angles.
+  const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
+    ? -(8 * C.H) / p.ascendingNodeCyclesIn8H
+    : p.perihelionEclipticYears;
+  const planetOmegaRate = 360 / planetAscNodePeriod;
+  const planetOmegaDeg = p.ascendingNodeInvPlane - planetOmegaRate * C.yearsFromBalancedToJ2000 + planetOmegaRate * yearsSinceBalanced;
+  const planetOmega = planetOmegaDeg * d2r;
 
   const eNx = Math.sin(earthI) * Math.sin(earthOmega);
   const eNy = Math.sin(earthI) * Math.cos(earthOmega);

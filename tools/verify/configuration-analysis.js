@@ -25,11 +25,12 @@ const planets = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uran
 const orbitDistance = { earth: 1.0 };
 const ecc = { earth: C.eccentricityBase };  // Base eccentricities for balance
 const inclJ2000 = {};
-const periLongJ2000 = {};  // ICRF perihelion longitude
-const omegaJ2000 = {};     // ascending node (for ecliptic plane normal)
-const eclPeriod = {};      // ecliptic perihelion period
-const icrfPeriod = {};     // |ICRF perihelion period|
-const perPlanetPhase = {}; // per-planet phase angles
+const periLongJ2000 = {};   // ICRF perihelion longitude at J2000
+const omegaJ2000 = {};      // ascending node Ω at J2000
+const eclPeriod = {};       // ecliptic perihelion period
+const icrfPeriod = {};      // SIGNED ICRF perihelion period (negative = retrograde)
+const ascNodePeriod = {};   // SIGNED asc-node period (-8H/N)
+const perPlanetPhase = {};  // per-planet phase angles
 const genPrec = C.H / 13;
 for (const p of planets) {
   if (p === 'earth') {
@@ -37,6 +38,7 @@ for (const p of planets) {
     omegaJ2000[p] = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
     icrfPeriod[p] = C.H / 3;
     eclPeriod[p] = C.H / 16;
+    ascNodePeriod[p] = -C.H / 5;            // Earth Ω regresses at -H/5
     perPlanetPhase[p] = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
     continue;
   }
@@ -46,7 +48,10 @@ for (const p of planets) {
   periLongJ2000[p] = C.planets[p].longitudePerihelion;
   omegaJ2000[p] = C.planets[p].ascendingNodeInvPlane;
   eclPeriod[p] = C.planets[p].perihelionEclipticYears;
-  icrfPeriod[p] = Math.abs(1 / (1/eclPeriod[p] - 1/genPrec));
+  icrfPeriod[p] = 1 / (1/eclPeriod[p] - 1/genPrec);   // signed
+  ascNodePeriod[p] = C.planets[p].ascendingNodeCyclesIn8H
+    ? -(8 * C.H) / C.planets[p].ascendingNodeCyclesIn8H
+    : eclPeriod[p];
   perPlanetPhase[p] = C.planets[p].inclinationPhaseAngle;
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
@@ -73,19 +78,22 @@ const trendJPL = {
 };
 
 // ── Reproduce fbeCalcApparentIncl from script.js ──
+// Planet Ω advances at the asc-node period (NOT the ICRF perihelion or ecliptic perihelion period).
+// Earth Ω regresses at -H/5 (the ecliptic precession rate).
 function fbeCalcApparentIncl(year, planetKey, planetMean, planetAmplitude, planetIcrfPeriod, planetPeriLongJ2000, planetPhaseAngle, isAntiPhase) {
   const periLong = planetPeriLongJ2000 + (360 / planetIcrfPeriod) * (year - 2000);
   const planetPhase = (periLong - planetPhaseAngle) * DEG2RAD;
   const sign = isAntiPhase ? -1 : 1;
   const planetI = (planetMean + sign * planetAmplitude * Math.cos(planetPhase)) * DEG2RAD;
-  const planetOmegaRad = (omegaJ2000[planetKey] + (360 / eclPeriod[planetKey]) * (year - 2000)) * DEG2RAD;
+  const planetOmegaRad = (omegaJ2000[planetKey] + (360 / ascNodePeriod[planetKey]) * (year - 2000)) * DEG2RAD;
 
-  const earthPeriod = C.H / 3;
+  const earthICRFPeriod = C.H / 3;
+  const earthAscPeriod = -C.H / 5;
   const earthCosPhase0 = (inclJ2000.earth - C.earthInvPlaneInclinationMean) / C.earthInvPlaneInclinationAmplitude;
   const earthPhase0 = Math.acos(earthCosPhase0);
-  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthPeriod;
+  const earthPhase = earthPhase0 + 2 * Math.PI * (year - 2000) / earthICRFPeriod;
   const earthI = (C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhase)) * DEG2RAD;
-  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthPeriod) * (year - 2000)) * DEG2RAD;
+  const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane + (360 / earthAscPeriod) * (year - 2000)) * DEG2RAD;
 
   const pnx = Math.sin(planetI) * Math.sin(planetOmegaRad);
   const pny = Math.sin(planetI) * Math.cos(planetOmegaRad);

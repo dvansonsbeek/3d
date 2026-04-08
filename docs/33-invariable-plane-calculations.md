@@ -177,48 +177,32 @@ function updatePlanetInvariablePlaneHeights() {
 
 ## Ascending Node Precession
 
-### Two Coordinate Systems
+### Linear Precession on the Invariable Plane
 
-The ascending node can be expressed in two coordinate systems with **different precession rates**:
+Each body's ascending node Ω on the invariable plane precesses linearly at a body-specific rate. These rates are **distinct from** the inclination-oscillation cycle (which is driven by the ICRF perihelion ϖ_ICRF) — Ω and the inclination are independent angles evolving at independent rates.
 
-| Coordinate System | Precession Period | Usage |
-|-------------------|-------------------|-------|
-| **ICRF (inertial)** | H/3 | Physical marker positions in 3D space |
-| **Ecliptic (precessing)** | H/16 | Height calculations |
+| Body | Ω Period | Source |
+|------|----------|--------|
+| **Earth** | −H/5 ≈ −67,063 yr | Ecliptic precession rate |
+| Other planets | −(8H)/N | Integer divisor of the Grand Holistic Octave 8H ≈ 2,682,536 yr, with N matching the Laplace-Lagrange secular eigenfrequencies s₁–s₈ |
 
-### Why This Matters
-
-The height calculation uses `sun.ra` (Earth's position), which is measured in **precessing ecliptic coordinates**. If we use the ICRF ascending node (H/3 period), the height calculation becomes incorrect when moving away from J2000.
+The signed period is negative because Ω regresses (retrograde) for every body. The per-planet `N` integer is stored as `ascendingNodeCyclesIn8H` in `data/planets.json`; constants.js precomputes the corresponding signed period as `ascendingNodePeriod = -(8H)/N`.
 
 ### Implementation
 
-We maintain **two ascending node values** for each planet:
-
 ```javascript
-// ICRF rate for visual markers
-o.<planet>AscendingNodeInvPlane  // H/3 period
+// Earth: regression at -H/5
+const earthAscNodePeriod = -H / 5;
+const earthOmega = earthAscendingNodeInvPlaneJ2000
+                 + (360 / earthAscNodePeriod) * (year - 2000);
 
-// Ecliptic rate for height calculations
-o.<planet>AscendingNodeInvPlaneEcliptic  // H/16 period
+// Planet: regression at -(8H)/N
+const planetAscNodePeriod = -(8 * H) / planet.ascendingNodeCyclesIn8H;
+const planetOmega = planet.ascendingNodeInvPlaneJ2000
+                  + (360 / planetAscNodePeriod) * (year - 2000);
 ```
 
-### Precession Calculation
-
-```javascript
-// ICRF rate: H/3
-const earthPerihelionICRFYears = holisticyearLength / 3;
-
-// Ecliptic rate: H/16
-const ascNodeInvPlaneEclipticYears = holisticyearLength / 16;
-
-// Calculate dynamic ascending node (ecliptic rate for height)
-const precessionRateEcliptic = 360 / ascNodeInvPlaneEclipticYears;
-const yearsSinceJ2000 = currentYear - 2000;
-const ascNodeDynamicEcliptic = ascNodeJ2000 + precessionRateEcliptic * yearsSinceJ2000;
-
-// Use for height calculation
-let angleFromInvAscNode = (eclipticLongitude - ascNodeDynamicEcliptic + 360) % 360;
-```
+The canonical engine implementation is `computeAscendingNodeInvPlane()` in [tools/lib/orbital-engine.js](../tools/lib/orbital-engine.js).
 
 ---
 
@@ -244,7 +228,10 @@ This quantity depends on which reference plane defines the ascending node. For t
 
 ### Why ω_inv is Not Constant
 
-Both the longitude of perihelion and the ascending node on the invariable plane precess at the same underlying ecliptic rate (`<planet>PerihelionEclipticYears`). If both were computed in the same coordinate frame, their difference would be constant. However, the two values displayed in the planet stats panels are computed in **different reference frames**:
+There are two independent reasons ω_inv = ϖ − Ω_inv varies over time:
+
+1. **Different precession rates.** The longitude of perihelion (ϖ_ICRF) precesses at the planet-specific ICRF perihelion rate (`1 / (1/perihelionEclipticYears − 1/(H/13))`), while the ascending node on the invariable plane regresses at `−(8H)/N` (and `−H/5` for Earth). These are distinct physical rates, so ϖ − Ω_inv has a non-zero secular drift.
+2. **Reference-frame mismatch.** The two quantities displayed in the planet stats panels are also computed in different coordinate frames, which adds an oscillating component on top of the secular drift:
 
 | Value | UI Label | Variable | Frame | Method |
 |-------|----------|----------|-------|--------|
@@ -258,7 +245,7 @@ The longitude of perihelion is computed by `apparentRaFromPdA()` (line 28092), w
 
 This Earth-frame transformation introduces oscillations of **±100 arcsec/century** with a period of **~6,500 years** (a harmonic of Earth's precession cycles). The ascending node on the invariable plane, by contrast, is a perfectly stable linear precession in ICRF.
 
-The result: ω_inv oscillates over time despite both underlying quantities sharing the same ICRF precession rate.
+The result: ω_inv has both a secular drift (from rate (1)) and an oscillating component (from frame mismatch (2)).
 
 ### Comparison with Ecliptic Argument of Periapsis
 

@@ -604,8 +604,9 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const earthI = (C.earthInvPlaneInclinationMean
     - C.earthInvPlaneInclinationAmplitude * Math.cos(earthPhaseRad)) * d2r;
 
-  // Earth Ω direction for plane normal (ascending node, separate from oscillation)
-  const earthOmegaRate = 360 / earthPrecYears;
+  // Earth Ω regresses at -H/5 (ecliptic precession rate), NOT at H/3.
+  const earthAscNodePeriod = -C.H / 5;
+  const earthOmegaRate = 360 / earthAscNodePeriod;
   const earthOmega = (C.ASTRO_REFERENCE.earthAscendingNodeInvPlane
     - earthOmegaRate * C.yearsFromBalancedToJ2000
     + earthOmegaRate * yearsSinceBalanced) * d2r;
@@ -624,8 +625,12 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const planetI = (p.invPlaneInclinationMean
     + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
-  // Ω direction for plane normal (ecliptic ascending node rate, geometric)
-  const planetOmegaRate = 360 / p.perihelionEclipticYears;
+  // Planet Ω advances at the asc-node period (-8H/N from the model's eigenfrequency
+  // assignment), NOT at the ecliptic perihelion period — they are different angles.
+  const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
+    ? -(8 * C.H) / p.ascendingNodeCyclesIn8H
+    : p.perihelionEclipticYears;
+  const planetOmegaRate = 360 / planetAscNodePeriod;
   const planetOmegaDeg = p.ascendingNodeInvPlane
     - planetOmegaRate * C.yearsFromBalancedToJ2000
     + planetOmegaRate * yearsSinceBalanced;
