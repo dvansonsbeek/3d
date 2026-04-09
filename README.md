@@ -1,7 +1,7 @@
 # Fibonacci Laws of Planetary Motion — Interactive 3D Solar System Simulation
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-7-green.svg)](https://github.com/dvansonsbeek/3d)
+[![Version](https://img.shields.io/badge/version-8-green.svg)](https://github.com/dvansonsbeek/3d)
 [![Three.js](https://img.shields.io/badge/Three.js-0.183-orange.svg)](https://threejs.org/)
 
 ![Solar System Simulation](https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/readme.png)
@@ -36,15 +36,15 @@ Everything comes together in the **Holistic-Year (H)**: a 335,317-year megacycle
 The model implements six laws connecting planetary orbital parameters through pure Fibonacci numbers:
 
 1. **Fibonacci Cycle Hierarchy** — One master cycle (H) divided by Fibonacci numbers produces all major precession periods
-2. **The Inclination Constant** — Every planet's orbital tilt satisfies a single universal formula using Fibonacci divisors
+2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone
 3. **The Inclination Balance** — Two groups of planets balance to 100%, grounded in conservation of angular momentum
-4. **The Eccentricity Constant** — Each mirror pair's AMD partition ratio (R = e_base / i_mean) equals a small Fibonacci/Lucas constant
+4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt
 5. **The Eccentricity Balance** — The same two planet groups balance independently in eccentricity to 100%
 6. **Saturn-Jupiter-Earth Resonance** — A closed beat-frequency loop connects inner and outer solar system dynamics
 
 The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 7,558,272 candidate configurations, only one satisfies all four physical constraints simultaneously.
 
-See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (47/50 checks pass).
+See the [Fibonacci Laws documentation](docs/10-fibonacci-laws.md) for the full derivation, and [verify-laws.js](tools/verify/verify-laws.js) for comprehensive verification (44/45 checks pass).
 
 ---
 

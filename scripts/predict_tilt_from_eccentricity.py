@@ -211,7 +211,7 @@ print("Section 2: Candidate Relations — K and ψ")
 print("=" * 90)
 
 print(f"""
-  ψ (inclination constant) = {PSI_NUM} / (2 × {H}) = {PSI:.10e}
+  ψ (inclination constant) = d_E × amp_E × √m_E = {PSI:.10e}
   K (eccentricity constant) = {K_STORED:.10e}
 
   Two numerical coincidences found:

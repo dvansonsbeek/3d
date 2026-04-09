@@ -228,7 +228,7 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 | `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
 | `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
 | `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |
-| `fibonacci_law4_verify.py` | Law 4 (eccentricity constant) verification |
+| `predict_tilt_from_eccentricity.py` | K amplitude constant (Law 4) investigation |
 
 > The shared Python library (`constants_scripts.py`, `predictive_formula.py`, `observed_formula.py`, `coefficients/`) lives in [`tools/lib/python/`](../tools/lib/python/README.md).
 

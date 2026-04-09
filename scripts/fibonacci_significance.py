@@ -7,7 +7,7 @@
 # eccentricities and inclinations are statistically significant,
 # or could arise by chance in random planetary systems.
 #
-# FOURTEEN TEST STATISTICS (matching the six Fibonacci Laws + eight Findings):
+# THIRTEEN TEST STATISTICS (matching the six Fibonacci Laws + findings):
 #
 #   Test 1  — Pairwise Fibonacci count (general):
 #       How many planet pairs have ξ-ratios near a Fibonacci ratio?
@@ -45,11 +45,11 @@
 #       How many pairwise precession-period ratios match Fibonacci ratios?
 #       Observed: 12/28 pairs match within 5%.
 #
-#   Test 10 — Law 4 pair constraints:
+#   Test 10 — R² partition (report only):
 #       For the 4 mirror pairs, how many of the pair-specific R-form
 #       constraints (R = e_base/i_mean,rad) match their Fibonacci/Lucas
-#       targets within tol? Forms: R²_Ju/R²_Ma=144/11, R_Sa/R_E=21/4,
-#       R²_Ne/R²_V=55/4, R²_Me+R²_Ur=11. Observed: 4/4 match.
+#       targets within tol? Observed: 4/4 match.
+#       Note: this is a report-only test, not Law 4. Law 4 is the K constant (Test 13).
 #
 #   Test 11 — E–J–S resonance loop (Law 6):
 #       Do Earth, Jupiter, Saturn periods satisfy b_E + b_J = b_S?
@@ -65,7 +65,7 @@
 #       NOTE: circular — amplitudes were derived from K. But the permutation
 #       test is still valid (shuffling breaks the planet-specific prediction).
 #
-#   Test 14 — Eccentricity Balance Scale (Finding 7):
+#   Test 14 — Eccentricity Balance Scale (Finding 6):
 #       Can each planet's eccentricity be predicted from the other 7 using
 #       the balance scale formula?  Observed: ~0% RMS (by construction).
 #       The permutation test measures whether the assignment matters.
@@ -479,7 +479,7 @@ def stat_prec_hierarchy(prec_periods, tol=TOLERANCE):
     return count
 
 
-# Law 4 pair constraints (current statement — three ratios + one sum-of-squares)
+# R² pair constraints (report only) (current statement — three ratios + one sum-of-squares)
 # Each entry: (inner, outer, form, target)
 # form: 'sq_ratio'  → R_outer² / R_inner²
 #       'lin_ratio' → R_outer  / R_inner
@@ -494,7 +494,7 @@ LAW4_PAIRS = [
 
 def stat_r2_partition(eccs, incl_mean, mirror_pairs=None, tol=TOLERANCE):
     """
-    Test 10 — Law 4: pair constraints.
+    Test 10 — R² partition (report only).
 
     For each of the four mirror pairs, compute the pair-specific
     R-form and check whether it lands within tol of its Fibonacci/Lucas
@@ -506,7 +506,7 @@ def stat_r2_partition(eccs, incl_mean, mirror_pairs=None, tol=TOLERANCE):
         Mercury / Uranus :  R²_Me + R²_Ur  =  55/5 = 11 (F₁₀/F₅)
 
     The `mirror_pairs` argument is accepted for backwards compatibility
-    but ignored — Law 4 fixes the constraint form per pair.
+    but ignored — the R² partition fixes the constraint form per pair.
 
     Returns: count of matching pairs out of 4 (higher = better).
     """
@@ -637,7 +637,7 @@ def _best_k_for_amplitudes(eccs_amp, tilts, d_vals, masses, sma, sqrt_m):
 
 def stat_ecc_scale_rms(eccs, d_vals, masses, sma, sqrt_m, group_a, group_b):
     """
-    Test 14 — Finding 7: Eccentricity Balance Scale (per-planet prediction).
+    Test 14 — Finding 6: Eccentricity Balance Scale (per-planet prediction).
 
     For each planet as target, predict its eccentricity from the other 7
     using the balance scale formula:
@@ -1341,10 +1341,9 @@ def main():
     print(f"  Test 7  — Saturn prediction (error):    {observed['saturn_pred']*100:.4f}%  [dual-balanced ecc]")
     print(f"  Test 8  — ψ full 8-planet (spread):     {observed['psi_full']*100:.4f}%")
     print(f"  Test 9  — Prec. hierarchy (pairs):      {observed['prec_hierarchy']}")
-    print(f"  Test 10 — Law 4 pair constraints:        {observed['r2_partition']}/4")
-    print(f"  Test 11 — E–J–S resonance (error):     {observed['ejs_resonance']*100:.4f}%")
-    print(f"  Test 12 — Mirror symmetry (matching):   {observed['mirror_symmetry']}/4")
-    print(f"  Test 13 — K amplitude (max error):      {observed['k_amplitude']*100:.4f}%")
+    print(f"  Test 10 — E–J–S resonance (error):     {observed['ejs_resonance']*100:.4f}%")
+    print(f"  Test 11 — Mirror symmetry (matching):   {observed['mirror_symmetry']}/4")
+    print(f"  Test 12 — K amplitude (max error):      {observed['k_amplitude']*100:.4f}%")
     print(f"  Test 14 — Ecc. Scale RMS (error):       {observed['ecc_scale_rms']*100:.4f}%")
     print(f"  (computed in {dt:.1f}s)")
     print()
@@ -1404,7 +1403,7 @@ def main():
 
     test_labels = ["pairwise", "ladder", "psi", "cross_param",
                     "incl_balance", "ecc_balance", "saturn_pred",
-                    "psi_full", "prec_hierarchy", "r2_partition",
+                    "psi_full", "prec_hierarchy",
                     "ejs_resonance", "mirror_symmetry",
                     "k_amplitude", "ecc_scale_rms"]
     law_labels = {
@@ -1417,11 +1416,10 @@ def main():
         "saturn_pred":     "Finding 4 — Saturn e pred",
         "psi_full":        "Law 2 — ψ full 8-planet",
         "prec_hierarchy":  "Law 1 — Prec. hierarchy",
-        "r2_partition":    "Law 4 — Pair constraints",
         "ejs_resonance":   "Law 6 — E–J–S resonance",
         "mirror_symmetry": "Finding 1 — Mirror symm.",
         "k_amplitude":     "Law 4 — K amplitude",
-        "ecc_scale_rms":   "Finding 7 — Ecc. Scale",
+        "ecc_scale_rms":   "Finding 6 — Ecc. Scale",
     }
 
     # Summary table
@@ -1443,7 +1441,7 @@ def main():
     print()
 
     # Fisher's combined p-value per distribution
-    print("  Fisher's combined p-values (all 14 tests):")
+    print("  Fisher's combined p-values (all 13 tests):")
     for dist, pvals in all_p_values.items():
         p_list = [pvals[t] for t in test_labels]
         # Replace exact zeros with conservative bound

@@ -198,7 +198,7 @@ and therefore the most significant eccentricity oscillations.
     3.059e-3, matching the tilt prediction (3.042e-3) to within 0.6%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
   - Venus: Base eccentricity derived from R = 311 constraint (ψ/ξ_V = 311),
-    giving e_V_base = 0.006757 — within 0.3% of J2000 (0.006777). Venus's
+    giving e_V_base = 0.006796 — within 0.3% of J2000 (0.006777). Venus's
     eccentricity variation is dominated by Laplace-Lagrange secular perturbations,
     not the K-driven tilt mechanism (JPL cosine fit R² = 0.074).
   - Script: `tools/fit/python/planet_eccentricity_jpl.py`
@@ -210,7 +210,7 @@ The following base eccentricities achieve 100% dual balance (Law 3 + Law 5):
 | Planet  | Base Ecc      | J2000 JPL     | Diff from JPL | Note                   |
 |---------|---------------|---------------|---------------|------------------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
-| Venus   | 0.00675727    | 0.00677672    | -0.287%       | R = 311 constraint |
+| Venus   | 0.00679616    | 0.00677672    | -0.287%       | R = 311 constraint |
 | Earth   | 0.01538600    | 0.01671022    | -8.008%       | eccentricityBase       |
 | Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
 | Jupiter | 0.04828624    | 0.04838624    | -0.207%       | Dual-balance optimized |
@@ -340,7 +340,7 @@ For each planet, six parameters fully describe the orbital dynamics:
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
 | Mercury |   0.03     | 0.384267    | 0.20563593    | 8.350e-5      |  6.726271    | 0.384267    |
-| Venus   |   2.6392   | 0.061809    | 0.00675727    | 9.526e-4      |  2.207312    | 0.061809    |
+| Venus   |   2.6392   | 0.061809    | 0.00679616    | 9.526e-4      |  2.207312    | 0.061809    |
 | Earth   |  23.41354  | 0.63603    | 0.01538600    | 1.356e-3      |  1.48128    | 0.63603    |
 | Mars    |  25.19     | 1.157559    | 0.09297543    | 3.042e-3      |  2.648955    | 1.157559    |
 | Jupiter |   3.13     | 0.021281    | 0.04828624    | 1.138e-6      |  0.329094    | 0.021281    |

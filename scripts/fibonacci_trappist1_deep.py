@@ -668,7 +668,7 @@ def main():
     section("11. AMD PARTITION RATIO TEST (mirror pairs)")
 
     print("  Apply the AMD partition ratio framework (R = e/i) to TRAPPIST-1.")
-    print("  Solar-system Law 4 uses pair-specific Fibonacci/Lucas constraints")
+    print("  The solar system's R² partition uses pair-specific Fibonacci/Lucas constraints")
     print("  (3 ratios + 1 sum-of-squares); here we report R² sum, R product,")
     print("  and R ratio for each candidate mirror pair as exploratory data.")
     print()

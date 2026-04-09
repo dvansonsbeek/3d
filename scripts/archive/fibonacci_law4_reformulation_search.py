@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-LAW 4 — REFORMULATION SEARCH (post phase-angle update)
-=======================================================
+LAW 4 SEARCH — REFORMULATION (R² pair variants)
+=================================================
 
-The current Law 4 form (R²-pair Fibonacci ratios with R = e_base / i_mean_rad)
-broke when we updated four planets' phase angles, because i_mean shifted for
-Mercury, Venus, Mars, and Neptune. The archive script
-fibonacci_law4_search.py exhausted the obvious "ξ × ∏ param^exp = const"
-universal-constant searches and concluded the data is irreducible — but it
-did NOT include i_mean in its parameter list (it used i_amplitude instead).
+Note: This search concluded that no R-definition produces pair constraints
+significantly tighter than random. Law 4 is now the K amplitude constant:
+e_amp = K × sin(tilt) × √d / (√m × a^1.5).
+
+This script tested whether the R²-pair Fibonacci ratios (R = e_base / i_mean_rad)
+could be reformulated with alternative R-definitions after phase angles shifted.
 
 This script tries SEVEN angles the archive search did not cover:
 

@@ -293,7 +293,7 @@ def section_3():
     print()
 
     # Compute precise R
-    psi1 = PSI1_THEORY  # = 2205/(2*H)
+    psi1 = PSI1_THEORY  # empirical, from Earth
     xi_V = XI_BASE["Venus"]
     R = psi1 / xi_V
 

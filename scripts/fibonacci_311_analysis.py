@@ -13,7 +13,7 @@ Part 1 — CAN ψ BE DERIVED FROM H?
   (10 sections, originally fibonacci_psi_from_H.py)
 
 Part 2 — FRESH INVESTIGATION: R ≈ 308 (nearest FPR prime = 311) AND THE LAST FREE PARAMETER
-  Deep analysis of R from multiple angles: factor structure of 2205/11025,
+  Deep analysis of R from multiple angles: ψ×2H near-miss with 2205,
   number-theoretic properties of 311 (Pisano period, Zeckendorf representation),
   √m weighting / AMD connection, and the inner eccentricity quartet.
   (10 sections, originally fibonacci_R311_fresh.py)
@@ -1030,12 +1030,12 @@ def _p2_section_1():
     print("=" * 80)
     print()
 
-    psi1 = 2205 / (2 * H)
+    psi1 = PSI1_THEORY
     xi_V = XI_BASE["Venus"]
     xi_E = XI_BASE["Earth"]
     R = psi1 / xi_V
 
-    print(f"  ψ = 2205/(2H) = {psi1:.10e}")
+    print(f"  ψ = {psi1:.10e} (empirical, from Earth)")
     print(f"  ξ_V = e_V × √m_V = {xi_V:.10e}")
     print(f"  R = ψ/ξ_V = {R:.6f}")
     print()
@@ -1050,26 +1050,13 @@ def _p2_section_1():
     print(f"  R = (5/2) × ψ / ξ_E = {R_via_E:.6f}")
     print()
 
-    val_num = 5 * 2205
-    print(f"  R = (5 × 2205) / (4H × e_E × √m_E)")
-    print(f"    = {val_num} / (4 × {H} × {ECC_BASE['Earth']} × {SQRT_M['Earth']:.8e})")
-    print(f"    = {val_num} / {4 * H * xi_E:.6f}")
-    print(f"    = {val_num / (4 * H * xi_E):.6f}")
-    print()
-
-    print(f"  KEY: 11025 = 105² = (5 × 21)² = (F₅ × F₈)²")
-    print(f"  So: R = (F₅ × F₈)² / (4H × ξ_E)")
-    print(f"       = (F₅ × F₈)² / (2F₃ × H × e_E × √m_E)")
+    print(f"  R = (5/2) × ψ / ξ_E")
+    print(f"    = (5/2) × {psi1:.8e} / {xi_E:.8e}")
+    print(f"    = {(5/2) * psi1 / xi_E:.6f}")
     print()
 
     R_times_xiE = R * xi_E
-    formula_val = (5 * 21)**2 / (4 * H)
-    print(f"  R × ξ_E = {R_times_xiE:.8e}")
-    print(f"  (F₅ × F₈)² / (4H) = {formula_val:.8e}")
-    print(f"  Agreement: {(R_times_xiE/formula_val - 1)*100:+.4f}%")
-    print()
-
-    print(f"  Note: R × ξ_E = ψ × (5/2) = (5/2) × 2205/(2H) = 11025/(4H)")
+    print(f"  R × ξ_E = ψ × (5/2) = {R_times_xiE:.8e}")
     print(f"  This is exact by construction (inner ladder).")
     print()
 
@@ -1102,23 +1089,20 @@ def _p2_section_1():
 
 
 def _p2_section_2(R):
-    """Factor analysis of 2205 and 11025."""
+    """Near-miss analysis: ψ×2H ≈ 2205 = F₅ × F₈²."""
     print()
     print("=" * 80)
-    print("  SECTION 2: FACTOR ANALYSIS OF 2205 AND 11025")
+    print("  SECTION 2: NEAR-MISS ANALYSIS — ψ × 2H ≈ 2205")
     print("=" * 80)
     print()
 
-    print("  2205 = 3² × 5 × 7²")
-    print("       = F₅ × F₈² = 5 × 21²")
+    psi_2H = PSI1_THEORY * 2 * H
+    print(f"  ψ × 2H = {psi_2H:.4f}")
+    print(f"  F₅ × F₈² = 5 × 21² = 2205")
+    print(f"  Difference: {((psi_2H / 2205) - 1) * 100:+.3f}%")
     print()
-    print("  11025 = 3² × 5² × 7² = (3 × 5 × 7)² = 105²")
-    print("        = (F₅ × F₈)² = (5 × 21)²")
-    print()
-
-    print("  Structure:")
-    print("    ψ × 2H = F₅ × F₈² = F_{b_J} × F_{b_S}² = 2205")
-    print("    R × ξ_E × 4H = (F₅ × F₈)² = (F_{b_J} × F_{b_S})² = 11025 = 5 × 2205")
+    print("  2205 = 3² × 5 × 7² = F₅ × F₈²")
+    print("  This is a near-miss, not an exact identity. ψ is empirical.")
     print()
 
     print("  R = (F₅/F₃) × ψ / ξ_E = (5/2) × ψ / ξ_E")
@@ -1432,13 +1416,10 @@ def _p2_section_4(R):
     print()
 
     target3 = xi_E * H
+    psi_2H = PSI1_THEORY * 2 * H
     print(f"  ξ_E × H = {target3:.8f}")
-    print(f"  ψ × 2H = 2205")
-    print(f"  Ratio: (ψ × 2H) / (ξ_E × H) = 2205 / {target3:.6f} = {2205/target3:.4f}")
-    print()
-
-    print(f"  2205/(ξ_E × H) = 2ψ/ξ_E = 4R/5 = {4*R/5:.4f}")
-    print(f"  Check: 4 × {R:.4f} / 5 = {4*R/5:.4f}")
+    print(f"  ψ × 2H = {psi_2H:.4f}")
+    print(f"  Ratio: (ψ × 2H) / (ξ_E × H) = 2ψ/ξ_E = 4R/5 = {4*R/5:.4f}")
     print()
 
 
@@ -1471,7 +1452,7 @@ def _p2_section_5():
 
     print()
 
-    psi1 = 2205 / (2 * H)
+    psi1 = PSI1_THEORY
     R_val = psi1 / XI_BASE["Venus"]
 
     print("  Predicted η × ξ = (ψ²/R) × k_ecc/d_incl:")
@@ -1589,7 +1570,7 @@ def _p2_section_7():
 
     The old idx(F) = 2k-4 selection rule and d = b × F decomposition have been
     superseded. The new framework finds pure Fibonacci d-values by exhaustive
-    search (Config #3 of 755 valid configurations).
+    search (Config #1 of 755 valid configurations).
     """
     pass
 
@@ -1755,7 +1736,7 @@ def _p2_section_9():
 
     xi_V = XI_BASE["Venus"]
     sigma_ecc = sum(float(k) * xi_V for k in ladder)
-    psi1 = 2205 / (2 * H)
+    psi1 = PSI1_THEORY
     R_val = psi1 / xi_V
 
     print(f"  Σ_ecc = Σ(k × ξ_V) = {float(ladder_sum)} × ξ_V = {sigma_ecc:.6e}")
@@ -1792,7 +1773,7 @@ def _p2_section_10(R):
     print("  Structural expressions:")
     print("    R = (F₅ × F₈)² / (4H × ξ_E)")
     print("    R = (5/2) × ψ / ξ_E")
-    print("    R = 2205 / (2H × ξ_V)")
+    print("    R = ψ / ξ_V")
     print()
     print("  Number-theoretic facts about 311:")
     print("    • 311 is prime")
@@ -1808,7 +1789,7 @@ def _p2_section_10(R):
     print("  ═══ D-VALUE ASSIGNMENT ═══")
     print()
     print("  The d-values are now pure Fibonacci numbers found by exhaustive search")
-    print("  (Config #3 of 755 valid configurations). Mirror symmetry is exact")
+    print("  (Config #1 of 755 valid configurations). Mirror symmetry is exact")
     print("  for all 4 inner/outer pairs: {Mars↔Jupiter(5), Earth↔Saturn(3),")
     print("  Venus↔Neptune(34), Mercury↔Uranus(21)}.")
     print()

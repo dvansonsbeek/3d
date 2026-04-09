@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-LAW 4 — BALANCE-EQUATION SEARCH
-================================
+LAW 4 SEARCH — BALANCE-EQUATION ENUMERATION
+=============================================
+
+Note: This search concluded that no second balance equation exists in (m, a, d)
+parameter space beyond Law 5. Law 4 is now the K amplitude constant:
+e_amp = K × sin(tilt) × √d / (√m × a^1.5).
 
 Law 5 has the form:
 
@@ -9,10 +13,6 @@ Law 5 has the form:
 
 with c_p = √m_p · a_p^(3/2) / √d_p. This is one equation in eight unknowns
 (the eccentricities); given seven of them, the eighth is determined.
-
-The current Law 4 tries to predict four outer eccentricities from four inner
-ones via fitted Fibonacci ratios — but those ratios are at noise level under
-the dense Fibonacci/Lucas combination space, so Law 4 isn't really a law.
 
 THIS SCRIPT asks the right question:
 

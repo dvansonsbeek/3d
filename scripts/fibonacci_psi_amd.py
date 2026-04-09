@@ -3,8 +3,8 @@
 PSI CONSTANT — AMD ORIGIN INVESTIGATION
 ========================================
 
-Investigates whether ψ = F₅×F₈²/(2H) can be derived from the total Angular
-Momentum Deficit (AMD) budget of the solar system.
+Investigates whether ψ (the empirical inclination amplitude constant) can be
+derived from the total Angular Momentum Deficit (AMD) budget of the solar system.
 
 Key insight: substituting amp = ψ/(d×√m) into the AMD inclination formula
 causes mass to cancel:
@@ -411,7 +411,8 @@ print("SECTION 11: Summary")
 print("=" * 72)
 print()
 print(f"  ψ = {PSI:.10f}° = {psi_rad:.10e} rad")
-print(f"  ψ = F₅ × F₈² / (2H) = 5 × 441 / {2*H} = 2205/{2*H}")
+print(f"  ψ = d_E × amp_E × √m_E (empirical, from Earth)")
+print(f"  Note: ψ ≈ 2205/(2H) = {2205/(2*H):.10f} (0.58% higher than actual)")
 print()
 print(f"  H = {H}")
 print(f"  H factorization: 23 × 61 × 239 = {23 * 61 * 239}")

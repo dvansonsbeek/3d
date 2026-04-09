@@ -10,7 +10,7 @@ The six Fibonacci Laws form a layered architecture:
 
 - **Law 1** (Fibonacci Cycle Hierarchy) — all major precession periods derive from the Holistic Year divided by Fibonacci numbers
 - **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups
-- **Laws 4–5** (Eccentricity Constant + Balance) — all 8 eccentricities are determined by Fibonacci pair constraints on the AMD partition ratio, and satisfy an independent balance condition
+- **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition
 - **Law 6** (Saturn-Jupiter-Earth Resonance) — a closed beat-frequency loop linking three dominant precession periods
 
 For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).

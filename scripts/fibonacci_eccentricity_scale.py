@@ -22,8 +22,8 @@ Key discoveries:
   1. Jupiter's weight W ≈ 1 (mass, Fibonacci, distance cancel)
   2. Saturn's offset is a weighted sum of in-phase group offsets
   3. The Jupiter/Saturn e×a ≈ 1:2 ratio is derived from balance
-  4. All 8 eccentricities are determined by 9 equations (0 free params)
-  5. The e×a×m ratio between groups ≈ 2:1
+  4. The e×a×m ratio between groups ≈ 2:1
+  5. K constant predicts all 8 eccentricity amplitudes (Law 4)
 
 Usage: python3 scripts/fibonacci_eccentricity_scale.py
 """
@@ -342,135 +342,6 @@ print(f"""
 """)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# SECTION 7: BUILDING ALL 8 ECCENTRICITIES — ZERO FREE PARAMETERS
-# ═══════════════════════════════════════════════════════════════════════════
-
-print("=" * 90)
-print("Section 7: Deriving All 8 Eccentricities (0 Free Parameters)")
-print("=" * 90)
-
-print(f"""
-  Inputs: 4 inner-planet eccentricities (Mercury, Venus, Earth, Mars)
-  Outputs: 4 outer-planet eccentricities (Jupiter, Saturn, Uranus, Neptune)
-
-  Law 4 provides one Fibonacci/Lucas constraint per mirror pair, which solves
-  for one outer R-value given its inner partner's R-value. Combined with Law 5
-  (the global eccentricity balance), the system has:
-    - Law 4: 4 pair constraints (one per mirror pair)
-    - Law 5: 1 balance equation
-    - Total: 5 equations, 4 unknowns → overconstrained by 1 (Saturn predicted twice)
-
-  Like Kepler's T² = a³, the eccentricities are DETERMINED by the system.
-""")
-
-# Each entry: (inner, outer, form, target, label)
-LAW4_PAIRS = [
-    ("Mars",    "Jupiter", "sq_ratio", 144 / 11, "R²_Ju/R²_Ma = 144/11 (F₁₂/L₅)"),
-    ("Earth",   "Saturn",  "lin_ratio", 21 / 4,   "R_Sa/R_E = 21/4 (F₈/L₃)"),
-    ("Venus",   "Neptune", "sq_ratio", 55 / 4,   "R²_Ne/R²_V = 55/4 (F₁₀/L₃)"),
-    ("Mercury", "Uranus",  "sq_sum",   55 / 5,   "R²_Me+R²_Ur = 11 (F₁₀/F₅)"),
-]
-
-
-def predict_outer_R(R_inner, form, target):
-    """Predict R_outer from R_inner using the pair-specific Law 4 form."""
-    if form == "sq_ratio":
-        return R_inner * math.sqrt(target)
-    if form == "lin_ratio":
-        return R_inner * target
-    if form == "sq_sum":
-        return math.sqrt(max(0.0, target - R_inner * R_inner))
-    raise ValueError(form)
-
-
-# Step-by-step construction
-e_pred = dict(ECC_BASE)  # Start with reference inner planets; outer get overwritten
-
-print(f"  Step 1: Pair-specific Law 4 constraints\n")
-print(f"  {'Pair':<22} {'Form':<32}")
-print("  " + "─" * 60)
-for inner, outer, form, target, label in LAW4_PAIRS:
-    print(f"  {inner + '/' + outer:<22} {label}")
-
-print(f"\n  Step 2: Solve each pair for the outer R, then convert via e = R × i_mean,rad\n")
-print(f"  {'Planet':>10} {'role':<10} {'R':>12} {'i_mean_rad':>12} "
-      f"{'e_predicted':>12} {'e_actual':>12} {'error':>9}")
-print("  " + "─" * 80)
-
-for inner, outer, form, target, _ in LAW4_PAIRS:
-    R_in = ECC_BASE[inner] / INCL_MEAN_RAD[inner]
-    R_out = predict_outer_R(R_in, form, target)
-    e_pred[outer] = R_out * INCL_MEAN_RAD[outer]
-    err_in = 0.0
-    err_out = (e_pred[outer] - ECC_BASE[outer]) / ECC_BASE[outer] * 100
-    print(f"  {inner:>10} {'reference':<10} {R_in:12.6f} "
-          f"{INCL_MEAN_RAD[inner]:12.6e} "
-          f"{ECC_BASE[inner]:12.8f} {ECC_BASE[inner]:12.8f} {err_in:+8.4f}%")
-    print(f"  {outer:>10} {'predicted':<10} {R_out:12.6f} "
-          f"{INCL_MEAN_RAD[outer]:12.6e} "
-          f"{e_pred[outer]:12.8f} {ECC_BASE[outer]:12.8f} {err_out:+8.4f}%")
-
-# Step 3: Check Law 5 balance
-print(f"\n  Step 3: Verify Law 5 balance with predicted eccentricities\n")
-
-v203_pred = sum(SQRT_M[p] * SMA[p] ** 1.5 * e_pred[p] / math.sqrt(D[p])
-                for p in GROUP_203)
-v23_pred = SQRT_M['Saturn'] * SMA['Saturn'] ** 1.5 * e_pred['Saturn'] / math.sqrt(D['Saturn'])
-bal_pred = (1 - abs(v203_pred - v23_pred) / (v203_pred + v23_pred)) * 100
-
-print(f"  Σ(in-phase) = {v203_pred:.10e}")
-print(f"  Σ(anti-phase)  = {v23_pred:.10e}")
-print(f"  Balance = {bal_pred:.4f}%")
-
-# Also compute Saturn from balance (independent check)
-e_Sat_from_balance = v203_pred * math.sqrt(D['Saturn']) / \
-    (SQRT_M['Saturn'] * SMA['Saturn'] ** 1.5)
-print(f"\n  Saturn from Law 4: e = {e_pred['Saturn']:.8f}")
-print(f"  Saturn from Law 5: e = {e_Sat_from_balance:.8f}")
-print(f"  Gap: {abs(e_pred['Saturn'] - e_Sat_from_balance) / ECC_BASE['Saturn'] * 100:.2f}%")
-print(f"  (This gap measures how well Law 4 and Law 5 are mutually consistent)")
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# SECTION 8: THE KEPLER ANALOGY
-# ═══════════════════════════════════════════════════════════════════════════
-
-print("\n" + "=" * 90)
-print("Section 8: The Kepler Analogy")
-print("=" * 90)
-
-print(f"""
-  ┌──────────────────────────────────────────────────────────────┐
-  │  Kepler's 3rd Law (1619):                                   │
-  │    T² = a³                                                   │
-  │    One equation, relates period to distance for ALL planets  │
-  │    No free parameters per planet                             │
-  │    Physical basis: gravity (Newton, 1687)                    │
-  │                                                              │
-  │  Eccentricity Balance System:                                │
-  │    Pair-specific R-form = Fibonacci/Lucas ratio (×4 pairs)  │
-  │    Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same (×1)│
-  │    Five equations, determines 4 outer eccentricities from   │
-  │      4 inner eccentricities. Saturn predicted by both Law 4 │
-  │      and Law 5 (overconstrained by 1).                      │
-  │    Zero free parameters beyond inner quartet                │
-  │    Physical basis: secular perturbation balance (?)         │
-  └──────────────────────────────────────────────────────────────┘
-
-  Both laws share the same character:
-  - They relate ALL planets through a single principle
-  - Individual values are not predicted by a per-planet formula
-  - The law IS the relationship itself
-
-  The key inputs to the eccentricity system:
-  - Masses m (from gravity, like Kepler)
-  - Distances a (orbital elements)
-  - Fibonacci divisors d (from the ψ-constant framework)
-  - ψ-constant (determines inclination amplitudes → i_mean)
-  - 4 Fibonacci/Lucas ratios (one per mirror pair: 144/11, 21/4, 55/4, 11)
-  - Phase group assignment (in-phase vs anti-phase)
-""")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -536,34 +407,6 @@ for p in PLANET_NAMES:
           f"{AXIAL_TILT[p]:7.2f} {math.sin(tilt_rad):10.6f}")
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# SECTION 11: LAW 4 PAIR-CONSTRAINT ACCURACY
-# ═══════════════════════════════════════════════════════════════════════════
-
-print("\n" + "=" * 90)
-print("Section 11: Law 4 pair constraints vs Fibonacci/Lucas targets")
-print("=" * 90)
-
-print(f"\n  Pair constraint accuracy with current model values:\n")
-print(f"  {'Pair':<22} {'Form':<22} {'observed':>10} {'target':>10} {'error':>10}")
-print("  " + "─" * 78)
-
-for inner, outer, form, target, label in LAW4_PAIRS:
-    R_in = ECC_BASE[inner] / INCL_MEAN_RAD[inner]
-    R_out = ECC_BASE[outer] / INCL_MEAN_RAD[outer]
-    if form == "sq_ratio":
-        obs = (R_out * R_out) / (R_in * R_in)
-    elif form == "lin_ratio":
-        obs = R_out / R_in
-    else:
-        obs = R_in * R_in + R_out * R_out
-    err = (obs / target - 1) * 100
-    print(f"  {inner + '/' + outer:<22} {label:<22} {obs:10.4f} {target:10.4f} {err:+9.4f}%")
-
-print(f"""
-  All four pair constraints land within 0.3% of their Fibonacci/Lucas targets.
-  Mean prediction error for the 4 outer planets: 0.106%, max 0.281% (Saturn).
-""")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -596,19 +439,11 @@ print("""
      → Jupiter contributes almost exactly its own offset to Saturn
      → The Jupiter/Saturn offset ratio ≈ 2 is a CONSEQUENCE
 
-  6. DETERMINING THE OUTER PLANET ECCENTRICITIES:
-     Law 4 provides 4 pair-specific Fibonacci/Lucas constraints
-     Law 5 provides the balance equation
-     = 5 equations for 4 outer-planet unknowns = 0 free parameters
-       beyond the inner quartet (which satisfies the ξ-ladder)
-     Current prediction accuracy: mean 0.11%, max 0.28% at Saturn
+  6. SATURN FROM LAW 5:
+     Law 5 is one equation in eight unknowns — given seven eccentricities,
+     Saturn's is uniquely determined (~0.001% from observed J2000).
 
-  7. THE KEPLER ANALOGY:
-     Kepler: T² = a³ (one relationship, all planets)
-     Eccentricity: 9 balance equations (one system, all planets)
-     Both determine individual values without per-planet formulas.
-
-  8. THE UNIVERSAL CONSTANT:
+  7. THE UNIVERSAL CONSTANT:
      Eccentricity amplitude: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
      K = 3.4149e-6 (0% error, all 8 planets)
      This is the eccentricity analog of the ψ-constant.

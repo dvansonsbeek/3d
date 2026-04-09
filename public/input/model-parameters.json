@@ -18,7 +18,7 @@
     "earthInvPlaneInclinationAmplitude": 0.6360323695291299,
     "eccentricityBase": 0.015385784721959072,
     "eccentricityAmplitude": 0.0013561739066062727,
-    "eccentricityAmplitudeK": 0.0000034149201315866186
+    "eccentricityAmplitudeK": 0.0000034149201282126695
   },
   "moon": {
     "moonStartposApsidal": 347.622,
@@ -57,9 +57,9 @@
     },
     "venus": {
       "name": "Venus",
-      "orbitalEccentricityBase": 0.006757270058130583,
+      "orbitalEccentricityBase": 0.006796164209625298,
       "orbitalEccentricityAmplitude": 0.0009526037225820447,
-      "eccentricityPhaseJ2000": 87.13170566776543,
+      "eccentricityPhaseJ2000": 84.80956236851715,
       "eocFraction": 0.436,
       "startpos": 249.35384756882547,
       "angleCorrection": -2.785608570036125,
@@ -138,7 +138,7 @@
     },
     "saturn": {
       "name": "Saturn",
-      "orbitalEccentricityBase": 0.05373662626292838,
+      "orbitalEccentricityBase": 0.053736637105894776,
       "orbitalEccentricityAmplitude": 0.000005347432417577137,
       "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.54,
@@ -194,7 +194,7 @@
     },
     "neptune": {
       "name": "Neptune",
-      "orbitalEccentricityBase": 0.008609307973025893,
+      "orbitalEccentricityBase": 0.008609291619407548,
       "orbitalEccentricityAmplitude": 0.000008014434394494452,
       "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.585,

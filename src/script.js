@@ -147,9 +147,9 @@ planets.venus = {
   meanAnomaly: 324.9668371,
   trueAnomaly: 324.5198504,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.006757270058130583,
+  orbitalEccentricityBase: 0.006796164209625298,
   orbitalEccentricityAmplitude: 0.0009526037225820447,
-  eccentricityPhaseJ2000: 87.13170566776543,
+  eccentricityPhaseJ2000: 84.80956236851715,
   angleCorrection: -2.785608570036125,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: holisticyearLength*3/34,
@@ -231,7 +231,7 @@ planets.saturn = {
   meanAnomaly: 325.663876,
   trueAnomaly: 321.7910116,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.05373662626292262,
+  orbitalEccentricityBase: 0.053736637105894776,
   orbitalEccentricityAmplitude: 0.000005347432417577137,
   eccentricityPhaseJ2000: 180,
   angleCorrection: -0.17477199527640508,
@@ -287,7 +287,7 @@ planets.neptune = {
   meanAnomaly: 262.5003424,
   trueAnomaly: 261.2242728,
   // Model parameters (from model-parameters.json)
-  orbitalEccentricityBase: 0.00860930797301989,
+  orbitalEccentricityBase: 0.008609291619407548,
   orbitalEccentricityAmplitude: 0.000008014434394494452,
   eccentricityPhaseJ2000: 0,
   angleCorrection: 2.332571061169066,

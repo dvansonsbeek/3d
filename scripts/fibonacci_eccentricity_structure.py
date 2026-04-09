@@ -16,11 +16,9 @@ and e_structural is the tilt-independent "floor" eccentricity.
 
 Key discoveries explored:
   1. The structural eccentricity carries the Law 5 balance (~99.98%)
-  2. Law 4 pair constraints (3 ratios + 1 sum-of-squares) require e_base —
-     the eccentricity amplitude term is load-bearing for three of four pairs
-  3. Mirror pairs conserve e × a^α where α is a Fibonacci fraction
-  4. Inner vs outer planets follow different scaling laws
-  5. Statistical significance: are these patterns real or numerology?
+  2. Mirror pairs conserve e × a^α where α is a Fibonacci fraction
+  3. Inner vs outer planets follow different scaling laws
+  4. Statistical significance: are these patterns real or numerology?
 
 Usage: python3 scripts/fibonacci_eccentricity_structure.py
 """
@@ -124,48 +122,6 @@ for label, ecc_set in [("Base (tuned for 100%)", ECC_BASE),
     print(f"    Sum  anti-phase: {sum(v23):.10e}")
     print(f"    Balance:  {bal:.6f}%")
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# SECTION 3: LAW 4 PAIR CONSTRAINTS — BASE vs STRUCTURAL
-# ═══════════════════════════════════════════════════════════════════════════
-
-print("\n" + "=" * 90)
-print("Section 3: Law 4 pair constraints — Base vs Structural")
-print("  R = e / i_mean_rad;  one pair-specific Fibonacci/Lucas constraint per pair")
-print("=" * 90)
-
-# Each entry: (inner, outer, form, target, label)
-LAW4_PAIRS = [
-    ("Mars",    "Jupiter", "sq_ratio", 144 / 11, "R²_Ju/R²_Ma = 144/11"),
-    ("Earth",   "Saturn",  "lin_ratio", 21 / 4,   "R_Sa/R_E = 21/4"),
-    ("Venus",   "Neptune", "sq_ratio", 55 / 4,   "R²_Ne/R²_V = 55/4"),
-    ("Mercury", "Uranus",  "sq_sum",   55 / 5,   "R²_Me+R²_Ur = 11"),
-]
-
-
-def _law4_obs(R_in, R_out, form):
-    if form == "sq_ratio":
-        return (R_out * R_out) / (R_in * R_in)
-    if form == "lin_ratio":
-        return R_out / R_in
-    return R_in * R_in + R_out * R_out  # sq_sum
-
-
-print(f"\n  {'Pair':<22} {'Form':<22} {'Target':>9} "
-      f"{'obs base':>10} {'obs struct':>11} {'base err':>10} {'struct err':>11}")
-print("  " + "─" * 96)
-
-for inner, outer, form, target, label in LAW4_PAIRS:
-    R_in_b = ECC_BASE[inner] / INCL_MEAN_RAD[inner]
-    R_out_b = ECC_BASE[outer] / INCL_MEAN_RAD[outer]
-    R_in_s = E_STRUCT[inner] / INCL_MEAN_RAD[inner]
-    R_out_s = E_STRUCT[outer] / INCL_MEAN_RAD[outer]
-    obs_b = _law4_obs(R_in_b, R_out_b, form)
-    obs_s = _law4_obs(R_in_s, R_out_s, form)
-    err_b = (obs_b / target - 1) * 100
-    err_s = (obs_s / target - 1) * 100
-    print(f"  {inner + '/' + outer:<22} {label:<22} {target:9.4f} "
-          f"{obs_b:10.4f} {obs_s:11.4f} {err_b:+9.3f}% {err_s:+10.3f}%")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -632,14 +588,7 @@ print("""
      - Structural eccentricities: 99.978% (removing amp adds ~0.02% imbalance)
      - J2000 eccentricities: 99.89% (snapshot with current amplitudes)
 
-  3. LAW 4 PAIR CONSTRAINTS: Carried by e_base (not e_structural)
-     - Mars/Jupiter, Earth/Saturn, Venus/Neptune all hit their pair targets
-       with e_base to <0.3% but drift to ~7-35% with e_structural
-     - Only Mercury/Uranus (sum-of-squares form) is unchanged
-     - Conclusion: the eccentricity amplitude term is part of what makes the
-       Law 4 ratios clean — the structural decomposition does NOT preserve them
-
-  4. SATURN'S ECCENTRICITY is determined by Law 5 balance:
+  3. SATURN'S ECCENTRICITY is determined by Law 5 balance:
      - Saturn is the sole anti-phase planet, must balance all in-phase planets
      - Jupiter contributes 51.2%, Uranus 37.0%, Neptune 11.4%
      - Inner planets contribute only 0.4% of the balance sum

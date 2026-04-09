@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-LAW 4 (ECCENTRICITY CONSTANT) — VERIFICATION
-==============================================
+R² PAIR PARTITION — VERIFICATION (report only)
+================================================
 
-Law 4 connects the eight planetary eccentricities to the eight inclination
-amplitudes through four small Fibonacci/Lucas ratios — one per mirror pair.
+Note: This test verifies the R² pair constraints that were explored as a
+candidate for Law 4. Law 4 is now the K amplitude constant.
+The R² partition is retained as a report-only observation.
+
 For each planet define the dimensionless ratio
 
     R = e_base / i_mean_rad
