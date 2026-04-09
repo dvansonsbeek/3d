@@ -184,7 +184,7 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 ### Phase Groups
 
-Each planet has a per-planet phase angle — the ICRF perihelion longitude at one of the eight balanced-year anchors (BY − n·H, n ∈ 0..7). At the chosen anchor, in-phase planets reach minimum inclination and Saturn (the sole anti-phase planet) reaches maximum. After the 2026-04-09 audit, all seven fitted planets share the same anchor: **n=7, year ≈ -2,649,854** (the start of the current Grand Holistic Octave). Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet phase angle — the ICRF perihelion longitude at a balanced-year anchor. All seven fitted planets share the same anchor: **n=7, year ≈ -2,649,854**, the **System Reset** — the epoch within each Grand Holistic Octave when all planets simultaneously reach their inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md#system-reset) for details.
 
 | Planet | Phase Angle | Group | Anchor |
 |--------|-------------|-------|--------|

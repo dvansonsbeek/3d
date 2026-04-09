@@ -60,20 +60,20 @@ The full eigenmode computation (B-matrix) confirmed that 100% vector balance is 
 
 ### 1C. Asc-node integers (third Fibonacci level) — re-fit 2026-04-09
 
-The original April 2026 finding noted that the model's asc-node cycle counts approximately matched Laplace-Lagrange's secular eigenfrequencies s₁–s₈. The 2026-04-09 JPL-frame audit then re-fit `ascendingNodeCyclesIn8H` to bring all 7 fitted-planet trends into JPL agreement, which produced a *different* integer set:
+The `ascendingNodeCyclesIn8H` integers are jointly fit to JPL's J2000-fixed-frame ascending-node trends, with Jupiter+Saturn locked to share N=36 to preserve the gas-giant vector pair lockstep. Total trend error: ~4.3″/century across all 7 fitted planets.
 
-| Planet | Original 8H/N | Eigenfreq match | **Re-fit 8H/N (2026-04-09)** | JPL trend match |
-|--------|:-------------:|:---------------:|:-------------------------:|:----------------:|
-| Mercury | 8H/12 (s₁) | 96.7% | **8H/9** | tightens trend |
-| Venus | 8H/15 (s₂) | 97.4% | **8H/1** (= 8H, full Grand Octave) | tightens trend |
-| Earth | 8H/40 (s₃) | 97.5% | 8H/40 (unchanged — = −H/5) | locked |
-| Mars | 8H/37 (s₄) | 98.6% | **8H/62** | tightens trend |
-| Jupiter | 8H/55 (s₆) | 99.2% | **8H/36** | tightens trend; J+S lockstep |
-| Saturn | 8H/55 (s₆) | 99.2% | **8H/36** | tightens trend; J+S lockstep |
-| Uranus | 8H/6 (s₇) | 96.9% | **8H/12** | tightens trend |
-| Neptune | 8H/1 (s₈) | 69.8% | **8H/3** | tightens trend |
+| Planet | 8H/N | Note |
+|--------|------|------|
+| Mercury | −8H/9 | |
+| Venus | −8H/1 | full Grand Octave |
+| Earth | −8H/40 = −H/5 | ecliptic precession (special) |
+| Mars | −8H/62 | |
+| Jupiter | −8H/36 | locked with Saturn |
+| Saturn | −8H/36 | locked with Jupiter |
+| Uranus | −8H/12 | |
+| Neptune | −8H/3 | |
 
-The new integers were chosen by `tools/explore/anchor-and-ascnode-audit.js` to bring the J2000-fixed-frame JPL trend errors below ~2″/century per planet (total ~4.3″/century across all 7), with Jupiter+Saturn locked to share N=36 to preserve the gas-giant vector pair lockstep.
+These integers were selected by `tools/explore/anchor-and-ascnode-audit.js`.
 
 The "third Fibonacci level" framing therefore needs reformulation:
 - **Level 1**: d-values are Fibonacci numbers (Law 2) — *unchanged*

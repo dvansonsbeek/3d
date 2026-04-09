@@ -491,19 +491,20 @@ The ascending node periods (whether 8H/N or Laskar's values) describe motion ove
 
 The model's 8H/N predictions and Laskar's N-body measurements both produce indistinguishable motion over observable timescales. The difference is philosophical: Laskar extracts 8 independent numbers from a simulation; our model derives all 7 from a single constant (H = 335,317) with a Fibonacci structure that also explains the scalar balance, the d-values, and the mirror symmetry.
 
-### Frequency comparison
+### Current ascending node integers
 
-| Mode | Our 8H/N | Our rate | Laskar rate | Diff |
-|------|---------|----------|-------------|------|
-| s₁ (Mercury) | 8H/12 | −5.80"/yr | −5.61"/yr | +3.3% |
-| s₂ (Venus) | 8H/15 | −7.25"/yr | −7.06"/yr | +2.6% |
-| s₃ (Earth) | 8H/40 | −19.33"/yr | −18.85"/yr | +2.5% |
-| s₄ (Mars) | 8H/37 | −17.88"/yr | −17.64"/yr | +1.4% |
-| s₆ (Saturn) | 8H/55 | −26.57"/yr | −26.35"/yr | +0.8% |
-| s₇ (Uranus) | 8H/6 | −2.90"/yr | −2.99"/yr | −3.1% |
-| s₈ (Neptune) | 8H/1 | −0.48"/yr | −0.69"/yr | −30% |
+| Planet | Period | Note |
+|--------|--------|------|
+| Mercury | −8H/9 | |
+| Venus | −8H/1 | full Grand Octave |
+| Earth | −H/5 = −8H/40 | ecliptic precession (special) |
+| Mars | −8H/62 | |
+| Jupiter | −8H/36 | locked with Saturn |
+| Saturn | −8H/36 | locked with Jupiter |
+| Uranus | −8H/12 | |
+| Neptune | −8H/3 | |
 
-The Neptune outlier (8H/1 = 2.68M yr vs Laskar's 1.87M yr) is the largest discrepancy. Neptune's eigenfrequency is so slow that even Laskar's 50 Myr integration captures only ~27 complete cycles, limiting measurement precision.
+The eight integers jointly reproduce JPL's J2000-fixed-frame ascending-node trends to ~4.3″/century across all 7 fitted planets.
 
 ---
 
