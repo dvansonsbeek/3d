@@ -355,7 +355,7 @@ for (const [inner, outer, level] of mirrorPairs) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  FINDING 2: Configuration Uniqueness (Config #3 only mirror-symmetric)   │');
+console.log('│  FINDING 2: Configuration Uniqueness (Config #1 only mirror-symmetric)   │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 const presetsPath = path.join(__dirname, '..', '..', 'data', 'balance-presets.json');
@@ -399,7 +399,7 @@ if (presetData) {
 
   console.log(`Total valid configurations: ${presetData.presets.length}`);
   console.log(`Mirror-symmetric configs:   ${mirrorCount}`);
-  check('Config #3 found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
+  check('Config #1 found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
   check('Only 1 mirror config', mirrorCount === 1, `found ${mirrorCount}`);
 }
 
@@ -721,12 +721,8 @@ const rmsErr = Math.sqrt(outerErrSqSum / 4);
 console.log(`\nRMS error (4 outer planets): ${rmsErr.toFixed(3)}%   (report only — not pass/fail)`);
 console.log(`Max  error (4 outer planets): ${maxOuterErr.toFixed(3)}%`);
 
-// Cross-check: Law 4 vs Law 5 Saturn prediction
-// Law 4 = direct pair constraint (from table above)
-// Law 5 = eccentricity balance using J2000 observed eccentricities (from Finding 4)
-const satLaw4 = eccPredicted.saturn;
+// Saturn prediction from Law 5 (eccentricity balance)
 const satLaw5 = satPredicted; // computed in Finding 4 from J2000 observed eccentricities
-const satConvergence = Math.abs(satLaw4 - satLaw5) / ecc.saturn * 100;
 
 console.log('\nSaturn prediction — Law 5:');
 console.log(`  Law 5 (eccentricity balance):  ${satLaw5.toFixed(8)}  (err: ${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`);

@@ -40,7 +40,7 @@ const RAD2DEG = 180 / Math.PI;
 
 const PSI = C.PSI;
 
-// Pure Fibonacci quantum numbers (d) — Config #3 (unique mirror-symmetric config)
+// Pure Fibonacci quantum numbers (d) — Config #1 (unique mirror-symmetric config)
 const FIBONACCI_D = { earth: 3 }; // Earth not in C.planets
 for (const [k, p] of Object.entries(C.planets)) FIBONACCI_D[k] = p.fibonacciD;
 FIBONACCI_D.pluto = null; // Not in Fibonacci theory

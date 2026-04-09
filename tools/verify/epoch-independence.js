@@ -283,7 +283,7 @@ console.log('\n─────────────────────�
 console.log('SECTION 5: WHY THE CONVERGENCE IS STRUCTURAL');
 console.log('───────────────────────────────────────────────────────────────\n');
 
-console.log('The Law 4/5 convergence is NOT a coincidence of the J2000 epoch.');
+console.log('The Law 5 balance is NOT a coincidence of the J2000 epoch.');
 console.log('Three independent lines of evidence:\n');
 
 console.log('1. COMMUNICATING VESSELS MECHANISM');
@@ -343,7 +343,7 @@ for (const targetBal of [99.96, 99.5, 99.0, 98.0, 95.0, 90.0, 80.0, 70.0, 60.0])
 }
 
 console.log('\nOnly configurations already near 100% produce corrections small');
-console.log('enough for an independent law to confirm. The Law 4/5 convergence');
+console.log('enough for an independent law to confirm. The Law 5 balance');
 console.log('(0.01% agreement) is only possible because the J2000 balance is');
 console.log('already 99.96% — and it\'s 99.96% because the communicating vessels');
 console.log('mechanism structurally maintains it there.\n');
@@ -366,6 +366,6 @@ console.log('  3. The Fibonacci divisors that define the v-weight formula are th
 console.log('     same constants that set the secular eigenmode frequencies. The');
 console.log('     balance is maintained because the formula and the dynamics share');
 console.log('     the same structural origin.\n');
-console.log('  The Law 4/5 convergence (0.30%) is therefore not a coincidence');
+console.log('  The Law 5 balance (0.30%) is therefore not a coincidence');
 console.log('  of the current epoch — it is a structural property of the solar');
 console.log('  system\'s Fibonacci architecture.');

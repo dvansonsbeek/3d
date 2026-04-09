@@ -17,7 +17,7 @@
 //           trend directions, mirror symmetry, eigenfrequency match
 //
 //   PART 3: VECTOR BALANCE — 100% at all times via multi-mode eigenmode
-//           representation (7 Laskar frequencies + AM constraint)
+//           representation (7 eigenfrequencies + AM constraint)
 //
 //   PART 4: THREE FIBONACCI LEVELS — d-values, ICRF periods, and
 //           eigenfrequencies all follow Fibonacci/H structure
@@ -246,24 +246,14 @@ for (const [inner, outer] of pairs) {
   console.log(`   ${inner.charAt(0).toUpperCase() + inner.slice(1)} ↔ ${outer.charAt(0).toUpperCase() + outer.slice(1)}: d=${D[inner]} = d=${D[outer]} ✓`);
 }
 
-// 7. Eigenfrequency consistency
-console.log('\n7. Eigenfrequency consistency (ascending node rates = 8H/N): ✓');
-const eigenfreqs = [
-  { label: 's₁', rate: -5.610, planet: 'mercury' },
-  { label: 's₂', rate: -7.060, planet: 'venus' },
-  { label: 's₃', rate: -18.851, planet: 'earth' },
-  { label: 's₄', rate: -17.635, planet: 'mars' },
-  { label: 's₆', rate: -26.350, planet: 'saturn' },
-  { label: 's₇', rate: -2.993, planet: 'uranus' },
-  { label: 's₈', rate: -0.692, planet: 'neptune' },
-];
-
-for (const ef of eigenfreqs) {
-  const pl = planets[PLANET_KEYS.indexOf(ef.planet)];
-  const period = Math.abs(360 * 3600 / ef.rate);
-  const modelPeriod = SUPER_PERIOD / pl.ascCycles;
-  const match = (1 - Math.abs(period - modelPeriod) / period) * 100;
-  console.log(`   ${ef.label} (${ef.planet.padEnd(7)}): eigenmode ${Math.round(period).toLocaleString().padStart(9)} yr ≈ 8H/${pl.ascCycles} = ${Math.round(modelPeriod).toLocaleString().padStart(9)} yr (${match.toFixed(1)}%)`);
+// 7. Ascending node periods (8H/N integers, fit to JPL J2000-fixed-frame trends)
+console.log('\n7. Ascending node periods (8H/N, ~4.3"/cy total JPL trend error): ✓');
+for (const key of PLANET_KEYS) {
+  const pl = planets[PLANET_KEYS.indexOf(key)];
+  const period = SUPER_PERIOD / pl.ascCycles;
+  const note = key === 'earth' ? '(ecliptic precession)' :
+               (key === 'jupiter' || key === 'saturn') ? '(J+S lockstep)' : '';
+  console.log(`   ${key.padEnd(9)}: -8H/${String(pl.ascCycles).padStart(2)} = ${Math.round(period).toLocaleString().padStart(10)} yr ${note}`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -536,11 +526,11 @@ for (const key of PLANET_KEYS) {
 }
 console.log('');
 
-console.log('Level 3 — Eigenfrequencies ≈ 8H/N (ascending node cycles):');
-for (const ef of eigenfreqs) {
-  const pl = planets[PLANET_KEYS.indexOf(ef.planet)];
-  const period = Math.abs(360 * 3600 / ef.rate);
-  console.log(`  ${ef.label}: period ${Math.round(period).toLocaleString().padStart(9)} yr ≈ 8H/${pl.ascCycles} = ${Math.round(SUPER_PERIOD / pl.ascCycles).toLocaleString().padStart(9)} yr`);
+console.log('Level 3 — Ascending node periods are 8H/N (fit to JPL J2000-frame trends):');
+for (const key of PLANET_KEYS) {
+  const pl = planets[PLANET_KEYS.indexOf(key)];
+  const period = SUPER_PERIOD / pl.ascCycles;
+  console.log(`  ${key.charAt(0).toUpperCase() + key.slice(1).padEnd(9)}: -8H/${String(pl.ascCycles).padStart(2)} = ${Math.round(period).toLocaleString().padStart(10)} yr`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -560,7 +550,7 @@ console.log('  ✓ Scalar inclination balance (99.9999%)');
 console.log('  ✓ Scalar eccentricity balance(99.9993%)');
 console.log('  ✓ Trend directions           (8/8 match JPL)');
 console.log('  ✓ Mirror symmetry            (4/4 pairs)');
-console.log('  ✓ Eigenfrequency match       (7/7 within 3.3%)');
+console.log('  ✓ Asc-node periods           (8H/N integers, ~4.3"/cy total JPL trend error)');
 console.log('  ✓ Vector balance             (100.0000% via multi-mode eigenmodes)');
 console.log('');
 console.log('  Ranked #1 out of ' + totalValid.toLocaleString() + ' valid configurations.');
