@@ -64,7 +64,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  Incl: Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
 │  Ecc:  Σ(pro)=X  Σ(anti)=Y  →  100%       ✓                           │
 │  LL: 7/8 pass (Saturn margin) | Dir: 7/7 fitted planets match    │
-│  ψ = 2205 / (2 × H) = 3.288e-3                                  │
+│  ψ = d_E × amp_E × √m_E = 3.307e-3                              │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -176,7 +176,7 @@ Below the results table:
 - **Inclination verification**: Sum of in-phase group weights, sum of anti-phase group weights, balance percentage, pass/fail indicator
 - **Eccentricity verification**: Same format for eccentricity weights
 - **Status line**: Count of LL bounds passes (out of 8) and direction matches (out of 7, Earth excluded)
-- **ψ formula**: `ψ = 2205 / (2 × H)` (see [Constants Reference](20-constants-reference.md) for current value)
+- **ψ formula**: `ψ = d_E × amp_E × √m_E` (see [Constants Reference](20-constants-reference.md) for current value)
 - **Explanatory text**: Brief description of the TNO margin (~0.006%, ~1.25 arcseconds) and balance conditions
 
 ---
@@ -226,14 +226,14 @@ The model's default (and uniquely determined) configuration:
 
 | Planet | Phase | d | Fibonacci | Mirror partner |
 |--------|-------|---|-----------|----------------|
-| Mercury | Prograde (234.52°) | 21 | F₈ | Uranus |
-| Venus | Prograde (259.82°) | 34 | F₉ | Neptune |
-| Earth | Prograde (21.77°) | 3 | F₄ | Saturn |
-| Mars | Prograde (231.95°) | 5 | F₅ | Jupiter |
-| Jupiter | Prograde (291.18°) | 5 | F₅ | Mars |
+| Mercury | In-phase (234.52°) | 21 | F₈ | Uranus |
+| Venus | In-phase (259.82°) | 34 | F₉ | Neptune |
+| Earth | In-phase (21.77°) | 3 | F₄ | Saturn |
+| Mars | In-phase (231.95°) | 5 | F₅ | Jupiter |
+| Jupiter | In-phase (291.18°) | 5 | F₅ | Mars |
 | Saturn | Anti-phase (120.38°) | 3 | F₄ | Earth |
-| Uranus | Prograde (21.33°) | 21 | F₈ | Mercury |
-| Neptune | Prograde (174.04°) | 34 | F₉ | Venus |
+| Uranus | In-phase (21.33°) | 21 | F₈ | Mercury |
+| Neptune | In-phase (174.04°) | 34 | F₉ | Venus |
 
 Expected results:
 - Inclination balance: **100%**
@@ -283,7 +283,7 @@ Determines each planet's oscillation amplitude around its mean inclination.
 
 | Variable | Type | Role |
 |----------|------|------|
-| ψ = 2205/(2×H) | Fixed | Universal coupling constant |
+| ψ = d_E × amp_E × √m_E | Fixed | Universal inclination amplitude constant |
 | d | **User-adjustable** | Fibonacci divisor |
 | m | Fixed | Planet mass (via √m) |
 
@@ -357,7 +357,7 @@ Computes the apparent change in ecliptic inclination over 1900–2100 by compari
 amplitude = ψ / (d × √m)
 
 Where:
-  ψ = 2205 / (2 × H)
+  ψ = d_E × amp_E × √m_E
   H = Holistic Year (see Constants Reference for current value)
   d = Fibonacci divisor
   m = planet mass in solar units

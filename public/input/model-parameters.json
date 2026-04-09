@@ -11,7 +11,7 @@
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
-    "psiNumerator": 2205
+    "_psiNote": "PSI is derived in constants.js from earthInvPlaneInclinationAmplitude: PSI = 3 × amp × √m_Earth"
   },
   "earth": {
     "earthtiltMean": 23.413539781551208,

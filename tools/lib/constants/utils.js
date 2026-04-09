@@ -113,7 +113,7 @@ function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
 /**
  * Compute invariable plane inclination amplitude from Fibonacci law.
  * Formula: amplitude = PSI / (fibonacciD × √massFraction)
- * @param {number} PSI - Universal Fibonacci constant (= 2205 / (2 × H))
+ * @param {number} PSI - Universal inclination amplitude constant (derived from Earth)
  * @param {number} fibonacciD - Fibonacci quantum number for the planet
  * @param {number} massFraction - Planet mass as fraction of Sun mass
  * @returns {number} Amplitude in degrees

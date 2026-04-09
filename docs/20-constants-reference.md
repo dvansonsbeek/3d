@@ -106,14 +106,14 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 
 | Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
-| Mercury | 21 | Prograde (234.52°) | Uranus | I |
-| Venus | 34 | Prograde (259.82°) | Neptune | I |
-| Earth | 3 | Prograde (21.77°) | Saturn | — |
-| Mars | 5 | Prograde (231.95°) | Jupiter | II |
-| Jupiter | 5 | Prograde (291.18°) | Mars | III |
+| Mercury | 21 | In-phase (234.52°) | Uranus | I |
+| Venus | 34 | In-phase (259.82°) | Neptune | I |
+| Earth | 3 | In-phase (21.77°) | Saturn | — |
+| Mars | 5 | In-phase (231.95°) | Jupiter | II |
+| Jupiter | 5 | In-phase (291.18°) | Mars | III |
 | Saturn | 3 | Anti-phase (120.38°) | Earth | III |
-| Uranus | 21 | Prograde (21.33°) | Mercury | III |
-| Neptune | 34 | Prograde (174.04°) | Venus | III |
+| Uranus | 21 | In-phase (21.33°) | Mercury | III |
+| Neptune | 34 | In-phase (174.04°) | Venus | III |
 
 Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -2,649,854 BC). See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups) and [32-inclination-calculations.md § Per-Planet Phase Angles](32-inclination-calculations.md#per-planet-phase-angles).
 
@@ -244,7 +244,8 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 
 | Constant | Formula | Value |
 |----------|---------|-------|
-| ψ (psi) | 2205 / (2 × H) = F(5) × F(8)² / (2 × H) | 3.288 × 10⁻³ |
+| ψ (psi) | d_E × amp_E × √m_E (from Earth) | 3.307 × 10⁻³ |
+| K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | 3.415 × 10⁻⁶ |
 
 Where F(n) are Fibonacci numbers: F(5) = 5, F(8) = 21.
 

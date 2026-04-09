@@ -24,7 +24,7 @@ Three of the four are pure Fibonacci/Lucas ratios; one is a Fibonacci/Fibonacci
 sum-of-squares. Each constraint gives one equation, so the four pair
 relations predict the four outer-planet eccentricities given the four
 inner-planet eccentricities — leaving zero free parameters beyond the inner
-quartet (which itself satisfies the Finding-6 ξ-ladder).
+quartet (which itself satisfies the ξ-ladder).
 
 Sections:
   1. Constraint accuracy (R-form value vs Fibonacci target)
@@ -141,7 +141,7 @@ print("\n" + "=" * 78)
 print("Section 2: Eccentricity prediction (4 inner planets → 4 outer planets)")
 print("=" * 78)
 
-print("\n  References:  Mercury, Venus, Earth, Mars  (inner quartet — Finding 6 ξ-ladder)")
+print("\n  References:  Mercury, Venus, Earth, Mars  (inner quartet — ξ-ladder)")
 print("  Predicted:   Jupiter, Saturn, Uranus, Neptune  (one per Law 4 pair)\n")
 
 predictions = {}

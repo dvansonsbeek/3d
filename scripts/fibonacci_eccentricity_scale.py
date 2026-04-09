@@ -600,7 +600,7 @@ print("""
      Law 4 provides 4 pair-specific Fibonacci/Lucas constraints
      Law 5 provides the balance equation
      = 5 equations for 4 outer-planet unknowns = 0 free parameters
-       beyond the inner quartet (which satisfies the Finding 6 ξ-ladder)
+       beyond the inner quartet (which satisfies the ξ-ladder)
      Current prediction accuracy: mean 0.11%, max 0.28% at Saturn
 
   7. THE KEPLER ANALOGY:

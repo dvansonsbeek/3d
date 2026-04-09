@@ -335,7 +335,8 @@ const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EAR
   SOLAR_SIDEREAL_DAY_RATIO;
 massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
-const PSI = modelParams.foundational.psiNumerator / (2 * H);
+// PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
+const PSI = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(massFraction.earth);
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,

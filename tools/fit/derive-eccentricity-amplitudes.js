@@ -54,7 +54,7 @@ console.log('');
 
 const R = 311;  // Fibonacci primitive root prime — master ratio
 const venusM = C.massFraction.venus;
-const venusBaseNew = K > 0 ? (2205 / (2 * C.H)) / (R * Math.sqrt(venusM)) : C.planets.venus.orbitalEccentricityBase;
+const venusBaseNew = K > 0 ? C.PSI / (R * Math.sqrt(venusM)) : C.planets.venus.orbitalEccentricityBase;
 const venusBaseOld = C.planets.venus.orbitalEccentricityBase;
 
 console.log(`  Venus base from R=${R}: e_V = ψ / (${R} × √m_V) = ${venusBaseNew.toFixed(10)}`);

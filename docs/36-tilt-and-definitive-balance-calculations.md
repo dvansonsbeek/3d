@@ -38,7 +38,7 @@ the anti-phase group.
 
 | Group       | Planets                                               |
 |-------------|-------------------------------------------------------|
-| Prograde    | Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune |
+| In-phase    | Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune |
 | Anti-phase  | Saturn (sole member)                                  |
 
 Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
@@ -50,7 +50,7 @@ Saturn alone carries 50.0% of total Law 5 weight, making it the decisive planet.
 | Symbol | Value                | Source                                      |
 |--------|----------------------|---------------------------------------------|
 | H      | 335317               | Holistic Year Length                         |
-| PSI    | 2205 / (2H) = 0.003287934 | Inclination formula constant            |
+| PSI    | 3.3069e-3 (d_E × amp_E × √m_E) | Inclination amplitude constant (Law 2, from Earth) |
 | K      | 3.414920e-6          | Tilt-eccentricity constant (derived from Earth) |
 
 PSI is defined in `tools/lib/constants.js` line 421.
@@ -62,14 +62,14 @@ K is derived in Section 4 below.
 
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|
-| Mercury | 21 | 234.52       | Prograde   | Uranus      |
-| Venus   | 34 | 259.82       | Prograde   | Neptune     |
-| Earth   |  3 |  21.77       | Prograde   | Saturn      |
-| Mars    |  5 | 231.95       | Prograde   | Jupiter     |
-| Jupiter |  5 | 291.18       | Prograde   | Mars        |
+| Mercury | 21 | 234.52       | In-phase   | Uranus      |
+| Venus   | 34 | 259.82       | In-phase   | Neptune     |
+| Earth   |  3 |  21.77       | In-phase   | Saturn      |
+| Mars    |  5 | 231.95       | In-phase   | Jupiter     |
+| Jupiter |  5 | 291.18       | In-phase   | Mars        |
 | Saturn  |  3 | 120.38       | Anti-phase | Earth       |
-| Uranus  | 21 |  21.33       | Prograde   | Mercury     |
-| Neptune | 34 | 174.04       | Prograde   | Venus       |
+| Uranus  | 21 |  21.33       | In-phase   | Mercury     |
+| Neptune | 34 | 174.04       | In-phase   | Venus       |
 
 Phase angles re-anchored 2026-04-09 to balanced year n=7. d-values, antiPhase, mirror pairs unchanged.
 

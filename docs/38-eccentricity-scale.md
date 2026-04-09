@@ -174,19 +174,15 @@ e(t) = √(e_base² + e_amp²) + (-e_amp - h₁·cos θ)·cos θ
 
 where θ = 360° × (t - t₀) / cycle_period and h₁ = √(e_base² + e_amp²) - e_base. The J2000 eccentricity is simply e(2000) — a snapshot of this oscillation. The base value is what the balance scale determines; the amplitude determines how far the planet departs from it.
 
-### Candidate relations between K and ψ
+### Relationship between K and ψ
 
-Two numerical coincidences have been found relating K to the inclination constant ψ = 2205/(2H):
+Both constants are empirical, derived from Earth. Their ratio is:
 
-| Relation | Value | Error vs K |
-|----------|-------|-----------|
-| K ≈ ψ²/π | 3.4411 × 10⁻⁶ | 0.77% |
-| K ≈ ψ^(11/5) | 3.4453 × 10⁻⁶ | 0.89% |
+```
+ψ / K ≈ 968.4 ≈ F₆ × L₅² = 8 × 11² = 968   (0.04% error)
+```
 
-- **ψ²/π** would imply eccentricity oscillations are a second-order effect of inclination coupling (ψ²), divided by π. However, π has no clear physical derivation in this context — why π and not 2π (full orbit) or 4π² (Kepler)?
-- **ψ^(11/5)** uses L₅/F₅ = 11/5, connecting the 5th Lucas number to the 5th Fibonacci number. This keeps everything in the Fibonacci/Lucas framework without transcendental constants, but 11 is not a Fibonacci number.
-
-Both are **noted as numerical coincidences**, not claimed as identities. Further investigation is needed. See [predict_tilt_from_eccentricity.py](../scripts/predict_tilt_from_eccentricity.py) for full analysis.
+Whether this near-integer ratio reflects a deeper structure or is a coincidence is an open question.
 
 ### Tilt prediction from eccentricity
 
@@ -212,16 +208,14 @@ This inner/outer distinction arises because the amplitude formula produces tiny 
 Law 5 relates all eight planets through a single principle. Individual values are not predicted by per-planet formulas — the law IS the relationship itself. Given seven of the eight eccentricities, the eighth is uniquely determined.
 
 The current system:
-- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same — one equation, predicts Saturn from the other seven to ~0.001%
-- **Law 4**: open placeholder — see [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-constant-open--placeholder). The four mirror-pair Fibonacci R² targets earlier framed as Law 4 were shown by three independent searches in 2026 to be at the noise level of the dense Fibonacci/Lucas combination space, and have been retracted as a derivation. Reformulating Law 4 to predict the remaining seven eccentricities (or finding a single physical constant tying eccentricity to a quantity outside `(m, a, d)` space) is an open research question.
-
-Where R = e / i_mean_rad and i_mean is derived from the ψ-constant. The R values still cluster near small Fibonacci ratios as a *descriptive observation*, but not significantly tighter than chance for the candidate space.
+- **Law 4**: e_amp = K × sin(tilt) × √d / (√m × a^1.5) — predicts all 8 eccentricity amplitudes from a single constant K
+- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same — one equation, predicts Saturn's base eccentricity from the other seven to ~0.001%
 
 ---
 
 ## Open Questions
 
-1. **What completes Law 4?** Law 5 alone is one equation in eight unknowns; predicting the remaining seven eccentricities requires either three more independent balance equations (none exist in the (m, a, d) parameter space — see [`scripts/fibonacci_law4_balance_search.py`](../scripts/fibonacci_law4_balance_search.py)) or a physical constant tying eccentricity to a quantity outside (m, a, d). Neither has been found.
+1. **What determines the 7 non-Saturn base eccentricities?** Law 4 predicts amplitudes and Law 5 predicts Saturn's base. The remaining seven base eccentricities are structural values with no known universal formula.
 
 2. **The R-value clustering**: The R = e/i_mean ratios cluster near small Fibonacci/Lucas combinations descriptively. Is there a physical mechanism behind the clustering that we have not yet uncovered, or is it noise from the dense candidate space (75% of random targets find a Fibonacci/Lucas match within 1%)?
 

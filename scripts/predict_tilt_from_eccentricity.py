@@ -39,9 +39,8 @@ from constants_scripts import *
 # K stored (empirical, derived from Earth)
 K_STORED = ECC_AMPLITUDE_K
 
-# ψ — the inclination amplitude constant
-PSI_NUM = 2205  # 5 × 21² = F₅ × F₈²
-PSI = PSI_NUM / (2 * H)
+# ψ — the inclination amplitude constant (from constants_scripts.py, derived from Earth)
+# PSI already imported via constants_scripts import *
 
 # Candidate relations
 K_PSI2_PI = PSI**2 / math.pi      # ψ²/π

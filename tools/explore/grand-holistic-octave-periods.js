@@ -344,7 +344,7 @@ const PSI = C.PSI;
 
 console.log('');
 console.log('7. INCLINATION PARAMETERS (from balanced year n=0, Saturn anti-phase)');
-console.log('   ψ = ' + PSI.toExponential(6) + ' = 2205/(2×' + H.toLocaleString() + ')');
+console.log('   ψ = ' + PSI.toExponential(6) + ' = d_E × amp_E × √m_E (derived from Earth)');
 console.log('');
 console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ BY state │ Mean       │ Amplitude  │ Range');
 console.log('   ───────────┼────┼────────────┼─────────────┼──────────┼────────────┼────────────┼─────────────────');

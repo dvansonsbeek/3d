@@ -224,7 +224,7 @@ The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase plane
 
 1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 62, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 phase angles (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -2,649,854 BC).
 
-2. **Law 4 has been demoted to an open placeholder** — see [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-constant-open--placeholder). Three independent searches confirmed the four mirror-pair Fibonacci/Lucas R² ratios were always at the noise level of the dense candidate space; only Law 5's eccentricity balance is a genuinely predictive eccentricity constraint at present.
+2. **Law 4 is the eccentricity amplitude constant K** — a single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt: `e_amp = K × sin(tilt) × √d / (√m × a^1.5)`. See [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-amplitude-constant).
 
 | Constraint | Result | Status |
 |:--|:--|:--:|
@@ -238,7 +238,7 @@ The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase plane
 | Asc-node integers (re-fit 2026-04-09, J+S lockstep) | Me9 Ve1 Ma62 Ju36 Sa36 Ur12 Ne3 | ✓ |
 | Phase anchor (n=7, balanced year ≈ -2,649,854) | All 7 fitted planets | ✓ |
 | Vector balance (multi-mode B-matrix) | 100.0000% | ✓ |
-| Eccentricity prediction beyond Law 5 (Law 4) | Open — see Law 4 placeholder | open |
+| Eccentricity amplitude constant (Law 4) | K predicts all 8 amplitudes | ✓ |
 | Ranked #1 out of 4.3M valid configs (by scalar balance) | Unchanged | ✓ |
 
 The d-values are uniquely determined by the scalar balance conditions (Laws 3 and 5). The vector balance is independently guaranteed by the eigenmode structure of the solar system. The asc-node integers and phase anchors are determined by JPL trend fitting — a third, independent constraint that was added 2026-04-09.

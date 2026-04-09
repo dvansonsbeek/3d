@@ -5,7 +5,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Pane } from 'tweakpane';
 
 /*
-  Fibonacci Laws of Planetary Motion — Holistic Universe Model v7
+  Fibonacci Laws of Planetary Motion — Holistic Universe Model v8
 
   This software is licensed under the GNU General Public License (GPL-3.0).
   For more information, visit <https://www.gnu.org/licenses/>.
@@ -43,7 +43,7 @@ const earthInvPlaneInclinationAmplitude = 0.6360323695291299; // Scene-geometry 
 const eccentricityBase = 0.015385784721959072;                      // Law 5 balance-locked
 const eccentricityAmplitude = 0.0013561739066062727;      // Solved: e(J2000) = 0.01671022
 const eccentricityAmplitudeK = 0.0000034149201315866186;           // Universal tilt-eccentricity coupling
-const psiNumerator = 2205;                                // Fibonacci constant: 5 × 21²
+// PSI is derived from Earth's inclination amplitude in section C5a below
 const earthAscendingNodeInvPlaneVerified = 284.51;        // Verified ascending node (Souami & Souchay 2012)
 const earthInclinationPhaseAngle = 21.77;                  // Phase angle: ω̃_ICRF at max inclination (from balanced year)
 
@@ -1330,7 +1330,7 @@ const axialCoinRotationYearlySeconds = axialCoinRotationMs * (meansolaryearlengt
 
 const meanAnomalisticYearinDays = ((meansolaryearlengthinDays)/(perihelionCycleLength-1))+meansolaryearlengthinDays;
 const eccentricityDerivedMean = Math.sqrt(eccentricityBase * eccentricityBase + eccentricityAmplitude * eccentricityAmplitude);
-const psiConstant = psiNumerator / (2 * holisticyearLength);  // ≈ 3.291×10⁻³
+// psiConstant is derived from Earth's inclination amplitude — see section E2c below
 
 // --- 9b. Equation of center (EoC) derived parameters ---
 // Equation of center eccentricity — derived, not a free parameter.
@@ -1521,13 +1521,15 @@ const M_EROS = 6.687e15;                             // 6.687 × 10¹⁵ kg (mea
 const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s²
 
 // ─── E2c. Derived planet inclination parameters (Fibonacci Laws) ────────
-// Amplitude = ψ / (d × √m), Mean from J2000 constraint: mean = inclJ2000 - amp × cos(Ω - φ)
+// PSI = d_Earth × inclAmp_Earth × √m_Earth — universal inclination amplitude constant
+// Amplitude = PSI / (d × √m), Mean from J2000 constraint: mean = inclJ2000 - amp × cos(Ω - φ)
 // fibonacciD values: Mercury=21, Venus=34, Earth=3, Mars=5, Jupiter=5, Saturn=3, Uranus=21, Neptune=34
 const _fibD = { mercury: 21, venus: 34, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
 const _massFrac = {
   mercury: M_MERCURY / M_SUN, venus: M_VENUS / M_SUN, mars: M_MARS / M_SUN,
   jupiter: M_JUPITER / M_SUN, saturn: M_SATURN / M_SUN, uranus: M_URANUS / M_SUN, neptune: M_NEPTUNE / M_SUN,
 };
+const psiConstant = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(M_EARTH / M_SUN);
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = planets[key];
   if (p && _fibD[key] && _massFrac[key]) {
@@ -19213,8 +19215,8 @@ function createBalanceExplorerPanel() {
           <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 3): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around a phase angle \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two balance groups must cancel: \u03A3(in-phase) w = \u03A3(anti-phase) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
           <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 5): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two balance groups balance: \u03A3(in-phase) v = \u03A3(anti-phase) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
-          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Grand Holistic Octave). These values (8H/12, 8H/15, 8H/40, etc.) match Laskar\u2019s (2004) N-body eigenfrequencies within 1\u20133% for 6 of 7 modes. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
-          <div class="fbe-balance-explain" style="margin-top:6px">The <b>genuine constraints</b> are the scalar inclination balance (Law 3) and eccentricity balance (Law 5) shown above \u2014 these select the Fibonacci d-values and cannot be achieved by arbitrary configurations. The ascending node periods describe motion over 50,000\u20132,000,000 year timescales. With only ~4,000 years of recorded astronomy, humanity cannot observationally distinguish between competing period values. Both our 8H/N predictions and Laskar\u2019s measurements produce indistinguishable motion over observable timescales.</div>
+          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Grand Holistic Octave). The integers are jointly fit to JPL\u2019s J2000-fixed-frame ascending-node trends (~4.3\u2033/century total across 7 fitted planets), with Jupiter and Saturn locked to a shared N=36. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
+          <div class="fbe-balance-explain" style="margin-top:6px">The <b>genuine constraints</b> are the scalar inclination balance (Law 3) and eccentricity balance (Law 5) shown above \u2014 these select the Fibonacci d-values and cannot be achieved by arbitrary configurations. The ascending node periods describe motion over 50,000\u20132,000,000 year timescales. With only ~4,000 years of recorded astronomy, the periods cannot be observationally verified by direct observation of a complete cycle.</div>
         </div>
       </div>
     </div>`;
@@ -19360,7 +19362,7 @@ function updateBalanceExplorerResults(panel, state) {
   // PSI formula line
   const psiLine = panel.querySelector('.fbe-psi-line');
   psiLine.textContent =
-    `\u03C8 = ${psiNumerator} / (2 \u00D7 ${holisticyearLength.toLocaleString()}) = ${results.PSI.toExponential(6)}`;
+    `\u03C8 = d\u2091 \u00D7 amp\u2091 \u00D7 \u221Am\u2091 = ${results.PSI.toExponential(6)}`;
 
   // Per-planet table
   const tbody = panel.querySelector('.fbe-results-tbody');
@@ -19448,10 +19450,11 @@ function fbeInitEigenmodes() {
   const NP = 8;
   const _8H = 8 * holisticyearLength;
 
-  // Model's own eigenfrequencies from ascendingNodeCyclesIn8H (8H/N periods)
-  // Inner: s₁(Me)=8H/12, s₂(Ve)=8H/15, s₃(Ea)=8H/40, s₄(Ma)=8H/37
-  // Outer: s₆(Sa)=8H/55, s₇(Ur)=8H/6, s₈(Ne)=8H/1
-  const ascCycles = [12, 15, 40, 37, 55, 6, 1];  // [s₁,s₂,s₃,s₄,s₆,s₇,s₈]
+  // Model's own ascending-node periods from ascendingNodeCyclesIn8H (8H/N, all retrograde)
+  // Read from planet config; Earth uses 40 (= 8H/40 = H/5, ecliptic precession)
+  const ascCycles = KEYS.map(key =>
+    key === 'earth' ? 40 : planets[key].ascendingNodeCyclesIn8H
+  );
   const S_RAD = ascCycles.map(n => -2 * Math.PI / (_8H / n));  // retrograde
 
   // Planet angular momenta and J2000 states
@@ -20290,7 +20293,7 @@ function createGHOPanel() {
     'Axial precession: the wobble of the planet\u2019s spin axis.',
     'Ecliptic perihelion precession: orbital shape rotation in the ecliptic frame.',
     'ICRF perihelion precession = inclination oscillation cycle. Ecliptic rate minus general precession (H/13).',
-    'Ascending node regression on the invariable plane. Matches secular eigenfrequencies s\u2081\u2013s\u2088.',
+    'Ascending node regression on the invariable plane. Integer divisors of 8H, fit to JPL J2000-fixed-frame trends.',
     'Obliquity oscillation: axial tilt variation period. Beat of axial precession and ICRF perihelion.',
     'Eccentricity cycle: orbital eccentricity oscillation period. Beat of axial precession and ICRF perihelion (wobble period).',
   ];
@@ -22822,7 +22825,7 @@ function setupGUI() {
   if (titleEl) {
     const versionEl = document.createElement('div');
     versionEl.style.cssText = 'font-size: 9px; font-weight: 400; letter-spacing: 0.05em; opacity: 0.60; margin-top: 2px;';
-    versionEl.textContent = 'Holistic Universe Model v7';
+    versionEl.textContent = 'Holistic Universe Model v8';
     titleEl.appendChild(versionEl);
   }
 
@@ -22913,12 +22916,12 @@ function setupGUI() {
     const laws = [
       { n: 1, title: 'Fibonacci Cycle Hierarchy',
         desc: 'Dividing the Holistic-Year by successive Fibonacci numbers produces the major precession periods of the solar system.' },
-      { n: 2, title: 'Inclination Constant',
-        desc: 'Each planet\u2019s mass-weighted inclination amplitude, multiplied by a Fibonacci divisor, equals the same universal constant \u03C8.' },
+      { n: 2, title: 'Inclination Amplitude Constant',
+        desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone.' },
       { n: 3, title: 'Inclination Balance',
         desc: 'The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn\u2019s alone (100%).' },
-      { n: 4, title: 'Eccentricity Constant',
-        desc: 'Within each mirror pair, Fibonacci constraints determine all eight eccentricities from the inclinations alone \u2014 zero free parameters.' },
+      { n: 4, title: 'Eccentricity Amplitude Constant',
+        desc: 'A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt.' },
       { n: 5, title: 'Eccentricity Balance',
         desc: 'The same Fibonacci divisors and phase groups produce an independent balance condition on eccentricities (100%).' },
       { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
@@ -22956,7 +22959,7 @@ function setupGUI() {
       fpFibDivisors: '3, 5, 8, 13, 21, 34',
       fpMeanObliquity: earthtiltMean + '\u00B0',
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
-      fpConfig: 'Config #3 (unique)',
+      fpConfig: 'Config #1 (unique)',
     };
     addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
@@ -23089,21 +23092,41 @@ function setupGUI() {
       { key: 'saturn', name: 'Saturn' }, { key: 'uranus', name: 'Uranus' },
       { key: 'neptune', name: 'Neptune' },
     ];
+    const _jplTrends = {
+      mercury: mercuryEclipticInclinationTrendJPL, venus: venusEclipticInclinationTrendJPL,
+      mars: marsEclipticInclinationTrendJPL, jupiter: jupiterEclipticInclinationTrendJPL,
+      saturn: saturnEclipticInclinationTrendJPL, uranus: uranusEclipticInclinationTrendJPL,
+      neptune: neptuneEclipticInclinationTrendJPL,
+    };
+    const _massRatios = {
+      mercury: MASS_RATIO_SUN_MERCURY, venus: MASS_RATIO_SUN_VENUS,
+      mars: MASS_RATIO_SUN_MARS, jupiter: MASS_RATIO_SUN_JUPITER,
+      saturn: MASS_RATIO_SUN_SATURN, uranus: MASS_RATIO_SUN_URANUS,
+      neptune: MASS_RATIO_SUN_NEPTUNE,
+    };
     planetCalibNames.forEach(({ key, name }) => {
       const p = planets[key];
       const v = {
+        massRatio: '1 / ' + _massRatios[key].toLocaleString('en-US'),
         period: fmtD(p.solarYearInput),
+        eccJ2000: String(p.orbitalEccentricityJ2000),
+        tilt: fmtDeg(p.axialTiltMean),
         incEcl: fmtDeg(p.eclipticInclinationJ2000),
         incInv: fmtDeg(p.invPlaneInclinationJ2000),
+        jplTrend: (_jplTrends[key] >= 0 ? '+' : '') + _jplTrends[key] + '\u00B0/cy',
         longPeri: fmtDeg(p.longitudePerihelion),
         ascNode: fmtDeg(p.ascendingNode),
       };
       const cnt = Object.keys(v).length;
       totalCalib += cnt;
       const pf = calibInputFolder.addFolder({ title: name + ' (' + cnt + ')', expanded: false });
+      addCalib(pf, v, 'massRatio', 'Mass (M\u2609)', 'Mass as fraction of solar mass (DE440).');
       addCalib(pf, v, 'period', 'Orbital period', 'Orbital period in days (JPL).');
+      addCalib(pf, v, 'eccJ2000', 'Eccentricity (J2000)', 'Orbital eccentricity at J2000 (JPL).');
+      addCalib(pf, v, 'tilt', 'Axial tilt', 'Mean axial tilt (obliquity). Used by Law 4 (K formula).');
       addCalib(pf, v, 'incEcl', 'Incl. ecliptic (J2000)', 'Inclination to the ecliptic at J2000 (JPL).');
       addCalib(pf, v, 'incInv', 'Incl. inv. plane (J2000)', 'Inclination to the invariable plane at J2000 (Souami & Souchay 2012).');
+      addCalib(pf, v, 'jplTrend', 'JPL incl. trend', 'JPL ecliptic inclination rate in J2000-fixed frame (\u00B0/century). Target for asc-node verification.');
       addCalib(pf, v, 'longPeri', 'Long. perihelion (J2000)', 'Longitude of perihelion at J2000 (JPL).');
       addCalib(pf, v, 'ascNode', 'Asc. node ecliptic (J2000)', 'Longitude of ascending node on the ecliptic at J2000 (SPICE).');
     });
@@ -23128,6 +23151,9 @@ function setupGUI() {
     // -- Earth (model-parameters.json values only) --
     const fundVals = {
       holisticYear: fmtYr(holisticyearLength),
+      fibD: '3',
+      balanceGroup: 'In-phase',
+      ascNodePeriod: '-H/5 = -8H/40 = ' + fmtYr(-(holisticyearLength / 5)),
       tropicalYear: fmtD(inputmeanlengthsolaryearindays),
       startJD: String(startmodelJD),
       correctionDays: String(correctionDays),
@@ -23149,6 +23175,9 @@ function setupGUI() {
     const fundFolder = constFolder.addFolder({ title: 'Earth (' + fundCount + ')', expanded: false });
     addFolderTooltip(fundFolder, fundCount + ' model parameters define all Earth orbital behaviours. Source: model-parameters.json.');
     addConst(fundFolder, fundVals, 'holisticYear', 'Holistic-Year', 'The fundamental cycle unifying all precession movements.');
+    addConst(fundFolder, fundVals, 'fibD', 'Fibonacci d', 'Fibonacci divisor for Earth (Laws 2 + 4). d=3 = F\u2084.');
+    addConst(fundFolder, fundVals, 'balanceGroup', 'Balance group', 'In-phase (MIN inclination at balanced year). Saturn is the sole anti-phase planet.');
+    addConst(fundFolder, fundVals, 'ascNodePeriod', 'Asc. node period', 'Earth ascending node = ecliptic precession rate -H/5 (special: defines the ecliptic frame).');
     addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. The actual mean tropical year is calculated from this and the Holistic-Year length.');
     addConst(fundFolder, fundVals, 'startJD', 'Start model JD', 'Julian Day of the model start date (June Solstice 2000).');
     addConst(fundFolder, fundVals, 'correctionDays', 'Correction days', 'Small correction because 21 June 00:00 UTC is not exactly at solstice.');
@@ -23193,7 +23222,11 @@ function setupGUI() {
     const planetModelNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };
     planetModelKeys.forEach(key => {
       const p = planets[key];
+      const ascNodeN = p.ascendingNodeCyclesIn8H;
       const v = {
+        fibD: String(_fibD[key] || '\u2014'),
+        balanceGroup: p.antiPhase ? 'Anti-phase' : 'In-phase',
+        ascNodeCycles: ascNodeN ? '-8H/' + ascNodeN + ' = ' + fmtYr(-(8 * holisticyearLength) / ascNodeN) : '\u2014',
         ecc: String(p.orbitalEccentricityBase),
         eccAmp: String(p.orbitalEccentricityAmplitude),
         ascNodeInv: fmtDeg(p.ascendingNodeInvPlane),
@@ -23213,6 +23246,9 @@ function setupGUI() {
       };
       const pf = constFolder.addFolder({ title: planetModelNames[key] + ' (' + pCount + ')', expanded: false });
       addFolderTooltip(pf, pCount + ' model parameters for ' + planetModelNames[key] + '. J2000 references are in Calibration Inputs.');
+      addConst(pf, v, 'fibD', 'Fibonacci d', 'Fibonacci divisor for inclination/eccentricity amplitude (Laws 2 + 4).');
+      addConst(pf, v, 'balanceGroup', 'Balance group', 'In-phase (MIN at balanced year) or anti-phase (MAX at balanced year). Saturn is the sole anti-phase planet.');
+      addConst(pf, v, 'ascNodeCycles', 'Asc. node period', 'Ascending node regression period as integer divisor of 8H (Grand Holistic Octave).');
       addConst(pf, v, 'ecc', 'Eccentricity base', 'Base orbital eccentricity (balance-derived mean).');
       addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity.');
       addConst(pf, v, 'ascNodeInv', 'Asc. node inv. plane', 'Ascending node on the invariable plane (model-adjusted).');
@@ -24481,7 +24517,7 @@ if (!o.Performance) stats.dom.style.display = 'none';
 /* Watermark / branding — bottom-right */
 const sceneWatermark = document.createElement('div');
 sceneWatermark.id = 'sceneWatermark';
-sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v7</span>';
+sceneWatermark.innerHTML = 'Holistic Universe Model · <a href="https://www.holisticuniverse.com" target="_blank" rel="noopener">holisticuniverse.com</a><span class="wm-version">v8</span>';
 document.body.appendChild(sceneWatermark);
 
 /* Simulation date HUD — bottom-left */

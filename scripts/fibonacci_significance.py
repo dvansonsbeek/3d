@@ -59,7 +59,7 @@
 #       Do the d-assignments show inner-outer mirror symmetry?
 #       Observed: 4/4 mirror pairs share the same d.
 #
-#   Test 13 — K amplitude constant (Finding 6):
+#   Test 13 — K amplitude constant (Law 4):
 #       Can a single constant K predict all 8 eccentricity amplitudes via
 #       e_amp = K × sin(tilt) × √d / (√m × a^1.5)?
 #       NOTE: circular — amplitudes were derived from K. But the permutation
@@ -565,7 +565,7 @@ def stat_mirror_symmetry(d_vals, mirror_pairs):
 
 def stat_k_amplitude(eccs_amp, tilts, d_vals, masses, sma, sqrt_m):
     """
-    Test 13 — Finding 6: K amplitude constant.
+    Test 13 — Law 4: K amplitude constant.
 
     Tests whether a single constant K can predict all 8 eccentricity
     amplitudes from:  e_amp = K × sin(tilt) × √d / (√m × a^1.5)
@@ -1227,8 +1227,8 @@ def print_observed_detail():
         print(f"  {p:<10} {d_str:>6} {xi_i[p]:>14.6e} {val:>14.6e} {abs(val/psi_obs-1)*100:>+7.3f}%")
     spread = (max(psi_products) - min(psi_products)) / psi_obs
     print(f"  {'ψ mean':>16} = {psi_obs:.6e}")
-    print(f"  {'ψ theory':>16} = {PSI1_THEORY:.6e}  "
-          f"(F₅×F₈²/(2H) = 2205/{2*H})")
+    print(f"  {'ψ (from Earth)':>16} = {PSI1_THEORY:.6e}  "
+          f"(d_E × amp_E × √m_E)")
     print(f"  {'Match':>16} = {abs(psi_obs/PSI1_THEORY-1)*100:.4f}%")
     print(f"  {'Spread':>16} = {spread*100:.4f}%")
     print()
@@ -1420,7 +1420,7 @@ def main():
         "r2_partition":    "Law 4 — Pair constraints",
         "ejs_resonance":   "Law 6 — E–J–S resonance",
         "mirror_symmetry": "Finding 1 — Mirror symm.",
-        "k_amplitude":     "Finding 6 — K amplitude",
+        "k_amplitude":     "Law 4 — K amplitude",
         "ecc_scale_rms":   "Finding 7 — Ecc. Scale",
     }
 

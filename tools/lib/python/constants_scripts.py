@@ -262,9 +262,8 @@ GROUP_23 = GROUP_ANTI
 # Fibonacci numbers used in the formula
 FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
 
-# Theoretical ψ from H and Fibonacci numbers (exact, zero free parameters)
-# ψ = F_5 × F_8² / (2H) = 5 × 21² / (2 × H) = 2205 / (2H)
-PSI = FIB[5] * FIB[8]**2 / (2 * H)
+# ψ derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
+PSI = 3 * EARTH_INCLINATION_AMPLITUDE * math.sqrt(MASS["Earth"])
 
 # Backwards compatibility aliases
 PSI1 = PSI
@@ -352,7 +351,7 @@ PERIOD_FRAC = {
 FIBONACCI_SLOTS = {"Earth": 3, "Jupiter": 5, "Saturn": 8}
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ECCENTRICITY LADDER (Finding 6)
+# ECCENTRICITY LADDER (ξ-ladder)
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Eccentricity ladder multipliers (relative to Venus = 1)

@@ -124,7 +124,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
 | [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; generates data/balance-presets.json |
-| [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of Laws 2, 3, 5 + findings (Law 4 demoted to placeholder, see [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-constant-open--placeholder)) |
+| [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws + findings |
 | [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
 | [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 5 sensitivity analysis |
 | [epoch-independence.js](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |

@@ -443,19 +443,47 @@ Dynamic inclinations should match static J2000 values within 0.01°.
 
 ### Trend Verification
 
-After implementation, ecliptic inclination rates should match JPL observed values:
+The model computes ecliptic inclination trends in two frames:
 
-| Planet | JPL Rate (°/cy) | Expected Trend | Match |
-|--------|-----------------|----------------|-------|
-| Mercury | -0.00595 | Decreasing | ✓ |
-| Venus | -0.00079 | Decreasing | ✓ |
-| Mars | -0.00813 | Decreasing | ✓ |
-| Jupiter | -0.00184 | Decreasing | ✓ |
-| Saturn | **+0.00194** | **Increasing** (retrograde) | ✓ |
-| Uranus | -0.00243 | Decreasing | ✓ |
-| Neptune | +0.00035 | Decreasing (balance model) | ✗ |
+- **Moving frame**: the angle between the planet's orbit and Earth's *current* (moving) orbital plane. This is the physical observable for an Earth-bound observer at any epoch.
+- **J2000-fixed frame**: the angle between the planet's orbit and Earth's orbital plane *frozen at J2000*. This matches JPL's published frame ("mean ecliptic and equinox of J2000").
 
-**Note**: Neptune's trend direction (✗) is a known consequence of the balance-driven group assignment. The magnitude is very small (+0.00035°/cy) and within the uncertainty of the model.
+JPL's catalog dI/dt values are in the J2000-fixed frame. The model's primary "Trend" column shows the moving-frame trend. To compare, the code re-expresses JPL's value into the moving frame:
+
+```
+frameCorrection = trend_moving − trend_J2000_fixed
+JPL_displayed   = JPL_catalog  + frameCorrection
+```
+
+The displayed error simplifies to `|trend_J2000_fixed − JPL_catalog|` — a direct J2000-vs-J2000 comparison.
+
+#### Why the frame correction is large
+
+Earth's orbital plane precesses around the invariable plane at -H/5 (~67,063 yr). This ecliptic precession shifts the reference plane by ~0.01°/cy — large enough to flip the apparent sign of the inclination trend for most planets. For example, Mercury's inclination is *increasing* in the moving frame (+0.00488°/cy) but *decreasing* in the J2000-fixed frame (-0.00605°/cy), because the ecliptic is tilting away from Mercury's orbit faster than Mercury's orbit converges toward it.
+
+#### Why only inclination needs a frame correction
+
+Inclination is the angle between two planes — the planet's orbit and the ecliptic. When the ecliptic moves, this angle changes even if the planet's orbit is fixed. No other Keplerian element has this property:
+
+- **Eccentricity** and **semi-major axis** are intrinsic to the orbit's shape. They are frame-independent.
+- **Argument of perihelion (ω)** is measured within the orbital plane. Frame-independent.
+- **Longitude of perihelion (ϖ = Ω + ω)** is technically frame-dependent through Ω, but the effect is negligible over the short comparison intervals (~200 years) used for rate verification. The ecliptic tilts by only ~0.01° over that span, far below the precision of perihelion rate comparisons.
+- **Ascending node (Ω)** is also frame-dependent (measured from the vernal equinox direction in the ecliptic). This is already handled: the `ascendingNodeCyclesIn8H` integers were fit directly to JPL's J2000-fixed-frame trends.
+- **Positions (RA/Dec)** are compared in the ICRF, an inertial frame tied to distant quasars. Both the model and JPL output in the same frame.
+
+#### Current results
+
+All seven fitted planets match JPL's J2000-fixed-frame trends in both sign and magnitude, to a total of ~4.3″/century:
+
+| Planet | Model moving (°/cy) | Model J2000 (°/cy) | JPL catalog (°/cy) | Error |
+|--------|-------|-------|-------|-------|
+| Mercury | +0.00488 | -0.00605 | -0.00595 | 0.4″ |
+| Venus | +0.00284 | -0.00124 | -0.00079 | 1.6″ |
+| Mars | +0.00207 | -0.00825 | -0.00813 | 0.4″ |
+| Jupiter | -0.00359 | -0.00182 | -0.00184 | 0.1″ |
+| Saturn | -0.00246 | +0.00242 | +0.00194 | 1.7″ |
+| Uranus | +0.00209 | -0.00240 | -0.00243 | 0.1″ |
+| Neptune | -0.00901 | +0.00034 | +0.00035 | 0.0″ |
 
 ---
 

@@ -63,7 +63,7 @@ replaceConst('correctionDays', mp.foundational.correctionDays);
 replaceConst('correctionSun', mp.foundational.correctionSun);
 replaceConst('temperatureGraphMostLikely', mp.foundational.temperatureGraphMostLikely);
 replaceConst('startAngleModel', mp.foundational.startAngleModel);
-replaceConst('psiNumerator', mp.foundational.psiNumerator);
+// PSI is now derived from earthInvPlaneInclinationAmplitude in script.js section E2c
 
 // A2. Earth parameters
 replaceConst('earthtiltMean', mp.earth.earthtiltMean);

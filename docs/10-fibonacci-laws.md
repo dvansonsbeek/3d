@@ -36,12 +36,13 @@ Where:
 H = see Constants Reference for current value
 ```
 
-### The ψ-Constant
+### The Universal Constants ψ and K
 
-Derived from Fibonacci numbers and the Holistic Year:
+Two empirical constants, both derived from Earth's fitted parameters, predict all 8 planets' oscillation amplitudes:
 
 ```
-ψ = (F₅ × F₈²) / (2H) = (5 × 21²) / (2H) = 2205 / (2H)
+ψ = d_Earth × inclAmp_Earth × √m_Earth = 3.307 × 10⁻³   (inclination amplitudes)
+K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.415 × 10⁻⁶   (eccentricity amplitudes)
 ```
 
 ### Planetary Data (JPL DE440)
@@ -59,7 +60,7 @@ Derived from Fibonacci numbers and the Holistic Year:
 
 Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invariable plane at J2000, Ω J2000 = longitude of ascending node on the invariable plane at J2000 epoch (Souami & Souchay 2012, verified).
 
-**Note on Earth's eccentricity:** The J2000 value (0.0167) is used for the balance calculations (Laws 3 and 5), consistent with all other planets. Earth's mean eccentricity over the Holistic Year (0.0153, used in the 3D simulation) differs due to long-term oscillation. The impact on balance is negligible — Earth's eccentricity weight is tiny compared to the gas giants. The historical Law 4 R²-pair tables and Finding 5 (eccentricity ladder) used the mean value for long-term structural relationships; with Law 4 now an open placeholder, only Finding 5 still relies on the mean.
+**Note on Earth's eccentricity:** The J2000 value (0.0167) is used for the balance calculations (Laws 3 and 5), consistent with all other planets. Earth's mean eccentricity over the Holistic Year (0.0153, used in the 3D simulation) differs due to long-term oscillation. The impact on balance is negligible — Earth's eccentricity weight is tiny compared to the gas giants.
 
 ---
 
@@ -80,21 +81,15 @@ All major precession periods derive from the Holistic Year divided by Fibonacci 
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence.
 
-### Law 2: The Inclination Constant
+### Law 2: The Inclination Amplitude Constant
 
-Each planet's mass-weighted inclination amplitude, multiplied by its Fibonacci divisor, equals the universal ψ-constant:
-
-```
-d × amplitude × √m = ψ
-```
-
-Equivalently:
+A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone:
 
 ```
-amplitude = ψ / (d × √m)
+d × amplitude × √m = ψ     →     amplitude = ψ / (d × √m)
 ```
 
-This holds for all 8 planets with a single universal ψ = 3.288 × 10⁻³.
+ψ = 3.307 × 10⁻³, derived from Earth's fitted inclination amplitude. This holds for all 8 planets with zero free parameters.
 
 ### Law 3: The Inclination Balance
 
@@ -114,24 +109,29 @@ where w_j = √(m_j × a_j(1-e_j²)) / d_j
 
 **Result: 100% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
 
-### Law 4: The Eccentricity Constant *(open — placeholder)*
+### Law 4: The Eccentricity Amplitude Constant
 
-**Status: open research question.** Law 4 is the conceptual slot for whatever rule fixes the eight planetary eccentricities. Law 5 alone is one balance equation in eight unknowns: given seven eccentricities it determines the eighth. To pin down all eight, we need either a *second* independent rule of the same type or a single *physical constant* that ties eccentricity to the rest of the model. Law 4 is the placeholder for that missing rule.
+A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt:
 
-**What we know so far:**
+```
+e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+```
 
-- The ratio `R = e_base / i_mean,rad` for each planet clusters near small Fibonacci/Lucas combinations, but at the noise level of the dense Fibonacci/Lucas candidate space — three independent searches confirm the clustering is not a derivable physical law:
-  - [`scripts/archive/fibonacci_law4_search.py`](../scripts/archive/fibonacci_law4_search.py) — found no universal `ξ × f(params) = const` across the 8 planets.
-  - [`scripts/fibonacci_law4_reformulation_search.py`](../scripts/fibonacci_law4_reformulation_search.py) — tried 7 alternative R-definitions × 5 pair forms; all give errors at noise level.
-  - [`scripts/fibonacci_law4_balance_search.py`](../scripts/fibonacci_law4_balance_search.py) — confirmed exactly **one** physical balance equation exists in `(m, a, d)` space: Law 5 itself. No second balance equation of the same form determines the other outer-planet eccentricities.
+K = 3.4149 × 10⁻⁶, derived from Earth's eccentricity amplitude and axial tilt. This is the eccentricity analog of ψ (Law 2) for inclination amplitudes.
 
-- The four mirror-pair `R` ratios that earlier versions of this doc presented as Fibonacci constraints (Mars/Jupiter `144/11`, Earth/Saturn `21/4`, Venus/Neptune `55/4`, Mercury/Uranus `55/5`) are still reported by [`tools/verify/verify-laws.js`](../tools/verify/verify-laws.js) for reference but are no longer pass/fail tested — they were always at the noise level of random Fibonacci/Lucas combinations.
+**The parallel:**
 
-- Law 5 alone reproduces the observed Saturn eccentricity to ~0.001%, which is the only currently *predictive* eccentricity statement in the model.
+| | Law 2 (inclination) | Law 4 (eccentricity) |
+|---|---|---|
+| **Formula** | amp = ψ / (d × √m) | e_amp = K × sin(tilt) × √d / (√m × a^1.5) |
+| **Constant** | ψ = 3.307 × 10⁻³ | K = 3.415 × 10⁻⁶ |
+| **Variables** | d, m | d, m, a, tilt |
+| **Predicts** | 8 inclination amplitudes | 8 eccentricity amplitudes |
+| **Free parameters** | 0 | 0 |
 
-**Direction for future work:**
+Both constants are empirical — derived from Earth's fitted parameters — and predict all 8 planets with zero free parameters. ψ uses only Fibonacci divisors and mass. K additionally uses semi-major axis and axial tilt, coupling the spin and orbital domains.
 
-Search for a constant or invariant that ties eccentricity to a quantity *outside* `(m, a, d)` space — for example to the perihelion-precession rate, the AMD partition between eccentricity and inclination at a more fundamental level than the simple ratio, or a connection to the obliquity / axial-precession structure. Until such a rule is found, Law 4 stays explicitly marked as a placeholder.
+**Note on base eccentricities:** Laws 2 and 4 predict oscillation *amplitudes*. The base (mean) eccentricities are partially constrained by Law 5, which predicts Saturn's from the other seven. The remaining seven base eccentricities are structural values set at formation, analogous to how the eight mean inclinations are derived from J2000 values rather than predicted by ψ.
 
 ### Law 5: The Eccentricity Balance
 
@@ -151,15 +151,7 @@ v_j = T_j × e_j × √(m_j / d_j)
 
 **Result: 100% balance** (dual-balanced eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
 
-#### The Eccentricity Amplitude Constant
-
-While eccentricity base values are determined by the balance system (Laws 4 + 5), the eccentricity **amplitude** — how much each planet's eccentricity oscillates over its eccentricity cycle — has a genuine universal constant, analogous to ψ for inclination:
-
-```
-e_amp = K × sin(tilt) × √d / (√m × a^1.5)
-```
-
-K = 3.4149 × 10⁻⁶ — a constant derived from Earth's mean parameters. The total eccentricity at any time oscillates around the base value with this amplitude over each planet's eccentricity cycle. Two candidate relations K ≈ ψ²/π (0.77%) and K ≈ ψ^(11/5) (0.89%) have been noted but are not proven identities. See [Eccentricity Balance Scale](38-eccentricity-scale.md) for details.
+The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant). See [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation of the balance as a scale.
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
@@ -181,14 +173,14 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 | Planet | d | Fibonacci | Phase group |
 |--------|---|-----------|-------------|
-| Mercury | 21 | F₈ | Prograde |
-| Venus | 34 | F₉ | Prograde |
-| Earth | 3 | F₄ | Prograde |
-| Mars | 5 | F₅ | Prograde |
-| Jupiter | 5 | F₅ | Prograde |
+| Mercury | 21 | F₈ | In-phase |
+| Venus | 34 | F₉ | In-phase |
+| Earth | 3 | F₄ | In-phase |
+| Mars | 5 | F₅ | In-phase |
+| Jupiter | 5 | F₅ | In-phase |
 | Saturn | 3 | F₄ | Anti-phase |
-| Uranus | 21 | F₈ | Prograde |
-| Neptune | 34 | F₉ | Prograde |
+| Uranus | 21 | F₈ | In-phase |
+| Neptune | 34 | F₉ | In-phase |
 
 ### Phase Groups
 
@@ -196,14 +188,14 @@ Each planet has a per-planet phase angle — the ICRF perihelion longitude at on
 
 | Planet | Phase Angle | Group | Anchor |
 |--------|-------------|-------|--------|
-| Mercury | 234.52° | Prograde | n=7 |
-| Venus | 259.82° | Prograde | n=7 |
-| Earth | 21.77° | Prograde | n=0 (locked) |
-| Mars | 231.95° | Prograde | n=7 |
-| Jupiter | 291.18° | Prograde | n=7* |
+| Mercury | 234.52° | In-phase | n=7 |
+| Venus | 259.82° | In-phase | n=7 |
+| Earth | 21.77° | In-phase | n=0 (locked) |
+| Mars | 231.95° | In-phase | n=7 |
+| Jupiter | 291.18° | In-phase | n=7* |
 | **Saturn** | **120.38°** | **Anti-phase** | n=7* |
-| Uranus | 21.33° | Prograde | n=7* |
-| Neptune | 174.04° | Prograde | n=7 |
+| Uranus | 21.33° | In-phase | n=7* |
+| Neptune | 174.04° | In-phase | n=7 |
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase value at n=7 coincides numerically with their phase at n=0 (and at any other anchor).
 
@@ -315,8 +307,6 @@ e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Epoch independence:** The agreement is not specific to the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, Law 5's balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillated alone. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
-> **Note:** Earlier versions of this section described a *second* convergent prediction from "Law 4 R² pair constraints" that also bracketed the J2000 value. Law 4 has since been [demoted to an open placeholder](#law-4-the-eccentricity-constant-open--placeholder); the four R² pair targets it used were at the noise level of the dense Fibonacci/Lucas combination space. The "two-law convergence" claim is therefore retracted — only Law 5 is currently a predictive eccentricity constraint, and it predicts only Saturn (1 equation, 1 unknown).
-
 With dual-balanced eccentricities, Law 5's balance reaches 100%. The model's eccentricities are optimized to satisfy both the inclination balance (Law 3) and eccentricity balance (Law 5) simultaneously. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
 
 ### Finding 5: Inner Planet Eccentricity Ladder
@@ -375,13 +365,13 @@ Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each p
 
 | Planet | Group | d | w_j |
 |--------|-------|---|-----|
-| Mercury | Prograde | 21 | 1.181 × 10⁻⁵ |
-| Venus | Prograde | 34 | 3.914 × 10⁻⁵ |
-| Earth | Prograde | 3 | 5.776 × 10⁻⁴ |
-| Mars | Prograde | 5 | 1.396 × 10⁻⁴ |
-| Jupiter | Prograde | 5 | 1.408 × 10⁻² |
-| Uranus | Prograde | 21 | 1.375 × 10⁻³ |
-| Neptune | Prograde | 34 | 1.155 × 10⁻³ |
+| Mercury | In-phase | 21 | 1.181 × 10⁻⁵ |
+| Venus | In-phase | 34 | 3.914 × 10⁻⁵ |
+| Earth | In-phase | 3 | 5.776 × 10⁻⁴ |
+| Mars | In-phase | 5 | 1.396 × 10⁻⁴ |
+| Jupiter | In-phase | 5 | 1.408 × 10⁻² |
+| Uranus | In-phase | 21 | 1.375 × 10⁻³ |
+| Neptune | In-phase | 34 | 1.155 × 10⁻³ |
 | Saturn | Anti-phase | 3 | 1.737 × 10⁻² |
 
 ```
@@ -439,13 +429,13 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 
 | Planet | Group | d | v_j = √m × a^(3/2) × e / √d |
 |--------|-------|---|------|
-| Mercury | Prograde | 21 | 4.404 × 10⁻⁶ |
-| Venus | Prograde | 34 | 1.119 × 10⁻⁶ |
-| Earth | Prograde | 3 | 1.672 × 10⁻⁵ |
-| Mars | Prograde | 5 | 4.463 × 10⁻⁵ |
-| Jupiter | Prograde | 5 | 7.928 × 10⁻³ |
-| Uranus | Prograde | 21 | 5.705 × 10⁻³ |
-| Neptune | Prograde | 34 | 1.734 × 10⁻³ |
+| Mercury | In-phase | 21 | 4.404 × 10⁻⁶ |
+| Venus | In-phase | 34 | 1.119 × 10⁻⁶ |
+| Earth | In-phase | 3 | 1.672 × 10⁻⁵ |
+| Mars | In-phase | 5 | 4.463 × 10⁻⁵ |
+| Jupiter | In-phase | 5 | 7.928 × 10⁻³ |
+| Uranus | In-phase | 21 | 5.705 × 10⁻³ |
+| Neptune | In-phase | 34 | 1.734 × 10⁻³ |
 | Saturn | Anti-phase | 3 | 1.547 × 10⁻² |
 
 ```
@@ -501,19 +491,12 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 ## Eccentricity Constant — Open Placeholder
 
-> **Status: open research question** — see [Law 4 § placeholder](#law-4-the-eccentricity-constant-open--placeholder).
+**What the amplitude laws predict vs what remains open:**
 
-This section originally derived the four mirror-pair Fibonacci/Lucas R² targets that fixed the eight planetary eccentricities. Three independent searches in 2026 confirmed those targets were at the noise level of the dense Fibonacci/Lucas combination space (median best-error ≈ 0.43% for random targets in this candidate space, against actual pair errors of 0.1–4%). The pair-constraint form is therefore retained for **reference** but is no longer claimed as a derivation.
-
-For the historical derivation tables (R values, pair constraints, prediction tables, and the belt-adjacent vs outer regime breakdown), see the script that reproduces them: [`scripts/fibonacci_law4_verify.py`](../scripts/fibonacci_law4_verify.py). The three search histories that established the noise-level conclusion are:
-
-- [`scripts/archive/fibonacci_law4_search.py`](../scripts/archive/fibonacci_law4_search.py) — exhaustive `ξ × ∏ param^exp = const` search across ~30 orbital parameters with no result.
-- [`scripts/fibonacci_law4_reformulation_search.py`](../scripts/fibonacci_law4_reformulation_search.py) — 7 alternative R-definitions × 5 pair forms, all at noise level.
-- [`scripts/fibonacci_law4_balance_search.py`](../scripts/fibonacci_law4_balance_search.py) — confirmed exactly **one** balance equation exists in `(m, a, d)` space (Law 5 itself), so the four mirror-pair eccentricities cannot be predicted from the four inner ones via additional balance equations of the same form as Law 5.
-
-**Where the search currently sits**: Law 5 alone is one equation in eight unknowns, sufficient to predict Saturn from the other seven (which it does, to ~0.001%). Predicting all eight requires either three more independent balance equations (none exist in the (m, a, d) parameter space) or a single physical constant tying eccentricity to a quantity *outside* (m, a, d). Neither has been found. The eccentricity-inclination ratios `R = e/i_mean` cluster near small Fibonacci/Lucas combinations as a *descriptive observation*, but the clustering is not significantly tighter than the noise floor of the candidate space.
-
-The historical note on AMD theory (Laskar 1997) is still relevant context: `C_k ≈ Λ_k(e²/2 + i²/2)` for small e and i — the ratio `R² + 1 = (e² + i²) / i²` describes how each planet partitions its angular momentum deficit between eccentricity and inclination. Whether this partition has a Fibonacci structure that we have not yet uncovered remains the central question for Law 4.
+- **Predicted**: all 8 inclination oscillation amplitudes (Law 2, from ψ)
+- **Predicted**: all 8 eccentricity oscillation amplitudes (Law 4, from K)
+- **Predicted**: Saturn's base eccentricity (Law 5, from the other seven, to ~0.001%)
+- **Not predicted**: the remaining 7 base eccentricities — structural values set at formation, analogous to the 8 mean inclinations
 
 ---
 
@@ -523,14 +506,14 @@ The historical note on AMD theory (Laskar 1997) is still relevant context: `C_k 
 
 | Planet | d | Phase | Amplitude (°) | Mean (°) | Range (°) | LL bounds (°) | Margin (°) |
 |--------|---|-------|---------------|----------|-----------|---------------|-----------|
-| Mercury | 21 | Prograde | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
-| Venus | 34 | Prograde | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
-| Earth | 3 | Prograde | 0.635 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
-| Mars | 5 | Prograde | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
-| Jupiter | 5 | Prograde | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
+| Mercury | 21 | In-phase | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
+| Venus | 34 | In-phase | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
+| Earth | 3 | In-phase | 0.635 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
+| Mars | 5 | In-phase | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
+| Jupiter | 5 | In-phase | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
 | Saturn | 3 | Anti-phase | 0.065 | 0.932 | 0.87 – 1.00 | 0.797 – 1.02 | +0.023 |
-| Uranus | 21 | Prograde | 0.024 | 1.001 | 0.98 – 1.02 | 0.90 – 1.11 | +0.075 |
-| Neptune | 34 | Prograde | 0.014 | 0.722 | 0.71 – 0.74 | 0.55 – 0.80 | +0.064 |
+| Uranus | 21 | In-phase | 0.024 | 1.001 | 0.98 – 1.02 | 0.90 – 1.11 | +0.075 |
+| Neptune | 34 | In-phase | 0.014 | 0.722 | 0.71 – 0.74 | 0.55 – 0.80 | +0.064 |
 
 **Balance: 100%** — All 8 planets fit within Laplace-Lagrange bounds.
 
@@ -542,12 +525,12 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 
 | Quantity | Expression | Value |
 |----------|-----------|-------|
-| ψ | F₅ × F₈² / (2H) = 5 × 21² / (2H) | 2205 / (2H) |
+| ψ | d_E × amp_E × √m_E | 3.307 × 10⁻³ |
 | d | F₄ | 3 |
 | m | Earth mass (JPL DE440) | 3.0027 × 10⁻⁶ M☉ |
-| √m | | 1.7329 × 10⁻³ |
-| d × √m | 3 × 1.7329 × 10⁻³ | 5.1986 × 10⁻³ |
-| **amplitude** | **3.288 × 10⁻³ / 5.1986 × 10⁻³** | **0.632 °** |
+| √m | | 1.7331 × 10⁻³ |
+| d × √m | 3 × 1.7331 × 10⁻³ | 5.1992 × 10⁻³ |
+| **amplitude** | **3.307 × 10⁻³ / 5.1992 × 10⁻³** | **0.636 °** |
 
 The mean is computed from the J2000 constraint:
 
@@ -559,18 +542,9 @@ mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle)
      = 1.48188°
 ```
 
-#### Fibonacci vs IAU 2006-Optimized Values
+#### How ψ is derived from Earth
 
-The 3D simulation (`script.js`) uses a slightly different value optimized for the IAU 2006 obliquity rate:
-
-| Parameter | Fibonacci prediction (ψ formula) | Current model value |
-|-----------|----------------------------------|-------------------|
-| Amplitude | ψ / (d × √m) for Earth | `earthInvPlaneInclinationAmplitude` |
-| Mean | derived from J2000 constraint | `earthInvPlaneInclinationMean` |
-
-For current values, see [Constants Reference](20-constants-reference.md).
-
-The model value was derived by calibrating the obliquity rate to match the IAU 2006 precession model (Capitaine et al. 2003), which specifies a rate of −46.836769"/century. In the 3D model, the obliquity depends on `earthInvPlaneInclinationAmplitude` through:
+Earth's inclination amplitude (`earthInvPlaneInclinationAmplitude` = 0.6360°) is fitted by calibrating the obliquity rate to match the IAU 2006 precession model (Capitaine et al. 2003), which specifies a rate of −46.836769"/century. In the 3D model, the obliquity depends on the amplitude through:
 
 ```
 obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
@@ -578,7 +552,7 @@ obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
 
 where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is the H/13 axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude.
 
-The Fibonacci prediction (~0.632°) represents the theoretical long-term value from the balance condition, while the model value is calibrated to the currently observed obliquity rate. The difference is within the model's tolerance.
+ψ is then computed as `3 × A × √m_Earth`, and all 7 non-Earth amplitudes follow from `ψ / (d × √m)`. For current values, see [Constants Reference](20-constants-reference.md).
 
 ---
 
@@ -587,7 +561,7 @@ The Fibonacci prediction (~0.632°) represents the theoretical long-term value f
 ```javascript
 // Fundamental constants
 const H = 335317; // See Constants Reference for current value
-const PSI = 2205 / (2 * H);  // = 3.288 × 10⁻³
+const PSI = 3 * earthInclAmp * Math.sqrt(earthMass);  // = 3.307 × 10⁻³ (from Earth)
 
 // Fibonacci divisors
 const FIBONACCI_D = {
@@ -675,13 +649,13 @@ Compute Saturn's eccentricity from the eccentricity balance equation (Law 5). Ve
 
 At J2000 epoch, `i(2000) = mean + amplitude × cos(ω̃_J2000 - phaseAngle)` should match observed invariable plane inclinations.
 
-### Test 7: ~~Eccentricity Prediction from AMD Partition~~ — RETIRED
+### Test 7: Eccentricity Amplitude Constant (Law 4)
 
-This test verified Law 4's R² pair constraints at the time. Law 4 has been [demoted to a placeholder](#law-4-the-eccentricity-constant-open--placeholder) and the pair-constraint targets shown to be at noise level. The test is preserved in `tools/verify/verify-laws.js` as a *report only* (no pass/fail bar) for reference.
+Verifies that `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` holds for all 8 planets with a single K derived from Earth.
 
-### Test 8: ~~Overconstrained System Consistency~~ — RETIRED
+### Test 8: Saturn Eccentricity from Law 5
 
-This test claimed an "8 pair constraints + Law 5 = 9 equations for 8 unknowns" overconstrained system. With Law 4 demoted, only Law 5 (one equation) is currently a predictive eccentricity constraint. The system is no longer claimed to be overconstrained on eccentricities.
+Verifies that Law 5 (eccentricity balance) predicts Saturn's base eccentricity from the other seven planets to ~0.001%.
 
 ---
 
@@ -752,7 +726,7 @@ npx parcel build src/index.html --no-cache
 
 ## Open Questions
 
-1. **Eccentricity formula** — *Partially resolved.* No universal closed-form formula `e = f(d, m, a)` exists — exhaustive search shows that any power-law ansatz requires per-planet Fibonacci numerators F_e with >300% spread across planets. However, eccentricities **are** predicted from inclinations via Fibonacci pair constraints on the AMD partition ratio R = e / i_mean_rad (Law 4). The R²_sum values show partial internal structure — belt-adjacent pairs follow R²_sum = F_k/d while outer pairs follow R²_sum = F_k/2 — but no single formula unifies both regimes. The second constraints (products/ratios) remain empirical.
+1. **Base eccentricity formula** — Law 4 predicts eccentricity *amplitudes*, and Law 5 predicts Saturn's *base* eccentricity from the other seven. The remaining seven base eccentricities have no known universal formula — exhaustive search shows no power-law ansatz in `(d, m, a, tilt)` produces a universal constant across all 8 planets.
 
 2. **Physical derivation of eccentricity balance** — The inclination balance follows from angular momentum conservation. What conservation law or secular perturbation mechanism produces the eccentricity balance? The linear (rather than quadratic) dependence on e distinguishes it from AMD conservation.
 
@@ -772,21 +746,21 @@ npx parcel build src/index.html --no-cache
 
 ### What appears genuinely new
 
-1. **Fibonacci quantization of inclination amplitudes** — No known physical theory predicts that Fibonacci numbers should appear as divisors in planetary inclination amplitudes. The relationship `d × amplitude × √m = ψ`, with `d` restricted to pure Fibonacci numbers, cannot be derived from Newtonian gravity, general relativity, or Laplace-Lagrange secular perturbation theory.
+1. **Fibonacci quantization of oscillation amplitudes** — No known physical theory predicts that Fibonacci numbers should appear as divisors in planetary inclination or eccentricity amplitudes. The relationships `d × inclAmp × √m = ψ` (Law 2) and `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` (Law 4), with `d` restricted to pure Fibonacci numbers, cannot be derived from Newtonian gravity, general relativity, or Laplace-Lagrange secular perturbation theory.
 
-2. **The universal constant ψ = 2205/(2H)** — This value has no known first-principles derivation. The numerator `2205 = 5 × 21²` (a product of Fibonacci numbers) is suggestive of a deeper structure, but no theoretical framework explains it.
+2. **Two universal amplitude constants ψ and K** — Both are empirical, derived from Earth, and predict all 8 planets with zero free parameters. No known theory explains why they exist or why Fibonacci divisors are the correct modulation.
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
 4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #1 is the only one that is also mirror-symmetric.
 
-5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05374) matches the J2000 observed value (0.05386) to ~0.22%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy. This is a non-trivial cross-validation of the d-value choice, even though it doesn't rise to a "two laws converge" claim. (An earlier "Law 4 R² pair" prediction has been retracted; see [Law 4 § placeholder](#law-4-the-eccentricity-constant-open--placeholder).)
+5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05374) matches the J2000 observed value (0.05386) to ~0.22%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
 
 ### Assessment
 
 The balance conditions (Laws 3 and 5) combine known conservation principles with a novel Fibonacci structure that modulates the planetary weights. The conservation laws guarantee that inclination and eccentricity oscillations balance around the invariable plane — but they do not predict that integer Fibonacci divisors should preserve that balance to such high precision.
 
-Law 2 (Inclination Amplitude quantization) is the most genuinely novel claim — no existing theory predicts that `d × amplitude × √m` should be constant across all planets when `d` is a Fibonacci number.
+Laws 2 and 4 (the amplitude constants ψ and K) are the most genuinely novel claims — no existing theory predicts that Fibonacci divisors should produce universal constants for either inclination or eccentricity amplitudes across all eight planets.
 
 The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #1 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
 
@@ -804,7 +778,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [Balance Search](../tools/verify/balance-search.js) | Exhaustive Fibonacci divisor search |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
 | [Configuration Analysis](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
-| [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 4/5 convergence, sensitivity, TNO closed-system argument |
+| [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Balance decomposition, sensitivity, TNO closed-system argument |
 | [Epoch Independence](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 
 ---

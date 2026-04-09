@@ -198,9 +198,8 @@ console.log();
 console.log('─── 5. Psi-Constant Verification ────────────────────────────');
 console.log();
 
-const psi = (5 * 21 * 21) / (2 * C.H);
-console.log(`  psi = (F5 x F8^2) / (2H) = (5 x 21^2) / (2 x ${C.fmtInt(C.H)})`);
-console.log(`      = 2205 / ${C.fmtInt(2 * C.H)}`);
+const psi = C.PSI;
+console.log(`  psi = d_E × amp_E × √m_E (derived from Earth)`);
 console.log(`      = ${psi.toExponential(6)}`);
 console.log(`      = ${psi.toFixed(10)}`);
 
