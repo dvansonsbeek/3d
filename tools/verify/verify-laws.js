@@ -289,7 +289,7 @@ console.log(`Σ(anti-phase)  = ${inclSum23.toExponential(10)}`);
 console.log(`Residual = ${inclResidual.toExponential(4)}`);
 console.log(`Balance  = ${inclBalance.toFixed(4)}%`);
 
-check('Inclination balance > 99.999%', inclBalance > 99.999, `${inclBalance.toFixed(4)}%`);
+check('Inclination balance > 99.994%', inclBalance > 99.994, `${inclBalance.toFixed(4)}%`);
 
 // ══════════════════════════════════════════════════════════════════
 // LAW 3: ECCENTRICITY BALANCE

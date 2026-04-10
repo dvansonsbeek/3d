@@ -70,7 +70,7 @@ replaceConst('earthtiltMean', mp.earth.earthtiltMean);
 replaceConst('earthInvPlaneInclinationAmplitude', mp.earth.earthInvPlaneInclinationAmplitude);
 replaceConst('eccentricityBase', mp.earth.eccentricityBase);
 replaceConst('eccentricityAmplitude', mp.earth.eccentricityAmplitude);
-replaceConst('eccentricityAmplitudeK', mp.earth.eccentricityAmplitudeK);
+// K is derived at runtime from eccentricityAmplitude + earthtiltMean (see section E2d in script.js)
 
 // A3. Moon model parameters
 replaceConst('moonStartposApsidal', mp.moon.moonStartposApsidal);
@@ -81,8 +81,9 @@ replaceConst('moonStartposMoon', mp.moon.moonStartposMoon);
 console.log('\n=== A4. Planet Parameters ===');
 for (const [key, p] of Object.entries(mp.planets)) {
   for (const prop of [
-    'orbitalEccentricityBase', 'orbitalEccentricityAmplitude',
-    'eccentricityPhaseJ2000', 'eocFraction', 'startpos', 'angleCorrection',
+    // orbitalEccentricityBase, orbitalEccentricityAmplitude, eccentricityPhaseJ2000
+    // are all derived at runtime (from balanced-year phase + K)
+    'eocFraction', 'startpos', 'angleCorrection',
     'ascendingNodeInvPlane', 'inclinationPhaseAngle',
     'ascendingNodeCyclesIn8H',
     // Note: 'antiPhase' is a boolean — cannot be synced by replacePlanetProp (numeric regex).
@@ -298,7 +299,7 @@ replaceConst('moonTilt', ar.moonReference.moonTilt);
 console.log('\n=== C. Planet Astro References ===');
 for (const [key, a] of Object.entries(ar.planetOrbitalElements)) {
   for (const prop of [
-    'solarYearInput', 'orbitalEccentricityJ2000', 'axialTiltMean',
+    'solarYearInput', 'orbitalEccentricityJ2000', 'axialTiltJ2000',
     'eclipticInclinationJ2000', 'longitudePerihelion', 'ascendingNode',
     'invPlaneInclinationJ2000', 'meanAnomaly', 'trueAnomaly',
   ]) {
@@ -359,11 +360,10 @@ if (fs.existsSync(balancePresetsPath)) {
     const re = /const BALANCE_PRESETS = \[[\s\S]*?\n\];/;
     const m = src.match(re);
     if (m) {
-      const oldCount = (m[0].match(/\["/g) || []).length;
-      if (oldCount !== bpData.presets.length) {
+      if (m[0] !== newBlock) {
         src = src.replace(re, newBlock);
         changes++;
-        console.log(`  BALANCE_PRESETS: ${oldCount} → ${bpData.presets.length} presets`);
+        console.log(`  BALANCE_PRESETS: updated (${bpData.presets.length} presets)`);
       }
     }
   }

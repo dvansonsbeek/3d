@@ -225,8 +225,8 @@ function exportPlanet(planetName, years) {
     const obliqRel = p.obliquityCycle ? amp * Math.cos(2 * Math.PI * t / p.obliquityCycle) : 0;
     inclinationTiltRel.push(+inclRel.toFixed(6));
     axialTiltRel.push(+obliqRel.toFixed(6));
-    inclinationTilt.push(+(p.axialTiltMean + inclRel).toFixed(6));
-    axialTilt.push(+(p.axialTiltMean + obliqRel).toFixed(6));
+    inclinationTilt.push(+(p.axialTiltJ2000 + inclRel).toFixed(6));
+    axialTilt.push(+(p.axialTiltJ2000 + obliqRel).toFixed(6));
 
     // Longitude of perihelion (linear precession)
     const lonPeri = OE.calcPlanetPerihelionLong(
@@ -287,15 +287,15 @@ function exportPlanet(planetName, years) {
       obliquityMean: (() => {
         // Analytical mean over 8H: cos terms average to 0, leaving the anchoring offsets
         // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
-        if (!p.obliquityCycle) return p.axialTiltMean;
+        if (!p.obliquityCycle) return p.axialTiltJ2000;
         const amp = p.invPlaneInclinationAmplitude;
         const t2000 = 2000 - C.balancedYear;
         const genPrecRate = 1 / (C.H / 13);
         const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
-        return p.axialTiltMean + amp * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
+        return p.axialTiltJ2000 + amp * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
                                - amp * Math.cos(2 * Math.PI * t2000 / p.obliquityCycle);
       })(),
-      obliquityJ2000: p.axialTiltMean,
+      obliquityJ2000: p.axialTiltJ2000,
       semiMajorAxis: p.orbitDistance,
       orbitalPeriodDays: p.solarYearInput,
       perihelionEclipticYears: p.perihelionEclipticYears,

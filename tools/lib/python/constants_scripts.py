@@ -175,7 +175,7 @@ ECC_BASE["Earth"] = EARTH_BASE_ECCENTRICITY
 # Eccentricity amplitudes (from constants.js orbitalEccentricityAmplitude)
 ECC_AMPLITUDE_K = _C['eccentricityAmplitudeK']
 
-AXIAL_TILT = {p['name']: p['axialTiltMean'] for p in _C['planets'].values()}
+AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = EARTH_OBLIQUITY_MEAN
 
 LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets'].values()}

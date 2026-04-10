@@ -142,7 +142,7 @@ function computePlanetObliquity(planetName, currentYear) {
   const p = C.planets[planetName];
   if (!p) return 0;
 
-  const tiltJ2000 = p.axialTiltMean;
+  const tiltJ2000 = p.axialTiltJ2000;
 
   // Venus, Neptune: no obliquity cycle — return static tilt
   if (!p.obliquityCycle) return tiltJ2000;
@@ -150,7 +150,7 @@ function computePlanetObliquity(planetName, currentYear) {
   // Two-component obliquity (same structure as Earth's -cos(H/3) + cos(H/8)):
   //   1. Inclination component at ICRF perihelion period (NEGATIVE sign)
   //   2. Obliquity precession component at obliquityCycle period (POSITIVE sign)
-  // Both with same amplitude, anchored to axialTiltMean at J2000
+  // Both with same amplitude, anchored to axialTiltJ2000 at J2000
   const amp = p.invPlaneInclinationAmplitude;
   const t = currentYear - C.balancedYear;
   const t2000 = 2000 - C.balancedYear;
@@ -202,7 +202,7 @@ function computeAxialTiltAbsolute(planetName, currentYear) {
   const p = C.planets[planetName];
   if (!p) return 0;
   // For planets: axial component = obliquity - inclination deviation
-  // At J2000: axialTiltMean - 0 = axialTiltMean ✓
+  // At J2000: axialTiltJ2000 - 0 = axialTiltJ2000 ✓
   const inclRel = computeInclinationTiltRelative(planetName, currentYear);
   const obliq = computePlanetObliquity(planetName, currentYear);
   return obliq - inclRel;
@@ -210,7 +210,7 @@ function computeAxialTiltAbsolute(planetName, currentYear) {
 
 /**
  * Compute axial tilt relative (deviation from mean) for any planet.
- * For Earth: H/8 component. For planets: axialTilt(t) - axialTiltMean.
+ * For Earth: H/8 component. For planets: axialTilt(t) - axialTiltJ2000.
  *
  * @param {string} planetName - planet key or 'earth'
  * @param {number} currentYear - decimal year
@@ -222,7 +222,7 @@ function computeAxialTiltRelative(planetName, currentYear) {
   }
   const p = C.planets[planetName];
   if (!p) return 0;
-  return computeAxialTiltAbsolute(planetName, currentYear) - p.axialTiltMean;
+  return computeAxialTiltAbsolute(planetName, currentYear) - p.axialTiltJ2000;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

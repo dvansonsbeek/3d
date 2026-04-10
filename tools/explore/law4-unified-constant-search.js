@@ -28,7 +28,7 @@ const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus
 const data = names.map(key => {
   const p = C.planets[key];
   const isEarth = key === 'earth';
-  const tilt = isEarth ? C.earthtiltMean : p.axialTiltMean;
+  const tilt = isEarth ? C.earthtiltMean : p.axialTiltJ2000;
   const d = isEarth ? 3 : p.fibonacciD;
   const m = C.massFraction[key];
   const a = sma(key);

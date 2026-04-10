@@ -464,7 +464,7 @@ where:
 - ωₒ = 2π / obliquity cycle period (obliquity component, **positive** sign)
 - t = years from balanced year
 
-Anchored to J2000: `obliquity(2000) = axialTiltMean` (the known J2000 tilt).
+Anchored to J2000: `obliquity(2000) = axialTiltJ2000` (the known J2000 tilt).
 
 The **mean obliquity** (time-averaged over the Grand Holistic Octave = 8H) is:
 

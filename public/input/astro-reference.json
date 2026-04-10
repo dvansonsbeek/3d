@@ -63,7 +63,7 @@
     "mercury": {
       "solarYearInput": 87.9683,
       "orbitalEccentricityJ2000": 0.20563593,
-      "axialTiltMean": 0.03,
+      "axialTiltJ2000": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
       "longitudePerihelion": 77.4569131,
       "ascendingNode": 48.33033155,
@@ -74,7 +74,7 @@
     "venus": {
       "solarYearInput": 224.695,
       "orbitalEccentricityJ2000": 0.00677672,
-      "axialTiltMean": 2.6392,
+      "axialTiltJ2000": 2.6392,
       "eclipticInclinationJ2000": 3.39467605,
       "longitudePerihelion": 131.5765919,
       "ascendingNode": 76.67877109,
@@ -83,9 +83,9 @@
       "trueAnomaly": 324.5198504
     },
     "mars": {
-      "solarYearInput": 686.935,
+      "solarYearInput": 686.93,
       "orbitalEccentricityJ2000": 0.0933941,
-      "axialTiltMean": 25.19,
+      "axialTiltJ2000": 25.19,
       "eclipticInclinationJ2000": 1.84969142,
       "longitudePerihelion": 336.0650681,
       "ascendingNode": 49.55737662,
@@ -94,9 +94,9 @@
       "trueAnomaly": 118.9501056
     },
     "jupiter": {
-      "solarYearInput": 4330.42,
+      "solarYearInput": 4330.53,
       "orbitalEccentricityJ2000": 0.04838624,
-      "axialTiltMean": 3.13,
+      "axialTiltJ2000": 3.13,
       "eclipticInclinationJ2000": 1.30439695,
       "longitudePerihelion": 14.70659401,
       "ascendingNode": 100.4877868,
@@ -107,7 +107,7 @@
     "saturn": {
       "solarYearInput": 10747,
       "orbitalEccentricityJ2000": 0.05386179,
-      "axialTiltMean": 26.73,
+      "axialTiltJ2000": 26.73,
       "eclipticInclinationJ2000": 2.48599187,
       "longitudePerihelion": 92.12794343,
       "ascendingNode": 113.6452856,
@@ -118,7 +118,7 @@
     "uranus": {
       "solarYearInput": 30586,
       "orbitalEccentricityJ2000": 0.04725744,
-      "axialTiltMean": 82.23,
+      "axialTiltJ2000": 82.23,
       "eclipticInclinationJ2000": 0.77263783,
       "longitudePerihelion": 170.7308251,
       "ascendingNode": 74.00919023,
@@ -127,9 +127,9 @@
       "trueAnomaly": 148.5142459
     },
     "neptune": {
-      "solarYearInput": 59980,
+      "solarYearInput": 59800,
       "orbitalEccentricityJ2000": 0.00859048,
-      "axialTiltMean": 28.32,
+      "axialTiltJ2000": 28.32,
       "eclipticInclinationJ2000": 1.77004347,
       "longitudePerihelion": 45.80124471,
       "ascendingNode": 131.7853754,

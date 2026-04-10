@@ -92,7 +92,8 @@ const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
   ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationPhaseAngle);
 const eccentricityBase = modelParams.earth.eccentricityBase;
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
-const eccentricityAmplitudeK = modelParams.earth.eccentricityAmplitudeK;
+// K derived at runtime from Earth (see section after PSI below)
+let eccentricityAmplitudeK;  // assigned after massFraction is computed
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
 
 
@@ -131,9 +132,8 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
   planets[key] = {
     // Model parameters (from model-parameters.json)
     name: mp.name,
-    orbitalEccentricityBase: mp.orbitalEccentricityBase,
-    orbitalEccentricityAmplitude: mp.orbitalEccentricityAmplitude,
-    eccentricityPhaseJ2000: mp.eccentricityPhaseJ2000,
+    // orbitalEccentricityBase, orbitalEccentricityAmplitude, eccentricityPhaseJ2000
+    // are derived at runtime from balanced-year phase + K (see below)
     eocFraction: mp.eocFraction,
     startpos: mp.startpos,
     angleCorrection: mp.angleCorrection,
@@ -151,7 +151,7 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     // Astro references (from astro-reference.json)
     solarYearInput: ar.solarYearInput,
     orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
-    axialTiltMean: ar.axialTiltMean,
+    axialTiltJ2000: ar.axialTiltJ2000,
     eclipticInclinationJ2000: ar.eclipticInclinationJ2000,
     longitudePerihelion: ar.longitudePerihelion,
     ascendingNode: ar.ascendingNode,
@@ -364,13 +364,69 @@ for (const [key, p] of Object.entries(planets)) {
 }
 
 // Derive wobblePeriod for each planet (beat of axial precession and ICRF inclination)
-// Matches script.js calcWobblePeriod()
+// Matches script.js calcWobblePeriod(). Needed before K derivation for base eccentricity.
 const H13 = H / 13;
 for (const [key, p] of Object.entries(planets)) {
   if (p.perihelionEclipticYears && p.axialPrecessionYears) {
     const inclICRF = (p.perihelionEclipticYears * H13) / (H13 - p.perihelionEclipticYears);
     const wobbleRate = Math.abs(1 / p.axialPrecessionYears - 1 / inclICRF);
     p.wobblePeriod = 1 / wobbleRate;
+  }
+}
+
+// K derived from Earth: K = e_amp × √m / (sin(meanObliquity) × √d)
+// Symmetric with PSI: eccentricity amplitude = K × sin(meanObliquity) × √d / (√m × a^1.5)
+eccentricityAmplitudeK = eccentricityAmplitude * Math.sqrt(massFraction.earth)
+  / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
+
+// Obliquity cycles (Fibonacci decomposition of perihelion rate numerator)
+// Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle
+const obliqCycles = {
+  mercury: 8 * H / 3, venus: null, mars: 3 * H / 8,
+  jupiter: H / 2, saturn: H / 3, uranus: H / 2, neptune: null,
+};
+
+// Compute model mean obliquity, K-derived eccentricity amplitudes, and phase-derived
+// base eccentricities for each planet. Closes the loop:
+// PSI → incl amp → mean tilt → K → ecc amp → phase from balanced year → base
+const genPrecRate = 1 / (H / 13);
+const t2000 = 2000 - balancedYear;
+for (const [key, p] of Object.entries(planets)) {
+  if (!p.fibonacciD || !massFraction[key]) continue;
+  // Mean obliquity: remove J2000 oscillation offset
+  const obliqPeriod = obliqCycles[key];
+  if (obliqPeriod && p.invPlaneInclinationAmplitude) {
+    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
+    p.obliquityMean = p.axialTiltJ2000
+      + p.invPlaneInclinationAmplitude * Math.cos(2 * Math.PI * t2000 / icrfPeriod)
+      - p.invPlaneInclinationAmplitude * Math.cos(2 * Math.PI * t2000 / obliqPeriod);
+  } else {
+    p.obliquityMean = p.axialTiltJ2000;
+  }
+  // Eccentricity amplitude from K using mean obliquity
+  const a = Math.pow(p.solarYearInput / meanSolarYearDays, 2 / 3);
+  p.orbitalEccentricityAmplitude = eccentricityAmplitudeK
+    * Math.sin(Math.abs(p.obliquityMean) * Math.PI / 180) * Math.sqrt(p.fibonacciD)
+    / (Math.sqrt(massFraction[key]) * Math.pow(a, 1.5));
+  // Base eccentricity from balanced-year phase (same principle as Earth)
+  // Phase at J2000 = (2000 - balancedYear) / wobblePeriod × 360°
+  // Then solve: e_J2000² = base² + amp² - 2·base·amp·cos(θ)
+  const amp = p.orbitalEccentricityAmplitude;
+  const eJ2000 = p.orbitalEccentricityJ2000;
+  if (p.wobblePeriod) {
+    const phaseDeg = (t2000 / p.wobblePeriod) * 360;
+    const cosTheta = Math.cos(phaseDeg * Math.PI / 180);
+    const sinTheta = Math.sin(phaseDeg * Math.PI / 180);
+    const disc = eJ2000 * eJ2000 - amp * amp * sinTheta * sinTheta;
+    p.orbitalEccentricityBase = amp * cosTheta + Math.sqrt(Math.max(0, disc));
+    p.eccentricityPhaseJ2000 = phaseDeg % 360;
+  } else {
+    // No wobble period — use J2000 as base, derive phase from law of cosines
+    p.orbitalEccentricityBase = eJ2000;
+    const base = eJ2000;
+    const cosTheta = (base * base + amp * amp - eJ2000 * eJ2000) / (2 * base * amp);
+    p.eccentricityPhaseJ2000 = Math.abs(cosTheta) <= 1
+      ? Math.acos(cosTheta) * 180 / Math.PI : (cosTheta > 1 ? 0 : 180);
   }
 }
 

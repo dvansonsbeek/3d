@@ -186,10 +186,11 @@ console.log('  ── Eccentricity records ──');
 
 const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
-// Helper: replace a Record<string, number> block by finding the variable name
+// Helper: replace a Record<string, ...> block by finding the variable name
 // then replacing the content between { and }
 function replaceRecordBlock(content, varName, line1, line2) {
-  const re = new RegExp('(export const ' + varName + '[^{]*\\{)([\\s\\S]*?)(\\})');
+  // Match both 'export const' and plain 'const'
+  const re = new RegExp('((export )?const ' + varName + '[^{]*\\{)([\\s\\S]*?)(\\})');
   const match = content.match(re);
   if (!match) {
     console.log(`  ⚠ ${varName}: not found`);
@@ -197,7 +198,7 @@ function replaceRecordBlock(content, varName, line1, line2) {
   }
   const newBody = `\n${line1}\n${line2}\n`;
   const oldBlock = match[0];
-  const newBlock = match[1] + newBody + match[3];
+  const newBlock = match[1] + newBody + match[4];
   if (oldBlock === newBlock) {
     console.log(`  ✓ ${varName}: unchanged`);
     return content;
@@ -207,44 +208,48 @@ function replaceRecordBlock(content, varName, line1, line2) {
   return content.replace(oldBlock, newBlock);
 }
 
-// Format eccentricity values to avoid JS floating-point noise
-function fmtEcc(v) {
-  // Use enough precision to distinguish all planets, avoid trailing noise
-  const s = v.toPrecision(8);
-  return parseFloat(s);
-}
-function fmtAmp(v) {
-  return v.toExponential().replace(/e\+0$/, '').replace(/e\+/, 'e+').replace(/e-0/, 'e-');
-  // Use the value as-is for amplitudes (scientific notation)
-}
+// ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000 are now derived at runtime in constants.ts
+// (from K + mean obliquity + balanced-year phase). We sync the INPUT tables instead.
 
-const eccBase = {}, eccAmp = {}, eccPhase = {};
-for (const p of planets7) {
-  eccBase[p] = fmtEcc(mp.planets[p].orbitalEccentricityBase);
-  eccAmp[p] = mp.planets[p].orbitalEccentricityAmplitude;
-  eccPhase[p] = mp.planets[p].eccentricityPhaseJ2000;
+const cap = p => p.charAt(0).toUpperCase() + p.slice(1);
+const ar = require('../../public/input/astro-reference.json').planetOrbitalElements;
+
+// SOLAR_YEAR_DAYS (from astro-reference.json)
+{
+  const inner = planets7.slice(0, 3).map(p => `${cap(p)}: ${ar[p].solarYearInput}`).join(', ');
+  const outer = planets7.slice(3).map(p => `${cap(p)}: ${ar[p].solarYearInput}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'SOLAR_YEAR_DAYS',
+    `  ${inner},`, `  ${outer},`);
 }
 
-constantsTs = replaceRecordBlock(constantsTs, 'ECC_BASE',
-  `  Mercury: ${eccBase.mercury}, Venus: ${eccBase.venus}, Earth: EARTH_ECC_BASE, Mars: ${eccBase.mars},`,
-  `  Jupiter: ${eccBase.jupiter}, Saturn: ${eccBase.saturn}, Uranus: ${eccBase.uranus}, Neptune: ${eccBase.neptune},`);
+// ECC_J2000 (from astro-reference.json)
+{
+  const inner = planets7.slice(0, 3).map(p => `${cap(p)}: ${ar[p].orbitalEccentricityJ2000}`).join(', ');
+  const outer = planets7.slice(3).map(p => `${cap(p)}: ${ar[p].orbitalEccentricityJ2000}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'ECC_J2000',
+    `  ${inner},`, `  ${outer},`);
+}
 
-constantsTs = replaceRecordBlock(constantsTs, 'ECC_AMPLITUDE',
-  `  Mercury: ${eccAmp.mercury}, Venus: ${eccAmp.venus}, Earth: EARTH_ECC_AMP, Mars: ${eccAmp.mars},`,
-  `  Jupiter: ${eccAmp.jupiter}, Saturn: ${eccAmp.saturn}, Uranus: ${eccAmp.uranus}, Neptune: ${eccAmp.neptune},`);
+// TILT_J2000 (from astro-reference.json)
+{
+  const inner = planets7.slice(0, 3).map(p => `${cap(p)}: ${ar[p].axialTiltJ2000}`).join(', ');
+  const outer = planets7.slice(3).map(p => `${cap(p)}: ${ar[p].axialTiltJ2000}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'TILT_J2000',
+    `  ${inner},`, `  ${outer},`);
+}
 
-constantsTs = replaceRecordBlock(constantsTs, 'ECC_PHASE_J2000',
-  `  Mercury: ${eccPhase.mercury}, Venus: ${eccPhase.venus}, Earth: 192.9471, Mars: ${eccPhase.mars},`,
-  `  Jupiter: ${eccPhase.jupiter}, Saturn: ${eccPhase.saturn}, Uranus: ${eccPhase.uranus}, Neptune: ${eccPhase.neptune},`);
+// INCL_J2000 (from astro-reference.json)
+{
+  const inner = ['mercury','venus','earth','mars'].map(p =>
+    `${cap(p)}: ${p === 'earth' ? C.ASTRO_REFERENCE.earthInclinationJ2000_deg : ar[p].invPlaneInclinationJ2000}`).join(', ');
+  const outer = planets7.slice(3).map(p => `${cap(p)}: ${ar[p].invPlaneInclinationJ2000}`).join(', ');
+  constantsTs = replaceRecordBlock(constantsTs, 'INCL_J2000',
+    `  ${inner},`, `  ${outer},`);
+}
 
 // ── 4. Inclination records ────────────────────────────────────
-
-console.log('');
-console.log('  ── Inclination records ──');
-
-constantsTs = replaceRecordBlock(constantsTs, 'INCL_MEAN',
-  `  Mercury: ${C.planets.mercury.invPlaneInclinationMean}, Venus: ${C.planets.venus.invPlaneInclinationMean}, Earth: ${C.earthInvPlaneInclinationMean}, Mars: ${C.planets.mars.invPlaneInclinationMean},`,
-  `  Jupiter: ${C.planets.jupiter.invPlaneInclinationMean}, Saturn: ${C.planets.saturn.invPlaneInclinationMean}, Uranus: ${C.planets.uranus.invPlaneInclinationMean}, Neptune: ${C.planets.neptune.invPlaneInclinationMean},`);
+// INCL_MEAN is now derived at runtime in constants.ts (from INCL_J2000 + PSI + phase).
+// INCL_J2000 is synced as an input table above.
 
 // ── 4b. Anti-phase flag ──────────────────────────────────────
 

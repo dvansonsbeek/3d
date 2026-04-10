@@ -119,7 +119,15 @@ function computeBalance(config) {
     const mean = inclJ2000[key] - (isAntiPhase ? -1 : 1) * amplitude * cosPhaseJ2000;
     const rangeMin = mean - amplitude;
     const rangeMax = mean + amplitude;
-    const fitsLL = rangeMin >= llBounds[key].min - 0.01 && rangeMax <= llBounds[key].max + 0.01;
+    // LL bounds have uncertainty (~0.03° from mass uncertainties + secular theory truncation).
+    // Treat anything within this tolerance as "within bounds".
+    const LL_UNCERTAINTY = 0.03; // degrees
+    const fitsLL = rangeMin >= llBounds[key].min - LL_UNCERTAINTY && rangeMax <= llBounds[key].max + LL_UNCERTAINTY;
+    // LL overshoot: absolute degrees by which the model range exceeds LL bounds
+    // 0 = fully within bounds. Compare against LL uncertainty (~0.03-0.05° typical)
+    const undershoot = Math.max(0, llBounds[key].min - rangeMin);
+    const overshoot = Math.max(0, rangeMax - llBounds[key].max);
+    const llOvershootDeg = undershoot + overshoot;
 
     let directionMatch = true;
     if (key !== 'earth') {
@@ -130,26 +138,34 @@ function computeBalance(config) {
     }
 
     if (!fitsLL || !directionMatch) allPass = false;
-    planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, directionMatch };
+    planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, llOvershootDeg, directionMatch };
   }
 
-  // Scalar balance (in-phase vs anti-phase)
-  let sumPro = 0, sumAnti = 0;
+  // Inclination balance (w = √(m·a·(1-e²)) / d × amplitude, but amplitude = PSI/(d×√m))
+  let wPro = 0, wAnti = 0;
   for (const key of planets) {
-    const cfg_mass = mass[key];
-    const cfg_sma = orbitDistance[key];
-    const cfg_ecc = eccBase[key];
-    const L = cfg_mass * Math.sqrt(cfg_sma * (1 - cfg_ecc * cfg_ecc));
-    const w = L * planetResults[key].amplitude;
-    if (config[key].group !== 'anti-phase') sumPro += w;
-    else sumAnti += w;
+    const w = Math.sqrt(mass[key] * orbitDistance[key] * (1 - eccBase[key] * eccBase[key])) / config[key].d;
+    if (config[key].group !== 'anti-phase') wPro += w; else wAnti += w;
   }
-  const totalLamp = sumPro + sumAnti;
-  const balanceResidual = Math.abs(sumPro - sumAnti);
-  const imbalance = totalLamp > 0 ? (balanceResidual / totalLamp) * 100 : 0;
-  const balance = 100 - imbalance;
+  const inclBalance = (1 - Math.abs(wPro - wAnti) / (wPro + wAnti)) * 100;
 
-  return { balance, imbalance, allPass, planetResults };
+  // Eccentricity balance (v = √m × a^1.5 × e_base / √d)
+  let vPro = 0, vAnti = 0;
+  for (const key of planets) {
+    const v = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) * eccBase[key] / Math.sqrt(config[key].d);
+    if (config[key].group !== 'anti-phase') vPro += v; else vAnti += v;
+  }
+  const eccBalance = (1 - Math.abs(vPro - vAnti) / (vPro + vAnti)) * 100;
+
+  // LL bounds: count passes and max overshoot (clamped by uncertainty)
+  const LL_UNCERTAINTY = 0.03; // degrees — LL theory uncertainty
+  const llPassCount = planets.filter(p => planetResults[p].fitsLL).length;
+  const dirPassCount = planets.filter(p => planetResults[p].directionMatch).length;
+  const maxLLOvershootRaw = Math.max(...planets.map(p => planetResults[p].llOvershootDeg));
+  // Effective overshoot: anything within LL uncertainty is treated as 0
+  const maxLLOvershoot = Math.max(0, maxLLOvershootRaw - LL_UNCERTAINTY);
+
+  return { inclBalance, eccBalance, llPassCount, dirPassCount, maxLLOvershoot, maxLLOvershootRaw, allPass, planetResults };
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -172,8 +188,12 @@ const currentConfig = {
 };
 
 const curResult = computeBalance(currentConfig);
-console.log(`\nCurrent config balance: ${curResult.balance.toFixed(4)}%`);
-console.log(`All LL+Dir pass: ${curResult.allPass}`);
+console.log(`\nCurrent config:`);
+console.log(`  Inclination balance: ${curResult.inclBalance.toFixed(4)}%`);
+console.log(`  Eccentricity balance: ${curResult.eccBalance.toFixed(4)}%`);
+console.log(`  LL bounds pass: ${curResult.llPassCount}/8`);
+console.log(`  Direction pass: ${curResult.dirPassCount}/8`);
+console.log(`  All LL+Dir pass: ${curResult.allPass}`);
 
 // ══════════════════════════════════════════════════════════════════
 // EXHAUSTIVE SEARCH
@@ -222,19 +242,25 @@ for (const scenario of scenarios) {
 
                       const result = computeBalance(config);
 
-                      if (result.balance >= THRESHOLD) {
+                      if (result.inclBalance >= THRESHOLD) {
                         count++;
                         const g = (grp) => grp === 'in-phase' ? 0 : 1;
                         allConfigs.push({
                           scenario: scenario.name,
-                          balance: result.balance,
+                          inclBalance: result.inclBalance,
+                          eccBalance: result.eccBalance,
+                          llPassCount: result.llPassCount,
+                          dirPassCount: result.dirPassCount,
+                          maxLLOvershoot: result.maxLLOvershoot,
                           allPass: result.allPass,
-                          failCount: planets.filter(pl =>
-                            !result.planetResults[pl].fitsLL || !result.planetResults[pl].directionMatch
-                          ).length,
+                          // Composite score: lower LL overshoot is better (0°=perfect),
+                          // then eccentricity balance, then inclination as tiebreaker.
+                          // Max overshoot capped at 1° for scoring. Configs within ~0.03° of
+                          // LL bounds are effectively equivalent (LL uncertainty).
+                          score: (1 - Math.min(1, result.maxLLOvershoot)) * 10000 + result.eccBalance * 1 + result.inclBalance * 0.001,
                           row: [
                             scenario.name,
-                            parseFloat(result.balance.toFixed(8)),
+                            parseFloat(result.inclBalance.toFixed(8)),
                             config.mercury.d, g(config.mercury.group),
                             config.venus.d, g(config.venus.group),
                             config.mars.d, g(config.mars.group),
@@ -259,11 +285,41 @@ for (const scenario of scenarios) {
   console.log(`Scenario ${scenario.name} (Ju=${scenario.jupiter.d}, Sa=${scenario.saturn.d}): ${count} configs >= ${THRESHOLD}%`);
 }
 
-// Sort by balance descending
-allConfigs.sort((a, b) => b.balance - a.balance);
+// Sort by composite score descending
+// Score = (100 - maxLLOvershoot%) × 100 + eccBalance × 1 + inclBalance × 0.001
+allConfigs.sort((a, b) => b.score - a.score);
 
-console.log(`\nTotal: ${allConfigs.length} configs >= ${THRESHOLD}%`);
+console.log(`\nTotal: ${allConfigs.length} configs >= ${THRESHOLD}% inclination balance`);
 console.log(`All pass LL+Dir: ${allConfigs.filter(c => c.allPass).length}`);
+console.log(`LL 8/8: ${allConfigs.filter(c => c.llPassCount === 8).length}`);
+console.log(`LL 7/8: ${allConfigs.filter(c => c.llPassCount >= 7).length}`);
+
+// Show top 20
+console.log('\nTop 20 by composite score (LL overshoot + ecc balance + incl balance):');
+console.log('Rank │ Incl bal   │ Ecc bal    │ LL max▲  │ Dir │ Score    │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
+console.log('─────┼────────────┼────────────┼──────────┼─────┼──────────┼─────────────────────────────');
+for (let i = 0; i < Math.min(20, allConfigs.length); i++) {
+  const c = allConfigs[i];
+  const r = c.row;
+  const pGroup = (d, g) => `${d}${g ? '*' : ''}`;
+  console.log(
+    `${(i + 1).toString().padStart(4)} │ ${c.inclBalance.toFixed(4).padStart(9)}% │ ${c.eccBalance.toFixed(4).padStart(9)}% │ ${c.maxLLOvershoot.toFixed(3).padStart(6)}° │ ${c.dirPassCount}/8 │ ${c.score.toFixed(1).padStart(8)} │ ` +
+    `${pGroup(r[2],r[3]).padStart(3)} ${pGroup(r[4],r[5]).padStart(3)} ${pGroup(r[6],r[7]).padStart(3)} ${pGroup(r[8],r[9]).padStart(3)} ${pGroup(r[10],r[11]).padStart(3)} ${pGroup(r[12],r[13]).padStart(3)} ${pGroup(r[14],r[15]).padStart(3)}`
+  );
+}
+
+// Find current config rank
+const curIdx = allConfigs.findIndex(c => {
+  const r = c.row;
+  return r[2] === 21 && r[3] === 0 && r[4] === 34 && r[5] === 0 &&
+         r[6] === 5 && r[7] === 0 && r[8] === 5 && r[9] === 0 &&
+         r[10] === 3 && r[11] === 1 && r[12] === 21 && r[13] === 0 &&
+         r[14] === 34 && r[15] === 0;
+});
+if (curIdx >= 0) {
+  const c = allConfigs[curIdx];
+  console.log(`\nConfig #1 rank: ${curIdx + 1}/${allConfigs.length} (score: ${c.score.toFixed(1)}, incl: ${c.inclBalance.toFixed(4)}%, ecc: ${c.eccBalance.toFixed(4)}%, LL max overshoot: ${c.maxLLOvershoot.toFixed(3)}°)`);
+}
 
 // ══════════════════════════════════════════════════════════════════
 // WRITE OUTPUT FILE

@@ -39,7 +39,7 @@ const names = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus
 const data = names.map(key => {
   const p = C.planets[key];  // undefined for earth
   const isEarth = key === 'earth';
-  const tilt = isEarth ? C.earthtiltMean : p.axialTiltMean;
+  const tilt = isEarth ? C.earthtiltMean : p.axialTiltJ2000;
   return {
     name: key,
     e_base: isEarth ? C.eccentricityBase : p.orbitalEccentricityBase,

@@ -509,7 +509,7 @@ J2000 (99.9845%) while the amplitude remains negligible.
 | T_wobble (Earth) | 20,957 years | `perihelionCycleLength` in script.js |
 | T_wobble (per planet) | Varies | `calcWobblePeriod()` in script.js, see doc 37 |
 | e_amplitude per planet | See Section 5 table | `orbitalEccentricityAmplitude` in constants.js |
-| axial tilt per planet | See Section 8 table | `axialTiltMean` in constants.js |
+| axial tilt per planet | See Section 8 table | `axialTiltJ2000` in constants.js |
 
 ---
 
@@ -555,7 +555,7 @@ their effect on Law 5 weights is negligible for the dominant planets.
 | Mass fractions                        | tools/lib/constants.js      | 407-418     |
 | eccentricityAmplitudeK (K)           | tools/lib/constants.js      | 66          |
 | orbitalEccentricityAmplitude (per planet) | tools/lib/constants.js  |             |
-| axialTiltMean (per planet)           | tools/lib/constants.js      |             |
+| axialTiltJ2000 (per planet)           | tools/lib/constants.js      |             |
 | Balance search script                 | tools/verify/balance-search.js |          |
 | Eccentricity balance script           | tools/verify/eccentricity-balance.js |    |
 | Derive K + planet amplitudes/phases  | tools/fit/derive-eccentricity-amplitudes.js | Pipeline Step 7a |

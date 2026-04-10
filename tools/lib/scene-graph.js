@@ -625,7 +625,7 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const planetI = (p.invPlaneInclinationMean
     + antiPhaseSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 
-  // Planet Ω advances at the asc-node period (-8H/N from the model's eigenfrequency
+  // Planet Ω advances at the asc-node period (-8H/N from the model's integer
   // assignment), NOT at the ecliptic perihelion period — they are different angles.
   const planetAscNodePeriod = p.ascendingNodeCyclesIn8H
     ? -(8 * C.H) / p.ascendingNodeCyclesIn8H

@@ -29,9 +29,6 @@
   "planets": {
     "mercury": {
       "name": "Mercury",
-      "orbitalEccentricityBase": 0.20563593,
-      "orbitalEccentricityAmplitude": 0.00008349732021736901,
-      "eccentricityPhaseJ2000": 89.98836768437955,
       "eocFraction": -0.527,
       "startpos": 83.65233343135114,
       "angleCorrection": 0.9709062824365233,
@@ -57,9 +54,6 @@
     },
     "venus": {
       "name": "Venus",
-      "orbitalEccentricityBase": 0.006796164209625298,
-      "orbitalEccentricityAmplitude": 0.0009526037225820447,
-      "eccentricityPhaseJ2000": 84.80956236851715,
       "eocFraction": 0.436,
       "startpos": 249.35384756882547,
       "angleCorrection": -2.785608570036125,
@@ -82,9 +76,6 @@
     },
     "mars": {
       "name": "Mars",
-      "orbitalEccentricityBase": 0.09297543,
-      "orbitalEccentricityAmplitude": 0.003041895556616812,
-      "eccentricityPhaseJ2000": 96.98363594881995,
       "eocFraction": -0.066224,
       "startpos": 121.47523498759016,
       "angleCorrection": -2.1093711045934462,
@@ -110,9 +101,6 @@
     },
     "jupiter": {
       "name": "Jupiter",
-      "orbitalEccentricityBase": 0.048286239999999994,
-      "orbitalEccentricityAmplitude": 0.0000011380669025163578,
-      "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.495,
       "startpos": 13.887575195258023,
       "angleCorrection": 0.9274947312525512,
@@ -138,9 +126,6 @@
     },
     "saturn": {
       "name": "Saturn",
-      "orbitalEccentricityBase": 0.053736637105894776,
-      "orbitalEccentricityAmplitude": 0.000005347432417577137,
-      "eccentricityPhaseJ2000": 180,
       "eocFraction": 0.54,
       "startpos": 11.278263770383436,
       "angleCorrection": -0.17477199527640508,
@@ -166,9 +151,6 @@
     },
     "uranus": {
       "name": "Uranus",
-      "orbitalEccentricityBase": 0.04735744,
-      "orbitalEccentricityAmplitude": 0.000028021304344320577,
-      "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.53,
       "startpos": 44.90040949955561,
       "angleCorrection": -0.7346245310250481,
@@ -194,9 +176,6 @@
     },
     "neptune": {
       "name": "Neptune",
-      "orbitalEccentricityBase": 0.008609291619407548,
-      "orbitalEccentricityAmplitude": 0.000008014434394494452,
-      "eccentricityPhaseJ2000": 0,
       "eocFraction": 0.585,
       "startpos": 47.95521341430522,
       "angleCorrection": 2.332571061169066,

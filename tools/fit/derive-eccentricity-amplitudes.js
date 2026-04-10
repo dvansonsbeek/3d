@@ -1,24 +1,19 @@
 // ═══════════════════════════════════════════════════════════════
 // Derive Planet Eccentricity Parameters (Pipeline Step 7a)
 //
-// Three derivations:
-//   1. K from Earth: K = e_amp × √m / (sin(tilt) × √d)
-//   2. Venus base from R=311: e_V = ψ / (311 × √m_V)
-//   3. Mercury/Mars amplitude from K: e_amp = K × sin(tilt) × √d / (√m × a^1.5)
+// K from Earth: K = e_amp × √m × a^1.5 / (sin(meanObliquity) × √d)
 //
-// Phase is recomputed for all affected planets via law of cosines.
-// Venus amplitude is NOT K-derived (Laplace-Lagrange dominated).
-// Outer planet amplitudes are kept as-is (negligible K contribution).
+// All 7 planet amplitudes derived from K (symmetric with PSI):
+//   e_amp = K × sin(meanObliquity) × √d / (√m × a^1.5)
 //
-// Usage: node tools/fit/derive-eccentricity-amplitudes.js [--write]
+// Uses model mean obliquity (from PSI → incl amp → mean tilt).
+// Base eccentricities come from the dual-balance optimizer (Step 7b).
+// Phase is recomputed for all planets via law of cosines.
+//
+// Usage: node tools/fit/derive-eccentricity-amplitudes.js
 // ═══════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');
-const fs = require('fs');
-const path = require('path');
-
-const WRITE = process.argv.includes('--write');
-const MP_PATH = path.join(__dirname, '..', '..', 'public', 'input', 'model-parameters.json');
 
 // ── Step 1: Derive K from Earth ────────────────────────────────
 
@@ -50,54 +45,37 @@ if (Math.abs(K - storedK) / K > 1e-6) {
 }
 console.log('');
 
-// ── Step 2: Derive Venus base from R=311 ──────────────────────
+// ── Step 2: Compute per-planet amplitudes and phases ───────────
 
-const R = 311;  // Fibonacci primitive root prime — master ratio
-const venusM = C.massFraction.venus;
-const venusBaseNew = K > 0 ? C.PSI / (R * Math.sqrt(venusM)) : C.planets.venus.orbitalEccentricityBase;
-const venusBaseOld = C.planets.venus.orbitalEccentricityBase;
-
-console.log(`  Venus base from R=${R}: e_V = ψ / (${R} × √m_V) = ${venusBaseNew.toFixed(10)}`);
-console.log(`  Venus base stored:     ${venusBaseOld.toFixed(10)}`);
-if (Math.abs(venusBaseNew - venusBaseOld) / venusBaseOld > 1e-6) {
-  console.log(`  ⚠ Differs by ${((venusBaseNew / venusBaseOld - 1) * 100).toFixed(4)}% → will update`);
-} else {
-  console.log(`  ✓ Matches (diff < 0.0001%)`);
-}
-console.log('');
-
-// ── Step 3: Compute per-planet amplitudes and phases ───────────
-
-// K-driven amplitude applies to Mercury and Mars (high tilt, good R²).
-// Venus: base from R=311, amplitude kept as-is (Laplace-Lagrange dominated).
-// Outer planets: amplitude kept as-is (negligible compared to J2000-base diff).
-// Phase is recomputed for ALL planets when base or amplitude changes.
-const kDrivenPlanets = ['mercury', 'mars'];
+// All 7 planets get their amplitude from K using model mean obliquity
+// (symmetric with PSI for inclination). Closes the loop:
+// PSI → incl amp → mean tilt → K → ecc amp.
+// Venus also gets its base from R=311.
+// Phase is recomputed for all planets via law of cosines.
+//
+// Note: constants.js now computes these at runtime. This script verifies
+// that the JSON values match and updates them if Earth parameters change.
 const allPlanetKeys = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const P_earth = C.meanSolarYearDays;
 const updates = {};
 let anyChanged = false;
 
-console.log('  Planet      | Old amp         | New amp         | Old phase  | New phase  | Amp Δ%   | Phase Δ°  | Mode');
-console.log('  ------------|-----------------|-----------------|------------|------------|----------|-----------|----------');
+console.log('  Planet      | Mean tilt  | Old amp         | K-derived amp   | Old phase  | New phase  | Amp Δ%   | Phase Δ°');
+console.log('  ------------|------------|-----------------|-----------------|------------|------------|----------|----------');
 
 for (const key of allPlanetKeys) {
   const p = C.planets[key];
-  const tilt = p.axialTiltMean;
+  const meanTilt = p.obliquityMean;  // computed by constants.js from PSI → incl amp → mean tilt
   const d = p.fibonacciD;
   const m = C.massFraction[key];
   const period_days = p.solarYearInput;
   const a = Math.pow(period_days / P_earth, 2 / 3);  // AU from Kepler
-  const isKDriven = kDrivenPlanets.includes(key);
-  const isVenus = key === 'venus';
 
-  // Amplitude: K formula for K-driven planets, keep existing for others
-  const ampNew = isKDriven
-    ? K * Math.sin(tilt * Math.PI / 180) * Math.sqrt(d) / (Math.sqrt(m) * Math.pow(a, 1.5))
-    : p.orbitalEccentricityAmplitude;
+  // Amplitude from K using model mean obliquity
+  const ampNew = K * Math.sin(Math.abs(meanTilt) * Math.PI / 180) * Math.sqrt(d) / (Math.sqrt(m) * Math.pow(a, 1.5));
 
-  // Base: R=311 for Venus, existing for others
-  const base = isVenus ? venusBaseNew : p.orbitalEccentricityBase;
+  // Base from dual-balance optimizer (Step 7b)
+  const base = p.orbitalEccentricityBase;
 
   // Phase from law of cosines: e(J2000) = sqrt(base² + amp² - 2·base·amp·cos(θ))
   const e_j2000 = p.orbitalEccentricityJ2000 || base;
@@ -110,39 +88,30 @@ for (const key of allPlanetKeys) {
     phaseNew = cosTheta > 1 ? 0 : 180;
   }
 
+  // Compare against runtime-derived values (from constants.js)
   const ampOld = p.orbitalEccentricityAmplitude;
   const phaseOld = p.eccentricityPhaseJ2000;
   const ampDiff = (ampNew / ampOld - 1) * 100;
   const phaseDiff = phaseNew - phaseOld;
-  const mode = isKDriven ? 'K-driven' : isVenus ? 'R=311' : 'keep';
 
   console.log(
     '  ' + key.padEnd(12) + '| ' +
+    meanTilt.toFixed(5).padStart(10) + ' | ' +
     ampOld.toExponential(5).padEnd(16) + '| ' +
     ampNew.toExponential(5).padEnd(16) + '| ' +
     phaseOld.toFixed(4).padStart(10) + ' | ' +
     phaseNew.toFixed(4).padStart(10) + ' | ' +
     (ampDiff >= 0 ? '+' : '') + ampDiff.toFixed(3) + '%'.padEnd(4) + '| ' +
-    (phaseDiff >= 0 ? '+' : '') + phaseDiff.toFixed(4).padEnd(9) + ' | ' +
-    mode
+    (phaseDiff >= 0 ? '+' : '') + phaseDiff.toFixed(4)
   );
 
-  if (isKDriven && (Math.abs(ampDiff) > 0.001 || Math.abs(phaseDiff) > 0.0001)) {
+  if (Math.abs(ampDiff) > 0.001 || Math.abs(phaseDiff) > 0.0001) {
     anyChanged = true;
     updates[key] = { amplitude: ampNew, phase: phaseNew };
   }
-  if (isVenus) {
-    // Venus: update base + phase (amplitude unchanged)
-    const baseChanged = Math.abs(venusBaseNew - venusBaseOld) / venusBaseOld > 1e-6;
-    const phaseChanged = Math.abs(phaseDiff) > 0.0001;
-    if (baseChanged || phaseChanged) {
-      anyChanged = true;
-      updates[key] = { base: venusBaseNew, phase: phaseNew };
-    }
-  }
 }
 
-// ── Step 3: Verify Earth consistency ───────────────────────────
+// ── Step 4: Verify Earth consistency ───────────────────────────
 
 console.log('');
 const earthBase = C.eccentricityBase;
@@ -154,40 +123,10 @@ console.log(`  Earth verification: e(J2000) = ${earthEJ2000}, phase = ${earthPha
 console.log(`  e_reconstructed = ${Math.sqrt(earthBase*earthBase + earthAmp*earthAmp - 2*earthBase*earthAmp*Math.cos(earthPhase*Math.PI/180)).toFixed(8)} (should be ${earthEJ2000})`);
 console.log('');
 
-// ── Step 4: Write if --write ───────────────────────────────────
+// ── Summary ───────────────────────────────────────────────────
 
 if (!anyChanged) {
-  console.log('  ✓ All amplitudes and phases already match K. Nothing to update.\n');
-  process.exit(0);
+  console.log('  ✓ All amplitudes, phases, and bases are correctly derived at runtime.\n');
+} else {
+  console.log(`  ⚠ ${Object.keys(updates).length} planet(s) show runtime/verification mismatch — check constants.js derivation.\n`);
 }
-
-if (!WRITE) {
-  console.log(`  ${Object.keys(updates).length} planets need updating. Run with --write to apply.\n`);
-  process.exit(0);
-}
-
-// Read and update model-parameters.json
-const mp = JSON.parse(fs.readFileSync(MP_PATH, 'utf8'));
-
-// Update K
-mp.earth.eccentricityAmplitudeK = K;
-
-// Update per-planet values
-for (const [key, vals] of Object.entries(updates)) {
-  if (vals.amplitude !== undefined) mp.planets[key].orbitalEccentricityAmplitude = vals.amplitude;
-  if (vals.base !== undefined) mp.planets[key].orbitalEccentricityBase = vals.base;
-  if (vals.phase !== undefined) mp.planets[key].eccentricityPhaseJ2000 = vals.phase;
-}
-
-fs.writeFileSync(MP_PATH, JSON.stringify(mp, null, 2) + '\n');
-console.log(`  ✓ Updated model-parameters.json:`);
-console.log(`    - eccentricityAmplitudeK: ${K.toExponential(10)}`);
-for (const [key, vals] of Object.entries(updates)) {
-  const parts = [];
-  if (vals.base !== undefined) parts.push(`base=${vals.base.toFixed(8)}`);
-  if (vals.amplitude !== undefined) parts.push(`amp=${vals.amplitude.toExponential(5)}`);
-  if (vals.phase !== undefined) parts.push(`phase=${vals.phase.toFixed(4)}°`);
-  console.log(`    - ${key}: ${parts.join(', ')}`);
-}
-console.log('');
-console.log('  Next: run export-to-script.js --write to sync to script.js\n');
