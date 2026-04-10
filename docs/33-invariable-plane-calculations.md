@@ -289,11 +289,11 @@ This value oscillates ~±7° due to the equatorial-frame perihelion fluctuation 
 **Mean value relationship:** The mean ω_inv equals `180° − i_inv`, where `i_inv` = `o.earthInvPlaneInclinationDynamic` (the Laplace-Lagrange dynamic inclination). Earth's perihelion lies very close to the descending node on the invariable plane (ω ≈ 180°), offset by the orbital inclination.
 
 **Verification at J2000:**
-- Earth's longitude of perihelion: ϖ ≈ 102.937°
+- Earth's longitude of perihelion: ϖ ≈ 102.947°
 - Earth's ascending node on inv. plane: Ω_inv = 284.51°
-- Direct calculation: ω = (102.937 − 284.51 + 360) % 360 = 178.427°
+- Direct calculation: ω = (102.947 − 284.51 + 360) % 360 = 178.437°
 - Mean formula: 180° − 1.5786° = 178.421°
-- Agreement within ~0.006°
+- Agreement within ~0.016°
 
 **Implementation:**
 ```javascript

@@ -527,10 +527,9 @@ oscillations superimposed on the trend — would constitute a confirmation.
    obliquity cycle theory section above for the full set of ecliptic precession
    predictions.
 
-3. **Saturn obliquity ambiguity**: the Fibonacci decomposition 8 = 5 + 3 gives
-   two options (H/5 or H/3). The Earth-Saturn mirror-pair argument favors H/3
-   but is not conclusive. Long-term numerical integration of Saturn's spin-axis
-   evolution could resolve this.
+3. **Saturn obliquity**: ~~ambiguous~~ **resolved**. The Fibonacci decomposition 8 = 5 + 3
+   gives H/3 (the Earth-Saturn mirror-pair argument). This is now a model prediction:
+   Saturn's obliquity oscillates at H/3 = 111,772 yr. See [The Closed Loop](72-the-closed-loop.md).
 
 4. **Perihelion Fibonacci pattern**: The WebGeoCalc perihelion rates reveal a
    striking Fibonacci structure: Jupiter=H/5, Saturn=H/8 (retrograde), Earth=Uranus=H/3,
@@ -542,12 +541,11 @@ oscillations superimposed on the trend — would constitute a confirmation.
    - Ecliptic → ICRF: `T_ICRF = (T_ecl × T_ref) / (T_ref − T_ecl)`
    - ICRF → Ecliptic: `T_ecl = (T_ICRF × T_ref) / (T_ICRF + T_ref)`
 
-6. **Invariable plane reference**: JPL ascending node rates (dΩ/dt) are measured
-   against the ecliptic, which itself precesses. These cannot be used to derive
-   precession rates against the invariable plane. Souami & Souchay (2012)
-   provide J2000 snapshot positions relative to the invariable plane, but not
-   rates. The eigenfrequency analysis (g_i ≈ |s_i| for most planets) supports
-   the model's single-rate assumption.
+6. **Invariable plane reference**: ~~unresolved~~ **resolved**. JPL ascending node rates
+   (dΩ/dt) are measured against the ecliptic, which itself precesses. The model now
+   uses integer divisors of 8H (`ascendingNodeCyclesIn8H`) fitted to reproduce JPL's
+   J2000-fixed-frame ecliptic-inclination trends to ~4.3″/century across all 7 fitted
+   planets. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md).
 
 7. **Jupiter obliquity verification**: The Mars-Jupiter reciprocity predicts
    Jupiter obliquity = H/2 = 167,659 yr. Current literature (Saillenfest+ 2020)

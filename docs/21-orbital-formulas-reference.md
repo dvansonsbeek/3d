@@ -2102,7 +2102,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Pluto | `orbitalEccentricityBase` | `invPlaneInclinationMean` | derived | `solarYearInput` |
 
 **How values are sourced:**
-- **Eccentricity**: Input constant per planet (`planets.{name}.orbitalEccentricityBase`)
+- **Eccentricity**: Derived at runtime from balanced-year phase (`planets.{name}.orbitalEccentricityBase`)
 - **Inclination (inv)**: Derived from the Fibonacci ψ formula (see [Fibonacci Laws](10-fibonacci-laws.md))
 - **Semi-major axis**: Derived from period via Kepler's 3rd Law: `a = (H / solarYearCount)^(2/3)` where `solarYearCount = meanSolarYearDays / solarYearInput`
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)

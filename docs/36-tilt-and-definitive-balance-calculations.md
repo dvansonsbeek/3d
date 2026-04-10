@@ -158,7 +158,7 @@ Section 10 and `docs/37-planets-precession-cycles.md`). For Earth the eccentrici
 cycle is H/16 = 20,957 years, resulting in an amplitude of 0.001356 AU.
 
 **Step 6 — Eccentricity balance is maintained at every epoch.**
-The mean perihelion distances (base eccentricities) achieve 100% Law 5 balance.
+The mean perihelion distances (base eccentricities) achieve ~99.9% Law 5 balance.
 The fluctuations change each planet's real eccentricity slightly, but because
 delta_v = K * sin(tilt) — with mass and distance cancelling — the balance is
 preserved at every epoch. The dominant planets (Saturn, Jupiter, Uranus, Neptune
@@ -197,26 +197,14 @@ and therefore the most significant eccentricity oscillations.
   - Mars: JPL data (1700–2500, 10-year steps) fitted cosine gives amplitude
     3.059e-3, matching the tilt prediction (3.042e-3) to within 0.6%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
-  - Venus: Base eccentricity derived from Phase-derived (ψ/ξ_V = 311),
-    giving e_V_base = 0.006796 — within 0.3% of J2000 (0.006777). Venus's
-    eccentricity variation is dominated by Laplace-Lagrange secular perturbations,
-    not the K-driven tilt mechanism (JPL cosine fit R² = 0.074).
+  - Venus: Base eccentricity derived from balanced-year phase.
+    Venus's eccentricity variation is dominated by Laplace-Lagrange secular
+    perturbations, not the K-driven tilt mechanism (JPL cosine fit R² = 0.074).
   - Script: `tools/fit/python/planet_eccentricity_jpl.py`
-- **Mercury**: JPL J2000 value (tilt = 0.03°, essentially no fluctuation)
-- **Neptune**: Solved algebraically for exact 100% Law 5 balance
 
-The following base eccentricities achieve 100% dual balance (Law 3 + Law 5):
-
-| Planet  | Base Ecc      | J2000 JPL     | Diff from JPL | Note                   |
-|---------|---------------|---------------|---------------|------------------------|
-| Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
-| Venus   | 0.00679616    | 0.00677672    | -0.287%       | Phase-derived |
-| Earth   | 0.01538600    | 0.01671022    | -8.008%       | eccentricityBase       |
-| Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
-| Jupiter | 0.04828624    | 0.04838624    | -0.207%       | Dual-balance optimized |
-| Saturn  | 0.05373663    | 0.05386179    | -0.232%       | Dual-balance optimized |
-| Uranus  | 0.04735744    | 0.04725744    | +0.212%       | Dual-balance optimized |
-| Neptune | 0.00860931    | 0.00859048    | +0.219%       | Dual-balance optimized |
+All base eccentricities are now derived at runtime from the balanced-year phase
+(same principle as Earth). See [The Closed Loop](72-the-closed-loop.md) for the
+full derivation chain. The eccentricity balance (Law 5) emerges naturally at ~99.9%.
 
 ### Cosine Fit Validation
 

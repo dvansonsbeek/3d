@@ -247,8 +247,6 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 | ψ (psi) | d_E × amp_E × √m_E (from Earth) | 3.307 × 10⁻³ |
 | K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | 3.415 × 10⁻⁶ |
 
-Where F(n) are Fibonacci numbers: F(5) = 5, F(8) = 21.
-
 ### J2000 Eccentricities (eccJ2000)
 
 All 8 planets, combining inner planet J2000 values with outer planet pre-dual-balance values:
@@ -285,15 +283,15 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 ## Planet Orbital Distances & Periods
 
-| Planet | Orbit Count in H | Distance (AU) | Period (years) | Speed (km/h) |
-|--------|-----------------|---------------|----------------|---------------|
-| Mercury | 1,392,228 | 0.3871 | 0.2409 | 172,341 |
-| Venus | 545,059 | 0.7233 | 0.6151 | 126,081 |
-| Mars | 178,287 | 1.5237 | 1.8811 | 86,870 |
-| Jupiter | 28,282 | 5.1996 | 11.8596 | 47,002 |
-| Saturn | 11,396 | 9.5312 | 29.4296 | 34,702 |
-| Uranus | 4,004 | 19.1424 | 83.7520 | 24,518 |
-| Neptune | 2,042 | 29.9882 | 164.2196 | 19,585 |
+| Planet | Orbit Count in H | Distance (AU) | Period (years) |
+|--------|-----------------|---------------|----------------|
+| Mercury | 1,392,228 | 0.3871 | 0.2408 |
+| Venus | 545,059 | 0.7233 | 0.6152 |
+| Mars | 178,289 | 1.5237 | 1.8808 |
+| Jupiter | 28,281 | 5.1996 | 11.8566 |
+| Saturn | 11,396 | 9.5309 | 29.4243 |
+| Uranus | 4,004 | 19.1414 | 83.7417 |
+| Neptune | 2,048 | 29.9284 | 163.7270 |
 
 ## Perihelion Precession Periods (Ecliptic)
 
@@ -686,45 +684,34 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 ## Planet Orbital Periods (Tuned)
 
-| Planet | Variable | Value (days) | J2000 Reference (days) |
-|--------|----------|-------------|----------------------|
-| Mercury | `solarYearInput` | 87.9686 | 87.96845 |
-| Venus | `solarYearInput` | 224.695 | 224.6965 |
-| Mars | `solarYearInput` | 686.931 | 686.934 |
-| Jupiter | `solarYearInput` | 4330.5 | 4330.595 |
-| Saturn | `solarYearInput` | 10747.0 | 10746.6 |
-| Uranus | `solarYearInput` | 30586 | 30583 |
-| Neptune | `solarYearInput` | 59980 | 59896 |
+| Planet | Variable | Value (days) |
+|--------|----------|-------------|
+| Mercury | `solarYearInput` | 87.9683 |
+| Venus | `solarYearInput` | 224.695 |
+| Mars | `solarYearInput` | 686.93 |
+| Jupiter | `solarYearInput` | 4330.53 |
+| Saturn | `solarYearInput` | 10747 |
+| Uranus | `solarYearInput` | 30586 |
+| Neptune | `solarYearInput` | 59800 |
+
+Values from `astro-reference.json`. These are the official JPL solar year periods.
 
 ## Planet Orbital Eccentricities (Base)
 
 Base eccentricities represent the long-term oscillation midpoint. They are derived at runtime from the balanced-year phase (same principle as Earth). The eccentricity balance (Law 5) emerges naturally at ~99.9%.
 
-Note: these values are computed at runtime by constants.js — not stored in JSON. The table below shows approximate values for reference.
-| Uranus | 0.04735744 | 0.04725744 | +0.21% | Dual-balance optimized |
-| Neptune | 0.00860931 | 0.00859048 | +0.22% | Dual-balance optimized |
+Note: these values are computed at runtime by constants.js — not stored in JSON.
 
 ## Planet Eccentricity Amplitudes & Coupling Constant
 
 Eccentricity oscillation amplitudes from the tilt formula: `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))`. See [doc 35 §4-5](35-tilt-and-definitive-balance-calculations.md).
 
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Coupling constant K | `eccentricityAmplitudeK` | 3.4149201316e-6 | Universal tilt-eccentricity coupling |
+| Constant | Formula | Value | Description |
+|----------|---------|-------|-------------|
+| K | e_amp × √m × a^1.5 / (sin(tiltMean) × √d) | 3.4149 × 10⁻⁶ | Universal eccentricity amplitude constant (from Earth) |
 
-| Planet | `orbitalEccentricityAmplitude` | % of Base | Regime |
-|--------|-------------------------------|-----------|--------|
-| Mercury | 8.436789e-5 | 0.041% | Tilt-driven (tilt ~0, negligible) |
-| Venus | 9.625389e-4 | 15.5% | Tilt-driven |
-| Earth | 1.37032e-3 | 8.9% | Tilt-driven |
-| Mars | 3.073636e-3 | 3.3% | Tilt-driven |
-| Jupiter | 1.149908e-6 | 0.002% | Laplace-Lagrange dominant |
-| Saturn | 5.403008e-6 | 0.010% | Laplace-Lagrange dominant |
-| Uranus | 2.831008e-5 | 0.060% | Laplace-Lagrange dominant |
-| Neptune | 8.098033e-6 | 0.093% | Laplace-Lagrange dominant |
-
-Inner planets (Mercury–Mars): tilt amplitude fully explains the J2000−base difference.
-Outer planets (Jupiter–Neptune): tilt amplitude is negligible; J2000−base differences come from Laplace-Lagrange secular eigenmode exchange.
+All 8 planet amplitudes are derived at runtime from K using model mean obliquity:
+`e_amp = K × sin(meanObliquity) × √d / (√m × a^1.5)`. See [The Closed Loop](72-the-closed-loop.md).
 
 ## Planet Eccentricity Phase Constants (J2000)
 
