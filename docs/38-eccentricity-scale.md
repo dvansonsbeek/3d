@@ -209,21 +209,19 @@ Law 5 relates all eight planets through a single principle. Individual values ar
 
 The current system:
 - **Law 4**: e_amp = K × sin(tilt) × √d / (√m × a^1.5) — predicts all 8 eccentricity amplitudes from a single constant K
-- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same — one equation, predicts Saturn's base eccentricity from the other seven to ~0.001%
+- **Law 5**: Σ(in-phase) √m × a^1.5 × e / √d = Σ(anti-phase) same — one equation, predicts Saturn's base eccentricity from the other seven to ~0.2%
 
 ---
 
 ## Open Questions
 
-1. **What determines the 7 non-Saturn base eccentricities?** Law 4 predicts amplitudes and Law 5 predicts Saturn's base. The remaining seven base eccentricities are structural values with no known universal formula.
+1. **What determines the base eccentricities?** Base eccentricities are now derived from the balanced-year phase (same timing anchor as Earth). The eccentricity balance (Law 5) emerges naturally at ~99.9%. The ~0.1% residual may reflect contributions from minor bodies or planetary mass uncertainties (especially Uranus and Neptune, known only from Voyager 2). See [The Closed Loop](72-the-closed-loop.md).
 
-2. **The R-value clustering**: The R = e/i_mean ratios cluster near small Fibonacci/Lucas combinations descriptively. Is there a physical mechanism behind the clustering that we have not yet uncovered, or is it noise from the dense candidate space (75% of random targets find a Fibonacci/Lucas match within 1%)?
+2. **Time evolution**: As eccentricities oscillate (with the amplitude formula), does Law 5's balance stay near-perfect at every moment? Analysis shows it stays within 99.8–99.9% across Saturn's entire secular range. See [epoch-independence.js](../tools/verify/epoch-independence.js).
 
-3. **Time evolution**: As eccentricities oscillate (with the amplitude formula), does Law 5's balance stay perfect at every moment? Or does it only balance at specific epochs? See [epoch-independence.js](../tools/verify/epoch-independence.js) for the analysis.
+3. **Can K be derived from first principles?** K is empirical — derived from Earth's eccentricity amplitude and mean obliquity. Is there a deeper reason it takes this specific value? Independent eccentricity amplitude measurements from long-term orbital integrations could test whether K is truly universal.
 
-4. **Can K be derived from first principles?** K ≈ ψ²/π (0.77%) and K ≈ ψ^(L₅/F₅) (0.89%) are suggestive but not exact. Is K truly fundamental, or just an empirical fit from Earth? Independent eccentricity amplitude measurements from long-term orbital integrations could test this.
-
-5. **Exoplanet extension**: Can the balance framework (Law 5 alone, until Law 4 is found) predict eccentricities in exoplanet systems? This would be the ultimate test.
+4. **Exoplanet extension**: Can the balance framework predict eccentricities in exoplanet systems? This would be the ultimate test.
 
 ---
 

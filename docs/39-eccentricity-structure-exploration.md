@@ -214,7 +214,7 @@ This fundamental difference explains why no single eccentricity constant exists.
 
 4. **The 5-parameter regression**: Are the exponents (3/5, −1/3, −2/5, 1/3, 7/5) physically meaningful, or artifacts of overfitting? A 9th planet or exoplanet system could test this.
 
-5. **Structural vs amplitude balance**: The structural eccentricities balance at 99.978% (not 100%). Is this because the amplitude perturbation slightly shifts the balance point, or because the true equilibrium uses e_base (not e_structural)?
+5. **Structural vs amplitude balance**: ~~unresolved~~ **resolved**. Base eccentricities are now derived from the balanced-year phase. The eccentricity balance emerges naturally at ~99.9% — no forcing. The ~0.1% residual may reflect minor body contributions or planetary mass uncertainties. See [The Closed Loop](72-the-closed-loop.md).
 
 ---
 

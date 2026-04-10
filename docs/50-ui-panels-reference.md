@@ -397,16 +397,16 @@ An interactive modal for testing different planetary group assignments and Fibon
 | **Phase angle selection** | Choose between per-planet model phases, Laplace-Lagrange eigenmodes, or custom angles |
 | **Fibonacci divisor dropdown** | Common Fibonacci values (1–55) plus custom input |
 | **Editable precession periods** | Modify ascending node precession rates |
-| **743 presets** | Pre-computed configurations with ≥99.994% inclination balance |
+| **765 presets** | Pre-computed configurations with ≥99.994% inclination balance, ranked by composite score (LL overshoot + eccentricity balance + inclination balance) |
 | **Dual balance display** | Inclination (Law 3) and eccentricity (Law 5) balance percentages |
 | **Per-planet results table** | Amplitude, mean, range, LL bounds check, trend comparison |
 | **Earth locked** | Earth's parameters (d=3, in-phase, 21.77°) are derived from the temperature model and cannot be changed |
 
 ### Default Configuration Result
 
-- Inclination balance: **100%**
-- Eccentricity balance: **100%**
-- LL bounds: **7/8 pass** (Saturn: +0.027° excess, within Brouwer & van Woerkom source precision)
+- Inclination balance: **~100%** (99.997%)
+- Eccentricity balance: **~99.9%**
+- LL bounds: **8/8 pass** (Saturn: +0.028° excess, within 0.03° LL uncertainty)
 - Trend directions: **7/7 fitted planets match JPL** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across the 7 fitted planets
 

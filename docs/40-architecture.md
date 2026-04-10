@@ -29,7 +29,7 @@
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Holistic Universe Model. It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~32,700 lines)
+- Single monolithic script.js (~45,600 lines)
 - 13 celestial bodies with full orbital mechanics
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS

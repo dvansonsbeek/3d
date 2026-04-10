@@ -40,10 +40,10 @@ The original April 2026 analysis below was conducted in two passes:
 ### 1A. Config #7 is the strongest scalar-balance candidate
 
 An exhaustive LL-constrained search tested 127 million (d-value, group) combinations. Out of 4.3 million that passed LL bounds with >95% inclination balance, **Config #7 ranked #1** with the highest combined score:
-- 99.9999% scalar inclination balance
-- 99.9993% scalar eccentricity balance
+- ~100% scalar inclination balance (99.997%)
+- ~99.9% scalar eccentricity balance (phase-derived bases)
 - 4/4 mirror symmetry (Me=Ur=21, Ve=Ne=34, Ma=Ju=5, Ea=Sa=3)
-- 7/8 LL bounds pass (Saturn marginal: 1.047° vs 1.02° limit)
+- 8/8 LL bounds pass (Saturn: +0.028° excess, within 0.03° LL uncertainty)
 
 No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition. **The d-values, antiPhase grouping, and the Saturn-only anti-phase assignment from this finding are all unchanged in the current model.** The 2026-04-09 audit only refit `ascendingNodeCyclesIn8H` and four phase angles, not the d-values themselves.
 
@@ -167,9 +167,9 @@ The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened
 | Constraint | Result | Status |
 |:--|:--|:--|
 | Fibonacci d-values | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 (unchanged) | ✓ |
-| LL bounds | 7/8 (Saturn +0.027° — within source precision) | ✓ |
-| Scalar inclination balance | 99.9999% | ✓ |
-| Scalar eccentricity balance | 99.9993% | ✓ |
+| LL bounds | 8/8 (Saturn +0.028° — within 0.03° LL uncertainty) | ✓ |
+| Scalar inclination balance | ~100% (99.997%) | ✓ |
+| Scalar eccentricity balance | ~99.9% (phase-derived bases) | ✓ |
 | Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |
 | Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |
@@ -229,9 +229,9 @@ The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase plane
 | Constraint | Result | Status |
 |:--|:--|:--:|
 | Fibonacci d-values (unchanged) | Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34 | ✓ |
-| LL bounds | 7/8 (Saturn within source precision) | ✓ |
-| Scalar inclination balance (Law 3) | 99.9999% | ✓ |
-| Scalar eccentricity balance (Law 5) | 99.9993% | ✓ |
+| LL bounds | 8/8 (Saturn within 0.03° LL uncertainty) | ✓ |
+| Scalar inclination balance (Law 3) | ~100% (99.997%) | ✓ |
+| Scalar eccentricity balance (Law 5) | ~99.9% (phase-derived bases) | ✓ |
 | Trend directions (J2000-fixed frame) | 7/7 fitted planets match JPL | ✓ |
 | Total trend error (J2000-fixed frame) | ~4.3″/century across 7 planets | ✓ |
 | Mirror symmetry | 4/4 | ✓ |

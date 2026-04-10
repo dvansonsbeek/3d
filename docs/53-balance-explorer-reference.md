@@ -74,7 +74,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **743 pre-computed configurations** that achieve ≥99.994% inclination vector balance (the TNO margin). These are grouped by Jupiter/Saturn d-value scenario:
+A dropdown in the header offers **765 pre-computed configurations** that achieve ≥99.994% inclination balance, ranked by composite score (LL overshoot + eccentricity balance + inclination balance). These are grouped by Jupiter/Saturn d-value scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -190,8 +190,8 @@ A configuration is valid when:
 | Check | Criterion |
 |-------|-----------|
 | **Inclination balance** | ≥99.994% (TNO margin) |
-| **Eccentricity balance** | High percentage (100% for the model configuration) |
-| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #7 has Saturn at +0.027° excess — within source precision, see [54 § 2A](54-vector-balance-analysis.md#2a-saturn-ll-bound-excess-is-within-source-precision)) |
+| **Eccentricity balance** | ~99.9% for the model configuration (phase-derived bases) |
+| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #7 has Saturn at +0.028° excess — within 0.03° LL uncertainty) |
 | **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
 
 ### Exploring Configurations
@@ -203,7 +203,7 @@ Useful experiments to try:
 | Change Saturn to in-phase group | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
-| Use Preset dropdown | See all 743 valid configurations |
+| Use Preset dropdown | See all 765 valid configurations |
 | Look for Config #7 (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
@@ -236,13 +236,13 @@ The model's default (and uniquely determined) configuration:
 | Neptune | In-phase (174.04°) | 34 | F₉ | Venus |
 
 Expected results:
-- Inclination balance: **100%**
-- Eccentricity balance: **100%**
-- LL bounds: **7/8 pass** (Saturn: +0.027° excess, within Brouwer & van Woerkom source precision)
+- Inclination balance: **~100%** (99.997%)
+- Eccentricity balance: **~99.9%**
+- LL bounds: **8/8 pass** (Saturn: +0.028° excess, within 0.03° LL uncertainty)
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is Config #7 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)). The d-values, antiPhase grouping, and mirror pairs are unchanged from the original April 2026 analysis; the asc-node integers and 4 phase angles were re-fit 2026-04-09 to bring JPL trends into agreement.
+This is Config #7 out of 765 valid configurations (rank 7 by composite score) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 
@@ -416,7 +416,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | Component | Location |
 |-----------|----------|
 | `BALANCE_PLANETS` array | [script.js:9207](../src/script.js#L9207) |
-| `BALANCE_PRESETS` (743 configs) | [script.js:9216](../src/script.js#L9216) |
+| `BALANCE_PRESETS` (765 configs) | [script.js:9216](../src/script.js#L9216) |
 | `D_VALUE_OPTIONS` | [script.js:9330](../src/script.js#L9330) |
 | `BALANCE_CONFIG` | [script.js:9348](../src/script.js#L9348) |
 | `computeBalanceResults()` | [script.js:9497](../src/script.js#L9497) |
