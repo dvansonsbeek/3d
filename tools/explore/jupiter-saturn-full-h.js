@@ -323,7 +323,7 @@ console.log('  SUMMARY');
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('');
 console.log(conjunctions.length + ' conjunctions computed over H = ' + H + ' years');
-console.log('Mean synodic interval: ' + (intervals.length > 0 ? (conjunctions.map((c, i) => i > 0 ? c.year - conjunctions[i - 1].year : 0).filter(v => v > 0).reduce((a, b) => a + b, 0) / (conjunctions.length - 1)).toFixed(4) : '?') + ' yr');
+console.log('Mean synodic interval: ' + (conjunctions.length > 1 ? (conjunctions.map((c, i) => i > 0 ? c.year - conjunctions[i - 1].year : 0).filter(v => v > 0).reduce((a, b) => a + b, 0) / (conjunctions.length - 1)).toFixed(4) : '?') + ' yr');
 console.log('Mean triple interval:  ' + tripleMean.toFixed(4) + ' yr (σ=' + tripleStd.toFixed(4) + ')');
 console.log('');
 console.log('The triple interval variation is dominated by:');

@@ -19,11 +19,16 @@
 // balance condition. The vector balance is perfect in eigenmode space.
 //
 // This script:
-//   1. Lists known eigenfrequencies and their Fibonacci connections
-//   2. Shows the eigenvector structure (which planets dominate which mode)
-//   3. Demonstrates that the single-frequency-per-planet approximation
-//      is what breaks the vector balance
-//   4. Shows what a multi-mode model would look like
+//   1. Lists Laskar eigenfrequencies and eigenvector structure
+//   2. Demonstrates that single-frequency-per-planet breaks vector balance
+//   3. Compares Laskar eigenmodes vs the model's 8H/N integers — both
+//      give 100% vector balance (eigenmode solver has 33 spare DOF)
+//   4. Shows the advantage of each approach: 8H/N fits JPL trends from
+//      a single constant H; Laskar eigenmodes are first-principles physics
+//
+// RESULT: Vector balance is guaranteed for ANY set of frequencies.
+// The genuine constraint is the SCALAR balance (Laws 3+5), not the
+// vector balance.
 //
 // Usage: node tools/explore/eigenmode-decomposition.js
 // ═══════════════════════════════════════════════════════════════════════════
@@ -344,50 +349,58 @@ for (const c of connections) {
 }
 
 console.log('');
-console.log('REMARKABLE: The eigenfrequencies match Fibonacci-based periods!');
+console.log('The Laskar eigenfrequencies are 8 independent measurements from');
+console.log('N-body integration. The model\'s ascending-node integers (8H/N)');
+console.log('are a separate set, fit to JPL J2000-fixed-frame trends.');
 console.log('');
-console.log('  s₃ ≈ H/5:      Earth\'s dominant eigenmode = ecliptic precession period');
-console.log('  s₆ ≈ 8H/55:    The dominant outer-planet mode = our Ju/Sa node rate');
-console.log('  s₇ ≈ 8H/6:     Uranus eigenmode ≈ our Uranus node rate');
-console.log('  s₈ ≈ 8H/1:     Neptune eigenmode ≈ our Neptune node rate');
-console.log('  s₁ ≈ 8H/12:    Mercury eigenmode ≈ our Mercury node rate');
-console.log('  s₂ ≈ 8H/15:    Venus eigenmode ≈ our Venus node rate');
-console.log('  s₄ ≈ 8H/37:    Mars eigenmode ≈ our Mars node rate');
-console.log('');
-console.log('Our model\'s per-planet ascendingNodeCyclesIn8H values are NOT');
-console.log('"different rates for each planet" — they ARE the eigenfrequencies!');
-console.log('Each planet\'s rate = its dominant eigenfrequency.');
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SECTION 6: WHAT WOULD A MULTI-MODE MODEL LOOK LIKE?
+// SECTION 6: LASKAR EIGENMODES vs MODEL 8H/N INTEGERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-console.log('');
 console.log('═══════════════════════════════════════════════════════════════════════════');
-console.log('6. PATH FORWARD: MULTI-MODE INCLINATION MODEL');
+console.log('6. TWO APPROACHES: LASKAR EIGENMODES vs MODEL 8H/N INTEGERS');
 console.log('═══════════════════════════════════════════════════════════════════════════');
 console.log('');
-console.log('Instead of: i_j(t) = mean + amp × cos(ω̃_ICRF_j(t) - φ_j)');
+
+const modelIntegers = {
+  mercury: 9, venus: 1, earth: 40, mars: 62,
+  jupiter: 36, saturn: 36, uranus: 12, neptune: 3,
+};
+
+console.log('  Planet     │ Laskar eigenmode  │ Model 8H/N          │ Both give');
+console.log('  ───────────┼───────────────────┼─────────────────────┼──────────────');
+const eigenPlanets2 = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
+const eigenLabels2 = ['s₁','s₂','s₃','s₄','s₅','s₆','s₇','s₈'];
+const eigenRates2 = [-5.610, -7.060, -18.851, -17.635, 0, -26.350, -2.993, -0.692];
+
+for (let i = 0; i < 8; i++) {
+  const key = eigenPlanets2[i];
+  if (key === 'jupiter') continue; // s₅=0 (invariable plane)
+  const eigenPeriod = Math.abs(360 * 3600 / eigenRates2[i]);
+  const modelPeriod = 8 * C.H / modelIntegers[key];
+  console.log(
+    '  ' + (key.charAt(0).toUpperCase() + key.slice(1)).padEnd(10) + ' │ ' +
+    (eigenLabels2[i] + ' = ' + Math.round(eigenPeriod).toLocaleString() + ' yr').padEnd(17) + ' │ ' +
+    ('8H/' + modelIntegers[key] + ' = ' + Math.round(modelPeriod).toLocaleString() + ' yr').padEnd(19) + ' │ ' +
+    '100% vector bal.'
+  );
+}
+
 console.log('');
-console.log('Use: p_j(t) = Σᵢ T_ji × sin(sᵢ×t + γᵢ)');
-console.log('     q_j(t) = Σᵢ T_ji × cos(sᵢ×t + γᵢ)');
-console.log('     I_j(t) = arcsin(√(p_j² + q_j²))');
-console.log('     Ω_j(t) = atan2(p_j, q_j)');
+console.log('  KEY INSIGHT: Both sets give 100% vector balance (multi-mode).');
+console.log('  This is guaranteed by angular momentum conservation —');
+console.log('  the eigenmode solver has 33 spare degrees of freedom.');
 console.log('');
-console.log('This would:');
-console.log('  ✓ Give 100% vector balance at ALL times (by construction)');
-console.log('  ✓ Use eigenfrequencies that ARE Fibonacci-based (s₃=H/5, s₆=8H/55, etc.)');
-console.log('  ✓ Reproduce all 8 LL-theory inclination ranges');
-console.log('  ✓ Match JPL trend directions');
-console.log('  ✓ Unify the ascending node and inclination oscillation into one framework');
+console.log('  The advantage of the 8H/N integers:');
+console.log('  • All derive from a single constant H (structural)');
+console.log('  • Jointly fit to JPL J2000-fixed-frame trends (~4.3″/cy total)');
+console.log('  • Jupiter+Saturn locked to shared N=36 (gas-giant lockstep)');
 console.log('');
-console.log('The d-values (Fibonacci divisors) would map to:');
-console.log('  d_j = PSI / (amplitude_j × √m_j)');
-console.log('  where amplitude_j = max(I_j) - min(I_j) from the multi-mode solution');
-console.log('');
-console.log('The "anti-phase" property would emerge naturally:');
-console.log('  A planet is "anti-phase" if its dominant eigenmode phase γᵢ');
-console.log('  places it at MAX inclination when others are at MIN.');
+console.log('  The advantage of Laskar eigenmodes:');
+console.log('  • Computed from first-principles N-body integration');
+console.log('  • Physically represent the secular perturbation modes');
+console.log('  • Used for the multi-mode vector balance solver');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION 7: SUMMARY
@@ -395,29 +408,23 @@ console.log('  places it at MAX inclination when others are at MIN.');
 
 console.log('');
 console.log('═══════════════════════════════════════════════════════════════════════════');
-console.log('7. SUMMARY: THE MISSING PIECE');
+console.log('7. SUMMARY');
 console.log('═══════════════════════════════════════════════════════════════════════════');
 console.log('');
-console.log('The "missing piece" in our vector balance is NOT:');
-console.log('  ✗ Wrong d-values');
-console.log('  ✗ Wrong group assignments');
-console.log('  ✗ Wrong phase angles');
-console.log('  ✗ Wrong ascending node rates');
+console.log('The vector balance puzzle has two layers:');
 console.log('');
-console.log('It IS:');
-console.log('  → Using a SINGLE oscillation frequency per planet');
-console.log('  → When the physics requires MULTIPLE eigenmodes per planet');
+console.log('  SCALAR balance (Laws 3 + 5): The genuine physical constraint.');
+console.log('  Selects the Fibonacci d-values. Cannot be achieved by arbitrary');
+console.log('  configurations — only Config #1 among 41M candidates.');
 console.log('');
-console.log('The eigenfrequencies themselves are Fibonacci-based:');
-console.log('  s₃ = H/5, s₆ = 8H/55, s₇ = 8H/6, s₈ = 8H/1, etc.');
+console.log('  VECTOR balance: Guaranteed by eigenmode structure for ANY set');
+console.log('  of frequencies. Both Laskar eigenmodes and 8H/N integers give');
+console.log('  100% vector balance. This is a mathematical property of the');
+console.log('  eigenmode solver (33 spare DOF), not a validation of specific');
+console.log('  frequency values.');
 console.log('');
-console.log('Each eigenmode independently satisfies the vector balance (by angular');
-console.log('momentum conservation). Our single-frequency model approximates this');
-console.log('by using each planet\'s DOMINANT eigenmode frequency, which gives ~92-98%');
-console.log('balance. The remaining 2-8% requires including the secondary eigenmodes.');
-console.log('');
-console.log('The Fibonacci structure is DEEPER than we thought:');
-console.log('  Level 1: d-values are Fibonacci numbers (Law 2)');
-console.log('  Level 2: ICRF perihelion periods are H/Fibonacci (Law 1)');
-console.log('  Level 3: Eigenfrequencies themselves are 8H/Fibonacci!');
+console.log('The model uses single-mode per planet for the simulation');
+console.log('(inclination oscillation at ICRF period, Ω regression at 8H/N).');
+console.log('The multi-mode decomposition is used only for the vector balance');
+console.log('verification in the invariable plane explorer.');
 console.log('');

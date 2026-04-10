@@ -17,6 +17,18 @@
  * with opposite signs, so it cancels in the net phase. The two parameters are
  * orthogonal — re-optimizing correctionSun at each year does not shift the minimum.
  *
+ * CAVEAT: This scan changes ONLY perihelionalignmentYear while keeping
+ * correctionSun, eccentricityBase, eccentricityAmplitude, earthtiltMean, and
+ * earthInvPlaneInclinationAmplitude fixed. These 5 parameters were jointly
+ * optimized for the current alignment year (1246). A proper test would re-run
+ * the full Sun optimizer (Step 1) at each candidate year. The scan shows
+ * sensitivity, not the true optimum.
+ *
+ * RESULT: Minimum at 1248, but only 0.27 mdeg better than current 1246 —
+ * well within the parameter coupling uncertainty. The alignment year 1246.03125
+ * is derived from Meeus (perihelion at 90° ecliptic longitude) and should not
+ * be changed without re-running the full pipeline.
+ *
  * Usage:
  *   node tools/explore/perihelion-alignment-year-scan.js
  *   node tools/explore/perihelion-alignment-year-scan.js --fine   (±5y around minimum)
@@ -76,13 +88,17 @@ sg._invalidateGraph();
 
 console.log('  ─────┴────────────┴────────────┴────────────┘');
 console.log('');
-console.log(`  Optimal year: ${bestYear}  (RMS ${bestRMS.toFixed(6)}°)`);
-console.log(`  Current year: ${origYear}  (RMS ${rows.find(r => r.y === origYear)?.rmsTotal.toFixed(6) ?? 'n/a'}°)`);
+// Find nearest scanned year to origYear for comparison
+const nearestRow = rows.reduce((best, r) => Math.abs(r.y - origYear) < Math.abs(best.y - origYear) ? r : best, rows[0]);
+const currentRMS = nearestRow.rmsTotal;
 
-if (bestYear === origYear) {
-  console.log('  ✓  perihelionalignmentYear = 1246 is confirmed optimal.');
+console.log(`  Optimal year: ${bestYear}  (RMS ${bestRMS.toFixed(6)}°)`);
+console.log(`  Current year: ${origYear}  (RMS ${currentRMS.toFixed(6)}° at nearest scan point ${nearestRow.y})`);
+
+if (Math.abs(bestYear - Math.round(origYear)) <= 2) {
+  console.log('  ✓  perihelionalignmentYear is confirmed near-optimal.');
 } else {
-  const improvement = rows.find(r => r.y === origYear)?.rmsTotal - bestRMS;
+  const improvement = currentRMS - bestRMS;
   console.log(`  ⚠  Better year found: ${bestYear} (improvement: ${(improvement * 1000).toFixed(2)} mdeg)`);
 }
 console.log('');

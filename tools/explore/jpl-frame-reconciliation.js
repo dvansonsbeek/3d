@@ -14,14 +14,15 @@
 // Saturn (7″/cy) and Neptune (1″/cy). The frame mismatch could
 // fully explain the residual.
 //
-// This script computes, for Config #1 + Phase B phases, both:
-//   (a) Trend vs MOVING Earth (model's current convention)
+// This script computes both:
+//   (a) Trend vs MOVING Earth (model's ecliptic-of-date)
 //   (b) Trend vs FIXED J2000 Earth (JPL's convention)
-// and shows whether (b) matches JPL's table values better.
+// and shows that (b) is the correct comparison for JPL's dI/dt.
 //
-// If yes → the trend mismatch we've been chasing is a frame
-// definition issue, not a model deficiency. We should stop trying
-// to fix the model parameters.
+// RESULT: With the current asc-node integers (fit to JPL J2000-fixed
+// frame), the fixed-frame comparison gives ~4.3″/cy total error with
+// 7/7 direction matches. The moving-frame gives different values that
+// should NOT be compared to JPL directly.
 //
 // Usage: node tools/explore/jpl-frame-reconciliation.js
 // ═══════════════════════════════════════════════════════════════
@@ -33,18 +34,6 @@ const PSI = C.PSI;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
-const SHARED_PERIOD = -H / 5;
-const sharedRate = 360 / SHARED_PERIOD;     // deg/yr
-
-const config = {
-  mercury: { d: 21, antiPhase: false, phase: 108.0 },
-  venus:   { d: 34, antiPhase: false, phase:  41.5 },
-  mars:    { d:  5, antiPhase: false, phase: 122.5 },
-  jupiter: { d:  5, antiPhase: false, phase: 104.5 },
-  saturn:  { d:  3, antiPhase: true,  phase: 182.0 },
-  uranus:  { d: 21, antiPhase: false, phase: 260.5 },
-  neptune: { d: 34, antiPhase: false, phase: 316.0 },
-};
 const PLANETS = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
 
 const jplTrends = {
@@ -58,17 +47,22 @@ for (const key of PLANETS) {
   const p = C.planets[key];
   const eclP = p.perihelionEclipticYears;
   const icrfPeriod = 1 / (1 / eclP - genPrecRate);
-  const cfg = config[key];
+  const d = p.fibonacciD;
   const sqrtM = Math.sqrt(C.massFraction[key]);
-  const amp = PSI / (cfg.d * sqrtM);
-  const antiSign = cfg.antiPhase ? -1 : 1;
-  const cosJ2000 = Math.cos((p.longitudePerihelion - cfg.phase) * DEG2RAD);
+  const amp = PSI / (d * sqrtM);
+  const antiSign = p.antiPhase ? -1 : 1;
+  const phase = p.inclinationPhaseAngle;
+  const cosJ2000 = Math.cos((p.longitudePerihelion - phase) * DEG2RAD);
   const mean = p.invPlaneInclinationJ2000 - antiSign * amp * cosJ2000;
+  const ascNodeRate = p.ascendingNodeCyclesIn8H
+    ? -360 * p.ascendingNodeCyclesIn8H / (8 * H)
+    : 360 / (-H / 5);  // Earth fallback
   data[key] = {
     periLongJ2000: p.longitudePerihelion,
     omegaJ2000: p.ascendingNodeInvPlane,
     icrfRate: 360 / icrfPeriod,
-    mean, amp, antiSign, phase: cfg.phase,
+    ascNodeRate,
+    mean, amp, antiSign, phase,
   };
 }
 data.earth = {
@@ -79,6 +73,7 @@ data.earth = {
   earthPhaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
   periLongJ2000: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
   icrfRate: 360 / (H / 3),
+  ascNodeRate: -360 * 40 / (8 * H),  // Earth: -8H/40 = -H/5
 };
 
 function planetInclAt(key, year) {
@@ -92,7 +87,7 @@ function earthInclAt(year) {
   return pl.earthMean + pl.earthAmp * Math.cos((peri - pl.earthPhaseAngle) * DEG2RAD);
 }
 function omegaAt(key, year) {
-  return data[key].omegaJ2000 + sharedRate * (year - 2000);
+  return data[key].omegaJ2000 + data[key].ascNodeRate * (year - 2000);
 }
 
 // Spherical-law-of-cosines: angle between two planes given their (i, Ω)
@@ -134,7 +129,7 @@ function earthSelfDrift() {
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('  JPL FRAME RECONCILIATION');
 console.log('═══════════════════════════════════════════════════════════════');
-console.log('  Model: Config #1 + Phase B phases, shared rate −H/5.');
+console.log('  Model: Config #1, per-planet asc-node rates (8H/N).');
 console.log('  All trends are slope between 1900 and 2100, in deg/century.');
 console.log('');
 

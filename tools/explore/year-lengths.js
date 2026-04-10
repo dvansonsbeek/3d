@@ -2,6 +2,16 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // YEAR LENGTHS — Verify tropical, sidereal, anomalistic year lengths,
 //                season length asymmetry, and day length relationships
+//
+// NOTE: This script verifies the ANALYTICAL derivation chain (formulas in
+// constants.js), not the simulation output. The authoritative year lengths
+// come from the fitting pipeline:
+//   - tools/fit/cardinal-point-harmonics.js (Step 6c) — measures actual
+//     SS/WS/VE/AE from simulation
+//   - tools/fit/year-length-harmonics.js (Step 6d) — computes tropical/
+//     sidereal/anomalistic from those cardinal point measurements
+//
+// Both should agree, but the simulation-derived values are the ground truth.
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

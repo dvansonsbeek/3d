@@ -10,6 +10,14 @@
 //
 // We sweep exponents (p, q, r, s) and check if e_base / (sin(tilt)^p × d^q × m^r × a^s)
 // is constant across all 8 planets (or across subsets like inner/outer).
+//
+// RESULT: No power-law formula produces a universal constant for base
+// eccentricities. Best all-8 spread is ~74% (vs 0% for the K amplitude
+// formula). Adding inclination mean as a 5th variable doesn't help (86%).
+// This negative result confirmed that Law 4 should predict AMPLITUDES
+// (via K), not base eccentricities — leading to the promotion of K to Law 4.
+//
+// Usage: node tools/explore/law4-tilt-search.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

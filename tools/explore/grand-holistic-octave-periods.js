@@ -343,13 +343,14 @@ for (const c of earthCycles) {
 const PSI = C.PSI;
 
 console.log('');
-console.log('7. INCLINATION PARAMETERS (from balanced year n=0, Saturn anti-phase)');
+console.log('7. INCLINATION PARAMETERS (from System Reset n=7, Saturn anti-phase)');
 console.log('   ψ = ' + PSI.toExponential(6) + ' = d_E × amp_E × √m_E (derived from Earth)');
 console.log('');
-console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ BY state │ Mean       │ Amplitude  │ Range');
+console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ SR state │ Mean       │ Amplitude  │ Range');
 console.log('   ───────────┼────┼────────────┼─────────────┼──────────┼────────────┼────────────┼─────────────────');
 
-const balancedYear = C.balancedYear;
+// Use System Reset (n=7 balanced year) as the phase anchor
+const systemReset = C.balancedYear - 7 * C.H;
 for (const [key, p] of Object.entries(planets)) {
   const d = key === 'earth' ? 3 : C.planets[key].fibonacciD;
   const mass = C.massFraction[key];
@@ -357,8 +358,8 @@ for (const [key, p] of Object.entries(planets)) {
   const inclJ2000 = key === 'earth' ? 1.57869 : C.planets[key].invPlaneInclinationJ2000;
   const antiPhase = key === 'earth' ? false : C.planets[key].antiPhase;
 
-  const periAtBY = ((p.icrfRate * (balancedYear - 2000) + (key === 'earth' ? 102.947 : C.planets[key].longitudePerihelion)) % 360 + 360) % 360;
-  const phase = antiPhase ? periAtBY : ((periAtBY - 180 + 360) % 360);
+  const periAtSR = ((p.icrfRate * (systemReset - 2000) + (key === 'earth' ? 102.947 : C.planets[key].longitudePerihelion)) % 360 + 360) % 360;
+  const phase = antiPhase ? periAtSR : ((periAtSR - 180 + 360) % 360);
   const periLong = key === 'earth' ? 102.947 : C.planets[key].longitudePerihelion;
   const cosJ2000 = Math.cos((periLong - phase) * DEG2RAD);
   const antiSign = antiPhase ? -1 : 1;

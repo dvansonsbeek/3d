@@ -2,6 +2,20 @@
 /**
  * Saturn (and Jupiter) drift analysis — compare model positions against
  * actual JPL Horizons data at opposition dates and the 2020 great conjunction.
+ *
+ * RESULT: Saturn's ecliptic longitude error grows at ~43″/yr over 2015-2024.
+ * After subtracting the J2000→of-date frame precession (~50″/yr), the
+ * residual is ~-7″/yr. This residual is within the uncertainty of the
+ * approximate frame correction. The gravitation correction (Step 5b)
+ * compensates for most of this over the ~200yr training window.
+ *
+ * The -7″/yr could indicate Saturn's solarYearInput (10747 days) needs a
+ * slight increase (~1.8 days to N=11394). However, changing the orbit count
+ * shifts the semi-major axis, which affects the balance weights (Laws 3+5)
+ * and would require re-running the full pipeline. The current value gives
+ * Saturn baseline RMS 0.072° — acceptable. Further investigation needed.
+ *
+ * Usage: node tools/explore/saturn-drift-analysis.js [planet]
  */
 
 const sg = require('../lib/scene-graph.js');

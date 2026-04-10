@@ -1,7 +1,14 @@
 /**
  * Test Moon-Sun separation at historical and ancient solar eclipses.
  * JD values computed from calendar dates using standard Julian Day algorithm.
- * Tests how full Meeus Ch. 47 accuracy holds across different eras.
+ * Tests how Meeus Ch. 47 Moon accuracy degrades with distance from J2000.
+ *
+ * RESULT: Modern (2000-2024) 0.27° RMS, 19th century 1.6°, medieval 2.3°,
+ * ancient (584 BCE+) 36° — Meeus Ch. 47 is designed for ±few centuries of
+ * J2000 and breaks down for ancient dates. The model's Moon accuracy is
+ * limited by the Meeus algorithm, not by the geometric framework.
+ *
+ * Usage: node tools/explore/moon-ancient-eclipses.js
  */
 
 const { computePlanetPosition, thetaToRaDeg, phiToDecDeg } = require('../lib/scene-graph');

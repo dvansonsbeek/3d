@@ -1,28 +1,23 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 1 v3: LL-BOUNDS-CONSTRAINED MULTI-MODE FIT
+// REVERSE SEARCH: DERIVE D-VALUES FROM LL BOUNDS
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// Previous approaches failed because the eigenvector fit is underdetermined —
-// many solutions match J2000 but produce unphysical long-term ranges.
+// Instead of searching for the best d-values by balance optimization
+// (forward search, done by tools/verify/balance-search.js), this script
+// derives d-values from physics:
 //
-// New approach: use the LL bounds as the PRIMARY constraint.
-// The LL bounds (from Laskar 2004 numerical integration) tell us the
-// CORRECT long-term inclination range for each planet. These are
-// effectively multi-million-year observational constraints.
+//   1. Laplace-Lagrange bounds give the long-term inclination range
+//   2. amplitude = (I_max - I_min) / 2
+//   3. d = ψ / (amplitude × √m) → nearest Fibonacci number
 //
-// Method:
-//   1. For each planet, the LL bounds give us the amplitude:
-//      amplitude = (I_max - I_min) / 2
-//      mean = (I_max + I_min) / 2
+// If the LL-derived d-values match Config #1, it means the d-values
+// can be independently predicted from secular theory — making them
+// not just a balance optimization result but a physical prediction.
 //
-//   2. From amplitude + ψ/(d×√m), derive the Fibonacci d-value
+// Also exhaustively searches all d-value × group × scenario combinations
+// and ranks Config #1 among all valid configurations.
 //
-//   3. Verify that these amplitudes are consistent with eigenmode
-//      structure (sum of mode contributions)
-//
-//   4. Use J2000 as a secondary fit for phases
-//
-// Usage: node tools/explore/step1-ll-constrained-fit.js
+// Usage: node tools/explore/config-reverse-search.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

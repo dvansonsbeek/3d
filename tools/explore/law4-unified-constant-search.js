@@ -2,8 +2,15 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Unified constant search: Can ψ and K derive from a single deeper constant?
 //
-// Approach: instead of assuming ψ = 2205/(2H), measure both ψ and K
-// empirically from the data, then look for structural relationships.
+// Both ψ and K are empirical constants derived from Earth. This script
+// explores whether they are structurally related.
+//
+// RESULT: ψ/K ≈ 968.4 ≈ F₆ × L₅² = 8 × 11² (0.04% error). This is a
+// striking near-integer with Fibonacci/Lucas structure, but whether it
+// reflects deeper physics is an open question. Both constants remain
+// empirical — no closed-form derivation has been found.
+//
+// Usage: node tools/explore/law4-unified-constant-search.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('../lib/constants');

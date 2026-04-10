@@ -25,6 +25,12 @@
 //   (b) Phase B optimum (continuous-sweep phases for the 5 planets
 //       that gave LL+dir feasibility)
 //
+// RESULT: Rigid rotation gives max residual 5-8% over H (vs 0.4% at
+// J2000). This proves rigid rotation is INSUFFICIENT — per-planet
+// ascending-node rates (8H/N) are needed. The model provides these
+// via ascendingNodeCyclesIn8H per planet, and the multi-mode eigenmode
+// decomposition achieves 100% vector balance at all times.
+//
 // Usage: node tools/explore/vector-balance-simulator.js
 // ═══════════════════════════════════════════════════════════════
 

@@ -9,6 +9,14 @@
  * 1. Computes the expected geocentric Moon-Sun separation for each eclipse
  *    based on the eclipse's gamma parameter (NASA GSFC catalog)
  * 2. Compares pure Meeus Moon position against JPL Horizons for independent verification
+ *
+ * RESULT: r² = 0.989 — the geocentric Moon-Sun separation tracks |gamma| almost
+ * perfectly. Residual RMS after parallax correction is 0.04° (central eclipses 0.03°).
+ * The "eclipse errors" are not model deficiencies but the expected parallax offset
+ * between geocentric and topocentric coordinates. Meeus Ch. 47 is accurate to ~0.1°
+ * for the Moon's geocentric position.
+ *
+ * Usage: node tools/explore/moon-parallax-analysis.js
  */
 
 const C = require('../lib/constants');
@@ -218,10 +226,10 @@ function meeusSun(jd) {
   const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
   const Mr = M * d2r;
-  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mr)
-          + (0.019993 - 0.000101 * T) * Math.sin(2 * Mr)
-          + 0.000289 * Math.sin(3 * Mr);
-  let lambda = L0 + C;
+  const eoc = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mr)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * Mr)
+            + 0.000289 * Math.sin(3 * Mr);
+  let lambda = L0 + eoc;
   lambda = lambda % 360; if (lambda < 0) lambda += 360;
   return { lambda_deg: lambda, beta_deg: 0, T };
 }
