@@ -17,7 +17,7 @@
 
 ## 1. Background & Motivation
 
-The solar system simulation (`src/script.js`, ~34,400 lines) models long-term planetary orbital mechanics using the Holistic-Year framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
+The solar system simulation (`src/script.js`) models long-term planetary orbital mechanics using the Holistic-Year framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
 
 The model is now mature. The next step is building a **feedback loop**: compare the model's predictions against authoritative astronomical data, identify where it deviates, and systematically improve it — either by tuning existing parameters or by discovering missing perturbation terms.
 

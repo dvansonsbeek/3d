@@ -246,7 +246,7 @@ phase-optimized reference JD providing the correct initial phase alignment.
 ```
 solarYearInput:            87.9683       (orbital period in days)
 eclipticInclinationJ2000:  7.00497902    (ecliptic inclination, degrees)
-orbitalEccentricityBase:       0.20563593    (J2000 eccentricity -- INPUT)
+orbitalEccentricityBase:       (phase-derived at runtime)
 realOrbitalEccentricity:   0.17056221    (e/(1+e) -- DERIVED)
 eocFraction:               -0.527        (EoC multiplier, negative = anti-Keplerian)
 longitudePerihelion:        77.4569131    (ecliptic longitude of perihelion, degrees)

@@ -561,9 +561,9 @@ involving the planet's eccentricity in the offset calculation.
 ### Current values (tools/lib/constants.js and src/script.js)
 
 ```
-solarYearInput:            686.935       (orbital period in days, calibrated from ISAW drift)
+solarYearInput:            686.93        (orbital period in days, JPL official)
 eclipticInclinationJ2000:  1.84969142    (ecliptic inclination, degrees)
-orbitalEccentricityBase:       0.09297543    (base eccentricity)
+orbitalEccentricityBase:       (phase-derived at runtime)
 eocFraction:               -0.066224     (EoC multiplier, near-zero = mostly geometric)
 longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degrees)
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)
@@ -580,7 +580,7 @@ mirrorPair:                'jupiter'     (paired planet)
 ### Derived values
 
 ```
-solarYearCount:            178287        (integer orbit count in H)
+solarYearCount:            178289        (integer orbit count in H)
 orbitDistance:              1.5237        (AU, from Kepler's 3rd law)
 eccDist:                   14.23         (eccentricity * orbitDistance * 100)
 elipticOrbit (static):     7.72          (realEcc*d/2*100 + (e-realEcc)*d*100, overwritten dynamically)

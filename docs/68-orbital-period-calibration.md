@@ -67,7 +67,7 @@ RMS values below are from the time of calibration (before parallax correction wa
 | Jupiter | 4330.5        | +1.87   | 0.477      | 0.277     | -41.9%  |
 | Saturn  | 10747.0       | +0.21   | 0.466      | 0.562     | +20.6%  |
 
-**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→87.9683, Mars 686.931→686.935, Jupiter 4330.5→4330.42. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below. For current baselines see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
+**Note:** Since this calibration, several `solarYearInput` values have been further adjusted through pipeline refits: Mercury 87.9686→87.9683, Mars 686.931→686.93, Jupiter 4330.5→4330.53. The drift values above reflect the state at calibration time. Current orbit counts are in the Quantization table below. For current baselines see [67-planet-parallax-corrections.md](67-planet-parallax-corrections.md) §5.
 
 ### Trade-offs
 
@@ -88,11 +88,11 @@ The integer `solarYearCount` means periods change in discrete steps:
 
 | Planet  | Count   | Step size (days) |
 |---------|---------|------------------|
-| Mercury | 1392228 | 0.00006          |
-| Venus   | 545059  | 0.0004           |
-| Mars    | 178287  | 0.004            |
-| Jupiter | 28282   | 0.15             |
-| Saturn  | 11396   | 0.94             |
+| Mercury | 1,392,228 | 0.00006          |
+| Venus   | 545,059  | 0.0004           |
+| Mars    | 178,289  | 0.004            |
+| Jupiter | 28,281   | 0.15             |
+| Saturn  | 11,396   | 0.94             |
 
 For Mercury and Venus, the steps are so small that fine-tuning is possible.
 For Saturn, each step changes the period by nearly a full day, limiting precision.

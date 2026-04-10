@@ -580,7 +580,7 @@ The optimizer operates at two levels:
 
 Before building the full optimization engine, create standalone Node.js exploration scripts in `tools/explore/` to validate the Fibonacci orbital structure:
 
-**Shared module:** `tools/explore/constants.js` -- All constants and derived formulas extracted from `script.js` (lines 25-186, 884-1011, 1687-1770). Replicates exact calculations including `Math.round`/`Math.ceil` rounding. This becomes the foundation for Phase 5.
+**Shared module:** `tools/lib/constants.js` -- All constants and derived formulas extracted from `script.js` (lines 25-186, 884-1011, 1687-1770). Replicates exact calculations including `Math.round`/`Math.ceil` rounding. This becomes the foundation for Phase 5.
 
 1. **`orbit-counts.js`** -- Compute all `SolarYearCount` values from the formula `round(H x meanSolarYear / SolarYearInput)`. Verify Fibonacci relationships between orbit counts. Show how `SolarYearInput` maps to integer orbit counts and their sensitivity to input changes (how much must `SolarYearInput` change to cross a rounding boundary?).
 
@@ -592,7 +592,7 @@ Before building the full optimization engine, create standalone Node.js explorat
    - All Fibonacci consecutive pairs: F(n)/H + F(n+1)/H = F(n+2)/H
    Check loop closure and quantify any residuals.
 
-4. **`alignment-explorer.js`** -- For Jupiter-Saturn: when do they align? How many great conjunctions in H years? Do the orbit counts predict alignment patterns that match the ~19.86-year cycle? Extend to other mirror pairs.
+4. **`jupiter-saturn-conjunctions.js`** -- For Jupiter-Saturn: when do they align? How many great conjunctions in H years? Do the orbit counts predict alignment patterns that match the ~19.86-year cycle? Extend to other mirror pairs.
 
 5. **`moon-cycles.js`** -- Verify the Moon's derived cycle calculations:
    - Compute synodic, tropical, anomalistic, and draconic months from the 3 input months
@@ -635,7 +635,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - ALL Earth-planet synodic periods match known values within 0.01 days (< 0.002% error)
 - Conjunction counts divisible by multiple Fibonacci numbers: Mercury-Uranus by {2,3,8,21,34}, Venus-Neptune by {2,3,8,13}
 
-**4. Alignment patterns (alignment-explorer.js):**
+**4. Alignment patterns (jupiter-saturn-conjunctions.js):**
 - Jupiter-Saturn trigon: conjunctions advance by ~-117.0° (close to -120° = 360°/3)
 - Full trigon rotation: ~3.08 conjunctions ≈ 61.1 years
 - Predicted great conjunction dates show ~0.3-1.3 year systematic offset from known dates — this reflects the approximate startpos values, not a structural issue
@@ -672,8 +672,8 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 #### Phase 3 Checkpoint (completed)
 
 ##### What was built:
-1. **`tools/export-reference-data.js`** — Parses PLANET_TEST_DATES from script.js (regex, not eval), assigns tier/weight/source/reliability metadata per entry, outputs `data/reference-data.json`
-2. **`tools/enrich-with-jpl.js`** — Queries JPL Horizons REST API for missing RA/Dec values on all Tier 2 entries, with response caching (`data/jpl-cache.json`) and 1 req/sec rate limiting
+1. **`tools/pipeline/export-reference-data.js`** — Parses PLANET_TEST_DATES from script.js (regex, not eval), assigns tier/weight/source/reliability metadata per entry, outputs `data/reference-data.json`
+2. **`tools/pipeline/enrich-with-jpl.js`** — Queries JPL Horizons REST API for missing RA/Dec values on all Tier 2 entries, with response caching (`data/jpl-cache.json`) and 1 req/sec rate limiting
 3. **`data/reference-data.json`** — The compiled reference dataset with 678 entries fully annotated
 4. **`data/jpl-cache.json`** — Cached JPL Horizons responses (288 entries) for reproducibility
 
@@ -721,7 +721,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - Accuracy: 1-2 arcminutes (0.017-0.033°) — the most precise pre-telescope planetary measurements
 - Data type: declination only (no RA); 322 negative (south), 601 positive (north)
 - Dec range: -27.98° to +27.30°; JD range: 2299198.5 to 2305532.88
-- Files: `data/tycho-mars-raw.csv` (raw CSV), `tools/import-tycho-mars.js` (parser)
+- Files: `data/tycho-mars-raw.csv` (raw CSV), `tools/pipeline/import-tycho-mars.js` (parser)
 - Densest coverage: 1595 (294 obs), 1593 (135 obs), 1591 (104 obs)
 - These are **positionReliable: true** — actual measurements, not computed from ephemeris
 
@@ -822,7 +822,7 @@ Update the existing `PLANET_TEST_DATES` in-code data structure to include tier a
 #### Phase 4 Checkpoint (completed)
 
 ##### What was built:
-1. **`tools/patch-planet-test-dates.js`** — Reads reference-data.json metadata, rewrites the PLANET_TEST_DATES block in script.js with annotated entries and appended Tycho data
+1. **`tools/pipeline/patch-planet-test-dates.js`** — Reads reference-data.json metadata, rewrites the PLANET_TEST_DATES block in script.js with annotated entries and appended Tycho data
 2. **Updated `src/script.js`** — PLANET_TEST_DATES now has 1,601 entries (was 678), lines 6825-8485
 
 ##### Changes to script.js:
@@ -877,7 +877,7 @@ Mars now has 923 Tier 1C observations (weight 5) vs 144 Tier 2 ephemeris entries
 |------|---------|----------|
 | `tools/lib/constants.js` (497 lines) | Canonical constants module | All input constants, derived values, Moon cycles, planet data, date utilities, formatting helpers |
 | `tools/lib/orbital-engine.js` (264 lines) | Time-dependent orbital functions | 15 exported functions computing orbital elements as f(year) |
-| `tools/explore/constants.js` (2 lines) | Backward-compat re-export | `module.exports = require('../lib/constants')` |
+| `tools/lib/constants.js` (2 lines) | Backward-compat re-export | `module.exports = require('../lib/constants')` |
 
 **Constants module (`tools/lib/constants.js`) includes:**
 - All 17 global input constants (H, eccentricityBase, earthtiltMean, etc.)
@@ -1012,7 +1012,7 @@ The growing errors at historical dates are the **model's own prediction error** 
 
 - Implement REST client with `fetch` (Node.js 18+)
 - Response parser for RA/Dec extraction
-- Result caching to `data/reference-cache.json`
+- Result caching to `data/jpl-cache.json`
 - Rate limiting (avoid hammering NASA's servers)
 
 #### Phase 7 Checkpoint (completed)

@@ -95,13 +95,13 @@ Not to be confused with the ascending node on the ecliptic, which is the commonl
 
 The Fibonacci divisors and balance groups produce two independent balance conditions:
 
-- **Inclination balance** (Law 3): The angular-momentum-weighted inclination oscillations of seven in-phase planets balance against Saturn's anti-phase oscillation. Result: **100.0000%**.
+- **Inclination balance** (Law 3): The angular-momentum-weighted inclination oscillations of seven in-phase planets balance against Saturn's anti-phase oscillation. Result: **99.9972%**.
 
-- **Eccentricity balance** (Law 5): The same divisors and groups produce a balance on base eccentricities. Result: **99.9993%**. This predicts Saturn's eccentricity from the other seven planets to 0.001%.
+- **Eccentricity balance** (Law 5): The same divisors and groups produce a balance on base eccentricities. Result: **99.89%**.
 
 Both balances use the same planet configuration — no separate tuning.
 
-The base eccentricities (mean eccentricities around which each planet oscillates) are determined by the dual-balance optimizer: it finds the values closest to J2000 observed eccentricities that simultaneously satisfy both balance conditions. For Venus, Mars, and Jupiter the optimizer lands exactly on J2000. For Mercury it shifts slightly (-0.15%) to accommodate the tilt oscillation. For Saturn, Uranus, and Neptune it adjusts by <0.5% to close the balance. Only Earth's base eccentricity is independently fitted (by the Sun optimizer).
+The base eccentricities (mean eccentricities around which each planet oscillates) are phase-derived at runtime — not fitted by an optimizer. For each planet, the law of cosines is solved using the K-derived amplitude, the J2000 observed eccentricity, and the phase angle at the balanced-year epoch. This is the same approach used for Earth (where the Sun optimizer derives eccentricityBase from perihelion geometry). The balance percentages emerge naturally from the phase-derived values rather than being forced to 100% by construction.
 
 ## System Reset
 
@@ -138,7 +138,7 @@ From these free parameters, the model derives:
 - All eccentricity cycle periods (beat of axial and ICRF inclination)
 
 **From the configuration:**
-- Two independent balance conditions (inclination 100%, eccentricity 99.999%)
+- Two independent balance conditions (inclination 99.997%, eccentricity 99.89%)
 - The System Reset epoch and all inclination phase angles
 - All ascending node cycles (integer divisors of 8H)
 
