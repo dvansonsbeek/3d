@@ -50,11 +50,10 @@ console.log('');
 // All 7 planets get their amplitude from K using model mean obliquity
 // (symmetric with PSI for inclination). Closes the loop:
 // PSI → incl amp → mean tilt → K → ecc amp.
-// Venus also gets its base from R=311.
-// Phase is recomputed for all planets via law of cosines.
+// Base eccentricities derived from balanced-year phase.
 //
-// Note: constants.js now computes these at runtime. This script verifies
-// that the JSON values match and updates them if Earth parameters change.
+// Note: constants.js computes all values at runtime. This script verifies
+// that the runtime derivation is internally consistent.
 const allPlanetKeys = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const P_earth = C.meanSolarYearDays;
 const updates = {};

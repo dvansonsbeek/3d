@@ -476,7 +476,7 @@ The vector balance diagram demonstrates an important subtlety: the multi-mode so
 | Constraint | Status | Laskar equivalent |
 |-----------|--------|-------------------|
 | Scalar inclination balance (Law 3) = 100% | ✓ Real constraint, selects d-values | None |
-| Scalar eccentricity balance (Law 5) = 100% | ✓ Independent constraint, same d-values | None |
+| Scalar eccentricity balance (Law 5) ≈ 99.9% | ✓ Independent constraint, same d-values | None |
 | Fibonacci d-values with mirror symmetry | ✓ Structural prediction | None |
 | 8H/N ascending node periods (re-fit 2026-04-09 to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-grand-holistic-octave-periods.md#notable-patterns) |
 | J2000 positions and short-term rates | ✓ Match observations | ✓ Match observations |

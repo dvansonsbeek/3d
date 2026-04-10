@@ -52,19 +52,11 @@ cos(θ_J2000) = (base² + amp² - e_J2000²) / (2·base·amp)
 phase = acos(cos(θ_J2000)) × 180/π
 ```
 
-| Planet | Phase (°) | base | amplitude | e(J2000) | Derivable? |
-|--------|----------|------|-----------|----------|------------|
-| Mercury | 89.99 | 0.205636 | 8.350e-5 | 0.205636 | Yes |
-| Venus | 84.81 | 0.006796 | 9.526e-4 | 0.006777 | Yes |
-| Earth | (from balancedYear) | 0.015386 | 0.001356 | 0.016710 | Yes |
-| Mars | 96.98 | 0.092975 | 3.042e-3 | 0.093394 | Yes |
-| Jupiter–Neptune | — | — | — | — | No (cos(θ) out of range) |
-
-The outer planets (Jupiter–Neptune) have `cos(θ) > 1` or `< -1` from the law of cosines, meaning their J2000 eccentricity falls outside the `[base-amp, base+amp]` range. This is because their eccentricity oscillation amplitude (K constant) is negligibly small — their eccentricity is essentially constant at `base`, and any J2000 deviation is from other perturbations not captured by the single H/16 cosine.
+All base eccentricities, amplitudes, and phases are now derived at runtime from the balanced-year phase and K constant (see constants.js section E2d and the closed-loop document [doc 72](72-the-closed-loop.md)). Every planet's J2000 eccentricity is reachable within one oscillation amplitude of its phase-derived base.
 
 ### Balance with structural eccentricities
 
-- **Base eccentricities**: 100% Law 5 balance (by construction — Venus from R=311 constraint, Neptune solved for balance)
+- **Base eccentricities**: ~99.9% Law 5 balance (phase-derived, not forced)
 - **Structural eccentricities**: ~99.98% balance (removing amplitudes adds ~0.02% imbalance)
 - **J2000 eccentricities**: 99.89% balance (a snapshot with current oscillation phases)
 

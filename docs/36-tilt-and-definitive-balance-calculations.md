@@ -197,7 +197,7 @@ and therefore the most significant eccentricity oscillations.
   - Mars: JPL data (1700–2500, 10-year steps) fitted cosine gives amplitude
     3.059e-3, matching the tilt prediction (3.042e-3) to within 0.6%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
-  - Venus: Base eccentricity derived from R = 311 constraint (ψ/ξ_V = 311),
+  - Venus: Base eccentricity derived from Phase-derived (ψ/ξ_V = 311),
     giving e_V_base = 0.006796 — within 0.3% of J2000 (0.006777). Venus's
     eccentricity variation is dominated by Laplace-Lagrange secular perturbations,
     not the K-driven tilt mechanism (JPL cosine fit R² = 0.074).
@@ -210,7 +210,7 @@ The following base eccentricities achieve 100% dual balance (Law 3 + Law 5):
 | Planet  | Base Ecc      | J2000 JPL     | Diff from JPL | Note                   |
 |---------|---------------|---------------|---------------|------------------------|
 | Mercury | 0.20563593    | 0.20563593    |  0.000%       | Tilt ~0, no fluctuation |
-| Venus   | 0.00679616    | 0.00677672    | -0.287%       | R = 311 constraint |
+| Venus   | 0.00679616    | 0.00677672    | -0.287%       | Phase-derived |
 | Earth   | 0.01538600    | 0.01671022    | -8.008%       | eccentricityBase       |
 | Mars    | 0.09297543    | 0.09339410    | -0.448%       | Cosine fit to JPL data |
 | Jupiter | 0.04828624    | 0.04838624    | -0.207%       | Dual-balance optimized |
@@ -330,7 +330,7 @@ For each planet, six parameters fully describe the orbital dynamics:
 |---|----------------------|-------------------------------------------------|------------------|
 | 1 | Mean tilt            | Axial obliquity (constant)                      | Base axial tilt  |
 | 2 | Amplitude tilt       | = Amplitude inclination = PSI / (d * sqrt(m))   | Obliquity oscillation (Step 3) |
-| 3 | Mean eccentricity    | Fixed perihelion distance, dual-balanced Law 5   | Base perihelion distance (Step 1) |
+| 3 | Mean eccentricity    | Fixed perihelion distance, phase-derived Law 5   | Base perihelion distance (Step 1) |
 | 4 | Amplitude ecc        | K * sin(tilt) * sqrt(d) / (sqrt(m) * a^1.5)     | Tilt+inclination combined effect (Step 5) |
 | 5 | Mean inclination     | Invariable plane mean (from Fibonacci balance)   | Orbital plane orientation |
 | 6 | Amplitude inclination| = Amplitude tilt = PSI / (d * sqrt(m))           | Inclination oscillation (Step 4) |
@@ -449,15 +449,7 @@ analytical solution gives 193.0129° ≈ ω + 90.07° (0.002% match).
 
 ### Inner Planets: Tilt-Driven Regime
 
-The phase offset φ₀ is determined from the J2000 observed eccentricity using
-the `computeEccentricityEarth` function:
-
-| Planet  | φ_J2000  | e_min      | e_max      | Note |
-|---------|----------|------------|------------|------|
-| Mercury |  89.99°  | 0.20555243 | 0.20571943 | Tilt ~0, essentially constant |
-| Venus   | 124.58°  | 0.00523792 | 0.00714312 | Past mean, decreasing |
-| Earth   | 192.95°  | 0.01402961 | 0.01674196 | ω + 90°, near maximum at J2000 |
-| Mars    |  96.98°  | 0.08993353 | 0.09601733 | Just past mean |
+The phase is now derived from the balanced-year anchor: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. The base eccentricity follows from the law of cosines with the J2000 eccentricity and K-derived amplitude. All values are computed at runtime by constants.js.
 
 The predictive formula works for these planets because the tilt mechanism is
 the dominant source of eccentricity variation over each planet's eccentricity cycle.
@@ -490,16 +482,7 @@ J2000 (99.9845%) while the amplitude remains negligible.
 
 ### Phase Constants (J2000)
 
-| Planet  | φ_J2000 (°) | Source |
-|---------|-------------|--------|
-| Mercury |   89.9884   | Analytical from J2000 constraint |
-| Venus   |  124.5803   | Analytical from J2000 constraint |
-| Earth   |  192.9471   | ω + 90° = 102.947° + 90° |
-| Mars    |   96.9836   | Analytical from J2000 constraint |
-| Jupiter |  180        | 180° = max ecc, closest to J2000 (amp 1.14e-6, negligible) |
-| Saturn  |  180        | 180° = max ecc, closest to J2000 (amp 5.35e-6, negligible) |
-| Uranus  |    0        | 0° = min ecc, closest to J2000 (amp 2.80e-5, negligible) |
-| Neptune |    0        | 0° = min ecc, closest to J2000 (amp 8.01e-6, negligible) |
+Eccentricity phases are now derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. See constants.js and script.js section E2d.
 
 ### Other Constants
 
@@ -521,7 +504,7 @@ J2000 (99.9845%) while the amplitude remains negligible.
 | Law 5 J2000 eccentricities       | 99.8909%            |
 | Law 3 inclination balance         | 100.0000%           |
 
-The Law 5 eccentricity balance is exact by construction (Venus from R=311 constraint, Neptune solved for balance).
+The Law 5 eccentricity balance reaches ~99.9% with phase-derived base eccentricities.
 Both balances are exact by construction: dual-balance optimizer finds outer planet base eccentricities that simultaneously satisfy both Law 3 and Law 5.
 
 ### Why the Balance Holds at All Epochs
@@ -534,7 +517,7 @@ delta_v = K * sin(tilt) — mass and distance cancel. Since the dominant planets
 (99.8% of weight) have tiny tilts or tiny amplitudes relative to their mean
 eccentricity, the balance barely shifts.
 
-In summary: the mean perihelion distances produce 100% eccentricity balance,
+In summary: the mean perihelion distances produce ~99.9% eccentricity balance,
 and the tilt-driven fluctuations preserve that balance at every epoch because
 their effect on Law 5 weights is negligible for the dominant planets.
 
@@ -546,7 +529,7 @@ their effect on Law 5 weights is negligible for the dominant planets.
 |---------------------------------------|-----------------------------|-------------|
 | eccentricityBase (Earth mean)         | src/script.js               | 46          |
 | eccentricityAmplitude (Earth)         | src/script.js               | 47          |
-| Planet eccentricities (dual-balanced) | src/script.js               | 133-244     |
+| Planet eccentricities (phase-derived) | src/script.js               | 133-244     |
 | Inclination mean/amplitude            | src/script.js               | 393-424     |
 | BALANCE_CONFIG                        | src/script.js               | 11657-11770 |
 | Law 5 formula                         | src/script.js               | 11865-11877 |
@@ -567,7 +550,7 @@ their effect on Law 5 weights is negligible for the dominant planets.
 ## 13. Verification Scripts
 
 Run `node tools/verify/eccentricity-balance.js` to verify Law 5 balance with current
-dual-balanced eccentricities.
+phase-derived eccentricities.
 
 Run `node tools/verify/balance-search.js` to perform exhaustive balance search across
 all Fibonacci d-value combinations.

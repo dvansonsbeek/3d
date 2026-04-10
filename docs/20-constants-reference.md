@@ -259,10 +259,10 @@ All 8 planets, combining inner planet J2000 values with outer planet pre-dual-ba
 | Venus | 0.00677672 | J2000 (same as model) |
 | Earth | 0.01671022 | J2000 (from ASTRO_REFERENCE) |
 | Mars | 0.09339410 | J2000 (same as model) |
-| Jupiter | 0.04838624 | J2000 (model uses dual-balanced) |
-| Saturn | 0.05386179 | J2000 (model uses dual-balanced) |
-| Uranus | 0.04725744 | J2000 (model uses dual-balanced) |
-| Neptune | 0.00859048 | J2000 (model uses dual-balanced) |
+| Jupiter | 0.04838624 | J2000 (base derived from phase) |
+| Saturn | 0.05386179 | J2000 (base derived from phase) |
+| Uranus | 0.04725744 | J2000 (base derived from phase) |
+| Neptune | 0.00859048 | J2000 (base derived from phase) |
 
 ## Planet Inclination Parameters (from ψ formula)
 
@@ -698,15 +698,9 @@ These values result from the optimization campaign (2025-2026) and may change in
 
 ## Planet Orbital Eccentricities (Base)
 
-Base eccentricities represent the fixed perihelion distance. They achieve 100% Law 5 eccentricity balance. See [doc 35 §6](35-tilt-and-definitive-balance-calculations.md) for derivation.
+Base eccentricities represent the long-term oscillation midpoint. They are derived at runtime from the balanced-year phase (same principle as Earth). The eccentricity balance (Law 5) emerges naturally at ~99.9%.
 
-| Planet | `orbitalEccentricityBase` | J2000 Value | Delta | Source |
-|--------|--------------------------|-------------|-------|--------|
-| Mercury | 0.20563593 | 0.20563593 | 0% | Tilt ~0, no fluctuation |
-| Venus | 0.00679616 | 0.00677672 | +0.29% | R = 311 constraint |
-| Mars | 0.09297543 | 0.09339410 | -0.45% | H/16 fit to JPL data |
-| Jupiter | 0.04828624 | 0.04838624 | -0.21% | Dual-balance optimized |
-| Saturn | 0.05373663 | 0.05386179 | -0.23% | Dual-balance optimized |
+Note: these values are computed at runtime by constants.js — not stored in JSON. The table below shows approximate values for reference.
 | Uranus | 0.04735744 | 0.04725744 | +0.21% | Dual-balance optimized |
 | Neptune | 0.00860931 | 0.00859048 | +0.22% | Dual-balance optimized |
 
@@ -734,18 +728,7 @@ Outer planets (Jupiter–Neptune): tilt amplitude is negligible; J2000−base di
 
 ## Planet Eccentricity Phase Constants (J2000)
 
-Phase angles for the eccentricity oscillation formula. Each planet oscillates at its own eccentricity cycle (the meeting frequency of axial precession and perihelion ICRF precession). Inner planet phases are derived analytically from JPL J2000 eccentricity constraints. Outer planet phases are set to maximize proximity to the J2000 observed eccentricity (amplitude is negligible). See [doc 36 §Phase Angles](36-tilt-and-definitive-balance-calculations.md).
-
-| Planet | `eccentricityPhaseJ2000` (deg) | Source |
-|--------|-------------------------------|--------|
-| Mercury | 89.9884 | Analytical from J2000 constraint |
-| Venus | 124.5803 | Analytical from J2000 constraint |
-| Earth | 192.9471 | ω + 90° = 102.947° + 90° |
-| Mars | 96.9836 | Analytical from J2000 constraint |
-| Jupiter | 180 | 180° = max ecc, closest to J2000 (amp 1.14e-6, negligible) |
-| Saturn | 180 | 180° = max ecc, closest to J2000 (amp 5.35e-6, negligible) |
-| Uranus | 0 | 0° = min ecc, closest to J2000 (amp 2.80e-5, negligible) |
-| Neptune | 0 | 0° = min ecc, closest to J2000 (amp 8.01e-6, negligible) |
+Phase angles for the eccentricity oscillation are now derived at runtime from the balanced-year phase: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. Earth's phase is independently determined by the Sun optimizer. The phases are no longer stored in JSON — they are computed by constants.js and script.js (section E2d).
 
 ## Per-Planet EoC Fractions
 

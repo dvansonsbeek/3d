@@ -14,8 +14,8 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 
 | Script | Produces | Data source |
 |--------|----------|-------------|
-| `derive-eccentricity-amplitudes.js` | `eccentricityAmplitudeK`, Venus base, Mercury/Mars amp+phase | Derived from Earth's K constant + R=311 |
-| `dual-balance-optimizer.js` | Jupiter/Saturn/Uranus/Neptune `orbitalEccentricityBase` | Dual-balance optimization (100% incl + 100% ecc) |
+| `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
+| `dual-balance-optimizer.js` | Verification only (no output) | Shows what forced 100% balance would require |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
@@ -167,33 +167,21 @@ Step 6d: year-length-harmonics.js             → TROPICAL/SIDEREAL/ANOMALISTIC_
 
 ── Phase 5b: Eccentricity amplitudes & balance law verification ──
 
-Step 7a: derive-eccentricity-amplitudes.js    → K, Venus base, Mercury/Mars amp+phase
-         Three derivations from the eccentricity chain:
-         1. K from Earth: K = e_amp × √m / (sin(tilt) × √d)
-         2. Venus base from R=311: e_V = ψ / (311 × √m_V)
-            Venus ecc variation is Laplace-Lagrange dominated (R²=7.4%),
-            not K-driven. Base set by R=311 constraint (within 0.3% of J2000).
-         3. Mercury/Mars amplitude from K + phase from law of cosines
-            These are K-driven (high tilt, good JPL cosine fit R²).
-         Outer planets (Jupiter–Neptune): amplitudes kept as-is (negligible).
-         All eccentricities must remain consistent with J2000 observed values
-         via the law of cosines: e(J2000) = sqrt(base² + amp² - 2·base·amp·cos(θ)).
-         Updates: model-parameters.json (K, Venus base+phase, Mercury/Mars amp+phase)
+Step 7a: derive-eccentricity-amplitudes.js    → verification only (no output)
+         Verifies that K-derived eccentricity amplitudes from constants.js
+         are internally consistent. All values are now computed at runtime:
+         - K from Earth: K = e_amp × √m × a^1.5 / (sin(meanObliquity) × √d)
+         - All 7 planet amplitudes from K using model mean obliquity
+         - All bases from balanced-year phase
+         - All phases from the eccentricity cycle timing
+         No --write option. Run to verify after Earth parameter changes.
 
-         Dependency chain (no circular dependencies):
-         - Steps 1-3 depend only on H, Earth params, and planet masses (fixed)
-         - Outer planet solarYearInput/eccBase changes do NOT require re-running 7a
-         - Only H changes or Sun optimizer re-runs (Step 1) require re-running 7a
-
-Step 7b: dual-balance-optimizer.js             → Jupiter/Saturn/Uranus/Neptune orbitalEccentricityBase
-         Finds outer planet base eccentricities that achieve 100% inclination
-         balance AND 100% eccentricity balance simultaneously, while minimizing
-         deviation from J2000 observed eccentricities.
-         Fixed: Mercury (=J2000), Venus (R=311), Earth (Sun optimizer), Mars (JPL fit).
-         Free: Jupiter, Saturn, Uranus, Neptune base eccentricities.
-         4 unknowns, 2 balance equations → 2 DOF used to minimize J2000 error.
-         Optional --scan-orbits tests ±1 orbit count per outer planet.
-         Updates: model-parameters.json (4 outer planet base eccentricities)
+Step 7b: dual-balance-optimizer.js            → verification only (no output)
+         Shows what base eccentricities a forced 100% dual balance would
+         require, for comparison against the natural phase-derived values.
+         Base eccentricities are derived at runtime from the balanced-year
+         phase (constants.js) — this script does NOT set them.
+         Optional --scan-orbits shows orbit count sensitivity.
 
 Step 7c: balance-search.js                    → balance-presets.json
          Exhaustive search for configs with ≥99.994% inclination balance.

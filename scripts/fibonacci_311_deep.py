@@ -4,7 +4,7 @@ DEEP INVESTIGATION: WHY 311 SPECIFICALLY?
 ==========================================
 
 Building on the established facts:
-  - R = ψ/ξ_V = 311 exactly (Venus base from R=311 constraint)
+  - R = ψ/ξ_V ≈ 311.89 (observed ratio, not forced as constraint)
   - 311 is prime, Pisano period π(311) = 310 (maximal)
   - 311 appears independently in TRAPPIST-1 super-period
   - Not expressible as simple Fibonacci product/ratio

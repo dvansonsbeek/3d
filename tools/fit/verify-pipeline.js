@@ -442,7 +442,7 @@ for (const p of eccPlanets) {
   const eMin = Math.abs(base - amp);
   const eMax = base + amp;
   const reachable = (j2000 >= eMin - 1e-12 && j2000 <= eMax + 1e-12);
-  const mode = p === 'venus' ? 'R=311' : ['mercury', 'earth', 'mars'].includes(p) ? 'K-driven' : 'L-L';
+  const mode = 'phase';  // all bases derived from balanced-year phase
   console.log(
     '  ' + p.padEnd(12) + '│ ' +
     base.toFixed(8).padStart(12) + ' │ ' +
@@ -455,9 +455,7 @@ for (const p of eccPlanets) {
 }
 
 console.log('');
-console.log('  Mode: K-driven = amplitude from K formula (Mercury, Earth, Mars)');
-console.log('        R=311    = base from R constraint, Laplace-Lagrange variation (Venus)');
-console.log('        L-L      = base from balance, Laplace-Lagrange variation (outer planets)');
+console.log('  All bases derived from balanced-year phase, amplitudes from K.');
 console.log('  Reachable: J2000 eccentricity within [base-amp, base+amp] range\n');
 
 // ═══════════════════════════════════════════════════════════════════════════

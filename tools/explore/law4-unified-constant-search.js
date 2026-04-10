@@ -61,13 +61,13 @@ for (const d of data) {
   console.log(`${d.name.padEnd(10)} ψ=${psi_j.toExponential(6)}  K=${k_j.toExponential(6)}  ψ/K=${(psi_j/k_j).toFixed(2)}`);
 }
 
-const psiModel = 2205 / (2 * H);
+const psiOldFormula = 2205 / (2 * H);  // historical formula (superseded)
+const psiModel = C.PSI;                // current: empirical from Earth
 const kModel = C.eccentricityAmplitudeK;
-console.log(`\nModel ψ = 2205/(2H) = ${psiModel.toExponential(6)}`);
+console.log(`\nModel ψ (empirical) = ${psiModel.toExponential(6)}`);
+console.log(`Old ψ = 2205/(2H)   = ${psiOldFormula.toExponential(6)} (superseded, ${((psiOldFormula/psiModel-1)*100).toFixed(3)}% off)`);
 console.log(`Model K = ${kModel.toExponential(6)}`);
 console.log(`Note: All ψ_j are identical because inclAmp = ψ/(d×√m) by construction.`);
-console.log(`But the ACTUAL Earth inclination amplitude from data is ${C.earthInvPlaneInclinationAmplitude}°`);
-console.log(`while ψ/(d_E×√m_E) = ${(psiModel / (3 * Math.sqrt(C.massFraction.earth))).toFixed(6)}°`);
 
 // ── 2. What is the "true" ψ from Earth's data? ─────────────────────────
 console.log('\n\n=== 2. TRUE ψ FROM EARTH DATA ===\n');
@@ -77,7 +77,7 @@ const earthInclAmpActual = C.earthInvPlaneInclinationAmplitude;
 const psiFromEarth = 3 * earthInclAmpActual * Math.sqrt(C.massFraction.earth);
 console.log(`Earth inclination amplitude (from model-params): ${earthInclAmpActual}°`);
 console.log(`ψ from Earth = 3 × ${earthInclAmpActual} × √m_E = ${psiFromEarth.toExponential(6)}`);
-console.log(`ψ from formula = 2205/(2H) = ${psiModel.toExponential(6)}`);
+console.log(`ψ old formula = 2205/(2H) = ${psiOldFormula.toExponential(6)} (superseded)`);
 console.log(`Difference: ${((psiFromEarth / psiModel - 1) * 100).toFixed(3)}%`);
 
 // ── 3. AMD-inspired coupling ────────────────────────────────────────────
@@ -286,7 +286,7 @@ function factorize(n) {
 }
 
 // ── 11. Completely empirical: fit ψ to minimize spread ──────────────────
-console.log('\n\n=== 11. BEST-FIT ψ (not 2205/(2H)) ===\n');
+console.log('\n\n=== 11. BEST-FIT ψ (empirical from Earth) ===\n');
 // If ψ were free, what value minimizes the spread of d × i_J2000_to_inv × √m?
 // This requires knowing the "true" inclination at extremum, which we don't have.
 // What we have is J2000 inclinations and a phase model.

@@ -265,7 +265,7 @@ mirrorPair:                'uranus'      (paired planet)
 ```
 solarYearInput:            224.695       (orbital period in days, calibrated)
 eclipticInclinationJ2000:  3.39467605    (ecliptic inclination, degrees)
-orbitalEccentricityBase:       0.00679616    (base eccentricity -- from R=311 constraint)
+orbitalEccentricityBase:       (phase-derived at runtime)
 realOrbitalEccentricity:   0.00671192    (e/(1+e) -- DERIVED)
 eocFraction:               0.436         (EoC multiplier)
 longitudePerihelion:        131.5765919   (ecliptic longitude of perihelion, degrees)

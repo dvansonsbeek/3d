@@ -149,7 +149,7 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 100% balance** (dual-balanced eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
+**Result: ~99.9% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
 
 The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant). See [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation of the balance as a scale.
 
@@ -307,7 +307,7 @@ e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Epoch independence:** The agreement is not specific to the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, Law 5's balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillated alone. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
-With dual-balanced eccentricities, Law 5's balance reaches 100%. The model's eccentricities are optimized to satisfy both the inclination balance (Law 3) and eccentricity balance (Law 5) simultaneously. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
+With phase-derived base eccentricities, Law 5's balance reaches ~99.9% — naturally, with no forced constraints. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
 
 ### Finding 5: Inner Planet Eccentricity Ladder
 
@@ -517,7 +517,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 **Balance: 100%** — All 8 planets fit within Laplace-Lagrange bounds.
 
-The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds, (2) the inclination structural weights balance to 100% (Law 3), and (3) the eccentricity weights balance to 100% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
+The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to ~100% (Law 3), and (3) the eccentricity weights balance to ~99.9% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
 
 ### Worked Example: Earth's Inclination Amplitude
 
