@@ -34,7 +34,7 @@ The six true degrees of freedom that define the model. Everything else is derive
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 | 4 | Mean obliquity | `earthtiltMean` | 23.41354° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
 | 5 | Inclination amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
-| 6 | Planet config | Config #1 | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
+| 6 | Planet config | Config #7 | Unique mirror-symmetric solution | 0 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 
 Total: **6 DOF** (items 2 and 6 are derived/constrained, not independently free).
 

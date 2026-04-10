@@ -126,7 +126,7 @@ The ICRF perihelion period for each planet, editable for exploration. The period
 
 ### Earth Row (Locked)
 
-Earth's controls are locked (grayed out): phase = 21.77°, d = 3, in-phase group. Earth's amplitude is independently calibrated from the temperature/obliquity model (0.635185°), so its parameters cannot be freely varied.
+Earth's controls are locked (grayed out): phase = 21.77°, d = 3, in-phase group. Earth's amplitude is independently calibrated from the obliquity rate (0.63603°), so its parameters cannot be freely varied.
 
 ### Instant Recalculation
 
@@ -191,7 +191,7 @@ A configuration is valid when:
 |-------|-----------|
 | **Inclination balance** | ≥99.994% (TNO margin) |
 | **Eccentricity balance** | High percentage (100% for the model configuration) |
-| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #1 has Saturn at +0.027° excess — within source precision, see [54 § 2A](54-vector-balance-analysis.md#2a-saturn-ll-bound-excess-is-within-source-precision)) |
+| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #7 has Saturn at +0.027° excess — within source precision, see [54 § 2A](54-vector-balance-analysis.md#2a-saturn-ll-bound-excess-is-within-source-precision)) |
 | **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
 
 ### Exploring Configurations
@@ -204,16 +204,16 @@ Useful experiments to try:
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 743 valid configurations |
-| Look for Config #1 (Scenario A) | The unique mirror-symmetric solution |
+| Look for Config #7 (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
 
-Earth's inclination amplitude (~0.632°) is predicted by the Fibonacci formula. With d = 3:
+Earth's inclination amplitude (~0.636°) is defined by the model and used to derive ψ. With d = 3:
 
 ```
 amplitude = ψ / (3 × √m_Earth)
-          = 3.288e-3 / (3 × 1.7331e-3)
-          = 0.632°
+          = 3.307e-3 / (3 × 1.7331e-3)
+          = 0.636°
 ```
 
 The model's calibrated value (0.63603°) is 0.47% higher, tuned to match IAU observations. Changing Earth's d would break this relationship.
@@ -242,7 +242,7 @@ Expected results:
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is Config #1 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)). The d-values, antiPhase grouping, and mirror pairs are unchanged from the original April 2026 analysis; the asc-node integers and 4 phase angles were re-fit 2026-04-09 to bring JPL trends into agreement.
+This is Config #7 out of 743 valid configurations — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)). The d-values, antiPhase grouping, and mirror pairs are unchanged from the original April 2026 analysis; the asc-node integers and 4 phase angles were re-fit 2026-04-09 to bring JPL trends into agreement.
 
 ---
 

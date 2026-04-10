@@ -40,7 +40,7 @@ const RAD2DEG = 180 / Math.PI;
 
 const PSI = C.PSI;
 
-// Pure Fibonacci quantum numbers (d) — Config #1 (unique mirror-symmetric config)
+// Pure Fibonacci quantum numbers (d) — Config #7 (unique mirror-symmetric config)
 const FIBONACCI_D = { earth: 3 }; // Earth not in C.planets
 for (const [k, p] of Object.entries(C.planets)) FIBONACCI_D[k] = p.fibonacciD;
 FIBONACCI_D.pluto = null; // Not in Fibonacci theory
@@ -328,7 +328,7 @@ console.log('BALANCE GROUPS (Saturn anti-phase vs rest):');
 console.log('  In-phase: Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune (MIN at balanced year)');
 console.log('  Anti-phase: Saturn (MAX at balanced year)');
 console.log('');
-console.log('FIBONACCI DIVISORS (Config #1 — unique mirror-symmetric):');
+console.log('FIBONACCI DIVISORS (Config #7 — unique mirror-symmetric):');
 console.log('  Mercury=21(F₈) Venus=34(F₉) Earth=3(F₄) Mars=5(F₅)');
 console.log('  Jupiter=5(F₅)  Saturn=3(F₄) Uranus=21(F₈) Neptune=34(F₉)');
 console.log('');

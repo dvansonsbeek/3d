@@ -266,18 +266,18 @@ Key behavioral notes:
 
 **Planet Inclination-Oscillation Periods** (the planet's *ICRF perihelion* period, which drives the cosine in `i(t) = mean + amp · cos(ω̃_ICRF(t) − φ)`). The ascending node Ω evolves on a *separate* `−(8H)/N` schedule listed in [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md). For current computed values see [Constants Reference](20-constants-reference.md):
 
-| Planet | Ecliptic perihelion period | Direction |
-|--------|----------------------------|-----------|
-| Mercury | H × 8/11 | Retrograde (in ICRF) |
-| Venus | H × 2 | Retrograde (in ICRF) |
-| Earth | H / 3 | **Prograde (sole)** |
-| Mars | H × 8/35 | Retrograde (in ICRF) |
-| Jupiter | H / 5 | Retrograde (in ICRF) |
-| Saturn | H / 8 | Retrograde (in ICRF) |
-| Uranus | H / 3 | Retrograde (in ICRF) |
-| Neptune | H × 2 | Retrograde (in ICRF) |
+| Planet | Ecliptic formula | Ecliptic period (yr) | ICRF period (yr) | ICRF direction |
+|--------|------------------|---------------------|------------------|----------------|
+| Mercury | H × 8/11 | 243,867 | 28,844 | Retrograde |
+| Venus | H × 2 | 670,634 | 26,825 | Retrograde |
+| Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | 111,772 | **Prograde (sole)** |
+| Mars | H × 8/35 | 76,644 | 38,877 | Retrograde |
+| Jupiter | H / 5 | 67,063 | 41,915 | Retrograde |
+| Saturn | −H / 8 | 41,915 | 15,967 | Retrograde |
+| Uranus | H / 3 | 111,772 | 33,532 | Retrograde |
+| Neptune | H × 2 | 670,634 | 26,825 | Retrograde |
 
-The "direction" column is the sign of the planet's ICRF perihelion advance after subtracting general precession (H/13). Earth is the only fitted planet with a prograde ICRF perihelion. The ICRF periods all divide 8H = 2,682,536 years exactly (the Grand Holistic Octave).
+The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years exactly (the Grand Holistic Octave). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
 
 ### The Key Insight
 

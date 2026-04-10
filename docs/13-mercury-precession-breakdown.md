@@ -183,9 +183,9 @@ First-order secular theory **overestimates by ~0.4%** compared to Park et al. (2
 
 | Source | Mercury Total |
 |--------|---------------|
-| Our calculation | 534"/cy |
+| Our model (H×8/11) | 531.4"/cy |
 | Park et al. (2017) | 532"/cy |
-| Overestimate | ~0.4% |
+| Difference | ~0.1% |
 
 The small overestimate reflects the limitations of first-order theory, which doesn't include:
 - **Indirect effects** - Venus perturbing Earth which then perturbs Mercury (Park includes cross-terms like "Venus+Earth/Moon = -0.0209"/cy")
@@ -497,7 +497,7 @@ With the full formula including eccentricity and inclination corrections, we exp
 - Closest giant planet to Mars (α = 0.293)
 - Inner planets contribute negatively but are small
 
-### 3.2 Mercury Precession Breakdown (Target: ~534 arcsec/century)
+### 3.2 Mercury Precession Breakdown (Target: ~531 arcsec/century)
 
 | Perturber | Position | α ratio | Contribution | Percentage |
 |-----------|----------|---------|--------------|------------|
@@ -508,7 +508,7 @@ With the full formula including eccentricity and inclination corrections, we exp
 | Mars | Outer | 0.254 | +3 | <1% |
 | Uranus | Outer | 0.020 | +1 | <1% |
 | Neptune | Outer | 0.013 | +1 | <1% |
-| **Calculated Total** | | | **~534** | |
+| **Calculated Total** | | | **~531** | |
 | **Observed (Park et al.)** | | | **532** | |
 | **Accuracy** | | | **~100%** | |
 
@@ -701,7 +701,7 @@ With eccentricity and inclination corrections:
 
 **Saturn (~78% accuracy):** The Jupiter-Saturn 5:2 near-resonance creates additional secular effects not captured in our first-order theory. This is a known limitation.
 
-**Mercury (relativity):** Our Newtonian model gives ~534 arcsec/century. The remaining ~43 arcsec/century is the famous relativistic contribution - a triumph of Einstein's General Relativity.
+**Mercury (relativity):** Our model gives ~531 arcsec/century (ecliptic rate from H×8/11). The remaining ~43 arcsec/century is the famous relativistic contribution - a triumph of Einstein's General Relativity.
 
 ---
 
@@ -743,7 +743,7 @@ With eccentricity and inclination corrections:
 
 | Planet | Observed (arcsec/century) | Our Model | Accuracy |
 |--------|--------------------------|-----------|----------|
-| Mercury | 532 | ~534 | ~100% |
+| Mercury | 532 | ~531 | ~100% |
 | Venus | ~8 | ~8 | ~100% |
 | Earth | 1,304 | ~1,240 | ~95% |
 | Mars | 1,739 | ~1,649 | ~95% |

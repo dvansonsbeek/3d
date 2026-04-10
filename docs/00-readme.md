@@ -109,6 +109,8 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | # | Document | Description |
 |---|----------|-------------|
 | 70 | [Ascending Node Limitations](70-ascending-node-limitations.md) | Limitations of ascending node model and JPL discrepancy |
+| 71 | [Correction Stack Architecture](71-correction-stack-architecture.md) | Layer ordering, prepareForFitting(), parallax + gravitation + elongation |
+| 72 | [The Closed Loop](72-the-closed-loop.md) | How PSI and K derive all orbital oscillations from Earth alone |
 
 ### 80–99 Appendices
 
@@ -123,7 +125,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
 | [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; generates data/balance-presets.json |
+| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; composite ranking (LL overshoot + eccentricity balance + inclination balance); generates data/balance-presets.json |
 | [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws + findings |
 | [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
 | [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 5 sensitivity analysis |
@@ -149,7 +151,7 @@ The shared libraries that both the simulation (`src/script.js`) and the optimiza
 
 | File | Description |
 |------|-------------|
-| `constants.js` | All model constants (mirrors `src/script.js` config) — the code-level single source of truth |
+| `constants.js` | All model constants — the single source of truth that feeds `src/script.js` via `export-to-script.js` |
 | `scene-graph.js` | Headless scene graph: builds the same orbital hierarchy as Three.js without a browser |
 | `orbital-engine.js` | Computes planet positions for any date using the scene graph |
 | `optimizer.js` | Parameter optimization engine with JPL reference comparison |
@@ -182,33 +184,12 @@ Scripts that fetch, enrich, and export reference data from JPL Horizons:
 
 ### `tools/explore/` — Investigation Scripts
 
-Ad-hoc analysis and exploration scripts used during development:
-
-| File | Description |
-|------|-------------|
-| `conjunction-finder.js` | Find planetary conjunctions and validate against observations |
-| `resonance-loop.js` | Saturn–Jupiter–Earth resonance loop analysis (Law 6) |
-| `year-lengths.js` | Measure tropical/sidereal/anomalistic year lengths |
-| `moon-cycles.js` | Moon cycle analysis (synodic, anomalistic, nodal) |
-| ... | And ~10 more investigation scripts |
+Ad-hoc analysis and exploration scripts used during development (~30 scripts). See the scripts themselves for descriptions — each has a header comment explaining its purpose.
 
 ### `tools/fit/` — Fitting & Derivation Scripts
 
 Centralized scripts for fitting harmonics, deriving constants, and generating training data.
-Run in dependency order when model parameters change (see `tools/fit/README.md`).
-
-| File | Description |
-|------|-------------|
-| `export-solar-measurements.js` | Single-pass export: cardinal points, perihelion/aphelion, world-angles |
-| `obliquity-harmonics.js` | Fit 16-harmonic obliquity formula (J2000-anchored) |
-| `cardinal-point-harmonics.js` | Fit 24-harmonic JD formula per cardinal point (IAU-anchored) |
-| `year-length-harmonics.js` | Fit sidereal + anomalistic year harmonics from solar measurements |
-| `eoc-constants.js` | Derive Equation of Center constants from first principles |
-| `eoc-fractions.js` | Derive per-planet EoC fractions from reference data |
-| `perihelion-offset.js` | Derive perihelion phase offset analytically |
-| `parallax-correction.js` | Fit extended parallax correction coefficients (up to 42p) |
-| `parallax-greedy-select.js` | Greedy forward selection for parallax model terms |
-| `ascnode-correction.js` | Optimize ascending node tilt corrections |
+Run in dependency order when model parameters change. See [`tools/fit/README.md`](../tools/fit/README.md) for the complete script listing, dependency chain, and step-by-step pipeline instructions.
 
 ### `data/` — Runtime Data
 

@@ -19611,9 +19611,9 @@ function fbeRenderVectorDiagram(panel, state) {
   const year = o.currentYear || 2000;
   const genPrecRate = 1 / (holisticyearLength / 13);
 
-  // Detect if current config matches Config #1
-  const CONFIG1 = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
-  const isConfig1 = BALANCE_PLANETS.every(k => state[k].d === CONFIG1[k]);
+  // Detect if current config matches Config #7 (unique mirror-symmetric solution)
+  const CONFIG7 = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
+  const isConfig7 = BALANCE_PLANETS.every(k => state[k].d === CONFIG7[k]);
 
   const planetColors = {
     mercury: '#a0a0a0', venus: '#e8c46a', earth: '#3399ff', mars: '#b03a2e',
@@ -19815,7 +19815,7 @@ function fbeRenderVectorDiagram(panel, state) {
   html += `<text x="326" y="${LY2}" fill="#ffd700" font-size="10" font-weight="700" dominant-baseline="central">${imbalancePct.toFixed(2)}%</text>`;
 
   // Note when non-Config-1 is selected
-  if (!isConfig1 && fbeMultiMode) {
+  if (!isConfig7 && fbeMultiMode) {
     const NY = LY2 + 18;
     html += `<text x="${CX}" y="${NY}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">Note: Vector balance is independent of d-value configuration \u2014 it works for any integer divisors of 8H.</text>`;
     html += `<text x="${CX}" y="${NY + 12}" fill="rgba(255,200,50,0.6)" font-size="8" font-style="italic" text-anchor="middle" dominant-baseline="central">The real constraints are the scalar Inclination Balance (Law 3) and Eccentricity Balance (Law 5) above.</text>`;
@@ -22995,7 +22995,7 @@ function setupGUI() {
       fpFibDivisors: '3, 5, 8, 13, 21, 34',
       fpMeanObliquity: earthtiltMean + '\u00B0',
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
-      fpConfig: 'Config #1 (unique)',
+      fpConfig: 'Config #7 (unique mirror-symmetric)',
     };
     addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');

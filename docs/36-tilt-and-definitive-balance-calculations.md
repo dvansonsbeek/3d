@@ -34,7 +34,7 @@ angles (per-planet phase angles from balanced year) should cancel. Prograde plan
 **Scalar balance**: the sum of v for the in-phase group must equal the sum of v for
 the anti-phase group.
 
-**Group assignment** (Config #1: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
+**Group assignment** (Config #7: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
 
 | Group       | Planets                                               |
 |-------------|-------------------------------------------------------|
@@ -58,7 +58,7 @@ K is derived in Section 4 below.
 
 ---
 
-## 3. Fibonacci D-Values and Phase Groups (Config #1)
+## 3. Fibonacci D-Values and Phase Groups (Config #7)
 
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|
@@ -297,7 +297,7 @@ Inclination amplitudes are derived from the PSI formula:
 |---------|-----|----------------|----------------------|------------------|-------|
 | Mercury |  21 | 4.0745e-4      | 0.384267             | 0.384267         | Yes   |
 | Venus   |  34 | 1.5646e-3      | 0.061809             | 0.061809         | Yes   |
-| Earth   |   3 | 1.7331e-3      | 0.632              | 0.63603         | ~0.6% |
+| Earth   |   3 | 1.7331e-3      | 0.636              | 0.63603         | 0.0% |
 | Mars    |   5 | 5.6808e-4      | 1.157559             | 1.157559         | Yes   |
 | Jupiter |   5 | 3.0900e-2      | 0.021281             | 0.021281         | Yes   |
 | Saturn  |   3 | 1.6908e-2      | 0.064819             | 0.064819         | Yes   |
@@ -305,7 +305,7 @@ Inclination amplitudes are derived from the PSI formula:
 | Neptune |  34 | 7.1772e-3      | 0.013474             | 0.013474         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
-precession rate (0.63603), while the Fibonacci formula predicts 0.632 (ψ/(d×√m)).
+precession rate (0.63603). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
 All other planets match exactly.
 
 ### Inclination Balance Result

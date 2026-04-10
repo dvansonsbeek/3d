@@ -318,7 +318,7 @@ const curIdx = allConfigs.findIndex(c => {
 });
 if (curIdx >= 0) {
   const c = allConfigs[curIdx];
-  console.log(`\nConfig #1 rank: ${curIdx + 1}/${allConfigs.length} (score: ${c.score.toFixed(1)}, incl: ${c.inclBalance.toFixed(4)}%, ecc: ${c.eccBalance.toFixed(4)}%, LL max overshoot: ${c.maxLLOvershoot.toFixed(3)}°)`);
+  console.log(`\nConfig #7 rank: ${curIdx + 1}/${allConfigs.length} (score: ${c.score.toFixed(1)}, incl: ${c.inclBalance.toFixed(4)}%, ecc: ${c.eccBalance.toFixed(4)}%, LL max overshoot: ${c.maxLLOvershoot.toFixed(3)}°)`);
 }
 
 // ══════════════════════════════════════════════════════════════════

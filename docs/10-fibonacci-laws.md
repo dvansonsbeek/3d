@@ -22,7 +22,7 @@ amplitude = ψ / (d × √m)
 ```
 
 Where:
-- `ψ` = Universal coupling constant, derived from Fibonacci numbers
+- `ψ` = Universal coupling constant, derived from Earth
 - `d` = Fibonacci divisor (a Fibonacci number: 1, 2, 3, 5, 8, 13, 21, ...)
 - `√m` = Square root of planetary mass in solar units
 
@@ -269,13 +269,13 @@ These are overlapping, not nested, constraints (full analysis: [configuration-an
 | **All four filters** | | |
 | Mirror ∩ Saturn-solo ∩ LL bounds ∩ Balance ≥ 99.994% | **1** | 0.0000132% |
 
-That single configuration is **Config #1** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
+That single configuration is **Config #7** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
 
 **Key structural constraints:**
 
 - **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric configurations.
 - **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune). Of the 81 mirror + Saturn-solo configs, 36 pass LL bounds — exactly the 6 × 6 grid where both pair d-values are ≥ 5.
-- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #1 achieves balance ≥ 99.994% (at 100%).
+- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #7 achieves balance ≥ 99.994%.
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -442,7 +442,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Σ(in-phase) v = 1.543 × 10⁻²
 Σ(anti-phase)  v = 1.547 × 10⁻²
 
-Balance: 100%
+Balance: ~99.9%
 ```
 
 Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
@@ -467,7 +467,7 @@ Three tests confirm the eccentricity balance is a genuine constraint on eccentri
 
 1. **Coefficient test**: The weight formula without eccentricities (`√m × a^(3/2) / √d`) gives only 74% balance — the eccentricity values contribute 26 percentage points of improvement
 2. **Random test**: Substituting random eccentricities into the same weight formula gives 50–85% balance across 1000 trials
-3. **Power test**: The balance peaks sharply at e¹·⁰ (100%), dropping to 98.5% for e⁰·⁹ and 98.4% for e¹·¹, and to 91% for e² — linear eccentricity is special
+3. **Power test**: The balance peaks sharply at e¹·⁰ (~99.9%), dropping to 98.5% for e⁰·⁹ and 98.4% for e¹·¹, and to 91% for e² — linear eccentricity is special
 
 ### Connection to AMD Theory
 
@@ -495,7 +495,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 - **Predicted**: all 8 inclination oscillation amplitudes (Law 2, from ψ)
 - **Predicted**: all 8 eccentricity oscillation amplitudes (Law 4, from K)
-- **Predicted**: Saturn's base eccentricity (Law 5, from the other seven, to ~0.001%)
+- **Predicted**: Saturn's base eccentricity (Law 5, from the other seven, to ~0.2%)
 - **Not predicted**: the remaining 7 base eccentricities — structural values set at formation, analogous to the 8 mean inclinations
 
 ---
@@ -508,7 +508,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 |--------|---|-------|---------------|----------|-----------|---------------|-----------|
 | Mercury | 21 | In-phase | 0.386 | 6.728 | 6.34 – 7.11 | 4.57 – 9.86 | +1.772 |
 | Venus | 34 | In-phase | 0.062 | 2.208 | 2.15 – 2.27 | 0.00 – 3.38 | +1.110 |
-| Earth | 3 | In-phase | 0.635 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
+| Earth | 3 | In-phase | 0.636 | 1.481 | 0.85 – 2.12 | 0.00 – 2.95 | +0.833 |
 | Mars | 5 | In-phase | 1.163 | 2.653 | 1.49 – 3.82 | 0.00 – 5.84 | +1.491 |
 | Jupiter | 5 | In-phase | 0.021 | 0.329 | 0.31 – 0.35 | 0.24 – 0.49 | +0.067 |
 | Saturn | 3 | Anti-phase | 0.065 | 0.932 | 0.87 – 1.00 | 0.797 – 1.02 | +0.023 |
@@ -536,9 +536,9 @@ The mean is computed from the J2000 constraint:
 
 ```
 mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle)
-     = 1.57867° - 0.632° × cos(102.947° - 21.77°)
-     = 1.57867° - 0.632° × cos(81.177°)
-     = 1.57867° - 0.632° × 0.15315
+     = 1.57867° - 0.636° × cos(102.947° - 21.77°)
+     = 1.57867° - 0.636° × cos(81.177°)
+     = 1.57867° - 0.636° × 0.15315
      = 1.48188°
 ```
 
@@ -639,7 +639,7 @@ Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 100% balance.
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 100% balance.
+Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to ~99.9% balance.
 
 ### Test 5: Saturn Eccentricity Prediction from Law 5
 
@@ -655,7 +655,7 @@ Verifies that `e_amp = K × sin(tilt) × √d / (√m × a^1.5)` holds for all 8
 
 ### Test 8: Saturn Eccentricity from Law 5
 
-Verifies that Law 5 (eccentricity balance) predicts Saturn's base eccentricity from the other seven planets to ~0.001%.
+Verifies that Law 5 (eccentricity balance) predicts Saturn's base eccentricity from the other seven planets to ~0.2%.
 
 ---
 
@@ -685,39 +685,20 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `data/balance-presets.json` containing all qualifying configurations sorted by balance (best first). The current run yields 743 presets across all four scenarios.
+The search writes `data/balance-presets.json` containing all qualifying configurations sorted by composite score (LL overshoot + eccentricity balance + inclination balance). The current run yields 765 presets across all four scenarios.
 
-### Important: Separate Input Values
+### Shared Input Values
 
-The search script (`tools/verify/balance-search.js`) and the application (`script.js`) each maintain their own copy of the planetary parameters (orbital periods, mass ratios, eccentricities, LL bounds, etc.). These are **not shared** — changing a value in one does not automatically update the other.
-
-If any input value changes in `script.js` (e.g. a refined eccentricity or mass ratio), the same change must be manually applied in `tools/verify/balance-search.js` before regenerating presets. If the two files use different values, the presets will not match the Balance Explorer's live computation.
+Both the search script (`tools/verify/balance-search.js`) and the application (`script.js`) use `tools/lib/constants.js` as the single source of truth for all planetary parameters. No manual sync is needed.
 
 ### Regenerating Presets
 
-The presets are hardcoded into `script.js` as the `BALANCE_PRESETS` array, which populates the Balance Explorer dropdown. If planetary parameters change, follow these steps:
-
 ```bash
-# 1. Verify the input values in tools/verify/balance-search.js match script.js
-#    (orbital periods, mass ratios, eccentricities, LL bounds, etc.)
-
-# 2. Run the exhaustive search
+# 1. Run the exhaustive search (writes data/balance-presets.json)
 node tools/verify/balance-search.js
 
-# 3. Replace the BALANCE_PRESETS array in script.js with the new data
-node -e "
-  const fs = require('fs');
-  const data = JSON.parse(fs.readFileSync('data/balance-presets.json'));
-  const src = fs.readFileSync('src/script.js', 'utf8');
-  const re = /const BALANCE_PRESETS = \[[\s\S]*?\n\];/;
-  const lines = data.presets.map(r => JSON.stringify(r));
-  const block = 'const BALANCE_PRESETS = [\n' + lines.join(',\n') + '\n];';
-  fs.writeFileSync('src/script.js', src.replace(re, block));
-  console.log('Replaced ' + data.presets.length + ' presets');
-"
-
-# 4. Rebuild
-npx parcel build src/index.html --no-cache
+# 2. Sync to script.js
+node tools/fit/export-to-script.js --write
 ```
 
 **When to regenerate**: any change to eccentricity, semi-major axis, mass ratios, the ψ-constant, or the Laplace-Lagrange bounds will shift the balance percentages and potentially change which configurations qualify.
@@ -752,7 +733,7 @@ npx parcel build src/index.html --no-cache
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
-4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #1 is the only one that is also mirror-symmetric.
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 743 valid configurations, Config #7 is the only one that is also mirror-symmetric.
 
 5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05374) matches the J2000 observed value (0.05386) to ~0.22%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
 
@@ -762,7 +743,7 @@ The balance conditions (Laws 3 and 5) combine known conservation principles with
 
 Laws 2 and 4 (the amplitude constants ψ and K) are the most genuinely novel claims — no existing theory predicts that Fibonacci divisors should produce universal constants for either inclination or eccentricity amplitudes across all eight planets.
 
-The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #1 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #7 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
 
 ---
 
