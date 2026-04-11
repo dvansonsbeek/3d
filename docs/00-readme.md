@@ -205,7 +205,7 @@ Statistical analysis and verification scripts. Install dependencies with `pip in
 
 | File | Description |
 |------|-------------|
-| `fibonacci_significance.py` | Fisher's exact test for statistical significance of Fibonacci structure |
+| `fibonacci_significance.py` | Monte Carlo + permutation significance analysis for the Fibonacci structure (11 tests across 3 null distributions, Stouffer's Z combining with correlation correction) |
 | `fibonacci_exoplanet_test.py` | TRAPPIST-1 exoplanet system Fibonacci test |
 | `fibonacci_eccentricity_scale.py` | Eccentricity balance scale: weight formula, per-planet breakdowns, offset ratios |
 | `fibonacci_eccentricity_structure.py` | Structural decomposition, mirror pair conservation, 10-direction exploration, statistical tests |

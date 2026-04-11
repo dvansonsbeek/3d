@@ -31,7 +31,7 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
-| `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (Fisher p-values + sigma, 11 tests × 3 nulls) | `tools/lib/python/constants_scripts.py` |
+| `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
 | `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline) | `fitted-coefficients.json` + `model-parameters.json` + `data/balance-presets.json` + `data/significance-results.json` |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
@@ -203,13 +203,19 @@ Step 7d: verify-laws.js                       → pass/fail
 Step 7e: fibonacci_significance.py            → data/significance-results.json
          Monte Carlo + permutation significance test for the Fibonacci structure.
          11 tests across 3 null distributions (permutation, log-uniform MC,
-         uniform MC); 100,000 trials per MC null. Computes Fisher's combined
-         p-value over the 6 empirical tests + sigma equivalent.
+         uniform MC); 100,000 trials per MC null. Of the 11 tests, 7 are
+         structural (5 multiset-invariant under permutation + 2 tautological —
+         Laws 2 and 4 are internally consistent by construction) and 4 are
+         empirical (Laws 3, 5; Findings 4 and 6). Computes Stouffer's Z
+         combined p-value with Brown-style correlation correction (variance
+         inflation factor 2.5 for the shared v_j dependency) + sigma
+         equivalents across all three null distributions. Fisher's combined
+         also reported for transparency.
          Run-time: ~2-3 minutes (single threaded).
          Stable across normal refits — only re-run before publication or when
          the significance test definitions themselves change.
-         **Required by export-to-holistic.js** — the website Fisher p-values,
-         sigma, and test counts all derive from this output.
+         **Required by export-to-holistic.js** — the website combined p-values,
+         sigma range, and test counts all derive from this output.
 
 ── Phase 6: Verify & sync ─────────────────────────────────────────
 

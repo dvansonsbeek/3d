@@ -9,8 +9,9 @@ These scripts were used during the research to discover and verify the six Fibon
 ## Quick Start
 
 ```bash
-# Run the statistical significance test (~30 min, 100k MC trials)
+# Run the statistical significance test (~2–3 min, 100k MC trials)
 python fibonacci_significance.py
+# → writes data/significance-results.json (consumed by tools/fit/export-to-holistic.js)
 
 # Verify J2000 eccentricity formation constraints
 python fibonacci_j2000_eccentricity.py
@@ -32,7 +33,7 @@ python fibonacci_trappist1_deep.py
 
 | Script | Description |
 |--------|-------------|
-| `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws (13 tests, 3 null distributions, Fisher's combined p ≤ 2.5 × 10⁻²¹) |
+| `fibonacci_significance.py` | Statistical significance of the Fibonacci Laws. 11 tests across 3 null distributions (permutation, log-uniform Monte Carlo, uniform Monte Carlo). Of the 11 tests, 7 are structural (5 multiset-invariant under permutation + 2 tautological — Laws 2 and 4 are internally consistent by construction and cannot be statistically tested) and 4 are empirical (Laws 3, 5; Findings 4 and 6). The 4 empirical tests share the quantity √m · a^(3/2) · e / √d, so their combined p-value uses Stouffer's Z method with a Brown-style correlation correction (variance inflation factor 2.5). Headline combined p spans 1.4 × 10⁻⁴ (permutation, conservative) to 6.8 × 10⁻⁶ (log-uniform Monte Carlo), equivalently 3.6σ–4.4σ — comfortably above the 3σ "evidence" threshold. Output: `data/significance-results.json`. |
 
 ### The Six Laws
 
