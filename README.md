@@ -175,7 +175,6 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ## Roadmap
 
-- [ ] Create 100% correct formulas for solstice dates (beyond J. Meeus formula)
 - [ ] Add more celestial objects
 
 ---

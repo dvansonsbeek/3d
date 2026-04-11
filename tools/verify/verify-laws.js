@@ -767,7 +767,6 @@ console.log(`║  Law 3 — Inclination balance:   ${inclBalance.toFixed(4)}%`.p
 console.log(`║  Law 4 — Eccentricity amplitude: K = ${C.eccentricityAmplitudeK.toExponential(4)} (all 8 planets)`.padEnd(76) + '║');
 console.log(`║  Law 5 — Eccentricity balance:  ${eccBalance.toFixed(4)}%`.padEnd(76) + '║');
 console.log('╠═══════════════════════════════════════════════════════════════════════════╣');
-console.log(`║  Saturn Obs 4 (pair): ${satLaw4.toFixed(8)} (Δ from J2000: ${((satLaw4 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw4 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%, REPORT)`.padEnd(76) + '║');
 console.log(`║  Saturn Law 5 (bal):  ${satLaw5.toFixed(8)} (err: ${((satLaw5 - ecc.saturn) / ecc.saturn * 100) >= 0 ? '+' : ''}${((satLaw5 - ecc.saturn) / ecc.saturn * 100).toFixed(3)}%)`.padEnd(76) + '║');
 console.log(`║  Eccentricity RMS:    ${rmsErr.toFixed(3)}% (4 outer planets, Obs 4 pair targets, REPORT only)`.padEnd(76) + '║');
 console.log('╚═══════════════════════════════════════════════════════════════════════════╝');

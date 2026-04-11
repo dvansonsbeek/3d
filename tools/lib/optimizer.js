@@ -317,8 +317,9 @@ function solveBaseForPerihelionRA() {
 function computePlanetPerihelionRA(planet) {
   sg._invalidateGraph();
   const graph = sg.buildSceneGraph();
-  // Measure at model start (pos=0) — matches what the browser shows on startup
-  sg.moveModel(graph, 0);
+  // Measure at J2000 (Jan 1, 2000) — longitudePerihelion targets are J2000 values
+  const pos = (1 / C.meanSolarYearDays) * (C.j2000JD - C.startmodelJD);
+  sg.moveModel(graph, pos);
 
   const pm = graph.planetNodeMap[planet];
   if (!pm) throw new Error(`Unknown planet: ${planet}`);
