@@ -80,9 +80,9 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 **Obliquity mechanism — counter-tilting nodes:**
 - `earthEclipticPrecession.orbitTiltb = -earthInvPlaneInclinationAmplitude` (H/5 period)
 - `earthObliquityPrecession.orbitTiltb = +earthInvPlaneInclinationAmplitude` (H/8 period, retrograde)
-- When both tilts add: max obliquity = 23.414° + 2 × 0.634° = **~24.71°**
-- When both tilts cancel: min obliquity = 23.414° − 2 × 0.634° = **~22.21°**
-- Total range: ±1.268° from mean — matches Milankovitch cycle and Laskar (1993) within 0.2° for ±10,000 yr
+- When both tilts add: max obliquity = 23.414° + 2 × 0.636° = **~24.69°**
+- When both tilts cancel: min obliquity = 23.414° − 2 × 0.636° = **~22.14°**
+- Total range: ±1.272° from mean — matches Milankovitch cycle and Laskar (1993) within 0.2° for ±10,000 yr
 
 **What's missing (tiny effects, negligible for optimization):**
 - Chandler wobble (~433d, <0.7 arcsec)

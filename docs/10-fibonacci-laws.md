@@ -540,7 +540,7 @@ Earth's inclination amplitude (`earthInvPlaneInclinationAmplitude` = 0.6360°) i
 obliquity = earthtiltMean − A × cos(phase₃) + A × cos(phase₈)
 ```
 
-where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is the H/13 axial precession cycle. The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude.
+where A is the amplitude, phase₃ is the H/3 inclination cycle, and phase₈ is the H/8 obliquity cycle (the Fibonacci beat of the H/5 ecliptic precession and the H/3 inclination precession, via 3 + 5 = 8). The obliquity rate sensitivity is approximately −82.70"/century per degree of amplitude.
 
 ψ is then computed as `3 × A × √m_Earth`, and all 7 non-Earth amplitudes follow from `ψ / (d × √m)`. For current values, see [Constants Reference](20-constants-reference.md).
 
