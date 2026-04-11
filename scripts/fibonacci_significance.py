@@ -7,68 +7,64 @@
 # eccentricities and inclinations are statistically significant,
 # or could arise by chance in random planetary systems.
 #
-# THIRTEEN TEST STATISTICS (matching the six Fibonacci Laws + findings):
+# ELEVEN TEST STATISTICS — Laws → Findings → Arithmetic:
 #
-#   Test 1  — Pairwise Fibonacci count (general):
-#       How many planet pairs have ξ-ratios near a Fibonacci ratio?
+#   Core Laws (6)
+#   -------------
+#   Law 1 — Fibonacci denominators in inclination cycle periods:
+#       The 8 inclination-cycle periods are expressed as T_i = H × (a_i/b_i).
+#       Count how many denominators b_i fall in the Fibonacci set
+#       {1,2,3,5,8,13,21,34,55}. Observed: 7/8 (Mercury's 11 is the
+#       only non-Fibonacci). Structural in permutation, strong in MC.
 #
-#   Test 2  — Eccentricity Ladder (Finding 5):
-#       Can 4 planets form a Fibonacci ladder e·√m = {a,b,c,d}×ξ_ref?
+#   Law 2 — ψ constant (full 8-planet):
+#       How constant is d × amp × √m across ALL 8 planets?
+#       Uses MODEL amplitudes (derived from ψ). Permutation still valid —
+#       shuffling assignment breaks planet-specific d×amp×√m = ψ match.
 #
-#   Test 3  — ψ-Constant best-3 (general search):
-#       Can 3 planets satisfy d₁·i·√m ≈ d₂·i·√m ≈ d₃·i·√m with Fib weights?
-#       NOTE: partially circular — uses model-derived INCLINATION_AMPS.
+#   Law 3 — Inclination balance:
+#       With the model's d-values and phase groups, how well do the
+#       angular-momentum-weighted structural weights cancel between groups?
 #
-#   Test 4  — Cross-parameter ratio (general):
-#       Does (Λ_ecc + Λ_amp) / Λ_mean match a Fibonacci ratio?
-#       NOTE: partially circular — Λ_amp uses model-derived amplitudes.
-#
-#   Test 5  — Inclination Balance (Law 3):
-#       With the model's Fibonacci d-values, phase groups, and base
-#       eccentricities, how well do the angular-momentum-weighted structural
-#       weights cancel? Observed: 100%.  Uses base eccentricities.
-#
-#   Test 6  — Eccentricity Balance (Law 5):
-#       With the model's d-values and base eccentricities, how well
-#       do the eccentricity weights cancel between the two phase groups?
-#       Observed: 100%.  Uses base eccentricities.
-#
-#   Test 7  — Saturn Eccentricity Prediction (Finding 4):
-#       The eccentricity balance predicts Saturn's eccentricity from the other 7
-#       planets. Observed: 0.22% error.  Uses base eccentricities.
-#
-#   Test 8  — ψ-Constant full 8-planet (Law 2):
-#       How constant is d × η = d × i_amp × √m across ALL 8 planets?
-#       Observed: <0.75% max error (0 free parameters).
-#
-#   Test 9  — Precession Fibonacci hierarchy (Law 1):
-#       How many pairwise precession-period ratios match Fibonacci ratios?
-#       Observed: 12/28 pairs match within 5%.
-#
-#   Test 10 — R² partition (report only):
-#       For the 4 mirror pairs, how many of the pair-specific R-form
-#       constraints (R = e_base/i_mean,rad) match their Fibonacci/Lucas
-#       targets within tol? Observed: 4/4 match.
-#       Note: this is a report-only test, not Law 4. Law 4 is the K constant (Test 13).
-#
-#   Test 11 — E–J–S resonance loop (Law 6):
-#       Do Earth, Jupiter, Saturn periods satisfy b_E + b_J = b_S?
-#       Observed: exactly 3 + 5 = 8 (0% error).
-#
-#   Test 12 — Mirror symmetry (Finding 1):
-#       Do the d-assignments show inner-outer mirror symmetry?
-#       Observed: 4/4 mirror pairs share the same d.
-#
-#   Test 13 — K amplitude constant (Law 4):
+#   Law 4 — K amplitude constant:
 #       Can a single constant K predict all 8 eccentricity amplitudes via
-#       e_amp = K × sin(tilt) × √d / (√m × a^1.5)?
-#       NOTE: circular — amplitudes were derived from K. But the permutation
-#       test is still valid (shuffling breaks the planet-specific prediction).
+#       e_amp = K × sin(meanObliquity) × √d / (√m × a^1.5)?
+#       NOTE: circular — amplitudes were derived from K. Permutation still
+#       valid (shuffling breaks planet-specific prediction).
 #
-#   Test 14 — Eccentricity Balance Scale (Finding 6):
-#       Can each planet's eccentricity be predicted from the other 7 using
-#       the balance scale formula?  Observed: ~0% RMS (by construction).
-#       The permutation test measures whether the assignment matters.
+#   Law 5 — Eccentricity balance:
+#       How well do the ecc-weighted quantities cancel between phase groups?
+#
+#   Law 6 — E–J–S resonance loop:
+#       Do Earth, Jupiter, Saturn periods satisfy b_E + b_J = b_S?
+#       Structural — permutation always yields p = 1.
+#
+#   Findings (4)
+#   ------------
+#   Finding 1 — Mirror symmetry:
+#       Do inner-outer mirror pairs share the same d-value?
+#       Structural — permutation always yields p = 1.
+#
+#   Finding 1b — d-set Fibonacci clustering:
+#       Does the distinct d-set form exactly 2 consecutive Fibonacci pairs?
+#       Observed: {3, 5, 21, 34} = (F_4,F_5) ∪ (F_8,F_9). Structural test;
+#       MC null draws random d-values from the Fibonacci pool.
+#
+#   Finding 4 — Saturn eccentricity prediction:
+#       The ecc balance predicts Saturn's e from the other 7 planets.
+#
+#   Finding 6 — Solo planet identification:
+#       Reformulation of the old "balance scale per-planet prediction".
+#       For each planet, compute the residual |v_p − Σ_{j≠p} v_j| / v_p;
+#       take argmin across 8 candidates. Saturn uniquely minimizes this
+#       with residual ≈ 0.25%. Complements F4 (which assumes Saturn is solo).
+#
+#   Arithmetic (1)
+#   --------------
+#   Year-length beat identity:
+#       Test whether (sidereal/tropical − 1) × H ≈ 13 and
+#                    (anomalistic/tropical − 1) × H ≈ 16.
+#       Single scalar — structural in permutation, meaningful in MC.
 #
 # THREE RANDOM DISTRIBUTIONS:
 #   1. Permutation (exhaustive 8! = 40,320) — fixes values, shuffles assignment
@@ -78,7 +74,15 @@
 # Addresses the Backus (1969) critique of Molchanov's resonance theory:
 # accounts for look-elsewhere effect and tests multiple null hypotheses.
 #
-# Run with: python fibonacci_significance.py [--trials N] [--seed S]
+# Run with:
+#   python fibonacci_significance.py [--trials N] [--seed S] [--tests SPEC]
+#
+# Test selection examples:
+#   --tests laws           → all 6 Laws
+#   --tests findings       → all 4 Findings
+#   --tests law3,law5      → specific laws (prefix match)
+#   --tests 1-6            → first 6 tests (= all Laws)
+#   --tests law1_fib_denominators  → one test by full ID
 # ═══════════════════════════════════════════════════════════════════════════
 
 import math
@@ -93,10 +97,31 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from constants_scripts import (
     PLANET_NAMES, MASSES, ECCENTRICITIES, ECC_DUAL_BALANCED, INCLINATION_AMPS,
     D_INCL, PSI1_THEORY, SEMI_MAJOR, PHASE_GROUP, GROUP_203, GROUP_23,
-    MIRROR_PAIRS, INCL_PERIOD, PERIOD_FRAC, H,
-    INCL_J2000, INCL_MEAN,
+    MIRROR_PAIRS, PERIOD_FRAC, H,
+    INCL_J2000, INCL_MEAN, EARTH_OBLIQUITY_MEAN,
     ECC_AMPLITUDE, AXIAL_TILT, ECC_AMPLITUDE_K, SMA, D,
 )
+
+# ─── Per-planet MEAN OBLIQUITY ──────────────────────────────────────────────
+# The K amplitude law (Law 4) uses each planet's MODEL MEAN obliquity (the
+# time-averaged axial tilt), not its J2000 instantaneous tilt. Earth's
+# mean obliquity = EARTH_OBLIQUITY_MEAN; the 7 other planets expose
+# obliquityMean on their planet object from constants.js. Load directly
+# via the dump bridge to keep the significance script self-contained.
+import json as _json, subprocess as _subprocess
+_dump_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          '..', 'tools', 'fit', 'python', '_dump_constants.js')
+_dumped = _json.loads(_subprocess.check_output(['node', _dump_path]).decode())
+OBLIQUITY_MEAN = {
+    p.capitalize(): _dumped['planets'][p]['obliquityMean']
+    for p in ('mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune')
+}
+OBLIQUITY_MEAN['Earth'] = EARTH_OBLIQUITY_MEAN
+
+# ─── Year lengths at J2000 (for Test 16) ────────────────────────────────────
+TROPICAL_YEAR_DAYS   = _dumped['meanSolarYearDays']
+SIDEREAL_YEAR_DAYS   = _dumped['meanSiderealYearDays']
+ANOMALISTIC_YEAR_DAYS = _dumped['meanAnomalisticYearDays']
 
 # ─── ECCENTRICITY SET SELECTION ───────────────────────────────────────────
 #
@@ -150,6 +175,121 @@ STRICT_TOL = 0.03  # 3% for laws that claim ~1-2% accuracy
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# TEST REGISTRY — single source of truth for test order, IDs, and labels
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Each entry: (stable_id, category, short_label)
+# Order defines the order of computation, printing, summary table, and Fisher's.
+# Stable IDs are used as dict keys in `observed`, `counts`, and `p_values`.
+#
+# Categories:
+#   "law"     — one of the 6 Fibonacci laws (Laws 1–6)
+#   "finding" — one of the numbered Findings (F1, F4, F5, F6)
+#   "general" — exploratory / look-elsewhere tests (not tied to a specific law)
+
+TEST_REGISTRY = [
+    # Laws 1–6 (core claims)
+    ("law1_fib_denominators", "law",    "Law 1 — Fibonacci denominators"),
+    ("law2_psi_full",        "law",     "Law 2 — ψ full 8-planet"),
+    ("law3_incl_balance",    "law",     "Law 3 — Inclination balance"),
+    ("law4_k_amplitude",     "law",     "Law 4 — K amplitude constant"),
+    ("law5_ecc_balance",     "law",     "Law 5 — Eccentricity balance"),
+    ("law6_ejs_resonance",   "law",     "Law 6 — E–J–S resonance"),
+    # Findings
+    ("f1_mirror_symmetry",   "finding", "Finding 1 — Mirror symmetry"),
+    ("f1b_d_set_fib_pairs",  "finding", "Finding 1b — d-set Fib clustering"),
+    ("f4_saturn_prediction", "finding", "Finding 4 — Saturn e prediction"),
+    ("f6_solo_planet",       "finding", "Finding 6 — Solo planet ID"),
+    # Arithmetic / structural
+    ("year_length_beat",     "new",     "Year-length beat identity"),
+]
+
+TEST_IDS       = [t[0] for t in TEST_REGISTRY]
+TEST_ID_SET    = set(TEST_IDS)
+TEST_LABEL_MAP = {t[0]: t[2] for t in TEST_REGISTRY}
+TEST_CAT_MAP   = {t[0]: t[1] for t in TEST_REGISTRY}
+
+# Tests that are pure STRUCTURAL checks: permutation trivially preserves them
+# (or the observation is a single scalar that can't be permuted). These are
+# reported but should be excluded from Fisher's method, otherwise their
+# forced p=1 dilutes the combined statistic.
+STRUCTURAL_TESTS = {
+    "law1_fib_denominators",  # permutation preserves the set of denominators
+    "law6_ejs_resonance",
+    "f1_mirror_symmetry",
+    "f1b_d_set_fib_pairs",    # d-set multiset is permutation-invariant
+    "year_length_beat",       # single scalar, can't permute
+}
+
+
+def parse_test_filter(spec):
+    """
+    Parse a `--tests` argument into a set of test IDs.
+
+    Accepts (comma-separated):
+      - category names: "laws", "findings", "general"
+      - stable IDs:     "law1_fib_denominators", "f4_saturn_prediction"
+      - short prefixes: "law1", "f4"          (matches any ID starting with prefix_)
+      - numeric:        "1", "3", "5-7", "1-6"
+      - "all"           (= all tests; equivalent to omitting the flag)
+
+    Returns: set of stable IDs (preserves TEST_REGISTRY order at caller).
+    Raises: ValueError on unknown tokens.
+    """
+    if spec is None or spec.strip() == "" or spec.strip().lower() == "all":
+        return set(TEST_IDS)
+
+    selected = set()
+    tokens = [t.strip() for t in spec.split(",") if t.strip()]
+    for tok in tokens:
+        low = tok.lower()
+        # Category aliases
+        if low in ("law", "laws"):
+            selected.update(tid for tid, cat, _ in TEST_REGISTRY if cat == "law")
+            continue
+        if low in ("finding", "findings"):
+            selected.update(tid for tid, cat, _ in TEST_REGISTRY if cat == "finding")
+            continue
+        if low in ("general", "gen"):
+            selected.update(tid for tid, cat, _ in TEST_REGISTRY if cat == "general")
+            continue
+        if low in ("new", "news"):
+            selected.update(tid for tid, cat, _ in TEST_REGISTRY if cat == "new")
+            continue
+        # Numeric range "a-b" or single number
+        if "-" in tok and all(p.strip().isdigit() for p in tok.split("-", 1)):
+            a, b = (int(p) for p in tok.split("-", 1))
+            for i in range(a, b + 1):
+                if 1 <= i <= len(TEST_IDS):
+                    selected.add(TEST_IDS[i - 1])
+                else:
+                    raise ValueError(f"test index {i} out of range (1..{len(TEST_IDS)})")
+            continue
+        if tok.isdigit():
+            i = int(tok)
+            if 1 <= i <= len(TEST_IDS):
+                selected.add(TEST_IDS[i - 1])
+                continue
+            raise ValueError(f"test index {i} out of range (1..{len(TEST_IDS)})")
+        # Exact stable ID
+        if low in TEST_ID_SET:
+            selected.add(low)
+            continue
+        # Prefix match: "law1" → "law1_fib_denominators"
+        prefix_matches = [tid for tid in TEST_IDS if tid.startswith(low + "_") or tid == low]
+        if len(prefix_matches) == 1:
+            selected.add(prefix_matches[0])
+            continue
+        if len(prefix_matches) > 1:
+            raise ValueError(f"ambiguous test prefix '{tok}': matches {prefix_matches}")
+        raise ValueError(
+            f"unknown test '{tok}'. Valid IDs: {', '.join(TEST_IDS)} "
+            f"(or categories: laws, findings, general; or indices 1..{len(TEST_IDS)})"
+        )
+    return selected
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # HELPER FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -189,123 +329,6 @@ def compute_xi(eccs, incls, sqrt_m):
     xi_e = {p: eccs[p] * sqrt_m[p] for p in PLANET_NAMES}
     xi_i = {p: incls[p] * sqrt_m[p] for p in PLANET_NAMES}
     return xi_e, xi_i
-
-
-def stat_pairwise_count(xi_e, xi_i, tol=TOLERANCE):
-    """
-    Test 1: Count how many pairwise ξ-ratios are near Fibonacci ratios.
-    Tests both eccentricity and inclination.
-    Total pairs: C(8,2) = 28 for ecc + 28 for incl = 56 tests.
-    """
-    count = 0
-    for i, p1 in enumerate(PLANET_NAMES):
-        for p2 in PLANET_NAMES[i+1:]:
-            # Eccentricity ratio
-            if xi_e[p2] > 0 and xi_e[p1] > 0:
-                ratio = xi_e[p1] / xi_e[p2]
-                if near_fibonacci(ratio, tol):
-                    count += 1
-            # Inclination ratio
-            if xi_i[p2] > 0 and xi_i[p1] > 0:
-                ratio = xi_i[p1] / xi_i[p2]
-                if near_fibonacci(ratio, tol):
-                    count += 1
-    return count
-
-
-def stat_ladder(xi_e, tol=STRICT_TOL):
-    """
-    Test 2 — Finding 5: Find the best 4-planet Fibonacci ladder in eccentricity.
-
-    For each subset of 4 planets, try each as reference and check if the
-    other 3 have ξ-ratios to the reference that are all Fibonacci ratios.
-
-    Returns: (best_count, best_mean_error)
-      best_count: max number of Fibonacci-matching ratios in any 4-planet subset
-      best_mean_error: mean relative error for the best ladder
-    """
-    best_count = 0
-    best_mean_err = 1.0
-
-    for subset in itertools.combinations(PLANET_NAMES, 4):
-        for ref in subset:
-            xi_ref = xi_e[ref]
-            if xi_ref <= 0:
-                continue
-            matches = 0
-            errors = []
-            for p in subset:
-                if p == ref:
-                    continue
-                ratio = xi_e[p] / xi_ref
-                err = best_fibonacci_error(ratio)
-                errors.append(err)
-                if err < tol:
-                    matches += 1
-
-            if matches > best_count or (matches == best_count and
-                                         sum(errors) / len(errors) < best_mean_err):
-                best_count = matches
-                best_mean_err = sum(errors) / len(errors)
-
-    return best_count, best_mean_err
-
-
-def stat_psi_constant(xi_i, tol=STRICT_TOL):
-    """
-    Test 3 — General: Find best 3-planet ψ-constant (d × i × √m = const).
-
-    For each subset of 3 planets, try all assignments of Fibonacci weights
-    d ∈ {1, 2, 3, 5, 8} and measure how constant d × ξ_i is.
-
-    Returns: best relative spread (max-min)/mean for any triplet+weights.
-    """
-    best_spread = 1.0
-    fib_weights = [1, 2, 3, 5, 8]
-
-    for subset in itertools.combinations(PLANET_NAMES, 3):
-        xi_vals = [xi_i[p] for p in subset]
-        if any(v <= 0 for v in xi_vals):
-            continue
-
-        # Try all ordered assignments of 3 distinct weights from fib_weights
-        for weights in itertools.permutations(fib_weights, 3):
-            psi_vals = [w * x for w, x in zip(weights, xi_vals)]
-            mean_psi = sum(psi_vals) / 3
-            if mean_psi <= 0:
-                continue
-            spread = (max(psi_vals) - min(psi_vals)) / mean_psi
-            if spread < best_spread:
-                best_spread = spread
-
-    return best_spread
-
-
-
-
-# Angular momentum weights W = m√a (precomputed, fixed for all tests)
-W = {p: MASSES[p] * math.sqrt(SEMI_MAJOR[p]) for p in PLANET_NAMES}
-
-
-def stat_cross_parameter(eccs, incl_means, incl_amps):
-    """
-    Test 4 — Cross-parameter ratio (Λ_ecc + Λ_amp) / Λ_mean.
-
-    Links all three fundamental orbital parameters in one equation.
-    The model claims this equals 5 = F₅ at 1.66%.
-
-    NOTE: Partially circular — Λ_amp uses model-derived amplitudes.
-    Look-elsewhere: we check against all extended Fibonacci ratios (~42).
-
-    Returns: best relative error to any extended Fibonacci ratio.
-    """
-    le = sum(W[p] * eccs[p] for p in PLANET_NAMES)
-    la = sum(W[p] * math.radians(incl_amps[p]) for p in PLANET_NAMES)
-    lm = sum(W[p] * math.radians(incl_means[p]) for p in PLANET_NAMES)
-    if lm <= 0:
-        return 1.0
-    ratio = (le + la) / lm
-    return best_fibonacci_error_ext(ratio)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -457,80 +480,6 @@ def stat_psi_full(incl_j2000, d_vals, sqrt_m):
     return (max(psi_vals) - min(psi_vals)) / mean_psi
 
 
-def stat_prec_hierarchy(prec_periods, tol=TOLERANCE):
-    """
-    Test 9 — Law 1: Fibonacci precession hierarchy.
-
-    For 8 precession periods, count how many pairwise ratios match
-    Fibonacci ratios (F_a/F_b where a,b ∈ {1,2,3,5,8,13,21,34}).
-
-    Total pairs: C(8,2) = 28.
-
-    Returns: count of matching pairs (higher = better).
-    """
-    count = 0
-    periods = [prec_periods[p] for p in PLANET_NAMES]
-    for i in range(len(periods)):
-        for j in range(i + 1, len(periods)):
-            if periods[i] > 0 and periods[j] > 0:
-                ratio = periods[i] / periods[j]
-                if best_fibonacci_error_ext(ratio) < tol:
-                    count += 1
-    return count
-
-
-# R² pair constraints (report only) (current statement — three ratios + one sum-of-squares)
-# Each entry: (inner, outer, form, target)
-# form: 'sq_ratio'  → R_outer² / R_inner²
-#       'lin_ratio' → R_outer  / R_inner
-#       'sq_sum'    → R_inner² + R_outer²
-LAW4_PAIRS = [
-    ("Mars",    "Jupiter", "sq_ratio", 144 / 11),  # F₁₂/L₅
-    ("Earth",   "Saturn",  "lin_ratio", 21 / 4),    # F₈/L₃
-    ("Venus",   "Neptune", "sq_ratio", 55 / 4),    # F₁₀/L₃
-    ("Mercury", "Uranus",  "sq_sum",   55 / 5),    # F₁₀/F₅ = 11
-]
-
-
-def stat_r2_partition(eccs, incl_mean, mirror_pairs=None, tol=TOLERANCE):
-    """
-    Test 10 — R² partition (report only).
-
-    For each of the four mirror pairs, compute the pair-specific
-    R-form and check whether it lands within tol of its Fibonacci/Lucas
-    target. R = e / i_mean,rad. The four constraints are:
-
-        Mars / Jupiter   :  R²_Ju / R²_Ma  =  144/11   (F₁₂/L₅)
-        Earth / Saturn   :  R_Sa / R_E     =  21/4     (F₈/L₃)
-        Venus / Neptune  :  R²_Ne / R²_V   =  55/4     (F₁₀/L₃)
-        Mercury / Uranus :  R²_Me + R²_Ur  =  55/5 = 11 (F₁₀/F₅)
-
-    The `mirror_pairs` argument is accepted for backwards compatibility
-    but ignored — the R² partition fixes the constraint form per pair.
-
-    Returns: count of matching pairs out of 4 (higher = better).
-    """
-    count = 0
-    for inner, outer, form, target in LAW4_PAIRS:
-        i_inner = math.radians(incl_mean.get(inner, 0))
-        i_outer = math.radians(incl_mean.get(outer, 0))
-        if i_inner <= 0 or i_outer <= 0:
-            continue
-        r_inner = eccs.get(inner, 0) / i_inner
-        r_outer = eccs.get(outer, 0) / i_outer
-        if r_inner <= 0 or r_outer <= 0:
-            continue
-        if form == "sq_ratio":
-            obs = (r_outer * r_outer) / (r_inner * r_inner)
-        elif form == "lin_ratio":
-            obs = r_outer / r_inner
-        else:  # sq_sum
-            obs = r_inner * r_inner + r_outer * r_outer
-        if abs(obs / target - 1.0) < tol:
-            count += 1
-    return count
-
-
 def stat_ejs_resonance(period_fracs):
     """
     Test 11 — Law 6: Earth–Jupiter–Saturn resonance loop.
@@ -635,103 +584,224 @@ def _best_k_for_amplitudes(eccs_amp, tilts, d_vals, masses, sma, sqrt_m):
     return K, max_err
 
 
-def stat_ecc_scale_rms(eccs, d_vals, masses, sma, sqrt_m, group_a, group_b):
+def stat_solo_planet_identification(eccs, d_vals, masses, sma, sqrt_m):
     """
-    Test 14 — Finding 6: Eccentricity Balance Scale (per-planet prediction).
+    Finding 6 (reformulated) — Solo planet identification.
 
-    For each planet as target, predict its eccentricity from the other 7
-    using the balance scale formula:
-      W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)
-      contribution = W_j × e_j (negative if same group, positive if opposite)
-      predicted_offset = sum of contributions
-      predicted_e = predicted_offset / a_target  (not used — see below)
+    The eccentricity balance equation says:
+        Σ v_j(in-phase) = v_solo
+    where v_j = √m_j × a_j^(3/2) × e_j / √d_j.
+    The original Finding 6 ("predict each planet's e from the other 7") is
+    mathematically ill-conditioned: for small-v planets (Mercury, Venus,
+    Earth, Mars — each <0.2% of the total) the residual gap dominates and
+    the prediction blows up to 100%+ error. See commit history for details.
 
-    Actually, the balance equation gives:
-      sum_same_group(v_j) = sum_opposite_group(v_j)
-    where v_j = √m_j × a_j^1.5 × e_j / √d_j.  So for a target planet t in
-    group_b (solo), the predicted eccentricity is:
-      e_t = sum_{j in group_a}(v_j) / (√m_t × a_t^1.5 / √d_t)
+    This reformulation asks a different question that IS well-conditioned:
+    "Which single planet, when treated as the solo anti-phase partner,
+    minimizes the balance residual?"  The planet that best fits the solo
+    role is found by computing, for each planet p:
 
-    For a target in the majority group, we solve:
-      sum_{j in group_a, j≠t}(v_j) + v_t = sum_{j in group_b}(v_j)
-      => v_t = sum_b - sum_{a\t}
-      => e_t = (sum_b - sum_{a\t}) × √d_t / (√m_t × a_t^1.5)
+        resid(p) = | v_p  -  Σ_{j≠p} v_j |  /  v_p
 
-    Returns: RMS of relative prediction errors across all 8 planets
+    and taking argmin.  Observed: Saturn uniquely minimizes this with
+    resid ≈ 0.25%; the next-best planet has resid >> 50%.
+
+    Returns: minimum residual ratio across 8 candidate solo planets.
+             Lower = better (= "some planet fits the solo role tightly").
+             The IDENTITY of the argmin is also meaningful but not returned.
+
+    Null (permutation): shuffle e's across planets, recompute argmin.
+                        How often does the min residual stay ≤ observed?
+    """
+    v = {}
+    for p in PLANET_NAMES:
+        d_p = d_vals.get(p, 0)
+        if d_p <= 0 or eccs.get(p, 0) <= 0:
+            return 1.0
+        v[p] = sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_p)
+
+    total = sum(v.values())
+    min_resid = float("inf")
+    for p in PLANET_NAMES:
+        if v[p] <= 0:
+            continue
+        sum_others = total - v[p]
+        resid = abs(v[p] - sum_others) / v[p]
+        if resid < min_resid:
+            min_resid = resid
+    return min_resid if min_resid != float("inf") else 1.0
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STRUCTURAL / ARITHMETIC TESTS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Fibonacci numbers for "is Fibonacci?" checks (up to F_10)
+_FIB_SET_FOR_DENOMS = {1, 2, 3, 5, 8, 13, 21, 34, 55}
+
+# Ordered Fibonacci sequence (indexed for "consecutive pair" checks)
+_FIB_SEQ_FOR_CLUSTER = (1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144)
+
+
+def stat_d_set_fib_clustering(d_vals):
+    """
+    Finding 1b — d-set Fibonacci clustering.
+
+    Beyond Finding 1 (mirror pairs share d), this tests a STRICTER structural
+    claim from fibonacci-laws-derivation.mdx §Finding 1:
+
+        "The divisors form two consecutive Fibonacci pairs:
+         (3,5) for the belt-adjacent and (21,34) for the outer planets."
+
+    Observed d-set for Config #7: {3, 5, 21, 34}
+        = {F_4, F_5, F_8, F_9}
+        = (F_4,F_5) ∪ (F_8,F_9)   ← two disjoint consecutive Fibonacci pairs.
+
+    Statistic (binary): 1 if the set of DISTINCT d-values across 8 planets
+                        has exactly 4 elements AND can be expressed as
+                        {F_i, F_{i+1}} ∪ {F_j, F_{j+1}} with i+1 < j.
+                        0 otherwise.
+
+    Null (Permutation): shuffling values preserves the multiset → unchanged
+                        → structural; always p = 1.
+    Null (MC): random 4-element subset of the Fibonacci pool {1,2,3,5,8,13,
+               21,34,55}. About 21 of C(9,4)=126 subsets form "2 consecutive
+               pairs" (≈16.7%). Requires random d-assignments that also yield
+               4 distinct values.
+
+    Returns: 1 (match) or 0 (no match).
+    """
+    d_set = sorted(set(d_vals.values()))
+    if len(d_set) != 4:
+        return 0
+    # All must be Fibonacci numbers
+    try:
+        indices = sorted(_FIB_SEQ_FOR_CLUSTER.index(d) for d in d_set)
+    except ValueError:
+        return 0
+    # Must form two disjoint consecutive pairs: (i, i+1) and (j, j+1) with
+    # i+1 < j (so the two pairs are disjoint and not adjacent).
+    if indices[1] == indices[0] + 1 and indices[3] == indices[2] + 1 and indices[2] > indices[1]:
+        return 1
+    return 0
+
+
+def stat_gho_fib_denominators(period_fracs):
+    """
+    Test 14 — Grand Holistic Octave divisibility (Fibonacci denominators).
+
+    The model's inclination oscillation periods are expressed as
+    T_i = H × (a_i / b_i) with small integer a_i and b_i. Count how many
+    of the 8 denominators b_i fall in the Fibonacci set {1,2,3,5,8,13,21,34,55}.
+
+    Observed: 7/8 (only Mercury's b=11 is non-Fibonacci).
+
+    Null (MC): draw random denominators from [1, 30] and count Fibonacci matches.
+    Null (Permutation): trivially unchanged — shuffling preserves the count.
+                        → structural; always p = 1.
+
+    Returns: integer count of Fibonacci-denominator planets (higher = better).
+    """
+    count = 0
+    for p, (a, b) in period_fracs.items():
+        if b in _FIB_SET_FOR_DENOMS:
+            count += 1
+    return count
+
+
+def stat_year_length_beat(tropical, sidereal, anomalistic, holistic_year):
+    """
+    Test 16 — Year-length Fibonacci beat identity.
+
+    The three year types satisfy Fibonacci beat-frequency relations:
+
+        (sidereal   / tropical    - 1) × H ≈ 13  (general precession period = H/13)
+        (anomalistic/ tropical    - 1) × H ≈ 16  (perihelion precession    = H/16)
+
+    The RHS constants 13 and 16 (where 16 = 2×8) are Fibonacci-structured.
+    Observed: both beats match to <0.001 on the implied integer.
+
+    Metric: max |beat_i − round(beat_i)| / round(beat_i) across both beats,
+            where beat_i is integer iff the year-length identity is exact.
+    Lower = better.
+
+    Null (MC): draw random (tropical, sidereal, anomalistic) triples in
+               a realistic range; compute beats; count how often both are
+               within tolerance of any integer in {3,5,8,13,16,21,34,55}.
+    Null (Permutation): single-point observation — cannot permute 3 scalars.
+                        → structural; always p = 1.
+
+    Returns: max relative error from nearest Fibonacci-like integer
              (lower = better).
     """
-    errors_sq = []
-    for target in PLANET_NAMES:
-        d_t = d_vals.get(target, 0)
-        if d_t <= 0 or eccs.get(target, 0) <= 0:
-            errors_sq.append(1.0)
-            continue
-
-        coeff_t = sqrt_m[target] * sma[target]**1.5 / math.sqrt(d_t)
-
-        # Determine which group target belongs to
-        if target in group_b:
-            # Target is the solo planet — predicted from group_a
-            sum_other = sum(
-                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
-                for p in group_a if d_vals.get(p, 0) > 0
-            )
-        else:
-            # Target is in group_a — predicted from balance with group_b
-            sum_b = sum(
-                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
-                for p in group_b if d_vals.get(p, 0) > 0
-            )
-            sum_a_without = sum(
-                sqrt_m[p] * sma[p]**1.5 * eccs[p] / math.sqrt(d_vals[p])
-                for p in group_a if p != target and d_vals.get(p, 0) > 0
-            )
-            sum_other = sum_b - sum_a_without
-
-        if coeff_t <= 0:
-            errors_sq.append(1.0)
-            continue
-
-        e_predicted = sum_other / coeff_t
-        rel_err = (e_predicted / eccs[target] - 1.0)
-        errors_sq.append(rel_err ** 2)
-
-    if not errors_sq:
+    if tropical <= 0:
         return 1.0
-    return math.sqrt(sum(errors_sq) / len(errors_sq))
+    beat_sid = (sidereal / tropical - 1.0) * holistic_year
+    beat_ano = (anomalistic / tropical - 1.0) * holistic_year
+    # Targets: general precession H/13 → beat = 13;
+    #          perihelion precession H/16 → beat = 16.
+    err_sid = abs(beat_sid - 13.0) / 13.0
+    err_ano = abs(beat_ano - 16.0) / 16.0
+    return max(err_sid, err_ano)
+
+
+def _nearest_fib_or_small(target, candidates=(3, 5, 8, 13, 16, 21, 34, 55)):
+    """Return min relative error to any integer in candidates."""
+    if target <= 0:
+        return 1.0
+    return min(abs(target / c - 1.0) for c in candidates)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # OBSERVED STATISTICS
 # ═══════════════════════════════════════════════════════════════════════════
 
-def compute_observed_stats():
-    """Compute all 14 test statistics for the real solar system.
+def compute_observed_stats(selected=None):
+    """Compute observed test statistics for the real solar system.
+
+    If `selected` is None, computes all 13 tests. Otherwise, computes only
+    the tests whose stable IDs are present in `selected` (a set of strings).
 
     All tests use base eccentricities (ECCENTRICITIES = ECC_BASE).
     ECC_DUAL_BALANCED is a legacy alias for the same set.
     """
     xi_e, xi_i = compute_xi(ECCENTRICITIES, INCLINATION_AMPS, SQRT_M)
 
+    def want(tid):
+        return selected is None or tid in selected
+
     obs = {}
-    # Tests 1-4: base eccentricities
-    obs["pairwise_count"] = stat_pairwise_count(xi_e, xi_i)
-    obs["ladder_count"], obs["ladder_mean_err"] = stat_ladder(xi_e)
-    obs["psi_spread"] = stat_psi_constant(xi_i)
-    obs["cross_param"] = stat_cross_parameter(ECCENTRICITIES, INCL_MEANS, INCLINATION_AMPS)
-    # Tests 5-7: base eccentricities (= dual-balanced, same set)
-    obs["incl_balance"] = stat_incl_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
-    obs["ecc_balance"] = stat_ecc_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
-    obs["saturn_pred"] = stat_saturn_prediction(ECC_DUAL_BALANCED, D_INCL, GROUP_203, "Saturn")
-    # Tests 8–12
-    obs["psi_full"] = stat_psi_full(INCL_J2000, D_INCL, SQRT_M)
-    obs["prec_hierarchy"] = stat_prec_hierarchy(INCL_PERIOD)
-    obs["r2_partition"] = stat_r2_partition(ECCENTRICITIES, INCL_MEANS, MIRROR_PAIRS)
-    obs["ejs_resonance"] = stat_ejs_resonance(PERIOD_FRAC)
-    obs["mirror_symmetry"] = stat_mirror_symmetry(D_INCL, MIRROR_PAIRS)
-    # Tests 13-14
-    obs["k_amplitude"] = stat_k_amplitude(ECC_AMPLITUDE, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
-    obs["ecc_scale_rms"] = stat_ecc_scale_rms(ECC_DUAL_BALANCED, D_INCL, MASSES, SMA, SQRT_M, GROUP_203, GROUP_23)
+    # ── Core Laws ──
+    if want("law1_fib_denominators"):
+        obs["law1_fib_denominators"] = stat_gho_fib_denominators(PERIOD_FRAC)
+    if want("law2_psi_full"):
+        # FIXED: use model INCLINATION_AMPS (the amplitudes d×amp×√m = ψ
+        # relation holds for), not J2000 instantaneous inclinations.
+        # Permutation remains valid — shuffling still breaks the match.
+        obs["law2_psi_full"] = stat_psi_full(INCLINATION_AMPS, D_INCL, SQRT_M)
+    if want("law3_incl_balance"):
+        obs["law3_incl_balance"] = stat_incl_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
+    if want("law4_k_amplitude"):
+        # FIXED: use per-planet model mean obliquity, not J2000 axial tilts.
+        obs["law4_k_amplitude"] = stat_k_amplitude(ECC_AMPLITUDE, OBLIQUITY_MEAN, D_INCL, MASSES, SMA, SQRT_M)
+    if want("law5_ecc_balance"):
+        obs["law5_ecc_balance"] = stat_ecc_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
+    if want("law6_ejs_resonance"):
+        obs["law6_ejs_resonance"] = stat_ejs_resonance(PERIOD_FRAC)
+    # ── Findings ──
+    if want("f1_mirror_symmetry"):
+        obs["f1_mirror_symmetry"] = stat_mirror_symmetry(D_INCL, MIRROR_PAIRS)
+    if want("f1b_d_set_fib_pairs"):
+        obs["f1b_d_set_fib_pairs"] = stat_d_set_fib_clustering(D_INCL)
+    if want("f4_saturn_prediction"):
+        obs["f4_saturn_prediction"] = stat_saturn_prediction(ECC_DUAL_BALANCED, D_INCL, GROUP_203, "Saturn")
+    if want("f6_solo_planet"):
+        obs["f6_solo_planet"] = stat_solo_planet_identification(
+            ECC_DUAL_BALANCED, D_INCL, MASSES, SMA, SQRT_M)
+    # ── Arithmetic / structural ──
+    if want("year_length_beat"):
+        obs["year_length_beat"] = stat_year_length_beat(
+            TROPICAL_YEAR_DAYS, SIDEREAL_YEAR_DAYS, ANOMALISTIC_YEAR_DAYS, H)
 
     return obs
 
@@ -740,7 +810,7 @@ def compute_observed_stats():
 # DISTRIBUTION 1: PERMUTATION TEST (EXHAUSTIVE)
 # ═══════════════════════════════════════════════════════════════════════════
 
-def permutation_test(observed):
+def permutation_test(observed, selected=None):
     """
     Exhaustive permutation test: keep the same 8 eccentricity values,
     8 inclination amplitude values, and 8 mean inclination values,
@@ -752,9 +822,15 @@ def permutation_test(observed):
     8! = 40,320 permutations (exhaustive, no sampling needed).
     We use the SAME permutation for eccentricities, amplitudes, and means
     (conservative — independent permutations would be ~10^13).
+
+    If `selected` is None, runs all tests. Otherwise runs only those whose
+    stable IDs are in `selected`.
     """
     print("  DISTRIBUTION 1: PERMUTATION TEST (8! = 40,320 trials)")
     print("  " + "─" * 60)
+
+    if selected is None:
+        selected = set(TEST_IDS)
 
     ecc_vals = [ECCENTRICITIES[p] for p in PLANET_NAMES]
     ecc_dual_vals = [ECC_DUAL_BALANCED[p] for p in PLANET_NAMES]
@@ -764,13 +840,8 @@ def permutation_test(observed):
 
     n_perms = math.factorial(8)  # 40,320
     incl_j2000_vals = [INCL_J2000[p] for p in PLANET_NAMES]
-    prec_vals = [INCL_PERIOD[p] for p in PLANET_NAMES]
 
-    counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
-              "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
-              "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0,
-              "k_amplitude": 0, "ecc_scale_rms": 0}
+    counts = {tid: 0 for tid in TEST_IDS if tid in selected}
 
     for idx, perm in enumerate(itertools.permutations(range(8))):
         # Assign shuffled values to planets
@@ -779,74 +850,70 @@ def permutation_test(observed):
         incls = {PLANET_NAMES[i]: incl_vals[perm[i]] for i in range(8)}
         means = {PLANET_NAMES[i]: mean_vals[perm[i]] for i in range(8)}
         ij2k = {PLANET_NAMES[i]: incl_j2000_vals[perm[i]] for i in range(8)}
-        precs = {PLANET_NAMES[i]: prec_vals[perm[i]] for i in range(8)}
         ecc_amps = {PLANET_NAMES[i]: ecc_amp_vals[perm[i]] for i in range(8)}
 
         xi_e, xi_i = compute_xi(eccs, incls, SQRT_M)
 
-        # Test 1: Pairwise count
-        pc = stat_pairwise_count(xi_e, xi_i)
-        if pc >= observed["pairwise_count"]:
-            counts["pairwise"] += 1
+        # Law 1 — Fibonacci denominators: structural (permutation preserves
+        # the multiset of denominators). Count as always matching; excluded
+        # from Fisher's.
+        if "law1_fib_denominators" in selected:
+            counts["law1_fib_denominators"] += 1
 
-        # Test 2: Ladder
-        lc, _ = stat_ladder(xi_e)
-        if lc >= observed["ladder_count"]:
-            counts["ladder"] += 1
+        # Law 2 — ψ full 8-planet (model d-values, shuffled J2000 inclinations)
+        if "law2_psi_full" in selected:
+            pf = stat_psi_full(ij2k, D_INCL, SQRT_M)
+            if pf <= observed["law2_psi_full"]:
+                counts["law2_psi_full"] += 1
 
-        # Test 3: ψ-constant (3-planet)
-        ps = stat_psi_constant(xi_i)
-        if ps <= observed["psi_spread"]:
-            counts["psi"] += 1
+        # Law 3 — Inclination balance (shuffled dual-balanced eccentricities)
+        if "law3_incl_balance" in selected:
+            ib = stat_incl_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
+            if ib >= observed["law3_incl_balance"]:
+                counts["law3_incl_balance"] += 1
 
-        # Test 4: Cross-parameter ratio
-        cp = stat_cross_parameter(eccs, means, incls)
-        if cp <= observed["cross_param"]:
-            counts["cross_param"] += 1
+        # Law 4 — K amplitude constant (shuffled amplitudes)
+        if "law4_k_amplitude" in selected:
+            ka = stat_k_amplitude(ecc_amps, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
+            if ka <= observed["law4_k_amplitude"]:
+                counts["law4_k_amplitude"] += 1
 
-        # Tests 5-7: Balance conditions (model d-values, shuffled dual-balanced eccentricities)
-        ib = stat_incl_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
-        if ib >= observed["incl_balance"]:
-            counts["incl_balance"] += 1
+        # Law 5 — Eccentricity balance (shuffled dual-balanced eccentricities)
+        if "law5_ecc_balance" in selected:
+            eb = stat_ecc_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
+            if eb >= observed["law5_ecc_balance"]:
+                counts["law5_ecc_balance"] += 1
 
-        eb = stat_ecc_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
-        if eb >= observed["ecc_balance"]:
-            counts["ecc_balance"] += 1
+        # Law 6 — E–J–S resonance: structure-only; permutation cannot break it.
+        # Count as always matching (conservative: p = 1.0).
+        if "law6_ejs_resonance" in selected:
+            counts["law6_ejs_resonance"] += 1
 
-        sp = stat_saturn_prediction(eccs_dual, D_INCL, GROUP_203, "Saturn")
-        if sp <= observed["saturn_pred"]:
-            counts["saturn_pred"] += 1
+        # Finding 1 — Mirror symmetry: same — structure-only, p = 1.0.
+        if "f1_mirror_symmetry" in selected:
+            counts["f1_mirror_symmetry"] += 1
 
-        # Test 8: ψ full 8-planet (model d-values, shuffled J2000 inclinations)
-        pf = stat_psi_full(ij2k, D_INCL, SQRT_M)
-        if pf <= observed["psi_full"]:
-            counts["psi_full"] += 1
+        # Finding 1b — d-set Fib clustering: also structure-only in permutation.
+        if "f1b_d_set_fib_pairs" in selected:
+            counts["f1b_d_set_fib_pairs"] += 1
 
-        # Test 9: Precession hierarchy (shuffled periods)
-        ph = stat_prec_hierarchy(precs)
-        if ph >= observed["prec_hierarchy"]:
-            counts["prec_hierarchy"] += 1
+        # Finding 4 — Saturn eccentricity prediction
+        if "f4_saturn_prediction" in selected:
+            sp = stat_saturn_prediction(eccs_dual, D_INCL, GROUP_203, "Saturn")
+            if sp <= observed["f4_saturn_prediction"]:
+                counts["f4_saturn_prediction"] += 1
 
-        # Test 10: Law 4 pair constraints (shuffled eccs + shuffled mean incl)
-        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
-        if rp >= observed["r2_partition"]:
-            counts["r2_partition"] += 1
+        # Finding 6 — Solo planet identification (shuffled eccentricities)
+        if "f6_solo_planet" in selected:
+            sp_id = stat_solo_planet_identification(
+                eccs_dual, D_INCL, MASSES, SMA, SQRT_M)
+            if sp_id <= observed["f6_solo_planet"]:
+                counts["f6_solo_planet"] += 1
 
-        # Tests 11-12: Not meaningful for permutation (structure is fixed)
-        # E-J-S resonance and mirror symmetry depend on planet identity, not values
-        # Count as always matching (conservative: p = 1.0)
-        counts["ejs_resonance"] += 1
-        counts["mirror_symmetry"] += 1
-
-        # Test 13: K amplitude constant (shuffled amplitudes)
-        ka = stat_k_amplitude(ecc_amps, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
-        if ka <= observed["k_amplitude"]:
-            counts["k_amplitude"] += 1
-
-        # Test 14: Eccentricity balance scale (shuffled eccentricities)
-        es = stat_ecc_scale_rms(eccs_dual, D_INCL, MASSES, SMA, SQRT_M, GROUP_203, GROUP_23)
-        if es <= observed["ecc_scale_rms"]:
-            counts["ecc_scale_rms"] += 1
+        # Year-length beat: single scalar — permutation cannot disturb it.
+        # Count as always matching (conservative: p = 1.0); excluded from Fisher's.
+        if "year_length_beat" in selected:
+            counts["year_length_beat"] += 1
 
         if (idx + 1) % 10000 == 0:
             print(f"    ... {idx+1:,}/{n_perms:,} permutations done")
@@ -859,7 +926,7 @@ def permutation_test(observed):
 # DISTRIBUTION 2: LOG-UNIFORM MONTE CARLO
 # ═══════════════════════════════════════════════════════════════════════════
 
-def log_uniform_mc(observed, n_trials, rng):
+def log_uniform_mc(observed, n_trials, rng, selected=None):
     """
     Log-uniform Monte Carlo: draw random eccentricities, inclination
     amplitudes, and mean inclinations from log-uniform distributions.
@@ -872,109 +939,114 @@ def log_uniform_mc(observed, n_trials, rng):
     print(f"  DISTRIBUTION 2: LOG-UNIFORM MONTE CARLO ({n_trials:,} trials)")
     print("  " + "─" * 60)
 
+    if selected is None:
+        selected = set(TEST_IDS)
+
     log_e_lo, log_e_hi = math.log(0.005), math.log(0.25)
     log_i_lo, log_i_hi = math.log(0.01), math.log(3.0)
     log_m_lo, log_m_hi = math.log(0.1), math.log(10.0)
 
-    # Precession period range (years) for MC
-    log_prec_lo, log_prec_hi = math.log(30000), math.log(700000)
-
     # Eccentricity amplitude range for MC
     log_ea_lo, log_ea_hi = math.log(1e-6), math.log(0.01)
 
-    counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
-              "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
-              "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0,
-              "k_amplitude": 0, "ecc_scale_rms": 0}
+    counts = {tid: 0 for tid in TEST_IDS if tid in selected}
 
     for trial in range(n_trials):
         eccs = {}
         incls = {}
         means = {}
         ij2k = {}
-        precs = {}
         for p in PLANET_NAMES:
             eccs[p] = math.exp(rng.uniform(log_e_lo, log_e_hi))
             incls[p] = math.exp(rng.uniform(log_i_lo, log_i_hi))
             means[p] = math.exp(rng.uniform(log_m_lo, log_m_hi))
             ij2k[p] = math.exp(rng.uniform(log_i_lo, log_i_hi))
-            precs[p] = math.exp(rng.uniform(log_prec_lo, log_prec_hi))
 
         xi_e, xi_i = compute_xi(eccs, incls, SQRT_M)
 
-        pc = stat_pairwise_count(xi_e, xi_i)
-        if pc >= observed["pairwise_count"]:
-            counts["pairwise"] += 1
-
-        lc, _ = stat_ladder(xi_e)
-        if lc >= observed["ladder_count"]:
-            counts["ladder"] += 1
-
-        ps = stat_psi_constant(xi_i)
-        if ps <= observed["psi_spread"]:
-            counts["psi"] += 1
-
-        cp = stat_cross_parameter(eccs, means, incls)
-        if cp <= observed["cross_param"]:
-            counts["cross_param"] += 1
-
-        # Tests 5-7: Random d-values and random solo planet
+        # Random d-values and random solo planet (shared across balance tests)
         d_rand = {p: rng.choice(FIB_D_POOL) for p in PLANET_NAMES}
         solo = PLANET_NAMES[rng.randint(0, 7)]
         grp_a = [p for p in PLANET_NAMES if p != solo]
         grp_b = [solo]
 
-        ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
-        if ib >= observed["incl_balance"]:
-            counts["incl_balance"] += 1
-
-        eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
-        if eb >= observed["ecc_balance"]:
-            counts["ecc_balance"] += 1
-
-        sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
-        if sp <= observed["saturn_pred"]:
-            counts["saturn_pred"] += 1
-
-        # Test 8: ψ full 8-planet (random d-values, random amplitudes)
-        pf = stat_psi_full(ij2k, d_rand, SQRT_M)
-        if pf <= observed["psi_full"]:
-            counts["psi_full"] += 1
-
-        # Test 9: Precession hierarchy (random periods)
-        ph = stat_prec_hierarchy(precs)
-        if ph >= observed["prec_hierarchy"]:
-            counts["prec_hierarchy"] += 1
-
-        # Test 10: Law 4 pair constraints (random eccs + random mean incl)
-        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
-        if rp >= observed["r2_partition"]:
-            counts["r2_partition"] += 1
-
-        # Test 11: E-J-S resonance — random period denominators
-        fib_denoms = [1, 2, 3, 5, 8, 13, 21]
-        rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
-        ej = stat_ejs_resonance(rand_fracs)
-        if ej <= observed["ejs_resonance"]:
-            counts["ejs_resonance"] += 1
-
-        # Test 12: Mirror symmetry — random d-values, check if mirror pairs match
-        ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
-        if ms >= observed["mirror_symmetry"]:
-            counts["mirror_symmetry"] += 1
-
-        # Test 13: K amplitude — random amplitudes, random tilts, random d-values
+        # Random amplitudes and tilts (for Law 4)
         rand_amps = {p: math.exp(rng.uniform(log_ea_lo, log_ea_hi)) for p in PLANET_NAMES}
         rand_tilts = {p: rng.uniform(0.01, 90.0) for p in PLANET_NAMES}
-        _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
-        if ka_err <= observed["k_amplitude"]:
-            counts["k_amplitude"] += 1
 
-        # Test 14: Eccentricity balance scale — random eccentricities, random d-values
-        es = stat_ecc_scale_rms(eccs, d_rand, MASSES, SMA, SQRT_M, grp_a, grp_b)
-        if es <= observed["ecc_scale_rms"]:
-            counts["ecc_scale_rms"] += 1
+        # Law 1 — Fibonacci denominators: draw 8 random denoms in [1, 30]
+        if "law1_fib_denominators" in selected:
+            rand_fracs = {p: (rng.randint(1, 8), rng.randint(1, 30)) for p in PLANET_NAMES}
+            gd = stat_gho_fib_denominators(rand_fracs)
+            if gd >= observed["law1_fib_denominators"]:
+                counts["law1_fib_denominators"] += 1
+
+        # Law 2 — ψ full 8-planet
+        if "law2_psi_full" in selected:
+            pf = stat_psi_full(ij2k, d_rand, SQRT_M)
+            if pf <= observed["law2_psi_full"]:
+                counts["law2_psi_full"] += 1
+
+        # Law 3 — Inclination balance
+        if "law3_incl_balance" in selected:
+            ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
+            if ib >= observed["law3_incl_balance"]:
+                counts["law3_incl_balance"] += 1
+
+        # Law 4 — K amplitude
+        if "law4_k_amplitude" in selected:
+            _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
+            if ka_err <= observed["law4_k_amplitude"]:
+                counts["law4_k_amplitude"] += 1
+
+        # Law 5 — Eccentricity balance
+        if "law5_ecc_balance" in selected:
+            eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
+            if eb >= observed["law5_ecc_balance"]:
+                counts["law5_ecc_balance"] += 1
+
+        # Law 6 — E–J–S resonance (random period denominators)
+        if "law6_ejs_resonance" in selected:
+            fib_denoms = [1, 2, 3, 5, 8, 13, 21]
+            rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
+            ej = stat_ejs_resonance(rand_fracs)
+            if ej <= observed["law6_ejs_resonance"]:
+                counts["law6_ejs_resonance"] += 1
+
+        # Finding 1 — Mirror symmetry (random d-values)
+        if "f1_mirror_symmetry" in selected:
+            ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
+            if ms >= observed["f1_mirror_symmetry"]:
+                counts["f1_mirror_symmetry"] += 1
+
+        # Finding 1b — d-set Fibonacci clustering
+        if "f1b_d_set_fib_pairs" in selected:
+            # d_rand is already drawn from FIB_D_POOL, so it's eligible
+            dc = stat_d_set_fib_clustering(d_rand)
+            if dc >= observed["f1b_d_set_fib_pairs"]:
+                counts["f1b_d_set_fib_pairs"] += 1
+
+        # Finding 4 — Saturn prediction
+        if "f4_saturn_prediction" in selected:
+            sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
+            if sp <= observed["f4_saturn_prediction"]:
+                counts["f4_saturn_prediction"] += 1
+
+        # Finding 6 — Solo planet identification (random eccentricities)
+        if "f6_solo_planet" in selected:
+            sp_id = stat_solo_planet_identification(
+                eccs, d_rand, MASSES, SMA, SQRT_M)
+            if sp_id <= observed["f6_solo_planet"]:
+                counts["f6_solo_planet"] += 1
+
+        # Test — Year-length beat: random (trop, sid, ano) in realistic range
+        if "year_length_beat" in selected:
+            trop = rng.uniform(360, 370)
+            sid = trop * (1 + math.exp(rng.uniform(math.log(1e-6), math.log(1e-3))))
+            ano = trop * (1 + math.exp(rng.uniform(math.log(1e-6), math.log(1e-3))))
+            yb = stat_year_length_beat(trop, sid, ano, H)
+            if yb <= observed["year_length_beat"]:
+                counts["year_length_beat"] += 1
 
         if (trial + 1) % 10000 == 0:
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
@@ -987,7 +1059,7 @@ def log_uniform_mc(observed, n_trials, rng):
 # DISTRIBUTION 3: UNIFORM MONTE CARLO
 # ═══════════════════════════════════════════════════════════════════════════
 
-def uniform_mc(observed, n_trials, rng):
+def uniform_mc(observed, n_trials, rng, selected=None):
     """
     Uniform Monte Carlo: draw random eccentricities, inclination
     amplitudes, and mean inclinations from uniform distributions.
@@ -1000,18 +1072,16 @@ def uniform_mc(observed, n_trials, rng):
     print(f"  DISTRIBUTION 3: UNIFORM MONTE CARLO ({n_trials:,} trials)")
     print("  " + "─" * 60)
 
-    counts = {"pairwise": 0, "ladder": 0, "psi": 0, "cross_param": 0,
-              "incl_balance": 0, "ecc_balance": 0, "saturn_pred": 0,
-              "psi_full": 0, "prec_hierarchy": 0, "r2_partition": 0,
-              "ejs_resonance": 0, "mirror_symmetry": 0,
-              "k_amplitude": 0, "ecc_scale_rms": 0}
+    if selected is None:
+        selected = set(TEST_IDS)
+
+    counts = {tid: 0 for tid in TEST_IDS if tid in selected}
 
     for trial in range(n_trials):
         eccs = {}
         incls = {}
         means = {}
         ij2k = {}
-        precs = {}
         rand_amps = {}
         rand_tilts = {}
         for p in PLANET_NAMES:
@@ -1019,82 +1089,89 @@ def uniform_mc(observed, n_trials, rng):
             incls[p] = rng.uniform(0.01, 3.0)
             means[p] = rng.uniform(0.1, 10.0)
             ij2k[p] = rng.uniform(0.01, 3.0)
-            precs[p] = rng.uniform(30000, 700000)
             rand_amps[p] = rng.uniform(1e-6, 0.01)
             rand_tilts[p] = rng.uniform(0.01, 90.0)
 
         xi_e, xi_i = compute_xi(eccs, incls, SQRT_M)
 
-        pc = stat_pairwise_count(xi_e, xi_i)
-        if pc >= observed["pairwise_count"]:
-            counts["pairwise"] += 1
-
-        lc, _ = stat_ladder(xi_e)
-        if lc >= observed["ladder_count"]:
-            counts["ladder"] += 1
-
-        ps = stat_psi_constant(xi_i)
-        if ps <= observed["psi_spread"]:
-            counts["psi"] += 1
-
-        cp = stat_cross_parameter(eccs, means, incls)
-        if cp <= observed["cross_param"]:
-            counts["cross_param"] += 1
-
-        # Tests 5-7: Random d-values and random solo planet
+        # Random d-values and random solo planet (shared across balance tests)
         d_rand = {p: rng.choice(FIB_D_POOL) for p in PLANET_NAMES}
         solo = PLANET_NAMES[rng.randint(0, 7)]
         grp_a = [p for p in PLANET_NAMES if p != solo]
         grp_b = [solo]
 
-        ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
-        if ib >= observed["incl_balance"]:
-            counts["incl_balance"] += 1
+        # Law 1 — Fibonacci denominators (uniform random denoms)
+        if "law1_fib_denominators" in selected:
+            rand_fracs = {p: (rng.randint(1, 8), rng.randint(1, 30)) for p in PLANET_NAMES}
+            gd = stat_gho_fib_denominators(rand_fracs)
+            if gd >= observed["law1_fib_denominators"]:
+                counts["law1_fib_denominators"] += 1
 
-        eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
-        if eb >= observed["ecc_balance"]:
-            counts["ecc_balance"] += 1
+        # Law 2 — ψ full 8-planet
+        if "law2_psi_full" in selected:
+            pf = stat_psi_full(ij2k, d_rand, SQRT_M)
+            if pf <= observed["law2_psi_full"]:
+                counts["law2_psi_full"] += 1
 
-        sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
-        if sp <= observed["saturn_pred"]:
-            counts["saturn_pred"] += 1
+        # Law 3 — Inclination balance
+        if "law3_incl_balance" in selected:
+            ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
+            if ib >= observed["law3_incl_balance"]:
+                counts["law3_incl_balance"] += 1
 
-        # Test 8: ψ full 8-planet
-        pf = stat_psi_full(ij2k, d_rand, SQRT_M)
-        if pf <= observed["psi_full"]:
-            counts["psi_full"] += 1
+        # Law 4 — K amplitude
+        if "law4_k_amplitude" in selected:
+            _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
+            if ka_err <= observed["law4_k_amplitude"]:
+                counts["law4_k_amplitude"] += 1
 
-        # Test 9: Precession hierarchy
-        ph = stat_prec_hierarchy(precs)
-        if ph >= observed["prec_hierarchy"]:
-            counts["prec_hierarchy"] += 1
+        # Law 5 — Eccentricity balance
+        if "law5_ecc_balance" in selected:
+            eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
+            if eb >= observed["law5_ecc_balance"]:
+                counts["law5_ecc_balance"] += 1
 
-        # Test 10: Law 4 pair constraints
-        rp = stat_r2_partition(eccs, means, MIRROR_PAIRS)
-        if rp >= observed["r2_partition"]:
-            counts["r2_partition"] += 1
+        # Law 6 — E–J–S resonance
+        if "law6_ejs_resonance" in selected:
+            fib_denoms = [1, 2, 3, 5, 8, 13, 21]
+            rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
+            ej = stat_ejs_resonance(rand_fracs)
+            if ej <= observed["law6_ejs_resonance"]:
+                counts["law6_ejs_resonance"] += 1
 
-        # Test 11: E-J-S resonance
-        fib_denoms = [1, 2, 3, 5, 8, 13, 21]
-        rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
-        ej = stat_ejs_resonance(rand_fracs)
-        if ej <= observed["ejs_resonance"]:
-            counts["ejs_resonance"] += 1
+        # Finding 1 — Mirror symmetry
+        if "f1_mirror_symmetry" in selected:
+            ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
+            if ms >= observed["f1_mirror_symmetry"]:
+                counts["f1_mirror_symmetry"] += 1
 
-        # Test 12: Mirror symmetry
-        ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
-        if ms >= observed["mirror_symmetry"]:
-            counts["mirror_symmetry"] += 1
+        # Finding 1b — d-set Fibonacci clustering
+        if "f1b_d_set_fib_pairs" in selected:
+            dc = stat_d_set_fib_clustering(d_rand)
+            if dc >= observed["f1b_d_set_fib_pairs"]:
+                counts["f1b_d_set_fib_pairs"] += 1
 
-        # Test 13: K amplitude — random amplitudes, random tilts, random d-values
-        _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
-        if ka_err <= observed["k_amplitude"]:
-            counts["k_amplitude"] += 1
+        # Finding 4 — Saturn prediction
+        if "f4_saturn_prediction" in selected:
+            sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
+            if sp <= observed["f4_saturn_prediction"]:
+                counts["f4_saturn_prediction"] += 1
 
-        # Test 14: Eccentricity balance scale — random eccentricities, random d-values
-        es = stat_ecc_scale_rms(eccs, d_rand, MASSES, SMA, SQRT_M, grp_a, grp_b)
-        if es <= observed["ecc_scale_rms"]:
-            counts["ecc_scale_rms"] += 1
+        # Finding 6 — Solo planet identification (random eccentricities)
+        if "f6_solo_planet" in selected:
+            sp_id = stat_solo_planet_identification(
+                eccs, d_rand, MASSES, SMA, SQRT_M)
+            if sp_id <= observed["f6_solo_planet"]:
+                counts["f6_solo_planet"] += 1
+
+        # Test — Year-length beat (uniform random ratio increments)
+        if "year_length_beat" in selected:
+            trop = rng.uniform(360, 370)
+            sid = trop * (1 + rng.uniform(1e-6, 1e-3))
+            ano = trop * (1 + rng.uniform(1e-6, 1e-3))
+            yb = stat_year_length_beat(trop, sid, ano, H)
+            if yb <= observed["year_length_beat"]:
+                counts["year_length_beat"] += 1
 
         if (trial + 1) % 10000 == 0:
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
@@ -1293,7 +1370,25 @@ def print_look_elsewhere():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Statistical significance test for Fibonacci laws of planetary motion")
+        description="Statistical significance test for Fibonacci laws of planetary motion",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""\
+Test selection examples:
+  --tests laws                    # all 6 Laws only
+  --tests findings                # all 3 Findings only
+  --tests law1,law3,law5          # three specific laws (prefix match)
+  --tests 1-6                     # first 6 tests (= all Laws)
+  --tests law3_incl_balance       # one test by full ID
+  --tests laws,f4                 # combine categories and specific tests
+
+Valid IDs (in order):
+   1. law1_fib_denominators    7.  f1_mirror_symmetry
+   2. law2_psi_full            8.  f1b_d_set_fib_pairs
+   3. law3_incl_balance        9.  f4_saturn_prediction
+   4. law4_k_amplitude         10. f6_solo_planet
+   5. law5_ecc_balance         11. year_length_beat
+   6. law6_ejs_resonance
+""")
     parser.add_argument("--trials", type=int, default=100_000,
                         help="Number of Monte Carlo trials per distribution (default: 100000)")
     parser.add_argument("--seed", type=int, default=42,
@@ -1302,7 +1397,18 @@ def main():
                         help="Skip Monte Carlo (run only permutation test)")
     parser.add_argument("--skip-perm", action="store_true",
                         help="Skip permutation test (run only Monte Carlo)")
+    parser.add_argument("--tests", type=str, default=None,
+                        help="Comma-separated list of test IDs / indices / categories "
+                             "(default: all 13). See epilog for examples.")
     args = parser.parse_args()
+
+    try:
+        selected = parse_test_filter(args.tests)
+    except ValueError as e:
+        parser.error(str(e))
+
+    # Preserve TEST_REGISTRY order for iteration
+    selected_ordered = [tid for tid in TEST_IDS if tid in selected]
 
     import random
     rng = random.Random(args.seed)
@@ -1317,6 +1423,9 @@ def main():
     print(f"  Fibonacci ratios tested: {len(FIB_RATIOS)} "
           f"({', '.join(f'{r:.3g}' for r in FIB_RATIOS[:5])} ... "
           f"{', '.join(f'{r:.3g}' for r in FIB_RATIOS[-3:])})")
+    print(f"  Tests selected: {len(selected_ordered)}/{len(TEST_IDS)}")
+    if len(selected_ordered) < len(TEST_IDS):
+        print(f"    Running: {', '.join(selected_ordered)}")
     print()
 
     # ─── Observed statistics ──────────────────────────────────────────
@@ -1328,23 +1437,39 @@ def main():
     print("=" * 78)
     print()
     t0 = time.time()
-    observed = compute_observed_stats()
+    observed = compute_observed_stats(selected)
     dt = time.time() - t0
 
-    print(f"  Test 1  — Pairwise Fibonacci count:     {observed['pairwise_count']}")
-    print(f"  Test 2  — Ladder (max matching):        {observed['ladder_count']} "
-          f"(mean error: {observed['ladder_mean_err']*100:.2f}%)")
-    print(f"  Test 3  — ψ-constant (min spread):      {observed['psi_spread']*100:.4f}%")
-    print(f"  Test 4  — Cross-parameter (error):      {observed['cross_param']*100:.4f}%")
-    print(f"  Test 5  — Incl. balance (Law 3):        {observed['incl_balance']:.4f}%  [dual-balanced ecc]")
-    print(f"  Test 6  — Ecc. balance (Law 5):         {observed['ecc_balance']:.4f}%  [dual-balanced ecc]")
-    print(f"  Test 7  — Saturn prediction (error):    {observed['saturn_pred']*100:.4f}%  [dual-balanced ecc]")
-    print(f"  Test 8  — ψ full 8-planet (spread):     {observed['psi_full']*100:.4f}%")
-    print(f"  Test 9  — Prec. hierarchy (pairs):      {observed['prec_hierarchy']}")
-    print(f"  Test 10 — E–J–S resonance (error):     {observed['ejs_resonance']*100:.4f}%")
-    print(f"  Test 11 — Mirror symmetry (matching):   {observed['mirror_symmetry']}/4")
-    print(f"  Test 12 — K amplitude (max error):      {observed['k_amplitude']*100:.4f}%")
-    print(f"  Test 14 — Ecc. Scale RMS (error):       {observed['ecc_scale_rms']*100:.4f}%")
+    # Formatters keyed by test ID — how to display the observed value
+    def fmt_observed(tid, obs):
+        if tid == "law1_fib_denominators":
+            return f"{obs[tid]} / 8 Fib denominators"
+        if tid == "law2_psi_full":
+            return f"{obs[tid]*100:.4f}% spread"
+        if tid == "law3_incl_balance":
+            return f"{obs[tid]:.4f}%"
+        if tid == "law4_k_amplitude":
+            return f"{obs[tid]*100:.4f}% max error"
+        if tid == "law5_ecc_balance":
+            return f"{obs[tid]:.4f}%"
+        if tid == "law6_ejs_resonance":
+            return f"{obs[tid]*100:.4f}% error"
+        if tid == "f1_mirror_symmetry":
+            return f"{obs[tid]}/4 pairs"
+        if tid == "f1b_d_set_fib_pairs":
+            return f"{'yes' if obs[tid] == 1 else 'no'} (2 consecutive Fib pairs)"
+        if tid == "f4_saturn_prediction":
+            return f"{obs[tid]*100:.4f}% error"
+        if tid == "f6_solo_planet":
+            return f"{obs[tid]*100:.4f}% min residual (best-fit solo)"
+        if tid == "year_length_beat":
+            return f"{obs[tid]*100:.6f}% max err (sid & ano beats)"
+        return str(obs.get(tid, "?"))
+
+    for idx, tid in enumerate(selected_ordered, start=1):
+        label = TEST_LABEL_MAP[tid]
+        val = fmt_observed(tid, observed)
+        print(f"  {idx:>2}. {label:<34}  {val}")
     print(f"  (computed in {dt:.1f}s)")
     print()
 
@@ -1354,45 +1479,48 @@ def main():
     if not args.skip_perm:
         print("=" * 78)
         t0 = time.time()
-        p_perm, n_perm = permutation_test(observed)
+        p_perm, n_perm = permutation_test(observed, selected)
         dt = time.time() - t0
         all_p_values["Permutation"] = p_perm
 
         print()
         print(f"  Results ({n_perm:,} permutations, {dt:.1f}s):")
-        for test_name, p in p_perm.items():
+        for tid in selected_ordered:
+            p = p_perm[tid]
             sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
             p_str = f"< 1/{n_perm:,}" if p == 0 else f"{p:.6f}"
-            print(f"    {test_name:<12} p = {p_str:<14} {sig}")
+            print(f"    {TEST_LABEL_MAP[tid]:<34} p = {p_str:<14} {sig}")
         print()
 
     if not args.skip_mc:
         print("=" * 78)
         t0 = time.time()
-        p_log, n_log = log_uniform_mc(observed, args.trials, rng)
+        p_log, n_log = log_uniform_mc(observed, args.trials, rng, selected)
         dt = time.time() - t0
         all_p_values["Log-uniform"] = p_log
 
         print()
         print(f"  Results ({n_log:,} trials, {dt:.1f}s):")
-        for test_name, p in p_log.items():
+        for tid in selected_ordered:
+            p = p_log[tid]
             sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
             p_str = f"< 1/{n_log:,}" if p == 0 else f"{p:.6f}"
-            print(f"    {test_name:<12} p = {p_str:<14} {sig}")
+            print(f"    {TEST_LABEL_MAP[tid]:<34} p = {p_str:<14} {sig}")
         print()
 
         print("=" * 78)
         t0 = time.time()
-        p_uni, n_uni = uniform_mc(observed, args.trials, rng)
+        p_uni, n_uni = uniform_mc(observed, args.trials, rng, selected)
         dt = time.time() - t0
         all_p_values["Uniform"] = p_uni
 
         print()
         print(f"  Results ({n_uni:,} trials, {dt:.1f}s):")
-        for test_name, p in p_uni.items():
+        for tid in selected_ordered:
+            p = p_uni[tid]
             sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
             p_str = f"< 1/{n_uni:,}" if p == 0 else f"{p:.6f}"
-            print(f"    {test_name:<12} p = {p_str:<14} {sig}")
+            print(f"    {TEST_LABEL_MAP[tid]:<34} p = {p_str:<14} {sig}")
         print()
 
     # ─── Summary ──────────────────────────────────────────────────────
@@ -1401,38 +1529,17 @@ def main():
     print("=" * 78)
     print()
 
-    test_labels = ["pairwise", "ladder", "psi", "cross_param",
-                    "incl_balance", "ecc_balance", "saturn_pred",
-                    "psi_full", "prec_hierarchy",
-                    "ejs_resonance", "mirror_symmetry",
-                    "k_amplitude", "ecc_scale_rms"]
-    law_labels = {
-        "pairwise":        "Pairwise Fibonacci count",
-        "ladder":          "Finding 5 — Ecc. Ladder",
-        "psi":             "ψ-Constant (3-planet)",
-        "cross_param":     "Cross-parameter ratio",
-        "incl_balance":    "Law 3 — Incl. Balance",
-        "ecc_balance":     "Law 5 — Ecc. Balance",
-        "saturn_pred":     "Finding 4 — Saturn e pred",
-        "psi_full":        "Law 2 — ψ full 8-planet",
-        "prec_hierarchy":  "Law 1 — Prec. hierarchy",
-        "ejs_resonance":   "Law 6 — E–J–S resonance",
-        "mirror_symmetry": "Finding 1 — Mirror symm.",
-        "k_amplitude":     "Law 4 — K amplitude",
-        "ecc_scale_rms":   "Finding 6 — Ecc. Scale",
-    }
-
-    # Summary table
-    header = f"  {'Test':<30}"
+    # Summary table — order from TEST_REGISTRY, restricted to selected
+    header = f"  {'Test':<34}"
     for dist in all_p_values:
         header += f" {dist:>14}"
     print(header)
-    print("  " + "─" * (30 + 15 * len(all_p_values)))
+    print("  " + "─" * (34 + 15 * len(all_p_values)))
 
-    for test in test_labels:
-        row = f"  {law_labels[test]:<30}"
+    for tid in selected_ordered:
+        row = f"  {TEST_LABEL_MAP[tid]:<34}"
         for dist, pvals in all_p_values.items():
-            p = pvals[test]
+            p = pvals[tid]
             if p == 0:
                 row += f" {'< 0.00003':>14}"
             else:
@@ -1441,16 +1548,27 @@ def main():
     print()
 
     # Fisher's combined p-value per distribution
-    print("  Fisher's combined p-values (all 13 tests):")
-    for dist, pvals in all_p_values.items():
-        p_list = [pvals[t] for t in test_labels]
-        # Replace exact zeros with conservative bound
-        n_total = 40320 if dist == "Permutation" else args.trials
-        p_list = [max(p, 1.0 / n_total) for p in p_list]
-        combined = fishers_method(p_list)
-        sig = "***" if combined < 0.001 else "**" if combined < 0.01 else "*" if combined < 0.05 else ""
-        print(f"    {dist:<14} p_combined = {combined:.2e}  {sig}")
-    print()
+    # Exclude STRUCTURAL tests (law6, f1, new_*) — they yield p=1 in permutation
+    # by construction and would dilute the combined statistic. Still reported
+    # in the summary table above, just not combined.
+    non_structural = [tid for tid in selected_ordered if tid not in STRUCTURAL_TESTS]
+    if non_structural:
+        print(f"  Fisher's combined p-values ({len(non_structural)} non-structural tests):")
+        excluded = [tid for tid in selected_ordered if tid in STRUCTURAL_TESTS]
+        if excluded:
+            print(f"    (excluded: {', '.join(excluded)})")
+        for dist, pvals in all_p_values.items():
+            p_list = [pvals[tid] for tid in non_structural]
+            # Replace exact zeros with conservative bound
+            n_total = 40320 if dist == "Permutation" else args.trials
+            p_list = [max(p, 1.0 / n_total) for p in p_list]
+            combined = fishers_method(p_list)
+            sig = "***" if combined < 0.001 else "**" if combined < 0.01 else "*" if combined < 0.05 else ""
+            print(f"    {dist:<14} p_combined = {combined:.2e}  {sig}")
+        print()
+    else:
+        print(f"  (No non-structural tests in selection — Fisher's method skipped.)")
+        print()
 
     # Interpretation
     print("  " + "─" * 60)
