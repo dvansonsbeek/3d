@@ -195,6 +195,21 @@ console.log(`  LL bounds pass: ${curResult.llPassCount}/8`);
 console.log(`  Direction pass: ${curResult.dirPassCount}/8`);
 console.log(`  All LL+Dir pass: ${curResult.allPass}`);
 
+// ── Saturn eccentricity prediction from Law 5 balance equation ──
+// v_j = √m × a^1.5 × e / √d. Saturn is the sole anti-phase planet, so:
+//   Σ(v_j in-phase) = v_Saturn  →  e_Saturn_predicted = Σ_others / saturnCoeff
+// where saturnCoeff = √m_Sa × a_Sa^1.5 / √d_Sa
+let sumVInPhase = 0;
+for (const key of planets) {
+  if (currentConfig[key].group !== 'in-phase') continue;
+  sumVInPhase += Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) * eccBase[key] / Math.sqrt(currentConfig[key].d);
+}
+const saturnCoeff = Math.sqrt(mass.saturn) * Math.pow(orbitDistance.saturn, 1.5) / Math.sqrt(currentConfig.saturn.d);
+const saturnPredicted = sumVInPhase / saturnCoeff;
+const saturnActual = eccBase.saturn;
+const saturnPredErrPct = (saturnPredicted - saturnActual) / saturnActual * 100;
+console.log(`  Saturn e predicted: ${saturnPredicted.toFixed(8)} (actual: ${saturnActual.toFixed(8)}, error: ${saturnPredErrPct >= 0 ? '+' : ''}${saturnPredErrPct.toFixed(3)}%)`);
+
 // ══════════════════════════════════════════════════════════════════
 // EXHAUSTIVE SEARCH
 // ══════════════════════════════════════════════════════════════════
@@ -328,10 +343,30 @@ if (curIdx >= 0) {
 const outputDir = path.join(__dirname, '..', '..', 'data');
 const outputPath = path.join(outputDir, 'balance-presets.json');
 
+// Exhaustive-search space size: 4 scenarios × 9 Fibonacci d-values × 2 phase groups
+// for each of 5 free planets (Mercury, Venus, Mars, Uranus, Neptune).
+// Earth is locked (d=3, in-phase); Jupiter/Saturn are fixed per scenario.
+const searchSpace = scenarios.length * Math.pow(fibNumbers.length, 5) * Math.pow(2, 5);
+const allPassCount = allConfigs.filter(c => c.allPass).length;
+
 const output = {
   generated: new Date().toISOString(),
   threshold: THRESHOLD,
+  searchSpace,
   count: allConfigs.length,
+  allPassCount,
+  currentConfig: {
+    rank: curIdx >= 0 ? curIdx + 1 : null,
+    inclBalance: curResult.inclBalance,
+    eccBalance: curResult.eccBalance,
+    saturnPredicted,
+    saturnActual,
+    saturnPredErrPct,
+    llPassCount: curResult.llPassCount,
+    dirPassCount: curResult.dirPassCount,
+    allPass: curResult.allPass,
+    dValues: { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 },
+  },
   scenarios: {
     A: 'Ju=5, Sa=3',
     B: 'Ju=8, Sa=5',
@@ -345,3 +380,7 @@ const output = {
 
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
 console.log(`\nWritten ${allConfigs.length} presets to ${outputPath}`);
+console.log(`  Search space: ${searchSpace.toLocaleString()} d-assignments`);
+console.log(`  Passing balance ≥${THRESHOLD}%: ${allConfigs.length}`);
+console.log(`  Passing balance + LL + Dir: ${allPassCount}`);
+if (curIdx >= 0) console.log(`  Current Config #${curIdx + 1} rank out of ${allConfigs.length}`);

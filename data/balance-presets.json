@@ -1,7 +1,30 @@
 {
-  "generated": "2026-04-11T00:36:17.234Z",
+  "generated": "2026-04-11T21:34:14.926Z",
   "threshold": 99.994,
+  "searchSpace": 7558272,
   "count": 765,
+  "allPassCount": 0,
+  "currentConfig": {
+    "rank": 7,
+    "inclBalance": 99.9972338257403,
+    "eccBalance": 99.88647989036204,
+    "saturnPredicted": 0.05373537229426289,
+    "saturnActual": 0.05385751185431099,
+    "saturnPredErrPct": -0.22678277522083834,
+    "llPassCount": 8,
+    "dirPassCount": 2,
+    "allPass": false,
+    "dValues": {
+      "mercury": 21,
+      "venus": 34,
+      "earth": 3,
+      "mars": 5,
+      "jupiter": 5,
+      "saturn": 3,
+      "uranus": 21,
+      "neptune": 34
+    }
+  },
   "scenarios": {
     "A": "Ju=5, Sa=3",
     "B": "Ju=8, Sa=5",

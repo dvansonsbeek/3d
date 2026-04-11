@@ -31,8 +31,9 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
+| `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (Fisher p-values + sigma, 11 tests × 3 nulls) | `tools/lib/python/constants_scripts.py` |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
-| `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline) | `fitted-coefficients.json` + `model-parameters.json` |
+| `export-to-holistic.js` | Syncs all values → Holistic website repo (manual, not in pipeline) | `fitted-coefficients.json` + `model-parameters.json` + `data/balance-presets.json` + `data/significance-results.json` |
 | `reclassify-tiers.js` | Tier reclassification + JPL enrichment of Tier 1 data | `data/reference-data.json` |
 | `verify-pipeline.js` | Pass/fail verification of all 9 targets + correction stack | Scene-graph simulation |
 
@@ -199,6 +200,17 @@ Step 7d: verify-laws.js                       → pass/fail
          eccentricity-balance.js              → convergence report
          Laws 4 and 5 independently predict Saturn's eccentricity.
 
+Step 7e: fibonacci_significance.py            → data/significance-results.json
+         Monte Carlo + permutation significance test for the Fibonacci structure.
+         11 tests across 3 null distributions (permutation, log-uniform MC,
+         uniform MC); 100,000 trials per MC null. Computes Fisher's combined
+         p-value over the 6 empirical tests + sigma equivalent.
+         Run-time: ~2-3 minutes (single threaded).
+         Stable across normal refits — only re-run before publication or when
+         the significance test definitions themselves change.
+         **Required by export-to-holistic.js** — the website Fisher p-values,
+         sigma, and test counts all derive from this output.
+
 ── Phase 6: Verify & sync ─────────────────────────────────────────
 
 Step 8:  verify-pipeline.js                   → pass/fail
@@ -217,10 +229,15 @@ Step 9:  export-to-script.js --write          → src/script.js
 
 Manual:  export-to-holistic.js --write        → Holistic website repo
          (NOT in automated pipeline — run manually after Step 9)
+         Requires Steps 7c (balance-search.js) and 7e
+         (fibonacci_significance.py) to have run first — both produce JSON
+         files this script reads (data/balance-presets.json,
+         data/significance-results.json).
          Syncs all fitted values to the Holistic website TypeScript files:
-         - constants.ts: harmonics, Earth scalars, eccentricity + inclination records
+         - constants.ts: harmonics, Earth scalars, eccentricity + inclination
+           records, BALANCE_RESULTS, SIGNIFICANCE_RESULTS
          - coefficients.ts: 429-term prediction coefficients (7 planets)
-         - model-values.ts: display strings, PLANET_INCL object
+         - model-values.ts: display strings (auto-derived from above imports)
 
 ── Phase 7: Dashboard ─────────────────────────────────────────────
 
@@ -329,9 +346,10 @@ node tools/fit/cardinal-point-harmonics.js --write                           # S
 node tools/fit/year-length-harmonics.js --write                              # Step 6d
 
 # Phase 5b: Balance law verification
-node tools/verify/verify-laws.js                                             # Step 7 (must pass)
-node tools/verify/eccentricity-balance.js                                    # Step 7 (convergence report)
-node tools/verify/balance-search.js                                          # Step 7 (balance presets)
+node tools/verify/balance-search.js                                          # Step 7c (balance presets)
+node tools/verify/verify-laws.js                                             # Step 7d (must pass)
+node tools/verify/eccentricity-balance.js                                    # Step 7d (convergence report)
+python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7e (~2-3 min, before export-to-holistic.js)
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
@@ -340,6 +358,10 @@ node tools/fit/export-to-script.js --write                                   # S
 
 # Phase 7: Dashboard
 node tools/export-dashboard-data.js                                          # Step 10
+
+# Manual: Sync to Holistic website (NOT in pipeline runner)
+# Requires Steps 7c (balance-search) and 7e (fibonacci_significance.py) to have run.
+node tools/fit/export-to-holistic.js --write                                 # → constants.ts, model-values.ts, etc.
 ```
 
 ## Where outputs are stored
@@ -405,8 +427,9 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     obliquity-harmonics.js       → fitted-coefficients.json  (Step 6b)
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 6d)
-    optimize.js                  → model-parameters.json     (Steps 1, 2)
-    balance-search.js            → data/balance-presets.json  (Step 7)
+    optimize.js                  → model-parameters.json       (Steps 1, 2)
+    balance-search.js            → data/balance-presets.json    (Step 7c)
+    fibonacci_significance.py    → data/significance-results.json (Step 7e)
 ```
 
 ## Correction Stack

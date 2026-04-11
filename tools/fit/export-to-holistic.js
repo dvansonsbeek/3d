@@ -172,11 +172,87 @@ const earthScalars = {
   EARTH_OBLIQ_MEAN: { val: C.earthtiltMean, prec: 6 },
   EARTH_ECC_BASE: { val: C.eccentricityBase, prec: -1 },
   EARTH_ECC_AMP: { val: C.eccentricityAmplitude, prec: -1 },
+  CORRECTION_SUN: { val: C.correctionSun, prec: 5 },
+  CORRECTION_DAYS: { val: C.correctionDays, prec: 4 },
+  START_ANGLE_MODEL: { val: C.startAngleModel, prec: 8 },
 };
 
 for (const [name, { val, prec }] of Object.entries(earthScalars)) {
   const output = prec < 0 ? val : parseFloat(val.toFixed(prec));
   constantsTs = replaceScalar(constantsTs, name, output);
+}
+
+// ── 2b. Balance + Config results (from balance-search.js) ─────
+
+console.log('');
+console.log('  ── Balance / Config results ──');
+
+const balancePresetsPath = path.join(__dirname, '..', '..', 'data', 'balance-presets.json');
+if (fs.existsSync(balancePresetsPath)) {
+  const bp = JSON.parse(fs.readFileSync(balancePresetsPath, 'utf8'));
+  const cc = bp.currentConfig || {};
+  const rnd = (n, d) => Number.parseFloat((Number(n)).toFixed(d));
+  const balanceLines = [
+    `inclBalance:     ${rnd(cc.inclBalance, 4)},   // Law 3 — in-phase vs anti-phase weights (%)`,
+    `eccBalance:      ${rnd(cc.eccBalance, 4)},   // Law 5 — eccentricity weights balance (%)`,
+    `saturnPredErrPct:${rnd(cc.saturnPredErrPct, 4)},   // Finding 4 — Saturn e predicted vs observed (%)`,
+    `threshold:       ${rnd(bp.threshold, 3)},    // TNO-margin threshold used in balance-search`,
+    `presetCount:     ${bp.count},       // Configs passing threshold`,
+    `configNumber:    ${cc.rank},         // Current config's rank within sorted presets`,
+    `searchSpace:     ${bp.searchSpace},   // Exhaustive search space size`,
+  ];
+  constantsTs = replaceObjectLiteral(constantsTs, 'BALANCE_RESULTS', balanceLines);
+} else {
+  console.log('  ⚠ balance-presets.json not found — run `node tools/verify/balance-search.js` first');
+}
+
+// ── 2c. Significance results (from fibonacci_significance.py) ─
+
+console.log('');
+console.log('  ── Significance results ──');
+
+const sigResultsPath = path.join(__dirname, '..', '..', 'data', 'significance-results.json');
+if (fs.existsSync(sigResultsPath)) {
+  const sr = JSON.parse(fs.readFileSync(sigResultsPath, 'utf8'));
+  const fc  = sr.fisher_combined || {};
+  const sc  = sr.stouffer_combined_corrected || {};
+  const ssc = sr.stouffer_sigma_corrected || {};  // sigma equivalents of sc
+  const scu = sr.stouffer_combined || {};  // uncorrected (informational, unused in TS)
+  void scu; // silence unused-var lint
+  const toExpJs = (n) => {
+    // Render as e.g. "1.8e-14" with one decimal in the mantissa
+    if (n === null || n === undefined) return 'null';
+    const s = Number(n).toExponential(1);
+    return s.replace(/e([+-]?)0*(\d)/, 'e$1$2');
+  };
+  const correlationFactor = sr.method && typeof sr.method.correlation_factor === 'number'
+    ? Number(sr.method.correlation_factor.toFixed(2))
+    : 2.5;
+  const sigLines = [
+    `testCount:          ${sr.counts.total},       // Total significance tests in the script`,
+    `lawCount:           ${sr.counts.lawCount || 6},        // Fibonacci Laws covered`,
+    `empiricalCount:     ${sr.counts.empirical},        // Empirical tests contributing to the combined p`,
+    `structuralCount:    ${sr.counts.structural},        // Structural / tautological tests excluded`,
+    `correlationFactor:  ${correlationFactor},      // Stouffer's variance inflation (k=4, r̄=0.5)`,
+    `// Headline (recommended for citation):`,
+    `headlineP:          ${toExpJs(sr.headline_p)},  // Stouffer's corrected, permutation null`,
+    `headlineSigma:      ${sr.headline_sigma},      // Sigma equivalent of headlineP`,
+    `// Stouffer's Z (correlation-corrected) across the 3 null distributions:`,
+    `stoufferP_permutation: ${toExpJs(sc.permutation)},`,
+    `stoufferP_logUniform:  ${toExpJs(sc.log_uniform)},`,
+    `stoufferP_uniform:     ${toExpJs(sc.uniform)},`,
+    `// Sigma equivalents of the corrected Stouffer p-values:`,
+    `stoufferSigma_permutation: ${ssc.permutation},`,
+    `stoufferSigma_logUniform:  ${ssc.log_uniform},`,
+    `stoufferSigma_uniform:     ${ssc.uniform},`,
+    `// Fisher's method (legacy / for transparency, sensitive to floor-clamp):`,
+    `fisherP_permutation: ${toExpJs(fc.permutation)},`,
+    `fisherP_logUniform:  ${toExpJs(fc.log_uniform)},`,
+    `fisherP_uniform:     ${toExpJs(fc.uniform)},`,
+  ];
+  constantsTs = replaceObjectLiteral(constantsTs, 'SIGNIFICANCE_RESULTS', sigLines);
+} else {
+  console.log('  ⚠ significance-results.json not found — run `python3 scripts/fibonacci_significance.py` first');
 }
 
 // ── 3. Planet eccentricity records ────────────────────────────
@@ -199,6 +275,29 @@ function replaceRecordBlock(content, varName, line1, line2) {
   const newBody = `\n${line1}\n${line2}\n`;
   const oldBlock = match[0];
   const newBlock = match[1] + newBody + match[4];
+  if (oldBlock === newBlock) {
+    console.log(`  ✓ ${varName}: unchanged`);
+    return content;
+  }
+  console.log(`  ↻ ${varName}: updated`);
+  changeCount++;
+  return content.replace(oldBlock, newBlock);
+}
+
+/**
+ * Replace an object-literal block (e.g. `export const FOO = { ... } as const`).
+ * Takes an array of lines for the new body. Preserves any trailing `as const`.
+ */
+function replaceObjectLiteral(content, varName, bodyLines) {
+  const re = new RegExp('((?:export )?const\\s+' + varName + '[^=]*=\\s*\\{)([\\s\\S]*?)(\\})');
+  const match = content.match(re);
+  if (!match) {
+    console.log(`  ⚠ ${varName}: not found`);
+    return content;
+  }
+  const newBody = '\n' + bodyLines.map(l => '  ' + l).join('\n') + '\n';
+  const oldBlock = match[0];
+  const newBlock = match[1] + newBody + match[3];
   if (oldBlock === newBlock) {
     console.log(`  ✓ ${varName}: unchanged`);
     return content;
@@ -422,53 +521,10 @@ if (fs.existsSync(MV_PATH)) {
   let mvTs = fs.readFileSync(MV_PATH, 'utf8');
   let mvChanges = 0;
 
-  // Helper: replace a string value like  key: 'value',
-  function replaceMV(key, newVal) {
-    const re = new RegExp("(" + key + ":\\s*')[^']*(')", 'g');
-    const match = mvTs.match(re);
-    if (!match) return;
-    const expected = match[0].replace(/'.+'/, "'" + newVal + "'");
-    if (match[0] === expected) return;
-    mvTs = mvTs.replace(match[0], expected);
-    console.log(`    ↻ ${key}: → '${newVal}'`);
-    mvChanges++;
-  }
-
-  // Helper: replace a numeric value in PLANET_INCL
-  function replacePlanetIncl(planet, field, newVal) {
-    const re = new RegExp("(" + planet + ":[^}]*" + field + ":\\s*)[\\d.]+");
-    const match = mvTs.match(re);
-    if (!match) return;
-    const rounded = parseFloat(newVal.toPrecision(7));
-    const expected = match[1] + rounded;
-    if (match[0] === expected) return;
-    mvTs = mvTs.replace(match[0], expected);
-    mvChanges++;
-  }
-
-  // Earth display values
-  replaceMV('eccentricityBase', C.eccentricityBase.toFixed(6));
-  replaceMV('eccentricityAmplitude', C.eccentricityAmplitude.toFixed(6));
-  replaceMV('correctionSun', C.correctionSun.toFixed(5));
-
-  // Per-planet inclination display strings
-  const inclPlanets = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-  for (const p of inclPlanets) {
-    const mean = C.planets[p].invPlaneInclinationMean;
-    const amp = C.planets[p].invPlaneInclinationAmplitude;
-    const phase = C.planets[p].inclinationPhaseAngle;
-    replaceMV(p + 'InclMean', mean.toFixed(6));
-    replaceMV(p + 'InclAmp', amp.toFixed(6));
-    replaceMV(p + 'InclPhase', phase.toFixed(2));
-  }
-
-  // PLANET_INCL numeric object
-  for (const p of inclPlanets) {
-    replacePlanetIncl(p, 'mean', C.planets[p].invPlaneInclinationMean);
-    replacePlanetIncl(p, 'amp', C.planets[p].invPlaneInclinationAmplitude);
-  }
-  replacePlanetIncl('earth', 'mean', C.earthInvPlaneInclinationMean);
-  replacePlanetIncl('earth', 'amp', C.earthInvPlaneInclinationAmplitude);
+  // All displayed values in model-values.ts now flow through imports from
+  // orbital/constants.ts (Earth scalars, INCL_*, ECC_*, CORRECTION_*, etc.).
+  // No direct string-literal replacement is needed — constants.ts is the single
+  // source of truth and is synced above.
 
   if (mvChanges === 0) {
     console.log('    ✓ All values match');

@@ -1,0 +1,150 @@
+{
+  "generated": "2026-04-11T22:57:58.992385+00:00",
+  "trials": 100000,
+  "seed": 42,
+  "method": {
+    "headline": "stouffer_corrected.permutation",
+    "correlation_factor": 2.5,
+    "correlation_assumption": "average pairwise r \u2248 0.5 among 4 empirical v_j-based tests"
+  },
+  "counts": {
+    "total": 11,
+    "structural": 7,
+    "empirical": 4,
+    "lawCount": 6
+  },
+  "fisher_combined": {
+    "permutation": 4.443842401878071e-08,
+    "log_uniform": 2.76070086057413e-11,
+    "uniform": 5.5972917609049155e-11
+  },
+  "stouffer_combined": {
+    "permutation": 4.9631432220106976e-09,
+    "log_uniform": 3.024795591404565e-12,
+    "uniform": 6.4496508529413385e-12
+  },
+  "stouffer_combined_corrected": {
+    "permutation": 0.0001443551303865368,
+    "log_uniform": 6.796619007635201e-06,
+    "uniform": 9.27878194289717e-06
+  },
+  "stouffer_sigma_corrected": {
+    "permutation": 3.6,
+    "log_uniform": 4.4,
+    "uniform": 4.3
+  },
+  "headline_p": 0.0001443551303865368,
+  "headline_sigma": 3.6,
+  "tests": {
+    "law1_fib_denominators": {
+      "label": "Law 1 \u2014 Fibonacci denominators",
+      "category": "law",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 0.00017,
+        "Uniform": 0.00019
+      }
+    },
+    "law2_psi_full": {
+      "label": "Law 2 \u2014 \u03c8 full 8-planet",
+      "category": "law",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 1.0,
+        "Uniform": 1.0
+      }
+    },
+    "law3_incl_balance": {
+      "label": "Law 3 \u2014 Inclination balance",
+      "category": "law",
+      "structural": false,
+      "p_values": {
+        "Permutation": 0.007390873015873016,
+        "Log-uniform": 1e-05,
+        "Uniform": 1e-05
+      }
+    },
+    "law4_k_amplitude": {
+      "label": "Law 4 \u2014 K amplitude constant",
+      "category": "law",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 1.0,
+        "Uniform": 1.0
+      }
+    },
+    "law5_ecc_balance": {
+      "label": "Law 5 \u2014 Eccentricity balance",
+      "category": "law",
+      "structural": false,
+      "p_values": {
+        "Permutation": 0.0007192460317460318,
+        "Log-uniform": 0.00037,
+        "Uniform": 0.00054
+      }
+    },
+    "law6_ejs_resonance": {
+      "label": "Law 6 \u2014 E\u2013J\u2013S resonance",
+      "category": "law",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 0.0331,
+        "Uniform": 0.0323
+      }
+    },
+    "f1_mirror_symmetry": {
+      "label": "Finding 1 \u2014 Mirror symmetry",
+      "category": "finding",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 0.00014,
+        "Uniform": 0.00014
+      }
+    },
+    "f1b_d_set_fib_pairs": {
+      "label": "Finding 1b \u2014 d-set Fib clustering",
+      "category": "finding",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 0.02022,
+        "Uniform": 0.01964
+      }
+    },
+    "f4_saturn_prediction": {
+      "label": "Finding 4 \u2014 Saturn e prediction",
+      "category": "finding",
+      "structural": false,
+      "p_values": {
+        "Permutation": 0.0007192460317460318,
+        "Log-uniform": 0.00037,
+        "Uniform": 0.00054
+      }
+    },
+    "f6_solo_planet": {
+      "label": "Finding 6 \u2014 Solo planet ID",
+      "category": "finding",
+      "structural": false,
+      "p_values": {
+        "Permutation": 0.003993055555555555,
+        "Log-uniform": 0.00304,
+        "Uniform": 0.0031
+      }
+    },
+    "year_length_beat": {
+      "label": "Year-length beat identity",
+      "category": "new",
+      "structural": true,
+      "p_values": {
+        "Permutation": 1.0,
+        "Log-uniform": 0.0,
+        "Uniform": 0.0
+      }
+    }
+  }
+}

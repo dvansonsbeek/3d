@@ -215,11 +215,38 @@ TEST_CAT_MAP   = {t[0]: t[1] for t in TEST_REGISTRY}
 # forced p=1 dilutes the combined statistic.
 STRUCTURAL_TESTS = {
     "law1_fib_denominators",  # permutation preserves the set of denominators
+    "law2_psi_full",          # tautological: INCL_AMP := PSI/(d×√m), so d×amp×√m = PSI exactly
+    "law4_k_amplitude",       # tautological: ECC_AMPLITUDE derived from K via the same formula
     "law6_ejs_resonance",
     "f1_mirror_symmetry",
     "f1b_d_set_fib_pairs",    # d-set multiset is permutation-invariant
     "year_length_beat",       # single scalar, can't permute
 }
+
+# Why Laws 2 and 4 are STRUCTURAL, not empirical:
+#
+# The "amplitudes" of long-term planetary inclination/eccentricity oscillations
+# are not directly observable on human timescales (Earth's obliquity oscillation
+# has a ~41,000 year period; precise astronomical observations only span ~200
+# years). The amplitudes used in this script come from the Holistic model's own
+# parametrization:
+#     INCLINATION_AMPS[p] := PSI / (D[p] × √m[p])
+#     ECC_AMPLITUDE[p]    := K × sin(tilt[p]) × √D[p] / (√m[p] × a[p]^1.5)
+# so "d × amp × √m = PSI" and the K-amplitude relation hold *identically by
+# construction*, not approximately. Any statistical test on these is degenerate.
+#
+# Substituting external secular-theory amplitudes (e.g. Laskar 2004) does not
+# fix this — those values are themselves N-body simulation outputs, theory not
+# observation. There is no human-timescale measurement of multi-millennial
+# planetary oscillation amplitudes. Comparing one theoretical fit against
+# another does not produce an independent statistical test.
+#
+# The honest disposition: Laws 2 and 4 are *internal consistency checks of the
+# model's parametrization*. They demonstrate that the universal-constant claim
+# is self-consistent, but they cannot serve as independent evidence in a
+# statistical significance analysis. The combined p-value below is built only
+# from tests where a meaningful counterfactual exists (the eccentricity-balance
+# tests: Laws 3, 5, F4, F6).
 
 
 def parse_test_filter(spec):
@@ -860,11 +887,10 @@ def permutation_test(observed, selected=None):
         if "law1_fib_denominators" in selected:
             counts["law1_fib_denominators"] += 1
 
-        # Law 2 — ψ full 8-planet (model d-values, shuffled J2000 inclinations)
+        # Law 2 — ψ full: STRUCTURAL (model amplitudes are tautologically PSI by
+        # construction; permutation cannot test this). Count as always matching.
         if "law2_psi_full" in selected:
-            pf = stat_psi_full(ij2k, D_INCL, SQRT_M)
-            if pf <= observed["law2_psi_full"]:
-                counts["law2_psi_full"] += 1
+            counts["law2_psi_full"] += 1
 
         # Law 3 — Inclination balance (shuffled dual-balanced eccentricities)
         if "law3_incl_balance" in selected:
@@ -872,11 +898,10 @@ def permutation_test(observed, selected=None):
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
-        # Law 4 — K amplitude constant (shuffled amplitudes)
+        # Law 4 — K amplitude: STRUCTURAL (model eccentricity amplitudes are
+        # tautologically derived from K; permutation cannot test this).
         if "law4_k_amplitude" in selected:
-            ka = stat_k_amplitude(ecc_amps, AXIAL_TILT, D_INCL, MASSES, SMA, SQRT_M)
-            if ka <= observed["law4_k_amplitude"]:
-                counts["law4_k_amplitude"] += 1
+            counts["law4_k_amplitude"] += 1
 
         # Law 5 — Eccentricity balance (shuffled dual-balanced eccentricities)
         if "law5_ecc_balance" in selected:
@@ -981,11 +1006,10 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
             if gd >= observed["law1_fib_denominators"]:
                 counts["law1_fib_denominators"] += 1
 
-        # Law 2 — ψ full 8-planet
+        # Law 2 — ψ full: STRUCTURAL (model amplitudes are tautologically PSI;
+        # MC against random amplitudes tests a different question, not the model claim).
         if "law2_psi_full" in selected:
-            pf = stat_psi_full(ij2k, d_rand, SQRT_M)
-            if pf <= observed["law2_psi_full"]:
-                counts["law2_psi_full"] += 1
+            counts["law2_psi_full"] += 1
 
         # Law 3 — Inclination balance
         if "law3_incl_balance" in selected:
@@ -993,11 +1017,10 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
-        # Law 4 — K amplitude
+        # Law 4 — K amplitude: STRUCTURAL (model eccentricity amplitudes are
+        # tautologically derived from K).
         if "law4_k_amplitude" in selected:
-            _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
-            if ka_err <= observed["law4_k_amplitude"]:
-                counts["law4_k_amplitude"] += 1
+            counts["law4_k_amplitude"] += 1
 
         # Law 5 — Eccentricity balance
         if "law5_ecc_balance" in selected:
@@ -1107,11 +1130,10 @@ def uniform_mc(observed, n_trials, rng, selected=None):
             if gd >= observed["law1_fib_denominators"]:
                 counts["law1_fib_denominators"] += 1
 
-        # Law 2 — ψ full 8-planet
+        # Law 2 — ψ full: STRUCTURAL (model amplitudes are tautologically PSI;
+        # MC against random amplitudes tests a different question, not the model claim).
         if "law2_psi_full" in selected:
-            pf = stat_psi_full(ij2k, d_rand, SQRT_M)
-            if pf <= observed["law2_psi_full"]:
-                counts["law2_psi_full"] += 1
+            counts["law2_psi_full"] += 1
 
         # Law 3 — Inclination balance
         if "law3_incl_balance" in selected:
@@ -1119,11 +1141,10 @@ def uniform_mc(observed, n_trials, rng, selected=None):
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
-        # Law 4 — K amplitude
+        # Law 4 — K amplitude: STRUCTURAL (model eccentricity amplitudes are
+        # tautologically derived from K).
         if "law4_k_amplitude" in selected:
-            _, ka_err = _best_k_for_amplitudes(rand_amps, rand_tilts, d_rand, MASSES, SMA, SQRT_M)
-            if ka_err <= observed["law4_k_amplitude"]:
-                counts["law4_k_amplitude"] += 1
+            counts["law4_k_amplitude"] += 1
 
         # Law 5 — Eccentricity balance
         if "law5_ecc_balance" in selected:
@@ -1184,6 +1205,33 @@ def uniform_mc(observed, n_trials, rng, selected=None):
 # FISHER'S METHOD — COMBINE INDEPENDENT P-VALUES
 # ═══════════════════════════════════════════════════════════════════════════
 
+def p_to_sigma(p):
+    """Convert a (one-tailed) p-value to an equivalent Gaussian sigma (z-score).
+
+    Solves erfc(σ / √2) = 2p for σ via Newton iteration.
+    Returns 0.0 for p ≥ 0.5 and a large finite value for p → 0.
+    """
+    if p <= 0:
+        return 40.0  # effectively infinite (beyond any meaningful discovery threshold)
+    if p >= 0.5:
+        return 0.0
+    target = 2.0 * p
+    # Initial guess from the large-sigma asymptotic: p ≈ exp(-σ²/2)/(σ√(2π))
+    sigma = math.sqrt(max(1.0, -2.0 * math.log(p)))
+    for _ in range(40):
+        f = math.erfc(sigma / math.sqrt(2)) - target
+        if abs(f) < 1e-14:
+            break
+        fprime = -math.sqrt(2.0 / math.pi) * math.exp(-sigma * sigma / 2.0)
+        if fprime == 0.0:
+            break
+        sigma -= f / fprime
+        if sigma < 0:
+            sigma = 0.0
+            break
+    return sigma
+
+
 def fishers_method(p_values_list):
     """
     Fisher's method: combine k independent p-values into one.
@@ -1201,6 +1249,49 @@ def fishers_method(p_values_list):
     # P(χ² > X) = Γ(k, X/2) / Γ(k) where Γ is incomplete gamma
     # Use series expansion for moderate X
     return chi2_survival(X, 2 * k)
+
+
+def stouffers_z(p_values_list, correlation_factor=1.0):
+    """
+    Stouffer's Z-method (also called the inverse normal method) for combining
+    independent p-values. Compared to Fisher's method, Stouffer's:
+      1. Is less sensitive to extreme small p-values (no log → no floor blow-up)
+      2. Generalizes naturally to correlated tests via a covariance penalty
+      3. Produces a Z-score that maps directly to a sigma figure
+
+    Procedure:
+      Z_i = Φ⁻¹(1 - p_i)              # convert each p-value to a z-score
+      Z_combined = Σ Z_i / √(k × ρ)    # ρ accounts for average correlation
+      p_combined = 1 - Φ(Z_combined)
+
+    For ρ = 1 (independent tests) this reduces to the standard Stouffer formula
+    Z_combined = (Σ Z_i) / √k. For ρ > 1 (positively correlated tests) the
+    denominator inflates, weakening the combined p — this is the correlation
+    penalty.
+
+    For correlated tests with average pairwise correlation r, a Brown-style
+    correction uses correlation_factor = 1 + (k-1) × r.
+
+    Args:
+      p_values_list: list of one-tailed p-values
+      correlation_factor: variance inflation factor (1 = independent, >1 = correlated)
+
+    Returns:
+      combined p-value
+    """
+    if not p_values_list:
+        return 1.0
+    k = len(p_values_list)
+    # Convert p-values to one-tailed z-scores via the inverse normal CDF.
+    # We reuse p_to_sigma which solves erfc(σ/√2) = 2p for σ.
+    z_scores = [p_to_sigma(p) for p in p_values_list]
+    z_sum = sum(z_scores)
+    z_combined = z_sum / math.sqrt(k * correlation_factor)
+    # Convert combined z back to a p-value: p = 0.5 × erfc(z/√2)
+    if z_combined <= 0:
+        return 1.0
+    p_combined = 0.5 * math.erfc(z_combined / math.sqrt(2.0))
+    return max(p_combined, 1e-300)  # avoid underflow to 0
 
 
 def chi2_survival(x, dof):
@@ -1547,27 +1638,154 @@ Valid IDs (in order):
         print(row)
     print()
 
-    # Fisher's combined p-value per distribution
-    # Exclude STRUCTURAL tests (law6, f1, new_*) — they yield p=1 in permutation
-    # by construction and would dilute the combined statistic. Still reported
-    # in the summary table above, just not combined.
+    # Combined p-values per distribution.
+    #
+    # We exclude STRUCTURAL tests (Laws 1, 2, 4, 6; Findings 1, 1b; Year-length
+    # beat) — these are either internal-consistency checks (Laws 2, 4 are
+    # tautological by construction; the amplitudes are model-derived) or
+    # multiset-invariant under permutation. Including them dilutes the combined
+    # statistic with forced p=1 values.
+    #
+    # We compute TWO combining methods for cross-validation:
+    #   - Fisher's: classical, sensitive to extreme p (and to floor-clamp)
+    #   - Stouffer's Z: less floor-sensitive, can absorb a correlation penalty
+    #
+    # The four empirical tests (Laws 3, 5; Findings 4, 6) all use the same
+    # underlying quantity v_j = √m × a^(3/2) × e / √d, so they are positively
+    # correlated. We apply a Brown-style correction with average pairwise
+    # correlation r ≈ 0.5 (a conservative estimate; the true value depends on
+    # the joint distribution but cannot exceed 1). For k=4 tests with r=0.5
+    # the variance inflation factor is:
+    #     correlation_factor = 1 + (k - 1) × r = 1 + 3 × 0.5 = 2.5
     non_structural = [tid for tid in selected_ordered if tid not in STRUCTURAL_TESTS]
+    fisher_combined = {}
+    stouffer_combined = {}
+    stouffer_combined_corrected = {}
     if non_structural:
-        print(f"  Fisher's combined p-values ({len(non_structural)} non-structural tests):")
+        k_nonstr = len(non_structural)
+        # Brown-style correction for shared v_j dependency among empirical tests
+        r_avg = 0.5  # average pairwise correlation (assumed; conservative)
+        correlation_factor = 1.0 + (k_nonstr - 1) * r_avg
+
+        print(f"  Combined p-values ({k_nonstr} non-structural tests):")
         excluded = [tid for tid in selected_ordered if tid in STRUCTURAL_TESTS]
         if excluded:
-            print(f"    (excluded: {', '.join(excluded)})")
+            print(f"    (excluded as structural: {', '.join(excluded)})")
+        print(f"    (correlation factor for Stouffer's: {correlation_factor:.2f},"
+              f" assuming r̄ = {r_avg:.2f} among k={k_nonstr})")
+
+        # Header
+        print(f"    {'Distribution':<14} {'Fisher':>14} {'Stouffer':>14} {'Stouffer (corr)':>18}")
         for dist, pvals in all_p_values.items():
             p_list = [pvals[tid] for tid in non_structural]
-            # Replace exact zeros with conservative bound
+            # Replace exact zeros with conservative bound (1/n_trials).
+            # This affects Fisher's significantly (sensitive to log of small p)
+            # and Stouffer's mildly (sensitive to z-score, which grows ~√log(1/p))
             n_total = 40320 if dist == "Permutation" else args.trials
-            p_list = [max(p, 1.0 / n_total) for p in p_list]
-            combined = fishers_method(p_list)
-            sig = "***" if combined < 0.001 else "**" if combined < 0.01 else "*" if combined < 0.05 else ""
-            print(f"    {dist:<14} p_combined = {combined:.2e}  {sig}")
+            p_list_clamped = [max(p, 1.0 / n_total) for p in p_list]
+
+            f_combined = fishers_method(p_list_clamped)
+            s_combined = stouffers_z(p_list_clamped, correlation_factor=1.0)
+            s_combined_corr = stouffers_z(p_list_clamped, correlation_factor=correlation_factor)
+
+            fisher_combined[dist] = f_combined
+            stouffer_combined[dist] = s_combined
+            stouffer_combined_corrected[dist] = s_combined_corr
+
+            print(f"    {dist:<14} {f_combined:>14.2e} {s_combined:>14.2e} {s_combined_corr:>18.2e}")
+        print()
+        print(f"  Headline: Stouffer's Z with correlation correction, permutation null")
+        print(f"            → p = {stouffer_combined_corrected.get('Permutation', float('nan')):.2e}"
+              f"  ({p_to_sigma(stouffer_combined_corrected.get('Permutation', 1.0)):.1f} σ)")
+        print(f"  Why this headline:")
+        print(f"    - Permutation null: model-independent (no MC distributional assumptions)")
+        print(f"    - Stouffer's: less sensitive to floor-clamp than Fisher's")
+        print(f"    - Correlation-corrected: penalizes the shared v_j dependency")
         print()
     else:
-        print(f"  (No non-structural tests in selection — Fisher's method skipped.)")
+        print(f"  (No non-structural tests in selection — combining skipped.)")
+        print()
+
+    # ══════════════════════════════════════════════════════════════════
+    # WRITE SIGNIFICANCE RESULTS TO JSON
+    # (consumed by export-to-holistic.js → website + paper)
+    # ══════════════════════════════════════════════════════════════════
+    if len(selected_ordered) == len(TEST_IDS) and fisher_combined:
+        # Only write the JSON when a full run is performed. Partial runs
+        # (via --tests) print but don't overwrite the canonical results.
+        import json
+        from datetime import datetime, timezone
+
+        # Headline statistic: Stouffer's Z with correlation correction, under
+        # the permutation null. This is the most defensible combined p-value
+        # because it (a) uses a model-independent null distribution, (b) is
+        # less floor-clamp-sensitive than Fisher's, and (c) explicitly accounts
+        # for the positive correlation among the four empirical tests (which
+        # all share v_j = √m × a^(3/2) × e / √d).
+        headline_p = stouffer_combined_corrected.get("Permutation")
+        headline_sigma = p_to_sigma(headline_p) if headline_p is not None else None
+        headline_sigma_rounded = round(headline_sigma, 1) if headline_sigma is not None else None
+
+        per_test_results = {}
+        for tid in selected_ordered:
+            per_test_results[tid] = {
+                "label": TEST_LABEL_MAP[tid],
+                "category": TEST_CAT_MAP[tid],
+                "structural": tid in STRUCTURAL_TESTS,
+                "p_values": {dist: all_p_values[dist][tid] for dist in all_p_values},
+            }
+
+        sig_output = {
+            "generated": datetime.now(timezone.utc).isoformat(),
+            "trials": args.trials,
+            "seed": args.seed,
+            "method": {
+                "headline":               "stouffer_corrected.permutation",
+                "correlation_factor":     1.0 + (len(non_structural) - 1) * 0.5,
+                "correlation_assumption": "average pairwise r ≈ 0.5 among 4 empirical v_j-based tests",
+            },
+            "counts": {
+                "total":      len(selected_ordered),
+                "structural": sum(1 for t in selected_ordered if t in STRUCTURAL_TESTS),
+                "empirical":  sum(1 for t in selected_ordered if t not in STRUCTURAL_TESTS),
+                "lawCount":   6,  # Fibonacci Laws 1-6 covered by the test suite
+            },
+            "fisher_combined": {
+                "permutation": fisher_combined.get("Permutation"),
+                "log_uniform": fisher_combined.get("Log-uniform"),
+                "uniform":     fisher_combined.get("Uniform"),
+            },
+            "stouffer_combined": {
+                "permutation": stouffer_combined.get("Permutation"),
+                "log_uniform": stouffer_combined.get("Log-uniform"),
+                "uniform":     stouffer_combined.get("Uniform"),
+            },
+            "stouffer_combined_corrected": {
+                "permutation": stouffer_combined_corrected.get("Permutation"),
+                "log_uniform": stouffer_combined_corrected.get("Log-uniform"),
+                "uniform":     stouffer_combined_corrected.get("Uniform"),
+            },
+            # Sigma equivalents of the corrected Stouffer p-values, for display.
+            # The "headline" sigma is the permutation value (most conservative);
+            # the MC values are the more powerful nulls — they typically give a
+            # stronger answer because they sample over both the values AND the
+            # assignment, while permutation only re-shuffles a fixed value set.
+            "stouffer_sigma_corrected": {
+                "permutation": round(p_to_sigma(stouffer_combined_corrected.get("Permutation", 1.0)), 1),
+                "log_uniform": round(p_to_sigma(stouffer_combined_corrected.get("Log-uniform", 1.0)), 1),
+                "uniform":     round(p_to_sigma(stouffer_combined_corrected.get("Uniform",     1.0)), 1),
+            },
+            "headline_p":     headline_p,
+            "headline_sigma": headline_sigma_rounded,
+            "tests": per_test_results,
+        }
+
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        out_path = os.path.join(repo_root, "data", "significance-results.json")
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        with open(out_path, "w") as f:
+            json.dump(sig_output, f, indent=2)
+        print(f"  Written significance results to {out_path}")
         print()
 
     # Interpretation
