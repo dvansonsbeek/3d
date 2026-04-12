@@ -291,6 +291,7 @@ for (const scenario of scenarios) {
                           scenario: scenario.name,
                           inclBalance: result.inclBalance,
                           eccBalance: result.eccBalance,
+                          eccBalanceJ2000: result.eccBalanceJ2000,
                           llPassCount: result.llPassCount,
                           dirPassCount: result.dirPassCount,
                           maxLLOvershoot: result.maxLLOvershoot,
@@ -356,7 +357,7 @@ const curIdx = allConfigs.findIndex(c => {
 });
 if (curIdx >= 0) {
   const c = allConfigs[curIdx];
-  console.log(`\nConfig #7 rank: ${curIdx + 1}/${allConfigs.length} (score: ${c.score.toFixed(1)}, incl: ${c.inclBalance.toFixed(4)}%, ecc: ${c.eccBalance.toFixed(4)}%, LL max overshoot: ${c.maxLLOvershoot.toFixed(3)}°)`);
+  console.log(`\nDefault config rank: ${curIdx + 1}/${allConfigs.length} (score: ${c.score.toFixed(1)}, incl: ${c.inclBalance.toFixed(4)}%, ecc: ${c.eccBalance.toFixed(4)}%, LL max overshoot: ${c.maxLLOvershoot.toFixed(3)}°)`);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -397,9 +398,21 @@ const output = {
     C: 'Ju=13, Sa=8',
     D: 'Ju=21, Sa=13',
   },
-  format: ['scenario','balance','me_d','me_phase','ve_d','ve_phase','ma_d','ma_phase','ju_d','ju_phase','sa_d','sa_phase','ur_d','ur_phase','ne_d','ne_phase'],
+  // Legacy format reference (pre-deep-analysis):
+  // ['scenario','balance','me_d','me_phase','ve_d','ve_phase','ma_d','ma_phase','ju_d','ju_phase','sa_d','sa_phase','ur_d','ur_phase','ne_d','ne_phase']
+  format: [
+    'scenario','inclBalance',
+    'me_d','me_group','ve_d','ve_group','ma_d','ma_group',
+    'ju_d','ju_group','sa_d','sa_group','ur_d','ur_group','ne_d','ne_group',
+    'eccBalance','anchor_n','dirCount','totalErr','mirror',
+    'me_N','ve_N','ma_N','ju_N','sa_N','ur_N','ne_N',
+    'me_phaseAngle','ve_phaseAngle','ma_phaseAngle','ju_phaseAngle','sa_phaseAngle','ur_phaseAngle','ne_phaseAngle',
+  ],
   phaseAngles: ['in-phase', 'anti-phase'],
-  presets: allConfigs.map(c => c.row),
+  // Presets now contain only the deep-analysis survivors (configs with a valid
+  // anchor giving LL 8/8), with extended per-config optimized parameters.
+  // Populated after the deep analysis section below.
+  presets: [],
 };
 
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
@@ -408,3 +421,367 @@ console.log(`  Search space: ${searchSpace.toLocaleString()} d-assignments`);
 console.log(`  Passing balance ≥${THRESHOLD}%: ${allConfigs.length}`);
 console.log(`  Passing balance + LL + Dir: ${allPassCount}`);
 if (curIdx >= 0) console.log(`  Current Config #${curIdx + 1} rank out of ${allConfigs.length}`);
+
+// ══════════════════════════════════════════════════════════════════
+// DEEP ANALYSIS: Per-config optimization of anchor n & ascending nodes
+//
+// For each surviving config that passes BOTH incl ≥ threshold AND
+// ecc ≥ 99% (the "~35"), we jointly sweep:
+//
+//   n ∈ {0..7}  — balanced-year anchor (position within 8H Grand Octave)
+//   N ∈ {1..120} — ascending node cycles in 8H (per planet, independent)
+//
+// This finds the optimal (n, N_per_planet) for EACH config, making the
+// LL bounds and direction checks FAIR — not biased toward the default config.
+// ══════════════════════════════════════════════════════════════════
+
+const DEEP_ECC_THRESHOLD = 99.0;
+const DEEP_N_MAX = 120;
+
+// Earth reference for apparent-inclination computation (config-independent)
+const eIcrfRate  = 360 / (C.H / 3);
+const eAscRate   = 360 / (-C.H / 5);
+const eIfix_deg  = C.ASTRO_REFERENCE.earthInclinationJ2000_deg;
+const ePeriJ2000 = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
+const ePhase     = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
+const BY_REF     = C.balancedYear;
+
+// Per-planet ICRF rates (config-independent: rate = 360 / icrfPeriod)
+const _icrfRate = {};
+const fittedPlanets = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
+for (const k of fittedPlanets) {
+  const eclP = C.planets[k].perihelionEclipticYears;
+  _icrfRate[k] = 360 * (1/eclP - 1/genPrec);  // deg/yr, negative = retrograde ICRF
+}
+
+/**
+ * Evaluate a planet under an arbitrary config at a specific anchor + ascending node.
+ *
+ * Adapted from tools/explore/anchor-and-ascnode-audit.js evalPlanet().
+ * Key difference: d and isAntiPhase are parameters, not read from a global config.
+ *
+ * @param {string} k         planet name (not earth)
+ * @param {number} d         Fibonacci divisor
+ * @param {boolean} isAntiPhase  true for anti-phase group
+ * @param {number} n         anchor offset in whole H (0..7 within 8H)
+ * @param {number} N         ascending node cycles in 8H (integer ≥1)
+ * @returns {{ phase, mean, amp, inLL, trendModel, jplMoving, errArcsec, dirMatch }}
+ */
+function evalPlanetDeep(k, d, isAntiPhase, n, N) {
+  const sqrtM = _sqrtMass[k];
+  const amp   = PSI / (d * sqrtM);
+  const sign  = isAntiPhase ? -1 : 1;
+  const rate  = _icrfRate[k];
+  const periJ = periLongJ2000[k];
+  const omJ   = omegaJ2000[k];
+  const ij2k  = inclJ2000[k];
+
+  // Phase from balanced-year anchor: n × H backwards from the reference BY
+  const yAnchor = BY_REF - n * C.H;
+  const periAtAnchor = ((periJ + rate * (yAnchor - 2000)) % 360 + 360) % 360;
+  // Convention: anti-phase planet's phase = perihelion at anchor;
+  //             in-phase adds 180° (minimum at balanced year, not maximum).
+  const phase = isAntiPhase ? periAtAnchor : (periAtAnchor + 180) % 360;
+
+  // Mean from J2000 constraint: i_J2000 = mean + sign * amp * cos(peri_J2000 - phase)
+  const cosJ = Math.cos((periJ - phase) * DEG2RAD);
+  const mean = ij2k - sign * amp * cosJ;
+
+  // LL bounds check (±0.03° uncertainty tolerance)
+  const inLL = mean - amp >= llBounds[k].min - 0.03 &&
+               mean + amp <= llBounds[k].max + 0.03;
+  const llOvershoot = Math.max(0, llBounds[k].min - (mean - amp)) +
+                      Math.max(0, (mean + amp) - llBounds[k].max);
+
+  // Apparent ecliptic-inclination trend (1900→2100) in the moving-Earth frame
+  const ascNodePeriod = -(8 * C.H) / N;
+  function apparentIncl(year, fixedEarth) {
+    const peri = periJ + rate * (year - 2000);
+    const iP  = (mean + sign * amp * Math.cos((peri - phase) * DEG2RAD)) * DEG2RAD;
+    const omP = (omJ + (360 / ascNodePeriod) * (year - 2000)) * DEG2RAD;
+    let iE, omE;
+    if (fixedEarth) {
+      iE  = eIfix_deg * DEG2RAD;
+      omE = omegaJ2000.earth * DEG2RAD;
+    } else {
+      const ePeri = ePeriJ2000 + eIcrfRate * (year - 2000);
+      iE  = (C.earthInvPlaneInclinationMean + C.earthInvPlaneInclinationAmplitude *
+             Math.cos((ePeri - ePhase) * DEG2RAD)) * DEG2RAD;
+      omE = (omegaJ2000.earth + eAscRate * (year - 2000)) * DEG2RAD;
+    }
+    const dot = Math.cos(iP) * Math.cos(iE) +
+                Math.sin(iP) * Math.sin(iE) * Math.cos(omP - omE);
+    return Math.acos(Math.max(-1, Math.min(1, dot))) * 180 / Math.PI;
+  }
+
+  const tMov = (apparentIncl(2100, false) - apparentIncl(1900, false)) / 2;
+  const tFix = (apparentIncl(2100, true)  - apparentIncl(1900, true))  / 2;
+  // Frame correction: JPL reports in fixed ecliptic frame
+  const jplMoving = trendJPL[k] + (tMov - tFix);
+  const errArcsec = Math.abs(tMov - jplMoving) * 3600;
+  const dirMatch  = (tMov >= 0) === (jplMoving >= 0);
+
+  return { phase, mean, amp, inLL, llOvershoot, tMov, jplMoving, errArcsec, dirMatch };
+}
+
+// ── Identify deep candidates ──
+const deepCandidates = allConfigs.filter(c => c.eccBalance >= DEEP_ECC_THRESHOLD);
+
+console.log('\n═══════════════════════════════════════════════════════════════');
+console.log('DEEP ANALYSIS: Per-config optimization of anchor n & ascending nodes');
+console.log('═══════════════════════════════════════════════════════════════');
+console.log(`  Candidates: ${deepCandidates.length} configs with incl ≥${THRESHOLD}% AND ecc ≥${DEEP_ECC_THRESHOLD}%`);
+console.log(`  Sweep: n ∈ {0..7} (anchor within 8H), N ∈ {1..${DEEP_N_MAX}} (asc node per planet)`);
+console.log(`  Evals per config: 8 × 7 × ${DEEP_N_MAX} = ${8 * 7 * DEEP_N_MAX}`);
+console.log('');
+
+const deepResults = [];
+
+for (const candidate of deepCandidates) {
+  const row = candidate.row;
+  // Reconstruct config from compact row
+  const cfg = {
+    mercury: { d: row[2],  anti: row[3]  === 1 },
+    venus:   { d: row[4],  anti: row[5]  === 1 },
+    mars:    { d: row[6],  anti: row[7]  === 1 },
+    jupiter: { d: row[8],  anti: row[9]  === 1 },
+    saturn:  { d: row[10], anti: row[11] === 1 },
+    uranus:  { d: row[12], anti: row[13] === 1 },
+    neptune: { d: row[14], anti: row[15] === 1 },
+  };
+
+  // Check mirror symmetry: inner ↔ outer pairs have same d
+  const mirror = cfg.mercury.d === cfg.uranus.d &&
+                 cfg.venus.d   === cfg.neptune.d &&
+                 cfg.mars.d    === cfg.jupiter.d;
+  // (Earth d=3 ↔ Saturn d=3 is always true by construction in scenarios)
+
+  // ── Shared-anchor sweep: all planets share the same n ──
+  let bestAnchor = null;
+
+  for (let n = 0; n < 8; n++) {
+    // Step 1: check LL bounds for all 7 fitted planets at this n (N-independent)
+    let allLL = true;
+    for (const k of fittedPlanets) {
+      const r = evalPlanetDeep(k, cfg[k].d, cfg[k].anti, n, 1);  // N=1 is dummy for LL check
+      if (!r.inLL) { allLL = false; break; }
+    }
+    if (!allLL) continue;
+
+    // Step 2: LL passes. Find best N per planet, with the constraint that
+    // Jupiter and Saturn SHARE the same N (to maximize vector balance
+    // preservation — their ascending nodes must regress in lockstep).
+    let totalErr = 0;
+    let dirCount = 0;
+    const perPlanet = {};
+
+    // First: jointly optimize Jupiter + Saturn with a shared N
+    let bestJuSaN = null;
+    for (let N = 1; N <= DEEP_N_MAX; N++) {
+      const rJu = evalPlanetDeep('jupiter', cfg.jupiter.d, cfg.jupiter.anti, n, N);
+      const rSa = evalPlanetDeep('saturn', cfg.saturn.d, cfg.saturn.anti, n, N);
+      const bothDir = rJu.dirMatch && rSa.dirMatch;
+      const combinedErr = rJu.errArcsec + rSa.errArcsec;
+      const dirN = (rJu.dirMatch ? 1 : 0) + (rSa.dirMatch ? 1 : 0);
+      if (!bestJuSaN ||
+          dirN > bestJuSaN.dirN ||
+          (dirN === bestJuSaN.dirN && combinedErr < bestJuSaN.combinedErr)) {
+        bestJuSaN = { N, rJu: { N, ...rJu }, rSa: { N, ...rSa }, dirN, combinedErr, bothDir };
+      }
+    }
+    if (bestJuSaN) {
+      perPlanet.jupiter = bestJuSaN.rJu;
+      perPlanet.saturn = bestJuSaN.rSa;
+      totalErr += bestJuSaN.combinedErr;
+      if (bestJuSaN.rJu.dirMatch) dirCount++;
+      if (bestJuSaN.rSa.dirMatch) dirCount++;
+    }
+
+    // Then: optimize the other 5 planets independently
+    const independentPlanets = fittedPlanets.filter(k => k !== 'jupiter' && k !== 'saturn');
+    for (const k of independentPlanets) {
+      let bestForPlanet = null;
+      for (let N = 1; N <= DEEP_N_MAX; N++) {
+        const r = evalPlanetDeep(k, cfg[k].d, cfg[k].anti, n, N);
+        if (!r.dirMatch) continue;
+        if (!bestForPlanet || r.errArcsec < bestForPlanet.errArcsec) {
+          bestForPlanet = { N, ...r };
+        }
+      }
+      if (bestForPlanet) {
+        totalErr += bestForPlanet.errArcsec;
+        dirCount++;
+        perPlanet[k] = bestForPlanet;
+      } else {
+        // No N gives direction match — find best N anyway
+        let bestAny = null;
+        for (let N = 1; N <= DEEP_N_MAX; N++) {
+          const r = evalPlanetDeep(k, cfg[k].d, cfg[k].anti, n, N);
+          if (!bestAny || r.errArcsec < bestAny.errArcsec) {
+            bestAny = { N, ...r };
+          }
+        }
+        totalErr += bestAny.errArcsec;
+        perPlanet[k] = bestAny;
+      }
+    }
+
+    const anchorResult = { n, dirCount, totalErr, perPlanet };
+    if (!bestAnchor ||
+        anchorResult.dirCount > bestAnchor.dirCount ||
+        (anchorResult.dirCount === bestAnchor.dirCount && anchorResult.totalErr < bestAnchor.totalErr)) {
+      bestAnchor = anchorResult;
+    }
+  }
+
+  // Check if this matches the default mirror-symmetric configuration
+  const isConfig7 = row[2] === 21 && row[3] === 0 && row[4] === 34 && row[5] === 0 &&
+                    row[6] === 5  && row[7] === 0 && row[8] === 5  && row[9] === 0 &&
+                    row[10] === 3 && row[11] === 1 && row[12] === 21 && row[13] === 0 &&
+                    row[14] === 34 && row[15] === 0;
+
+  deepResults.push({
+    scenario: row[0],
+    inclBalance: candidate.inclBalance,
+    eccBalance: candidate.eccBalance,
+    eccBalanceJ2000: candidate.eccBalanceJ2000 != null ? candidate.eccBalanceJ2000 : null,
+    mirror,
+    isConfig7,
+    dValues: { me: cfg.mercury.d, ve: cfg.venus.d, ma: cfg.mars.d, ju: cfg.jupiter.d, sa: cfg.saturn.d, ur: cfg.uranus.d, ne: cfg.neptune.d },
+    groups:  { me: cfg.mercury.anti ? 1 : 0, ve: cfg.venus.anti ? 1 : 0, ma: cfg.mars.anti ? 1 : 0, ju: cfg.jupiter.anti ? 1 : 0, sa: cfg.saturn.anti ? 1 : 0, ur: cfg.uranus.anti ? 1 : 0, ne: cfg.neptune.anti ? 1 : 0 },
+    bestAnchor,
+  });
+}
+
+// ── Sort: highest eccentricity balance first, then direction count, then lowest error ──
+deepResults.sort((a, b) => {
+  if (!a.bestAnchor && !b.bestAnchor) return 0;
+  if (!a.bestAnchor) return 1;
+  if (!b.bestAnchor) return -1;
+  if (b.eccBalance !== a.eccBalance) return b.eccBalance - a.eccBalance;
+  if (b.bestAnchor.dirCount !== a.bestAnchor.dirCount) return b.bestAnchor.dirCount - a.bestAnchor.dirCount;
+  return a.bestAnchor.totalErr - b.bestAnchor.totalErr;
+});
+
+// ── Print summary table ──
+console.log(`  ${deepResults.length} candidates analyzed.\n`);
+console.log('  Rank │ Scen │ Incl%    │ Ecc%     │ Mir │ n │ Dir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
+console.log('  ─────┼──────┼──────────┼──────────┼─────┼───┼─────┼─────────┼─────────────────────────────');
+for (let i = 0; i < deepResults.length; i++) {
+  const r = deepResults[i];
+  const d = r.dValues;
+  const g = r.groups;
+  const pGroup = (dv, gv) => `${dv}${gv ? '*' : ''}`;
+  const ba = r.bestAnchor;
+  console.log(
+    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │ ${r.eccBalance.toFixed(4).padStart(8)} │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
+    `${pGroup(d.me, g.me).padStart(3)} ${pGroup(d.ve, g.ve).padStart(3)} ${pGroup(d.ma, g.ma).padStart(3)} ${pGroup(d.ju, g.ju).padStart(3)} ${pGroup(d.sa, g.sa).padStart(3)} ${pGroup(d.ur, g.ur).padStart(3)} ${pGroup(d.ne, g.ne).padStart(3)}` +
+    `${r.isConfig7 ? '  ◄ default (mirror)' : ''}`
+  );
+}
+
+// ── Detail for the best configs ──
+const top5 = deepResults.filter(r => r.bestAnchor).slice(0, 5);
+for (const r of top5) {
+  const d = r.dValues;
+  const ba = r.bestAnchor;
+  console.log(`\n  ─── Detail: Scenario ${r.scenario} d=[${d.me},${d.ve},${d.ma},${d.ju},${d.sa},${d.ur},${d.ne}]` +
+    ` ${r.mirror ? '(mirror)' : ''}${r.isConfig7 ? ' (default config)' : ''} ───`);
+  console.log(`  Incl: ${r.inclBalance.toFixed(4)}%  Ecc: ${r.eccBalance.toFixed(4)}%  Anchor n=${ba.n}  Dir: ${ba.dirCount}/7  Total err: ${ba.totalErr.toFixed(1)}″`);
+  console.log('  Planet   │ d  │ grp │ phase     │ mean     │ N    │ asc period    │ err     │ dir');
+  console.log('  ─────────┼────┼─────┼───────────┼──────────┼──────┼───────────────┼─────────┼─────');
+  for (const k of fittedPlanets) {
+    const pp = ba.perPlanet[k];
+    if (!pp) continue;
+    const ascP = -(8 * C.H) / pp.N;
+    const dv = r.dValues[k.slice(0, 2)];
+    const gv = r.groups[k.slice(0, 2)];
+    console.log(
+      `  ${k.padEnd(8)} │ ${String(dv).padStart(2)} │ ${gv ? 'anti' : ' in '} │ ` +
+      `${pp.phase.toFixed(1).padStart(7)}° │ ${pp.mean.toFixed(4).padStart(7)}° │ ` +
+      `${String(pp.N).padStart(4)} │ ${ascP.toFixed(0).padStart(11)} yr │ ` +
+      `${pp.errArcsec.toFixed(1).padStart(5)}″ │  ${pp.dirMatch ? '✓' : '✗'}`
+    );
+  }
+}
+
+// ── Write deep analysis to the output JSON ──
+output.deepAnalysis = {
+  eccThreshold: DEEP_ECC_THRESHOLD,
+  nRange: [0, 7],
+  nMaxAscNode: DEEP_N_MAX,
+  candidateCount: deepResults.length,
+  configs: deepResults.map(r => ({
+    scenario: r.scenario,
+    inclBalance: r.inclBalance,
+    eccBalance: r.eccBalance,
+    mirror: r.mirror,
+    isConfig7: r.isConfig7,
+    dValues: r.dValues,
+    groups: r.groups,
+    bestAnchor: r.bestAnchor ? {
+      n: r.bestAnchor.n,
+      balancedYear: BY_REF - r.bestAnchor.n * C.H,
+      dirCount: r.bestAnchor.dirCount,
+      totalErrArcsec: r.bestAnchor.totalErr,
+      perPlanet: Object.fromEntries(
+        fittedPlanets.map(k => {
+          const pp = r.bestAnchor.perPlanet[k];
+          return [k, pp ? {
+            phase: parseFloat(pp.phase.toFixed(2)),
+            mean: parseFloat(pp.mean.toFixed(5)),
+            amp: parseFloat(pp.amp.toFixed(6)),
+            N: pp.N,
+            ascNodePeriod: parseFloat((-(8 * C.H) / pp.N).toFixed(0)),
+            errArcsec: parseFloat(pp.errArcsec.toFixed(2)),
+            dirMatch: pp.dirMatch,
+          } : null];
+        })
+      ),
+    } : null,
+  })),
+};
+
+// ── Populate the presets array with deep survivors (extended row format) ──
+// Only configs with a valid anchor (LL 8/8) are included. These replace the
+// former 765-row "all passing incl threshold" list with a smaller, richer set
+// that includes per-config optimized anchor, ascending nodes, and phase angles.
+const DEEP_MAX_RATE_ERROR = 5.0;  // arcsec — max total rate error across 7 planets
+const deepSurvivors = deepResults.filter(r =>
+  r.bestAnchor && r.bestAnchor.totalErr <= DEEP_MAX_RATE_ERROR
+);
+output.presets = deepSurvivors.map(r => {
+  const ba = r.bestAnchor;
+  const pp = ba.perPlanet;
+  const d = r.dValues;
+  const g = r.groups;
+  return [
+    // Original 16 fields (same positions as before):
+    r.scenario,
+    parseFloat(r.inclBalance.toFixed(8)),
+    d.me, g.me, d.ve, g.ve, d.ma, g.ma,
+    d.ju, g.ju, d.sa, g.sa, d.ur, g.ur, d.ne, g.ne,
+    // Extended deep-analysis fields (positions 16..34):
+    parseFloat(r.eccBalance.toFixed(4)),          // [16] eccBalance
+    ba.n,                                          // [17] anchor_n
+    ba.dirCount,                                   // [18] dirCount
+    parseFloat(ba.totalErr.toFixed(1)),            // [19] totalErr (arcsec)
+    r.mirror ? 1 : 0,                             // [20] mirror
+    // Per-planet ascending node integers (positions 21..27):
+    pp.mercury.N, pp.venus.N, pp.mars.N, pp.jupiter.N,
+    pp.saturn.N, pp.uranus.N, pp.neptune.N,
+    // Per-planet optimized phase angles (positions 28..34):
+    parseFloat(pp.mercury.phase.toFixed(2)),
+    parseFloat(pp.venus.phase.toFixed(2)),
+    parseFloat(pp.mars.phase.toFixed(2)),
+    parseFloat(pp.jupiter.phase.toFixed(2)),
+    parseFloat(pp.saturn.phase.toFixed(2)),
+    parseFloat(pp.uranus.phase.toFixed(2)),
+    parseFloat(pp.neptune.phase.toFixed(2)),
+  ];
+});
+output.presetCount = deepSurvivors.length;
+
+// Re-write the output file with deep analysis + extended presets
+fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
+console.log(`\nWritten ${outputPath}: ${deepSurvivors.length} deep-analysis presets (was ${allConfigs.length} raw).`);

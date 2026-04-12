@@ -269,13 +269,13 @@ These are overlapping, not nested, constraints (full analysis: [configuration-an
 | **All four filters** | | |
 | Mirror ∩ Saturn-solo ∩ LL bounds ∩ Balance ≥ 99.994% | **1** | 0.0000132% |
 
-That single configuration is **Config #7** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34).
+That single configuration is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34) — the unique mirror-symmetric solution.
 
 **Key structural constraints:**
 
 - **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric configurations.
 - **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune). Of the 81 mirror + Saturn-solo configs, 36 pass LL bounds — exactly the 6 × 6 grid where both pair d-values are ≥ 5.
-- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only Config #7 achieves balance ≥ 99.994%.
+- **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only the default configuration achieves balance ≥ 99.994%.
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
 
@@ -723,7 +723,7 @@ node tools/fit/export-to-script.js --write
 
 3. **Mirror symmetry across the asteroid belt** (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju) — No known law predicts that inner and outer planets should pair with identical Fibonacci divisors. The fact that the pairs follow distance ordering (belt-adjacent=5, middle=3, far=34, outermost=21) is unexplained.
 
-4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of 765 valid configurations, Config #7 is the only one that is also mirror-symmetric.
+4. **Simultaneous satisfaction of three independent constraints** — Pure Fibonacci d-values satisfy all three conditions (Laplace-Lagrange bounds, inclination balance, eccentricity balance) at the same time. Law 5 uses `1/√d` scaling while Law 3 uses `1/d`, making them genuinely independent constraints. Out of the valid configurations, only one is also mirror-symmetric — the default configuration.
 
 5. **Saturn eccentricity prediction from Law 5** — Law 5 (eccentricity balance) is one equation in eight unknowns, sufficient to uniquely determine Saturn's eccentricity from the other seven. The prediction (0.05373) matches the J2000 observed value (0.05386) to ~0.23%. The d-values were originally chosen to match Laws 1, 2, and 3 — *not* tuned for eccentricity — yet they produce a Law 5 balance equation that nevertheless predicts Saturn's eccentricity to sub-percent accuracy.
 
@@ -733,7 +733,7 @@ The balance conditions (Laws 3 and 5) combine known conservation principles with
 
 Laws 2 and 4 (the amplitude constants ψ and K) are the most genuinely novel claims — no existing theory predicts that Fibonacci divisors should produce universal constants for either inclination or eccentricity amplitudes across all eight planets.
 
-The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of Config #7 argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
+The key unresolved question is **why Fibonacci numbers work**: do they encode something about the secular eigenmode structure (real physics), or is the Fibonacci restriction a coincidence made possible by having enough number choices? The mirror symmetry and the uniqueness of the default configuration argue against coincidence, but a theoretical derivation from first principles — or a successful prediction for an independent system such as exoplanetary or satellite systems — would be needed to settle the question definitively.
 
 ---
 

@@ -68,7 +68,7 @@ const trendJPL = {
   jupiter: -0.00184, saturn: +0.00194, uranus: -0.00243, neptune: +0.00035,
 };
 
-// Config #7 — the unique mirror-symmetric configuration
+// The default configuration — the unique mirror-symmetric d-assignment
 // Per-planet phase angles (ICRF perihelion at balanced year)
 const config = {};
 for (const p of planets) {
@@ -355,7 +355,7 @@ for (const [inner, outer, level] of mirrorPairs) {
 // ══════════════════════════════════════════════════════════════════
 
 console.log('\n┌───────────────────────────────────────────────────────────────────────────┐');
-console.log('│  FINDING 2: Configuration Uniqueness (Config #7 only mirror-symmetric)   │');
+console.log('│  FINDING 2: Configuration Uniqueness (only one mirror-symmetric config)  │');
 console.log('└───────────────────────────────────────────────────────────────────────────┘\n');
 
 const presetsPath = path.join(__dirname, '..', '..', 'data', 'balance-presets.json');
@@ -399,7 +399,7 @@ if (presetData) {
 
   console.log(`Total valid configurations: ${presetData.presets.length}`);
   console.log(`Mirror-symmetric configs:   ${mirrorCount}`);
-  check('Config #7 found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
+  check('Mirror-symmetric config found', config27Found, 'Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34');
   check('Only 1 mirror config', mirrorCount === 1, `found ${mirrorCount}`);
 }
 

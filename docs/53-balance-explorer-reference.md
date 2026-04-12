@@ -191,7 +191,7 @@ A configuration is valid when:
 |-------|-----------|
 | **Inclination balance** | ≥99.994% (TNO margin) |
 | **Eccentricity balance** | ~99.9% for the model configuration (phase-derived bases) |
-| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (Config #7 has Saturn at +0.028° excess — within 0.03° LL uncertainty) |
+| **LL bounds** | All 8 planets within Laplace-Lagrange bounds (the default configuration has Saturn at +0.028° excess — within 0.03° LL uncertainty) |
 | **Trend directions** | All 7 fitted planets match JPL direction in the J2000-fixed frame (7/7 ✓) |
 
 ### Exploring Configurations
@@ -204,7 +204,7 @@ Useful experiments to try:
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
 | Use Preset dropdown | See all 765 valid configurations |
-| Look for Config #7 (Scenario A) | The unique mirror-symmetric solution |
+| Look for the default configuration (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
 
@@ -242,7 +242,7 @@ Expected results:
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is Config #7 out of 765 valid configurations (rank 7 by composite score) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is the default configuration out of 765 valid configurations (rank 7 by composite score) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 

@@ -2,9 +2,9 @@
 
 ## Overview
 
-This document presents the analysis of the **dynamic vector balance** — whether the angular momentum perturbations of all 8 planets cancel at every moment in time — and the verification that **Config #7** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34, Saturn-only anti-phase) is the most likely correct Fibonacci d-value configuration.
+This document presents the analysis of the **dynamic vector balance** — whether the angular momentum perturbations of all 8 planets cancel at every moment in time — and the verification that **the default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34, Saturn-only anti-phase) is the most likely correct Fibonacci d-value configuration.
 
-Config #7's *d-values and phase groups* are unchanged. What was refined later (2026-04-09 audit) are two non-d-value parameters:
+the default configuration's *d-values and phase groups* are unchanged. What was refined later (2026-04-09 audit) are two non-d-value parameters:
 - The **asc-node integer assignments** `ascendingNodeCyclesIn8H` (Mercury 9, Venus 1, Mars 62, Jupiter/Saturn 36, Uranus 12, Neptune 3) — re-fit so all 7 fitted planets match JPL ecliptic-inclination trend directions in the J2000-fixed frame, with Jupiter+Saturn locked to share N=36.
 - Four **phase angles** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -2,649,854 BC).
 
@@ -37,9 +37,9 @@ The original April 2026 analysis below was conducted in two passes:
 
 ## Step 1 FINDINGS (2026-04-05)
 
-### 1A. Config #7 is the strongest scalar-balance candidate
+### 1A. the default configuration is the strongest scalar-balance candidate
 
-An exhaustive LL-constrained search tested 127 million (d-value, group) combinations. Out of 4.3 million that passed LL bounds with >95% inclination balance, **Config #7 ranked #1** with the highest combined score:
+An exhaustive LL-constrained search tested 127 million (d-value, group) combinations. Out of 4.3 million that passed LL bounds with >95% inclination balance, **the default configuration ranked #1** with the highest combined score:
 - ~100% scalar inclination balance (99.997%)
 - ~99.9% scalar eccentricity balance (phase-derived bases)
 - 4/4 mirror symmetry (Me=Ur=21, Ve=Ne=34, Ma=Ju=5, Ea=Sa=3)
@@ -50,7 +50,7 @@ No other configuration achieves this combination. The d-values are uniquely dete
 ### 1B. Vector balance varies by configuration — NOT guaranteed by d-values alone
 
 Different configurations give different vector balance in the single-mode approximation:
-- Config #7: **92% min, 7.4 pp variation** (locked nodes), **65% min** (default node rates)
+- the default configuration: **92% min, 7.4 pp variation** (locked nodes), **65% min** (default node rates)
 - Preset #346 (Ma8 Ju21 Sa13): **98% min, 1.7 pp variation** (locked nodes), **67% min** (default)
 - Preset #620 (Ve2 Ma5 Ju21 Sa13 Ur8 Ne13): **98% min, 1.7 pp variation** (locked)
 
@@ -95,11 +95,11 @@ Each planet allows many Fibonacci d-values within LL bounds:
 - Jupiter: d = 1 through 55 (any Fibonacci number)
 - Saturn: d = 2 through 55
 
-The LL bounds narrow the search space but do not determine d-values uniquely. The scalar balance (Laws 3 and 5) provides the additional constraint that selects Config #7.
+The LL bounds narrow the search space but do not determine d-values uniquely. The scalar balance (Laws 3 and 5) provides the additional constraint that selects the default configuration.
 
 ### 1F. The d-values represent dominant-mode amplitudes
 
-The LL bounds give total multi-mode amplitude ranges, while Config #7 d-values give the dominant eigenmode amplitude only. The single-mode amplitude (ψ/(d×√m)) is always smaller than the LL half-range — as expected when multiple eigenmodes contribute.
+The LL bounds give total multi-mode amplitude ranges, while the default configuration d-values give the dominant eigenmode amplitude only. The single-mode amplitude (ψ/(d×√m)) is always smaller than the LL half-range — as expected when multiple eigenmodes contribute.
 
 ### 1G. Ascending node coupling does NOT affect trend directions
 
@@ -148,9 +148,9 @@ The ratio Ω_rate / I_rate reveals which planets have significant I-Ω coupling:
 
 For Earth, Jupiter, Mars, and Saturn, the ascending node regresses fast enough relative to the inclination oscillation that the coupling could matter on longer timescales. For Neptune, the coupling is negligible.
 
-### 1J. Config #7 trend matches — corrected 2026-04-09
+### 1J. the default configuration trend matches — corrected 2026-04-09
 
-> **The original 2026-04-05 conclusion** ("Config #7 achieves 8/8 trend direction matches with Saturn +4.01″ and Neptune +20.59″ in the moving-Earth frame") was based on using the planet's **ICRF perihelion period** for Ω instead of the per-planet asc-node rate. This temporarily masked a deeper issue: the model trend was being computed in the moving-Earth frame and compared against JPL's J2000-fixed catalog values. The numbers happened to align for *most* planets but not Saturn or Neptune at the precision level the model claims to reach.
+> **The original 2026-04-05 conclusion** ("the default configuration achieves 8/8 trend direction matches with Saturn +4.01″ and Neptune +20.59″ in the moving-Earth frame") was based on using the planet's **ICRF perihelion period** for Ω instead of the per-planet asc-node rate. This temporarily masked a deeper issue: the model trend was being computed in the moving-Earth frame and compared against JPL's J2000-fixed catalog values. The numbers happened to align for *most* planets but not Saturn or Neptune at the precision level the model claims to reach.
 
 **Current state (2026-04-09)**:
 1. `fbeCalcApparentIncl` was updated to compute trends in **both** frames (moving for visualization, J2000-fixed for JPL comparison) and re-express JPL's catalog values into the moving frame for the Balance Explorer display (Fix B). See [Balance Explorer Reference](53-balance-explorer-reference.md).
@@ -160,7 +160,7 @@ For Earth, Jupiter, Mars, and Saturn, the ascending node regresses fast enough r
 
 The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened to mostly cancel; the 2026-04-09 audit fixes both errors directly.
 
-### Step 1 Final Score for Config #7
+### Step 1 Final Score for the default configuration
 
 (After the 2026-04-09 audit + JPL-frame correction)
 
@@ -181,14 +181,14 @@ The 2026-04-05 ICRF-period-for-Ω workaround was making two errors that happened
 
 ### 2A. Saturn LL bound excess is within source precision
 
-Config #7 exceeds Saturn's LL upper bound by 0.027° (98.6″). However:
+the default configuration exceeds Saturn's LL upper bound by 0.027° (98.6″). However:
 - The LL bounds come from **Brouwer & van Woerkom first-order secular theory** (Farside Table 10.4)
 - These are NOT high-precision numerical integration values (like Laskar 2004)
 - The values have **3 significant figures** (Saturn max = 1.02, could be 1.015–1.025)
 - First-order secular theory has inherent accuracy limits of ~5-10% in amplitudes
 - The 0.027° excess is **well within this uncertainty**
 
-**Conclusion**: Saturn's marginal LL bound failure is not a real constraint violation. Config #7 with d=3 for Saturn is consistent with the secular theory within its precision.
+**Conclusion**: Saturn's marginal LL bound failure is not a real constraint violation. the default configuration with d=3 for Saturn is consistent with the secular theory within its precision.
 
 ### 2B. Vector balance is 100% with multi-mode eigenmode representation
 
@@ -197,7 +197,7 @@ The multi-mode model (7 Laskar eigenfrequencies, inner/outer subsystem fit, AM c
 J2000 reconstruction accuracy: inner planets < 0.1″, outer planets 0.6-6.2″.
 
 This proves that:
-1. **Config #7 d-values do NOT need to change** for vector balance — it's guaranteed by the eigenmode structure
+1. **the default configuration d-values do NOT need to change** for vector balance — it's guaranteed by the eigenmode structure
 2. **d-values are determined by scalar balance** (Laws 3 & 5), not vector balance
 3. **Vector balance is determined by eigenmode physics**, not by d-value choice
 4. The 92% single-mode vector balance measures the dominant eigenmode's share of the dynamics, not a configuration quality
@@ -218,7 +218,7 @@ The original April 2026 analysis treated "which Ω rate for trend computation" a
 
 ## FINAL CONCLUSION (2026-04-09 update)
 
-**Config #7 (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34, Saturn-only anti-phase) is confirmed as the most likely correct d-value configuration.**
+**the default configuration (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34, Saturn-only anti-phase) is confirmed as the most likely correct d-value configuration.**
 
 The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase planet are unchanged from the April 2026 analysis. The 2026-04-09 audit added two complementary results:
 
@@ -266,7 +266,7 @@ The analysis started by trying to derive d-values from eigenmode amplitudes (bot
 - Multi-mode amplitude ranges differ from single-mode amplitudes (multiple eigenmodes contribute)
 - JPL inclination rates cannot determine d-values (rates are 2-130× slower than single-mode predictions due to multi-mode interference)
 
-The correct approach was the **exhaustive LL-constrained search** — testing all valid Fibonacci d-value combinations against the scalar balance conditions. This identified Config #7 as uniquely optimal.
+The correct approach was the **exhaustive LL-constrained search** — testing all valid Fibonacci d-value combinations against the scalar balance conditions. This identified the default configuration as uniquely optimal.
 
 ### Data Sources
 
@@ -289,7 +289,7 @@ The correct approach was the **exhaustive LL-constrained search** — testing al
 | `eigenmode-decomposition.js` | Eigenmode theory and Fibonacci connection | Original "s₁–s₈ ≈ 8H/N" claim — superseded by 2026-04-09 re-fit, see [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) |
 | `laplace-lagrange-eigenmodes.js` | B-matrix from first principles | 100% vector balance with B-matrix eigenvectors |
 | `eigenmode-subsystem-fit.js` | Direct inner/outer subsystem fit (no B-matrix) | 98.7% min with inner/outer split; feeds into proof |
-| `config-exhaustive-search.js` | LL-bounds-constrained exhaustive search | **Config #7 ranks #1 out of 4.3M valid configs** |
+| `config-exhaustive-search.js` | LL-bounds-constrained exhaustive search | **the default configuration ranks #1 out of 4.3M valid configs** |
 | `single-mode-observational-constraints.js` | All observational constraints per (d,group) | Rates 2-130× slower than single-mode prediction (frame-corrected 2026-04-09) |
 | `ascending-node-inclination-coupling.js` | I-Ω coupling + node rate mode analysis | Coupling doesn't change trend signs over 200 yr (legacy framing — node-rate analysis predates the J2000-fixed-frame correction) |
 | `vector-balance-j2000.js` | J2000 instant residual diagnostic (Phase A) | Static \|V\| ≈ 0.42% — invariable plane is real |
@@ -312,5 +312,5 @@ The correct approach was the **exhaustive LL-constrained search** — testing al
 | `vector-balance-frequency-analysis.js` | Frequency analysis; superseded by eigenmode decomposition |
 | `vector-balance-preset-scan.js` | Preset scan; superseded by ll-constrained-fit |
 | `vector-balance-comprehensive.js` | Scored search; superseded by ll-constrained-fit |
-| `preset346-deep-analysis.js` | #346 analysis; conclusion: Config #7 is better |
+| `preset346-deep-analysis.js` | #346 analysis; conclusion: the default configuration is better |
 | `step1-d-period-coupled.js` | d+period coupling; confirms rates can't determine d |

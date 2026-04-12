@@ -73,7 +73,7 @@ RMS values below are from the time of calibration (before parallax correction wa
 
 - **Jupiter** was the biggest win: 42% RMS improvement with near-zero drift.
   Further refined from 4330.65 to 4330.5 to optimize invariable plane balance
-  (Config #7 achieves ~99.9% balance). This shifts count from 28254 to 28255
+  (the default configuration achieves ~99.9% balance). This shifts count from 28254 to 28255
   (boundary at ~4330.455), which slightly changes the effective SMA
 - **Mars** improved both drift (10.65 -> 3.89 deg) and RMS (-5.1%)
 - **Venus** improved modestly on both metrics

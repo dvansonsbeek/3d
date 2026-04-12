@@ -34,7 +34,7 @@ angles (per-planet phase angles from balanced year) should cancel. Prograde plan
 **Scalar balance**: the sum of v for the in-phase group must equal the sum of v for
 the anti-phase group.
 
-**Group assignment** (Config #7: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
+**Group assignment** (the default configuration: Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34):
 
 | Group       | Planets                                               |
 |-------------|-------------------------------------------------------|
@@ -58,7 +58,7 @@ K is derived in Section 4 below.
 
 ---
 
-## 3. Fibonacci D-Values and Phase Groups (Config #7)
+## 3. Fibonacci D-Values and Phase Groups (the default configuration)
 
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|

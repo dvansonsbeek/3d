@@ -157,7 +157,7 @@ A single modal panel with a **Years / 8H/N toggle** button:
 ## Related Documentation
 
 - [Fibonacci Laws](10-fibonacci-laws.md) — The six laws and their derivation
-- [Vector Balance Analysis](54-vector-balance-analysis.md) — Config #7 verification and eigenfrequency connection
+- [Vector Balance Analysis](54-vector-balance-analysis.md) — the default configuration verification and eigenfrequency connection
 - [Balance Explorer Reference](53-balance-explorer-reference.md) — Interactive balance testing
 - [Ascending Node Calculations](31-ascending-node-calculations.md) — Dynamic ascending node model
 - [Inclination Calculations](32-inclination-calculations.md) — ICRF perihelion inclination model

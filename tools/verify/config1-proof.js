@@ -3,13 +3,13 @@
 // CONFIG #1 PROOF — WHY THIS IS THE MOST LIKELY CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// This script demonstrates why Config #7 (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34,
+// This script demonstrates why the default configuration (Me21 Ve34 Ma5 Ju5 Sa3 Ur21 Ne34,
 // Saturn-only anti-phase) is the most likely correct Fibonacci d-value
 // configuration for the Holistic Universe Model.
 //
 // The proof has four parts:
 //
-//   PART 1: UNIQUENESS — Config #7 ranks #1 out of 4.3 million valid
+//   PART 1: UNIQUENESS — the default configuration ranks #1 out of 4.3 million valid
 //           configurations by combined scalar balance score
 //
 //   PART 2: COMPLETENESS — All 9 constraints are satisfied:
@@ -38,7 +38,7 @@ const PLANET_KEYS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', '
 const NP = 8;
 const FIB_D = [1, 2, 3, 5, 8, 13, 21, 34, 55];
 
-// Config #7
+// the default configuration
 const D = { mercury: 21, venus: 34, earth: 3, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
 const ANTI = { mercury: false, venus: false, earth: false, mars: false, jupiter: false, saturn: true, uranus: false, neptune: false };
 
@@ -148,7 +148,7 @@ countValid();
 console.log(`  Total combinations tested:  ${totalTested.toLocaleString()}`);
 console.log(`  Pass LL bounds:             ${totalValid.toLocaleString()}`);
 console.log(`  Inclination balance > 99%:  ${totalAbove99.toLocaleString()}`);
-console.log(`  Config #7 scalar balance:   99.9999% (ranked #1)`);
+console.log(`  the default configuration scalar balance:   99.9999% (ranked #1)`);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PART 2: COMPLETENESS — ALL CONSTRAINTS SATISFIED
@@ -483,7 +483,7 @@ for (let i = 0; i <= 1000; i++) {
 console.log(`  Single-mode (locked Ω): min ${smMin.toFixed(1)}%, max ${smMax.toFixed(1)}%, var ${(smMax - smMin).toFixed(1)} pp`);
 console.log(`  Multi-mode (7 eigenfreqs): min ${vMin.toFixed(1)}%, max ${vMax.toFixed(1)}%, var ${(vMax - vMin).toFixed(1)} pp`);
 console.log(`  → The ${(100 - smMin).toFixed(1)}% gap is the contribution of secondary eigenmodes,`);
-console.log(`    NOT a flaw in Config #7's d-values.`);
+console.log(`    NOT a flaw in the default configuration's d-values.`);
 
 console.log('');
 console.log('J2000 reconstruction:');
@@ -542,7 +542,7 @@ console.log('══════════════════════�
 console.log('VERDICT');
 console.log('═══════════════════════════════════════════════════════════════════════════');
 console.log('');
-console.log('Config #7 uniquely satisfies all constraints:');
+console.log('the default configuration uniquely satisfies all constraints:');
 console.log('');
 console.log('  ✓ Fibonacci d-values         (all 8 are Fibonacci numbers)');
 console.log('  ✓ LL bounds                  (7/8 pass, Saturn within source precision)');

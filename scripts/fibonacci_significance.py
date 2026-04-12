@@ -699,7 +699,7 @@ def stat_d_set_fib_clustering(d_vals):
         "The divisors form two consecutive Fibonacci pairs:
          (3,5) for the belt-adjacent and (21,34) for the outer planets."
 
-    Observed d-set for Config #7: {3, 5, 21, 34}
+    Observed d-set for the default (mirror-symmetric) configuration: {3, 5, 21, 34}
         = {F_4, F_5, F_8, F_9}
         = (F_4,F_5) ∪ (F_8,F_9)   ← two disjoint consecutive Fibonacci pairs.
 
