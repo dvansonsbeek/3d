@@ -214,38 +214,63 @@ console.log('  ── Significance results ──');
 const sigResultsPath = path.join(__dirname, '..', '..', 'data', 'significance-results.json');
 if (fs.existsSync(sigResultsPath)) {
   const sr = JSON.parse(fs.readFileSync(sigResultsPath, 'utf8'));
-  const fc  = sr.fisher_combined || {};
-  const sc  = sr.stouffer_combined_corrected || {};
-  const ssc = sr.stouffer_sigma_corrected || {};  // sigma equivalents of sc
-  const scu = sr.stouffer_combined || {};  // uncorrected (informational, unused in TS)
-  void scu; // silence unused-var lint
+  const fc   = sr.fisher_combined || {};
+  const sc   = sr.stouffer_combined_corrected || {};
+  const ssc  = sr.stouffer_sigma_corrected || {};  // sigma equivalents of sc
+  const scu  = sr.stouffer_combined || {};  // uncorrected (informational, unused in TS)
+  const jc   = sr.joint_combined || {};      // NEW: direct joint test per null
+  void scu;  // silence unused-var lint
   const toExpJs = (n) => {
     // Render as e.g. "1.8e-14" with one decimal in the mantissa
     if (n === null || n === undefined) return 'null';
     const s = Number(n).toExponential(1);
     return s.replace(/e([+-]?)0*(\d)/, 'e$1$2');
   };
-  const correlationFactor = sr.method && typeof sr.method.correlation_factor === 'number'
-    ? Number(sr.method.correlation_factor.toFixed(2))
-    : 2.5;
+  const empR = (dist) => {
+    const v = sr.method && sr.method[`empirical_correlation_${dist}`];
+    return (typeof v === 'number') ? Number(v.toFixed(3)) : 'null';
+  };
+  const jointField = (distKey, field) => {
+    const j = jc[distKey];
+    if (!j) return 'null';
+    const v = j[field];
+    if (typeof v === 'number') {
+      return field === 'p' ? toExpJs(v) : String(v);
+    }
+    return 'null';
+  };
   const sigLines = [
     `testCount:          ${sr.counts.total},       // Total significance tests in the script`,
     `lawCount:           ${sr.counts.lawCount || 6},        // Fibonacci Laws covered`,
-    `empiricalCount:     ${sr.counts.empirical},        // Empirical tests contributing to the combined p`,
-    `structuralCount:    ${sr.counts.structural},        // Structural / tautological tests excluded`,
-    `correlationFactor:  ${correlationFactor},      // Stouffer's variance inflation (k=4, r̄=0.5)`,
-    `// Headline (recommended for citation):`,
-    `headlineP:          ${toExpJs(sr.headline_p)},  // Stouffer's corrected, permutation null`,
+    `empiricalCount:     ${sr.counts.empirical},        // Permutation-combinable empirical tests`,
+    `mcCombinableCount:  ${sr.counts.mc_combinable || sr.counts.empirical},        // MC-combinable tests (larger set)`,
+    `structuralCount:    ${sr.counts.structural},        // Structural / tautological tests`,
+    `// Empirical pairwise correlation MEASURED from each null (not assumed):`,
+    `empiricalR_permutation: ${empR('permutation')},`,
+    `empiricalR_logUniform:  ${empR('log_uniform')},`,
+    `empiricalR_uniform:     ${empR('uniform')},`,
+    `// Derived Brown-style variance inflation factor using MEASURED r̄:`,
+    `correlationFactor:  ${Number((sr.method && sr.method.correlation_factor || 1).toFixed(2))},      // 1 + (k-1)*r̄_permutation`,
+    `// HEADLINE (recommended for citation): direct joint permutation test`,
+    `// — studentized T = Sum z_i, p = fraction of nulls with T_null >= T_obs.`,
+    `// Model-independent; joint null captures inter-test correlation.`,
+    `headlineP:          ${toExpJs(sr.headline_p)},  // Direct joint permutation test`,
     `headlineSigma:      ${sr.headline_sigma},      // Sigma equivalent of headlineP`,
-    `// Stouffer's Z (correlation-corrected) across the 3 null distributions:`,
+    `// Direct joint test across the 3 null distributions:`,
+    `jointP_permutation: ${jointField('permutation', 'p')},`,
+    `jointP_logUniform:  ${jointField('log_uniform', 'p')},`,
+    `jointP_uniform:     ${jointField('uniform', 'p')},`,
+    `jointSigma_permutation: ${jointField('permutation', 'sigma')},`,
+    `jointSigma_logUniform:  ${jointField('log_uniform', 'sigma')},`,
+    `jointSigma_uniform:     ${jointField('uniform', 'sigma')},`,
+    `// Supporting: Stouffer's Z with MEASURED correlation (approximation of joint test):`,
     `stoufferP_permutation: ${toExpJs(sc.permutation)},`,
     `stoufferP_logUniform:  ${toExpJs(sc.log_uniform)},`,
     `stoufferP_uniform:     ${toExpJs(sc.uniform)},`,
-    `// Sigma equivalents of the corrected Stouffer p-values:`,
     `stoufferSigma_permutation: ${ssc.permutation},`,
     `stoufferSigma_logUniform:  ${ssc.log_uniform},`,
     `stoufferSigma_uniform:     ${ssc.uniform},`,
-    `// Fisher's method (legacy / for transparency, sensitive to floor-clamp):`,
+    `// Supporting: Fisher's method (floor-clamp sensitive, for cross-check only):`,
     `fisherP_permutation: ${toExpJs(fc.permutation)},`,
     `fisherP_logUniform:  ${toExpJs(fc.log_uniform)},`,
     `fisherP_uniform:     ${toExpJs(fc.uniform)},`,

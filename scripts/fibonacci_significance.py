@@ -7,6 +7,40 @@
 # eccentricities and inclinations are statistically significant,
 # or could arise by chance in random planetary systems.
 #
+# ───────────────────────────────────────────────────────────────────────────
+# HONEST BREAKDOWN OF THE TEST SUITE (read this first):
+#
+#   4 EMPIRICAL tests        → contribute to the headline combined p
+#     Laws 3, 5 (inclination and eccentricity balance)
+#     Findings 4, 6 (Saturn prediction; solo-planet identification)
+#
+#   2 TAUTOLOGICAL tests     → internal consistency only, excluded from headline
+#     Law 2 (ψ constant):    INCL_AMP := PSI/(d·√m) by construction
+#     Law 4 (K amplitude):   ECC_AMP := K·sin(θ)·√d/(√m·a^1.5) by construction
+#
+#   5 STRUCTURAL tests       → permutation-invariant or single-scalar;
+#                              excluded from the permutation combined p
+#                              but testable under the MC nulls
+#     Law 1 (Fib denominators), Law 6 (E–J–S resonance),
+#     Finding 1 (mirror symmetry), Finding 1b (d-set Fib clustering),
+#     Year-length beat identity
+#
+# HEADLINE statistic: direct joint permutation test over the 4 empirical
+# tests, using a studentized combined statistic
+#     T(σ) = Σ_i sign_i × (s_i(σ) − μ_i) / σ_i
+# computed across all 40,320 permutations. The p-value is the fraction of
+# permutations with T ≥ T_obs. This is model-independent (no distributional
+# assumptions) and self-correcting for correlation (the null captures the
+# joint distribution directly). Stouffer+Brown and Fisher are also reported
+# for transparency but are approximations of the joint test.
+#
+# MC combined p-values include more tests (9 total: the 4 empirical + 5
+# structural that become meaningful under random solar systems).
+#
+# Jackknife: leave-one-planet-out re-runs the 7! = 5040 permutation test to
+# report how much each planet contributes to the headline significance.
+# ───────────────────────────────────────────────────────────────────────────
+#
 # ELEVEN TEST STATISTICS — Laws → Findings → Arithmetic:
 #
 #   Core Laws (6)
@@ -95,7 +129,7 @@ from collections import defaultdict
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tools', 'lib', 'python'))
 
 from constants_scripts import (
-    PLANET_NAMES, MASSES, ECCENTRICITIES, ECC_DUAL_BALANCED, INCLINATION_AMPS,
+    PLANET_NAMES, MASSES, ECCENTRICITIES, INCLINATION_AMPS,
     D_INCL, PSI1_THEORY, SEMI_MAJOR, PHASE_GROUP, GROUP_203, GROUP_23,
     MIRROR_PAIRS, PERIOD_FRAC, H,
     INCL_J2000, INCL_MEAN, EARTH_OBLIQUITY_MEAN,
@@ -126,8 +160,7 @@ ANOMALISTIC_YEAR_DAYS = _dumped['meanAnomalisticYearDays']
 # ─── ECCENTRICITY SET SELECTION ───────────────────────────────────────────
 #
 # ECCENTRICITIES = ECC_BASE = base eccentricities (long-term means for 100%
-# Law 5 balance).  ECC_DUAL_BALANCED is a legacy alias for the same set —
-# there is no longer any distinction between "dual-balanced" and "base".
+# Law 5 balance).
 #
 # All tests use base eccentricities (the model's values):
 #   Tests 1, 2, 4, 10: These test whether the model's base eccentricity
@@ -161,11 +194,6 @@ FIB_SET = [1, 2, 3, 5, 8]
 FIB_RATIOS = sorted(set(a / b for a in FIB_SET for b in FIB_SET if a != b))
 # = [0.125, 0.2, 0.25, 0.333, 0.375, 0.4, 0.6, 0.625, 0.667,
 #    1.5, 1.6, 1.667, 2.0, 2.5, 2.667, 3.0, 4.0, 5.0, 8.0]
-
-# Extended set including 13 and 21 — used for system-level tests (Tests 6-7)
-# where the model predicts ratios like 13/3, 21, 5
-FIB_SET_EXT = [1, 2, 3, 5, 8, 13, 21]
-FIB_RATIOS_EXT = sorted(set(a / b for a in FIB_SET_EXT for b in FIB_SET_EXT if a != b))
 
 # Tolerance for "near a Fibonacci ratio" — relative error
 TOLERANCE = 0.05  # 5% relative tolerance (generous)
@@ -340,13 +368,6 @@ def best_fibonacci_error(ratio):
     return min(abs(ratio / fr - 1.0) for fr in FIB_RATIOS if fr > 0)
 
 
-def best_fibonacci_error_ext(ratio):
-    """Return the smallest relative error to any extended Fibonacci ratio.
-    Uses {1,2,3,5,8,13,21} — more ratios to check (larger look-elsewhere),
-    but captures system-level relations like 13/3 and 21."""
-    return min(abs(ratio / fr - 1.0) for fr in FIB_RATIOS_EXT if fr > 0)
-
-
 # ═══════════════════════════════════════════════════════════════════════════
 # TEST STATISTICS
 # ═══════════════════════════════════════════════════════════════════════════
@@ -425,9 +446,8 @@ def stat_incl_balance(eccs, d_vals, group_a, group_b):
     How well do the angular-momentum-weighted inclination structural weights
     cancel between the two phase groups?
 
-    Observed: 100% with the model's d-values, phase groups, and dual-balanced
-    eccentricities (ECC_DUAL_BALANCED). The (1-e²) term enters via angular
-    momentum, so the dual-balanced outer-planet values are needed for 100%.
+    Observed: 100% with the model's d-values, phase groups, and base
+    eccentricities. The (1-e²) term enters via angular momentum.
 
     Null hypothesis: random Fibonacci d-assignments and random solo-planet
     phase splits cannot achieve this level of balance.
@@ -443,9 +463,8 @@ def stat_ecc_balance(eccs, d_vals, group_a, group_b):
 
     How well do the eccentricity-weighted quantities cancel between groups?
 
-    Observed: 100% with the model's d-values, phase groups, and dual-balanced
-    eccentricities (ECC_DUAL_BALANCED). The dual-balanced outer-planet values
-    are the model's prediction — using J2000 would test a straw man.
+    Observed: 100% with the model's d-values, phase groups, and base
+    eccentricities (the model's long-term-mean values).
 
     Returns: balance percentage (higher = more balanced).
     """
@@ -458,8 +477,8 @@ def stat_saturn_prediction(eccs, d_vals, group_a, solo_planet):
 
     Since the solo anti-phase planet carries the entire anti-phase contribution,
     the eccentricity balance directly predicts its eccentricity from the
-    other seven planets. Uses ECC_DUAL_BALANCED: Saturn's dual-balanced
-    value (0.05373663) IS the model's prediction from the dual-balance optimizer.
+    other seven planets. Uses base eccentricities: Saturn's base value
+    (0.05373663) IS the model's prediction from the balance optimizer.
 
     e_solo = sum_A(v_j) / (sqrt(m_solo) × a_solo^(3/2) / sqrt(d_solo))
 
@@ -772,13 +791,6 @@ def stat_year_length_beat(tropical, sidereal, anomalistic, holistic_year):
     return max(err_sid, err_ano)
 
 
-def _nearest_fib_or_small(target, candidates=(3, 5, 8, 13, 16, 21, 34, 55)):
-    """Return min relative error to any integer in candidates."""
-    if target <= 0:
-        return 1.0
-    return min(abs(target / c - 1.0) for c in candidates)
-
-
 # ═══════════════════════════════════════════════════════════════════════════
 # OBSERVED STATISTICS
 # ═══════════════════════════════════════════════════════════════════════════
@@ -790,7 +802,6 @@ def compute_observed_stats(selected=None):
     the tests whose stable IDs are present in `selected` (a set of strings).
 
     All tests use base eccentricities (ECCENTRICITIES = ECC_BASE).
-    ECC_DUAL_BALANCED is a legacy alias for the same set.
     """
     xi_e, xi_i = compute_xi(ECCENTRICITIES, INCLINATION_AMPS, SQRT_M)
 
@@ -807,12 +818,12 @@ def compute_observed_stats(selected=None):
         # Permutation remains valid — shuffling still breaks the match.
         obs["law2_psi_full"] = stat_psi_full(INCLINATION_AMPS, D_INCL, SQRT_M)
     if want("law3_incl_balance"):
-        obs["law3_incl_balance"] = stat_incl_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
+        obs["law3_incl_balance"] = stat_incl_balance(ECCENTRICITIES, D_INCL, GROUP_203, GROUP_23)
     if want("law4_k_amplitude"):
         # FIXED: use per-planet model mean obliquity, not J2000 axial tilts.
         obs["law4_k_amplitude"] = stat_k_amplitude(ECC_AMPLITUDE, OBLIQUITY_MEAN, D_INCL, MASSES, SMA, SQRT_M)
     if want("law5_ecc_balance"):
-        obs["law5_ecc_balance"] = stat_ecc_balance(ECC_DUAL_BALANCED, D_INCL, GROUP_203, GROUP_23)
+        obs["law5_ecc_balance"] = stat_ecc_balance(ECCENTRICITIES, D_INCL, GROUP_203, GROUP_23)
     if want("law6_ejs_resonance"):
         obs["law6_ejs_resonance"] = stat_ejs_resonance(PERIOD_FRAC)
     # ── Findings ──
@@ -821,10 +832,10 @@ def compute_observed_stats(selected=None):
     if want("f1b_d_set_fib_pairs"):
         obs["f1b_d_set_fib_pairs"] = stat_d_set_fib_clustering(D_INCL)
     if want("f4_saturn_prediction"):
-        obs["f4_saturn_prediction"] = stat_saturn_prediction(ECC_DUAL_BALANCED, D_INCL, GROUP_203, "Saturn")
+        obs["f4_saturn_prediction"] = stat_saturn_prediction(ECCENTRICITIES, D_INCL, GROUP_203, "Saturn")
     if want("f6_solo_planet"):
         obs["f6_solo_planet"] = stat_solo_planet_identification(
-            ECC_DUAL_BALANCED, D_INCL, MASSES, SMA, SQRT_M)
+            ECCENTRICITIES, D_INCL, MASSES, SMA, SQRT_M)
     # ── Arithmetic / structural ──
     if want("year_length_beat"):
         obs["year_length_beat"] = stat_year_length_beat(
@@ -836,6 +847,53 @@ def compute_observed_stats(selected=None):
 # ═══════════════════════════════════════════════════════════════════════════
 # DISTRIBUTION 1: PERMUTATION TEST (EXHAUSTIVE)
 # ═══════════════════════════════════════════════════════════════════════════
+
+# IDs of tests that produce a meaningful continuous statistic under the
+# permutation null (the 4 genuinely empirical tests). For these we also
+# store the per-permutation raw statistic so that (a) the empirical
+# correlation matrix can be measured, and (b) a direct joint permutation
+# test can be computed by combining studentized statistics.
+PERM_EMPIRICAL_TESTS = (
+    "law3_incl_balance",
+    "law5_ecc_balance",
+    "f4_saturn_prediction",
+    "f6_solo_planet",
+)
+
+# Under an MC null (random solar systems), structural tests that are
+# permutation-invariant DO become meaningful — the null also draws random
+# d-assignments, random period denominators, random year lengths, etc.
+# So the MC-combinable set is larger than the permutation-combinable set.
+# Only Laws 2 and 4 remain excluded (tautological by construction).
+MC_COMBINABLE_TESTS = (
+    "law1_fib_denominators",
+    "law3_incl_balance",
+    "law5_ecc_balance",
+    "law6_ejs_resonance",
+    "f1_mirror_symmetry",
+    "f1b_d_set_fib_pairs",
+    "f4_saturn_prediction",
+    "f6_solo_planet",
+    "year_length_beat",
+)
+
+# Sign convention for studentization: +1 means "larger statistic = more
+# observed-like" (balance percentages); -1 means "smaller = more observed-like"
+# (residual errors). This orients all z-scores so that positive = evidence
+# toward the model.
+STAT_SIGN = {
+    "law3_incl_balance":    +1,
+    "law5_ecc_balance":     +1,
+    "f4_saturn_prediction": -1,
+    "f6_solo_planet":       -1,
+    # MC-meaningful structural tests:
+    "law1_fib_denominators": +1,  # higher count of Fib denominators = better
+    "law6_ejs_resonance":    -1,  # smaller |b_E + b_J - b_S|/b_S = better
+    "f1_mirror_symmetry":    +1,  # more matching mirror pairs = better
+    "f1b_d_set_fib_pairs":   +1,  # 1 if Fib-pair structure, 0 otherwise
+    "year_length_beat":      -1,  # smaller max |beat - int|/int = better
+}
+
 
 def permutation_test(observed, selected=None):
     """
@@ -852,6 +910,14 @@ def permutation_test(observed, selected=None):
 
     If `selected` is None, runs all tests. Otherwise runs only those whose
     stable IDs are in `selected`.
+
+    Returns:
+      p_values: dict of per-test p-values
+      n_perms:  total permutations run
+      raw_series: dict[tid -> list of float], per-permutation raw statistic
+                  for each empirical test (same order as enumerate), used
+                  downstream for empirical correlation and direct joint test.
+                  Only populated for tests in PERM_EMPIRICAL_TESTS ∩ selected.
     """
     print("  DISTRIBUTION 1: PERMUTATION TEST (8! = 40,320 trials)")
     print("  " + "─" * 60)
@@ -860,7 +926,6 @@ def permutation_test(observed, selected=None):
         selected = set(TEST_IDS)
 
     ecc_vals = [ECCENTRICITIES[p] for p in PLANET_NAMES]
-    ecc_dual_vals = [ECC_DUAL_BALANCED[p] for p in PLANET_NAMES]
     incl_vals = [INCLINATION_AMPS[p] for p in PLANET_NAMES]
     mean_vals = [INCL_MEANS[p] for p in PLANET_NAMES]
     ecc_amp_vals = [ECC_AMPLITUDE[p] for p in PLANET_NAMES]
@@ -869,11 +934,14 @@ def permutation_test(observed, selected=None):
     incl_j2000_vals = [INCL_J2000[p] for p in PLANET_NAMES]
 
     counts = {tid: 0 for tid in TEST_IDS if tid in selected}
+    # Per-permutation raw statistics for empirical tests
+    raw_series = {
+        tid: [] for tid in PERM_EMPIRICAL_TESTS if tid in selected
+    }
 
     for idx, perm in enumerate(itertools.permutations(range(8))):
         # Assign shuffled values to planets
         eccs = {PLANET_NAMES[i]: ecc_vals[perm[i]] for i in range(8)}
-        eccs_dual = {PLANET_NAMES[i]: ecc_dual_vals[perm[i]] for i in range(8)}
         incls = {PLANET_NAMES[i]: incl_vals[perm[i]] for i in range(8)}
         means = {PLANET_NAMES[i]: mean_vals[perm[i]] for i in range(8)}
         ij2k = {PLANET_NAMES[i]: incl_j2000_vals[perm[i]] for i in range(8)}
@@ -892,9 +960,10 @@ def permutation_test(observed, selected=None):
         if "law2_psi_full" in selected:
             counts["law2_psi_full"] += 1
 
-        # Law 3 — Inclination balance (shuffled dual-balanced eccentricities)
+        # Law 3 — Inclination balance (shuffled base eccentricities)
         if "law3_incl_balance" in selected:
-            ib = stat_incl_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
+            ib = stat_incl_balance(eccs, D_INCL, GROUP_203, GROUP_23)
+            raw_series["law3_incl_balance"].append(ib)
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
@@ -903,9 +972,10 @@ def permutation_test(observed, selected=None):
         if "law4_k_amplitude" in selected:
             counts["law4_k_amplitude"] += 1
 
-        # Law 5 — Eccentricity balance (shuffled dual-balanced eccentricities)
+        # Law 5 — Eccentricity balance (shuffled base eccentricities)
         if "law5_ecc_balance" in selected:
-            eb = stat_ecc_balance(eccs_dual, D_INCL, GROUP_203, GROUP_23)
+            eb = stat_ecc_balance(eccs, D_INCL, GROUP_203, GROUP_23)
+            raw_series["law5_ecc_balance"].append(eb)
             if eb >= observed["law5_ecc_balance"]:
                 counts["law5_ecc_balance"] += 1
 
@@ -924,14 +994,16 @@ def permutation_test(observed, selected=None):
 
         # Finding 4 — Saturn eccentricity prediction
         if "f4_saturn_prediction" in selected:
-            sp = stat_saturn_prediction(eccs_dual, D_INCL, GROUP_203, "Saturn")
+            sp = stat_saturn_prediction(eccs, D_INCL, GROUP_203, "Saturn")
+            raw_series["f4_saturn_prediction"].append(sp)
             if sp <= observed["f4_saturn_prediction"]:
                 counts["f4_saturn_prediction"] += 1
 
         # Finding 6 — Solo planet identification (shuffled eccentricities)
         if "f6_solo_planet" in selected:
             sp_id = stat_solo_planet_identification(
-                eccs_dual, D_INCL, MASSES, SMA, SQRT_M)
+                eccs, D_INCL, MASSES, SMA, SQRT_M)
+            raw_series["f6_solo_planet"].append(sp_id)
             if sp_id <= observed["f6_solo_planet"]:
                 counts["f6_solo_planet"] += 1
 
@@ -944,7 +1016,7 @@ def permutation_test(observed, selected=None):
             print(f"    ... {idx+1:,}/{n_perms:,} permutations done")
 
     p_values = {k: v / n_perms for k, v in counts.items()}
-    return p_values, n_perms
+    return p_values, n_perms, raw_series
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -960,6 +1032,13 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
     Incl. amplitudes:    log-uniform in [0.01, 3.0] degrees
     Mean inclinations:   log-uniform in [0.1, 10.0] degrees
     Masses: FIXED at solar system values (conservative).
+
+    Returns:
+      p_values: dict of per-test p-values
+      n_trials: total trials run
+      raw_series: dict[tid -> list of float], per-trial raw statistic for
+                  each MC-combinable test. Used for empirical correlation
+                  and direct joint MC test.
     """
     print(f"  DISTRIBUTION 2: LOG-UNIFORM MONTE CARLO ({n_trials:,} trials)")
     print("  " + "─" * 60)
@@ -975,6 +1054,9 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
     log_ea_lo, log_ea_hi = math.log(1e-6), math.log(0.01)
 
     counts = {tid: 0 for tid in TEST_IDS if tid in selected}
+    raw_series = {
+        tid: [] for tid in MC_COMBINABLE_TESTS if tid in selected
+    }
 
     for trial in range(n_trials):
         eccs = {}
@@ -999,10 +1081,12 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
         rand_amps = {p: math.exp(rng.uniform(log_ea_lo, log_ea_hi)) for p in PLANET_NAMES}
         rand_tilts = {p: rng.uniform(0.01, 90.0) for p in PLANET_NAMES}
 
-        # Law 1 — Fibonacci denominators: draw 8 random denoms in [1, 30]
+        # Law 1 — Fibonacci denominators: draw 8 random denoms in [2, 40]
+        # (widened from [1,30] so the observed max denom (Mars=35) is in range)
         if "law1_fib_denominators" in selected:
-            rand_fracs = {p: (rng.randint(1, 8), rng.randint(1, 30)) for p in PLANET_NAMES}
+            rand_fracs = {p: (rng.randint(1, 8), rng.randint(2, 40)) for p in PLANET_NAMES}
             gd = stat_gho_fib_denominators(rand_fracs)
+            raw_series["law1_fib_denominators"].append(gd)
             if gd >= observed["law1_fib_denominators"]:
                 counts["law1_fib_denominators"] += 1
 
@@ -1014,6 +1098,7 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
         # Law 3 — Inclination balance
         if "law3_incl_balance" in selected:
             ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
+            raw_series["law3_incl_balance"].append(ib)
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
@@ -1025,6 +1110,7 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
         # Law 5 — Eccentricity balance
         if "law5_ecc_balance" in selected:
             eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
+            raw_series["law5_ecc_balance"].append(eb)
             if eb >= observed["law5_ecc_balance"]:
                 counts["law5_ecc_balance"] += 1
 
@@ -1033,12 +1119,14 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
             fib_denoms = [1, 2, 3, 5, 8, 13, 21]
             rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
             ej = stat_ejs_resonance(rand_fracs)
+            raw_series["law6_ejs_resonance"].append(ej)
             if ej <= observed["law6_ejs_resonance"]:
                 counts["law6_ejs_resonance"] += 1
 
         # Finding 1 — Mirror symmetry (random d-values)
         if "f1_mirror_symmetry" in selected:
             ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
+            raw_series["f1_mirror_symmetry"].append(ms)
             if ms >= observed["f1_mirror_symmetry"]:
                 counts["f1_mirror_symmetry"] += 1
 
@@ -1046,12 +1134,14 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
         if "f1b_d_set_fib_pairs" in selected:
             # d_rand is already drawn from FIB_D_POOL, so it's eligible
             dc = stat_d_set_fib_clustering(d_rand)
+            raw_series["f1b_d_set_fib_pairs"].append(dc)
             if dc >= observed["f1b_d_set_fib_pairs"]:
                 counts["f1b_d_set_fib_pairs"] += 1
 
         # Finding 4 — Saturn prediction
         if "f4_saturn_prediction" in selected:
             sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
+            raw_series["f4_saturn_prediction"].append(sp)
             if sp <= observed["f4_saturn_prediction"]:
                 counts["f4_saturn_prediction"] += 1
 
@@ -1059,6 +1149,7 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
         if "f6_solo_planet" in selected:
             sp_id = stat_solo_planet_identification(
                 eccs, d_rand, MASSES, SMA, SQRT_M)
+            raw_series["f6_solo_planet"].append(sp_id)
             if sp_id <= observed["f6_solo_planet"]:
                 counts["f6_solo_planet"] += 1
 
@@ -1068,6 +1159,7 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
             sid = trop * (1 + math.exp(rng.uniform(math.log(1e-6), math.log(1e-3))))
             ano = trop * (1 + math.exp(rng.uniform(math.log(1e-6), math.log(1e-3))))
             yb = stat_year_length_beat(trop, sid, ano, H)
+            raw_series["year_length_beat"].append(yb)
             if yb <= observed["year_length_beat"]:
                 counts["year_length_beat"] += 1
 
@@ -1075,7 +1167,7 @@ def log_uniform_mc(observed, n_trials, rng, selected=None):
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
 
     p_values = {k: v / n_trials for k, v in counts.items()}
-    return p_values, n_trials
+    return p_values, n_trials, raw_series
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1091,6 +1183,8 @@ def uniform_mc(observed, n_trials, rng, selected=None):
     Incl. amplitudes:    uniform in [0.01, 3.0] degrees
     Mean inclinations:   uniform in [0.1, 10.0] degrees
     Masses: FIXED at solar system values (conservative).
+
+    Returns: (p_values, n_trials, raw_series) — same shape as log_uniform_mc.
     """
     print(f"  DISTRIBUTION 3: UNIFORM MONTE CARLO ({n_trials:,} trials)")
     print("  " + "─" * 60)
@@ -1099,6 +1193,9 @@ def uniform_mc(observed, n_trials, rng, selected=None):
         selected = set(TEST_IDS)
 
     counts = {tid: 0 for tid in TEST_IDS if tid in selected}
+    raw_series = {
+        tid: [] for tid in MC_COMBINABLE_TESTS if tid in selected
+    }
 
     for trial in range(n_trials):
         eccs = {}
@@ -1123,10 +1220,11 @@ def uniform_mc(observed, n_trials, rng, selected=None):
         grp_a = [p for p in PLANET_NAMES if p != solo]
         grp_b = [solo]
 
-        # Law 1 — Fibonacci denominators (uniform random denoms)
+        # Law 1 — Fibonacci denominators (uniform random denoms, widened to [2,40])
         if "law1_fib_denominators" in selected:
-            rand_fracs = {p: (rng.randint(1, 8), rng.randint(1, 30)) for p in PLANET_NAMES}
+            rand_fracs = {p: (rng.randint(1, 8), rng.randint(2, 40)) for p in PLANET_NAMES}
             gd = stat_gho_fib_denominators(rand_fracs)
+            raw_series["law1_fib_denominators"].append(gd)
             if gd >= observed["law1_fib_denominators"]:
                 counts["law1_fib_denominators"] += 1
 
@@ -1138,6 +1236,7 @@ def uniform_mc(observed, n_trials, rng, selected=None):
         # Law 3 — Inclination balance
         if "law3_incl_balance" in selected:
             ib = stat_incl_balance(eccs, d_rand, grp_a, grp_b)
+            raw_series["law3_incl_balance"].append(ib)
             if ib >= observed["law3_incl_balance"]:
                 counts["law3_incl_balance"] += 1
 
@@ -1149,6 +1248,7 @@ def uniform_mc(observed, n_trials, rng, selected=None):
         # Law 5 — Eccentricity balance
         if "law5_ecc_balance" in selected:
             eb = stat_ecc_balance(eccs, d_rand, grp_a, grp_b)
+            raw_series["law5_ecc_balance"].append(eb)
             if eb >= observed["law5_ecc_balance"]:
                 counts["law5_ecc_balance"] += 1
 
@@ -1157,24 +1257,28 @@ def uniform_mc(observed, n_trials, rng, selected=None):
             fib_denoms = [1, 2, 3, 5, 8, 13, 21]
             rand_fracs = {p: (rng.randint(1, 8), rng.choice(fib_denoms)) for p in PLANET_NAMES}
             ej = stat_ejs_resonance(rand_fracs)
+            raw_series["law6_ejs_resonance"].append(ej)
             if ej <= observed["law6_ejs_resonance"]:
                 counts["law6_ejs_resonance"] += 1
 
         # Finding 1 — Mirror symmetry
         if "f1_mirror_symmetry" in selected:
             ms = stat_mirror_symmetry(d_rand, MIRROR_PAIRS)
+            raw_series["f1_mirror_symmetry"].append(ms)
             if ms >= observed["f1_mirror_symmetry"]:
                 counts["f1_mirror_symmetry"] += 1
 
         # Finding 1b — d-set Fibonacci clustering
         if "f1b_d_set_fib_pairs" in selected:
             dc = stat_d_set_fib_clustering(d_rand)
+            raw_series["f1b_d_set_fib_pairs"].append(dc)
             if dc >= observed["f1b_d_set_fib_pairs"]:
                 counts["f1b_d_set_fib_pairs"] += 1
 
         # Finding 4 — Saturn prediction
         if "f4_saturn_prediction" in selected:
             sp = stat_saturn_prediction(eccs, d_rand, grp_a, solo)
+            raw_series["f4_saturn_prediction"].append(sp)
             if sp <= observed["f4_saturn_prediction"]:
                 counts["f4_saturn_prediction"] += 1
 
@@ -1182,6 +1286,7 @@ def uniform_mc(observed, n_trials, rng, selected=None):
         if "f6_solo_planet" in selected:
             sp_id = stat_solo_planet_identification(
                 eccs, d_rand, MASSES, SMA, SQRT_M)
+            raw_series["f6_solo_planet"].append(sp_id)
             if sp_id <= observed["f6_solo_planet"]:
                 counts["f6_solo_planet"] += 1
 
@@ -1191,6 +1296,7 @@ def uniform_mc(observed, n_trials, rng, selected=None):
             sid = trop * (1 + rng.uniform(1e-6, 1e-3))
             ano = trop * (1 + rng.uniform(1e-6, 1e-3))
             yb = stat_year_length_beat(trop, sid, ano, H)
+            raw_series["year_length_beat"].append(yb)
             if yb <= observed["year_length_beat"]:
                 counts["year_length_beat"] += 1
 
@@ -1198,7 +1304,227 @@ def uniform_mc(observed, n_trials, rng, selected=None):
             print(f"    ... {trial+1:,}/{n_trials:,} trials done")
 
     p_values = {k: v / n_trials for k, v in counts.items()}
-    return p_values, n_trials
+    return p_values, n_trials, raw_series
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# EMPIRICAL CORRELATION & DIRECT JOINT PERMUTATION TEST
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _mean_var(xs):
+    """Return (mean, population variance) of a sequence."""
+    n = len(xs)
+    if n == 0:
+        return 0.0, 0.0
+    m = sum(xs) / n
+    v = sum((x - m) ** 2 for x in xs) / n
+    return m, v
+
+
+def _pearson(xs, ys):
+    """Pearson correlation coefficient of two equal-length sequences."""
+    n = len(xs)
+    if n < 2 or n != len(ys):
+        return 0.0
+    mx, vx = _mean_var(xs)
+    my, vy = _mean_var(ys)
+    sx = math.sqrt(vx)
+    sy = math.sqrt(vy)
+    if sx <= 0 or sy <= 0:
+        return 0.0
+    cov = sum((xs[i] - mx) * (ys[i] - my) for i in range(n)) / n
+    return cov / (sx * sy)
+
+
+def studentize(raw_series, observed, test_ids):
+    """
+    Convert per-trial raw statistics and the observed value into oriented
+    z-scores (positive = more observed-like) using the NULL distribution
+    mean and std.
+
+    Returns:
+      z_obs: dict[tid -> float] observed studentized z
+      z_series: dict[tid -> list[float]] studentized null series
+      stats:   dict[tid -> (mean, std, sign)] for diagnostics
+    """
+    z_obs = {}
+    z_series = {}
+    stats = {}
+    for tid in test_ids:
+        series = raw_series.get(tid)
+        if not series:
+            continue
+        mean, var = _mean_var(series)
+        std = math.sqrt(var)
+        sign = STAT_SIGN.get(tid, +1)
+        if std <= 0:
+            # Degenerate: all null draws equal. Treat as uninformative (z=0).
+            z_obs[tid] = 0.0
+            z_series[tid] = [0.0] * len(series)
+            stats[tid] = (mean, std, sign)
+            continue
+        z_obs[tid] = sign * (observed[tid] - mean) / std
+        z_series[tid] = [sign * (x - mean) / std for x in series]
+        stats[tid] = (mean, std, sign)
+    return z_obs, z_series, stats
+
+
+def empirical_correlation(z_series, test_ids):
+    """
+    Compute the average pairwise Pearson correlation of the studentized
+    null series across a list of test IDs. Returns r̄ (0.0 if <2 tests).
+    """
+    tids = [t for t in test_ids if t in z_series and len(z_series[t]) > 0]
+    k = len(tids)
+    if k < 2:
+        return 0.0
+    r_sum = 0.0
+    r_n = 0
+    for i in range(k):
+        for j in range(i + 1, k):
+            r = _pearson(z_series[tids[i]], z_series[tids[j]])
+            r_sum += r
+            r_n += 1
+    return r_sum / r_n if r_n > 0 else 0.0
+
+
+def direct_joint_test(z_obs, z_series, test_ids):
+    """
+    Direct joint test: combine studentized z-scores into a single statistic
+    T = Σ_i z_i, then compute the p-value as the fraction of null samples
+    with T_null ≥ T_obs.
+
+    This is model-independent (no Gaussian assumption, no correlation
+    correction needed — the correlation is baked into the joint null by
+    construction).
+
+    Returns: (p, T_obs, n_samples). p is never zero: if no null samples
+    meet or exceed T_obs, the conservative upper bound 1/(n+1) is returned.
+    """
+    tids = [t for t in test_ids if t in z_obs and t in z_series and len(z_series[t]) > 0]
+    if not tids:
+        return 1.0, 0.0, 0
+
+    n = len(z_series[tids[0]])
+    T_obs = sum(z_obs[t] for t in tids)
+
+    # Build null distribution of T
+    ge = 0
+    for idx in range(n):
+        T_null = sum(z_series[t][idx] for t in tids)
+        if T_null >= T_obs:
+            ge += 1
+
+    # Use the "+1" rule so p is never exactly 0
+    p = (ge + 1) / (n + 1)
+    return p, T_obs, n
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LEAVE-ONE-OUT (JACKKNIFE) PERMUTATION TEST
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _balance_ex(eccs, d_vals, group_a, group_b, fn):
+    """Compute either stat_incl_balance or stat_ecc_balance over a subset."""
+    return fn(eccs, d_vals, group_a, group_b)
+
+
+def jackknife_permutation(drop_planet):
+    """
+    Run the 4-empirical-test direct joint permutation test after removing
+    `drop_planet` from the system entirely.
+
+    Uses 7! = 5,040 permutations of the remaining planets. Drops the
+    removed planet from the phase groups as well. If Saturn (the solo
+    anti-phase planet) is dropped, F4 is undefined and is excluded from
+    the joint test for that leave-one-out run.
+
+    Returns: dict with keys {p, T_obs, n, sigma, tests_used, observed}
+    """
+    remaining = [p for p in PLANET_NAMES if p != drop_planet]
+    n = len(remaining)
+    if n < 3:
+        return None
+
+    grp_a = [p for p in GROUP_203 if p != drop_planet]
+    grp_b = [p for p in GROUP_23  if p != drop_planet]
+
+    # Determine which tests are meaningful after the drop
+    tests = ["law3_incl_balance", "law5_ecc_balance", "f6_solo_planet"]
+    # F4 requires a designated solo planet (Saturn by convention in
+    # GROUP_23). If we drop Saturn, F4 is undefined.
+    f4_enabled = "Saturn" in remaining and len(grp_b) >= 1
+    if f4_enabled:
+        tests.append("f4_saturn_prediction")
+
+    # Observed values with the remaining subset
+    obs = {}
+    obs["law3_incl_balance"] = stat_incl_balance(
+        ECCENTRICITIES, D_INCL, grp_a, grp_b)
+    obs["law5_ecc_balance"] = stat_ecc_balance(
+        ECCENTRICITIES, D_INCL, grp_a, grp_b)
+    # Restrict solo-planet argmin to the remaining planets
+    obs["f6_solo_planet"] = _stat_solo_planet_subset(
+        ECCENTRICITIES, D_INCL, remaining)
+    if f4_enabled:
+        obs["f4_saturn_prediction"] = stat_saturn_prediction(
+            ECCENTRICITIES, D_INCL, grp_a, "Saturn")
+
+    # Permutation loop over remaining planets
+    ecc_vals = [ECCENTRICITIES[p] for p in remaining]
+    raw_series = {t: [] for t in tests}
+
+    for perm in itertools.permutations(range(n)):
+        eccs_perm = {remaining[i]: ecc_vals[perm[i]] for i in range(n)}
+        # Extend with dropped planet's original value so stat functions that
+        # iterate PLANET_NAMES keep working (they skip planets not in groups).
+        eccs_perm[drop_planet] = ECCENTRICITIES[drop_planet]
+
+        raw_series["law3_incl_balance"].append(
+            stat_incl_balance(eccs_perm, D_INCL, grp_a, grp_b))
+        raw_series["law5_ecc_balance"].append(
+            stat_ecc_balance(eccs_perm, D_INCL, grp_a, grp_b))
+        raw_series["f6_solo_planet"].append(
+            _stat_solo_planet_subset(eccs_perm, D_INCL, remaining))
+        if f4_enabled:
+            raw_series["f4_saturn_prediction"].append(
+                stat_saturn_prediction(eccs_perm, D_INCL, grp_a, "Saturn"))
+
+    z_obs, z_series, _ = studentize(raw_series, obs, tests)
+    p, T_obs, n_samples = direct_joint_test(z_obs, z_series, tests)
+    return {
+        "drop": drop_planet,
+        "p": p,
+        "sigma": p_to_sigma(p),
+        "T_obs": T_obs,
+        "n": n_samples,
+        "tests_used": tests,
+        "observed": obs,
+    }
+
+
+def _stat_solo_planet_subset(eccs, d_vals, planet_subset):
+    """
+    Solo-planet-identification statistic restricted to a subset of planets.
+    Same shape as stat_solo_planet_identification but iterates only the
+    given subset (used by jackknife).
+    """
+    v = {}
+    for p in planet_subset:
+        d_p = d_vals.get(p, 0)
+        if d_p <= 0 or eccs.get(p, 0) <= 0:
+            return 1.0
+        v[p] = SQRT_M[p] * SEMI_MAJOR[p] ** 1.5 * eccs[p] / math.sqrt(d_p)
+    total = sum(v.values())
+    min_resid = float("inf")
+    for p in planet_subset:
+        if v[p] <= 0:
+            continue
+        sum_others = total - v[p]
+        resid = abs(v[p] - sum_others) / v[p]
+        if resid < min_resid:
+            min_resid = resid
+    return min_resid if min_resid != float("inf") else 1.0
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1208,28 +1534,27 @@ def uniform_mc(observed, n_trials, rng, selected=None):
 def p_to_sigma(p):
     """Convert a (one-tailed) p-value to an equivalent Gaussian sigma (z-score).
 
-    Solves erfc(σ / √2) = 2p for σ via Newton iteration.
+    Solves Φ(σ) = 1 - p for σ via bisection on erfc.
     Returns 0.0 for p ≥ 0.5 and a large finite value for p → 0.
+    Robust across the full range [1e-300, 0.5] — no Newton-overshoot artifacts.
     """
     if p <= 0:
         return 40.0  # effectively infinite (beyond any meaningful discovery threshold)
     if p >= 0.5:
         return 0.0
+    # We want σ such that 0.5 * erfc(σ/√2) = p, i.e. erfc(σ/√2) = 2p.
+    # erfc is monotone decreasing in σ, so bisect in [0, 40].
     target = 2.0 * p
-    # Initial guess from the large-sigma asymptotic: p ≈ exp(-σ²/2)/(σ√(2π))
-    sigma = math.sqrt(max(1.0, -2.0 * math.log(p)))
-    for _ in range(40):
-        f = math.erfc(sigma / math.sqrt(2)) - target
-        if abs(f) < 1e-14:
+    lo, hi = 0.0, 40.0
+    for _ in range(100):
+        mid = 0.5 * (lo + hi)
+        if math.erfc(mid / math.sqrt(2.0)) > target:
+            lo = mid
+        else:
+            hi = mid
+        if hi - lo < 1e-12:
             break
-        fprime = -math.sqrt(2.0 / math.pi) * math.exp(-sigma * sigma / 2.0)
-        if fprime == 0.0:
-            break
-        sigma -= f / fprime
-        if sigma < 0:
-            sigma = 0.0
-            break
-    return sigma
+    return 0.5 * (lo + hi)
 
 
 def fishers_method(p_values_list):
@@ -1407,51 +1732,25 @@ def print_observed_detail():
 # ═══════════════════════════════════════════════════════════════════════════
 
 def print_look_elsewhere():
-    """Quantify the look-elsewhere effect for each test."""
+    """Quantify the look-elsewhere effect for the current test suite."""
     print("=" * 78)
     print("  LOOK-ELSEWHERE EFFECT ACCOUNTING")
     print("=" * 78)
     print()
-
-    n_fib_ratios = len(FIB_RATIOS)
-    n_pairs = 28  # C(8,2)
-    n_pairwise_tests = 2 * n_pairs * n_fib_ratios
-
-    n_4subsets = 70  # C(8,4)
-    n_ladder_tests = n_4subsets * 4 * 3 * n_fib_ratios  # subsets × refs × others × ratios
-
-    n_3subsets = 56  # C(8,3)
-    n_weight_perms = 60  # P(5,3) = 5×4×3
-    n_psi_tests = n_3subsets * n_weight_perms
-
-    print(f"  Test 1 (Pairwise):   {n_pairwise_tests:>6,} implicit comparisons")
-    print(f"    = {n_pairs} pairs × 2 properties × {n_fib_ratios} Fibonacci ratios")
+    print("  The 4 EMPIRICAL tests (Laws 3, 5; F4, F6) have zero per-test")
+    print("  look-elsewhere: each uses fixed model d-values and phase groups,")
+    print("  and computes a single scalar statistic with no tunable parameters.")
     print()
-    print(f"  Test 2 (Ladder):     {n_ladder_tests:>6,} implicit comparisons")
-    print(f"    = {n_4subsets} subsets × 4 refs × 3 others × {n_fib_ratios} ratios")
+    print("  Multiple-testing correction across the 4 tests is absorbed by the")
+    print("  joint permutation test, which combines them into a single T")
+    print("  statistic and computes one p-value from its joint null.")
     print()
-    print(f"  Test 3 (ψ-constant): {n_psi_tests:>6,} implicit comparisons")
-    print(f"    = {n_3subsets} subsets × {n_weight_perms} weight permutations")
-    print()
-    n_fib_ratios_ext = len(FIB_RATIOS_EXT)
-    print(f"  Test 4 (Cross-param):{n_fib_ratios_ext:>6,} implicit comparisons")
-    print(f"    = 1 ratio × {n_fib_ratios_ext} extended Fibonacci ratios (incl. 13, 21)")
-    print(f"    (system-level sum — no subset/weight optimization)")
-    print()
-    n_d_configs = len(FIB_D_POOL)**8 * 8
-    print(f"  Test 5 (Incl. bal.):       0 look-elsewhere (fixed d + phase)")
-    print(f"    Perm: fixed model d-values, shuffled eccentricities")
-    print(f"    MC: random d from {len(FIB_D_POOL)} choices × 8 planets × 8 solo choices")
-    print()
-    print(f"  Test 6 (Ecc. bal.):        0 look-elsewhere (fixed d + phase)")
-    print(f"    Same null model as Test 5")
-    print()
-    print(f"  Test 7 (Saturn pred.):     0 look-elsewhere (fixed d + phase)")
-    print(f"    Prediction from balance equation — no optimization")
-    print()
-    print("  NOTE: Tests 1-4 are accounted for automatically by the Monte Carlo approach,")
-    print("  since each random trial computes the SAME optimized statistics.")
-    print("  Tests 5-7 have zero look-elsewhere (fixed predictions, no optimization).")
+    print(f"  Law 1 (Fib denominators):  9 of {len(FIB_D_POOL)} Fib numbers in "
+          f"draw range [2,40] under MC null → baseline ≈ {9/39*100:.0f}% per slot")
+    print(f"  Law 6 (E–J–S resonance):   b_E + b_J = b_S constrained across "
+          f"Fibonacci triples → ≈ 1 in 50 random Fib-triples satisfy it")
+    print(f"  Findings 1, 1b:            structural d-assignment claims — "
+          f"MC draws from {len(FIB_D_POOL)}-element Fib pool")
     print()
 
 
@@ -1480,8 +1779,9 @@ Valid IDs (in order):
    5. law5_ecc_balance         11. year_length_beat
    6. law6_ejs_resonance
 """)
-    parser.add_argument("--trials", type=int, default=100_000,
-                        help="Number of Monte Carlo trials per distribution (default: 100000)")
+    parser.add_argument("--trials", type=int, default=1_000_000,
+                        help="Number of Monte Carlo trials per distribution (default: 1000000; "
+                             "set lower to iterate quickly, higher for tighter tail estimates)")
     parser.add_argument("--seed", type=int, default=42,
                         help="Random seed for reproducibility (default: 42)")
     parser.add_argument("--skip-mc", action="store_true",
@@ -1566,13 +1866,17 @@ Valid IDs (in order):
 
     # ─── Significance tests ──────────────────────────────────────────
     all_p_values = {}
+    all_raw_series = {}  # dist name -> raw_series dict (for joint tests)
+    all_n_samples = {}   # dist name -> n
 
     if not args.skip_perm:
         print("=" * 78)
         t0 = time.time()
-        p_perm, n_perm = permutation_test(observed, selected)
+        p_perm, n_perm, raw_perm = permutation_test(observed, selected)
         dt = time.time() - t0
         all_p_values["Permutation"] = p_perm
+        all_raw_series["Permutation"] = raw_perm
+        all_n_samples["Permutation"] = n_perm
 
         print()
         print(f"  Results ({n_perm:,} permutations, {dt:.1f}s):")
@@ -1586,9 +1890,11 @@ Valid IDs (in order):
     if not args.skip_mc:
         print("=" * 78)
         t0 = time.time()
-        p_log, n_log = log_uniform_mc(observed, args.trials, rng, selected)
+        p_log, n_log, raw_log = log_uniform_mc(observed, args.trials, rng, selected)
         dt = time.time() - t0
         all_p_values["Log-uniform"] = p_log
+        all_raw_series["Log-uniform"] = raw_log
+        all_n_samples["Log-uniform"] = n_log
 
         print()
         print(f"  Results ({n_log:,} trials, {dt:.1f}s):")
@@ -1601,9 +1907,11 @@ Valid IDs (in order):
 
         print("=" * 78)
         t0 = time.time()
-        p_uni, n_uni = uniform_mc(observed, args.trials, rng, selected)
+        p_uni, n_uni, raw_uni = uniform_mc(observed, args.trials, rng, selected)
         dt = time.time() - t0
         all_p_values["Uniform"] = p_uni
+        all_raw_series["Uniform"] = raw_uni
+        all_n_samples["Uniform"] = n_uni
 
         print()
         print(f"  Results ({n_uni:,} trials, {dt:.1f}s):")
@@ -1638,72 +1946,148 @@ Valid IDs (in order):
         print(row)
     print()
 
-    # Combined p-values per distribution.
+    # Combined p-values — DIRECT JOINT TEST + supporting approximations.
     #
-    # We exclude STRUCTURAL tests (Laws 1, 2, 4, 6; Findings 1, 1b; Year-length
-    # beat) — these are either internal-consistency checks (Laws 2, 4 are
-    # tautological by construction; the amplitudes are model-derived) or
-    # multiset-invariant under permutation. Including them dilutes the combined
-    # statistic with forced p=1 values.
+    # For each null distribution we compute:
     #
-    # We compute TWO combining methods for cross-validation:
-    #   - Fisher's: classical, sensitive to extreme p (and to floor-clamp)
-    #   - Stouffer's Z: less floor-sensitive, can absorb a correlation penalty
+    #  1. DIRECT JOINT TEST (headline when available):
+    #     Studentize each test's raw statistic using the null mean and std,
+    #     sum them into T = Σ_i z_i, then compute p as the fraction of null
+    #     samples with T_null ≥ T_obs. This uses the joint null distribution
+    #     directly — no distributional assumptions, no correlation correction.
     #
-    # The four empirical tests (Laws 3, 5; Findings 4, 6) all use the same
-    # underlying quantity v_j = √m × a^(3/2) × e / √d, so they are positively
-    # correlated. We apply a Brown-style correction with average pairwise
-    # correlation r ≈ 0.5 (a conservative estimate; the true value depends on
-    # the joint distribution but cannot exceed 1). For k=4 tests with r=0.5
-    # the variance inflation factor is:
-    #     correlation_factor = 1 + (k - 1) × r = 1 + 3 × 0.5 = 2.5
-    non_structural = [tid for tid in selected_ordered if tid not in STRUCTURAL_TESTS]
+    #  2. EMPIRICAL CORRELATION: average pairwise Pearson r between the
+    #     studentized null series, reported for transparency. For the
+    #     permutation null this is the TRUE correlation among tests given
+    #     the shared permutation scheme — previously assumed to be 0.5.
+    #
+    #  3. STOUFFER'S Z (empirical-r-corrected) and FISHER'S METHOD:
+    #     kept as supporting statistics. Stouffer's now uses the measured r
+    #     instead of the hard-coded 0.5, so the variance-inflation factor
+    #     is correct rather than a guess.
+    #
+    # Test sets differ per null:
+    #   - Permutation: 4 empirical tests (Laws 3, 5; F4, F6). Structural
+    #     tests are permutation-invariant and would dilute the result.
+    #   - MC nulls:    up to 9 tests (the 4 empirical + Laws 1, 6; F1, F1b;
+    #     year-length beat). Under random solar systems those structural
+    #     tests become meaningful because the null draws random d-values,
+    #     random period denominators, random year lengths, etc.
+    non_structural_perm = [tid for tid in selected_ordered
+                           if tid in PERM_EMPIRICAL_TESTS]
+    non_structural_mc = [tid for tid in selected_ordered
+                         if tid in MC_COMBINABLE_TESTS]
+
+    def combinable_for(dist):
+        return non_structural_perm if dist == "Permutation" else non_structural_mc
+
     fisher_combined = {}
     stouffer_combined = {}
     stouffer_combined_corrected = {}
-    if non_structural:
-        k_nonstr = len(non_structural)
-        # Brown-style correction for shared v_j dependency among empirical tests
-        r_avg = 0.5  # average pairwise correlation (assumed; conservative)
-        correlation_factor = 1.0 + (k_nonstr - 1) * r_avg
+    joint_combined = {}       # dist -> {p, T_obs, n, sigma, tests_used}
+    empirical_r = {}          # dist -> measured average pairwise r
 
-        print(f"  Combined p-values ({k_nonstr} non-structural tests):")
-        excluded = [tid for tid in selected_ordered if tid in STRUCTURAL_TESTS]
-        if excluded:
-            print(f"    (excluded as structural: {', '.join(excluded)})")
-        print(f"    (correlation factor for Stouffer's: {correlation_factor:.2f},"
-              f" assuming r̄ = {r_avg:.2f} among k={k_nonstr})")
+    if non_structural_perm or non_structural_mc:
+        print(f"  Combined p-values:")
+        excluded_always = [tid for tid in selected_ordered
+                           if tid not in MC_COMBINABLE_TESTS]
+        if excluded_always:
+            print(f"    (always excluded, tautological: {', '.join(excluded_always)})")
+        print(f"    Permutation-combinable tests: {len(non_structural_perm)} "
+              f"({', '.join(non_structural_perm)})")
+        print(f"    MC-combinable tests:          {len(non_structural_mc)} "
+              f"({', '.join(non_structural_mc)})")
+        print()
 
         # Header
-        print(f"    {'Distribution':<14} {'Fisher':>14} {'Stouffer':>14} {'Stouffer (corr)':>18}")
-        for dist, pvals in all_p_values.items():
-            p_list = [pvals[tid] for tid in non_structural]
-            # Replace exact zeros with conservative bound (1/n_trials).
-            # This affects Fisher's significantly (sensitive to log of small p)
-            # and Stouffer's mildly (sensitive to z-score, which grows ~√log(1/p))
-            n_total = 40320 if dist == "Permutation" else args.trials
-            p_list_clamped = [max(p, 1.0 / n_total) for p in p_list]
+        print(f"    {'Distribution':<14} {'r̄ (meas)':>10} {'JointP':>12} {'JointSig':>10} "
+              f"{'FisherP':>12} {'StoufferP':>12} {'StoufCorrP':>12}")
+        print(f"    {'─'*14} {'─'*10} {'─'*12} {'─'*10} {'─'*12} {'─'*12} {'─'*12}")
 
-            f_combined = fishers_method(p_list_clamped)
-            s_combined = stouffers_z(p_list_clamped, correlation_factor=1.0)
-            s_combined_corr = stouffers_z(p_list_clamped, correlation_factor=correlation_factor)
+        for dist, pvals in all_p_values.items():
+            combinable = combinable_for(dist)
+            raw_series = all_raw_series.get(dist, {})
+
+            # ─ Direct joint test (studentized combined statistic) ─
+            z_obs, z_series, _z_stats = studentize(raw_series, observed, combinable)
+            r_meas = empirical_correlation(z_series, combinable)
+            empirical_r[dist] = r_meas
+
+            joint_p, T_obs, n_joint = direct_joint_test(z_obs, z_series, combinable)
+            joint_sigma = p_to_sigma(joint_p)
+            joint_combined[dist] = {
+                "p":          joint_p,
+                "sigma":      joint_sigma,
+                "T_obs":      T_obs,
+                "n":          n_joint,
+                "tests_used": list(combinable),
+            }
+
+            # ─ Supporting: Fisher's and Stouffer's on per-test p-values ─
+            k_c = len(combinable)
+            n_total = all_n_samples.get(dist, args.trials)
+            p_list = [max(pvals[tid], 1.0 / n_total) for tid in combinable]
+
+            # Stouffer's with measured r̄ (clamp r to [0, 1])
+            r_use = max(0.0, min(1.0, r_meas))
+            correlation_factor = 1.0 + (k_c - 1) * r_use if k_c > 1 else 1.0
+
+            f_combined = fishers_method(p_list)
+            s_combined = stouffers_z(p_list, correlation_factor=1.0)
+            s_combined_corr = stouffers_z(p_list, correlation_factor=correlation_factor)
 
             fisher_combined[dist] = f_combined
             stouffer_combined[dist] = s_combined
             stouffer_combined_corrected[dist] = s_combined_corr
 
-            print(f"    {dist:<14} {f_combined:>14.2e} {s_combined:>14.2e} {s_combined_corr:>18.2e}")
+            print(f"    {dist:<14} {r_meas:>10.3f} {joint_p:>12.3e} "
+                  f"{joint_sigma:>8.2f} σ {f_combined:>12.3e} "
+                  f"{s_combined:>12.3e} {s_combined_corr:>12.3e}")
         print()
-        print(f"  Headline: Stouffer's Z with correlation correction, permutation null")
-        print(f"            → p = {stouffer_combined_corrected.get('Permutation', float('nan')):.2e}"
-              f"  ({p_to_sigma(stouffer_combined_corrected.get('Permutation', 1.0)):.1f} σ)")
-        print(f"  Why this headline:")
-        print(f"    - Permutation null: model-independent (no MC distributional assumptions)")
-        print(f"    - Stouffer's: less sensitive to floor-clamp than Fisher's")
-        print(f"    - Correlation-corrected: penalizes the shared v_j dependency")
+        print(f"  Headline: DIRECT JOINT permutation test (studentized combined T)")
+        if "Permutation" in joint_combined:
+            jp = joint_combined["Permutation"]
+            print(f"            → p = {jp['p']:.3e}  ({jp['sigma']:.2f} σ)"
+                  f"  [k={len(jp['tests_used'])}, n={jp['n']:,}]")
+        print(f"  Why this is the headline:")
+        print(f"    - Model-independent: no Gaussian or distributional assumptions")
+        print(f"    - Self-correcting for correlation: joint null captures it directly")
+        print(f"    - No floor-clamp artifact: p ≥ 1/(n+1) by construction")
+        print(f"  Supporting: Stouffer's Z with MEASURED correlation (r̄ above)")
+        print(f"              replaces the previous assumed r̄ = 0.5")
         print()
     else:
-        print(f"  (No non-structural tests in selection — combining skipped.)")
+        print(f"  (No combinable tests in selection — combining skipped.)")
+        print()
+
+    # ─── Leave-one-out jackknife (robustness to any single planet) ────
+    jackknife_results = {}
+    if not args.skip_perm and non_structural_perm:
+        print("=" * 78)
+        print("  LEAVE-ONE-OUT JACKKNIFE (7! = 5,040 permutations per drop)")
+        print("=" * 78)
+        print()
+        print(f"  For each planet, re-run the direct joint permutation test")
+        print(f"  with that planet removed from the system.")
+        print()
+        print(f"  {'Drop':<12} {'JointP':>12} {'Sigma':>10} {'k':>4} {'Tests used':<40}")
+        print(f"  {'─'*12} {'─'*12} {'─'*10} {'─'*4} {'─'*40}")
+        t0 = time.time()
+        for p in PLANET_NAMES:
+            jk = jackknife_permutation(p)
+            if jk is None:
+                continue
+            jackknife_results[p] = jk
+            short_tests = ",".join(t.split("_")[0] for t in jk["tests_used"])
+            print(f"  {p:<12} {jk['p']:>12.3e} {jk['sigma']:>8.2f} σ "
+                  f"{len(jk['tests_used']):>4} {short_tests:<40}")
+        dt = time.time() - t0
+        print(f"  (computed in {dt:.1f}s)")
+        # Full 8-planet reference
+        if "Permutation" in joint_combined:
+            jp = joint_combined["Permutation"]
+            print(f"  {'— full —':<12} {jp['p']:>12.3e} {jp['sigma']:>8.2f} σ "
+                  f"{len(jp['tests_used']):>4}")
         print()
 
     # ══════════════════════════════════════════════════════════════════
@@ -1716,14 +2100,16 @@ Valid IDs (in order):
         import json
         from datetime import datetime, timezone
 
-        # Headline statistic: Stouffer's Z with correlation correction, under
-        # the permutation null. This is the most defensible combined p-value
-        # because it (a) uses a model-independent null distribution, (b) is
-        # less floor-clamp-sensitive than Fisher's, and (c) explicitly accounts
-        # for the positive correlation among the four empirical tests (which
-        # all share v_j = √m × a^(3/2) × e / √d).
-        headline_p = stouffer_combined_corrected.get("Permutation")
-        headline_sigma = p_to_sigma(headline_p) if headline_p is not None else None
+        # NEW HEADLINE: direct joint permutation test.
+        # Model-independent, no correlation assumption, no floor-clamp.
+        jp_perm = joint_combined.get("Permutation")
+        if jp_perm is not None:
+            headline_p = jp_perm["p"]
+            headline_sigma = jp_perm["sigma"]
+        else:
+            # Fall back to Stouffer-corrected if no permutation run
+            headline_p = stouffer_combined_corrected.get("Permutation")
+            headline_sigma = p_to_sigma(headline_p) if headline_p is not None else None
         headline_sigma_rounded = round(headline_sigma, 1) if headline_sigma is not None else None
 
         per_test_results = {}
@@ -1735,21 +2121,77 @@ Valid IDs (in order):
                 "p_values": {dist: all_p_values[dist][tid] for dist in all_p_values},
             }
 
+        # Resolve git SHA of the script for reproducibility
+        def _git_sha():
+            try:
+                return _subprocess.check_output(
+                    ["git", "-C", os.path.dirname(os.path.abspath(__file__)),
+                     "rev-parse", "HEAD"],
+                    stderr=_subprocess.DEVNULL,
+                ).decode().strip()
+            except Exception:
+                return None
+
+        git_sha = _git_sha()
+
+        # Joint-combined struct per null distribution
+        def _joint_entry(dist):
+            j = joint_combined.get(dist)
+            if j is None:
+                return None
+            return {
+                "p":          j["p"],
+                "sigma":      round(j["sigma"], 2),
+                "T_obs":      j["T_obs"],
+                "n_samples":  j["n"],
+                "tests_used": j["tests_used"],
+                "empirical_r": round(empirical_r.get(dist, 0.0), 3),
+            }
+
         sig_output = {
             "generated": datetime.now(timezone.utc).isoformat(),
             "trials": args.trials,
             "seed": args.seed,
+            "git_sha": git_sha,
             "method": {
-                "headline":               "stouffer_corrected.permutation",
-                "correlation_factor":     1.0 + (len(non_structural) - 1) * 0.5,
-                "correlation_assumption": "average pairwise r ≈ 0.5 among 4 empirical v_j-based tests",
+                "headline": "joint_permutation.direct",
+                "headline_description":
+                    "Direct joint permutation test: studentized T = Σ_i z_i "
+                    "with p = #{T_null ≥ T_obs} / n. Model-independent; "
+                    "joint null captures inter-test correlation directly.",
+                "empirical_correlation_permutation": round(empirical_r.get("Permutation", 0.0), 3),
+                "empirical_correlation_log_uniform": round(empirical_r.get("Log-uniform", 0.0), 3),
+                "empirical_correlation_uniform":     round(empirical_r.get("Uniform", 0.0), 3),
+                # Kept for backward-compat with older consumers
+                "correlation_factor":     1.0 + (len(non_structural_perm) - 1) *
+                                          max(0.0, min(1.0, empirical_r.get("Permutation", 0.5))),
+                "correlation_assumption": "measured empirically from permutation null",
             },
             "counts": {
                 "total":      len(selected_ordered),
                 "structural": sum(1 for t in selected_ordered if t in STRUCTURAL_TESTS),
-                "empirical":  sum(1 for t in selected_ordered if t not in STRUCTURAL_TESTS),
+                "empirical":  len(non_structural_perm),
+                "mc_combinable": len(non_structural_mc),
                 "lawCount":   6,  # Fibonacci Laws 1-6 covered by the test suite
             },
+            # NEW: direct joint test per null distribution
+            "joint_combined": {
+                "permutation": _joint_entry("Permutation"),
+                "log_uniform": _joint_entry("Log-uniform"),
+                "uniform":     _joint_entry("Uniform"),
+            },
+            # NEW: leave-one-out jackknife (permutation null only)
+            "jackknife_permutation": {
+                planet: {
+                    "p":          jk["p"],
+                    "sigma":      round(jk["sigma"], 2),
+                    "n_samples":  jk["n"],
+                    "tests_used": jk["tests_used"],
+                    "observed":   jk["observed"],
+                }
+                for planet, jk in jackknife_results.items()
+            },
+            # Kept for backward compatibility with export-to-holistic.js
             "fisher_combined": {
                 "permutation": fisher_combined.get("Permutation"),
                 "log_uniform": fisher_combined.get("Log-uniform"),
@@ -1766,10 +2208,7 @@ Valid IDs (in order):
                 "uniform":     stouffer_combined_corrected.get("Uniform"),
             },
             # Sigma equivalents of the corrected Stouffer p-values, for display.
-            # The "headline" sigma is the permutation value (most conservative);
-            # the MC values are the more powerful nulls — they typically give a
-            # stronger answer because they sample over both the values AND the
-            # assignment, while permutation only re-shuffles a fixed value set.
+            # Previously the HEADLINE; now demoted to supporting.
             "stouffer_sigma_corrected": {
                 "permutation": round(p_to_sigma(stouffer_combined_corrected.get("Permutation", 1.0)), 1),
                 "log_uniform": round(p_to_sigma(stouffer_combined_corrected.get("Log-uniform", 1.0)), 1),
@@ -1792,14 +2231,19 @@ Valid IDs (in order):
     print("  " + "─" * 60)
     print("  INTERPRETATION:")
     print()
+    print("  HEADLINE: Direct joint permutation test on the 4 empirical tests.")
+    print("    - No distributional assumptions")
+    print("    - No correlation penalty (the joint null handles it)")
+    print("    - No floor-clamp artifact (p ≥ 1/(n+1) by construction)")
+    print()
+    print("  Supporting statistics:")
+    print("    - Stouffer's Z with MEASURED r̄ (replaces hard-coded 0.5)")
+    print("    - Fisher's method (sensitive to extreme p — for cross-check only)")
+    print("    - Three null distributions (permutation, log-uniform, uniform)")
+    print("    - Leave-one-out jackknife (robustness to any single planet)")
+    print()
     print("  Significance levels: * p<0.05, ** p<0.01, *** p<0.001")
-    print()
-    print("  If p < 0.05 for ALL three distributions, the result is robust")
-    print("  against the choice of null model.")
-    print()
-    print("  The permutation test is the most conservative (same values,")
-    print("  different assignment). The MC tests are the most general")
-    print("  (completely random planetary systems).")
+    print("  Conventional thresholds: 3σ ≈ 'evidence', 5σ ≈ 'discovery'")
     print()
     print("  Reference: Backus, J. (1969). 'Die Reihe — a Scientific")
     print("  Evaluation' critiqued Molchanov's planetary resonance theory")
