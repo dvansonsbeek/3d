@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-11T21:34:14.926Z",
+  "generated": "2026-04-12T09:19:02.899Z",
   "threshold": 99.994,
   "searchSpace": 7558272,
   "count": 765,
@@ -8,6 +8,7 @@
     "rank": 7,
     "inclBalance": 99.9972338257403,
     "eccBalance": 99.88647989036204,
+    "eccBalanceJ2000": 99.87534335666744,
     "saturnPredicted": 0.05373537229426289,
     "saturnActual": 0.05385751185431099,
     "saturnPredErrPct": -0.22678277522083834,

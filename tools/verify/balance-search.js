@@ -104,7 +104,29 @@ function fbeCalcApparentIncl(year, planetKey, planetMean, planetAmplitude, plane
   return Math.acos(Math.min(1, Math.max(-1, cosAngle))) * 180 / Math.PI;
 }
 
-// ── Balance computation (reproduces computeBalanceResults from script.js) ──
+// ── Pre-computed per-planet constants for fast balance check ──
+const _wCoeff = {};  // inclination balance coefficient per planet
+const _vCoeff = {};  // eccentricity balance coefficient (base) per planet
+const _vCoeffJ = {}; // eccentricity balance coefficient (J2000) per planet
+const _sqrtMass = {};
+for (const key of planets) {
+  _sqrtMass[key] = Math.sqrt(mass[key]);
+  _wCoeff[key] = Math.sqrt(mass[key] * orbitDistance[key] * (1 - eccBase[key] * eccBase[key]));
+  _vCoeff[key] = _sqrtMass[key] * Math.pow(orbitDistance[key], 1.5) * eccBase[key];
+  _vCoeffJ[key] = _sqrtMass[key] * Math.pow(orbitDistance[key], 1.5) * eccJ2000[key];
+}
+
+// ── Fast inclination balance only (for 7.5M screening) ──
+function computeInclBalance(config) {
+  let wPro = 0, wAnti = 0;
+  for (const key of planets) {
+    const w = _wCoeff[key] / config[key].d;
+    if (config[key].group !== 'anti-phase') wPro += w; else wAnti += w;
+  }
+  return (1 - Math.abs(wPro - wAnti) / (wPro + wAnti)) * 100;
+}
+
+// ── Full balance computation (only for configs passing threshold) ──
 function computeBalance(config) {
   const planetResults = {};
   let allPass = true;
@@ -113,18 +135,13 @@ function computeBalance(config) {
     const d = config[key].d;
     const isAntiPhase = config[key].group === 'anti-phase';
     const phaseAngle = perPlanetPhase[key];
-    const sqrtM = Math.sqrt(mass[key]);
-    const amplitude = (d > 0) ? PSI / (d * sqrtM) : NaN;
+    const amplitude = (d > 0) ? PSI / (d * _sqrtMass[key]) : NaN;
     const cosPhaseJ2000 = Math.cos((periLongJ2000[key] - phaseAngle) * DEG2RAD);
     const mean = inclJ2000[key] - (isAntiPhase ? -1 : 1) * amplitude * cosPhaseJ2000;
     const rangeMin = mean - amplitude;
     const rangeMax = mean + amplitude;
-    // LL bounds have uncertainty (~0.03° from mass uncertainties + secular theory truncation).
-    // Treat anything within this tolerance as "within bounds".
-    const LL_UNCERTAINTY = 0.03; // degrees
+    const LL_UNCERTAINTY = 0.03;
     const fitsLL = rangeMin >= llBounds[key].min - LL_UNCERTAINTY && rangeMax <= llBounds[key].max + LL_UNCERTAINTY;
-    // LL overshoot: absolute degrees by which the model range exceeds LL bounds
-    // 0 = fully within bounds. Compare against LL uncertainty (~0.03-0.05° typical)
     const undershoot = Math.max(0, llBounds[key].min - rangeMin);
     const overshoot = Math.max(0, rangeMax - llBounds[key].max);
     const llOvershootDeg = undershoot + overshoot;
@@ -141,31 +158,38 @@ function computeBalance(config) {
     planetResults[key] = { amplitude, mean, rangeMin, rangeMax, fitsLL, llOvershootDeg, directionMatch };
   }
 
-  // Inclination balance (w = √(m·a·(1-e²)) / d × amplitude, but amplitude = PSI/(d×√m))
+  // Inclination balance
   let wPro = 0, wAnti = 0;
   for (const key of planets) {
-    const w = Math.sqrt(mass[key] * orbitDistance[key] * (1 - eccBase[key] * eccBase[key])) / config[key].d;
+    const w = _wCoeff[key] / config[key].d;
     if (config[key].group !== 'anti-phase') wPro += w; else wAnti += w;
   }
   const inclBalance = (1 - Math.abs(wPro - wAnti) / (wPro + wAnti)) * 100;
 
-  // Eccentricity balance (v = √m × a^1.5 × e_base / √d)
+  // Eccentricity balance (base)
   let vPro = 0, vAnti = 0;
   for (const key of planets) {
-    const v = Math.sqrt(mass[key]) * Math.pow(orbitDistance[key], 1.5) * eccBase[key] / Math.sqrt(config[key].d);
+    const v = _vCoeff[key] / Math.sqrt(config[key].d);
     if (config[key].group !== 'anti-phase') vPro += v; else vAnti += v;
   }
   const eccBalance = (1 - Math.abs(vPro - vAnti) / (vPro + vAnti)) * 100;
 
-  // LL bounds: count passes and max overshoot (clamped by uncertainty)
-  const LL_UNCERTAINTY = 0.03; // degrees — LL theory uncertainty
+  // Eccentricity balance (J2000)
+  let vProJ = 0, vAntiJ = 0;
+  for (const key of planets) {
+    const v = _vCoeffJ[key] / Math.sqrt(config[key].d);
+    if (config[key].group !== 'anti-phase') vProJ += v; else vAntiJ += v;
+  }
+  const eccBalanceJ2000 = (1 - Math.abs(vProJ - vAntiJ) / (vProJ + vAntiJ)) * 100;
+
+  // LL bounds summary
+  const LL_UNCERTAINTY = 0.03;
   const llPassCount = planets.filter(p => planetResults[p].fitsLL).length;
   const dirPassCount = planets.filter(p => planetResults[p].directionMatch).length;
   const maxLLOvershootRaw = Math.max(...planets.map(p => planetResults[p].llOvershootDeg));
-  // Effective overshoot: anything within LL uncertainty is treated as 0
   const maxLLOvershoot = Math.max(0, maxLLOvershootRaw - LL_UNCERTAINTY);
 
-  return { inclBalance, eccBalance, llPassCount, dirPassCount, maxLLOvershoot, maxLLOvershootRaw, allPass, planetResults };
+  return { inclBalance, eccBalance, eccBalanceJ2000, llPassCount, dirPassCount, maxLLOvershoot, maxLLOvershootRaw, allPass, planetResults };
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -190,7 +214,7 @@ const currentConfig = {
 const curResult = computeBalance(currentConfig);
 console.log(`\nCurrent config:`);
 console.log(`  Inclination balance: ${curResult.inclBalance.toFixed(4)}%`);
-console.log(`  Eccentricity balance: ${curResult.eccBalance.toFixed(4)}%`);
+console.log(`  Eccentricity balance: ${curResult.eccBalance.toFixed(4)}% (base), ${curResult.eccBalanceJ2000.toFixed(4)}% (J2000)`);
 console.log(`  LL bounds pass: ${curResult.llPassCount}/8`);
 console.log(`  Direction pass: ${curResult.dirPassCount}/8`);
 console.log(`  All LL+Dir pass: ${curResult.allPass}`);
@@ -255,9 +279,12 @@ for (const scenario of scenarios) {
                         neptune: { d: fibNumbers[ni], group: groups[np] },
                       };
 
-                      const result = computeBalance(config);
+                      // Fast screening: inclination balance only (no trig)
+                      const inclBal = computeInclBalance(config);
 
-                      if (result.inclBalance >= THRESHOLD) {
+                      if (inclBal >= THRESHOLD) {
+                        // Full computation only for survivors (~765 out of 7.5M)
+                        const result = computeBalance(config);
                         count++;
                         const g = (grp) => grp === 'in-phase' ? 0 : 1;
                         allConfigs.push({
@@ -268,10 +295,6 @@ for (const scenario of scenarios) {
                           dirPassCount: result.dirPassCount,
                           maxLLOvershoot: result.maxLLOvershoot,
                           allPass: result.allPass,
-                          // Composite score: lower LL overshoot is better (0°=perfect),
-                          // then eccentricity balance, then inclination as tiebreaker.
-                          // Max overshoot capped at 1° for scoring. Configs within ~0.03° of
-                          // LL bounds are effectively equivalent (LL uncertainty).
                           score: (1 - Math.min(1, result.maxLLOvershoot)) * 10000 + result.eccBalance * 1 + result.inclBalance * 0.001,
                           row: [
                             scenario.name,
@@ -359,6 +382,7 @@ const output = {
     rank: curIdx >= 0 ? curIdx + 1 : null,
     inclBalance: curResult.inclBalance,
     eccBalance: curResult.eccBalance,
+    eccBalanceJ2000: curResult.eccBalanceJ2000,
     saturnPredicted,
     saturnActual,
     saturnPredErrPct,

@@ -195,6 +195,7 @@ if (fs.existsSync(balancePresetsPath)) {
   const balanceLines = [
     `inclBalance:     ${rnd(cc.inclBalance, 4)},   // Law 3 — in-phase vs anti-phase weights (%)`,
     `eccBalance:      ${rnd(cc.eccBalance, 4)},   // Law 5 — eccentricity weights balance (%)`,
+    `eccBalanceJ2000: ${rnd(cc.eccBalanceJ2000, 4)},   // Law 5 — J2000 snapshot eccentricity balance (%)`,
     `saturnPredErrPct:${rnd(cc.saturnPredErrPct, 4)},   // Finding 4 — Saturn e predicted vs observed (%)`,
     `threshold:       ${rnd(bp.threshold, 3)},    // TNO-margin threshold used in balance-search`,
     `presetCount:     ${bp.count},       // Configs passing threshold`,
