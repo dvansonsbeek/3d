@@ -28,7 +28,6 @@ OBSERVED (per planet)
   │  orbitalEccentricityJ2000
   │  axialTiltJ2000
   │  longitudePerihelion
-  │  orbitalEccentricityBase  (from dual-balance optimizer)
   │
   ├─── SYSTEM RESET ──► Inclination phase angle
   │       │                φ = ω̃_ICRF(t_SR)       (anti-phase)
@@ -75,7 +74,7 @@ The inclination amplitude equals the axial tilt amplitude — they are the same 
 
 ### 2. Axial precession cycle
 
-The period for each planet's spin axis to precess around its orbit normal. For Earth: H/5. For other planets: set from observations where known, predicted from Fibonacci ratios (H × d-combinations) where not yet observed.
+The period for each planet's spin axis to precess around its orbit normal. For Earth: H/13 (25,794 yr). For other planets: set from observations where known, predicted from Fibonacci ratios (H × d-combinations) where not yet observed.
 
 ### 3. Obliquity cycle
 
@@ -83,7 +82,7 @@ The beat frequency of the inclination and axial cycles: 1/P_obliquity = |1/P_inc
 
 ### 4. Eccentricity cycle (perihelion wobble)
 
-The beat frequency of the axial precession and the ICRF inclination precession: 1/P_wobble = |1/P_axial − 1/P_ICRF|. This is the period over which the eccentricity oscillates around its base value with the K-derived amplitude. For Earth: |1/(H/5) − 1/(H/3)| = 16/H, giving the H/16 perihelion precession cycle.
+The eccentricity oscillates around its base value with the K-derived amplitude at the **ecliptic perihelion precession period**. For Earth this is H/16 (20,957 yr). The ecliptic perihelion rate is the sum of the ICRF perihelion rate and the general precession: 1/(H/16) = 1/(H/3) + 1/(H/13), or equivalently 3 + 13 = 16 in the Fibonacci framework.
 
 ### 5. Ascending node cycle (invariable plane)
 
@@ -105,7 +104,7 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 
 ## System Reset
 
-The System Reset epoch (≈ −2,649,854) is the year where all 7 non-Earth planets simultaneously reach their inclination extremes:
+The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Grand Holistic Octave (≈ −2,649,854). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
 - Anti-phase planet (Saturn): at **maximum** inclination
@@ -122,7 +121,7 @@ The model has 6 free parameters:
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
 3. **Mean obliquity** — Earth's mean axial tilt (23.4135°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF
-5. **Planet configuration** — which d goes to which planet — 0 DOF (unique solution from exhaustive search)
+5. **Planet configuration** — which d goes to which planet — 0 DOF (unique mirror-symmetric solution among 41 viable candidates from 7,558,272 exhaustively tested; five successive physical filters)
 
 From these free parameters, the model derives:
 
