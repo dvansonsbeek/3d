@@ -237,44 +237,24 @@ Earth–Saturn is the only pair with opposite balance groups (in-phase vs anti-p
 
 ### Finding 2: Configuration Uniqueness
 
-The exhaustive search evaluates 7,558,272 configurations (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Four independent filters constrain the solution space:
+The exhaustive search evaluates 7,558,272 candidates (see [Exhaustive Search](#exhaustive-search-and-preset-generation)). Five successive physical filters narrow these to a single mirror-symmetric solution:
 
-- **Balance ≥ 99.994%** — the inclination balance exceeds the TNO margin
-- **Mirror symmetry** — inner/outer d-values match across the asteroid belt (Me↔Ur, Ve↔Ne, Ea↔Sa, Ma↔Ju)
-- **Saturn-solo** — Saturn is the only anti-phase planet (all others in-phase)
-- **LL bounds** — all 8 planets' inclination ranges fall within Laplace-Lagrange secular theory bounds
+| Filter | Surviving |
+|--------|----------|
+| Inclination balance ≥ 99.994% (TNO margin) | 765 |
+| + Eccentricity balance ≥ 99% | 94 |
+| + Per-config optimised anchor gives LL bounds 8/8 | 49 |
+| + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 41 |
+| + Mirror symmetry | **1** |
 
-These are overlapping, not nested, constraints (full analysis: [configuration-analysis.js](../tools/verify/configuration-analysis.js)):
+Each of the 94 candidates passing both balance thresholds is evaluated at its own optimal anchor position (*n*) and ascending node integers (*N* per planet), making the LL and direction checks fair — not biased toward any single configuration. Jupiter and Saturn are constrained to share the same *N*.
 
-| Filter | Count | % of total |
-|--------|------:|------------|
-| Total search space | 7,558,272 | 100% |
-| **Single filters** | | |
-| Balance ≥ 99.994% | 765 | 0.0101% |
-| Mirror-symmetric | 2,592 | 0.0343% |
-| Saturn-solo | 236,196 | 3.125% |
-| LL bounds | 739,200 | 9.780% |
-| **Two-filter intersections** | | |
-| Mirror ∩ Balance | 1 | 0.0000132% |
-| Saturn-solo ∩ Balance | 15 | 0.000199% |
-| Saturn-solo ∩ LL bounds | 36,288 | 0.480% |
-| Mirror ∩ Saturn-solo | 81 | 0.00107% |
-| Mirror ∩ LL bounds | 380 | 0.00503% |
-| Balance ∩ LL bounds | 180 | 0.00238% |
-| **Three-filter intersections** | | |
-| Saturn-solo ∩ Balance ∩ LL bounds | 5 | 0.0000662% |
-| Mirror ∩ Saturn-solo ∩ LL bounds | 36 | 0.000476% |
-| Mirror ∩ Saturn-solo ∩ Balance | 1 | 0.0000132% |
-| Mirror ∩ Balance ∩ LL bounds | 1 | 0.0000132% |
-| **All four filters** | | |
-| Mirror ∩ Saturn-solo ∩ LL bounds ∩ Balance ≥ 99.994% | **1** | 0.0000132% |
-
-That single configuration is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34) — the unique mirror-symmetric solution.
+The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #8 of 41 by eccentricity balance (99.89%). All 41 candidates are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
 
 **Key structural constraints:**
 
-- **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric configurations.
-- **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune). Of the 81 mirror + Saturn-solo configs, 36 pass LL bounds — exactly the 6 × 6 grid where both pair d-values are ≥ 5.
+- **Mirror symmetry requires Scenario A.** Since Earth is locked at d=3, the Earth↔Saturn mirror pair forces Sa=3, which only occurs in Scenario A (Ju=5, Sa=3). Scenarios B/C/D have zero mirror-symmetric candidates.
+- **LL bounds impose a floor of d ≥ 5** for the free mirror pairs (Mercury↔Uranus and Venus↔Neptune).
 - **Balance selects one.** Among those 36 LL-valid mirror + Saturn-solo configs, only the default configuration achieves balance ≥ 99.994%.
 
 The mirror symmetry, combined with the six laws, uniquely determines all 8 Fibonacci divisor assignments.
@@ -675,7 +655,7 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `data/balance-presets.json` containing all qualifying configurations sorted by composite score (LL overshoot + eccentricity balance + inclination balance). The current run yields 765 presets across all four scenarios.
+The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised anchor, ascending nodes, and phase angles), sorted by eccentricity balance. The current run yields 41 presets.
 
 ### Shared Input Values
 
@@ -746,9 +726,9 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
-| [Balance Search](../tools/verify/balance-search.js) | Exhaustive Fibonacci divisor search |
+| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 41 survivors with per-config optimised anchor and ascending nodes |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
-| [Configuration Analysis](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M configurations |
+| [Configuration Analysis](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of all 7.56M configurations (superseded by the sequential pipeline in balance-search.js) |
 | [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Balance decomposition, sensitivity, TNO closed-system argument |
 | [Epoch Independence](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 

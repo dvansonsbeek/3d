@@ -125,9 +125,9 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | [inclination-optimization.js](../tools/verify/inclination-optimization.js) | Computes Fibonacci-derived inclination amplitudes and means with balance verification |
 | [inclination-verification.js](../tools/verify/inclination-verification.js) | Verifies inclination parameters against J2000 and JPL trends |
 | [mercury-precession-centuries.js](../tools/verify/mercury-precession-centuries.js) | Mercury perihelion precession analysis by century |
-| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search of all Fibonacci divisor configurations; composite ranking (LL overshoot + eccentricity balance + inclination balance); generates data/balance-presets.json |
+| [balance-search.js](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline (7.5M → 41 survivors) with per-config optimised anchor and ascending nodes; generates data/balance-presets.json |
 | [verify-laws.js](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws + findings |
-| [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Filter intersection analysis of all 7.56M Fibonacci divisor configurations |
+| [configuration-analysis.js](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of 7.56M configs (superseded by the sequential pipeline in balance-search.js) |
 | [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) | Pair decomposition, Law 5 sensitivity analysis |
 | [epoch-independence.js](../tools/verify/epoch-independence.js) | AMD exchange across mirror pairs, balance stability across Saturn's secular cycle |
 

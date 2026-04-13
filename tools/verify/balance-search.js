@@ -747,6 +747,7 @@ output.deepAnalysis = {
 // former 765-row "all passing incl threshold" list with a smaller, richer set
 // that includes per-config optimized anchor, ascending nodes, and phase angles.
 const DEEP_MAX_RATE_ERROR = 5.0;  // arcsec — max total rate error across 7 planets
+const deepLLValidCount = deepResults.filter(r => r.bestAnchor).length;
 const deepSurvivors = deepResults.filter(r =>
   r.bestAnchor && r.bestAnchor.totalErr <= DEEP_MAX_RATE_ERROR
 );
@@ -781,6 +782,14 @@ output.presets = deepSurvivors.map(r => {
   ];
 });
 output.presetCount = deepSurvivors.length;
+output.deepAnalysis.llValidCount = deepLLValidCount;
+output.deepAnalysis.maxRateError = DEEP_MAX_RATE_ERROR;
+output.deepAnalysis.survivorCount = deepSurvivors.length;
+
+// Update currentConfig.rank to reflect the position in the deep survivors
+// (sorted by ecc balance), not in the raw allConfigs (sorted by composite score).
+const deepRankIdx = deepSurvivors.findIndex(r => r.isConfig7);
+if (deepRankIdx >= 0) output.currentConfig.rank = deepRankIdx + 1;
 
 // Re-write the output file with deep analysis + extended presets
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));

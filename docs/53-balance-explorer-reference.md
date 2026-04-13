@@ -74,7 +74,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **765 pre-computed configurations** that achieve ≥99.994% inclination balance, ranked by composite score (LL overshoot + eccentricity balance + inclination balance). These are grouped by Jupiter/Saturn d-value scenario:
+A dropdown in the header offers **41 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Sorted by eccentricity balance, grouped by Jupiter/Saturn scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -203,7 +203,7 @@ Useful experiments to try:
 | Change Saturn to in-phase group | Balance collapses (all planets on one side) |
 | Increase Neptune d from 34 to 55 | Amplitude decreases, may still pass LL bounds |
 | Set Jupiter d to large value (e.g., 55) | Jupiter amplitude shrinks, balance breaks |
-| Use Preset dropdown | See all 765 valid configurations |
+| Use Preset dropdown | See all 41 surviving configurations |
 | Look for the default configuration (Scenario A) | The unique mirror-symmetric solution |
 
 ### Why Earth Is Locked
@@ -242,7 +242,7 @@ Expected results:
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is the default configuration out of 765 valid configurations (rank 7 by composite score) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is the default configuration out of 41 survivors (ranked #8 by eccentricity balance) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 
@@ -416,7 +416,7 @@ fits = (mean − amplitude ≥ LL_min − 0.01) AND (mean + amplitude ≤ LL_max
 | Component | Location |
 |-----------|----------|
 | `BALANCE_PLANETS` array | [script.js:9207](../src/script.js#L9207) |
-| `BALANCE_PRESETS` (765 configs) | [script.js:9216](../src/script.js#L9216) |
+| `BALANCE_PRESETS` (41 configs) | [script.js:9216](../src/script.js#L9216) |
 | `D_VALUE_OPTIONS` | [script.js:9330](../src/script.js#L9330) |
 | `BALANCE_CONFIG` | [script.js:9348](../src/script.js#L9348) |
 | `computeBalanceResults()` | [script.js:9497](../src/script.js#L9497) |

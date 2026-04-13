@@ -192,15 +192,22 @@ if (fs.existsSync(balancePresetsPath)) {
   const bp = JSON.parse(fs.readFileSync(balancePresetsPath, 'utf8'));
   const cc = bp.currentConfig || {};
   const rnd = (n, d) => Number.parseFloat((Number(n)).toFixed(d));
+  const da = bp.deepAnalysis || {};
   const balanceLines = [
     `inclBalance:     ${rnd(cc.inclBalance, 4)},   // Law 3 — in-phase vs anti-phase weights (%)`,
     `eccBalance:      ${rnd(cc.eccBalance, 4)},   // Law 5 — eccentricity weights balance (%)`,
     `eccBalanceJ2000: ${rnd(cc.eccBalanceJ2000, 4)},   // Law 5 — J2000 snapshot eccentricity balance (%)`,
     `saturnPredErrPct:${rnd(cc.saturnPredErrPct, 4)},   // Finding 4 — Saturn e predicted vs observed (%)`,
     `threshold:       ${rnd(bp.threshold, 3)},    // TNO-margin threshold used in balance-search`,
-    `presetCount:     ${bp.count},       // Configs passing threshold`,
+    `presetCount:     ${bp.count},       // Configs passing inclination balance threshold`,
     `configNumber:    ${cc.rank},         // Current config's rank within sorted presets`,
     `searchSpace:     ${bp.searchSpace},   // Exhaustive search space size`,
+    `// Deep analysis pipeline counts:`,
+    `deepEccThreshold:    ${da.eccThreshold || 99},     // Eccentricity balance threshold (%)`,
+    `deepCandidateCount:  ${da.candidateCount || 94},   // Configs passing incl + ecc thresholds`,
+    `deepLLValidCount:    ${da.llValidCount || 49},     // Configs with valid LL anchor`,
+    `deepSurvivorCount:   ${da.survivorCount || bp.presetCount || 41}, // Configs passing all filters (rate error ≤ max)`,
+    `deepMaxRateError:    ${da.maxRateError || 5},      // Max total rate error threshold (arcsec)`,
   ];
   constantsTs = replaceObjectLiteral(constantsTs, 'BALANCE_RESULTS', balanceLines);
 } else {

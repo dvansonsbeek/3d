@@ -1,11 +1,11 @@
 {
-  "generated": "2026-04-12T19:44:45.529Z",
+  "generated": "2026-04-13T07:43:40.093Z",
   "threshold": 99.994,
   "searchSpace": 7558272,
   "count": 765,
   "allPassCount": 0,
   "currentConfig": {
-    "rank": 7,
+    "rank": 8,
     "inclBalance": 99.9972338257403,
     "eccBalance": 99.88647989036204,
     "eccBalanceJ2000": 99.87534335666744,
@@ -7475,7 +7475,10 @@
         },
         "bestAnchor": null
       }
-    ]
+    ],
+    "llValidCount": 49,
+    "maxRateError": 5,
+    "survivorCount": 41
   },
   "presetCount": 41
 }
