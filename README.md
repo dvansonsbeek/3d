@@ -8,7 +8,7 @@
 
 > **[Live Demo](https://3d.holisticuniverse.com)** — Experience the simulation in your browser
 >
-> **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v2)** — Read the accompanying research paper
+> **[Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v3)** — Read the accompanying research paper
 
 What if the orbits of all eight planets, the wobble of Earth's axis, and the rhythm of ice ages are all governed by the same mathematical structure?
 

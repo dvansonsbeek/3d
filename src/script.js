@@ -18,7 +18,7 @@ import { Pane } from 'tweakpane';
   Fibonacci number ratios. 70 model parameters (Earth 11, Moon 3, 7 planets x 8)
   and 75 calibration inputs from astronomical observations (astro-reference.json).
 
-  Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v2
+  Preprint: https://doi.org/10.21203/rs.3.rs-8758810/v3
   Website:  https://holisticuniverse.com
 */
 
