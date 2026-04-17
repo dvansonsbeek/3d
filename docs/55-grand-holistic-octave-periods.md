@@ -80,9 +80,11 @@ Notes:
 ## Notable Patterns
 
 ### Mirror Symmetry in Periods
-- **Venus = Neptune**: ecliptic 8H/4, ICRF 8H/100
+- **Venus = Neptune**: ecliptic 8H/4, ICRF 8H/100, obliquity 8H/100, ecliptic precession −96
+- **Mercury ↔ Uranus**: ecliptic precession 8H/8 = H (identical)
+- **Mars ↔ Jupiter**: axial↔obliquity swap (16↔21), identical sum (37)
 - **Earth ICRF = Uranus ecliptic**: both 8H/24
-- **Jupiter = Saturn**: ascending node 8H/36 (the gas-giant lockstep that prevents the J–S vector pair from drifting apart)
+- **Jupiter = Saturn**: ascending node 8H/36 (gas-giant lockstep)
 - **Jupiter obliquity = Uranus obliquity**: both 8H/16
 - **Mercury axial = Mercury ascending node**: both 8H/9 (Cassini state)
 
@@ -112,6 +114,85 @@ Ecliptic perihelion ←── minus H/13 ──→ ICRF perihelion
 
 Ascending node ←── matches eigenfrequency s₁...s₈ ──→ Secular theory
 ```
+
+### Integer Arithmetic Identities
+
+Working in the 8H/N integer domain, every planetary cycle reduces to simple addition and subtraction of N values. Three universal identities connect the six cycle types:
+
+**Identity 1: Frame conversion**
+```
+N_ICRF = 104 − N_ecl    (for prograde ecliptic planets)
+```
+
+| Planet | N_ecl + N_ICRF | = 104? |
+|--------|---------------|--------|
+| Mercury | 11 + 93 | ✓ |
+| Venus | 4 + 100 | ✓ |
+| Mars | 35 + 69 | ✓ |
+| Jupiter | 40 + 64 | ✓ |
+| Uranus | 24 + 80 | ✓ |
+| Neptune | 4 + 100 | ✓ |
+
+The number 104 = 8 × 13 is Earth's axial precession N. Earth itself breaks the sum rule (N_ecl=128 > 104, giving prograde ICRF), and Saturn's retrograde ecliptic gives ICRF = 104 + 64 = 168.
+
+**Identity 2: Eccentricity cycle as integer beat**
+```
+N_ecc = |N_axial ± N_ICRF|
+```
+Opposite directions (one prograde, one retrograde) → add. Same direction → subtract.
+
+| Planet | Formula | N_ecc |
+|--------|---------|-------|
+| Mercury | \|9 − 93\| | 84 |
+| Venus | 91 + 100 | 191 |
+| Earth | 104 + 24 | 128 |
+| Mars | \|16 − 69\| | 53 |
+| Jupiter | \|21 − 64\| | 43 |
+| Saturn | \|6 − 168\| | 162 |
+| Uranus | Axial ≈ 0 → Ecc = ICRF | 80 |
+| Neptune | Axial ≈ 0 → Ecc = ICRF | 100 |
+
+Uranus and Neptune: Ecc = ICRF is the structural definition of "frozen axial" — when N_axial = 0, the beat reduces to the ICRF rate alone.
+
+**Identity 3: Obliquity decomposition**
+```
+N_ecl = N_obliq + N_eclPrec
+```
+
+| Planet | N_ecl | = N_obliq + N_eclPrec | EclPrec period |
+|--------|-------|----------------------|----------------|
+| Mercury | 11 | 3 + 8 | H (335,317 yr) |
+| Venus | 4 | 100 + (−96) | 8H/96 (27,943 yr) |
+| Earth | 128 | 64 + 64 | H/8 (41,915 yr) |
+| Mars | 35 | 21 + 14 | 8H/14 (191,610 yr) |
+| Jupiter | 40 | 16 + 24 | H/3 (111,772 yr) |
+| Saturn | 64 | 24 + 40 | H/5 (67,063 yr) |
+| Uranus | 24 | 16 + 8 | H (335,317 yr) |
+| Neptune | 4 | 100 + (−96) | 8H/96 (27,943 yr) |
+
+**Mirror pairs share identical ecliptic precession N:**
+- Mercury ↔ Uranus: N_eclPrec = 8 (period = H)
+- Venus ↔ Neptune: N_eclPrec = −96 (period = 8H/96)
+
+Earth ↔ Saturn and Mars ↔ Jupiter have different ecliptic precessions, but cross-pair links appear: Jupiter's ecliptic precession (24) = Saturn's obliquity (24), and Saturn's ecliptic precession (40) = Jupiter's ecliptic perihelion (40).
+
+### Mars–Jupiter Axial–Obliquity Swap
+
+The d=5 mirror pair exhibits exact reciprocity in the integer domain:
+
+| | Mars | Jupiter |
+|---|---|---|
+| Axial N | 16 | **21** |
+| Obliquity N | **21** | 16 |
+| \|Axial − Obliq\| | **5 = d** | **5 = d** |
+| Axial + Obliq | **37** | **37** |
+
+Mars's obliquity = Jupiter's axial, and vice versa. The difference |Axial − Obliq| equals the Fibonacci divisor d = 5 for both. The sum Axial + Obliq = 37 is identical for both.
+
+Cross-pair |Axial − Obliq| values link to other planets' N values:
+- Venus: |91 − 100| = 9 = Mercury's Cassini N
+- Mercury: |9 − 3| = 6 = Saturn's axial N
+- Earth: |104 − 64| = 40 = Earth's ascending node N
 
 ### Earth's Unique Cycle Chain
 ```
