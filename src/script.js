@@ -121,7 +121,7 @@ planets.mercury = {
   // Model parameters (from model-parameters.json)
   angleCorrection: 0.9715524542954483,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
-  axialPrecessionYears: -(holisticyearLength/(1+(3/8))),
+  axialPrecessionYears: -(8 * holisticyearLength / 9),
   startpos: 83.65192497119597,
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
@@ -1547,7 +1547,7 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Obliquity = |inclination − ecliptic| where inclination ≈ perihelion ecliptic.
 // Confirmed for Mercury (0.2%), Earth (2%), Mars (0.7%). See docs/37 §Obliquity Cycle Theory.
 // Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle (consistent with observations).
-const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (observed ~895 kyr, Bills 2005)
+const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (free prediction; Bills 2005 theoretical ~895 kyr)
 const venusObliquityCycle   = null;                          // N/A — tidally damped at 177°
 const marsObliquityCycle    = 3 * holisticyearLength / 8;    // 3H/8 = 125,744 yr (observed ~124,800 yr)
 const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,659 yr (prediction, = Mars axial)
@@ -19650,12 +19650,12 @@ function ghoComputeData() {
   // observed = published value, source = citation, predicted = true if no observation exists
   const sci = {
     mercury: {
-      axial:  { observed: '~300 kyr', source: 'Peale 2006; Margot+ 2012 (Cassini state)' },
+      axial:  { observed: '~300 kyr', source: 'Peale 2006 (theoretical); Cassini state (MESSENGER) \u2192 = asc. node', error: '0.7%' },
       ecl:    { observed: '~227 kyr (~570\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
       asc:    { observed: '231,842 yr (s\u2081)', source: 'Laskar 2004 Table 3' },
-      obliq:  { observed: '~895 kyr', source: 'Bills 2005; Yseboodt & Margot 2006', error: '0.2%' },
-      ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
+      obliq:  { observed: '~895 kyr', source: 'Bills 2005 (theoretical); free prediction via Fibonacci decomposition', error: '0.1%' },
+      ecc:    { predicted: true, source: 'Free prediction (beat of axial \u00d7 ICRF perihelion)' },
     },
     venus: {
       axial:  { observed: '~29 kyr', source: 'Cottereau & Souchay 2009' },
@@ -34466,7 +34466,7 @@ const planetStats = {
        static: true},
       {label : () => `Axial Precession Period`,
        value : [ { v: () => planets.mercury.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Mercury's spin axis to complete one full precession cycle. Negative = retrograde. Mercury is in a Cassini state: axial precession locked to orbital plane precession.`],
+       hover : [`Period for Mercury's spin axis to complete one full precession cycle. Negative = retrograde. Mercury is in a Cassini state (MESSENGER): axial precession rate = ascending node regression rate = −8H/9.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => mercuryWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],

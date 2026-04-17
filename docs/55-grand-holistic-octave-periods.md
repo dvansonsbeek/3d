@@ -46,7 +46,7 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 
 | Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
-| Mercury | 8H/11 | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/82 |
+| Mercury | **8H/9** | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/84 |
 | Venus | 8H/91 | 8H/4 | 8H/100 | **8H/1** | — | 8H/191 |
 | **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
 | Mars | 8H/16 | 8H/35 | 8H/69 | **8H/62** | 8H/21 | 8H/53 |
@@ -58,7 +58,7 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 Notes:
 - Uranus and Neptune axial precession periods are extremely long (~200M and ~23M years) — effectively frozen
 - Venus and Neptune obliquity is tidally damped / frozen — no oscillation
-- Mercury's axial precession period = ecliptic perihelion period (spin-orbit resonance)
+- Mercury's axial precession period = ascending node period (Cassini state, confirmed by MESSENGER)
 - ICRF perihelion = inclination cycle (same physical driver)
 - Earth's eccentricity cycle = perihelion precession period (H/16)
 
@@ -66,7 +66,7 @@ Notes:
 
 | Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
-| Mercury | −243,867 | 243,867 | −28,844 | **−298,060** | 894,179 | 32,714 |
+| Mercury | **−298,060** | 243,867 | −28,844 | **−298,060** | 894,179 | 31,935 |
 | Venus | +29,587 | 670,634 | −26,825 | **−2,682,536** | — | 14,069 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
 | Mars | −167,659 | 76,644 | −38,877 | **−43,267** | 125,744 | 50,614 |
@@ -84,7 +84,7 @@ Notes:
 - **Earth ICRF = Uranus ecliptic**: both 8H/24
 - **Jupiter = Saturn**: ascending node 8H/36 (the gas-giant lockstep that prevents the J–S vector pair from drifting apart)
 - **Jupiter obliquity = Uranus obliquity**: both 8H/16
-- **Mercury axial = Mercury ecliptic**: both 8H/11 (spin-orbit resonance)
+- **Mercury axial = Mercury ascending node**: both 8H/9 (Cassini state)
 
 ### Fibonacci Connections in 8H/N Divisors
 Many divisors are products of small Fibonacci numbers:

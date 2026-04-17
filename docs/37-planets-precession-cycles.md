@@ -91,7 +91,7 @@ over longer timescales.
 
 | Planet | Rate | Period | Direction | Source |
 |--------|------|--------|-----------|--------|
-| Mercury | Cassini state (locked) | ~300 kyr | Retrograde | Peale 2006; Margot+ 2012 |
+| Mercury | Cassini state (= asc. node) | 298,060 yr (model: −8H/9) | Retrograde | Peale 2006 (~300 kyr, theoretical); MESSENGER (Cassini state observed) |
 | Venus | ~44"/yr (cone period ~29 kyr) | ~29 kyr | Prograde (obliquity 177°) | Cottereau & Souchay 2009 (A&A) |
 | Earth | 50.29"/yr | 25,771 yr | Retrograde | IAU 2006 |
 | Mars | 7604 ± 6 mas/yr | 170,400 yr | Retrograde | Konopliv+ 2020 (InSight/RISE) |
@@ -101,7 +101,7 @@ over longer timescales.
 | Neptune | ~0.005 "/yr (est.) | ~70 Myr (est.) | Retrograde | Ward & Hamilton 2004 (est.) |
 
 Notes:
-- Mercury is in a Cassini state: spin axis co-precesses with orbital node.
+- Mercury is in a Cassini state (confirmed by MESSENGER): spin axis co-precesses with orbital node at −8H/9 = −298,060 yr. This constrains the axial precession rate to equal the ascending node regression rate.
 - Venus and Uranus have prograde precession because obliquity > 90° (cos flips sign).
 - Jupiter alpha depends on polar moment of inertia λ (0.220–0.265). Near resonance with s₇.
 - Saturn alpha depends on λ (0.200–0.240). Captured in resonance with s₈.
@@ -112,7 +112,7 @@ Notes:
 
 | Planet | Period | Amplitude | Character | Source |
 |--------|--------|-----------|-----------|--------|
-| Mercury | ~895 kyr | ~0.03° | Regular, tiny | Bills 2005; Yseboodt & Margot 2006 |
+| Mercury | ~895 kyr (theoretical) | ~0.03° | Regular, tiny | Bills 2005 (theoretical); model: 8H/3 = 894 kyr |
 | Venus | None | N/A | Tidally damped at 177° | Correia & Laskar 2003 |
 | Earth | ~41,000 yr (H/8) | 22.1°–24.5° | Regular (Moon stabilizes) | Laskar+ 1993 |
 | Mars | ~124,800 yr | 15°–35° (short-term) | Quasi-periodic, chaotic long-term | Ward 1973; Laskar+ 2004 |
@@ -240,7 +240,7 @@ Current H-based fits used in the simulation:
 
 | Planet | Constant | Formula | Period | Direction | Observed | Source |
 |--------|----------|---------|--------|-----------|----------|--------|
-| Mercury | `mercuryAxialPrecessionYears` | `-mercuryPerihelionEclipticYears` | 243,867 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006 |
+| Mercury | `mercuryAxialPrecessionYears` | `−8H/9` (Cassini state = asc. node) | 298,060 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006; MESSENGER |
 | Venus | `venusAxialPrecessionYears` | `H×3/34` (F4/F9) | 29,560 yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
 | Mars | `marsAxialPrecessionYears` | `-H/2` | 167,659 yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
 | Jupiter | `jupiterAxialPrecessionYears` | `-H×3/8` (F4/F6) | 125,744 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
@@ -264,7 +264,7 @@ from two independently known quantities:
 2. **Axial precession** — the planet's spin-axis cone rate (`AxialPrecessionYears`)
 
 The wobble is the **meeting frequency** of these two motions:
-
+ Which values do we now 
 - **Opposite directions** (one prograde, one retrograde):
   `1/T_wobble = 1/|T_axial| + 1/|T_peri_ICRF|`
 - **Same direction** (both retrograde or both prograde):
@@ -293,7 +293,7 @@ Earth is the only planet with prograde perihelion ICRF.
 
 | Planet | Period | H expression | Direction |
 |--------|--------|-------------|-----------|
-| Mercury | 243,867 yr | −H×8/11 | Retrograde (Cassini) |
+| Mercury | 298,060 yr | −8H/9 | Retrograde (Cassini state = asc. node) |
 | Venus | 29,560 yr | +H×3/34 | Prograde (obliq 177°) |
 | Earth | 25,794 yr | −H/13 | Retrograde |
 | Mars | 167,659 yr | −H/2 | Retrograde |
@@ -306,7 +306,7 @@ Earth is the only planet with prograde perihelion ICRF.
 
 | Planet | Axial dir | Peri ICRF dir | Formula | Ecc. cycle rate | Period | H expr |
 |--------|-----------|---------------|---------|-------------|--------|--------|
-| Mercury | retro | retro | same: \|diff\| | 82/(8H) | 32,714 yr | 4H/41 |
+| Mercury | retro | retro | same: \|diff\| | 84/(8H) | 31,935 yr | 2H/21 |
 | Venus | pro | retro | opp: sum | 143/(6H) | 14,069 yr | 6H/143 |
 | Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
 | Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
@@ -316,7 +316,7 @@ Earth is the only planet with prograde perihelion ICRF.
 | Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
 
 Calculation detail:
-- **Mercury**: |11/(8H) − 93/(8H)| = 82/(8H) = 41/(4H)
+- **Mercury**: |9/(8H) − 93/(8H)| = 84/(8H) = 21/(2H) (21 = F₈)
 - **Venus**: 34/(3H) + 25/(2H) = 68/(6H) + 75/(6H) = 143/(6H)
 - **Earth**: 13/H + 3/H = 16/H ✓
 - **Mars**: |2/H − 26/(3H)| = |6/(3H) − 26/(3H)| = 20/(3H)
@@ -358,7 +358,7 @@ both the obliquity and ecliptic precession rates.
 
 | Planet | Peri ecl rate | Base | N | Decomp | Obliquity | Period | Observed | Error |
 |--------|-------------|------|---|--------|-----------|--------|----------|-------|
-| Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = 894,179 yr | ~895 kyr | 0.2% |
+| Mercury | 11/(8H) | 1/(8H) | 11 | 3 + 8 | 3/(8H) | 8H/3 = 894,179 yr | ~895 kyr (Bills 2005, theoretical) | 0.1% |
 | Earth | 8/H (obliquity level) | 1/H | 8 | 5 + 3 | 8/H | H/8 = 41,915 yr | ~41,000 yr | 2% |
 | Mars | 35/(8H) | 1/(8H) | 35 | 8 + 27 | 8/(8H) | 8H/8 = 335,317 yr | ~124,800 yr | — |
 
@@ -382,7 +382,7 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 
 | Planet | Peri ecl | N | Decomp | Obliquity prediction | Ecliptic prediction | Status |
 |--------|---------|---|--------|---------------------|---------------------|--------|
-| Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Confirmed |
+| Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Free prediction (Cassini state) |
 | Venus | H×2 | 1 | — | N/A | N/A | ✓ Consistent (tidally damped) |
 | Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
 | Mars | 8H/35 | 35 | 8 + 27 | **8H/8 = ~335,317 yr** | 24H/41 = ~196,263 yr | Prediction |
