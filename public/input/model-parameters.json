@@ -68,7 +68,10 @@
       "inclinationPhaseAngle": 259.82,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 1,
-      "obliquityCycleFraction": null,
+      "obliquityCycleFraction": [
+        8,
+        100
+      ],
       "axialPrecessionFraction": [
         8,
         91
@@ -190,7 +193,10 @@
       "inclinationPhaseAngle": 174.04,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 3,
-      "obliquityCycleFraction": null,
+      "obliquityCycleFraction": [
+        8,
+        100
+      ],
       "axialPrecessionFraction": [
         -68,
         1

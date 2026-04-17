@@ -1546,14 +1546,15 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // The perihelion rate numerator N decomposes as N = A + B (Fibonacci sum).
 // Obliquity = |inclination − ecliptic| where inclination ≈ perihelion ecliptic.
 // Confirmed for Mercury (0.2%), Earth (2%), Mars (0.7%). See docs/37 §Obliquity Cycle Theory.
-// Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle (consistent with observations).
+// Venus/Neptune: obliquity cycle = ICRF period (8H/100). The two-component formula cancels exactly:
+// mean − A·cos(ω_ICRF·t) + A·cos(ω_obliq·t) = mean when ω_obliq = ω_ICRF → constant obliquity.
 const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (free prediction; Bills 2005 theoretical ~895 kyr)
-const venusObliquityCycle   = null;                          // N/A — tidally damped at 177°
+const venusObliquityCycle   = 8 * holisticyearLength / 100;  // 8H/100 = ICRF period → cancels with inclination → constant obliquity
 const marsObliquityCycle    = 8 * holisticyearLength / 21;   // 8H/21 = 127,740 yr (observed ~124,800 yr, = Jupiter axial)
 const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,659 yr (prediction, = Mars axial)
 const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
 const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,659 yr (prediction, tentative)
-const neptuneObliquityCycle = null;                          // N/A — frozen at ~28°
+const neptuneObliquityCycle = 8 * holisticyearLength / 100;  // 8H/100 = ICRF period → cancels with inclination → constant obliquity
 
 // Mean obliquity (analytical, averaged over 8H = Grand Holistic Octave)
 // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)

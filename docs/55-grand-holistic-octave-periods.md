@@ -35,7 +35,7 @@ The ecliptic rate minus general precession (H/13). This is the rate that drives 
 The rate at which the ascending node on the invariable plane regresses. These rates correspond to the Laplace-Lagrange secular eigenfrequencies (s₁...s₈) — a third level of Fibonacci structure.
 
 ### 5. Obliquity Oscillation
-The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have no obliquity cycle (tidally damped / frozen).
+The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = ICRF period (8H/100) — the two-component formula cancels exactly, producing constant obliquity.
 
 ### 6. Eccentricity Cycle (Wobble Period)
 The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = 20,957 yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
@@ -47,17 +47,17 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 | Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
 | Mercury | **8H/9** | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/84 |
-| Venus | 8H/91 | 8H/4 | 8H/100 | **8H/1** | — | 8H/191 |
+| Venus | 8H/91 | 8H/4 | 8H/100 | **8H/1** | 8H/100 | 8H/191 |
 | **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
 | Mars | 8H/16 | 8H/35 | 8H/69 | **8H/62** | 8H/21 | 8H/53 |
 | Jupiter | 8H/21 | 8H/40 | 8H/64 | **8H/36** | 8H/16 | 8H/43 |
 | Saturn | 8H/6 | 8H/64 | 8H/168 | **8H/36** | 8H/24 | 8H/162 |
 | Uranus | ~∞ | 8H/24 | 8H/80 | **8H/12** | 8H/16 | 8H/80 |
-| Neptune | ~∞ | 8H/4 | 8H/100 | **8H/3** | — | 8H/100 |
+| Neptune | ~∞ | 8H/4 | 8H/100 | **8H/3** | 8H/100 | 8H/100 |
 
 Notes:
 - Uranus and Neptune axial precession periods are extremely long (~200M and ~23M years) — effectively frozen
-- Venus and Neptune obliquity is tidally damped / frozen — no oscillation
+- Venus and Neptune obliquity cycle = ICRF period (8H/100): the two-component formula cancels exactly, producing constant obliquity
 - Mercury's axial precession period = ascending node period (Cassini state, confirmed by MESSENGER)
 - ICRF perihelion = inclination cycle (same physical driver)
 - Earth's eccentricity cycle = perihelion precession period (H/16)
@@ -67,13 +67,13 @@ Notes:
 | Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | **−298,060** | 243,867 | −28,844 | **−298,060** | 894,179 | 31,935 |
-| Venus | +29,478 | 670,634 | −26,825 | **−2,682,536** | — | 14,045 |
+| Venus | +29,478 | 670,634 | −26,825 | **−2,682,536** | 26,825 | 14,045 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
 | Mars | −167,659 | 76,644 | −38,877 | **−43,267** | 127,740 | 50,614 |
 | Jupiter | −127,740 | 67,063 | −41,915 | **−74,515** | 167,659 | 62,385 |
 | Saturn | −447,089 | −41,915 | −15,967 | **−74,515** | 111,772 | 16,559 |
 | Uranus | ~∞ | 111,772 | −33,532 | **−223,545** | 167,659 | 33,526 |
-| Neptune | ~∞ | 670,634 | −26,825 | **−894,179** | — | 26,857 |
+| Neptune | ~∞ | 670,634 | −26,825 | **−894,179** | 26,825 | 26,857 |
 
 (+ = prograde, − = retrograde, ~∞ = frozen)
 

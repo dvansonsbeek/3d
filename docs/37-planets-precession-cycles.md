@@ -383,13 +383,13 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 | Planet | Peri ecl | N | Decomp | Obliquity prediction | Ecliptic prediction | Status |
 |--------|---------|---|--------|---------------------|---------------------|--------|
 | Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Free prediction (Cassini state) |
-| Venus | H×2 | 1 | — | N/A | N/A | ✓ Consistent (tidally damped) |
+| Venus | H×2 | — | obliq = ICRF | **8H/100 = ICRF** | 8H/96 | ✓ Cancels → constant obliquity |
 | Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
 | Mars | 8H/35 | 35 | 21 + 14 | **8H/21 = ~127,740 yr** | 8H/14 = ~191,610 yr | Mirror reciprocity (= Ju axial) |
 | Jupiter | H/5 | 5 | 2 + 3 | **H/2 = ~167,659 yr** | H/3 = ~111,772 yr | Prediction |
 | Saturn | H/8 (r) | 8 | 5 + 3 | **H/5 = ~67,063 yr** or **H/3 = ~111,772 yr** | H/3 or H/5 | Ambiguous |
 | Uranus | H/3 | 3 | 2 + 1 | **H/2 = ~167,659 yr** or **H = 335,317 yr** | H or H/2 | Ambiguous |
-| Neptune | H×2 | 1 | — | N/A | N/A | ✓ Consistent (frozen) |
+| Neptune | H×2 | — | obliq = ICRF | **8H/100 = ICRF** | 8H/96 | ✓ Cancels → constant obliquity |
 
 ### Resolving ambiguities
 
