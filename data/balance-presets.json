@@ -1,17 +1,17 @@
 {
-  "generated": "2026-04-13T07:43:40.093Z",
+  "generated": "2026-04-17T18:46:41.995Z",
   "threshold": 99.994,
   "searchSpace": 7558272,
-  "count": 765,
+  "count": 767,
   "allPassCount": 0,
   "currentConfig": {
     "rank": 8,
-    "inclBalance": 99.9972338257403,
-    "eccBalance": 99.88647989036204,
+    "inclBalance": 99.99723472603128,
+    "eccBalance": 99.88667322118206,
     "eccBalanceJ2000": 99.87534335666744,
-    "saturnPredicted": 0.05373537229426289,
+    "saturnPredicted": 0.05373558006900368,
     "saturnActual": 0.05385751185431099,
-    "saturnPredErrPct": -0.22678277522083834,
+    "saturnPredErrPct": -0.22639698922063012,
     "llPassCount": 8,
     "dirPassCount": 2,
     "allPass": false,
@@ -76,7 +76,7 @@
   "presets": [
     [
       "A",
-      99.99882555,
+      99.9988281,
       21,
       1,
       5,
@@ -91,7 +91,7 @@
       0,
       34,
       1,
-      99.9835,
+      99.9831,
       0,
       7,
       2.5,
@@ -113,7 +113,7 @@
     ],
     [
       "A",
-      99.9972958,
+      99.99729917,
       13,
       1,
       5,
@@ -128,7 +128,7 @@
       0,
       34,
       1,
-      99.9759,
+      99.9756,
       0,
       7,
       2.3,
@@ -150,7 +150,7 @@
     ],
     [
       "D",
-      99.99428652,
+      99.99429381,
       34,
       1,
       3,
@@ -165,7 +165,7 @@
       0,
       21,
       1,
-      99.9678,
+      99.9672,
       2,
       7,
       1.5,
@@ -187,7 +187,7 @@
     ],
     [
       "A",
-      99.99519642,
+      99.99520114,
       8,
       1,
       5,
@@ -202,7 +202,7 @@
       0,
       34,
       1,
-      99.9664,
+      99.966,
       4,
       7,
       2.4,
@@ -224,7 +224,7 @@
     ],
     [
       "A",
-      99.99645079,
+      99.99645092,
       21,
       0,
       5,
@@ -239,7 +239,7 @@
       0,
       34,
       1,
-      99.9612,
+      99.9616,
       0,
       7,
       2.5,
@@ -261,7 +261,7 @@
     ],
     [
       "A",
-      99.99492201,
+      99.99492296,
       13,
       0,
       5,
@@ -276,7 +276,7 @@
       0,
       34,
       1,
-      99.9537,
+      99.954,
       0,
       7,
       2.3,
@@ -298,7 +298,7 @@
     ],
     [
       "A",
-      99.99681503,
+      99.99681548,
       21,
       0,
       8,
@@ -313,7 +313,7 @@
       0,
       34,
       1,
-      99.894,
+      99.8937,
       0,
       7,
       2.3,
@@ -335,7 +335,7 @@
     ],
     [
       "A",
-      99.99723383,
+      99.99723473,
       21,
       0,
       34,
@@ -350,7 +350,7 @@
       0,
       34,
       0,
-      99.8865,
+      99.8867,
       7,
       7,
       4.2,
@@ -372,7 +372,7 @@
     ],
     [
       "A",
-      99.99439317,
+      99.99439185,
       34,
       1,
       34,
@@ -387,7 +387,7 @@
       0,
       34,
       1,
-      99.853,
+      99.8528,
       2,
       7,
       2.8,
@@ -409,7 +409,7 @@
     ],
     [
       "A",
-      99.99809118,
+      99.99809219,
       55,
       1,
       34,
@@ -424,7 +424,7 @@
       0,
       34,
       1,
-      99.8508,
+      99.8506,
       2,
       7,
       3.2,
@@ -446,7 +446,7 @@
     ],
     [
       "A",
-      99.99436176,
+      99.99436087,
       21,
       0,
       55,
@@ -461,7 +461,7 @@
       0,
       34,
       1,
-      99.8308,
+      99.8306,
       7,
       7,
       2.9,
@@ -483,7 +483,7 @@
     ],
     [
       "A",
-      99.99961671,
+      99.9996163,
       55,
       0,
       8,
@@ -498,7 +498,7 @@
       0,
       34,
       0,
-      99.7923,
+      99.7926,
       0,
       7,
       2.5,
@@ -520,7 +520,7 @@
     ],
     [
       "A",
-      99.99779449,
+      99.99779633,
       34,
       1,
       8,
@@ -535,7 +535,7 @@
       0,
       34,
       0,
-      99.7879,
+      99.7882,
       2,
       7,
       2.5,
@@ -557,7 +557,7 @@
     ],
     [
       "A",
-      99.99807811,
+      99.99807858,
       21,
       0,
       8,
@@ -572,7 +572,7 @@
       0,
       34,
       0,
-      99.7855,
+      99.7858,
       0,
       7,
       2.8,
@@ -594,7 +594,7 @@
     ],
     [
       "A",
-      99.99769863,
+      99.99769877,
       21,
       0,
       5,
@@ -609,7 +609,7 @@
       0,
       34,
       0,
-      99.6243,
+      99.6246,
       0,
       7,
       2.3,
@@ -631,7 +631,7 @@
     ],
     [
       "A",
-      99.99469004,
+      99.99469363,
       13,
       1,
       5,
@@ -646,7 +646,7 @@
       0,
       34,
       0,
-      99.6173,
+      99.6177,
       0,
       7,
       2.7,
@@ -668,7 +668,7 @@
     ],
     [
       "B",
-      99.99822623,
+      99.99821866,
       5,
       1,
       3,
@@ -683,7 +683,7 @@
       0,
       55,
       0,
-      99.5132,
+      99.5134,
       4,
       7,
       1.4,
@@ -705,7 +705,7 @@
     ],
     [
       "B",
-      99.99550826,
+      99.99551398,
       8,
       0,
       13,
@@ -720,7 +720,7 @@
       0,
       34,
       1,
-      99.4886,
+      99.4885,
       4,
       7,
       1.5,
@@ -742,7 +742,7 @@
     ],
     [
       "B",
-      99.99843141,
+      99.99843003,
       34,
       1,
       21,
@@ -757,7 +757,7 @@
       0,
       34,
       1,
-      99.451,
+      99.4509,
       2,
       7,
       1.3,
@@ -779,7 +779,7 @@
     ],
     [
       "B",
-      99.99937066,
+      99.99937643,
       8,
       1,
       34,
@@ -816,7 +816,7 @@
     ],
     [
       "B",
-      99.99523603,
+      99.99523372,
       21,
       1,
       34,
@@ -853,7 +853,7 @@
     ],
     [
       "B",
-      99.99514851,
+      99.9951509,
       21,
       1,
       55,
@@ -890,7 +890,7 @@
     ],
     [
       "B",
-      99.99744813,
+      99.99744919,
       55,
       1,
       55,
@@ -927,7 +927,7 @@
     ],
     [
       "B",
-      99.99931894,
+      99.99932425,
       13,
       0,
       3,
@@ -942,7 +942,7 @@
       0,
       55,
       1,
-      99.3467,
+      99.347,
       0,
       7,
       0.7,
@@ -964,7 +964,7 @@
     ],
     [
       "B",
-      99.99671587,
+      99.99671269,
       34,
       0,
       3,
@@ -979,7 +979,7 @@
       0,
       55,
       1,
-      99.3365,
+      99.3368,
       2,
       7,
       1,
@@ -1001,7 +1001,7 @@
     ],
     [
       "B",
-      99.99486804,
+      99.99487124,
       13,
       0,
       55,
@@ -1038,7 +1038,7 @@
     ],
     [
       "B",
-      99.99488878,
+      99.99489273,
       13,
       1,
       55,
@@ -1053,7 +1053,7 @@
       0,
       34,
       1,
-      99.2808,
+      99.281,
       0,
       7,
       1,
@@ -1075,7 +1075,7 @@
     ],
     [
       "B",
-      99.99538325,
+      99.99538489,
       21,
       0,
       55,
@@ -1090,7 +1090,7 @@
       0,
       34,
       1,
-      99.2777,
+      99.2779,
       3,
       7,
       1.1,
@@ -1112,7 +1112,7 @@
     ],
     [
       "B",
-      99.99884904,
+      99.99885085,
       34,
       1,
       55,
@@ -1127,7 +1127,7 @@
       0,
       34,
       1,
-      99.2711,
+      99.2713,
       3,
       7,
       0.9,
@@ -1149,7 +1149,7 @@
     ],
     [
       "B",
-      99.99790686,
+      99.99791188,
       8,
       0,
       34,
@@ -1164,7 +1164,7 @@
       0,
       34,
       1,
-      99.26,
+      99.2601,
       4,
       7,
       1.2,
@@ -1186,7 +1186,7 @@
     ],
     [
       "B",
-      99.99989834,
+      99.99989771,
       34,
       0,
       21,
@@ -1201,7 +1201,7 @@
       0,
       34,
       1,
-      99.2474,
+      99.2477,
       2,
       7,
       1.1,
@@ -1223,7 +1223,7 @@
     ],
     [
       "B",
-      99.99697545,
+      99.99698191,
       8,
       1,
       13,
@@ -1238,7 +1238,7 @@
       0,
       34,
       1,
-      99.21,
+      99.2104,
       4,
       7,
       1,
@@ -1260,7 +1260,7 @@
     ],
     [
       "C",
-      99.99626493,
+      99.9962646,
       55,
       1,
       8,
@@ -1275,7 +1275,7 @@
       0,
       55,
       1,
-      99.1883,
+      99.1881,
       0,
       7,
       0.9,
@@ -1297,7 +1297,7 @@
     ],
     [
       "A",
-      99.99845215,
+      99.99845324,
       55,
       1,
       21,
@@ -1312,7 +1312,7 @@
       0,
       55,
       1,
-      99.1129,
+      99.1127,
       2,
       7,
       2.9,
@@ -1334,7 +1334,7 @@
     ],
     [
       "A",
-      99.99982339,
+      99.99982507,
       13,
       0,
       34,
@@ -1349,7 +1349,7 @@
       0,
       55,
       1,
-      99.0894,
+      99.0892,
       7,
       7,
       4.6,
@@ -1371,7 +1371,7 @@
     ],
     [
       "A",
-      99.99662408,
+      99.99662242,
       21,
       1,
       55,
@@ -1386,7 +1386,7 @@
       0,
       55,
       1,
-      99.0843,
+      99.0842,
       7,
       7,
       2.8,
@@ -1408,7 +1408,7 @@
     ],
     [
       "A",
-      99.99552343,
+      99.99551746,
       5,
       1,
       34,
@@ -1423,7 +1423,7 @@
       0,
       55,
       1,
-      99.07,
+      99.0699,
       4,
       7,
       2.7,
@@ -1445,7 +1445,7 @@
     ],
     [
       "A",
-      99.99959247,
+      99.9995922,
       55,
       0,
       34,
@@ -1482,7 +1482,7 @@
     ],
     [
       "C",
-      99.9987452,
+      99.99876021,
       5,
       0,
       8,
@@ -1497,7 +1497,7 @@
       0,
       55,
       1,
-      99.0559,
+      99.0556,
       4,
       7,
       1.5,
@@ -1519,7 +1519,7 @@
     ],
     [
       "A",
-      99.99790506,
+      99.99790281,
       13,
       1,
       13,
@@ -1556,7 +1556,7 @@
     ],
     [
       "A",
-      99.99490679,
+      99.99491256,
       5,
       1,
       13,
@@ -1603,8 +1603,8 @@
     "configs": [
       {
         "scenario": "A",
-        "inclBalance": 99.99882554902251,
-        "eccBalance": 99.98345740079309,
+        "inclBalance": 99.99882809903586,
+        "eccBalance": 99.98311634990917,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1699,8 +1699,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99729579578265,
-        "eccBalance": 99.97593279924858,
+        "inclBalance": 99.99729916893824,
+        "eccBalance": 99.97558851479326,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1795,8 +1795,8 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99428652487674,
-        "eccBalance": 99.96783591373435,
+        "inclBalance": 99.99429380523569,
+        "eccBalance": 99.96719935889907,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1891,8 +1891,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99519641754715,
-        "eccBalance": 99.96639565898698,
+        "inclBalance": 99.99520113978345,
+        "eccBalance": 99.96604720705432,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -1987,8 +1987,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99645079268437,
-        "eccBalance": 99.96124579168281,
+        "inclBalance": 99.9964509222769,
+        "eccBalance": 99.96156261441998,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2083,8 +2083,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99492200655865,
-        "eccBalance": 99.9537244011234,
+        "inclBalance": 99.9949229602987,
+        "eccBalance": 99.9540378944624,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2179,8 +2179,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99681503165694,
-        "eccBalance": 99.89398163206512,
+        "inclBalance": 99.99681547547469,
+        "eccBalance": 99.89371406144916,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2275,8 +2275,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9972338257403,
-        "eccBalance": 99.88647989036204,
+        "inclBalance": 99.99723472603128,
+        "eccBalance": 99.88667322118206,
         "mirror": true,
         "isConfig7": true,
         "dValues": {
@@ -2371,8 +2371,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99578007019572,
-        "eccBalance": 99.86283543349398,
+        "inclBalance": 99.99577598493545,
+        "eccBalance": 99.86260634314415,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2467,8 +2467,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99895834142532,
-        "eccBalance": 99.85890065562967,
+        "inclBalance": 99.99895630215894,
+        "eccBalance": 99.85914828813128,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2563,8 +2563,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99439317295246,
-        "eccBalance": 99.85297160062242,
+        "inclBalance": 99.99439184882274,
+        "eccBalance": 99.85277689806843,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2659,8 +2659,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99809117951396,
-        "eccBalance": 99.85082287549415,
+        "inclBalance": 99.9980921876764,
+        "eccBalance": 99.85063022284554,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2755,8 +2755,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99763112018587,
-        "eccBalance": 99.84512110638785,
+        "inclBalance": 99.9976378477581,
+        "eccBalance": 99.84541723166834,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2851,8 +2851,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99436175964979,
-        "eccBalance": 99.83079940635409,
+        "inclBalance": 99.99436086858148,
+        "eccBalance": 99.83064550041331,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -2947,8 +2947,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99961670752738,
-        "eccBalance": 99.7922766086553,
+        "inclBalance": 99.9996162969475,
+        "eccBalance": 99.79258118734127,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3043,8 +3043,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99779449348246,
-        "eccBalance": 99.78792169905073,
+        "inclBalance": 99.99779633225856,
+        "eccBalance": 99.78824532030744,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3139,8 +3139,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99807810728448,
-        "eccBalance": 99.78545462817905,
+        "inclBalance": 99.99807858058891,
+        "eccBalance": 99.78575404034525,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3235,8 +3235,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99769863250688,
-        "eccBalance": 99.62428103333775,
+        "inclBalance": 99.9976987701131,
+        "eccBalance": 99.62463512307434,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3331,8 +3331,8 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99848648943824,
-        "eccBalance": 99.62222522047678,
+        "inclBalance": 99.99847587540651,
+        "eccBalance": 99.62292298296988,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3427,8 +3427,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99469004043961,
-        "eccBalance": 99.61730515997917,
+        "inclBalance": 99.99469362641234,
+        "eccBalance": 99.61769020848368,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3523,8 +3523,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99912089017772,
-        "eccBalance": 99.52007485457457,
+        "inclBalance": 99.99912502688662,
+        "eccBalance": 99.52053547896189,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3619,8 +3619,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99822622841964,
-        "eccBalance": 99.51315201814636,
+        "inclBalance": 99.99821865960787,
+        "eccBalance": 99.51343776630007,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3715,8 +3715,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99550826148402,
-        "eccBalance": 99.4885678949743,
+        "inclBalance": 99.99551398495402,
+        "eccBalance": 99.4884586901453,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3811,8 +3811,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99843140576336,
-        "eccBalance": 99.45097575313163,
+        "inclBalance": 99.9984300348161,
+        "eccBalance": 99.45094227218578,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -3907,8 +3907,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9993706574368,
-        "eccBalance": 99.43860903201741,
+        "inclBalance": 99.99937643018933,
+        "eccBalance": 99.43861879574575,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4003,8 +4003,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99523603490495,
-        "eccBalance": 99.42606203955572,
+        "inclBalance": 99.99523372344738,
+        "eccBalance": 99.42606233810174,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4099,8 +4099,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99514851310913,
-        "eccBalance": 99.40907865810811,
+        "inclBalance": 99.99515090249767,
+        "eccBalance": 99.40910288505873,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4195,8 +4195,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99744812527696,
-        "eccBalance": 99.4012529037356,
+        "inclBalance": 99.99744919327091,
+        "eccBalance": 99.40127130050726,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4291,8 +4291,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99931894060869,
-        "eccBalance": 99.34667595470268,
+        "inclBalance": 99.99932425030316,
+        "eccBalance": 99.34698491576201,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4387,8 +4387,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99671587067779,
-        "eccBalance": 99.336521436392,
+        "inclBalance": 99.99671269146394,
+        "eccBalance": 99.33682300437954,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4483,8 +4483,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99486803917233,
-        "eccBalance": 99.32974628876691,
+        "inclBalance": 99.99487124325154,
+        "eccBalance": 99.32973565859928,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4579,8 +4579,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99488877822881,
-        "eccBalance": 99.28084223290851,
+        "inclBalance": 99.99489272543,
+        "eccBalance": 99.28104764263284,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4675,8 +4675,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99538324619739,
-        "eccBalance": 99.27769028989873,
+        "inclBalance": 99.99538488880141,
+        "eccBalance": 99.27786071324395,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4771,8 +4771,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99884903723132,
-        "eccBalance": 99.2710636432492,
+        "inclBalance": 99.99885085116453,
+        "eccBalance": 99.27126163651104,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4867,8 +4867,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99790685593948,
-        "eccBalance": 99.25996396572859,
+        "inclBalance": 99.9979118792455,
+        "eccBalance": 99.26014893674487,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -4963,8 +4963,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99989833588269,
-        "eccBalance": 99.24743900211212,
+        "inclBalance": 99.9998977080998,
+        "eccBalance": 99.24766779528849,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5059,8 +5059,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99697545225412,
-        "eccBalance": 99.21004953388308,
+        "inclBalance": 99.9969819066621,
+        "eccBalance": 99.21035433699792,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5155,8 +5155,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99725185522634,
-        "eccBalance": 99.19711123177979,
+        "inclBalance": 99.99725720433035,
+        "eccBalance": 99.19754819212847,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5251,8 +5251,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99626492982775,
-        "eccBalance": 99.18826792076895,
+        "inclBalance": 99.99626459938573,
+        "eccBalance": 99.1880847572638,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5347,8 +5347,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99960219079261,
-        "eccBalance": 99.18701845250854,
+        "inclBalance": 99.99960983642933,
+        "eccBalance": 99.18731686650281,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5443,8 +5443,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9980401517554,
-        "eccBalance": 99.1230597719203,
+        "inclBalance": 99.99805062059568,
+        "eccBalance": 99.12348320228544,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5539,8 +5539,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99845214570135,
-        "eccBalance": 99.11291099921522,
+        "inclBalance": 99.99845324242757,
+        "eccBalance": 99.1126932892308,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5635,8 +5635,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99982338538122,
-        "eccBalance": 99.0894097452543,
+        "inclBalance": 99.99982507352557,
+        "eccBalance": 99.08923958122433,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5731,8 +5731,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99662407709174,
-        "eccBalance": 99.08427970093602,
+        "inclBalance": 99.9966224154003,
+        "eccBalance": 99.08424212745152,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5827,8 +5827,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99552342601275,
-        "eccBalance": 99.06997435323657,
+        "inclBalance": 99.99551745969258,
+        "eccBalance": 99.06994316536965,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -5923,8 +5923,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99959246700583,
-        "eccBalance": 99.0639843901115,
+        "inclBalance": 99.99959220152618,
+        "eccBalance": 99.06398625136259,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6019,8 +6019,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99874519519888,
-        "eccBalance": 99.05587555922656,
+        "inclBalance": 99.99876021338726,
+        "eccBalance": 99.05564055927523,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6115,8 +6115,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99790505864547,
-        "eccBalance": 99.03838516442222,
+        "inclBalance": 99.997902809489,
+        "eccBalance": 99.03841982504493,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6211,8 +6211,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99490678952577,
-        "eccBalance": 99.0161525892417,
+        "inclBalance": 99.99491255500209,
+        "eccBalance": 99.01617761462462,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6307,8 +6307,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9955542481517,
-        "eccBalance": 99.96014307643206,
+        "inclBalance": 99.9955552815596,
+        "eccBalance": 99.96003545330154,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6333,8 +6333,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99988952474334,
-        "eccBalance": 99.827115160016,
+        "inclBalance": 99.9998871954974,
+        "eccBalance": 99.8271169010397,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6359,8 +6359,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99767767416888,
-        "eccBalance": 99.79568809709147,
+        "inclBalance": 99.99767977715305,
+        "eccBalance": 99.79575160209848,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6385,8 +6385,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99962849368093,
-        "eccBalance": 99.99130110730174,
+        "inclBalance": 99.99960086696782,
+        "eccBalance": 99.99143075195809,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6411,8 +6411,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99981213420419,
-        "eccBalance": 99.97111690489436,
+        "inclBalance": 99.99980251385108,
+        "eccBalance": 99.97177439407298,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6437,8 +6437,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9943429850608,
-        "eccBalance": 99.96664539924497,
+        "inclBalance": 99.99437107674217,
+        "eccBalance": 99.96595492888032,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6463,8 +6463,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99590439354002,
-        "eccBalance": 99.9599237554063,
+        "inclBalance": 99.99589686764301,
+        "eccBalance": 99.96057305233715,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6489,8 +6489,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9967705906496,
-        "eccBalance": 99.95176687506728,
+        "inclBalance": 99.99678562054112,
+        "eccBalance": 99.9516259280719,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6515,8 +6515,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99797133350219,
-        "eccBalance": 99.86663418915909,
+        "inclBalance": 99.9979556375272,
+        "eccBalance": 99.86707041396016,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6541,8 +6541,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9982972738248,
-        "eccBalance": 99.85958068094888,
+        "inclBalance": 99.99832594090257,
+        "eccBalance": 99.85924557643054,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6567,8 +6567,8 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99450087088627,
-        "eccBalance": 99.8574721185297,
+        "inclBalance": 99.99445068267069,
+        "eccBalance": 99.85828415851965,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6593,8 +6593,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99457392464845,
-        "eccBalance": 99.85344378303758,
+        "inclBalance": 99.99455663479722,
+        "eccBalance": 99.85296007464586,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6619,8 +6619,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99654021456365,
-        "eccBalance": 99.78454958094277,
+        "inclBalance": 99.9965378677537,
+        "eccBalance": 99.7842029581708,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6645,8 +6645,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99672734635122,
-        "eccBalance": 99.77949550342673,
+        "inclBalance": 99.99673679697379,
+        "eccBalance": 99.77961535212403,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6671,8 +6671,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99815076715623,
-        "eccBalance": 99.76150147966197,
+        "inclBalance": 99.99813605910373,
+        "eccBalance": 99.7612348999491,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6697,8 +6697,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99958603032077,
-        "eccBalance": 99.7555970468828,
+        "inclBalance": 99.99959395804542,
+        "eccBalance": 99.75608616335342,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6723,8 +6723,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9947639805461,
-        "eccBalance": 99.75439697152373,
+        "inclBalance": 99.99478801656245,
+        "eccBalance": 99.7543594527716,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6749,8 +6749,8 @@
       },
       {
         "scenario": "D",
-        "inclBalance": 99.99817986433027,
-        "eccBalance": 99.74654182510258,
+        "inclBalance": 99.99813679518633,
+        "eccBalance": 99.74627225661895,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6775,8 +6775,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99960184080432,
-        "eccBalance": 99.73858545495557,
+        "inclBalance": 99.99955526091784,
+        "eccBalance": 99.73871805429158,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6801,8 +6801,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.9947857200599,
-        "eccBalance": 99.73719953893449,
+        "inclBalance": 99.99474836449481,
+        "eccBalance": 99.7377553362222,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6827,8 +6827,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99418297705915,
-        "eccBalance": 99.71935930360178,
+        "inclBalance": 99.99419557653641,
+        "eccBalance": 99.72019785040678,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6853,8 +6853,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9990778076858,
-        "eccBalance": 99.71689782283306,
+        "inclBalance": 99.99908011584849,
+        "eccBalance": 99.71711409955996,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6879,8 +6879,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.997608989127,
-        "eccBalance": 99.70930296484799,
+        "inclBalance": 99.99763860104825,
+        "eccBalance": 99.70927046338379,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6905,8 +6905,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99724657115311,
-        "eccBalance": 99.70135441489583,
+        "inclBalance": 99.99724024217286,
+        "eccBalance": 99.70091842567376,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6931,8 +6931,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99520942872466,
-        "eccBalance": 99.69807633502754,
+        "inclBalance": 99.99519518641638,
+        "eccBalance": 99.69830103532391,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6957,8 +6957,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99844698247693,
-        "eccBalance": 99.69418984320741,
+        "inclBalance": 99.99844130052486,
+        "eccBalance": 99.69385674147664,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -6983,8 +6983,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99647555425197,
-        "eccBalance": 99.63960031249128,
+        "inclBalance": 99.99646814088172,
+        "eccBalance": 99.64040723330993,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7009,8 +7009,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99576036527854,
-        "eccBalance": 99.56513987556285,
+        "inclBalance": 99.99580575599646,
+        "eccBalance": 99.56488220764078,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7035,8 +7035,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99530225553602,
-        "eccBalance": 99.56189646009061,
+        "inclBalance": 99.99530107439826,
+        "eccBalance": 99.56197201232968,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7061,8 +7061,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99903684323151,
-        "eccBalance": 99.53218030120146,
+        "inclBalance": 99.99905108969529,
+        "eccBalance": 99.53208696827501,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7087,8 +7087,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99777648384092,
-        "eccBalance": 99.45164090347568,
+        "inclBalance": 99.9977936602398,
+        "eccBalance": 99.4522034629226,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7113,8 +7113,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99885970947034,
-        "eccBalance": 99.3930459976031,
+        "inclBalance": 99.99884579767266,
+        "eccBalance": 99.3933219253314,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7139,8 +7139,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9984263152877,
-        "eccBalance": 99.36178665703126,
+        "inclBalance": 99.99842810938141,
+        "eccBalance": 99.36134556174979,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7165,8 +7165,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99726695723596,
-        "eccBalance": 99.34343608962405,
+        "inclBalance": 99.99724518804138,
+        "eccBalance": 99.34370165980148,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7191,8 +7191,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99510309256986,
-        "eccBalance": 99.24148172506348,
+        "inclBalance": 99.99511736858051,
+        "eccBalance": 99.24165074623403,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7217,8 +7217,8 @@
       },
       {
         "scenario": "B",
-        "inclBalance": 99.99409283398347,
-        "eccBalance": 99.21716293504007,
+        "inclBalance": 99.99413848991185,
+        "eccBalance": 99.21762509302658,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7243,8 +7243,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99737894547255,
-        "eccBalance": 99.1867389756941,
+        "inclBalance": 99.99744925676511,
+        "eccBalance": 99.18703694181042,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7269,8 +7269,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99733207542224,
-        "eccBalance": 99.13208935890736,
+        "inclBalance": 99.99733200625572,
+        "eccBalance": 99.13181861254526,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7295,8 +7295,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99741438389023,
-        "eccBalance": 99.0866724532256,
+        "inclBalance": 99.99741431332725,
+        "eccBalance": 99.0863788484793,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7321,8 +7321,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99940002106723,
-        "eccBalance": 99.07716890111658,
+        "inclBalance": 99.99939084250084,
+        "eccBalance": 99.07717607461237,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7347,8 +7347,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.9968255340364,
-        "eccBalance": 99.05444912901602,
+        "inclBalance": 99.9968157591456,
+        "eccBalance": 99.05441054076678,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7373,8 +7373,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99780167368863,
-        "eccBalance": 99.02496613719448,
+        "inclBalance": 99.99780237550095,
+        "eccBalance": 99.02505413676026,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7399,8 +7399,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99586438719304,
-        "eccBalance": 99.01860786719011,
+        "inclBalance": 99.99584985204342,
+        "eccBalance": 99.01856191642608,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7425,8 +7425,8 @@
       },
       {
         "scenario": "C",
-        "inclBalance": 99.99820793139355,
-        "eccBalance": 99.01789809871677,
+        "inclBalance": 99.99823222051452,
+        "eccBalance": 99.01765162719423,
         "mirror": false,
         "isConfig7": false,
         "dValues": {
@@ -7451,8 +7451,8 @@
       },
       {
         "scenario": "A",
-        "inclBalance": 99.99899369745266,
-        "eccBalance": 99.01663855524659,
+        "inclBalance": 99.99900811591968,
+        "eccBalance": 99.01669344031954,
         "mirror": false,
         "isConfig7": false,
         "dValues": {

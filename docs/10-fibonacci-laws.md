@@ -241,7 +241,7 @@ The exhaustive search evaluates 7,558,272 candidates (see [Exhaustive Search](#e
 
 | Filter | Surviving |
 |--------|----------|
-| Inclination balance ≥ 99.994% (TNO margin) | 765 |
+| Inclination balance ≥ 99.994% (TNO margin) | 767 |
 | + Eccentricity balance ≥ 99% | 94 |
 | + Per-config optimised anchor gives LL bounds 8/8 | 49 |
 | + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 41 |
