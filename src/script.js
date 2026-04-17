@@ -146,7 +146,7 @@ planets.venus = {
   // Model parameters (from model-parameters.json)
   angleCorrection: -2.802572285195346,
   perihelionEclipticYears: holisticyearLength*2,
-  axialPrecessionYears: holisticyearLength*3/34,
+  axialPrecessionYears: 8 * holisticyearLength / 91,
   startpos: 249.35354318180453,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
@@ -196,7 +196,7 @@ planets.jupiter = {
   // Model parameters (from model-parameters.json)
   angleCorrection: 0.9306794439183754,
   perihelionEclipticYears: holisticyearLength/5,
-  axialPrecessionYears: -holisticyearLength*3/8,
+  axialPrecessionYears: -(8 * holisticyearLength / 21),
   startpos: 13.887515861166527,
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
@@ -1549,7 +1549,7 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle (consistent with observations).
 const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (free prediction; Bills 2005 theoretical ~895 kyr)
 const venusObliquityCycle   = null;                          // N/A — tidally damped at 177°
-const marsObliquityCycle    = 3 * holisticyearLength / 8;    // 3H/8 = 125,744 yr (observed ~124,800 yr)
+const marsObliquityCycle    = 8 * holisticyearLength / 21;   // 8H/21 = 127,740 yr (observed ~124,800 yr, = Jupiter axial)
 const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,659 yr (prediction, = Mars axial)
 const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
 const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,659 yr (prediction, tentative)
@@ -34857,7 +34857,7 @@ const planetStats = {
        static: true},
       {label : () => `Axial Precession Period`,
        value : [ { v: () => planets.venus.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Venus's spin axis to complete one full precession cycle. Prograde (obliquity 177°). H×3/34 ≈ ${fmtNum(planets.venus.axialPrecessionYears, 0, ',')} years.`],
+       hover : [`Period for Venus's spin axis to complete one full precession cycle. Prograde (obliquity 177°). 8H/91 ≈ ${fmtNum(planets.venus.axialPrecessionYears, 0, ',')} years.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => venusWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
@@ -35574,7 +35574,7 @@ const planetStats = {
        static: true},
       {label : () => `Axial Precession Period`,
        value : [ { v: () => planets.jupiter.axialPrecessionYears, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`Period for Jupiter's spin axis to complete one full precession cycle. Negative = retrograde. H×3/8 ≈ ${fmtNum(Math.abs(planets.jupiter.axialPrecessionYears), 0, ',')} years.`],
+       hover : [`Period for Jupiter's spin axis to complete one full precession cycle. Negative = retrograde. 8H/21 ≈ ${fmtNum(Math.abs(planets.jupiter.axialPrecessionYears), 0, ',')} years. 21 = F₈.`],
        constant: true},
       {label : () => `Eccentricity Cycle`,
        value : [ { v: () => jupiterWobblePeriod, dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],

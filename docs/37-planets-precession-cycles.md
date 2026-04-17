@@ -135,7 +135,7 @@ allows obliquity to wander 0°–60°+.
 | Phenomenon | Observed value | H expression | H rate | Error |
 |-----------|---------------|-------------|--------|-------|
 | Inclination (inv. plane) | ≈ perihelion ecliptic (g₄ ≈ \|s₄\|) | **8H/35** = 76,644 yr | 35/(8H) | — |
-| Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **3H/8** = 125,744 yr | 8/(3H) | 0.7% |
+| Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **8H/21** = 127,740 yr | 21/(8H) | 2.4% |
 | Perihelion ecliptic (ϖ) | 76,644 yr (WebGeoCalc) | **8H/35** = 76,644 yr | 35/(8H) | 0.0% |
 | Axial precession | 170,400 yr (InSight) | **H/2** = 167,659 yr | 2/H | 1.7% |
 
@@ -150,7 +150,7 @@ with the eigenfrequency data.
 |----------------|-----------|-------------|----------|-------------|
 | Inclination (inv. plane) | 3/H | H/3 = 111,772 yr | 35/(8H) | 8H/35 = 76,644 yr |
 | Ecliptic precession | 5/H | H/5 = 67,063 yr | **?** | **?** (predicted 3H/5) |
-| Obliquity cycle | 8/H | H/8 = 41,915 yr | 8/(3H) | 3H/8 = 125,744 yr |
+| Obliquity cycle | 8/H | H/8 = 41,915 yr | 21/(8H) | 8H/21 = 127,740 yr |
 | Axial precession | 13/H | H/13 = 25,794 yr | 2/H | H/2 = 167,659 yr |
 | Perihelion (ecliptic) | 16/H | H/16 = 20,957 yr | 35/(8H) | 8H/35 = 76,644 yr |
 | Perihelion (ICRF) | 3/H | H/3 = 111,772 yr | 69/(8H) | 8H/69 = 38,877 yr |
@@ -167,10 +167,10 @@ All are Fibonacci numbers or sums thereof. Identities:
 16 = 13 + 3   perihelion = axial + inclination
 ```
 
-**Mars** — rates for obliquity and perihelion ecliptic share a 1/(3H) base:
+**Mars** — rates for obliquity and perihelion ecliptic share a 1/(8H) base:
 
 ```
-obliquity:        8/(3H)  →  3H/8  = 125,744 yr
+obliquity:       21/(8H)  →  8H/21 = 127,740 yr
 perihelion ecl:  35/(8H)  →  8H/35 =  76,644 yr
 ```
 
@@ -178,10 +178,10 @@ The relationship **perihelion ecl = obliquity + ecliptic** predicts:
 
 ```
 perihelion ecl = obliquity + ecliptic
-35/(8H) = 8/(3H) + 41/(24H)
+35/(8H) = 21/(8H) + 14/(8H)
 ```
 
-This gives a **predicted Mars ecliptic precession = 24H/41 = 196,263 yr**.
+This gives a **predicted Mars ecliptic precession = 8H/14 = H/1.75 = 191,610 yr**.
 
 **Mars axial precession**: H/2 = 167,659 yr (rate = 2/H = 6/(3H)). The value 6
 is not a Fibonacci number, suggesting either:
@@ -241,9 +241,9 @@ Current H-based fits used in the simulation:
 | Planet | Constant | Formula | Period | Direction | Observed | Source |
 |--------|----------|---------|--------|-----------|----------|--------|
 | Mercury | `mercuryAxialPrecessionYears` | `−8H/9` (Cassini state = asc. node) | 298,060 yr | Retrograde | ~300 kyr (Cassini) | Peale 2006; MESSENGER |
-| Venus | `venusAxialPrecessionYears` | `H×3/34` (F4/F9) | 29,560 yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
+| Venus | `venusAxialPrecessionYears` | `8H/91` | 29,478 yr | Prograde | ~29 kyr | Cottereau & Souchay 2009 |
 | Mars | `marsAxialPrecessionYears` | `-H/2` | 167,659 yr | Retrograde | 170,400 yr | Konopliv+ 2020 |
-| Jupiter | `jupiterAxialPrecessionYears` | `-H×3/8` (F4/F6) | 125,744 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
+| Jupiter | `jupiterAxialPrecessionYears` | `−8H/21` (F₈) | 127,740 yr | Retrograde | 113–136 kyr | Saillenfest+ 2020 |
 | Saturn | `saturnAxialPrecessionYears` | `-H×4/3` | 446,677 yr | Retrograde | 400–480 kyr | Saillenfest+ 2021 |
 | Uranus | `uranusAxialPrecessionYears` | `H×610` (F15) | 204 Myr | Prograde | ~40–50 Myr (bare) | Saillenfest+ 2022 |
 | Neptune | `neptuneAxialPrecessionYears` | `-H×68` (2×F9) | 22.8 Myr | Retrograde | ~70 Myr (est.) | Ward & Hamilton 2004 |
@@ -294,10 +294,10 @@ Earth is the only planet with prograde perihelion ICRF.
 | Planet | Period | H expression | Direction |
 |--------|--------|-------------|-----------|
 | Mercury | 298,060 yr | −8H/9 | Retrograde (Cassini state = asc. node) |
-| Venus | 29,560 yr | +H×3/34 | Prograde (obliq 177°) |
+| Venus | 29,478 yr | +8H/91 | Prograde (obliq 177°) |
 | Earth | 25,794 yr | −H/13 | Retrograde |
 | Mars | 167,659 yr | −H/2 | Retrograde |
-| Jupiter | 125,744 yr | −H×3/8 | Retrograde |
+| Jupiter | 127,740 yr | −8H/21 | Retrograde |
 | Saturn | 446,677 yr | −H×4/3 | Retrograde |
 | Uranus | 204 Myr | +H×610 | Prograde (obliq 98°) |
 | Neptune | 22.8 Myr | −H×68 | Retrograde |
@@ -307,25 +307,25 @@ Earth is the only planet with prograde perihelion ICRF.
 | Planet | Axial dir | Peri ICRF dir | Formula | Ecc. cycle rate | Period | H expr |
 |--------|-----------|---------------|---------|-------------|--------|--------|
 | Mercury | retro | retro | same: \|diff\| | 84/(8H) | 31,935 yr | 2H/21 |
-| Venus | pro | retro | opp: sum | 143/(6H) | 14,069 yr | 6H/143 |
+| Venus | pro | retro | opp: sum | 191/(8H) | 14,045 yr | 8H/191 |
 | Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
 | Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
-| Jupiter | retro | retro | same: \|diff\| | 16/(3H) | 62,872 yr | **3H/16** |
+| Jupiter | retro | retro | same: \|diff\| | 43/(8H) | 62,385 yr | 8H/43 |
 | Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,559 yr | 4H/81 |
 | Uranus | pro | retro | opp: sum | ≈10/H | 33,532 yr | ≈H/10 |
 | Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
 
 Calculation detail:
 - **Mercury**: |9/(8H) − 93/(8H)| = 84/(8H) = 21/(2H) (21 = F₈)
-- **Venus**: 34/(3H) + 25/(2H) = 68/(6H) + 75/(6H) = 143/(6H)
+- **Venus**: 91/(8H) + 25/(2H) = 91/(8H) + 100/(8H) = 191/(8H)
 - **Earth**: 13/H + 3/H = 16/H ✓
 - **Mars**: |2/H − 26/(3H)| = |6/(3H) − 26/(3H)| = 20/(3H)
-- **Jupiter**: |8/(3H) − 8/H| = |8/(3H) − 24/(3H)| = 16/(3H)
+- **Jupiter**: |21/(8H) − 8/H| = |21/(8H) − 64/(8H)| = 43/(8H)
 - **Saturn**: |3/(4H) − 21/H| = |3/(4H) − 84/(4H)| = 81/(4H)
 - **Uranus**: 1/(H×610) + 10/H ≈ 10/H (axial negligible)
 - **Neptune**: |1/(68H) − 25/(2H)| ≈ 25/(2H) (axial negligible)
 
-Notable: Jupiter's eccentricity cycle = **3H/16** uses Fibonacci 16. For Uranus and Neptune
+Notable: Jupiter's eccentricity cycle = **8H/43** (43 is prime). For Uranus and Neptune
 the extremely slow axial precession makes the eccentricity cycle nearly equal to the
 perihelion ICRF rate.
 
@@ -371,7 +371,7 @@ Three cross-planet period matches link obliquity cycles to other planets' preces
 
 | Connection | Period | Significance |
 |-----------|--------|-------------|
-| Mars obliquity = Jupiter axial | 3H/8 = 125,744 yr | Exact match, mirror pair (d=5) |
+| Mars obliquity = Jupiter axial | 8H/21 = 127,740 yr | Exact match, mirror pair (d=5), 21 = F₈ |
 | Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | 894,179 ≈ 894,178 yr |
 | Earth obliquity = Saturn peri ecl = Jupiter peri ICRF | H/8 = 41,915 yr | Same Fibonacci rate (8/H) |
 
@@ -385,7 +385,7 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 | Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Free prediction (Cassini state) |
 | Venus | H×2 | 1 | — | N/A | N/A | ✓ Consistent (tidally damped) |
 | Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
-| Mars | 8H/35 | 35 | 8 + 27 | **8H/8 = ~335,317 yr** | 24H/41 = ~196,263 yr | Prediction |
+| Mars | 8H/35 | 35 | 21 + 14 | **8H/21 = ~127,740 yr** | 8H/14 = ~191,610 yr | Mirror reciprocity (= Ju axial) |
 | Jupiter | H/5 | 5 | 2 + 3 | **H/2 = ~167,659 yr** | H/3 = ~111,772 yr | Prediction |
 | Saturn | H/8 (r) | 8 | 5 + 3 | **H/5 = ~67,063 yr** or **H/3 = ~111,772 yr** | H/3 or H/5 | Ambiguous |
 | Uranus | H/3 | 3 | 2 + 1 | **H/2 = ~167,659 yr** or **H = 335,317 yr** | H or H/2 | Ambiguous |
@@ -422,13 +422,12 @@ eccentricity cycle rate to obliquity rate shows a pattern:
 
 | Planet | Ecc cycle rate | Obliq rate | Ratio |
 |--------|---------------|------------|-------|
-| Earth | 16/H | 8/H | **2** |
-| Mars | 20/(3H) | 8/(3H) | **5/2** |
-| Jupiter | 16/(3H) | 2/H = 6/(3H) | **8/3** |
+| Earth | 128/(8H) | 64/(8H) | **2** |
+| Mars | 53/(8H) | 21/(8H) | **53/21 ≈ 2.52** |
+| Jupiter | 43/(8H) | 16/(8H) | **43/16 ≈ 2.69** |
 
-The ratios 2, 5/2, 8/3 have Fibonacci numerators (2, 5, 8) and sequential
-denominators (1, 2, 3), connecting the eccentricity and obliquity cycles through
-the Fibonacci sequence.
+All ratios are close to Fibonacci convergents (2, 5/2, 8/3) but with the integer
+8H/N values the exact ratios are 2, 53/21, and 43/16.
 
 ### Physical interpretation
 
