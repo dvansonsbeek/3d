@@ -18428,9 +18428,10 @@ function fbeBuildGroupToggle(planet, isAntiPhase) {
 function fbeComputePhaseAngle(planet, period, isAntiPhase) {
   const cfg = BALANCE_CONFIG[planet];
   const icrfRate = 360 / period;
-  // Use the System Reset (n=7 balanced year) as the phase anchor — this is
-  // where all planets are simultaneously at their inclination extremes.
-  const systemReset = balancedYear - 7 * holisticyearLength;
+  // Use the System Reset (systemResetN × H backwards from balanced year) as
+  // the phase anchor — where all planets are at their inclination extremes.
+  // Both inclination and eccentricity use the same anchor (systemResetN).
+  const systemReset = balancedYear - systemResetN * holisticyearLength;
   const periAtSR = ((cfg.periLongJ2000 + icrfRate * (systemReset - 2000)) % 360 + 360) % 360;
   return isAntiPhase ? periAtSR : ((periAtSR - 180 + 360) % 360);
 }

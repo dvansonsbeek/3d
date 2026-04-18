@@ -588,6 +588,8 @@ module.exports = {
   iauObliquityAtGrid,
   cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
+  systemResetN,
+  eccentricityAnchor,
   meanSiderealYearDays,
   meanLengthOfDay,
   meanSiderealDay,

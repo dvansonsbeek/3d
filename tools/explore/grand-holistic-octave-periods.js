@@ -349,8 +349,8 @@ console.log('');
 console.log('   Planet     │ d  │ ICRF Period │ Phase (max) │ SR state │ Mean       │ Amplitude  │ Range');
 console.log('   ───────────┼────┼────────────┼─────────────┼──────────┼────────────┼────────────┼─────────────────');
 
-// Use System Reset (n=7 balanced year) as the phase anchor
-const systemReset = C.balancedYear - 7 * C.H;
+// Use System Reset as the phase anchor (systemResetN × H backwards from balanced year)
+const systemReset = C.balancedYear - C.systemResetN * C.H;
 for (const [key, p] of Object.entries(planets)) {
   const d = key === 'earth' ? 3 : C.planets[key].fibonacciD;
   const mass = C.massFraction[key];
