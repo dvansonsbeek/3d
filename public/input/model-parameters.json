@@ -11,7 +11,9 @@
     "temperatureGraphMostLikely": 14.5,
     "startAngleModel": 89.91949879,
     "useVariableSpeed": true,
-    "_psiNote": "PSI is derived in constants.js from earthInvPlaneInclinationAmplitude: PSI = 3 × amp × √m_Earth"
+    "systemResetN": 7,
+    "_psiNote": "PSI is derived in constants.js from earthInvPlaneInclinationAmplitude: PSI = 3 × amp × √m_Earth",
+    "_systemResetNNote": "Eccentricity anchor offset (0..7) in units of H. 0 = balancedYear (n=0), 7 = System Reset. Shifts all eccentricity phase calculations."
   },
   "earth": {
     "earthtiltMean": 23.413539781551208,

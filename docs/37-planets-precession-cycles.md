@@ -474,24 +474,20 @@ mean = tiltJ2000 + A·cos(ωᵢ·t₂₀₀₀) − A·cos(ωₒ·t₂₀₀₀)
 Since all ICRF and obliquity cycle periods divide 8H evenly, the cosine terms
 average to zero over 8H, leaving only the constant anchoring offsets.
 
-| Planet | J2000 tilt | Mean obliquity (8H) | Shift | Amplitude |
-|--------|-----------|---------------------|-------|-----------|
-| Mercury | 0.0300° | −0.1188° | −0.1488° | ±0.3843° |
-| Venus | 2.6392° | 2.6392° | — | (no cycle) |
-| Earth | 23.4393° | 23.4533° | +0.0140° | ±0.6360° |
-| Mars | 25.1900° | 26.8078° | +1.6178° | ±1.1576° |
-| Jupiter | 3.1300° | 3.1189° | −0.0111° | ±0.0213° |
-| Saturn | 26.7300° | 26.7970° | +0.0670° | ±0.0648° |
-| Uranus | 82.2300° | 82.2407° | +0.0107° | ±0.0237° |
-| Neptune | 28.3200° | 28.3200° | — | (no cycle) |
+Under the System Reset (n=7) anchor convention:
 
-**Notable result**: Mars and Saturn have nearly identical mean obliquities
-(26.81° vs 26.80°), differing by only 0.01°. These are the two planets with
-the largest obliquities after Uranus. Mars (d=5) and Saturn (d=3, anti-phase)
-are deeply connected in the balance framework — Saturn is the sole anti-phase
-planet opposing all others. Whether this convergence follows from the balance
-laws or is a numerical coincidence of the current parameters remains an open
-question.
+| Planet | J2000 tilt | Formula midpoint | Shift | Amplitude |
+|--------|-----------|---------------------|-------|-----------|
+| Mercury | 0.0300° | 0.0084° | −0.0216° | ±0.3865° |
+| Venus | 2.6392° | 2.6392° | — | (cancels: cycle=ICRF) |
+| Earth | 23.4393° | 23.4533° | +0.0140° | ±0.6360° |
+| Mars | 25.1900° | 25.4022° | +0.2122° | ±1.1642° |
+| Jupiter | 3.1300° | 3.1188° | −0.0112° | ±0.0214° |
+| Saturn | 26.7300° | 26.7974° | +0.0674° | ±0.0652° |
+| Uranus | 82.2300° | 82.2408° | +0.0108° | ±0.0238° |
+| Neptune | 28.3200° | 28.3200° | — | (cancels: cycle=ICRF) |
+
+**Formula midpoint stability**: Most planets have midpoints within ±0.1° of their J2000 values, with Mars being the largest outlier at +0.21°. The small shifts reflect that the inclination amplitude is much smaller than the mean obliquity for each planet — so the two-cosine oscillation is centered close to the observed value.
 
 ### Summary of testable predictions
 

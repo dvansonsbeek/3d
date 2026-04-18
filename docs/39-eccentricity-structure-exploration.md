@@ -56,9 +56,9 @@ All base eccentricities, amplitudes, and phases are now derived at runtime from 
 
 ### Balance with structural eccentricities
 
-- **Base eccentricities**: ~99.9% Law 5 balance (phase-derived, not forced)
+- **Base eccentricities**: ~99.86% Law 5 balance (phase-derived, not forced)
 - **Structural eccentricities**: ~99.98% balance (removing amplitudes adds ~0.02% imbalance)
-- **J2000 eccentricities**: 99.89% balance (a snapshot with current oscillation phases)
+- **J2000 eccentricities**: 99.88% balance (a snapshot with current oscillation phases)
 
 This confirms that the structural component carries the balance, and the amplitude is a perturbation on top.
 

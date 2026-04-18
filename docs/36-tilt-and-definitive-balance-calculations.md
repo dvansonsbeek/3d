@@ -437,7 +437,7 @@ analytical solution gives 193.0129° ≈ ω + 90.07° (0.002% match).
 
 ### Inner Planets: Tilt-Driven Regime
 
-The phase is now derived from the balanced-year anchor: `phase = (2000 - balancedYear) / wobblePeriod × 360°`. The base eccentricity follows from the law of cosines with the J2000 eccentricity and K-derived amplitude. All values are computed at runtime by constants.js.
+The phase is derived from the **System Reset anchor (n=7, -2,649,854 BC)** with a balance-group offset: `phase = phaseOffset + (2000 - systemReset) / wobblePeriod × 360°`, where `phaseOffset = 90°` for in-phase planets and `270°` for Saturn (anti-phase). At the anchor, every planet passes through its mean eccentricity — in-phase rising, Saturn falling — mirroring the inclination alignment. The base eccentricity follows from the law of cosines with the J2000 eccentricity and K-derived amplitude. All values are computed at runtime by constants.js.
 
 The predictive formula works for these planets because the tilt mechanism is
 the dominant source of eccentricity variation over each planet's eccentricity cycle.

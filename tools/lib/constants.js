@@ -62,6 +62,7 @@ const correctionSun = modelParams.foundational.correctionSun;
 const temperatureGraphMostLikely = modelParams.foundational.temperatureGraphMostLikely;
 const startAngleModel = modelParams.foundational.startAngleModel;
 const useVariableSpeed = modelParams.foundational.useVariableSpeed;
+const systemResetN = modelParams.foundational.systemResetN || 0;  // 0..7: eccentricity anchor offset in units of H
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -365,12 +366,19 @@ for (const [key, p] of Object.entries(planets)) {
 
 // Derive wobblePeriod for each planet (beat of axial precession and ICRF inclination)
 // Matches script.js calcWobblePeriod(). Needed before K derivation for base eccentricity.
+// If |axial| > 8H (effectively frozen, e.g. Uranus ~200 Myr, Neptune ~23 Myr),
+// treat as infinite: wobble = |ICRF period| exactly.
 const H13 = H / 13;
+const FROZEN_THRESHOLD = 8 * H;
 for (const [key, p] of Object.entries(planets)) {
   if (p.perihelionEclipticYears && p.axialPrecessionYears) {
     const inclICRF = (p.perihelionEclipticYears * H13) / (H13 - p.perihelionEclipticYears);
-    const wobbleRate = Math.abs(1 / p.axialPrecessionYears - 1 / inclICRF);
-    p.wobblePeriod = 1 / wobbleRate;
+    if (Math.abs(p.axialPrecessionYears) > FROZEN_THRESHOLD) {
+      p.wobblePeriod = Math.abs(inclICRF);
+    } else {
+      const wobbleRate = Math.abs(1 / p.axialPrecessionYears - 1 / inclICRF);
+      p.wobblePeriod = 1 / wobbleRate;
+    }
   }
 }
 
@@ -379,22 +387,21 @@ for (const [key, p] of Object.entries(planets)) {
 eccentricityAmplitudeK = eccentricityAmplitude * Math.sqrt(massFraction.earth)
   / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
 
-// Obliquity cycles (Fibonacci decomposition of perihelion rate numerator)
-// Venus/Neptune: rate numerator = 1, cannot decompose → no obliquity cycle
-const obliqCycles = {
-  mercury: 8 * H / 3, venus: null, mars: 3 * H / 8,
-  jupiter: H / 2, saturn: H / 3, uranus: H / 2, neptune: null,
-};
+// Obliquity cycles (loaded per-planet from model-parameters.json via p.obliquityCycle).
+// Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
+// Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
 
 // Compute model mean obliquity, K-derived eccentricity amplitudes, and phase-derived
 // base eccentricities for each planet. Closes the loop:
-// PSI → incl amp → mean tilt → K → ecc amp → phase from balanced year → base
+// PSI → incl amp → mean tilt → K → ecc amp → phase from eccentricity anchor → base
+// Anchor = balancedYear - systemResetN × H  (n=0: balancedYear, n=7: System Reset)
 const genPrecRate = 1 / (H / 13);
-const t2000 = 2000 - balancedYear;
+const eccentricityAnchor = balancedYear - systemResetN * H;
+const t2000 = 2000 - eccentricityAnchor;
 for (const [key, p] of Object.entries(planets)) {
   if (!p.fibonacciD || !massFraction[key]) continue;
   // Mean obliquity: remove J2000 oscillation offset
-  const obliqPeriod = obliqCycles[key];
+  const obliqPeriod = p.obliquityCycle;
   if (obliqPeriod && p.invPlaneInclinationAmplitude) {
     const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - genPrecRate);
     p.obliquityMean = p.axialTiltJ2000
@@ -408,18 +415,23 @@ for (const [key, p] of Object.entries(planets)) {
   p.orbitalEccentricityAmplitude = eccentricityAmplitudeK
     * Math.sin(Math.abs(p.obliquityMean) * Math.PI / 180) * Math.sqrt(p.fibonacciD)
     / (Math.sqrt(massFraction[key]) * Math.pow(a, 1.5));
-  // Base eccentricity from balanced-year phase (same principle as Earth)
-  // Phase at J2000 = (2000 - balancedYear) / wobblePeriod × 360°
+  // Base eccentricity from phase at eccentricity anchor
+  // Phase at J2000 = phaseOffset + (2000 - anchor) / wobblePeriod × 360°
+  // Phase offset: 90° for in-phase planets (mean, rising at anchor)
+  //               270° for Saturn (anti-phase, mean, falling at anchor)
+  // This encodes the physical state at n=7: all planets at mean eccentricity,
+  // with Saturn falling and others rising (mirrors inclination alignment).
   // Then solve: e_J2000² = base² + amp² - 2·base·amp·cos(θ)
   const amp = p.orbitalEccentricityAmplitude;
   const eJ2000 = p.orbitalEccentricityJ2000;
   if (p.wobblePeriod) {
-    const phaseDeg = (t2000 / p.wobblePeriod) * 360;
+    const phaseOffset = p.antiPhase ? 270 : 90;
+    const phaseDeg = (t2000 / p.wobblePeriod) * 360 + phaseOffset;
     const cosTheta = Math.cos(phaseDeg * Math.PI / 180);
     const sinTheta = Math.sin(phaseDeg * Math.PI / 180);
     const disc = eJ2000 * eJ2000 - amp * amp * sinTheta * sinTheta;
     p.orbitalEccentricityBase = amp * cosTheta + Math.sqrt(Math.max(0, disc));
-    p.eccentricityPhaseJ2000 = phaseDeg % 360;
+    p.eccentricityPhaseJ2000 = ((phaseDeg % 360) + 360) % 360;
   } else {
     // No wobble period — use J2000 as base, derive phase from law of cosines
     p.orbitalEccentricityBase = eJ2000;

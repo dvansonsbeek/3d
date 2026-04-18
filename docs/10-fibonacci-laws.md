@@ -107,7 +107,7 @@ Substituting Law 2 and simplifying:
 where w_j = √(m_j × a_j(1-e_j²)) / d_j
 ```
 
-**Result: 99.9972% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
+**Result: 99.9975% balance.** See [Inclination Balance Derivation](#inclination-balance-derivation) for the full treatment.
 
 ### Law 4: The Eccentricity Amplitude Constant
 
@@ -241,15 +241,15 @@ The exhaustive search evaluates 7,558,272 candidates (see [Exhaustive Search](#e
 
 | Filter | Surviving |
 |--------|----------|
-| Inclination balance ≥ 99.994% (TNO margin) | 767 |
+| Inclination balance ≥ 99.994% (TNO margin) | 766 |
 | + Eccentricity balance ≥ 99% | 94 |
 | + Per-config optimised anchor gives LL bounds 8/8 | 49 |
-| + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 41 |
+| + Direction match + rate error ≤ 5″ (Jupiter–Saturn shared ascending node) | 43 |
 | + Mirror symmetry | **1** |
 
 Each of the 94 candidates passing both balance thresholds is evaluated at its own optimal anchor position (*n*) and ascending node integers (*N* per planet), making the LL and direction checks fair — not biased toward any single configuration. Jupiter and Saturn are constrained to share the same *N*.
 
-The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #8 of 41 by eccentricity balance (99.89%). All 41 candidates are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
+The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #11 of 43 by eccentricity balance (99.86%). All 43 candidates are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
 
 **Key structural constraints:**
 
@@ -265,7 +265,7 @@ The eccentricity balance (Law 5) is genuinely independent from the inclination b
 
 - The weight formulas differ: `w_j = √(m·a(1-e²))/d` (inclination) vs `v_j = √m × a^(3/2) × e / √d` (eccentricity)
 - The ratio v_j/w_j varies by a factor of ~150 across planets — the two balance conditions are not proportional
-- The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 99.89%
+- The coefficient `√m × a^(3/2) / √d` alone (without e) gives only 74% balance; the actual eccentricity values improve it to 99.86%
 - Random eccentricity values in the same weight formula give 50–85% balance
 
 The two balances also differ structurally. The inclination balance is a **global** property — all mass in the solar system contributes (TNOs provide a 0.0002% correction). The eccentricity balance is a **closed-system** property of the 8 planets — the mirror pairs act as "communicating vessels" exchanging Angular Momentum Deficit (AMD), and TNOs cannot participate because (a) they lack paired counterparts, (b) the a^(3/2) weighting makes them far too heavy for any Fibonacci d-factor, and (c) they are test particles that cannot shape the eigenmode structure. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the quantitative analysis.
@@ -349,7 +349,7 @@ Where `w_j = √(m_j × a_j(1-e_j²)) / d_j` is the structural weight for each p
 Σ(anti-phase)  w = 1.7374 × 10⁻²
 
 Difference: 9.6 × 10⁻⁷
-Balance: 99.9972%
+Balance: 99.9975%
 ```
 
 Jupiter (d=5) contributes the dominant in-phase weight (1.408 × 10⁻²). The remaining six planets collectively contribute 3.29 × 10⁻³ to match Saturn's total of 1.737 × 10⁻².
@@ -437,7 +437,7 @@ Three tests confirm the eccentricity balance is a genuine constraint on eccentri
 
 1. **Coefficient test**: The weight formula without eccentricities (`√m × a^(3/2) / √d`) gives only 74% balance — the eccentricity values contribute 26 percentage points of improvement
 2. **Random test**: Substituting random eccentricities into the same weight formula gives 50–85% balance across 1000 trials
-3. **Power test**: The balance peaks sharply at e¹·⁰ (99.89%), dropping to 98.5% for e⁰·⁹ and 98.4% for e¹·¹, and to 91% for e² — linear eccentricity is special
+3. **Power test**: The balance peaks sharply at e¹·⁰ (99.86%), dropping substantially for other powers — linear eccentricity is special
 
 ### Connection to AMD Theory
 
@@ -487,7 +487,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 **LL bounds: 8/8 pass** — All 8 planets' inclination ranges fit within Laplace-Lagrange secular theory bounds.
 
-The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9972% (Law 3), and (3) the eccentricity weights balance to 99.8865% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
+The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8636% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
 
 ### Worked Example: Earth's Inclination Amplitude
 
@@ -605,7 +605,7 @@ Compute `mean ± amplitude` for each planet and verify the range falls within th
 
 ### Test 3: Inclination Balance
 
-Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9972% balance.
+Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9975% balance.
 
 ### Test 4: Eccentricity Balance
 
@@ -655,7 +655,7 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised anchor, ascending nodes, and phase angles), sorted by eccentricity balance. The current run yields 41 presets.
+The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised anchor, ascending nodes, and phase angles), sorted by eccentricity balance. The current run yields 43 presets.
 
 ### Shared Input Values
 
@@ -689,7 +689,7 @@ node tools/fit/export-to-script.js --write
 
 ### What builds on established theory
 
-**Law 3 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 99.9972%.
+**Law 3 (Inclination Balance)** is rooted in **angular momentum conservation**. The weight factor `√(m·a(1-e²))` is proportional to a planet's orbital angular momentum `L`. The invariable plane is defined as the plane perpendicular to the total angular momentum vector, so inclination oscillations must balance around it — that is what makes it the invariable plane. The novel contribution is that dividing by a Fibonacci divisor `d` preserves the balance to 99.9975%.
 
 **Phase angles** are per-planet values (ICRF perihelion longitude at the balanced year) that cluster near the **eigenmodes of Laplace-Lagrange secular perturbation theory** (γ₁-γ₈) within 1-10°. Saturn's anti-phase behavior (MAX inclination at balanced year, opposite to all other planets) is consistent with its known retrograde precession in secular theory.
 
@@ -726,7 +726,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
-| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 41 survivors with per-config optimised anchor and ascending nodes |
+| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 43 survivors with per-config optimised anchor and ascending nodes |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
 | [Configuration Analysis](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of all 7.56M configurations (superseded by the sequential pipeline in balance-search.js) |
 | [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Balance decomposition, sensitivity, TNO closed-system argument |

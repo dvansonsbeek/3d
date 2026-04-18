@@ -45,30 +45,30 @@ barycenterEarthAndSun (the Sun)
 | speed | 2π rad/yr (= 1 year period) | Orbits once per year — tracks the Sun's apparent annual motion in the geocentric frame. |
 | startPos | 0° | The initial angle within the annual cycle. |
 | orbitRadius | 0 | Not on a circular orbit — positioned via orbitCenter offset. |
-| **orbitCenter** | **(−6.4602, −1.3227, 0)** | **See derivation below** |
+| **orbitCenter** | **(−6.4682, −1.3244, 0)** | **See derivation below** |
 | tilt | 0° | In the ecliptic plane. |
 
-### Why orbitCenter = (−6.4602, −1.3227, 0)
+### Why orbitCenter = (−6.4682, −1.3244, 0)
 
 The orbit center places Mercury's perihelion point at the correct distance and direction from the Sun. It encodes two things:
 
 1. **The distance** = `mercuryPerihelionDistance` = `orbitDistance × realEccentricity × 100`
    - `orbitDistance` = 0.38711 AU (from Kepler's 3rd law: `(H / solarYearCount)^(2/3)`)
-   - `realEccentricity` = `e_base / (1 + e_base)` = 0.20532 / 1.20532 = 0.17034. Here `e_base` is `orbitalEccentricityBase` (0.20532) — the model's phase-derived **base** eccentricity (the midpoint of the eccentricity oscillation cycle), not the J2000 snapshot (0.20564). The formula converts the orbital eccentricity to the geometric focus offset as a fraction of the semi-major axis.
+   - `realEccentricity` = `e_base / (1 + e_base)` = 0.20563 / 1.20563 = 0.17056. Here `e_base` is `orbitalEccentricityBase` (0.20563) — the model's phase-derived **base** eccentricity (the midpoint of the eccentricity oscillation cycle), essentially equal to the J2000 snapshot (0.20564) because Mercury's amplitude is tiny. The formula converts the orbital eccentricity to the geometric focus offset as a fraction of the semi-major axis.
    - `× 100` = scene-graph scale factor (1 AU = 100 scene units)
-   - Result: **6.5942 scene units**
+   - Result: **6.6024 scene units**
 
 2. **The direction** = `longitudePerihelion + angleCorrection` = 77.457° + 0.972° = **78.429°**
    - `longitudePerihelion` = 77.457° (JPL J2000 ecliptic longitude of Mercury's perihelion)
    - `angleCorrection` = 0.972° (fitted offset so the model's perihelion RA matches JPL at J2000; see [optimization](61-optimization-execution-plan.md))
    - The two components of orbitCenter are the X and Y projections:
-     - `orbitCentera` = cos(angle + 90°) × distance = cos(168.43°) × 6.5942 = **−6.4602**
-     - `orbitCenterb` = cos(90° − (angle − 90°)) × distance = sin(168.43°) × 6.5942 = **−1.3227**
+     - `orbitCentera` = cos(angle + 90°) × distance = cos(168.43°) × 6.6024 = **−6.4682**
+     - `orbitCenterb` = cos(90° − (angle − 90°)) × distance = sin(168.43°) × 6.6024 = **−1.3244**
    - (The `+90°` and the `90−(x−90)` formulas are the simulation's convention for converting ecliptic longitude to scene-graph X/Y coordinates.)
 
-**In plain terms**: the perihelion point is placed 6.59 scene units from the Sun, in the direction 78.4° ecliptic longitude. This matches Mercury's observed perihelion direction at J2000.
+**In plain terms**: the perihelion point is placed 6.60 scene units from the Sun, in the direction 78.4° ecliptic longitude. This matches Mercury's observed perihelion direction at J2000.
 
-### How orbitalEccentricityBase (0.20532) is derived
+### How orbitalEccentricityBase (0.20563) is derived
 
 The base eccentricity is **not** an input — it's derived at runtime from the closed-loop chain PSI → K → eccentricity amplitude → phase → base. Here is the full derivation for Mercury:
 
@@ -79,31 +79,36 @@ a = (solarYearInput / meanSolarYearDays)^(2/3)
   = 0.38711 AU
 ```
 
-**Step B: Mean obliquity** (axial tilt adjusted for J2000 oscillation offset)
+**Step B: Mean obliquity** (axial tilt adjusted for oscillation offset relative to the System Reset anchor)
 ```
 obliquityMean = axialTiltJ2000 + amp×cos(ICRF phase) − amp×cos(obliq phase)
              = 0.03° + oscillation offset
-             = −0.1197°
+             ≈ 0.0084°
 ```
-Mercury's mean obliquity is slightly negative because the oscillation offset at J2000 shifts it below the J2000 snapshot (0.03°).
+Mercury's mean obliquity is nearly zero under the System Reset anchor — very close to the J2000 snapshot (0.03°) because Mercury's amplitude is tiny.
 
 **Step C: Eccentricity amplitude from K** (the universal eccentricity amplitude constant)
 ```
 e_amp = K × sin(|obliquityMean|) × √d / (√m × a^1.5)
-      = 3.4149×10⁻⁶ × sin(0.1197°) × √21 / (4.074×10⁻⁴ × 0.2408)
-      = 3.4149×10⁻⁶ × 0.002089 × 4.5826 / (9.814×10⁻⁵)
-      = 3.331×10⁻⁴
+      = 3.4149×10⁻⁶ × sin(0.0084°) × √21 / (4.074×10⁻⁴ × 0.2408)
+      ≈ 2.34×10⁻⁵
 ```
-Mercury has a tiny eccentricity amplitude (~0.03%) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt.
+Mercury has an extremely tiny eccentricity amplitude (~0.01%) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt.
 
 **Step D: Phase at J2000** (where in the eccentricity cycle Mercury is right now)
+
+The eccentricity anchor is the **System Reset** (n=7, -2,649,854 BC), when all planets simultaneously reach inclination extremes. At the anchor, in-phase planets are at eccentricity MEAN + rising (phase 90°); Saturn (anti-phase) is at MEAN + falling (phase 270°).
+
 ```
-t₂₀₀₀ = 2000 − balancedYear = 2000 − (−302,635) = 304,635 years
+anchor = balancedYear − 7H = −2,649,854 (System Reset)
+t₂₀₀₀ = 2000 − anchor = 2,651,854 years
 wobblePeriod = 31,935 years  (Mercury's eccentricity cycle = 2H/21)
-θ = (t₂₀₀₀ / wobblePeriod) × 360° = 3434.1°  (mod 360° = ~194°)
-cos(θ) = −0.9698
-sin(θ) = −0.2440
+phaseOffset = 90°  (Mercury is in-phase)
+θ = 90° + (t₂₀₀₀ / wobblePeriod) × 360° = 90° + 14.12° = 104.12°
+cos(θ) = −0.2440
+sin(θ) = +0.9698
 ```
+
 
 **Step E: Base eccentricity from law of cosines**
 
@@ -115,14 +120,14 @@ e_J2000² = base² + amp² − 2·base·amp·cos(θ)
 
 Solving for `base` (choosing the positive root):
 ```
-discriminant = e_J2000² − amp²·sin²(θ) = 0.04229
+discriminant = e_J2000² − amp²·sin²(θ) ≈ 0.04229
 base = amp·cos(θ) + √discriminant
-     = 3.331×10⁻⁴ × (−0.9698) + √0.04229
-     = −0.000323 + 0.20564
-     = 0.20532
+     ≈ 2.34×10⁻⁵ × (−0.2440) + √0.04229
+     ≈ −5.7×10⁻⁶ + 0.20564
+     ≈ 0.20563
 ```
 
-This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — the value it oscillates around over its 31,935-year cycle (2H/21). It differs from the J2000 snapshot (0.20564) by only 0.16% because Mercury's eccentricity amplitude is tiny.
+This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — the value it oscillates around over its 31,935-year cycle (2H/21). Because Mercury's amplitude is extremely small (~2×10⁻⁵), the base is essentially equal to the J2000 value.
 
 ---
 
@@ -149,7 +154,7 @@ This is the **arithmetic midpoint** of Mercury's eccentricity oscillation — th
 |----------|-------|-----------------|
 | speed | −2π rad/yr | Orbits once per year (negative = opposite handedness to Step 2, creating the retrograde apparent motion). |
 | startPos | 131.670° | = `180° − ascendingNode` = 180° − 48.330°. Places the starting position at the descending node. |
-| **orbitRadius** | **3.2971** | = `mercuryElipticOrbit` = `mercuryPerihelionDistance / 2` = 6.5942 / 2. The semi-minor axis of the projected ellipse (half the perihelion distance). |
+| **orbitRadius** | **3.3012** | = `mercuryElipticOrbit` = `mercuryPerihelionDistance / 2` = 6.6024 / 2. The semi-minor axis of the projected ellipse (half the perihelion distance). |
 | orbitCenter | (100, 0, 0) | Places the orbit center at 100 scene units along the X-axis (= 1 AU = the Sun's distance from Earth in the geocentric frame). |
 | **orbitTilta** | computed | = `cos(−90° − ascNode) × −eclipticInclination` = cos(−138.33°) × −7.005° |
 | **orbitTiltb** | computed | = `sin(−90° − ascNode) × −eclipticInclination` = sin(−138.33°) × −7.005° |
@@ -194,13 +199,13 @@ This is the only fitted value per planet (besides angleCorrection). It's optimis
 | `perihelionEclipticYears` (243,867 yr) | H × 8/11 (Fibonacci Law 1) | Model prediction |
 | `longitudePerihelion` (77.457°) | JPL J2000 | Observed input |
 | `angleCorrection` (0.972°) | Fitted to match JPL RA at J2000 | Calibration |
-| `orbitalEccentricityBase` (0.20532) | Phase-derived from K + J2000 eccentricity | Model derived |
+| `orbitalEccentricityBase` (0.20563) | Phase-derived from K + J2000 eccentricity | Model derived |
 | `ascendingNode` (48.330°) | JPL J2000 | Observed input |
 | `eclipticInclinationJ2000` (7.005°) | JPL J2000 | Observed input |
 | `startpos` (83.652°) | Fitted to match JPL RA at J2000 | Calibration |
 | `solarYearInput` (87.9683 days) | JPL orbital period | Observed input |
 
-The orbit center (−6.4602, −1.3227) is **fully derived** — it follows from the observed perihelion direction and the model-derived eccentricity. No fitting is needed for the orbit center itself.
+The orbit center (−6.4682, −1.3244) is **fully derived** — it follows from the observed perihelion direction and the model-derived eccentricity. No fitting is needed for the orbit center itself.
 
 ---
 
