@@ -249,6 +249,8 @@ The exhaustive search evaluates 7,558,272 candidates (see [Exhaustive Search](#e
 
 Each of the 94 candidates passing both balance thresholds is evaluated at its own optimal anchor position (*n*) and ascending node integers (*N* per planet), making the LL and direction checks fair — not biased toward any single configuration. Jupiter and Saturn are constrained to share the same *N*.
 
+**Per-config eccentricity balance** (deep analysis refinement): after the optimal *n* is found for each candidate, the base eccentricities are **recomputed using the candidate's own d-values, anti-phase assignments, and that optimal anchor** — not the default config's bases. This is the fair comparison: each config is evaluated against its own physical reference point. Final ranking uses this per-config eccentricity balance. Under this fair ranking, the default configuration places at #11 of 43 survivors; top non-mirror configs reach ~99.999% (at anchors n=0 or n=4 with different anti-phase patterns), while mirror symmetry remains the unique structural property of the default.
+
 The sole mirror-symmetric survivor is the **default configuration** (Me=21, Ve=34, Ea=3, Ma=5, Ju=5, Sa=3, Ur=21, Ne=34), ranking #11 of 43 by eccentricity balance (99.86%). All 43 candidates are available for comparison in the [interactive Balance Explorer](https://3d.holisticuniverse.com).
 
 **Key structural constraints:**
@@ -726,7 +728,7 @@ The key unresolved question is **why Fibonacci numbers work**: do they encode so
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height above/below invariable plane |
 | [05 - Invariable Plane Overview](05-invariable-plane-overview.md) | Conceptual background |
 | [Inclination Optimization](../tools/verify/inclination-optimization.js) | Optimization script |
-| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 43 survivors with per-config optimised anchor and ascending nodes |
+| [Balance Search](../tools/verify/balance-search.js) | Exhaustive search + deep analysis: five-stage pipeline producing 43 survivors with per-config optimised anchor, ascending nodes, and base eccentricities |
 | [Verify Laws](../tools/verify/verify-laws.js) | Comprehensive verification of all six laws, five findings, and predictions |
 | [Configuration Analysis](../tools/verify/configuration-analysis.js) | Historical: four-filter intersection analysis of all 7.56M configurations (superseded by the sequential pipeline in balance-search.js) |
 | [Eccentricity Balance](../tools/verify/eccentricity-balance.js) | Balance decomposition, sensitivity, TNO closed-system argument |

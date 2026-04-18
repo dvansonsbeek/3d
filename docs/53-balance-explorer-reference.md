@@ -74,7 +74,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **43 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Sorted by eccentricity balance, grouped by Jupiter/Saturn scenario:
+A dropdown in the header offers **43 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
