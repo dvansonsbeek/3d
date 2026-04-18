@@ -19953,7 +19953,7 @@ function wgcLinearFit(x, y) {
 }
 
 /** Render an SVG line chart with data + trend line. */
-function wgcRenderChart(title, yrArr, values, color, label) {
+function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
   const W = 800, H = 180;
   const margin = { top: 18, right: 20, bottom: 24, left: 60 };
   const plotW = W - margin.left - margin.right;
@@ -19962,9 +19962,18 @@ function wgcRenderChart(title, yrArr, values, color, label) {
   const unwrapped = wgcUnwrap(values);
   const fit = wgcLinearFit(yrArr, unwrapped);
 
-  // Find min/max of UNWRAPPED values + trend line for scaling
-  const ymin = Math.min(...unwrapped);
-  const ymax = Math.max(...unwrapped);
+  // Optional model line: { rate (deg/yr), anchorYear, anchorValue }
+  // Produces ϖ_model(t) = anchorValue + rate × (t - anchorYear)
+  let modelValues = null;
+  if (modelLine) {
+    modelValues = yrArr.map(y => modelLine.anchorValue + modelLine.rate * (y - modelLine.anchorYear));
+  }
+
+  // Find min/max of UNWRAPPED values + trend line + model line for scaling
+  const allY = [...unwrapped];
+  if (modelValues) allY.push(...modelValues);
+  const ymin = Math.min(...allY);
+  const ymax = Math.max(...allY);
   const yPad = (ymax - ymin) * 0.05 || 1;
   const y0 = ymin - yPad;
   const y1 = ymax + yPad;
@@ -20017,6 +20026,7 @@ function wgcRenderChart(title, yrArr, values, color, label) {
         ${xticks.join('')}
         <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="0.8" opacity="0.85"/>
         <line x1="${trendStart.x.toFixed(1)}" y1="${trendStart.y.toFixed(1)}" x2="${trendEnd.x.toFixed(1)}" y2="${trendEnd.y.toFixed(1)}" stroke="#ff6" stroke-width="1.4" stroke-dasharray="4,2"/>
+        ${modelValues ? `<line x1="${sx(xmin).toFixed(1)}" y1="${sy(modelValues[0]).toFixed(1)}" x2="${sx(xmax).toFixed(1)}" y2="${sy(modelValues[modelValues.length - 1]).toFixed(1)}" stroke="#e55" stroke-width="1.4"/>` : ''}
         <text x="${W - margin.right}" y="${margin.top - 4}" text-anchor="end" font-size="10" fill="#ccc">start: ${startVal.toFixed(3)}\u00B0 &#8594; end: ${endVal.toFixed(3)}\u00B0</text>
       </svg>
       <div class="wgc-chart-footer">
@@ -20042,12 +20052,19 @@ function wgcRenderPlanet(planetKey) {
   const rateSinCy = (d.rates && d.rates.sinPi != null) ? d.rates.sinPi : rateRawCy;
   const ratePiCy = rateSinCy;                                   // prefer sin-fit for period estimate
   const periodYr = ratePiCy !== 0 ? Math.abs(360 * 3600 * 100 / ratePiCy) : Infinity;
-  const N = 8 * H / periodYr;
 
   const baselineYr = d.yrArr[d.yrArr.length - 1] - d.yrArr[0];
   const oscPeriod = d.oscPeriod || 10;
   const nCycles = baselineYr / oscPeriod;
   const reliable = nCycles >= 4;  // heuristic: need ≥4 oscillation cycles for clean OLS
+
+  // Planets whose perihelion trend cannot be reliably determined from the
+  // 1900-2026 observational baseline: Venus, Jupiter, Uranus, Neptune.
+  // Their trends flip sign across sub-windows (1800-1900, 1900-2026, 2026-2100),
+  // so the "direction" for these planets is inherited from Laskar-style
+  // million-year secular integrations rather than direct observation.
+  // Only Mercury, Mars, and Saturn have reliably resolvable trends.
+  const undeterminedTrend = ['VENUS', 'JUPITER', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
 
   return `
     <div class="wgc-planet-content">
@@ -20055,15 +20072,24 @@ function wgcRenderPlanet(planetKey) {
       <div class="wgc-planet-summary">
         ϖ rate [raw OLS]: <b>${rateRawCy.toFixed(1)} \u2033/cy</b>
         &nbsp;\u2022&nbsp; [sin+lin]: <b>${rateSinCy.toFixed(1)} \u2033/cy</b>
-        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} yr</b>
-        &nbsp;\u2022&nbsp; 8H/N \u2248 8H/${Math.round(N)} (N=${N.toFixed(3)})
+        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} yr</b>${undeterminedTrend ? ' <span style="color:#cb4b16;">\u26a0 trend undetermined</span>' : ''}
       </div>
       <div class="wgc-planet-method">
-        Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}
+        Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
       ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
       ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
-      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])}`)}
+      ${(() => {
+        // Model line for ϖ: uses the planet's ecliptic perihelion rate.
+        // Anchor at J2000 using JPL longitudePerihelion (matches observed at J2000).
+        const modelPlanet = planets[planetKey.toLowerCase()];
+        const modelLine = modelPlanet ? {
+          rate: 360 / modelPlanet.perihelionEclipticYears,  // deg/yr (signed)
+          anchorYear: 2000,
+          anchorValue: modelPlanet.longitudePerihelion,
+        } : null;
+        return wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#e55">red line = model prediction</span>`, modelLine);
+      })()}
     </div>
   `;
 }
