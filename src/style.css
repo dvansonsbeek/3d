@@ -2844,7 +2844,7 @@ a:link {
 .ebs-dialog {
   position: relative;
   width: min(860px, 94vw);
-  max-height: 92vh;
+  max-height: 96vh;
   display: flex;
   flex-direction: column;
   background: rgba(20, 24, 30, 0.96);

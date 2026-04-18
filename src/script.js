@@ -19396,15 +19396,17 @@ function hexToCSS(hex) {
 function renderEccWaterfallSVG(data) {
   const items = data.items;
   const targetOffset = data.targetOffset;
+  const residual = targetOffset - data.total;
   // Compute max cumulative excursion to determine scale
   let cumTest = 0, maxCum = 0;
   for (const item of items) { cumTest += item.contribution; maxCum = Math.max(maxCum, Math.abs(cumTest)); }
   const maxVal = Math.max(maxCum, Math.abs(targetOffset)) * 1.15;
-  const svgW = 900, barH = 28, padTop = 10, padBottom = 30, padLeft = 80, padRight = 140;
+  const svgW = 900, barH = 22, padTop = 10, padBottom = 30, padLeft = 80, padRight = 140;
   const chartW = svgW - padLeft - padRight;
-  const svgH = padTop + items.length * barH + padBottom;
+  const rowCount = items.length + 1;  // +1 for residual row
+  const svgH = padTop + rowCount * barH + padBottom;
   const scale = chartW / maxVal;
-  const maxAbsC = Math.max(...items.map(i => Math.abs(i.contribution)));
+  const maxAbsC = Math.max(...items.map(i => Math.abs(i.contribution)), Math.abs(residual));
   const valColX = svgW - padRight + 8; // left edge of value column
   const valColW = padRight - 16;       // width available for background bars
   let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
@@ -19442,21 +19444,43 @@ function renderEccWaterfallSVG(data) {
       svg += `<line x1="${cumX}" y1="${y + barH - 2}" x2="${cumX}" y2="${y + barH + 2}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
     }
   }
+  // Residual bar — the Law 5 imbalance closure that makes the sum = target's offset
+  {
+    const y = padTop + items.length * barH;
+    const residualWidth = Math.abs(residual) * scale;
+    const isResidualPositive = residual >= 0;
+    svg += `<circle cx="${padLeft - 14}" cy="${y + barH/2}" r="4" fill="#888"/>`;
+    svg += `<text x="${padLeft - 22}" y="${y + barH/2 + 4}" fill="#ccc" font-size="11" text-anchor="end" font-family="var(--pl-body-font)" font-style="italic">Residual</text>`;
+    const residualBarX = isResidualPositive ? cumX : cumX - residualWidth;
+    const residualFillColor = isResidualPositive ? 'rgba(80,180,120,0.5)' : 'rgba(200,80,80,0.45)';
+    svg += `<rect x="${Math.max(residualBarX, padLeft)}" y="${y + 4}" width="${Math.min(residualWidth, chartW)}" height="${barH - 8}" rx="3" fill="${residualFillColor}" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>`;
+    cumX += residual * scale;
+    const residualSignStr = residual >= 0 ? '+' : '';
+    const residualValBarPct = maxAbsC > 0 ? Math.abs(residual) / maxAbsC : 0;
+    const residualValBarW = Math.max(residualValBarPct * valColW, 2);
+    const residualValBarColor = isResidualPositive ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
+    svg += `<rect x="${svgW - 8 - residualValBarW}" y="${y + 3}" width="${residualValBarW}" height="${barH - 6}" rx="2" fill="${residualValBarColor}"/>`;
+    svg += `<text x="${svgW - 12}" y="${y + barH/2 + 4}" fill="${isResidualPositive ? 'rgba(76,175,80,0.9)' : 'rgba(239,83,80,0.9)'}" font-size="10" text-anchor="end" font-family="var(--pl-mono-font)">${residualSignStr}${residual.toFixed(4)}</text>`;
+  }
   // Zero line
   svg += `<line x1="${padLeft}" y1="${padTop - 2}" x2="${padLeft}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>`;
   // Separator between chart and value column
   svg += `<line x1="${svgW - padRight}" y1="${padTop - 2}" x2="${svgW - padRight}" y2="${svgH - padBottom + 4}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-  // Total in value column — same row as eccentricity label
-  svg += `<text x="${svgW - 12}" y="${svgH - padBottom + 18}" fill="rgba(143,188,143,.85)" font-size="11" font-weight="600" text-anchor="end" font-family="var(--pl-mono-font)">${data.total.toFixed(6)}</text>`;
+  // Total in value column — same row as eccentricity label (now equals target offset exactly)
+  svg += `<text x="${svgW - 12}" y="${svgH - padBottom + 18}" fill="rgba(143,188,143,.85)" font-size="11" font-weight="600" text-anchor="end" font-family="var(--pl-mono-font)">${data.targetOffset.toFixed(6)}</text>`;
   svg += '</svg>';
   return svg;
 }
 
 function renderEccBuildupTable(data) {
   const items = data.items;
-  // Compute total absolute contributions for meaningful percentages
-  const totalAbsContrib = items.reduce((s, i) => s + Math.abs(i.contribution), 0);
-  const maxAbsContrib = Math.max(...items.map(i => Math.abs(i.contribution)));
+  // Residual: what's needed to close the balance so sum = target's offset.
+  // This represents the Law 5 imbalance (~0.14%) that the other 7 planets
+  // alone cannot account for — a real contribution to the target's eccentricity.
+  const residual = data.targetOffset - data.total;
+  // Compute total absolute contributions INCLUDING residual for meaningful percentages
+  const totalAbsContrib = items.reduce((s, i) => s + Math.abs(i.contribution), 0) + Math.abs(residual);
+  const maxAbsContrib = Math.max(...items.map(i => Math.abs(i.contribution)), Math.abs(residual));
   let html = '<table class="ebs-table">';
   html += '<colgroup><col style="width:12%"><col style="width:13%"><col style="width:5%"><col style="width:13%"><col style="width:13%"><col style="width:9%"><col style="width:15.6%"></colgroup>';
   html += '<thead><tr>';
@@ -19483,10 +19507,26 @@ function renderEccBuildupTable(data) {
     html += `<td class="ebs-mono ebs-col-contrib ${signClass}" style="background:linear-gradient(270deg,${contribBarColor} ${contribBarPct.toFixed(1)}%,transparent ${contribBarPct.toFixed(1)}%)">${item.contribution >= 0 ? '+' : ''}${item.contribution.toFixed(4)}</td>`;
     html += '</tr>';
   }
-  // Summary row
+  // Residual row: represents the Law 5 imbalance closure.
+  // Sign and bar color follow the residual's sign (positive = adds to target, negative = subtracts).
+  const residualSignClass = residual > 0 ? 'ebs-positive' : 'ebs-negative';
+  const residualSharePct = totalAbsContrib > 0 ? (Math.abs(residual) / totalAbsContrib) * 100 : 0;
+  const residualBarPct = maxAbsContrib > 0 ? (Math.abs(residual) / maxAbsContrib) * 100 : 0;
+  const residualBarColor = residual > 0 ? 'rgba(76,175,80,0.2)' : 'rgba(239,83,80,0.2)';
+  const residualShareBarColor = 'rgba(255,255,255,0.08)';
+  html += `<tr>`;
+  html += `<td title="The Law 5 imbalance (~0.14%). This small residual, together with the seven planet contributions, sets the target\u2019s eccentricity exactly."><span class="ebs-dot" style="background:#888"></span><em>Residual</em></td>`;
+  html += `<td class="ebs-mono ebs-fixed">—</td>`;
+  html += `<td class="ebs-mono ebs-fixed">—</td>`;
+  html += `<td class="ebs-mono ebs-fixed">—</td>`;
+  html += `<td class="ebs-mono">—</td>`;
+  html += `<td class="ebs-mono" style="background:linear-gradient(270deg,${residualShareBarColor} ${residualSharePct.toFixed(1)}%,transparent ${residualSharePct.toFixed(1)}%)">${residualSharePct.toFixed(1)}%</td>`;
+  html += `<td class="ebs-mono ebs-col-contrib ${residualSignClass}" style="background:linear-gradient(270deg,${residualBarColor} ${residualBarPct.toFixed(1)}%,transparent ${residualBarPct.toFixed(1)}%)">${residual >= 0 ? '+' : ''}${residual.toFixed(4)}</td>`;
+  html += '</tr>';
+  // Summary row — now sums to exactly the target's offset
   html += `<tr class="ebs-summary"><td colspan="5">TOTAL &rarr; e <small>base</small> = <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span></td>`;
   html += `<td class="ebs-mono">100%</td>`;
-  html += `<td class="ebs-mono ebs-col-contrib ebs-fixed">${data.total.toFixed(6)} AU</td></tr>`;
+  html += `<td class="ebs-mono ebs-col-contrib ebs-fixed">${data.targetOffset.toFixed(6)} AU</td></tr>`;
   html += '</tbody></table>';
   return html;
 }
@@ -19603,9 +19643,8 @@ function updateEccBalanceScale(targetKey) {
     const pullers = data.items.filter(i => i.sign < 0);
     const pullTotal = Math.abs(pullers.reduce((s, i) => s + i.contribution, 0)).toFixed(2);
     html += `<div class="ebs-callout ebs-callout-tug">`;
-    html += `Saturn (anti-phase) pulls one way with <span class="ebs-positive">+${satPush}</span> AU `;
-    html += `while all other planets pull the opposite way with <span class="ebs-negative">\u2212${pullTotal}</span> AU. `;
-    html += `${data.targetName}\u2019s base eccentricity of <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span> is the <strong>residual</strong> after these opposing forces nearly cancel.</div>`;
+    html += `Saturn pulls one way with <span class="ebs-positive">+${satPush}</span> AU, the others pull back with <span class="ebs-negative">\u2212${pullTotal}</span> AU. `;
+    html += `Together with the Law 5 residual, they sum to ${data.targetName}\u2019s offset e\u00D7a = <span class="ebs-fixed">${data.targetOffset.toFixed(6)}</span> AU, giving base e = <span class="ebs-ecc">${data.targetEcc.toFixed(6)}</span>.</div>`;
   }
   // SVG chart
   html += `<div class="ebs-chart">${renderEccWaterfallSVG(data)}</div>`;
