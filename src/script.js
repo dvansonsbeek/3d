@@ -19907,6 +19907,208 @@ function closeGHOPanel() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// WEBGEOCALC EXPLORER PANEL (.wgc-)
+// Shows observed perihelion precession rates 1900-2026 from JPL WebGeoCalc
+// Data source: tools/explore/wgc-perihelion-rates.js → data/wgc-perihelion-data.json
+// ═══════════════════════════════════════════════════════════════════
+
+let wgcPanel = null;
+let wgcData = null;
+let wgcSelectedPlanet = 'URANUS';
+
+async function loadWGCData() {
+  if (wgcData) return wgcData;
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/wgc-perihelion-data.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    wgcData = await res.json();
+    return wgcData;
+  } catch (e) {
+    console.error('Failed to load WGC data:', e);
+    return null;
+  }
+}
+
+function wgcUnwrap(angles) {
+  const out = [angles[0]];
+  for (let i = 1; i < angles.length; i++) {
+    let d = angles[i] - angles[i - 1];
+    while (d > 180) d -= 360;
+    while (d < -180) d += 360;
+    out.push(out[i - 1] + d);
+  }
+  return out;
+}
+
+function wgcLinearFit(x, y) {
+  const n = x.length;
+  const xMean = x.reduce((s, v) => s + v, 0) / n;
+  const yMean = y.reduce((s, v) => s + v, 0) / n;
+  let num = 0, den = 0;
+  for (let i = 0; i < n; i++) {
+    num += (x[i] - xMean) * (y[i] - yMean);
+    den += (x[i] - xMean) ** 2;
+  }
+  return { slope: num / den, intercept: yMean - (num / den) * xMean };
+}
+
+/** Render an SVG line chart with data + trend line. */
+function wgcRenderChart(title, yrArr, values, color, label) {
+  const W = 800, H = 180;
+  const margin = { top: 18, right: 20, bottom: 24, left: 60 };
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+
+  const unwrapped = wgcUnwrap(values);
+  const fit = wgcLinearFit(yrArr, unwrapped);
+
+  // Find min/max of UNWRAPPED values + trend line for scaling
+  const ymin = Math.min(...unwrapped);
+  const ymax = Math.max(...unwrapped);
+  const yPad = (ymax - ymin) * 0.05 || 1;
+  const y0 = ymin - yPad;
+  const y1 = ymax + yPad;
+
+  const xmin = yrArr[0];
+  const xmax = yrArr[yrArr.length - 1];
+
+  const sx = (x) => margin.left + ((x - xmin) / (xmax - xmin)) * plotW;
+  const sy = (y) => margin.top + plotH - ((y - y0) / (y1 - y0)) * plotH;
+
+  // Data polyline (use unwrapped values — smoother)
+  let pathPoints = '';
+  for (let i = 0; i < yrArr.length; i++) {
+    pathPoints += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(unwrapped[i]).toFixed(1) + ' ';
+  }
+
+  // Trend line
+  const trendY0 = fit.slope * xmin + fit.intercept;
+  const trendY1 = fit.slope * xmax + fit.intercept;
+  const trendStart = { x: sx(xmin), y: sy(trendY0) };
+  const trendEnd   = { x: sx(xmax), y: sy(trendY1) };
+
+  const rateArcSecCy = fit.slope * 3600 * 100;  // "/century
+  const startVal = values[0];
+  const endVal = values[values.length - 1];
+
+  // Y-axis ticks (4 ticks)
+  const yticks = [];
+  for (let i = 0; i <= 4; i++) {
+    const yv = y0 + (y1 - y0) * (i / 4);
+    yticks.push(`<line x1="${margin.left - 4}" y1="${sy(yv).toFixed(1)}" x2="${margin.left}" y2="${sy(yv).toFixed(1)}" stroke="#888" stroke-width="0.5"/>
+                  <text x="${margin.left - 6}" y="${(sy(yv) + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="#aaa">${yv.toFixed(2)}</text>`);
+  }
+
+  // X-axis ticks (year)
+  const xticks = [];
+  const nXticks = Math.min(8, Math.floor((xmax - xmin) / 20) + 1);
+  for (let i = 0; i <= nXticks; i++) {
+    const xv = xmin + ((xmax - xmin) * i) / nXticks;
+    xticks.push(`<line x1="${sx(xv).toFixed(1)}" y1="${margin.top + plotH}" x2="${sx(xv).toFixed(1)}" y2="${margin.top + plotH + 4}" stroke="#888" stroke-width="0.5"/>
+                  <text x="${sx(xv).toFixed(1)}" y="${margin.top + plotH + 14}" text-anchor="middle" font-size="9" fill="#aaa">${Math.round(xv)}</text>`);
+  }
+
+  return `
+    <div class="wgc-chart">
+      <div class="wgc-chart-title">${title}</div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="wgc-svg">
+        <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#111" stroke="#333" stroke-width="0.5"/>
+        ${yticks.join('')}
+        ${xticks.join('')}
+        <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="0.8" opacity="0.85"/>
+        <line x1="${trendStart.x.toFixed(1)}" y1="${trendStart.y.toFixed(1)}" x2="${trendEnd.x.toFixed(1)}" y2="${trendEnd.y.toFixed(1)}" stroke="#ff6" stroke-width="1.4" stroke-dasharray="4,2"/>
+        <text x="${W - margin.right}" y="${margin.top - 4}" text-anchor="end" font-size="10" fill="#ccc">start: ${startVal.toFixed(3)}\u00B0 &#8594; end: ${endVal.toFixed(3)}\u00B0</text>
+      </svg>
+      <div class="wgc-chart-footer">
+        <span>Trend: <b>${rateArcSecCy.toFixed(1)} \u2033/cy</b></span>
+        ${label ? `<span style="margin-left:16px">${label}</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function wgcRenderPlanet(planetKey) {
+  if (!wgcData || !wgcData[planetKey]) return '<div style="padding:40px;text-align:center;color:#888">Loading data\u2026</div>';
+  const d = wgcData[planetKey];
+  const H = 335317;
+
+  // Compute ϖ trend for header
+  const piFit = wgcLinearFit(d.yrArr, wgcUnwrap(d.piArr));
+  const ratePiCy = piFit.slope * 3600 * 100;
+  const periodYr = ratePiCy !== 0 ? Math.abs(360 * 3600 * 100 / ratePiCy) : Infinity;
+  const N = 8 * H / periodYr;
+
+  return `
+    <div class="wgc-planet-content">
+      <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
+      <div class="wgc-planet-summary">
+        Longitude of perihelion rate: <b>${ratePiCy.toFixed(1)} \u2033/century</b>
+        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} years</b>
+        &nbsp;\u2022&nbsp; 8H/N \u2248 8H/${Math.round(N)} (exact N = ${N.toFixed(3)})
+      </div>
+      ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
+      ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])}`)}
+    </div>
+  `;
+}
+
+async function createWGCPanel() {
+  await loadWGCData();
+
+  const panel = document.createElement('div');
+  panel.id = 'wgcPanel';
+  panel.className = 'wgc-modal';
+
+  const planets = ['MERCURY','VENUS','EARTH','MARS','JUPITER','SATURN','URANUS','NEPTUNE'];
+
+  panel.innerHTML = `
+    <div class="wgc-overlay"></div>
+    <div class="wgc-container">
+      <div class="wgc-header">
+        <div class="wgc-title">WebGeoCalc Explorer</div>
+        <div class="wgc-subtitle">Observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
+        <div class="wgc-close" title="Close"></div>
+      </div>
+      <div class="wgc-body">
+        <div class="wgc-tabs">
+          ${planets.map(p => `<button class="wgc-tab${p === wgcSelectedPlanet ? ' wgc-tab-active' : ''}" data-planet="${p}">${p[0] + p.slice(1).toLowerCase()}</button>`).join('')}
+        </div>
+        <div class="wgc-content">
+          ${wgcData ? wgcRenderPlanet(wgcSelectedPlanet) : '<div style="padding:40px;text-align:center;color:#888">Loading data\u2026</div>'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Event: close
+  panel.querySelector('.wgc-close').addEventListener('click', closeWGCPanel);
+  panel.querySelector('.wgc-overlay').addEventListener('click', closeWGCPanel);
+
+  // Event: tab switch
+  panel.querySelectorAll('.wgc-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      wgcSelectedPlanet = tab.dataset.planet;
+      panel.querySelectorAll('.wgc-tab').forEach(t => t.classList.toggle('wgc-tab-active', t.dataset.planet === wgcSelectedPlanet));
+      panel.querySelector('.wgc-content').innerHTML = wgcRenderPlanet(wgcSelectedPlanet);
+    });
+  });
+
+  document.body.appendChild(panel);
+  return panel;
+}
+
+async function openWGCPanel() {
+  if (wgcPanel) { wgcPanel.remove(); wgcPanel = null; }
+  wgcPanel = await createWGCPanel();
+  wgcPanel.classList.add('visible');
+}
+
+function closeWGCPanel() {
+  if (wgcPanel) wgcPanel.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FORMULA VERIFICATION PANEL (.vfp-)
 // Compare model predictions vs published scientific formulas
 // ═══════════════════════════════════════════════════════════════════
@@ -23940,6 +24142,8 @@ function setupGUI() {
     'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
   addTooltip(toolsFolder.addButton({ title: 'Grand Holistic Octave' }).on('click', () => openGHOPanel()),
     'All planetary periods as integer divisors of 8H = 2,682,536 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
+  addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
+    'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
   addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),

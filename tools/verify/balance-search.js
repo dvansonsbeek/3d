@@ -134,6 +134,57 @@ for (const p of planets) {
 }
 
 /**
+ * Required eccentricity direction at J2000 per planet.
+ * Derived from observed short-term eccentricity trends.
+ *   'rising'  = phase ∈ (0°, 180°)  → sin(θ) > 0 → de/dt > 0
+ *   'falling' = phase ∈ (180°, 360°) → sin(θ) < 0 → de/dt < 0
+ */
+const REQUIRED_ECC_DIR = {
+  mercury: 'rising',  venus: 'falling', earth: 'falling',
+  mars: 'rising',     jupiter: 'falling', saturn: 'falling',
+  uranus: 'falling',  neptune: 'rising',
+};
+
+/**
+ * Compute eccentricity phase at J2000 for (key, d, antiPhase, n) and return
+ * both the phase (mod 360°) and the direction ('rising' | 'falling').
+ */
+function eccPhaseDirection(key, d, antiPhase, n) {
+  if (key === 'earth') {
+    // Earth uses H/16 wobble, phase at J2000 is derived; use Earth's own constants
+    const t2000 = 2000 - (C.balancedYear - n * C.H);
+    const phaseOffset = 90; // Earth is in-phase
+    const phaseDeg = ((t2000 / (C.H / 16)) * 360 + phaseOffset) % 360;
+    const p = (phaseDeg + 360) % 360;
+    return { phase: p, dir: p > 0 && p < 180 ? 'rising' : 'falling' };
+  }
+  const t2000 = 2000 - (C.balancedYear - n * C.H);
+  const phaseOffset = antiPhase ? 270 : 90;
+  const wob = wobblePeriod[key];
+  const phaseDeg = (t2000 / wob) * 360 + phaseOffset;
+  const p = ((phaseDeg % 360) + 360) % 360;
+  return { phase: p, dir: p > 0 && p < 180 ? 'rising' : 'falling' };
+}
+
+/**
+ * Check how many planets (out of 8) have their eccentricity phase in the
+ * required direction at J2000 for a given config + anchor n.
+ */
+function checkEccDirections(cfg, n) {
+  const results = {};
+  let match = 0;
+  for (const k of planets) {
+    const d = k === 'earth' ? 3 : cfg[k].d;
+    const anti = k === 'earth' ? false : cfg[k].anti;
+    const { phase, dir } = eccPhaseDirection(k, d, anti, n);
+    const ok = dir === REQUIRED_ECC_DIR[k];
+    results[k] = { phase, dir, ok };
+    if (ok) match++;
+  }
+  return { match, total: planets.length, results };
+}
+
+/**
  * Compute a planet's base eccentricity under a given config and anchor.
  *
  * @param {string} key       planet name
@@ -632,15 +683,22 @@ for (const candidate of deepCandidates) {
 
   // ── Shared-anchor sweep: all planets share the same n ──
   let bestAnchor = null;
+  const allAnchors = [];  // all 8 anchors' results (for ecc direction analysis)
 
   for (let n = 0; n < 8; n++) {
+    // Always record ecc direction (N-independent) so we can report sweep
+    const eccDirCheckThisN = checkEccDirections(cfg, n);
+
     // Step 1: check LL bounds for all 7 fitted planets at this n (N-independent)
     let allLL = true;
     for (const k of fittedPlanets) {
       const r = evalPlanetDeep(k, cfg[k].d, cfg[k].anti, n, 1);  // N=1 is dummy for LL check
       if (!r.inLL) { allLL = false; break; }
     }
-    if (!allLL) continue;
+    if (!allLL) {
+      allAnchors.push({ n, llPass: false, eccDirMatch: eccDirCheckThisN.match, eccDirPerPlanet: eccDirCheckThisN.results });
+      continue;
+    }
 
     // Step 2: LL passes. Find best N per planet, with the constraint that
     // Jupiter and Saturn SHARE the same N (to maximize vector balance
@@ -700,7 +758,14 @@ for (const candidate of deepCandidates) {
       }
     }
 
-    const anchorResult = { n, dirCount, totalErr, perPlanet };
+    // Eccentricity direction check: at this anchor, does each planet's
+    // eccentricity phase at J2000 match the required direction (rising/falling)?
+    const anchorResult = {
+      n, dirCount, totalErr, perPlanet,
+      eccDirMatch: eccDirCheckThisN.match,
+      eccDirPerPlanet: eccDirCheckThisN.results,
+    };
+    allAnchors.push({ n, llPass: true, ...anchorResult });
     if (!bestAnchor ||
         anchorResult.dirCount > bestAnchor.dirCount ||
         (anchorResult.dirCount === bestAnchor.dirCount && anchorResult.totalErr < bestAnchor.totalErr)) {
@@ -721,6 +786,10 @@ for (const candidate of deepCandidates) {
     ? eccBalanceForConfig(cfg, bestAnchor.n)
     : candidate.eccBalance;  // fallback if no valid anchor
 
+  // Find anchor(s) with best ecc direction match (max eccDirMatch, tiebreak by LL pass + inclination dir)
+  const maxEccMatch = Math.max(...allAnchors.map(a => a.eccDirMatch));
+  const bestEccAnchors = allAnchors.filter(a => a.eccDirMatch === maxEccMatch);
+
   deepResults.push({
     scenario: row[0],
     inclBalance: candidate.inclBalance,
@@ -732,6 +801,9 @@ for (const candidate of deepCandidates) {
     dValues: { me: cfg.mercury.d, ve: cfg.venus.d, ma: cfg.mars.d, ju: cfg.jupiter.d, sa: cfg.saturn.d, ur: cfg.uranus.d, ne: cfg.neptune.d },
     groups:  { me: cfg.mercury.anti ? 1 : 0, ve: cfg.venus.anti ? 1 : 0, ma: cfg.mars.anti ? 1 : 0, ju: cfg.jupiter.anti ? 1 : 0, sa: cfg.saturn.anti ? 1 : 0, ur: cfg.uranus.anti ? 1 : 0, ne: cfg.neptune.anti ? 1 : 0 },
     bestAnchor,
+    allAnchors,          // all n values with ecc direction data
+    maxEccMatch,         // best ecc direction count across all n for this config
+    bestEccAnchors,      // all n values that achieve maxEccMatch
   });
 }
 
@@ -747,8 +819,8 @@ deepResults.sort((a, b) => {
 
 // ── Print summary table ──
 console.log(`  ${deepResults.length} candidates analyzed.\n`);
-console.log('  Rank │ Scen │ Incl%    │ Ecc% (per-cfg) │ Mir │ n │ Dir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
-console.log('  ─────┼──────┼──────────┼────────────────┼─────┼───┼─────┼─────────┼─────────────────────────────');
+console.log('  Rank │ Scen │ Incl%    │ Ecc% (per-cfg) │ Mir │ n │ Dir │ EccDir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
+console.log('  ─────┼──────┼──────────┼────────────────┼─────┼───┼─────┼────────┼─────────┼─────────────────────────────');
 for (let i = 0; i < deepResults.length; i++) {
   const r = deepResults[i];
   const d = r.dValues;
@@ -756,10 +828,80 @@ for (let i = 0; i < deepResults.length; i++) {
   const pGroup = (dv, gv) => `${dv}${gv ? '*' : ''}`;
   const ba = r.bestAnchor;
   console.log(
-    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │   ${r.eccBalance.toFixed(4).padStart(8)}     │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
+    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │   ${r.eccBalance.toFixed(4).padStart(8)}     │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.eccDirMatch + '/8' : '  — ' } │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
     `${pGroup(d.me, g.me).padStart(3)} ${pGroup(d.ve, g.ve).padStart(3)} ${pGroup(d.ma, g.ma).padStart(3)} ${pGroup(d.ju, g.ju).padStart(3)} ${pGroup(d.sa, g.sa).padStart(3)} ${pGroup(d.ur, g.ur).padStart(3)} ${pGroup(d.ne, g.ne).padStart(3)}` +
     `${r.isConfig7 ? '  ◄ default (mirror)' : ''}`
   );
+}
+
+// ── Eccentricity direction analysis across all configs (sweep all n per config) ──
+console.log('');
+console.log(`  ═══════════════════════════════════════════════════════════════`);
+console.log(`  ECCENTRICITY DIRECTION CHECK (sweep all n per config)`);
+console.log(`  Required: Me rising, Ve falling, Ea falling, Ma rising,`);
+console.log(`            Ju falling, Sa falling, Ur falling, Ne rising`);
+console.log(`  ═══════════════════════════════════════════════════════════════`);
+
+// Distribution of max ecc direction match per config
+const eccMatchDist = {};
+for (const r of deepResults) {
+  const m = r.maxEccMatch;
+  eccMatchDist[m] = (eccMatchDist[m] || 0) + 1;
+}
+console.log('');
+console.log(`  Distribution of max ecc direction match (best n per config):`);
+for (let m = 8; m >= 0; m--) {
+  if (eccMatchDist[m]) {
+    console.log(`    ${m}/8 match: ${eccMatchDist[m]} configs`);
+  }
+}
+
+// Configs reaching 8/8
+const eccDirPerfect = deepResults.filter(r => r.maxEccMatch === 8);
+console.log('');
+if (eccDirPerfect.length > 0) {
+  console.log(`  ${eccDirPerfect.length} config(s) reach 8/8 ecc direction match (at some n):`);
+  for (const r of eccDirPerfect) {
+    const d = r.dValues;
+    const ns = r.bestEccAnchors.map(a => a.llPass ? `${a.n}(LL✓ Dir${a.dirCount}/7)` : `${a.n}(LL✗)`).join(', ');
+    console.log(
+      `    Scenario ${r.scenario}: d=[${d.me},${d.ve},${d.ma},${d.ju},${d.sa},${d.ur},${d.ne}]` +
+      `${r.mirror ? ' (mirror)' : ''}${r.isConfig7 ? ' ◄ default' : ''}  viable n: ${ns}`
+    );
+  }
+} else {
+  console.log(`  No config reaches 8/8 ecc direction match at any n.`);
+  const best = Math.max(...deepResults.map(r => r.maxEccMatch));
+  const topConfigs = deepResults.filter(r => r.maxEccMatch === best);
+  console.log(`  Best: ${best}/8 — ${topConfigs.length} config(s) achieve this.`);
+  console.log(`  Top ${Math.min(10, topConfigs.length)} configs reaching ${best}/8:`);
+  for (const r of topConfigs.slice(0, 10)) {
+    const d = r.dValues;
+    const ns = r.bestEccAnchors.map(a => a.llPass ? `${a.n}(LL✓ Dir${a.dirCount}/7)` : `${a.n}(LL✗)`).join(', ');
+    // Identify which planet fails
+    const failingPlanets = Object.entries(r.bestEccAnchors[0].eccDirPerPlanet)
+      .filter(([, v]) => !v.ok).map(([k]) => k.substr(0, 2)).join(',');
+    console.log(
+      `    ${r.scenario} d=[${d.me},${d.ve},${d.ma},${d.ju},${d.sa},${d.ur},${d.ne}]` +
+      `${r.mirror ? ' (mirror)' : ''}${r.isConfig7 ? ' ◄ default' : ''}  n:${ns}  fails:${failingPlanets}`
+    );
+  }
+}
+
+// Detailed sweep for default config
+const defaultResult = deepResults.find(r => r.isConfig7);
+if (defaultResult) {
+  console.log('');
+  console.log('  Default config: ecc direction match at each n:');
+  for (const a of defaultResult.allAnchors) {
+    const planetsList = planets.map(k => {
+      const res = a.eccDirPerPlanet[k];
+      return `${k.substr(0,2)}:${res.phase.toFixed(0).padStart(3)}°${res.ok ? '✓' : '✗'}`;
+    }).join(' ');
+    const ll = a.llPass ? 'LL✓' : 'LL✗';
+    const dir = a.llPass ? ` Dir${a.dirCount}/7` : '';
+    console.log(`    n=${a.n}: ${ll}${dir}  ecc=${a.eccDirMatch}/8  ${planetsList}`);
+  }
 }
 
 // ── Detail for the best configs ──
