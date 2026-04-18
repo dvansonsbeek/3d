@@ -116,6 +116,80 @@ for (const key of planets) {
   _vCoeffJ[key] = _sqrtMass[key] * Math.pow(orbitDistance[key], 1.5) * eccJ2000[key];
 }
 
+// ── Per-config base eccentricity (for fair deep-analysis ranking) ──
+// Each candidate config is evaluated at its own optimal anchor n.
+// The base eccentricity depends on that config's d-values and anti-phase
+// assignments, so recompute it per config.
+const K_ECC = C.eccentricityAmplitudeK;
+const obliquityCycle = {};  // per planet
+const wobblePeriod = {};    // per planet
+for (const p of planets) {
+  if (p === 'earth') {
+    obliquityCycle[p] = C.H / 8;
+    wobblePeriod[p] = C.H / 16;
+  } else {
+    obliquityCycle[p] = C.planets[p].obliquityCycle;
+    wobblePeriod[p] = C.planets[p].wobblePeriod;
+  }
+}
+
+/**
+ * Compute a planet's base eccentricity under a given config and anchor.
+ *
+ * @param {string} key       planet name
+ * @param {number} d         Fibonacci divisor (from the candidate config)
+ * @param {boolean} antiPhase  is this planet anti-phase in the candidate config?
+ * @param {number} n         anchor offset in whole H (0..7 within 8H)
+ * @returns {number} base eccentricity
+ */
+function baseEccForConfig(key, d, antiPhase, n) {
+  if (key === 'earth') return eccBase.earth;  // Earth is a fixed input
+  const tiltJ2000 = C.planets[key].axialTiltJ2000;
+  const t2000 = 2000 - (C.balancedYear - n * C.H);
+  // Inclination amplitude from PSI and this config's d
+  const inclAmp = PSI / (d * _sqrtMass[key]);
+  // Mean obliquity (anchored at n × H back from balancedYear)
+  const obliqCyc = obliquityCycle[key];
+  let meanObliq;
+  if (obliqCyc && inclAmp) {
+    meanObliq = tiltJ2000
+      + inclAmp * Math.cos(2 * Math.PI * t2000 / icrfPeriod[key])
+      - inclAmp * Math.cos(2 * Math.PI * t2000 / obliqCyc);
+  } else {
+    meanObliq = tiltJ2000;
+  }
+  // K-derived eccentricity amplitude using this config's d
+  const a = orbitDistance[key];
+  const eccAmp = K_ECC * Math.sin(Math.abs(meanObliq) * Math.PI / 180) * Math.sqrt(d)
+               / (_sqrtMass[key] * Math.pow(a, 1.5));
+  // Phase at J2000: phaseOffset + (2000 − anchor) / wobble × 360°
+  const phaseOffset = antiPhase ? 270 : 90;
+  const wob = wobblePeriod[key];
+  const phaseDeg = (t2000 / wob) * 360 + phaseOffset;
+  const theta = phaseDeg * Math.PI / 180;
+  const sinT = Math.sin(theta);
+  const cosT = Math.cos(theta);
+  const eJ = eccJ2000[key];
+  const disc = eJ * eJ - eccAmp * eccAmp * sinT * sinT;
+  return eccAmp * cosT + Math.sqrt(Math.max(0, disc));
+}
+
+/**
+ * Compute eccentricity balance for a candidate config at its best anchor n,
+ * using bases recomputed per config (not the default config's bases).
+ */
+function eccBalanceForConfig(cfg, n) {
+  let vPro = 0, vAnti = 0;
+  for (const k of planets) {
+    const d = k === 'earth' ? 3 : cfg[k].d;
+    const antiPhase = k === 'earth' ? false : cfg[k].anti;
+    const base = baseEccForConfig(k, d, antiPhase, n);
+    const v = _sqrtMass[k] * Math.pow(orbitDistance[k], 1.5) * base / Math.sqrt(d);
+    if (antiPhase) vAnti += v; else vPro += v;
+  }
+  return (1 - Math.abs(vPro - vAnti) / (vPro + vAnti)) * 100;
+}
+
 // ── Fast inclination balance only (for 7.5M screening) ──
 function computeInclBalance(config) {
   let wPro = 0, wAnti = 0;
@@ -640,10 +714,18 @@ for (const candidate of deepCandidates) {
                     row[10] === 3 && row[11] === 1 && row[12] === 21 && row[13] === 0 &&
                     row[14] === 34 && row[15] === 0;
 
+  // Per-config eccentricity balance: recompute base eccentricities using
+  // this config's d-values, anti-phase assignments, and optimal anchor n.
+  // This gives a fair comparison across candidate configs.
+  const eccBalanceAtAnchor = bestAnchor
+    ? eccBalanceForConfig(cfg, bestAnchor.n)
+    : candidate.eccBalance;  // fallback if no valid anchor
+
   deepResults.push({
     scenario: row[0],
     inclBalance: candidate.inclBalance,
-    eccBalance: candidate.eccBalance,
+    eccBalance: eccBalanceAtAnchor,              // per-config, at best anchor
+    eccBalanceDefault: candidate.eccBalance,     // balance under default bases (for reference)
     eccBalanceJ2000: candidate.eccBalanceJ2000 != null ? candidate.eccBalanceJ2000 : null,
     mirror,
     isConfig7,
@@ -653,7 +735,7 @@ for (const candidate of deepCandidates) {
   });
 }
 
-// ── Sort: highest eccentricity balance first, then direction count, then lowest error ──
+// ── Sort: highest (per-config) eccentricity balance first, then direction count, then lowest error ──
 deepResults.sort((a, b) => {
   if (!a.bestAnchor && !b.bestAnchor) return 0;
   if (!a.bestAnchor) return 1;
@@ -665,8 +747,8 @@ deepResults.sort((a, b) => {
 
 // ── Print summary table ──
 console.log(`  ${deepResults.length} candidates analyzed.\n`);
-console.log('  Rank │ Scen │ Incl%    │ Ecc%     │ Mir │ n │ Dir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
-console.log('  ─────┼──────┼──────────┼──────────┼─────┼───┼─────┼─────────┼─────────────────────────────');
+console.log('  Rank │ Scen │ Incl%    │ Ecc% (per-cfg) │ Mir │ n │ Dir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
+console.log('  ─────┼──────┼──────────┼────────────────┼─────┼───┼─────┼─────────┼─────────────────────────────');
 for (let i = 0; i < deepResults.length; i++) {
   const r = deepResults[i];
   const d = r.dValues;
@@ -674,7 +756,7 @@ for (let i = 0; i < deepResults.length; i++) {
   const pGroup = (dv, gv) => `${dv}${gv ? '*' : ''}`;
   const ba = r.bestAnchor;
   console.log(
-    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │ ${r.eccBalance.toFixed(4).padStart(8)} │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
+    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │   ${r.eccBalance.toFixed(4).padStart(8)}     │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
     `${pGroup(d.me, g.me).padStart(3)} ${pGroup(d.ve, g.ve).padStart(3)} ${pGroup(d.ma, g.ma).padStart(3)} ${pGroup(d.ju, g.ju).padStart(3)} ${pGroup(d.sa, g.sa).padStart(3)} ${pGroup(d.ur, g.ur).padStart(3)} ${pGroup(d.ne, g.ne).padStart(3)}` +
     `${r.isConfig7 ? '  ◄ default (mirror)' : ''}`
   );
