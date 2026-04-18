@@ -19953,7 +19953,7 @@ function wgcLinearFit(x, y) {
 }
 
 /** Render an SVG line chart with data + trend line. */
-function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
+function wgcRenderChart(title, yrArr, values, color, label, modelValues) {
   const W = 800, H = 180;
   const margin = { top: 18, right: 20, bottom: 24, left: 60 };
   const plotW = W - margin.left - margin.right;
@@ -19962,12 +19962,8 @@ function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
   const unwrapped = wgcUnwrap(values);
   const fit = wgcLinearFit(yrArr, unwrapped);
 
-  // Optional model line: { rate (deg/yr), anchorYear, anchorValue }
-  // Produces ϖ_model(t) = anchorValue + rate × (t - anchorYear)
-  let modelValues = null;
-  if (modelLine) {
-    modelValues = yrArr.map(y => modelLine.anchorValue + modelLine.rate * (y - modelLine.anchorYear));
-  }
+  // Optional modelValues: parallel array to yrArr with model's predicted ϖ(t)
+  // (baseline + missing advance integrated from J2000). Plotted as red polyline.
 
   // Find min/max of UNWRAPPED values + trend line + model line for scaling
   const allY = [...unwrapped];
@@ -20005,7 +20001,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
   for (let i = 0; i <= 4; i++) {
     const yv = y0 + (y1 - y0) * (i / 4);
     yticks.push(`<line x1="${margin.left - 4}" y1="${sy(yv).toFixed(1)}" x2="${margin.left}" y2="${sy(yv).toFixed(1)}" stroke="#888" stroke-width="0.5"/>
-                  <text x="${margin.left - 6}" y="${(sy(yv) + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="#aaa">${yv.toFixed(2)}</text>`);
+                  <text x="${margin.left - 6}" y="${(sy(yv) + 3).toFixed(1)}" text-anchor="end" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#aaa">${yv.toFixed(2)}</text>`);
   }
 
   // X-axis ticks (year)
@@ -20014,7 +20010,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
   for (let i = 0; i <= nXticks; i++) {
     const xv = xmin + ((xmax - xmin) * i) / nXticks;
     xticks.push(`<line x1="${sx(xv).toFixed(1)}" y1="${margin.top + plotH}" x2="${sx(xv).toFixed(1)}" y2="${margin.top + plotH + 4}" stroke="#888" stroke-width="0.5"/>
-                  <text x="${sx(xv).toFixed(1)}" y="${margin.top + plotH + 14}" text-anchor="middle" font-size="9" fill="#aaa">${Math.round(xv)}</text>`);
+                  <text x="${sx(xv).toFixed(1)}" y="${margin.top + plotH + 14}" text-anchor="middle" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#aaa">${Math.round(xv)}</text>`);
   }
 
   return `
@@ -20024,13 +20020,27 @@ function wgcRenderChart(title, yrArr, values, color, label, modelLine) {
         <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#111" stroke="#333" stroke-width="0.5"/>
         ${yticks.join('')}
         ${xticks.join('')}
-        <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="0.8" opacity="0.85"/>
-        <line x1="${trendStart.x.toFixed(1)}" y1="${trendStart.y.toFixed(1)}" x2="${trendEnd.x.toFixed(1)}" y2="${trendEnd.y.toFixed(1)}" stroke="#ff6" stroke-width="1.4" stroke-dasharray="4,2"/>
-        ${modelValues ? `<line x1="${sx(xmin).toFixed(1)}" y1="${sy(modelValues[0]).toFixed(1)}" x2="${sx(xmax).toFixed(1)}" y2="${sy(modelValues[modelValues.length - 1]).toFixed(1)}" stroke="#e55" stroke-width="1.4"/>` : ''}
-        <text x="${W - margin.right}" y="${margin.top - 4}" text-anchor="end" font-size="10" fill="#ccc">start: ${startVal.toFixed(3)}\u00B0 &#8594; end: ${endVal.toFixed(3)}\u00B0</text>
+        ${modelValues ? `<path d="${modelValues.map((v, i) => (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="#ffe066" stroke-width="1.4" opacity="0.95"/>` : ''}
+        <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="1.4" opacity="0.95"/>
+        ${(() => {
+          const xJ2000 = sx(2000);
+          if (xJ2000 >= margin.left && xJ2000 <= margin.left + plotW) {
+            return `<line x1="${xJ2000.toFixed(1)}" y1="${margin.top}" x2="${xJ2000.toFixed(1)}" y2="${(margin.top + plotH).toFixed(1)}" stroke="#555" stroke-width="0.6" stroke-dasharray="2,3"/><text x="${xJ2000.toFixed(1)}" y="${(margin.top + 8).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="#777">J2000</text>`;
+          }
+          return '';
+        })()}
+        <text x="${W - margin.right}" y="${margin.top - 4}" text-anchor="end" font-size="10" font-family="Inter,system-ui,sans-serif" fill="#ccc">start: ${startVal.toFixed(3)}\u00B0 &#8594; end: ${endVal.toFixed(3)}\u00B0</text>
+        ${modelValues ? `
+        <g font-family="Inter,system-ui,sans-serif" font-size="9">
+          <rect x="${(margin.left + 6).toFixed(1)}" y="${(margin.top + 4).toFixed(1)}" width="84" height="26" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" rx="3"/>
+          <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 11).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 11).toFixed(1)}" stroke="${color}" stroke-width="1.6"/>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed</text>
+          <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ffe066" stroke-width="1.6"/>
+          <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model</text>
+        </g>` : ''}
       </svg>
       <div class="wgc-chart-footer">
-        <span>Trend: <b>${rateArcSecCy.toFixed(1)} \u2033/cy</b></span>
+        <span>Observed trend: <b>${rateArcSecCy.toFixed(1)} \u2033/cy</b></span>
         ${label ? `<span style="margin-left:16px">${label}</span>` : ''}
       </div>
     </div>
@@ -20066,30 +20076,60 @@ function wgcRenderPlanet(planetKey) {
   // Only Mercury, Mars, and Saturn have reliably resolvable trends.
   const undeterminedTrend = ['VENUS', 'JUPITER', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
 
+  // Model's predicted trajectory using predictGeocentricPrecession(year, planet):
+  //   baseline rate + 429-term missing-advance formula (fitted to observations).
+  // We integrate the instantaneous rate to build the full ϖ(t) curve.
+  const modelPlanetKey = planetKey.toLowerCase();
+  const modelPlanet = planets[modelPlanetKey];
+  const modelBaselineCy = modelPlanet ? (360 / modelPlanet.perihelionEclipticYears) * 3600 * 100 : null;
+  const modelBaselinePeriodYr = modelPlanet ? Math.abs(modelPlanet.perihelionEclipticYears) : null;
+  let modelValues = null;
+  let modelRateAtJ2000 = null;
+  let modelMissingAdvance = null;
+  if (modelPlanet && typeof predictGeocentricPrecession === 'function' && PREDICT_PLANETS && PREDICT_PLANETS[modelPlanetKey]) {
+    // Find index nearest to year 2000 (J2000 anchor)
+    let j2000Idx = 0;
+    for (let i = 1; i < d.yrArr.length; i++) {
+      if (Math.abs(d.yrArr[i] - 2000) < Math.abs(d.yrArr[j2000Idx] - 2000)) j2000Idx = i;
+    }
+    modelValues = new Array(d.yrArr.length);
+    modelValues[j2000Idx] = modelPlanet.longitudePerihelion;
+    // Trapezoidal integration of rate("/cy) → degrees (÷ 360000)
+    for (let i = j2000Idx + 1; i < d.yrArr.length; i++) {
+      const dt = d.yrArr[i] - d.yrArr[i - 1];
+      const rateAvg = 0.5 * (predictGeocentricPrecession(d.yrArr[i - 1], modelPlanetKey)
+                           + predictGeocentricPrecession(d.yrArr[i], modelPlanetKey));
+      modelValues[i] = modelValues[i - 1] + rateAvg * dt / 360000;
+    }
+    for (let i = j2000Idx - 1; i >= 0; i--) {
+      const dt = d.yrArr[i + 1] - d.yrArr[i];
+      const rateAvg = 0.5 * (predictGeocentricPrecession(d.yrArr[i], modelPlanetKey)
+                           + predictGeocentricPrecession(d.yrArr[i + 1], modelPlanetKey));
+      modelValues[i] = modelValues[i + 1] - rateAvg * dt / 360000;
+    }
+    modelRateAtJ2000 = predictGeocentricPrecession(2000, modelPlanetKey);
+    modelMissingAdvance = modelRateAtJ2000 - modelBaselineCy;
+  }
+
   return `
     <div class="wgc-planet-content">
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
-        ϖ rate [raw OLS]: <b>${rateRawCy.toFixed(1)} \u2033/cy</b>
-        &nbsp;\u2022&nbsp; [sin+lin]: <b>${rateSinCy.toFixed(1)} \u2033/cy</b>
-        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} yr</b>${undeterminedTrend ? ' <span style="color:#cb4b16;">\u26a0 trend undetermined</span>' : ''}
+        <div><span style="color:#268bd2">\u2501\u2501</span> <b>Observed:</b> ${undeterminedTrend ? '<span style="color:#cb4b16;">\u26a0 trend cannot be determined from 1900\u20132026 baseline</span>' : `[raw OLS] ${rateRawCy.toFixed(1)} \u2033/cy \u2022 [sin+lin] ${rateSinCy.toFixed(1)} \u2033/cy`}</div>
+        ${modelRateAtJ2000 !== null ? `<div><span style="color:#ffe066">\u2501\u2501</span> <b>Model:</b> ${modelRateAtJ2000.toFixed(1)} \u2033/cy <span style="color:#aaa">(baseline ${modelBaselineCy.toFixed(1)} + missing advance ${modelMissingAdvance.toFixed(1)})</span></div>` : ''}
       </div>
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
-      ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
-      ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
-      ${(() => {
-        // Model line for ϖ: uses the planet's ecliptic perihelion rate.
-        // Anchor at J2000 using JPL longitudePerihelion (matches observed at J2000).
-        const modelPlanet = planets[planetKey.toLowerCase()];
-        const modelLine = modelPlanet ? {
-          rate: 360 / modelPlanet.perihelionEclipticYears,  // deg/yr (signed)
-          anchorYear: 2000,
-          anchorValue: modelPlanet.longitudePerihelion,
-        } : null;
-        return wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#e55">red line = model prediction</span>`, modelLine);
-      })()}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ffe066">yellow line = model (baseline + missing advance)</span>`, modelValues)}
+      <details class="wgc-chart-collapsible">
+        <summary>Ascending node longitude vs. Time (\u03A9) \u2014 click to expand</summary>
+        ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
+      </details>
+      <details class="wgc-chart-collapsible">
+        <summary>Argument of periapsis vs. Time (\u03C9) \u2014 click to expand</summary>
+        ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
+      </details>
     </div>
   `;
 }
