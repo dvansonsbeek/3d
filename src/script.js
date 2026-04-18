@@ -20122,13 +20122,19 @@ function wgcRenderPlanet(planetKey) {
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
       ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ffe066">yellow line = model (baseline + missing advance)</span>`, modelValues)}
+      <div class="wgc-frame-note">
+        <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ecliptic plane</b> \u2014
+        Earth\u2019s orbital plane at J2000. The ecliptic plane itself precesses (H/5 cycle, \~67,000 yr)
+        because Earth\u2019s orbit tilts relative to the invariable plane. In the <b>ICRF (inertial) frame</b>
+        each rate would differ by Earth\u2019s general precession (H/13 \u2248 \u221250.3\u2033/yr \u2248 \u22125,030\u2033/cy).
+      </div>
       <details class="wgc-chart-collapsible">
-        <summary>Ascending node longitude vs. Time (\u03A9) \u2014 click to expand</summary>
-        ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
+        <summary>Ascending node longitude vs. Time (\u03A9) \u2014 ecliptic frame, click to expand</summary>
+        ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9) \u2014 ecliptic frame', d.yrArr, d.omArr, '#2aa198', '')}
       </details>
       <details class="wgc-chart-collapsible">
-        <summary>Argument of periapsis vs. Time (\u03C9) \u2014 click to expand</summary>
-        ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
+        <summary>Argument of periapsis vs. Time (\u03C9) \u2014 ecliptic frame, click to expand</summary>
+        ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9) \u2014 ecliptic frame', d.yrArr, d.wArr, '#859900', '')}
       </details>
     </div>
   `;

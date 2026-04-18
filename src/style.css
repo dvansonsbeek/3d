@@ -3387,6 +3387,12 @@ details.wgc-chart-collapsible > summary::before {
 details.wgc-chart-collapsible[open] > summary::before { transform:rotate(90deg); }
 details.wgc-chart-collapsible > summary:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); }
 details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
+.wgc-frame-note {
+  font:400 10px/1.4 Inter,system-ui,sans-serif; color:rgba(255,255,255,.55);
+  background:rgba(100,150,255,.05); border:1px solid rgba(100,150,255,.12);
+  border-radius:4px; padding:8px 10px; margin:12px 0;
+}
+.wgc-frame-note b { color:rgba(140,180,255,.85); font-weight:600; }
 .wgc-svg {
   width:100%; display:block; border-radius:4px; background:#0a0d11;
   border:1px solid rgba(255,255,255,.06);

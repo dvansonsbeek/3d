@@ -30,7 +30,8 @@ const WGC_NAME = {
 };
 
 function args() {
-  const out = { start: 1900, end: 2026, stepMonths: 1 };  // MONTHLY by default
+  // Default: extend past (1800) + future (2100) to sanity-check the 1900-2026 trend.
+  const out = { start: 1800, end: 2100, stepMonths: 1 };  // monthly
   for (let i = 2; i < process.argv.length; i++) {
     const a = process.argv[i];
     if (a === '--start') out.start = parseInt(process.argv[++i]);
@@ -250,6 +251,15 @@ async function main() {
   console.log(`  Total epochs: ${times.length}`);
   console.log('');
 
+  // Sub-windows for cross-checking the trustworthy 1900-2026 baseline
+  // against extended past (1800-1900) and future (2026-2100).
+  const WINDOWS = [
+    { name: 'full',       from: start, to: end },
+    { name: 'past',       from: 1800,  to: 1900 },
+    { name: 'trustworthy',from: 1900,  to: 2026 },
+    { name: 'future',     from: 2026,  to: 2100 },
+  ];
+
   const results = {};
   for (const planet of PLANETS) {
     console.log(`  Fetching ${planet}...`);
@@ -262,6 +272,23 @@ async function main() {
 
       const osc = OSCILLATION_PERIOD[planet];
 
+      // Compute rate for each sub-window
+      const windowRates = {};
+      for (const w of WINDOWS) {
+        const idx = yrArr.map((y, i) => (y >= w.from && y <= w.to) ? i : -1).filter(i => i >= 0);
+        if (idx.length < 10) { windowRates[w.name] = null; continue; }
+        const yrSub = idx.map(i => yrArr[i]);
+        const piSub = idx.map(i => piArr[i]);
+        const trSub = extractTrends(yrSub, piSub, osc);
+        windowRates[w.name] = {
+          raw:  trSub.raw.slope  * 3600 * 100,
+          sin:  trSub.sinFit ? trSub.sinFit.b * 3600 * 100 : NaN,
+          span: w.to - w.from,
+          nCycles: (w.to - w.from) / osc,
+        };
+      }
+
+      // Full-baseline trend extractions (for UI JSON)
       const trOm = extractTrends(yrArr, omArr, osc);
       const trW  = extractTrends(yrArr, wArr,  osc);
       const trPi = extractTrends(yrArr, piArr, osc);
@@ -278,16 +305,14 @@ async function main() {
         sinPi: trPi.sinFit ? trPi.sinFit.b * 3600 * 100 : NaN,
       };
 
-      results[planet] = { rates, trPi, omArr, wArr, piArr, yrArr, osc };
+      results[planet] = { rates, windowRates, trPi, omArr, wArr, piArr, yrArr, osc };
 
-      console.log(`    Ω rate [raw | MA | sin]:  ${rates.rawOm.toFixed(1).padStart(9)} | ${rates.maOm.toFixed(1).padStart(9)} | ${rates.sinOm.toFixed(1).padStart(9)}  ″/cy`);
-      console.log(`    ω rate [raw | MA | sin]:  ${rates.rawW.toFixed(1).padStart(9)} | ${rates.maW.toFixed(1).padStart(9)} | ${rates.sinW.toFixed(1).padStart(9)}  ″/cy`);
-      console.log(`    ϖ rate [raw | MA | sin]:  ${rates.rawPi.toFixed(1).padStart(9)} | ${rates.maPi.toFixed(1).padStart(9)} | ${rates.sinPi.toFixed(1).padStart(9)}  ″/cy`);
-      const sinFit = trPi.sinFit;
-      if (sinFit) {
-        const periodSin = sinFit.b !== 0 ? 360 / Math.abs(sinFit.b) : Infinity;
-        const N = 8 * H / periodSin;
-        console.log(`    ϖ best (sin fit):  rate ${rates.sinPi.toFixed(1)} ″/cy  period ${Math.round(periodSin).toLocaleString()} yr  → 8H/${Math.round(N)} (exact N=${N.toFixed(3)})  osc ampl ${(sinFit.C * 3600).toFixed(0)}″`);
+      // Cross-window ϖ rate comparison
+      console.log(`    ϖ rate per window (″/cy):`);
+      for (const w of WINDOWS) {
+        const wr = windowRates[w.name];
+        if (!wr) { console.log(`      ${w.name.padEnd(12)} (${w.from}-${w.to}): no data`); continue; }
+        console.log(`      ${w.name.padEnd(12)} (${w.from}-${w.to}, ${wr.nCycles.toFixed(1)}× osc):  raw=${wr.raw.toFixed(1).padStart(9)}  sin+lin=${wr.sin.toFixed(1).padStart(9)}`);
       }
       console.log('');
     } catch (e) {
@@ -297,18 +322,27 @@ async function main() {
   }
 
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('  Summary: ϖ rates from different trend-extraction methods');
+  console.log('  ϖ rate stability across time windows (sin+linear fit, ″/cy)');
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('');
-  console.log('  Planet    │ Raw        │ MA smooth  │ Sine+Lin   │ Best N (from sine fit)');
-  console.log('  ──────────┼────────────┼────────────┼────────────┼─────────────');
+  console.log('  Planet    │ past       │ trust     │ future    │ full      │ past/trust/future consistent?');
+  console.log('  ──────────┼────────────┼───────────┼───────────┼───────────┼──────────────────────────────');
   for (const p of PLANETS) {
-    const r = results[p]?.rates;
-    if (!r) continue;
-    const periodSin = r.sinPi !== 0 && !isNaN(r.sinPi) ? 360 / Math.abs(r.sinPi / 3600 / 100) : Infinity;
-    const N = 8 * H / periodSin;
+    const wr = results[p]?.windowRates;
+    if (!wr) continue;
+    const past = wr.past ? wr.past.sin : NaN;
+    const tr   = wr.trustworthy ? wr.trustworthy.sin : NaN;
+    const fut  = wr.future ? wr.future.sin : NaN;
+    const full = wr.full ? wr.full.sin : NaN;
+    // Consistency: max deviation from median across past/trust/future
+    const vals = [past, tr, fut].filter(v => !isNaN(v));
+    const median = vals.sort((a, b) => a - b)[Math.floor(vals.length / 2)];
+    const maxDev = Math.max(...vals.map(v => Math.abs(v - median)));
+    const consistent = maxDev < Math.abs(median) * 0.15 ? '  ✓ consistent' :
+                       maxDev < Math.abs(median) * 0.50 ? '  ~ partial'     :
+                                                          '  ✗ differs';
     console.log(
-      `  ${p.padEnd(10)}│ ${r.rawPi.toFixed(1).padStart(8)} │ ${r.maPi.toFixed(1).padStart(8)} │ ${r.sinPi.toFixed(1).padStart(8)} │ 8H/${Math.round(N)} (exact ${N.toFixed(3)})`
+      `  ${p.padEnd(10)}│ ${past.toFixed(1).padStart(9)} │ ${tr.toFixed(1).padStart(8)} │ ${fut.toFixed(1).padStart(8)} │ ${full.toFixed(1).padStart(8)} │${consistent}`
     );
   }
 
@@ -322,6 +356,7 @@ async function main() {
       wArr: results[p].wArr,
       piArr: results[p].piArr,
       rates: results[p].rates,
+      windowRates: results[p].windowRates,   // per-window trend for sanity check
       oscPeriod: results[p].osc,
       sinFit: results[p].trPi.sinFit,
     };
