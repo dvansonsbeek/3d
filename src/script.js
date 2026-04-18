@@ -19730,7 +19730,7 @@ function ghoComputeData() {
       ecl:    { observed: '~81 kyr (~1,600\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
       asc:    { observed: '72,991 yr (s\u2084)', source: 'Laskar 2004 Table 3' },
-      obliq:  { observed: '~124,800 yr', source: 'Ward 1973; Laskar+ 2004 (modes s\u2083+s\u2084)', error: '0.7%' },
+      obliq:  { observed: '~124,800 yr', source: 'Ward 1973; Laskar+ 2004 (modes s\u2083+s\u2084)', error: '2.4%' },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
     jupiter: {
@@ -19914,7 +19914,7 @@ function closeGHOPanel() {
 
 let wgcPanel = null;
 let wgcData = null;
-let wgcSelectedPlanet = 'URANUS';
+let wgcSelectedPlanet = 'MERCURY';
 
 async function loadWGCData() {
   if (wgcData) return wgcData;
@@ -20032,19 +20032,34 @@ function wgcRenderPlanet(planetKey) {
   const d = wgcData[planetKey];
   const H = 335317;
 
-  // Compute ϖ trend for header
+  // Use the exploration script's pre-computed rates. For all trend lines we
+  // fall back to raw OLS linear regression (what the yellow dashed line shows).
+  // The "sin-fit" rate below is the bias-corrected trend (linear + sinusoid
+  // model removes the dominant periodic component). For inner planets (short
+  // oscillation periods) both rates agree; for outer planets they differ.
   const piFit = wgcLinearFit(d.yrArr, wgcUnwrap(d.piArr));
-  const ratePiCy = piFit.slope * 3600 * 100;
+  const rateRawCy = piFit.slope * 3600 * 100;                   // raw OLS trend
+  const rateSinCy = (d.rates && d.rates.sinPi != null) ? d.rates.sinPi : rateRawCy;
+  const ratePiCy = rateSinCy;                                   // prefer sin-fit for period estimate
   const periodYr = ratePiCy !== 0 ? Math.abs(360 * 3600 * 100 / ratePiCy) : Infinity;
   const N = 8 * H / periodYr;
+
+  const baselineYr = d.yrArr[d.yrArr.length - 1] - d.yrArr[0];
+  const oscPeriod = d.oscPeriod || 10;
+  const nCycles = baselineYr / oscPeriod;
+  const reliable = nCycles >= 4;  // heuristic: need ≥4 oscillation cycles for clean OLS
 
   return `
     <div class="wgc-planet-content">
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
-        Longitude of perihelion rate: <b>${ratePiCy.toFixed(1)} \u2033/century</b>
-        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} years</b>
-        &nbsp;\u2022&nbsp; 8H/N \u2248 8H/${Math.round(N)} (exact N = ${N.toFixed(3)})
+        ϖ rate [raw OLS]: <b>${rateRawCy.toFixed(1)} \u2033/cy</b>
+        &nbsp;\u2022&nbsp; [sin+lin]: <b>${rateSinCy.toFixed(1)} \u2033/cy</b>
+        &nbsp;\u2022&nbsp; Period: <b>${isFinite(periodYr) ? Math.round(periodYr).toLocaleString() : '\u221E'} yr</b>
+        &nbsp;\u2022&nbsp; 8H/N \u2248 8H/${Math.round(N)} (N=${N.toFixed(3)})
+      </div>
+      <div class="wgc-planet-method">
+        Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}
       </div>
       ${wgcRenderChart('Ascending node longitude vs. Time (\u03A9)', d.yrArr, d.omArr, '#2aa198', '')}
       ${wgcRenderChart('Argument of periapsis vs. Time (\u03C9)', d.yrArr, d.wArr, '#859900', '')}
@@ -20060,7 +20075,11 @@ async function createWGCPanel() {
   panel.id = 'wgcPanel';
   panel.className = 'wgc-modal';
 
-  const planets = ['MERCURY','VENUS','EARTH','MARS','JUPITER','SATURN','URANUS','NEPTUNE'];
+  // Earth excluded: Earth's ecliptic inclination is ~0 by definition (ecliptic IS
+  // Earth's orbital plane), so its ascending node Ω is numerically undefined
+  // and produces spurious trends. The reference WebGeoCalc charts also omit Earth.
+  const planets = ['MERCURY','VENUS','MARS','JUPITER','SATURN','URANUS','NEPTUNE'];
+  if (!planets.includes(wgcSelectedPlanet)) wgcSelectedPlanet = 'MERCURY';
 
   panel.innerHTML = `
     <div class="wgc-overlay"></div>

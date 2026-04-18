@@ -135,15 +135,29 @@ for (const p of planets) {
 
 /**
  * Required eccentricity direction at J2000 per planet.
- * Derived from observed short-term eccentricity trends.
+ *
+ * Only planets whose de/dt is resolvable from the 1900-2026 trustworthy
+ * observational baseline are constrained. For Venus, Jupiter, Uranus, Neptune
+ * the short-baseline trend flips sign across sub-windows (1800-1900, 1900-2026,
+ * 2026-2100), so the "direction" is inherited from Laskar-style million-year
+ * secular integrations — a theoretical prediction, not an observation.
+ *
+ * Mars is also excluded: at 50,614-year wobble, the 126-year observation
+ * window (1900-2026) covers only 0.25% of a cycle — too short to distinguish
+ * a real secular trend from short-period noise.
+ *
+ * Constraining those here would amount to fitting to theory, not data, so they
+ * are deliberately excluded. Earth's eccentricity direction is derived from its
+ * own H/16 wobble geometry, not a free-parameter choice, so it is also excluded.
+ *
  *   'rising'  = phase ∈ (0°, 180°)  → sin(θ) > 0 → de/dt > 0
  *   'falling' = phase ∈ (180°, 360°) → sin(θ) < 0 → de/dt < 0
  */
 const REQUIRED_ECC_DIR = {
-  mercury: 'rising',  venus: 'falling', earth: 'falling',
-  mars: 'rising',     jupiter: 'falling', saturn: 'falling',
-  uranus: 'falling',  neptune: 'rising',
+  mercury: 'rising',
+  saturn:  'falling',
 };
+const CONSTRAINED_ECC_PLANETS = Object.keys(REQUIRED_ECC_DIR);
 
 /**
  * Compute eccentricity phase at J2000 for (key, d, antiPhase, n) and return
@@ -177,11 +191,17 @@ function checkEccDirections(cfg, n) {
     const d = k === 'earth' ? 3 : cfg[k].d;
     const anti = k === 'earth' ? false : cfg[k].anti;
     const { phase, dir } = eccPhaseDirection(k, d, anti, n);
-    const ok = dir === REQUIRED_ECC_DIR[k];
-    results[k] = { phase, dir, ok };
-    if (ok) match++;
+    const required = REQUIRED_ECC_DIR[k];
+    if (required === undefined) {
+      // Not observationally constrained — report phase/dir but don't score.
+      results[k] = { phase, dir, ok: null };
+    } else {
+      const ok = dir === required;
+      results[k] = { phase, dir, ok };
+      if (ok) match++;
+    }
   }
-  return { match, total: planets.length, results };
+  return { match, total: CONSTRAINED_ECC_PLANETS.length, results };
 }
 
 /**
@@ -819,7 +839,8 @@ deepResults.sort((a, b) => {
 
 // ── Print summary table ──
 console.log(`  ${deepResults.length} candidates analyzed.\n`);
-console.log('  Rank │ Scen │ Incl%    │ Ecc% (per-cfg) │ Mir │ n │ Dir │ EccDir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne');
+const ECC_TOTAL = CONSTRAINED_ECC_PLANETS.length;
+console.log(`  Rank │ Scen │ Incl%    │ Ecc% (per-cfg) │ Mir │ n │ Dir │ EccDir │ Tot err │ Me  Ve  Ma  Ju  Sa  Ur  Ne`);
 console.log('  ─────┼──────┼──────────┼────────────────┼─────┼───┼─────┼────────┼─────────┼─────────────────────────────');
 for (let i = 0; i < deepResults.length; i++) {
   const r = deepResults[i];
@@ -828,7 +849,7 @@ for (let i = 0; i < deepResults.length; i++) {
   const pGroup = (dv, gv) => `${dv}${gv ? '*' : ''}`;
   const ba = r.bestAnchor;
   console.log(
-    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │   ${r.eccBalance.toFixed(4).padStart(8)}     │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.eccDirMatch + '/8' : '  — ' } │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
+    `  ${(i + 1).toString().padStart(4)} │  ${r.scenario}   │ ${r.inclBalance.toFixed(4).padStart(8)} │   ${r.eccBalance.toFixed(4).padStart(8)}     │  ${r.mirror ? 'Y' : ' '}  │ ${ba ? ba.n : '-'} │ ${ba ? ba.dirCount + '/7' : ' — '} │ ${ba ? ba.eccDirMatch + '/' + ECC_TOTAL : '  — ' } │ ${ba ? ba.totalErr.toFixed(1).padStart(5) + '″' : '   — '} │ ` +
     `${pGroup(d.me, g.me).padStart(3)} ${pGroup(d.ve, g.ve).padStart(3)} ${pGroup(d.ma, g.ma).padStart(3)} ${pGroup(d.ju, g.ju).padStart(3)} ${pGroup(d.sa, g.sa).padStart(3)} ${pGroup(d.ur, g.ur).padStart(3)} ${pGroup(d.ne, g.ne).padStart(3)}` +
     `${r.isConfig7 ? '  ◄ default (mirror)' : ''}`
   );
@@ -838,8 +859,10 @@ for (let i = 0; i < deepResults.length; i++) {
 console.log('');
 console.log(`  ═══════════════════════════════════════════════════════════════`);
 console.log(`  ECCENTRICITY DIRECTION CHECK (sweep all n per config)`);
-console.log(`  Required: Me rising, Ve falling, Ea falling, Ma rising,`);
-console.log(`            Ju falling, Sa falling, Ur falling, Ne rising`);
+console.log(`  Constraining only observationally resolvable planets:`);
+console.log(`    ${CONSTRAINED_ECC_PLANETS.map(k => `${k} ${REQUIRED_ECC_DIR[k]}`).join(', ')}`);
+console.log(`  (Venus/Jupiter/Uranus/Neptune trends flip sign across sub-windows;`);
+console.log(`   Earth direction is derived from its own H/16 wobble geometry.)`);
 console.log(`  ═══════════════════════════════════════════════════════════════`);
 
 // Distribution of max ecc direction match per config
@@ -850,17 +873,17 @@ for (const r of deepResults) {
 }
 console.log('');
 console.log(`  Distribution of max ecc direction match (best n per config):`);
-for (let m = 8; m >= 0; m--) {
+for (let m = ECC_TOTAL; m >= 0; m--) {
   if (eccMatchDist[m]) {
-    console.log(`    ${m}/8 match: ${eccMatchDist[m]} configs`);
+    console.log(`    ${m}/${ECC_TOTAL} match: ${eccMatchDist[m]} configs`);
   }
 }
 
-// Configs reaching 8/8
-const eccDirPerfect = deepResults.filter(r => r.maxEccMatch === 8);
+// Configs reaching perfect match across all constrained planets
+const eccDirPerfect = deepResults.filter(r => r.maxEccMatch === ECC_TOTAL);
 console.log('');
 if (eccDirPerfect.length > 0) {
-  console.log(`  ${eccDirPerfect.length} config(s) reach 8/8 ecc direction match (at some n):`);
+  console.log(`  ${eccDirPerfect.length} config(s) reach ${ECC_TOTAL}/${ECC_TOTAL} ecc direction match (at some n):`);
   for (const r of eccDirPerfect) {
     const d = r.dValues;
     const ns = r.bestEccAnchors.map(a => a.llPass ? `${a.n}(LL✓ Dir${a.dirCount}/7)` : `${a.n}(LL✗)`).join(', ');
@@ -870,17 +893,17 @@ if (eccDirPerfect.length > 0) {
     );
   }
 } else {
-  console.log(`  No config reaches 8/8 ecc direction match at any n.`);
+  console.log(`  No config reaches ${ECC_TOTAL}/${ECC_TOTAL} ecc direction match at any n.`);
   const best = Math.max(...deepResults.map(r => r.maxEccMatch));
   const topConfigs = deepResults.filter(r => r.maxEccMatch === best);
-  console.log(`  Best: ${best}/8 — ${topConfigs.length} config(s) achieve this.`);
-  console.log(`  Top ${Math.min(10, topConfigs.length)} configs reaching ${best}/8:`);
+  console.log(`  Best: ${best}/${ECC_TOTAL} — ${topConfigs.length} config(s) achieve this.`);
+  console.log(`  Top ${Math.min(10, topConfigs.length)} configs reaching ${best}/${ECC_TOTAL}:`);
   for (const r of topConfigs.slice(0, 10)) {
     const d = r.dValues;
     const ns = r.bestEccAnchors.map(a => a.llPass ? `${a.n}(LL✓ Dir${a.dirCount}/7)` : `${a.n}(LL✗)`).join(', ');
-    // Identify which planet fails
+    // Identify which constrained planet fails (null ok = unconstrained, skip)
     const failingPlanets = Object.entries(r.bestEccAnchors[0].eccDirPerPlanet)
-      .filter(([, v]) => !v.ok).map(([k]) => k.substr(0, 2)).join(',');
+      .filter(([, v]) => v.ok === false).map(([k]) => k.substr(0, 2)).join(',');
     console.log(
       `    ${r.scenario} d=[${d.me},${d.ve},${d.ma},${d.ju},${d.sa},${d.ur},${d.ne}]` +
       `${r.mirror ? ' (mirror)' : ''}${r.isConfig7 ? ' ◄ default' : ''}  n:${ns}  fails:${failingPlanets}`
@@ -896,11 +919,12 @@ if (defaultResult) {
   for (const a of defaultResult.allAnchors) {
     const planetsList = planets.map(k => {
       const res = a.eccDirPerPlanet[k];
-      return `${k.substr(0,2)}:${res.phase.toFixed(0).padStart(3)}°${res.ok ? '✓' : '✗'}`;
+      const mark = res.ok === true ? '✓' : res.ok === false ? '✗' : '·';
+      return `${k.substr(0,2)}:${res.phase.toFixed(0).padStart(3)}°${mark}`;
     }).join(' ');
     const ll = a.llPass ? 'LL✓' : 'LL✗';
     const dir = a.llPass ? ` Dir${a.dirCount}/7` : '';
-    console.log(`    n=${a.n}: ${ll}${dir}  ecc=${a.eccDirMatch}/8  ${planetsList}`);
+    console.log(`    n=${a.n}: ${ll}${dir}  ecc=${a.eccDirMatch}/${ECC_TOTAL}  ${planetsList}`);
   }
 }
 
