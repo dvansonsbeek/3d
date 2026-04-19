@@ -11,16 +11,16 @@ This document explains **why** each value in Mercury's 5-layer scene graph hiera
 | Base eccentricity | 0.20563 | Phase-derived (≈ J2000, amp negligible) |
 | Eccentricity amplitude | 2.34×10⁻⁵ | K formula × sin(0.0084°) — tiny |
 | Inclination (J2000, inv. plane) | 6.3473° | JPL J2000 |
-| Mean inclination | 6.7032° | Derived from PSI / (d × √m) |
+| Mean inclination | 6.7032° | Derived from J2000 constraint (mean = i_J2000 − amp·cos(ω̃_J2000 − cycleAnchor)) |
 | Inclination amplitude | 0.3865° | PSI / (d × √m), d = 21 |
-| Mean obliquity | 0.0084° | Two-cosine formula at System Reset anchor |
+| Mean obliquity | 0.0084° | Axial tilt + oscillation offset at System Reset (see Step B) |
 | **Ecliptic perihelion** | **243,867 yr** | **H × 8/11 (Fibonacci Law 1)** |
 | **Axial precession** | **−298,060 yr** | **−8H/9 (Cassini state, MESSENGER)** |
 | **Obliquity cycle** | **894,179 yr** | **8H/3 (Fibonacci 11 = 3 + 8)** |
-| **Eccentricity cycle** | **31,935 yr** | **2H/21 (beat: \|9 − 93\|/8H)** |
+| **Eccentricity cycle** | **31,935 yr** | **2H/21 = 8H/84 (beat of axial × ICRF peri: 84 = \|93 − 9\|)** |
 | **Inclination cycle (= ICRF peri)** | **28,844 yr** | **8H/93 (drives the inclination oscillation)** |
 | Orbit center (scene) | (−6.4682, −1.3244, 0) | Derived from base × direction |
-| Inclination phase at J2000 | 22.94° (just past MIN, heading to MAX; next MIN ≈ 3838 AD) | Current angle in inclination cycle (intuitive convention) |
+| Inclination phase at J2000 | 22.94° (just past MIN, heading to MAX; next MIN ≈ 29,006 AD) | Current angle in inclination cycle (intuitive convention) |
 | Eccentricity phase at J2000 | 104.12° (past mean rising, heading to MAX) | Current angle in eccentricity cycle (intuitive convention) |
 | Spin axis tilt | −0.03° | JPL J2000 (nearly zero) |
 
@@ -42,8 +42,8 @@ Both phases are computed in the ICRF frame and describe **where Mercury currentl
 - At J2000, Mercury is **22.94° past MIN**, climbing toward MAX
 - 22.94° / 360° × 28,844 yr = **1,838 years past MIN**
 - Mercury reached its minimum inclination around year **162 AD**
-- Will reach the next MAX inclination around year **16,261 AD** (90° away in cycle)
-- Will reach the next MIN inclination around year **28,838 AD** (full cycle later)
+- Will reach the next MAX inclination around year **14,585 AD** (157.06° further in cycle: (180° − 22.94°)/360° × 28,844 yr)
+- Will reach the next MIN inclination around year **29,006 AD** (full cycle later: previous MIN + 28,844 yr)
 
 **How to read Mercury's eccentricity phase (104.12°)**:
 - 90° = "mean rising" alignment at the System Reset (where all in-phase planets pass through mean simultaneously)
@@ -136,10 +136,15 @@ a = (solarYearInput / meanSolarYearDays)^(2/3)
 
 **Step B: Mean obliquity** (axial tilt adjusted for oscillation offset relative to the System Reset anchor)
 ```
-obliquityMean = axialTiltJ2000 + amp×cos(ICRF phase) − amp×cos(obliq phase)
+obliquityMean = axialTiltJ2000 + amp × [cos(φ_ICRF) − cos(φ_obliq)]
              = 0.03° + oscillation offset
              ≈ 0.0084°
 ```
+Where:
+- `φ_ICRF` = ω̃_ICRF(J2000) − cycleAnchor — the J2000 phase of the inclination oscillation (ICRF perihelion − cycle anchor)
+- `φ_obliq` = the J2000 phase of the obliquity oscillation (distinct cycle, 8H/3 for Mercury)
+- The two cosine terms remove the J2000-epoch oscillation offset so the result is the time-averaged obliquity around the System Reset
+
 Mercury's mean obliquity is nearly zero under the System Reset anchor — very close to the J2000 snapshot (0.03°) because Mercury's amplitude is tiny.
 
 **Step C: Eccentricity amplitude from K** (the universal eccentricity amplitude constant)
