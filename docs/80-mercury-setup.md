@@ -20,15 +20,38 @@ This document explains **why** each value in Mercury's 5-layer scene graph hiera
 | **Eccentricity cycle** | **31,935 yr** | **2H/21 (beat: \|9 − 93\|/8H)** |
 | **Inclination cycle (= ICRF peri)** | **28,844 yr** | **8H/93 (drives the inclination oscillation)** |
 | Orbit center (scene) | (−6.4682, −1.3244, 0) | Derived from base × direction |
-| Inclination phase at J2000 | 234.52° | ICRF perihelion longitude at System Reset (in-phase group) |
-| Eccentricity phase at J2000 | 104.12° | System Reset anchor + 90° offset |
+| Inclination phase at J2000 | 202.94° (22.94° past MIN; next MIN ≈ 3838 AD) | Current angle in inclination cycle (ICRF) |
+| Eccentricity phase at J2000 | 104.12° (14.12° past mean rising; next MIN ≈ 24,500 AD) | Current angle in eccentricity cycle (ICRF) |
 | Spin axis tilt | −0.03° | JPL J2000 (nearly zero) |
 
-**Two distinct phases**: Mercury has two different oscillation phases at J2000:
-- **Inclination phase** (234.52°) — drives the orbital plane tilt oscillation around the invariable plane. Anchored at the System Reset where Mercury is at minimum inclination (in-phase group).
-- **Eccentricity phase** (104.12°) — drives the eccentricity oscillation. Anchored at the System Reset where Mercury is at mean eccentricity, rising (90° offset for in-phase).
+**Two distinct phases — two different oscillations**
 
-Both phases are referenced to the same epoch (n=7, the System Reset) but they describe different oscillations with different periods (28,844 yr for inclination vs 31,935 yr for eccentricity).
+Both phases are computed in the ICRF frame and describe **where Mercury currently is** in each cycle (not where the cycle starts). The phase values directly answer: "how far is the planet from its minimum point right now?"
+
+| | Inclination | Eccentricity |
+|---|---|---|
+| **Cycle period** | 28,844 yr (8H/93 = ICRF perihelion) | 31,935 yr (2H/21 = beat freq) |
+| **Cycle anchor** (where MIN occurs) | `inclinationPhaseAngle` = **234.52°** (ICRF perihelion at MIN) | System Reset epoch + 90° offset (in-phase) |
+| **Current phase at J2000** | **202.94°** = ω̃_ICRF(J2000) − 234.52° | **104.12°** = 90° + (J2000 − SR)/wobble × 360° |
+| **Formula** | i(t) = mean + amp · cos(phase) | e(t) = √(base² + amp² − 2·base·amp·cos(phase)) |
+| **MIN at phase** | 180° | 0° (or 360°) |
+| **MAX at phase** | 0° (or 360°) | 180° |
+| **Current value at J2000** | 6.3473° (close to MIN; cos(202.94°) = −0.92) | 0.20564 (essentially constant) |
+
+**How to read the inclination phase**:
+- At phase 180° → MIN inclination (6.3167°)
+- At phase 0° → MAX inclination (7.0897°)
+- At phase 202.94° → currently 22.94° past MIN, heading back toward MAX
+
+Translating phase to time: 22.94° / 360° × 28,844 yr = **1,838 years**. Mercury reached its minimum inclination ~1,838 years ago (around 162 AD). It is now slowly climbing back toward maximum inclination. The previous MIN (full cycle earlier) was at year −25,006; the next MIN will be around year 28,838.
+
+**How to read the eccentricity phase**:
+- At phase 0° (= 360°) → MIN eccentricity (base − amp)
+- At phase 90° → MEAN eccentricity, rising (System Reset alignment for in-phase planets)
+- At phase 180° → MAX eccentricity (base + amp)
+- At phase 270° → MEAN eccentricity, falling (System Reset alignment for Saturn)
+
+Mercury at phase 104.12° is 14.12° past the "mean rising" point, meaning it has just slightly passed the mean and is heading toward MAX. But because Mercury's amplitude is so tiny (2×10⁻⁵), the actual eccentricity hardly moves throughout the entire cycle.
 
 ## The 5-Layer Hierarchy
 
