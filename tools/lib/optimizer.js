@@ -20,6 +20,16 @@ const path = require('path');
 const REF_PATH = path.join(__dirname, '..', '..', 'data', 'reference-data.json');
 const CACHE_PATH = path.join(__dirname, '..', '..', 'data', 'jpl-cache.json');
 
+// Cache reference-data.json once at module load so the hot objective() path
+// doesn't re-read + re-parse ~28k entries on every Nelder-Mead evaluation.
+let _refDataCache = null;
+function getRefData() {
+  if (_refDataCache === null) {
+    _refDataCache = JSON.parse(fs.readFileSync(REF_PATH, 'utf-8'));
+  }
+  return _refDataCache;
+}
+
 /**
  * Load JPL reference dates from cache for sun/moon.
  * Uses the same yearly dates as defaultReferenceDates().
@@ -816,8 +826,8 @@ function baseline(target, overrides, refDates) {
         _raDeg: true, // flag: RA is already in degrees
       }));
     } else {
-      // Load from reference-data.json (planets)
-      const refData = JSON.parse(fs.readFileSync(REF_PATH, 'utf-8'));
+      // Load from reference-data.json (planets) — cached at module load
+      const refData = getRefData();
       const entries = refData.planets[target];
       if (!entries || entries.length === 0) {
         throw new Error(`No reference data for ${target}. Use 'baseline-jpl' command to fetch from JPL first.`);
@@ -1145,14 +1155,29 @@ function nelderMead(planet, paramNames, options = {}) {
   // Nelder-Mead coefficients
   const alpha = 1, gamma = 2, rho = 0.5, sigma = 0.5;
 
+  // Early stopping on stalled improvement: track best-f N iters ago and bail
+  // when no meaningful improvement has occurred. Guards against running the
+  // full maxIter in a flat region where fRange > tol but no progress is made.
+  const stallWindow = 10;
+  const stallTol = 1e-7;
+  const bestHistory = [];
+
   let iter = 0;
   for (; iter < maxIter; iter++) {
     // Sort by function value
     simplex.sort((a, b) => a.f - b.f);
 
-    // Check convergence
+    // Check convergence (simplex collapsed: worst ~ best)
     const fRange = simplex[n].f - simplex[0].f;
     if (fRange < tol) break;
+
+    // Check stalled improvement (best hasn't dropped meaningfully in stallWindow iters)
+    bestHistory.push(simplex[0].f);
+    if (bestHistory.length > stallWindow) {
+      const improvement = bestHistory[bestHistory.length - stallWindow - 1] - simplex[0].f;
+      if (improvement < stallTol) break;
+      bestHistory.shift();
+    }
 
     // Centroid of all points except worst
     const centroid = new Array(n).fill(0);

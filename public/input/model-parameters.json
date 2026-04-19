@@ -32,8 +32,8 @@
     "mercury": {
       "name": "Mercury",
       "eocFraction": -0.527,
-      "startpos": 83.65192497119597,
-      "angleCorrection": 0.9715524542954483,
+      "startpos": 83.65315034119067,
+      "angleCorrection": 0.9715968260096552,
       "perihelionEclipticFraction": [
         8,
         11
@@ -57,8 +57,8 @@
     "venus": {
       "name": "Venus",
       "eocFraction": 0.436,
-      "startpos": 249.35354318180453,
-      "angleCorrection": -2.802572285195346,
+      "startpos": 249.32614838335923,
+      "angleCorrection": -2.7527468541978024,
       "perihelionEclipticFraction": [
         2,
         1
@@ -82,8 +82,8 @@
     "mars": {
       "name": "Mars",
       "eocFraction": -0.066224,
-      "startpos": 121.4752720588814,
-      "angleCorrection": -2.099153836434212,
+      "startpos": 121.46203760083546,
+      "angleCorrection": -2.1107563501855893,
       "perihelionEclipticFraction": [
         8,
         35
@@ -108,7 +108,7 @@
       "name": "Jupiter",
       "eocFraction": 0.495,
       "startpos": 13.887515861166527,
-      "angleCorrection": 0.9306794439183754,
+      "angleCorrection": 0.9306755832626976,
       "perihelionEclipticFraction": [
         1,
         5
@@ -132,8 +132,8 @@
     "saturn": {
       "name": "Saturn",
       "eocFraction": 0.54,
-      "startpos": 11.278552886031846,
-      "angleCorrection": -0.17881048745370975,
+      "startpos": 11.278897080150683,
+      "angleCorrection": -0.17881068888467055,
       "perihelionEclipticFraction": [
         -1,
         8
@@ -158,7 +158,7 @@
       "name": "Uranus",
       "eocFraction": 0.53,
       "startpos": 44.900388945775106,
-      "angleCorrection": -0.732974049112844,
+      "angleCorrection": -0.7329073036839873,
       "perihelionEclipticFraction": [
         1,
         3
@@ -183,7 +183,7 @@
       "name": "Neptune",
       "eocFraction": 0.585,
       "startpos": 47.9552024382285,
-      "angleCorrection": 2.3321732763466585,
+      "angleCorrection": 2.332350155095547,
       "perihelionEclipticFraction": [
         2,
         1
