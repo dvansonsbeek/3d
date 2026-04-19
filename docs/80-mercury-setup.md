@@ -51,11 +51,11 @@ Both phases are computed in the ICRF frame and describe **where Mercury currentl
 - Time since System Reset alignment: 14.12° / 360° × 31,935 yr = ~1,253 years
 - But because Mercury's amplitude is so tiny (2×10⁻⁵), the actual eccentricity hardly moves throughout the entire cycle.
 
-### Note on the model parameter `inclinationPhaseAngle`
+### Note on the model parameter `inclinationCycleAnchor`
 
-The model stores `inclinationPhaseAngle = 234.52°` for Mercury. This is **not** the user-facing phase value above — it's an internal parameter such that the formula `i(t) = mean + amp × cos(ω̃_ICRF(t) − 234.52°)` gives the correct inclination. In this internal formula, MIN occurs when cos = −1 (phase 180° in formula coordinates), MAX when cos = +1 (phase 0° in formula coordinates).
+The model stores `inclinationCycleAnchor = 234.52°` for Mercury. This is **not** the user-facing phase value above — it's the ICRF perihelion longitude at which Mercury reaches its inclination MAX, used as the anchor for the formula `i(t) = mean + amp × cos(ω̃_ICRF(t) − 234.52°)`. In formula coordinates, MAX occurs when cos = +1 (ω̃_ICRF = 234.52°) and MIN when cos = −1 (ω̃_ICRF = 234.52° + 180°).
 
-The user-facing **22.94°** is derived as: `((ω̃_ICRF(J2000) − 234.52°) − 180° + 360°) mod 360°`. The −180° shift converts from formula-coordinate (MIN at 180°) to intuitive convention (MIN at 0°).
+The user-facing **22.94°** is derived as: `((ω̃_ICRF(J2000) − 234.52°) − 180° + 360°) mod 360°`. The −180° shift converts from the cycle anchor (MAX at 0°) to the intuitive convention (MIN at 0°).
 
 ## The 5-Layer Hierarchy
 

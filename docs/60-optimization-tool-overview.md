@@ -139,9 +139,9 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `AngleCorrection` | 0.9709 deg | Perihelion alignment fine-tune |
 | `PerihelionEclipticYears` | H/(1+3/8) | Perihelion precession period |
 | `Startpos` | 83.653 deg | Starting orbital position |
-| `InvPlaneInclinationMean` | 6.701170 deg | Inclination oscillation center (Mercury, after 2026-04-09 phase re-anchor) |
+| `InvPlaneInclinationMean` | 6.701170 deg | Inclination oscillation center (Mercury, after 2026-04-09 re-anchor) |
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Inclination oscillation range |
-| `InclinationPhaseAngle` | Per-planet | ICRF perihelion at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
+| `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
 
 ### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
 | Planet | Formula | Direction |
@@ -543,7 +543,7 @@ These are the raw input values at the top of `script.js`. Changing them is strai
 | `AngleCorrection` | 0.9709 deg | Fine-tunes perihelion alignment -> feeds into `orbitCentera`/`orbitCenterb` of the PerihelionFromEarth object | **Medium cascade**: affects perihelion direction vector |
 | `InvPlaneInclinationMean` | 6.726271 deg | Center of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Range of inclination oscillation | **Isolated to inclination**: affects computed inclination vs time |
-| `InclinationPhaseAngle` | Per-planet | Phase of inclination oscillation (ICRF perihelion at balanced year) | **Constrained**: per-planet value derived from balanced year |
+| `InclinationCycleAnchor` | Per-planet | Cycle anchor of inclination oscillation (ICRF perihelion longitude where MAX inclination occurs, at the balanced year) | **Constrained**: per-planet value derived from balanced year |
 
 **Earth input constants -- HIGH IMPACT, change with extreme care:**
 

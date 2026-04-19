@@ -50,29 +50,29 @@ The **ecliptic inclination** (what we traditionally measure) depends on both:
 The model calculates dynamic inclination using the planet's ICRF perihelion longitude:
 
 ```
-i(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)
+i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)
 ```
 
 Where:
-- `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle))
+- `mean` = Computed from J2000 constraint (mean = inclJ2000 - amplitude × cos(ω̃_J2000 - cycleAnchor))
 - `amplitude` = Fibonacci-derived: ψ / (d × √m), see [Fibonacci Laws](10-fibonacci-laws.md)
 - `ω̃_ICRF(t)` = Current ICRF perihelion longitude (ecliptic perihelion minus general precession)
-- `phaseAngle` = Per-planet phase angle from balanced year (see table below)
+- `cycleAnchor` = Per-planet cycle anchor (ICRF perihelion longitude where MAX inclination occurs, evaluated at the balanced year — see table below)
 
 ### Why This Works
 
 The ICRF perihelion longitude tracks each planet's apsidal precession in an inertial frame. As the perihelion sweeps through its cycle:
-- At `ω̃_ICRF(t) = phaseAngle`: `cos(0°) = +1` → **Maximum inclination** (mean + amplitude)
-- At `ω̃_ICRF(t) = phaseAngle + 90°`: `cos(90°) = 0` → Mean inclination
-- At `ω̃_ICRF(t) = phaseAngle + 180°`: `cos(180°) = -1` → **Minimum inclination** (mean - amplitude)
+- At `ω̃_ICRF(t) = cycleAnchor`: `cos(0°) = +1` → **Maximum inclination** (mean + amplitude)
+- At `ω̃_ICRF(t) = cycleAnchor + 90°`: `cos(90°) = 0` → Mean inclination
+- At `ω̃_ICRF(t) = cycleAnchor + 180°`: `cos(180°) = -1` → **Minimum inclination** (mean - amplitude)
 
 For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others are at MIN).
 
-### Per-Planet Phase Angles
+### Per-Planet Cycle Anchors
 
 Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Grand Holistic Octave).
 
-| Planet | Phase Angle | Balance Group | Anchor n | Anchor year | ICRF Direction | Incl. Trend at J2000 |
+| Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
 | Mercury | 234.52° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Venus | 259.82° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
@@ -88,7 +88,7 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 
 **Key insights**:
 - All seven fitted planets share the same balanced-year anchor (n=7, ≈ -2,649,854 BC = the **start of the current Grand Holistic Octave**).
-- Earth's phase angle is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
+- Earth's cycle anchor is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
 - Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
 - Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
 - Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde.
@@ -121,7 +121,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const amplitude = mercuryInvPlaneInclinationAmplitude;
   const icrfPeriod = mercuryPerihelionICRFYears;     // |ICRF period|
   const periLongJ2000 = mercuryLongitudePerihelion;   // ICRF perihelion at J2000
-  const phaseAngle = mercuryInclinationPhaseAngle;    // 234.52° (n=7 anchor)
+  const cycleAnchor = mercuryInclinationCycleAnchor;  // 234.52° (n=7 anchor)
 
   // Calculate current ICRF perihelion longitude
   const yearsSinceJ2000 = currentYear - 2000;
@@ -129,7 +129,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   const periLongCurrent = periLongJ2000 + icrfRate * yearsSinceJ2000;
 
   // Calculate inclination from ICRF perihelion position
-  const phaseDeg = periLongCurrent - phaseAngle;
+  const phaseDeg = periLongCurrent - cycleAnchor;
   const phaseRad = phaseDeg * Math.PI / 180;
 
   // Saturn is anti-phase: flip the cosine sign
@@ -497,7 +497,7 @@ The planet information panels display four invariable plane values:
 |----------|-------------|
 | **Ascending Node on Inv. Plane (Ω)** | Current ascending node in ecliptic coordinates |
 | **Descending Node on Inv. Plane** | Ascending node + 180° |
-| **ω̃ at Max Inclination** | ICRF perihelion longitude where inclination reaches maximum (= phase angle) |
+| **ω̃ at Max Inclination** | ICRF perihelion longitude where inclination reaches maximum (= cycle anchor) |
 | **Current Oscillation Phase** | Position in oscillation cycle (0° = max, 180° = min) |
 
 **Note**: The ascending node values use ecliptic coordinates (precession period H/16), while the oscillation phase uses ICRF perihelion coordinates (per-planet ICRF period).

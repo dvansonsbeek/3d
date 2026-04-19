@@ -24,8 +24,8 @@ The balance weight is:
 where m = planet mass / Sun mass, a = semi-major axis (AU), e = eccentricity,
 d = Fibonacci d-value, and i_amplitude = PSI / (d * sqrt(m)).
 
-**Vector balance**: the sum of L * i_amplitude vectors at their respective phase
-angles (per-planet phase angles from balanced year) should cancel. Prograde planets (7) vs anti-phase Saturn.
+**Vector balance**: the sum of L * i_amplitude vectors at their respective cycle
+anchors (per-planet cycle anchors — ICRF perihelion longitudes where MAX inclination occurs at the balanced year) should cancel. Prograde planets (7) vs anti-phase Saturn.
 
 ### Law 5 — Eccentricity Balance (Scalar)
 

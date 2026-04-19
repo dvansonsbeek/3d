@@ -464,7 +464,7 @@ for (const key of Object.keys(planetInputs)) {
       console.log(`const ${key}InvPlaneInclinationMean = ${result.mean.toFixed(6)};`);
       console.log(`const ${key}InvPlaneInclinationAmplitude = ${result.amplitude.toFixed(6)};  // Range: ${result.rangeMin.toFixed(2)}° to ${result.rangeMax.toFixed(2)}°`);
     }
-    console.log(`const ${key}InclinationPhaseAngle = ${input.phaseAngle};${retro}`);
+    console.log(`const ${key}InclinationCycleAnchor = ${input.phaseAngle};${retro}`);
     console.log('');
   }
 }

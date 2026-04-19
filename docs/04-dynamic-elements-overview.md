@@ -127,13 +127,13 @@ Where:
 
 **Planet Inclination Oscillation** (ICRF perihelion approach):
 ```
-i_p(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)
+i_p(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)
 
 Where:
-  mean       = Laplace-Lagrange midpoint (center of oscillation range)
-  amplitude  = half of oscillation range
-  ω̃_ICRF(t) = planet's ICRF perihelion longitude (precesses with time)
-  phaseAngle = per-planet phase (ICRF perihelion at balanced year)
+  mean        = Laplace-Lagrange midpoint (center of oscillation range)
+  amplitude   = half of oscillation range
+  ω̃_ICRF(t)  = planet's ICRF perihelion longitude (precesses with time)
+  cycleAnchor = per-planet cycle anchor (ICRF perihelion where MAX occurs, at the balanced year)
 ```
 
 **Inputs**:
@@ -283,7 +283,7 @@ The ICRF period is derived from the ecliptic period by subtracting the general p
 
 The three systems are **geometrically linked** through orbital plane precession:
 
-1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is driven by the ICRF perihelion longitude: `i(t) = mean + A × cos(ω̃_ICRF(t) - phaseAngle)`
+1. **Planet inclination oscillation**: Each planet's orbital plane precesses around the invariable plane, causing its inclination to oscillate. The phase of this oscillation is driven by the ICRF perihelion longitude: `i(t) = mean + A × cos(ω̃_ICRF(t) - cycleAnchor)`
 
 2. **Ecliptic inclination**: Depends on BOTH Earth's and the planet's dynamic inclinations to the invariable plane, plus their ascending node difference.
 
@@ -356,7 +356,7 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 |---------------|----------|---------|
 | `<planet>InvPlaneInclinationMean` | [script.js:292-332](../src/script.js#L292-L332) | Laplace-Lagrange midpoint (center of oscillation) |
 | `<planet>InclinationAmplitude` | [script.js:292-332](../src/script.js#L292-L332) | Half of oscillation range from Laplace-Lagrange bounds |
-| `<planet>InclinationPhaseAngle` | [script.js:359-369](../src/script.js#L359-L369) | Geometric link between Ω and inclination phase (Ω_J2000 - φ₀) |
+| `<planet>InclinationCycleAnchor` | [script.js:359-369](../src/script.js#L359-L369) | ICRF perihelion longitude where MAX inclination occurs (evaluated at balanced year) |
 
 ## References
 
@@ -371,6 +371,6 @@ The Y-rotations through the tilted apsidal frame cause the ascending node to pre
 
 *Document created: 2024-12-21*
 *Updated: 2024-12-31 - Added planet inclination oscillation approach*
-*Updated: 2026-04-03 - Migrated from Ω-based to ICRF perihelion approach with per-planet phase angles*
+*Updated: 2026-04-03 - Migrated from Ω-based to ICRF perihelion approach with per-planet cycle anchors*
 *Updated: 2025-01-01 - Saturn anomaly resolved (phase offset 37.8°), fixed document references*
 *Part of the Holistic Universe Model documentation*

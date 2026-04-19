@@ -6,7 +6,7 @@ This document presents the analysis of the **dynamic vector balance** — whethe
 
 the default configuration's *d-values and phase groups* are unchanged. What was refined later (2026-04-09 audit) are two non-d-value parameters:
 - The **asc-node integer assignments** `ascendingNodeCyclesIn8H` (Mercury 9, Venus 1, Mars 62, Jupiter/Saturn 36, Uranus 12, Neptune 3) — re-fit so all 7 fitted planets match JPL ecliptic-inclination trend directions in the J2000-fixed frame, with Jupiter+Saturn locked to share N=36.
-- Four **phase angles** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -2,649,854 BC).
+- Four **cycle anchors** (Mercury, Venus, Mars, Neptune) re-anchored so all 7 fitted planets share the same balanced-year extremum at n=7 (≈ -2,649,854 BC).
 
 The d-values, the antiPhase grouping, and Saturn's role as the sole anti-phase planet are exactly as analyzed below.
 
@@ -45,7 +45,7 @@ An exhaustive LL-constrained search tested 127 million (d-value, group) combinat
 - 4/4 mirror symmetry (Me=Ur=21, Ve=Ne=34, Ma=Ju=5, Ea=Sa=3)
 - 8/8 LL bounds pass (Saturn: +0.028° excess, within 0.03° LL uncertainty)
 
-No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition. **The d-values, antiPhase grouping, and the Saturn-only anti-phase assignment from this finding are all unchanged in the current model.** The 2026-04-09 audit only refit `ascendingNodeCyclesIn8H` and four phase angles, not the d-values themselves.
+No other configuration achieves this combination. The d-values are uniquely determined by the scalar balance condition. **The d-values, antiPhase grouping, and the Saturn-only anti-phase assignment from this finding are all unchanged in the current model.** The 2026-04-09 audit only refit `ascendingNodeCyclesIn8H` and four cycle anchors, not the d-values themselves.
 
 ### 1B. Vector balance varies by configuration — NOT guaranteed by d-values alone
 
@@ -222,7 +222,7 @@ The original April 2026 analysis treated "which Ω rate for trend computation" a
 
 The d-values, antiPhase grouping, and Saturn's role as the sole anti-phase planet are unchanged from the April 2026 analysis. The 2026-04-09 audit added two complementary results:
 
-1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 62, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 phase angles (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -2,649,854 BC).
+1. **JPL ecliptic-inclination trends now match in the J2000-fixed frame** for all 7 fitted planets, with a total residual of ~4.3″/century. This required re-fitting `ascendingNodeCyclesIn8H` per planet (Mercury 9, Venus 1, Mars 62, Jupiter 36, Saturn 36, Uranus 12, Neptune 3, with Jupiter+Saturn locked) and re-anchoring 4 cycle anchors (Mercury, Venus, Mars, Neptune) to balanced year n=7 (≈ -2,649,854 BC).
 
 2. **Law 4 is the eccentricity amplitude constant K** — a single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt: `e_amp = K × sin(tilt) × √d / (√m × a^1.5)`. See [10-fibonacci-laws.md § Law 4](10-fibonacci-laws.md#law-4-the-eccentricity-amplitude-constant).
 

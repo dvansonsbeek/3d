@@ -186,7 +186,7 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md#system-reset) for details.
 
-| Planet | Phase Angle | Group | Anchor |
+| Planet | Cycle Anchor | Group | Balanced Year |
 |--------|-------------|-------|--------|
 | Mercury | 234.52° | In-phase | n=7 |
 | Venus | 259.82° | In-phase | n=7 |
@@ -507,7 +507,7 @@ Earth has Fibonacci divisor d = 3 (= F₄). Step by step:
 The mean is computed from the J2000 constraint:
 
 ```
-mean = inclJ2000 - amplitude × cos(ω̃_J2000 - phaseAngle)
+mean = inclJ2000 - amplitude × cos(ω̃_J2000 - cycleAnchor)
      = 1.57867° - 0.636° × cos(102.947° - 21.77°)
      = 1.57867° - 0.636° × cos(81.177°)
      = 1.57867° - 0.636° × 0.15315
@@ -547,9 +547,9 @@ const FIBONACCI_D = {
   neptune: 34    // F₉
 };
 
-// Per-planet phase angles (ICRF perihelion at balanced year n=7 ≈ -2,649,854 BC)
+// Per-planet cycle anchors (ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC)
 // Re-fit 2026-04-09 to match JPL ecliptic-inclination trends in the J2000-fixed frame.
-const PHASE_ANGLE = {
+const CYCLE_ANCHOR = {
   mercury: 234.52, venus: 259.82, earth: 21.77, mars: 231.95,
   jupiter: 291.18, saturn: 120.38, uranus: 21.33, neptune: 174.04
 };
@@ -619,7 +619,7 @@ Compute Saturn's eccentricity from the eccentricity balance equation (Law 5). Ve
 
 ### Test 6: J2000 Inclination Match
 
-At J2000 epoch, `i(2000) = mean + amplitude × cos(ω̃_J2000 - phaseAngle)` should match observed invariable plane inclinations.
+At J2000 epoch, `i(2000) = mean + amplitude × cos(ω̃_J2000 - cycleAnchor)` should match observed invariable plane inclinations.
 
 ### Test 7: Eccentricity Amplitude Constant (Law 4)
 
@@ -657,7 +657,7 @@ Only configurations with balance ≥ 99.994% (the TNO margin) are retained.
 
 ### Output
 
-The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised anchor, ascending nodes, and phase angles), sorted by eccentricity balance. The current run yields 43 presets.
+The search writes `data/balance-presets.json` containing the deep-analysis survivors (per-config optimised balanced year, ascending nodes, and cycle anchors), sorted by eccentricity balance. The current run yields 43 presets.
 
 ### Shared Input Values
 

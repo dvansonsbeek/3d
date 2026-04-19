@@ -85,9 +85,9 @@ A dropdown in the header offers **43 deep-analysis survivors** — configuration
 
 Selecting a preset applies its d-values and balance group assignments to all planets (except Earth, which is locked).
 
-### Phase Angle (γ)
+### Cycle Anchor (γ)
 
-A dropdown per planet to select the oscillation phase angle. Each planet has a per-planet phase angle (ICRF perihelion longitude at the balanced year). Available options:
+A dropdown per planet to select the inclination cycle anchor. Each planet has a per-planet cycle anchor (ICRF perihelion longitude where MAX inclination occurs, evaluated at the balanced year). Available options:
 
 | Option | Value | Description |
 |--------|-------|-------------|
@@ -95,7 +95,7 @@ A dropdown per planet to select the oscillation phase angle. Each planet has a p
 | γ₁–γ₈ | Various | Laplace-Lagrange eigenmode angles |
 | Custom | User input | Any angle 0°–360° |
 
-Phase angles are per-planet values derived from the balanced year (~302,635 BC). They cluster near LL eigenmodes. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
+Cycle anchors are per-planet values derived from the balanced year (~302,635 BC). They cluster near LL eigenmodes. See [Fibonacci Laws — Phase Groups](10-fibonacci-laws.md#phase-groups).
 
 ### ω̃ J2000 (Read-Only)
 
@@ -272,7 +272,7 @@ These can be changed via the UI controls (except for Earth, which is locked):
 | Variable | Symbol | Description | Default |
 |----------|--------|-------------|---------|
 | Fibonacci divisor | d | Fibonacci number dividing the amplitude | See [Default Configuration](#default-configuration) |
-| Phase angle | γ | Per-planet phase angle (ICRF perihelion at balanced year) | Per-planet values |
+| Cycle anchor | γ | Per-planet cycle anchor (ICRF perihelion longitude where MAX inclination occurs, at the balanced year) | Per-planet values |
 | ICRF period | T | ICRF perihelion period in years | From model constants |
 
 ### Variables Used Per Calculation

@@ -99,7 +99,7 @@ The Holistic-Year is divided by Fibonacci-related integers to produce all Earth 
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
 | Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.48128 deg | Mean orbital inclination to invariable plane (derived) |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603 deg | Oscillation amplitude (derived from obliquity rate) |
-| Inclination Phase Angle | `earthInclinationPhaseAngle` | 21.77 deg | ICRF perihelion at balanced year (phase offset for inclination oscillation) |
+| Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
 
 ## Fibonacci Divisor Assignments
@@ -279,7 +279,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Neptune | 0.743755 | 0.013474 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
 | Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
 
-**Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)` (Saturn: sign flipped, anti-phase)
+**Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
 
 ## Planet Orbital Distances & Periods
 
@@ -589,11 +589,11 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
-### Inclination Phase Angles
+### Inclination Cycle Anchors
 
-Each planet has a per-planet phase angle (ICRF perihelion longitude at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Grand Holistic Octave); Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Grand Holistic Octave); Earth is locked to its IAU-derived n=0 reference.
 
-| Planet | Phase Angle | Anchor | Notes |
+| Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|
 | Mercury | 234.52° | n=7 | |
 | Venus | 259.82° | n=7 | |
@@ -607,7 +607,7 @@ Each planet has a per-planet phase angle (ICRF perihelion longitude at one of th
 
 \* Jupiter, Saturn, and Uranus have ICRF periods that divide H exactly; their phase at n=7 numerically coincides with their phase at n=0 (and any other anchor).
 
-The eigenmode-cluster claim from earlier model versions (phase angles ≈ Laplace-Lagrange γ₁–γ₈) no longer holds in detail under the n=7 anchor — the alignment was specific to the n=0 phase set. See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups).
+The eigenmode-cluster claim from earlier model versions (cycle anchors ≈ Laplace-Lagrange γ₁–γ₈) no longer holds in detail under the n=7 anchor — the alignment was specific to the n=0 anchor set. See [10-fibonacci-laws.md § Phase Groups](10-fibonacci-laws.md#phase-groups).
 
 The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
 

@@ -221,14 +221,14 @@ Planetary inclinations oscillate as the ICRF perihelion longitude precesses (Lap
 
 **Formula:**
 ```
-i(t) = i_mean + A × cos(ω̃_ICRF(t) - phaseAngle)
+i(t) = i_mean + A × cos(ω̃_ICRF(t) - cycleAnchor)
 ```
 
 Where:
 - i_mean = Laplace-Lagrange mean inclination
 - A = oscillation amplitude
 - ω̃_ICRF(t) = current ICRF perihelion longitude
-- phaseAngle = per-planet phase angle (ICRF perihelion at balanced year)
+- cycleAnchor = per-planet cycle anchor (ICRF perihelion where MAX inclination occurs, at the balanced year)
 
 **Implementation (lines 19905-20026):**
 - Function: `computePlanetInvPlaneInclinationDynamic(planet, currentYear)`

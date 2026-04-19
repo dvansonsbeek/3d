@@ -79,8 +79,8 @@ SOLSTICE_OBLIQUITY_HARMONICS = [tuple(h) for h in _C['SOLSTICE_OBLIQUITY_HARMONI
 PERI_HARMONICS = [tuple(h) for h in _C['PERI_HARMONICS']]
 PERI_OFFSET = _C['PERI_OFFSET']
 
-# Earth phase angle: ω̃_ICRF at max inclination (from balanced year)
-PHASE_ANGLE = 21.77  # degrees (was 203.3195 in ascending-node-based model)
+# Earth inclination cycle anchor: ω̃_ICRF at max inclination (from balanced year)
+EARTH_INCL_CYCLE_ANCHOR = 21.77  # degrees (was 203.3195 in ascending-node-based model)
 
 # Physical & astronomical constants (from constants.js)
 _AU_KM = _C['currentAUDistance']
@@ -312,9 +312,9 @@ OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 INCL_MEAN = {p['name']: p['invPlaneInclinationMean'] for p in _C['planets'].values()}
 INCL_MEAN["Earth"] = EARTH_INCLINATION_MEAN
 
-# Phase angle for inclination oscillation (from constants.js inclinationCycleAnchor)
+# Cycle anchor for inclination oscillation (from constants.js inclinationCycleAnchor)
 INCL_CYCLE_ANCHOR = {p['name']: p['inclinationCycleAnchor'] for p in _C['planets'].values()}
-INCL_CYCLE_ANCHOR["Earth"] = PHASE_ANGLE  # 21.77
+INCL_CYCLE_ANCHOR["Earth"] = EARTH_INCL_CYCLE_ANCHOR  # 21.77
 
 # J2000 orbital inclination to ecliptic (from constants.js eclipticInclinationJ2000)
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}

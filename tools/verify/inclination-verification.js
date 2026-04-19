@@ -355,7 +355,7 @@ for (const [name, p] of Object.entries(currentCodeValues)) {
   console.log(`// ${name.toUpperCase()}`);
   console.log(`const ${name}InvPlaneInclinationMean = ${p.mean.toFixed(6)};`);
   console.log(`const ${name}InvPlaneInclinationAmplitude = ${p.amplitude.toFixed(6)};  // Range: ${(p.mean - p.amplitude).toFixed(2)}° to ${(p.mean + p.amplitude).toFixed(2)}°`);
-  console.log(`const ${name}InclinationPhaseAngle = ${p.phaseAngle};${retro}`);
+  console.log(`const ${name}InclinationCycleAnchor = ${p.phaseAngle};${retro}`);
   console.log(`const ${name}AscendingNodeInvPlaneVerified = ${p.omegaJ2000};`);
   console.log(`// Period: ${periodExpr} = ${Math.abs(p.period).toLocaleString()} years`);
   console.log('');

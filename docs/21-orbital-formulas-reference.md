@@ -93,7 +93,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `{planet}OrbitalEccentricity` | Eccentricity (e) |
 | `{planet}InvPlaneInclinationMean` | Mean inclination to invariable plane (Laplace-Lagrange midpoint) |
 | `{planet}InvPlaneInclinationAmplitude` | Inclination oscillation amplitude (half of L-L range) |
-| `{planet}InclinationPhaseAngle` | Phase angle for inclination oscillation (ICRF perihelion at balanced year) |
+| `{planet}InclinationCycleAnchor` | Cycle anchor for inclination oscillation (ICRF perihelion longitude where MAX inclination occurs, evaluated at the balanced year) |
 | `{planet}EclipticInclinationJ2000` | J2000 orbital inclination to ecliptic |
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
@@ -2066,16 +2066,16 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 
 ### Inclination Oscillation (ICRF perihelion approach)
 ```
-i(t) = mean + A·cos(ω̃_ICRF(t) - phaseAngle)   Dynamic inclination to invariable plane
+i(t) = mean + A·cos(ω̃_ICRF(t) - cycleAnchor)   Dynamic inclination to invariable plane
 
 Where:
-  mean       = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
-  A          = <planet>InclinationAmplitude          Half of oscillation range
-  ω̃_ICRF(t) = Current ICRF perihelion longitude (ecliptic rate - general precession H/13)
-  phaseAngle = <planet>InclinationPhaseAngle         Per-planet ICRF perihelion at balanced year
+  mean        = <planet>InvPlaneInclinationMean      Laplace-Lagrange midpoint
+  A           = <planet>InclinationAmplitude          Half of oscillation range
+  ω̃_ICRF(t)  = Current ICRF perihelion longitude (ecliptic rate - general precession H/13)
+  cycleAnchor = <planet>InclinationCycleAnchor        ICRF perihelion where MAX occurs (at balanced year)
 
 Mean derivation:
-  mean = i_J2000 - A·cos(ω̃_J2000 - phaseAngle)    From known J2000 constraint
+  mean = i_J2000 - A·cos(ω̃_J2000 - cycleAnchor)    From known J2000 constraint
 
 Note: Saturn is anti-phase (cos sign flipped): MAX inclination at balanced year,
       while all other planets are at MIN.

@@ -88,7 +88,7 @@ The formula depends on three dynamic quantities:
 | Planet's ecliptic inclination | `computeEclipticInclination()` | perihelionEclipticYears | Rate factor `1/tan(i)` |
 
 The **planet's ecliptic inclination** is computed via the dot product of the planet's and Earth's orbital plane normal vectors on the invariable plane. Both planes oscillate independently:
-- The planet's invariable plane inclination oscillates: `i_planet(t) = mean + amplitude × cos(ω̃_ICRF(t) - phaseAngle)`
+- The planet's invariable plane inclination oscillates: `i_planet(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)`
 - Earth's invariable plane inclination oscillates at period H/3
 - Their ascending nodes on the invariable plane precess linearly
 
