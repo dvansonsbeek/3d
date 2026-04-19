@@ -2,6 +2,34 @@
 
 This document explains **why** each value in Mercury's 5-layer scene graph hierarchy is set the way it is. It serves as a companion to the [Planet Inspector](51-planet-inspector-reference.md) and the [Scene Graph Hierarchy](41-scene-graph-hierarchy.md).
 
+## Mercury at a glance
+
+| Quantity | Value | Source |
+|----------|-------|--------|
+| Semi-major axis | 0.38711 AU | Kepler's 3rd law from H × 8/11 period |
+| Eccentricity (J2000) | 0.20564 | JPL J2000 |
+| Base eccentricity | 0.20563 | Phase-derived (≈ J2000, amp negligible) |
+| Eccentricity amplitude | 2.34×10⁻⁵ | K formula × sin(0.0084°) — tiny |
+| Inclination (J2000, inv. plane) | 6.3473° | JPL J2000 |
+| Mean inclination | 6.7032° | Derived from PSI / (d × √m) |
+| Inclination amplitude | 0.3865° | PSI / (d × √m), d = 21 |
+| Mean obliquity | 0.0084° | Two-cosine formula at System Reset anchor |
+| **Ecliptic perihelion** | **243,867 yr** | **H × 8/11 (Fibonacci Law 1)** |
+| **Axial precession** | **−298,060 yr** | **−8H/9 (Cassini state, MESSENGER)** |
+| **Obliquity cycle** | **894,179 yr** | **8H/3 (Fibonacci 11 = 3 + 8)** |
+| **Eccentricity cycle** | **31,935 yr** | **2H/21 (beat: \|9 − 93\|/8H)** |
+| **Inclination cycle (= ICRF peri)** | **28,844 yr** | **8H/93 (drives the inclination oscillation)** |
+| Orbit center (scene) | (−6.4682, −1.3244, 0) | Derived from base × direction |
+| Inclination phase at J2000 | 234.52° | ICRF perihelion longitude at System Reset (in-phase group) |
+| Eccentricity phase at J2000 | 104.12° | System Reset anchor + 90° offset |
+| Spin axis tilt | −0.03° | JPL J2000 (nearly zero) |
+
+**Two distinct phases**: Mercury has two different oscillation phases at J2000:
+- **Inclination phase** (234.52°) — drives the orbital plane tilt oscillation around the invariable plane. Anchored at the System Reset where Mercury is at minimum inclination (in-phase group).
+- **Eccentricity phase** (104.12°) — drives the eccentricity oscillation. Anchored at the System Reset where Mercury is at mean eccentricity, rising (90° offset for in-phase).
+
+Both phases are referenced to the same epoch (n=7, the System Reset) but they describe different oscillations with different periods (28,844 yr for inclination vs 31,935 yr for eccentricity).
+
 ## The 5-Layer Hierarchy
 
 Mercury's position in the simulation is computed by nesting five scene-graph containers. Each layer adds one physical effect. When the simulation runs, the combined rotation of all layers produces Mercury's apparent motion as seen from Earth's geocentric reference frame.
@@ -90,10 +118,19 @@ Mercury's mean obliquity is nearly zero under the System Reset anchor — very c
 **Step C: Eccentricity amplitude from K** (the universal eccentricity amplitude constant)
 ```
 e_amp = K × sin(|obliquityMean|) × √d / (√m × a^1.5)
-      = 3.4149×10⁻⁶ × sin(0.0084°) × √21 / (4.074×10⁻⁴ × 0.2408)
-      ≈ 2.34×10⁻⁵
+
+Inputs:
+  K               = 3.4149×10⁻⁶          (derived from Earth)
+  sin(0.0084°)    = 1.466×10⁻⁴           (tilt → tiny)
+  √d = √21        = 4.583                 (Mercury's Fibonacci divisor)
+  √m              = 4.074×10⁻⁴            (mass fraction √(1.66×10⁻⁷))
+  a^1.5           = 0.2408                 (= 0.38711^1.5)
+
+  numerator       = 3.4149×10⁻⁶ × 1.466×10⁻⁴ × 4.583 = 2.295×10⁻⁹
+  denominator     = 4.074×10⁻⁴ × 0.2408              = 9.81×10⁻⁵
+  e_amp           = 2.295×10⁻⁹ / 9.81×10⁻⁵           ≈ 2.34×10⁻⁵
 ```
-Mercury has an extremely tiny eccentricity amplitude (~0.01%) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt.
+Mercury has an extremely tiny eccentricity amplitude (~0.01% of base) because its mean obliquity is nearly zero — the `sin(tilt)` factor in the K formula makes the amplitude proportional to the tilt. As a consequence, Mercury's eccentricity is essentially constant at the J2000 value over the entire 31,935-year cycle (variation ≤ 0.01%).
 
 **Step D: Phase at J2000** (where in the eccentricity cycle Mercury is right now)
 
@@ -184,7 +221,7 @@ The planet's starting position within its orbit is measured from the ascending n
 | startPos | 83.652° | = `planets.mercury.startpos` — fitted so Mercury's RA at J2000 matches JPL Horizons. |
 | tilt | −0.03° | = `−axialTiltJ2000`. Mercury's spin axis tilt (nearly zero). |
 | orbitRadius | 38.711 scene units | = `orbitDistance × 100` = 0.38711 AU × 100. |
-| orbitCenter | (100 + eccentricityOffset, 0, 0) | Offset from the orbit center to create the elliptical orbit shape. |
+| orbitCenter | (100 + eccentricityOffset, 0, 0) | The Sun is at (100, 0, 0); the eccentricityOffset = `mercuryPerihelionDistance` ≈ 6.60 from Step 2. This offsets the orbit center from the Sun by `a × e_real`, creating the elliptical shape (Sun at the focus, not the geometric center). |
 
 ### Why startPos = 83.652°?
 
