@@ -51,7 +51,7 @@ for (const key of PLANETS) {
   const sqrtM = Math.sqrt(C.massFraction[key]);
   const amp = PSI / (d * sqrtM);
   const antiSign = p.antiPhase ? -1 : 1;
-  const phase = p.inclinationPhaseAngle;
+  const phase = p.inclinationCycleAnchor;
   const cosJ2000 = Math.cos((p.longitudePerihelion - phase) * DEG2RAD);
   const mean = p.invPlaneInclinationJ2000 - antiSign * amp * cosJ2000;
   const ascNodeRate = p.ascendingNodeCyclesIn8H
@@ -70,7 +70,7 @@ data.earth = {
   inclJ2000: C.ASTRO_REFERENCE.earthInclinationJ2000_deg,
   earthMean: C.earthInvPlaneInclinationMean,
   earthAmp:  C.earthInvPlaneInclinationAmplitude,
-  earthPhaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+  earthPhaseAngle: C.ASTRO_REFERENCE.earthInclinationCycleAnchor,
   periLongJ2000: C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
   icrfRate: 360 / (H / 3),
   ascNodeRate: -360 * 40 / (8 * H),  // Earth: -8H/40 = -H/5

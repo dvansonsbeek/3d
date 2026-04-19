@@ -595,7 +595,7 @@ function computePlanetInvPlaneInclinationDynamic(planetName, currentYear, julian
   const i_J2000 = p.invPlaneInclinationJ2000;
   const i_mean = p.invPlaneInclinationMean;
   const amplitude = p.invPlaneInclinationAmplitude;
-  const phaseOffset = p.inclinationPhaseAngle;
+  const phaseOffset = p.inclinationCycleAnchor;
 
   if (i_J2000 === undefined || amplitude === undefined) {
     return i_J2000 || 0;

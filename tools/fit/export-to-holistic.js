@@ -406,11 +406,11 @@ console.log('  ── Inclination phase angles ──');
 {
   const cap = p => p.charAt(0).toUpperCase() + p.slice(1);
   const phase = p => p === 'earth'
-    ? C.ASTRO_REFERENCE.earthInclinationPhaseAngle
-    : mp.planets[p].inclinationPhaseAngle;
+    ? C.ASTRO_REFERENCE.earthInclinationCycleAnchor
+    : mp.planets[p].inclinationCycleAnchor;
   const inner = ['mercury', 'venus', 'earth', 'mars'].map(p => `${cap(p)}: ${phase(p)}`).join(', ');
   const outer = ['jupiter', 'saturn', 'uranus', 'neptune'].map(p => `${cap(p)}: ${phase(p)}`).join(', ');
-  constantsTs = replaceRecordBlock(constantsTs, 'INCL_PHASE_ANGLE',
+  constantsTs = replaceRecordBlock(constantsTs, 'INCL_CYCLE_ANCHOR',
     `  ${inner},`,
     `  ${outer},`);
 }

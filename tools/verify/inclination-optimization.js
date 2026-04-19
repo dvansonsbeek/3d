@@ -91,7 +91,7 @@ const earthFibAmp = getFibonacciAmplitude('earth');
 
 console.log(`FIBONACCI CONSTANTS:`);
 console.log(`  ψ = ${PSI.toExponential(6)} = d_E × amp_E × √m_E`);
-console.log(`  Earth phase angle: ${C.ASTRO_REFERENCE.earthInclinationPhaseAngle}°`);
+console.log(`  Earth phase angle: ${C.ASTRO_REFERENCE.earthInclinationCycleAnchor}°`);
 console.log(`  Earth perihelion J2000: ${C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000}°\n`);
 
 const earthConfig = {
@@ -99,7 +99,7 @@ const earthConfig = {
   omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane,
   period: holisticyearLength / 3,         // 111,772 years (ICRF)
   inclJ2000: C.ASTRO_REFERENCE.earthInclinationJ2000_deg,
-  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+  phaseAngle: C.ASTRO_REFERENCE.earthInclinationCycleAnchor,
   amplitude: earthFibAmp
 };
 // Mean derived from J2000 constraint: mean = inclJ2000 - amplitude × cos(ω̃ - φ)
@@ -170,7 +170,7 @@ for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune
     eclPeriod: p.perihelionEclipticYears,
     icrfPeriod: icrfPeriod,
     ascNodePeriod: ascNodePeriod,
-    phaseAngle: p.inclinationPhaseAngle,
+    phaseAngle: p.inclinationCycleAnchor,
     antiPhase: p.antiPhase || false,
   };
 }
@@ -183,7 +183,7 @@ planetInputs.earth = {
   eclPeriod: holisticyearLength / 16,
   icrfPeriod: holisticyearLength / 3,
   ascNodePeriod: -holisticyearLength / 5,
-  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+  phaseAngle: C.ASTRO_REFERENCE.earthInclinationCycleAnchor,
   antiPhase: false,
 };
 // Pluto — not in Fibonacci theory, hardcoded values from script.js

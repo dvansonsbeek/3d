@@ -29,7 +29,7 @@ OBSERVED (per planet)
   │  axialTiltJ2000
   │  longitudePerihelion
   │
-  ├─── SYSTEM RESET ──► Inclination phase angle
+  ├─── SYSTEM RESET ──► Inclination cycle anchor
   │       │                φ = ω̃_ICRF(t_SR)       (anti-phase)
   │       │                φ = ω̃_ICRF(t_SR) − 180° (in-phase)
   │       │
@@ -45,7 +45,7 @@ OBSERVED (per planet)
                                    cos(θ) = (base² + amp² − e_J2000²) / (2 × base × amp)
 ```
 
-The inclination phase angles are not free parameters. They are the ICRF perihelion longitudes evaluated at the System Reset epoch — the unique year where all planets simultaneously reach their inclination extremes. In-phase planets are at minimum (perihelion 180° away), Saturn at maximum (perihelion aligned).
+The inclination cycle anchors are not free parameters. They are the ICRF perihelion longitudes evaluated at the System Reset epoch — the unique year where all planets simultaneously reach their inclination extremes. In-phase planets are at minimum (perihelion 180° away), Saturn at maximum (perihelion aligned).
 
 The loop closes because K uses the **model mean obliquity** — which itself depends on the inclination amplitude from PSI. Yet there is no circular dependency: PSI determines inclination amplitudes independently, those determine mean obliquity, and then K determines eccentricity amplitudes.
 
@@ -55,7 +55,7 @@ For each of the 8 planets, PSI and K together predict:
 
 | Quantity | Formula | Derived from |
 |----------|---------|--------------|
-| Inclination phase angle | ω̃_ICRF at System Reset | longitudePerihelion + ICRF rate + System Reset |
+| Inclination cycle anchor | ω̃_ICRF at System Reset | longitudePerihelion + ICRF rate + System Reset |
 | Inclination amplitude | ψ / (d × √m) | PSI + Fibonacci d + mass |
 | Inclination mean | J2000 − amp × cos(ω̃ − φ) | amplitude + phase + invPlaneInclinationJ2000 |
 | Mean obliquity | tiltJ2000 + oscillation offset | inclination amplitude + obliquity cycle |
@@ -100,7 +100,7 @@ The Fibonacci divisors and balance groups produce two independent balance condit
 
 Both balances use the same planet configuration — no separate tuning.
 
-The base eccentricities (mean eccentricities around which each planet oscillates) are phase-derived at runtime — not fitted by an optimizer. For each planet, the law of cosines is solved using the K-derived amplitude, the J2000 observed eccentricity, and the phase angle at the System Reset epoch (n=7). At n=7, in-phase planets are at eccentricity mean + rising (phase 90°); Saturn (anti-phase) is at mean + falling (phase 270°). This mirrors the inclination alignment at n=7 and is a physically motivated convention: every planet simultaneously passes through its mean eccentricity at the System Reset, with direction determined by its balance group. The balance percentages (99.86% eccentricity, 99.9975% inclination) emerge naturally from the phase-derived values rather than being forced to 100% by construction.
+The base eccentricities (mean eccentricities around which each planet oscillates) are phase-derived at runtime — not fitted by an optimizer. For each planet, the law of cosines is solved using the K-derived amplitude, the J2000 observed eccentricity, and the eccentricity phase at the System Reset. The balance percentages emerge naturally from the phase-derived values rather than being forced to 100% by construction.
 
 ## System Reset
 
@@ -115,7 +115,7 @@ The System Reset also defines the **eccentricity phase alignment**:
 
 This is the physically motivated symmetry: at n=7, every cycle type (inclination, eccentricity) reaches its reference state simultaneously. The direction of eccentricity change (rising vs falling) encodes the balance group — the same grouping that produces the 99.9975% inclination balance.
 
-The inclination phase angles are a direct consequence: each planet's phase angle equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The phase angles are derived, not fitted.
+The inclination cycle anchors are a direct consequence: each planet's phase angle equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The phase angles are derived, not fitted.
 
 The System Reset occurs once per Grand Holistic Octave (8H = 2,682,536 years). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
 
@@ -144,7 +144,7 @@ From these free parameters, the model derives:
 
 **From the configuration:**
 - Two independent balance conditions (inclination 99.998%, eccentricity 99.86%)
-- The System Reset epoch and all inclination phase angles
+- The System Reset epoch and all inclination cycle anchors
 - All ascending node cycles (integer divisors of 8H)
 
 The J2000 observed values serve as anchors — the model does not predict them, but uses them as boundary conditions to solve for means and phases. The test is whether two constants (PSI and K) derived from Earth alone correctly predict the amplitudes for the other seven planets. They do.

@@ -128,12 +128,12 @@ function computeInvPlaneInclinationAmplitude(PSI, fibonacciD, massFraction) {
  * @param {number} inclJ2000 - Invariable plane inclination at J2000 (degrees)
  * @param {number} amplitude - Inclination oscillation amplitude (degrees)
  * @param {number} longitudePerihelion - Longitude of perihelion at J2000 (degrees)
- * @param {number} inclinationPhaseAngle - Phase angle for inclination oscillation (degrees)
+ * @param {number} inclinationCycleAnchor - Phase angle for inclination oscillation (degrees)
  * @returns {number} Mean inclination in degrees
  */
-function computeInvPlaneInclinationMean(inclJ2000, amplitude, longitudePerihelion, inclinationPhaseAngle, antiPhase = false) {
+function computeInvPlaneInclinationMean(inclJ2000, amplitude, longitudePerihelion, inclinationCycleAnchor, antiPhase = false) {
   const sign = antiPhase ? -1 : 1;
-  return inclJ2000 - sign * amplitude * Math.cos((longitudePerihelion - inclinationPhaseAngle) * Math.PI / 180);
+  return inclJ2000 - sign * amplitude * Math.cos((longitudePerihelion - inclinationCycleAnchor) * Math.PI / 180);
 }
 
 /**

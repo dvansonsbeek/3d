@@ -24,7 +24,7 @@ function computeDynamicEclipticInclination(key, yearsSinceBalanced) {
   const eclRate = 1 / p.perihelionEclipticYears;
   const icrfRate = (eclRate - genPrecRate) * 360;  // deg/yr
   const periICRFDeg = p.longitudePerihelion - icrfRate * C.yearsFromBalancedToJ2000 + icrfRate * yearsSinceBalanced;
-  const planetPhaseDeg = periICRFDeg - p.inclinationPhaseAngle;
+  const planetPhaseDeg = periICRFDeg - p.inclinationCycleAnchor;
   const antiSign = p.antiPhase ? -1 : 1;
   const planetI = (p.invPlaneInclinationMean + antiSign * p.invPlaneInclinationAmplitude * Math.cos(planetPhaseDeg * d2r)) * d2r;
 

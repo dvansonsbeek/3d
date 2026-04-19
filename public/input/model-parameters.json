@@ -42,7 +42,7 @@
       "mirrorPair": "uranus",
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 32.83,
-      "inclinationPhaseAngle": 234.52,
+      "inclinationCycleAnchor": 234.52,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 9,
       "obliquityCycleFraction": [
@@ -67,7 +67,7 @@
       "mirrorPair": "neptune",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 54.7,
-      "inclinationPhaseAngle": 259.82,
+      "inclinationCycleAnchor": 259.82,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 1,
       "obliquityCycleFraction": [
@@ -92,7 +92,7 @@
       "mirrorPair": "jupiter",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
-      "inclinationPhaseAngle": 231.95,
+      "inclinationCycleAnchor": 231.95,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 62,
       "obliquityCycleFraction": [
@@ -117,7 +117,7 @@
       "mirrorPair": "mars",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 312.89,
-      "inclinationPhaseAngle": 291.18,
+      "inclinationCycleAnchor": 291.18,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 36,
       "obliquityCycleFraction": [
@@ -142,7 +142,7 @@
       "mirrorPair": "earth",
       "fibonacciD": 3,
       "ascendingNodeInvPlane": 118.81,
-      "inclinationPhaseAngle": 120.38,
+      "inclinationCycleAnchor": 120.38,
       "antiPhase": true,
       "ascendingNodeCyclesIn8H": 36,
       "obliquityCycleFraction": [
@@ -167,7 +167,7 @@
       "mirrorPair": "mercury",
       "fibonacciD": 21,
       "ascendingNodeInvPlane": 307.8,
-      "inclinationPhaseAngle": 21.33,
+      "inclinationCycleAnchor": 21.33,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 12,
       "obliquityCycleFraction": [
@@ -192,7 +192,7 @@
       "mirrorPair": "venus",
       "fibonacciD": 34,
       "ascendingNodeInvPlane": 192.04,
-      "inclinationPhaseAngle": 174.04,
+      "inclinationCycleAnchor": 174.04,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 3,
       "obliquityCycleFraction": [
@@ -211,7 +211,7 @@
       "orbitalEccentricityBase": 0.2488273,
       "type": "I",
       "ascendingNodeInvPlane": 101.06,
-      "inclinationPhaseAngle": 203.32,
+      "inclinationCycleAnchor": 203.32,
       "invPlaneInclinationMean": 15.7162,
       "invPlaneInclinationAmplitude": 0.717024
     },
@@ -220,7 +220,7 @@
       "orbitalEccentricityBase": 0.96714291,
       "type": "III",
       "ascendingNodeInvPlane": 59.56,
-      "inclinationPhaseAngle": 23.3195,
+      "inclinationCycleAnchor": 23.3195,
       "invPlaneInclinationMean": 150,
       "invPlaneInclinationAmplitude": 0.1
     },
@@ -229,7 +229,7 @@
       "orbitalEccentricityBase": 0.2229512,
       "type": "II",
       "ascendingNodeInvPlane": 10.36,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 9.25,
       "invPlaneInclinationAmplitude": 0.5
     },
@@ -238,7 +238,7 @@
       "orbitalEccentricityBase": 0.0755347,
       "orbitDistanceOverride": 2.76596,
       "ascendingNodeInvPlane": 80.89,
-      "inclinationPhaseAngle": 203.3195,
+      "inclinationCycleAnchor": 203.3195,
       "invPlaneInclinationMean": 0.43,
       "invPlaneInclinationAmplitude": 0.05
     }

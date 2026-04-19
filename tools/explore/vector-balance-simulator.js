@@ -107,7 +107,7 @@ function buildPlanetData() {
     icrfRate: 360 / (H / 3),
     earthMean: C.earthInvPlaneInclinationMean,
     earthAmp:  C.earthInvPlaneInclinationAmplitude,
-    earthPhaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+    earthPhaseAngle: C.ASTRO_REFERENCE.earthInclinationCycleAnchor,
     isEarth: true,
   };
   return data;

@@ -30,7 +30,7 @@ const earthConfig = {
   mean: C.earthInvPlaneInclinationMean,
   amplitude: C.earthInvPlaneInclinationAmplitude,
   inclJ2000: 1.57866663,
-  phaseAngle: C.ASTRO_REFERENCE.earthInclinationPhaseAngle,
+  phaseAngle: C.ASTRO_REFERENCE.earthInclinationCycleAnchor,
   omegaJ2000: C.ASTRO_REFERENCE.earthAscendingNodeInvPlane  // for ecliptic plane normal
 };
 
@@ -76,7 +76,7 @@ for (const p of planetNames) {
   currentCodeValues[p] = {
     mean: pd.invPlaneInclinationMean,
     amplitude: pd.invPlaneInclinationAmplitude,
-    phaseAngle: pd.inclinationPhaseAngle,
+    phaseAngle: pd.inclinationCycleAnchor,
     periLongJ2000: pd.longitudePerihelion,
     omegaJ2000: pd.ascendingNodeInvPlane,  // for ecliptic plane normal
     icrfPeriod: icrfP,

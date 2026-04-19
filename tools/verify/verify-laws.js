@@ -42,7 +42,7 @@ for (const p of planets) {
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
-    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationCycleAnchor) * DEG2RAD);
 
 // Mean eccentricities = base eccentricities (already includes Earth base)
 const eccMean = eccBase;
@@ -73,9 +73,9 @@ const trendJPL = {
 const config = {};
 for (const p of planets) {
   if (p === 'earth') {
-    config[p] = { d: 3, phase: C.ASTRO_REFERENCE.earthInclinationPhaseAngle, antiPhase: false };
+    config[p] = { d: 3, phase: C.ASTRO_REFERENCE.earthInclinationCycleAnchor, antiPhase: false };
   } else {
-    config[p] = { d: C.planets[p].fibonacciD, phase: C.planets[p].inclinationPhaseAngle, antiPhase: C.planets[p].antiPhase };
+    config[p] = { d: C.planets[p].fibonacciD, phase: C.planets[p].inclinationCycleAnchor, antiPhase: C.planets[p].antiPhase };
   }
 }
 

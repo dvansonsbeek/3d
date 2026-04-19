@@ -56,7 +56,7 @@ const planets = PLANET_KEYS.map(key => {
   const eclP = key === 'earth' ? H / 16 : p.perihelionEclipticYears;
   const icrfP = key === 'earth' ? H / 3 : 1 / (1 / eclP - 1 / genPrec);
   const icrfRate = 360 / icrfP;
-  const phaseAngle = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationPhaseAngle : p.inclinationPhaseAngle;
+  const phaseAngle = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationCycleAnchor : p.inclinationCycleAnchor;
   const eccBase = key === 'earth' ? C.eccentricityBase : p.orbitalEccentricityBase;
   const ascCycles = key === 'earth' ? 40 : p.ascendingNodeCyclesIn8H;
   // Asc-node Ω advances at this rate (-8H/N, retrograde for the planets and Earth at -H/5)

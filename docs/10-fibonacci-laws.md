@@ -184,7 +184,7 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 ### Phase Groups
 
-Each planet has a per-planet phase angle — the ICRF perihelion longitude at a balanced-year anchor. All seven fitted planets share the same anchor: **n=7, year ≈ -2,649,854**, the **System Reset** — the epoch within each Grand Holistic Octave when all planets simultaneously reach their inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md#system-reset) for details.
+Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md#system-reset) for details.
 
 | Planet | Phase Angle | Group | Anchor |
 |--------|-------------|-------|--------|
@@ -199,7 +199,7 @@ Each planet has a per-planet phase angle — the ICRF perihelion longitude at a 
 
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase value at n=7 coincides numerically with their phase at n=0 (and at any other anchor).
 
-The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5). The phase angles produce a total JPL ecliptic-inclination trend error of ~4.3″/century across all 7 fitted planets in the [J2000-fixed frame](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean), with all 7 directions matching JPL.
+The group assignment is constrained by: (1) each planet's oscillation range must fall within the Laplace-Lagrange secular theory bounds, (2) the inclination structural weights must balance (Law 3), and (3) the eccentricity weights must balance (Law 5). The cycle anchor for each planet is set by the System Reset convention (see [Inclination Calculations](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean)), with all 7 directions matching JPL.
 
 ### Ecliptic Perihelion Periods
 

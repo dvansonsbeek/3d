@@ -142,7 +142,7 @@ function recomputeInclinationDerived() {
   const eps = C.earthtiltMean;
   // mean = inclJ2000 − A × cos(ω̃_J2000 − phaseAngle) — uses perihelion longitude (ICRF)
   const cosTheta = Math.cos((C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000
-    - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * Math.PI / 180);
+    - C.ASTRO_REFERENCE.earthInclinationCycleAnchor) * Math.PI / 180);
   C.earthInvPlaneInclinationMean = C.ASTRO_REFERENCE.earthInclinationJ2000_deg - A * cosTheta;
   // earthRAAngle = 2A − A²/ε
   C.earthRAAngle = 2 * A - (A * A) / eps;

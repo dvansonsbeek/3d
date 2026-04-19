@@ -70,7 +70,7 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Phase Angles
 
-Each planet's phase angle is the ICRF perihelion longitude at the balanced-year anchor where the planet is at its inclination extremum. After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Grand Holistic Octave).
+Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Grand Holistic Octave).
 
 | Planet | Phase Angle | Balance Group | Anchor n | Anchor year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
@@ -92,7 +92,7 @@ Each planet's phase angle is the ICRF perihelion longitude at the balanced-year 
 - Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
 - Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
 - Earth is the **sole planet** with prograde ICRF perihelion motion (+H/3); all others are retrograde.
-- The phase angles produce a total JPL ecliptic-inclination trend error of ~4.3″/century across all 7 fitted planets in the [J2000-fixed frame](#two-frames--be-careful-which-one-you-mean), with all 7 directions matching JPL.
+- The cycle anchors give a total inclination trend error of ~4.3″/century across all 7 fitted planets in the [J2000-fixed frame](#two-frames--be-careful-which-one-you-mean), with all 7 directions matching JPL.
 
 ### Inclination Constants
 

@@ -85,7 +85,7 @@ const jplRatesArcsecCy = {
 };
 
 // Earth's inclination parameters (fixed, used for ecliptic calculations)
-const earthPhaseAngle = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
+const earthPhaseAngle = C.ASTRO_REFERENCE.earthInclinationCycleAnchor;
 const earthAmp = C.earthInvPlaneInclinationAmplitude;
 const earthMean = C.earthInvPlaneInclinationMean;
 

@@ -43,7 +43,7 @@ for (const key of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'ur
   const icrfP = key === 'earth' ? H / 3 : 1 / (1 / eclP - 1 / genPrec);
   const icrfRate = 360 / icrfP;
   const periLong = key === 'earth' ? C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 : p.longitudePerihelion;
-  const phaseAngle = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationPhaseAngle : p.inclinationPhaseAngle;
+  const phaseAngle = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationCycleAnchor : p.inclinationCycleAnchor;
   const antiPhase = key === 'saturn';
   const inclJ2000 = key === 'earth' ? C.ASTRO_REFERENCE.earthInclinationJ2000_deg : p.invPlaneInclinationJ2000;
   const omegaJ2000 = key === 'earth' ? C.ASTRO_REFERENCE.earthAscendingNodeInvPlane : p.ascendingNodeInvPlane;

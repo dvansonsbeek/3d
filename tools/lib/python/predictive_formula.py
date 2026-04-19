@@ -37,7 +37,7 @@ from constants_scripts import (
     _SIDEREAL_YEAR_S, _MEAN_SOLAR_YEAR_DAYS, _MEAN_SIDEREAL_YEAR_DAYS,
     _MEAN_LENGTH_OF_DAY, _MEAN_ANOM_YEAR_DAYS, _ECCENTRICITY_DERIVED_MEAN,
     TROPICAL_YEAR_HARMONICS, SIDEREAL_YEAR_HARMONICS, ANOMALISTIC_YEAR_HARMONICS,
-    INCL_MEAN, INCL_AMP, INCL_PHASE_ANGLE, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
+    INCL_MEAN, INCL_AMP, INCL_CYCLE_ANCHOR, INCL_PERIOD, OMEGA_J2000, INCL_ECLIPTIC,
     ECC_BASE, ECC_AMPLITUDE, ECC_PHASE_J2000,
     AXIAL_TILT, LONGITUDE_PERIHELION, PERIHELION_ECLIPTIC_YEARS,
     OBLIQUITY_CYCLE, EARTH_RA_ANGLE, BALANCED_JD,
@@ -399,7 +399,7 @@ def calc_planet_inclination(planet: str, year: int) -> float:
     peri = calc_planet_perihelion_icrf(planet, year)
     mean = INCL_MEAN[planet]
     amp = INCL_AMP[planet]
-    phase = INCL_PHASE_ANGLE[planet]
+    phase = INCL_CYCLE_ANCHOR[planet]
     sign = -1 if planet == 'Saturn' else 1
     return mean + sign * amp * math.cos(math.radians(peri - phase))
 

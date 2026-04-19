@@ -32,7 +32,7 @@ const ASTRO_REFERENCE = {
   earthEccentricityJ2000: astroRef.earthOrbital.earthEccentricityJ2000,
   earthPerihelionLongitudeJ2000: astroRef.earthOrbital.earthPerihelionLongitudeJ2000,
   earthAscendingNodeInvPlane: astroRef.earthOrbital.earthAscendingNodeInvPlane,
-  earthInclinationPhaseAngle: astroRef.earthOrbital.earthInclinationPhaseAngle,
+  earthInclinationCycleAnchor: astroRef.earthOrbital.earthInclinationCycleAnchor,
   perihelionPassageJ2000_JD: astroRef.earthOrbital.perihelionPassageJ2000_JD,
   earthInclinationJ2000_deg: astroRef.earthOrbital.earthInclinationJ2000_deg,
   // Lunar Meeus coefficients
@@ -90,7 +90,7 @@ const earthRAAngle = utils.computeEarthRAAngle(earthInvPlaneInclinationAmplitude
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 const earthInvPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
   ASTRO_REFERENCE.earthInclinationJ2000_deg, earthInvPlaneInclinationAmplitude,
-  ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationPhaseAngle);
+  ASTRO_REFERENCE.earthPerihelionLongitudeJ2000, ASTRO_REFERENCE.earthInclinationCycleAnchor);
 const eccentricityBase = modelParams.earth.eccentricityBase;
 const eccentricityAmplitude = modelParams.earth.eccentricityAmplitude;
 // K derived at runtime from Earth (see section after PSI below)
@@ -143,7 +143,7 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
     mirrorPair: mp.mirrorPair,
     fibonacciD: mp.fibonacciD,
     ascendingNodeInvPlane: mp.ascendingNodeInvPlane,
-    inclinationPhaseAngle: mp.inclinationPhaseAngle,
+    inclinationCycleAnchor: mp.inclinationCycleAnchor,
     antiPhase: mp.antiPhase || false,
     ascendingNodeCyclesIn8H: mp.ascendingNodeCyclesIn8H,
     ascendingNodePeriod: mp.ascendingNodeCyclesIn8H ? -(8 * H) / mp.ascendingNodeCyclesIn8H : null,
@@ -360,7 +360,7 @@ for (const [key, p] of Object.entries(planets)) {
     p.invPlaneInclinationAmplitude = utils.computeInvPlaneInclinationAmplitude(PSI, p.fibonacciD, massFraction[key]);
     p.invPlaneInclinationMean = utils.computeInvPlaneInclinationMean(
       p.invPlaneInclinationJ2000, p.invPlaneInclinationAmplitude,
-      p.longitudePerihelion, p.inclinationPhaseAngle, p.antiPhase);
+      p.longitudePerihelion, p.inclinationCycleAnchor, p.antiPhase);
   }
 }
 

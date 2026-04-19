@@ -59,7 +59,7 @@ const ll = {
 
 const eMean = C.earthInvPlaneInclinationMean;
 const eAmp  = C.earthInvPlaneInclinationAmplitude;
-const ePh   = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
+const ePh   = C.ASTRO_REFERENCE.earthInclinationCycleAnchor;
 const eL    = C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000;
 const eO0   = C.ASTRO_REFERENCE.earthAscendingNodeInvPlane;
 const eIfix = C.ASTRO_REFERENCE.earthInclinationJ2000_deg;
@@ -83,7 +83,7 @@ for (const k of PLANETS) {
     omJ: p.ascendingNodeInvPlane,
     inclJ2000: p.invPlaneInclinationJ2000,
     currentN: p.ascendingNodeCyclesIn8H,
-    currentPhase: p.inclinationPhaseAngle,
+    currentPhase: p.inclinationCycleAnchor,
   };
 }
 

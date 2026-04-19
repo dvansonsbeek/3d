@@ -39,7 +39,7 @@ for (const p of planets) {
     icrfPeriod[p] = C.H / 3;
     eclPeriod[p] = C.H / 16;
     ascNodePeriod[p] = -C.H / 5;            // Earth Ω regresses at -H/5
-    perPlanetPhase[p] = C.ASTRO_REFERENCE.earthInclinationPhaseAngle;
+    perPlanetPhase[p] = C.ASTRO_REFERENCE.earthInclinationCycleAnchor;
     continue;
   }
   orbitDistance[p] = C.derived[p].orbitDistance;
@@ -52,12 +52,12 @@ for (const p of planets) {
   ascNodePeriod[p] = C.planets[p].ascendingNodeCyclesIn8H
     ? -(8 * C.H) / C.planets[p].ascendingNodeCyclesIn8H
     : eclPeriod[p];
-  perPlanetPhase[p] = C.planets[p].inclinationPhaseAngle;
+  perPlanetPhase[p] = C.planets[p].inclinationCycleAnchor;
 }
 // Earth's J2000 inclination (computed from mean + amplitude model)
 inclJ2000.earth = C.earthInvPlaneInclinationMean +
   C.earthInvPlaneInclinationAmplitude * Math.cos(
-    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationPhaseAngle) * DEG2RAD);
+    (C.ASTRO_REFERENCE.earthPerihelionLongitudeJ2000 - C.ASTRO_REFERENCE.earthInclinationCycleAnchor) * DEG2RAD);
 
 // Laplace-Lagrange bounds
 const llBounds = {

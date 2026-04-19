@@ -452,7 +452,7 @@ The Balance Explorer includes an interactive polar SVG diagram showing the 2D ve
 - **Green arrows**: In-phase planets (7 planets)
 - **Red arrow**: Anti-phase planet (Saturn)
 - **Gold dashed circle**: Net imbalance at center
-- **Dashed lines**: Fixed phase angles (φ) — where each planet reaches its inclination extreme
+- **Dashed lines**: Fixed cycle anchor for inclination extreme
 - **Force share**: In-phase total %, anti-phase total %, and imbalance %
 
 The diagram updates live as the simulation year changes.

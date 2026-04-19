@@ -242,7 +242,7 @@ MIRROR_PAIRS = [
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Balance groups: Saturn is the sole anti-phase planet
-# Per-planet phase angles are in INCL_PHASE_ANGLE (ICRF perihelion at balanced year)
+# Per-planet phase angles are in INCL_CYCLE_ANCHOR (ICRF perihelion at balanced year)
 PHASE_GROUP = {
     "Mercury": "in-phase", "Venus": "in-phase", "Earth": "in-phase", "Mars": "in-phase",
     "Jupiter": "in-phase", "Saturn": "anti-phase", "Uranus": "in-phase", "Neptune": "in-phase",
@@ -312,9 +312,9 @@ OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 INCL_MEAN = {p['name']: p['invPlaneInclinationMean'] for p in _C['planets'].values()}
 INCL_MEAN["Earth"] = EARTH_INCLINATION_MEAN
 
-# Phase angle for inclination oscillation (from constants.js inclinationPhaseAngle)
-INCL_PHASE_ANGLE = {p['name']: p['inclinationPhaseAngle'] for p in _C['planets'].values()}
-INCL_PHASE_ANGLE["Earth"] = PHASE_ANGLE  # 21.77
+# Phase angle for inclination oscillation (from constants.js inclinationCycleAnchor)
+INCL_CYCLE_ANCHOR = {p['name']: p['inclinationCycleAnchor'] for p in _C['planets'].values()}
+INCL_CYCLE_ANCHOR["Earth"] = PHASE_ANGLE  # 21.77
 
 # J2000 orbital inclination to ecliptic (from constants.js eclipticInclinationJ2000)
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
@@ -525,7 +525,7 @@ def compute_mean_inclination(planet):
     amp = INCL_AMP[planet]
     i_j2000 = INCL_J2000[planet]
     peri_long = LONGITUDE_PERIHELION[planet]
-    phase = INCL_PHASE_ANGLE[planet]
+    phase = INCL_CYCLE_ANCHOR[planet]
     sign = -1 if planet == 'Saturn' else 1
     mean = i_j2000 - sign * amp * math.cos(math.radians(peri_long - phase))
     return mean

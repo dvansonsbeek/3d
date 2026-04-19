@@ -84,7 +84,7 @@ for (const [key, p] of Object.entries(mp.planets)) {
     // orbitalEccentricityBase, orbitalEccentricityAmplitude, eccentricityPhaseJ2000
     // are all derived at runtime (from balanced-year phase + K)
     'eocFraction', 'startpos', 'angleCorrection',
-    'ascendingNodeInvPlane', 'inclinationPhaseAngle',
+    'ascendingNodeInvPlane', 'inclinationCycleAnchor',
     'ascendingNodeCyclesIn8H',
     // Note: 'antiPhase' is a boolean — cannot be synced by replacePlanetProp (numeric regex).
     // Values are set manually in script.js planet definitions.
