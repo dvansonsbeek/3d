@@ -64,8 +64,8 @@ const STEPS = [
     cmd: 'python3 tools/fit/python/fit_perihelion_harmonics.py --write' },
   { id: '4b', phase: 2, name: 'Verify perihelion ERD',
     cmd: 'python3 tools/fit/python/verify_perihelion_erd.py' },
-  { id: '4c', phase: 2, name: 'Train precession (unified)',
-    cmd: 'python3 tools/fit/python/train_precession.py --write' },
+  { id: '4c', phase: 2, name: 'Train precession (physical-beat)',
+    cmd: 'python3 tools/fit/python/train_precession_physical.py --write' },
   { id: '4d', phase: 2, name: 'Train observed',
     cmd: 'python3 tools/fit/python/train_observed.py --write' },
 

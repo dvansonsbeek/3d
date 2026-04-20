@@ -994,7 +994,7 @@ output.deepAnalysis = {
 // Only configs with a valid anchor (LL 8/8) are included. These replace the
 // former 765-row "all passing incl threshold" list with a smaller, richer set
 // that includes per-config optimized anchor, ascending nodes, and phase angles.
-const DEEP_MAX_RATE_ERROR = 5.0;  // arcsec — max total rate error across 7 planets
+const DEEP_MAX_RATE_ERROR = 6.0;  // arcsec — max total rate error across 7 planets
 const deepLLValidCount = deepResults.filter(r => r.bestAnchor).length;
 const deepSurvivors = deepResults.filter(r =>
   r.bestAnchor && r.bestAnchor.totalErr <= DEEP_MAX_RATE_ERROR

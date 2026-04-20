@@ -24,14 +24,14 @@
 // Run with: node 86-mercury-precession-centuries.js
 // ═══════════════════════════════════════════════════════════════════════════
 
-const { H: holisticyearLength } = require("../lib/constants");
+const { H: holisticyearLength, planets } = require("../lib/constants");
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Mercury's perihelion precession period (ecliptic frame)
-const mercuryPerihelionEclipticYears = holisticyearLength / (1 + 3/8);  // ~243,867 years
+// Mercury's perihelion precession period (ecliptic frame) — from model-parameters.json
+const mercuryPerihelionEclipticYears = planets.mercury.perihelionEclipticYears;  // H × 8/11 ~ 243,867
 
 // Ecliptic precession rate: 129,600,000 / period_years arcsec/century
 // This is the formula used in script.js OrbitalFormulas.precessionRateFromPeriod()

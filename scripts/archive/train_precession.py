@@ -3,8 +3,8 @@
 UNIFIED TRAINING SCRIPT
 ========================
 
-Trains precession coefficients for all 7 planets using the unified feature
-matrix. All planets use the SAME feature structure.
+Trains precession coefficients for all 7 planets (or a single planet) using
+the unified feature matrix. All planets use the SAME feature structure.
 
 Training target: Observed Excel fluctuations
 Method: Ridge regression (α=0.01)
@@ -12,11 +12,26 @@ Output: Coefficient files for each planet
 
 Usage:
     cd tools/fit/python
+
+    # Train all 7 planets (dry run — does NOT update fitted-coefficients.json):
     python train_precession.py
+
+    # Train all 7 planets and update fitted-coefficients.json:
+    python train_precession.py --write
+
+    # Train a SINGLE planet (much faster — useful for iteration):
+    python train_precession.py --planet venus
+    python train_precession.py --planet mars --write
+
+    # Valid planets: mercury, venus, mars, jupiter, saturn, uranus, neptune
+
+When --planet is used with --write, only that planet's entry in
+fitted-coefficients.json is replaced; other planets' coefficients are preserved.
 
 Author: Holistic Universe Model
 """
 
+import argparse
 import math
 import os
 import sys
@@ -178,9 +193,34 @@ def write_coefficients(
 
 
 def main():
-    """Train all planets with unified feature matrix."""
+    """Train planets with unified feature matrix (all or single via --planet)."""
+    # ─── Parse CLI arguments ──────────────────────────────────────────────
+    parser = argparse.ArgumentParser(
+        description='Train precession coefficients (all planets or a single one).',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='Examples:\n'
+               '  python train_precession.py                         # all 7 planets, dry run\n'
+               '  python train_precession.py --write                 # all 7, update JSON\n'
+               '  python train_precession.py --planet venus          # venus only, dry run\n'
+               '  python train_precession.py --planet mars --write   # mars only, update JSON\n'
+    )
+    parser.add_argument('--planet', type=str, default=None,
+                        choices=list(PLANETS.keys()),
+                        help='Train only one planet (default: all 7)')
+    parser.add_argument('--write', action='store_true',
+                        help='Write results to fitted-coefficients.json')
+    args = parser.parse_args()
+
+    # Determine which planets to train
+    if args.planet:
+        planets_to_train = {args.planet: PLANETS[args.planet]}
+        mode_label = f"SINGLE PLANET ({PLANETS[args.planet]['name']})"
+    else:
+        planets_to_train = PLANETS
+        mode_label = "ALL 7 PLANETS"
+
     print("=" * 70)
-    print("UNIFIED PRECESSION TRAINING")
+    print(f"UNIFIED PRECESSION TRAINING — {mode_label}")
     print("=" * 70)
     test_feat = build_features(2000, list(PLANETS.values())[0]['period'], list(PLANETS.values())[0]['theta0'])
     n_terms = len(test_feat)
@@ -203,7 +243,7 @@ def main():
 
     # Show data counts
     print("\nData points per planet:")
-    for planet_key in PLANETS:
+    for planet_key in planets_to_train:
         if planet_key in data:
             print(f"  {PLANETS[planet_key]['name']:<10}: {len(data[planet_key]):>4} points")
 
@@ -214,7 +254,7 @@ def main():
 
     # Train each planet
     results = {}
-    for planet_key, planet_info in PLANETS.items():
+    for planet_key, planet_info in planets_to_train.items():
         if planet_key not in data or not data[planet_key]:
             print(f"{planet_info['name']:<10} {'No data':<12}")
             continue
@@ -257,7 +297,7 @@ def main():
     print(f"{'Planet':<10} {'Year':>6} {'Predicted':>12} {'Observed':>12} {'Diff':>12}")
     print("-" * 56)
 
-    for planet_key in PLANETS:
+    for planet_key in planets_to_train:
         if planet_key not in results:
             continue
 
@@ -287,16 +327,22 @@ def main():
     print("Training complete. Coefficient files written to tools/lib/python/coefficients/ directory.")
 
     # ─── Write to fitted-coefficients.json if --write flag is present ───
-    if '--write' in sys.argv:
+    if args.write:
         import json
         json_path = Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'fitted-coefficients.json'
         fc = json.loads(json_path.read_text())
-        coeffs_dict = {}
+        # Merge into existing coeffs (preserves other planets when training single)
+        coeffs_dict = fc.get('PREDICT_COEFFS_UNIFIED', {}) or {}
         for planet_key, res in results.items():
             coeffs_dict[planet_key] = [float(c) for c in res['coefficients']]
         fc['PREDICT_COEFFS_UNIFIED'] = coeffs_dict
         json_path.write_text(json.dumps(fc, indent=2) + '\n')
-        print(f'\n✓ Written PREDICT_COEFFS_UNIFIED to fitted-coefficients.json')
+        trained_list = ', '.join(PLANETS[k]['name'] for k in results.keys())
+        print(f'\n✓ Written to fitted-coefficients.json (trained: {trained_list})')
+        if args.planet:
+            other_planets = [PLANETS[k]['name'] for k in PLANETS if k not in results]
+            if other_planets:
+                print(f'  Other planets preserved: {", ".join(other_planets)}')
     else:
         print('\n  (dry run — add --write to update fitted-coefficients.json)')
 

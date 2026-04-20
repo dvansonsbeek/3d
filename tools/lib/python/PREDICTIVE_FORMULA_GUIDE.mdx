@@ -4,14 +4,15 @@ A unified system for predicting planetary precession fluctuations for all 7 plan
 
 ## Overview
 
-This system predicts how planetary precession rates deviate from their baseline values over time. The model uses a **unified 429-term feature matrix** that captures the complex interactions between:
+This system predicts how planetary precession rates deviate from their baseline values over time. The model uses a **physical-beat feature matrix (~2421 terms per planet)** whose feature frequencies are derived entirely from `public/input/model-parameters.json` — no hardcoded `H_DIV_X` constants. It captures the interactions between:
 
 - Earth's perihelion longitude and its rate of change (ERD)
 - Planet perihelion longitudes relative to Earth
 - Earth's obliquity and eccentricity variations
-- Multiple harmonic periods derived from the Holistic Year (H; see [Constants Reference](../../../docs/20-constants-reference.md))
+- **The six physical periods per planet** (ecliptic perihelion, ICRF perihelion, obliquity cycle, ascending node, axial precession, wobble) plus **all pairwise internal and Earth-cross beat frequencies** — derived from the Holistic Year (H) via `planet_beats.py`
+- **Sideband structure**: high-harmonic carriers (fundamentals and ICRF internal-beats) amplitude-modulated by Earth's ecliptic perihelion rate (see GROUP J, K, L below)
 
-All 7 planets use the **same feature structure** with planet-specific coefficients trained via ridge regression.
+All 7 planets use the **same feature structure** with planet-specific coefficients trained via ridge regression. When JSON periods change, feature *frequencies* update automatically, but coefficients must be retrained.
 
 ## Key Concepts
 
@@ -34,10 +35,10 @@ Each planet's precession period is derived from H using Fibonacci-related fracti
 | Planet | Period Formula | Baseline Rate |
 |--------|---------------|---------------|
 | Mercury | H × 8/11 | +531.4 "/cy |
-| Venus | H × 2 | +193.3 "/cy |
-| Mars | H × 3/13 | +1674.8 "/cy |
+| Venus | H × 8/6 | −289.9 "/cy (retrograde) |
+| Mars | H × 8/35 | +1691.0 "/cy |
 | Jupiter | H / 5 | +1932.5 "/cy |
-| Saturn | H / 8 | -3092.0 "/cy |
+| Saturn | H / 8 | −3092.0 "/cy (retrograde) |
 | Uranus | H / 3 | +1159.5 "/cy |
 | Neptune | H × 2 | +193.3 "/cy |
 
@@ -54,23 +55,30 @@ All planets are calibrated to their official J2000 (year 2000) perihelion longit
 ```
 tools/lib/python/                     # Python physics library
 ├── constants_scripts.py              # Shared constants (reads from constants.js via load_constants)
-├── predictive_formula.py             # Core system: constants, features, calculations
+├── planet_beats.py                   # Fundamental periods + beats per planet (derived from JSON)
+├── predictive_formula_physical.py    # Primary: ~2421-term physical-beat feature builder
+├── predictive_formula.py             # Legacy 429-term builder + shared helpers (calc_erd, etc.)
 ├── observed_formula.py               # Observed formula: feature builders (225/328 terms)
 ├── predict_precession.py             # Prediction API (Earth + Planets output)
 ├── validate_precession.py            # Validation against observed data
 ├── coefficients/                     # ML coefficient output
-│   ├── *_coeffs_unified.py           # Predictive coefficients (7 files, 429 terms)
+│   ├── *_coeffs_physical.py          # Physical-beat coefficients (7 files, ~2421 terms) — active
 │   └── *_coeffs.py                   # Observed coefficients (7 files, 225/328 terms)
 └── PREDICTIVE_FORMULA_GUIDE.mdx      # This guide
 
 tools/fit/                            # Fitting scripts
 ├── python/
-│   ├── train_precession.py           # Predictive training (ridge regression)
+│   ├── train_precession_physical.py  # Physical-beat predictive training (ridge)
 │   ├── train_observed.py             # Observed training (SVD least-squares)
 │   ├── fit_perihelion_harmonics.py   # Earth perihelion harmonics
 │   ├── load_constants.py             # Python bridge to constants.js
-│   └── greedy_features.py            # Feature selection
+│   └── greedy_features_physical.py   # Residual-analysis / candidate features
 └── README.md                         # Dependency chain & refit guide
+
+scripts/archive/                      # Legacy 429-term system (superseded)
+├── train_precession.py
+├── greedy_features.py
+└── *_coeffs_unified.py
 
 data/
 └── 01-holistic-year-objects-data.xlsx  # Training data (Excel, multiple sheets)
@@ -198,23 +206,28 @@ Earth orbital parameters (obliquity, eccentricity, perihelion) are computed anal
 ### 3. Run Training
 
 ```bash
-python tools/fit/python/train_precession.py
+python tools/fit/python/train_precession_physical.py --write
 ```
 
 This will:
-1. Load observed data from Excel
-2. Build the 429-term feature matrix for each data point
+1. Load observed data from Excel (downsampled by `stepYears=23` for speed)
+2. Build the ~2421-term physical-beat feature matrix for each data point
 3. Fit ridge regression (α=0.01) for each planet
-4. Write new coefficient files to `tools/lib/python/coefficients/`
-5. Display RMSE and R² metrics
+4. Write new coefficient files to `tools/lib/python/coefficients/*_coeffs_physical.py`
+5. Update `public/input/fitted-coefficients.json` (`PREDICT_COEFFS_PHYSICAL` key)
+6. Display RMSE and R² metrics
+
+Per-planet mode (~7× faster for iteration):
+
+```bash
+python tools/fit/python/train_precession_physical.py --planet venus --write
+```
 
 ### 4. Update JavaScript
 
-The tooling side is automatic — `tools/lib/constants/fitted-coefficients.js` reads
-the coefficient files from `tools/lib/python/coefficients/` at require-time.
-
-For the browser (`src/script.js`), the PREDICT_COEFFS arrays are currently embedded
-directly in the script and not yet synced by `export-to-script.js`.
+- **Tweakpane (`src/script.js`):** `node tools/fit/export-to-script.js --write` — replaces the `PREDICT_COEFFS` block in-place.
+- **Holistic website:** `node tools/fit/export-to-holistic.js --write` — writes `coefficients.ts` (and verifies `planets.ts::buildFeatures` term count matches).
+- **Node verification (`tools/lib/orbital-engine.js`):** picks up coefficients automatically via `tools/lib/constants/fitted-coefficients.js`, which reads the JSON.
 
 ### 5. Validate Results
 
@@ -230,57 +243,50 @@ This compares predictions against observed data and shows:
 
 ## Feature Matrix Architecture
 
-The 429-term unified feature matrix is organized into 25 groups:
+The ~2421-term physical-beat feature matrix is organized into 8 groups. All frequencies derive from `planet_beats.py::fundamental_periods(planet)` — which reads `model-parameters.json` at import time.
 
 | Group | Terms | Description |
 |-------|-------|-------------|
-| 1 | 18 | Angle terms (δ, Σ, harmonics) |
-| 2 | 6 | Obliquity/Eccentricity terms |
-| 3 | 12 | ERD terms (linear, quadratic, cubic) |
-| 4 | 22 | Periodic terms (11 periods × 2) |
-| 5 | 22 | ERD × Periodic |
-| 6 | 12 | ERD² × Periodic |
-| 7 | 24 | Periodic × Angle |
-| 8 | 16 | ERD × Periodic × Angle |
-| 9 | 16 | Periodic × 2δ |
-| 10 | 12 | Periodic × Periodic |
-| 11 | 1 | Constant |
-| 12 | 4 | ERD × Sum-angle |
-| 13 | 60 | Extended harmonics (3δ, beats) |
-| 14 | 16 | Venus periodic terms |
-| 15 | 12 | Time-varying obliq/ecc (critical for Saturn) |
-| 16 | 20 | Venus fine-tuning |
-| 17 | 14 | Greedy round-1: H/60, H/24×angle, H/45×angle, H/9×2δ |
-| 18 | 16 | Greedy round-2: H/110, H/60×angle, H/75, H/41×angle, H/56, H/45 |
-| 19 | 16 | Greedy round-3: H/56×angle, H/41×2δ, ERD×H/110, ERD×6δ, H/39×angle |
-| 20 | 18 | Greedy round-4: H/60×2δ, H/112×angle, H/39×2δ, H/96×angle, H/37 |
-| 21 | 22 | Greedy round-5: H/96×2δ, H/7+angle, H/18, H/37×2δ, H/38×2δ, ERD×6δ |
-| 22 | 10 | Greedy round-6: H/31 bundle (Venus dominant, ΔRMSE -1.55) |
-| 23 | 20 | Greedy round-7: H/128 bundle, H/42 bundle (Venus) |
-| 24 | 18 | Saturn high-frequency harmonics: H/(8×34) harmonic series |
-| 25 | 22 | Venus high-frequency triplets: carrier ± 16 sideband structure |
+| A | 49 | Earth reference: angle harmonics (δ, Σ), obliquity/eccentricity terms, ERD (linear/quadratic/cubic + cross-terms), 3δ/4δ, sum-angle×ERD, constant |
+| B | 10 | Planet angle cross-terms: n=3,4 θ_P; obliq/ecc × 2δ; cos(θ_E)×cos/sin(θ_P) |
+| C+D+E | 2·7·N_template | Physical periods & beats × 7 harmonics (sin/cos). Template per planet = 6 fundamentals + 15 internal-beat pairs (sum+diff) + 36 Earth-cross-beat pairs (sum+diff). HARMONIC_ORDERS = (1, 2, 4, 6, 8, 12, 16). Venus: 107 template entries → 1498 terms. |
+| F | 4·N_fund | Fundamental period × angle: cos(φ)·cos(δ), sin(φ)·sin(δ), cos(φ)·cos(2δ), sin(φ)·sin(2δ) per fundamental |
+| I | 4·N_fund | Fundamental × 2δ: sin(φ)·cos(2δ), sin(φ)·sin(2δ), cos(φ)·cos(2δ), cos(φ)·sin(2δ) per fundamental |
+| J | 64·N_fund | Fundamental × Earth-cycle sidebands (n=1 carrier). 4 Earth cycles {ecl, obliq, icrf, axial} × 4 harmonics {1,2,3,4} × 4 combinations {sin·sin, sin·cos, cos·sin, cos·cos} per fundamental |
+| L | 48·N_fund | High-harmonic fundamental × Earth ecl sidebands. Carrier n ∈ {6,10,12,16} × sideband k ∈ {1,2,3} × 4 combos. Added after residual analysis revealed Venus H/165 (= 12·V_icrf) sideband structure. |
+| K | 144 | ICRF internal-beat carriers × Earth ecl sidebands. Carrier = n·(T_ecl ± T_icrf) for n ∈ {2,4,6,8,10,12} × sideband k ∈ {1,2,3} × 4 combos × 2 signs. Added after diagnosing Venus H/116 peak as 8·(V_ecl+V_icrf). |
+
+**Removed groups** (were present in earlier versions; dropped after 0.00% impact diagnostic):
+- ~~G (ERD × period, 4·N_fund)~~ and ~~H (ERD × period × angle, 4·N_fund)~~ — 48 features total, zero contribution to any planet's RMSE.
+
+### How the residual structure was discovered
+
+The GROUP K and L feature classes were identified by running `greedy_features_physical.py` on Venus residuals and decomposing peaks in **8H/N form**:
+
+- Venus residual peak at H/116 = **8H/928** decomposed as `8 × (T_ecl + T_icrf)` — an 8th-harmonic Venus ICRF *internal* beat. Sidebands at H/84, H/100, H/132, H/148, H/164 followed the pattern `8H/(928 ± k·128)` where 128 = 8H/128 = Earth ecliptic perihelion rate. This became GROUP K.
+- After GROUP K, residual peaks at H/165, H/181, H/197 decomposed as `12·T_icrf ± k·E_ecl` — high-harmonic *fundamental* × Earth-ecl sidebands. This became GROUP L.
+
+This methodology (express residual peaks as 8H/N integers, find the physical decomposition, add matching feature classes) is the recommended way to extend the matrix.
 
 ### Saturn Note
 
-Saturn's precession period (H/8) equals the obliquity cycle, creating strong coupling with Earth's obliquity/eccentricity variations. The GROUP 15 terms are critical for Saturn's accuracy.
-
-### Groups 17–25 Note
-
-Groups 17–23 were added via greedy forward feature selection (`greedy_features.py`) over 7 rounds. Each round identifies candidate features with highest residual correlation, refits with ridge regression, and selects the terms providing the largest RMSE reduction. Groups 24–25 add planet-specific high-frequency harmonics: Saturn's H/(8×34) series (GROUP 24) and Venus's carrier ± 16 sideband triplets (GROUP 25).
+Saturn's precession period (H/8) equals the obliquity cycle, creating strong coupling with Earth's obliquity/eccentricity variations. The Group A obliq/ecc × diff-angle terms and the C+D+E beat combinations involving H/8 are critical.
 
 ## Training Metrics
 
-Current model performance (429 terms, 14,579 data points, 23-year steps):
+Current model performance (~2421 terms per planet, 14,580 data points, 23-year steps, ridge α=0.01):
 
-| Planet | RMSE ("/cy) | R² |
-|--------|-------------|-----|
-| Mercury | 0.7450 | 0.999929 |
-| Venus | 3.2698 | 0.999960 |
-| Mars | 2.0272 | 0.999636 |
-| Jupiter | 2.3254 | 0.999625 |
-| Saturn | 3.7209 | 0.999618 |
-| Uranus | 1.3956 | 0.999618 |
-| Neptune | 0.2482 | 0.999902 |
+| Planet | RMSE ("/cy) | R² | Feature count |
+|--------|-------------|------|---------------|
+| Mercury | 0.0974 | 0.999999 | 2421 |
+| Venus   | 0.7278 | 0.999998 | 2421 |
+| Mars    | 0.0980 | 0.999999 | 2435 |
+| Jupiter | 0.0975 | 0.999999 | 2407 |
+| Saturn  | 0.0977 | 1.000000 | 2407 |
+| Uranus  | 0.1027 | 0.999998 | 2407 |
+| Neptune | 0.0978 | 0.999985 | 2393 |
+
+Feature count differs per planet because frozen periods (Uranus/Neptune ~200 Myr axial ≈ treated as infinite → merged with ICRF) and null beats (e.g. ecl+wobble when they coincide) drop template entries.
 
 ## Extending the Model
 
@@ -288,19 +294,22 @@ Current model performance (429 terms, 14,579 data points, 23-year steps):
 
 To add features to the model:
 
-1. Run `python tools/fit/python/greedy_features.py` to find candidate terms with highest residual correlation
-2. Edit `tools/lib/python/predictive_formula.py`: add period constants, add a new GROUP to `build_features()`, update the docstring term count
-3. Retrain all planets with `python tools/fit/python/train_precession.py`
+1. Run `python tools/fit/python/greedy_features_physical.py --planet venus` (or another planet) to find candidate terms with highest residual correlation. Convert residual peaks to 8H/N form and decompose physically (see "How the residual structure was discovered" above).
+2. Edit `tools/lib/python/predictive_formula_physical.py`: add a new GROUP block to `build_features_physical()` and update the matching count in `feature_count()`. Keep Python and JS in sync — the ordering is what makes coefficients portable.
+3. Retrain all planets with `python tools/fit/python/train_precession_physical.py --write`.
+4. Port the new group to the JS side: `src/script.js::buildPredictiveFeatures` (tweakpane), `tools/lib/orbital-engine.js::buildPredictiveFeatures` (Node verification), and the Holistic website's `src/lib/orbital/planets.ts::buildFeatures`. The `tools/fit/export-to-*.js` scripts sync coefficients but not the feature builder structure.
 
 ### Adding a New Planet
 
-1. Add planet to `model-parameters.json` (with `perihelionEclipticFraction`) and `astro-reference.json` (with `longitudePerihelion`). The `PLANETS` dict in `predictive_formula.py` reads `period`, `theta0`, and `baseline` from `constants_scripts.py` (via `PERIHELION_ECLIPTIC_YEARS` and `LONGITUDE_PERIHELION` dicts), so no hardcoded values are needed.
+1. Add planet to `model-parameters.json` (with `perihelionEclipticFraction`, `axialPrecessionFraction`, `ascendingNodeCyclesIn8H`, and `obliquityCycleFraction` if applicable) and `astro-reference.json` (with `longitudePerihelion`).
 
-2. Add column to `data/01-holistic-year-objects-data.xlsx`: `NewPlanet Precession Fluctuation`
+2. Add column to `data/01-holistic-year-objects-data.xlsx`: `NewPlanet Precession Fluctuation`.
 
-3. Retrain: `python tools/fit/python/train_precession.py` (generates `tools/lib/python/coefficients/newplanet_coeffs_unified.py`)
+3. Register the planet in `train_precession_physical.py::PLANETS_FLUCT_COLS` and `predictive_formula_physical.py::_TEMPLATES`.
 
-4. Import in `tools/lib/python/predict_precession.py`
+4. Retrain: `python tools/fit/python/train_precession_physical.py --planet newplanet --write` (generates `tools/lib/python/coefficients/newplanet_coeffs_physical.py` and updates JSON).
+
+5. Import in `tools/lib/python/predict_precession.py`.
 
 ## Mathematical Background
 
@@ -315,11 +324,13 @@ Total precession rate = Baseline + Fluctuation
 
 Key calculated values for each prediction:
 
-1. **Earth Perihelion** (θ_E): Sum of mean motion + 21 harmonic terms
+1. **Earth Perihelion** (θ_E): Sum of mean motion + Fourier harmonics (`PERI_HARMONICS_RAW`)
 2. **ERD**: Analytical derivative of Earth perihelion (rate deviation)
-3. **Planet Perihelion** (θ_P): Linear from J2000 value
+3. **Planet Perihelion** (θ_P): Linear from J2000 value, period = `|perihelionEclipticYears|`
 4. **Difference Angle** (δ): θ_E - θ_P (key interaction term)
-5. **Obliquity/Eccentricity**: Time-varying Earth parameters
+5. **Obliquity / Eccentricity**: Time-varying Earth parameters
+6. **Six physical periods per planet** (ecl, icrf, obliq, asc, axial, wobble) + all pairwise **internal beats** (15 pairs × sum/diff) + all pairwise **Earth-cross beats** (36 pairs × sum/diff), each at 7 harmonic orders (1, 2, 4, 6, 8, 12, 16)
+7. **Sidebands**: high-harmonic carriers × Earth ecliptic perihelion (Group J: n=1 carrier × 4 Earth cycles; Group L: high-n fundamental × Earth ecl; Group K: high-n ICRF internal beat × Earth ecl) — these capture the amplitude-modulation structure that dominates Venus residuals.
 
 The model captures how these parameters interact across multiple timescales to produce the observed fluctuation patterns.
 

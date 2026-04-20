@@ -15,8 +15,8 @@ For predictive formulas using calculated values, see: predictive_formula.py
 
 PLANETARY PERIODS (derived from H):
   Mercury:  H × 8/11
-  Venus:    H × 2
-  Mars:     H × 3/13
+  Venus:    H × 8/6 (retrograde)
+  Mars:     H × 8/35
   Jupiter:  H/5
   Saturn:   H/8 (retrograde)
   Uranus:   H/3
@@ -62,14 +62,16 @@ H_DIV_5 = H // 5                # H/5
 H_DIV_12 = H // 12              # H/12
 H_DIV_13 = H // 13              # H/13 (axial precession)
 
-# Planetary perihelion periods
-MERCURY_PERIOD = int(H * 8 / 11)    # H × 8/11
-VENUS_PERIOD = H * 2                 # H × 2
-MARS_PERIOD = int(H * 3 / 13)        # H × 3/13
-JUPITER_PERIOD = H_DIV_5             # H/5
-SATURN_PERIOD = OBLIQ_CYCLE          # H/8 (retrograde)
-URANUS_PERIOD = INCLIN_CYCLE         # H/3
-NEPTUNE_PERIOD = H * 2               # H × 2
+# Planetary perihelion periods (absolute values; loaded from JSON via constants_scripts)
+# Venus and Saturn are retrograde in the model; we take absolute values here.
+from constants_scripts import INCL_PERIOD
+MERCURY_PERIOD = INCL_PERIOD['Mercury']
+VENUS_PERIOD = INCL_PERIOD['Venus']
+MARS_PERIOD = INCL_PERIOD['Mars']
+JUPITER_PERIOD = INCL_PERIOD['Jupiter']
+SATURN_PERIOD = INCL_PERIOD['Saturn']
+URANUS_PERIOD = INCL_PERIOD['Uranus']
+NEPTUNE_PERIOD = INCL_PERIOD['Neptune']
 
 # Earth mean values for normalization
 # Obliquity mean derived from Pythagorean tilt model (see constants_scripts.py)
@@ -833,6 +835,18 @@ def _get_excel_path() -> str:
     return os.path.join(script_dir, '..', '..', '..', 'data', '01-holistic-year-objects-data.xlsx')
 
 
+def _get_step_years() -> int:
+    """Read stepYears from public/input/model-parameters.json (default 23)."""
+    import json
+    from pathlib import Path as _Path
+    try:
+        mp_path = _Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'model-parameters.json'
+        mp = json.loads(mp_path.read_text())
+        return int(mp.get('foundational', {}).get('stepYears', 23))
+    except Exception:
+        return 23
+
+
 def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     """
     Load data from the Holistic Year Objects Excel file.
@@ -841,22 +855,41 @@ def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     from 'Earth Longitude' sheet. ERD is derived as the numerical derivative
     of Earth Longitude RA.
 
+    Results are cached to a pickle file keyed on the XLSX mtime + step value,
+    so reruns avoid the ~3-minute Excel load.
+
     Args:
         excel_path: Path to Excel file. If None, uses default location.
 
     Returns:
         Dictionary mapping year to data values
     """
+    import pickle
+    from pathlib import Path as _Path
     if excel_path is None:
         excel_path = _get_excel_path()
+
+    _step = _get_step_years()
+
+    # --- Cache check ----------------------------------------------------
+    xlsx_mtime = os.path.getmtime(excel_path)
+    cache_dir = _Path(excel_path).parent / '.cache'
+    cache_file = cache_dir / f'observed_excel_step{_step}.pkl'
+    if cache_file.exists():
+        try:
+            with open(cache_file, 'rb') as f:
+                cached = pickle.load(f)
+            if cached.get('xlsx_mtime') == xlsx_mtime and cached.get('step') == _step:
+                return cached['data']
+        except Exception:
+            pass  # cache corrupt — fall through to re-read
 
     # Read perihelion sheet (canonical name or first sheet as fallback)
     xl = pd.ExcelFile(excel_path)
     peri_sheet = 'Perihelion Planets' if 'Perihelion Planets' in xl.sheet_names else xl.sheet_names[0]
     df_peri = pd.read_excel(excel_path, sheet_name=peri_sheet)
 
-    # Downsample by stepYears for fitting efficiency
-    _step = 20  # matches stepYears in model-parameters.json
+    # Downsample by stepYears (from model-parameters.json) for fitting efficiency
     df_peri = df_peri.iloc[::_step].reset_index(drop=True)
 
     # Read Earth Longitude — fall back to Earth Perihelion ICRF from perihelion sheet if separate sheet absent
@@ -918,6 +951,14 @@ def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
             }
         except (ValueError, KeyError):
             continue
+
+    # --- Cache write ----------------------------------------------------
+    try:
+        cache_dir.mkdir(exist_ok=True, parents=True)
+        with open(cache_file, 'wb') as f:
+            pickle.dump({'xlsx_mtime': xlsx_mtime, 'step': _step, 'data': data}, f)
+    except Exception:
+        pass  # non-fatal — just means next run re-reads Excel
 
     return data
 
@@ -1039,8 +1080,8 @@ if __name__ == '__main__':
     # Print planetary periods
     print("Planetary Periods:")
     print(f"  Mercury:  {MERCURY_PERIOD:>7,} years (H × 8/11)")
-    print(f"  Venus:    {VENUS_PERIOD:>7,} years (H × 2)")
-    print(f"  Mars:     {MARS_PERIOD:>7,} years (H × 3/13)")
+    print(f"  Venus:    {VENUS_PERIOD:>7,} years (H × 8/6, retrograde)")
+    print(f"  Mars:     {MARS_PERIOD:>7,} years (H × 8/35)")
     print(f"  Jupiter:  {JUPITER_PERIOD:>7,} years (H/5)")
     print(f"  Saturn:   {SATURN_PERIOD:>7,} years (H/8, retrograde)")
     print(f"  Uranus:   {URANUS_PERIOD:>7,} years (H/3)")

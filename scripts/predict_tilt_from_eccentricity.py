@@ -57,27 +57,14 @@ def calc_wobble_period(peri_ecl_yr, axial_yr):
     wobble_rate = abs(1 / axial_yr - 1 / incl_ICRF)
     return 1 / wobble_rate
 
-PERI_ECL = {
-    "Mercury": H / (1 + 3/8),
-    "Venus":   H * 2,
-    "Earth":   H / 3,
-    "Mars":    H / (4 + 1/3),
-    "Jupiter": H / 5,
-    "Saturn":  -H / 8,
-    "Uranus":  H / 3,
-    "Neptune": H * 2,
-}
+# Loaded from model-parameters.json via constants_scripts (single source of truth).
+from constants_scripts import PERIHELION_ECLIPTIC_YEARS as _PEY
+from constants_scripts import _C as _CONST
+PERI_ECL = dict(_PEY)
+PERI_ECL["Earth"] = H / 3  # Earth inclination cycle (H/3) — not ecliptic (H/16)
 
-AXIAL_PREC = {
-    "Mercury": H * 1597,
-    "Venus":   -H * 987,
-    "Earth":   H / 13,
-    "Mars":    H / (5 - 1/3),
-    "Jupiter": H * 2,
-    "Saturn":  H * 2,
-    "Uranus":  H * 610,
-    "Neptune": H * 987,
-}
+AXIAL_PREC = {p['name']: p['axialPrecessionYears'] for p in _CONST['planets'].values()}
+AXIAL_PREC["Earth"] = -H / 13  # Earth axial precession (retrograde)
 
 ECC_CYCLE = {}
 for p in PLANET_NAMES:

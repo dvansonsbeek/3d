@@ -29,8 +29,9 @@ Author: Holistic Universe Model
 """
 
 from typing import Dict, List, Optional
+from predictive_formula_physical import build_features_physical
 from predictive_formula import (
-    build_features, PLANETS, H, J2000,
+    PLANETS, H, J2000,
     calc_earth_perihelion, calc_erd, calc_obliquity, calc_eccentricity,
     calc_inclination, calc_planet_perihelion,
     calc_solar_year, calc_sidereal_year, calc_day_length,
@@ -41,25 +42,25 @@ from predictive_formula import (
     calc_inclination_precession,
 )
 
-# Import trained coefficients for each planet
-from mercury_coeffs_unified import MERCURY_COEFFS
-from venus_coeffs_unified import VENUS_COEFFS
-from mars_coeffs_unified import MARS_COEFFS
-from jupiter_coeffs_unified import JUPITER_COEFFS
-from saturn_coeffs_unified import SATURN_COEFFS
-from uranus_coeffs_unified import URANUS_COEFFS
-from neptune_coeffs_unified import NEPTUNE_COEFFS
+# Import physical-beat trained coefficients (2421 terms/planet)
+from coefficients.mercury_coeffs_physical import MERCURY_COEFFS_PHYSICAL
+from coefficients.venus_coeffs_physical   import VENUS_COEFFS_PHYSICAL
+from coefficients.mars_coeffs_physical    import MARS_COEFFS_PHYSICAL
+from coefficients.jupiter_coeffs_physical import JUPITER_COEFFS_PHYSICAL
+from coefficients.saturn_coeffs_physical  import SATURN_COEFFS_PHYSICAL
+from coefficients.uranus_coeffs_physical  import URANUS_COEFFS_PHYSICAL
+from coefficients.neptune_coeffs_physical import NEPTUNE_COEFFS_PHYSICAL
 
 
 # Coefficient registry
 COEFFICIENTS = {
-    'mercury': MERCURY_COEFFS,
-    'venus': VENUS_COEFFS,
-    'mars': MARS_COEFFS,
-    'jupiter': JUPITER_COEFFS,
-    'saturn': SATURN_COEFFS,
-    'uranus': URANUS_COEFFS,
-    'neptune': NEPTUNE_COEFFS,
+    'mercury': MERCURY_COEFFS_PHYSICAL,
+    'venus':   VENUS_COEFFS_PHYSICAL,
+    'mars':    MARS_COEFFS_PHYSICAL,
+    'jupiter': JUPITER_COEFFS_PHYSICAL,
+    'saturn':  SATURN_COEFFS_PHYSICAL,
+    'uranus':  URANUS_COEFFS_PHYSICAL,
+    'neptune': NEPTUNE_COEFFS_PHYSICAL,
 }
 
 
@@ -83,11 +84,9 @@ def predict(year: int, planet: str) -> float:
     if planet not in COEFFICIENTS:
         raise ValueError(f"No coefficients for planet: {planet}")
 
-    planet_info = PLANETS[planet]
     coeffs = COEFFICIENTS[planet]
-
-    features = build_features(year, planet_info['period'], planet_info['theta0'])
-
+    # Physical-beat formula derives period/theta0 internally from planet name
+    features = build_features_physical(year, planet.capitalize())
     return sum(c * f for c, f in zip(coeffs, features))
 
 

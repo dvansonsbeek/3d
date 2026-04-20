@@ -308,17 +308,18 @@ for (const [key, a] of Object.entries(ar.planetOrbitalElements)) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// D. PREDICT_COEFFS (429-term prediction coefficients per planet)
+// D. PREDICT_COEFFS (physical-beat prediction coefficients per planet, ~2421 terms)
 // ═══════════════════════════════════════════════════════════════════════════
 
 console.log('\n=== D. Prediction Coefficients ===');
-if (fc.PREDICT_COEFFS_UNIFIED) {
+const coeffsSource = fc.PREDICT_COEFFS_PHYSICAL || fc.PREDICT_COEFFS_UNIFIED;
+if (coeffsSource) {
   const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
   // Build the new PREDICT_COEFFS block
   let newCoeffs = 'const PREDICT_COEFFS = {\n';
   for (const p of planets7) {
-    const coeffs = fc.PREDICT_COEFFS_UNIFIED[p];
+    const coeffs = coeffsSource[p];
     if (!coeffs) continue;
     newCoeffs += '  ' + p + ': [\n';
     // Format 7 coefficients per line
@@ -335,10 +336,11 @@ if (fc.PREDICT_COEFFS_UNIFIED) {
   const re = /const PREDICT_COEFFS = \{[\s\S]*?\n\};/;
   const m = src.match(re);
   if (m) {
+    const termCount = coeffsSource.venus ? coeffsSource.venus.length : (coeffsSource.mercury ? coeffsSource.mercury.length : 0);
     if (m[0] === newCoeffs) {
-      console.log('  PREDICT_COEFFS: unchanged (' + planets7.length + ' × ' + fc.PREDICT_COEFFS_UNIFIED.mercury.length + ' terms)');
+      console.log('  PREDICT_COEFFS: unchanged (' + planets7.length + ' planets × ~' + termCount + ' terms)');
     } else {
-      console.log('  PREDICT_COEFFS: ' + planets7.length + ' × ' + fc.PREDICT_COEFFS_UNIFIED.mercury.length + ' terms updated');
+      console.log('  PREDICT_COEFFS: ' + planets7.length + ' planets × ~' + termCount + ' terms updated');
       src = src.replace(re, newCoeffs);
       changes++;
     }

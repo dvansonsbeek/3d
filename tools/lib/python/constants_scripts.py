@@ -182,20 +182,12 @@ LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets
 LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
 PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
 
-# Predicted obliquity cycle periods (years) from Fibonacci decomposition
-# See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory
-# Mercury, Earth, Mars: confirmed (0.2%, 2%, 0.7% error vs observations)
-# Jupiter, Saturn, Uranus: predictions; Venus, Neptune: N/A
-OBLIQUITY_CYCLE = {
-    "Mercury": H * 8 / 3,     # 8H/3 = 894,179 yr (observed ~895 kyr, Bills 2005)
-    "Venus":   None,           # N/A — tidally damped at 177°
-    "Earth":   H / 8,          # H/8 = 41,915 yr (observed ~41,000 yr)
-    "Mars":    3 * H / 8,      # 3H/8 = 125,744 yr (observed ~124,800 yr, Laskar 2004)
-    "Jupiter": H / 2,          # H/2 = 167,659 yr (prediction)
-    "Saturn":  H / 3,          # H/3 = 111,772 yr (prediction, mirror-pair with Earth)
-    "Uranus":  H / 2,          # H/2 = 167,659 yr (prediction, tentative)
-    "Neptune": None,           # N/A — frozen at ~28°
-}
+# Obliquity cycle periods (years) — loaded from model-parameters.json via constants.js.
+# See docs/37-planets-precession-cycles.md § Obliquity Cycle Theory.
+# Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
+# Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
+OBLIQUITY_CYCLE = {p['name']: p['obliquityCycle'] for p in _C['planets'].values()}
+OBLIQUITY_CYCLE["Earth"] = H / 8  # Earth: 8 = 5 + 3 (Fibonacci decomposition: H/5 + H/3 beat)
 
 ECC_AMPLITUDE = {p['name']: p['orbitalEccentricityAmplitude'] for p in _C['planets'].values()}
 ECC_AMPLITUDE["Earth"] = EARTH_ECCENTRICITY_AMPLITUDE
@@ -320,32 +312,39 @@ INCL_CYCLE_ANCHOR["Earth"] = EARTH_INCL_CYCLE_ANCHOR  # 21.77
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
 INCL_ECLIPTIC["Earth"] = 0.000
 
-# Inclination oscillation periods (years)
-INCL_PERIOD = {
-    "Mercury": round(H * 8 / 11),  # H × 8/11
-    "Venus":   H * 2,               # H × 2
-    "Earth":   round(H / 3),        # H/3
-    "Mars":    round(H * 3 / 13),   # H × 3/13
-    "Jupiter": round(H / 5),        # H/5
-    "Saturn":  round(H / 8),        # H/8
-    "Uranus":  round(H / 3),        # H/3
-    "Neptune": H * 2,               # H × 2
-}
+# Perihelion ecliptic periods (years) — loaded from model-parameters.json via constants.js.
+# These are the planet's perihelion precession rate as observed from Earth's ecliptic frame.
+# Historical note: this dict is named INCL_PERIOD for backward compatibility; downstream
+# consumers treat it as the planet's "own-frame" precession rate.
+# NOTE: absolute (positive) periods. Venus (prograde) and Saturn (retrograde) kept as abs.
+INCL_PERIOD = {p['name']: abs(round(p['perihelionEclipticYears']))
+               for p in _C['planets'].values()}
+INCL_PERIOD["Earth"] = round(H / 3)  # Earth uses ICRF period here (H/3) not ecliptic (H/16)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # OSCILLATION PERIOD FRACTIONS (T_osc / H = a / b)
+# Loaded directly from model-parameters.json perihelionEclipticFraction.
 # ═══════════════════════════════════════════════════════════════════════════
 
+import json as _json
+from pathlib import Path as _Path
+
+_MODEL_PARAMS_PATH = _Path(__file__).resolve().parent.parent.parent.parent / 'public' / 'input' / 'model-parameters.json'
+with open(_MODEL_PARAMS_PATH) as _f:
+    _MODEL_PARAMS = _json.load(_f)
+
+def _frac_to_tuple(planet_key):
+    """Get perihelionEclipticFraction from JSON as (|num|, |den|) tuple."""
+    frac = _MODEL_PARAMS['planets'][planet_key].get('perihelionEclipticFraction')
+    if frac is None:
+        return (1, 1)
+    return (abs(frac[0]), abs(frac[1]))
+
 PERIOD_FRAC = {
-    "Mercury": (8, 11),
-    "Venus":   (2, 1),
-    "Earth":   (1, 3),
-    "Mars":    (3, 13),
-    "Jupiter": (1, 5),
-    "Saturn":  (1, 8),
-    "Uranus":  (1, 3),
-    "Neptune": (2, 1),
+    _MODEL_PARAMS['planets'][k]['name']: _frac_to_tuple(k)
+    for k in _MODEL_PARAMS['planets']
 }
+PERIOD_FRAC["Earth"] = (1, 3)  # Earth: H/3 (matches INCL_PERIOD convention)
 
 # E–J–S period denominators (used in ψ formula)
 FIBONACCI_SLOTS = {"Earth": 3, "Jupiter": 5, "Saturn": 8}

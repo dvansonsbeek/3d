@@ -15,14 +15,19 @@ from load_constants import C
 H = int(C['H'])
 ANCHOR_YEAR = C['balancedYear']
 
+# Periods loaded from model-parameters.json (via constants.js → _dump_constants.js).
+# C['planets'] values contain derived perihelionEclipticYears. We take abs values
+# since this script compares to observed eccentricity magnitudes (direction
+# is handled separately in the analysis).
+_P = C['planets']
 PLANETS = {
-    'Mercury': {'id': '199', 'period': H * 8 / 11, 'e_model': 0.20563593, 'e_j2000': 0.20563593, 'range': (-9000, 9000)},
-    'Venus':   {'id': '299', 'period': H * 2,      'e_model': 0.00675727, 'e_j2000': 0.00677672, 'range': (-9000, 9000)},
-    'Mars':    {'id': '499', 'period': H * 3 / 13,  'e_model': 0.09297543, 'e_j2000': 0.09339410, 'range': (1700, 2500)},
-    'Jupiter': {'id': '599', 'period': H / 5,       'e_model': 0.04828624, 'e_j2000': 0.04838624, 'range': (1700, 2100)},
-    'Saturn':  {'id': '699', 'period': H / 8,       'e_model': 0.05373663, 'e_j2000': 0.05386179, 'range': (1800, 2200)},
-    'Uranus':  {'id': '799', 'period': H / 3,       'e_model': 0.04735744, 'e_j2000': 0.04725744, 'range': (1700, 2300)},
-    'Neptune': {'id': '899', 'period': H * 2,       'e_model': 0.00860931, 'e_j2000': 0.00859048, 'range': (1700, 2300)},
+    'Mercury': {'id': '199', 'period': abs(_P['mercury']['perihelionEclipticYears']), 'e_model': 0.20563593, 'e_j2000': 0.20563593, 'range': (-9000, 9000)},
+    'Venus':   {'id': '299', 'period': abs(_P['venus']['perihelionEclipticYears']),   'e_model': 0.00675727, 'e_j2000': 0.00677672, 'range': (-9000, 9000)},
+    'Mars':    {'id': '499', 'period': abs(_P['mars']['perihelionEclipticYears']),    'e_model': 0.09297543, 'e_j2000': 0.09339410, 'range': (1700, 2500)},
+    'Jupiter': {'id': '599', 'period': abs(_P['jupiter']['perihelionEclipticYears']), 'e_model': 0.04828624, 'e_j2000': 0.04838624, 'range': (1700, 2100)},
+    'Saturn':  {'id': '699', 'period': abs(_P['saturn']['perihelionEclipticYears']),  'e_model': 0.05373663, 'e_j2000': 0.05386179, 'range': (1800, 2200)},
+    'Uranus':  {'id': '799', 'period': abs(_P['uranus']['perihelionEclipticYears']),  'e_model': 0.04735744, 'e_j2000': 0.04725744, 'range': (1700, 2300)},
+    'Neptune': {'id': '899', 'period': abs(_P['neptune']['perihelionEclipticYears']), 'e_model': 0.00860931, 'e_j2000': 0.00859048, 'range': (1700, 2300)},
 }
 
 # ─── Step 1: Fetch data from JPL Horizons ──────────────────────────────────

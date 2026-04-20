@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WRITE = process.argv.includes('--write');
-const HOLISTIC_ROOT = path.resolve(__dirname, '..', '..', '..', 'Holistic', 'holisticuniverse');
+const HOLISTIC_ROOT = path.resolve(__dirname, '..', '..', '..', '..', 'code', 'Holistic', 'holisticuniverse');
 const CONSTANTS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'constants.ts');
 const COEFFICIENTS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'coefficients.ts');
 
@@ -493,7 +493,7 @@ if (fitted.CARDINAL_POINT_HARMONICS) {
 console.log('');
 console.log('  ── Prediction Coefficients ──');
 
-const coeffs = fitted.PREDICT_COEFFS_UNIFIED;
+const coeffs = fitted.PREDICT_COEFFS_PHYSICAL || fitted.PREDICT_COEFFS_UNIFIED;
 const planetNames = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const Names = planetNames.map(p => p.charAt(0).toUpperCase() + p.slice(1));
 
@@ -532,10 +532,10 @@ const PLANETS_PATH = path.join(HOLISTIC_ROOT, 'src', 'lib', 'orbital', 'planets.
 if (fs.existsSync(PLANETS_PATH)) {
   const planetsTs = fs.readFileSync(PLANETS_PATH, 'utf8');
   const OE = require('../lib/orbital-engine');
-  const expectedCount = OE.buildPredictiveFeatures(2000, 243866.91, 77.4569).length;
+  const expectedCount = OE.buildPredictiveFeatures(2000, 'mercury').length;
 
   // Count features by checking the comment at the top of buildFeatures
-  const commentMatch = planetsTs.match(/Build unified (\d+)-term feature matrix/);
+  const commentMatch = planetsTs.match(/Build (?:unified|physical-beat) (\d+)-term feature matrix/);
   const declaredCount = commentMatch ? parseInt(commentMatch[1]) : 0;
 
   if (declaredCount !== expectedCount) {

@@ -20,14 +20,16 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 
 | File | Description |
 |------|-------------|
-| `predictive_formula.py` | Feature matrix builder (429-term) and prediction functions for planetary precession. Year-only input. See [PREDICTIVE_FORMULA_GUIDE.mdx](PREDICTIVE_FORMULA_GUIDE.mdx) for full documentation. |
+| `predictive_formula_physical.py` | **Primary** feature matrix builder (~2421-term) for planetary precession prediction. All feature frequencies derive from `model-parameters.json` via `planet_beats.py` — no hardcoded H_DIV_X constants. See [PREDICTIVE_FORMULA_GUIDE.mdx](PREDICTIVE_FORMULA_GUIDE.mdx) for full documentation. |
+| `planet_beats.py` | Derives the six fundamental periods per planet (ecl, icrf, obliq, asc, axial, wobble) plus all pairwise internal and Earth-cross beat frequencies. Single source for all physical-beat feature frequencies. |
+| `predictive_formula.py` | Legacy 429-term feature builder + shared helpers (`calc_earth_perihelion`, `calc_erd`, `calc_obliquity`, `calc_eccentricity`). The 429-term `build_features` is deprecated but the helper functions are still imported by `predictive_formula_physical.py` and `verify_perihelion_erd.py`. |
 | `observed_formula.py` | Feature matrix builder using observed orbital parameters (perihelion, ERD, obliquity, eccentricity) as inputs. Used to fit against observed data. |
 
 ### Fitted coefficients
 
 | Directory | Description |
 |-----------|-------------|
-| `coefficients/` | Per-planet coefficient modules (`mercury_coeffs.py` … `neptune_coeffs.py`) and unified variants. Imported by `observed_formula.py`. |
+| `coefficients/` | Per-planet coefficient modules. `*_coeffs_physical.py` (7 files, 2421 terms) are the **active** predictive coefficients consumed by `predict_precession.py`, `validate_precession.py`, and the sync pipeline. `*_coeffs.py` are for `observed_formula.py`. Legacy `*_coeffs_unified.py` (429-term) are archived in `scripts/archive/`. |
 
 ### Usage scripts
 
@@ -40,7 +42,7 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 
 | File | Description |
 |------|-------------|
-| `PREDICTIVE_FORMULA_GUIDE.mdx` | Full guide to the predictive formula system: ML architecture, 429-term feature matrix, training procedure, and how to extend. |
+| `PREDICTIVE_FORMULA_GUIDE.mdx` | Full guide to the physical-beat predictive formula: 2421-term ML architecture, feature groups A/B/C+D+E/F/I/J/K/L, training procedure, and how to extend. |
 
 ---
 
@@ -52,7 +54,7 @@ All constants originate from `tools/lib/constants.js` (the single source of trut
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tools', 'lib', 'python'))
 from constants_scripts import H, PHI, PLANET_NAMES
-from predictive_formula import build_features, PLANETS
+from predictive_formula_physical import build_features_physical
 ```
 
 ### From a script in `tools/fit/python/`
@@ -61,7 +63,7 @@ from predictive_formula import build_features, PLANETS
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / 'lib' / 'python'))
-from predictive_formula import build_features, PLANETS
+from predictive_formula_physical import build_features_physical
 ```
 
 ### From the same directory

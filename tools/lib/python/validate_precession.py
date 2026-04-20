@@ -10,11 +10,13 @@ Author: Holistic Universe Model
 """
 
 import math
+from pathlib import Path
 from typing import List, Tuple, Dict
 
 import pandas as pd
 
-from predictive_formula import build_features, PLANETS
+from predictive_formula_physical import build_features_physical
+from predictive_formula import PLANETS
 
 
 PLANET_FLUCTUATION_COLS = {
@@ -52,13 +54,13 @@ def load_excel_data(excel_path: str) -> Dict[str, List[Tuple[int, float]]]:
 
 def load_coefficients(planet_key: str) -> List[float]:
     """Load trained coefficients for a planet."""
-    filename = Path(__file__).parent / 'coefficients' / f"{planet_key}_coeffs_unified.py"
+    filename = Path(__file__).parent / 'coefficients' / f"{planet_key}_coeffs_physical.py"
 
     coeffs = []
     with open(filename, 'r') as f:
         in_list = False
         for line in f:
-            if '_COEFFS = [' in line:
+            if '_COEFFS_PHYSICAL = [' in line:
                 in_list = True
                 continue
             if in_list:
@@ -78,7 +80,7 @@ def load_coefficients(planet_key: str) -> List[float]:
 def predict_fluctuation(year: int, planet_key: str, coeffs: List[float]) -> float:
     """Predict fluctuation using unified feature matrix."""
     planet = PLANETS[planet_key]
-    features = build_features(year, planet['period'], planet['theta0'])
+    features = build_features_physical(year, planet_key.capitalize())
     return sum(c * f for c, f in zip(coeffs, features))
 
 

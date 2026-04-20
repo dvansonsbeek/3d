@@ -183,7 +183,7 @@ PLANETS = {
     },
     'venus': {
         'name': 'Venus',
-        'period': PERIHELION_ECLIPTIC_YEARS['Venus'],
+        'period': abs(PERIHELION_ECLIPTIC_YEARS['Venus']),  # retrograde (negative in constants)
         'theta0': LONGITUDE_PERIHELION['Venus'],
         'baseline': 1296000 / PERIHELION_ECLIPTIC_YEARS['Venus'] * 100,
     },

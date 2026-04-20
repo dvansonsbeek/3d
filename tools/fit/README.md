@@ -27,9 +27,9 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | `moon-eclipse-optimizer.js` | `moonStartposNodal/Apsidal/Moon` | 66 solar eclipses (2000–2025) — run separately, not part of standard pipeline |
 | `python/fit_perihelion_harmonics.py` | `PERI_HARMONICS_RAW`, `PERI_OFFSET` | `data/01-holistic-year-objects-data.xlsx` |
 | `python/verify_perihelion_erd.py` | pass/fail verification (exits 0=pass, 1=fail) | `data/01-holistic-year-objects-data.xlsx` |
-| `python/train_precession.py` | `PREDICT_COEFFS` (429 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
+| `python/train_precession_physical.py` | `PREDICT_COEFFS_PHYSICAL` (~2421 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/train_observed.py` | Observed coefficients (225/328 terms × 7 planets) | `data/01-holistic-year-objects-data.xlsx` |
-| `python/greedy_features.py` | Candidate features for ML | `data/01-holistic-year-objects-data.xlsx` |
+| `python/greedy_features_physical.py` | Candidate features for ML (physical-beat basis) | `data/01-holistic-year-objects-data.xlsx` |
 | `python/planet_eccentricity_jpl.py` | Planet `orbitalEccentricityBase` values | JPL Horizons (cached in `data/`) |
 | `../../scripts/fibonacci_significance.py` | `data/significance-results.json` (combined p + sigma via Stouffer's Z with correlation correction; Fisher's reported for transparency; 11 tests × 3 null distributions) | `tools/lib/python/constants_scripts.py` |
 | `export-to-script.js` | Syncs all JSON values → `src/script.js` | All 4 JSON files in `public/input/` |
@@ -80,9 +80,17 @@ Step 2:  node tools/optimize.js optimize <planet> startpos   (for each planet)
 
 ── Phase 2: Generate input data (manual) ──────────────────────────
 
+Step 2-sync: node tools/fit/export-to-script.js --write
+         After Steps 1–2, sync model-parameters.json changes (startpos,
+         angleCorrection, and any modified Fibonacci fractions) to src/script.js.
+         The browser simulation reads from script.js, so this sync is REQUIRED
+         before Step 3's browser export — otherwise Step 3 will use the old
+         pre-optimization values.
+
 Step 3:  Export from browser GUI              → data/01-holistic-year-objects-data.xlsx
          (Perihelion/precession data for all planets, 1-year steps over full H)
          Menu: Analysis → Export Objects Report
+         IMPORTANT: Run "Step 2-sync" above first. Reload the browser after syncing.
 
 ── Phase 3: Earth perihelion & ML training ────────────────────────
 
@@ -98,10 +106,29 @@ Step 4b: python/verify_perihelion_erd.py      → pass/fail verification
 Note: eocEccentricity and perihelionPhaseOffset are derived analytically in constants.js
       from correctionSun and the eccentricity constants — no pipeline step needed.
 
-Step 4c: python/train_precession.py           → tools/lib/python/coefficients/*_coeffs_unified.py
-         (429-term ML coefficients, uses perihelion/ERD as features)
+Step 4c: python/train_precession_physical.py  → tools/lib/python/coefficients/*_coeffs_physical.py
+         (~2421-term physical-beat ML coefficients, all feature frequencies
+          derived from model-parameters.json — no hardcoded H_DIV_X constants)
          Downsampled by stepYears for efficiency.
-         Updates: coefficients/*_coeffs_unified.py + fitted-coefficients.json (auto-written by script)
+         Updates: coefficients/*_coeffs_physical.py + fitted-coefficients.json
+                  (PREDICT_COEFFS_PHYSICAL key, auto-written by script).
+         Auto-updates when JSON periods change — but coefficients need retraining.
+
+         Standalone per-planet mode (useful for iteration — ~7× faster):
+           python3 tools/fit/python/train_precession_physical.py --planet venus
+           python3 tools/fit/python/train_precession_physical.py --planet venus --write
+         Valid planets: mercury, venus, mars, jupiter, saturn, uranus, neptune.
+         When --planet is used with --write, only that planet's entry is replaced
+         in fitted-coefficients.json (other planets' coefficients are preserved).
+
+         Residual-analysis tool:
+           python3 tools/fit/python/greedy_features_physical.py --planet venus
+         Ranks candidate features by |correlation| with residuals. Used to
+         identify missing physical-beat structure (e.g. the GROUP K/L terms
+         capturing 8H/N sidebands were discovered this way).
+
+         The legacy 429-term script (train_precession.py) and its 429-term
+         greedy_features.py are archived in scripts/archive/.
 
 Step 4d: python/train_observed.py             → tools/lib/python/coefficients/*_coeffs.py
          (225-term observed coefficients)
@@ -328,14 +355,19 @@ node tools/optimize.js optimize saturn startpos --write                      # S
 node tools/optimize.js optimize uranus startpos --write                      # Step 2
 node tools/optimize.js optimize neptune startpos --write                     # Step 2
 
+# Step 2-sync: push startpos/angleCorrection + any Fibonacci changes to script.js
+# so the browser simulation uses the post-optimization values
+node tools/fit/export-to-script.js --write                                   # Step 2-sync
+
 # Phase 2: Generate input data (manual)
+# Reload the browser after Step 2-sync, THEN export.
 # Export from browser: Analysis → Export Objects Report                      # Step 3
 # Save as data/01-holistic-year-objects-data.xlsx
 
 # Phase 3: Earth perihelion & ML training
 python3 tools/fit/python/fit_perihelion_harmonics.py --write                 # Step 4a
 python3 tools/fit/python/verify_perihelion_erd.py                            # Step 4b (must pass)
-python3 tools/fit/python/train_precession.py --write                         # Step 4c
+python3 tools/fit/python/train_precession_physical.py --write                # Step 4c
 python3 tools/fit/python/train_observed.py --write                           # Step 4d
 
 # Phase 4: Planet positions & corrections
@@ -425,7 +457,7 @@ public/input/ (single source of truth)
 
 Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script.js:
     fit_perihelion_harmonics.py  → fitted-coefficients.json  (Step 4a)
-    train_precession.py          → fitted-coefficients.json  (Step 4c)
+    train_precession_physical.py → fitted-coefficients.json  (Step 4c)
     train_observed.py            → fitted-coefficients.json  (Step 4d)
     parallax-correction.js       → fitted-coefficients.json  (Step 5a)
     gravitation-correction.js    → fitted-coefficients.json  (Step 5b)

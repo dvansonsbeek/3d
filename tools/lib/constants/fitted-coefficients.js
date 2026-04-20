@@ -74,8 +74,8 @@ function buildFittedCoefficients(params) {
     };
   }
 
-  // 429 coefficients per planet (from fitted-coefficients.json)
-  const PREDICT_COEFFS = data.PREDICT_COEFFS_UNIFIED || {};
+  // 2421-term physical-beat coefficients per planet (from fitted-coefficients.json)
+  const PREDICT_COEFFS = data.PREDICT_COEFFS_PHYSICAL || data.PREDICT_COEFFS_UNIFIED || {};
 
   // Perihelion harmonics — expand divisors to actual periods using H
   const PERI_HARMONICS = PERI_HARMONICS_RAW.map(([div, s, c]) => [params.H / div, s, c]);
