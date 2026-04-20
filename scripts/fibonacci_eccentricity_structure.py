@@ -526,28 +526,28 @@ for pair in MIRROR_PAIRS:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SECTION 8: ECCENTRICITY CYCLE / PRECESSION PERIOD RATIOS
+# SECTION 8: OBLIQUITY CYCLE / PRECESSION PERIOD RATIOS
 # ═══════════════════════════════════════════════════════════════════════════
 
 print("\n" + "=" * 90)
-print("Section 8: Eccentricity Cycle / Precession Period Ratios")
+print("Section 8: Obliquity Cycle / Precession Period Ratios")
 print("=" * 90)
 
-ECC_CYCLE = {
-    'Mercury': H * 8 / 3,
-    'Venus': None,
-    'Earth': H / 8,
-    'Mars': 3 * H / 8,
+OBLIQ_CYCLE = {
+    'Mercury': 8 * H / 3,
+    'Venus':   8 * H / 110,
+    'Earth':   H / 8,
+    'Mars':    8 * H / 21,
     'Jupiter': H / 2,
-    'Saturn': H / 3,
-    'Uranus': H / 2,
-    'Neptune': None,
+    'Saturn':  H / 3,
+    'Uranus':  H / 2,
+    'Neptune': 8 * H / 100,
 }
 
-print(f"\n  {'Planet':>10} {'T_ecc':>12} {'T_prec':>10} {'ratio':>10} {'fraction':>10}")
+print(f"\n  {'Planet':>10} {'T_obliq':>12} {'T_prec':>10} {'ratio':>10} {'fraction':>10}")
 print("  " + "─" * 55)
 for p in PLANET_NAMES:
-    ec = ECC_CYCLE[p]
+    ec = OBLIQ_CYCLE[p]
     tp = float(INCL_PERIOD[p])
     if ec:
         ratio = ec / tp

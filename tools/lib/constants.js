@@ -376,7 +376,9 @@ for (const [key, p] of Object.entries(planets)) {
     if (Math.abs(p.axialPrecessionYears) > FROZEN_THRESHOLD) {
       p.wobblePeriod = Math.abs(inclICRF);
     } else {
-      const wobbleRate = Math.abs(1 / p.axialPrecessionYears - 1 / inclICRF);
+      // Magnitude of frequency difference — sign of axial vs ICRF is irrelevant.
+      // Needed so Venus (prograde axial, retrograde ICRF) gives the slow beat.
+      const wobbleRate = Math.abs(1 / Math.abs(p.axialPrecessionYears) - 1 / Math.abs(inclICRF));
       p.wobblePeriod = 1 / wobbleRate;
     }
   }

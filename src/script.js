@@ -123,6 +123,7 @@ planets.mercury = {
   angleCorrection: 0.9715968259722167,
   perihelionEclipticYears: holisticyearLength/(1+(3/8)),
   axialPrecessionYears: -(8 * holisticyearLength / 9),
+  obliquityCycle: holisticyearLength * 8 / 3,
   startpos: 83.65315034119067,
   eocFraction: -0.527,
   perihelionRef_JD: 2460335.9,
@@ -148,6 +149,7 @@ planets.venus = {
   angleCorrection: -2.7523535583644403,
   perihelionEclipticYears: -holisticyearLength*8/6,
   axialPrecessionYears: 8 * holisticyearLength / 91,
+  obliquityCycle: 8 * holisticyearLength / 110,
   startpos: 249.32614838335923,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
@@ -173,6 +175,7 @@ planets.mars = {
   angleCorrection: -2.1107563501910356,
   perihelionEclipticYears: holisticyearLength/(4+(3/8)),
   axialPrecessionYears: -holisticyearLength/2,
+  obliquityCycle: 8 * holisticyearLength / 21,
   startpos: 121.46203760083546,
   eocFraction: -0.066224,
   perihelionRef_JD: 2456499.441,
@@ -198,6 +201,7 @@ planets.jupiter = {
   angleCorrection: 0.9306755832658276,
   perihelionEclipticYears: holisticyearLength/5,
   axialPrecessionYears: -(8 * holisticyearLength / 21),
+  obliquityCycle: holisticyearLength / 2,
   startpos: 13.887515861166527,
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
@@ -223,6 +227,7 @@ planets.saturn = {
   angleCorrection: -0.178810688932316,
   perihelionEclipticYears: -holisticyearLength/8,
   axialPrecessionYears: -holisticyearLength*4/3,
+  obliquityCycle: holisticyearLength / 3,
   startpos: 11.279227516588579,
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
@@ -248,6 +253,7 @@ planets.uranus = {
   angleCorrection: -0.7329073036804559,
   perihelionEclipticYears: holisticyearLength/3,
   axialPrecessionYears: holisticyearLength*610,
+  obliquityCycle: holisticyearLength / 2,
   startpos: 44.900388945775106,
   eocFraction: 0.53,
   perihelionRef_JD: 2439699.8,
@@ -273,6 +279,7 @@ planets.neptune = {
   angleCorrection: 2.332350155084832,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
+  obliquityCycle: 8 * holisticyearLength / 100,
   startpos: 47.9552024382285,
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
@@ -2879,22 +2886,22 @@ const PREDICT_COEFFS = {
 // Post-hoc RA/Dec correction for geocentric parallax effect.
 // Source: public/input/fitted-coefficients.json
 const PARALLAX_DEC_CORRECTION = {
-  Mercury: { A: 6.4667, B:-2.7053, C:-0.0269, D: 3.9719, E: 4.2259, F:-0.9678, G:-0.5314, H:-0.0542, I: 0.0200, J: 0.0193, K: 0.2897, L:-2.9411, M:-1.4328, N: 0.2498, O: 2.5249, P:-0.0101, Q: 0.0375, R:-0.0027, S: 0.0627, U:-2.6732, V: 0.3334, W:-0.0354, X:-0.0156, Y:-0.0766, Z: 0.1617, AA:-2.1846, AB: 0.1037, AC:-0.0011, AD: 0.0149, AE:-0.0552, AF: 0.0152, AG: 0.0019, AH:-0.3491, AI: 2.5965, AJ: 0.0040, AK: 0.0798, AL: 0.0087, AM:-0.0181, AN: 0.0190, AO:-0.1174, AP:-2.4027, AQ: 0.9836, AR:-0.0047, AS:-0.0026, AT:0, AU_:-0.0004, AV: 0.0050, AW: 0.0033, AX:-3.3068, AY:-4.3091, AZ:-0.5233, BA: 0.1492, BB:-0.2278, BC:-0.1826, BD: 0.0854, BE: 0.0980, BF: 1.0594, BG:-1.2992, BH:-2.1256, BI: 1.0004, BJ:-1.1056, BK: 1.8083, BL:-0.0014, BM: 0.0004, BN:-0.0043, BO:-0.0995, BP: 0.0070, BQ: 0.6631, BR:-2.3683, BS: 3.4411, BT:-0.1909, BU:-0.0720, BV: 0.0820, BW:-1.4355, BX: 0.2097, BY: 0.0322, BZ: 2.2287, CA: 0.0249 },
-  Venus: { A: 17.0102, B: 15.2419, C: 0.0010, D:-2.4507, E:-0.7265, F:-0.7192, G: 1.0011, H:-0.0027, I: 0.0056, J: 0.0111, K: 0.0824, L:-26.1176, M:-12.4131, N: 0.9277, O: 3.6373, P: 0.0043, Q:-0.0002, R:-0.0191, S:-0.0029, U: 0.1489, V: 10.0060, W:-0.8418, X: 0.2086, Y:-0.0681, Z:-11.1894, AA: 2.7543, AB:-0.5551, AC:0, AD: 0.0016, AE:-0.4480, AF: 0.0550, AG:-0.1662, AH:-1.9150, AI: 8.3774, AJ:-0.0004, AK: 0.0731, AL: 0.0062, AM:-0.0028, AN: 0.0125, AO:-0.0168, AP: 0.2360, AQ:-0.0237, AR: 0.0001, AS:-0.0001, AT:0, AU_: 0.0001, AV:-0.0001, AW: 0.0001, AX: 0.3717, AY:-0.6122, AZ:-0.7265, BA:-0.2494, BB:-0.0975, BC:-0.0210, BD: 0.0440, BE: 0.0191, BF:-0.0824, BG:-0.3904, BH: 0.0198, BI: 0.0083, BJ:-0.1112, BK: 0.2811, BL: 0.0004, BM: 0.0003, BN: 0.0001, BO:-0.0119, BP:-0.0034, BQ:-0.0235, BR:-0.2673, BS:-0.6470, BT: 0.1040, BU:-0.0589, BV:-0.1729, BW:-0.0909, BX: 0.0036, BY: 0.0284, BZ: 0.1443, CA:-0.0043 },
-  Mars: { A: 28.3845, B: 9.0999, C:-0.0125, D: 3.0444, E: 0.4448, F:-0.7761, G:-0.4549, H:-0.0329, I:-0.1877, J:-0.0249, K: 0.0521, L:-91.8970, M: 4.0049, N:-1.3272, O:-2.1834, P:-0.0890, Q:-0.0504, R: 0.0051, S: 0.0856, U:-0.1740, V: 73.5392, W: 1.4988, X: 0.3712, Y: 0.4066, Z:-14.3588, AA:-8.6689, AB: 0.7622, AC: 0.0234, AD: 0.0671, AE: 2.8718, AF:-0.6315, AG:-0.5064, AH: 3.1039, AI:-2.5323, AJ: 0.0315, AK: 1.0452, AL: 0.0047, AM:-0.0067, AN: 0.0233, AO:-0.0176, AP:-0.9669, AQ: 0.0154, AR: 0.0009, AS:-0.0009, AT: 0.0001, AU_: 0.0003, AV:-0.0013, AW: 0.0012, AX: 0.2005, AY:-0.4400, AZ:-0.1225, BA: 0.2649, BB:-0.0010, BC: 0.0102, BD:-0.0075, BE:-0.0098, BF:-0.0793, BG:-0.0529, BH: 0.0329, BI: 0.0260, BJ:-0.2106, BK: 0.0923, BL: 0.0027, BM: 0.0098, BN:-0.0083, BO:-0.1656, BP:-0.0043, BQ: 0.1414 },
-  Jupiter: { A:-81.6012, B: 352.0061, C: 0.0021, D: 170.8932, E: 20.8426, F: 3.7841, G: 6.2292, H: 0.3581, I:-0.1094, J: 0.2554, K:-0.0482, L: 512.6906, M: 249.6351, N:-3.2226, O: 29.5161, P: 0.0084, Q:-0.0903, R:-0.3540, S: 0.1030, U:-67.1238, V:-476.0734, W: 435.1355, X: 0.7183, Y:-1.2085, Z:-1814.9380, AA:-2139.1846, AB:-23.6023, AC:-0.0007, AD: 0.4237, AE:-1.2931, AF: 4.1769, AG:-3.3005, AH:-209.2241, AI: 6144.5302, AJ:-0.0395, AK:-39.0701, AL: 0.0104, AM: 0.0351, AN:-1.7433, AO: 0.2957, AP:-4077.6807, AQ: 86.6749, AR: 0.0043, AS:-0.0168, AT:-0.0035, AU_:-0.0034, AV:-0.0576, AW: 0.1385, AX:-6.1892, AY:-2.2416, AZ: 0.8396, BA: 0.4405, BB:-0.0225, BC:-0.0040, BD: 0.0015, BE: 0.0016, BF:-0.1921, BG:-2.5051, BH: 46.5279, BI:-9.9694, BJ:-0.6688, BK:-0.3182, BL:-0.0092, BM:-0.0241, BN:-0.0092, BO:-2.5006, BP:-29.5895, BQ: 4504.2111 },
-  Saturn: { A:-210.6151, B:-3099.6669, C: 0.0005, D:-40.0853, E:-267.5205, F: 16.7337, G: 5.9876, H:-1.4978, I: 4.1955, J: 9.8057, K:-1.7967, L: 6014.8904, M: 16113.9764, N:-16.7530, O:-14.8195, P:-0.2398, Q:-0.0909, R:-7.6063, S:-0.0882, U: 888.2981, V:-38246.0030, W: 3032.4907, X: 1.0113, Y:-6.7480, Z: 29531.9299, AA:-12878.3454, AB:-67.2446, AC: 0.2106, AD:-14.5930, AE:-0.8087, AF: 65.5817, AG:-27.8362, AH: 1216.0981, AI: 52385.1469, AJ:-0.0320, AK: 1709.4148, AL:-0.2379, AM: 0.0378, AN:-22.8400, AO: 18.8381, AP:-142882.9254, AQ:-300.5993, AR: 0.0054, AS: 0.0073, AT: 0.7187, AU_: 0.9273, AV: 0.0477, AW:-0.2150, AX: 20.2851, AY:-0.0012, AZ:-0.6141, BA:-0.1562, BB: 0.2207, BC: 0.6861, BD:-0.0281, BE:-0.0900, BF: 8.8314, BG: 3.5849, BH:-686.1455, BI: 120.2255, BJ:-12.3170, BK:-1.2091, BL: 0.1069, BM:-0.0839, BN: 0.3676, BO:-1395.2571, BP:-54.1707, BQ: 347723.8141 },
-  Uranus: { A: 277.1266, B:-4970.6126, C:-0.0047, D: 335.0007, E:-496.4750, F: 72.2249, G:-12.0403, H: 2.6529, I:-30.8295, J: 6.9123, K:-1.4077, L:-5847.4988, M:-52587.9372, N:-101.4490, O: 583.8512, P: 0.1012, Q: 0.2920, R:-3.3593, S:-0.2849, U: 10427.0372, V: 9159.2391, W:-3504.3313, X: 28.9004, Y:-18.2678, Z: 96314.7988, AA: 30348.3252, AB: 377.9108, AC: 0.0822, AD: 234.6889, AE: 1825.2540, AF: 290.2001, AG:-212.5388, AH:-8461.3339, AI:-407801.6236, AJ: 0.0694, AK:-36105.0058, AL:-0.2726, AM: 0.2390, AN:-63.4293, AO: 24.3049, AP: 1050491.2874, AQ:-68922.0579, AR:-0.0093, AS: 0.0025, AT:-0.0008, AU_:-0.0013, AV: 0.2427, AW:-0.0601, AX: 86.7195, AY:-23.4219, AZ:-3.0053, BA: 0.9749, BB:-0.0284, BC: 0.0592, BD: 0.0015, BE:-0.0027, BF:-7.6807, BG: 9.3427, BH:-10503.1938, BI: 1537.1200, BJ:-58.4425, BK: 20.1590, BL: 0.0610, BM: 0.1639, BN:-0.0504, BO: 14595.2366, BP:-2066.1818, BQ:-5282044.5859 },
-  Neptune: { A:-656.7064, B:-12048.3221, C:-0.0027, D: 690.2494, E: 50.1579, F: 32.6791, G: 3.5552, H:-0.6138, I: 2.3684, J: 17.3658, K: 2.4699, L: 49674.8222, M:-127701.9572, N:-33.7060, O: 435.6106, P: 0.0887, Q:-0.0033, R:-8.8596, S: 0.1421, U:-1717.4579, V:-905396.6037, W:-33331.5086, X:-5.2202, Y:-11.2660, Z: 367501.3930, AA: 96217.2538, AB:-131.4336, AC: 0.0047, AD:-54.7368, AE: 705.3738, AF: 352.1247, AG: 135.3416, AH:-13518.9324, AI:-999645.5837, AJ: 0.0389, AK:-33589.4197, AL: 0.0010, AM:-0.0316, AN:-264.9963, AO:-43.1555, AP: 3095938.7769, AQ: 18397.6228, AR:-0.0040, AS:-0.0073, AT:-0.0007, AU_:-0.0006, AV: 0.1239, AW: 0.2201, AX: 139.0086, AY:-38.5306, AZ:-2.8349, BA: 0.7654, BB: 0.3826, BC: 0.9176, BD:-0.0139, BE:-0.0295, BF: 14.4514, BG: 10.5178, BH:-48131.4468, BI: 14184.9631, BJ:-171.4738, BK:-151.0258, BL: 0.0080, BM:-0.0597, BN:-0.0472, BO: 10728.6107, BP: 323.2472, BQ:-22810754.8820 },
+  Mercury: { A: 6.4667, B:-2.7053, C:-0.0269, D: 3.9718, E: 4.2260, F:-0.9678, G:-0.5314, H:-0.0542, I: 0.0200, J: 0.0193, K: 0.2897, L:-2.9411, M:-1.4327, N: 0.2498, O: 2.5249, P:-0.0101, Q: 0.0375, R:-0.0027, S: 0.0627, U:-2.6732, V: 0.3334, W:-0.0354, X:-0.0156, Y:-0.0766, Z: 0.1617, AA:-2.1846, AB: 0.1037, AC:-0.0011, AD: 0.0149, AE:-0.0552, AF: 0.0152, AG: 0.0019, AH:-0.3491, AI: 2.5965, AJ: 0.0040, AK: 0.0798, AL: 0.0087, AM:-0.0181, AN: 0.0190, AO:-0.1174, AP:-2.4027, AQ: 0.9837, AR:-0.0047, AS:-0.0026, AT:0, AU_:-0.0004, AV: 0.0050, AW: 0.0033, AX:-3.3068, AY:-4.3091, AZ:-0.5233, BA: 0.1493, BB:-0.2278, BC:-0.1826, BD: 0.0854, BE: 0.0980, BF: 1.0594, BG:-1.2992, BH:-2.1256, BI: 1.0004, BJ:-1.1056, BK: 1.8083, BL:-0.0014, BM: 0.0004, BN:-0.0043, BO:-0.0995, BP: 0.0070, BQ: 0.6631, BR:-2.3683, BS: 3.4411, BT:-0.1909, BU:-0.0720, BV: 0.0820, BW:-1.4355, BX: 0.2097, BY: 0.0322, BZ: 2.2287, CA: 0.0249 },
+  Venus: { A: 16.9096, B: 15.2607, C: 0.0010, D:-2.5036, E:-0.7265, F:-0.7182, G: 1.0031, H:-0.0027, I: 0.0057, J: 0.0111, K: 0.0824, L:-25.9781, M:-12.3472, N: 0.9262, O: 3.6494, P: 0.0043, Q:-0.0002, R:-0.0191, S:-0.0029, U: 0.1490, V: 9.9576, W:-0.8452, X: 0.2076, Y:-0.0687, Z:-11.2027, AA: 2.7918, AB:-0.5565, AC:0, AD: 0.0016, AE:-0.4471, AF: 0.0554, AG:-0.1656, AH:-1.9206, AI: 8.3301, AJ:-0.0004, AK: 0.0733, AL: 0.0061, AM:-0.0028, AN: 0.0125, AO:-0.0168, AP: 0.2359, AQ:-0.0237, AR: 0.0001, AS:-0.0001, AT:0, AU_: 0.0001, AV:-0.0001, AW: 0.0001, AX: 0.3676, AY:-0.6213, AZ:-0.7267, BA:-0.2490, BB:-0.0974, BC:-0.0210, BD: 0.0440, BE: 0.0191, BF:-0.0825, BG:-0.3898, BH: 0.0199, BI: 0.0083, BJ:-0.1110, BK: 0.2805, BL: 0.0004, BM: 0.0003, BN: 0.0001, BO:-0.0119, BP:-0.0034, BQ:-0.0234, BR:-0.2715, BS:-0.6532, BT: 0.1039, BU:-0.0592, BV:-0.1730, BW:-0.0904, BX: 0.0036, BY: 0.0285, BZ: 0.1445, CA:-0.0042 },
+  Mars: { A: 28.3845, B: 9.0999, C:-0.0125, D: 3.0444, E: 0.4448, F:-0.7761, G:-0.4549, H:-0.0329, I:-0.1877, J:-0.0249, K: 0.0521, L:-91.8970, M: 4.0049, N:-1.3272, O:-2.1834, P:-0.0890, Q:-0.0504, R: 0.0051, S: 0.0856, U:-0.1740, V: 73.5392, W: 1.4988, X: 0.3712, Y: 0.4066, Z:-14.3588, AA:-8.6689, AB: 0.7622, AC: 0.0234, AD: 0.0671, AE: 2.8718, AF:-0.6315, AG:-0.5064, AH: 3.1039, AI:-2.5323, AJ: 0.0315, AK: 1.0452, AL: 0.0047, AM:-0.0067, AN: 0.0233, AO:-0.0176, AP:-0.9669, AQ: 0.0154, AR: 0.0009, AS:-0.0009, AT: 0.0001, AU_: 0.0003, AV:-0.0013, AW: 0.0012, AX: 0.2005, AY:-0.4400, AZ:-0.1225, BA: 0.2649, BB:-0.0011, BC: 0.0102, BD:-0.0075, BE:-0.0098, BF:-0.0793, BG:-0.0529, BH: 0.0329, BI: 0.0260, BJ:-0.2106, BK: 0.0923, BL: 0.0027, BM: 0.0098, BN:-0.0083, BO:-0.1656, BP:-0.0043, BQ: 0.1414 },
+  Jupiter: { A:-81.6032, B: 352.0008, C: 0.0021, D: 170.8957, E: 20.8426, F: 3.7842, G: 6.2292, H: 0.3581, I:-0.1094, J: 0.2554, K:-0.0482, L: 512.7150, M: 249.6245, N:-3.2228, O: 29.5157, P: 0.0084, Q:-0.0903, R:-0.3541, S: 0.1030, U:-67.1244, V:-476.1441, W: 435.1335, X: 0.7183, Y:-1.2085, Z:-1814.9106, AA:-2139.1913, AB:-23.6022, AC:-0.0007, AD: 0.4237, AE:-1.2923, AF: 4.1770, AG:-3.3005, AH:-209.2221, AI: 6144.5546, AJ:-0.0395, AK:-39.0726, AL: 0.0104, AM: 0.0351, AN:-1.7433, AO: 0.2957, AP:-4077.6665, AQ: 86.6761, AR: 0.0043, AS:-0.0168, AT:-0.0035, AU_:-0.0034, AV:-0.0576, AW: 0.1385, AX:-6.1892, AY:-2.2415, AZ: 0.8396, BA: 0.4405, BB:-0.0225, BC:-0.0040, BD: 0.0015, BE: 0.0016, BF:-0.1921, BG:-2.5051, BH: 46.5277, BI:-9.9693, BJ:-0.6688, BK:-0.3182, BL:-0.0092, BM:-0.0241, BN:-0.0092, BO:-2.4998, BP:-29.5898, BQ: 4504.1972 },
+  Saturn: { A:-210.6488, B:-3099.5856, C: 0.0005, D:-40.2451, E:-267.5120, F: 16.7158, G: 5.9810, H:-1.4983, I: 4.1931, J: 9.8058, K:-1.7969, L: 6015.4225, M: 16112.2740, N:-16.7366, O:-14.8410, P:-0.2399, Q:-0.0909, R:-7.6063, S:-0.0883, U: 888.3238, V:-38248.0117, W: 3031.5256, X: 1.0145, Y:-6.7484, Z: 29531.1534, AA:-12872.9112, AB:-67.1823, AC: 0.2107, AD:-14.5829, AE:-0.9196, AF: 65.5878, AG:-27.8552, AH: 1216.2116, AI: 52346.1366, AJ:-0.0318, AK: 1711.2147, AL:-0.2379, AM: 0.0377, AN:-22.8409, AO: 18.8392, AP:-142846.9992, AQ:-300.8742, AR: 0.0054, AS: 0.0073, AT: 0.7187, AU_: 0.9274, AV: 0.0476, AW:-0.2150, AX: 20.2827, AY:0, AZ:-0.6139, BA:-0.1563, BB: 0.2207, BC: 0.6861, BD:-0.0281, BE:-0.0900, BF: 8.8313, BG: 3.5877, BH:-686.1052, BI: 120.1959, BJ:-12.3187, BK:-1.2125, BL: 0.1069, BM:-0.0839, BN: 0.3676, BO:-1395.7443, BP:-54.1065, BQ: 347640.8979 },
+  Uranus: { A: 276.8172, B:-4970.0596, C:-0.0047, D: 334.2412, E:-496.5494, F: 72.2333, G:-12.0559, H: 2.6529, I:-30.8305, J: 6.9127, K:-1.4077, L:-5835.9737, M:-52546.0115, N:-101.4617, O: 583.9772, P: 0.1013, Q: 0.2920, R:-3.3594, S:-0.2849, U: 10428.3137, V: 9051.7155, W:-3495.0001, X: 28.8957, Y:-18.2593, Z: 96304.4000, AA: 30325.2585, AB: 378.3222, AC: 0.0821, AD: 234.6958, AE: 1825.4817, AF: 290.0285, AG:-212.4331, AH:-8463.2350, AI:-407514.7420, AJ: 0.0693, AK:-36108.3380, AL:-0.2728, AM: 0.2389, AN:-63.4338, AO: 24.3025, AP: 1049768.3320, AQ:-68929.3023, AR:-0.0094, AS: 0.0025, AT:-0.0008, AU_:-0.0013, AV: 0.2431, AW:-0.0599, AX: 86.7219, AY:-23.4188, AZ:-3.0055, BA: 0.9749, BB:-0.0284, BC: 0.0591, BD: 0.0015, BE:-0.0027, BF:-7.6788, BG: 9.3469, BH:-10502.9847, BI: 1536.7723, BJ:-58.4576, BK: 20.1581, BL: 0.0610, BM: 0.1639, BN:-0.0504, BO: 14596.4697, BP:-2065.9277, BQ:-5278625.7890 },
+  Neptune: { A:-630.4824, B:-11985.2303, C:-0.0027, D: 612.3974, E: 10.3588, F: 33.0198, G: 2.2107, H:-0.6144, I: 2.7386, J: 17.3756, K: 2.4693, L: 48045.4740, M:-139544.7410, N:-34.0841, O: 465.0126, P: 0.0886, Q:-0.0033, R:-8.8644, S: 0.1417, U:-518.7404, V:-880146.1711, W:-37070.3310, X:-5.1741, Y:-11.3127, Z: 365638.4760, AA: 112913.2331, AB:-94.6577, AC: 0.0048, AD:-60.0961, AE: 712.3885, AF: 353.6330, AG: 128.2714, AH:-14004.8819, AI:-1261911.5678, AJ: 0.0394, AK:-33827.8502, AL:-0.0009, AM:-0.0321, AN:-265.1415, AO:-43.1393, AP: 3487452.6019, AQ: 6380.3382, AR:-0.0040, AS:-0.0073, AT:-0.0007, AU_:-0.0006, AV: 0.1235, AW: 0.2202, AX: 138.5530, AY:-38.0279, AZ:-2.8251, BA: 0.7544, BB: 0.3823, BC: 0.9161, BD:-0.0139, BE:-0.0295, BF: 14.4936, BG: 10.5355, BH:-47986.3435, BI: 14029.9056, BJ:-172.1637, BK:-151.6876, BL: 0.0080, BM:-0.0597, BN:-0.0472, BO: 10779.7034, BP: 397.6513, BQ:-25590862.5861 },
 };
 const PARALLAX_RA_CORRECTION = {
-  Mercury: { A:-1.1095, B: 2.5635, C: 0.2067, D:-2.6911, E:-13.0264, F:-1.2079, G:-0.8401, H: 0.1248, I: 0.0241, J:-0.2601, K: 0.0822, L: 0.6584, M:-9.3213, N: 0.5134, O: 2.4853, P:-0.0016, Q: 0.0026, R: 0.0807, S:-0.2105, U: 5.7820, V:-0.1675, W:-0.0284, X:-0.0153, Y:-0.0673, Z:-0.1302, AA: 2.3711, AB: 0.0220, AC:-0.0017, AD:-0.0816, AE:-0.1052, AF: 0.0136, AG:-0.0022, AH:-0.2200, AI:-1.7964, AJ: 0.0006, AK: 0.0996, AL: 0.0206, AM:-0.0023, AN: 0.1135, AO: 0.0284, AP: 7.5837, AQ:-1.2702, AR:-0.0003, AS:-0.0008, AT: 0.0003, AU_: 0.0001, AV: 0.0005, AW:0, AX: 2.8800, AY: 0.4150, AZ:-2.0016, BA:-0.8588, BB: 0.0966, BC:-0.0507, BD:-0.0640, BE: 0.0767, BF: 1.3873, BG: 0.8346, BH: 3.0806, BI:-2.5252, BJ: 1.8372, BK:-1.8328, BL: 0.0021, BM: 0.0023, BN:-0.0070, BO: 0.0486, BP:-0.0459, BQ:-1.8409, BR: 4.3274, BS:-0.4143, BT: 0.0919, BU:-0.6493, BV:-2.3741, BW:-2.4219, BX: 0.0083, BY: 0.7021, BZ:-3.9778, CA: 1.5466 },
-  Venus: { A: 12.6177, B: 1.0216, C: 0.1800, D: 4.3776, E:-0.7966, F:-0.1120, G:-0.6563, H:-0.0092, I:-0.0331, J:-0.0239, K: 0.0027, L:-16.4921, M:-7.3233, N: 0.3779, O:-7.3269, P:-0.0152, Q:-0.0042, R: 0.0277, S:-0.1571, U: 0.1350, V: 5.6275, W: 0.4244, X: 0.3969, Y:-0.1373, Z:-0.7561, AA:-2.8802, AB: 0.5601, AC: 0.0151, AD: 0.0091, AE:-0.2362, AF: 0.1319, AG:-0.2261, AH: 2.5565, AI: 5.2128, AJ: 0.0021, AK: 0.0024, AL: 0.0012, AM:-0.0016, AN: 0.0050, AO: 0.0007, AP: 0.0379, AQ:-0.0210, AR:-0.0002, AS:-0.0003, AT: 0.0002, AU_: 0.0003, AV: 0.0003, AW: 0.0003, AX: 5.3754, AY: 2.3338, AZ:-0.3364, BA:-0.5301, BB:-0.0300, BC:-0.0012, BD:-0.0001, BE: 0.0226, BF:-0.0942, BG:-0.0919, BH: 0.0115, BI: 0.0082, BJ:-0.0657, BK: 0.0950, BL:-0.0011, BM:-0.0003, BN:-0.0002, BO:-0.0006, BP:-0.0017, BQ:-0.0038, BR: 4.0250, BS: 0.4157, BT:-0.0017, BU:-0.0059, BV: 0.2946, BW: 0.0891, BX: 0.0079, BY: 0.0001, BZ:-0.0097, CA: 0.1059 },
+  Mercury: { A:-1.1095, B: 2.5628, C: 0.2067, D:-2.6935, E:-13.0267, F:-1.2079, G:-0.8400, H: 0.1248, I: 0.0241, J:-0.2601, K: 0.0822, L: 0.6585, M:-9.3190, N: 0.5134, O: 2.4853, P:-0.0015, Q: 0.0026, R: 0.0807, S:-0.2105, U: 5.7822, V:-0.1675, W:-0.0284, X:-0.0153, Y:-0.0673, Z:-0.1300, AA: 2.3710, AB: 0.0220, AC:-0.0017, AD:-0.0815, AE:-0.1052, AF: 0.0136, AG:-0.0022, AH:-0.2200, AI:-1.7963, AJ: 0.0006, AK: 0.0996, AL: 0.0206, AM:-0.0023, AN: 0.1135, AO: 0.0284, AP: 7.5826, AQ:-1.2703, AR:-0.0003, AS:-0.0008, AT: 0.0003, AU_: 0.0001, AV: 0.0005, AW:0, AX: 2.8811, AY: 0.4141, AZ:-2.0018, BA:-0.8586, BB: 0.0966, BC:-0.0507, BD:-0.0640, BE: 0.0767, BF: 1.3873, BG: 0.8346, BH: 3.0805, BI:-2.5252, BJ: 1.8371, BK:-1.8327, BL: 0.0021, BM: 0.0023, BN:-0.0070, BO: 0.0486, BP:-0.0459, BQ:-1.8407, BR: 4.3269, BS:-0.4143, BT: 0.0919, BU:-0.6494, BV:-2.3739, BW:-2.4219, BX: 0.0083, BY: 0.7021, BZ:-3.9777, CA: 1.5467 },
+  Venus: { A: 12.5874, B: 1.0312, C: 0.1800, D: 4.3170, E:-0.7981, F:-0.1113, G:-0.6482, H:-0.0091, I:-0.0330, J:-0.0237, K: 0.0025, L:-16.4527, M:-7.2639, N: 0.3775, O:-7.3121, P:-0.0153, Q:-0.0043, R: 0.0276, S:-0.1570, U: 0.1349, V: 5.6148, W: 0.4180, X: 0.3964, Y:-0.1375, Z:-0.7627, AA:-2.8374, AB: 0.5542, AC: 0.0151, AD: 0.0091, AE:-0.2360, AF: 0.1322, AG:-0.2259, AH: 2.5495, AI: 5.1708, AJ: 0.0021, AK: 0.0024, AL: 0.0012, AM:-0.0016, AN: 0.0050, AO: 0.0008, AP: 0.0374, AQ:-0.0210, AR:-0.0002, AS:-0.0003, AT: 0.0002, AU_: 0.0003, AV: 0.0003, AW: 0.0003, AX: 5.3717, AY: 2.3184, AZ:-0.3364, BA:-0.5298, BB:-0.0297, BC:-0.0011, BD:-0.0001, BE: 0.0224, BF:-0.0941, BG:-0.0914, BH: 0.0116, BI: 0.0083, BJ:-0.0654, BK: 0.0945, BL:-0.0011, BM:-0.0003, BN:-0.0002, BO:-0.0006, BP:-0.0017, BQ:-0.0038, BR: 4.0188, BS: 0.4056, BT:-0.0017, BU:-0.0062, BV: 0.2948, BW: 0.0895, BX: 0.0078, BY: 0.0002, BZ:-0.0093, CA: 0.1061 },
   Mars: { A:-8.2123, B: 16.2573, C: 0.0016, D:-3.3182, E: 0.7671, F:-0.3085, G:-2.1949, H: 0.0160, I: 0.4772, J: 0.0269, K: 0.0915, L: 17.1788, M:-0.9760, N: 2.2305, O: 8.4951, P: 0.0080, Q: 0.0121, R:-0.3058, S: 0.0333, U:-1.0749, V:-5.8941, W:-0.9705, X:-0.4407, Y:-1.0765, Z:-24.5575, AA: 3.6196, AB: 3.5386, AC: 0.0024, AD:-0.2632, AE:-3.4237, AF: 1.7427, AG: 0.3460, AH:-12.8978, AI: 3.1198, AJ:-0.0493, AK:-0.2905, AL:-0.0297, AM: 0.0024, AN:-0.1040, AO:-0.0245, AP:-0.6279, AQ: 0.3566, AR:-0.0009, AS: 0.0002, AT:-0.0001, AU_: 0.0003, AV: 0.0008, AW: 0.0004, AX: 0.3097, AY:-0.5709, AZ:-0.1550, BA:-0.5224, BB: 0.0803, BC:-0.1413, BD:-0.0149, BE: 0.0176, BF: 0.4007, BG: 0.2010, BH: 0.1250, BI: 0.1217, BJ: 0.3706, BK:-0.0092, BL: 0.0003, BM: 0.0016, BN: 0.0080, BO: 0.1730, BP: 0.0142, BQ: 0.1064 },
-  Jupiter: { A: 69.1848, B:-42.9693, C:-0.0128, D:-140.3998, E: 6.7515, F:-4.3344, G:-6.8345, H:-0.0119, I:-1.4119, J:-0.1387, K: 0.1450, L:-747.1194, M: 117.3576, N: 9.1466, O: 22.0136, P:-0.0807, Q: 0.1030, R:-0.3267, S: 1.2313, U:-25.2758, V: 2018.3318, W:-118.9815, X: 0.1527, Y:-0.2481, Z: 213.6520, AA: 1224.3581, AB: 29.7046, AC: 0.0521, AD: 2.9719, AE:-44.9684, AF: 1.7050, AG: 3.7673, AH:-134.6649, AI:-4135.9464, AJ: 0.0348, AK: 119.2629, AL: 0.0415, AM:-0.0569, AN:-0.4700, AO:-0.5510, AP: 2165.2228, AQ: 34.9216, AR: 0.0651, AS:-0.0592, AT:-0.0014, AU_: 0.0008, AV:-0.3742, AW: 0.4702, AX:-1.3182, AY: 3.4197, AZ: 0.2114, BA:-0.7380, BB: 0.0477, BC:-0.0445, BD:-0.0119, BE:-0.0010, BF: 0.7373, BG:-0.4732, BH: 11.3589, BI: 17.8085, BJ:-3.1409, BK:-0.5050, BL: 0.0634, BM: 0.0376, BN: 0.0029, BO:-34.0631, BP: 22.9049, BQ:-2607.2531 },
-  Saturn: { A: 644.8568, B: 1074.8533, C:-0.0955, D: 883.8083, E:-397.0938, F: 89.1238, G: 34.4763, H: 0.8956, I: 7.6794, J:-9.0784, K: 16.7274, L:-12605.2330, M: 30059.5705, N:-3.1441, O: 932.7570, P: 0.9739, Q:-0.5925, R: 14.0781, S:-2.8744, U: 3382.8941, V: 61753.2240, W: 11409.2034, X:-12.1690, Y: 19.7794, Z:-10258.3250, AA:-54835.9924, AB:-253.8384, AC:-0.9902, AD:-35.6725, AE:-226.6976, AF:-165.1595, AG: 85.8636, AH:-6833.6393, AI: 363873.2477, AJ:-0.6390, AK:-8654.4971, AL: 0.5468, AM: 0.9246, AN: 8.4229, AO:-97.0354, AP:-421663.8431, AQ:-9677.7387, AR:-0.0245, AS:-0.0286, AT:-1.7462, AU_:-3.3959, AV: 0.4450, AW:-0.7762, AX: 10.1445, AY:-0.7210, AZ:-1.8632, BA:-0.2268, BB:-0.4590, BC:-0.0850, BD: 0.0181, BE: 0.0963, BF:-4.9041, BG:-27.8626, BH: 27.9005, BI: 206.0661, BJ: 22.2390, BK: 27.0002, BL:-0.2152, BM: 0.1472, BN:-1.0314, BO: 1663.3925, BP:-694.1966, BQ: 971254.4757 },
-  Uranus: { A: 9.5522, B:-710.9466, C:-0.0094, D: 29.0310, E: 482.8929, F:-132.0576, G: 11.3869, H: 1.3013, I: 19.1616, J:-1.3274, K:-0.5033, L: 377.3855, M:-3950.8538, N: 228.3179, O:-280.5100, P:-0.0477, Q: 0.0985, R: 2.1820, S:-0.3482, U:-9024.1667, V:-10588.7007, W:-740.4747, X:-14.4695, Y:-6.1043, Z: 13456.7749, AA: 2646.1167, AB:-209.6150, AC: 0.0181, AD:-128.1971, AE:-3503.8794, AF: 95.1803, AG: 35.9623, AH: 2187.6833, AI: 10291.7851, AJ: 0.2673, AK: 48697.0045, AL: 0.1277, AM:-0.1862, AN: 23.9117, AO: 9.0758, AP: 13351.4529, AQ: 55944.7528, AR: 0.0393, AS: 0.0110, AT: 0.0007, AU_:0, AV:-0.8029, AW:-0.2231, AX: 10.4838, AY: 5.4274, AZ:-0.4378, BA:-0.4792, BB: 0.3245, BC:-0.2063, BD:-0.0174, BE: 0.0138, BF:-17.0678, BG: 7.3315, BH:-695.0787, BI: 1335.0221, BJ:-22.8180, BK:-4.2407, BL:-0.4420, BM:-0.2158, BN: 0.0248, BO:-16542.8887, BP: 338.6799, BQ: 84546.3473 },
-  Neptune: { A:-848.9619, B: 1234.0209, C:-0.0022, D:-666.5590, E:-410.4095, F:-546.8155, G: 59.8484, H:-0.5619, I:-43.7676, J:-9.6213, K:-0.4478, L: 50070.7976, M: 115610.8949, N: 893.5536, O: 146.3949, P: 0.0294, Q: 0.1475, R: 4.5340, S: 1.2127, U: 15132.7629, V:-737511.3651, W: 11194.6671, X: 17.7030, Y:-2.1584, Z:-37377.3399, AA:-44044.5772, AB:-1811.2178, AC: 0.1206, AD: 582.4035, AE:-21275.4552, AF: 72.1120, AG: 199.5595, AH:-1195.7841, AI: 246381.6321, AJ:-0.0264, AK: 487789.8816, AL: 0.1233, AM: 0.0055, AN: 139.5811, AO: 6.7958, AP:-3009985.4346, AQ:-177338.4844, AR: 0.0010, AS:0, AT:0, AU_:0, AV:-0.0294, AW: 0.0045, AX: 8.5959, AY: 17.8776, AZ:-0.3495, BA:-0.7002, BB: 0.7282, BC:-0.6356, BD:-0.0243, BE: 0.0209, BF: 7.9095, BG:-5.3288, BH: 1572.0165, BI: 2743.2549, BJ: 16.9888, BK:-3.4627, BL: 0.1678, BM:-0.0043, BN:-0.0389, BO:-161818.0503, BP: 1617.3342, BQ: 26371058.3238 },
+  Jupiter: { A: 69.1838, B:-42.9808, C:-0.0128, D:-140.3991, E: 6.7513, F:-4.3345, G:-6.8345, H:-0.0119, I:-1.4119, J:-0.1387, K: 0.1450, L:-747.1049, M: 117.3523, N: 9.1467, O: 22.0140, P:-0.0807, Q: 0.1030, R:-0.3267, S: 1.2313, U:-25.2752, V: 2018.2823, W:-118.9844, X: 0.1527, Y:-0.2481, Z: 213.7114, AA: 1224.3659, AB: 29.7051, AC: 0.0521, AD: 2.9719, AE:-44.9687, AF: 1.7050, AG: 3.7672, AH:-134.6666, AI:-4135.9768, AJ: 0.0348, AK: 119.2644, AL: 0.0415, AM:-0.0569, AN:-0.4700, AO:-0.5510, AP: 2165.2511, AQ: 34.9210, AR: 0.0651, AS:-0.0592, AT:-0.0014, AU_: 0.0008, AV:-0.3742, AW: 0.4702, AX:-1.3183, AY: 3.4198, AZ: 0.2114, BA:-0.7380, BB: 0.0477, BC:-0.0445, BD:-0.0119, BE:-0.0010, BF: 0.7373, BG:-0.4731, BH: 11.3588, BI: 17.8086, BJ:-3.1409, BK:-0.5050, BL: 0.0634, BM: 0.0376, BN: 0.0029, BO:-34.0637, BP: 22.9048, BQ:-2607.2816 },
+  Saturn: { A: 644.8654, B: 1074.8492, C:-0.0955, D: 883.6770, E:-397.1245, F: 89.1149, G: 34.4699, H: 0.8953, I: 7.6777, J:-9.0791, K: 16.7275, L:-12605.4466, M: 30060.2149, N:-3.1352, O: 932.7996, P: 0.9739, Q:-0.5925, R: 14.0789, S:-2.8744, U: 3383.2067, V: 61754.4887, W: 11408.9513, X:-12.1671, Y: 19.7798, Z:-10258.3004, AA:-54833.7301, AB:-253.7742, AC:-0.9902, AD:-35.6649, AE:-226.7689, AF:-165.1610, AG: 85.8532, AH:-6833.9703, AI: 363853.3857, AJ:-0.6389, AK:-8653.3852, AL: 0.5468, AM: 0.9244, AN: 8.4242, AO:-97.0360, AP:-421655.3418, AQ:-9678.7708, AR:-0.0245, AS:-0.0286, AT:-1.7463, AU_:-3.3960, AV: 0.4451, AW:-0.7761, AX: 10.1432, AY:-0.7199, AZ:-1.8631, BA:-0.2269, BB:-0.4590, BC:-0.0849, BD: 0.0181, BE: 0.0963, BF:-4.9037, BG:-27.8604, BH: 27.9083, BI: 206.0414, BJ: 22.2390, BK: 26.9984, BL:-0.2152, BM: 0.1472, BN:-1.0314, BO: 1663.0398, BP:-694.1654, BQ: 971235.9455 },
+  Uranus: { A: 9.5384, B:-710.8846, C:-0.0094, D: 28.9915, E: 482.8139, F:-132.0577, G: 11.3865, H: 1.3013, I: 19.1617, J:-1.3268, K:-0.5032, L: 377.8749, M:-3949.0345, N: 228.3168, O:-280.4548, P:-0.0476, Q: 0.0985, R: 2.1817, S:-0.3482, U:-9022.6661, V:-10593.0500, W:-740.2706, X:-14.4697, Y:-6.1038, Z: 13455.5962, AA: 2645.6675, AB:-209.6034, AC: 0.0180, AD:-128.1984, AE:-3503.8427, AF: 95.1691, AG: 35.9652, AH: 2187.1338, AI: 10302.8127, AJ: 0.2673, AK: 48696.2955, AL: 0.1277, AM:-0.1862, AN: 23.9061, AO: 9.0742, AP: 13314.4614, AQ: 55935.2574, AR: 0.0393, AS: 0.0110, AT: 0.0007, AU_:0, AV:-0.8028, AW:-0.2227, AX: 10.4843, AY: 5.4281, AZ:-0.4378, BA:-0.4792, BB: 0.3245, BC:-0.2063, BD:-0.0174, BE: 0.0138, BF:-17.0677, BG: 7.3318, BH:-695.0909, BI: 1334.9449, BJ:-22.8190, BK:-4.2410, BL:-0.4420, BM:-0.2158, BN: 0.0248, BO:-16542.3968, BP: 338.7438, BQ: 84751.4219 },
+  Neptune: { A:-854.7003, B: 1223.3890, C:-0.0022, D:-671.3934, E:-435.3614, F:-551.3497, G: 59.8737, H:-0.5646, I:-43.8150, J:-9.5926, K:-0.4475, L: 50425.0402, M: 116765.7454, N: 901.1692, O: 162.4152, P: 0.0294, Q: 0.1476, R: 4.5197, S: 1.2126, U: 15880.5183, V:-742969.5784, W: 11307.6338, X: 17.7014, Y:-2.1721, Z:-37063.0943, AA:-44584.5671, AB:-1811.8810, AC: 0.1206, AD: 582.4575, AE:-21459.1801, AF: 72.5992, AG: 200.9709, AH:-1426.9971, AI: 252661.2561, AJ:-0.0265, AK: 491947.3490, AL: 0.1236, AM: 0.0054, AN: 139.1519, AO: 6.7883, AP:-3043805.2727, AQ:-184797.4768, AR: 0.0010, AS:0, AT:0, AU_:0, AV:-0.0295, AW: 0.0047, AX: 8.9620, AY: 17.7859, AZ:-0.3577, BA:-0.6982, BB: 0.7283, BC:-0.6354, BD:-0.0243, BE: 0.0209, BF: 7.9040, BG:-5.3329, BH: 1463.7840, BI: 2771.0626, BJ: 17.0701, BK:-3.3858, BL: 0.1677, BM:-0.0042, BN:-0.0390, BO:-163234.6732, BP: 1621.8065, BQ: 26672936.6087 },
 };
 
 // ─── B3b. Moon post-Meeus correction (fitted to JPL DE440 residuals) ─────
@@ -2909,30 +2916,30 @@ const MOON_CORRECTION = { raSinD: 0.000002, raCosD: -0.005654, raSinMp: -0.00002
 // @AUTO:GRAVITATION_CORRECTION
 const GRAVITATION_CORRECTION = {
   Mercury: [
-    { period: 47.426470, raSin: 0.000200, raCos: -0.000478, decSin: -0.001286, decCos: -0.000649 },
-    { period: 23.713235, raSin: 0.002511, raCos: -0.000081, decSin: -0.000413, decCos: 0.006152 }
+    { period: 47.426470, raSin: 0.000200, raCos: -0.000497, decSin: -0.001285, decCos: -0.000651 },
+    { period: 23.713235, raSin: 0.002511, raCos: -0.000087, decSin: -0.000411, decCos: 0.006151 }
   ],
   Mars: [
-    { period: 2.235327, raSin: 0.003963, raCos: -0.004249, decSin: -0.000718, decCos: 0.000133 },
+    { period: 2.235327, raSin: 0.003963, raCos: -0.004249, decSin: -0.000719, decCos: 0.000134 },
     { period: 2.742730, raSin: 0.000926, raCos: 0.003505, decSin: -0.000044, decCos: 0.000396 }
   ],
   Jupiter: [
-    { period: 12.782259, raSin: 0.000006, raCos: -0.001397, decSin: 0.001840, decCos: -0.000838 },
-    { period: 19.858869, raSin: 0.022972, raCos: -0.005566, decSin: -0.000398, decCos: 0.000107 }
+    { period: 12.782259, raSin: 0.000005, raCos: -0.001399, decSin: 0.001840, decCos: -0.000838 },
+    { period: 19.858869, raSin: 0.022973, raCos: -0.005565, decSin: -0.000399, decCos: 0.000106 }
   ],
   Saturn: [
-    { period: 19.858869, raSin: -0.005438, raCos: -0.005148, decSin: 0.016701, decCos: -0.012291 },
-    { period: 136.086445, raSin: 0.024137, raCos: 0.003950, decSin: -0.001066, decCos: -0.002107 },
-    { period: 71.740907, raSin: 0.005223, raCos: -0.020661, decSin: 0.000989, decCos: 0.005621 },
-    { period: 45.362148, raSin: 0.013310, raCos: -0.002623, decSin: -0.008450, decCos: 0.000262 }
+    { period: 19.858869, raSin: -0.005439, raCos: -0.005145, decSin: 0.016697, decCos: -0.012293 },
+    { period: 136.086445, raSin: 0.024145, raCos: 0.003954, decSin: -0.001067, decCos: -0.002114 },
+    { period: 71.740907, raSin: 0.005227, raCos: -0.020670, decSin: 0.000985, decCos: 0.005629 },
+    { period: 45.362148, raSin: 0.013312, raCos: -0.002621, decSin: -0.008450, decCos: 0.000254 }
   ],
   Uranus: [
-    { period: 171.429959, raSin: 0.011155, raCos: 0.006563, decSin: 0.000288, decCos: 0.000733 },
-    { period: 13.812127, raSin: -0.002183, raCos: -0.014433, decSin: 0.000038, decCos: -0.001093 }
+    { period: 171.429959, raSin: 0.011154, raCos: 0.006576, decSin: 0.000294, decCos: 0.000718 },
+    { period: 13.812127, raSin: -0.002183, raCos: -0.014433, decSin: 0.000039, decCos: -0.001093 }
   ],
   Neptune: [
-    { period: 12.782259, raSin: -0.000202, raCos: -0.009368, decSin: -0.000005, decCos: -0.000272 },
-    { period: 35.870454, raSin: 0.001355, raCos: -0.004908, decSin: 0.000029, decCos: -0.000076 }
+    { period: 12.782259, raSin: -0.000201, raCos: -0.009367, decSin: -0.000004, decCos: -0.000272 },
+    { period: 35.870454, raSin: 0.001357, raCos: -0.004908, decSin: 0.000031, decCos: -0.000077 }
   ],
 };
 
@@ -2942,8 +2949,8 @@ const GRAVITATION_CORRECTION = {
 // Source: public/input/fitted-coefficients.json
 // @AUTO:ELONGATION_CORRECTION
 const ELONGATION_CORRECTION = {
-  Venus: { cosVwE_sinEl_ra: -0.000195, cosVwE_sinEl_dec: -0.000095, sinEl_d_ra: 0.000855, sinEl_d_dec: -0.000468, sinVwE_sinEl_ra: -0.000724, sinVwE_sinEl_dec: -0.000599, sin2VwE_sinEl_ra: 0.000980, sin2VwE_sinEl_dec: 0.007360, cos2VwE_sinEl_ra: 0.001644, cos2VwE_sinEl_dec: 0.006513, cos4VwE_sinEl_ra: -0.004497, cos4VwE_sinEl_dec: -0.000960, sin4VwE_sinEl_ra: 0.001718, sin4VwE_sinEl_dec: 0.001133, sinVwE_sinEl_d2_ra: 0.000455, sinVwE_sinEl_d2_dec: 0.000209, cos3VwE_sinEl_ra: -0.000495, cos3VwE_sinEl_dec: 0.001940, sin3VwE_sinEl_ra: -0.010583, sin3VwE_sinEl_dec: -0.007427, sin2syn_ra: -0.001309, sin2syn_dec: -0.000251, cos1syn_ra: 0.000605, cos1syn_dec: -0.000767, sin3VwE_sinEl_d2_ra: 0.001743, sin3VwE_sinEl_d2_dec: 0.002461, sin2VwE_sinEl_d2_ra: -0.000149, sin2VwE_sinEl_d2_dec: -0.001140, cos2VwE_sinEl_d2_ra: -0.000891, cos2VwE_sinEl_d2_dec: -0.001697, cosEl_d_ra: 0.000512, cosEl_d_dec: -0.000290, cosVwE_cosEl_d_ra: -0.007225, cosVwE_cosEl_d_dec: 0.002820, sinVwE_cosEl_d_ra: -0.006634, sinVwE_cosEl_d_dec: 0.000392, cosEl_d2_ra: -0.000363, cosEl_d2_dec: -0.000096, cosVwE_cosEl_d2_ra: 0.000639, cosVwE_cosEl_d2_dec: -0.000653, sinVwE_cosEl_d2_ra: 0.000339, sinVwE_cosEl_d2_dec: 0.000408 },
-  Mars: { cosVwE_sinEl_ra: -0.000875, cosVwE_sinEl_dec: -0.003834, sinEl_d_ra: 0.003302, sinEl_d_dec: -0.013200, sinVwE_sinEl_ra: -0.006307, sinVwE_sinEl_dec: -0.000118, sin2VwE_sinEl_ra: -0.000584, sin2VwE_sinEl_dec: 0.017373, cos2VwE_sinEl_ra: 0.003369, cos2VwE_sinEl_dec: 0.001156, cos4VwE_sinEl_ra: 0.005336, cos4VwE_sinEl_dec: -0.010682, sin4VwE_sinEl_ra: -0.021742, sin4VwE_sinEl_dec: 0.004819, sinVwE_sinEl_d2_ra: 0.005297, sinVwE_sinEl_d2_dec: -0.001801, cos3VwE_sinEl_ra: -0.017348, cos3VwE_sinEl_dec: 0.002619, sin3VwE_sinEl_ra: 0.013702, sin3VwE_sinEl_dec: -0.004251, sin2syn_ra: 0.002806, sin2syn_dec: -0.012816, cos1syn_ra: -0.000914, cos1syn_dec: 0.010111, sin3VwE_sinEl_d2_ra: -0.035737, sin3VwE_sinEl_d2_dec: 0.002366, sin2VwE_sinEl_d2_ra: 0.004711, sin2VwE_sinEl_d2_dec: -0.014882, cos2VwE_sinEl_d2_ra: -0.010967, cos2VwE_sinEl_d2_dec: 0.000605, cosEl_d_ra: 0.000334, cosEl_d_dec: -0.002091, cosVwE_cosEl_d_ra: -0.000446, cosVwE_cosEl_d_dec: 0.005493, sinVwE_cosEl_d_ra: -0.000053, sinVwE_cosEl_d_dec: -0.002066, cosEl_d2_ra: 0.000072, cosEl_d2_dec: -0.001298, cosVwE_cosEl_d2_ra: 0.000345, cosVwE_cosEl_d2_dec: -0.002654, sinVwE_cosEl_d2_ra: 0.000313, sinVwE_cosEl_d2_dec: -0.000515 },
+  Venus: { cosVwE_sinEl_ra: -0.000135, cosVwE_sinEl_dec: 0.000267, sinEl_d_ra: 0.000574, sinEl_d_dec: -0.000494, sinVwE_sinEl_ra: -0.000834, sinVwE_sinEl_dec: -0.000372, sin2VwE_sinEl_ra: 0.001120, sin2VwE_sinEl_dec: 0.007330, cos2VwE_sinEl_ra: 0.001733, cos2VwE_sinEl_dec: 0.006612, cos4VwE_sinEl_ra: -0.004515, cos4VwE_sinEl_dec: -0.000983, sin4VwE_sinEl_ra: 0.001715, sin4VwE_sinEl_dec: 0.001151, sinVwE_sinEl_d2_ra: 0.000404, sinVwE_sinEl_d2_dec: -0.000047, cos3VwE_sinEl_ra: -0.000497, cos3VwE_sinEl_dec: 0.001937, sin3VwE_sinEl_ra: -0.010661, sin3VwE_sinEl_dec: -0.007444, sin2syn_ra: -0.001254, sin2syn_dec: -0.000249, cos1syn_ra: 0.000487, cos1syn_dec: -0.000780, sin3VwE_sinEl_d2_ra: 0.001789, sin3VwE_sinEl_d2_dec: 0.002460, sin2VwE_sinEl_d2_ra: -0.000206, sin2VwE_sinEl_d2_dec: -0.001109, cos2VwE_sinEl_d2_ra: -0.000903, cos2VwE_sinEl_d2_dec: -0.001688, cosEl_d_ra: 0.000316, cosEl_d_dec: -0.000383, cosVwE_cosEl_d_ra: -0.007652, cosVwE_cosEl_d_dec: 0.003919, sinVwE_cosEl_d_ra: -0.007723, sinVwE_cosEl_d_dec: 0.001901, cosEl_d2_ra: -0.000298, cosEl_d2_dec: 0.000024, cosVwE_cosEl_d2_ra: 0.001205, cosVwE_cosEl_d2_dec: -0.001736, sinVwE_cosEl_d2_ra: 0.001427, sinVwE_cosEl_d2_dec: -0.001142 },
+  Mars: { cosVwE_sinEl_ra: -0.000875, cosVwE_sinEl_dec: -0.003831, sinEl_d_ra: 0.003302, sinEl_d_dec: -0.013202, sinVwE_sinEl_ra: -0.006307, sinVwE_sinEl_dec: -0.000119, sin2VwE_sinEl_ra: -0.000584, sin2VwE_sinEl_dec: 0.017373, cos2VwE_sinEl_ra: 0.003369, cos2VwE_sinEl_dec: 0.001158, cos4VwE_sinEl_ra: 0.005336, cos4VwE_sinEl_dec: -0.010682, sin4VwE_sinEl_ra: -0.021742, sin4VwE_sinEl_dec: 0.004820, sinVwE_sinEl_d2_ra: 0.005297, sinVwE_sinEl_d2_dec: -0.001799, cos3VwE_sinEl_ra: -0.017348, cos3VwE_sinEl_dec: 0.002619, sin3VwE_sinEl_ra: 0.013702, sin3VwE_sinEl_dec: -0.004251, sin2syn_ra: 0.002806, sin2syn_dec: -0.012816, cos1syn_ra: -0.000914, cos1syn_dec: 0.010112, sin3VwE_sinEl_d2_ra: -0.035737, sin3VwE_sinEl_d2_dec: 0.002365, sin2VwE_sinEl_d2_ra: 0.004711, sin2VwE_sinEl_d2_dec: -0.014883, cos2VwE_sinEl_d2_ra: -0.010967, cos2VwE_sinEl_d2_dec: 0.000603, cosEl_d_ra: 0.000334, cosEl_d_dec: -0.002089, cosVwE_cosEl_d_ra: -0.000446, cosVwE_cosEl_d_dec: 0.005487, sinVwE_cosEl_d_ra: -0.000053, sinVwE_cosEl_d_dec: -0.002067, cosEl_d2_ra: 0.000072, cosEl_d2_dec: -0.001300, cosVwE_cosEl_d2_ra: 0.000345, cosVwE_cosEl_d2_dec: -0.002643, sinVwE_cosEl_d2_ra: 0.000313, sinVwE_cosEl_d2_dec: -0.000519 },
 };
 // ─── B4. Obliquity harmonics (fitted) ────────────────────────────────────
 // Source: public/input/fitted-coefficients.json
@@ -3514,7 +3521,11 @@ function calcWobblePeriod(periEclYr, axialYr) {
   const H13 = holisticyearLength / 13;
   const inclICRF = (periEclYr * H13) / (H13 - periEclYr);
   if (Math.abs(axialYr) > 8 * holisticyearLength) return Math.abs(inclICRF);
-  const wobbleRate = Math.abs(1 / axialYr - 1 / inclICRF);
+  // Beat of two absolute rates: sign convention of axial/ICRF is irrelevant —
+  // wobble is the magnitude of the frequency difference, not a signed rate.
+  // This matters for Venus (prograde axial, retrograde ICRF); matches other
+  // planets where axial and ICRF share a sign (result identical).
+  const wobbleRate = Math.abs(1 / Math.abs(axialYr) - 1 / Math.abs(inclICRF));
   return 1 / wobbleRate;
 }
 const mercuryWobblePeriod  = calcWobblePeriod(planets.mercury.perihelionEclipticYears, planets.mercury.axialPrecessionYears);
@@ -3532,13 +3543,15 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Confirmed for Mercury (0.2%), Earth (2%), Mars (0.7%). See docs/37 §Obliquity Cycle Theory.
 // Venus/Neptune: obliquity cycle = ICRF period (8H/100). The two-component formula cancels exactly:
 // mean − A·cos(ω_ICRF·t) + A·cos(ω_obliq·t) = mean when ω_obliq = ω_ICRF → constant obliquity.
-const mercuryObliquityCycle = holisticyearLength * 8 / 3;   // 8H/3 = 894,179 yr (free prediction; Bills 2005 theoretical ~895 kyr)
-const venusObliquityCycle   = 8 * holisticyearLength / 110;  // 8H/110 = 24,387 yr
-const marsObliquityCycle    = 8 * holisticyearLength / 21;   // 8H/21 = 127,740 yr (observed ~124,800 yr, = Jupiter axial)
-const jupiterObliquityCycle = holisticyearLength / 2;        // H/2 = 167,659 yr (prediction, = Mars axial)
-const saturnObliquityCycle  = holisticyearLength / 3;        // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
-const uranusObliquityCycle  = holisticyearLength / 2;         // H/2 = 167,659 yr (prediction, tentative)
-const neptuneObliquityCycle = 8 * holisticyearLength / 100;  // 8H/100 = ICRF period → cancels with inclination → constant obliquity
+// Aliases: source of truth is planets.<key>.obliquityCycle (declared in the
+// planet blocks above). Kept as named constants for compact downstream use.
+const mercuryObliquityCycle = planets.mercury.obliquityCycle;   // 8H/3 = 894,179 yr (Bills 2005 ~895 kyr, 0.2% match)
+const venusObliquityCycle   = planets.venus.obliquityCycle;      // 8H/110 = 24,387 yr (= ICRF, two-component cancellation)
+const marsObliquityCycle    = planets.mars.obliquityCycle;       // 8H/21 = 127,740 yr (observed ~124,800 yr, = Jupiter axial)
+const jupiterObliquityCycle = planets.jupiter.obliquityCycle;    // H/2 = 167,659 yr (prediction, = Mars axial)
+const saturnObliquityCycle  = planets.saturn.obliquityCycle;     // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
+const uranusObliquityCycle  = planets.uranus.obliquityCycle;     // H/2 = 167,659 yr (prediction, tentative)
+const neptuneObliquityCycle = planets.neptune.obliquityCycle;    // 8H/100 = ICRF period → cancels with inclination → constant obliquity
 
 // Mean obliquity (analytical, averaged over 8H = Grand Holistic Octave)
 // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
@@ -5673,9 +5686,9 @@ const jupiter = {
   _eccentricityKey: 'eccentricityJupiter',
   _eocFraction: planets.jupiter.eocFraction,
   perihelionPhaseJ2000: -planets.jupiter.startpos * (Math.PI / 180)
-    + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / (holisticyearLength / 5))
+    + (Math.PI * 2 / (holisticyearLength / jupiterSolarYearCount) - Math.PI * 2 / planets.jupiter.perihelionEclipticYears)
     * (planets.jupiter.perihelionRef_JD - startmodelJD) / meansolaryearlengthinDays,
-  perihelionPrecessionRate: Math.PI * 2 / (holisticyearLength / 5),
+  perihelionPrecessionRate: Math.PI * 2 / planets.jupiter.perihelionEclipticYears,
 
   size: (diameters.jupiterDiameter/ currentAUDistance)*100,
   color: 0xCDC2B2,
@@ -25019,14 +25032,16 @@ function setupGUI() {
     addConst(moonFolder, moonVals, 'startMoon', 'Start pos. Moon', 'Initial Moon position angle.');
 
     // -- Per-planet data (Mercury through Neptune) — model-parameters.json only --
+    // Numeric values always source from planets.X.perihelionEclipticYears
+    // (single source of truth). Formula strings are human-readable labels.
     const planetPeriLabels = {
       mercury: 'H/(1+3/8) \u2248 ' + Math.round(planets.mercury.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
-      venus: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr',
-      mars: 'H/(4+3/8) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
-      jupiter: 'H/5 = ' + Math.round(holisticyearLength / 5).toLocaleString('en-US') + ' yr',
-      saturn: '\u2013H/8 = \u2013' + Math.round(holisticyearLength / 8).toLocaleString('en-US') + ' yr',
-      uranus: 'H/3 = ' + Math.round(holisticyearLength / 3).toLocaleString('en-US') + ' yr',
-      neptune: 'H\u00D72 = ' + (holisticyearLength * 2).toLocaleString('en-US') + ' yr',
+      venus:   '\u20138H/6 = '     + Math.round(planets.venus.perihelionEclipticYears).toLocaleString('en-US')   + ' yr',
+      mars:    'H/(4+3/8) \u2248 ' + Math.round(planets.mars.perihelionEclipticYears).toLocaleString('en-US')    + ' yr',
+      jupiter: 'H/5 = '            + Math.round(planets.jupiter.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
+      saturn:  '\u2013H/8 = '      + Math.round(planets.saturn.perihelionEclipticYears).toLocaleString('en-US')  + ' yr',
+      uranus:  'H/3 = '            + Math.round(planets.uranus.perihelionEclipticYears).toLocaleString('en-US')  + ' yr',
+      neptune: 'H\u00D72 = '       + Math.round(planets.neptune.perihelionEclipticYears).toLocaleString('en-US') + ' yr',
     };
     const planetModelKeys = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const planetModelNames = { mercury: 'Mercury', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune' };

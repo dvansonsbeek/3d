@@ -37,9 +37,9 @@ console.log('');
 
 const planets = {
   mercury: { name: 'Mercury', eclP: C.planets.mercury.perihelionEclipticYears, eclExpr: '8H/11' },
-  venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   eclExpr: '2H' },
+  venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   eclExpr: '-8H/6' },
   earth:   { name: 'Earth',   eclP: H/16,                                      eclExpr: 'H/16' },
-  mars:    { name: 'Mars',    eclP: H/(35/8),                                  eclExpr: '8H/35' },
+  mars:    { name: 'Mars',    eclP: C.planets.mars.perihelionEclipticYears,    eclExpr: '8H/35' },
   jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, eclExpr: 'H/5' },
   saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  eclExpr: '-H/8' },
   uranus:  { name: 'Uranus',  eclP: C.planets.uranus.perihelionEclipticYears,  eclExpr: 'H/3' },
@@ -47,7 +47,7 @@ const planets = {
 };
 
 const icrfExpr = {
-  mercury: '-8H/93', venus: '-2H/25', earth: '+H/3', mars: '-8H/69',
+  mercury: '-8H/93', venus: '-8H/110', earth: '+H/3', mars: '-8H/69',
   jupiter: '-H/8', saturn: '-H/21', uranus: '-H/10', neptune: '-2H/25',
 };
 

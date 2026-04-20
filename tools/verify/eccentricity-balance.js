@@ -40,24 +40,22 @@ function computeEccentricity(currentYear, balancedYear, cyclePeriod, base, ampli
   return root + (-amplitude - h1 * cosθ) * cosθ;
 }
 
-// Wobble period calculation (mirrors calcWobblePeriod in script.js)
+// Wobble period calculation (mirrors calcWobblePeriod in script.js).
+// Uses abs of both rates: wobble is the magnitude of the frequency difference,
+// not a signed rate. Needed so Venus (prograde axial, retrograde ICRF) gives
+// the slow beat consistent with other planets.
 function calcWobblePeriod(periEclYr, axialYr) {
   const H13 = C.H / 13;
   const inclICRF = (periEclYr * H13) / (H13 - periEclYr);
-  const wobbleRate = Math.abs(1 / axialYr - 1 / inclICRF);
+  const wobbleRate = Math.abs(1 / Math.abs(axialYr) - 1 / Math.abs(inclICRF));
   return 1 / wobbleRate;
 }
 
-// Axial precession periods (from script.js)
-const axialPrecessionYears = {
-  mercury: -C.planets.mercury.perihelionEclipticYears,  // Cassini state: locked to orbital plane
-  venus:    C.H * 3 / 34,
-  mars:    -C.H / 2,
-  jupiter: -C.H * 3 / 8,
-  saturn:  -C.H * 4 / 3,
-  uranus:   C.H * 610,
-  neptune: -C.H * 68,
-};
+// Axial precession periods — sourced dynamically from model-parameters.json
+// via C.planets (single source of truth).
+const axialPrecessionYears = Object.fromEntries(
+  Object.keys(C.planets).map(p => [p, C.planets[p].axialPrecessionYears])
+);
 
 // Wobble periods for all planets
 const wobblePeriods = {};

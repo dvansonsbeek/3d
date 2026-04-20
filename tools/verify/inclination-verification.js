@@ -342,8 +342,8 @@ console.log('');
 for (const [name, p] of Object.entries(currentCodeValues)) {
   const periodExpr =
     name === 'mercury' ? 'holisticyearLength/(1+(3/8))' :
-    name === 'venus' ? 'holisticyearLength*2' :
-    name === 'mars' ? 'holisticyearLength/(4+(1/3))' :
+    name === 'venus' ? '-holisticyearLength*8/6' :
+    name === 'mars' ? 'holisticyearLength/(4+(3/8))' :
     name === 'jupiter' ? 'holisticyearLength/5' :
     name === 'saturn' ? '-holisticyearLength/8' :
     name === 'uranus' ? 'holisticyearLength/3' :
