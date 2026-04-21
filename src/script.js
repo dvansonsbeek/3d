@@ -21697,31 +21697,31 @@ function ghoComputeData() {
       axial:  { observed: '~300 kyr', source: 'Peale 2006 (theoretical); Cassini state (MESSENGER) \u2192 = asc. node', error: '0.7%' },
       ecl:    { observed: '~227 kyr (~570\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '231,842 yr (s\u2081)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '231,842 yr (s\u2081)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: '~895 kyr', source: 'Bills 2005 (theoretical); free prediction via Fibonacci decomposition', error: '0.1%' },
       ecc:    { predicted: true, source: 'Free prediction (beat of axial \u00d7 ICRF perihelion)' },
     },
     venus: {
       axial:  { observed: '~29 kyr', source: 'Cottereau & Souchay 2009' },
-      ecl:    { observed: '~324 kyr (~400\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
+      ecl:    { observed: '~0\u2033/cy', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '183,830 yr (s\u2082)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '183,830 yr (s\u2082)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: 'Constant (tidally damped)', source: 'Correia & Laskar 2003; obliq cycle = ICRF \u2192 cancels' },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
     earth: {
       axial:  { observed: '25,771 yr', source: 'IAU 2006 (50.29\u2033/yr)', error: '0.1%' },
       ecl:    { observed: '~20,957 yr (~6,186\u2033/cy)', source: 'Derived (axial + inclination rates)' },
-      icrf:   { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3' },
-      asc:    { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3' },
+      icrf:   { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
+      asc:    { observed: '68,753 yr (s\u2083)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: '~41,000 yr', source: 'Laskar+ 1993 (Milankovitch)', error: '2%' },
-      ecc:    { observed: '~100 kyr / ~413 kyr', source: 'Berger 1978 (Milankovitch eccentricity)' },
+      ecc:    { observed: '~100 kyr / ~413 kyr', source: 'Berger 1978 (Milankovitch, theoretical)', theory: true },
     },
     mars: {
       axial:  { observed: '170,400 yr', source: 'Konopliv+ 2020 (InSight/RISE, 7604\u00B16 mas/yr)', error: '1.7%' },
       ecl:    { observed: '~81 kyr (~1,600\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '72,991 yr (s\u2084)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '72,991 yr (s\u2084)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: '~124,800 yr', source: 'Ward 1973; Laskar+ 2004 (modes s\u2083+s\u2084)', error: '2.4%' },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
@@ -21729,7 +21729,7 @@ function ghoComputeData() {
       axial:  { observed: '113\u2013136 kyr', source: 'Saillenfest+ 2020 (A&A)' },
       ecl:    { observed: '~72 kyr (~1,800\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '\u221E (s\u2085=0, inv. plane)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '\u221E (s\u2085=0, inv. plane)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2020', predicted: true },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
@@ -21737,7 +21737,7 @@ function ghoComputeData() {
       axial:  { observed: '400\u2013480 kyr', source: 'Saillenfest+ 2021 (Nature Astron.)' },
       ecl:    { observed: '~38 kyr (~3,400\u2033/cy, retro)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '49,187 yr (s\u2086)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '49,187 yr (s\u2086)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: 'No regular cycle', source: 'Saillenfest+ 2021', predicted: true },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
@@ -21745,7 +21745,7 @@ function ghoComputeData() {
       axial:  { observed: '~40\u201350 Myr', source: 'Saillenfest+ 2022 (A&A)' },
       ecl:    { observed: '~118 kyr (~1,100\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '433,010 yr (s\u2087)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '433,010 yr (s\u2087)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: 'Frozen at ~98\u00B0', source: 'Saillenfest+ 2022', predicted: true },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
@@ -21753,7 +21753,7 @@ function ghoComputeData() {
       axial:  { observed: '~70 Myr (est.)', source: 'Ward & Hamilton 2004' },
       ecl:    { observed: '~648 kyr (~200\u2033/cy)', source: 'WebGeoCalc (JPL/NAIF, 1900\u20132100)' },
       icrf:   { predicted: true, source: 'Model prediction' },
-      asc:    { observed: '1,872,832 yr (s\u2088)', source: 'Laskar 2004 Table 3' },
+      asc:    { observed: '1,872,832 yr (s\u2088)', source: 'Laskar 2004 Table 3 (secular theory)', theory: true },
       obliq:  { observed: 'Constant (~28\u00B0)', source: 'Rogoszinski & Hamilton 2020; obliq cycle = ICRF \u2192 cancels' },
       ecc:    { predicted: true, source: 'Model prediction (wobble period)' },
     },
@@ -21776,8 +21776,13 @@ function ghoComputeData() {
     const mkHover = (sk, period) => {
       const ref = s[sk];
       const yr = Math.round(Math.abs(period)).toLocaleString('en-US');
-      const status = ref.predicted ? '\u26AB Prediction' : (ref.error ? `\u2705 Confirmed (${ref.error})` : '\u2705 Observed');
-      return `Model: ${yr} yr\nObserved: ${ref.observed}\nSource: ${ref.source}\n${status}`;
+      const label = ref.theory ? 'Theory' : 'Observed';
+      let status;
+      if (ref.predicted) status = '\u26AB Prediction';
+      else if (ref.theory) status = '\uD83D\uDD2C Theoretical';
+      else if (ref.error) status = `\u2705 Confirmed (${ref.error})`;
+      else status = '\u2705 Observed';
+      return `Model: ${yr} yr\n${label}: ${ref.observed}\nSource: ${ref.source}\n${status}`;
     };
 
     rows.push({

@@ -64,7 +64,7 @@ precession hierarchy.
 | Planet | Observed ("/cy) | Observed period | H Ratio | H-predicted ("/cy) | H-predicted period |
 |--------|----------------|-----------------|---------|-------------------|-------------------|
 | Mercury | ~570 | ~227 kyr | H × 8/11 | 531.4 | 243,867 yr |
-| Venus | ~400 | ~324 kyr | −8H/6 | −289.9 | −447,089 yr (r) |
+| Venus | ~0 | — | −8H/6 | −289.9 | −447,089 yr (r) |
 | Earth | ~6,186 | ~20,957 yr | H/16 | 6,186.5 | 20,957 yr |
 | Mars | ~1,600 | ~81 kyr | H × 8/35 | 1,691.0 | 76,644 yr |
 | Jupiter | ~1,800 | ~72 kyr | H/5 | 1,932.5 | 67,063 yr |

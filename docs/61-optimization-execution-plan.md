@@ -402,13 +402,13 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 
 | Planet | PerihelionEclipticYears | Fibonacci | Arcsec/century |
 |--------|----------------------|-----------|----------------|
-| Mercury | H/(1+3/8) | — | ~575 |
+| Mercury | H/(1+3/8) | — | ~570 |
 | Venus | −8H/6 | 6 (retrograde) | ~−290 (model) |
 | Mars | H/(4+3/8) | — | ~1,600 |
 | Jupiter | H/5 | 5 | ~1,800 |
 | Saturn | −H/8 | 8 (retrograde) | ~−3,400 |
 | Uranus | H/3 | 3 | ~1,100 |
-| Neptune | H×2 | — | ~400 |
+| Neptune | H×2 | — | ~200 |
 
 Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter, Saturn, and Uranus use clean Fibonacci divisions. Venus and Saturn both precess ecliptic-retrograde.
 

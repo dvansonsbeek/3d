@@ -796,7 +796,7 @@ A **Precession Breakdown** feature that:
 
 For Mercury, this breakdown historically demonstrated:
 - Newtonian mechanics predicts ~532 arcsec/century
-- Observed value is ~575 arcsec/century
+- Observed value is ~570 arcsec/century
 - The ~43 arcsec/century discrepancy was unexplained until Einstein's General Relativity (1915)
 
 This feature brings that same analysis to all planets!

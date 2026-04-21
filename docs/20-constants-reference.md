@@ -563,8 +563,8 @@ Observed linear trend rates from JPL SPICE/WebGeoCalc. These fluctuate over time
 
 | Planet | Rate (arcsec/cy) | Range | Source |
 |--------|-----------------|-------|--------|
-| Mercury | ~570–575 | min–max | JPL SPICE |
-| Venus | ~0–400 | min–max | JPL SPICE |
+| Mercury | ~570 | single value | JPL SPICE |
+| Venus | ~0 | single value | JPL SPICE |
 | Earth | 1163 | single value | JPL SPICE |
 | Mars | ~1550–1650 | min–max | JPL SPICE |
 | Jupiter | ~800–1800 | min–max | JPL SPICE |

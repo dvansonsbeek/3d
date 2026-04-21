@@ -134,7 +134,7 @@ perihelion direction.
 
 | Planet  | Precession period          | Rate (arcsec/century) |
 |---------|----------------------------|-----------------------|
-| Mercury | H / (1 + 3/8) = H / 1.375 | ~575                  |
+| Mercury | H / (1 + 3/8) = H / 1.375 | ~570                  |
 | Venus   | −8H / 6                    | ~−290 (model)         |
 
 Mercury has the fastest perihelion precession of any planet, famously
