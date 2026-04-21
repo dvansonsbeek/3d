@@ -269,7 +269,7 @@ Key behavioral notes:
 | Planet | Ecliptic formula | Ecliptic period (yr) | ICRF period (yr) | ICRF direction |
 |--------|------------------|---------------------|------------------|----------------|
 | Mercury | H × 8/11 | 243,867 | 28,844 | Retrograde |
-| Venus | H × 2 | 670,634 | 26,825 | Retrograde |
+| Venus | −8H/6 | 447,089 | 24,387 | Retrograde |
 | Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | 111,772 | **Prograde (sole)** |
 | Mars | H × 8/35 | 76,644 | 38,877 | Retrograde |
 | Jupiter | H / 5 | 67,063 | 41,915 | Retrograde |

@@ -147,7 +147,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | Planet | Formula | Direction |
 |--------|---------|-----------|
 | Mercury | H/(1+3/8) | Prograde |
-| Venus | Hx2 | Prograde |
+| Venus | −8H/6 | **Retrograde** |
 | Mars | H/(4+3/8) | Prograde |
 | Jupiter | H/5 | Prograde |
 | Saturn | -H/8 | **Retrograde** |

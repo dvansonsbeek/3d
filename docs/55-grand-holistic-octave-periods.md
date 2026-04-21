@@ -47,9 +47,9 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 | Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
 | Mercury | **8H/9** | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/84 |
-| Venus | 8H/91 | 8H/4 | 8H/100 | **8H/1** | 8H/100 | 8H/191 |
+| Venus | 8H/91 | 8H/6 | 8H/110 | **8H/1** | 8H/110 | 8H/191 |
 | **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
-| Mars | 8H/16 | 8H/35 | 8H/69 | **8H/62** | 8H/21 | 8H/53 |
+| Mars | 8H/16 | 8H/35 | 8H/69 | **8H/63** | 8H/21 | 8H/53 |
 | Jupiter | 8H/21 | 8H/40 | 8H/64 | **8H/36** | 8H/16 | 8H/43 |
 | Saturn | 8H/6 | 8H/64 | 8H/168 | **8H/36** | 8H/24 | 8H/162 |
 | Uranus | ~∞ | 8H/24 | 8H/80 | **8H/12** | 8H/16 | 8H/80 |
@@ -57,7 +57,7 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 
 Notes:
 - Uranus and Neptune axial precession periods are extremely long (~200M and ~23M years) — effectively frozen
-- Venus and Neptune obliquity cycle = ICRF period (8H/100): the two-component formula cancels exactly, producing constant obliquity
+- Venus and Neptune obliquity cycle = |ICRF period| (Venus: 8H/110, Neptune: 8H/100): the two-component formula cancels exactly, producing constant obliquity
 - Mercury's axial precession period = ascending node period (Cassini state, confirmed by MESSENGER)
 - ICRF perihelion = inclination cycle (same physical driver)
 - Earth's eccentricity cycle = perihelion precession period (H/16)
@@ -67,9 +67,9 @@ Notes:
 | Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | **−298,060** | 243,867 | −28,844 | **−298,060** | 894,179 | 31,935 |
-| Venus | +29,478 | 670,634 | −26,825 | **−2,682,536** | 26,825 | 14,045 |
+| Venus | +29,478 | −447,089 | −24,387 | **−2,682,536** | 24,387 | 14,045 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
-| Mars | −167,659 | 76,644 | −38,877 | **−43,267** | 127,740 | 50,614 |
+| Mars | −167,659 | 76,644 | −38,877 | **−42,580** | 127,740 | 50,614 |
 | Jupiter | −127,740 | 67,063 | −41,915 | **−74,515** | 167,659 | 62,385 |
 | Saturn | −447,089 | −41,915 | −15,967 | **−74,515** | 111,772 | 16,559 |
 | Uranus | ~∞ | 111,772 | −33,532 | **−223,545** | 167,659 | 33,526 |
@@ -92,7 +92,7 @@ Notes:
 Many divisors are products of small Fibonacci numbers:
 - 24 = 3 × 8, 40 = 5 × 8, 64 = 8 × 8, 80 = 5 × 16
 - 104 = 8 × 13, 128 = 8 × 16, 168 = 8 × 21
-- The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 62 = 2 × 31, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Grand Octave)
+- The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 63 = 7 × 9, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Grand Octave)
 
 ### The Three Fibonacci Levels
 1. **Level 1** — Fibonacci d-values (Law 2): d = 3, 5, 21, 34

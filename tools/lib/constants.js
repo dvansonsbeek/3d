@@ -160,6 +160,18 @@ for (const [key, mp] of Object.entries(modelParams.planets)) {
   };
 }
 
+// Tidally damped planets (obliquityCycleFraction = null): set obliquity cycle
+// to |ICRF perihelion period|. The two-component formula then cancels exactly,
+// producing constant obliquity. Physically: the spin axis tracks the orbital
+// plane in lockstep, so the angle between them never changes.
+const _H13_obliq = H / 13;
+for (const p of Object.values(planets)) {
+  if (p.obliquityCycle === null && p.perihelionEclipticYears) {
+    const icrfPeriod = 1 / (1 / p.perihelionEclipticYears - 1 / _H13_obliq);
+    p.obliquityCycle = Math.abs(icrfPeriod);
+  }
+}
+
 // Derive orbitTilta/b from ascendingNode + eclipticInclinationJ2000
 for (const p of Object.values(planets)) {
   if (p.ascendingNode !== undefined && p.eclipticInclinationJ2000 !== undefined) {

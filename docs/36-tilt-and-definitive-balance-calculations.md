@@ -375,7 +375,7 @@ occurs at each planet's eccentricity cycle (see Section 10).
 | Planet  | Period (years)      | Fibonacci Expression | Direction  |
 |---------|---------------------|----------------------|------------|
 | Mercury | 243,867             | H / (1 + 3/8)       | Prograde   |
-| Venus   | 670,634             | H * 2                | Prograde   |
+| Venus   | -447,089            | -8H / 6              | Retrograde |
 | Earth   |  20,957             | H / 16               | Prograde   |
 | Mars    |  76,644             | H / (4 + 3/8)       | Prograde   |
 | Jupiter |  67,063             | H / 5                | Prograde   |

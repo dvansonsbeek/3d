@@ -288,14 +288,14 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 | Planet | H Formula | Direction |
 |--------|-----------|-----------|
 | Mercury | H / (1+3/8) | Prograde |
-| Venus | H × 2 | Prograde |
+| Venus | −8H / 6 | **Retrograde** |
 | Mars | H / (4+3/8) | Prograde |
 | Jupiter | H / 5 | Prograde |
-| Saturn | H / 8 | **Retrograde** |
+| Saturn | −H / 8 | **Retrograde** |
 | Uranus | H / 3 | Prograde |
 | Neptune | H × 2 | Prograde |
 
-**Note:** Saturn's negative value indicates retrograde precession (clockwise motion). Venus and Neptune share the same formula.
+**Note:** Negative values indicate retrograde precession (clockwise motion in the ecliptic frame).
 
 ---
 

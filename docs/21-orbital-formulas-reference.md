@@ -1983,15 +1983,15 @@ For current computed values, see [Constants Reference](20-constants-reference.md
 | Planet | ICRF Period | Ecliptic Period | Holistic Ratio |
 |--------|-------------|-----------------|----------------|
 | **Mercury** | `mercuryPerihelionEcliptic` | derived | H / (1+3/8) |
-| **Venus** | `venusPerihelionEcliptic` | derived | H × 2 |
+| **Venus** | `venusPerihelionEcliptic` | derived | −8H / 6 (retrograde) |
 | **Earth** | H/3 | derived | 3 |
 | **Mars** | `marsPerihelionEcliptic` | derived | H / (4+3/8) |
 | **Jupiter** | `jupiterPerihelionEcliptic` | derived | H / 5 |
-| **Saturn** | `saturnPerihelionEcliptic` | derived | H / 8 (retrograde) |
+| **Saturn** | `saturnPerihelionEcliptic` | derived | −H / 8 (retrograde) |
 | **Uranus** | `uranusPerihelionEcliptic` | derived | H / 3 |
 | **Neptune** | `neptunePerihelionEcliptic` | derived | H × 2 |
 
-**Note:** Saturn has retrograde precession (opposite to orbital motion).
+**Note:** Venus and Saturn both precess retrograde in the ecliptic frame (opposite to orbital motion).
 
 ### 10.7 Formula Quick Reference
 

@@ -270,7 +270,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
 | Mercury | 6.701170 | 0.384267 | 6.32 - 7.09 | 234.52° | 8H/93 ≈ 28,844 yr |
-| Venus | 2.192804 | 0.061809 | 2.13 - 2.25 | 259.82° | 2H/25 ≈ 26,825 yr |
+| Venus | 2.192804 | 0.061809 | 2.13 - 2.25 | 259.82° | 8H/110 ≈ 24,387 yr |
 | Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
 | Mars | 1.913480 | 1.157559 | 0.76 - 3.07 | 231.95° | 8H/69 ≈ 38,877 yr |
 | Jupiter | 0.319566 | 0.021281 | 0.30 - 0.34 | 291.18° | H/8 ≈ 41,915 yr |
@@ -298,7 +298,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Planet | Formula | Period (years) |
 |--------|---------|----------------|
 | Mercury | H / (1 + 3/8) | ~243,867 |
-| Venus | H × 2 | ~670,634 |
+| Venus | -8H / 6 | ~-447,089 (retrograde) |
 | Earth | H / 16 | ~20,957 |
 | Mars | H / (4 + 3/8) | ~76,644 |
 | Jupiter | H / 5 | ~67,063 |
@@ -805,7 +805,7 @@ Per-planet configuration for the predictive perihelion precession formula:
 | Planet | Period Formula | Theta0 (deg) | Baseline (arcsec/cy) |
 |--------|---------------|---------------|---------------------|
 | Mercury | H × 8/11 | 77.4569131 | 1296000/period×100 |
-| Venus | H × 2 | 131.5765919 | 1296000/period×100 |
+| Venus | -8H / 6 | 131.5765919 | -1296000/period×100 (retrograde) |
 | Mars | H × 8/35 | 336.0650681 | 1296000/period×100 |
 | Jupiter | H / 5 | 14.70659401 | 1296000/period×100 |
 | Saturn | H / 8 | 92.12794343 | -1296000/period×100 (retrograde) |

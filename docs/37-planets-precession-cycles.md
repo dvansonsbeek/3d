@@ -64,7 +64,7 @@ precession hierarchy.
 | Planet | Observed ("/cy) | Observed period | H Ratio | H-predicted ("/cy) | H-predicted period |
 |--------|----------------|-----------------|---------|-------------------|-------------------|
 | Mercury | ~570 | ~227 kyr | H × 8/11 | 531.4 | 243,867 yr |
-| Venus | ~400 | ~324 kyr | H × 2 | 193.3 | 670,634 yr |
+| Venus | ~400 | ~324 kyr | −8H/6 | −289.9 | −447,089 yr (r) |
 | Earth | ~6,186 | ~20,957 yr | H/16 | 6,186.5 | 20,957 yr |
 | Mars | ~1,600 | ~81 kyr | H × 8/35 | 1,691.0 | 76,644 yr |
 | Jupiter | ~1,800 | ~72 kyr | H/5 | 1,932.5 | 67,063 yr |
@@ -79,10 +79,9 @@ observations include contributions from planetary perturbations that average out
 over longer timescales.
 
 **Notable patterns:**
-- **Venus = Neptune** (both H×2) — inner/outer mirror symmetry
 - **Earth = Uranus** (both H/3) — same period, same rate
 - **Jupiter = H/5**, **Saturn = H/8** — consecutive Fibonacci denominators
-- Saturn is the only planet with retrograde perihelion precession against the ecliptic
+- Saturn's perihelion precesses obviously retrograde against the ecliptic
 - Mercury's H × 8/11: 8 is Fibonacci (F6), 11 is Lucas (L5)
 
 ---
@@ -278,7 +277,7 @@ The wobble is the **meeting frequency** of these two motions:
 | Planet | Perihelion Ecliptic | H expr | → Perihelion (ICRF) | H expr | Dir |
 |--------|--------------------|---------|--------------------|--------|-----|
 | Mercury | 243,867 yr | H×8/11 | −28,844 yr | −8H/93 | retro |
-| Venus | 670,634 yr | H×2 | −26,825 yr | −2H/25 | retro |
+| Venus | −447,089 yr (r) | −8H/6 | −24,387 yr | −8H/110 | retro |
 | Earth | 20,957 yr | H/16 | +111,772 yr | +H/3 | **pro** |
 | Mars | 76,644 yr | 8H/35 | −38,877 yr | −8H/69 | retro |
 | Jupiter | 67,063 yr | H/5 | −41,915 yr | −H/8 | retro |
@@ -383,7 +382,7 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 | Planet | Peri ecl | N | Decomp | Obliquity prediction | Ecliptic prediction | Status |
 |--------|---------|---|--------|---------------------|---------------------|--------|
 | Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Free prediction (Cassini state) |
-| Venus | H×2 | — | obliq = ICRF | **8H/100 = ICRF** | 8H/96 | ✓ Cancels → constant obliquity |
+| Venus | −8H/6 (r) | — | obliq = ICRF | **8H/110 = ICRF** | — | ✓ Cancels → constant obliquity |
 | Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
 | Mars | 8H/35 | 35 | 21 + 14 | **8H/21 = ~127,740 yr** | 8H/14 = ~191,610 yr | Mirror reciprocity (= Ju axial) |
 | Jupiter | H/5 | 5 | 2 + 3 | **H/2 = ~167,659 yr** | H/3 = ~111,772 yr | Prediction |
@@ -527,8 +526,9 @@ oscillations superimposed on the trend — would constitute a confirmation.
    Saturn's obliquity oscillates at H/3 = 111,772 yr. See [The Closed Loop](72-the-closed-loop.md).
 
 4. **Perihelion Fibonacci pattern**: The WebGeoCalc perihelion rates reveal a
-   striking Fibonacci structure: Jupiter=H/5, Saturn=H/8 (retrograde), Earth=Uranus=H/3,
-   Venus=Neptune=H×2. This extends the Fibonacci framework beyond Earth.
+   striking Fibonacci structure: Jupiter=H/5, Saturn=H/8 (retrograde),
+   Earth=Uranus=H/3, Venus=−8H/6 (retrograde), Neptune=H×2. This extends the
+   Fibonacci framework beyond Earth.
 
 5. **Frame dependence**: Axial precession is measured in ICRF. Inclination
    precession is measured against the ecliptic (or invariable plane). The

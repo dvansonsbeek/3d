@@ -364,7 +364,7 @@ console.log('══════════════════════�
 console.log('');
 
 const modelIntegers = {
-  mercury: 9, venus: 1, earth: 40, mars: 62,
+  mercury: 9, venus: 1, earth: 40, mars: 63,
   jupiter: 36, saturn: 36, uranus: 12, neptune: 3,
 };
 

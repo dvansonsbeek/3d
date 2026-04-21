@@ -186,7 +186,7 @@ Each body's ascending node Ω on the invariable plane precesses linearly at a bo
 | **Earth** | 40 | −H/5 ≈ −67,063 yr | = −(8H)/40, the ecliptic precession rate |
 | Mercury | 9 | −298,060 yr | |
 | Venus | 1 | −2,682,536 yr | = −8H, full Grand Holistic Octave |
-| Mars | 62 | −43,267 yr | |
+| Mars | 63 | −42,580 yr | |
 | Jupiter | 36 | −74,515 yr | Shared with Saturn (lockstep) |
 | Saturn | 36 | −74,515 yr | Shared with Jupiter (lockstep) |
 | Uranus | 12 | −223,545 yr | |

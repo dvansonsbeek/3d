@@ -149,7 +149,7 @@ planets.venus = {
   angleCorrection: -2.7523535583644403,
   perihelionEclipticYears: -holisticyearLength*8/6,
   axialPrecessionYears: 8 * holisticyearLength / 91,
-  obliquityCycle: 8 * holisticyearLength / 110,
+  // obliquityCycle derived below from |ICRF| (tidally damped)
   startpos: 249.32614838335923,
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
@@ -182,7 +182,7 @@ planets.mars = {
   ascendingNodeInvPlane: 354.87,
   inclinationCycleAnchor: 231.95,
   antiPhase: false,
-  ascendingNodeCyclesIn8H: 62,
+  ascendingNodeCyclesIn8H: 63,
 };
 
 // Jupiter
@@ -279,7 +279,7 @@ planets.neptune = {
   angleCorrection: 2.332350155084832,
   perihelionEclipticYears: holisticyearLength*2,
   axialPrecessionYears: -holisticyearLength*68,
-  obliquityCycle: 8 * holisticyearLength / 100,
+  // obliquityCycle derived below from |ICRF| (tidally damped)
   startpos: 47.9552024382285,
   eocFraction: 0.585,
   perihelionRef_JD: 2409432.4,
@@ -3546,12 +3546,12 @@ const neptuneWobblePeriod  = calcWobblePeriod(planets.neptune.perihelionEcliptic
 // Aliases: source of truth is planets.<key>.obliquityCycle (declared in the
 // planet blocks above). Kept as named constants for compact downstream use.
 const mercuryObliquityCycle = planets.mercury.obliquityCycle;   // 8H/3 = 894,179 yr (Bills 2005 ~895 kyr, 0.2% match)
-const venusObliquityCycle   = planets.venus.obliquityCycle;      // 8H/110 = 24,387 yr (= ICRF, two-component cancellation)
+const venusObliquityCycle   = Math.abs(1 / (1 / planets.venus.perihelionEclipticYears - 13 / holisticyearLength));   // = |ICRF| (tidally damped, cancels)
 const marsObliquityCycle    = planets.mars.obliquityCycle;       // 8H/21 = 127,740 yr (observed ~124,800 yr, = Jupiter axial)
 const jupiterObliquityCycle = planets.jupiter.obliquityCycle;    // H/2 = 167,659 yr (prediction, = Mars axial)
 const saturnObliquityCycle  = planets.saturn.obliquityCycle;     // H/3 = 111,772 yr (prediction, mirror-pair with Earth)
 const uranusObliquityCycle  = planets.uranus.obliquityCycle;     // H/2 = 167,659 yr (prediction, tentative)
-const neptuneObliquityCycle = planets.neptune.obliquityCycle;    // 8H/100 = ICRF period → cancels with inclination → constant obliquity
+const neptuneObliquityCycle = Math.abs(1 / (1 / planets.neptune.perihelionEclipticYears - 13 / holisticyearLength));  // = |ICRF| (tidally damped, cancels)
 
 // Mean obliquity (analytical, averaged over 8H = Grand Holistic Octave)
 // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)

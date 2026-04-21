@@ -36,7 +36,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  │ Planet │ Phase(γ)  │ ω̃ J2000│ d  │ Period(yr) │ Grp │ Trend │  │
 │  ├────────┼───────────┼────────┼────┼────────────┼─────┼───────┤  │
 │  │ Mercury│ [▼ 99.5°] │ 77.46  │[▼] │ 8H/93      │ PRO │ +0.53 │  │
-│  │ Venus  │ [▼ 79.8°] │131.58  │[▼] │ 2H/25      │ PRO │ +0.19 │  │
+│  │ Venus  │ [▼ 79.8°] │131.58  │[▼] │ 8H/110     │ PRO │ +0.19 │  │
 │  │ Earth🔒│  21.8°    │102.95  │ 3  │ H/3        │ PRO │ +1.16 │  │
 │  │ Mars   │ [▼ 97.0°] │336.07  │[▼] │ 8H/69      │ PRO │ +1.68 │  │
 │  │ Jupiter│ [▼291.2°] │ 14.71  │[▼] │ H/8        │ PRO │ +1.94 │  │
@@ -498,7 +498,7 @@ The model's 8H/N predictions and Laskar's N-body measurements both produce indis
 | Mercury | −8H/9 | |
 | Venus | −8H/1 | full Grand Octave |
 | Earth | −H/5 = −8H/40 | ecliptic precession (special) |
-| Mars | −8H/62 | |
+| Mars | −8H/63 | |
 | Jupiter | −8H/36 | locked with Saturn |
 | Saturn | −8H/36 | locked with Jupiter |
 | Uranus | −8H/12 | |

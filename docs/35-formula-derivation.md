@@ -74,7 +74,7 @@ For example:
 
 This section documents the resonance mechanism that forms Law 6 of the Fibonacci Laws. A remarkable discovery emerges when analyzing the planetary precession periods: **Saturn's ecliptic-retrograde precession creates a closed resonance loop** with Jupiter and Earth that explains why certain periods appear in the Mercury fluctuation formula.
 
-**Saturn's Unique Motion**: Saturn is the only planet whose perihelion precesses **retrograde in the ecliptic frame** (opposite to orbital motion) with a period of H/8 years. All other planets precess prograde in this frame. This creates beat frequencies when combined with prograde periods.
+**Saturn's Motion**: Saturn's perihelion precesses **retrograde in the ecliptic frame** (opposite to orbital motion) with a period of H/8 years. This creates beat frequencies when combined with prograde periods in the Fibonacci resonance loop.
 
 **The Resonance Loop**:
 
@@ -329,7 +329,7 @@ For full implementation details, see [jupiter_coeffs.py](../tools/lib/python/coe
 
 ## 8. Saturn Formula: Coefficient Breakdown
 
-Saturn is unique in the solar system: in the ecliptic frame, it is the **only planet with retrograde perihelion precession**. While all other planets precess prograde (in the direction of orbital motion), Saturn's perihelion precesses opposite to its orbital motion with a period of H/8.
+Saturn's perihelion precesses **retrograde in the ecliptic frame** — opposite to orbital motion — with a period of H/8.
 
 ### 8.1 Physical Driver
 
@@ -350,7 +350,7 @@ Saturn's precession fluctuation is driven by:
 | **RMSE** | 0.05 arcsec/century |
 | **Features** | 225 terms |
 
-> **Ecliptic-retrograde precession**: Saturn's perihelion precesses **opposite** to its orbital direction in the ecliptic frame. This unique behavior creates the resonance loop with Jupiter and Earth that appears throughout the Holistic model. When calculating beat frequencies, Saturn's ecliptic rate must be treated as negative.
+> **Ecliptic-retrograde precession**: Saturn's perihelion precesses **opposite** to its orbital direction in the ecliptic frame. This creates the resonance loop with Jupiter and Earth that appears throughout the Holistic model. When calculating beat frequencies, Saturn's ecliptic rate must be treated as negative.
 
 ### 8.3 The Saturn-Jupiter-Earth Loop
 
@@ -446,9 +446,8 @@ Neptune, the outermost major planet, has the longest precession period in the Fi
 Neptune's precession fluctuation is driven by:
 
 1. **Outer solar system dynamics**: Dominated by interactions with Uranus
-2. **Venus period resonance**: Period (H×2) matches Venus's precession period
-3. **Long orbital period**: 164.8 years means slow accumulation of precession
-4. **Kuiper Belt interactions**: Possible perturbations from trans-Neptunian objects
+2. **Long orbital period**: 164.8 years means slow accumulation of precession
+3. **Kuiper Belt interactions**: Possible perturbations from trans-Neptunian objects
 
 ### 10.2 Formula Summary
 
@@ -460,25 +459,17 @@ Neptune's precession fluctuation is driven by:
 | **RMSE** | 0.02 arcsec/century |
 | **Features** | 225 terms |
 
-> **Neptune-Venus connection**: Neptune shares its perihelion precession period (H×2) with Venus. Despite being at opposite ends of the solar system, these two nearly-circular planets (e = 0.00859 and 0.00678 respectively) share this ultra-long timescale. This may reflect a deep structural property of the solar system's organization around the Fibonacci hierarchy.
-
-### 10.3 Neptune-Venus Period Match
-
-Neptune's precession period (H×2) exactly matches Venus's precession period. Both planets have nearly circular orbits, which may explain why they share this ultra-long timescale in the Fibonacci hierarchy.
-
 For full implementation details, see [neptune_coeffs.py](../tools/lib/python/coefficients/neptune_coeffs.py).
 
-### 10.4 Predictive Formula Enhancement
+### 10.3 Predictive Formula Enhancement
 
-Neptune now uses the **unified 429-term predictive matrix**, the same system used by all other planets. Despite Neptune and Venus sharing the same precession period (H×2), the unified matrix handles this through its ridge regression regularization (α=0.01), which prevents term interference between the two planets.
+Neptune now uses the **unified 429-term predictive matrix**, the same system used by all other planets. The ridge regression regularization (α=0.01) prevents term interference across planets.
 
 | Property | Observed Formula | Predictive Formula |
 |----------|------------------|-------------------|
 | **R²** | 0.999999 | 0.999902 |
 | **RMSE** | 0.02 arcsec/century | 0.25 arcsec/century |
 | **Features** | 225 terms | 429 terms (unified) |
-
-> **Venus period match**: Both Neptune and Venus have precession period H×2. The ridge regression regularization in the unified predictive system handles this shared period without requiring a custom reduced feature set.
 
 ---
 
@@ -522,7 +513,7 @@ The table below shows two sets of formula accuracy values:
 | Property | Mercury | Venus | Mars | Jupiter | Saturn | Uranus | Neptune |
 |----------|---------|-------|------|---------|--------|--------|---------|
 | Eccentricity | 0.20564 | 0.00678 | 0.09339 | 0.04839 | 0.05386 | 0.04726 | 0.00859 |
-| Period | H×8/11 | H×2 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
+| Period | H×8/11 | −8H/6 | H×8/35 | H/5 | H/8 | H/3 | H×2 |
 
 ### Observed Formula Accuracy (using Excel data)
 
@@ -565,10 +556,9 @@ The table below shows two sets of formula accuracy values:
 **Outer Planets (Jupiter, Saturn, Uranus, Neptune)**:
 - All achieve excellent fits (R² ≥ 0.999999) with 225 features
 - **Uranus** and **Neptune** achieve the best fits (RMSE = 0.01–0.02 arcsec/century)
-- **Saturn** is unique with ecliptic-retrograde precession, creating the resonance loop
-- **Neptune** and **Venus** share the same period (H×2) despite being at opposite ends of the solar system
+- **Saturn** has ecliptic-retrograde precession, creating the resonance loop
 
-> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to simple fractions of H: Jupiter (H/5), Saturn (H/8), Mars (H×8/35), Uranus (H/3), and both Venus and Neptune share H×2. The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
+> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to simple fractions of H: Jupiter (H/5), Saturn (H/8), Mars (H×8/35), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
 
 ---
 
@@ -590,14 +580,14 @@ The fundamental periods are model parameters, not independently derived values:
 | Obliquity cycle | H/8 | Fibonacci | Obliquity formula |
 | **Planetary perihelion periods** | | | |
 | Mercury | H×8/11 | Fibonacci | Mercury fluctuation formula |
-| Venus | H×2 | Fibonacci | Venus fluctuation formula |
+| Venus | −8H/6 (ecliptic-retrograde) | Fibonacci | Venus fluctuation formula |
 | Mars | H×8/35 | Fibonacci | Mars fluctuation formula |
 | Jupiter | H/5 | Fibonacci | Jupiter fluctuation, beat frequencies |
 | Saturn | H/8 (ecliptic-retrograde) | Fibonacci | Saturn fluctuation, resonance loop |
 | Uranus | H/3 | Fibonacci | Uranus fluctuation formula |
 | Neptune | H×2 | Fibonacci | Neptune fluctuation formula |
 
-**Note**: Saturn is the only planet with ecliptic-retrograde perihelion precession (opposite to orbital motion in the ecliptic frame). Venus and Neptune share the same period (H×2). Uranus shares its period with Earth's inclination precession (H/3).
+**Note**: Venus and Saturn both show ecliptic-retrograde perihelion precession (opposite to orbital motion in the ecliptic frame). Uranus shares its period with Earth's inclination precession (H/3).
 
 If future research refines H, all beat frequencies and coefficients would need recalculation.
 
@@ -776,7 +766,7 @@ All planetary formulas are implemented in Python for consistency and to handle t
 | Planet | R² | RMSE (″/cy) | Features | Period (years) |
 |--------|-----|-------------|----------|----------------|
 | Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
-| Venus | **0.999999** | **0.46** | **328** | H×2 |
+| Venus | **0.999999** | **0.46** | **328** | −8H/6 |
 | Mars | 1.000000 | 0.03 | 225 | H×8/35 |
 | Jupiter | 1.000000 | 0.06 | 225 | H/5 |
 | Saturn | 1.000000 | 0.05 | 225 | H/8 |

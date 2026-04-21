@@ -70,10 +70,7 @@
       "inclinationCycleAnchor": 259.82,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 1,
-      "obliquityCycleFraction": [
-        8,
-        110
-      ],
+      "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         8,
         91
@@ -94,7 +91,7 @@
       "ascendingNodeInvPlane": 354.87,
       "inclinationCycleAnchor": 231.95,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 62,
+      "ascendingNodeCyclesIn8H": 63,
       "obliquityCycleFraction": [
         8,
         21
@@ -195,10 +192,7 @@
       "inclinationCycleAnchor": 174.04,
       "antiPhase": false,
       "ascendingNodeCyclesIn8H": 3,
-      "obliquityCycleFraction": [
-        8,
-        100
-      ],
+      "obliquityCycleFraction": null,
       "axialPrecessionFraction": [
         -68,
         1

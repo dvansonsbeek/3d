@@ -145,7 +145,7 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 | Planet | Ecliptic Period | ICRF Period | ICRF Direction |
 |--------|----------------|-------------|----------------|
 | Mercury | `H × 8/11` | `8H/93` ≈ 28,844 yr | Retrograde |
-| Venus | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
+| Venus | `−8H/6` | `8H/110` ≈ 24,387 yr | Retrograde |
 | Earth | `H / 3` | `H/3` ≈ 111,772 yr | Prograde (sole) |
 | Mars | `H × 8/35` | `8H/69` ≈ 38,877 yr | Retrograde |
 | Jupiter | `H / 5` | `H/8` ≈ 41,915 yr | Retrograde |
@@ -218,7 +218,7 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 | Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
 | Mercury | 9 | −298,060 | |
 | Venus | 1 | −2,682,536 (= −8H) | Full Grand Octave |
-| Mars | 62 | −43,267 | |
+| Mars | 63 | −42,580 | |
 | Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
 | Saturn | 36 | −74,515 | Shared with Jupiter |
 | Uranus | 12 | −223,545 | |

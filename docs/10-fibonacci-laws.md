@@ -206,11 +206,11 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 | Planet | Expression |
 |--------|------------|
 | Mercury | H × 8/11 |
-| Venus | 2H |
+| Venus | −8H/6 |
 | Earth | H/3 |
 | Mars | H × 8/35 |
 | Jupiter | H/5 |
-| Saturn | H/8 |
+| Saturn | −H/8 |
 | Uranus | H/3 |
 | Neptune | 2H |
 
@@ -274,7 +274,7 @@ The two balances also differ structurally. The inclination balance is a **global
 
 ### Finding 4: Saturn Eccentricity Prediction from Law 5
 
-Since Saturn is the sole retrograde planet, the eccentricity balance (Law 5) directly predicts its eccentricity from the other seven:
+Since Saturn is the sole anti-phase planet in the balance, the eccentricity balance (Law 5) directly predicts its eccentricity from the other seven:
 
 ```
 e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
