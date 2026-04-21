@@ -4093,15 +4093,21 @@ const OrbitalFormulas = {
   },
 
   // Secular precession contribution from ONE perturber (arcsec/century)
-  // Implements Lagrange-Laplace secular perturbation theory
-  // A_ii = Σ(j≠i) (n_i/4) × ε_ij × α_ij × ᾱ_ij × b₃/₂⁽¹⁾(α_ij)
+  // Implements Lagrange-Laplace first-order secular perturbation theory.
+  //     A_ii = Σ(j≠i) (n_i/4) × ε_ij × α_ij × ᾱ_ij × b₃/₂⁽¹⁾(α_ij)
   // Where:
-  //   ε_ij = m_j / (M_sun + m_i) ≈ m_j / M_sun for planets
-  //   α_ij = a_inner / a_outer (always < 1)
-  //   ᾱ_ij = a_i / a_j for outer perturber, or 1 for inner perturber
-  //   b₃/₂⁽¹⁾ = Laplace coefficient for outer perturber
-  //   b₃/₂⁽²⁾ = Laplace coefficient for inner perturber
-  // Reference: Murray & Dermott (1999), farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
+  //   ε_ij = m_j / M_sun
+  //   α_ij = min(a_i, a_j) / max(a_i, a_j) (always ≤ 1)
+  //   ᾱ_ij = α_ij if j is outer of i (α × ᾱ = α²)
+  //          1    if j is inner of i (α × ᾱ = α)
+  //   b₃/₂⁽¹⁾(α) = Laplace coefficient — ALWAYS this one for the diagonal
+  //                self-precession rate.  b₃/₂⁽²⁾ appears only in the
+  //                off-diagonal A_ij terms (eigenvector mixing), which we
+  //                don't use for the per-planet precession display.
+  // All contributions are POSITIVE: the diagonal self-precession rate is
+  // prograde for every perturber.  (An earlier version negated inner
+  // perturbers; that was a confusion with the off-diagonal A_ij formula.)
+  // Reference: Murray & Dermott (1999) §7.4, eq 7.138.
   secularPrecessionContribution: (
     n_rad_per_year,       // Mean motion of perturbed planet (rad/year)
     m_perturber,          // Mass of perturbing planet (kg)
@@ -4126,41 +4132,29 @@ const OrbitalFormulas = {
       ? a_planet_km / a_perturber_km  // Same as α for outer perturber
       : 1;                             // 1 for inner perturber
 
-    // Get appropriate Laplace coefficient
-    // Note: b₃/₂⁽¹⁾(α) ≈ 3α × (1 + terms) already contains one factor of α
-    // Note: b₃/₂⁽²⁾(α) ≈ 3.75α² × (1 + terms) already contains α² factor
-    const laplace = isOuter
-      ? OrbitalFormulas.laplaceCoefficient_3_2_1(alpha)
-      : OrbitalFormulas.laplaceCoefficient_3_2_2(alpha);
+    // Diagonal A_ii secular contributions always use b₃/₂⁽¹⁾(α) —
+    // for both inner and outer perturbers.  The shape difference comes
+    // from the α · ᾱ prefactor above, not from switching Laplace orders.
+    const laplace = OrbitalFormulas.laplaceCoefficient_3_2_1(alpha);
 
     // Mass ratio ε = m_perturber / M_sun
     const massRatio = m_perturber / M_sun;
 
-    // Base secular precession rate (rad/year)
-    // Laplace-Lagrange first-order secular theory:
+    // Base secular precession rate (rad/year).  Laplace-Lagrange first-order
+    // secular theory, diagonal A_ii contribution:
     //
-    // For EXTERIOR perturbers: dω/dt = (n/4) × ε × α² × b₃/₂⁽¹⁾(α)
-    // For INTERIOR perturbers: dω/dt = (n/4) × ε × α × b₃/₂⁽²⁾(α)
+    //   For EXTERIOR perturber:  dω/dt = (n/4) × ε × α² × b₃/₂⁽¹⁾(α)
+    //   For INTERIOR perturber:  dω/dt = (n/4) × ε × α  × b₃/₂⁽¹⁾(α)
     //
-    // Where:
-    //   n = mean motion of the perturbed planet (rad/year)
-    //   ε = m_perturber / M_sun (mass ratio)
-    //   α = a_inner / a_outer (semi-major axis ratio, always < 1)
-    //   b₃/₂⁽ʲ⁾(α) = Laplace coefficient (computed via numerical integration)
+    // Both use the SAME Laplace coefficient b₃/₂⁽¹⁾; the α-vs-α² difference
+    // is the α·ᾱ prefactor computed above.  Both contribute prograde (+),
+    // no sign flip.
     //
-    // Note: Eccentricity and inclination corrections are negligible for first-order theory
-    //       (they contribute ~2-5% for Mercury, which is within the expected ~4% error)
-    //
-    // Reference: Murray & Dermott (1999), PERIHELION_PRECESSION_CORRECTED.md
-    let rate_rad_per_year = 0.25 * n_rad_per_year * massRatio * alpha * alpha_bar * laplace;
+    // Eccentricity and inclination corrections are negligible at first order
+    // (~2–5 % for Mercury, within the method's ~4 % expected accuracy).
+    const rate_rad_per_year = 0.25 * n_rad_per_year * massRatio * alpha * alpha_bar * laplace;
 
-    // Sign: outer perturbers cause prograde (+), inner cause retrograde (-)
-    if (!isOuter) {
-      rate_rad_per_year = -rate_rad_per_year;
-    }
-
-    // Convert rad/year to arcsec/century
-    // 1 rad = 206264.806 arcsec, 1 century = 100 years
+    // Convert rad/year to arcsec/century (1 rad = 206264.806 arcsec).
     const arcsec_per_century = rate_rad_per_year * 206264.806 * 100;
 
     return arcsec_per_century;

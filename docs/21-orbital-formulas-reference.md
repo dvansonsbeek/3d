@@ -421,8 +421,8 @@ Advanced functions for computing secular perturbations.
 
 | Function | Description |
 |----------|-------------|
-| `laplaceCoefficient_3_2_1(alpha)` | Laplace coefficient b₃/₂⁽¹⁾(α) for outer perturber |
-| `laplaceCoefficient_3_2_2(alpha)` | Laplace coefficient b₃/₂⁽²⁾(α) for inner perturber |
+| `laplaceCoefficient_3_2_1(alpha)` | Laplace coefficient b₃/₂⁽¹⁾(α) — used for the diagonal A_ii secular self-precession rate of both inner and outer perturbers |
+| `laplaceCoefficient_3_2_2(alpha)` | Laplace coefficient b₃/₂⁽²⁾(α) — helper for off-diagonal A_ij eigenvector-mixing terms; not used by the current breakdown display |
 | `eccentricityCorrectionFactor(e_planet, e_perturber)` | First-order eccentricity correction (≈1.0) |
 | `inclinationCorrectionFactor(i_mutual_deg)` | g(I) = cos(I_mutual) |
 | `meanMotionRadPerYear(period_days)` | Mean motion in rad/year |
