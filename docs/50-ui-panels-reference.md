@@ -15,6 +15,10 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
+| **Eccentricity Balance Scale** | Visualize Law 5 balance per target planet (waterfall chart + buildup table) |
+| **Grand Holistic Octave** | All periods as integer divisors of 8H = 2,682,536 yr (8 planets × 6 cycles) |
+| **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet |
+| **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) |
 
 ---
 
@@ -416,6 +420,119 @@ See [53 - Balance Explorer Reference](53-balance-explorer-reference.md) for comp
 
 ---
 
+## Eccentricity Balance Scale
+
+### Purpose
+
+Visualizes how each planet's base eccentricity is the weighted sum of the other 7 planets' perihelion offsets (Law 5 / eccentricity balance). For a selected target planet, the panel computes per-planet weights from mass, Fibonacci divisor, and semi-major-axis ratios, and shows them as a waterfall SVG chart plus a detailed buildup table. Saturn sits alone on one side (sole anti-phase member); the other 7 balance it.
+
+### Accessing the Scale
+
+1. Open the Tweakpane Tools folder
+2. Click "Eccentricity Balance Scale"
+3. Use the planet nav bar (dropdown + left/right arrows) to switch targets
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Waterfall SVG chart** | Green bars (positive push) and red bars (negative pull) showing each planet's contribution to the target's eccentricity |
+| **Buildup table** | Columns: Mass, d, offset (AU), weight, contribution, share (%) |
+| **Planet nav bar** | Full-width dropdown + arrows; starts at the currently focused planet |
+| **Uses base eccentricities** | Long-term mean values (not J2000 instantaneous) — the balance is the model's structural claim |
+| **Color coding** | Amber `#f0b040` = eccentricity values, green = positive contribution, red = negative contribution |
+
+### Full Reference
+
+See [38 — The Eccentricity Balance Scale](38-eccentricity-scale.md) for the physics derivation, per-planet weight formulas `W_j = √(m_j/m_target × d_target/d_j × a_j/a_target)`, and the Saturn-eccentricity prediction from the other 7 planets.
+
+---
+
+## Grand Holistic Octave
+
+### Purpose
+
+Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Grand Holistic Octave 8H = 2,682,536 years. Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
+
+### Accessing the Panel
+
+1. Open the Tweakpane Tools folder
+2. Click "Grand Holistic Octave"
+3. Use the **Years / 8H/N** toggle button in the header to switch display modes
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **8 × 6 grid** | Every planet row, every cycle column, one cell per combination |
+| **Years / 8H/N toggle** | Values shown as years with thousand separators, or as the 8H/N integer divisor |
+| **Color coding** | Green = prograde, red = retrograde, neutral = oscillation (no direction), ∞ = frozen, — = N/A |
+| **Earth row highlighted** | Earth is the reference planet for all derived cycles |
+| **Scientific-reference hover** | Each cell hover shows observed value, source (WebGeoCalc, Laskar, Cottereau, Saillenfest, etc.), and pass/fail status |
+
+### Full Reference
+
+See [55 — Grand Holistic Octave Period Table](55-grand-holistic-octave-periods.md) for the complete period table (both years and 8H/N), the three Fibonacci identities linking cycles, mirror-symmetry patterns, and the Earth cycle chain.
+
+---
+
+## WebGeoCalc Explorer
+
+### Purpose
+
+Shows the actual observed perihelion-precession history of each planet from JPL NAIF WebGeoCalc over 1900–2026, plotted alongside the model's own prediction for direct comparison. For each planet the panel displays three charts (longitude of perihelion ϖ, ascending node Ω, argument of periapsis ω) in the ecliptic-of-date frame. This is the panel that grounds the model's Fibonacci perihelion rates in observation — the rates are calibrated to match what JPL reports, not what first-order secular theory predicts.
+
+### Accessing the Explorer
+
+1. Open the Tweakpane Tools folder
+2. Click "WebGeoCalc Explorer"
+3. Use the tab row to switch between planets (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune — Earth excluded because its ecliptic inclination is zero by definition)
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Primary chart (ϖ vs time)** | Blue = observed, yellow = model prediction (`predictGeocentricPrecession` integrated from J2000), with linear OLS trend overlay |
+| **Two trend estimates** | Raw OLS (affected by oscillations) and sin+lin (bias-corrected) for each planet |
+| **Collapsible charts** | Ascending node Ω and argument of periapsis ω for detailed inspection |
+| **Resolvability flag** | Venus, Jupiter, Uranus, Neptune are flagged as un-determined (their oscillation period exceeds the 126-year observational baseline) |
+| **Frame note** | Reminder that all angles are in the ecliptic-of-date frame — in ICRF each rate would differ by ~−5,030″/cy (general precession, H/13) |
+
+### Full Reference
+
+See [56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) for the complete observed-rate table, the data pipeline (`tools/explore/wgc-perihelion-rates.js` → `public/input/wgc-perihelion-data.json`), and why only Mercury / Mars / Saturn have resolvable trends from the 1900–2026 window.
+
+---
+
+## Formula Verification
+
+### Purpose
+
+Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Peters, Harkness) across nine Earth quantities over a ±12,000-year window. This is the **analytical twin** of the WebGeoCalc Explorer — where WebGeoCalc compares the model against *observed JPL data*, Formula Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
+
+### Accessing the Panel
+
+1. Open the Tweakpane Tools folder
+2. Click "Formula Verification"
+3. Navigate between the 9 categories with the `‹` / `›` arrows or click the category name to open a dropdown
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Nine categories** | Eccentricity, obliquity, inclination (inv. plane), ascending node (inv. plane), perihelion longitude, tropical year, solar day, sidereal year, axial precession |
+| **Main chart** | Model curve (amber) + all reference formulas on a −12,000 BC to +12,000 AD axis, with J2000 gridline |
+| **Residual chart** | `reference − model` in arcseconds, seconds, milliseconds, degrees, or AU depending on the category |
+| **J2000 comparison table** | Every reference formula's value at J2000 + Δ vs Model, with source links |
+| **Export buttons** | "Export for Paper" (±12 k yr) and "Export Cycles" (±~250 k yr, eccentricity/obliquity only) produce publication-grade SVG |
+| **Earth-only** | All nine quantities describe Earth's orbit + spin axis; per-planet observational validation lives in the WebGeoCalc Explorer |
+
+### Full Reference
+
+See [57 — Formula Verification](57-formula-verification.md) for the complete reference-formula catalogue (polynomial / trigonometric-series / N-body-tabulated classes), colour coding, interpretation at different time scales (century → 100-kyr), and code locations.
+
+---
+
 ## Validation: Angular Momentum Calculation
 
 ### Purpose
@@ -463,6 +580,10 @@ This 99.994% accuracy validates that our orbital elements are consistent with pu
 | [53 - Balance Explorer Reference](53-balance-explorer-reference.md) | Balance explorer calculations and controls |
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
+| [38 - Eccentricity Balance Scale](38-eccentricity-scale.md) | Law 5 balance math; Saturn eccentricity prediction |
+| [55 - Grand Holistic Octave](55-grand-holistic-octave-periods.md) | 8H period table for all planets × cycles |
+| [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
+| [57 - Formula Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
 
 ---
 
