@@ -213,6 +213,80 @@ The current system:
 
 ---
 
+## Interactive Panel
+
+The balance can be explored live in the 3D simulation via a modal panel under **Tools → Eccentricity Balance Scale**. The panel lets you pick any of the 8 planets as the balance target and see the per-planet contributions that make up (or cancel out) its perihelion offset.
+
+### Panel layout
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Eccentricity Balance Scale                       [×]    │
+│ Target: ◄ [Jupiter ▼] ►                                 │
+├─────────────────────────────────────────────────────────┤
+│ Hero values: target's e, target's perihelion offset     │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌── Waterfall SVG ──────────────────────────────┐     │
+│  │                                                │     │
+│  │  Start   +Saturn  -Uranus  -Neptune  ...  End  │     │
+│  │    ┌─┐     ┌─┐      ┌─┐      ┌─┐          ┌─┐ │     │
+│  │    └─┘     └─┘      └─┘      └─┘          └─┘ │     │
+│  │          green     red      red                │     │
+│  └───────────────────────────────────────────────┘     │
+├─────────────────────────────────────────────────────────┤
+│ Buildup table: Mass, d, offset, weight, contribution,   │
+│                share (%), cumulative per planet         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Waterfall chart
+
+`renderEccWaterfallSVG(data)` draws each planet's contribution as a stacked bar on the chart, starting from zero and building up to the target's perihelion offset:
+
+- **Green bars** — positive contributions (planets pushing the perihelion outward, weight × offset > 0)
+- **Red bars** — negative contributions (planets pulling it back, weight × offset < 0 because of the in-phase / anti-phase sign convention)
+- **Amber `#f0b040`** — eccentricity values shown in the summary
+
+For Saturn as target, all bars are green (every in-phase planet pushes). For Jupiter or Earth as target, Saturn's bar is green (pushes) and the other gas giants' bars are red (pull back) — this is the tug-of-war that produces the small residual inner-planet eccentricities.
+
+### Buildup table
+
+`renderEccBuildupTable(data)` shows columns for each planet:
+
+| Column | Content |
+|--------|---------|
+| Mass (m_j) | Planet mass (JPL DE440 ratios, normalized to Sun = 1) |
+| d | Fibonacci divisor from the default configuration (3, 5, 21, 34) |
+| Offset (AU) | e_base_j × a_j |
+| Weight W_j | √(m_j/m_target × d_target/d_j × a_j/a_target) |
+| Contribution | W_j × Offset, signed |
+| Share (%) | Contribution / target offset |
+| Cumulative | Running total as bars are added left-to-right |
+
+The table matches the examples in the §"Every Planet as the Balance Target" tables above — those tables are the panel's output for each target.
+
+### Navigation
+
+A full-width planet nav bar with dropdown + left/right arrows switches between targets. The panel opens with the currently focused planet as the target (or Jupiter by default). Hover tooltips show the physical meaning of each weight component.
+
+### Code locations
+
+| Component | Location |
+|-----------|----------|
+| Panel build | `createEccBalanceScalePanel()` in `src/script.js` |
+| Open/close | `openEccBalanceScale()` / `closeEccBalanceScale()` in `src/script.js` |
+| Re-render on target change | `updateEccBalanceScale(targetKey)` |
+| Per-planet weight + contribution computation | `computeEccScaleData(targetKey)` |
+| Waterfall SVG renderer | `renderEccWaterfallSVG(data)` |
+| Buildup table renderer | `renderEccBuildupTable(data)` |
+| Base-eccentricity lookup | `ECC_BASE_SCALE` in `src/script.js` |
+| Fibonacci-divisor / phase-group lookup | `BALANCE_CONFIG` in `src/script.js` |
+| Tools-menu button | `"Eccentricity Balance Scale"` in Tweakpane Tools folder |
+| CSS | `.ebs-*` classes in `src/style.css` |
+
+---
+
 ## Open Questions
 
 1. **What determines the base eccentricities?** Base eccentricities are now derived from the balanced-year phase (same timing anchor as Earth). The eccentricity balance (Law 5) emerges naturally at ~99.9%. The ~0.1% residual may reflect contributions from minor bodies or planetary mass uncertainties (especially Uranus and Neptune, known only from Voyager 2). See [The Closed Loop](72-the-closed-loop.md).
