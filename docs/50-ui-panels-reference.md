@@ -495,12 +495,12 @@ Shows the actual observed perihelion-precession history of each planet from JPL 
 | **Primary chart (ϖ vs time)** | Blue = observed, yellow = model prediction (`predictGeocentricPrecession` integrated from J2000), with linear OLS trend overlay |
 | **Two trend estimates** | Raw OLS (affected by oscillations) and sin+lin (bias-corrected) for each planet |
 | **Collapsible charts** | Ascending node Ω and argument of periapsis ω for detailed inspection |
-| **Resolvability flag** | Venus, Jupiter, Uranus, Neptune are flagged as un-determined (their oscillation period exceeds the 126-year observational baseline) |
+| **Resolvability flag** | Venus, Jupiter, Saturn, Uranus, Neptune are flagged as un-determined: Venus/Jupiter/Uranus/Neptune because their oscillation period exceeds the 126-year baseline (apparent slope flips sign across sub-windows); Saturn because its magnitude varies by ~2× across plausible windows even though direction stays retrograde |
 | **Frame note** | Reminder that all angles are in the ecliptic-of-date frame — in ICRF each rate would differ by ~−5,030″/cy (general precession, H/13) |
 
 ### Full Reference
 
-See [56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) for the complete observed-rate table, the data pipeline (`tools/explore/wgc-perihelion-rates.js` → `public/input/wgc-perihelion-data.json`), and why only Mercury / Mars / Saturn have resolvable trends from the 1900–2026 window.
+See [56 — WebGeoCalc Explorer](56-webgeocalc-explorer.md) for the complete observed-rate table, the data pipeline (`tools/explore/wgc-perihelion-rates.js` → `public/input/wgc-perihelion-data.json`), and why only Mercury and Mars have reliably resolvable trends from the 1900–2026 window. Saturn's direction stays retrograde across windows but its magnitude varies by ~2× (sliding-window range −1,800 to −3,600 ″/cy), so it is also flagged as un-determined.
 
 ---
 
