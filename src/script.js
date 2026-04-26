@@ -22060,12 +22060,16 @@ function wgcRenderPlanet(planetKey) {
   const reliable = nCycles >= 4;  // heuristic: need ≥4 oscillation cycles for clean OLS
 
   // Planets whose perihelion trend cannot be reliably determined from the
-  // 1900-2026 observational baseline: Venus, Jupiter, Uranus, Neptune.
-  // Their trends flip sign across sub-windows (1800-1900, 1900-2026, 2026-2100),
-  // so the "direction" for these planets is inherited from Laskar-style
-  // million-year secular integrations rather than direct observation.
-  // Only Mercury, Mars, and Saturn have reliably resolvable trends.
-  const undeterminedTrend = ['VENUS', 'JUPITER', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
+  // 1900-2026 observational baseline: Venus, Jupiter, Saturn, Uranus, Neptune.
+  // For Venus / Jupiter / Uranus / Neptune the trend literally flips sign
+  // across sub-windows (1800-1900, 1900-2026, 2026-2100). For Saturn the
+  // direction stays retrograde across most windows, but the magnitude
+  // varies by ~2× depending on which 126-year stretch is used (sliding-
+  // window analysis showed midpoint trends from -1,800 to -3,600 ″/cy with
+  // 0.4° non-linear residuals). Saturn's "rate" is therefore reported as
+  // un-determined and we let the user read the trend visually from the chart.
+  // Only Mercury and Mars have reliably resolvable trends from this baseline.
+  const undeterminedTrend = ['VENUS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
 
   // Model's predicted trajectory using predictGeocentricPrecession(year, planet):
   //   baseline rate + missing-advance formula (fitted to observations).
