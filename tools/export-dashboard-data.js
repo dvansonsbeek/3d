@@ -18,9 +18,9 @@ const OUTPUT_DIR = path.join(__dirname, '..', 'dashboard', 'data');
 // ── Configuration ──────────────────────────────────────────────────────────
 
 const STEP = C.stepYears;                 // years between data points (from model-parameters.json)
-const H = C.H;                            // one full Holistic Year
+const H = C.H;                            // one full Earth Fundamental Cycle
 const startYear = C.balancedYear;         // start of the cycle
-const endYear = startYear + 2 * H;        // 2 full Holistic Years
+const endYear = startYear + 2 * H;        // 2 full Earth Fundamental Cycles
 const PLANET_NAMES = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
 const PLANET_COLORS = {
@@ -347,7 +347,7 @@ function main() {
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('  DASHBOARD DATA EXPORT');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`  Holistic Year: ${H} years`);
+  console.log(`  Earth Fundamental Cycle: ${H} years`);
   console.log(`  Range: ${startYear.toFixed(0)} to ${endYear.toFixed(0)}`);
   console.log(`  Step: ${STEP} years → ~${Math.ceil(H / STEP)} data points`);
   console.log(`  Output: ${OUTPUT_DIR}`);

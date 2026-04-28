@@ -24,7 +24,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Variable | Description |
 |----------|-------------|
-| `holisticyearLength` | Length of Holistic-Year (H) in Earth solar years |
+| `holisticyearLength` | Length of Earth Fundamental Cycle (H) in Earth solar years |
 | `meansolaryearlengthinDays` | Mean solar year in days (rounded to H/8 precision) |
 | `meansiderealyearlengthinSeconds` | Mean sidereal year in seconds (derived: `siderealYearJ2000 × 86400`) |
 | `meanlengthofday` | Mean solar day in SI seconds |
@@ -98,7 +98,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | `{planet}OrbitDistance` | Semi-major axis (a) in AU (derived) |
 | `{planet}PerihelionDistance` | Distance at perihelion |
 | `{planet}Speed` | Mean orbital velocity (km/h) |
-| `{planet}SolarYearCount` | Number of orbits in Holistic-Year (derived) |
+| `{planet}SolarYearCount` | Number of orbits in Earth Fundamental Cycle (derived) |
 | `{planet}PerihelionEcliptic` | Perihelion precession period |
 | `{planet}PerihelionEclipticYears` | Perihelion precession cycle length against ecliptic |
 | `{planet}AngleCorrection` | Alignment correction angle |
@@ -411,7 +411,7 @@ These formulas handle precession calculations and secular perturbation theory.
 | `perturbationStrength(a_p, a_pert, m_pert, M_sun)` | strength = (m/M) × (a_ratio)² | Relative influence of perturbing planet |
 | `precessionRatio(rate1_arcsec, rate2_arcsec)` | ratio = rate₁ / rate₂ | Ratio between two precession rates |
 | `precessionDecomposition(total, ecliptic)` | {total, ecliptic, perturbations} | Decompose precession into components |
-| `holisticRatioDescription(ratio)` | string | Format ratio as readable fraction (e.g., "Holistic Year / 4") |
+| `holisticRatioDescription(ratio)` | string | Format ratio as readable fraction (e.g., "Earth Fundamental Cycle / 4") |
 
 ---
 
@@ -1829,13 +1829,13 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 }
 ```
 
-### 10.3 Holistic Year Relationships
+### 10.3 Earth Fundamental Cycle Relationships
 
-#### 10.3.1 Precession Ratio to Holistic Year
+#### 10.3.1 Precession Ratio to Earth Fundamental Cycle
 
 **Formula:** `ratio = holisticyearLength / precession_period`
 
-**Physical Meaning:** Shows how precession periods relate to the fundamental Holistic Year (H).
+**Physical Meaning:** Shows how precession periods relate to the Earth Fundamental Cycle (H).
 
 **Observed Patterns:**
 | Planet | Ratio | Expression |
@@ -1851,7 +1851,7 @@ precessionICRFToEcliptic: (ICRF_years, reference_years) => {
 
 **Implementation:**
 ```javascript
-// Ratio of holistic year to precession period
+// Ratio of Earth Fundamental Cycle to precession period
 // Shows resonance structure in Newtonian precession
 holisticPrecessionRatio: (precession_period, holistic_year) => {
   if (precession_period === 0) return Infinity;
@@ -1867,7 +1867,7 @@ holisticPrecessionRatio: (precession_period, holistic_year) => {
 
 **Implementation:**
 ```javascript
-// Precession period from holistic year ratio
+// Precession period from Earth Fundamental Cycle ratio
 // period = holisticyearLength / n
 precessionFromHolisticRatio: (holistic_year, ratio) => {
   if (ratio === 0) return Infinity;

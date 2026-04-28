@@ -197,7 +197,7 @@ for (const key of planetKeys) {
 console.log();
 console.log('─── 5. Conjunction Counts in H Years ────────────────────────');
 console.log();
-console.log('Number of conjunctions (= orbit count difference) in one Holistic Year:');
+console.log('Number of conjunctions (= orbit count difference) in one Earth Fundamental Cycle:');
 console.log();
 
 for (let i = 0; i < planetKeys.length; i++) {

@@ -210,7 +210,7 @@ for (const d of data) {
   console.log(`${d.name.padEnd(10)} N=${String(N).padStart(10)}  T=${T.toFixed(1).padStart(10)}  η=ψ/d=${(psiModel/d.d).toExponential(3)}  ξ_amp=${xi.toExponential(3)}  e_amp_check=${eAmpCheck.toExponential(3)}`);
 }
 
-// ── 9. Natural units: express everything per-Holistic-Year ──────────────
+// ── 9. Natural units: express everything per-Earth Fundamental Cycle ──────────────
 console.log('\n\n=== 9. EVERYTHING IN H-NATURAL UNITS ===\n');
 console.log('Define: T̃ = T/H = 1/N (orbital period in H-units)');
 console.log('Then a^1.5 = T = H/N = H×T̃');

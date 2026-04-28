@@ -464,7 +464,7 @@ where:
 
 Anchored to J2000: `obliquity(2000) = axialTiltJ2000` (the known J2000 tilt).
 
-The **mean obliquity** (time-averaged over the Grand Holistic Octave = 8H) is:
+The **mean obliquity** (time-averaged over the Solar System Resonance Cycle = 8H) is:
 
 ```
 mean = tiltJ2000 + A·cos(ωᵢ·t₂₀₀₀) − A·cos(ωₒ·t₂₀₀₀)
@@ -540,7 +540,7 @@ oscillations superimposed on the trend — would constitute a confirmation.
    (dΩ/dt) are measured against the ecliptic, which itself precesses. The model now
    uses integer divisors of 8H (`ascendingNodeCyclesIn8H`) fitted to reproduce JPL's
    J2000-fixed-frame ecliptic-inclination trends to ~4.3″/century across all 7 fitted
-   planets. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md).
+   planets. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md).
 
 7. **Jupiter obliquity verification**: The Mars-Jupiter reciprocity predicts
    Jupiter obliquity = H/2 = 167,659 yr. Current literature (Saillenfest+ 2020)

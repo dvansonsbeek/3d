@@ -16,7 +16,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Invariable Plane Balance Explorer** | Test Fibonacci Law assignments interactively |
 | **Eccentricity Balance Scale** | Visualize Law 5 balance per target planet (waterfall chart + buildup table) |
-| **Grand Holistic Octave** | All periods as integer divisors of 8H = 2,682,536 yr (8 planets × 6 cycles) |
+| **Solar System Resonance Cycle** | All periods as integer divisors of 8H = 2,682,536 yr (8 planets × 6 cycles) |
 | **WebGeoCalc Explorer** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet |
 | **Formula Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 9 quantities) |
 
@@ -448,16 +448,16 @@ See [38 — The Eccentricity Balance Scale](38-eccentricity-scale.md) for the ph
 
 ---
 
-## Grand Holistic Octave
+## Solar System Resonance Cycle
 
 ### Purpose
 
-Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Grand Holistic Octave 8H = 2,682,536 years. Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
+Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICRF perihelion / inclination, ascending node regression, obliquity oscillation, eccentricity cycle) as integer divisors of the Solar System Resonance Cycle 8H = 2,682,536 years. Every cycle for every planet divides 8H evenly — this is the super-period that resets the whole system once every ~2.68 million years.
 
 ### Accessing the Panel
 
 1. Open the Tweakpane Tools folder
-2. Click "Grand Holistic Octave"
+2. Click "Solar System Resonance Cycle"
 3. Use the **Years / 8H/N** toggle button in the header to switch display modes
 
 ### Key Features
@@ -472,7 +472,7 @@ Shows all 8 planets × 6 cycle types (axial precession, ecliptic perihelion, ICR
 
 ### Full Reference
 
-See [55 — Grand Holistic Octave Period Table](55-grand-holistic-octave-periods.md) for the complete period table (both years and 8H/N), the three Fibonacci identities linking cycles, mirror-symmetry patterns, and the Earth cycle chain.
+See [55 — Solar System Resonance Cycle Period Table](55-solar-system-resonance-cycle-periods.md) for the complete period table (both years and 8H/N), the three Fibonacci identities linking cycles, mirror-symmetry patterns, and the Earth cycle chain.
 
 ---
 
@@ -581,7 +581,7 @@ This 99.994% accuracy validates that our orbital elements are consistent with pu
 | [33 - Invariable Plane Calculations](33-invariable-plane-calculations.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
 | [38 - Eccentricity Balance Scale](38-eccentricity-scale.md) | Law 5 balance math; Saturn eccentricity prediction |
-| [55 - Grand Holistic Octave](55-grand-holistic-octave-periods.md) | 8H period table for all planets × cycles |
+| [55 - Solar System Resonance Cycle](55-solar-system-resonance-cycle-periods.md) | 8H period table for all planets × cycles |
 | [56 - WebGeoCalc Explorer](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
 | [57 - Formula Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
 

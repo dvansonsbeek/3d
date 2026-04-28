@@ -84,7 +84,7 @@ function getFibonacciAmplitude(key) {
 //
 // Earth's phase angle (21.77°) clusters near the γ₁ eigenmode (20.23°).
 // Saturn is anti-phase: MAX inclination at balanced year (others at MIN).
-// All ICRF periods divide 8H = 2,682,536 years (Grand Holistic Octave).
+// All ICRF periods divide 8H = 2,682,536 years (Solar System Resonance Cycle).
 // ═══════════════════════════════════════════════════════════════════════════
 
 const earthFibAmp = getFibonacciAmplitude('earth');

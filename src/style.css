@@ -1538,7 +1538,7 @@ a:link {
   );
 }
 
-/* highlight row (e.g. Holistic Year) */
+/* highlight row (e.g. Earth Fundamental Cycle) */
 .pl-row.pl-highlight .pl-key { font-weight:600; font-size:12px; }
 .pl-row.pl-highlight .pl-val { font-weight:600; font-size:13px; }
 .pl-row.pl-highlight .pl-alt { font-weight:600; }
@@ -3208,7 +3208,7 @@ a:link {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   GRAND HOLISTIC OCTAVE PERIOD TABLE (.gho-)
+   SOLAR SYSTEM RESONANCE CYCLE PERIOD TABLE (.gho-)
    ══════════════════════════════════════════════════════════════════ */
 
 .gho-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:10000; }

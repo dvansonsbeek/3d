@@ -48,7 +48,7 @@ where `siderealYearJ2000 = 365.25636301` days (from `astro-reference.json`). As 
 
 ## Mean Year Lengths (Derived)
 
-All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the Holistic Year `H = 335,317`:
+All three mean year lengths derive from `inputmeanlengthsolaryearindays` and the Earth Fundamental Cycle `H = 335,317`:
 
 | Year type | Formula | Mean (days) |
 |-----------|---------|-------------|

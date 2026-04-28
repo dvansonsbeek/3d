@@ -341,4 +341,4 @@ All three literature values are **theoretical** (not directly observed), making 
 - [62 — Type I Inner Planets](62-type-i-inner-planets.md) — Mercury and Venus specific details
 - [12 — Perihelion Precession](12-perihelion-precession.md) — Conceptual background on the precession sandwich
 - [37 — Planetary Precession Cycles](37-planets-precession-cycles.md) — Full precession analysis for all planets
-- [55 — Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md) — 8H/N period table
+- [55 — Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — 8H/N period table

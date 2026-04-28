@@ -86,7 +86,7 @@ The eccentricity oscillates around its base value with the K-derived amplitude a
 
 ### 5. Ascending node cycle (invariable plane)
 
-The rate at which each planet's ascending node on the invariable plane regresses. These are set as integer divisors of the Grand Holistic Octave (8H): each planet has an integer number of ascending node cycles in 8H. This ensures the eigenmode decomposition of the vector balance achieves 100% at all times.
+The rate at which each planet's ascending node on the invariable plane regresses. These are set as integer divisors of the Solar System Resonance Cycle (8H): each planet has an integer number of ascending node cycles in 8H. This ensures the eigenmode decomposition of the vector balance achieves 100% at all times.
 
 Not to be confused with the ascending node on the ecliptic, which is the commonly tabulated quantity. The invariable plane ascending node is the dynamically meaningful one for the balance laws.
 
@@ -104,7 +104,7 @@ The base eccentricities (mean eccentricities around which each planet oscillates
 
 ## System Reset
 
-The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Grand Holistic Octave (≈ −2,649,854). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
+The System Reset epoch is the year where all 7 non-Earth planets simultaneously reach their inclination extremes. For the default configuration, it falls at anchor n=7 within the Solar System Resonance Cycle (≈ −2,649,854). Other viable configurations may have a different optimal anchor (n ∈ {0..7}); the deep analysis in `balance-search.js` determines the best n for each. **Each candidate's eccentricity balance is computed using its OWN bases** — recomputed with the candidate's d-values, anti-phase assignments, and optimal anchor — not the default config's bases. This makes the ranking a fair physical comparison.
 
 - In-phase planets (Mercury, Venus, Mars, Jupiter, Uranus, Neptune): all at **minimum** inclination
 - Anti-phase planet (Saturn): at **maximum** inclination
@@ -117,13 +117,13 @@ This is the physically motivated symmetry: at n=7, every cycle type (inclination
 
 The inclination cycle anchors are a direct consequence: each planet's cycle anchor equals its ICRF perihelion longitude at the System Reset (minus 180° for in-phase planets). This is not a coincidence — the System Reset defines the phase geometry. The cycle anchors are derived, not fitted.
 
-The System Reset occurs once per Grand Holistic Octave (8H = 2,682,536 years). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
+The System Reset occurs once per Solar System Resonance Cycle (8H = 2,682,536 years). It is the moment when the inclination oscillation "resets" — all planets return to their extreme positions simultaneously, like the hands of a clock aligning at midnight.
 
 ## The Complete Picture
 
 The model has 6 free parameters:
 
-1. **H** — the Holistic Year (335,317 years) — 1 DOF
+1. **H** — the Earth Fundamental Cycle (335,317 years) — 1 DOF
 2. **Fibonacci divisors** — {3, 5, 8, 13, 21, 34} — 3 DOF (assumed, not derived)
 3. **Mean obliquity** — Earth's mean axial tilt (23.4135°) — 1 DOF
 4. **Inclination amplitude** — Earth's invariable-plane amplitude (0.6360°) — 1 DOF

@@ -260,7 +260,7 @@ i_app = arccos(n_ecl · n_planet)
 
 ### 3.3 Earth Obliquity
 
-Earth's axial tilt oscillates with the holistic year cycle.
+Earth's axial tilt oscillates with the Earth Fundamental Cycle.
 
 **Formula:**
 ```
@@ -336,7 +336,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Constant | Value | Description |
 |----------|-------|-------------|
 | General precession | H/13 | holisticyearLength/13 |
-| Holistic year | H (see [Constants Reference](20-constants-reference.md)) | Complete precession cycle |
+| Earth Fundamental Cycle | H (see [Constants Reference](20-constants-reference.md)) | Complete precession cycle |
 
 ---
 

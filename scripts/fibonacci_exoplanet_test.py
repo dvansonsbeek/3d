@@ -709,14 +709,14 @@ def section_7():
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SECTION 8: TRAPPIST-1 "HOLISTIC YEAR" ANALOG
+# SECTION 8: TRAPPIST-1 "EARTH FUNDAMENTAL CYCLE" ANALOG
 # ═══════════════════════════════════════════════════════════════════════════
 
 def section_8():
     print()
     print()
     print("=" * 80)
-    print("  SECTION 8: TRAPPIST-1 — searching for a 'Holistic Year' analog")
+    print("  SECTION 8: TRAPPIST-1 — searching for an 'Earth Fundamental Cycle' analog")
     print("=" * 80)
     print()
 
@@ -886,7 +886,7 @@ def main():
     section_5()   # Kepler-90 period ratios
     section_6()   # Kepler-90 outer planets
     section_7()   # Comparative analysis
-    section_8()   # TRAPPIST-1 "Holistic Year" analog
+    section_8()   # TRAPPIST-1 "Earth Fundamental Cycle" analog
     section_9()   # Summary
 
     print()

@@ -8,7 +8,7 @@ This document explains **how the planetary precession formulas were derived** �
 
 | Term | Value | Meaning |
 |------|-------|---------|
-| **Holistic-Year (H)** | See [Constants Reference](20-constants-reference.md) | Master cycle from which all periods derive via Fibonacci fractions |
+| **Earth Fundamental Cycle (H)** | See [Constants Reference](20-constants-reference.md) | Master cycle from which all periods derive via Fibonacci fractions |
 | **Anchor Year** | `balancedYear` = perihelionalignmentYear − 14.5×(H/16) | Year zero of the current Holistic cycle; formulas use `Year − balancedYear` |
 | **ERD** | Earth Rate Deviation | Difference between instantaneous and mean Earth perihelion rate (°/year); see [Section 14](#14-observed-angle-formulas-using-observational-data) |
 
@@ -42,7 +42,7 @@ This document explains **how the planetary precession formulas were derived** �
 
 ## 1. Fibonacci Hierarchy in Orbital Periods
 
-This section documents the timescale hierarchy that forms Law 1 of the Fibonacci Laws. A remarkable pattern emerges when dividing the Holistic-Year by Fibonacci numbers. The resulting periods correspond to major planetary cycles:
+This section documents the timescale hierarchy that forms Law 1 of the Fibonacci Laws. A remarkable pattern emerges when dividing the Earth Fundamental Cycle by Fibonacci numbers. The resulting periods correspond to major planetary cycles:
 
 | Fibonacci | H/F | Period (years) | Astronomical Meaning |
 |-----------|-----|----------------|---------------------|
@@ -572,7 +572,7 @@ The fundamental periods are model parameters, not independently derived values:
 
 | Parameter | Current Value | H Fraction | Impact |
 |-----------|---------------|------------|--------|
-| **Holistic-Year (H)** | See [Constants Reference](20-constants-reference.md) | — | All derived periods scale with H |
+| **Earth Fundamental Cycle (H)** | See [Constants Reference](20-constants-reference.md) | — | All derived periods scale with H |
 | **Earth precession cycles** | | | |
 | Axial precession | H/13 | Fibonacci | All formulas using longitude of perihelion |
 | Inclination precession | H/3 | Fibonacci | Obliquity, inclination formulas |

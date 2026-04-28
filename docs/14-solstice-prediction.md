@@ -8,7 +8,7 @@ points (VE, SS, AE, WS) using **24 harmonics** per cardinal point:
 nonlinear interactions between the precession cycles.
 
 These harmonics replace the conventional Meeus polynomial approach, extending
-the valid prediction range from ±2,000 years to the full **335,317-year** Holistic Year.
+the valid prediction range from ±2,000 years to the full **335,317-year** Earth Fundamental Cycle.
 
 Three formulas are provided for each cardinal point:
 
@@ -18,7 +18,7 @@ Three formulas are provided for each cardinal point:
 
 **Key result:** With one astronomical observation per cardinal point (the J2000 date)
 and the model's existing constants, all cardinal point dates across the full
-335,317-year Holistic Year can be predicted to **0.05–1.0 minutes** accuracy.
+335,317-year Earth Fundamental Cycle can be predicted to **0.05–1.0 minutes** accuracy.
 The RA position requires **zero observations** — it is fully derived from model parameters.
 
 | Cardinal Point | Detection | RMSE (JD) | J2000 Anchor |
@@ -53,7 +53,7 @@ and `baseRA` = 90° (SS), 270° (WS), 0° (VE), 180° (AE).
 - **Same formula for all 4 cardinal points** — only baseRA changes (0°, 90°, 180°, 270°)
 - **Mean SS RA ≈ 86.85° = 5h 47m 22s** (at balanced year when all precession phases = 0)
 - **At J2000: SS ≈ 90°, WS ≈ 270°, VE ≈ 0°, AE ≈ 180°** (near current obliquity maximum)
-- **Range: 6.32°** (25.3 minutes of RA) oscillation over the full Holistic Year
+- **Range: 6.32°** (25.3 minutes of RA) oscillation over the full Earth Fundamental Cycle
 - **RMSE: 0.089°** (0.36 minutes of RA) — validated against 14,579 simulation data points
 - **Zero fitted constants** — everything derived from earthRAAngle, A, and ε
 
@@ -238,7 +238,7 @@ of the Fibonacci precession hierarchy.
 
 ### 5. Long-term calendar implications
 
-Over the full Holistic Year, the solstice RA drifts by 6.3° (25 minutes of RA).
+Over the full Earth Fundamental Cycle, the solstice RA drifts by 6.3° (25 minutes of RA).
 The "summer solstice at 6h RA" is a temporary coincidence of our epoch.
 At the balanced year, the solstice occurs at 5h 47m RA. In ~80,000 years, it will
 be at 5h 35m RA (the minimum).
@@ -250,7 +250,7 @@ be at 5h 35m RA (the minimum).
 Cardinal point observations generated from the headless scene-graph (no browser needed):
 - Script: `tools/fit/export-solar-measurements.js` (single-pass, configurable step size)
 - File: [../data/02-solar-measurements.csv](../data/02-solar-measurements.csv)
-- ~87,000 data points (6 types × ~14,579 steps) spanning one full Holistic Year
+- ~87,000 data points (6 types × ~14,579 steps) spanning one full Earth Fundamental Cycle
 - Step: stepYears (from model-parameters.json), grid-aligned
 - Columns: Type, Model Year, JD, RA (°), Obliquity (°), World Angle (°), Distance (AU)
 - Detection: SS/WS by max/min declination (parabolic interpolation), VE/AE by declination

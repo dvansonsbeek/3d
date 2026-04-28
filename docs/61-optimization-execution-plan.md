@@ -193,7 +193,7 @@ earth.pivotObj
 | `moonTilt` | 6.687° | Moon's axial tilt |
 | `moonStartposApsidal/Nodal/Moon` | 330° / 64° / 132.105° | Start positions (aligned to Stellarium) |
 
-**Derived cycles** (lines 992-1011): Synodic and tropical months derived from sidereal month + Holistic Year integer rounding. Apsidal precession (~3,232 days ≈ 8.85 yr), nodal precession (~6,798 days ≈ 18.6 yr), apsidal-nodal beat (~206 days), lunar leveling cycle, draconic year — all derived from the 3 input months.
+**Derived cycles** (lines 992-1011): Synodic and tropical months derived from sidereal month + Earth Fundamental Cycle integer rounding. Apsidal precession (~3,232 days ≈ 8.85 yr), nodal precession (~6,798 days ≈ 18.6 yr), apsidal-nodal beat (~206 days), lunar leveling cycle, draconic year — all derived from the 3 input months.
 
 **Eclipse cycle verification** (lines 22634-22690): Saros (223 synodic = 239 anomalistic = 242 draconic months), Exeligmos (3× Saros), Callippic (940 synodic months = 76 solar years).
 
@@ -328,7 +328,7 @@ Traced through the full Three.js hierarchy numerically (container → orbit → 
 Mars's `RealPerihelionAtSun.speed = −2π + 2×2π/(H/marsCount)` creates frame rotation at the planet level:
 
 ```
-Frame rotation rates (per holistic year):
+Frame rotation rates (per Earth Fundamental Cycle):
   Ecliptic1:           +ω_prec  (slow precession)
   PerihelionFromEarth: +2π      (annual co-rotation with Sun)
   Ecliptic2:           −ω_prec  (cancels Ecliptic1)
@@ -1512,7 +1512,7 @@ Once the tool is built, Claude runs this self-improving loop in two stages:
 
 ### Still Open -- Epistemological
 
-3. **Circular reasoning risk**: Optimizing to match JPL makes our model a worse version of JPL. The model's value lies in its structural simplicity (Holistic-Year framework, Fibonacci relationships). Optimization should preserve structure and only tune free parameters.
+3. **Circular reasoning risk**: Optimizing to match JPL makes our model a worse version of JPL. The model's value lies in its structural simplicity (Earth Fundamental Cycle framework, Fibonacci relationships). Optimization should preserve structure and only tune free parameters.
 
 4. **Historical vs modern accuracy**: The model spans 300,000+ years; JPL is reliable for ~500 years. Should we weight modern-era accuracy (where JPL is a good proxy) or prioritize matching ancient observed events (where JPL itself may be wrong)?
 

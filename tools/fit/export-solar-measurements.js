@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Export Solar Measurements across the full Holistic Year.
+ * Export Solar Measurements across the full Earth Fundamental Cycle.
  *
  * Single-pass simulation (1-year steps) measuring all solar events:
  *   - Cardinal points: SS (max dec), WS (min dec), VE (dec=0 asc), AE (dec=0 desc)

@@ -34,7 +34,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 
 | # | Document | Description |
 |---|----------|-------------|
-| 01 | [Introduction](01-introduction.md) | Core concepts, the two forces, the Holistic-Year |
+| 01 | [Introduction](01-introduction.md) | Core concepts, the two forces, the Earth Fundamental Cycle |
 | 02 | [User Guide](02-user-guide.md) | How to use the 3D simulation — controls, panels, features |
 | 03 | [Glossary](03-glossary.md) | Essential terms and definitions |
 | 04 | [Dynamic Elements Overview](04-dynamic-elements-overview.md) | How orbital elements change over time |
@@ -137,7 +137,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 
 | # | File | Description |
 |---|------|-------------|
-| 98 | [Holistic Year Objects Data](../data/01-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning one complete Holistic Year |
+| 98 | [Earth Fundamental Cycle Objects Data](../data/01-holistic-year-objects-data.xlsx) | Planetary positions and orbital elements spanning one complete Earth Fundamental Cycle |
 
 ---
 
@@ -221,7 +221,7 @@ See the [Python Scripts README](../scripts/README.md) and [Predictive Formula Gu
 
 | Concept | Value | Description |
 |---------|-------|-------------|
-| Holistic-Year (H) | 335,317 years | Complete cycle unifying all precession movements |
+| Earth Fundamental Cycle (H) | 335,317 years | Complete cycle unifying all precession movements |
 | Axial Precession | H/13 (~25,794 yr) | Earth's wobble around the EARTH-WOBBLE-CENTER |
 | Inclination Precession | H/3 (~111,772 yr) | PERIHELION-OF-EARTH orbit period |
 | Perihelion Precession | H/16 (~20,957 yr) | Combined cycle where axial meets inclination |

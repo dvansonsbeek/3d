@@ -8,7 +8,7 @@ This document describes the Fibonacci Laws of Planetary Motion as implemented in
 
 The six Fibonacci Laws form a layered architecture:
 
-- **Law 1** (Fibonacci Cycle Hierarchy) — all major precession periods derive from the Holistic Year divided by Fibonacci numbers
+- **Law 1** (Fibonacci Cycle Hierarchy) — all major precession periods derive from the Earth Fundamental Cycle divided by Fibonacci numbers
 - **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups
 - **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition
 - **Law 6** (Saturn-Jupiter-Earth Resonance) — a closed beat-frequency loop linking three dominant precession periods
@@ -30,7 +30,7 @@ Where:
 
 ## Fundamental Constants
 
-### The Holistic Year
+### The Earth Fundamental Cycle
 
 ```
 H = see Constants Reference for current value
@@ -60,7 +60,7 @@ K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.415 × 10⁻
 
 Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invariable plane at J2000, Ω J2000 = longitude of ascending node on the invariable plane at J2000 epoch (Souami & Souchay 2012, verified).
 
-**Note on Earth's eccentricity:** The J2000 value (0.0167) is used for the balance calculations (Laws 3 and 5), consistent with all other planets. Earth's mean eccentricity over the Holistic Year (0.0153, used in the 3D simulation) differs due to long-term oscillation. The impact on balance is negligible — Earth's eccentricity weight is tiny compared to the gas giants.
+**Note on Earth's eccentricity:** The J2000 value (0.0167) is used for the balance calculations (Laws 3 and 5), consistent with all other planets. Earth's mean eccentricity over the Earth Fundamental Cycle (0.0153, used in the 3D simulation) differs due to long-term oscillation. The impact on balance is negligible — Earth's eccentricity weight is tiny compared to the gas giants.
 
 ---
 
@@ -68,7 +68,7 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 ### Law 1: Fibonacci Cycle Hierarchy
 
-All major precession periods derive from the Holistic Year divided by Fibonacci numbers:
+All major precession periods derive from the Earth Fundamental Cycle divided by Fibonacci numbers:
 
 | F(n) | Period = H/F(n) | Astronomical meaning |
 |------|-----------------|---------------------|
@@ -184,7 +184,7 @@ Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, 
 
 ### Phase Groups
 
-Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md#system-reset) for details.
+Each planet has a per-planet cycle anchor for inclination extremes (in-phase at minimum, Saturn at maximum). This occurs once per 8H. Earth is locked to its own n=0 reference for the IAU obliquity constraint. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md#system-reset) for details.
 
 | Planet | Cycle Anchor | Group | Balanced Year |
 |--------|-------------|-------|--------|
@@ -214,7 +214,7 @@ The group assignment is constrained by: (1) each planet's oscillation range must
 | Uranus | H/3 |
 | Neptune | 2H |
 
-The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years (the Grand Holistic Octave).
+The inclination oscillation uses the **ICRF perihelion period** (ecliptic rate − general precession H/13). All ICRF periods divide 8H = 2,682,536 years (the Solar System Resonance Cycle).
 
 ---
 

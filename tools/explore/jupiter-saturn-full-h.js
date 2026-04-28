@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Jupiter-Saturn conjunction pattern over the full Holistic Year.
+ * Jupiter-Saturn conjunction pattern over the full Earth Fundamental Cycle.
  *
  * Analytical computation — no scene-graph needed. Computes all ~16,870
  * conjunctions in H from orbital periods + perihelion precession + eccentricity.

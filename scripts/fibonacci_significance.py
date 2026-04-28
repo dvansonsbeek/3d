@@ -734,7 +734,7 @@ def stat_d_set_fib_clustering(d_vals):
 
 def stat_gho_fib_denominators(period_fracs):
     """
-    Test 14 — Grand Holistic Octave divisibility (Fibonacci denominators).
+    Test 14 — Solar System Resonance Cycle divisibility (Fibonacci denominators).
 
     The model's inclination oscillation periods are expressed as
     T_i = H × (a_i / b_i) with small integer a_i and b_i. Count how many

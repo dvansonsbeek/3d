@@ -263,7 +263,7 @@ These are read from the model's orbital element constants and cannot be changed 
 | Perihelion longitude | ω̃_J2000 | ICRF perihelion longitude at J2000 | JPL orbital elements |
 | JPL trend | trend_JPL | Observed ecliptic inclination trend (°/century) | JPL ephemerides |
 | LL bounds | LL_min, LL_max | Laplace-Lagrange secular theory inclination bounds | Secular perturbation theory |
-| Holistic Year | H | See [Constants Reference](20-constants-reference.md) — used to derive ψ | Model calibration |
+| Earth Fundamental Cycle | H | See [Constants Reference](20-constants-reference.md) — used to derive ψ | Model calibration |
 
 ### User-Adjustable Parameters (per planet)
 
@@ -358,7 +358,7 @@ amplitude = ψ / (d × √m)
 
 Where:
   ψ = d_E × amp_E × √m_E
-  H = Holistic Year (see Constants Reference for current value)
+  H = Earth Fundamental Cycle (see Constants Reference for current value)
   d = Fibonacci divisor
   m = planet mass in solar units
 ```
@@ -478,7 +478,7 @@ The vector balance diagram demonstrates an important subtlety: the multi-mode so
 | Scalar inclination balance (Law 3) = 100% | ✓ Real constraint, selects d-values | None |
 | Scalar eccentricity balance (Law 5) ≈ 99.9% | ✓ Independent constraint, same d-values | None |
 | Fibonacci d-values with mirror symmetry | ✓ Structural prediction | None |
-| 8H/N ascending node periods (re-fit 2026-04-09 to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-grand-holistic-octave-periods.md#notable-patterns) |
+| 8H/N ascending node periods (re-fit 2026-04-09 to JPL trends) | ✓ JPL trend match for 7/7 fitted planets | Laskar's s₁–s₈ are no longer the target — see [55 § Notable Patterns](55-solar-system-resonance-cycle-periods.md#notable-patterns) |
 | J2000 positions and short-term rates | ✓ Match observations | ✓ Match observations |
 
 **What CANNOT be observationally verified:**

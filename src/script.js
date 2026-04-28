@@ -13,7 +13,7 @@ import { Pane } from 'tweakpane';
   Interactive 3D simulation of the solar system modelled from a geo-heliocentric
   frame of reference. Six Fibonacci Laws and only 6 free parameters describe the
   precession, eccentricity, inclination, obliquity and perihelion movements of
-  all planets. The Holistic-Year cycle (H) unifies axial precession
+  all planets. The Earth Fundamental Cycle (H) unifies axial precession
   (H/13), inclination precession (H/3) and perihelion precession (H/16) through
   Fibonacci number ratios. 70 model parameters (Earth 11, Moon 3, 7 planets x 8)
   and 75 calibration inputs from astronomical observations (astro-reference.json).
@@ -3553,7 +3553,7 @@ const saturnObliquityCycle  = planets.saturn.obliquityCycle;     // H/3 = 111,77
 const uranusObliquityCycle  = planets.uranus.obliquityCycle;     // H/2 = 167,659 yr (prediction, tentative)
 const neptuneObliquityCycle = Math.abs(1 / (1 / planets.neptune.perihelionEclipticYears - 13 / holisticyearLength));  // = |ICRF| (tidally damped, cancels)
 
-// Mean obliquity (analytical, averaged over 8H = Grand Holistic Octave)
+// Mean obliquity (analytical, averaged over 8H = Solar System Resonance Cycle)
 // mean = tiltJ2000 + amp×cos(ωᵢ·t₂₀₀₀) − amp×cos(ωₒ·t₂₀₀₀)
 function calcObliquityMean(planetKey, obliqCycle) {
   if (!obliqCycle) return planets[planetKey].axialTiltJ2000;
@@ -3954,14 +3954,14 @@ const OrbitalFormulas = {
     return (ICRF_years * reference_years) / sum;
   },
 
-  // Ratio of holistic year to precession period
+  // Ratio of Earth Fundamental Cycle to precession period
   // Shows resonance structure in Newtonian precession (e.g., Mars = 4, Earth = 3)
   holisticPrecessionRatio: (precession_period, holistic_year) => {
     if (precession_period === 0) return Infinity;
     return holistic_year / precession_period;
   },
 
-  // Precession period from holistic year ratio
+  // Precession period from Earth Fundamental Cycle ratio
   // period = holisticyearLength / n (where n is integer ratio)
   precessionFromHolisticRatio: (holistic_year, ratio) => {
     if (ratio === 0) return Infinity;
@@ -4003,7 +4003,7 @@ const OrbitalFormulas = {
   },
 
   // Format holistic ratio as readable fraction (e.g., "1/4" for ratio=4)
-  // Returns string like "Holistic Year / 4" or "Holistic Year × 1.22"
+  // Returns string like "Earth Fundamental Cycle / 4" or "Earth Fundamental Cycle × 1.22"
   holisticRatioDescription: (ratio) => {
     if (!isFinite(ratio) || ratio === 0) return 'N/A';
     const absRatio = Math.abs(ratio);
@@ -4011,10 +4011,10 @@ const OrbitalFormulas = {
     // Check if it's close to an integer
     if (Math.abs(absRatio - Math.round(absRatio)) < 0.01) {
       const n = Math.round(absRatio);
-      if (n === 1) return `= Holistic Year${sign}`;
-      return `= Holistic Year / ${n}${sign}`;
+      if (n === 1) return `= Earth Fundamental Cycle${sign}`;
+      return `= Earth Fundamental Cycle / ${n}${sign}`;
     }
-    return `≈ Holistic Year / ${absRatio.toFixed(2)}${sign}`;
+    return `≈ Earth Fundamental Cycle / ${absRatio.toFixed(2)}${sign}`;
   },
 
   // --- 11c. Precession breakdown (Lagrange-Laplace secular theory) ---
@@ -20491,11 +20491,11 @@ function createBalanceExplorerPanel() {
           <div class="fbe-grid-header">
             <span>Planet</span>
             <span class="fbe-header-tip">Group <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Balance group: <b>in-phase</b> planets reach minimum inclination at the balanced year (~302,635 BC). <b>Anti-phase</b> planets reach maximum. The two groups must have equal structural weights for the invariable plane to remain stable.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
-            <span class="fbe-header-tip">Anchor \u03C6 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet cycle anchor: the ICRF perihelion longitude where MAX inclination occurs, evaluated at the <b>balanced year</b>. The balanced year is determined by the anchor position (n) within the Grand Holistic Octave (8H = 2,682,536 yr). Each config may have a different optimal anchor.<br><br>In-phase planets: \u03C6 = \u03D6(balanced year) \u2212 180\u00B0 (at the balanced year they are at MIN, so MAX is 180\u00B0 away)<br>Anti-phase planets: \u03C6 = \u03D6(balanced year) (at the balanced year they are at MAX)</span></span>
+            <span class="fbe-header-tip">Anchor \u03C6 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Per-planet cycle anchor: the ICRF perihelion longitude where MAX inclination occurs, evaluated at the <b>balanced year</b>. The balanced year is determined by the anchor position (n) within the Solar System Resonance Cycle (8H = 2,682,536 yr). Each config may have a different optimal anchor.<br><br>In-phase planets: \u03C6 = \u03D6(balanced year) \u2212 180\u00B0 (at the balanced year they are at MIN, so MAX is 180\u00B0 away)<br>Anti-phase planets: \u03C6 = \u03D6(balanced year) (at the balanced year they are at MAX)</span></span>
             <span class="fbe-header-tip">\u03D6 J2000 <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ICRF perihelion longitude at J2000 epoch. Read-only reference.</span></span>
             <span class="fbe-header-tip">d <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The Fibonacci divisor d determines each planet\u2019s inclination amplitude via:<br><br><b>amp = \u03C8 / (d \u00D7 \u221Am)</b><br><br>A larger d means a smaller oscillation. Each planet is assigned a Fibonacci number (1, 2, 3, 5, 8, 13, 21, 34, 55) as its divisor.<br><br><a href="https://www.holisticuniverse.com/en/model/fibonacci-laws" target="_blank" rel="noopener">Fibonacci Laws of Planetary Motion \u2192</a></span></span>
-            <span class="fbe-header-tip">N <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Ascending node cycles in 8H (Grand Holistic Octave). The ascending node regression period = \u22128H/N years.<br><br>Per-config optimized to minimize the ecliptic inclination rate error against JPL trends. Each planet\u2019s N is independent (trend only depends on that planet\u2019s own ascending node + Earth\u2019s fixed \u03A9 at \u2212H/5).</span></span>
-            <span class="fbe-header-tip">Incl. cycle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The inclination oscillation period (years): how long for the planet\u2019s invariable-plane inclination to complete one full cycle (min \u2192 max \u2192 min).<br><br>This equals the ICRF perihelion period (ecliptic rate minus general precession H/13). Negative = retrograde ICRF precession. All ICRF periods divide the Grand Holistic Octave (8H) evenly.</span></span>
+            <span class="fbe-header-tip">N <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">Ascending node cycles in 8H (Solar System Resonance Cycle). The ascending node regression period = \u22128H/N years.<br><br>Per-config optimized to minimize the ecliptic inclination rate error against JPL trends. Each planet\u2019s N is independent (trend only depends on that planet\u2019s own ascending node + Earth\u2019s fixed \u03A9 at \u2212H/5).</span></span>
+            <span class="fbe-header-tip">Incl. cycle <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The inclination oscillation period (years): how long for the planet\u2019s invariable-plane inclination to complete one full cycle (min \u2192 max \u2192 min).<br><br>This equals the ICRF perihelion period (ecliptic rate minus general precession H/13). Negative = retrograde ICRF precession. All ICRF periods divide the Solar System Resonance Cycle (8H) evenly.</span></span>
             <span class="fbe-header-tip">Ecl. period <span class="fbe-tip-icon">?</span><span class="fbe-tip-content">The ecliptic perihelion precession period (years) \u2014 the period visible in the simulation. All ecliptic periods are H/Fibonacci fractions.</span></span>
           </div>
           <div class="fbe-planet-grid">
@@ -20600,7 +20600,7 @@ function createBalanceExplorerPanel() {
           <div class="fbe-balance-explain"><b>Inclination balance</b> (Law 3): each planet\u2019s inclination oscillates with amplitude \u03C8/(d\u00D7\u221Am) around its mean, with phase timed by cycle anchor \u03B3. The structural weights w = \u221A(m\u00B7a(1\u2212e\u00B2))/d of the two balance groups must cancel: \u03A3(in-phase) w = \u03A3(anti-phase) w. At 100%, the invariable plane is a perfect center of symmetry.</div>
           <div class="fbe-balance-explain" style="margin-top:6px"><b>Eccentricity balance</b> (Law 5): an independent constraint using different powers of mass, distance, and d. The eccentricity weights v = \u221Am \u00D7 a\u00B3\u02F2 \u00D7 e / \u221Ad of the same two balance groups balance: \u03A3(in-phase) v = \u03A3(anti-phase) v. This uses 1/\u221Ad scaling instead of 1/d, confirming d encodes real physics.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">Note: this balance considers only the 8 major planets, which carry 99.994% of the solar system\u2019s orbital angular momentum. Trans-Neptunian Objects (TNOs) contribute the remaining ~0.006%, tilting the invariable plane by approximately 1.25\u2033 (<a href="https://arxiv.org/abs/1909.11293" target="_blank" rel="noopener">Li, Xia & Zhou 2019</a>).</div>
-          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Grand Holistic Octave). The integers are jointly fit to JPL\u2019s J2000-fixed-frame ascending-node trends (~4.3\u2033/century total across 7 fitted planets), with Jupiter and Saturn locked to a shared N=36. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
+          <div class="fbe-balance-explain" style="margin-top:10px"><b>What determines the ascending node periods?</b> The model assigns each planet an ascending node period as an integer divisor of 8H (the Solar System Resonance Cycle). The integers are jointly fit to JPL\u2019s J2000-fixed-frame ascending-node trends (~4.3\u2033/century total across 7 fitted planets), with Jupiter and Saturn locked to a shared N=36. However, the vector balance diagram gives 100% for <i>any</i> set of frequencies \u2014 this is a mathematical property of the eigenmode solver (33 degrees of freedom), not a unique validation of specific periods.</div>
           <div class="fbe-balance-explain" style="margin-top:6px">The <b>genuine constraints</b> are the scalar inclination balance (Law 3) and eccentricity balance (Law 5) shown above \u2014 these select the Fibonacci d-values and cannot be achieved by arbitrary configurations. The ascending node periods describe motion over 50,000\u20132,000,000 year timescales. With only ~4,000 years of recorded astronomy, the periods cannot be observationally verified by direct observation of a complete cycle.</div>
         </div>
       </div>
@@ -21663,7 +21663,7 @@ function closeEccBalanceScale() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// GRAND HOLISTIC OCTAVE PERIOD TABLE — Modal panel
+// SOLAR SYSTEM RESONANCE CYCLE PERIOD TABLE — Modal panel
 // Shows all planetary periods as 8H/N fractions
 // ═══════════════════════════════════════════════════════════════════
 
@@ -21831,7 +21831,7 @@ function createGHOPanel() {
     <div class="gho-overlay"></div>
     <div class="gho-container">
       <div class="gho-header">
-        <div class="gho-title">Grand Holistic Octave</div>
+        <div class="gho-title">Solar System Resonance Cycle</div>
         <div class="gho-subtitle">\u2014 8H = ${data.S.toLocaleString('en-US')} years \u2014 all planetary periods divide evenly</div>
         <div class="gho-controls">
           <button class="gho-toggle" title="Toggle between years and 8H/N notation">
@@ -21855,7 +21855,7 @@ function createGHOPanel() {
             </div>`;
           }).join('')}
         </div>
-        <div class="gho-footer">All ${data.rows.length} planets \u00D7 6 cycle types = integer divisors of 8H \u2002\u2022\u2002 H = ${data.H.toLocaleString('en-US')} years (Holistic Year)</div>
+        <div class="gho-footer">All ${data.rows.length} planets \u00D7 6 cycle types = integer divisors of 8H \u2002\u2022\u2002 H = ${data.H.toLocaleString('en-US')} years (Earth Fundamental Cycle)</div>
       </div>
     </div>
   `;
@@ -24741,7 +24741,7 @@ function setupGUI() {
     const lawsFolder = aboutFolder.addFolder({ title: 'The Six Laws', expanded: false });
     const laws = [
       { n: 1, title: 'Fibonacci Cycle Hierarchy',
-        desc: 'Dividing the Holistic-Year by successive Fibonacci numbers produces the major precession periods of the solar system.' },
+        desc: 'Dividing the Earth Fundamental Cycle by successive Fibonacci numbers produces the major precession periods of the solar system.' },
       { n: 2, title: 'Inclination Amplitude Constant',
         desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone.' },
       { n: 3, title: 'Inclination Balance',
@@ -24787,13 +24787,13 @@ function setupGUI() {
       fpAmplitude: earthInvPlaneInclinationAmplitude + '\u00B0',
       fpConfig: 'Config #' + (fbeMatchDefaultPreset() || '?') + ' (unique mirror-symmetric)',
     };
-    addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Holistic-Year', readonly: true }),
+    addTooltip(freeFolder.addBinding(freeParams, 'fpHolisticYear', { label: 'Earth Fundamental Cycle', readonly: true }),
       '1 DOF \u2014 Fitted to match 1246 AD alignment + J2000 longitude of perihelion.');
     const balancedBlade = addTooltip(freeFolder.addBinding(freeParams, 'fpBalancedYear', { label: 'Balanced year', readonly: true }),
-      '0 DOF \u2014 Calculated from Holistic-Year and 1246 AD. Not independently free.');
+      '0 DOF \u2014 Calculated from Earth Fundamental Cycle and 1246 AD. Not independently free.');
     balancedBlade.element.style.opacity = '0.65';
     addTooltip(freeFolder.addBinding(freeParams, 'fpFibDivisors', { label: 'Fibonacci divisors', readonly: true }),
-      '3 DOF \u2014 Assumed; not independently derived. Used to divide the Holistic-Year into precession periods (H/3, H/5, H/8, H/13, etc.).');
+      '3 DOF \u2014 Assumed; not independently derived. Used to divide the Earth Fundamental Cycle into precession periods (H/3, H/5, H/8, H/13, etc.).');
     addTooltip(freeFolder.addBinding(freeParams, 'fpMeanObliquity', { label: 'Mean obliquity', readonly: true }),
       '1 DOF \u2014 Fitted to observed obliquity range (~22.1\u00B0 to ~24.5\u00B0).');
     addTooltip(freeFolder.addBinding(freeParams, 'fpAmplitude', { label: 'Amplitude', readonly: true }),
@@ -25000,11 +25000,11 @@ function setupGUI() {
     };
     const fundFolder = constFolder.addFolder({ title: 'Earth (' + fundCount + ')', expanded: false });
     addFolderTooltip(fundFolder, fundCount + ' model parameters define all Earth orbital behaviours. Source: model-parameters.json.');
-    addConst(fundFolder, fundVals, 'holisticYear', 'Holistic-Year', 'The fundamental cycle unifying all precession movements.');
+    addConst(fundFolder, fundVals, 'holisticYear', 'Earth Fundamental Cycle', 'The fundamental cycle unifying all precession movements.');
     addConst(fundFolder, fundVals, 'fibD', 'Fibonacci d', 'Fibonacci divisor for Earth (Laws 2 + 4). d=3 = F\u2084.');
     addConst(fundFolder, fundVals, 'balanceGroup', 'Balance group', 'In-phase (MIN inclination at balanced year). Saturn is the sole anti-phase planet.');
     addConst(fundFolder, fundVals, 'ascNodePeriod', 'Asc. node period', 'Earth ascending node = ecliptic precession rate -H/5 (special: defines the ecliptic frame).');
-    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. The actual mean tropical year is calculated from this and the Holistic-Year length.');
+    addConst(fundFolder, fundVals, 'tropicalYear', 'Input tropical year', 'Input value used by the model. The actual mean tropical year is calculated from this and the Earth Fundamental Cycle length.');
     addConst(fundFolder, fundVals, 'startJD', 'Start model JD', 'Julian Day of the model start date (June Solstice 2000).');
     addConst(fundFolder, fundVals, 'correctionDays', 'Correction days', 'Small correction because 21 June 00:00 UTC is not exactly at solstice.');
     addConst(fundFolder, fundVals, 'correctionSun', 'Correction Sun', 'Degree correction for solstice alignment at ~01:47 UTC.');
@@ -25076,7 +25076,7 @@ function setupGUI() {
       addFolderTooltip(pf, pCount + ' model parameters for ' + planetModelNames[key] + '. J2000 references are in Calibration Inputs.');
       addConst(pf, v, 'fibD', 'Fibonacci d', 'Fibonacci divisor for inclination/eccentricity amplitude (Laws 2 + 4).');
       addConst(pf, v, 'balanceGroup', 'Balance group', 'In-phase (MIN at balanced year) or anti-phase (MAX at balanced year). Saturn is the sole anti-phase planet.');
-      addConst(pf, v, 'ascNodeCycles', 'Asc. node period', 'Ascending node regression period as integer divisor of 8H (Grand Holistic Octave).');
+      addConst(pf, v, 'ascNodeCycles', 'Asc. node period', 'Ascending node regression period as integer divisor of 8H (Solar System Resonance Cycle).');
       addConst(pf, v, 'ecc', 'Eccentricity base', 'Base orbital eccentricity (balance-derived mean).');
       addConst(pf, v, 'eccAmp', 'Eccentricity amplitude', 'Oscillation amplitude of orbital eccentricity.');
       addConst(pf, v, 'ascNodeInv', 'Asc. node inv. plane', 'Ascending node on the invariable plane (model-adjusted).');
@@ -25750,7 +25750,7 @@ function setupGUI() {
   }), 'Anomalistic year in days. Perihelion to perihelion.');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
-  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Holistic Year. See doc 14.');
+  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from 24-harmonic Fibonacci formula. Valid across the full 335,317-year Earth Fundamental Cycle. See doc 14.');
   for (const [cp, label] of [['VE', 'Vernal Equinox'], ['SS', 'Summer Solstice'], ['AE', 'Autumnal Equinox'], ['WS', 'Winter Solstice']]) {
     const sub = cpFolder.addFolder({ title: label });
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'Date', {
@@ -26107,7 +26107,7 @@ function setupGUI() {
   if (_hFact > 1) _hFactors[_hFact] = (_hFactors[_hFact] || 0) + 1;
   const _hFactStr = Object.entries(_hFactors).map(([p, e]) => e > 1 ? p + '^' + e : p).join(' \u00D7 ');
   const _hTip =
-    `\n\nFull Holistic Year (H = ${holisticyearLength.toLocaleString('en-US')} yr):\n` +
+    `\n\nFull Earth Fundamental Cycle (H = ${holisticyearLength.toLocaleString('en-US')} yr):\n` +
     `  Start JD: ${_hJdStart}  |  End JD: ${_hJdEnd}\n` +
     `  H = ${_hFactStr} — exact-divisor steps:\n` +
     _hSteps.map(s => `    ${s.step} yr → ${s.pts.toLocaleString('en-US')} pts`).join('\n');
@@ -26228,14 +26228,14 @@ function setupGUI() {
     'Open the invariable plane inspector. Test Fibonacci d-value and phase group assignments to verify vector balance theory.');
   addTooltip(toolsFolder.addButton({ title: 'Eccentricity Balance Scale' }).on('click', () => openEccBalanceScale()),
     'Show how each planet\u2019s eccentricity is the weighted sum of all other planets\u2019 perihelion offsets. Select any planet as the balance target.');
-  addTooltip(toolsFolder.addButton({ title: 'Grand Holistic Octave' }).on('click', () => openGHOPanel()),
+  addTooltip(toolsFolder.addButton({ title: 'Solar System Resonance Cycle' }).on('click', () => openGHOPanel()),
     'All planetary periods as integer divisors of 8H = 2,682,536 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
   addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),
-    'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across the full Holistic Year.');
+    'Open the Orbital Data Explorer dashboard. Interactive charts for orbital elements, sky positions, and Earth predictions across the full Earth Fundamental Cycle.');
 
   /* --- Console Tests (F12) ------------------------------------------------ */
   const calibFolder = toolsFolder.addFolder({ title: 'Console Tests (F12)', expanded: false });
@@ -26274,7 +26274,7 @@ function setupGUI() {
   addTestButton('Analyze Solar Day', analyzeSolarDay,
     'Measure Earth\'s rotation period relative to the Sun (mean solar day).');
   addTestButton('Solar Day Multi-Epoch', analyzeSolarDayMultiEpoch,
-    'Measure solar day offset at 65 epochs (H/64 steps) across one full holistic year.');
+    'Measure solar day offset at 65 epochs (H/64 steps) across one full Earth Fundamental Cycle.');
   addTestButton('Analyze Stellar Day', analyzeStellarDay,
     'Measure Earth\'s rotation period relative to distant stars.');
 
@@ -32369,7 +32369,7 @@ async function analyzeSolarDay(startYear, endYear, methodAOnly = false) {
   console.log('   a higher mean; RA=270° gives a lower mean. Use Reports > Solar Day');
   console.log('   to compare all starting angles side by side.');
   console.log('');
-  console.log('2) STRUCTURAL RA OFFSET (~14 ms mean over one full holistic year)');
+  console.log('2) STRUCTURAL RA OFFSET (~14 ms mean over one full Earth Fundamental Cycle)');
   console.log('   Confirmed by the Solar Day Multi-Epoch test: 65 measurements across');
   console.log(`   one full H cycle give mean offset = -14.194 ms/day (all from RA≈90°).`);
   console.log('   This reflects the coin rotation effect of axial precession: the RA');
@@ -33075,7 +33075,7 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
  * Multi-Epoch Solar Day Analysis
  *
  * Measures the solar day offset (Method A) at 65 equally-spaced epochs across
- * one full holistic year (H = 335,008 tropical years). The epochs are placed
+ * one full Earth Fundamental Cycle (H = 335,008 tropical years). The epochs are placed
  * at H/64 intervals (~5,234 years) starting from balancedYear. This covers
  * 4 full perihelion cycles (H/16) with 4 samples per cycle, revealing the
  * modulation pattern and enabling derivation of a day-length formula.
@@ -33089,11 +33089,11 @@ async function analyzeSolarDayMultiEpoch() {
   const stepYears = holisticyearLength / numSteps;  // H/64 = 5,234.5 years
   const startEpoch = balancedYear;
 
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║     MULTI-EPOCH SOLAR DAY ANALYSIS (64 steps across one holistic year)  ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
+  console.log('╔════════════════════════════════════════════════════════════════════════════════════╗');
+  console.log('║     MULTI-EPOCH SOLAR DAY ANALYSIS (64 steps across one Earth Fundamental Cycle)  ║');
+  console.log('╚════════════════════════════════════════════════════════════════════════════════════╝');
   console.log('');
-  console.log(`Holistic year H = ${holisticyearLength} tropical years`);
+  console.log(`Earth Fundamental Cycle H = ${holisticyearLength} tropical years`);
   console.log(`Step size: H/32 = ${stepYears.toFixed(2)} years`);
   console.log(`Start epoch: ${startEpoch.toFixed(0)} (balanced year)`);
   console.log(`End epoch: ${(startEpoch + (numPoints - 1) * stepYears).toFixed(0)}`);
@@ -35538,7 +35538,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over a Holistic Year. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`],
+       hover : [`Obliquity of the ecliptic: angle between equator and orbital plane. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => earthPerihelionFromEarth.distAU, dec:8, sep:',' },{ small: 'AU' }],
@@ -35609,7 +35609,7 @@ const planetStats = {
        static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => holisticyearLength-13, dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`${fmtNum(holisticyearLength,0,',')} solar years = ${fmtNum((holisticyearLength-13),0,',')} sidereal years. 13 fewer orbits because Earth's axial precession is retrograde (H/13 = precession cycle)`],
        constant: true},
@@ -35886,7 +35886,7 @@ const planetStats = {
      null,
       {label : () => `Obliquity (degrees)`,
        value : [ { small: earthtiltMean },{ v: () => o.obliquityEarth, dec:12, sep:',' }],
-       hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over a Holistic Year. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`]},
+       hover : [`Left = mean obliquity (base tilt). Right = current dynamic value. Full range ~${(earthtiltMean - 2*earthInvPlaneInclinationAmplitude).toFixed(2)}°–${(earthtiltMean + 2*earthInvPlaneInclinationAmplitude).toFixed(2)}° over an Earth Fundamental Cycle. Obliquity cycle: ~${fmtNum(holisticyearLength/8, 0, ',')} years`]},
       {label : () => `Orbital Eccentricity`,
        value : [ { small: eccentricityBase },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
        hover : [`Left = base eccentricity. Right = current dynamic value. Phase: ω+90° = 192.95°. Eccentricity cycle: ${fmtNum(perihelionCycleLength, 0, ',')} years`]},
@@ -35899,9 +35899,9 @@ const planetStats = {
        hover : [`Left = mean AU from v = 2πa/P using mean sidereal year. Right = current AU derived from dynamic sidereal year`]},
 
     {header : '—  Precession Cycles —' },
-      {label : () => `Holistic Year cycle`,
+      {label : () => `Earth Fundamental Cycle`,
        value : [ { v: () => (holisticyearLength), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The length of the Holistic-Year is ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
+       hover : [`The length of the Earth Fundamental Cycle is ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true, highlight: true},
     null,
     null,
@@ -36022,30 +36022,30 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth, dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`The Moon orbits Earth ${fmtNum((meansolaryearlengthinDays*holisticyearLength)/moonSiderealMonth,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
       {label : () => `Sidereal month`,
        value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Holistic Year (${fmtNum(holisticyearLength,0,',')} yr = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d`],
+       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength,0,',')} yr = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} = ${fmtNum(moonSiderealMonth,10,',')} d`],
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon',
        constant: true},
       {label : () => `Synodic month`,
        value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: in one Holistic Year the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Synodic orbits = sidereal − 1 + 13 − H = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Synodic orbits = sidereal − 1 + 13 − H = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 − ${fmtNum(holisticyearLength,0,',')} = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')}. The −H subtracts Earth's solar orbits (one fewer Moon-Sun alignment per Earth year); +13 adds general precession (H/13 period). Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13-holisticyearLength,0,',')} = ${fmtNum(moonSynodicMonth,10,',')} d. All derived from the 3 lunar month inputs`],
        static: true},
       {label : () => `Anomalistic month`,
        value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Holistic Year (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} anomalistic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d`],
+       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} anomalistic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonAnomalisticMonthInput),0,',')} = ${fmtNum(moonAnomalisticMonth,10,',')} d`],
        constant: true},
       {label : () => `Draconic month (a.k.a. nodal period)`,
        value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Holistic Year (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} draconic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} = ${fmtNum(moonNodalMonth,10,',')} d`],
+       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. In one Earth Fundamental Cycle (${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} d), the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} draconic orbits. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonNodalMonthInput),0,',')} = ${fmtNum(moonNodalMonth,10,',')} d`],
        constant: true},
       {label : () => `Tropical month`,
        value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: in one Holistic Year the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Tropical orbits = sidereal − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Holistic Year. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: in one Earth Fundamental Cycle the Moon completes ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} sidereal orbits. Tropical orbits = sidereal − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput),0,',')} − 1 + 13 = ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')}. The +13 accounts for general precession (H/13 period): the westward drift of the equinox adds 13 extra returns to the same ecliptic longitude per Earth Fundamental Cycle. Period = ${fmtNum(holisticyearLength*meansolaryearlengthinDays,0,',')} / ${fmtNum(Math.round(holisticyearLength*meansolaryearlengthinDays/moonSiderealMonthInput-1)+13,0,',')} = ${fmtNum(moonTropicalMonth,10,',')} d. All derived from the 3 lunar month inputs`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html',
        static: true},
 
@@ -36133,7 +36133,7 @@ const planetStats = {
     {header : '—  Moon Cycles & Precession —' },
       {label : () => `Full Moon cycle (fixed stars)`,
        value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time between successive perigee full moons ("supermoon" alignments), measured against the fixed star background. Derived by converting the Earth-frame value to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession adds 13 cycles per Holistic Year). All derived from the 3 lunar month inputs`],
+       hover : [`Time between successive perigee full moons ("supermoon" alignments), measured against the fixed star background. Derived by converting the Earth-frame value to ICRF: cycles_ICRF = cycles_Earth + 13 (general precession adds 13 cycles per Earth Fundamental Cycle). All derived from the 3 lunar month inputs`],
        static: true},
       {label : () => `Full Moon cycle (from Earth)`,
        value : [ { v: () => moonFullMoonCycleEarth, dec:10, sep:',' },{ small: 'days' }],
@@ -36146,7 +36146,7 @@ const planetStats = {
        static: true},
       {label : () => `Draconic year (from Earth)`,
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: 'days' }],
-       hover : [`Time for the Sun to return to the Moon's ascending node as experienced from Earth — the eclipse year. Eclipses can only occur when the Sun is near a lunar node. Converted from ICRF to Earth frame by subtracting 13 cycles (general precession) per Holistic Year. All derived from the 3 lunar month inputs`],
+       hover : [`Time for the Sun to return to the Moon's ascending node as experienced from Earth — the eclipse year. Eclipses can only occur when the Sun is near a lunar node. Converted from ICRF to Earth frame by subtracting 13 cycles (general precession) per Earth Fundamental Cycle. All derived from the 3 lunar month inputs`],
        static: true},
     null,
       {label : () => `Apsidal precession (fixed stars)`,
@@ -36517,7 +36517,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.mercuryInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Mercury's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.mercury.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Mercury's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.mercury.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -36548,7 +36548,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (mercurySolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Mercury orbits the Sun ${fmtNum(mercurySolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -36908,7 +36908,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.venusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Venus's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.venus.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Venus's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.venus.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -36939,7 +36939,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (venusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Venus orbits the Sun ${fmtNum(venusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -37267,7 +37267,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.marsInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Mars's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.mars.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Mars's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.mars.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -37298,7 +37298,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (marsSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Mars orbits the Sun ${fmtNum(marsSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -37657,7 +37657,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (jupiterSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Jupiter orbits the Sun ${fmtNum(jupiterSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -37984,7 +37984,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.saturnInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Saturn's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.saturn.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Saturn's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.saturn.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -38015,7 +38015,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (saturnSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Saturn orbits the Sun ${fmtNum(saturnSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -38343,7 +38343,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.uranusInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Uranus's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.uranus.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Uranus's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.uranus.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -38374,7 +38374,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (uranusSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Uranus orbits the Sun ${fmtNum(uranusSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -38702,7 +38702,7 @@ const planetStats = {
        hidden: true},
       {label : () => `Inclination to Inv. plane (I)`,
        value : [ { v: () => o.neptuneInvPlaneInclinationDynamic, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Angle between Neptune's orbit and the invariable plane. Precesses over the Holistic Year cycle. Inclination tilt drives inclination tilt amplitude = ${planets.neptune.invPlaneInclinationAmplitude.toFixed(4)}°`]},
+       hover : [`Angle between Neptune's orbit and the invariable plane. Precesses over the Earth Fundamental Cycle. Inclination tilt drives inclination tilt amplitude = ${planets.neptune.invPlaneInclinationAmplitude.toFixed(4)}°`]},
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
@@ -38733,7 +38733,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (neptuneSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Neptune orbits the Sun ${fmtNum(neptuneSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -39093,7 +39093,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (plutoSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Pluto orbits the Sun ${fmtNum(plutoSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -39435,7 +39435,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (halleysSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Halleys orbits the Sun ${fmtNum(halleysSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -39763,7 +39763,7 @@ const planetStats = {
       static: true},
 
     {header : '—  Orbital Period & Motion —' },
-      {label : () => `Orbits per Holistic Year`,
+      {label : () => `Orbits per Earth Fundamental Cycle`,
        value : [ { v: () => (erosSolarYearCount), dec:0, sep:',' },{ small: 'orbits' }],
        hover : [`Eros orbits the Sun ${fmtNum(erosSolarYearCount,0,',')} times in ${fmtNum(holisticyearLength,0,',')} Earth solar years`],
        constant: true},
@@ -40241,7 +40241,7 @@ function buildObliquityChart(currentYear) {
   const endYear   = Math.round(balancedYear + ysbStart + H);
   const curYear   = Math.round(currentYear || startmodelYear);
 
-  // Phase angle markers at inclination tilt peaks (3 per Holistic Year)
+  // Phase angle markers at inclination tilt peaks (3 per Earth Fundamental Cycle)
   const phaseLabel = earthInclinationCycleAnchor.toFixed(1) + '°';
   const peakAxialVal = mid + A;  // inclination tilt curve value at peak
   const peakTs = [c3 / 2, 3 * c3 / 2, 5 * c3 / 2];
@@ -43553,7 +43553,7 @@ function updatePlanetInvariablePlaneHeights() {
   const DEG2RAD = Math.PI / 180;
 
   // Years since balancedYear - using balancedYear as epoch ensures perfect synchronization
-  // over complete Holistic Year cycles (ascending nodes return to exact same values)
+  // over complete Earth Fundamental Cycles (ascending nodes return to exact same values)
   // Calculate from JD directly using mean solar year length to avoid calendar-based drift
   const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
 
@@ -43594,7 +43594,7 @@ function updatePlanetInvariablePlaneHeights() {
     const ascNodeAtBalancedVerified = ascNodeJ2000Verified - precessionRateICRF * yearsFromBalancedToJ2000;
 
     // Calculate current ascending node from balancedYear reference
-    // This ensures perfect cycle synchronization over complete Holistic Years
+    // This ensures perfect cycle synchronization over complete Earth Fundamental Cycles
     const rawSS = ascNodeAtBalancedSS + precessionRateICRF * yearsSinceBalanced;
     const rawVerified = ascNodeAtBalancedVerified + precessionRateICRF * yearsSinceBalanced;
     const ascNodeDynamicSS = ((rawSS % 360) + 360) % 360;
@@ -45253,7 +45253,7 @@ function computePlanetInvPlaneInclinationDynamic(planet, currentYear) {
   //   ω̃(t) = ω̃_balanced + rate × (t - balancedYear)
   //
   // Earth is sole prograde (+H/3); all others retrograde in ICRF.
-  // All ICRF periods divide the Grand Holistic Octave (8H) evenly.
+  // All ICRF periods divide the Solar System Resonance Cycle (8H) evenly.
 
   const yearsSinceBalanced = (o.julianDay - balancedJD) / meansolaryearlengthinDays;
 

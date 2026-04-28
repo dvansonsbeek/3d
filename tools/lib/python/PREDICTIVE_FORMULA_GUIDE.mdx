@@ -9,14 +9,14 @@ This system predicts how planetary precession rates deviate from their baseline 
 - Earth's perihelion longitude and its rate of change (ERD)
 - Planet perihelion longitudes relative to Earth
 - Earth's obliquity and eccentricity variations
-- **The six physical periods per planet** (ecliptic perihelion, ICRF perihelion, obliquity cycle, ascending node, axial precession, wobble) plus **all pairwise internal and Earth-cross beat frequencies** — derived from the Holistic Year (H) via `planet_beats.py`
+- **The six physical periods per planet** (ecliptic perihelion, ICRF perihelion, obliquity cycle, ascending node, axial precession, wobble) plus **all pairwise internal and Earth-cross beat frequencies** — derived from the Earth Fundamental Cycle (H) via `planet_beats.py`
 - **Sideband structure**: high-harmonic carriers (fundamentals and ICRF internal-beats) amplitude-modulated by Earth's ecliptic perihelion rate (see GROUP J, K, L below)
 
 All 7 planets use the **same feature structure** with planet-specific coefficients trained via ridge regression. When JSON periods change, feature *frequencies* update automatically, but coefficients must be retrained.
 
 ## Key Concepts
 
-### Holistic Year (H)
+### Earth Fundamental Cycle (H)
 
 The fundamental cycle of H years from which all other periods are derived (see [Constants Reference](../../../docs/20-constants-reference.md) for current value):
 
@@ -338,4 +338,4 @@ The model captures how these parameters interact across multiple timescales to p
 
 - Holistic Universe Model documentation
 - J2000 perihelion values from NASA JPL Horizons
-- Training data spans one full Holistic Year (H years) of calculated values (14,579 data points, 23-year steps)
+- Training data spans one full Earth Fundamental Cycle (H years) of calculated values (14,579 data points, 23-year steps)

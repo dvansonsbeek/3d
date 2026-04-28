@@ -296,7 +296,7 @@ def main():
     print("Model Information:")
     print(f"  Feature matrix: 429 terms (unified for all planets)")
     print(f"  Reference epoch: J{J2000}")
-    print(f"  Holistic Year (H): {H:,} years")
+    print(f"  Earth Fundamental Cycle (H): {H:,} years")
     print()
     print("Training metrics:")
     metrics = {

@@ -138,7 +138,7 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 
 ## Scope and limitations
 
-1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the Eccentricity Balance Scale, the Grand Holistic Octave panel, the planetStats panel).
+1. **Only perihelion-related angles** — the Explorer does not show eccentricity, inclination, or semi-major-axis evolution. Those are handled elsewhere (the Eccentricity Balance Scale, the Solar System Resonance Cycle panel, the planetStats panel).
 2. **No ICRF frame variant** — all angles are in the ecliptic-of-date frame; the ICRF-frame rate is noted but not plotted. Future work: add an optional ICRF-frame chart that subtracts general precession.
 3. **Earth is excluded** — ecliptic inclination zero by definition ⇒ `Ω` undefined. WebGeoCalc's reference charts also omit Earth.
 4. **Baseline is fixed at 1900–2026** — extending the pipeline script to broader windows (say 1600–2200) is possible but introduces ephemeris extrapolation issues outside DE441's validated span.
@@ -148,7 +148,7 @@ The yellow and blue curves tracking each other over 1900–2026 is the visual va
 
 - [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — First-order Laplace-Lagrange analysis, reference-frame discussion, why the model's Fibonacci framework matches WebGeoCalc where L-L fails.
 - [Planets Precession Cycles](37-planets-precession-cycles.md) — Full per-planet tables (axial, perihelion ecliptic, ICRF, ascending node, obliquity, eccentricity) with Fibonacci fractions and WebGeoCalc / Laskar references.
-- [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md) — The period table modal; shows each WebGeoCalc-observed rate next to the model's Fibonacci fraction.
+- [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — The period table modal; shows each WebGeoCalc-observed rate next to the model's Fibonacci fraction.
 - [Perihelion Precession](12-perihelion-precession.md) — The three methods used inside the simulation for computing perihelion longitude and precession (scene-graph, ICRF analytical, predictive formula).
 - [Constants Reference § Observed trend rates](20-constants-reference.md) — The constants block that feeds the display.
 

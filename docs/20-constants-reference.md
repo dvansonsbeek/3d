@@ -29,7 +29,7 @@ The six true degrees of freedom that define the model. Everything else is derive
 
 | # | Parameter | Variable | Value | DOF | Section |
 |---|-----------|----------|-------|-----|---------|
-| 1 | Holistic-Year | `holisticyearLength` | 335,317 years | 1 | [Part 1 — Holistic-Year](#the-holistic-year-h) |
+| 1 | Earth Fundamental Cycle | `holisticyearLength` | 335,317 years | 1 | [Part 1 — Earth Fundamental Cycle](#the-earth-fundamental-cycle-h) |
 | 2 | Balanced year | `balancedYear` | −302,635 (derived) | 0 | [Part 2 — Time Constants](#time-constants) |
 | 3 | Fibonacci divisors | — | 3, 5, 8, 13, 21, 34 | 3 | [Part 1 — Fibonacci Divisors](#fibonacci-divisor-assignments) |
 | 4 | Mean obliquity | `earthtiltMean` | 23.41354° | 1 | [Part 1 — Earth Parameters](#earth-parameters) |
@@ -79,15 +79,15 @@ Reference values from astronomical observations (IAU, JPL, Meeus) used to anchor
 
 These constants define the model. Changing any of them changes the theory.
 
-## The Holistic-Year (H)
+## The Earth Fundamental Cycle (H)
 
 | Constant | Variable | Value |
 |----------|----------|-------|
-| Holistic-Year | `holisticyearLength` (H) | **335,317** years |
+| Earth Fundamental Cycle | `holisticyearLength` (H) | **335,317** years |
 | Perihelion alignment year | `perihelionalignmentYear` | 1246.03125 AD |
 | Obliquity cycle position | `temperatureGraphMostLikely` | 14.5 (of 16) |
 
-The Holistic-Year is divided by Fibonacci-related integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)).
+The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce all Earth precession cycles (see [Part 2 — Derived Constants](#part-2--derived-constants)).
 
 ## Earth Parameters
 
@@ -308,7 +308,7 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 ## Moon Derived Cycles
 
-All Moon cycles are derived from the 3 input months (sidereal, anomalistic, nodal) and H. Integer rounding to `totalDaysInH = H × meanSolarYearDays` ensures exact cycle closure over the Holistic-Year.
+All Moon cycles are derived from the 3 input months (sidereal, anomalistic, nodal) and H. Integer rounding to `totalDaysInH = H × meanSolarYearDays` ensures exact cycle closure over the Earth Fundamental Cycle.
 
 | Cycle | Variable | Formula | Value (days) |
 |-------|----------|---------|-------------|
@@ -591,7 +591,7 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 
 ### Inclination Cycle Anchors
 
-Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Grand Holistic Octave); Earth is locked to its IAU-derived n=0 reference.
+Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the planet reaches MAX inclination, evaluated at one of the eight balanced-year anchors). After the 2026-04-09 audit, the seven fitted planets share anchor n=7 (≈ -2,649,854 BC, the start of the current Solar System Resonance Cycle); Earth is locked to its IAU-derived n=0 reference.
 
 | Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|

@@ -481,7 +481,7 @@ def calc_solar_year(year: int) -> float:
       Y_solar(t) = mean + Σ harmonics at H/8, H/3, H/16
       where t = year - ANCHOR_YEAR
 
-    Fitted from 491 data points spanning the full Holistic Year.
+    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
     RMS = 0.003 seconds.  Dominant term: H/8 (obliquity cycle, 1.82s).
     """
     t = time_offset(year)
@@ -496,7 +496,7 @@ def calc_sidereal_year(year: int) -> float:
       Y_sid(t) = mean + Σ harmonics at H/8, H/3
       where t = year - ANCHOR_YEAR
 
-    Fitted from 491 data points spanning the full Holistic Year.
+    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
     RMS = 0.0002 seconds.  Both terms ~0.09s amplitude.
     """
     t = time_offset(year)
@@ -573,7 +573,7 @@ def calc_anomalistic_year(year: int) -> float:
       Y_anom(t) = mean + Σ harmonics at H/8, H/3, H/16, H/24
       where t = year - ANCHOR_YEAR
 
-    Fitted from 491 data points spanning the full Holistic Year.
+    Fitted from 491 data points spanning the full Earth Fundamental Cycle.
     RMS = 0.002 seconds.  Dominant term: H/3 (inclination cycle, 0.17s).
     H/24 = H/(3×8) is the beat frequency between H/3 and H/8.
     """

@@ -27,7 +27,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 
 These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and climate patterns including ice ages.
 
-Everything comes together in the **Holistic-Year (H)**: a 335,317-year megacycle that unifies all precession periods through Fibonacci number ratios (H/3, H/13, H/16) — and this simulation visualizes it all in one interactive view.
+Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year megacycle that unifies all precession periods through Fibonacci number ratios (H/3, H/13, H/16) — and this simulation visualizes it all in one interactive view.
 
 ---
 
@@ -82,7 +82,7 @@ The simulation will open in your browser at `http://localhost:1234`
 
 ### Orbital Data Explorer (Dashboard)
 
-An interactive data dashboard for exploring planetary orbital elements across a full Holistic Year:
+An interactive data dashboard for exploring planetary orbital elements across a full Earth Fundamental Cycle:
 
 ```bash
 npm run dashboard:export   # generate JSON data from the orbital engine
@@ -165,7 +165,7 @@ The pipeline runs across 6 phases: Sun geometry → planet alignment → perihel
 
 ## Quick Facts
 
-- **Master cycle**: 335,317 years (the Holistic-Year, H)
+- **Master cycle**: 335,317 years (the Earth Fundamental Cycle, H)
 - **Axial precession**: ~25,794 years (H/13)
 - **Inclination precession**: ~111,772 years (H/3)
 - **Perihelion precession**: ~20,957 years (H/16)

@@ -286,7 +286,7 @@ The correct approach was the **exhaustive LL-constrained search** — testing al
 ### Kept in tools/explore/ (active reference)
 | Script | Purpose | Key Finding |
 |--------|---------|-------------|
-| `eigenmode-decomposition.js` | Eigenmode theory and Fibonacci connection | Original "s₁–s₈ ≈ 8H/N" claim — superseded by 2026-04-09 re-fit, see [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) |
+| `eigenmode-decomposition.js` | Eigenmode theory and Fibonacci connection | Original "s₁–s₈ ≈ 8H/N" claim — superseded by 2026-04-09 re-fit, see [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) |
 | `laplace-lagrange-eigenmodes.js` | B-matrix from first principles | 100% vector balance with B-matrix eigenvectors |
 | `eigenmode-subsystem-fit.js` | Direct inner/outer subsystem fit (no B-matrix) | 98.7% min with inner/outer split; feeds into proof |
 | `config-exhaustive-search.js` | LL-bounds-constrained exhaustive search | **the default configuration ranks #1 out of 4.3M valid configs** |

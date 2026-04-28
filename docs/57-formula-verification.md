@@ -144,7 +144,7 @@ Cases where the model *disagrees* with a reference are also documented in the pa
 ## Related documentation
 
 - [WebGeoCalc Explorer](56-webgeocalc-explorer.md) — the observational complement of this panel (model vs JPL data, 1900–2026).
-- [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md) — the eight-planet cycle table; uses the same model functions.
+- [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) — the eight-planet cycle table; uses the same model functions.
 - [Planets Precession Cycles](37-planets-precession-cycles.md) — per-planet observed and model rates, with WebGeoCalc and Laskar references.
 - [Perihelion Precession](12-perihelion-precession.md) — the three internal computation methods used by the simulation for ϖ, one of which (`calcEarthPerihelionPredictive`) is what this panel plots for category 5.
 - [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) — reference-frame discussion (ecliptic vs ICRF) that applies to category 4's ascending-node comparison and category 5's perihelion.

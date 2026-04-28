@@ -259,7 +259,7 @@ When measuring in Earth's equatorial frame, all these rotations compound to crea
 
 ### Why the Average Converges
 
-Over a complete cycle of all Earth precession periods (the Holistic Year H), the oscillations in each direction cancel out:
+Over a complete cycle of all Earth precession periods (the Earth Fundamental Cycle H), the oscillations in each direction cancel out:
 
 - Sometimes Earth's orientation adds to the apparent precession rate
 - Sometimes it subtracts from it

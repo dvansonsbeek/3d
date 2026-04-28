@@ -46,15 +46,15 @@ The two movements interact:
 - PERIHELION-OF-EARTH moves counter-clockwise (H/3 years)
 - They meet and realign every **H/16 years** (perihelion precession cycle)
 
-This creates 16 meeting points per Holistic-Year as the solstice and perihelion alignment moves around the zodiac.
+This creates 16 meeting points per Earth Fundamental Cycle as the solstice and perihelion alignment moves around the zodiac.
 
 ---
 
-## The Holistic-Year (H)
+## The Earth Fundamental Cycle (H)
 
-The Holistic-Year is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](20-constants-reference.md) for the current value), this cycle integrates:
+The Earth Fundamental Cycle is the grand unified cycle where all celestial movements converge. At exactly **H years** (see [Constants Reference](20-constants-reference.md) for the current value), this cycle integrates:
 
-| Cycle | Formula | Count per Holistic-Year |
+| Cycle | Formula | Count per Earth Fundamental Cycle |
 |-------|---------|------------------------|
 | Axial Precession | H / 13 | 13 cycles |
 | Inclination Precession | H / 3 | 3 cycles |
@@ -68,7 +68,7 @@ The ratio between axial and inclination precession cycles follows a Fibonacci pa
 
 ### The Six Determining Factors
 
-The Holistic-Year duration is uniquely determined by six constraints:
+The Earth Fundamental Cycle duration is uniquely determined by six constraints:
 
 1. **Planetary Alignment**: All major planetary orbits must realign within one cycle
 2. **1246 AD Calibration**: Perihelion alignment epoch (perihelion near the December solstice)
@@ -92,7 +92,7 @@ Several Earth parameters oscillate over long timescales:
 
 ### Obliquity (Axial Tilt)
 
-Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,915 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Holistic-Year. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
+Earth's axial tilt is not constant but oscillates over approximately H/8 years (~41,915 years). The orbital eccentricity and inclination to the invariable plane also oscillate over the Earth Fundamental Cycle. See [Constants Reference](20-constants-reference.md) for all current values (mean, amplitude, and range for each parameter).
 
 ---
 

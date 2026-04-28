@@ -70,7 +70,7 @@ For Saturn (anti-phase), the sign is flipped: MAX at balanced year (where others
 
 ### Per-Planet Cycle Anchors
 
-Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Grand Holistic Octave).
+Each planet's inclination cycle anchor is the ICRF perihelion longitude where the planet reaches its inclination extremum (MAX for in-phase, MIN for Saturn). After a 2026-04-09 audit that re-fitted the JPL ecliptic-inclination trends in the J2000-fixed frame and adjusted the asc-node integers `ascendingNodeCyclesIn8H`, all seven fitted planets share the **same balanced-year anchor**: **n=7, year ≈ -2,649,854** (the oldest of the eight anchors in the current Solar System Resonance Cycle).
 
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
@@ -87,7 +87,7 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 \* Jupiter, Saturn, and Uranus have ICRF perihelion periods that divide H exactly, so their phase at n=7 coincides numerically with their phase at n=0. The conceptual anchor is still n=7 — the oldest balanced year of the current 8H octave.
 
 **Key insights**:
-- All seven fitted planets share the same balanced-year anchor (n=7, ≈ -2,649,854 BC = the **start of the current Grand Holistic Octave**).
+- All seven fitted planets share the same balanced-year anchor (n=7, ≈ -2,649,854 BC = the **start of the current Solar System Resonance Cycle**).
 - Earth's cycle anchor is set independently from the IAU obliquity model and is locked to the n=0 reference; this is consistent with n=7 because Earth's H/3 ICRF return divides 8H seven times.
 - Balance groups are determined by the **invariable plane balance condition**: Σ(in-phase) w = Σ(anti-phase) w (Law 3, scalar form).
 - Saturn is **anti-phase**: its inclination is at MAX at n=7 while all other planets are at MIN.
@@ -156,9 +156,9 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 
 For computed period values, see [Constants Reference](20-constants-reference.md).
 
-### Grand Holistic Octave (8H)
+### Solar System Resonance Cycle (8H)
 
-All ICRF perihelion periods divide evenly into 8H = 2,682,536 years (the "Grand Holistic Octave"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
+All ICRF perihelion periods divide evenly into 8H = 2,682,536 years (the "Solar System Resonance Cycle"), ensuring all 8 planets return simultaneously to their balanced-year configuration. This is a structural consequence of the Fibonacci period ratios.
 
 ---
 
@@ -224,7 +224,7 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 | Uranus | 12 | −223,545 | |
 | Neptune | 3 | −894,179 | |
 
-The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame. Jupiter and Saturn share N=36 because the gas-giant pair's invariable-plane balance requires their nodes to regress in lockstep. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) for the full derivation.
+The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame. Jupiter and Saturn share N=36 because the gas-giant pair's invariable-plane balance requires their nodes to regress in lockstep. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.
 
 ```javascript
 // Earth: Ω regresses at -H/5

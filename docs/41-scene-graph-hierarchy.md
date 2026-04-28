@@ -43,13 +43,13 @@ All other calculations are relative to:
 
 ---
 
-## Part 2: The Holistic Year Structure
+## Part 2: The Earth Fundamental Cycle Structure
 
-All Earth precession cycles derive from the **Holistic Year** (H) divided by integers. See [Constants Reference](20-constants-reference.md) for the current value of H and all derived periods:
+All Earth precession cycles derive from the **Earth Fundamental Cycle** (H) divided by integers. See [Constants Reference](20-constants-reference.md) for the current value of H and all derived periods:
 
 | Cycle | Divisor | Formula | Direction |
 |-------|---------|---------|-----------|
-| **Holistic Year** | 1 | H | - |
+| **Earth Fundamental Cycle** | 1 | H | - |
 | **Inclination Precession** | 3 | H / 3 | Counter-clockwise |
 | **Ecliptic Precession** | 5 | H / 5 | Counter-clockwise |
 | **Obliquity Cycle** | 8 | H / 8 | Clockwise (negative) |

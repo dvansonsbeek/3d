@@ -9,7 +9,7 @@ This glossary defines the key terms used throughout the documentation. For a com
 ### Holistic Universe Model
 A geo-heliocentric framework that models the solar system through two interacting forces: axial precession (clockwise) and inclination precession (counter-clockwise). These opposing movements generate all observable precession phenomena.
 
-### Holistic-Year
+### Earth Fundamental Cycle
 The grand cycle (H) where all precession movements complete and realign. Comprises 13 axial precession cycles, 3 inclination precession cycles, and 16 perihelion precession cycles. See [Constants Reference](20-constants-reference.md) for the current value of H.
 
 ### EARTH-WOBBLE-CENTER

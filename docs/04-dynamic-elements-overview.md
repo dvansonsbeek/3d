@@ -236,7 +236,7 @@ Saturn's published JPL ecliptic-inclination trend (`+0.00194°/century`, increas
 
 1. **Frame mismatch**: JPL's `dI/dt` is published against the **J2000-fixed** ecliptic ("mean ecliptic and equinox of J2000"), not the moving ecliptic of date. The model's `fbeCalcApparentIncl()` originally compared the moving-frame trend against the J2000-frame catalog value, which was meaningless. After the [frame correction](32-inclination-calculations.md#two-frames--be-careful-which-one-you-mean), Saturn's direction matches JPL.
 
-2. **Asc-node integer assignment**: Saturn (and the other six fitted planets) now use `ascendingNodeCyclesIn8H` integers chosen to match the J2000-frame JPL trends to <2″/century. See [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md) for the full integer assignment.
+2. **Asc-node integer assignment**: Saturn (and the other six fitted planets) now use `ascendingNodeCyclesIn8H` integers chosen to match the J2000-frame JPL trends to <2″/century. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full integer assignment.
 
 The total trend error across all 7 fitted planets in the J2000-fixed frame is now ~4.3″/century, all directions match JPL, and Saturn's residual is the second-largest (1.7″) after a small structural Saturn LL-bound excess (~0.025°) that is being tracked separately.
 
@@ -264,7 +264,7 @@ Key behavioral notes:
 | Ascending Node (Ecliptic) | Earth's obliquity changes | Earth's inclination crossovers | H years |
 | Ecliptic Inclination | Earth's + planet's inclination changes | Ω precession on inv. plane | H/3 years |
 
-**Planet Inclination-Oscillation Periods** (the planet's *ICRF perihelion* period, which drives the cosine in `i(t) = mean + amp · cos(ω̃_ICRF(t) − φ)`). The ascending node Ω evolves on a *separate* `−(8H)/N` schedule listed in [55-grand-holistic-octave-periods.md](55-grand-holistic-octave-periods.md). For current computed values see [Constants Reference](20-constants-reference.md):
+**Planet Inclination-Oscillation Periods** (the planet's *ICRF perihelion* period, which drives the cosine in `i(t) = mean + amp · cos(ω̃_ICRF(t) − φ)`). The ascending node Ω evolves on a *separate* `−(8H)/N` schedule listed in [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md). For current computed values see [Constants Reference](20-constants-reference.md):
 
 | Planet | Ecliptic formula | Ecliptic period (yr) | ICRF period (yr) | ICRF direction |
 |--------|------------------|---------------------|------------------|----------------|
@@ -277,7 +277,7 @@ Key behavioral notes:
 | Uranus | H / 3 | 111,772 | 33,532 | Retrograde |
 | Neptune | H × 2 | 670,634 | 26,825 | Retrograde |
 
-The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years exactly (the Grand Holistic Octave). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
+The ICRF period is derived from the ecliptic period by subtracting the general precession rate (H/13): `1/P_ICRF = 1/P_ecliptic − 13/H`. Earth is the only planet with a prograde ICRF perihelion. All ICRF periods divide 8H = 2,682,536 years exactly (the Solar System Resonance Cycle). The inclination oscillation is driven by the ICRF period, not the ecliptic period.
 
 ### The Key Insight
 

@@ -159,7 +159,7 @@ All planetary orbital planes **precess around the invariable plane** like spinni
 - **Inclination** `i(t)` — oscillates with the planet's *ICRF perihelion period* (e.g., Earth: H/3, Jupiter: H/8). This is the "nodding" of the orbital plane.
 - **Ascending node** `Ω(t)` — regresses linearly at `−(8H)/N` years for some planet-specific integer N (Earth: N=40, period −H/5 ≈ −67,063 years). This is the "spinning" of the line of nodes.
 
-Per-planet integer assignments are listed in [Grand Holistic Octave Periods](55-grand-holistic-octave-periods.md). The invariable plane itself varies < 0.1 mas over 100 years and is treated as fixed for all model purposes.
+Per-planet integer assignments are listed in [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md). The invariable plane itself varies < 0.1 mas over 100 years and is treated as fixed for all model purposes.
 
 ---
 

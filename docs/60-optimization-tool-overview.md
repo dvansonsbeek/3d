@@ -17,7 +17,7 @@
 
 ## 1. Background & Motivation
 
-The solar system simulation (`src/script.js`) models long-term planetary orbital mechanics using the Holistic-Year framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
+The solar system simulation (`src/script.js`) models long-term planetary orbital mechanics using the Earth Fundamental Cycle framework. It computes perihelion positions, RA/Dec coordinates, inclinations, and precession rates from ~13 input constants per planet.
 
 The model is now mature. The next step is building a **feedback loop**: compare the model's predictions against authoritative astronomical data, identify where it deviates, and systematically improve it — either by tuning existing parameters or by discovering missing perturbation terms.
 
@@ -42,7 +42,7 @@ The model is fundamentally built on **Fibonacci number relationships between pla
 
 ### 2.1 How Orbit Counts Work
 
-Each planet has an integer orbit count in the Holistic Year (H = 335,317 solar years):
+Each planet has an integer orbit count in the Earth Fundamental Cycle (H = 335,317 solar years):
 
 ```
 SolarYearCount = round(H x meanSolarYear / SolarYearInput)
@@ -143,7 +143,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `InvPlaneInclinationAmplitude` | 0.384267 deg | Inclination oscillation range |
 | `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
 
-### 3.2 Perihelion Precession Periods (Fibonacci/Holistic-Year derived)
+### 3.2 Perihelion Precession Periods (Fibonacci/Earth Fundamental Cycle derived)
 | Planet | Formula | Direction |
 |--------|---------|-----------|
 | Mercury | H/(1+3/8) | Prograde |
@@ -637,7 +637,7 @@ Additionally, there are less well-known cycles that may need modeling:
 | `AscendingNode` | SPICE kernel data -- defines where orbit crosses ecliptic |
 | `InvPlaneInclinationJ2000` | Souami & Souchay (2012) research paper |
 | `LongitudePerihelion` | JPL J2000 reference -- defines perihelion direction |
-| `PerihelionEclipticYears` | Derived from H/n -- the Fibonacci/Holistic-Year structure is fundamental |
+| `PerihelionEclipticYears` | Derived from H/n -- the Fibonacci/Earth Fundamental Cycle structure is fundamental |
 | `holisticyearLength` | Core model constant (335,317) -- the entire model is built on this |
 | `perihelionalignmentYear` | Historical reference (1246.03125 AD) |
 | `AscendingNodeInvPlaneVerified` | Optimized from Souami & Souchay to match J2000 ecliptic inclinations |

@@ -849,7 +849,7 @@ def _get_step_years() -> int:
 
 def load_excel_data(excel_path: str = None) -> Dict[int, Dict]:
     """
-    Load data from the Holistic Year Objects Excel file.
+    Load data from the Earth Fundamental Cycle Objects Excel file.
 
     Reads planet data from 'Perihelion Planets' sheet and Earth longitude
     from 'Earth Longitude' sheet. ERD is derived as the numerical derivative

@@ -1,14 +1,14 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// GRAND HOLISTIC OCTAVE — Complete Planetary Period Overview
+// SOLAR SYSTEM RESONANCE CYCLE — Complete Planetary Period Overview
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// The Holistic Year H = 335,317 years is the master cycle.
-// The Grand Holistic Octave 8H = 2,682,536 years is when ALL planetary
+// The Earth Fundamental Cycle H = 335,317 years is the master cycle.
+// The Solar System Resonance Cycle 8H = 2,682,536 years is when ALL planetary
 // inclination phases realign — every planet returns to its balanced-year
 // position (7 at MIN, Saturn at MAX).
 //
 // This script provides a complete overview of all planetary periods
-// and verifies they divide the Grand Holistic Octave evenly.
+// and verifies they divide the Solar System Resonance Cycle evenly.
 //
 // Usage: node tools/explore/grand-holistic-octave-periods.js
 // ═══════════════════════════════════════════════════════════════════════════
@@ -16,14 +16,14 @@
 const C = require('../lib/constants');
 
 const H = C.H;
-const GHO = 8 * H; // Grand Holistic Octave
+const GHO = 8 * H; // Solar System Resonance Cycle
 const genPrec = H / 13;
 const DEG2RAD = Math.PI / 180;
 
 console.log('╔══════════════════════════════════════════════════════════════════════════════════════╗');
-console.log('║                     THE GRAND HOLISTIC OCTAVE                                       ║');
+console.log('║                     THE SOLAR SYSTEM RESONANCE CYCLE                                ║');
 console.log('║                                                                                     ║');
-console.log('║   All cycles come together in the Grand Holistic Octave                             ║');
+console.log('║   All cycles come together in the Solar System Resonance Cycle                      ║');
 console.log('║   period of ' + GHO.toLocaleString() + ' years (8 × H = 8 × ' + H.toLocaleString() + ')                         ║');
 console.log('║                                                                                     ║');
 console.log('║   Factor 8 = F₆ (6th Fibonacci number)                                             ║');
@@ -130,7 +130,7 @@ const sEigenTheory = {
   neptune: { mode: 's₈', rate: -0.692, period: 1872832 },
 };
 
-// Fitted to Grand Holistic Octave: 8H / n cycles
+// Fitted to Solar System Resonance Cycle: 8H / n cycles
 // Each planet completes an integer number of nodal cycles in 8H
 const sEigenFitted = {
   mercury: { n: 12, expr: '8H/12 = 2H/3',    factors: '2²×3',     note: '3=F₄' },
@@ -261,7 +261,7 @@ console.log('   Cycle                  │ Period (yr)   │ Expression │ Fib 
 console.log('   ───────────────────────┼───────────────┼────────────┼──────┼─────────────┼─────────────');
 
 const earthCycles = [
-  { name: 'Holistic Year',         period: H,      expr: 'H',     fib: '—',  inH: 1 },
+  { name: 'Earth Fundamental Cycle',         period: H,      expr: 'H',     fib: '—',  inH: 1 },
   { name: 'Inclination precession',period: H/3,    expr: 'H/3',   fib: 'F₄', inH: 3 },
   { name: 'Ecliptic precession',   period: H/5,    expr: 'H/5',   fib: 'F₅', inH: 5 },
   { name: 'Obliquity cycle',       period: H/8,    expr: 'H/8',   fib: 'F₆', inH: 8 },
@@ -305,7 +305,7 @@ console.log('   Verified for ALL 8 planets ✓');
 // ═══════════════════════════════════════════════════════════════════════════
 
 console.log('');
-console.log('6. GRAND HOLISTIC OCTAVE COMPATIBILITY (8H = ' + GHO.toLocaleString() + ' years)');
+console.log('6. SOLAR SYSTEM RESONANCE CYCLE COMPATIBILITY (8H = ' + GHO.toLocaleString() + ' years)');
 console.log('');
 
 let allEclOK = true, allICRFOK = true;
@@ -378,7 +378,7 @@ for (const [key, p] of Object.entries(planets)) {
 
 console.log('');
 console.log('═══════════════════════════════════════════════════════════════════════════════');
-console.log('The Grand Holistic Octave is the complete reset cycle of the solar system.');
+console.log('The Solar System Resonance Cycle is the complete reset cycle of the solar system.');
 console.log('After 8H = ' + GHO.toLocaleString() + ' years, all 8 planets return to their');
 console.log('balanced-year inclination positions: 7 at minimum, Saturn at maximum.');
 console.log('═══════════════════════════════════════════════════════════════════════════════');

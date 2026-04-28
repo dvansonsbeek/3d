@@ -1,12 +1,12 @@
-# Grand Holistic Octave — Period Table
+# Solar System Resonance Cycle — Period Table
 
 ## Overview
 
-The **Grand Holistic Octave** (8H = 2,682,536 years) is the fundamental super-period of the solar system. Every major planetary cycle — axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, and eccentricity oscillation — divides 8H evenly as an integer.
+The **Solar System Resonance Cycle** (8H = 2,682,536 years) is the fundamental super-period of the solar system. Every major planetary cycle — axial precession, perihelion precession, inclination oscillation, ascending node regression, obliquity oscillation, and eccentricity oscillation — divides 8H evenly as an integer.
 
 ### System Reset
 
-The **System Reset** is the epoch within each Grand Holistic Octave when all seven fitted planets simultaneously reach their inclination extremes: the seven in-phase planets at minimum inclination, Saturn (anti-phase) at maximum. This occurs once per 8H. The current System Reset is at approximately **-2,649,854** (balanced year anchor n=7, the oldest of the eight anchors in the current octave).
+The **System Reset** is the epoch within each Solar System Resonance Cycle when all seven fitted planets simultaneously reach their inclination extremes: the seven in-phase planets at minimum inclination, Saturn (anti-phase) at maximum. This occurs once per 8H. The current System Reset is at approximately **-2,649,854** (balanced year anchor n=7, the oldest of the eight anchors in the current octave).
 
 At the System Reset, every planet's ICRF perihelion phase = 180° (in-phase) or 0° (Saturn anti-phase), meaning the inclination oscillations are perfectly synchronized. At intermediate balanced years (n=0 through n=6), only a subset of planets are at their extremes — the others have drifted because their ICRF periods don't divide H evenly.
 
@@ -16,7 +16,7 @@ At the System Reset, every planet's ICRF perihelion phase = 180° (in-phase) or 
 | Balanced Year (n=0) | ≈ -302,635 | Jupiter, Saturn, Uranus (+ Earth by definition) |
 | n=1 through n=6 | intermediate | Planet-dependent subsets |
 
-This document describes the "Grand Holistic Octave Period Table" modal panel, which visualizes all planetary periods as **8H/N** fractions.
+This document describes the "Solar System Resonance Cycle Period Table" modal panel, which visualizes all planetary periods as **8H/N** fractions.
 
 ## The Six Cycle Types
 
@@ -205,7 +205,7 @@ Perihelion precession (H/16 = 8H/128)
 Obliquity oscillation (H/8 = 8H/64)
 ```
 
-### The Grand Holistic Octave as Synchronization Point
+### The Solar System Resonance Cycle as Synchronization Point
 Every 8H years, ALL planetary cycles return to their starting configuration:
 - All ecliptic perihelions complete integer revolutions
 - All ICRF perihelions complete integer revolutions
@@ -258,5 +258,5 @@ Run `node tools/explore/grand-holistic-octave-periods.js` to verify all periods 
 | Axial precession values | `axialPrecessionYears` in planet objects, `src/script.js` |
 | Obliquity cycles | `mercuryObliquityCycle` etc. in `src/script.js` |
 | Ascending node cycles | `ascendingNodeCyclesIn8H` in planet objects |
-| Button | Tools folder in Tweakpane: "Grand Holistic Octave" |
+| Button | Tools folder in Tweakpane: "Solar System Resonance Cycle" |
 | CSS | `.gho-*` classes in `src/style.css` |
