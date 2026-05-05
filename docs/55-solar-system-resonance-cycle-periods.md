@@ -47,7 +47,7 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 | Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
 | Mercury | **8H/9** | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/84 |
-| Venus | 8H/91 | 8H/6 | 8H/110 | **8H/1** | 8H/110 | 8H/191 |
+| Venus | 8H/91 | 8H/6 | 8H/110 | **8H/1** | 8H/110 | 8H/19 |
 | **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
 | Mars | 8H/16 | 8H/35 | 8H/69 | **8H/63** | 8H/21 | 8H/53 |
 | Jupiter | 8H/21 | 8H/40 | 8H/64 | **8H/36** | 8H/16 | 8H/43 |
@@ -67,7 +67,7 @@ Notes:
 | Planet | Axial prec. | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|--:|--:|--:|--:|--:|--:|
 | Mercury | **−298,060** | 243,867 | −28,844 | **−298,060** | 894,179 | 31,935 |
-| Venus | +29,478 | −447,089 | −24,387 | **−2,682,536** | 24,387 | 14,045 |
+| Venus | +29,478 | −447,089 | −24,387 | **−2,682,536** | 24,387 | 141,186 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
 | Mars | −167,659 | 76,644 | −38,877 | **−42,580** | 127,740 | 50,614 |
 | Jupiter | −127,740 | 67,063 | −41,915 | **−74,515** | 167,659 | 62,385 |
@@ -127,42 +127,48 @@ N_ICRF = 104 − N_ecl    (for prograde ecliptic planets)
 | Planet | N_ecl + N_ICRF | = 104? |
 |--------|---------------|--------|
 | Mercury | 11 + 93 | ✓ |
-| Venus | 4 + 100 | ✓ |
 | Mars | 35 + 69 | ✓ |
 | Jupiter | 40 + 64 | ✓ |
 | Uranus | 24 + 80 | ✓ |
 | Neptune | 4 + 100 | ✓ |
 
-The number 104 = 8 × 13 is Earth's axial precession N. Earth itself breaks the sum rule (N_ecl=128 > 104, giving prograde ICRF), and Saturn's retrograde ecliptic gives ICRF = 104 + 64 = 168.
+The number 104 = 8 × 13 is Earth's axial precession N. Three special cases:
+
+- **Earth** breaks the sum rule (N_ecl=128 > 104, giving prograde ICRF perihelion).
+- **Saturn** is retrograde ecliptic, so N_ICRF = 104 + |N_ecl| = 104 + 64 = 168.
+- **Venus** is also retrograde ecliptic, so N_ICRF = 104 + |N_ecl| = 104 + 6 = 110.
 
 **Identity 2: Eccentricity cycle as integer beat**
+
+The eccentricity cycle (wobble period) is the beat between axial and ICRF perihelion frequencies. The simulation's `_calcWobble` formula uses the **slow beat** (magnitude difference of frequencies) for all planets except Earth; Earth's wobble is hardcoded to its perihelion precession period H/16:
+
 ```
-N_ecc = |N_axial ± N_ICRF|
+N_ecc = |N_axial − N_ICRF|        (slow beat — all planets except Earth)
+N_ecc = N_axial + N_ICRF = 128    (Earth — fast beat = perihelion precession H/16)
 ```
-Opposite directions (one prograde, one retrograde) → add. Same direction → subtract.
 
 | Planet | Formula | N_ecc |
 |--------|---------|-------|
 | Mercury | \|9 − 93\| | 84 |
-| Venus | 91 + 100 | 191 |
-| Earth | 104 + 24 | 128 |
+| Venus | \|91 − 110\| | 19 |
+| **Earth** | **104 + 24** | **128** |
 | Mars | \|16 − 69\| | 53 |
 | Jupiter | \|21 − 64\| | 43 |
 | Saturn | \|6 − 168\| | 162 |
 | Uranus | Axial ≈ 0 → Ecc = ICRF | 80 |
 | Neptune | Axial ≈ 0 → Ecc = ICRF | 100 |
 
-Uranus and Neptune: Ecc = ICRF is the structural definition of "frozen axial" — when N_axial = 0, the beat reduces to the ICRF rate alone.
+Earth uses the fast beat (sum) by definition — its wobble equals its perihelion precession period H/16. All other non-frozen planets follow the slow-beat rule. Uranus and Neptune are special cases (frozen axial → wobble equals ICRF rate alone).
 
 **Identity 3: Obliquity decomposition**
 ```
 N_ecl = N_obliq + N_eclPrec
 ```
 
-| Planet | N_ecl | = N_obliq + N_eclPrec | EclPrec period |
-|--------|-------|----------------------|----------------|
+| Planet | N_ecl | = N_obliq + N_eclPrec | Period at 8H/N_eclPrec |
+|--------|-------|----------------------|------------------------|
 | Mercury | 11 | 3 + 8 | H (335,317 yr) |
-| Venus | 4 | 100 + (−96) | 8H/96 (27,943 yr) |
+| Venus | 6 | 110 + (−104) | H/13 (25,794 yr) |
 | Earth | 128 | 64 + 64 | H/8 (41,915 yr) |
 | Mars | 35 | 21 + 14 | 8H/14 (191,610 yr) |
 | Jupiter | 40 | 16 + 24 | H/3 (111,772 yr) |
@@ -170,11 +176,11 @@ N_ecl = N_obliq + N_eclPrec
 | Uranus | 24 | 16 + 8 | H (335,317 yr) |
 | Neptune | 4 | 100 + (−96) | 8H/96 (27,943 yr) |
 
-**Mirror pairs share identical ecliptic precession N:**
-- Mercury ↔ Uranus: N_eclPrec = 8 (period = H)
-- Venus ↔ Neptune: N_eclPrec = −96 (period = 8H/96)
+The "Period at 8H/N_eclPrec" column is the period associated with the residual integer N_eclPrec — the second factor in the obliquity decomposition. For Earth specifically this happens to equal the obliquity period (since 128 = 64 + 64), but in general it is a derived quantity, not the canonical "ecliptic precession" period reported elsewhere.
 
-Earth ↔ Saturn and Mars ↔ Jupiter have different ecliptic precessions, but cross-pair links appear: Jupiter's ecliptic precession (24) = Saturn's obliquity (24), and Saturn's ecliptic precession (40) = Jupiter's ecliptic perihelion (40).
+**Mirror pair**: Mercury ↔ Uranus share N_eclPrec = 8 (period = H).
+
+Earth ↔ Saturn and Mars ↔ Jupiter have different decompositions, but cross-pair links appear: Jupiter's N_eclPrec (24) = Saturn's obliquity (24), and Saturn's N_eclPrec (40) = Jupiter's ecliptic perihelion (40).
 
 ### Mars–Jupiter Axial–Obliquity Swap
 
