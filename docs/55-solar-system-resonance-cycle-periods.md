@@ -35,7 +35,7 @@ The ecliptic rate minus general precession (H/13). This is the rate that drives 
 The rate at which the ascending node on the invariable plane regresses. These rates correspond to the Laplace-Lagrange secular eigenfrequencies (s₁...s₈) — a third level of Fibonacci structure.
 
 ### 5. Obliquity Oscillation
-The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = ICRF period (8H/100) — the two-component formula cancels exactly, producing constant obliquity.
+The period of the planet's axial tilt oscillation. This is a beat frequency derived from the Fibonacci decomposition of the ecliptic perihelion rate. For Earth: obliquity = beat of inclination (H/3) and ecliptic precession (H/5) = H/8. Venus and Neptune have obliquity cycle = |ICRF period| per planet (Venus: 8H/110, Neptune: 8H/100) — the two-component formula cancels exactly, producing constant obliquity.
 
 ### 6. Eccentricity Cycle (Wobble Period)
 The wobble period: the beat frequency between the axial precession and the ICRF perihelion precession. This determines how long the eccentricity takes to complete one full oscillation. For Earth this is H/16 = 20,957 yr (the perihelion precession period). Computed via `calcWobblePeriod()`.
@@ -46,14 +46,16 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 
 | Planet | Axial | Peri. ecl. | ICRF / Incl. | Asc. node | Obliquity | Ecc. cycle |
 |--------|:-----:|:----------:|:----------:|:---------:|:---------:|:----------:|
-| Mercury | **8H/9** | 8H/11 | 8H/93 | **8H/9** | 8H/3 | 8H/84 |
-| Venus | 8H/91 | 8H/6 | 8H/110 | **8H/1** | 8H/110 | 8H/19 |
-| **Earth** | **8H/104** | **8H/128** | **8H/24** | **8H/40** | **8H/64** | **8H/128** |
-| Mars | 8H/16 | 8H/35 | 8H/69 | **8H/63** | 8H/21 | 8H/53 |
-| Jupiter | 8H/21 | 8H/40 | 8H/64 | **8H/36** | 8H/16 | 8H/43 |
-| Saturn | 8H/6 | 8H/64 | 8H/168 | **8H/36** | 8H/24 | 8H/162 |
-| Uranus | ~∞ | 8H/24 | 8H/80 | **8H/12** | 8H/16 | 8H/80 |
-| Neptune | ~∞ | 8H/4 | 8H/100 | **8H/3** | 8H/100 | 8H/100 |
+| Mercury | **−8H/9** | 8H/11 | −8H/93 | **−8H/9** | 8H/3 | 8H/84 |
+| Venus | +8H/91 | −8H/6 | −8H/110 | **−8H/1** | 8H/110 | 8H/19 |
+| **Earth** | **−8H/104** | **8H/128** | **+8H/24** | **−8H/40** | **8H/64** | **8H/128** |
+| Mars | −8H/16 | 8H/35 | −8H/69 | **−8H/63** | 8H/21 | 8H/53 |
+| Jupiter | −8H/21 | 8H/40 | −8H/64 | **−8H/36** | 8H/16 | 8H/43 |
+| Saturn | −8H/6 | −8H/64 | −8H/168 | **−8H/36** | 8H/24 | 8H/162 |
+| Uranus | ~∞ | 8H/24 | −8H/80 | **−8H/12** | 8H/16 | 8H/80 |
+| Neptune | ~∞ | 8H/4 | −8H/100 | **−8H/3** | 8H/100 | 8H/100 |
+
+Sign convention: + = prograde, − = retrograde, ~∞ = frozen. Obliquity and eccentricity cycles are oscillation periods (no direction, shown unsigned). Earth's ICRF perihelion is the sole prograde ICRF; Venus's axial precession is the sole prograde axial (obliquity 177° flips the cos sign — Cottereau & Souchay 2009).
 
 Notes:
 - Uranus and Neptune axial precession periods are extremely long (~200M and ~23M years) — effectively frozen
@@ -80,7 +82,6 @@ Notes:
 ## Notable Patterns
 
 ### Mirror Symmetry in Periods
-- **Venus = Neptune**: ecliptic 8H/4, ICRF 8H/100, obliquity 8H/100, ecliptic precession −96
 - **Mercury ↔ Uranus**: ecliptic precession 8H/8 = H (identical)
 - **Mars ↔ Jupiter**: axial↔obliquity swap (16↔21), identical sum (37)
 - **Earth ICRF = Uranus ecliptic**: both 8H/24
@@ -196,9 +197,10 @@ The d=5 mirror pair exhibits exact reciprocity in the integer domain:
 Mars's obliquity = Jupiter's axial, and vice versa. The difference |Axial − Obliq| equals the Fibonacci divisor d = 5 for both. The sum Axial + Obliq = 37 is identical for both.
 
 Cross-pair |Axial − Obliq| values link to other planets' N values:
-- Venus: |91 − 100| = 9 = Mercury's Cassini N
 - Mercury: |9 − 3| = 6 = Saturn's axial N
 - Earth: |104 − 64| = 40 = Earth's ascending node N
+
+(With the corrected Venus values N_axial = 91 and N_obliq = 110, |91 − 110| = 19 has no obvious cross-pair match in the per-planet table.)
 
 ### Earth's Unique Cycle Chain
 ```
