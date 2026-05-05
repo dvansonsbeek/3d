@@ -496,7 +496,7 @@ The model's 8H/N predictions and Laskar's N-body measurements both produce indis
 | Planet | Period | Note |
 |--------|--------|------|
 | Mercury | −8H/9 | |
-| Venus | −8H/1 | full Grand Octave |
+| Venus | −8H/1 | full Solar System Resonance Cycle |
 | Earth | −H/5 = −8H/40 | ecliptic precession (special) |
 | Mars | −8H/63 | |
 | Jupiter | −8H/36 | locked with Saturn |

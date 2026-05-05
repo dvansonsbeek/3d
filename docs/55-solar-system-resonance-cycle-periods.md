@@ -93,7 +93,7 @@ Notes:
 Many divisors are products of small Fibonacci numbers:
 - 24 = 3 × 8, 40 = 5 × 8, 64 = 8 × 8, 80 = 5 × 16
 - 104 = 8 × 13, 128 = 8 × 16, 168 = 8 × 21
-- The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 63 = 7 × 9, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Grand Octave)
+- The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 63 = 7 × 9, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Solar System Resonance Cycle)
 
 ### The Three Fibonacci Levels
 1. **Level 1** — Fibonacci d-values (Law 2): d = 3, 5, 21, 34

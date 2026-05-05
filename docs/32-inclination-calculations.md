@@ -217,7 +217,7 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 |------|---|---------------|-------|
 | Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
 | Mercury | 9 | −298,060 | |
-| Venus | 1 | −2,682,536 (= −8H) | Full Grand Octave |
+| Venus | 1 | −2,682,536 (= −8H) | Full Solar System Resonance Cycle |
 | Mars | 63 | −42,580 | |
 | Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
 | Saturn | 36 | −74,515 | Shared with Jupiter |

@@ -65,7 +65,7 @@ The `ascendingNodeCyclesIn8H` integers are jointly fit to JPL's J2000-fixed-fram
 | Planet | 8H/N | Note |
 |--------|------|------|
 | Mercury | −8H/9 | |
-| Venus | −8H/1 | full Grand Octave |
+| Venus | −8H/1 | full Solar System Resonance Cycle |
 | Earth | −8H/40 = −H/5 | ecliptic precession (special) |
 | Mars | −8H/63 | |
 | Jupiter | −8H/36 | locked with Saturn |

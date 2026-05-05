@@ -573,7 +573,7 @@ if (curIdx >= 0) console.log(`  Current Config #${curIdx + 1} rank out of ${allC
 // For each surviving config that passes BOTH incl ≥ threshold AND
 // ecc ≥ 99% (the "~35"), we jointly sweep:
 //
-//   n ∈ {0..7}  — balanced-year anchor (position within 8H Grand Octave)
+//   n ∈ {0..7}  — balanced-year anchor (position within 8H Solar System Resonance Cycle)
 //   N ∈ {1..120} — ascending node cycles in 8H (per planet, independent)
 //
 // This finds the optimal (n, N_per_planet) for EACH config, making the

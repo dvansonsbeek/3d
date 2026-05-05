@@ -177,7 +177,7 @@ for (const k of PLANETS) {
       `→ err ${best.err.toFixed(2)}″  dir ${best.dirMatch ? '✓' : '✗'}  ` +
       `LL ${best.inLL ? '✓' : '✗'}`);
     console.log(`  Best ascNode period: ${(-(8 * H) / best.N).toFixed(0)} yr` +
-      (best.N === 1 ? '  (= −8H, full Grand Octave)' :
+      (best.N === 1 ? '  (= −8H, full Solar System Resonance Cycle)' :
        best.N === 2 ? '  (= −4H)' :
        best.N === 4 ? '  (= −2H)' :
        best.N === 8 ? '  (= −H)' :
