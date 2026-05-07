@@ -77,7 +77,7 @@ These integers were selected by `tools/explore/anchor-and-ascnode-audit.js`.
 
 The "third Fibonacci level" framing therefore needs reformulation:
 - **Level 1**: d-values are Fibonacci numbers (Law 2) — *unchanged*
-- **Level 2**: ICRF perihelion periods are H/Fibonacci (Law 1) — *unchanged*
+- **Level 2**: Earth's, Jupiter's, and Saturn's ICRF perihelion periods are H/Fibonacci — Earth's H/3 is Law 1's hierarchy, Jupiter (H/8) and Saturn (H/21) are Law 6's H/8 triple identity and its subtractive ICRF chain. The other five planets' ICRF perihelion periods are 8H/N (mostly non-Fibonacci).
 - **Level 3**: Asc-node periods are 8H/N for an integer set selected to fit JPL trends — *the integers no longer match s₁–s₈, but they remain small integers and several factor as products of small Fibonacci numbers* (Mercury 9 = 3², J/S 36 = 4×9, Uranus 12 = 4×3, Neptune 3 = F₄). Whether the new integers themselves form a Fibonacci-style structure is an open question for further work.
 
 ### 1D. JPL inclination rates cannot determine d-values

@@ -27,20 +27,20 @@ The model starts from a single observation: two of Earth's precession motions ro
 
 These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and climate patterns including ice ages.
 
-Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year megacycle that unifies all precession periods through Fibonacci number ratios (H/3, H/13, H/16) — and this simulation visualizes it all in one interactive view.
+Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year master cycle from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
 
 ---
 
 ## The Six Fibonacci Laws
 
-The model implements six laws connecting planetary orbital parameters through pure Fibonacci numbers:
+The model implements six laws — anchored on Earth and extending to all eight planets through Fibonacci numbers:
 
-1. **Fibonacci Cycle Hierarchy** — One master cycle (H) divided by Fibonacci numbers produces all major precession periods
+1. **Fibonacci Cycle Hierarchy** — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
 2. **Inclination Amplitude Constant** — A single constant ψ predicts all eight inclination amplitudes from Fibonacci divisors and mass alone
-3. **The Inclination Balance** — Two groups of planets balance to 100%, grounded in conservation of angular momentum
+3. **The Inclination Balance** — Seven planets' angular-momentum-weighted oscillations balance against Saturn alone (anti-phase) to 99.9975%
 4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt
-5. **The Eccentricity Balance** — The same two planet groups balance independently in eccentricity to 100%
-6. **Saturn-Jupiter-Earth Resonance** — A closed beat-frequency loop connects inner and outer solar system dynamics
+5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3 (99.86%)
+6. **Saturn-Jupiter-Earth Resonance** — Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion and Saturn's ecliptic perihelion: a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics through their well-known mutual resonance lock
 
 The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 7,558,272 candidate configurations, five successive physical filters (inclination balance, eccentricity balance, Laplace–Lagrange bounds, direction match, and mirror symmetry) narrow the field to 43 viable candidates — of which only one is mirror-symmetric.
 

@@ -59,31 +59,33 @@ Because `SolarYearCount` is **rounded to an integer**, a change in `SolarYearInp
 
 Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 
-**Law 1 -- Fibonacci Cycle Hierarchy**: All major precession periods derive from H divided by Fibonacci numbers:
+**Law 1 -- Fibonacci Cycle Hierarchy**: Earth's major precession periods divide H by Fibonacci numbers — H/3 (inclination), H/5 (ecliptic), H/8 (obliquity), H/13 (axial). The Fibonacci addition rule connects them: 3 + 5 = 8, 5 + 8 = 13. Earth's H/Fibonacci hierarchy is unique among the planets:
 
-| F(n) | Period = H/F(n) | Astronomical meaning |
-|------|-----------------|---------------------|
-| 3 | H/3 | Earth inclination precession |
-| 5 | H/5 | Jupiter perihelion precession |
-| 8 | H/8 | Saturn perihelion precession (retrograde) |
-| 13 | H/13 | Earth axial precession |
+| F(n) | Period = H/F(n) | Earth's astronomical cycle |
+|------|-----------------|----------------------------|
+| 3 | H/3 | Inclination precession (ICRF perihelion) |
+| 5 | H/5 | Ecliptic precession |
+| 8 | H/8 | Obliquity cycle |
+| 13 | H/13 | Axial precession |
 | 16 | H/16 | Perihelion precession cycle |
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The mass-weighted amplitudes cancel between the in-phase group (7 planets) and anti-phase group (Saturn) to **100% balance**.
+Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
-**Laws 4-5 -- Eccentricity Constant & Balance**: All 8 eccentricities are determined by Fibonacci pair constraints. Saturn's eccentricity is independently predicted to within 0.3% by two different laws.
+**Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The angular-momentum-weighted oscillations of the seven in-phase planets balance against Saturn alone (anti-phase) to **99.9975% balance**.
 
-**Law 6 -- Saturn-Jupiter-Earth Resonance Loop** (the 3-5-8-13-21 loop):
+**Laws 4-5 -- Eccentricity Constant & Balance**: A single constant K predicts all 8 eccentricity amplitudes. The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3. Saturn's eccentricity is independently predicted to within 0.3%.
+
+**Law 6 -- Saturn-Jupiter-Earth Resonance** (the H/8 triple identity): Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period. The gas giants gravitationally drive Earth's spin-axis dynamics through their well-known mutual resonance lock (the Great Inequality). The closed beat-frequency loop:
 
 ```
-Jupiter (H/5) + Saturn (H/8)  -> Axial (H/13)
-Jupiter - Saturn              -> Earth inclination (H/3)
-Axial - Earth inclination     -> Obliquity (H/8) -> Saturn
+Earth (H/3) + Jupiter (H/5) -> Saturn obliquity (H/8)   (3 + 5 = 8)
+Saturn (H/8) - Jupiter (H/5) -> Earth inclination (H/3) (8 - 5 = 3)
+Saturn (H/8) - Earth (H/3)   -> Jupiter (H/5)           (8 - 3 = 5)
 ```
 
-Each beat frequency returns another H/Fibonacci period. The loop closes because F(n)+F(n+1)=F(n+2).
+All three rows are cyclic permutations of the Fibonacci identity 3 + 5 = 8. Combining Jupiter and Saturn further extends to axial precession (5 + 8 = 13), connecting Law 6 back to Law 1's hierarchy.
 
 ### 2.3 Mirror Pairs
 
@@ -100,7 +102,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 
 ### 2.4 Implications for the Optimization Tool
 
-1. **Jupiter-Saturn-Earth must be aligned FIRST** -- they form the 3-5-8-13-21 resonance loop. If these three aren't right, the beat frequencies that drive all precession periods will be wrong, affecting everything.
+1. **Jupiter-Saturn-Earth must be aligned FIRST** -- they form the H/8 triple identity (Law 6) and extend through 5+8=13 to Earth's axial precession. If these three aren't right, the beat frequencies that drive Earth's spin-axis dynamics and the rest of the Fibonacci hierarchy will be wrong, affecting everything.
 2. **Conjunction periods emerge from orbit count ratios** -- Jupiter and Saturn's great conjunction period (~19.86 years) is determined by `1/(1/T_J - 1/T_S)`. Getting this right validates the orbit counts.
 3. **Once Jupiter-Saturn are aligned, extend outward** -- fit Mars (shares d=5 with Jupiter), then Mercury/Uranus (d=21 pair), Venus/Neptune (d=34 pair).
 4. **Orbit counts are integers** -- `SolarYearCount` is rounded, creating discrete jumps in orbit geometry. The optimizer must understand this.

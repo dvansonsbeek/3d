@@ -89,7 +89,7 @@ Note: `earthWobbleCenter` is NOT in the main chain (used for labels/tracking onl
 - Free core nutation (~430d, <0.1 arcsec)
 - Secular acceleration of precession — constant-speed approximation is adequate for ~200-year windows
 
-**Assessment conclusion for Earth chain**: The chain is geometrically sound. All precession periods derive from Fibonacci divisions of H (see [Constants Reference](20-constants-reference.md)). The eccentricity and obliquity mechanisms correctly reproduce observed J2000 values and long-term oscillation ranges. The main tunable constants are: `eccentricityBase`, `eccentricityAmplitude`, `earthInvPlaneInclinationAmplitude`, `earthRAAngle`, and `earthtiltMean`.
+**Assessment conclusion for Earth chain**: The chain is geometrically sound. Earth's major precession periods (axial, ecliptic, obliquity, inclination) derive from H divided by Fibonacci numbers (Law 1; see [Constants Reference](20-constants-reference.md)). The eccentricity and obliquity mechanisms correctly reproduce observed J2000 values and long-term oscillation ranges. The main tunable constants are: `eccentricityBase`, `eccentricityAmplitude`, `earthInvPlaneInclinationAmplitude`, `earthRAAngle`, and `earthtiltMean`.
 
 #### Step 2: Investigate the Sun's apparent motion -- observation or model artifact?
 

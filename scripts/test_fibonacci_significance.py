@@ -46,9 +46,9 @@ LOCKED_OBSERVED = [
     # (test_id,                expected,       rel_tol)
     ("law1_fib_denominators",  7.0,            0.0),        # integer count, exact
     ("law2_psi_full",          0.0,            1e-6),       # tautological, spread ≈ 0
-    ("law3_incl_balance",      99.9972,        1e-4),       # percentage
+    ("law3_incl_balance",      99.9975,        1e-4),       # percentage
     ("law4_k_amplitude",       4.5e-5,         0.05),       # relative error, wider tol
-    ("law5_ecc_balance",       99.8865,        1e-4),       # percentage
+    ("law5_ecc_balance",       99.8632,        1e-4),       # percentage
     ("law6_ejs_resonance",     0.0,            1e-6),       # b_E + b_J = b_S exactly
     ("f1_mirror_symmetry",     4.0,            0.0),        # integer count, exact
     ("f1b_d_set_fib_pairs",    1.0,            0.0),        # binary

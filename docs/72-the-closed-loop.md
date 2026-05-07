@@ -68,7 +68,7 @@ Each planet has up to five distinct periodic motions. Their periods interlock:
 
 ### 1. Inclination cycle (ICRF perihelion precession)
 
-The inclination on the invariable plane oscillates at the ICRF perihelion precession rate. This is the ecliptic perihelion rate corrected for the general precession of the ecliptic: 1/P_ICRF = 1/P_ecliptic − 13/H. The ecliptic perihelion period is set from observations (H/d ratios from Law 1).
+The inclination on the invariable plane oscillates at the ICRF perihelion precession rate. This is the ecliptic perihelion rate corrected for the general precession of the ecliptic: 1/P_ICRF = 1/P_ecliptic − 13/H. The ecliptic perihelion period is set from observations (H/d ratios for Earth, Jupiter, and Saturn — see Laws 1 and 6; 8H/N for the other planets — see [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md)).
 
 The inclination amplitude equals the axial tilt amplitude — they are the same oscillation seen from two reference frames.
 
@@ -131,8 +131,10 @@ The model has 6 free parameters:
 
 From these free parameters, the model derives:
 
-**From Law 1 (Fibonacci cycle hierarchy):**
-- Ecliptic perihelion periods (H/d ratios, observed inputs)
+**From Law 1 (Earth's Fibonacci cycle hierarchy) and the 8H scaffold:**
+- Earth's ecliptic perihelion (H/16), inclination (H/3), ecliptic precession (H/5), obliquity (H/8), and axial precession (H/13) — all H/Fibonacci by Law 1
+- Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) — H/Fibonacci by Law 6's H/8 triple identity
+- Other planets' precession periods — integer divisors of 8H (the Solar System Resonance Cycle), mostly non-Fibonacci
 - Axial precession periods (H × d-combinations, some predicted)
 
 **From PSI and K (derived from Earth):**

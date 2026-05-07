@@ -1,6 +1,6 @@
 # Fibonacci Laws of Planetary Motion
 
-This document describes the Fibonacci Laws of Planetary Motion as implemented in the Holistic Universe Model. Six laws connect planetary orbital parameters through Fibonacci numbers: a cycle hierarchy, inclination and eccentricity constants, two independent balance conditions, and a resonance loop.
+This document describes the Fibonacci Laws of Planetary Motion as implemented in the Holistic Universe Model. Six laws form a symmetric architecture anchored on Earth and extending to all eight planets through Fibonacci numbers: an Earth-specific cycle hierarchy, paired inclination and eccentricity laws (amplitude constants + collective balance), and a three-planet coupling at H/8.
 
 ---
 
@@ -8,10 +8,10 @@ This document describes the Fibonacci Laws of Planetary Motion as implemented in
 
 The six Fibonacci Laws form a layered architecture:
 
-- **Law 1** (Fibonacci Cycle Hierarchy) — all major precession periods derive from the Earth Fundamental Cycle divided by Fibonacci numbers
-- **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups
-- **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition
-- **Law 6** (Saturn-Jupiter-Earth Resonance) — a closed beat-frequency loop linking three dominant precession periods
+- **Law 1** (Fibonacci Cycle Hierarchy) — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
+- **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups (seven in-phase planets balanced against Saturn alone)
+- **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition with the same Fibonacci divisors and phase groups as Law 3
+- **Law 6** (Saturn-Jupiter-Earth Resonance) — Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion and Saturn's ecliptic perihelion: a triple identity at H/8, with the gas giants gravitationally driving Earth's spin-axis dynamics through their well-known mutual resonance lock
 
 For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
 
@@ -68,18 +68,20 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 ### Law 1: Fibonacci Cycle Hierarchy
 
-All major precession periods derive from the Earth Fundamental Cycle divided by Fibonacci numbers:
+**Earth's major precession periods divide the Earth Fundamental Cycle H by Fibonacci numbers — H/3 (inclination), H/5 (ecliptic), H/8 (obliquity), H/13 (axial). The Fibonacci addition rule connects them: 3 + 5 = 8, 5 + 8 = 13.**
 
-| F(n) | Period = H/F(n) | Astronomical meaning |
-|------|-----------------|---------------------|
-| 3 | H/3 | Earth inclination precession |
-| 5 | H/5 | Jupiter perihelion precession |
-| 8 | H/8 | Saturn perihelion precession (retrograde) |
-| 13 | H/13 | Earth axial precession |
+| F(n) | Period = H/F(n) | Earth's astronomical cycle |
+|------|-----------------|----------------------------|
+| 3 | H/3 | Inclination precession (ICRF perihelion) |
+| 5 | H/5 | Ecliptic precession |
+| 8 | H/8 | Obliquity cycle |
+| 13 | H/13 | Axial precession |
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence.
+Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence (3+5=8, 5+8=13, 8+13=21, …).
+
+**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6 (the H/8 triple identity). The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
 
 ### Law 2: The Inclination Amplitude Constant
 
@@ -93,7 +95,9 @@ d × amplitude × √m = ψ     →     amplitude = ψ / (d × √m)
 
 ### Law 3: The Inclination Balance
 
-The angular-momentum-weighted inclination amplitudes cancel between the two phase groups, conserving the orientation of the invariable plane:
+**The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn's alone, conserving the orientation of the invariable plane.**
+
+In-phase group: Mercury, Venus, Earth, Mars, Jupiter, Uranus, Neptune. Anti-phase group: Saturn (alone). The two groups must cancel:
 
 ```
 Σ(in-phase group) L_j × amp_j = Σ(anti-phase group) L_j × amp_j
@@ -135,6 +139,8 @@ Both constants are empirical — derived from Earth's fitted parameters — and 
 
 ### Law 5: The Eccentricity Balance
 
+**The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3.**
+
 The eccentricities satisfy an independent balance condition using the same Fibonacci divisors and phase groups:
 
 ```
@@ -149,21 +155,33 @@ Or equivalently, in terms of orbital period `T_j ∝ a_j^(3/2)`:
 v_j = T_j × e_j × √(m_j / d_j)
 ```
 
-**Result: 99.8865% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
+**Result: 99.8632% balance** (phase-derived base eccentricities). See [Eccentricity Balance Derivation](#eccentricity-balance-derivation) for the full treatment and [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation as a balance scale.
 
 The eccentricity amplitudes used in the balance are predicted by Law 4 (the K constant). See [Eccentricity Balance Scale](38-eccentricity-scale.md) for a physical interpretation of the balance as a scale.
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
-Saturn's retrograde precession creates a closed beat-frequency loop linking the three dominant precession periods:
+**Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period — a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics. Jupiter and Saturn maintain this configuration through their well-known mutual resonance lock.**
+
+The triple identity at H/8:
+
+| Object | Period | Frame |
+|--------|--------|-------|
+| Earth obliquity | H/8 | — |
+| Jupiter perihelion | H/8 | ICRF |
+| Saturn perihelion | H/8 (retrograde) | ecliptic |
+
+The same H/8 coincides with three different physical quantities — one Earth spin-axis cycle and two gas-giant orbital cycles — closing through the Fibonacci identity 3 + 5 = 8. The closed beat-frequency loop:
 
 ```
-Jupiter + Saturn → Axial:       1/(H/5) + 1/(H/8) = 1/(H/13)
-Jupiter − Saturn → Earth incl:  1/(H/5) − 1/(−H/8) = 1/(H/3)
-Axial − Earth   → Obliquity:    1/(H/13) − 1/(H/3) = 1/(H/8) → Saturn
+Earth incl. + Jupiter → Saturn (obliquity):  1/(H/3) + 1/(H/5) = 1/(H/8)    (3 + 5 = 8)
+Saturn − Jupiter → Earth inclination:        1/(H/8) − 1/(H/5) = 1/(H/3)    (8 − 5 = 3)
+Saturn − Earth → Jupiter:                    1/(H/8) − 1/(H/3) = 1/(H/5)    (8 − 3 = 5)
 ```
 
-Each frequency sum/difference returns another Fibonacci period (H/5, H/8, H/13, H/3). The loop closes because the Fibonacci recurrence `F(n) + F(n+1) = F(n+2)` maps directly to beat frequencies: `1/H(n) + 1/H(n+1) = 1/H(n+2)`.
+All three rows are cyclic permutations of a single Fibonacci identity (3 + 5 = 8). Combining Jupiter and Saturn further extends to axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13), connecting Law 6 to Law 1's hierarchy.
+
+The physical mechanism is the Jupiter–Saturn mean-motion near-resonance (5:2, the Great Inequality), well established in celestial mechanics. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit. The triple identity at H/8 is what couples this gas-giant resonance into Earth's obliquity cycle — making Earth's spin-axis dynamics a direct beat of Jupiter and Saturn.
 
 ---
 
@@ -289,7 +307,7 @@ e_Saturn = Σ(in-phase group) v_j / (√m_Sa × a_Sa^(3/2) / √d_Sa)
 
 **Epoch independence:** The agreement is not specific to the J2000 epoch. The mirror pairs act as communicating vessels that exchange AMD (Angular Momentum Deficit) secularly: when Saturn's eccentricity rises, Earth's falls, and vice versa. When all four pairs co-evolve with AMD conservation, Law 5's balance stays within 99.8–99.9% across Saturn's entire upper secular range (e = 0.054–0.088), compared to a 36–100% swing if Saturn oscillated alone. See [epoch-independence.js](../tools/verify/epoch-independence.js) for the full analysis.
 
-With phase-derived base eccentricities, Law 5's balance reaches 99.8865% — naturally, with no forced constraints. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
+With phase-derived base eccentricities, Law 5's balance reaches 99.8632% — naturally, with no forced constraints. See [eccentricity-balance.js](../tools/verify/eccentricity-balance.js) for the static analysis.
 
 ---
 
@@ -414,7 +432,7 @@ The half-power difference in Fibonacci divisor scaling (1/d vs 1/√d) and the s
 Σ(in-phase) v = 1.543 × 10⁻²
 Σ(anti-phase)  v = 1.547 × 10⁻²
 
-Balance: 99.8865%
+Balance: 99.8632%
 ```
 
 Saturn alone carries the entire anti-phase contribution. The in-phase group is dominated by Jupiter (7.928 × 10⁻³), Uranus (5.705 × 10⁻³), and Neptune (1.734 × 10⁻³), with the four inner planets contributing only 6.6 × 10⁻⁵ combined.
@@ -489,7 +507,7 @@ The eccentricity balance (Law 5) operates on linear e rather than e², suggestin
 
 **LL bounds: 8/8 pass** — All 8 planets' inclination ranges fit within Laplace-Lagrange secular theory bounds.
 
-The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8636% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
+The non-trivial test is that these Fibonacci divisors simultaneously satisfy three independent constraints: (1) all 8 planets fit within their Laplace-Lagrange bounds (within 0.03° uncertainty), (2) the inclination structural weights balance to 99.9975% (Law 3), and (3) the eccentricity weights balance to 99.8632% (Law 5). The fact that pure Fibonacci numbers achieve all three is the core prediction of the theory.
 
 ### Worked Example: Earth's Inclination Amplitude
 
@@ -611,7 +629,7 @@ Verify `Σ(in-phase) w_j = Σ(anti-phase) w_j` to 99.9975% balance.
 
 ### Test 4: Eccentricity Balance
 
-Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 99.8865% balance.
+Verify `Σ(in-phase) v_j = Σ(anti-phase) v_j` to 99.8632% balance.
 
 ### Test 5: Saturn Eccentricity Prediction from Law 5
 

@@ -24741,17 +24741,17 @@ function setupGUI() {
     const lawsFolder = aboutFolder.addFolder({ title: 'The Six Laws', expanded: false });
     const laws = [
       { n: 1, title: 'Fibonacci Cycle Hierarchy',
-        desc: 'Dividing the Earth Fundamental Cycle by successive Fibonacci numbers produces the major precession periods of the solar system.' },
+        desc: 'Earth\u2019s major precession periods divide the Earth Fundamental Cycle (H) by Fibonacci numbers \u2014 H/3, H/5, H/8, H/13. Unique to Earth.' },
       { n: 2, title: 'Inclination Amplitude Constant',
         desc: 'A single constant \u03C8 predicts all eight inclination amplitudes from Fibonacci divisors and mass alone.' },
-      { n: 3, title: 'Inclination Balance',
-        desc: 'The angular-momentum-weighted inclination oscillations of seven planets balance against Saturn\u2019s alone (100%).' },
+      { n: 3, title: 'The Inclination Balance',
+        desc: 'Seven planets\u2019 angular-momentum-weighted inclination oscillations balance Saturn alone (99.9975%).' },
       { n: 4, title: 'Eccentricity Amplitude Constant',
         desc: 'A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt.' },
-      { n: 5, title: 'Eccentricity Balance',
-        desc: 'The same Fibonacci divisors and phase groups produce an independent balance condition on eccentricities (100%).' },
+      { n: 5, title: 'The Eccentricity Balance',
+        desc: 'Seven planets\u2019 eccentricities balance Saturn alone \u2014 same Fibonacci divisors and phase groups as Law 3 (99.8632%).' },
       { n: 6, title: 'Saturn-Jupiter-Earth Resonance',
-        desc: 'Saturn\u2019s ecliptic-retrograde precession creates a closed resonance loop with Jupiter and Earth, linking the Fibonacci timescale to orbital structure.' },
+        desc: 'H/8 triple identity \u2014 Earth\u2019s obliquity cycle equals Jupiter\u2019s ICRF perihelion period equals Saturn\u2019s ecliptic perihelion period. The Jupiter-Saturn mutual resonance lock drives Earth\u2019s spin axis.' },
     ];
     // Inject after all Tweakpane children are set up
     const lawsContainer = lawsFolder.element.querySelector('.tp-fldv_c');

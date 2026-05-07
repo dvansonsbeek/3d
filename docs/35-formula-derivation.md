@@ -42,18 +42,20 @@ This document explains **how the planetary precession formulas were derived** �
 
 ## 1. Fibonacci Hierarchy in Orbital Periods
 
-This section documents the timescale hierarchy that forms Law 1 of the Fibonacci Laws. A remarkable pattern emerges when dividing the Earth Fundamental Cycle by Fibonacci numbers. The resulting periods correspond to major planetary cycles:
+This section documents the timescale hierarchy that forms Law 1 of the Fibonacci Laws. **Earth's major precession periods divide H by Fibonacci numbers — a hierarchy unique to Earth.** When the Earth Fundamental Cycle is divided by Fibonacci numbers, the resulting periods are exactly Earth's major cycles:
 
-| Fibonacci | H/F | Period (years) | Astronomical Meaning |
-|-----------|-----|----------------|---------------------|
-| 3 | H/3 | **111,772** | Earth true perihelion precession |
-| 5 | H/5 | **67,063** | Jupiter perihelion precession |
-| 8 | H/8 | **41,915** | Saturn perihelion precession |
+| Fibonacci | H/F | Period (years) | Earth's astronomical cycle |
+|-----------|-----|----------------|----------------------------|
+| 3 | H/3 | **111,772** | Inclination precession (ICRF perihelion) |
+| 5 | H/5 | **67,063** | Ecliptic precession |
+| 8 | H/8 | **41,915** | Obliquity cycle |
 | 13 | H/13 | **25,794** | Axial precession |
-| 21 | H/21 | **15,953** | Saturn + Axial beat frequency |
-| 34 | H/34 | **9,853** | Earth + Saturn beat frequency |
+| 21 | H/21 | **15,953** | Beat: axial + obliquity |
+| 34 | H/34 | **9,853** | Beat: axial + ecliptic |
 | 55 | H/55 | **6,091** | Higher-order resonance |
 | 89 | H/89 | **3,764** | Higher-order resonance |
+
+Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6 (the H/8 triple identity), not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
 **Beat Frequency Rule**: Just as Fibonacci numbers add (F(n) + F(n+1) = F(n+2)), the corresponding beat frequencies follow the same pattern:
 
@@ -72,9 +74,17 @@ For example:
 
 ## 2. Saturn-Jupiter-Earth Resonance Loop
 
-This section documents the resonance mechanism that forms Law 6 of the Fibonacci Laws. A remarkable discovery emerges when analyzing the planetary precession periods: **Saturn's ecliptic-retrograde precession creates a closed resonance loop** with Jupiter and Earth that explains why certain periods appear in the Mercury fluctuation formula.
+This section documents the resonance mechanism that forms Law 6 of the Fibonacci Laws. **Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period — a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics. Jupiter and Saturn maintain this configuration through their well-known mutual resonance lock (the Great Inequality).**
 
-**Saturn's Motion**: Saturn's perihelion precesses **retrograde in the ecliptic frame** (opposite to orbital motion) with a period of H/8 years. This creates beat frequencies when combined with prograde periods in the Fibonacci resonance loop.
+**The triple identity at H/8**:
+
+| Object | Period | Frame |
+|--------|--------|-------|
+| Earth obliquity | H/8 | — |
+| Jupiter perihelion | H/8 | ICRF |
+| Saturn perihelion | H/8 (retrograde) | ecliptic |
+
+The same H/8 timescale appears in three different physical quantities — one Earth spin-axis cycle and two gas-giant orbital cycles. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit; the H/8 coincidence is what couples the gas-giant resonance into Earth's obliquity cycle.
 
 **The Resonance Loop**:
 
@@ -96,10 +106,10 @@ This section documents the resonance mechanism that forms Law 6 of the Fibonacci
 
 Combining Jupiter and Saturn further gives axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13).
 
-**Physical Interpretation**: Saturn's ecliptic-retrograde precession converts the Fibonacci recurrence into physical beat frequencies:
+**Physical Interpretation**: The H/8 triple identity is the structural fingerprint of the Jupiter–Saturn mean-motion near-resonance (5:2, the Great Inequality), reflected through Saturn's ecliptic-retrograde perihelion. This converts the Fibonacci recurrence into physical beat frequencies:
 - Earth, Jupiter, and Saturn each act as the beat frequency of the other two (3 + 5 = 8)
 - Jupiter + Saturn additionally produces axial precession (5 + 8 = 13)
-- The solar system's major cycles are coupled through gravitational resonances
+- The gas-giant resonance is what drives Earth's spin-axis dynamics through this H/8 coupling
 
 ---
 
