@@ -63,7 +63,7 @@ K is derived in Section 4 below.
 | Planet  | d  | Phase (deg)  | Group      | Mirror Pair |
 |---------|----|--------------|------------|-------------|
 | Mercury | 21 | 234.52       | In-phase   | Uranus      |
-| Venus   | 34 | 259.82       | In-phase   | Neptune     |
+| Venus   | 34 | 218.64       | In-phase   | Neptune     |
 | Earth   |  3 |  21.77       | In-phase   | Saturn      |
 | Mars    |  5 | 231.95       | In-phase   | Jupiter     |
 | Jupiter |  5 | 291.18       | In-phase   | Mars        |

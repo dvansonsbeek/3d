@@ -75,7 +75,7 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 | Planet | Cycle Anchor | Balance Group | n | Balanced Year | ICRF Direction | Incl. Trend at J2000 |
 |--------|-------------|---------------|----------|-------------|----------------|----------------------|
 | Mercury | 234.52° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Venus | 259.82° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Venus | 218.64° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Earth | 21.77° | In-phase | n=0 (locked) | -302,635 | Prograde | Decreasing |
 | Mars | 231.95° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Jupiter | 291.18° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |

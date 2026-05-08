@@ -154,7 +154,7 @@ planets.venus = {
   eocFraction: 0.436,
   perihelionRef_JD: 2455464.42,
   ascendingNodeInvPlane: 54.70,
-  inclinationCycleAnchor: 259.82,
+  inclinationCycleAnchor: 218.64,
   antiPhase: false,
   ascendingNodeCyclesIn8H: 1,
 };

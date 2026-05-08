@@ -227,7 +227,7 @@ The model's default (and uniquely determined) configuration:
 | Planet | Phase | d | Fibonacci | Mirror partner |
 |--------|-------|---|-----------|----------------|
 | Mercury | In-phase (234.52°) | 21 | F₈ | Uranus |
-| Venus | In-phase (259.82°) | 34 | F₉ | Neptune |
+| Venus | In-phase (218.64°) | 34 | F₉ | Neptune |
 | Earth | In-phase (21.77°) | 3 | F₄ | Saturn |
 | Mars | In-phase (231.95°) | 5 | F₅ | Jupiter |
 | Jupiter | In-phase (291.18°) | 5 | F₅ | Mars |

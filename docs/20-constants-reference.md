@@ -107,7 +107,7 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Planet | Fibonacci Divisor (d) | Phase Group | Mirror Pair | EoC Type |
 |--------|----------------------|-------------|-------------|----------|
 | Mercury | 21 | In-phase (234.52°) | Uranus | I |
-| Venus | 34 | In-phase (259.82°) | Neptune | I |
+| Venus | 34 | In-phase (218.64°) | Neptune | I |
 | Earth | 3 | In-phase (21.77°) | Saturn | — |
 | Mars | 5 | In-phase (231.95°) | Jupiter | II |
 | Jupiter | 5 | In-phase (291.18°) | Mars | III |
@@ -269,14 +269,14 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 
 | Planet | Mean (deg) | Amplitude (deg) | Range (deg) | Phase Angle | ICRF Period |
 |--------|----------|---------------|-----------|-------------|-------------|
-| Mercury | 6.701170 | 0.384267 | 6.32 - 7.09 | 234.52° | 8H/93 ≈ 28,844 yr |
-| Venus | 2.192804 | 0.061809 | 2.13 - 2.25 | 259.82° | 8H/110 ≈ 24,387 yr |
+| Mercury | 6.703207 | 0.386478 | 6.32 - 7.09 | 234.52° | 8H/93 ≈ 28,844 yr |
+| Venus | 2.151359 | 0.062165 | 2.09 - 2.21 | 218.64° | 8H/110 ≈ 24,387 yr |
 | Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
-| Mars | 1.913480 | 1.157559 | 0.76 - 3.07 | 231.95° | 8H/69 ≈ 38,877 yr |
-| Jupiter | 0.319566 | 0.021281 | 0.30 - 0.34 | 291.18° | H/8 ≈ 41,915 yr |
-| Saturn | 0.982568 | 0.064819 | 0.92 - 1.05 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
-| Uranus | 1.015064 | 0.023695 | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
-| Neptune | 0.743755 | 0.013474 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
+| Mars | 1.915105 | 1.164222 | 0.75 - 3.08 | 231.95° | 8H/69 ≈ 38,877 yr |
+| Jupiter | 0.319552 | 0.021404 | 0.30 - 0.34 | 291.18° | H/8 ≈ 41,915 yr |
+| Saturn | 0.982897 | 0.065193 | 0.92 - 1.05 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
+| Uranus | 1.015182 | 0.023831 | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
+| Neptune | 0.743803 | 0.013551 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
 | Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
 
 **Formula**: `i(t) = mean + amplitude × cos(ω̃_ICRF(t) - cycleAnchor)` (Saturn: sign flipped, anti-phase)
@@ -596,7 +596,7 @@ Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the p
 | Planet | Cycle Anchor | Balanced Year | Notes |
 |--------|-------------|--------|-------|
 | Mercury | 234.52° | n=7 | |
-| Venus | 259.82° | n=7 | |
+| Venus | 218.64° | n=7 | |
 | Earth | 21.77° | n=0 | locked, IAU reference |
 | Mars | 231.95° | n=7 | |
 | Jupiter | 291.18° | n=7* | |
