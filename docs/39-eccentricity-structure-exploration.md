@@ -22,14 +22,14 @@ where:
 
 | Planet | e_base | e_amplitude | e_structural | structural % |
 |--------|--------|-------------|-------------|-------------|
-| Mercury | 0.205636 | 8.350e-5 | 0.205552 | 99.96% |
-| Venus | 0.006796 | 9.526e-4 | 0.005805 | 85.90% |
+| Mercury | 0.205630 | 2.338e-5 | 0.205607 | 99.99% |
+| Venus | 0.007707 | 9.526e-4 | 0.006754 | 87.64% |
 | Earth | 0.015386 | 1.356e-3 | 0.014030 | 91.19% |
-| Mars | 0.092975 | 3.042e-3 | 0.089934 | 96.73% |
-| Jupiter | 0.048215 | 1.138e-6 | 0.048214 | 100.00% |
-| Saturn | 0.053745 | 5.347e-6 | 0.053740 | 99.99% |
-| Uranus | 0.047344 | 2.802e-5 | 0.047316 | 99.94% |
-| Neptune | 0.008686 | 8.014e-6 | 0.008678 | 99.91% |
+| Mars | 0.091466 | 3.066e-3 | 0.088400 | 96.65% |
+| Jupiter | 0.048386 | 1.134e-6 | 0.048385 | 100.00% |
+| Saturn | 0.053866 | 5.360e-6 | 0.053861 | 99.99% |
+| Uranus | 0.047243 | 2.802e-5 | 0.047215 | 99.94% |
+| Neptune | 0.008597 | 8.039e-6 | 0.008589 | 99.91% |
 
 The gas giants have negligible amplitudes (tiny axial tilts → tiny sin(tilt)), so their base and structural values are nearly identical. The inner planets, especially Venus and Earth, have significant amplitude contributions.
 

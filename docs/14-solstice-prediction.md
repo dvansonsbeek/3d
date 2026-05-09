@@ -278,7 +278,7 @@ All implementations return exact J2000 anchor values by construction. Legacy `SO
 | `CARDINAL_POINT_HARMONICS` | 4 × 24 × [div, sin, cos] | Fitted from 14,579 simulation observations per type |
 | `SOLSTICE_OBLIQUITY_MEAN` | 23.45326° | **Derived at startup** from Pythagorean tilt model (zero fitting) |
 | `SOLSTICE_OBLIQUITY_HARMONICS` | 16 × [div, sin, cos] | Fitted from 14,579 SS observations |
-| `earthInvPlaneInclinationMean` | 1.48128° | Model parameter (mean orbital plane tilt to invariable plane) |
+| `earthInvPlaneInclinationMean` | 1.481134° | Model parameter (mean orbital plane tilt to invariable plane) |
 | `earthRAAngle` | 1.25478° | Scene graph parameter (perihelion precession tilt) |
 | `earthInvPlaneInclinationAmplitude` | 0.63603° | Model parameter (inclination oscillation) |
 | `earthtiltMean` | 23.41354° | Model parameter (mean obliquity) |

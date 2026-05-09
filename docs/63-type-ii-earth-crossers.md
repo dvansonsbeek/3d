@@ -61,7 +61,7 @@ eo = (e_Mars * d * 100) / 2  -  (2 * e_Earth * 100 * sin(delta_omega)) / 2
 ```
 
 Where:
-- `e_Mars` = Mars orbital eccentricity (0.09297543)
+- `e_Mars` = Mars orbital eccentricity (0.09146580)
 - `d` = Mars orbit distance in AU (1.5237, from Kepler's 3rd law)
 - `e_Earth` = Earth's orbital eccentricity (0.01671022)
 - `delta_omega` = angle between Earth's and Mars's ecliptic perihelion
@@ -112,7 +112,7 @@ The legacy formula remains in script.js as a historical artifact.
 
 ## Derived Eccentricity: e/(1+e) Circular-Orbit Equivalent
 
-Mars uses `e/(1+e) = 0.08506635` (from base e = 0.09297543) for the orbit
+Mars uses `e/(1+e) = 0.08380088` (from base e = 0.09146580) for the orbit
 offset calculation. See the
 [Type III doc, "Perihelion Distance: Circular-Orbit Eccentricity e/(1+e)"](64-type-iii-outer-planets.md#perihelion-distance-circular-orbit-eccentricity-e1e)
 section for the full derivation and physical basis.

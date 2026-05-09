@@ -117,14 +117,14 @@ mass or position.
 
 | Planet  | Tilt (deg) | e_amplitude   | % of J2000 ecc | Effect on balance |
 |---------|------------|---------------|-----------------|-------------------|
-| Mercury |   0.03     | 8.350e-5      | 0.041%          | Negligible        |
+| Mercury |   0.03     | 2.338e-5      | 0.011%          | Negligible        |
 | Venus   |   2.6392   | 9.526e-4      | 14.057%         | Negligible (tiny v) |
 | Earth   |  23.41354  | 1.356e-3      | 8.116%          | 0.05% of total    |
-| Mars    |  25.19     | 3.042e-3      | 3.257%          | 0.14% of total    |
-| Jupiter |   3.13     | 1.138e-6      | 0.002%          | Negligible        |
-| Saturn  |  26.73     | 5.347e-6      | 0.010%          | Negligible        |
+| Mars    |  25.19     | 3.066e-3      | 3.283%          | 0.14% of total    |
+| Jupiter |   3.13     | 1.134e-6      | 0.002%          | Negligible        |
+| Saturn  |  26.73     | 5.360e-6      | 0.010%          | Negligible        |
 | Uranus  |  82.23     | 2.802e-5      | 0.059%          | Negligible        |
-| Neptune |  28.32     | 8.014e-6      | 0.093%          | Negligible        |
+| Neptune |  28.32     | 8.039e-6      | 0.094%          | Negligible        |
 
 ### The Physical Mechanism: How Eccentricity Arises from Tilt and Inclination
 
@@ -190,12 +190,12 @@ and therefore the most significant eccentricity oscillations.
 **Derivation of base eccentricities:**
 
 - **Earth**: eccentricityBase = 0.015386 (tuned parameter in the model)
-- **Saturn**: 0.05373663 (dual-balance optimized, sole anti-phase group member)
+- **Saturn**: 0.05386607 (dual-balance optimized, sole anti-phase group member)
 - **Jupiter, Uranus**: Dual-balanced from Law 5 optimization
 - **Venus, Mars**: Derived by fitting a cosine to JPL Horizons eccentricity
   data (originally fitted at H/16 period; to be re-fitted with per-planet eccentricity cycles).
   - Mars: JPL data (1700–2500, 10-year steps) fitted cosine gives amplitude
-    3.059e-3, matching the tilt prediction (3.042e-3) to within 0.6%
+    3.059e-3, matching the tilt prediction (3.066e-3) to within 0.2%
     (ratio 1.00x, R² = 0.867). Fitted mean = 0.09297543.
   - Venus: Base eccentricity derived from balanced-year phase.
     Venus's eccentricity variation is dominated by Laplace-Lagrange secular
@@ -215,7 +215,7 @@ amplitudes are expected to remain similar since they depend on tilt, not period.
 
 | Planet  | Fit Amp       | Tilt-Predicted Amp | Ratio | R²    |
 |---------|---------------|--------------------|-------|-------|
-| Mars    | 3.059e-3      | 3.042e-3           | 1.01x | 0.867 |
+| Mars    | 3.059e-3      | 3.066e-3           | 1.00x | 0.867 |
 | Venus   | 1.084e-3      | 9.526e-4           | 1.14x | 0.074 |
 
 Mars matches almost exactly. Venus has lower R² because 300 years of JPL data
@@ -232,18 +232,12 @@ The JPL J2000 values represent the actual eccentricity at that epoch:
 | Venus   | 0.00677672    | 0.00677672    |  0.000%       |
 | Earth   | 0.01671022    | 0.01671022    |  0.000%       |
 | Mars    | 0.09339410    | 0.09339410    |  0.000%       |
-| Jupiter | 0.04828624    | 0.04838624    | -0.207%       |
-| Saturn  | 0.05373663    | 0.05386179    | -0.232%       |
-| Uranus  | 0.04735744    | 0.04725744    | +0.212%       |
-| Neptune | 0.00860931    | 0.00859048    | +0.219%       |
+| Jupiter | 0.04838624    | 0.04838624    |  0.000%       |
+| Saturn  | 0.05386179    | 0.05386179    |  0.000%       |
+| Uranus  | 0.04725744    | 0.04725744    |  0.000%       |
+| Neptune | 0.00859048    | 0.00859048    |  0.000%       |
 
-At J2000, Venus and Mars are above their base eccentricities (JPL trend shows
-Venus decreasing and Mars increasing toward their respective bases). The outer
-giants (Jupiter, Saturn, Uranus, Neptune) have tilt-derived amplitudes that are
-negligible (< 0.001% of their base eccentricity), so their J2000 model values
-are indistinguishable from their base values at the precision shown. The larger
-J2000−base differences for the outer planets (~0.2–1.1%) come from
-Laplace-Lagrange secular exchange, not the tilt mechanism (see Section 10).
+At J2000, **Earth and Mars are above their base eccentricities** (Earth: 0.01671 vs base 0.01539; Mars: 0.09339 vs base 0.09147), while **Venus is below its base** (0.00678 vs 0.00771). The differences reflect each planet's phase in its own eccentricity oscillation at the J2000 epoch. The outer giants (Jupiter, Saturn, Uranus, Neptune) have base eccentricities calibrated very close to their J2000 values (differences ≤ 1.5×10⁻⁵, well below 0.1%), so their J2000 model values match the base values at the precision shown above. The post-2026 phase-derived calibration makes the outer-planet differences much smaller than in earlier model versions, where Laplace-Lagrange secular exchange was invoked to explain ~0.2–1.1% offsets (see Section 10).
 
 ### Law 5 Weight Contributions
 
@@ -266,14 +260,14 @@ Laplace-Lagrange secular exchange, not the tilt mechanism (see Section 10).
 
 | Planet  | Mean Incl (deg) | Amplitude (deg) | J2000 Incl (deg) | Range (deg)      |
 |---------|-----------------|------------------|-------------------|------------------|
-| Mercury |  6.726271       | 0.384267         | 6.3472858         | 6.34 to 7.11    |
-| Venus   |  2.207312       | 0.061809         | 2.1545441         | 2.15 to 2.27    |
-| Earth   |  1.48128       | 0.63603         | (computed)        | 0.85 to 2.12    |
-| Mars    |  2.648955       | 1.157559         | 1.6311858         | 1.49 to 3.81    |
-| Jupiter |  0.329094       | 0.021281         | 0.3219652         | 0.31 to 0.35    |
-| Saturn  |  0.931672       | 0.064819         | 0.9254704         | 0.87 to 1.00    |
-| Uranus  |  1.000594       | 0.023695         | 0.9946692         | 0.98 to 1.02    |
-| Neptune |  0.722202       | 0.013474         | 0.7354155         | 0.71 to 0.74    |
+| Mercury |  6.703207       | 0.386478         | 6.3472858         | 6.32 to 7.09    |
+| Venus   |  2.151359       | 0.062165         | 2.1545441         | 2.09 to 2.21    |
+| Earth   |  1.481134       | 0.636032        | 1.5786900         | 0.85 to 2.12    |
+| Mars    |  1.915105       | 1.164222         | 1.6311858         | 0.75 to 3.08    |
+| Jupiter |  0.319552       | 0.021404         | 0.3219652         | 0.30 to 0.34    |
+| Saturn  |  0.982897       | 0.065193         | 0.9254704         | 0.92 to 1.05    |
+| Uranus  |  1.015182       | 0.023831         | 0.9946692         | 0.99 to 1.04    |
+| Neptune |  0.743803       | 0.013551         | 0.7354155         | 0.73 to 0.76    |
 
 ### Amplitude Derivation
 
@@ -283,14 +277,14 @@ Inclination amplitudes are derived from the PSI formula:
 
 | Planet  | d  | sqrt(m)        | PSI / (d * sqrt(m)) | Actual amplitude | Match |
 |---------|-----|----------------|----------------------|------------------|-------|
-| Mercury |  21 | 4.0745e-4      | 0.384267             | 0.384267         | Yes   |
-| Venus   |  34 | 1.5646e-3      | 0.061809             | 0.061809         | Yes   |
+| Mercury |  21 | 4.0745e-4      | 0.386478             | 0.386478         | Yes   |
+| Venus   |  34 | 1.5646e-3      | 0.062165             | 0.062165         | Yes   |
 | Earth   |   3 | 1.7331e-3      | 0.636              | 0.63603         | 0.0% |
-| Mars    |   5 | 5.6808e-4      | 1.157559             | 1.157559         | Yes   |
-| Jupiter |   5 | 3.0900e-2      | 0.021281             | 0.021281         | Yes   |
-| Saturn  |   3 | 1.6908e-2      | 0.064819             | 0.064819         | Yes   |
-| Uranus  |  21 | 6.6078e-3      | 0.023695             | 0.023695         | Yes   |
-| Neptune |  34 | 7.1772e-3      | 0.013474             | 0.013474         | Yes   |
+| Mars    |   5 | 5.6808e-4      | 1.164222             | 1.164222         | Yes   |
+| Jupiter |   5 | 3.0900e-2      | 0.021404             | 0.021404         | Yes   |
+| Saturn  |   3 | 1.6908e-2      | 0.065193             | 0.065193         | Yes   |
+| Uranus  |  21 | 6.6078e-3      | 0.023831             | 0.023831         | Yes   |
+| Neptune |  34 | 7.1772e-3      | 0.013551             | 0.013551         | Yes   |
 
 Earth shows a ~0.5% mismatch because its amplitude was independently tuned for IAU 2006
 precession rate (0.63603). The Fibonacci formula (ψ/(d×√m)) gives 0.636, matching exactly since ψ is derived from Earth.
@@ -327,14 +321,14 @@ For each planet, six parameters fully describe the orbital dynamics:
 
 | Planet  | 1. Tilt    | 2. Amp Tilt | 3. Mean Ecc  | 4. Amp Ecc    | 5. Mean Incl | 6. Amp Incl |
 |---------|------------|-------------|---------------|---------------|--------------|-------------|
-| Mercury |   0.03     | 0.384267    | 0.20563593    | 8.350e-5      |  6.726271    | 0.384267    |
-| Venus   |   2.6392   | 0.061809    | 0.00679616    | 9.526e-4      |  2.207312    | 0.061809    |
-| Earth   |  23.41354  | 0.63603    | 0.01538600    | 1.356e-3      |  1.48128    | 0.63603    |
-| Mars    |  25.19     | 1.157559    | 0.09297543    | 3.042e-3      |  2.648955    | 1.157559    |
-| Jupiter |   3.13     | 0.021281    | 0.04828624    | 1.138e-6      |  0.329094    | 0.021281    |
-| Saturn  |  26.73     | 0.064819    | 0.05373663    | 5.347e-6      |  0.931672    | 0.064819    |
-| Uranus  |  82.23     | 0.023695    | 0.04735744    | 2.802e-5      |  1.000594    | 0.023695    |
-| Neptune |  28.32     | 0.013474    | 0.00860931    | 8.014e-6      |  0.722202    | 0.013474    |
+| Mercury |   0.03     | 0.386478    | 0.20563022    | 2.338e-5      |  6.703207    | 0.386478    |
+| Venus   |   2.6392   | 0.062165    | 0.00770652    | 9.526e-4      |  2.151359    | 0.062165    |
+| Earth   |  23.41354  | 0.636032   | 0.01538578    | 1.356e-3      |  1.481134   | 0.636032   |
+| Mars    |  25.19     | 1.164222    | 0.09146580    | 3.066e-3      |  1.915105    | 1.164222    |
+| Jupiter |   3.13     | 0.021404    | 0.04838630    | 1.134e-6      |  0.319552    | 0.021404    |
+| Saturn  |  26.73     | 0.065193    | 0.05386607    | 5.360e-6      |  0.982897    | 0.065193    |
+| Uranus  |  82.23     | 0.023831    | 0.04724317    | 2.802e-5      |  1.015182    | 0.023831    |
+| Neptune |  28.32     | 0.013551    | 0.00859679    | 8.039e-6      |  0.743803    | 0.013551    |
 
 Note: Columns 2 and 6 are identical — the amplitude of axial tilt oscillation IS the
 amplitude of inclination oscillation, both derived from PSI / (d * sqrt(m)).
@@ -442,29 +436,22 @@ The phase is derived from the **System Reset anchor (n=7, -2,649,854 BC)** with 
 The predictive formula works for these planets because the tilt mechanism is
 the dominant source of eccentricity variation over each planet's eccentricity cycle.
 
-### Outer Planets: Laplace-Lagrange Regime
+### Outer Planets: Tilt Now Sufficient
 
-For the outer planets, the tilt-derived amplitude is orders of magnitude too
-small to account for the J2000−base difference:
+With the post-2026 phase-derived base recalibration, the J2000−base differences for the outer planets are small enough that the tilt-derived amplitude alone fits within the cos(φ) ∈ [−1, +1] range:
 
-| Planet  | e_J2000 − e_base | e_amplitude | cos(φ)  | Factor too small |
-|---------|------------------|-------------|---------|------------------|
-| Jupiter | +1.71e-4         | 1.138e-6    |   150×  | 150×             |
-| Saturn  | +1.17e-4         | 5.347e-6    |  21.9×  |  22×             |
-| Uranus  | −8.68e-5         | 2.802e-5    |  −3.10  |   3×             |
-| Neptune | −9.52e-5         | 8.014e-6    | −11.9×  |  12×             |
+| Planet  | e_J2000 − e_base | e_amplitude | cos(φ)  | In valid range? |
+|---------|------------------|-------------|---------|-----------------|
+| Jupiter | −5.82e-8         | 1.134e-6    |  −0.05  | ✓               |
+| Saturn  | −4.28e-6         | 5.360e-6    |  −0.80  | ✓               |
+| Uranus  | +1.43e-5         | 2.802e-5    |  +0.51  | ✓               |
+| Neptune | −6.31e-6         | 8.039e-6    |  −0.79  | ✓               |
 
-Since cos(φ) must be between −1 and +1, these results confirm that the tilt
-mechanism is **not** the dominant driver of eccentricity variation for the giant
-planets. Instead, their J2000−base differences come from **Laplace-Lagrange
-secular eigenmode exchange** — long-period gravitational coupling between the
-giants that redistributes eccentricity among them as a coupled system.
+This is a notable change from earlier model versions, where the J2000−base differences were one to two orders of magnitude *larger* than the tilt amplitudes (e.g., Jupiter previously +1.71×10⁻⁴ vs amp 1.138×10⁻⁶, a factor of 150) and a Laplace-Lagrange secular-exchange explanation was required to bridge the gap.
 
-The tilt-derived amplitudes (~10⁻⁶ to 10⁻⁵) are still physically real — they
-represent the tilt-coupled component — but they are negligible compared to the
-secular exchange (~10⁻⁴). The outer planet phases are set to the value that
-places the dynamic eccentricity closest to the JPL J2000 observed value:
-180° when J2000 > base (maximum eccentricity) and 0° when J2000 < base
+The kinematic mismatch that previously ruled out the tilt mechanism for the giants has now been eliminated by the recalibration. Whether tilt is the *physical* driver of outer-planet eccentricity offsets at J2000, or merely numerically compatible with them while Laplace-Lagrange dynamics do the underlying work, is a separate physics question. What we can say firmly is that the tilt-derived amplitudes (~10⁻⁶ to 10⁻⁵) are no longer too small to account for the residuals.
+
+The outer planet phases are set to the value that places the dynamic eccentricity closest to the JPL J2000 observed value: 180° when J2000 > base (maximum eccentricity) and 0° when J2000 < base
 (minimum eccentricity). This maximizes the dynamic eccentricity balance at
 J2000 (99.9845%) while the amplitude remains negligible.
 

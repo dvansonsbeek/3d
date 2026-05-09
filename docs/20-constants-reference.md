@@ -97,7 +97,7 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Eccentricity Amplitude | `eccentricityAmplitude` | 0.001356 | Oscillation amplitude (derived from base + e(J2000) constraint) |
 | Mean Obliquity | `earthtiltMean` | 23.41354 deg | Mean axial tilt (derived from obliquity at J2000) |
 | RA Angle | `earthRAAngle` | ~1.254 | **Derived**: `2A − A²/ε` where A = inclination amplitude, ε = earthtiltMean |
-| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.48128 deg | Mean orbital inclination to invariable plane (derived) |
+| Mean Inclination (inv. plane) | `earthInvPlaneInclinationMean` | 1.481134 deg | Mean orbital inclination to invariable plane (derived) |
 | Inclination Amplitude | `earthInvPlaneInclinationAmplitude` | 0.63603 deg | Oscillation amplitude (derived from obliquity rate) |
 | Inclination Cycle Anchor | `earthInclinationCycleAnchor` | 21.77 deg | ICRF perihelion longitude where Earth reaches MAX inclination (anchor for the oscillation) |
 | Perihelion Ref JD | `perihelionRefJD` | 2451547.042 | JD of Earth perihelion 2000 (Jan 3.542) |
