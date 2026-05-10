@@ -861,7 +861,7 @@ To derive `GM` from orbits, the model uses:
 **Available for Earth-Moon:**
 - `moonDistance` = 384,399.07 km (Moon's semi-major axis)
 - `moonSiderealMonth` = 27.32166156 days
-- `MASS_RATIO_EARTH_MOON` = 81.3007 (lunar laser ranging)
+- `MASS_RATIO_EARTH_MOON` = 81.30056816 (DE440 SPICE kernel)
 
 Result: `M_Earth ≈ 5.97219 × 10²⁴ kg` (matches CODATA 2022 to ~3.7 ppm — limited by Brown's lunar theory floor in the 3-body system; see [doc 24](24-moon-kepler-derivation.md) for the precision analysis).
 
@@ -1076,9 +1076,9 @@ const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3))
 
 **Step 2: Mass Ratio Separation**
 ```javascript
-// Earth-Moon mass ratio ≈ 81.30
+// Earth-Moon mass ratio ≈ 81.30 (DE440 SPICE kernel)
 // Earth is 81.3 times more massive than Moon
-const MASS_RATIO_EARTH_MOON = 81.3007;
+const MASS_RATIO_EARTH_MOON = 81.30056816;
 
 // Earth's fraction: ratio / (ratio + 1) ≈ 0.9879
 // Moon's fraction: 1 / (ratio + 1) ≈ 0.0121
@@ -1475,21 +1475,21 @@ For the derivation of `GM_Earth`, `GM_Moon`, and `GM_Sun` from the Moon's and Ea
 | Body | GM (km³/s²) | Mass (kg) | Derivation Method |
 |------|-------------|-----------|-------------------|
 | **Sun** | 132,712,430,441 | 1.988 × 10³⁰ | Kepler from Earth's orbit minus GM_Earth (M_Sun only; matches JPL DE440 to 0.07 ppm) |
-| **Earth** | 398,601.93 | 5.972 × 10²⁴ | Moon's orbit with Δa = a_M·μ·m correction (matches JPL DE440 to 3.7 ppm) |
-| **Moon** | 4,902.81 | 7.346 × 10²² | Same Δa correction, split via M_M/(M_E+M_M) |
+| **Earth** | 398,601.91 | 5.972 × 10²⁴ | Moon's orbit with Δa = a_M·μ·m correction (matches JPL DE440 to 3.7 ppm) |
+| **Moon** | 4,902.82 | 7.346 × 10²² | Same Δa correction, split via M_M/(M_E+M_M) (matches DE440 to 3.7 ppm) |
 
 #### 8.1.2 Derived from Sun/Planet Mass Ratios
 
 | Body | Mass Ratio (Sun/Planet) | GM (km³/s²) | Mass (kg) |
 |------|------------------------|-------------|-----------|
-| **Mercury** | 6,023,625.5 | ~22,032 | ~3.30 × 10²³ |
+| **Mercury** | 6,023,657.94 | ~22,032 | ~3.30 × 10²³ |
 | **Venus** | 408,523.72 | ~324,859 | ~4.87 × 10²⁴ |
 | **Mars** | 3,098,703.59 | ~42,828 | ~6.42 × 10²³ |
 | **Jupiter** | 1,047.348625 | ~126,712,756 | ~1.90 × 10²⁷ |
 | **Saturn** | 3,497.9018 | ~37,940,582 | ~5.69 × 10²⁶ |
 | **Uranus** | 22,902.944 | ~5,794,558 | ~8.68 × 10²⁵ |
 | **Neptune** | 19,412.237 | ~6,836,535 | ~1.02 × 10²⁶ |
-| **Pluto** | 136,047,200 | ~975 | ~1.46 × 10²² |
+| **Pluto** | 136,045,556 | ~975 | ~1.46 × 10²² |
 
 #### 8.1.3 Small Bodies (Direct Measurements/Estimates)
 

@@ -3,10 +3,10 @@
   "physicalConstants": {
     "currentAUDistance": 149597870.698828,
     "G_CONSTANT": 6.6743e-20,
-    "MASS_RATIO_EARTH_MOON": 81.3007,
+    "MASS_RATIO_EARTH_MOON": 81.30056816,
     "speedOfLight": 299792.458,
     "massRatioDE440": {
-      "mercury": 6023625.5,
+      "mercury": 6023657.94,
       "venus": 408523.72,
       "mars": 3098703.59,
       "jupiter": 1047.348625,

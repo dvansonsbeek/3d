@@ -80,7 +80,7 @@ The Δa chain consumes three hardcoded observational constants and three model-d
 ```
 a_M       = moonDistance              = 384,399.07 km     // IAU mean lunar distance
 T_M_iau   = moonSiderealMonthInput    = 27.32166156 days  // IAU sidereal month
-ratio     = MASS_RATIO_EARTH_MOON     = 81.3007           // M_Earth / M_Moon (lunar laser ranging)
+ratio     = MASS_RATIO_EARTH_MOON     = 81.30056816      // M_Earth / M_Moon (DE440 SPICE kernel)
 ```
 
 **Model-derived (computed at runtime, used by the chain):**
@@ -98,7 +98,7 @@ The derived values differ from their nominal IAU references by sub-ppm amounts (
 ```
 1.  m   =  T_M / T_S                                     = 0.07480133    (lunar small parameter, Hill 1878)
 
-2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215056    (Moon mass fraction)
+2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215058    (Moon mass fraction)
 
 3.  Δa  =  a_M · μ · m                                    = 349.37 km     (solar-tidal shift)
 
@@ -108,15 +108,15 @@ The derived values differ from their nominal IAU references by sub-ppm amounts (
 
 6.  GM(M_E + M_M)  =  4π² · moonDistanceCorrected³ / T²
                    =  4π² · (384,748.44)³ / (2,360,591.63)²
-                   =  403,504.72 km³/s²
+                   =  403,504.73 km³/s²
 
 7.  GM_Earth  =  GM(M_E + M_M)  ·  ratio / (ratio + 1)
-              =  403,504.72 · 0.987849
+              =  403,504.73 · 0.987849
               =  398,601.91 km³/s²
 
 8.  GM_Moon   =  GM(M_E + M_M)  /  (ratio + 1)
-              =  403,504.72 / 82.3007
-              =  4,902.81 km³/s²
+              =  403,504.73 / 82.30056816
+              =  4,902.82 km³/s²
 ```
 
 ### Equivalent multiplicative form
@@ -134,7 +134,7 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 | Quantity | Model | JPL/GRAIL reference | Residual |
 |---|---|---|---|
 | GM_Earth | **398,601.91 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
-| GM_Moon | **4,902.81 km³/s²** | 4,902.80 km³/s² | **2.1 ppm** |
+| GM_Moon | **4,902.82 km³/s²** | 4,902.80 km³/s² | **3.7 ppm** |
 | GM_Sun (downstream, after subtracting GM_Earth) | **132,712,430,441 km³/s²** | 132,712,440,042 km³/s² | **0.07 ppm** |
 | M_Earth (= GM_Earth / G with G = 6.6743×10⁻²⁰ km³/(kg·s²)) | **5.972191 × 10²⁴ kg** | spread of published values: 5.972168–5.972370 × 10²⁴ | within published spread |
 
@@ -194,7 +194,7 @@ JPL DE440 sidesteps this entirely by **fitting** `GM_Earth` from artificial-sate
 The `Δa = a_M · μ · m` correction:
 
 1. **Uses only natural orbital quantities** of the Earth-Moon-Sun system (Moon's distance, Moon/Earth mass ratio, Moon/Sun period ratio)
-2. **Achieves 3.7 ppm precision** for GM_Earth and 2.1 ppm for GM_Moon
+2. **Achieves 3.7 ppm precision** for both GM_Earth and GM_Moon
 3. **Leaves GM_Sun precision at 0.07 ppm** vs JPL DE440
 4. **Re-parameterizes Hill-Brown's leading `½·m²` correction** as `3·μ·m` — numerically equivalent to ~3% in our solar system because `μ ≈ m/6` — using only quantities the model already tracks, rather than introducing a fitted coefficient
 

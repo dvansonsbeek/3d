@@ -46,7 +46,7 @@ for (const [k, p] of Object.entries(C.planets)) FIBONACCI_D[k] = p.fibonacciD;
 FIBONACCI_D.pluto = null; // Not in Fibonacci theory
 
 // Planetary masses in solar units
-const PLANET_MASS = { ...C.massFraction, pluto: 1 / 136047200 };
+const PLANET_MASS = { ...C.massFraction, pluto: 1 / 136045556 };
 
 // Semi-major axes in AU (from model orbit distances)
 const PLANET_SMA = { earth: 1.0, pluto: 39.48 };

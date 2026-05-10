@@ -3386,9 +3386,9 @@ const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSunin
 // Gravitational constant (km³/(kg·s²))
 const G_CONSTANT = 6.6743e-20;  // 6.6743 × 10⁻¹¹ m³/(kg·s²) converted to km³/(kg·s²)
 
-// Earth-Moon mass ratio ≈ 81.30 (lunar laser ranging, DE440-consistent).
-// Earth is 81.3 times more massive than Moon.
-const MASS_RATIO_EARTH_MOON = 81.3007;
+// Earth-Moon mass ratio ≈ 81.30 (lunar laser ranging, DE440 SPICE kernel gm_de440.tpc:
+// GM_Earth/GM_Moon = 398600.4355/4902.80012 = 81.30056816).
+const MASS_RATIO_EARTH_MOON = 81.30056816;
 
 // Solar tidal correction for the Moon's apparent semi-major axis.
 //
@@ -3424,7 +3424,7 @@ const M_EARTH = GM_EARTH / G_CONSTANT;
 // Moon's gravitational parameter (km³/s²)
 // GM_Moon = GM_system × (1 / (ratio + 1))
 const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
-// Result: ~4,902.81 km³/s² (GRAIL: 4902.800, residual ~2 ppm)
+// Result: ~4,902.82 km³/s² (GRAIL: 4902.800, residual ~3.7 ppm)
 
 // Moon's mass derived from gravitational parameter (kg)
 // M_MOON = GM_MOON / G ≈ 7.35 × 10²² kg
@@ -3456,7 +3456,7 @@ const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
 // GM_planet = GM_SUN / ratio, then M_planet = GM_planet / G
 
 // Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
-const MASS_RATIO_SUN_MERCURY = 6023625.5;            // DE440
+const MASS_RATIO_SUN_MERCURY = 6023657.94;           // DE440
 const GM_MERCURY = GM_SUN / MASS_RATIO_SUN_MERCURY;  // ~22,032 km³/s²
 const M_MERCURY = GM_MERCURY / G_CONSTANT;           // ~3.30 × 10²³ kg
 
@@ -3491,7 +3491,7 @@ const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,535 km³/s²
 const M_NEPTUNE = GM_NEPTUNE / G_CONSTANT;           // ~1.02 × 10²⁶ kg
 
 // Pluto: Mass from Charon orbit (binary system)
-const MASS_RATIO_SUN_PLUTO = 136047200;              // DE440
+const MASS_RATIO_SUN_PLUTO = 136045556;              // DE440
 const GM_PLUTO = GM_SUN / MASS_RATIO_SUN_PLUTO;      // ~975.5 km³/s²
 const M_PLUTO = GM_PLUTO / G_CONSTANT;               // ~1.47 × 10²² kg
 

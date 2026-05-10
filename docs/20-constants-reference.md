@@ -135,13 +135,13 @@ Phase angles re-anchored 2026-04-09 to balanced year n=7 (≈ -2,649,854 BC). Se
 | Astronomical Unit | `currentAUDistance` | 149,597,870.698828 km |
 | Mean Sidereal Year | `meanSiderealYearSeconds` | siderealYearJ2000 × 86400 (derived) |
 | Gravitational Constant | `G_CONSTANT` | 6.6743 × 10⁻²⁰ km³/(kg·s²) |
-| Earth/Moon Mass Ratio | `MASS_RATIO_EARTH_MOON` | 81.3007 |
+| Earth/Moon Mass Ratio | `MASS_RATIO_EARTH_MOON` | 81.30056816 |
 
 ### DE440 Sun/Planet Mass Ratios
 
 | Planet | `massRatioDE440` (M_Sun / M_Planet) |
 |--------|-------------------------------------|
-| Mercury | 6,023,625.5 |
+| Mercury | 6,023,657.94 |
 | Venus | 408,523.72 |
 | Mars | 3,098,703.59 |
 | Jupiter | 1,047.348625 |
@@ -632,7 +632,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Orbital Period | `solarYearInput` | 90,465 days | JPL Horizons |
 | Eccentricity | `orbitalEccentricityBase` | 0.2488273 | JPL Horizons |
 | Long. Perihelion | `longitudePerihelion` | 224.06891 deg | JPL Horizons |
-| Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | 136,047,200 | DE440 |
+| Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | 136,045,556 | DE440 |
 | GM | `GM_PLUTO` | ~975.5 km³/s² | Derived from Charon orbit |
 
 ### Halley's Comet
