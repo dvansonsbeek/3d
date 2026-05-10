@@ -30,48 +30,60 @@ This gap is **not** explained by the M+m correction (which we already split out 
 
 ## The Δa Correction
 
-### Formula
-
-Apply a physically-motivated shift to the Moon's semi-major axis **before** the Kepler computation:
+The fix is to apply a physically-motivated shift to the Moon's semi-major axis **before** the Kepler computation:
 
 ```
 Δa = a_M  ·  μ  ·  m
-
-where:
-  a_M  = Moon's semi-major axis = 384,399.07 km
-  μ    = M_Moon / (M_Earth + M_Moon) = 1/82.3007 ≈ 0.01215   (Moon mass fraction)
-  m    = T_Moon / T_Sun = 27.32 / 365.26 ≈ 0.0748           (Brown's parameter)
-
-Δa ≈ 349 km
 ```
 
-### Physical interpretation
+Each factor is a natural quantity of the Earth-Moon-Sun system:
 
-Each factor in `Δa` is a natural quantity of the Earth-Moon-Sun system:
+| Factor | Physical meaning | Value |
+|---|---|---|
+| `a_M` | Moon's geometric distance from Earth | 384,399.07 km |
+| `a_M · μ` | **Earth's wobble around the Earth-Moon barycenter** | ≈ 4,670 km |
+| `m` | **Orbital phase ratio**: the fraction of Earth's heliocentric orbit completed during one lunar orbit | ≈ 7.5% |
 
-| Factor | Physical meaning |
-|---|---|
-| `a_M` | Moon's geometric distance from Earth |
-| `a_M · μ` | **Earth's wobble around the Earth-Moon barycenter** (≈ 4,670 km) |
-| `m` | **Orbital phase ratio**: the fraction of Earth's heliocentric orbit completed during one lunar orbit (≈ 7.5%) |
+The product is the **Earth-Moon barycentric wobble × orbital phase fraction during one lunar orbit** — the leading-order coupling between the Earth-Moon barycentric motion and the Sun's gravitational pull on the system. Every input is directly involved in the three-body dynamics being modeled.
 
-The product is the **Earth-Moon barycentric wobble × orbital phase fraction during one lunar orbit** — the leading-order coupling between the Earth-Moon barycentric motion and the Sun's gravitational pull on the system. Every input is a quantity directly involved in the three-body dynamics being modeled.
+## The Full Computation Chain
 
-### Application
+From observational inputs to final values, in 8 steps:
+
+### Inputs (constants)
 
 ```
-moonDistanceCorrected = a_M + Δa = 384,748.44 km
+a_M    = moonDistance              = 384,399.07 km        // Moon's semi-major axis
+T_M    = moonSiderealMonth         = 27.32166156 days     // Moon's sidereal month
+LOD    = meanlengthofday           = 86,400 s             // Length of day
+T_S    = meanSiderealYearDays      = 365.25636 days       // Sidereal year
+ratio  = MASS_RATIO_EARTH_MOON     = 81.3007              // M_Earth / M_Moon (lunar laser ranging)
+```
 
-GM(M_E + M_M) = 4π² · (moonDistanceCorrected)³ / T²
-              = 403,504.75 km³/s²
+### Computation
 
-GM_Earth = GM(M_E + M_M) × M_E / (M_E + M_M)
-         = 403,504.75 × 81.3007 / 82.3007
-         = 398,601.93 km³/s²
+```
+1.  m   =  T_M / T_S                                     = 0.07480       (Brown's parameter)
 
-GM_Moon  = GM(M_E + M_M) × M_M / (M_E + M_M)
-         = 403,504.75 / 82.3007
-         = 4,902.81 km³/s²
+2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215       (Moon mass fraction)
+
+3.  Δa  =  a_M · μ · m                                    = 349.37 km     (solar-tidal shift)
+
+4.  moonDistanceCorrected  =  a_M + Δa                    = 384,748.44 km
+
+5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.62 s
+
+6.  GM(M_E + M_M)  =  4π² · moonDistanceCorrected³ / T²
+                   =  4π² · (384,748.44)³ / (2,360,591.62)²
+                   =  403,504.75 km³/s²
+
+7.  GM_Earth  =  GM(M_E + M_M)  ·  ratio / (ratio + 1)
+              =  403,504.75 · 0.987849
+              =  398,601.93 km³/s²
+
+8.  GM_Moon   =  GM(M_E + M_M)  /  (ratio + 1)
+              =  403,504.75 / 82.3007
+              =  4,902.81 km³/s²
 ```
 
 ### Equivalent multiplicative form
