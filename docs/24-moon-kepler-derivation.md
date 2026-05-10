@@ -140,6 +140,44 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 
 The G uncertainty (~22 ppm) sets a hard floor on how precisely M_Earth can be expressed in kg — different reference sources disagree by up to 30 ppm because they use slightly different G values to convert their fitted GM_Earth.
 
+## External Corroboration of the 384,748 km Value
+
+The corrected Moon distance produced by `Δa` — `moonDistanceCorrected ≈ 384,748 km` — is not a fitted target. **It is an established physics-textbook value** that appears in independent academic references, used as the standard input for Kepler's-law calculations:
+
+- **University of Nevada Las Vegas (D. Jeffery, astrophysics reference pages)** lists it directly as a constant: *"Moon mean orbital radius R_Mo = 384,748 km = 1.28338 light-seconds = 60.3229 R_eq_⊕"* — see [moon facts](https://www.physics.unlv.edu/~jeffery/astro/moon/moon_facts.html) and [Earth-Moon system](https://www.physics.unlv.edu/~jeffery/astro/moon/diagram/earth_moon_system.html).
+- **University physics textbooks** pair `T = 27.321661 days` with `r = 384,748 km` in Kepler's-law homework problems (e.g. the Chegg-archived problem at [chegg.com/.../q1625345](https://www.chegg.com/homework-help/questions-and-answers/orbit-moon-takes-27321661-days-convert-seconds-radius-384-748-km-need-convert-meters-604-r-q1625345)).
+
+### How 384,748 km differs from the four mean-distance definitions
+
+Wikipedia's [Lunar Distance](https://en.wikipedia.org/wiki/Lunar_distance) article catalogs four distinct ways to compute the Moon's mean distance, none of which produces 384,748 km:
+
+| Method | Value |
+|---|---|
+| LLR / Brown's harmonic-mean parallax | 384,399 km |
+| Time-averaged center-to-center distance | 385,000.6 km |
+| Mean of constantly-changing osculating ellipse | 383,397 km |
+| **(missing from the catalog) Kepler-effective semi-major axis** | **384,748 km** |
+
+The 384,748 km value is what Kepler's third law *requires* in order to recover the JPL DE440 combined parameter `GM(M_E + M_M) = 403,503.24 km³/s²` from the IAU sidereal month:
+
+```
+a_Kepler  =  ( GM_EM · T² / (4π²) )^(1/3)  =  384,748 km
+```
+
+This is the value [Wikipedia's Lunar Theory](https://en.wikipedia.org/wiki/Lunar_theory) article alludes to when noting that *"following a line of thought put forth by Horrocks and Hill, one can detach one of the most pronounced perturbations of the Sun and amalgamate its effect with the motion of the Kepler ellipse"* — but no public source we found gives a clean closed-form correction connecting the geometric `a_M` (384,399) to this Kepler-effective value.
+
+### What the model contributes
+
+The textbook value 384,748 km is well-known but, in published references, stated rather than derived. The `Δa = a_M · μ · m` formula provides a clean physical bridge:
+
+```
+geometric a_M  (LLR / Brown's parallax)        =  384,399 km
++  Δa  =  a_M · μ · m                          =     349 km
+=  Kepler-effective semi-major axis            =  384,748 km
+```
+
+Using only `μ = M_M/(M_E+M_M)` and `m = T_M/T_S` — both already tracked by the model — and numerically equivalent to Hill-Brown's leading `½·m²` correction because `μ ≈ m/6` in our solar system (see §"What this formula is, honestly" above). This is what makes the agreement with the published 384,748 km value non-trivial: the formula uses no fitted coefficient, and its inputs are the same orbital quantities that drive the rest of the model.
+
 ## Residual: Why ~3.7 ppm Remains
 
 The Δa correction reduces the 0.27% raw-Kepler gap to a ~3.7 ppm residual. That residual reflects **higher-order Brown's lunar theory terms** (`m⁴` and beyond) that no clean closed-form correction can capture.
