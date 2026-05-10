@@ -71,39 +71,51 @@ The model uses this re-parameterization because:
 
 From observational inputs to final values, in 8 steps:
 
-### Inputs (constants)
+### Inputs (model runtime values)
+
+The Δa chain consumes three hardcoded observational constants and three model-derived values. Both layers are shown — the derived values are what the chain actually uses, so the chain stays self-consistent with the rest of the model's time geometry.
+
+**Hardcoded (observational):**
 
 ```
-a_M    = moonDistance              = 384,399.07 km        // Moon's semi-major axis
-T_M    = moonSiderealMonth         = 27.32166156 days     // Moon's sidereal month
-LOD    = meanlengthofday           = 86,400 s             // Length of day
-T_S    = meanSiderealYearDays      = 365.25636 days       // Sidereal year
-ratio  = MASS_RATIO_EARTH_MOON     = 81.3007              // M_Earth / M_Moon (lunar laser ranging)
+a_M       = moonDistance              = 384,399.07 km     // IAU mean lunar distance
+T_M_iau   = moonSiderealMonthInput    = 27.32166156 days  // IAU sidereal month
+ratio     = MASS_RATIO_EARTH_MOON     = 81.3007           // M_Earth / M_Moon (lunar laser ranging)
 ```
+
+**Model-derived (computed at runtime, used by the chain):**
+
+```
+T_M       = moonSiderealMonth         = 27.32166241 days  // T_M_iau quantized to fit H integer-moons
+T_S       = meansiderealyearlengthinDays = 365.25636437 days  // sidereal year derived via H/13 from tropical year
+LOD       = meanlengthofday           = 86,399.99968 s    // sidereal-seconds / sidereal-days ratio
+```
+
+The derived values differ from their nominal IAU references by sub-ppm amounts (T_M by 0.074 sec, T_S by 0.118 sec, LOD by 0.32 ms). Using them rather than raw IAU values keeps the GM derivation consistent with the model's year-length, sidereal-day, and scene-graph speeds.
 
 ### Computation
 
 ```
-1.  m   =  T_M / T_S                                     = 0.07480       (lunar small parameter, Hill 1878)
+1.  m   =  T_M / T_S                                     = 0.07480133    (lunar small parameter, Hill 1878)
 
-2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215       (Moon mass fraction)
+2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215056    (Moon mass fraction)
 
 3.  Δa  =  a_M · μ · m                                    = 349.37 km     (solar-tidal shift)
 
 4.  moonDistanceCorrected  =  a_M + Δa                    = 384,748.44 km
 
-5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.62 s
+5.  T (in seconds)  =  T_M · LOD                          = 2,360,591.63 s
 
 6.  GM(M_E + M_M)  =  4π² · moonDistanceCorrected³ / T²
-                   =  4π² · (384,748.44)³ / (2,360,591.62)²
-                   =  403,504.75 km³/s²
+                   =  4π² · (384,748.44)³ / (2,360,591.63)²
+                   =  403,504.72 km³/s²
 
 7.  GM_Earth  =  GM(M_E + M_M)  ·  ratio / (ratio + 1)
-              =  403,504.75 · 0.987849
-              =  398,601.93 km³/s²
+              =  403,504.72 · 0.987849
+              =  398,601.91 km³/s²
 
 8.  GM_Moon   =  GM(M_E + M_M)  /  (ratio + 1)
-              =  403,504.75 / 82.3007
+              =  403,504.72 / 82.3007
               =  4,902.81 km³/s²
 ```
 
@@ -121,7 +133,7 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 
 | Quantity | Model | JPL/GRAIL reference | Residual |
 |---|---|---|---|
-| GM_Earth | **398,601.93 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
+| GM_Earth | **398,601.91 km³/s²** | 398,600.44 km³/s² | **3.7 ppm** |
 | GM_Moon | **4,902.81 km³/s²** | 4,902.80 km³/s² | **2.1 ppm** |
 | GM_Sun (downstream, after subtracting GM_Earth) | **132,712,430,441 km³/s²** | 132,712,440,042 km³/s² | **0.07 ppm** |
 | M_Earth (= GM_Earth / G with G = 6.6743×10⁻²⁰ km³/(kg·s²)) | **5.972191 × 10²⁴ kg** | spread of published values: 5.972168–5.972370 × 10²⁴ | within published spread |
