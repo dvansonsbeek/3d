@@ -65,19 +65,29 @@ For current values, see [Constants Reference](20-constants-reference.md).
 |----------|-------------|
 | `GM_SUN` | Gravitational parameter, derived from Kepler's 3rd Law. Used by `OrbitalFormulas.orbitalVelocity`, etc. |
 
-**GM_SUN derivation (implemented at line ~307-310):**
+**GM_SUN derivation:**
+
+The chain is **Earth/Moon → Sun**, because Kepler's 3rd law on Earth's orbit returns G(M_Sun + M_Earth), not GM_Sun alone. We back out GM_Sun by subtracting GM_Earth (which itself comes from the Moon's orbit with the `Δa = a_M·μ·m` solar-tidal correction).
+
 ```javascript
-// GM = (2π)² × a³ / P²
-// Where a = semi-major axis (km), P = orbital period (seconds)
-const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
-             / Math.pow(meansiderealyearlengthinSeconds, 2);
-// Result: ~1.32712 × 10¹¹ km³/s²
+// Step 1: GM_Earth from Moon's orbit (with Δa solar-tidal correction)
+const moonOrbitalShift = moonDistance * (1/(MASS_RATIO_EARTH_MOON+1)) * (moonSiderealMonth/meansiderealyearlengthinDays);
+const moonDistanceCorrected = moonDistance + moonOrbitalShift;
+const GM_EARTH_MOON_SYSTEM = 4π² · moonDistanceCorrected³ / (moonSiderealMonth × meanlengthofday)²;
+const GM_EARTH = GM_EARTH_MOON_SYSTEM × M_E/(M_E + M_M);
+
+// Step 2: GM_Sun from Earth's orbit, minus GM_Earth (M+m correction)
+const GM_SUN_PLUS_EARTH = 4π² · currentAUDistance³ / meansiderealyearlengthinSeconds²;
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+// Result: ~1.32712 × 10¹¹ km³/s²  (matches JPL DE440 to ~0.07 ppm)
 ```
+
+For the full derivation including the physical interpretation of the Δa correction, see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md).
 
 **Advantages of deriving GM:**
 - Self-consistent with simulation's orbital mechanics
-- No external constant needed
-- Automatically adjusts if AU or year length changes
+- No external GM constant needed
+- Automatically adjusts if AU, year length, or Moon orbit parameters change
 
 **Note:** The gravitational constant `G` alone is not needed for orbital mechanics. All velocity, energy, and momentum formulas use the combined `GM` (gravitational parameter), not G and M separately.
 
@@ -261,7 +271,7 @@ These formulas calculate fundamental properties of celestial bodies.
 | `keplerPeriod(a_km)` | P = 2π√(a³/GM) | Orbital period from semi-major axis (days) |
 | `synodicPeriod(P1_days, P2_days)` | P_syn = \|P₁ × P₂ / (P₁ - P₂)\| | Synodic period between two planets (days) |
 
-**Implementation Note:** Mass (M) and gravitational parameter (GM) for planets are derived from orbital mechanics rather than direct measurement. For the Sun, `GM_SUN` is derived from Earth's orbital elements.
+**Implementation Note:** Mass (M) and gravitational parameter (GM) for planets are derived from orbital mechanics rather than direct measurement. The chain is Moon → Earth → Sun: `GM_Earth` from the Moon's orbit (with the `Δa = a_M·μ·m` solar-tidal correction, see [doc 24](24-moon-kepler-derivation.md)), then `GM_Sun` from Earth's orbit minus `GM_Earth`. Planet GMs follow from `GM_Sun / massRatio_DE440`.
 
 ---
 
@@ -841,18 +851,19 @@ Or in convenient units: `GM_sun = 1.327124 × 10¹¹ km³/s²`
 
 ### A.2.5 About Mass Calculations
 
-**Cannot directly calculate planetary mass** from orbital elements alone.
+**Cannot directly calculate planetary mass** from orbital elements alone — gravitational parameter `GM` is what orbital mechanics actually constrains. To get mass in kg, divide `GM/G` (limited to ~22 ppm by G's measurement uncertainty).
 
-To derive mass, you need:
-- **For Sun:** Use any planet's a and P: `M_sun = 4π²a³ / (GP²)`
-- **For Earth:** Use Moon's orbital data: `M_earth = 4π²a_moon³ / (GP_moon²)`
-- **For other planets:** Need satellite orbital data
+To derive `GM` from orbits, the model uses:
+- **For the Sun:** Earth's orbit gives `G(M_Sun + M_Earth) = 4π²·a_E³ / P_E²`, then subtract `GM_Earth`
+- **For Earth + Moon system:** Moon's orbit gives `G(M_Earth + M_Moon) = 4π²·(a_M + Δa)³ / T_M²`, with the solar-tidal correction `Δa = a_M·μ·m` — see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md)
+- **For other planets:** Use the DE440 mass ratios: `GM_planet = GM_Sun / massRatio_DE440[planet]`
 
 **Available for Earth-Moon:**
-- `moonDistance` = 384,399.07 km
+- `moonDistance` = 384,399.07 km (Moon's semi-major axis)
 - `moonSiderealMonth` = 27.32166156 days
+- `MASS_RATIO_EARTH_MOON` = 81.3007 (lunar laser ranging)
 
-This allows: `M_earth ≈ 5.97 × 10²⁴ kg` (can verify against known value)
+Result: `M_Earth ≈ 5.97219 × 10²⁴ kg` (matches CODATA 2022 to ~3.7 ppm — limited by Brown's lunar theory floor in the 3-body system; see [doc 24](24-moon-kepler-derivation.md) for the precision analysis).
 
 ---
 
@@ -907,13 +918,15 @@ Formulas are added inline to each planet's existing `planetStats` entries (not i
 
 ### A.3.3 Implemented Code Structure
 
-**GM_SUN derived from Kepler's 3rd Law (lines ~307-310):**
+**GM_SUN derived from Kepler's 3rd Law:**
 ```javascript
-// Derived from: GM = (2π)² × a³ / P²
-// Using Earth's semi-major axis (AU in km) and sidereal year (seconds)
-const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
-             / Math.pow(meansiderealyearlengthinSeconds, 2);
-// Result: ~1.32712 × 10¹¹ km³/s²
+// Earth's orbit gives G(M_Sun + M_Earth); subtract GM_Earth to recover GM_Sun.
+// GM_Earth comes from the Moon's orbit with the Δa = a_M·μ·m solar-tidal
+// correction. See doc 24 — Moon Kepler Derivation for the full chain.
+const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
+                         / Math.pow(meansiderealyearlengthinSeconds, 2);
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+// Result: ~1.32712 × 10¹¹ km³/s² (matches JPL DE440 to ~0.07 ppm)
 ```
 
 **OrbitalFormulas helper object (lines ~312-380):**
@@ -1455,26 +1468,28 @@ tidalAcceleration: (GM, r_km, delta_r_km) => {
 
 ### A.6.1 Current GM and Mass Values (Implemented)
 
+For the derivation of `GM_Earth`, `GM_Moon`, and `GM_Sun` from the Moon's and Earth's orbits — including the `Δa = a_M · μ · m` correction that closes the Earth-Moon-Sun three-body residual — see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md).
+
 #### 8.1.1 Derived from Kepler's 3rd Law
 
 | Body | GM (km³/s²) | Mass (kg) | Derivation Method |
 |------|-------------|-----------|-------------------|
-| **Sun** | 132,712,828,771 | 1.988 × 10³⁰ | Kepler's 3rd Law from Earth's orbit |
-| **Earth** | 398,601.34 | 5.972 × 10²⁴ | Moon's orbit + solar perturbation correction |
-| **Moon** | 4,902.80 | 7.346 × 10²² | Same correction as Earth |
+| **Sun** | 132,712,430,441 | 1.988 × 10³⁰ | Kepler from Earth's orbit minus GM_Earth (M_Sun only; matches JPL DE440 to 0.07 ppm) |
+| **Earth** | 398,601.93 | 5.972 × 10²⁴ | Moon's orbit with Δa = a_M·μ·m correction (matches JPL DE440 to 3.7 ppm) |
+| **Moon** | 4,902.81 | 7.346 × 10²² | Same Δa correction, split via M_M/(M_E+M_M) |
 
 #### 8.1.2 Derived from Sun/Planet Mass Ratios
 
 | Body | Mass Ratio (Sun/Planet) | GM (km³/s²) | Mass (kg) |
 |------|------------------------|-------------|-----------|
-| **Mercury** | 6,023,600 | ~22,032 | ~3.30 × 10²³ |
-| **Venus** | 408,523.71 | ~324,859 | ~4.87 × 10²⁴ |
+| **Mercury** | 6,023,625.5 | ~22,032 | ~3.30 × 10²³ |
+| **Venus** | 408,523.72 | ~324,859 | ~4.87 × 10²⁴ |
 | **Mars** | 3,098,703.59 | ~42,828 | ~6.42 × 10²³ |
-| **Jupiter** | 1,047.3486 | ~126,686,534 | ~1.90 × 10²⁷ |
-| **Saturn** | 3,497.898 | ~37,931,187 | ~5.68 × 10²⁶ |
-| **Uranus** | 22,902.98 | ~5,793,939 | ~8.68 × 10²⁵ |
-| **Neptune** | 19,412.24 | ~6,836,529 | ~1.02 × 10²⁶ |
-| **Pluto** | 135,200,000 | ~982 | ~1.47 × 10²² |
+| **Jupiter** | 1,047.348625 | ~126,712,756 | ~1.90 × 10²⁷ |
+| **Saturn** | 3,497.9018 | ~37,940,582 | ~5.69 × 10²⁶ |
+| **Uranus** | 22,902.944 | ~5,794,558 | ~8.68 × 10²⁵ |
+| **Neptune** | 19,412.237 | ~6,836,535 | ~1.02 × 10²⁶ |
+| **Pluto** | 136,047,200 | ~975 | ~1.46 × 10²² |
 
 #### 8.1.3 Small Bodies (Direct Measurements/Estimates)
 

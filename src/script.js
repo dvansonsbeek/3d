@@ -3368,7 +3368,7 @@ const moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meanso
 // Mean AU distance derived from mean sidereal year and mean orbital speed
 // meanAU = (P_seconds / 3600 * v_km/h) / (2π) = orbital circumference / 2π
 const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSuninKM) / (2 * Math.PI);
-// Result: 149,597,870.345632 km
+// Result: 149,597,870.698828 km (= currentAUDistance — the formula is an algebraic round-trip through speedofSuninKM)
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
 // GM and mass for Sun, Earth, Moon, and all planets. Derived from
@@ -3376,57 +3376,78 @@ const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSunin
 // ─────────────────────────────────────────────────────────────────────────
 
 // --- E2a. Sun, Earth, Moon masses (Kepler's 3rd Law) ---
-
-// Gravitational parameter of the Sun (derived from Kepler's 3rd Law)
-// GM = (2π)² × a³ / P² where a = mean AU in km, P = mean sidereal year in seconds
-// The 0.029% difference represents the inherent limitation of deriving GM_SUN from Kepler's law in a multi-body Solar System. Kepler's law assumes a perfect two-body system. The real Solar System is an N-body problem.
-const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(meanAUDistance, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
-// Result: ~1.32712 × 10¹¹ km³/s²
+//
+// Convention: GM_X is the gravitational parameter of body X ALONE (M_X only,
+// not including any orbiting companion). This matches JPL/IAU/CODATA tables.
+//
+// Order of computation: Earth/Moon → Sun. Kepler's 3rd law on Earth's orbit
+// gives G(M_Sun + M_Earth), so GM_Earth must be known first to back it out.
 
 // Gravitational constant (km³/(kg·s²))
 const G_CONSTANT = 6.6743e-20;  // 6.6743 × 10⁻¹¹ m³/(kg·s²) converted to km³/(kg·s²)
 
-// Sun's mass derived from gravitational parameter (kg)
-// M_SUN = GM_SUN / G ≈ 1.989 × 10³⁰ kg
-const M_SUN = GM_SUN / G_CONSTANT;
-
-// Earth-Moon mass ratio ≈ 81.30
-// Earth is 81.3 times more massive than Moon
-// TODO: Derive from orbital geometry relationship
+// Earth-Moon mass ratio ≈ 81.30 (lunar laser ranging, DE440-consistent).
+// Earth is 81.3 times more massive than Moon.
 const MASS_RATIO_EARTH_MOON = 81.3007;
 
+// Solar tidal correction for the Moon's apparent semi-major axis.
+//
+// In the Earth-Moon-Sun three-body system, the Moon's "Kepler-effective"
+// semi-major axis differs from its observed semi-major axis by a small shift
+// proportional to:
+//   - Earth's wobble around the Earth-Moon barycenter:  a_M × M_M/(M_E + M_M) ≈ 4,670 km
+//   - Brown's parameter (orbital period ratio):          m = T_Moon / T_Sun  ≈ 0.0748
+//
+//   Δa = a_M × M_M/(M_E + M_M) × m  ≈  349 km
+//
+// Physically: the Earth-Moon barycenter wobble scaled by the orbital phase
+// fraction during one lunar orbit — the leading-order coupling between the
+// EM-barycentric motion and the Sun's gravitational pull on the system.
+// All three inputs are natural quantities of the Earth-Moon-Sun problem
+// (no rotational empiricism like the older "1+1/year" SSDR factor).
+const moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meansiderealyearlengthinDays);
+const moonDistanceCorrected = moonDistance + moonOrbitalShift;
+
 // Earth+Moon system gravitational parameter from Moon's orbit (km³/s²)
-// GM_system = (2π)² × a³ / P² - this gives G(M_Earth + M_Moon)
-const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
+// GM_system = (2π)² × a³ / P² — this gives G(M_Earth + M_Moon)
+const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
 
-// Solar/sidereal day correction for Kepler-derived GM
-// Kepler's 3rd law (GM = 4π²a³/P²) uses the Moon's sidereal period, measured against
-// the stars. But the gravitational dynamics occur in a frame rotating with Earth's orbit
-// around the Sun. The ratio of solar day to sidereal day (meanlengthofday / meanSiderealday
-// ≈ 1.002738) corrects for this extra rotation — the same reason a solar day is ~3m56s
-// longer than a sidereal day. Without this correction, GM is underestimated by ~0.27%.
-// Observation: moonApogee / AU (405400 / 149597870 ≈ 0.002710) is within 1% of
-// solarDay/siderealDay - 1 (≈ 0.002738) — a numerical coincidence that allowed an
-// earlier apogee-based formula to also produce accurate GM values.
-const SOLAR_SIDEREAL_DAY_RATIO = meanlengthofday / meanSiderealday;
-
-// Earth's gravitational parameter (corrected for Moon's mass and solar/sidereal frame)
-// GM_Earth = GM_system × (ratio / (ratio + 1)) × (solarDay / siderealDay)
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) * SOLAR_SIDEREAL_DAY_RATIO;
-// Result: ~398,600 km³/s² (JPL: 398600.435, error: 0.001%)
+// Earth's gravitational parameter (split via Earth/Moon mass ratio)
+// GM_Earth = GM_system × (ratio / (ratio + 1))
+const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
+// Result: ~398,602 km³/s² (JPL DE440: 398,600.44, residual ~3.7 ppm)
 
 // Earth's mass derived from gravitational parameter (kg)
 // M_EARTH = GM_EARTH / G ≈ 5.97 × 10²⁴ kg
 const M_EARTH = GM_EARTH / G_CONSTANT;
 
 // Moon's gravitational parameter (km³/s²)
-// GM_Moon = GM_system / (ratio + 1) × (solarDay / siderealDay)
-const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1) * SOLAR_SIDEREAL_DAY_RATIO;
-// Result: ~4,902.9 km³/s² (GRAIL: 4902.800, error: 0.001%)
+// GM_Moon = GM_system × (1 / (ratio + 1))
+const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
+// Result: ~4,902.81 km³/s² (GRAIL: 4902.800, residual ~2 ppm)
 
 // Moon's mass derived from gravitational parameter (kg)
 // M_MOON = GM_MOON / G ≈ 7.35 × 10²² kg
 const M_MOON = GM_MOON / G_CONSTANT;
+
+// Gravitational parameter of the Sun, M_Sun only (JPL/IAU convention).
+//
+// Kepler's 3rd law on Earth's orbit returns the COMBINED gravitational parameter
+// G(M_Sun + M_Earth) — both bodies orbit their common barycenter, so the formula
+// can't separate them. We back out GM_Sun by subtracting GM_Earth (already
+// computed above from the Moon's orbit).
+//
+// Without this M+m correction, GM_Sun is biased high by ~398,605 km³/s² (3 ppm),
+// which propagates as a ~150 km error in any inverse calculation of Earth's
+// semi-major axis. With the correction, our value matches JPL DE440 to ~0.07 ppm
+// — the floor set by genuine N-body perturbations on Earth's measured (a, P).
+const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(meanAUDistance, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+// Result: ~1.32712 × 10¹¹ km³/s² (JPL DE440: 132,712,440,042; residual 0.07 ppm)
+
+// Sun's mass derived from gravitational parameter (kg)
+// M_SUN = GM_SUN / G ≈ 1.988 × 10³⁰ kg
+const M_SUN = GM_SUN / G_CONSTANT;
 
 // Mass ratio Sun/Earth ≈ 332,946
 const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
@@ -3451,22 +3472,22 @@ const M_MARS = GM_MARS / G_CONSTANT;                 // ~6.42 × 10²³ kg
 
 // Jupiter: Mass from Galilean moon orbits (Io, Europa, Ganymede, Callisto)
 const MASS_RATIO_SUN_JUPITER = 1047.348625;          // DE440
-const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,712,764 km³/s²
+const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,712,756 km³/s²
 const M_JUPITER = GM_JUPITER / G_CONSTANT;           // ~1.90 × 10²⁷ kg
 
 // Saturn: Mass from Titan and other moon orbits
 const MASS_RATIO_SUN_SATURN = 3497.9018;             // DE440
-const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,940,585 km³/s²
+const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,940,582 km³/s²
 const M_SATURN = GM_SATURN / G_CONSTANT;             // ~5.68 × 10²⁶ kg
 
 // Uranus: Mass from moon orbits (Titania, Oberon, etc.)
 const MASS_RATIO_SUN_URANUS = 22902.944;             // DE440
-const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,794,556 km³/s²
+const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,794,558 km³/s²
 const M_URANUS = GM_URANUS / G_CONSTANT;             // ~8.68 × 10²⁵ kg
 
 // Neptune: Mass from Triton orbit and Voyager 2 flyby
 const MASS_RATIO_SUN_NEPTUNE = 19412.237;            // DE440
-const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,527 km³/s²
+const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,535 km³/s²
 const M_NEPTUNE = GM_NEPTUNE / G_CONSTANT;           // ~1.02 × 10²⁶ kg
 
 // Pluto: Mass from Charon orbit (binary system)

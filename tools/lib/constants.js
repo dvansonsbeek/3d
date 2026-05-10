@@ -332,20 +332,31 @@ ASTRO_REFERENCE.ascNodeTiltCorrection = {
 // 9. MASS COMPUTATION, PSI, J2000 ECCENTRICITIES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const GM_SUN = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
-const M_SUN = GM_SUN / G_CONSTANT;
+// Order: Earth/Moon → Sun. Kepler on Earth's orbit gives G(M_Sun + M_Earth);
+// we back out GM_Sun by subtracting GM_Earth (computed from the Moon's orbit).
 
 const massFraction = {};
 for (const [k, ratio] of Object.entries(massRatioDE440)) {
   massFraction[k] = 1 / ratio;
 }
 
-// Earth mass via Moon orbital mechanics
-const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistance, 3)) /
+// Earth mass via Moon orbital mechanics.
+// Δa = a_M × M_M/(M_E + M_M) × m  is the leading-order correction for the
+// Sun's tidal coupling to the Earth-Moon barycentric wobble (Earth-Moon-Sun
+// 3-body). Closes G(M_E + M_M) to ~3.7 ppm of JPL DE440 — better and more
+// physically motivated than the older "1+1/year" SSDR factor.
+const moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meanSiderealYearDays);
+const moonDistanceCorrected = moonDistance + moonOrbitalShift;
+const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) /
   Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
-const SOLAR_SIDEREAL_DAY_RATIO = meanLengthOfDay / meanSiderealDay;
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1)) *
-  SOLAR_SIDEREAL_DAY_RATIO;
+const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
+const GM_MOON  = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
+
+// GM_Sun (M_Sun only): Kepler from Earth's orbit gives G(M_Sun + M_Earth);
+// subtract GM_Earth to recover the JPL/IAU convention.
+const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+const M_SUN = GM_SUN / G_CONSTANT;
 massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
 
 // PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
