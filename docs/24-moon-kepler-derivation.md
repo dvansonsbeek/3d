@@ -46,6 +46,20 @@ Each factor is a natural quantity of the Earth-Moon-Sun system:
 
 The product is the **Earth-Moon barycentric wobble × orbital phase fraction during one lunar orbit** — the leading-order coupling between the Earth-Moon barycentric motion and the Sun's gravitational pull on the system. Every input is directly involved in the three-body dynamics being modeled.
 
+### Pythagorean-mean interpretation
+
+For small `μ·m`, the additive form `a_M · (1 + μ·m)` is mathematically equivalent to a **Pythagorean (RMS) mean** of `a_M` and a kinematic length `b`:
+
+```
+moonDistanceCorrected = a_M · (1 + μ·m)  ≈  √( a_M² + b² )
+
+where  b = a_M · √(2 · μ · m) ≈ 16,400 km
+```
+
+The length `b` factors as `b² = 2 · a_M · R_wobble · m`, where `R_wobble = a_M·μ ≈ 4,670 km` is Earth's wobble radius around the Earth-Moon barycenter. So `b² = (orbital diameter) × (wobble amplitude) × (orbital phase fraction)` — a kinematic interaction length between the Earth-Moon barycentric motion and the Sun's gravitational gradient over one lunar orbit.
+
+This Pythagorean-mean framing makes explicit that **the correction is not a small additive offset**, but the geometric combination of two orthogonal contributions: the geometric Earth-Moon distance and the kinematic length scale of the three-body coupling. Both views — additive `a + Δa` and Pythagorean `√(a² + b²)` — give the same numerical result to leading order in `μ·m`.
+
 ## The Full Computation Chain
 
 From observational inputs to final values, in 8 steps:
