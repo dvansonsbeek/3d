@@ -97,7 +97,7 @@ The G uncertainty (~22 ppm) sets a hard floor on how precisely M_Earth can be ex
 
 ## Residual: Why ~3.7 ppm Remains
 
-The new formula closes most of the 0.27% gap, but not all. The residual ~3.7 ppm reflects **higher-order Brown's lunar theory terms** (`m⁴` and beyond) that no clean closed-form correction can capture.
+The Δa correction reduces the 0.27% raw-Kepler gap to a ~3.7 ppm residual. That residual reflects **higher-order Brown's lunar theory terms** (`m⁴` and beyond) that no clean closed-form correction can capture.
 
 This is a fundamental limit of the 3-body problem:
 - Poincaré (1890) proved analytically there is no closed-form solution
