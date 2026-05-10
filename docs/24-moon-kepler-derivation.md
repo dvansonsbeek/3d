@@ -63,7 +63,7 @@ ratio  = MASS_RATIO_EARTH_MOON     = 81.3007              // M_Earth / M_Moon (l
 ### Computation
 
 ```
-1.  m   =  T_M / T_S                                     = 0.07480       (Brown's parameter)
+1.  m   =  T_M / T_S                                     = 0.07480       (lunar small parameter, Hill 1878)
 
 2.  μ   =  1 / (ratio + 1)  =  M_Moon / (M_E + M_M)      = 0.01215       (Moon mass fraction)
 

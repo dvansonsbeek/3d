@@ -3396,7 +3396,7 @@ const MASS_RATIO_EARTH_MOON = 81.3007;
 // semi-major axis differs from its observed semi-major axis by a small shift
 // proportional to:
 //   - Earth's wobble around the Earth-Moon barycenter:  a_M × M_M/(M_E + M_M) ≈ 4,670 km
-//   - Brown's parameter (orbital period ratio):          m = T_Moon / T_Sun  ≈ 0.0748
+//   - Lunar small parameter (Hill 1878), orbital period ratio: m = T_Moon / T_Sun  ≈ 0.0748
 //
 //   Δa = a_M × M_M/(M_E + M_M) × m  ≈  349 km
 //
