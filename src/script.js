@@ -3435,6 +3435,15 @@ const M_EARTH_SYSTEM = M_EARTH_ALONE + M_MOON_ALONE;
 //
 // Without this M+m correction, GM_Sun is biased high by ~398,605 km³/s² (3 ppm).
 // With the correction, our value matches JPL DE440 to ~0.07 ppm.
+//
+// AU-equivalent representation (symmetric analog of the Moon-side Δa = +349 km):
+// The GM subtraction below is mathematically equivalent to using a "Kepler-effective
+// AU" of (meanAUDistance − 149.77 km) directly in the bare Kepler formula:
+//   Δa_Sun-side = AU / (3 × M_Sun/M_Earth_alone) ≈ 149.77 km
+// We subtract this from AU to recover GM_Sun_alone; for the Moon, we ADD Δa = 349 km
+// to the geometric a_M to recover GM_Earth+Moon system. Same physics, opposite
+// direction. See docs/24-moon-kepler-derivation.md §Sun-side analog for the full
+// symmetric picture.
 const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(meanAUDistance, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
 const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 // Result: ~1.32712 × 10¹¹ km³/s² (JPL DE440: 132,712,440,042; residual 0.07 ppm)

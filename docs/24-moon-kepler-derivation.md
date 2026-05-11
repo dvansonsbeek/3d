@@ -141,6 +141,41 @@ The exact factor (using the cube `(1 + Δa/a_M)³` rather than the linear approx
 
 The G uncertainty (~22 ppm) sets a hard floor on how precisely M_Earth can be expressed in kg — different reference sources disagree by up to 30 ppm because they use slightly different G values to convert their fitted GM_Earth.
 
+## Sun-side Analog: the AU-Equivalent Δa = −149.77 km
+
+The Moon-side `Δa = +349 km` has a beautiful symmetric counterpart in the Sun-side GM derivation. Kepler's 3rd law on Earth's heliocentric orbit returns:
+
+```
+GM_Sun_plus_Earth  =  4π² · AU³ / T_sidereal_year²   (the combined two-body GM)
+```
+
+To recover GM_Sun alone, the model subtracts GM_Earth_alone:
+
+```
+GM_Sun  =  GM_Sun_plus_Earth  −  GM_Earth_alone
+```
+
+This GM-subtraction is **mathematically equivalent** to plugging a slightly-shrunk "Kepler-effective AU" into the bare Kepler formula:
+
+```
+Δa_Sun-side  =  AU / (3 × M_Sun / M_Earth_alone)  ≈  149.77 km
+a_eff_Sun    =  AU − Δa_Sun-side  ≈  149,597,720.93 km
+GM_Sun       =  4π² · a_eff_Sun³ / T_sidereal_year²   (= same result as GM-subtraction)
+```
+
+So the Kepler-correction picture for both bodies is **symmetric but opposite in sign**:
+
+| Body | Geometric a | Kepler-effective a | Δa | Direction |
+|---|---|---|---|---|
+| **Moon** (deriving GM_Earth+Moon **system**) | 384,399.07 km | 384,748.44 km | **+349.37 km** | ADD a moon's contribution |
+| **Earth/Sun** (deriving GM_Sun **alone**) | 149,597,870.70 km (1 AU) | 149,597,720.93 km | **−149.77 km** | SUBTRACT Earth's contribution |
+
+The quick-derivation formula `Δa ≈ a / (3 × mass_ratio)` works in both cases:
+- For Moon: `Δa ≈ a_M / (3 × Sun/(EMB·something))` — actually `Δa_Moon = a·μ·m` is the structural form (see §The Δa Correction); the `3·μ·m` factor in GM matches the `Δa/a` factor at first order
+- For Sun: `Δa_Sun-side = AU / (3 × M_Sun/M_Earth)` = AU / (3 × Sun/Earth ratio) ≈ AU × Earth-mass-fraction / 3
+
+In the code, the Sun-side correction is done at the GM level (subtraction), not at the AU level. The 149.77 km AU-equivalent is purely conceptual — useful for understanding the structural symmetry with the Moon-side derivation.
+
 ## External Corroboration of the 384,748 km Value
 
 The corrected Moon distance produced by `Δa` — `moonDistanceCorrected ≈ 384,748 km` — is not a fitted target. **It is an established physics-textbook value** that appears in independent academic references, used as the standard input for Kepler's-law calculations:
