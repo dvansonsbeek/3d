@@ -275,6 +275,8 @@ Inclination amplitudes are derived from the PSI formula:
 
     i_amplitude = PSI / (d * sqrt(m))
 
+**SYSTEM/ALONE mass convention** (intentional, see [doc 10 §Universal Constants](10-fibonacci-laws.md#the-universal-constants-ψ-and-k) and [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)): Earth uses M_Earth_ALONE in PSI calibration; other planets use M_planet_SYSTEM in the formula. This preserves the model's fitted state — the Moon's perturbation contribution is empirically absorbed into the calibrated `inclAmp_Earth`.
+
 | Planet  | d  | sqrt(m)        | PSI / (d * sqrt(m)) | Actual amplitude | Match |
 |---------|-----|----------------|----------------------|------------------|-------|
 | Mercury |  21 | 4.0745e-4      | 0.386478             | 0.386478         | Yes   |

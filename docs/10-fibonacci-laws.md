@@ -45,6 +45,12 @@ Two empirical constants, both derived from Earth's fitted parameters, predict al
 K = e_amp_Earth × √m_Earth / (sin(tilt_Earth) × √d_Earth) = 3.415 × 10⁻⁶   (eccentricity amplitudes)
 ```
 
+**SYSTEM/ALONE mass convention** (intentional asymmetry — see [doc 25 §Sun/System vs Sun/Planet-Alone](25-universal-mass-from-moon-formula.md#sunsystem-vs-sunplanet-alone)):
+- **Earth** uses **M_Earth_ALONE** (`M_Earth/M_Sun ≈ 3.0027e-6`) in ψ and K calibration — the Moon's contribution to Earth's perturbation budget is empirically absorbed into the fitted `inclAmp_Earth` (and `e_amp_Earth`), calibrated against observations of Earth's secular variation which already implicitly contain the Moon's tug on the Earth-Moon Barycenter.
+- **Other 7 planets** use **M_planet_SYSTEM** (planet + moons) in the amplitude formulas — physically correct for the Laplace-Lagrange secular perturbation source convention (distant bodies see planet+moons as one point mass).
+
+Switching Earth to M_Earth_SYSTEM would shift ψ and K each by 0.612% (= √(82.3/81.3)) and propagate as a uniform 0.612% increase in all 7 outer-planet amplitudes — requiring re-calibration of `inclAmp_Earth` and `e_amp_Earth` to keep outputs the same. The two conventions are calibration-equivalent; the current Earth-ALONE convention preserves the fitted model state.
+
 ### Planetary Data (JPL DE440)
 
 | Planet | Mass (M☉) | √m | a (AU) | e | i J2000 (°) | Ω J2000 (°) |

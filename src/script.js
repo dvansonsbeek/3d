@@ -3533,6 +3533,23 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // PSI = d_Earth × inclAmp_Earth × √m_Earth — universal inclination amplitude constant
 // Amplitude = PSI / (d × √m), Mean from J2000 constraint: mean = inclJ2000 - amp × cos(Ω - φ)
 // fibonacciD values: Mercury=21, Venus=34, Earth=3, Mars=5, Jupiter=5, Saturn=3, Uranus=21, Neptune=34
+//
+// SYSTEM/ALONE mass convention (intentional asymmetry):
+//   • PSI calibration uses M_EARTH_ALONE — the Moon's contribution to Earth's
+//     perturbation budget is empirically absorbed into the fitted constant
+//     `earthInvPlaneInclinationAmplitude` (calibrated against observations
+//     of Earth's secular inclination variation, which already implicitly
+//     contains the Moon's tug on the EMB).
+//   • Outer planets use M_X_SYSTEM (planet + moons) in _massFrac — physically
+//     correct for the Laplace-Lagrange secular perturbation source convention
+//     (distant bodies see planet+moons as one point mass).
+//
+// Switching Earth to M_EARTH_SYSTEM here would shift PSI by 0.612% (= √(82.3/81.3))
+// and propagate as a 0.612% uniform increase in all 7 outer-planet amplitudes —
+// requiring re-calibration of `earthInvPlaneInclinationAmplitude` to keep
+// outputs the same. The current convention preserves the fitted model state
+// and is empirically valid; both conventions are calibration-equivalent. See
+// docs/25-universal-mass-from-moon-formula.md for the SYSTEM/ALONE distinction.
 const _fibD = { mercury: 21, venus: 34, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
 const _massFrac = {
   mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
