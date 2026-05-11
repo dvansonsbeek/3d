@@ -427,7 +427,7 @@ getPlanetPerturbationData: (o) => {
       e: mercuryOrbitalEccentricity,
       i_deg: o.mercuryEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.mercuryAscendingNode,
-      mass: M_MERCURY,
+      mass: M_MERCURY_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(mercurySolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(mercuryPerihelionEclipticYears)
     },
@@ -437,7 +437,7 @@ getPlanetPerturbationData: (o) => {
       e: venusOrbitalEccentricity,
       i_deg: o.venusEclipticInclinationDynamic,    // DYNAMIC
       omega_deg: o.venusAscendingNode,
-      mass: M_VENUS,
+      mass: M_VENUS_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(venusSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(venusPerihelionEclipticYears)
     },
@@ -447,7 +447,7 @@ getPlanetPerturbationData: (o) => {
       e: earthOrbitalEccentricity,
       i_deg: o.earthEclipticInclinationDynamic,    // DYNAMIC
       omega_deg: o.earthAscendingNode,
-      mass: M_EARTH,
+      mass: M_EARTH_ALONE,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(earthSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
     },
@@ -457,7 +457,7 @@ getPlanetPerturbationData: (o) => {
       e: marsOrbitalEccentricity,
       i_deg: o.marsEclipticInclinationDynamic,     // DYNAMIC
       omega_deg: o.marsAscendingNode,
-      mass: M_MARS,
+      mass: M_MARS_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(marsSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(marsPerihelionEclipticYears)
     },
@@ -467,7 +467,7 @@ getPlanetPerturbationData: (o) => {
       e: jupiterOrbitalEccentricity,
       i_deg: o.jupiterEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.jupiterAscendingNode,
-      mass: M_JUPITER,
+      mass: M_JUPITER_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(jupiterSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(jupiterPerihelionEclipticYears)
     },
@@ -477,7 +477,7 @@ getPlanetPerturbationData: (o) => {
       e: saturnOrbitalEccentricity,
       i_deg: o.saturnEclipticInclinationDynamic,   // DYNAMIC
       omega_deg: o.saturnAscendingNode,
-      mass: M_SATURN,
+      mass: M_SATURN_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(saturnSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(saturnPerihelionEclipticYears)
     },
@@ -487,7 +487,7 @@ getPlanetPerturbationData: (o) => {
       e: uranusOrbitalEccentricity,
       i_deg: o.uranusEclipticInclinationDynamic,   // DYNAMIC
       omega_deg: o.uranusAscendingNode,
-      mass: M_URANUS,
+      mass: M_URANUS_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(uranusSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(uranusPerihelionEclipticYears)
     },
@@ -497,7 +497,7 @@ getPlanetPerturbationData: (o) => {
       e: neptuneOrbitalEccentricity,
       i_deg: o.neptuneEclipticInclinationDynamic,  // DYNAMIC
       omega_deg: o.neptuneAscendingNode,
-      mass: M_NEPTUNE,
+      mass: M_NEPTUNE_SYSTEM,
       n_rad_year: OrbitalFormulas.meanMotionRadPerYear(neptuneSolarYearInput),
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(neptunePerihelionEclipticYears)
     }

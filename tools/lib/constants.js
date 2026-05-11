@@ -349,15 +349,15 @@ const moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moo
 const moonDistanceCorrected = moonDistance + moonOrbitalShift;
 const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) /
   Math.pow(moonSiderealMonth * meanLengthOfDay, 2);
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
-const GM_MOON  = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
+const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
+const GM_MOON_ALONE  = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
 
 // GM_Sun (M_Sun only): Kepler from Earth's orbit gives G(M_Sun + M_Earth);
 // subtract GM_Earth to recover the JPL/IAU convention.
 const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3)) / Math.pow(meanSiderealYearSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 const M_SUN = GM_SUN / G_CONSTANT;
-massFraction.earth = (GM_EARTH / G_CONSTANT) / M_SUN;
+massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
 
 // PSI derived from Earth's fitted inclination amplitude: PSI = d_Earth × amp_Earth × √m_Earth
 const PSI = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(massFraction.earth);

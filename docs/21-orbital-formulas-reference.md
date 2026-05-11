@@ -74,11 +74,11 @@ The chain is **Earth/Moon → Sun**, because Kepler's 3rd law on Earth's orbit r
 const moonOrbitalShift = moonDistance * (1/(MASS_RATIO_EARTH_MOON+1)) * (moonSiderealMonth/meansiderealyearlengthinDays);
 const moonDistanceCorrected = moonDistance + moonOrbitalShift;
 const GM_EARTH_MOON_SYSTEM = 4π² · moonDistanceCorrected³ / (moonSiderealMonth × meanlengthofday)²;
-const GM_EARTH = GM_EARTH_MOON_SYSTEM × M_E/(M_E + M_M);
+const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM × M_E/(M_E + M_M);
 
-// Step 2: GM_Sun from Earth's orbit, minus GM_Earth (M+m correction)
+// Step 2: GM_Sun from Earth's orbit, minus GM_EARTH_ALONE (M+m correction)
 const GM_SUN_PLUS_EARTH = 4π² · currentAUDistance³ / meansiderealyearlengthinSeconds²;
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 // Result: ~1.32712 × 10¹¹ km³/s²  (matches JPL DE440 to ~0.07 ppm)
 ```
 
@@ -920,12 +920,12 @@ Formulas are added inline to each planet's existing `planetStats` entries (not i
 
 **GM_SUN derived from Kepler's 3rd Law:**
 ```javascript
-// Earth's orbit gives G(M_Sun + M_Earth); subtract GM_Earth to recover GM_Sun.
-// GM_Earth comes from the Moon's orbit with the Δa = a_M·μ·m solar-tidal
+// Earth's orbit gives G(M_Sun + M_Earth); subtract GM_EARTH_ALONE to recover GM_Sun.
+// GM_EARTH_ALONE comes from the Moon's orbit with the Δa = a_M·μ·m solar-tidal
 // correction. See doc 24 — Moon Kepler Derivation for the full chain.
 const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(currentAUDistance, 3))
                          / Math.pow(meansiderealyearlengthinSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 // Result: ~1.32712 × 10¹¹ km³/s² (matches JPL DE440 to ~0.07 ppm)
 ```
 
@@ -1060,7 +1060,7 @@ const M_SUN = GM_SUN / G;  // ≈ 1.989 × 10³⁰ kg
 
 #### 7.1.2 Earth's Mass (M⊕)
 
-**Formula:** `M_EARTH = GM_EARTH / G`
+**Formula:** `M_EARTH_ALONE = GM_EARTH_ALONE / G`
 
 **Derivation Approach:**
 
@@ -1099,13 +1099,13 @@ const MASS_RATIO_EARTH_MOON = 81.30056816;
 ```javascript
 // Earth's gravitational parameter (corrected for Moon's mass and solar perturbation)
 // GM_Earth = GM_system × (ratio / (ratio + 1)) / (1 - moonApogee/AU)
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1))
+const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1))
                / (1 - moonAtApogee / meanAUDistance);
 // Result: ~398,600 km³/s² (matches JPL value)
 
 // Earth's mass derived from gravitational parameter (kg)
-// M_EARTH = GM_EARTH / G ≈ 5.97 × 10²⁴ kg
-const M_EARTH = GM_EARTH / G_CONSTANT;
+// M_EARTH_ALONE = GM_EARTH_ALONE / G ≈ 5.97 × 10²⁴ kg
+const M_EARTH_ALONE = GM_EARTH_ALONE / G_CONSTANT;
 ```
 
 **Why Solar Perturbation Correction?**
@@ -1121,7 +1121,7 @@ const M_EARTH = GM_EARTH / G_CONSTANT;
 
 #### 7.1.3 Moon's Mass (M☽)
 
-**Formula:** `M_MOON = GM_MOON / G`
+**Formula:** `M_MOON_ALONE = GM_MOON_ALONE / G`
 
 **Derivation:**
 
@@ -1131,13 +1131,13 @@ The Moon's gravitational parameter uses the same Earth-Moon system GM and solar 
 // Moon's gravitational parameter (km³/s²)
 // GM_Moon = GM_system / (ratio + 1) with same solar perturbation correction
 // The entire GM_EARTH_MOON_SYSTEM is affected by solar perturbation
-const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1)
+const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1)
               / (1 - moonAtApogee / meanAUDistance);
 // Result: ~4,902.8 km³/s² (matches GRAIL value)
 
 // Moon's mass derived from gravitational parameter (kg)
-// M_MOON = GM_MOON / G ≈ 7.35 × 10²² kg
-const M_MOON = GM_MOON / G_CONSTANT;
+// M_MOON_ALONE = GM_MOON_ALONE / G ≈ 7.35 × 10²² kg
+const M_MOON_ALONE = GM_MOON_ALONE / G_CONSTANT;
 ```
 
 **Display:** Added to Moon's planetStats

@@ -5,6 +5,7 @@ This document describes how the model derives `GM_Earth` and `GM_Moon` from the 
 **Related documents:**
 - [20 — Constants Reference](20-constants-reference.md) — canonical mass / GM values
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass table
+- [25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — generalizes this Δa correction to every moon-bearing planet (Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto)
 - Code: [src/script.js §E2a](../src/script.js) and [tools/lib/constants.js §9](../tools/lib/constants.js) (search `moonOrbitalShift`)
 
 ---

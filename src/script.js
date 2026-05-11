@@ -3377,123 +3377,144 @@ const meanAUDistance = (meansiderealyearlengthinSeconds / 60 / 60 * speedofSunin
 
 // --- E2a. Sun, Earth, Moon masses (Kepler's 3rd Law) ---
 //
-// Convention: GM_X is the gravitational parameter of body X ALONE (M_X only,
-// not including any orbiting companion). This matches JPL/IAU/CODATA tables.
+// Convention: For every planet we define TWO variants of the mass constants:
+//   MASS_RATIO_SUN_<P>_SYSTEM, GM_<P>_SYSTEM, M_<P>_SYSTEM  (planet + moons)
+//   MASS_RATIO_SUN_<P>_ALONE,  GM_<P>_ALONE,  M_<P>_ALONE   (planet only)
+//
+// SYSTEM is correct for orbital dynamics (Hill sphere, sphere of influence,
+// N-body perturbations, balance/AMD calculations) — a distant body sees the
+// planet+moons as one point mass.
+//
+// ALONE is correct for intrinsic body properties (surface gravity, escape
+// velocity, density, Schwarzschild radius) — moons are too far from the
+// planet's surface to contribute.
+//
+// For Mercury/Venus (no moons) SYSTEM = ALONE trivially.
+// For Pluto (Charon = 10.85% of system) the two differ by 12% — the only
+// case where the distinction is visible in the simulation panel.
 //
 // Order of computation: Earth/Moon → Sun. Kepler's 3rd law on Earth's orbit
-// gives G(M_Sun + M_Earth), so GM_Earth must be known first to back it out.
+// gives G(M_Sun + M_Earth), so GM_EARTH_ALONE must be known first to back
+// it out of the Sun's GM derivation. See doc 24 and doc 25 for the universal
+// mass-from-moon formula and per-planet verification.
 
 // Gravitational constant (km³/(kg·s²))
 const G_CONSTANT = 6.6743e-20;  // 6.6743 × 10⁻¹¹ m³/(kg·s²) converted to km³/(kg·s²)
 
-// Earth-Moon mass ratio ≈ 81.30 (lunar laser ranging, DE440 SPICE kernel gm_de440.tpc:
-// GM_Earth/GM_Moon = 398600.4355/4902.80012 = 81.30056816).
+// Earth-Moon mass ratio (DE440 SPICE kernel: GM_E/GM_M = 81.30056816).
 const MASS_RATIO_EARTH_MOON = 81.30056816;
 
-// Solar tidal correction for the Moon's apparent semi-major axis.
-//
-// In the Earth-Moon-Sun three-body system, the Moon's "Kepler-effective"
-// semi-major axis differs from its observed semi-major axis by a small shift
-// proportional to:
-//   - Earth's wobble around the Earth-Moon barycenter:  a_M × M_M/(M_E + M_M) ≈ 4,670 km
-//   - Lunar small parameter (Hill 1878), orbital period ratio: m = T_Moon / T_Sun  ≈ 0.0748
-//
-//   Δa = a_M × M_M/(M_E + M_M) × m  ≈  349 km
-//
-// Physically: the Earth-Moon barycenter wobble scaled by the orbital phase
-// fraction during one lunar orbit — the leading-order coupling between the
-// EM-barycentric motion and the Sun's gravitational pull on the system.
-// All three inputs are natural quantities of the Earth-Moon-Sun problem
-// (no rotational empiricism like the older "1+1/year" SSDR factor).
+// Solar Δa correction for Moon's apparent semi-major axis (see doc 24).
+// Δa = a_M × M_M/(M_E + M_M) × m ≈ 349 km
 const moonOrbitalShift = moonDistance * (1 / (MASS_RATIO_EARTH_MOON + 1)) * (moonSiderealMonth / meansiderealyearlengthinDays);
 const moonDistanceCorrected = moonDistance + moonOrbitalShift;
 
-// Earth+Moon system gravitational parameter from Moon's orbit (km³/s²)
-// GM_system = (2π)² × a³ / P² — this gives G(M_Earth + M_Moon)
+// Earth-Moon SYSTEM gravitational parameter from Kepler on the Moon's orbit
 const GM_EARTH_MOON_SYSTEM = (4 * Math.PI * Math.PI * Math.pow(moonDistanceCorrected, 3)) / Math.pow(moonSiderealMonth * meanlengthofday, 2);
+const GM_EARTH_SYSTEM = GM_EARTH_MOON_SYSTEM;  // alias for naming consistency
+// Result: ~403,505 km³/s² (DE440 BODY3: 403,503.24, residual ~3.7 ppm)
 
-// Earth's gravitational parameter (split via Earth/Moon mass ratio)
-// GM_Earth = GM_system × (ratio / (ratio + 1))
-const GM_EARTH = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
-// Result: ~398,602 km³/s² (JPL DE440: 398,600.44, residual ~3.7 ppm)
+// Earth ALONE (split from system via Earth/Moon mass ratio)
+const GM_EARTH_ALONE = GM_EARTH_MOON_SYSTEM * (MASS_RATIO_EARTH_MOON / (MASS_RATIO_EARTH_MOON + 1));
+const M_EARTH_ALONE  = GM_EARTH_ALONE / G_CONSTANT;
+// Result: ~398,602 km³/s² (DE440 BODY399: 398,600.44, residual ~3.7 ppm)
 
-// Earth's mass derived from gravitational parameter (kg)
-// M_EARTH = GM_EARTH / G ≈ 5.97 × 10²⁴ kg
-const M_EARTH = GM_EARTH / G_CONSTANT;
+// Moon ALONE (split from system)
+const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
+const M_MOON_ALONE  = GM_MOON_ALONE / G_CONSTANT;
+// Result: ~4,902.82 km³/s² (DE440 BODY301: 4902.800, residual ~3.7 ppm)
 
-// Moon's gravitational parameter (km³/s²)
-// GM_Moon = GM_system × (1 / (ratio + 1))
-const GM_MOON = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
-// Result: ~4,902.82 km³/s² (GRAIL: 4902.800, residual ~3.7 ppm)
-
-// Moon's mass derived from gravitational parameter (kg)
-// M_MOON = GM_MOON / G ≈ 7.35 × 10²² kg
-const M_MOON = GM_MOON / G_CONSTANT;
+// Earth-Moon SYSTEM mass
+const M_EARTH_SYSTEM = M_EARTH_ALONE + M_MOON_ALONE;
 
 // Gravitational parameter of the Sun, M_Sun only (JPL/IAU convention).
 //
 // Kepler's 3rd law on Earth's orbit returns the COMBINED gravitational parameter
 // G(M_Sun + M_Earth) — both bodies orbit their common barycenter, so the formula
-// can't separate them. We back out GM_Sun by subtracting GM_Earth (already
-// computed above from the Moon's orbit).
+// can't separate them. We back out GM_Sun by subtracting GM_EARTH_ALONE.
 //
-// Without this M+m correction, GM_Sun is biased high by ~398,605 km³/s² (3 ppm),
-// which propagates as a ~150 km error in any inverse calculation of Earth's
-// semi-major axis. With the correction, our value matches JPL DE440 to ~0.07 ppm
-// — the floor set by genuine N-body perturbations on Earth's measured (a, P).
+// Without this M+m correction, GM_Sun is biased high by ~398,605 km³/s² (3 ppm).
+// With the correction, our value matches JPL DE440 to ~0.07 ppm.
 const GM_SUN_PLUS_EARTH = (4 * Math.PI * Math.PI * Math.pow(meanAUDistance, 3)) / Math.pow(meansiderealyearlengthinSeconds, 2);
-const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH;
+const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 // Result: ~1.32712 × 10¹¹ km³/s² (JPL DE440: 132,712,440,042; residual 0.07 ppm)
 
 // Sun's mass derived from gravitational parameter (kg)
-// M_SUN = GM_SUN / G ≈ 1.988 × 10³⁰ kg
 const M_SUN = GM_SUN / G_CONSTANT;
 
-// Mass ratio Sun/Earth ≈ 332,946
-const MASS_RATIO_SUN_EARTH = M_SUN / M_EARTH;
+// Mass ratios Sun/Earth — both variants
+const MASS_RATIO_SUN_EARTH_ALONE  = M_SUN / M_EARTH_ALONE;    // ~332,945 (planet alone)
+const MASS_RATIO_SUN_EARTH_SYSTEM = M_SUN / M_EARTH_SYSTEM;   // ~328,899 (Earth+Moon)
 
-// --- E2b. Planetary mass ratios (Sun/Planet) — IAU/JPL DE440 ---
-// GM_planet = GM_SUN / ratio, then M_planet = GM_planet / G
+// --- E2b. Planetary mass ratios — DE440 SPICE kernel gm_de440.tpc ---
+//
+// For each planet: SYSTEM (BODY-i, planet + moons) and ALONE (BODY-iJ9,
+// planet only). For orbital dynamics use _SYSTEM. For intrinsic body
+// properties (surface gravity, escape velocity, density) use _ALONE.
 
-// Mercury: No moons, mass determined from Mariner 10 and MESSENGER spacecraft
-const MASS_RATIO_SUN_MERCURY = 6023657.94;           // DE440
-const GM_MERCURY = GM_SUN / MASS_RATIO_SUN_MERCURY;  // ~22,032 km³/s²
-const M_MERCURY = GM_MERCURY / G_CONSTANT;           // ~3.30 × 10²³ kg
+// Mercury (no moons, SYSTEM = ALONE)
+const MASS_RATIO_SUN_MERCURY_SYSTEM = 6023657.94;
+const MASS_RATIO_SUN_MERCURY_ALONE  = MASS_RATIO_SUN_MERCURY_SYSTEM;
+const GM_MERCURY_SYSTEM = GM_SUN / MASS_RATIO_SUN_MERCURY_SYSTEM;
+const GM_MERCURY_ALONE  = GM_MERCURY_SYSTEM;
+const M_MERCURY_SYSTEM  = GM_MERCURY_SYSTEM / G_CONSTANT;
+const M_MERCURY_ALONE   = M_MERCURY_SYSTEM;
 
-// Venus: No moons, mass determined from Venera, Magellan spacecraft
-const MASS_RATIO_SUN_VENUS = 408523.72;              // DE440
-const GM_VENUS = GM_SUN / MASS_RATIO_SUN_VENUS;      // ~324,859 km³/s²
-const M_VENUS = GM_VENUS / G_CONSTANT;               // ~4.87 × 10²⁴ kg
+// Venus (no moons, SYSTEM = ALONE)
+const MASS_RATIO_SUN_VENUS_SYSTEM = 408523.72;
+const MASS_RATIO_SUN_VENUS_ALONE  = MASS_RATIO_SUN_VENUS_SYSTEM;
+const GM_VENUS_SYSTEM = GM_SUN / MASS_RATIO_SUN_VENUS_SYSTEM;
+const GM_VENUS_ALONE  = GM_VENUS_SYSTEM;
+const M_VENUS_SYSTEM  = GM_VENUS_SYSTEM / G_CONSTANT;
+const M_VENUS_ALONE   = M_VENUS_SYSTEM;
 
-// Mars: Mass from Phobos/Deimos orbits and spacecraft tracking
-const MASS_RATIO_SUN_MARS = 3098703.59;              // DE440
-const GM_MARS = GM_SUN / MASS_RATIO_SUN_MARS;        // ~42,828 km³/s²
-const M_MARS = GM_MARS / G_CONSTANT;                 // ~6.42 × 10²³ kg
+// Mars (Phobos/Deimos negligible, <1 ppm)
+const MASS_RATIO_SUN_MARS_SYSTEM = 3098703.59;
+const MASS_RATIO_SUN_MARS_ALONE  = 3098703.71;
+const GM_MARS_SYSTEM = GM_SUN / MASS_RATIO_SUN_MARS_SYSTEM;
+const GM_MARS_ALONE  = GM_SUN / MASS_RATIO_SUN_MARS_ALONE;
+const M_MARS_SYSTEM  = GM_MARS_SYSTEM / G_CONSTANT;
+const M_MARS_ALONE   = GM_MARS_ALONE / G_CONSTANT;
 
-// Jupiter: Mass from Galilean moon orbits (Io, Europa, Ganymede, Callisto)
-const MASS_RATIO_SUN_JUPITER = 1047.348625;          // DE440
-const GM_JUPITER = GM_SUN / MASS_RATIO_SUN_JUPITER;  // ~126,712,756 km³/s²
-const M_JUPITER = GM_JUPITER / G_CONSTANT;           // ~1.90 × 10²⁷ kg
+// Jupiter (Galileans + small moons = 207 ppm of system)
+const MASS_RATIO_SUN_JUPITER_SYSTEM = 1047.348625;
+const MASS_RATIO_SUN_JUPITER_ALONE  = 1047.5655;
+const GM_JUPITER_SYSTEM = GM_SUN / MASS_RATIO_SUN_JUPITER_SYSTEM;
+const GM_JUPITER_ALONE  = GM_SUN / MASS_RATIO_SUN_JUPITER_ALONE;
+const M_JUPITER_SYSTEM  = GM_JUPITER_SYSTEM / G_CONSTANT;
+const M_JUPITER_ALONE   = GM_JUPITER_ALONE / G_CONSTANT;
 
-// Saturn: Mass from Titan and other moon orbits
-const MASS_RATIO_SUN_SATURN = 3497.9018;             // DE440
-const GM_SATURN = GM_SUN / MASS_RATIO_SUN_SATURN;    // ~37,940,582 km³/s²
-const M_SATURN = GM_SATURN / G_CONSTANT;             // ~5.68 × 10²⁶ kg
+// Saturn (Titan + others = 247 ppm of system)
+const MASS_RATIO_SUN_SATURN_SYSTEM = 3497.9018;
+const MASS_RATIO_SUN_SATURN_ALONE  = 3498.7667;
+const GM_SATURN_SYSTEM = GM_SUN / MASS_RATIO_SUN_SATURN_SYSTEM;
+const GM_SATURN_ALONE  = GM_SUN / MASS_RATIO_SUN_SATURN_ALONE;
+const M_SATURN_SYSTEM  = GM_SATURN_SYSTEM / G_CONSTANT;
+const M_SATURN_ALONE   = GM_SATURN_ALONE / G_CONSTANT;
 
-// Uranus: Mass from moon orbits (Titania, Oberon, etc.)
-const MASS_RATIO_SUN_URANUS = 22902.944;             // DE440
-const GM_URANUS = GM_SUN / MASS_RATIO_SUN_URANUS;    // ~5,794,558 km³/s²
-const M_URANUS = GM_URANUS / G_CONSTANT;             // ~8.68 × 10²⁵ kg
+// Uranus (major moons = 105 ppm of system)
+const MASS_RATIO_SUN_URANUS_SYSTEM = 22902.944;
+const MASS_RATIO_SUN_URANUS_ALONE  = 22905.343;
+const GM_URANUS_SYSTEM = GM_SUN / MASS_RATIO_SUN_URANUS_SYSTEM;
+const GM_URANUS_ALONE  = GM_SUN / MASS_RATIO_SUN_URANUS_ALONE;
+const M_URANUS_SYSTEM  = GM_URANUS_SYSTEM / G_CONSTANT;
+const M_URANUS_ALONE   = GM_URANUS_ALONE / G_CONSTANT;
 
-// Neptune: Mass from Triton orbit and Voyager 2 flyby
-const MASS_RATIO_SUN_NEPTUNE = 19412.237;            // DE440
-const GM_NEPTUNE = GM_SUN / MASS_RATIO_SUN_NEPTUNE;  // ~6,836,535 km³/s²
-const M_NEPTUNE = GM_NEPTUNE / G_CONSTANT;           // ~1.02 × 10²⁶ kg
+// Neptune (Triton + others = 210 ppm of system)
+const MASS_RATIO_SUN_NEPTUNE_SYSTEM = 19412.237;
+const MASS_RATIO_SUN_NEPTUNE_ALONE  = 19416.299;
+const GM_NEPTUNE_SYSTEM = GM_SUN / MASS_RATIO_SUN_NEPTUNE_SYSTEM;
+const GM_NEPTUNE_ALONE  = GM_SUN / MASS_RATIO_SUN_NEPTUNE_ALONE;
+const M_NEPTUNE_SYSTEM  = GM_NEPTUNE_SYSTEM / G_CONSTANT;
+const M_NEPTUNE_ALONE   = GM_NEPTUNE_ALONE / G_CONSTANT;
 
-// Pluto: Mass from Charon orbit (binary system)
-const MASS_RATIO_SUN_PLUTO = 136045556;              // DE440
-const GM_PLUTO = GM_SUN / MASS_RATIO_SUN_PLUTO;      // ~975.5 km³/s²
-const M_PLUTO = GM_PLUTO / G_CONSTANT;               // ~1.47 × 10²² kg
+// Pluto (Charon binary — ALONE differs from SYSTEM by 10.85%, visible in panel)
+const MASS_RATIO_SUN_PLUTO_SYSTEM = 136045556;
+const MASS_RATIO_SUN_PLUTO_ALONE  = 152610777;
+const GM_PLUTO_SYSTEM = GM_SUN / MASS_RATIO_SUN_PLUTO_SYSTEM;
+const GM_PLUTO_ALONE  = GM_SUN / MASS_RATIO_SUN_PLUTO_ALONE;
+const M_PLUTO_SYSTEM  = GM_PLUTO_SYSTEM / G_CONSTANT;
+const M_PLUTO_ALONE   = GM_PLUTO_ALONE / G_CONSTANT;
 
 // Ceres: Mass from Dawn spacecraft (2015-2018)
 const GM_CERES = 62.6274;                            // km³/s² (Dawn radiometric tracking)
@@ -3514,10 +3535,10 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 // fibonacciD values: Mercury=21, Venus=34, Earth=3, Mars=5, Jupiter=5, Saturn=3, Uranus=21, Neptune=34
 const _fibD = { mercury: 21, venus: 34, mars: 5, jupiter: 5, saturn: 3, uranus: 21, neptune: 34 };
 const _massFrac = {
-  mercury: M_MERCURY / M_SUN, venus: M_VENUS / M_SUN, mars: M_MARS / M_SUN,
-  jupiter: M_JUPITER / M_SUN, saturn: M_SATURN / M_SUN, uranus: M_URANUS / M_SUN, neptune: M_NEPTUNE / M_SUN,
+  mercury: M_MERCURY_SYSTEM / M_SUN, venus: M_VENUS_SYSTEM / M_SUN, mars: M_MARS_SYSTEM / M_SUN,
+  jupiter: M_JUPITER_SYSTEM / M_SUN, saturn: M_SATURN_SYSTEM / M_SUN, uranus: M_URANUS_SYSTEM / M_SUN, neptune: M_NEPTUNE_SYSTEM / M_SUN,
 };
-const psiConstant = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(M_EARTH / M_SUN);
+const psiConstant = 3 * earthInvPlaneInclinationAmplitude * Math.sqrt(M_EARTH_ALONE / M_SUN);
 for (const key of ['mercury','venus','mars','jupiter','saturn','uranus','neptune']) {
   const p = planets[key];
   if (p && _fibD[key] && _massFrac[key]) {
@@ -3604,7 +3625,7 @@ const neptuneObliquityMean = calcObliquityMean('neptune', neptuneObliquityCycle)
 //                 270° for Saturn (anti-phase, mean, falling at anchor)
 //   base = amp·cos(θ) + √(e_J2000² − amp²·sin²(θ))
 // Closes the full loop: PSI → incl amp → mean tilt → K → ecc amp → phase → base
-const _kConstant = eccentricityAmplitude * Math.sqrt(M_EARTH / M_SUN) / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
+const _kConstant = eccentricityAmplitude * Math.sqrt(M_EARTH_ALONE / M_SUN) / (Math.sin(earthtiltMean * Math.PI / 180) * Math.sqrt(3));
 const _obliqMeans = { mercury: mercuryObliquityMean, venus: venusObliquityMean, mars: marsObliquityMean,
   jupiter: jupiterObliquityMean, saturn: saturnObliquityMean, uranus: uranusObliquityMean, neptune: neptuneObliquityMean };
 const _wobblePeriods = { mercury: mercuryWobblePeriod, venus: venusWobblePeriod, mars: marsWobblePeriod,
@@ -3834,9 +3855,26 @@ const OrbitalFormulas = {
 
   // Kepler's 3rd Law: Orbital period from semi-major axis
   // P = 2π√(a³/GM) - returns days
-  keplerPeriod: (a_km, GM = GM_SUN) => {
+  //
+  // By default a year-frame compensation factor (solar/sidereal) is applied
+  // to reconcile the model's dual year-frame chain:
+  //   - GM_SUN is derived using the sidereal year (4π²·meanAU³/sidYearSec²)
+  //   - Planet orbit distances are derived using the solar year (via H-cycle ratios)
+  // Without this factor, every planet's T_kepler would be sid/solar ≈ 1.0000388
+  // times its actual input period — the residual T/(T-T_solar) ≈ H/13 (Earth's
+  // precession period) would appear uniformly. The compensation hides this
+  // dual-frame artifact so verification reads as expected.
+  //
+  // Set applyYearCompensation = false to disable compensation. This is correct
+  // for Earth's heliocentric Kepler verification: Earth IS the year reference,
+  // so the verification should match the sidereal year directly using the
+  // two-body GM (GM_SUN + GM_EARTH_SYSTEM).
+  keplerPeriod: (a_km, GM = GM_SUN, applyYearCompensation = true) => {
     const P_seconds = 2 * Math.PI * Math.sqrt(Math.pow(a_km, 3) / GM);
-    return P_seconds / o.lengthofDay;
+    const compensation = applyYearCompensation
+      ? (meansolaryearlengthinDays / meansiderealyearlengthinDays)
+      : 1;
+    return (P_seconds / o.lengthofDay) * compensation;
   },
 
   // Hill Sphere Radius (km)
@@ -4326,7 +4364,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.mercury.orbitalEccentricityBase,
       i_deg: planets.mercury.eclipticInclinationJ2000,        // Fixed ecliptic inclination (7.005°)
       omega_deg: planets.mercury.ascendingNode,               // Fixed J2000 ascending node
-      mass: M_MERCURY,
+      mass: M_MERCURY_SYSTEM,
       period_days: (holisticyearLength / mercurySolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.mercury.perihelionEclipticYears)
     },
@@ -4336,7 +4374,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.venus.orbitalEccentricityBase,
       i_deg: planets.venus.eclipticInclinationJ2000,          // Fixed ecliptic inclination (3.39°)
       omega_deg: planets.venus.ascendingNode,                 // Fixed J2000 ascending node
-      mass: M_VENUS,
+      mass: M_VENUS_SYSTEM,
       period_days: (holisticyearLength / venusSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.venus.perihelionEclipticYears)
     },
@@ -4346,7 +4384,7 @@ function getPlanetPerturbationData(oRef) {
       e: eccentricityBase,                          // Fixed base eccentricity
       i_deg: 0,                                     // Earth defines the ecliptic (0° by definition)
       omega_deg: 0,                                 // Reference point
-      mass: M_EARTH,
+      mass: M_EARTH_ALONE,
       period_days: meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(earthPerihelionICRFYears)
     },
@@ -4356,7 +4394,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.mars.orbitalEccentricityBase,
       i_deg: planets.mars.eclipticInclinationJ2000,          // Fixed ecliptic inclination (1.85°)
       omega_deg: planets.mars.ascendingNode,                 // Fixed J2000 ascending node
-      mass: M_MARS,
+      mass: M_MARS_SYSTEM,
       period_days: (holisticyearLength / marsSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.mars.perihelionEclipticYears)
     },
@@ -4366,7 +4404,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.jupiter.orbitalEccentricityBase,
       i_deg: planets.jupiter.eclipticInclinationJ2000,       // Fixed ecliptic inclination (1.30°)
       omega_deg: planets.jupiter.ascendingNode,              // Fixed J2000 ascending node
-      mass: M_JUPITER,
+      mass: M_JUPITER_SYSTEM,
       period_days: (holisticyearLength / jupiterSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.jupiter.perihelionEclipticYears)
     },
@@ -4376,7 +4414,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.saturn.orbitalEccentricityBase,
       i_deg: planets.saturn.eclipticInclinationJ2000,        // Fixed ecliptic inclination (2.49°)
       omega_deg: planets.saturn.ascendingNode,               // Fixed J2000 ascending node
-      mass: M_SATURN,
+      mass: M_SATURN_SYSTEM,
       period_days: (holisticyearLength / saturnSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.saturn.perihelionEclipticYears)
     },
@@ -4386,7 +4424,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.uranus.orbitalEccentricityBase,
       i_deg: planets.uranus.eclipticInclinationJ2000,        // Fixed ecliptic inclination (0.77°)
       omega_deg: planets.uranus.ascendingNode,               // Fixed J2000 ascending node
-      mass: M_URANUS,
+      mass: M_URANUS_SYSTEM,
       period_days: (holisticyearLength / uranusSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.uranus.perihelionEclipticYears)
     },
@@ -4396,7 +4434,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.neptune.orbitalEccentricityBase,
       i_deg: planets.neptune.eclipticInclinationJ2000,       // Fixed ecliptic inclination (1.77°)
       omega_deg: planets.neptune.ascendingNode,              // Fixed J2000 ascending node
-      mass: M_NEPTUNE,
+      mass: M_NEPTUNE_SYSTEM,
       period_days: (holisticyearLength / neptuneSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.neptune.perihelionEclipticYears)
     },
@@ -4406,7 +4444,7 @@ function getPlanetPerturbationData(oRef) {
       e: planets.pluto.orbitalEccentricityBase,
       i_deg: planets.pluto.eclipticInclinationJ2000,         // Fixed ecliptic inclination (17.14°)
       omega_deg: planets.pluto.ascendingNode,                // Fixed J2000 ascending node
-      mass: M_PLUTO,
+      mass: M_PLUTO_SYSTEM,
       period_days: (holisticyearLength / plutoSolarYearCount) * meansolaryearlengthinDays,
       observedPrecession: OrbitalFormulas.precessionRateFromPeriod(planets.pluto.perihelionEclipticYears)
     },
@@ -20057,7 +20095,7 @@ const _balICRF = (k) => 1 / (1 / planets[k].perihelionEclipticYears - _balGP);
 const BALANCE_CONFIG = {
   mercury: {
     name: 'Mercury',
-    mass: M_MERCURY / M_SUN,
+    mass: M_MERCURY_SYSTEM / M_SUN,
     sma: mercuryOrbitDistance,
     ecc: planets.mercury.orbitalEccentricityBase,
     defaultD: 21,
@@ -20073,7 +20111,7 @@ const BALANCE_CONFIG = {
   },
   venus: {
     name: 'Venus',
-    mass: M_VENUS / M_SUN,
+    mass: M_VENUS_SYSTEM / M_SUN,
     sma: venusOrbitDistance,
     ecc: planets.venus.orbitalEccentricityBase,
     defaultD: 34,
@@ -20089,7 +20127,7 @@ const BALANCE_CONFIG = {
   },
   earth: {
     name: 'Earth',
-    mass: M_EARTH / M_SUN,
+    mass: M_EARTH_ALONE / M_SUN,
     sma: 1.0,
     ecc: eccentricityBase,
     defaultD: 3,
@@ -20105,7 +20143,7 @@ const BALANCE_CONFIG = {
   },
   mars: {
     name: 'Mars',
-    mass: M_MARS / M_SUN,
+    mass: M_MARS_SYSTEM / M_SUN,
     sma: marsOrbitDistance,
     ecc: planets.mars.orbitalEccentricityBase,
     defaultD: 5,
@@ -20121,7 +20159,7 @@ const BALANCE_CONFIG = {
   },
   jupiter: {
     name: 'Jupiter',
-    mass: M_JUPITER / M_SUN,
+    mass: M_JUPITER_SYSTEM / M_SUN,
     sma: jupiterOrbitDistance,
     ecc: planets.jupiter.orbitalEccentricityBase,
     defaultD: 5,
@@ -20137,7 +20175,7 @@ const BALANCE_CONFIG = {
   },
   saturn: {
     name: 'Saturn',
-    mass: M_SATURN / M_SUN,
+    mass: M_SATURN_SYSTEM / M_SUN,
     sma: saturnOrbitDistance,
     ecc: planets.saturn.orbitalEccentricityBase,
     defaultD: 3,
@@ -20153,7 +20191,7 @@ const BALANCE_CONFIG = {
   },
   uranus: {
     name: 'Uranus',
-    mass: M_URANUS / M_SUN,
+    mass: M_URANUS_SYSTEM / M_SUN,
     sma: uranusOrbitDistance,
     ecc: planets.uranus.orbitalEccentricityBase,
     defaultD: 21,
@@ -20169,7 +20207,7 @@ const BALANCE_CONFIG = {
   },
   neptune: {
     name: 'Neptune',
-    mass: M_NEPTUNE / M_SUN,
+    mass: M_NEPTUNE_SYSTEM / M_SUN,
     sma: neptuneOrbitDistance,
     ecc: planets.neptune.orbitalEccentricityBase,
     defaultD: 34,
@@ -24588,14 +24626,14 @@ const fibGaugeEls = {};
 // Dynamic Fibonacci balance computation (called each frame)
 function computeDynamicFibonacciBalance() {
   const planetConfigs = [
-    { key: 'mercury', mass: M_MERCURY / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, antiPhase: planets.mercury.antiPhase },
-    { key: 'venus',   mass: M_VENUS / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, antiPhase: planets.venus.antiPhase },
-    { key: 'earth',   mass: M_EARTH / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  antiPhase: false },
-    { key: 'mars',    mass: M_MARS / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  antiPhase: planets.mars.antiPhase },
-    { key: 'jupiter', mass: M_JUPITER / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  antiPhase: planets.jupiter.antiPhase },
-    { key: 'saturn',  mass: M_SATURN / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  antiPhase: planets.saturn.antiPhase },
-    { key: 'uranus',  mass: M_URANUS / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, antiPhase: planets.uranus.antiPhase },
-    { key: 'neptune', mass: M_NEPTUNE / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, antiPhase: planets.neptune.antiPhase },
+    { key: 'mercury', mass: M_MERCURY_SYSTEM / M_SUN, sma: mercuryOrbitDistance, ecc: o.eccentricityMercury, d: 21, antiPhase: planets.mercury.antiPhase },
+    { key: 'venus',   mass: M_VENUS_SYSTEM / M_SUN,   sma: venusOrbitDistance,   ecc: o.eccentricityVenus,   d: 34, antiPhase: planets.venus.antiPhase },
+    { key: 'earth',   mass: M_EARTH_ALONE / M_SUN,   sma: 1.0,                 ecc: o.eccentricityEarth,   d: 3,  antiPhase: false },
+    { key: 'mars',    mass: M_MARS_SYSTEM / M_SUN,    sma: marsOrbitDistance,    ecc: o.eccentricityMars,    d: 5,  antiPhase: planets.mars.antiPhase },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM / M_SUN, sma: jupiterOrbitDistance, ecc: o.eccentricityJupiter, d: 5,  antiPhase: planets.jupiter.antiPhase },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM / M_SUN,  sma: saturnOrbitDistance,  ecc: o.eccentricitySaturn,  d: 3,  antiPhase: planets.saturn.antiPhase },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM / M_SUN,  sma: uranusOrbitDistance,  ecc: o.eccentricityUranus,  d: 21, antiPhase: planets.uranus.antiPhase },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM / M_SUN, sma: neptuneOrbitDistance, ecc: o.eccentricityNeptune, d: 34, antiPhase: planets.neptune.antiPhase },
   ];
   // Inclination balance: w = √(m·a(1-e²)) / d
   let inclSum203 = 0, inclSum23 = 0;
@@ -24946,10 +24984,10 @@ function setupGUI() {
       neptune: neptuneEclipticInclinationTrendJPL,
     };
     const _massRatios = {
-      mercury: MASS_RATIO_SUN_MERCURY, venus: MASS_RATIO_SUN_VENUS,
-      mars: MASS_RATIO_SUN_MARS, jupiter: MASS_RATIO_SUN_JUPITER,
-      saturn: MASS_RATIO_SUN_SATURN, uranus: MASS_RATIO_SUN_URANUS,
-      neptune: MASS_RATIO_SUN_NEPTUNE,
+      mercury: MASS_RATIO_SUN_MERCURY_SYSTEM, venus: MASS_RATIO_SUN_VENUS_SYSTEM,
+      mars: MASS_RATIO_SUN_MARS_SYSTEM, jupiter: MASS_RATIO_SUN_JUPITER_SYSTEM,
+      saturn: MASS_RATIO_SUN_SATURN_SYSTEM, uranus: MASS_RATIO_SUN_URANUS_SYSTEM,
+      neptune: MASS_RATIO_SUN_NEPTUNE_SYSTEM,
     };
     planetCalibNames.forEach(({ key, name }) => {
       const p = planets[key];
@@ -35539,18 +35577,23 @@ const planetStats = {
        hover : [`Equatorial diameter of Earth. About 43 km larger than polar diameter due to rotational flattening`],
        info  : 'https://en.wikipedia.org/wiki/Earth',
        constant: true},
+      {label : () => `Mass (M⊕-System)`,
+       value : [ { v: () => fmtScientific(M_EARTH_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Earth+Moon combined SYSTEM mass: M_System = M_Earth + M_Moon. Used for orbital dynamics where the Earth-Moon system acts as a single point mass (Hill sphere, perturbations on other planets, etc.).`],
+       info  : 'https://en.wikipedia.org/wiki/Earth_mass',
+       constant: true},
       {label : () => `Mass (M⊕)`,
-       value : [ { v: () => fmtScientific(M_EARTH, 12) },{ small: 'kg' }],
-       hover : [`Earth's mass derived from Moon's orbital data using Kepler's 3rd Law: GM = 4π²a³/P² ≈ 5.97 × 10²⁴ kg`],
+       value : [ { v: () => fmtScientific(M_EARTH_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Earth ALONE mass (planet only, no Moon): derived from Moon's orbit via Kepler's 3rd Law and split via Earth/Moon mass ratio. Used for intrinsic body properties (surface gravity, escape velocity, density, Schwarzschild radius).`],
        info  : 'https://en.wikipedia.org/wiki/Earth_mass',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_EARTH, dec:2, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_EARTH_ALONE, dec:2, sep:',' },{ small: 'km³/s²' }],
        hover : [`Derived from Moon's orbit, corrected for Moon's mass: GM_Earth = GM_system × (ratio/(ratio+1)) ≈ 398,600 km³/s²`],
        constant: true},
       {label : () => `Mass ratio (M⊕/M☽)`,
        value : [ { v: () => MASS_RATIO_EARTH_MOON, dec:6, sep:',' },{ small: '' }],
-       hover : [`Earth is ~81.3 times more massive than Moon`],
+       hover : [`Earth is ~${MASS_RATIO_EARTH_MOON.toFixed(2)} times more massive than Moon`],
        constant: true},
       {label : () => `Number of Moons`,
        value : '1',
@@ -35574,23 +35617,23 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(o.lengthofAU, M_EARTH, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(o.lengthofAU, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Earth's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 1.5 million km. Moon orbits at ~384,400 km (25% of Hill sphere)`],
        static: true},
       {label : () => `Hill Sphere`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(o.lengthofAU, M_EARTH, M_SUN) / o.lengthofAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(o.lengthofAU, M_EARTH_ALONE, M_SUN) / o.lengthofAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Hill sphere radius as fraction of semi-major axis ≈ 0.01 AU`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(o.lengthofAU, M_EARTH, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(o.lengthofAU, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 925,000 km. Used for spacecraft trajectory calculations`],
        static: true},
       {label : () => `Lagrange L1 Distance`,
-       value : [ { v: () => OrbitalFormulas.lagrangeL1L2Distance(o.lengthofAU, M_EARTH, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.lagrangeL1L2Distance(o.lengthofAU, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`L1 point distance from Earth toward Sun ≈ r_Hill. Location of SOHO, DSCOVR spacecraft`],
        static: true},
       {label : () => `Lagrange L2 Distance`,
-       value : [ { v: () => OrbitalFormulas.lagrangeL1L2Distance(o.lengthofAU, M_EARTH, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.lagrangeL1L2Distance(o.lengthofAU, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`L2 point distance from Earth away from Sun ≈ r_Hill. Location of JWST, Gaia spacecraft`],
        static: true},
     null,
@@ -35603,29 +35646,29 @@ const planetStats = {
        hover : [`Barycenter is at ~73% of Earth's radius from center - about 1,700 km below the surface`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_EARTH) * 1000000, dec:3, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_EARTH_ALONE) * 1000000, dec:3, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 8.87 mm. If Earth compressed to this size, it would become a black hole`],
        static: true},
       {label : () => `Tidal Force Ratio (Sun/Moon)`,
-       value : [ { v: () => OrbitalFormulas.tidalForceRatio(M_SUN, M_MOON, o.lengthofAU, moonDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.tidalForceRatio(M_SUN, M_MOON_ALONE, o.lengthofAU, moonDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Sun's tidal force on Earth is ~46% of Moon's: (M_Sun/M_Moon) × (r_Moon/r_Sun)³`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
       {label : () => `Surface Gravity (g)`,
-       value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_EARTH, diameters.earthDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
-       hover : [`g = GM/R² ≈ 9.7982 m/s² (equatorial, no rotation). Effective: 9.780 equatorial, 9.832 polar. Standard gravity: 9.80665 m/s²`],
+       value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_EARTH_ALONE, diameters.earthDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+       hover : [`g = GM/R² with R = equatorial radius (no rotation effects). Real-world effective g: 9.780 m/s² at equator (rotation-reduced), 9.832 m/s² at poles. Standard gravity: 9.80665 m/s²`],
        static: true},
       {label : () => `Surface Escape Velocity`,
-       value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_EARTH, diameters.earthDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+       value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_EARTH_ALONE, diameters.earthDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
        hover : [`v_esc = √(2GM/R) ≈ 11.19 km/s. Minimum velocity to escape Earth's gravity`],
        static: true},
       {label : () => `Mean Density (ρ)`,
-       value : [ { v: () => OrbitalFormulas.meanDensity(M_EARTH, diameters.earthDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+       value : [ { v: () => OrbitalFormulas.meanDensity(M_EARTH_ALONE, diameters.earthDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
        hover : [`ρ = 3M/(4πR³) ≈ 5,515 kg/m³. Earth is the densest planet in the Solar System`],
        static: true},
       {label : () => `Gravitational Potential at Moon`,
-       value : [ { v: () => OrbitalFormulas.gravitationalPotential(GM_EARTH, moonDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.gravitationalPotential(GM_EARTH_ALONE, moonDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Φ = -GM/r. Potential energy per unit mass at Moon's distance`],
        static: true},
 
@@ -35650,8 +35693,8 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.meanMotion(o.lengthofsolarYear), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
       {label : () => `Period (Kepler verification)`,
-       value : [ { v: () => OrbitalFormulas.keplerPeriod(o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`]},
+       value : [ { v: () => OrbitalFormulas.keplerPeriod(o.lengthofAU, GM_SUN_PLUS_EARTH, false), dec:6, sep:',' },{ small: 'days' }],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)). Earth is the year reference, so this uses the two-body GM that defined the sidereal year (GM_SUN_PLUS_EARTH = GM_Sun + GM_Earth-alone) and skips the solar/sidereal compensation that other planets need. Result matches the sidereal year (~365.25636 days) exactly by construction.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => o.lengthofDay/86400*24, dec:6, sep:',' }, { small : 'hours' }],
@@ -35982,12 +36025,12 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Moon',
        constant: true},
       {label : () => `Mass (M☽)`,
-       value : [ { v: () => fmtScientific(M_MOON, 12) },{ small: 'kg' }],
+       value : [ { v: () => fmtScientific(M_MOON_ALONE, 12) },{ small: 'kg' }],
        hover : [`Moon's mass derived from Earth-Moon system: M_Moon = M_Earth / ${MASS_RATIO_EARTH_MOON.toFixed(2)} ≈ 7.35 × 10²² kg`],
        info  : 'https://en.wikipedia.org/wiki/Moon',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_MOON, dec:6, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_MOON_ALONE, dec:6, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM_Moon = GM_system / (1 + mass_ratio) ≈ 4,903 km³/s²`],
        constant: true},
       'null_row',
@@ -36007,15 +36050,15 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(moonDistance, M_MOON, M_EARTH), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(moonDistance, M_MOON_ALONE, M_EARTH_ALONE), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Moon's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 60,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(moonDistance, M_MOON, M_EARTH), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(moonDistance, M_MOON_ALONE, M_EARTH_ALONE), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 66,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MOON) * 1000000, dec:4, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MOON_ALONE) * 1000000, dec:4, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 0.11 mm. If Moon compressed to this size, it would become a black hole`],
        static: true},
     null,
@@ -36026,19 +36069,19 @@ const planetStats = {
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MOON, diameters.moonDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MOON_ALONE, diameters.moonDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
       hover : [`g = GM/R² ≈ 1.62 m/s². About 16.5% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MOON, diameters.moonDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MOON_ALONE, diameters.moonDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 2.38 km/s. About 21% of Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_MOON, diameters.moonDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_MOON_ALONE, diameters.moonDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 3,346 kg/m³. About 61% of Earth's density`],
       static: true},
      {label : () => `Gravitational Potential at Surface`,
-      value : [ { v: () => OrbitalFormulas.gravitationalPotential(GM_MOON, diameters.moonDiameter/2), dec:4, sep:',' },{ small: 'km²/s²' }],
+      value : [ { v: () => OrbitalFormulas.gravitationalPotential(GM_MOON_ALONE, diameters.moonDiameter/2), dec:4, sep:',' },{ small: 'km²/s²' }],
       hover : [`Φ = -GM/r. Potential energy per unit mass at Moon's surface`],
       static: true},
 
@@ -36104,22 +36147,22 @@ const planetStats = {
        hover : [`Mean orbital velocity: v = 2πr / P`],
        static: true},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(o.moonDistanceFromEarthKm, moonDistance, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH) * 3600, 0, ',')} km/h at perigee to ${fmtNum(OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH) * 3600, 0, ',')} km/h at apogee`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(o.moonDistanceFromEarthKm, moonDistance, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at perigee to ${fmtNum(OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, 0, ',')} km/h at apogee`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(moonDistance, moonOrbitalEccentricityBase, o.moonTrueAnomaly, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(moonDistance, moonOrbitalEccentricityBase, o.moonTrueAnomaly, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Earth: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(moonDistance, moonOrbitalEccentricityBase, o.moonTrueAnomaly, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(moonDistance, moonOrbitalEccentricityBase, o.moonTrueAnomaly, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perigee velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perigee: vₚ = √(GM/a) × √((1+e)/(1-e))`],
        static: true},
       {label : () => `Apogee velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at apogee: vₐ = √(GM/a) × √((1-e)/(1+e))`],
        static: true},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
@@ -36128,26 +36171,26 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Escape velocity (v_esc)`,
-       value : [ { v: () => OrbitalFormulas.escapeVelocity(o.moonDistanceFromEarthKm, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.escapeVelocity(o.moonDistanceFromEarthKm, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum velocity to escape Earth's gravity from Moon's current position: v_esc = √(2GM/r)`]},
       {label : () => `Circular velocity (v_circ)`,
-       value : [ { v: () => OrbitalFormulas.circularVelocity(o.moonDistanceFromEarthKm, GM_EARTH) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.circularVelocity(o.moonDistanceFromEarthKm, GM_EARTH_ALONE) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at Moon's current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(o.moonDistanceFromEarthKm, moonDistance, GM_EARTH), o.moonDistanceFromEarthKm, GM_EARTH), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(o.moonDistanceFromEarthKm, moonDistance, GM_EARTH_ALONE), o.moonDistanceFromEarthKm, GM_EARTH_ALONE), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perigee, <1 near apogee, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(moonDistance, GM_EARTH), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(moonDistance, GM_EARTH_ALONE), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`],
        static: true},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(moonDistance, moonOrbitalEccentricityBase, GM_EARTH), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`],
        static: true},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(moonDistance, moonOrbitalEccentricityBase, GM_EARTH), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(moonDistance, moonOrbitalEccentricityBase, GM_EARTH_ALONE), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`],
        static: true},
 
@@ -36417,8 +36460,8 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Standard_gravitational_parameter',
        constant: true},
       {label : () => `Mass ratio (M☉/M⊕)`,
-       value : [ { v: () => MASS_RATIO_SUN_EARTH, dec:0, sep:',' },{ small: '' }],
-       hover : [`Sun is ~332,946 times more massive than Earth`],
+       value : [ { v: () => MASS_RATIO_SUN_EARTH_ALONE, dec:0, sep:',' },{ small: '' }],
+       hover : [`Sun is ~${fmtNum(MASS_RATIO_SUN_EARTH_ALONE, 0, ',')} times more massive than Earth`],
        constant: true},
       'null_row',
     null,
@@ -36514,12 +36557,12 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Mercury_(planet)',
        constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_MERCURY, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Mercury mass ratio (1:${fmtNum(MASS_RATIO_SUN_MERCURY,0,',')}), originally measured via MESSENGER spacecraft`],
+       value : [ { v: () => fmtScientific(M_MERCURY_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Mass derived from Sun/Mercury mass ratio (1:${fmtNum(MASS_RATIO_SUN_MERCURY_ALONE,0,',')}), originally measured via MESSENGER spacecraft`],
        info  : 'https://en.wikipedia.org/wiki/Mercury_(planet)',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_MERCURY, dec:2, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_MERCURY_ALONE, dec:2, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 22,032 km³/s². Mercury has no moons, so mass was determined via spacecraft tracking`],
        constant: true},
       'null_row',
@@ -36542,29 +36585,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(mercuryOrbitDistance * o.lengthofAU, M_MERCURY, M_SUN), dec:0, sep:',' },{ small: 'km' }],
-       hover : [`Region where Mercury's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 175,000 km`],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(mercuryOrbitDistance * o.lengthofAU, M_MERCURY_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Region where Mercury's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 221,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(mercuryOrbitDistance * o.lengthofAU, M_MERCURY, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(mercuryOrbitDistance * o.lengthofAU, M_MERCURY_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 112,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MERCURY) * 1000000, dec:6, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MERCURY_ALONE) * 1000000, dec:6, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 0.49 mm. If Mercury compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MERCURY, diameters.mercuryDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MERCURY_ALONE, diameters.mercuryDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
       hover : [`g = GM/R² ≈ 3.70 m/s². About 38% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MERCURY, diameters.mercuryDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MERCURY_ALONE, diameters.mercuryDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 4.25 km/s. About 38% of Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_MERCURY, diameters.mercuryDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_MERCURY_ALONE, diameters.mercuryDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 5,427 kg/m³. Second densest planet after Earth`],
       static: true},
 
@@ -36595,7 +36638,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(mercuryOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -36905,12 +36948,12 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/venus',
        constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_VENUS, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Venus mass ratio (1:${fmtNum(MASS_RATIO_SUN_VENUS,2,',')}), originally measured via Venera and Magellan spacecraft`],
+       value : [ { v: () => fmtScientific(M_VENUS_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Mass derived from Sun/Venus mass ratio (1:${fmtNum(MASS_RATIO_SUN_VENUS_ALONE,2,',')}), originally measured via Venera and Magellan spacecraft`],
        info  : 'https://en.wikipedia.org/wiki/Venus',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_VENUS, dec:2, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_VENUS_ALONE, dec:2, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 324,859 km³/s². Venus has no moons, so mass was determined via spacecraft tracking`],
        constant: true},
       'null_row',
@@ -36933,29 +36976,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(venusOrbitDistance * o.lengthofAU, M_VENUS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(venusOrbitDistance * o.lengthofAU, M_VENUS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Venus's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 1,000,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(venusOrbitDistance * o.lengthofAU, M_VENUS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(venusOrbitDistance * o.lengthofAU, M_VENUS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 616,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_VENUS) * 1000000, dec:3, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_VENUS_ALONE) * 1000000, dec:3, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 7.22 mm. If Venus compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_VENUS, diameters.venusDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_VENUS_ALONE, diameters.venusDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
       hover : [`g = GM/R² ≈ 8.87 m/s². About 90% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_VENUS, diameters.venusDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_VENUS_ALONE, diameters.venusDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 10.36 km/s. About 93% of Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_VENUS, diameters.venusDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_VENUS_ALONE, diameters.venusDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 5,243 kg/m³. About 95% of Earth's density`],
       static: true},
 
@@ -36986,7 +37029,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(venusOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37260,13 +37303,18 @@ const planetStats = {
        hover : [`Equatorial diameter of Mars ≈ 53% of Earth's. About half the size of Earth`],
        info  : 'https://en.wikipedia.org/wiki/mars',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_MARS_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Mars+moons combined SYSTEM mass (Phobos and Deimos together add <1 ppm). Used for orbital dynamics where Mars+moons act as a single point mass.`],
+       info  : 'https://en.wikipedia.org/wiki/Mars',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_MARS, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Mars mass ratio (1:${fmtNum(MASS_RATIO_SUN_MARS,2,',')}), measured from Phobos/Deimos orbits and spacecraft`],
+       value : [ { v: () => fmtScientific(M_MARS_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Mars ALONE mass (planet only): derived from Sun/Mars mass ratio 1:${fmtNum(MASS_RATIO_SUN_MARS_ALONE,2,',')} (Phobos/Deimos orbits and spacecraft tracking). Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Mars',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_MARS, dec:2, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_MARS_ALONE, dec:2, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 42,828 km³/s². Derived from moon orbits (Phobos, Deimos) and spacecraft tracking`],
        constant: true},
       {label : () => `Number of Moons`,
@@ -37292,29 +37340,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(marsOrbitDistance * o.lengthofAU, M_MARS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(marsOrbitDistance * o.lengthofAU, M_MARS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Mars's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 1,080,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(marsOrbitDistance * o.lengthofAU, M_MARS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(marsOrbitDistance * o.lengthofAU, M_MARS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 577,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MARS) * 1000000, dec:4, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_MARS_ALONE) * 1000000, dec:4, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 0.95 mm. If Mars compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MARS, diameters.marsDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
-      hover : [`g = GM/R² ≈ 3.71 m/s². About 38% of Earth's surface gravity`],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_MARS_ALONE, diameters.marsDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+      hover : [`g = GM/R² ≈ 3.73 m/s². About 38% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MARS, diameters.marsDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_MARS_ALONE, diameters.marsDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 5.03 km/s. About 45% of Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_MARS, diameters.marsDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_MARS_ALONE, diameters.marsDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 3,933 kg/m³. About 71% of Earth's density`],
       static: true},
 
@@ -37345,7 +37393,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(marsOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37619,13 +37667,18 @@ const planetStats = {
        hover : [`Equatorial diameter of Jupiter ≈ 11× Earth's. Largest planet in the Solar System`],
        info  : 'https://en.wikipedia.org/wiki/jupiter',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_JUPITER_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Jupiter+all moons (Galileans + small) combined SYSTEM mass. Galileans contribute ~207 ppm of the system. Used for orbital dynamics where Jupiter+moons act as a single point mass.`],
+       info  : 'https://en.wikipedia.org/wiki/Jupiter',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_JUPITER, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Jupiter mass ratio (1:${fmtNum(MASS_RATIO_SUN_JUPITER,4,',')}), measured from Galilean moon orbits`],
+       value : [ { v: () => fmtScientific(M_JUPITER_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Jupiter ALONE mass (planet only, no Galileans): derived from Sun/Jupiter alone mass ratio 1:${fmtNum(MASS_RATIO_SUN_JUPITER_ALONE,4,',')}. Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Jupiter',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_JUPITER, dec:0, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_JUPITER_ALONE, dec:0, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 126,686,534 km³/s². Derived from Io, Europa, Ganymede, Callisto orbits`],
        constant: true},
       {label : () => `Number of Moons`,
@@ -37651,29 +37704,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(jupiterOrbitDistance * o.lengthofAU, M_JUPITER, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(jupiterOrbitDistance * o.lengthofAU, M_JUPITER_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Jupiter's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 53,000,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(jupiterOrbitDistance * o.lengthofAU, M_JUPITER, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(jupiterOrbitDistance * o.lengthofAU, M_JUPITER_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 48,200,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_JUPITER), dec:3, sep:',' },{ small: 'm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_JUPITER_ALONE), dec:3, sep:',' },{ small: 'm' }],
        hover : [`r_s = 2GM/c² ≈ 2.82 m. If Jupiter compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_JUPITER, diameters.jupiterDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
-      hover : [`g = GM/R² ≈ 24.79 m/s². About 2.53 times Earth's surface gravity`],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_JUPITER_ALONE, diameters.jupiterDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
+      hover : [`g = GM/R² ≈ 25.92 m/s². About 2.65 times Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_JUPITER, diameters.jupiterDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
-      hover : [`v_esc = √(2GM/R) ≈ 59.5 km/s. About 5.3 times Earth's escape velocity`],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_JUPITER_ALONE, diameters.jupiterDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
+      hover : [`v_esc = √(2GM/R) ≈ 60.20 km/s. About 5.4 times Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_JUPITER, diameters.jupiterDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_JUPITER_ALONE, diameters.jupiterDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 1,326 kg/m³. Only about 24% of Earth's density`],
       static: true},
 
@@ -37704,7 +37757,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(jupiterOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37977,13 +38030,18 @@ const planetStats = {
        hover : [`Equatorial diameter of Saturn ≈ 9.1× Earth's. Second largest planet in the Solar System`],
        info  : 'https://en.wikipedia.org/wiki/saturn',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_SATURN_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Saturn+all moons (Titan, Iapetus, etc.) combined SYSTEM mass. Moons contribute ~247 ppm of the system. Used for orbital dynamics where Saturn+moons act as a single point mass.`],
+       info  : 'https://en.wikipedia.org/wiki/Saturn',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_SATURN, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Saturn mass ratio (1:${fmtNum(MASS_RATIO_SUN_SATURN,3,',')}), measured from Titan and other moon orbits`],
+       value : [ { v: () => fmtScientific(M_SATURN_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Saturn ALONE mass (planet only, no moons): derived from Sun/Saturn alone mass ratio 1:${fmtNum(MASS_RATIO_SUN_SATURN_ALONE,3,',')}. Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Saturn',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_SATURN, dec:0, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_SATURN_ALONE, dec:0, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 37,931,187 km³/s². Derived from Titan and other moon orbits`],
        constant: true},
       {label : () => `Number of Moons`,
@@ -38009,29 +38067,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(saturnOrbitDistance * o.lengthofAU, M_SATURN, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(saturnOrbitDistance * o.lengthofAU, M_SATURN_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Saturn's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 65,000,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(saturnOrbitDistance * o.lengthofAU, M_SATURN, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(saturnOrbitDistance * o.lengthofAU, M_SATURN_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 54,500,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_SATURN) * 1000, dec:0, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_SATURN_ALONE) * 1000, dec:0, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 843 mm. If Saturn compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_SATURN, diameters.saturnDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
-      hover : [`g = GM/R² ≈ 10.44 m/s². About 1.07 times Earth's surface gravity`],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_SATURN_ALONE, diameters.saturnDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
+      hover : [`g = GM/R² ≈ 11.19 m/s². About 1.14 times Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_SATURN, diameters.saturnDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
-      hover : [`v_esc = √(2GM/R) ≈ 35.5 km/s. About 3.2 times Earth's escape velocity`],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_SATURN_ALONE, diameters.saturnDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
+      hover : [`v_esc = √(2GM/R) ≈ 36.09 km/s. About 3.2 times Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_SATURN, diameters.saturnDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_SATURN_ALONE, diameters.saturnDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 687 kg/m³. Least dense planet - would float in water!`],
       static: true},
 
@@ -38062,7 +38120,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(saturnOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -38336,13 +38394,18 @@ const planetStats = {
        hover : [`Equatorial diameter of Uranus ≈ 4× Earth's. Third largest planet in the Solar System`],
        info  : 'https://en.wikipedia.org/wiki/uranus',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_URANUS_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Uranus+all moons (Titania, Oberon, Ariel, etc.) combined SYSTEM mass. Moons contribute ~105 ppm of the system. Used for orbital dynamics where Uranus+moons act as a single point mass.`],
+       info  : 'https://en.wikipedia.org/wiki/Uranus',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_URANUS, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Uranus mass ratio (1:${fmtNum(MASS_RATIO_SUN_URANUS,2,',')}), measured from moon orbits (Titania, Oberon, etc.)`],
+       value : [ { v: () => fmtScientific(M_URANUS_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Uranus ALONE mass (planet only, no moons): derived from Sun/Uranus alone mass ratio 1:${fmtNum(MASS_RATIO_SUN_URANUS_ALONE,2,',')}. Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Uranus',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_URANUS, dec:0, sep:',' },{ small: 'km³/s²' }],
+       value : [ { v: () => GM_URANUS_ALONE, dec:0, sep:',' },{ small: 'km³/s²' }],
        hover : [`GM = GM_SUN / mass_ratio ≈ 5,793,939 km³/s². Derived from Uranian moon orbits`],
        constant: true},
       {label : () => `Number of Moons`,
@@ -38368,29 +38431,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(uranusOrbitDistance * o.lengthofAU, M_URANUS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(uranusOrbitDistance * o.lengthofAU, M_URANUS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Uranus's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 70,000,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(uranusOrbitDistance * o.lengthofAU, M_URANUS, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(uranusOrbitDistance * o.lengthofAU, M_URANUS_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 51,800,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_URANUS) * 1000, dec:0, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_URANUS_ALONE) * 1000, dec:0, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 129 mm. If Uranus compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_URANUS, diameters.uranusDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
-      hover : [`g = GM/R² ≈ 8.87 m/s². About 90% of Earth's surface gravity`],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_URANUS_ALONE, diameters.uranusDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
+      hover : [`g = GM/R² ≈ 9.01 m/s². About 92% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_URANUS, diameters.uranusDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
-      hover : [`v_esc = √(2GM/R) ≈ 21.3 km/s. About 1.9 times Earth's escape velocity`],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_URANUS_ALONE, diameters.uranusDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
+      hover : [`v_esc = √(2GM/R) ≈ 21.38 km/s. About 1.9 times Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_URANUS, diameters.uranusDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_URANUS_ALONE, diameters.uranusDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 1,271 kg/m³. About 23% of Earth's density`],
       static: true},
 
@@ -38421,7 +38484,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(uranusOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -38695,14 +38758,19 @@ const planetStats = {
        hover : [`Equatorial diameter of Neptune ≈ 3.9× Earth's. Fourth largest planet in the Solar System`],
        info  : 'https://en.wikipedia.org/wiki/neptune',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_NEPTUNE_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Neptune+all moons (Triton dominates) combined SYSTEM mass. Moons contribute ~210 ppm of the system. Used for orbital dynamics where Neptune+moons act as a single point mass.`],
+       info  : 'https://en.wikipedia.org/wiki/Neptune',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_NEPTUNE, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Neptune mass ratio (1:${fmtNum(MASS_RATIO_SUN_NEPTUNE,2,',')}), measured from Triton orbit and Voyager 2`],
+       value : [ { v: () => fmtScientific(M_NEPTUNE_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Neptune ALONE mass (planet only, no moons): derived from Sun/Neptune alone mass ratio 1:${fmtNum(MASS_RATIO_SUN_NEPTUNE_ALONE,2,',')}. Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Neptune',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_NEPTUNE, dec:0, sep:',' },{ small: 'km³/s²' }],
-       hover : [`GM = GM_SUN / mass_ratio ≈ 6,836,529 km³/s². Derived from Triton orbit and Voyager 2 flyby`],
+       value : [ { v: () => GM_NEPTUNE_ALONE, dec:0, sep:',' },{ small: 'km³/s²' }],
+       hover : [`GM = GM_SUN / mass_ratio ≈ 6,835,105 km³/s². Derived from Triton orbit and Voyager 2 flyby`],
        constant: true},
       {label : () => `Number of Moons`,
        value : '16',
@@ -38727,29 +38795,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(neptuneOrbitDistance * o.lengthofAU, M_NEPTUNE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(neptuneOrbitDistance * o.lengthofAU, M_NEPTUNE_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Neptune's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 116,000,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(neptuneOrbitDistance * o.lengthofAU, M_NEPTUNE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(neptuneOrbitDistance * o.lengthofAU, M_NEPTUNE_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 86,800,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_NEPTUNE) * 1000, dec:0, sep:',' },{ small: 'mm' }],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_NEPTUNE_ALONE) * 1000, dec:0, sep:',' },{ small: 'mm' }],
        hover : [`r_s = 2GM/c² ≈ 152 mm. If Neptune compressed to this size, it would become a black hole`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_NEPTUNE, diameters.neptuneDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
-      hover : [`g = GM/R² ≈ 11.15 m/s². About 1.14 times Earth's surface gravity`],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_NEPTUNE_ALONE, diameters.neptuneDiameter/2), dec:2, sep:',' },{ small: 'm/s²' }],
+      hover : [`g = GM/R² ≈ 11.27 m/s². About 1.15 times Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_NEPTUNE, diameters.neptuneDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_NEPTUNE_ALONE, diameters.neptuneDiameter/2), dec:2, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 23.5 km/s. About 2.1 times Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_NEPTUNE, diameters.neptuneDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_NEPTUNE_ALONE, diameters.neptuneDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 1,638 kg/m³. About 30% of Earth's density`],
       static: true},
 
@@ -38780,7 +38848,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(neptuneOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39053,14 +39121,19 @@ const planetStats = {
        hover : [`Mean diameter of Pluto ≈ 19% of Earth's. Largest known dwarf planet in the Solar System`],
        info  : 'https://en.wikipedia.org/wiki/pluto',
        constant: true},
+      {label : () => `Mass (M-System)`,
+       value : [ { v: () => fmtScientific(M_PLUTO_SYSTEM, 12) },{ small: 'kg' }],
+       hover : [`Pluto+Charon combined SYSTEM mass (binary system — Charon is ~10.85% of system, so SYSTEM mass is 12% larger than ALONE). Sun/system ratio 1:${fmtNum(MASS_RATIO_SUN_PLUTO_SYSTEM,0,',')}. Used for orbital dynamics.`],
+       info  : 'https://en.wikipedia.org/wiki/Pluto',
+       constant: true},
       {label : () => `Mass (M)`,
-       value : [ { v: () => fmtScientific(M_PLUTO, 12) },{ small: 'kg' }],
-       hover : [`Mass derived from Sun/Pluto mass ratio (1:${fmtNum(MASS_RATIO_SUN_PLUTO,0,',')}), measured from Charon's orbit (binary system)`],
+       value : [ { v: () => fmtScientific(M_PLUTO_ALONE, 12) },{ small: 'kg' }],
+       hover : [`Pluto ALONE mass (planet only, no Charon): derived from Sun/Pluto alone mass ratio 1:${fmtNum(MASS_RATIO_SUN_PLUTO_ALONE,0,',')}. Used for surface gravity, escape velocity, density.`],
        info  : 'https://en.wikipedia.org/wiki/Pluto',
        constant: true},
       {label : () => `Gravitational parameter (GM)`,
-       value : [ { v: () => GM_PLUTO, dec:2, sep:',' },{ small: 'km³/s²' }],
-       hover : [`GM = GM_SUN / mass_ratio ≈ 982 km³/s². Derived from Charon's orbit - Pluto-Charon is a binary system`],
+       value : [ { v: () => GM_PLUTO_ALONE, dec:2, sep:',' },{ small: 'km³/s²' }],
+       hover : [`GM = GM_SUN / mass_ratio ≈ 870 km³/s². Derived from Charon's orbit - Pluto-Charon is a binary system`],
        constant: true},
       {label : () => `Number of Moons`,
        value : '5',
@@ -39087,29 +39160,29 @@ const planetStats = {
 
     {header : '—  Gravitational Influence Zones —' },
       {label : () => `Hill Sphere (r_Hill)`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(plutoOrbitDistance * o.lengthofAU, M_PLUTO, M_SUN), dec:0, sep:',' },{ small: 'km' }],
-       hover : [`Region where Pluto's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 6,000,000 km`],
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(plutoOrbitDistance * o.lengthofAU, M_PLUTO_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Region where Pluto's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 7,962,000 km`],
        static: true},
       {label : () => `Sphere of Influence (r_SOI)`,
-       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(plutoOrbitDistance * o.lengthofAU, M_PLUTO, M_SUN), dec:0, sep:',' },{ small: 'km' }],
-       hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 3,100,000 km`],
+       value : [ { v: () => OrbitalFormulas.sphereOfInfluence(plutoOrbitDistance * o.lengthofAU, M_PLUTO_SYSTEM, M_SUN), dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 3,295,000 km`],
        static: true},
       {label : () => `Schwarzschild Radius (r_s)`,
-       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_PLUTO) * 1e9, dec:3, sep:',' },{ small: 'nm' }],
-       hover : [`r_s = 2GM/c² ≈ 22 nm. Pluto is so small its Schwarzschild radius is measured in nanometers`],
+       value : [ { v: () => OrbitalFormulas.schwarzschildRadius(GM_PLUTO_ALONE) * 1e9, dec:3, sep:',' },{ small: 'nm' }],
+       hover : [`r_s = 2GM/c² ≈ 19 nm. Pluto is so small its Schwarzschild radius is measured in nanometers`],
        static: true},
 
     {header : '—  Surface & Physical Properties —' },
      {label : () => `Surface Gravity (g)`,
-      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_PLUTO, diameters.plutoDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
+      value : [ { v: () => OrbitalFormulas.surfaceGravity(GM_PLUTO_ALONE, diameters.plutoDiameter/2), dec:4, sep:',' },{ small: 'm/s²' }],
       hover : [`g = GM/R² ≈ 0.62 m/s². Only about 6.3% of Earth's surface gravity`],
       static: true},
      {label : () => `Surface Escape Velocity`,
-      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_PLUTO, diameters.plutoDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
+      value : [ { v: () => OrbitalFormulas.surfaceEscapeVelocity(GM_PLUTO_ALONE, diameters.plutoDiameter/2), dec:3, sep:',' },{ small: 'km/s' }],
       hover : [`v_esc = √(2GM/R) ≈ 1.21 km/s. Only about 11% of Earth's escape velocity`],
       static: true},
      {label : () => `Mean Density (ρ)`,
-      value : [ { v: () => OrbitalFormulas.meanDensity(M_PLUTO, diameters.plutoDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
+      value : [ { v: () => OrbitalFormulas.meanDensity(M_PLUTO_ALONE, diameters.plutoDiameter/2), dec:0, sep:',' },{ small: 'kg/m³' }],
       hover : [`ρ = 3M/(4πR³) ≈ 1,854 kg/m³. About 34% of Earth's density`],
       static: true},
 
@@ -39140,7 +39213,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(plutoOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39482,7 +39555,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(halleysOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39810,7 +39883,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(erosOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM). Should match sidereal period`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -43732,21 +43805,21 @@ function updatePlanetInvariablePlaneHeights() {
  */
 function updateInvariablePlaneBalance() {
   // Total mass of 8 major planets (in kg, from existing constants)
-  const TOTAL_MASS = M_MERCURY + M_VENUS + M_EARTH + M_MARS + M_JUPITER + M_SATURN + M_URANUS + M_NEPTUNE;
+  const TOTAL_MASS = M_MERCURY_SYSTEM + M_VENUS_SYSTEM + M_EARTH_ALONE + M_MARS_SYSTEM + M_JUPITER_SYSTEM + M_SATURN_SYSTEM + M_URANUS_SYSTEM + M_NEPTUNE_SYSTEM;
 
   let weightedSum = 0;
   let aboveCount = 0;
   let belowCount = 0;
 
   const planetConfigs = [
-    { key: 'mercury', mass: M_MERCURY },
-    { key: 'venus',   mass: M_VENUS },
-    { key: 'earth',   mass: M_EARTH },
-    { key: 'mars',    mass: M_MARS },
-    { key: 'jupiter', mass: M_JUPITER },
-    { key: 'saturn',  mass: M_SATURN },
-    { key: 'uranus',  mass: M_URANUS },
-    { key: 'neptune', mass: M_NEPTUNE }
+    { key: 'mercury', mass: M_MERCURY_SYSTEM },
+    { key: 'venus',   mass: M_VENUS_SYSTEM },
+    { key: 'earth',   mass: M_EARTH_ALONE },
+    { key: 'mars',    mass: M_MARS_SYSTEM },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM }
   ];
 
   for (const { key, mass } of planetConfigs) {
@@ -43883,15 +43956,15 @@ function calculateInvariablePlaneFromAngularMomentum() {
   // GM_SUN is in km³/s², lengthofAU is in km
   // Including Pluto as per Souami & Souchay (2012) who used N=10 body system
   const planetConfigs = [
-    { key: 'mercury', mass: M_MERCURY, a: mercuryOrbitDistance, e: planets.mercury.orbitalEccentricityBase, i: planets.mercury.eclipticInclinationJ2000, node: planets.mercury.ascendingNode },
-    { key: 'venus',   mass: M_VENUS,   a: venusOrbitDistance,   e: planets.venus.orbitalEccentricityBase,   i: planets.venus.eclipticInclinationJ2000,   node: planets.venus.ascendingNode },
-    { key: 'earth',   mass: M_EARTH,   a: 1.0,                  e: o.eccentricityEarth,        i: 0,                         node: 0 },
-    { key: 'mars',    mass: M_MARS,    a: marsOrbitDistance,    e: planets.mars.orbitalEccentricityBase,    i: planets.mars.eclipticInclinationJ2000,    node: planets.mars.ascendingNode },
-    { key: 'jupiter', mass: M_JUPITER, a: jupiterOrbitDistance, e: planets.jupiter.orbitalEccentricityBase, i: planets.jupiter.eclipticInclinationJ2000, node: planets.jupiter.ascendingNode },
-    { key: 'saturn',  mass: M_SATURN,  a: saturnOrbitDistance,  e: planets.saturn.orbitalEccentricityBase,  i: planets.saturn.eclipticInclinationJ2000,  node: planets.saturn.ascendingNode },
-    { key: 'uranus',  mass: M_URANUS,  a: uranusOrbitDistance,  e: planets.uranus.orbitalEccentricityBase,  i: planets.uranus.eclipticInclinationJ2000,  node: planets.uranus.ascendingNode },
-    { key: 'neptune', mass: M_NEPTUNE, a: neptuneOrbitDistance, e: planets.neptune.orbitalEccentricityBase, i: planets.neptune.eclipticInclinationJ2000, node: planets.neptune.ascendingNode },
-    { key: 'pluto',   mass: M_PLUTO,   a: plutoOrbitDistance,   e: planets.pluto.orbitalEccentricityBase,   i: planets.pluto.eclipticInclinationJ2000,   node: planets.pluto.ascendingNode },
+    { key: 'mercury', mass: M_MERCURY_SYSTEM, a: mercuryOrbitDistance, e: planets.mercury.orbitalEccentricityBase, i: planets.mercury.eclipticInclinationJ2000, node: planets.mercury.ascendingNode },
+    { key: 'venus',   mass: M_VENUS_SYSTEM,   a: venusOrbitDistance,   e: planets.venus.orbitalEccentricityBase,   i: planets.venus.eclipticInclinationJ2000,   node: planets.venus.ascendingNode },
+    { key: 'earth',   mass: M_EARTH_ALONE,   a: 1.0,                  e: o.eccentricityEarth,        i: 0,                         node: 0 },
+    { key: 'mars',    mass: M_MARS_SYSTEM,    a: marsOrbitDistance,    e: planets.mars.orbitalEccentricityBase,    i: planets.mars.eclipticInclinationJ2000,    node: planets.mars.ascendingNode },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM, a: jupiterOrbitDistance, e: planets.jupiter.orbitalEccentricityBase, i: planets.jupiter.eclipticInclinationJ2000, node: planets.jupiter.ascendingNode },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM,  a: saturnOrbitDistance,  e: planets.saturn.orbitalEccentricityBase,  i: planets.saturn.eclipticInclinationJ2000,  node: planets.saturn.ascendingNode },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM,  a: uranusOrbitDistance,  e: planets.uranus.orbitalEccentricityBase,  i: planets.uranus.eclipticInclinationJ2000,  node: planets.uranus.ascendingNode },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM, a: neptuneOrbitDistance, e: planets.neptune.orbitalEccentricityBase, i: planets.neptune.eclipticInclinationJ2000, node: planets.neptune.ascendingNode },
+    { key: 'pluto',   mass: M_PLUTO_SYSTEM,   a: plutoOrbitDistance,   e: planets.pluto.orbitalEccentricityBase,   i: planets.pluto.eclipticInclinationJ2000,   node: planets.pluto.ascendingNode },
     // Including Ceres as per Souami & Souchay (2012) who used N=10 body system
     { key: 'ceres',   mass: M_CERES,   a: planets.ceres.orbitDistance,   e: planets.ceres.orbitalEccentricityBase,   i: planets.ceres.eclipticInclinationJ2000,   node: planets.ceres.ascendingNode }
   ];

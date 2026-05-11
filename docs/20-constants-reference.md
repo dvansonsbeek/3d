@@ -633,7 +633,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Eccentricity | `orbitalEccentricityBase` | 0.2488273 | JPL Horizons |
 | Long. Perihelion | `longitudePerihelion` | 224.06891 deg | JPL Horizons |
 | Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | 136,045,556 | DE440 |
-| GM | `GM_PLUTO` | ~975.5 km³/s² | Derived from Charon orbit |
+| GM | `GM_PLUTO_ALONE` | ~870 km³/s² | Pluto alone (matches Wikipedia / DE440 BODY999). System value ~975.5 km³/s² also stored as `GM_PLUTO_SYSTEM`. |
 
 ### Halley's Comet
 

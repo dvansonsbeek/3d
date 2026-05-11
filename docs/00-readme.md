@@ -59,6 +59,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 22 | [Coordinate Frames](22-coordinate-frames.md) | ICRF, ecliptic, equatorial, and invariable plane transformations |
 | 23 | [Verification Data Reference](23-verification-data-reference.md) | Astronomical verification data: transits, oppositions, conjunctions |
 | 24 | [Moon Kepler Derivation](24-moon-kepler-derivation.md) | The Δa correction for deriving GM_Earth/GM_Moon from the Moon's orbit |
+| 25 | [Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) | Generalization of doc 24's Δa to all moon-bearing planets — Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto |
 
 ### 30–39 Calculations & Implementations
 
