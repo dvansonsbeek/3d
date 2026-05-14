@@ -123,6 +123,18 @@ npm run build
 
 ---
 
+## Related Findings — Mass Calibration Chain
+
+The model's gravitational parameters (`GM_Sun`, `GM_Earth`, `GM_Moon`, `GM_planet`) are computed from a self-consistent chain rather than copied from a reference table. The chain re-parameterizes classical 19th–20th century perturbation results (Hill 1878, Brown 1908, Brouwer 1959) into compact closed forms and verifies the synthesis against JPL DE440 reference data. The physics is classical; the contribution is **synthesis and presentation**:
+
+- **[Doc 24 — Moon Kepler Derivation](docs/24-moon-kepler-derivation.md)** — Re-parameterizes Hill-Brown's solar perturbation on the lunar orbit as `Δa = a_M·μ·m` (barycentric wobble × phase-fraction). Reproduces the textbook 384,748 km Kepler-effective Moon distance from the geometric LLR value (384,399 km), giving `GM_Earth` to 3.7 ppm vs DE440 — the precision floor of any Kepler-from-Moon-orbit derivation
+- **[Doc 25 — Universal Mass-from-Moon Formula](docs/25-universal-mass-from-moon-formula.md)** — Packages three classical terms (Newton's two-body Kepler + Hill-Brown's solar perturbation + Brouwer's J2 oblateness) as a single closed-form formula and verifies it against 22 moons of 7 planets. Matches DE440 to 3–340 ppm — a synthesis demonstration, not a new physical law
+- **[Doc 26 — Universal Sun-side Δa Formula](docs/26-universal-sun-side-delta-a.md)** — An algebraic identity: the symmetric `Δa = a·(1 − ((μ_S+μ_E−μ_b)/(μ_S+μ_E))^(1/3))` makes the elaborate two-body Kepler form algebraically identical to the simple `T = 2π·√(a³/(μ_S+μ_E))` for every planet. Useful as a conceptual lens; the model uses the simple form
+
+These are calibration findings, not Fibonacci Laws, and not improvements on Newton. The physics is fully classical; the contribution is pedagogical — cleaner notation, a closed-form derivation of a textbook value, and a unified-formula demonstration across all moon-bearing planets in DE440. Suitable for an undergraduate astrodynamics or physics-education context.
+
+---
+
 ## Documentation
 
 Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, organized by category:

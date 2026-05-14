@@ -3882,25 +3882,36 @@ const OrbitalFormulas = {
   // Kepler's 3rd Law: Orbital period from semi-major axis
   // P = 2π√(a³/GM) - returns days
   //
+  // Default GM is GM_SUN_PLUS_EARTH — the SYSTEM gravitational parameter that
+  // anchors the model's AU via 4π²·meanAU³ = (GM_Sun + GM_Earth_alone)·sidYearSec².
+  // Using the system mass for every planet makes Kepler verification exact.
+  //
+  // Algebraic identity (see doc 26): this simple form is identically equal to
+  // the elaborate two-body Kepler formula
+  //   T = 2π · √( (a − Δa)³ / (GM_Sun + GM_Earth − GM_body) )
+  // when Δa = a · (1 − ((μ_S + μ_E − μ_b)/(μ_S + μ_E))^(1/3)).
+  // The (a−Δa)³ numerator and (GM_sys − GM_body) denominator cancel by
+  // construction. No Δa is computed here; the simple form captures the same
+  // physics in one line.
+  //
   // By default a year-frame compensation factor (solar/sidereal) is applied
   // to reconcile the model's dual year-frame chain:
-  //   - GM_SUN is derived using the sidereal year (4π²·meanAU³/sidYearSec²)
+  //   - GM_SUN_PLUS_EARTH is derived using the sidereal year (4π²·meanAU³/sidYearSec²)
   //   - Planet orbit distances are derived using the solar year (via H-cycle ratios)
   // Without this factor, every planet's T_kepler would be sid/solar ≈ 1.0000388
   // times its actual input period — the residual T/(T-T_solar) ≈ H/13 (Earth's
   // precession period) would appear uniformly. The compensation hides this
   // dual-frame artifact so verification reads as expected.
   //
-  // Set applyYearCompensation = false to disable compensation. This is correct
-  // for Earth's heliocentric Kepler verification: Earth IS the year reference,
-  // so the verification should match the sidereal year directly using the
-  // two-body GM (GM_SUN + GM_EARTH_SYSTEM).
-  keplerPeriod: (a_km, GM = GM_SUN, applyYearCompensation = true) => {
+  // Every planet (including Earth) uses the compensation so all verifications
+  // sit in the same solar-year frame. Set applyYearCompensation = false only
+  // when the bare sidereal year is wanted explicitly.
+  keplerPeriod: (a_km, GM = GM_SUN_PLUS_EARTH, applyYearCompensation = true) => {
     const P_seconds = 2 * Math.PI * Math.sqrt(Math.pow(a_km, 3) / GM);
     const compensation = applyYearCompensation
       ? (meansolaryearlengthinDays / meansiderealyearlengthinDays)
       : 1;
-    return (P_seconds / o.lengthofDay) * compensation;
+    return (P_seconds / meanlengthofday) * compensation;
   },
 
   // Hill Sphere Radius (km)
@@ -35719,8 +35730,8 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.meanMotion(o.lengthofsolarYear), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Mean angular motion: n = 360°/P. Rate at which mean anomaly increases`]},
       {label : () => `Period (Kepler verification)`,
-       value : [ { v: () => OrbitalFormulas.keplerPeriod(o.lengthofAU, GM_SUN_PLUS_EARTH, false), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)). Earth is the year reference, so this uses the two-body GM that defined the sidereal year (GM_SUN_PLUS_EARTH = GM_Sun + GM_Earth-alone) and skips the solar/sidereal compensation that other planets need. Result matches the sidereal year (~365.25636 days) exactly by construction.`]},
+       value : [ { v: () => OrbitalFormulas.keplerPeriod(o.lengthofAU, GM_SUN_PLUS_EARTH), dec:6, sep:',' },{ small: 'days' }],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal). Same formula every planet uses; result is the mean solar year (~365.2422 days). The bare sidereal year (~365.25636) is shown above. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/GM_Sun) with Earth's Δa = 149.77 km (see doc 24 and doc 26) — both forms collapse to the same number because μ_body = μ_Earth cancels in the denominator.`]},
     null,
       {label : () => `Length of Day`,
        value : [ { v: () => o.lengthofDay/86400*24, dec:6, sep:',' }, { small : 'hours' }],
@@ -36664,7 +36675,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(mercuryOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37055,7 +37066,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(venusOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37419,7 +37430,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(marsOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -37783,7 +37794,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(jupiterOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -38146,7 +38157,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(saturnOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -38510,7 +38521,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(uranusOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -38874,7 +38885,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(neptuneOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39239,7 +39250,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(plutoOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39581,7 +39592,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(halleysOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,
@@ -39909,7 +39920,7 @@ const planetStats = {
        static: true},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(erosOrbitDistance * o.lengthofAU), dec:6, sep:',' },{ small: 'days' }],
-       hover : [`Kepler's 3rd Law: P = 2π√(a³/GM_Sun) × (solar/sidereal year). The compensation factor (~1.0000388 reciprocal) reconciles the model's dual year-frame chain: GM_Sun uses sidereal year, orbit distances use solar year via H-cycle ratios. Without it, every planet's T_kepler would be uniformly sid/solar times its solar-year input — the residual ratio T/(T-T_solar) = H/13 = Earth's precession period. With compensation, T_kepler matches the planet's solar-year input directly.`],
+       hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 26). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via H-cycle ratios.`],
        static: true},
     null,
       {label : () => `Length of Day`,

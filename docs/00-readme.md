@@ -60,6 +60,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 23 | [Verification Data Reference](23-verification-data-reference.md) | Astronomical verification data: transits, oppositions, conjunctions |
 | 24 | [Moon Kepler Derivation](24-moon-kepler-derivation.md) | The Δa correction for deriving GM_Earth/GM_Moon from the Moon's orbit |
 | 25 | [Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) | Generalization of doc 24's Δa to all moon-bearing planets — Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto |
+| 26 | [Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) | Sun-side mirror of doc 25: exact symmetric Δa for deriving T_planet from heliocentric a — generalizes doc 24's Earth-only Δa = 149.77 km to every planet |
 
 ### 30–39 Calculations & Implementations
 

@@ -6,6 +6,7 @@ This document describes how the model derives `GM_Earth` and `GM_Moon` from the 
 - [20 — Constants Reference](20-constants-reference.md) — canonical mass / GM values
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass table
 - [25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — generalizes this Δa correction to every moon-bearing planet (Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto)
+- [26 — Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) — generalizes the Sun-side Δa = −149.77 km below to every planet, with the exact symmetric form
 - Code: [src/script.js §E2a](../src/script.js) and [tools/lib/constants.js §9](../tools/lib/constants.js) (search `moonOrbitalShift`)
 
 ---
@@ -170,11 +171,13 @@ So the Kepler-correction picture for both bodies is **symmetric but opposite in 
 | **Moon** (deriving GM_Earth+Moon **system**) | 384,399.07 km | 384,748.44 km | **+349.37 km** | ADD a moon's contribution |
 | **Earth/Sun** (deriving GM_Sun **alone**) | 149,597,870.70 km (1 AU) | 149,597,720.93 km | **−149.77 km** | SUBTRACT Earth's contribution |
 
-The quick-derivation formula `Δa ≈ a / (3 × mass_ratio)` works in both cases:
-- For Moon: `Δa ≈ a_M / (3 × Sun/(EMB·something))` — actually `Δa_Moon = a·μ·m` is the structural form (see §The Δa Correction); the `3·μ·m` factor in GM matches the `Δa/a` factor at first order
-- For Sun: `Δa_Sun-side = AU / (3 × M_Sun/M_Earth)` = AU / (3 × Sun/Earth ratio) ≈ AU × Earth-mass-fraction / 3
+The two derivations use structurally different forms:
+- **Moon-side**: `Δa = a_M · μ · m` — see §The Δa Correction above for the geometric/period interpretation (planet's barycentric wobble × phase-fraction during one lunar month)
+- **Sun-side**: `Δa = AU / (3 × M_Sun/M_Earth)` ≈ `AU × M_Earth/(3·M_Sun)` — Earth's distance times one-third of its mass fraction in the Sun-Earth system
 
 In the code, the Sun-side correction is done at the GM level (subtraction), not at the AU level. The 149.77 km AU-equivalent is purely conceptual — useful for understanding the structural symmetry with the Moon-side derivation.
+
+The −149.77 km value above uses the **asymmetric** `Δa = AU/(3·M_Sun/M_Earth)` form. There is also a fully-symmetric form `Δa = a · (1 − ((μ_S + μ_E − μ_b)/(μ_S + μ_E))^(1/3))` that generalizes to every planet and makes the elaborate two-body Kepler formula algebraically identical to the simple `T = 2π·√(a³/(μ_S + μ_E))` — exact, not approximate. For Earth specifically the two forms **coincide** at 149.77 km because `μ_b = μ_E` cancels the asymmetry. For Jupiter–Neptune they diverge by tens to hundreds of km, which is the source of the ~0.5 sec residual when using the asymmetric form for those planets. See [doc 26](26-universal-sun-side-delta-a.md) for the per-planet table and full derivation.
 
 ## External Corroboration of the 384,748 km Value
 

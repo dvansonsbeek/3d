@@ -4,6 +4,7 @@ This document generalizes doc 24's Δa correction to a single closed-form formul
 
 **Related documents:**
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) — the Earth-Moon-Sun case (this doc generalizes it)
+- [26 — Universal Sun-side Δa Formula](26-universal-sun-side-delta-a.md) — the Sun-side mirror of this document: derives `T_planet` from `a_planet` for every planet using the exact symmetric Δa
 - [20 — Constants Reference §1.3 DE440 Sun/Planet Mass Ratios](20-constants-reference.md) — current mass-ratio table
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass table
 
@@ -149,7 +150,7 @@ Corrected formula matches DE440 to **3.7 ppm**. The 2,727 ppm shift between bare
 
 **Triton corrected:** 19,412.31 — matches DE440 to **4 ppm**. Nereid sits 200 ppm high, consistent with its highly eccentric (e ≈ 0.75) and inclined orbit being less precisely determined.
 
-### Pluto (1 moon) — DE440 Sun/System ratio: **136,045,556**
+### Pluto (Charon) — DE440 Sun/System ratio: **136,045,556**
 
 | Moon | a (km) | T (d) | bare ratio | corrected ratio | solar ppm | J2 ppm |
 |---|---|---|---|---|---|---|
@@ -215,7 +216,7 @@ For planets with multiple moons, each moon's Kepler derivation yields a slightly
 | Uranus (5 majors) | 22,895.67 – 22,903.77 | 22,905.343 | 354 ppm |
 | Neptune (2 moons) | 19,416.35 – 19,420.19 | 19,416.299 | 197 ppm (Nereid noisy) |
 
-Earth and Pluto have a single moon each, so their planet-alone values are **single numbers, not ranges** (332,944.79 and 152,617,440 respectively).
+Earth has a single moon, and only Pluto's Charon is precise enough to use in this analysis (the four smaller Plutonian moons — Nix, Hydra, Kerberos, Styx — have poorly-determined elements), so their planet-alone values are **single numbers, not ranges** (332,944.79 and 152,617,440 respectively).
 
 For multi-moon planets, the **best moon** of each system (closest to DE440 — typically a large outer satellite like Callisto, Titan, Titania, Triton) is the recommended choice for a single representative value. Averaging across all moons biases toward the noisier inner-moon measurements where J2 corrections are largest.
 
