@@ -230,6 +230,8 @@ JPL DE440 sidesteps this entirely by **fitting** `GM_Earth` from artificial-sate
 
 ## Summary
 
+**Headline:** The model derives `GM_Earth` and `GM_Moon` to ~4 ppm and `GM_Sun` to 0.07 ppm against JPL DE440. These residuals sit at the precision floor of Kepler-from-Moon-orbit derivations (Hill-Brown m⁴-and-beyond terms), and fall inside the ~22 ppm uncertainty in `G` that bounds any mass-in-kg statement.
+
 The `Δa = a_M · μ · m` correction:
 
 1. **Uses only natural orbital quantities** of the Earth-Moon-Sun system (Moon's distance, Moon/Earth mass ratio, Moon/Sun period ratio)
