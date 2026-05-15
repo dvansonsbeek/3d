@@ -36584,8 +36584,30 @@ const planetStats = {
        value : [ { small:{ v: () => 9192631770/ 86400*meanlengthofday, dec:0, sep:',' }},{ small: 'transitions' }],
        hover : [`A NEW-SI second is 9,192,631,770/86,400*${fmtNum(meanlengthofday,8,',')} periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the caesium-133 atom`],
        static: true},
+
+    {header : '—  Sun-SSB Barycentric Motion —' },
+      {label : () => `Sun-SSB offset`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude, dec:0, sep:',' },{ small: 'km' }],
+       hover : [`Distance from the Sun's center to the Solar System Barycenter (SSB) at the current simulated date. The SSB is the mass-weighted average position of every body in the solar system. Computed as Σ M_b · r_b / M_S where the sum runs over all planets. Maximum ≈ 2.2 R☉ when planets align (Jose 1965). Jupiter+Saturn dominate. This is a center-of-mass calculation, not a gravity simulation. See doc 26 §"Mirror Diagram" and the README's "Mass Calibration Chain" section.`]},
+      {label : () => `In solar radii`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude / (diameters.sunDiameter / 2), dec:3, sep:',' },{ small: 'R☉' }],
+       hover : [`Sun-SSB distance in units of solar radius (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Values < 1 mean SSB sits inside the Sun; > 1 means outside. The Sun's surface passes near or outside the SSB roughly every Jupiter-Saturn synodic period (~20 years).`]},
+      {label : () => `Direction (ecliptic λ)`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).direction, dec:2, sep:',' },{ small: '°' }],
+       hover : [`Heliocentric ecliptic longitude pointing from Sun toward SSB. This is roughly the angular position of the dominant pulling planet (usually Jupiter).`]},
+      {label : () => `Inside Sun?`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude < (diameters.sunDiameter / 2) ? 'Yes' : 'No' }],
+       hover : [`Whether the SSB currently lies inside the Sun's body (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Famously sometimes outside — e.g., when Jupiter and Saturn align around 1990, 2000-2002, 2017-2018.`]},
+      {label : () => `Dominant planet`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).dominantPlanet }],
+       hover : [`Planet contributing the largest fraction of the SSB displacement at this moment. Jupiter dominates ~99% of the time; Saturn can occasionally rival it during specific Jupiter-Saturn configurations.`]},
+      {label : () => `Dominant share`,
+       value : [ { v: () => computeSunSSBOffset(o.currentYear).dominantShare, dec:1, sep:',' },{ small: '%' }],
+       hover : [`Percentage of total SSB-contribution magnitude coming from the dominant planet alone.`]},
+    null,
+      { viz: 'sun-ssb-trajectory' },
     ],
-    
+
     mercury: [
     {header : '—  General Characteristics —' },
       {label : () => `Size diameter`,
@@ -40195,6 +40217,7 @@ const TAB_CONFIG = {
     'Our Milky Way is orbiting the Great Attractor':        -1,
     'The age of the universe':                               0,
     'New Constants which can be used for long term calculations': -1,
+    'Sun-SSB Barycentric Motion':    3,
   },
   moonHeaderMap: {
     'General Characteristics':       0,
@@ -40302,6 +40325,263 @@ function autoOpenGroups(stats, selName, threshold = 25) {
  *  • Column widths frozen per-planet per-tab
  * ──────────────────────────────────────────────────────────────────────────
  */
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  Sun-SSB barycentric offset & trajectory chart
+ *
+ *  The Sun's offset from the Solar System Barycenter (SSB) is the vector sum
+ *  of each planet's contribution: Δr_b = a_b · M_b / M_S (toward the planet).
+ *  Each planet contributes 3·Δa (where Δa is the Sun-side correction from
+ *  doc 26). Jupiter and Saturn dominate; outer planets matter a little; inner
+ *  planets are negligible (<100 km vs Jupiter's ~743,000 km).
+ *
+ *  This is NOT a gravity simulation — it's a mass-weighted vector sum from
+ *  analytical mean orbital motions. See doc 26 and the README's Mass
+ *  Calibration Chain section for the derivation.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function computeSunSSBOffset(year) {
+  // 3D mass-weighted SSB offset (x, y, z in km from Sun's center).
+  // Reference plane: INVARIABLE PLANE — consistent with the model's Fibonacci
+  // balance framework (Law 3 uses inv-plane inclinations). The invariable
+  // plane is tilted ~1.58° from the ecliptic and is the weighted-mean orbital
+  // plane of all planets — so each planet sits closer to it than to the
+  // ecliptic. SSB z-amplitude in this frame is ~±15,000 km (vs ~±35,000 km
+  // in the ecliptic frame).
+  // Uses each planet's existing model anchors:
+  //   - longitudePerihelion + meanAnomaly  → mean longitude at MODEL EPOCH
+  //   - invPlaneInclinationJ2000           → inclination to invariable plane
+  //   - ascendingNodeInvPlane              → longitude of ascending node (inv plane)
+  //   - <planet>OrbitDistance × meanAUDistance → semi-major axis in km
+  //   - H / <planet>SolarYearCount          → orbital period in solar years
+  // Earth has no `planets.earth` object — derive from ASTRO_REFERENCE and
+  // earthAscendingNodeInvPlaneVerified (Souami & Souchay 2012).
+  const modelEpochYr = julianDateToDecimalYear(startmodelJD);
+  const dt = year - modelEpochYr;
+  const DEG = Math.PI / 180;
+
+  // Earth's mean longitude at model epoch from perihelion-passage anchor.
+  const earthMeanAnom_modelEpoch = (360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360;
+  const earthL_modelEpoch = ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + earthMeanAnom_modelEpoch;
+
+  const planetList = [
+    { key: 'mercury', mass: M_MERCURY_SYSTEM, a_km: mercuryOrbitDistance * meanAUDistance, periodYr: holisticyearLength / mercurySolarYearCount, L0: planets.mercury.longitudePerihelion + planets.mercury.meanAnomaly, i: planets.mercury.invPlaneInclinationJ2000, Omega: planets.mercury.ascendingNodeInvPlane },
+    { key: 'venus',   mass: M_VENUS_SYSTEM,   a_km: venusOrbitDistance   * meanAUDistance, periodYr: holisticyearLength / venusSolarYearCount,   L0: planets.venus.longitudePerihelion   + planets.venus.meanAnomaly,   i: planets.venus.invPlaneInclinationJ2000,   Omega: planets.venus.ascendingNodeInvPlane   },
+    { key: 'earth',   mass: M_EARTH_SYSTEM,   a_km: meanAUDistance,                         periodYr: 1,                                                  L0: earthL_modelEpoch,                                            i: ASTRO_REFERENCE.earthInclinationJ2000_deg,  Omega: earthAscendingNodeInvPlaneVerified },
+    { key: 'mars',    mass: M_MARS_SYSTEM,    a_km: marsOrbitDistance    * meanAUDistance, periodYr: holisticyearLength / marsSolarYearCount,    L0: planets.mars.longitudePerihelion    + planets.mars.meanAnomaly,    i: planets.mars.invPlaneInclinationJ2000,    Omega: planets.mars.ascendingNodeInvPlane    },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM, a_km: jupiterOrbitDistance * meanAUDistance, periodYr: holisticyearLength / jupiterSolarYearCount, L0: planets.jupiter.longitudePerihelion + planets.jupiter.meanAnomaly, i: planets.jupiter.invPlaneInclinationJ2000, Omega: planets.jupiter.ascendingNodeInvPlane },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM,  a_km: saturnOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / saturnSolarYearCount,  L0: planets.saturn.longitudePerihelion  + planets.saturn.meanAnomaly,  i: planets.saturn.invPlaneInclinationJ2000,  Omega: planets.saturn.ascendingNodeInvPlane  },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM,  a_km: uranusOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / uranusSolarYearCount,  L0: planets.uranus.longitudePerihelion  + planets.uranus.meanAnomaly,  i: planets.uranus.invPlaneInclinationJ2000,  Omega: planets.uranus.ascendingNodeInvPlane  },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM, a_km: neptuneOrbitDistance * meanAUDistance, periodYr: holisticyearLength / neptuneSolarYearCount, L0: planets.neptune.longitudePerihelion + planets.neptune.meanAnomaly, i: planets.neptune.invPlaneInclinationJ2000, Omega: planets.neptune.ascendingNodeInvPlane },
+  ];
+
+  let x = 0, y = 0, z = 0;
+  const contributions = {};
+
+  for (const p of planetList) {
+    const L = (p.L0 + 360 * dt / p.periodYr) * DEG;
+    const Om = p.Omega * DEG;
+    const ii = p.i * DEG;
+    const argLat = L - Om;
+    // 3D heliocentric position in ecliptic frame
+    const dx_planet = p.a_km * (Math.cos(Om) * Math.cos(argLat) - Math.sin(Om) * Math.sin(argLat) * Math.cos(ii));
+    const dy_planet = p.a_km * (Math.sin(Om) * Math.cos(argLat) + Math.cos(Om) * Math.sin(argLat) * Math.cos(ii));
+    const dz_planet = p.a_km * Math.sin(argLat) * Math.sin(ii);
+    // Sun-SSB contribution
+    const scale = p.mass / M_SUN;
+    const cx = dx_planet * scale;
+    const cy = dy_planet * scale;
+    const cz = dz_planet * scale;
+    x += cx;  y += cy;  z += cz;
+    contributions[p.key] = Math.sqrt(cx * cx + cy * cy + cz * cz);
+  }
+
+  const magnitude = Math.sqrt(x * x + y * y + z * z);
+  let direction = Math.atan2(y, x) * 180 / Math.PI;
+  if (direction < 0) direction += 360;
+
+  // Find dominant planet
+  let dominantKey = 'jupiter', dominantContrib = 0;
+  for (const [k, v] of Object.entries(contributions)) {
+    if (v > dominantContrib) { dominantContrib = v; dominantKey = k; }
+  }
+  const totalContrib = Object.values(contributions).reduce((s, v) => s + v, 0);
+
+  return {
+    x, y, z, magnitude, direction,
+    contributions,
+    dominantPlanet: dominantKey.charAt(0).toUpperCase() + dominantKey.slice(1),
+    dominantShare: totalContrib > 0 ? (dominantContrib / totalContrib) * 100 : 0,
+  };
+}
+
+function buildSunSSBChart(currentYear) {
+  const R_SUN_KM = diameters.sunDiameter / 2;
+  const halfRange = 25;
+  const samples = 200;
+  const points = [];
+
+  // Fixed chart scale — physically maximum possible SSB excursion (all planets
+  // aligned). Computed once from the model's mass ratios and inv-plane data so
+  // the chart never zooms in/out as the time window slides.
+  // Max R: Σ a_b · M_b / M_Sun  ;  Max |z|: Σ a_b · sin(i_b) · M_b / M_Sun
+  const planetMaxData = [
+    { a_km: mercuryOrbitDistance * meanAUDistance, m: M_MERCURY_SYSTEM, i_deg: planets.mercury.invPlaneInclinationJ2000 },
+    { a_km: venusOrbitDistance   * meanAUDistance, m: M_VENUS_SYSTEM,   i_deg: planets.venus.invPlaneInclinationJ2000   },
+    { a_km: meanAUDistance,                         m: M_EARTH_SYSTEM,   i_deg: ASTRO_REFERENCE.earthInclinationJ2000_deg },
+    { a_km: marsOrbitDistance    * meanAUDistance, m: M_MARS_SYSTEM,    i_deg: planets.mars.invPlaneInclinationJ2000    },
+    { a_km: jupiterOrbitDistance * meanAUDistance, m: M_JUPITER_SYSTEM, i_deg: planets.jupiter.invPlaneInclinationJ2000 },
+    { a_km: saturnOrbitDistance  * meanAUDistance, m: M_SATURN_SYSTEM,  i_deg: planets.saturn.invPlaneInclinationJ2000  },
+    { a_km: uranusOrbitDistance  * meanAUDistance, m: M_URANUS_SYSTEM,  i_deg: planets.uranus.invPlaneInclinationJ2000  },
+    { a_km: neptuneOrbitDistance * meanAUDistance, m: M_NEPTUNE_SYSTEM, i_deg: planets.neptune.invPlaneInclinationJ2000 },
+  ];
+  let maxR = 0, maxAbsZ = 0;
+  for (const p of planetMaxData) {
+    maxR += p.a_km * (p.m / M_SUN);
+    maxAbsZ += p.a_km * Math.sin(p.i_deg * Math.PI / 180) * (p.m / M_SUN);
+  }
+  // Padding so trajectory never touches chart edge; ensure Sun is always visible
+  const scale = Math.max(maxR * 1.1, R_SUN_KM * 1.4);
+
+  for (let i = 0; i <= samples; i++) {
+    const year = currentYear - halfRange + (2 * halfRange) * (i / samples);
+    const ssb = computeSunSSBOffset(year);
+    points.push({ year, x: ssb.x, y: ssb.y, z: ssb.z, mag: ssb.magnitude });
+  }
+
+  // SVG dimensions (380 — larger than before)
+  const W = 380, Ht = 380;
+  const cx = W / 2, cy = Ht / 2;
+  const radiusPx = Math.min(W, Ht) * 0.42;
+  const sunRadiusPx = radiusPx * (R_SUN_KM / scale);
+  const toPx = (kx, ky) => [cx + kx / scale * radiusPx, cy - ky / scale * radiusPx];
+
+  // z → color: blue (below inv plane) → white → red (above) — RdBu diverging
+  // Classic scientific convention used in solar/plasma/climate physics.
+  const zColor = (z) => {
+    const t = Math.max(-1, Math.min(1, z / maxAbsZ));  // -1..+1
+    if (t >= 0) {
+      // 0 → white, +1 → red
+      const r = 255, g = Math.round(255 - 195 * t), b = Math.round(255 - 195 * t);
+      return `rgb(${r},${g},${b})`;
+    } else {
+      // 0 → white, -1 → blue
+      const a = -t;
+      const r = Math.round(255 - 195 * a), g = Math.round(255 - 195 * a), b = 255;
+      return `rgb(${r},${g},${b})`;
+    }
+  };
+
+  // Build trajectory as individual segments (color per segment, click/hover per segment)
+  let segments = '';
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1], b = points[i];
+    const [ax, ay] = toPx(a.x, a.y);
+    const [bx, by] = toPx(b.x, b.y);
+    const insideSun = (a.mag < R_SUN_KM) && (b.mag < R_SUN_KM);
+    const color = zColor((a.z + b.z) / 2);
+    const sw = insideSun ? 3 : 1.6;
+    const yrLabel = b.year.toFixed(2);
+    const magKm = Math.round(b.mag).toLocaleString();
+    const zKm = Math.round(b.z).toLocaleString();
+    const insideTxt = insideSun ? ' (inside Sun)' : '';
+    segments += `<line x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"><title>Year ${yrLabel}: ${magKm} km (z=${zKm} km)${insideTxt}</title></line>`;
+  }
+
+  const current = computeSunSSBOffset(currentYear);
+  const [curPx, curPy] = toPx(current.x, current.y);
+  const insideSunNow = current.magnitude < R_SUN_KM;
+
+  // Year ticks at ±25, ±12.5, 0 (5 markers)
+  let ticks = '';
+  for (const frac of [0, 0.25, 0.5, 0.75, 1]) {
+    const yr = currentYear - halfRange + 2 * halfRange * frac;
+    const idx = Math.floor(frac * samples);
+    if (idx < points.length) {
+      const [tx, ty] = toPx(points[idx].x, points[idx].y);
+      ticks += `<circle cx="${tx.toFixed(1)}" cy="${ty.toFixed(1)}" r="2.5" fill="rgba(255,255,255,0.85)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>`;
+      // Place label offset radially outward from sun center
+      const dxL = tx - cx, dyL = ty - cy, lenL = Math.sqrt(dxL * dxL + dyL * dyL) || 1;
+      const lx = tx + (dxL / lenL) * 12;
+      const ly = ty + (dyL / lenL) * 12;
+      ticks += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="rgba(255,255,255,0.85)" font-size="10" text-anchor="middle" dominant-baseline="middle" style="paint-order:stroke;stroke:rgba(0,0,0,0.7);stroke-width:2.5;">${Math.round(yr)}</text>`;
+    }
+  }
+
+  // Arrow markers showing time direction (start = past, end = future)
+  const [p0x, p0y] = toPx(points[0].x, points[0].y);
+  const [pNx, pNy] = toPx(points[points.length - 1].x, points[points.length - 1].y);
+  const [p1x, p1y] = toPx(points[1].x, points[1].y);
+  const [pN1x, pN1y] = toPx(points[points.length - 2].x, points[points.length - 2].y);
+
+  const arrowMarker = `<defs>
+    <marker id="ssbStart" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="8" markerHeight="8" orient="auto">
+      <circle cx="4" cy="4" r="3" fill="rgba(100,140,200,0.9)" stroke="white" stroke-width="0.6"/>
+    </marker>
+    <marker id="ssbEnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,180,100,0.95)" stroke="white" stroke-width="0.6"/>
+    </marker>
+  </defs>`;
+
+  // Background dashed mini-lines for arrow placement (invisible — used only to host markers)
+  const dirCues = `
+    <line x1="${p0x.toFixed(1)}" y1="${p0y.toFixed(1)}" x2="${p1x.toFixed(1)}" y2="${p1y.toFixed(1)}" stroke="transparent" marker-start="url(#ssbStart)"/>
+    <line x1="${pN1x.toFixed(1)}" y1="${pN1y.toFixed(1)}" x2="${pNx.toFixed(1)}" y2="${pNy.toFixed(1)}" stroke="transparent" marker-end="url(#ssbEnd)"/>
+  `;
+
+  // z-color legend (top-right, always visible)
+  const legendW = 88, legendH = 8;
+  const legendX = W - legendW - 12, legendY = 44;
+  let legend = `<text x="${legendX + legendW / 2}" y="${legendY - 4}" fill="rgba(255,255,255,0.7)" font-size="8" text-anchor="middle">z (inv plane)</text>`;
+  legend += `<rect x="${legendX}" y="${legendY}" width="${legendW}" height="${legendH}" fill="url(#ssbZGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>`;
+  legend += `<text x="${legendX - 4}" y="${legendY + legendH - 1}" fill="rgba(100,140,255,0.95)" font-size="8" text-anchor="end">below</text>`;
+  legend += `<text x="${legendX + legendW + 4}" y="${legendY + legendH - 1}" fill="rgba(255,90,90,0.95)" font-size="8">above</text>`;
+  legend += `<text x="${legendX + legendW / 2}" y="${legendY + legendH + 10}" fill="rgba(255,255,255,0.55)" font-size="8" text-anchor="middle">±${Math.round(maxAbsZ).toLocaleString()} km</text>`;
+
+  return `<div class="pl-viz-row" style="grid-column:1/-1; padding:8px 4px; display:flex; justify-content:center;">
+    <svg viewBox="0 0 ${W} ${Ht}" style="display:block; width:100%; max-width:400px;">
+      ${arrowMarker}
+      <defs>
+        <linearGradient id="ssbZGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"  stop-color="rgb(60,60,255)"/>
+          <stop offset="50%" stop-color="rgb(255,255,255)"/>
+          <stop offset="100%" stop-color="rgb(255,60,60)"/>
+        </linearGradient>
+        <radialGradient id="ssbSunBody" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="rgb(255,250,220)"/>
+          <stop offset="60%"  stop-color="rgb(255,210,90)"/>
+          <stop offset="100%" stop-color="rgb(255,160,40)"/>
+        </radialGradient>
+        <radialGradient id="ssbSunHalo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="rgba(255,220,120,0.55)"/>
+          <stop offset="50%"  stop-color="rgba(255,180,60,0.18)"/>
+          <stop offset="100%" stop-color="rgba(255,150,40,0)"/>
+        </radialGradient>
+      </defs>
+      <!-- Sun: outer halo + body with radial gradient -->
+      <circle cx="${cx}" cy="${cy}" r="${(sunRadiusPx * 2.2).toFixed(1)}" fill="url(#ssbSunHalo)"/>
+      <circle cx="${cx}" cy="${cy}" r="${sunRadiusPx.toFixed(1)}" fill="url(#ssbSunBody)" stroke="rgba(255,235,120,0.95)" stroke-width="1"/>
+      <text x="${cx}" y="${(cy + 4).toFixed(1)}" fill="rgba(180,90,20,0.85)" font-size="13" text-anchor="middle" font-weight="bold">☉</text>
+      <!-- Axes -->
+      <line x1="${cx - radiusPx}" y1="${cy}" x2="${cx + radiusPx}" y2="${cy}" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+      <line x1="${cx}" y1="${cy - radiusPx}" x2="${cx}" y2="${cy + radiusPx}" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+      <!-- Trajectory segments (color-coded by z, click + hover) -->
+      ${segments}
+      ${dirCues}
+      ${ticks}
+      <!-- Current position marker — white halo + inner colored dot -->
+      <circle cx="${curPx.toFixed(1)}" cy="${curPy.toFixed(1)}" r="10" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+      <circle cx="${curPx.toFixed(1)}" cy="${curPy.toFixed(1)}" r="7.5" fill="rgba(255,255,255,0.85)"/>
+      <circle cx="${curPx.toFixed(1)}" cy="${curPy.toFixed(1)}" r="5.5" fill="${insideSunNow ? 'rgba(255,220,100,1)' : 'rgba(255,70,30,1)'}" stroke="white" stroke-width="0.8"/>
+      <text x="${(curPx + 13).toFixed(1)}" y="${(curPy + 4).toFixed(1)}" fill="white" font-size="11" font-weight="bold" style="paint-order:stroke;stroke:rgba(0,0,0,0.85);stroke-width:3;">${Math.round(currentYear)}</text>
+      <!-- Title (linked to Wikipedia) -->
+      <a href="https://en.wikipedia.org/wiki/Barycenter_(astronomy)" target="_blank" rel="noopener">
+        <text x="${cx}" y="16" fill="rgba(255,255,255,0.9)" font-size="12" text-anchor="middle" font-weight="bold" style="cursor:pointer;">Sun-SSB Trajectory (±25 yr) <tspan fill="rgba(180,200,255,0.85)" font-size="10" font-weight="normal">ⓘ</tspan></text>
+      </a>
+      <!-- z-height legend (bottom-left) -->
+      ${legend}
+    </svg>
+  </div>`;
+}
+
 function buildObliquityChart(currentYear) {
   const H   = holisticyearLength;
   const A   = earthInvPlaneInclinationAmplitude;
@@ -41244,6 +41524,7 @@ function updateDomLabel () {
       if (row.viz === 'precession-tree')   nextHTML += buildPrecessionViz();
       if (row.viz === 'obliquity-chart')   nextHTML += buildObliquityChart(o.currentYear);
       if (row.viz === 'perihelion-chart')  nextHTML += buildPerihelionChart(row.planet, o.currentYear);
+      if (row.viz === 'sun-ssb-trajectory') nextHTML += buildSunSSBChart(o.currentYear);
       continue;
     }
 
