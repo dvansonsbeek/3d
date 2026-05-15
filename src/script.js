@@ -40341,51 +40341,60 @@ function autoOpenGroups(stats, selName, threshold = 25) {
 function computeSunSSBOffset(year) {
   // 3D mass-weighted SSB offset (x, y, z in km from Sun's center).
   // Reference plane: INVARIABLE PLANE — consistent with the model's Fibonacci
-  // balance framework (Law 3 uses inv-plane inclinations). The invariable
-  // plane is tilted ~1.58° from the ecliptic and is the weighted-mean orbital
-  // plane of all planets — so each planet sits closer to it than to the
-  // ecliptic. SSB z-amplitude in this frame is ~±15,000 km (vs ~±35,000 km
-  // in the ecliptic frame).
-  // Uses each planet's existing model anchors:
-  //   - longitudePerihelion + meanAnomaly  → mean longitude at MODEL EPOCH
-  //   - invPlaneInclinationJ2000           → inclination to invariable plane
-  //   - ascendingNodeInvPlane              → longitude of ascending node (inv plane)
-  //   - <planet>OrbitDistance × meanAUDistance → semi-major axis in km
-  //   - H / <planet>SolarYearCount          → orbital period in solar years
-  // Earth has no `planets.earth` object — derive from ASTRO_REFERENCE and
-  // earthAscendingNodeInvPlaneVerified (Souami & Souchay 2012).
-  const modelEpochYr = julianDateToDecimalYear(startmodelJD);
-  const dt = year - modelEpochYr;
+  // balance framework (Law 3 uses inv-plane inclinations).
+  //
+  // Fully Keplerian eccentric orbits, fully anchored on the simulation's LIVE
+  // runtime state. For each planet at target year t:
+  //   1. M(t) = o.<planet>MeanAnomaly + 360°·(t − o.currentYear) / T_b
+  //   2. E    = solve Kepler's eq:  M = E − e·sin(E)
+  //   3. ν    = 2·atan2(√(1+e)·sin(E/2), √(1-e)·cos(E/2))     (true anomaly)
+  //   4. r    = a·(1 − e²) / (1 + e·cos ν)                     (heliocentric dist)
+  //   5. argLat = (ω̃ + ν) − Ω                                  (true longitude − asc. node)
+  //   6. (x,y,z) rotated by Ω, i into invariable-plane frame
+  // All five orbital anchors are live runtime values that evolve with the sim:
+  //   M_live  = o.<planet>MeanAnomaly                  (textbook M, linear in time)
+  //   ω̃_live  = o.<planet>Perihelion                    (precesses over ~10⁴ yr)
+  //   i_live  = o.<planet>InvPlaneInclinationDynamic   (oscillates over ~10⁵ yr)
+  //   Ω_live  = o.<planet>AscendingNodeInvPlane        (regresses over ~10⁴ yr)
+  //   e_live  = o.eccentricity<Planet>                  (oscillates over ~10⁴-10⁵ yr)
+  // Fallbacks to J2000 references are kept for first-frame initialization.
+  const dt = year - o.currentYear;
   const DEG = Math.PI / 180;
 
-  // Earth's mean longitude at model epoch from perihelion-passage anchor.
-  const earthMeanAnom_modelEpoch = (360 * (startmodelJD - ASTRO_REFERENCE.perihelionPassageJ2000_JD) / meansolaryearlengthinDays) % 360;
-  const earthL_modelEpoch = ASTRO_REFERENCE.perihelionLongitudeJ2000_deg + earthMeanAnom_modelEpoch;
-
   const planetList = [
-    { key: 'mercury', mass: M_MERCURY_SYSTEM, a_km: mercuryOrbitDistance * meanAUDistance, periodYr: holisticyearLength / mercurySolarYearCount, L0: planets.mercury.longitudePerihelion + planets.mercury.meanAnomaly, i: planets.mercury.invPlaneInclinationJ2000, Omega: planets.mercury.ascendingNodeInvPlane },
-    { key: 'venus',   mass: M_VENUS_SYSTEM,   a_km: venusOrbitDistance   * meanAUDistance, periodYr: holisticyearLength / venusSolarYearCount,   L0: planets.venus.longitudePerihelion   + planets.venus.meanAnomaly,   i: planets.venus.invPlaneInclinationJ2000,   Omega: planets.venus.ascendingNodeInvPlane   },
-    { key: 'earth',   mass: M_EARTH_SYSTEM,   a_km: meanAUDistance,                         periodYr: 1,                                                  L0: earthL_modelEpoch,                                            i: ASTRO_REFERENCE.earthInclinationJ2000_deg,  Omega: earthAscendingNodeInvPlaneVerified },
-    { key: 'mars',    mass: M_MARS_SYSTEM,    a_km: marsOrbitDistance    * meanAUDistance, periodYr: holisticyearLength / marsSolarYearCount,    L0: planets.mars.longitudePerihelion    + planets.mars.meanAnomaly,    i: planets.mars.invPlaneInclinationJ2000,    Omega: planets.mars.ascendingNodeInvPlane    },
-    { key: 'jupiter', mass: M_JUPITER_SYSTEM, a_km: jupiterOrbitDistance * meanAUDistance, periodYr: holisticyearLength / jupiterSolarYearCount, L0: planets.jupiter.longitudePerihelion + planets.jupiter.meanAnomaly, i: planets.jupiter.invPlaneInclinationJ2000, Omega: planets.jupiter.ascendingNodeInvPlane },
-    { key: 'saturn',  mass: M_SATURN_SYSTEM,  a_km: saturnOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / saturnSolarYearCount,  L0: planets.saturn.longitudePerihelion  + planets.saturn.meanAnomaly,  i: planets.saturn.invPlaneInclinationJ2000,  Omega: planets.saturn.ascendingNodeInvPlane  },
-    { key: 'uranus',  mass: M_URANUS_SYSTEM,  a_km: uranusOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / uranusSolarYearCount,  L0: planets.uranus.longitudePerihelion  + planets.uranus.meanAnomaly,  i: planets.uranus.invPlaneInclinationJ2000,  Omega: planets.uranus.ascendingNodeInvPlane  },
-    { key: 'neptune', mass: M_NEPTUNE_SYSTEM, a_km: neptuneOrbitDistance * meanAUDistance, periodYr: holisticyearLength / neptuneSolarYearCount, L0: planets.neptune.longitudePerihelion + planets.neptune.meanAnomaly, i: planets.neptune.invPlaneInclinationJ2000, Omega: planets.neptune.ascendingNodeInvPlane },
+    { key: 'mercury', mass: M_MERCURY_SYSTEM, a_km: mercuryOrbitDistance * meanAUDistance, periodYr: holisticyearLength / mercurySolarYearCount, M0: o.mercuryMeanAnomaly ?? 0, peri: o.mercuryPerihelion ?? planets.mercury.longitudePerihelion, e: o.eccentricityMercury ?? planets.mercury.orbitalEccentricityBase, i: o.mercuryInvPlaneInclinationDynamic ?? planets.mercury.invPlaneInclinationJ2000, Omega: o.mercuryAscendingNodeInvPlane ?? planets.mercury.ascendingNodeInvPlane },
+    { key: 'venus',   mass: M_VENUS_SYSTEM,   a_km: venusOrbitDistance   * meanAUDistance, periodYr: holisticyearLength / venusSolarYearCount,   M0: o.venusMeanAnomaly   ?? 0, peri: o.venusPerihelion   ?? planets.venus.longitudePerihelion,   e: o.eccentricityVenus   ?? planets.venus.orbitalEccentricityBase,   i: o.venusInvPlaneInclinationDynamic   ?? planets.venus.invPlaneInclinationJ2000,   Omega: o.venusAscendingNodeInvPlane   ?? planets.venus.ascendingNodeInvPlane   },
+    { key: 'earth',   mass: M_EARTH_SYSTEM,   a_km: meanAUDistance,                         periodYr: 1,                                                  M0: o.earthMeanAnomaly   ?? 0, peri: o.earthPerihelion   ?? ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: o.eccentricityEarth   ?? eccentricityBase,                       i: o.earthInvPlaneInclinationDynamic   ?? ASTRO_REFERENCE.earthInclinationJ2000_deg, Omega: o.earthAscendingNodeInvPlane   ?? earthAscendingNodeInvPlaneVerified },
+    { key: 'mars',    mass: M_MARS_SYSTEM,    a_km: marsOrbitDistance    * meanAUDistance, periodYr: holisticyearLength / marsSolarYearCount,    M0: o.marsMeanAnomaly    ?? 0, peri: o.marsPerihelion    ?? planets.mars.longitudePerihelion,    e: o.eccentricityMars    ?? planets.mars.orbitalEccentricityBase,    i: o.marsInvPlaneInclinationDynamic    ?? planets.mars.invPlaneInclinationJ2000,    Omega: o.marsAscendingNodeInvPlane    ?? planets.mars.ascendingNodeInvPlane    },
+    { key: 'jupiter', mass: M_JUPITER_SYSTEM, a_km: jupiterOrbitDistance * meanAUDistance, periodYr: holisticyearLength / jupiterSolarYearCount, M0: o.jupiterMeanAnomaly ?? 0, peri: o.jupiterPerihelion ?? planets.jupiter.longitudePerihelion, e: o.eccentricityJupiter ?? planets.jupiter.orbitalEccentricityBase, i: o.jupiterInvPlaneInclinationDynamic ?? planets.jupiter.invPlaneInclinationJ2000, Omega: o.jupiterAscendingNodeInvPlane ?? planets.jupiter.ascendingNodeInvPlane },
+    { key: 'saturn',  mass: M_SATURN_SYSTEM,  a_km: saturnOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / saturnSolarYearCount,  M0: o.saturnMeanAnomaly  ?? 0, peri: o.saturnPerihelion  ?? planets.saturn.longitudePerihelion,  e: o.eccentricitySaturn  ?? planets.saturn.orbitalEccentricityBase,  i: o.saturnInvPlaneInclinationDynamic  ?? planets.saturn.invPlaneInclinationJ2000,  Omega: o.saturnAscendingNodeInvPlane  ?? planets.saturn.ascendingNodeInvPlane  },
+    { key: 'uranus',  mass: M_URANUS_SYSTEM,  a_km: uranusOrbitDistance  * meanAUDistance, periodYr: holisticyearLength / uranusSolarYearCount,  M0: o.uranusMeanAnomaly  ?? 0, peri: o.uranusPerihelion  ?? planets.uranus.longitudePerihelion,  e: o.eccentricityUranus  ?? planets.uranus.orbitalEccentricityBase,  i: o.uranusInvPlaneInclinationDynamic  ?? planets.uranus.invPlaneInclinationJ2000,  Omega: o.uranusAscendingNodeInvPlane  ?? planets.uranus.ascendingNodeInvPlane  },
+    { key: 'neptune', mass: M_NEPTUNE_SYSTEM, a_km: neptuneOrbitDistance * meanAUDistance, periodYr: holisticyearLength / neptuneSolarYearCount, M0: o.neptuneMeanAnomaly ?? 0, peri: o.neptunePerihelion ?? planets.neptune.longitudePerihelion, e: o.eccentricityNeptune ?? planets.neptune.orbitalEccentricityBase, i: o.neptuneInvPlaneInclinationDynamic ?? planets.neptune.invPlaneInclinationJ2000, Omega: o.neptuneAscendingNodeInvPlane ?? planets.neptune.ascendingNodeInvPlane },
   ];
 
   let x = 0, y = 0, z = 0;
   const contributions = {};
 
   for (const p of planetList) {
-    const L = (p.L0 + 360 * dt / p.periodYr) * DEG;
+    // 1. Mean anomaly at target year
+    const M_deg = p.M0 + 360 * dt / p.periodYr;
+    // 2. Solve Kepler's equation for eccentric anomaly E
+    const E_deg = OrbitalFormulas.eccentricAnomaly(((M_deg % 360) + 360) % 360, p.e);
+    const E_rad = E_deg * DEG;
+    // 3. True anomaly ν from E
+    const nu = 2 * Math.atan2(Math.sqrt(1 + p.e) * Math.sin(E_rad / 2),
+                              Math.sqrt(1 - p.e) * Math.cos(E_rad / 2));
+    // 4. Heliocentric distance (varies with ν, ranges from a(1-e) at perihelion to a(1+e) at aphelion)
+    const r = p.a_km * (1 - p.e * p.e) / (1 + p.e * Math.cos(nu));
+    // 5. True longitude (ω̃ + ν) minus ascending node = argument of latitude
     const Om = p.Omega * DEG;
     const ii = p.i * DEG;
-    const argLat = L - Om;
-    // 3D heliocentric position in ecliptic frame
-    const dx_planet = p.a_km * (Math.cos(Om) * Math.cos(argLat) - Math.sin(Om) * Math.sin(argLat) * Math.cos(ii));
-    const dy_planet = p.a_km * (Math.sin(Om) * Math.cos(argLat) + Math.cos(Om) * Math.sin(argLat) * Math.cos(ii));
-    const dz_planet = p.a_km * Math.sin(argLat) * Math.sin(ii);
-    // Sun-SSB contribution
+    const argLat = (p.peri * DEG + nu) - Om;
+    // 6. 3D rotation into invariable-plane frame
+    const dx_planet = r * (Math.cos(Om) * Math.cos(argLat) - Math.sin(Om) * Math.sin(argLat) * Math.cos(ii));
+    const dy_planet = r * (Math.sin(Om) * Math.cos(argLat) + Math.cos(Om) * Math.sin(argLat) * Math.cos(ii));
+    const dz_planet = r * Math.sin(argLat) * Math.sin(ii);
+    // Sun-SSB contribution: scale by mass fraction
     const scale = p.mass / M_SUN;
     const cx = dx_planet * scale;
     const cy = dy_planet * scale;
@@ -43729,21 +43738,21 @@ function updatePlanetAnomalies() {
   // Get Sun position (common for all planets) - using pooled vector
   sun.pivotObj.getWorldPosition(_anomalySunPos);
 
-  // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix, eccentricity]
+  // Planet configuration: [planetObj, fixedPerihelionAtSun, propertyPrefix, eccentricity, solarYearCount]
   const planetConfigs = [
-    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityBase },
-    { planet: venus, fixedPerihelion: venusFixedPerihelionAtSun, key: 'venus', e: planets.venus.orbitalEccentricityBase },
-    { planet: mars, fixedPerihelion: marsFixedPerihelionAtSun, key: 'mars', e: planets.mars.orbitalEccentricityBase },
-    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityBase },
-    { planet: saturn, fixedPerihelion: saturnFixedPerihelionAtSun, key: 'saturn', e: planets.saturn.orbitalEccentricityBase },
-    { planet: uranus, fixedPerihelion: uranusFixedPerihelionAtSun, key: 'uranus', e: planets.uranus.orbitalEccentricityBase },
-    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityBase },
-    { planet: pluto, fixedPerihelion: plutoFixedPerihelionAtSun, key: 'pluto', e: planets.pluto.orbitalEccentricityBase },
-    { planet: halleys, fixedPerihelion: halleysFixedPerihelionAtSun, key: 'halleys', e: planets.halleys.orbitalEccentricityBase },
-    { planet: eros, fixedPerihelion: erosFixedPerihelionAtSun, key: 'eros', e: planets.eros.orbitalEccentricityBase }
+    { planet: mercury, fixedPerihelion: mercuryFixedPerihelionAtSun, key: 'mercury', e: planets.mercury.orbitalEccentricityBase, solarYearCount: mercurySolarYearCount },
+    { planet: venus,   fixedPerihelion: venusFixedPerihelionAtSun,   key: 'venus',   e: planets.venus.orbitalEccentricityBase,   solarYearCount: venusSolarYearCount   },
+    { planet: mars,    fixedPerihelion: marsFixedPerihelionAtSun,    key: 'mars',    e: planets.mars.orbitalEccentricityBase,    solarYearCount: marsSolarYearCount    },
+    { planet: jupiter, fixedPerihelion: jupiterFixedPerihelionAtSun, key: 'jupiter', e: planets.jupiter.orbitalEccentricityBase, solarYearCount: jupiterSolarYearCount },
+    { planet: saturn,  fixedPerihelion: saturnFixedPerihelionAtSun,  key: 'saturn',  e: planets.saturn.orbitalEccentricityBase,  solarYearCount: saturnSolarYearCount  },
+    { planet: uranus,  fixedPerihelion: uranusFixedPerihelionAtSun,  key: 'uranus',  e: planets.uranus.orbitalEccentricityBase,  solarYearCount: uranusSolarYearCount  },
+    { planet: neptune, fixedPerihelion: neptuneFixedPerihelionAtSun, key: 'neptune', e: planets.neptune.orbitalEccentricityBase, solarYearCount: neptuneSolarYearCount },
+    { planet: pluto,   fixedPerihelion: plutoFixedPerihelionAtSun,   key: 'pluto',   e: planets.pluto.orbitalEccentricityBase,   solarYearCount: plutoSolarYearCount   },
+    { planet: halleys, fixedPerihelion: halleysFixedPerihelionAtSun, key: 'halleys', e: planets.halleys.orbitalEccentricityBase, solarYearCount: halleysSolarYearCount },
+    { planet: eros,    fixedPerihelion: erosFixedPerihelionAtSun,    key: 'eros',    e: planets.eros.orbitalEccentricityBase,    solarYearCount: erosSolarYearCount    }
   ];
 
-  for (const { planet, fixedPerihelion, key, e } of planetConfigs) {
+  for (const { planet, fixedPerihelion, key, e, solarYearCount } of planetConfigs) {
     // Skip if objects don't exist
     if (!planet?.pivotObj || !fixedPerihelion?.pivotObj || !fixedPerihelion?.planetObj) {
       continue;
@@ -43786,22 +43795,24 @@ function updatePlanetAnomalies() {
     const periAngleP = Math.atan2(-periDirFromPZ, periDirFromPX);
     const planetAngleP = Math.atan2(-planetDirFromPZ, planetDirFromPX);
 
-    // True Anomaly: angle at Sun from perihelion to planet
+    // True Anomaly: angle at Sun from perihelion to planet (geometric, from world positions)
     let trueAnomalyRad = planetAngleSun - periAngleSun;
-
-    // Mean Anomaly: angle at P from perihelion to planet
-    let meanAnomalyRad = planetAngleP - periAngleP;
-
-    // Normalize to 0 to 2*PI range
     trueAnomalyRad = ((trueAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-    meanAnomalyRad = ((meanAnomalyRad % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-
-    // Convert to degrees and store in o object
     o[key + 'TrueAnomaly'] = trueAnomalyRad * 180 / Math.PI;
-    o[key + 'MeanAnomaly'] = meanAnomalyRad * 180 / Math.PI;
+
+    // Mean Anomaly: textbook definition — fictitious angle advancing linearly in time.
+    // Computed analytically from M_at_modelEpoch + 360°·(JD−modelEpochJD)/period_days.
+    // (Previous code stored "angle at orbit center from perihelion to planet", which
+    // is a geometric ellipse angle close to eccentric anomaly E, not textbook mean
+    // anomaly M = E − e·sin(E). For low-e bodies the difference is small; for
+    // Mercury/Pluto/Halley it matters substantially.)
+    const periodDays = (holisticyearLength / solarYearCount) * meansolaryearlengthinDays;
+    let meanAnomalyDeg = planets[key].meanAnomaly + 360 * (o.julianDay - startmodelJD) / periodDays;
+    meanAnomalyDeg = ((meanAnomalyDeg % 360) + 360) % 360;
+    o[key + 'MeanAnomaly'] = meanAnomalyDeg;
 
     // Calculate Eccentric Anomaly from Mean Anomaly using Newton-Raphson iteration
-    o[key + 'EccentricAnomaly'] = OrbitalFormulas.eccentricAnomaly(o[key + 'MeanAnomaly'], e);
+    o[key + 'EccentricAnomaly'] = OrbitalFormulas.eccentricAnomaly(meanAnomalyDeg, e);
   }
 
   // Calculate Earth's anomalies

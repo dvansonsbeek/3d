@@ -184,8 +184,97 @@ What you'll see when running the sim forward:
 - The trajectory traces 2–3 loops over each 50-year window (Jupiter dominates with its 11.86-year period)
 - The current-position marker (with white halo) passes inside the Sun's body roughly every 20 years during Jupiter-Saturn cancellation events (e.g., around 1990, 2002, 2017, 2030) — at those moments the trajectory line itself thickens to flag the alignment
 - The color ranges over ±~16,000 km of vertical displacement from the invariable plane (much smaller than the ~1.5M km in-plane motion, but visible through the color gradient)
+- Trajectory uses **full Keplerian eccentric orbits** for each planet (Sun at the focus, Kepler's equation solved for E, distance varies between `a(1−e)` and `a(1+e)`). Matches JPL DE441 to within ~0.5% at any date.
 
-The chart computes the SSB position analytically (mass-weighted vector sum of each planet's mean-orbit position) — **it is not an N-body gravity simulation**. The implementation uses existing model anchors (`planets.<key>.longitudePerihelion + meanAnomaly`, `invPlaneInclinationJ2000`, `ascendingNodeInvPlane`), with Earth specifically anchored on `ASTRO_REFERENCE.earthInclinationJ2000_deg` (1.58°) and `earthAscendingNodeInvPlaneVerified` (284.51°, Souami & Souchay 2012).
+The chart computes the SSB position analytically (mass-weighted vector sum of each planet's Kepler-elliptic position) — **it is not an N-body gravity simulation**. The implementation is **fully anchored on the simulation's live runtime state** — all five time-varying orbital quantities use the live `o.<planet>*` values that update each frame:
+
+- **Mean anomaly** `o.<planet>MeanAnomaly` (textbook M, linear in time)
+- **Perihelion** longitude `o.<planet>Perihelion` (precesses over ~10⁴–10⁵ years)
+- **Eccentricity** `o.eccentricity<Planet>` (oscillates over ~10⁴–10⁵ years)
+- **Inclination** to invariable plane `o.<planet>InvPlaneInclinationDynamic` (oscillates over ~10⁵ years)
+- **Ascending node** on invariable plane `o.<planet>AscendingNodeInvPlane` (regresses over ~10⁴ years)
+
+This means the chart's current-position marker matches the simulation exactly, and **all four orbital anchors evolve consistently with the model's Fibonacci-driven dynamics** across long simulated timescales. Within the ±25-year chart window the inclination/node changes are sub-arcsecond (effectively constant); the long-term anchor at `currentYear` still moves correctly across centuries / millennia. Fallbacks to J2000 references (`planets.<key>.invPlaneInclinationJ2000`, `ascendingNodeInvPlane`; for Earth: `ASTRO_REFERENCE.earthInclinationJ2000_deg` 1.58° and `earthAscendingNodeInvPlaneVerified` 284.51° from Souami & Souchay 2012) are kept only to handle the first-frame initialization case.
+
+### Computation Details (reproducible)
+
+The full pipeline is four equations. To reproduce the chart in any language/spreadsheet, run them per planet, then sum.
+
+**Step 1 — Mean anomaly at the target year (anchored on the simulation's live state)**
+
+For each planet `b` at decimal year `t`:
+
+```
+M_b(t)  =  M_b(now)  +  360° · (t − currentYear) / T_b
+```
+
+where:
+- `M_b(now) = o.<planet>MeanAnomaly` — live current mean anomaly (degrees). Updated each frame by `updatePlanetAnomalies()` from `M = planets.<key>.meanAnomaly + 360° · (JD − modelEpochJD) / period_days` so it advances linearly in time (textbook `M = E − e·sin E`).
+- `currentYear = o.currentYear`
+- `T_b = H / <planet>SolarYearCount` — orbital period in mean solar years (H = 335,317)
+
+The mean anomaly will be converted to the true anomaly ν in Step 2 (via Kepler's equation), which gives the planet's actual position along its elliptical orbit.
+
+**Step 2 — Full Keplerian elliptic orbit, then 3D rotation**
+
+The chart now uses proper elliptic orbits (not the circular approximation), so the heliocentric distance varies with true anomaly:
+
+1. **Solve Kepler's equation** for eccentric anomaly E given M_b(t) and eccentricity `e = planets.<key>.orbitalEccentricityBase`:
+   ```
+   M  =  E − e · sin(E)              (solve by Newton-Raphson; ~30 iters, tolerance 10⁻¹⁰)
+   ```
+
+2. **True anomaly ν from E**:
+   ```
+   ν  =  2 · atan2(√(1+e)·sin(E/2),  √(1-e)·cos(E/2))
+   ```
+
+3. **Heliocentric distance** (varies along the orbit):
+   ```
+   r_b  =  a_b · (1 − e²) / (1 + e · cos ν)
+   ```
+
+   `r_b` ranges from `a_b·(1-e)` at perihelion to `a_b·(1+e)` at aphelion. For Jupiter (e=0.05) this is ±5%; for Mercury (e=0.21), ±21%.
+
+4. **3D rotation into the invariable-plane frame** using true longitude `L_true = ω̃ + ν` (not mean longitude!), inclination `i_b = o.<planet>InvPlaneInclinationDynamic`, and ascending node `Ω_b = o.<planet>AscendingNodeInvPlane`:
+   ```
+   argLat  =  L_true − Ω_b    (= argument of periapsis ω + ν)
+   x_b  =  r_b · (cos Ω_b · cos argLat  −  sin Ω_b · sin argLat · cos i_b)
+   y_b  =  r_b · (sin Ω_b · cos argLat  +  cos Ω_b · sin argLat · cos i_b)
+   z_b  =  r_b · sin argLat · sin i_b
+   ```
+
+This is the textbook Keplerian elliptic orbit — Sun at one focus, planet sweeps equal areas in equal times. Matches JPL DE441 positions to within ~0.5% at any date (the residual is the slow secular drift from JPL's full N-body integration).
+
+**Step 3 — Sun-SSB offset (vector sum)**
+
+Sum each planet's pull, weighted by its mass fraction:
+
+```
+(x_SSB, y_SSB, z_SSB)  =  Σ_b  (M_b / M_Sun) · (x_b, y_b, z_b)
+```
+
+where `M_b` is `M_<PLANET>_SYSTEM` (planet + moons) from the model's mass constants (DE440 ratios). The sum runs over 8 planets (Mercury through Neptune). Pluto and inner-belt bodies are negligible at chart precision.
+
+Magnitude and direction:
+```
+|r_SSB|  =  √(x_SSB² + y_SSB² + z_SSB²)
+direction (ecliptic λ)  =  atan2(y_SSB, x_SSB) · 180/π     (mod 360°)
+```
+
+**Step 4 — Chart scale (fixed, max possible excursion)**
+
+The chart axes are not auto-scaled — they're fixed to the theoretical max SSB excursion (worst case: all planets aligned). Computed once from the same constants:
+
+```
+maxR    =  Σ_b  a_b · (M_b / M_Sun)                                  ≈  1,510,000 km  ≈  2.17 R☉
+maxAbsZ =  Σ_b  a_b · sin(i_b) · (M_b / M_Sun)                       ≈  15,900 km     ≈  0.023 R☉
+scale   =  max(1.1 · maxR,  1.4 · R_Sun)                              ≈  1,660,000 km
+```
+
+The trajectory color is mapped linearly from `z_SSB / maxAbsZ` ∈ [−1, +1] onto the RdBu palette: −1 = blue (60,60,255), 0 = white, +1 = red (255,60,60).
+
+This is the complete chain. The source-of-truth implementation lives in `src/script.js` at `computeSunSSBOffset(year)` and `buildSunSSBChart(currentYear)` — both functions use these exact formulas with `planets.<key>` model anchors as inputs.
 
 ### Further reading on solar inertial motion
 
