@@ -125,6 +125,75 @@ Both formulas extract a "Kepler-effective" semi-major axis from a geometric one 
 - Moon-side: a_M_geometric (LLR) → a_M_Kepler_eff (textbook 384,748 km)
 - Sun-side: a_b_geometric (Keplerian system formula) → a_b − Δa_b (bare body formula)
 
+## Physical Interpretation: Δa = 1/3 × Sun's Barycentric Pull
+
+Beyond being an algebraic identity, the leading-order Δa has a direct geometric reading. The Sun's offset from the Solar System Barycenter (SSB) due to a single planet is, by definition of the barycenter:
+
+```
+Δr_Sun_from_SSB  =  a_b · M_b / (M_S + M_b)  ≈  a_b · M_b / M_S
+```
+
+Our leading-order Δa formula is:
+
+```
+Δa_b  =  a_b · M_b / (3 · M_S)
+```
+
+So **each planet's Δa equals exactly one-third of its contribution to the Sun's barycentric displacement** — the ratio is constant for every planet:
+
+| Planet | Δr_Sun = a·M/M_Sun (km) | Δa (km) | Ratio |
+|---|---|---|---|
+| Mercury | 9.6 | 3.21 | **3.00** |
+| Venus | 265 | 88.29 | **3.00** |
+| Earth | 449 | 149.77 | **3.00** |
+| Mars | 73.6 | 24.52 | **3.00** |
+| Jupiter | 743,108 | 247,782 | **3.00** |
+| Saturn | 408,683 | 136,227 | **3.00** |
+| Uranus | 125,632 | 41,844 | **3.00** |
+| Neptune | 232,044 | 77,348 | **3.00** |
+| Pluto | 43.4 | 14.47 | **3.00** |
+
+The factor of 3 is algebraic: differentiating `a³` yields `3·a²`, and that 3 propagates to the linear `Δa ≈ a · μ_b / (3·μ_S)` form.
+
+### Consequence: Σ(3·Δa) = max solar inertial motion
+
+Summing the per-planet barycentric pulls (3·Δa = a·M/M_Sun) gives the **maximum Sun-SSB excursion** when all planets align in the same direction:
+
+```
+3 · Σ Δa  =  Σ (a_b · M_b / M_Sun)  ≈  1,510,000 km  ≈  2.17 R☉
+```
+
+This is a well-known quantity in **solar inertial motion (SIM) studies** — Jose (1965), Charvátová & Střeštík (1991), and current JPL ephemeris analyses. The Sun's actual position relative to the SSB sweeps from ~0 (planets scattered) to ~2 R☉ (alignment) on a Jupiter-Saturn-dominated cycle of roughly 178.7 years (the "Jose cycle").
+
+So the Δa values we computed for each planet aren't just abstract algebraic corrections — they are **one-third of each planet's pull on the Sun**, and their sum (multiplied by 3) is the radius of the Sun's well-documented barycentric wobble.
+
+## In-Model Visualization
+
+The model includes an interactive **Sun-SSB Trajectory** chart in the simulation: click the **Sun** in the planet selector → **CYCLES** tab → §"Sun-SSB Barycentric Motion".
+
+What it shows:
+- Live readouts: Sun-SSB offset (km and R☉), ecliptic longitude direction, "inside Sun?" flag, dominant planet (usually Jupiter), and that planet's share of the total displacement
+- 2D SVG chart of the SSB trajectory over ±25 years centered on the current simulated date
+- **Reference plane: invariable plane** (matches the model's Fibonacci-balance framework for Laws 3 and 5 — see [doc 10](10-fibonacci-laws.md))
+- Trajectory color-coded by z-coordinate (RdBu diverging palette): 🔴 red = above invariable plane, ⚪ white = on plane, 🔵 blue = below
+- Year tick markers at ±25, ±12.5, 0 years
+- The Sun rendered with a radial-gradient body and corona-style halo
+- Title links to Wikipedia's "[Barycenter (astronomy)](https://en.wikipedia.org/wiki/Barycenter_(astronomy))" article
+
+What you'll see when running the sim forward:
+- The trajectory traces 2–3 loops over each 50-year window (Jupiter dominates with its 11.86-year period)
+- The current-position marker (with white halo) passes inside the Sun's body roughly every 20 years during Jupiter-Saturn cancellation events (e.g., around 1990, 2002, 2017, 2030) — at those moments the trajectory line itself thickens to flag the alignment
+- The color ranges over ±~16,000 km of vertical displacement from the invariable plane (much smaller than the ~1.5M km in-plane motion, but visible through the color gradient)
+
+The chart computes the SSB position analytically (mass-weighted vector sum of each planet's mean-orbit position) — **it is not an N-body gravity simulation**. The implementation uses existing model anchors (`planets.<key>.longitudePerihelion + meanAnomaly`, `invPlaneInclinationJ2000`, `ascendingNodeInvPlane`), with Earth specifically anchored on `ASTRO_REFERENCE.earthInclinationJ2000_deg` (1.58°) and `earthAscendingNodeInvPlaneVerified` (284.51°, Souami & Souchay 2012).
+
+### Further reading on solar inertial motion
+
+- **Wikipedia — [Barycenter (astronomy)](https://en.wikipedia.org/wiki/Barycenter_(astronomy))**: the canonical introduction
+- **Jose 1965**, *Astron. J.* 70:193 — "Sun's motion and sunspots", the original paper relating Sun's barycentric motion to solar activity
+- **Charvátová & Střeštík 1991**, *Climatic Change* 19:91-101 — patterns in Sun's barycentric motion across the Jose cycle
+- **JPL Horizons** — barycentric-frame planet/Sun positions to ~10⁻⁹ precision
+
 ## Practical Use
 
 For period computation in software/spreadsheets, the **simple form is strictly preferable**:
@@ -175,9 +244,13 @@ For every planet, both `T_col` forms produce the same value: Mercury 87.97 d, Ve
 - For Earth the symmetric and asymmetric forms coincide at Δa = 149.77 km (the doc 24 value).
 - For Jupiter–Neptune the symmetric form is the only one that closes the residual to zero.
 - In code the simple form is preferred (`a³/(GM_Sun + GM_Earth)`); the Δa machinery lives here as the conceptual explanation.
+- **Each Δa equals exactly 1/3 of that planet's contribution to the Sun's barycentric displacement.** Summing 3·Δa across all planets gives ~1.5 million km ≈ 2.17 R☉ — the maximum solar inertial motion amplitude (Jose 1965, Charvátová 1991).
+- An interactive **Sun-SSB trajectory chart** in the model (Sun > CYCLES tab) visualizes this in the invariable plane frame with RdBu z-color coding.
 
 ## See Also
 
 - [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md) §Sun-side Analog — Earth's 149.77 km case (asymmetric form)
 - [25 — Universal Mass-from-Moon Formula](25-universal-mass-from-moon-formula.md) — Moon-side mirror of this document
 - [src/script.js §E2 / OrbitalFormulas.keplerPeriod](../src/script.js) — implementation using the simple form
+- [src/script.js — `computeSunSSBOffset` / `buildSunSSBChart`](../src/script.js) — Sun-SSB visualization for the Sun > CYCLES tab
+- [Wikipedia — Barycenter (astronomy)](https://en.wikipedia.org/wiki/Barycenter_(astronomy)) — canonical reference linked from the in-model chart title
