@@ -49,6 +49,7 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 12 | [Perihelion Precession](12-perihelion-precession.md) | Perihelion longitude and precession rate calculations |
 | 13 | [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) | Mercury's perihelion precession by contributing planet |
 | 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from Fibonacci harmonics (H/3, H/8, H/16) |
+| 15 | [Planet Nine Prediction](15-planet-nine-prediction.md) | Falsifiable test: the Fibonacci 4-pair structure forbids a major 9th planet at ETNO distances (canonical 7.5M-config search) |
 
 ### 20–29 Technical Reference
 
