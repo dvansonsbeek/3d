@@ -1,0 +1,115 @@
+{
+  "doc_reference": "docs/17-milankovitch-evidence.md",
+  "rng_seed": 20260517,
+  "test_3_405kyr_absence": {
+    "precession": {
+      "band_kyr": [
+        18,
+        26
+      ],
+      "peak_period_kyr": 23.64888888888889,
+      "peak_amplitude": 6.5957281209093095
+    },
+    "obliquity": {
+      "band_kyr": [
+        30,
+        50
+      ],
+      "peak_period_kyr": 40.930769230769236,
+      "peak_amplitude": 106.72447671477929
+    },
+    "100-kyr peak": {
+      "band_kyr": [
+        80,
+        125
+      ],
+      "peak_period_kyr": 95.01785714285714,
+      "peak_amplitude": 54.29124507907305
+    },
+    "405-kyr ecc": {
+      "band_kyr": [
+        380,
+        440
+      ],
+      "peak_period_kyr": 380.07142857142856,
+      "peak_amplitude": 6.492355593971359
+    },
+    "ratio_405_over_100": 0.11958384053479525,
+    "verdict": "405-kyr ESSENTIALLY ABSENT \u2014 against eccentricity attribution"
+  },
+  "test_4_bispectrum": {
+    "n_segments": 11,
+    "observed_max_bicoherence": 0.5067118275295867,
+    "observed_at_periods_kyr": [
+      125.0,
+      125.0
+    ],
+    "null_shuffles": 50,
+    "null_median_b2": 0.3669677013122539,
+    "null_p95_b2": 0.5552943596275565,
+    "ratio_observed_over_null_p95": 0.9125103087116628,
+    "verdict": "Observed b\u00b2 below null 95th percentile \u2014 NO statistically significant coupling (consistent with M-M 1997)"
+  },
+  "test_6_peak_position": {
+    "mtm_window_diagnostic": {
+      "0-700 kyr (post-MPT)": {
+        "window_kyr": [
+          0,
+          700
+        ],
+        "T_kyr": 700,
+        "peak_period_kyr": 116.83333333333333,
+        "peak_amplitude": 38.30054119355899,
+        "rayleigh_resolution_at_100kyr": 14.285714285714286
+      },
+      "0-641 kyr (Cheng window)": {
+        "window_kyr": [
+          0,
+          641
+        ],
+        "T_kyr": 641,
+        "peak_period_kyr": 107.00000000000001,
+        "peak_amplitude": 31.85495353777331,
+        "rayleigh_resolution_at_100kyr": 15.600624024960998
+      },
+      "0-5320 kyr (full)": {
+        "window_kyr": [
+          0,
+          5320
+        ],
+        "T_kyr": 5320,
+        "peak_period_kyr": 95.01785714285714,
+        "peak_amplitude": 54.29124507907305,
+        "rayleigh_resolution_at_100kyr": 1.8796992481203008
+      },
+      "0-641 kyr Cheng (U-Th)": {
+        "window_kyr": [
+          0,
+          641
+        ],
+        "T_kyr": 641,
+        "peak_period_kyr": 107.00000000000001,
+        "peak_amplitude": 3.9255649527766407,
+        "vs_lr04_same_bin": true
+      }
+    },
+    "lombscargle_lr04_641kyr": {
+      "peak_period_kyr": 98.69168106640335,
+      "peak_power": 0.4031701756401316,
+      "n_samples": 621
+    },
+    "lombscargle_cheng_641kyr": {
+      "peak_period_kyr": 100.85771947527749,
+      "peak_power": 0.01972541461779088,
+      "n_samples": 8351
+    },
+    "regime_change_check": {
+      "post_mpt_amplitude": 38.30054119355899,
+      "pre_mpt_amplitude": 16.464764384101514,
+      "ratio_post_over_pre": 2.3262125287709705
+    },
+    "rayleigh_limit_at_641kyr_kyr": 15.600624024960998,
+    "rayleigh_note": "At T=641 kyr the Rayleigh limit is ~15 kyr at the 100-kyr period scale. 99 kyr and 111.77 kyr are NOT separately resolvable."
+  },
+  "runtime_seconds": 365.4
+}

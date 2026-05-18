@@ -1,0 +1,539 @@
+{
+  "exploratory": true,
+  "doc_reference": "(not yet documented)",
+  "rng_seed": 20260517,
+  "pre_mpt_window_kyr": [
+    1500,
+    2500
+  ],
+  "post_mpt_window_kyr": [
+    0,
+    1000
+  ],
+  "pre_mpt_results": {
+    "r2": 0.4636964993124828,
+    "condition": 22.23018592363823,
+    "window_kyr": [
+      1500,
+      2500
+    ],
+    "T_kyr": 1000,
+    "amps": {
+      "23.7 kyr (climatic precession)": {
+        "period_kyr": 23.7,
+        "amp": 0.0963537821691862,
+        "ci_lo": 0.046392256196634674,
+        "ci_hi": 0.1610514728588111
+      },
+      "41.0 kyr (obliquity)": {
+        "period_kyr": 41.0,
+        "amp": 0.8377444326675418,
+        "ci_lo": 0.7698723964578489,
+        "ci_hi": 0.9013546290609784
+      },
+      "95.0 kyr (g4-g5 ecc beat)": {
+        "period_kyr": 95.0,
+        "amp": 0.5080890790230204,
+        "ci_lo": 0.34735293679664414,
+        "ci_hi": 0.674016174753738
+      },
+      "99.0 kyr (g3-g5 ecc beat)": {
+        "period_kyr": 99.0,
+        "amp": 0.30415708517364026,
+        "ci_lo": 0.1372246070283673,
+        "ci_hi": 0.500082178707379
+      },
+      "110.0 kyr (g3-g1 Earth-Mercury)": {
+        "period_kyr": 110.0,
+        "amp": 1.8119189780818181,
+        "ci_lo": 1.1519418172455396,
+        "ci_hi": 2.4904012678240375
+      },
+      "111.77 kyr (H/3 model)": {
+        "period_kyr": 111.77,
+        "amp": 1.6724963132927355,
+        "ci_lo": 1.0275714266552611,
+        "ci_hi": 2.3367957943185758
+      },
+      "124.0 kyr (g4-g2 ecc beat)": {
+        "period_kyr": 124.0,
+        "amp": 0.40423859329467526,
+        "ci_lo": 0.29530564519312,
+        "ci_hi": 0.5058490556790666
+      },
+      "405.0 kyr (g2-g5 ecc long)": {
+        "period_kyr": 405.0,
+        "amp": 0.14104561008562974,
+        "ci_lo": 0.0848581100047232,
+        "ci_hi": 0.21073751554439998
+      }
+    }
+  },
+  "post_mpt_results": {
+    "r2": 0.6184117427856229,
+    "condition": 22.23018592363811,
+    "window_kyr": [
+      0,
+      1000
+    ],
+    "T_kyr": 1000,
+    "amps": {
+      "23.7 kyr (climatic precession)": {
+        "period_kyr": 23.7,
+        "amp": 0.21129875961872377,
+        "ci_lo": 0.15570388427181536,
+        "ci_hi": 0.2672469491463672
+      },
+      "41.0 kyr (obliquity)": {
+        "period_kyr": 41.0,
+        "amp": 0.6039413822146166,
+        "ci_lo": 0.5529387795881577,
+        "ci_hi": 0.6559285450953047
+      },
+      "95.0 kyr (g4-g5 ecc beat)": {
+        "period_kyr": 95.0,
+        "amp": 0.9248419621081333,
+        "ci_lo": 0.7794352945288595,
+        "ci_hi": 1.0893227521839375
+      },
+      "99.0 kyr (g3-g5 ecc beat)": {
+        "period_kyr": 99.0,
+        "amp": 0.3598669283186138,
+        "ci_lo": 0.18733630947560864,
+        "ci_hi": 0.59979621027509
+      },
+      "110.0 kyr (g3-g1 Earth-Mercury)": {
+        "period_kyr": 110.0,
+        "amp": 3.031162621067862,
+        "ci_lo": 2.413616318522644,
+        "ci_hi": 3.824847161620975
+      },
+      "111.77 kyr (H/3 model)": {
+        "period_kyr": 111.77,
+        "amp": 2.7433893028194496,
+        "ci_lo": 2.1541661266478087,
+        "ci_hi": 3.4986423558493946
+      },
+      "124.0 kyr (g4-g2 ecc beat)": {
+        "period_kyr": 124.0,
+        "amp": 0.2700343911836022,
+        "ci_lo": 0.18199290537892113,
+        "ci_hi": 0.37022958084137286
+      },
+      "405.0 kyr (g2-g5 ecc long)": {
+        "period_kyr": 405.0,
+        "amp": 0.047888563729877945,
+        "ci_lo": 0.01306023692418735,
+        "ci_hi": 0.11041323802485925
+      }
+    }
+  },
+  "comparison": {
+    "23.7 kyr (climatic precession)": {
+      "period_kyr": 23.7,
+      "pre_mpt_amp": 0.0963537821691862,
+      "post_mpt_amp": 0.21129875961872377,
+      "ratio_post_over_pre": 2.1929472290740737
+    },
+    "41.0 kyr (obliquity)": {
+      "period_kyr": 41.0,
+      "pre_mpt_amp": 0.8377444326675418,
+      "post_mpt_amp": 0.6039413822146166,
+      "ratio_post_over_pre": 0.7209136326833582
+    },
+    "95.0 kyr (g4-g5 ecc beat)": {
+      "period_kyr": 95.0,
+      "pre_mpt_amp": 0.5080890790230204,
+      "post_mpt_amp": 0.9248419621081333,
+      "ratio_post_over_pre": 1.8202358607795048
+    },
+    "99.0 kyr (g3-g5 ecc beat)": {
+      "period_kyr": 99.0,
+      "pre_mpt_amp": 0.30415708517364026,
+      "post_mpt_amp": 0.3598669283186138,
+      "ratio_post_over_pre": 1.183161418426828
+    },
+    "110.0 kyr (g3-g1 Earth-Mercury)": {
+      "period_kyr": 110.0,
+      "pre_mpt_amp": 1.8119189780818181,
+      "post_mpt_amp": 3.031162621067862,
+      "ratio_post_over_pre": 1.6729018558416957
+    },
+    "111.77 kyr (H/3 model)": {
+      "period_kyr": 111.77,
+      "pre_mpt_amp": 1.6724963132927355,
+      "post_mpt_amp": 2.7433893028194496,
+      "ratio_post_over_pre": 1.6402961734596522
+    },
+    "124.0 kyr (g4-g2 ecc beat)": {
+      "period_kyr": 124.0,
+      "pre_mpt_amp": 0.40423859329467526,
+      "post_mpt_amp": 0.2700343911836022,
+      "ratio_post_over_pre": 0.668007448231834
+    },
+    "405.0 kyr (g2-g5 ecc long)": {
+      "period_kyr": 405.0,
+      "pre_mpt_amp": 0.14104561008562974,
+      "post_mpt_amp": 0.047888563729877945,
+      "ratio_post_over_pre": 0.3395253755207587
+    }
+  },
+  "diagnostic": {
+    "q1_41kyr_ratio": 0.7209136326833582,
+    "q1_interpretation": "YES \u2014 41-kyr shrank, consistent with saturation",
+    "q2_h3_region_mean_ratio": 1.656599014650674,
+    "q2_interpretation": "H/3 region grew (1.66\u00d7) \u2014 consistent with visibility-mechanism but see Q3 for whether this is H/3-specific",
+    "q3_interpretation": "Individual candidates inside 80-125 kyr cannot be resolved separately at T=1000 (Rayleigh ~10 kyr at 100-kyr period); see band-aggregate below",
+    "q3_individual_ratios_collinear_warning": "95, 99, 110, 111.77 are pairwise within the T=1000 Rayleigh limit; the individual ratios are NOT independent measurements.",
+    "q3_individual_ratios": {
+      "95": 1.8202358607795048,
+      "99": 1.183161418426828,
+      "110": 1.6729018558416957,
+      "111.77": 1.6402961734596522,
+      "124": 0.668007448231834
+    },
+    "band_100kyr_rms_pre": 2.5679503862231248,
+    "band_100kyr_rms_post": 4.215671611449186,
+    "band_100kyr_ratio": 1.6416483877827122,
+    "net_interpretation": "100-kyr BAND AS A WHOLE grew 1.64\u00d7 at MPT, while 41-kyr obliquity shrank to 0.72\u00d7. Consistent with the visibility-mechanism story \u2014 but the data CANNOT separately attribute the band's growth to specific sub-periods (H/3 vs eccentricity beats are Rayleigh-coupled at T=1000)."
+  },
+  "berger_triplet_test": {
+    "candidates": [
+      "19.2 kyr (g3+k Earth, Berger)",
+      "22.4 kyr (g2+k Venus, Berger)",
+      "23.7 kyr (g5+k Jupiter, Berger)",
+      "41.0 kyr (obliquity, anchor)",
+      "110.0 kyr (100-kyr-band anchor)"
+    ],
+    "pre_mpt": {
+      "r2": 0.37648097479239295,
+      "condition": 1.5204530908755127,
+      "window_kyr": [
+        1500,
+        2500
+      ],
+      "T_kyr": 1000,
+      "amps": {
+        "19.2 kyr (g3+k Earth, Berger)": {
+          "period_kyr": 19.2,
+          "amp": 0.04272280492078669,
+          "ci_lo": 0.013697818263667817,
+          "ci_hi": 0.12419365399821389
+        },
+        "22.4 kyr (g2+k Venus, Berger)": {
+          "period_kyr": 22.4,
+          "amp": 0.18473161572306168,
+          "ci_lo": 0.12002185724688345,
+          "ci_hi": 0.2560273205584718
+        },
+        "23.7 kyr (g5+k Jupiter, Berger)": {
+          "period_kyr": 23.7,
+          "amp": 0.12170677136054357,
+          "ci_lo": 0.06443711005069686,
+          "ci_hi": 0.20012090104409003
+        },
+        "41.0 kyr (obliquity, anchor)": {
+          "period_kyr": 41.0,
+          "amp": 0.8272625180604624,
+          "ci_lo": 0.7621109114431612,
+          "ci_hi": 0.8936679081958935
+        },
+        "110.0 kyr (100-kyr-band anchor)": {
+          "period_kyr": 110.0,
+          "amp": 0.15005771865180226,
+          "ci_lo": 0.08939186455837493,
+          "ci_hi": 0.22204687002442056
+        }
+      }
+    },
+    "post_mpt": {
+      "r2": 0.25741775328364147,
+      "condition": 1.5204530908755118,
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "T_kyr": 1000,
+      "amps": {
+        "19.2 kyr (g3+k Earth, Berger)": {
+          "period_kyr": 19.2,
+          "amp": 0.03923642277736764,
+          "ci_lo": 0.009725942628139457,
+          "ci_hi": 0.12334243384995791
+        },
+        "22.4 kyr (g2+k Venus, Berger)": {
+          "period_kyr": 22.4,
+          "amp": 0.1938461382008935,
+          "ci_lo": 0.1199958410299024,
+          "ci_hi": 0.2706937466865832
+        },
+        "23.7 kyr (g5+k Jupiter, Berger)": {
+          "period_kyr": 23.7,
+          "amp": 0.21287477745930156,
+          "ci_lo": 0.1342430897807266,
+          "ci_hi": 0.2940301105984361
+        },
+        "41.0 kyr (obliquity, anchor)": {
+          "period_kyr": 41.0,
+          "amp": 0.5994258775525207,
+          "ci_lo": 0.5211212409579552,
+          "ci_hi": 0.6688860907105447
+        },
+        "110.0 kyr (100-kyr-band anchor)": {
+          "period_kyr": 110.0,
+          "amp": 0.27418103401376964,
+          "ci_lo": 0.2045168438186459,
+          "ci_hi": 0.3468068392807451
+        }
+      }
+    },
+    "growth_ratios": {
+      "19.2 kyr (g3+k Earth, Berger)": {
+        "period_kyr": 19.2,
+        "pre": 0.04272280492078669,
+        "post": 0.03923642277736764,
+        "ratio": 0.9183952891229116
+      },
+      "22.4 kyr (g2+k Venus, Berger)": {
+        "period_kyr": 22.4,
+        "pre": 0.18473161572306168,
+        "post": 0.1938461382008935,
+        "ratio": 1.049339266817737
+      },
+      "23.7 kyr (g5+k Jupiter, Berger)": {
+        "period_kyr": 23.7,
+        "pre": 0.12170677136054357,
+        "post": 0.21287477745930156,
+        "ratio": 1.7490791603425442
+      },
+      "41.0 kyr (obliquity, anchor)": {
+        "period_kyr": 41.0,
+        "pre": 0.8272625180604624,
+        "post": 0.5994258775525207,
+        "ratio": 0.7245896731280533
+      },
+      "110.0 kyr (100-kyr-band anchor)": {
+        "period_kyr": 110.0,
+        "pre": 0.15005771865180226,
+        "post": 0.27418103401376964,
+        "ratio": 1.827170481313169
+      }
+    },
+    "verdict": "Jupiter-SPECIFIC growth \u2014 only g5+k (23.7 kyr) grew. The 23.7-kyr growth in the main fit is NOT general precession-band amplification.",
+    "sub_peak_ratios": {
+      "Earth_g3_k_19.2": 0.9183952891229116,
+      "Venus_g2_k_22.4": 1.049339266817737,
+      "Jupiter_g5_k_23.7": 1.7490791603425442
+    }
+  },
+  "delta_ordering_test": {
+    "candidates_with_delta": [
+      {
+        "label": "25.794 kyr (k pure axial, delta=0)",
+        "period_kyr": 25.794,
+        "delta": 0
+      },
+      {
+        "label": "23.739 kyr (g5+k Jupiter, delta=9)",
+        "period_kyr": 23.739,
+        "delta": 9
+      },
+      {
+        "label": "23.125 kyr (g1+k Mercury, delta=12)",
+        "period_kyr": 23.125,
+        "delta": 12
+      },
+      {
+        "label": "22.354 kyr (g2+k Venus, delta=16)",
+        "period_kyr": 22.354,
+        "delta": 16
+      },
+      {
+        "label": "19.161 kyr (g3+k Earth, delta=36)",
+        "period_kyr": 19.161,
+        "delta": 36
+      },
+      {
+        "label": "16.457 kyr (g6+k Saturn, delta=59)",
+        "period_kyr": 16.457,
+        "delta": 59
+      },
+      {
+        "label": "41.0 kyr (obliquity anchor)",
+        "period_kyr": 41.0,
+        "delta": null
+      },
+      {
+        "label": "110.0 kyr (100-kyr-band anchor)",
+        "period_kyr": 110.0,
+        "delta": null
+      }
+    ],
+    "pre_mpt": {
+      "r2": 0.3835735251997192,
+      "condition": 1.6133428280379933,
+      "window_kyr": [
+        1500,
+        2500
+      ],
+      "T_kyr": 1000,
+      "amps": {
+        "25.794 kyr (k pure axial, delta=0)": {
+          "period_kyr": 25.794,
+          "amp": 0.09077170055931988,
+          "ci_lo": 0.0312380598044956,
+          "ci_hi": 0.1674304081897992
+        },
+        "23.739 kyr (g5+k Jupiter, delta=9)": {
+          "period_kyr": 23.739,
+          "amp": 0.10899351936576836,
+          "ci_lo": 0.04738811304264735,
+          "ci_hi": 0.17989233702254376
+        },
+        "23.125 kyr (g1+k Mercury, delta=12)": {
+          "period_kyr": 23.125,
+          "amp": 0.030418992895510415,
+          "ci_lo": 0.009784629005750974,
+          "ci_hi": 0.12207089551752656
+        },
+        "22.354 kyr (g2+k Venus, delta=16)": {
+          "period_kyr": 22.354,
+          "amp": 0.1936033179119179,
+          "ci_lo": 0.12466095656237886,
+          "ci_hi": 0.27115169411098533
+        },
+        "19.161 kyr (g3+k Earth, delta=36)": {
+          "period_kyr": 19.161,
+          "amp": 0.06886661096136636,
+          "ci_lo": 0.019654440658202838,
+          "ci_hi": 0.1429854480459654
+        },
+        "16.457 kyr (g6+k Saturn, delta=59)": {
+          "period_kyr": 16.457,
+          "amp": 0.018165077379295496,
+          "ci_lo": 0.007561443500677016,
+          "ci_hi": 0.10431696554131283
+        },
+        "41.0 kyr (obliquity anchor)": {
+          "period_kyr": 41.0,
+          "amp": 0.8242022415304868,
+          "ci_lo": 0.7555458254201644,
+          "ci_hi": 0.8882824504689688
+        },
+        "110.0 kyr (100-kyr-band anchor)": {
+          "period_kyr": 110.0,
+          "amp": 0.1507601711192837,
+          "ci_lo": 0.08501391767378852,
+          "ci_hi": 0.22319104458164657
+        }
+      }
+    },
+    "post_mpt": {
+      "r2": 0.2666215300660738,
+      "condition": 1.6133428280379947,
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "T_kyr": 1000,
+      "amps": {
+        "25.794 kyr (k pure axial, delta=0)": {
+          "period_kyr": 25.794,
+          "amp": 0.018287050831930548,
+          "ci_lo": 0.009590670920807239,
+          "ci_hi": 0.11266874476047975
+        },
+        "23.739 kyr (g5+k Jupiter, delta=9)": {
+          "period_kyr": 23.739,
+          "amp": 0.19897334464288652,
+          "ci_lo": 0.12542245635246432,
+          "ci_hi": 0.2760896226805511
+        },
+        "23.125 kyr (g1+k Mercury, delta=12)": {
+          "period_kyr": 23.125,
+          "amp": 0.1457018125530745,
+          "ci_lo": 0.07181105792194833,
+          "ci_hi": 0.23427936225136226
+        },
+        "22.354 kyr (g2+k Venus, delta=16)": {
+          "period_kyr": 22.354,
+          "amp": 0.16809765800845594,
+          "ci_lo": 0.09785780243170501,
+          "ci_hi": 0.2493490010055673
+        },
+        "19.161 kyr (g3+k Earth, delta=36)": {
+          "period_kyr": 19.161,
+          "amp": 0.058065455372868086,
+          "ci_lo": 0.013532373253390363,
+          "ci_hi": 0.14460920108302017
+        },
+        "16.457 kyr (g6+k Saturn, delta=59)": {
+          "period_kyr": 16.457,
+          "amp": 0.023710204650423103,
+          "ci_lo": 0.008786482686839996,
+          "ci_hi": 0.11149561669848516
+        },
+        "41.0 kyr (obliquity anchor)": {
+          "period_kyr": 41.0,
+          "amp": 0.5979664493739419,
+          "ci_lo": 0.5205639162814293,
+          "ci_hi": 0.6768219020049304
+        },
+        "110.0 kyr (100-kyr-band anchor)": {
+          "period_kyr": 110.0,
+          "amp": 0.2741206034799589,
+          "ci_lo": 0.2052316082596588,
+          "ci_hi": 0.3512540036426571
+        }
+      }
+    },
+    "delta_ordered_results": [
+      {
+        "delta": 0,
+        "label": "25.794 kyr (k pure axial, delta=0)",
+        "pre": 0.09077170055931988,
+        "post": 0.018287050831930548,
+        "ratio": 0.20146202747385838
+      },
+      {
+        "delta": 9,
+        "label": "23.739 kyr (g5+k Jupiter, delta=9)",
+        "pre": 0.10899351936576836,
+        "post": 0.19897334464288652,
+        "ratio": 1.8255520676890644
+      },
+      {
+        "delta": 12,
+        "label": "23.125 kyr (g1+k Mercury, delta=12)",
+        "pre": 0.030418992895510415,
+        "post": 0.1457018125530745,
+        "ratio": 4.78983025682546
+      },
+      {
+        "delta": 16,
+        "label": "22.354 kyr (g2+k Venus, delta=16)",
+        "pre": 0.1936033179119179,
+        "post": 0.16809765800845594,
+        "ratio": 0.8682581467169583
+      },
+      {
+        "delta": 36,
+        "label": "19.161 kyr (g3+k Earth, delta=36)",
+        "pre": 0.06886661096136636,
+        "post": 0.058065455372868086,
+        "ratio": 0.8431583108604308
+      },
+      {
+        "delta": 59,
+        "label": "16.457 kyr (g6+k Saturn, delta=59)",
+        "pre": 0.018165077379295496,
+        "post": 0.023710204650423103,
+        "ratio": 1.3052630690936624
+      }
+    ],
+    "monotonic_decline": false,
+    "spearman_rho": -0.08571428571428572,
+    "verdict": "\u03b4-ordering hypothesis NOT supported \u2014 Spearman \u03c1 = -0.09. The H-divisor \u03b4 does not cleanly predict growth ratio."
+  },
+  "runtime_seconds": 4.26
+}

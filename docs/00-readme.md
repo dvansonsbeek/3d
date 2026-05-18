@@ -50,6 +50,8 @@ Documents are organized in numbered ranges by category, with gaps for future add
 | 13 | [Mercury Precession Breakdown](13-mercury-precession-breakdown.md) | Mercury's perihelion precession by contributing planet |
 | 14 | [Solstice Prediction](14-solstice-prediction.md) | Solstice RA and timing from Fibonacci harmonics (H/3, H/8, H/16) |
 | 15 | [Planet Nine Prediction](15-planet-nine-prediction.md) | Falsifiable test: the Fibonacci 4-pair structure forbids a major 9th planet at ETNO distances (canonical 7.5M-config search) |
+| 16 | [Milankovitch Language of the Holistic Model](16-milankovitch-language.md) | Model framework: five H-divisor Milankovitch periods (H/3 inclination, H/5 ecliptic, H/8 obliquity, H/13 axial, H/16 climatic precession) closed by Fibonacci beat algebra; Berger 1978 spectrum matched <0.4 %; eigenmode convergence at H/3 and H/5 |
+| 17 | [Milankovitch Evidence](17-milankovitch-evidence.md) | Empirical tests on LR04 + Cheng 2016: 405-kyr absence (against mainstream eccentricity), no eccentricity-beat phase coupling, cross-planet obliquity validation (Mercury 0.09%, Earth 2.2%, Mars 2.4%), peak-position Rayleigh-limited at T=641 kyr, multi-component amplitude fit with robustness checks. **Final locked synthesis (§8)**: H/3 = 111.77 kyr inclination attribution is consistent with the data and supported by ~110 kyr amplitude-profile centroid; aligns with Muller-MacDonald 1997 with a viable no-dust mechanism |
 
 ### 20–29 Technical Reference
 
