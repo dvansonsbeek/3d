@@ -93,10 +93,10 @@ Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV expo
 
 ### Python Analysis Scripts (Optional)
 
-The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis). To use them:
+The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis, Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records, Planet Nine falsification). To use them:
 
 ```bash
-pip install -r requirements.txt   # numpy, pandas, openpyxl
+pip install -r requirements.txt   # numpy, pandas, openpyxl, scipy
 python3 scripts/fibonacci_significance.py
 ```
 
@@ -154,7 +154,8 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 | 80–99 | Appendices | Code scripts and data spreadsheets |
 
 **Investigation & Verification:**
-- [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis
+- [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
+- [Milankovitch Framework (Doc 16)](docs/16-milankovitch-language.md) and [Empirical Evidence (Doc 17)](docs/17-milankovitch-evidence.md) — Empirical tests of the H/3 = 111.77-kyr inclination attribution against LR04 + Cheng2016 U-Th-dated speleothem records
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — 429-term ML system for planetary precession prediction
 

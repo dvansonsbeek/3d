@@ -21,6 +21,10 @@ python fibonacci_311_deep.py
 
 # Test TRAPPIST-1 exoplanet Fibonacci structure
 python fibonacci_trappist1_deep.py
+
+# Run Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records
+python milankovitch_spectral_tests.py
+# → writes data/milankovitch-spectral-results.json (consumed by docs/17)
 ```
 
 ---
@@ -44,6 +48,7 @@ python fibonacci_trappist1_deep.py
 | `predict_tilt_from_eccentricity.py` | Law 4 | K amplitude constant investigation — universality, tilt prediction, K-ψ relations |
 | `fibonacci_law4_balance_search.py` | Law 5 | Proves exactly one balance equation exists in (m, a, d) space — Law 5 itself |
 | `fibonacci_psi_amd.py` | Law 2 | AMD interpretation of ψ: mass cancellation, amplitude budget, eccentricity parallel |
+| `fibonacci_amd_structure.py` | Law 2 | Systematic AMD-based investigation of Fibonacci inclination structure (complements `fibonacci_psi_amd.py`) |
 
 ### Formation & Structure
 
@@ -60,6 +65,30 @@ python fibonacci_trappist1_deep.py
 | `fibonacci_trappist1_deep.py` | TRAPPIST-1: Fibonacci period ratios, super-period = 311 × P_b, additive triads |
 | `fibonacci_exoplanet_test.py` | Broader exoplanet tests: TRAPPIST-1 + Kepler-90 period ratios and ξ-structure |
 
+### Milankovitch & Paleoclimate
+
+Empirical tests of the model's H/3 = 111.77-kyr inclination attribution for the dominant 100-kyr glacial cycle, run on the LR04 benthic δ¹⁸O stack and the U-Th-dated Cheng 2016 speleothem record.
+
+| Script | Description |
+|--------|-------------|
+| `milankovitch_spectral_tests.py` | Spectral analysis (Lomb-Scargle, multitaper, Hinich bispectrum) of LR04 and Cheng 2016. Tests the model's H/3 attribution against the mainstream 95k/125k eccentricity beat; documents the chronology-bias test (LR04 vs Cheng2016 share the same FFT bin, refuting a ~10% dating offset). Output: `data/milankovitch-spectral-results.json` |
+| `milankovitch_amplitude_fit.py` | Multi-component OLS amplitude fit over LR04 with the five H-divisor candidates plus the Berger 95k/100k/125k triplet; collinearity-aware analysis with Rayleigh resolution diagnostics. Output: `data/milankovitch-amplitude-fit-results.json` |
+| `mpt_transition_analysis.py` | Comparative amplitude analysis across the Mid-Pleistocene Transition (pre-MPT vs post-MPT intervals). Documents 1.75×–2.19× amplitude growth in the 80–125 kyr band. Output: `data/mpt-transition-analysis.json` |
+
+Used in: [Doc 16](../docs/16-milankovitch-language.md) (model framework) and [Doc 17](../docs/17-milankovitch-evidence.md) (empirical evidence).
+
+### Falsifiable Predictions
+
+| Script | Description |
+|--------|-------------|
+| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. The closed 8-planet structure forbids a major 9th planet at ETNO distances (Doc 15). |
+
+### Regression Tests
+
+| Script | Description |
+|--------|-------------|
+| `test_fibonacci_significance.py` | Locks in the 11 observed test statistics from `fibonacci_significance.py` to guard against silent drift when underlying constants change. |
+
 ### Archived Scripts
 
 Completed search scripts moved to `archive/`:
@@ -72,7 +101,9 @@ Completed search scripts moved to `archive/`:
 
 | File | Description |
 |------|-------------|
-| [`../data/01-holistic-year-objects-data.xlsx`](../data/01-holistic-year-objects-data.xlsx) | Excel data file with planet perihelions, fluctuations, Earth eccentricity/obliquity. All scripts read from this via `constants_scripts.py`. |
+| [`../data/01-holistic-year-objects-data.xlsx`](../data/01-holistic-year-objects-data.xlsx) | Excel data file with planet perihelions, fluctuations, Earth eccentricity/obliquity. All Fibonacci-Law scripts read from this via `constants_scripts.py`. |
+| [`../data/lr04-stack.txt`](../data/lr04-stack.txt) | LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005, *Paleoceanography* 20, PA1003) — 5.3 Myr orbitally-tuned marine climate record. Used by the Milankovitch scripts. |
+| [`../data/cheng2016-speleothem.txt`](../data/cheng2016-speleothem.txt) | Cheng 2016 U-Th-dated Asian Monsoon speleothem record (*Science* 352, 343) — 640-kyr non-tuned chronology. Used by the Milankovitch scripts as the chronology-bias control. |
 
 ---
 
