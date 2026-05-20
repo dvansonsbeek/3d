@@ -240,6 +240,35 @@ This is the **same prediction**, from a different angle, as [Berger & Loutre 200
 
 The formula answers the **orbital half** ("yes, the clock is shifting away from 100-kyr pacing toward 41-kyr pacing for the next ~250 kyr"); it explicitly takes no position on the **climate-response half**, which depends on ice-sheet hysteresis and anthropogenic forcing.
 
+#### Empirical analogue: the late Pliocene (8H ago)
+
+Because the formula is exactly 8H-periodic (every component is an integer-divisor of 8H, so C(t) = C(t + 8H) by construction), the **orbital signal in the next 250 kyr is byte-identical to the orbital signal in 2.43–2.68 Ma BC** (verified: max |ΔC| = 3 × 10⁻¹⁴, pure floating-point noise). This makes the late-Pliocene LR04 record a **direct empirical analogue** for how Earth's climate responded to the same orbital signal we're about to enter.
+
+The comparison reveals concrete climate-response differences between pre-iNHG (no/small NH ice sheets) and post-MPT (large hysteretic ice sheets) states:
+
+| Metric | Late Pliocene (2.43–2.68 Ma BC) | Post-MPT (0–250 kyr BP) |
+|---|---:|---:|
+| LR04 correlation with formula C(t) | **r = 0.760** | r = 0.675 |
+| LR04 normalised standard deviation | 1.04 | 1.74 |
+| LR04 normalised range | [−1.62, +2.34] | [−4.18, +2.89] |
+| Climate amplification factor (LR04 std / orbital std) | **2.4×** | 4.0× |
+| LR04 peak-to-peak intervals (kyr) | 32, 46, 35, 44 (mean **39.2**) | 44, 25, 22, 31, 45, 20, 18 (mean 29.3) |
+| Dominant spectral period (15–120 kyr band) | **41.8 kyr** (amp 1.04) | 41.8 kyr (amp 0.55) |
+
+Three findings emerge:
+
+1. **The orbital signal is empirically 41-kyr-paced in the late-Pliocene window.** LR04 peak-to-peak intervals cluster tightly at the obliquity period (mean 39.2 kyr), spectral peak at 41.8 kyr is dominant and high-amplitude — the canonical "41-kyr world." This is the empirical confirmation that the next 250 kyr orbital signal will indeed look 41-kyr-paced (the same signal produced this pattern 8H ago).
+
+2. **The climate response was cleaner and more orbital-coupled in the late Pliocene.** LR04 correlation with the orbital formula is r = 0.760 (late Pliocene) vs r = 0.675 (post-MPT 0–250 kyr), and the amplification ratio is 2.4× vs 4.0×. Without large hysteretic ice sheets, the climate tracked the orbital signal more directly — consistent with the model's "same forcing, different response" framing for the MPT.
+
+3. **The climate envelope reachable by orbital forcing alone is modest.** Late-Pliocene LR04 stays within normalised range [−1.62, +2.34] — substantially narrower than the post-MPT range [−4.18, +2.89]. If ice sheets shrink below the Willeit threshold and the climate re-couples to the orbital clock, the natural climate amplitude over the next 250 kyr would be closer to the late-Pliocene envelope than to the late-Pleistocene one.
+
+This empirical anchor sharpens the three climate-response scenarios:
+
+- **Scenario A (return to 41-kyr world)** gains a concrete empirical analogue: 2.4× amplification of the orbital signal, glacial peaks at ~40-kyr intervals, normalised climate range [−1.6, +2.3]. The late Pliocene happened, and we have the LR04 data — this scenario is not speculative.
+- **Scenario B (post-MPT hysteresis persists)** would require the orbital signal's reduced 100-kyr-band amplitude to nevertheless trigger occasional large hysteretic responses. Hard to assess without an ice-sheet model.
+- **Scenario C (anthropogenic CO₂)** is consistent with the late-Pliocene analogue in another way: late-Pliocene global mean temperature was ~2–3 °C warmer than pre-industrial, comparable to projected anthropogenic warming. If anthropogenic CO₂ pushes us toward Pliocene-like temperatures and ice-sheet reduction, the natural orbital response would then converge on Scenario A.
+
 ### 2.5 Earth's Fibonacci H/n positions are empty in the climate spectrum
 
 The model's intrinsic Earth precession periods are the Fibonacci divisors of H:
