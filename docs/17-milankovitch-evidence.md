@@ -210,6 +210,36 @@ Evaluating C(t) at negative t (future):
 
 The LGM offset of ~9 kyr is expected: pure orbital forcing predicts the **insolation drive**, not the **ice-sheet response**. Ice sheets carry memory; peak ice volume lags peak orbital cooling by several kyr (standard climate physics). The MIS 6 match within 2 kyr is excellent.
 
+#### Pacing shift: the next 250 kyr looks more like a 41-kyr world than a 100-kyr world
+
+A striking feature of the forward projection is that the **intervals between predicted glacial peaks are not ~100 kyr** — they are much closer to the obliquity band (~40 kyr):
+
+| Interval | Years between peaks | Closest band |
+|---|---:|---|
+| Glacial onset → 2nd peak | **43.1 kyr** | obliquity (~41 kyr) |
+| 2nd → 3rd peak | **29.2 kyr** | precession (~23 kyr) |
+| 3rd → 4th peak | **43.8 kyr** | obliquity (~41 kyr) |
+| 4th → 5th peak | **40.4 kyr** | obliquity (~41 kyr) |
+| 5th → 6th peak | **48.5 kyr** | obliquity (~41 kyr) |
+| Mean | **~41 kyr** | |
+
+By contrast the **past ~700 kyr** in LR04 was dominated by ~100-kyr pacing (LGM ~20 kyr BP → MIS 6 ~140 kyr BP → MIS 8 ~240 kyr BP → MIS 10 ~340 kyr BP → MIS 11 ~425 kyr BP, mean interval ~100 kyr). The forward projection's ~40-kyr orbital pacing therefore resembles the **pre-MPT "41-kyr world"** (Early Pleistocene, ~2.7–1.2 Ma) more than the late-Pleistocene 100-kyr regime.
+
+**Why the pattern shifts.** Planetary eigenmodes are stationary on Myr timescales, but the phase alignment between different beats is not. Two factors converge over the next ~50–250 kyr:
+
+1. **Eccentricity is at a long-term minimum.** The Venus-Jupiter g₂−g₅ eccentricity envelope (~400-kyr modulation) is near a deep low; Earth's eccentricity drops toward ~0.014 (close to the model's minimum). Climatic-precession amplitude scales as e·sin ϖ, so when eccentricity is small, the precession contribution is suppressed and the obliquity-band signal (k+s₃ at 41 kyr) shows through more cleanly.
+2. **The 100-kyr-band beats are partially out of phase.** The Mercury-Mars s₁−s₄ nodal beat (n=25, 107 kyr), the Mars-Jupiter g₄−g₅ eccentricity beat (n=28, 95.8 kyr), and adjacent inclination-side beats happen to be phased such that their constructive interference — which produced the strong 100-kyr-band signal of the last ~1 Myr — breaks down for the next ~250 kyr.
+
+This is the **same prediction**, from a different angle, as [Berger & Loutre 2002 (*Science* 297, 1287)](https://www.science.org/doi/10.1126/science.1076120) — the famous "exceptionally long interglacial ahead" paper. Berger & Loutre identified the next 50+ kyr as an unusual eccentricity-minimum interval where the next natural glaciation is unusually delayed; the 8H formula reaches the same conclusion via the integer-divisor decomposition and extends it to ~250 kyr.
+
+**Will Earth's climate respond to the new orbital pacing?** Three plausible scenarios — only one of which the formula can speak to:
+
+- **(A) Return to a "41-kyr world" (orbital-paced).** If ice sheets shrink below the Willeit 2019 hysteresis threshold (anthropogenic warming, weaker orbital cooling, or both), the climate response could track each obliquity cycle individually — like the pre-MPT Early Pleistocene. This is the scenario where the orbital prediction and climate response align.
+- **(B) 100-kyr-band response persists despite weak orbital signal.** If post-MPT ice-sheet hysteresis remains in place, the climate could keep producing ~100-kyr cycles even when orbital triggers are weaker — manifesting as subdued or "skipped" glacials. Several "exceptionally long interglacial" hypotheses fall in this camp.
+- **(C) Anthropogenic CO₂ overrides orbital pacing.** [Ganopolski et al. 2016](https://www.nature.com/articles/nature16494) showed moderate-emission scenarios can delay the next natural glaciation by 50+ kyr by holding ice sheets below the formation threshold even when orbital forcing would otherwise allow them. In this scenario, the orbital "41-kyr world" prediction becomes academic in the near-term — surface climate is dominated by CO₂.
+
+The formula answers the **orbital half** ("yes, the clock is shifting away from 100-kyr pacing toward 41-kyr pacing for the next ~250 kyr"); it explicitly takes no position on the **climate-response half**, which depends on ice-sheet hysteresis and anthropogenic forcing.
+
 ### 2.5 Earth's Fibonacci H/n positions are empty in the climate spectrum
 
 The model's intrinsic Earth precession periods are the Fibonacci divisors of H:
@@ -462,6 +492,8 @@ The orbital forcing — planetary eigenmodes, Earth's precession, obliquity osci
 - Once ice sheets pass the Willeit threshold (~1 Ma), they become hysteretic — small orbital nudges trigger large climate responses
 
 The 8H formula has stationary amplitudes, so the formula's reconstruction shows the same oscillation amplitude in pre-MPT as post-MPT. LR04's actual amplitude grows from left to right. **This mismatch is the correct and expected outcome**: the formula correctly captures orbital forcing; the LR04 amplitude variation correctly reflects changing climate sensitivity.
+
+The same kind of climate-sensitivity transition could in principle run in reverse — if ice sheets shrink below the Willeit hysteresis threshold (anthropogenic warming, weaker orbital cooling, or both), the climate response could re-couple to the orbital signal at its native pacing. Doc 17 §2.4 ("Pacing shift") notes that the 8H formula's forward projection for the next ~250 kyr is **obliquity-band (~40-kyr) paced**, not 100-kyr paced — so a return to a "41-kyr-world" response is the orbital-driven scenario.
 
 ### 5.3 Two MPT mechanisms supported by evidence
 
