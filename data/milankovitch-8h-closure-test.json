@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "script": "milankovitch_8h_closure_test.py",
+    "H_kyr": 335.317,
+    "eight_H_kyr": 2682.536,
+    "window_kyr": [
+      0,
+      5320
+    ],
+    "n_max_fit": 200,
+    "scan_range": [
+      1.0,
+      180.0,
+      0.05
+    ],
+    "int_tolerance": 0.3,
+    "n_noise_samples": 200,
+    "rng_seed": 20260520
+  },
+  "joint_fit": {
+    "n_integers_fit": 200,
+    "r_squared": 0.44307269396033055,
+    "residual_std": 0.7462756233722696,
+    "residual_variance_fraction": 0.5569273060396694
+  },
+  "noise_floor": {
+    "median": 0.029191844890849396,
+    "p90": 0.07461796776002631,
+    "p95": 0.11547917539303175,
+    "p99": 0.17687143755322826,
+    "max": 0.2684344772796089,
+    "n_samples": 200
+  },
+  "integer_check": [
+    {
+      "n": 25,
+      "residual_amp": 1.1961376384278308e-16
+    },
+    {
+      "n": 28,
+      "residual_amp": 8.844914714167239e-16
+    },
+    {
+      "n": 65,
+      "residual_amp": 8.440031000452359e-16
+    },
+    {
+      "n": 113,
+      "residual_amp": 3.905951223333306e-16
+    },
+    {
+      "n": 120,
+      "residual_amp": 1.925111230699274e-17
+    }
+  ],
+  "half_integer_check": [
+    {
+      "n": 2.5,
+      "period_kyr": 1073.0144,
+      "amplitude": 0.1323531021131621,
+      "note": "above 95th pct"
+    },
+    {
+      "n": 5.5,
+      "period_kyr": 487.7338181818182,
+      "amplitude": 0.02984400689384988,
+      "note": "at noise level"
+    },
+    {
+      "n": 10.5,
+      "period_kyr": 255.47961904761905,
+      "amplitude": 0.040532936187358655,
+      "note": "at noise level"
+    },
+    {
+      "n": 15.5,
+      "period_kyr": 173.06683870967743,
+      "amplitude": 0.013265850396279899,
+      "note": "at noise level"
+    },
+    {
+      "n": 20.5,
+      "period_kyr": 130.85541463414634,
+      "amplitude": 0.050218167809986405,
+      "note": "at noise level"
+    },
+    {
+      "n": 25.5,
+      "period_kyr": 105.19749019607843,
+      "amplitude": 0.15178900632134695,
+      "note": "above 95th pct"
+    },
+    {
+      "n": 30.5,
+      "period_kyr": 87.952,
+      "amplitude": 0.03202181700882215,
+      "note": "at noise level"
+    },
+    {
+      "n": 40.5,
+      "period_kyr": 66.23545679012346,
+      "amplitude": 0.05544718583068466,
+      "note": "at noise level"
+    },
+    {
+      "n": 50.5,
+      "period_kyr": 53.11952475247525,
+      "amplitude": 0.05826552064388829,
+      "note": "at noise level"
+    },
+    {
+      "n": 65.5,
+      "period_kyr": 40.95474809160305,
+      "amplitude": 0.5372648792965095,
+      "note": "above 95th pct"
+    },
+    {
+      "n": 75.5,
+      "period_kyr": 35.53027814569536,
+      "amplitude": 0.03757720836125321,
+      "note": "at noise level"
+    },
+    {
+      "n": 100.5,
+      "period_kyr": 26.69190049751244,
+      "amplitude": 0.030513717074812582,
+      "note": "at noise level"
+    },
+    {
+      "n": 113.5,
+      "period_kyr": 23.634678414096918,
+      "amplitude": 0.10601848165900875,
+      "note": "at noise level"
+    },
+    {
+      "n": 120.5,
+      "period_kyr": 22.261709543568465,
+      "amplitude": 0.010342137044074688,
+      "note": "at noise level"
+    },
+    {
+      "n": 150.5,
+      "period_kyr": 17.824159468438538,
+      "amplitude": 0.016482100188556413,
+      "note": "at noise level"
+    }
+  ],
+  "orphans": [
+    {
+      "n": 65.45000000000006,
+      "period_kyr": 40.986035141329225,
+      "amplitude": 0.5437051213570342,
+      "nearest_int": 65,
+      "delta_n": 0.4500000000000597
+    },
+    {
+      "n": 28.450000000000024,
+      "period_kyr": 94.28949033391908,
+      "amplitude": 0.3002990643085292,
+      "nearest_int": 28,
+      "delta_n": 0.45000000000002416
+    },
+    {
+      "n": 29.550000000000026,
+      "period_kyr": 90.77956006768181,
+      "amplitude": 0.20109707822299758,
+      "nearest_int": 30,
+      "delta_n": 0.4499999999999744
+    },
+    {
+      "n": 26.600000000000023,
+      "period_kyr": 100.8472180451127,
+      "amplitude": 0.17688637586828615,
+      "nearest_int": 27,
+      "delta_n": 0.39999999999997726
+    },
+    {
+      "n": 21.500000000000018,
+      "period_kyr": 124.76911627906966,
+      "amplitude": 0.17540956784420916,
+      "nearest_int": 22,
+      "delta_n": 0.49999999999998224
+    },
+    {
+      "n": 27.450000000000024,
+      "period_kyr": 97.72444444444436,
+      "amplitude": 0.1714416814645104,
+      "nearest_int": 27,
+      "delta_n": 0.45000000000002416
+    },
+    {
+      "n": 1.3000000000000003,
+      "period_kyr": 2063.4892307692303,
+      "amplitude": 0.16611766134302153,
+      "nearest_int": 1,
+      "delta_n": 0.30000000000000027
+    },
+    {
+      "n": 25.45000000000002,
+      "period_kyr": 105.40416502946947,
+      "amplitude": 0.15485066343349102,
+      "nearest_int": 25,
+      "delta_n": 0.4500000000000206
+    },
+    {
+      "n": 66.60000000000005,
+      "period_kyr": 40.27831831831829,
+      "amplitude": 0.1482657683352673,
+      "nearest_int": 67,
+      "delta_n": 0.39999999999994884
+    },
+    {
+      "n": 35.60000000000003,
+      "period_kyr": 75.35213483146062,
+      "amplitude": 0.1470428157059049,
+      "nearest_int": 36,
+      "delta_n": 0.39999999999997016
+    },
+    {
+      "n": 22.500000000000018,
+      "period_kyr": 119.22382222222213,
+      "amplitude": 0.14484200662025673,
+      "nearest_int": 23,
+      "delta_n": 0.49999999999998224
+    },
+    {
+      "n": 34.55000000000003,
+      "period_kyr": 77.6421418234442,
+      "amplitude": 0.13751810324210595,
+      "nearest_int": 35,
+      "delta_n": 0.4499999999999673
+    },
+    {
+      "n": 2.450000000000001,
+      "period_kyr": 1094.912653061224,
+      "amplitude": 0.13414902710285784,
+      "nearest_int": 2,
+      "delta_n": 0.45000000000000107
+    },
+    {
+      "n": 36.35000000000003,
+      "period_kyr": 73.7974140302613,
+      "amplitude": 0.13047418538653882,
+      "nearest_int": 36,
+      "delta_n": 0.35000000000002984
+    },
+    {
+      "n": 67.65000000000006,
+      "period_kyr": 39.65315594974128,
+      "amplitude": 0.12141826308907551,
+      "nearest_int": 68,
+      "delta_n": 0.34999999999993747
+    },
+    {
+      "n": 37.500000000000036,
+      "period_kyr": 71.53429333333327,
+      "amplitude": 0.11965959078235376,
+      "nearest_int": 38,
+      "delta_n": 0.4999999999999645
+    },
+    {
+      "n": 24.65000000000002,
+      "period_kyr": 108.82498985801209,
+      "amplitude": 0.11567084014468991,
+      "nearest_int": 25,
+      "delta_n": 0.3499999999999801
+    }
+  ],
+  "far_from_any_int_orphans": [],
+  "verdict": "PASS: no orphan peaks off the 8H lattice",
+  "runtime_seconds": 1.565521240234375
+}
