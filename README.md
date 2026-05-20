@@ -25,7 +25,7 @@ The model starts from a single observation: two of Earth's precession motions ro
 | Axial Precession | Clockwise | ~25,794 years |
 | Inclination Precession | Counter-clockwise | ~111,772 years |
 
-These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and climate patterns including ice ages.
+These two counter-rotating motions interact in a **Fibonacci ratio of 3:13**. From this starting point, the model derives what is normally calculated separately: precession of the equinoxes, obliquity oscillation, eccentricity cycles, Milankovitch beat frequencies, the length of days and years, and the orbital-forcing component of climate (the timing of glacial-interglacial cycles).
 
 Everything comes together in the **Earth Fundamental Cycle (H)**: a 335,317-year master cycle from which Earth's major precession periods emerge as Fibonacci divisions (H/3, H/5, H/8, H/13) — and this simulation visualizes it all in one interactive view.
 
@@ -93,7 +93,7 @@ Features: multi-planet overlay, synchronized zoom/pan, light/dark mode, CSV expo
 
 ### Python Analysis Scripts (Optional)
 
-The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis, Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records, Planet Nine falsification). To use them:
+The `scripts/` directory contains statistical analysis and verification scripts (Fibonacci significance tests, exoplanet tests, eccentricity analysis, Milankovitch spectral analysis on LR04 + Cheng2016 paleoclimate records producing the **8H Orbital Forcing Formula**, Planet Nine falsification). To use them:
 
 ```bash
 pip install -r requirements.txt   # numpy, pandas, openpyxl, scipy
@@ -117,6 +117,7 @@ npm run build
 - Planet info sidebar with per-planet data, charts, and precession analysis
 - [Eccentricity Balance Scale](docs/38-eccentricity-scale.md) for visualizing Law 5 balance per planet
 - [Invariable Plane Balance Explorer](docs/53-balance-explorer-reference.md) for interactive Fibonacci Law testing
+- **Orbital Forcing Formula Explorer** — Tools-menu modal plotting the 8H formula on top of LR04 across five tabs (full record → forward projection of the next natural glaciation)
 - Console tests for year length, day length, and calibration verification
 - Export functionality for solstice dates and object positions
 - Built with [Three.js](https://threejs.org/) and [Tweakpane v4](https://tweakpane.github.io/docs/)
@@ -155,7 +156,7 @@ Detailed documentation is available in the [`/docs`](docs/00-readme.md) folder, 
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — Statistical significance tests, exoplanet Fibonacci tests, eccentricity analysis, Milankovitch paleoclimate tests
-- [Milankovitch Framework (Doc 16)](docs/16-milankovitch-language.md) and [Empirical Evidence (Doc 17)](docs/17-milankovitch-evidence.md) — Empirical tests of the H/3 = 111.77-kyr inclination attribution against LR04 + Cheng2016 U-Th-dated speleothem records
+- [Milankovitch Framework (Doc 16)](docs/16-milankovitch-language.md) and [Empirical Evidence (Doc 17)](docs/17-milankovitch-evidence.md) — Spectral analysis of LR04 + Cheng2016 U-Th-dated speleothems. Produces the explicit **8H Orbital Forcing Formula** (26-component fit on LR04, R² = 0.238, forward projection of the next natural glaciation). Identifies the 100-kyr-band empirical centroid as the Mercury–Mars s₁−s₄ nodal beat at 107 kyr (planet-pair orbital-plane coupling); H/3 inclination precession is one theoretical pathway within the broader inclination-side eigenmode family
 - [Fitting Pipeline](tools/fit/README.md) — Pipeline: Earth perihelion harmonics, ML precession prediction, parallax corrections, solar measurements, obliquity/cardinal-point/year-length harmonics
 - [Predictive Formula Guide](tools/lib/python/PREDICTIVE_FORMULA_GUIDE.mdx) — 429-term ML system for planetary precession prediction
 
