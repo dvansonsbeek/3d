@@ -22291,6 +22291,390 @@ function closeWGCPanel() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// ORBITAL FORCING FORMULA EXPLORER (.lr04-)
+// LR04 δ¹⁸O climate proxy (Lisiecki & Raymo 2005) overlaid with the
+// 8H integer-divisor orbital-forcing formula from docs/17 §2.
+// Data: public/input/lr04-data.json (2,115 samples, 0–5,320 kyr BP)
+// The formula captures orbital forcing only — not the full climate
+// response (ice-sheet hysteresis, CO₂ feedbacks, etc.).
+// ═══════════════════════════════════════════════════════════════════
+
+let lr04Panel = null;
+let lr04Data = null;
+let lr04SelectedWindow = 'full';
+
+// Fitted coefficients from scripts/milankovitch_climate_formula.py on full LR04.
+// C_normalized(t) = intercept + Σ [a_n cos(2π n t / 8H) + b_n sin(2π n t / 8H)]
+// where t is age in kyr BP (positive = past, negative = future).
+// De-normalize to original δ¹⁸O units:
+//   δ¹⁸O_pred(t) = C_normalized(t) × LR04_STD + (LR04_TREND_SLOPE × t + LR04_TREND_INTERCEPT)
+const LR04_FORMULA = {
+  H_kyr: 335.317,
+  eight_H_kyr: 2682.536,
+  intercept: -0.002261,
+  // LR04 linear trend on dt=1 grid (Earth cooling slope, ppm/kyr) for de-normalization
+  LR04_TREND_SLOPE:     -0.00028904,
+  LR04_TREND_INTERCEPT: 4.253596,
+  LR04_STD:             0.267287,
+  // 26 active integer divisors of 8H (doc 17 §2.2 + pre-MPT additions from §3.3).
+  // Joint OLS fit on full LR04 (T=5320 kyr); R² = 0.238, condition number 1.6.
+  components: [
+    {n:7,   a:-0.089988, b:-0.062707, label:'g₂−g₅ Venus-Jupiter (~405k)'},
+    {n:9,   a:-0.040350, b:+0.103257, label:'g₂−g₇ Venus-Uranus'},
+    {n:12,  a:+0.101987, b:-0.019640, label:'s₅−s₁ Jupiter-Mercury nodal'},
+    {n:14,  a:+0.054979, b:+0.026097, label:'g₂−g₈ Venus-Neptune ecc (~192k)'},
+    {n:16,  a:+0.081679, b:-0.010479, label:'Mars Axial = 8H/16 (model, ~168k)'},
+    {n:18,  a:+0.087128, b:+0.085807, label:'s₄−s₆ Mars-Saturn nodal'},
+    {n:20,  a:-0.084197, b:+0.059747, label:'g₃−g₂ Earth-Venus ecc'},
+    {n:21,  a:+0.044452, b:+0.071342, label:'Mars Obliq / Jupiter Axial = 8H/21 (model, ~128k)'},
+    {n:22,  a:-0.043901, b:+0.083932, label:'s₂−s₄ / g₄−g₂ (~125k)'},
+    {n:25,  a:-0.066783, b:+0.202439, label:'s₁−s₄ Mercury-Mars nodal (100k)'},
+    {n:28,  a:-0.180551, b:-0.155608, label:'g₄−g₅ Mars-Jupiter (95k)'},
+    {n:30,  a:+0.082500, b:+0.093144, label:'g₃−g₇ Earth-Uranus ecc (~89k)'},
+    {n:31,  a:+0.078151, b:+0.133991, label:'g₄−g₇ Mars-Uranus'},
+    {n:35,  a:-0.060006, b:-0.111107, label:'Mars apsidal = 8H/35 (model)'},
+    {n:38,  a:-0.100127, b:+0.029125, label:'s₈−s₃ Neptune-Earth nodal (~71k)'},
+    {n:39,  a:-0.099399, b:+0.130220, label:'s₅−s₃ Earth nodal'},
+    {n:48,  a:-0.101161, b:-0.003824, label:'s₇−s₆ Uranus-Saturn nodal'},
+    {n:50,  a:-0.095594, b:+0.122590, label:'g₆−g₅ Saturn-Jupiter ecc'},
+    {n:53,  a:-0.039019, b:-0.132695, label:'Mars Ecc cycle = 8H/53 (model)'},
+    {n:65,  a:-0.111955, b:+0.250919, label:'k+s₃ Earth obliquity (41k)'},
+    {n:66,  a:+0.020411, b:-0.038065, label:'obliquity-band smeared centroid (~40.6k)'},
+    {n:68,  a:+0.133293, b:-0.092262, label:'k+s₄ Mars obliquity sub-peak'},
+    {n:73,  a:+0.037796, b:-0.084253, label:'2|s₄| Mars nodal harmonic'},
+    {n:76,  a:-0.006315, b:-0.090842, label:'g₄−s₃ Mars apsidal − Earth nodal'},
+    {n:113, a:-0.076753, b:-0.037619, label:'k+g₅ Jupiter (23.7k)'},
+    {n:120, a:+0.033739, b:+0.098624, label:'k+g₂ Venus = H/15 (22.4k)'},
+  ],
+};
+
+async function loadLR04Data() {
+  if (lr04Data) return lr04Data;
+  // Try local first (works for parcel dev server), then fall back to GitHub master
+  const urls = [
+    'input/lr04-data.json',
+    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lr04-data.json',
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        lr04Data = await res.json();
+        return lr04Data;
+      }
+    } catch (_) { /* try next */ }
+  }
+  console.error('Failed to load LR04 data from any source');
+  return null;
+}
+
+/** Evaluate normalized formula C(t) at age t (kyr BP). */
+function lr04FormulaNormalized(t_kyr_BP) {
+  const EIGHT_H = LR04_FORMULA.eight_H_kyr;
+  let C = LR04_FORMULA.intercept;
+  for (const c of LR04_FORMULA.components) {
+    const omega = 2 * Math.PI * c.n / EIGHT_H;
+    C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
+  }
+  return C;
+}
+
+/** Predicted δ¹⁸O (in original per-mille units) at age t (kyr BP). */
+function lr04FormulaD18O(t_kyr_BP) {
+  const C = lr04FormulaNormalized(t_kyr_BP);
+  return C * LR04_FORMULA.LR04_STD + LR04_FORMULA.LR04_TREND_SLOPE * t_kyr_BP + LR04_FORMULA.LR04_TREND_INTERCEPT;
+}
+
+/** Find local maxima or minima in [t, vals] arrays.
+ *  type: 'max' (glacial) or 'min' (interglacial); prominence in δ¹⁸O units. */
+function lr04FindExtrema(t, vals, type, prominence) {
+  const out = [];
+  const halfWidth = 8;  // require monotonicity over ±8 samples
+  for (let i = halfWidth; i < vals.length - halfWidth; i++) {
+    const v = vals[i];
+    let isExtremum = true;
+    for (let j = 1; j <= halfWidth; j++) {
+      if (type === 'max' && (vals[i - j] >= v || vals[i + j] >= v)) { isExtremum = false; break; }
+      if (type === 'min' && (vals[i - j] <= v || vals[i + j] <= v)) { isExtremum = false; break; }
+    }
+    if (!isExtremum) continue;
+    // Prominence relative to ±halfWidth neighbors
+    const localOpposite = (vals[i - halfWidth] + vals[i + halfWidth]) / 2;
+    if (Math.abs(v - localOpposite) < prominence) continue;
+    out.push({ t: t[i], v });
+  }
+  return out;
+}
+
+/** Render the LR04 + formula overlay chart for a chosen window. */
+function lr04RenderChart(windowKey) {
+  if (!lr04Data) return '<div style="padding:40px;text-align:center;color:#888">Loading LR04 data…</div>';
+
+  // Window selection
+  let t_lo, t_hi, title, subtitle, showFuture;
+  switch (windowKey) {
+    case 'past200':    t_lo = 0;    t_hi = 200;  title = 'Last 200 kyr';
+                        subtitle = 'High-resolution recent record; LGM + MIS 6 visible'; showFuture = false; break;
+    case 'postMPT':    t_lo = 0;    t_hi = 700;  title = 'Post-MPT (0–700 kyr BP)';
+                        subtitle = '~7 glacial-interglacial cycles since MPT'; showFuture = false; break;
+    case 'postMPText': t_lo = 0;    t_hi = 1200; title = 'Post-MPT extended (0–1,200 kyr BP)';
+                        subtitle = 'Through MPT transition (~1 Myr BP)'; showFuture = false; break;
+    case 'full':       t_lo = 0;    t_hi = 5320; title = 'Full LR04 (0–5,320 kyr BP)';
+                        subtitle = 'Pre-MPT: 41-kyr-band dominated · Post-MPT: 100-kyr-band dominated · Same orbital forcing throughout, climate response amplifies different bands';
+                        showFuture = false; break;
+    case 'future':     t_lo = -250; t_hi = 250;  title = 'Forward projection: −250 to +250 kyr';
+                        subtitle = 'Past = LR04 + formula match; future = formula extrapolation';
+                        showFuture = true; break;
+    default:           t_lo = 0;    t_hi = 200;  title = ''; subtitle = ''; showFuture = false;
+  }
+
+  // Extract LR04 in the window (only for past, t ≥ 0)
+  const ages = lr04Data.age_kyr_BP;
+  const d18o = lr04Data.d18o_per_mille;
+  const lr04T = [], lr04V = [];
+  for (let i = 0; i < ages.length; i++) {
+    if (ages[i] >= Math.max(0, t_lo) && ages[i] <= t_hi) {
+      lr04T.push(ages[i]); lr04V.push(d18o[i]);
+    }
+  }
+
+  // Build formula grid (0.5 kyr resolution)
+  const dtGrid = (t_hi - t_lo) / 800;
+  const fT = [], fV = [];
+  for (let t = t_lo; t <= t_hi + 1e-9; t += dtGrid) {
+    fT.push(t);
+    fV.push(lr04FormulaD18O(t));
+  }
+
+  // Chart dimensions
+  const W = 980, H = 380;
+  const margin = { top: 30, right: 30, bottom: 60, left: 60 };
+  const plotW = W - margin.left - margin.right;
+  const plotH = H - margin.top - margin.bottom;
+
+  // y-axis: δ¹⁸O. Inverted (paleoclimate convention: cold/glacial points down).
+  const allV = [...lr04V, ...fV];
+  const ymin = Math.min(...allV);
+  const ymax = Math.max(...allV);
+  const yPad = (ymax - ymin) * 0.08 || 0.2;
+  const y0 = ymin - yPad;
+  const y1 = ymax + yPad;
+
+  const xmin = t_lo;
+  const xmax = t_hi;
+
+  // x-axis runs left-to-right with TIME (past on left, future on right).
+  // Internally t is in kyr BP (positive = past), so we reverse the mapping:
+  // larger t (older past) maps to smaller pixel-x (left edge).
+  const sx = x => margin.left + ((xmax - x) / (xmax - xmin)) * plotW;
+  // INVERTED y: higher δ¹⁸O (colder) at the bottom of the plot
+  const sy = y => margin.top + ((y - y0) / (y1 - y0)) * plotH;
+
+  // LR04 polyline
+  let lr04Path = '';
+  for (let i = 0; i < lr04T.length; i++) {
+    lr04Path += (i === 0 ? 'M' : 'L') + sx(lr04T[i]).toFixed(1) + ',' + sy(lr04V[i]).toFixed(1) + ' ';
+  }
+
+  // Formula polyline (full range — including future if applicable)
+  let formulaPath = '';
+  for (let i = 0; i < fT.length; i++) {
+    formulaPath += (i === 0 ? 'M' : 'L') + sx(fT[i]).toFixed(1) + ',' + sy(fV[i]).toFixed(1) + ' ';
+  }
+
+  // Y-axis ticks
+  const yticks = [];
+  for (let i = 0; i <= 4; i++) {
+    const yv = y0 + (y1 - y0) * (i / 4);
+    yticks.push(`<line x1="${margin.left - 4}" y1="${sy(yv).toFixed(1)}" x2="${margin.left}" y2="${sy(yv).toFixed(1)}" stroke="#888" stroke-width="0.5"/>` +
+                `<text x="${margin.left - 6}" y="${(sy(yv) + 3).toFixed(1)}" text-anchor="end" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#aaa">${yv.toFixed(2)}</text>`);
+  }
+  // Y-axis label
+  yticks.push(`<text x="14" y="${(margin.top + plotH/2).toFixed(1)}" font-size="10" font-family="Inter,system-ui,sans-serif" fill="#888" transform="rotate(-90 14 ${(margin.top + plotH/2).toFixed(1)})">δ¹⁸O (‰, axis inverted: colder ↓)</text>`);
+
+  // X-axis ticks. Labels show calendar year (BC for past, AD for future).
+  // Convention: today ≈ 2000 AD, so year_AD = 2000 - t_kyr_BP * 1000.
+  function lr04FmtYear(yr) {
+    if (yr === 0) return '0';
+    return yr < 0 ? Math.abs(yr).toLocaleString() + ' BC'
+                  : yr.toLocaleString() + ' AD';
+  }
+  const xticks = [];
+  const tickStep = (xmax - xmin) <= 250 ? 25
+                : (xmax - xmin) <= 700 ? 100
+                : (xmax - xmin) <= 1500 ? 200
+                : 500;
+  for (let xv = Math.ceil(xmin / tickStep) * tickStep; xv <= xmax; xv += tickStep) {
+    const yearCE = 2000 - xv * 1000;
+    const label = lr04FmtYear(yearCE);
+    xticks.push(`<line x1="${sx(xv).toFixed(1)}" y1="${margin.top + plotH}" x2="${sx(xv).toFixed(1)}" y2="${margin.top + plotH + 4}" stroke="#888" stroke-width="0.5"/>` +
+                `<text x="${sx(xv).toFixed(1)}" y="${margin.top + plotH + 16}" text-anchor="middle" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#aaa">${label}</text>`);
+  }
+  xticks.push(`<text x="${(margin.left + plotW/2).toFixed(1)}" y="${(H - 18).toFixed(1)}" text-anchor="middle" font-size="10" font-family="Inter,system-ui,sans-serif" fill="#888">Calendar year (today ≈ 2000 AD; past ← → future)</text>`);
+
+  // Vertical "now" line at t=0 if 0 is in window
+  let nowMarker = '';
+  if (xmin <= 0 && xmax >= 0) {
+    const x0 = sx(0);
+    nowMarker = `<line x1="${x0.toFixed(1)}" y1="${margin.top}" x2="${x0.toFixed(1)}" y2="${margin.top + plotH}" stroke="#ff6b6b" stroke-width="1.0" stroke-dasharray="3,4" opacity="0.7"/>` +
+                `<text x="${x0.toFixed(1)}" y="${(margin.top - 6).toFixed(1)}" text-anchor="middle" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#ff6b6b">today</text>`;
+  }
+
+  // Known-event markers (LGM, MIS 6, MIS 11) for past windows
+  let eventMarkers = '';
+  if (windowKey === 'past200' || windowKey === 'postMPT' || windowKey === 'postMPText' || windowKey === 'future') {
+    const events = [
+      { t: 20,   label: 'LGM' },
+      { t: 140,  label: 'MIS 6' },
+      { t: 240,  label: 'MIS 8' },
+      { t: 340,  label: 'MIS 10' },
+      { t: 425,  label: 'MIS 11' },
+    ];
+    for (const ev of events) {
+      if (ev.t >= xmin && ev.t <= xmax) {
+        const xe = sx(ev.t);
+        eventMarkers += `<line x1="${xe.toFixed(1)}" y1="${margin.top + plotH - 8}" x2="${xe.toFixed(1)}" y2="${margin.top + plotH}" stroke="#ccc" stroke-width="0.6" opacity="0.6"/>` +
+                        `<text x="${xe.toFixed(1)}" y="${margin.top + plotH - 12}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="#999">${ev.label}</text>`;
+      }
+    }
+  }
+  // Major climate-system transition markers for the Full LR04 view
+  // (these mark when climate SENSITIVITY changed, not when orbital forcing changed)
+  let transitionMarkers = '';
+  if (windowKey === 'full') {
+    const transitions = [
+      { t: 2700, label: 'iNHG',
+        desc: 'Northern Hemisphere glaciation onset' },
+      { t: 1000, label: 'MPT',
+        desc: 'Mid-Pleistocene Transition (41-kyr → 100-kyr world)' },
+    ];
+    for (const tr of transitions) {
+      if (tr.t >= xmin && tr.t <= xmax) {
+        const xe = sx(tr.t);
+        transitionMarkers += `<line x1="${xe.toFixed(1)}" y1="${margin.top}" x2="${xe.toFixed(1)}" y2="${margin.top + plotH}" stroke="#ff9b66" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.55"/>` +
+                              `<text x="${xe.toFixed(1)}" y="${(margin.top + 10).toFixed(1)}" text-anchor="middle" font-size="9" font-family="Inter,system-ui,sans-serif" fill="#ff9b66" font-weight="600">${tr.label}</text>` +
+                              `<text x="${xe.toFixed(1)}" y="${(margin.top + 22).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="rgba(255,155,102,0.7)">${tr.desc}</text>`;
+      }
+    }
+  }
+
+  // Forward-projection timeline markers (only on the future tab).
+  // Predicted phase transitions of the orbital signal C(t):
+  //   −5.7 kyr  → peak orbital interglacial warmth (cooling begins after this)
+  //   −38 kyr   → next natural glaciation onset (first predicted glacial peak)
+  //   later     → subsequent glacial peaks, strongest at ~−194.5 kyr
+  // Convention: t in kyr BP (negative = future), so year_AD = 2000 - t*1000.
+  let futureMarkers = '';
+  if (windowKey === 'future') {
+    const futureEvents = [
+      { t: -5.7,   label: 'Peak warmth' },
+      { t: -38.0,  label: 'Glacial onset' },
+      { t: -81.5,  label: 'Moderate' },
+      { t: -110.5, label: 'Mild' },
+      { t: -154.5, label: 'Strong' },
+      { t: -194.5, label: 'Strongest' },
+    ];
+    for (const ev of futureEvents) {
+      if (ev.t >= xmin && ev.t <= xmax) {
+        const xe = sx(ev.t);
+        futureMarkers += `<line x1="${xe.toFixed(1)}" y1="${margin.top}" x2="${xe.toFixed(1)}" y2="${margin.top + 8}" stroke="#5fc3ff" stroke-width="0.6" opacity="0.7"/>` +
+                          `<text x="${xe.toFixed(1)}" y="${(margin.top + 18).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="#5fc3ff">${ev.label}</text>`;
+      }
+    }
+  }
+
+  // Future-projection note (only when the future tab is selected)
+  const futureNote = showFuture
+    ? `<div class="lr04-future-note">The future portion of the curve (right of "today") is pure orbital-forcing extrapolation. Anthropogenic CO₂ may delay the next natural glaciation by 50+ kyr (<a href="https://www.nature.com/articles/nature16494" target="_blank" rel="noopener">Ganopolski et al. 2016</a>).</div>`
+    : '';
+
+  return `
+    <div class="lr04-chart-title">${title}</div>
+    <div class="lr04-chart-subtitle">${subtitle}</div>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="lr04-svg">
+      <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0a0d11" stroke="#333" stroke-width="0.5"/>
+      ${yticks.join('')}
+      ${xticks.join('')}
+      ${nowMarker}
+      ${eventMarkers}
+      ${transitionMarkers}
+      ${futureMarkers}
+      <path d="${lr04Path}" fill="none" stroke="#8cb4ff" stroke-width="1.3" opacity="0.95"/>
+      <path d="${formulaPath}" fill="none" stroke="#ffe066" stroke-width="1.4" opacity="0.95"/>
+      <g font-family="Inter,system-ui,sans-serif" font-size="10">
+        <rect x="${(margin.left + 8).toFixed(1)}" y="${(margin.top + 8).toFixed(1)}" width="180" height="38" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" rx="3"/>
+        <line x1="${(margin.left + 14).toFixed(1)}" y1="${(margin.top + 18).toFixed(1)}" x2="${(margin.left + 30).toFixed(1)}" y2="${(margin.top + 18).toFixed(1)}" stroke="#8cb4ff" stroke-width="1.6"/>
+        <text x="${(margin.left + 36).toFixed(1)}" y="${(margin.top + 22).toFixed(1)}" fill="#ccc">LR04 δ¹⁸O (Lisiecki & Raymo 2005)</text>
+        <line x1="${(margin.left + 14).toFixed(1)}" y1="${(margin.top + 34).toFixed(1)}" x2="${(margin.left + 30).toFixed(1)}" y2="${(margin.top + 34).toFixed(1)}" stroke="#ffe066" stroke-width="1.6"/>
+        <text x="${(margin.left + 36).toFixed(1)}" y="${(margin.top + 38).toFixed(1)}" fill="#ccc">8H orbital-forcing formula (26 components)</text>
+      </g>
+    </svg>
+    <div class="lr04-caveat">
+      <b>Note on amplitude:</b> the formula captures the <i>orbital-forcing</i> component with stationary amplitudes (constant over time, because planetary eigenmodes are stationary over the past 5 Myr). The LR04 amplitude growth from left to right — small in the Pliocene, large in the Pleistocene — reflects Earth's climate <i>sensitivity</i> increasing over time (CO₂ decline, Northern Hemisphere ice-sheet establishment at <b>iNHG</b> ≈ 2.7 Ma BC, and post-MPT ice-sheet hysteresis from <b>MPT</b> ≈ 1 Ma BC onward). The formula does <i>not</i> model these sensitivity changes — that would require an ice-sheet response model (e.g. Willeit 2019, Ganopolski 2016). See doc 17 §2.6 for full caveats.
+    </div>
+    ${futureNote}
+  `;
+}
+
+async function createLR04Panel() {
+  await loadLR04Data();
+
+  const panel = document.createElement('div');
+  panel.id = 'lr04Panel';
+  panel.className = 'lr04-modal';
+
+  const windows = [
+    { key: 'full',       label: 'Full LR04 (5.3M)' },
+    { key: 'postMPText', label: 'Post-MPT ext (1.2M)' },
+    { key: 'postMPT',    label: 'Post-MPT (700k)' },
+    { key: 'past200',    label: 'Last 200 kyr' },
+    { key: 'future',     label: 'Forward projection' },
+  ];
+
+  panel.innerHTML = `
+    <div class="lr04-overlay"></div>
+    <div class="lr04-container">
+      <div class="lr04-header">
+        <div class="lr04-title">Orbital Forcing Formula Explorer</div>
+        <div class="lr04-subtitle">The 8H integer-divisor orbital-forcing formula vs LR04 δ¹⁸O climate proxy (Lisiecki & Raymo 2005)</div>
+        <div class="lr04-close" title="Close"></div>
+      </div>
+      <div class="lr04-body">
+        <div class="lr04-tabs">
+          ${windows.map(w => `<button class="lr04-tab${w.key === lr04SelectedWindow ? ' lr04-tab-active' : ''}" data-window="${w.key}">${w.label}</button>`).join('')}
+        </div>
+        <div class="lr04-content">
+          ${lr04RenderChart(lr04SelectedWindow)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  panel.querySelector('.lr04-close').addEventListener('click', closeLR04Panel);
+  panel.querySelector('.lr04-overlay').addEventListener('click', closeLR04Panel);
+  panel.querySelectorAll('.lr04-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      lr04SelectedWindow = tab.dataset.window;
+      panel.querySelectorAll('.lr04-tab').forEach(t => t.classList.toggle('lr04-tab-active', t.dataset.window === lr04SelectedWindow));
+      panel.querySelector('.lr04-content').innerHTML = lr04RenderChart(lr04SelectedWindow);
+    });
+  });
+
+  document.body.appendChild(panel);
+  return panel;
+}
+
+async function openLR04Panel() {
+  if (lr04Panel) { lr04Panel.remove(); lr04Panel = null; }
+  lr04Panel = await createLR04Panel();
+  lr04Panel.classList.add('visible');
+}
+
+function closeLR04Panel() {
+  if (lr04Panel) lr04Panel.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // FORMULA VERIFICATION PANEL (.vfp-)
 // Compare model predictions vs published scientific formulas
 // ═══════════════════════════════════════════════════════════════════
@@ -22370,7 +22754,7 @@ function axialPrecessionCapitaine2009(year) {
 
 // ── Berger (1978) trigonometric series ────────────────────────────
 // Source: Berger, A.L. (1978), J. Atmos. Sci., 35(12), 2362-2367
-// Epoch: 1950.0 CE. Coefficients from palinsol R package (Crucifix).
+// Epoch: 1950.0 AD. Coefficients from palinsol R package (Crucifix).
 
 const _BER78_ARCSEC2RAD = Math.PI / (180 * 3600);
 const _BER78_DEG2RAD = Math.PI / 180;
@@ -26328,6 +26712,8 @@ function setupGUI() {
     'All planetary periods as integer divisors of 8H = 2,682,536 years. Axial precession, perihelion, inclination, ascending node, obliquity, and eccentricity cycles.');
   addTooltip(toolsFolder.addButton({ title: 'WebGeoCalc Explorer' }).on('click', () => openWGCPanel()),
     'Observed perihelion precession rates for all 8 planets (1900\u20132026) from JPL WebGeoCalc. Three charts per planet: ascending node, argument of periapsis, longitude of perihelion.');
+  addTooltip(toolsFolder.addButton({ title: 'Orbital Forcing Formula' }).on('click', () => openLR04Panel()),
+    'The 8H integer-divisor orbital-forcing formula (doc 17 \u00a72) overlaid on LR04 \u03b4\u00b9\u2078O climate proxy (Lisiecki & Raymo 2005). Tabs: full LR04 (5.3 Myr), post-MPT, last 200 kyr, and forward projection (next 250 kyr with predicted upcoming glacial/interglacial events). The formula captures orbital forcing only \u2014 not the full climate response.');
   addTooltip(toolsFolder.addButton({ title: 'Formula Verification' }).on('click', () => openVerificationPanel()),
     'Compare the model against published formulas (Laskar, Meeus, Capitaine, etc.) for eccentricity, obliquity, year lengths, and precession over \u00B112,000 years.');
   addTooltip(toolsFolder.addButton({ title: 'Data Explorer' }).on('click', () => window.open('https://data.holisticuniverse.com', '_blank')),

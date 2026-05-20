@@ -67,12 +67,24 @@ python milankovitch_spectral_tests.py
 
 ### Milankovitch & Paleoclimate
 
-Empirical tests of the model's H/3 = 111.77-kyr inclination attribution for the dominant 100-kyr glacial cycle, run on the LR04 benthic δ¹⁸O stack and the U-Th-dated Cheng 2016 speleothem record.
+Empirical tests on the LR04 benthic δ¹⁸O stack and the U-Th-dated Cheng 2016 speleothem record, building toward the **26-component 8H integer-divisor climate formula** for Earth's orbital forcing.
+
+**Main pipeline** (produces the formula and per-planet attribution):
 
 | Script | Description |
 |--------|-------------|
-| `milankovitch_spectral_tests.py` | Spectral analysis (Lomb-Scargle, multitaper, Hinich bispectrum) of LR04 and Cheng 2016. Tests the model's H/3 attribution against the mainstream 95k/125k eccentricity beat; documents the chronology-bias test (LR04 vs Cheng2016 share the same FFT bin, refuting a ~10% dating offset). Output: `data/milankovitch-spectral-results.json` |
-| `milankovitch_amplitude_fit.py` | Multi-component OLS amplitude fit over LR04 with the five H-divisor candidates plus the Berger 95k/100k/125k triplet; collinearity-aware analysis with Rayleigh resolution diagnostics. Output: `data/milankovitch-amplitude-fit-results.json` |
+| `milankovitch_8h_divisor_spectrum.py` | Single-component OLS amplitude scan over all integer divisors of 8H = 2,682.536 kyr on LR04 (full, 0–1200, 0–700, pre-MPT) and Cheng 2016. Identifies which integers carry significant climate-spectral power; source of the §2.2 26-integer table. Output: `data/milankovitch-8h-divisor-spectrum.json` |
+| `milankovitch_8h_beat_decomposition.py` | Enumerates physical interpretations (climatic-precession k+g_j, obliquity k+s_j, eccentricity g_j−g_k, nodal s_j−s_k, or direct doc-55 planet apsidal/nodal) for each peak from the divisor-spectrum scan. Uses Laskar 2004 secular eigenfrequencies. Output: `data/milankovitch-8h-beat-decomposition.json` |
+| `milankovitch_planet_climate_match.py` | Per-planet match counts: cross-references LR04 peaks against the full doc 55 8H/n period table (8 planets × 6 cycle types) to identify which planets contribute directly to Earth's climate. Output: `data/milankovitch-planet-climate-match.json` |
+| `milankovitch_climate_formula.py` | The headline result: joint multi-component OLS fit of the 26 active integer divisors against LR04 (R² = 0.238, condition number 1.6). Produces fitted amplitudes + phases, validates against past 200 kyr, and forward-projects 250 kyr to identify the next natural glaciation peak. Output: `data/milankovitch-climate-formula.json` — also consumed by `src/script.js` (Orbital Forcing Formula Explorer modal). |
+
+**Supporting tests** (specific empirical questions):
+
+| Script | Description |
+|--------|-------------|
+| `milankovitch_spectral_tests.py` | Spectral analysis (Lomb-Scargle, multitaper, Hinich bispectrum). Documents the 405-kyr absence test and the chronology-bias test (LR04 vs Cheng2016 share the same FFT bin, refuting a ~10% dating offset). Output: `data/milankovitch-spectral-results.json` |
+| `milankovitch_candidate_amplitudes.py` | Standard Berger candidate set vs Holistic H-divisor set (head-to-head AIC/R²) across LR04 full / post-MPT / pre-MPT / Cheng2016 full / Cheng halves / LR04 sub-windows. Includes H/18 cross-window replication and MPT growth ratios for both candidate sets. Output: `data/milankovitch-candidate-amplitudes.json` |
+| `milankovitch_temporal_structure.py` | Non-stationarity diagnostics: cycle-length distribution by band, restricted (prominence-thresholded) cycle counting, and sliding-window single-component OLS amplitude tests across T ∈ {300, 400, 500, 600, 700, 800} kyr for binning-artifact robustness. Output: `data/milankovitch-temporal-structure.json` |
 | `mpt_transition_analysis.py` | Comparative amplitude analysis across the Mid-Pleistocene Transition (pre-MPT vs post-MPT intervals). Documents 1.75×–2.19× amplitude growth in the 80–125 kyr band. Output: `data/mpt-transition-analysis.json` |
 
 Used in: [Doc 16](../docs/16-milankovitch-language.md) (model framework) and [Doc 17](../docs/17-milankovitch-evidence.md) (empirical evidence).
@@ -94,6 +106,8 @@ Used in: [Doc 16](../docs/16-milankovitch-language.md) (model framework) and [Do
 Completed search scripts moved to `archive/`:
 - `fibonacci_law4_reformulation_search.py` — R² pair reformulation search (concluded: at noise level)
 - `fibonacci_law4_verify.py` — R² pair constraint verification (superseded by Law 4 = K constant)
+- `milankovitch_amplitude_fit.py` — early 8-candidate multi-component fit (H/3 vs eccentricity-beat head-to-head). Superseded by `milankovitch_candidate_amplitudes.py` (broader head-to-head) and `milankovitch_climate_formula.py` (full 26-component fit).
+- `generate_lr04_json.py` — one-shot utility converting `data/lr04-stack.txt` to `public/input/lr04-data.json` for the in-app Orbital Forcing Formula Explorer. Output is committed; no re-runs expected.
 
 ---
 

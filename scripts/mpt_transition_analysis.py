@@ -28,22 +28,102 @@ Run:  python3 scripts/mpt_transition_analysis.py
 """
 
 import json
-import sys
 import time
 from pathlib import Path
 
 import numpy as np
+from scipy.signal import detrend
 
-# Re-use helpers from the consolidated amplitude fit script
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from milankovitch_amplitude_fit import (
-    parse_lr04, preprocess, build_X, fit_amplitudes, bootstrap_amps,
-    CANDIDATE_PERIODS, LR04_CACHE, RNG_SEED, DATA_DIR,
-)
+SCRIPT_DIR = Path(__file__).resolve().parent
+DATA_DIR = SCRIPT_DIR.parent / "data"
+LR04_CACHE = DATA_DIR / "lr04-stack.txt"
+
+RNG_SEED = 20260517
+DT_KYR = 1.0
+BOOTSTRAP_ITERATIONS = 1000
 
 WIN_PRE_MPT = (1500, 2500)
 WIN_POST_MPT = (0, 1000)
-BOOTSTRAP_ITERATIONS = 1000
+
+# 8 locked candidate periods (mirrors the original head-to-head set)
+CANDIDATE_PERIODS = [
+    ("23.7 kyr (climatic precession)", 23.7),
+    ("41.0 kyr (obliquity)",           41.0),
+    ("95.0 kyr (g4-g5 ecc beat)",      95.0),
+    ("99.0 kyr (g3-g5 ecc beat)",      99.0),
+    ("110.0 kyr (g3-g1 Earth-Mercury)", 110.0),
+    ("111.77 kyr (H/3 model)",         111.77),
+    ("124.0 kyr (g4-g2 ecc beat)",     124.0),
+    ("405.0 kyr (g2-g5 ecc long)",     405.0),
+]
+
+
+def parse_lr04(path):
+    ages, d18o = [], []
+    with open(path, "rt") as f:
+        for line in f:
+            parts = line.split()
+            if len(parts) < 2:
+                continue
+            try:
+                a, v = float(parts[0]), float(parts[1])
+            except ValueError:
+                continue
+            ages.append(a)
+            d18o.append(v)
+    return np.array(ages), np.array(d18o)
+
+
+def preprocess(ages, d18o, window):
+    lo, hi = window
+    mask = (ages >= lo) & (ages <= hi)
+    a = ages[mask]
+    v = d18o[mask]
+    grid = np.arange(lo, hi + DT_KYR, DT_KYR)
+    v_grid = np.interp(grid, a, v)
+    v_det = detrend(v_grid, type="linear")
+    return grid, (v_det - v_det.mean()) / v_det.std()
+
+
+def build_X(t, periods):
+    n = len(t)
+    p = len(periods)
+    X = np.zeros((n, 1 + 2 * p))
+    X[:, 0] = 1.0
+    for i, P in enumerate(periods):
+        omega = 2 * np.pi / P
+        X[:, 1 + 2 * i] = np.cos(omega * t)
+        X[:, 2 + 2 * i] = np.sin(omega * t)
+    return X
+
+
+def fit_amplitudes(X, y):
+    beta, _, _, svals = np.linalg.lstsq(X, y, rcond=None)
+    p = (len(beta) - 1) // 2
+    amps = np.array([
+        np.sqrt(beta[1 + 2 * i] ** 2 + beta[2 + 2 * i] ** 2) for i in range(p)
+    ])
+    y_hat = X @ beta
+    ss_res = float(np.sum((y - y_hat) ** 2))
+    ss_tot = float(np.sum((y - y.mean()) ** 2))
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    cond = float(svals[0] / svals[-1]) if len(svals) > 0 else float("nan")
+    return amps, r2, cond
+
+
+def bootstrap_amps(t, y, periods, n_iters, rng):
+    n = len(t)
+    p = len(periods)
+    boot = np.zeros((n_iters, p))
+    for k in range(n_iters):
+        idx = rng.integers(0, n, size=n)
+        X_b = build_X(t[idx], periods)
+        try:
+            amps, _, _ = fit_amplitudes(X_b, y[idx])
+            boot[k] = amps
+        except Exception:
+            boot[k] = np.nan
+    return boot
 
 
 def fit_window(ages, d18o, win, label, rng, candidates=None):

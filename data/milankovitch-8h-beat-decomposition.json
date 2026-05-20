@@ -1,0 +1,995 @@
+{
+  "meta": {
+    "script": "milankovitch_8h_beat_decomposition.py",
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "k_arcsec_per_yr": 50.29,
+    "scale_factor": 2.069858024691358,
+    "eigenmodes": {
+      "g1_Mercury": 5.59,
+      "g2_Venus": 7.45,
+      "g3_Earth": 17.37,
+      "g4_Mars": 17.92,
+      "g5_Jupiter": 4.26,
+      "g6_Saturn": 28.25,
+      "g7_Uranus": 3.09,
+      "g8_Neptune": 0.673,
+      "s1_Mercury": -5.61,
+      "s2_Venus": -7.06,
+      "s3_Earth": -18.85,
+      "s4_Mars": -17.74,
+      "s5_Jupiter": 0.0,
+      "s6_Saturn": -26.33,
+      "s7_Uranus": -2.99,
+      "s8_Neptune": -0.69
+    }
+  },
+  "annotated_peaks": {
+    "LR04 full": [
+      {
+        "n": 7,
+        "period_kyr": 383.2194285714286,
+        "amplitude": 0.10706822777747729,
+        "amp_over_median": 3.7873437102235523,
+        "class": "Unpredicted",
+        "description": "\u03b4=-17 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -17,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g2_Venus - g5_Jupiter",
+            "n_predicted": 6.6,
+            "period_kyr": 406.26959247648904,
+            "error": 0.39715290123456803
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g5_Jupiter - g8_Neptune",
+            "n_predicted": 7.42,
+            "period_kyr": 361.304711458043,
+            "error": 0.4245807345678996
+          }
+        ]
+      },
+      {
+        "n": 9,
+        "period_kyr": 298.05955555555556,
+        "amplitude": 0.10931328407669406,
+        "amp_over_median": 3.866758491157519,
+        "class": "Unpredicted",
+        "description": "\u03b4=-15 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -15,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g2_Venus - g7_Uranus",
+            "n_predicted": 9.02,
+            "period_kyr": 297.2477064220183,
+            "error": 0.024580987654321262
+          }
+        ]
+      },
+      {
+        "n": 12,
+        "period_kyr": 223.54466666666667,
+        "amplitude": 0.10973810005029229,
+        "amp_over_median": 3.8817855831250223,
+        "class": "Unpredicted",
+        "description": "\u03b4=-12 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -12,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s5_Jupiter - s1_Mercury",
+            "n_predicted": 11.61,
+            "period_kyr": 231.01604278074868,
+            "error": 0.38809648148148135
+          }
+        ]
+      },
+      {
+        "n": 18,
+        "period_kyr": 149.02977777777778,
+        "amplitude": 0.1242972834303276,
+        "amp_over_median": 4.396790199760391,
+        "class": "Unpredicted",
+        "description": "\u03b4=-6 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -6,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s4_Mars - s6_Saturn",
+            "n_predicted": 17.78,
+            "period_kyr": 150.87310826542492,
+            "error": 0.21991956790123623
+          }
+        ]
+      },
+      {
+        "n": 20,
+        "period_kyr": 134.1268,
+        "amplitude": 0.09974465275334302,
+        "amp_over_median": 3.528285571504272,
+        "class": "Unpredicted",
+        "description": "\u03b4=-4 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -4,
+        "interpretations": []
+      },
+      {
+        "n": 22,
+        "period_kyr": 121.93345454545455,
+        "amplitude": 0.09174300323255026,
+        "amp_over_median": 3.245241781455076,
+        "class": "Unpredicted",
+        "description": "\u03b4=-2 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -2,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s2_Venus - s4_Mars",
+            "n_predicted": 22.11,
+            "period_kyr": 121.3483146067416,
+            "error": 0.10608370370369968
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g2_Venus",
+            "n_predicted": 21.67,
+            "period_kyr": 123.78223495702005,
+            "error": 0.32858648148148006
+          }
+        ]
+      },
+      {
+        "n": 25,
+        "period_kyr": 107.30144,
+        "amplitude": 0.21145073801543202,
+        "amp_over_median": 7.479685050071758,
+        "class": "Planet-modulated",
+        "description": "100k centroid \u2248 107 kyr",
+        "delta": 1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s1_Mercury - s4_Mars",
+            "n_predicted": 25.11,
+            "period_kyr": 106.84253915910968,
+            "error": 0.1073778395061673
+          }
+        ]
+      },
+      {
+        "n": 28,
+        "period_kyr": 95.80485714285714,
+        "amplitude": 0.23998657424063358,
+        "amp_over_median": 8.489088325785834,
+        "class": "Planet-modulated",
+        "description": "g4-g5 95.8 kyr Mars-Jupiter ecc beat",
+        "delta": 4,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g5_Jupiter",
+            "n_predicted": 28.27,
+            "period_kyr": 94.87554904831626,
+            "error": 0.2742606172839501
+          }
+        ]
+      },
+      {
+        "n": 31,
+        "period_kyr": 86.53341935483871,
+        "amplitude": 0.1548766104890748,
+        "amp_over_median": 5.478478244877896,
+        "class": "Unpredicted",
+        "description": "\u03b4=+7 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": 7,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g7_Uranus",
+            "n_predicted": 30.7,
+            "period_kyr": 87.39042481456507,
+            "error": 0.3040054938271588
+          },
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s7_Uranus - s4_Mars",
+            "n_predicted": 30.53,
+            "period_kyr": 87.86440677966104,
+            "error": 0.46959413580247755
+          }
+        ]
+      },
+      {
+        "n": 35,
+        "period_kyr": 76.64388571428572,
+        "amplitude": 0.12948639238126272,
+        "amp_over_median": 4.580345485534188,
+        "class": "Unpredicted",
+        "description": "\u03b4=-5 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -5,
+        "interpretations": [
+          {
+            "type": "Direct planet apsidal (model)",
+            "formula": "Mars (model 8H/35)",
+            "n_predicted": 35,
+            "period_kyr": 76.64388571428572,
+            "error": 0
+          },
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s4_Mars",
+            "n_predicted": 35.29,
+            "period_kyr": 76.01173020527862,
+            "error": 0.29107932098764167
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g3_Earth - g8_Neptune",
+            "n_predicted": 34.56,
+            "period_kyr": 77.61873390429417,
+            "error": 0.4395805617283912
+          }
+        ]
+      },
+      {
+        "n": 39,
+        "period_kyr": 68.78297435897436,
+        "amplitude": 0.16119326290674232,
+        "amp_over_median": 5.7019183288348465,
+        "class": "Unpredicted",
+        "description": "\u03b4=-1 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s5_Jupiter - s3_Earth",
+            "n_predicted": 39.02,
+            "period_kyr": 68.75331564986737,
+            "error": 0.0168237654321004
+          }
+        ]
+      },
+      {
+        "n": 48,
+        "period_kyr": 55.88616666666667,
+        "amplitude": 0.10199244627627321,
+        "amp_over_median": 3.607797176745782,
+        "class": "Unpredicted",
+        "description": "\u03b4=+8 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": 8,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s7_Uranus - s6_Saturn",
+            "n_predicted": 48.31,
+            "period_kyr": 55.52699228791776,
+            "error": 0.31048629629628266
+          }
+        ]
+      },
+      {
+        "n": 50,
+        "period_kyr": 53.65072,
+        "amplitude": 0.15408162732409506,
+        "amp_over_median": 5.4503571621615805,
+        "class": "Unpredicted",
+        "description": "\u03b4=+10 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": 10,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g6_Saturn - g5_Jupiter",
+            "n_predicted": 49.66,
+            "period_kyr": 54.022509378907884,
+            "error": 0.34410598765432354
+          },
+          {
+            "type": "Obliquity sub-peak (k + s_j)",
+            "formula": "k + s6_Saturn",
+            "n_predicted": 49.59,
+            "period_kyr": 54.09015025041737,
+            "error": 0.4062017283950681
+          }
+        ]
+      },
+      {
+        "n": 53,
+        "period_kyr": 50.61388679245283,
+        "amplitude": 0.14300547757323814,
+        "amp_over_median": 5.058558521582732,
+        "class": "Unpredicted",
+        "description": "\u03b4=-11 from H/8 = 41.91 kyr (obliquity / model)",
+        "delta": -11,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s6_Saturn",
+            "n_predicted": 53.07,
+            "period_kyr": 50.54602184087365,
+            "error": 0.07115975308640543
+          }
+        ]
+      },
+      {
+        "n": 65,
+        "period_kyr": 41.269784615384616,
+        "amplitude": 0.27585521209741987,
+        "amp_over_median": 9.757876114666772,
+        "class": "Planet-modulated",
+        "description": "s3+k 41.27 kyr (Berger Earth obliquity)",
+        "delta": 1,
+        "interpretations": [
+          {
+            "type": "Obliquity sub-peak (k + s_j)",
+            "formula": "k + s3_Earth",
+            "n_predicted": 65.08,
+            "period_kyr": 41.22137404580153,
+            "error": 0.07633629629629013
+          }
+        ]
+      },
+      {
+        "n": 68,
+        "period_kyr": 39.44905882352941,
+        "amplitude": 0.16313308650556244,
+        "amp_over_median": 5.770536058467988,
+        "class": "Planet-modulated",
+        "description": "k+s4 Berger Mars obliquity sub-peak OR k\u2212g3 Earth axial-apsidal beat (~39.5 kyr); pre-MPT may include Mars ICRF (8H/69 \u00b11)",
+        "delta": 4,
+        "interpretations": []
+      },
+      {
+        "n": 73,
+        "period_kyr": 36.747068493150685,
+        "amplitude": 0.09334262438165995,
+        "amp_over_median": 3.301825468544885,
+        "class": "Planet-modulated",
+        "description": "2|s4| Mars nodal harmonic (~36.7 kyr) OR g3\u2212s4 Earth-Mars apsidal-nodal beat",
+        "delta": 9,
+        "interpretations": []
+      },
+      {
+        "n": 76,
+        "period_kyr": 35.29652631578947,
+        "amplitude": 0.09242018524137231,
+        "amp_over_median": 3.2691958626519657,
+        "class": "Planet-modulated",
+        "description": "g4\u2212s3 Mars apsidal \u2212 Earth nodal beat (~35.3 kyr)",
+        "delta": 12,
+        "interpretations": []
+      },
+      {
+        "n": 113,
+        "period_kyr": 23.739256637168143,
+        "amplitude": 0.08582259418968814,
+        "amp_over_median": 3.0358180857809867,
+        "class": "Planet-modulated",
+        "description": "g5+k Jupiter 23.74 kyr",
+        "delta": 9,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g5_Jupiter",
+            "n_predicted": 112.91,
+            "period_kyr": 23.758020164986256,
+            "error": 0.08924475308643309
+          }
+        ]
+      },
+      {
+        "n": 120,
+        "period_kyr": 22.354466666666667,
+        "amplitude": 0.1038904324426085,
+        "amp_over_median": 3.6749349833423475,
+        "class": "Planet-modulated",
+        "description": "g2+k Venus 22.35 kyr (= H/15)",
+        "delta": 16,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g2_Venus",
+            "n_predicted": 119.51,
+            "period_kyr": 22.445445098718395,
+            "error": 0.4863976543209958
+          }
+        ]
+      }
+    ],
+    "LR04 0-1200": [
+      {
+        "n": 3,
+        "period_kyr": 894.1786666666667,
+        "amplitude": 0.23831709989636884,
+        "amp_over_median": 3.90784382933804,
+        "class": "Unpredicted",
+        "description": "\u03b4=-21 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -21,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s1_Mercury - s2_Venus",
+            "n_predicted": 3.0,
+            "period_kyr": 893.7931034482765,
+            "error": 0.0012941358024671779
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g1_Mercury - g5_Jupiter",
+            "n_predicted": 2.75,
+            "period_kyr": 974.436090225564,
+            "error": 0.24708882716049407
+          }
+        ]
+      },
+      {
+        "n": 18,
+        "period_kyr": 149.02977777777778,
+        "amplitude": 0.2461281442412679,
+        "amp_over_median": 4.035926713265265,
+        "class": "Unpredicted",
+        "description": "\u03b4=-6 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -6,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s4_Mars - s6_Saturn",
+            "n_predicted": 17.78,
+            "period_kyr": 150.87310826542492,
+            "error": 0.21991956790123623
+          }
+        ]
+      },
+      {
+        "n": 22,
+        "period_kyr": 121.93345454545455,
+        "amplitude": 0.3863568167195716,
+        "amp_over_median": 6.335349426444035,
+        "class": "Unpredicted",
+        "description": "\u03b4=-2 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -2,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s2_Venus - s4_Mars",
+            "n_predicted": 22.11,
+            "period_kyr": 121.3483146067416,
+            "error": 0.10608370370369968
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g2_Venus",
+            "n_predicted": 21.67,
+            "period_kyr": 123.78223495702005,
+            "error": 0.32858648148148006
+          }
+        ]
+      },
+      {
+        "n": 25,
+        "period_kyr": 107.30144,
+        "amplitude": 0.4352786139224903,
+        "amp_over_median": 7.137552639737105,
+        "class": "Planet-modulated",
+        "description": "100k centroid \u2248 107 kyr",
+        "delta": 1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s1_Mercury - s4_Mars",
+            "n_predicted": 25.11,
+            "period_kyr": 106.84253915910968,
+            "error": 0.1073778395061673
+          }
+        ]
+      },
+      {
+        "n": 28,
+        "period_kyr": 95.80485714285714,
+        "amplitude": 0.661201768259823,
+        "amp_over_median": 10.842164708974456,
+        "class": "Planet-modulated",
+        "description": "g4-g5 95.8 kyr Mars-Jupiter ecc beat",
+        "delta": 4,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g5_Jupiter",
+            "n_predicted": 28.27,
+            "period_kyr": 94.87554904831626,
+            "error": 0.2742606172839501
+          }
+        ]
+      },
+      {
+        "n": 35,
+        "period_kyr": 76.64388571428572,
+        "amplitude": 0.33638268507830066,
+        "amp_over_median": 5.5158903861746245,
+        "class": "Unpredicted",
+        "description": "\u03b4=-5 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -5,
+        "interpretations": [
+          {
+            "type": "Direct planet apsidal (model)",
+            "formula": "Mars (model 8H/35)",
+            "n_predicted": 35,
+            "period_kyr": 76.64388571428572,
+            "error": 0
+          },
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s4_Mars",
+            "n_predicted": 35.29,
+            "period_kyr": 76.01173020527862,
+            "error": 0.29107932098764167
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g3_Earth - g8_Neptune",
+            "n_predicted": 34.56,
+            "period_kyr": 77.61873390429417,
+            "error": 0.4395805617283912
+          }
+        ]
+      },
+      {
+        "n": 39,
+        "period_kyr": 68.78297435897436,
+        "amplitude": 0.19845924104920384,
+        "amp_over_median": 3.254268035514386,
+        "class": "Unpredicted",
+        "description": "\u03b4=-1 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s5_Jupiter - s3_Earth",
+            "n_predicted": 39.02,
+            "period_kyr": 68.75331564986737,
+            "error": 0.0168237654321004
+          }
+        ]
+      },
+      {
+        "n": 42,
+        "period_kyr": 63.86990476190476,
+        "amplitude": 0.18536933073489104,
+        "amp_over_median": 3.0396240789094278,
+        "class": "Unpredicted",
+        "description": "\u03b4=+2 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": 2,
+        "interpretations": []
+      },
+      {
+        "n": 48,
+        "period_kyr": 55.88616666666667,
+        "amplitude": 0.2316449162601765,
+        "amp_over_median": 3.7984356011318283,
+        "class": "Unpredicted",
+        "description": "\u03b4=+8 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": 8,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s7_Uranus - s6_Saturn",
+            "n_predicted": 48.31,
+            "period_kyr": 55.52699228791776,
+            "error": 0.31048629629628266
+          }
+        ]
+      },
+      {
+        "n": 65,
+        "period_kyr": 41.269784615384616,
+        "amplitude": 0.5396298501965527,
+        "amp_over_median": 8.848669193835471,
+        "class": "Planet-modulated",
+        "description": "s3+k 41.27 kyr (Berger Earth obliquity)",
+        "delta": 1,
+        "interpretations": [
+          {
+            "type": "Obliquity sub-peak (k + s_j)",
+            "formula": "k + s3_Earth",
+            "n_predicted": 65.08,
+            "period_kyr": 41.22137404580153,
+            "error": 0.07633629629629013
+          }
+        ]
+      },
+      {
+        "n": 113,
+        "period_kyr": 23.739256637168143,
+        "amplitude": 0.20700185770306773,
+        "amp_over_median": 3.3943469966620285,
+        "class": "Planet-modulated",
+        "description": "g5+k Jupiter 23.74 kyr",
+        "delta": 9,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g5_Jupiter",
+            "n_predicted": 112.91,
+            "period_kyr": 23.758020164986256,
+            "error": 0.08924475308643309
+          }
+        ]
+      },
+      {
+        "n": 116,
+        "period_kyr": 23.125310344827586,
+        "amplitude": 0.19804381701713372,
+        "amp_over_median": 3.2474560516450377,
+        "class": "Planet-modulated",
+        "description": "g1+k Mercury 23.13 kyr",
+        "delta": 12,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g1_Mercury",
+            "n_predicted": 115.66,
+            "period_kyr": 23.192555476020047,
+            "error": 0.3363335802469294
+          }
+        ]
+      }
+    ],
+    "LR04 0-700": [
+      {
+        "n": 13,
+        "period_kyr": 206.34892307692309,
+        "amplitude": 0.2734360461042231,
+        "amp_over_median": 3.4329644529105017,
+        "class": "Unpredicted",
+        "description": "\u03b4=-11 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -11,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s2_Venus",
+            "n_predicted": 13.18,
+            "period_kyr": 203.45368916797494,
+            "error": 0.1849956172839473
+          }
+        ]
+      },
+      {
+        "n": 17,
+        "period_kyr": 157.79623529411765,
+        "amplitude": 0.34563197038355925,
+        "amp_over_median": 4.33937765346384,
+        "class": "Unpredicted",
+        "description": "\u03b4=-7 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -7,
+        "interpretations": []
+      },
+      {
+        "n": 22,
+        "period_kyr": 121.93345454545455,
+        "amplitude": 0.41532124196893827,
+        "amp_over_median": 5.214320059596508,
+        "class": "Unpredicted",
+        "description": "\u03b4=-2 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -2,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s2_Venus - s4_Mars",
+            "n_predicted": 22.11,
+            "period_kyr": 121.3483146067416,
+            "error": 0.10608370370369968
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g2_Venus",
+            "n_predicted": 21.67,
+            "period_kyr": 123.78223495702005,
+            "error": 0.32858648148148006
+          }
+        ]
+      },
+      {
+        "n": 27,
+        "period_kyr": 99.35318518518518,
+        "amplitude": 0.9326404405108671,
+        "amp_over_median": 11.709215098876273,
+        "class": "Planet-modulated",
+        "description": "g3-g5 99 kyr Earth-Jupiter ecc beat",
+        "delta": 3,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g3_Earth - g5_Jupiter",
+            "n_predicted": 27.14,
+            "period_kyr": 98.8558352402746,
+            "error": 0.13583870370370477
+          },
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s1_Mercury - s3_Earth",
+            "n_predicted": 27.4,
+            "period_kyr": 97.88519637462235,
+            "error": 0.40492024691358
+          }
+        ]
+      },
+      {
+        "n": 39,
+        "period_kyr": 68.78297435897436,
+        "amplitude": 0.333411391700225,
+        "amp_over_median": 4.185949410144773,
+        "class": "Unpredicted",
+        "description": "\u03b4=-1 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s5_Jupiter - s3_Earth",
+            "n_predicted": 39.02,
+            "period_kyr": 68.75331564986737,
+            "error": 0.0168237654321004
+          }
+        ]
+      },
+      {
+        "n": 66,
+        "period_kyr": 40.64448484848485,
+        "amplitude": 0.596115053285948,
+        "amp_over_median": 7.484169760834991,
+        "class": "Planet-modulated",
+        "description": "Obliquity-band arithmetic-mean cycle length (~40.5 kyr) \u2014 Jensen's inequality vs k+s3 Fourier centroid (doc 17 \u00a76.6). At T<3000 kyr Fourier resolution cannot separate n=65/66/67, and amplitude piles at the cycle-counting mean position.",
+        "delta": 2,
+        "interpretations": []
+      },
+      {
+        "n": 71,
+        "period_kyr": 37.782197183098596,
+        "amplitude": 0.24326929343359263,
+        "amp_over_median": 3.0542236429349803,
+        "class": "Unpredicted",
+        "description": "\u03b4=+7 from H/8 = 41.91 kyr (obliquity / model)",
+        "delta": 7,
+        "interpretations": []
+      }
+    ],
+    "LR04 pre-MPT": [
+      {
+        "n": 14,
+        "period_kyr": 191.6097142857143,
+        "amplitude": 0.264883674937375,
+        "amp_over_median": 4.9822178436915925,
+        "class": "Unpredicted",
+        "description": "\u03b4=-10 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -10,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g2_Venus - g8_Neptune",
+            "n_predicted": 14.03,
+            "period_kyr": 191.2350597609562,
+            "error": 0.02742783333333243
+          }
+        ]
+      },
+      {
+        "n": 16,
+        "period_kyr": 167.6585,
+        "amplitude": 0.2057035307651352,
+        "amp_over_median": 3.8690938644320796,
+        "class": "Unpredicted",
+        "description": "\u03b4=-8 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -8,
+        "interpretations": []
+      },
+      {
+        "n": 21,
+        "period_kyr": 127.73980952380953,
+        "amplitude": 0.16865360581171743,
+        "amp_over_median": 3.1722189163855674,
+        "class": "Unpredicted",
+        "description": "\u03b4=-3 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": -3,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g6_Saturn - g4_Mars",
+            "n_predicted": 21.38,
+            "period_kyr": 125.45982575024205,
+            "error": 0.3816333950617228
+          },
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g3_Earth - g2_Venus",
+            "n_predicted": 20.53,
+            "period_kyr": 130.64516129032256,
+            "error": 0.4670083950617254
+          }
+        ]
+      },
+      {
+        "n": 25,
+        "period_kyr": 107.30144,
+        "amplitude": 0.2262789868073955,
+        "amp_over_median": 4.256099232958763,
+        "class": "Planet-modulated",
+        "description": "100k centroid \u2248 107 kyr",
+        "delta": 1,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s1_Mercury - s4_Mars",
+            "n_predicted": 25.11,
+            "period_kyr": 106.84253915910968,
+            "error": 0.1073778395061673
+          }
+        ]
+      },
+      {
+        "n": 28,
+        "period_kyr": 95.80485714285714,
+        "amplitude": 0.2758607180902487,
+        "amp_over_median": 5.188685910401064,
+        "class": "Planet-modulated",
+        "description": "g4-g5 95.8 kyr Mars-Jupiter ecc beat",
+        "delta": 4,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g4_Mars - g5_Jupiter",
+            "n_predicted": 28.27,
+            "period_kyr": 94.87554904831626,
+            "error": 0.2742606172839501
+          }
+        ]
+      },
+      {
+        "n": 30,
+        "period_kyr": 89.41786666666667,
+        "amplitude": 0.30709825966273796,
+        "amp_over_median": 5.7762352829787025,
+        "class": "Unpredicted",
+        "description": "\u03b4=+6 from H/3 = 111.77 kyr (inclination precession)",
+        "delta": 6,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g3_Earth - g7_Uranus",
+            "n_predicted": 29.56,
+            "period_kyr": 90.75630252100841,
+            "error": 0.4424274074074077
+          }
+        ]
+      },
+      {
+        "n": 38,
+        "period_kyr": 70.59305263157894,
+        "amplitude": 0.23977266155107993,
+        "amp_over_median": 4.509902820895429,
+        "class": "Unpredicted",
+        "description": "\u03b4=-2 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": -2,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s3_Earth",
+            "n_predicted": 37.59,
+            "period_kyr": 71.36563876651982,
+            "error": 0.41137827160493856
+          }
+        ]
+      },
+      {
+        "n": 50,
+        "period_kyr": 53.65072,
+        "amplitude": 0.2692855087221108,
+        "amp_over_median": 5.065012281032664,
+        "class": "Unpredicted",
+        "description": "\u03b4=+10 from H/5 = 67.06 kyr (ecliptic precession)",
+        "delta": 10,
+        "interpretations": [
+          {
+            "type": "Eccentricity beat (g_j - g_k)",
+            "formula": "g6_Saturn - g5_Jupiter",
+            "n_predicted": 49.66,
+            "period_kyr": 54.022509378907884,
+            "error": 0.34410598765432354
+          },
+          {
+            "type": "Obliquity sub-peak (k + s_j)",
+            "formula": "k + s6_Saturn",
+            "n_predicted": 49.59,
+            "period_kyr": 54.09015025041737,
+            "error": 0.4062017283950681
+          }
+        ]
+      },
+      {
+        "n": 53,
+        "period_kyr": 50.61388679245283,
+        "amplitude": 0.22378134858289866,
+        "amp_over_median": 4.209120959450152,
+        "class": "Unpredicted",
+        "description": "\u03b4=-11 from H/8 = 41.91 kyr (obliquity / model)",
+        "delta": -11,
+        "interpretations": [
+          {
+            "type": "Nodal beat (s_j - s_k)",
+            "formula": "s8_Neptune - s6_Saturn",
+            "n_predicted": 53.07,
+            "period_kyr": 50.54602184087365,
+            "error": 0.07115975308640543
+          }
+        ]
+      },
+      {
+        "n": 66,
+        "period_kyr": 40.64448484848485,
+        "amplitude": 0.6834811095809945,
+        "amp_over_median": 12.855649865117751,
+        "class": "Planet-modulated",
+        "description": "Obliquity-band arithmetic-mean cycle length (~40.5 kyr) \u2014 Jensen's inequality vs k+s3 Fourier centroid (doc 17 \u00a76.6). At T<3000 kyr Fourier resolution cannot separate n=65/66/67, and amplitude piles at the cycle-counting mean position.",
+        "delta": 2,
+        "interpretations": []
+      },
+      {
+        "n": 68,
+        "period_kyr": 39.44905882352941,
+        "amplitude": 0.42643991534154374,
+        "amp_over_median": 8.020941856757622,
+        "class": "Planet-modulated",
+        "description": "k+s4 Berger Mars obliquity sub-peak OR k\u2212g3 Earth axial-apsidal beat (~39.5 kyr); pre-MPT may include Mars ICRF (8H/69 \u00b11)",
+        "delta": 4,
+        "interpretations": []
+      }
+    ],
+    "Cheng full": [
+      {
+        "n": 114,
+        "period_kyr": 23.53101754385965,
+        "amplitude": 0.625302819517003,
+        "amp_over_median": 5.1901731829936955,
+        "class": "Unpredicted",
+        "description": "\u03b4=+10 from H/13 = 25.79 kyr (axial precession)",
+        "delta": 10,
+        "interpretations": []
+      },
+      {
+        "n": 120,
+        "period_kyr": 22.354466666666667,
+        "amplitude": 0.6572530589029875,
+        "amp_over_median": 5.455368334007813,
+        "class": "Planet-modulated",
+        "description": "g2+k Venus 22.35 kyr (= H/15)",
+        "delta": 16,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g2_Venus",
+            "n_predicted": 119.51,
+            "period_kyr": 22.445445098718395,
+            "error": 0.4863976543209958
+          }
+        ]
+      },
+      {
+        "n": 141,
+        "period_kyr": 19.0250780141844,
+        "amplitude": 0.43415287780880624,
+        "amp_over_median": 3.6035798230740794,
+        "class": "Planet-modulated",
+        "description": "g4+k Mars 19.03 kyr (Berger)",
+        "delta": 37,
+        "interpretations": [
+          {
+            "type": "Climatic precession sub-peak (k + g_j)",
+            "formula": "k + g4_Mars",
+            "n_predicted": 141.19,
+            "period_kyr": 19.000146606069496,
+            "error": 0.18501586419750993
+          }
+        ]
+      }
+    ]
+  }
+}

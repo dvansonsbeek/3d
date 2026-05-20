@@ -6,13 +6,13 @@ MILANKOVITCH SPECTRAL TESTS
 Consolidated spectral-evidence pipeline for the Holistic model's Milankovitch
 predictions. Runs four tests on paleoclimate data:
 
-  §3 — 405-kyr eccentricity absence (MTM on full LR04)
-  §4 — Bispectral phase coupling on LR04 (Muller-MacDonald 1997 replication)
-  §6 — 100-kyr peak position (MTM and Lomb-Scargle on LR04 + Cheng 2016)
-  §6.5 — Pre-MPT regime-change sanity check
+  §7.1 — 405-kyr eccentricity absence (MTM on full LR04)
+  §7.2 — Bispectral phase coupling on LR04 (Muller-MacDonald 1997 replication)
+  §4   — 100-kyr peak position (MTM and Lomb-Scargle on LR04 + Cheng 2016)
+  §5   — Pre-MPT regime-change sanity check
 
-Test §5 (cross-planet obliquity) is a documentation-level comparison; no
-computation needed. See docs/17-milankovitch-evidence.md §5.
+Test §3.6 (cross-planet obliquity) is a documentation-level comparison; no
+computation needed. See docs/17-milankovitch-evidence.md §3.6.
 
 Companion document: docs/17-milankovitch-evidence.md
 Run:  python3 scripts/milankovitch_spectral_tests.py
@@ -192,12 +192,12 @@ def ls_peak(t, y, periods, band_kyr):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# §3 — 405-kyr absence test (MTM on full LR04)
+# §7.1 — 405-kyr absence test (MTM on full LR04)
 # ═══════════════════════════════════════════════════════════════════════════
 
 def test_405_absence(lr04_ages, lr04_d18o):
     print("\n" + "═" * 72)
-    print("§3 — 405-kyr eccentricity absence test (full LR04, MTM)")
+    print("§7.1 — 405-kyr eccentricity absence test (full LR04, MTM)")
     print("═" * 72)
     t, y = preprocess_window(lr04_ages, lr04_d18o, WIN_FULL_LR04)
     freqs, spec = mtm_spectrum(y, DT_KYR)
@@ -229,7 +229,7 @@ def test_405_absence(lr04_ages, lr04_d18o):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# §4 — Bispectral test (Hinich) on full LR04
+# §7.2 — Bispectral test (Hinich) on full LR04
 # ═══════════════════════════════════════════════════════════════════════════
 
 def segmented_bispectrum(x, segment_len, overlap):
@@ -287,7 +287,7 @@ def max_bicoh_in_triplet(freqs, bicoh, period_range_kyr):
 
 def test_bispectrum(lr04_ages, lr04_d18o, rng):
     print("\n" + "═" * 72)
-    print("§4 — Bispectral phase coupling (LR04, Muller-MacDonald 1997 replication)")
+    print("§7.2 — Bispectral phase coupling (LR04, Muller-MacDonald 1997 replication)")
     print("═" * 72)
     t, y = preprocess_window(lr04_ages, lr04_d18o, WIN_FULL_LR04)
     freqs, bicoh, n_seg = segmented_bispectrum(y, BISPEC_SEGMENT_LEN, BISPEC_OVERLAP)
@@ -333,13 +333,13 @@ def test_bispectrum(lr04_ages, lr04_d18o, rng):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# §6 — Peak-position diagnostic: MTM vs Lomb-Scargle
-# §6.5 — Pre-MPT regime-change sanity check
+# §4 — Peak-position diagnostic: MTM vs Lomb-Scargle
+# §5 — Pre-MPT regime-change sanity check
 # ═══════════════════════════════════════════════════════════════════════════
 
 def test_peak_position(lr04_ages, lr04_d18o, cheng_ages, cheng_d18o):
     print("\n" + "═" * 72)
-    print("§6 — Peak position diagnostic (window + method dependence)")
+    print("§4 — Peak position diagnostic (window + method dependence)")
     print("═" * 72)
 
     # MTM on three LR04 windows — demonstrates window-dependent FFT bin pinning
@@ -400,8 +400,8 @@ def test_peak_position(lr04_ages, lr04_d18o, cheng_ages, cheng_d18o):
 
     print("\n  Rayleigh limit at T=641 kyr ≈ 15 kyr — 99 vs 111.77 not separable")
 
-    # Pre-MPT regime-change sanity check (§6.5)
-    print("\n  §6.5 — Pre-MPT regime-change sanity check (LR04):")
+    # Pre-MPT regime-change sanity check (§5)
+    print("\n  §5 — Pre-MPT regime-change sanity check (LR04):")
     t_post, y_post = preprocess_window(lr04_ages, lr04_d18o, WIN_POST_MPT)
     freqs_post, spec_post = mtm_spectrum(y_post, DT_KYR)
     _, a_post = band_peak(freqs_post, spec_post, SEARCH_BAND_KYR)

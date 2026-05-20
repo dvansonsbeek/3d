@@ -1,0 +1,353 @@
+{
+  "meta": {
+    "script": "milankovitch_climate_formula.py",
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "n_components": 26,
+    "integers": [
+      7,
+      9,
+      12,
+      14,
+      16,
+      18,
+      20,
+      21,
+      22,
+      25,
+      28,
+      30,
+      31,
+      35,
+      38,
+      39,
+      48,
+      50,
+      53,
+      65,
+      66,
+      68,
+      73,
+      76,
+      113,
+      120
+    ],
+    "convention": "t = age in kyr BP; t<0 = future; C(t) normalized \u03b4\u00b9\u2078O (positive=colder)",
+    "normalization": {
+      "original_mean": 2.296811699882301e-16,
+      "original_std": 0.26728652336026737
+    }
+  },
+  "fit": {
+    "r2": 0.23808484122741436,
+    "condition": 1.552616680470846,
+    "intercept": -0.0022611442336195726,
+    "components": [
+      {
+        "n": 7,
+        "period_kyr": 383.2194285714286,
+        "a_cos": -0.0899883301991842,
+        "b_sin": -0.0627068862099105,
+        "amp": 0.10968159895889588,
+        "phase_atan2_rad": -2.5329949965948937,
+        "label": "g\u2082\u2212g\u2085 Venus-Jupiter (~405 kyr long ecc)"
+      },
+      {
+        "n": 9,
+        "period_kyr": 298.05955555555556,
+        "a_cos": -0.04034981265226585,
+        "b_sin": 0.1032569103885479,
+        "amp": 0.11086070955961613,
+        "phase_atan2_rad": 1.9433214934737335,
+        "label": "g\u2082\u2212g\u2087 Venus-Uranus ecc / Mercury Axial = AscNode = 8H/9 (doc 55, Cassini-locked)"
+      },
+      {
+        "n": 12,
+        "period_kyr": 223.54466666666667,
+        "a_cos": 0.10198681846800567,
+        "b_sin": -0.019639609693789875,
+        "amp": 0.1038606056700535,
+        "phase_atan2_rad": -0.19024130475069806,
+        "label": "s\u2085\u2212s\u2081 Jupiter-Mercury nodal / Uranus AscNode = 8H/12 (doc 55)"
+      },
+      {
+        "n": 14,
+        "period_kyr": 191.6097142857143,
+        "a_cos": 0.05497945297070213,
+        "b_sin": 0.02609697594962415,
+        "amp": 0.06085879067704934,
+        "phase_atan2_rad": 0.4431772555887764,
+        "label": "g\u2082\u2212g\u2088 Venus-Neptune ecc (pre-MPT, ~192 kyr)"
+      },
+      {
+        "n": 16,
+        "period_kyr": 167.6585,
+        "a_cos": 0.081678822136079,
+        "b_sin": -0.010479366165388665,
+        "amp": 0.08234832785652373,
+        "phase_atan2_rad": -0.12760257297053318,
+        "label": "Mars Axial = 8H/16 (model direct, ~168 kyr)"
+      },
+      {
+        "n": 18,
+        "period_kyr": 149.02977777777778,
+        "a_cos": 0.0871280757147099,
+        "b_sin": 0.08580651086831957,
+        "amp": 0.1222867894956085,
+        "phase_atan2_rad": 0.7777563194672181,
+        "label": "s\u2084\u2212s\u2086 Mars-Saturn nodal"
+      },
+      {
+        "n": 20,
+        "period_kyr": 134.1268,
+        "a_cos": -0.0841968868409636,
+        "b_sin": 0.0597468288770181,
+        "amp": 0.1032414612186873,
+        "phase_atan2_rad": 2.524447080311167,
+        "label": "g\u2083\u2212g\u2082 Earth-Venus ecc"
+      },
+      {
+        "n": 21,
+        "period_kyr": 127.73980952380953,
+        "a_cos": 0.04445178439193565,
+        "b_sin": 0.07134181751630723,
+        "amp": 0.08405721897705881,
+        "phase_atan2_rad": 1.0135776177271634,
+        "label": "Mars Obliq / Jupiter Axial = 8H/21 (model direct, ~128 kyr)"
+      },
+      {
+        "n": 22,
+        "period_kyr": 121.93345454545455,
+        "a_cos": -0.043900550595710325,
+        "b_sin": 0.08393217655578182,
+        "amp": 0.09471994828966838,
+        "phase_atan2_rad": 2.052711808258984,
+        "label": "s\u2082\u2212s\u2084 Venus-Mars nodal / g\u2084\u2212g\u2082"
+      },
+      {
+        "n": 25,
+        "period_kyr": 107.30144,
+        "a_cos": -0.06678331771354734,
+        "b_sin": 0.20243930834175758,
+        "amp": 0.21317055398604612,
+        "phase_atan2_rad": 1.8894474231604852,
+        "label": "s\u2081\u2212s\u2084 Mercury-Mars nodal (100-kyr centroid)"
+      },
+      {
+        "n": 28,
+        "period_kyr": 95.80485714285714,
+        "a_cos": -0.18055137782690556,
+        "b_sin": -0.15560844128380413,
+        "amp": 0.23835433084793975,
+        "phase_atan2_rad": -2.43025840439396,
+        "label": "g\u2084\u2212g\u2085 Mars-Jupiter ecc (Berger 95k)"
+      },
+      {
+        "n": 30,
+        "period_kyr": 89.41786666666667,
+        "a_cos": 0.08250006460229414,
+        "b_sin": 0.09314448454336366,
+        "amp": 0.1244273107490137,
+        "phase_atan2_rad": 0.8459261883363275,
+        "label": "g\u2083\u2212g\u2087 Earth-Uranus ecc (pre-MPT, ~89 kyr)"
+      },
+      {
+        "n": 31,
+        "period_kyr": 86.53341935483871,
+        "a_cos": 0.07815100863715294,
+        "b_sin": 0.1339906977729255,
+        "amp": 0.15511636677243254,
+        "phase_atan2_rad": 1.0427788546439396,
+        "label": "g\u2084\u2212g\u2087 Mars-Uranus"
+      },
+      {
+        "n": 35,
+        "period_kyr": 76.64388571428572,
+        "a_cos": -0.06000625582548781,
+        "b_sin": -0.11110675007889197,
+        "amp": 0.12627533667065494,
+        "phase_atan2_rad": -2.0659895914839974,
+        "label": "Mars apsidal = 8H/35 (model)"
+      },
+      {
+        "n": 38,
+        "period_kyr": 70.59305263157894,
+        "a_cos": -0.10012654052438981,
+        "b_sin": 0.029124878254436284,
+        "amp": 0.10427647218197406,
+        "phase_atan2_rad": 2.858523043663026,
+        "label": "s\u2088\u2212s\u2083 Neptune-Earth nodal (pre-MPT, ~71 kyr)"
+      },
+      {
+        "n": 39,
+        "period_kyr": 68.78297435897436,
+        "a_cos": -0.09939948534429778,
+        "b_sin": 0.13022031354648606,
+        "amp": 0.16382181706615395,
+        "phase_atan2_rad": 2.222766495190486,
+        "label": "s\u2085\u2212s\u2083 Earth nodal"
+      },
+      {
+        "n": 48,
+        "period_kyr": 55.88616666666667,
+        "a_cos": -0.10116116165583008,
+        "b_sin": -0.0038236869076923585,
+        "amp": 0.10123339967187235,
+        "phase_atan2_rad": -3.1038126651619615,
+        "label": "s\u2087\u2212s\u2086 Uranus-Saturn nodal"
+      },
+      {
+        "n": 50,
+        "period_kyr": 53.65072,
+        "a_cos": -0.09559443730961628,
+        "b_sin": 0.12259028180635133,
+        "amp": 0.15545633997332753,
+        "phase_atan2_rad": 2.2330908327530294,
+        "label": "g\u2086\u2212g\u2085 Saturn-Jupiter ecc"
+      },
+      {
+        "n": 53,
+        "period_kyr": 50.61388679245283,
+        "a_cos": -0.03901857444461605,
+        "b_sin": -0.13269498963860307,
+        "amp": 0.13831272330078323,
+        "phase_atan2_rad": -1.8567828200710421,
+        "label": "s\u2088\u2212s\u2086 / Mars Ecc cycle = 8H/53 (model)"
+      },
+      {
+        "n": 65,
+        "period_kyr": 41.269784615384616,
+        "a_cos": -0.11195528793166333,
+        "b_sin": 0.25091917096174793,
+        "amp": 0.27476247351483885,
+        "phase_atan2_rad": 1.99046957324205,
+        "label": "k+s\u2083 Earth obliquity (Berger 41k)"
+      },
+      {
+        "n": 66,
+        "period_kyr": 40.64448484848485,
+        "a_cos": 0.02041115488937837,
+        "b_sin": -0.03806479659439708,
+        "amp": 0.043191943504443255,
+        "phase_atan2_rad": -1.0785932767573978,
+        "label": "obliquity-band arithmetic-mean cycle length (~40.5 kyr; Jensen's inequality vs k+s\u2083 \u2014 see doc 17 \u00a76.6)"
+      },
+      {
+        "n": 68,
+        "period_kyr": 39.44905882352941,
+        "a_cos": 0.13329315802554723,
+        "b_sin": -0.09226229453181113,
+        "amp": 0.16210921309012075,
+        "phase_atan2_rad": -0.6054554798349878,
+        "label": "k+s\u2084 Berger Mars obliquity sub-peak / k\u2212g\u2083 Earth axial-apsidal beat"
+      },
+      {
+        "n": 73,
+        "period_kyr": 36.747068493150685,
+        "a_cos": 0.03779579802583964,
+        "b_sin": -0.08425299719027682,
+        "amp": 0.09234224322570281,
+        "phase_atan2_rad": -1.1491082051906172,
+        "label": "2|s\u2084| Mars nodal harmonic / g\u2083\u2212s\u2084"
+      },
+      {
+        "n": 76,
+        "period_kyr": 35.29652631578947,
+        "a_cos": -0.0063150286349199225,
+        "b_sin": -0.09084240135453309,
+        "amp": 0.0910616355581094,
+        "phase_atan2_rad": -1.6402009818816106,
+        "label": "g\u2084\u2212s\u2083 Mars apsidal \u2212 Earth nodal beat"
+      },
+      {
+        "n": 113,
+        "period_kyr": 23.739256637168143,
+        "a_cos": -0.07675275698014658,
+        "b_sin": -0.03761932577154675,
+        "amp": 0.08547630885549048,
+        "phase_atan2_rad": -2.685866954507376,
+        "label": "k+g\u2085 Jupiter climatic precession (Berger 23.7k)"
+      },
+      {
+        "n": 120,
+        "period_kyr": 22.354466666666667,
+        "a_cos": 0.03373925692101938,
+        "b_sin": 0.09862414251960946,
+        "amp": 0.10423559346648723,
+        "phase_atan2_rad": 1.241177196016948,
+        "label": "k+g\u2082 Venus climatic precession = H/15"
+      }
+    ],
+    "residual_std": 0.8728775164778766,
+    "max_residual": 3.706541845595114
+  },
+  "validation_past_200kyr_r2": 0.30812988884427706,
+  "forward_projection": {
+    "C_at_t_0_normalized": -0.4422455539305002,
+    "C_at_t_0_d18o": -0.11820627658161878,
+    "glacial_maxima_future_kyrBP": [
+      {
+        "t_kyr_BP": -38.0,
+        "kyr_from_now": 38.0,
+        "year_CE": 39950,
+        "C_normalized": 0.24945173363987821
+      },
+      {
+        "t_kyr_BP": -81.5,
+        "kyr_from_now": 81.5,
+        "year_CE": 83450,
+        "C_normalized": 0.45040539844157795
+      },
+      {
+        "t_kyr_BP": -110.5,
+        "kyr_from_now": 110.5,
+        "year_CE": 112450,
+        "C_normalized": 0.3212129019647247
+      },
+      {
+        "t_kyr_BP": -154.5,
+        "kyr_from_now": 154.5,
+        "year_CE": 156450,
+        "C_normalized": 0.6691496948469016
+      },
+      {
+        "t_kyr_BP": -194.5,
+        "kyr_from_now": 194.5,
+        "year_CE": 196450,
+        "C_normalized": 0.9205274702228898
+      }
+    ],
+    "interglacial_peaks_future_kyrBP": [
+      {
+        "t_kyr_BP": -54.0,
+        "kyr_from_now": 54.0,
+        "year_CE": 55950,
+        "C_normalized": -0.502288601810045
+      },
+      {
+        "t_kyr_BP": -96.0,
+        "kyr_from_now": 96.0,
+        "year_CE": 97950,
+        "C_normalized": -0.5220960928420897
+      },
+      {
+        "t_kyr_BP": -138.0,
+        "kyr_from_now": 138.0,
+        "year_CE": 139950,
+        "C_normalized": -0.7403313883817209
+      },
+      {
+        "t_kyr_BP": -167.0,
+        "kyr_from_now": 167.0,
+        "year_CE": 168950,
+        "C_normalized": 0.09823628255647346
+      },
+      {
+        "t_kyr_BP": -212.5,
+        "kyr_from_now": 212.5,
+        "year_CE": 214450,
+        "C_normalized": -0.5727932300638541
+      }
+    ]
+  }
+}

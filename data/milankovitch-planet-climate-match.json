@@ -1,0 +1,1247 @@
+{
+  "meta": {
+    "script": "milankovitch_planet_climate_match.py",
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "doc_55_table": {
+      "Mercury": {
+        "Axial": 9,
+        "Peri_ecl": 11,
+        "ICRF": 93,
+        "AscNode": 9,
+        "Obliq": 3,
+        "Ecc": 84
+      },
+      "Venus": {
+        "Axial": 91,
+        "Peri_ecl": 6,
+        "ICRF": 110,
+        "AscNode": 1,
+        "Obliq": 110,
+        "Ecc": 19
+      },
+      "Earth": {
+        "Axial": 104,
+        "Peri_ecl": 128,
+        "ICRF": 24,
+        "AscNode": 40,
+        "Obliq": 64,
+        "Ecc": 128
+      },
+      "Mars": {
+        "Axial": 16,
+        "Peri_ecl": 35,
+        "ICRF": 69,
+        "AscNode": 63,
+        "Obliq": 21,
+        "Ecc": 53
+      },
+      "Jupiter": {
+        "Axial": 21,
+        "Peri_ecl": 40,
+        "ICRF": 64,
+        "AscNode": 36,
+        "Obliq": 16,
+        "Ecc": 43
+      },
+      "Saturn": {
+        "Axial": 6,
+        "Peri_ecl": 64,
+        "ICRF": 168,
+        "AscNode": 36,
+        "Obliq": 24,
+        "Ecc": 162
+      },
+      "Uranus": {
+        "Axial": 0,
+        "Peri_ecl": 24,
+        "ICRF": 80,
+        "AscNode": 12,
+        "Obliq": 16,
+        "Ecc": 80
+      },
+      "Neptune": {
+        "Axial": 0,
+        "Peri_ecl": 4,
+        "ICRF": 100,
+        "AscNode": 3,
+        "Obliq": 100,
+        "Ecc": 100
+      }
+    }
+  },
+  "results": {
+    "LR04 full": {
+      "peak_matches": [
+        {
+          "n": 7,
+          "period": 383.2194285714286,
+          "amp": 0.10706822777747729,
+          "exact": [],
+          "near": [
+            [
+              "Venus",
+              "Peri_ecl",
+              6,
+              1
+            ],
+            [
+              "Saturn",
+              "Axial",
+              6,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 9,
+          "period": 298.05955555555556,
+          "amp": 0.10931328407669406,
+          "exact": [
+            [
+              "Mercury",
+              "Axial",
+              9,
+              0
+            ],
+            [
+              "Mercury",
+              "AscNode",
+              9,
+              0
+            ]
+          ],
+          "near": []
+        },
+        {
+          "n": 12,
+          "period": 223.54466666666667,
+          "amp": 0.10973810005029229,
+          "exact": [
+            [
+              "Uranus",
+              "AscNode",
+              12,
+              0
+            ]
+          ],
+          "near": [
+            [
+              "Mercury",
+              "Peri_ecl",
+              11,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 18,
+          "period": 149.02977777777778,
+          "amp": 0.1242972834303276,
+          "exact": [],
+          "near": [
+            [
+              "Venus",
+              "Ecc",
+              19,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 20,
+          "period": 134.1268,
+          "amp": 0.09974465275334302,
+          "exact": [],
+          "near": [
+            [
+              "Venus",
+              "Ecc",
+              19,
+              1
+            ],
+            [
+              "Mars",
+              "Obliq",
+              21,
+              1
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 22,
+          "period": 121.93345454545455,
+          "amp": 0.09174300323255026,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "Obliq",
+              21,
+              1
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 25,
+          "period": 107.30144,
+          "amp": 0.21145073801543202,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "ICRF",
+              24,
+              1
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24,
+              1
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 28,
+          "period": 95.80485714285714,
+          "amp": 0.23998657424063358,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 31,
+          "period": 86.53341935483871,
+          "amp": 0.1548766104890748,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 35,
+          "period": 76.64388571428572,
+          "amp": 0.12948639238126272,
+          "exact": [
+            [
+              "Mars",
+              "Peri_ecl",
+              35,
+              0
+            ]
+          ],
+          "near": [
+            [
+              "Jupiter",
+              "AscNode",
+              36,
+              1
+            ],
+            [
+              "Saturn",
+              "AscNode",
+              36,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 39,
+          "period": 68.78297435897436,
+          "amp": 0.16119326290674232,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "AscNode",
+              40,
+              1
+            ],
+            [
+              "Jupiter",
+              "Peri_ecl",
+              40,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 48,
+          "period": 55.88616666666667,
+          "amp": 0.10199244627627321,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 50,
+          "period": 53.65072,
+          "amp": 0.15408162732409506,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 53,
+          "period": 50.61388679245283,
+          "amp": 0.14300547757323814,
+          "exact": [
+            [
+              "Mars",
+              "Ecc",
+              53,
+              0
+            ]
+          ],
+          "near": []
+        },
+        {
+          "n": 65,
+          "period": 41.269784615384616,
+          "amp": 0.27585521209741987,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "Obliq",
+              64,
+              1
+            ],
+            [
+              "Jupiter",
+              "ICRF",
+              64,
+              1
+            ],
+            [
+              "Saturn",
+              "Peri_ecl",
+              64,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 68,
+          "period": 39.44905882352941,
+          "amp": 0.16313308650556244,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "ICRF",
+              69,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 73,
+          "period": 36.747068493150685,
+          "amp": 0.09334262438165995,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 76,
+          "period": 35.29652631578947,
+          "amp": 0.09242018524137231,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 113,
+          "period": 23.739256637168143,
+          "amp": 0.08582259418968814,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 120,
+          "period": 22.354466666666667,
+          "amp": 0.1038904324426085,
+          "exact": [],
+          "near": []
+        }
+      ],
+      "per_planet_summary": {
+        "Mercury": {
+          "exact_matches": 2,
+          "near_matches": 1,
+          "total": 3,
+          "peaks_exact": [
+            "n=9 (Axial, 298k)",
+            "n=9 (AscNode, 298k)"
+          ],
+          "peaks_near": [
+            "n=12\u2248Peri_ecl=N11 (224k)"
+          ]
+        },
+        "Venus": {
+          "exact_matches": 0,
+          "near_matches": 3,
+          "total": 3,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=7\u2248Peri_ecl=N6 (383k)",
+            "n=18\u2248Ecc=N19 (149k)",
+            "n=20\u2248Ecc=N19 (134k)"
+          ]
+        },
+        "Earth": {
+          "exact_matches": 0,
+          "near_matches": 3,
+          "total": 3,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248ICRF=N24 (107k)",
+            "n=39\u2248AscNode=N40 (69k)",
+            "n=65\u2248Obliq=N64 (41k)"
+          ]
+        },
+        "Mars": {
+          "exact_matches": 2,
+          "near_matches": 3,
+          "total": 5,
+          "peaks_exact": [
+            "n=35 (Peri_ecl, 77k)",
+            "n=53 (Ecc, 51k)"
+          ],
+          "peaks_near": [
+            "n=20\u2248Obliq=N21 (134k)",
+            "n=22\u2248Obliq=N21 (122k)",
+            "n=68\u2248ICRF=N69 (39k)"
+          ]
+        },
+        "Jupiter": {
+          "exact_matches": 0,
+          "near_matches": 5,
+          "total": 5,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=20\u2248Axial=N21 (134k)",
+            "n=22\u2248Axial=N21 (122k)",
+            "n=35\u2248AscNode=N36 (77k)",
+            "n=39\u2248Peri_ecl=N40 (69k)",
+            "n=65\u2248ICRF=N64 (41k)"
+          ]
+        },
+        "Saturn": {
+          "exact_matches": 0,
+          "near_matches": 4,
+          "total": 4,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=7\u2248Axial=N6 (383k)",
+            "n=25\u2248Obliq=N24 (107k)",
+            "n=35\u2248AscNode=N36 (77k)",
+            "n=65\u2248Peri_ecl=N64 (41k)"
+          ]
+        },
+        "Uranus": {
+          "exact_matches": 1,
+          "near_matches": 1,
+          "total": 2,
+          "peaks_exact": [
+            "n=12 (AscNode, 224k)"
+          ],
+          "peaks_near": [
+            "n=25\u2248Peri_ecl=N24 (107k)"
+          ]
+        },
+        "Neptune": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        }
+      }
+    },
+    "LR04 0-1200": {
+      "peak_matches": [
+        {
+          "n": 3,
+          "period": 894.1786666666667,
+          "amp": 0.23831709989636884,
+          "exact": [
+            [
+              "Mercury",
+              "Obliq",
+              3,
+              0
+            ],
+            [
+              "Neptune",
+              "AscNode",
+              3,
+              0
+            ]
+          ],
+          "near": [
+            [
+              "Neptune",
+              "Peri_ecl",
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 18,
+          "period": 149.02977777777778,
+          "amp": 0.2461281442412679,
+          "exact": [],
+          "near": [
+            [
+              "Venus",
+              "Ecc",
+              19,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 22,
+          "period": 121.93345454545455,
+          "amp": 0.3863568167195716,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "Obliq",
+              21,
+              1
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 25,
+          "period": 107.30144,
+          "amp": 0.4352786139224903,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "ICRF",
+              24,
+              1
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24,
+              1
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 28,
+          "period": 95.80485714285714,
+          "amp": 0.661201768259823,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 35,
+          "period": 76.64388571428572,
+          "amp": 0.33638268507830066,
+          "exact": [
+            [
+              "Mars",
+              "Peri_ecl",
+              35,
+              0
+            ]
+          ],
+          "near": [
+            [
+              "Jupiter",
+              "AscNode",
+              36,
+              1
+            ],
+            [
+              "Saturn",
+              "AscNode",
+              36,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 39,
+          "period": 68.78297435897436,
+          "amp": 0.19845924104920384,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "AscNode",
+              40,
+              1
+            ],
+            [
+              "Jupiter",
+              "Peri_ecl",
+              40,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 42,
+          "period": 63.86990476190476,
+          "amp": 0.18536933073489104,
+          "exact": [],
+          "near": [
+            [
+              "Jupiter",
+              "Ecc",
+              43,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 48,
+          "period": 55.88616666666667,
+          "amp": 0.2316449162601765,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 65,
+          "period": 41.269784615384616,
+          "amp": 0.5396298501965527,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "Obliq",
+              64,
+              1
+            ],
+            [
+              "Jupiter",
+              "ICRF",
+              64,
+              1
+            ],
+            [
+              "Saturn",
+              "Peri_ecl",
+              64,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 113,
+          "period": 23.739256637168143,
+          "amp": 0.20700185770306773,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 116,
+          "period": 23.125310344827586,
+          "amp": 0.19804381701713372,
+          "exact": [],
+          "near": []
+        }
+      ],
+      "per_planet_summary": {
+        "Mercury": {
+          "exact_matches": 1,
+          "near_matches": 0,
+          "total": 1,
+          "peaks_exact": [
+            "n=3 (Obliq, 894k)"
+          ],
+          "peaks_near": []
+        },
+        "Venus": {
+          "exact_matches": 0,
+          "near_matches": 1,
+          "total": 1,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=18\u2248Ecc=N19 (149k)"
+          ]
+        },
+        "Earth": {
+          "exact_matches": 0,
+          "near_matches": 3,
+          "total": 3,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248ICRF=N24 (107k)",
+            "n=39\u2248AscNode=N40 (69k)",
+            "n=65\u2248Obliq=N64 (41k)"
+          ]
+        },
+        "Mars": {
+          "exact_matches": 1,
+          "near_matches": 1,
+          "total": 2,
+          "peaks_exact": [
+            "n=35 (Peri_ecl, 77k)"
+          ],
+          "peaks_near": [
+            "n=22\u2248Obliq=N21 (122k)"
+          ]
+        },
+        "Jupiter": {
+          "exact_matches": 0,
+          "near_matches": 5,
+          "total": 5,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=22\u2248Axial=N21 (122k)",
+            "n=35\u2248AscNode=N36 (77k)",
+            "n=39\u2248Peri_ecl=N40 (69k)",
+            "n=42\u2248Ecc=N43 (64k)",
+            "n=65\u2248ICRF=N64 (41k)"
+          ]
+        },
+        "Saturn": {
+          "exact_matches": 0,
+          "near_matches": 3,
+          "total": 3,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248Obliq=N24 (107k)",
+            "n=35\u2248AscNode=N36 (77k)",
+            "n=65\u2248Peri_ecl=N64 (41k)"
+          ]
+        },
+        "Uranus": {
+          "exact_matches": 0,
+          "near_matches": 1,
+          "total": 1,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248Peri_ecl=N24 (107k)"
+          ]
+        },
+        "Neptune": {
+          "exact_matches": 1,
+          "near_matches": 1,
+          "total": 2,
+          "peaks_exact": [
+            "n=3 (AscNode, 894k)"
+          ],
+          "peaks_near": [
+            "n=3\u2248Peri_ecl=N4 (894k)"
+          ]
+        }
+      }
+    },
+    "LR04 0-700": {
+      "peak_matches": [
+        {
+          "n": 13,
+          "period": 206.34892307692309,
+          "amp": 0.2734360461042231,
+          "exact": [],
+          "near": [
+            [
+              "Uranus",
+              "AscNode",
+              12,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 17,
+          "period": 157.79623529411765,
+          "amp": 0.34563197038355925,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "Axial",
+              16,
+              1
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16,
+              1
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 22,
+          "period": 121.93345454545455,
+          "amp": 0.41532124196893827,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "Obliq",
+              21,
+              1
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 27,
+          "period": 99.35318518518518,
+          "amp": 0.9326404405108671,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 39,
+          "period": 68.78297435897436,
+          "amp": 0.333411391700225,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "AscNode",
+              40,
+              1
+            ],
+            [
+              "Jupiter",
+              "Peri_ecl",
+              40,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 66,
+          "period": 40.64448484848485,
+          "amp": 0.596115053285948,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 71,
+          "period": 37.782197183098596,
+          "amp": 0.24326929343359263,
+          "exact": [],
+          "near": []
+        }
+      ],
+      "per_planet_summary": {
+        "Mercury": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Venus": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Earth": {
+          "exact_matches": 0,
+          "near_matches": 1,
+          "total": 1,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=39\u2248AscNode=N40 (69k)"
+          ]
+        },
+        "Mars": {
+          "exact_matches": 0,
+          "near_matches": 2,
+          "total": 2,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=17\u2248Axial=N16 (158k)",
+            "n=22\u2248Obliq=N21 (122k)"
+          ]
+        },
+        "Jupiter": {
+          "exact_matches": 0,
+          "near_matches": 3,
+          "total": 3,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=17\u2248Obliq=N16 (158k)",
+            "n=22\u2248Axial=N21 (122k)",
+            "n=39\u2248Peri_ecl=N40 (69k)"
+          ]
+        },
+        "Saturn": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Uranus": {
+          "exact_matches": 0,
+          "near_matches": 2,
+          "total": 2,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=13\u2248AscNode=N12 (206k)",
+            "n=17\u2248Obliq=N16 (158k)"
+          ]
+        },
+        "Neptune": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        }
+      }
+    },
+    "LR04 pre-MPT": {
+      "peak_matches": [
+        {
+          "n": 14,
+          "period": 191.6097142857143,
+          "amp": 0.264883674937375,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 16,
+          "period": 167.6585,
+          "amp": 0.2057035307651352,
+          "exact": [
+            [
+              "Mars",
+              "Axial",
+              16,
+              0
+            ],
+            [
+              "Jupiter",
+              "Obliq",
+              16,
+              0
+            ],
+            [
+              "Uranus",
+              "Obliq",
+              16,
+              0
+            ]
+          ],
+          "near": []
+        },
+        {
+          "n": 21,
+          "period": 127.73980952380953,
+          "amp": 0.16865360581171743,
+          "exact": [
+            [
+              "Mars",
+              "Obliq",
+              21,
+              0
+            ],
+            [
+              "Jupiter",
+              "Axial",
+              21,
+              0
+            ]
+          ],
+          "near": []
+        },
+        {
+          "n": 25,
+          "period": 107.30144,
+          "amp": 0.2262789868073955,
+          "exact": [],
+          "near": [
+            [
+              "Earth",
+              "ICRF",
+              24,
+              1
+            ],
+            [
+              "Saturn",
+              "Obliq",
+              24,
+              1
+            ],
+            [
+              "Uranus",
+              "Peri_ecl",
+              24,
+              1
+            ]
+          ]
+        },
+        {
+          "n": 28,
+          "period": 95.80485714285714,
+          "amp": 0.2758607180902487,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 30,
+          "period": 89.41786666666667,
+          "amp": 0.30709825966273796,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 38,
+          "period": 70.59305263157894,
+          "amp": 0.23977266155107993,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 50,
+          "period": 53.65072,
+          "amp": 0.2692855087221108,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 53,
+          "period": 50.61388679245283,
+          "amp": 0.22378134858289866,
+          "exact": [
+            [
+              "Mars",
+              "Ecc",
+              53,
+              0
+            ]
+          ],
+          "near": []
+        },
+        {
+          "n": 66,
+          "period": 40.64448484848485,
+          "amp": 0.6834811095809945,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 68,
+          "period": 39.44905882352941,
+          "amp": 0.42643991534154374,
+          "exact": [],
+          "near": [
+            [
+              "Mars",
+              "ICRF",
+              69,
+              1
+            ]
+          ]
+        }
+      ],
+      "per_planet_summary": {
+        "Mercury": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Venus": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Earth": {
+          "exact_matches": 0,
+          "near_matches": 1,
+          "total": 1,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248ICRF=N24 (107k)"
+          ]
+        },
+        "Mars": {
+          "exact_matches": 3,
+          "near_matches": 1,
+          "total": 4,
+          "peaks_exact": [
+            "n=16 (Axial, 168k)",
+            "n=21 (Obliq, 128k)",
+            "n=53 (Ecc, 51k)"
+          ],
+          "peaks_near": [
+            "n=68\u2248ICRF=N69 (39k)"
+          ]
+        },
+        "Jupiter": {
+          "exact_matches": 2,
+          "near_matches": 0,
+          "total": 2,
+          "peaks_exact": [
+            "n=16 (Obliq, 168k)",
+            "n=21 (Axial, 128k)"
+          ],
+          "peaks_near": []
+        },
+        "Saturn": {
+          "exact_matches": 0,
+          "near_matches": 1,
+          "total": 1,
+          "peaks_exact": [],
+          "peaks_near": [
+            "n=25\u2248Obliq=N24 (107k)"
+          ]
+        },
+        "Uranus": {
+          "exact_matches": 1,
+          "near_matches": 1,
+          "total": 2,
+          "peaks_exact": [
+            "n=16 (Obliq, 168k)"
+          ],
+          "peaks_near": [
+            "n=25\u2248Peri_ecl=N24 (107k)"
+          ]
+        },
+        "Neptune": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        }
+      }
+    },
+    "Cheng full": {
+      "peak_matches": [
+        {
+          "n": 114,
+          "period": 23.53101754385965,
+          "amp": 0.625302819517003,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 120,
+          "period": 22.354466666666667,
+          "amp": 0.6572530589029875,
+          "exact": [],
+          "near": []
+        },
+        {
+          "n": 141,
+          "period": 19.0250780141844,
+          "amp": 0.43415287780880624,
+          "exact": [],
+          "near": []
+        }
+      ],
+      "per_planet_summary": {
+        "Mercury": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Venus": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Earth": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Mars": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Jupiter": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Saturn": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Uranus": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        },
+        "Neptune": {
+          "exact_matches": 0,
+          "near_matches": 0,
+          "total": 0,
+          "peaks_exact": [],
+          "peaks_near": []
+        }
+      }
+    }
+  }
+}

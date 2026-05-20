@@ -535,5 +535,5 @@
     "spearman_rho": -0.08571428571428572,
     "verdict": "\u03b4-ordering hypothesis NOT supported \u2014 Spearman \u03c1 = -0.09. The H-divisor \u03b4 does not cleanly predict growth ratio."
   },
-  "runtime_seconds": 4.26
+  "runtime_seconds": 5.93
 }
