@@ -711,7 +711,7 @@ This two-layer view clarifies which physical mechanisms operate at which scales:
 | **405 kyr** | ❌ (between n=6, n=7) | **carbon-cycle resonance, δ¹³C preference — primary explanation** |
 | 2.4 Myr | not resolved on lattice | weak / not present in either proxy |
 | **4.5 Myr (13H)** | **✓ (13H)** | **carbon-cycle amplification, δ¹³C only** |
-| 9 Myr | not on lattice | possible long-period internal feedback |
+| 9 Myr | not on lattice | candidate Layer-2: δ¹³C/δ¹⁸O ratio 2.05 (inside carbon-amplified cluster, between 405 kyr and 4.5 Myr), but F-stat not significant individually — signature present, statistical confirmation pending |
 
 ### 6.10 The framework's claim, refined
 
@@ -719,7 +719,7 @@ The framework's empirically supported claim is:
 
 > **Orbital motions are captured by the 8H integer-divisor lattice (doc 55, Layer 1). Most prominent climate-band cycles concentrate at 8H/n integer positions, and any beats between doc-55 cycles are mathematically constrained to also land on the lattice. Cycles observed in climate records that do *not* coincide with 8H/n positions — the 405-kyr line being the clearest example — are not orbital phenomena in this framework. They arise from climate-system internal physics (Layer 2): primarily the carbon-cycle silicate-weathering thermostat resonance at ~400 kyr, loosely entrained by long-period orbital eccentricity forcing. The 8H integer-divisor lattice is a complete description of orbital geometry in this framework; what the lattice does not predict belongs to Layer 2 climate physics.**
 
-The 405-kyr cycle is the clearest case of a Layer-2-only signal. The 2.4-Myr cycle (whatever its physical interpretation) does not appear strongly in either proxy and may simply be too weak to register as a climate signal. The 9-Myr "grand cycle" candidate sits off the 8H lattice and shows some δ¹³C dominance, suggesting a possible second Layer-2 phenomenon at very long periods — characterising it further is open future work. The framework's 8H integer-divisor structure remains a useful description of orbital motions; climate-internal phenomena are added as Layer 2 where empirically warranted.
+The 405-kyr cycle is the clearest case of a Layer-2-only signal. The 2.4-Myr cycle (whatever its physical interpretation) is *not* carbon-amplified — δ¹³C/δ¹⁸O ratio 0.20 places it firmly in the insolation-control cluster, consistent with the silicate-weathering response being a *narrow* resonance peak near 400 kyr rather than a broad low-pass amplification (§6.7). The 9-Myr "grand cycle" candidate (Boulila 2018) sits off the 8H lattice and shows a clear carbon-cycle ratio of 2.05 — inside the carbon-amplified cluster between confirmed 405 kyr (1.53) and 4.5 Myr (2.76), and well above any insolation control (≤ 0.94) — but its absolute power is too small for the F-test to confirm individually (F δ¹³C = 1.61, F δ¹⁸O = 0.74, both below the α=0.05 threshold of 4.46). The 9-Myr signature is therefore consistent with a second Layer-2 cycle but is not statistically confirmed at single-cycle significance; further characterisation (longer records, multi-cycle joint fits) is open future work. The framework's 8H integer-divisor structure remains a useful description of orbital motions; climate-internal phenomena are added as Layer 2 where empirically warranted.
 
 ---
 
