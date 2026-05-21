@@ -1,0 +1,28 @@
+{
+  "berger_loutre_2002": {
+    "next_natural_glaciation_kyr_ahead": 50,
+    "exceptionally_long_interglacial_kyr": 50,
+    "comparison_with_holocene_normal": "The next glacial inception is delayed ~50 kyr beyond the typical ~10-20 kyr interglacial duration"
+  },
+  "model_8h_formula": {
+    "next_natural_glaciation_kyr_ahead": 38.0,
+    "peak_warmth_kyr_ahead": 54.0,
+    "orbital_zero_crossing_kyr_ahead": 46.0,
+    "strongest_glaciation_kyr_ahead": 195.0,
+    "predicted_glaciation_dates_kyr": [
+      38.0,
+      81.0,
+      110.5,
+      154.5,
+      195.0
+    ]
+  },
+  "comparison": {
+    "difference_kyr": 12.0,
+    "difference_pct_relative_to_BL": 24.0,
+    "qualitative_agreement": true,
+    "both_identify_unusual_low_eccentricity_interval": true,
+    "8H_formula_extends_horizon": true
+  },
+  "verdict": "Two independent methods converge on consistent predictions within ~25%"
+}

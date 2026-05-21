@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "n_integers": 25,
+    "integers": [
+      9,
+      12,
+      14,
+      16,
+      18,
+      20,
+      21,
+      22,
+      25,
+      28,
+      30,
+      31,
+      35,
+      38,
+      39,
+      48,
+      50,
+      53,
+      65,
+      66,
+      68,
+      73,
+      76,
+      113,
+      120
+    ],
+    "full_record_in_sample_r2": 0.2320586554529559
+  },
+  "F1_temporal_split_0_2000": {
+    "name": "F1 0-2000 train / 2000-5320 test",
+    "train_window": "0\u20132000 kyr",
+    "test_window": "2000\u20135320 kyr",
+    "train_samples": 2000,
+    "test_samples": 3321,
+    "train_r2": 0.638698873551123,
+    "test_r2": -2.1198084535284645,
+    "test_over_train_ratio": -3.3189481636979745,
+    "verdict": "NULL (test R\u00b2 collapses)"
+  },
+  "F2_temporal_split_2000_5320": {
+    "name": "F2 2000-5320 train / 0-2000 test",
+    "train_window": "2000\u20135320 kyr",
+    "test_window": "0\u20132000 kyr",
+    "train_samples": 3321,
+    "test_samples": 2000,
+    "train_r2": 0.28268518574916257,
+    "test_r2": -0.14513029220392792,
+    "test_over_train_ratio": -0.5133990018589358,
+    "verdict": "NULL (test R\u00b2 collapses)"
+  },
+  "F3_even_odd": {
+    "name": "F3 even/odd",
+    "train_window": "even-index samples",
+    "test_window": "odd-index samples",
+    "train_samples": 2661,
+    "test_samples": 2660,
+    "train_r2": 0.23105982929526203,
+    "test_r2": 0.2329507709932399,
+    "test_over_train_ratio": 1.0081837751882068,
+    "verdict": "POSITIVE (out-of-sample R\u00b2 \u2265 0.10, retains \u226540% of training R\u00b2)"
+  }
+}

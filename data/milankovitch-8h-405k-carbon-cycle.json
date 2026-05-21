@@ -1,0 +1,384 @@
+{
+  "meta": {
+    "test_periods_kyr": {
+      "405k_g2_g5_carbon": 405.0,
+      "obliquity_control": 41.0,
+      "precession_control": 23.74,
+      "100k_eccentricity": 100.0
+    },
+    "hypotheses": {
+      "405k_g2_g5_carbon": "carbon-cycle amplified \u2014 \u03b4\u00b9\u00b3C should be stronger",
+      "obliquity_control": "direct insolation \u2014 should be SIMILAR in both",
+      "precession_control": "direct insolation \u2014 should be SIMILAR in both",
+      "100k_eccentricity": "mixed: eccentricity envelope + ice-sheet response"
+    },
+    "NW": 3,
+    "K_tapers": 5,
+    "F_critical": 4.458970107524511,
+    "data_source": "Westerhold 2020 CENOGRID TableS34 LOESS-smoothed \u03b4\u00b9\u00b3C + \u03b4\u00b9\u2078O"
+  },
+  "interval_results": [
+    {
+      "name": "Cenozoic_full",
+      "label": "full record",
+      "window_kyr": [
+        0,
+        67000
+      ],
+      "n_samples": 13401,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.12061927253306298,
+          "F_d13c": 12.613575368861806,
+          "sig_d13c": true,
+          "amp_d18o": 0.0788865922802948,
+          "F_d18o": 10.663323587966072,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 1.529021206854598
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.013580017190495817,
+          "F_d13c": 1.9294897478008501,
+          "sig_d13c": false,
+          "amp_d18o": 0.02788061628309057,
+          "F_d18o": 2.098764701520703,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.4870773677528792
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.0036089214268276177,
+          "F_d13c": 0.03470822659039297,
+          "sig_d13c": false,
+          "amp_d18o": 0.005433646524964951,
+          "F_d18o": 1.5764109414902998,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.6641803824091955
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.021836782259969614,
+          "F_d13c": 0.8666932612402591,
+          "sig_d13c": false,
+          "amp_d18o": 0.0019303613426788994,
+          "F_d18o": 0.10852152777489309,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 11.312277021495449
+        }
+      }
+    },
+    {
+      "name": "Eocene",
+      "label": "warmhouse",
+      "window_kyr": [
+        33000,
+        50000
+      ],
+      "n_samples": 3401,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.2999184148918985,
+          "F_d13c": 15.96187556309563,
+          "sig_d13c": true,
+          "amp_d18o": 0.1630921537672057,
+          "F_d18o": 18.74521191869285,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 1.8389506053123545
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.038184890036839496,
+          "F_d13c": 2.033914412074303,
+          "sig_d13c": false,
+          "amp_d18o": 0.02906231785199451,
+          "F_d18o": 4.928401123264397,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 1.3138969242337606
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.009821882890813139,
+          "F_d13c": 0.8205695389664809,
+          "sig_d13c": false,
+          "amp_d18o": 0.008657529175073096,
+          "F_d18o": 0.6572275730715463,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 1.1344903022784458
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.018707178636424654,
+          "F_d13c": 0.26053124391710364,
+          "sig_d13c": false,
+          "amp_d18o": 0.02798595356116693,
+          "F_d18o": 1.1735693440475035,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.6684488557996672
+        }
+      }
+    },
+    {
+      "name": "Oligocene",
+      "label": "coolhouse",
+      "window_kyr": [
+        23000,
+        34000
+      ],
+      "n_samples": 2201,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.3314566145256039,
+          "F_d13c": 11.697806486572148,
+          "sig_d13c": true,
+          "amp_d18o": 0.2839757837765059,
+          "F_d18o": 4.4741282699024305,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 1.1672002806636015
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.02481179883482581,
+          "F_d13c": 1.057674270785652,
+          "sig_d13c": false,
+          "amp_d18o": 0.05121984478743939,
+          "F_d18o": 2.5924012134534933,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.48441768884294606
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.00785961884242175,
+          "F_d13c": 0.1639462753051055,
+          "sig_d13c": false,
+          "amp_d18o": 0.009053620099061587,
+          "F_d18o": 0.3803369703836552,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.868118913365539
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.01726731012535693,
+          "F_d13c": 0.07964529002909972,
+          "sig_d13c": false,
+          "amp_d18o": 0.0595093865239543,
+          "F_d18o": 0.9218005652537087,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.2901611180012135
+        }
+      }
+    },
+    {
+      "name": "Paleocene",
+      "label": "hothouse",
+      "window_kyr": [
+        58000,
+        66000
+      ],
+      "n_samples": 1601,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.29674319842622926,
+          "F_d13c": 10.211639835892202,
+          "sig_d13c": true,
+          "amp_d18o": 0.41172826820658975,
+          "F_d18o": 16.067147546046282,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 0.7207258314295163
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.014885968155092478,
+          "F_d13c": 0.606156418823002,
+          "sig_d13c": false,
+          "amp_d18o": 0.03277680131465962,
+          "F_d18o": 2.7266868584317874,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.45416171066194433
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.007619992183066995,
+          "F_d13c": 2.122174750267585,
+          "sig_d13c": false,
+          "amp_d18o": 0.020688765383089645,
+          "F_d18o": 3.1278692285120875,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.3683154621346008
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.06291639784679191,
+          "F_d13c": 2.021326737590874,
+          "sig_d13c": false,
+          "amp_d18o": 0.09599282793066626,
+          "F_d18o": 2.5606963679210892,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.65542811065255
+        }
+      }
+    },
+    {
+      "name": "Miocene",
+      "label": "coolhouse",
+      "window_kyr": [
+        5000,
+        23000
+      ],
+      "n_samples": 3601,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.1865456474493848,
+          "F_d13c": 17.88381329448619,
+          "sig_d13c": true,
+          "amp_d18o": 0.16743690859715646,
+          "F_d18o": 7.840664240335467,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 1.1141250099056885
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.029248428195254497,
+          "F_d13c": 1.3160365052260072,
+          "sig_d13c": false,
+          "amp_d18o": 0.025608231275368376,
+          "F_d18o": 0.6153947810328307,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 1.1421494862625476
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.0076811924524449494,
+          "F_d13c": 0.37028266815574196,
+          "sig_d13c": false,
+          "amp_d18o": 0.004138951007431874,
+          "F_d18o": 0.1014172183647185,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 1.8558307258657205
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.017918497776548865,
+          "F_d13c": 0.47596975247930445,
+          "sig_d13c": false,
+          "amp_d18o": 0.03335551083310672,
+          "F_d18o": 0.18094505574290717,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.5371975223585548
+        }
+      }
+    },
+    {
+      "name": "post_MPT",
+      "label": "icehouse",
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "n_samples": 201,
+      "cycle_results": {
+        "405k_g2_g5_carbon": {
+          "period_kyr": 405.0,
+          "amp_d13c": 0.2855016717837013,
+          "F_d13c": 0.8691799431257057,
+          "sig_d13c": false,
+          "amp_d18o": 0.08704848976844493,
+          "F_d18o": 0.16434151787148849,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 3.2798004025475422
+        },
+        "obliquity_control": {
+          "period_kyr": 41.0,
+          "amp_d13c": 0.35120042151443803,
+          "F_d13c": 4.150024000356387,
+          "sig_d13c": false,
+          "amp_d18o": 0.5374622989816238,
+          "F_d18o": 25.738282989402773,
+          "sig_d18o": true,
+          "amp_ratio_d13c_over_d18o": 0.6534419664037604
+        },
+        "precession_control": {
+          "period_kyr": 23.74,
+          "amp_d13c": 0.21861923394639685,
+          "F_d13c": 2.32624776521895,
+          "sig_d13c": false,
+          "amp_d18o": 0.24727512986586972,
+          "F_d18o": 4.422743361372203,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 0.8841133116176432
+        },
+        "100k_eccentricity": {
+          "period_kyr": 100.0,
+          "amp_d13c": 0.5168803162527853,
+          "F_d13c": 3.4882862038236917,
+          "sig_d13c": false,
+          "amp_d18o": 0.4735194897002961,
+          "F_d18o": 1.6583347118766094,
+          "sig_d18o": false,
+          "amp_ratio_d13c_over_d18o": 1.0915713661119493
+        }
+      }
+    }
+  ],
+  "summary": [
+    {
+      "interval": "Cenozoic_full",
+      "ratio_405": 1.529021206854598,
+      "ratio_obliquity": 0.4870773677528792,
+      "ratio_precession": 0.6641803824091955,
+      "ratio_100k": 11.312277021495449,
+      "carbon_amplified_at_405": true,
+      "verdict": "POSITIVE \u2014 405 carbon-amplified"
+    },
+    {
+      "interval": "Eocene",
+      "ratio_405": 1.8389506053123545,
+      "ratio_obliquity": 1.3138969242337606,
+      "ratio_precession": 1.1344903022784458,
+      "ratio_100k": 0.6684488557996672,
+      "carbon_amplified_at_405": false,
+      "verdict": "PARTIAL"
+    },
+    {
+      "interval": "Oligocene",
+      "ratio_405": 1.1672002806636015,
+      "ratio_obliquity": 0.48441768884294606,
+      "ratio_precession": 0.868118913365539,
+      "ratio_100k": 0.2901611180012135,
+      "carbon_amplified_at_405": false,
+      "verdict": "PARTIAL"
+    },
+    {
+      "interval": "Paleocene",
+      "ratio_405": 0.7207258314295163,
+      "ratio_obliquity": 0.45416171066194433,
+      "ratio_precession": 0.3683154621346008,
+      "ratio_100k": 0.65542811065255,
+      "carbon_amplified_at_405": true,
+      "verdict": "POSITIVE \u2014 405 carbon-amplified"
+    },
+    {
+      "interval": "Miocene",
+      "ratio_405": 1.1141250099056885,
+      "ratio_obliquity": 1.1421494862625476,
+      "ratio_precession": 1.8558307258657205,
+      "ratio_100k": 0.5371975223585548,
+      "carbon_amplified_at_405": false,
+      "verdict": "no carbon-cycle excess"
+    },
+    {
+      "interval": "post_MPT",
+      "ratio_405": 3.2798004025475422,
+      "ratio_obliquity": 0.6534419664037604,
+      "ratio_precession": 0.8841133116176432,
+      "ratio_100k": 1.0915713661119493,
+      "carbon_amplified_at_405": true,
+      "verdict": "POSITIVE \u2014 405 carbon-amplified"
+    }
+  ]
+}

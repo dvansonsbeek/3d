@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "16H_kyr": 5365.072,
+    "framework_8H_over_7_kyr": 383.2194285714286,
+    "proposed_16H_over_13_kyr": 412.69784615384617,
+    "laskar_405_kyr": 405.0,
+    "venus_g2_arcsec_per_yr": 7.453,
+    "jupiter_g5_arcsec_per_yr": 4.257,
+    "F_critical": 4.458970107524511
+  },
+  "lattice_candidates_in_350_450_kyr": {
+    "8H": [
+      {
+        "n": 6,
+        "period_kyr": 447.08933333333334,
+        "fraction_kyr_label": "8H/6"
+      },
+      {
+        "n": 7,
+        "period_kyr": 383.2194285714286,
+        "fraction_kyr_label": "8H/7"
+      }
+    ],
+    "16H": [
+      {
+        "n": 12,
+        "period_kyr": 447.08933333333334,
+        "fraction_kyr_label": "16H/12"
+      },
+      {
+        "n": 13,
+        "period_kyr": 412.69784615384617,
+        "fraction_kyr_label": "16H/13"
+      },
+      {
+        "n": 14,
+        "period_kyr": 383.2194285714286,
+        "fraction_kyr_label": "16H/14"
+      },
+      {
+        "n": 15,
+        "period_kyr": 357.6714666666667,
+        "fraction_kyr_label": "16H/15"
+      }
+    ]
+  },
+  "interval_results": [
+    {
+      "name": "Eocene_33_50Ma",
+      "window_kyr": [
+        33000,
+        50000
+      ],
+      "label": "CENOGRID Eocene (warmhouse, 405k strongest at F=18.75)",
+      "span_kyr": 17000,
+      "rayleigh_kyr": 9.411764705882353,
+      "peak": {
+        "peak_period_kyr": 405.9856368430956,
+        "peak_power": 0.013869261005715311,
+        "half_max_lower_kyr": 401.91199099699134,
+        "half_max_upper_kyr": 409.9313383810121,
+        "fwhm_kyr": 8.019347384020762
+      },
+      "fwhm_over_rayleigh": 0.8520556595522059,
+      "is_spread_fwhm_gt_2x_rayleigh": false,
+      "encompasses_383": false,
+      "encompasses_413": false,
+      "F_at_405": 18.74521191869285,
+      "F_at_383": 1.2450091723034455,
+      "F_at_413": 0.35994373378128863,
+      "sidebands_above_30pct": []
+    },
+    {
+      "name": "Paleocene_58_66Ma",
+      "window_kyr": [
+        58000,
+        66000
+      ],
+      "label": "CENOGRID Paleocene hothouse (per Test O highest amps)",
+      "span_kyr": 8000,
+      "rayleigh_kyr": 20.0,
+      "peak": {
+        "peak_period_kyr": 403.1444617081892,
+        "peak_power": 0.08768732632565565,
+        "half_max_lower_kyr": 394.1273845183667,
+        "half_max_upper_kyr": 413.15309005343556,
+        "fwhm_kyr": 19.02570553506888
+      },
+      "fwhm_over_rayleigh": 0.951285276753444,
+      "is_spread_fwhm_gt_2x_rayleigh": false,
+      "encompasses_383": false,
+      "encompasses_413": true,
+      "F_at_405": 16.067147546046282,
+      "F_at_383": 0.1854561838019428,
+      "F_at_413": 5.389268405990813,
+      "sidebands_above_30pct": []
+    },
+    {
+      "name": "Oligocene_23_34Ma",
+      "window_kyr": [
+        23000,
+        34000
+      ],
+      "label": "CENOGRID Oligocene (coolhouse, 405k strong)",
+      "span_kyr": 11000,
+      "rayleigh_kyr": 14.545454545454545,
+      "peak": {
+        "peak_period_kyr": 405.7346262143301,
+        "peak_power": 0.040745158164019246,
+        "half_max_lower_kyr": 400.55863151175123,
+        "half_max_upper_kyr": 411.2028249546362,
+        "fwhm_kyr": 10.644193442884955
+      },
+      "fwhm_over_rayleigh": 0.7317882991983407,
+      "is_spread_fwhm_gt_2x_rayleigh": false,
+      "encompasses_383": false,
+      "encompasses_413": false,
+      "F_at_405": 4.4741282699024305,
+      "F_at_383": 0.5583167067919543,
+      "F_at_413": 1.3689232980448707,
+      "sidebands_above_30pct": [
+        {
+          "period_kyr": 439.384263870174,
+          "power": 0.0332951965685631
+        }
+      ]
+    },
+    {
+      "name": "Cenozoic_full_0_67Ma",
+      "window_kyr": [
+        0,
+        67000
+      ],
+      "label": "CENOGRID full (combined, F=10.66)",
+      "span_kyr": 67000,
+      "rayleigh_kyr": 2.388059701492537,
+      "peak": {
+        "peak_period_kyr": 404.5153808813218,
+        "peak_power": 0.0035293992588975908,
+        "half_max_lower_kyr": 403.425341765732,
+        "half_max_upper_kyr": 405.64266673534826,
+        "fwhm_kyr": 2.217324969616243
+      },
+      "fwhm_over_rayleigh": 0.9285048310268018,
+      "is_spread_fwhm_gt_2x_rayleigh": false,
+      "encompasses_383": false,
+      "encompasses_413": false,
+      "F_at_405": 10.663323587966072,
+      "F_at_383": 0.3548766998452517,
+      "F_at_413": 2.0696569002693246,
+      "sidebands_above_30pct": [
+        {
+          "period_kyr": 412.1562351980614,
+          "power": 0.001282359377809774
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "model_13H_myr": 4.359121,
+  "laskar_2004_eigenfreq_period_myr": 122.29658330398027,
+  "boulila_2020_central_estimate_myr": 4.5,
+  "boulila_2020_range_myr": [
+    3.7,
+    4.8
+  ],
+  "diff_model_vs_laskar_pct": 96.4356150578917,
+  "diff_model_vs_boulila_central_pct": 3.130644444444444,
+  "model_in_boulila_range": true,
+  "verdict": "13H matches Boulila 2020 within published range"
+}

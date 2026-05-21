@@ -230,9 +230,9 @@ def main():
     print(f"\n[6] Closure-test verdict:")
 
     # Check: are there any orphans in "empty" regions far from any formula integer?
-    # The 26-component formula uses integers: 7, 9, 12, 14, 16, 18, 20, 21, 22,
-    # 25, 28, 30, 31, 35, 38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120
-    formula_integers = {7, 9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
+    # The 25-component formula uses integers: 9, 12, 14, 16, 18, 20, 21, 22, 25,
+    # 28, 30, 31, 35, 38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120
+    formula_integers = {9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
                         38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120}
     far_from_any_int_orphans = []
     for n, a in orphans:

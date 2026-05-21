@@ -8,23 +8,23 @@
 
 Earth's climate-relevant orbital forcing arises from the gravitational interplay of all eight planets. Their orbital and rotational cycles synchronise over a common **Solar System Resonance Cycle of 8H = 2,682,536 years**, and every climate-relevant cycle on Earth therefore lands at an integer divisor of 8H. Spectral analysis of LR04 confirms this structure empirically and yields an explicit predictive formula.
 
-> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Joint OLS fit on LR04 explains ~24 % of the observed variance (R² = 0.238); the remaining ~76 % comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
+> **Orbital forcing is not climate.** The formula and analysis in this document capture the **orbital-forcing component** of climate only. Joint OLS fit on LR04 explains ~23 % of the observed variance (R² = 0.232); the remaining ~77 % comes from non-orbital sources — ice-sheet hysteresis, CO₂ and carbon-cycle feedbacks, internal variability (Heinrich events, Dansgaard-Oeschger cycles), and regional asymmetries that distinguish, say, Antarctic from Greenland records. The model takes no position on those components. Orbital cycles are the **clock** that sets the timing of glacial-interglacial transitions; the **magnitude** of the observed climate response is dominated by Earth-system feedbacks, not orbital forcing directly. Every prediction in this document — including the forward projection of the next natural glaciation — therefore describes when the orbital clock makes a phase transition possible, not when surface climate necessarily follows.
 
 ### The 8H Orbital Forcing Formula
 
 $$C(t) \;=\; c_0 \;+\; \sum_{n \in N} \left[\, a_n \cos\!\left(\tfrac{2\pi n t}{8H}\right) + b_n \sin\!\left(\tfrac{2\pi n t}{8H}\right) \,\right]$$
 
-with **N = 26 integer divisors** of 8H, joint-OLS-fitted on full LR04 (T = 5,320 kyr; R² = 0.238; condition number 1.6). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's doc 55 period table.
+with **N = 25 integer divisors** of 8H, joint-OLS-fitted on full LR04 (T = 5,320 kyr; R² = 0.232; condition number 1.5). Each integer corresponds to a specific eigenmode beat or direct planet apsidal/nodal period from the model's doc 55 period table.
 
 ### Five headline findings
 
-1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The formula has **26 such integers** — 20 detected above the 3× median significance threshold in full LR04, plus 6 more present in pre-MPT data (filtered down post-MPT by ice-sheet dynamics). **25 of the 26** have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The one exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6).
+1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The formula has **25 such integers** — 19 detected above the 3× median significance threshold in full LR04, plus 6 more present in pre-MPT data (filtered down post-MPT by ice-sheet dynamics). **24 of the 25** have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The one exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6).
 
 2. **Mars dominates the per-planet climate fingerprint.** Two exclusive direct matches in LR04 full (n=35 Mars apsidal, n=53 Mars eccentricity cycle) and three more exclusive matches in pre-MPT (n=16 Mars Axial, n=21 Mars Obliquity / Jupiter Axial, n=53 confirmed). Mars's strong gravitational coupling to Earth — Earth's nearest outer rocky neighbour, with similar apsidal eigenmode rate (g₃ ≈ 17.4″/yr, g₄ ≈ 17.9″/yr) — produces the cleanest direct climate signal of any planet. Neptune contributes nothing directly in LR04 full but appears via pre-MPT eigenmode beats (Venus-Neptune n=14, Neptune-Earth nodal n=38) — visible only when the post-MPT ice-sheet response doesn't dominate.
 
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat, not direct eccentricity forcing.**
    - The dominant 100-kyr-band centroid sits at **n = 25 = 107.3 kyr**, corresponding to the **s₁−s₄ Mercury-Mars nodal beat** — a planet-pair orbital-plane coupling, not an eccentricity beat.
-   - Direct eccentricity attribution fails two specific tests: the 405-kyr g₂−g₅ term is essentially absent in post-MPT LR04 (amplitude ratio 0.12), and bispectral analysis finds no significant 95k + 125k phase coupling.
+   - Standard direct-eccentricity attribution fails two specific tests: the 405-kyr term (g₂−g₅ in standard labeling) is essentially absent in post-MPT LR04 (amplitude ratio 0.12), and bispectral analysis finds no significant 95k + 125k phase coupling. In this framework the 405-kyr cycle is modelled as climate-internal carbon-cycle resonance, not as a Venus-Jupiter beat (see [doc 18 §6](18-8h-super-cycle-test.md)).
    - This vindicates Muller & MacDonald 1997's broader "inclination, not eccentricity" framing — though the empirical signal is a *planet-pair* nodal beat, not Earth's intrinsic inclination precession period.
    - At T ≈ 1.2 Myr the Rayleigh resolution at P = 110 kyr is ΔP ≈ 10 kyr, so 95k / 100k / 112k are spectrally collinear — but the structural failure modes of eccentricity attribution discriminate cleanly.
 
@@ -117,19 +117,18 @@ $$C(t) \;=\; c_0 \;+\; \sum_{n \in N} \left[\, a_n \cos\!\left(\tfrac{2\pi n t}{
 with:
 - **t** = age in kyr BP (positive = past, negative = future, t = 0 ≈ 2000 AD)
 - **8H** = 2,682.536 kyr (Solar System Resonance Cycle)
-- **N** = the 26 active integer divisors listed below
+- **N** = the 25 active integer divisors listed below
 - **a_n, b_n** = OLS-fitted coefficients (amplitude = √(a_n² + b_n²), phase = atan2(b_n, a_n))
 - **C(t)** = normalized δ¹⁸O proxy (positive = colder/glacial, negative = warmer/interglacial)
 
 To recover δ¹⁸O in original per-mille units, multiply by the LR04 detrended standard deviation (0.2673) and add back the LR04 linear trend (−0.000289 × t + 4.2536).
 
-### 2.2 The 26 active integer divisors
+### 2.2 The 25 active integer divisors
 
-Each n corresponds to a specific celestial-mechanics quantity. Letters refer to Laskar 2004 secular eigenfrequencies (g_i apsidal, s_i nodal); **k** = Earth's general precession in longitude (50.29″/yr).
+Each n corresponds to a specific celestial-mechanics quantity. Letters refer to Laskar 2004 secular eigenfrequencies (g_i apsidal, s_i nodal); **k** = Earth's general precession in longitude (50.29″/yr). Laskar labels are used here as numerical descriptors of where the framework's integer divisors happen to coincide with standard secular-beat periods; this framework's planet-motion model (doc 55) has different per-planet apsidal periods than Laskar 2004, so the physical attribution behind each label is framework-dependent. The empirical 405-kyr climate cycle sits off the 8H lattice and is not produced by any combination of doc-55 cycles; it is modelled separately as a carbon-cycle internal response (see [doc 18 §6](18-8h-super-cycle-test.md)).
 
 | n | period | fitted amp | physical interpretation |
 |---:|---:|---:|---|
-| 7 | 383.2 kyr | 0.110 | g₂−g₅ Venus-Jupiter long eccentricity (~405k) |
 | **9** | **298.1 kyr** | **0.111** | **g₂−g₇ Venus-Uranus eccentricity beat AND Mercury Axial = AscNode = 8H/9 (Cassini-locked, doc 55)** |
 | **12** | **223.5 kyr** | **0.104** | **s₅−s₁ Jupiter-Mercury nodal beat AND Uranus AscNode = 8H/12 (doc 55)** |
 | 14 | 191.6 kyr | 0.061 | g₂−g₈ Venus-Neptune eccentricity beat |
@@ -156,7 +155,7 @@ Each n corresponds to a specific celestial-mechanics quantity. Letters refer to 
 | **113** | **23.74 kyr** | **0.086** | **k+g₅ climatic precession sub-peak (Berger 23.7k)** — *note: Berger's convention associates g₅ with Jupiter at ~305 kyr eigenmode, an attribution the model does not endorse (Jupiter sits at H/5 or H/8 in doc 55)* |
 | **120** | **22.35 kyr** | **0.104** | **k+g₂ climatic precession sub-peak = H/15 (Berger 22.4k)** |
 
-**Six of the 26 integers** correspond directly to specific doc 55 planet cycles — these are the **model-direct matches** detectable as climate signals:
+**Six of the 25 integers** correspond directly to specific doc 55 planet cycles — these are the **model-direct matches** detectable as climate signals:
 
 - **n = 9** → Mercury Axial = Mercury AscNode = 8H/9 (Cassini-locked, doc 55)
 - **n = 12** → Uranus AscNode = 8H/12 (doc 55)
@@ -169,8 +168,8 @@ The other 20 integers are eigenmode beats between planet pairs (k+g_j, k+s_j, g_
 
 ### 2.3 Joint OLS fit on LR04
 
-- **R² = 0.238** (23.8% of LR04 variance explained by orbital forcing alone)
-- **Condition number = 1.6** (all 26 candidates Rayleigh-resolvable at T = 5,320 kyr — no collinearity)
+- **R² = 0.232** (23.2% of LR04 variance explained by orbital forcing alone)
+- **Condition number = 1.5** (all 25 candidates Rayleigh-resolvable at T = 5,320 kyr — no collinearity)
 - **Past-200-kyr local R² = 0.320** (recent record fitted more cleanly than the noisier older portion)
 
 Three components dominate by amplitude: **obliquity (n=65) at 0.275, Mars-Jupiter eccentricity (n=28) at 0.238, Mercury-Mars nodal (n=25) at 0.213**. The structural picture matches established paleoclimate theory: obliquity dominates the 41-kyr band, eccentricity-beat signals dominate the 100-kyr band, and a small but real climatic-precession contribution sits in the 22–24-kyr band.
@@ -227,7 +226,7 @@ By contrast the **past ~700 kyr** in LR04 was dominated by ~100-kyr pacing (LGM 
 
 **Why the pattern shifts.** Planetary eigenmodes are stationary on Myr timescales, but the phase alignment between different beats is not. Two factors converge over the next ~50–250 kyr:
 
-1. **Eccentricity is at a long-term minimum.** The Venus-Jupiter g₂−g₅ eccentricity envelope (~400-kyr modulation) is near a deep low; Earth's eccentricity drops toward ~0.014 (close to the model's minimum). Climatic-precession amplitude scales as e·sin ϖ, so when eccentricity is small, the precession contribution is suppressed and the obliquity-band signal (k+s₃ at 41 kyr) shows through more cleanly.
+1. **Eccentricity is at a long-term minimum.** The empirical ~400-kyr long-eccentricity modulation (g₂−g₅ in standard Milankovitch labeling) is near a deep low; Earth's eccentricity drops toward ~0.014 (close to the model's minimum). Climatic-precession amplitude scales as e·sin ϖ, so when eccentricity is small, the precession contribution is suppressed and the obliquity-band signal (k+s₃ at 41 kyr) shows through more cleanly.
 2. **The 100-kyr-band beats are partially out of phase.** The Mercury-Mars s₁−s₄ nodal beat (n=25, 107 kyr), the Mars-Jupiter g₄−g₅ eccentricity beat (n=28, 95.8 kyr), and adjacent inclination-side beats happen to be phased such that their constructive interference — which produced the strong 100-kyr-band signal of the last ~1 Myr — breaks down for the next ~250 kyr.
 
 This is the **same prediction**, from a different angle, as [Berger & Loutre 2002 (*Science* 297, 1287)](https://www.science.org/doi/10.1126/science.1076120) — the famous "exceptionally long interglacial ahead" paper. Berger & Loutre identified the next 50+ kyr as an unusual eccentricity-minimum interval where the next natural glaciation is unusually delayed; the 8H formula reaches the same conclusion via the integer-divisor decomposition and extends it to ~250 kyr.
@@ -293,7 +292,7 @@ The formula captures the orbital-forcing component of climate, not the full clim
 2. **Ice-sheet hysteresis** — existing ice sheets resist instantaneous orbital forcing
 3. **Carbon-cycle feedbacks** — CO₂ amplification/buffering of orbital signals
 4. **Internal variability** — Heinrich events, Dansgaard-Oeschger cycles, regional asymmetries
-5. **The ~76% of LR04 variance** beyond the 26-component fit lives in ice-volume dynamics, carbon cycle, and other internal feedbacks
+5. **The ~77% of LR04 variance** beyond the 25-component fit lives in ice-volume dynamics, carbon cycle, and other internal feedbacks
 
 The formula is **not a weather forecast**. It tells you *when the orbital clock makes glaciation possible*; the actual ice-volume response depends on the full climate system. Comparison to Ganopolski et al. (2016): anthropogenic CO₂ may delay the next natural glaciation by 50+ kyr in moderate-emission scenarios.
 
@@ -356,7 +355,7 @@ Beyond direct planet apsidal/nodal periods, the pre-MPT spectrum contains eigenm
 | **30** | **89.4 kyr** | 0.307 | **g₃ − g₇ Earth-Uranus eccentricity beat** |
 | **38** | **70.6 kyr** | 0.240 | **s₈ − s₃ Neptune-Earth nodal beat** |
 
-The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the joint 26-component fit on full LR04 in §2.2 — that fit assigns these same integers smaller amplitudes (0.061, 0.124, 0.104 respectively) because their pre-MPT prominence is averaged out across 5,320 kyr.
+The amplitudes here come from a **single-component scan on the pre-MPT window (1,200–3,000 kyr BP)** and are not directly comparable to the joint 25-component fit on full LR04 in §2.2 — that fit assigns these same integers smaller amplitudes (0.061, 0.124, 0.104 respectively) because their pre-MPT prominence is averaged out across 5,320 kyr.
 
 Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptune-Earth eigenmode beats**. Neptune's and Uranus's gravitational influence on Earth's orbit IS detectable in the climate record — but only in the pre-MPT 41-kyr world where ice-sheet amplification didn't dominate the spectrum.
 
@@ -422,7 +421,7 @@ The candidates 95 kyr (g₄−g₅), 100 kyr (centroid), and 112 kyr (H/3) **lie
 
 Three independent empirical tests bear on the eccentricity-vs-inclination-side question:
 
-- **405-kyr absence.** Standard Milankovitch predicts the g₂−g₅ Venus-Jupiter eccentricity beat (~405 kyr) should dominate the eccentricity-side signal. In post-MPT LR04 it is **essentially absent** — amplitude ratio 0.12 vs the 100-kyr-band peak. (The 405-kyr signal *does* appear in pre-MPT data as n = 7 at 383 kyr with amp 0.110, but is filtered out post-MPT by the same ice-sheet response that suppresses other slow signals.) **First specific failure mode** of the eccentricity attribution. Full methodology in §7.1.
+- **405-kyr absence.** Standard Milankovitch predicts a g₂−g₅ Venus-Jupiter eccentricity beat (~405 kyr) should dominate the eccentricity-side signal. In post-MPT LR04 it is **essentially absent** — amplitude ratio 0.12 vs the 100-kyr-band peak. In this framework, the empirical 405-kyr cycle is not orbital at all: it does not coincide with any 8H/n integer or any beat between doc-55 cycles, and is modelled as the carbon-cycle silicate-weathering thermostat resonance (climate-internal physics, loosely entrained by long-period orbital forcing). It is filtered out post-MPT by the ice-sheet response that suppresses other slow signals (see [doc 18 §6](18-8h-super-cycle-test.md)). **First specific failure mode** of the standard eccentricity attribution. Full methodology in §7.1.
 
 - **No bispectral coupling.** Direct bispectral analysis of LR04 in the 100-kyr band fails to detect significant 95k+125k phase coupling — replicating Muller & MacDonald 1997. **Second specific failure mode**. Descriptive: rules out a specific eccentricity-coupling signature; does not positively confirm inclination. Full methodology in §7.2.
 
@@ -481,7 +480,7 @@ The following findings of the model are **independent of which attribution wins 
 - Cross-planet obliquity validation: Mercury 0.09 %, Earth 2.2 %, Mars 2.4 % (§3.6)
 - 405-kyr term essentially absent in post-MPT LR04 (ratio 0.12, §4.4)
 - No eccentricity-beat phase coupling in LR04 (§4.4)
-- 25 of 26 formula components have clean eigenmode-beat or direct-planet-cycle interpretations as integer divisors of 8H (§2)
+- 24 of 25 formula components have clean eigenmode-beat or direct-planet-cycle interpretations as integer divisors of 8H (§2)
 - Six integers in the formula are direct doc 55 planet-cycle matches: n=9 (Mercury), n=12 (Uranus), n=16, 21, 35, 53 (Mars/Jupiter)
 
 These are the **robust contributions** of the Holistic model to Milankovitch theory. The 100-kyr-cycle attribution is the *specific* claim with the most empirical contention — it is *competitive*, not *decisively confirmed*.
@@ -541,7 +540,7 @@ A windowed amplitude analysis across the MPT (pre-MPT 1,500–2,500 kyr vs post-
 | 41-kyr obliquity (anchor) | **0.72×** | **shrank** |
 | 100-kyr band (n = 25, 28, 110-kyr anchor mean) | **1.64×** | grew |
 | 23.7-kyr climatic-precession (n = 113) | **2.19×** | grew most |
-| 405-kyr eccentricity (n = 7) | 0.34× | shrank |
+| 405-kyr empirical line (off-lattice carbon-cycle resonance, see [doc 18 §6](18-8h-super-cycle-test.md)) | 0.34× | shrank |
 
 The 41-kyr peak actually *decreased* — consistent with the standard "ice-sheet saturation silences the obliquity pacemaker" framing (Willeit 2019). Within the climatic-precession triplet, the three k+g_j sub-peaks grew very differently — k+g₅ at 23.7 kyr grew 1.75×, while k+g₂ at 22.4 kyr grew 1.05× and k+g₃ at 19.2 kyr grew 0.92× — so the 23-kyr growth is concentrated in one specific sub-peak rather than spread across the precession band (planet attribution of g₂/g₃/g₅ is Berger's convention and not endorsed by the model; see §2.2 note on n=113). The overall pattern is consistent with established "nonlinear ice-sheet response to orbital forcing" framings (Imbrie+ 1992 *Pacemaker*; Willeit 2019; Lisiecki 2023) and does not by itself discriminate between the model and standard frameworks.
 
@@ -582,7 +581,7 @@ Multiple results in this document — particularly the 100-kyr peak position dis
 
 When candidate periods are closer than ΔP, joint OLS fits suffer from collinearity: shared frequency components get distributed arbitrarily between the candidates, producing inflated amplitudes that can exceed reasonable values (condition number > 100). Diagnostic: report condition number; reject results where cond > 100 and adjacent candidates have implausible amplitudes.
 
-The 8H formula's 26 components are all Rayleigh-resolvable at T = 5,320 kyr (condition number 1.6), so the joint fit is clean.
+The 8H formula's 25 components are all Rayleigh-resolvable at T = 5,320 kyr (condition number 1.5), so the joint fit is clean.
 
 ### 6.4 Non-stationarity and cycle-length distributions
 
@@ -624,7 +623,7 @@ n=66 is therefore an **emergent windowing-and-statistics phenomenon**, not a sep
 
 ## 7. Specific Empirical Tests
 
-### 7.1 The 405-kyr eccentricity absence
+### 7.1 The 405-kyr absence (standard eccentricity-attribution prediction)
 
 **Hypothesis tested**. Berger 1978 / Laskar 2004 secular theory identifies the **g₂−g₅ ≈ 3.200″/yr → 405 kyr** beat as the *strongest* eccentricity eigenmode term. If eccentricity drives glacial cycles via insolation forcing, this term should produce the *strongest* climate spectral peak. Muller's earlier work flagged the absence of 405-kyr power in past-1.2-Myr climate records as an anomaly; this test quantifies it sharply on the full LR04 stack.
 
@@ -706,12 +705,12 @@ The observed max bicoherence (0.507) is **below** the null 95th percentile (0.55
 
 **Result.**
 
-- Joint fit with all 200 integer divisors: **R² = 0.443** (vs R² = 0.238 with the 26 active components; the extra integers absorb noise leakage)
+- Joint fit with all 200 integer divisors: **R² = 0.443** (vs R² = 0.232 with the 25 active components; the extra integers absorb noise leakage)
 - Residual std: 0.746 (residual variance fraction = 0.557 — the ~56% non-orbital climate-system response that the 8H formula cannot capture in principle)
 - Residual amplitude at integer positions: **0.000** (machine zero — they're orthogonal to the fit)
 - Residual noise floor at random non-integer positions: median 0.029, 95th percentile **0.127**
 
-**Residual peaks above noise threshold (>0.3 from any integer):** 14 orphans, every single one **between two adjacent integer divisors** that are already in or near the 26-component formula:
+**Residual peaks above noise threshold (>0.3 from any integer):** 14 orphans, every single one **between two adjacent integer divisors** that are already in or near the 25-component formula:
 
 | Orphan n | Period | Amp | Closest integer | Likely source |
 |---:|---:|---:|---|---|

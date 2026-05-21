@@ -178,11 +178,11 @@ The model treats the inclination cycle as a *permanent formation-epoch feature* 
 
 ## 6. Scope and Empirical Evidence
 
-This document is the *framework* — what the model says about Milankovitch. The empirical evidence is in the companion document [doc 17 — Milankovitch Evidence](17-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016, an explicit 26-component **8H Orbital Forcing Formula** (R² = 0.238, forward-projection of the next natural glaciation), per-planet contribution analysis, and the MPT amplitude-growth investigation.
+This document is the *framework* — what the model says about Milankovitch. The empirical evidence is in the companion document [doc 17 — Milankovitch Evidence](17-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016, an explicit 25-component **8H Orbital Forcing Formula** (R² = 0.232, forward-projection of the next natural glaciation), per-planet contribution analysis, and the MPT amplitude-growth investigation. See [doc 18](18-8h-super-cycle-test.md) for the super-cycle test, fourteen falsifiable follow-up tests, and the dedicated investigation of the empirical 405-kyr climate cycle.
 
 **Five headline findings from doc 17 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (25 of 26 with clean physical interpretations).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (24 of 25 with clean physical interpretations).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.

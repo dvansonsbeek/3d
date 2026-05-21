@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "F_critical": 4.458970107524511,
+    "data_source": "Westerhold 2020 CENOGRID TableS34 LOESS-smoothed \u03b4\u00b9\u00b3C + \u03b4\u00b9\u2078O",
+    "test_window_kyr": [
+      0,
+      67000
+    ],
+    "laskar_g4_minus_g3_arcsec_per_yr": 0.548,
+    "laskar_g4_minus_g3_period_kyr": 2365.0
+  },
+  "A_empirical_peak_search_2_3_Myr_band": {
+    "delta13c_peak_kyr": 2908.0111501636165,
+    "delta13c_peak_power": 0.011938859469563799,
+    "delta18o_peak_kyr": 2068.9833577649392,
+    "delta18o_peak_power": 0.005308627841267703,
+    "laskar_prediction_kyr": 2365.0
+  },
+  "B_cycle_results": [
+    {
+      "name": "precession",
+      "period_kyr": 23.74,
+      "hypothesis": "control: direct insolation; expect ratio ~1",
+      "amp_d13c": 0.0036089214268276177,
+      "F_d13c": 0.03470822659039297,
+      "sig_d13c": false,
+      "amp_d18o": 0.005433646524964951,
+      "F_d18o": 1.5764109414902998,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 0.6641803824091955
+    },
+    {
+      "name": "obliquity",
+      "period_kyr": 41.27,
+      "hypothesis": "control: direct insolation, \u03b4\u00b9\u2078O slight win expected",
+      "amp_d13c": 0.014113824626082185,
+      "F_d13c": 1.6645034670378211,
+      "sig_d13c": false,
+      "amp_d18o": 0.014953777022411196,
+      "F_d18o": 0.6913204196087386,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 0.9438300841941019
+    },
+    {
+      "name": "100_kyr_ecc",
+      "period_kyr": 100.0,
+      "hypothesis": "control: ice-sheet hysteresis post-MPT, \u03b4\u00b9\u2078O expected to win",
+      "amp_d13c": 0.021836782259969614,
+      "F_d13c": 0.8666932612402591,
+      "sig_d13c": false,
+      "amp_d18o": 0.0019303613426788994,
+      "F_d18o": 0.10852152777489309,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 11.312277021495449
+    },
+    {
+      "name": "405_g2_g5",
+      "period_kyr": 405.0,
+      "hypothesis": "known carbon-amplified (P\u00e4like 2006), \u03b4\u00b9\u00b3C should win",
+      "amp_d13c": 0.12061927253306298,
+      "F_d13c": 12.613575368861806,
+      "sig_d13c": true,
+      "amp_d18o": 0.0788865922802948,
+      "F_d18o": 10.663323587966072,
+      "sig_d18o": true,
+      "amp_ratio_d13c_over_d18o": 1.529021206854598
+    },
+    {
+      "name": "1200_Palike_Norris",
+      "period_kyr": 1200.0,
+      "hypothesis": "P\u00e4like-Norris obliquity modulation \u2014 predicted carbon-related",
+      "amp_d13c": 0.03415385133197127,
+      "F_d13c": 1.3286940599137769,
+      "sig_d13c": false,
+      "amp_d18o": 0.026950863965228476,
+      "F_d18o": 0.4785827228103513,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 1.2672636905457264
+    },
+    {
+      "name": "2365_g4_g3",
+      "period_kyr": 2365.0,
+      "hypothesis": "g\u2084\u2212g\u2083 Mars-Earth secular beat \u2014 HEADLINE TEST",
+      "amp_d13c": 0.013446164992340932,
+      "F_d13c": 0.545895644070168,
+      "sig_d13c": false,
+      "amp_d18o": 0.06619071075121581,
+      "F_d18o": 0.4528104394791602,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 0.20314278000246352
+    },
+    {
+      "name": "4500_Boulila_lib",
+      "period_kyr": 4500.0,
+      "hypothesis": "Boulila 2020 libration \u2014 matches 13H in framework",
+      "amp_d13c": 0.11387642169730058,
+      "F_d13c": 5.39847438865507,
+      "sig_d13c": true,
+      "amp_d18o": 0.041328223969154664,
+      "F_d18o": 0.33531510872208786,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 2.7554153254272986
+    },
+    {
+      "name": "9000_grand_cycle",
+      "period_kyr": 9000.0,
+      "hypothesis": "Boulila 2018 grand cycle \u2014 orbital chaos or internal?",
+      "amp_d13c": 0.39574430528952564,
+      "F_d13c": 1.6080041850342595,
+      "sig_d13c": false,
+      "amp_d18o": 0.1926043631852744,
+      "F_d18o": 0.7448964818560428,
+      "sig_d18o": false,
+      "amp_ratio_d13c_over_d18o": 2.0547006243510806
+    }
+  ],
+  "verdict": "NEGATIVE \u2014 2.4 Myr g\u2084\u2212g\u2083 NOT carbon-amplified; carbon-cycle interpretation does NOT generalize"
+}

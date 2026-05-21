@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "bandpass_kyr": [
+      380.0,
+      430.0
+    ],
+    "window_kyr": [
+      0,
+      67000
+    ],
+    "sliding_window_len_kyr": 4000,
+    "sliding_window_step_kyr": 2000
+  },
+  "drift_d13c": {
+    "label": "\u03b4\u00b9\u00b3C",
+    "fitted_period_kyr": 402.903526286361,
+    "rms_drift_kyr": 133.1599254998559,
+    "max_drift_kyr": 341.983289721257,
+    "mean_amplitude": 0.14056048732939888,
+    "amplitude_cv": 0.495777207779752
+  },
+  "drift_d18o": {
+    "label": "\u03b4\u00b9\u2078O",
+    "fitted_period_kyr": 404.32471445059144,
+    "rms_drift_kyr": 65.83196967449273,
+    "max_drift_kyr": 739.2951236382202,
+    "mean_amplitude": 0.09739773868769963,
+    "amplitude_cv": 0.5143299492041816
+  },
+  "delta13c_delta18o_phase_residual_correlation": {
+    "r": 0.20658256348540044,
+    "p": 4.225824003403091e-129
+  },
+  "period_drift_d13c": {
+    "label": "\u03b4\u00b9\u00b3C",
+    "n_windows": 32,
+    "mean_peak_period_kyr": 404.221691154994,
+    "std_peak_period_kyr": 13.61703234491433,
+    "range_peak_period_kyr": 50.0
+  },
+  "period_drift_d18o": {
+    "label": "\u03b4\u00b9\u2078O",
+    "n_windows": 32,
+    "mean_peak_period_kyr": 403.78824266273114,
+    "std_peak_period_kyr": 13.214021150130648,
+    "range_peak_period_kyr": 50.0
+  },
+  "verdict": "CARBON-CYCLE CLOCK \u2014 significant phase drift, consistent with internal oscillator"
+}

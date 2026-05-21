@@ -6,7 +6,7 @@ MILANKOVITCH SPECTRAL TESTS
 Consolidated spectral-evidence pipeline for the Holistic model's Milankovitch
 predictions. Runs four tests on paleoclimate data:
 
-  §7.1 — 405-kyr eccentricity absence (MTM on full LR04)
+  §7.1 — 405-kyr absence test (vs standard eccentricity-attribution prediction; MTM on full LR04)
   §7.2 — Bispectral phase coupling on LR04 (Muller-MacDonald 1997 replication)
   §4   — 100-kyr peak position (MTM and Lomb-Scargle on LR04 + Cheng 2016)
   §5   — Pre-MPT regime-change sanity check
@@ -197,7 +197,7 @@ def ls_peak(t, y, periods, band_kyr):
 
 def test_405_absence(lr04_ages, lr04_d18o):
     print("\n" + "═" * 72)
-    print("§7.1 — 405-kyr eccentricity absence test (full LR04, MTM)")
+    print("§7.1 — 405-kyr absence test vs standard eccentricity prediction (full LR04, MTM)")
     print("═" * 72)
     t, y = preprocess_window(lr04_ages, lr04_d18o, WIN_FULL_LR04)
     freqs, spec = mtm_spectrum(y, DT_KYR)

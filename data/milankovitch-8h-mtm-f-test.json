@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "window_kyr": [
+      0,
+      5320
+    ],
+    "n_samples": 5321,
+    "NW": 3,
+    "K_tapers": 5,
+    "alpha": 0.05,
+    "F_critical": 4.458970107524511
+  },
+  "formula_integer_results": [
+    {
+      "n": 9,
+      "period_kyr": 298.05955555555556,
+      "F_stat": 6.155708023674358,
+      "p_value": 0.024065735523636556,
+      "significant": true
+    },
+    {
+      "n": 12,
+      "period_kyr": 223.54466666666667,
+      "F_stat": 4.190142605730496,
+      "p_value": 0.05689500114306334,
+      "significant": false
+    },
+    {
+      "n": 14,
+      "period_kyr": 191.6097142857143,
+      "F_stat": 0.573623406492042,
+      "p_value": 0.585057240051293,
+      "significant": false
+    },
+    {
+      "n": 16,
+      "period_kyr": 167.6585,
+      "F_stat": 1.819961787795609,
+      "p_value": 0.22313075373698987,
+      "significant": false
+    },
+    {
+      "n": 18,
+      "period_kyr": 149.02977777777778,
+      "F_stat": 2.2941233250707374,
+      "p_value": 0.16311690517287936,
+      "significant": false
+    },
+    {
+      "n": 20,
+      "period_kyr": 134.1268,
+      "F_stat": 1.5599729769959791,
+      "p_value": 0.26788552171391067,
+      "significant": false
+    },
+    {
+      "n": 21,
+      "period_kyr": 127.73980952380953,
+      "F_stat": 0.7664863094447725,
+      "p_value": 0.49595990196860595,
+      "significant": false
+    },
+    {
+      "n": 22,
+      "period_kyr": 121.93345454545455,
+      "F_stat": 0.3614285337442632,
+      "p_value": 0.7074975221552828,
+      "significant": false
+    },
+    {
+      "n": 25,
+      "period_kyr": 107.30144,
+      "F_stat": 3.4992045084854793,
+      "p_value": 0.08094297755305546,
+      "significant": false
+    },
+    {
+      "n": 28,
+      "period_kyr": 95.80485714285714,
+      "F_stat": 1.3906454396801118,
+      "p_value": 0.3031634872770481,
+      "significant": false
+    },
+    {
+      "n": 30,
+      "period_kyr": 89.41786666666667,
+      "F_stat": 1.271896489244875,
+      "p_value": 0.33141523370536485,
+      "significant": false
+    },
+    {
+      "n": 31,
+      "period_kyr": 86.53341935483871,
+      "F_stat": 2.0821235361134085,
+      "p_value": 0.1870764057367592,
+      "significant": false
+    },
+    {
+      "n": 35,
+      "period_kyr": 76.64388571428572,
+      "F_stat": 1.2208488248509346,
+      "p_value": 0.3445684375222424,
+      "significant": false
+    },
+    {
+      "n": 38,
+      "period_kyr": 70.59305263157894,
+      "F_stat": 1.0482109403126527,
+      "p_value": 0.394175829834581,
+      "significant": false
+    },
+    {
+      "n": 39,
+      "period_kyr": 68.78297435897436,
+      "F_stat": 3.8664833537407284,
+      "p_value": 0.06685246931803468,
+      "significant": false
+    },
+    {
+      "n": 48,
+      "period_kyr": 55.88616666666667,
+      "F_stat": 1.9176659510727427,
+      "p_value": 0.20875562279968884,
+      "significant": false
+    },
+    {
+      "n": 50,
+      "period_kyr": 53.65072,
+      "F_stat": 12.65051773730204,
+      "p_value": 0.0033306499940595202,
+      "significant": true
+    },
+    {
+      "n": 53,
+      "period_kyr": 50.61388679245283,
+      "F_stat": 6.662778603923336,
+      "p_value": 0.019804249903469517,
+      "significant": true
+    },
+    {
+      "n": 65,
+      "period_kyr": 41.269784615384616,
+      "F_stat": 1.0413775413445718,
+      "p_value": 0.39631734148976494,
+      "significant": false
+    },
+    {
+      "n": 66,
+      "period_kyr": 40.64448484848485,
+      "F_stat": 0.043567058686469096,
+      "p_value": 0.9575938888886198,
+      "significant": false
+    },
+    {
+      "n": 68,
+      "period_kyr": 39.44905882352941,
+      "F_stat": 9.334032375834456,
+      "p_value": 0.008098301549344877,
+      "significant": true
+    },
+    {
+      "n": 73,
+      "period_kyr": 36.747068493150685,
+      "F_stat": 14.21093269304529,
+      "p_value": 0.002327615327380128,
+      "significant": true
+    },
+    {
+      "n": 76,
+      "period_kyr": 35.29652631578947,
+      "F_stat": 5.95449478662847,
+      "p_value": 0.026071323071637287,
+      "significant": true
+    },
+    {
+      "n": 113,
+      "period_kyr": 23.739256637168143,
+      "F_stat": 1.5255072246268604,
+      "p_value": 0.27463213994399394,
+      "significant": false
+    },
+    {
+      "n": 120,
+      "period_kyr": 22.354466666666667,
+      "F_stat": 5.380741201163931,
+      "p_value": 0.03305912439198411,
+      "significant": true
+    }
+  ],
+  "n_formula_significant": 7,
+  "n_formula_total": 25,
+  "fraction_formula_significant": 0.28,
+  "permutation_test": {
+    "n_permutations": 1000,
+    "null_mean_significant_count": 0.84,
+    "null_p95_significant_count": 2.0,
+    "p_value": 0.0,
+    "significant_at_05": true
+  },
+  "verdict": "POSITIVE \u2014 framework integers carry significantly more lines than random"
+}

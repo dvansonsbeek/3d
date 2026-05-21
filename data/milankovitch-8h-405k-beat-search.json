@@ -1,0 +1,940 @@
+{
+  "target_period_yr": 405000.0,
+  "tolerance_pct": 3.0,
+  "tolerance_yr": 12150.0,
+  "n_cycles_total": 46,
+  "A_jupiter_saturn_earth": {
+    "n_cycles": 18,
+    "n_pairs_within_3pct": 0,
+    "n_triplets_within_3pct": 0,
+    "hits_within_3pct": [],
+    "closest_15_combinations": [
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Earth.obliquity (8H/64 = +41915 yr)) + f(Jupiter.axial (-8H/21 = -127740 yr)) + f(Jupiter.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Earth.obliquity (8H/64 = +41915 yr)",
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Jupiter.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Earth.obliquity (8H/64 = +41915 yr)) + f(Jupiter.axial (-8H/21 = -127740 yr)) + f(Saturn.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Earth.obliquity (8H/64 = +41915 yr)",
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Saturn.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Jupiter.axial (-8H/21 = -127740 yr)) - f(Jupiter.ICRF (-8H/64 = -41915 yr)) + f(Jupiter.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Jupiter.ICRF (-8H/64 = -41915 yr)",
+          "Jupiter.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Jupiter.axial (-8H/21 = -127740 yr)) - f(Jupiter.ICRF (-8H/64 = -41915 yr)) + f(Saturn.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Jupiter.ICRF (-8H/64 = -41915 yr)",
+          "Saturn.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Jupiter.axial (-8H/21 = -127740 yr)) + f(Jupiter.asc_node (-8H/36 = -74515 yr)) - f(Saturn.peri_ecl (-8H/64 = -41915 yr))|",
+        "components": [
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Jupiter.asc_node (-8H/36 = -74515 yr)",
+          "Saturn.peri_ecl (-8H/64 = -41915 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383246.1240349713,
+        "diff_pct": -5.371327398772522,
+        "expression": "|+f(Jupiter.axial (-8H/21 = -127740 yr)) - f(Saturn.peri_ecl (-8H/64 = -41915 yr)) + f(Saturn.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Jupiter.axial (-8H/21 = -127740 yr)",
+          "Saturn.peri_ecl (-8H/64 = -41915 yr)",
+          "Saturn.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383233.1636438579,
+        "diff_pct": -5.3745274953437345,
+        "expression": "|+f(Jupiter.asc_node (-8H/36 = -74515 yr)) + f(Jupiter.ecc (8H/43 = +62385 yr))|",
+        "components": [
+          "Jupiter.asc_node (-8H/36 = -74515 yr)",
+          "Jupiter.ecc (8H/43 = +62385 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383233.1636438579,
+        "diff_pct": -5.3745274953437345,
+        "expression": "|+f(Jupiter.ecc (8H/43 = +62385 yr)) + f(Saturn.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Jupiter.ecc (8H/43 = +62385 yr)",
+          "Saturn.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 446617.488175677,
+        "diff_pct": 10.275923006340005,
+        "expression": "|+f(Saturn.ICRF (-8H/168 = -15967 yr)) + f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Saturn.ICRF (-8H/168 = -15967 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 446830.48187260027,
+        "diff_pct": 10.32851404261735,
+        "expression": "|+f(Earth.peri_ecl (8H/128 = +20957 yr)) - f(Earth.asc_node (-8H/40 = -67063 yr)) - f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Earth.peri_ecl (8H/128 = +20957 yr)",
+          "Earth.asc_node (-8H/40 = -67063 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 446830.48187260027,
+        "diff_pct": 10.32851404261735,
+        "expression": "|+f(Earth.peri_ecl (8H/128 = +20957 yr)) + f(Jupiter.peri_ecl (8H/40 = +67063 yr)) - f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Earth.peri_ecl (8H/128 = +20957 yr)",
+          "Jupiter.peri_ecl (8H/40 = +67063 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 446830.48187260027,
+        "diff_pct": 10.32851404261735,
+        "expression": "|+f(Earth.asc_node (-8H/40 = -67063 yr)) - f(Earth.ecc (8H/128 = +20957 yr)) + f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Earth.asc_node (-8H/40 = -67063 yr)",
+          "Earth.ecc (8H/128 = +20957 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 446830.48187260027,
+        "diff_pct": 10.32851404261735,
+        "expression": "|+f(Earth.ecc (8H/128 = +20957 yr)) + f(Jupiter.peri_ecl (8H/40 = +67063 yr)) - f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Earth.ecc (8H/128 = +20957 yr)",
+          "Jupiter.peri_ecl (8H/40 = +67063 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 447088.99999999994,
+        "diff_pct": 10.392345679012331,
+        "expression": "|+f(Earth.peri_ecl (8H/128 = +20957 yr)) - f(Earth.ecc (8H/128 = +20957 yr)) + f(Saturn.axial (-8H/6 = -447089 yr))|",
+        "components": [
+          "Earth.peri_ecl (8H/128 = +20957 yr)",
+          "Earth.ecc (8H/128 = +20957 yr)",
+          "Saturn.axial (-8H/6 = -447089 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 447088.99999999994,
+        "diff_pct": 10.392345679012331,
+        "expression": "|+f(Earth.ICRF (+8H/24 = +111772 yr)) + f(Saturn.axial (-8H/6 = -447089 yr)) - f(Saturn.obliquity (8H/24 = +111772 yr))|",
+        "components": [
+          "Earth.ICRF (+8H/24 = +111772 yr)",
+          "Saturn.axial (-8H/6 = -447089 yr)",
+          "Saturn.obliquity (8H/24 = +111772 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      }
+    ]
+  },
+  "B_all_planets_pairs": {
+    "n_within_3pct": 0,
+    "hits_within_3pct": [],
+    "closest_20_pairs": [
+      {
+        "type": "pair",
+        "period_yr": 383233.1636438579,
+        "diff_pct": -5.3745274953437345,
+        "expression": "|+f(Jupiter.asc_node (-8H/36 = -74515 yr)) + f(Jupiter.ecc (8H/43 = +62385 yr))|",
+        "components": [
+          "Jupiter.asc_node (-8H/36 = -74515 yr)",
+          "Jupiter.ecc (8H/43 = +62385 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383233.1636438579,
+        "diff_pct": -5.3745274953437345,
+        "expression": "|+f(Jupiter.ecc (8H/43 = +62385 yr)) + f(Saturn.asc_node (-8H/36 = -74515 yr))|",
+        "components": [
+          "Jupiter.ecc (8H/43 = +62385 yr)",
+          "Saturn.asc_node (-8H/36 = -74515 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383229.470034671,
+        "diff_pct": -5.375439497612095,
+        "expression": "|+f(Mercury.ICRF (-8H/93 = -28844 yr)) - f(Neptune.ICRF (-8H/100 = -26825 yr))|",
+        "components": [
+          "Mercury.ICRF (-8H/93 = -28844 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383229.470034671,
+        "diff_pct": -5.375439497612095,
+        "expression": "|+f(Mercury.ICRF (-8H/93 = -28844 yr)) + f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.ICRF (-8H/93 = -28844 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383229.470034671,
+        "diff_pct": -5.375439497612095,
+        "expression": "|+f(Mercury.ICRF (-8H/93 = -28844 yr)) + f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.ICRF (-8H/93 = -28844 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.axial (-8H/9 = -298060 yr)) - f(Mars.axial (-8H/16 = -167659 yr))|",
+        "components": [
+          "Mercury.axial (-8H/9 = -298060 yr)",
+          "Mars.axial (-8H/16 = -167659 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.axial (-8H/9 = -298060 yr)) + f(Jupiter.obliquity (8H/16 = +167659 yr))|",
+        "components": [
+          "Mercury.axial (-8H/9 = -298060 yr)",
+          "Jupiter.obliquity (8H/16 = +167659 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.axial (-8H/9 = -298060 yr)) + f(Uranus.obliquity (8H/16 = +167659 yr))|",
+        "components": [
+          "Mercury.axial (-8H/9 = -298060 yr)",
+          "Uranus.obliquity (8H/16 = +167659 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.asc_node (-8H/9 = -298060 yr)) - f(Mars.axial (-8H/16 = -167659 yr))|",
+        "components": [
+          "Mercury.asc_node (-8H/9 = -298060 yr)",
+          "Mars.axial (-8H/16 = -167659 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.asc_node (-8H/9 = -298060 yr)) + f(Jupiter.obliquity (8H/16 = +167659 yr))|",
+        "components": [
+          "Mercury.asc_node (-8H/9 = -298060 yr)",
+          "Jupiter.obliquity (8H/16 = +167659 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383221.3061249531,
+        "diff_pct": -5.377455277789361,
+        "expression": "|+f(Mercury.asc_node (-8H/9 = -298060 yr)) + f(Uranus.obliquity (8H/16 = +167659 yr))|",
+        "components": [
+          "Mercury.asc_node (-8H/9 = -298060 yr)",
+          "Uranus.obliquity (8H/16 = +167659 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383219.6530612723,
+        "diff_pct": -5.377863441661163,
+        "expression": "|+f(Mercury.peri_ecl (8H/11 = +243867 yr)) - f(Neptune.peri_ecl (8H/4 = +670634 yr))|",
+        "components": [
+          "Mercury.peri_ecl (8H/11 = +243867 yr)",
+          "Neptune.peri_ecl (8H/4 = +670634 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383219.4897959053,
+        "diff_pct": -5.3779037540974555,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) + f(Neptune.peri_ecl (8H/4 = +670634 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Neptune.peri_ecl (8H/4 = +670634 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383219.4897959053,
+        "diff_pct": -5.3779037540974555,
+        "expression": "|+f(Neptune.peri_ecl (8H/4 = +670634 yr)) - f(Neptune.asc_node (-8H/3 = -894179 yr))|",
+        "components": [
+          "Neptune.peri_ecl (8H/4 = +670634 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383219.1836734433,
+        "diff_pct": -5.37797933989055,
+        "expression": "|+f(Venus.peri_ecl (-8H/6 = -447089 yr)) + f(Venus.asc_node (-8H/1 = -2682536 yr))|",
+        "components": [
+          "Venus.peri_ecl (-8H/6 = -447089 yr)",
+          "Venus.asc_node (-8H/1 = -2682536 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383219.1836734433,
+        "diff_pct": -5.37797933989055,
+        "expression": "|+f(Venus.asc_node (-8H/1 = -2682536 yr)) + f(Saturn.axial (-8H/6 = -447089 yr))|",
+        "components": [
+          "Venus.asc_node (-8H/1 = -2682536 yr)",
+          "Saturn.axial (-8H/6 = -447089 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383217.6734783084,
+        "diff_pct": -5.378352227578167,
+        "expression": "|+f(Venus.ecc (8H/19 = +141186 yr)) + f(Uranus.asc_node (-8H/12 = -223545 yr))|",
+        "components": [
+          "Venus.ecc (8H/19 = +141186 yr)",
+          "Uranus.asc_node (-8H/12 = -223545 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 383142.0146520147,
+        "diff_pct": -5.397033419255627,
+        "expression": "|+f(Mercury.ecc (8H/84 = +31935 yr)) - f(Venus.axial (+8H/91 = +29478 yr))|",
+        "components": [
+          "Mercury.ecc (8H/84 = +31935 yr)",
+          "Venus.axial (+8H/91 = +29478 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 446617.488175677,
+        "diff_pct": 10.275923006340005,
+        "expression": "|+f(Saturn.ICRF (-8H/168 = -15967 yr)) + f(Saturn.ecc (8H/162 = +16559 yr))|",
+        "components": [
+          "Saturn.ICRF (-8H/168 = -15967 yr)",
+          "Saturn.ecc (8H/162 = +16559 yr)"
+        ],
+        "signs": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "pair",
+        "period_yr": 447038.2554685389,
+        "diff_pct": 10.379816165071334,
+        "expression": "|+f(Mars.ICRF (-8H/69 = -38877 yr)) - f(Mars.asc_node (-8H/63 = -42580 yr))|",
+        "components": [
+          "Mars.ICRF (-8H/69 = -38877 yr)",
+          "Mars.asc_node (-8H/63 = -42580 yr)"
+        ],
+        "signs": [
+          1,
+          -1
+        ]
+      }
+    ]
+  },
+  "C_all_planets_triplets": {
+    "n_within_3pct": 0,
+    "hits_within_3pct": [],
+    "closest_25_triplets": [
+      {
+        "type": "triplet",
+        "period_yr": 383430.1229464993,
+        "diff_pct": -5.325895568765599,
+        "expression": "|+f(Mercury.ecc (8H/84 = +31935 yr)) + f(Venus.axial (+8H/91 = +29478 yr)) + f(Saturn.ICRF (-8H/168 = -15967 yr))|",
+        "components": [
+          "Mercury.ecc (8H/84 = +31935 yr)",
+          "Venus.axial (+8H/91 = +29478 yr)",
+          "Saturn.ICRF (-8H/168 = -15967 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383387.91087921144,
+        "diff_pct": -5.336318301429273,
+        "expression": "|+f(Mercury.ICRF (-8H/93 = -28844 yr)) - f(Earth.axial (-8H/104 = -25794 yr)) - f(Neptune.peri_ecl (8H/4 = +670634 yr))|",
+        "components": [
+          "Mercury.ICRF (-8H/93 = -28844 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.peri_ecl (8H/4 = +670634 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Earth.axial (-8H/104 = -25794 yr)) + f(Neptune.ICRF (-8H/100 = -26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Earth.axial (-8H/104 = -25794 yr)) - f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Earth.axial (-8H/104 = -25794 yr)) - f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Earth.axial (-8H/104 = -25794 yr)) - f(Neptune.ICRF (-8H/100 = -26825 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr))|",
+        "components": [
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Earth.axial (-8H/104 = -25794 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr)) + f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383377.92238646816,
+        "diff_pct": -5.338784595933789,
+        "expression": "|+f(Earth.axial (-8H/104 = -25794 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr)) + f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383375.20588830515,
+        "diff_pct": -5.339455336220951,
+        "expression": "|+f(Venus.axial (+8H/91 = +29478 yr)) - f(Venus.peri_ecl (-8H/6 = -447089 yr)) + f(Earth.axial (-8H/104 = -25794 yr))|",
+        "components": [
+          "Venus.axial (+8H/91 = +29478 yr)",
+          "Venus.peri_ecl (-8H/6 = -447089 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383375.20588830515,
+        "diff_pct": -5.339455336220951,
+        "expression": "|+f(Venus.axial (+8H/91 = +29478 yr)) + f(Earth.axial (-8H/104 = -25794 yr)) - f(Saturn.axial (-8H/6 = -447089 yr))|",
+        "components": [
+          "Venus.axial (+8H/91 = +29478 yr)",
+          "Earth.axial (-8H/104 = -25794 yr)",
+          "Saturn.axial (-8H/6 = -447089 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) + f(Venus.ICRF (-8H/110 = -24387 yr)) - f(Neptune.ICRF (-8H/100 = -26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) + f(Venus.ICRF (-8H/110 = -24387 yr)) + f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) + f(Venus.ICRF (-8H/110 = -24387 yr)) + f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Venus.obliquity (8H/110 = +24387 yr)) - f(Neptune.ICRF (-8H/100 = -26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Venus.obliquity (8H/110 = +24387 yr)) + f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Mercury.obliquity (8H/3 = +894179 yr)) - f(Venus.obliquity (8H/110 = +24387 yr)) + f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Mercury.obliquity (8H/3 = +894179 yr)",
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.ICRF (-8H/110 = -24387 yr)) - f(Neptune.ICRF (-8H/100 = -26825 yr)) - f(Neptune.asc_node (-8H/3 = -894179 yr))|",
+        "components": [
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.ICRF (-8H/110 = -24387 yr)) - f(Neptune.asc_node (-8H/3 = -894179 yr)) + f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.ICRF (-8H/110 = -24387 yr)) - f(Neptune.asc_node (-8H/3 = -894179 yr)) + f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.obliquity (8H/110 = +24387 yr)) + f(Neptune.ICRF (-8H/100 = -26825 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr))|",
+        "components": [
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.obliquity (8H/110 = +24387 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr)) - f(Neptune.obliquity (8H/100 = +26825 yr))|",
+        "components": [
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.obliquity (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383369.2218123895,
+        "diff_pct": -5.340932885829752,
+        "expression": "|+f(Venus.obliquity (8H/110 = +24387 yr)) + f(Neptune.asc_node (-8H/3 = -894179 yr)) - f(Neptune.ecc (8H/100 = +26825 yr))|",
+        "components": [
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Neptune.asc_node (-8H/3 = -894179 yr)",
+          "Neptune.ecc (8H/100 = +26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383365.4025550406,
+        "diff_pct": -5.341875912335653,
+        "expression": "|+f(Venus.axial (+8H/91 = +29478 yr)) + f(Venus.ICRF (-8H/110 = -24387 yr)) - f(Uranus.asc_node (-8H/12 = -223545 yr))|",
+        "components": [
+          "Venus.axial (+8H/91 = +29478 yr)",
+          "Venus.ICRF (-8H/110 = -24387 yr)",
+          "Uranus.asc_node (-8H/12 = -223545 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383365.4025550406,
+        "diff_pct": -5.341875912335653,
+        "expression": "|+f(Venus.axial (+8H/91 = +29478 yr)) - f(Venus.obliquity (8H/110 = +24387 yr)) - f(Uranus.asc_node (-8H/12 = -223545 yr))|",
+        "components": [
+          "Venus.axial (+8H/91 = +29478 yr)",
+          "Venus.obliquity (8H/110 = +24387 yr)",
+          "Uranus.asc_node (-8H/12 = -223545 yr)"
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "type": "triplet",
+        "period_yr": 383340.95748256374,
+        "diff_pct": -5.347911732700311,
+        "expression": "|+f(Earth.obliquity (8H/64 = +41915 yr)) + f(Jupiter.ecc (8H/43 = +62385 yr)) + f(Neptune.ICRF (-8H/100 = -26825 yr))|",
+        "components": [
+          "Earth.obliquity (8H/64 = +41915 yr)",
+          "Jupiter.ecc (8H/43 = +62385 yr)",
+          "Neptune.ICRF (-8H/100 = -26825 yr)"
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  }
+}

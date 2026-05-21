@@ -22311,40 +22311,41 @@ let lr04SelectedWindow = 'full';
 const LR04_FORMULA = {
   H_kyr: 335.317,
   eight_H_kyr: 2682.536,
-  intercept: -0.002261,
+  intercept: -0.001677,
   // LR04 linear trend on dt=1 grid (Earth cooling slope, ppm/kyr) for de-normalization
   LR04_TREND_SLOPE:     -0.00028904,
   LR04_TREND_INTERCEPT: 4.253596,
   LR04_STD:             0.267287,
-  // 26 active integer divisors of 8H (doc 17 §2.2 + pre-MPT additions from §3.3).
-  // Joint OLS fit on full LR04 (T=5320 kyr); R² = 0.238, condition number 1.6.
+  // 25 active integer divisors of 8H (doc 17 §2.2 + pre-MPT additions from §3.3).
+  // Joint OLS fit on full LR04 (T=5320 kyr); R² = 0.232, condition number 1.54.
+  // The empirical 405-kyr climate cycle sits off the 8H lattice and is modelled
+  // separately as a carbon-cycle internal response (see doc 18 §6).
   components: [
-    {n:7,   a:-0.089988, b:-0.062707, label:'g₂−g₅ Venus-Jupiter (~405k)'},
-    {n:9,   a:-0.040350, b:+0.103257, label:'g₂−g₇ Venus-Uranus'},
-    {n:12,  a:+0.101987, b:-0.019640, label:'s₅−s₁ Jupiter-Mercury nodal'},
-    {n:14,  a:+0.054979, b:+0.026097, label:'g₂−g₈ Venus-Neptune ecc (~192k)'},
-    {n:16,  a:+0.081679, b:-0.010479, label:'Mars Axial = 8H/16 (model, ~168k)'},
-    {n:18,  a:+0.087128, b:+0.085807, label:'s₄−s₆ Mars-Saturn nodal'},
-    {n:20,  a:-0.084197, b:+0.059747, label:'g₃−g₂ Earth-Venus ecc'},
-    {n:21,  a:+0.044452, b:+0.071342, label:'Mars Obliq / Jupiter Axial = 8H/21 (model, ~128k)'},
-    {n:22,  a:-0.043901, b:+0.083932, label:'s₂−s₄ / g₄−g₂ (~125k)'},
-    {n:25,  a:-0.066783, b:+0.202439, label:'s₁−s₄ Mercury-Mars nodal (100k)'},
-    {n:28,  a:-0.180551, b:-0.155608, label:'g₄−g₅ Mars-Jupiter (95k)'},
-    {n:30,  a:+0.082500, b:+0.093144, label:'g₃−g₇ Earth-Uranus ecc (~89k)'},
-    {n:31,  a:+0.078151, b:+0.133991, label:'g₄−g₇ Mars-Uranus'},
-    {n:35,  a:-0.060006, b:-0.111107, label:'Mars apsidal = 8H/35 (model)'},
-    {n:38,  a:-0.100127, b:+0.029125, label:'s₈−s₃ Neptune-Earth nodal (~71k)'},
-    {n:39,  a:-0.099399, b:+0.130220, label:'s₅−s₃ Earth nodal'},
-    {n:48,  a:-0.101161, b:-0.003824, label:'s₇−s₆ Uranus-Saturn nodal'},
-    {n:50,  a:-0.095594, b:+0.122590, label:'g₆−g₅ Saturn-Jupiter ecc'},
-    {n:53,  a:-0.039019, b:-0.132695, label:'Mars Ecc cycle = 8H/53 (model)'},
-    {n:65,  a:-0.111955, b:+0.250919, label:'k+s₃ Earth obliquity (41k)'},
-    {n:66,  a:+0.020411, b:-0.038065, label:'obliquity-band smeared centroid (~40.6k)'},
-    {n:68,  a:+0.133293, b:-0.092262, label:'k+s₄ Mars obliquity sub-peak'},
-    {n:73,  a:+0.037796, b:-0.084253, label:'2|s₄| Mars nodal harmonic'},
-    {n:76,  a:-0.006315, b:-0.090842, label:'g₄−s₃ Mars apsidal − Earth nodal'},
-    {n:113, a:-0.076753, b:-0.037619, label:'k+g₅ Jupiter (23.7k)'},
-    {n:120, a:+0.033739, b:+0.098624, label:'k+g₂ Venus = H/15 (22.4k)'},
+    {n:9,   a:-0.039304, b:+0.102823, label:'g₂−g₇ Venus-Uranus'},
+    {n:12,  a:+0.102944, b:-0.020192, label:'s₅−s₁ Jupiter-Mercury nodal'},
+    {n:14,  a:+0.055867, b:+0.025477, label:'g₂−g₈ Venus-Neptune ecc (~192k)'},
+    {n:16,  a:+0.082491, b:-0.011157, label:'Mars Axial = 8H/16 (model, ~168k)'},
+    {n:18,  a:+0.087859, b:+0.085082, label:'s₄−s₆ Mars-Saturn nodal'},
+    {n:20,  a:-0.083550, b:+0.058986, label:'g₃−g₂ Earth-Venus ecc'},
+    {n:21,  a:+0.045057, b:+0.070568, label:'Mars Obliq / Jupiter Axial = 8H/21 (model, ~128k)'},
+    {n:22,  a:-0.043339, b:+0.083147, label:'s₂−s₄ / g₄−g₂ (~125k)'},
+    {n:25,  a:-0.066349, b:+0.201638, label:'s₁−s₄ Mercury-Mars nodal (100k)'},
+    {n:28,  a:-0.180239, b:-0.156402, label:'g₄−g₅ Mars-Jupiter (95k)'},
+    {n:30,  a:+0.082737, b:+0.092368, label:'g₃−g₇ Earth-Uranus ecc (~89k)'},
+    {n:31,  a:+0.078352, b:+0.133226, label:'g₄−g₇ Mars-Uranus'},
+    {n:35,  a:-0.059932, b:-0.111807, label:'Mars apsidal = 8H/35 (model)'},
+    {n:38,  a:-0.100128, b:+0.028488, label:'s₈−s₃ Neptune-Earth nodal (~71k)'},
+    {n:39,  a:-0.099422, b:+0.129606, label:'s₅−s₃ Earth nodal'},
+    {n:48,  a:-0.101282, b:-0.004223, label:'s₇−s₆ Uranus-Saturn nodal'},
+    {n:50,  a:-0.095717, b:+0.122234, label:'g₆−g₅ Saturn-Jupiter ecc'},
+    {n:53,  a:-0.039134, b:-0.132993, label:'Mars Ecc cycle = 8H/53 (model)'},
+    {n:65,  a:-0.111976, b:+0.250745, label:'k+s₃ Earth obliquity (41k)'},
+    {n:66,  a:+0.020399, b:-0.038237, label:'obliquity-band smeared centroid (~40.6k)'},
+    {n:68,  a:+0.133297, b:-0.092432, label:'k+s₄ Mars obliquity sub-peak'},
+    {n:73,  a:+0.037827, b:-0.084431, label:'2|s₄| Mars nodal harmonic'},
+    {n:76,  a:-0.006275, b:-0.091031, label:'g₄−s₃ Mars apsidal − Earth nodal'},
+    {n:113, a:-0.076807, b:-0.037739, label:'k+g₅ Jupiter (23.7k)'},
+    {n:120, a:+0.033708, b:+0.098530, label:'k+g₂ Venus = H/15 (22.4k)'},
   ],
 };
 
@@ -22606,7 +22607,7 @@ function lr04RenderChart(windowKey) {
         <line x1="${(margin.left + 14).toFixed(1)}" y1="${(margin.top + 18).toFixed(1)}" x2="${(margin.left + 30).toFixed(1)}" y2="${(margin.top + 18).toFixed(1)}" stroke="#8cb4ff" stroke-width="1.6"/>
         <text x="${(margin.left + 36).toFixed(1)}" y="${(margin.top + 22).toFixed(1)}" fill="#ccc">LR04 δ¹⁸O (Lisiecki & Raymo 2005)</text>
         <line x1="${(margin.left + 14).toFixed(1)}" y1="${(margin.top + 34).toFixed(1)}" x2="${(margin.left + 30).toFixed(1)}" y2="${(margin.top + 34).toFixed(1)}" stroke="#ffe066" stroke-width="1.6"/>
-        <text x="${(margin.left + 36).toFixed(1)}" y="${(margin.top + 38).toFixed(1)}" fill="#ccc">8H orbital-forcing formula (26 components)</text>
+        <text x="${(margin.left + 36).toFixed(1)}" y="${(margin.top + 38).toFixed(1)}" fill="#ccc">8H orbital-forcing formula (25 components)</text>
       </g>
     </svg>
     <div class="lr04-caveat">

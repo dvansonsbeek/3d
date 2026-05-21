@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "script": "milankovitch_8h_cheng_closure_test.py",
+    "H_kyr": 335.317,
+    "eight_H_kyr": 2682.536,
+    "datasets": [
+      "Cheng2016 (U-Th, T=640)",
+      "LR04 matched window (T=640)"
+    ],
+    "scan_range": [
+      1.0,
+      30.0,
+      0.025
+    ],
+    "int_tolerance": 0.2
+  },
+  "cheng_peaks": [],
+  "cheng_summary": {
+    "total_peaks": 0,
+    "near_integer": 0,
+    "in_formula": 0,
+    "orphan": 0,
+    "binomial_p_value": 1.0,
+    "verdict": "NULL (p \u2265 0.05)"
+  },
+  "cross_dataset_at_formula_integers": [
+    {
+      "n": 7,
+      "lr04_amp": 0.08869131608874076,
+      "cheng_amp": 0.1341477239947924,
+      "both_peaks": false
+    },
+    {
+      "n": 9,
+      "lr04_amp": 0.11235379710592856,
+      "cheng_amp": 0.07223673957074735,
+      "both_peaks": false
+    },
+    {
+      "n": 12,
+      "lr04_amp": 0.19964524584303803,
+      "cheng_amp": 0.04870098218081762,
+      "both_peaks": false
+    },
+    {
+      "n": 14,
+      "lr04_amp": 0.1496822143863771,
+      "cheng_amp": 0.2219257891988746,
+      "both_peaks": false
+    },
+    {
+      "n": 16,
+      "lr04_amp": 0.16284836482369994,
+      "cheng_amp": 0.27208078501828814,
+      "both_peaks": false
+    },
+    {
+      "n": 18,
+      "lr04_amp": 0.29730054983604903,
+      "cheng_amp": 0.16898927075982473,
+      "both_peaks": false
+    },
+    {
+      "n": 20,
+      "lr04_amp": 0.27652908350001815,
+      "cheng_amp": 0.10396905220811246,
+      "both_peaks": false
+    },
+    {
+      "n": 21,
+      "lr04_amp": 0.308027716917519,
+      "cheng_amp": 0.11175200656582614,
+      "both_peaks": false
+    },
+    {
+      "n": 22,
+      "lr04_amp": 0.32082501473934694,
+      "cheng_amp": 0.09719863607979239,
+      "both_peaks": false
+    },
+    {
+      "n": 25,
+      "lr04_amp": 0.5247109024505098,
+      "cheng_amp": 0.11070007402041834,
+      "both_peaks": false
+    },
+    {
+      "n": 28,
+      "lr04_amp": 0.8616198296858549,
+      "cheng_amp": 0.18691470203335678,
+      "both_peaks": false
+    },
+    {
+      "n": 30,
+      "lr04_amp": 0.5283191779470487,
+      "cheng_amp": 0.08697345344127809,
+      "both_peaks": false
+    }
+  ],
+  "both_peaks_count": 0,
+  "both_peaks_of_total": "0/12",
+  "runtime_seconds": 0.22673606872558594
+}

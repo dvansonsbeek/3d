@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "matched_window_kyr": [
+      0,
+      640
+    ],
+    "bands": {
+      "100k": {
+        "range_kyr": [
+          80.0,
+          125.0
+        ],
+        "predicted_n": 25,
+        "predicted_kyr": 107.30144
+      },
+      "obliquity": {
+        "range_kyr": [
+          35.0,
+          50.0
+        ],
+        "predicted_n": 65,
+        "predicted_kyr": 41.269784615384616
+      },
+      "precession": {
+        "range_kyr": [
+          18.0,
+          26.0
+        ],
+        "predicted_n": 113,
+        "predicted_kyr": 23.739256637168143
+      }
+    }
+  },
+  "B1_band_centroid_agreement": {
+    "bands": {
+      "100k": {
+        "band_range_kyr": [
+          80.0,
+          125.0
+        ],
+        "predicted_centroid_kyr": 107.30144,
+        "lr04_peak_kyr": 98.77000592768226,
+        "cheng_peak_kyr": 100.00375107843504,
+        "diff_kyr": 1.2337451507527817,
+        "rayleigh_resolution_kyr": 16.416015625,
+        "centroids_agree": true,
+        "diff_lr04_vs_predicted_kyr": 8.531434072317737,
+        "diff_cheng_vs_predicted_kyr": 7.297688921564955
+      },
+      "obliquity": {
+        "band_range_kyr": [
+          35.0,
+          50.0
+        ],
+        "predicted_centroid_kyr": 41.269784615384616,
+        "lr04_peak_kyr": 40.60840804247541,
+        "cheng_peak_kyr": 40.33805983053779,
+        "diff_kyr": 0.27034821193762326,
+        "rayleigh_resolution_kyr": 2.822265625,
+        "centroids_agree": true,
+        "diff_lr04_vs_predicted_kyr": 0.6613765729092052,
+        "diff_cheng_vs_predicted_kyr": 0.9317247848468284
+      },
+      "precession": {
+        "band_range_kyr": [
+          18.0,
+          26.0
+        ],
+        "predicted_centroid_kyr": 23.739256637168143,
+        "lr04_peak_kyr": 23.495769201797774,
+        "cheng_peak_kyr": 23.498129221806494,
+        "diff_kyr": 0.002360020008719488,
+        "rayleigh_resolution_kyr": 0.75625,
+        "centroids_agree": true,
+        "diff_lr04_vs_predicted_kyr": 0.2434874353703691,
+        "diff_cheng_vs_predicted_kyr": 0.2411274153616496
+      }
+    },
+    "n_agree": 3,
+    "n_bands": 3,
+    "verdict": "POSITIVE \u2014 chronology-independent centroid agreement"
+  },
+  "B2_permutation_formula_amplitudes": {
+    "formula_integers_resolvable": [
+      9,
+      12,
+      14,
+      16,
+      18,
+      20,
+      21,
+      22,
+      25,
+      28,
+      30
+    ],
+    "n_formula": 11,
+    "n_candidates": 19,
+    "n_permutations": 1000,
+    "formula_mean_amplitude": 0.13467649918884875,
+    "null_mean_amplitude": 0.12029294240383119,
+    "null_p95_amplitude": 0.14221629874042488,
+    "p_value": 0.154,
+    "significant_at_05": false,
+    "verdict": "NULL"
+  },
+  "B3_cross_coherence": {
+    "nperseg": 256,
+    "bands": {
+      "100k": {
+        "band_range_kyr": [
+          80.0,
+          125.0
+        ],
+        "max_coherence_in_band": 0.6183149794011755,
+        "max_at_period_kyr": 85.33333333333333,
+        "offband_p95_coherence": 0.7190439517308416,
+        "coherence_high_vs_offband": false
+      },
+      "obliquity": {
+        "band_range_kyr": [
+          35.0,
+          50.0
+        ],
+        "max_coherence_in_band": 0.42781618664806664,
+        "max_at_period_kyr": 42.666666666666664,
+        "offband_p95_coherence": 0.7193935937388056,
+        "coherence_high_vs_offband": false
+      },
+      "precession": {
+        "band_range_kyr": [
+          18.0,
+          26.0
+        ],
+        "max_coherence_in_band": 0.848134070092697,
+        "max_at_period_kyr": 23.272727272727273,
+        "offband_p95_coherence": 0.6343866819409673,
+        "coherence_high_vs_offband": true
+      }
+    },
+    "n_high_bands": 1,
+    "n_bands": 3,
+    "verdict": "PARTIAL \u2014 1/3 bands show elevated coherence"
+  }
+}

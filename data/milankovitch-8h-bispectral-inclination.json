@@ -1,0 +1,88 @@
+{
+  "constants": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "predicted_inclination_centroid_kyr": 107.30144,
+    "predicted_obliquity_centroid_kyr": 41.269784615384616
+  },
+  "data": {
+    "source": "LR04 (Lisiecki & Raymo 2005)",
+    "window_kyr": [
+      0,
+      5320
+    ],
+    "n_samples": 5321,
+    "dt_kyr": 1.0
+  },
+  "method": {
+    "segment_length": 1500,
+    "overlap": 0.75,
+    "segments_averaged": 11,
+    "n_null_surrogates": 100,
+    "null_type": "phase-randomization"
+  },
+  "tests": {
+    "D1_inclination_self_coupling": {
+      "name": "D1: inclination self-coupling (n~25 x n~25)",
+      "f1_range": [
+        0.007692307692307693,
+        0.011111111111111112
+      ],
+      "f2_range": [
+        0.007692307692307693,
+        0.011111111111111112
+      ],
+      "f1_period_range_kyr": [
+        90.0,
+        130.0
+      ],
+      "f2_period_range_kyr": [
+        90.0,
+        130.0
+      ],
+      "observed_max_b2": 0.5067118275295867,
+      "observed_p1_kyr": 125.0,
+      "observed_p2_kyr": 125.0,
+      "beat_difference_period_kyr": 62.5,
+      "n_null": 100,
+      "null_median_b2": 0.3404817605698662,
+      "null_p95_b2": 0.5871412136871301,
+      "null_p99_b2": 0.7259909209548625,
+      "observed_over_null_p95": 0.8630152605836288,
+      "empirical_p_value": 0.11,
+      "significant_at_05": false,
+      "verdict": "NO significant phase coupling"
+    },
+    "D2_inclination_obliquity_coupling": {
+      "name": "D2: inclination x obliquity (n~25 x n~65)",
+      "f1_range": [
+        0.007692307692307693,
+        0.011111111111111112
+      ],
+      "f2_range": [
+        0.023255813953488372,
+        0.02631578947368421
+      ],
+      "f1_period_range_kyr": [
+        90.0,
+        130.0
+      ],
+      "f2_period_range_kyr": [
+        38.0,
+        43.0
+      ],
+      "observed_max_b2": 0.67144392456981,
+      "observed_p1_kyr": 125.0,
+      "observed_p2_kyr": 40.54054054054054,
+      "beat_difference_period_kyr": 30.612244897959187,
+      "n_null": 100,
+      "null_median_b2": 0.36443906199997655,
+      "null_p95_b2": 0.5730577976478108,
+      "null_p99_b2": 0.6176665944238716,
+      "observed_over_null_p95": 1.1716862196550462,
+      "empirical_p_value": 0.01,
+      "significant_at_05": true,
+      "verdict": "SIGNIFICANT phase coupling"
+    }
+  }
+}

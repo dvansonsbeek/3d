@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "framework_long_ecc_kyr": 383.2194285714286,
+    "laskar_long_ecc_kyr": 405.0,
+    "search_band_kyr": [
+      350.0,
+      450.0
+    ]
+  },
+  "intervals": [
+    {
+      "name": "N1_Eocene",
+      "label": "CENOGRID Eocene (warmhouse, 405k dominant)",
+      "window_kyr": [
+        33000,
+        50000
+      ],
+      "n_samples": 3401,
+      "rayleigh_resolution_kyr": 9.411764705882353,
+      "observed_peak_kyr": 405.9882699837262,
+      "observed_power": 0.01383556281875744,
+      "framework_383_diff_kyr": 22.768841412297604,
+      "laskar_405_diff_kyr": 0.9882699837261839,
+      "winner": "standard Laskar (405)"
+    },
+    {
+      "name": "N2_Oligocene",
+      "label": "CENOGRID Oligocene (coolhouse, 405k strong)",
+      "window_kyr": [
+        23000,
+        34000
+      ],
+      "n_samples": 2201,
+      "rayleigh_resolution_kyr": 14.545454545454545,
+      "observed_peak_kyr": 405.7398431587253,
+      "observed_power": 0.04063896381794681,
+      "framework_383_diff_kyr": 22.520414587296727,
+      "laskar_405_diff_kyr": 0.7398431587253071,
+      "winner": "standard Laskar (405)"
+    },
+    {
+      "name": "N3_Paleocene_Eocene",
+      "label": "CENOGRID Paleocene-Eocene (hothouse, 405k strongest)",
+      "window_kyr": [
+        50000,
+        66000
+      ],
+      "n_samples": 3201,
+      "rayleigh_resolution_kyr": 10.0,
+      "observed_peak_kyr": 402.8981915284862,
+      "observed_power": 0.008326418816509045,
+      "framework_383_diff_kyr": 19.678762957057643,
+      "laskar_405_diff_kyr": 2.1018084715137775,
+      "winner": "standard Laskar (405)"
+    },
+    {
+      "name": "N4_LR04_control",
+      "label": "LR04 control (post-MPT icehouse, 405k absent per \u00a77.1)",
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "n_samples": 1065,
+      "rayleigh_resolution_kyr": 30.075187969924812,
+      "observed_peak_kyr": 393.0681871363275,
+      "observed_power": 0.0062418147325970195,
+      "framework_383_diff_kyr": 9.848758564898901,
+      "laskar_405_diff_kyr": 11.93181286367252,
+      "winner": "framework (8H/7)"
+    }
+  ],
+  "framework_wins": 0,
+  "laskar_wins": 3,
+  "ties": 0,
+  "verdict": "FALSIFIED \u2014 Laskar 405 kyr wins; framework's n=7 placement is empirically wrong"
+}

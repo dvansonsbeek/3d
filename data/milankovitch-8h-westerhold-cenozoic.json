@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "H_kyr": 335.317,
+    "8H_kyr": 2682.536,
+    "dt_kyr": 5.0,
+    "source": "Westerhold 2020 CENOGRID (PANGAEA TableS34, LOESS-smoothed)",
+    "bands": {
+      "100k": {
+        "range_kyr": [
+          80.0,
+          125.0
+        ],
+        "predicted_n": 25,
+        "predicted_kyr": 107.30144
+      },
+      "obliquity": {
+        "range_kyr": [
+          35.0,
+          50.0
+        ],
+        "predicted_n": 65,
+        "predicted_kyr": 41.269784615384616
+      },
+      "precession": {
+        "range_kyr": [
+          18.0,
+          26.0
+        ],
+        "predicted_n": 113,
+        "predicted_kyr": 23.739256637168143
+      }
+    }
+  },
+  "windows": {
+    "W1_0_5Ma": {
+      "window_kyr": [
+        0,
+        5000
+      ],
+      "label": "Icehouse \u2014 LR04 overlap, Pliocene-Pleistocene",
+      "n_samples": 1001,
+      "I1_band_centroids": {
+        "bands": {
+          "100k": {
+            "observed_peak_kyr": 94.6363281388662,
+            "primary_predicted_kyr": 107.30144,
+            "diff_to_primary_kyr": 12.665111861133795,
+            "nearest_formula_integer_n": 28,
+            "nearest_formula_period_kyr": 95.80485714285714,
+            "diff_to_nearest_formula_kyr": 1.1685290039909404,
+            "diff_to_nearest_8H_integer_kyr": 1.1685290039909404,
+            "tolerance_kyr": 2.10125,
+            "rayleigh_resolution_kyr": 2.10125,
+            "agree_primary": false,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "obliquity": {
+            "observed_peak_kyr": 40.97935880544576,
+            "primary_predicted_kyr": 41.269784615384616,
+            "diff_to_primary_kyr": 0.2904258099388528,
+            "nearest_formula_integer_n": 65,
+            "nearest_formula_period_kyr": 41.269784615384616,
+            "diff_to_nearest_formula_kyr": 0.2904258099388528,
+            "diff_to_nearest_8H_integer_kyr": 0.2904258099388528,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.36125,
+            "agree_primary": true,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "precession": {
+            "observed_peak_kyr": 23.671700690597255,
+            "primary_predicted_kyr": 23.739256637168143,
+            "diff_to_primary_kyr": 0.06755594657088793,
+            "nearest_formula_integer_n": 113,
+            "nearest_formula_period_kyr": 23.739256637168143,
+            "diff_to_nearest_formula_kyr": 0.06755594657088793,
+            "diff_to_nearest_8H_integer_kyr": 0.06755594657088793,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.0968,
+            "agree_primary": true,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          }
+        },
+        "n_agree_primary": 2,
+        "n_agree_any_formula_integer": 3,
+        "n_agree_any_8h_integer": 3
+      },
+      "I2_permutation": {
+        "n_resolvable_formula": 25,
+        "n_candidates": 172,
+        "formula_mean_amplitude": 0.12014167555890388,
+        "null_mean_amplitude": 0.03915496140505824,
+        "p_value": 0.0,
+        "significant_at_05": true
+      }
+    },
+    "W2_5_15Ma": {
+      "window_kyr": [
+        5000,
+        15000
+      ],
+      "label": "Coolhouse \u2014 late Miocene cooling",
+      "n_samples": 2001,
+      "I1_band_centroids": {
+        "bands": {
+          "100k": {
+            "observed_peak_kyr": 95.13274336283186,
+            "primary_predicted_kyr": 107.30144,
+            "diff_to_primary_kyr": 12.16869663716814,
+            "nearest_formula_integer_n": 28,
+            "nearest_formula_period_kyr": 95.80485714285714,
+            "diff_to_nearest_formula_kyr": 0.6721137800252848,
+            "diff_to_nearest_8H_integer_kyr": 0.6721137800252848,
+            "tolerance_kyr": 1.050625,
+            "rayleigh_resolution_kyr": 1.050625,
+            "agree_primary": false,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "obliquity": {
+            "observed_peak_kyr": 40.66149555516821,
+            "primary_predicted_kyr": 41.269784615384616,
+            "diff_to_primary_kyr": 0.608289060216407,
+            "nearest_formula_integer_n": 66,
+            "nearest_formula_period_kyr": 40.64448484848485,
+            "diff_to_nearest_formula_kyr": 0.017010706683358023,
+            "diff_to_nearest_8H_integer_kyr": 0.017010706683358023,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.180625,
+            "agree_primary": true,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "precession": {
+            "observed_peak_kyr": 22.29978790839549,
+            "primary_predicted_kyr": 23.739256637168143,
+            "diff_to_primary_kyr": 1.4394687287726526,
+            "nearest_formula_integer_n": 120,
+            "nearest_formula_period_kyr": 22.354466666666667,
+            "diff_to_nearest_formula_kyr": 0.05467875827117652,
+            "diff_to_nearest_8H_integer_kyr": 0.05467875827117652,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.0484,
+            "agree_primary": false,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          }
+        },
+        "n_agree_primary": 1,
+        "n_agree_any_formula_integer": 3,
+        "n_agree_any_8h_integer": 3
+      },
+      "I2_permutation": {
+        "n_resolvable_formula": 25,
+        "n_candidates": 172,
+        "formula_mean_amplitude": 0.041790352166031386,
+        "null_mean_amplitude": 0.02169114079601506,
+        "p_value": 0.0,
+        "significant_at_05": true
+      }
+    },
+    "W3_15_30Ma": {
+      "window_kyr": [
+        15000,
+        30000
+      ],
+      "label": "Coolhouse/Warmhouse boundary \u2014 mid Miocene + Oligocene",
+      "n_samples": 3001,
+      "I1_band_centroids": {
+        "bands": {
+          "100k": {
+            "observed_peak_kyr": 94.86869261974236,
+            "primary_predicted_kyr": 107.30144,
+            "diff_to_primary_kyr": 12.432747380257638,
+            "nearest_formula_integer_n": 28,
+            "nearest_formula_period_kyr": 95.80485714285714,
+            "diff_to_nearest_formula_kyr": 0.9361645231147833,
+            "diff_to_nearest_8H_integer_kyr": 0.9361645231147833,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.7004166666666667,
+            "agree_primary": false,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "obliquity": {
+            "observed_peak_kyr": 40.369473046638404,
+            "primary_predicted_kyr": 41.269784615384616,
+            "diff_to_primary_kyr": 0.9003115687462113,
+            "nearest_formula_integer_n": 66,
+            "nearest_formula_period_kyr": 40.64448484848485,
+            "diff_to_nearest_formula_kyr": 0.27501180184644625,
+            "diff_to_nearest_8H_integer_kyr": 0.27501180184644625,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.12041666666666667,
+            "agree_primary": true,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "precession": {
+            "observed_peak_kyr": 24.652019283964275,
+            "primary_predicted_kyr": 23.739256637168143,
+            "diff_to_primary_kyr": 0.9127626467961321,
+            "nearest_formula_integer_n": 113,
+            "nearest_formula_period_kyr": 23.739256637168143,
+            "diff_to_nearest_formula_kyr": 0.9127626467961321,
+            "diff_to_nearest_8H_integer_kyr": 0.0415972656156498,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.032266666666666666,
+            "agree_primary": true,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          }
+        },
+        "n_agree_primary": 2,
+        "n_agree_any_formula_integer": 3,
+        "n_agree_any_8h_integer": 3
+      },
+      "I2_permutation": {
+        "n_resolvable_formula": 25,
+        "n_candidates": 172,
+        "formula_mean_amplitude": 0.033723477997025554,
+        "null_mean_amplitude": 0.021581583609120755,
+        "p_value": 0.003,
+        "significant_at_05": true
+      }
+    },
+    "W4_30_50Ma": {
+      "window_kyr": [
+        30000,
+        50000
+      ],
+      "label": "Warmhouse \u2014 Eocene",
+      "n_samples": 4001,
+      "I1_band_centroids": {
+        "bands": {
+          "100k": {
+            "observed_peak_kyr": 124.335416472344,
+            "primary_predicted_kyr": 107.30144,
+            "diff_to_primary_kyr": 17.033976472343994,
+            "nearest_formula_integer_n": 22,
+            "nearest_formula_period_kyr": 121.93345454545455,
+            "diff_to_nearest_formula_kyr": 2.4019619268894417,
+            "diff_to_nearest_8H_integer_kyr": 2.4019619268894417,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.5253125,
+            "agree_primary": false,
+            "agree_any_formula_integer": false,
+            "agree_any_8h_integer": false
+          },
+          "obliquity": {
+            "observed_peak_kyr": 48.79209370424597,
+            "primary_predicted_kyr": 41.269784615384616,
+            "diff_to_primary_kyr": 7.5223090888613555,
+            "nearest_formula_integer_n": 65,
+            "nearest_formula_period_kyr": 41.269784615384616,
+            "diff_to_nearest_formula_kyr": 7.5223090888613555,
+            "diff_to_nearest_8H_integer_kyr": 0.018711886064153305,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.0903125,
+            "agree_primary": false,
+            "agree_any_formula_integer": false,
+            "agree_any_8h_integer": true
+          },
+          "precession": {
+            "observed_peak_kyr": 25.26707168894289,
+            "primary_predicted_kyr": 23.739256637168143,
+            "diff_to_primary_kyr": 1.5278150517747484,
+            "nearest_formula_integer_n": 113,
+            "nearest_formula_period_kyr": 23.739256637168143,
+            "diff_to_nearest_formula_kyr": 1.5278150517747484,
+            "diff_to_nearest_8H_integer_kyr": 0.03987170728352396,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.0242,
+            "agree_primary": false,
+            "agree_any_formula_integer": false,
+            "agree_any_8h_integer": true
+          }
+        },
+        "n_agree_primary": 0,
+        "n_agree_any_formula_integer": 0,
+        "n_agree_any_8h_integer": 2
+      },
+      "I2_permutation": {
+        "n_resolvable_formula": 25,
+        "n_candidates": 172,
+        "formula_mean_amplitude": 0.018669308105396434,
+        "null_mean_amplitude": 0.012874751888619506,
+        "p_value": 0.014,
+        "significant_at_05": true
+      }
+    },
+    "W5_50_67Ma": {
+      "window_kyr": [
+        50000,
+        67000
+      ],
+      "label": "Hothouse \u2014 Paleocene-Eocene + early-Eocene Climatic Optimum",
+      "n_samples": 3401,
+      "I1_band_centroids": {
+        "bands": {
+          "100k": {
+            "observed_peak_kyr": 99.74558515414547,
+            "primary_predicted_kyr": 107.30144,
+            "diff_to_primary_kyr": 7.555854845854526,
+            "nearest_formula_integer_n": 28,
+            "nearest_formula_period_kyr": 95.80485714285714,
+            "diff_to_nearest_formula_kyr": 3.9407280112883285,
+            "diff_to_nearest_8H_integer_kyr": 0.39239996896029083,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.618014705882353,
+            "agree_primary": false,
+            "agree_any_formula_integer": false,
+            "agree_any_8h_integer": true
+          },
+          "obliquity": {
+            "observed_peak_kyr": 38.56103810232251,
+            "primary_predicted_kyr": 41.269784615384616,
+            "diff_to_primary_kyr": 2.7087465130621027,
+            "nearest_formula_integer_n": 68,
+            "nearest_formula_period_kyr": 39.44905882352941,
+            "diff_to_nearest_formula_kyr": 0.8880207212068996,
+            "diff_to_nearest_8H_integer_kyr": 0.23909524517965508,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.10625,
+            "agree_primary": false,
+            "agree_any_formula_integer": true,
+            "agree_any_8h_integer": true
+          },
+          "precession": {
+            "observed_peak_kyr": 25.930833818272507,
+            "primary_predicted_kyr": 23.739256637168143,
+            "diff_to_primary_kyr": 2.191577181104364,
+            "nearest_formula_integer_n": 113,
+            "nearest_formula_period_kyr": 23.739256637168143,
+            "diff_to_nearest_formula_kyr": 2.191577181104364,
+            "diff_to_nearest_8H_integer_kyr": 0.1372184336571216,
+            "tolerance_kyr": 1.0,
+            "rayleigh_resolution_kyr": 0.02847058823529412,
+            "agree_primary": false,
+            "agree_any_formula_integer": false,
+            "agree_any_8h_integer": true
+          }
+        },
+        "n_agree_primary": 0,
+        "n_agree_any_formula_integer": 1,
+        "n_agree_any_8h_integer": 3
+      },
+      "I2_permutation": {
+        "n_resolvable_formula": 25,
+        "n_candidates": 172,
+        "formula_mean_amplitude": 0.024417607259537632,
+        "null_mean_amplitude": 0.010224941607725017,
+        "p_value": 0.0,
+        "significant_at_05": true
+      }
+    }
+  },
+  "overall_verdict": "POSITIVE \u2014 5/5 Cenozoic windows show permutation-test significance (p<0.05); 3/5 also show full 3/3 band peak match to nearest framework integer",
+  "n_windows_permutation_significant": 5,
+  "n_windows_all3_bands_match_framework_integer": 3,
+  "n_windows": 5
+}

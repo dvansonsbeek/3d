@@ -45,15 +45,16 @@ H = 335.317
 EIGHT_H = 8 * H  # 2682.536 kyr
 DT_KYR = 1.0
 
-# 26 significant integer divisors of 8H. 20 from §2.2 of doc 17
-# (LR04 full T=5320 kyr, amp > 3× median) + 6 added from §3.3 (pre-MPT
-# 1200–3000 kyr) to capture outer-planet and Mars-direct cycles.
-CLIMATE_INTEGERS = [7, 9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
+# 25 significant integer divisors of 8H. 19 from §2.2 of doc 17 (LR04 full
+# T=5320 kyr, amp > 3× median) + 6 added from §3.3 (pre-MPT 1200–3000 kyr)
+# to capture outer-planet and Mars-direct cycles. The 405-kyr Laskar g₂−g₅
+# secular eigenbeat lives off the 8H lattice and is modelled separately
+# (doc 18 §6).
+CLIMATE_INTEGERS = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
                     38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
 
 # Eigenmode-beat labels (mirror §2.2 table + §6.6 n=66 interpretation)
 LABELS = {
-    7:   "g₂−g₅ Venus-Jupiter (~405 kyr long ecc)",
     9:   "g₂−g₇ Venus-Uranus ecc / Mercury Axial = AscNode = 8H/9 (doc 55, Cassini-locked)",
     12:  "s₅−s₁ Jupiter-Mercury nodal / Uranus AscNode = 8H/12 (doc 55)",
     14:  "g₂−g₈ Venus-Neptune ecc (pre-MPT, ~192 kyr)",

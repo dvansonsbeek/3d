@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "script": "milankovitch_8h_super_cycle_test.py",
+    "H_kyr": 335.317,
+    "eight_H_kyr": 2682.536,
+    "test_range_myr": [
+      0.0,
+      600.0
+    ],
+    "n_events": 20,
+    "n_trials": 100000,
+    "rng_seed": 20260520,
+    "pre_registered": true
+  },
+  "events": [
+    {
+      "n": 1,
+      "name": "End-Ordovician extinction",
+      "age_myr": 443.1,
+      "tier": "Tier 1",
+      "kind": "Big Five",
+      "k": 165,
+      "k_eight_h_myr": 442.61844,
+      "delta_myr": 0.48156000000000176,
+      "fractional_residual": 0.3590333922825124
+    },
+    {
+      "n": 2,
+      "name": "Late Devonian (F-F) extinction",
+      "age_myr": 371.1,
+      "tier": "Tier 1",
+      "kind": "Big Five",
+      "k": 138,
+      "k_eight_h_myr": 370.189968,
+      "delta_myr": 0.9100320000000011,
+      "fractional_residual": 0.6784863278628788
+    },
+    {
+      "n": 3,
+      "name": "End-Permian extinction",
+      "age_myr": 251.902,
+      "tier": "Tier 1",
+      "kind": "Big Five",
+      "k": 94,
+      "k_eight_h_myr": 252.158384,
+      "delta_myr": -0.2563840000000255,
+      "fractional_residual": 0.19115046359119653
+    },
+    {
+      "n": 4,
+      "name": "End-Triassic extinction",
+      "age_myr": 201.36,
+      "tier": "Tier 1",
+      "kind": "Big Five",
+      "k": 75,
+      "k_eight_h_myr": 201.19020000000003,
+      "delta_myr": 0.16979999999998086,
+      "fractional_residual": 0.12659662349358564
+    },
+    {
+      "n": 5,
+      "name": "End-Cretaceous (K-Pg) extinction",
+      "age_myr": 66.0,
+      "tier": "Tier 1",
+      "kind": "Big Five",
+      "k": 25,
+      "k_eight_h_myr": 67.0634,
+      "delta_myr": -1.0634000000000015,
+      "fractional_residual": 0.7928318576153358
+    },
+    {
+      "n": 6,
+      "name": "Cambrian base (Phanerozoic start)",
+      "age_myr": 538.8,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 201,
+      "k_eight_h_myr": 539.189736,
+      "delta_myr": -0.38973600000008446,
+      "fractional_residual": 0.29057280125977536
+    },
+    {
+      "n": 7,
+      "name": "Ordovician/Cambrian",
+      "age_myr": 486.85,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 181,
+      "k_eight_h_myr": 485.53901600000006,
+      "delta_myr": 1.3109839999999622,
+      "fractional_residual": 0.9774213654541648
+    },
+    {
+      "n": 8,
+      "name": "Devonian/Silurian",
+      "age_myr": 419.62,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 156,
+      "k_eight_h_myr": 418.47561600000006,
+      "delta_myr": 1.1443839999999454,
+      "fractional_residual": 0.8532105440523183
+    },
+    {
+      "n": 9,
+      "name": "Carboniferous/Devonian",
+      "age_myr": 358.86,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 134,
+      "k_eight_h_myr": 359.459824,
+      "delta_myr": -0.5998240000000123,
+      "fractional_residual": 0.44720667308846573
+    },
+    {
+      "n": 10,
+      "name": "Permian/Carboniferous",
+      "age_myr": 298.9,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 111,
+      "k_eight_h_myr": 297.761496,
+      "delta_myr": 1.1385039999999549,
+      "fractional_residual": 0.8488266327087122
+    },
+    {
+      "n": 11,
+      "name": "Cretaceous/Jurassic",
+      "age_myr": 145.0,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 54,
+      "k_eight_h_myr": 144.85694400000003,
+      "delta_myr": 0.14305599999997298,
+      "fractional_residual": 0.10665728251176222
+    },
+    {
+      "n": 12,
+      "name": "Neogene/Paleogene",
+      "age_myr": 23.04,
+      "tier": "Tier 2",
+      "kind": "Period boundary",
+      "k": 9,
+      "k_eight_h_myr": 24.142824,
+      "delta_myr": -1.1028240000000018,
+      "fractional_residual": 0.8222249393857178
+    },
+    {
+      "n": 13,
+      "name": "Quaternary/Neogene",
+      "age_myr": 2.58,
+      "tier": "Tier 2",
+      "kind": "Period boundary (user-identified)",
+      "k": 1,
+      "k_eight_h_myr": 2.6825360000000003,
+      "delta_myr": -0.10253600000000018,
+      "fractional_residual": 0.07644706352496307
+    },
+    {
+      "n": 14,
+      "name": "Eocene/Paleocene",
+      "age_myr": 56.0,
+      "tier": "Tier 3",
+      "kind": "Epoch boundary",
+      "k": 21,
+      "k_eight_h_myr": 56.333256000000006,
+      "delta_myr": -0.33325600000000577,
+      "fractional_residual": 0.24846339434028494
+    },
+    {
+      "n": 15,
+      "name": "Oligocene/Eocene (EOT)",
+      "age_myr": 33.9,
+      "tier": "Tier 3",
+      "kind": "Epoch boundary + EOT",
+      "k": 13,
+      "k_eight_h_myr": 34.872968,
+      "delta_myr": -0.9729680000000016,
+      "fractional_residual": 0.7254090905024235
+    },
+    {
+      "n": 16,
+      "name": "Pliocene/Miocene",
+      "age_myr": 5.333,
+      "tier": "Tier 3",
+      "kind": "Epoch boundary (user-identified)",
+      "k": 2,
+      "k_eight_h_myr": 5.3650720000000005,
+      "delta_myr": -0.03207200000000032,
+      "fractional_residual": 0.023911701464584496
+    },
+    {
+      "n": 17,
+      "name": "PETM",
+      "age_myr": 55.8,
+      "tier": "Tier 3",
+      "kind": "Climate event",
+      "k": 21,
+      "k_eight_h_myr": 56.333256000000006,
+      "delta_myr": -0.5332560000000086,
+      "fractional_residual": 0.397576025074786
+    },
+    {
+      "n": 18,
+      "name": "MMCO peak",
+      "age_myr": 15.0,
+      "tier": "Tier 3",
+      "kind": "Climate event",
+      "k": 6,
+      "k_eight_h_myr": 16.095216,
+      "delta_myr": -1.0952160000000006,
+      "fractional_residual": 0.8165526949125763
+    },
+    {
+      "n": 19,
+      "name": "Late Miocene cooling onset",
+      "age_myr": 7.0,
+      "tier": "Tier 3",
+      "kind": "Climate event",
+      "k": 3,
+      "k_eight_h_myr": 8.047608,
+      "delta_myr": -1.0476080000000003,
+      "fractional_residual": 0.7810579242925356
+    },
+    {
+      "n": 20,
+      "name": "iNHG (NH ice-sheet est.)",
+      "age_myr": 2.7,
+      "tier": "Tier 3",
+      "kind": "Climate event",
+      "k": 1,
+      "k_eight_h_myr": 2.6825360000000003,
+      "delta_myr": 0.017463999999999924,
+      "fractional_residual": 0.013020514915736395
+    }
+  ],
+  "primary_test": {
+    "observed_median_fractional_residual": 0.4223913490816259,
+    "null_median": 0.5005446704669596,
+    "null_5th_pct": 0.3296874540278153,
+    "p_one_sided": 0.23337
+  },
+  "secondary_test_near_int_hits": {
+    "observed": 3,
+    "null_median": 2.0,
+    "null_95th_pct": 4.0,
+    "p_one_sided": 0.32142
+  },
+  "verdict": "NULL (p \u2265 0.05): observed alignment is consistent with random placement",
+  "sensitivity_analyses": {
+    "S1_drop_user_identified": {
+      "n_events": 18,
+      "observed_median": 0.5628465004756722,
+      "p_one_sided": 0.7104
+    },
+    "S2_mean_residual": {
+      "observed_mean": 0.4788328656167159,
+      "p_one_sided": 0.37302
+    },
+    "S3_near_int_hits": {
+      "observed": 3,
+      "p_one_sided": 0.32142
+    },
+    "S4_alternative_periods": [
+      {
+        "label": "7H = 7\u00d7335.317",
+        "period_kyr": 2347.219,
+        "obs_median": 0.44817675726038486,
+        "p_one_sided": 0.3088
+      },
+      {
+        "label": "8H = 8\u00d7335.317 (this model)",
+        "period_kyr": 2682.536,
+        "obs_median": 0.4223913490816259,
+        "p_one_sided": 0.2278
+      },
+      {
+        "label": "9H = 9\u00d7335.317",
+        "period_kyr": 3017.853,
+        "obs_median": 0.40661258185869054,
+        "p_one_sided": 0.1872
+      },
+      {
+        "label": "13H = 13\u00d7335.317",
+        "period_kyr": 4359.121,
+        "obs_median": 0.5490561055772478,
+        "p_one_sided": 0.6703
+      },
+      {
+        "label": "21H = 21\u00d7335.317",
+        "period_kyr": 7041.657,
+        "obs_median": 0.5146070023007367,
+        "p_one_sided": 0.5507
+      },
+      {
+        "label": "64H = 64\u00d7335.317",
+        "period_kyr": 21460.288,
+        "obs_median": 0.570355812559459,
+        "p_one_sided": 0.7487
+      },
+      {
+        "label": "100\u00d7H",
+        "period_kyr": 33531.7,
+        "obs_median": 0.4231190187196029,
+        "p_one_sided": 0.2268
+      }
+    ]
+  },
+  "runtime_seconds": 20.454728603363037
+}
