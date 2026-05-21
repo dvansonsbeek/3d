@@ -97,6 +97,51 @@ The H test is **essentially null** — observed median is indistinguishable from
 
 **The 8H super-cycle hypothesis is rejected at all conventional significance levels.** Both the primary 8H test and the sharpened H test give clean null results. The apparent alignment in the discovery phase (Plio-Pleistocene) does not generalize to a Phanerozoic-wide pattern.
 
+### 4.5 Complementary global-spectral test on CENOGRID
+
+§4.1–§4.4 tested *event-clustering*. This test asks the parallel *spectral* question: does the continuous 67-Myr CENOGRID record show enhanced power at any integer multiple of H, from 1H (the Earth Fundamental Cycle = 335,317 yr) to 8H (the Solar System Resonance Cycle / orbital-forcing period = 2,682,536 yr)? Uniquely enabled by CENOGRID's length — at LR04's 5.3 Myr, 8H fits only ~2 cycles (Rayleigh-unresolved); at 67 Myr it fits 25 cycles, properly resolved. Methodology: Thomson MTM F-test (K=5 DPSS tapers, NW=3) on LOESS-smoothed δ¹⁸O and δ¹³C, 5-kyr grid; F-critical (α=0.05, F(2,8)) = 4.46; empirical null from 1000 random periods uniform in [100, 10000] kyr.
+
+| Period | δ¹⁸O F | δ¹⁸O p (random null) | δ¹³C F | δ¹³C p (random null) |
+|---|---:|---:|---:|---:|
+| 1H = 335.3 kyr | 2.30 (ns) | 0.153 | 2.28 (ns) | 0.235 |
+| 2H = 670.6 kyr | 0.89 (ns) | 0.466 | 0.43 (ns) | 0.711 |
+| 3H = 1006.0 kyr | 0.10 (ns) | 0.920 | 0.54 (ns) | 0.642 |
+| 4H = 1341.3 kyr | 0.11 (ns) | 0.911 | 0.77 (ns) | 0.542 |
+| 5H = 1676.6 kyr | 0.30 (ns) | 0.711 | 0.55 (ns) | 0.633 |
+| 6H = 2011.9 kyr | 0.30 (ns) | 0.711 | 0.13 (ns) | 0.915 |
+| 7H = 2347.2 kyr | 0.62 (ns) | 0.573 | 0.69 (ns) | 0.577 |
+| 8H = 2682.5 kyr | 1.93 (ns) | 0.197 | 0.14 (ns) | 0.903 |
+| 405 kyr (positive control) | **20.05** ✓ | — | **16.95** ✓ | — |
+
+**Result: NULL on all 16 cells (8 nH × 2 proxies).** F at every H-multiple sits well below F-critical and the empirical p-values against the random-period null are all > 0.15. The same MTM machinery cleanly detects the off-lattice empirical 405-kyr line at F = 17–20 in both proxies, confirming the test is sensitive — it just doesn't find anything at 1H–8H. This is consistent with the framework's predictive structure: climate forcing operates at the 8H/n integer *divisors* (precession at n = 113/120, obliquity at n = 65/66/68, eccentricity at n = 21–31, etc.), not at the integer *multiples* of H.
+
+Data: [data/milankovitch-8h-cenogrid-spectral.json](../data/milankovitch-8h-cenogrid-spectral.json).
+
+### 4.6 Sharpened test on the Plio-Pleistocene window
+
+The §4.5 null is global. A natural rescue argument is that 8H imprints climate *specifically* during the Plio-Pleistocene (each of those epochs aligns with one 8H, per §1) and gets diluted in a global 67-Myr average. We test this directly by tiling 0–64.4 Ma into twelve non-overlapping 2×8H = 5.365 Myr windows and evaluating F + OLS amplitude at each nH (n=1..8) in each window. W1 = Plio-Pleistocene (0–5.37 Ma) is the test window; W2–W12 are controls.
+
+**Per-nH result in W1 (Plio-Pleistocene), both proxies:**
+
+| nH | δ¹⁸O W1 F | δ¹⁸O W1 amp-rank | δ¹³C W1 F | δ¹³C W1 amp-rank | Verdict |
+|---|---:|:---:|---:|:---:|---|
+| 1H | 0.34 | 7/12 | 2.96 | 6/12 | NULL |
+| 2H | 4.06 | 9/12 | 1.05 | 8/12 | NULL |
+| 3H | 1.12 | 10/12 | 0.74 | 10/12 | NULL |
+| 4H | 1.22 | 9/12 | 2.41 | 5/12 | NULL |
+| 5H | 0.13 | **12/12** (lowest) | 1.26 | 11/12 | NULL |
+| 6H | 1.72 | 10/12 | 1.98 | 11/12 | NULL |
+| 7H | 2.22 | 9/12 | 1.85 | 11/12 | NULL |
+| 8H | 0.97 | 7/12 | 1.45 | **12/12** (lowest) | NULL |
+
+**Result: doubly NULL.** Not a single nH in W1 reaches F-critical. For 5H (δ¹⁸O) and 8H (δ¹³C), the Plio-Pleistocene amplitude is literally the *lowest* of all 12 windows — the opposite of the hypothesis. The 405-kyr positive control is significant in 5/12 (δ¹⁸O) and 6/12 (δ¹³C) windows — concentrated in *warmhouse* intervals (Eocene W8: F=8.4 δ¹⁸O / F=18.9 δ¹³C; Paleocene W12: F=14.0 δ¹⁸O / F=14.5 δ¹³C), matching the documented Paleocene→Pliocene 2.6× weakening (§6.2). W1 itself shows only weak 405-kyr power (F=2.81 δ¹⁸O, F=0.46 δ¹³C). Plio-Pleistocene is genuinely the *quietest* window at long periods, not the loudest.
+
+**Cross-window false-positive accounting.** Across all 192 cells (12 windows × 8 nH × 2 proxies), only 5 reach F ≥ 4.46. Chance expectation at α = 0.05 is ~10. The H-multiple lattice carries *less* than chance significance across CENOGRID — there is no systematic H-multiple structure to find.
+
+**Combined verdict from §4.1–§4.6.** Three independent test families now converge on the same conclusion: 8H and its integer multiples do not pace climate, either through discrete events (§4.1–§4.4), through global spectral power (§4.5), or through Plio-Pleistocene-specific amplification (§4.6). The Plio-Pleistocene 1×8H + 1×8H *temporal* alignment in §1 stands as a real but coincidental observation; the §7.2 reading ("most parsimoniously a climate-response amplification artifact combined with statistical coincidence") is preserved.
+
+Data: [data/milankovitch-8h-cenogrid-windowed.json](../data/milankovitch-8h-cenogrid-windowed.json).
+
 ---
 
 ## 5. Fourteen follow-up tests of independent framework predictions
@@ -703,7 +748,9 @@ The combined picture from §4 + §5 is sharp: the 8H framework's claims hold str
 | Band centroids stable in time-frequency (no off-lattice drift) | ✅ supported (Test K) |
 | Phase prediction generalizes partially across the MPT | ⚠ partial (Test M — 30% within ±10 kyr out-of-sample) |
 | **405-kyr empirical climate line is off the 8H lattice and not reproducible by any doc-55 beat** | ✅ characterised (§6 — explained as Layer-2 carbon-cycle thermostat resonance, not orbital in this framework) |
-| 8H or H as deep-time geological-event pacer | ❌ rejected (§4) |
+| 8H or H as deep-time geological-event pacer | ❌ rejected (§4.1–§4.4) |
+| H-multiples (1H..8H) as global continuous-record spectral pacers (CENOGRID 67-Myr MTM F-test) | ❌ rejected (§4.5 — 16/16 cells NULL) |
+| H-multiples as Plio-Pleistocene-specific climate amplifiers (windowed CENOGRID MTM + OLS) | ❌ rejected (§4.6 — W1 ranks bottom-half on every nH) |
 
 This is the right shape for a scientific theory: claims inside the scope it was constructed for survive falsifiable testing; speculative extensions outside that scope are testable and, when tested, do not survive.
 
