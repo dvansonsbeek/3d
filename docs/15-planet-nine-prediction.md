@@ -49,7 +49,7 @@ By ~2030-2035, the Vera Rubin Observatory (LSST) is expected to provide a defini
 
 ## 2. The Fibonacci Model's 8-Planet Architecture
 
-The Fibonacci-Universe model has a **unique configuration** that achieves Law 3 (inclination) balance ≥ 99.994% — the canonical screening threshold from the model's exhaustive 7.5M-config search — and Law 5 (eccentricity) balance ~98% with base eccentricities (up to ~99.86% with the tuned per-config eccentricities in the published Config #7). The structure is the **4-mirror-pair**, where each planet is paired with another across the asteroid belt via Fibonacci-numbered "d" divisors:
+The Fibonacci-Universe model has a **unique configuration** that achieves Law 3 (inclination) balance 99.997% — passing the canonical screening threshold of 99.994% (the Li 2019 TNO-margin) — and Law 5 (eccentricity) balance 99.862% with phase-derived base eccentricities ([doc 19](19-balance-sensitivity-analysis.md)). The structure is the **4-mirror-pair**, where each planet is paired with another across the asteroid belt via Fibonacci-numbered "d" divisors:
 
 | Pair | Fibonacci d | Phase grouping |
 |---|---|---|
@@ -172,7 +172,7 @@ This is why no choice of Fibonacci d, no regrouping into mirror pairs, no scenar
 
 ### 5.2 Beyond regrouping
 
-The 7.5M search explored every possible (Mercury, Venus, Mars, Uranus, Neptune) d-and-group combination, every Fibonacci d-value for Planet Nine, and every possible in-phase / anti-phase assignment. The best min(Law 3, Law 5) 9-planet balance achievable with a 5 M_Earth body at 450 AU is **8.96%** — vs. the current 8-planet baseline of **99.97% on Law 3 and ~98% on Law 5**.
+The 7.5M search explored every possible (Mercury, Venus, Mars, Uranus, Neptune) d-and-group combination, every Fibonacci d-value for Planet Nine, and every possible in-phase / anti-phase assignment. The best min(Law 3, Law 5) 9-planet balance achievable with a 5 M_Earth body at 450 AU is **8.96%** — vs. the current 8-planet baseline of **99.997% on Law 3 and 99.862% on Law 5**.
 
 This is not a tuning artifact. The structural argument holds for **any d-pool drawn from Fibonacci numbers** and **any phase grouping**.
 
@@ -248,8 +248,9 @@ Mustill, Raymond & Davies (2016) proposed that *if* Planet Nine exists, it was c
 | Hypothesis | Compatibility with Fibonacci model |
 |---|---|
 | No capture event occurred at planet mass | ✓ Consistent (matches our prediction) |
-| Capture occurred at sub-asteroid mass | ✓ Consistent (no balance disruption) |
-| Capture occurred at planet mass, system re-equilibrated since | ✗ Requires fine-tuning to absurd precision over Gyr |
+| Capture occurred at tiny-body mass (≲ 2 × 10⁻¹⁰ M_Earth, ~few-km asteroid) | ✓ Consistent (Law-4-compatible orbit) |
+| Capture occurred at sub-asteroid mass (10⁻¹⁰ to 10⁻⁴ M_Earth) | ✗ Violates Law 4 by 1–4 orders of magnitude |
+| Capture occurred at planet mass, system re-equilibrated since | ✗ Violates Law 4 by 4–7 orders; would require fine-tuning over Gyr |
 | Capture occurred at planet mass, system is still equilibrating | ✗ Would show observable imbalance now |
 
 The Fibonacci model is essentially **immune to interstellar visitors** by virtue of mass scale and orbital topology. The only theoretical vulnerability is the **capture of a massive interstellar body** that becomes a long-term resident. So far no such body has been observed, and our balance equations imply none could have remained for Gyr without disrupting the precession structure we measure today.
@@ -269,11 +270,12 @@ By 2030-2035, the Vera Rubin Observatory (LSST) will discriminate between hypoth
 | M ≥ 1 M_Earth body found at 300-700 AU with e ≈ 0.2-0.6 | **FALSIFIED** (Law-4 violation by 5+ orders) | confirmed |
 | M ≥ 0.1 M_Earth body found (Mars-mass) at similar e | **FALSIFIED** (Law-4 violation by 4+ orders) | weakened |
 | M ~ Ceres-mass body found at 300-500 AU with high e | **FALSIFIED** (Law-4 violation by 3+ orders) | weakened |
-| Tiny body (≲ 10⁻⁸ M_Earth) found at similar orbit | consistent | n/a |
-| No detection above ~10⁻⁸ M_Earth by 2035 | consistent | **FALSIFIED** |
+| M ~ 10⁻⁸ M_Earth body found at similar orbit | **FALSIFIED** (Law-4 violation by ~1.5 orders) | n/a |
+| Tiny body (≲ 2 × 10⁻¹⁰ M_Earth) found at similar orbit | consistent | n/a |
+| No detection above ~10⁻¹⁰ M_Earth by 2035 | consistent | **FALSIFIED** |
 | ETNO clustering disappears with more discoveries | consistent | **FALSIFIED** |
 
-Under the framework's Law-4 compliance test (§4.1), the threshold for compatibility at e ≈ 0.25 and a ≈ 460 AU sits near 10⁻¹¹ M_Sun (~10⁻⁵ M_Earth_Moon = lunar-asteroid mass). Detection of any body more massive than this at high-e ETNO orbits falsifies the model — a much sharper criterion than the secondary v-balance test alone (which allowed Ceres-mass).
+Under the framework's Law-4 compliance test (§4.1), the upper mass threshold for compatibility at e ≈ 0.25 and a ≈ 460 AU sits near **~2 × 10⁻¹⁰ M_Earth** (~5 × 10¹³ kg, roughly a 2-km rocky asteroid). Bodies above this mass at high-e ETNO orbits violate Law 4 — a much sharper criterion than the secondary v-balance test alone (which allowed bodies up to Ceres-mass).
 
 ### 8.2 The asymmetric falsification
 
