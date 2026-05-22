@@ -92,9 +92,7 @@ const STEPS = [
   // Phase 5b: Eccentricity amplitudes & balance law verification
   { id: '7a', phase: 2, name: 'Derive eccentricity amplitudes',
     cmd: 'node tools/fit/derive-eccentricity-amplitudes.js --write' },
-  { id: '7b', phase: 2, name: 'Dual-balance optimizer',
-    cmd: 'node tools/fit/dual-balance-optimizer.js --write' },
-  { id: '7c', phase: 2, name: 'Balance search (presets)',
+  { id: '7b', phase: 2, name: 'Balance search (presets)',
     cmd: 'node tools/verify/balance-search.js' },
 
   // Phase 6: Verify & sync

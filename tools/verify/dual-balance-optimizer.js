@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════
-// Dual Balance Verification + Sensitivity Analysis (Pipeline Step 7b)
+// Dual Balance Verification + Sensitivity Analysis
 //
+// Standalone diagnostic — NOT part of the fitting pipeline.
 // Verifies the dual balance (inclination + eccentricity) using
 // the phase-derived base eccentricities from constants.js.
 // Base eccentricities are derived at runtime from the balanced-year
@@ -18,9 +19,12 @@
 //      shift implies the framework needs an additional contribution
 //      (asteroids, TNOs, etc.) rather than that observed values are wrong.
 //
+// See docs/19-balance-sensitivity-analysis.md for the full analysis
+// write-up that uses outputs of this script.
+//
 // Usage:
-//   node tools/fit/dual-balance-optimizer.js
-//   node tools/fit/dual-balance-optimizer.js --scan-orbits
+//   node tools/verify/dual-balance-optimizer.js
+//   node tools/verify/dual-balance-optimizer.js --scan-orbits
 //
 // ═══════════════════════════════════════════════════════════════
 

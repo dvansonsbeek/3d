@@ -1,6 +1,6 @@
 # Doc 19 — Dual-Balance Sensitivity Analysis
 
-> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions, computes single-parameter sensitivities (Δm/m, Δa/a, Δe/e per planet) that would close it, and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 5–10 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods. The natural interpretation is that the gap reflects the absence of *additional gravitating bodies* (asteroids, Trans-Neptunian Objects, dust) from the balance equations. The analysis is reproducible via [`tools/fit/dual-balance-optimizer.js`](../tools/fit/dual-balance-optimizer.js) which prints all the numbers used here.
+> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions, computes single-parameter sensitivities (Δm/m, Δa/a, Δe/e per planet) that would close it, and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 5–10 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods. The natural interpretation is that the gap reflects the absence of *additional gravitating bodies* (asteroids, Trans-Neptunian Objects, dust) from the balance equations. The analysis is reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) which prints all the numbers used here.
 
 ---
 
@@ -165,7 +165,7 @@ To prevent over-interpretation:
 All numbers in this document come from a single script run:
 
 ```bash
-node tools/fit/dual-balance-optimizer.js
+node tools/verify/dual-balance-optimizer.js
 ```
 
 The script produces four sections of output:
@@ -175,7 +175,7 @@ The script produces four sections of output:
 3. **Per-planet contribution gap** (the §2 table here)
 4. **Sensitivity table** (the §3 table here)
 
-The full script logic is in [`tools/fit/dual-balance-optimizer.js`](../tools/fit/dual-balance-optimizer.js). It reads canonical values via `tools/lib/constants.js` (the same source the simulation uses) and writes nothing — it is verification-and-diagnostic only.
+The full script logic is in [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js). It reads canonical values via `tools/lib/constants.js` (the same source the simulation uses) and writes nothing — it is verification-and-diagnostic only.
 
 ---
 

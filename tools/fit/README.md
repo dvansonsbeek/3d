@@ -15,7 +15,6 @@ then `export-to-script.js --write` (Step 9) to sync values to `src/script.js`.
 | Script | Produces | Data source |
 |--------|----------|-------------|
 | `derive-eccentricity-amplitudes.js` | Verification only (no output) | Verifies K-derived amplitudes match runtime |
-| `dual-balance-optimizer.js` | Verification only (no output) | Shows what forced 100% balance would require |
 | `export-solar-measurements.js` | `data/02-solar-measurements.csv` | Scene-graph simulation (1-year steps, single pass) |
 | `obliquity-harmonics.js` | `SOLSTICE_OBLIQUITY_HARMONICS` (16 terms) | `data/02-solar-measurements.csv` |
 | `cardinal-point-harmonics.js` | `CARDINAL_POINT_HARMONICS` (4×24 terms) + anchors | `data/02-solar-measurements.csv` |
@@ -204,30 +203,25 @@ Step 7a: derive-eccentricity-amplitudes.js    → verification only (no output)
          - All phases from the eccentricity cycle timing
          No --write option. Run to verify after Earth parameter changes.
 
-Step 7b: dual-balance-optimizer.js            → verification only (no output)
-         Shows what base eccentricities a forced 100% dual balance would
-         require, for comparison against the natural phase-derived values.
-         Base eccentricities are derived at runtime from the balanced-year
-         phase (constants.js) — this script does NOT set them.
-         Optional --scan-orbits shows orbit count sensitivity.
-
-Step 7c: balance-search.js                    → balance-presets.json
+Step 7b: balance-search.js                    → balance-presets.json
          Exhaustive search for configs with ≥99.994% inclination balance.
          Writes data/balance-presets.json (synced to script.js by Step 9).
          Count changes when eccentricity values change (affects w = √(m·a(1-e²))/d).
 
-Step 7d: verify-laws.js                       → pass/fail
+Step 7c: verify-laws.js                       → pass/fail
          Verifies Laws 2 (inclination amplitude), 3 (inclination balance),
          and 5 (eccentricity balance). All must pass.
          Key targets:
-         - Inclination balance = 100% (Law 3, from dual-balance optimizer)
-         - Eccentricity balance = 100% (Law 5, from dual-balance optimizer)
+         - Inclination balance (Law 3) — natural phase-derived value ≈99.9975%
+         - Eccentricity balance (Law 5) — natural phase-derived value ≈99.8632%
          - All 8 planet inclination amplitudes match ψ/(d×√m) (Law 2)
          - All eccentricities consistent with J2000 observed values
          eccentricity-balance.js              → convergence report
          Laws 4 and 5 independently predict Saturn's eccentricity.
+         For per-planet sensitivity decomposition of the residual balance
+         gaps, see tools/verify/dual-balance-optimizer.js and doc 19.
 
-Step 7e: fibonacci_significance.py            → data/significance-results.json
+Step 7d: fibonacci_significance.py            → data/significance-results.json
          Monte Carlo + permutation significance test for the Fibonacci structure.
          11 tests across 3 null distributions (permutation, log-uniform MC,
          uniform MC); 100,000 trials per MC null. Of the 11 tests, 7 are
@@ -262,7 +256,7 @@ Step 9:  export-to-script.js --write          → src/script.js
 
 Manual:  export-to-holistic.js --write        → Holistic website repo
          (NOT in automated pipeline — run manually after Step 9)
-         Requires Steps 7c (balance-search.js) and 7e
+         Requires Steps 7b (balance-search.js) and 7d
          (fibonacci_significance.py) to have run first — both produce JSON
          files this script reads (data/balance-presets.json,
          data/significance-results.json).
@@ -384,10 +378,10 @@ node tools/fit/cardinal-point-harmonics.js --write                           # S
 node tools/fit/year-length-harmonics.js --write                              # Step 6d
 
 # Phase 5b: Balance law verification
-node tools/verify/balance-search.js                                          # Step 7c (balance presets)
-node tools/verify/verify-laws.js                                             # Step 7d (must pass)
-node tools/verify/eccentricity-balance.js                                    # Step 7d (convergence report)
-python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7e (~2-3 min, before export-to-holistic.js)
+node tools/verify/balance-search.js                                          # Step 7b (balance presets)
+node tools/verify/verify-laws.js                                             # Step 7c (must pass)
+node tools/verify/eccentricity-balance.js                                    # Step 7c (convergence report)
+python3 scripts/fibonacci_significance.py --trials 100000                    # Step 7d (~2-3 min, before export-to-holistic.js)
 
 # Phase 6: Verify & sync
 node tools/fit/verify-pipeline.js                                            # Step 8 (must pass)
@@ -398,7 +392,7 @@ node tools/fit/export-to-script.js --write                                   # S
 node tools/export-dashboard-data.js                                          # Step 10
 
 # Manual: Sync to Holistic website (NOT in pipeline runner)
-# Requires Steps 7c (balance-search) and 7e (fibonacci_significance.py) to have run.
+# Requires Steps 7b (balance-search) and 7d (fibonacci_significance.py) to have run.
 node tools/fit/export-to-holistic.js --write                                 # → constants.ts, model-values.ts, etc.
 ```
 
@@ -466,8 +460,8 @@ Fitting scripts write to JSON, then export-to-script.js (Step 9) syncs to script
     cardinal-point-harmonics.js  → fitted-coefficients.json  (Step 6c)
     year-length-harmonics.js     → fitted-coefficients.json  (Step 6d)
     optimize.js                  → model-parameters.json       (Steps 1, 2)
-    balance-search.js            → data/balance-presets.json    (Step 7c)
-    fibonacci_significance.py    → data/significance-results.json (Step 7e)
+    balance-search.js            → data/balance-presets.json    (Step 7b)
+    fibonacci_significance.py    → data/significance-results.json (Step 7d)
 ```
 
 ## Correction Stack
