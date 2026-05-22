@@ -1,0 +1,84 @@
+{
+  "framework": "Mass-uncertainty Monte Carlo for Law 5 balance",
+  "n_trials": 100000,
+  "relative_mass_uncertainty_sigmas": {
+    "Mercury": 1e-07,
+    "Venus": 1e-07,
+    "Earth": 3e-09,
+    "Mars": 1e-07,
+    "Jupiter": 1e-08,
+    "Saturn": 3e-06,
+    "Uranus": 0.0005,
+    "Neptune": 0.0005
+  },
+  "framework_residual_v_magnitude": 4.27e-05,
+  "framework_closure_pct": 99.862,
+  "baseline": {
+    "v_in_phase": 0.01542998098028195,
+    "v_anti_phase": 0.015472267741370742,
+    "gap": -4.22867610887917e-05,
+    "balance_pct": 99.86315959893507
+  },
+  "per_planet_contribution": {
+    "Mercury": {
+      "sigma_relative_mass": 1e-07,
+      "sigma_gap": 2.2013242546809502e-13,
+      "sigma_balance_pct": 7.123508306819493e-10,
+      "pct_of_residual": 5.155326123374591e-07
+    },
+    "Venus": {
+      "sigma_relative_mass": 1e-07,
+      "sigma_gap": 6.338431608568685e-14,
+      "sigma_balance_pct": 2.0511230964649674e-10,
+      "pct_of_residual": 1.4844102127795515e-07
+    },
+    "Earth": {
+      "sigma_relative_mass": 3e-09,
+      "sigma_gap": 2.2997394596117547e-14,
+      "sigma_balance_pct": 7.441980939077632e-11,
+      "pct_of_residual": 5.3858066969830324e-08
+    },
+    "Mars": {
+      "sigma_relative_mass": 1e-07,
+      "sigma_gap": 2.1968527058091604e-12,
+      "sigma_balance_pct": 7.109038327912564e-09,
+      "pct_of_residual": 5.144854111965246e-06
+    },
+    "Jupiter": {
+      "sigma_relative_mass": 1e-08,
+      "sigma_gap": 3.974369702914454e-11,
+      "sigma_balance_pct": 1.2861101917575592e-07,
+      "pct_of_residual": 9.307657383874599e-05
+    },
+    "Saturn": {
+      "sigma_relative_mass": 3e-06,
+      "sigma_gap": 2.3167892076337205e-08,
+      "sigma_balance_pct": 7.497154101961469e-05,
+      "pct_of_residual": 0.05425735849259298
+    },
+    "Uranus": {
+      "sigma_relative_mass": 0.0005,
+      "sigma_gap": 1.426374295617593e-06,
+      "sigma_balance_pct": 0.004615762135841448,
+      "pct_of_residual": 3.340455024865557
+    },
+    "Neptune": {
+      "sigma_relative_mass": 0.0005,
+      "sigma_gap": 4.3327064113905196e-07,
+      "sigma_balance_pct": 0.0014020683253237374,
+      "pct_of_residual": 1.0146853422460234
+    }
+  },
+  "combined": {
+    "sigma_gap": 1.487826004367131e-06,
+    "sigma_balance_pct": 0.004814620507939398,
+    "pct_of_residual": 3.4843700336466767
+  },
+  "residual_split": {
+    "framework_residual_v": 4.27e-05,
+    "mass_uncertainty_v": 1.487826004367131e-06,
+    "minor_body_v_implied": 4.267407144602831e-05,
+    "minor_body_N_implied": 624.6434209881061
+  },
+  "rng_seed": 20260522
+}
