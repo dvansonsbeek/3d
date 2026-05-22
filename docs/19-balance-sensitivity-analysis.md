@@ -79,7 +79,7 @@ The sensitivity table reads as *predictions* only if the corresponding observabl
 
 For mass and semi-major axis, the required shift is *five to six orders of magnitude larger* than the precision of the published observable. **There is no reasonable interpretation in which the framework's 0.14% gap could be explained by mis-measurement of Saturn's mass or orbit.**
 
-The eccentricity-base channel is the exception: base eccentricities are not directly observed. They are framework constructs derived from the balanced-year phase via the law of cosines. The "Δe/e = ±0.28%" reading for Saturn therefore says the *phase-derived bases* differ from the *forced-100%-balance bases* by 0.28% on Saturn — a difference of a few parts per thousand in a quantity that is not externally constrained. This is the channel through which a small framework-level refinement could in principle close the gap (see §6).
+The eccentricity-base channel is the exception: base eccentricities are not directly observed. They are framework constructs derived from the balanced-year phase via the law of cosines. The "Δe/e = ±0.28%" reading for Saturn therefore says the *phase-derived bases* differ from the *forced-100%-balance bases* by 0.28% on Saturn — a difference of a few parts per thousand in a quantity that is not externally constrained. This is the channel through which a small framework-level refinement could in principle close the gap (see §7).
 
 The implication for mass and `a` is stronger and more interesting: **the gap is not in the planets; it is in what's missing from the eight-planet sum.**
 
@@ -152,7 +152,75 @@ This is outside the scope of the current document but is the natural follow-up a
 
 ---
 
-## 6. Honest scientific framing
+## 6. Setting a principled Law 5 threshold
+
+### 6.1 How Law 3's 99.994% threshold was derived
+
+The Law 3 threshold sits at 99.994% — i.e. configurations are accepted if their inclination balance is ≥ 99.994%. The number is not arbitrary: it is set by the *measured* external-body contribution to the invariable plane.
+
+**Li, Xia & Zhou 2019** ([arXiv:1909.11293](https://arxiv.org/abs/1909.11293)) integrated the Trans-Neptunian Object population to compute its net tilt of the invariable plane. They found **~1.25″** — equivalent to **0.006%** of the invariable-plane angle. Adding this to the 8-planet sum closes the inclination balance to exactly 100%; therefore an 8-planet-only framework should land at 100% − 0.006% = **99.994%**, and any configuration below that fails to leave room for the TNO contribution. The threshold is principled, externally derived, and falsifiable.
+
+### 6.2 Why the analogous calculation fails for Law 5
+
+The Law 5 weight is `v = √m · a^(3/2) · e / √d`. Two structural differences make the Li-2019 approach not transfer directly:
+
+1. **No zero-mean for TNO eccentricities.** Inclinations distribute symmetrically about the invariable plane, so individual contributions partially cancel in Li 2019. TNO eccentricities sit at ⟨e⟩ ≈ 0.15 with no analogous cancellation axis — every TNO contributes a positive v with sign determined by its (currently undefined) in-phase / anti-phase assignment.
+
+2. **a^(3/2) amplifies single bodies enormously.** The Law 3 weight contains `√a` (sub-linear), so distant bodies are only modestly heavier than nearby ones. The Law 5 weight contains `a^(3/2)` (super-linear), so a single Sedna-class body at a ≈ 500 AU contributes more v than the entire 8-planet sum.
+
+### 6.3 The numbers for individual major TNOs
+
+At the framework's default d = 8 assignment, the seven largest TNOs contribute (recomputed in §5.3):
+
+| Body | v contribution | as % of v_in_phase (0.01543) |
+|---|---:|---:|
+| Pluto+Charon | 1.85 × 10⁻³ | **12%** |
+| Eris | 7.94 × 10⁻³ | **51%** |
+| Makemake | 6.8 × 10⁻⁴ | 4.4% |
+| Haumea | 8.5 × 10⁻⁴ | 5.5% |
+| Gonggong | 2.94 × 10⁻³ | **19%** |
+| Quaoar | 1.08 × 10⁻⁴ | 0.7% |
+| Sedna | **6.84 × 10⁻²** | **443%** |
+| **Worst-case sum (all in-phase)** | **8.28 × 10⁻²** | **536%** |
+| **Expected ±-random residual (σ)** | **6.90 × 10⁻²** | **447%** |
+| Current 8-planet ecc-balance gap | 4.27 × 10⁻⁵ | 0.28% |
+
+The worst-case and random-residual contributions are **3 to 4 orders of magnitude larger** than the current 8-planet gap. The Li-2019 calibration argument — "external bodies introduce a small known offset, so set the threshold just below 100%" — does not apply to Law 5 at these magnitudes.
+
+### 6.4 Three principled options for the threshold
+
+Given the above, three logically consistent ways to set a Law 5 threshold exist; none matches the current 99%:
+
+| Option | Threshold | Rationale | Implication |
+|---|---:|---|---|
+| **A. Strict 8-planet scope** | ~99.9999% (1 ppm) | The balance equation is *defined* over the 8 primary planets; the prediction is 100% within DE440 / JPL measurement precision. | The framework's current 99.86% achievement would **fail this test by 5 orders of magnitude**. Forces a framework revision. |
+| **B. Framework-prediction as target** | 99.862% ± δ (δ ≈ ppm) | The phase-derived 99.862% *is* the framework's prediction. Threshold = predicted value ± uncertainty from measurement precision. | Current 99% threshold is then **100× too loose**. Any deviation from 99.862% beyond ppm-level would falsify Law 5. |
+| **C. Includes external-body uncertainty** | ≤ some number > 50% | If external bodies enter the equation, the natural-cancellation residual is poorly constrained (TNO contributions are 100× the gap); the threshold must be loose enough to admit this uncertainty. | A statistically derived threshold here is **looser than 99%**, not tighter. |
+
+The current 99% threshold sits in a no-man's-land between A and C: tighter than the cancellation-allowed bound, looser than the strict measurement-limited bound. **It is not principled — it is a working choice for the deep-analysis filter in balance-search.js, not a theoretical commitment of the framework.**
+
+### 6.5 Current state and honest recommendation
+
+Until a Li-2019 analogue computation is done for Law 5 — taking known TNOs from the MPC database, computing per-body v, applying some in-phase / anti-phase assignment rule, and reporting the net residual — the framework's Law 5 closure of 99.862% should be described as:
+
+> *The framework's 8-planet phase-derived eccentricity balance closes to 99.862%. A principled threshold analogous to Law 3's 99.994% has not yet been derived because external-body contributions in the Law 5 weight (a^(3/2)·e per body) are several orders of magnitude larger than the observed residual, and the framework currently lacks an inclusion / cancellation rule for sub-planetary bodies. The current 99% threshold used by balance-search.js is a working filter, not a derived bound.*
+
+This is the honest framing. It preserves Law 5's empirical result without claiming a threshold derivation that hasn't been done.
+
+### 6.6 Path forward
+
+The Law-5 analogue of Li 2019 would require:
+
+1. **MPC TNO catalog** — full population with a, e, mass-estimate or absolute-magnitude → mass.
+2. **An in-phase / anti-phase rule** for TNOs — either inherited from a structural property (orbital direction? Fibonacci-d locking? proximity to invariable plane?) or treated as a free parameter to be fit.
+3. **Per-body v computation** with that rule applied.
+4. **Net residual Σv** compared to the framework's 4.27 × 10⁻⁵ gap.
+
+Until step 2 is articulated, step 4 has no unique answer. This is the open work.
+
+---
+
+## 7. Honest scientific framing
 
 The sensitivity table in §3 should be read as a **diagnostic tool**, not as a list of predictions. Concretely:
 
@@ -164,7 +232,7 @@ The sensitivity table in §3 should be read as a **diagnostic tool**, not as a l
 
 ---
 
-## 7. What this analysis does *not* claim
+## 8. What this analysis does *not* claim
 
 To prevent over-interpretation:
 
@@ -180,7 +248,7 @@ To prevent over-interpretation:
 
 ---
 
-## 8. Reproducing this analysis
+## 9. Reproducing this analysis
 
 All numbers in this document come from a single script run:
 
@@ -199,7 +267,7 @@ The full script logic is in [`tools/verify/dual-balance-optimizer.js`](../tools/
 
 ---
 
-## 9. Related documents
+## 10. Related documents
 
 - [doc 10 — Fibonacci Laws of Planetary Motion](10-fibonacci-laws.md) — Laws 3 and 5, exhaustive search, configuration uniqueness
 - [doc 20 — Constants Reference](20-constants-reference.md) — H, ψ, K, mass and eccentricity sources
