@@ -1,14 +1,22 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════
-// Dual Balance Verification (Pipeline Step 7b)
+// Dual Balance Verification + Sensitivity Analysis (Pipeline Step 7b)
 //
 // Verifies the dual balance (inclination + eccentricity) using
 // the phase-derived base eccentricities from constants.js.
 // Base eccentricities are derived at runtime from the balanced-year
 // phase — this script does NOT set them.
 //
-// Also shows what bases a forced 100% optimizer would find, for
-// comparison against the natural phase-derived values.
+// Outputs four sections:
+//   1. Current state (using phase-derived bases from constants.js)
+//   2. Forced 100%/100% solution (eccentricity-only optimizer, comparison)
+//   3. Per-planet contribution to current balance gaps (diagnostic)
+//   4. Per-planet sensitivity table — Δm/m, Δa/a, Δe/e shifts that
+//      would close eccentricity balance to 100%, holding all other
+//      parameters fixed. Sensitivity analysis only — DE440 masses and
+//      orbital periods are observed to <1e-7 precision, so a non-trivial
+//      shift implies the framework needs an additional contribution
+//      (asteroids, TNOs, etc.) rather than that observed values are wrong.
 //
 // Usage:
 //   node tools/fit/dual-balance-optimizer.js
@@ -269,6 +277,157 @@ console.log('  Note: Base eccentricities are derived at runtime from the');
 console.log('  balanced-year phase (constants.js). The optimizer solution above');
 console.log('  shows what forced 100% balance would require — for comparison only.');
 console.log('');
+
+// ── Section 3: Per-planet contribution to current balance gaps ───
+//
+// Decomposes the in-phase and anti-phase sums into per-planet shares,
+// so it's visible which planet contributes most to each balance group.
+
+console.log('═══ Section 3: Per-planet contribution to current balance gaps ═══');
+console.log('');
+
+(function showContributionGap() {
+  let w203 = 0, w23 = 0, v203 = 0, v23 = 0;
+  const rows = [];
+  for (const p of planets) {
+    const { mass, sma, d, antiPhase } = defaultParams[p];
+    const e = currentEcc[p];
+    const w = Math.sqrt(mass * sma * (1 - e * e)) / d;
+    const v = Math.sqrt(mass) * Math.pow(sma, 1.5) * e / Math.sqrt(d);
+    rows.push({ p, w, v, antiPhase });
+    if (!antiPhase) { w203 += w; v203 += v; }
+    else { w23 += w; v23 += v; }
+  }
+  const wGap = w203 - w23;
+  const vGap = v203 - v23;
+
+  console.log(`  Inclination:  in-phase Σw = ${w203.toFixed(8)}   anti-phase Σw = ${w23.toFixed(8)}   gap = ${wGap.toExponential(3)}`);
+  console.log(`  Eccentricity: in-phase Σv = ${v203.toFixed(8)}   anti-phase Σv = ${v23.toFixed(8)}   gap = ${vGap.toExponential(3)}`);
+  console.log('');
+  console.log('  ' + 'Planet'.padEnd(10) + ' │ group │       w       │ % of group │       v       │ % of group');
+  console.log('  ' + '─'.repeat(78));
+  for (const { p, w, v, antiPhase } of rows) {
+    const groupW = antiPhase ? w23 : w203;
+    const groupV = antiPhase ? v23 : v203;
+    console.log(
+      '  ' + p.padEnd(10) + ' │ ' + (antiPhase ? 'anti' : 'in  ') +
+      '  │ ' + w.toFixed(8).padStart(13) +
+      ' │ ' + (w / groupW * 100).toFixed(2).padStart(8) + '%' +
+      ' │ ' + v.toFixed(8).padStart(13) +
+      ' │ ' + (v / groupV * 100).toFixed(2).padStart(8) + '%'
+    );
+  }
+  console.log('');
+})();
+
+// ── Section 4: Per-planet sensitivity to close eccentricity balance ──
+//
+// For each free planet, computes the single-parameter shift required
+// to close the eccentricity-balance gap to exactly 100%, holding all
+// other planets and other parameters fixed. Also reports the side-effect
+// on inclination balance.
+
+console.log('═══ Section 4: Per-planet sensitivity to close eccentricity balance ═══');
+console.log('');
+console.log('  "If only this planet\'s single parameter could change, what shift would');
+console.log('   close the ecc-balance gap to 100%? What does it do to incl balance?"');
+console.log('');
+
+(function showSensitivityTable() {
+  // Recompute per-planet w, v and the signed gap
+  let w203 = 0, w23 = 0, v203 = 0, v23 = 0;
+  const pv = {};
+  for (const p of planets) {
+    const { mass, sma, d, antiPhase } = defaultParams[p];
+    const e = currentEcc[p];
+    const w = Math.sqrt(mass * sma * (1 - e * e)) / d;
+    const v = Math.sqrt(mass) * Math.pow(sma, 1.5) * e / Math.sqrt(d);
+    pv[p] = { w, v, antiPhase };
+    if (!antiPhase) { w203 += w; v203 += v; }
+    else { w23 += w; v23 += v; }
+  }
+  const wGap = w203 - w23;
+  const vGap = v203 - v23;   // signed: positive ⇒ in-phase Σv exceeds anti-phase Σv
+
+  const eccBal = (1 - Math.abs(vGap) / (v203 + v23)) * 100;
+  const inclBal = (1 - Math.abs(wGap) / (w203 + w23)) * 100;
+  console.log(`  Current eccentricity balance: ${eccBal.toFixed(6)}%   (signed gap = ${vGap.toExponential(3)})`);
+  console.log(`  Current inclination balance:  ${inclBal.toFixed(6)}%   (signed gap = ${wGap.toExponential(3)})`);
+  console.log('');
+  console.log('  ' + 'Planet'.padEnd(10) + ' │ grp  │   Δm/m    │   Δa/a    │   Δe/e    │ ΔinclBal (m)│ ΔinclBal (a)│ ΔinclBal (e)');
+  console.log('  ' + '─'.repeat(108));
+
+  for (const p of freePlanets) {
+    const { w, v, antiPhase } = pv[p];
+    // To close ecc balance:
+    //   if in-phase  → planet's v must decrease by vGap (Δv = -vGap)
+    //   if anti-phase → planet's v must increase by vGap (Δv = +vGap)
+    const needed_dv = antiPhase ? +vGap : -vGap;
+
+    // Δm/m = 2·Δv/v          (since dv/dm = v/(2m))
+    const dm_over_m = 2 * needed_dv / v;
+    // Δa/a = (2/3)·Δv/v       (since dv/da = 1.5·v/a)
+    const da_over_a = (2 / 3) * needed_dv / v;
+    // Δe/e = Δv/v             (since dv/de = v/e)
+    const de_over_e = needed_dv / v;
+
+    // Side-effect on inclination balance:
+    // Δw from a Δm/m shift  =  (Δm/m) · w/2
+    // Δw from a Δa/a shift  =  (Δa/a) · w/2
+    // Δw from a Δe/e shift  ≈  -e²·(Δe/e)·w  (negligible for small e)
+    const dw_m = dm_over_m * w / 2;
+    const dw_a = da_over_a * w / 2;
+    const e_p = currentEcc[p];
+    const dw_e = -(e_p * e_p) * de_over_e * w / (1 - e_p * e_p);
+
+    // New incl gap after each shift (sign depends on phase group)
+    const wGapAfter = (sign) => (antiPhase ? wGap - sign : wGap + sign);
+    const inclBalAfter = (signed_dw) => {
+      const newGap = wGapAfter(signed_dw);
+      const newTotal = (w203 + w23) + (antiPhase ? signed_dw : signed_dw);
+      return (1 - Math.abs(newGap) / newTotal) * 100;
+    };
+
+    const inclBal_m = inclBalAfter(dw_m);
+    const inclBal_a = inclBalAfter(dw_a);
+    const inclBal_e = inclBalAfter(dw_e);
+
+    const fmtPct = (x) => (x >= 0 ? '+' : '') + (x * 100).toFixed(3) + '%';
+    const fmtDeltaBal = (newBal) => {
+      const delta = newBal - inclBal;
+      return (delta >= 0 ? '+' : '') + delta.toExponential(2);
+    };
+
+    console.log(
+      '  ' + p.padEnd(10) + ' │ ' + (antiPhase ? 'anti' : 'in  ') +
+      ' │ ' + fmtPct(dm_over_m).padStart(9) +
+      ' │ ' + fmtPct(da_over_a).padStart(9) +
+      ' │ ' + fmtPct(de_over_e).padStart(9) +
+      ' │ ' + fmtDeltaBal(inclBal_m).padStart(11) +
+      ' │ ' + fmtDeltaBal(inclBal_a).padStart(11) +
+      ' │ ' + fmtDeltaBal(inclBal_e).padStart(11)
+    );
+  }
+
+  console.log('');
+  console.log('  Sensitivity readings:');
+  console.log('  • Δe/e — most physically defensible. Base eccentricity is a framework-derived');
+  console.log('    quantity (not directly observed). Side-effect on incl balance is negligible.');
+  console.log('  • Δa/a — leverages a^(3/2) in v. ~2/3 the size of Δe/e for the same v-shift,');
+  console.log('    but a (orbital period) is observed to <1e-9 precision, so any non-trivial Δa');
+  console.log('    is a sensitivity reading, not a prediction. Side-effect on incl balance non-zero.');
+  console.log('  • Δm/m — twice the size of Δe/e for the same v-shift. DE440 masses are observed');
+  console.log('    to ~1e-7 precision, so Δm/m sensitivity values indicate by how much the framework');
+  console.log('    would have to be "wrong" about mass to close balance via that channel alone.');
+  console.log('');
+  console.log('  Implication of non-trivial sensitivities: the framework\'s 0.14% ecc-balance gap');
+  console.log('  is NOT attributable to a single planet\'s observed mass or period being off — both');
+  console.log('  are known far below the required shift. The gap therefore reflects either (a) a');
+  console.log('  small framework-level imperfection in the phase-derived base eccentricities, or');
+  console.log('  (b) the absence of additional gravitating bodies (asteroids, TNOs, dust) in the');
+  console.log('  balance equation. The latter is the natural next analysis step.');
+  console.log('');
+})();
 
 // ── Print helper ───────────────────────────────────────────────
 

@@ -124,19 +124,34 @@ ANOMALISTIC_YEAR_HARMONICS = [
     (H / h[0], h[1], h[2]) for h in _C['ANOMALISTIC_YEAR_HARMONICS']
 ]
 
-# Moon sidereal month
-_MOON_SIDEREAL_MONTH = _TOTAL_DAYS_IN_H / math.ceil(_TOTAL_DAYS_IN_H / _MOON_SIDEREAL_MONTH_INPUT)
+# Moon sidereal month (matches constants.js line 271 / script.js line 3347:
+# integer orbit count via Math.round, then total-days-in-H divided by count).
+# round() in Python uses banker's rounding which diverges from JS Math.round
+# at exact .5 boundaries; for these inputs the fractional part is ~0.14, so
+# round() matches Math.round() exactly.
+_MOON_SIDEREAL_MONTH = _TOTAL_DAYS_IN_H / round(
+    _TOTAL_DAYS_IN_H / _MOON_SIDEREAL_MONTH_INPUT
+)
 
 # GM_SUN from Kepler's 3rd law
 _GM_SUN = (4 * math.pi**2 * _AU_KM**3) / _SIDEREAL_YEAR_S**2
 _M_SUN = _GM_SUN / _G
 
-# Earth mass via Moon orbital mechanics
-_SOLAR_SIDEREAL_DAY_RATIO = _MEAN_LENGTH_OF_DAY / _MEAN_SIDEREAL_DAY
-_GM_EARTH_MOON_SYSTEM = (4 * math.pi**2 * _MOON_DISTANCE_KM**3) / \
+# Earth mass via Moon orbital mechanics (matches constants.js / script.js).
+# Δa correction for the Moon's apparent semi-major axis:
+#   Δa = a_M × M_M/(M_E + M_M) × m ≈ 349 km
+# is the leading-order correction for the Sun's tidal coupling to the
+# Earth-Moon barycentric wobble (Earth-Moon-Sun 3-body). Closes
+# G(M_E + M_M) to ~3.7 ppm of JPL DE440 — better and more physically
+# motivated than the older "1 + 1/year" SSDR factor that was used here
+# previously. See doc 24 for the universal mass-from-moon formula.
+_MOON_ORBITAL_SHIFT_KM = _MOON_DISTANCE_KM * (1.0 / (_MASS_RATIO_EARTH_MOON + 1)) \
+    * (_MOON_SIDEREAL_MONTH / _MEAN_SIDEREAL_YEAR_DAYS)
+_MOON_DISTANCE_CORRECTED_KM = _MOON_DISTANCE_KM + _MOON_ORBITAL_SHIFT_KM
+_GM_EARTH_MOON_SYSTEM = (4 * math.pi**2 * _MOON_DISTANCE_CORRECTED_KM**3) / \
     (_MOON_SIDEREAL_MONTH * _MEAN_LENGTH_OF_DAY)**2
 _GM_EARTH = _GM_EARTH_MOON_SYSTEM * \
-    (_MASS_RATIO_EARTH_MOON / (_MASS_RATIO_EARTH_MOON + 1)) * _SOLAR_SIDEREAL_DAY_RATIO
+    (_MASS_RATIO_EARTH_MOON / (_MASS_RATIO_EARTH_MOON + 1))
 
 # ═══════════════════════════════════════════════════════════════════════════
 # PLANET LIST (inner → outer)
@@ -146,18 +161,51 @@ PLANET_NAMES = ["Mercury", "Venus", "Earth", "Mars",
                 "Jupiter", "Saturn", "Uranus", "Neptune"]
 
 # ═══════════════════════════════════════════════════════════════════════════
-# MASSES (solar mass units) — computed from DE440 mass ratios
-# Replicates constants.js section 9: massFraction[k] = 1 / ratio
-# Earth via Moon orbital mechanics (same chain as constants.js)
+# MASSES (solar mass units) — Fibonacci-law convention: Earth ALONE,
+# other planets SYSTEM (planet + moons)
+# ───────────────────────────────────────────────────────────────────────────
+# • MASS["Earth"]                 — Earth ALONE (Moon factored out via the
+#                                   Moon-orbital-mechanics chain above; matches
+#                                   M_EARTH_ALONE in script.js)
+# • MASS[<other planet>]          — planet + moons SYSTEM (matches
+#                                   M_<PLANET>_SYSTEM in script.js); for the
+#                                   moonless inner planets Mercury / Venus this
+#                                   is identical to ALONE; for Mars, Jupiter,
+#                                   Saturn, Uranus, Neptune the satellites add
+#                                   a small but non-zero contribution.
+#
+# The Fibonacci-law balance equations compare M_Earth_ALONE against
+# M_<other>_SYSTEM because Earth's contribution to the balance is the planet
+# itself (the Moon is already accounted for separately in the inclination
+# constant ψ), while each outer planet's gravitational signature on the
+# Sun's wobble is the full planet+moons SYSTEM. Using SYSTEM for Earth
+# would double-count the Moon; using ALONE for the outer planets would
+# under-count their gravitational effect.
+#
+# Source ratios: astro-reference.json::massRatioDE440 (JPL DE440 SYSTEM
+# ratios for the 7 non-Earth planets). Earth's mass is computed independently
+# from Moon orbital mechanics (see _GM_EARTH derivation above).
 # ═══════════════════════════════════════════════════════════════════════════
 
 MASS = {p: 1.0 / _MASS_RATIO_DE440[p] for p in PLANET_NAMES if p != "Earth"}
 MASS["Earth"] = (_GM_EARTH / _G) / _M_SUN
 
+# Explicit ALONE / SYSTEM aliases — useful when a script wants to make the
+# convention visible at the call site. Numerically identical to MASS[planet]
+# (Earth ALONE, others SYSTEM); provided for readability, not for new physics.
+MASS_EARTH_ALONE   = MASS["Earth"]
+MASS_MERCURY_SYSTEM = MASS["Mercury"]   # Mercury has no moons; SYSTEM ≡ ALONE
+MASS_VENUS_SYSTEM   = MASS["Venus"]     # Venus has no moons; SYSTEM ≡ ALONE
+MASS_MARS_SYSTEM    = MASS["Mars"]
+MASS_JUPITER_SYSTEM = MASS["Jupiter"]
+MASS_SATURN_SYSTEM  = MASS["Saturn"]
+MASS_URANUS_SYSTEM  = MASS["Uranus"]
+MASS_NEPTUNE_SYSTEM = MASS["Neptune"]
+
 # Alias used in some scripts
 MASSES = MASS
 
-# Precomputed √m
+# Precomputed √m (uses the same ALONE/SYSTEM convention as MASS)
 SQRT_M = {p: math.sqrt(MASS[p]) for p in PLANET_NAMES}
 
 # ═══════════════════════════════════════════════════════════════════════════

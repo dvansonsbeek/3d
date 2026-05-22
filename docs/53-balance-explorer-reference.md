@@ -74,7 +74,7 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 
 ### Preset Dropdown
 
-A dropdown in the header offers **43 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
+A dropdown in the header offers **42 deep-analysis survivors** — configurations passing all five physical filters (inclination balance ≥99.994%, eccentricity balance ≥99%, LL bounds, direction match ≤5″, per-config optimised anchor and ascending nodes). Each candidate's eccentricity balance is computed with its own recomputed bases (not the default config's) for a fair comparison. Sorted by this per-config eccentricity balance, grouped by Jupiter/Saturn scenario:
 
 | Scenario | Jupiter d | Saturn d |
 |----------|-----------|----------|
@@ -242,7 +242,7 @@ Expected results:
 - Trend directions: **7/7 fitted planets match JPL direction** (J2000-fixed frame)
 - Total trend error: **~4.3″/century** across all 7 fitted planets
 
-This is the default configuration out of 43 survivors (ranked #11 by eccentricity balance) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
+This is the default configuration out of 42 survivors (ranked #11 by eccentricity balance) — the only one with mirror-symmetric d-assignments (Finding 2 in [Fibonacci Laws](10-fibonacci-laws.md#finding-2-configuration-uniqueness)).
 
 ---
 
