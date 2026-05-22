@@ -129,7 +129,7 @@ Used in: [Doc 16](../docs/16-milankovitch-language.md) (model framework), [Doc 1
 
 | Script | Description |
 |--------|-------------|
-| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. The closed 8-planet structure forbids a major 9th planet at ETNO distances (Doc 15). |
+| `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure: (1) Law-4 compliance pre-check (§3.5) — all candidates fail by 4–7 orders of magnitude; (2) full canonical 7.5M-config v-balance search (§4) — confirms rejection. The closed 8-planet structure forbids a major 9th planet at ETNO distances (Doc 15). |
 
 ### Regression Tests
 

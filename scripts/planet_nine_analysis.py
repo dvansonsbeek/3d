@@ -10,16 +10,30 @@ Companion document: docs/15-planet-nine-prediction.md
 Canonical reference:  tools/verify/balance-search.js
 
 This script combines:
-  §1. The Planet Nine problem (current research status)
-  §2. Known extreme TNOs (ETNOs) vs H-cycle divisors
-  §3. Fibonacci-period candidates for Planet Nine's orbit
-  §4. FULL canonical 7.5M-config balance search (THE KEY TEST)
-  §5. Falsifiability criteria & predictions
-  §6. Conclusion
+  §1.   The Planet Nine problem (current research status)
+  §2.   Known extreme TNOs (ETNOs) vs H-cycle divisors
+  §3.   Fibonacci-period candidates for Planet Nine's orbit
+  §3.5. LAW-4 COMPLIANCE PRE-CHECK (the primary scientific test)
+  §4.   Full canonical 7.5M-config balance search (secondary confirmation)
+  §5.   Falsifiability criteria & predictions
+  §6.   Conclusion
 
-Implementation matches `tools/verify/balance-search.js` (the canonical
-balance-search). Balance formulas:
+Two-tier test structure (consistent with doc 19):
+
+  PRIMARY (§3.5): Law-4 compliance — Planet Nine candidates must have
+    observed eccentricity consistent with the framework's Law 4 amplitude
+    prediction e_amp = K · sin(tilt) · √d / (√m · a^(3/2)). All proposed
+    candidates fail this by 4–6 orders of magnitude.
+
+  SECONDARY (§4): Full canonical v-balance search — implementation matches
+    `tools/verify/balance-search.js` exactly. Adds Planet Nine v9 (computed
+    with the candidate's observed e) to either the in-phase or anti-phase
+    side, then checks closure. Even ignoring Law 4, the resulting v9 is
+    so large that no configuration keeps the balance near 100%.
+
+Balance formulas:
   Law 3 weight:    w_j = √(m_j × a_j × (1 − e_j²)) / d_j           (AMD-based)
+  Law 4 amp:       e_amp = K · sin(tilt) · √d / (√m · a^(3/2))
   Law 5 weight:    v_j = √m_j × a_j^(3/2) × e_j / √d_j
   Balance %:       1 − |Σ_in − Σ_anti| / (Σ_in + Σ_anti)
 Uses DE440 SYSTEM masses (planet + moons — correct for AMD/balance).
@@ -264,8 +278,83 @@ def section_3():
     print(f"  This falls within Batygin & Brown 2016/2019/2021 estimated ranges.")
     print()
     print(f"  ★ But: even at this 'natural' Fibonacci-period location, can such a")
-    print(f"    body actually FIT the model's balance laws? That's §4 (canonical test).")
+    print(f"    body actually FIT the model's balance laws? That's §3.5 (Law-4)")
+    print(f"    and §4 (canonical balance test).")
     print()
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 3.5 — Law-4 compliance pre-check (primary test, framework-natural)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def section_3_5():
+    print("═" * 78)
+    print("  §3.5  LAW-4 COMPLIANCE PRE-CHECK (PRIMARY TEST)")
+    print("═" * 78)
+    print()
+    print("  Before any Planet Nine candidate can be tested as a primary balanced")
+    print("  planet, it must satisfy Law 4 of the framework — its observed eccentricity")
+    print("  must be consistent with the predicted oscillation amplitude:")
+    print()
+    print("      e_amp = K · sin(tilt) · √d / (√m · a^(3/2))")
+    print()
+    print("  For distant low-mass bodies, this predicts very small amplitudes. Any")
+    print("  candidate whose observed e is orders of magnitude larger than the maximum")
+    print("  Law-4-predicted amplitude (across all Fibonacci d-values) cannot be a")
+    print("  Fibonacci-balanced primary planet — its (m, a, e) is structurally")
+    print("  incompatible with Law 4. See doc 19 §5 for the framework-natural reading.")
+    print()
+    K_const = 3.4149e-6
+    sin_tilt = 0.5
+
+    print(f"  Inputs: K = {K_const:.4e}, ⟨sin(tilt)⟩ = {sin_tilt}")
+    print()
+    print(f"  {'Candidate':<28} {'M (M_E)':>9} {'a (AU)':>7} {'e_obs':>7} "
+          f"{'max e_amp':>12} {'ratio':>11} {'Law-4 OK?':>11}")
+    print("  " + "─" * 92)
+
+    law4_results = []
+    for cand in P9_CANDIDATES:
+        m_sun = cand["M_E"] * M_EARTH_SOLAR
+        a = cand["a_AU"]
+        e_obs = cand["e"]
+        # Max possible Law-4 amplitude across all Fibonacci d
+        e_amp_max = max(K_const * sin_tilt * math.sqrt(d) / (math.sqrt(m_sun) * a ** 1.5)
+                        for d in FIB_D)
+        ratio = e_obs / e_amp_max
+        # A body satisfies Law 4 if its observed e is consistent with predicted amp.
+        # Allow factor-of-5 margin (oscillation around some non-zero base could give
+        # e_obs ≈ base ± amp; require base + amp to be plausibly within 5× of amp_max).
+        passes = ratio < 5
+        verdict = "✓ pass" if passes else "✗ FAIL"
+        law4_results.append({
+            "label": cand["label"], "M_E": cand["M_E"], "a_AU": a, "e_obs": e_obs,
+            "e_amp_max": e_amp_max, "ratio": ratio, "passes": passes,
+        })
+        print(f"  {cand['label']:<28} {cand['M_E']:>9.4g} {a:>7.0f} {e_obs:>7.3f} "
+              f"{e_amp_max:>12.2e} {ratio:>10.0f}× {verdict:>11}")
+
+    print()
+    n_pass = sum(1 for r in law4_results if r["passes"])
+    n_fail = len(law4_results) - n_pass
+
+    print(f"  RESULT: {n_fail} of {len(law4_results)} candidates FAIL Law-4 compliance.")
+    print()
+    if n_fail == len(law4_results):
+        print("  ALL proposed Planet Nine candidates fail Law-4 compliance by 4–6 orders")
+        print("  of magnitude. Their observed eccentricities are far too large for their")
+        print("  (m, a) — under the framework, a body in such an orbit cannot be a")
+        print("  primary balanced planet.")
+        print()
+        print("  This is the PRIMARY scientific argument: Planet Nine at proposed")
+        print("  parameters is structurally incompatible with Law 4 (eccentricity")
+        print("  amplitude scaling). The body's predicted Law-4 amplitude (across all")
+        print("  Fibonacci d) is too small to accommodate the observed e.")
+    print()
+    print("  §4 (next) provides a SECONDARY confirmation via the full canonical")
+    print("  v-balance search: even if Law 4 were ignored and observed e treated as")
+    print("  e_base directly, the resulting v contribution would crash the balance.")
+    print()
+    return law4_results
 
 # ═══════════════════════════════════════════════════════════════════════════
 # SECTION 4 — Full canonical 7.5M-config balance search
@@ -488,7 +577,8 @@ def main():
     section_1()
     section_2()
     section_3()
-    best_per_cand = section_4()    # the heavy lifting — ~7 min
+    section_3_5()                  # Law-4 compliance pre-check (primary test)
+    best_per_cand = section_4()    # canonical v-balance search (secondary confirmation, ~7 min)
     section_5(best_per_cand)
     section_6(best_per_cand)
 

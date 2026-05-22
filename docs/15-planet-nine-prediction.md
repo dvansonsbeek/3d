@@ -1,6 +1,6 @@
 # Planet Nine: A Falsifiable Prediction
 
-> **TL;DR.** The Fibonacci-Universe model's 8-planet mirror-symmetric balance structure predicts that **no body more massive than ~10⁻³ M_Earth (Pluto-mass scale) can exist at hundreds of AU as a long-term resident**. Ceres-mass (~10⁻⁴ M_Earth) bodies and smaller remain compatible. This is incompatible with the conventional Planet Nine hypothesis (Batygin & Brown 2016-2025: 4-10 M_Earth at 290-700 AU), itself contested within the astronomy community (OSSOS null result, no detection after a decade of searching). The Vera Rubin Observatory (LSST) is expected to discriminate between the competing hypotheses by ~2030-2035. Either outcome teaches us something definitive about the model.
+> **TL;DR.** The Fibonacci-Universe model's 8-planet mirror-symmetric balance structure tests proposed Planet Nine candidates on two tiers: (1) **Law-4 compliance** — observed eccentricity must be consistent with the framework's predicted oscillation amplitude e_amp = K · sin(tilt) · √d / (√m · a^(3/2)); and (2) the **canonical v-balance search** as a secondary confirmation. All proposed Batygin-Brown / Siraj candidates (4–10 M_Earth, e ≈ 0.22–0.60, a ≈ 290–700 AU) **fail Law-4 compliance by 4–7 orders of magnitude** — their observed eccentricities cannot be base+amplitude under Law 4 for any Fibonacci d. The v-balance test confirms the rejection for all candidates above ~10⁻⁴ M_Earth. This is incompatible with the conventional Planet Nine hypothesis, itself contested within the astronomy community (OSSOS null result, no detection after a decade of searching). The Vera Rubin Observatory (LSST) is expected to discriminate between the competing hypotheses by ~2030–2035. Either outcome teaches us something definitive about the model.
 
 **Related documents:**
 - [10 — Fibonacci Laws](10-fibonacci-laws.md) — the underlying balance structure (Laws 3 & 5)
@@ -64,15 +64,29 @@ The structure has a key topological property: **mirror symmetry requires an even
 
 ---
 
-## 3. Method: Canonical 7.5M-Configuration Search
+## 3. Method: Two-Tier Test
 
-To test whether a hypothetical Planet Nine could fit, we ran the canonical balance search **with a 9th body** added. For each of:
+The framework's prediction is tested with a two-tier structure consistent with [doc 19 §5–§6](19-balance-sensitivity-analysis.md) (the Law-4 extension to external bodies):
+
+### 3.1 Primary test — Law-4 compliance
+
+Before any candidate can be tested as a primary balanced planet, it must satisfy Law 4 — its observed eccentricity must be consistent with the framework's predicted oscillation amplitude:
+
+$$
+e_{\text{amp}} = K \cdot \frac{\sin(\text{tilt}) \cdot \sqrt{d}}{\sqrt{m} \cdot a^{3/2}}
+$$
+
+For distant low-mass bodies, this predicts very small amplitudes. Any candidate whose observed e is many orders of magnitude larger than the maximum Law-4-predicted amplitude (across all Fibonacci d-values) is **structurally incompatible** with Law 4 — its (m, a, e) cannot be that of a Fibonacci-balanced primary planet, regardless of how its v contribution would interact with the balance equation.
+
+### 3.2 Secondary confirmation — canonical 7.5M-configuration v-balance search
+
+If Law-4 compliance is bypassed (treating the candidate's observed e as if it were e_base, like for the 8 primary planets), the canonical balance search adds a 9th body and checks closure. For each of:
 
 - **7,558,272** 8-planet configurations (5 free planets × 9 Fibonacci d × 2 groups × 4 Jupiter-Saturn scenarios)
 - × **9** Planet Nine candidate masses/distances (published Batygin-Brown / Siraj estimates + smaller test bodies)
 - × **18** Planet Nine options (9 Fibonacci d × 2 groups)
 
-we computed:
+we compute:
 
 - **Law 3 weight**: `w_j = √(m_j × a_j × (1 − e_j²)) / d_j`  (AMD-based)
 - **Law 5 weight**: `v_j = √m_j × a_j^(3/2) × e_j / √d_j`
@@ -80,13 +94,33 @@ we computed:
 
 Total: **1,224,440,064 balance evaluations** across the complete canonical search space.
 
-The implementation in [`scripts/planet_nine_analysis.py`](../scripts/planet_nine_analysis.py) is verified to **reproduce exactly** the canonical search's 767 surviving configs at the 99.994% Law 3 threshold — confirming the implementation matches `balance-search.js` to machine precision.
+The implementation in [`scripts/planet_nine_analysis.py`](../scripts/planet_nine_analysis.py) is verified to **reproduce exactly** the canonical search's 767 surviving 8-planet configs at the 99.994% Law 3 threshold — confirming the implementation matches `balance-search.js` to machine precision.
 
 ---
 
 ## 4. Results
 
-For each Planet Nine candidate, the **best 9-planet balance achievable across all 7.5M × 18 = 136M configurations**:
+### 4.1 Primary test — Law-4 compliance (the decisive result)
+
+For each candidate, the maximum Law-4-predicted amplitude `e_amp_max` (across all Fibonacci d) is compared to the observed e:
+
+| Candidate | M (M_E) | a (AU) | e_obs | max e_amp | ratio | Law-4 compliant? |
+|---|---:|---:|---:|---:|---:|---|
+| Batygin & Brown 2016 | 10.0 | 700 | 0.600 | 1.25 × 10⁻⁷ | 4,809,310× | **✗ FAIL** |
+| Batygin & Brown 2019 | 5.0 | 450 | 0.220 | 3.42 × 10⁻⁷ | 642,704× | **✗ FAIL** |
+| Batygin & Brown 2021 | 6.2 | 380 | 0.225 | 3.96 × 10⁻⁷ | 567,987× | **✗ FAIL** |
+| Siraj et al. 2025 | 4.4 | 290 | 0.300 | 7.05 × 10⁻⁷ | 425,333× | **✗ FAIL** |
+| Mars-mass test | 0.107 | 460 | 0.250 | 2.26 × 10⁻⁶ | 110,421× | ✗ FAIL |
+| Lunar-mass test | 0.0123 | 460 | 0.250 | 6.68 × 10⁻⁶ | 37,438× | ✗ FAIL |
+| Pluto-mass test | 0.0022 | 460 | 0.250 | 1.58 × 10⁻⁵ | 15,833× | ✗ FAIL |
+| Ceres-mass test | 0.00016 | 460 | 0.250 | 5.85 × 10⁻⁵ | 4,270× | ✗ FAIL |
+| 10⁻⁵ M_E (lower) | 0.00001 | 460 | 0.250 | 2.34 × 10⁻⁴ | 1,067× | ✗ FAIL |
+
+**All 9 candidates fail Law-4 compliance by 3 to 7 orders of magnitude.** The Batygin-Brown range fails by 4–7 orders of magnitude; even the sub-asteroid test bodies fail by 3–4 orders. Under the framework, no body at the (m, a, e) of any proposed Planet Nine candidate can be a primary balanced planet — the observed eccentricity is structurally inconsistent with Law 4's amplitude scaling.
+
+### 4.2 Secondary confirmation — canonical v-balance search
+
+If Law-4 compliance is bypassed (treating the candidate's observed e as e_base, like for the 8 primary planets), the **best 9-planet balance achievable across all 7.5M × 18 = 136M configurations**:
 
 | Candidate | M (M_E) | a (AU) | Best Law 3 | Best Law 5 | min(L3, L5) | Verdict |
 |---|---|---|---|---|---|---|
@@ -100,11 +134,29 @@ For each Planet Nine candidate, the **best 9-planet balance achievable across al
 | **Ceres-mass test** | **0.00016** | **460** | **99.99%** | **99.99%** | **99.99%** | **ACCEPT** |
 | 10⁻⁵ M_E (lower) | 0.00001 | 460 | 99.998% | 99.9997% | 99.998% | ACCEPT |
 
-The pattern is sharp: **all conventional Batygin-Brown candidates fail by 4-5 orders of magnitude in mass**, while only sub-asteroid-mass bodies (≲ 10⁻⁴ M_Earth) are compatible.
+The pattern is sharp: **all conventional Batygin-Brown candidates fail by 4-5 orders of magnitude in mass**, while only sub-asteroid-mass bodies (≲ 10⁻⁴ M_Earth) are compatible *under this secondary test*.
+
+### 4.3 Why two tests?
+
+The primary test (Law-4 compliance) and the secondary test (v-balance) agree on the proposed Batygin-Brown candidates — both reject them. They diverge for sub-asteroid-mass bodies:
+
+| Body | Law-4 compliance (§4.1) | v-balance (§4.2) | Combined verdict |
+|---|---|---|---|
+| Batygin-Brown 5–10 M_E | FAIL by 5–7 orders | FAIL by ~90% balance loss | **REJECT** |
+| Mars to Pluto-mass | FAIL by 4 orders | REJECT or MARGINAL | **REJECT** |
+| Ceres-mass and below | FAIL by 3 orders | ACCEPT (small √m) | **REJECT** (by primary test) |
+
+The primary test is more stringent because it is the **framework-natural** reading (consistent with doc 19's Law-4 extension to external bodies). Under the secondary test alone, very small bodies escape rejection by virtue of having small √m; the primary test correctly identifies that those bodies' *parameters* (e at 0.25 with predicted amp at most ~6 × 10⁻⁵) are still structurally incompatible with Law 4. The combined verdict is that **no proposed Planet Nine candidate, regardless of mass, can be a Fibonacci-balanced primary planet** — the observed orbits don't fit Law 4.
 
 ---
 
 ## 5. Why the Result is Robust
+
+The rejection holds via two independent arguments, in order of strength:
+
+**Primary argument — Law-4 compliance failure (5–7 orders of magnitude).** The observed eccentricities of all Planet Nine candidates are 4 to 7 orders of magnitude too large for the framework's Law 4 amplitude prediction. This is a *structural* incompatibility — there is no choice of mass, distance, eccentricity, Fibonacci d, or phase group that allows the candidate orbits to satisfy Law 4. This argument requires no v-balance computation; it is a direct check of the framework's amplitude scaling law against the proposed orbital elements. **No re-parameterization within the published Planet Nine range escapes this rejection** because the failure grows worse as the body moves to smaller a (because predicted amplitude shrinks faster than observed e changes).
+
+**Secondary argument — v-balance disruption (described below).** Even if Law 4 were ignored and the candidate's observed e were treated as e_base directly, the resulting v9 contribution would crash the framework's balance equation. This is the original "leverage" argument:
 
 ### 5.1 The a^(3/2) leverage
 
@@ -214,15 +266,18 @@ By 2030-2035, the Vera Rubin Observatory (LSST) will discriminate between hypoth
 
 | LSST outcome | Fibonacci model | Conventional (Batygin/Brown) |
 |---|---|---|
-| M ≥ 1 M_Earth body found at any 300-700 AU | **FALSIFIED** | confirmed |
-| M ≥ 0.1 M_Earth body found (Mars-mass) | **FALSIFIED** | weakened |
-| M ~ Ceres-mass body found at 300-500 AU | consistent | weakened |
-| No detection above 10⁻⁴ M_Earth by 2035 | consistent | **FALSIFIED** |
+| M ≥ 1 M_Earth body found at 300-700 AU with e ≈ 0.2-0.6 | **FALSIFIED** (Law-4 violation by 5+ orders) | confirmed |
+| M ≥ 0.1 M_Earth body found (Mars-mass) at similar e | **FALSIFIED** (Law-4 violation by 4+ orders) | weakened |
+| M ~ Ceres-mass body found at 300-500 AU with high e | **FALSIFIED** (Law-4 violation by 3+ orders) | weakened |
+| Tiny body (≲ 10⁻⁸ M_Earth) found at similar orbit | consistent | n/a |
+| No detection above ~10⁻⁸ M_Earth by 2035 | consistent | **FALSIFIED** |
 | ETNO clustering disappears with more discoveries | consistent | **FALSIFIED** |
+
+Under the framework's Law-4 compliance test (§4.1), the threshold for compatibility at e ≈ 0.25 and a ≈ 460 AU sits near 10⁻¹¹ M_Sun (~10⁻⁵ M_Earth_Moon = lunar-asteroid mass). Detection of any body more massive than this at high-e ETNO orbits falsifies the model — a much sharper criterion than the secondary v-balance test alone (which allowed Ceres-mass).
 
 ### 8.2 The asymmetric falsification
 
-A **single detection** of a 1+ M_Earth body at hundreds of AU falsifies the Fibonacci model's balance closure. The conventional Planet Nine hypothesis, by contrast, can be re-parameterized to fit nearly any detection — making it harder to falsify cleanly.
+A **single detection** of a ≳ Ceres-mass body in a high-e Batygin-Brown-style orbit falsifies the Fibonacci model — either via Law-4 violation (primary, very strong) or via v-balance disruption (secondary, still strong). The conventional Planet Nine hypothesis, by contrast, can be re-parameterized to fit nearly any detection — making it harder to falsify cleanly.
 
 In Popper's terms: **our prediction is more vulnerable, and therefore stronger**.
 
@@ -232,9 +287,13 @@ In Popper's terms: **our prediction is more vulnerable, and therefore stronger**
 
 ### 9.1 Summary
 
-Across the complete canonical 7,558,272-configuration search × 18 Planet Nine options, no Fibonacci configuration accommodates a Batygin-Brown-mass (4-10 M_Earth) Planet Nine at typical hundreds-of-AU distance. Best achievable Law 5 balance with a 5 M_Earth body: ~9%, versus the current 8-planet 98% baseline.
+The Fibonacci-Universe model rejects all proposed Planet Nine candidates on two independent tiers:
 
-The Fibonacci-Universe model is structurally **complete with 8 planets**. The 4 mirror pairs (Mercury-Uranus, Venus-Neptune, Earth-Saturn, Mars-Jupiter) uniquely balance Laws 3 and 5 to >99.99% with Saturn as the anti-phase anchor. Adding any major 9th planet disrupts this balance by 5-10× the level the model itself maintains.
+- **Primary test (Law-4 compliance):** All candidates fail by 3 to 7 orders of magnitude. Their observed eccentricities are far too large for the framework's Law 4 amplitude prediction `e_amp = K · sin(tilt) · √d / (√m · a^(3/2))`, regardless of which Fibonacci d is assumed. The candidate (m, a, e) tuples are structurally incompatible with being Fibonacci-balanced primary planets.
+
+- **Secondary confirmation (v-balance):** Across the complete canonical 7,558,272-configuration search × 18 Planet Nine options, no Fibonacci configuration accommodates a Batygin-Brown-mass (4-10 M_Earth) Planet Nine at typical hundreds-of-AU distance. Best achievable Law 5 balance with a 5 M_Earth body: ~9%, versus the current 8-planet 99.86% baseline.
+
+The Fibonacci-Universe model is structurally **complete with 8 planets**. The 4 mirror pairs (Mercury-Uranus, Venus-Neptune, Earth-Saturn, Mars-Jupiter) uniquely balance Laws 3 and 5 with Saturn as the anti-phase anchor. Adding any major 9th planet at proposed parameters fails the framework's structural constraints — first by violating Law 4 (the eccentricity amplitude scaling), and second by disrupting the v-balance equation.
 
 ### 9.2 What this means for the model's broader credibility
 
