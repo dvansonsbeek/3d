@@ -1,0 +1,293 @@
+{
+  "framework": "TNO contribution to Law 5 balance \u2014 two approaches",
+  "tno_sample_size": 19,
+  "tno_data": [
+    {
+      "name": "Pluto+Charon",
+      "mass_solar": 7.27e-09,
+      "a_au": 39.482,
+      "e": 0.249,
+      "peri_deg": 224.07,
+      "i_deg": 17.16,
+      "mass_source": "New Horizons mission, direct"
+    },
+    {
+      "name": "Eris+Dysnomia",
+      "mass_solar": 8.4e-09,
+      "a_au": 67.864,
+      "e": 0.439,
+      "peri_deg": 187.46,
+      "i_deg": 44.04,
+      "mass_source": "Brown 2008 / Dysnomia binary"
+    },
+    {
+      "name": "Haumea+system",
+      "mass_solar": 2.02e-09,
+      "a_au": 43.13,
+      "e": 0.191,
+      "peri_deg": 238.78,
+      "i_deg": 28.21,
+      "mass_source": "Ragozzine 2009 / Hi'iaka binary"
+    },
+    {
+      "name": "Makemake",
+      "mass_solar": 1.54e-09,
+      "a_au": 45.79,
+      "e": 0.159,
+      "peri_deg": 296.5,
+      "i_deg": 28.99,
+      "mass_source": "Parker 2018 / S/2015 (136472) 1"
+    },
+    {
+      "name": "Gonggong",
+      "mass_solar": 9e-10,
+      "a_au": 67.49,
+      "e": 0.503,
+      "peri_deg": 247.38,
+      "i_deg": 30.74,
+      "mass_source": "Kiss 2019 / Xiangliu binary"
+    },
+    {
+      "name": "Quaoar+Weywot",
+      "mass_solar": 7e-10,
+      "a_au": 43.69,
+      "e": 0.039,
+      "peri_deg": 145.42,
+      "i_deg": 7.98,
+      "mass_source": "Fraser 2013 / Weywot binary"
+    },
+    {
+      "name": "Sedna",
+      "mass_solar": 4e-10,
+      "a_au": 506.0,
+      "e": 0.852,
+      "peri_deg": 311.41,
+      "i_deg": 11.93,
+      "mass_source": "Brown / spectral, H-derived"
+    },
+    {
+      "name": "Orcus+Vanth",
+      "mass_solar": 6.3e-10,
+      "a_au": 39.42,
+      "e": 0.226,
+      "peri_deg": 73.04,
+      "i_deg": 20.59,
+      "mass_source": "Brown 2010 / Vanth binary"
+    },
+    {
+      "name": "Salacia+Actaea",
+      "mass_solar": 4.92e-10,
+      "a_au": 42.18,
+      "e": 0.106,
+      "peri_deg": 313.99,
+      "i_deg": 23.92,
+      "mass_source": "Fraser 2013 / Actaea binary"
+    },
+    {
+      "name": "Varuna",
+      "mass_solar": 2e-10,
+      "a_au": 42.7,
+      "e": 0.054,
+      "peri_deg": 97.33,
+      "i_deg": 17.19,
+      "mass_source": "H-derived, albedo 0.10"
+    },
+    {
+      "name": "2002 MS4",
+      "mass_solar": 1.5e-10,
+      "a_au": 41.93,
+      "e": 0.143,
+      "peri_deg": 12.5,
+      "i_deg": 17.69,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "Ixion",
+      "mass_solar": 1.3e-10,
+      "a_au": 39.61,
+      "e": 0.241,
+      "peri_deg": 300.16,
+      "i_deg": 19.65,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "2002 AW197",
+      "mass_solar": 1.2e-10,
+      "a_au": 47.42,
+      "e": 0.131,
+      "peri_deg": 297.2,
+      "i_deg": 24.41,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "2003 AZ84",
+      "mass_solar": 1.3e-10,
+      "a_au": 39.49,
+      "e": 0.176,
+      "peri_deg": 13.63,
+      "i_deg": 13.55,
+      "mass_source": "H-derived / binary"
+    },
+    {
+      "name": "2004 GV9",
+      "mass_solar": 1e-10,
+      "a_au": 41.85,
+      "e": 0.077,
+      "peri_deg": 158.2,
+      "i_deg": 21.93,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "Chaos",
+      "mass_solar": 1e-10,
+      "a_au": 45.84,
+      "e": 0.106,
+      "peri_deg": 58.2,
+      "i_deg": 12.06,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "Huya",
+      "mass_solar": 1.5e-10,
+      "a_au": 39.79,
+      "e": 0.282,
+      "peri_deg": 130.1,
+      "i_deg": 15.46,
+      "mass_source": "H-derived"
+    },
+    {
+      "name": "2002 TX300",
+      "mass_solar": 1e-10,
+      "a_au": 43.21,
+      "e": 0.123,
+      "peri_deg": 339.4,
+      "i_deg": 25.83,
+      "mass_source": "H-derived (Haumea family)"
+    },
+    {
+      "name": "Varda",
+      "mass_solar": 1.4e-10,
+      "a_au": 45.93,
+      "e": 0.144,
+      "peri_deg": 192.1,
+      "i_deg": 21.5,
+      "mass_source": "Grundy 2015 / Ilmar\u00eb binary"
+    }
+  ],
+  "saturn_perihelion_deg": 93.06,
+  "framework_8planet_closure_pct": 99.862,
+  "framework_residual_v": 4.27e-05,
+  "K_constant": 3.4149e-06,
+  "tno_sin_tilt_assumed": 0.5,
+  "approach_1_observed_e_naive": {
+    "description": "v per body = \u221am\u00b7a^(3/2)\u00b7e_observed/\u221ad. Naive \u2014 uses currently-observed e (~0.15).",
+    "total_v_19_bodies": 0.24141509191401994,
+    "total_v_vs_gap": 5653.749225152692,
+    "random_sigma_19_bodies": 0.19554007973342594,
+    "random_sigma_vs_gap": 4579.392967995924,
+    "rules": [
+      {
+        "id": "1_upper_lower_ecliptic",
+        "desc": "\u03d6 in [0\u00b0, 180\u00b0] = in-phase",
+        "v_in": 0.004292845040732123,
+        "v_anti": 0.23712224687328784,
+        "closure_pct": 3.5564015544322536,
+        "p_random_null": 0.97,
+        "verdict": "WORSE than random"
+      },
+      {
+        "id": "2_saturn_relative",
+        "desc": "|\u03d6 \u2212 \u03d6_Saturn| > 90\u00b0 = in-phase (opposite Saturn)",
+        "v_in": 0.23712224687328784,
+        "v_anti": 0.004292845040732123,
+        "closure_pct": 3.5564015544322536,
+        "p_random_null": 0.97,
+        "verdict": "WORSE than random"
+      },
+      {
+        "id": "3_cos_perihelion",
+        "desc": "cos(\u03d6) > 0 = in-phase (\u03d6 in upper half)",
+        "v_in": 0.20073936862168246,
+        "v_anti": 0.040675723292337526,
+        "closure_pct": 33.6977468722827,
+        "p_random_null": 0.085,
+        "verdict": "CONSISTENT WITH RANDOM"
+      },
+      {
+        "id": "4_inclination_above_median",
+        "desc": "i > i_median = in-phase",
+        "v_in": 0.03742618730205904,
+        "v_anti": 0.20398890461196093,
+        "closure_pct": 31.005673262041455,
+        "p_random_null": 0.163,
+        "verdict": "CONSISTENT WITH RANDOM"
+      },
+      {
+        "id": "5_eccentricity_above_median",
+        "desc": "e > e_median = in-phase",
+        "v_in": 0.23596527520175575,
+        "v_anti": 0.0054498167122642134,
+        "closure_pct": 4.514893140322118,
+        "p_random_null": 0.938,
+        "verdict": "WORSE than random"
+      },
+      {
+        "id": "6_distance_above_median",
+        "desc": "a > a_median = in-phase",
+        "v_in": 0.22872156212521003,
+        "v_anti": 0.012693529788809917,
+        "closure_pct": 10.515937249963415,
+        "p_random_null": 0.744,
+        "verdict": "WORSE than random"
+      },
+      {
+        "id": "7_mass_above_median",
+        "desc": "m > m_median = in-phase",
+        "v_in": 0.2367908451989942,
+        "v_anti": 0.004624246715025758,
+        "closure_pct": 3.83095081451883,
+        "p_random_null": 0.965,
+        "verdict": "WORSE than random"
+      },
+      {
+        "id": "8_perihelion_quadrant_13",
+        "desc": "\u03d6 in 1st/3rd quadrant = in-phase",
+        "v_in": 0.041795763760195476,
+        "v_anti": 0.1996193281538245,
+        "closure_pct": 34.62564285341452,
+        "p_random_null": 0.059,
+        "verdict": "CONSISTENT WITH RANDOM"
+      }
+    ],
+    "random_null": {
+      "n_trials": 1000,
+      "mean_closure_pct": 19.83690384199541,
+      "median_closure_pct": 22.000635894660327,
+      "p95_closure_pct": 34.874833125823415,
+      "max_closure_pct": 37.890243286550984
+    },
+    "interpretation": "Under the naive observed-e interpretation, the 19 major TNOs alone contribute v values 100-500\u00d7 the framework's residual. The eight rules tested do not produce closure approaching the 8-planet 99.86%. But this interpretation is inconsistent with the framework's own Law 4, which predicts TNO eccentricity amplitudes ~150\u00d7 smaller than observed e."
+  },
+  "approach_2_law4_natural": {
+    "description": "v per body = K \u00b7 sin(tilt), uniform regardless of (m, a, d). Comes from substituting Law 4's e_amp into Law 5's v formula.",
+    "v_per_body": 1.70745e-06,
+    "for_19_known_tnos": {
+      "worst_case_sum": 3.244155e-05,
+      "worst_case_vs_gap": 0.7597552693208431,
+      "random_sigma": 7.442602001148524e-06,
+      "random_sigma_vs_gap": 0.17429981267326755
+    },
+    "for_N_1000_tnos_random": 5.399430990854499e-05,
+    "for_N_10000_tnos_random": 0.000170745,
+    "interpretation": "Under the framework's own Law 4 extended to TNOs (assuming e_base \u2248 e_amp for distant low-mass bodies, as is the case for Neptune), every TNO contributes v = K\u00b7sin(tilt) \u2248 1.7e-6 \u2014 uniformly. The huge a^(3/2) factor cancels with the tiny e_amp. The 8-planet framework's 4.27e-5 residual is then quantitatively consistent with random \u00b1 contributions from ~600-1000 TNO-equivalent bodies (\u03c3 ~ 4-5e-5)."
+  },
+  "vector_cancellation": {
+    "vec_x": 0.09990594385412588,
+    "vec_y": -0.16232283737205636,
+    "vec_mag": 0.19060404284772872,
+    "scalar_sum": 0.24141509191401994,
+    "cancellation_factor": 1.266579073072881,
+    "vec_angle_deg": -58.3886660585155
+  },
+  "rng_seed": 20260522
+}
