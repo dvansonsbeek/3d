@@ -1,6 +1,6 @@
 # Doc 19 — Dual-Balance Sensitivity Analysis
 
-> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions, computes single-parameter sensitivities (Δm/m, Δa/a, Δe/e per planet) that would close it, and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 5–10 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods. The natural interpretation is that the gap reflects the absence of *additional gravitating bodies* (asteroids, Trans-Neptunian Objects, dust) from the balance equations. The analysis is reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) which prints all the numbers used here.
+> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions, computes single-parameter sensitivities (Δm/m, Δa/a, Δe/e per planet) that would close it, and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 4–6 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods. Scale checks on Trans-Neptunian Object populations (§5) reveal a different open question: external-body contributions are typically *much larger* than the gap (10× to 500×, depending on Fibonacci-divisor assignment), so the real puzzle is not whether external bodies can close the gap but what determines their net contribution after in-phase / anti-phase cancellation. The analysis is reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) which prints all the numbers used here.
 
 ---
 
@@ -104,33 +104,51 @@ For d = 1 (smallest Fibonacci) this is **7.6 × 10⁻⁶ — about 18% of the ga
 
 ### 5.2 Scale check: full asteroid belt
 
-The total mass of the main-belt asteroids is ~3% of Ceres (~1.4 × 10⁻¹¹ M_sun) distributed at roughly the same a. Treating the belt as a single equivalent body:
+The total mass of the main-belt asteroids is ~3× the mass of Ceres (~1.4 × 10⁻⁹ M_sun) distributed at roughly the same a. Treating the belt as a single equivalent body:
 
 ```
-v_belt ≈ √(1.4 × 10⁻¹¹) × 2.7^(3/2) × ⟨e⟩ / √d  ≈ 1.3 × 10⁻⁶ × ⟨e⟩ / √d
+v_belt ≈ √(1.4 × 10⁻⁹) × 2.7^(3/2) × ⟨e⟩ / √d  ≈ 1.66 × 10⁻⁴ × ⟨e⟩ / √d
 ```
 
-For ⟨e⟩ ≈ 0.1 and d = 3, that's ~7.5 × 10⁻⁸ — three orders of magnitude below the gap. **The main asteroid belt is too light to close the gap on its own.**
+For ⟨e⟩ ≈ 0.1 and d = 3, that's ~9.6 × 10⁻⁶ — **about 22% of the gap**. For d = 1, ~17 × 10⁻⁶ ≈ 39% of the gap. The main asteroid belt is **the same order of magnitude as the gap**, not three orders below it.
 
 ### 5.3 Scale check: Trans-Neptunian Objects
 
-The total mass of the TNO + scattered-disk population is poorly constrained but commonly estimated at ~0.05–0.1 M_⊕ (~1.5 × 10⁻⁷ to 3 × 10⁻⁷ M_sun) — roughly 100× the main belt. At a ≈ 40 AU and ⟨e⟩ ≈ 0.15:
+The total mass of the TNO + scattered-disk population is poorly constrained but commonly estimated at ~0.02–0.1 M_⊕ (~6 × 10⁻⁸ to 3 × 10⁻⁷ M_sun). At a ≈ 40 AU and ⟨e⟩ ≈ 0.15:
 
 ```
-v_TNO ≈ √(2 × 10⁻⁷) × 40^(3/2) × 0.15 / √d  ≈ 2.7 × 10⁻⁵ / √d
+v_TNO ≈ √M_TNO × 40^(3/2) × 0.15 / √d
 ```
 
-For d = 3, this gives **~1.6 × 10⁻⁵ — about 37% of the gap on its own**. For d = 1, ~63%. **The TNO population is the right order of magnitude to be a significant contributor to closing the gap**, but assigning it to a single Fibonacci d-value is a non-trivial framework extension.
+Numerically, with M_TNO at the conservative end (0.02 M_⊕):
 
-### 5.4 Putting it together
+| Fibonacci d | v_TNO | Compared to 4.27 × 10⁻⁵ gap |
+|---:|---:|---:|
+| 1 | 9.3 × 10⁻³ | **218× gap** |
+| 8 | 3.3 × 10⁻³ | **77× gap** |
+| 55 | 1.3 × 10⁻³ | **29× gap** |
 
-A combined contribution from asteroid belt + TNOs + Centaurs + outer-disk dust could plausibly aggregate to the ~4 × 10⁻⁵ v-units required. The analysis would need to:
+Even at the **conservative 0.02 M_⊕** estimate and the **largest Fibonacci divisor (d = 55)**, the TNO population contributes **30× more v than the entire balance gap**. At commonly-cited TNO masses (0.05–0.1 M_⊕), the contribution is 50–500× the gap. A single Pluto+Charon system alone contributes ~27× the gap (at d = 21).
+
+This is a surprising and important result: **the TNO population has far more than enough mass to close the gap — by 1 to 2 orders of magnitude, on either side**. The question is no longer "can external bodies close the gap?" (clearly yes), but "what determines the *net* contribution after in-phase and anti-phase parts cancel?"
+
+### 5.4 Re-framing: the cancellation question
+
+The fact that the 8-planet sum sits at 99.86% balance — only 4.27 × 10⁻⁵ off — when external bodies could contribute v values 100× larger in either direction is itself a **non-trivial observation**. Three possible explanations:
+
+1. **Near-perfect cancellation.** The TNO population naturally distributes across in-phase and anti-phase groups with v contributions that cancel to ~0.5% precision, leaving the observed 4.27 × 10⁻⁵ residual. This would be a striking framework prediction but is currently unsupported by any structural rule — the framework has no formal in-phase / anti-phase assignment for sub-planetary bodies.
+
+2. **Structural exclusion.** The framework's balance equation applies only to a privileged subset of bodies (perhaps "primary" planets meeting a mass threshold, or only those with Fibonacci-locked resonances). TNOs and asteroids would then enter the dynamics via N-body perturbations but not via the balance equation itself. This is a plausible interpretation but requires articulating the inclusion criterion.
+
+3. **Coincidence.** The 99.86% closure of the 8-planet sum is partly fortuitous — there's no deep reason the residual *should* be 4.27 × 10⁻⁵ specifically, and a complete framework would predict whatever number the corrected external-body sum produces. The current 99.86% would then be a piece of evidence rather than a constraint.
+
+A future analysis would need to:
 
 1. Estimate the v-contribution of each known minor-body population (belt, Trojans, Centaurs, classical KBOs, scattered disk, plutinos).
-2. Decide how each population maps onto a Fibonacci d-value and an in-phase / anti-phase group — the framework currently has no rule for this.
-3. Compare the aggregated v against the 4.27 × 10⁻⁵ gap.
+2. Either (a) propose an in-phase / anti-phase assignment rule and test whether the net contribution lands at ~4 × 10⁻⁵, or (b) propose a structural-exclusion criterion that justifies leaving them out.
+3. Treat the result as a falsifiable prediction of the framework once a rule is committed to.
 
-This is outside the scope of the current document but is the natural follow-up analysis.
+This is outside the scope of the current document but is the natural follow-up analysis. The result of §5.3 makes it a substantially harder analysis than the original framing suggested, because the magnitudes involved are large.
 
 ---
 
@@ -142,7 +160,7 @@ The sensitivity table in §3 should be read as a **diagnostic tool**, not as a l
 
 - **The Δm/m and Δa/a columns** are sensitivity readings. They quantify how *unlikely* it is that the gap is due to mis-measured masses or orbits: the required shifts are 4–6 orders of magnitude larger than DE440 / JPL precision. This is itself an important result — it formally rules out the simplest "the masses are slightly wrong" explanation.
 
-- **The implication** is that if the framework is correct *and* the gap is real (both of which require continued empirical scrutiny), the missing contribution must come from gravitating bodies not currently in the balance sum. Section 5 shows TNO populations are at the right order of magnitude.
+- **The implication** is that if the framework is correct *and* the gap is real (both of which require continued empirical scrutiny), the explanation involves gravitating bodies not currently in the balance sum. Section 5 shows that the TNO population alone has ~100× more total v than the gap — far more than enough mass, with the open question being what determines the net residual after in-phase / anti-phase cancellation.
 
 ---
 
@@ -157,6 +175,8 @@ To prevent over-interpretation:
 3. **It does not assign Fibonacci d-values to asteroid/TNO populations.** That assignment is a separate framework extension which would require its own derivation.
 
 4. **It does not claim the phase-derived bases are wrong.** The Δe/e column is informational — it shows the size of the gap in eccentricity units. The phase-derived approach remains the framework's authoritative source.
+
+5. **It does not propose a cancellation rule for external bodies.** §5.3 shows the TNO population's *total* v is 30–500× the gap, so any framework extension including those bodies must explain why their net contribution lands at the small observed residual. This document treats that as an open question, not a solved problem.
 
 ---
 
