@@ -1,0 +1,873 @@
+{
+  "framework": "Law-4 TNO obliquity predictions",
+  "K_constant": 3.4149e-06,
+  "fibonacci_d_pool": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    13,
+    21,
+    34,
+    55
+  ],
+  "assumption": "e_obs \u2248 e_amp (body sampled near eccentricity peak)",
+  "results": [
+    {
+      "name": "Pluto+Charon",
+      "m_sun": 7.27e-09,
+      "a_au": 39.482,
+      "e_obs": 0.249,
+      "min_sin_tilt": 207.97251007752558,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": 119.6,
+      "law4_compliant": false,
+      "notes": "tidally locked binary; obliquity well-known",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 1542.3654145944327
+        },
+        {
+          "d": 2,
+          "sin_tilt": 1090.6170437273242
+        },
+        {
+          "d": 3,
+          "sin_tilt": 890.4850873048645
+        },
+        {
+          "d": 5,
+          "sin_tilt": 689.7667826355595
+        },
+        {
+          "d": 8,
+          "sin_tilt": 545.3085218636621
+        },
+        {
+          "d": 13,
+          "sin_tilt": 427.7751990632694
+        },
+        {
+          "d": 21,
+          "sin_tilt": 336.57172674575884
+        },
+        {
+          "d": 34,
+          "sin_tilt": 264.51348637568424
+        },
+        {
+          "d": 55,
+          "sin_tilt": 207.97251007752558
+        }
+      ]
+    },
+    {
+      "name": "Eris+Dysnomia",
+      "m_sun": 8.4e-09,
+      "a_au": 67.864,
+      "e_obs": 0.439,
+      "min_sin_tilt": 888.1861750751991,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "obliquity poorly constrained",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 6586.964967851975
+        },
+        {
+          "d": 2,
+          "sin_tilt": 4657.6875962063605
+        },
+        {
+          "d": 3,
+          "sin_tilt": 3802.9859973319726
+        },
+        {
+          "d": 5,
+          "sin_tilt": 2945.7802867053465
+        },
+        {
+          "d": 8,
+          "sin_tilt": 2328.8437981031802
+        },
+        {
+          "d": 13,
+          "sin_tilt": 1826.8953800981005
+        },
+        {
+          "d": 21,
+          "sin_tilt": 1437.3935983430495
+        },
+        {
+          "d": 34,
+          "sin_tilt": 1129.655172369885
+        },
+        {
+          "d": 55,
+          "sin_tilt": 888.1861750751991
+        }
+      ]
+    },
+    {
+      "name": "Haumea+system",
+      "m_sun": 2.02e-09,
+      "a_au": 43.13,
+      "e_obs": 0.191,
+      "min_sin_tilt": 96.01053812880525,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": 75.0,
+      "law4_compliant": false,
+      "notes": "fast rotator, oblate ellipsoid",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 712.033207616086
+        },
+        {
+          "d": 2,
+          "sin_tilt": 503.4835095353432
+        },
+        {
+          "d": 3,
+          "sin_tilt": 411.09256408909994
+        },
+        {
+          "d": 5,
+          "sin_tilt": 318.4309308933578
+        },
+        {
+          "d": 8,
+          "sin_tilt": 251.7417547676716
+        },
+        {
+          "d": 13,
+          "sin_tilt": 197.4824799917611
+        },
+        {
+          "d": 21,
+          "sin_tilt": 155.37838434394862
+        },
+        {
+          "d": 34,
+          "sin_tilt": 122.11268768064099
+        },
+        {
+          "d": 55,
+          "sin_tilt": 96.01053812880525
+        }
+      ]
+    },
+    {
+      "name": "Makemake",
+      "m_sun": 1.54e-09,
+      "a_au": 45.79,
+      "e_obs": 0.159,
+      "min_sin_tilt": 76.34034437013314,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "obliquity not directly measured",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 566.1551464221434
+        },
+        {
+          "d": 2,
+          "sin_tilt": 400.33214323876024
+        },
+        {
+          "d": 3,
+          "sin_tilt": 326.86982618991647
+        },
+        {
+          "d": 5,
+          "sin_tilt": 253.19227864225186
+        },
+        {
+          "d": 8,
+          "sin_tilt": 200.16607161938012
+        },
+        {
+          "d": 13,
+          "sin_tilt": 157.02318540714313
+        },
+        {
+          "d": 21,
+          "sin_tilt": 123.54518159848948
+        },
+        {
+          "d": 34,
+          "sin_tilt": 97.0948065825475
+        },
+        {
+          "d": 55,
+          "sin_tilt": 76.34034437013314
+        }
+      ]
+    },
+    {
+      "name": "Gonggong",
+      "m_sun": 9e-10,
+      "a_au": 67.49,
+      "e_obs": 0.503,
+      "min_sin_tilt": 330.3612089007287,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "extreme scattered-disk object",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 2450.0242976446784
+        },
+        {
+          "d": 2,
+          "sin_tilt": 1732.4287949363602
+        },
+        {
+          "d": 3,
+          "sin_tilt": 1414.5221877662789
+        },
+        {
+          "d": 5,
+          "sin_tilt": 1095.6841752119356
+        },
+        {
+          "d": 8,
+          "sin_tilt": 866.2143974681801
+        },
+        {
+          "d": 13,
+          "sin_tilt": 679.5144793300411
+        },
+        {
+          "d": 21,
+          "sin_tilt": 534.6391332589408
+        },
+        {
+          "d": 34,
+          "sin_tilt": 420.17570061083126
+        },
+        {
+          "d": 55,
+          "sin_tilt": 330.3612089007287
+        }
+      ]
+    },
+    {
+      "name": "Quaoar+Weywot",
+      "m_sun": 7e-10,
+      "a_au": 43.69,
+      "e_obs": 0.039,
+      "min_sin_tilt": 11.7659597608028,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO; LOW eccentricity",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 87.25869297729419
+        },
+        {
+          "d": 2,
+          "sin_tilt": 61.70121352171969
+        },
+        {
+          "d": 3,
+          "sin_tilt": 50.378829879575704
+        },
+        {
+          "d": 5,
+          "sin_tilt": 39.02327382500266
+        },
+        {
+          "d": 8,
+          "sin_tilt": 30.850606760859844
+        },
+        {
+          "d": 13,
+          "sin_tilt": 24.201207058431056
+        },
+        {
+          "d": 21,
+          "sin_tilt": 19.041407886255342
+        },
+        {
+          "d": 34,
+          "sin_tilt": 14.964742386990524
+        },
+        {
+          "d": 55,
+          "sin_tilt": 11.7659597608028
+        }
+      ]
+    },
+    {
+      "name": "Sedna",
+      "m_sun": 4e-10,
+      "a_au": 506.0,
+      "e_obs": 0.852,
+      "min_sin_tilt": 7658.364457960003,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "detached/inner-Oort-cloud body",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 56795.95090675017
+        },
+        {
+          "d": 2,
+          "sin_tilt": 40160.80203010129
+        },
+        {
+          "d": 3,
+          "sin_tilt": 32791.15754489298
+        },
+        {
+          "d": 5,
+          "sin_tilt": 25399.921414846838
+        },
+        {
+          "d": 8,
+          "sin_tilt": 20080.401015050644
+        },
+        {
+          "d": 13,
+          "sin_tilt": 15752.362556386403
+        },
+        {
+          "d": 21,
+          "sin_tilt": 12393.892580818021
+        },
+        {
+          "d": 34,
+          "sin_tilt": 9740.425222331047
+        },
+        {
+          "d": 55,
+          "sin_tilt": 7658.364457960003
+        }
+      ]
+    },
+    {
+      "name": "Orcus+Vanth",
+      "m_sun": 6.3e-10,
+      "a_au": 39.42,
+      "e_obs": 0.226,
+      "min_sin_tilt": 55.436309207895086,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "plutino (3:2 resonance)",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 411.1266724777589
+        },
+        {
+          "d": 2,
+          "sin_tilt": 290.71045803568404
+        },
+        {
+          "d": 3,
+          "sin_tilt": 237.3640950260692
+        },
+        {
+          "d": 5,
+          "sin_tilt": 183.86143740471215
+        },
+        {
+          "d": 8,
+          "sin_tilt": 145.35522901784202
+        },
+        {
+          "d": 13,
+          "sin_tilt": 114.0260229484192
+        },
+        {
+          "d": 21,
+          "sin_tilt": 89.71519508784039
+        },
+        {
+          "d": 34,
+          "sin_tilt": 70.50764264428328
+        },
+        {
+          "d": 55,
+          "sin_tilt": 55.436309207895086
+        }
+      ]
+    },
+    {
+      "name": "Salacia+Actaea",
+      "m_sun": 4.92e-10,
+      "a_au": 42.18,
+      "e_obs": 0.106,
+      "min_sin_tilt": 25.432493632539057,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 188.61242080070622
+        },
+        {
+          "d": 2,
+          "sin_tilt": 133.36912176419
+        },
+        {
+          "d": 3,
+          "sin_tilt": 108.89543192179471
+        },
+        {
+          "d": 5,
+          "sin_tilt": 84.35003886223488
+        },
+        {
+          "d": 8,
+          "sin_tilt": 66.684560882095
+        },
+        {
+          "d": 13,
+          "sin_tilt": 52.31167341433362
+        },
+        {
+          "d": 21,
+          "sin_tilt": 41.15860453943332
+        },
+        {
+          "d": 34,
+          "sin_tilt": 32.34676330762462
+        },
+        {
+          "d": 55,
+          "sin_tilt": 25.432493632539057
+        }
+      ]
+    },
+    {
+      "name": "Varuna",
+      "m_sun": 2e-10,
+      "a_au": 42.7,
+      "e_obs": 0.054,
+      "min_sin_tilt": 8.413781604055163,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO; LOW eccentricity",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 62.39827440274722
+        },
+        {
+          "d": 2,
+          "sin_tilt": 44.122242964521526
+        },
+        {
+          "d": 3,
+          "sin_tilt": 36.025660523394244
+        },
+        {
+          "d": 5,
+          "sin_tilt": 27.905356648645572
+        },
+        {
+          "d": 8,
+          "sin_tilt": 22.061121482260763
+        },
+        {
+          "d": 13,
+          "sin_tilt": 17.306167527659788
+        },
+        {
+          "d": 21,
+          "sin_tilt": 13.616419794534027
+        },
+        {
+          "d": 34,
+          "sin_tilt": 10.701215775405174
+        },
+        {
+          "d": 55,
+          "sin_tilt": 8.413781604055163
+        }
+      ]
+    },
+    {
+      "name": "2002 MS4",
+      "m_sun": 1.5e-10,
+      "a_au": 41.93,
+      "e_obs": 0.143,
+      "min_sin_tilt": 18.776283123895272,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 139.24864249671197
+        },
+        {
+          "d": 2,
+          "sin_tilt": 98.46365938044629
+        },
+        {
+          "d": 3,
+          "sin_tilt": 80.39524122976661
+        },
+        {
+          "d": 5,
+          "sin_tilt": 62.27388607944279
+        },
+        {
+          "d": 8,
+          "sin_tilt": 49.231829690223144
+        },
+        {
+          "d": 13,
+          "sin_tilt": 38.62062465851145
+        },
+        {
+          "d": 21,
+          "sin_tilt": 30.386544983858435
+        },
+        {
+          "d": 34,
+          "sin_tilt": 23.88094517120113
+        },
+        {
+          "d": 55,
+          "sin_tilt": 18.776283123895272
+        }
+      ]
+    },
+    {
+      "name": "Ixion",
+      "m_sun": 1.3e-10,
+      "a_au": 39.61,
+      "e_obs": 0.241,
+      "min_sin_tilt": 27.048092751756375,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "plutino",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 200.5940245443988
+        },
+        {
+          "d": 2,
+          "sin_tilt": 141.84139502084514
+        },
+        {
+          "d": 3,
+          "sin_tilt": 115.81301406853905
+        },
+        {
+          "d": 5,
+          "sin_tilt": 89.7083749523074
+        },
+        {
+          "d": 8,
+          "sin_tilt": 70.92069751042257
+        },
+        {
+          "d": 13,
+          "sin_tilt": 55.63477238819322
+        },
+        {
+          "d": 21,
+          "sin_tilt": 43.77320483002558
+        },
+        {
+          "d": 34,
+          "sin_tilt": 34.40159139740609
+        },
+        {
+          "d": 55,
+          "sin_tilt": 27.048092751756375
+        }
+      ]
+    },
+    {
+      "name": "2002 AW197",
+      "m_sun": 1.2e-10,
+      "a_au": 47.42,
+      "e_obs": 0.131,
+      "min_sin_tilt": 18.503117546841793,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 137.2227923574413
+        },
+        {
+          "d": 2,
+          "sin_tilt": 97.0311670093003
+        },
+        {
+          "d": 3,
+          "sin_tilt": 79.22561610652087
+        },
+        {
+          "d": 5,
+          "sin_tilt": 61.36789835471548
+        },
+        {
+          "d": 8,
+          "sin_tilt": 48.51558350465015
+        },
+        {
+          "d": 13,
+          "sin_tilt": 38.05875492362329
+        },
+        {
+          "d": 21,
+          "sin_tilt": 29.944468240532505
+        },
+        {
+          "d": 34,
+          "sin_tilt": 23.53351473860546
+        },
+        {
+          "d": 55,
+          "sin_tilt": 18.503117546841793
+        }
+      ]
+    },
+    {
+      "name": "2003 AZ84",
+      "m_sun": 1.3e-10,
+      "a_au": 39.49,
+      "e_obs": 0.176,
+      "min_sin_tilt": 19.66326848871008,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "plutino",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 145.8267020173275
+        },
+        {
+          "d": 2,
+          "sin_tilt": 103.11504987452227
+        },
+        {
+          "d": 3,
+          "sin_tilt": 84.19308566473939
+        },
+        {
+          "d": 5,
+          "sin_tilt": 65.21568372907001
+        },
+        {
+          "d": 8,
+          "sin_tilt": 51.557524937261135
+        },
+        {
+          "d": 13,
+          "sin_tilt": 40.445050111944795
+        },
+        {
+          "d": 21,
+          "sin_tilt": 31.821995254293945
+        },
+        {
+          "d": 34,
+          "sin_tilt": 25.009073071969908
+        },
+        {
+          "d": 55,
+          "sin_tilt": 19.66326848871008
+        }
+      ]
+    },
+    {
+      "name": "2004 GV9",
+      "m_sun": 1e-10,
+      "a_au": 41.85,
+      "e_obs": 0.077,
+      "min_sin_tilt": 8.231416619685882,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 61.04581948156854
+        },
+        {
+          "d": 2,
+          "sin_tilt": 43.16591291850697
+        },
+        {
+          "d": 3,
+          "sin_tilt": 35.2448203105849
+        },
+        {
+          "d": 5,
+          "sin_tilt": 27.300520420593646
+        },
+        {
+          "d": 8,
+          "sin_tilt": 21.582956459253484
+        },
+        {
+          "d": 13,
+          "sin_tilt": 16.931064022577996
+        },
+        {
+          "d": 21,
+          "sin_tilt": 13.32128993499513
+        },
+        {
+          "d": 34,
+          "sin_tilt": 10.469271669954008
+        },
+        {
+          "d": 55,
+          "sin_tilt": 8.231416619685882
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "m_sun": 1e-10,
+      "a_au": 45.84,
+      "e_obs": 0.106,
+      "min_sin_tilt": 12.990128386231861,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 96.33737048515115
+        },
+        {
+          "d": 2,
+          "sin_tilt": 68.12080795173114
+        },
+        {
+          "d": 3,
+          "sin_tilt": 55.62040678262273
+        },
+        {
+          "d": 5,
+          "sin_tilt": 43.08338183567597
+        },
+        {
+          "d": 8,
+          "sin_tilt": 34.06040397586557
+        },
+        {
+          "d": 13,
+          "sin_tilt": 26.719179155967975
+        },
+        {
+          "d": 21,
+          "sin_tilt": 21.02253773815285
+        },
+        {
+          "d": 34,
+          "sin_tilt": 16.521722734553112
+        },
+        {
+          "d": 55,
+          "sin_tilt": 12.990128386231861
+        }
+      ]
+    },
+    {
+      "name": "Varda",
+      "m_sun": 1.4e-10,
+      "a_au": 45.93,
+      "e_obs": 0.144,
+      "min_sin_tilt": 20.94169560828242,
+      "best_d": 55,
+      "predicted_tilt_deg": null,
+      "measured_obliquity_deg": null,
+      "law4_compliant": false,
+      "notes": "classical KBO with companion",
+      "per_d_sin_tilt": [
+        {
+          "d": 1,
+          "sin_tilt": 155.307771287362
+        },
+        {
+          "d": 2,
+          "sin_tilt": 109.81917824826303
+        },
+        {
+          "d": 3,
+          "sin_tilt": 89.66698355999927
+        },
+        {
+          "d": 5,
+          "sin_tilt": 69.45574680650628
+        },
+        {
+          "d": 8,
+          "sin_tilt": 54.909589124131514
+        },
+        {
+          "d": 13,
+          "sin_tilt": 43.07462560420135
+        },
+        {
+          "d": 21,
+          "sin_tilt": 33.89093418758217
+        },
+        {
+          "d": 34,
+          "sin_tilt": 26.635063037418938
+        },
+        {
+          "d": 55,
+          "sin_tilt": 20.94169560828242
+        }
+      ]
+    }
+  ],
+  "threshold_analysis": {
+    "a_au": 45,
+    "d_max": 55,
+    "note": "Maximum mass that satisfies Law 4 with sin(tilt) \u2264 1 at d = 55, for various e values"
+  }
+}

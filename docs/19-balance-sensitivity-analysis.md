@@ -1,6 +1,6 @@
 # Doc 19 — Dual-Balance Sensitivity Analysis
 
-> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions (§2), computes single-parameter sensitivities Δm/m, Δa/a, Δe/e per planet (§3), and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 4–6 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods (§4). §5 then extends the framework's own Law 4 to external bodies, showing that **every body following Law 4 contributes a uniform `v = K · sin(tilt) ≈ 1.7 × 10⁻⁶` to the balance equation** — independent of mass and distance, because the huge `a^(3/2)` factor cancels with the tiny Law-4-predicted eccentricity amplitude. Random ± aggregation across N ≈ 625 minor bodies (TNOs with absolute magnitude H<8) gives σ ≈ 4.3 × 10⁻⁵, matching the framework's observed residual. §6 uses this result to derive the principled Law 5 threshold at 99.862% — exactly the framework's current achievement — analogous to Law 3's Li-2019-derived 99.994%, and distinguishes it from the looser 99% screening filter used in `balance-search.js`. Reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) and [`scripts/tno_balance_test.py`](../scripts/tno_balance_test.py).
+> **Scope.** The Holistic-Universe model's eight-planet dual balance closes to 99.997% on Law 3 (inclination) and 99.862% on Law 5 (eccentricity) using phase-derived base eccentricities ([doc 10](10-fibonacci-laws.md)). The remaining 0.14% eccentricity-balance gap is small but real. This document decomposes that gap into per-planet contributions (§2), computes single-parameter sensitivities Δm/m, Δa/a, Δe/e per planet (§3), and shows that the gap cannot be attributed to any single observed planetary parameter being mis-measured — the required shifts are 4–6 orders of magnitude larger than the precision of DE440 masses and JPL orbital periods (§4). §5 then extends the framework's own Law 4 to external bodies, showing that **every body following Law 4 contributes a uniform `v = K · sin(tilt) ≈ 1.7 × 10⁻⁶` to the balance equation** — independent of mass and distance, because the huge `a^(3/2)` factor cancels with the tiny Law-4-predicted eccentricity amplitude. Random ± aggregation across N ≈ 625 such bodies gives σ ≈ 4.3 × 10⁻⁵, matching the framework's observed residual. **Per [doc 27](27-law4-tno-obliquity-predictions.md), the relevant population is the sub-200-km low-`e` classical-belt KBOs (the Law-4-admissible regime); large named TNOs (Pluto, Eris, Haumea, ...) are *not* part of the N = 625 because their externally-forced `e_amp` values give individual `v` contributions ~10–40× larger than K · sin(tilt).** §6 uses this result to derive the principled Law 5 threshold at 99.862% — exactly the framework's current achievement — analogous to Law 3's Li-2019-derived 99.994%, and distinguishes it from the looser 99% screening filter used in `balance-search.js`. Reproducible via [`tools/verify/dual-balance-optimizer.js`](../tools/verify/dual-balance-optimizer.js) and [`scripts/tno_balance_test.py`](../scripts/tno_balance_test.py).
 
 ---
 
@@ -109,7 +109,7 @@ $$
 v = \sqrt{m} \cdot a^{3/2} \cdot e_{\text{amp}} / \sqrt{d} = K \cdot \sin(\text{tilt})
 $$
 
-**Every body following Law 4 contributes the SAME v to the eccentricity balance, regardless of its mass or distance.** This is the framework-natural extension of Law 5 to external bodies. With K = 3.4149 × 10⁻⁶ and ⟨sin(tilt)⟩ ≈ 0.5 (isotropic average for unmeasured TNO axial obliquities):
+**Every body where actual `e_amp` matches the Law-4 intrinsic prediction contributes the SAME v to the eccentricity balance, regardless of its mass or distance.** This is the framework-natural extension of Law 5 to external bodies. (Which bodies actually satisfy `actual ≈ intrinsic` is the central population question — see §5.2 caveat and §5.4.) With K = 3.4149 × 10⁻⁶ and ⟨sin(tilt)⟩ ≈ 0.5 (isotropic average for unmeasured TNO axial obliquities):
 
 $$
 v_{\text{per body}} \approx 1.7 \times 10^{-6}
@@ -135,6 +135,22 @@ $$
 | 10000 | 1.7 × 10⁻⁴ | 4.0× |
 
 **The framework's 4.27 × 10⁻⁵ residual is quantitatively consistent with the random-residual contribution from ~625 minor bodies.** This is well within the order of magnitude of the known + extrapolated TNO population (catalogued ≥ 4000, expected total > 10⁵ in the Kuiper belt).
+
+#### Population caveat — which 625?
+
+The √N aggregation requires each body's *actual* v contribution to be roughly K · sin(tilt) ≈ 1.7 × 10⁻⁶. Per [doc 27 §2.4](27-law4-tno-obliquity-predictions.md#24-why-no-individual-tno-obliquity-prediction-is-possible), this is only true in the Law-4-admissible regime — empirically the **sub-200-km low-`e` classical-belt KBO** population, where intrinsic Law-4 amplitude dominates external forcing.
+
+Large named TNOs are **not** part of this aggregation. Their `e_amp` values are dominated by external forcing (Neptune resonance, scattering, tides) and run far above Law 4's intrinsic prediction. Worked example for Pluto with its integrated `e_amp ≈ 0.025`:
+
+```
+v_Pluto = √m · a^(3/2) · e_amp / √d
+       = √(7.27×10⁻⁹) · 39.482^(3/2) · 0.025 / √55
+       ≈ 7.1 × 10⁻⁵
+```
+
+That is **~40× the K · sin(tilt) value** and **~1.6× the entire framework residual** from a single body. A √N aggregation that includes Pluto-class bodies is dominated by their individual variance, not by random aggregation — so they cannot be among the 625.
+
+The corollary: the 625 must be a population *smaller and more dynamically quiescent than the named TNOs* — sub-200-km classical-belt bodies in the Law-4-compatible regime. Whether ~625 such bodies exist at the right size/eccentricity slice is an open empirical question; surveys like Col-OSSOS enumerate 10⁴–10⁵ bodies > 100 km in the cold classical belt, so 625 in the relevant slice is plausible but not directly counted.
 
 ### 5.3 Mass uncertainty contribution
 
@@ -176,7 +192,11 @@ The mass-uncertainty channel is small enough to be effectively absorbed in the c
 
 **The framework's claim stands empirically:** the 8-planet Law 5 balance closes to 99.862% with a residual quantitatively consistent with the sum of expected external-body contributions, under the framework's own Law 4 extended to minor bodies.
 
-The required assumption (Law 4 applies to TNOs, with their oscillation midpoints near the framework-predicted amplitudes rather than at the observed scalar eccentricity) is plausible — distant outer planets like Neptune have base/amp ratio ~1000× — but has not been formally derived for the TNO regime, particularly for resonant orbits (plutinos at 3:2 with Neptune) and scattered-disk dynamics (Sedna and similar). Formal extension of Law 4 to TNOs is open theoretical work.
+The required assumption is that **for the relevant population, each body's actual `e_amp` ≈ its Law-4 intrinsic prediction** — i.e., external forcing on that body's eccentricity amplitude is negligible. By analogy with distant outer planets (Neptune's base/amp ratio ~1000×), this is *plausible for non-resonant non-scattered bodies* — but [doc 27 §2.1](27-law4-tno-obliquity-predictions.md#21-pluto-the-one-body-where-we-can-decompose-intrinsic-vs-external) has now tested it against the one body with integrated `e_amp` data:
+
+- **Pluto**: Law-4 intrinsic `e_amp ≈ 0.001`, actual `e_amp ≈ 0.025`. Decomposition is **intrinsic + external ≈ 1 : 24**. The Law-4 intrinsic component is correctly captured; the additional ~96% is Neptune-resonance forcing.
+
+This means the assumption **fails individually for resonant/scattered bodies** (Pluto-class), which is exactly the doc 27 §7 reading: such bodies are "non-planets" because external forcing dominates. The √N = 625 aggregation therefore restricts to a population where the assumption *does* hold — sub-200-km low-`e` classical-belt KBOs (no resonance, weak scattering, no detachment), where actual `e_amp` should approximate Law-4 intrinsic. Formal extension of Law 4 to that population, with bottom-up N count, is open theoretical work (§6.5).
 
 **Testable prediction.** A future Uranus or Neptune orbiter (e.g., NASA's proposed Uranus Orbiter and Probe mission, target launch ~2032) would shrink the mass-uncertainty channel by ~100× (typical orbiter precision ~10⁻⁶ vs current ~5 × 10⁻⁴). The Law 5 residual would not move significantly — most of it is in the minor-body channel — but the mass-uncertainty budget would essentially vanish, sharpening the framework's prediction.
 
@@ -208,7 +228,7 @@ $$
 
 The implied threshold depends on the minor-body population size N:
 
-| N (minor bodies) | σ_external | Δ_balance | Implied threshold | Empirical category |
+| N (minor bodies) | σ_external | Δ_balance | Implied threshold | Original empirical-category mapping |
 |---:|---:|---:|---:|---|
 | 30 | 9.4 × 10⁻⁶ | 0.030% | 99.970% | Major dwarf planets (H<5) |
 | 100 | 1.7 × 10⁻⁵ | 0.055% | 99.945% | TNOs with H<6 (>600 km) |
@@ -218,6 +238,8 @@ The implied threshold depends on the minor-body population size N:
 
 The threshold varies by ~1.7 percentage points across realistic N values — significantly wider than the framework's measurement precision. A bottom-up theoretical derivation of N (which bodies follow Law 4?) is open work (§6.5).
 
+> ⚠️ **Empirical-category caveat.** The "Original empirical-category mapping" column above pairs N values with named-TNO populations at various size cuts. Per [doc 27 §2.4](27-law4-tno-obliquity-predictions.md#24-why-no-individual-tno-obliquity-prediction-is-possible) and the population caveat in §5.2, **none of those named populations actually fit the Law-4-admissible regime** — they sit above the curve at their observed eccentricities. The mapping is retained here for historical context (the table was originally calibrated against these named categories), but the *correct* population that the √N = 625 actually counts is the **sub-200-km low-`e` cold-classical-belt KBOs** — bodies smaller than any named TNO, enumerated only statistically. The N values themselves remain meaningful (they parameterise the √N dependence of the threshold); the labels in the rightmost column do not.
+
 #### Calibrated N from the framework's residual
 
 The most defensible "natural" N value is the one that makes the predicted σ_external equal to the framework's observed residual:
@@ -226,7 +248,7 @@ $$
 N_{\text{calibrated}} = \left(\frac{\text{gap}}{K \cdot \langle\sin(\text{tilt})\rangle}\right)^2 = \left(\frac{4.27 \times 10^{-5}}{1.7 \times 10^{-6}}\right)^2 \approx 625
 $$
 
-N = 625 sits squarely in the empirical "TNOs with absolute magnitude H<8" category (which contains ~500–1000 known bodies), so the calibrated value is **not arbitrary** — it falls within a defensible empirical population class.
+N = 625 was originally calibrated against the "TNOs with absolute magnitude H<8" (>250 km diameter) population. Per [doc 27 §2.4](27-law4-tno-obliquity-predictions.md#24-why-no-individual-tno-obliquity-prediction-is-possible), bodies in this size range sit above Law 4's admissibility curve at their observed eccentricities and do **not** fit the K · sin(tilt) per-body model — they belong to the externally-forced regime (§5.2 population caveat). The correct interpretation of "N=625" is therefore: ~625 bodies from the **sub-200-km low-`e` classical-belt KBO** population (where Law 4 actually admits the body and the intrinsic K · sin(tilt) contribution is the dominant v). This population is enumerated only statistically (via surveys like Col-OSSOS), not by named-body catalogue. The calibration is internally consistent under this revised population, but **less directly observed** than the original H<8 framing suggested.
 
 **The framework's principled Law 5 threshold, derived analogously to Law 3's, is therefore 100% − 0.138% = 99.862% — exactly the framework's current achievement.**
 
@@ -263,7 +285,13 @@ Under Law-4 extension:
 
 This is consistent with the 19-body sample being a small fraction of the ~625 minor bodies that combine to give σ ≈ gap.
 
-> **Sanity check on the framework's interpretation.** As a methodological check, the same 19-TNO sample was also tested using their *currently-observed* eccentricities (e ≈ 0.15 typical) instead of Law-4-derived values. That interpretation produces per-body v values 100–500× the gap (Sedna alone gives v = 0.19 ≈ 4500× the residual) and is empirically incompatible with the framework's 99.86% closure. This confirms that the Law-4 extension is the correct framework reading — using observed e treats TNOs as if their oscillation midpoints sit at observed values, contradicting the framework's prediction that distant low-mass bodies have small oscillation midpoints. Details in `scripts/tno_balance_test.py`.
+> **Methodological sanity check (limited scope).** As a methodological check, the same 19-TNO sample was tested using their *currently-observed* eccentricities (e ≈ 0.15 typical) instead of Law-4-derived values. That interpretation produces per-body v values 100–500× the gap (Sedna alone gives v = 0.19 ≈ 4500× the residual) and is empirically incompatible with the framework's 99.86% closure. This demonstrates that **observed-e cannot be the input to v**: it would shatter the framework's residual by orders of magnitude. Details in `scripts/tno_balance_test.py`.
+>
+> **What this does and does not show (per [doc 27](27-law4-tno-obliquity-predictions.md)).** The 19-TNO sanity sample (Pluto, Eris, Haumea, ...) consists entirely of bodies that the doc 27 analysis identifies as **outside** the Law-4-admissible regime — they sit above the admissibility curve at their observed eccentricities. Pluto's actual integrated `e_amp ≈ 0.025` gives a v contribution ~40× the K · sin(tilt) value, decomposable into intrinsic (~0.001, Law-4 amount) + external (~0.024, Neptune-driven) — see [doc 27 §2.1](27-law4-tno-obliquity-predictions.md#21-pluto-the-one-body-where-we-can-decompose-intrinsic-vs-external). So the §6.4 sanity check:
+> - ✅ **Does show** that observed-e fails wildly as a v-input for any TNO (rules out that reading).
+> - ❌ **Does not confirm** that Law-4 extension applies to these 19 specific bodies — they are not in the admissible regime.
+>
+> The framework's actual claim (per the §5.2 population caveat) is restricted to sub-200-km low-`e` cold-classical-belt KBOs, which are *not* in this 19-body sample. The 19-TNO sanity check rules out one wrong interpretation; it does not validate the framework's chosen one.
 
 ### 6.5 Path forward
 
@@ -302,7 +330,7 @@ To prevent over-interpretation:
 
 4. **It does not claim the phase-derived bases are wrong.** The Δe/e column is informational — it shows the size of the gap in eccentricity units. The phase-derived approach remains the framework's authoritative source.
 
-5. **It does not formally extend Law 4 to TNOs.** §5 extends Law 4 to TNOs *by analogy* (because Neptune's base/amp ≈ 1000× suggests distant bodies have small base eccentricities near their Law-4 amplitudes). Under that extension, each body contributes v = K · sin(tilt) ≈ 1.7×10⁻⁶, and random ± across ~625 minor bodies gives σ ≈ gap. This analogy-based extension is plausible but has not been formally derived for the TNO regime — particularly for resonant orbits (plutinos at 3:2 with Neptune) and scattered-disk dynamics (Sedna). A complete formal derivation would constitute a non-trivial framework extension.
+5. **It does not formally extend Law 4 to TNOs, and the per-body extension has now been individually tested and failed.** §5 extends Law 4 to TNOs *by analogy* (because Neptune's base/amp ≈ 1000× suggests distant bodies have small base eccentricities near their Law-4 amplitudes). Under that extension, each body contributes v = K · sin(tilt) ≈ 1.7×10⁻⁶, and random ± across ~625 minor bodies gives σ ≈ gap. **[Doc 27](27-law4-tno-obliquity-predictions.md) tests this against the one body where independent integrated `e_amp` data exists — Pluto, with `e_amp ≈ 0.025` — and finds Law 4 under-predicts by ~25×.** The per-body extension therefore fails individually for resonance-forced bodies like Pluto. The framework's claim in §5 is retained at the **statistical** level (aggregate σ across the Law-4-admissible sub-200-km classical-belt KBO population) but **not** at the individual level: Pluto and other named TNOs are *not* part of the √N = 625 — see the §5.2 population caveat. Whether the right population of sub-200-km low-`e` bodies exists at N ≈ 625 to close the budget is an empirical open question.
 
 6. **It does not claim the derived 99.862% Law 5 threshold is final or N-independent.** The §6.2 derivation calibrates N from the framework's observed residual, which means the threshold *cannot* be tighter than the residual — it is a self-consistency check rather than an independent prediction. A bottom-up N derivation (independent count of bodies following Law 4) would produce an N-independent threshold that could be tighter or looser; until that is done, the 99.862% number should be read as "the framework's claim is consistent with a calibrated population of ~625 minor bodies" rather than "the framework predicts 99.862% from first principles." The two-tier separation (search filter 99% vs scientific bound 99.862%) is also intentional: the search filter could be tightened in a future revision once N is independently constrained.
 
