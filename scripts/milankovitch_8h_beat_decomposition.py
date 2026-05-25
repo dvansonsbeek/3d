@@ -90,7 +90,7 @@ EARTH_FIBONACCI = {
     "H/5 (ecliptic precession)":         40,
     "H/8 (obliquity / Jupiter ICRF)":    64,
     "H/13 (axial precession)":          104,
-    "H/16 (climatic precession)":       128,
+    "H/16 (perihelion precession)":     128,
 }
 
 

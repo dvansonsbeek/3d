@@ -83,7 +83,7 @@ The Fibonacci H/n anchors remain real in Earth's intrinsic frame, but in the hel
 | Earth's intrinsic clock | What climate observes | Offset |
 |---|---|---|
 | H/8 = 41.91 kyr (obliquity) | k+s₃ = 41.27 kyr (n=65) | 0.6 kyr |
-| H/16 = 20.96 kyr (climatic precession) | k+g₂ = 22.4, k+g₅ = 23.7 kyr (n=120, 113) | 1.4–2.7 kyr |
+| H/16 = 20.96 kyr (perihelion precession) | k+g₂ = 22.4, k+g₅ = 23.7 kyr (n=120, 113) — climatic precession peaks | 1.4–2.7 kyr |
 | H/3 = 111.77 kyr (inclination precession) | s₁−s₄ = 107.3 kyr (n=25) | 4.5 kyr |
 
 Both descriptions of the same physics are valid — they measure the same geometry in different reference frames. The intrinsic H/n positions in the climate spectrum therefore appear **near zero amplitude** (§2.5): the energy has been carried into the offset positions by the frame transformation.
@@ -284,7 +284,7 @@ The model's intrinsic Earth precession periods are the Fibonacci divisors of H:
 | 40 | 67.06 kyr | H/5 = ecliptic precession |
 | 64 | 41.91 kyr | H/8 = obliquity (model) / Jupiter ICRF perihelion |
 | 104 | 25.79 kyr | H/13 = axial precession |
-| 128 | 20.96 kyr | H/16 = climatic precession |
+| 128 | 20.96 kyr | H/16 = perihelion precession |
 
 **Every one of these integers has amplitude below the significance threshold in LR04** (0.014–0.078, none above 0.085). The fitted formula passes near zero at these specific frequencies.
 

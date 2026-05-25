@@ -1,6 +1,6 @@
 # Milankovitch Language of the Holistic Model
 
-> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 climatic precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks within 0.4 %.
+> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 perihelion precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks (at ~19–24 kyr) within 0.4 % when expressed as 8H/n integer divisors. *Note: in this framework H/16 = 20,957 yr is **perihelion precession** (the rotation of Earth's apsidal line in the ecliptic frame), distinct from **climatic precession** (~23.7 kyr dominant, the parameter e·sin ϖ that drives seasonal insolation — captured in the 8H lattice at n=113 and n=120).*
 >
 > For the **100-kyr ice age problem**, the model's H/3 = 111,772 yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
@@ -43,7 +43,7 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 | **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); also matches Jupiter's perihelion period |
 | **Obliquity oscillation** | H/8 | **41,915** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
 | **Axial precession** | H/13 | **25,794** | Earth's spin-axis equinox precession |
-| **Climatic precession** | H/16 | **20,957** | Beat: f_axial + f_apsidal (13 + 3 = 16) |
+| **Perihelion precession** | H/16 | **20,957** | Beat: f_axial + f_apsidal (13 + 3 = 16). Also the Berger climatic-precession centroid in the ~19–24 kyr band; dominant Berger peak is at 23.7 kyr (n=113, see §4.2). |
 
 All five periods are integer divisors of H using divisors from the Fibonacci-related set {3, 5, 8, 13, 16 = 2·F₆}. There is no degree of freedom; every Milankovitch period in the model is locked to H by integer arithmetic.
 
@@ -56,7 +56,7 @@ The five cycles are not independently chosen — they must satisfy four **kinema
 | Physical identity | Model form | Fibonacci arithmetic |
 |---|---|---|
 | f_obliquity = f_axial − f_nodal | 8/H = 13/H − 5/H | **13 − 5 = 8** (F₇ − F₅ = F₆) |
-| f_climatic = f_axial + f_apsidal | 16/H = 13/H + 3/H | **13 + 3 = 16** |
+| f_perihelion = f_axial + f_apsidal | 16/H = 13/H + 3/H | **13 + 3 = 16** |
 | f_apsidal = f_obliquity − f_nodal | 3/H = 8/H − 5/H | **8 − 5 = 3** (F₆ − F₅ = F₄) |
 | f_nodal = f_axial − f_obliquity | 5/H = 13/H − 8/H | **13 − 8 = 5** (F₇ − F₆ = F₅) |
 
