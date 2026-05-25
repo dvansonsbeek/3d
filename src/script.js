@@ -25051,6 +25051,368 @@ function cfmRenderChart(tabKey) {
   `;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// Paper export — white-background SVG of the current tab.
+// Mirrors renderVFPPaperChart's style (Formula Verification modal).
+//
+// opts.includeData   default true   — overlay the proxy data line
+// opts.layers        default ['total'] — which formula layers to draw
+//                                     subset of ['l1','l2','total']
+// opts.titleSuffix   default ''    — appended to the chart title
+// ───────────────────────────────────────────────────────────────────
+function cfmRenderPaperChart(tabKey, opts) {
+  opts = opts || {};
+  const includeData = opts.includeData !== false;
+  const layers = opts.layers || ['total'];
+  const titleSuffix = opts.titleSuffix || '';
+  // SVG/XML entity escaping — proxy labels contain '&' (e.g. "Lisiecki & Raymo")
+  // which would break the SVG parser if inserted raw into text elements.
+  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Tab → window + title (mirrors cfmRenderChart switch)
+  let t_lo, t_hi, title, isCenogrid = false, isEpica = false, isCenco2pip = false;
+  switch (tabKey) {
+    case 'past200':    t_lo = 0;    t_hi = 200;   title = 'Climate Formula — Last 200 kyr'; break;
+    case 'postMPT':    t_lo = 0;    t_hi = 700;   title = 'Climate Formula — Post-MPT (0–700 kyr BP)'; break;
+    case 'postMPText': t_lo = 0;    t_hi = 1200;  title = 'Climate Formula — Post-MPT extended (0–1,200 kyr BP)'; break;
+    case 'full':       t_lo = 0;    t_hi = 5320;  title = 'Climate Formula — Full LR04 (0–5,320 kyr BP)'; break;
+    case 'cenogrid':
+      t_lo = 0; t_hi = 67000; isCenogrid = true;
+      title = `Climate Formula — CENOGRID (0–67 Myr BP, ${cfmSelectedProxy === 'd13c' ? 'δ¹³C' : 'δ¹⁸O'})`;
+      break;
+    case 'epica':      t_lo = 0;    t_hi = 800;   isEpica = true;
+      title = 'Climate Formula — EPICA CO₂ (0–800 kyr BP)'; break;
+    case 'cenco2pip':  t_lo = 0;    t_hi = 66000; isCenco2pip = true;
+      title = 'Climate Formula — CenCO2PIP CO₂ (0–66 Myr BP)'; break;
+    case 'future':     t_lo = -250; t_hi = 250;
+      title = 'Climate Formula — Forward projection (−250 to +250 kyr)'; break;
+    default:           t_lo = 0;    t_hi = 200;   title = 'Climate Formula'; break;
+  }
+  if (titleSuffix) title += ' — ' + titleSuffix;
+
+  // Data source selection (mirrors cfmRenderChart)
+  let dataAges, dataVals, proxyLabel;
+  if (isCenogrid) {
+    dataAges = cfmCenogridData.age_kyr_BP;
+    dataVals = cfmSelectedProxy === 'd13c' ? cfmCenogridData.d13c_per_mille : cfmCenogridData.d18o_per_mille;
+    proxyLabel = cfmSelectedProxy === 'd13c' ? 'CENOGRID δ¹³C (Westerhold 2020)' : 'CENOGRID δ¹⁸O (Westerhold 2020)';
+  } else if (isEpica) {
+    dataAges = cfmEpicaData.age_kyr_BP; dataVals = cfmEpicaData.co2_ppm;
+    proxyLabel = 'EPICA CO₂ (Bereiter 2015)';
+  } else if (isCenco2pip) {
+    dataAges = cfmCenco2pipData.age_kyr_BP; dataVals = cfmCenco2pipData.co2_ppm;
+    proxyLabel = 'CenCO2PIP CO₂ (Consortium 2023)';
+  } else {
+    dataAges = cfmLR04Data.age_kyr_BP; dataVals = cfmLR04Data.d18o_per_mille;
+    proxyLabel = 'LR04 δ¹⁸O (Lisiecki & Raymo 2005)';
+  }
+  const isCo2 = isEpica || isCenco2pip;
+
+  // Extract proxy data in window
+  const dT = [], dV = [];
+  for (let i = 0; i < dataAges.length; i++) {
+    if (dataAges[i] >= Math.max(0, t_lo) && dataAges[i] <= t_hi) {
+      dT.push(dataAges[i]); dV.push(dataVals[i]);
+    }
+  }
+
+  // Formula evaluation
+  const regimeKey = cfmTabToRegime(tabKey);
+  const nSamples = (tabKey === 'cenogrid' || tabKey === 'cenco2pip') ? 3000 : 800;
+  const dtGrid = (t_hi - t_lo) / nSamples;
+  const useCenogridStitch = tabKey === 'cenogrid' && cfmSelectedProxy !== 'd13c';
+  const useLR04Stitch     = tabKey === 'full' || tabKey === 'postMPText';
+  const evalAt = useCenogridStitch
+    ? (t, layer) => cfmEvalStitchedCenogrid(t, layer)
+    : useLR04Stitch
+    ? (t, layer) => cfmEvalStitched(t, layer)
+    : (t, layer) => cfmEvalRaw(t, regimeKey, layer);
+  const fT = [], totalV = [], l1V = [], l2V = [];
+  for (let t = t_lo; t <= t_hi + 1e-9; t += dtGrid) {
+    fT.push(t);
+    totalV.push(evalAt(t, 'all'));
+    l1V.push(evalAt(t, 'l1'));
+    l2V.push(evalAt(t, 'l2'));
+  }
+
+  // Chart layout — paper-figure size
+  const W = 1000, H = 520, PAD = { l: 80, r: 30, t: 80, b: 70 };
+  const plotW = W - PAD.l - PAD.r;
+  const plotH = H - PAD.t - PAD.b;
+
+  // Y-range — locked to data + Total like the modal chart
+  const allV = [];
+  if (includeData) allV.push(...dV);
+  if (layers.includes('total')) allV.push(...totalV);
+  if (layers.includes('l1'))    allV.push(...l1V);
+  if (layers.includes('l2'))    allV.push(...l2V);
+  const finiteV = allV.filter(v => Number.isFinite(v));
+  const ymin = finiteV.length ? Math.min(...finiteV) : -1;
+  const ymax = finiteV.length ? Math.max(...finiteV) : 1;
+  const yPad = (ymax - ymin) * 0.08 || 0.2;
+  let y0 = ymin - yPad, y1 = ymax + yPad;
+  if (isCo2) y0 = Math.max(0, y0);
+
+  const xmin = t_lo, xmax = t_hi;
+  // x runs left → right = past → future (today on left edge for forward tab,
+  // past on left for backward tabs because xmin = 0; same convention as modal).
+  const sx = x => PAD.l + ((xmax - x) / (xmax - xmin)) * plotW;
+  // y inverted for δ¹⁸O/δ¹³C, standard for CO₂
+  const sy = isCo2
+    ? y => PAD.t + ((y1 - y) / (y1 - y0)) * plotH
+    : y => PAD.t + ((y - y0) / (y1 - y0)) * plotH;
+
+  function buildPath(ts, vs) {
+    let p = '';
+    let started = false;
+    for (let i = 0; i < ts.length; i++) {
+      if (!Number.isFinite(vs[i])) { started = false; continue; }
+      const x = sx(ts[i]).toFixed(1), y = sy(vs[i]).toFixed(1);
+      p += started ? ` L${x},${y}` : ` M${x},${y}`;
+      started = true;
+    }
+    return p;
+  }
+
+  // Paper palette — data as near-black "ground truth", formula in bold red
+  // for maximum contrast on white background.
+  const colors = {
+    bg:       '#ffffff',
+    plotBg:   '#ffffff',
+    border:   '#ccc',
+    grid:     '#e8e8e8',
+    gridMaj:  '#ddd',
+    tickText: '#555',
+    axisLabel:'#444',
+    title:    '#222',
+    subtitle: '#666',
+    data:     '#1f2937',  // slate-800 (near-black, conventional ground truth)
+    total:    '#dc2626',  // red-600 (bold model curve)
+    l1:       '#b45309',  // amber-700
+    l2:       '#15803d',  // green-700
+    today:    '#7c3aed',  // violet-600 (distinct from formula red)
+    event:    '#9ca3af',  // gray-400
+    trans:    '#b45309',  // amber-700
+    glacial:  '#1d4ed8',  // blue-700
+    inter:    '#c2410c',  // orange-700
+  };
+
+  // Y-axis ticks + label
+  let yticks = '';
+  for (let i = 0; i <= 4; i++) {
+    const yv = y0 + (y1 - y0) * (i / 4);
+    const yp = sy(yv).toFixed(1);
+    yticks += `<line x1="${PAD.l}" y1="${yp}" x2="${W - PAD.r}" y2="${yp}" stroke="${colors.grid}" stroke-width="0.5"/>`;
+    yticks += `<text x="${PAD.l - 8}" y="${yp}" text-anchor="end" dominant-baseline="middle" fill="${colors.tickText}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${yv.toFixed(2)}</text>`;
+  }
+  const yLabelText = isCo2
+    ? 'CO₂ (ppm)'
+    : (cfmSelectedProxy === 'd13c' && isCenogrid ? 'δ¹³C (‰)' : 'δ¹⁸O (‰)');
+  const yLabel = `<text x="16" y="${PAD.t + plotH / 2}" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,16,${PAD.t + plotH / 2})" fill="${colors.axisLabel}" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${yLabelText}</text>`;
+
+  // X-axis ticks + label
+  let xticks = '';
+  let xAxisLabel;
+  if (isCenogrid || isCenco2pip) {
+    for (let xv = 0; xv <= xmax; xv += 5000) {
+      const xp = sx(xv).toFixed(1);
+      const label = (xv / 1000).toFixed(0) + ' Ma';
+      xticks += `<line x1="${xp}" y1="${PAD.t}" x2="${xp}" y2="${H - PAD.b}" stroke="${colors.grid}" stroke-width="0.5"/>`;
+      xticks += `<line x1="${xp}" y1="${H - PAD.b}" x2="${xp}" y2="${H - PAD.b + 4}" stroke="${colors.tickText}" stroke-width="0.5"/>`;
+      xticks += `<text x="${xp}" y="${H - PAD.b + 16}" text-anchor="middle" fill="${colors.tickText}" font-size="10" font-family="Inter,Helvetica,Arial,sans-serif">${label}</text>`;
+    }
+    xAxisLabel = 'Million years before present (Ma BP) — past ← → present';
+  } else {
+    const span = xmax - xmin;
+    const tickStep = span <= 250 ? 25 : span <= 700 ? 100 : span <= 1500 ? 200 : 500;
+    for (let xv = Math.ceil(xmin / tickStep) * tickStep; xv <= xmax; xv += tickStep) {
+      const xp = sx(xv).toFixed(1);
+      const yearCE = 2000 - xv * 1000;
+      const label = xv === 0 ? '2000 AD' : (yearCE < 0 ? Math.abs(yearCE).toLocaleString() + ' BC' : yearCE.toLocaleString() + ' AD');
+      xticks += `<line x1="${xp}" y1="${PAD.t}" x2="${xp}" y2="${H - PAD.b}" stroke="${colors.grid}" stroke-width="0.5"/>`;
+      xticks += `<line x1="${xp}" y1="${H - PAD.b}" x2="${xp}" y2="${H - PAD.b + 4}" stroke="${colors.tickText}" stroke-width="0.5"/>`;
+      xticks += `<text x="${xp}" y="${H - PAD.b + 16}" text-anchor="middle" fill="${colors.tickText}" font-size="10" font-family="Inter,Helvetica,Arial,sans-serif">${label}</text>`;
+    }
+    xAxisLabel = 'Calendar year (today ≈ 2000 AD; past ← → future)';
+  }
+  const xLabel = `<text x="${PAD.l + plotW / 2}" y="${H - 18}" text-anchor="middle" fill="${colors.axisLabel}" font-size="12" font-weight="500" font-family="Inter,Helvetica,Arial,sans-serif">${xAxisLabel}</text>`;
+
+  // Plot border + clip path
+  const plotBorder = `<rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}" fill="${colors.plotBg}" stroke="${colors.border}" stroke-width="0.5"/>`;
+  const clipDef = `<defs><clipPath id="cfm-paper-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${plotW}" height="${plotH}"/></clipPath></defs>`;
+
+  // "today" line if t=0 is in window
+  let todayMarker = '';
+  if (xmin <= 0 && xmax >= 0) {
+    const x0 = sx(0).toFixed(1);
+    todayMarker = `<line x1="${x0}" y1="${PAD.t}" x2="${x0}" y2="${H - PAD.b}" stroke="${colors.today}" stroke-width="1" stroke-dasharray="3,4"/>` +
+                  `<text x="${x0}" y="${PAD.t - 6}" text-anchor="middle" font-size="10" font-family="Inter,Helvetica,Arial,sans-serif" fill="${colors.today}" font-weight="600">today</text>`;
+  }
+
+  // MIS event markers (past-only windows)
+  let eventMarkers = '';
+  if (tabKey === 'past200' || tabKey === 'postMPT' || tabKey === 'postMPText' || tabKey === 'future' || tabKey === 'epica') {
+    const events = [{ t: 20, label: 'LGM' }, { t: 140, label: 'MIS 6' }, { t: 240, label: 'MIS 8' }, { t: 340, label: 'MIS 10' }, { t: 425, label: 'MIS 11' }];
+    for (const ev of events) {
+      if (ev.t >= xmin && ev.t <= xmax) {
+        const xe = sx(ev.t).toFixed(1);
+        eventMarkers += `<line x1="${xe}" y1="${H - PAD.b - 10}" x2="${xe}" y2="${H - PAD.b}" stroke="${colors.event}" stroke-width="0.7"/>` +
+                        `<text x="${xe}" y="${H - PAD.b - 14}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${colors.event}">${ev.label}</text>`;
+      }
+    }
+  }
+
+  // L3 transition markers
+  let transMarkers = '';
+  if (tabKey === 'full' || tabKey === 'cenogrid' || tabKey === 'cenco2pip' || tabKey === 'postMPText') {
+    const trans = [
+      { t: 56000, label: 'PETM' }, { t: 34000, label: 'EOT' }, { t: 23000, label: 'Mi-1' },
+      { t: 14000, label: 'MMCT' }, { t: 2700,  label: 'iNHG' }, { t: 1000,  label: 'MPT' },
+    ];
+    for (const tr of trans) {
+      if (tr.t >= xmin && tr.t <= xmax) {
+        const xe = sx(tr.t).toFixed(1);
+        transMarkers += `<line x1="${xe}" y1="${PAD.t}" x2="${xe}" y2="${H - PAD.b}" stroke="${colors.trans}" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.7"/>` +
+                        `<text x="${xe}" y="${PAD.t + 12}" text-anchor="middle" font-size="10" font-family="Inter,Helvetica,Arial,sans-serif" fill="${colors.trans}" font-weight="600">${tr.label}</text>`;
+      }
+    }
+  }
+
+  // Forward projection markers (future tab only)
+  let futureMarkers = '';
+  if (tabKey === 'future') {
+    const GLACIAL_D18O = 4.5, INTERGLACIAL_D18O = 3.7;
+    const fT_future = [], fV_future = [];
+    for (let i = 0; i < fT.length; i++) {
+      if (fT[i] < 0) { fT_future.push(fT[i]); fV_future.push(totalV[i]); }
+    }
+    const glacials      = cfmFindExtrema(fT_future, fV_future, 'max', 0.3, 32).filter(p => p.v >= GLACIAL_D18O);
+    const interglacials = cfmFindExtrema(fT_future, fV_future, 'min', 0.3, 32).filter(p => p.v <= INTERGLACIAL_D18O);
+    const plotBot = H - PAD.b;
+    for (const ev of [...glacials, ...interglacials]) {
+      if (ev.t < xmin || ev.t > xmax) continue;
+      const isG = glacials.includes(ev);
+      const xe = sx(ev.t).toFixed(1);
+      const kyr = (-ev.t).toFixed(0);
+      const color = isG ? colors.glacial : colors.inter;
+      const lbl1 = `${isG ? 'Glacial' : 'Interglacial'} ${kyr} kyr`;
+      if (isG) {
+        futureMarkers += `<line x1="${xe}" y1="${plotBot - 10}" x2="${xe}" y2="${plotBot}" stroke="${color}" stroke-width="0.8"/>` +
+                         `<text x="${xe}" y="${plotBot - 14}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
+      } else {
+        futureMarkers += `<line x1="${xe}" y1="${PAD.t}" x2="${xe}" y2="${PAD.t + 10}" stroke="${color}" stroke-width="0.8"/>` +
+                         `<text x="${xe}" y="${PAD.t + 22}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
+      }
+    }
+  }
+
+  // Curves
+  let curvePaths = '';
+  if (includeData) {
+    const dataPath = buildPath(dT, dV);
+    curvePaths += `<path d="${dataPath}" fill="none" stroke="${colors.data}" stroke-width="1.4" opacity="0.9" clip-path="url(#cfm-paper-clip)"/>`;
+  }
+  if (layers.includes('l1')) {
+    curvePaths += `<path d="${buildPath(fT, l1V)}" fill="none" stroke="${colors.l1}" stroke-width="1.6" clip-path="url(#cfm-paper-clip)"/>`;
+  }
+  if (layers.includes('l2')) {
+    curvePaths += `<path d="${buildPath(fT, l2V)}" fill="none" stroke="${colors.l2}" stroke-width="1.6" clip-path="url(#cfm-paper-clip)"/>`;
+  }
+  if (layers.includes('total')) {
+    curvePaths += `<path d="${buildPath(fT, totalV)}" fill="none" stroke="${colors.total}" stroke-width="2.2" clip-path="url(#cfm-paper-clip)"/>`;
+  }
+
+  // Title
+  const titleText = `<text x="${W / 2}" y="22" text-anchor="middle" fill="${colors.title}" font-size="16" font-weight="700" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(title)}</text>`;
+
+  // R² caption (using stitched / single-regime R² same as modal)
+  let r2Caption = '';
+  if (useLR04Stitch || useCenogridStitch) {
+    let ssRes = 0, ssTot = 0;
+    const dMean = dV.length ? dV.reduce((a, b) => a + b, 0) / dV.length : 0;
+    for (let i = 0; i < dT.length; i++) {
+      const yPred = evalAt(dT[i], 'all');
+      if (!Number.isFinite(yPred)) continue;
+      ssRes += (dV[i] - yPred) ** 2;
+      ssTot += (dV[i] - dMean) ** 2;
+    }
+    const stitchedR2 = ssTot > 0 ? 1 - ssRes / ssTot : NaN;
+    r2Caption = `Stitched fit R² = ${stitchedR2.toFixed(4)}`;
+  } else if (CLIMATE_FORMULA_COEFFS && CLIMATE_FORMULA_COEFFS.regimes[regimeKey]) {
+    const r2 = CLIMATE_FORMULA_COEFFS.regimes[regimeKey].r2;
+    r2Caption = `Per-regime R² = ${r2.l1_l2_l3.toFixed(4)} · L1 = ${r2.l1_only.toFixed(4)} · regime: ${regimeKey}`;
+  }
+  const r2Text = r2Caption
+    ? `<text x="${W / 2}" y="42" text-anchor="middle" fill="${colors.subtitle}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(r2Caption)}</text>`
+    : '';
+
+  // Legend
+  const legendItems = [];
+  if (includeData)              legendItems.push({ color: colors.data,  label: proxyLabel,                  width: 1.4 });
+  if (layers.includes('total')) legendItems.push({ color: colors.total, label: 'Total formula (L1+L2+L3)',  width: 2.2 });
+  if (layers.includes('l1'))    legendItems.push({ color: colors.l1,    label: 'L1 only (orbital lattice)', width: 1.6 });
+  if (layers.includes('l2'))    legendItems.push({ color: colors.l2,    label: 'L2 only (carbon thermostat)', width: 1.6 });
+  const legendY = 62;
+  const legendItemWidths = legendItems.map(c => 28 + c.label.length * 6.0 + 16);
+  const legendTotalW = legendItemWidths.reduce((a, b) => a + b, 0);
+  let legendX = (W - legendTotalW) / 2;
+  let legendSVG = '';
+  legendItems.forEach((it, i) => {
+    legendSVG += `<line x1="${legendX}" y1="${legendY}" x2="${legendX + 22}" y2="${legendY}" stroke="${it.color}" stroke-width="${it.width}"/>`;
+    legendSVG += `<text x="${legendX + 28}" y="${legendY + 4}" fill="${colors.title}" font-size="11" font-family="Inter,Helvetica,Arial,sans-serif">${xmlEsc(it.label)}</text>`;
+    legendX += legendItemWidths[i];
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${W}" height="${H}" fill="${colors.bg}"/>
+  ${clipDef}
+  ${titleText}
+  ${r2Text}
+  ${legendSVG}
+  ${plotBorder}
+  ${yticks}
+  ${xticks}
+  ${yLabel}
+  ${xLabel}
+  ${todayMarker}
+  ${eventMarkers}
+  ${transMarkers}
+  ${futureMarkers}
+  ${curvePaths}
+</svg>`;
+}
+
+function exportCfmPaper(opts) {
+  opts = opts || {};
+  const tabKey = cfmSelectedTab;
+  // Ensure needed data is loaded before exporting
+  const needsLR04   = tabKey !== 'cenogrid' && tabKey !== 'epica' && tabKey !== 'cenco2pip';
+  if (needsLR04   && !cfmLR04Data)      { alert('LR04 data not loaded yet'); return; }
+  if (tabKey === 'cenogrid'  && !cfmCenogridData)  { alert('CENOGRID data not loaded yet'); return; }
+  if (tabKey === 'epica'     && !cfmEpicaData)     { alert('EPICA data not loaded yet'); return; }
+  if (tabKey === 'cenco2pip' && !cfmCenco2pipData) { alert('CenCO2PIP data not loaded yet'); return; }
+  const svg = cfmRenderPaperChart(tabKey, opts);
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    const titleMap = {
+      past200: 'Climate Formula — Last 200 kyr',
+      postMPT: 'Climate Formula — Post-MPT (0–700 kyr BP)',
+      postMPText: 'Climate Formula — Post-MPT extended',
+      full: 'Climate Formula — Full LR04',
+      cenogrid: 'Climate Formula — CENOGRID',
+      epica: 'Climate Formula — EPICA CO₂',
+      cenco2pip: 'Climate Formula — CenCO2PIP CO₂',
+      future: 'Climate Formula — Forward projection',
+    };
+    let docTitle = titleMap[tabKey] || 'Climate Formula';
+    if (opts.titleSuffix) docTitle += ' — ' + opts.titleSuffix;
+    win.document.title = docTitle;
+  }
+}
+
 async function createClimateFormulaPanel() {
   // Coefficients are embedded in the bundle as CLIMATE_FORMULA_COEFFS.
   // Proxy data arrays are fetched on demand; CENOGRID / EPICA / CenCO2PIP
@@ -25120,6 +25482,8 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
       <div class="cfm-header">
         <div class="cfm-title">Climate Formula Explorer</div>
         <div class="cfm-subtitle">Per-regime decomposition of paleoclimate proxies into orbital (L1) + carbon-cycle (L2) + boundary-condition (L3) layers</div>
+        <button class="cfm-export-btn" data-cfm-export="formula-only" title="Export the current tab as a paper-style SVG showing ONLY the model formula curve (no data overlay)">Export Formula Only</button>
+        <button class="cfm-export-btn" data-cfm-export="paper" title="Export the current tab as a paper-style SVG (white background, formula curve + proxy data overlay)">Export Formula &amp; Data</button>
         <div class="cfm-close" title="Close"></div>
       </div>
       <div class="cfm-body">
@@ -25181,6 +25545,27 @@ Note: L1, L2, and Total each carry the baseline once — they do NOT visually su
       panel.querySelectorAll('.cfm-proxy-btn').forEach(b => b.classList.toggle('cfm-proxy-btn-active', b.dataset.proxy === cfmSelectedProxy));
       rerender();
     });
+  });
+
+  // Export buttons. "Formula Only" is contextual — only the LR04 windows
+  // (postMPT / postMPText / full / future) have a meaningful "formula
+  // without overlay" view; for CENOGRID / EPICA / CenCO2PIP the proxy
+  // data IS the comparison story, so the secondary button is hidden.
+  const exportFormulaOnlyBtn = panel.querySelector('[data-cfm-export="formula-only"]');
+  const exportPaperBtn       = panel.querySelector('[data-cfm-export="paper"]');
+  function updateExportButtonVisibility() {
+    const lr04Tab = cfmSelectedTab === 'postMPT' || cfmSelectedTab === 'postMPText'
+                    || cfmSelectedTab === 'full' || cfmSelectedTab === 'past200'
+                    || cfmSelectedTab === 'future';
+    if (exportFormulaOnlyBtn) exportFormulaOnlyBtn.style.display = lr04Tab ? '' : 'none';
+  }
+  updateExportButtonVisibility();
+  if (exportPaperBtn) exportPaperBtn.addEventListener('click', () => exportCfmPaper({ includeData: true,  layers: ['total'], titleSuffix: 'Formula & Data' }));
+  if (exportFormulaOnlyBtn) exportFormulaOnlyBtn.addEventListener('click', () => exportCfmPaper({ includeData: false, layers: ['total'], titleSuffix: 'Formula only' }));
+
+  // Update export-button visibility whenever the tab changes
+  panel.querySelectorAll('.cfm-tab').forEach(tab => {
+    tab.addEventListener('click', updateExportButtonVisibility);
   });
 
   document.body.appendChild(panel);
