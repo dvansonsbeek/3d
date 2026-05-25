@@ -291,7 +291,7 @@ def main():
 
     OUT_PATH.write_text(json.dumps({
         "framework": "8H super-cycle spectral test on CENOGRID continuous record",
-        "doc_reference": "doc 18 §4 complement",
+        "doc_reference": "doc 17 §11 complement",
         "data_source": "Westerhold 2020 CENOGRID (PANGAEA TableS34, LOESS-smoothed)",
         "window_ma": [WINDOW[0]/1000, WINDOW[1]/1000],
         "test_periods_kyr": FRAMEWORK_PERIODS_KYR,

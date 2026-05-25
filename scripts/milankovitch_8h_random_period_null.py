@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA — RANDOM-PERIOD NULL BASELINE
 ======================================================
 
-Pre-registered Test C from doc 18 §5.3.
+Pre-registered Test C from doc 17 §12.3.
 
 The 25-component 8H Orbital Forcing Formula achieves R² = 0.232 on LR04 with
 amplitudes + phases fit at the 25 model-selected integer divisors of 8H. The

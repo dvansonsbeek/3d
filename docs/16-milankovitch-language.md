@@ -1,6 +1,10 @@
 # Milankovitch Language of the Holistic Model
 
-> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 climatic precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory (Laskar 2004 eigenfrequencies, Berger 1978 climatic precession spectrum) recovers the same periods to within 0.06–2.8% — including all six Berger climatic precession peaks within 0.4 % (see [eigenfrequencies.mdx on the website](../../Holistic/holisticuniverse/src/content/en/model/eigenfrequencies.mdx)). For the **100-kyr ice age problem**, the model's H/3 = 111,772 yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity. Companion document with the full empirical analysis (LR04 + Cheng 2016, the 8H Orbital Forcing Formula, per-planet contributions, MPT amplitude growth): [17 — Milankovitch Evidence](17-milankovitch-evidence.md).
+> **TL;DR.** The Holistic model has **five** natural Milankovitch-band periods, all integer divisors of H, structured into a closed Fibonacci algebra: **H/3 inclination precession (111,772 yr), H/5 ecliptic precession (67,063 yr), H/8 obliquity oscillation (41,915 yr), H/13 axial precession (25,794 yr), and H/16 climatic precession (20,957 yr)**. These satisfy four beat-frequency identities (13−5=8, 13+3=16, 8−5=3, 13−8=5) that close *only because* the divisors are Fibonacci. Standard secular theory recovers the same periods to within 0.06–2.8 % — including all six Berger 1978 climatic-precession peaks within 0.4 %.
+>
+> For the **100-kyr ice age problem**, the model's H/3 = 111,772 yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
+>
+> Companion docs: [17 — Milankovitch Evidence & Hypothesis Tests](17-milankovitch-evidence.md) (empirical 31-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [18 — Climate Formula: Architecture, Variance & Implementation](18-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
 **Related documents:**
 - [10 — Fibonacci Laws](10-fibonacci-laws.md)
@@ -21,7 +25,7 @@ Earth's Pleistocene climate is dominated by glacial-interglacial cycles attribut
 | Climatic precession (e · sin ω̃) | 19, 22, 23 kyr triplet | Strong seasonal forcing at low-mid lat |
 | Obliquity (axial tilt) | ~41 kyr | Strong high-latitude seasonal contrast |
 | Eccentricity | 95, 124, 405 kyr (beats ~100) | Direct ~0.2 % only; presumed amplified |
-| Earth orbital inclination / orbital-plane beats | ~70 kyr (s₃ Earth nodal), 100-kyr-band centroid at **~107 kyr (s₁−s₄ Mercury-Mars nodal, empirical — doc 17 §4.2)**, model's H/3 inclination precession at ~112 kyr | Inclination-side family supported empirically; model's H/3 "second obliquity component" is one theoretical pathway within that family — see §5.3 |
+| Inclination / orbital-plane beats | ~70 kyr (s₃), ~110 kyr (s₁−s₄ centroid) | Inclination-side family; the model's H/3 = 111.77 kyr position is discussed in §5.3 |
 
 The **Mid-Pleistocene Transition (~1.2 → 0.7 Myr ago)** changed the dominant ice age period from **~41 kyr (obliquity-paced)** to **~100 kyr**, with no change in orbital forcing. The mechanism (Earth-system feedbacks, CO₂ thresholds, ice-sheet thickness) is outside this analysis. What the model *can* address: which orbital cycle's period best matches the post-MPT spectral peak.
 
@@ -178,15 +182,19 @@ The model treats the inclination cycle as a *permanent formation-epoch feature* 
 
 ## 6. Scope and Empirical Evidence
 
-This document is the *framework* — what the model says about Milankovitch. The empirical evidence is in the companion document [doc 17 — Milankovitch Evidence](17-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016, an explicit 25-component **8H Orbital Forcing Formula** (R² = 0.232, forward-projection of the next natural glaciation), per-planet contribution analysis, and the MPT amplitude-growth investigation. See [doc 18](18-8h-super-cycle-test.md) for the super-cycle test, fourteen falsifiable follow-up tests, and the dedicated investigation of the empirical 405-kyr climate cycle.
+This document is the *framework* — what the model says about Milankovitch.
+
+The empirical evidence lives in [doc 17 — Milankovitch Evidence & Hypothesis Tests](17-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 31-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
+
+The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 18 — Climate Formula: Architecture, Variance & Implementation](18-climate-formula.md).
 
 **Five headline findings from doc 17 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (24 of 25 with clean physical interpretations).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (30 of 31 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 18 §2.4](18-climate-formula.md#24-the-31-lattice-integers--per-line-identities)).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.
-5. Forward projection: the next natural glaciation peak is predicted in ~38,000 years (~40,000 CE).
+5. Forward projection: the next natural glacial maximum is predicted at ~58,000 years from now (~ 60,000 CE), with the strongest glacial in the next 250 kyr at ~198,000 years from now. Orbital-only — see [doc 18 §13.7](18-climate-formula.md) for the anthropogenic-CO₂ caveat (Ganopolski 2016 vs Caillon 2003 framing).
 
 The framework laid out in §§ 1–5 of this document (five H-divisor periods, Fibonacci closure, Berger 1978 spectrum match, eigenmode convergence at H/3 and H/5, cross-planet validation) **stands independently** of the specific 100-kyr-cycle attribution. See [doc 17 §4.8](17-milankovitch-evidence.md#48-what-stands-independently-of-the-100-kyr-cycle-attribution) for what remains robust regardless of how the 100-kyr question resolves.
 

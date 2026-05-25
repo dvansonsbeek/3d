@@ -298,7 +298,7 @@ def main():
 
     OUT_PATH.write_text(json.dumps({
         "framework": "8H windowed H-multiple spectral test on CENOGRID",
-        "doc_reference": "doc 18 §4.6 — Plio-Pleistocene windowed complement to §4.5",
+        "doc_reference": "doc 17 §11.6 — Plio-Pleistocene windowed complement to §4.5",
         "data_source": "Westerhold 2020 CENOGRID (PANGAEA TableS34, LOESS-smoothed)",
         "window_length_kyr": WINDOW_KYR,
         "n_windows": N_WINDOWS,

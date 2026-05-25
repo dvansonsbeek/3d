@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA — OUT-OF-SAMPLE CROSS-VALIDATION
 =========================================================
 
-Test F (doc 18 §5.6 — cross-validation).
+Test F (doc 17 §12.6 — cross-validation).
 
 The 25-component 8H Orbital Forcing Formula achieves R² = 0.232 on the full
 LR04 record (T = 5320 kyr) using a joint amplitude+phase OLS fit. With 26 × 2

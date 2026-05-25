@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — WAVELET TIME-FREQUENCY STABILITY
 =============================================================
 
-Test K (doc 18 §5.11 — band-centroid stability in time).
+Test K (doc 17 §12.11 — band-centroid stability in time).
 
 The framework predicts that the integer-divisor lattice positions are STABLE
 in time (the orbital eigenfrequencies don't change on the 5-Myr timescale).

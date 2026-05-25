@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA — PHASE PREDICTION ACCURACY
 ====================================================
 
-Test G (doc 18 §5.7 — phase prediction).
+Test G (doc 17 §12.7 — phase prediction).
 
 The R² goodness-of-fit metric is dominated by amplitude. Phase is independent
 information: did the formula correctly time the glacial maxima, or does it

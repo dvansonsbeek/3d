@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — MTM F-TEST FOR LINE SIGNIFICANCE
 =============================================================
 
-Test J (doc 18 §5.10 — line significance).
+Test J (doc 17 §12.10 — line significance).
 
 The closure test and the random-period null both work on band-aggregate
 statistics. The Thomson multi-taper (MTM) F-test gives a per-spectral-line

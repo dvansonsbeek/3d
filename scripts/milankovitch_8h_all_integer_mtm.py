@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — ALL-INTEGER MTM F-TEST SCAN
 ========================================================
 
-Test L (doc 18 §5.12 — falsifying the integer-selection claim).
+Test L (doc 17 §12.12 — falsifying the integer-selection claim).
 
 Test J (§5.10) showed that 7/25 framework integers carry F-test-significant
 spectral lines in LR04 (vs 0.88 random null). The follow-up question for

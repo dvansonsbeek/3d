@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — 405-KYR HEAD-TO-HEAD: FRAMEWORK (383) vs LASKAR (405)
 ==================================================================================
 
-Test N (doc 18 §5.14 — head-to-head against standard Milankovitch).
+Test N (doc 17 §12.14 — head-to-head against standard Milankovitch).
 
 Standard Milankovitch theory places the long-eccentricity cycle at 405 kyr,
 the g₂−g₅ Venus-Jupiter eccentricity beat in the Laskar 2004 secular

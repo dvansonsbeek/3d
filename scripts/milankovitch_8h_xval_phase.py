@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — CROSS-VALIDATED PHASE PREDICTION
 ==============================================================
 
-Test M (doc 18 §5.13 — out-of-sample glacial timing).
+Test M (doc 17 §12.13 — out-of-sample glacial timing).
 
 Test G showed the formula correctly times glacial maxima within 5 kyr median
 on the FULL-RECORD fit. Test F1/F2 showed amplitudes don't generalize across

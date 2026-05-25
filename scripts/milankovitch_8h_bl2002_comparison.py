@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA ↔ BERGER & LOUTRE 2002 COMPARISON
 ==========================================================
 
-Pre-registered Test E from doc 18 §5.5.
+Pre-registered Test E from doc 17 §12.5.
 
 Berger & Loutre (2002, Science 297, 1287–1288) used a purely astronomical
 insolation-based model to predict that the current interglacial will be
