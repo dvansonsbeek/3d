@@ -72,20 +72,20 @@ CYCLES = [
     ("Mars",    "asc_node",  -42580, "-8H/63"),
     ("Mars",    "obliquity", 127740, "8H/21"),
     ("Mars",    "ecc",        50614, "8H/53"),
-    # Jupiter
+    # Jupiter (perihelion dynamical: 8H/39, 8H/65, ecc 8H/44)
     ("Jupiter", "axial",    -127740, "-8H/21"),
-    ("Jupiter", "peri_ecl",   67063, "8H/40"),
-    ("Jupiter", "ICRF",      -41915, "-8H/64"),
+    ("Jupiter", "peri_ecl",   68783, "8H/39"),
+    ("Jupiter", "ICRF",      -41270, "-8H/65"),
     ("Jupiter", "asc_node",  -74515, "-8H/36"),
     ("Jupiter", "obliquity", 167659, "8H/16"),
-    ("Jupiter", "ecc",        62385, "8H/43"),
-    # Saturn
+    ("Jupiter", "ecc",        60967, "8H/44"),
+    # Saturn (perihelion dynamical: 8H/65, 8H/169, ecc 8H/163)
     ("Saturn",  "axial",    -447089, "-8H/6"),
-    ("Saturn",  "peri_ecl",  -41915, "-8H/64"),
-    ("Saturn",  "ICRF",      -15967, "-8H/168"),
+    ("Saturn",  "peri_ecl",  -41270, "-8H/65"),
+    ("Saturn",  "ICRF",      -15873, "-8H/169"),
     ("Saturn",  "asc_node",  -74515, "-8H/36"),
     ("Saturn",  "obliquity", 111772, "8H/24"),
-    ("Saturn",  "ecc",        16559, "8H/162"),
+    ("Saturn",  "ecc",        16457, "8H/163"),
     # Uranus (axial frozen, omit)
     ("Uranus",  "peri_ecl",  111772, "8H/24"),
     ("Uranus",  "ICRF",      -33532, "-8H/80"),
