@@ -822,8 +822,8 @@
   },
   "meta": {
     "script": "/home/dennis/code/3d/scripts/milankovitch_climate_formula.py",
-    "doc": "docs/28-lr04-cenogrid-variance-decomposition.md",
+    "doc": "docs/18-climate-formula.md",
     "predecessor": "scripts/milankovitch_climate_formula_v1_legacy.py (25 components, single-layer)",
-    "runtime_sec": 0.6689047813415527
+    "runtime_sec": 0.5457909107208252
   }
 }
