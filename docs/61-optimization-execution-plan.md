@@ -1271,7 +1271,7 @@ The baseline computes model RA/Dec (from the standalone scene graph engine) at s
 
 #### Step 4: Jupiter and Saturn (resonance core)
 
-**Why next**: Jupiter and Saturn form the 3-5-8-13-21 resonance loop with Earth. Their accuracy anchors the outer solar system.
+**Why next**: Jupiter and Saturn lock to Earth's obliquity beat at 8H/65 (Law 6) and anchor Earth's Fibonacci hierarchy (Law 1). Their accuracy anchors the outer solar system.
 
 **Method (for each)**:
 1. Sensitivity scan `startpos` and `angleCorrection` (isolated, safe)

@@ -86,30 +86,9 @@ This section documents the resonance mechanism that forms Law 6 of the Fibonacci
 
 At the dynamical level the identity is exact: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit; this shared period is what couples the gas-giant pair into Earth's obliquity cycle. **Why Earth's obliquity is one step off:** obliquity = axial (104/8H, H/13) − ecliptic; with Law 1's anchor H/5 (= 40/8H) the beat is 104 − 40 = 64 → H/8, and with the gas giants' real ecliptic 8H/39 (= 39/8H, Laskar's s₃) it is 104 − 39 = 65 → 8H/65. The one-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65).
 
-**The Resonance Loop** (kinematic Fibonacci identity — uses the H/5, H/8 anchors; the dynamical periods are 8H/39, 8H/65):
+**The Fibonacci beat-loop is Earth's own hierarchy.** The identities 1/(H/3) + 1/(H/5) = 1/(H/8) and 1/(H/5) + 1/(H/8) = 1/(H/13) (i.e. 3 + 5 = 8, 5 + 8 = 13) connect **Earth's** inclination, ecliptic, obliquity, and axial precession periods — this is Law 1's hierarchy, not a relation among the three planets. Jupiter and Saturn's perihelion periods are *not* H/5 and H/8 (they sit at 8H/39 and 8H/65); H/5 and H/8 are Earth's ecliptic precession and obliquity.
 
-| Relationship | Calculation | Result |
-|-------------|-------------|--------|
-| Earth + Jupiter → Saturn | 1/(H/3) + 1/(H/5) | = **1/(H/8)** = Obliquity / Saturn |
-| Saturn − Jupiter → Earth | 1/(H/8) − 1/(H/5) | = **1/(H/3)** = Earth inclination |
-| Saturn − Earth → Jupiter | 1/(H/8) − 1/(H/3) | = **1/(H/5)** = Jupiter |
-
-**This is a closed loop**: all three rows are cyclic permutations of a single Fibonacci identity (3 + 5 = 8). Each planet's period is the beat frequency of the other two:
-
-```
-               Saturn (H/8)
-              ╱               ╲
-          8−5=3             8−3=5
-            ╱                   ╲
-    Earth (H/3) ──3+5=8── Jupiter (H/5)
-```
-
-Combining Jupiter and Saturn further gives axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13).
-
-**Physical Interpretation**: The identity (kinematic H/8 / dynamical 8H/65) is the structural fingerprint of the locking of Jupiter's and Saturn's perihelion precession to a common period, reflected through Saturn's ecliptic-retrograde perihelion. This converts the Fibonacci recurrence into physical beat frequencies:
-- Earth, Jupiter, and Saturn each act as the beat frequency of the other two (3 + 5 = 8)
-- Jupiter + Saturn additionally produces axial precession (5 + 8 = 13)
-- The gas-giant resonance is what drives Earth's spin-axis dynamics through this H/8 coupling
+**The genuine three-body content** (kinematic anchors at H/8; dynamical lock at 8H/65) is the structural coincidence that Jupiter's ICRF perihelion and Saturn's ecliptic perihelion share a single period, 8H/65 — Earth's obliquity beat — reflected through Saturn's ecliptic-retrograde perihelion. The gas giants drive Earth's spin-axis dynamics through this coupling.
 
 ---
 
@@ -364,18 +343,11 @@ Saturn's precession fluctuation is driven by:
 
 > **Ecliptic-retrograde precession**: Saturn's perihelion precesses **opposite** to its orbital direction in the ecliptic frame. This creates the resonance loop with Jupiter and Earth that appears throughout the Holistic model. When calculating beat frequencies, Saturn's ecliptic rate must be treated as negative.
 
-### 8.3 The Saturn-Jupiter-Earth Loop
+### 8.3 The Saturn-Jupiter-Earth Coupling
 
-Saturn's role in the resonance loop (kinematic Fibonacci identity at the H/5, H/8 anchors; the dynamical perihelion periods are 8H/39, 8H/65) (from [Section 2](#2-saturn-jupiter-earth-resonance-loop)):
+Saturn's perihelion is dynamically locked to Jupiter's: Saturn's ecliptic perihelion and Jupiter's ICRF perihelion share the period 8H/65 (= Earth's obliquity beat; see [Section 2](#2-saturn-jupiter-earth-resonance-loop)). The clean Fibonacci beat identities (1/(H/3) + 1/(H/5) = 1/(H/8), etc.) are **Earth's own** precession hierarchy (Law 1) — H/5 and H/8 are Earth's ecliptic and obliquity, not Jupiter's and Saturn's periods.
 
-```
-Earth + Jupiter → Saturn:  1/(H/3) + 1/(H/5) = 1/(H/8)    (3 + 5 = 8)
-Saturn − Jupiter → Earth:  1/(H/8) − 1/(H/5) = 1/(H/3)    (8 − 5 = 3)
-Saturn − Earth → Jupiter:  1/(H/8) − 1/(H/3) = 1/(H/5)    (8 − 3 = 5)
-Jupiter + Saturn → Axial:  1/(H/5) + 1/(H/8) = 1/(H/13)   (5 + 8 = 13)
-```
-
-This closed loop means Saturn's coefficients include strong coupling to Jupiter and Earth periods.
+This gas-giant lock means Saturn's coefficients include strong coupling to Jupiter and Earth periods.
 
 ### 8.4 Predictive Formula Enhancement
 

@@ -181,15 +181,9 @@ At the **dynamical** level the identity is exact and structural: Jupiter's ICRF 
 
 **Why Earth's obliquity is one step off (8H/64 vs 8H/65).** Earth's obliquity is the beat of its axial precession against the precession of the ecliptic plane: in 8H-integer terms, 104 (axial, H/13) − (ecliptic). With Law 1's Fibonacci ecliptic anchor H/5 = 40, the beat is 104 − 40 = 64 → H/8. With the gas giants' real ecliptic period 8H/39 = 39 (Laskar's s₃), it is 104 − 39 = 65 → 8H/65. The single-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65). Law 1 sets Earth's Fibonacci hierarchy; Law 6 explains why the gas-giant-driven obliquity recorded in climate lands one step over.
 
-The closed beat-frequency loop (kinematic Fibonacci anchors):
+**Earth sits between Jupiter and Saturn.** On the 8H lattice the four periods line up as **39 < 40 < 64 < 65**: Jupiter's ecliptic perihelion (8H/39), Earth's ecliptic precession (8H/40 = H/5), Earth's obliquity (8H/64 = H/8), and Saturn's ecliptic perihelion (8H/65). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's (67,063 vs 68,783), its obliquity just *above* Saturn's (41,915 vs 41,270). The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and push Earth's orbital plane and spin-axis beat from both sides; the clean Fibonacci anchors are the balance point in between. (The integer relationships are exact; the directional "push from each side" is the physical reading.)
 
-```
-Earth incl. + Jupiter → Saturn (obliquity):  1/(H/3) + 1/(H/5) = 1/(H/8)    (3 + 5 = 8)
-Saturn − Jupiter → Earth inclination:        1/(H/8) − 1/(H/5) = 1/(H/3)    (8 − 5 = 3)
-Saturn − Earth → Jupiter:                    1/(H/8) − 1/(H/3) = 1/(H/5)    (8 − 3 = 5)
-```
-
-All three rows are cyclic permutations of a single Fibonacci identity (3 + 5 = 8). Combining Jupiter and Saturn further extends to axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13), connecting Law 6 to Law 1's hierarchy.
+The Fibonacci beat-loop itself — 1/(H/3) + 1/(H/5) = 1/(H/8) and 1/(H/5) + 1/(H/8) = 1/(H/13) — is **Earth's own** precession hierarchy (Law 1): inclination + ecliptic = obliquity, ecliptic + obliquity = axial. It is *not* a relation among the three planets' periods (Jupiter and Saturn sit at 8H/39 and 8H/65, not H/5 and H/8). The genuine three-body content of Law 6 is the dynamical 8H/65 lock above.
 
 The physical mechanism is the locking of Jupiter's and Saturn's perihelion precession to a common period (8H/65): a structural balance held by the mutual gravitational coupling of the two gas giants. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit. This shared perihelion period is what couples the gas-giant pair into Earth's obliquity cycle — making Earth's spin-axis dynamics a direct beat of Jupiter and Saturn.
 

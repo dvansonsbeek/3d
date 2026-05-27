@@ -77,15 +77,7 @@ At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn
 
 **Laws 4-5 -- Eccentricity Constant & Balance**: A single constant K predicts all 8 eccentricity amplitudes. The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3. Saturn's eccentricity is independently predicted to within 0.3%.
 
-**Law 6 -- Saturn-Jupiter-Earth Resonance**: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (~41,270 yr) — a structural balance, not a coincidence, and the obliquity beat in Earth's climate record. Earth's own obliquity sits one 8H-lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so the gas giants' real ecliptic period 8H/39 gives 8H/65 while Law 1's Fibonacci anchor H/5 gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock. At the kinematic level all three quantities collapse onto H/8, closing through 3 + 5 = 8 — the beat-frequency loop:
-
-```
-Earth (H/3) + Jupiter (H/5) -> Saturn obliquity (H/8)   (3 + 5 = 8)
-Saturn (H/8) - Jupiter (H/5) -> Earth inclination (H/3) (8 - 5 = 3)
-Saturn (H/8) - Earth (H/3)   -> Jupiter (H/5)           (8 - 3 = 5)
-```
-
-All three rows are cyclic permutations of the Fibonacci identity 3 + 5 = 8. Combining Jupiter and Saturn further extends to axial precession (5 + 8 = 13), connecting Law 6 back to Law 1's hierarchy.
+**Law 6 -- Saturn-Jupiter-Earth Resonance**: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (~41,270 yr) — a structural balance, not a coincidence, and the obliquity beat in Earth's climate record. Earth's own obliquity sits one 8H-lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so the gas giants' real ecliptic period 8H/39 gives 8H/65 while Law 1's Fibonacci anchor H/5 gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock. The clean Fibonacci beat-loop (1/(H/3) + 1/(H/5) = 1/(H/8), 5 + 8 = 13, …) is **Earth's own** precession hierarchy (Law 1) — H/5 and H/8 are Earth's ecliptic and obliquity, not Jupiter's and Saturn's periods (those are 8H/39 and 8H/65).
 
 ### 2.3 Mirror Pairs
 
@@ -102,7 +94,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 
 ### 2.4 Implications for the Optimization Tool
 
-1. **Jupiter-Saturn-Earth must be aligned FIRST** -- they form the triple identity (Law 6; kinematic H/8 / dynamical 8H/65) and extend through 5+8=13 to Earth's axial precession. If these three aren't right, the beat frequencies that drive Earth's spin-axis dynamics and the rest of the Fibonacci hierarchy will be wrong, affecting everything.
+1. **Jupiter-Saturn-Earth must be aligned FIRST** -- Jupiter's and Saturn's perihelion lock to Earth's obliquity beat at 8H/65 (Law 6), and this trio anchors Earth's Fibonacci hierarchy (Law 1). If these three aren't right, the beat frequencies that drive Earth's spin-axis dynamics and the rest of the Fibonacci hierarchy will be wrong, affecting everything.
 2. **Conjunction periods emerge from orbit count ratios** -- Jupiter and Saturn's great conjunction period (~19.86 years) is determined by `1/(1/T_J - 1/T_S)`. Getting this right validates the orbit counts.
 3. **Once Jupiter-Saturn are aligned, extend outward** -- fit Mars (shares d=5 with Jupiter), then Mercury/Uranus (d=21 pair), Venus/Neptune (d=34 pair).
 4. **Orbit counts are integers** -- `SolarYearCount` is rounded, creating discrete jumps in orbit geometry. The optimizer must understand this.

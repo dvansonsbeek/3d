@@ -102,6 +102,8 @@ Many divisors are products of small Fibonacci numbers:
 
 The kinematic anchors (40 = 5 × 8, 64 = 8², 168 = 8 × 21) factor through 8; the dynamical secular values factor through 13. Earth's axial precession (8H/104 = 8 × 13) is the bridge: the frame conversion N_ICRF = 104 − N_ecl is exactly what carries Jupiter and Saturn onto the 13-lattice.
 
+**Earth sits between Jupiter and Saturn.** In the ecliptic frame the four periods order as **39 < 40 < 64 < 65**: Jupiter ecliptic perihelion (8H/39 = 68,783 yr), Earth ecliptic precession (8H/40 = H/5 = 67,063 yr), Earth obliquity (8H/64 = H/8 = 41,915 yr), and Saturn ecliptic perihelion (8H/65 = 41,270 yr). Earth's two Fibonacci values each sit exactly one 8H-step off a gas-giant period — its ecliptic precession just *below* Jupiter's, its obliquity just *above* Saturn's. The two gas giants move in opposite senses (Jupiter prograde, Saturn retrograde) and drive Earth's orbital plane from both sides; the clean Fibonacci anchors are the balance point in between. The relationship is exact through the obliquity beat: Earth's obliquity = axial(104) − Earth ecliptic(40) = 64, while the climate-recorded beat = axial(104) − Jupiter's nodal drive(39) = 65.
+
 ### The Three Fibonacci Levels
 1. **Level 1** — Fibonacci d-values (Law 2): d = 3, 5, 21, 34
 2. **Level 2** — Ecliptic periods are H/Fibonacci: H/3, H/5, H/8, H/13, H/16
