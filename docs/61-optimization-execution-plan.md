@@ -405,8 +405,8 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 | Mercury | H/(1+3/8) | — | ~570 |
 | Venus | −8H/6 | 6 (retrograde) | ~−290 (model) |
 | Mars | H/(4+3/8) | — | ~1,600 |
-| Jupiter | 8H/39 (kinematic anchor H/5) | 39 = 3×13 | ~1,884 |
-| Saturn | −8H/65 (kinematic anchor −H/8) | 65 = 5×13 (retrograde) | ~−3,140 |
+| Jupiter | 8H/39 | 39 = 3×13 | ~1,884 |
+| Saturn | −8H/65 | 65 = 5×13 (retrograde) | ~−3,140 |
 | Uranus | H/3 | 3 | ~1,100 |
 | Neptune | H×2 | — | ~200 |
 

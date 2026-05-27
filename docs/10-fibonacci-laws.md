@@ -169,15 +169,14 @@ The eccentricity amplitudes used in the balance are predicted by Law 4 (the K co
 
 **Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period lock to a single period: 8H/65 (~41,270 yr). This is a structural balance of the solar system — not a coincidence — and it is the obliquity beat that dominates Earth's climate record. Earth's own obliquity cycle sits one lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so beating against the gas giants' actual ecliptic period (8H/39) gives 8H/65, while beating against Law 1's Fibonacci anchor (H/5) gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.**
 
-Two levels, one motion:
+Two levels (the gas-giant perihelion lock):
 
 | Object | Kinematic (Fibonacci anchor) | Dynamical (N-body secular) | Frame |
 |--------|------------------------------|----------------------------|-------|
 | Jupiter perihelion | H/8 | **8H/65** | ICRF |
 | Saturn perihelion | H/8 (retrograde) | **8H/65** (retrograde) | ecliptic |
-| Earth obliquity beat | H/8 (= 8H/64) | 8H/65 (k+s₃) as recorded | — |
 
-At the **dynamical** level the identity is exact and structural: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. At the **kinematic** level all three quantities collapse onto Earth's Fibonacci anchor H/8, closing through 3 + 5 = 8.
+At the **dynamical** level the identity is exact and structural: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. At the **kinematic** level both gas-giant anchors coincide with Earth's H/8 obliquity, closing Earth's hierarchy through 3 + 5 = 8. Earth's obliquity is the cycle this lock *drives*: its own (model) value is the Fibonacci H/8 = 8H/64, while the climate record (k+s₃) shows the gas-giant-driven 8H/65 — one lattice step off.
 
 **Why Earth's obliquity is one step off (8H/64 vs 8H/65).** Earth's obliquity is the beat of its axial precession against the precession of the ecliptic plane: in 8H-integer terms, 104 (axial, H/13) − (ecliptic). With Law 1's Fibonacci ecliptic anchor H/5 = 40, the beat is 104 − 40 = 64 → H/8. With the gas giants' real ecliptic period 8H/39 = 39 (Laskar's s₃), it is 104 − 39 = 65 → 8H/65. The single-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65). Law 1 sets Earth's Fibonacci hierarchy; Law 6 explains why the gas-giant-driven obliquity recorded in climate lands one step over.
 

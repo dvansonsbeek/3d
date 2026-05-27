@@ -603,7 +603,7 @@ The first-order L-L total (~553) matches Mercury's observed rate (~570) to withi
 | **WebGeoCalc observed (1900–2100)** | | | **~1,800** | |
 | **Model dynamical secular mean (8H/39)** | | | **1,884** | |
 
-**Insight:** Saturn dominates Jupiter's diagonal A_ii rate almost entirely. First-order L-L gives ~754 ″/cy, but the WebGeoCalc observed rate is ~1,800 ″/cy. The 2.4× gap reflects strong Jupiter–Saturn off-diagonal coupling and the 5:2 near-resonance ("Great Inequality") — effects that first-order diagonal theory cannot capture. The model's dynamical secular value (8H/39 = 1,884 ″/cy; the clean kinematic Fibonacci anchor H/5 = 1,933 ″/cy) is closer to WebGeoCalc than to first-order L-L because the framework reproduces the observed secular rate, not the L-L diagonal.
+**Insight:** Saturn dominates Jupiter's diagonal A_ii rate almost entirely. First-order L-L gives ~754 ″/cy, but the WebGeoCalc observed rate is ~1,800 ″/cy. The 2.4× gap reflects strong Jupiter–Saturn off-diagonal coupling and the 5:2 near-resonance ("Great Inequality") — effects that first-order diagonal theory cannot capture. The model's dynamical secular value (8H/39 = 1,884 ″/cy) is closer to WebGeoCalc than to first-order L-L because the framework reproduces the observed secular rate, not the L-L diagonal.
 
 ### 3.4 Saturn Precession Breakdown
 
@@ -622,7 +622,7 @@ The first-order L-L total (~553) matches Mercury's observed rate (~570) to withi
 
 **Insight:** Jupiter's gravitational perturbation dominates Saturn's diagonal rate. First-order L-L predicts +1,867 ″/cy **prograde**, but WebGeoCalc shows Saturn moving **retrograde** across the 1800–2100 window — the direction is *opposite* to first-order prediction. The retrograde *direction* is robust across plausible 126-year sub-windows; the *magnitude*, however, varies by ~2× depending on which window you measure (sliding-window OLS gives anywhere from −1,800 to −3,600 ″/cy, with non-linear midpoint residuals of 0.4° suggesting longer-period structure underneath). The WebGeoCalc Explorer therefore flags Saturn as un-determined and lets the user read the trend visually. This is one of the largest known failures of first-order secular theory.
 
-The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's dynamical secular rate (−8H/65 = −3,140 ″/cy retrograde; kinematic Fibonacci anchor −H/8 = −3,092) sits within the observed window-spread; first-order L-L has the wrong sign entirely.
+The retrograde signal that first-order L-L misses is dominated by the Jupiter–Saturn 5:2 "Great Inequality" near-resonance, which secular theory treats as slowly averaging out but which in practice produces a large retrograde signal during the current epoch. The model's dynamical secular rate (−8H/65 = −3,140 ″/cy retrograde) sits within the observed window-spread; first-order L-L has the wrong sign entirely.
 
 See docs/10-fibonacci-laws.md §"Saturn's Ecliptic-Retrograde Perihelion Precession" for more on this discrepancy.
 
@@ -779,7 +779,7 @@ documented in §7.1 and [docs/37-planets-precession-cycles.md](37-planets-preces
 
 Standard astronomy explains this via the **Great Inequality**: the Jupiter-Saturn 5:2 near-resonance drives a ~900-year oscillation in Saturn's perihelion rate. The long-term secular average is prograde (standard theory's answer), but the current epoch happens to be in the retrograde phase of that cycle. Under this view, Saturn's rate should reverse within ~450 years.
 
-**The Holistic Universe Model's interpretation is different.** The model treats Saturn's observed retrograde direction as structural, not transient: `ω_peri = −8H/65 = −3,140 ″/cy` permanently (dynamical secular value; kinematic Fibonacci anchor −H/8 = −3,092), because ICRF (not the ecliptic) is the stable foundation and the Fibonacci structure is anchored there. The model's value sits within the observed window-spread (which itself runs from −1,800 to −3,600 ″/cy across plausible 126-year baselines); standard secular theory has the wrong sign entirely. This is the clearest concrete disagreement between the model and L-L secular theory, and it's a **testable prediction** — long-baseline integration (DE441) can tell whether Saturn's rate stays retrograde or reverses within ~450 yr.
+**The Holistic Universe Model's interpretation is different.** The model treats Saturn's observed retrograde direction as structural, not transient: `ω_peri = −8H/65 = −3,140 ″/cy` permanently, because ICRF (not the ecliptic) is the stable foundation and the Fibonacci structure is anchored there. The model's value sits within the observed window-spread (which itself runs from −1,800 to −3,600 ″/cy across plausible 126-year baselines); standard secular theory has the wrong sign entirely. This is the clearest concrete disagreement between the model and L-L secular theory, and it's a **testable prediction** — long-baseline integration (DE441) can tell whether Saturn's rate stays retrograde or reverses within ~450 yr.
 
 See §1.5a for the reference-frame explanation of why L-L cannot produce the date-frame retrograde signal even when its long-term eigenvalue is "right".
 
@@ -836,8 +836,8 @@ The table below compares, for each planet:
 | Venus | ~0 | ~1,199 | −290 (−8H/6) | L-L fails catastrophically (low-e singularity) |
 | Earth | ~6,186 | ~1,280 | 6,187 (H/16) | Fibonacci matches obs exactly; L-L gives inertial rate (different frame) |
 | Mars | ~1,600 | ~1,776 | 1,691 (H × 8/35) | L-L over by ~11 %; Fibonacci matches obs to ~5 % |
-| Jupiter | ~1,800 | ~754 | 1,884 (8H/39 dynamical; anchor H/5 = 1,933) | L-L under by ~58 %; dynamical secular matches obs to ~5 % |
-| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65 dynamical; anchor −H/8 = −3,092) | L-L has wrong sign; dynamical secular sits within the observed window-spread |
+| Jupiter | ~1,800 | ~754 | 1,884 (8H/39) | L-L under by ~58 %; dynamical secular matches obs to ~5 % |
+| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (−8H/65) | L-L has wrong sign; dynamical secular sits within the observed window-spread |
 | Uranus | ~1,100 | ~278 | 1,160 (H/3) | L-L under by ~75 %; Fibonacci matches obs to ~5 % |
 | Neptune | ~200 | ~68 | 193 (2H) | L-L under by ~66 %; Fibonacci matches obs to ~4 % |
 

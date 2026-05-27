@@ -1294,7 +1294,7 @@ The 405-kyr cycle is a **real, empirically observed climate signal**. Across CEN
 | Planet | Laskar (g_i) apsidal period | Framework (doc 55) ecliptic perihelion |
 |---|---:|---:|
 | Venus | ~174 kyr (g₂ = 7.453″/yr) | **−447,089 yr** (= −8H/6, retrograde) |
-| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+68,783 yr** (= 8H/39, dynamical; kinematic anchor H/5) |
+| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+68,783 yr** (= 8H/39) |
 
 In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in doc 55 reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.
 

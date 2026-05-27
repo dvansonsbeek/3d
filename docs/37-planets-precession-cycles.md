@@ -384,7 +384,7 @@ Three cross-planet period matches link obliquity cycles to other planets' preces
 |-----------|--------|-------------|
 | Mars obliquity = Jupiter axial | 8H/21 = 127,740 yr | Exact match, mirror pair (d=5), 21 = F₈ |
 | Mercury obliquity ≈ 2 × Saturn axial | 8H/3 ≈ 2 × H×4/3 | 894,179 ≈ 894,178 yr |
-| Earth obliquity = Saturn peri ecl = Jupiter peri ICRF | H/8 = 41,915 yr | Same Fibonacci rate (8/H) |
+| Jupiter peri ICRF = Saturn peri ecl (Law 6 lock) | 8H/65 = 41,270 yr | Drives Earth's obliquity; Earth's own H/8 (= 8H/64 = 41,915 yr) sits one 8H-step off |
 
 The Mars-Jupiter connection is the strongest: both are mirror pairs (d=5) and the
 match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = H/2**.
