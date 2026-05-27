@@ -40,7 +40,7 @@ The model implements six laws — anchored on Earth and extending to all eight p
 3. **The Inclination Balance** — Seven planets' angular-momentum-weighted oscillations balance against Saturn alone (anti-phase) to 99.9975%
 4. **Eccentricity Amplitude Constant** — A single constant K predicts all eight eccentricity amplitudes from Fibonacci divisors, mass, distance, and axial tilt
 5. **The Eccentricity Balance** — Seven planets' eccentricities balance against Saturn alone using the same Fibonacci divisors and phase groups as Law 3 (99.86%)
-6. **Saturn-Jupiter-Earth Resonance** — Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion and Saturn's ecliptic perihelion: a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics through their well-known mutual resonance lock
+6. **Saturn-Jupiter-Earth Resonance** — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
 
 The Fibonacci divisors follow a mirror symmetry: Mercury↔Uranus, Venus↔Neptune, Earth↔Saturn, Mars↔Jupiter. Out of 7,558,272 candidate configurations, five successive physical filters (inclination balance, eccentricity balance, Laplace–Lagrange bounds, direction match, and mirror symmetry) narrow the field to 43 viable candidates — of which only one is mirror-symmetric.
 
