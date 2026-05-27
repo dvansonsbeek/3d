@@ -110,8 +110,8 @@ The Earth Fundamental Cycle is divided by Fibonacci-related integers to produce 
 | Venus | 34 | In-phase (218.64°) | Neptune | I |
 | Earth | 3 | In-phase (21.77°) | Saturn | — |
 | Mars | 5 | In-phase (231.95°) | Jupiter | II |
-| Jupiter | 5 | In-phase (291.18°) | Mars | III |
-| Saturn | 3 | Anti-phase (120.38°) | Earth | III |
+| Jupiter | 5 | In-phase (287.06°) | Mars | III |
+| Saturn | 3 | Anti-phase (116.26°) | Earth | III |
 | Uranus | 21 | In-phase (21.33°) | Mercury | III |
 | Neptune | 34 | In-phase (174.04°) | Venus | III |
 
@@ -273,8 +273,8 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Venus | 2.151359 | 0.062165 | 2.09 - 2.21 | 218.64° | 8H/110 ≈ 24,387 yr |
 | Earth | 1.481134 | 0.636032 | 0.85 - 2.12 | 21.77° | H/3 ≈ 111,772 yr |
 | Mars | 1.915105 | 1.164222 | 0.75 - 3.08 | 231.95° | 8H/69 ≈ 38,877 yr |
-| Jupiter | 0.319552 | 0.021404 | 0.30 - 0.34 | 291.18° | H/8 ≈ 41,915 yr |
-| Saturn | 0.982897 | 0.065193 | 0.92 - 1.05 | 120.38° (anti-phase) | H/5 ≈ 67,063 yr |
+| Jupiter | 0.321086 | 0.021404 | 0.30 - 0.34 | 287.06° | 8H/65 ≈ 41,270 yr |
+| Saturn | 0.984965 | 0.065193 | 0.92 - 1.05 | 116.26° (anti-phase) | 8H/169 ≈ 15,873 yr |
 | Uranus | 1.015182 | 0.023831 | 0.99 - 1.04 | 21.33° | H/16 ≈ 20,957 yr |
 | Neptune | 0.743803 | 0.013551 | 0.73 - 0.76 | 174.04° | 2H/25 ≈ 26,825 yr |
 | Pluto | 15.716200 | 0.717024 | 15.00 - 16.43 | 203.32° | H/14 ≈ 23,951 yr |
@@ -599,8 +599,8 @@ Each planet has a per-planet cycle anchor (ICRF perihelion longitude where the p
 | Venus | 218.64° | n=7 | |
 | Earth | 21.77° | n=0 | locked, IAU reference |
 | Mars | 231.95° | n=7 | |
-| Jupiter | 291.18° | n=7* | |
-| Saturn | 120.38° | n=7* | anti-phase |
+| Jupiter | 287.06° | n=7* | |
+| Saturn | 116.26° | n=7* | anti-phase |
 | Uranus | 21.33° | n=7* | |
 | Neptune | 174.04° | n=7 | |
 | Pluto | 203.32° | — | not fitted |

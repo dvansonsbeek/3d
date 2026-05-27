@@ -206,7 +206,7 @@ planets.jupiter = {
   eocFraction: 0.495,
   perihelionRef_JD: 2464224.5,
   ascendingNodeInvPlane: 312.89,
-  inclinationCycleAnchor: 291.18,
+  inclinationCycleAnchor: 287.06,
   antiPhase: false,
   ascendingNodeCyclesIn8H: 36,
 };
@@ -232,7 +232,7 @@ planets.saturn = {
   eocFraction: 0.54,
   perihelionRef_JD: 2452875.9,
   ascendingNodeInvPlane: 118.81,
-  inclinationCycleAnchor: 120.38,
+  inclinationCycleAnchor: 116.26,
   antiPhase: true,
   ascendingNodeCyclesIn8H: 36,
 };
