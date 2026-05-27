@@ -40,15 +40,15 @@ const planets = {
   venus:   { name: 'Venus',   eclP: C.planets.venus.perihelionEclipticYears,   eclExpr: '-8H/6' },
   earth:   { name: 'Earth',   eclP: H/16,                                      eclExpr: 'H/16' },
   mars:    { name: 'Mars',    eclP: C.planets.mars.perihelionEclipticYears,    eclExpr: '8H/35' },
-  jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, eclExpr: 'H/5' },
-  saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  eclExpr: '-H/8' },
+  jupiter: { name: 'Jupiter', eclP: C.planets.jupiter.perihelionEclipticYears, eclExpr: '8H/39' },
+  saturn:  { name: 'Saturn',  eclP: C.planets.saturn.perihelionEclipticYears,  eclExpr: '-8H/65' },
   uranus:  { name: 'Uranus',  eclP: C.planets.uranus.perihelionEclipticYears,  eclExpr: 'H/3' },
   neptune: { name: 'Neptune', eclP: C.planets.neptune.perihelionEclipticYears, eclExpr: '2H' },
 };
 
 const icrfExpr = {
   mercury: '-8H/93', venus: '-8H/110', earth: '+H/3', mars: '-8H/69',
-  jupiter: '-H/8', saturn: '-H/21', uranus: '-H/10', neptune: '-2H/25',
+  jupiter: '-8H/65', saturn: '-8H/169', uranus: '-H/10', neptune: '-2H/25',
 };
 
 // Compute ICRF periods
