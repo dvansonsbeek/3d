@@ -33,8 +33,8 @@ PLANET_CYCLES = {
     "Venus":   {"Axial": 91, "Peri_ecl": 6,  "ICRF": 110, "AscNode": 1,  "Obliq": 110, "Ecc": 19},
     "Earth":   {"Axial": 104,"Peri_ecl": 128,"ICRF": 24,  "AscNode": 40, "Obliq": 64,  "Ecc": 128},
     "Mars":    {"Axial": 16, "Peri_ecl": 35, "ICRF": 69,  "AscNode": 63, "Obliq": 21,  "Ecc": 53},
-    "Jupiter": {"Axial": 21, "Peri_ecl": 40, "ICRF": 64,  "AscNode": 36, "Obliq": 16,  "Ecc": 43},
-    "Saturn":  {"Axial": 6,  "Peri_ecl": 64, "ICRF": 168, "AscNode": 36, "Obliq": 24,  "Ecc": 162},
+    "Jupiter": {"Axial": 21, "Peri_ecl": 39, "ICRF": 65,  "AscNode": 36, "Obliq": 16,  "Ecc": 44},
+    "Saturn":  {"Axial": 6,  "Peri_ecl": 65, "ICRF": 169, "AscNode": 36, "Obliq": 24,  "Ecc": 163},
     "Uranus":  {"Axial": 0,  "Peri_ecl": 24, "ICRF": 80,  "AscNode": 12, "Obliq": 16,  "Ecc": 80},
     "Neptune": {"Axial": 0,  "Peri_ecl": 4,  "ICRF": 100, "AscNode": 3,  "Obliq": 100, "Ecc": 100},
 }

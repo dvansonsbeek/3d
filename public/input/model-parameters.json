@@ -107,8 +107,8 @@
       "startpos": 13.887515861166527,
       "angleCorrection": 0.9306755833382816,
       "perihelionEclipticFraction": [
-        1,
-        5
+        8,
+        39
       ],
       "type": "III",
       "mirrorPair": "mars",
@@ -132,8 +132,8 @@
       "startpos": 11.279516656942398,
       "angleCorrection": -0.17881068893228758,
       "perihelionEclipticFraction": [
-        -1,
-        8
+        -8,
+        65
       ],
       "type": "III",
       "mirrorPair": "earth",
