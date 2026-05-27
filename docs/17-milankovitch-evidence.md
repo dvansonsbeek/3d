@@ -110,9 +110,9 @@ What differs between frameworks is **physical attribution**:
 |---|---|---|
 | Eigenmodes (g_j, s_j) | Mathematical objects — accepted | Mathematical objects — accepted |
 | Attribution to planets | g_j labelled by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", g₃ = "Earth", …) | **Not endorsed** — the eigenmodes are composite modes of the multi-planet system, not single-planet quantities |
-| Planet-specific cycles | Same as the eigenmode periods (1/g₅ ≈ 305 kyr "is" Jupiter's apsidal period) | Specific H-divisor cycles per [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (Jupiter ecliptic perihelion = H/5 = 67.06 kyr; Jupiter ICRF perihelion = H/8 = 41.91 kyr; Jupiter Axial = 8H/21; …) |
+| Planet-specific cycles | Same as the eigenmode periods (1/g₅ ≈ 305 kyr "is" Jupiter's apsidal period) | Specific 8H-divisor cycles per [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr; Jupiter ICRF perihelion = 8H/65 = 41.27 kyr; Jupiter Axial = 8H/21; … the kinematic Fibonacci anchors are H/5 and H/8) |
 
-**Notation in this document.** Throughout §§2–7, references like *"k+g₅ climatic precession sub-peak"* mean **the mathematical eigenmode beat**, *not* "Jupiter modulation of climatic precession". The 23.7-kyr peak at n=113 is real and is correctly described as k+g₅; whether g₅ is "Jupiter" is a separate (Berger) interpretive claim that the model does not accept. When we want the model's planet-specific cycle for Jupiter (or any other planet), we use the doc 55 notation: e.g., **Jupiter ecliptic perihelion = H/5** and **Jupiter Axial = 8H/21**, two distinct cycles that don't reduce to a single "Jupiter eigenmode".
+**Notation in this document.** Throughout §§2–7, references like *"k+g₅ climatic precession sub-peak"* mean **the mathematical eigenmode beat**, *not* "Jupiter modulation of climatic precession". The 23.7-kyr peak at n=113 is real and is correctly described as k+g₅; whether g₅ is "Jupiter" is a separate (Berger) interpretive claim that the model does not accept. When we want the model's planet-specific cycle for Jupiter (or any other planet), we use the doc 55 notation: e.g., **Jupiter ecliptic perihelion = 8H/39** (dynamical; kinematic anchor H/5) and **Jupiter Axial = 8H/21**, two distinct cycles that don't reduce to a single "Jupiter eigenmode".
 
 ---
 
@@ -162,7 +162,7 @@ Each n corresponds to a specific celestial-mechanics quantity. Letters refer to 
 | 68 | 39.5 kyr | 0.162 | k+s₄ Berger Mars-modulated obliquity sub-peak |
 | 73 | 36.8 kyr | 0.092 | 2\|s₄\| Mars nodal harmonic / g₃−s₄ |
 | 76 | 35.3 kyr | 0.091 | g₄−s₃ Mars apsidal − Earth nodal beat |
-| **113** | **23.74 kyr** | **0.086** | **k+g₅ climatic precession sub-peak (Berger 23.7k)** — *note: Berger's convention associates g₅ with Jupiter at ~305 kyr eigenmode, an attribution the model does not endorse (Jupiter sits at H/5 or H/8 in doc 55)* |
+| **113** | **23.74 kyr** | **0.086** | **k+g₅ climatic precession sub-peak (Berger 23.7k)** — *note: Berger's convention associates g₅ with Jupiter at ~305 kyr eigenmode, an attribution the model does not endorse (Jupiter's perihelion sits at 8H/39 ecliptic / 8H/65 ICRF in doc 55)* |
 | **120** | **22.35 kyr** | **0.104** | **k+g₂ climatic precession sub-peak = H/15 (Berger 22.4k)** |
 
 **Six of the 25 integers** correspond directly to specific doc 55 planet cycles — these are the **model-direct matches** detectable as climate signals:
@@ -290,7 +290,7 @@ The model's intrinsic Earth precession periods are the Fibonacci divisors of H:
 |---:|---:|---|
 | 24 | 111.77 kyr | H/3 = inclination precession |
 | 40 | 67.06 kyr | H/5 = ecliptic precession |
-| 64 | 41.91 kyr | H/8 = obliquity (model) / Jupiter ICRF perihelion |
+| 64 | 41.91 kyr | H/8 = obliquity (model, kinematic intrinsic value) |
 | 104 | 25.79 kyr | H/13 = axial precession |
 | 128 | 20.96 kyr | H/16 = perihelion precession |
 
@@ -1294,7 +1294,7 @@ The 405-kyr cycle is a **real, empirically observed climate signal**. Across CEN
 | Planet | Laskar (g_i) apsidal period | Framework (doc 55) ecliptic perihelion |
 |---|---:|---:|
 | Venus | ~174 kyr (g₂ = 7.453″/yr) | **−447,089 yr** (= −8H/6, retrograde) |
-| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+67,063 yr** (= H/5) |
+| Jupiter | ~305 kyr (g₅ = 4.257″/yr) | **+68,783 yr** (= 8H/39, dynamical; kinematic anchor H/5) |
 
 In the framework's planet motions, Venus's and Jupiter's perihelion-precession rates produce a beat at ~58 or ~79 kyr (depending on sign convention), **not 405 kyr**. The §13.3 mathematical proof confirms it: no combination of any cycles in doc 55 reaches the 405-kyr range. The framework simply does not have a Venus-Jupiter beat at 405 kyr.
 

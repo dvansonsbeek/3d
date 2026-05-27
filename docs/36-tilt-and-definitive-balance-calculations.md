@@ -374,8 +374,8 @@ occurs at each planet's eccentricity cycle (see Section 10).
 | Venus   | -447,089            | -8H / 6              | Retrograde |
 | Earth   |  20,957             | H / 16               | Prograde   |
 | Mars    |  76,644             | H / (4 + 3/8)       | Prograde   |
-| Jupiter |  67,063             | H / 5                | Prograde   |
-| Saturn  | -41,915             | -H / 8               | Retrograde |
+| Jupiter |  68,783             | 8H / 39              | Prograde   |
+| Saturn  | -41,270             | -8H / 65             | Retrograde |
 | Uranus  | 111,772             | H / 3                | Prograde   |
 | Neptune | 670,634             | H * 2                | Prograde   |
 

@@ -301,8 +301,8 @@ See [Fibonacci Laws](10-fibonacci-laws.md), verified by [Inclination Optimizatio
 | Venus | -8H / 6 | ~-447,089 (retrograde) |
 | Earth | H / 16 | ~20,957 |
 | Mars | H / (4 + 3/8) | ~76,644 |
-| Jupiter | H / 5 | ~67,063 |
-| Saturn | -H / 8 | ~-41,915 (retrograde) |
+| Jupiter | 8H / 39 | ~68,783 |
+| Saturn | -8H / 65 | ~-41,270 (retrograde) |
 | Uranus | H / 3 | ~111,772 |
 | Neptune | H × 2 | ~670,634 |
 

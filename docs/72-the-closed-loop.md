@@ -133,7 +133,7 @@ From these free parameters, the model derives:
 
 **From Law 1 (Earth's Fibonacci cycle hierarchy) and the 8H scaffold:**
 - Earth's ecliptic perihelion (H/16), inclination (H/3), ecliptic precession (H/5), obliquity (H/8), and axial precession (H/13) — all H/Fibonacci by Law 1
-- Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) — H/Fibonacci by Law 6's H/8 triple identity
+- Jupiter's and Saturn's perihelion — kinematic Fibonacci anchors (Jupiter H/5 ecliptic, H/8 ICRF; Saturn H/8 ecliptic, H/21 ICRF) refined dynamically to 8H/39, 8H/65, 8H/169 by Law 6's two-level structure (kinematic H/8 triple identity / dynamical 8H/65 dual identity)
 - Other planets' precession periods — integer divisors of 8H (the Solar System Resonance Cycle), mostly non-Fibonacci
 - Axial precession periods (H × d-combinations, some predicted)
 

@@ -345,12 +345,12 @@ Without the modified speed, Mars's negative planet speed would produce CW orbit 
 ##### Saturn — retrograde perihelion precession
 
 Saturn is unique among Type III planets:
-- `PerihelionEclipticYears = −H/8` (NEGATIVE → retrograde precession)
+- `PerihelionEclipticYears = −8H/65` (dynamical secular value; kinematic Fibonacci anchor was −H/8. NEGATIVE → retrograde precession)
 - `RealPerihelionAtSun.orbitRadius: −saturnElipticOrbit` (NEGATIVE radius → flips EO circle direction)
 - The negative PrecYears reverses the Ecliptic1/2 sandwich rotation directions:
-  - Ecliptic1: speed = 2π/(−H/8) = negative (opposite to other planets)
-  - Ecliptic2: speed = −2π/(−H/8) = positive
-- This correctly models Saturn's retrograde apsidal precession (~−3400 arcsec/century)
+  - Ecliptic1: speed = 2π/(−8H/65) = negative (opposite to other planets)
+  - Ecliptic2: speed = −2π/(−8H/65) = positive
+- This correctly models Saturn's retrograde apsidal precession (~−3140 arcsec/century; closer to the observed ~−3400 than the kinematic anchor's −3092)
 - The negative orbitRadius ensures the EO offset is in the correct direction for the reversed precession
 
 ##### Planet speed and startPos conventions
@@ -405,12 +405,12 @@ All planets use `PerihelionDurationEcliptic1` (+ω_prec) and `PerihelionDuration
 | Mercury | H/(1+3/8) | — | ~570 |
 | Venus | −8H/6 | 6 (retrograde) | ~−290 (model) |
 | Mars | H/(4+3/8) | — | ~1,600 |
-| Jupiter | H/5 | 5 | ~1,800 |
-| Saturn | −H/8 | 8 (retrograde) | ~−3,400 |
+| Jupiter | 8H/39 (kinematic anchor H/5) | 39 = 3×13 | ~1,884 |
+| Saturn | −8H/65 (kinematic anchor −H/8) | 65 = 5×13 (retrograde) | ~−3,140 |
 | Uranus | H/3 | 3 | ~1,100 |
 | Neptune | H×2 | — | ~200 |
 
-Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter, Saturn, and Uranus use clean Fibonacci divisions. Venus and Saturn both precess ecliptic-retrograde.
+Mercury and Mars use non-Fibonacci periods (rational fractions of H). Jupiter and Saturn use their *dynamical* secular periods (8H/39, −8H/65; one 8H-lattice integer off the clean kinematic Fibonacci anchors H/5, −H/8 — see Law 6); Uranus uses a clean Fibonacci division. Venus and Saturn both precess ecliptic-retrograde.
 
 ##### Assessment conclusion for planet chains
 
@@ -627,7 +627,7 @@ All 6 scripts + shared constants module created in `tools/explore/`. Run with `n
 - ALL Fibonacci beat frequency identities are **algebraically EXACT** (zero residual) — this is pure number theory (F(n) + F(n+1) = F(n+2))
 - Earth meeting frequency: 1/(H/13) + 1/(H/3) = 1/(H/16) — EXACT (16 = 13 + 3)
 - Psi-constant: ψ = (5 × 21²) / (2 × H) = 3.288 × 10⁻³ (H=335,317)
-- Clean Fibonacci perihelion precession: Jupiter (H/5), Saturn (-H/8), Uranus (H/3). Others use rational fractions of H.
+- Perihelion precession: Uranus at clean Fibonacci H/3; Jupiter and Saturn at dynamical secular 8H/39 and −8H/65 (kinematic Fibonacci anchors H/5, −H/8). Others use rational fractions of H.
 
 **3. Conjunction periods (conjunction-periods.js):**
 - Jupiter-Saturn great conjunction: **19.8601 years** (model) vs ~19.859 years (known) — 0.001 year difference

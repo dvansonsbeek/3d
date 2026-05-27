@@ -40,7 +40,7 @@ The "100-kyr problem" is that standard eccentricity has *split* peaks at 95 & 12
 | Cycle | Model formula | Years | Source |
 |---|---|---:|---|
 | **Inclination precession** | H/3 | **111,772** | Earth's orbital plane → invariable plane oscillation |
-| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); also matches Jupiter's perihelion period |
+| **Ecliptic precession** | H/5 | **67,063** | Earth's orbital plane regression around the invariable plane = **nodal regression** (`f_nodal` in §3); coincides with Jupiter's *kinematic* perihelion anchor (Jupiter's dynamical ecliptic perihelion is 8H/39 = 68,783 yr) |
 | **Obliquity oscillation** | H/8 | **41,915** | Beat: f_axial − f_nodal (13 − 5 = 8 in H/n indices) |
 | **Axial precession** | H/13 | **25,794** | Earth's spin-axis equinox precession |
 | **Perihelion precession** | H/16 | **20,957** | Beat: f_axial + f_apsidal (13 + 3 = 16). Also the Berger climatic-precession centroid in the ~19–24 kyr band; dominant Berger peak is at 23.7 kyr (n=113, see §4.2). |
@@ -68,7 +68,7 @@ This is structural, not numerical fitting. The same Fibonacci numbers that organ
 
 ## 4. Comparison with Standard Secular Theory — Direct Matches
 
-> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles live in the [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (e.g., Jupiter ecliptic perihelion = H/5 = 67.06 kyr, Jupiter ICRF = H/8 = 41.91 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
+> **A note on eigenmode labelling.** The secular eigenmodes g_j (apsidal) and s_j (nodal) are **mathematical objects** — eigenvalues of the Laplace-Lagrange perturbation matrix capturing gravitational coupling between all eight planets. Both Berger 1978 and the Holistic model accept the eigenmodes. What differs is **attribution**: Berger labels each g_j / s_j by the planet whose contribution dominates that mode (g₅ = "Jupiter", g₂ = "Venus", …), while the Holistic model treats the eigenmodes as **composite modes of the multi-planet system** and does not equate them to single-planet quantities. The model's planet-specific cycles live in the [doc 55 period table](55-solar-system-resonance-cycle-periods.md) (e.g., Jupiter ecliptic perihelion = 8H/39 = 68.78 kyr, Jupiter ICRF = 8H/65 = 41.27 kyr, Jupiter Axial = 8H/21 — three distinct cycles, none equal to 1/g₅; the kinematic Fibonacci anchors are H/5 and H/8). The "(Jupiter)" / "(Mercury)" / etc. labels in the tables that follow are Berger's convention, retained for consistency with the literature.
 
 ### 4.1 Standard Milankovitch periods
 

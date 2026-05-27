@@ -44,8 +44,8 @@ The WebGeoCalc trends extracted by the Explorer for the 1900–2026 window are s
 | Venus | ~0 ″/cy (flips sign across windows) | ✗ un-determined | −290 (−8H/6) |
 | Earth | ~6,186 ″/cy prograde (wrt equinox) | ✓ resolvable | 6,187 (H/16) |
 | Mars | ~1,600 ″/cy prograde | ✓ resolvable | 1,691 (H × 8/35) |
-| Jupiter | ~1,800 ″/cy prograde (current epoch) | ✗ un-determined | 1,933 (H/5) |
-| Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,092 (−H/8) |
+| Jupiter | ~1,800 ″/cy prograde (current epoch) | ✗ un-determined | 1,884 (8H/39 dynamical; kinematic anchor H/5 = 1,933) |
+| Saturn | retrograde, ~−1,800 to −3,600 ″/cy depending on window | ✗ un-determined (magnitude window-sensitive) | −3,140 (−8H/65 dynamical; kinematic anchor −H/8 = −3,092) |
 | Uranus | ~1,100 ″/cy (current epoch) | ✗ un-determined | 1,160 (H/3) |
 | Neptune | ~200 ″/cy (current epoch) | ✗ un-determined | 193 (2H) |
 

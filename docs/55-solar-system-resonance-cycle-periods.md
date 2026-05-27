@@ -26,7 +26,7 @@ Each planet has up to six distinct long-period cycles shown in the modal:
 The rate at which the planet's spin axis precesses (wobbles). For Earth this is the well-known ~25,794-year cycle (H/13). Every planet has its own axial precession rate, though Uranus and Neptune's are extremely long (effectively frozen).
 
 ### 2. Perihelion Precession — Ecliptic Frame
-The rate at which the perihelion longitude advances in the ecliptic frame. All planets precess prograde except Saturn (retrograde). These periods are H/Fibonacci fractions.
+The rate at which the perihelion longitude advances in the ecliptic frame. All planets precess prograde except Saturn (retrograde). Earth's is an H/Fibonacci fraction (H/16); the others are 8H/N. Jupiter and Saturn sit at clean kinematic Fibonacci anchors (H/5, H/8) but their *dynamical* secular periods land one 8H-lattice integer off — Jupiter 8H/39, Saturn −8H/65 — matching Laskar's secular theory and the climate record (Law 6).
 
 ### 3. Perihelion Precession — ICRF Frame (= Inclination Cycle)
 The ecliptic rate minus general precession (H/13). This is the rate that drives the inclination oscillation on the invariable plane. Earth is the sole prograde planet in the ICRF. All ICRF periods divide 8H evenly.
@@ -50,8 +50,8 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 | Venus | +8H/91 | −8H/6 | −8H/110 | **−8H/1** | 8H/110 | 8H/19 |
 | **Earth** | **−8H/104** | **8H/128** | **+8H/24** | **−8H/40** | **8H/64** | **8H/128** |
 | Mars | −8H/16 | 8H/35 | −8H/69 | **−8H/63** | 8H/21 | 8H/53 |
-| Jupiter | −8H/21 | 8H/40 | −8H/64 | **−8H/36** | 8H/16 | 8H/43 |
-| Saturn | −8H/6 | −8H/64 | −8H/168 | **−8H/36** | 8H/24 | 8H/162 |
+| Jupiter | −8H/21 | 8H/39 | −8H/65 | **−8H/36** | 8H/16 | 8H/44 |
+| Saturn | −8H/6 | −8H/65 | −8H/169 | **−8H/36** | 8H/24 | 8H/163 |
 | Uranus | ~∞ | 8H/24 | −8H/80 | **−8H/12** | 8H/16 | 8H/80 |
 | Neptune | ~∞ | 8H/4 | −8H/100 | **−8H/3** | 8H/100 | 8H/100 |
 
@@ -72,8 +72,8 @@ Notes:
 | Venus | +29,478 | −447,089 | −24,387 | **−2,682,536** | 24,387 | 141,186 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
 | Mars | −167,659 | 76,644 | −38,877 | **−42,580** | 127,740 | 50,614 |
-| Jupiter | −127,740 | 67,063 | −41,915 | **−74,515** | 167,659 | 62,385 |
-| Saturn | −447,089 | −41,915 | −15,967 | **−74,515** | 111,772 | 16,559 |
+| Jupiter | −127,740 | 68,783 | −41,270 | **−74,515** | 167,659 | 60,967 |
+| Saturn | −447,089 | −41,270 | −15,873 | **−74,515** | 111,772 | 16,457 |
 | Uranus | ~∞ | 111,772 | −33,532 | **−223,545** | 167,659 | 33,532 |
 | Neptune | ~∞ | 670,634 | −26,825 | **−894,179** | 26,825 | 26,825 |
 
@@ -91,9 +91,16 @@ Notes:
 
 ### Fibonacci Connections in 8H/N Divisors
 Many divisors are products of small Fibonacci numbers:
-- 24 = 3 × 8, 40 = 5 × 8, 64 = 8 × 8, 80 = 5 × 16
-- 104 = 8 × 13, 128 = 8 × 16, 168 = 8 × 21
+- 24 = 3 × 8, 64 = 8 × 8, 80 = 5 × 16
+- 104 = 8 × 13, 128 = 8 × 16
 - The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 63 = 7 × 9, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Solar System Resonance Cycle)
+
+**Jupiter and Saturn's dynamical perihelion integers are themselves Fibonacci products** — and all share the factor 13 (= F₇, Earth's axial-precession Fibonacci number):
+- Jupiter ecliptic 39 = **3 × 13** (F₄ × F₇)
+- Jupiter ICRF / Saturn ecliptic 65 = **5 × 13** (F₅ × F₇)
+- Saturn ICRF 169 = **13²** (F₇²)
+
+The kinematic anchors (40 = 5 × 8, 64 = 8², 168 = 8 × 21) factor through 8; the dynamical secular values factor through 13. Earth's axial precession (8H/104 = 8 × 13) is the bridge: the frame conversion N_ICRF = 104 − N_ecl is exactly what carries Jupiter and Saturn onto the 13-lattice.
 
 ### The Three Fibonacci Levels
 1. **Level 1** — Fibonacci d-values (Law 2): d = 3, 5, 21, 34
@@ -129,14 +136,16 @@ N_ICRF = 104 − N_ecl    (for prograde ecliptic planets)
 |--------|---------------|--------|
 | Mercury | 11 + 93 | ✓ |
 | Mars | 35 + 69 | ✓ |
-| Jupiter | 40 + 64 | ✓ |
+| Jupiter | 39 + 65 | ✓ |
 | Uranus | 24 + 80 | ✓ |
 | Neptune | 4 + 100 | ✓ |
 
-The number 104 = 8 × 13 is Earth's axial precession N. Three special cases:
+The number 104 = 8 × 13 is Earth's axial precession N. The frame conversion is a true
+*dynamical* identity: it holds for Jupiter at its secular values (39 + 65 = 104) just as
+it did at the kinematic anchors (40 + 64 = 104). Three special cases:
 
 - **Earth** breaks the sum rule (N_ecl=128 > 104, giving prograde ICRF perihelion).
-- **Saturn** is retrograde ecliptic, so N_ICRF = 104 + |N_ecl| = 104 + 64 = 168.
+- **Saturn** is retrograde ecliptic, so N_ICRF = 104 + |N_ecl| = 104 + 65 = 169 (dynamical; kinematic anchor was 104 + 64 = 168).
 - **Venus** is also retrograde ecliptic, so N_ICRF = 104 + |N_ecl| = 104 + 6 = 110.
 
 **Identity 2: Eccentricity cycle as integer beat**
@@ -154,19 +163,27 @@ N_ecc = N_axial + N_ICRF = 128    (Earth — fast beat = perihelion precession H
 | Venus | \|91 − 110\| | 19 |
 | **Earth** | **104 + 24** | **128** |
 | Mars | \|16 − 69\| | 53 |
-| Jupiter | \|21 − 64\| | 43 |
-| Saturn | \|6 − 168\| | 162 |
+| Jupiter | \|21 − 65\| | 44 |
+| Saturn | \|6 − 169\| | 163 |
 | Uranus | Axial ≈ 0 → Ecc = ICRF | 80 |
 | Neptune | Axial ≈ 0 → Ecc = ICRF | 100 |
 
 Earth uses the fast beat (sum) by definition — its wobble equals its perihelion precession period H/16. All other non-frozen planets follow the slow-beat rule. Uranus and Neptune are special cases (frozen axial → wobble equals ICRF rate alone).
 
-**Identity 3: Obliquity decomposition**
+**Identity 3: Obliquity decomposition** — *kinematic only*
 ```
 N_ecl = N_obliq + N_eclPrec
 ```
 
-| Planet | N_ecl | = N_obliq + N_eclPrec | Period at 8H/N_eclPrec |
+> Unlike Identities 1 and 2, this decomposition holds for Jupiter and Saturn **only
+> at their kinematic Fibonacci anchors** (Jupiter N_ecl=40, Saturn N_ecl=64). It is a
+> structural Fibonacci identity — the ecliptic-perihelion integer splits into the
+> obliquity integer plus a residual. The *dynamical* secular values (Jupiter 39,
+> Saturn 65) are off-lattice beats and do not decompose this way, which is why the
+> obliquity cycles (Jupiter 8H/16, Saturn 8H/24) are anchored to the kinematic
+> integers, not the dynamical ones. The table below uses the kinematic N_ecl.
+
+| Planet | N_ecl (kinematic) | = N_obliq + N_eclPrec | Period at 8H/N_eclPrec |
 |--------|-------|----------------------|------------------------|
 | Mercury | 11 | 3 + 8 | H (335,317 yr) |
 | Venus | 6 | 110 + (−104) | H/13 (25,794 yr) |
@@ -181,7 +198,7 @@ The "Period at 8H/N_eclPrec" column is the period associated with the residual i
 
 **Mirror pair**: Mercury ↔ Uranus share N_eclPrec = 8 (period = H).
 
-Earth ↔ Saturn and Mars ↔ Jupiter have different decompositions, but cross-pair links appear: Jupiter's N_eclPrec (24) = Saturn's obliquity (24), and Saturn's N_eclPrec (40) = Jupiter's ecliptic perihelion (40).
+Earth ↔ Saturn and Mars ↔ Jupiter have different decompositions, but cross-pair links appear (at the kinematic anchors): Jupiter's N_eclPrec (24) = Saturn's obliquity (24), and Saturn's N_eclPrec (40) = Jupiter's *kinematic* ecliptic perihelion (40; the dynamical value is 39).
 
 ### Mars–Jupiter Axial–Obliquity Swap
 

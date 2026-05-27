@@ -11,7 +11,7 @@ The six Fibonacci Laws form a layered architecture:
 - **Law 1** (Fibonacci Cycle Hierarchy) — Earth's major precession periods divide H by Fibonacci numbers (H/3, H/5, H/8, H/13). A hierarchy unique to Earth.
 - **Laws 2–3** (Inclination Constant + Balance) — each planet's inclination amplitude is quantized by a Fibonacci divisor, and the mass-weighted amplitudes cancel between two phase groups (seven in-phase planets balanced against Saturn alone)
 - **Laws 4–5** (Eccentricity Amplitude Constant + Balance) — a single constant K predicts all 8 eccentricity amplitudes, and the base eccentricities satisfy an independent balance condition with the same Fibonacci divisors and phase groups as Law 3
-- **Law 6** (Saturn-Jupiter-Earth Resonance) — Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion and Saturn's ecliptic perihelion: a triple identity at H/8, with the gas giants gravitationally driving Earth's spin-axis dynamics through their well-known mutual resonance lock
+- **Law 6** (Saturn-Jupiter-Earth Resonance) — Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (a structural balance, not a coincidence); this is the obliquity beat in Earth's climate record, one 8H-lattice step from Earth's Fibonacci obliquity H/8 (= 8H/64). The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock
 
 For detailed mathematical derivations and formula coefficient breakdowns, see [Formula Derivation](35-formula-derivation.md).
 
@@ -87,7 +87,7 @@ Where a = semi-major axis, e = eccentricity, i J2000 = inclination to the invari
 
 Beat frequency rule: `1/H(n) + 1/H(n+1) = 1/H(n+2)` — an algebraic identity from the Fibonacci recurrence (3+5=8, 5+8=13, 8+13=21, …).
 
-**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6 (the H/8 triple identity). The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
+**Earth's H/Fibonacci hierarchy is unique.** Only Earth has all major precession periods at H divided by Fibonacci numbers. At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values; their dynamical secular periods sit one 8H-lattice integer away (8H/39, 8H/65, 8H/169). Both levels are the subject of Law 6. The other planets' precession periods divide the Solar System Resonance Cycle (8H) by various integers, mostly non-Fibonacci. See [Solar System Resonance Cycle Periods](55-solar-system-resonance-cycle-periods.md) for the all-planet 8H/N table.
 
 ### Law 2: The Inclination Amplitude Constant
 
@@ -167,17 +167,21 @@ The eccentricity amplitudes used in the balance are predicted by Law 4 (the K co
 
 ### Law 6: Saturn-Jupiter-Earth Resonance
 
-**Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period — a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics. Jupiter and Saturn maintain this configuration through their well-known mutual resonance lock.**
+**Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period lock to a single period: 8H/65 (~41,270 yr). This is a structural balance of the solar system — not a coincidence — and it is the obliquity beat that dominates Earth's climate record. Earth's own obliquity cycle sits one lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so beating against the gas giants' actual ecliptic period (8H/39) gives 8H/65, while beating against Law 1's Fibonacci anchor (H/5) gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.**
 
-The triple identity at H/8:
+Two levels, one motion:
 
-| Object | Period | Frame |
-|--------|--------|-------|
-| Earth obliquity | H/8 | — |
-| Jupiter perihelion | H/8 | ICRF |
-| Saturn perihelion | H/8 (retrograde) | ecliptic |
+| Object | Kinematic (Fibonacci anchor) | Dynamical (N-body secular) | Frame |
+|--------|------------------------------|----------------------------|-------|
+| Jupiter perihelion | H/8 | **8H/65** | ICRF |
+| Saturn perihelion | H/8 (retrograde) | **8H/65** (retrograde) | ecliptic |
+| Earth obliquity beat | H/8 (= 8H/64) | 8H/65 (k+s₃) as recorded | — |
 
-The same H/8 coincides with three different physical quantities — one Earth spin-axis cycle and two gas-giant orbital cycles — closing through the Fibonacci identity 3 + 5 = 8. The closed beat-frequency loop:
+At the **dynamical** level the identity is exact and structural: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. At the **kinematic** level all three quantities collapse onto Earth's Fibonacci anchor H/8, closing through 3 + 5 = 8.
+
+**Why Earth's obliquity is one step off (8H/64 vs 8H/65).** Earth's obliquity is the beat of its axial precession against the precession of the ecliptic plane: in 8H-integer terms, 104 (axial, H/13) − (ecliptic). With Law 1's Fibonacci ecliptic anchor H/5 = 40, the beat is 104 − 40 = 64 → H/8. With the gas giants' real ecliptic period 8H/39 = 39 (Laskar's s₃), it is 104 − 39 = 65 → 8H/65. The single-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65). Law 1 sets Earth's Fibonacci hierarchy; Law 6 explains why the gas-giant-driven obliquity recorded in climate lands one step over.
+
+The closed beat-frequency loop (kinematic Fibonacci anchors):
 
 ```
 Earth incl. + Jupiter → Saturn (obliquity):  1/(H/3) + 1/(H/5) = 1/(H/8)    (3 + 5 = 8)
@@ -187,7 +191,7 @@ Saturn − Earth → Jupiter:                    1/(H/8) − 1/(H/3) = 1/(H/5)  
 
 All three rows are cyclic permutations of a single Fibonacci identity (3 + 5 = 8). Combining Jupiter and Saturn further extends to axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13), connecting Law 6 to Law 1's hierarchy.
 
-The physical mechanism is the Jupiter–Saturn mean-motion near-resonance (5:2, the Great Inequality), well established in celestial mechanics. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit. The triple identity at H/8 is what couples this gas-giant resonance into Earth's obliquity cycle — making Earth's spin-axis dynamics a direct beat of Jupiter and Saturn.
+The physical mechanism is the locking of Jupiter's and Saturn's perihelion precession to a common period (8H/65): a structural balance held by the mutual gravitational coupling of the two gas giants. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit. This shared perihelion period is what couples the gas-giant pair into Earth's obliquity cycle — making Earth's spin-axis dynamics a direct beat of Jupiter and Saturn.
 
 ---
 

@@ -148,8 +148,8 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 | Venus | `−8H/6` | `8H/110` ≈ 24,387 yr | Retrograde |
 | Earth | `H / 3` | `H/3` ≈ 111,772 yr | Prograde (sole) |
 | Mars | `H × 8/35` | `8H/69` ≈ 38,877 yr | Retrograde |
-| Jupiter | `H / 5` | `H/8` ≈ 41,915 yr | Retrograde |
-| Saturn | `H / 8` | `H/5` ≈ 67,063 yr | Retrograde |
+| Jupiter | `8H/39` | `8H/65` ≈ 41,270 yr | Retrograde |
+| Saturn | `−8H/65` | `8H/169` ≈ 15,873 yr | Retrograde |
 | Uranus | `H / 3` | `H/16` ≈ 20,957 yr | Retrograde |
 | Neptune | `H × 2` | `2H/25` ≈ 26,825 yr | Retrograde |
 | Pluto | `H` | `H/14` ≈ 23,951 yr | Retrograde |

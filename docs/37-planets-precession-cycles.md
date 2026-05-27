@@ -67,8 +67,8 @@ precession hierarchy.
 | Venus | ~0 | — | −8H/6 | −289.9 | −447,089 yr (r) |
 | Earth | ~6,186 | ~20,957 yr | H/16 | 6,186.5 | 20,957 yr |
 | Mars | ~1,600 | ~81 kyr | H × 8/35 | 1,691.0 | 76,644 yr |
-| Jupiter | ~1,800 | ~72 kyr | H/5 | 1,932.5 | 67,063 yr |
-| Saturn | ~−3,400 | ~38 kyr (r) | H/8 | −3,092.0 | 41,915 yr |
+| Jupiter | ~1,800 | ~72 kyr | 8H/39 | 1,884.2 | 68,783 yr |
+| Saturn | ~−3,400 | ~38 kyr (r) | −8H/65 | −3,140.0 | 41,270 yr |
 | Uranus | ~1,100 | ~118 kyr | H/3 | 1,159.5 | 111,772 yr |
 | Neptune | ~200 | ~648 kyr | H × 2 | 193.3 | 670,634 yr |
 
@@ -80,7 +80,7 @@ over longer timescales.
 
 **Notable patterns:**
 - **Earth = Uranus** (both H/3) — same period, same rate
-- **Jupiter = H/5**, **Saturn = H/8** — consecutive Fibonacci denominators
+- **Jupiter = 8H/39**, **Saturn = −8H/65** (dynamical; kinematic Fibonacci anchors H/5, H/8 — consecutive Fibonacci denominators)
 - Saturn's perihelion precesses obviously retrograde against the ecliptic
 - Mercury's H × 8/11: 8 is Fibonacci (F6), 11 is Lucas (L5)
 
@@ -280,12 +280,12 @@ The wobble is the **meeting frequency** of these two motions:
 | Venus | −447,089 yr (r) | −8H/6 | −24,387 yr | −8H/110 | retro |
 | Earth | 20,957 yr | H/16 | +111,772 yr | +H/3 | **pro** |
 | Mars | 76,644 yr | 8H/35 | −38,877 yr | −8H/69 | retro |
-| Jupiter | 67,063 yr | H/5 | −41,915 yr | −H/8 | retro |
-| Saturn | −41,915 yr (r) | −H/8 | −15,967 yr | −H/21 | retro |
+| Jupiter | 68,783 yr | 8H/39 | −41,270 yr | −8H/65 | retro |
+| Saturn | −41,270 yr (r) | −8H/65 | −15,873 yr | −8H/169 | retro |
 | Uranus | 111,772 yr | H/3 | −33,532 yr | −H/10 | retro |
 | Neptune | 670,634 yr | H×2 | −26,825 yr | −2H/25 | retro |
 
-Notable ICRF patterns: Jupiter = **H/8** (F6), Saturn = **H/21** (F8).
+Notable ICRF patterns (dynamical): Jupiter = **8H/65**, Saturn = **8H/169** — at the kinematic level these sit at the Fibonacci anchors H/8 (F6) and H/21 (F8).
 Earth is the only planet with prograde perihelion ICRF.
 
 ### Part 2: Axial Precession (from research)
@@ -309,8 +309,8 @@ Earth is the only planet with prograde perihelion ICRF.
 | Venus | pro | retro | opp: sum | 191/(8H) | 14,045 yr | 8H/191 |
 | Earth | retro | pro | opp: sum | 16/H | 20,957 yr | **H/16** |
 | Mars | retro | retro | same: \|diff\| | 20/(3H) | 50,298 yr | 3H/20 |
-| Jupiter | retro | retro | same: \|diff\| | 43/(8H) | 62,385 yr | 8H/43 |
-| Saturn | retro | retro | same: \|diff\| | 81/(4H) | 16,559 yr | 4H/81 |
+| Jupiter | retro | retro | same: \|diff\| | 44/(8H) | 60,967 yr | 8H/44 |
+| Saturn | retro | retro | same: \|diff\| | 163/(8H) | 16,457 yr | 8H/163 |
 | Uranus | pro | retro | opp: sum | ≈10/H | 33,532 yr | ≈H/10 |
 | Neptune | retro | retro | same: \|diff\| | ≈25/(2H) | 26,825 yr | ≈2H/25 |
 
@@ -319,12 +319,13 @@ Calculation detail:
 - **Venus**: 91/(8H) + 25/(2H) = 91/(8H) + 100/(8H) = 191/(8H)
 - **Earth**: 13/H + 3/H = 16/H ✓
 - **Mars**: |2/H − 26/(3H)| = |6/(3H) − 26/(3H)| = 20/(3H)
-- **Jupiter**: |21/(8H) − 8/H| = |21/(8H) − 64/(8H)| = 43/(8H)
-- **Saturn**: |3/(4H) − 21/H| = |3/(4H) − 84/(4H)| = 81/(4H)
+- **Jupiter**: |21/(8H) − 65/(8H)| = 44/(8H)
+- **Saturn**: |6/(8H) − 169/(8H)| = 163/(8H)
 - **Uranus**: 1/(H×610) + 10/H ≈ 10/H (axial negligible)
 - **Neptune**: |1/(68H) − 25/(2H)| ≈ 25/(2H) (axial negligible)
 
-Notable: Jupiter's eccentricity cycle = **8H/43** (43 is prime). For Uranus and Neptune
+Notable: Jupiter's eccentricity cycle = **8H/44 = 2H/11 = 60,967 yr** (dynamical;
+the kinematic Fibonacci-anchored value was 8H/43). For Uranus and Neptune
 the extremely slow axial precession makes the eccentricity cycle nearly equal to the
 perihelion ICRF rate.
 
@@ -352,6 +353,17 @@ decomposition of the perihelion ecliptic rate:
 Each planet's perihelion ecliptic rate has a known H-expression with a rate
 numerator N and a rate base. The Fibonacci decomposition N = A + B determines
 both the obliquity and ecliptic precession rates.
+
+> **Kinematic vs dynamical for Jupiter and Saturn.** This decomposition is a
+> *structural Fibonacci identity*: it works only with the clean kinematic anchors
+> (Jupiter H/5 ecliptic, H/8 ICRF; Saturn H/8 ecliptic, H/21 ICRF), because only
+> those integers split as Fibonacci sums (5 = 2 + 3, 8 = 5 + 3). The *dynamical*
+> perihelion periods that the data tables and the simulation use — Jupiter 8H/39
+> ecliptic / 8H/65 ICRF, Saturn 8H/65 ecliptic / 8H/169 ICRF — are off-lattice
+> secular beats and do not Fibonacci-decompose. The two views coexist: the
+> kinematic anchor positions Jupiter and Saturn in Earth's Fibonacci hierarchy
+> (Law 6), while the dynamical value reproduces Laskar's secular theory and the
+> climate record. See [10-fibonacci-laws.md](10-fibonacci-laws.md), Law 6.
 
 ### Three confirmed predictions
 
@@ -526,9 +538,12 @@ oscillations superimposed on the trend — would constitute a confirmation.
    Saturn's obliquity oscillates at H/3 = 111,772 yr. See [The Closed Loop](72-the-closed-loop.md).
 
 4. **Perihelion Fibonacci pattern**: The WebGeoCalc perihelion rates reveal a
-   striking Fibonacci structure: Jupiter=H/5, Saturn=H/8 (retrograde),
+   striking *kinematic* Fibonacci structure: Jupiter≈H/5, Saturn≈H/8 (retrograde),
    Earth=Uranus=H/3, Venus=−8H/6 (retrograde), Neptune=H×2. This extends the
-   Fibonacci framework beyond Earth.
+   Fibonacci framework beyond Earth. For Jupiter and Saturn the *dynamical* secular
+   periods are slightly off these clean anchors — 8H/39 and −8H/65 — matching
+   Laskar's secular theory and the climate record; the Fibonacci anchors and the
+   dynamical beats are two views of the same motion (see Law 6).
 
 5. **Frame dependence**: Axial precession is measured in ICRF. Inclination
    precession is measured against the ecliptic (or invariable plane). The

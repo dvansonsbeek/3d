@@ -71,13 +71,13 @@ Documented in detail in `docs/10-fibonacci-laws.md`. Summary:
 | 21 | H/21 | Beat: axial + obliquity |
 | 34 | H/34 | Beat: axial + ecliptic |
 
-Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
+At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values; their dynamical secular periods sit one 8H-lattice integer away (8H/39, 8H/65, 8H/169). Both levels are the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
 **Laws 2-3 -- Inclination Constant & Balance**: Each planet's inclination amplitude = `psi / (d x sqrt(m))` where d is a Fibonacci divisor and psi is a universal constant. The angular-momentum-weighted oscillations of the seven in-phase planets balance against Saturn alone (anti-phase) to **99.9975% balance**.
 
 **Laws 4-5 -- Eccentricity Constant & Balance**: A single constant K predicts all 8 eccentricity amplitudes. The mass- and distance-weighted eccentricities of seven planets balance against Saturn's alone — using the same Fibonacci divisors and phase groups as Law 3. Saturn's eccentricity is independently predicted to within 0.3%.
 
-**Law 6 -- Saturn-Jupiter-Earth Resonance** (the H/8 triple identity): Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period. The gas giants gravitationally drive Earth's spin-axis dynamics through their well-known mutual resonance lock (the Great Inequality). The closed beat-frequency loop:
+**Law 6 -- Saturn-Jupiter-Earth Resonance**: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion lock to one period, 8H/65 (~41,270 yr) — a structural balance, not a coincidence, and the obliquity beat in Earth's climate record. Earth's own obliquity sits one 8H-lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so the gas giants' real ecliptic period 8H/39 gives 8H/65 while Law 1's Fibonacci anchor H/5 gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock. At the kinematic level all three quantities collapse onto H/8, closing through 3 + 5 = 8 — the beat-frequency loop:
 
 ```
 Earth (H/3) + Jupiter (H/5) -> Saturn obliquity (H/8)   (3 + 5 = 8)
@@ -102,7 +102,7 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 
 ### 2.4 Implications for the Optimization Tool
 
-1. **Jupiter-Saturn-Earth must be aligned FIRST** -- they form the H/8 triple identity (Law 6) and extend through 5+8=13 to Earth's axial precession. If these three aren't right, the beat frequencies that drive Earth's spin-axis dynamics and the rest of the Fibonacci hierarchy will be wrong, affecting everything.
+1. **Jupiter-Saturn-Earth must be aligned FIRST** -- they form the triple identity (Law 6; kinematic H/8 / dynamical 8H/65) and extend through 5+8=13 to Earth's axial precession. If these three aren't right, the beat frequencies that drive Earth's spin-axis dynamics and the rest of the Fibonacci hierarchy will be wrong, affecting everything.
 2. **Conjunction periods emerge from orbit count ratios** -- Jupiter and Saturn's great conjunction period (~19.86 years) is determined by `1/(1/T_J - 1/T_S)`. Getting this right validates the orbit counts.
 3. **Once Jupiter-Saturn are aligned, extend outward** -- fit Mars (shares d=5 with Jupiter), then Mercury/Uranus (d=21 pair), Venus/Neptune (d=34 pair).
 4. **Orbit counts are integers** -- `SolarYearCount` is rounded, creating discrete jumps in orbit geometry. The optimizer must understand this.
@@ -145,16 +145,18 @@ Earth-Saturn is the only pair with opposite balance groups (in-phase vs anti-pha
 | `InvPlaneInclinationAmplitude` | 0.386478 deg | Inclination oscillation range |
 | `InclinationCycleAnchor` | Per-planet | ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC (e.g. Mercury: 234.52°, after 2026-04-09 audit) |
 
-### 3.2 Perihelion Precession Periods (Fibonacci/Earth Fundamental Cycle derived)
+### 3.2 Perihelion Precession Periods (ecliptic frame, as used by the simulation)
 | Planet | Formula | Direction |
 |--------|---------|-----------|
 | Mercury | H/(1+3/8) | Prograde |
 | Venus | −8H/6 | **Retrograde** |
 | Mars | H/(4+3/8) | Prograde |
-| Jupiter | H/5 | Prograde |
-| Saturn | -H/8 | **Retrograde** |
+| Jupiter | 8H/39 (dynamical; kinematic anchor H/5) | Prograde |
+| Saturn | −8H/65 (dynamical; kinematic anchor −H/8) | **Retrograde** |
 | Uranus | H/3 | Prograde |
 | Neptune | Hx2 | Prograde |
+
+Jupiter and Saturn use their *dynamical* secular periods (Law 6); the clean kinematic Fibonacci anchors (H/5, −H/8) are one 8H-lattice integer away.
 
 ### 3.3 How the Model Computes Planet Positions
 

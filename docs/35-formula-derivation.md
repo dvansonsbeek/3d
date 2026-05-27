@@ -55,7 +55,7 @@ This section documents the timescale hierarchy that forms Law 1 of the Fibonacci
 | 55 | H/55 | **6,091** | Higher-order resonance |
 | 89 | H/89 | **3,764** | Higher-order resonance |
 
-Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values — but those specific coincidences are the subject of Law 6 (the H/8 triple identity), not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
+At the kinematic level, Jupiter's perihelion (H/5 ecliptic, H/8 ICRF) and Saturn's perihelion (H/8 ecliptic, H/21 ICRF) coincide with some of these Fibonacci values; their dynamical secular periods sit one 8H-lattice integer away (8H/39, 8H/65, 8H/169). Both levels are the subject of Law 6, not Law 1. The remaining planets' precession periods divide 8H by various integers, mostly non-Fibonacci.
 
 **Beat Frequency Rule**: Just as Fibonacci numbers add (F(n) + F(n+1) = F(n+2)), the corresponding beat frequencies follow the same pattern:
 
@@ -74,19 +74,19 @@ For example:
 
 ## 2. Saturn-Jupiter-Earth Resonance Loop
 
-This section documents the resonance mechanism that forms Law 6 of the Fibonacci Laws. **Earth's H/8 obliquity cycle equals both Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period — a triple identity at H/8 by which the gas giants gravitationally drive Earth's spin-axis dynamics. Jupiter and Saturn maintain this configuration through their well-known mutual resonance lock (the Great Inequality).**
+This section documents the resonance mechanism that forms Law 6 of the Fibonacci Laws. Earth's only intrinsic precessional motion is its axial precession (H/13, lunisolar); obliquity, eccentricity, and climatic precession are gas-giant coupling beats. **Jupiter's ICRF perihelion period and Saturn's ecliptic perihelion period lock to a single period: 8H/65 = 41,270 yr — a structural balance of the solar system, not a coincidence, and the obliquity beat (k+s₃) recorded in Earth's climate. Earth's own obliquity sits one 8H-lattice step away at H/8 (= 8H/64): obliquity is Earth's axial precession (H/13) beating against the ecliptic, so beating against the gas giants' actual ecliptic period 8H/39 gives 8H/65, while beating against Law 1's Fibonacci anchor H/5 gives H/8. The gas giants drive Earth's spin-axis dynamics through their mutual resonance lock.**
 
-**The triple identity at H/8**:
+**Two levels, one motion (kinematic anchors at H/8; dynamical at 8H/65)**:
 
-| Object | Period | Frame |
-|--------|--------|-------|
-| Earth obliquity | H/8 | — |
-| Jupiter perihelion | H/8 | ICRF |
-| Saturn perihelion | H/8 (retrograde) | ecliptic |
+| Object | Kinematic period | Dynamical period | Frame |
+|--------|------------------|------------------|-------|
+| Jupiter perihelion | H/8 | 8H/65 | ICRF |
+| Saturn perihelion | H/8 (retrograde) | 8H/65 (retrograde) | ecliptic |
+| Earth obliquity beat | H/8 (= 8H/64) | 8H/65 (k+s₃) as recorded | — |
 
-The same H/8 timescale appears in three different physical quantities — one Earth spin-axis cycle and two gas-giant orbital cycles. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit; the H/8 coincidence is what couples the gas-giant resonance into Earth's obliquity cycle.
+At the dynamical level the identity is exact: Jupiter's ICRF perihelion and Saturn's ecliptic perihelion *are* the same period, 8H/65. Saturn's ecliptic-retrograde perihelion precession is itself a consequence of Jupiter's gravitational pull from inside Saturn's orbit; this shared period is what couples the gas-giant pair into Earth's obliquity cycle. **Why Earth's obliquity is one step off:** obliquity = axial (104/8H, H/13) − ecliptic; with Law 1's anchor H/5 (= 40/8H) the beat is 104 − 40 = 64 → H/8, and with the gas giants' real ecliptic 8H/39 (= 39/8H, Laskar's s₃) it is 104 − 39 = 65 → 8H/65. The one-integer shift in the ecliptic period (40 → 39) propagates one-for-one into the obliquity beat (64 → 65).
 
-**The Resonance Loop**:
+**The Resonance Loop** (kinematic Fibonacci identity — uses the H/5, H/8 anchors; the dynamical periods are 8H/39, 8H/65):
 
 | Relationship | Calculation | Result |
 |-------------|-------------|--------|
@@ -106,7 +106,7 @@ The same H/8 timescale appears in three different physical quantities — one Ea
 
 Combining Jupiter and Saturn further gives axial precession: 1/(H/5) + 1/(H/8) = 1/(H/13) (5 + 8 = 13).
 
-**Physical Interpretation**: The H/8 triple identity is the structural fingerprint of the Jupiter–Saturn mean-motion near-resonance (5:2, the Great Inequality), reflected through Saturn's ecliptic-retrograde perihelion. This converts the Fibonacci recurrence into physical beat frequencies:
+**Physical Interpretation**: The identity (kinematic H/8 / dynamical 8H/65) is the structural fingerprint of the locking of Jupiter's and Saturn's perihelion precession to a common period, reflected through Saturn's ecliptic-retrograde perihelion. This converts the Fibonacci recurrence into physical beat frequencies:
 - Earth, Jupiter, and Saturn each act as the beat frequency of the other two (3 + 5 = 8)
 - Jupiter + Saturn additionally produces axial precession (5 + 8 = 13)
 - The gas-giant resonance is what drives Earth's spin-axis dynamics through this H/8 coupling
@@ -308,27 +308,29 @@ Jupiter's precession fluctuation is driven by:
 
 1. **Saturn resonance**: Jupiter and Saturn are locked in gravitational resonance
 2. **Earth's reference frame motion**: ERD effects still contribute
-3. **Fibonacci hierarchy**: Jupiter's period (H/5) is a key Fibonacci division
+3. **Fibonacci hierarchy**: Jupiter's kinematic Fibonacci anchor (H/5) is a key division; its dynamical ecliptic-perihelion period is 8H/39 (~68,783 yr)
 4. **Long-term stability**: Jupiter's massive orbit shows slow, predictable precession
 
 ### 7.2 Formula Summary
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/5 (~67,063 years) |
+| **Perihelion period (ecliptic)** | 8H/39 (~68,783 yr) dynamical; H/5 kinematic anchor |
 | **Eccentricity** | 0.04839 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.06 arcsec/century |
 | **Features** | 225 terms |
 
-> **Jupiter's Fibonacci connection**: Jupiter's period H/5 is a fundamental Fibonacci division. This explains why Jupiter appears in the beat frequency calculations for Mercury, Venus, and all other planets. Jupiter acts as a **gravitational anchor** for the outer solar system.
+> **Jupiter's Fibonacci connection**: Jupiter's kinematic anchor H/5 is a fundamental Fibonacci division (its dynamical perihelion sits one integer off at 8H/39). This explains why Jupiter appears in the beat frequency calculations for Mercury, Venus, and all other planets. Jupiter acts as a **gravitational anchor** for the outer solar system.
 
 ### 7.3 Key Periods in Jupiter Formula
 
+The predictive formula uses the kinematic Fibonacci-anchor periods as its harmonic basis (the fit is built on these; the dynamical perihelion 8H/39 differs by ~2.6% and is absorbed by the fit):
+
 | H Fraction | Physical Meaning |
 |------------|------------------|
-| H/5 | Jupiter's own precession |
-| H/8 | Saturn precession (resonance partner) |
+| H/5 | Jupiter's precession (kinematic anchor; dynamical 8H/39) |
+| H/8 | Saturn precession (resonance partner; kinematic anchor, dynamical 8H/65) |
 | H/13 | Axial precession (Jupiter+Saturn sum) |
 | H/3 | Inclination cycle |
 | H/16 | Earth effective perihelion |
@@ -339,7 +341,7 @@ For full implementation details, see [jupiter_coeffs.py](../tools/lib/python/coe
 
 ## 8. Saturn Formula: Coefficient Breakdown
 
-Saturn's perihelion precesses **retrograde in the ecliptic frame** — opposite to orbital motion — with a period of H/8.
+Saturn's perihelion precesses **retrograde in the ecliptic frame** — opposite to orbital motion — with a period of 8H/65 (~41,270 yr; kinematic Fibonacci anchor −H/8).
 
 ### 8.1 Physical Driver
 
@@ -347,14 +349,14 @@ Saturn's precession fluctuation is driven by:
 
 1. **Ecliptic-retrograde precession**: Creates beat frequencies when combined with prograde periods
 2. **Jupiter resonance**: Saturn and Jupiter form a closed resonance loop
-3. **Obliquity coupling**: Saturn's period (H/8) matches Earth's obliquity cycle
+3. **Obliquity coupling**: Saturn's perihelion period (kinematic H/8 / dynamical 8H/65) matches Earth's obliquity beat
 4. **Ring dynamics**: Saturn's rings influence its precession behavior
 
 ### 8.2 Formula Summary
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H/8 (~41,915 years) — **ECLIPTIC-RETROGRADE** |
+| **Perihelion period (ecliptic)** | 8H/65 (~41,270 yr) dynamical; −H/8 kinematic anchor — **ECLIPTIC-RETROGRADE** |
 | **Eccentricity** | 0.05386 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.05 arcsec/century |
@@ -364,7 +366,7 @@ Saturn's precession fluctuation is driven by:
 
 ### 8.3 The Saturn-Jupiter-Earth Loop
 
-Saturn's role in the resonance loop (from [Section 2](#2-saturn-jupiter-earth-resonance-loop)):
+Saturn's role in the resonance loop (kinematic Fibonacci identity at the H/5, H/8 anchors; the dynamical perihelion periods are 8H/39, 8H/65) (from [Section 2](#2-saturn-jupiter-earth-resonance-loop)):
 
 ```
 Earth + Jupiter → Saturn:  1/(H/3) + 1/(H/5) = 1/(H/8)    (3 + 5 = 8)
@@ -387,7 +389,7 @@ $$
 e_{\text{Saturn}}(t) = \texttt{eccentricityDerivedMean} + 0.019 \cdot \cos\left(\frac{2\pi t}{H/8}\right)
 $$
 
-This accounts for the resonance between Saturn's perihelion period (H/8) and Earth's obliquity cycle. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (14,579 data points, 23-year steps).
+This accounts for the resonance between Saturn's perihelion period (kinematic H/8 / dynamical 8H/65) and Earth's obliquity beat — the formula uses the H/8 kinematic anchor as the basis period. The predictive formula achieves **R² = 0.999617, RMSE = 3.72″/century** (14,579 data points, 23-year steps).
 
 For implementation details, see [predictive_formula.py](../tools/lib/python/predictive_formula.py) (GROUP 15 terms in `build_features`).
 
@@ -568,7 +570,7 @@ The table below shows two sets of formula accuracy values:
 - **Uranus** and **Neptune** achieve the best fits (RMSE = 0.01–0.02 arcsec/century)
 - **Saturn** has ecliptic-retrograde precession, creating the resonance loop
 
-> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to simple fractions of H: Jupiter (H/5), Saturn (H/8), Mars (H×8/35), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
+> **Physical Interpretation**: The Fibonacci hierarchy organizes the entire solar system's precession dynamics. Planetary periods correspond to integer divisors of 8H: Jupiter (8H/39 dynamical, H/5 kinematic anchor), Saturn (−8H/65 dynamical, −H/8 anchor), Mars (H×8/35), Uranus (H/3), Venus (−8H/6), and Neptune (H×2). The near-perfect fits achieved across all planets suggest the solar system is deeply organized around this mathematical structure.
 
 ---
 
@@ -592,8 +594,8 @@ The fundamental periods are model parameters, not independently derived values:
 | Mercury | H×8/11 | Fibonacci | Mercury fluctuation formula |
 | Venus | −8H/6 (ecliptic-retrograde) | Fibonacci | Venus fluctuation formula |
 | Mars | H×8/35 | Fibonacci | Mars fluctuation formula |
-| Jupiter | H/5 | Fibonacci | Jupiter fluctuation, beat frequencies |
-| Saturn | H/8 (ecliptic-retrograde) | Fibonacci | Saturn fluctuation, resonance loop |
+| Jupiter | 8H/39 (kinematic anchor H/5) | dynamical | Jupiter fluctuation, beat frequencies |
+| Saturn | −8H/65 (ecliptic-retrograde; kinematic anchor −H/8) | dynamical | Saturn fluctuation, resonance loop |
 | Uranus | H/3 | Fibonacci | Uranus fluctuation formula |
 | Neptune | H×2 | Fibonacci | Neptune fluctuation formula |
 
@@ -778,8 +780,8 @@ All planetary formulas are implemented in Python for consistency and to handle t
 | Mercury | 0.999994 | 0.22 | 225 | H×8/11 |
 | Venus | **0.999999** | **0.46** | **328** | −8H/6 |
 | Mars | 1.000000 | 0.03 | 225 | H×8/35 |
-| Jupiter | 1.000000 | 0.06 | 225 | H/5 |
-| Saturn | 1.000000 | 0.05 | 225 | H/8 |
+| Jupiter | 1.000000 | 0.06 | 225 | 8H/39 |
+| Saturn | 1.000000 | 0.05 | 225 | −8H/65 |
 | Uranus | 1.000000 | 0.01 | 225 | H/3 |
 | Neptune | 0.999999 | 0.02 | 225 | H×2 |
 
