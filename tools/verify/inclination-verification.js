@@ -344,8 +344,8 @@ for (const [name, p] of Object.entries(currentCodeValues)) {
     name === 'mercury' ? 'holisticyearLength/(1+(3/8))' :
     name === 'venus' ? '-holisticyearLength*8/6' :
     name === 'mars' ? 'holisticyearLength/(4+(3/8))' :
-    name === 'jupiter' ? 'holisticyearLength/5' :
-    name === 'saturn' ? '-holisticyearLength/8' :
+    name === 'jupiter' ? 'holisticyearLength*8/39' :
+    name === 'saturn' ? '-holisticyearLength*8/65' :
     name === 'uranus' ? 'holisticyearLength/3' :
     name === 'neptune' ? 'holisticyearLength*2' :
     'holisticyearLength';
