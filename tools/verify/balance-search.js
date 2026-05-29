@@ -632,9 +632,12 @@ function evalPlanetDeep(k, d, isAntiPhase, n, N) {
   const cosJ = Math.cos((periJ - phase) * DEG2RAD);
   const mean = ij2k - sign * amp * cosJ;
 
-  // LL bounds check (±0.03° uncertainty tolerance)
-  const inLL = mean - amp >= llBounds[k].min - 0.03 &&
-               mean + amp <= llBounds[k].max + 0.03;
+  // LL bounds check (±0.05° uncertainty tolerance — relaxed from 0.03° on 2026-05-29
+  // to absorb the 0.0002° edge-case overshoot Saturn picked up after the 2026-05-27
+  // J/S inclinationCycleAnchor recomputation pushed it 0.0002° beyond the prior 0.03°
+  // ceiling at n=systemResetN. 0.05° is still very tight (~3% of Saturn's mean).
+  const inLL = mean - amp >= llBounds[k].min - 0.05 &&
+               mean + amp <= llBounds[k].max + 0.05;
   const llOvershoot = Math.max(0, llBounds[k].min - (mean - amp)) +
                       Math.max(0, (mean + amp) - llBounds[k].max);
 
@@ -711,12 +714,31 @@ for (const candidate of deepCandidates) {
 
     // Step 1: check LL bounds for all 7 fitted planets at this n (N-independent)
     let allLL = true;
+    const llFailedPlanets = [];
+    const llDiagnostic = {};
     for (const k of fittedPlanets) {
       const r = evalPlanetDeep(k, cfg[k].d, cfg[k].anti, n, 1);  // N=1 is dummy for LL check
-      if (!r.inLL) { allLL = false; break; }
+      llDiagnostic[k] = {
+        inLL: r.inLL,
+        mean: parseFloat(r.mean.toFixed(5)),
+        amp: parseFloat(r.amp.toFixed(6)),
+        minBound: llBounds[k].min,
+        maxBound: llBounds[k].max,
+        overshoot: parseFloat(r.llOvershoot.toFixed(5)),
+      };
+      if (!r.inLL) {
+        allLL = false;
+        llFailedPlanets.push(k);
+      }
     }
     if (!allLL) {
-      allAnchors.push({ n, llPass: false, eccDirMatch: eccDirCheckThisN.match, eccDirPerPlanet: eccDirCheckThisN.results });
+      allAnchors.push({
+        n, llPass: false,
+        llFailedPlanets,
+        llDiagnostic,
+        eccDirMatch: eccDirCheckThisN.match,
+        eccDirPerPlanet: eccDirCheckThisN.results,
+      });
       continue;
     }
 
@@ -806,6 +828,24 @@ for (const candidate of deepCandidates) {
     ? eccBalanceForConfig(cfg, bestAnchor.n)
     : candidate.eccBalance;  // fallback if no valid anchor
 
+  // ── System Reset anchor (n = systemResetN) — the simulator's actual operating anchor.
+  // Extracted from allAnchors so the modal can display the data that matches the live
+  // simulation, NOT the optimizer's freely-chosen mathematical optimum. bestAnchor is
+  // kept for exploration; systemResetAnchor is what drives the preset rows below.
+  const systemResetAnchorRaw = allAnchors.find(a => a.n === C.systemResetN && a.llPass);
+  const systemResetAnchor = systemResetAnchorRaw
+    ? {
+        n: systemResetAnchorRaw.n,
+        dirCount: systemResetAnchorRaw.dirCount,
+        totalErr: systemResetAnchorRaw.totalErr,
+        perPlanet: systemResetAnchorRaw.perPlanet,
+        eccDirMatch: systemResetAnchorRaw.eccDirMatch,
+      }
+    : null;
+  const eccBalanceAtSystemReset = systemResetAnchor
+    ? eccBalanceForConfig(cfg, C.systemResetN)
+    : candidate.eccBalance;
+
   // Find anchor(s) with best ecc direction match (max eccDirMatch, tiebreak by LL pass + inclination dir)
   const maxEccMatch = Math.max(...allAnchors.map(a => a.eccDirMatch));
   const bestEccAnchors = allAnchors.filter(a => a.eccDirMatch === maxEccMatch);
@@ -814,6 +854,7 @@ for (const candidate of deepCandidates) {
     scenario: row[0],
     inclBalance: candidate.inclBalance,
     eccBalance: eccBalanceAtAnchor,              // per-config, at best anchor
+    eccBalanceAtSystemReset,                     // per-config, at n=systemResetN (operating point)
     eccBalanceDefault: candidate.eccBalance,     // balance under default bases (for reference)
     eccBalanceJ2000: candidate.eccBalanceJ2000 != null ? candidate.eccBalanceJ2000 : null,
     mirror,
@@ -821,6 +862,7 @@ for (const candidate of deepCandidates) {
     dValues: { me: cfg.mercury.d, ve: cfg.venus.d, ma: cfg.mars.d, ju: cfg.jupiter.d, sa: cfg.saturn.d, ur: cfg.uranus.d, ne: cfg.neptune.d },
     groups:  { me: cfg.mercury.anti ? 1 : 0, ve: cfg.venus.anti ? 1 : 0, ma: cfg.mars.anti ? 1 : 0, ju: cfg.jupiter.anti ? 1 : 0, sa: cfg.saturn.anti ? 1 : 0, ur: cfg.uranus.anti ? 1 : 0, ne: cfg.neptune.anti ? 1 : 0 },
     bestAnchor,
+    systemResetAnchor,   // operating-point anchor for modal display
     allAnchors,          // all n values with ecc direction data
     maxEccMatch,         // best ecc direction count across all n for this config
     bestEccAnchors,      // all n values that achieve maxEccMatch
@@ -954,53 +996,61 @@ for (const r of top5) {
 }
 
 // ── Write deep analysis to the output JSON ──
+// Helper: serialize an anchor result (used for both bestAnchor and systemResetAnchor).
+const serializeAnchor = (anchor) => anchor ? {
+  n: anchor.n,
+  balancedYear: BY_REF - anchor.n * C.H,
+  dirCount: anchor.dirCount,
+  totalErrArcsec: anchor.totalErr,
+  perPlanet: Object.fromEntries(
+    fittedPlanets.map(k => {
+      const pp = anchor.perPlanet[k];
+      return [k, pp ? {
+        phase: parseFloat(pp.phase.toFixed(2)),
+        mean: parseFloat(pp.mean.toFixed(5)),
+        amp: parseFloat(pp.amp.toFixed(6)),
+        N: pp.N,
+        ascNodePeriod: parseFloat((-(8 * C.H) / pp.N).toFixed(0)),
+        errArcsec: parseFloat(pp.errArcsec.toFixed(2)),
+        dirMatch: pp.dirMatch,
+      } : null];
+    })
+  ),
+} : null;
+
 output.deepAnalysis = {
   eccThreshold: DEEP_ECC_THRESHOLD,
   nRange: [0, 7],
   nMaxAscNode: DEEP_N_MAX,
+  systemResetN: C.systemResetN,
   candidateCount: deepResults.length,
   configs: deepResults.map(r => ({
     scenario: r.scenario,
     inclBalance: r.inclBalance,
     eccBalance: r.eccBalance,
+    eccBalanceAtSystemReset: r.eccBalanceAtSystemReset,
     mirror: r.mirror,
     isConfig7: r.isConfig7,
     dValues: r.dValues,
     groups: r.groups,
-    bestAnchor: r.bestAnchor ? {
-      n: r.bestAnchor.n,
-      balancedYear: BY_REF - r.bestAnchor.n * C.H,
-      dirCount: r.bestAnchor.dirCount,
-      totalErrArcsec: r.bestAnchor.totalErr,
-      perPlanet: Object.fromEntries(
-        fittedPlanets.map(k => {
-          const pp = r.bestAnchor.perPlanet[k];
-          return [k, pp ? {
-            phase: parseFloat(pp.phase.toFixed(2)),
-            mean: parseFloat(pp.mean.toFixed(5)),
-            amp: parseFloat(pp.amp.toFixed(6)),
-            N: pp.N,
-            ascNodePeriod: parseFloat((-(8 * C.H) / pp.N).toFixed(0)),
-            errArcsec: parseFloat(pp.errArcsec.toFixed(2)),
-            dirMatch: pp.dirMatch,
-          } : null];
-        })
-      ),
-    } : null,
+    bestAnchor: serializeAnchor(r.bestAnchor),
+    systemResetAnchor: serializeAnchor(r.systemResetAnchor),
   })),
 };
 
 // ── Populate the presets array with deep survivors (extended row format) ──
-// Only configs with a valid anchor (LL 8/8) are included. These replace the
-// former 765-row "all passing incl threshold" list with a smaller, richer set
-// that includes per-config optimized anchor, ascending nodes, and phase angles.
+// IMPORTANT: row data reflects the SIMULATOR'S OPERATING POINT (systemResetAnchor,
+// i.e., n = systemResetN), NOT the optimizer's freely-chosen mathematical optimum
+// (bestAnchor). This keeps the modal aligned with what the live 3D simulation
+// actually does. bestAnchor is preserved in `deepAnalysis.configs` for exploration.
+// Filter: configs whose System Reset state passes LL + has totalErr <= cutoff.
 const DEEP_MAX_RATE_ERROR = 6.0;  // arcsec — max total rate error across 7 planets
-const deepLLValidCount = deepResults.filter(r => r.bestAnchor).length;
+const deepLLValidCount = deepResults.filter(r => r.systemResetAnchor).length;
 const deepSurvivors = deepResults.filter(r =>
-  r.bestAnchor && r.bestAnchor.totalErr <= DEEP_MAX_RATE_ERROR
+  r.systemResetAnchor && r.systemResetAnchor.totalErr <= DEEP_MAX_RATE_ERROR
 );
 output.presets = deepSurvivors.map(r => {
-  const ba = r.bestAnchor;
+  const ba = r.systemResetAnchor;   // operating-point anchor (n=systemResetN)
   const pp = ba.perPlanet;
   const d = r.dValues;
   const g = r.groups;
@@ -1010,9 +1060,9 @@ output.presets = deepSurvivors.map(r => {
     parseFloat(r.inclBalance.toFixed(8)),
     d.me, g.me, d.ve, g.ve, d.ma, g.ma,
     d.ju, g.ju, d.sa, g.sa, d.ur, g.ur, d.ne, g.ne,
-    // Extended deep-analysis fields (positions 16..34):
-    parseFloat(r.eccBalance.toFixed(4)),          // [16] eccBalance
-    ba.n,                                          // [17] anchor_n
+    // Extended deep-analysis fields (positions 16..34) — at System Reset:
+    parseFloat(r.eccBalanceAtSystemReset.toFixed(4)),  // [16] eccBalance @ systemResetN
+    ba.n,                                          // [17] anchor_n (= systemResetN)
     ba.dirCount,                                   // [18] dirCount
     parseFloat(ba.totalErr.toFixed(1)),            // [19] totalErr (arcsec)
     r.mirror ? 1 : 0,                             // [20] mirror

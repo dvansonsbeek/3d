@@ -845,8 +845,8 @@
   },
   "meta": {
     "script": "/home/dennis/code/3d/scripts/milankovitch_climate_formula.py",
-    "doc": "docs/18-climate-formula.md",
+    "doc": "docs/92-climate-formula.md",
     "predecessor": "scripts/milankovitch_climate_formula_v1_legacy.py (25 components, single-layer)",
-    "runtime_sec": 0.5455827713012695
+    "runtime_sec": 1.2418725490570068
   }
 }

@@ -83,15 +83,15 @@
       "angleCorrection": -2.110756350118468,
       "perihelionEclipticFraction": [
         8,
-        35
+        36
       ],
       "type": "II",
       "mirrorPair": "jupiter",
       "fibonacciD": 5,
       "ascendingNodeInvPlane": 354.87,
-      "inclinationCycleAnchor": 231.95,
+      "inclinationCycleAnchor": 236.07,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 63,
+      "ascendingNodeCyclesIn8H": 64,
       "obliquityCycleFraction": [
         8,
         21
@@ -166,7 +166,7 @@
       "ascendingNodeInvPlane": 307.8,
       "inclinationCycleAnchor": 21.33,
       "antiPhase": false,
-      "ascendingNodeCyclesIn8H": 12,
+      "ascendingNodeCyclesIn8H": 11,
       "obliquityCycleFraction": [
         1,
         2
