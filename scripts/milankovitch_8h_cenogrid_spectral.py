@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — CENOGRID SUPER-CYCLE SPECTRAL TEST
 ================================================================
 
-Doc 18 §4 complement.
+Doc 92 §4 complement.
 
 §4 tested whether 20 discrete geological event boundaries cluster at integer
 multiples of 8H = 2,682,536 years (NULL: p=0.233 for 8H, p=0.504 for H).
@@ -179,7 +179,7 @@ def main():
     t0 = time.time()
     f_crit = float(f_dist.ppf(1 - ALPHA, 2, 2 * K - 2))
     print("=" * 72)
-    print("CENOGRID SUPER-CYCLE SPECTRAL TEST (DOC 18 §4 COMPLEMENT)")
+    print("CENOGRID SUPER-CYCLE SPECTRAL TEST (DOC 92 §4 COMPLEMENT)")
     print("=" * 72)
     print(f"  8H = {EIGHT_H:.3f} kyr,  H = {H_KYR:.3f} kyr")
     print(f"  window: {WINDOW[0]/1000:.0f}–{WINDOW[1]/1000:.0f} Ma  ({WINDOW[1]-WINDOW[0]} kyr)")
@@ -291,7 +291,7 @@ def main():
 
     OUT_PATH.write_text(json.dumps({
         "framework": "8H super-cycle spectral test on CENOGRID continuous record",
-        "doc_reference": "doc 17 §11 complement",
+        "doc_reference": "doc 91 §11 complement",
         "data_source": "Westerhold 2020 CENOGRID (PANGAEA TableS34, LOESS-smoothed)",
         "window_ma": [WINDOW[0]/1000, WINDOW[1]/1000],
         "test_periods_kyr": FRAMEWORK_PERIODS_KYR,

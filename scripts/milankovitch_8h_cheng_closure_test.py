@@ -59,7 +59,7 @@ N_SCAN_HI   = 30.0    # safely Rayleigh-resolvable at T=640 (corresponds to P �
 N_SCAN_STEP = 0.025
 INT_TOLERANCE = 0.20  # peaks within this distance of an integer count as "integer"
 
-# Active formula integers from the 25-component fit (doc 17 §2.2) in the n=1..30 range
+# Active formula integers from the 25-component fit (doc 91 §2.2) in the n=1..30 range
 FORMULA_INTS_IN_RANGE = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30]
 
 

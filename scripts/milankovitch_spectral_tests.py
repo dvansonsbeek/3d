@@ -12,9 +12,9 @@ predictions. Runs four tests on paleoclimate data:
   §5   — Pre-MPT regime-change sanity check
 
 Test §3.6 (cross-planet obliquity) is a documentation-level comparison; no
-computation needed. See docs/17-milankovitch-evidence.md §3.6.
+computation needed. See docs/91-milankovitch-evidence.md §3.6.
 
-Companion document: docs/17-milankovitch-evidence.md
+Companion document: docs/91-milankovitch-evidence.md
 Run:  python3 scripts/milankovitch_spectral_tests.py
 """
 
@@ -441,7 +441,7 @@ def main():
     print("=" * 72)
     print("MILANKOVITCH SPECTRAL TESTS")
     print("=" * 72)
-    print(f"\nSee docs/17-milankovitch-evidence.md for narrative and synthesis.")
+    print(f"\nSee docs/91-milankovitch-evidence.md for narrative and synthesis.")
     print(f"RNG seed: {RNG_SEED}")
 
     print("\nLoading data...")
@@ -458,7 +458,7 @@ def main():
 
     out = DATA_DIR / "milankovitch-spectral-results.json"
     out.write_text(json.dumps({
-        "doc_reference": "docs/17-milankovitch-evidence.md",
+        "doc_reference": "docs/91-milankovitch-evidence.md",
         "rng_seed": RNG_SEED,
         "test_3_405kyr_absence":       r3,
         "test_4_bispectrum":            r4,

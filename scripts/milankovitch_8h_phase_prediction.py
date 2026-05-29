@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA — PHASE PREDICTION ACCURACY
 ====================================================
 
-Test G (doc 17 §12.7 — phase prediction).
+Test G (doc 91 §12.7 — phase prediction).
 
 The R² goodness-of-fit metric is dominated by amplitude. Phase is independent
 information: did the formula correctly time the glacial maxima, or does it
@@ -101,7 +101,8 @@ def load_integers():
         return formula["meta"]["integers"]
     except (FileNotFoundError, KeyError):
         return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                113, 120, 134, 141, 152, 185]
 
 
 def nearest_offset(observed_t, predicted_t):

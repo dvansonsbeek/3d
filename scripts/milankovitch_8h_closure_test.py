@@ -24,7 +24,7 @@ Method
    if the framework were incomplete.
 
 Companion documents:
-  - docs/17-milankovitch-evidence.md §7.3 (The 8H integer-lattice
+  - docs/91-milankovitch-evidence.md §7.3 (The 8H integer-lattice
     closure test)
   - https://holisticuniverse.com/model/orbital-forcing
     ("Closure: no orphan peaks off the 8H lattice")
@@ -230,10 +230,12 @@ def main():
     print(f"\n[6] Closure-test verdict:")
 
     # Check: are there any orphans in "empty" regions far from any formula integer?
-    # The 25-component formula uses integers: 9, 12, 14, 16, 18, 20, 21, 22, 25,
-    # 28, 30, 31, 35, 38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120
+    # The canonical 32-component formula uses integers: 9, 12, 14, 16, 18, 20, 21, 22,
+    # 25, 28, 30, 31, 35, 38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110, 113,
+    # 120, 134, 141, 152, 185
     formula_integers = {9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                        38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120}
+                        38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                        113, 120, 134, 141, 152, 185}
     far_from_any_int_orphans = []
     for n, a in orphans:
         # "Far" = > 1.0 from the nearest INTEGER (not just formula integer)

@@ -268,5 +268,5 @@
   ],
   "far_from_any_int_orphans": [],
   "verdict": "PASS: no orphan peaks off the 8H lattice",
-  "runtime_seconds": 1.565521240234375
+  "runtime_seconds": 1.2486577033996582
 }

@@ -3,21 +3,23 @@
 MILANKOVITCH 8H FORMULA — RANDOM-PERIOD NULL BASELINE
 ======================================================
 
-Pre-registered Test C from doc 17 §12.3.
+Test C from doc 91 §12.3 — re-run 2026-05-28 against the 32-integer canonical
+L1 lattice.
 
-The 25-component 8H Orbital Forcing Formula achieves R² = 0.232 on LR04 with
-amplitudes + phases fit at the 25 model-selected integer divisors of 8H. The
-concern this test addresses: with 25 × 2 free parameters (cos and sin per
-period), could *any* 25 periods do this well?
+The canonical 32-component 8H Orbital Forcing Formula (L1 lattice from
+milankovitch_climate_formula.py) achieves a measurable R² on full LR04 (plain
+OLS, no L2/L3) at integer divisors of 8H. The concern this test addresses:
+with 32 × 2 free parameters (cos and sin per period), could *any* 32 periods
+do this well?
 
 Three null distributions, each with 1000 random trials:
-  Null A — 25 random periods uniform in [22, 400] kyr (covers Milankovitch band)
-  Null B — 25 random integers from {1..200}, periods 8H/n (lattice positions,
+  Null A — 32 random periods uniform in [22, 400] kyr (covers Milankovitch band)
+  Null B — 32 random integers from {1..200}, periods 8H/n (lattice positions,
            random subset)
-  Null C — 25 half-integer offsets from the 8H lattice (n + 0.5; deliberately
+  Null C — 32 half-integer offsets from the 8H lattice (n + 0.5; deliberately
            between adjacent integers)
 
-For each trial, fit a 25-component sinusoidal model (cos+sin per period plus
+For each trial, fit a 32-component sinusoidal model (cos+sin per period plus
 intercept) by OLS to the full LR04 record and compute R². The empirical
 p-value is the fraction of nulls reaching the model's R².
 
@@ -42,7 +44,7 @@ H_KYR = 335.317
 EIGHT_H = 8 * H_KYR
 DT_KYR = 1.0
 WINDOW = (0, 5320)
-N_COMPONENTS = 25
+N_COMPONENTS = 32
 N_TRIALS = 1000
 PERIOD_BAND_KYR = (22.0, 400.0)
 RNG_SEED = 20260520
@@ -104,14 +106,15 @@ def fit_r2(t, y, periods_kyr):
 
 
 def model_r2(t, y):
-    """Compute model R² at the 25 integer divisors used by the formula."""
+    """Compute model R² at the 32 integer divisors used by the canonical formula."""
     try:
         formula = json.loads(FORMULA_JSON.read_text())
-        integers = formula["meta"]["integers"]
+        integers = formula["config"]["L1_integers"]
     except (FileNotFoundError, KeyError):
-        # Fallback: hard-coded 26 from milankovitch_climate_formula.py
+        # Fallback: canonical 32-integer L1 lattice from milankovitch_climate_formula.py
         integers = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                    113, 120, 134, 141, 152, 185]
     periods = [EIGHT_H / n for n in integers]
     return fit_r2(t, y, periods), integers
 
@@ -126,7 +129,7 @@ def main():
     print(f"  LR04 window {WINDOW}: {len(y)} samples, dt = {DT_KYR} kyr")
 
     r2_obs, integers = model_r2(t, y)
-    print(f"  model R² (25 components @ integer divisors) = {r2_obs:.4f}")
+    print(f"  model R² ({len(integers)} components @ integer divisors) = {r2_obs:.4f}")
     print(f"  integers used: {integers}\n")
 
     rng = np.random.default_rng(RNG_SEED)

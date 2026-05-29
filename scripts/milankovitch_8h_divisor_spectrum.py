@@ -29,7 +29,7 @@ Predicted set (model + planet eigenmodes):
   Planet-modulated near H/13 (n=104): {113, 116, 120, 139, 140, 141, 163}
                                        (climatic precession sub-peaks)
 
-Companion document: docs/17-milankovitch-evidence.md
+Companion document: docs/91-milankovitch-evidence.md
 Run:  python3 scripts/milankovitch_8h_divisor_spectrum.py
 """
 
@@ -69,7 +69,7 @@ PLANET_MODULATED = {
     28: ("near H/3", "g4-g5 95.8 kyr Mars-Jupiter ecc beat"),
     # Near H/8 (obliquity)
     65: ("near H/8", "s3+k 41.27 kyr (Berger Earth obliquity)"),
-    66: ("near H/8", "Obliquity-band arithmetic-mean cycle length (~40.5 kyr) — Jensen's inequality vs k+s3 Fourier centroid (doc 17 §6.6). At T<3000 kyr Fourier resolution cannot separate n=65/66/67, and amplitude piles at the cycle-counting mean position."),
+    66: ("near H/8", "Obliquity-band arithmetic-mean cycle length (~40.5 kyr) — Jensen's inequality vs k+s3 Fourier centroid (doc 91 §6.6). At T<3000 kyr Fourier resolution cannot separate n=65/66/67, and amplitude piles at the cycle-counting mean position."),
     67: ("near H/8", "s4+k 40.04 kyr (Berger Mars-modulated obliquity sub-peak)"),
     68: ("near H/8", "k+s4 Berger Mars obliquity sub-peak OR k−g3 Earth axial-apsidal beat (~39.5 kyr); pre-MPT may include Mars ICRF (8H/69 ±1)"),
     73: ("near H/8", "2|s4| Mars nodal harmonic (~36.7 kyr) OR g3−s4 Earth-Mars apsidal-nodal beat"),

@@ -3,7 +3,7 @@
 MILANKOVITCH 8H VARIANCE BUDGET — TIER A DECOMPOSITION
 ========================================================
 
-Companion script for doc 18: pushes the LR04 / CENOGRID variance
+Companion script for doc 92: pushes the LR04 / CENOGRID variance
 decomposition beyond the canonical 25-component R² = 0.232 baseline by:
 
   • A1 — adding 6 sub-dominant precession sidebands (n=96, 107, 110, 134,
@@ -20,7 +20,7 @@ All ΔR² values are reported for:
   • LR04 (5,320-kyr benthic δ¹⁸O stack)
   • CENOGRID δ¹⁸O (LOESS-smoothed, 67-Myr)
   • CENOGRID δ¹³C (LOESS-smoothed, 67-Myr) — for the Layer-2 carbon-cycle
-    diagnostic per doc 18 §6 (high δ¹³C/δ¹⁸O ratio = carbon-amplified)
+    diagnostic per doc 92 §6 (high δ¹³C/δ¹⁸O ratio = carbon-amplified)
 
 Output: data/milankovitch-8h-variance-budget.json
 Run:    python3 scripts/milankovitch_8h_variance_budget.py
@@ -42,20 +42,25 @@ OUT_PATH = DATA_DIR / "milankovitch-8h-variance-budget.json"
 H = 335.317              # kyr (Earth Fundamental Cycle)
 EIGHT_H = 8 * H          # kyr (Solar System Resonance Cycle = 2682.536 kyr)
 
-# Canonical 25-integer set from doc 17 §2.2 + §3.3 (used in milankovitch_climate_formula.py)
+# Canonical 25-integer set (used in milankovitch_climate_formula.py)
 BASE_25 = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
            38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
 
-# Tier A1 — 6 sub-dominant precession sidebands from doc 18 §5.12
-# (MTM-significant integers not in the canonical 25-set)
+# Tier A1 — 6 sub-dominant precession sidebands (MTM-significant integers
+# not in the canonical 25-set; from doc 91 §12.12 Test L)
 SIDEBANDS_6 = [96, 107, 110, 134, 152, 185]
 
-EXTENDED_31 = sorted(BASE_25 + SIDEBANDS_6)
+# Berger-quintet completion (k+g₃ Earth at ~19 kyr) added 2026-05-28.
+# Subthreshold in LR04 (amp/median 2.03×), 3σ in Cheng monsoon (3.60×).
+BERGER_QUINTET_141 = [141]
+
+EXTENDED_32 = sorted(BASE_25 + SIDEBANDS_6 + BERGER_QUINTET_141)
+EXTENDED_31 = EXTENDED_32  # backward-compat alias (former name)
 
 # Layer-2 explicit line periods (in kyr)
 PERIOD_405K = 404.5             # silicate-weathering thermostat, off lattice
 PERIOD_13H = 13.0 * H           # Boulila libration = 4,359.121 kyr
-PERIOD_9M = 9000.0              # 9-Myr carbon-cycle candidate (doc 18 §6.10)
+PERIOD_9M = 9000.0              # 9-Myr carbon-cycle candidate (doc 92 §6.10)
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -258,10 +263,10 @@ def run_tier_a(label, t, y):
 def main():
     t0 = time.time()
     print("=" * 78)
-    print("MILANKOVITCH 8H VARIANCE BUDGET — TIER A DECOMPOSITION (doc 18)")
+    print("MILANKOVITCH 8H VARIANCE BUDGET — TIER A DECOMPOSITION (doc 92)")
     print("=" * 78)
     print(f"H = {H} kyr;  8H = {EIGHT_H:.3f} kyr")
-    print(f"Base set     : {len(BASE_25)} integers (canonical, doc 17 §2.2 + §3.3)")
+    print(f"Base set     : {len(BASE_25)} integers (canonical, doc 91 §2.2 + §3.3)")
     print(f"Sidebands    : {len(SIDEBANDS_6)} integers ({SIDEBANDS_6})")
     print(f"Extended set : {len(EXTENDED_31)} integers")
     print(f"L2 lines     : 405-kyr ({PERIOD_405K} kyr), 13H ({PERIOD_13H:.1f} kyr), 9-Myr ({PERIOD_9M:.0f} kyr)")
@@ -361,7 +366,7 @@ def main():
     # Add tier-A label & metadata
     out["meta"] = {
         "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget.py"),
-        "doc": "docs/18-climate-formula.md",
+        "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }
 

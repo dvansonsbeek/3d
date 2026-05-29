@@ -3,7 +3,7 @@
 MPT TRANSITION ANALYSIS — comparative amplitude fit pre-MPT vs post-MPT
 =========================================================================
 
-EXPLORATORY analysis — NOT YET documented in doc 17.
+EXPLORATORY analysis — NOT YET documented in doc 91.
 
 Tests the visibility-mechanism hypothesis: did each spectral component's
 amplitude actually change at the Mid-Pleistocene Transition, and if so, how?

@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — ALL-INTEGER MTM F-TEST SCAN
 ========================================================
 
-Test L (doc 17 §12.12 — falsifying the integer-selection claim).
+Test L (doc 91 §12.12 — falsifying the integer-selection claim).
 
 Test J (§5.10) showed that 7/25 framework integers carry F-test-significant
 spectral lines in LR04 (vs 0.88 random null). The follow-up question for
@@ -101,7 +101,8 @@ def load_integers():
         return formula["meta"]["integers"]
     except (FileNotFoundError, KeyError):
         return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                113, 120, 134, 141, 152, 185]
 
 
 def main():

@@ -3,7 +3,7 @@
 405-KYR CYCLE EVOLUTION ACROSS THE CENOZOIC
 =============================================
 
-Follow-up to Test N (doc 17 §12.14). Asks three quantitative questions:
+Follow-up to Test N (doc 91 §12.14). Asks three quantitative questions:
 
   (a) Does CENOGRID (Westerhold 2020) show a STATISTICALLY SIGNIFICANT
       beat at 405 kyr?  Specifically: Thomson MTM F-test at f = 1/405

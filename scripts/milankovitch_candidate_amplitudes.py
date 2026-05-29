@@ -25,7 +25,7 @@ Tests:
      tuned finding (Cheng halves significant, LR04 not).
   3. MPT growth — pre vs post amplitude ratios for both candidate sets.
 
-Companion document: docs/17-milankovitch-evidence.md
+Companion document: docs/91-milankovitch-evidence.md
 Run:  python3 scripts/milankovitch_candidate_amplitudes.py
 """
 

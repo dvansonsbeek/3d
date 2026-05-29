@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MILANKOVITCH 8H VARIANCE BUDGET — TIER B ROUND 1 (doc 18)
+MILANKOVITCH 8H VARIANCE BUDGET — TIER B ROUND 1 (doc 92)
 ============================================================
 
 Companion to milankovitch_8h_variance_budget.py (Tier A). Tier B Round 1
@@ -56,7 +56,9 @@ EIGHT_H = 8 * H  # 2682.536 kyr
 BASE_25 = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
            38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
 SIDEBANDS_6 = [96, 107, 110, 134, 152, 185]
-EXTENDED_31 = sorted(BASE_25 + SIDEBANDS_6)
+BERGER_QUINTET_141 = [141]  # k+g3 Earth at ~19 kyr (added 2026-05-28)
+EXTENDED_32 = sorted(BASE_25 + SIDEBANDS_6 + BERGER_QUINTET_141)
+EXTENDED_31 = EXTENDED_32  # backward-compat alias
 
 PERIOD_405K = 404.5
 PERIOD_13H = 13.0 * H              # 4359.121 kyr
@@ -629,7 +631,7 @@ def stage_b2_eigenmode_enumeration(ages_cgd, d13c_cgd, d18o_cgd):
 def main():
     t0 = time.time()
     print("=" * 78)
-    print("MILANKOVITCH 8H VARIANCE BUDGET — TIER B ROUND 1 (doc 18)")
+    print("MILANKOVITCH 8H VARIANCE BUDGET — TIER B ROUND 1 (doc 92)")
     print("=" * 78)
     print(f"H = {H} kyr;  8H = {EIGHT_H:.3f} kyr")
     print(f"Round 1 stages: B4 + B1 + C8 + B2")
@@ -661,7 +663,7 @@ def main():
 
     out["meta"] = {
         "script": str(SCRIPT_DIR / "milankovitch_8h_variance_budget_tier_b.py"),
-        "doc": "docs/18-climate-formula.md",
+        "doc": "docs/92-climate-formula.md",
         "runtime_sec": time.time() - t0,
     }
 

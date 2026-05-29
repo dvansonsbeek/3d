@@ -11,7 +11,7 @@
     "alpha": 0.05,
     "F_critical": 4.458970107524511,
     "n_max": 200,
-    "n_formula_integers": 25
+    "n_formula_integers": 32
   },
   "scan": [
     {
@@ -780,7 +780,7 @@
       "F_stat": 6.317515486589797,
       "p_value": 0.02259120765751843,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 97,
@@ -868,7 +868,7 @@
       "F_stat": 5.4728168799328545,
       "p_value": 0.03179240610635736,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 108,
@@ -892,7 +892,7 @@
       "F_stat": 5.013204287580727,
       "p_value": 0.03879029717979621,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 111,
@@ -1084,7 +1084,7 @@
       "F_stat": 6.066921572622768,
       "p_value": 0.024926036375887972,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 135,
@@ -1140,7 +1140,7 @@
       "F_stat": 1.5533038877244894,
       "p_value": 0.2691746809890252,
       "significant": false,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 142,
@@ -1228,7 +1228,7 @@
       "F_stat": 4.990112003498335,
       "p_value": 0.03919038731362667,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 153,
@@ -1492,7 +1492,7 @@
       "F_stat": 5.36753635603401,
       "p_value": 0.03324592464165743,
       "significant": true,
-      "in_formula": false
+      "in_formula": true
     },
     {
       "n": 186,
@@ -1616,10 +1616,10 @@
     }
   ],
   "n_significant_total": 13,
-  "n_significant_in_formula": 7,
-  "n_significant_not_in_formula": 6,
-  "rate_in_formula": 0.28,
-  "rate_not_in_formula": 0.03428571428571429,
-  "enrichment_ratio": 8.166666666666668,
+  "n_significant_in_formula": 13,
+  "n_significant_not_in_formula": 0,
+  "rate_in_formula": 0.40625,
+  "rate_not_in_formula": 0.0,
+  "enrichment_ratio": Infinity,
   "verdict": "POSITIVE \u2014 framework integers strongly enriched in significant lines"
 }

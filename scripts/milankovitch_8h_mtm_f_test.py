@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — MTM F-TEST FOR LINE SIGNIFICANCE
 =============================================================
 
-Test J (doc 17 §12.10 — line significance).
+Test J (doc 91 §12.10 — line significance).
 
 The closure test and the random-period null both work on band-aggregate
 statistics. The Thomson multi-taper (MTM) F-test gives a per-spectral-line
@@ -128,7 +128,8 @@ def load_integers():
         return formula["meta"]["integers"]
     except (FileNotFoundError, KeyError):
         return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                113, 120, 134, 141, 152, 185]
 
 
 def main():

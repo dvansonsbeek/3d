@@ -3,13 +3,13 @@
 MILANKOVITCH 8H FRAMEWORK — CENOGRID SLIDING-WINDOW H-MULTIPLE SPECTRAL TEST
 =============================================================================
 
-Doc 18 §4.6 — pre-registered windowed complement to §4.5.
+Doc 92 §4.6 — pre-registered windowed complement to §4.5.
 
 §4.5 found that the *global* 0–67 Myr CENOGRID MTM F-test gives NULL at all
 H-multiples (1H..8H) in both δ¹⁸O and δ¹³C. The objection: a global
 spectral test averages over the whole record, and any time-localised power
 at H-multiples (e.g. amplification specifically during the Plio-Pleistocene)
-would be diluted in a global test. The Plio-Pleistocene observation (doc 18
+would be diluted in a global test. The Plio-Pleistocene observation (doc 92
 §1) is that each of those epochs aligns with one 8H cycle — if 8H imprints
 climate at all, it should be most visible there.
 
@@ -163,7 +163,7 @@ def main():
     windows = [(i, (i * WINDOW_KYR, (i + 1) * WINDOW_KYR)) for i in range(N_WINDOWS)]
 
     print("=" * 78)
-    print("CENOGRID WINDOWED H-MULTIPLE SPECTRAL TEST (DOC 18 §4.6)")
+    print("CENOGRID WINDOWED H-MULTIPLE SPECTRAL TEST (DOC 92 §4.6)")
     print("=" * 78)
     print(f"  window length: 2×8H = {WINDOW_KYR:.0f} kyr  ({WINDOW_KYR/1000:.2f} Myr)")
     print(f"  tiling: {N_WINDOWS} non-overlapping windows, "
@@ -298,7 +298,7 @@ def main():
 
     OUT_PATH.write_text(json.dumps({
         "framework": "8H windowed H-multiple spectral test on CENOGRID",
-        "doc_reference": "doc 17 §11.6 — Plio-Pleistocene windowed complement to §4.5",
+        "doc_reference": "doc 91 §11.6 — Plio-Pleistocene windowed complement to §4.5",
         "data_source": "Westerhold 2020 CENOGRID (PANGAEA TableS34, LOESS-smoothed)",
         "window_length_kyr": WINDOW_KYR,
         "n_windows": N_WINDOWS,

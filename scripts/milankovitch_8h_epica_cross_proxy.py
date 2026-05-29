@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — EPICA CO₂ CROSS-PROXY VALIDATION
 =============================================================
 
-Test H (doc 17 §12.8 — cross-proxy).
+Test H (doc 91 §12.8 — cross-proxy).
 
 The 8H framework explains LR04 benthic δ¹⁸O (marine sediment ice-volume
 proxy) and Cheng 2016 speleothem δ¹⁸O (continental monsoon proxy). The
@@ -60,7 +60,8 @@ BANDS = {
 }
 
 FORMULA_INTEGERS_FULL = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                          38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                          38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                          113, 120, 134, 141, 152, 185]
 # Resolvable on 800-kyr record: n ≥ 4 (i.e. P ≤ 670 kyr). Cap n ≤ 30 to mirror Cheng test.
 FORMULA_INT_RESOLVABLE = [n for n in FORMULA_INTEGERS_FULL if 4 <= n <= 30]
 

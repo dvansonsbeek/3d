@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — CHENG 2016 INDEPENDENT-CHRONOLOGY VALIDATION
 =========================================================================
 
-Companion to milankovitch_8h_cheng_closure_test.py (doc 17 §12.2). The closure
+Companion to milankovitch_8h_cheng_closure_test.py (doc 91 §12.2). The closure
 test is blocked by Rayleigh resolution (T_Cheng = 640 kyr < 8H = 2682 kyr).
 This script tests the SAME framework predictions on Cheng using methods that
 do NOT require resolving adjacent integer divisors:
@@ -16,7 +16,7 @@ do NOT require resolving adjacent integer divisors:
        artifact).
 
   B2 — Permutation test on formula-integer amplitudes. Mirror of Test C
-       (doc 17 §12.3) but applied to Cheng instead of LR04. For each of the
+       (doc 91 §12.3) but applied to Cheng instead of LR04. For each of the
        25 formula integers in n=1..30 (the n's resolvable on Cheng's 640
        kyr record), compute Cheng amplitude. Compare to 1000 random sets
        of equal-size non-formula integer positions. Tests whether the
@@ -65,7 +65,8 @@ BANDS = {
 
 # 25 active formula integers in the n=1..30 resolvable range on Cheng
 FORMULA_INTEGERS_FULL = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                          38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                          38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                          113, 120, 134, 141, 152, 185]
 # n=1..30 subset (periods 89..2682 kyr, all individually resolvable in 640 kyr)
 FORMULA_INT_RESOLVABLE = [n for n in FORMULA_INTEGERS_FULL if 1 <= n <= 30]
 

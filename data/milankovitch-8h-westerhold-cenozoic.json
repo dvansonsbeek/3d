@@ -89,10 +89,10 @@
         "n_agree_any_8h_integer": 3
       },
       "I2_permutation": {
-        "n_resolvable_formula": 25,
-        "n_candidates": 172,
-        "formula_mean_amplitude": 0.12014167555890388,
-        "null_mean_amplitude": 0.03915496140505824,
+        "n_resolvable_formula": 32,
+        "n_candidates": 165,
+        "formula_mean_amplitude": 0.10199374803257713,
+        "null_mean_amplitude": 0.03942215913967496,
         "p_value": 0.0,
         "significant_at_05": true
       }
@@ -154,10 +154,10 @@
         "n_agree_any_8h_integer": 3
       },
       "I2_permutation": {
-        "n_resolvable_formula": 25,
-        "n_candidates": 172,
-        "formula_mean_amplitude": 0.041790352166031386,
-        "null_mean_amplitude": 0.02169114079601506,
+        "n_resolvable_formula": 32,
+        "n_candidates": 165,
+        "formula_mean_amplitude": 0.03610801469044183,
+        "null_mean_amplitude": 0.022082488578663476,
         "p_value": 0.0,
         "significant_at_05": true
       }
@@ -203,9 +203,9 @@
             "observed_peak_kyr": 24.652019283964275,
             "primary_predicted_kyr": 23.739256637168143,
             "diff_to_primary_kyr": 0.9127626467961321,
-            "nearest_formula_integer_n": 113,
-            "nearest_formula_period_kyr": 23.739256637168143,
-            "diff_to_nearest_formula_kyr": 0.9127626467961321,
+            "nearest_formula_integer_n": 110,
+            "nearest_formula_period_kyr": 24.38669090909091,
+            "diff_to_nearest_formula_kyr": 0.26532837487336636,
             "diff_to_nearest_8H_integer_kyr": 0.0415972656156498,
             "tolerance_kyr": 1.0,
             "rayleigh_resolution_kyr": 0.032266666666666666,
@@ -219,11 +219,11 @@
         "n_agree_any_8h_integer": 3
       },
       "I2_permutation": {
-        "n_resolvable_formula": 25,
-        "n_candidates": 172,
-        "formula_mean_amplitude": 0.033723477997025554,
-        "null_mean_amplitude": 0.021581583609120755,
-        "p_value": 0.003,
+        "n_resolvable_formula": 32,
+        "n_candidates": 165,
+        "formula_mean_amplitude": 0.029193549936112936,
+        "null_mean_amplitude": 0.02183207234909417,
+        "p_value": 0.033,
         "significant_at_05": true
       }
     },
@@ -268,28 +268,28 @@
             "observed_peak_kyr": 25.26707168894289,
             "primary_predicted_kyr": 23.739256637168143,
             "diff_to_primary_kyr": 1.5278150517747484,
-            "nearest_formula_integer_n": 113,
-            "nearest_formula_period_kyr": 23.739256637168143,
-            "diff_to_nearest_formula_kyr": 1.5278150517747484,
+            "nearest_formula_integer_n": 107,
+            "nearest_formula_period_kyr": 25.070429906542056,
+            "diff_to_nearest_formula_kyr": 0.1966417824008353,
             "diff_to_nearest_8H_integer_kyr": 0.03987170728352396,
             "tolerance_kyr": 1.0,
             "rayleigh_resolution_kyr": 0.0242,
             "agree_primary": false,
-            "agree_any_formula_integer": false,
+            "agree_any_formula_integer": true,
             "agree_any_8h_integer": true
           }
         },
         "n_agree_primary": 0,
-        "n_agree_any_formula_integer": 0,
+        "n_agree_any_formula_integer": 1,
         "n_agree_any_8h_integer": 2
       },
       "I2_permutation": {
-        "n_resolvable_formula": 25,
-        "n_candidates": 172,
-        "formula_mean_amplitude": 0.018669308105396434,
-        "null_mean_amplitude": 0.012874751888619506,
-        "p_value": 0.014,
-        "significant_at_05": true
+        "n_resolvable_formula": 32,
+        "n_candidates": 165,
+        "formula_mean_amplitude": 0.016679760493783502,
+        "null_mean_amplitude": 0.013093443765814797,
+        "p_value": 0.057,
+        "significant_at_05": false
       }
     },
     "W5_50_67Ma": {
@@ -333,33 +333,33 @@
             "observed_peak_kyr": 25.930833818272507,
             "primary_predicted_kyr": 23.739256637168143,
             "diff_to_primary_kyr": 2.191577181104364,
-            "nearest_formula_integer_n": 113,
-            "nearest_formula_period_kyr": 23.739256637168143,
-            "diff_to_nearest_formula_kyr": 2.191577181104364,
+            "nearest_formula_integer_n": 107,
+            "nearest_formula_period_kyr": 25.070429906542056,
+            "diff_to_nearest_formula_kyr": 0.8604039117304509,
             "diff_to_nearest_8H_integer_kyr": 0.1372184336571216,
             "tolerance_kyr": 1.0,
             "rayleigh_resolution_kyr": 0.02847058823529412,
             "agree_primary": false,
-            "agree_any_formula_integer": false,
+            "agree_any_formula_integer": true,
             "agree_any_8h_integer": true
           }
         },
         "n_agree_primary": 0,
-        "n_agree_any_formula_integer": 1,
+        "n_agree_any_formula_integer": 2,
         "n_agree_any_8h_integer": 3
       },
       "I2_permutation": {
-        "n_resolvable_formula": 25,
-        "n_candidates": 172,
-        "formula_mean_amplitude": 0.024417607259537632,
-        "null_mean_amplitude": 0.010224941607725017,
-        "p_value": 0.0,
+        "n_resolvable_formula": 32,
+        "n_candidates": 165,
+        "formula_mean_amplitude": 0.02013706689530923,
+        "null_mean_amplitude": 0.010739751708446085,
+        "p_value": 0.002,
         "significant_at_05": true
       }
     }
   },
-  "overall_verdict": "POSITIVE \u2014 5/5 Cenozoic windows show permutation-test significance (p<0.05); 3/5 also show full 3/3 band peak match to nearest framework integer",
-  "n_windows_permutation_significant": 5,
+  "overall_verdict": "POSITIVE \u2014 4/5 Cenozoic windows show permutation-test significance (p<0.05); 3/5 also show full 3/3 band peak match to nearest framework integer",
+  "n_windows_permutation_significant": 4,
   "n_windows_all3_bands_match_framework_integer": 3,
   "n_windows": 5
 }

@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — WESTERHOLD 2020 CENOGRID DEEP-TIME TEST
 ====================================================================
 
-Test I (doc 17 §12.9 — Cenozoic generalization).
+Test I (doc 91 §12.9 — Cenozoic generalization).
 
 LR04 spans 5.3 Myr; the framework's band structure has been verified there.
 Westerhold et al. 2020 Science 369, 1383 (CENOGRID) is a 67-Myr astronomically
@@ -71,7 +71,8 @@ WINDOWS = [
 ]
 
 FORMULA_INTEGERS = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                    38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                    113, 120, 134, 141, 152, 185]
 
 N_PERMUTATIONS = 1000
 RNG_SEED = 20260520

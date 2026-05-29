@@ -1,23 +1,23 @@
 {
-  "model_r2": 0.2320586554529558,
-  "n_components": 25,
+  "model_r2": 0.23851038083532317,
+  "n_components": 32,
   "n_trials": 1000,
   "null_A_random_periods": {
-    "description": "25 random periods uniform in [22, 400] kyr",
-    "mean_r2": 0.09659522855951169,
-    "p95_r2": 0.14964132063455762,
-    "p_value": 0.004
+    "description": "32 random periods uniform in [22, 400] kyr",
+    "mean_r2": 0.13494516675075982,
+    "p95_r2": 0.1927175690694368,
+    "p_value": 0.009
   },
   "null_B_random_integers": {
-    "description": "25 random integers from {1..200}, periods 8H/n",
-    "mean_r2": 0.05614337987909479,
-    "p95_r2": 0.1021256411546591,
+    "description": "32 random integers from {1..200}, periods 8H/n",
+    "mean_r2": 0.06963968782813225,
+    "p95_r2": 0.11199498716217561,
     "p_value": 0.0
   },
   "null_C_half_integers": {
-    "description": "25 random half-integer offsets (n + 0.5) from 8H lattice",
-    "mean_r2": 0.06324785596073551,
-    "p95_r2": 0.19585382859172826,
-    "p_value": 0.007
+    "description": "32 random half-integer offsets (n + 0.5) from 8H lattice",
+    "mean_r2": 0.0771584146475251,
+    "p95_r2": 0.2089138949297762,
+    "p_value": 0.015
   }
 }

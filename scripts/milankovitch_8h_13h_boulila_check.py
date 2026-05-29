@@ -3,7 +3,7 @@
 MILANKOVITCH 13H ↔ BOULILA 2020 CROSS-CHECK
 ============================================
 
-Pre-registered Test A from doc 17 §12.1.
+Pre-registered Test A from doc 91 §12.1.
 
 The 8H Orbital Forcing Framework predicts a long-period climate eigenmode at
 13H = 4.359 Myr (next integer multiple of H after 8H that survives the joint

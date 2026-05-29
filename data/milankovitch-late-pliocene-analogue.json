@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "script": "milankovitch_late_pliocene_analogue.py",
+    "formula": "canonical 32-component L1 + 3-line L2 + 6-step L3, sequential ridge per regime",
+    "H_kyr": 335.317,
+    "EIGHT_H_kyr": 2682.536,
+    "windows": {
+      "late_pliocene_kyr_BP": [
+        2432.536,
+        2682.536
+      ],
+      "post_mpt_kyr_BP": [
+        0.0,
+        250.0
+      ]
+    }
+  },
+  "late_pliocene": {
+    "n_samples": 248,
+    "r_with_formula": 0.7600849448310729,
+    "normalized_range": [
+      -1.9654418436686947,
+      2.0843789999882745
+    ],
+    "amplification_factor": 1.1917969264271437,
+    "glacial_peak_intervals_kyr": [
+      38.0,
+      40.0,
+      35.0,
+      45.0
+    ],
+    "mean_interval_kyr": 39.5,
+    "dominant_period_kyr": 41.333333333333336,
+    "dominant_amplitude": 8.573181148533955
+  },
+  "post_mpt": {
+    "n_samples": 251,
+    "r_with_formula": 0.944655364992955,
+    "normalized_range": [
+      -2.354527610345843,
+      1.7950383245534325
+    ],
+    "amplification_factor": 1.075470164114021,
+    "glacial_peak_intervals_kyr": [
+      22.0,
+      22.0,
+      25.0,
+      22.0,
+      31.0,
+      45.0,
+      38.0
+    ],
+    "mean_interval_kyr": 29.285714285714285,
+    "dominant_period_kyr": 125.5,
+    "dominant_amplitude": 6.994419624275456
+  }
+}

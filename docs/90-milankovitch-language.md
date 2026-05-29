@@ -4,7 +4,7 @@
 >
 > For the **100-kyr ice age problem**, the model's H/3 = 111,772 yr inclination precession lies in the same Rayleigh-limited band as the empirical centroid (Mercury-Mars s₁−s₄ nodal beat at ~107 kyr) — both sit on the *inclination-side / orbital-plane* family of eigenmode beats that Muller & MacDonald (1997, *PNAS*) argued for spectrally over direct eccentricity.
 >
-> Companion docs: [17 — Milankovitch Evidence & Hypothesis Tests](17-milankovitch-evidence.md) (empirical 31-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [18 — Climate Formula: Architecture, Variance & Implementation](18-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
+> Companion docs: [17 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md) (empirical 31-component 8H Orbital Forcing Formula + 14 hypothesis tests + 405-kyr off-lattice characterization); [18 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md) (canonical L1+L2+L3 modular formula + per-regime ridge fits across LR04 / CENOGRID / EPICA / CenCO2PIP + Climate Formula Explorer modal).
 
 **Related documents:**
 - [10 — Fibonacci Laws](10-fibonacci-laws.md)
@@ -142,7 +142,7 @@ The Boulila et al. 2020 *Palaeogeography* result identifies a ~4.5 Myr cycle in 
 The standard story attributes the post-MPT ~100-kyr ice age cycle to **eccentricity**. Specific problems:
 
 1. **Spectral mismatch.** Eccentricity has a *split* peak at ~95 and ~125 kyr; climate records show a *single narrow peak* near ~100 kyr (Muller & MacDonald 1997).
-2. **The 405-kyr absence.** Eccentricity's theoretically *strongest* term is the 405-kyr g₂−g₅ Venus-Jupiter beat, which is largely absent from climate records of the past 1.2 Myr (doc 17 §7.1 quantifies the absence: amplitude ratio 0.12 vs the 100-kyr peak in post-MPT LR04).
+2. **The 405-kyr absence.** Eccentricity's theoretically *strongest* term is the 405-kyr g₂−g₅ Venus-Jupiter beat, which is largely absent from climate records of the past 1.2 Myr (doc 91 §7.1 quantifies the absence: amplitude ratio 0.12 vs the 100-kyr peak in post-MPT LR04).
 3. **Weak forcing.** Eccentricity changes Earth's annual-mean insolation by only ~0.2 %, requiring rescue amplification mechanisms (CO₂ thresholds, ice-sheet nonlinearity) that aren't independently established.
 
 ### 5.2 The Muller-MacDonald inclination alternative
@@ -155,11 +155,11 @@ Their spectral evidence has **never been refuted**; what was rejected was their 
 
 ### 5.3 The model's position
 
-The model's broader claim — that the 100-kyr cycle sits in the **inclination-side / orbital-plane family** of eigenmode beats rather than direct eccentricity — is empirically supported by doc 17 §4:
+The model's broader claim — that the 100-kyr cycle sits in the **inclination-side / orbital-plane family** of eigenmode beats rather than direct eccentricity — is empirically supported by doc 91 §4:
 
 - The 100-kyr-band centroid is the **Mercury-Mars s₁−s₄ nodal beat at n=25 = 107.3 kyr** — a planet-pair orbital-plane coupling (not an eccentricity beat).
-- The 405-kyr g₂−g₅ eccentricity term is essentially absent in post-MPT LR04 (amplitude ratio 0.12 vs the 100-kyr peak — doc 17 §7.1).
-- Bispectral analysis finds no significant 95k + 125k eccentricity-beat phase coupling (doc 17 §7.2, replicating M-M 1997).
+- The 405-kyr g₂−g₅ eccentricity term is essentially absent in post-MPT LR04 (amplitude ratio 0.12 vs the 100-kyr peak — doc 91 §7.1).
+- Bispectral analysis finds no significant 95k + 125k eccentricity-beat phase coupling (doc 91 §7.2, replicating M-M 1997).
 
 Within that inclination-side family, the model **proposes** a specific dust-free mechanism:
 
@@ -167,7 +167,7 @@ $$\text{Inclination precession (H/3)} \;\rightarrow\; \text{second obliquity com
 
 Earth's actual obliquity would then have **two** components — one at H/8 ≈ 41 kyr (the well-known Berger 1978 obliquity cycle) and a second at H/3 ≈ 112 kyr. Standard secular theory distributes the H/3 component across smaller spectral terms rather than recognising it as one peak. Every step after "second obliquity component" is standard Milankovitch physics; the mechanism needs no new forcing.
 
-Important distinction: H/3 = 111.77 kyr and the empirically dominant Mercury-Mars nodal beat at 107.3 kyr lie within one Rayleigh element of each other at T = 1.2 Myr (ΔP ≈ 10 kyr at P = 110 kyr — doc 17 §4.3), so the data cannot single out H/3 specifically. The empirical signal is consistent with the inclination-side family but does not confirm the model's specific H/3-second-obliquity proposal. That proposal remains **theoretical** within the broader empirically-supported framework.
+Important distinction: H/3 = 111.77 kyr and the empirically dominant Mercury-Mars nodal beat at 107.3 kyr lie within one Rayleigh element of each other at T = 1.2 Myr (ΔP ≈ 10 kyr at P = 110 kyr — doc 91 §4.3), so the data cannot single out H/3 specifically. The empirical signal is consistent with the inclination-side family but does not confirm the model's specific H/3-second-obliquity proposal. That proposal remains **theoretical** within the broader empirically-supported framework.
 
 Full mechanism statement: [website supporting-evidence.mdx §6](../../Holistic/holisticuniverse/src/content/en/model/supporting-evidence.mdx).
 
@@ -184,26 +184,26 @@ The model treats the inclination cycle as a *permanent formation-epoch feature* 
 
 This document is the *framework* — what the model says about Milankovitch.
 
-The empirical evidence lives in [doc 17 — Milankovitch Evidence & Hypothesis Tests](17-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 31-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
+The empirical evidence lives in [doc 91 — Milankovitch Evidence & Hypothesis Tests](91-milankovitch-evidence.md): spectral analysis of LR04 + Cheng 2016 + EPICA + CENOGRID, the 31-component **8H Orbital Forcing Formula**, per-planet contributions, the MPT amplitude-growth analysis, a pre-registered super-cycle hypothesis test (NULL), fourteen falsifiable follow-up tests (16 positives / 2 partials / 5 nulls), and the 405-kyr off-lattice characterization as a Layer-2 carbon-cycle thermostat resonance.
 
-The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 18 — Climate Formula: Architecture, Variance & Implementation](18-climate-formula.md).
+The canonical L1 + L2 + L3 modular formula — per-regime ridge fitting across LR04 / CENOGRID / EPICA / CenCO2PIP, stitched per-regime evaluation, and the Climate Formula Explorer modal in `src/script.js` — is documented in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
 
-**Five headline findings from doc 17 §1**:
+**Five headline findings from doc 91 §1**:
 
-1. Every significant LR04 climate peak sits at an integer divisor of 8H (30 of 31 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 18 §2.4](18-climate-formula.md#24-the-31-lattice-integers--per-line-identities)).
+1. Every significant LR04 climate peak sits at an integer divisor of 8H (30 of 31 with clean physical interpretations as Berger/Laskar eigenmode beats or direct planet periods; n=66 is the obliquity-band centroid added by this framework — see [doc 92 §2.4](92-climate-formula.md#24-the-31-lattice-integers--per-line-identities)).
 2. **Mars dominates the per-planet climate fingerprint** (two exclusive direct matches in LR04 full, three more in pre-MPT).
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat** (Mercury-Mars s₁−s₄ nodal at 107 kyr), not direct eccentricity forcing — vindicates Muller-MacDonald 1997's framing.
 4. Pre-MPT and post-MPT differ in **climate sensitivity, not orbital forcing**.
-5. Forward projection: the next natural glacial maximum is predicted at ~58,000 years from now (~ 60,000 CE), with the strongest glacial in the next 250 kyr at ~198,000 years from now. Orbital-only — see [doc 18 §13.7](18-climate-formula.md) for the anthropogenic-CO₂ caveat (Ganopolski 2016 vs Caillon 2003 framing).
+5. Forward projection: the next natural glacial maximum is predicted at ~58,000 years from now (~ 60,000 CE), with the strongest glacial in the next 250 kyr at ~198,000 years from now. Orbital-only — see [doc 92 §13.7](92-climate-formula.md) for the anthropogenic-CO₂ caveat (Ganopolski 2016 vs Caillon 2003 framing).
 
-The framework laid out in §§ 1–5 of this document (five H-divisor periods, Fibonacci closure, Berger 1978 spectrum match, eigenmode convergence at H/3 and H/5, cross-planet validation) **stands independently** of the specific 100-kyr-cycle attribution. See [doc 17 §4.8](17-milankovitch-evidence.md#48-what-stands-independently-of-the-100-kyr-cycle-attribution) for what remains robust regardless of how the 100-kyr question resolves.
+The framework laid out in §§ 1–5 of this document (five H-divisor periods, Fibonacci closure, Berger 1978 spectrum match, eigenmode convergence at H/3 and H/5, cross-planet validation) **stands independently** of the specific 100-kyr-cycle attribution. See [doc 91 §4.8](91-milankovitch-evidence.md#48-what-stands-independently-of-the-100-kyr-cycle-attribution) for what remains robust regardless of how the 100-kyr question resolves.
 
 **What the model addresses and does not** (scope):
 
 | Question | Within scope? |
 |---|---|
 | Match of model H-divisor periods to standard Milankovitch values | **Yes** — §§ 2, 4 |
-| Whether the 100-kyr cycle is best attributed to H/3 inclination or eccentricity beats | **Yes** — see doc 17 §§ 3, 4, 7 |
+| Whether the 100-kyr cycle is best attributed to H/3 inclination or eccentricity beats | **Yes** — see doc 91 §§ 3, 4, 7 |
 | Mechanism by which inclination forcing becomes climatically visible at MPT | **Partial** — model cites Farley dust + Willeit threshold as compatible; doesn't discriminate |
 | Cause of the MPT itself (ice-sheet response change) | **No** — Earth-system physics, outside scope |
 | Future climate prediction | **No** — requires ice-sheet dynamics |

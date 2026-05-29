@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FRAMEWORK — CROSS-VALIDATED PHASE PREDICTION
 ==============================================================
 
-Test M (doc 17 §12.13 — out-of-sample glacial timing).
+Test M (doc 91 §12.13 — out-of-sample glacial timing).
 
 Test G showed the formula correctly times glacial maxima within 5 kyr median
 on the FULL-RECORD fit. Test F1/F2 showed amplitudes don't generalize across
@@ -110,7 +110,8 @@ def load_integers():
         return formula["meta"]["integers"]
     except (FileNotFoundError, KeyError):
         return [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
-                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
+                38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 96, 107, 110,
+                113, 120, 134, 141, 152, 185]
 
 
 def run_split(name, train_range, test_range, t, y, integers):

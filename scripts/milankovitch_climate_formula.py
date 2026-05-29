@@ -6,7 +6,7 @@ MILANKOVITCH 8H CLIMATE FORMULA — modular L1/L2/L3 architecture
 This is the canonical climate-prediction formula. Successor to the v1
 25-component flat model, which is preserved as
 `milankovitch_climate_formula_v1_legacy.py` for historical reference and
-backward-compatibility. Built from the findings of doc 18 / Tier B Rounds 1-3.
+backward-compatibility. Built from the findings of doc 92 / Tier B Rounds 1-3.
 
 Architectural change from v1:
   • v1: single layer of 25 lattice integers, full-record OLS fit
@@ -22,8 +22,8 @@ The formula:
          + Σ_i γ_i H(t - t_i)                                  ← L3 (step components)
 
 L1 = 31 integer divisors of 8H = 2682.536 kyr
-  Canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles, doc 17 §2.2)
-  + 6 precession-band sidebands (MTM-significant per Round 1 A1, doc 18 §2.2)
+  Canonical 25 (Berger eigenmode beats + Mars/Jupiter direct cycles, doc 91 §2.2)
+  + 6 precession-band sidebands (MTM-significant per Round 1 A1, doc 92 §2.2)
 
 L2 = 405-kyr silicate-weathering thermostat family
   Fundamental 405-kyr (g₂−g₅ eccentricity beat, off-lattice)
@@ -39,7 +39,7 @@ L1 fit method: ridge regression (λ = L1_RIDGE_LAMBDA, intercept un-penalized).
   69 600; max |amp| ≈ 17 in normalized units) that fit the window but
   blow up under extrapolation. Ridge λ=1 shrinks max |amp| ≈ 25× with
   ΔR² < 0.01 in post-MPT and is a no-op for the well-conditioned
-  inhg-mpt / pre-inhg / lr04-full regimes (cond ≤ 3). See doc 18 §9.5.
+  inhg-mpt / pre-inhg / lr04-full regimes (cond ≤ 3). See doc 92 §9.5.
 
 L3 = Cenozoic boundary-condition step components
   At PETM (56 Ma), EOT (34 Ma), Mi-1 (23 Ma), MMCT (14 Ma), iNHG (2.7 Ma), MPT (1 Ma)
@@ -72,7 +72,7 @@ Forward projection honesty:
   The current operative regime is **post-MPT** (we are at ~1.05 Ma since MPT;
   no scheduled boundary-condition transition within the next 250 kyr). A
   formula trained on post-MPT data projects forward credibly within this
-  regime. Doc 28 Round 2 C5 + Round 3 R3-3 documented that cross-regime
+  regime. Doc 93 Round 2 C5 + Round 3 R3-3 documented that cross-regime
   prediction fails catastrophically (R² ≈ −0.9). Forward projections
   beyond ~250 kyr enter "unknown" territory because they may encounter
   the next boundary-condition shift (an Anthropocene-induced regime
@@ -104,7 +104,7 @@ EIGHT_H = 8 * H              # 2682.536 kyr
 
 # L1 ridge regularization. Acts only where the lattice is under-determined
 # (post-MPT 1000-kyr window: cond ≈ 632, max VIF ≈ 7×10⁴). No-op in regimes
-# whose window length resolves the lattice (cond ≤ 3). See doc 18 §9.5.
+# whose window length resolves the lattice (cond ≤ 3). See doc 92 §9.5.
 L1_RIDGE_LAMBDA = 1.0
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -112,11 +112,16 @@ L1_RIDGE_LAMBDA = 1.0
 # ─────────────────────────────────────────────────────────────────────────
 
 L1_LATTICE_INTEGERS = sorted([
-    # Canonical 25 (doc 17 §2.2 + pre-MPT additions from §3.3)
+    # Canonical 25 (doc 91 §2.2 + pre-MPT additions from §3.3)
     9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
     38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120,
     # 6 precession-band sidebands (Round 1 A1; MTM-significant, on-lattice at higher N)
     96, 107, 110, 134, 152, 185,
+    # Berger quintet completion: k+g₃ Earth climatic precession at ~19 kyr.
+    # Subthreshold in LR04 (amp/median 2.03×) but 3σ-significant in Cheng monsoon (3.6×).
+    # Combines with k+g₅ (n=113) to produce the 95-kyr eccentricity beat at n=28
+    # (Wigley 1976 / Berger 1978 combination tone: 1/95 ≈ 1/19 − 1/23.7).
+    141,
 ])
 
 L2_THERMOSTAT_FAMILY = {
@@ -165,6 +170,7 @@ L1_LABELS = {
     113: "k+g₅ Jupiter climatic precession (Berger 23.7k)",
     120: "k+g₂ Venus climatic precession = H/15",
     134: "k+g₅ Jupiter precession sub-peak (Round 1 A1)",
+    141: "k+g₃ Earth climatic precession — Berger quintet 19-kyr peak (subthreshold LR04, 3σ in Cheng monsoon; beats with n=113 to form n=28 per Wigley 1976)",
     152: "k+g₄ Mars climatic precession sub-peak (Round 1 A1)",
     185: "k+g₂ Venus precession sub-peak (Round 1 A1)",
 }
@@ -878,7 +884,7 @@ def main():
 
     out["meta"] = {
         "script": str(SCRIPT_DIR / "milankovitch_climate_formula.py"),
-        "doc": "docs/18-climate-formula.md",
+        "doc": "docs/92-climate-formula.md",
         "predecessor": "scripts/milankovitch_climate_formula_v1_legacy.py (25 components, single-layer)",
         "runtime_sec": time.time() - t0,
     }

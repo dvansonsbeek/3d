@@ -175,6 +175,27 @@
       "significant": true
     },
     {
+      "n": 96,
+      "period_kyr": 27.943083333333334,
+      "F_stat": 6.317515486589797,
+      "p_value": 0.02259120765751843,
+      "significant": true
+    },
+    {
+      "n": 107,
+      "period_kyr": 25.070429906542056,
+      "F_stat": 5.4728168799328545,
+      "p_value": 0.03179240610635736,
+      "significant": true
+    },
+    {
+      "n": 110,
+      "period_kyr": 24.38669090909091,
+      "F_stat": 5.013204287580727,
+      "p_value": 0.03879029717979621,
+      "significant": true
+    },
+    {
       "n": 113,
       "period_kyr": 23.739256637168143,
       "F_stat": 1.5255072246268604,
@@ -187,15 +208,43 @@
       "F_stat": 5.380741201163931,
       "p_value": 0.03305912439198411,
       "significant": true
+    },
+    {
+      "n": 134,
+      "period_kyr": 20.01892537313433,
+      "F_stat": 6.066921572622768,
+      "p_value": 0.024926036375887972,
+      "significant": true
+    },
+    {
+      "n": 141,
+      "period_kyr": 19.0250780141844,
+      "F_stat": 1.5533038877244894,
+      "p_value": 0.2691746809890252,
+      "significant": false
+    },
+    {
+      "n": 152,
+      "period_kyr": 17.648263157894736,
+      "F_stat": 4.990112003498335,
+      "p_value": 0.03919038731362667,
+      "significant": true
+    },
+    {
+      "n": 185,
+      "period_kyr": 14.500194594594594,
+      "F_stat": 5.36753635603401,
+      "p_value": 0.03324592464165743,
+      "significant": true
     }
   ],
-  "n_formula_significant": 7,
-  "n_formula_total": 25,
-  "fraction_formula_significant": 0.28,
+  "n_formula_significant": 13,
+  "n_formula_total": 32,
+  "fraction_formula_significant": 0.40625,
   "permutation_test": {
     "n_permutations": 1000,
-    "null_mean_significant_count": 0.84,
-    "null_p95_significant_count": 2.0,
+    "null_mean_significant_count": 0.0,
+    "null_p95_significant_count": 0.0,
     "p_value": 0.0,
     "significant_at_05": true
   },

@@ -5,8 +5,8 @@ MILANKOVITCH 8H CLIMATE FORMULA — V1 LEGACY (25 components, single-layer)
 
 ⚠ This is the v1 LEGACY formula, preserved for historical reference.
    The canonical formula is now `milankovitch_climate_formula.py`
-   (modular L1/L2/L3 architecture, 31 lattice integers + 3 L2 thermostat
-   lines + L3 step components, per doc 18).
+   (modular L1/L2/L3 architecture, 32 lattice integers + 3 L2 thermostat
+   lines + L3 step components, per doc 92).
 
 This v1 script remains runnable as a baseline for comparison.
 
@@ -14,7 +14,7 @@ Original v1 description:
 ========================
 
 Builds an explicit climate-prediction formula from the 8H integer-divisor
-analysis (§2 of doc 17):
+analysis (§2 of doc 91):
 
     C(t) = Σ_n A_n cos(2π n t / 8H + φ_n)
 
@@ -56,11 +56,11 @@ H = 335.317
 EIGHT_H = 8 * H  # 2682.536 kyr
 DT_KYR = 1.0
 
-# 25 significant integer divisors of 8H. 19 from §2.2 of doc 17 (LR04 full
+# 25 significant integer divisors of 8H. 19 from §2.2 of doc 91 (LR04 full
 # T=5320 kyr, amp > 3× median) + 6 added from §3.3 (pre-MPT 1200–3000 kyr)
 # to capture outer-planet and Mars-direct cycles. The 405-kyr Laskar g₂−g₅
 # secular eigenbeat lives off the 8H lattice and is modelled separately
-# (doc 17 §13).
+# (doc 91 §13).
 CLIMATE_INTEGERS = [9, 12, 14, 16, 18, 20, 21, 22, 25, 28, 30, 31, 35,
                     38, 39, 48, 50, 53, 65, 66, 68, 73, 76, 113, 120]
 
@@ -85,7 +85,7 @@ LABELS = {
     50:  "g₆−g₅ Saturn-Jupiter ecc",
     53:  "s₈−s₆ / Mars Ecc cycle = 8H/53 (model)",
     65:  "k+s₃ Earth obliquity (Berger 41k)",
-    66:  "obliquity-band arithmetic-mean cycle length (~40.5 kyr; Jensen's inequality vs k+s₃ — see doc 17 §6.6)",
+    66:  "obliquity-band arithmetic-mean cycle length (~40.5 kyr; Jensen's inequality vs k+s₃ — see doc 91 §6.6)",
     68:  "k+s₄ Berger Mars obliquity sub-peak / k−g₃ Earth axial-apsidal beat",
     73:  "2|s₄| Mars nodal harmonic / g₃−s₄",
     76:  "g₄−s₃ Mars apsidal − Earth nodal beat",
@@ -213,7 +213,7 @@ def main():
     print("MILANKOVITCH 8H CLIMATE FORMULA — FIT + FORWARD PROJECTION")
     print("=" * 78)
     print(f"H = {H} kyr;  8H = {EIGHT_H} kyr")
-    print(f"Components: {len(CLIMATE_INTEGERS)} integer divisors of 8H (doc 17 §2.2 + pre-MPT additions from §3.3)")
+    print(f"Components: {len(CLIMATE_INTEGERS)} integer divisors of 8H (doc 91 §2.2 + pre-MPT additions from §3.3)")
 
     ages, vals = load_lr04()
     t, y, mean_orig, std_orig = preprocess(ages, vals)

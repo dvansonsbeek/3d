@@ -3,7 +3,7 @@
 MILANKOVITCH 8H FORMULA ↔ BERGER & LOUTRE 2002 COMPARISON
 ==========================================================
 
-Pre-registered Test E from doc 17 §12.5.
+Pre-registered Test E from doc 91 §12.5.
 
 Berger & Loutre (2002, Science 297, 1287–1288) used a purely astronomical
 insolation-based model to predict that the current interglacial will be
@@ -11,7 +11,7 @@ insolation-based model to predict that the current interglacial will be
 typical ~10–20 kyr interglacial duration.
 
 The 8H Orbital Forcing Formula projects forward from the 25-component
-amplitude+phase fit to LR04 (doc 17 §6, data/milankovitch-climate-formula.json).
+amplitude+phase fit to LR04 (doc 91 §6, data/milankovitch-climate-formula.json).
 Its forward projection independently identifies an unusually delayed
 glaciation onset.
 
@@ -44,7 +44,7 @@ BL2002 = {
 def extract_8h_predictions():
     """Read the climate-formula JSON and pull the forward-projection summary.
 
-    Schema is doc 17 §6 forward_projection: lists of glacial maxima and
+    Schema is doc 91 §6 forward_projection: lists of glacial maxima and
     interglacial peaks each with kyr_from_now and C_normalized."""
     formula = json.loads(FORMULA_JSON.read_text())
     fp = formula.get("forward_projection", {})

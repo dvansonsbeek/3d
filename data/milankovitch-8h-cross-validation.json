@@ -2,7 +2,7 @@
   "meta": {
     "H_kyr": 335.317,
     "8H_kyr": 2682.536,
-    "n_integers": 25,
+    "n_integers": 32,
     "integers": [
       9,
       12,
@@ -27,10 +27,17 @@
       68,
       73,
       76,
+      96,
+      107,
+      110,
       113,
-      120
+      120,
+      134,
+      141,
+      152,
+      185
     ],
-    "full_record_in_sample_r2": 0.2320586554529559
+    "full_record_in_sample_r2": 0.2385103808353234
   },
   "F1_temporal_split_0_2000": {
     "name": "F1 0-2000 train / 2000-5320 test",
@@ -38,9 +45,9 @@
     "test_window": "2000\u20135320 kyr",
     "train_samples": 2000,
     "test_samples": 3321,
-    "train_r2": 0.638698873551123,
-    "test_r2": -2.1198084535284645,
-    "test_over_train_ratio": -3.3189481636979745,
+    "train_r2": 0.652796265896808,
+    "test_r2": -2.1554324296099687,
+    "test_over_train_ratio": -3.301845525493084,
     "verdict": "NULL (test R\u00b2 collapses)"
   },
   "F2_temporal_split_2000_5320": {
@@ -49,9 +56,9 @@
     "test_window": "0\u20132000 kyr",
     "train_samples": 3321,
     "test_samples": 2000,
-    "train_r2": 0.28268518574916257,
-    "test_r2": -0.14513029220392792,
-    "test_over_train_ratio": -0.5133990018589358,
+    "train_r2": 0.2899509962219592,
+    "test_r2": -0.14443919690731732,
+    "test_over_train_ratio": -0.49815037295732645,
     "verdict": "NULL (test R\u00b2 collapses)"
   },
   "F3_even_odd": {
@@ -60,9 +67,9 @@
     "test_window": "odd-index samples",
     "train_samples": 2661,
     "test_samples": 2660,
-    "train_r2": 0.23105982929526203,
-    "test_r2": 0.2329507709932399,
-    "test_over_train_ratio": 1.0081837751882068,
+    "train_r2": 0.23732959863624126,
+    "test_r2": 0.23952908846784615,
+    "test_over_train_ratio": 1.0092676591720702,
     "verdict": "POSITIVE (out-of-sample R\u00b2 \u2265 0.10, retains \u226540% of training R\u00b2)"
   }
 }
