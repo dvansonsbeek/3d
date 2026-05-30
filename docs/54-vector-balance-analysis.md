@@ -67,10 +67,10 @@ The `ascendingNodeCyclesIn8H` integers are jointly fit to JPL's J2000-fixed-fram
 | Mercury | −8H/9 | |
 | Venus | −8H/1 | full Solar System Resonance Cycle |
 | Earth | −8H/40 = −H/5 | ecliptic precession (special) |
-| Mars | −8H/63 | |
+| Mars | −8H/64 | |
 | Jupiter | −8H/36 | locked with Saturn |
 | Saturn | −8H/36 | locked with Jupiter |
-| Uranus | −8H/12 | |
+| Uranus | −8H/11 | |
 | Neptune | −8H/3 | |
 
 These integers were selected by `tools/explore/anchor-and-ascnode-audit.js`.

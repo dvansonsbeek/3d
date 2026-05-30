@@ -49,10 +49,10 @@ All periods expressed as 8H/N where 8H = 2,682,536 years:
 | Mercury | **−8H/9** | 8H/11 | −8H/93 | **−8H/9** | 8H/3 | 8H/84 |
 | Venus | +8H/91 | −8H/6 | −8H/110 | **−8H/1** | 8H/110 | 8H/19 |
 | **Earth** | **−8H/104** | **8H/128** | **+8H/24** | **−8H/40** | **8H/64** | **8H/128** |
-| Mars | −8H/16 | 8H/35 | −8H/69 | **−8H/63** | 8H/21 | 8H/53 |
+| Mars | −8H/16 | 8H/36 | −8H/68 | **−8H/64** | 8H/21 | 8H/52 |
 | Jupiter | −8H/21 | 8H/39 | −8H/65 | **−8H/36** | 8H/16 | 8H/44 |
 | Saturn | −8H/6 | −8H/65 | −8H/169 | **−8H/36** | 8H/24 | 8H/163 |
-| Uranus | ~∞ | 8H/24 | −8H/80 | **−8H/12** | 8H/16 | 8H/80 |
+| Uranus | ~∞ | 8H/24 | −8H/80 | **−8H/11** | 8H/16 | 8H/80 |
 | Neptune | ~∞ | 8H/4 | −8H/100 | **−8H/3** | 8H/100 | 8H/100 |
 
 Sign convention: + = prograde, − = retrograde, ~∞ = frozen. Obliquity and eccentricity cycles are oscillation periods (no direction, shown unsigned). Earth's ICRF perihelion is the sole prograde ICRF; Venus's axial precession is the sole prograde axial (obliquity 177° flips the cos sign — Cottereau & Souchay 2009).
@@ -71,10 +71,10 @@ Notes:
 | Mercury | **−298,060** | 243,867 | −28,844 | **−298,060** | 894,179 | 31,935 |
 | Venus | +29,478 | −447,089 | −24,387 | **−2,682,536** | 24,387 | 141,186 |
 | **Earth** | **−25,794** | **20,957** | **+111,772** | **−67,063** | **41,915** | **20,957** |
-| Mars | −167,659 | 76,644 | −38,877 | **−42,580** | 127,740 | 50,614 |
+| Mars | −167,659 | 74,515 | −39,449 | **−41,915** | 127,740 | 51,587 |
 | Jupiter | −127,740 | 68,783 | −41,270 | **−74,515** | 167,659 | 60,967 |
 | Saturn | −447,089 | −41,270 | −15,873 | **−74,515** | 111,772 | 16,457 |
-| Uranus | ~∞ | 111,772 | −33,532 | **−223,545** | 167,659 | 33,532 |
+| Uranus | ~∞ | 111,772 | −33,532 | **−243,867** | 167,659 | 33,532 |
 | Neptune | ~∞ | 670,634 | −26,825 | **−894,179** | 26,825 | 26,825 |
 
 (+ = prograde, − = retrograde, ~∞ = frozen)
@@ -93,7 +93,7 @@ Notes:
 Many divisors are products of small Fibonacci numbers:
 - 24 = 3 × 8, 64 = 8 × 8, 80 = 5 × 16
 - 104 = 8 × 13, 128 = 8 × 16
-- The new asc-node integers cluster on small factors as well: Mercury 9 = 3², Mars 63 = 7 × 9, Jupiter/Saturn 36 = 4 × 9, Uranus 12 = 4 × 3, Neptune 3 = F₄, Venus 1 (= 8H, a full Solar System Resonance Cycle)
+- The asc-node integers cluster on small factors / structural matches: Mercury 9 = 3², Mars **64 = 2⁶ = 8²** (also matches Earth.Obliq=64), Jupiter/Saturn 36 = 4 × 9, Uranus **11** (= Mercury.Peri_ecl, a Mercury↔Uranus mirror identity), Neptune 3 = F₄, Venus 1 (= 8H, a full Solar System Resonance Cycle)
 
 **Jupiter and Saturn's dynamical perihelion integers are themselves Fibonacci products** — and all share the factor 13 (= F₇, Earth's axial-precession Fibonacci number):
 - Jupiter ecliptic 39 = **3 × 13** (F₄ × F₇)

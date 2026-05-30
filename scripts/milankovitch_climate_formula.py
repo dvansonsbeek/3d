@@ -3,16 +3,13 @@
 MILANKOVITCH 8H CLIMATE FORMULA — modular L1/L2/L3 architecture
 ===================================================================
 
-This is the canonical climate-prediction formula. Successor to the v1
-25-component flat model, which is preserved as
-`milankovitch_climate_formula_v1_legacy.py` for historical reference and
-backward-compatibility. Built from the findings of doc 92 / Tier B Rounds 1-3.
+This is the canonical climate-prediction formula. Built from the findings of
+doc 92 / Tier B Rounds 1-3.
 
-Architectural change from v1:
-  • v1: single layer of 25 lattice integers, full-record OLS fit
-  • v2 (now canonical): explicit three-layer decomposition + regime-aware
-        sequential fitting (L1 → L2 → L3 on residuals; per-layer ΔR² is the
-        unique variance contribution after preceding layers)
+Architecture:
+  • Explicit three-layer decomposition + regime-aware sequential fitting
+    (L1 → L2 → L3 on residuals; per-layer ΔR² is the unique variance
+    contribution after preceding layers)
 
 The formula:
 
@@ -142,7 +139,7 @@ L3_TRANSITIONS_MA = {
 # Per-integer label (mirrored from v1 for backward compatibility + 6 new sidebands)
 L1_LABELS = {
     9:   "g₂−g₇ Venus-Uranus ecc / Mercury Axial = 8H/9",
-    12:  "s₅−s₁ Jupiter-Mercury nodal / Uranus AscNode = 8H/12",
+    12:  "s₅−s₁ Jupiter-Mercury nodal",
     14:  "g₂−g₈ Venus-Neptune ecc",
     16:  "Mars Axial = 8H/16",
     18:  "s₄−s₆ Mars-Saturn nodal",
@@ -153,12 +150,12 @@ L1_LABELS = {
     28:  "g₄−g₅ Mars-Jupiter ecc (Berger 95k)",
     30:  "g₃−g₇ Earth-Uranus ecc",
     31:  "g₄−g₇ Mars-Uranus",
-    35:  "Mars apsidal = 8H/35",
+    35:  "Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat; close to Mars apsidal at 8H/36)",
     38:  "s₈−s₃ Neptune-Earth nodal",
     39:  "s₅−s₃ Earth nodal",
     48:  "s₇−s₆ Uranus-Saturn nodal",
     50:  "g₆−g₅ Saturn-Jupiter ecc",
-    53:  "Mars Ecc cycle = 8H/53",
+    53:  "Mars.AscNode(64) − Uranus.AscNode(11) s-beat (close to Mars Ecc cycle at 8H/52)",
     65:  "k+s₃ Earth obliquity (Berger 41k)",
     66:  "obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ ratio 15.79)",
     68:  "k+s₄ Berger Mars obliquity sub-peak",
@@ -885,7 +882,6 @@ def main():
     out["meta"] = {
         "script": str(SCRIPT_DIR / "milankovitch_climate_formula.py"),
         "doc": "docs/92-climate-formula.md",
-        "predecessor": "scripts/milankovitch_climate_formula_v1_legacy.py (25 components, single-layer)",
         "runtime_sec": time.time() - t0,
     }
 

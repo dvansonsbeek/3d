@@ -71,7 +71,7 @@ PLANET_MODULATED = {
     65: ("near H/8", "s3+k 41.27 kyr (Berger Earth obliquity)"),
     66: ("near H/8", "Obliquity-band arithmetic-mean cycle length (~40.5 kyr) — Jensen's inequality vs k+s3 Fourier centroid (doc 91 §6.6). At T<3000 kyr Fourier resolution cannot separate n=65/66/67, and amplitude piles at the cycle-counting mean position."),
     67: ("near H/8", "s4+k 40.04 kyr (Berger Mars-modulated obliquity sub-peak)"),
-    68: ("near H/8", "k+s4 Berger Mars obliquity sub-peak OR k−g3 Earth axial-apsidal beat (~39.5 kyr); pre-MPT may include Mars ICRF (8H/69 ±1)"),
+    68: ("near H/8", "k+s4 Berger Mars obliquity sub-peak OR k−g3 Earth axial-apsidal beat (~39.5 kyr); Mars ICRF = 8H/68 exactly"),
     73: ("near H/8", "2|s4| Mars nodal harmonic (~36.7 kyr) OR g3−s4 Earth-Mars apsidal-nodal beat"),
     76: ("near H/8", "g4−s3 Mars apsidal − Earth nodal beat (~35.3 kyr)"),
     # Near H/13 (axial / climatic precession sub-peaks)

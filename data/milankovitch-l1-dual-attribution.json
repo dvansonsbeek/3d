@@ -1,32 +1,8 @@
 {
   "meta": {
     "script": "milankovitch_l1_dual_attribution.py",
-    "mode": "tweaked",
     "H_kyr": 335.317,
     "EIGHT_H_kyr": 2682.536,
-    "tweaks_defined": {
-      "Mars.Peri_ecl": [
-        35,
-        36
-      ],
-      "Mars.ICRF": [
-        69,
-        68
-      ],
-      "Mars.Ecc": [
-        53,
-        52
-      ],
-      "Mars.AscNode": [
-        63,
-        64
-      ],
-      "Uranus.AscNode": [
-        12,
-        11
-      ]
-    },
-    "tweaks_applied_in_this_run": true,
     "scoring_earth_planet": {
       "mass_weight": {
         "Jupiter": 10,

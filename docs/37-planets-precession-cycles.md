@@ -66,7 +66,7 @@ precession hierarchy.
 | Mercury | ~570 | ~227 kyr | H × 8/11 | 531.4 | 243,867 yr |
 | Venus | ~0 | — | −8H/6 | −289.9 | −447,089 yr (r) |
 | Earth | ~6,186 | ~20,957 yr | H/16 | 6,186.5 | 20,957 yr |
-| Mars | ~1,600 | ~81 kyr | H × 8/35 | 1,691.0 | 76,644 yr |
+| Mars | ~1,600 | ~81 kyr | H × 8/36 | 1,739.3 | 74,515 yr |
 | Jupiter | ~1,800 | ~72 kyr | 8H/39 | 1,884.2 | 68,783 yr |
 | Saturn | ~−3,400 | ~38 kyr (r) | −8H/65 | −3,140.0 | 41,270 yr |
 | Uranus | ~1,100 | ~118 kyr | H/3 | 1,159.5 | 111,772 yr |
@@ -133,26 +133,27 @@ allows obliquity to wander 0°–60°+.
 
 | Phenomenon | Observed value | H expression | H rate | Error |
 |-----------|---------------|-------------|--------|-------|
-| Inclination (inv. plane) | ≈ perihelion ecliptic (g₄ ≈ \|s₄\|) | **8H/35** = 76,644 yr | 35/(8H) | — |
+| Inclination (inv. plane) | ≈ perihelion ICRF (s₄ ≈ −g₄) | **8H/68** = 39,449 yr | 68/(8H) | — |
 | Obliquity cycle | ~124,800 yr (s₃+s₄ weighted) | **8H/21** = 127,740 yr | 21/(8H) | 2.4% |
-| Perihelion ecliptic (ϖ) | 76,644 yr (WebGeoCalc) | **8H/35** = 76,644 yr | 35/(8H) | 0.0% |
+| Perihelion ecliptic (ϖ) | 76,644 yr (WebGeoCalc) | **8H/36** = 74,515 yr | 36/(8H) | 2.8% |
 | Axial precession | 170,400 yr (InSight) | **H/2** = 167,659 yr | 2/H | 1.7% |
 
 Note: Mars's apsidal eigenfrequency g₄ = 17.916"/yr and nodal eigenfrequency
-|s₄| = 17.755"/yr differ by only 0.9%. The model treats inclination and
-perihelion ecliptic as precessing at the same rate (8H/35), which is consistent
-with the eigenfrequency data.
+|s₄| = 17.755"/yr differ by only 0.9%. The model places Mars perihelion at
+8H/36 = 74,515 yr, which closes LR04 family coverage at n=25 (s₁−s₄
+Mercury-Mars nodal beat) and creates a Mars-Jupiter resonance lock —
+Mars.Peri_ecl (8H/36) equals Jupiter.AscNode (also 8H/36) exactly.
 
 ### Mars vs Earth comparison
 
 | Precession type | Earth rate | Earth period | Mars rate | Mars period |
 |----------------|-----------|-------------|----------|-------------|
-| Inclination (inv. plane) | 3/H | H/3 = 111,772 yr | 35/(8H) | 8H/35 = 76,644 yr |
+| Inclination (inv. plane) | 3/H | H/3 = 111,772 yr | 68/(8H) | 8H/68 = 39,449 yr (= ICRF) |
 | Ecliptic precession | 5/H | H/5 = 67,063 yr | **?** | **?** (predicted 3H/5) |
 | Obliquity cycle | 8/H | H/8 = 41,915 yr | 21/(8H) | 8H/21 = 127,740 yr |
 | Axial precession | 13/H | H/13 = 25,794 yr | 2/H | H/2 = 167,659 yr |
-| Perihelion (ecliptic) | 16/H | H/16 = 20,957 yr | 35/(8H) | 8H/35 = 76,644 yr |
-| Perihelion (ICRF) | 3/H | H/3 = 111,772 yr | 69/(8H) | 8H/69 = 38,877 yr |
+| Perihelion (ecliptic) | 16/H | H/16 = 20,957 yr | 36/(8H) | 8H/36 = 74,515 yr |
+| Perihelion (ICRF) | 3/H | H/3 = 111,772 yr | 68/(8H) | 8H/68 = 39,449 yr |
 
 ### Fibonacci analysis
 
@@ -170,17 +171,23 @@ All are Fibonacci numbers or sums thereof. Identities:
 
 ```
 obliquity:       21/(8H)  →  8H/21 = 127,740 yr
-perihelion ecl:  35/(8H)  →  8H/35 =  76,644 yr
+perihelion ecl: 36/(8H)  →  8H/36 =  74,515 yr
 ```
 
-The relationship **perihelion ecl = obliquity + ecliptic** predicts:
+The Mars perihelion at 8H/36 has two structural consequences:
 
-```
-perihelion ecl = obliquity + ecliptic
-35/(8H) = 21/(8H) + 14/(8H)
-```
+1. **Mars-Jupiter resonance lock**: Mars.Peri_ecl (8H/36) equals
+   Jupiter.AscNode (also 8H/36) exactly — the two planets share the same
+   period at different orbital elements.
+2. **LR04 family-coverage closure**: the Mars.Peri_ecl − Mercury.Peri_ecl
+   g-beat (36 − 11 = 25) lands at the empirical n=25 climate peak
+   (107.3 kyr, the 100-kyr-band centroid identified as the s₁−s₄
+   Mercury-Mars nodal beat in [doc 91 §4](91-milankovitch-evidence.md)).
 
-This gives a **predicted Mars ecliptic precession = 8H/14 = H/1.75 = 191,610 yr**.
+(Historical note: the model previously used 8H/35 for Mars perihelion ecliptic.
+The shift to 8H/36 was made when these two structural identities were
+identified — it closes the n=25 LR04 family gap and surfaces the Mars-Jupiter
+period match.)
 
 **Mars axial precession**: H/2 = 167,659 yr (rate = 2/H = 6/(3H)). The value 6
 is not a Fibonacci number, suggesting either:
@@ -194,8 +201,9 @@ is not a Fibonacci number, suggesting either:
 - **Axial precession**: Konopliv et al. 2020, "Detection of the Chandler Wobble
   of Mars From Orbiting Spacecraft", *Geophysical Research Letters* — rate
   7604 ± 6 mas/yr from InSight + 3 landers spanning 1976–2019.
-- **Perihelion longitude**: WebGeoCalc long-term analysis — dϖ/dt ≈ +1691.0"/cy
-  → 76,644 yr = 8H/35 (exact match).
+- **Perihelion longitude**: WebGeoCalc long-term analysis — dϖ/dt ≈ +1739.3"/cy
+  → 74,515 yr = 8H/36 (Mars-Jupiter resonance lock with Jupiter.AscNode;
+  closes LR04 family coverage at n=25).
 - **Eigenfrequencies**: g₄ = 17.916"/yr (apsidal), s₄ = -17.755"/yr (nodal) —
   differ by only 0.9%, supporting the model's single-rate assumption.
   Source: Laskar et al. 2004, Table 3.
@@ -279,7 +287,7 @@ The wobble is the **meeting frequency** of these two motions:
 | Mercury | 243,867 yr | H×8/11 | −28,844 yr | −8H/93 | retro |
 | Venus | −447,089 yr (r) | −8H/6 | −24,387 yr | −8H/110 | retro |
 | Earth | 20,957 yr | H/16 | +111,772 yr | +H/3 | **pro** |
-| Mars | 76,644 yr | 8H/35 | −38,877 yr | −8H/69 | retro |
+| Mars | 74,515 yr | 8H/36 | −39,449 yr | −8H/68 | retro |
 | Jupiter | 68,783 yr | 8H/39 | −41,270 yr | −8H/65 | retro |
 | Saturn | −41,270 yr (r) | −8H/65 | −15,873 yr | −8H/169 | retro |
 | Uranus | 111,772 yr | H/3 | −33,532 yr | −H/10 | retro |
@@ -396,7 +404,7 @@ match is exact. If this reciprocity extends: **Jupiter obliquity = Mars axial = 
 | Mercury | H×8/11 | 11 | 3 + 8 | **8H/3 = ~894,179 yr** | H = 335,317 yr | ✓ Free prediction (Cassini state) |
 | Venus | −8H/6 (r) | — | obliq = ICRF | **8H/110 = ICRF** | — | ✓ Cancels → constant obliquity |
 | Earth | H/16 | 8 | 5 + 3 | **H/8 = ~41,915 yr** | H/5 = ~67,063 yr | ✓ Confirmed |
-| Mars | 8H/35 | 35 | 21 + 14 | **8H/21 = ~127,740 yr** | 8H/14 = ~191,610 yr | Mirror reciprocity (= Ju axial) |
+| Mars | 8H/36 | 36 | — | **8H/21 = ~127,740 yr** (from obliquity entry directly) | — | Mars-Jupiter resonance lock (= Ju AscNode); Mars obliquity confirmed independently as 8H/21 (= Jupiter axial, mirror reciprocity) |
 | Jupiter | H/5 | 5 | 2 + 3 | **H/2 = ~167,659 yr** | H/3 = ~111,772 yr | Prediction |
 | Saturn | H/8 (r) | 8 | 5 + 3 | **H/5 = ~67,063 yr** or **H/3 = ~111,772 yr** | H/3 or H/5 | Ambiguous |
 | Uranus | H/3 | 3 | 2 + 1 | **H/2 = ~167,659 yr** or **H = 335,317 yr** | H or H/2 | Ambiguous |

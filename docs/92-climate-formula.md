@@ -116,7 +116,7 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | n | Period (kyr) | Category | Identity |
 |---:|---:|---|---|
 | 9 | 298.1 | g-beat / Direct | g₂−g₇ Venus-Uranus eccentricity / Mercury axial = 8H/9 |
-| 12 | 223.5 | s-beat / Direct | s₅−s₁ Jupiter-Mercury nodal / Uranus AscNode = 8H/12 |
+| 12 | 223.5 | s-beat | s₅−s₁ Jupiter-Mercury nodal |
 | 14 | 191.6 | g-beat | g₂−g₈ Venus-Neptune eccentricity |
 | 16 | 167.7 | Direct | Mars axial = 8H/16 |
 | 18 | 149.0 | s-beat | s₄−s₆ Mars-Saturn nodal |
@@ -127,12 +127,12 @@ The 25 canonical integers come from Berger 1978 + Laskar 2004 eigenmode beats + 
 | **28** | **95.8** | g-beat | g₄−g₅ Mars-Jupiter eccentricity — **Berger 1978 classic 95-kyr peak** |
 | 30 | 89.4 | g-beat | g₃−g₇ Earth-Uranus eccentricity |
 | 31 | 86.5 | g-beat | g₄−g₇ Mars-Uranus eccentricity |
-| 35 | 76.6 | Direct | Mars apsidal = 8H/35 |
+| 35 | 76.6 | 3-term beat | Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) — close to Mars perihelion at 8H/36 |
 | 38 | 70.6 | s-beat | s₈−s₃ Neptune-Earth nodal |
 | 39 | 68.8 | Direct | Jupiter ecliptic perihelion = 8H/39 (≈ Laskar s₃) |
 | 48 | 55.9 | s-beat | s₇−s₆ Uranus-Saturn nodal |
 | 50 | 53.7 | g-beat | g₆−g₅ Saturn-Jupiter eccentricity |
-| 53 | 50.6 | Direct | Mars eccentricity cycle = 8H/53 |
+| 53 | 50.6 | s-beat | Mars.AscNode(64) − Uranus.AscNode(11) — close to Mars Ecc cycle at 8H/52 |
 | **65** | **41.3** | Obliquity / Direct | k+s₃ obliquity beat = Saturn ecliptic = Jupiter ICRF perihelion (Law 6 lock) — **Berger 1978 classic 41-kyr peak** |
 | 66 | 40.6 | Obliquity centroid | Obliquity-band arithmetic-mean (Round 2 C10: EPICA CO₂ amplification 15.79) |
 | 68 | 39.4 | Obliquity | k+s₄ Mars obliquity sub-peak |
@@ -824,8 +824,6 @@ Sub-LR04-resolution components (ENSO ~2–7 yr, solar cycles ~11/100/210 yr, Hei
 The variance-decomposition findings of Tiers A and B Rounds 1-3 are crystallized
 into a canonical, deployable formula at
 [`scripts/milankovitch_climate_formula.py`](../scripts/milankovitch_climate_formula.py).
-The previous flat 25-component formula is preserved as
-`milankovitch_climate_formula_v1_legacy.py` for historical reference.
 
 > **Why the §9 numbers differ slightly from §§3–8.** §§3–8 (variance-budget research) use **joint OLS** on each fit and report per-component ΔR² — useful for *attribution* of variance to individual lines. §9 (canonical formula) uses **sequential ridge regression** (L1 → residual → L2 → residual → L3) with λ=1 on L1. Sequential ridge trades ~0.6% absolute R² for **forward-projection stability** (§9.5 ridge analysis: post-MPT OLS max amplitude 17.78 vs ridge 0.32 — ~56× shrinkage of degenerate coefficients). The headline drift to look out for: §4.1 Tier A5 joint-OLS post-MPT R² = 0.8975 vs §9.3 sequential-ridge post-MPT total R² = 0.868. Both are correct; they answer different questions (variance attribution vs deployable prediction).
 
@@ -1061,10 +1059,6 @@ Output JSON contains:
 - L3 step amplitudes per transition (PETM/EOT/Mi-1/MMCT/iNHG/MPT)
 - Forward projection 0 → −250 kyr from now (next glacial maxima + interglacial peaks)
 - Per-layer contribution breakdown at sample forward-projection epochs
-
-The v1 25-component flat formula remains available at
-`scripts/milankovitch_climate_formula_v1_legacy.py` for backward compatibility
-and historical comparison.
 
 ---
 

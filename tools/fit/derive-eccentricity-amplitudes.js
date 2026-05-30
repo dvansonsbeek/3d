@@ -77,20 +77,36 @@ for (const key of allPlanetKeys) {
   const base = p.orbitalEccentricityBase;
 
   // Phase from law of cosines: e(J2000) = sqrt(base² + amp² - 2·base·amp·cos(θ))
+  // NOTE: acos is single-valued in [0°, 180°]. For planets whose runtime phase
+  // sits in (180°, 360°), acos returns the reflected counterpart (360° − θ).
+  // To avoid false "mismatch" warnings, the verification compares COSINES
+  // (mathematically equivalent, unambiguous on the full circle), and the
+  // displayed phaseNew uses phaseOld's branch.
   const e_j2000 = p.orbitalEccentricityJ2000 || base;
   const cosTheta = (base * base + ampNew * ampNew - e_j2000 * e_j2000) / (2 * base * ampNew);
-
-  let phaseNew;
-  if (Math.abs(cosTheta) <= 1) {
-    phaseNew = Math.acos(cosTheta) * 180 / Math.PI;
-  } else {
-    phaseNew = cosTheta > 1 ? 0 : 180;
-  }
 
   // Compare against runtime-derived values (from constants.js)
   const ampOld = p.orbitalEccentricityAmplitude;
   const phaseOld = p.eccentricityPhaseJ2000;
   const ampDiff = (ampNew / ampOld - 1) * 100;
+
+  // Cosine match — the substantive consistency check (immune to acos branch ambiguity).
+  const cosThetaRuntime = Math.cos(phaseOld * Math.PI / 180);
+  const cosDiff = cosTheta - cosThetaRuntime;
+  // Convert cosine residual to an equivalent degree threshold (worst-case dθ/d(cosθ) ≈ 1/sin(θ));
+  // for a 0.0001° threshold on phase, we need |cosDiff| < ~1.7e-6 (at θ=90°, dcos/dθ ≈ 0.017°⁻¹).
+  // Use 1e-6 as a tight cosine-match threshold.
+  const phaseMatch = Math.abs(cosDiff) < 1e-6;
+
+  // Display phaseNew: pick the acos branch matching phaseOld (so the two columns
+  // line up visually when amplitudes are consistent).
+  let phaseNew;
+  if (Math.abs(cosTheta) <= 1) {
+    const acosVal = Math.acos(cosTheta) * 180 / Math.PI;
+    phaseNew = phaseOld > 180 ? (360 - acosVal) : acosVal;
+  } else {
+    phaseNew = cosTheta > 1 ? 0 : 180;
+  }
   const phaseDiff = phaseNew - phaseOld;
 
   console.log(
@@ -104,7 +120,7 @@ for (const key of allPlanetKeys) {
     (phaseDiff >= 0 ? '+' : '') + phaseDiff.toFixed(4)
   );
 
-  if (Math.abs(ampDiff) > 0.001 || Math.abs(phaseDiff) > 0.0001) {
+  if (Math.abs(ampDiff) > 0.001 || !phaseMatch) {
     anyChanged = true;
     updates[key] = { amplitude: ampNew, phase: phaseNew };
   }

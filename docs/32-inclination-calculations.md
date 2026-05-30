@@ -77,9 +77,9 @@ Each planet's inclination cycle anchor is the ICRF perihelion longitude where th
 | Mercury | 234.52° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Venus | 218.64° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Earth | 21.77° | In-phase | n=0 (locked) | -302,635 | Prograde | Decreasing |
-| Mars | 231.95° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
-| Jupiter | 291.18° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
-| **Saturn** | **120.38°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
+| Mars | 236.07° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
+| Jupiter | 287.06° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
+| **Saturn** | **116.26°** | **Anti-phase** | n=7 (= n=0)* | -2,649,854 | **Retrograde** | **Increasing** |
 | Uranus | 21.33° | In-phase | n=7 (= n=0)* | -2,649,854 | Retrograde | Decreasing |
 | Neptune | 174.04° | In-phase | n=7 | -2,649,854 | Retrograde | Decreasing |
 | Pluto | 203.32° | — | — | — | Retrograde | — |
@@ -147,7 +147,7 @@ The inclination oscillation period equals the absolute ICRF perihelion period fo
 | Mercury | `H × 8/11` | `8H/93` ≈ 28,844 yr | Retrograde |
 | Venus | `−8H/6` | `8H/110` ≈ 24,387 yr | Retrograde |
 | Earth | `H / 3` | `H/3` ≈ 111,772 yr | Prograde (sole) |
-| Mars | `H × 8/35` | `8H/69` ≈ 38,877 yr | Retrograde |
+| Mars | `H × 8/36` | `8H/68` ≈ 39,449 yr | Retrograde |
 | Jupiter | `8H/39` | `8H/65` ≈ 41,270 yr | Retrograde |
 | Saturn | `−8H/65` | `8H/169` ≈ 15,873 yr | Retrograde |
 | Uranus | `H / 3` | `H/16` ≈ 20,957 yr | Retrograde |
@@ -218,10 +218,10 @@ Both Earth's and each planet's ascending node on the invariable plane evolve lin
 | Earth | 40 | −H/5 ≈ −67,063 | Ecliptic precession rate (= −(8H)/40) |
 | Mercury | 9 | −298,060 | |
 | Venus | 1 | −2,682,536 (= −8H) | Full Solar System Resonance Cycle |
-| Mars | 63 | −42,580 | |
+| Mars | 64 | −41,915 | |
 | Jupiter | 36 | −74,515 | Shared with Saturn (J+S lockstep) |
 | Saturn | 36 | −74,515 | Shared with Jupiter |
-| Uranus | 12 | −223,545 | |
+| Uranus | 11 | −243,867 | |
 | Neptune | 3 | −894,179 | |
 
 The integers were chosen to fit JPL ecliptic-inclination trends to <2″/century each in the J2000-fixed frame. Jupiter and Saturn share N=36 because the gas-giant pair's invariable-plane balance requires their nodes to regress in lockstep. See [55-solar-system-resonance-cycle-periods.md](55-solar-system-resonance-cycle-periods.md) for the full derivation.

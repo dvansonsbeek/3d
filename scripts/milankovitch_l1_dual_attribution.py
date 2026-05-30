@@ -31,7 +31,6 @@ those by the formula's design).
 Run:  python3 scripts/milankovitch_l1_dual_attribution.py
 """
 
-import argparse
 import json
 from pathlib import Path
 
@@ -39,56 +38,25 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DATA_DIR = SCRIPT_DIR.parent / "data"
 FORMULA_JSON = DATA_DIR / "milankovitch-climate-formula.json"
 SPEC_JSON = DATA_DIR / "milankovitch-8h-divisor-spectrum.json"
+OUT_PATH = DATA_DIR / "milankovitch-l1-dual-attribution.json"
 
 H = 335.317
 EIGHT_H = 8 * H
 
 # ─────────────────────────────────────────────────────────────────────────
-# PLANET_CYCLES — baseline (no tweaks) and tweaked (current canonical) sets
+# PLANET_CYCLES — current canonical state (matches public/input/model-parameters.json)
 # ─────────────────────────────────────────────────────────────────────────
-#
-# BASELINE: the original live-settings PLANET_CYCLES before the 2026-05-28
-# tweak set.
-#
-# TWEAKED: applies five user-introduced adjustments (2026-05-28):
-#   - Mars.Peri_ecl   35 → 36   (aligns with Jupiter.AscNode = 36)
-#   - Mars.ICRF       69 → 68   (auto-derived from new Peri_ecl)
-#   - Mars.Ecc        53 → 52   (auto-derived from new ICRF + Mars.Axial)
-#   - Mars.AscNode    63 → 64
-#   - Uranus.AscNode  12 → 11   (needed to close n=53 via s-beat with Mars.AscNode=64
-#                                after Mars.Ecc=52 lost the direct attribution)
-#
-# Run with --baseline to use the un-tweaked set; default is --tweaked.
 
-BASELINE_PLANET_CYCLES = {
+PLANET_CYCLES = {
     "Mercury": {"Axial":   9, "Peri_ecl": 11, "ICRF":  93, "AscNode":  9, "Obliq":   3, "Ecc":  84},
     "Venus":   {"Axial":  91, "Peri_ecl":  6, "ICRF": 110, "AscNode":  1, "Obliq": 110, "Ecc":  19},
     "Earth":   {"Axial": 104, "Peri_ecl":128, "ICRF":  24, "AscNode": 40, "Obliq":  64, "Ecc": 128},
-    "Mars":    {"Axial":  16, "Peri_ecl": 35, "ICRF":  69, "AscNode": 63, "Obliq":  21, "Ecc":  53},  # ← pre-tweak
+    "Mars":    {"Axial":  16, "Peri_ecl": 36, "ICRF":  68, "AscNode": 64, "Obliq":  21, "Ecc":  52},
     "Jupiter": {"Axial":  21, "Peri_ecl": 39, "ICRF":  65, "AscNode": 36, "Obliq":  16, "Ecc":  44},
     "Saturn":  {"Axial":   6, "Peri_ecl": 65, "ICRF": 169, "AscNode": 36, "Obliq":  24, "Ecc": 163},
-    "Uranus":  {"Axial":   0, "Peri_ecl": 24, "ICRF":  80, "AscNode": 12, "Obliq":  16, "Ecc":  80},  # ← pre-tweak
+    "Uranus":  {"Axial":   0, "Peri_ecl": 24, "ICRF":  80, "AscNode": 11, "Obliq":  16, "Ecc":  80},
     "Neptune": {"Axial":   0, "Peri_ecl":  4, "ICRF": 100, "AscNode":  3, "Obliq": 100, "Ecc": 100},
 }
-
-TWEAKS = {
-    ("Mars",   "Peri_ecl"): (35, 36),
-    ("Mars",   "ICRF"):     (69, 68),
-    ("Mars",   "Ecc"):      (53, 52),
-    ("Mars",   "AscNode"):  (63, 64),
-    ("Uranus", "AscNode"):  (12, 11),
-}
-
-def apply_tweaks(baseline):
-    out = {p: dict(elems) for p, elems in baseline.items()}
-    for (planet, elem), (_, new) in TWEAKS.items():
-        out[planet][elem] = new
-    return out
-
-TWEAKED_PLANET_CYCLES = apply_tweaks(BASELINE_PLANET_CYCLES)
-
-# PLANET_CYCLES is bound at runtime by main() based on --baseline / --tweaked
-PLANET_CYCLES = TWEAKED_PLANET_CYCLES  # default; overridden by CLI
 
 MASS_WEIGHT = {
     "Jupiter": 10, "Saturn": 7, "Venus": 6, "Mars": 4,
@@ -300,31 +268,7 @@ def find_combos(target_n):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="L1 lattice triple attribution (Berger | family | Earth-planet).",
-    )
-    grp = parser.add_mutually_exclusive_group()
-    grp.add_argument("--tweaked", action="store_true",
-                     help="Use TWEAKED PLANET_CYCLES (default).")
-    grp.add_argument("--baseline", action="store_true",
-                     help="Use BASELINE PLANET_CYCLES (no 2026-05-28 tweaks).")
-    args = parser.parse_args()
-
-    # Bind the active cycle set + tag output paths
-    global PLANET_CYCLES
-    use_baseline = args.baseline
-    if use_baseline:
-        PLANET_CYCLES = BASELINE_PLANET_CYCLES
-        mode = "baseline"
-        suffix = "-baseline"
-    else:
-        PLANET_CYCLES = TWEAKED_PLANET_CYCLES
-        mode = "tweaked"
-        suffix = ""
-
-    global OUT_PATH, DOC_PATH
-    OUT_PATH = DATA_DIR / f"milankovitch-l1-dual-attribution{suffix}.json"
-    DOC_PATH = SCRIPT_DIR.parent / "docs" / f"93-l1-attribution-reference{suffix}.md"
+    DOC_PATH = SCRIPT_DIR.parent / "docs" / "93-l1-attribution-reference.md"
 
     formula = json.loads(FORMULA_JSON.read_text())
     spec = json.loads(SPEC_JSON.read_text())
@@ -333,14 +277,8 @@ def main():
     family_preds = predict_all_families(PLANET_CYCLES)
 
     print("=" * 130)
-    print(f"L1 LATTICE TRIPLE ATTRIBUTION — mode: {mode.upper()}  "
-          f"({'no tweaks applied' if use_baseline else 'with 2026-05-28 tweaks'})")
+    print("L1 LATTICE TRIPLE ATTRIBUTION")
     print("=" * 130)
-    print()
-    print("Active PLANET_CYCLES tweaks (baseline → tweaked):")
-    for (p, e), (old, new) in TWEAKS.items():
-        marker = " [APPLIED]" if not use_baseline else " [SKIPPED — baseline mode]"
-        print(f"  {p}.{e}: {old} → {new}{marker}")
     print()
 
     rows = []
@@ -471,10 +409,7 @@ def main():
     out = {
         "meta": {
             "script": "milankovitch_l1_dual_attribution.py",
-            "mode": mode,
             "H_kyr": H, "EIGHT_H_kyr": EIGHT_H,
-            "tweaks_defined": {f"{p}.{e}": list(v) for (p, e), v in TWEAKS.items()},
-            "tweaks_applied_in_this_run": not use_baseline,
             "scoring_earth_planet": {
                 "mass_weight": MASS_WEIGHT,
                 "element_weight": ELEMENT_WEIGHT,
@@ -508,7 +443,7 @@ def main():
     print(f"[saved] {OUT_PATH}")
 
     # ── Write the markdown reference document (top 5 per integer) ──
-    write_reference_doc(rows, mode=mode, use_baseline=use_baseline)
+    write_reference_doc(rows, DOC_PATH)
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -647,10 +582,9 @@ STATUS_LABEL = {
 }
 
 
-def write_reference_doc(rows, mode="tweaked", use_baseline=False):
-    suffix = "" if mode == "tweaked" else f" ({mode})"
+def write_reference_doc(rows, DOC_PATH):
     lines = []
-    lines.append(f"# L1 Lattice Attribution Reference — Berger vs Our Model{suffix}")
+    lines.append("# L1 Lattice Attribution Reference — Berger vs Our Model")
     lines.append("")
     lines.append("> **One entry per L1 lattice integer.** For each integer this doc lists "
                  "(a) the standard Berger / secular-theory attribution, "
@@ -661,19 +595,10 @@ def write_reference_doc(rows, mode="tweaked", use_baseline=False):
                  "is preserved in the companion JSON.")
     lines.append("")
     lines.append("**Generated by:** [`scripts/milankovitch_l1_dual_attribution.py`]"
-                 "(../scripts/milankovitch_l1_dual_attribution.py) "
-                 f"(mode: `{mode}`)")
+                 "(../scripts/milankovitch_l1_dual_attribution.py)")
     lines.append("")
-    if use_baseline:
-        lines.append("**PLANET_CYCLES mode:** **BASELINE** — pre-2026-05-28 values, NO tweaks applied. "
-                     "Five adjustments (Mars.Peri_ecl 35→36, Mars.ICRF 69→68, Mars.Ecc 53→52, "
-                     "Mars.AscNode 63→64, Uranus.AscNode 12→11) are NOT in effect in this run. "
-                     "Re-run without `--baseline` to see the tweaked version.")
-    else:
-        lines.append("**PLANET_CYCLES mode:** **TWEAKED** (post-2026-05-28 canonical). Five "
-                     "adjustments active: Mars.Peri_ecl=36, Mars.ICRF=68, Mars.Ecc=52, Mars.AscNode=64, "
-                     "Uranus.AscNode=11 (the Uranus change is needed to close n=53 via s-beat with Mars.AscNode=64). "
-                     "Re-run with `--baseline` to see results without these tweaks.")
+    lines.append("**PLANET_CYCLES used:** the current canonical state (matches "
+                 "`public/input/model-parameters.json` and `src/script.js`).")
     lines.append("")
 
     # ── Scope note: where L1 ends and L2/L3 begin ──

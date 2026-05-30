@@ -38,9 +38,9 @@ The explorer is a centered overlay modal (not a side panel) to provide the horiz
 │  │ Mercury│ [▼ 99.5°] │ 77.46  │[▼] │ 8H/93      │ PRO │ +0.53 │  │
 │  │ Venus  │ [▼ 79.8°] │131.58  │[▼] │ 8H/110     │ PRO │ +0.19 │  │
 │  │ Earth🔒│  21.8°    │102.95  │ 3  │ H/3        │ PRO │ +1.16 │  │
-│  │ Mars   │ [▼ 97.0°] │336.07  │[▼] │ 8H/69      │ PRO │ +1.68 │  │
-│  │ Jupiter│ [▼291.2°] │ 14.71  │[▼] │ 8H/65      │ PRO │ +1.94 │  │
-│  │ Saturn │ [▼120.4°] │ 92.13  │[▼] │ 8H/169     │ ANT │ -3.11 │  │
+│  │ Mars   │ [▼ 97.0°] │336.07  │[▼] │ 8H/68      │ PRO │ +1.68 │  │
+│  │ Jupiter│ [▼287.1°] │ 14.71  │[▼] │ 8H/65      │ PRO │ +1.94 │  │
+│  │ Saturn │ [▼116.3°] │ 92.13  │[▼] │ 8H/169     │ ANT │ -3.11 │  │
 │  │ Uranus │ [▼ 21.3°] │170.73  │[▼] │ H/16       │ PRO │ +1.16 │  │
 │  │ Neptune│ [▼354.0°] │ 45.80  │[▼] │ 2H/25      │ PRO │ +0.19 │  │
 │  └────────┴──────────┴────────┴────┴────────────┴─────┴───────┘  │
@@ -229,9 +229,9 @@ The model's default (and uniquely determined) configuration:
 | Mercury | In-phase (234.52°) | 21 | F₈ | Uranus |
 | Venus | In-phase (218.64°) | 34 | F₉ | Neptune |
 | Earth | In-phase (21.77°) | 3 | F₄ | Saturn |
-| Mars | In-phase (231.95°) | 5 | F₅ | Jupiter |
-| Jupiter | In-phase (291.18°) | 5 | F₅ | Mars |
-| Saturn | Anti-phase (120.38°) | 3 | F₄ | Earth |
+| Mars | In-phase (236.07°) | 5 | F₅ | Jupiter |
+| Jupiter | In-phase (287.06°) | 5 | F₅ | Mars |
+| Saturn | Anti-phase (116.26°) | 3 | F₄ | Earth |
 | Uranus | In-phase (21.33°) | 21 | F₈ | Mercury |
 | Neptune | In-phase (174.04°) | 34 | F₉ | Venus |
 
@@ -498,10 +498,10 @@ The model's 8H/N predictions and Laskar's N-body measurements both produce indis
 | Mercury | −8H/9 | |
 | Venus | −8H/1 | full Solar System Resonance Cycle |
 | Earth | −H/5 = −8H/40 | ecliptic precession (special) |
-| Mars | −8H/63 | |
+| Mars | −8H/64 | |
 | Jupiter | −8H/36 | locked with Saturn |
 | Saturn | −8H/36 | locked with Jupiter |
-| Uranus | −8H/12 | |
+| Uranus | −8H/11 | |
 | Neptune | −8H/3 | |
 
 The eight integers jointly reproduce JPL's J2000-fixed-frame ascending-node trends to ~4.3″/century across all 7 fitted planets.

@@ -88,16 +88,16 @@ The **Solar System Resonance Cycle** is 8H = **2,682,536 yr** — the smallest p
 
 The Berger climatic-precession spectrum is a **set of six** peaks from `g_j + k` beats (apsidal eigenfrequencies plus axial precession k). Every Berger peak matches integer divisors of 8H to within 0.4 %:
 
-| Berger period (yr) | Eigenmode (Berger label) | Resonance Cycle / n | Deviation |
-|---:|---|---:|---:|
-| 23,716 | g₅ + k (Jupiter) | n = 113 → 23,739 | 0.10 % |
-| 23,159 | g₁ + k (Mercury) | n = 116 → 23,125 | 0.15 % |
-| 22,428 | g₂ + k (Venus) | n = 120 → 22,354 | 0.33 % |
-| 19,155 | g₃ + k (Earth) | n = 140 → 19,161 | 0.03 % |
-| 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % |
-| 16,469 | g₆ + k (Saturn) | n = 163 → 16,457 | 0.07 % |
+| Berger period (yr) | Eigenmode (Berger label) | Resonance Cycle / n | Deviation | Holistic model attribution |
+|---:|---|---:|---:|---|
+| 23,716 | g₅ + k (Jupiter) | n = 113 → 23,739 | 0.10 % | Earth.Axial(104) + Mercury.Obliq(3) + Saturn.Axial(6) (3-term) |
+| 23,159 | g₁ + k (Mercury) | n = 116 → 23,125 | 0.15 % | — (not in canonical L1) |
+| 22,428 | g₂ + k (Venus) | n = 120 → 22,354 | 0.33 % | **Earth.Axial(104) + Jupiter.Obliq(16)** (clean 2-term beat) |
+| 19,155 | g₃ + k (Earth) | n = 140 → 19,161 | 0.03 % | — (not in canonical L1) |
+| 18,976 | g₄ + k (Mars) | n = 141 → 19,025 | 0.26 % | Earth.Axial(104) + Jupiter.Axial(21) + Jupiter.Obliq(16) (3-term) |
+| 16,469 | g₆ + k (Saturn) | n = 163 → 16,457 | 0.07 % | — (not in canonical L1) |
 
-All six peaks match. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer; δ_j contributes the planet-specific eigenmode (see website eigenfrequencies.mdx §"Berger climatic precession peaks").
+All six peaks match an integer-divisor position. **Berger names each peak after a single planet** (g_j + k convention) while the Holistic model derives the same LR04 lattice peaks via **multi-planet beats from PLANET_CYCLES** — see [doc 93 — L1 attribution reference](93-l1-attribution-reference.md) for all 32 L1 lattice components with full ranked attribution alternatives. The structural decomposition is `n = 104 + δ_j` where 104 = 8 × 13 is Earth's axial precession integer (see website [eigenfrequencies.mdx §"Berger climatic precession peaks"](https://www.holisticuniverse.com/model/eigenfrequencies#berger-climatic-precession-peaks)).
 
 ### 4.3 Eigenfrequency convergence at H/3 and H/5
 

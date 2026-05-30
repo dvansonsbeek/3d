@@ -65,9 +65,9 @@ K is derived in Section 4 below.
 | Mercury | 21 | 234.52       | In-phase   | Uranus      |
 | Venus   | 34 | 218.64       | In-phase   | Neptune     |
 | Earth   |  3 |  21.77       | In-phase   | Saturn      |
-| Mars    |  5 | 231.95       | In-phase   | Jupiter     |
-| Jupiter |  5 | 291.18       | In-phase   | Mars        |
-| Saturn  |  3 | 120.38       | Anti-phase | Earth       |
+| Mars    |  5 | 236.07       | In-phase   | Jupiter     |
+| Jupiter |  5 | 287.06       | In-phase   | Mars        |
+| Saturn  |  3 | 116.26       | Anti-phase | Earth       |
 | Uranus  | 21 |  21.33       | In-phase   | Mercury     |
 | Neptune | 34 | 174.04       | In-phase   | Venus       |
 
@@ -373,7 +373,7 @@ occurs at each planet's eccentricity cycle (see Section 10).
 | Mercury | 243,867             | H / (1 + 3/8)       | Prograde   |
 | Venus   | -447,089            | -8H / 6              | Retrograde |
 | Earth   |  20,957             | H / 16               | Prograde   |
-| Mars    |  76,644             | H / (4 + 3/8)       | Prograde   |
+| Mars    |  74,515             | H × 8/36             | Prograde   |
 | Jupiter |  68,783             | 8H / 39              | Prograde   |
 | Saturn  | -41,270             | -8H / 65             | Retrograde |
 | Uranus  | 111,772             | H / 3                | Prograde   |

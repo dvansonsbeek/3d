@@ -67,11 +67,11 @@ CYCLES = [
     ("Earth",   "ecc",        20957, "8H/128"),
     # Mars
     ("Mars",    "axial",    -167659, "-8H/16"),
-    ("Mars",    "peri_ecl",   76644, "8H/35"),
-    ("Mars",    "ICRF",      -38877, "-8H/69"),
-    ("Mars",    "asc_node",  -42580, "-8H/63"),
+    ("Mars",    "peri_ecl",   74515, "8H/36"),
+    ("Mars",    "ICRF",      -39449, "-8H/68"),
+    ("Mars",    "asc_node",  -41915, "-8H/64"),
     ("Mars",    "obliquity", 127740, "8H/21"),
-    ("Mars",    "ecc",        50614, "8H/53"),
+    ("Mars",    "ecc",        51587, "8H/52"),
     # Jupiter (perihelion dynamical: 8H/39, 8H/65, ecc 8H/44)
     ("Jupiter", "axial",    -127740, "-8H/21"),
     ("Jupiter", "peri_ecl",   68783, "8H/39"),
@@ -89,7 +89,7 @@ CYCLES = [
     # Uranus (axial frozen, omit)
     ("Uranus",  "peri_ecl",  111772, "8H/24"),
     ("Uranus",  "ICRF",      -33532, "-8H/80"),
-    ("Uranus",  "asc_node", -223545, "-8H/12"),
+    ("Uranus",  "asc_node", -243867, "-8H/11"),
     ("Uranus",  "obliquity", 167659, "8H/16"),
     ("Uranus",  "ecc",        33532, "8H/80"),
     # Neptune (axial frozen, omit)

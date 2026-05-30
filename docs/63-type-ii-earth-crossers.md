@@ -375,7 +375,7 @@ best tradeoff.
 | **orbitalEccentricityBase**   | 0.09339    | 0.110      | 0.80 deg      | 0.90 deg    | High     |
 | solarYearInput            | 686.931    | 686.942    | 1.08 deg      | 0.87 deg    | Moderate |
 | ascendingNode             | 49.557     | 55.0       | 1.11 deg      | 0.69 deg    | Low      |
-| inclinationCycleAnchor    | 231.95     | 100.0      | 1.15 deg      | 0.79 deg    | Minimal  |
+| inclinationCycleAnchor    | 236.07     | 100.0      | 1.15 deg      | 0.79 deg    | Minimal  |
 | eclipticInclinationJ2000  | 1.850      | (no effect)| 1.20 deg      | 0.78 deg    | None     |
 
 Three parameters have strong leverage on Tycho Dec: `angleCorrection`,
@@ -569,9 +569,9 @@ longitudePerihelion:       336.0650681   (ecliptic longitude of perihelion, degr
 ascendingNode:             49.55737662   (ecliptic ascending node, degrees)
 angleCorrection:           -2.1094       (perihelion alignment offset, degrees)
 startpos:                  121.475       (orbital phase at model start, degrees)
-perihelionEclipticYears:   H / (4+3/8)  (perihelion precession period, = H×8/35)
+perihelionEclipticYears:   H × 8/36     (perihelion precession period)
 perihelionRef_JD:          2456505.6     (phase-optimized)
-inclinationCycleAnchor:    231.95        (ICRF perihelion longitude where MAX inclination occurs, at balanced year n=7 ≈ -2,649,854 BC, degrees)
+inclinationCycleAnchor:    236.07        (ICRF perihelion longitude where MAX inclination occurs, at balanced year n=7 ≈ -2,649,854 BC, degrees)
 ascNodeToolCorrection:     130.44        (180 - ascendingNode, tilt placement frame correction)
 type:                      'II'          (formula selector)
 mirrorPair:                'jupiter'     (paired planet)

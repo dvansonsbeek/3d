@@ -212,9 +212,9 @@ Each planet has a per-planet cycle anchor for inclination extremes (in-phase at 
 | Mercury | 234.52° | In-phase | n=7 |
 | Venus | 218.64° | In-phase | n=7 |
 | Earth | 21.77° | In-phase | n=0 (locked) |
-| Mars | 231.95° | In-phase | n=7 |
-| Jupiter | 291.18° | In-phase | n=7* |
-| **Saturn** | **120.38°** | **Anti-phase** | n=7* |
+| Mars | 236.07° | In-phase | n=7 |
+| Jupiter | 287.06° | In-phase | n=7* |
+| **Saturn** | **116.26°** | **Anti-phase** | n=7* |
 | Uranus | 21.33° | In-phase | n=7* |
 | Neptune | 174.04° | In-phase | n=7 |
 
@@ -571,8 +571,8 @@ const FIBONACCI_D = {
 // Per-planet cycle anchors (ICRF perihelion longitude where MAX inclination occurs, evaluated at balanced year n=7 ≈ -2,649,854 BC)
 // Re-fit 2026-04-09 to match JPL ecliptic-inclination trends in the J2000-fixed frame.
 const CYCLE_ANCHOR = {
-  mercury: 234.52, venus: 218.64, earth: 21.77, mars: 231.95,
-  jupiter: 291.18, saturn: 120.38, uranus: 21.33, neptune: 174.04
+  mercury: 234.52, venus: 218.64, earth: 21.77, mars: 236.07,
+  jupiter: 287.06, saturn: 116.26, uranus: 21.33, neptune: 174.04
 };
 // Saturn is anti-phase (MAX at balanced year, others at MIN).
 // Earth is locked to its IAU-derived n=0 reference; the other 7 share anchor n=7.

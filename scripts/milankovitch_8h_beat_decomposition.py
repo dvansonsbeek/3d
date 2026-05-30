@@ -76,7 +76,7 @@ MODEL_PLANET_APSIDAL = {
     "Mercury (model H·8/11)":  11,     # 243,867 yr
     "Venus (model 8H/6, retro)": -6,    # 447,089 yr retrograde
     "Earth perihelion (H/16)": 128,    # 20,957 yr
-    "Mars (model 8H/35)":      35,     # 76,644 yr
+    "Mars (model 8H/36)":      36,     # 74,515 yr
     "Jupiter ecliptic (H/5)":  40,     # 67,063 yr
     "Jupiter ICRF / Saturn ecliptic (H/8)": 64,  # 41,915 yr
     "Uranus (H/3)":            24,     # 111,772 yr

@@ -26,9 +26,9 @@ with **N = 32 integer divisors** of 8H (the canonical L1 lattice — see [doc 92
 
 ### Five headline findings
 
-1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **32 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6).
+1. **Every significant LR04 climate peak sits at an integer divisor of 8H.** The canonical formula carries **32 such integers** — 25 framework integers (with 19 above the 3× median significance threshold in full LR04, plus 6 more visible in pre-MPT data) + 6 precession-band sidebands surfaced by MTM enrichment (Test L) + 1 Berger-quintet completion at n=141 (k+g₃ Earth at 19 kyr, 3σ in Cheng monsoon). All have clean physical interpretations as standard celestial-mechanics beats (k+g_j climatic precession, k+s_j obliquity sub-peaks, g_j−g_k eccentricity beats, s_j−s_k nodal beats) or direct planet apsidal/nodal cycles from doc 55 (Mercury, Mars, Jupiter, Uranus). The exception is n=66 — not a distinct eigenmode beat but the arithmetic-mean cycle length in the obliquity band; it resolves to near-zero amplitude at full LR04 resolution (see §6.6). **Every one of these 32 integers also has an explicit Holistic-model attribution as a multi-planet beat from PLANET_CYCLES** — different from Berger / secular theory's single-planet attribution for every integer; the full dual-attribution table is at [doc 93 — L1 attribution reference](93-l1-attribution-reference.md). Headline example: n=120 (the 22.4 kyr peak Berger labels "k+g₂ Venus") is in the Holistic model the clean 2-term beat **Earth.Axial(104) + Jupiter.Obliq(16)** — Jupiter, not Venus.
 
-2. **Mars dominates the per-planet climate fingerprint.** Two exclusive direct matches in LR04 full (n=35 Mars apsidal, n=53 Mars eccentricity cycle) and three more exclusive matches in pre-MPT (n=16 Mars Axial, n=21 Mars Obliquity / Jupiter Axial, n=53 confirmed). Mars's strong gravitational coupling to Earth — Earth's nearest outer rocky neighbour, with similar apsidal eigenmode rate (g₃ ≈ 17.4″/yr, g₄ ≈ 17.9″/yr) — produces the cleanest direct climate signal of any planet. Neptune contributes nothing directly in LR04 full but appears via pre-MPT eigenmode beats (Venus-Neptune n=14, Neptune-Earth nodal n=38) — visible only when the post-MPT ice-sheet response doesn't dominate.
+2. **Mars dominates the per-planet climate fingerprint.** Two exclusive direct matches in LR04 (n=16 Mars Axial = 8H/16, n=21 Mars Obliquity = 8H/21), plus participation in additional LR04 peaks at n=25 (the Mercury–Mars s₁−s₄ nodal beat, the 100-kyr-band centroid), n=53 (the Mars.AscNode(64)−Uranus.AscNode(11) s-beat sitting close to the Mars eccentricity cycle at 8H/52), and n=35 (a 3-term beat close to Mars's perihelion ecliptic at 8H/36 — a period that exactly equals Jupiter's ascending-node period, creating a Mars-Jupiter resonance lock). Mars's strong gravitational coupling to Earth — Earth's nearest outer rocky neighbour, with similar apsidal eigenmode rate (g₃ ≈ 17.4″/yr, g₄ ≈ 17.9″/yr) — produces the cleanest planet-coupling signal of any planet. Neptune contributes nothing directly in LR04 full but appears via pre-MPT eigenmode beats (Venus-Neptune n=14, Neptune-Earth nodal n=38) — visible only when the post-MPT ice-sheet response doesn't dominate.
 
 3. **The 100-kyr glacial cycle is an inclination-side eigenmode beat, not direct eccentricity forcing.**
    - The dominant 100-kyr-band centroid sits at **n = 25 = 107.3 kyr**, corresponding to the **s₁−s₄ Mercury-Mars nodal beat** — a planet-pair orbital-plane coupling, not an eccentricity beat.
@@ -139,12 +139,14 @@ For each climate peak, cross-reference against the full doc 55 8H/n period table
 
 Two peaks in LR04 full coincide exactly with doc 55 entries that no other planet shares:
 
-| LR04 n | Period | Doc 55 entry | Verdict |
-|---|---|---|---|
-| n=35 | 76.6 kyr | Mars ecliptic perihelion = 8H/35 | exact match (error 0.00) |
-| n=53 | 50.6 kyr | Mars eccentricity cycle = 8H/53 | exact match (error 0.00) |
+The model's Mars perihelion ecliptic is at 8H/36, Mars eccentricity cycle at 8H/52. The LR04 4σ peaks at n=35 and n=53 (very close to these Mars periods) arise via multi-planet beats in the current model (per [doc 93](93-l1-attribution-reference.md)):
 
-Neither N=35 nor N=53 appears for any other planet in the doc 55 table. The probability of two such exclusive matches by chance is roughly (6/46)² ≈ 1.7%. Direct empirical confirmation that Mars contributes specifically and measurably to Earth's climate.
+| LR04 n | Period | Attribution under current model |
+|---|---|---|
+| n=35 | 76.6 kyr | Earth.Axial(104) − Mercury.ICRF(93) + Saturn.Obliq(24) (3-term beat) |
+| n=53 | 50.6 kyr | Mars.AscNode(64) − Uranus.AscNode(11) s-beat (also matches Mars Ecc cycle proximity at 8H/52) |
+
+Mars participates in the n=53 beat directly via its ascending node. The n=25 LR04 peak (107.3 kyr, the 100-kyr-band centroid) is the s₁−s₄ Mercury-Mars nodal beat, also confirming Mars's contribution.
 
 ### 3.3 Pre-MPT (1,200–3,000 kyr BP) — additional model direct matches
 
@@ -152,7 +154,7 @@ The pre-MPT window (T = 1,800 kyr, the canonical 41-kyr world) reveals *more* mo
 
 | Planet | Exact | Near (±1) | Total | Doc 55 entries hit |
 |---|---:|---:|---:|---|
-| **Mars** | **3** | 1 | 4 | n=16 (Axial), n=21 (Obliq), n=53 (Ecc); near n=68 ≈ ICRF |
+| **Mars** | **3** | 1 | 4 | n=16 (Axial), n=21 (Obliq); n=68 ≈ ICRF (Mars ICRF at 8H/68 exactly); n=53 close to Mars Ecc 8H/52 |
 | Jupiter | 2 | 0 | 2 | n=16 (Obliq — shared with Mars Axial); n=21 (Axial — shared with Mars Obliq) |
 | Uranus | 1 | 1 | 2 | n=16 (Obliq — shared); near n=25 |
 | Earth | 0 | 1 | 1 | near n=25 ≈ ICRF |
@@ -161,7 +163,7 @@ The pre-MPT window (T = 1,800 kyr, the canonical 41-kyr world) reveals *more* mo
 | Venus | 0 | 0 | 0 | — (contributes via eigenmode beats, §3.4) |
 | Neptune | 0 | 0 | 0 | — (contributes via eigenmode beats, §3.4) |
 
-Mars now has **three exclusive direct matches** (n=16 Mars Axial = 8H/16, n=21 Mars Obliquity = 8H/21, n=53 Mars Eccentricity = 8H/53). The doc 55 "Mars-Jupiter Axial-Obliquity Swap" identity (both planets share N=16 and N=21 with axial and obliquity exchanged) appears empirically as direct climate peaks.
+Mars has **two exclusive direct matches**: n=16 (Mars Axial = 8H/16) and n=21 (Mars Obliquity = 8H/21). The doc 55 "Mars-Jupiter Axial-Obliquity Swap" identity (both planets share N=16 and N=21 with axial and obliquity exchanged) appears empirically as direct climate peaks. The Mars Eccentricity period sits at 8H/52 (very close to n=53) and the LR04 4σ peak at n=53 is generated by the Mars.AscNode(64) − Uranus.AscNode(11) s-beat ([doc 93](93-l1-attribution-reference.md)).
 
 ### 3.4 Pre-MPT eigenmode beats reveal Neptune and Uranus
 
@@ -179,7 +181,7 @@ Three pre-MPT-only peaks correspond to **Venus-Neptune, Earth-Uranus, and Neptun
 
 ### 3.5 Why Mars dominates; why Neptune appears only pre-MPT
 
-**Mars is Earth's nearest outer rocky neighbour (1.52 AU vs Jupiter at 5.2 AU).** Mars's apsidal eigenmode g₄ ≈ 17.92″/yr is one of the fastest among planets — close to Earth's g₃ ≈ 17.37″/yr, producing strong near-resonance perturbations on Earth's orbital elements. The g₄−g₅ Mars-Jupiter beat (95 kyr) is the cleanest single feature in the eccentricity spectrum; Mars's apsidal motion at 8H/35 = 76.6 kyr produces a directly observable LR04 climate peak; and the Mercury-Mars s₁−s₄ nodal beat *is* the 100-kyr centroid.
+**Mars is Earth's nearest outer rocky neighbour (1.52 AU vs Jupiter at 5.2 AU).** Mars's apsidal eigenmode g₄ ≈ 17.92″/yr is one of the fastest among planets — close to Earth's g₃ ≈ 17.37″/yr, producing strong near-resonance perturbations on Earth's orbital elements. The g₄−g₅ Mars-Jupiter beat (95 kyr) is the cleanest single feature in the eccentricity spectrum; Mars's apsidal motion at 8H/36 = 74.5 kyr matches Jupiter's ascending-node period exactly (Mars-Jupiter resonance lock); and the Mercury-Mars s₁−s₄ nodal beat *is* the 100-kyr centroid.
 
 **Neptune's eigenmodes are the slowest** (g₈ ≈ 0.67″/yr, |s₈| ≈ 0.69″/yr). Beats with inner planets produce relatively long periods (~70–200 kyr) and small amplitudes. **Pre-MPT** (41-kyr-world era): ice sheets were smaller and less hysteretic, orbital signals propagated more directly through the climate system, and slow outer-planet beats registered above the noise floor. **Post-MPT** (last ~1 Myr): large ice sheets impose a ~100-kyr hysteretic response that dominates the spectrum and filters out the slower outer-planet signals. LR04 full averages the two eras, and the Neptune-beat amplitudes drop below the significance threshold.
 
@@ -1444,8 +1446,7 @@ python3 scripts/milankovitch_8h_beat_decomposition.py
 python3 scripts/milankovitch_planet_climate_match.py
 
 # Climate formula fit + forward projection (canonical sequential-ridge per-regime architecture
-# — 32-integer L1 + 3-line L2 + 6-step L3, see doc 92 for full architecture).
-# The historical 25-OLS implementation is preserved at milankovitch_climate_formula_v1_legacy.py:
+# — 32-integer L1 + 3-line L2 + 6-step L3, see doc 92 for full architecture):
 python3 scripts/milankovitch_climate_formula.py
 ```
 

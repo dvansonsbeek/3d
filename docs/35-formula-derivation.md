@@ -254,7 +254,7 @@ Mars's precession fluctuation is driven by:
 
 | Property | Value |
 |----------|-------|
-| **Perihelion period** | H×8/35 (~76,644 years) |
+| **Perihelion period** | H×8/36 (~74,515 years) |
 | **Eccentricity** | 0.09339 |
 | **Formula R²** | **1.000000** |
 | **RMSE** | 0.03 arcsec/century |

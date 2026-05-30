@@ -271,7 +271,7 @@ Key behavioral notes:
 | Mercury | H × 8/11 | 243,867 | 28,844 | Retrograde |
 | Venus | −8H/6 | 447,089 | 24,387 | Retrograde |
 | Earth | H / 16 (ecliptic) / H / 3 (ICRF) | 20,957 | 111,772 | **Prograde (sole)** |
-| Mars | H × 8/35 | 76,644 | 38,877 | Retrograde |
+| Mars | H × 8/36 | 74,515 | 39,449 | Retrograde |
 | Jupiter | 8H / 39 | 68,783 | 41,270 | Retrograde |
 | Saturn | −8H / 65 | 41,270 | 15,873 | Retrograde |
 | Uranus | H / 3 | 111,772 | 33,532 | Retrograde |
