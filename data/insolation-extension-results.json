@@ -1,0 +1,125 @@
+{
+  "metadata": {
+    "script": "/home/dennis/code/3d/scripts/milankovitch_insolation_extension.py",
+    "H_kyr": 335.317,
+    "eight_H_kyr": 2682.536,
+    "L1_n_components": 32,
+    "insolation_features": [
+      "eps_anom (\u03b5\u221223.45\u00b0)",
+      "ecc (e)",
+      "e\u00b7sin(\u03d6)",
+      "e\u00b7cos(\u03d6)"
+    ],
+    "runtime_sec": 0.2639918327331543
+  },
+  "regime_results": {
+    "post-mpt": {
+      "regime": "post-mpt",
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "n_samples": 1001,
+      "r2_l1": 0.8702417498406259,
+      "r2_l1_l2": 0.8735160573771876,
+      "r2_l1_l2_l3": 0.8735160573771876,
+      "r2_l1_l2_l3_linsol": 0.8776361397188572,
+      "delta_r2_linsol": 0.004120082341669606,
+      "linsol_coefs": {
+        "gamma_eps_anom": -0.006846886521771023,
+        "gamma_ecc": 0.07736070765563349,
+        "gamma_e_sin_peri": -0.02634095438765967,
+        "gamma_e_cos_peri": -0.038822446645077065
+      },
+      "r2_insol_on_residual": 0.032573955683497746
+    },
+    "inhg-mpt": {
+      "regime": "inhg-mpt",
+      "window_kyr": [
+        1000,
+        2700
+      ],
+      "n_samples": 1701,
+      "r2_l1": 0.7215739272152626,
+      "r2_l1_l2": 0.7288534879845776,
+      "r2_l1_l2_l3": 0.7288534879845776,
+      "r2_l1_l2_l3_linsol": 0.729725749731073,
+      "delta_r2_linsol": 0.0008722617464953508,
+      "linsol_coefs": {
+        "gamma_eps_anom": -0.012611474787809107,
+        "gamma_ecc": 0.06277079902489487,
+        "gamma_e_sin_peri": -0.08648168690907726,
+        "gamma_e_cos_peri": 0.011533134259712315
+      },
+      "r2_insol_on_residual": 0.0032169388424427847
+    },
+    "pre-inhg": {
+      "regime": "pre-inhg",
+      "window_kyr": [
+        2700,
+        5320
+      ],
+      "n_samples": 2621,
+      "r2_l1": 0.3813015022594487,
+      "r2_l1_l2": 0.42975047528483323,
+      "r2_l1_l2_l3": 0.42975047528483323,
+      "r2_l1_l2_l3_linsol": 0.43046395996819986,
+      "delta_r2_linsol": 0.0007134846833666275,
+      "linsol_coefs": {
+        "gamma_eps_anom": 0.02376875904649275,
+        "gamma_ecc": 0.45426568441695503,
+        "gamma_e_sin_peri": -0.45850490875735156,
+        "gamma_e_cos_peri": -0.003487485542678784
+      },
+      "r2_insol_on_residual": 0.0012511797948854264
+    },
+    "lr04-full": {
+      "regime": "lr04-full",
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "n_samples": 5321,
+      "r2_l1": 0.23851034743183974,
+      "r2_l1_l2": 0.2474557740025657,
+      "r2_l1_l2_l3": 0.25525662694102247,
+      "r2_l1_l2_l3_linsol": 0.25733627648558355,
+      "delta_r2_linsol": 0.0020796495445610796,
+      "linsol_coefs": {
+        "gamma_eps_anom": 0.04256713668419701,
+        "gamma_ecc": 0.14879218492036686,
+        "gamma_e_sin_peri": -0.1438112020381761,
+        "gamma_e_cos_peri": -0.01657522215919689
+      },
+      "r2_insol_on_residual": 0.002792437797759839
+    },
+    "epica-co2": {
+      "regime": "epica-co2",
+      "window_kyr": [
+        0,
+        800
+      ],
+      "n_samples": 801,
+      "r2_l1": 0.8336437529715354,
+      "r2_l1_l2": 0.8451857942676444,
+      "r2_l1_l2_l3": 0.8451857942676444,
+      "r2_l1_l2_l3_linsol": 0.8493608702210482,
+      "delta_r2_linsol": 0.004175075953403828,
+      "linsol_coefs": {
+        "gamma_eps_anom": 0.0023961845280400192,
+        "gamma_ecc": -1.2945064169222347,
+        "gamma_e_sin_peri": 1.2472612208520943,
+        "gamma_e_cos_peri": -0.003135422483604902
+      },
+      "r2_insol_on_residual": 0.026968300057823358
+    },
+    "_insol_only_r2": {
+      "post-mpt": 0.04918504398677903,
+      "inhg-mpt": 0.0075042803335659825,
+      "pre-inhg": 0.0004262810244324289,
+      "lr04-full": 0.001977394976694802
+    }
+  },
+  "verdict": "NULL \u2014 L1's 32 integers already capture insolation-driven variance",
+  "max_delta_r2": 0.004120082341669606
+}

@@ -1,0 +1,618 @@
+{
+  "metadata": {
+    "H_kyr": 335.317,
+    "eight_H_kyr": 2682.536,
+    "L1_n_components": 32
+  },
+  "test_A_lattice_extension": {
+    "post-mpt": {
+      "r2_canon": 0.8735160573771876,
+      "per_integer": {
+        "23": {
+          "r2_canon": 0.8735160573771876,
+          "r2_extended": 0.8735221019174535,
+          "delta_r2": 6.044540265870424e-06,
+          "amplitude": 0.0034916081229571906
+        },
+        "24": {
+          "r2_canon": 0.8735160573771876,
+          "r2_extended": 0.873532055440289,
+          "delta_r2": 1.5998063101374527e-05,
+          "amplitude": 0.005653981297161465
+        },
+        "26": {
+          "r2_canon": 0.8735160573771876,
+          "r2_extended": 0.8735295738019411,
+          "delta_r2": 1.3516424753445833e-05,
+          "amplitude": 0.0052320847124125115
+        },
+        "27": {
+          "r2_canon": 0.8735160573771876,
+          "r2_extended": 0.8735332329910067,
+          "delta_r2": 1.7175613819087054e-05,
+          "amplitude": 0.005853713507568681
+        },
+        "29": {
+          "r2_canon": 0.8735160573771876,
+          "r2_extended": 0.8735215910391052,
+          "delta_r2": 5.533661917578314e-06,
+          "amplitude": 0.003314362833089116
+        }
+      },
+      "batch_all": {
+        "r2_extended": 0.8736674531961321,
+        "delta_r2": 0.00015139581894452192,
+        "amplitudes": {
+          "23": {
+            "a_cos": -0.02080944028524849,
+            "b_sin": -0.046261143523250524,
+            "amp": 0.050725991415290314
+          },
+          "24": {
+            "a_cos": -0.05561277674735068,
+            "b_sin": 0.05106577806768795,
+            "amp": 0.07550162003036112
+          },
+          "26": {
+            "a_cos": -0.013963529319296517,
+            "b_sin": 0.08061425943106384,
+            "amp": 0.08181466234526498
+          },
+          "27": {
+            "a_cos": 0.058775902210074615,
+            "b_sin": -0.010106112373460468,
+            "amp": 0.05963841201703198
+          },
+          "29": {
+            "a_cos": 0.010699416038371134,
+            "b_sin": -0.009345554479934515,
+            "amp": 0.014206227229619324
+          }
+        }
+      }
+    },
+    "inhg-mpt": {
+      "r2_canon": 0.7288534879845776,
+      "per_integer": {
+        "23": {
+          "r2_canon": 0.7288534879845776,
+          "r2_extended": 0.7311829547279964,
+          "delta_r2": 0.0023294667434188288,
+          "amplitude": 0.06810852147054097
+        },
+        "24": {
+          "r2_canon": 0.7288534879845776,
+          "r2_extended": 0.7322708966578637,
+          "delta_r2": 0.003417408673286104,
+          "amplitude": 0.08305482236982789
+        },
+        "26": {
+          "r2_canon": 0.7288534879845776,
+          "r2_extended": 0.7289533599768645,
+          "delta_r2": 9.987199228689292e-05,
+          "amplitude": 0.014137989083388055
+        },
+        "27": {
+          "r2_canon": 0.7288534879845776,
+          "r2_extended": 0.7326666106663726,
+          "delta_r2": 0.0038131226817950115,
+          "amplitude": 0.08759936315176065
+        },
+        "29": {
+          "r2_canon": 0.7288534879845776,
+          "r2_extended": 0.7328623725919836,
+          "delta_r2": 0.004008884607406005,
+          "amplitude": 0.0897891374610172
+        }
+      },
+      "batch_all": {
+        "r2_extended": 0.7393107648349804,
+        "delta_r2": 0.010457276850402764,
+        "amplitudes": {
+          "23": {
+            "a_cos": -0.0015494298686328455,
+            "b_sin": -0.02207549156919428,
+            "amp": 0.022129800291448166
+          },
+          "24": {
+            "a_cos": -0.035051603501443845,
+            "b_sin": 0.06500661240161981,
+            "amp": 0.07385441465448671
+          },
+          "26": {
+            "a_cos": 0.009278141217571324,
+            "b_sin": 0.01267014532467083,
+            "amp": 0.015704027731810524
+          },
+          "27": {
+            "a_cos": -0.06299622973272617,
+            "b_sin": 0.05545946452394624,
+            "amp": 0.083930192218422
+          },
+          "29": {
+            "a_cos": -0.002404512702231698,
+            "b_sin": 0.07160332147382273,
+            "amp": 0.07164368309501401
+          }
+        }
+      }
+    },
+    "pre-inhg": {
+      "r2_canon": 0.42975047528483323,
+      "per_integer": {
+        "23": {
+          "r2_canon": 0.42975047528483323,
+          "r2_extended": 0.43144218537589973,
+          "delta_r2": 0.0016917100910665006,
+          "amplitude": 0.05817660783457716
+        },
+        "24": {
+          "r2_canon": 0.42975047528483323,
+          "r2_extended": 0.44890047072850603,
+          "delta_r2": 0.019149995443672796,
+          "amplitude": 0.19585999013990402
+        },
+        "26": {
+          "r2_canon": 0.42975047528483323,
+          "r2_extended": 0.4433686012258271,
+          "delta_r2": 0.013618125940993875,
+          "amplitude": 0.1650132050800706
+        },
+        "27": {
+          "r2_canon": 0.42975047528483323,
+          "r2_extended": 0.4574181837147565,
+          "delta_r2": 0.027667708429923277,
+          "amplitude": 0.23525237832973364
+        },
+        "29": {
+          "r2_canon": 0.42975047528483323,
+          "r2_extended": 0.4329430534034038,
+          "delta_r2": 0.0031925781185705437,
+          "amplitude": 0.08005353290453845
+        }
+      },
+      "batch_all": {
+        "r2_extended": 0.49808162045704485,
+        "delta_r2": 0.06833114517221162,
+        "amplitudes": {
+          "23": {
+            "a_cos": 0.007065351234833026,
+            "b_sin": 0.0716897284083132,
+            "amp": 0.07203704843571303
+          },
+          "24": {
+            "a_cos": 0.08014837661074256,
+            "b_sin": 0.18961325107076935,
+            "amp": 0.20585661819568501
+          },
+          "26": {
+            "a_cos": 0.006612527364611361,
+            "b_sin": 0.17625605877152678,
+            "amp": 0.17638005491500347
+          },
+          "27": {
+            "a_cos": 0.028056957594809022,
+            "b_sin": 0.24345521498874184,
+            "amp": 0.24506659212281756
+          },
+          "29": {
+            "a_cos": -0.06946140746477354,
+            "b_sin": -0.00670137700539193,
+            "amp": 0.06978392064620398
+          }
+        }
+      }
+    },
+    "lr04-full": {
+      "r2_canon": 0.25525662694102247,
+      "per_integer": {
+        "23": {
+          "r2_canon": 0.25525662694102247,
+          "r2_extended": 0.25840215984975323,
+          "delta_r2": 0.0031455329087307637,
+          "amplitude": 0.07924300530983744
+        },
+        "24": {
+          "r2_canon": 0.25525662694102247,
+          "r2_extended": 0.2584050979321254,
+          "delta_r2": 0.0031484709911029363,
+          "amplitude": 0.07941446517299984
+        },
+        "26": {
+          "r2_canon": 0.25525662694102247,
+          "r2_extended": 0.26881643535702804,
+          "delta_r2": 0.01355980841600557,
+          "amplitude": 0.16469546885150127
+        },
+        "27": {
+          "r2_canon": 0.25525662694102247,
+          "r2_extended": 0.2708448547629706,
+          "delta_r2": 0.01558822782194813,
+          "amplitude": 0.1764903020235067
+        },
+        "29": {
+          "r2_canon": 0.25525662694102247,
+          "r2_extended": 0.2622907301191655,
+          "delta_r2": 0.007034103178143014,
+          "amplitude": 0.11861788992212274
+        }
+      },
+      "batch_all": {
+        "r2_extended": 0.29778966340665936,
+        "delta_r2": 0.042533036465636886,
+        "amplitudes": {
+          "23": {
+            "a_cos": -0.08094841211879594,
+            "b_sin": 0.0008789146455232277,
+            "amp": 0.0809531834797653
+          },
+          "24": {
+            "a_cos": 0.0023890039643577623,
+            "b_sin": 0.07981881443951586,
+            "amp": 0.07985455828236471
+          },
+          "26": {
+            "a_cos": -0.13152829814959402,
+            "b_sin": 0.10105195330556134,
+            "amp": 0.16586497665570585
+          },
+          "27": {
+            "a_cos": -0.1757988036054705,
+            "b_sin": 0.024090421891745175,
+            "amp": 0.17744173064991522
+          },
+          "29": {
+            "a_cos": 0.06812561410850887,
+            "b_sin": -0.09281427785296409,
+            "amp": 0.11513292088290249
+          }
+        }
+      }
+    }
+  },
+  "test_B_phase_modulation": {
+    "post-mpt": {
+      "regime": "post-mpt",
+      "r2_canon": 0.8735160573771876,
+      "r2_with_inclination_phase_term": 0.8752985086000007,
+      "delta_r2_phase_test": 0.001782451222813064,
+      "beta_dY_dt_x_incl": -0.042237895924436566,
+      "beta_incl_only": 0.006450078693094301,
+      "pearson_residual_vs_dY_x_incl": {
+        "r": -0.11734537924843483,
+        "p": 0.0001985417705321428
+      },
+      "pearson_residual_vs_incl_only": {
+        "r": 0.008723275117303402,
+        "p": 0.7828150021523436
+      },
+      "interpretation": "If beta_dY_dt_x_incl > 0 \u2192 high inclination delays events; < 0 \u2192 high inclination advances events; ~0 \u2192 no detectable timing modulation by inclination."
+    },
+    "inhg-mpt": {
+      "regime": "inhg-mpt",
+      "r2_canon": 0.7288534879845776,
+      "r2_with_inclination_phase_term": 0.7308275914173712,
+      "delta_r2_phase_test": 0.0019741034327935836,
+      "beta_dY_dt_x_incl": -0.005791673956273964,
+      "beta_incl_only": 0.044100257168559934,
+      "pearson_residual_vs_dY_x_incl": {
+        "r": -0.010414607579387822,
+        "p": 0.6677577193912347
+      },
+      "pearson_residual_vs_incl_only": {
+        "r": 0.08460240557887916,
+        "p": 0.0004776782977023946
+      },
+      "interpretation": "If beta_dY_dt_x_incl > 0 \u2192 high inclination delays events; < 0 \u2192 high inclination advances events; ~0 \u2192 no detectable timing modulation by inclination."
+    },
+    "pre-inhg": {
+      "regime": "pre-inhg",
+      "r2_canon": 0.42975047528483323,
+      "r2_with_inclination_phase_term": 0.44767495924888434,
+      "delta_r2_phase_test": 0.017924483964051108,
+      "beta_dY_dt_x_incl": -0.005045357864721353,
+      "beta_incl_only": 0.13365135146175294,
+      "pearson_residual_vs_dY_x_incl": {
+        "r": -0.011451341767409428,
+        "p": 0.5578761564911078
+      },
+      "pearson_residual_vs_incl_only": {
+        "r": 0.17717348758773396,
+        "p": 6.327736030311352e-20
+      },
+      "interpretation": "If beta_dY_dt_x_incl > 0 \u2192 high inclination delays events; < 0 \u2192 high inclination advances events; ~0 \u2192 no detectable timing modulation by inclination."
+    },
+    "lr04-full": {
+      "regime": "lr04-full",
+      "r2_canon": 0.25525662694102247,
+      "r2_with_inclination_phase_term": 0.2597866152023439,
+      "delta_r2_phase_test": 0.004529988261321449,
+      "beta_dY_dt_x_incl": -0.03790122884599973,
+      "beta_incl_only": 0.05691034011470214,
+      "pearson_residual_vs_dY_x_incl": {
+        "r": -0.041712768131755604,
+        "p": 0.002339559809777911
+      },
+      "pearson_residual_vs_incl_only": {
+        "r": 0.06449014330399054,
+        "p": 2.5010833204210102e-06
+      },
+      "interpretation": "If beta_dY_dt_x_incl > 0 \u2192 high inclination delays events; < 0 \u2192 high inclination advances events; ~0 \u2192 no detectable timing modulation by inclination."
+    }
+  },
+  "test_C_peak_matching": {
+    "post-mpt": {
+      "regime": "post-mpt",
+      "n_glacial_matches": 21,
+      "n_intergl_matches": 21,
+      "n_total_matches": 42,
+      "mean_offset_kyr": -5.666666666666667,
+      "rmse_offset_kyr": 9.692903638868023,
+      "pearson_dt_vs_inclination": {
+        "r": -0.05086788216685254,
+        "p": 0.7490289547105007
+      },
+      "n_observations": 42,
+      "peak_table_first10": [
+        {
+          "t_actual": 18.0,
+          "t_pred": 23.0,
+          "dt_kyr": -5.0
+        },
+        {
+          "t_actual": 62.0,
+          "t_pred": 61.0,
+          "dt_kyr": 1.0
+        },
+        {
+          "t_actual": 87.0,
+          "t_pred": 91.0,
+          "dt_kyr": -4.0
+        },
+        {
+          "t_actual": 129.0,
+          "t_pred": 145.0,
+          "dt_kyr": -16.0
+        },
+        {
+          "t_actual": 185.0,
+          "t_pred": 181.0,
+          "dt_kyr": 4.0
+        },
+        {
+          "t_actual": 223.0,
+          "t_pred": 227.0,
+          "dt_kyr": -4.0
+        },
+        {
+          "t_actual": 252.0,
+          "t_pred": 267.0,
+          "dt_kyr": -15.0
+        },
+        {
+          "t_actual": 294.0,
+          "t_pred": 299.0,
+          "dt_kyr": -5.0
+        },
+        {
+          "t_actual": 341.0,
+          "t_pred": 358.0,
+          "dt_kyr": -17.0
+        },
+        {
+          "t_actual": 426.0,
+          "t_pred": 436.0,
+          "dt_kyr": -10.0
+        }
+      ],
+      "interpretation": "Pearson r positive \u2192 high inclination predicts later events (user hypothesis); negative \u2192 inverse; ~0 \u2192 no detectable timing correlation."
+    },
+    "inhg-mpt": {
+      "regime": "inhg-mpt",
+      "n_glacial_matches": 40,
+      "n_intergl_matches": 41,
+      "n_total_matches": 81,
+      "mean_offset_kyr": -4.679012345679013,
+      "rmse_offset_kyr": 8.654549934450737,
+      "pearson_dt_vs_inclination": {
+        "r": 0.1018454685256526,
+        "p": 0.3656148122361771
+      },
+      "n_observations": 81,
+      "peak_table_first10": [
+        {
+          "t_actual": 1038.0,
+          "t_pred": 1045.0,
+          "dt_kyr": -7.0
+        },
+        {
+          "t_actual": 1082.0,
+          "t_pred": 1096.0,
+          "dt_kyr": -14.0
+        },
+        {
+          "t_actual": 1118.0,
+          "t_pred": 1128.0,
+          "dt_kyr": -10.0
+        },
+        {
+          "t_actual": 1178.0,
+          "t_pred": 1173.0,
+          "dt_kyr": 5.0
+        },
+        {
+          "t_actual": 1198.0,
+          "t_pred": 1208.0,
+          "dt_kyr": -10.0
+        },
+        {
+          "t_actual": 1248.0,
+          "t_pred": 1253.0,
+          "dt_kyr": -5.0
+        },
+        {
+          "t_actual": 1290.0,
+          "t_pred": 1295.0,
+          "dt_kyr": -5.0
+        },
+        {
+          "t_actual": 1340.0,
+          "t_pred": 1340.0,
+          "dt_kyr": 0.0
+        },
+        {
+          "t_actual": 1368.0,
+          "t_pred": 1370.0,
+          "dt_kyr": -2.0
+        },
+        {
+          "t_actual": 1394.0,
+          "t_pred": 1413.0,
+          "dt_kyr": -19.0
+        }
+      ],
+      "interpretation": "Pearson r positive \u2192 high inclination predicts later events (user hypothesis); negative \u2192 inverse; ~0 \u2192 no detectable timing correlation."
+    },
+    "pre-inhg": {
+      "regime": "pre-inhg",
+      "n_glacial_matches": 59,
+      "n_intergl_matches": 59,
+      "n_total_matches": 118,
+      "mean_offset_kyr": -4.322033898305085,
+      "rmse_offset_kyr": 9.349159302366013,
+      "pearson_dt_vs_inclination": {
+        "r": -0.055779352819324404,
+        "p": 0.548548827854284
+      },
+      "n_observations": 118,
+      "peak_table_first10": [
+        {
+          "t_actual": 2705.0,
+          "t_pred": 2716.0,
+          "dt_kyr": -11.0
+        },
+        {
+          "t_actual": 2760.0,
+          "t_pred": 2772.0,
+          "dt_kyr": -12.0
+        },
+        {
+          "t_actual": 2805.0,
+          "t_pred": 2805.0,
+          "dt_kyr": 0.0
+        },
+        {
+          "t_actual": 2848.0,
+          "t_pred": 2850.0,
+          "dt_kyr": -2.0
+        },
+        {
+          "t_actual": 2915.0,
+          "t_pred": 2922.0,
+          "dt_kyr": -7.0
+        },
+        {
+          "t_actual": 2957.0,
+          "t_pred": 2971.0,
+          "dt_kyr": -14.0
+        },
+        {
+          "t_actual": 3015.0,
+          "t_pred": 3019.0,
+          "dt_kyr": -4.0
+        },
+        {
+          "t_actual": 3050.0,
+          "t_pred": 3046.0,
+          "dt_kyr": 4.0
+        },
+        {
+          "t_actual": 3075.0,
+          "t_pred": 3091.0,
+          "dt_kyr": -16.0
+        },
+        {
+          "t_actual": 3135.0,
+          "t_pred": 3130.0,
+          "dt_kyr": 5.0
+        }
+      ],
+      "interpretation": "Pearson r positive \u2192 high inclination predicts later events (user hypothesis); negative \u2192 inverse; ~0 \u2192 no detectable timing correlation."
+    },
+    "lr04-full": {
+      "regime": "lr04-full",
+      "n_glacial_matches": 93,
+      "n_intergl_matches": 91,
+      "n_total_matches": 184,
+      "mean_offset_kyr": -5.461956521739131,
+      "rmse_offset_kyr": 10.804336890905148,
+      "pearson_dt_vs_inclination": {
+        "r": -0.01170214842456967,
+        "p": 0.8747252667228915
+      },
+      "n_observations": 184,
+      "peak_table_first10": [
+        {
+          "t_actual": 18.0,
+          "t_pred": 31.0,
+          "dt_kyr": -13.0
+        },
+        {
+          "t_actual": 77.0,
+          "t_pred": 91.0,
+          "dt_kyr": -14.0
+        },
+        {
+          "t_actual": 124.0,
+          "t_pred": 139.0,
+          "dt_kyr": -15.0
+        },
+        {
+          "t_actual": 171.0,
+          "t_pred": 182.0,
+          "dt_kyr": -11.0
+        },
+        {
+          "t_actual": 277.0,
+          "t_pred": 297.0,
+          "dt_kyr": -20.0
+        },
+        {
+          "t_actual": 341.0,
+          "t_pred": 343.0,
+          "dt_kyr": -2.0
+        },
+        {
+          "t_actual": 426.0,
+          "t_pred": 438.0,
+          "dt_kyr": -12.0
+        },
+        {
+          "t_actual": 496.0,
+          "t_pred": 511.0,
+          "dt_kyr": -15.0
+        },
+        {
+          "t_actual": 536.0,
+          "t_pred": 546.0,
+          "dt_kyr": -10.0
+        },
+        {
+          "t_actual": 568.0,
+          "t_pred": 587.0,
+          "dt_kyr": -19.0
+        }
+      ],
+      "interpretation": "Pearson r positive \u2192 high inclination predicts later events (user hypothesis); negative \u2192 inverse; ~0 \u2192 no detectable timing correlation."
+    }
+  },
+  "decision": {
+    "max_delta_r2_from_n24": 0.019149995443672796,
+    "test_b_significant_count": 1,
+    "test_c_significant_count": 0
+  },
+  "meta": {
+    "runtime_sec": 1.6780683994293213,
+    "script": "/home/dennis/code/3d/scripts/milankovitch_inclination_test.py"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "script": "/home/dennis/code/3d/scripts/milankovitch_insolation_laskar_check.py",
+    "data_source": "Laskar et al. (2011), A&A 532, A89 \u2014 La2010a solution",
+    "window_kyr": [
+      0,
+      500
+    ],
+    "runtime_sec": 0.10256004333496094,
+    "obliquity_source": "model (computeObliquityEarth) \u2014 held identical in both variants",
+    "eccentricity_perihelion_sources": {
+      "V1": "model",
+      "V2": "La2010a"
+    }
+  },
+  "lr04_three_way": {
+    "regime": "lr04-0-500-kyr",
+    "window_kyr": [
+      0,
+      500
+    ],
+    "n_samples": 501,
+    "r2_l1": 0.9423754109685781,
+    "r2_l1_l2": 0.9423766130397437,
+    "r2_l1_l2_l3": 0.9423766130397437,
+    "v1_model_r2": 0.9436093492969116,
+    "v1_delta_r2": 0.0012327362571679101,
+    "v1_coefs": {
+      "gamma_eps_anom": 9.766740151563027e-05,
+      "gamma_ecc": -0.19618190106966515,
+      "gamma_e_sin_peri": 0.22810275147145917,
+      "gamma_e_cos_peri": -0.011244700222741266
+    },
+    "v2_laskar_r2": 0.9423810752203511,
+    "v2_delta_r2": 4.4621806073452674e-06,
+    "v2_coefs": {
+      "gamma_eps_anom": 0.00030083963852734147,
+      "gamma_ecc": -0.0015435770560267667,
+      "gamma_e_sin_peri": -0.0012615756634512412,
+      "gamma_e_cos_peri": 0.00022544226367300437
+    },
+    "laskar_feature_ranges": {
+      "eps_range": [
+        -1.2394173594618003,
+        1.2657666792863829
+      ],
+      "ecc_range": [
+        0.0041544,
+        0.0499509
+      ],
+      "esin_range": [
+        -0.04380552140676136,
+        0.04833819925269822
+      ],
+      "ecos_range": [
+        -0.04385752972905853,
+        0.03573433933769132
+      ]
+    }
+  },
+  "lr04_insol_only": {
+    "model_only_r2": 0.18792222719130225,
+    "laskar_only_r2": 0.2927430784051769
+  },
+  "epica_three_way": {
+    "regime": "epica-0-500-kyr",
+    "window_kyr": [
+      0,
+      500
+    ],
+    "n_samples": 501,
+    "r2_l1": 0.9229907371114497,
+    "r2_l1_l2": 0.9229923979495837,
+    "r2_l1_l2_l3": 0.9229923979495837,
+    "v1_model_r2": 0.9264580127627156,
+    "v1_delta_r2": 0.003465614813131901,
+    "v1_coefs": {
+      "gamma_eps_anom": -0.003554735138934264,
+      "gamma_ecc": -1.148509799753877,
+      "gamma_e_sin_peri": 1.1111047998728896,
+      "gamma_e_cos_peri": -0.015393253142177873
+    },
+    "v2_laskar_r2": 0.9229994716093688,
+    "v2_delta_r2": 7.073659785139519e-06,
+    "v2_coefs": {
+      "gamma_eps_anom": -0.0017689949562093754,
+      "gamma_ecc": 0.0014265903707831628,
+      "gamma_e_sin_peri": -0.00043433709955299874,
+      "gamma_e_cos_peri": 0.0013394547932960707
+    },
+    "laskar_feature_ranges": {
+      "eps_range": [
+        -1.2394173594618003,
+        1.2657666792863829
+      ],
+      "ecc_range": [
+        0.0041544,
+        0.0499509
+      ],
+      "esin_range": [
+        -0.04380552140676136,
+        0.04833819925269822
+      ],
+      "ecos_range": [
+        -0.04385752972905853,
+        0.03573433933769132
+      ]
+    }
+  },
+  "epica_insol_only": {
+    "model_only_r2": 0.09559737191291973,
+    "laskar_only_r2": 0.17197315784612255
+  },
+  "verdict": "NULL CONFIRMED \u2014 even with Laskar's full-range e(t), L1 already captures the variance",
+  "max_delta_r2_model": 0.003465614813131901,
+  "max_delta_r2_laskar": 7.073659785139519e-06
+}
