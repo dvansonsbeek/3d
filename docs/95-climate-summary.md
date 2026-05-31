@@ -49,14 +49,15 @@ The two paradigms are **not contradictory** — they describe the same gravitati
 
 Berger's three insolation features ε(t), e(t), ϖ(t) are themselves *defined* as Fourier projections of the same secular gravitational coupling that L1 enumerates. For example:
 
-| Berger insolation feature | Decomposition into Laskar beats | Corresponding L1 integers |
+| Berger insolation feature | Decomposition into Laskar beats | Corresponding L1 integer |
 |---------------------------|---------------------------------|--------------------------|
 | Eccentricity 95-kyr beat | g₄ − g₅ (Mars-Jupiter) | n = 28 |
 | Eccentricity 405-kyr line | g₂ − g₅ (Venus-Jupiter) | off-lattice → L2 |
 | Climatic precession 23.7 kyr | k + g₅ (Jupiter) | n = 113 |
-| Climatic precession 22 kyr | k + g₂ (Venus) | n = 120 |
-| Obliquity 41 kyr | k + s₃ (Earth nodal) | n = 65 |
-| Obliquity 41.3 kyr | k + s₄ (Mars sub-peak) | n = 68 |
+| Climatic precession 22.4 kyr | k + g₂ (Venus) | n = 120 |
+| Obliquity 41.2 kyr | k + s₃ (Earth nodal) | n = 65 |
+
+The periods in the first column are computed from the Laskar 2004 eigenmode beats — e.g. for the obliquity row, k + s₃ = 50.29 − 18.85 = 31.44″/yr, giving period 1,296,000 / 31.44 = 41,222 yr ≈ 41.2 kyr. The often-cited textbook rounding "41 kyr" (Berger 1978) and our model's 8H/65 = 41.27 kyr both refer to this same Laskar eigenmode period.
 
 Every Berger insolation peak is *somewhere* in the L1 lattice (see [doc 93](93-l1-attribution-reference.md) for the full mapping). The lattice contains all of Berger, plus integer-divisor structure that Berger's reduction does not surface (planet-planet beats not historically considered insolation-relevant, like 8H/16 Mars Axial, 8H/35 Earth-Mercury-Saturn 3-term beat, etc.).
 
