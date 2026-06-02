@@ -21904,13 +21904,17 @@ function createGHOPanel() {
     <div class="gho-overlay"></div>
     <div class="gho-container">
       <div class="gho-header">
-        <div class="gho-title">Solar System Resonance Cycle</div>
-        <div class="gho-subtitle">\u2014 8H = ${data.S.toLocaleString('en-US')} years \u2014 all planetary periods divide evenly</div>
+        <div class="gho-title-block">
+          <div class="gho-title">Solar System Resonance Cycle</div>
+          <div class="gho-subtitle">8H = ${data.S.toLocaleString('en-US')} years \u2014 all planetary periods divide evenly</div>
+        </div>
         <div class="gho-controls">
           <button class="gho-toggle" title="Toggle between years and 8H/N notation">
             <span class="gho-toggle-yr">Years</span>
             <span class="gho-toggle-8h">8H/N</span>
           </button>
+          <button class="gho-export-btn" data-gho-export="years" title="Open a paper-styled SVG view of the SSRC table (in years) in a new tab">Export SSRC in years</button>
+          <button class="gho-export-btn" data-gho-export="8h" title="Open a paper-styled SVG view of the SSRC table (in 8H/N notation) in a new tab">Export SSRC in 8H</button>
         </div>
         <div class="gho-close" title="Close"></div>
       </div>
@@ -21955,6 +21959,12 @@ function createGHOPanel() {
     }
   });
 
+  // Event: export buttons
+  const exportYearsBtn = panel.querySelector('[data-gho-export="years"]');
+  const export8HBtn = panel.querySelector('[data-gho-export="8h"]');
+  if (exportYearsBtn) exportYearsBtn.addEventListener('click', () => exportGHOPaper({ showAs8H: false }));
+  if (export8HBtn) export8HBtn.addEventListener('click', () => exportGHOPaper({ showAs8H: true }));
+
   document.body.appendChild(panel);
   return panel;
 }
@@ -21968,6 +21978,129 @@ function openGHOPanel() {
 
 function closeGHOPanel() {
   if (ghoPanel) ghoPanel.classList.remove('visible');
+}
+
+// Render the SSRC table as a self-contained paper-styled SVG. opts.showAs8H
+// toggles between years notation (false) and 8H/N notation (true).
+function ghoRenderPaperSVG(opts) {
+  opts = opts || {};
+  const showAs8H = !!opts.showAs8H;
+  const data = ghoComputeData();
+  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const W = 1200, HGT = 720;
+  const PAD_X = 30, PAD_TOP = 30;
+  const TITLE_H = 32, SUBTITLE_H = 22, NOTATION_H = 22, SPACER = 14;
+  const TABLE_TOP = PAD_TOP + TITLE_H + SUBTITLE_H + NOTATION_H + SPACER;
+  const HEADER_H = 38, ROW_H = 46;
+  const TABLE_BOT = TABLE_TOP + HEADER_H + 8 * ROW_H;
+
+  const cycleLabels = ['Axial', 'Peri. ecl.', 'ICRF / Incl.', 'Asc. node', 'Obliquity', 'Ecc. cycle'];
+  const planetColW = 160;
+  const cycleColW = (W - 2 * PAD_X - planetColW) / 6;
+
+  const COL_PRO   = '#2a9d3a';
+  const COL_RETRO = '#cc3333';
+  const COL_OSC   = '#6b6b6b';
+  const COL_NA    = '#aaaaaa';
+  const COL_TEXT  = '#222222';
+  const COL_DIM   = '#666666';
+  const COL_HDR_BG = '#eeeeee';
+  const COL_EARTH_BG = '#eef4fc';
+  const COL_BORDER = '#d6d6d6';
+
+  let s = '';
+  s += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${HGT}" width="${W}" height="${HGT}" font-family="Inter, system-ui, sans-serif">`;
+  s += `<rect x="0" y="0" width="${W}" height="${HGT}" fill="#ffffff"/>`;
+
+  // Title block
+  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H - 6}" text-anchor="middle" font-size="22" font-weight="700" fill="${COL_TEXT}">Solar System Resonance Cycle</text>`;
+  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H + SUBTITLE_H - 4}" text-anchor="middle" font-size="13" fill="${COL_DIM}">8H = ${data.S.toLocaleString('en-US')} years — all planetary periods divide evenly</text>`;
+  s += `<text x="${W/2}" y="${PAD_TOP + TITLE_H + SUBTITLE_H + NOTATION_H - 2}" text-anchor="middle" font-size="11" font-style="italic" fill="${COL_DIM}">(${showAs8H ? 'in 8H/N notation' : 'in years'})</text>`;
+
+  // Table header background
+  s += `<rect x="${PAD_X}" y="${TABLE_TOP}" width="${W - 2*PAD_X}" height="${HEADER_H}" fill="${COL_HDR_BG}"/>`;
+  s += `<text x="${PAD_X + 14}" y="${TABLE_TOP + HEADER_H/2 + 5}" font-size="12" font-weight="700" fill="${COL_TEXT}">Planet</text>`;
+  for (let i = 0; i < 6; i++) {
+    const cx = PAD_X + planetColW + i * cycleColW + cycleColW / 2;
+    s += `<text x="${cx}" y="${TABLE_TOP + HEADER_H/2 + 5}" text-anchor="middle" font-size="12" font-weight="700" fill="${COL_TEXT}">${xmlEsc(cycleLabels[i])}</text>`;
+  }
+
+  // Planet rows
+  for (let ri = 0; ri < data.rows.length; ri++) {
+    const row = data.rows[ri];
+    const ry = TABLE_TOP + HEADER_H + ri * ROW_H;
+    if (row.key === 'earth') {
+      s += `<rect x="${PAD_X}" y="${ry}" width="${W - 2*PAD_X}" height="${ROW_H}" fill="${COL_EARTH_BG}"/>`;
+    }
+    s += `<line x1="${PAD_X}" y1="${ry + ROW_H}" x2="${W - PAD_X}" y2="${ry + ROW_H}" stroke="${COL_BORDER}" stroke-width="0.5"/>`;
+
+    const colorHex = '#' + (row.color || 0xaaaaaa).toString(16).padStart(6, '0');
+    const dotX = PAD_X + 14;
+    const dotY = ry + ROW_H / 2;
+    s += `<circle cx="${dotX + 5}" cy="${dotY}" r="5" fill="${colorHex}"/>`;
+    s += `<text x="${dotX + 18}" y="${dotY + 5}" font-size="13" font-weight="600" fill="${COL_TEXT}">${xmlEsc(row.name)}</text>`;
+
+    for (let ci = 0; ci < row.cycles.length; ci++) {
+      const cyc = row.cycles[ci];
+      const cx = PAD_X + planetColW + ci * cycleColW + cycleColW / 2;
+      const cy = ry + ROW_H / 2 + 5;
+
+      let text, color;
+      if (cyc.n === null || cyc.frozen) {
+        text = cyc.frozen ? '∞' : '—';
+        color = COL_NA;
+      } else {
+        const isRetro = cyc.period < 0;
+        const isOsc = cyc.oscillation;
+        color = isOsc ? COL_OSC : (isRetro ? COL_RETRO : COL_PRO);
+        const sign = isOsc ? '' : (isRetro ? '−' : '');
+        if (showAs8H) {
+          text = `${sign}8H/${cyc.n}`;
+        } else {
+          const yr = Math.round(Math.abs(cyc.period));
+          text = `${sign}${yr.toLocaleString('en-US')}`;
+        }
+      }
+      s += `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="13" font-weight="500" fill="${color}">${xmlEsc(text)}</text>`;
+    }
+  }
+
+  // Outer table border
+  s += `<rect x="${PAD_X}" y="${TABLE_TOP}" width="${W - 2*PAD_X}" height="${TABLE_BOT - TABLE_TOP}" fill="none" stroke="${COL_BORDER}" stroke-width="1"/>`;
+
+  // Footer + legend
+  const footerY = TABLE_BOT + 28;
+  s += `<text x="${W/2}" y="${footerY}" text-anchor="middle" font-size="11" fill="${COL_DIM}">All ${data.rows.length} planets × 6 cycle types = integer divisors of 8H · H = ${data.H.toLocaleString('en-US')} years (Earth Fundamental Cycle)</text>`;
+
+  const legendY = footerY + 26;
+  const legend = [
+    { color: COL_PRO,   label: 'Prograde' },
+    { color: COL_RETRO, label: 'Retrograde' },
+    { color: COL_OSC,   label: 'Oscillation' },
+  ];
+  const itemW = 120;
+  const legendStartX = (W - legend.length * itemW) / 2;
+  for (let i = 0; i < legend.length; i++) {
+    const lx = legendStartX + i * itemW;
+    s += `<rect x="${lx}" y="${legendY - 10}" width="14" height="14" fill="${legend[i].color}"/>`;
+    s += `<text x="${lx + 20}" y="${legendY + 2}" font-size="11" fill="${COL_DIM}">${legend[i].label}</text>`;
+  }
+
+  s += '</svg>';
+  return s;
+}
+
+function exportGHOPaper(opts) {
+  opts = opts || {};
+  const showAs8H = !!opts.showAs8H;
+  const svg = ghoRenderPaperSVG({ showAs8H });
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.document.title = 'Solar System Resonance Cycle — ' + (showAs8H ? 'in 8H/N' : 'in years');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -22017,7 +22150,7 @@ function wgcLinearFit(x, y) {
 }
 
 /** Render an SVG line chart with data + trend line. */
-function wgcRenderChart(title, yrArr, values, color, label, modelValues) {
+function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRate) {
   const W = 800, H = 180;
   const margin = { top: 18, right: 20, bottom: 24, left: 60 };
   const plotW = W - margin.left - margin.right;
@@ -22084,7 +22217,7 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues) {
         <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#111" stroke="#333" stroke-width="0.5"/>
         ${yticks.join('')}
         ${xticks.join('')}
-        ${modelValues ? `<path d="${modelValues.map((v, i) => (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="#ffe066" stroke-width="1.4" opacity="0.95"/>` : ''}
+        ${modelValues ? `<path d="${modelValues.map((v, i) => (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="#ff5252" stroke-width="1.4" opacity="0.95"/>` : ''}
         <path d="${pathPoints}" fill="none" stroke="${color}" stroke-width="1.4" opacity="0.95"/>
         ${(() => {
           const xJ2000 = sx(2000);
@@ -22099,13 +22232,13 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues) {
           <rect x="${(margin.left + 6).toFixed(1)}" y="${(margin.top + 4).toFixed(1)}" width="84" height="26" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" rx="3"/>
           <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 11).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 11).toFixed(1)}" stroke="${color}" stroke-width="1.6"/>
           <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 14).toFixed(1)}" fill="#ccc">Observed</text>
-          <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ffe066" stroke-width="1.6"/>
+          <line x1="${(margin.left + 10).toFixed(1)}" y1="${(margin.top + 23).toFixed(1)}" x2="${(margin.left + 22).toFixed(1)}" y2="${(margin.top + 23).toFixed(1)}" stroke="#ff5252" stroke-width="1.6"/>
           <text x="${(margin.left + 26).toFixed(1)}" y="${(margin.top + 26).toFixed(1)}" fill="#ccc">Model</text>
         </g>` : ''}
       </svg>
       <div class="wgc-chart-footer">
-        <span>Observed trend: <b>${rateArcSecCy.toFixed(1)} \u2033/cy</b></span>
-        ${label ? `<span style="margin-left:16px">${label}</span>` : ''}
+        ${omitRate ? '' : `<span>Observed trend: <b>${rateArcSecCy.toFixed(1)} \u2033/cy</b></span>`}
+        ${label ? `<span style="${omitRate ? '' : 'margin-left:16px'}">${label}</span>` : ''}
       </div>
     </div>
   `;
@@ -22117,7 +22250,7 @@ function wgcRenderPlanet(planetKey) {
   const H = 335317;
 
   // Use the exploration script's pre-computed rates. For all trend lines we
-  // fall back to raw OLS linear regression (what the yellow dashed line shows).
+  // fall back to raw OLS linear regression (the rate shown in the chart footer).
   // The "sin-fit" rate below is the bias-corrected trend (linear + sinusoid
   // model removes the dominant periodic component). For inner planets (short
   // oscillation periods) both rates agree; for outer planets they differ.
@@ -22184,17 +22317,16 @@ function wgcRenderPlanet(planetKey) {
       <div class="wgc-planet-title">${planetKey} PERIHELION PRECESSION</div>
       <div class="wgc-planet-summary">
         <div><span style="color:#268bd2">\u2501\u2501</span> <b>Observed:</b> ${undeterminedTrend ? '<span style="color:#cb4b16;">\u26a0 trend cannot be determined from 1900\u20132026 baseline</span>' : `[raw OLS] ${rateRawCy.toFixed(1)} \u2033/cy \u2022 [sin+lin] ${rateSinCy.toFixed(1)} \u2033/cy`}</div>
-        ${modelRateAtJ2000 !== null ? `<div><span style="color:#ffe066">\u2501\u2501</span> <b>Model:</b> ${modelRateAtJ2000.toFixed(1)} \u2033/cy <span style="color:#aaa">(baseline ${modelBaselineCy.toFixed(1)} + missing advance ${modelMissingAdvance.toFixed(1)})</span></div>` : ''}
+        ${modelRateAtJ2000 !== null ? `<div><span style="color:#ff5252">\u2501\u2501</span> <b>Model:</b> ${modelRateAtJ2000.toFixed(1)} \u2033/cy <span style="color:#aaa">(baseline ${modelBaselineCy.toFixed(1)} + missing advance ${modelMissingAdvance.toFixed(1)})</span></div>` : ''}
       </div>
       <div class="wgc-planet-method">
         Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
       </div>
-      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ffe066">yellow line = model (baseline + missing advance)</span>`, modelValues)}
+      ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = model (baseline + missing advance)</span>`, modelValues, undeterminedTrend)}
       <div class="wgc-frame-note">
-        <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ecliptic plane</b> \u2014
-        Earth\u2019s orbital plane at J2000. The ecliptic plane itself precesses (H/5 cycle, \~67,000 yr)
-        because Earth\u2019s orbit tilts relative to the invariable plane. In the <b>ICRF (inertial) frame</b>
-        each rate would differ by Earth\u2019s general precession (H/13 \u2248 \u221250.3\u2033/yr \u2248 \u22125,030\u2033/cy).
+        <b>Frame note:</b> All angles (\u03A9, \u03C9, \u03D6) are measured in the <b>ECLIPJ2000</b> frame \u2014
+        Earth\u2019s mean ecliptic at J2000, an inertial reference plane. Earth\u2019s current orbital plane
+        precesses relative to the invariable plane in ecliptic with period H/5 = 67,063 yr.
       </div>
       <details class="wgc-chart-collapsible">
         <summary>Ascending node longitude vs. Time (\u03A9) \u2014 ecliptic frame, click to expand</summary>
@@ -22206,6 +22338,210 @@ function wgcRenderPlanet(planetKey) {
       </details>
     </div>
   `;
+}
+
+// Compute the model perihelion curve (for paper export) — mirrors the integration
+// logic in wgcRenderPlanet so the exported figure carries the same red model overlay.
+function wgcComputeModelCurve(planetKey, d) {
+  const modelPlanetKey = planetKey.toLowerCase();
+  const modelPlanet = planets[modelPlanetKey];
+  if (!modelPlanet || typeof predictGeocentricPrecession !== 'function' || !PREDICT_PLANETS || !PREDICT_PLANETS[modelPlanetKey]) return null;
+  let j2000Idx = 0;
+  for (let i = 1; i < d.yrArr.length; i++) {
+    if (Math.abs(d.yrArr[i] - 2000) < Math.abs(d.yrArr[j2000Idx] - 2000)) j2000Idx = i;
+  }
+  const mv = new Array(d.yrArr.length);
+  mv[j2000Idx] = modelPlanet.longitudePerihelion;
+  for (let i = j2000Idx + 1; i < d.yrArr.length; i++) {
+    const dt = d.yrArr[i] - d.yrArr[i - 1];
+    const r = 0.5 * (predictGeocentricPrecession(d.yrArr[i - 1], modelPlanetKey)
+                   + predictGeocentricPrecession(d.yrArr[i], modelPlanetKey));
+    mv[i] = mv[i - 1] + r * dt / 360000;
+  }
+  for (let i = j2000Idx - 1; i >= 0; i--) {
+    const dt = d.yrArr[i + 1] - d.yrArr[i];
+    const r = 0.5 * (predictGeocentricPrecession(d.yrArr[i], modelPlanetKey)
+                   + predictGeocentricPrecession(d.yrArr[i + 1], modelPlanetKey));
+    mv[i] = mv[i + 1] - r * dt / 360000;
+  }
+  const modelBaselineCy = (360 / modelPlanet.perihelionEclipticYears) * 3600 * 100;
+  const modelRateAtJ2000 = predictGeocentricPrecession(2000, modelPlanetKey);
+  const modelMissingAdvance = modelRateAtJ2000 - modelBaselineCy;
+  return { values: mv, baselineCy: modelBaselineCy, rateAtJ2000: modelRateAtJ2000, missingAdvance: modelMissingAdvance };
+}
+
+// Paper-styled single chart panel for the export SVG.
+// W and H are the panel dimensions; everything (axes, ticks, labels, lines) is drawn
+// in paper-friendly colors against a near-white plot area.
+function wgcPaperChartPanel(xOff, yOff, W, H, opts) {
+  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const { title, yrArr, values, color, modelValues, label, omitRate } = opts;
+  const m = { top: 30, right: 24, bottom: 32, left: 70 };
+  const plotW = W - m.left - m.right;
+  const plotH = H - m.top - m.bottom;
+  const unwrapped = wgcUnwrap(values);
+  const fit = wgcLinearFit(yrArr, unwrapped);
+  const allY = [...unwrapped]; if (modelValues) allY.push(...modelValues);
+  const ymin = Math.min(...allY), ymax = Math.max(...allY);
+  const yPad = (ymax - ymin) * 0.05 || 1;
+  const y0 = ymin - yPad, y1 = ymax + yPad;
+  const xmin = yrArr[0], xmax = yrArr[yrArr.length - 1];
+  const sx = (x) => xOff + m.left + ((x - xmin) / (xmax - xmin)) * plotW;
+  const sy = (y) => yOff + m.top + plotH - ((y - y0) / (y1 - y0)) * plotH;
+
+  const COL_AXIS = '#666', COL_TICK = '#aaa', COL_GRID = '#e8e8e8';
+  const COL_PLOT_BG = '#fafafa', COL_FRAME = '#bbb';
+  const COL_TEXT = '#222', COL_DIM = '#666';
+
+  let s = '';
+  // Chart title
+  s += `<text x="${xOff + W/2}" y="${yOff + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="${COL_TEXT}">${xmlEsc(title)}</text>`;
+  // Plot background + frame
+  s += `<rect x="${xOff + m.left}" y="${yOff + m.top}" width="${plotW}" height="${plotH}" fill="${COL_PLOT_BG}" stroke="${COL_FRAME}" stroke-width="0.7"/>`;
+
+  // Y ticks + horizontal gridlines
+  for (let i = 0; i <= 4; i++) {
+    const yv = y0 + (y1 - y0) * (i / 4);
+    const py = sy(yv);
+    if (i > 0 && i < 4) s += `<line x1="${xOff + m.left}" y1="${py.toFixed(1)}" x2="${xOff + m.left + plotW}" y2="${py.toFixed(1)}" stroke="${COL_GRID}" stroke-width="0.5"/>`;
+    s += `<line x1="${xOff + m.left - 4}" y1="${py.toFixed(1)}" x2="${xOff + m.left}" y2="${py.toFixed(1)}" stroke="${COL_AXIS}" stroke-width="0.6"/>`;
+    s += `<text x="${xOff + m.left - 6}" y="${(py + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="${COL_TICK}">${yv.toFixed(2)}°</text>`;
+  }
+  // X ticks
+  const nXticks = Math.min(8, Math.floor((xmax - xmin) / 20) + 1);
+  for (let i = 0; i <= nXticks; i++) {
+    const xv = xmin + ((xmax - xmin) * i) / nXticks;
+    const px = sx(xv);
+    s += `<line x1="${px.toFixed(1)}" y1="${(yOff + m.top + plotH).toFixed(1)}" x2="${px.toFixed(1)}" y2="${(yOff + m.top + plotH + 4).toFixed(1)}" stroke="${COL_AXIS}" stroke-width="0.6"/>`;
+    s += `<text x="${px.toFixed(1)}" y="${(yOff + m.top + plotH + 16).toFixed(1)}" text-anchor="middle" font-size="10" fill="${COL_TICK}">${Math.round(xv)}</text>`;
+  }
+  // J2000 marker
+  const xJ2000 = sx(2000);
+  if (xJ2000 >= xOff + m.left && xJ2000 <= xOff + m.left + plotW) {
+    s += `<line x1="${xJ2000.toFixed(1)}" y1="${(yOff + m.top).toFixed(1)}" x2="${xJ2000.toFixed(1)}" y2="${(yOff + m.top + plotH).toFixed(1)}" stroke="#888" stroke-width="0.6" stroke-dasharray="2,3"/>`;
+    s += `<text x="${xJ2000.toFixed(1)}" y="${(yOff + m.top + 10).toFixed(1)}" text-anchor="middle" font-size="9" fill="#888">J2000</text>`;
+  }
+  // Model line (red) drawn first, observed (blue) on top
+  if (modelValues) {
+    let p = '';
+    for (let i = 0; i < modelValues.length; i++) p += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(modelValues[i]).toFixed(1) + ' ';
+    s += `<path d="${p.trim()}" fill="none" stroke="#cc3333" stroke-width="1.4" opacity="0.95"/>`;
+  }
+  // Observed data line
+  let p = '';
+  for (let i = 0; i < yrArr.length; i++) p += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(unwrapped[i]).toFixed(1) + ' ';
+  s += `<path d="${p.trim()}" fill="none" stroke="${color}" stroke-width="1.6" opacity="0.95"/>`;
+  // OLS trend dashed
+  const trendY0 = fit.slope * xmin + fit.intercept;
+  const trendY1 = fit.slope * xmax + fit.intercept;
+  s += `<line x1="${sx(xmin).toFixed(1)}" y1="${sy(trendY0).toFixed(1)}" x2="${sx(xmax).toFixed(1)}" y2="${sy(trendY1).toFixed(1)}" stroke="${color}" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.6"/>`;
+
+  // Legend (only on chart with model overlay)
+  if (modelValues) {
+    const lx = xOff + m.left + 8, ly = yOff + m.top + 8;
+    s += `<rect x="${lx}" y="${ly}" width="100" height="32" fill="rgba(255,255,255,0.85)" stroke="#ccc" stroke-width="0.5" rx="3"/>`;
+    s += `<line x1="${lx + 6}" y1="${ly + 11}" x2="${lx + 22}" y2="${ly + 11}" stroke="${color}" stroke-width="1.6"/>`;
+    s += `<text x="${lx + 27}" y="${ly + 14}" font-size="10" fill="${COL_TEXT}">Observed</text>`;
+    s += `<line x1="${lx + 6}" y1="${ly + 24}" x2="${lx + 22}" y2="${ly + 24}" stroke="#cc3333" stroke-width="1.6"/>`;
+    s += `<text x="${lx + 27}" y="${ly + 27}" font-size="10" fill="${COL_TEXT}">Model</text>`;
+  }
+  // Rate footer (omitted when omitRate is true — for planets whose long-term trend
+  // cannot be determined from the 1900–2026 baseline)
+  const rateArcSecCy = fit.slope * 3600 * 100;
+  if (omitRate) {
+    if (label) s += `<text x="${xOff + m.left}" y="${(yOff + H - 4).toFixed(1)}" font-size="10" fill="${COL_DIM}">${xmlEsc(label)}</text>`;
+  } else {
+    s += `<text x="${xOff + m.left}" y="${(yOff + H - 4).toFixed(1)}" font-size="10" fill="${COL_DIM}">Observed OLS trend: <tspan font-weight="700" fill="${COL_TEXT}">${rateArcSecCy.toFixed(1)} ″/cy</tspan>${label ? ' · ' + xmlEsc(label) : ''}</text>`;
+  }
+  return s;
+}
+
+// Render the WGC export as a paper-styled self-contained SVG.
+// opts.includeAllCharts: false → just the main perihelion chart; true → 3 stacked charts.
+function wgcRenderPaperSVG(planetKey, opts) {
+  opts = opts || {};
+  const includeAll = !!opts.includeAllCharts;
+  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (!wgcData || !wgcData[planetKey]) return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="100"><text x="20" y="50" font-family="Inter,system-ui,sans-serif" font-size="14" fill="#222">WGC data not loaded for ' + planetKey + '</text></svg>';
+  const d = wgcData[planetKey];
+  const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
+
+  // Compute rates
+  const piFit = wgcLinearFit(d.yrArr, wgcUnwrap(d.piArr));
+  const rateRawCy = piFit.slope * 3600 * 100;
+  const rateSinCy = (d.rates && d.rates.sinPi != null) ? d.rates.sinPi : rateRawCy;
+  const baselineYr = d.yrArr[d.yrArr.length - 1] - d.yrArr[0];
+  const oscPeriod = d.oscPeriod || 10;
+  const nCycles = baselineYr / oscPeriod;
+  const reliable = nCycles >= 4;
+  const undeterminedTrend = ['VENUS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE'].includes(planetKey.toUpperCase());
+  const model = wgcComputeModelCurve(planetKey, d);
+
+  // Layout
+  const W = 1100;
+  const HEADER_H = 110;
+  const CHART_H = 320;
+  const CHART_GAP = 16;
+  const FOOTER_H = 36;
+  const numCharts = includeAll ? 3 : 1;
+  const HGT = HEADER_H + numCharts * CHART_H + (numCharts - 1) * CHART_GAP + FOOTER_H;
+
+  const COL_TEXT = '#222', COL_DIM = '#555';
+  let s = '';
+  s += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${HGT}" width="${W}" height="${HGT}" font-family="Inter, system-ui, sans-serif">`;
+  s += `<rect x="0" y="0" width="${W}" height="${HGT}" fill="#ffffff"/>`;
+
+  // Header
+  s += `<text x="${W/2}" y="28" text-anchor="middle" font-size="20" font-weight="700" fill="${COL_TEXT}">WebGeoCalc Explorer — ${xmlEsc(planetName)} perihelion precession</text>`;
+  s += `<text x="${W/2}" y="48" text-anchor="middle" font-size="12" fill="${COL_DIM}">Observed angles 1900–2026 from JPL NAIF WebGeoCalc — ecliptic frame (ϖ = Ω + ω)</text>`;
+  // Rate summary
+  const observedLine = undeterminedTrend
+    ? `Observed: ⚠ long-term trend cannot be determined from 1900–2026 baseline (sign flips across sub-windows)`
+    : `Observed: raw OLS ${rateRawCy.toFixed(1)} ″/cy · sin+lin ${rateSinCy.toFixed(1)} ″/cy`;
+  s += `<text x="40" y="72" font-size="12" fill="${COL_TEXT}">${xmlEsc(observedLine)}</text>`;
+  if (model) {
+    const modelLine = `Model: ${model.rateAtJ2000.toFixed(1)} ″/cy (baseline ${model.baselineCy.toFixed(1)} + missing advance ${model.missingAdvance.toFixed(1)})`;
+    s += `<text x="40" y="88" font-size="12" fill="${COL_TEXT}">${xmlEsc(modelLine)}</text>`;
+  }
+  s += `<text x="40" y="${model ? 104 : 88}" font-size="11" fill="${COL_DIM}">Baseline: ${Math.round(baselineYr)} yr · ${nCycles.toFixed(1)}× dominant oscillation period (${oscPeriod} yr) · ${reliable ? 'raw OLS reliable' : '⚠ too few cycles — use sin+lin'}</text>`;
+
+  // Charts
+  const piLabel = `Baseline: ${d.yrArr[0]}–${Math.round(d.yrArr[d.yrArr.length-1])}`;
+  s += wgcPaperChartPanel(0, HEADER_H, W, CHART_H, {
+    title: 'Longitude of perihelion vs. Time (ϖ = Ω + ω)',
+    yrArr: d.yrArr, values: d.piArr, color: '#1976d2',
+    modelValues: model ? model.values : null, label: piLabel, omitRate: undeterminedTrend,
+  });
+  if (includeAll) {
+    s += wgcPaperChartPanel(0, HEADER_H + CHART_H + CHART_GAP, W, CHART_H, {
+      title: 'Ascending node longitude vs. Time (Ω) — ecliptic frame',
+      yrArr: d.yrArr, values: d.omArr, color: '#00796b', modelValues: null, label: '',
+    });
+    s += wgcPaperChartPanel(0, HEADER_H + 2 * (CHART_H + CHART_GAP), W, CHART_H, {
+      title: 'Argument of periapsis vs. Time (ω) — ecliptic frame',
+      yrArr: d.yrArr, values: d.wArr, color: '#558b2f', modelValues: null, label: '',
+    });
+  }
+
+  // Footer
+  const footerY = HGT - 14;
+  s += `<text x="${W/2}" y="${footerY}" text-anchor="middle" font-size="10" fill="${COL_DIM}">Data: JPL NAIF WebGeoCalc · Reference frame: ECLIPJ2000 (Earth's mean ecliptic at J2000, inertial). Earth's current orbital plane precesses relative to the invariable plane in ecliptic with period H/5 = 67,063 yr.</text>`;
+  s += '</svg>';
+  return s;
+}
+
+function exportWGCPaper(planetKey, opts) {
+  opts = opts || {};
+  const includeAll = !!opts.includeAllCharts;
+  if (!wgcData) { alert('WGC data not loaded yet'); return; }
+  const svg = wgcRenderPaperSVG(planetKey, { includeAllCharts: includeAll });
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    const planetName = planetKey[0] + planetKey.slice(1).toLowerCase();
+    win.document.title = `WebGeoCalc Explorer — ${planetName} (${includeAll ? 'all 3 charts' : 'perihelion only'})`;
+  }
 }
 
 async function createWGCPanel() {
@@ -22225,8 +22561,14 @@ async function createWGCPanel() {
     <div class="wgc-overlay"></div>
     <div class="wgc-container">
       <div class="wgc-header">
-        <div class="wgc-title">WebGeoCalc Explorer</div>
-        <div class="wgc-subtitle">Observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
+        <div class="wgc-title-block">
+          <div class="wgc-title">WebGeoCalc Explorer</div>
+          <div class="wgc-subtitle">Observed perihelion precession from JPL NAIF WebGeoCalc (1900\u20132026)</div>
+        </div>
+        <div class="wgc-controls">
+          <button class="wgc-export-btn" data-wgc-export="perihelion" title="Open a paper-styled SVG of the current planet's perihelion chart in a new tab">Export perihelion chart</button>
+          <button class="wgc-export-btn" data-wgc-export="all" title="Open a paper-styled SVG of the current planet's perihelion + ascending node + argument of periapsis charts in a new tab">Export full set</button>
+        </div>
         <div class="wgc-close" title="Close"></div>
       </div>
       <div class="wgc-body">
@@ -22252,6 +22594,12 @@ async function createWGCPanel() {
       panel.querySelector('.wgc-content').innerHTML = wgcRenderPlanet(wgcSelectedPlanet);
     });
   });
+
+  // Event: export buttons (use the currently-selected planet)
+  const exportPerihelionBtn = panel.querySelector('[data-wgc-export="perihelion"]');
+  const exportAllBtn = panel.querySelector('[data-wgc-export="all"]');
+  if (exportPerihelionBtn) exportPerihelionBtn.addEventListener('click', () => exportWGCPaper(wgcSelectedPlanet, { includeAllCharts: false }));
+  if (exportAllBtn) exportAllBtn.addEventListener('click', () => exportWGCPaper(wgcSelectedPlanet, { includeAllCharts: true }));
 
   document.body.appendChild(panel);
   return panel;
@@ -25036,7 +25384,7 @@ function cfmRenderChart(tabKey) {
   // Render layer polylines based on visibility flags
   // Order matters for layering: L1/L2/L3 below, Total on top, data on top of all
   let layerPaths = '';
-  if (cfmLayerVisibility.l1) layerPaths += `<path d="${l1Path}" fill="none" stroke="#ffe066" stroke-width="1.2" opacity="0.85"/>`;
+  if (cfmLayerVisibility.l1) layerPaths += `<path d="${l1Path}" fill="none" stroke="#ff5252" stroke-width="1.2" opacity="0.85"/>`;
   if (cfmLayerVisibility.l2) layerPaths += `<path d="${l2Path}" fill="none" stroke="#66e0a0" stroke-width="1.2" opacity="0.85"/>`;
   if (cfmLayerVisibility.total) layerPaths += `<path d="${totalPath}" fill="none" stroke="#ffffff" stroke-width="1.6" opacity="0.95"/>`;
 

@@ -3227,13 +3227,15 @@ a:link {
   border-bottom:1px solid rgba(255,255,255,.08);
   background:rgba(255,255,255,.02);
 }
+.gho-title-block {
+  display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;
+}
 .gho-title {
   font:800 15px/1.2 Inter,system-ui,sans-serif; color:#fff;
   text-transform:uppercase; letter-spacing:.06em;
 }
 .gho-subtitle {
   font:400 11px/1.3 Inter,system-ui,sans-serif; color:rgba(255,255,255,.5);
-  flex:1; padding-left:4px;
 }
 .gho-controls { display:flex; gap:8px; }
 .gho-close {
@@ -3256,6 +3258,20 @@ a:link {
 .gho-toggle-8h { background:transparent; color:rgba(255,255,255,.3); }
 .gho-toggle.gho-toggle-active .gho-toggle-yr { background:transparent; color:rgba(255,255,255,.3); }
 .gho-toggle.gho-toggle-active .gho-toggle-8h { background:rgba(100,150,255,.15); color:#8cb4ff; }
+.gho-export-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ccc;
+  font: 600 11px/1.3 Inter, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+.gho-export-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
 
 /* Table */
 .gho-table { width:100%; }
@@ -3326,14 +3342,30 @@ a:link {
   display:flex; align-items:center; gap:16px; padding:18px 24px;
   border-bottom:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.02);
 }
+.wgc-title-block {
+  display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;
+}
 .wgc-title {
   font:800 15px/1.2 Inter,system-ui,sans-serif; color:#fff;
   text-transform:uppercase; letter-spacing:.06em;
 }
 .wgc-subtitle {
   font:400 11px/1.3 Inter,system-ui,sans-serif; color:rgba(255,255,255,.5);
-  flex:1; padding-left:4px;
 }
+.wgc-controls { display:flex; gap:8px; }
+.wgc-export-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ccc;
+  font: 600 11px/1.3 Inter, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.wgc-export-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
 .wgc-close {
   width:32px; height:32px; cursor:pointer; opacity:.4; transition:opacity .15s;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E") center/18px no-repeat;
