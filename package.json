@@ -15,7 +15,6 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
-    "baseline-browser-mapping": "^2.10.0",
     "parcel": "^2.16.4",
     "xlsx": "^0.18.5"
   }
