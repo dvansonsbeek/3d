@@ -125,11 +125,114 @@ Empirical tests on the LR04 benthic δ¹⁸O stack and the U-Th-dated Cheng 2016
 
 Used in: [Doc 90](../docs/90-milankovitch-language.md) (model framework), [Doc 91](../docs/91-milankovitch-evidence.md) (empirical evidence + super-cycle test + 14 follow-up tests + 405-kyr investigation), and [Doc 92](../docs/92-climate-formula.md) (canonical L1+L2+L3 climate formula + Climate Formula Explorer modal).
 
+**Doc 92 — Variance budget and follow-up Milankovitch tests** (additional empirical tests beyond the canonical 32-component formula):
+
+| Script | Description |
+|--------|-------------|
+| `milankovitch_8h_variance_budget.py` | **Tier A variance decomposition** (doc 92). Quantifies how much of LR04's δ¹⁸O variance is explained by L1 only vs L1+L2 vs L1+L2+L3 layers — establishes the three-layer architecture's incremental power. |
+| `milankovitch_8h_variance_budget_tier_b.py` | **Tier B round 1.** Per-integer variance decomposition within L1: which specific 8H/n integers contribute most to explanatory power per regime. |
+| `milankovitch_8h_variance_budget_tier_b_r2.py` | **Tier B round 2.** Refined per-integer attribution with regime-conditional amplitude budgets. |
+| `milankovitch_8h_variance_budget_tier_b_r3.py` | **Tier B round 3.** Final variance budget reconciliation across post-MPT / pre-MPT / EPICA / CenCO2PIP. |
+| `milankovitch_inclination_test.py` | Inclination (H/3) climate test — does the model's inclination cycle add predictive power on top of L1+L2+L3? |
+| `milankovitch_insolation_extension.py` | Tests whether adding insolation features (orbital integration outputs) to L1+L2+L3 improves R². |
+| `milankovitch_insolation_laskar_check.py` | Laskar-hardening of the insolation extension test (validation against published Laskar 2004 insolation). |
+| `milankovitch_l1_dual_attribution.py` | **Triple attribution table** of all 32 L1 components: standard Berger label / solar-system resonance family / direct planet apsidal-nodal. |
+| `milankovitch_late_pliocene_analogue.py` | Late Pliocene 8H-ago analogue table — comparative climate-state lookup. |
+| `milankovitch_timing_offset_diagnosis.py` | Diagnoses the systematic ~5 kyr early offset of LR04 peaks vs the L1+L2+L3 climate-formula prediction. |
+| `fit_methodology_diagnostics.py` | Methodological diagnostics for the fitting pipeline (residual structure, conditioning, regularization sensitivity). |
+
+### Doc 97 — Paleo-ECS decomposition cluster
+
+Climate sensitivity (Charney ECS) decomposition across paleoclimate eras using the 8H L1 lattice. Cross-proxy validation on LR04, EPICA, Snyder GAST, and multiple boron-isotope CO₂ reconstructions (0–67 Ma). See [Doc 97](../docs/97-paleo-ecs-decomposition.md).
+
+| Script | Description |
+|--------|-------------|
+| `climate_ecs_boron.py` | ECS analysis using boron-isotope CO₂ reconstructions (de la Vega 2020, Chalk 2017, Dyez 2018, Martinez-Boti 2015) as the forcing record, instead of CenCO2PIP. Output: `data/climate-ecs-boron.json` |
+| `climate_ecs_cross_proxy.py` | Cross-proxy validation of L1 amplitude structure and obliquity-band ECS — checks consistency across δ¹⁸O / CO₂ / GAST. Output: `data/climate-ecs-cross-proxy.json` |
+| `climate_ecs_full_forcing.py` | ECS spectrum with **full radiative forcing** (CO₂ + ice-albedo + other GHGs), not CO₂-only. Output: `data/climate-ecs-full-forcing.json` |
+| `climate_ecs_monte_carlo.py` | Monte Carlo over four forcing-calibration constants with literature-justified uncertainty ranges → marginalized ECS distribution. Output: `data/climate-ecs-monte-carlo.json` |
+| `climate_ecs_per_regime.py` | Per-regime full-forcing ECS: post-MPT vs iNHG-MPT comparison. Output: `data/climate-ecs-per-regime.json` |
+| `climate_ecs_phase_lag.py` | Bootstrap-based phase-lag analysis from the canonical L1 lattice (CO₂-only ΔF). Output: `data/climate-ecs-phase-lag.json` |
+| `climate_ecs_snyder.py` | ECS from canonical climate formula L1 lattice — direct-temperature pathway using Snyder 2016's GAST reconstruction (replaces δ¹⁸O × κ). Output: `data/climate-ecs-snyder.json` |
+| `climate_ecs_tight.py` | **Tightened ECS** — three improvements over `climate_ecs_per_regime.py`: frequency-dependent ice fraction (replaces constant f_ice=0.6), regime-conditional forcing kernels, refined error budget. Output: `data/climate-ecs-tight.json` |
+| `cenogrid_l1_lattice_extension.py` | Deep-time test of the 8H L1 lattice on CENOGRID 0–67 Ma — does the framework's lattice persist across the Cenozoic? Output: `data/cenogrid-l1-lattice-extension.json` |
+| `cenogrid_mtm_ftest.py` | Per-L1-integer Thomson Multitaper F-test across CENOGRID 0–67 Ma — stronger statistical test than R²-only. Output: `data/cenogrid-mtm-ftest.json` |
+
+### Doc 98 — Lattice mechanism investigation
+
+Physical mechanism behind the 8H lattice: Chirikov resonance overlap, action-angle closure, commensurability. Three experiments (A: action-angle closure, B: Chirikov, plus follow-ups). See [Doc 98](../docs/98-lattice-mechanism.md).
+
+**Primary experiments:**
+
+| Script | Description |
+|--------|-------------|
+| `action_closure_test.py` | **Experiment A** (doc 98) — Action-angle closure test for the 8H period. Tests whether all 32 L1 integers' action vectors close on themselves modulo the 8H period. |
+| `chirikov_resonance_test.py` | **Experiment B** (doc 98) — Chirikov resonance overlap test on the L1 lattice. Computes resonance-overlap criterion at each L1 integer. |
+| `eight_h_derivation_test.py` | **Experiment 1** (follow-up to A) — derives 8H from Laskar eigenfrequency / LA2004 spectral data, validating the closure period. |
+
+**Mechanism follow-ups:**
+
+| Script | Description |
+|--------|-------------|
+| `laplace_lagrange_first_principles.py` | First-principles secular eigenfrequencies from the Laplace-Lagrange matrix: builds A (eccentricity) and B (inclination/nodal) from planetary masses and semi-major axes, computes eigenvalues g_j and s_j. Output: `data/laplace-lagrange.json` |
+| `solar_8H_lattice_test.py` | Cross-domain test — does the 8H lattice show up in solar-activity (sunspot/cosmogenic) records? Output: `data/solar-8H-lattice-test.json` |
+| `eight_h_history.py` | When did the "current 8H pattern" emerge? Traces the framework's closure period back through geological time using paleo-LOD data. Output: `data/eight-h-history.json` |
+| `equilibrium_libration_test.py` | Tests the J2000-off-balance / libration hypothesis — is the framework currently librating around equilibrium? Output: `data/l1-libration-test.json` |
+| `lod_oscillation_signature_test.py` | Tests whether LA2004 carries the spectral signature of the framework's bounded-LOD oscillation model — distinguishes it from mainstream monotonic tidal recession. |
+| `paleo_lod_comparison.py` | Paleo-LOD evidence: framework's bounded-oscillator model vs mainstream tidal-dissipation models, tested against published paleontological / sedimentological / cyclostratigraphic data. |
+| `paleo_l1_renumbering.py` | Framework's deep-time prediction: as LOD evolves, both Earth's precession constant k AND the framework's H shift → the L1 integer labels MUST renumber over geological time. Output: `data/paleo-l1-renumbering.json` |
+
+**Sub-lattice + stability scans:**
+
+| Script | Description |
+|--------|-------------|
+| `h8_subband_scan.py` | Granular scan of the H/8 sub-band — which specific integer divisors of 8H resist chaos best. Output: `data/h8-subband-stability.json` |
+| `h_multiple_scan.py` | Scans integer and rational multiples of H = 335,317 yr to find which gives the strongest commensurability (motivated by the empirical 7.51 Myr ≈ 22.4 × H optimum). Output: `data/h-multiple-scan.json` |
+| `l1_invariant_test.py` | Tests the "8H is an invariant manifold" hypothesis. Output: `data/l1-invariant-test.json` |
+| `l1_fibonacci_stability_test.py` | Does the framework's Fibonacci structure predict which L1 integers are dynamically stable vs which drift in Laskar 2004? Output: `data/l1-fibonacci-stability.json` |
+| `stability_sublattice_full_scan.py` | Builds the framework's "stability sub-lattice" and tests whether it reflects the same balance structure as Laws 3, 5, 6. Output: `data/stability-sublattice.json` |
+| `precession_band_disambiguation.py` | Disambiguates what drives the 'drift' in the obliquity precession band across LA2004 50 Myr. |
+
+### Doc 99 — Deep-time canonical 9-step chain
+
+The deep-time extension framework (Architecture α) — canonical 9-step chain from `t_Ma` through LOD, H, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, planet orbital + synodic periods. See [Doc 99](../docs/99-evolving-8H-theory.md).
+
+| Script | Description |
+|--------|-------------|
+| `devonian_cross_check.py` | **Canonical 9-step chain verification at Devonian (t = 380 Ma).** All J2000 values match IAU to ppb precision; produces deep-time predictions for LOD (79,204 s), H (307,391 yr), Moon distance (370,402 km), Moon synodic month (30.33 Devonian days), anomalistic year, stellar/sidereal days, and planet orbital periods. Single source of truth for Architecture α numerics. |
+| `test_evolving_8h_climate_formula.py` | Tests whether using time-evolving 8H(t) improves the climate formula's R² vs the constant 8H_now = 2,682,536 yr. **Result: NULL** (ΔR² < 0.002 in all regimes) — climate formula doesn't benefit from deep-time 8H scaling at Phanerozoic. |
+
+### Framework vs Laskar / N-body comparisons
+
+Direct head-to-head tests against Laskar 2004 secular eigenmode theory + tidal-dissipation models.
+
+| Script | Description |
+|--------|-------------|
+| `framework_vs_laskar_models.py` | Direct comparison: framework's bounded-oscillator models vs LA2004's secular-eigenmode + tidal-dissipation models. |
+| `l1_vs_laskar_eigenmodes.py` | Tests whether the 8H L1 lattice integers correspond to Laskar 2004 secular eigenmode beats — discriminates between framework interpretations. Output: `data/l1-vs-laskar-eigenmodes.json` |
+| `l1_vs_laskar_50myr.py` | Tests whether the 31/32 L1-lattice ↔ Laskar match persists across −50 Myr (forward-integrated). |
+| `l1_vs_laskar_published_50myr.py` | Same test using the **published** Laskar 2004 nominal solution (INSOLN.LA2004.BTL.ASC, 1-kyr Earth orbital elements). Output: `data/l1-vs-laskar-50myr-published.json` |
+| `nbody_50myr_backward.py` | Extends the in-repo 10-Myr forward N-body integration backward to −50 Myr — independent ground truth against the framework's L1 lattice. |
+
 ### Falsifiable Predictions
 
 | Script | Description |
 |--------|-------------|
 | `planet_nine_analysis.py` | Planet Nine prediction — falsifiable test from the Fibonacci balance laws. Two-tier structure: (1) Law-4 compliance pre-check (§3.5) — all candidates fail by 4–7 orders of magnitude; (2) full canonical 7.5M-config v-balance search (§4) — confirms rejection. The closed 8-planet structure forbids a major 9th planet at ETNO distances (Doc 15). |
+| `tno_balance_test.py` | **TNO contribution to Law 5 balance** — tests whether trans-Neptunian objects participate in the framework's v-balance. Two approaches: (a) treat TNOs as a population-summed perturbation, (b) treat individually. |
+| `tno_obliquity_prediction.py` | **Law-4 TNO obliquity predictions** — derives expected TNO axial tilts from Law 4's K-amplitude constant. |
+
+### Browser-Modal Data Exports
+
+One-shot utilities that prepare data for the in-app modals (Climate Formula Explorer, CO₂/temperature record browser). Outputs are committed; no re-runs expected unless source data updates.
+
+| Script | Description |
+|--------|-------------|
+| `export_climate_formula_browser.py` | Exports the canonical 32-component climate formula coefficients (L1+L2+L3 + per-regime amplitudes/phases) → `public/input/climate-formula-data.json` for the Orbital Forcing Formula Explorer modal. |
+| `export_cenogrid_browser.py` | Exports Westerhold 2020 CENOGRID (δ¹⁸O + δ¹³C, 67-Myr) → `public/input/cenogrid-data.json` for the browser modal. |
+| `export_cenco2pip_browser.py` | Exports CenCO2PIP atmospheric CO₂ proxy compilation → `public/input/cenco2pip-data.json`. |
+| `export_epica_browser.py` | Exports EPICA Dome C atmospheric CO₂ (Bereiter 2015, 0–800 kyr) → `public/input/epica-co2-data.json`. |
+| `mass_uncertainty_monte_carlo.py` | Monte Carlo over planetary mass uncertainties → marginalized Law 5 balance distribution. |
 
 ### Regression Tests
 
