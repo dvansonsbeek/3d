@@ -1,0 +1,140 @@
+{
+  "method": "Computed paleo-H(t) = 13 \u00d7 paleo-precession-period(t) where paleo-precession-period scales with paleo-LOD. Used paleo-LOD data points from doc 97 Test C-PaleoLOD compilation (IERS modern, Wells 1963, Williams 2000, Zhou 2022, Lantink 2022, etc.). Computed paleo-8H and compared to current 8H = 2,682,536 yr.",
+  "rows": [
+    {
+      "age_Ma": 0.0,
+      "lod_hr": 24.0,
+      "prec_yr": 25771.5,
+      "paleo_H": 335029.5,
+      "paleo_8H": 2680236.0,
+      "delta_pct": -0.08573976267233692,
+      "source": "IERS modern"
+    },
+    {
+      "age_Ma": 1.0,
+      "lod_hr": 24.0,
+      "prec_yr": 25771.5,
+      "paleo_H": 335029.5,
+      "paleo_8H": 2680236.0,
+      "delta_pct": -0.08573976267233692,
+      "source": "Pleistocene (negligible change)"
+    },
+    {
+      "age_Ma": 3.0,
+      "lod_hr": 23.998,
+      "prec_yr": 25769.352375,
+      "paleo_H": 335001.580875,
+      "paleo_8H": 2680012.647,
+      "delta_pct": -0.09406595102545201,
+      "source": "iNHG era (very small change)"
+    },
+    {
+      "age_Ma": 15.0,
+      "lod_hr": 23.985,
+      "prec_yr": 25755.392812500002,
+      "paleo_H": 334820.1065625,
+      "paleo_8H": 2678560.8525,
+      "delta_pct": -0.14818617532066533,
+      "source": "MMCT era"
+    },
+    {
+      "age_Ma": 34.0,
+      "lod_hr": 23.965,
+      "prec_yr": 25733.9165625,
+      "paleo_H": 334540.9153125,
+      "paleo_8H": 2676327.3225,
+      "delta_pct": -0.2314480588517814,
+      "source": "EOT era"
+    },
+    {
+      "age_Ma": 56.0,
+      "lod_hr": 23.945,
+      "prec_yr": 25712.4403125,
+      "paleo_H": 334261.7240625,
+      "paleo_8H": 2674093.7925,
+      "delta_pct": -0.3147099423828802,
+      "source": "PETM era"
+    },
+    {
+      "age_Ma": 90.0,
+      "lod_hr": 23.5,
+      "prec_yr": 25234.59375,
+      "paleo_H": 328049.71875,
+      "paleo_8H": 2624397.75,
+      "delta_pct": -2.1672868509499965,
+      "source": "Pannella 1972 / Scrutton"
+    },
+    {
+      "age_Ma": 180.0,
+      "lod_hr": 23.05,
+      "prec_yr": 24751.378125,
+      "paleo_H": 321767.91562499997,
+      "paleo_8H": 2574143.3249999997,
+      "delta_pct": -4.0406792303999,
+      "source": "Jurassic, Scrutton 1970"
+    },
+    {
+      "age_Ma": 290.0,
+      "lod_hr": 22.6,
+      "prec_yr": 24268.1625,
+      "paleo_H": 315486.1125,
+      "paleo_8H": 2523888.9,
+      "delta_pct": -5.914071609849787,
+      "source": "Permian, Mazzullo 1971"
+    },
+    {
+      "age_Ma": 380.0,
+      "lod_hr": 22.0,
+      "prec_yr": 23623.875,
+      "paleo_H": 307110.375,
+      "paleo_8H": 2456883.0,
+      "delta_pct": -8.411928115782976,
+      "source": "Devonian, Wells 1963"
+    },
+    {
+      "age_Ma": 440.0,
+      "lod_hr": 21.8,
+      "prec_yr": 23409.1125,
+      "paleo_H": 304318.46249999997,
+      "paleo_8H": 2434547.6999999997,
+      "delta_pct": -9.24454695109405,
+      "source": "Silurian, Wells 1963"
+    },
+    {
+      "age_Ma": 620.0,
+      "lod_hr": 21.9,
+      "prec_yr": 23516.493749999998,
+      "paleo_H": 305714.41874999995,
+      "paleo_8H": 2445715.3499999996,
+      "delta_pct": -8.828237533438521,
+      "source": "Elatina, Williams 2000"
+    },
+    {
+      "age_Ma": 900.0,
+      "lod_hr": 19.4,
+      "prec_yr": 20831.9625,
+      "paleo_H": 270815.5125,
+      "paleo_8H": 2166524.1,
+      "delta_pct": -19.2359729748268,
+      "source": "Big Cottonwood, Sonett 1998"
+    },
+    {
+      "age_Ma": 1400.0,
+      "lod_hr": 18.7,
+      "prec_yr": 20080.29375,
+      "paleo_H": 261043.81875,
+      "paleo_8H": 2088350.55,
+      "delta_pct": -22.150138898415527,
+      "source": "Zhou 2022 cyclostratigraphy"
+    },
+    {
+      "age_Ma": 2500.0,
+      "lod_hr": 17.0,
+      "prec_yr": 18254.8125,
+      "paleo_H": 237312.5625,
+      "paleo_8H": 1898500.5,
+      "delta_pct": -29.227398998559572,
+      "source": "Lantink/Zhou 2022"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "method": "Chirikov resonance overlap test (peak-vs-peak reformulation). Extracted spectral peaks from LA2004 eccentricity and obliquity (Welch PSD, full 51 Myr, period range 14.0-500.0 kyr) with FWHM widths. Computed local Chirikov K = \u03a3(widths)/\u03a3(separations) in \u00b115.0% around each peak. Tagged peaks as L1-aligned (within 3% of any L1 integer) vs non-L1. Compared K distributions.",
+  "n_resonances_used": 36,
+  "n_L1_aligned_peaks": 23,
+  "n_non_L1_peaks": 10,
+  "L1_median_K": 0.5840447308101239,
+  "L1_stable_fraction": 0.9565217391304348,
+  "control_median_K": 0.5157970436745275,
+  "control_stable_fraction": 1.0,
+  "mann_whitney_U": 125.5,
+  "mann_whitney_p": 0.6671643609603694,
+  "L1_in_control_bottom_quartile": 8,
+  "verdict": "NULL BUT INFORMATIVE \u2014 ALL spectral peaks are KAM-stable: L1-aligned 96% stable, non-L1 100% stable, Mann-Whitney p=0.667. This says KAM theory is the GENERAL property of LA2004's spectrum (which is what we'd expect for a quasi-periodic Hamiltonian solution), but it does NOT single out L1 from the broader set of stable peaks. L1 captures 23/33=70% of the stable spectral peaks, but the remaining 10 non-L1 peaks are ALSO KAM-stable. The mechanism that singles out L1 must be more specific than KAM stability \u2014 likely the 8H quantization itself (periodicity in action-angle space) rather than resonance-overlap protection."
+}

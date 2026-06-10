@@ -1,0 +1,80 @@
+{
+  "method": "Compare R\u00b2 between constant 8H_now and time-warped 8H(t)",
+  "results": [
+    {
+      "regime": "post-mpt",
+      "n_points": 801,
+      "window_kyr": [
+        0,
+        1000
+      ],
+      "r2_const_l1": 0.8810989613112075,
+      "r2_const_total": 0.8845752161805875,
+      "r2_warp_l1": 0.8811042515982092,
+      "r2_warp_total": 0.8850039139247439,
+      "delta_r2_l1": 5.290287001691318e-06,
+      "delta_r2_total": 0.00042869774415632556,
+      "max_time_shift_kyr": 0.020833912056787085
+    },
+    {
+      "regime": "inhg-mpt",
+      "n_points": 731,
+      "window_kyr": [
+        1000,
+        2700
+      ],
+      "r2_const_l1": 0.5627166225888932,
+      "r2_const_total": 0.5750190087714127,
+      "r2_warp_l1": 0.5627454864327615,
+      "r2_warp_total": 0.5764304719325353,
+      "delta_r2_l1": 2.8863843868243144e-05,
+      "delta_r2_total": 0.001411463161122617,
+      "max_time_shift_kyr": 0.13105247953080834
+    },
+    {
+      "regime": "pre-inhg",
+      "n_points": 585,
+      "window_kyr": [
+        2700,
+        5320
+      ],
+      "r2_const_l1": 0.25391749022514765,
+      "r2_const_total": 0.29633148560103817,
+      "r2_warp_l1": 0.2543255269996303,
+      "r2_warp_total": 0.29664682809512477,
+      "delta_r2_l1": 0.0004080367744826452,
+      "delta_r2_total": 0.0003153424940866012,
+      "max_time_shift_kyr": 0.43783409095522074
+    },
+    {
+      "regime": "lr04-full",
+      "n_points": 2115,
+      "window_kyr": [
+        0,
+        5320
+      ],
+      "r2_const_l1": 0.16266255732087487,
+      "r2_const_total": 0.5419239771046027,
+      "r2_warp_l1": 0.16275764700518103,
+      "r2_warp_total": 0.5419448046666,
+      "delta_r2_l1": 9.508968430615994e-05,
+      "delta_r2_total": 2.0827561997283084e-05,
+      "max_time_shift_kyr": 0.5897204825514564
+    },
+    {
+      "regime": "(0, 66000)",
+      "n_points": 23409,
+      "window_kyr": [
+        0,
+        66000
+      ],
+      "r2_const_l1": 0.0010484425284253973,
+      "r2_const_total": 0.49605499708131673,
+      "r2_warp_l1": 0.0011758945657549535,
+      "r2_warp_total": 0.4960202290131567,
+      "delta_r2_l1": 0.00012745203732955623,
+      "delta_r2_total": -3.476806816005151e-05,
+      "max_time_shift_kyr": 159.86890414908703
+    }
+  ]
+}

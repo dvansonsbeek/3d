@@ -1,0 +1,125 @@
+{
+  "method": "Test if solar activity spectral peaks sit on 8H/N integer divisors. Peaks identified via Welch PSD. Each peak period P \u2192 n_real = 8H/P. Lattice fit = fractional error to nearest integer. Joint test vs Monte Carlo null (random periods in same range).",
+  "constants": {
+    "H_yr": 335317,
+    "8H_yr": 2682536
+  },
+  "canonical_cycles": [
+    {
+      "name": "Schwabe",
+      "period_yr": 11.07,
+      "n_real": 242324.84191508582,
+      "n_nearest_integer": 242325,
+      "fractional_error": 6.523673338514833e-07
+    },
+    {
+      "name": "Hale",
+      "period_yr": 22.14,
+      "n_real": 121162.42095754291,
+      "n_nearest_integer": 121162,
+      "fractional_error": 3.4743363671136136e-06
+    },
+    {
+      "name": "Gleissberg",
+      "period_yr": 88.0,
+      "n_real": 30483.363636363636,
+      "n_nearest_integer": 30483,
+      "fractional_error": 1.1929152761737129e-05
+    },
+    {
+      "name": "Suess (de Vries)",
+      "period_yr": 210.0,
+      "n_real": 12773.980952380953,
+      "n_nearest_integer": 12774,
+      "fractional_error": 1.4911240838689423e-06
+    },
+    {
+      "name": "Eddy",
+      "period_yr": 1000.0,
+      "n_real": 2682.536,
+      "n_nearest_integer": 2683,
+      "fractional_error": 0.00017294073797985158
+    },
+    {
+      "name": "Hallstatt (Bray)",
+      "period_yr": 2300.0,
+      "n_real": 1166.32,
+      "n_nearest_integer": 1166,
+      "fractional_error": 0.0002744425385934274
+    }
+  ],
+  "silso_peaks": [
+    {
+      "period_yr": 10.75199999997858,
+      "power": 71836.73506913362,
+      "n_real": 249491.8154766875,
+      "n_nearest_integer": 249492,
+      "fractional_error": 7.395961092594744e-07,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    }
+  ],
+  "steinhilber_peaks": [
+    {
+      "period_yr": 213.99999999999997,
+      "power": 3106207.594506433,
+      "n_real": 12535.21495327103,
+      "n_nearest_integer": 12535,
+      "fractional_error": 1.7148246591944664e-05,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    },
+    {
+      "period_yr": 470.8,
+      "power": 2339772.615239601,
+      "n_real": 5697.824978759558,
+      "n_nearest_integer": 5698,
+      "fractional_error": 3.0716258413868024e-05,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    },
+    {
+      "period_yr": 784.6666666666666,
+      "power": 1813857.179058819,
+      "n_real": 3418.694987255735,
+      "n_nearest_integer": 3419,
+      "fractional_error": 8.921109805931159e-05,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    },
+    {
+      "period_yr": 147.125,
+      "power": 1360615.9845362331,
+      "n_real": 18233.039932030588,
+      "n_nearest_integer": 18233,
+      "fractional_error": 2.1900965605115103e-06,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    },
+    {
+      "period_yr": 87.18518518518518,
+      "power": 828970.608534472,
+      "n_real": 30768.254885301616,
+      "n_nearest_integer": 30768,
+      "fractional_error": 8.284103666667114e-06,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    },
+    {
+      "period_yr": 102.34782608695652,
+      "power": 336313.92184189835,
+      "n_real": 26209.99490229397,
+      "n_nearest_integer": 26210,
+      "fractional_error": 1.944946978610394e-07,
+      "on_lattice_pct1": "True",
+      "on_lattice_pct5": "True"
+    }
+  ],
+  "joint_test": {
+    "observed_mean_fractional_error": 2.4714899900260396e-05,
+    "null_mean_fractional_error": 5.262520308713286e-05,
+    "null_p5": 1.4075137398567031e-05,
+    "null_p25": 2.888736406682538e-05,
+    "p_value": 0.1886
+  }
+}

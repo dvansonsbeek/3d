@@ -1,0 +1,538 @@
+{
+  "method": "Test L1 lattice integers against Laskar 2004 secular eigenmode beats (analytical) and against actual 10-Myr N-body Earth eccentricity/inclination spectra (numerical), plus 5-Myr stability test.",
+  "test1_analytical": [
+    {
+      "n": 9,
+      "lattice_period_yr": 298059.55555555556,
+      "best_laskar_beat": "g2-g7",
+      "laskar_period_yr": 296873.21039972507,
+      "fractional_error": 0.003996134087791687,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 12,
+      "lattice_period_yr": 223544.66666666666,
+      "best_laskar_beat": "s1+s5",
+      "laskar_period_yr": 231016.04278074866,
+      "fractional_error": 0.03234137345679013,
+      "category": "incl-beat"
+    },
+    {
+      "n": 14,
+      "lattice_period_yr": 191609.7142857143,
+      "best_laskar_beat": "g2-g8",
+      "laskar_period_yr": 191139.16583092444,
+      "fractional_error": 0.002461810758377403,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 16,
+      "lattice_period_yr": 167658.5,
+      "best_laskar_beat": "s2+s8",
+      "laskar_period_yr": 167182.6625386997,
+      "fractional_error": 0.0028462129629629697,
+      "category": "incl-beat"
+    },
+    {
+      "n": 18,
+      "lattice_period_yr": 149029.77777777778,
+      "best_laskar_beat": "g1+g7",
+      "laskar_period_yr": 149351.77182368192,
+      "fractional_error": 0.002155943930041024,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 20,
+      "lattice_period_yr": 134126.8,
+      "best_laskar_beat": "g1+g5",
+      "laskar_period_yr": 131607.00685453162,
+      "fractional_error": 0.01914634490740724,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 21,
+      "lattice_period_yr": 127739.80952380953,
+      "best_laskar_beat": "s2+s7",
+      "laskar_period_yr": 128955.22388059701,
+      "fractional_error": 0.009425088183421472,
+      "category": "incl-beat"
+    },
+    {
+      "n": 22,
+      "lattice_period_yr": 121933.45454545454,
+      "best_laskar_beat": "s2-s4",
+      "laskar_period_yr": 121178.12061711079,
+      "fractional_error": 0.006233253367003422,
+      "category": "incl-beat"
+    },
+    {
+      "n": 25,
+      "lattice_period_yr": 107301.44,
+      "best_laskar_beat": "s1-s4",
+      "laskar_period_yr": 106710.58048579663,
+      "fractional_error": 0.005537028395061708,
+      "category": "incl-beat"
+    },
+    {
+      "n": 28,
+      "lattice_period_yr": 95804.85714285714,
+      "best_laskar_beat": "g4-g5",
+      "laskar_period_yr": 94885.96844455833,
+      "fractional_error": 0.009684136794532729,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 30,
+      "lattice_period_yr": 89417.86666666667,
+      "best_laskar_beat": "g3-g7",
+      "laskar_period_yr": 90753.12489058508,
+      "fractional_error": 0.01471308261316889,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 31,
+      "lattice_period_yr": 86533.41935483871,
+      "best_laskar_beat": "g4-g7",
+      "laskar_period_yr": 87399.26492902181,
+      "fractional_error": 0.009906783253683701,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 35,
+      "lattice_period_yr": 76643.88571428572,
+      "best_laskar_beat": "s4-s8",
+      "laskar_period_yr": 75953.81820312959,
+      "fractional_error": 0.009085356437389676,
+      "category": "incl-beat"
+    },
+    {
+      "n": 38,
+      "lattice_period_yr": 70593.05263157895,
+      "best_laskar_beat": "s4+s8",
+      "laskar_period_yr": 70255.32606927956,
+      "fractional_error": 0.004807131091617899,
+      "category": "incl-beat"
+    },
+    {
+      "n": 39,
+      "lattice_period_yr": 68782.97435897436,
+      "best_laskar_beat": "s3+s5",
+      "laskar_period_yr": 68753.31564986736,
+      "fractional_error": 0.00043137860082320516,
+      "category": "incl-beat"
+    },
+    {
+      "n": 48,
+      "lattice_period_yr": 55886.166666666664,
+      "best_laskar_beat": "s6-s7",
+      "laskar_period_yr": 55486.57789955902,
+      "fractional_error": 0.007201539223250914,
+      "category": "incl-beat"
+    },
+    {
+      "n": 50,
+      "lattice_period_yr": 53650.72,
+      "best_laskar_beat": "k+s6",
+      "laskar_period_yr": 53713.30523331718,
+      "fractional_error": 0.0011651718888890596,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 53,
+      "lattice_period_yr": 50613.88679245283,
+      "best_laskar_beat": "s6-s8",
+      "laskar_period_yr": 50516.46852465406,
+      "fractional_error": 0.001928445725599882,
+      "category": "incl-beat"
+    },
+    {
+      "n": 65,
+      "lattice_period_yr": 41269.78461538462,
+      "best_laskar_beat": "g6+g7",
+      "laskar_period_yr": 41362.14215044841,
+      "fractional_error": 0.002232900189933463,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 66,
+      "lattice_period_yr": 40644.48484848485,
+      "best_laskar_beat": "s1+s6",
+      "laskar_period_yr": 40554.49510279438,
+      "fractional_error": 0.0022189832585109612,
+      "category": "incl-beat"
+    },
+    {
+      "n": 68,
+      "lattice_period_yr": 39449.05882352941,
+      "best_laskar_beat": "k+s4",
+      "laskar_period_yr": 39608.680902564476,
+      "fractional_error": 0.004029977151416036,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 73,
+      "lattice_period_yr": 36747.068493150684,
+      "best_laskar_beat": "g3+g4",
+      "laskar_period_yr": 36730.52941843329,
+      "fractional_error": 0.00045028141383377277,
+      "category": "ecc-beat"
+    },
+    {
+      "n": 76,
+      "lattice_period_yr": 35296.52631578947,
+      "best_laskar_beat": "s3+s4",
+      "laskar_period_yr": 35404.99931703319,
+      "fractional_error": 0.003063776397010918,
+      "category": "incl-beat"
+    },
+    {
+      "n": 96,
+      "lattice_period_yr": 27943.083333333332,
+      "best_laskar_beat": "k-g5",
+      "laskar_period_yr": 28041.265665028044,
+      "fractional_error": 0.003501351646090681,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 107,
+      "lattice_period_yr": 25070.429906542056,
+      "best_laskar_beat": "k-s8",
+      "laskar_period_yr": 25328.77571720891,
+      "fractional_error": 0.010199695932848791,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 110,
+      "lattice_period_yr": 24386.69090909091,
+      "best_laskar_beat": "k-s7",
+      "laskar_period_yr": 24240.111773848734,
+      "fractional_error": 0.006046966144781246,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 113,
+      "lattice_period_yr": 23739.256637168142,
+      "best_laskar_beat": "k+g5",
+      "laskar_period_yr": 23678.75818068208,
+      "fractional_error": 0.002554967453293951,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 120,
+      "lattice_period_yr": 22354.466666666667,
+      "best_laskar_beat": "k+g2",
+      "laskar_period_yr": 22372.56184822219,
+      "fractional_error": 0.0008088113323044186,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 134,
+      "lattice_period_yr": 20018.925373134327,
+      "best_laskar_beat": "k+g3",
+      "laskar_period_yr": 19102.900663442564,
+      "fractional_error": 0.047952126529389835,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 141,
+      "lattice_period_yr": 19025.078014184397,
+      "best_laskar_beat": "k-s4",
+      "laskar_period_yr": 18994.549326470285,
+      "fractional_error": 0.0016072341169773182,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 152,
+      "lattice_period_yr": 17648.263157894737,
+      "best_laskar_beat": "k-s6",
+      "laskar_period_yr": 16870.14543991898,
+      "fractional_error": 0.04612394841211842,
+      "category": "obliq/precession"
+    },
+    {
+      "n": 185,
+      "lattice_period_yr": 14500.194594594595,
+      "best_laskar_beat": "k+g6",
+      "laskar_period_yr": 16463.289151759516,
+      "fractional_error": 0.11924072638638646,
+      "category": "obliq/precession"
+    }
+  ],
+  "test1_summary": {
+    "median_err": 0.004418554121516967,
+    "n_match_1pct": 25,
+    "n_match_5pct": 31,
+    "n_match_10pct": 31
+  },
+  "test2_nbody_spectra": {
+    "ecc_Earth": [
+      {
+        "rank": 1,
+        "peak_period_yr": 425411.4630435477,
+        "nearest_L1_n": 9,
+        "L1_period_yr": 298059.55555555556,
+        "L1_err": 0.29936172047849974,
+        "nearest_laskar_beat": "s5+s7",
+        "laskar_period_yr": 433444.8160535117,
+        "laskar_err": 0.018883724835458058
+      },
+      {
+        "rank": 2,
+        "peak_period_yr": 96589.73758143964,
+        "nearest_L1_n": 28,
+        "L1_period_yr": 95804.85714285714,
+        "L1_err": 0.00812591956698008,
+        "nearest_laskar_beat": "s1-s3",
+        "laskar_period_yr": 97885.19637462235,
+        "laskar_err": 0.013411971350377111
+      },
+      {
+        "rank": 3,
+        "peak_period_yr": 101492.78985884319,
+        "nearest_L1_n": 28,
+        "L1_period_yr": 95804.85714285714,
+        "L1_err": 0.056042727014370707,
+        "nearest_laskar_beat": "s1+s2",
+        "laskar_period_yr": 102288.87134964483,
+        "laskar_err": 0.007843724582887538
+      },
+      {
+        "rank": 4,
+        "peak_period_yr": 127350.95726620952,
+        "nearest_L1_n": 21,
+        "L1_period_yr": 127739.80952380953,
+        "L1_err": 0.003053390928088344,
+        "nearest_laskar_beat": "s2+s7",
+        "laskar_period_yr": 128955.22388059701,
+        "laskar_err": 0.012597208916411981
+      },
+      {
+        "rank": 5,
+        "peak_period_yr": 54479.67844125763,
+        "nearest_L1_n": 50,
+        "L1_period_yr": 53650.72,
+        "L1_err": 0.01521592022888771,
+        "nearest_laskar_beat": "g5-g6",
+        "laskar_period_yr": 54027.01350675338,
+        "laskar_err": 0.008308876767551711
+      },
+      {
+        "rank": 6,
+        "peak_period_yr": 77797.90134002145,
+        "nearest_L1_n": 35,
+        "L1_period_yr": 76643.88571428572,
+        "L1_err": 0.014833505864020935,
+        "nearest_laskar_beat": "g3-g8",
+        "laskar_period_yr": 77626.17247864681,
+        "laskar_err": 0.002207371386846046
+      },
+      {
+        "rank": 7,
+        "peak_period_yr": 178519.11811979857,
+        "nearest_L1_n": 16,
+        "L1_period_yr": 167658.5,
+        "L1_err": 0.0608372830550863,
+        "nearest_laskar_beat": "g5+g7",
+        "laskar_period_yr": 176446.56228727024,
+        "laskar_err": 0.011609713594582668
+      },
+      {
+        "rank": 8,
+        "peak_period_yr": 61143.875595817924,
+        "nearest_L1_n": 48,
+        "L1_period_yr": 55886.166666666664,
+        "L1_err": 0.08598913428233641,
+        "nearest_laskar_beat": "g4+g7",
+        "laskar_period_yr": 61704.00171400005,
+        "laskar_err": 0.009160788594507014
+      },
+      {
+        "rank": 9,
+        "peak_period_yr": 243831.62786159458,
+        "nearest_L1_n": 12,
+        "L1_period_yr": 223544.66666666666,
+        "L1_err": 0.08320069620518364,
+        "nearest_laskar_beat": "s1+s5",
+        "laskar_period_yr": 231016.04278074866,
+        "laskar_err": 0.05255915810938355
+      },
+      {
+        "rank": 10,
+        "peak_period_yr": 49125.399764349444,
+        "nearest_L1_n": 53,
+        "L1_period_yr": 50613.88679245283,
+        "L1_err": 0.03029974382383734,
+        "nearest_laskar_beat": "s5+s6",
+        "laskar_period_yr": 49189.661061980485,
+        "laskar_err": 0.0013081073729536517
+      },
+      {
+        "rank": 11,
+        "peak_period_yr": 66205.46811096504,
+        "nearest_L1_n": 39,
+        "L1_period_yr": 68782.97435897436,
+        "L1_err": 0.03893192392642306,
+        "nearest_laskar_beat": "s3+s8",
+        "laskar_period_yr": 66318.69818851704,
+        "laskar_err": 0.0017102828630743364
+      },
+      {
+        "rank": 12,
+        "peak_period_yr": 37939.33349970064,
+        "nearest_L1_n": 73,
+        "L1_period_yr": 36747.068493150684,
+        "L1_err": 0.031425565411141505,
+        "nearest_laskar_beat": "g1+g6",
+        "laskar_period_yr": 38302.965819922865,
+        "laskar_err": 0.009584573229919704
+      }
+    ],
+    "inc_Earth": [
+      {
+        "rank": 1,
+        "peak_period_yr": 69665.69386051878,
+        "nearest_L1_n": 39,
+        "L1_period_yr": 68782.97435897436,
+        "L1_err": 0.012670791786151638,
+        "nearest_laskar_beat": "g4+g8",
+        "laskar_period_yr": 69720.1510603273,
+        "laskar_err": 0.0007816932092510527
+      },
+      {
+        "rank": 2,
+        "peak_period_yr": 229818.1870434128,
+        "nearest_L1_n": 12,
+        "L1_period_yr": 223544.66666666666,
+        "L1_err": 0.027297754183227732,
+        "nearest_laskar_beat": "s1+s5",
+        "laskar_period_yr": 231016.04278074866,
+        "laskar_err": 0.005212188611989998
+      },
+      {
+        "rank": 3,
+        "peak_period_yr": 72180.70812339899,
+        "nearest_L1_n": 38,
+        "L1_period_yr": 70593.05263157895,
+        "L1_err": 0.021995565478601445,
+        "nearest_laskar_beat": "g3+g8",
+        "laskar_period_yr": 71837.9654778666,
+        "laskar_err": 0.004748396828504926
+      },
+      {
+        "rank": 4,
+        "peak_period_yr": 98980.58213972741,
+        "nearest_L1_n": 28,
+        "L1_period_yr": 95804.85714285714,
+        "L1_err": 0.03208432329067541,
+        "nearest_laskar_beat": "g3-g5",
+        "laskar_period_yr": 98852.06513862936,
+        "laskar_err": 0.0012984061956377265
+      },
+      {
+        "rank": 5,
+        "peak_period_yr": 196021.12972967676,
+        "nearest_L1_n": 14,
+        "L1_period_yr": 191609.7142857143,
+        "L1_err": 0.02250479552916585,
+        "nearest_laskar_beat": "g2-g8",
+        "laskar_period_yr": 191139.16583092444,
+        "laskar_err": 0.0249052941664238
+      },
+      {
+        "rank": 6,
+        "peak_period_yr": 104135.84227523701,
+        "nearest_L1_n": 25,
+        "L1_period_yr": 107301.44,
+        "L1_err": 0.03039873357336599,
+        "nearest_laskar_beat": "g1-g4",
+        "laskar_period_yr": 105143.59889664124,
+        "laskar_err": 0.009677327223615018
+      },
+      {
+        "rank": 7,
+        "peak_period_yr": 49736.413415298586,
+        "nearest_L1_n": 53,
+        "L1_period_yr": 50613.88679245283,
+        "L1_err": 0.01764247393207368,
+        "nearest_laskar_beat": "s2+s3",
+        "laskar_period_yr": 50019.297568506365,
+        "laskar_err": 0.005687666918112864
+      },
+      {
+        "rank": 8,
+        "peak_period_yr": 53747.4231238675,
+        "nearest_L1_n": 50,
+        "L1_period_yr": 53650.72,
+        "L1_err": 0.001799214143618254,
+        "nearest_laskar_beat": "k+s6",
+        "laskar_period_yr": 53713.30523331718,
+        "laskar_err": 0.0006347818847368656
+      },
+      {
+        "rank": 9,
+        "peak_period_yr": 170890.04380809917,
+        "nearest_L1_n": 16,
+        "L1_period_yr": 167658.5,
+        "L1_err": 0.018910076538619376,
+        "nearest_laskar_beat": "s3-s6",
+        "laskar_period_yr": 172869.14765906363,
+        "laskar_err": 0.011581153628744397
+      },
+      {
+        "rank": 10,
+        "peak_period_yr": 35262.83353250109,
+        "nearest_L1_n": 76,
+        "L1_period_yr": 35296.52631578947,
+        "L1_err": 0.0009554757775584646,
+        "nearest_laskar_beat": "s3+s4",
+        "laskar_period_yr": 35404.99931703319,
+        "laskar_err": 0.004031604108077804
+      },
+      {
+        "rank": 11,
+        "peak_period_yr": 277697.50805645075,
+        "nearest_L1_n": 9,
+        "L1_period_yr": 298059.55555555556,
+        "L1_err": 0.0733245596678728,
+        "nearest_laskar_beat": "g1-g8",
+        "laskar_period_yr": 263553.9106031643,
+        "laskar_err": 0.05093166860687613
+      },
+      {
+        "rank": 12,
+        "peak_period_yr": 34061.37249005649,
+        "nearest_L1_n": 76,
+        "L1_period_yr": 35296.52631578947,
+        "L1_err": 0.03626259705458312,
+        "nearest_laskar_beat": "s3+s4",
+        "laskar_period_yr": 35404.99931703319,
+        "laskar_err": 0.03944723094669597
+      }
+    ]
+  },
+  "test3_stability": {
+    "peaks_0_5_Myr_kyr": [
+      95.68438989833233,
+      129.85747508737282,
+      192.28919371284556,
+      175.4216613721326,
+      54.939618638244994,
+      77.21247141709412,
+      80.31337886701485,
+      87.32766002061963
+    ],
+    "peaks_5_10_Myr_kyr": [
+      95.68474853678029,
+      129.8581393536319,
+      192.29065763911592,
+      80.31363050263306,
+      54.93973500107165,
+      175.422878500737,
+      149.24012480219747,
+      62.6898835185853
+    ],
+    "median_drift_pct": 0.0006026825722321911,
+    "verdict": "\u2713 Stable: peaks shift by <2% over 5 Myr. Lattice plausibly fixed on Myr scales."
+  },
+  "verdict": "\u2713 STRONG: L1 integers map well onto Laskar's beat structure AND are stable on Myr scales. Lattice has dynamical reality."
+}

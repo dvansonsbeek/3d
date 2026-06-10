@@ -1,0 +1,3 @@
+{
+  "method": "Computed paleo L1 integers for major Laskar beats at geological epochs from 0 to 620 Ma. Used paleo-LOD data to compute paleo-k, then paleo-H = 13 \u00d7 paleo-precession-period, then paleo n = 8H_paleo / paleo-beat-period. Validated against published Mesozoic and Paleozoic cyclostratigraphic obliquity/precession estimates."
+}

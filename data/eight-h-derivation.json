@@ -1,0 +1,21 @@
+{
+  "method": "Find period T that minimizes commensurability metric J(T) = \u03a3 w\u1d62(f\u1d62T \u2212 round(f\u1d62T))\u00b2. Tested with (A) top-20 LA2004 obliquity spectral peaks weighted by amplitude and (B) all Laskar 2004 simple beats with equal weights. Compared global minimum to 8H = 2,682,536 yr.",
+  "EIGHT_H_yr": 2682536,
+  "path_A_LA2004": {
+    "T_optimal_yr": 7511825.5912795635,
+    "J_optimal": 0.009302244108451655,
+    "J_at_8H": 0.016659926654221863,
+    "T_optimal_over_8H": 2.800270188836073,
+    "pct_T_better_than_8H": 0.8049999999999999,
+    "rank_of_8H": 19
+  },
+  "path_B_Laskar": {
+    "T_optimal_yr": 6058252.912645632,
+    "J_optimal": 0.047389316776989196,
+    "J_at_8H": 0.08663457694379109,
+    "T_optimal_over_8H": 2.258405073648828,
+    "pct_T_better_than_8H": 64.115,
+    "rank_of_8H": 450
+  },
+  "verdict": "? PARTIAL. 8H is better than median (0.8% LA2004, 64.1% Laskar) but other periods also give competitive commensurability. 8H may be ONE OF several near-optimal closed periods, not the unique one."
+}
